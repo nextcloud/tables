@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+    <id>tables</id>
+    <name>Tables</name>
+    <summary>App for working with tables.</summary>
+    <description><![CDATA[This app provides basic functions to manage data within tables.]]></description>
+    <version>0.0.1</version>
+    <licence>agpl</licence>
+    <author mail="flost-dev@mailbox.org" >Florian Steffens</author>
+    <namespace>Tables</namespace>
+    <category>office</category>
+    <dependencies>
+        <nextcloud min-version="21" max-version="22"/>
+    </dependencies>
+    <navigations>
+        <navigation>
+            <name>Tables</name>
+            <route>tables.page.index</route>
+        </navigation>
+    </navigations>
+</info>

@@ -1,0 +1,47 @@
+{
+	"name": "tables",
+	"description": "This app provides basic functions to manage data within tables.",
+	"version": "0.0.1",
+	"author": "Florian Steffens <flost-dev@mailbox.org",
+	"bugs": {
+		"url": "https://github.com/datenangebot"
+	},
+	"repository": {
+		"url": "https://github.com/datenangebot",
+		"type": "git"
+	},
+	"url": "https://github.com/datenangebot",
+	"license": "agpl",
+	"private": true,
+	"scripts": {
+		"build": "NODE_ENV=production webpack --progress --config webpack.js",
+		"dev": "NODE_ENV=development webpack --progress --config webpack.js",
+		"watch": "NODE_ENV=development webpack --progress --watch --config webpack.js",
+		"serve": "NODE_ENV=development webpack serve --progress --config webpack.js",
+		"lint": "eslint --ext .js,.vue src",
+		"lint:fix": "eslint --ext .js,.vue src --fix",
+		"stylelint": "stylelint css/*.css css/*.scss src/**/*.scss src/**/*.vue",
+		"stylelint:fix": "stylelint css/*.css css/*.scss src/**/*.scss src/**/*.vue --fix"
+	},
+	"dependencies": {
+		"@nextcloud/axios": "^1.6.0",
+		"@nextcloud/dialogs": "^3.1.2",
+		"@nextcloud/router": "^1.2.0",
+		"@nextcloud/vue": "^4.1.0",
+		"vue": "^2.6.14"
+	},
+	"browserslist": [
+		"extends @nextcloud/browserslist-config"
+	],
+	"engines": {
+		"node": ">=14.0.0",
+		"npm": ">=7.0.0"
+	},
+	"devDependencies": {
+		"@nextcloud/babel-config": "^1.0.0",
+		"@nextcloud/browserslist-config": "^2.1.0",
+		"@nextcloud/eslint-config": "^6.1.0",
+		"@nextcloud/stylelint-config": "^1.0.0-beta.0",
+		"@nextcloud/webpack-vue-config": "^4.1.0"
+	}
+}
