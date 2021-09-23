@@ -1,0 +1,104 @@
+/* ===== GENERAL ================================ */
+.row {
+    width: 100%;
+}
+
+.row::after {
+    content: '';
+    clear: both;
+    display: table;
+}
+
+
+/* ===== SHOW DETAILS ON HOVER =================== */
+.row:hover .hideIfNoHover {
+    visibility: visible;
+}
+
+.showIfHover:hover .hideIfNoHover {
+    visibility: visible;
+}
+
+.hideIfNoHover {
+    visibility: hidden;
+}
+
+/* ===== COLS ================================== */
+/* normal cols */
+.col-1 { width: calc(25% - 20px); }
+.col-2 { width: calc(50% - 20px); }
+.col-3 { width: calc(75% - 20px); }
+.col-4 { width: calc(100% - 20px); }
+
+[class*='col-'] {
+    float: left;
+    position: relative;
+    padding: 0 20px 20px 0;
+    display: flex;
+}
+
+.floatReverse [class*='col-'] {
+    float: right;
+}
+
+/* cols with fix relative width */
+.fix-col-1 { width: 25%; }
+.fix-col-2 { width: 50%; }
+.fix-col-3 { width: 75%; }
+.fix-col-4 { width: 100%; }
+
+[class*='fix-col-'] {
+    float: left;
+    position: relative;
+    padding: 0;
+    display: flex;
+}
+
+.floatReverse [class*='fix-col-'] {
+    float: right;
+}
+
+
+/* ===== BOXES ========================== */
+/* boxes, fixed width */
+.box-1 { width: 150px; }
+.box-2 { width: 200px; }
+.box-3 { width: 250px; }
+.box-4 { width: 300px; }
+
+.box-1 h4, .box-2 h4, .box-3 h4, .box-4 h4 {
+    line-break: anywhere;
+}
+
+[class*='box-'] {
+    margin-right: 20px;
+    margin-bottom: 20px;
+    background-color: var(--color-background-darker);
+    padding: 15px;
+    float: left;
+    position: relative;
+}
+
+/* ===== HIDE COMPONENTS ON SMALL SCREENS ============== */
+@media only screen and (max-width: 1025px) {
+    .hide-m {
+        display: none;
+    }
+    .col-3 { width: calc(100% - 20px); }
+}
+
+@media only screen and (max-width: 641px) {
+    .hide-s {
+        display: none;
+    }
+    .col-1 { width: calc(50% - 20px); }
+    .col-2 { width: calc(100% - 0px); }
+}
+
+@media only screen and (max-width: 460px) {
+    .hide-xs {
+        display: none;
+    }
+    .col-1 { width: 100%; padding-left: 0; padding-right: 0; }
+    .col-3 { width: 100%; padding-left: 0; padding-right: 0; }
+}

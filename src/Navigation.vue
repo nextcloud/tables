@@ -1,10 +1,6 @@
 <template>
 	<AppNavigation>
-		<AppNavigationNew v-if="!loading"
-			:text="t('tables', 'New table')"
-			:disabled="false"
-			button-class="icon-add"
-			@click="showModalAddNewTable = true" />
+		<CreateTable />
 		<ul>
 			<AppNavigationItem v-for="table in tables"
 				:key="table.id"
@@ -22,8 +18,6 @@
 				</template>
 			</AppNavigationItem>
 		</ul>
-		<Modal
-			v-if="showModalAddNewTable" />
 	</AppNavigation>
 </template>
 
@@ -34,8 +28,7 @@ import { showError } from '@nextcloud/dialogs'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import AppNavigation from '@nextcloud/vue/dist/Components/AppNavigation'
 import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
-import AppNavigationNew from '@nextcloud/vue/dist/Components/AppNavigationNew'
-import Modal from '@nextcloud/vue/dist/Components/Modal'
+import CreateTable from './modals/CreateTable'
 
 export default {
 	name: 'Navigation',
@@ -43,8 +36,7 @@ export default {
 		ActionButton,
 		AppNavigation,
 		AppNavigationItem,
-		AppNavigationNew,
-		Modal,
+		CreateTable,
 	},
 	data() {
 		return {

@@ -22,6 +22,8 @@ class PageController extends Controller {
 	public function index(): TemplateResponse
     {
 		Util::addScript(Application::APP_ID, 'tables-main');
+        Util::addStyle(Application::APP_ID, 'grid');
+        Util::addStyle(Application::APP_ID, 'style');
 
 		return new TemplateResponse(Application::APP_ID, 'main');
 	}
