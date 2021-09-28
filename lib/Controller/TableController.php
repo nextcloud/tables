@@ -43,12 +43,12 @@ class TableController extends Controller {
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
-	public function create(string $title, string $content): DataResponse {
-		return new DataResponse($this->service->create($title, $content,
-			$this->userId));
+    /**
+     * @NoAdminRequired
+     * @throws Exception
+     */
+	public function create(string $title): DataResponse {
+		return new DataResponse($this->service->create($title, $this->userId));
 	}
 
 	/**

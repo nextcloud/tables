@@ -24,6 +24,8 @@ class PageController extends Controller {
 		Util::addScript(Application::APP_ID, 'tables-main');
         Util::addStyle(Application::APP_ID, 'grid');
         Util::addStyle(Application::APP_ID, 'style');
+        Util::addStyle(Application::APP_ID, 'tabulator_nextcloud');
+        Util::addStyle(Application::APP_ID, 'modal');
 
 		return new TemplateResponse(Application::APP_ID, 'main');
 	}

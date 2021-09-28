@@ -1,0 +1,38 @@
+.modal-container {
+    overflow: auto !important;
+}
+
+.modal__content {
+    width: 50vw;
+    padding: 20px;
+    min-height: 50vh;
+    max-height: 80vh;
+}
+
+@media only screen and (max-width: 1025px) {
+    .modal__content {
+        width: calc(100% - 40px);
+    }
+}
+
+@media only screen and (max-width: 641px) {
+    .modal__content {
+        width: calc(100% - 40px);
+        max-height: 90vh !important;
+    }
+
+    .modal-wrapper .prev, .modal-wrapper .next {
+        min-width: 20px !important;
+    }
+}
+
+@media only screen and (max-width: 460px) {
+    .modal__content {
+        width: calc(100% - 40px);
+        max-height: 90% !important;
+    }
+
+    .modal-wrapper .prev, .modal-wrapper .next {
+        min-width: 10px !important;
+    }
+}

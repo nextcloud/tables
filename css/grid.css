@@ -1,6 +1,11 @@
 /* ===== GENERAL ================================ */
 .row {
     width: 100%;
+    margin-bottom: 20px;
+}
+
+.row-with-margin {
+    margin: 50px;
 }
 
 .row::after {
@@ -30,10 +35,10 @@
 .col-3 { width: calc(75% - 20px); }
 .col-4 { width: calc(100% - 20px); }
 
-[class*='col-'] {
+.row > [class*='col-'], .row-with-margin > [class*='col-'] {
     float: left;
     position: relative;
-    padding: 0 20px 20px 0;
+    padding: 0 20px 0 0;
     display: flex;
 }
 
@@ -66,6 +71,11 @@
 .box-3 { width: 250px; }
 .box-4 { width: 300px; }
 
+[class*='box-'] .header {
+    font-weight: lighter;
+    font-size: 1.35em;
+}
+
 .box-1 h4, .box-2 h4, .box-3 h4, .box-4 h4 {
     line-break: anywhere;
 }
@@ -85,6 +95,7 @@
         display: none;
     }
     .col-3 { width: calc(100% - 20px); }
+    .row-with-margin { margin: 25px; }
 }
 
 @media only screen and (max-width: 641px) {
@@ -93,6 +104,7 @@
     }
     .col-1 { width: calc(50% - 20px); }
     .col-2 { width: calc(100% - 0px); }
+    .row-with-margin { margin: 10px; }
 }
 
 @media only screen and (max-width: 460px) {
@@ -101,4 +113,13 @@
     }
     .col-1 { width: 100%; padding-left: 0; padding-right: 0; }
     .col-3 { width: 100%; padding-left: 0; padding-right: 0; }
+    .row-with-margin { margin: 5px; }
+}
+
+input {
+    width: 100%;
+}
+
+input.missing {
+    border: 1px solid var(--color-error);
 }

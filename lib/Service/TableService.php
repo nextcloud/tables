@@ -52,12 +52,19 @@ class TableService {
 		}
     }
 
-	public function create($title, $content, $userId) {
-		$note = new Table();
-		$note->setTitle($title);
-		$note->setContent($content);
-		$note->setUserId($userId);
-		return $this->mapper->insert($note);
+    /**
+     * @throws \OCP\DB\Exception
+     * @noinspection PhpUndefinedMethodInspection
+     */
+    public function create($title, $userId) {
+		$item = new Table();
+        $item->setTitle($title);
+        $item->setOwnership($userId);
+        $item->setCreatedBy($userId);
+        $item->setLastEditBy($userId);
+        $item->setCreatedAt('2021-09-18 01:23:45');
+        $item->setLastEditAt('2021-09-18 01:23:45');
+		return $this->mapper->insert($item);
 	}
 
 	public function update($id, $title, $content, $userId) {

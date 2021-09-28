@@ -1,18 +1,16 @@
 <template>
 	<AppNavigation>
-		<CreateTable />
+		<CreateTable @updateTables="loadTablesFromBE" />
 		<ul>
 			<AppNavigationItem v-for="table in tables"
 				:key="table.id"
 				:title="table.title"
-				:class="{active: table.id === activeTableId}">
+				:class="{active: activeTable && table.id === activeTable.id}"
+				@click="updateActiveTable(table.id)">
 				<template slot="actions">
 					<ActionButton
-						icon="icon-close">
-						{{ t('tables', 'Cancel table creation') }}
-					</ActionButton>
-					<ActionButton
-						icon="icon-delete">
+						icon="icon-delete"
+						@click="deleteTable(table.id)">
 						{{ t('tables', 'Delete table') }}
 					</ActionButton>
 				</template>
@@ -24,7 +22,7 @@
 <script>
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
-import { showError } from '@nextcloud/dialogs'
+import { showError, showMessage } from '@nextcloud/dialogs'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import AppNavigation from '@nextcloud/vue/dist/Components/AppNavigation'
 import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
@@ -38,23 +36,50 @@ export default {
 		AppNavigationItem,
 		CreateTable,
 	},
+	props: {
+		activeTable: {
+			type: Object,
+			default: null,
+		},
+	},
 	data() {
 		return {
 			loading: true,
 			tables: [],
-			activeTableId: null,
 			showModalAddNewTable: false,
 		}
 	},
 	async mounted() {
-		try {
-			const response = await axios.get(generateUrl('/apps/tables/table'))
-			this.tables = response.data
-		} catch (e) {
-			console.error(e)
-			showError(t('tables', 'Could not fetch tables'))
-		}
+		await this.loadTablesFromBE()
 		this.loading = false
+	},
+	methods: {
+		async loadTablesFromBE() {
+			try {
+				const response = await axios.get(generateUrl('/apps/tables/table'))
+				this.tables = response.data
+			} catch (e) {
+				console.error(e)
+				showError(t('tables', 'Could not fetch tables'))
+			}
+		},
+		updateActiveTable(tableId) {
+			console.debug('update selected table', tableId)
+			// eslint-disable-next-line vue/custom-event-name-casing
+			this.$emit('updateActiveTable', tableId)
+		},
+		async deleteTable(tableId) {
+			this.loading = true
+			try {
+				const response = await axios.delete(generateUrl('/apps/tables/table/' + tableId))
+				console.debug('table deleted', response)
+				showMessage(t('tables', 'Table deleted'))
+				await this.loadTablesFromBE()
+			} catch (e) {
+				console.error(e)
+				showError(t('tables', 'Could not fetch tables'))
+			}
+		},
 	},
 }
 </script>

@@ -1,0 +1,33 @@
+h2 {
+    margin-top: -10px;
+    font-size: x-large;
+}
+
+.modal__content h2 {
+    margin-top: 0;
+}
+
+h3 {
+    font-size: 20px;
+    margin-top: 40px;
+}
+h4 {
+    font-size: large;
+    font-weight: 300;
+    margin-bottom: 20px;
+    margin-top: 10px;
+}
+
+p, .p {
+    padding-top: 5px;
+    padding-bottom: 7px;
+}
+
+p span, .p span {
+    font-weight: 100;
+}
+
+.icon-left {
+    background-position: left;
+    padding-left: 22px;
+}
