@@ -57,34 +57,39 @@ class TableService {
      * @noinspection PhpUndefinedMethodInspection
      */
     public function create($title, $userId) {
+        $time = new \DateTime();
 		$item = new Table();
         $item->setTitle($title);
         $item->setOwnership($userId);
         $item->setCreatedBy($userId);
         $item->setLastEditBy($userId);
-        $item->setCreatedAt('2021-09-18 01:23:45');
-        $item->setLastEditAt('2021-09-18 01:23:45');
+        $item->setCreatedAt($time->format('Y-m-d H:i:s'));
+        $item->setLastEditAt($time->format('Y-m-d H:i:s'));
 		return $this->mapper->insert($item);
 	}
 
-	public function update($id, $title, $content, $userId) {
+	public function update($id, $title, $userId) {
 		try {
-			$note = $this->mapper->find($id, $userId);
-			$note->setTitle($title);
-			$note->setContent($content);
-			return $this->mapper->update($note);
+            $time = new \DateTime();
+            $item = $this->mapper->find($id, $userId);
+            $item->setTitle($title);
+            $item->setLastEditBy($userId);
+            $item->setLastEditAt($time->format('Y-m-d H:i:s'));
+			return $this->mapper->update($item);
 		} catch (Exception $e) {
 			$this->handleException($e);
 		}
+        return null;
 	}
 
 	public function delete($id, $userId) {
 		try {
-			$note = $this->mapper->find($id, $userId);
-			$this->mapper->delete($note);
-			return $note;
+            $item = $this->mapper->find($id, $userId);
+			$this->mapper->delete($item);
+			return $item;
 		} catch (Exception $e) {
 			$this->handleException($e);
-		}
-	}
+        }
+        return null;
+    }
 }
