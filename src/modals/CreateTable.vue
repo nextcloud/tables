@@ -18,7 +18,7 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-4">
+					<div class="col-4 mandatory">
 						{{ t('tables', 'Title') }}
 					</div>
 					<div class="col-3">
@@ -51,7 +51,7 @@
 <script>
 import AppNavigationNew from '@nextcloud/vue/dist/Components/AppNavigationNew'
 import Modal from '@nextcloud/vue/dist/Components/Modal'
-import { showError, showMessage } from '@nextcloud/dialogs'
+import { showError, showSuccess } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 
@@ -68,16 +68,26 @@ export default {
 			errorTitle: false,
 		}
 	},
+	watch: {
+		title(val) {
+			if (this.title.length >= 200) {
+				showError(t('tables', 'The title limit is reached with 200 characters. Please use a shorter title.'))
+				this.title = this.title.slice(0, 199)
+			}
+		},
+	},
 	methods: {
 		async submit(template) {
 			console.debug('try to add table from template', template)
 			if (this.title === '') {
-				showMessage(t('tables', 'Please give the new table a title.'))
+				showError(t('tables', 'Can not create new table. Title is missing.'))
 				this.errorTitle = true
 			} else {
 				console.debug('submit okay, try to send to BE')
 				await this.sendNewTableToBE()
 				this.showModal = false
+				showSuccess(t('tables', 'The table $table was created.', { table: this.title }))
+				this.reset()
 			}
 		},
 		async sendNewTableToBE() {
@@ -93,6 +103,10 @@ export default {
 				console.error(e)
 				showError(t('tables', 'Could not create new table'))
 			}
+		},
+		reset() {
+			this.title = ''
+			this.errorTitle = false
 		},
 	},
 }

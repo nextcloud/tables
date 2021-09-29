@@ -31,3 +31,7 @@ p span, .p span {
     background-position: left;
     padding-left: 22px;
 }
+
+.mandatory {
+    font-weight: bold;
+}
