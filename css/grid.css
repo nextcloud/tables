@@ -4,6 +4,10 @@
     margin-bottom: 20px;
 }
 
+.row:last-child {
+    margin-bottom: 0;
+}
+
 .row-with-margin {
     margin: 50px;
 }
@@ -44,6 +48,13 @@
 
 .floatReverse [class*='col-'] {
     float: right;
+}
+
+/* put two or more elements (buttons) to the left and right */
+.col-stretch-elements {
+    justify-content: space-between;
+    padding-right: 0;
+    width: 100%;
 }
 
 /* cols with fix relative width */

@@ -2,26 +2,12 @@
 	<AppNavigation>
 		<CreateTable @updateTables="loadTablesFromBE" />
 		<ul>
-			<AppNavigationItem v-for="table in tables"
+			<NavigationTableItem v-for="table in tables"
 				:key="table.id"
-				:title="table.title"
-				:class="{active: activeTable && table.id === activeTable.id}"
-				icon="icon-category-organization"
-				:undo="undo"
-				@click="updateActiveTable(table.id)">
-				<template slot="actions">
-					<ActionButton
-						icon="icon-delete"
-						@click="deleteTable(table.id)">
-						{{ t('tables', 'Delete table') }}
-					</ActionButton>
-					<ActionButton
-						icon="icon-delete"
-						@click="undo = true">
-						{{ t('tables', 'Undo test') }}
-					</ActionButton>
-				</template>
-			</AppNavigationItem>
+				:table="table"
+				:active-table="activeTable"
+				@reloadNecessary="loadTablesFromBE"
+				@updateActiveTable="updateActiveTable" />
 		</ul>
 	</AppNavigation>
 </template>
@@ -30,17 +16,15 @@
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showMessage } from '@nextcloud/dialogs'
-import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import AppNavigation from '@nextcloud/vue/dist/Components/AppNavigation'
-import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
 import CreateTable from './modals/CreateTable'
+import NavigationTableItem from './NavigationTableItem'
 
 export default {
 	name: 'Navigation',
 	components: {
-		ActionButton,
+		NavigationTableItem,
 		AppNavigation,
-		AppNavigationItem,
 		CreateTable,
 	},
 	props: {
@@ -54,7 +38,6 @@ export default {
 			loading: true,
 			tables: [],
 			showModalAddNewTable: false,
-			undo: false,
 		}
 	},
 	async mounted() {
