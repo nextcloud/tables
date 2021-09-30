@@ -67,6 +67,10 @@ export default {
 				const response = await axios.delete(generateUrl('/apps/tables/table/' + this.table.id))
 				console.debug('table deleted', response)
 				showWarning(t('tables', 'Table "{table}" deleted.', { table: response.data.title }))
+				if (this.table.id === this.activeTable.id) {
+					// eslint-disable-next-line vue/custom-event-name-casing
+					await this.$emit('activeTableWasDeleted', null)
+				}
 				// eslint-disable-next-line vue/custom-event-name-casing
 				this.$emit('reloadNecessary')
 			} catch (e) {

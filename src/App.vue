@@ -30,12 +30,16 @@ export default {
 	},
 	methods: {
 		async loadTableFromBE(tableId) {
-			try {
-				const response = await axios.get(generateUrl('/apps/tables/table/' + tableId))
-				this.activeTable = response.data
-			} catch (e) {
-				console.error(e)
-				showError(t('tables', 'Could not fetch table'))
+			if (tableId === null) {
+				this.activeTable = null
+			} else {
+				try {
+					const response = await axios.get(generateUrl('/apps/tables/table/' + tableId))
+					this.activeTable = response.data
+				} catch (e) {
+					console.error(e)
+					showError(t('tables', 'Could not fetch table'))
+				}
 			}
 		},
 	},
