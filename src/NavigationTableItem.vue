@@ -13,7 +13,7 @@
 			</ActionButton>
 		</template>
 		<DialogConfirmation
-			:description="t('tables', 'Do you really want to delete the table \'{table}\'?', { table: table.title })"
+			:description="t('tables', 'Do you really want to delete the table »{table}«?', { table: table.title })"
 			:title="t('tables', 'Confirmation table deleting')"
 			:cancel-title="t('tables', 'Cancel')"
 			:confirm-title="t('tables', 'Delete')"

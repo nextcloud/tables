@@ -1,5 +1,5 @@
 <template>
-	<Modal v-if="showModal">
+	<Modal v-if="showModal" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div v-if="title" class="col-4">

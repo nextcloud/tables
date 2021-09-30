@@ -86,7 +86,7 @@ export default {
 				console.debug('submit okay, try to send to BE')
 				await this.sendNewTableToBE()
 				this.showModal = false
-				showSuccess(t('tables', 'The table "{table}" was created.', { table: this.title }))
+				showSuccess(t('tables', 'The table »{table}« was created.', { table: this.title }))
 				this.reset()
 			}
 		},
