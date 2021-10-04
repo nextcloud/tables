@@ -35,11 +35,12 @@ class ColumnMapper extends QBMapper {
 	}
 
     /**
+     * @param string $userId
      * @param integer $tableID
      * @return array
      * @throws Exception
      */
-	public function findAllByTable(int $tableID): array {
+	public function findAllByTable(string $userId, int $tableID): array {
         // TODO check if request is permitted
         $qb = $this->db->getQueryBuilder();
 		$qb->select('*')

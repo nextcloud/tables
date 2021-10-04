@@ -3,9 +3,15 @@
 		v-if="table"
 		:title="table.title"
 		:class="{active: activeTable && table.id === activeTable.id}"
-		icon="icon-category-organization"
 		@click="updateActiveTable">
+		<template #icon>
+			<Table :size="20" decorative title="" />
+		</template>
 		<template slot="actions">
+			<ActionButton
+				icon="icon-fullscreen">
+				{{ t('tables', 'Add view') }}
+			</ActionButton>
 			<ActionButton
 				icon="icon-delete"
 				@click="actionDelete">
@@ -30,6 +36,7 @@ import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showWarning } from '@nextcloud/dialogs'
 import DialogConfirmation from './modals/DialogConfirmation'
+import Table from 'vue-material-design-icons/Table'
 
 export default {
 	name: 'NavigationTableItem',
@@ -37,6 +44,7 @@ export default {
 		DialogConfirmation,
 		ActionButton,
 		AppNavigationItem,
+		Table,
 	},
 	props: {
 		table: {

@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<TabulatorComponent v-model="data" :options="options" />
+		<TabulatorComponent v-model="data" :options="options2" />
 	</div>
 </template>
 
@@ -12,52 +12,60 @@ export default {
 	components: {
 		TabulatorComponent,
 	},
+	props: {
+		columns: {
+			type: Array,
+			default: null,
+		},
+	},
 	data() {
 		return {
-			data: [
-				{
-					name: 'Test',
-					age: 13,
-				},
-				{
-					name: 'Test2',
-					age: 14,
-				},
-				{
-					name: 'Test3',
-					age: 91,
-				},
-			],
+			data: [],
 			options: {
 				resizableColumns: 'header',
-				columns: [
-					{
-						formatter: 'rowSelection',
-						titleFormatter: 'rowSelection',
-						align: 'center',
-						headerSort: false,
-						width: 60,
-					},
-					{
-						title: 'Name',
-						field: 'name',
-						sorter: 'string',
-						editor: true,
-					},
-					{
-						title: 'AGE',
-						field: 'age',
-						editor: false,
-						// headerFilter: 'input',
-					},
-				],
+				columns: this.columnsDefinition,
 				// footerElement: '<button>TEST</button>',
-				initialSort: [
-					{ column: 'age', dir: 'desc' }, // sort by this first
-				],
+				// initialSort: [
+				// { column: 'age', dir: 'desc' }, // sort by this first
+				// ],
 				layout: 'fitDataFill',
 			},
 		}
+	},
+	computed: {
+		columnsDefinition() {
+			const def = [
+				{
+					formatter: 'rowSelection',
+					titleFormatter: 'rowSelection',
+					align: 'center',
+					headerSort: false,
+					width: 60,
+				},
+			]
+			if (this.columns) {
+				this.columns.forEach(item => {
+					def.push({
+						title: item.title,
+						field: 'column-' + item.id,
+						editor: true,
+					})
+				})
+			}
+			console.debug('columns definition array', def)
+			return def
+		},
+		options2() {
+			return {
+				resizableColumns: 'header',
+				columns: this.columnsDefinition,
+				// footerElement: '<button>TEST</button>',
+				// initialSort: [
+				// { column: 'age', dir: 'desc' }, // sort by this first
+				// ],
+				layout: 'fitDataFill',
+			}
+		},
 	},
 }
 </script>

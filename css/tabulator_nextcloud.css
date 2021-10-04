@@ -52,6 +52,14 @@
     text-align: left;
     vertical-align: bottom;
     overflow: hidden;
+    border-right: 1px solid transparent;
+    border-left: 1px solid transparent;
+}
+
+.tabulator .tabulator-header .tabulator-col:hover {
+    border-right: 1px solid var(--color-placeholder-light);
+    border-left: 1px solid var(--color-placeholder-light);
+    cursor: pointer;
 }
 
 .tabulator .tabulator-header .tabulator-col.tabulator-moving {

@@ -15,10 +15,9 @@ class Column extends Entity implements JsonSerializable {
     protected $lastEditBy;
     protected $lastEditAt;
     protected $type;
-    protected $formType;
+    protected $mandatory;
     protected $prefix;
     protected $suffix;
-    protected $sortWeight;
     protected $description;
 
     // type number
@@ -36,7 +35,7 @@ class Column extends Entity implements JsonSerializable {
     public function __construct() {
         $this->addType('id', 'integer');
         $this->addType('tableId', 'integer');
-        $this->addType('sortWeight', 'integer');
+        $this->addType('mandatory', 'boolean');
 
         // type number
         $this->addType('numberDecimals', 'integer');
@@ -60,10 +59,9 @@ class Column extends Entity implements JsonSerializable {
             'lastEditBy'    => $this->lastEditBy,
             'lastEditAt'    => $this->lastEditAt,
             'type'          => $this->type,
-            'formType'      => $this->formType,
+            'mandatory'      => $this->mandatory,
             'prefix'        => $this->prefix,
             'suffix'        => $this->suffix,
-            'sortWeight'       => $this->sortWeight,
             'description'   => $this->description,
 
             // type number

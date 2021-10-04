@@ -39,7 +39,7 @@
 .col-3 { width: calc(75% - 20px); }
 .col-4 { width: calc(100% - 20px); }
 
-.row > [class*='col-'], .row-with-margin > [class*='col-'] {
+.row [class^='col-'], .row-with-margin [class^='col-'] {
     float: left;
     position: relative;
     padding: 0 20px 0 0;
@@ -55,6 +55,10 @@
     justify-content: space-between;
     padding-right: 0;
     width: 100%;
+}
+
+.row > [class*='fix-col-'].margin-bottom, .row > [class*='col-'].margin-bottom {
+    margin-bottom: 15px;
 }
 
 /* cols with fix relative width */
@@ -82,7 +86,7 @@
 .box-3 { width: 250px; }
 .box-4 { width: 300px; }
 
-[class*='box-'] .header {
+[class^='box-'] .header {
     font-weight: lighter;
     font-size: 1.35em;
 }
@@ -91,7 +95,7 @@
     line-break: anywhere;
 }
 
-[class*='box-'] {
+[class^='box-'] {
     margin-right: 20px;
     margin-bottom: 20px;
     background-color: var(--color-background-darker);
@@ -127,7 +131,7 @@
     .row-with-margin { margin: 5px; }
 }
 
-input {
+input, textarea {
     width: 100%;
 }
 

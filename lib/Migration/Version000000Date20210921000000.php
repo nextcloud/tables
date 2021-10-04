@@ -91,10 +91,6 @@ class Version000000Date20210921000000 extends SimpleMigrationStep {
                 'notnull' => true,
                 'length' => 20,
             ]);
-            $table->addColumn('form_type', Types::STRING, [
-                'notnull' => true,
-                'length' => 20,
-            ]);
             $table->addColumn('prefix', Types::STRING, [
                 'notnull' => true,
                 'length' => 200,
@@ -103,7 +99,7 @@ class Version000000Date20210921000000 extends SimpleMigrationStep {
                 'notnull' => true,
                 'length' => 200,
             ]);
-            $table->addColumn('sort_weight', Types::INTEGER, [
+            $table->addColumn('mandatory', Types::BOOLEAN, [
                 'notnull' => false,
                 'default' => 0,
             ]);
