@@ -1,8 +1,8 @@
 <template>
 	<div id="content">
-		<Navigation :active-table="activeTable" @updateActiveTable="loadTableFromBE" />
+		<Navigation />
 		<AppContent>
-			<TableDefaultView :active-table="activeTable" />
+			<TableDefaultView />
 		</AppContent>
 	</div>
 </template>
@@ -11,9 +11,6 @@
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 import Navigation from './Navigation'
 import '@nextcloud/dialogs/styles/toast.scss'
-import axios from '@nextcloud/axios'
-import { generateUrl } from '@nextcloud/router'
-import { showError } from '@nextcloud/dialogs'
 import TableDefaultView from './pages/TableDefaultView'
 
 export default {
@@ -28,20 +25,10 @@ export default {
 			activeTable: null,
 		}
 	},
+	beforeMount() {
+		this.$store.dispatch('loadTablesFromBE')
+	},
 	methods: {
-		async loadTableFromBE(tableId) {
-			if (tableId === null) {
-				this.activeTable = null
-			} else {
-				try {
-					const response = await axios.get(generateUrl('/apps/tables/table/' + tableId))
-					this.activeTable = response.data
-				} catch (e) {
-					console.error(e)
-					showError(t('tables', 'Could not fetch table'))
-				}
-			}
-		},
 	},
 }
 </script>

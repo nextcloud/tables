@@ -22,13 +22,17 @@
 import { generateFilePath } from '@nextcloud/router'
 import Vue from 'vue'
 import App from './App'
+import Vuex from 'vuex'
+import store from './store'
 
 // eslint-disable-next-line
-__webpack_public_path__ = generateFilePath(appName, '', 'js/')
+__webpack_public_path__ = generateFilePath('tables', '', 'js/')
 
 Vue.mixin({ methods: { t, n } })
+Vue.use(Vuex)
 
 export default new Vue({
 	el: '#content',
+	store,
 	render: h => h(App),
 })

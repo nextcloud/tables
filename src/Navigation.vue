@@ -1,25 +1,20 @@
 <template>
 	<AppNavigation>
-		<CreateTable @updateTables="loadTablesFromBE" />
+		<CreateTable />
+		<div v-if="tablesLoading" class="icon-loading" />
 		<ul>
 			<NavigationTableItem v-for="table in tables"
 				:key="table.id"
-				:table="table"
-				:active-table="activeTable"
-				@reloadNecessary="loadTablesFromBE"
-				@updateActiveTable="updateActiveTable"
-				@activeTableWasDeleted="updateActiveTable(null)" />
+				:table="table" />
 		</ul>
 	</AppNavigation>
 </template>
 
 <script>
-import axios from '@nextcloud/axios'
-import { generateUrl } from '@nextcloud/router'
-import { showError } from '@nextcloud/dialogs'
 import AppNavigation from '@nextcloud/vue/dist/Components/AppNavigation'
 import CreateTable from './modals/CreateTable'
 import NavigationTableItem from './NavigationTableItem'
+import { mapState, mapGetters } from 'vuex'
 
 export default {
 	name: 'Navigation',
@@ -28,37 +23,17 @@ export default {
 		AppNavigation,
 		CreateTable,
 	},
-	props: {
-		activeTable: {
-			type: Object,
-			default: null,
-		},
-	},
 	data() {
 		return {
 			loading: true,
-			tables: [],
 			showModalAddNewTable: false,
 		}
 	},
-	async mounted() {
-		await this.loadTablesFromBE()
-		this.loading = false
+	computed: {
+		...mapState(['tables', 'tablesLoading']),
+		...mapGetters(['activeTable']),
 	},
 	methods: {
-		async loadTablesFromBE() {
-			try {
-				const response = await axios.get(generateUrl('/apps/tables/table'))
-				this.tables = response.data
-			} catch (e) {
-				console.error(e)
-				showError(t('tables', 'Could not fetch tables'))
-			}
-		},
-		async updateActiveTable(tableId) {
-			// eslint-disable-next-line vue/custom-event-name-casing
-			this.$emit('updateActiveTable', tableId)
-		},
 	},
 }
 </script>

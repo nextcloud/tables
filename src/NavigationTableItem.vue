@@ -3,10 +3,8 @@
 		v-if="table"
 		:title="table.title"
 		:class="{active: activeTable && table.id === activeTable.id}"
-		@click="updateActiveTable">
-		<template #icon>
-			<Table :size="20" decorative title="" />
-		</template>
+		icon="icon-menu"
+		@click="updateActiveTable(table.id)">
 		<template slot="actions">
 			<ActionButton
 				icon="icon-fullscreen">
@@ -36,7 +34,7 @@ import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showWarning } from '@nextcloud/dialogs'
 import DialogConfirmation from './modals/DialogConfirmation'
-import Table from 'vue-material-design-icons/Table'
+import { mapGetters } from 'vuex'
 
 export default {
 	name: 'NavigationTableItem',
@@ -44,14 +42,9 @@ export default {
 		DialogConfirmation,
 		ActionButton,
 		AppNavigationItem,
-		Table,
 	},
 	props: {
 		table: {
-			type: Object,
-			default: null,
-		},
-		activeTable: {
 			type: Object,
 			default: null,
 		},
@@ -60,6 +53,9 @@ export default {
 		return {
 			showDeletionConfirmation: false,
 		}
+	},
+	computed: {
+		...mapGetters(['activeTable']),
 	},
 	methods: {
 		cancelDeletion() {
@@ -87,8 +83,7 @@ export default {
 			}
 		},
 		updateActiveTable(tableId) {
-			// eslint-disable-next-line vue/custom-event-name-casing
-			this.$emit('updateActiveTable', this.table.id)
+			this.$store.commit('setActiveTableId', tableId)
 		},
 	},
 }

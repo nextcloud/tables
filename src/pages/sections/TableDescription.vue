@@ -1,32 +1,33 @@
 <template>
 	<div>
-		<h3>{{ t('tables', 'Table') }}</h3>
 		<h2>
 			{{ activeTable.title }}&nbsp;
 			<Actions>
-				<ActionButton icon="icon-template-add">
+				<ActionButton @click="showCreateColumn = true">
 					<template #icon>
 						<TableColumnPlusAfter :size="20" decorative title="" />
 					</template>
 					{{ t('tables', 'Add a new column') }}
 				</ActionButton>
-				<ActionButton icon="icon-menu">
+				<ActionButton>
 					<template #icon>
-						<TableEdit :size="20" decorative title="" />
+						<ViewColumnOutline :size="20" decorative title="" />
 					</template>
 					{{ t('tables', 'Edit columns') }}
 				</ActionButton>
 			</Actions>
 		</h2>
-		<h4>{{ t('tables', 'Default view') }}</h4>
+		<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false" />
 	</div>
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex'
 import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter'
-import TableEdit from 'vue-material-design-icons/TableEdit'
+import ViewColumnOutline from 'vue-material-design-icons/ViewColumnOutline'
+import CreateColumn from '../../modals/CreateColumn'
 
 export default {
 	name: 'TableDescription',
@@ -34,13 +35,17 @@ export default {
 		Actions,
 		ActionButton,
 		TableColumnPlusAfter,
-		TableEdit,
+		ViewColumnOutline,
+		CreateColumn,
 	},
-	props: {
-		activeTable: {
-			type: Object,
-			default: null,
-		},
+	data() {
+		return {
+			showCreateColumn: false,
+		}
+	},
+	computed: {
+		...mapState([]),
+		...mapGetters(['activeTable']),
 	},
 }
 </script>

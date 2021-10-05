@@ -1,6 +1,7 @@
 <template>
 	<div>
-		<div v-if="!activeTable" class="row-with-margin">
+		<div v-if="tablesLoading" class="icon-loading" />
+		<div v-if="!tablesLoading && !activeTable" class="row-with-margin">
 			<EmptyContent icon="icon-category-organization">
 				{{ t('tables', 'No table in context') }}
 				<template #desc>
@@ -8,15 +9,9 @@
 				</template>
 			</EmptyContent>
 		</div>
-		<div v-else>
+		<div v-if="!tablesLoading && activeTable">
 			<div class="row-with-margin">
 				<TableDescription :active-table="activeTable" />
-			</div>
-			<div class="row-with-margin">
-				<button @click="showCreateColumn = true">
-					Add column
-				</button>
-				<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false" />
 			</div>
 			<div class="row">
 				<NcTable :columns="columns" />
@@ -32,27 +27,23 @@ import NcTable from './sections/NcTable'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
-import CreateColumn from '../modals/CreateColumn'
+import { mapState, mapGetters } from 'vuex'
 
 export default {
 	name: 'TableDefaultView',
 	components: {
-		CreateColumn,
 		TableDescription,
 		EmptyContent,
 		NcTable,
 	},
-	props: {
-		activeTable: {
-			type: Object,
-			default: null,
-		},
-	},
 	data() {
 		return {
 			columns: null,
-			showCreateColumn: false,
 		}
+	},
+	computed: {
+		...mapState(['tables', 'tablesLoading']),
+		...mapGetters(['activeTable']),
 	},
 	watch: {
 		activeTable() {
