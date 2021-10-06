@@ -21,11 +21,16 @@
 					<div class="col-4 mandatory">
 						{{ t('tables', 'Title') }}
 					</div>
-					<div class="col-3">
+					<div class="col-2">
 						<input v-model="title"
 							:class="{missing: errorTitle}"
 							type="text"
 							:placeholder="t('tables', 'Title of the new table')">
+					</div>
+					<div class="col-2">
+						<EmojiPicker @select="addIconToTitle">
+							<button>{{ t('tables', 'Add an icon as prefix') }}</button>
+						</EmojiPicker>
 					</div>
 				</div>
 				<div class="row">
@@ -54,17 +59,20 @@ import Modal from '@nextcloud/vue/dist/Components/Modal'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
+import EmojiPicker from '@nextcloud/vue/dist/Components/EmojiPicker'
 
 export default {
 	name: 'CreateTable',
 	components: {
 		AppNavigationNew,
 		Modal,
+		EmojiPicker,
 	},
 	data() {
 		return {
 			showModal: false,
 			title: '',
+			icon: '',
 			errorTitle: false,
 		}
 	},
@@ -107,6 +115,9 @@ export default {
 		reset() {
 			this.title = ''
 			this.errorTitle = false
+		},
+		addIconToTitle(icon) {
+			this.title = icon + ' ' + this.title
 		},
 	},
 }
