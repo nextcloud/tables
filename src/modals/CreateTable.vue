@@ -105,8 +105,7 @@ export default {
 				}
 				const response = await axios.post(generateUrl('/apps/tables/table'), data)
 				console.debug('table created: ', response)
-				// eslint-disable-next-line vue/custom-event-name-casing
-				this.$emit('updateTables')
+				await this.$store.dispatch('loadTablesFromBE')
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not create new table'))

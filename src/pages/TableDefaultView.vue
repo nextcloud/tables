@@ -1,7 +1,7 @@
 <template>
 	<div>
-		<div v-if="tablesLoading" class="icon-loading" />
-		<div v-if="!tablesLoading && !activeTable" class="row-with-margin">
+		<div v-if="somethingIsLoading" class="icon-loading" />
+		<div v-if="!somethingIsLoading && !activeTable" class="row-with-margin">
 			<EmptyContent icon="icon-category-organization">
 				{{ t('tables', 'No table in context') }}
 				<template #desc>
@@ -9,7 +9,7 @@
 				</template>
 			</EmptyContent>
 		</div>
-		<div v-if="!tablesLoading && activeTable">
+		<div v-if="!somethingIsLoading && activeTable">
 			<div class="row-with-margin">
 				<TableDescription :active-table="activeTable" />
 			</div>
@@ -38,12 +38,16 @@ export default {
 	},
 	data() {
 		return {
+			loading: false,
 			columns: null,
 		}
 	},
 	computed: {
 		...mapState(['tables', 'tablesLoading']),
 		...mapGetters(['activeTable']),
+		somethingIsLoading() {
+			return this.tablesLoading || this.loading
+		},
 	},
 	watch: {
 		activeTable() {
@@ -53,6 +57,7 @@ export default {
 	},
 	methods: {
 		async getColumnsForTableFromBE(tableId) {
+			this.loading = true
 			if (!tableId) {
 				this.columns = null
 			} else {
@@ -66,6 +71,7 @@ export default {
 					showError(t('tables', 'Could not fetch columns for table'))
 				}
 			}
+			this.loading = false
 		},
 	},
 }

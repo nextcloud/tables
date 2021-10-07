@@ -68,7 +68,8 @@ class TableService {
 		return $this->mapper->insert($item);
 	}
 
-	public function update($id, $title, $userId) {
+    /** @noinspection PhpUndefinedMethodInspection */
+    public function update($id, $title, $userId) {
 		try {
             $time = new \DateTime();
             $item = $this->mapper->find($id, $userId);

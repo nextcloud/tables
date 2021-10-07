@@ -2,8 +2,9 @@
 	<AppNavigation>
 		<CreateTable />
 		<div v-if="tablesLoading" class="icon-loading" />
-		<ul>
-			<NavigationTableItem v-for="table in tables"
+		<ul v-if="!tablesLoading">
+			<NavigationTableItem
+				v-for="table in tables"
 				:key="table.id"
 				:table="table" />
 		</ul>

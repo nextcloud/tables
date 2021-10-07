@@ -69,3 +69,7 @@ clean-dev:
 test:
 	./vendor/phpunit/phpunit/phpunit -c phpunit.xml
 	./vendor/phpunit/phpunit/phpunit -c phpunit.integration.xml
+
+# logging
+read-log:
+	sudo -u www-data php /var/www/html/nextcloud/occ log:watch

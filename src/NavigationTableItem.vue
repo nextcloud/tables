@@ -3,7 +3,13 @@
 		v-if="table"
 		:title="table.title"
 		:class="{active: activeTable && table.id === activeTable.id}"
-		icon="icon-menu"
+		icon="icon-triangle-e"
+		:editable="true"
+		:edit-placeholder="t('tables', 'Tables title')"
+		:edit-label="t('tables', 'Edit title')"
+		:allow-collapse="true"
+		:open="false"
+		@update:title="updateTableTitle"
 		@click="updateActiveTable(table.id)">
 		<template slot="actions">
 			<ActionButton
@@ -32,7 +38,7 @@ import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
-import { showError, showWarning } from '@nextcloud/dialogs'
+import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
 import DialogConfirmation from './modals/DialogConfirmation'
 import { mapGetters } from 'vuex'
 
@@ -84,6 +90,21 @@ export default {
 		},
 		updateActiveTable(tableId) {
 			this.$store.commit('setActiveTableId', tableId)
+		},
+		async updateTableTitle(newTitle) {
+			console.debug('try to set new table title: ', newTitle)
+			try {
+				// const data = { title: newTitle }
+				const data = this.table
+				data.title = newTitle
+				console.debug('data to update', data)
+				const response = await axios.put(generateUrl('/apps/tables/table/' + this.table.id), data)
+				showSuccess(t('tables', 'Tables title is updated to »{table}«', { table: response.data.title }))
+				await this.$store.dispatch('loadTablesFromBE')
+			} catch (e) {
+				console.error(e)
+				showError(t('tables', 'Could not update tables title'))
+			}
 		},
 	},
 }

@@ -54,10 +54,9 @@ class TableController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function update(int $id, string $title,
-						   string $content): DataResponse {
-		return $this->handleNotFound(function () use ($id, $title, $content) {
-			return $this->service->update($id, $title, $content, $this->userId);
+	public function update(int $id, string $title): DataResponse {
+		return $this->handleNotFound(function () use ($id, $title) {
+			return $this->service->update($id, $title, $this->userId);
 		});
 	}
 
