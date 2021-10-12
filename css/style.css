@@ -35,3 +35,14 @@ p span, .p span {
 .mandatory {
     font-weight: bold;
 }
+
+.v-popover button {
+    height: 25px;
+    margin-left: 10px;
+    background-color: transparent;
+    border: none;
+}
+
+.popover__inner p {
+    padding: 15px;
+}

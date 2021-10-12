@@ -13,11 +13,13 @@
 		@click="updateActiveTable(table.id)">
 		<template slot="actions">
 			<ActionButton
+				close-after-click="true"
 				icon="icon-fullscreen">
 				{{ t('tables', 'Add view') }}
 			</ActionButton>
 			<ActionButton
 				icon="icon-delete"
+				close-after-click="true"
 				@click="actionDelete">
 				{{ t('tables', 'Delete table') }}
 			</ActionButton>

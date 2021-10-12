@@ -3,7 +3,7 @@
 		<h2>
 			{{ activeTable.title }}&nbsp;
 			<Actions>
-				<ActionButton @click="showCreateColumn = true">
+				<ActionButton close-after-click="true" @click="showCreateColumn = true">
 					<template #icon>
 						<TableColumnPlusAfter :size="20" decorative title="" />
 					</template>

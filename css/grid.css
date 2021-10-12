@@ -135,6 +135,15 @@ input, textarea {
     width: 100%;
 }
 
+textarea {
+    min-height: 100px;
+}
+
 input.missing {
     border: 1px solid var(--color-error);
+}
+
+.hint {
+    color: var(--color-text-lighter);
+    font-weight: lighter;
 }
