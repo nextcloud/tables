@@ -48,21 +48,21 @@ class ColumnController extends Controller {
      * @throws Exception
      */
 	public function create(
-        string $tableId,
+        int $tableId,
         string $title,
         string $type,
-        string $prefix,
-        string $suffix,
-        bool $mandatory,
-        string $description,
-        string $textDefault,
-        string $textAllowedPattern,
-        int $textMaxLength,
-        bool $textMultiline,
-        float $numberDefault,
-        float $numberMin,
-        float $numberMax,
-        int $numberDecimals
+        string $prefix = null,
+        string $suffix = null,
+        bool $mandatory = false,
+        string $description = null,
+        string $textDefault = null,
+        string $textAllowedPattern = null,
+        int $textMaxLength = -1,
+        bool $textMultiline = false,
+        float $numberDefault = null,
+        float $numberMin = null,
+        float $numberMax = null,
+        int $numberDecimals = null
     ): DataResponse {
 		return new DataResponse($this->service->create(
             $tableId,
@@ -88,7 +88,7 @@ class ColumnController extends Controller {
 	 */
 	public function update(
         int $id,
-        string $tableId,
+        int $tableId,
         string $userId,
         string $title,
         string $type,

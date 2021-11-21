@@ -56,7 +56,7 @@ class ColumnService {
      * @noinspection DuplicatedCode
      */
     public function create(
-        string $tableId,
+        int $tableId,
         string $title,
         string $userId,
         string $type,

@@ -83,66 +83,114 @@
 						{{ t('tables', 'Number') }}
 					</CheckboxRadioSwitch>
 				</div>
-				<div v-if="type === 'number'" class="row">
-					<div class="fix-col-1">
-						{{ t('tables', 'Default') }}
-					</div>
-					<div class="fix-col-3 margin-bottom">
-						<input v-model="numberDefault" type="number">
-					</div>
-
-					<div class="fix-col-1">
-						{{ t('tables', 'Decimals') }}
-					</div>
-					<div class="fix-col-3 margin-bottom">
-						<input v-model="numberDecimals" type="number">
+				<div v-if="type === 'number'">
+					<div class="row">
+						<div class="col-4">
+							<h3>{{ t('tables', 'Number column specific parameters') }}</h3>
+						</div>
 					</div>
 
-					<div class="fix-col-1">
-						{{ t('tables', 'Minimum') }}
-					</div>
-					<div class="fix-col-3 margin-bottom">
-						<input v-model="numberMin" type="number">
+					<!-- default -->
+					<div class="row">
+						<div class="fix-col-1">
+							{{ t('tables', 'Default') }}
+						</div>
+						<div class="fix-col-1">
+							&nbsp;
+						</div>
+						<div class="fix-col-2 margin-bottom">
+							<input v-model="numberDefault" type="number">
+						</div>
 					</div>
 
-					<div class="fix-col-1">
-						{{ t('tables', 'Maximum') }}
+					<!-- decimals -->
+					<div class="row">
+						<div class="fix-col-1">
+							{{ t('tables', 'Decimals') }}
+						</div>
+						<div class="fix-col-1">
+							&nbsp;
+						</div>
+						<div class="fix-col-2 margin-bottom">
+							<input v-model="numberDecimals" type="number">
+						</div>
 					</div>
-					<div class="fix-col-3 margin-bottom">
-						<input v-model="numberMax" type="number">
+
+					<!-- min -->
+					<div class="row">
+						<div class="fix-col-1">
+							{{ t('tables', 'Minimum') }}
+						</div>
+						<div class="fix-col-1">
+							&nbsp;
+						</div>
+						<div class="fix-col-2 margin-bottom">
+							<input v-model="numberMin" type="number">
+						</div>
+					</div>
+
+					<!-- max -->
+					<div class="row">
+						<div class="fix-col-1">
+							{{ t('tables', 'Maximum') }}
+						</div>
+						<div class="fix-col-1">
+							&nbsp;
+						</div>
+						<div class="fix-col-2 margin-bottom">
+							<input v-model="numberMax" type="number">
+						</div>
 					</div>
 				</div>
 
 				<div v-if="type === 'textline' || type === 'longtext'">
-					<div class="fix-col-1">
-						{{ t('tables', 'Default') }}
-					</div>
-					<div v-if="type === 'textline'" class="fix-col-3 margin-bottom">
-						<input v-model="textDefault">
-					</div>
-					<div v-if="type === 'longtext'" class="fix-col-3 margin-bottom">
-						<textarea v-model="textDefault" />
+					<div class="row">
+						<div class="col-4">
+							<h3>{{ t('tables', 'Text column specific parameters') }}</h3>
+						</div>
 					</div>
 
-					<div class="fix-col-1">
-						{{ t('tables', 'Allowed pattern (regex)') }}
-					</div>
-					<div class="fix-col-3 margin-bottom">
-						<input v-model="textAllowedPattern">
+					<!-- default -->
+					<div class="row">
+						<div class="fix-col-1">
+							{{ t('tables', 'Default') }}
+						</div>
+						<div v-if="type === 'textline'" class="fix-col-3 margin-bottom">
+							<input v-model="textDefault">
+						</div>
+						<div v-if="type === 'longtext'" class="fix-col-3 margin-bottom">
+							<textarea v-model="textDefault" />
+						</div>
 					</div>
 
-					<div class="fix-col-1">
-						{{ t('tables', 'Maximum text length') }}
+					<!-- allowed pattern -->
+					<div class="row">
+						<div class="fix-col-1">
+							{{ t('tables', 'Allowed pattern (regex)') }}
+						</div>
+						<div class="fix-col-3 margin-bottom">
+							<input v-model="textAllowedPattern">
+						</div>
 					</div>
-					<div class="fix-col-3 margin-bottom">
-						<input v-model="textMaxLength">
+
+					<!-- max text length -->
+					<div class="row">
+						<div class="fix-col-1">
+							{{ t('tables', 'Maximum text length') }}
+						</div>
+						<div class="fix-col-1">
+							&nbsp;
+						</div>
+						<div class="fix-col-2 margin-bottom">
+							<input v-model="textMaxLength">
+						</div>
 					</div>
 				</div>
 
 				<div class="row">
 					<div class="col-4 margin-bottom">
 						<button>{{ t('tables', 'Cancel') }}</button>
-						<button class="success">
+						<button class="success" @click="actionConfirm">
 							{{ t('tables', 'Save') }}
 						</button>
 					</div>
@@ -156,6 +204,10 @@
 import Modal from '@nextcloud/vue/dist/Components/Modal'
 import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch'
 import Popover from '@nextcloud/vue/dist/Components/Popover'
+import axios from '@nextcloud/axios'
+import { generateUrl } from '@nextcloud/router'
+import { showError } from '@nextcloud/dialogs'
+import { mapGetters } from 'vuex'
 
 export default {
 	name: 'CreateColumn',
@@ -187,12 +239,68 @@ export default {
 			textMaxLength: null,
 		}
 	},
+	computed: {
+		...mapGetters(['activeTable']),
+	},
 	methods: {
 		actionConfirm() {
-			this.$emit('submit')
+			console.debug('submit new column', null)
+			this.sendNewColumnToBE()
 		},
 		actionCancel() {
 			this.$emit('close')
+		},
+		async sendNewColumnToBE() {
+			try {
+				let type = this.type
+				let textMultiline = false
+				if (type === 'textline') {
+					type = 'text'
+				} else if (type === 'longtext') {
+					type = 'text'
+					textMultiline = true
+				}
+				const data = {
+					type,
+					title: this.title,
+					description: this.description,
+					prefix: this.prefix,
+					suffix: this.suffix,
+					mandatory: this.mandatory,
+					numberDefault: this.numberDefault,
+					numberMin: this.numberMin,
+					numberMax: this.numberMax,
+					numberDecimals: this.numberDecimals,
+					textDefault: this.textDefault,
+					textAllowedPattern: this.textAllowedPattern,
+					textMaxLength: this.textMaxLength,
+					textMultiline,
+					tableId: this.activeTable.id,
+				}
+				console.debug('try so send new column', data)
+				const response = await axios.post(generateUrl('/apps/tables/column'), data)
+				console.debug('column created: ', response)
+				// await this.$store.dispatch('loadTablesFromBE')
+				this.reset()
+			} catch (e) {
+				console.error(e)
+				showError(t('tables', 'Could not create new column'))
+			}
+		},
+		reset() {
+			this.type = null
+			this.title = ''
+			this.description = ''
+			this.prefix = ''
+			this.suffix = ''
+			this.mandatory = false
+			this.numberDefault = null
+			this.numberMin = 0
+			this.numberMax = 100
+			this.numberDecimals = 2
+			this.textDefault = ''
+			this.textAllowedPattern = ''
+			this.textMaxLength = null
 		},
 	},
 }

@@ -24,6 +24,7 @@ import Vue from 'vue'
 import App from './App'
 import Vuex from 'vuex'
 import store from './store'
+// import router from './router'
 
 // eslint-disable-next-line
 __webpack_public_path__ = generateFilePath('tables', '', 'js/')
@@ -33,6 +34,7 @@ Vue.use(Vuex)
 
 export default new Vue({
 	el: '#content',
+	// router,
 	store,
 	render: h => h(App),
 })

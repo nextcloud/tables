@@ -13,13 +13,13 @@
 		@click="updateActiveTable(table.id)">
 		<template slot="actions">
 			<ActionButton
-				close-after-click="true"
+				:close-after-click="true"
 				icon="icon-fullscreen">
 				{{ t('tables', 'Add view') }}
 			</ActionButton>
 			<ActionButton
 				icon="icon-delete"
-				close-after-click="true"
+				:close-after-click="true"
 				@click="actionDelete">
 				{{ t('tables', 'Delete table') }}
 			</ActionButton>
@@ -79,16 +79,15 @@ export default {
 				const response = await axios.delete(generateUrl('/apps/tables/table/' + this.table.id))
 				console.debug('table deleted', response)
 				showWarning(t('tables', 'Table "{table}" deleted.', { table: response.data.title }))
-				if (this.table.id === this.activeTable.id) {
-					// eslint-disable-next-line vue/custom-event-name-casing
-					await this.$emit('activeTableWasDeleted', null)
+				if (this.table && this.activeTable && this.table.id === this.activeTable.id) {
+					this.$store.commit('setActiveTableId', null)
 				}
-				// eslint-disable-next-line vue/custom-event-name-casing
-				this.$emit('reloadNecessary')
+				await this.$store.dispatch('loadTablesFromBE')
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not fetch tables'))
 			}
+			this.showDeletionConfirmation = false
 		},
 		updateActiveTable(tableId) {
 			this.$store.commit('setActiveTableId', tableId)

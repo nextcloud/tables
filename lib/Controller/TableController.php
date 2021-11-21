@@ -30,11 +30,11 @@ class TableController extends Controller {
      * @NoAdminRequired
      * @throws Exception
      */
-	public function index(): DataResponse {
-		return new DataResponse($this->service->findAll($this->userId));
-	}
+    public function index(): DataResponse {
+        return new DataResponse($this->service->findAll($this->userId));
+    }
 
-	/**
+    /**
 	 * @NoAdminRequired
 	 */
 	public function show(int $id): DataResponse {
