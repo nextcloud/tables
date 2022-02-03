@@ -92,24 +92,30 @@ export default {
 				this.errorTitle = true
 			} else {
 				console.debug('submit okay, try to send to BE')
-				await this.sendNewTableToBE()
+				const newTableId = await this.sendNewTableToBE()
+				if (newTableId) {
+					this.$store.commit('setActiveTableId', newTableId)
+				}
 				this.showModal = false
 				showSuccess(t('tables', 'The table »{table}« was created.', { table: this.title }))
 				this.reset()
 			}
 		},
 		async sendNewTableToBE() {
+			let ret = null
 			try {
 				const data = {
 					title: this.title,
 				}
 				const response = await axios.post(generateUrl('/apps/tables/table'), data)
 				console.debug('table created: ', response)
+				ret = response.data.id
 				await this.$store.dispatch('loadTablesFromBE')
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not create new table'))
 			}
+			return ret
 		},
 		reset() {
 			this.title = ''
