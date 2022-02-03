@@ -6,10 +6,10 @@
 					<h2>{{ t('tables', 'Create column') }}</h2>
 				</div>
 
-				<div class="fix-col-1 mandatory">
+				<div class="fix-col-1 mandatory" :class="{error: titleMissingError}">
 					{{ t('tables', 'Title') }}
 				</div>
-				<div class="fix-col-3 margin-bottom">
+				<div class="fix-col-3 margin-bottom" :class="{error: titleMissingError}">
 					<input v-model="title" :placeholder="t('tables', 'Title for the column.')">
 				</div>
 
@@ -83,64 +83,20 @@
 						{{ t('tables', 'Number') }}
 					</CheckboxRadioSwitch>
 				</div>
+
+				<!-- type specific parameter -------------------------------- -->
+
 				<div v-if="type === 'number'">
 					<div class="row">
 						<div class="col-4">
 							<h3>{{ t('tables', 'Number column specific parameters') }}</h3>
 						</div>
 					</div>
-
-					<!-- default -->
-					<div class="row">
-						<div class="fix-col-1">
-							{{ t('tables', 'Default') }}
-						</div>
-						<div class="fix-col-1">
-							&nbsp;
-						</div>
-						<div class="fix-col-2 margin-bottom">
-							<input v-model="numberDefault" type="number">
-						</div>
-					</div>
-
-					<!-- decimals -->
-					<div class="row">
-						<div class="fix-col-1">
-							{{ t('tables', 'Decimals') }}
-						</div>
-						<div class="fix-col-1">
-							&nbsp;
-						</div>
-						<div class="fix-col-2 margin-bottom">
-							<input v-model="numberDecimals" type="number">
-						</div>
-					</div>
-
-					<!-- min -->
-					<div class="row">
-						<div class="fix-col-1">
-							{{ t('tables', 'Minimum') }}
-						</div>
-						<div class="fix-col-1">
-							&nbsp;
-						</div>
-						<div class="fix-col-2 margin-bottom">
-							<input v-model="numberMin" type="number">
-						</div>
-					</div>
-
-					<!-- max -->
-					<div class="row">
-						<div class="fix-col-1">
-							{{ t('tables', 'Maximum') }}
-						</div>
-						<div class="fix-col-1">
-							&nbsp;
-						</div>
-						<div class="fix-col-2 margin-bottom">
-							<input v-model="numberMax" type="number">
-						</div>
-					</div>
+					<NumberForm
+						:number-default.sync="numberDefault"
+						:number-min.sync="numberMin"
+						:number-max.sync="numberMax"
+						:number-decimals.sync="numberDecimals" />
 				</div>
 
 				<div v-if="type === 'textline' || type === 'longtext'">
@@ -149,42 +105,13 @@
 							<h3>{{ t('tables', 'Text column specific parameters') }}</h3>
 						</div>
 					</div>
-
-					<!-- default -->
-					<div class="row">
-						<div class="fix-col-1">
-							{{ t('tables', 'Default') }}
-						</div>
-						<div v-if="type === 'textline'" class="fix-col-3 margin-bottom">
-							<input v-model="textDefault">
-						</div>
-						<div v-if="type === 'longtext'" class="fix-col-3 margin-bottom">
-							<textarea v-model="textDefault" />
-						</div>
-					</div>
-
-					<!-- allowed pattern -->
-					<div class="row">
-						<div class="fix-col-1">
-							{{ t('tables', 'Allowed pattern (regex)') }}
-						</div>
-						<div class="fix-col-3 margin-bottom">
-							<input v-model="textAllowedPattern">
-						</div>
-					</div>
-
-					<!-- max text length -->
-					<div class="row">
-						<div class="fix-col-1">
-							{{ t('tables', 'Maximum text length') }}
-						</div>
-						<div class="fix-col-1">
-							&nbsp;
-						</div>
-						<div class="fix-col-2 margin-bottom">
-							<input v-model="textMaxLength">
-						</div>
-					</div>
+					<TextlineForm v-if="type === 'textline'"
+						:text-default.sync="textDefault"
+						:text-allowed-pattern.sync="textAllowedPattern"
+						:text-max-length.sync="textMaxLength" />
+					<LongtextForm v-if="type === 'longtext'"
+						:text-default.sync="textDefault"
+						:text-max-length.sync="textMaxLength" />
 				</div>
 
 				<div class="row">
@@ -203,6 +130,9 @@
 </template>
 
 <script>
+import NumberForm from '../columnTypePartials/forms/NumberForm'
+import TextlineForm from '../columnTypePartials/forms/TextlineForm'
+import LongtextForm from '../columnTypePartials/forms/LongtextForm'
 import Modal from '@nextcloud/vue/dist/Components/Modal'
 import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch'
 import Popover from '@nextcloud/vue/dist/Components/Popover'
@@ -217,6 +147,9 @@ export default {
 		Modal,
 		CheckboxRadioSwitch,
 		Popover,
+		NumberForm,
+		TextlineForm,
+		LongtextForm,
 	},
 	props: {
 		showModal: {
@@ -240,6 +173,7 @@ export default {
 			textAllowedPattern: '',
 			textMaxLength: null,
 			typeMissingError: false,
+			titleMissingError: false,
 		}
 	},
 	computed: {
@@ -248,7 +182,11 @@ export default {
 	methods: {
 		async actionConfirm() {
 			console.debug('try to submit new column', null)
-			if (this.type === null) {
+			if (!this.title) {
+				showInfo(t('tables', 'Please insert a title for the new column.'))
+				this.titleMissingError = true
+			} else if (this.type === null) {
+				this.titleMissingError = false
 				showInfo(t('tables', 'You need to select a type for the new column.'))
 				this.typeMissingError = true
 			} else {
@@ -311,6 +249,8 @@ export default {
 			this.textDefault = ''
 			this.textAllowedPattern = ''
 			this.textMaxLength = null
+			this.titleMissingError = false
+			this.typeMissingError = false
 		},
 	},
 }

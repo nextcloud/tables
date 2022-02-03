@@ -56,6 +56,10 @@ p span, .p span {
     color:  var(--color-error);
 }
 
+.error input {
+    border-color: var(--color-error);
+}
+
 .icon-loading:first-child {
     top: 10vh;
 }
