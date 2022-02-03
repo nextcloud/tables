@@ -106,6 +106,10 @@ class Version000000Date20210921000000 extends SimpleMigrationStep {
             $table->addColumn('description', Types::TEXT, [
                 'notnull' => false,
             ]);
+            $table->addColumn('order_weight', Types::INTEGER, [
+                'notnull' => true,
+                'default' => 0,
+            ]);
 
             // type text
             $table->addColumn('text_default', Types::STRING, [

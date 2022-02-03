@@ -20,7 +20,31 @@
 					<span v-if="column.type === 'number' && column.textMultiline" class="block">{{ t('tables', 'Longtext') }}
 						{{ (column.mandatory) ? ', ' + t('tables', 'mandatory'): '' }}</span>
 				</div>
-				<div class="col-1">
+				<div class="col-2">
+					<Popover>
+						<template #trigger>
+							<button class="icon-details" />
+						</template>
+						<table>
+							<tr>
+								<td>
+									{{ t('tables', 'Last edit') }}
+								</td>
+								<td>
+									{{ t('tables', '{dateTime} by »{userName}«', { dateTime: column.lastEditAt, userName: column.lastEditBy }) }}
+								</td>
+							</tr>
+							<tr>
+								<td>
+									{{ t('tables', 'Create') }}
+								</td>
+								<td>
+									{{ t('tables', '{dateTime} by »{userName}«', { dateTime: column.createdAt, userName: column.createdBy }) }}
+								</td>
+							</tr>
+						</table>
+					</Popover>
+
 					{{ column.description }}
 				</div>
 				<div class="col-1">
@@ -54,6 +78,7 @@ import { showError } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
 import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
+import Popover from '@nextcloud/vue/dist/Components/Popover'
 
 export default {
 	name: 'EditColumns',
@@ -61,6 +86,7 @@ export default {
 		Modal,
 		Actions,
 		ActionButton,
+		Popover,
 	},
 	props: {
 		showModal: {
