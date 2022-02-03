@@ -1,37 +1,77 @@
-# This file is licensed under the Affero General Public License version 3 or
-# later. See the COPYING file.
-app_name=$(notdir $(CURDIR))
-build_tools_directory=$(CURDIR)/build/tools
-composer=$(shell which composer 2> /dev/null)
-
-all: dev-setup lint build-js-production test
-
-# Dev env management
-dev-setup: clean clean-dev composer npm-init
+app_name=tables
+project_dir=$(CURDIR)/../$(app_name)
+build_dir=$(CURDIR)/build/artifacts
+cert_dir=$(HOME)/.nextcloud/certificates
+php_dirs=appinfo/ lib/ tests/api/
 
 
-# Installs and updates the composer dependencies. If composer is not installed
-# a copy is fetched from the web
-composer:
-ifeq (, $(composer))
-	@echo "No composer command available, downloading a copy from the web"
-	mkdir -p $(build_tools_directory)
-	curl -sS https://getcomposer.org/installer | php
-	mv composer.phar $(build_tools_directory)
-	php $(build_tools_directory)/composer.phar install --prefer-dist
-	php $(build_tools_directory)/composer.phar update --prefer-dist
-else
-	composer install --prefer-dist
-	composer update --prefer-dist
-endif
+all: dev-setup build
+
+
+##### Environment ####
+
+dev-setup: clean clean-dev init
+
+init: composer-init npm-init
+
+composer-init:
+	composer install
 
 npm-init:
-	npm ci
+	npm install
+
+npm-upgrade:
+	npm upgrade
+	npm install
 
 npm-update:
 	npm update
 
-# Building
+
+
+##### Building #####
+
+build: clean build-js-production assemble
+
+appstore: build
+	@echo "Signing…"
+#	php ../server/occ integrity:sign-app \
+#		--privateKey=$(cert_dir)/$(app_name).key\
+#		--certificate=$(cert_dir)/$(app_name).crt\
+#		--path=$(build_dir)/$(app_name)
+	tar -czf $(build_dir)/$(app_name).tar.gz \
+		-C $(build_dir) $(app_name)
+	openssl dgst -sha512 -sign $(cert_dir)/$(app_name).key $(build_dir)/$(app_name).tar.gz | openssl base64
+
+assemble:
+	mkdir -p $(build_dir)
+	rsync -a \
+	--exclude=babel.config.js \
+	--exclude=build \
+	--exclude=composer.* \
+	--exclude=CONTRIBUTING.md \
+	--exclude=.editorconfig \
+	--exclude=.eslintrc.js \
+	--exclude=.git \
+	--exclude=.github \
+	--exclude=.gitignore \
+	--exclude=l10n/no-php \
+	--exclude=Makefile \
+	--exclude=node_modules \
+	--exclude=package*.json \
+	--exclude=.php_cs.* \
+	--exclude=phpunit*xml \
+	--exclude=.scrutinizer.yml \
+	--exclude=src \
+	--exclude=.stylelintrc.js \
+	--exclude=tests \
+	--exclude=.travis.yml \
+	--exclude=.tx \
+	--exclude=.idea \
+	--exclude=vendor \
+	--exclude=webpack*.js \
+	$(project_dir) $(build_dir)
+
 build-js:
 	npm run dev
 
@@ -41,34 +81,82 @@ build-js-production:
 watch-js:
 	npm run watch
 
-serve-js:
-	npm run serve
 
-# Linting
-lint:
+##### Testing #####
+test: test-api
+
+test-api:
+	phpunit --bootstrap vendor/autoload.php --testdox tests/api/
+
+
+
+##### Linting #####
+
+lint: lint-php lint-js lint-css lint-xml
+
+
+lint-php: lint-phpfast lint-php-phan
+lint-phpfast: lint-php-lint lint-php-ncversion lint-php-cs-fixer lint-php-phpcs
+
+lint-php-lint:
+	# Check PHP syntax errors
+	@! find $(php_dirs) -name "*.php" | xargs -I{} php -l '{}' | grep -v "No syntax errors detected"
+
+lint-php-ncversion:
+	# Check min-version consistency
+	php tests/nextcloud-version.php
+
+lint-php-phan:
+	# PHAN
+	vendor/bin/phan --allow-polyfill-parser -k tests/phan-config.php --no-progress-bar -m checkstyle | vendor/bin/cs2pr --graceful-warnings --colorize
+
+lint-php-phpcs:
+	# PHP CodeSniffer
+	vendor/bin/phpcs --standard=tests/phpcs.xml $(php_dirs) --report=checkstyle | vendor/bin/cs2pr --graceful-warnings --colorize
+
+lint-php-cs-fixer:
+	# PHP Coding Standards Fixer (with Nextcloud coding standards)
+	vendor/bin/php-cs-fixer fix --dry-run --diff
+
+
+lint-js:
 	npm run lint
 
-lint-fix:
-	npm run lint:fix
-
-# Style linting
-stylelint:
+lint-css:
 	npm run stylelint
 
-stylelint-fix:
+lint-xml:
+	# Check info.xml schema validity
+	wget https://apps.nextcloud.com/schema/apps/info.xsd -P appinfo/ -N --no-verbose || [ -f appinfo/info.xsd ]
+	xmllint appinfo/info.xml --schema appinfo/info.xsd --noout
+
+
+
+##### Fix lint #####
+
+lint-fix: lint-php-fix lint-js-fix lint-css-fix
+
+lint-php-fix:
+	vendor/bin/phpcbf --standard=tests/phpcs.xml $(php_dirs)
+	vendor/bin/php-cs-fixer fix
+
+lint-js-fix:
+	npm run lint:fix
+
+lint-css-fix:
 	npm run stylelint:fix
 
-# Cleaning
+
+
+##### Cleaning #####
+
 clean:
-	rm -rf js/*
+	rm -rf js/
+	rm -rf $(build_dir)
 
 clean-dev:
 	rm -rf node_modules
-
-# Tests
-test:
-	./vendor/phpunit/phpunit/phpunit -c phpunit.xml
-	./vendor/phpunit/phpunit/phpunit -c phpunit.integration.xml
+	rm -rf vendor
 
 # logging
 log:
