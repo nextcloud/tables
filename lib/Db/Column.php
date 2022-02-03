@@ -19,6 +19,7 @@ class Column extends Entity implements JsonSerializable {
     protected $prefix;
     protected $suffix;
     protected $description;
+    protected $orderWeight;
 
     // type number
     protected $numberDefault;
@@ -36,6 +37,7 @@ class Column extends Entity implements JsonSerializable {
         $this->addType('id', 'integer');
         $this->addType('tableId', 'integer');
         $this->addType('mandatory', 'boolean');
+        $this->addType('orderWeight', 'integer');
 
         // type number
         $this->addType('numberDecimals', 'integer');
@@ -63,6 +65,7 @@ class Column extends Entity implements JsonSerializable {
             'prefix'        => $this->prefix,
             'suffix'        => $this->suffix,
             'description'   => $this->description,
+            'orderWeight'   => $this->orderWeight,
 
             // type number
             'numberDefault' => $this->numberDefault,

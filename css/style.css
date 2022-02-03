@@ -27,6 +27,11 @@ p span, .p span {
     font-weight: 100;
 }
 
+[class^='col-'] span {
+    color: var(--color-text-lighter);
+    font-weight: 100;
+}
+
 .icon-left {
     background-position: left;
     padding-left: 22px;
@@ -53,4 +58,8 @@ p span, .p span {
 
 .icon-loading:first-child {
     top: 10vh;
+}
+
+.block {
+    display: block !important;
 }
