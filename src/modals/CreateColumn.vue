@@ -57,10 +57,10 @@
 					<CheckboxRadioSwitch type="switch" :checked.sync="mandatory" />
 				</div>
 
-				<div class="fix-col-1 mandatory">
+				<div class="fix-col-1 mandatory" :class="{error: typeMissingError}">
 					{{ t('tables', 'Type') }}
 				</div>
-				<div class="fix-col-3 margin-bottom">
+				<div class="fix-col-3 margin-bottom" :class="{error: typeMissingError}">
 					<CheckboxRadioSwitch :checked.sync="type"
 						value="textline"
 						name="type"
@@ -189,7 +189,9 @@
 
 				<div class="row">
 					<div class="col-4 margin-bottom">
-						<button>{{ t('tables', 'Cancel') }}</button>
+						<button @click="actionCancel">
+							{{ t('tables', 'Cancel') }}
+						</button>
 						<button class="success" @click="actionConfirm">
 							{{ t('tables', 'Save') }}
 						</button>
@@ -206,7 +208,7 @@ import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwi
 import Popover from '@nextcloud/vue/dist/Components/Popover'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
-import { showError } from '@nextcloud/dialogs'
+import { showError, showInfo, showSuccess } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -237,17 +239,26 @@ export default {
 			textDefault: '',
 			textAllowedPattern: '',
 			textMaxLength: null,
+			typeMissingError: false,
 		}
 	},
 	computed: {
 		...mapGetters(['activeTable']),
 	},
 	methods: {
-		actionConfirm() {
-			console.debug('submit new column', null)
-			this.sendNewColumnToBE()
+		async actionConfirm() {
+			console.debug('try to submit new column', null)
+			if (this.type === null) {
+				showInfo(t('tables', 'You need to select a type for the new column.'))
+				this.typeMissingError = true
+			} else {
+				await this.sendNewColumnToBE()
+				this.reset()
+				this.$emit('close')
+			}
 		},
 		actionCancel() {
+			this.reset()
 			this.$emit('close')
 		},
 		async sendNewColumnToBE() {
@@ -277,11 +288,10 @@ export default {
 					textMultiline,
 					tableId: this.activeTable.id,
 				}
-				console.debug('try so send new column', data)
-				const response = await axios.post(generateUrl('/apps/tables/column'), data)
-				console.debug('column created: ', response)
-				// await this.$store.dispatch('loadTablesFromBE')
-				this.reset()
+				// console.debug('try so send new column', data)
+				await axios.post(generateUrl('/apps/tables/column'), data)
+				showSuccess(t('tables', 'The column »{column}« was created.', { column: data.title }))
+				await this.$store.dispatch('loadTablesFromBE')
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not create new column'))

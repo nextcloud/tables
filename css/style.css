@@ -46,3 +46,11 @@ p span, .p span {
 .popover__inner p {
     padding: 15px;
 }
+
+.error {
+    color:  var(--color-error);
+}
+
+.icon-loading:first-child {
+    top: 10vh;
+}

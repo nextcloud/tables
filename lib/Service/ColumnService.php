@@ -68,10 +68,10 @@ class ColumnService {
         string $textAllowedPattern,
         int $textMaxLength,
         bool $textMultiline,
-        float $numberDefault,
-        float $numberMin,
-        float $numberMax,
-        int $numberDecimals
+        float $numberDefault = null,
+        float $numberMin = null,
+        float $numberMax = null,
+        int $numberDecimals = null
     ) {
         $time = new \DateTime();
 		$item = new Column();
