@@ -27,7 +27,7 @@
 					<input v-model="prefix">
 				</div>
 
-				<div class="col-1">
+				<div class="fix-col-1">
 					{{ t('tables', 'suffix') }}
 					<Popover>
 						<template #trigger>
@@ -42,7 +42,7 @@
 					<input v-model="suffix">
 				</div>
 
-				<div class="col-1">
+				<div class="fix-col-1">
 					{{ t('tables', 'mandatory') }}
 					<Popover>
 						<template #trigger>
