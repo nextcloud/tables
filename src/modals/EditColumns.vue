@@ -20,35 +20,13 @@
 					<span v-if="column.type === 'number' && column.textMultiline" class="block">{{ t('tables', 'Longtext') }}
 						{{ (column.mandatory) ? ', ' + t('tables', 'mandatory'): '' }}</span>
 				</div>
-				<div class="col-2">
-					<Popover>
-						<template #trigger>
-							<button class="icon-details" />
-						</template>
-						<table>
-							<tr>
-								<td>
-									{{ t('tables', 'Last edit') }}
-								</td>
-								<td>
-									{{ t('tables', '{dateTime} by »{userName}«', { dateTime: column.lastEditAt, userName: column.lastEditBy }) }}
-								</td>
-							</tr>
-							<tr>
-								<td>
-									{{ t('tables', 'Create') }}
-								</td>
-								<td>
-									{{ t('tables', '{dateTime} by »{userName}«', { dateTime: column.createdAt, userName: column.createdBy }) }}
-								</td>
-							</tr>
-						</table>
-					</Popover>
+				<div class="col-1">
+					<ColumnInfoPopover :column="column" />
 
-					{{ column.description }}
+					{{ column.description | truncate(50, '...') }}
 				</div>
 				<div class="col-1">
-					{{ column.oderWeight }}
+					<NumberTableDisplay v-if="column.type === 'number'" :column="column" />
 				</div>
 				<div class="col-1">
 					<Actions>
@@ -78,7 +56,8 @@ import { showError } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
 import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
-import Popover from '@nextcloud/vue/dist/Components/Popover'
+import ColumnInfoPopover from '../partials/ColumnInfoPopover'
+import NumberTableDisplay from '../columnTypePartials/tableDisplay/NumberTableDisplay'
 
 export default {
 	name: 'EditColumns',
@@ -86,7 +65,17 @@ export default {
 		Modal,
 		Actions,
 		ActionButton,
-		Popover,
+		ColumnInfoPopover,
+		NumberTableDisplay,
+	},
+	filters: {
+		truncate(text, length, suffix) {
+			if (text.length > length) {
+				return text.substring(0, length) + suffix
+			} else {
+				return text
+			}
+		},
 	},
 	props: {
 		showModal: {
