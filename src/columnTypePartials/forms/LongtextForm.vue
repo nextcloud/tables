@@ -49,7 +49,7 @@ export default {
 			set(defaultText) { this.$emit('update:textDefault', defaultText) },
 		},
 		maxLength: {
-			get() { return this.textMaxLength },
+			get() { return (this.textMaxLength && this.textMaxLength === -1) ? '' : this.textMaxLength },
 			set(maxLength) { this.$emit('update:textMaxLength', parseFloat(maxLength)) },
 		},
 	},

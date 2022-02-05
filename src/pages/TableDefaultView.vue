@@ -11,7 +11,7 @@
 		</div>
 		<div v-if="!somethingIsLoading && activeTable">
 			<div class="row-with-margin">
-				<TableDescription :active-table="activeTable" />
+				<TableDescription :active-table="activeTable" @reload="getColumnsForTableFromBE(activeTable.id)" />
 			</div>
 			<div class="row">
 				<NcTable :columns="columns" />

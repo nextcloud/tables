@@ -188,7 +188,7 @@ export default {
 				// console.debug('try so send new column', data)
 				await axios.post(generateUrl('/apps/tables/column'), data)
 				showSuccess(t('tables', 'The column »{column}« was created.', { column: data.title }))
-				await this.$store.dispatch('loadTablesFromBE')
+				// await this.$store.dispatch('loadTablesFromBE')
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not create new column'))

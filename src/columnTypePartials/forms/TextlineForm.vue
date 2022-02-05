@@ -72,7 +72,7 @@ export default {
 			set(allowedPattern) { this.$emit('update:textAllowedPattern', allowedPattern) },
 		},
 		maxLength: {
-			get() { return this.textMaxLength },
+			get() { return (this.textMaxLength && this.textMaxLength === -1) ? '' : this.textMaxLength },
 			set(maxLength) { this.$emit('update:textMaxLength', parseFloat(maxLength)) },
 		},
 	},

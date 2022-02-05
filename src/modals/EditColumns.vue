@@ -11,7 +11,7 @@
 
 			<div v-for="column in columns"
 				:key="column.id"
-				:class="{ editRow: editColumn && editColumn.id === column.id }"
+				:class="{ editRow: editColumn && editColumn.id === column.id, deleteRow: deleteId && deleteId === column.id }"
 				style="margin-bottom: 25px;">
 				<!-- edit mode -->
 				<div v-if="editColumn && editColumn.id === column.id" class="row">
@@ -49,7 +49,7 @@
 
 				<!-- no edit mode -->
 				<div v-else class="row">
-					<div class="col-1 block" :class="{mandatory: column.mandatory}">
+					<div class="col-1 block margin-bottom" :class="{mandatory: column.mandatory}">
 						{{ column.title }}
 
 						<span v-if="column.type === 'number'" class="block">{{ t('tables', 'Number') }}
@@ -59,29 +59,41 @@
 						<span v-if="column.type === 'text' && column.textMultiline" class="block">{{ t('tables', 'Longtext') }}
 							{{ (column.mandatory) ? ', ' + t('tables', 'mandatory'): '' }}</span>
 					</div>
-					<div class="col-1">
+					<div class="col-1 margin-bottom">
 						<ColumnInfoPopover :column="column" />
 
 						{{ column.description | truncate(50, '...') }}
 					</div>
-					<div class="col-1">
+					<div class="col-1 margin-bottom">
 						<NumberTableDisplay v-if="column.type === 'number'" :column="column" />
 						<TextlineTableDisplay v-if="column.type === 'text' && !column.textMultiline" :column="column" />
 						<LongtextTableDisplay v-if="column.type === 'text' && column.textMultiline" :column="column" />
 					</div>
-					<div class="col-1">
-						<Actions>
+					<div class="col-1 margin-bottom">
+						<Actions v-if="!otherActionPerformed">
 							<ActionButton icon="icon-rename" :close-after-click="true" @click="editColumn = column">
 								{{ t('tables', 'Edit') }}
 							</ActionButton>
-							<ActionButton :close-after-click="true" icon="icon-delete">
+							<ActionButton :close-after-click="true" icon="icon-delete" @click="deleteId = column.id">
 								{{ t('tables', 'Delete') }}
 							</ActionButton>
 						</Actions>
 					</div>
+					<div v-if="column.id === deleteId" class="row">
+						<div class="col-4">
+							<h4>{{ t('tables', 'Do you really want to delete the column »{column}«?', { column: column.title }) }}</h4>
+						</div>
+						<div class="col-4">
+							<button class="secondary" @click="deleteId = null">
+								{{ t('tables', 'Cancel') }}
+							</button>
+							<button class="error" @click="deleteColumn">
+								{{ t('tables', 'Delete') }}
+							</button>
+						</div>
+					</div>
 				</div>
 			</div>
-
 			<div class="row">
 				<div class="col-4 margin-bottom">
 					<button class="secondary" @click="actionCancel">
@@ -144,10 +156,14 @@ export default {
 			loading: false,
 			columns: null,
 			editColumn: null,
+			deleteId: null,
 		}
 	},
 	computed: {
 		...mapGetters(['activeTable']),
+		otherActionPerformed() {
+			return !!(this.editColumn !== null || this.deleteId !== null)
+		},
 	},
 	mounted() {
 		this.getColumnsForTableFromBE()
@@ -187,6 +203,7 @@ export default {
 			this.loading = false
 			this.columns = null
 			this.editColumn = null
+			this.deleteId = null
 		},
 		async sendEditColumnToBE() {
 			if (!this.editColumn) {
@@ -204,12 +221,38 @@ export default {
 				showError(t('tables', 'Could not update column'))
 			}
 		},
+		async deleteColumn() {
+			console.debug('try to delete column with id:', this.deleteId)
+			await this.deleteColumnAtBE(this.deleteId)
+			this.deleteId = null
+			this.getColumnsForTableFromBE()
+		},
+		async deleteColumnAtBE(columnId) {
+			if (!columnId) {
+				showError(t('tables', 'Error occurs, see the logs.'))
+				console.debug('tried to delete column at BE, but it is null', columnId)
+				return
+			}
+			try {
+				console.debug('try so delete column', columnId)
+				await axios.delete(generateUrl('/apps/tables/column/' + columnId))
+				showSuccess(t('tables', 'The column is removed.'))
+				this.getColumnsForTableFromBE()
+			} catch (e) {
+				console.error(e)
+				showError(t('tables', 'Could not delete column'))
+			}
+		},
 	},
 }
 </script>
 <style scoped>
 
 .editRow {
+	background-color: var(--color-primary-light-hover);
+}
+
+.deleteRow {
 	background-color: var(--color-primary-light-hover);
 }
 

@@ -17,8 +17,8 @@
 				</ActionButton>
 			</Actions>
 		</h2>
-		<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false" />
-		<EditColumns :show-modal="showEditColumns" @close="showEditColumns = false" />
+		<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false; $emit('reload')" />
+		<EditColumns :show-modal="showEditColumns" @close="showEditColumns = false; $emit('reload')" />
 	</div>
 </template>
 

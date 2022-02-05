@@ -25,7 +25,7 @@ class ColumnMapper extends QBMapper {
      * @throws Exception
      * @throws DoesNotExistException
      */
-	public function find(int $id, string $userId): Table {
+	public function find(int $id, string $userId): Column {
         // TODO check if request is permitted
         $qb = $this->db->getQueryBuilder();
 		$qb->select('*')
