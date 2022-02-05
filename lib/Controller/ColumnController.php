@@ -62,7 +62,8 @@ class ColumnController extends Controller {
         float $numberDefault = null,
         float $numberMin = null,
         float $numberMax = null,
-        int $numberDecimals = null
+        int $numberDecimals = null,
+        int $orderWeight = 0
     ): DataResponse {
 		return new DataResponse($this->service->create(
             $tableId,
@@ -80,7 +81,8 @@ class ColumnController extends Controller {
             $numberDefault,
             $numberMin,
             $numberMax,
-            $numberDecimals));
+            $numberDecimals,
+            $orderWeight));
 	}
 
 	/**
@@ -89,26 +91,25 @@ class ColumnController extends Controller {
 	public function update(
         int $id,
         int $tableId,
-        string $userId,
         string $title,
         string $type,
-        string $prefix,
-        string $suffix,
-        bool $mandatory,
-        string $description,
-        string $textDefault,
-        string $textAllowedPattern,
-        int $textMaxLength,
-        bool $textMultiline,
-        float $numberDefault,
-        float $numberMin,
-        float $numberMax,
-        int $numberDecimals
+        string $prefix = '',
+        string $suffix = '',
+        bool $mandatory = false,
+        string $description = '',
+        string $textDefault = '',
+        string $textAllowedPattern = '',
+        int $textMaxLength = null,
+        bool $textMultiline = false,
+        float $numberDefault = null,
+        float $numberMin = null,
+        float $numberMax = null,
+        int $numberDecimals = null,
+        int $orderWeight = 0
     ): DataResponse {
 		return $this->handleNotFound(function () use (
             $id,
             $tableId,
-            $userId,
             $title,
             $type,
             $prefix,
@@ -122,12 +123,13 @@ class ColumnController extends Controller {
             $numberDefault,
             $numberMin,
             $numberMax,
-            $numberDecimals
+            $numberDecimals,
+            $orderWeight
         ) {
 			return $this->service->update(
                 $id,
                 $tableId,
-                $userId,
+                $this->userId,
                 $title,
                 $type,
                 $prefix,
@@ -141,7 +143,8 @@ class ColumnController extends Controller {
                 $numberDefault,
                 $numberMin,
                 $numberMax,
-                $numberDecimals);
+                $numberDecimals,
+                $orderWeight);
 		});
 	}
 

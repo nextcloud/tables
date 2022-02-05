@@ -71,7 +71,8 @@ class ColumnService {
         float $numberDefault = null,
         float $numberMin = null,
         float $numberMax = null,
-        int $numberDecimals = null
+        int $numberDecimals = null,
+        int $orderWeight = 0
     ) {
         $time = new \DateTime();
 		$item = new Column();
@@ -94,6 +95,7 @@ class ColumnService {
         $item->setLastEditBy($userId);
         $item->setCreatedAt($time->format('Y-m-d H:i:s'));
         $item->setLastEditAt($time->format('Y-m-d H:i:s'));
+        $item->setOrderWeight($orderWeight);
 		return $this->mapper->insert($item);
 	}
 
@@ -114,10 +116,11 @@ class ColumnService {
         $textAllowedPattern,
         $textMaxLength,
         $textMultiline,
-        $numberDefault,
-        $numberMin,
-        $numberMax,
-        $numberDecimals
+        $numberDefault = null,
+        $numberMin = null,
+        $numberMax = null,
+        $numberDecimals = null,
+        $orderWeight = 0
     ) {
 		try {
             $time = new \DateTime();
@@ -125,7 +128,6 @@ class ColumnService {
             $item->setId($id);
             $item->setTitle($title);
             $item->setTableId($tableId);
-            $item->setUserId($userId);
             $item->setType($type);
             $item->setPrefix($prefix);
             $item->setSuffix($suffix);
@@ -141,6 +143,7 @@ class ColumnService {
             $item->setNumberDecimals($numberDecimals);
             $item->setLastEditBy($userId);
             $item->setLastEditAt($time->format('Y-m-d H:i:s'));
+            $item->setOrderWeight($orderWeight);
 			return $this->mapper->update($item);
 		} catch (Exception $e) {
 			$this->handleException($e);

@@ -88,7 +88,7 @@ export default {
 			default: null,
 		},
 		description: {
-			type: Text,
+			type: String,
 			default: null,
 		},
 		prefix: {

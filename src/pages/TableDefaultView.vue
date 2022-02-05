@@ -64,7 +64,7 @@ export default {
 				try {
 					console.debug('try to fetch columns for table id: ', tableId)
 					const response = await axios.get(generateUrl('/apps/tables/column/' + tableId))
-					this.columns = response.data
+					this.columns = response.data.sort(this.compareColumns)
 					console.debug('columns loaded', this.columns)
 				} catch (e) {
 					console.error(e)
@@ -72,6 +72,11 @@ export default {
 				}
 			}
 			this.loading = false
+		},
+		compareColumns(a, b) {
+			if (a.orderWeight < b.orderWeight) { return 1 }
+			if (a.orderWeight > b.orderWeight) { return -1 }
+			return 0
 		},
 	},
 }

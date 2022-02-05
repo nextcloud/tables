@@ -97,7 +97,7 @@
 import Modal from '@nextcloud/vue/dist/Components/Modal'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
-import { showError } from '@nextcloud/dialogs'
+import { showError, showSuccess } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
 import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
@@ -179,14 +179,30 @@ export default {
 			if (a.orderWeight > b.orderWeight) { return -1 }
 			return 0
 		},
-		safeColumn() {
+		async safeColumn() {
+			await this.sendEditColumnToBE()
 			this.editColumn = null
-			return true
 		},
 		reset() {
 			this.loading = false
 			this.columns = null
 			this.editColumn = null
+		},
+		async sendEditColumnToBE() {
+			if (!this.editColumn) {
+				showError(t('tables', 'Error occurs, see the logs.'))
+				console.debug('tried to send editColumn to BE, but it is null', this.editColumn)
+				return
+			}
+			try {
+				console.debug('try so send column', this.editColumn)
+				await axios.put(generateUrl('/apps/tables/column/' + this.editColumn.id), this.editColumn)
+				showSuccess(t('tables', 'The column »{column}« was updated.', { column: this.editColumn.title }))
+				this.getColumnsForTableFromBE()
+			} catch (e) {
+				console.error(e)
+				showError(t('tables', 'Could not update column'))
+			}
 		},
 	},
 }
