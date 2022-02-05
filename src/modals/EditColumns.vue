@@ -21,7 +21,8 @@
 							:order-weight.sync="editColumn.orderWeight"
 							:prefix.sync="editColumn.prefix"
 							:suffix.sync="editColumn.suffix"
-							:title.sync="editColumn.title" />
+							:title.sync="editColumn.title"
+							:title-missing-error="editErrorTitle" />
 					</div>
 					<div class="fix-col-2 margin-bottom">
 						<NumberForm v-if="editColumn.type === 'number'"
@@ -157,6 +158,7 @@ export default {
 			columns: null,
 			editColumn: null,
 			deleteId: null,
+			editErrorTitle: false,
 		}
 	},
 	computed: {
@@ -196,6 +198,12 @@ export default {
 			return 0
 		},
 		async safeColumn() {
+			if (this.editColumn.title === '') {
+				showError(t('tables', 'Can not update column. Title is missing.'))
+				this.editErrorTitle = true
+				return
+			}
+			this.editErrorTitle = false
 			await this.sendEditColumnToBE()
 			this.editColumn = null
 		},
@@ -204,6 +212,7 @@ export default {
 			this.columns = null
 			this.editColumn = null
 			this.deleteId = null
+			this.editErrorTitle = false
 		},
 		async sendEditColumnToBE() {
 			if (!this.editColumn) {

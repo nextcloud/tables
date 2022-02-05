@@ -17,7 +17,12 @@
 				</ActionButton>
 			</Actions>
 		</h2>
-		<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false; $emit('reload')" />
+		<p v-if="!columns || columns.length === 0">
+			{{ t('tables', 'There are no columns yet, click on the three-dot menu next to the table title ahead and create some.') }}
+		</p>
+		<CreateColumn
+			:show-modal="showCreateColumn"
+			@close="showCreateColumn = false; $emit('reload')" />
 		<EditColumns :show-modal="showEditColumns" @close="showEditColumns = false; $emit('reload')" />
 	</div>
 </template>
@@ -40,6 +45,12 @@ export default {
 		ViewColumnOutline,
 		CreateColumn,
 		EditColumns,
+	},
+	props: {
+		columns: {
+			type: Array,
+			default: null,
+		},
 	},
 	data() {
 		return {
