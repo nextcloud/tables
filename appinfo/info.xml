@@ -11,7 +11,7 @@
     <namespace>Tables</namespace>
     <category>office</category>
     <dependencies>
-        <nextcloud min-version="21" max-version="22"/>
+        <nextcloud min-version="22" max-version="23"/>
     </dependencies>
     <navigations>
         <navigation>

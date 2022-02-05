@@ -6,56 +6,13 @@
 					<h2>{{ t('tables', 'Create column') }}</h2>
 				</div>
 
-				<div class="fix-col-1 mandatory" :class="{error: titleMissingError}">
-					{{ t('tables', 'Title') }}
-				</div>
-				<div class="fix-col-3 margin-bottom" :class="{error: titleMissingError}">
-					<input v-model="title" :placeholder="t('tables', 'Title for the column.')">
-				</div>
-
-				<div class="fix-col-1">
-					{{ t('tables', 'Description') }}
-				</div>
-				<div class="fix-col-3 margin-bottom">
-					<textarea v-model="description" />
-				</div>
-
-				<div class="fix-col-1">
-					{{ t('tables', 'prefix') }}
-				</div>
-				<div class="fix-col-3 margin-bottom">
-					<input v-model="prefix">
-				</div>
-
-				<div class="fix-col-1">
-					{{ t('tables', 'suffix') }}
-					<Popover>
-						<template #trigger>
-							<button class="icon-details" />
-						</template>
-						<p>
-							{{ t('tables', 'Here is a good place to put your unit for example.') }}
-						</p>
-					</Popover>
-				</div>
-				<div class="fix-col-3 margin-bottom">
-					<input v-model="suffix">
-				</div>
-
-				<div class="fix-col-1">
-					{{ t('tables', 'mandatory') }}
-					<Popover>
-						<template #trigger>
-							<button class="icon-details" />
-						</template>
-						<p>
-							{{ t('tables', 'Check if this field is mandatory. If so, it will be required in every form.') }}
-						</p>
-					</Popover>
-				</div>
-				<div class="fix-col-3 margin-bottom">
-					<CheckboxRadioSwitch type="switch" :checked.sync="mandatory" />
-				</div>
+				<MainForm :description.sync="description"
+					:mandatory.sync="mandatory"
+					:order-weight.sync="orderWeight"
+					:prefix.sync="prefix"
+					:suffix.sync="suffix"
+					:title.sync="title"
+					:title-missing-error="titleMissingError" />
 
 				<div class="fix-col-1 mandatory" :class="{error: typeMissingError}">
 					{{ t('tables', 'Type') }}
@@ -116,10 +73,10 @@
 
 				<div class="row">
 					<div class="col-4 margin-bottom">
-						<button @click="actionCancel">
+						<button class="secondary" @click="actionCancel">
 							{{ t('tables', 'Cancel') }}
 						</button>
-						<button class="success" @click="actionConfirm">
+						<button class="primary" @click="actionConfirm">
 							{{ t('tables', 'Save') }}
 						</button>
 					</div>
@@ -133,9 +90,9 @@
 import NumberForm from '../columnTypePartials/forms/NumberForm'
 import TextlineForm from '../columnTypePartials/forms/TextlineForm'
 import LongtextForm from '../columnTypePartials/forms/LongtextForm'
+import MainForm from '../columnTypePartials/forms/MainForm'
 import Modal from '@nextcloud/vue/dist/Components/Modal'
 import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch'
-import Popover from '@nextcloud/vue/dist/Components/Popover'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showInfo, showSuccess } from '@nextcloud/dialogs'
@@ -146,10 +103,10 @@ export default {
 	components: {
 		Modal,
 		CheckboxRadioSwitch,
-		Popover,
 		NumberForm,
 		TextlineForm,
 		LongtextForm,
+		MainForm,
 	},
 	props: {
 		showModal: {
@@ -164,6 +121,7 @@ export default {
 			description: '',
 			prefix: '',
 			suffix: '',
+			orderWeight: 0,
 			mandatory: false,
 			numberDefault: null,
 			numberMin: 0,
@@ -215,6 +173,7 @@ export default {
 					description: this.description,
 					prefix: this.prefix,
 					suffix: this.suffix,
+					orderWeight: this.orderWeight,
 					mandatory: this.mandatory,
 					numberDefault: this.numberDefault,
 					numberMin: this.numberMin,
@@ -241,6 +200,7 @@ export default {
 			this.description = ''
 			this.prefix = ''
 			this.suffix = ''
+			this.orderWeight = 0
 			this.mandatory = false
 			this.numberDefault = null
 			this.numberMin = 0

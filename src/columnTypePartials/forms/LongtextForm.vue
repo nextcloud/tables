@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div style="width: 100%">
 		<!-- default -->
 		<div class="row">
 			<div class="fix-col-1">

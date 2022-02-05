@@ -21,3 +21,10 @@ export default {
 	},
 }
 </script>
+<style scoped>
+
+table td {
+	padding-right: 10px;
+}
+
+</style>

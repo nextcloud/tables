@@ -9,39 +9,84 @@
 				</div>
 			</div>
 
-			<div v-for="column in columns" :key="column.id" class="row">
-				<div class="col-1 block" :class="{mandatory: column.mandatory}">
-					{{ column.title }}
+			<div v-for="column in columns"
+				:key="column.id"
+				:class="{ editRow: editColumn && editColumn.id === column.id }"
+				style="margin-bottom: 25px;">
+				<!-- edit mode -->
+				<div v-if="editColumn && editColumn.id === column.id" class="row">
+					<div class="col-2 margin-bottom">
+						<MainForm :description.sync="editColumn.description"
+							:mandatory.sync="editColumn.mandatory"
+							:order-weight.sync="editColumn.orderWeight"
+							:prefix.sync="editColumn.prefix"
+							:suffix.sync="editColumn.suffix"
+							:title.sync="editColumn.title" />
+					</div>
+					<div class="fix-col-2 margin-bottom">
+						<NumberForm v-if="editColumn.type === 'number'"
+							:number-default.sync="editColumn.numberDefault"
+							:number-min.sync="editColumn.numberMin"
+							:number-max.sync="editColumn.numberMax"
+							:number-decimals.sync="editColumn.numberDecimals" />
+						<TextlineForm v-if="editColumn.type === 'text' && !editColumn.textMultiline"
+							:text-default.sync="editColumn.textDefault"
+							:text-allowed-pattern.sync="editColumn.textAllowedPattern"
+							:text-max-length.sync="editColumn.textMaxLength" />
+						<LongtextForm v-if="editColumn.type === 'text' && editColumn.textMultiline"
+							:text-default.sync="editColumn.textDefault"
+							:text-max-length.sync="editColumn.textMaxLength" />
+					</div>
+					<div class="col-4">
+						<button class="secondary" @click="editColumn = null">
+							{{ t('tables', 'Cancel') }}
+						</button>
+						<button class="primary" @click="safeColumn">
+							{{ t('tables', 'Save') }}
+						</button>
+					</div>
+				</div>
 
-					<span v-if="column.type === 'number'" class="block">{{ t('tables', 'Number') }}
-						{{ (column.mandatory) ? ', ' + t('tables', 'mandatory'): '' }}</span>
-					<span v-if="column.type === 'text' && !column.textMultiline" class="block">{{ t('tables', 'Textline') }}
-						{{ (column.mandatory) ? ', ' + t('tables', 'mandatory'): '' }}</span>
-					<span v-if="column.type === 'number' && column.textMultiline" class="block">{{ t('tables', 'Longtext') }}
-						{{ (column.mandatory) ? ', ' + t('tables', 'mandatory'): '' }}</span>
-				</div>
-				<div class="col-1">
-					<ColumnInfoPopover :column="column" />
+				<!-- no edit mode -->
+				<div v-else class="row">
+					<div class="col-1 block" :class="{mandatory: column.mandatory}">
+						{{ column.title }}
 
-					{{ column.description | truncate(50, '...') }}
-				</div>
-				<div class="col-1">
-					<NumberTableDisplay v-if="column.type === 'number'" :column="column" />
-				</div>
-				<div class="col-1">
-					<Actions>
-						<ActionButton icon="icon-delete" @click="alert('Delete')">
-							{{ t('tables', 'Delete') }}
-						</ActionButton>
-					</Actions>
+						<span v-if="column.type === 'number'" class="block">{{ t('tables', 'Number') }}
+							{{ (column.mandatory) ? ', ' + t('tables', 'mandatory'): '' }}</span>
+						<span v-if="column.type === 'text' && !column.textMultiline" class="block">{{ t('tables', 'Textline') }}
+							{{ (column.mandatory) ? ', ' + t('tables', 'mandatory'): '' }}</span>
+						<span v-if="column.type === 'text' && column.textMultiline" class="block">{{ t('tables', 'Longtext') }}
+							{{ (column.mandatory) ? ', ' + t('tables', 'mandatory'): '' }}</span>
+					</div>
+					<div class="col-1">
+						<ColumnInfoPopover :column="column" />
+
+						{{ column.description | truncate(50, '...') }}
+					</div>
+					<div class="col-1">
+						<NumberTableDisplay v-if="column.type === 'number'" :column="column" />
+						<TextlineTableDisplay v-if="column.type === 'text' && !column.textMultiline" :column="column" />
+						<LongtextTableDisplay v-if="column.type === 'text' && column.textMultiline" :column="column" />
+					</div>
+					<div class="col-1">
+						<Actions>
+							<ActionButton icon="icon-rename" :close-after-click="true" @click="editColumn = column">
+								{{ t('tables', 'Edit') }}
+							</ActionButton>
+							<ActionButton :close-after-click="true" icon="icon-delete">
+								{{ t('tables', 'Delete') }}
+							</ActionButton>
+						</Actions>
+					</div>
 				</div>
 			</div>
 
 			<div class="row">
 				<div class="col-4 margin-bottom">
-					<Button @click="actionCancel">
+					<button class="secondary" @click="actionCancel">
 						{{ t('tables', 'Close') }}
-					</Button>
+					</button>
 				</div>
 			</div>
 		</div>
@@ -58,6 +103,12 @@ import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import ColumnInfoPopover from '../partials/ColumnInfoPopover'
 import NumberTableDisplay from '../columnTypePartials/tableDisplay/NumberTableDisplay'
+import TextlineTableDisplay from '../columnTypePartials/tableDisplay/TextlineTableDisplay'
+import LongtextTableDisplay from '../columnTypePartials/tableDisplay/LongtextTableDisplay'
+import NumberForm from '../columnTypePartials/forms/NumberForm'
+import TextlineForm from '../columnTypePartials/forms/TextlineForm'
+import LongtextForm from '../columnTypePartials/forms/LongtextForm'
+import MainForm from '../columnTypePartials/forms/MainForm'
 
 export default {
 	name: 'EditColumns',
@@ -67,6 +118,12 @@ export default {
 		ActionButton,
 		ColumnInfoPopover,
 		NumberTableDisplay,
+		TextlineTableDisplay,
+		LongtextTableDisplay,
+		NumberForm,
+		TextlineForm,
+		LongtextForm,
+		MainForm,
 	},
 	filters: {
 		truncate(text, length, suffix) {
@@ -86,6 +143,7 @@ export default {
 		return {
 			loading: false,
 			columns: null,
+			editColumn: null,
 		}
 	},
 	computed: {
@@ -103,7 +161,7 @@ export default {
 				try {
 					console.debug('try to fetch columns for table id: ', this.activeTable.id)
 					const response = await axios.get(generateUrl('/apps/tables/column/' + this.activeTable.id))
-					this.columns = response.data
+					this.columns = response.data.sort(this.compareColumns)
 					console.debug('columns loaded', this.columns)
 				} catch (e) {
 					console.error(e)
@@ -113,8 +171,30 @@ export default {
 			this.loading = false
 		},
 		actionCancel() {
+			this.reset()
 			this.$emit('close')
+		},
+		compareColumns(a, b) {
+			if (a.orderWeight < b.orderWeight) { return 1 }
+			if (a.orderWeight > b.orderWeight) { return -1 }
+			return 0
+		},
+		safeColumn() {
+			this.editColumn = null
+			return true
+		},
+		reset() {
+			this.loading = false
+			this.columns = null
+			this.editColumn = null
 		},
 	},
 }
 </script>
+<style scoped>
+
+.editRow {
+	background-color: var(--color-primary-light-hover);
+}
+
+</style>
