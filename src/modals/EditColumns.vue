@@ -7,6 +7,9 @@
 				<div class="col-4">
 					<h2>{{ t('tables', 'Edit columns') }}</h2>
 				</div>
+				<div v-if="!columns || columns.length === 0" class="col-4">
+					<p>{{ t('tables', 'There are no columns yet, click on the three-dot menu next to the table title ahead and create some.') }}</p>
+				</div>
 			</div>
 
 			<div v-for="column in columns"
