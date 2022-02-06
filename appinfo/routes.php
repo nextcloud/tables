@@ -5,7 +5,11 @@ return [
         'table' => ['url' => '/table'],
 	],
 	'routes' => [
-		['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
+        ['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
+
+        ['name' => 'tableTemplate#list', 'url' => '/table/templates', 'verb' => 'GET'],
+
+        // columns
         ['name' => 'column#index', 'url' => '/column/{tableId}', 'verb' => 'GET'],
         ['name' => 'column#show', 'url' => '/column/{id}', 'verb' => 'GET'],
         ['name' => 'column#create', 'url' => '/column', 'verb' => 'POST'],

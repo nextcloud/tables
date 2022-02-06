@@ -6,6 +6,16 @@
 		<tr>
 			<td>{{ t('tables', 'Decimals') }}</td><td>{{ column.numberDecimals }}</td>
 		</tr>
+
+		<tr>
+			<td>{{ t('tables', 'Default') }}</td><td>{{ column.numberDefault }}</td>
+		</tr>
+		<tr>
+			<td>{{ t('tables', 'Min') }}</td><td>{{ column.numberMin }}</td>
+		</tr>
+		<tr>
+			<td>{{ t('tables', 'Max') }}</td><td>{{ column.numberMax }}</td>
+		</tr>
 	</table>
 </template>
 

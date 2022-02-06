@@ -47,8 +47,8 @@ class TableController extends Controller {
      * @NoAdminRequired
      * @throws Exception
      */
-	public function create(string $title): DataResponse {
-		return new DataResponse($this->service->create($title, $this->userId));
+	public function create(string $title, string $template): DataResponse {
+		return new DataResponse($this->service->create($title, $this->userId, $template));
 	}
 
 	/**

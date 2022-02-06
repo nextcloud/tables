@@ -15,8 +15,16 @@ class TableService {
 	/** @var TableMapper */
 	private $mapper;
 
-	public function __construct(TableMapper $mapper) {
+    /** @var TableTemplateService */
+    private $tableTemplateService;
+
+    /** @var ColumnService */
+    private $columnService;
+
+	public function __construct(TableMapper $mapper, TableTemplateService $tableTemplateService, ColumnService $columnService) {
 		$this->mapper = $mapper;
+        $this->tableTemplateService = $tableTemplateService;
+        $this->columnService = $columnService;
 	}
 
     /**
@@ -56,7 +64,7 @@ class TableService {
      * @throws \OCP\DB\Exception
      * @noinspection PhpUndefinedMethodInspection
      */
-    public function create($title, $userId) {
+    public function create($title, $userId, $template) {
         $time = new \DateTime();
 		$item = new Table();
         $item->setTitle($title);
@@ -65,7 +73,11 @@ class TableService {
         $item->setLastEditBy($userId);
         $item->setCreatedAt($time->format('Y-m-d H:i:s'));
         $item->setLastEditAt($time->format('Y-m-d H:i:s'));
-		return $this->mapper->insert($item);
+		$newTable = $this->mapper->insert($item);
+        if($template !== 'custom') {
+            return $this->tableTemplateService->makeTemplate($newTable, $template);
+        }
+        return $newTable;
 	}
 
     /** @noinspection PhpUndefinedMethodInspection */
@@ -85,6 +97,10 @@ class TableService {
 
 	public function delete($id, $userId) {
 		try {
+            $columns = $this->columnService->findAllByTable($userId, $id);
+            foreach ($columns as $column) {
+                $this->columnService->delete($column->id, $userId);
+            }
             $item = $this->mapper->find($id, $userId);
 			$this->mapper->delete($item);
 			return $item;

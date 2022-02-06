@@ -47,6 +47,21 @@
 							{{ t('tables', 'Create table') }}
 						</button>
 					</div>
+
+					<!-- templates boxes -->
+					<div v-for="template in templates" :key="template.name" class="box-1">
+						<div class="icon-left" :class="template.icon">
+							<div class="header">
+								{{ template.title }}
+							</div>
+						</div>
+						<p>
+							{{ template.description }}
+						</p>
+						<button @click="submit(template.name)">
+							{{ t('tables', 'Create table') }}
+						</button>
+					</div>
 				</div>
 			</div>
 		</Modal>
@@ -74,6 +89,7 @@ export default {
 			title: '',
 			icon: '',
 			errorTitle: false,
+			templates: null,
 		}
 	},
 	watch: {
@@ -84,6 +100,9 @@ export default {
 			}
 		},
 	},
+	beforeMount() {
+		this.loadTemplatesFromBE()
+	},
 	methods: {
 		async submit(template) {
 			console.debug('try to add table from template', template)
@@ -92,7 +111,7 @@ export default {
 				this.errorTitle = true
 			} else {
 				console.debug('submit okay, try to send to BE')
-				const newTableId = await this.sendNewTableToBE()
+				const newTableId = await this.sendNewTableToBE(template)
 				if (newTableId) {
 					this.$store.commit('setActiveTableId', newTableId)
 				}
@@ -101,11 +120,12 @@ export default {
 				this.reset()
 			}
 		},
-		async sendNewTableToBE() {
+		async sendNewTableToBE(template) {
 			let ret = null
 			try {
 				const data = {
 					title: this.title,
+					template,
 				}
 				const response = await axios.post(generateUrl('/apps/tables/table'), data)
 				console.debug('table created: ', response)
@@ -123,6 +143,17 @@ export default {
 		},
 		addIconToTitle(icon) {
 			this.title = icon + ' ' + this.title
+		},
+		async loadTemplatesFromBE() {
+			try {
+				console.debug('try to fetched templates')
+				const response = await axios.get(generateUrl('/apps/tables/table/templates'))
+				console.debug('fetched templates: ', response)
+				this.templates = response.data
+			} catch (e) {
+				console.error(e)
+				showError(t('tables', 'Could not fetch templates from BE'))
+			}
 		},
 	},
 }
