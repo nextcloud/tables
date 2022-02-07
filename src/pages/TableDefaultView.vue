@@ -11,10 +11,12 @@
 		</div>
 		<div v-if="!somethingIsLoading && activeTable">
 			<div class="row-with-margin">
-				<TableDescription :active-table="activeTable" :columns="columns" @reload="getColumnsForTableFromBE(activeTable.id)" />
+				<TableDescription :active-table="activeTable"
+					:columns="columns"
+					@reload="getColumnsForTableFromBE(activeTable.id)" />
 			</div>
 			<div class="row">
-				<NcTable :columns="columns" />
+				<NcTable :rows="rows" :columns="columns" />
 			</div>
 		</div>
 	</div>
@@ -40,6 +42,7 @@ export default {
 		return {
 			loading: false,
 			columns: null,
+			rows: null,
 		}
 	},
 	computed: {
@@ -53,6 +56,7 @@ export default {
 		activeTable() {
 			console.debug('table changed, I will try to fetch columns')
 			this.getColumnsForTableFromBE(this.activeTable.id)
+			this.getRowsForTableFromBE(this.activeTable.id)
 		},
 	},
 	methods: {
@@ -69,6 +73,23 @@ export default {
 				} catch (e) {
 					console.error(e)
 					showError(t('tables', 'Could not fetch columns for table'))
+				}
+			}
+			this.loading = false
+		},
+		async getRowsForTableFromBE(tableId) {
+			this.loading = true
+			if (!tableId) {
+				this.rows = null
+			} else {
+				try {
+					console.debug('try to fetch rows for table id: ', tableId)
+					const response = await axios.get(generateUrl('/apps/tables/row/' + tableId))
+					this.rows = response.data
+					console.debug('rows loaded', this.rows)
+				} catch (e) {
+					console.error(e)
+					showError(t('tables', 'Could not fetch rows for table'))
 				}
 			}
 			this.loading = false

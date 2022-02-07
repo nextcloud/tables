@@ -1,6 +1,9 @@
 <template>
 	<div>
-		<TabulatorComponent v-model="data" :options="options2" />
+		<TabulatorComponent v-model="data"
+			:options="options2"
+			@cell-click="cellClick"
+			@cell-edited="edited" />
 	</div>
 </template>
 
@@ -17,10 +20,13 @@ export default {
 			type: Array,
 			default: null,
 		},
+		rows: {
+			type: Array,
+			default: null,
+		},
 	},
 	data() {
 		return {
-			data: [],
 			options: {
 				resizableColumns: 'header',
 				columns: this.columnsDefinition,
@@ -65,6 +71,30 @@ export default {
 				// ],
 				layout: 'fitDataFill',
 			}
+		},
+		data() {
+			const d = []
+			if (this.rows) {
+				this.rows.forEach(item => {
+					const t = { id: item.id }
+
+					if (item.data) {
+						item.data.forEach(c => {
+							t['column-' + c.columnId] = c.value
+						})
+					}
+					d.push(t)
+				})
+			}
+			return d
+		},
+	},
+	methods: {
+		cellClick(e, cell) {
+			console.debug('cell click', cell)
+		},
+		edited(data) {
+			console.debug('data edited', data)
 		},
 	},
 }

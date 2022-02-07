@@ -15,5 +15,12 @@ return [
         ['name' => 'column#create', 'url' => '/column', 'verb' => 'POST'],
         ['name' => 'column#update', 'url' => '/column/{id}', 'verb' => 'PUT'],
         ['name' => 'column#destroy', 'url' => '/column/{id}', 'verb' => 'DELETE'],
+
+        // rows
+        ['name' => 'row#index', 'url' => '/row/{tableId}', 'verb' => 'GET'],
+        ['name' => 'row#show', 'url' => '/row/{id}', 'verb' => 'GET'],
+        ['name' => 'row#create', 'url' => '/row', 'verb' => 'POST'],
+        ['name' => 'row#update', 'url' => '/row/{id}', 'verb' => 'PUT'],
+        ['name' => 'row#destroy', 'url' => '/row/{id}', 'verb' => 'DELETE'],
     ]
 ];
