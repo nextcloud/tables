@@ -54,17 +54,23 @@ class RowService {
      */
     public function create(
         int $tableId,
+        int $columnId,
         string $userId,
         string $data
     ) {
         $time = new \DateTime();
-		$item = new Row();
+        $item = new Row();
+        $d = [];
+        $d[] = (object) [
+            "columnId" => $columnId,
+            "value" => $data
+        ];
+        $item->setDataArray($d);
         $item->setTableId($tableId);
         $item->setCreatedBy($userId);
-        $item->setLastEditBy($userId);
         $item->setCreatedAt($time->format('Y-m-d H:i:s'));
+        $item->setLastEditBy($userId);
         $item->setLastEditAt($time->format('Y-m-d H:i:s'));
-        $item->setData($data);
 		return $this->mapper->insert($item);
 	}
 
@@ -73,18 +79,32 @@ class RowService {
      */
     public function update(
         int $id,
-        int $tableId,
+        int $columnId,
         string $userId,
         string $data
     ) {
 		try {
             $time = new \DateTime();
-            $item = new Row();
-            $item->setId($id);
-            $item->setTableId($tableId);
+            $item = $this->mapper->find($id);
+            $d = $item->getDataArray();
+            $columnFound = false;
+            foreach ($d as $c) {
+                if($c->columnId === $columnId) {
+                    $c->value = $data;
+                    $columnFound = true;
+                    break;
+                }
+            }
+            // if the value was not set, add it
+            if(!$columnFound) {
+                $d[] = (object) [
+                        "columnId" => $columnId,
+                        "value" => $data
+                    ];
+            }
+            $item->setDataArray($d);
             $item->setLastEditBy($userId);
             $item->setLastEditAt($time->format('Y-m-d H:i:s'));
-            $item->setData($data);
 			return $this->mapper->update($item);
 		} catch (Exception $e) {
 			$this->handleException($e);

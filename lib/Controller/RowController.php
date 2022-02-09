@@ -50,10 +50,12 @@ class RowController extends Controller {
      */
 	public function create(
         int $tableId,
+        int $columnId,
         string $data
     ): DataResponse {
 		return new DataResponse($this->service->create(
             $tableId,
+            $columnId,
             $this->userId,
             $data));
 	}
@@ -63,17 +65,17 @@ class RowController extends Controller {
 	 */
 	public function update(
         int $id,
-        int $tableId,
+        int $columnId,
         string $data
     ): DataResponse {
 		return $this->handleNotFound(function () use (
             $id,
-            $tableId,
+            $columnId,
             $data
         ) {
 			return $this->service->update(
                 $id,
-                $tableId,
+                $columnId,
                 $this->userId,
                 $data);
 		});

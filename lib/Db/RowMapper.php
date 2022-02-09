@@ -24,7 +24,7 @@ class RowMapper extends QBMapper {
      * @throws Exception
      * @throws MultipleObjectsReturnedException
      */
-	public function find(int $id): Table {
+	public function find(int $id): Row {
         // TODO check if request is permitted
         $qb = $this->db->getQueryBuilder();
 		$qb->select('*')

@@ -16,7 +16,7 @@
 					@reload="getColumnsForTableFromBE(activeTable.id)" />
 			</div>
 			<div class="row">
-				<NcTable :rows="rows" :columns="columns" />
+				<NcTable :rows="rows" :columns="columns" @update-rows="getRowsForTableFromBE(activeTable.id)" />
 			</div>
 		</div>
 	</div>

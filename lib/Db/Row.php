@@ -27,7 +27,18 @@ class Row extends Entity implements JsonSerializable {
             'createdAt'     => $this->createdAt,
             'lastEditBy'    => $this->lastEditBy,
             'lastEditAt'    => $this->lastEditAt,
-            'data'          => \json_decode($this->data),
+            'data'          => $this->getDataArray(),
 		];
 	}
+
+    /** @noinspection PhpUndefinedMethodInspection */
+    public function getDataArray()
+    {
+        return \json_decode($this->getData());
+    }
+
+    /** @noinspection PhpUndefinedMethodInspection */
+    public function setDataArray($array) {
+        $this->setData(\json_encode($array));
+    }
 }
