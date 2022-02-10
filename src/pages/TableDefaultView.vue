@@ -13,7 +13,7 @@
 			<div class="row-with-margin">
 				<TableDescription :active-table="activeTable"
 					:columns="columns"
-					@reload="getColumnsForTableFromBE(activeTable.id)" />
+					@reload="getColumnsForTableFromBE(activeTable.id); getRowsForTableFromBE(activeTable.id)" />
 			</div>
 			<div class="row">
 				<NcTable :rows="rows" :columns="columns" @update-rows="getRowsForTableFromBE(activeTable.id)" />
@@ -66,10 +66,10 @@ export default {
 				this.columns = null
 			} else {
 				try {
-					console.debug('try to fetch columns for table id: ', tableId)
+					// console.debug('try to fetch columns for table id: ', tableId)
 					const response = await axios.get(generateUrl('/apps/tables/column/' + tableId))
 					this.columns = response.data.sort(this.compareColumns)
-					console.debug('columns loaded', this.columns)
+					// console.debug('columns loaded', this.columns)
 				} catch (e) {
 					console.error(e)
 					showError(t('tables', 'Could not fetch columns for table'))

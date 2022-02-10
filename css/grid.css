@@ -12,6 +12,10 @@
     margin: 50px;
 }
 
+.row.padding-left {
+    padding-left: 20px;
+}
+
 .row::after {
     content: '';
     clear: both;

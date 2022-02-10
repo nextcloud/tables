@@ -408,7 +408,7 @@
 }
 
 .tabulator .tabulator-footer .tabulator-page.active {
-    color: #d00;
+    color: var(-color-text-light);
 }
 
 .tabulator .tabulator-footer .tabulator-page:disabled {

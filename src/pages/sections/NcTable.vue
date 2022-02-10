@@ -1,15 +1,17 @@
 <template>
 	<div>
-		<TabulatorComponent ref="tabulator"
-			v-model="data"
-			:options="options2"
-			@cell-edited="edited" />
-		<button @click="newRow = true">
-			{{ t('tables', 'Add new row') }}
-		</button>
-		<button class="error" @click="actionDeleteRows">
-			{{ t('tables', 'Delete rows') }}
-		</button>
+		<div class="row padding-left">
+			<div class="col-4">
+				<button class="icon-delete" @click="actionDeleteRows" />
+				<button class="icon-add" @click="newRow = true" />
+			</div>
+		</div>
+		<div class="row">
+			<TabulatorComponent ref="tabulator"
+				v-model="data"
+				:options="getOptions"
+				@cell-edited="actionEdited" />
+		</div>
 		<DialogConfirmation
 			:show-modal="deleteRows"
 			confirm-class="error"
@@ -43,18 +45,20 @@ export default {
 			type: Array,
 			default: null,
 		},
+		options: {
+			type: Object,
+			default() {
+				return {
+					pagination: 'local',
+					paginationSize: 30,
+					paginationSizeSelector: [5, 10, 30, 100],
+					layout: 'fitColumns',
+				}
+			},
+		},
 	},
 	data() {
 		return {
-			options: {
-				resizableColumns: 'header',
-				columns: this.columnsDefinition,
-				// footerElement: '<button>TEST</button>',
-				// initialSort: [
-				// { column: 'age', dir: 'desc' }, // sort by this first
-				// ],
-				layout: 'fitDataFill',
-			},
 			newRow: false,
 			deleteRows: false,
 			deleteRowsCount: 0,
@@ -62,7 +66,7 @@ export default {
 	},
 	computed: {
 		...mapGetters(['activeTable']),
-		columnsDefinition() {
+		getColumnsDefinition() {
 			const def = [
 				{
 					formatter: 'rowSelection',
@@ -71,43 +75,57 @@ export default {
 					headerSort: false,
 					width: 60,
 				},
-				{
-					formatter(cell) { return '<div class="icon-delete" />' },
-					width: 60,
-					headerSort: false,
-					hozAlign: 'center',
-					cellClick(e, cell) {
-						cell.getRow().delete()
-					},
-				},
 			]
 			if (this.columns) {
 				this.columns.forEach(item => {
 					let formatter = null
+					let formatterParams = null
 					if (item.type === 'text' && item.textMultiline) {
 						formatter = 'textarea'
+					} else if (item.type === 'number') {
+						formatter = 'money'
+						formatterParams = {
+							symbolAfter: item.suffix,
+							precision: (item.numberDecimals !== undefined) ? item.numberDecimals : 2,
+						}
 					}
 					def.push({
 						title: item.title,
 						field: 'column-' + item.id,
 						editor: true,
 						formatter,
+						formatterParams,
+						headerFilter: 'input',
 					})
 				})
 			}
 			console.debug('columns definition array', def)
 			return def
 		},
-		options2() {
-			return {
-				resizableColumns: 'header',
-				columns: this.columnsDefinition,
-				// footerElement: '<button>TEST</button>',
-				// initialSort: [
-				// { column: 'age', dir: 'desc' }, // sort by this first
-				// ],
-				layout: 'fitDataFill',
+		getOptions() {
+			const lang = {
+				specific: {
+					pagination: {
+						first: t('tables', 'First'),
+						first_title: t('tables', 'First page'),
+						last: t('tables', 'Last'),
+						last_title: t('tables', 'Last page'),
+						prev: t('tables', 'Back'),
+						prev_title: t('tables', 'Previous page'),
+						next: t('tables', 'Next'),
+						next_title: t('tables', 'Next page'),
+						page_size: t('tables', 'Number items'),
+					},
+					headerFilters: {
+						default: t('tables', 'Textfilter'), // default header filter placeholder text
+					},
+				},
 			}
+			const o = Object.assign({}, this.options)
+			o.columns = this.getColumnsDefinition
+			o.locale = 'specific'
+			o.langs = lang
+			return o
 		},
 		data() {
 			const d = []
@@ -164,7 +182,7 @@ export default {
 			this.deleteRows = false
 			this.deleteRowsCount = 0
 		},
-		async edited(data) {
+		async actionEdited(data) {
 			const newValue = data._cell.value
 			const rowId = data._cell.row.data.id
 			const column = data._cell.column.field
@@ -192,10 +210,3 @@ export default {
 	},
 }
 </script>
-<style scoped>
-
-	[class^='icon-']:hover, .icon-delete:hover {
-		cursor: pointer;
-	}
-
-</style>
