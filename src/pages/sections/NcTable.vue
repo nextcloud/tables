@@ -3,22 +3,19 @@
 		<TabulatorComponent ref="tabulator"
 			v-model="data"
 			:options="options2"
-			@cell-click="updateSelectedRows"
 			@cell-edited="edited" />
 		<button @click="newRow = true">
 			{{ t('tables', 'Add new row') }}
 		</button>
-		<button class="error" @click="deleteRows = true">
-			{{ n('tables', 'Delete selected row', 'Delete %n rows', selectedRowIds.length, {}) }}
-		</button>
-		<button @click="debug">
-			debug tab
+		<button class="error" @click="actionDeleteRows">
+			{{ t('tables', 'Delete rows') }}
 		</button>
 		<DialogConfirmation
 			:show-modal="deleteRows"
-			:title="n('tables', 'Delete selected row', 'Delete %n rows', selectedRowIds.length, {})"
-			:description="n('tables', 'Are you sure you want to delete the selected row?', 'Are you sure you want to delete the %n selected rows?', selectedRowIds.length, {})"
-			@confirm="deleteRow"
+			confirm-class="error"
+			:title="n('tables', 'Delete selected row', 'Delete %n rows', deleteRowsCount, {})"
+			:description="n('tables', 'Are you sure you want to delete the selected row?', 'Are you sure you want to delete the %n selected rows?', deleteRowsCount, {})"
+			@confirm="deleteRowsAtBE"
 			@cancel="deleteRows = false" />
 	</div>
 </template>
@@ -27,7 +24,7 @@
 import { TabulatorComponent } from 'vue-tabulator'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
-import { showError, showSuccess } from '@nextcloud/dialogs'
+import { showError, showInfo, showSuccess } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
 import DialogConfirmation from '../../modals/DialogConfirmation'
 
@@ -60,7 +57,7 @@ export default {
 			},
 			newRow: false,
 			deleteRows: false,
-			selectedRowIds: [],
+			deleteRowsCount: 0,
 		}
 	},
 	computed: {
@@ -73,6 +70,15 @@ export default {
 					align: 'center',
 					headerSort: false,
 					width: 60,
+				},
+				{
+					formatter(cell) { return '<div class="icon-delete" />' },
+					width: 60,
+					headerSort: false,
+					hozAlign: 'center',
+					cellClick(e, cell) {
+						cell.getRow().delete()
+					},
 				},
 			]
 			if (this.columns) {
@@ -124,19 +130,39 @@ export default {
 		},
 	},
 	methods: {
-		debug() {
-			console.debug('tabulator debug', this.$refs.tabulator.getInstance().getSelectedRows())
+		actionDeleteRows() {
+			const selectedRows = this.$refs.tabulator.getInstance().getSelectedRows()
+			if (selectedRows && selectedRows.length > 0) {
+				this.deleteRows = true
+				this.deleteRowsCount = selectedRows.length
+			} else {
+				showInfo(t('tables', 'No selected rows to delete.'))
+			}
 		},
-		updateSelectedRows() {
-			console.debug('update selected rows')
-			const rows = this.$refs.tabulator.getInstance().getSelectedRows()
-			const selectedRowIds = []
-			rows.forEach(row => {
-				selectedRowIds.push(row._row.data.id)
-			})
-		},
-		deleteRow() {
+		async deleteRowsAtBE() {
+			const selectedRows = this.$refs.tabulator.getInstance().getSelectedRows()
+			if (selectedRows && selectedRows.length > 0) {
+				let error = false
+				for (const row of selectedRows) {
+					console.debug('try to delete row with id', row._row.data.id)
+					try {
+						const res = await axios.delete(generateUrl('/apps/tables/row/' + row._row.data.id))
+						console.debug('successfully deleted row', res)
+					} catch (e) {
+						console.error(e)
+						showError(t('tables', 'Could not delete row.'))
+						error = true
+					}
+				}
+				if (!error) {
+					showSuccess(n('tables', 'Selected row was deleted.', 'Selected %n rows were deleted.', this.deleteRowsCount, {}))
+				}
+				this.$emit('update-rows')
+			} else {
+				showInfo(t('tables', 'No selected rows to delete.'))
+			}
 			this.deleteRows = false
+			this.deleteRowsCount = 0
 		},
 		async edited(data) {
 			const newValue = data._cell.value
