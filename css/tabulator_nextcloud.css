@@ -9,6 +9,10 @@
     transform: translatez(0);
 }
 
+.tabulator .tabulator-cell.tabulator-editing textarea {
+    background-color: var(--color-background-hover) !important;
+}
+
 .tabulator[tabulator-layout="fitDataFill"] .tabulator-tableHolder .tabulator-table {
     min-width: 100%;
 }

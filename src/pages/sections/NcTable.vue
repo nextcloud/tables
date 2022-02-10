@@ -29,6 +29,7 @@ import { generateUrl } from '@nextcloud/router'
 import { showError, showInfo, showSuccess } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
 import DialogConfirmation from '../../modals/DialogConfirmation'
+// import moment from '@nextcloud/moment'
 
 export default {
 	name: 'NcTable',
@@ -67,6 +68,47 @@ export default {
 	computed: {
 		...mapGetters(['activeTable']),
 		getColumnsDefinition() {
+			const numberEditor = function(cell, onRendered, success, cancel, editorParams) {
+				// cell - the cell component for the editable cell
+				// onRendered - function to call when the editor has been rendered
+				// success - function to call to pass the successfully updated value to Tabulator
+				// cancel - function to call to abort the edit and return to a normal cell
+				// editorParams - params object passed into the editorParams column definition property
+
+				// create and style editor
+				const editor = document.createElement('input')
+
+				editor.setAttribute('type', 'number')
+
+				// create and style input
+				editor.style.padding = '3px'
+				editor.style.width = '100%'
+				editor.style.boxSizing = 'border-box'
+
+				// Set value of editor to the current value of the cell
+				editor.value = (cell.getValue() === null || cell.getValue() === undefined) ? editorParams.default : cell.getValue()
+
+				// set focus on the select box when the editor is selected (timeout allows for editor to be added to DOM)
+				onRendered(function() {
+					editor.focus()
+					editor.style.css = '100%'
+				})
+
+				// when the value has been set, trigger the cell to update
+				/**
+				 *
+				 */
+				function successFunc() {
+					success(editor.value)
+				}
+
+				// editor.addEventListener('change', successFunc)
+				editor.addEventListener('blur', successFunc)
+
+				// return the editor element
+				return editor
+			}
+
 			const def = [
 				{
 					formatter: 'rowSelection',
@@ -80,22 +122,41 @@ export default {
 				this.columns.forEach(item => {
 					let formatter = null
 					let formatterParams = null
+					let editorParams = null
+					let customEditor = null
+					let align = null
 					if (item.type === 'text' && item.textMultiline) {
 						formatter = 'textarea'
 					} else if (item.type === 'number') {
+						align = 'right'
 						formatter = 'money'
 						formatterParams = {
-							symbolAfter: item.suffix,
+							suffix: item.suffix,
+							prefix: item.prefix,
 							precision: (item.numberDecimals !== undefined) ? item.numberDecimals : 2,
 						}
+						formatter = (cell, formatterParams, onRendered) => {
+							// cell - the cell component
+							// formatterParams - parameters set for the column
+							// onRendered - function to call when the formatter has been rendered
+
+							return (cell.getValue()) ? formatterParams.prefix + ' ' + (Math.round(cell.getValue() * 100) / 100).toFixed(formatterParams.precision) + ' ' + formatterParams.suffix : '' // return the contents of the cell;
+						}
+						editorParams = {
+							default: item.numberDefault,
+						}
+						customEditor = numberEditor
 					}
 					def.push({
 						title: item.title,
 						field: 'column-' + item.id,
-						editor: true,
+						// editor: true,
 						formatter,
 						formatterParams,
 						headerFilter: 'input',
+						editor: (customEditor) || true,
+						editorParams,
+						align,
 					})
 				})
 			}
@@ -126,7 +187,6 @@ export default {
 			o.locale = 'specific'
 			o.langs = lang
 			// o.responsiveLayout = 'collapse'
-			o.height = '311px'
 			// o.columnMinWidth = 80
 			return o
 		},
