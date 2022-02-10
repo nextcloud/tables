@@ -104,11 +104,11 @@ export default {
 			type: Number,
 			default: null,
 		},
-		prefix: {
+		numberPrefix: {
 			type: String,
 			default: null,
 		},
-		suffix: {
+		numberSuffix: {
 			type: String,
 			default: null,
 		},

@@ -22,8 +22,6 @@
 						<MainForm :description.sync="editColumn.description"
 							:mandatory.sync="editColumn.mandatory"
 							:order-weight.sync="editColumn.orderWeight"
-							:prefix.sync="editColumn.prefix"
-							:suffix.sync="editColumn.suffix"
 							:title.sync="editColumn.title"
 							:title-missing-error="editErrorTitle" />
 					</div>
@@ -32,7 +30,9 @@
 							:number-default.sync="editColumn.numberDefault"
 							:number-min.sync="editColumn.numberMin"
 							:number-max.sync="editColumn.numberMax"
-							:number-decimals.sync="editColumn.numberDecimals" />
+							:number-decimals.sync="editColumn.numberDecimals"
+							:number-prefix.sync="editColumn.numberPrefix"
+							:number-suffix.sync="editColumn.numberSuffix" />
 						<TextlineForm v-if="editColumn.type === 'text' && !editColumn.textMultiline"
 							:text-default.sync="editColumn.textDefault"
 							:text-allowed-pattern.sync="editColumn.textAllowedPattern"

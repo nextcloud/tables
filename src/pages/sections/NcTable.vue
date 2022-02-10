@@ -193,7 +193,17 @@ export default {
 		getData() {
 			const d = []
 			if (this.newRow) {
-				d.push({})
+				const newRow = {}
+				if (this.columns) {
+					this.columns.forEach(col => {
+						if (col.type === 'number') {
+							newRow['column-' + col.id] = col.numberDefault
+						} else if (col.type === 'text') {
+							newRow['column-' + col.id] = col.textDefault
+						}
+					})
+				}
+				d.push(newRow)
 			}
 			if (this.rows) {
 				this.rows.forEach(item => {

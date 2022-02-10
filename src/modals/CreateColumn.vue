@@ -9,8 +9,6 @@
 				<MainForm :description.sync="description"
 					:mandatory.sync="mandatory"
 					:order-weight.sync="orderWeight"
-					:prefix.sync="prefix"
-					:suffix.sync="suffix"
 					:title.sync="title"
 					:title-missing-error="titleMissingError" />
 
@@ -53,7 +51,9 @@
 						:number-default.sync="numberDefault"
 						:number-min.sync="numberMin"
 						:number-max.sync="numberMax"
-						:number-decimals.sync="numberDecimals" />
+						:number-decimals.sync="numberDecimals"
+						:number-prefix.sync="numberPrefix"
+						:number-suffix.sync="numberSuffix" />
 				</div>
 
 				<div v-if="type === 'textline' || type === 'longtext'">
@@ -119,8 +119,8 @@ export default {
 			type: null,
 			title: '',
 			description: '',
-			prefix: '',
-			suffix: '',
+			numberPrefix: '',
+			numberSuffix: '',
 			orderWeight: 0,
 			mandatory: false,
 			numberDefault: null,
@@ -171,8 +171,8 @@ export default {
 					type,
 					title: this.title,
 					description: this.description,
-					prefix: this.prefix,
-					suffix: this.suffix,
+					numberPrefix: this.numberPrefix,
+					numberSuffix: this.numberSuffix,
 					orderWeight: this.orderWeight,
 					mandatory: this.mandatory,
 					numberDefault: this.numberDefault,
@@ -198,8 +198,8 @@ export default {
 			this.type = null
 			this.title = ''
 			this.description = ''
-			this.prefix = ''
-			this.suffix = ''
+			this.numberPrefix = ''
+			this.numberSuffix = ''
 			this.orderWeight = 0
 			this.mandatory = false
 			this.numberDefault = null
