@@ -8,7 +8,7 @@
 		</div>
 		<div class="row">
 			<TabulatorComponent ref="tabulator"
-				v-model="data"
+				v-model="getData"
 				:options="getOptions"
 				@cell-edited="actionEdited" />
 		</div>
@@ -125,9 +125,12 @@ export default {
 			o.columns = this.getColumnsDefinition
 			o.locale = 'specific'
 			o.langs = lang
+			// o.responsiveLayout = 'collapse'
+			o.height = '311px'
+			// o.columnMinWidth = 80
 			return o
 		},
-		data() {
+		getData() {
 			const d = []
 			if (this.newRow) {
 				d.push({})
