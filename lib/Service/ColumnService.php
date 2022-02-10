@@ -60,8 +60,8 @@ class ColumnService {
         string $title,
         string $userId,
         string $type,
-        string $prefix,
-        string $suffix,
+        string $numberPrefix,
+        string $numberSuffix,
         bool $mandatory,
         string $description,
         string $textDefault,
@@ -79,8 +79,8 @@ class ColumnService {
         $item->setTitle($title);
         $item->setTableId($tableId);
         $item->setType($type);
-        $item->setPrefix($prefix);
-        $item->setSuffix($suffix);
+        $item->setNumberPrefix($numberPrefix);
+        $item->setNumberSuffix($numberSuffix);
         $item->setMandatory($mandatory);
         $item->setDescription($description);
         $item->setTextDefault($textDefault);
@@ -108,8 +108,8 @@ class ColumnService {
         $userId,
         $title,
         $type,
-        $prefix,
-        $suffix,
+        $numberPrefix,
+        $numberSuffix,
         $mandatory,
         $description,
         $textDefault,
@@ -129,8 +129,8 @@ class ColumnService {
             $item->setTitle($title);
             $item->setTableId($tableId);
             $item->setType($type);
-            $item->setPrefix($prefix);
-            $item->setSuffix($suffix);
+            $item->setNumberPrefix($numberPrefix);
+            $item->setNumberSuffix($numberSuffix);
             $item->setMandatory($mandatory);
             $item->setDescription($description);
             $item->setTextDefault($textDefault);

@@ -131,8 +131,8 @@ export default {
 						align = 'right'
 						formatter = 'money'
 						formatterParams = {
-							suffix: item.suffix,
-							prefix: item.prefix,
+							suffix: item.numberSuffix,
+							prefix: item.numberPrefix,
 							precision: (item.numberDecimals !== undefined) ? item.numberDecimals : 2,
 						}
 						formatter = (cell, formatterParams, onRendered) => {

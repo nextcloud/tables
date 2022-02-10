@@ -16,6 +16,12 @@
 		<tr>
 			<td>{{ t('tables', 'Max') }}</td><td>{{ column.numberMax }}</td>
 		</tr>
+		<tr>
+			<td>{{ t('tables', 'Prefix') }}</td><td>{{ column.numberPrefix }}</td>
+		</tr>
+		<tr>
+			<td>{{ t('tables', 'Suffix') }}</td><td>{{ column.numberSuffix }}</td>
+		</tr>
 	</table>
 </template>
 

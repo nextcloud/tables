@@ -91,14 +91,6 @@ class Version000000Date20210921000000 extends SimpleMigrationStep {
                 'notnull' => true,
                 'length' => 20,
             ]);
-            $table->addColumn('prefix', Types::STRING, [
-                'notnull' => true,
-                'length' => 200,
-            ]);
-            $table->addColumn('suffix', Types::STRING, [
-                'notnull' => true,
-                'length' => 200,
-            ]);
             $table->addColumn('mandatory', Types::BOOLEAN, [
                 'notnull' => false,
                 'default' => 0,
@@ -140,6 +132,14 @@ class Version000000Date20210921000000 extends SimpleMigrationStep {
             $table->addColumn('number_decimals', Types::INTEGER, [
                 'notnull' => false,
                 'default' => 0,
+            ]);
+            $table->addColumn('number_prefix', Types::STRING, [
+                'notnull' => true,
+                'length' => 200,
+            ]);
+            $table->addColumn('number_suffix', Types::STRING, [
+                'notnull' => true,
+                'length' => 200,
             ]);
 
             $table->setPrimaryKey(['id']);

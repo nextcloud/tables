@@ -11,10 +11,8 @@
 			<div class="fix-col-2 margin-bottom">
 				<input v-model="defaultNum" type="number">
 			</div>
-		</div>
 
-		<!-- decimals -->
-		<div class="row">
+			<!-- decimals -->
 			<div class="fix-col-1">
 				{{ t('tables', 'Decimals') }}
 			</div>
@@ -24,10 +22,8 @@
 			<div class="fix-col-2 margin-bottom">
 				<input v-model="decimals" type="number">
 			</div>
-		</div>
 
-		<!-- min -->
-		<div class="row">
+			<!-- min -->
 			<div class="fix-col-1">
 				{{ t('tables', 'Minimum') }}
 			</div>
@@ -37,10 +33,8 @@
 			<div class="fix-col-2 margin-bottom">
 				<input v-model="min" type="number">
 			</div>
-		</div>
 
-		<!-- max -->
-		<div class="row">
+			<!-- max -->
 			<div class="fix-col-1">
 				{{ t('tables', 'Maximum') }}
 			</div>
@@ -50,15 +44,49 @@
 			<div class="fix-col-2 margin-bottom">
 				<input v-model="max" type="number">
 			</div>
+
+			<!-- prefix -->
+			<div class="fix-col-1">
+				{{ t('tables', 'prefix') }}
+			</div>
+			<div class="fix-col-1">
+			&nbsp;
+			</div>
+			<div class="fix-col-2 margin-bottom">
+				<input v-model="localPrefix">
+			</div>
+
+			<!-- suffix -->
+			<div class="fix-col-1">
+				{{ t('tables', 'suffix') }}
+				<Popover>
+					<template #trigger>
+						<button class="icon-details" />
+					</template>
+					<p>
+						{{ t('tables', 'Here is a good place for a unit.') }}
+					</p>
+				</Popover>
+			</div>
+			<div class="fix-col-1">
+			&nbsp;
+			</div>
+			<div class="fix-col-2 margin-bottom">
+				<input v-model="localSuffix">
+			</div>
 		</div>
 	</div>
 </template>
 
 <script>
 // import { showError, showInfo, showSuccess } from '@nextcloud/dialogs'
+import Popover from '@nextcloud/vue/dist/Components/Popover'
 
 export default {
 	name: 'NumberForm',
+	components: {
+		Popover,
+	},
 	props: {
 		numberDefault: {
 			type: Number,
@@ -74,6 +102,14 @@ export default {
 		},
 		numberDecimals: {
 			type: Number,
+			default: null,
+		},
+		prefix: {
+			type: String,
+			default: null,
+		},
+		suffix: {
+			type: String,
 			default: null,
 		},
 	},
@@ -93,6 +129,14 @@ export default {
 		decimals: {
 			get() { return this.numberDecimals },
 			set(decimals) { this.$emit('update:numberDecimals', parseFloat(decimals)) },
+		},
+		localPrefix: {
+			get() { return this.prefix },
+			set(prefix) { this.$emit('update:numberPrefix', prefix) },
+		},
+		localSuffix: {
+			get() { return this.suffix },
+			set(suffix) { this.$emit('update:numberSuffix', suffix) },
 		},
 	},
 }

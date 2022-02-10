@@ -16,8 +16,6 @@ class Column extends Entity implements JsonSerializable {
     protected $lastEditAt;
     protected $type;
     protected $mandatory;
-    protected $prefix;
-    protected $suffix;
     protected $description;
     protected $orderWeight;
 
@@ -26,6 +24,8 @@ class Column extends Entity implements JsonSerializable {
     protected $numberMin;
     protected $numberMax;
     protected $numberDecimals;
+    protected $numberPrefix;
+    protected $numberSuffix;
 
     // type text
     protected $textDefault;
@@ -62,8 +62,6 @@ class Column extends Entity implements JsonSerializable {
             'lastEditAt'    => $this->lastEditAt,
             'type'          => $this->type,
             'mandatory'      => $this->mandatory,
-            'prefix'        => $this->prefix,
-            'suffix'        => $this->suffix,
             'description'   => $this->description,
             'orderWeight'   => $this->orderWeight,
 
@@ -72,6 +70,8 @@ class Column extends Entity implements JsonSerializable {
             'numberMin'     => $this->numberMin,
             'numberMax'     => $this->numberMax,
             'numberDecimals' => $this->numberDecimals,
+            'numberPrefix'  => $this->numberPrefix,
+            'numberSuffix'  => $this->numberSuffix,
 
             // type text
             'textDefault'   => $this->textDefault,
