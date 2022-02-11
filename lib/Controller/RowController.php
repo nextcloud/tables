@@ -48,17 +48,31 @@ class RowController extends Controller {
      * @NoAdminRequired
      * @throws Exception
      */
-	public function create(
+    public function create(
         int $tableId,
         int $columnId,
         string $data
     ): DataResponse {
-		return new DataResponse($this->service->create(
+        return new DataResponse($this->service->create(
             $tableId,
             $columnId,
             $this->userId,
             $data));
-	}
+    }
+
+    /**
+     * @NoAdminRequired
+     * @throws Exception
+     */
+    public function createComplete(
+        int $tableId,
+        Array $data
+    ): DataResponse {
+        return new DataResponse($this->service->createComplete(
+            $tableId,
+            $this->userId,
+            $data));
+    }
 
 	/**
 	 * @NoAdminRequired

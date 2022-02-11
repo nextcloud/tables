@@ -74,6 +74,27 @@ class RowService {
 		return $this->mapper->insert($item);
 	}
 
+    /**
+     * @throws \OCP\DB\Exception
+     * @noinspection PhpUndefinedMethodInspection
+     * @noinspection DuplicatedCode
+     */
+    public function createComplete(
+        int $tableId,
+        string $userId,
+        Array $data
+    ) {
+        $time = new \DateTime();
+        $item = new Row();
+        $item->setDataArray($data);
+        $item->setTableId($tableId);
+        $item->setCreatedBy($userId);
+        $item->setCreatedAt($time->format('Y-m-d H:i:s'));
+        $item->setLastEditBy($userId);
+        $item->setLastEditAt($time->format('Y-m-d H:i:s'));
+        return $this->mapper->insert($item);
+    }
+
     /** @noinspection PhpUndefinedMethodInspection
      * @noinspection DuplicatedCode
      */

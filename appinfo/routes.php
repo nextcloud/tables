@@ -20,6 +20,7 @@ return [
         ['name' => 'row#index', 'url' => '/row/{tableId}', 'verb' => 'GET'],
         ['name' => 'row#show', 'url' => '/row/{id}', 'verb' => 'GET'],
         ['name' => 'row#create', 'url' => '/row/column/{columnId}', 'verb' => 'POST'],
+        ['name' => 'row#createComplete', 'url' => '/row', 'verb' => 'POST'],
         ['name' => 'row#update', 'url' => '/row/{id}/column/{columnId}', 'verb' => 'PUT'],
         ['name' => 'row#destroy', 'url' => '/row/{id}', 'verb' => 'DELETE'],
     ]

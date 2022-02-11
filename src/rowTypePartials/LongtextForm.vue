@@ -6,7 +6,9 @@
 		<div class="fix-col-3" :class="{ 'margin-bottom': !column.description }">
 			<textarea v-model="localValue" />
 		</div>
-		<div v-if="column.description" class="fix-col-1" />
+		<div v-if="column.description" class="fix-col-1">
+&nbsp;
+		</div>
 		<div v-if="column.description" class="fix-col-3 p span margin-bottom">
 			{{ column.description }}
 		</div>

@@ -36,7 +36,7 @@
 import Modal from '@nextcloud/vue/dist/Components/Modal'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
-import { showError, showSuccess } from '@nextcloud/dialogs'
+import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
 import TextlineForm from '../rowTypePartials/TextlineForm'
 import LongtextForm from '../rowTypePartials/LongtextForm'
@@ -73,47 +73,42 @@ export default {
 			this.reset()
 			this.$emit('close')
 		},
-		actionConfirm() {
-
+		async actionConfirm() {
+			let mandatoryFieldsEmpty = false
+			this.columns.forEach(col => {
+				console.debug('col', col)
+				if (col.mandatory) {
+					mandatoryFieldsEmpty = mandatoryFieldsEmpty || !(this.row[col.id] && this.row[col.id] !== 0)
+					console.debug('after update', mandatoryFieldsEmpty)
+				}
+			})
+			if (!mandatoryFieldsEmpty) {
+				console.debug('try to add new row to BE', this.row)
+				await this.sendNewRowToBE()
+				this.$emit('update-rows')
+				this.actionCancel()
+			} else {
+				showWarning(t('tables', 'Please fill in the mandatory fields.'))
+			}
 		},
-		async sendNewColumnToBE() {
+		async sendNewRowToBE() {
 			try {
-				let type = this.type
-				let textMultiline = false
-				if (type === 'textline') {
-					type = 'text'
-				} else if (type === 'longtext') {
-					type = 'text'
-					textMultiline = true
+				const data = []
+				for (const [key, value] of Object.entries(this.row)) {
+					data.push({
+						columnId: key,
+						value,
+					})
 				}
-				const data = {
-					type,
-					title: this.title,
-					description: this.description,
-					numberPrefix: this.numberPrefix,
-					numberSuffix: this.numberSuffix,
-					orderWeight: this.orderWeight,
-					mandatory: this.mandatory,
-					numberDefault: this.numberDefault,
-					numberMin: this.numberMin,
-					numberMax: this.numberMax,
-					numberDecimals: this.numberDecimals,
-					textDefault: this.textDefault,
-					textAllowedPattern: this.textAllowedPattern,
-					textMaxLength: this.textMaxLength,
-					textMultiline,
-					tableId: this.activeTable.id,
-				}
-				// console.debug('try so send new column', data)
-				await axios.post(generateUrl('/apps/tables/column'), data)
-				showSuccess(t('tables', 'The column »{column}« was created.', { column: data.title }))
-				// await this.$store.dispatch('loadTablesFromBE')
+				await axios.post(generateUrl('/apps/tables/row'), { tableId: this.activeTable.id, data })
+				showSuccess(t('tables', 'The row was saved.'))
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not create new column'))
 			}
 		},
 		reset() {
+			this.row = {}
 		},
 	},
 }
