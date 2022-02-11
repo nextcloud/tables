@@ -9,6 +9,10 @@
     transform: translatez(0);
 }
 
+.tabulator .tabulator-tableHolder {
+    min-height: 100px;
+}
+
 .tabulator .tabulator-cell.tabulator-editing textarea {
     background-color: var(--color-background-hover) !important;
 }

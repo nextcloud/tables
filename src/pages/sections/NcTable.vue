@@ -4,6 +4,7 @@
 			<div class="col-4">
 				<button class="icon-delete" @click="actionDeleteRows" />
 				<button class="icon-add" @click="newRow = true" />
+				<button class="icon-download" @click="downloadCSV" />
 			</div>
 		</div>
 		<div class="row">
@@ -19,6 +20,10 @@
 			:description="n('tables', 'Are you sure you want to delete the selected row?', 'Are you sure you want to delete the %n selected rows?', deleteRowsCount, {})"
 			@confirm="deleteRowsAtBE"
 			@cancel="deleteRows = false" />
+		<CreateRow :columns="columns"
+			:show-modal="newRow"
+			@update-rows="actionUpdateRows"
+			@close="newRow = false" />
 	</div>
 </template>
 
@@ -29,11 +34,13 @@ import { generateUrl } from '@nextcloud/router'
 import { showError, showInfo, showSuccess } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
 import DialogConfirmation from '../../modals/DialogConfirmation'
+import CreateRow from '../../modals/CreateRow'
 // import moment from '@nextcloud/moment'
 
 export default {
 	name: 'NcTable',
 	components: {
+		CreateRow,
 		DialogConfirmation,
 		TabulatorComponent,
 	},
@@ -188,23 +195,12 @@ export default {
 			o.langs = lang
 			// o.responsiveLayout = 'collapse'
 			// o.columnMinWidth = 80
+			o.clipboard = true
+			// o.clipboardPasteAction = 'insert'
 			return o
 		},
 		getData() {
 			const d = []
-			if (this.newRow) {
-				const newRow = {}
-				if (this.columns) {
-					this.columns.forEach(col => {
-						if (col.type === 'number') {
-							newRow['column-' + col.id] = col.numberDefault
-						} else if (col.type === 'text') {
-							newRow['column-' + col.id] = col.textDefault
-						}
-					})
-				}
-				d.push(newRow)
-			}
 			if (this.rows) {
 				this.rows.forEach(item => {
 					const t = { id: item.id }
@@ -221,6 +217,10 @@ export default {
 		},
 	},
 	methods: {
+		actionUpdateRows() {
+			console.debug('NcTable action update rows -> emit action')
+			this.$emit('update-rows')
+		},
 		actionDeleteRows() {
 			const selectedRows = this.$refs.tabulator.getInstance().getSelectedRows()
 			if (selectedRows && selectedRows.length > 0) {
@@ -279,6 +279,11 @@ export default {
 				console.error(e)
 				showError(t('tables', 'Could not save new value.'))
 			}
+		},
+		downloadCSV() {
+			// remove icons from title for download-filename
+			const title = this.activeTable.title.replace(/([#0-9]\u20E3)|[\xA9\xAE\u203C\u2047-\u2049\u2122\u2139\u3030\u303D\u3297\u3299][\uFE00-\uFEFF]?|[\u2190-\u21FF][\uFE00-\uFEFF]?|[\u2300-\u23FF][\uFE00-\uFEFF]?|[\u2460-\u24FF][\uFE00-\uFEFF]?|[\u25A0-\u25FF][\uFE00-\uFEFF]?|[\u2600-\u27BF][\uFE00-\uFEFF]?|[\u2900-\u297F][\uFE00-\uFEFF]?|[\u2B00-\u2BF0][\uFE00-\uFEFF]?|(?:\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDEFF])[\uFE00-\uFEFF]?/g, '')
+			this.$refs.tabulator.getInstance().download('csv', (title) || 'download')
 		},
 	},
 }
