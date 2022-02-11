@@ -21,10 +21,14 @@ class TableService {
     /** @var ColumnService */
     private $columnService;
 
-	public function __construct(TableMapper $mapper, TableTemplateService $tableTemplateService, ColumnService $columnService) {
+    /** @var RowService */
+    private $rowService;
+
+	public function __construct(TableMapper $mapper, TableTemplateService $tableTemplateService, ColumnService $columnService, RowService $rowService) {
 		$this->mapper = $mapper;
         $this->tableTemplateService = $tableTemplateService;
         $this->columnService = $columnService;
+        $this->rowService = $rowService;
 	}
 
     /**
@@ -97,9 +101,10 @@ class TableService {
 
 	public function delete($id, $userId) {
 		try {
+            $this->rowService->deleteAllByTable($id);
             $columns = $this->columnService->findAllByTable($userId, $id);
             foreach ($columns as $column) {
-                $this->columnService->delete($column->id, $userId);
+                $this->columnService->delete($column->id, $userId, true);
             }
             $item = $this->mapper->find($id, $userId);
 			$this->mapper->delete($item);

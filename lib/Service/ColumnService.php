@@ -17,8 +17,12 @@ class ColumnService {
 	/** @var ColumnMapper */
 	private $mapper;
 
-	public function __construct(ColumnMapper $mapper) {
+    /** @var RowService */
+    private $rowService;
+
+	public function __construct(ColumnMapper $mapper, RowService $rowService) {
 		$this->mapper = $mapper;
+        $this->rowService = $rowService;
 	}
 
     /**
@@ -150,8 +154,11 @@ class ColumnService {
 		}
 	}
 
-	public function delete($id, $userId) {
+	public function delete($id, $userId, bool $skipRowCleanup = false) {
 		try {
+            if(!$skipRowCleanup) {
+                $this->rowService->deleteColumnDataFromRows($id);
+            }
             $item = $this->mapper->find($id, $userId);
 			$this->mapper->delete($item);
 			return $item;

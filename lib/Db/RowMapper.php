@@ -46,4 +46,31 @@ class RowMapper extends QBMapper {
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId)));
 		return $this->findEntities($qb);
 	}
+
+    /**
+     * @return int affected rows
+     * @throws Exception
+     */
+    public function deleteAllByTable(int $tableId): int
+    {
+         $qb = $this->db->getQueryBuilder();
+         $qb->delete($this->tableName)
+            ->where(
+                $qb->expr()->eq('table_id', $qb->createNamedParameter($tableId))
+            );
+        return $qb->executeStatement();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function findAllWithColumn(int $columnId): array
+    {
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('*')
+            ->from($this->table);
+        $qb->where('JSON_CONTAINS(JSON_EXTRACT(data, \'$[*].columnId\'), :columnId, \'$\') = 1');
+        $qb->setParameter('columnId', $columnId);
+        return $this->findEntities($qb);
+    }
 }

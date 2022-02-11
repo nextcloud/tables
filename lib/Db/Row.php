@@ -34,11 +34,19 @@ class Row extends Entity implements JsonSerializable {
     /** @noinspection PhpUndefinedMethodInspection */
     public function getDataArray()
     {
-        return \json_decode($this->getData());
+        return \json_decode($this->getData(), true);
     }
 
     /** @noinspection PhpUndefinedMethodInspection */
     public function setDataArray($array) {
-        $this->setData(\json_encode($array));
+        $new = [];
+        foreach ($array as $a) {
+            $new[] = [
+                'columnId' => intval($a['columnId']),
+                'value' => $a['value']
+            ];
+        }
+        $json = \json_encode($new);
+        $this->setData($json);
     }
 }

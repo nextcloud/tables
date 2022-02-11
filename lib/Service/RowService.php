@@ -4,8 +4,10 @@ namespace OCA\Tables\Service;
 
 use Exception;
 
+use OCA\Tables\Db\Column;
 use OCA\Tables\Db\Row;
 use OCA\Tables\Db\RowMapper;
+use OCA\Tables\Db\Table;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 
@@ -109,9 +111,9 @@ class RowService {
             $item = $this->mapper->find($id);
             $d = $item->getDataArray();
             $columnFound = false;
-            foreach ($d as $c) {
-                if($c->columnId === $columnId) {
-                    $c->value = $data;
+            foreach ($d as $key => $c) {
+                if($c['columnId'] == $columnId) {
+                    $d[$key]['value'] = $data;
                     $columnFound = true;
                     break;
                 }
@@ -139,6 +141,32 @@ class RowService {
 			return $item;
 		} catch (Exception $e) {
 			$this->handleException($e);
+        }
+    }
+
+    /**
+     * @throws \OCP\DB\Exception
+     */
+    public function deleteAllByTable(int $tableId): int
+    {
+        return $this->mapper->deleteAllByTable($tableId);
+    }
+
+    /**
+     * @throws \OCP\DB\Exception
+     */
+    public function deleteColumnDataFromRows(int $columnId) {
+        $rows = $this->mapper->findAllWithColumn($columnId);
+        foreach ($rows as $row) {
+            /* @var $row Row */
+            $data = $row->getDataArray();
+            foreach ($data as $key => $col) {
+                if($col['columnId'] == $columnId) {
+                    unset($data[$key]);
+                }
+            }
+            $row->setDataArray($data);
+            $this->mapper->update($row);
         }
     }
 }
