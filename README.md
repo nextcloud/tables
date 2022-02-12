@@ -1,32 +1,50 @@
-# Nextcloud App Tutorial
+# Nextcloud App »Tables«
 
-[![PHPUnit GitHub Action](https://github.com/nextcloud/app-tutorial/workflows/PHPUnit/badge.svg)](https://github.com/nextcloud/app-tutorial/actions?query=workflow%3APHPUnit)
-[![Node GitHub Action](https://github.com/nextcloud/app-tutorial/workflows/Node/badge.svg)](https://github.com/nextcloud/app-tutorial/actions?query=workflow%3ANode)
-[![Lint GitHub Action](https://github.com/nextcloud/app-tutorial/workflows/Lint/badge.svg)](https://github.com/nextcloud/app-tutorial/actions?query=workflow%3ALint)
+This app is for managing data in tables.
+The use should be lightweight and well integrated into the Nextcloud environment.
 
-This is the [tutorial app](https://docs.nextcloud.com/server/latest/developer_manual/app_development/tutorial.html) which shows how to develop a very simple notes app.
- 
-## Try it 
-To install it change into your Nextcloud's apps directory:
+## Features
+- Create and edit tables, from scratch or templates
+- Create and manage columns
+- Create and manage rows
 
-    cd nextcloud/apps
+### API
+- coming soon
 
-Then run:
+## Security
+This is a private project. I do my very best to keep this app secure for a professional usage.
+If you have any hints about securing this app, you are very welcome.
 
-    git clone https://github.com/nextcloud/app-tutorial.git notestutorial
+### Vulnerability
+If you found a vulnerability, please send me a mail to flost-dev@mailbox.org about it. 
 
-Then install the dependencies using:
+## Bugs
+If you found a bug, please open an issue at GitHub or send a mail to flost-dev@mailbox.org in german or english.
+Please specify the following information at minimum:
+- Version from
+    - Nextcloud
+    - Server OS
+    - PHP
+    - DB
+- A vulnerability description
+- Reproduction steps
 
-    make composer
-
-## Frontend development
-
-The app tutorial also shows the very basic implementation of an app frontend using [Vue.js](https://vuejs.org/). To build the frontend code after doing changes to its source in `src/` requires to have Node and npm installed.
-
-- 👩‍💻 Run `make dev-setup` to install the frontend dependencies
-- 🏗 To build the Javascript whenever you make changes, run `make build-js`
-
-To continuously run the build when editing source files you can make use of the `make watch-js` command.
-
-# Requirements
+## Requirements
 Your database have to support native json datatype.
+
+## Tested environment
+The app is developed and tested with the following components.
+
+- Server OS
+  - Debian 10 ✓
+  - Debian 11 ✓
+
+- PHP
+  - 7.4 ✓
+
+- DB
+  - MariaDB 10.3 ✓
+  - MariaDB 10.5 ✓
+
+### Known environment bugs
+none for now

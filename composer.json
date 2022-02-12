@@ -1,6 +1,6 @@
 {
     "name": "nextcloud/tables",
-    "description": "This app provides basic functions to manage data within tables.",
+    "description": "This app is for managing data in tables.",
     "type": "project",
     "license": "AGPL",
     "authors": [
