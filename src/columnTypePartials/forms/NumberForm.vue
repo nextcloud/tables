@@ -131,11 +131,11 @@ export default {
 			set(decimals) { this.$emit('update:numberDecimals', parseFloat(decimals)) },
 		},
 		localPrefix: {
-			get() { return this.prefix },
+			get() { return this.numberPrefix },
 			set(prefix) { this.$emit('update:numberPrefix', prefix) },
 		},
 		localSuffix: {
-			get() { return this.suffix },
+			get() { return this.numberSuffix },
 			set(suffix) { this.$emit('update:numberSuffix', suffix) },
 		},
 	},

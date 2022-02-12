@@ -82,12 +82,12 @@ export default {
 				// cancel - function to call to abort the edit and return to a normal cell
 				// editorParams - params object passed into the editorParams column definition property
 
-				// create and style editor
 				const editor = document.createElement('input')
 
 				editor.setAttribute('type', 'number')
+				editor.setAttribute('min', (editorParams.numberMin || editorParams.numberMin === 0) ? editorParams.numberMin : null)
+				editor.setAttribute('max', (editorParams.numberMax || editorParams.numberMax === 0) ? editorParams.numberMax : null)
 
-				// create and style input
 				editor.style.padding = '3px'
 				editor.style.width = '100%'
 				editor.style.boxSizing = 'border-box'
@@ -112,7 +112,6 @@ export default {
 				// editor.addEventListener('change', successFunc)
 				editor.addEventListener('blur', successFunc)
 
-				// return the editor element
 				return editor
 			}
 
@@ -149,8 +148,11 @@ export default {
 
 							return (cell.getValue()) ? formatterParams.prefix + ' ' + (Math.round(cell.getValue() * 100) / 100).toFixed(formatterParams.precision) + ' ' + formatterParams.suffix : '' // return the contents of the cell;
 						}
+						// console.debug('item', item)
 						editorParams = {
 							default: item.numberDefault,
+							numberMin: item.numberMin,
+							numberMax: item.numberMax,
 						}
 						customEditor = numberEditor
 					}

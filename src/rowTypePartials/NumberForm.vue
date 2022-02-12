@@ -43,8 +43,8 @@ export default {
 			get() {
 				return (this.value && true)
 					? this.value
-					: ((this.column.textDefault !== undefined)
-						? this.column.textDefault
+					: ((this.column.numberDefault !== undefined)
+						? this.column.numberDefault
 						: '')
 			},
 			set(v) { this.$emit('update:value', v) },
