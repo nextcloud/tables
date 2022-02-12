@@ -58,7 +58,7 @@ export default {
 			default() {
 				return {
 					pagination: 'local',
-					paginationSize: 30,
+					paginationSize: 10,
 					paginationSizeSelector: [5, 10, 30, 100],
 					layout: 'fitColumns',
 				}
@@ -257,9 +257,9 @@ export default {
 		},
 		async actionEdited(data) {
 			const newValue = data._cell.value
-			const rowId = data._cell.row.data.id
+			const rowId = parseInt(data._cell.row.data.id)
 			const column = data._cell.column.field
-			const columnId = column.split('-')[1]
+			const columnId = parseInt(column.split('-')[1])
 			console.debug('data edited', data)
 			try {
 				console.debug('try to send cell', { rowId, newValue, columnId })

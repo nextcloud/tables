@@ -120,7 +120,7 @@ class RowService {
             }
             // if the value was not set, add it
             if(!$columnFound) {
-                $d[] = (object) [
+                $d[] = [
                         "columnId" => $columnId,
                         "value" => $data
                     ];
