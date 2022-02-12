@@ -5,6 +5,10 @@
 				<button class="icon-delete" @click="actionDeleteRows" />
 				<button class="icon-add" @click="newRow = true" />
 				<button class="icon-download" @click="downloadCSV" />
+				<div style="padding-left: 30px; padding-right: 15px; padding-top: 10px;">
+					{{ t('tables', 'Show filter') }}
+				</div>
+				<CheckboxRadioSwitch type="switch" :checked.sync="showFilter" style="height: 40px;" />
 			</div>
 		</div>
 		<div class="row">
@@ -35,6 +39,7 @@ import { showError, showInfo, showSuccess } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
 import DialogConfirmation from '../../modals/DialogConfirmation'
 import CreateRow from '../../modals/CreateRow'
+import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch'
 // import moment from '@nextcloud/moment'
 
 export default {
@@ -43,6 +48,7 @@ export default {
 		CreateRow,
 		DialogConfirmation,
 		TabulatorComponent,
+		CheckboxRadioSwitch,
 	},
 	props: {
 		columns: {
@@ -60,7 +66,7 @@ export default {
 					pagination: 'local',
 					paginationSize: 10,
 					paginationSizeSelector: [5, 10, 30, 100],
-					layout: 'fitColumns',
+					layout: 'fitDataFill',
 				}
 			},
 		},
@@ -70,6 +76,7 @@ export default {
 			newRow: false,
 			deleteRows: false,
 			deleteRowsCount: 0,
+			showFilter: false,
 		}
 	},
 	computed: {
@@ -159,13 +166,13 @@ export default {
 					def.push({
 						title: item.title,
 						field: 'column-' + item.id,
-						// editor: true,
 						formatter,
 						formatterParams,
-						headerFilter: 'input',
+						headerFilter: this.showFilter ? 'input' : null,
 						editor: (customEditor) || true,
 						editorParams,
 						align,
+						minWidth: 140,
 					})
 				})
 			}

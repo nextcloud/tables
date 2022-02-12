@@ -67,3 +67,7 @@ p span, .p span, .p .span, p .span, .p .span, .p.span {
 .block {
     display: block !important;
 }
+
+.align-right {
+    text-align: right;
+}

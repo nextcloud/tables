@@ -1,16 +1,24 @@
 <template>
-	<table v-if="column">
+	<table v-if="column" style="width: 100%;">
 		<tr>
-			<td>{{ t('tables', 'Order weight') }}</td><td>{{ column.orderWeight }}</td>
+			<td>{{ t('tables', 'Order weight') }}</td><td class="align-right">
+				{{ column.orderWeight }}
+			</td>
 		</tr>
 		<tr>
-			<td>{{ t('tables', 'Allowed pattern') }}</td><td>{{ column.textAllowedPattern | truncate(20, '...') }}</td>
+			<td>{{ t('tables', 'Allowed pattern') }}</td><td class="align-right">
+				{{ column.textAllowedPattern | truncate(20, '...') }}
+			</td>
 		</tr>
 		<tr>
-			<td>{{ t('tables', 'Default') }}</td><td>{{ column.textDefault | truncate(20, '...') }}</td>
+			<td>{{ t('tables', 'Default') }}</td><td class="align-right">
+				{{ column.textDefault | truncate(20, '...') }}
+			</td>
 		</tr>
 		<tr>
-			<td>{{ t('tables', 'Max length') }}</td><td>{{ maxLength }}</td>
+			<td>{{ t('tables', 'Max length') }}</td><td class="align-right">
+				{{ maxLength }}
+			</td>
 		</tr>
 	</table>
 </template>
