@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import { generateUrl } from '@nextcloud/router'
-import App from './App'
 
 Vue.use(Router)
 
@@ -11,14 +10,7 @@ export default new Router({
 	routes: [
 		{
 			path: '/table/:tableId',
-			components: App,
-			props: {
-				default: (route) => {
-					return {
-						tableId: route.params.tableId,
-					}
-				},
-			},
+			name: 'table',
 		},
 	],
 })

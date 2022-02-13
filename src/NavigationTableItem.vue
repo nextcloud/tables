@@ -92,7 +92,14 @@ export default {
 			this.showDeletionConfirmation = false
 		},
 		updateActiveTable(tableId) {
-			this.$store.commit('setActiveTableId', tableId)
+			console.debug('set new activeTableId from nav', tableId)
+			// this.$store.commit('setActiveTableId', tableId)
+			if ((this.activeTable && this.activeTable.id !== tableId) || !this.activeTable) {
+				this.$router.push({
+					name: 'table',
+					params: { tableId },
+				})
+			}
 		},
 		async updateTableTitle(newTitle) {
 			console.debug('try to set new table title: ', newTitle)
