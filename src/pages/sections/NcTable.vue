@@ -2,13 +2,33 @@
 	<div>
 		<div class="row padding-left">
 			<div class="col-4">
-				<button class="icon-delete" @click="actionDeleteRows" />
-				<button class="icon-add" @click="newRow = true" />
-				<button class="icon-download" @click="downloadCSV" />
-				<div style="padding-left: 30px; padding-right: 15px; padding-top: 10px;">
-					{{ t('tables', 'Show filter') }}
-				</div>
-				<CheckboxRadioSwitch type="switch" :checked.sync="showFilter" style="height: 40px;" />
+				<Actions>
+					<ActionButton :close-after-click="true" icon="icon-add" @click="newRow = true">
+						{{ t('tables', 'Add new row') }}
+					</ActionButton>
+				</Actions>
+				<Actions>
+					<ActionCheckbox :checked.sync="showFilter">
+						{{ t('tables', 'Show filter') }}
+					</ActionCheckbox>
+					<ActionButton :close-after-click="true" icon="icon-delete" @click="actionDeleteRows">
+						{{ t('tables', 'Delete selected rows') }}
+					</ActionButton>
+					<ActionButton :close-after-click="true" icon="icon-download" @click="downloadCSV">
+						{{ t('tables', 'Download CSV') }}
+					</ActionButton>
+					<ActionButton :close-after-click="true" icon="icon-external" @click="copyClipboard">
+						{{ t('tables', 'Copy table to clipboard') }}
+					</ActionButton>
+					<!--
+					<ActionButton :close-after-click="true" icon="icon-clippy">
+						{{ t('tables', 'Click here and then »strg + v«') }}
+					</ActionButton>
+					-->
+					<ActionButton :close-after-click="true" icon="icon-file" @click="print">
+						{{ t('tables', 'Print') }}
+					</ActionButton>
+				</Actions>
 			</div>
 		</div>
 		<div class="row">
@@ -39,8 +59,10 @@ import { showError, showInfo, showSuccess } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
 import DialogConfirmation from '../../modals/DialogConfirmation'
 import CreateRow from '../../modals/CreateRow'
-import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch'
+import Actions from '@nextcloud/vue/dist/Components/Actions'
+import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 // import moment from '@nextcloud/moment'
+import ActionCheckbox from '@nextcloud/vue/dist/Components/ActionCheckbox'
 
 export default {
 	name: 'NcTable',
@@ -48,7 +70,9 @@ export default {
 		CreateRow,
 		DialogConfirmation,
 		TabulatorComponent,
-		CheckboxRadioSwitch,
+		Actions,
+		ActionButton,
+		ActionCheckbox,
 	},
 	props: {
 		columns: {
@@ -122,6 +146,90 @@ export default {
 				return editor
 			}
 
+			const minMaxFilterEditor = function(cell, onRendered, success, cancel, editorParams) {
+
+				let end = null
+
+				const container = document.createElement('span')
+
+				// create and style inputs
+				const start = document.createElement('input')
+				start.setAttribute('type', 'number')
+				start.setAttribute('placeholder', 'Min')
+				start.setAttribute('min', 0)
+				start.setAttribute('max', 100)
+				start.style.padding = '4px'
+				start.style.width = '50%'
+				start.style.boxSizing = 'border-box'
+
+				start.value = cell.getValue()
+
+				/**
+				 *
+				 */
+				function buildValues() {
+					success({
+						start: start.value,
+						end: end.value,
+					})
+				}
+
+				// noinspection JSClosureCompilerSyntax
+				/**
+				 * @param {number} e - event
+				 */
+				function keypress(e) {
+					if (e.keyCode === 13) {
+						buildValues()
+					}
+
+					if (e.keyCode === 27) {
+						cancel()
+					}
+				}
+
+				end = start.cloneNode()
+				end.setAttribute('placeholder', 'Max')
+
+				start.addEventListener('change', buildValues)
+				start.addEventListener('blur', buildValues)
+				start.addEventListener('keydown', keypress)
+
+				end.addEventListener('change', buildValues)
+				end.addEventListener('blur', buildValues)
+				end.addEventListener('keydown', keypress)
+
+				container.appendChild(start)
+				container.appendChild(end)
+
+				return container
+			}
+
+			const minMaxFilterFunction = function minMaxFilterFunction(headerValue, rowValue, rowData, filterParams) {
+				// headerValue - the value of the header filter element
+				// rowValue - the value of the column in this row
+				// rowData - the data for the row being filtered
+				// filterParams - params object passed to the headerFilterFuncParams property
+
+				if (rowValue) {
+					if (headerValue.start !== '') {
+						if (headerValue.end !== '') {
+							return rowValue >= headerValue.start && rowValue <= headerValue.end
+						} else {
+							return rowValue >= headerValue.start
+						}
+					} else {
+						if (headerValue.end !== '') {
+							return rowValue <= headerValue.end
+						}
+					}
+				}
+
+				return true // must return a boolean, true if it passes the filter.
+			}
+
+			// start logic -------------------------------------
+
 			const def = [
 				{
 					formatter: 'rowSelection',
@@ -129,6 +237,7 @@ export default {
 					align: 'center',
 					headerSort: false,
 					width: 60,
+					print: false,
 				},
 			]
 			if (this.columns) {
@@ -138,6 +247,10 @@ export default {
 					let editorParams = null
 					let customEditor = null
 					let align = null
+					let sorter = null
+					let headerFilter = null
+					let headerFilterFunc = null
+					let headerFilterLiveFilter = null
 					if (item.type === 'text' && item.textMultiline) {
 						formatter = 'textarea'
 					} else if (item.type === 'number') {
@@ -162,17 +275,24 @@ export default {
 							numberMax: item.numberMax,
 						}
 						customEditor = numberEditor
+						sorter = 'number'
+						headerFilter = minMaxFilterEditor
+						headerFilterFunc = minMaxFilterFunction
+						headerFilterLiveFilter = false
 					}
 					def.push({
 						title: item.title,
 						field: 'column-' + item.id,
 						formatter,
 						formatterParams,
-						headerFilter: this.showFilter ? 'input' : null,
+						headerFilter: this.showFilter ? headerFilter || 'input' : null,
 						editor: (customEditor) || true,
 						editorParams,
 						align,
-						minWidth: 140,
+						minWidth: (item.type === 'number') ? 110 : 140,
+						sorter,
+						headerFilterFunc,
+						headerFilterLiveFilter,
 					})
 				})
 			}
@@ -205,7 +325,10 @@ export default {
 			// o.responsiveLayout = 'collapse'
 			// o.columnMinWidth = 80
 			o.clipboard = true
-			// o.clipboardPasteAction = 'insert'
+			o.clipboardPasteAction = 'insert'
+			o.printAsHtml = true
+			o.printHeader = '<h1>' + this.activeTable.title + '<h1>'
+			// o.printFooter = '<h2>' + t('tables', 'Printed with Nextcloud tables.') + '<h2>'
 			return o
 		},
 		getData() {
@@ -293,6 +416,18 @@ export default {
 			// remove icons from title for download-filename
 			const title = this.activeTable.title.replace(/([#0-9]\u20E3)|[\xA9\xAE\u203C\u2047-\u2049\u2122\u2139\u3030\u303D\u3297\u3299][\uFE00-\uFEFF]?|[\u2190-\u21FF][\uFE00-\uFEFF]?|[\u2300-\u23FF][\uFE00-\uFEFF]?|[\u2460-\u24FF][\uFE00-\uFEFF]?|[\u25A0-\u25FF][\uFE00-\uFEFF]?|[\u2600-\u27BF][\uFE00-\uFEFF]?|[\u2900-\u297F][\uFE00-\uFEFF]?|[\u2B00-\u2BF0][\uFE00-\uFEFF]?|(?:\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDEFF])[\uFE00-\uFEFF]?/g, '')
 			this.$refs.tabulator.getInstance().download('csv', (title) || 'download')
+		},
+		copyClipboard() {
+			console.debug('tab instance', this.$refs.tabulator.getInstance())
+			this.$refs.tabulator.getInstance().copyToClipboard('all')
+			showSuccess(t('tables', 'Table copied to clipboard.'))
+		},
+		importClipboard() {
+			document.getElementById('tabulator').focus()
+			showInfo(t('tables', 'Now press »strg + v«'))
+		},
+		print() {
+			this.$refs.tabulator.getInstance().print('all', true, {})
 		},
 	},
 }

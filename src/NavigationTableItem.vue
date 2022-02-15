@@ -99,6 +99,8 @@ export default {
 					name: 'table',
 					params: { tableId },
 				})
+			} else {
+				console.debug('no route update performed')
 			}
 		},
 		async updateTableTitle(newTitle) {

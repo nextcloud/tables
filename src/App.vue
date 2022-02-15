@@ -30,21 +30,23 @@ export default {
 			activeTable: null,
 		}
 	},
-	async beforeMount() {
-
+	mounted() {
+		// console.debug('startup route id', this.$router.params)
 	},
 	async created() {
 		await this.$store.dispatch('loadTablesFromBE')
 
-		if (this.$router && this.$router.params && this.$router.params.tableId) {
+		/*
+		if (this.$router && this.$router.params && this.$router.params.tableId && false) {
 			console.debug('try to fetch routing from url', this.$router)
-			this.$router.push({
+			await this.$router.push({
 				name: 'table',
 				params: { tableId: this.$router.params.tableId },
 			})
 		} else {
 			console.debug('no routing', this.$router)
 		}
+*/
 
 		this.$watch(
 			() => this.$route.params,
