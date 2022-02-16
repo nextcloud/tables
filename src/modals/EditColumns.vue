@@ -33,6 +33,10 @@
 							:number-decimals.sync="editColumn.numberDecimals"
 							:number-prefix.sync="editColumn.numberPrefix"
 							:number-suffix.sync="editColumn.numberSuffix" />
+						<NumberStarsForm v-if="editColumn.type === 'number' && editColumn.subtype === 'stars'"
+							:number-default.sync="editColumn.numberDefault" />
+						<NumberProgressForm v-if="editColumn.type === 'number' && editColumn.subtype === 'progress'"
+							:number-default.sync="editColumn.numberDefault" />
 						<TextLineForm v-if="editColumn.type === 'text' && editColumn.subtype === 'line'"
 							:text-default.sync="editColumn.textDefault"
 							:text-allowed-pattern.sync="editColumn.textAllowedPattern"
@@ -91,8 +95,11 @@
 					</div>
 					<div class="col-1 margin-bottom">
 						<NumberTableDisplay v-if="column.type === 'number' && !column.subtype" :column="column" />
+						<NumberStarsTableDisplay v-if="column.type === 'number' && column.subtype === 'stars'" :column="column" />
+						<NumberProgressTableDisplay v-if="column.type === 'number' && column.subtype === 'progress'" :column="column" />
 						<TextLineTableDisplay v-if="column.type === 'text' && column.subtype === 'line'" :column="column" />
 						<TextLongTableDisplay v-if="column.type === 'text' && column.subtype === 'long'" :column="column" />
+						<TextLinkTableDisplay v-if="column.type === 'text' && column.subtype === 'link'" :column="column" />
 					</div>
 					<div class="col-1 margin-bottom">
 						<Actions v-if="!otherActionPerformed">
@@ -140,9 +147,14 @@ import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import ColumnInfoPopover from '../partials/ColumnInfoPopover'
 import NumberTableDisplay from '../columnTypePartials/tableDisplay/NumberTableDisplay'
+import NumberStarsTableDisplay from '../columnTypePartials/tableDisplay/NumberStarsTableDisplay'
+import NumberProgressTableDisplay from '../columnTypePartials/tableDisplay/NumberProgressTableDisplay'
 import TextLineTableDisplay from '../columnTypePartials/tableDisplay/TextLineTableDisplay'
 import TextLongTableDisplay from '../columnTypePartials/tableDisplay/TextLongTableDisplay'
+import TextLinkTableDisplay from '../columnTypePartials/tableDisplay/TextLinkTableDisplay'
 import NumberForm from '../columnTypePartials/forms/NumberForm'
+import NumberStarsForm from '../columnTypePartials/forms/NumberStarsForm'
+import NumberProgressForm from '../columnTypePartials/forms/NumberProgressForm'
 import TextLineForm from '../columnTypePartials/forms/TextLineForm'
 import TextLongForm from '../columnTypePartials/forms/TextLongForm'
 import MainForm from '../columnTypePartials/forms/MainForm'
@@ -155,9 +167,14 @@ export default {
 		ActionButton,
 		ColumnInfoPopover,
 		NumberTableDisplay,
+		NumberStarsTableDisplay,
+		NumberProgressTableDisplay,
 		TextLineTableDisplay,
 		TextLongTableDisplay,
+		TextLinkTableDisplay,
 		NumberForm,
+		NumberStarsForm,
+		NumberProgressForm,
 		TextLineForm,
 		TextLongForm,
 		MainForm,

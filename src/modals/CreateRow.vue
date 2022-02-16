@@ -7,16 +7,28 @@
 				</div>
 			</div>
 			<div v-for="column in columns" :key="column.id">
-				<TextlineForm
+				<TextLineForm
 					v-if="column.type === 'text' && column.subtype === 'line'"
 					:column="column"
 					:value.sync="row[column.id]" />
-				<LongtextForm
+				<TextLongForm
 					v-if="column.type === 'text' && column.subtype === 'long'"
+					:column="column"
+					:value.sync="row[column.id]" />
+				<TextLinkForm
+					v-if="column.type === 'text' && column.subtype === 'link'"
 					:column="column"
 					:value.sync="row[column.id]" />
 				<NumberForm
 					v-if="column.type === 'number' && !column.subtype"
+					:column="column"
+					:value.sync="row[column.id]" />
+				<NumberStarsForm
+					v-if="column.type === 'number' && column.subtype === 'stars'"
+					:column="column"
+					:value.sync="row[column.id]" />
+				<NumberProgressForm
+					v-if="column.type === 'number' && column.subtype === 'progress'"
 					:column="column"
 					:value.sync="row[column.id]" />
 			</div>
@@ -38,17 +50,23 @@ import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
-import TextlineForm from '../rowTypePartials/TextlineForm'
-import LongtextForm from '../rowTypePartials/LongtextForm'
+import TextLineForm from '../rowTypePartials/TextLineForm'
+import TextLongForm from '../rowTypePartials/TextLongForm'
+import TextLinkForm from '../rowTypePartials/TextLinkForm'
 import NumberForm from '../rowTypePartials/NumberForm'
+import NumberStarsForm from '../rowTypePartials/NumberStarsForm'
+import NumberProgressForm from '../rowTypePartials/NumberProgressForm'
 
 export default {
 	name: 'CreateRow',
 	components: {
 		Modal,
-		TextlineForm,
-		LongtextForm,
+		TextLineForm,
+		TextLongForm,
+		TextLinkForm,
 		NumberForm,
+		NumberStarsForm,
+		NumberProgressForm,
 	},
 	props: {
 		showModal: {

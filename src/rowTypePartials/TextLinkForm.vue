@@ -4,7 +4,7 @@
 			{{ column.title }}
 		</div>
 		<div class="fix-col-3" :class="{ 'margin-bottom': !column.description }">
-			<textarea v-model="localValue" />
+			<input v-model="localValue">
 		</div>
 		<div v-if="column.description" class="fix-col-1">
 &nbsp;
@@ -18,7 +18,7 @@
 <script>
 
 export default {
-	name: 'LongtextForm',
+	name: 'TextLinkForm',
 	props: {
 		column: {
 			type: Object,
@@ -36,14 +36,15 @@ export default {
 	computed: {
 		localValue: {
 			get() {
-				return (this.value && true)
-					? this.value
-					: ((this.column.textDefault !== undefined)
-						? this.column.textDefault
-						: '')
+				return this.value
 			},
 			set(v) { this.$emit('update:value', v) },
 		},
+	},
+	beforeMount() {
+		if (this.localValue === null) {
+			this.localValue = this.column.textDefault
+		}
 	},
 }
 </script>

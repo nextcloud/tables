@@ -253,11 +253,30 @@ export default {
 					let headerFilterFunc = null
 					let headerFilterLiveFilter = null
 					let validator = null
-					if (item.type === 'text' && item.textMultiline) {
+
+					// specific parameters depending on column type
+					if (item.type === 'text' && item.subtype === 'long') {
 						formatter = 'textarea'
-					} else if (item.type === 'number') {
+						if (item.textMaxLength && parseInt(item.textMaxLength) !== -1) {
+							validator = 'maxLength:' + item.textMaxLength
+						} else {
+							validator = item.mandatory ? 'required' : null
+						}
+					} else if (item.type === 'text' && item.subtype === 'line') {
+						if (item.textMaxLength && parseInt(item.textMaxLength) !== -1) {
+							validator = 'maxLength:' + item.textMaxLength
+						} else {
+							validator = item.mandatory ? 'required' : null
+						}
+					} else if (item.type === 'text' && item.subtype === 'link') {
+						formatter = 'link'
+						formatterParams = {
+							// labelField:"name",
+							// urlPrefix:"mailto://",
+							target: '_blank',
+						}
+					} else if (item.type === 'number' && !item.subtype) {
 						align = 'right'
-						formatter = 'money'
 						formatterParams = {
 							suffix: item.numberSuffix,
 							prefix: item.numberPrefix,
@@ -277,16 +296,29 @@ export default {
 						}
 						customEditor = numberEditor
 						sorter = 'number'
-						// validator = item.numberDecimals === 0 ? 'integer' : 'float'
 						headerFilter = minMaxFilterEditor
 						headerFilterFunc = minMaxFilterFunction
 						headerFilterLiveFilter = false
-					}
-					if (item.type === 'text' && item.textMaxLength && parseInt(item.textMaxLength) !== -1) {
-						validator = 'maxLength:' + item.textMaxLength
-					} else {
+						validator = item.mandatory ? 'required' : null
+					} else if (item.type === 'number' && item.subtype === 'stars') {
+						formatter = 'star'
+						sorter = 'number'
+						headerFilter = minMaxFilterEditor
+						headerFilterFunc = minMaxFilterFunction
+						headerFilterLiveFilter = false
+						validator = item.mandatory ? 'required' : null
+					} else if (item.type === 'number' && item.subtype === 'progress') {
+						formatter = 'progress'
+						formatterParams = {
+							color: 'var(--color-primary-element-hover)',
+						}
+						sorter = 'number'
+						headerFilter = minMaxFilterEditor
+						headerFilterFunc = minMaxFilterFunction
+						headerFilterLiveFilter = false
 						validator = item.mandatory ? 'required' : null
 					}
+
 					// console.debug('item to push as column definition', item)
 					def.push({
 						title: item.title,
@@ -391,7 +423,7 @@ export default {
 			this.deleteRowsCount = 0
 		},
 		async actionEdited(data) {
-			const newValue = data._cell.value
+			const newValue = '' + data._cell.value
 			const rowId = parseInt(data._cell.row.data.id)
 			const column = data._cell.column.field
 			const columnId = parseInt(column.split('-')[1])

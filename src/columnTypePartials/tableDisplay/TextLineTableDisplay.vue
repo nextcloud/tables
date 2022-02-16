@@ -5,11 +5,13 @@
 				{{ column.orderWeight }}
 			</td>
 		</tr>
+		<!--
 		<tr>
 			<td>{{ t('tables', 'Allowed pattern') }}</td><td class="align-right">
 				{{ column.textAllowedPattern | truncate(20, '...') }}
 			</td>
 		</tr>
+		-->
 		<tr>
 			<td>{{ t('tables', 'Default') }}</td><td class="align-right">
 				{{ column.textDefault | truncate(20, '...') }}

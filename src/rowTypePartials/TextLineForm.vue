@@ -18,7 +18,7 @@
 <script>
 
 export default {
-	name: 'TextlineForm',
+	name: 'TextLineForm',
 	props: {
 		column: {
 			type: Object,
