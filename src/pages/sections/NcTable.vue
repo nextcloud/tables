@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="row padding-left">
+		<div class="row padding-left" style="margin-bottom: 0px;">
 			<div class="col-4">
 				<Actions>
 					<ActionButton :close-after-click="true" icon="icon-add" @click="newRow = true">
@@ -91,6 +91,9 @@ export default {
 					paginationSize: 10,
 					paginationSizeSelector: [5, 10, 30, 100],
 					layout: 'fitDataFill',
+					clipboard: true,
+					clipboardPasteAction: 'insert',
+					printAsHtml: true,
 				}
 			},
 		},
@@ -145,7 +148,6 @@ export default {
 
 				return editor
 			}
-
 			const minMaxFilterEditor = function(cell, onRendered, success, cancel, editorParams) {
 
 				let end = null
@@ -204,7 +206,6 @@ export default {
 
 				return container
 			}
-
 			const minMaxFilterFunction = function minMaxFilterFunction(headerValue, rowValue, rowData, filterParams) {
 				// headerValue - the value of the header filter element
 				// rowValue - the value of the column in this row
@@ -251,6 +252,7 @@ export default {
 					let headerFilter = null
 					let headerFilterFunc = null
 					let headerFilterLiveFilter = null
+					let validator = null
 					if (item.type === 'text' && item.textMultiline) {
 						formatter = 'textarea'
 					} else if (item.type === 'number') {
@@ -268,7 +270,6 @@ export default {
 
 							return (cell.getValue()) ? formatterParams.prefix + ' ' + (Math.round(cell.getValue() * 100) / 100).toFixed(formatterParams.precision) + ' ' + formatterParams.suffix : '' // return the contents of the cell;
 						}
-						// console.debug('item', item)
 						editorParams = {
 							default: item.numberDefault,
 							numberMin: item.numberMin,
@@ -276,10 +277,17 @@ export default {
 						}
 						customEditor = numberEditor
 						sorter = 'number'
+						// validator = item.numberDecimals === 0 ? 'integer' : 'float'
 						headerFilter = minMaxFilterEditor
 						headerFilterFunc = minMaxFilterFunction
 						headerFilterLiveFilter = false
 					}
+					if (item.type === 'text' && item.textMaxLength && parseInt(item.textMaxLength) !== -1) {
+						validator = 'maxLength:' + item.textMaxLength
+					} else {
+						validator = item.mandatory ? 'required' : null
+					}
+					// console.debug('item to push as column definition', item)
 					def.push({
 						title: item.title,
 						field: 'column-' + item.id,
@@ -291,12 +299,13 @@ export default {
 						align,
 						minWidth: (item.type === 'number') ? 110 : 140,
 						sorter,
+						validator,
 						headerFilterFunc,
 						headerFilterLiveFilter,
 					})
 				})
 			}
-			console.debug('columns definition array', def)
+			// console.debug('columns definition array', def)
 			return def
 		},
 		getOptions() {
@@ -322,13 +331,7 @@ export default {
 			o.columns = this.getColumnsDefinition
 			o.locale = 'specific'
 			o.langs = lang
-			// o.responsiveLayout = 'collapse'
-			// o.columnMinWidth = 80
-			o.clipboard = true
-			o.clipboardPasteAction = 'insert'
-			o.printAsHtml = true
 			o.printHeader = '<h1>' + this.activeTable.title + '<h1>'
-			// o.printFooter = '<h2>' + t('tables', 'Printed with Nextcloud tables.') + '<h2>'
 			return o
 		},
 		getData() {

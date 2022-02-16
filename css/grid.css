@@ -9,7 +9,8 @@
 }
 
 .row-with-margin {
-    margin: 50px;
+    margin: 40px;
+    margin-bottom: 20px;
 }
 
 .row.padding-left {
@@ -113,8 +114,8 @@
     .hide-m {
         display: none;
     }
-    .col-3 { width: calc(100% - 20px); }
-    .row-with-margin { margin: 25px; }
+
+    .row-with-margin { margin: 20px; margin-left: 55px; margin-top: 30px; }
 }
 
 @media only screen and (max-width: 641px) {
@@ -123,16 +124,22 @@
     }
     .col-1 { width: calc(50% - 20px); }
     .col-2 { width: calc(100% - 0px); }
-    .row-with-margin { margin: 10px; }
+    .fix-col-1 { width: 50%; }
+    .fix-col-2 { width: 100%; }
+
+    .col-3 { width: calc(100% - 20px); }
+    .fix-col-3 { width: 100%; }
+
+    .row-with-margin { margin: 20px 10px 10px 55px; }
 }
 
 @media only screen and (max-width: 460px) {
     .hide-xs {
         display: none;
     }
-    .col-1 { width: 100%; padding-left: 0; padding-right: 0; }
-    .col-3 { width: 100%; padding-left: 0; padding-right: 0; }
-    .row-with-margin { margin: 5px; }
+    .col-1, .fix-col-1 { width: 100%; padding-left: 0; padding-right: 0; }
+    .col-3, .fix-col-3 { width: 100%; padding-left: 0; padding-right: 0; }
+    .row-with-margin { margin: 5px 5px 5px 45px; }
 }
 
 input, textarea {

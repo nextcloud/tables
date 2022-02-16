@@ -10,7 +10,7 @@
 }
 
 .tabulator .tabulator-tableHolder {
-    min-height: 100px;
+    min-height: 74px;
 }
 
 .tabulator .tabulator-cell.tabulator-editing textarea {
