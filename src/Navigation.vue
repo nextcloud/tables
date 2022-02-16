@@ -12,9 +12,9 @@
 		</template>
 		<template #footer>
 			<AppNavigationSettings :title="t('tables', 'Donation')">
-				{{ t('tables', 'This is a private project. Donations are always welcome to give something back to my family.') }}<br>
-				<a href="https://www.paypal.com/donate/?hosted_button_id=3NBB57F2WUFTN" target="_blank">PayPal</a><br>
-				<a href="https://buymeacoff.ee/iPbXoknVC" target="_blank">Buy me a coffee</a><br>
+				{{ t('tables', 'This is a private project. Donations are welcome to give something back to me and my family.') }}<br>
+				<a href="https://www.paypal.com/donate/?hosted_button_id=3NBB57F2WUFTN" target="_blank">» PayPal</a><br>
+				<a href="https://buymeacoff.ee/iPbXoknVC" target="_blank">» Buy me a coffee</a><br>
 			</AppNavigationSettings>
 		</template>
 	</AppNavigation>

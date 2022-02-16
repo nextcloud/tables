@@ -3,34 +3,34 @@
 	 viewBox="0 0 415 415" style="enable-background:new 415 415 415 415;" xml:space="preserve">
 <g>
 	<g>
-		<rect x="150" y="115" width="120" height="70" style="fill:rgb(255,255,255);"/>
+		<rect x="150" y="115" width="120" height="60" style="fill:rgb(255,255,255);"/>
 	</g>
 	<g>
-		<rect x="150" y="315" width="120" height="70" style="fill:rgb(255,255,255);"/>
+		<rect x="150" y="315" width="120" height="60" style="fill:rgb(255,255,255);"/>
 	</g>
 	<g>
-		<rect x="300" y="115" width="120" height="70" style="fill:rgb(255,255,255);"/>
+		<rect x="300" y="115" width="120" height="60" style="fill:rgb(255,255,255);"/>
 	</g>
 	<g>
-		<rect x="150" y="215" width="120" height="70" style="fill:rgb(255,255,255);"/>
+		<rect x="150" y="215" width="120" height="60" style="fill:rgb(255,255,255);"/>
 	</g>
 	<g>
-		<rect x="0" y="215" width="120" height="70" style="fill:rgb(255,255,255);"/>
+		<rect x="0" y="215" width="120" height="60" style="fill:rgb(255,255,255);"/>
 	</g>
 	<g>
-		<rect x="300" y="315" width="120" height="70" style="fill:rgb(255,255,255);"/>
+		<rect x="300" y="315" width="120" height="60" style="fill:rgb(255,255,255);"/>
 	</g>
 	<g>
-		<rect x="300" y="215" width="120" height="70" style="fill:rgb(255,255,255);"/>
+		<rect x="300" y="215" width="120" height="60" style="fill:rgb(255,255,255);"/>
 	</g>
 	<g>
-		<rect y="315" width="120" height="70" style="fill:rgb(255,255,255);"/>
+		<rect y="315" width="120" height="60" style="fill:rgb(255,255,255);"/>
 	</g>
 	<g>
-		<rect x="0" y="115" width="120" height="70" style="fill:rgb(255,255,255);"/>
+		<rect x="0" y="115" width="120" height="60" style="fill:rgb(255,255,255);"/>
 	</g>
 	<g>
-		<rect y="15" width="415" height="70" style="fill:rgb(255,255,255);"/>
+		<rect y="15" width="415" height="50" style="fill:rgb(255,255,255);"/>
 	</g>
 </g>
 </svg>
