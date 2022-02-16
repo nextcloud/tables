@@ -8,14 +8,10 @@
 			<div class="fix-col-3 margin-bottom">
 				<input v-model="defaultText">
 			</div>
-			<!--
-      <div v-if="type === 'longtext'" class="fix-col-3 margin-bottom">
-        <textarea v-model="textDefault" />
-      </div>
-      -->
 		</div>
 
 		<!-- allowed pattern -->
+		<!--
 		<div class="row">
 			<div class="fix-col-1">
 				{{ t('tables', 'Allowed pattern (regex)') }}
@@ -24,6 +20,7 @@
 				<input v-model="allowedPattern">
 			</div>
 		</div>
+-->
 
 		<!-- max text length -->
 		<div class="row">
@@ -47,7 +44,7 @@
 // import { showError, showInfo, showSuccess } from '@nextcloud/dialogs'
 
 export default {
-	name: 'TextlineForm',
+	name: 'TextLineForm',
 	props: {
 		textDefault: {
 			type: String,

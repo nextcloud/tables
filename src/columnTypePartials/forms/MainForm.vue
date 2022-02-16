@@ -18,7 +18,7 @@
 
 		<!-- mandatory -->
 		<div class="fix-col-1">
-			{{ t('tables', 'mandatory') }}
+			{{ t('tables', 'Mandatory') }}
 		</div>
 		<div class="fix-col-3 margin-bottom">
 			<CheckboxRadioSwitch type="switch" :checked.sync="localMandatory" />

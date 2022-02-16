@@ -19,31 +19,27 @@ class TableMapper extends QBMapper {
 
     /**
      * @param int $id
-     * @param string $userId
      * @return Entity|Table
      * @throws MultipleObjectsReturnedException
      * @throws Exception
      * @throws DoesNotExistException
      */
-	public function find(int $id, string $userId): Table {
+	public function find(int $id): Table {
         $qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
-			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)))
-			->andWhere($qb->expr()->eq('ownership', $qb->createNamedParameter($userId)));
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
 		return $this->findEntity($qb);
 	}
 
     /**
-     * @param string $userId
      * @return array
      * @throws Exception
      */
-	public function findAll(string $userId): array {
+	public function findAll(): array {
         $qb = $this->db->getQueryBuilder();
 		$qb->select('*')
-			->from($this->table)
-			->where($qb->expr()->eq('ownership', $qb->createNamedParameter($userId)));
+			->from($this->table);
 		return $this->findEntities($qb);
 	}
 }

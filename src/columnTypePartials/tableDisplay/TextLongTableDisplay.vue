@@ -21,7 +21,7 @@
 <script>
 
 export default {
-	name: 'LongtextTableDisplay',
+	name: 'TextLongTableDisplay',
 	filters: {
 		truncate(text, length, suffix) {
 			if (text.length > length) {

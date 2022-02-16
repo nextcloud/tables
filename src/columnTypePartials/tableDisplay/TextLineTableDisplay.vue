@@ -26,7 +26,7 @@
 <script>
 
 export default {
-	name: 'TextlineTableDisplay',
+	name: 'TextLineTableDisplay',
 	filters: {
 		truncate(text, length, suffix) {
 			if (text.length > length) {

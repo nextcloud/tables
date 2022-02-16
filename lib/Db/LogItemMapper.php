@@ -19,14 +19,12 @@ class LogItemMapper extends QBMapper {
 
     /**
      * @param int $id
-     * @param string $userId
      * @return Entity|Table
      * @throws MultipleObjectsReturnedException
      * @throws Exception
      * @throws DoesNotExistException
      */
 	public function find(int $id): Table {
-        // TODO check if request is permitted
         $qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
@@ -35,17 +33,10 @@ class LogItemMapper extends QBMapper {
 	}
 
     /**
-     * @param string|null $userId
-     * @param int|null $tableId
-     * @param int|null $rowId
-     * @param int|null $columnId
-     * @param string|null $payloadKeyword
      * @return array
      * @throws Exception
      */
-	public function findAll(string $userId = null, int $tableId = null, int $rowId = null, int $columnId = null, string $payloadKeyword = null): array {
-        // TODO check if request is permitted
-        // TODO realize filtering
+	public function findAll(): array {
         $qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table);

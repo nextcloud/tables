@@ -26,18 +26,18 @@
 							:title-missing-error="editErrorTitle" />
 					</div>
 					<div class="fix-col-2 margin-bottom">
-						<NumberForm v-if="editColumn.type === 'number'"
+						<NumberForm v-if="editColumn.type === 'number' && !editColumn.subtype"
 							:number-default.sync="editColumn.numberDefault"
 							:number-min.sync="editColumn.numberMin"
 							:number-max.sync="editColumn.numberMax"
 							:number-decimals.sync="editColumn.numberDecimals"
 							:number-prefix.sync="editColumn.numberPrefix"
 							:number-suffix.sync="editColumn.numberSuffix" />
-						<TextlineForm v-if="editColumn.type === 'text' && !editColumn.textMultiline"
+						<TextLineForm v-if="editColumn.type === 'text' && editColumn.subtype === 'line'"
 							:text-default.sync="editColumn.textDefault"
 							:text-allowed-pattern.sync="editColumn.textAllowedPattern"
 							:text-max-length.sync="editColumn.textMaxLength" />
-						<LongtextForm v-if="editColumn.type === 'text' && editColumn.textMultiline"
+						<TextLongForm v-if="editColumn.type === 'text' && editColumn.subtype === 'long'"
 							:text-default.sync="editColumn.textDefault"
 							:text-max-length.sync="editColumn.textMaxLength" />
 					</div>
@@ -56,12 +56,33 @@
 					<div class="col-1 block margin-bottom" :class="{mandatory: column.mandatory}">
 						{{ column.title }}
 
-						<span v-if="column.type === 'number'" class="block">{{ t('tables', 'Number') }}
-							{{ (column.mandatory) ? ', ' + t('tables', 'mandatory'): '' }}</span>
-						<span v-if="column.type === 'text' && !column.textMultiline" class="block">{{ t('tables', 'Textline') }}
-							{{ (column.mandatory) ? ', ' + t('tables', 'mandatory'): '' }}</span>
-						<span v-if="column.type === 'text' && column.textMultiline" class="block">{{ t('tables', 'Longtext') }}
-							{{ (column.mandatory) ? ', ' + t('tables', 'mandatory'): '' }}</span>
+						<span v-if="column.type === 'number' && !column.subtype" class="block">{{ t('tables', 'Number') }}
+							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
+						<span v-if="column.type === 'number' && column.subtype === 'stars'" class="block">{{ t('tables', 'Star rating') }}
+							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
+						<span v-if="column.type === 'number' && column.subtype === 'progress'" class="block">{{ t('tables', 'Progress bar') }}
+							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
+
+						<span v-if="column.type === 'text' && column.subtype === 'line'" class="block">{{ t('tables', 'Textline') }}
+							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
+						<span v-if="column.type === 'text' && column.subtype === 'long'" class="block">{{ t('tables', 'Long text') }}
+							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
+						<span v-if="column.type === 'text' && column.subtype === 'link'" class="block">{{ t('tables', 'Link') }}
+							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
+
+						<span v-if="column.type === 'selection' && !column.subtype" class="block">{{ t('tables', 'Selection') }}
+							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
+						<span v-if="column.type === 'selection' && column.subtype === 'multi'" class="block">{{ t('tables', 'Multiselect') }}
+							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
+						<span v-if="column.type === 'selection' && column.subtype === 'check'" class="block">{{ t('tables', 'Yes / No') }}
+							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
+
+						<span v-if="column.type === 'datetime' && !column.subtype" class="block">{{ t('tables', 'Date and time') }}
+							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
+						<span v-if="column.type === 'datetime' && column.subtype === 'date'" class="block">{{ t('tables', 'Date') }}
+							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
+						<span v-if="column.type === 'datetime' && column.subtype === 'time'" class="block">{{ t('tables', 'Time') }}
+							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
 					</div>
 					<div class="col-1 margin-bottom">
 						<ColumnInfoPopover :column="column" />
@@ -69,9 +90,9 @@
 						{{ column.description | truncate(50, '...') }}
 					</div>
 					<div class="col-1 margin-bottom">
-						<NumberTableDisplay v-if="column.type === 'number'" :column="column" />
-						<TextlineTableDisplay v-if="column.type === 'text' && !column.textMultiline" :column="column" />
-						<LongtextTableDisplay v-if="column.type === 'text' && column.textMultiline" :column="column" />
+						<NumberTableDisplay v-if="column.type === 'number' && !column.subtype" :column="column" />
+						<TextLineTableDisplay v-if="column.type === 'text' && column.subtype === 'line'" :column="column" />
+						<TextLongTableDisplay v-if="column.type === 'text' && column.subtype === 'long'" :column="column" />
 					</div>
 					<div class="col-1 margin-bottom">
 						<Actions v-if="!otherActionPerformed">
@@ -119,11 +140,11 @@ import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import ColumnInfoPopover from '../partials/ColumnInfoPopover'
 import NumberTableDisplay from '../columnTypePartials/tableDisplay/NumberTableDisplay'
-import TextlineTableDisplay from '../columnTypePartials/tableDisplay/TextlineTableDisplay'
-import LongtextTableDisplay from '../columnTypePartials/tableDisplay/LongtextTableDisplay'
+import TextLineTableDisplay from '../columnTypePartials/tableDisplay/TextLineTableDisplay'
+import TextLongTableDisplay from '../columnTypePartials/tableDisplay/TextLongTableDisplay'
 import NumberForm from '../columnTypePartials/forms/NumberForm'
-import TextlineForm from '../columnTypePartials/forms/TextlineForm'
-import LongtextForm from '../columnTypePartials/forms/LongtextForm'
+import TextLineForm from '../columnTypePartials/forms/TextLineForm'
+import TextLongForm from '../columnTypePartials/forms/TextLongForm'
 import MainForm from '../columnTypePartials/forms/MainForm'
 
 export default {
@@ -134,11 +155,11 @@ export default {
 		ActionButton,
 		ColumnInfoPopover,
 		NumberTableDisplay,
-		TextlineTableDisplay,
-		LongtextTableDisplay,
+		TextLineTableDisplay,
+		TextLongTableDisplay,
 		NumberForm,
-		TextlineForm,
-		LongtextForm,
+		TextLineForm,
+		TextLongForm,
 		MainForm,
 	},
 	filters: {
@@ -266,6 +287,14 @@ export default {
 
 .deleteRow {
 	background-color: var(--color-primary-light-hover);
+}
+
+.row {
+	border-bottom: 1px solid var(--color-primary-light-hover);
+}
+
+.row:last-child {
+	border-bottom: none;
 }
 
 </style>

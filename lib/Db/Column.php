@@ -15,6 +15,7 @@ class Column extends Entity implements JsonSerializable {
     protected $lastEditBy;
     protected $lastEditAt;
     protected $type;
+    protected $subtype;
     protected $mandatory;
     protected $description;
     protected $orderWeight;
@@ -31,7 +32,10 @@ class Column extends Entity implements JsonSerializable {
     protected $textDefault;
     protected $textAllowedPattern;
     protected $textMaxLength;
-    protected $textMultiline;
+
+    // type selection
+    protected $selectionOptions;
+    protected $selectionDefault;
 
     public function __construct() {
         $this->addType('id', 'integer');
@@ -46,8 +50,18 @@ class Column extends Entity implements JsonSerializable {
         $this->addType('numberDefault', 'float');
 
         // type text
-        $this->addType('textMultiline', 'boolean');
         $this->addType('textMaxLength', 'integer');
+    }
+
+    /** @noinspection PhpUndefinedMethodInspection */
+    public function getSelectionOptionsArray() {
+        return \json_decode($this->getSelectionOptions(), true);
+    }
+
+    /** @noinspection PhpUndefinedMethodInspection */
+    public function setSelectionOptionsArray($array) {
+        $json = \json_encode($array);
+        $this->setSelectionOptions($json);
     }
 
 	public function jsonSerialize(): array {
@@ -61,7 +75,8 @@ class Column extends Entity implements JsonSerializable {
             'lastEditBy'    => $this->lastEditBy,
             'lastEditAt'    => $this->lastEditAt,
             'type'          => $this->type,
-            'mandatory'      => $this->mandatory,
+            'subtype'       => $this->subtype,
+            'mandatory'     => $this->mandatory,
             'description'   => $this->description,
             'orderWeight'   => $this->orderWeight,
 
@@ -77,7 +92,10 @@ class Column extends Entity implements JsonSerializable {
             'textDefault'   => $this->textDefault,
             'textAllowedPattern' => $this->textAllowedPattern,
             'textMaxLength' => $this->textMaxLength,
-            'textMultiline' => $this->textMultiline,
+
+            // type selection
+            'selectionOptions' => $this->getSelectionOptionsArray(),
+            'selectionDefault' => $this->selectionDefault,
         ];
 	}
 }

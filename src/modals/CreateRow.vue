@@ -8,15 +8,15 @@
 			</div>
 			<div v-for="column in columns" :key="column.id">
 				<TextlineForm
-					v-if="column.type === 'text' && !column.textMultiline"
+					v-if="column.type === 'text' && column.subtype === 'line'"
 					:column="column"
 					:value.sync="row[column.id]" />
 				<LongtextForm
-					v-if="column.type === 'text' && column.textMultiline"
+					v-if="column.type === 'text' && column.subtype === 'long'"
 					:column="column"
 					:value.sync="row[column.id]" />
 				<NumberForm
-					v-if="column.type === 'number'"
+					v-if="column.type === 'number' && !column.subtype"
 					:column="column"
 					:value.sync="row[column.id]" />
 			</div>

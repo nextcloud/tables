@@ -32,7 +32,7 @@
 // import { showError, showInfo, showSuccess } from '@nextcloud/dialogs'
 
 export default {
-	name: 'LongtextForm',
+	name: 'TextLongForm',
 	props: {
 		textDefault: {
 			type: String,

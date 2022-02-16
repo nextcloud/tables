@@ -19,14 +19,12 @@ class ColumnMapper extends QBMapper {
 
     /**
      * @param int $id
-     * @param string $userId
      * @return Entity|Table
      * @throws MultipleObjectsReturnedException
      * @throws Exception
      * @throws DoesNotExistException
      */
-	public function find(int $id, string $userId): Column {
-        // TODO check if request is permitted
+	public function find(int $id): Column {
         $qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
@@ -35,13 +33,11 @@ class ColumnMapper extends QBMapper {
 	}
 
     /**
-     * @param string $userId
      * @param integer $tableID
      * @return array
      * @throws Exception
      */
-	public function findAllByTable(string $userId, int $tableID): array {
-        // TODO check if request is permitted
+	public function findAllByTable(int $tableID): array {
         $qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)

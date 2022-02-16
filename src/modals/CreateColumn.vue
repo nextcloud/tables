@@ -15,71 +15,91 @@
 				<div class="fix-col-1 mandatory" :class="{error: typeMissingError}">
 					{{ t('tables', 'Type') }}
 				</div>
-				<div class="fix-col-3 margin-bottom" :class="{error: typeMissingError}">
-					<CheckboxRadioSwitch :checked.sync="type"
-						value="textline"
-						name="type"
-						class="row"
-						type="radio">
-						{{ t('tables', 'Textline') }}
-					</CheckboxRadioSwitch>
-					<CheckboxRadioSwitch :checked.sync="type"
-						value="longtext"
-						name="type"
-						class="row"
-						type="radio">
-						{{ t('tables', 'Longtext') }}
-					</CheckboxRadioSwitch>
-					<CheckboxRadioSwitch :checked.sync="type"
-						value="number"
-						name="type"
-						class="row"
-						type="radio">
-						{{ t('tables', 'Number') }}
-					</CheckboxRadioSwitch>
+				<div class="fix-col-3">
+					<Multiselect v-model="combinedTypeObject"
+						:options="typeOptions"
+						track-by="id"
+						label="label"
+						style="width: 100%" />
 				</div>
+			</div>
 
-				<!-- type specific parameter -------------------------------- -->
+			<!-- type specific parameter -------------------------------- -->
 
-				<div v-if="type === 'number'">
-					<div class="row">
-						<div class="col-4">
-							<h3>{{ t('tables', 'Number column specific parameters') }}</h3>
-						</div>
-					</div>
-					<NumberForm
-						:number-default.sync="numberDefault"
-						:number-min.sync="numberMin"
-						:number-max.sync="numberMax"
-						:number-decimals.sync="numberDecimals"
-						:number-prefix.sync="numberPrefix"
-						:number-suffix.sync="numberSuffix" />
-				</div>
-
-				<div v-if="type === 'textline' || type === 'longtext'">
-					<div class="row">
-						<div class="col-4">
-							<h3>{{ t('tables', 'Text column specific parameters') }}</h3>
-						</div>
-					</div>
-					<TextlineForm v-if="type === 'textline'"
-						:text-default.sync="textDefault"
-						:text-allowed-pattern.sync="textAllowedPattern"
-						:text-max-length.sync="textMaxLength" />
-					<LongtextForm v-if="type === 'longtext'"
-						:text-default.sync="textDefault"
-						:text-max-length.sync="textMaxLength" />
-				</div>
-
+			<div v-if="combinedType === 'number'">
 				<div class="row">
-					<div class="col-4 margin-bottom">
-						<button class="secondary" @click="actionCancel">
-							{{ t('tables', 'Cancel') }}
-						</button>
-						<button class="primary" @click="actionConfirm">
-							{{ t('tables', 'Save') }}
-						</button>
+					<div class="col-4">
+						<h3>{{ t('tables', 'Number column specific parameters') }}</h3>
 					</div>
+				</div>
+				<NumberForm
+					:number-default.sync="numberDefault"
+					:number-min.sync="numberMin"
+					:number-max.sync="numberMax"
+					:number-decimals.sync="numberDecimals"
+					:number-prefix.sync="numberPrefix"
+					:number-suffix.sync="numberSuffix" />
+			</div>
+
+			<div v-if="combinedType === 'number-stars'">
+				<div class="row">
+					<div class="col-4">
+						<h3>{{ t('tables', 'Stars rating column specific parameters') }}</h3>
+					</div>
+				</div>
+				<NumberStarsForm :number-default.sync="numberDefault" />
+			</div>
+
+			<div v-if="combinedType === 'number-progress'">
+				<div class="row">
+					<div class="col-4">
+						<h3>{{ t('tables', 'Progress bar column specific parameters') }}</h3>
+					</div>
+				</div>
+				<NumberProgressForm :number-default.sync="numberDefault" />
+			</div>
+
+			<div v-if="type === 'text' && subtype !== 'link'">
+				<div class="row">
+					<div class="col-4">
+						<h3>{{ t('tables', 'Text column specific parameters') }}</h3>
+					</div>
+				</div>
+				<TextLineForm v-if="subtype === 'line'"
+					:text-default.sync="textDefault"
+					:text-allowed-pattern.sync="textAllowedPattern"
+					:text-max-length.sync="textMaxLength" />
+				<TextLongForm v-if="subtype === 'long'"
+					:text-default.sync="textDefault"
+					:text-max-length.sync="textMaxLength" />
+			</div>
+
+			<div v-if="combinedType === 'selection'">
+				<div class="row">
+					<div class="col-4">
+						<h3>{{ t('tables', 'Selection column specific parameters') }}</h3>
+					</div>
+				</div>
+				<SelectionForm :selection-options.sync="selectionOptions" :selection-default.sync="selectionDefault" />
+			</div>
+
+			<div v-if="combinedType === 'selection-multi'">
+				<div class="row">
+					<div class="col-4">
+						<h3>{{ t('tables', 'Multiple selection column specific parameters') }}</h3>
+					</div>
+				</div>
+				<SelectionMultiForm :selection-options.sync="selectionOptions" :selection-default.sync="selectionDefault" />
+			</div>
+
+			<div class="row">
+				<div class="col-4 margin-bottom">
+					<button class="secondary" @click="actionCancel">
+						{{ t('tables', 'Cancel') }}
+					</button>
+					<button class="primary" @click="actionConfirm">
+						{{ t('tables', 'Save') }}
+					</button>
 				</div>
 			</div>
 		</div>
@@ -88,25 +108,33 @@
 
 <script>
 import NumberForm from '../columnTypePartials/forms/NumberForm'
-import TextlineForm from '../columnTypePartials/forms/TextlineForm'
-import LongtextForm from '../columnTypePartials/forms/LongtextForm'
+import NumberStarsForm from '../columnTypePartials/forms/NumberStarsForm'
+import NumberProgressForm from '../columnTypePartials/forms/NumberProgressForm'
+import TextLineForm from '../columnTypePartials/forms/TextLineForm'
+import TextLongForm from '../columnTypePartials/forms/TextLongForm'
+import SelectionForm from '../columnTypePartials/forms/SelectionForm'
+import SelectionMultiForm from '../columnTypePartials/forms/SelectionMultiForm'
 import MainForm from '../columnTypePartials/forms/MainForm'
 import Modal from '@nextcloud/vue/dist/Components/Modal'
-import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showInfo, showSuccess } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
+import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
 
 export default {
 	name: 'CreateColumn',
 	components: {
+		SelectionMultiForm,
 		Modal,
-		CheckboxRadioSwitch,
 		NumberForm,
-		TextlineForm,
-		LongtextForm,
+		TextLineForm,
+		TextLongForm,
 		MainForm,
+		Multiselect,
+		NumberStarsForm,
+		NumberProgressForm,
+		SelectionForm,
 	},
 	props: {
 		showModal: {
@@ -117,6 +145,7 @@ export default {
 	data() {
 		return {
 			type: null,
+			subtype: null,
 			title: '',
 			description: '',
 			numberPrefix: '',
@@ -132,10 +161,49 @@ export default {
 			textMaxLength: null,
 			typeMissingError: false,
 			titleMissingError: false,
+			selectionOptions: null,
+			selectionDefault: null,
+			typeOptions: [
+				{ id: 'text-line', label: t('tables', 'Textline') },
+				{ id: 'text-long', label: t('tables', 'Long text') },
+				{ id: 'text-link', label: t('tables', 'Link') },
+
+				{ id: 'number', label: t('tables', 'Number') },
+				{ id: 'number-stars', label: t('tables', 'Stars rating') },
+				{ id: 'number-progress', label: t('tables', 'Progress bar') },
+
+				{ id: 'selection', label: t('tables', 'Selection') },
+				{ id: 'selection-multi', label: t('tables', 'Multiselect') },
+				{ id: 'selection-check', label: t('tables', 'Yes / No') },
+
+				{ id: 'datetime', label: t('tables', 'Date and time') },
+				{ id: 'datetime-date', label: t('tables', 'Date') },
+				{ id: 'datetime-time', label: t('tables', 'Time') },
+			],
 		}
 	},
 	computed: {
 		...mapGetters(['activeTable']),
+		combinedType: {
+			get() {
+				return this.type ? this.type + ((this.subtype) ? ('-' + this.subtype) : '') : null
+			},
+			set(newValue) {
+				if (newValue) {
+					const types = newValue.split('-')
+					this.type = types[0]
+					this.subtype = types[1]
+				}
+			},
+		},
+		combinedTypeObject: {
+			get() {
+				return this.combinedType ? this.typeOptions.filter(item => item.id === this.combinedType) : null
+			},
+			set(o) {
+				if (o) this.combinedType = o.id
+			},
+		},
 	},
 	methods: {
 		async actionConfirm() {
@@ -159,16 +227,9 @@ export default {
 		},
 		async sendNewColumnToBE() {
 			try {
-				let type = this.type
-				let textMultiline = false
-				if (type === 'textline') {
-					type = 'text'
-				} else if (type === 'longtext') {
-					type = 'text'
-					textMultiline = true
-				}
 				const data = {
-					type,
+					type: this.type,
+					subtype: this.subtype,
 					title: this.title,
 					description: this.description,
 					numberPrefix: this.numberPrefix,
@@ -182,7 +243,8 @@ export default {
 					textDefault: this.textDefault,
 					textAllowedPattern: this.textAllowedPattern,
 					textMaxLength: this.textMaxLength,
-					textMultiline,
+					selectionOptions: this.selectionOptions,
+					selectionDefault: this.selectionDefault,
 					tableId: this.activeTable.id,
 				}
 				// console.debug('try so send new column', data)
@@ -209,6 +271,8 @@ export default {
 			this.textDefault = ''
 			this.textAllowedPattern = ''
 			this.textMaxLength = null
+			this.selectionOptions = null
+			this.selectionDefault = null
 			this.titleMissingError = false
 			this.typeMissingError = false
 		},

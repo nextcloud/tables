@@ -51,6 +51,7 @@ class ColumnController extends Controller {
         int $tableId,
         string $title,
         string $type,
+        string $subtype = '',
         string $numberPrefix = '',
         string $numberSuffix = '',
         bool $mandatory = false,
@@ -58,11 +59,12 @@ class ColumnController extends Controller {
         string $textDefault = '',
         string $textAllowedPattern = '',
         int $textMaxLength = -1,
-        bool $textMultiline = false,
         float $numberDefault = null,
         float $numberMin = null,
         float $numberMax = null,
         int $numberDecimals = null,
+        string $selectionOptions = '',
+        string $selectionDefault = '',
         int $orderWeight = 0
     ): DataResponse {
 		return new DataResponse($this->service->create(
@@ -70,6 +72,7 @@ class ColumnController extends Controller {
             $title,
             $this->userId,
             $type,
+            $subtype,
             $numberPrefix,
             $numberSuffix,
             $mandatory,
@@ -77,11 +80,12 @@ class ColumnController extends Controller {
             $textDefault,
             $textAllowedPattern,
             $textMaxLength,
-            $textMultiline,
             $numberDefault,
             $numberMin,
             $numberMax,
             $numberDecimals,
+            $selectionOptions,
+            $selectionDefault,
             $orderWeight));
 	}
 
@@ -93,6 +97,7 @@ class ColumnController extends Controller {
         int $tableId,
         string $title,
         string $type,
+        string $subtype = '',
         string $numberPrefix = '',
         string $numberSuffix = '',
         bool $mandatory = false,
@@ -100,11 +105,12 @@ class ColumnController extends Controller {
         string $textDefault = '',
         string $textAllowedPattern = '',
         int $textMaxLength = null,
-        bool $textMultiline = false,
         float $numberDefault = null,
         float $numberMin = null,
         float $numberMax = null,
         int $numberDecimals = null,
+        string $selectionOptions = '',
+        string $selectionDefault = '',
         int $orderWeight = 0
     ): DataResponse {
 		return $this->handleNotFound(function () use (
@@ -112,6 +118,7 @@ class ColumnController extends Controller {
             $tableId,
             $title,
             $type,
+            $subtype,
             $numberPrefix,
             $numberSuffix,
             $mandatory,
@@ -119,11 +126,12 @@ class ColumnController extends Controller {
             $textDefault,
             $textAllowedPattern,
             $textMaxLength,
-            $textMultiline,
             $numberDefault,
             $numberMin,
             $numberMax,
             $numberDecimals,
+            $selectionOptions,
+            $selectionDefault,
             $orderWeight
         ) {
 			return $this->service->update(
@@ -132,6 +140,7 @@ class ColumnController extends Controller {
                 $this->userId,
                 $title,
                 $type,
+                $subtype,
                 $numberPrefix,
                 $numberSuffix,
                 $mandatory,
@@ -139,11 +148,12 @@ class ColumnController extends Controller {
                 $textDefault,
                 $textAllowedPattern,
                 $textMaxLength,
-                $textMultiline,
                 $numberDefault,
                 $numberMin,
                 $numberMax,
                 $numberDecimals,
+                $selectionOptions,
+                $selectionDefault,
                 $orderWeight);
 		});
 	}

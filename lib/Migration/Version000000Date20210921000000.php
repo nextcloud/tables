@@ -91,6 +91,10 @@ class Version000000Date20210921000000 extends SimpleMigrationStep {
                 'notnull' => true,
                 'length' => 20,
             ]);
+            $table->addColumn('subtype', Types::STRING, [
+                'notnull' => true,
+                'length' => 20,
+            ]);
             $table->addColumn('mandatory', Types::BOOLEAN, [
                 'notnull' => false,
                 'default' => 0,
@@ -114,10 +118,6 @@ class Version000000Date20210921000000 extends SimpleMigrationStep {
             $table->addColumn('text_max_length', Types::INTEGER, [
                 'notnull' => false,
             ]);
-            $table->addColumn('text_multiline', Types::BOOLEAN, [
-                'notnull' => false,
-                'default' => false,
-            ]);
 
             // type number
             $table->addColumn('number_default', Types::FLOAT, [
@@ -140,6 +140,14 @@ class Version000000Date20210921000000 extends SimpleMigrationStep {
             $table->addColumn('number_suffix', Types::STRING, [
                 'notnull' => true,
                 'length' => 200,
+            ]);
+
+            // type selection
+            $table->addColumn('selection_options', Types::STRING, [
+                'notnull' => false,
+            ]);
+            $table->addColumn('selection_default', Types::STRING, [
+                'notnull' => false,
             ]);
 
             $table->setPrimaryKey(['id']);

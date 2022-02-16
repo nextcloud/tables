@@ -29,7 +29,7 @@ class ColumnService {
      * @throws Exception
      */
     public function findAllByTable(string $userId, int $tableId): array {
-		return $this->mapper->findAllByTable($userId, $tableId);
+		return $this->mapper->findAllByTable($tableId);
 	}
 
     /**
@@ -51,7 +51,7 @@ class ColumnService {
      * @throws \OCP\DB\Exception
      */
     public function find($id, $userId) {
-        return $this->mapper->find($id, $userId);
+        return $this->mapper->find($id);
     }
 
     /**
@@ -64,6 +64,7 @@ class ColumnService {
         string $title,
         string $userId,
         string $type,
+        string $subtype,
         string $numberPrefix,
         string $numberSuffix,
         bool $mandatory,
@@ -71,11 +72,12 @@ class ColumnService {
         string $textDefault,
         string $textAllowedPattern,
         int $textMaxLength,
-        bool $textMultiline,
         float $numberDefault = null,
         float $numberMin = null,
         float $numberMax = null,
         int $numberDecimals = null,
+        string $selectionOptions,
+        string $selectionDefault,
         int $orderWeight = 0
     ) {
         $time = new \DateTime();
@@ -83,6 +85,7 @@ class ColumnService {
         $item->setTitle($title);
         $item->setTableId($tableId);
         $item->setType($type);
+        $item->setSubtype($subtype);
         $item->setNumberPrefix($numberPrefix);
         $item->setNumberSuffix($numberSuffix);
         $item->setMandatory($mandatory);
@@ -90,7 +93,6 @@ class ColumnService {
         $item->setTextDefault($textDefault);
         $item->setTextAllowedPattern($textAllowedPattern);
         $item->setTextMaxLength($textMaxLength);
-        $item->setTextMultiline($textMultiline);
         $item->setNumberDefault($numberDefault);
         $item->setNumberMin($numberMin);
         $item->setNumberMax($numberMax);
@@ -99,6 +101,8 @@ class ColumnService {
         $item->setLastEditBy($userId);
         $item->setCreatedAt($time->format('Y-m-d H:i:s'));
         $item->setLastEditAt($time->format('Y-m-d H:i:s'));
+        $item->setSelectionOptions($selectionOptions);
+        $item->setSelectionDefault($selectionDefault);
         $item->setOrderWeight($orderWeight);
 		return $this->mapper->insert($item);
 	}
@@ -112,6 +116,7 @@ class ColumnService {
         $userId,
         $title,
         $type,
+        $subtype,
         $numberPrefix,
         $numberSuffix,
         $mandatory,
@@ -119,11 +124,12 @@ class ColumnService {
         $textDefault,
         $textAllowedPattern,
         $textMaxLength,
-        $textMultiline,
         $numberDefault = null,
         $numberMin = null,
         $numberMax = null,
         $numberDecimals = null,
+        $selectionOptions,
+        $selectionDefault,
         $orderWeight = 0
     ) {
 		try {
@@ -133,6 +139,7 @@ class ColumnService {
             $item->setTitle($title);
             $item->setTableId($tableId);
             $item->setType($type);
+            $item->setSubtype($subtype);
             $item->setNumberPrefix($numberPrefix);
             $item->setNumberSuffix($numberSuffix);
             $item->setMandatory($mandatory);
@@ -140,13 +147,14 @@ class ColumnService {
             $item->setTextDefault($textDefault);
             $item->setTextAllowedPattern($textAllowedPattern);
             $item->setTextMaxLength($textMaxLength);
-            $item->setTextMultiline($textMultiline);
             $item->setNumberDefault($numberDefault);
             $item->setNumberMin($numberMin);
             $item->setNumberMax($numberMax);
             $item->setNumberDecimals($numberDecimals);
             $item->setLastEditBy($userId);
             $item->setLastEditAt($time->format('Y-m-d H:i:s'));
+            $item->setSelectionOptions($selectionOptions);
+            $item->setSelectionDefault($selectionDefault);
             $item->setOrderWeight($orderWeight);
 			return $this->mapper->update($item);
 		} catch (Exception $e) {
