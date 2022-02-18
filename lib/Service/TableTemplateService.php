@@ -40,6 +40,9 @@ class TableTemplateService {
         ];
     }
 
+    /**
+     * @throws Exception
+     */
     public function makeTemplate(Table $table, string $template): Table {
         if($template === 'todo') {
             $this->makeTodo($table);
@@ -49,6 +52,9 @@ class TableTemplateService {
         return $table;
     }
 
+    /**
+     * @throws Exception
+     */
     private function makeMembers(Table $table) {
 
         $params = [
@@ -90,6 +96,9 @@ class TableTemplateService {
         $this->createColumn($table->id, $params);
     }
 
+    /**
+     * @throws Exception
+     */
     private function makeTodo(Table $table) {
 
         $params = [
@@ -120,7 +129,7 @@ class TableTemplateService {
         $params = [
             'title' => $this->l->t('Progress'),
             'type' => 'number',
-            'suffix' => '%',
+            'subtype' => 'progress',
             'orderWeight' => 20,
             'numberDefault' => 0,
         ];
@@ -135,8 +144,12 @@ class TableTemplateService {
         $this->createColumn($table->id, $params);
     }
 
-    private function createColumn($tableId, $parameters) {
-        return $this->columnService->create(
+    /**
+     * @throws Exception
+     */
+    private function createColumn($tableId, $parameters): void
+    {
+        $this->columnService->create(
 
             // tableId
             $tableId,
@@ -148,7 +161,10 @@ class TableTemplateService {
             $this->userId,
 
             // column type
-            (isset($parameters['type'])) ? $parameters['type']: 'text',
+            (isset($parameters['type'])) ? $parameters['type'] : 'text',
+
+            // column subtype
+            (isset($parameters['subtype'])) ? $parameters['subtype'] : '',
 
             // prefix
             (isset($parameters['prefix'])) ? $parameters['prefix'] : '',
@@ -171,9 +187,6 @@ class TableTemplateService {
             // textMaxLength
             (isset($parameters['textMaxLength'])) ? $parameters['textMaxLength'] : -1,
 
-            // textMultiline
-            (isset($parameters['textMultiline'])) ? $parameters['textMultiline'] : false,
-
             // numberDefault
             (isset($parameters['numberDefault'])) ? $parameters['numberDefault'] : null,
 
@@ -185,6 +198,12 @@ class TableTemplateService {
 
             // numberDecimals
             (isset($parameters['numberDecimals'])) ? $parameters['numberDecimals'] : null,
+
+            // selectionDefault
+            (isset($parameters['selectionDefault'])) ? $parameters['selectionDefault'] : null,
+
+            // selectionOptions
+            (isset($parameters['selectionOptions'])) ? $parameters['selectionOptions'] : null,
 
             // orderWeight
             (isset($parameters['orderWeight'])) ? $parameters['orderWeight'] : 0,
