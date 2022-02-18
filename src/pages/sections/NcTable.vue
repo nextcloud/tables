@@ -253,6 +253,7 @@ export default {
 					let headerFilterFunc = null
 					let headerFilterLiveFilter = null
 					let validator = null
+					let minWidth = 140
 
 					// specific parameters depending on column type
 					if (item.type === 'text' && item.subtype === 'long') {
@@ -300,6 +301,7 @@ export default {
 						headerFilterFunc = minMaxFilterFunction
 						headerFilterLiveFilter = false
 						validator = item.mandatory ? 'required' : null
+						minWidth = 110
 					} else if (item.type === 'number' && item.subtype === 'stars') {
 						formatter = 'star'
 						sorter = 'number'
@@ -307,16 +309,29 @@ export default {
 						headerFilterFunc = minMaxFilterFunction
 						headerFilterLiveFilter = false
 						validator = item.mandatory ? 'required' : null
+						minWidth = 110
 					} else if (item.type === 'number' && item.subtype === 'progress') {
 						formatter = 'progress'
 						formatterParams = {
-							color: 'var(--color-primary-element-hover)',
+							color: 'var(--color-placeholder-dark)',
 						}
 						sorter = 'number'
 						headerFilter = minMaxFilterEditor
 						headerFilterFunc = minMaxFilterFunction
 						headerFilterLiveFilter = false
 						validator = item.mandatory ? 'required' : null
+					} else if (item.type === 'selection' && item.subtype === 'check') {
+						formatter = 'tickCross'
+						validator = item.mandatory ? 'required' : null
+						minWidth = 60
+						headerFilterFunc = function(headerValue, rowValue, rowData, filterParams) {
+							// headerValue - the value of the header filter element
+							// rowValue - the value of the column in this row
+							// rowData - the data for the row being filtered
+							// filterParams - params object passed to the headerFilterFuncParams property
+							return '' + headerValue === '' + rowValue // must return a boolean, true if it passes the filter.
+						}
+						headerFilter = true
 					}
 
 					// console.debug('item to push as column definition', item)
@@ -329,7 +344,7 @@ export default {
 						editor: (customEditor) || true,
 						editorParams,
 						align,
-						minWidth: (item.type === 'number') ? 110 : 140,
+						minWidth,
 						sorter,
 						validator,
 						headerFilterFunc,

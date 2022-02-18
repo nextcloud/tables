@@ -44,6 +44,8 @@
 						<TextLongForm v-if="editColumn.type === 'text' && editColumn.subtype === 'long'"
 							:text-default.sync="editColumn.textDefault"
 							:text-max-length.sync="editColumn.textMaxLength" />
+						<SelectionCheckForm v-if="editColumn.type === 'selection' && editColumn.subtype === 'check'"
+							:selection-default.sync="editColumn.selectionDefault" />
 					</div>
 					<div class="col-4">
 						<button class="secondary" @click="editColumn = null">
@@ -100,6 +102,7 @@
 						<TextLineTableDisplay v-if="column.type === 'text' && column.subtype === 'line'" :column="column" />
 						<TextLongTableDisplay v-if="column.type === 'text' && column.subtype === 'long'" :column="column" />
 						<TextLinkTableDisplay v-if="column.type === 'text' && column.subtype === 'link'" :column="column" />
+						<SelectionCheckTableDisplay v-if="column.type === 'selection' && column.subtype === 'check'" :column="column" />
 					</div>
 					<div class="col-1 margin-bottom">
 						<Actions v-if="!otherActionPerformed">
@@ -158,10 +161,14 @@ import NumberProgressForm from '../columnTypePartials/forms/NumberProgressForm'
 import TextLineForm from '../columnTypePartials/forms/TextLineForm'
 import TextLongForm from '../columnTypePartials/forms/TextLongForm'
 import MainForm from '../columnTypePartials/forms/MainForm'
+import SelectionCheckTableDisplay from '../columnTypePartials/tableDisplay/SelectionCheckTableDisplay'
+import SelectionCheckForm from '../columnTypePartials/forms/SelectionCheckForm'
 
 export default {
 	name: 'EditColumns',
 	components: {
+		SelectionCheckTableDisplay,
+		SelectionCheckForm,
 		Modal,
 		Actions,
 		ActionButton,
@@ -265,7 +272,7 @@ export default {
 				console.debug('try so send column', this.editColumn)
 				await axios.put(generateUrl('/apps/tables/column/' + this.editColumn.id), this.editColumn)
 				showSuccess(t('tables', 'The column »{column}« was updated.', { column: this.editColumn.title }))
-				this.getColumnsForTableFromBE()
+				await this.getColumnsForTableFromBE()
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not update column'))
@@ -275,7 +282,7 @@ export default {
 			console.debug('try to delete column with id:', this.deleteId)
 			await this.deleteColumnAtBE(this.deleteId)
 			this.deleteId = null
-			this.getColumnsForTableFromBE()
+			await this.getColumnsForTableFromBE()
 		},
 		async deleteColumnAtBE(columnId) {
 			if (!columnId) {

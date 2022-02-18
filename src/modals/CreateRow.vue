@@ -31,6 +31,10 @@
 					v-if="column.type === 'number' && column.subtype === 'progress'"
 					:column="column"
 					:value.sync="row[column.id]" />
+				<SelectionCheckForm
+					v-if="column.type === 'selection' && column.subtype === 'check'"
+					:column="column"
+					:value.sync="row[column.id]" />
 			</div>
 			<div class="fix-col-4">
 				<button class="secondary" @click="actionCancel">
@@ -56,10 +60,12 @@ import TextLinkForm from '../rowTypePartials/TextLinkForm'
 import NumberForm from '../rowTypePartials/NumberForm'
 import NumberStarsForm from '../rowTypePartials/NumberStarsForm'
 import NumberProgressForm from '../rowTypePartials/NumberProgressForm'
+import SelectionCheckForm from '../columnTypePartials/forms/SelectionCheckForm'
 
 export default {
 	name: 'CreateRow',
 	components: {
+		SelectionCheckForm,
 		Modal,
 		TextLineForm,
 		TextLongForm,

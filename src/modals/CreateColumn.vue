@@ -74,6 +74,7 @@
 					:text-max-length.sync="textMaxLength" />
 			</div>
 
+			<!--
 			<div v-if="combinedType === 'selection'">
 				<div class="row">
 					<div class="col-4">
@@ -90,6 +91,16 @@
 					</div>
 				</div>
 				<SelectionMultiForm :selection-options.sync="selectionOptions" :selection-default.sync="selectionDefault" />
+			</div>
+-->
+
+			<div v-if="combinedType === 'selection-check'">
+				<div class="row">
+					<div class="col-4">
+						<h3>{{ t('tables', 'Yes / No column specific parameters') }}</h3>
+					</div>
+				</div>
+				<SelectionCheckForm :selection-default.sync="selectionDefault" />
 			</div>
 
 			<div class="row">
@@ -112,8 +123,9 @@ import NumberStarsForm from '../columnTypePartials/forms/NumberStarsForm'
 import NumberProgressForm from '../columnTypePartials/forms/NumberProgressForm'
 import TextLineForm from '../columnTypePartials/forms/TextLineForm'
 import TextLongForm from '../columnTypePartials/forms/TextLongForm'
-import SelectionForm from '../columnTypePartials/forms/SelectionForm'
-import SelectionMultiForm from '../columnTypePartials/forms/SelectionMultiForm'
+// import SelectionForm from '../columnTypePartials/forms/SelectionForm'
+// import SelectionMultiForm from '../columnTypePartials/forms/SelectionMultiForm'
+import SelectionCheckForm from '../columnTypePartials/forms/SelectionCheckForm'
 import MainForm from '../columnTypePartials/forms/MainForm'
 import Modal from '@nextcloud/vue/dist/Components/Modal'
 import axios from '@nextcloud/axios'
@@ -125,7 +137,6 @@ import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
 export default {
 	name: 'CreateColumn',
 	components: {
-		SelectionMultiForm,
 		Modal,
 		NumberForm,
 		TextLineForm,
@@ -134,7 +145,9 @@ export default {
 		Multiselect,
 		NumberStarsForm,
 		NumberProgressForm,
-		SelectionForm,
+		// SelectionForm,
+		// SelectionMultiForm,
+		SelectionCheckForm,
 	},
 	props: {
 		showModal: {
@@ -172,8 +185,8 @@ export default {
 				{ id: 'number-stars', label: t('tables', 'Stars rating') },
 				{ id: 'number-progress', label: t('tables', 'Progress bar') },
 
-				{ id: 'selection', label: t('tables', 'Selection') },
-				{ id: 'selection-multi', label: t('tables', 'Multiselect') },
+				// { id: 'selection', label: t('tables', 'Selection') },
+				// { id: 'selection-multi', label: t('tables', 'Multiselect') },
 				{ id: 'selection-check', label: t('tables', 'Yes / No') },
 
 				{ id: 'datetime', label: t('tables', 'Date and time') },
@@ -244,7 +257,7 @@ export default {
 					textAllowedPattern: this.textAllowedPattern,
 					textMaxLength: this.textMaxLength,
 					selectionOptions: this.selectionOptions,
-					selectionDefault: this.selectionDefault,
+					selectionDefault: this.selectionDefault ? 'true' : 'false',
 					tableId: this.activeTable.id,
 				}
 				// console.debug('try so send new column', data)

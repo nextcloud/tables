@@ -3,30 +3,36 @@
 		<!-- options -->
 		<div class="row">
 			<div class="fix-col-1">
-				{{ t('tables', 'Options') }}
+				{{ t('tables', 'Default') }}
 			</div>
-			<div class="fix-col-3 margin-bottom">
-				<textarea v-model="localSelectionOptions" />
-				{{ t('tables', 'Put a option name at each line.') }}
+			<div class="fix-col-1">
+				&nbsp;
+			</div>
+			<div class="fix-col-2 margin-bottom">
+				<CheckboxRadioSwitch type="switch" :checked.sync="localSelectionDefault" />
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
+import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch'
 
 export default {
 	name: 'SelectionCheckForm',
+	components: {
+		CheckboxRadioSwitch,
+	},
 	props: {
 		selectionDefault: {
-			type: Number,
-			default: null,
+			type: String,
+			default: '',
 		},
 	},
 	computed: {
-		localSelectionOptions: {
-			get() { return this.selectionOptions },
-			set(optionsText) { this.$emit('update:selectionOptions', optionsText) },
+		localSelectionDefault: {
+			get() { return (this.selectionDefault === 'true' || this.selectionDefault === true) },
+			set(defaultValue) { this.$emit('update:selectionDefault', '' + defaultValue) },
 		},
 	},
 }
