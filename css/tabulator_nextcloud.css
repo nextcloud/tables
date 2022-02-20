@@ -329,7 +329,7 @@
 .tabulator .tabulator-tableHolder .tabulator-table {
     position: relative;
     display: inline-block;
-    background-color: var(--color-primary-text);
+    /* background-color: var(--color-primary-text); */
     white-space: nowrap;
     overflow: visible;
     color: var(--color-main-text);
