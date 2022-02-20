@@ -60,6 +60,7 @@ class TableTemplateService {
         $params = [
             'title' => $this->l->t('Name'),
             'type' => 'text',
+            'subtype' => 'line',
             'mandatory' => true,
             'orderWeight' => 50,
         ];
@@ -68,6 +69,7 @@ class TableTemplateService {
         $params = [
             'title' => $this->l->t('Position'),
             'type' => 'text',
+            'subtype' => 'line',
             'orderWeight' => 40,
         ];
         $this->createColumn($table->id, $params);
@@ -75,7 +77,7 @@ class TableTemplateService {
         $params = [
             'title' => $this->l->t('Skills'),
             'type' => 'text',
-            'textMultiline' => true,
+            'subtype' => 'long',
             'orderWeight' => 30,
         ];
         $this->createColumn($table->id, $params);
@@ -83,6 +85,7 @@ class TableTemplateService {
         $params = [
             'title' => $this->l->t('Birthday'),
             'type' => 'text',
+            'subtype' => 'line',
             'orderWeight' => 20,
         ];
         $this->createColumn($table->id, $params);
@@ -90,7 +93,7 @@ class TableTemplateService {
         $params = [
             'title' => $this->l->t('Comments'),
             'type' => 'text',
-            'textMultiline' => true,
+            'subtype' => 'long',
             'orderWeight' => 10,
         ];
         $this->createColumn($table->id, $params);
@@ -104,6 +107,7 @@ class TableTemplateService {
         $params = [
             'title' => $this->l->t('Task'),
             'type' => 'text',
+            'subtype' => 'line',
             'mandatory' => true,
             'orderWeight' => 50,
         ];
@@ -112,6 +116,7 @@ class TableTemplateService {
         $params = [
             'title' => $this->l->t('Description'),
             'type' => 'text',
+            'subtype' => 'long',
             'description' => 'Title or short description',
             'textMultiline' => true,
             'orderWeight' => 40,
@@ -121,6 +126,7 @@ class TableTemplateService {
         $params = [
             'title' => $this->l->t('Target'),
             'type' => 'text',
+            'subtype' => 'long',
             'description' => 'Date, time or whatever',
             'orderWeight' => 30,
         ];
@@ -138,7 +144,7 @@ class TableTemplateService {
         $params = [
             'title' => $this->l->t('Comments'),
             'type' => 'text',
-            'textMultiline' => true,
+            'subtype' => 'long',
             'orderWeight' => 10,
         ];
         $this->createColumn($table->id, $params);
@@ -167,10 +173,10 @@ class TableTemplateService {
             (isset($parameters['subtype'])) ? $parameters['subtype'] : '',
 
             // prefix
-            (isset($parameters['prefix'])) ? $parameters['prefix'] : '',
+            (isset($parameters['numberPrefix'])) ? $parameters['numberPrefix'] : '',
 
             // suffix
-            (isset($parameters['suffix'])) ? $parameters['suffix'] : '',
+            (isset($parameters['numberSuffix'])) ? $parameters['numberSuffix'] : '',
 
             // mandatory
             isset($parameters['mandatory']) && !!$parameters['mandatory'],
@@ -199,11 +205,11 @@ class TableTemplateService {
             // numberDecimals
             (isset($parameters['numberDecimals'])) ? $parameters['numberDecimals'] : null,
 
-            // selectionDefault
-            (isset($parameters['selectionDefault'])) ? $parameters['selectionDefault'] : null,
-
             // selectionOptions
-            (isset($parameters['selectionOptions'])) ? $parameters['selectionOptions'] : null,
+            (isset($parameters['selectionOptions'])) ? $parameters['selectionOptions'] : '',
+
+            // selectionDefault
+            (isset($parameters['selectionDefault'])) ? $parameters['selectionDefault'] : '',
 
             // orderWeight
             (isset($parameters['orderWeight'])) ? $parameters['orderWeight'] : 0,
