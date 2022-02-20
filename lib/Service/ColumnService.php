@@ -78,7 +78,8 @@ class ColumnService {
         int $numberDecimals = null,
         string $selectionOptions,
         string $selectionDefault,
-        int $orderWeight = 0
+        int $orderWeight = 0,
+        string $datetimeDefault
     ) {
         $time = new \DateTime();
 		$item = new Column();
@@ -104,6 +105,7 @@ class ColumnService {
         $item->setSelectionOptions($selectionOptions);
         $item->setSelectionDefault($selectionDefault);
         $item->setOrderWeight($orderWeight);
+        $item->setDatetimeDefault($datetimeDefault);
 		return $this->mapper->insert($item);
 	}
 
@@ -130,7 +132,8 @@ class ColumnService {
         $numberDecimals = null,
         $selectionOptions,
         $selectionDefault,
-        $orderWeight = 0
+        $orderWeight = 0,
+        $datetimeDefault
     ) {
 		try {
             $time = new \DateTime();
@@ -156,6 +159,7 @@ class ColumnService {
             $item->setSelectionOptions($selectionOptions);
             $item->setSelectionDefault($selectionDefault);
             $item->setOrderWeight($orderWeight);
+            $item->setDatetimeDefault($datetimeDefault);
 			return $this->mapper->update($item);
 		} catch (Exception $e) {
 			$this->handleException($e);

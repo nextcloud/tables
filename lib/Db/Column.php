@@ -37,6 +37,9 @@ class Column extends Entity implements JsonSerializable {
     protected $selectionOptions;
     protected $selectionDefault;
 
+    // type datetime
+    protected $datetimeDefault;
+
     public function __construct() {
         $this->addType('id', 'integer');
         $this->addType('tableId', 'integer');
@@ -96,6 +99,9 @@ class Column extends Entity implements JsonSerializable {
             // type selection
             'selectionOptions' => $this->getSelectionOptionsArray(),
             'selectionDefault' => $this->selectionDefault,
+
+            // type datetime
+            'datetimeDefault' => $this->datetimeDefault,
         ];
 	}
 }

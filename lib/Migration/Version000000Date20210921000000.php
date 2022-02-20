@@ -150,6 +150,11 @@ class Version000000Date20210921000000 extends SimpleMigrationStep {
                 'notnull' => false,
             ]);
 
+            // type datetime
+            $table->addColumn('datetime_default', Types::STRING, [
+                'notnull' => false,
+            ]);
+
             $table->setPrimaryKey(['id']);
         }
 

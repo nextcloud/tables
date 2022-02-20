@@ -103,6 +103,15 @@
 				<SelectionCheckForm :selection-default.sync="selectionDefault" />
 			</div>
 
+			<div v-if="combinedType === 'datetime-date'">
+				<div class="row">
+					<div class="col-4">
+						<h3>{{ t('tables', 'Date column specific parameters') }}</h3>
+					</div>
+				</div>
+				<DatetimeDateForm :datetime-default.sync="datetimeDefault" />
+			</div>
+
 			<div class="row">
 				<div class="col-4 margin-bottom">
 					<button class="secondary" @click="actionCancel">
@@ -133,6 +142,7 @@ import { generateUrl } from '@nextcloud/router'
 import { showError, showInfo, showSuccess } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
 import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
+import DatetimeDateForm from '../columnTypePartials/forms/DatetimeDateForm'
 
 export default {
 	name: 'CreateColumn',
@@ -148,6 +158,7 @@ export default {
 		// SelectionForm,
 		// SelectionMultiForm,
 		SelectionCheckForm,
+		DatetimeDateForm,
 	},
 	props: {
 		showModal: {
@@ -176,6 +187,7 @@ export default {
 			titleMissingError: false,
 			selectionOptions: null,
 			selectionDefault: null,
+			datetimeDefault: '',
 			typeOptions: [
 				{ id: 'text-line', label: t('tables', 'Textline') },
 				{ id: 'text-long', label: t('tables', 'Long text') },
@@ -258,6 +270,7 @@ export default {
 					textMaxLength: this.textMaxLength,
 					selectionOptions: this.selectionOptions,
 					selectionDefault: this.selectionDefault ? 'true' : 'false',
+					datetimeDefault: this.datetimeDefault,
 					tableId: this.activeTable.id,
 				}
 				// console.debug('try so send new column', data)
@@ -286,6 +299,7 @@ export default {
 			this.textMaxLength = null
 			this.selectionOptions = null
 			this.selectionDefault = null
+			this.datetimeDefault = ''
 			this.titleMissingError = false
 			this.typeMissingError = false
 		},

@@ -65,7 +65,8 @@ class ColumnController extends Controller {
         int $numberDecimals = null,
         string $selectionOptions = '',
         string $selectionDefault = '',
-        int $orderWeight = 0
+        int $orderWeight = 0,
+        string $datetimeDefault = ''
     ): DataResponse {
 		return new DataResponse($this->service->create(
             $tableId,
@@ -86,7 +87,8 @@ class ColumnController extends Controller {
             $numberDecimals,
             $selectionOptions,
             $selectionDefault,
-            $orderWeight));
+            $orderWeight,
+            $datetimeDefault));
 	}
 
 	/**
@@ -111,7 +113,8 @@ class ColumnController extends Controller {
         int $numberDecimals = null,
         string $selectionOptions = '',
         string $selectionDefault = '',
-        int $orderWeight = 0
+        int $orderWeight = 0,
+        string $datetimeDefault = ''
     ): DataResponse {
 		return $this->handleNotFound(function () use (
             $id,
@@ -132,7 +135,8 @@ class ColumnController extends Controller {
             $numberDecimals,
             $selectionOptions,
             $selectionDefault,
-            $orderWeight
+            $orderWeight,
+            $datetimeDefault
         ) {
 			return $this->service->update(
                 $id,
@@ -154,7 +158,8 @@ class ColumnController extends Controller {
                 $numberDecimals,
                 $selectionOptions,
                 $selectionDefault,
-                $orderWeight);
+                $orderWeight,
+                $datetimeDefault);
 		});
 	}
 

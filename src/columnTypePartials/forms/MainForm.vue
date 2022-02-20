@@ -39,7 +39,6 @@
 </template>
 
 <script>
-// import { showError, showInfo, showSuccess } from '@nextcloud/dialogs'
 import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch'
 
 export default {
