@@ -103,6 +103,15 @@
 				<SelectionCheckForm :selection-default.sync="selectionDefault" />
 			</div>
 
+			<div v-if="combinedType === 'datetime'">
+				<div class="row">
+					<div class="col-4">
+						<h3>{{ t('tables', 'Date and time column specific parameters') }}</h3>
+					</div>
+				</div>
+				<DatetimeForm :datetime-default.sync="datetimeDefault" />
+			</div>
+
 			<div v-if="combinedType === 'datetime-date'">
 				<div class="row">
 					<div class="col-4">
@@ -110,6 +119,15 @@
 					</div>
 				</div>
 				<DatetimeDateForm :datetime-default.sync="datetimeDefault" />
+			</div>
+
+			<div v-if="combinedType === 'datetime-time'">
+				<div class="row">
+					<div class="col-4">
+						<h3>{{ t('tables', 'Time column specific parameters') }}</h3>
+					</div>
+				</div>
+				<DatetimeTimeForm :datetime-default.sync="datetimeDefault" />
 			</div>
 
 			<div class="row">
@@ -142,7 +160,9 @@ import { generateUrl } from '@nextcloud/router'
 import { showError, showInfo, showSuccess } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
 import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
+import DatetimeForm from '../columnTypePartials/forms/DatetimeForm'
 import DatetimeDateForm from '../columnTypePartials/forms/DatetimeDateForm'
+import DatetimeTimeForm from '../columnTypePartials/forms/DatetimeTimeForm'
 
 export default {
 	name: 'CreateColumn',
@@ -159,6 +179,8 @@ export default {
 		// SelectionMultiForm,
 		SelectionCheckForm,
 		DatetimeDateForm,
+		DatetimeForm,
+		DatetimeTimeForm,
 	},
 	props: {
 		showModal: {

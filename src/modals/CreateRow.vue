@@ -35,6 +35,18 @@
 					v-if="column.type === 'selection' && column.subtype === 'check'"
 					:column="column"
 					:value.sync="row[column.id]" />
+				<DatetimeForm
+					v-if="column.type === 'datetime' && !column.subtype"
+					:column="column"
+					:value.sync="row[column.id]" />
+				<DatetimeDateForm
+					v-if="column.type === 'datetime' && column.subtype === 'date'"
+					:column="column"
+					:value.sync="row[column.id]" />
+				<DatetimeTimeForm
+					v-if="column.type === 'datetime' && column.subtype === 'time'"
+					:column="column"
+					:value.sync="row[column.id]" />
 			</div>
 			<div class="fix-col-4">
 				<button class="secondary" @click="actionCancel">
@@ -61,6 +73,9 @@ import NumberForm from '../rowTypePartials/NumberForm'
 import NumberStarsForm from '../rowTypePartials/NumberStarsForm'
 import NumberProgressForm from '../rowTypePartials/NumberProgressForm'
 import SelectionCheckForm from '../columnTypePartials/forms/SelectionCheckForm'
+import DatetimeForm from '../rowTypePartials/DatetimeForm'
+import DatetimeDateForm from '../rowTypePartials/DatetimeDateForm'
+import DatetimeTimeForm from '../rowTypePartials/DatetimeTimeForm'
 
 export default {
 	name: 'CreateRow',
@@ -73,6 +88,9 @@ export default {
 		NumberForm,
 		NumberStarsForm,
 		NumberProgressForm,
+		DatetimeForm,
+		DatetimeDateForm,
+		DatetimeTimeForm,
 	},
 	props: {
 		showModal: {

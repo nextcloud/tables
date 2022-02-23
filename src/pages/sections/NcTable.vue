@@ -63,6 +63,7 @@ import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 // import moment from '@nextcloud/moment'
 import ActionCheckbox from '@nextcloud/vue/dist/Components/ActionCheckbox'
+import Moment from '@nextcloud/moment'
 
 export default {
 	name: 'NcTable',
@@ -92,7 +93,7 @@ export default {
 					paginationSizeSelector: [5, 10, 30, 100],
 					layout: 'fitDataFill',
 					clipboard: true,
-					clipboardPasteAction: 'insert',
+					// clipboardPasteAction: 'insert',
 					printAsHtml: true,
 				}
 			},
@@ -109,45 +110,6 @@ export default {
 	computed: {
 		...mapGetters(['activeTable']),
 		getColumnsDefinition() {
-			const numberEditor = function(cell, onRendered, success, cancel, editorParams) {
-				// cell - the cell component for the editable cell
-				// onRendered - function to call when the editor has been rendered
-				// success - function to call to pass the successfully updated value to Tabulator
-				// cancel - function to call to abort the edit and return to a normal cell
-				// editorParams - params object passed into the editorParams column definition property
-
-				const editor = document.createElement('input')
-
-				editor.setAttribute('type', 'number')
-				editor.setAttribute('min', (editorParams.numberMin || editorParams.numberMin === 0) ? editorParams.numberMin : null)
-				editor.setAttribute('max', (editorParams.numberMax || editorParams.numberMax === 0) ? editorParams.numberMax : null)
-
-				editor.style.padding = '3px'
-				editor.style.width = '100%'
-				editor.style.boxSizing = 'border-box'
-
-				// Set value of editor to the current value of the cell
-				editor.value = (cell.getValue() === null || cell.getValue() === undefined) ? editorParams.default : cell.getValue()
-
-				// set focus on the select box when the editor is selected (timeout allows for editor to be added to DOM)
-				onRendered(function() {
-					editor.focus()
-					editor.style.css = '100%'
-				})
-
-				// when the value has been set, trigger the cell to update
-				/**
-				 *
-				 */
-				function successFunc() {
-					success(editor.value)
-				}
-
-				// editor.addEventListener('change', successFunc)
-				editor.addEventListener('blur', successFunc)
-
-				return editor
-			}
 			const minMaxFilterEditor = function(cell, onRendered, success, cancel, editorParams) {
 
 				let end = null
@@ -237,16 +199,29 @@ export default {
 					titleFormatter: 'rowSelection',
 					align: 'center',
 					headerSort: false,
-					width: 60,
+					width: 40,
 					print: false,
+				},
+				{
+					formatter: (cell, formatterParams, onRendered) => {
+						// cell - the cell component
+						// formatterParams - parameters set for the column
+						// onRendered - function to call when the formatter has been rendered
+
+						return '<div class="icon-rename" />'
+					},
+					width: 20,
+					align: 'center',
+					headerSort: false,
+					cellClick(e, cell) {
+						console.debug('cell edit click', cell)
+					},
 				},
 			]
 			if (this.columns) {
 				this.columns.forEach(item => {
 					let formatter = null
 					let formatterParams = null
-					let editorParams = null
-					let customEditor = null
 					let align = null
 					let sorter = null
 					let headerFilter = null
@@ -290,12 +265,6 @@ export default {
 
 							return (cell.getValue()) ? formatterParams.prefix + ' ' + (Math.round(cell.getValue() * 100) / 100).toFixed(formatterParams.precision) + ' ' + formatterParams.suffix : '' // return the contents of the cell;
 						}
-						editorParams = {
-							default: item.numberDefault,
-							numberMin: item.numberMin,
-							numberMax: item.numberMax,
-						}
-						customEditor = numberEditor
 						sorter = 'number'
 						headerFilter = minMaxFilterEditor
 						headerFilterFunc = minMaxFilterFunction
@@ -332,6 +301,36 @@ export default {
 							return '' + headerValue === '' + rowValue // must return a boolean, true if it passes the filter.
 						}
 						headerFilter = true
+					} else if (item.type === 'datetime' && !item.subtype) {
+						formatter = (cell, formatterParams, onRendered) => {
+							// cell - the cell component
+							// formatterParams - parameters set for the column
+							// onRendered - function to call when the formatter has been rendered
+
+							return (cell.getValue()) ? Moment(cell.getValue(), 'YYYY-MM-DD HH:mm:ss').format('lll') : ''
+						}
+						validator = item.mandatory ? 'required' : null
+						minWidth = 100
+					} else if (item.type === 'datetime' && item.subtype === 'date') {
+						formatter = (cell, formatterParams, onRendered) => {
+							// cell - the cell component
+							// formatterParams - parameters set for the column
+							// onRendered - function to call when the formatter has been rendered
+
+							return (cell.getValue()) ? Moment(cell.getValue(), 'YYYY-MM-DD HH:mm:ss').format('ll') : ''
+						}
+						validator = item.mandatory ? 'required' : null
+						minWidth = 100
+					} else if (item.type === 'datetime' && item.subtype === 'time') {
+						formatter = (cell, formatterParams, onRendered) => {
+							// cell - the cell component
+							// formatterParams - parameters set for the column
+							// onRendered - function to call when the formatter has been rendered
+
+							return (cell.getValue()) ? Moment(cell.getValue(), 'HH:mm:ss').format('LT') : ''
+						}
+						validator = item.mandatory ? 'required' : null
+						minWidth = 100
 					}
 
 					// console.debug('item to push as column definition', item)
@@ -341,8 +340,7 @@ export default {
 						formatter,
 						formatterParams,
 						headerFilter: this.showFilter ? headerFilter || 'input' : null,
-						editor: (customEditor) || true,
-						editorParams,
+						editor: false,
 						align,
 						minWidth,
 						sorter,
@@ -352,7 +350,6 @@ export default {
 					})
 				})
 			}
-			// console.debug('columns definition array', def)
 			return def
 		},
 		getOptions() {
@@ -379,6 +376,13 @@ export default {
 			o.locale = 'specific'
 			o.langs = lang
 			o.printHeader = '<h1>' + this.activeTable.title + '<h1>'
+			/* o.rowFormatter = function(row) {
+				const height = '49px'
+				row.getElement().style.height = height
+				row.getCells().forEach(c => {
+					c.style.height = height
+				})
+			} */
 			return o
 		},
 		getData() {

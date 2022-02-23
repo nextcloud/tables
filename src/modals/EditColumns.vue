@@ -46,6 +46,8 @@
 							:text-max-length.sync="editColumn.textMaxLength" />
 						<SelectionCheckForm v-if="editColumn.type === 'selection' && editColumn.subtype === 'check'"
 							:selection-default.sync="editColumn.selectionDefault" />
+						<DatetimeDateForm v-if="editColumn.type === 'datetime' && editColumn.subtype === 'date'"
+							:datetime-default.sync="editColumn.datetimeDefault" />
 					</div>
 					<div class="col-4">
 						<button class="secondary" @click="editColumn = null">
@@ -103,6 +105,7 @@
 						<TextLongTableDisplay v-if="column.type === 'text' && column.subtype === 'long'" :column="column" />
 						<TextLinkTableDisplay v-if="column.type === 'text' && column.subtype === 'link'" :column="column" />
 						<SelectionCheckTableDisplay v-if="column.type === 'selection' && column.subtype === 'check'" :column="column" />
+						<DatetimeDateTableDisplay v-if="column.type === 'datetime' && column.subtype === 'date'" :column="column" />
 					</div>
 					<div class="col-1 margin-bottom">
 						<Actions v-if="!otherActionPerformed">
@@ -163,10 +166,14 @@ import TextLongForm from '../columnTypePartials/forms/TextLongForm'
 import MainForm from '../columnTypePartials/forms/MainForm'
 import SelectionCheckTableDisplay from '../columnTypePartials/tableDisplay/SelectionCheckTableDisplay'
 import SelectionCheckForm from '../columnTypePartials/forms/SelectionCheckForm'
+import DatetimeDateForm from '../columnTypePartials/forms/DatetimeDateForm'
+import DatetimeDateTableDisplay from '../columnTypePartials/tableDisplay/DatetimeDateTableDisplay'
 
 export default {
 	name: 'EditColumns',
 	components: {
+		DatetimeDateForm,
+		DatetimeDateTableDisplay,
 		SelectionCheckTableDisplay,
 		SelectionCheckForm,
 		Modal,
