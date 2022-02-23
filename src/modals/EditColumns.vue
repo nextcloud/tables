@@ -46,7 +46,11 @@
 							:text-max-length.sync="editColumn.textMaxLength" />
 						<SelectionCheckForm v-if="editColumn.type === 'selection' && editColumn.subtype === 'check'"
 							:selection-default.sync="editColumn.selectionDefault" />
+						<DatetimeForm v-if="editColumn.type === 'datetime' && !editColumn.subtype"
+							:datetime-default.sync="editColumn.datetimeDefault" />
 						<DatetimeDateForm v-if="editColumn.type === 'datetime' && editColumn.subtype === 'date'"
+							:datetime-default.sync="editColumn.datetimeDefault" />
+						<DatetimeTimeForm v-if="editColumn.type === 'datetime' && editColumn.subtype === 'time'"
 							:datetime-default.sync="editColumn.datetimeDefault" />
 					</div>
 					<div class="col-4">
@@ -105,7 +109,9 @@
 						<TextLongTableDisplay v-if="column.type === 'text' && column.subtype === 'long'" :column="column" />
 						<TextLinkTableDisplay v-if="column.type === 'text' && column.subtype === 'link'" :column="column" />
 						<SelectionCheckTableDisplay v-if="column.type === 'selection' && column.subtype === 'check'" :column="column" />
+						<DatetimeTableDisplay v-if="column.type === 'datetime' && !column.subtype" :column="column" />
 						<DatetimeDateTableDisplay v-if="column.type === 'datetime' && column.subtype === 'date'" :column="column" />
+						<DatetimeTimeTableDisplay v-if="column.type === 'datetime' && column.subtype === 'time'" :column="column" />
 					</div>
 					<div class="col-1 margin-bottom">
 						<Actions v-if="!otherActionPerformed">
@@ -166,13 +172,21 @@ import TextLongForm from '../columnTypePartials/forms/TextLongForm'
 import MainForm from '../columnTypePartials/forms/MainForm'
 import SelectionCheckTableDisplay from '../columnTypePartials/tableDisplay/SelectionCheckTableDisplay'
 import SelectionCheckForm from '../columnTypePartials/forms/SelectionCheckForm'
+import DatetimeForm from '../columnTypePartials/forms/DatetimeForm'
 import DatetimeDateForm from '../columnTypePartials/forms/DatetimeDateForm'
+import DatetimeTimeForm from '../columnTypePartials/forms/DatetimeTimeForm'
+import DatetimeTableDisplay from '../columnTypePartials/tableDisplay/DatetimeTableDisplay'
 import DatetimeDateTableDisplay from '../columnTypePartials/tableDisplay/DatetimeDateTableDisplay'
+import DatetimeTimeTableDisplay from '../columnTypePartials/tableDisplay/DatetimeTimeTableDisplay'
 
 export default {
 	name: 'EditColumns',
 	components: {
 		DatetimeDateForm,
+		DatetimeForm,
+		DatetimeTimeForm,
+		DatetimeTableDisplay,
+		DatetimeTimeTableDisplay,
 		DatetimeDateTableDisplay,
 		SelectionCheckTableDisplay,
 		SelectionCheckForm,
