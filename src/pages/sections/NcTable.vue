@@ -35,7 +35,8 @@
 			<TabulatorComponent ref="tabulator"
 				v-model="getData"
 				:options="getOptions"
-				@cell-edited="actionEdited" />
+				@cell-edited="actionEdited"
+				@cell-click="actionCellClick" />
 		</div>
 		<DialogConfirmation
 			:show-modal="deleteRows"
@@ -48,6 +49,10 @@
 			:show-modal="newRow"
 			@update-rows="actionUpdateRows"
 			@close="newRow = false" />
+		<EditRow :columns="columns"
+			:row="getEditRow"
+			:show-modal="getEditRow !== null"
+			@close="editRowId = null" />
 	</div>
 </template>
 
@@ -64,10 +69,12 @@ import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 // import moment from '@nextcloud/moment'
 import ActionCheckbox from '@nextcloud/vue/dist/Components/ActionCheckbox'
 import Moment from '@nextcloud/moment'
+import EditRow from '../../modals/EditRow'
 
 export default {
 	name: 'NcTable',
 	components: {
+		EditRow,
 		CreateRow,
 		DialogConfirmation,
 		TabulatorComponent,
@@ -105,6 +112,7 @@ export default {
 			deleteRows: false,
 			deleteRowsCount: 0,
 			showFilter: false,
+			editRowId: null,
 		}
 	},
 	computed: {
@@ -213,9 +221,7 @@ export default {
 					width: 20,
 					align: 'center',
 					headerSort: false,
-					cellClick(e, cell) {
-						console.debug('cell edit click', cell)
-					},
+					field: 'editRow',
 				},
 			]
 			if (this.columns) {
@@ -401,6 +407,15 @@ export default {
 			}
 			return d
 		},
+		getEditRow() {
+			if (this.editRowId !== null) {
+				return this.rows.filter(item => {
+					return item.id === this.editRowId
+				})[0]
+			} else {
+				return null
+			}
+		},
 	},
 	methods: {
 		actionUpdateRows() {
@@ -482,6 +497,14 @@ export default {
 		},
 		print() {
 			this.$refs.tabulator.getInstance().print('all', true, {})
+		},
+		actionCellClick(e, cell) {
+			// e - the click event object
+			// cell - cell component
+			if (cell._cell.column.field === 'editRow') {
+				console.debug('I have to edit row with id: ', cell._cell.row.data.id)
+				this.editRowId = cell._cell.row.data.id
+			}
 		},
 	},
 }
