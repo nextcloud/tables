@@ -22,6 +22,7 @@ return [
         ['name' => 'row#create', 'url' => '/row/column/{columnId}', 'verb' => 'POST'],
         ['name' => 'row#createComplete', 'url' => '/row', 'verb' => 'POST'],
         ['name' => 'row#update', 'url' => '/row/{id}/column/{columnId}', 'verb' => 'PUT'],
+        ['name' => 'row#updateSet', 'url' => '/row/{id}', 'verb' => 'PUT'],
         ['name' => 'row#destroy', 'url' => '/row/{id}', 'verb' => 'DELETE'],
     ]
 ];

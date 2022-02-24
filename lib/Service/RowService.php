@@ -106,7 +106,7 @@ class RowService {
         string $userId,
         string $data
     ) {
-		try {
+        try {
             $time = new \DateTime();
             $item = $this->mapper->find($id);
             $d = $item->getDataArray();
@@ -121,18 +121,66 @@ class RowService {
             // if the value was not set, add it
             if(!$columnFound) {
                 $d[] = [
-                        "columnId" => $columnId,
-                        "value" => $data
-                    ];
+                    "columnId" => $columnId,
+                    "value" => $data
+                ];
             }
             $item->setDataArray($d);
             $item->setLastEditBy($userId);
             $item->setLastEditAt($time->format('Y-m-d H:i:s'));
-			return $this->mapper->update($item);
-		} catch (Exception $e) {
-			$this->handleException($e);
-		}
-	}
+            return $this->mapper->update($item);
+        } catch (Exception $e) {
+            $this->handleException($e);
+        }
+    }
+
+    /** @noinspection PhpUndefinedMethodInspection
+     * @noinspection DuplicatedCode
+     */
+    public function updateSet(
+        int $id,
+        string $userId,
+        array $data
+    ) {
+        try {
+            $time = new \DateTime();
+            $item = $this->mapper->find($id);
+            $d = $item->getDataArray();
+            foreach ($data as $dataObject) {
+                $d = $this->replaceOrAddData($d, $dataObject);
+            }
+
+            $item->setDataArray($d);
+            $item->setLastEditBy($userId);
+            $item->setLastEditAt($time->format('Y-m-d H:i:s'));
+            return $this->mapper->update($item);
+        } catch (Exception $e) {
+            $this->handleException($e);
+        }
+    }
+
+    private function replaceOrAddData($dataArray, $newDataObject): array
+    {
+        $columnId = intval($newDataObject['columnId']);
+        $value = $newDataObject['value'];
+
+        $columnFound = false;
+        foreach ($dataArray as $key => $c) {
+            if($c['columnId'] == $columnId) {
+                $dataArray[$key]['value'] = $value;
+                $columnFound = true;
+                break;
+            }
+        }
+        // if the value was not set, add it
+        if(!$columnFound) {
+            $dataArray[] = [
+                "columnId" => $columnId,
+                "value" => $value
+            ];
+        }
+        return $dataArray;
+    }
 
 	public function delete($id, $userId) {
 		try {

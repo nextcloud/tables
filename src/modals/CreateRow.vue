@@ -48,7 +48,7 @@
 					:column="column"
 					:value.sync="row[column.id]" />
 			</div>
-			<div class="fix-col-4">
+			<div class="fix-col-4 margin-bottom">
 				<button class="secondary" @click="actionCancel">
 					{{ t('tables', 'Cancel') }}
 				</button>
@@ -118,14 +118,11 @@ export default {
 		async actionConfirm() {
 			let mandatoryFieldsEmpty = false
 			this.columns.forEach(col => {
-				console.debug('col', col)
 				if (col.mandatory) {
 					mandatoryFieldsEmpty = mandatoryFieldsEmpty || !(this.row[col.id] && this.row[col.id] !== 0)
-					console.debug('after update', mandatoryFieldsEmpty)
 				}
 			})
 			if (!mandatoryFieldsEmpty) {
-				console.debug('try to add new row to BE', this.row)
 				await this.sendNewRowToBE()
 				this.$emit('update-rows')
 				this.actionCancel()

@@ -1,15 +1,15 @@
 <template>
 	<div class="row">
-		<div class="fix-col-3" :class="{ mandatory: column.mandatory }">
+		<div class="fix-col-2" :class="{ mandatory: column.mandatory }">
 			{{ column.title }}
 		</div>
-		<div class="fix-col-1" :class="{ 'margin-bottom': !column.description }">
+		<div class="fix-col-2" :class="{ 'margin-bottom': !column.description }">
 			<DatetimePicker v-model="localValue" type="time" format="HH:mm" />
 		</div>
-		<div v-if="column.description" class="fix-col-3">
+		<div v-if="column.description" class="fix-col-2 hide-s">
 &nbsp;
 		</div>
-		<div v-if="column.description" class="fix-col-1 p span margin-bottom">
+		<div v-if="column.description" class="fix-col-2 p span margin-bottom">
 			{{ column.description }}
 		</div>
 	</div>

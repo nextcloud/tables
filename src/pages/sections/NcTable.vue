@@ -52,6 +52,7 @@
 		<EditRow :columns="columns"
 			:row="getEditRow"
 			:show-modal="getEditRow !== null"
+			@update-rows="actionUpdateRows"
 			@close="editRowId = null" />
 	</div>
 </template>
@@ -419,7 +420,6 @@ export default {
 	},
 	methods: {
 		actionUpdateRows() {
-			console.debug('NcTable action update rows -> emit action')
 			this.$emit('update-rows')
 		},
 		actionDeleteRows() {
@@ -436,10 +436,8 @@ export default {
 			if (selectedRows && selectedRows.length > 0) {
 				let error = false
 				for (const row of selectedRows) {
-					console.debug('try to delete row with id', row._row.data.id)
 					try {
-						const res = await axios.delete(generateUrl('/apps/tables/row/' + row._row.data.id))
-						console.debug('successfully deleted row', res)
+						await axios.delete(generateUrl('/apps/tables/row/' + row._row.data.id))
 					} catch (e) {
 						console.error(e)
 						showError(t('tables', 'Could not delete row.'))
@@ -461,17 +459,13 @@ export default {
 			const rowId = parseInt(data._cell.row.data.id)
 			const column = data._cell.column.field
 			const columnId = parseInt(column.split('-')[1])
-			console.debug('data edited', data)
 			try {
-				console.debug('try to send cell', { rowId, newValue, columnId })
-
 				// if row exists
 				if (rowId) {
 					await axios.put(generateUrl('/apps/tables/row/' + rowId + '/column/' + columnId), { tableId: this.activeTable.id, data: newValue })
 				} else {
 					// else create new row in BE
-					const res = await axios.post(generateUrl('/apps/tables/row/column/' + columnId), { tableId: this.activeTable.id, data: newValue })
-					console.debug('new row after creation', res)
+					await axios.post(generateUrl('/apps/tables/row/column/' + columnId), { tableId: this.activeTable.id, data: newValue })
 					this.$emit('update-rows')
 				}
 				showSuccess(t('tables', 'New value successfully saved.'))
@@ -487,7 +481,6 @@ export default {
 			this.$refs.tabulator.getInstance().download('csv', (title) || 'download')
 		},
 		copyClipboard() {
-			console.debug('tab instance', this.$refs.tabulator.getInstance())
 			this.$refs.tabulator.getInstance().copyToClipboard('all')
 			showSuccess(t('tables', 'Table copied to clipboard.'))
 		},

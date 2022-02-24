@@ -1,15 +1,15 @@
 <template>
 	<div class="row">
-		<div class="fix-col-3" :class="{ mandatory: column.mandatory }">
+		<div class="fix-col-2" :class="{ mandatory: column.mandatory }">
 			{{ column.title }}
 		</div>
-		<div class="fix-col-1" :class="{ 'margin-bottom': !column.description }">
-			<DatetimePicker v-model="localValue" type="datetime" />
+		<div class="fix-col-2" :class="{ 'margin-bottom': !column.description }">
+			<DatetimePicker v-model="localValue" type="datetime" format="YYYY-MM-DD HH:mm" />
 		</div>
-		<div v-if="column.description" class="fix-col-3">
+		<div v-if="column.description" class="fix-col-2 hide-s">
 &nbsp;
 		</div>
-		<div v-if="column.description" class="fix-col-1 p span margin-bottom">
+		<div v-if="column.description" class="fix-col-2 p span margin-bottom">
 			{{ column.description }}
 		</div>
 	</div>
@@ -31,30 +31,22 @@ export default {
 		},
 		value: {
 			type: String,
-			default: '',
+			default: null,
 		},
-	},
-	data() {
-		return {
-		}
 	},
 	computed: {
 		localValue: {
 			get() {
-				if (this.value) {
-					return Moment(this.value, 'YYYY-MM-DD HH:mm:ss').toDate()
+				if (this.value !== null) {
+					return Moment(this.value, 'YYYY-MM-DD HH:mm').toDate()
 				} else {
-					return this.column.datetimeDefault === 'now' ? Moment().toDate() : ''
+					return this.column.datetimeDefault === 'now' ? Moment().format('YYYY-MM-DD HH:mm') : ''
 				}
 			},
 			set(v) {
-				// console.debug('date as moment', Moment(v).format('YYYY-MM-DD HH:mm:ss'))
-				this.$emit('update:value', Moment(v).format('YYYY-MM-DD HH:mm:ss'))
+				if (v) this.$emit('update:value', Moment(v).format('YYYY-MM-DD HH:mm'))
 			},
 		},
-	},
-	created() {
-		if (this.column.datetimeDefault === 'now') this.localValue = Moment().toDate()
 	},
 }
 </script>

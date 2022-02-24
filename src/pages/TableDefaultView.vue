@@ -66,10 +66,8 @@ export default {
 				this.columns = null
 			} else {
 				try {
-					// console.debug('try to fetch columns for table id: ', tableId)
 					const response = await axios.get(generateUrl('/apps/tables/column/' + tableId))
 					this.columns = response.data.sort(this.compareColumns)
-					// console.debug('columns loaded', this.columns)
 				} catch (e) {
 					console.error(e)
 					showError(t('tables', 'Could not fetch columns for table'))
@@ -83,10 +81,8 @@ export default {
 				this.rows = null
 			} else {
 				try {
-					console.debug('try to fetch rows for table id: ', tableId)
 					const response = await axios.get(generateUrl('/apps/tables/row/' + tableId))
 					this.rows = response.data
-					console.debug('rows loaded', this.rows)
 				} catch (e) {
 					console.error(e)
 					showError(t('tables', 'Could not fetch rows for table'))

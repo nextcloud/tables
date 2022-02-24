@@ -48,13 +48,15 @@
 					:column="column"
 					:value.sync="localRow[column.id]" />
 			</div>
-			<div class="fix-col-4">
-				<button class="secondary" @click="actionCancel">
-					{{ t('tables', 'Cancel') }}
-				</button>
-				<button class="primary" @click="actionConfirm">
-					{{ t('tables', 'Save') }}
-				</button>
+			<div class="row">
+				<div class="fix-col-4 margin-bottom">
+					<button class="secondary" @click="actionCancel">
+						{{ t('tables', 'Cancel') }}
+					</button>
+					<button class="primary" @click="actionConfirm">
+						{{ t('tables', 'Save') }}
+					</button>
+				</div>
 			</div>
 		</div>
 	</Modal>
@@ -116,17 +118,19 @@ export default {
 	},
 	watch: {
 		row() {
-			if (this.row) {
-				this.row.data.forEach(item => {
-					this.localRow[item.columnId] = item.value
-				})
-				console.debug('set row data to localRow', this.localRow)
-			} else {
-				console.debug('no data to fill localRow')
-			}
+			this.loadValues()
 		},
 	},
 	methods: {
+		loadValues() {
+			if (this.row) {
+				const tmp = {}
+				this.row.data.forEach(item => {
+					tmp[item.columnId] = item.value
+				})
+				this.localRow = Object.assign({}, tmp)
+			}
+		},
 		actionCancel() {
 			this.reset()
 			this.$emit('close')
@@ -134,32 +138,35 @@ export default {
 		async actionConfirm() {
 			let mandatoryFieldsEmpty = false
 			this.columns.forEach(col => {
-				console.debug('col', col)
+				// console.debug('col', col)
 				if (col.mandatory) {
-					mandatoryFieldsEmpty = mandatoryFieldsEmpty || !(this.row[col.id] && this.row[col.id] !== 0)
-					console.debug('after update', mandatoryFieldsEmpty)
+					mandatoryFieldsEmpty = mandatoryFieldsEmpty || !(this.localRow[col.id] && this.localRow[col.id] !== 0)
+					// console.debug('after update', mandatoryFieldsEmpty)
 				}
 			})
 			if (!mandatoryFieldsEmpty) {
-				console.debug('try to add new row to BE', this.row)
-				await this.sendNewRowToBE()
+				await this.sendRowToBE()
 				this.$emit('update-rows')
 				this.actionCancel()
 			} else {
 				showWarning(t('tables', 'Please fill in the mandatory fields.'))
 			}
 		},
-		async sendNewRowToBE() {
+		async sendRowToBE() {
 			try {
 				const data = []
-				for (const [key, value] of Object.entries(this.row)) {
+				for (const [key, value] of Object.entries(this.localRow)) {
 					data.push({
 						columnId: key,
 						value,
 					})
 				}
-				await axios.post(generateUrl('/apps/tables/row'), { tableId: this.activeTable.id, data })
-				showSuccess(t('tables', 'The row was saved.'))
+				const response = await axios.put(generateUrl('/apps/tables/row/' + this.row.id), { data })
+				if (response.status === 200) {
+					showSuccess(t('tables', 'The row was saved.'))
+				} else {
+					showWarning(t('tables', 'Something did not work as expected.'))
+				}
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not create new column'))
@@ -167,6 +174,7 @@ export default {
 		},
 		reset() {
 			this.localRow = {}
+			this.dataLoaded = false
 		},
 	},
 }

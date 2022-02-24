@@ -74,26 +74,44 @@ class RowController extends Controller {
             $data));
     }
 
-	/**
-	 * @NoAdminRequired
-	 */
-	public function update(
+    /**
+     * @NoAdminRequired
+     */
+    public function update(
         int $id,
         int $columnId,
         string $data
     ): DataResponse {
-		return $this->handleNotFound(function () use (
+        return $this->handleNotFound(function () use (
             $id,
             $columnId,
             $data
         ) {
-			return $this->service->update(
+            return $this->service->update(
                 $id,
                 $columnId,
                 $this->userId,
                 $data);
-		});
-	}
+        });
+    }
+
+    /**
+     * @NoAdminRequired
+     */
+    public function updateSet(
+        int $id,
+        array $data
+    ): DataResponse {
+        return $this->handleNotFound(function () use (
+            $id,
+            $data
+        ) {
+            return $this->service->updateSet(
+                $id,
+                $this->userId,
+                $data);
+        });
+    }
 
 	/**
 	 * @NoAdminRequired
