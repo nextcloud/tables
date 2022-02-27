@@ -3,7 +3,7 @@
 }
 
 .modal__content {
-    width: 50vw;
+    width: 60vw;
     max-width: calc(900px - 52px); /* because the outer div is limited to 900px */
     padding: 20px;
     min-height: 50vh;

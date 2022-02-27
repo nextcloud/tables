@@ -4,7 +4,12 @@
 			{{ column.title }}
 		</div>
 		<div class="fix-col-2" :class="{ 'margin-bottom': !column.description }">
-			<DatetimePicker v-model="localValue" type="time" format="HH:mm" />
+			<DatetimePicker v-model="localValue"
+				type="time"
+				format="HH:mm"
+				:clearable="false"
+				:show-week-number="true" />
+			<div v-if="canBeCleared" class="icon-close make-empty" @click="emptyValue" />
 		</div>
 		<div v-if="column.description" class="fix-col-2 hide-s">
 &nbsp;
@@ -31,7 +36,7 @@ export default {
 		},
 		value: {
 			type: String,
-			default: '',
+			default: null,
 		},
 	},
 	data() {
@@ -39,22 +44,34 @@ export default {
 		}
 	},
 	computed: {
+		canBeCleared() {
+			return !this.column.mandatory
+		},
 		localValue: {
 			get() {
-				if (this.value) {
-					return Moment(this.value, 'HH:mm:ss').toDate()
+				if (this.value !== null && this.value !== 'none') {
+					return Moment(this.value, 'HH:mm').toDate()
+				} else if (this.value === null && this.column.datetimeDefault === 'now') {
+					const dt = Moment()
+					this.$emit('update:value', dt.format('HH:mm'))
+					return dt.toDate()
 				} else {
-					return this.column.datetimeDefault === 'now' ? Moment().toDate() : ''
+					return null
 				}
 			},
 			set(v) {
-				// console.debug('date as moment', Moment(v).format('YYYY-MM-DD HH:mm:ss'))
-				this.$emit('update:value', Moment(v).format('HH:mm:ss'))
+				if (v === 'none') {
+					this.$emit('update:value', v)
+				} else if (v) {
+					this.$emit('update:value', Moment(v).format('HH:mm'))
+				}
 			},
 		},
 	},
-	created() {
-		if (this.column.datetimeDefault === 'now') this.localValue = Moment().toDate()
+	methods: {
+		emptyValue() {
+			this.localValue = 'none'
+		},
 	},
 }
 </script>
@@ -62,6 +79,14 @@ export default {
 
 .mx-datepicker {
 	width: 100%;
+}
+
+.make-empty {
+	padding-left: 15px;
+}
+
+.make-empty:hover {
+	cursor: pointer;
 }
 
 </style>

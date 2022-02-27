@@ -208,7 +208,7 @@ export default {
 					titleFormatter: 'rowSelection',
 					align: 'center',
 					headerSort: false,
-					width: 40,
+					width: 60,
 					print: false,
 				},
 				{
@@ -217,9 +217,9 @@ export default {
 						// formatterParams - parameters set for the column
 						// onRendered - function to call when the formatter has been rendered
 
-						return '<div class="icon-rename" />'
+						return '<div class="icon-rename button" />'
 					},
-					width: 20,
+					width: 60,
 					align: 'center',
 					headerSort: false,
 					field: 'editRow',

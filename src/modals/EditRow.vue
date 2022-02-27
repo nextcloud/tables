@@ -49,12 +49,20 @@
 					:value.sync="localRow[column.id]" />
 			</div>
 			<div class="row">
-				<div class="fix-col-4 margin-bottom">
+				<div class="fix-col-3 margin-bottom">
 					<button class="secondary" @click="actionCancel">
 						{{ t('tables', 'Cancel') }}
 					</button>
 					<button class="primary" @click="actionConfirm">
 						{{ t('tables', 'Save') }}
+					</button>
+				</div>
+				<div class="fix-col-1">
+					<button v-if="!prepareDeleteRow" class="warning" @click="prepareDeleteRow = true">
+						{{ t('tables', 'Delete') }}
+					</button>
+					<button v-if="prepareDeleteRow" class="error" @click="actionDeleteRow">
+						{{ t('tables', 'Delete') }}
 					</button>
 				</div>
 			</div>
@@ -111,6 +119,7 @@ export default {
 	data() {
 		return {
 			localRow: {},
+			prepareDeleteRow: false,
 		}
 	},
 	computed: {
@@ -175,6 +184,20 @@ export default {
 		reset() {
 			this.localRow = {}
 			this.dataLoaded = false
+			this.prepareDeleteRow = false
+		},
+		actionDeleteRow() {
+			this.deleteRowAtBE(this.row.id)
+		},
+		async deleteRowAtBE(rowId) {
+			try {
+				await axios.delete(generateUrl('/apps/tables/row/' + rowId))
+				showSuccess(t('tables', 'Row deleted.'))
+			} catch (e) {
+				console.error(e)
+				showError(t('tables', 'Could not delete row.'))
+			}
+			this.$emit('update-rows')
 		},
 	},
 }

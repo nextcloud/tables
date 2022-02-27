@@ -48,13 +48,15 @@
 					:column="column"
 					:value.sync="row[column.id]" />
 			</div>
-			<div class="fix-col-4 margin-bottom">
-				<button class="secondary" @click="actionCancel">
-					{{ t('tables', 'Cancel') }}
-				</button>
-				<button class="primary" @click="actionConfirm">
-					{{ t('tables', 'Save') }}
-				</button>
+			<div class="row">
+				<div class="fix-col-4 margin-bottom">
+					<button class="secondary" @click="actionCancel">
+						{{ t('tables', 'Cancel') }}
+					</button>
+					<button class="primary" @click="actionConfirm">
+						{{ t('tables', 'Save') }}
+					</button>
+				</div>
 			</div>
 		</div>
 	</Modal>
