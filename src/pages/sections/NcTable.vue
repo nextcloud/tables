@@ -246,6 +246,7 @@ export default {
 					let headerFilterLiveFilter = null
 					let validator = null
 					let minWidth = 140
+					let maxWidth = null
 
 					// specific parameters depending on column type
 					if (item.type === 'text' && item.subtype === 'long') {
@@ -255,6 +256,7 @@ export default {
 						} else {
 							validator = item.mandatory ? 'required' : null
 						}
+						maxWidth = 200
 					} else if (item.type === 'text' && item.subtype === 'line') {
 						if (item.textMaxLength && parseInt(item.textMaxLength) !== -1) {
 							validator = 'maxLength:' + item.textMaxLength
@@ -354,6 +356,7 @@ export default {
 						editor: false,
 						align,
 						minWidth,
+						maxWidth,
 						sorter,
 						validator,
 						headerFilterFunc,

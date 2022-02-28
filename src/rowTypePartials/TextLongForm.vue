@@ -8,7 +8,7 @@
 				<div class="fix-col-4 p span" style="padding-bottom: 0;">
 					{{ t('tables', 'Text length: {length}', { length: localValue.length }) }}
 				</div>
-				<div class="fix-col-4 p span" style="padding-top: 0;">
+				<div v-if="column.textMaxLength !== -1" class="fix-col-4 p span" style="padding-top: 0;">
 					{{ t('tables', 'Max: {maxLength}', { maxLength: column.textMaxLength }) }}
 				</div>
 			</div>

@@ -38,14 +38,6 @@
 					{{ column.tableId }}
 				</td>
 			</tr>
-			<tr>
-				<td>
-					{{ t('tables', 'Ownership') }}
-				</td>
-				<td>
-					{{ column.ownership }}
-				</td>
-			</tr>
 		</table>
 	</Popover>
 </template>
