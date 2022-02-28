@@ -5,11 +5,11 @@
 				<div class="fix-col-4">
 					{{ column.title }}
 				</div>
-				<div class="fix-col-4 p span" style="padding-bottom: 0;">
-					{{ t('tables', 'Text length: {length}', { length: localValue.length }) }}
+				<div v-if="column.textMaxLength === -1 || !column.textMaxLength" class="fix-col-4 p span" style="padding-bottom: 0; padding-top: 0;">
+					{{ t('tables', 'length: {length}', { length: localValue.length ? localValue.length : 0 }) }}
 				</div>
-				<div v-if="column.textMaxLength !== -1" class="fix-col-4 p span" style="padding-top: 0;">
-					{{ t('tables', 'Max: {maxLength}', { maxLength: column.textMaxLength }) }}
+				<div v-if="column.textMaxLength !== -1" class="fix-col-4 p span" style="padding-bottom: 0; padding-top: 0;">
+					{{ t('tables', 'length: {length} / {maxLength}', { length: localValue.length ? localValue.length : 0, maxLength: column.textMaxLength }) }}
 				</div>
 			</div>
 		</div>
