@@ -11,6 +11,13 @@ The use should be lightweight and well integrated into the Nextcloud environment
 ### API
 - coming soon
 
+## License
+This app goes under the GNU Affero General Public License v3.0.
+The used [tabulator](http://tabulator.info/) framework is published with the MIT license.
+Please make sure to mathe the license within your project.
+
+Well, it is free to use this software. But please think about a donation. See below.
+
 ## Security
 This is a private project. I do my very best to keep this app secure for a professional usage.
 If you have any hints about securing this app, you are very welcome.
