@@ -78,9 +78,13 @@ export default {
 		async deleteMe() {
 			console.debug('click on confirm to delete', null)
 			try {
-				const response = await axios.delete(generateUrl('/apps/tables/table/' + this.table.id))
-				console.debug('table deleted', response)
-				showWarning(t('tables', 'Table "{table}" deleted.', { table: response.data.title }))
+				const res = await axios.delete(generateUrl('/apps/tables/table/' + this.table.id))
+				if (res.status === 200) {
+					showWarning(t('tables', 'Table "{table}" deleted.', { table: res.data.title }))
+				} else {
+					showWarning(t('tables', 'Sorry, something went wrong.'))
+					console.debug('axios error', res)
+				}
 				if (this.table && this.activeTable && this.table.id === this.activeTable.id) {
 					this.$store.commit('setActiveTableId', null)
 				}
@@ -110,9 +114,14 @@ export default {
 				const data = this.table
 				data.title = newTitle
 				console.debug('data to update', data)
-				const response = await axios.put(generateUrl('/apps/tables/table/' + this.table.id), data)
-				showSuccess(t('tables', 'Tables title is updated to »{table}«', { table: response.data.title }))
-				await this.$store.dispatch('loadTablesFromBE')
+				const res = await axios.put(generateUrl('/apps/tables/table/' + this.table.id), data)
+				if (res.status === 200) {
+					showSuccess(t('tables', 'Tables title is updated to »{table}«', { table: res.data.title }))
+					await this.$store.dispatch('loadTablesFromBE')
+				} else {
+					showWarning(t('tables', 'Sorry, something went wrong.'))
+					console.debug('axios error', res)
+				}
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not update tables title'))

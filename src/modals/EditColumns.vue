@@ -153,7 +153,7 @@
 import Modal from '@nextcloud/vue/dist/Components/Modal'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
-import { showError, showSuccess } from '@nextcloud/dialogs'
+import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
 import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
@@ -246,10 +246,13 @@ export default {
 				this.columns = null
 			} else {
 				try {
-					console.debug('try to fetch columns for table id: ', this.activeTable.id)
-					const response = await axios.get(generateUrl('/apps/tables/column/' + this.activeTable.id))
-					this.columns = response.data.sort(this.compareColumns)
-					console.debug('columns loaded', this.columns)
+					const res = await axios.get(generateUrl('/apps/tables/column/' + this.activeTable.id))
+					if (res.status === 200) {
+						this.columns = res.data.sort(this.compareColumns)
+					} else {
+						showWarning(t('tables', 'Sorry, something went wrong.'))
+						console.debug('axios error', res)
+					}
 				} catch (e) {
 					console.error(e)
 					showError(t('tables', 'Could not fetch columns for table'))
@@ -291,9 +294,14 @@ export default {
 			}
 			try {
 				console.debug('try so send column', this.editColumn)
-				await axios.put(generateUrl('/apps/tables/column/' + this.editColumn.id), this.editColumn)
-				showSuccess(t('tables', 'The column »{column}« was updated.', { column: this.editColumn.title }))
-				await this.getColumnsForTableFromBE()
+				const res = await axios.put(generateUrl('/apps/tables/column/' + this.editColumn.id), this.editColumn)
+				if (res.status === 200) {
+					showSuccess(t('tables', 'The column »{column}« was updated.', { column: this.editColumn.title }))
+					await this.getColumnsForTableFromBE()
+				} else {
+					showWarning(t('tables', 'Sorry, something went wrong.'))
+					console.debug('axios error', res)
+				}
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not update column'))
@@ -313,9 +321,14 @@ export default {
 			}
 			try {
 				console.debug('try so delete column', columnId)
-				await axios.delete(generateUrl('/apps/tables/column/' + columnId))
-				showSuccess(t('tables', 'The column is removed.'))
-				this.getColumnsForTableFromBE()
+				const res = await axios.delete(generateUrl('/apps/tables/column/' + columnId))
+				if (res.status === 200) {
+					showSuccess(t('tables', 'The column is removed.'))
+					await this.getColumnsForTableFromBE()
+				} else {
+					showWarning(t('tables', 'Sorry, something went wrong.'))
+					console.debug('axios error', res)
+				}
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not delete column'))

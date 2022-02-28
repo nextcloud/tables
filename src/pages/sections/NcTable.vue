@@ -61,7 +61,7 @@
 import { TabulatorComponent } from 'vue-tabulator'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
-import { showError, showInfo, showSuccess } from '@nextcloud/dialogs'
+import { showError, showInfo, showSuccess, showWarning } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
 import DialogConfirmation from '../../modals/DialogConfirmation'
 import CreateRow from '../../modals/CreateRow'
@@ -444,7 +444,11 @@ export default {
 				let error = false
 				for (const row of selectedRows) {
 					try {
-						await axios.delete(generateUrl('/apps/tables/row/' + row._row.data.id))
+						const res = await axios.delete(generateUrl('/apps/tables/row/' + row._row.data.id))
+						if (res.status !== 200) {
+							error = true
+							console.debug('axios error', res)
+						}
 					} catch (e) {
 						console.error(e)
 						showError(t('tables', 'Could not delete row.'))
@@ -469,13 +473,24 @@ export default {
 			try {
 				// if row exists
 				if (rowId) {
-					await axios.put(generateUrl('/apps/tables/row/' + rowId + '/column/' + columnId), { tableId: this.activeTable.id, data: newValue })
+					const res = await axios.put(generateUrl('/apps/tables/row/' + rowId + '/column/' + columnId), { tableId: this.activeTable.id, data: newValue })
+					if (res.status === 200) {
+						showSuccess(t('tables', 'New value successfully saved.'))
+					} else {
+						showWarning(t('tables', 'Sorry, something went wrong.'))
+						console.debug('axios error', res)
+					}
 				} else {
 					// else create new row in BE
-					await axios.post(generateUrl('/apps/tables/row/column/' + columnId), { tableId: this.activeTable.id, data: newValue })
+					const res = await axios.post(generateUrl('/apps/tables/row/column/' + columnId), { tableId: this.activeTable.id, data: newValue })
+					if (res.status === 200) {
+						showSuccess(t('tables', 'New value successfully saved.'))
+					} else {
+						showWarning(t('tables', 'Sorry, something went wrong.'))
+						console.debug('axios error', res)
+					}
 					this.$emit('update-rows')
 				}
-				showSuccess(t('tables', 'New value successfully saved.'))
 				this.newRow = false
 			} catch (e) {
 				console.error(e)

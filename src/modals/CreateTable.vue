@@ -71,7 +71,7 @@
 <script>
 import AppNavigationNew from '@nextcloud/vue/dist/Components/AppNavigationNew'
 import Modal from '@nextcloud/vue/dist/Components/Modal'
-import { showError, showSuccess } from '@nextcloud/dialogs'
+import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import EmojiPicker from '@nextcloud/vue/dist/Components/EmojiPicker'
@@ -127,9 +127,12 @@ export default {
 					title: this.title,
 					template,
 				}
-				const response = await axios.post(generateUrl('/apps/tables/table'), data)
-				console.debug('table created: ', response)
-				ret = response.data.id
+				const res = await axios.post(generateUrl('/apps/tables/table'), data)
+				if (res.status !== 200) {
+					showWarning(t('tables', 'Sorry, something went wrong.'))
+					console.debug('axios error', res)
+				}
+				ret = res.data.id
 				await this.$store.dispatch('loadTablesFromBE')
 			} catch (e) {
 				console.error(e)
@@ -146,10 +149,12 @@ export default {
 		},
 		async loadTemplatesFromBE() {
 			try {
-				console.debug('try to fetched templates')
-				const response = await axios.get(generateUrl('/apps/tables/table/templates'))
-				console.debug('fetched templates: ', response)
-				this.templates = response.data
+				const res = await axios.get(generateUrl('/apps/tables/table/templates'))
+				if (res.status !== 200) {
+					showWarning(t('tables', 'Sorry, something went wrong.'))
+					console.debug('axios error', res)
+				}
+				this.templates = res.data
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not fetch templates from BE'))

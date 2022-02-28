@@ -191,8 +191,13 @@ export default {
 		},
 		async deleteRowAtBE(rowId) {
 			try {
-				await axios.delete(generateUrl('/apps/tables/row/' + rowId))
-				showSuccess(t('tables', 'Row deleted.'))
+				const res = await axios.delete(generateUrl('/apps/tables/row/' + rowId))
+				if (res.status === 200) {
+					showSuccess(t('tables', 'Row deleted.'))
+				} else {
+					showWarning(t('tables', 'Sorry, something went wrong.'))
+					console.debug('axios error', res)
+				}
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not delete row.'))

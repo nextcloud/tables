@@ -28,7 +28,7 @@ import EmptyContent from '@nextcloud/vue/dist/Components/EmptyContent'
 import NcTable from './sections/NcTable'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
-import { showError } from '@nextcloud/dialogs'
+import { showError, showWarning } from '@nextcloud/dialogs'
 import { mapState, mapGetters } from 'vuex'
 
 export default {
@@ -66,8 +66,12 @@ export default {
 				this.columns = null
 			} else {
 				try {
-					const response = await axios.get(generateUrl('/apps/tables/column/' + tableId))
-					this.columns = response.data.sort(this.compareColumns)
+					const res = await axios.get(generateUrl('/apps/tables/column/' + tableId))
+					if (res.status !== 200) {
+						showWarning(t('tables', 'Sorry, something went wrong.'))
+						console.debug('axios error', res)
+					}
+					this.columns = res.data.sort(this.compareColumns)
 				} catch (e) {
 					console.error(e)
 					showError(t('tables', 'Could not fetch columns for table'))
@@ -81,8 +85,12 @@ export default {
 				this.rows = null
 			} else {
 				try {
-					const response = await axios.get(generateUrl('/apps/tables/row/' + tableId))
-					this.rows = response.data
+					const res = await axios.get(generateUrl('/apps/tables/row/' + tableId))
+					if (res.status !== 200) {
+						showWarning(t('tables', 'Sorry, something went wrong.'))
+						console.debug('axios error', res)
+					}
+					this.rows = res.data
 				} catch (e) {
 					console.error(e)
 					showError(t('tables', 'Could not fetch rows for table'))

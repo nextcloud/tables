@@ -157,7 +157,7 @@ import MainForm from '../columnTypePartials/forms/MainForm'
 import Modal from '@nextcloud/vue/dist/Components/Modal'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
-import { showError, showInfo, showSuccess } from '@nextcloud/dialogs'
+import { showError, showInfo, showSuccess, showWarning } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
 import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
 import DatetimeForm from '../columnTypePartials/forms/DatetimeForm'
@@ -296,8 +296,13 @@ export default {
 					tableId: this.activeTable.id,
 				}
 				// console.debug('try so send new column', data)
-				await axios.post(generateUrl('/apps/tables/column'), data)
-				showSuccess(t('tables', 'The column »{column}« was created.', { column: data.title }))
+				const res = await axios.post(generateUrl('/apps/tables/column'), data)
+				if (res.status === 200) {
+					showSuccess(t('tables', 'The column »{column}« was created.', { column: data.title }))
+				} else {
+					showWarning(t('tables', 'Sorry, something went wrong.'))
+					console.debug('axios error', res)
+				}
 				// await this.$store.dispatch('loadTablesFromBE')
 			} catch (e) {
 				console.error(e)

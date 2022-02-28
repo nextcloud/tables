@@ -141,8 +141,13 @@ export default {
 						value,
 					})
 				}
-				await axios.post(generateUrl('/apps/tables/row'), { tableId: this.activeTable.id, data })
-				showSuccess(t('tables', 'The row was saved.'))
+				const res = await axios.post(generateUrl('/apps/tables/row'), { tableId: this.activeTable.id, data })
+				if (res.status === 200) {
+					showSuccess(t('tables', 'The row was saved.'))
+				} else {
+					showWarning(t('tables', 'Sorry, something went wrong.'))
+					console.debug('axios error', res)
+				}
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not create new column'))
