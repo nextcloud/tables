@@ -58,11 +58,11 @@
 					</button>
 				</div>
 				<div class="fix-col-1">
-					<button v-if="!prepareDeleteRow" class="warning" @click="prepareDeleteRow = true">
+					<button v-if="!prepareDeleteRow" class="error" @click="prepareDeleteRow = true">
 						{{ t('tables', 'Delete') }}
 					</button>
 					<button v-if="prepareDeleteRow" class="error" @click="actionDeleteRow">
-						{{ t('tables', 'Delete') }}
+						{{ t('tables', 'I really want to delete this row!') }}
 					</button>
 				</div>
 			</div>
@@ -82,7 +82,7 @@ import TextLinkForm from '../rowTypePartials/TextLinkForm'
 import NumberForm from '../rowTypePartials/NumberForm'
 import NumberStarsForm from '../rowTypePartials/NumberStarsForm'
 import NumberProgressForm from '../rowTypePartials/NumberProgressForm'
-import SelectionCheckForm from '../columnTypePartials/forms/SelectionCheckForm'
+import SelectionCheckForm from '../rowTypePartials/SelectionCheckForm'
 import DatetimeForm from '../rowTypePartials/DatetimeForm'
 import DatetimeDateForm from '../rowTypePartials/DatetimeDateForm'
 import DatetimeTimeForm from '../rowTypePartials/DatetimeTimeForm'

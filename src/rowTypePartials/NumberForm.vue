@@ -11,7 +11,7 @@
 				:max="column.numberMax">
 			{{ column.numberSuffix }}
 		</div>
-		<div v-if="column.description" class="fix-col-2">
+		<div v-if="column.description" class="fix-col-2 hide-s">
 &nbsp;
 		</div>
 		<div v-if="column.description" class="fix-col-2 p span margin-bottom">

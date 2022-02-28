@@ -6,7 +6,7 @@
 		<div class="fix-col-2" :class="{ 'margin-bottom': !column.description }">
 			<CheckboxRadioSwitch type="switch" :checked.sync="localValue" />
 		</div>
-		<div v-if="column.description" class="fix-col-2">
+		<div v-if="column.description" class="fix-col-2 hide-s">
 &nbsp;
 		</div>
 		<div v-if="column.description" class="fix-col-2 p span margin-bottom">
@@ -43,10 +43,12 @@ export default {
 				if (this.value) {
 					return this.value === 'true'
 				} else {
-					return this.column.selectionDefault === 'true'
+					const defaultValueBool = this.column.selectionDefault === 'true'
+					this.$emit('update:value', '' + defaultValueBool)
+					return defaultValueBool
 				}
 			},
-			set(v) { this.$emit('update:value', v) },
+			set(v) { this.$emit('update:value', '' + v) },
 		},
 	},
 }

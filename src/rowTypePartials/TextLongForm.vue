@@ -1,13 +1,23 @@
 <template>
 	<div class="row">
 		<div class="fix-col-1" :class="{ mandatory: column.mandatory }">
-			{{ column.title }}
+			<div class="row">
+				<div class="fix-col-4">
+					{{ column.title }}
+				</div>
+				<div class="fix-col-4 p span" style="padding-bottom: 0;">
+					{{ t('tables', 'Text length: {length}', { length: localValue.length }) }}
+				</div>
+				<div class="fix-col-4 p span" style="padding-top: 0;">
+					{{ t('tables', 'Max: {maxLength}', { maxLength: column.textMaxLength }) }}
+				</div>
+			</div>
 		</div>
 		<div class="fix-col-3" :class="{ 'margin-bottom': !column.description }">
-			<textarea v-model="localValue" />
+			<textarea v-model="localValue" :maxlength="column.textMaxLength" />
 		</div>
-		<div v-if="column.description" class="fix-col-1">
-&nbsp;
+		<div v-if="column.description" class="fix-col-1 hide-s">
+			&nbsp;
 		</div>
 		<div v-if="column.description" class="fix-col-3 p span margin-bottom">
 			{{ column.description }}

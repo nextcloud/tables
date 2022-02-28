@@ -200,6 +200,16 @@ export default {
 				return true // must return a boolean, true if it passes the filter.
 			}
 
+			const headerFilterFunctionCheckbox = function(headerValue, rowValue, rowData, filterParams) {
+				// headerValue - the value of the header filter element
+				// rowValue - the value of the column in this row
+				// rowData - the data for the row being filtered
+				// filterParams - params object passed to the headerFilterFuncParams property
+
+				// only filter if filter checkbox is true
+				return ('' + headerValue === 'true' && '' + rowValue === 'true') || '' + headerValue === 'false' // must return a boolean, true if it passes the filter.
+			}
+
 			// start logic -------------------------------------
 
 			const def = [
@@ -300,13 +310,7 @@ export default {
 						formatter = 'tickCross'
 						validator = item.mandatory ? 'required' : null
 						minWidth = 60
-						headerFilterFunc = function(headerValue, rowValue, rowData, filterParams) {
-							// headerValue - the value of the header filter element
-							// rowValue - the value of the column in this row
-							// rowData - the data for the row being filtered
-							// filterParams - params object passed to the headerFilterFuncParams property
-							return '' + headerValue === '' + rowValue // must return a boolean, true if it passes the filter.
-						}
+						headerFilterFunc = headerFilterFunctionCheckbox
 						headerFilter = true
 					} else if (item.type === 'datetime' && !item.subtype) {
 						formatter = (cell, formatterParams, onRendered) => {
