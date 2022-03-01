@@ -103,6 +103,7 @@ export default {
 					clipboard: true,
 					// clipboardPasteAction: 'insert',
 					printAsHtml: true,
+					columnMaxWidth: 300,
 				}
 			},
 		},
@@ -216,7 +217,7 @@ export default {
 				{
 					formatter: 'rowSelection',
 					titleFormatter: 'rowSelection',
-					align: 'center',
+					hozAlign: 'center',
 					headerSort: false,
 					width: 60,
 					print: false,
@@ -227,10 +228,10 @@ export default {
 						// formatterParams - parameters set for the column
 						// onRendered - function to call when the formatter has been rendered
 
-						return '<div class="icon-rename button" />'
+						return '<button class="icon-rename" />'
 					},
 					width: 60,
-					align: 'center',
+					hozAlign: 'center',
 					headerSort: false,
 					field: 'editRow',
 				},
@@ -239,14 +240,14 @@ export default {
 				this.columns.forEach(item => {
 					let formatter = null
 					let formatterParams = null
-					let align = null
+					let hozAlign = null
 					let sorter = null
 					let headerFilter = null
 					let headerFilterFunc = null
 					let headerFilterLiveFilter = null
 					let validator = null
 					let minWidth = 140
-					let maxWidth = null
+					let width = null
 
 					// specific parameters depending on column type
 					if (item.type === 'text' && item.subtype === 'long') {
@@ -256,7 +257,7 @@ export default {
 						} else {
 							validator = item.mandatory ? 'required' : null
 						}
-						maxWidth = 200
+						width = 300
 					} else if (item.type === 'text' && item.subtype === 'line') {
 						if (item.textMaxLength && parseInt(item.textMaxLength) !== -1) {
 							validator = 'maxLength:' + item.textMaxLength
@@ -271,7 +272,7 @@ export default {
 							target: '_blank',
 						}
 					} else if (item.type === 'number' && !item.subtype) {
-						align = 'right'
+						hozAlign = 'right'
 						formatterParams = {
 							suffix: item.numberSuffix,
 							prefix: item.numberPrefix,
@@ -354,9 +355,9 @@ export default {
 						formatterParams,
 						headerFilter: this.showFilter ? headerFilter || 'input' : null,
 						editor: false,
-						align,
+						hozAlign,
 						minWidth,
-						maxWidth,
+						width,
 						sorter,
 						validator,
 						headerFilterFunc,

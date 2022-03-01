@@ -5,9 +5,6 @@
 				<div class="fix-col-4">
 					{{ column.title }}
 				</div>
-				<div v-if="column.textMaxLength === -1 || !column.textMaxLength" class="fix-col-4 p span" style="padding-bottom: 0; padding-top: 0;">
-					{{ t('tables', 'length: {length}', { length }) }}
-				</div>
 				<div v-if="column.textMaxLength !== -1" class="fix-col-4 p span" style="padding-bottom: 0; padding-top: 0;">
 					{{ t('tables', 'length: {length} / {maxLength}', { length, maxLength: column.textMaxLength }) }}
 				</div>

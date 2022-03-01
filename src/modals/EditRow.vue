@@ -57,7 +57,7 @@
 						{{ t('tables', 'Save') }}
 					</button>
 				</div>
-				<div class="fix-col-1">
+				<div class="fix-col-1" style="justify-content: end;">
 					<button v-if="!prepareDeleteRow" class="error" @click="prepareDeleteRow = true">
 						{{ t('tables', 'Delete') }}
 					</button>
