@@ -31,14 +31,14 @@ class ColumnController extends Controller {
      * @throws \Exception
      */
 	public function index(int $tableId): DataResponse {
-		return new DataResponse($this->service->findAllByTable($this->userId, $tableId));
+		return new DataResponse($this->service->findAllByTable($tableId));
 	}
 
 	/**
 	 * @NoAdminRequired
 	 */
 	public function show(int $id): DataResponse {
-		return $this->handleNotFound(function () use ($id) {
+		return $this->handleError(function () use ($id) {
 			return $this->service->find($id, $this->userId);
 		});
 	}
@@ -116,7 +116,7 @@ class ColumnController extends Controller {
         int $orderWeight = 0,
         string $datetimeDefault = ''
     ): DataResponse {
-		return $this->handleNotFound(function () use (
+		return $this->handleError(function () use (
             $id,
             $tableId,
             $title,
@@ -167,7 +167,7 @@ class ColumnController extends Controller {
 	 * @NoAdminRequired
 	 */
 	public function destroy(int $id): DataResponse {
-		return $this->handleNotFound(function () use ($id) {
+		return $this->handleError(function () use ($id) {
 			return $this->service->delete($id, $this->userId);
 		});
 	}

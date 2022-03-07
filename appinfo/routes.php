@@ -1,13 +1,17 @@
 <?php
 
 return [
-	'resources' => [
-        'table' => ['url' => '/table'],
-	],
 	'routes' => [
         ['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
 
         ['name' => 'tableTemplate#list', 'url' => '/table/templates', 'verb' => 'GET'],
+
+        // table
+        ['name' => 'table#index', 'url' => '/table', 'verb' => 'GET'],
+        ['name' => 'table#show', 'url' => '/table/{id}', 'verb' => 'GET'],
+        ['name' => 'table#create', 'url' => '/table', 'verb' => 'POST'],
+        ['name' => 'table#update', 'url' => '/table/{id}', 'verb' => 'PUT'],
+        ['name' => 'table#destroy', 'url' => '/table/{id}', 'verb' => 'DELETE'],
 
         // columns
         ['name' => 'column#index', 'url' => '/column/{tableId}', 'verb' => 'GET'],

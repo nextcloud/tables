@@ -39,11 +39,16 @@ export default {
 	computed: {
 		localValue: {
 			get() {
-				return (this.value && true)
-					? this.value
-					: ((this.column.numberDefault !== undefined)
-						? this.column.numberDefault
-						: '')
+				if (this.value) {
+					return this.value
+				} else {
+					if (this.column.numberDefault !== undefined) {
+						this.$emit('update:value', this.column.numberDefault)
+						return this.column.numberDefault
+					} else {
+						return null
+					}
+				}
 			},
 			set(v) { this.$emit('update:value', v) },
 		},

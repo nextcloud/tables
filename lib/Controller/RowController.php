@@ -39,7 +39,7 @@ class RowController extends Controller {
 	 * @NoAdminRequired
 	 */
 	public function show(int $id): DataResponse {
-		return $this->handleNotFound(function () use ($id) {
+		return $this->handleError(function () use ($id) {
 			return $this->service->find($id, $this->userId);
 		});
 	}
@@ -82,7 +82,7 @@ class RowController extends Controller {
         int $columnId,
         string $data
     ): DataResponse {
-        return $this->handleNotFound(function () use (
+        return $this->handleError(function () use (
             $id,
             $columnId,
             $data
@@ -102,7 +102,7 @@ class RowController extends Controller {
         int $id,
         array $data
     ): DataResponse {
-        return $this->handleNotFound(function () use (
+        return $this->handleError(function () use (
             $id,
             $data
         ) {
@@ -117,7 +117,7 @@ class RowController extends Controller {
 	 * @NoAdminRequired
 	 */
 	public function destroy(int $id): DataResponse {
-		return $this->handleNotFound(function () use ($id) {
+		return $this->handleError(function () use ($id) {
 			return $this->service->delete($id, $this->userId);
 		});
 	}

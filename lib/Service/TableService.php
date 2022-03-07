@@ -2,15 +2,20 @@
 
 namespace OCA\Tables\Service;
 
+use DateTime;
 use Exception;
 
+use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Errors\PermissionError;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
+use Psr\Log\LoggerInterface;
 
-class TableService {
+class TableService extends SuperService {
 
 	/** @var TableMapper */
 	private $mapper;
@@ -24,52 +29,61 @@ class TableService {
     /** @var RowService */
     private $rowService;
 
-	public function __construct(TableMapper $mapper, TableTemplateService $tableTemplateService, ColumnService $columnService, RowService $rowService) {
+	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, $userId,
+                                TableMapper $mapper, TableTemplateService $tableTemplateService, ColumnService $columnService, RowService $rowService) {
+        parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
         $this->tableTemplateService = $tableTemplateService;
         $this->columnService = $columnService;
         $this->rowService = $rowService;
 	}
 
-    /**
-     * @throws \OCP\DB\Exception
-     */
-    public function findAll(string $userId): array {
-		return $this->mapper->findAll($userId);
-	}
 
     /**
-     * @throws TableNotFound
-     * @throws Exception
+     * @throws InternalError
      */
-    private function handleException(Exception $e): void {
-		if ($e instanceof DoesNotExistException ||
-			$e instanceof MultipleObjectsReturnedException) {
-			throw new TableNotFound($e->getMessage());
-		} else {
-			throw $e;
-		}
-	}
+    public function findAll(): array {
+        try {
+            return $this->mapper->findAll($this->userId);
+        } catch (\OCP\DB\Exception $e) {
+            $this->logger->error($e->getMessage());
+            throw new InternalError($e->getMessage());
+        }
+    }
 
-	public function find($id, $userId) {
+
+    /**
+     * @throws PermissionError
+     * @throws NotFoundError
+     * @throws InternalError
+     */
+    public function find($id) {
 		try {
-			return $this->mapper->find($id, $userId);
+			$table = $this->mapper->find($id);
 
-			// in order to be able to plug in different storage backends like files
-		// for instance it is a good idea to turn storage related exceptions
-		// into service related exceptions so controllers and service users
-		// have to deal with only one type of exception
-		} catch (Exception $e) {
-			$this->handleException($e);
-		}
+            // security
+            if(!$this->permissionsService->canReadTable($table))
+                throw new PermissionError('PermissionError: can not read table with id '.$id);
+
+            return $table;
+        } catch (DoesNotExistException $e) {
+            $this->logger->warning($e->getMessage());
+            throw new NotFoundError($e->getMessage());
+        } catch (MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
+            $this->logger->error($e->getMessage());
+            throw new InternalError($e->getMessage());
+        }
     }
 
     /**
-     * @throws \OCP\DB\Exception
      * @noinspection PhpUndefinedMethodInspection
+     *
+     * @throws \OCP\DB\Exception
+     * @throws InternalError
      */
-    public function create($title, $userId, $template) {
-        $time = new \DateTime();
+    public function create($title, $template) {
+        $userId = $this->userId;
+        $time = new DateTime();
 		$item = new Table();
         $item->setTitle($title);
         $item->setOwnership($userId);
@@ -77,41 +91,63 @@ class TableService {
         $item->setLastEditBy($userId);
         $item->setCreatedAt($time->format('Y-m-d H:i:s'));
         $item->setLastEditAt($time->format('Y-m-d H:i:s'));
-		$newTable = $this->mapper->insert($item);
+        try {
+            $newTable = $this->mapper->insert($item);
+        } catch (\OCP\DB\Exception $e) {
+            $this->logger->error($e->getMessage());
+            throw new InternalError($e->getMessage());
+        }
         if($template !== 'custom') {
             return $this->tableTemplateService->makeTemplate($newTable, $template);
         }
         return $newTable;
 	}
 
-    /** @noinspection PhpUndefinedMethodInspection */
+    /**
+     * @noinspection PhpUndefinedMethodInspection
+     *
+     * @throws InternalError
+     */
     public function update($id, $title, $userId) {
 		try {
-            $time = new \DateTime();
-            $item = $this->mapper->find($id, $userId);
+            $item = $this->mapper->find($id);
+
+            // security
+            if(!$this->permissionsService->canUpdateTable($item))
+                throw new PermissionError('PermissionError: can not update table with id '.$id);
+
+            $time = new DateTime();
             $item->setTitle($title);
             $item->setLastEditBy($userId);
             $item->setLastEditAt($time->format('Y-m-d H:i:s'));
 			return $this->mapper->update($item);
 		} catch (Exception $e) {
-			$this->handleException($e);
+            $this->logger->error($e->getMessage());
+            throw new InternalError($e->getMessage());
 		}
-        return null;
 	}
 
-	public function delete($id, $userId) {
+    /**
+     * @throws InternalError
+     */
+    public function delete($id) {
 		try {
+            $item = $this->mapper->find($id);
+
+            // security
+            if(!$this->permissionsService->canDeleteTable($item))
+                throw new PermissionError('PermissionError: can not delete table with id '.$id);
+
             $this->rowService->deleteAllByTable($id);
-            $columns = $this->columnService->findAllByTable($userId, $id);
+            $columns = $this->columnService->findAllByTable($id);
             foreach ($columns as $column) {
-                $this->columnService->delete($column->id, $userId, true);
+                $this->columnService->delete($column->id, true);
             }
-            $item = $this->mapper->find($id, $userId);
 			$this->mapper->delete($item);
 			return $item;
 		} catch (Exception $e) {
-			$this->handleException($e);
+            $this->logger->error($e->getMessage());
+            throw new InternalError($e->getMessage());
         }
-        return null;
     }
 }

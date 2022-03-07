@@ -28,7 +28,7 @@ class ColumnService {
     /**
      * @throws Exception
      */
-    public function findAllByTable(string $userId, int $tableId): array {
+    public function findAllByTable(int $tableId): array {
 		return $this->mapper->findAllByTable($tableId);
 	}
 
@@ -166,12 +166,12 @@ class ColumnService {
 		}
 	}
 
-	public function delete($id, $userId, bool $skipRowCleanup = false) {
+	public function delete($id, bool $skipRowCleanup = false) {
 		try {
             if(!$skipRowCleanup) {
                 $this->rowService->deleteColumnDataFromRows($id);
             }
-            $item = $this->mapper->find($id, $userId);
+            $item = $this->mapper->find($id);
 			$this->mapper->delete($item);
 			return $item;
 		} catch (Exception $e) {
