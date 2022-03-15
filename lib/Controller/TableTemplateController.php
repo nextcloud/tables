@@ -13,8 +13,9 @@ class TableTemplateController extends Controller {
 	/** @var TableTemplateService */
 	private $service;
 
+    use Errors;
 
-	public function __construct(IRequest     $request,
+    public function __construct(IRequest     $request,
                                 TableTemplateService $service) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->service = $service;
@@ -24,7 +25,9 @@ class TableTemplateController extends Controller {
      * @NoAdminRequired
      */
 	public function list(): DataResponse {
-		return new DataResponse($this->service->getTemplateList());
-	}
+        return $this->handleError(function () {
+            return $this->service->getTemplateList();
+        });
+    }
 
 }

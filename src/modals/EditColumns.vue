@@ -293,7 +293,7 @@ export default {
 				return
 			}
 			try {
-				console.debug('try so send column', this.editColumn)
+				// console.debug('try so send column', this.editColumn)
 				const res = await axios.put(generateUrl('/apps/tables/column/' + this.editColumn.id), this.editColumn)
 				if (res.status === 200) {
 					showSuccess(t('tables', 'The column »{column}« was updated.', { column: this.editColumn.title }))

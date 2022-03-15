@@ -2,17 +2,18 @@
 
 namespace OCA\Tables\Service;
 
+use DateTime;
 use Exception;
-
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
+use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Errors\PermissionError;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
+use Psr\Log\LoggerInterface;
 
-use OCA\Tables\Db\Table;
-use OCA\Tables\Db\TableMapper;
-
-class ColumnService {
+class ColumnService extends SuperService {
 
 	/** @var ColumnMapper */
 	private $mapper;
@@ -20,44 +21,60 @@ class ColumnService {
     /** @var RowService */
     private $rowService;
 
-	public function __construct(ColumnMapper $mapper, RowService $rowService) {
-		$this->mapper = $mapper;
+	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, $userId,
+                                ColumnMapper $mapper, RowService $rowService) {
+        parent::__construct($logger, $userId, $permissionsService);
+        $this->mapper = $mapper;
         $this->rowService = $rowService;
 	}
 
+
     /**
-     * @throws Exception
+     * @throws InternalError
+     * @throws PermissionError
      */
     public function findAllByTable(int $tableId): array {
-		return $this->mapper->findAllByTable($tableId);
-	}
+        try {
+            if($this->permissionsService->canReadColumnsByTableId($tableId)) {
+                return $this->mapper->findAllByTable($tableId);
+            } else {
+                throw new PermissionError('no read access to table id = '.$tableId);
+            }
+        } catch (\OCP\DB\Exception $e) {
+            $this->logger->error($e->getMessage());
+            throw new InternalError($e->getMessage());
+        }
+    }
+
 
     /**
-     * @throws TableNotFound
-     * @throws Exception
+     * @throws NotFoundError
+     * @throws InternalError
+     * @throws PermissionError
      */
-    private function handleException(Exception $e): void {
-		if ($e instanceof DoesNotExistException ||
-			$e instanceof MultipleObjectsReturnedException) {
-			throw new TableNotFound($e->getMessage());
-		} else {
-			throw $e;
-		}
-	}
+    public function find($id) {
+        try {
+            $column = $this->mapper->find($id);
 
-    /**
-     * @throws DoesNotExistException
-     * @throws MultipleObjectsReturnedException
-     * @throws \OCP\DB\Exception
-     */
-    public function find($id, $userId) {
-        return $this->mapper->find($id);
+            // security
+            if(!$this->permissionsService->canReadColumn($column))
+                throw new PermissionError('PermissionError: can not read column with id '.$id);
+
+            return $column;
+        } catch (DoesNotExistException $e) {
+            $this->logger->warning($e->getMessage());
+            throw new NotFoundError($e->getMessage());
+        } catch (MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
+            $this->logger->error($e->getMessage());
+            throw new InternalError($e->getMessage());
+        }
     }
 
     /**
-     * @throws \OCP\DB\Exception
      * @noinspection PhpUndefinedMethodInspection
      * @noinspection DuplicatedCode
+     * @throws InternalError
+     * @throws PermissionError
      */
     public function create(
         int $tableId,
@@ -76,12 +93,16 @@ class ColumnService {
         float $numberMin = null,
         float $numberMax = null,
         int $numberDecimals = null,
-        string $selectionOptions,
-        string $selectionDefault,
+        string $selectionOptions = '',
+        string $selectionDefault = '',
         int $orderWeight = 0,
-        string $datetimeDefault
+        string $datetimeDefault = ''
     ) {
-        $time = new \DateTime();
+        // security
+        if(!$this->permissionsService->canCreateColumnAtTableById($tableId))
+            throw new PermissionError('create column at the table id = '.$tableId.' is not allowed.');
+
+        $time = new DateTime();
 		$item = new Column();
         $item->setTitle($title);
         $item->setTableId($tableId);
@@ -106,11 +127,18 @@ class ColumnService {
         $item->setSelectionDefault($selectionDefault);
         $item->setOrderWeight($orderWeight);
         $item->setDatetimeDefault($datetimeDefault);
-		return $this->mapper->insert($item);
-	}
+        try {
+            return $this->mapper->insert($item);
+        } catch (\OCP\DB\Exception $e) {
+            $this->logger->error($e->getMessage());
+            throw new InternalError($e->getMessage());
+        }
+    }
 
-    /** @noinspection PhpUndefinedMethodInspection
+    /**
+     * @noinspection PhpUndefinedMethodInspection
      * @noinspection DuplicatedCode
+     * @throws InternalError
      */
     public function update(
         $id,
@@ -130,13 +158,19 @@ class ColumnService {
         $numberMin = null,
         $numberMax = null,
         $numberDecimals = null,
-        $selectionOptions,
-        $selectionDefault,
+        $selectionOptions = '',
+        $selectionDefault = '',
         $orderWeight = 0,
-        $datetimeDefault
+        $datetimeDefault = ''
     ) {
 		try {
-            $time = new \DateTime();
+
+            // security
+            if(!$this->permissionsService->canUpdateColumn($this->mapper->find($id)))
+                throw new PermissionError('update column id = '.$id.' is not allowed.');
+
+
+            $time = new DateTime();
             $item = new Column();
             $item->setId($id);
             $item->setTitle($title);
@@ -162,20 +196,31 @@ class ColumnService {
             $item->setDatetimeDefault($datetimeDefault);
 			return $this->mapper->update($item);
 		} catch (Exception $e) {
-			$this->handleException($e);
+            $this->logger->error($e->getMessage());
+            throw new InternalError($e->getMessage());
 		}
 	}
 
-	public function delete($id, bool $skipRowCleanup = false) {
+    /**
+     * @throws InternalError
+     */
+    public function delete($id, bool $skipRowCleanup = false) {
 		try {
+            $item = $this->mapper->find($id);
+
+            // security
+            if(!$this->permissionsService->canDeleteColumn($item))
+                throw new PermissionError('delete column id = '.$id.' is not allowed.');
+
             if(!$skipRowCleanup) {
                 $this->rowService->deleteColumnDataFromRows($id);
             }
-            $item = $this->mapper->find($id);
+
 			$this->mapper->delete($item);
 			return $item;
 		} catch (Exception $e) {
-			$this->handleException($e);
+            $this->logger->error($e->getMessage());
+            throw new InternalError($e->getMessage());
         }
     }
 }

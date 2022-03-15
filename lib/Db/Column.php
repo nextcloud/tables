@@ -9,7 +9,6 @@ use OCP\AppFramework\Db\Entity;
 class Column extends Entity implements JsonSerializable {
 	protected $title;
     protected $tableId;
-	protected $ownership;
     protected $createdBy;
     protected $createdAt;
     protected $lastEditBy;
@@ -72,7 +71,6 @@ class Column extends Entity implements JsonSerializable {
 			'id'            => $this->id,
             'tableId'       => $this->tableId,
             'title'         => $this->title,
-			'ownership'     => $this->ownership,
             'createdBy'     => $this->createdBy,
             'createdAt'     => $this->createdAt,
             'lastEditBy'    => $this->lastEditBy,

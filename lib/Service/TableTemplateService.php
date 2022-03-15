@@ -3,6 +3,7 @@
 namespace OCA\Tables\Service;
 
 use OCA\Tables\Db\Table;
+use OCA\Tables\Errors\InternalError;
 use OCP\DB\Exception;
 use OCP\IL10N;
 
@@ -41,7 +42,7 @@ class TableTemplateService {
     }
 
     /**
-     * @throws Exception
+     * @throws InternalError
      */
     public function makeTemplate(Table $table, string $template): Table {
         if($template === 'todo') {
@@ -53,7 +54,7 @@ class TableTemplateService {
     }
 
     /**
-     * @throws Exception
+     * @throws InternalError
      */
     private function makeMembers(Table $table) {
 
@@ -100,7 +101,7 @@ class TableTemplateService {
     }
 
     /**
-     * @throws Exception
+     * @throws InternalError
      */
     private function makeTodo(Table $table) {
 
@@ -151,7 +152,7 @@ class TableTemplateService {
     }
 
     /**
-     * @throws Exception
+     * @throws InternalError
      */
     private function createColumn($tableId, $parameters): void
     {

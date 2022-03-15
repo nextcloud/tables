@@ -38,7 +38,6 @@ class RowMapper extends QBMapper {
      * @throws Exception
      */
 	public function findAllByTable(int $tableId): array {
-        // TODO check if request is permitted
         $qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)

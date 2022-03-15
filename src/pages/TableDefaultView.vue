@@ -54,7 +54,7 @@ export default {
 	},
 	watch: {
 		activeTable() {
-			console.debug('table changed, I will try to fetch columns')
+			// console.debug('table changed, I will try to fetch columns')
 			this.getColumnsForTableFromBE(this.activeTable.id)
 			this.getRowsForTableFromBE(this.activeTable.id)
 		},
@@ -71,7 +71,9 @@ export default {
 						showWarning(t('tables', 'Sorry, something went wrong.'))
 						console.debug('axios error', res)
 					}
-					this.columns = res.data.sort(this.compareColumns)
+					if (res.data && Array.isArray(res.data)) {
+						this.columns = res.data.sort(this.compareColumns)
+					}
 				} catch (e) {
 					console.error(e)
 					showError(t('tables', 'Could not fetch columns for table'))

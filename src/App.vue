@@ -52,7 +52,7 @@ export default {
 			() => this.$route.params,
 			(toParams, previousParams) => {
 				// react to route changes...
-				console.debug('change route to', toParams)
+				// console.debug('change route to', toParams)
 				this.$store.commit('setActiveTableId', parseInt(toParams.tableId))
 			}
 		)

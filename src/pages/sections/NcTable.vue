@@ -103,7 +103,7 @@ export default {
 					clipboard: true,
 					// clipboardPasteAction: 'insert',
 					printAsHtml: true,
-					columnMaxWidth: 300,
+					// columnMaxWidth: 300,
 				}
 			},
 		},
@@ -518,7 +518,7 @@ export default {
 			// e - the click event object
 			// cell - cell component
 			if (cell._cell.column.field === 'editRow') {
-				console.debug('I have to edit row with id: ', cell._cell.row.data.id)
+				// console.debug('I have to edit row with id: ', cell._cell.row.data.id)
 				this.editRowId = cell._cell.row.data.id
 			}
 		},

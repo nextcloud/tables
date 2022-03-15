@@ -2,65 +2,87 @@
 
 namespace OCA\Tables\Service;
 
+use DateTime;
 use Exception;
-
-use OCA\Tables\Db\Column;
 use OCA\Tables\Db\Row;
 use OCA\Tables\Db\RowMapper;
-use OCA\Tables\Db\Table;
+use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Errors\PermissionError;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
+use Psr\Log\LoggerInterface;
 
-class RowService {
+class RowService extends SuperService {
 
 	/** @var RowMapper */
 	private $mapper;
 
-	public function __construct(RowMapper $mapper) {
-		$this->mapper = $mapper;
+	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, $userId,
+                                RowMapper $mapper) {
+        parent::__construct($logger, $userId, $permissionsService);
+        $this->mapper = $mapper;
 	}
 
-    /**
-     * @throws Exception
-     */
-    public function findAllByTable(string $userId, int $tableId): array {
-		return $this->mapper->findAllByTable($tableId, $userId);
-	}
 
     /**
-     * @throws TableNotFound
-     * @throws Exception
+     * @throws InternalError
+     * @throws PermissionError
      */
-    private function handleException(Exception $e): void {
-		if ($e instanceof DoesNotExistException ||
-			$e instanceof MultipleObjectsReturnedException) {
-			throw new TableNotFound($e->getMessage());
-		} else {
-			throw $e;
-		}
-	}
+    public function findAllByTable(int $tableId): array {
+        try {
+            if($this->permissionsService->canReadTableByTableId($tableId)) {
+                return $this->mapper->findAllByTable($tableId);
+            } else {
+                throw new PermissionError('no read access to table id = '.$tableId);
+            }
+        } catch (\OCP\DB\Exception $e) {
+            $this->logger->error($e->getMessage());
+            throw new InternalError($e->getMessage());
+        }
+    }
+
 
     /**
-     * @throws DoesNotExistException
-     * @throws MultipleObjectsReturnedException
-     * @throws \OCP\DB\Exception
+     * @throws NotFoundError
+     * @throws InternalError
+     * @throws PermissionError
      */
-    public function find($id, $userId) {
-        return $this->mapper->find($id, $userId);
+    public function find($id) {
+        try {
+            $row = $this->mapper->find($id);
+
+            // security
+            if(!$this->permissionsService->canReadRow($row))
+                throw new PermissionError('PermissionError: can not read row with id '.$id);
+
+            return $row;
+        } catch (DoesNotExistException $e) {
+            $this->logger->warning($e->getMessage());
+            throw new NotFoundError($e->getMessage());
+        } catch (MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
+            $this->logger->error($e->getMessage());
+            throw new InternalError($e->getMessage());
+        }
     }
 
     /**
      * @throws \OCP\DB\Exception
+     * @throws PermissionError
      * @noinspection PhpUndefinedMethodInspection
      * @noinspection DuplicatedCode
      */
     public function create(
         int $tableId,
         int $columnId,
-        string $userId,
         string $data
     ) {
-        $time = new \DateTime();
+
+        // security
+        if(!$this->permissionsService->canCreateRowAtTableById($tableId))
+            throw new PermissionError('create row at the table id = '.$tableId.' is not allowed.');
+
+        $time = new DateTime();
         $item = new Row();
         $d = [];
         $d[] = (object) [
@@ -69,93 +91,114 @@ class RowService {
         ];
         $item->setDataArray($d);
         $item->setTableId($tableId);
-        $item->setCreatedBy($userId);
+        $item->setCreatedBy($this->userId);
         $item->setCreatedAt($time->format('Y-m-d H:i:s'));
-        $item->setLastEditBy($userId);
+        $item->setLastEditBy($this->userId);
         $item->setLastEditAt($time->format('Y-m-d H:i:s'));
 		return $this->mapper->insert($item);
 	}
 
     /**
      * @throws \OCP\DB\Exception
+     * @throws PermissionError
      * @noinspection PhpUndefinedMethodInspection
      * @noinspection DuplicatedCode
      */
     public function createComplete(
         int $tableId,
-        string $userId,
         Array $data
     ) {
-        $time = new \DateTime();
+
+        // security
+        if(!$this->permissionsService->canCreateRowAtTableById($tableId))
+            throw new PermissionError('create row at the table id = '.$tableId.' is not allowed.');
+
+        $time = new DateTime();
         $item = new Row();
         $item->setDataArray($data);
         $item->setTableId($tableId);
-        $item->setCreatedBy($userId);
+        $item->setCreatedBy($this->userId);
         $item->setCreatedAt($time->format('Y-m-d H:i:s'));
-        $item->setLastEditBy($userId);
+        $item->setLastEditBy($this->userId);
         $item->setLastEditAt($time->format('Y-m-d H:i:s'));
         return $this->mapper->insert($item);
     }
 
-    /** @noinspection PhpUndefinedMethodInspection
+    /**
+     * @noinspection PhpUndefinedMethodInspection
      * @noinspection DuplicatedCode
+     * @throws InternalError
+     * @throws NotFoundError|PermissionError
      */
     public function update(
         int $id,
         int $columnId,
-        string $userId,
         string $data
     ) {
         try {
-            $time = new \DateTime();
-            $item = $this->mapper->find($id);
+
+            $item = $this->find($id);
+
+            // security
+            if(!$this->permissionsService->canUpdateRow($item))
+                throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
+
+            $time = new DateTime();
             $d = $item->getDataArray();
             $columnFound = false;
             foreach ($d as $key => $c) {
-                if($c['columnId'] == $columnId) {
+                if ($c['columnId'] == $columnId) {
                     $d[$key]['value'] = $data;
                     $columnFound = true;
                     break;
                 }
             }
             // if the value was not set, add it
-            if(!$columnFound) {
+            if (!$columnFound) {
                 $d[] = [
                     "columnId" => $columnId,
                     "value" => $data
                 ];
             }
             $item->setDataArray($d);
-            $item->setLastEditBy($userId);
+            $item->setLastEditBy($this->userId);
             $item->setLastEditAt($time->format('Y-m-d H:i:s'));
             return $this->mapper->update($item);
-        } catch (Exception $e) {
-            $this->handleException($e);
+        } catch (InternalError $e) {
+            throw new InternalError($e->getMessage());
+        } catch (NotFoundError|\OCP\DB\Exception $e) {
+            throw new NotFoundError($e->getMessage());
         }
     }
 
-    /** @noinspection PhpUndefinedMethodInspection
+    /**
+     * @noinspection PhpUndefinedMethodInspection
      * @noinspection DuplicatedCode
+     * @throws InternalError
      */
     public function updateSet(
         int $id,
-        string $userId,
         array $data
     ) {
         try {
-            $time = new \DateTime();
             $item = $this->mapper->find($id);
+
+            // security
+            if(!$this->permissionsService->canUpdateRow($item))
+                throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
+
+            $time = new DateTime();
             $d = $item->getDataArray();
             foreach ($data as $dataObject) {
                 $d = $this->replaceOrAddData($d, $dataObject);
             }
 
             $item->setDataArray($d);
-            $item->setLastEditBy($userId);
+            $item->setLastEditBy($this->userId);
             $item->setLastEditAt($time->format('Y-m-d H:i:s'));
             return $this->mapper->update($item);
         } catch (Exception $e) {
-            $this->handleException($e);
+            throw new InternalError($e->getMessage());
         }
     }
 
@@ -182,29 +225,55 @@ class RowService {
         return $dataArray;
     }
 
-	public function delete($id, $userId) {
-		try {
-            $item = $this->mapper->find($id, $userId);
-			$this->mapper->delete($item);
-			return $item;
-		} catch (Exception $e) {
-			$this->handleException($e);
+    /**
+     * @throws PermissionError
+     * @throws NotFoundError
+     * @throws InternalError
+     */
+    public function delete($id) {
+        try {
+            $item = $this->mapper->find($id);
+
+            // security
+            if(!$this->permissionsService->canDeleteRow($item))
+                throw new PermissionError('delete row id = '.$item->getId().' is not allowed.');
+
+            $this->mapper->delete($item);
+            return $item;
+        } catch (DoesNotExistException $e) {
+            throw new NotFoundError($e->getMessage());
+        } catch (MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
+            throw new InternalError($e->getMessage());
         }
     }
 
     /**
      * @throws \OCP\DB\Exception
+     * @throws PermissionError
      */
     public function deleteAllByTable(int $tableId): int
     {
+        // security
+        if(!$this->permissionsService->canDeleteRowsByTableId($tableId))
+            throw new PermissionError('delete all rows for table id = '.$tableId.' is not allowed.');
+
         return $this->mapper->deleteAllByTable($tableId);
     }
 
     /**
      * @throws \OCP\DB\Exception
+     * @throws PermissionError
      */
     public function deleteColumnDataFromRows(int $columnId) {
+
         $rows = $this->mapper->findAllWithColumn($columnId);
+
+        // security
+        if(count($rows) > 0) {
+            if(!$this->permissionsService->canUpdateRow($rows[0]))
+                throw new PermissionError('update row id = '.$rows[0]->getId().' within '.__FUNCTION__.' is not allowed.');
+        }
+
         foreach ($rows as $row) {
             /* @var $row Row */
             $data = $row->getDataArray();

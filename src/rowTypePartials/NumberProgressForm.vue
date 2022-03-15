@@ -28,7 +28,7 @@ export default {
 			default: null,
 		},
 		value: {
-			type: String,
+			type: Number,
 			default: null,
 		},
 	},
@@ -50,7 +50,7 @@ export default {
 					}
 				}
 			},
-			set(v) { this.$emit('update:value', v) },
+			set(v) { this.$emit('update:value', parseFloat(v)) },
 		},
 	},
 }

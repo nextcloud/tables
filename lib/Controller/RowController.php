@@ -29,10 +29,11 @@ class RowController extends Controller {
 
     /**
      * @NoAdminRequired
-     * @throws \Exception
      */
 	public function index(int $tableId): DataResponse {
-		return new DataResponse($this->service->findAllByTable($this->userId, $tableId));
+        return $this->handleError(function () use ($tableId) {
+            return $this->service->findAllByTable($tableId);
+        });
 	}
 
 	/**
@@ -40,38 +41,39 @@ class RowController extends Controller {
 	 */
 	public function show(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
-			return $this->service->find($id, $this->userId);
+			return $this->service->find($id);
 		});
 	}
 
     /**
      * @NoAdminRequired
-     * @throws Exception
      */
     public function create(
         int $tableId,
         int $columnId,
         string $data
     ): DataResponse {
-        return new DataResponse($this->service->create(
-            $tableId,
-            $columnId,
-            $this->userId,
-            $data));
+        return $this->handleError(function () use ($tableId, $columnId, $data) {
+            return $this->service->create(
+                $tableId,
+                $columnId,
+                $data);
+        });
     }
 
     /**
      * @NoAdminRequired
-     * @throws Exception
      */
     public function createComplete(
         int $tableId,
         Array $data
     ): DataResponse {
-        return new DataResponse($this->service->createComplete(
-            $tableId,
-            $this->userId,
-            $data));
+        return $this->handleError(function () use ($tableId, $data) {
+            return $this->service->createComplete(
+                $tableId,
+                $data);
+        });
+
     }
 
     /**
@@ -90,7 +92,6 @@ class RowController extends Controller {
             return $this->service->update(
                 $id,
                 $columnId,
-                $this->userId,
                 $data);
         });
     }
@@ -108,7 +109,6 @@ class RowController extends Controller {
         ) {
             return $this->service->updateSet(
                 $id,
-                $this->userId,
                 $data);
         });
     }
@@ -118,7 +118,7 @@ class RowController extends Controller {
 	 */
 	public function destroy(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
-			return $this->service->delete($id, $this->userId);
+			return $this->service->delete($id);
 		});
 	}
 }

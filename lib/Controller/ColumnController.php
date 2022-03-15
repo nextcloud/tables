@@ -28,10 +28,11 @@ class ColumnController extends Controller {
 
     /**
      * @NoAdminRequired
-     * @throws \Exception
      */
 	public function index(int $tableId): DataResponse {
-		return new DataResponse($this->service->findAllByTable($tableId));
+        return $this->handleError(function () use ($tableId) {
+    		return $this->service->findAllByTable($tableId);
+        });
 	}
 
 	/**
@@ -39,13 +40,12 @@ class ColumnController extends Controller {
 	 */
 	public function show(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
-			return $this->service->find($id, $this->userId);
+			return $this->service->find($id);
 		});
 	}
 
     /**
      * @NoAdminRequired
-     * @throws Exception
      */
 	public function create(
         int $tableId,
@@ -68,27 +68,50 @@ class ColumnController extends Controller {
         int $orderWeight = 0,
         string $datetimeDefault = ''
     ): DataResponse {
-		return new DataResponse($this->service->create(
-            $tableId,
-            $title,
-            $this->userId,
-            $type,
-            $subtype,
-            $numberPrefix,
-            $numberSuffix,
-            $mandatory,
-            $description,
-            $textDefault,
-            $textAllowedPattern,
-            $textMaxLength,
-            $numberDefault,
-            $numberMin,
-            $numberMax,
-            $numberDecimals,
-            $selectionOptions,
-            $selectionDefault,
-            $orderWeight,
-            $datetimeDefault));
+
+
+        return $this->handleError(function () use (
+                $tableId,
+                $title,
+                $type,
+                $subtype,
+                $numberPrefix,
+                $numberSuffix,
+                $mandatory,
+                $description,
+                $textDefault,
+                $textAllowedPattern,
+                $textMaxLength,
+                $numberDefault,
+                $numberMin,
+                $numberMax,
+                $numberDecimals,
+                $selectionOptions,
+                $selectionDefault,
+                $orderWeight,
+                $datetimeDefault) {
+            return $this->service->create(
+                $tableId,
+                $title,
+                $this->userId,
+                $type,
+                $subtype,
+                $numberPrefix,
+                $numberSuffix,
+                $mandatory,
+                $description,
+                $textDefault,
+                $textAllowedPattern,
+                $textMaxLength,
+                $numberDefault,
+                $numberMin,
+                $numberMax,
+                $numberDecimals,
+                $selectionOptions,
+                $selectionDefault,
+                $orderWeight,
+                $datetimeDefault);
+        });
 	}
 
 	/**

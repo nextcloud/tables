@@ -2,17 +2,11 @@
 
 namespace OCA\Tables\Controller;
 
-use Closure;
-use OCA\Activity\Data;
 use OCA\Tables\AppInfo\Application;
-use OCA\Tables\Errors\InternalError;
-use OCA\Tables\Errors\NotFoundError;
-use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\TableService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
-use OCP\AppFramework\Http;
 
 
 class TableController extends Controller {

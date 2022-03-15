@@ -8,7 +8,8 @@
 			<input v-model="localValue"
 				type="number"
 				:min="column.numberMin"
-				:max="column.numberMax">
+				:max="column.numberMax"
+				:step="column.numberDecimals === 0 ? '' : 'any'">
 			{{ column.numberSuffix }}
 		</div>
 		<div v-if="column.description" class="fix-col-2 hide-s">
@@ -30,7 +31,7 @@ export default {
 			default: null,
 		},
 		value: {
-			type: String,
+			type: Number,
 			default: null,
 		},
 	},
@@ -41,13 +42,18 @@ export default {
 	computed: {
 		localValue: {
 			get() {
-				return (this.value)
-					? this.value
-					: ((this.column.numberDefault !== undefined)
-						? this.column.numberDefault
-						: '')
+				if (this.value) {
+					return this.value
+				} else {
+					if (this.column.numberDefault !== undefined) {
+						this.$emit('update:value', this.column.numberDefault)
+						return this.column.numberDefault
+					} else {
+						return null
+					}
+				}
 			},
-			set(v) { this.$emit('update:value', v) },
+			set(v) { this.$emit('update:value', parseFloat(v)) },
 		},
 	},
 }

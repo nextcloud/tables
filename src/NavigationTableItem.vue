@@ -96,7 +96,7 @@ export default {
 			this.showDeletionConfirmation = false
 		},
 		updateActiveTable(tableId) {
-			console.debug('set new activeTableId from nav', tableId)
+			// console.debug('set new activeTableId from nav', tableId)
 			// this.$store.commit('setActiveTableId', tableId)
 			if ((this.activeTable && this.activeTable.id !== tableId) || !this.activeTable) {
 				this.$router.push({
@@ -113,7 +113,7 @@ export default {
 				// const data = { title: newTitle }
 				const data = this.table
 				data.title = newTitle
-				console.debug('data to update', data)
+				// console.debug('data to update', data)
 				const res = await axios.put(generateUrl('/apps/tables/table/' + this.table.id), data)
 				if (res.status === 200) {
 					showSuccess(t('tables', 'Tables title is updated to »{table}«', { table: res.data.title }))
