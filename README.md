@@ -1,7 +1,18 @@
 # Nextcloud App »Tables«
 
-This app is for managing data in tables.
-The use should be lightweight and well integrated into the Nextcloud environment.
+Manage data within tables.
+
+With this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.
+You can choose from the following column types:
+- Textline or long text
+- link
+- Number
+- Progressbar
+- stars rating
+- yes / no tick
+- date and/or time
+
+Have a good time and manage whatever you want.
 
 ## Features
 - Create and edit tables, from scratch or templates

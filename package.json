@@ -1,7 +1,7 @@
 {
 	"name": "tables",
-	"description": "This app is for managing data in tables.",
-	"version": "0.0.1",
+	"description": "Manage data within tables.",
+	"version": "0.0.2",
 	"author": "Florian Steffens <flost-dev@mailbox.org",
 	"bugs": {
 		"url": "https://github.com/datenangebot/tables/issues"
@@ -10,7 +10,7 @@
 		"url": "https://github.com/datenangebot/tables",
 		"type": "git"
 	},
-	"url": "https://github.com/datenangebot/tables/blob/master/README.md",
+	"url": "https://github.com/datenangebot/tables/wiki",
 	"license": "agpl",
 	"private": true,
 	"scripts": {
