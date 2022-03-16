@@ -11,10 +11,15 @@
 			</ul>
 		</template>
 		<template #footer>
-			<AppNavigationSettings :title="t('tables', 'Donation')">
-				{{ t('tables', 'This is a private project. Donations are welcome to give something back to me and my family.') }}<br>
-				<a href="https://www.paypal.com/donate/?hosted_button_id=3NBB57F2WUFTN" target="_blank">» PayPal</a><br>
-				<a href="https://buymeacoff.ee/iPbXoknVC" target="_blank">» Buy me a coffee</a><br>
+			<AppNavigationSettings :title="t('tables', 'Information')">
+				<AppNavigationItem
+					:title="t('tables', 'Documentation')"
+					icon="icon-info"
+					@click="openLink('https://github.com/datenangebot/tables/wiki')" />
+				<AppNavigationItem
+					:title="t('tables', 'Donations')"
+					icon="icon-category-workflow"
+					@click="openLink('https://github.com/datenangebot/tables/wiki/Donations')" />
 			</AppNavigationSettings>
 		</template>
 	</AppNavigation>
@@ -26,6 +31,7 @@ import CreateTable from './modals/CreateTable'
 import NavigationTableItem from './NavigationTableItem'
 import { mapState, mapGetters } from 'vuex'
 import AppNavigationSettings from '@nextcloud/vue/dist/Components/AppNavigationSettings'
+import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
 
 export default {
 	name: 'Navigation',
@@ -34,6 +40,7 @@ export default {
 		AppNavigation,
 		CreateTable,
 		AppNavigationSettings,
+		AppNavigationItem,
 	},
 	data() {
 		return {
@@ -46,6 +53,9 @@ export default {
 		...mapGetters(['activeTable']),
 	},
 	methods: {
+		openLink(link) {
+			window.open(link, '_blank')
+		},
 	},
 }
 </script>
