@@ -109,7 +109,7 @@
     position: relative;
 }
 
-/* ===== HIDE COMPONENTS ON SMALL SCREENS ============== */
+/* ===== RESIZE OR HIDE COMPONENTS ON SMALL SCREENS ============== */
 @media only screen and (max-width: 1025px) {
     .hide-m {
         display: none;

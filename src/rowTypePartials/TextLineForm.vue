@@ -10,14 +10,13 @@
 				</div>
 			</div>
 		</div>
-		<div class="fix-col-3" :class="{ 'margin-bottom': !column.description }">
+		<div class="fix-col-2" :class="{ 'margin-bottom': !column.description }">
 			<input v-model="localValue" :maxlength="column.textMaxLength">
 		</div>
-		<div v-if="column.description" class="fix-col-1 hide-s">
-&nbsp;
-		</div>
-		<div v-if="column.description" class="fix-col-3 p span margin-bottom">
-			{{ column.description }}
+		<div class="fix-col-1 p span margin-bottom">
+			<div class="hint-padding-left">
+				{{ column.description }}
+			</div>
 		</div>
 	</div>
 </template>
@@ -58,3 +57,16 @@ export default {
 	},
 }
 </script>
+<style scoped>
+
+.hint-padding-left {
+	padding-left: 20px;
+}
+
+@media only screen and (max-width: 641px) {
+	.hint-padding-left {
+		padding-left: 0;
+	}
+}
+
+</style>
