@@ -20,15 +20,16 @@
 					<ActionButton :close-after-click="true" icon="icon-external" @click="copyClipboard">
 						{{ t('tables', 'Copy table to clipboard') }}
 					</ActionButton>
-					<!--
-					<ActionButton :close-after-click="true" icon="icon-clippy">
-						{{ t('tables', 'Click here and then »strg + v«') }}
+					<ActionButton :close-after-click="true" icon="icon-clippy" @click="importClipboard">
+						{{ t('tables', 'Paste from clipboard') }}
 					</ActionButton>
-					-->
 					<ActionButton :close-after-click="true" icon="icon-file" @click="print">
 						{{ t('tables', 'Print') }}
 					</ActionButton>
 				</Actions>
+				<div v-if="insertedRows" class="insertedRowsInfo">
+					Inserted rows: {{ insertedRows }}
+				</div>
 			</div>
 		</div>
 		<div class="row">
@@ -36,7 +37,8 @@
 				v-model="getData"
 				:options="getOptions"
 				@cell-edited="actionEdited"
-				@cell-click="actionCellClick" />
+				@cell-click="actionCellClick"
+				@row-added="callbackRowAdded" />
 		</div>
 		<DialogConfirmation
 			:show-modal="deleteRows"
@@ -54,6 +56,7 @@
 			:show-modal="getEditRow !== null"
 			@update-rows="actionUpdateRows"
 			@close="editRowId = null" />
+		<PasteRowsInfo :show-modal="showModalPasteRowsInfo" @close="showModalPasteRowsInfo = false" />
 	</div>
 </template>
 
@@ -71,10 +74,12 @@ import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import ActionCheckbox from '@nextcloud/vue/dist/Components/ActionCheckbox'
 import Moment from '@nextcloud/moment'
 import EditRow from '../../modals/EditRow'
+import PasteRowsInfo from '../../modals/PasteRowsInfo'
 
 export default {
 	name: 'NcTable',
 	components: {
+		PasteRowsInfo,
 		EditRow,
 		CreateRow,
 		DialogConfirmation,
@@ -101,7 +106,7 @@ export default {
 					paginationSizeSelector: [5, 10, 30, 100],
 					layout: 'fitDataFill',
 					clipboard: true,
-					// clipboardPasteAction: 'insert',
+					clipboardPasteAction: 'insert',
 					printAsHtml: true,
 					// columnMaxWidth: 300,
 				}
@@ -115,6 +120,9 @@ export default {
 			deleteRowsCount: 0,
 			showFilter: false,
 			editRowId: null,
+			insertedRows: null,
+			insertedRowsTimer: null,
+			showModalPasteRowsInfo: false,
 		}
 	},
 	computed: {
@@ -200,7 +208,6 @@ export default {
 
 				return true // must return a boolean, true if it passes the filter.
 			}
-
 			const headerFilterFunctionCheckbox = function(headerValue, rowValue, rowData, filterParams) {
 				// headerValue - the value of the header filter element
 				// rowValue - the value of the column in this row
@@ -391,13 +398,6 @@ export default {
 			o.locale = 'specific'
 			o.langs = lang
 			o.printHeader = '<h1>' + this.activeTable.title + '<h1>'
-			/* o.rowFormatter = function(row) {
-				const height = '49px'
-				row.getElement().style.height = height
-				row.getCells().forEach(c => {
-					c.style.height = height
-				})
-			} */
 			return o
 		},
 		getData() {
@@ -427,6 +427,41 @@ export default {
 		},
 	},
 	methods: {
+		async callbackRowAdded(row) {
+			// this is triggered if a user paste data from clipboard
+			const data = []
+			for (const [key, value] of Object.entries(row._row.data)) {
+				const parts = key.split('-')
+				if (parts[0] === 'column') {
+					data.push({
+						columnId: parseInt(parts[1]),
+						value,
+					})
+				}
+			}
+
+			try {
+				const res = await axios.post(generateUrl('/apps/tables/row'), { tableId: this.activeTable.id, data })
+				if (res.status === 200) {
+					if (!this.insertedRows) {
+						this.insertedRows = 1
+					} else {
+						this.insertedRows++
+					}
+					clearTimeout(this.insertedRowsTimer)
+					this.insertedRowsTimer = setTimeout(() => {
+						showSuccess(t('tables', '{number} rows were saved.', { number: this.insertedRows }))
+						this.insertedRows = null
+					}, 2000)
+				} else {
+					showWarning(t('tables', 'Sorry, something went wrong.'))
+					console.debug('axios error', res)
+				}
+			} catch (e) {
+				console.error(e)
+				showError(t('tables', 'Could not create new row'))
+			}
+		},
 		actionUpdateRows() {
 			this.$emit('update-rows')
 		},
@@ -508,8 +543,9 @@ export default {
 			showSuccess(t('tables', 'Table copied to clipboard.'))
 		},
 		importClipboard() {
-			document.getElementById('tabulator').focus()
-			showInfo(t('tables', 'Now press »strg + v«'))
+			this.showModalPasteRowsInfo = true
+			// document.getElementById('tabulator').focus()
+			// showInfo(t('tables', 'Now press »strg + v«'))
 		},
 		print() {
 			this.$refs.tabulator.getInstance().print('all', true, {})
@@ -525,3 +561,11 @@ export default {
 	},
 }
 </script>
+<style scoped>
+
+.insertedRowsInfo {
+	align-self: center;
+	padding-left: 10px;
+}
+
+</style>
