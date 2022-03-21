@@ -1,15 +1,8 @@
 <template>
 	<div>
-		<div v-if="somethingIsLoading" class="icon-loading" />
-		<div v-if="!somethingIsLoading && !activeTable" class="row-with-margin">
-			<EmptyContent icon="icon-category-organization">
-				{{ t('tables', 'No table in context') }}
-				<template #desc>
-					{{ t('tables', 'Please create or select a table from the left.') }}
-				</template>
-			</EmptyContent>
-		</div>
-		<div v-if="!somethingIsLoading && activeTable">
+		<div v-if="loading" class="icon-loading" />
+
+		<div v-if="!loading">
 			<div class="row-with-margin">
 				<TableDescription :active-table="activeTable"
 					:columns="columns"
@@ -24,7 +17,6 @@
 
 <script>
 import TableDescription from './sections/TableDescription'
-import EmptyContent from '@nextcloud/vue/dist/Components/EmptyContent'
 import NcTable from './sections/NcTable'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
@@ -35,7 +27,6 @@ export default {
 	name: 'TableDefaultView',
 	components: {
 		TableDescription,
-		EmptyContent,
 		NcTable,
 	},
 	data() {
@@ -46,11 +37,8 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(['tables', 'tablesLoading']),
+		...mapState(['tables']),
 		...mapGetters(['activeTable']),
-		somethingIsLoading() {
-			return this.tablesLoading || this.loading
-		},
 	},
 	watch: {
 		activeTable() {

@@ -4,6 +4,11 @@
 			<CreateTable />
 			<div v-if="tablesLoading" class="icon-loading" />
 			<ul v-if="!tablesLoading">
+				<AppNavigationItem
+					:title="t('tables', 'Startpage')"
+					icon="icon-home"
+					@click="updateActiveTable(null)" />
+
 				<NavigationTableItem
 					v-for="table in tables"
 					:key="table.id"
@@ -55,6 +60,12 @@ export default {
 	methods: {
 		openLink(link) {
 			window.open(link, '_blank')
+		},
+		updateActiveTable(tableId) {
+			this.$router.push({
+				name: 'table',
+				params: { tableId },
+			})
 		},
 	},
 }
