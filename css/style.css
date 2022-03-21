@@ -23,7 +23,7 @@ p, .p {
     padding-bottom: 7px;
 }
 
-p span, .p span, .p .span, p .span, .p .span, .p.span {
+p span, .p span, .p .span, p .span, .p .span, .p.span, p.span {
     font-weight: 100;
 }
 
