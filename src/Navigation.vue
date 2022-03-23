@@ -5,7 +5,7 @@
 			<div v-if="tablesLoading" class="icon-loading" />
 			<ul v-if="!tablesLoading">
 				<AppNavigationItem
-					:title="t('tables', 'Startpage')"
+					:title="t('tables', 'Start page')"
 					icon="icon-home"
 					@click="updateActiveTable(null)" />
 

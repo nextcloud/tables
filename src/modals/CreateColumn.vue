@@ -97,7 +97,7 @@
 			<div v-if="combinedType === 'selection-check'">
 				<div class="row">
 					<div class="col-4">
-						<h3>{{ t('tables', 'Yes / No column specific parameters') }}</h3>
+						<h3>{{ t('tables', 'Yes/No column specific parameters') }}</h3>
 					</div>
 				</div>
 				<SelectionCheckForm :selection-default.sync="selectionDefault" />
@@ -221,7 +221,7 @@ export default {
 
 				// { id: 'selection', label: t('tables', 'Selection') },
 				// { id: 'selection-multi', label: t('tables', 'Multiselect') },
-				{ id: 'selection-check', label: t('tables', 'Yes / No') },
+				{ id: 'selection-check', label: t('tables', 'Yes/No') },
 
 				{ id: 'datetime', label: t('tables', 'Date and time') },
 				{ id: 'datetime-date', label: t('tables', 'Date') },
@@ -298,7 +298,7 @@ export default {
 				// console.debug('try so send new column', data)
 				const res = await axios.post(generateUrl('/apps/tables/column'), data)
 				if (res.status === 200) {
-					showSuccess(t('tables', 'The column »{column}« was created.', { column: data.title }))
+					showSuccess(t('tables', 'The column "{column}" was created.', { column: data.title }))
 				} else {
 					showWarning(t('tables', 'Sorry, something went wrong.'))
 					console.debug('axios error', res)

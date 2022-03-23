@@ -6,7 +6,7 @@
 					{{ column.title }}
 				</div>
 				<div v-if="column.textMaxLength !== -1" class="fix-col-4 p span" style="padding-bottom: 0; padding-top: 0;">
-					{{ t('tables', 'length: {length} / {maxLength}', { length, maxLength: column.textMaxLength }) }}
+					{{ t('tables', 'length: {length}/{maxLength}', { length, maxLength: column.textMaxLength }) }}
 				</div>
 			</div>
 		</div>

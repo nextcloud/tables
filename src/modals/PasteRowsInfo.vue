@@ -8,7 +8,7 @@
 				<div class="col-4">
 					<ol>
 						<li>{{ t('tables', 'Click inside the table.') }}</li>
-						<li>{{ t('tables', 'Then push the buttons »strg + v« or as a mac user »⌘ + v«.') }}</li>
+						<li>{{ t('tables', 'Then push the buttons "Ctrl + V" or as a mac user "⌘ + V".') }}</li>
 					</ol>
 				</div>
 				<div class="col-4">

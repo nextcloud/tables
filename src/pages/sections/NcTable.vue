@@ -382,14 +382,14 @@ export default {
 						first_title: t('tables', 'First page'),
 						last: t('tables', 'Last'),
 						last_title: t('tables', 'Last page'),
-						prev: t('tables', 'Back'),
+						prev: t('tables', 'Previous'),
 						prev_title: t('tables', 'Previous page'),
 						next: t('tables', 'Next'),
 						next_title: t('tables', 'Next page'),
 						page_size: t('tables', 'Number items'),
 					},
 					headerFilters: {
-						default: t('tables', 'Textfilter'), // default header filter placeholder text
+						default: t('tables', 'Text filter'), // default header filter placeholder text
 					},
 				},
 			}
@@ -450,6 +450,7 @@ export default {
 					}
 					clearTimeout(this.insertedRowsTimer)
 					this.insertedRowsTimer = setTimeout(() => {
+						// TODO add plural
 						showSuccess(t('tables', '{number} rows were saved.', { number: this.insertedRows }))
 						this.insertedRows = null
 					}, 2000)
@@ -545,7 +546,7 @@ export default {
 		importClipboard() {
 			this.showModalPasteRowsInfo = true
 			// document.getElementById('tabulator').focus()
-			// showInfo(t('tables', 'Now press »strg + v«'))
+			// showInfo(t('tables', 'Now press "Ctrl + V"'))
 		},
 		print() {
 			this.$refs.tabulator.getInstance().print('all', true, {})

@@ -27,8 +27,8 @@
 			</ActionButton>
 		</template>
 		<DialogConfirmation
-			:description="t('tables', 'Do you really want to delete the table »{table}«?', { table: table.title })"
-			:title="t('tables', 'Confirmation table deleting')"
+			:description="t('tables', 'Do you really want to delete the table \'{table}\'?', { table: table.title })"
+			:title="t('tables', 'Confirm table deletion')"
 			:cancel-title="t('tables', 'Cancel')"
 			:confirm-title="t('tables', 'Delete')"
 			confirm-class="error"
@@ -116,7 +116,7 @@ export default {
 				// console.debug('data to update', data)
 				const res = await axios.put(generateUrl('/apps/tables/table/' + this.table.id), data)
 				if (res.status === 200) {
-					showSuccess(t('tables', 'Tables title is updated to »{table}«', { table: res.data.title }))
+					showSuccess(t('tables', 'Table title is updated to "{table}"', { table: res.data.title }))
 					await this.$store.dispatch('loadTablesFromBE')
 				} else {
 					showWarning(t('tables', 'Sorry, something went wrong.'))

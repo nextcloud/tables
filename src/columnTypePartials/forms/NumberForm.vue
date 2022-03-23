@@ -47,7 +47,7 @@
 
 			<!-- prefix -->
 			<div class="fix-col-1">
-				{{ t('tables', 'prefix') }}
+				{{ t('tables', 'Prefix') }}
 			</div>
 			<div class="fix-col-1">
 			&nbsp;
@@ -58,7 +58,7 @@
 
 			<!-- suffix -->
 			<div class="fix-col-1">
-				{{ t('tables', 'suffix') }}
+				{{ t('tables', 'Suffix') }}
 				<Popover>
 					<template #trigger>
 						<button class="icon-details" />

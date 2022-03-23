@@ -7,7 +7,7 @@
 			</div>
 			<div class="fix-col-3 margin-bottom">
 				<textarea v-model="localSelectionOptions" />
-				{{ t('tables', 'Put a option name at each line.') }}
+				{{ t('tables', 'Put an option name at each line.') }}
 			</div>
 		</div>
 	</div>

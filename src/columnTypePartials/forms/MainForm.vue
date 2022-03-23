@@ -5,7 +5,7 @@
 			{{ t('tables', 'Title') }}
 		</div>
 		<div class="fix-col-3 margin-bottom" :class="{error: titleMissingError}">
-			<input v-model="localTitle" :placeholder="t('tables', 'Title for the column.')">
+			<input v-model="localTitle" :placeholder="t('tables', 'Enter a column title.')">
 		</div>
 
 		<!-- description -->

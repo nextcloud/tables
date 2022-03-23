@@ -86,7 +86,7 @@
 							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
 						<span v-if="column.type === 'selection' && column.subtype === 'multi'" class="block">{{ t('tables', 'Multiselect') }}
 							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
-						<span v-if="column.type === 'selection' && column.subtype === 'check'" class="block">{{ t('tables', 'Yes / No') }}
+						<span v-if="column.type === 'selection' && column.subtype === 'check'" class="block">{{ t('tables', 'Yes/No') }}
 							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
 
 						<span v-if="column.type === 'datetime' && !column.subtype" class="block">{{ t('tables', 'Date and time') }}
@@ -125,7 +125,7 @@
 					</div>
 					<div v-if="column.id === deleteId" class="row">
 						<div class="col-4">
-							<h4>{{ t('tables', 'Do you really want to delete the column »{column}«?', { column: column.title }) }}</h4>
+							<h4>{{ t('tables', 'Do you really want to delete the column "{column}"?', { column: column.title }) }}</h4>
 						</div>
 						<div class="col-4">
 							<button class="secondary" @click="deleteId = null">
@@ -271,7 +271,7 @@ export default {
 		},
 		async safeColumn() {
 			if (this.editColumn.title === '') {
-				showError(t('tables', 'Can not update column. Title is missing.'))
+				showError(t('tables', 'Cannot update column. Title is missing.'))
 				this.editErrorTitle = true
 				return
 			}
@@ -288,7 +288,7 @@ export default {
 		},
 		async sendEditColumnToBE() {
 			if (!this.editColumn) {
-				showError(t('tables', 'Error occurs, see the logs.'))
+				showError(t('tables', 'An error occurred. See the logs.'))
 				console.debug('tried to send editColumn to BE, but it is null', this.editColumn)
 				return
 			}
@@ -296,7 +296,7 @@ export default {
 				// console.debug('try so send column', this.editColumn)
 				const res = await axios.put(generateUrl('/apps/tables/column/' + this.editColumn.id), this.editColumn)
 				if (res.status === 200) {
-					showSuccess(t('tables', 'The column »{column}« was updated.', { column: this.editColumn.title }))
+					showSuccess(t('tables', 'The column "{column}" was updated.', { column: this.editColumn.title }))
 					await this.getColumnsForTableFromBE()
 				} else {
 					showWarning(t('tables', 'Sorry, something went wrong.'))
@@ -315,7 +315,7 @@ export default {
 		},
 		async deleteColumnAtBE(columnId) {
 			if (!columnId) {
-				showError(t('tables', 'Error occurs, see the logs.'))
+				showError(t('tables', 'An error occurred. See the logs.'))
 				console.debug('tried to delete column at BE, but it is null', columnId)
 				return
 			}
