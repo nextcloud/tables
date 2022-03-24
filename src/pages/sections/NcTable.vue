@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="row padding-left" style="margin-bottom: 0px;">
-			<div class="col-4">
+			<div v-if="hasColumns" class="col-4">
 				<Actions>
 					<ActionButton :close-after-click="true" icon="icon-add" @click="newRow = true">
 						{{ t('tables', 'Add new row') }}
@@ -32,7 +32,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="row">
+		<div v-if="hasColumns" class="row">
 			<TabulatorComponent ref="tabulator"
 				v-model="getData"
 				:options="getOptions"
@@ -425,6 +425,9 @@ export default {
 				return null
 			}
 		},
+		hasColumns() {
+			return !(this.columns === null || this.columns.length === 0)
+		},
 	},
 	methods: {
 		async callbackRowAdded(row) {
@@ -450,8 +453,7 @@ export default {
 					}
 					clearTimeout(this.insertedRowsTimer)
 					this.insertedRowsTimer = setTimeout(() => {
-						// TODO add plural
-						showSuccess(t('tables', '{number} rows were saved.', { number: this.insertedRows }))
+						showSuccess(n('tables', '%n row was saved.', '%n rows were saved.', this.insertedRows))
 						this.insertedRows = null
 					}, 2000)
 				} else {

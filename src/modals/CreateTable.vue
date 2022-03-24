@@ -105,15 +105,13 @@ export default {
 	},
 	methods: {
 		async submit(template) {
-			console.debug('try to add table from template', template)
 			if (this.title === '') {
 				showError(t('tables', 'Cannot create new table. Title is missing.'))
 				this.errorTitle = true
 			} else {
-				console.debug('submit okay, try to send to BE')
 				const newTableId = await this.sendNewTableToBE(template)
 				if (newTableId) {
-					this.$store.commit('setActiveTableId', newTableId)
+					await this.$router.push('/table/' + newTableId)
 				}
 				this.showModal = false
 				showSuccess(t('tables', 'The table "{table}" was created.', { table: this.title }))

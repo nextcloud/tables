@@ -3,10 +3,9 @@
 		:class="{ 'box-1': size === 1, 'box-2': size === 2, 'box-3': size === 3, 'box-4': size === 4 }"
 		:style="{ minHeight: `${minHeight}px` }">
 		<h4 v-if="header" class="header">
-			<div v-if="icon" class="icon">
-				{{ icon }}
-			</div>
-			{{ header }}
+			<router-link :to="'/table/' + tableId">
+				{{ header }}
+			</router-link>
 		</h4>
 		<div class="body">
 			<slot />
@@ -23,7 +22,7 @@ import '@nextcloud/dialogs/styles/toast.scss'
 // import { showError, showSuccess } from '@nextcloud/dialogs'
 
 export default {
-	name: 'Box',
+	name: 'TableBox',
 	props: {
 		header: {
 			type: String,
@@ -48,6 +47,10 @@ export default {
 		icon: {
 			type: String,
 			default: '',
+		},
+		tableId: {
+			type: Number,
+			default: null,
 		},
 	},
 }

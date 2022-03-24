@@ -162,7 +162,7 @@ class TableTemplateService {
             $tableId,
 
             // title
-            (isset($parameters['title']) && $parameters['title'] != '') ? $parameters['title'] : $this->l->t('Dummy title'),
+            (isset($parameters['title']) && $parameters['title'] != '') ? $parameters['title'] : $this->l->t('No title given'),
 
             // userId
             $this->userId,

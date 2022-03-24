@@ -7,7 +7,7 @@
 				<AppNavigationItem
 					:title="t('tables', 'Start page')"
 					icon="icon-home"
-					@click="updateActiveTable(null)" />
+					@click="$router.push('/').catch(() => {})" />
 
 				<NavigationTableItem
 					v-for="table in tables"
@@ -60,12 +60,6 @@ export default {
 	methods: {
 		openLink(link) {
 			window.open(link, '_blank')
-		},
-		updateActiveTable(tableId) {
-			this.$router.push({
-				name: 'table',
-				params: { tableId },
-			})
 		},
 	},
 }

@@ -2,7 +2,7 @@
 	<div>
 		<div v-if="loading" class="icon-loading" />
 
-		<div v-if="!loading">
+		<div v-if="!loading && activeTable">
 			<div class="row-with-margin">
 				<TableDescription :active-table="activeTable"
 					:columns="columns"

@@ -9,16 +9,9 @@
 		:edit-label="t('tables', 'Edit title')"
 		:allow-collapse="true"
 		:open="false"
-		@update:title="updateTableTitle"
-		@click="updateActiveTable(table.id)">
+		:to="'/table/' + parseInt(table.id)"
+		@update:title="updateTableTitle">
 		<template slot="actions">
-			<!--
-			<ActionButton
-				:close-after-click="true"
-				icon="icon-fullscreen">
-				{{ t('tables', 'Add view') }}
-			</ActionButton>
-			-->
 			<ActionButton
 				icon="icon-delete"
 				:close-after-click="true"
@@ -76,7 +69,6 @@ export default {
 			this.showDeletionConfirmation = true
 		},
 		async deleteMe() {
-			console.debug('click on confirm to delete', null)
 			try {
 				const res = await axios.delete(generateUrl('/apps/tables/table/' + this.table.id))
 				if (res.status === 200) {
@@ -89,26 +81,15 @@ export default {
 					this.$store.commit('setActiveTableId', null)
 				}
 				await this.$store.dispatch('loadTablesFromBE')
+				await this.$router.push('/')
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not fetch tables'))
 			}
 			this.showDeletionConfirmation = false
 		},
-		updateActiveTable(tableId) {
-			// console.debug('set new activeTableId from nav', tableId)
-			// this.$store.commit('setActiveTableId', tableId)
-			if ((this.activeTable && this.activeTable.id !== tableId) || !this.activeTable) {
-				this.$router.push({
-					name: 'table',
-					params: { tableId },
-				})
-			} else {
-				console.debug('no route update performed')
-			}
-		},
 		async updateTableTitle(newTitle) {
-			console.debug('try to set new table title: ', newTitle)
+			// console.debug('try to set new table title: ', newTitle)
 			try {
 				// const data = { title: newTitle }
 				const data = this.table

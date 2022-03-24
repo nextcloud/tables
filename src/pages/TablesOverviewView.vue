@@ -1,24 +1,37 @@
 <template>
-	<div class="row padding-left">
-		<div class="col-4 row-with-margin">
-			<h2>{{ t('tables', 'All tables') }}</h2>
+	<div>
+		<div class="row padding-left">
+			<div class="col-4 row-with-margin">
+				<h2>{{ t('tables', 'All tables') }}</h2>
+			</div>
+			<div class="col-4">
+				<TableBox v-for="table in tables"
+					:key="table.id"
+					:header="table.title"
+					:table-id="table.id">
+					{{ t('tables', 'Owner: {ownerName}', { ownerName: table.ownership }) }}
+				</TableBox>
+			</div>
 		</div>
-		<div class="col-4">
-			<Box v-for="table in tables" :key="table.id" :header="table.title">
-				{{ t('tables', 'Ownership: {ownerName}', { ownerName: table.ownership }) }}
-			</Box>
-		</div>
+		<EmptyContent v-if="!tables || tables.length === 0" icon="icon-category-organization">
+			{{ t('tables', 'No tables') }}
+			<template #desc>
+				{{ t('tables', 'Please create a table on the left.') }}
+			</template>
+		</EmptyContent>
 	</div>
 </template>
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import Box from '../partials/Box'
+import TableBox from '../partials/TableBox'
+import EmptyContent from '@nextcloud/vue/dist/Components/EmptyContent'
 
 export default {
 	name: 'TablesOverviewView',
 	components: {
-		Box,
+		TableBox,
+		EmptyContent,
 	},
 	data() {
 		return {
@@ -27,8 +40,6 @@ export default {
 	computed: {
 		...mapState(['tables']),
 		...mapGetters(['activeTable']),
-	},
-	methods: {
 	},
 }
 </script>
