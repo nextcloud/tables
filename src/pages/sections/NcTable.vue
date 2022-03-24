@@ -205,7 +205,7 @@ export default {
 					} else if (item.type === 'selection' && item.subtype === 'check') {
 						formatter = 'tickCross'
 						validator = item.mandatory ? 'required' : null
-						minWidth = 60
+						minWidth = 80
 						headerFilterFunc = this.headerFilterFunctionCheckbox
 						headerFilter = true
 						formatterClipboard = this.selectionCheckFormatterClipboard
