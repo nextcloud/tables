@@ -118,7 +118,7 @@ class TableTemplateService {
             'title' => $this->l->t('Description'),
             'type' => 'text',
             'subtype' => 'long',
-            'description' => 'Title or short description',
+            'description' => $this->l->t('Title or short description'),
             'textMultiline' => true,
             'orderWeight' => 40,
         ];
@@ -128,7 +128,7 @@ class TableTemplateService {
             'title' => $this->l->t('Target'),
             'type' => 'text',
             'subtype' => 'long',
-            'description' => 'Date, time or whatever',
+            'description' => $this->l->t('Date, time or whatever'),
             'orderWeight' => 30,
         ];
         $this->createColumn($table->id, $params);
