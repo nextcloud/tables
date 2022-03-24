@@ -46,7 +46,8 @@ export default new Vuex.Store({
 			state.tablesLoading = !!(value)
 		},
 		setActiveTableId(state, tableId) {
-			state.activeTableId = tableId
+			console.debug('set activeTableId in store', tableId)
+			state.activeTableId = tableId || null
 		},
 		setTables(state, tables) {
 			state.tables = tables

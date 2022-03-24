@@ -70,11 +70,12 @@ import DialogConfirmation from '../../modals/DialogConfirmation'
 import CreateRow from '../../modals/CreateRow'
 import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
-// import moment from '@nextcloud/moment'
 import ActionCheckbox from '@nextcloud/vue/dist/Components/ActionCheckbox'
-import Moment from '@nextcloud/moment'
 import EditRow from '../../modals/EditRow'
 import PasteRowsInfo from '../../modals/PasteRowsInfo'
+import tabulatorTableMixin from '../../mixins/tabulatorTableMixin'
+import tabulatorPrintMixin from '../../mixins/tabulatorPrintMixin'
+import tabulatorClipboardMixin from '../../mixins/tabulatorClipboardMixin'
 
 export default {
 	name: 'NcTable',
@@ -88,6 +89,7 @@ export default {
 		ActionButton,
 		ActionCheckbox,
 	},
+	mixins: [tabulatorPrintMixin, tabulatorTableMixin, tabulatorClipboardMixin],
 	props: {
 		columns: {
 			type: Array,
@@ -108,7 +110,6 @@ export default {
 					clipboard: true,
 					clipboardPasteAction: 'insert',
 					printAsHtml: true,
-					// columnMaxWidth: 300,
 				}
 			},
 		},
@@ -128,120 +129,9 @@ export default {
 	computed: {
 		...mapGetters(['activeTable']),
 		getColumnsDefinition() {
-			const minMaxFilterEditor = function(cell, onRendered, success, cancel, editorParams) {
-
-				let end = null
-
-				const container = document.createElement('span')
-
-				// create and style inputs
-				const start = document.createElement('input')
-				start.setAttribute('type', 'number')
-				start.setAttribute('placeholder', 'Min')
-				start.setAttribute('min', 0)
-				start.setAttribute('max', 100)
-				start.style.padding = '4px'
-				start.style.width = '50%'
-				start.style.boxSizing = 'border-box'
-
-				start.value = cell.getValue()
-
-				/**
-				 *
-				 */
-				function buildValues() {
-					success({
-						start: start.value,
-						end: end.value,
-					})
-				}
-
-				// noinspection JSClosureCompilerSyntax
-				/**
-				 * @param {number} e - event
-				 */
-				function keypress(e) {
-					if (e.keyCode === 13) {
-						buildValues()
-					}
-
-					if (e.keyCode === 27) {
-						cancel()
-					}
-				}
-
-				end = start.cloneNode()
-				end.setAttribute('placeholder', 'Max')
-
-				start.addEventListener('change', buildValues)
-				start.addEventListener('blur', buildValues)
-				start.addEventListener('keydown', keypress)
-
-				end.addEventListener('change', buildValues)
-				end.addEventListener('blur', buildValues)
-				end.addEventListener('keydown', keypress)
-
-				container.appendChild(start)
-				container.appendChild(end)
-
-				return container
-			}
-			const minMaxFilterFunction = function minMaxFilterFunction(headerValue, rowValue, rowData, filterParams) {
-				// headerValue - the value of the header filter element
-				// rowValue - the value of the column in this row
-				// rowData - the data for the row being filtered
-				// filterParams - params object passed to the headerFilterFuncParams property
-
-				if (rowValue) {
-					if (headerValue.start !== '') {
-						if (headerValue.end !== '') {
-							return rowValue >= headerValue.start && rowValue <= headerValue.end
-						} else {
-							return rowValue >= headerValue.start
-						}
-					} else {
-						if (headerValue.end !== '') {
-							return rowValue <= headerValue.end
-						}
-					}
-				}
-
-				return true // must return a boolean, true if it passes the filter.
-			}
-			const headerFilterFunctionCheckbox = function(headerValue, rowValue, rowData, filterParams) {
-				// headerValue - the value of the header filter element
-				// rowValue - the value of the column in this row
-				// rowData - the data for the row being filtered
-				// filterParams - params object passed to the headerFilterFuncParams property
-
-				// only filter if filter checkbox is true
-				return ('' + headerValue === 'true' && '' + rowValue === 'true') || '' + headerValue === 'false' // must return a boolean, true if it passes the filter.
-			}
-
-			// start logic -------------------------------------
-
 			const def = [
-				{
-					formatter: 'rowSelection',
-					titleFormatter: 'rowSelection',
-					hozAlign: 'center',
-					headerSort: false,
-					width: 60,
-					print: false,
-				},
-				{
-					formatter: (cell, formatterParams, onRendered) => {
-						// cell - the cell component
-						// formatterParams - parameters set for the column
-						// onRendered - function to call when the formatter has been rendered
-
-						return '<button class="icon-rename" />'
-					},
-					width: 60,
-					hozAlign: 'center',
-					headerSort: false,
-					field: 'editRow',
-				},
+				this.getRowSelectionColumnDef(),
+				this.getRowEditColumnDef(),
 			]
 			if (this.columns) {
 				this.columns.forEach(item => {
@@ -255,6 +145,8 @@ export default {
 					let validator = null
 					let minWidth = 140
 					let width = null
+					let formatterClipboard = false
+					let mutatorClipboard = null
 
 					// specific parameters depending on column type
 					if (item.type === 'text' && item.subtype === 'long') {
@@ -274,8 +166,6 @@ export default {
 					} else if (item.type === 'text' && item.subtype === 'link') {
 						formatter = 'link'
 						formatterParams = {
-							// labelField:"name",
-							// urlPrefix:"mailto://",
 							target: '_blank',
 						}
 					} else if (item.type === 'number' && !item.subtype) {
@@ -285,71 +175,51 @@ export default {
 							prefix: item.numberPrefix,
 							precision: (item.numberDecimals !== undefined) ? item.numberDecimals : 2,
 						}
-						formatter = (cell, formatterParams, onRendered) => {
-							// cell - the cell component
-							// formatterParams - parameters set for the column
-							// onRendered - function to call when the formatter has been rendered
-
-							return (cell.getValue()) ? formatterParams.prefix + ' ' + (Math.round(cell.getValue() * 100) / 100).toFixed(formatterParams.precision) + ' ' + formatterParams.suffix : '' // return the contents of the cell;
-						}
+						formatter = this.numberFormatter
 						sorter = 'number'
-						headerFilter = minMaxFilterEditor
-						headerFilterFunc = minMaxFilterFunction
+						headerFilter = this.minMaxFilterEditor
+						headerFilterFunc = this.minMaxFilterFunction
 						headerFilterLiveFilter = false
 						validator = item.mandatory ? 'required' : null
 						minWidth = 110
 					} else if (item.type === 'number' && item.subtype === 'stars') {
 						formatter = 'star'
 						sorter = 'number'
-						headerFilter = minMaxFilterEditor
-						headerFilterFunc = minMaxFilterFunction
+						headerFilter = this.minMaxFilterEditor
+						headerFilterFunc = this.minMaxFilterFunction
 						headerFilterLiveFilter = false
 						validator = item.mandatory ? 'required' : null
 						minWidth = 110
+						formatterClipboard = this.numberStarsFormatterClipboard
+						mutatorClipboard = this.numberStarsAccessor
 					} else if (item.type === 'number' && item.subtype === 'progress') {
 						formatter = 'progress'
 						formatterParams = {
 							color: 'var(--color-placeholder-dark)',
 						}
 						sorter = 'number'
-						headerFilter = minMaxFilterEditor
-						headerFilterFunc = minMaxFilterFunction
+						headerFilter = this.minMaxFilterEditor
+						headerFilterFunc = this.minMaxFilterFunction
 						headerFilterLiveFilter = false
 						validator = item.mandatory ? 'required' : null
 					} else if (item.type === 'selection' && item.subtype === 'check') {
 						formatter = 'tickCross'
 						validator = item.mandatory ? 'required' : null
 						minWidth = 60
-						headerFilterFunc = headerFilterFunctionCheckbox
+						headerFilterFunc = this.headerFilterFunctionCheckbox
 						headerFilter = true
+						formatterClipboard = this.selectionCheckFormatterClipboard
+						mutatorClipboard = this.selectionCheckAccessor
 					} else if (item.type === 'datetime' && !item.subtype) {
-						formatter = (cell, formatterParams, onRendered) => {
-							// cell - the cell component
-							// formatterParams - parameters set for the column
-							// onRendered - function to call when the formatter has been rendered
-
-							return (cell.getValue()) ? Moment(cell.getValue(), 'YYYY-MM-DD HH:mm:ss').format('lll') : ''
-						}
+						formatter = this.datetimeFormatter
 						validator = item.mandatory ? 'required' : null
 						minWidth = 100
 					} else if (item.type === 'datetime' && item.subtype === 'date') {
-						formatter = (cell, formatterParams, onRendered) => {
-							// cell - the cell component
-							// formatterParams - parameters set for the column
-							// onRendered - function to call when the formatter has been rendered
-
-							return (cell.getValue()) ? Moment(cell.getValue(), 'YYYY-MM-DD HH:mm:ss').format('ll') : ''
-						}
+						formatter = this.datetimeDateFormatter
 						validator = item.mandatory ? 'required' : null
 						minWidth = 100
 					} else if (item.type === 'datetime' && item.subtype === 'time') {
-						formatter = (cell, formatterParams, onRendered) => {
-							// cell - the cell component
-							// formatterParams - parameters set for the column
-							// onRendered - function to call when the formatter has been rendered
-
-							return (cell.getValue()) ? Moment(cell.getValue(), 'HH:mm:ss').format('LT') : ''
-						}
+						formatter = this.datetimeTimeFormatter
 						validator = item.mandatory ? 'required' : null
 						minWidth = 100
 					}
@@ -369,6 +239,8 @@ export default {
 						validator,
 						headerFilterFunc,
 						headerFilterLiveFilter,
+						formatterClipboard,
+						mutatorClipboard,
 					})
 				})
 			}
@@ -455,6 +327,7 @@ export default {
 					this.insertedRowsTimer = setTimeout(() => {
 						showSuccess(n('tables', '%n row was saved.', '%n rows were saved.', this.insertedRows))
 						this.insertedRows = null
+						this.actionUpdateRows()
 					}, 2000)
 				} else {
 					showWarning(t('tables', 'Sorry, something went wrong.'))
@@ -547,11 +420,6 @@ export default {
 		},
 		importClipboard() {
 			this.showModalPasteRowsInfo = true
-			// document.getElementById('tabulator').focus()
-			// showInfo(t('tables', 'Now press "Ctrl + V"'))
-		},
-		print() {
-			this.$refs.tabulator.getInstance().print('all', true, {})
 		},
 		actionCellClick(e, cell) {
 			// e - the click event object

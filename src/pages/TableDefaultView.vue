@@ -41,10 +41,10 @@ export default {
 		...mapGetters(['activeTable']),
 	},
 	watch: {
-		activeTable() {
-			// console.debug('table changed, I will try to fetch columns')
-			this.getColumnsForTableFromBE(this.activeTable.id)
-			this.getRowsForTableFromBE(this.activeTable.id)
+		async activeTable() {
+			console.debug('table changed, I will try to fetch columns')
+			await this.getColumnsForTableFromBE(this.activeTable.id)
+			await this.getRowsForTableFromBE(this.activeTable.id)
 		},
 	},
 	methods: {
