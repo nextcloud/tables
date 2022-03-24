@@ -38,6 +38,12 @@ class TableTemplateService {
                 'icon'          => 'icon-menu-sidebar',
                 'description'   => $this->l->t('List of members with some basic attributes.')
             ],
+            [
+                'name'          => 'weight',
+                'title'         => $this->l->t('Weight tracking'),
+                'icon'          => 'icon-category-monitoring',
+                'description'   => $this->l->t('Track your weight and other health measures.')
+            ],
         ];
     }
 
@@ -49,8 +55,63 @@ class TableTemplateService {
             $this->makeTodo($table);
         } elseif ($template === 'members') {
             $this->makeMembers($table);
+        } elseif ($template === 'weight') {
+            $this->makeWeight($table);
         }
         return $table;
+    }
+
+    /**
+     * @throws InternalError
+     * @throws PermissionError
+     */
+    private function makeWeight(Table $table) {
+
+        $params = [
+            'title' => $this->l->t('Date'),
+            'type' => 'datetime',
+            'subtype' => 'date',
+            'mandatory' => true,
+            'datetimeDefault' => 'today',
+            'orderWeight' => 50,
+        ];
+        $this->createColumn($table->id, $params);
+
+        $params = [
+            'title' => $this->l->t('Weight'),
+            'type' => 'number',
+            'suffix' => 'kg',
+            'numberMin' => 0,
+            'numberMax' => 200,
+            'orderWeight' => 40,
+        ];
+        $this->createColumn($table->id, $params);
+
+        $params = [
+            'title' => $this->l->t('Body fat'),
+            'type' => 'number',
+            'numberMin' => 0,
+            'numberMax' => 100,
+            'suffix' => '%',
+            'orderWeight' => 30,
+        ];
+        $this->createColumn($table->id, $params);
+
+        $params = [
+            'title' => $this->l->t('Feeling over all'),
+            'type' => 'number',
+            'subtype' => 'stars',
+            'orderWeight' => 20,
+        ];
+        $this->createColumn($table->id, $params);
+
+        $params = [
+            'title' => $this->l->t('Comments'),
+            'type' => 'text',
+            'subtype' => 'long',
+            'orderWeight' => 10,
+        ];
+        $this->createColumn($table->id, $params);
     }
 
     /**
@@ -216,6 +277,9 @@ class TableTemplateService {
 
             // orderWeight
             (isset($parameters['orderWeight'])) ? $parameters['orderWeight'] : 0,
+
+            // datetimeDefault
+            (isset($parameters['datetimeDefault'])) ? $parameters['datetimeDefault'] : '',
         );
     }
 }

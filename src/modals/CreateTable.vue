@@ -34,7 +34,7 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="box-1">
+					<div class="box-1" style="min-height:180px;">
 						<div class="icon-category-customization icon-left">
 							<div class="header">
 								{{ t('tables', 'Custom table') }}
@@ -49,7 +49,10 @@
 					</div>
 
 					<!-- templates boxes -->
-					<div v-for="template in templates" :key="template.name" class="box-1">
+					<div v-for="template in templates"
+						:key="template.name"
+						class="box-1"
+						style="min-height:180px;">
 						<div class="icon-left" :class="template.icon">
 							<div class="header">
 								{{ template.title }}
@@ -112,9 +115,9 @@ export default {
 				const newTableId = await this.sendNewTableToBE(template)
 				if (newTableId) {
 					await this.$router.push('/table/' + newTableId)
+					showSuccess(t('tables', 'The table "{table}" was created.', { table: this.title }))
 				}
 				this.showModal = false
-				showSuccess(t('tables', 'The table "{table}" was created.', { table: this.title }))
 				this.reset()
 			}
 		},
@@ -129,6 +132,7 @@ export default {
 				if (res.status !== 200) {
 					showWarning(t('tables', 'Sorry, something went wrong.'))
 					console.debug('axios error', res)
+					return false
 				}
 				ret = res.data.id
 				await this.$store.dispatch('loadTablesFromBE')

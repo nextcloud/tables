@@ -160,4 +160,4 @@ clean-dev:
 
 # logging
 log:
-	sudo -u www-data php /var/www/html/nextcloud/occ log:watch
+	sudo -u www-data php /var/www/html/nextcloud/23/occ log:watch
