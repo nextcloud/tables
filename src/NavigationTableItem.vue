@@ -20,7 +20,7 @@
 			</ActionButton>
 		</template>
 		<DialogConfirmation
-			:description="t('tables', 'Do you really want to delete the table \'{table}\'?', { table: table.title })"
+			:description="getTranslatedDescription"
 			:title="t('tables', 'Confirm table deletion')"
 			:cancel-title="t('tables', 'Cancel')"
 			:confirm-title="t('tables', 'Delete')"
@@ -59,6 +59,9 @@ export default {
 	},
 	computed: {
 		...mapGetters(['activeTable']),
+		getTranslatedDescription() {
+			return t('tables', 'Do you really want to delete the table "{table}"?', { table: this.table.title })
+		},
 	},
 	methods: {
 		cancelDeletion() {
