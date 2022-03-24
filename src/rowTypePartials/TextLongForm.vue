@@ -10,8 +10,10 @@
 				</div>
 			</div>
 		</div>
-		<div class="fix-col-2" :class="{ 'margin-bottom': !column.description }">
-			<textarea v-model="localValue" :maxlength="column.textMaxLength" />
+		<div class="fix-col-2 margin-bottom">
+			<VueSimplemde ref="markdownEditor"
+				v-model="localValue"
+				:configs="configs" />
 		</div>
 		<div class="fix-col-1 p span margin-bottom">
 			<div class="hint-padding-left">
@@ -22,9 +24,13 @@
 </template>
 
 <script>
+import VueSimplemde from 'vue-simplemde'
 
 export default {
 	name: 'TextLongForm',
+	components: {
+		VueSimplemde,
+	},
 	props: {
 		column: {
 			type: Object,
@@ -37,9 +43,20 @@ export default {
 	},
 	data() {
 		return {
+			editor: null,
+			configs: {
+				toolbar: ['bold', 'italic', 'strikethrough', 'heading', '|', 'quote', 'code', 'unordered-list', 'ordered-list', 'link', '|', 'preview', 'fullscreen'],
+				autoDownloadFontAwesome: false,
+				placeholder: t('tables', 'Some text'),
+				spellChecker: false,
+				status: false,
+			},
 		}
 	},
 	computed: {
+		simplemde() {
+			return this.$refs.markdownEditor.simplemde
+		},
 		localValue: {
 			get() {
 				return (this.value && true)
@@ -54,9 +71,21 @@ export default {
 }
 </script>
 <style scoped>
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+@import '~simplemde/dist/simplemde.min.css';
+
+.editor {
+	padding-left: 3em;
+	padding-top: 3em;
+}
+
+.editor-toolbar a {
+	color: var(--color-main-text) !important;
+}
 
 .hint-padding-left {
 	padding-left: 20px;
+	color: var(--color-text-lighter);
 }
 
 @media only screen and (max-width: 641px) {
@@ -65,4 +94,21 @@ export default {
 	}
 }
 
+</style>
+<style>
+.editor-toolbar.fullscreen{
+	z-index: 10005;
+}
+
+.vue-simplemde {
+	width: 100%;
+}
+
+.CodeMirror, .CodeMirror-scroll {
+	min-height: 200px;
+}
+
+.CodeMirror-code.div[contenteditable=true] {
+	border: none;
+}
 </style>

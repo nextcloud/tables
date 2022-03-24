@@ -3,7 +3,7 @@
 		<div class="fix-col-1" :class="{ mandatory: column.mandatory }">
 			{{ column.title }}
 		</div>
-		<div class="fix-col-2" :class="{ 'margin-bottom': !column.description }">
+		<div class="fix-col-1" :class="{ 'margin-bottom': !column.description }">
 			{{ column.numberPrefix }}&nbsp;
 			<input v-model="localValue"
 				type="number"
@@ -12,7 +12,7 @@
 				:step="column.numberDecimals === 0 ? '' : 'any'">
 			{{ column.numberSuffix }}
 		</div>
-		<div class="fix-col-1 p span margin-bottom">
+		<div class="fix-col-2 p span margin-bottom">
 			<div class="hint-padding-left">
 				{{ column.description }}
 			</div>
