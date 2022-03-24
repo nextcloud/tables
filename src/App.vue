@@ -40,7 +40,7 @@ export default {
 	},
 	watch: {
 		'$route'(to, from) {
-			console.debug('route changed', { to, from })
+			// console.debug('route changed', { to, from })
 			this.$store.commit('setActiveTableId', parseInt(to.params.tableId))
 		},
 	},

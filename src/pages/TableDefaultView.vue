@@ -34,6 +34,7 @@ export default {
 			loading: false,
 			columns: null,
 			rows: null,
+			lastActiveTableId: null,
 		}
 	},
 	computed: {
@@ -41,13 +42,28 @@ export default {
 		...mapGetters(['activeTable']),
 	},
 	watch: {
-		async activeTable() {
+		activeTable() {
 			console.debug('table changed, I will try to fetch columns')
-			await this.getColumnsForTableFromBE(this.activeTable.id)
-			await this.getRowsForTableFromBE(this.activeTable.id)
+			this.reload()
 		},
 	},
+	mounted() {
+		this.reload()
+	},
 	methods: {
+		reload() {
+			if (!this.activeTable) {
+				console.debug('no active table set, but expected')
+				return
+			}
+
+			if (this.activeTable.id !== this.lastActiveTableId) {
+				// console.debug('try to reload')
+				this.getColumnsForTableFromBE(this.activeTable.id)
+				this.getRowsForTableFromBE(this.activeTable.id)
+				this.lastActiveTableId = this.activeTable.id
+			}
+		},
 		async getColumnsForTableFromBE(tableId) {
 			this.loading = true
 			if (!tableId) {
