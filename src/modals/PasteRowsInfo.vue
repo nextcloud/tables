@@ -7,19 +7,31 @@
 				</div>
 				<div class="col-4">
 					<ol>
-						<li>{{ t('tables', 'Click inside the table.') }}</li>
-						<li>{{ t('tables', 'Then push the buttons "Ctrl + V" or as a mac user "⌘ + V".') }}</li>
+						<li class="bold">
+							{{ t('tables', 'Click inside the table.') }}
+						</li>
+						<li class="bold">
+							{{ t('tables', 'Then push the buttons "Ctrl + V" or as a mac user "⌘ + V".') }}
+						</li>
 					</ol>
 				</div>
 				<div class="col-4">
-					<p class="span">
+					<p class="light">
 						{{ t('tables', 'The app will attempt to work out which columns in the data correspond to columns in the table. It tries three different ways to achieve this:') }}
-						<ol>
-							<li>{{ t('tables', 'First it checks the values of all columns in the first row of data to see if they match the titles of columns in the table.') }}</li>
-							<li>{{ t('tables', 'If any of the columns don\'t match it then tries the same approach but with the column ids.') }}</li>
-							<li>{{ t('tables', 'If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two bling columns for the row numbers and edit-button-column.') }}</li>
-						</ol>
 					</p>
+				</div>
+				<div class="col-4">
+					<ol>
+						<li class="light">
+							{{ t('tables', 'First it checks the values of all columns in the first row of data to see if they match the titles of columns in the table.') }}
+						</li>
+						<li class="light">
+							{{ t('tables', 'If any of the columns don\'t match it then tries the same approach but with the column ids.') }}
+						</li>
+						<li class="light">
+							{{ t('tables', 'If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two bling columns for the row numbers and edit-button-column.') }}
+						</li>
+					</ol>
 				</div>
 				<div class="col-4">
 					<button class="success" @click="actionClose">

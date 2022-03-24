@@ -23,8 +23,12 @@ p, .p {
     padding-bottom: 7px;
 }
 
-p span, .p span, .p .span, p .span, .p .span, .p.span, p.span {
+p span, .p span, .p .span, p .span, .p .span, .p.span, p.span, .light {
     font-weight: 100;
+}
+
+.bold {
+    font-weight: bold;
 }
 
 [class^='col-'] span {
