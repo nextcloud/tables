@@ -62,5 +62,10 @@ export default {
 		...mapState([]),
 		...mapGetters(['activeTable']),
 	},
+	mounted() {
+		if (this.columns.length === 0) {
+			this.showCreateColumn = true
+		}
+	},
 }
 </script>

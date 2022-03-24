@@ -1,6 +1,6 @@
 <template>
 	<div
-		:class="{ 'box-1': size === 1, 'box-2': size === 2, 'box-3': size === 3, 'box-4': size === 4 }"
+		:class="{ 'box-1': size === 1, 'box-2': size === 2, 'box-3': size === 3, 'box-4': size === 4, 'light': background === 'light' }"
 		:style="{ minHeight: `${minHeight}px` }">
 		<h4 v-if="header" class="header">
 			<router-link :to="'/table/' + tableId">
@@ -18,8 +18,6 @@
 </template>
 
 <script>
-import '@nextcloud/dialogs/styles/toast.scss'
-// import { showError, showSuccess } from '@nextcloud/dialogs'
 
 export default {
 	name: 'TableBox',
@@ -51,6 +49,10 @@ export default {
 		tableId: {
 			type: Number,
 			default: null,
+		},
+		background: {
+			type: String,
+			default: 'normal', // light
 		},
 	},
 }

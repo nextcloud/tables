@@ -109,6 +109,10 @@
     position: relative;
 }
 
+[class^='box-'].light {
+    background-color: var(--color-background-hover);
+}
+
 /* ===== RESIZE OR HIDE COMPONENTS ON SMALL SCREENS ============== */
 @media only screen and (max-width: 1025px) {
     .hide-m {
