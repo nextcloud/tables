@@ -4,7 +4,7 @@ namespace OCA\Tables\Service;
 
 use OCA\Tables\Db\Table;
 use OCA\Tables\Errors\InternalError;
-use OCP\DB\Exception;
+use OCA\Tables\Errors\PermissionError;
 use OCP\IL10N;
 
 class TableTemplateService {
@@ -42,7 +42,7 @@ class TableTemplateService {
     }
 
     /**
-     * @throws InternalError
+     * @throws InternalError|PermissionError
      */
     public function makeTemplate(Table $table, string $template): Table {
         if($template === 'todo') {
@@ -55,6 +55,7 @@ class TableTemplateService {
 
     /**
      * @throws InternalError
+     * @throws PermissionError
      */
     private function makeMembers(Table $table) {
 
@@ -102,6 +103,7 @@ class TableTemplateService {
 
     /**
      * @throws InternalError
+     * @throws PermissionError
      */
     private function makeTodo(Table $table) {
 
@@ -152,7 +154,7 @@ class TableTemplateService {
     }
 
     /**
-     * @throws InternalError
+     * @throws InternalError|PermissionError
      */
     private function createColumn($tableId, $parameters): void
     {
