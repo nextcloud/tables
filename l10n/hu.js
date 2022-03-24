@@ -20,8 +20,6 @@ OC.L10N.register(
     "Edit title" : "Cím szerkesztése",
     "Add view" : "Nézet hozzáadása",
     "Delete table" : "Táblázat törlése",
-    "Do you really want to delete the table »{table}«?" : "Biztosan törölni szeretné a »{table}« táblázatot?",
-    "Confirmation table deleting" : "Táblázat törlésének megerősítése",
     "Cancel" : "Mégse",
     "Delete" : "Törlés",
     "Table \"{table}\" deleted." : "\"{table}\" táblázat törölve."
