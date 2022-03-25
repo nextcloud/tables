@@ -26,6 +26,7 @@ class PageController extends Controller {
         Util::addStyle(Application::APP_ID, 'style');
         Util::addStyle(Application::APP_ID, 'tabulator_nextcloud');
         Util::addStyle(Application::APP_ID, 'modal');
+        Util::addStyle(Application::APP_ID, 'icons');
 
 		return new TemplateResponse(Application::APP_ID, 'main');
 	}

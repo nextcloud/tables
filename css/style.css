@@ -75,3 +75,12 @@ p span, .p span, .p .span, p .span, .p .span, .p.span, p.span, .light {
 .align-right {
     text-align: right;
 }
+
+em {
+    font-style: italic;
+}
+
+ul li {
+    list-style-type: circle;
+    margin-left: 10px;
+}

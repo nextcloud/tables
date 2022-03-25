@@ -150,7 +150,7 @@ export default {
 
 					// specific parameters depending on column type
 					if (item.type === 'text' && item.subtype === 'long') {
-						formatter = 'textarea'
+						formatter = 'html'
 						if (item.textMaxLength && parseInt(item.textMaxLength) !== -1) {
 							validator = 'maxLength:' + item.textMaxLength
 						} else {

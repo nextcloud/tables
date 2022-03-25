@@ -1,6 +1,6 @@
 <template>
 	<div class="row">
-		<div class="fix-col-1" :class="{ mandatory: column.mandatory }">
+		<div :class="{ mandatory: column.mandatory, 'fix-col-1': !showBigEditor, 'fix-col-4': showBigEditor }">
 			<div class="row">
 				<div class="fix-col-4">
 					{{ column.title }}
@@ -10,12 +10,10 @@
 				</div>
 			</div>
 		</div>
-		<div class="fix-col-2 margin-bottom">
-			<VueSimplemde ref="markdownEditor"
-				v-model="localValue"
-				:configs="configs" />
+		<div class="margin-bottom" :class="{ 'fix-col-2': !showBigEditor, 'fix-col-4': showBigEditor }">
+			<TiptapMenuBar :value.sync="localValue" @input="updateText" @big="setShowBigEditor" />
 		</div>
-		<div class="fix-col-1 p span margin-bottom">
+		<div class="p span margin-bottom" :class="{ 'fix-col-1': !showBigEditor, 'fix-col-4': showBigEditor }">
 			<div class="hint-padding-left">
 				{{ column.description }}
 			</div>
@@ -24,12 +22,12 @@
 </template>
 
 <script>
-import VueSimplemde from 'vue-simplemde'
+import TiptapMenuBar from '../partials/TiptapMenuBar'
 
 export default {
 	name: 'TextLongForm',
 	components: {
-		VueSimplemde,
+		TiptapMenuBar,
 	},
 	props: {
 		column: {
@@ -43,20 +41,10 @@ export default {
 	},
 	data() {
 		return {
-			editor: null,
-			configs: {
-				toolbar: ['bold', 'italic', 'strikethrough', 'heading', '|', 'quote', 'code', 'unordered-list', 'ordered-list', 'link', '|', 'preview', 'fullscreen'],
-				autoDownloadFontAwesome: false,
-				placeholder: t('tables', 'Some text'),
-				spellChecker: false,
-				status: false,
-			},
+			showBigEditor: false,
 		}
 	},
 	computed: {
-		simplemde() {
-			return this.$refs.markdownEditor.simplemde
-		},
 		localValue: {
 			get() {
 				return (this.value && true)
@@ -68,20 +56,17 @@ export default {
 			set(v) { this.$emit('update:value', v) },
 		},
 	},
+	methods: {
+		updateText(text) {
+			this.localValue = text
+		},
+		setShowBigEditor(v) {
+			this.showBigEditor = !!v
+		},
+	},
 }
 </script>
 <style scoped>
-@import '@fortawesome/fontawesome-free/css/all.min.css';
-@import '~simplemde/dist/simplemde.min.css';
-
-.editor {
-	padding-left: 3em;
-	padding-top: 3em;
-}
-
-.editor-toolbar a {
-	color: var(--color-main-text) !important;
-}
 
 .hint-padding-left {
 	padding-left: 20px;
@@ -94,21 +79,4 @@ export default {
 	}
 }
 
-</style>
-<style>
-.editor-toolbar.fullscreen{
-	z-index: 10005;
-}
-
-.vue-simplemde {
-	width: 100%;
-}
-
-.CodeMirror, .CodeMirror-scroll {
-	min-height: 200px;
-}
-
-.CodeMirror-code.div[contenteditable=true] {
-	border: none;
-}
 </style>
