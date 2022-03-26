@@ -16,6 +16,9 @@
 					</ol>
 				</div>
 				<div class="col-4">
+					<h3>{{ t('tables', 'Column mapping') }}</h3>
+				</div>
+				<div class="col-4">
 					<p class="light">
 						{{ t('tables', 'The app will attempt to work out which columns in the data correspond to columns in the table. It tries three different ways to achieve this:') }}
 					</p>
@@ -30,6 +33,22 @@
 						</li>
 						<li class="light">
 							{{ t('tables', 'If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two bling columns for the row numbers and edit-button-column.') }}
+						</li>
+					</ol>
+				</div>
+				<div class="col-4">
+					<h3>{{ t('tables', 'Hints') }}</h3>
+				</div>
+				<div class="col-4 margin-bottom">
+					<ol>
+						<li class="light">
+							{{ t('tables', 'The format for a date has to be like YYYY-MM-DD, for example 2022-12-24.') }}
+						</li>
+						<li class="light">
+							{{ t('tables', 'If you try to import with the order of columns, see the third attemp above, you need to blind columns at the beginnig.') }}
+						</li>
+						<li class="light">
+							{{ t('tables', 'If you are on a Chrome browser, you have to create a row first. this one can be clicked an the insert process should run.') }}
 						</li>
 					</ol>
 				</div>
