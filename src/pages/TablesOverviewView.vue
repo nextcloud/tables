@@ -9,7 +9,27 @@
 					:key="table.id"
 					:header="table.title"
 					:table-id="table.id">
-					{{ t('tables', 'Owner: {ownerName}', { ownerName: table.ownership }) }}
+					<div class="row">
+						<div class="col-2">
+							{{ t('tables', 'Owner') }}
+						</div>
+						<div class="col-2">
+							<UserBubble :user="table.ownership" />
+						</div>
+						<div class="col-2">
+							{{ t('tables', 'Created at') }}
+						</div>
+						<div class="col-2">
+							{{ table.createdAt | niceDateTime('l') }}
+							{{ table.createdAt | niceDateTime('LT') }}
+						</div>
+						<div class="col-2 light">
+							{{ t('tables', 'Internal ID') }}
+						</div>
+						<div class="col-2 light">
+							{{ table.id }}
+						</div>
+					</div>
 				</TableBox>
 			</div>
 		</div>
@@ -26,13 +46,17 @@
 import { mapState, mapGetters } from 'vuex'
 import TableBox from '../partials/TableBox'
 import EmptyContent from '@nextcloud/vue/dist/Components/EmptyContent'
+import UserBubble from '@nextcloud/vue/dist/Components/UserBubble'
+import formatting from '../mixins/formatting'
 
 export default {
 	name: 'TablesOverviewView',
 	components: {
 		TableBox,
 		EmptyContent,
+		UserBubble,
 	},
+	mixins: [formatting],
 	data() {
 		return {
 		}

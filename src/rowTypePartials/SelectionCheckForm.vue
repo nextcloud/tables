@@ -6,10 +6,16 @@
 		<div class="fix-col-1" :class="{ 'margin-bottom': !column.description }">
 			<CheckboxRadioSwitch type="switch" :checked.sync="localValue" />
 		</div>
-		<div class="fix-col-2 p span margin-bottom">
+		<div class="fix-col-1 hide-s">
+			&nbsp;
+		</div>
+		<div v-if="column.description" class="fix-col-1 p span margin-bottom">
 			<div class="hint-padding-left">
 				{{ column.description }}
 			</div>
+		</div>
+		<div v-if="!column.description" class="fix-col-1 p span margin-bottom hide-s">
+			&nbsp;
 		</div>
 	</div>
 </template>

@@ -28,7 +28,7 @@ p, .p {
     padding-bottom: 7px;
 }
 
-p span, .p span, .p .span, p .span, .p .span, .p.span, p.span, .light {
+p span, .p span, p .span, .p .span, .p.span, p.span, .light {
     font-weight: 100;
 }
 
@@ -81,11 +81,13 @@ p span, .p span, .p .span, p .span, .p .span, .p.span, p.span, .light {
     text-align: right;
 }
 
-em {
-    font-style: italic;
+.hint-padding-left {
+    padding-left: 20px;
+    color: var(--color-text-lighter);
 }
 
-ul li {
-    list-style-type: circle;
-    margin-left: 10px;
+@media only screen and (max-width: 641px) {
+    .hint-padding-left {
+        padding-left: 0;
+    }
 }

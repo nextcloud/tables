@@ -9,10 +9,16 @@
 				:min="column.numberMin"
 				:max="column.numberMax">
 		</div>
-		<div class="fix-col-2 p span margin-bottom">
+		<div class="fix-col-1 hide-s">
+			&nbsp;
+		</div>
+		<div v-if="column.description" class="fix-col-1 p span margin-bottom">
 			<div class="hint-padding-left">
 				{{ column.description }}
 			</div>
+		</div>
+		<div v-if="!column.description" class="fix-col-1 p span margin-bottom hide-s">
+			&nbsp;
 		</div>
 	</div>
 </template>

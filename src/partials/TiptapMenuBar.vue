@@ -138,36 +138,3 @@ export default {
 	}
 }
 </style>
-<style>
-
-.tiptap-wrapper div[contenteditable=true] {
-	width: 100% !important;
-}
-
-.is-active {
-	background-color: var(--color-primary) !important;
-}
-
-.tiptap-wrapper {
-	width: 100%;
-}
-
-.tiptap-wrapper .menuBar button {
-	position: relative;
-	width: 44px;
-	height: 44px;
-	margin: 0;
-	background-size: 16px;
-	border: 0;
-	background-color: transparent;
-	opacity: .5;
-	color: var(--color-main-text);
-	background-position: center center;
-	vertical-align: top;
-}
-
-.tiptap-wrapper .menuBar button:hover, .tiptap-wrapper .menuBar button:focus, .tiptap-wrapper .menuBar button:active {
-	background-color: var(--color-background-dark);
-}
-
-</style>
