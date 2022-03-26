@@ -19,7 +19,7 @@ You can choose from the following column types:
 Have a good time and manage whatever you want.
 
 ]]></description>
-    <version>0.0.2</version>
+    <version>0.1.0</version>
     <licence>agpl</licence>
     <author mail="flost-dev@mailbox.org" >Florian Steffens</author>
     <namespace>Tables</namespace>
@@ -27,6 +27,11 @@ Have a good time and manage whatever you want.
     <screenshot small-thumbnail="https://dl.datenangebot.de/nc%20tables/screenshots/tables-overview-small.png">https://dl.datenangebot.de/nc%20tables/screenshots/tables-overview.png</screenshot>
     <screenshot>https://dl.datenangebot.de/nc%20tables/screenshots/tables-newtable.png</screenshot>
     <screenshot>https://dl.datenangebot.de/nc%20tables/screenshots/tables-menu.png</screenshot>
+    <website>https://github.com/datenangebot/tables</website>
+    <documentation>
+        <user>https://github.com/datenangebot/tables/wiki</user>
+        <admin>https://github.com/datenangebot/tables/wiki/Administration</admin>
+    </documentation>
     <bugs>https://github.com/datenangebot/tables/issues</bugs>
     <dependencies>
         <nextcloud min-version="22" max-version="23"/>
