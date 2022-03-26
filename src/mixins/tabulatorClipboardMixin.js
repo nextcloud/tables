@@ -26,14 +26,19 @@ export default {
 		selectionCheckFormatterClipboard(cell, formatterParams, onRendered) {
 			return cell.getValue() === true ? 1 : 0
 		},
+		datetimeDateFormatterClipboard(cell, formatterParams, onRendered) {
+			return cell.getValue()
+		},
 		selectionCheckAccessor(value, data, type, params, column) {
 			return parseInt(value) === 1 || value === true
 		},
 		numberStarsAccessor(value, data, type, params, column) {
-			const starFull = '★'
-			console.debug('try to mutate paste stars', value)
-			console.debug('mutate res', value.split(starFull).length - 1)
-			return value.split(starFull).length - 1
+			if (isNaN(parseInt(value))) {
+				const starFull = '★'
+				return value.split(starFull).length - 1
+			} else {
+				return parseInt(value)
+			}
 		},
 	},
 }
