@@ -38,7 +38,7 @@ export default {
 			default: null,
 		},
 		value: {
-			type: String,
+			type: Number,
 			default: null,
 		},
 	},
@@ -88,7 +88,7 @@ export default {
 			}
 		},
 		less() {
-			if (this.localValue > 1) {
+			if (this.localValue > 0) {
 				this.localValue--
 			}
 		},

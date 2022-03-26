@@ -14,7 +14,7 @@
 							{{ t('tables', 'Owner') }}
 						</div>
 						<div class="col-2">
-							<UserBubble :user="table.ownership" />
+							<UserBubble :user="table.ownership" display-name="" />
 						</div>
 						<div class="col-2">
 							{{ t('tables', 'Created at') }}
