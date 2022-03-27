@@ -101,7 +101,6 @@
     "If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two bling columns for the row numbers and edit-button-column." : "如果這些選項中的任何一個匹配，應用程序將假定數據中的列與表中的可見列的順序相同，並以這種方式導入它們。行號和編輯按鈕必須有兩個 bling 列- 縱列。",
     "Could not fetch rows for table" : "無法取得表列",
     "All tables" : "所有數據庫表",
-    "Owner: {ownerName}" : "所有者︰{ownerName}",
     "No tables" : "沒有數據庫表",
     "Please create a table on the left." : "請在左側創建一個表格。",
     "Add new row" : "添加新列",

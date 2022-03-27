@@ -138,7 +138,6 @@
     "If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two bling columns for the row numbers and edit-button-column." : "Wenn eine dieser Optionen übereinstimmt, geht die App davon aus, dass die Spalten in den Daten in derselben Reihenfolge wie die sichtbaren Spalten in der Tabelle sind, und importiert diese auf diese Weise. Es müssen zwei Bling-Spalten für die Zeilennummern und die Bearbeiten-Tasten-Spalte vorhanden sein.",
     "Could not fetch rows for table" : "Konnte Zeilen für die Tabelle nicht laden",
     "All tables" : "Alle Tabellen",
-    "Owner: {ownerName}" : "Eigentümer: {ownerName}",
     "No tables" : "Keine Tabellen",
     "Please create a table on the left." : "Bitte erstellen Sie links eine Tabelle.",
     "Add new row" : "Neue Zeile hinzufügen",
@@ -172,7 +171,6 @@
     "Column ID" : "Spalten-ID",
     "Table ID" : "Tabellen-ID",
     "Today" : "Heute",
-    "length: {length}/{maxLength}" : "Länge: {length}/{maxLength}",
-    "Some text" : "Etwas Text"
+    "length: {length}/{maxLength}" : "Länge: {length}/{maxLength}"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

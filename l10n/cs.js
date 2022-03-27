@@ -140,7 +140,6 @@ OC.L10N.register(
     "If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two bling columns for the row numbers and edit-button-column." : "Pokud některá z těchto voleb odpovídá, aplikace předpokládá, že sloupce v údajích jsou ve stejném pořadí jak viditelné sloupce v tabulce a importuje je takto. Je třeba, aby zde byly dva výrazné sloupce pro čísla řádků a sloupec s tlačítky upravit.",
     "Could not fetch rows for table" : "Nepodařilo se získat řádky tabulky",
     "All tables" : "Všechny tabulky",
-    "Owner: {ownerName}" : "Vlastník: {ownerName}",
     "No tables" : "Žádné tabulky",
     "Please create a table on the left." : "Vlevo vytvořte tabulku.",
     "Add new row" : "Přidat nový řádek",
@@ -174,7 +173,6 @@ OC.L10N.register(
     "Column ID" : "Identif. soupce",
     "Table ID" : "Identif. tabulky",
     "Today" : "Dnes",
-    "length: {length}/{maxLength}" : "délka: {length}/{maxLength}",
-    "Some text" : "Nějaký text"
+    "length: {length}/{maxLength}" : "délka: {length}/{maxLength}"
 },
 "nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;");

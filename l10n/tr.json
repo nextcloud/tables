@@ -138,7 +138,6 @@
     "If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two bling columns for the row numbers and edit-button-column." : "Bu seçeneklerden birinde eşleşme bulunursa uygulama, verilerdeki sütunların tablodaki görünür sütunlarla aynı sırada olduğunu varsayar ve bunları buna göre içe aktarır. Satır numaraları ve düzenleme düğmesi sütunu için iki bling sütunu olmalıdır.",
     "Could not fetch rows for table" : "Tablo satırları alınamadı",
     "All tables" : "Tüm tablolar",
-    "Owner: {ownerName}" : "Sahibi: {ownerName}",
     "No tables" : "Herhangi bir tablo yok",
     "Please create a table on the left." : "Lütfen sol taraftan bir tablo oluşturun.",
     "Add new row" : "Yeni satır ekle",
@@ -172,7 +171,6 @@
     "Column ID" : "Sütun kodu",
     "Table ID" : "Tablo kodu",
     "Today" : "Bugün",
-    "length: {length}/{maxLength}" : "Uzunluk: {length}/{maxLength}",
-    "Some text" : "Bir metin"
+    "length: {length}/{maxLength}" : "Uzunluk: {length}/{maxLength}"
 },"pluralForm" :"nplurals=2; plural=(n > 1);"
 }
