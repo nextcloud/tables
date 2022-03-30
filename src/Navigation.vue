@@ -7,7 +7,7 @@
 				<AppNavigationItem
 					:title="t('tables', 'Start page')"
 					icon="icon-home"
-					@click="$router.push('/').catch(() => {})" />
+					@click="$router.push('/').catch(() => {}); closeNav()" />
 
 				<NavigationTableItem
 					v-for="table in tables"
@@ -37,6 +37,7 @@ import NavigationTableItem from './NavigationTableItem'
 import { mapState, mapGetters } from 'vuex'
 import AppNavigationSettings from '@nextcloud/vue/dist/Components/AppNavigationSettings'
 import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
+import { emit } from '@nextcloud/event-bus'
 
 export default {
 	name: 'Navigation',
@@ -60,6 +61,13 @@ export default {
 	methods: {
 		openLink(link) {
 			window.open(link, '_blank')
+		},
+		closeNav() {
+			if (window.innerWidth < 960) {
+				emit('toggle-navigation', {
+					open: false,
+				})
+			}
 		},
 	},
 }

@@ -10,6 +10,7 @@
 		:allow-collapse="true"
 		:open="false"
 		:to="'/table/' + parseInt(table.id)"
+		@click="closeNav"
 		@update:title="updateTableTitle">
 		<template slot="actions">
 			<ActionButton
@@ -38,6 +39,7 @@ import { generateUrl } from '@nextcloud/router'
 import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
 import DialogConfirmation from './modals/DialogConfirmation'
 import { mapGetters } from 'vuex'
+import { emit } from '@nextcloud/event-bus'
 
 export default {
 	name: 'NavigationTableItem',
@@ -64,8 +66,15 @@ export default {
 		},
 	},
 	methods: {
+		closeNav() {
+			if (window.innerWidth < 960) {
+				emit('toggle-navigation', {
+					open: false,
+				})
+			}
+		},
 		cancelDeletion() {
-			console.debug('click on cancel', null)
+			// console.debug('click on cancel', null)
 			this.showDeletionConfirmation = false
 		},
 		actionDelete() {
