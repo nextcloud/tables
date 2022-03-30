@@ -6,7 +6,7 @@ OC.L10N.register(
     "Members" : "Mitglieder",
     "List of members with some basic attributes." : "Liste der Mitglieder mit einigen grundlegenden Attributen.",
     "Weight tracking" : "Gewichtsverfolgung",
-    "Track your weight and other health measures." : "Verfolgen Sie Ihr Gewicht und andere Gesundheitsmaßnahmen.",
+    "Track your weight and other health measures." : "Verfolgen Sie Ihr Gewicht und andere Gesundheitsdaten.",
     "Date" : "Datum",
     "Weight" : "Gewicht",
     "Body fat" : "Körperfett",
