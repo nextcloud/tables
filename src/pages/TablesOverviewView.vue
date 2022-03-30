@@ -1,9 +1,11 @@
 <template>
 	<div>
-		<div class="row padding-left">
-			<div class="col-4 row-with-margin">
-				<h2>{{ t('tables', 'All tables') }}</h2>
+		<div class="row firstrow">
+			<div class="col-4">
+				<h1>{{ t('tables', 'All tables') }}</h1>
 			</div>
+		</div>
+		<div class="row padding-left">
 			<div class="col-4">
 				<TableBox v-for="table in tables"
 					:key="table.id"

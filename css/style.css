@@ -1,11 +1,9 @@
 h1 {
-    margin-top: 0;
-    font-size: xx-large;
+    font-size: x-large;
 }
 
 h2 {
-    margin-top: -10px;
-    font-size: x-large;
+    font-size: larger;
 }
 
 .modal__content h2 {
@@ -13,14 +11,12 @@ h2 {
 }
 
 h3 {
-    font-size: 20px;
-    margin-top: 40px;
-}
-h4 {
     font-size: large;
+}
+
+h4 {
+    font-size: medium;
     font-weight: 300;
-    margin-bottom: 20px;
-    margin-top: 10px;
 }
 
 p, .p {

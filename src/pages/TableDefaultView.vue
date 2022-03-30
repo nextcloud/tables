@@ -3,12 +3,10 @@
 		<div v-if="loading" class="icon-loading" />
 
 		<div v-if="!loading && activeTable">
-			<div class="row-with-margin">
-				<TableDescription :active-table="activeTable"
-					:columns="columns"
-					@reload="getColumnsForTableFromBE(activeTable.id); getRowsForTableFromBE(activeTable.id)" />
-			</div>
-			<div class="row">
+			<TableDescription :active-table="activeTable"
+				:columns="columns"
+				@reload="getColumnsForTableFromBE(activeTable.id); getRowsForTableFromBE(activeTable.id)" />
+			<div class="row" style="margin-top: 30px;">
 				<NcTable :rows="rows" :columns="columns" @update-rows="getRowsForTableFromBE(activeTable.id)" />
 			</div>
 		</div>

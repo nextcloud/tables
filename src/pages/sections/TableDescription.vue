@@ -1,29 +1,33 @@
 <template>
 	<div>
-		<h2>
-			{{ activeTable.title }}&nbsp;
-			<Actions>
-				<ActionButton :close-after-click="true" @click="showCreateColumn = true">
-					<template #icon>
-						<TableColumnPlusAfter :size="20" decorative title="" />
-					</template>
-					{{ t('tables', 'Add a new column') }}
-				</ActionButton>
-				<ActionButton :close-after-click="true" @click="showEditColumns = true">
-					<template #icon>
-						<ViewColumnOutline :size="20" decorative title="" />
-					</template>
-					{{ t('tables', 'Edit columns') }}
-				</ActionButton>
-			</Actions>
-		</h2>
-		<p v-if="!columns || columns.length === 0">
-			{{ t('tables', 'There are no columns yet, click on the three-dot menu next to the table title ahead and create some.') }}
-		</p>
-		<CreateColumn
-			:show-modal="showCreateColumn"
-			@close="showCreateColumn = false; $emit('reload')" />
-		<EditColumns :show-modal="showEditColumns" @close="showEditColumns = false; $emit('reload')" />
+		<div class="row firstrow">
+			<h1>
+				{{ activeTable.title }}&nbsp;
+				<Actions>
+					<ActionButton :close-after-click="true" @click="showCreateColumn = true">
+						<template #icon>
+							<TableColumnPlusAfter :size="20" decorative title="" />
+						</template>
+						{{ t('tables', 'Add a new column') }}
+					</ActionButton>
+					<ActionButton :close-after-click="true" @click="showEditColumns = true">
+						<template #icon>
+							<ViewColumnOutline :size="20" decorative title="" />
+						</template>
+						{{ t('tables', 'Edit columns') }}
+					</ActionButton>
+				</Actions>
+			</h1>
+		</div>
+		<div class="row padding-left">
+			<p v-if="!columns || columns.length === 0">
+				{{ t('tables', 'There are no columns yet, click on the three-dot menu next to the table title ahead and create some.') }}
+			</p>
+			<CreateColumn
+				:show-modal="showCreateColumn"
+				@close="showCreateColumn = false; $emit('reload')" />
+			<EditColumns :show-modal="showEditColumns" @close="showEditColumns = false; $emit('reload')" />
+		</div>
 	</div>
 </template>
 
@@ -64,7 +68,7 @@ export default {
 	},
 	mounted() {
 		if (this.columns && this.columns.length === 0) {
-			this.showCreateColumn = true
+			// this.showCreateColumn = true
 		}
 	},
 }

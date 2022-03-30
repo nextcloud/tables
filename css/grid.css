@@ -9,12 +9,17 @@
 }
 
 .row-with-margin {
-    margin: 40px;
-    margin-bottom: 20px;
+
 }
 
 .row.padding-left {
     padding-left: 20px;
+}
+
+.row.firstrow {
+    padding-top: 35px;
+    padding-left: 45px;
+    width: calc(100% - 45px);
 }
 
 .row::after {
@@ -48,7 +53,7 @@
     float: left;
     position: relative;
     padding: 0 20px 0 0;
-    display: flex;
+    display: block;
 }
 
 .floatReverse [class*='col-'] {
@@ -93,7 +98,9 @@
 
 [class^='box-'] .header {
     font-weight: lighter;
-    font-size: 1.35em;
+    font-size: 1.2em;
+    line-break: anywhere;
+    margin-bottom: 10px;
 }
 
 .box-1 h4, .box-2 h4, .box-3 h4, .box-4 h4 {
@@ -113,13 +120,16 @@
     background-color: var(--color-background-hover);
 }
 
+
 /* ===== RESIZE OR HIDE COMPONENTS ON SMALL SCREENS ============== */
 @media only screen and (max-width: 1025px) {
     .hide-m {
         display: none;
     }
 
-    .row-with-margin { margin: 20px; margin-left: 55px; margin-top: 30px; }
+    .row.firstrow {
+        padding-top: 20px;
+    }
 }
 
 @media only screen and (max-width: 641px) {
@@ -134,7 +144,14 @@
     .col-3 { width: calc(100% - 20px); }
     .fix-col-3 { width: 100%; }
 
-    .row-with-margin { margin: 20px 10px 10px 55px; }
+    .row.firstrow {
+        padding-top: 20px;
+    }
+
+    [class^='box-'] {
+        margin-bottom: 15px;
+        padding: 10px;
+    }
 }
 
 @media only screen and (max-width: 460px) {

@@ -2,11 +2,11 @@
 	<div
 		:class="{ 'box-1': size === 1, 'box-2': size === 2, 'box-3': size === 3, 'box-4': size === 4, 'light': background === 'light' }"
 		:style="{ minHeight: `${minHeight}px` }">
-		<h4 v-if="header" class="header">
+		<h2 v-if="header">
 			<router-link :to="'/table/' + tableId">
 				{{ header }}
 			</router-link>
-		</h4>
+		</h2>
 		<div class="body">
 			<slot />
 		</div>
