@@ -21,7 +21,7 @@
 				:value.sync="localValue"
 				@input="updateText"
 				@big="setShowBigEditor" />
-			<textarea v-if="isMobileDevice" :value="localValue" />
+			<textarea v-if="isMobileDevice" v-model="localValue" />
 		</div>
 		<div v-if="column.description" class="p span margin-bottom" :class="{ 'fix-col-1': !showBigEditor, 'fix-col-4': showBigEditor }">
 			<div class="hint-padding-left" :style="[showBigEditor ? {'padding-left': '0'} : {}]">
