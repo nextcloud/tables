@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="row firstrow">
+		<div class="row first-row">
 			<h1>
 				{{ activeTable.title }}&nbsp;
 				<Actions>
@@ -19,7 +19,7 @@
 				</Actions>
 			</h1>
 		</div>
-		<div class="row padding-left">
+		<div v-if="!loading" class="row space-LR space-T">
 			<p v-if="!columns || columns.length === 0">
 				{{ t('tables', 'There are no columns yet, click on the three-dot menu next to the table title ahead and create some.') }}
 			</p>
@@ -54,6 +54,10 @@ export default {
 		columns: {
 			type: Array,
 			default: null,
+		},
+		loading: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	data() {

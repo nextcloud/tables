@@ -2,13 +2,10 @@
 	<div style="width: 100%">
 		<!-- default -->
 		<div class="row">
-			<div class="fix-col-1">
+			<div class="fix-col-4 title">
 				{{ t('tables', 'Set today as default') }}
 			</div>
-			<div class="fix-col-1">
-      &nbsp;
-			</div>
-			<div class="fix-col-2 margin-bottom">
+			<div class="fix-col-4 margin-bottom">
 				<CheckboxRadioSwitch type="switch" :checked.sync="localDefault" />
 			</div>
 		</div>

@@ -3,7 +3,7 @@
 		<div class="fix-col-1" :class="{ mandatory: column.mandatory }">
 			{{ column.title }}
 		</div>
-		<div class="fix-col-2" :class="{ 'margin-bottom': !column.description }">
+		<div class="fix-col-2" :class="{ 'space-B': !column.description }">
 			<DatetimePicker v-model="localValue"
 				type="datetime"
 				format="YYYY-MM-DD HH:mm"
@@ -14,12 +14,12 @@
 		<div class="fix-col-1 hide-s">
 			&nbsp;
 		</div>
-		<div v-if="column.description" class="fix-col-1 p span margin-bottom">
+		<div v-if="column.description" class="fix-col-1 p span space-B">
 			<div class="hint-padding-left">
 				{{ column.description }}
 			</div>
 		</div>
-		<div v-if="!column.description" class="fix-col-1 p span margin-bottom hide-s">
+		<div v-if="!column.description" class="fix-col-1 p span space-B hide-s">
 			&nbsp;
 		</div>
 	</div>

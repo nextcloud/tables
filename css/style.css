@@ -6,10 +6,6 @@ h2 {
     font-size: larger;
 }
 
-.modal__content h2 {
-    margin-top: 0;
-}
-
 h3 {
     font-size: large;
 }
@@ -30,6 +26,14 @@ p span, .p span, p .span, .p .span, .p.span, p.span, .light {
 
 .bold {
     font-weight: bold;
+}
+
+
+.light {
+    font-weight: 100;
+    /*
+    background-color: var(--color-background-hover);
+    */
 }
 
 [class^='col-'] span {
@@ -75,15 +79,4 @@ p span, .p span, p .span, .p .span, .p.span, p.span, .light {
 
 .align-right {
     text-align: right;
-}
-
-.hint-padding-left {
-    padding-left: 20px;
-    color: var(--color-text-lighter);
-}
-
-@media only screen and (max-width: 641px) {
-    .hint-padding-left {
-        padding-left: 0;
-    }
 }

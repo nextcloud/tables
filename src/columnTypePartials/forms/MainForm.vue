@@ -1,34 +1,34 @@
 <template>
-	<div style="width: 100%">
+	<div class="row space-R">
 		<!-- title -->
-		<div class="fix-col-1 mandatory" :class="{error: titleMissingError}">
+		<div class="fix-col-4 mandatory title space-T" :class="{error: titleMissingError}">
 			{{ t('tables', 'Title') }}
 		</div>
-		<div class="fix-col-3 margin-bottom" :class="{error: titleMissingError}">
+		<div class="fix-col-4" :class="{error: titleMissingError}">
 			<input v-model="localTitle" :placeholder="t('tables', 'Enter a column title')">
 		</div>
 
 		<!-- description -->
-		<div class="fix-col-1">
+		<div class="fix-col-4 title space-T">
 			{{ t('tables', 'Description') }}
 		</div>
-		<div class="fix-col-3 margin-bottom">
+		<div class="fix-col-4">
 			<textarea v-model="localDescription" />
 		</div>
 
 		<!-- mandatory -->
-		<div class="fix-col-1">
+		<div class="fix-col-4 title space-T">
 			{{ t('tables', 'Mandatory') }}
 		</div>
-		<div class="fix-col-3 margin-bottom">
+		<div class="fix-col-4">
 			<CheckboxRadioSwitch type="switch" :checked.sync="localMandatory" />
 		</div>
 
 		<!-- order weight -->
-		<div class="fix-col-1">
+		<div class="fix-col-4 title space-T">
 			{{ t('tables', 'Order weight') }}
 		</div>
-		<div class="fix-col-3 margin-bottom">
+		<div class="fix-col-4">
 			<input v-model="localOrderWeight"
 				type="number"
 				max="100"

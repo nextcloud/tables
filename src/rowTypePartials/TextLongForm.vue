@@ -8,7 +8,7 @@
 						<template #trigger>
 							<button class="icon-info" />
 						</template>
-						<p>{{ t('tables', 'There is a bug with the editor on mobile devices, thats why you see only a simple text box.') }}</p>
+						<p>{{ t('tables', 'There is a bug with the editor on mobile devices, that is why you see only a simple text box.') }}</p>
 					</Popover>
 				</div>
 				<div v-if="column.textMaxLength !== -1" class="fix-col-4 p span" style="padding-bottom: 0; padding-top: 0;">
@@ -16,19 +16,19 @@
 				</div>
 			</div>
 		</div>
-		<div :class="{ 'fix-col-2': !showBigEditor, 'fix-col-4': showBigEditor, 'margin-bottom': !showBigEditor }">
+		<div :class="{ 'fix-col-2': !showBigEditor, 'fix-col-4': showBigEditor, 'space-B': !showBigEditor }">
 			<TiptapMenuBar v-if="!isMobileDevice"
 				:value.sync="localValue"
 				@input="updateText"
 				@big="setShowBigEditor" />
 			<textarea v-if="isMobileDevice" v-model="localValue" />
 		</div>
-		<div v-if="column.description" class="p span margin-bottom" :class="{ 'fix-col-1': !showBigEditor, 'fix-col-4': showBigEditor }">
+		<div v-if="column.description" class="p span space-B" :class="{ 'fix-col-1': !showBigEditor, 'fix-col-4': showBigEditor }">
 			<div class="hint-padding-left" :style="[showBigEditor ? {'padding-left': '0'} : {}]">
 				{{ column.description }}
 			</div>
 		</div>
-		<div v-if="!column.description" class="fix-col-1 p span margin-bottom hide-s">
+		<div v-if="!column.description" class="fix-col-1 p span space-B hide-s">
 			&nbsp;
 		</div>
 	</div>

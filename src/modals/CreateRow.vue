@@ -49,7 +49,7 @@
 					:value.sync="row[column.id]" />
 			</div>
 			<div class="row">
-				<div class="fix-col-4 margin-bottom">
+				<div class="fix-col-4 space-B space-T">
 					<button class="secondary" @click="actionCancel">
 						{{ t('tables', 'Cancel') }}
 					</button>

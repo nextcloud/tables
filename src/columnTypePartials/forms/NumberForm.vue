@@ -1,79 +1,58 @@
 <template>
-	<div style="width: 100%">
-		<!-- default -->
-		<div class="row">
-			<div class="fix-col-1">
-				{{ t('tables', 'Default') }}
-			</div>
-			<div class="fix-col-1">
-      &nbsp;
-			</div>
-			<div class="fix-col-2 margin-bottom">
-				<input v-model="defaultNum" type="number">
-			</div>
+	<div>
+		<div class="fix-col-4 title">
+			{{ t('tables', 'Default') }}
+		</div>
+		<div class="fix-col-4 space-B">
+			<input v-model="defaultNum" type="number">
+		</div>
 
-			<!-- decimals -->
-			<div class="fix-col-1">
-				{{ t('tables', 'Decimals') }}
-			</div>
-			<div class="fix-col-1">
-      &nbsp;
-			</div>
-			<div class="fix-col-2 margin-bottom">
-				<input v-model="decimals" type="number">
-			</div>
+		<!-- decimals -->
+		<div class="fix-col-4 title">
+			{{ t('tables', 'Decimals') }}
+		</div>
+		<div class="fix-col-4 space-B">
+			<input v-model="decimals" type="number">
+		</div>
 
-			<!-- min -->
-			<div class="fix-col-1">
-				{{ t('tables', 'Minimum') }}
-			</div>
-			<div class="fix-col-1">
-      &nbsp;
-			</div>
-			<div class="fix-col-2 margin-bottom">
-				<input v-model="min" type="number">
-			</div>
+		<!-- min -->
+		<div class="fix-col-4 title">
+			{{ t('tables', 'Minimum') }}
+		</div>
+		<div class="fix-col-4 space-B">
+			<input v-model="min" type="number">
+		</div>
 
-			<!-- max -->
-			<div class="fix-col-1">
-				{{ t('tables', 'Maximum') }}
-			</div>
-			<div class="fix-col-1">
-      &nbsp;
-			</div>
-			<div class="fix-col-2 margin-bottom">
-				<input v-model="max" type="number">
-			</div>
+		<!-- max -->
+		<div class="fix-col-4 title">
+			{{ t('tables', 'Maximum') }}
+		</div>
+		<div class="fix-col-4 space-B">
+			<input v-model="max" type="number">
+		</div>
 
-			<!-- prefix -->
-			<div class="fix-col-1">
-				{{ t('tables', 'Prefix') }}
-			</div>
-			<div class="fix-col-1">
-			&nbsp;
-			</div>
-			<div class="fix-col-2 margin-bottom">
-				<input v-model="localPrefix">
-			</div>
+		<!-- prefix -->
+		<div class="fix-col-4 title">
+			{{ t('tables', 'Prefix') }}
+		</div>
+		<div class="fix-col-4 space-B">
+			<input v-model="localPrefix">
+		</div>
 
-			<!-- suffix -->
-			<div class="fix-col-1">
-				{{ t('tables', 'Suffix') }}
-				<Popover>
-					<template #trigger>
-						<button class="icon-details" />
-					</template>
-					<p>
-						{{ t('tables', 'Here is a good place for a unit.') }}
-					</p>
-				</Popover>
-			</div>
-			<div class="fix-col-1">
-			&nbsp;
-			</div>
-			<div class="fix-col-2 margin-bottom">
-				<input v-model="localSuffix">
-			</div>
+		<!-- suffix -->
+		<div class="fix-col-4 title" style="display: flex;">
+			{{ t('tables', 'Suffix') }}
+			<Popover>
+				<template #trigger>
+					<button class="icon-details" />
+				</template>
+				<p>
+					{{ t('tables', 'Here is a good place for a unit.') }}
+				</p>
+			</Popover>
+		</div>
+		<div class="fix-col-4">
+			<input v-model="localSuffix">
 		</div>
 	</div>
 </template>

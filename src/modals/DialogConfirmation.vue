@@ -9,7 +9,7 @@
 					<p>{{ description }}</p>
 				</div>
 			</div>
-			<div class="row">
+			<div class="row space-T">
 				<div class="col-4 col-stretch-elements">
 					<button :class="{ error: cancelClass === 'error', success: cancelClass === 'success', warning: cancelClass === 'warning' }" @click="actionCancel">
 						{{ cancelTitle }}
@@ -77,12 +77,6 @@ export default {
 		padding: 20px;
 		min-height: inherit;
 		max-height: inherit;
-	}
-
-	@media only screen and (max-width: 1025px) {
-		.modal__content {
-			width: 35vw;
-		}
 	}
 
 </style>

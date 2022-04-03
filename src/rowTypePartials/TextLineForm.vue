@@ -10,18 +10,18 @@
 				</div>
 			</div>
 		</div>
-		<div class="fix-col-2" :class="{ 'margin-bottom': !column.description }">
+		<div class="fix-col-2" :class="{ 'space-B': !column.description }">
 			<input v-model="localValue" :maxlength="column.textMaxLength">
 		</div>
 		<div class="fix-col-1 hide-s">
 			&nbsp;
 		</div>
-		<div v-if="column.description" class="fix-col-1 p span margin-bottom">
-			<div class="hint-padding-left">
+		<div v-if="column.description" class="fix-col-1 p span space-B">
+			<div class="space-L">
 				{{ column.description }}
 			</div>
 		</div>
-		<div v-if="!column.description" class="fix-col-1 p span margin-bottom hide-s">
+		<div v-if="!column.description" class="fix-col-1 p span space-B hide-s">
 			&nbsp;
 		</div>
 	</div>

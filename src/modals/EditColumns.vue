@@ -17,15 +17,15 @@
 				:class="{ editRow: editColumn && editColumn.id === column.id, deleteRow: deleteId && deleteId === column.id }"
 				style="margin-bottom: 25px;">
 				<!-- edit mode -->
-				<div v-if="editColumn && editColumn.id === column.id" class="row">
-					<div class="col-2 margin-bottom">
+				<div v-if="editColumn && editColumn.id === column.id" class="row space-L">
+					<div class="col-2">
 						<MainForm :description.sync="editColumn.description"
 							:mandatory.sync="editColumn.mandatory"
 							:order-weight.sync="editColumn.orderWeight"
 							:title.sync="editColumn.title"
 							:title-missing-error="editErrorTitle" />
 					</div>
-					<div class="fix-col-2 margin-bottom">
+					<div class="col-2 space-LR space-T">
 						<NumberForm v-if="editColumn.type === 'number' && !editColumn.subtype"
 							:number-default.sync="editColumn.numberDefault"
 							:number-min.sync="editColumn.numberMin"
@@ -53,7 +53,7 @@
 						<DatetimeTimeForm v-if="editColumn.type === 'datetime' && editColumn.subtype === 'time'"
 							:datetime-default.sync="editColumn.datetimeDefault" />
 					</div>
-					<div class="col-4">
+					<div class="col-4 space-B space-T">
 						<button class="secondary" @click="editColumn = null">
 							{{ t('tables', 'Cancel') }}
 						</button>
@@ -65,7 +65,7 @@
 
 				<!-- no edit mode -->
 				<div v-else class="row">
-					<div class="col-1 block margin-bottom" :class="{mandatory: column.mandatory}">
+					<div class="col-1 block space-T" :class="{mandatory: column.mandatory}">
 						{{ column.title }}
 
 						<span v-if="column.type === 'number' && !column.subtype" class="block">{{ t('tables', 'Number') }}
@@ -96,38 +96,42 @@
 						<span v-if="column.type === 'datetime' && column.subtype === 'time'" class="block">{{ t('tables', 'Time') }}
 							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
 					</div>
-					<div class="col-1 margin-bottom">
+					<div class="col-1 space-T">
 						<ColumnInfoPopover :column="column" />
 
 						{{ column.description | truncate(50, '...') }}
 					</div>
-					<div class="col-1 margin-bottom">
-						<NumberTableDisplay v-if="column.type === 'number' && !column.subtype" :column="column" />
-						<NumberStarsTableDisplay v-if="column.type === 'number' && column.subtype === 'stars'" :column="column" />
-						<NumberProgressTableDisplay v-if="column.type === 'number' && column.subtype === 'progress'" :column="column" />
-						<TextLineTableDisplay v-if="column.type === 'text' && column.subtype === 'line'" :column="column" />
-						<TextLongTableDisplay v-if="column.type === 'text' && column.subtype === 'long'" :column="column" />
-						<TextLinkTableDisplay v-if="column.type === 'text' && column.subtype === 'link'" :column="column" />
-						<SelectionCheckTableDisplay v-if="column.type === 'selection' && column.subtype === 'check'" :column="column" />
-						<DatetimeTableDisplay v-if="column.type === 'datetime' && !column.subtype" :column="column" />
-						<DatetimeDateTableDisplay v-if="column.type === 'datetime' && column.subtype === 'date'" :column="column" />
-						<DatetimeTimeTableDisplay v-if="column.type === 'datetime' && column.subtype === 'time'" :column="column" />
+					<div class="col-2">
+						<div class="row space-T">
+							<div class="col-3 column-details-table">
+								<NumberTableDisplay v-if="column.type === 'number' && !column.subtype" :column="column" />
+								<NumberStarsTableDisplay v-if="column.type === 'number' && column.subtype === 'stars'" :column="column" />
+								<NumberProgressTableDisplay v-if="column.type === 'number' && column.subtype === 'progress'" :column="column" />
+								<TextLineTableDisplay v-if="column.type === 'text' && column.subtype === 'line'" :column="column" />
+								<TextLongTableDisplay v-if="column.type === 'text' && column.subtype === 'long'" :column="column" />
+								<TextLinkTableDisplay v-if="column.type === 'text' && column.subtype === 'link'" :column="column" />
+								<SelectionCheckTableDisplay v-if="column.type === 'selection' && column.subtype === 'check'" :column="column" />
+								<DatetimeTableDisplay v-if="column.type === 'datetime' && !column.subtype" :column="column" />
+								<DatetimeDateTableDisplay v-if="column.type === 'datetime' && column.subtype === 'date'" :column="column" />
+								<DatetimeTimeTableDisplay v-if="column.type === 'datetime' && column.subtype === 'time'" :column="column" />
+							</div>
+							<div class="col-1">
+								<Actions v-if="!otherActionPerformed">
+									<ActionButton icon="icon-rename" :close-after-click="true" @click="editColumn = column">
+										{{ t('tables', 'Edit') }}
+									</ActionButton>
+									<ActionButton :close-after-click="true" icon="icon-delete" @click="deleteId = column.id">
+										{{ t('tables', 'Delete') }}
+									</ActionButton>
+								</Actions>
+							</div>
+						</div>
 					</div>
-					<div class="col-1 margin-bottom">
-						<Actions v-if="!otherActionPerformed">
-							<ActionButton icon="icon-rename" :close-after-click="true" @click="editColumn = column">
-								{{ t('tables', 'Edit') }}
-							</ActionButton>
-							<ActionButton :close-after-click="true" icon="icon-delete" @click="deleteId = column.id">
-								{{ t('tables', 'Delete') }}
-							</ActionButton>
-						</Actions>
-					</div>
-					<div v-if="column.id === deleteId" class="row">
-						<div class="col-4">
+					<div v-if="column.id === deleteId" class="row space-L">
+						<div class="col-4 space-T">
 							<h4>{{ t('tables', 'Do you really want to delete the column "{column}"?', { column: column.title }) }}</h4>
 						</div>
-						<div class="col-4">
+						<div class="col-4 space-T space-B">
 							<button class="secondary" @click="deleteId = null">
 								{{ t('tables', 'Cancel') }}
 							</button>
@@ -139,7 +143,7 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-4 margin-bottom">
+				<div class="col-4 space-B">
 					<button class="secondary" @click="actionCancel">
 						{{ t('tables', 'Close') }}
 					</button>
@@ -339,20 +343,20 @@ export default {
 </script>
 <style scoped>
 
-.editRow {
-	background-color: var(--color-primary-light-hover);
-}
+	.editRow {
+		background-color: var(--color-primary-light-hover);
+	}
 
-.deleteRow {
-	background-color: var(--color-primary-light-hover);
-}
+	.deleteRow {
+		background-color: var(--color-primary-light-hover);
+	}
 
-.row {
-	border-bottom: 1px solid var(--color-primary-light-hover);
-}
+</style>
+<style>
 
-.row:last-child {
-	border-bottom: none;
-}
+	.column-details-table table {
+		width: 100%;
+		max-width: 200px;
+	}
 
 </style>

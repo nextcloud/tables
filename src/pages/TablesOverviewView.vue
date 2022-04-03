@@ -1,12 +1,12 @@
 <template>
 	<div>
-		<div class="row firstrow">
+		<div class="row first-row">
 			<div class="col-4">
 				<h1>{{ t('tables', 'All tables') }}</h1>
 			</div>
 		</div>
-		<div class="row padding-left">
-			<div class="col-4">
+		<div class="row space-LR space-T">
+			<div class="fix-col-4">
 				<TableBox v-for="table in tables"
 					:key="table.id"
 					:header="table.title"

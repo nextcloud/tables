@@ -1,78 +1,70 @@
 <template>
-	<div>
-		<AppNavigationNew
-			:text="t('tables', 'New table')"
-			:disabled="false"
-			button-class="icon-add"
-			@click="showModal = true" />
-		<Modal
-			v-if="showModal"
-			@close="showModal = false">
-			<div class="modal__content">
-				<div class="row">
-					<div class="col-4">
-						<h2>Add table</h2>
-					</div>
-					<div class="col-4">
-						<p>{{ t('tables', 'Please choose one of the templates or create a table from scratch.') }}</p>
-					</div>
+	<Modal
+		v-if="showModal"
+		@close="actionCancel">
+		<div class="modal__content">
+			<div class="row">
+				<div class="col-4">
+					<h2>Add table</h2>
 				</div>
-				<div class="row">
-					<div class="col-4 mandatory">
-						{{ t('tables', 'Title') }}
-					</div>
-					<div class="col-2">
-						<input v-model="title"
-							:class="{missing: errorTitle}"
-							type="text"
-							:placeholder="t('tables', 'Title of the new table')">
-					</div>
-					<div class="col-2">
-						<EmojiPicker @select="addIconToTitle">
-							<button>{{ t('tables', 'Add an icon as prefix') }}</button>
-						</EmojiPicker>
-					</div>
-				</div>
-				<div class="row">
-					<div class="box-1" style="min-height:180px;">
-						<div class="icon-category-customization icon-left">
-							<div class="header">
-								{{ t('tables', 'Custom table') }}
-							</div>
-						</div>
-						<p>
-							{{ t('tables', 'Custom table from scratch.') }}
-						</p>
-						<button @click="submit('custom')">
-							{{ t('tables', 'Create table') }}
-						</button>
-					</div>
-
-					<!-- templates boxes -->
-					<div v-for="template in templates"
-						:key="template.name"
-						class="box-1"
-						style="min-height:180px;">
-						<div class="icon-left" :class="template.icon">
-							<div class="header">
-								{{ template.title }}
-							</div>
-						</div>
-						<p>
-							{{ template.description }}
-						</p>
-						<button @click="submit(template.name)">
-							{{ t('tables', 'Create table') }}
-						</button>
-					</div>
+				<div class="col-4">
+					<p>{{ t('tables', 'Please choose one of the templates or create a table from scratch.') }}</p>
 				</div>
 			</div>
-		</Modal>
-	</div>
+			<div class="row space-T">
+				<div class="col-4 mandatory">
+					{{ t('tables', 'Title') }}
+				</div>
+				<div class="col-2">
+					<input v-model="title"
+						:class="{missing: errorTitle}"
+						type="text"
+						:placeholder="t('tables', 'Title of the new table')">
+				</div>
+				<div class="col-2">
+					<EmojiPicker @select="addIconToTitle">
+						<button>{{ t('tables', 'Add an icon as prefix') }}</button>
+					</EmojiPicker>
+				</div>
+			</div>
+			<div class="row space-T">
+				<div class="box-1" style="min-height:180px;">
+					<div class="icon-category-customization icon-left">
+						<div class="header">
+							{{ t('tables', 'Custom table') }}
+						</div>
+					</div>
+					<p>
+						{{ t('tables', 'Custom table from scratch.') }}
+					</p>
+					<button @click="submit('custom')">
+						{{ t('tables', 'Create table') }}
+					</button>
+				</div>
+
+				<!-- templates boxes -->
+				<div v-for="template in templates"
+					:key="template.name"
+					class="box-1"
+					style="min-height:180px;">
+					<div class="icon-left" :class="template.icon">
+						<div class="header">
+							{{ template.title }}
+						</div>
+					</div>
+					<p>
+						{{ template.description }}
+					</p>
+					<button @click="submit(template.name)">
+						{{ t('tables', 'Create table') }}
+					</button>
+				</div>
+			</div>
+		</div>
+	</Modal>
 </template>
 
 <script>
-import AppNavigationNew from '@nextcloud/vue/dist/Components/AppNavigationNew'
 import Modal from '@nextcloud/vue/dist/Components/Modal'
 import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
@@ -82,13 +74,17 @@ import EmojiPicker from '@nextcloud/vue/dist/Components/EmojiPicker'
 export default {
 	name: 'CreateTable',
 	components: {
-		AppNavigationNew,
 		Modal,
 		EmojiPicker,
 	},
+	props: {
+		showModal: {
+			type: Boolean,
+			default: false,
+		},
+	},
 	data() {
 		return {
-			showModal: false,
 			title: '',
 			icon: '',
 			errorTitle: false,
@@ -107,6 +103,10 @@ export default {
 		this.loadTemplatesFromBE()
 	},
 	methods: {
+		actionCancel() {
+			this.reset()
+			this.$emit('close')
+		},
 		async submit(template) {
 			if (this.title === '') {
 				showError(t('tables', 'Cannot create new table. Title is missing.'))
@@ -117,8 +117,7 @@ export default {
 					await this.$router.push('/table/' + newTableId)
 					showSuccess(t('tables', 'The table "{table}" was created.', { table: this.title }))
 				}
-				this.showModal = false
-				this.reset()
+				this.actionCancel()
 			}
 		},
 		async sendNewTableToBE(template) {

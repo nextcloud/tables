@@ -1,7 +1,12 @@
 <template>
 	<AppNavigation>
 		<template #list>
-			<CreateTable />
+			<AppNavigationNew
+				:text="t('tables', 'New table')"
+				:disabled="false"
+				button-class="icon-add"
+				@click="showModalCreateTable = true" />
+			<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
 			<div v-if="tablesLoading" class="icon-loading" />
 			<ul v-if="!tablesLoading">
 				<AppNavigationItem
@@ -38,6 +43,7 @@ import { mapState, mapGetters } from 'vuex'
 import AppNavigationSettings from '@nextcloud/vue/dist/Components/AppNavigationSettings'
 import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
 import { emit } from '@nextcloud/event-bus'
+import AppNavigationNew from '@nextcloud/vue/dist/Components/AppNavigationNew'
 
 export default {
 	name: 'Navigation',
@@ -47,11 +53,13 @@ export default {
 		CreateTable,
 		AppNavigationSettings,
 		AppNavigationItem,
+		AppNavigationNew,
 	},
 	data() {
 		return {
 			loading: true,
 			showModalAddNewTable: false,
+			showModalCreateTable: false,
 		}
 	},
 	computed: {

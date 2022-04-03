@@ -10,6 +10,10 @@
     max-height: 80vh;
 }
 
+.modal__content h2 {
+    margin-top: 0;
+}
+
 @media only screen and (max-width: 1025px) {
     .modal__content {
         width: calc(100% - 40px);

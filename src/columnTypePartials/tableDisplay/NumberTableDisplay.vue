@@ -1,5 +1,5 @@
 <template>
-	<table v-if="column" style="width: 100%;">
+	<table v-if="column">
 		<tr>
 			<td>{{ t('tables', 'Order weight') }}</td><td class="align-right">
 				{{ column.orderWeight }}

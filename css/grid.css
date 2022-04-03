@@ -1,22 +1,9 @@
-/* ===== GENERAL ================================ */
+/* ===== ROWS ================================ */
 .row {
-    /* width: 100%; */
-    margin-bottom: 20px;
+    width: 100%;
 }
 
-.row:last-child {
-    margin-bottom: 0;
-}
-
-.row-with-margin {
-
-}
-
-.row.padding-left {
-    padding-left: 20px;
-}
-
-.row.firstrow {
+.row.first-row {
     padding-top: 35px;
     padding-left: 45px;
     width: calc(100% - 45px);
@@ -28,19 +15,18 @@
     display: table;
 }
 
+    /* ===== SHOW DETAILS ON HOVER =================== */
+    .row:hover .hideIfNoHover {
+        visibility: visible;
+    }
 
-/* ===== SHOW DETAILS ON HOVER =================== */
-.row:hover .hideIfNoHover {
-    visibility: visible;
-}
+    .showIfHover:hover .hideIfNoHover {
+        visibility: visible;
+    }
 
-.showIfHover:hover .hideIfNoHover {
-    visibility: visible;
-}
-
-.hideIfNoHover {
-    visibility: hidden;
-}
+    .hideIfNoHover {
+        visibility: hidden;
+    }
 
 /* ===== COLS ================================== */
 /* normal cols */
@@ -49,10 +35,12 @@
 .col-3 { width: calc(75% - 20px); }
 .col-4 { width: calc(100% - 20px); }
 
-.row [class^='col-'], .row-with-margin [class^='col-'] {
+.row [class^='col-'], .row [class^='fix-col-'] {
     float: left;
     position: relative;
-    padding: 0 20px 0 0;
+    /*
+    padding-right: 20px;
+    */
     display: block;
 }
 
@@ -60,15 +48,88 @@
     float: right;
 }
 
-/* put two or more elements (buttons) to the left and right */
+/* ===================== SPACES for rows OR columns =================00 */
+.row .space-L {
+    margin-left: 20px;
+}
+.row.space-L {
+    margin-left: 20px;
+    width: calc(100% - 20px);
+}
+
+.row .space-L-small {
+    margin-left: 8px;
+}
+.row.space-L-small {
+    margin-left: 8px;
+    width: calc(100% - 8px);
+}
+
+.row .space-R {
+    margin-right: 20px;
+}
+.row.space-R {
+    margin-right: 20px;
+    width: calc(100% - 20px);
+}
+
+.row .space-R-small {
+    margin-right: 8px;
+}
+.row.space-R-small {
+    margin-right: 8px;
+    width: calc(100% - 8px);
+}
+
+.row .space-LR {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+.row.space-LR {
+    margin-left: 20px;
+    margin-right: 20px;
+    width: calc(100% - 40px);
+}
+
+.row .space-LR-small {
+    margin-left: 8px;
+    margin-right: 8px;
+}
+.row.space-LR-small {
+    margin-left: 8px;
+    margin-right: 8px;
+    width: calc(100% - 16px);
+}
+
+.row .space-T, .row.space-T {
+    padding-top: 20px;
+}
+
+.row .space-T-small, .row.space-T-small {
+    padding-top: 8px;
+}
+
+.row .space-B, .row.space-B {
+    padding-bottom: 20px;
+}
+
+.row .space-B-small, .row.space-B-small {
+    padding-bottom: 12px;
+}
+
+@media only screen and (max-width: 641px) {
+    .row .no-padding-on-mobile, .row.no-padding-on-mobile {
+        padding: 0 0 0 0;
+        margin: 0 0 0 0;
+        width: 100%;
+    }
+}
+
+    /* put two or more elements (buttons) to the left and right */
 .col-stretch-elements {
     justify-content: space-between;
     padding-right: 0;
     width: 100%;
-}
-
-.row > [class*='fix-col-'].margin-bottom, .row > [class*='col-'].margin-bottom {
-    margin-bottom: 15px;
 }
 
 /* cols with fix relative width */
@@ -88,20 +149,12 @@
     float: right;
 }
 
-
 /* ===== BOXES ========================== */
 /* boxes, fixed width */
 .box-1 { width: 150px; }
 .box-2 { width: 200px; }
 .box-3 { width: 250px; }
 .box-4 { width: 300px; }
-
-[class^='box-'] .header {
-    font-weight: lighter;
-    font-size: 1.2em;
-    line-break: anywhere;
-    margin-bottom: 10px;
-}
 
 .box-1 h4, .box-2 h4, .box-3 h4, .box-4 h4 {
     line-break: anywhere;
@@ -116,18 +169,13 @@
     position: relative;
 }
 
-[class^='box-'].light {
-    background-color: var(--color-background-hover);
-}
-
-
 /* ===== RESIZE OR HIDE COMPONENTS ON SMALL SCREENS ============== */
 @media only screen and (max-width: 1025px) {
     .hide-m {
         display: none;
     }
 
-    .row.firstrow {
+    .row.first-row {
         padding-top: 20px;
     }
 }
@@ -144,10 +192,6 @@
     .col-3 { width: calc(100% - 20px); }
     .fix-col-3 { width: 100%; }
 
-    .row.firstrow {
-        padding-top: 20px;
-    }
-
     [class^='box-'] {
         margin-bottom: 15px;
         padding: 10px;
@@ -160,7 +204,6 @@
     }
     .col-1, .fix-col-1 { width: 100%; padding-left: 0; padding-right: 0; }
     .col-3, .fix-col-3 { width: 100%; padding-left: 0; padding-right: 0; }
-    .row-with-margin { margin: 5px 5px 5px 45px; }
 }
 
 input, textarea {
@@ -175,7 +218,6 @@ input.missing {
     border: 1px solid var(--color-error);
 }
 
-.hint {
-    color: var(--color-text-lighter);
-    font-weight: lighter;
+.row .linebreak {
+    line-break: anywhere;
 }

@@ -1,7 +1,7 @@
 <template>
 	<div>
-		<div class="row padding-left" style="margin-bottom: 0px;">
-			<div v-if="hasColumns" class="col-4">
+		<div class="row space-LR space-T">
+			<div v-if="hasColumns" class="col-4" style="display: flex;">
 				<Actions>
 					<ActionButton :close-after-click="true" icon="icon-add" @click="newRow = true">
 						{{ t('tables', 'Add new row') }}
@@ -302,6 +302,11 @@ export default {
 		},
 	},
 	methods: {
+		getColumnSetup() {
+			// http://tabulator.info/docs/4.4/persist
+			const tabulatorInstance = this.$refs.tabulator.getInstance()
+			console.debug('column setup', tabulatorInstance.getColumnLayout())
+		},
 		async callbackRowAdded(row) {
 			// this is triggered if a user paste data from clipboard
 			const data = []

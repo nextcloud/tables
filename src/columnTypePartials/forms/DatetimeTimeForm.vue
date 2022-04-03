@@ -1,16 +1,10 @@
 <template>
-	<div style="width: 100%">
-		<!-- default -->
-		<div class="row">
-			<div class="fix-col-1">
-				{{ t('tables', 'Set now as default') }}
-			</div>
-			<div class="fix-col-1">
-      &nbsp;
-			</div>
-			<div class="fix-col-2 margin-bottom">
-				<CheckboxRadioSwitch type="switch" :checked.sync="localDefault" />
-			</div>
+	<div class="row">
+		<div class="fix-col-4 title">
+			{{ t('tables', 'Set now as default') }}
+		</div>
+		<div class="fix-col-4">
+			<CheckboxRadioSwitch type="switch" :checked.sync="localDefault" />
 		</div>
 	</div>
 </template>

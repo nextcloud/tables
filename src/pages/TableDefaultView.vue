@@ -5,10 +5,10 @@
 		<div v-if="!loading && activeTable">
 			<TableDescription :active-table="activeTable"
 				:columns="columns"
+				:loading="loading"
 				@reload="getColumnsForTableFromBE(activeTable.id); getRowsForTableFromBE(activeTable.id)" />
-			<div class="row" style="margin-top: 30px;">
-				<NcTable :rows="rows" :columns="columns" @update-rows="getRowsForTableFromBE(activeTable.id)" />
-			</div>
+
+			<NcTable :rows="rows" :columns="columns" @update-rows="getRowsForTableFromBE(activeTable.id)" />
 		</div>
 	</div>
 </template>

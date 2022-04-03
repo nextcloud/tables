@@ -6,79 +6,74 @@
 					<h2>{{ t('tables', 'Create column') }}</h2>
 				</div>
 
-				<MainForm :description.sync="description"
-					:mandatory.sync="mandatory"
-					:order-weight.sync="orderWeight"
-					:title.sync="title"
-					:title-missing-error="titleMissingError" />
-
-				<div class="fix-col-1 mandatory" :class="{error: typeMissingError}">
-					{{ t('tables', 'Type') }}
+				<div class="col-2">
+					<MainForm :description.sync="description"
+						:mandatory.sync="mandatory"
+						:order-weight.sync="orderWeight"
+						:title.sync="title"
+						:title-missing-error="titleMissingError" />
 				</div>
-				<div class="fix-col-3">
-					<Multiselect v-model="combinedTypeObject"
-						:options="typeOptions"
-						track-by="id"
-						label="label"
-						style="width: 100%" />
-				</div>
-			</div>
-
-			<!-- type specific parameter -------------------------------- -->
-
-			<div v-if="combinedType === 'number'">
-				<div class="row">
-					<div class="col-4">
-						<h3>{{ t('tables', 'Number column specific parameters') }}</h3>
+				<div class="col-2">
+					<div class="row space-L no-padding-on-mobile">
+						<div class="col-4 mandatory space-T" :class="{error: typeMissingError}">
+							{{ t('tables', 'Type') }}
+						</div>
+						<div class="col-4">
+							<Multiselect v-model="combinedTypeObject"
+								:options="typeOptions"
+								track-by="id"
+								label="label"
+								style="width: 100%" />
+						</div>
 					</div>
-				</div>
-				<NumberForm
-					:number-default.sync="numberDefault"
-					:number-min.sync="numberMin"
-					:number-max.sync="numberMax"
-					:number-decimals.sync="numberDecimals"
-					:number-prefix.sync="numberPrefix"
-					:number-suffix.sync="numberSuffix" />
-			</div>
 
-			<div v-if="combinedType === 'number-stars'">
-				<div class="row">
-					<div class="col-4">
-						<h3>{{ t('tables', 'Stars rating column specific parameters') }}</h3>
+					<!-- type specific parameter -------------------------------- -->
+
+					<div v-if="combinedType === 'number'" class="row space-L no-padding-on-mobile">
+						<div class="col-4 space-T space-B">
+							<h4>{{ t('tables', 'Number column specific parameters') }}</h4>
+						</div>
+						<NumberForm
+							:number-default.sync="numberDefault"
+							:number-min.sync="numberMin"
+							:number-max.sync="numberMax"
+							:number-decimals.sync="numberDecimals"
+							:number-prefix.sync="numberPrefix"
+							:number-suffix.sync="numberSuffix" />
 					</div>
-				</div>
-				<NumberStarsForm :number-default.sync="numberDefault" />
-			</div>
 
-			<div v-if="combinedType === 'number-progress'">
-				<div class="row">
-					<div class="col-4">
-						<h3>{{ t('tables', 'Progress bar column specific parameters') }}</h3>
+					<div v-if="combinedType === 'number-stars'" class="row space-L no-padding-on-mobile">
+						<div class="col-4 space-T space-B">
+							<h4>{{ t('tables', 'Stars rating column specific parameters') }}</h4>
+						</div>
+						<NumberStarsForm :number-default.sync="numberDefault" />
 					</div>
-				</div>
-				<NumberProgressForm :number-default.sync="numberDefault" />
-			</div>
 
-			<div v-if="type === 'text' && subtype !== 'link'">
-				<div class="row">
-					<div class="col-4">
-						<h3>{{ t('tables', 'Text column specific parameters') }}</h3>
+					<div v-if="combinedType === 'number-progress'" class="row space-L no-padding-on-mobile">
+						<div class="col-4 space-T space-B">
+							<h4>{{ t('tables', 'Progress bar column specific parameters') }}</h4>
+						</div>
+						<NumberProgressForm :number-default.sync="numberDefault" />
 					</div>
-				</div>
-				<TextLineForm v-if="subtype === 'line'"
-					:text-default.sync="textDefault"
-					:text-allowed-pattern.sync="textAllowedPattern"
-					:text-max-length.sync="textMaxLength" />
-				<TextLongForm v-if="subtype === 'long'"
-					:text-default.sync="textDefault"
-					:text-max-length.sync="textMaxLength" />
-			</div>
 
-			<!--
+					<div v-if="type === 'text' && subtype !== 'link'" class="row space-L no-padding-on-mobile">
+						<div class="col-4 space-T space-B">
+							<h4>{{ t('tables', 'Text column specific parameters') }}</h4>
+						</div>
+						<TextLineForm v-if="subtype === 'line'"
+							:text-default.sync="textDefault"
+							:text-allowed-pattern.sync="textAllowedPattern"
+							:text-max-length.sync="textMaxLength" />
+						<TextLongForm v-if="subtype === 'long'"
+							:text-default.sync="textDefault"
+							:text-max-length.sync="textMaxLength" />
+					</div>
+
+					<!--
 			<div v-if="combinedType === 'selection'">
 				<div class="row">
 					<div class="col-4">
-						<h3>{{ t('tables', 'Selection column specific parameters') }}</h3>
+						<h4>{{ t('tables', 'Selection column specific parameters') }}</h4>
 					</div>
 				</div>
 				<SelectionForm :selection-options.sync="selectionOptions" :selection-default.sync="selectionDefault" />
@@ -87,51 +82,44 @@
 			<div v-if="combinedType === 'selection-multi'">
 				<div class="row">
 					<div class="col-4">
-						<h3>{{ t('tables', 'Multiple selection column specific parameters') }}</h3>
+						<h4>{{ t('tables', 'Multiple selection column specific parameters') }}</h4>
 					</div>
 				</div>
 				<SelectionMultiForm :selection-options.sync="selectionOptions" :selection-default.sync="selectionDefault" />
 			</div>
 -->
 
-			<div v-if="combinedType === 'selection-check'">
-				<div class="row">
-					<div class="col-4">
-						<h3>{{ t('tables', 'Yes/No column specific parameters') }}</h3>
+					<div v-if="combinedType === 'selection-check'" class="row space-L no-padding-on-mobile">
+						<div class="col-4 space-T space-B">
+							<h4>{{ t('tables', 'Yes/No column specific parameters') }}</h4>
+						</div>
+						<SelectionCheckForm :selection-default.sync="selectionDefault" />
+					</div>
+
+					<div v-if="combinedType === 'datetime'" class="row space-L no-padding-on-mobile">
+						<div class="col-4 space-T space-B">
+							<h4>{{ t('tables', 'Date and time column specific parameters') }}</h4>
+						</div>
+						<DatetimeForm :datetime-default.sync="datetimeDefault" />
+					</div>
+
+					<div v-if="combinedType === 'datetime-date'" class="row space-L no-padding-on-mobile">
+						<div class="col-4 space-T space-B">
+							<h4>{{ t('tables', 'Date column specific parameters') }}</h4>
+						</div>
+						<DatetimeDateForm :datetime-default.sync="datetimeDefault" />
+					</div>
+
+					<div v-if="combinedType === 'datetime-time'" class="row space-L no-padding-on-mobile">
+						<div class="col-4 space-T space-B">
+							<h4>{{ t('tables', 'Time column specific parameters') }}</h4>
+						</div>
+						<DatetimeTimeForm :datetime-default.sync="datetimeDefault" />
 					</div>
 				</div>
-				<SelectionCheckForm :selection-default.sync="selectionDefault" />
 			</div>
-
-			<div v-if="combinedType === 'datetime'">
-				<div class="row">
-					<div class="col-4">
-						<h3>{{ t('tables', 'Date and time column specific parameters') }}</h3>
-					</div>
-				</div>
-				<DatetimeForm :datetime-default.sync="datetimeDefault" />
-			</div>
-
-			<div v-if="combinedType === 'datetime-date'">
-				<div class="row">
-					<div class="col-4">
-						<h3>{{ t('tables', 'Date column specific parameters') }}</h3>
-					</div>
-				</div>
-				<DatetimeDateForm :datetime-default.sync="datetimeDefault" />
-			</div>
-
-			<div v-if="combinedType === 'datetime-time'">
-				<div class="row">
-					<div class="col-4">
-						<h3>{{ t('tables', 'Time column specific parameters') }}</h3>
-					</div>
-				</div>
-				<DatetimeTimeForm :datetime-default.sync="datetimeDefault" />
-			</div>
-
-			<div class="row">
-				<div class="col-4 margin-bottom">
+			<div class="row space-T space-B">
+				<div class="col-4">
 					<button class="secondary" @click="actionCancel">
 						{{ t('tables', 'Cancel') }}
 					</button>
@@ -211,7 +199,7 @@ export default {
 			selectionDefault: null,
 			datetimeDefault: '',
 			typeOptions: [
-				{ id: 'text-line', label: t('tables', 'Textline') },
+				{ id: 'text-line', label: t('tables', 'Text line') },
 				{ id: 'text-long', label: t('tables', 'Long text') },
 				{ id: 'text-link', label: t('tables', 'Link') },
 

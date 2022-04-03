@@ -39,7 +39,7 @@
 				<div class="col-4">
 					<h3>{{ t('tables', 'Hints') }}</h3>
 				</div>
-				<div class="col-4 margin-bottom">
+				<div class="col-4 space-B">
 					<ol>
 						<li class="light">
 							{{ t('tables', 'The format for a date has to be like YYYY-MM-DD, for example 2022-12-24.') }}

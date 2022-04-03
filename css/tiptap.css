@@ -35,5 +35,9 @@
 
 .tiptap-wrapper ul li, .tabulator-cell ul li {
     list-style-type: circle;
-    margin-left: 10px;
+    margin-left: 15px;
+}
+
+.tiptap-wrapper ul li p, .tabulator-cell ul li p {
+    padding: 0 0 0 0;
 }
