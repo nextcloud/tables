@@ -16,7 +16,7 @@
 				</div>
 			</div>
 		</div>
-		<div :class="{ 'fix-col-2': !showBigEditor, 'fix-col-4': showBigEditor, 'space-B': !showBigEditor }">
+		<div :class="{ 'fix-col-2': !showBigEditor, 'fix-col-4': showBigEditor, 'space-B': !showBigEditor }" class="no-padding-on-mobile">
 			<TiptapMenuBar v-if="!isMobileDevice"
 				:value.sync="localValue"
 				@input="updateText"
@@ -24,7 +24,7 @@
 			<textarea v-if="isMobileDevice" v-model="localValue" />
 		</div>
 		<div v-if="column.description" class="p span space-B light" :class="{ 'fix-col-1': !showBigEditor, 'fix-col-4': showBigEditor }">
-			<div :class="{ 'space-L-small': !showBigEditor }">
+			<div :class="{ 'space-L-small': !showBigEditor }" class="no-padding-on-mobile">
 				{{ column.description }}
 			</div>
 		</div>

@@ -93,9 +93,9 @@ export default {
 
 <style lang="scss">
 /* Basic editor styles */
-.ProseMirror {
+.tiptap-wrapper .ProseMirror, .tabulator-cell .ProseMirror {
 	> * + * {
-		margin-top: 0.75em;
+		/*margin-top: 0.75em;*/
 	}
 
 	ul,
@@ -112,24 +112,12 @@ export default {
 		line-height: 1.1;
 	}
 
-	code {
-		background-color: rgba(#616161, 0.1);
-		color: #616161;
-	}
-
 	pre {
 		background: #0D0D0D;
 		color: #FFF;
 		font-family: 'JetBrainsMono', monospace;
 		padding: 0.75rem 1rem;
 		border-radius: 0.5rem;
-
-		code {
-			color: inherit;
-			padding: 0;
-			background: none;
-			font-size: 0.8rem;
-		}
 	}
 
 	img {
@@ -147,7 +135,7 @@ export default {
 	}
 }
 
-ul[data-type='taskList'] {
+.tiptap-wrapper ul[data-type='taskList'], .tabulator-cell ul[data-type='taskList'] {
 	list-style: none;
 	padding: 0;
 	p {
@@ -167,10 +155,14 @@ ul[data-type='taskList'] {
 	}
 }
 
-ul {
+.tiptap-wrapper ul, .tabulator-cell ul {
 	li {
 		list-style-type: disc;
 		margin-left: 15px;
+
+		label input {
+			max-height: 30px;
+		}
 	}
 }
 </style>

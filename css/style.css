@@ -28,8 +28,8 @@ p code {
     white-space: pre-wrap;
     background-color: var(--color-background-dark);
     border-radius: var(--border-radius);
-    padding: 1em 1.3em;
-    margin-bottom: 1em;
+    padding: 0.8em 1em;
+    margin-bottom: 0.8em;
     font-family: 'Lucida Console', 'Lucida Sans Typewriter', 'DejaVu Sans Mono', monospace;
 }
 
