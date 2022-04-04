@@ -24,7 +24,10 @@
 				:class="{ 'is-active': editor.isActive('code') }"
 				class="icon-code"
 				@click="editor.chain().focus().toggleCode().run()" />
-			<button class="icon-checkbox-mark" :class="{ 'is-active': editor.isActive('taskList') }" @click="editor.chain().focus().toggleTaskList().run()" />
+			<button v-if="big"
+				class="icon-checkbox-mark"
+				:class="{ 'is-active': editor.isActive('taskList') }"
+				@click="editor.chain().focus().toggleTaskList().run()" />
 			<button :class="{ 'is-active': big }" class="icon-fullscreen" @click="big = !big" />
 		</div>
 		<EditorContent :editor="editor" />

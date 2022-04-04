@@ -19,7 +19,7 @@ You can choose from the following column types:
 Have a good time and manage whatever you want.
 
 ]]></description>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
     <licence>agpl</licence>
     <author mail="flost-dev@mailbox.org" >Florian Steffens</author>
     <namespace>Tables</namespace>
