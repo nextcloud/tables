@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="row first-row">
-			<div class="col-4">
+			<div class="col-3">
 				<h1>{{ t('tables', 'All tables') }}</h1>
 			</div>
 		</div>
@@ -25,11 +25,8 @@
 							{{ table.createdAt | niceDateTime('l') }}
 							{{ table.createdAt | niceDateTime('LT') }}
 						</div>
-						<div class="col-2 light">
-							{{ t('tables', 'Internal ID') }}
-						</div>
-						<div class="col-2 light">
-							{{ table.id }}
+						<div class="col-4">
+							<TableInfoPopover :table="table" />
 						</div>
 					</div>
 				</TableBox>
@@ -50,10 +47,12 @@ import TableBox from '../partials/TableBox'
 import EmptyContent from '@nextcloud/vue/dist/Components/EmptyContent'
 import UserBubble from '@nextcloud/vue/dist/Components/UserBubble'
 import formatting from '../mixins/formatting'
+import TableInfoPopover from '../partials/TableInfoPopover'
 
 export default {
 	name: 'TablesOverviewView',
 	components: {
+		TableInfoPopover,
 		TableBox,
 		EmptyContent,
 		UserBubble,
