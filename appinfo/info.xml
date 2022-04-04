@@ -34,7 +34,7 @@ Have a good time and manage whatever you want.
     </documentation>
     <bugs>https://github.com/datenangebot/tables/issues</bugs>
     <dependencies>
-        <nextcloud min-version="22" max-version="23"/>
+        <nextcloud min-version="22" max-version="24"/>
     </dependencies>
     <navigations>
         <navigation>
