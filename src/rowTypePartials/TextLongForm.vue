@@ -23,8 +23,8 @@
 				@big="setShowBigEditor" />
 			<textarea v-if="isMobileDevice" v-model="localValue" />
 		</div>
-		<div v-if="column.description" class="p span space-B" :class="{ 'fix-col-1': !showBigEditor, 'fix-col-4': showBigEditor }">
-			<div class="hint-padding-left" :style="[showBigEditor ? {'padding-left': '0'} : {}]">
+		<div v-if="column.description" class="p span space-B light" :class="{ 'fix-col-1': !showBigEditor, 'fix-col-4': showBigEditor }">
+			<div :class="{ 'space-L-small': !showBigEditor }">
 				{{ column.description }}
 			</div>
 		</div>

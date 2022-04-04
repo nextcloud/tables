@@ -24,6 +24,15 @@ p span, .p span, p .span, .p .span, .p.span, p.span, .light {
     font-weight: 100;
 }
 
+p code {
+    white-space: pre-wrap;
+    background-color: var(--color-background-dark);
+    border-radius: var(--border-radius);
+    padding: 1em 1.3em;
+    margin-bottom: 1em;
+    font-family: 'Lucida Console', 'Lucida Sans Typewriter', 'DejaVu Sans Mono', monospace;
+}
+
 .bold {
     font-weight: bold;
 }
@@ -31,6 +40,7 @@ p span, .p span, p .span, .p .span, .p.span, p.span, .light {
 
 .light {
     font-weight: 100;
+    color: var(--color-text-lighter);
     /*
     background-color: var(--color-background-hover);
     */

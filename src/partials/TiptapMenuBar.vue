@@ -5,6 +5,10 @@
 			<button class="icon-redo" @click="editor.chain().focus().redo().run()" />
 			<button :class="{ 'is-active': editor.isActive('bold') }" class="icon-bold" @click="editor.chain().focus().toggleBold().run()" />
 			<button :class="{ 'is-active': editor.isActive('italic') }" class="icon-italic" @click="editor.chain().focus().toggleItalic().run()" />
+			<button v-if="big"
+				:class="{ 'is-active': editor.isActive('strike') }"
+				class="icon-strike"
+				@click="editor.chain().focus().toggleStrike().run()" />
 			<button :class="{ 'is-active': editor.isActive('bulletList') }" class="icon-ul" @click="editor.chain().focus().toggleBulletList().run()" />
 			<button v-if="big"
 				:class="{ 'is-active': editor.isActive('orderedList') }"
@@ -17,14 +21,10 @@
 				class="icon-h3"
 				@click="editor.chain().focus().toggleHeading({ level: 3 }).run()" />
 			<button v-if="big"
-				:class="{ 'is-active': editor.isActive('strike') }"
-				class="icon-strike"
-				@click="editor.chain().focus().toggleStrike().run()" />
-			<button v-if="big"
 				:class="{ 'is-active': editor.isActive('code') }"
 				class="icon-code"
 				@click="editor.chain().focus().toggleCode().run()" />
-			<button class="icon-checkmark" :class="{ 'is-active': editor.isActive('taskList') }" @click="editor.chain().focus().toggleTaskList().run()" />
+			<button class="icon-checkbox-mark" :class="{ 'is-active': editor.isActive('taskList') }" @click="editor.chain().focus().toggleTaskList().run()" />
 			<button :class="{ 'is-active': big }" class="icon-fullscreen" @click="big = !big" />
 		</div>
 		<EditorContent :editor="editor" />
@@ -152,6 +152,7 @@ ul[data-type='taskList'] {
 	padding: 0;
 	p {
 		margin: 0;
+		padding-top: 7px;
 	}
 	li {
 		display: flex;
@@ -163,6 +164,13 @@ ul[data-type='taskList'] {
 		> div {
 			flex: 1 1 auto;
 		}
+	}
+}
+
+ul {
+	li {
+		list-style-type: disc;
+		margin-left: 15px;
 	}
 }
 </style>

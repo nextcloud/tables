@@ -18,7 +18,7 @@
 			&nbsp;
 		</div>
 		<div v-if="column.description" class="fix-col-1 p span space-B">
-			<div class="hint-padding-left">
+			<div class="space-L-small">
 				{{ column.description }}
 			</div>
 		</div>

@@ -32,12 +32,3 @@
 .tiptap-wrapper em, .tabulator-cell em {
     font-style: italic;
 }
-
-.tiptap-wrapper ul li, .tabulator-cell ul li {
-    list-style-type: circle;
-    margin-left: 15px;
-}
-
-.tiptap-wrapper ul li p, .tabulator-cell ul li p {
-    padding: 0 0 0 0;
-}
