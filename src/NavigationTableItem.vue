@@ -81,23 +81,17 @@ export default {
 			this.showDeletionConfirmation = true
 		},
 		async deleteMe() {
-			try {
-				const res = await axios.delete(generateUrl('/apps/tables/table/' + this.table.id))
-				if (res.status === 200) {
-					showWarning(t('tables', 'Table "{table}" deleted.', { table: res.data.title }))
-				} else {
-					showWarning(t('tables', 'Sorry, something went wrong.'))
-					console.debug('axios error', res)
-				}
-				if (this.table && this.activeTable && this.table.id === this.activeTable.id) {
-					this.$store.commit('setActiveTableId', null)
-				}
+
+			const res = await axios.delete(generateUrl('/apps/tables/table/' + this.table.id))
+			if (res.status === 200) {
+				showWarning(t('tables', 'Table "{table}" deleted.', { table: res.data.title }))
 				await this.$store.dispatch('loadTablesFromBE')
-				await this.$router.push('/')
-			} catch (e) {
-				console.error(e)
-				showError(t('tables', 'Could not fetch tables'))
+			} else {
+				showWarning(t('tables', 'Sorry, something went wrong.'))
+				console.debug('axios error', res)
 			}
+			await this.$router.push('/').catch(err => err)
+
 			this.showDeletionConfirmation = false
 		},
 		async updateTableTitle(newTitle) {
