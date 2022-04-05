@@ -17,6 +17,7 @@ OC.L10N.register(
     "Progress" : "Progrès",
     "Tables" : "Tables",
     "Manage data within tables." : "Gérer des données à l'aide de tables.",
+    "New table" : "Nouvelle table",
     "Information" : "Information",
     "Documentation" : "Documentation",
     "Donations" : "Dons",
@@ -27,7 +28,6 @@ OC.L10N.register(
     "Delete" : "Supprimer",
     "Table \"{table}\" deleted." : "Table \"{table}\" supprimée.",
     "Sorry, something went wrong." : "Désolé, il y a eu un problème.",
-    "Could not fetch tables" : "Impossible de récupérer les tables",
     "Could not update tables title" : "Impossible de mettre à jour le titre des tables",
     "Set today as default" : "Définir aujourd’hui comme valeur par défaut",
     "Set now as default" : "Définir maintenant comme valeur par défaut",
@@ -51,7 +51,6 @@ OC.L10N.register(
     "Create column" : "Créer la colonne",
     "Type" : "Type",
     "Save" : "Enregistrer",
-    "Textline" : "Ligne de texte",
     "Long text" : "Texte long",
     "Link" : "Lien",
     "Number" : "Nombre",
@@ -66,7 +65,6 @@ OC.L10N.register(
     "Create row" : "Créer maintenant",
     "Please fill in the mandatory fields." : "Veuillez compléter les champs obligatoires.",
     "The row was saved." : "La ligne a été sauvegardée.",
-    "New table" : "Nouvelle table",
     "Title of the new table" : "Titre de la nouvelle table",
     "Add an icon as prefix" : "Ajouter une icône en préfixe",
     "Custom table" : "Table personnalisée",
@@ -77,6 +75,7 @@ OC.L10N.register(
     "Confirmation" : "Confirmation",
     "Confirm" : "Confirmer",
     "Edit columns" : "Modifier les colonnes",
+    "Textline" : "Ligne de texte",
     "Edit" : "Modifier",
     "Close" : "Fermer",
     "Could not fetch columns for table" : "Impossible de récupérer les colonnes de la table",
@@ -111,6 +110,7 @@ OC.L10N.register(
     "Create" : "Créer",
     "Column ID" : "ID colonne",
     "Table ID" : "ID table",
-    "Today" : "Aujourd'hui"
+    "Today" : "Aujourd'hui",
+    "Could not fetch tables" : "Impossible de récupérer les tables"
 },
-"nplurals=2; plural=(n > 1);");
+"nplurals=3; plural=(n==0 || n==1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

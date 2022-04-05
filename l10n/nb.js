@@ -17,6 +17,7 @@ OC.L10N.register(
     "Progress" : "Fremdrift",
     "Tables" : "Tabeller",
     "Manage data within tables." : "Håndter data i tabeller.",
+    "New table" : "Ny tabell",
     "Information" : "Informasjo",
     "Documentation" : "Dokumentasjo",
     "Donations" : "Donasjoner",
@@ -27,7 +28,6 @@ OC.L10N.register(
     "Delete" : "Slett",
     "Table \"{table}\" deleted." : "Tabell \"{table}\" slettet.",
     "Sorry, something went wrong." : "Noe gikk galt.",
-    "Could not fetch tables" : "Kunne ikke hente tabeller",
     "Could not update tables title" : "Kunne ikke oppdatere tabelltittel",
     "Set today as default" : "Sett i dag som standard",
     "Set now as default" : "Sett nå som standard",
@@ -64,7 +64,6 @@ OC.L10N.register(
     "Date column specific parameters" : "Spesifikke parametere for kolonne med dato",
     "Time column specific parameters" : "Spesifikke parametere for kolonne med tid",
     "Save" : "Lagre",
-    "Textline" : "Tekstlinje",
     "Long text" : "Lang tekst",
     "Link" : "Lenke",
     "Number" : "Nummer",
@@ -80,7 +79,6 @@ OC.L10N.register(
     "Create row" : "Opprett rad",
     "Please fill in the mandatory fields." : "Fyll inn de obligatoriske feltene.",
     "The row was saved." : "Raden ble lagret.",
-    "New table" : "Ny tabell",
     "Please choose one of the templates or create a table from scratch." : "Velg en av malene eller lag en tabell fra bunnen av.",
     "Title of the new table" : "Tittel på den nye tabellen",
     "Add an icon as prefix" : "Legg til et ikon som et prefiks",
@@ -95,6 +93,7 @@ OC.L10N.register(
     "Edit columns" : "Rediger kolonner",
     "There are no columns yet, click on the three-dot menu next to the table title ahead and create some." : "Tabellen har ingen kolonner ennå, klikk på trippel-prikk-menyen ved siden av tittelen på tabellen og lag noen.",
     "Star rating" : "Stjernevurdering",
+    "Textline" : "Tekstlinje",
     "Edit" : "Rediger",
     "Close" : "Lukk",
     "Could not fetch columns for table" : "Kunne ikke hente kolonner for tabellen",
@@ -133,6 +132,7 @@ OC.L10N.register(
     "Create" : "Opprett",
     "Column ID" : "Kolonne ID",
     "Table ID" : "Tabell ID",
-    "Today" : "I dag"
+    "Today" : "I dag",
+    "Could not fetch tables" : "Kunne ikke hente tabeller"
 },
 "nplurals=2; plural=(n != 1);");

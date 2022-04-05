@@ -17,6 +17,7 @@ OC.L10N.register(
     "Progress" : "Πρόοδος",
     "Tables" : "Πίνακες",
     "Manage data within tables." : "Διαχείριση δεδομένων μέσα σε πίνακες.",
+    "New table" : "Νέος πίνακας",
     "Information" : "Πληροφορίες",
     "Documentation" : "Τεκμηρίωση",
     "Donations" : "Δωρεές",
@@ -27,7 +28,6 @@ OC.L10N.register(
     "Delete" : "Διαγραφή",
     "Table \"{table}\" deleted." : "Ο πίνακας \"{table}\" διαγράφηκε.",
     "Sorry, something went wrong." : "Συγνώμη, κάτι πήγε πολύ λάθος.",
-    "Could not fetch tables" : "Αδυναμία ανάκτησης πινάκων",
     "Could not update tables title" : "Αδυναμία ενημέρωσης τίτλου πινάκων",
     "Set today as default" : "Ορισμός σημερινής ημερομηνίας ως προεπιλογή",
     "Set now as default" : "Ορισμός παρούσας χρονικής στιγμής ως προεπιλογή",
@@ -63,7 +63,6 @@ OC.L10N.register(
     "Date column specific parameters" : "Συγκεκριμένες παράμετροι στήλης ημερομηνίας",
     "Time column specific parameters" : "Συγκεκριμένες παράμετροι στήλης ώρας",
     "Save" : "Αποθήκευση",
-    "Textline" : "Γραμμή κειμένου",
     "Long text" : "Εκτεταμένο κείμενο",
     "Link" : "Σύνδεσμος",
     "Number" : "Αριθμός",
@@ -79,7 +78,6 @@ OC.L10N.register(
     "Create row" : "Δημιουργία γραμμής",
     "Please fill in the mandatory fields." : "Παρακαλούμε συμπληρώστε τα υποχρεωτικά πεδία.",
     "The row was saved." : "Η γραμμή αποθηκεύτηκε.",
-    "New table" : "Νέος πίνακας",
     "Please choose one of the templates or create a table from scratch." : "Παρακαλούμε επιλέξτε είτε ένα πρότυπο είτε δημιουργήστε ένα πίνακα από την αρχή.",
     "Title of the new table" : "Τίτλος του νέου πίνακα",
     "Add an icon as prefix" : "Προσθήκη εικόνας ως πρόθεμα",
@@ -94,6 +92,7 @@ OC.L10N.register(
     "Edit columns" : "Επεξεργασία στηλών",
     "There are no columns yet, click on the three-dot menu next to the table title ahead and create some." : "Δεν υπάρχουν ακόμη στήλες, κάντε κλικ στο μενού με τις τρεις κουκκίδες δίπλα στον τίτλο του πίνακα και δημιουργήστε μερικές.",
     "Star rating" : "Αξιολόγηση με αστέρι",
+    "Textline" : "Γραμμή κειμένου",
     "Edit" : "Επεξεργασία",
     "Close" : "Κλείσιμο",
     "Could not fetch columns for table" : "Αδυναμία ανάκτησης στηλών για τον πίνακα",
@@ -132,6 +131,7 @@ OC.L10N.register(
     "Create" : "Δημιουργία",
     "Column ID" : "ID στήλης",
     "Table ID" : "ID πίνακα",
-    "Today" : "Σήμερα"
+    "Today" : "Σήμερα",
+    "Could not fetch tables" : "Αδυναμία ανάκτησης πινάκων"
 },
 "nplurals=2; plural=(n != 1);");

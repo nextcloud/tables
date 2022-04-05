@@ -22,7 +22,6 @@ OC.L10N.register(
     "Delete" : "Eliminar",
     "Table \"{table}\" deleted." : "Tabla «{table}» eliminada.",
     "Sorry, something went wrong." : "Lo sentimos, algo ha salido mal.",
-    "Could not fetch tables" : "No se ha podido obtener las tablas.",
     "Could not update tables title" : "No se ha podido actualizar el título de la table",
     "Set today as default" : "Establecer hoy como predeterminado",
     "Set now as default" : "Establecer ahora como predeterminado",
@@ -35,6 +34,7 @@ OC.L10N.register(
     "Here is a good place for a unit." : "Este es un buen lugar para una unidad.",
     "Options" : "Opciones",
     "Maximum text length" : "Longitud máxima del texto",
-    "Today as default" : "Hoy como predeterminado"
+    "Today as default" : "Hoy como predeterminado",
+    "Could not fetch tables" : "No se ha podido obtener las tablas."
 },
 "nplurals=2; plural=(n != 1);");

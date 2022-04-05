@@ -17,6 +17,7 @@ OC.L10N.register(
     "Progress" : "Fortschritt",
     "Tables" : "Tabellen",
     "Manage data within tables." : "Daten in Tabellen verwalten",
+    "New table" : "Neue Tabelle",
     "Information" : "Informationen",
     "Documentation" : "Dokumentation",
     "Donations" : "Spenden",
@@ -27,7 +28,6 @@ OC.L10N.register(
     "Delete" : "Löschen",
     "Table \"{table}\" deleted." : "Tabelle \"{table}\" gelöscht",
     "Sorry, something went wrong." : "Leider ist etwas schiefgelaufen",
-    "Could not fetch tables" : "Tabellen konnten nicht geladen werden",
     "Could not update tables title" : "Tabellentitel konnte nicht aktualisiert werden",
     "Set today as default" : "Heute als Standard festlegen",
     "Set now as default" : "Jetzt als Standard festlegen",
@@ -55,7 +55,6 @@ OC.L10N.register(
     "Create column" : "Spalte erstellen",
     "Type" : "Typ",
     "Save" : "Speichern",
-    "Textline" : "Textzeile",
     "Long text" : "Langtext",
     "Link" : "Verknüpfung",
     "Stars rating" : "Sternebewertung",
@@ -70,7 +69,6 @@ OC.L10N.register(
     "Create row" : "Zeile erstellen",
     "Please fill in the mandatory fields." : "Bitte fülle die Pflichtfelder aus",
     "The row was saved." : "Die Reihe wurde gespeichert",
-    "New table" : "Neue Tabelle",
     "Please choose one of the templates or create a table from scratch." : "Bitte wähle eine der Vorlagen oder erstelle eine Tabelle von Grund auf neu",
     "Title of the new table" : "Titel der neuen Tabelle",
     "Add an icon as prefix" : "Icon als Vorzeichen hinzufügen",
@@ -84,6 +82,7 @@ OC.L10N.register(
     "Edit columns" : "Spalten bearbeiten",
     "There are no columns yet, click on the three-dot menu next to the table title ahead and create some." : "Es gibt noch keine Spalten, klicke auf das Drei-Punkte-Menü neben dem Tabellentitel und erstelle welche.",
     "Star rating" : "Sternebewertung",
+    "Textline" : "Textzeile",
     "Edit" : "Bearbeiten",
     "Close" : "Schließen",
     "Could not fetch columns for table" : "Spalten der Tabelle konnten nicht abgerufen werden",
@@ -122,6 +121,7 @@ OC.L10N.register(
     "Create" : "Erstellen",
     "Column ID" : "Spalten-ID",
     "Table ID" : "Tabellen-ID",
-    "Today" : "Heute"
+    "Today" : "Heute",
+    "Could not fetch tables" : "Tabellen konnten nicht geladen werden"
 },
 "nplurals=2; plural=(n != 1);");
