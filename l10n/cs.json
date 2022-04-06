@@ -78,6 +78,7 @@
     "Date column specific parameters" : "Parametry určené pouze pro sloupec s datumy",
     "Time column specific parameters" : "Parametry určené pouze pro sloupec s časy",
     "Save" : "Uložit",
+    "Text line" : "Testový řádek",
     "Long text" : "Dlouhý text",
     "Link" : "Odkaz",
     "Number" : "Číslo",
@@ -138,6 +139,8 @@
     "If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two bling columns for the row numbers and edit-button-column." : "Pokud některá z těchto voleb odpovídá, aplikace předpokládá, že sloupce v údajích jsou ve stejném pořadí jak viditelné sloupce v tabulce a importuje je takto. Je třeba, aby zde byly dva výrazné sloupce pro čísla řádků a sloupec s tlačítky upravit.",
     "Hints" : "Tipy",
     "The format for a date has to be like YYYY-MM-DD, for example 2022-12-24." : "Je třeba, aby formát data byl v podobě RRRR-MM-DD – např. 2022-12-24.",
+    "If you try to import with the order of columns, see the third attempt above, you need to add two blind columns at the beginning." : "Pokud se pokusíte naimportovat s pořadím sloupců a výše uvidíte třetí pokus, potřebujete dva slepé sloupce na začátku.",
+    "If you are on a Chrome browser, you have to create a row first. Click on this newly created row and the insert process should run." : "Pokud používáte prohlížeč Chrome, je třeba nejprve vytvořit řádek. Klikněte na tento nově vytvořený řádek a proces vkládání by se měl spustit.",
     "Could not fetch rows for table" : "Nepodařilo se získat řádky tabulky",
     "All tables" : "Všechny tabulky",
     "Owner" : "Vlastník",
@@ -176,6 +179,7 @@
     "Table ID" : "Identif. tabulky",
     "Today" : "Dnes",
     "length: {length}/{maxLength}" : "délka: {length}/{maxLength}",
+    "There is a bug with the editor on mobile devices, that is why you see only a simple text box." : "Při používání editoru na mobilních zařízeních se vyskytuje chyba – z toho důvodu vidíte pouze jednoduchý textový box.",
     "Could not fetch tables" : "Nepodařilo se získat tabulky"
 },"pluralForm" :"nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;"
 }

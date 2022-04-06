@@ -80,6 +80,7 @@ OC.L10N.register(
     "Date column specific parameters" : "Parametry szczegółowe dla kolumny daty",
     "Time column specific parameters" : "Parametry szczegółowe dla kolumny godziny",
     "Save" : "Zapisz",
+    "Text line" : "Linia tekstu",
     "Long text" : "Długi tekst",
     "Link" : "Link",
     "Number" : "Liczba",
@@ -140,6 +141,8 @@ OC.L10N.register(
     "If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two bling columns for the row numbers and edit-button-column." : "Jeśli którakolwiek z tych opcji jest zgodna, aplikacja przyjmie, że kolumny w danych są w tej samej kolejności, co widoczne kolumny w tabeli i zaimportuje je w ten sposób. Muszą być dwie blingowe kolumny dla numerów wierszy i kolumny z przyciskiem edycji.",
     "Hints" : "Poradnik",
     "The format for a date has to be like YYYY-MM-DD, for example 2022-12-24." : "Data musi mieć format RRRR-MM-DD, na przykład 2022-12-24.",
+    "If you try to import with the order of columns, see the third attempt above, you need to add two blind columns at the beginning." : "Jeśli próbujesz importować według kolejności kolumn, zobacz trzecią próbę powyżej, gdzie najpierw musisz dodać na początku dwie nie niewidoczne kolumny.",
+    "If you are on a Chrome browser, you have to create a row first. Click on this newly created row and the insert process should run." : "Jeśli korzystasz z przeglądarki Chrome, musisz najpierw utworzyć wiersz. Kliknij ten nowo utworzony wiersz, a proces wstawiania powinien zostać uruchomiony.",
     "Could not fetch rows for table" : "Nie udało się pobrać wierszy dla tabeli",
     "All tables" : "Wszystkie tabele",
     "Owner" : "Właściciel",
@@ -178,6 +181,7 @@ OC.L10N.register(
     "Table ID" : "ID tabeli",
     "Today" : "Dzisiaj",
     "length: {length}/{maxLength}" : "długość: {length}/{maxLength}",
+    "There is a bug with the editor on mobile devices, that is why you see only a simple text box." : "W edytorze na urządzeniach mobilnych jest błąd, dlatego widzisz tylko proste pole tekstowe.",
     "Could not fetch tables" : "Nie udało się pobrać tabel"
 },
 "nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);");

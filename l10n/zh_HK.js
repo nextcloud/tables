@@ -54,6 +54,7 @@ OC.L10N.register(
     "Maximum" : "最高",
     "Prefix" : "前綴",
     "Suffix" : "後綴",
+    "Here is a good place for a unit." : "這裡是度量單位的好地方。",
     "Options" : "選項",
     "Put an option name at each line." : "在每一行放置一個選項名稱。",
     "Allowed pattern (regex)" : "允許的模式（正則表達式）",
@@ -79,6 +80,7 @@ OC.L10N.register(
     "Date column specific parameters" : "日期列特定參數",
     "Time column specific parameters" : "時間列特定參數",
     "Save" : "保存",
+    "Text line" : "文字行",
     "Long text" : "長文本",
     "Link" : "連結",
     "Number" : "數字",
@@ -138,6 +140,7 @@ OC.L10N.register(
     "If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two bling columns for the row numbers and edit-button-column." : "如果這些選項中的任何一個匹配，應用程序將假定數據中的列與表中的可見列的順序相同，並以這種方式導入它們。行號和編輯按鈕必須有兩個 bling 列- 縱列。",
     "Hints" : "提示",
     "The format for a date has to be like YYYY-MM-DD, for example 2022-12-24." : "日期的格式必須是 YYYY-MM-DD，例如 2022-12-24。",
+    "If you are on a Chrome browser, you have to create a row first. Click on this newly created row and the insert process should run." : "如果您使用的是 Chrome 瀏覽器，則必須先創建一行。 單擊此新行，插入過程應運行。 ",
     "Could not fetch rows for table" : "無法取得表列",
     "All tables" : "所有數據庫表",
     "Owner" : "所有者",
@@ -176,6 +179,7 @@ OC.L10N.register(
     "Table ID" : "表 ID",
     "Today" : "今日",
     "length: {length}/{maxLength}" : "長度： {length} / {maxLength}",
+    "There is a bug with the editor on mobile devices, that is why you see only a simple text box." : "移動設備上的編輯器存在錯誤，這就是您只能看到一個簡單文本框的原因。",
     "Could not fetch tables" : "無法擷取數據庫表"
 },
 "nplurals=1; plural=0;");

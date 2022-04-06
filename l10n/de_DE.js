@@ -80,6 +80,7 @@ OC.L10N.register(
     "Date column specific parameters" : "Spezifische Parameter für die Datum-Spalten",
     "Time column specific parameters" : "Spezifische Parameter für die Zeit-Spalten",
     "Save" : "Speichern",
+    "Text line" : "Textzeile",
     "Long text" : "Langtext",
     "Link" : "Verknüpfung",
     "Number" : "Anzahl",
@@ -140,6 +141,8 @@ OC.L10N.register(
     "If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two bling columns for the row numbers and edit-button-column." : "Wenn eine dieser Optionen übereinstimmt, geht die App davon aus, dass die Spalten in den Daten in derselben Reihenfolge wie die sichtbaren Spalten in der Tabelle sind, und importiert diese auf diese Weise. Es müssen zwei Bling-Spalten für die Zeilennummern und die Bearbeiten-Tasten-Spalte vorhanden sein.",
     "Hints" : "Hinweise",
     "The format for a date has to be like YYYY-MM-DD, for example 2022-12-24." : "Das Format für ein Datum muss JJJJ-MM-TT sein, zum Beispiel 2022-12-24.",
+    "If you try to import with the order of columns, see the third attempt above, you need to add two blind columns at the beginning." : "Wenn Sie versuchen, mit der Reihenfolge der Spalten zu importieren, siehe dritter Versuch oben, müssen Sie zwei blinde Zeilen am Anfang hinzufügen.",
+    "If you are on a Chrome browser, you have to create a row first. Click on this newly created row and the insert process should run." : "Wenn Sie einen Chrome-Browser verwenden, müssen Sie zuerst eine Zeile erstellen. Diese dann anklicken und der Einfügevorgang sollte ablaufen.",
     "Could not fetch rows for table" : "Konnte Zeilen für die Tabelle nicht laden",
     "All tables" : "Alle Tabellen",
     "Owner" : "Besitzer",
@@ -178,6 +181,7 @@ OC.L10N.register(
     "Table ID" : "Tabellen-ID",
     "Today" : "Heute",
     "length: {length}/{maxLength}" : "Länge: {length}/{maxLength}",
+    "There is a bug with the editor on mobile devices, that is why you see only a simple text box." : "Es gibt einen Fehler im Editor auf Mobilgeräten, deshalb sehen Sie nur ein einfaches Textfeld.",
     "Could not fetch tables" : "Tabellen konnten nicht geladen werden"
 },
 "nplurals=2; plural=(n != 1);");

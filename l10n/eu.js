@@ -53,6 +53,7 @@ OC.L10N.register(
     "Row deleted." : "Errenkada ezabatuta.",
     "Could not delete row." : "Ezin izan da errenkada ezabatu.",
     "Paste rows from clipboard" : "Itsatsi errenkadak arbeletik",
+    "Click inside the table." : "Egin klik taula barnean.",
     "All tables" : "Taula guztiak",
     "Owner" : "Jabea",
     "Created at" : "Sortua",
