@@ -80,6 +80,7 @@ OC.L10N.register(
     "Date column specific parameters" : "Tarih sütununa özel parametreler",
     "Time column specific parameters" : "Saat sütununa özel parametreler",
     "Save" : "Kaydet",
+    "Text line" : "Metin satırı",
     "Long text" : "Uzun metin",
     "Link" : "Bağlantı",
     "Number" : "Sayı",
@@ -140,6 +141,8 @@ OC.L10N.register(
     "If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two bling columns for the row numbers and edit-button-column." : "Bu seçeneklerden birinde eşleşme bulunursa uygulama, verilerdeki sütunların tablodaki görünür sütunlarla aynı sırada olduğunu varsayar ve bunları buna göre içe aktarır. Satır numaraları ve düzenleme düğmesi sütunu için iki bling sütunu olmalıdır.",
     "Hints" : "İpuçları",
     "The format for a date has to be like YYYY-MM-DD, for example 2022-12-24." : "Tarih biçimi YYYY-AA-GG şeklinde olmalıdır. Örnek: 2022-12-24.",
+    "If you try to import with the order of columns, see the third attempt above, you need to add two blind columns at the beginning." : "Sütun sırasına göre içe aktarmayı denerseniz, yukarıdaki üçüncü denemeye bakın. Başlangıca iki kör sütun eklemeniz gerekir.",
+    "If you are on a Chrome browser, you have to create a row first. Click on this newly created row and the insert process should run." : "Chrome web tarayıcısı kullanıyorsanız, önce bir satır oluşturmanız gerekir. Yeni oluşturulan satıra tıkladığınızda ekleme işleminin yapılması gerekir.",
     "Could not fetch rows for table" : "Tablo satırları alınamadı",
     "All tables" : "Tüm tablolar",
     "Owner" : "Sahibi",
@@ -178,6 +181,7 @@ OC.L10N.register(
     "Table ID" : "Tablo kodu",
     "Today" : "Bugün",
     "length: {length}/{maxLength}" : "Uzunluk: {length}/{maxLength}",
+    "There is a bug with the editor on mobile devices, that is why you see only a simple text box." : "Mobil aygıtlarda düzenleyicide bir sorun var. Bu yüzden yalnızca basit bir metin kutusu görüyorsunuz.",
     "Could not fetch tables" : "Tablolar alınamadı"
 },
 "nplurals=2; plural=(n > 1);");
