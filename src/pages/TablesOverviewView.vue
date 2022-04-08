@@ -6,7 +6,7 @@
 			</div>
 		</div>
 		<div class="row space-LR space-T">
-			<div class="fix-col-4">
+			<div class="fix-col-4" style="display: block;">
 				<TableBox v-for="table in tables"
 					:key="table.id"
 					:header="table.title"
