@@ -45,7 +45,7 @@
 							{{ t('tables', 'The format for a date has to be like YYYY-MM-DD, for example 2022-12-24.') }}
 						</li>
 						<li class="light">
-							{{ t('tables', 'If you try to import with the order of columns, see the third attempt above, you need to add two blind columns at the beginning.') }}
+							{{ t('tables', 'If you try to import by column order, see the third point above. You need to add two dummy columns at the beginning.') }}
 						</li>
 						<li class="light">
 							{{ t('tables', 'If you are on a Chrome browser, you have to create a row first. Click on this newly created row and the insert process should run.') }}

@@ -158,7 +158,7 @@ export default {
 				this.templates = res.data
 			} catch (e) {
 				console.error(e)
-				showError(t('tables', 'Could not fetch templates from BE'))
+				showError(t('tables', 'Could not fetch templates from backend'))
 			}
 		},
 	},
