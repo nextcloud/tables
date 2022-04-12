@@ -87,7 +87,6 @@ OC.L10N.register(
     "Create table" : "Opprett tabell",
     "The title limit is reached with 200 characters. Please use a shorter title." : "Tittel har en grense på 200 tegn. Bruk en kortere tittel.",
     "Could not create new table" : "Kunne ikke opprette ny tabell",
-    "Could not fetch templates from BE" : "Kunne ikke hente maler fra BE",
     "Confirmation" : "Bekreftelse",
     "Confirm" : "Bekreft",
     "Edit columns" : "Rediger kolonner",

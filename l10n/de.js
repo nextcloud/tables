@@ -76,7 +76,6 @@ OC.L10N.register(
     "Create table" : "Tabelle erstellen",
     "The title limit is reached with 200 characters. Please use a shorter title." : "Bei 200 Zeichen ist die Titelgrenze erreicht. Bitte verwende einen kürzeren Titel.",
     "Could not create new table" : "Neue Tabelle konnte nicht erstellt werden",
-    "Could not fetch templates from BE" : "Vorlagen konnten nicht von BE abgerufen werden",
     "Confirmation" : "Bestätigung",
     "Confirm" : "Bestätigen",
     "Edit columns" : "Spalten bearbeiten",

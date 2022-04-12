@@ -90,7 +90,6 @@ OC.L10N.register(
     "Create table" : "Δημιουργία πίνακα",
     "The title limit is reached with 200 characters. Please use a shorter title." : "Το όριο τίτλου είναι 200 χαρακτήρες. Χρησιμοποιήστε έναν πιο σύντομο τίτλο.",
     "Could not create new table" : "Αδυναμία δημιουργίας νέου πίνακα",
-    "Could not fetch templates from BE" : "Αδυναμία ανάκτησης προτύπων από BE",
     "Confirmation" : "Επιβεβαίωση",
     "Confirm" : "Επιβεβαίωση",
     "Edit columns" : "Επεξεργασία στηλών",
