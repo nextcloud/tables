@@ -109,6 +109,7 @@ OC.L10N.register(
     "Cannot create new table. Title is missing." : "Neue Tabelle kann nicht erstellt werden. Titel fehlt.",
     "The table \"{table}\" was created." : "Die Tabelle \"{table}\" wurde erstellt.",
     "Could not create new table" : "Neue Tabelle konnte nicht erstellt werden.",
+    "Could not fetch templates from backend" : "Vorlagen konnten nicht vom Backend abgerufen werden",
     "Confirmation" : "Bestätigung",
     "Confirm" : "Bestätigen",
     "Edit columns" : "Spalten bearbeiten",
