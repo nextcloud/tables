@@ -141,6 +141,7 @@ OC.L10N.register(
     "If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two bling columns for the row numbers and edit-button-column." : "Wenn eine dieser Optionen übereinstimmt, geht die App davon aus, dass die Spalten in den Daten in derselben Reihenfolge wie die sichtbaren Spalten in der Tabelle sind, und importiert diese auf diese Weise. Es müssen zwei Bling-Spalten für die Zeilennummern und die Bearbeiten-Tasten-Spalte vorhanden sein.",
     "Hints" : "Hinweise",
     "The format for a date has to be like YYYY-MM-DD, for example 2022-12-24." : "Das Format für ein Datum muss JJJJ-MM-TT sein, zum Beispiel 2022-12-24.",
+    "If you try to import by column order, see the third point above. You need to add two dummy columns at the beginning." : "Wenn Sie versuchen, in der Reihenfolge der Spalten zu importieren, beachten Sie den dritten Punkt oben. Sie müssen am Anfang zwei Dummy-Spalten hinzufügen.",
     "If you are on a Chrome browser, you have to create a row first. Click on this newly created row and the insert process should run." : "Wenn Sie einen Chrome-Browser verwenden, müssen Sie zuerst eine Zeile erstellen. Diese dann anklicken und der Einfügevorgang sollte ablaufen.",
     "Could not fetch rows for table" : "Konnte Zeilen für die Tabelle nicht laden",
     "All tables" : "Alle Tabellen",
