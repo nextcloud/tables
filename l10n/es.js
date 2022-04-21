@@ -1,6 +1,16 @@
 OC.L10N.register(
     "tables",
     {
+    "ToDo list" : "Lista de tareas",
+    "Setup a simple todo-list." : "Configura una lista de tareas sencillas.",
+    "Members" : "Miembros",
+    "List of members with some basic attributes." : "Lista de miembros con algunos atributos básico.s",
+    "Weight tracking" : "Seguimiento del peso",
+    "Track your weight and other health measures." : "Monitoriza tu peso y otras medidas de salud.",
+    "Date" : "Fecha",
+    "Weight" : "Peso",
+    "Body fat" : "Grasa corporal",
+    "Feeling over all" : "Sentimiento general",
     "Comments" : "Comentarios",
     "Name" : "Nombre",
     "Position" : "Posición",
