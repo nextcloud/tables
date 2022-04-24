@@ -1,0 +1,27 @@
+OC.L10N.register(
+    "tables",
+    {
+    "Date" : "Date",
+    "Name" : "ئاتى",
+    "Birthday" : "تۇغۇلغان كۈن",
+    "Description" : "چۈشەندۈرۈش",
+    "Documentation" : "قوللانما",
+    "Cancel" : "ۋاز كەچ",
+    "Delete" : "ئۆچۈر",
+    "Title" : "ماۋزۇ",
+    "Default" : "كۆڭۈلدىكى",
+    "Yes" : "Yes",
+    "No" : "No",
+    "Type" : "Type",
+    "Save" : "ساقلا",
+    "Link" : "Link",
+    "Time" : "ۋاقىت",
+    "Edit" : "تەھرىر",
+    "Close" : "ياپ",
+    "Owner" : "Owner",
+    "Previous" : "ئالدىنقى",
+    "Next" : "كېيىنكى",
+    "Create" : "قۇر",
+    "Today" : "بۈگۈن"
+},
+"nplurals=2; plural=(n != 1);");

@@ -1,0 +1,28 @@
+OC.L10N.register(
+    "tables",
+    {
+    "Date" : "Date",
+    "Comments" : "Kommentarer",
+    "Name" : "Numm",
+    "Birthday" : "Gebuertsdag",
+    "Description" : "Beschreiwung",
+    "Documentation" : "Dokumentatioun",
+    "Cancel" : "Ofbriechen",
+    "Delete" : "Läschen",
+    "Title" : "Titel",
+    "Default" : "Standard",
+    "Yes" : "Yes",
+    "No" : "No",
+    "Type" : "Typ",
+    "Save" : "Späicheren",
+    "Link" : "Link",
+    "Time" : "Zäit",
+    "Edit" : "Änneren",
+    "Close" : "Zoumaachen",
+    "Owner" : "Owner",
+    "Previous" : "Zeréck",
+    "Next" : "Weider",
+    "Create" : "Erstellen",
+    "Today" : "Haut"
+},
+"nplurals=2; plural=(n != 1);");

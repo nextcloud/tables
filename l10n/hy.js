@@ -1,0 +1,27 @@
+OC.L10N.register(
+    "tables",
+    {
+    "Date" : "Date",
+    "Comments" : "Կարծիքներ",
+    "Name" : "Անուն",
+    "Birthday" : "Ծննդյան օր",
+    "Description" : "Նկարագրություն",
+    "Cancel" : "ընդհատել",
+    "Delete" : "հեռացնել",
+    "Title" : "Վերնագիր",
+    "Default" : "Լռելյայն",
+    "Yes" : "Yes",
+    "No" : "No",
+    "Type" : "Տիպ",
+    "Save" : "Պահպանել",
+    "Link" : "Հղում",
+    "Time" : "Ժամ",
+    "Edit" : "մշակել",
+    "Close" : "Փակել",
+    "Owner" : "Owner",
+    "Previous" : "Նախորդ",
+    "Next" : "Հաջորդ",
+    "Create" : "Ստեղծել",
+    "Today" : "այսօր"
+},
+"nplurals=2; plural=(n != 1);");

@@ -1,0 +1,27 @@
+OC.L10N.register(
+    "tables",
+    {
+    "Date" : "Date",
+    "Name" : "ឈ្មោះ",
+    "Birthday" : "ថ្ងៃ​កំណើត",
+    "Description" : "ការ​អធិប្បាយ",
+    "Documentation" : "កម្រង​ឯកសារ",
+    "Cancel" : "បោះបង់",
+    "Delete" : "លុប",
+    "Title" : "ចំណងជើង",
+    "Default" : "លំនាំ​ដើម",
+    "Yes" : "Yes",
+    "No" : "No",
+    "Type" : "Type",
+    "Save" : "រក្សាទុក",
+    "Link" : "Link",
+    "Time" : "ម៉ោង",
+    "Edit" : "កែប្រែ",
+    "Close" : "បិទ",
+    "Owner" : "Owner",
+    "Previous" : "មុន",
+    "Next" : "បន្ទាប់",
+    "Create" : "បង្កើត",
+    "Today" : "ថ្ងៃ​នេះ"
+},
+"nplurals=1; plural=0;");

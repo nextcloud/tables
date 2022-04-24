@@ -1,0 +1,27 @@
+OC.L10N.register(
+    "tables",
+    {
+    "Date" : "Date",
+    "Name" : "Ad",
+    "Birthday" : "Ad günü",
+    "Description" : "Açıqlanma",
+    "Documentation" : "Sənədlər",
+    "Cancel" : "Dayandır",
+    "Delete" : "Sil",
+    "Title" : "Başlıq",
+    "Default" : "Susmaya görə",
+    "Yes" : "Yes",
+    "No" : "No",
+    "Type" : "Type",
+    "Save" : "Saxla",
+    "Link" : "Link",
+    "Time" : "Vaxt",
+    "Edit" : "Dəyişiklik et",
+    "Close" : "Bağla",
+    "Owner" : "Owner",
+    "Previous" : "Əvvələ",
+    "Next" : "Növbəti",
+    "Create" : "Yarat",
+    "Today" : "Bu gün"
+},
+"nplurals=2; plural=(n != 1);");

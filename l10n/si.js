@@ -1,0 +1,26 @@
+OC.L10N.register(
+    "tables",
+    {
+    "Date" : "දිනය",
+    "Comments" : "අදහස්",
+    "Name" : "නම",
+    "Birthday" : "උපන් දිනය",
+    "Description" : "විස්තරය",
+    "Information" : "තොරතුරු",
+    "Cancel" : "අවලංගු කරන්න",
+    "Yes" : "ඔව්",
+    "No" : "නැහැ",
+    "Max" : "උපරිම",
+    "Save" : "සුරකින්න",
+    "Link" : "සබැඳිය",
+    "Time" : "වේලාව",
+    "Confirm" : "තහවුරු කරන්න",
+    "Edit" : "සංස්කරණය",
+    "Close" : "වසන්න",
+    "Owner" : "හිමිකරු",
+    "Previous" : "පෙර",
+    "Next" : "ඊළඟ",
+    "Create" : "සාදන්න",
+    "Today" : "අද"
+},
+"nplurals=2; plural=(n != 1);");

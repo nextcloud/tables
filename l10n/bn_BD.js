@@ -1,0 +1,27 @@
+OC.L10N.register(
+    "tables",
+    {
+    "Date" : "Date",
+    "Name" : "নাম",
+    "Birthday" : "জন্মদিন",
+    "Description" : "বিবরণ",
+    "Documentation" : "নথিবদ্ধকরণ",
+    "Cancel" : "বাতির",
+    "Delete" : "মুছে",
+    "Title" : "শিরোনাম",
+    "Default" : "পূর্বনির্ধারিত",
+    "Yes" : "Yes",
+    "No" : "No",
+    "Type" : "ধরণ",
+    "Save" : "সংরক্ষণ",
+    "Link" : "Link",
+    "Time" : "সময়",
+    "Edit" : "সম্পাদনা",
+    "Close" : "বন্ধ",
+    "Owner" : "Owner",
+    "Previous" : "পূর্ববর্তী",
+    "Next" : "পরবর্তী",
+    "Create" : "তৈরী কর",
+    "Today" : "আজ"
+},
+"nplurals=2; plural=(n != 1);");

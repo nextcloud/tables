@@ -1,0 +1,27 @@
+OC.L10N.register(
+    "tables",
+    {
+    "Date" : "ວັນທີ",
+    "Comments" : "ຄໍາເຫັນ",
+    "Name" : "ຊື່",
+    "Progress" : "ດຳເນີນການ",
+    "Information" : "ຂໍ້ມຸນ",
+    "Cancel" : "ຍົກເລີກ",
+    "Delete" : "ລຶບ",
+    "Default" : "ເລີ່ມຕົ້ນ",
+    "Yes" : "ແມ່ນແລ້ວ",
+    "No" : "ບໍ່",
+    "Type" : "ພິມ",
+    "Save" : "ບັນທຶກ",
+    "Link" : "ລິງ",
+    "Confirm" : "ຢືນຢັນ",
+    "Edit" : "ແກ້ໄຂ",
+    "Close" : "ປິດ",
+    "Owner" : "ເຈົ້າຂອງ",
+    "Print" : "ພິມ",
+    "Previous" : "ກ່ອນໜ້າ",
+    "Next" : "ທັດໄປ",
+    "Create" : "ສ້າງ",
+    "Today" : "ມື້ນີ້"
+},
+"nplurals=1; plural=0;");

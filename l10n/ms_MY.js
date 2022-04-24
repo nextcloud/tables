@@ -1,0 +1,25 @@
+OC.L10N.register(
+    "tables",
+    {
+    "Date" : "Date",
+    "Name" : "Nama",
+    "Birthday" : "Hari lahir",
+    "Description" : "Keterangan",
+    "Documentation" : "Dokumentasi",
+    "Cancel" : "Batal",
+    "Delete" : "Padam",
+    "Title" : "Judul",
+    "Yes" : "Yes",
+    "No" : "No",
+    "Type" : "Jenis",
+    "Save" : "Simpan",
+    "Link" : "Link",
+    "Edit" : "Sunting",
+    "Close" : "Tutup",
+    "Owner" : "Owner",
+    "Previous" : "Sebelum",
+    "Next" : "Seterus",
+    "Create" : "Buat",
+    "Today" : "Hari ini"
+},
+"nplurals=1; plural=0;");

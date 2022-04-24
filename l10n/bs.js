@@ -1,0 +1,28 @@
+OC.L10N.register(
+    "tables",
+    {
+    "Members" : "Članovi",
+    "Date" : "Date",
+    "Comments" : "Komentari",
+    "Name" : "Ime",
+    "Birthday" : "Rođendan",
+    "Description" : "Opis",
+    "Documentation" : "Dokumentacija",
+    "Cancel" : "Otkaži",
+    "Delete" : "Obriši",
+    "Title" : "Naslov",
+    "Default" : "Zadano",
+    "Yes" : "Yes",
+    "No" : "No",
+    "Type" : "Type",
+    "Save" : "Spremi",
+    "Link" : "Veza",
+    "Edit" : "Izmjeni",
+    "Close" : "Zatvori",
+    "Owner" : "Vlasnik",
+    "Previous" : "Prethodno",
+    "Next" : "Sljedeće",
+    "Create" : "Ustvari",
+    "Today" : "Danas"
+},
+"nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);");

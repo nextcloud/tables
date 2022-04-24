@@ -4,6 +4,8 @@
     "Members" : "Členovia",
     "List of members with some basic attributes." : "Zoznam členov s niekoľkými základnými atribútmi.",
     "Date" : "Dátum",
+    "Weight" : "Váha",
+    "Body fat" : "Tuk v tele",
     "Comments" : "Komentáre",
     "Name" : "Meno",
     "Position" : "Pozícia",
@@ -72,8 +74,18 @@
     "Textline" : "Riadok s textom",
     "Edit" : "Upraviť",
     "Close" : "Zatvoriť",
+    "Owner" : "Vlastník",
+    "Created at" : "Vytvorené:",
     "Show filter" : "Zobraziť filter",
+    "Download CSV" : "Stiahnuť CSV",
+    "Print" : "Tlačiť",
+    "First" : "Prvé",
+    "Last" : "Posledné",
+    "Previous" : "Predchádzajúce",
+    "Next" : "Ďalšie",
     "Number items" : "Počet položiek",
+    "Create" : "Vytvoriť",
+    "Today" : "Dnes",
     "Could not fetch tables" : "Nepodarilo sa získať tabuľky."
 },"pluralForm" :"nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);"
 }

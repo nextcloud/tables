@@ -139,6 +139,16 @@ OC.L10N.register(
     "If any of the columns don't match it then tries the same approach but with the column ids." : "Si alguna de las columnas no coincide, entonces prueba la misma aproximación, pero con los ids de las columnas.",
     "If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two bling columns for the row numbers and edit-button-column." : "Si ninguna de esas opciones funciona, la app asumirá que las columnas en los datos están en el mismo orden que las columnas visibles en la tabla y las importará de esa forma. Tiene que haber dos columnas ciegas, para los números de fila y la columna del botón de editar.",
     "Hints" : "Pistas",
+    "Owner" : "Propietario",
+    "Created at" : "Creado el",
+    "Download CSV" : "Descargar CSV",
+    "Print" : "Imprimir",
+    "First" : "Primera",
+    "Last" : "Última",
+    "Previous" : "Anterior",
+    "Next" : "Siguiente",
+    "Create" : "Crear",
+    "Today" : "Hoy",
     "Could not fetch tables" : "No se ha podido obtener las tablas."
 },
 "nplurals=2; plural=(n != 1);");

@@ -1,0 +1,28 @@
+{ "translations": {
+    "Date" : "Dato",
+    "Comments" : "Kommentarar",
+    "Name" : "Namn",
+    "Birthday" : "Bursdag",
+    "Description" : "Skildring",
+    "Information" : "Informasjon",
+    "Documentation" : "Dokumentasjon",
+    "Cancel" : "Avbryt",
+    "Delete" : "Slett",
+    "Title" : "Tittel",
+    "Default" : "Standard",
+    "Yes" : "Ja",
+    "No" : "Nei",
+    "Type" : "Type",
+    "Save" : "Lagre",
+    "Link" : "Lenkje",
+    "Time" : "Tid",
+    "Edit" : "Rediger",
+    "Close" : "Lukk",
+    "Owner" : "Owner",
+    "Created at" : "Skapt den",
+    "Previous" : "Førre",
+    "Next" : "Neste",
+    "Create" : "Lag",
+    "Today" : "I dag"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

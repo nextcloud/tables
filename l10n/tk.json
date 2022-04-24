@@ -1,0 +1,17 @@
+{ "translations": {
+    "Name" : "Ady",
+    "Progress" : "Ösüş",
+    "Cancel" : "ýatyrmak",
+    "Delete" : "Pozmak",
+    "Default" : "Bellenen",
+    "Yes" : "Hawa",
+    "No" : "Ýok",
+    "Type" : "Görnüşi",
+    "Save" : "Saklamak",
+    "Link" : "Baglanyşyk",
+    "Edit" : "Redaktirläň",
+    "Close" : "Ýap",
+    "Create" : "Dörediň",
+    "Today" : "Şu gün"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

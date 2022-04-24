@@ -151,6 +151,7 @@ OC.L10N.register(
     "First page" : "Erste Seite",
     "Last" : "Letzte",
     "Last page" : "Letzte Seite",
+    "Previous" : "Vorheriges",
     "Previous page" : "Vorheriger Seite",
     "Next" : "Nächste",
     "Next page" : "Nächster Seite",
