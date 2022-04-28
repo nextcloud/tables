@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.2 - 2022-04-28
+### Updated
+- many css fixes
+- css cleanup
+- minor bug fixes
+- translations
+- Nextcloud 24 compatible
+
 ## 0.1.1 - 2022-04-04
 ### Updated
 - many css fixes

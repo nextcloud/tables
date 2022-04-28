@@ -1,7 +1,7 @@
 {
 	"name": "tables",
 	"description": "Manage data within tables.",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"author": "Florian Steffens <flost-dev@mailbox.org",
 	"bugs": {
 		"url": "https://github.com/datenangebot/tables/issues"
