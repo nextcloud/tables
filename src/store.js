@@ -34,6 +34,7 @@ export default new Vuex.Store({
 		tablesLoading: false,
 		tables: [],
 		activeTableId: null,
+		showSidebar: false,
 	},
 	getters: {
 		activeTable(state) {
@@ -51,6 +52,9 @@ export default new Vuex.Store({
 		},
 		setTables(state, tables) {
 			state.tables = tables
+		},
+		setShowSidebar(state, status) {
+			state.showSidebar = !!status
 		},
 	},
 	actions: {
