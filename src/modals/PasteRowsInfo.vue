@@ -32,7 +32,7 @@
 							{{ t('tables', 'If any of the columns don\'t match it then tries the same approach but with the column ids.') }}
 						</li>
 						<li class="light">
-							{{ t('tables', 'If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two bling columns for the row numbers and edit-button-column.') }}
+							{{ t('tables', 'If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two blind columns for the row numbers and edit-button-column.') }}
 						</li>
 					</ol>
 				</div>
