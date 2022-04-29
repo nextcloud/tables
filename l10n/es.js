@@ -137,7 +137,6 @@ OC.L10N.register(
     "The app will attempt to work out which columns in the data correspond to columns in the table. It tries three different ways to achieve this:" : "La app intentará determinar qué columnas en los datos corresponden a columnas en la tabla. Intenta tres cosas diferentes para conseguirlo:",
     "First it checks the values of all columns in the first row of data to see if they match the titles of columns in the table." : "Primero, comprueba los valores de todas las columnas en la primera fila de datos para ver si coinciden con los títulos de columnas en la tabla.",
     "If any of the columns don't match it then tries the same approach but with the column ids." : "Si alguna de las columnas no coincide, entonces prueba la misma aproximación, pero con los ids de las columnas.",
-    "If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two bling columns for the row numbers and edit-button-column." : "Si ninguna de esas opciones funciona, la app asumirá que las columnas en los datos están en el mismo orden que las columnas visibles en la tabla y las importará de esa forma. Tiene que haber dos columnas ciegas, para los números de fila y la columna del botón de editar.",
     "Hints" : "Pistas",
     "Owner" : "Propietario",
     "Created at" : "Creado el",
