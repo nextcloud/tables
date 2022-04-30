@@ -136,6 +136,7 @@
     "The app will attempt to work out which columns in the data correspond to columns in the table. It tries three different ways to achieve this:" : "該應用程式將嘗試找出數據中的哪些列對應於表中的列。程式將以三種不同的方式進行嘗試：",
     "First it checks the values of all columns in the first row of data to see if they match the titles of columns in the table." : "首先，它檢查第一行數據中所有縱列的值，看它們是否與表中縱列的標題匹配。",
     "If any of the columns don't match it then tries the same approach but with the column ids." : "如果任何列不匹配，則嘗試相同的方法，但使用縱列 ID。",
+    "If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two blind columns for the row numbers and edit-button-column." : "如果其中一個選項匹配，應用程式將假定數據中的列與表中可見列的順序相同，並以這種方式導入它們。 前面必須有兩個虛擬列，一個用於行號列，一個用於編輯按鈕列。",
     "Hints" : "提示",
     "The format for a date has to be like YYYY-MM-DD, for example 2022-12-24." : "日期的格式必須是 YYYY-MM-DD，例如 2022-12-24。",
     "If you try to import by column order, see the third point above. You need to add two dummy columns at the beginning." : "如果您嘗試按列順序導入，請參閱上面的第三點。 您需要在開頭添加兩個虛擬列。",

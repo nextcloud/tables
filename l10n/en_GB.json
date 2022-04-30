@@ -26,6 +26,7 @@
     "Confirm" : "Confirm",
     "Edit" : "Edit",
     "Close" : "Close",
+    "If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two blind columns for the row numbers and edit-button-column." : "If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two dummy columns for the row numbers and edit-button-column.",
     "The format for a date has to be like YYYY-MM-DD, for example 2022-12-24." : "The format for a date must be YYYY-MM-DD, such as 2022-12-24.",
     "Owner" : "Owner",
     "Created at" : "Created at",
