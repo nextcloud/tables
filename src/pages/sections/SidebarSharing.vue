@@ -24,6 +24,7 @@
 
 <template>
 	<div class="sharing">
+		<h3>{{ t('tables', 'Add a new share') }}</h3>
 		<Multiselect id="ajax"
 			:clear-on-select="false"
 			:hide-selected="true"
@@ -51,12 +52,14 @@
 </template>
 
 <script>
-import { generateOcsUrl } from '@nextcloud/router'
+import { generateOcsUrl, generateUrl } from '@nextcloud/router'
 import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
 import ShareTypes from '../../mixins/shareTypesMixin'
+import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
 	components: {
@@ -91,6 +94,8 @@ export default {
 	},
 
 	computed: {
+		...mapState(['tables', 'tablesLoading', 'showSidebar']),
+		...mapGetters(['activeTable']),
 		sortedShares() {
 			return [...this.userShares, ...this.groupShares].slice()
 				.sort(this.sortByDisplayName)
@@ -138,14 +143,31 @@ export default {
 		removeShare(item) {
 			console.debug('remove share', item)
 		},
-
-		/**
-		 * Add a new share and dispatch the change to the parent
-		 *
-		 * @param {object} share the new share
-		 */
 		addShare(share) {
 			console.debug('add share', share)
+			this.sendNewShareToBE(share)
+		},
+
+		async sendNewShareToBE(share) {
+			try {
+				const data = {
+					nodeType: 'table',
+					nodeId: this.activeTable.id,
+					user: share.user,
+				}
+				console.debug('data array', data)
+				const res = await axios.post(generateUrl('/apps/tables/share'), data)
+				if (res.status !== 200) {
+					showWarning(t('tables', 'Sorry, something went wrong.'))
+					console.debug('axios error', res)
+					return false
+				}
+				console.debug('new share was saved', res)
+				showSuccess(t('tables', 'Saved new share with "{userName}".', { userName: share.user }))
+			} catch (e) {
+				console.error(e)
+				showError(t('tables', 'Could not create new share'))
+			}
 		},
 
 		sortByDisplayName(a, b) {
@@ -210,7 +232,7 @@ export default {
 			this.suggestions = exactSuggestions.concat(suggestions)
 
 			this.loading = false
-			console.info('suggestions', this.suggestions)
+			// console.info('suggestions', this.suggestions)
 		},
 
 		/**

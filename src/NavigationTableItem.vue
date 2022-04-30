@@ -4,16 +4,18 @@
 		:title="table.title"
 		:class="{active: activeTable && table.id === activeTable.id}"
 		icon="icon-triangle-e"
-		:editable="true"
+		:editable="canEditTableTitle"
 		:edit-placeholder="t('tables', 'Tables title')"
 		:edit-label="t('tables', 'Edit title')"
 		:allow-collapse="true"
 		:open="false"
+		:force-menu="true"
 		:to="'/table/' + parseInt(table.id)"
 		@click="closeNav"
 		@update:title="updateTableTitle">
 		<template slot="actions">
 			<ActionButton
+				v-if="!table.isShared"
 				icon="icon-delete"
 				:close-after-click="true"
 				@click="actionDelete">
@@ -63,6 +65,13 @@ export default {
 		...mapGetters(['activeTable']),
 		getTranslatedDescription() {
 			return t('tables', 'Do you really want to delete the table "{table}"?', { table: this.table.title })
+		},
+		canEditTableTitle() {
+			if (!this.table.isShared) {
+				return true
+			}
+
+			return !!this.table.onSharePermissions.manage
 		},
 	},
 	methods: {

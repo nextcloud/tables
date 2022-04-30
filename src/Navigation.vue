@@ -1,12 +1,6 @@
 <template>
 	<AppNavigation>
 		<template #list>
-			<AppNavigationNew
-				:text="t('tables', 'New table')"
-				:disabled="false"
-				button-class="icon-add"
-				@click="showModalCreateTable = true" />
-			<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
 			<div v-if="tablesLoading" class="icon-loading" />
 			<ul v-if="!tablesLoading">
 				<AppNavigationItem
@@ -14,8 +8,24 @@
 					icon="icon-home"
 					@click="$router.push('/').catch(() => {}); closeNav()" />
 
+				<AppNavigationCaption
+					:title="t('tables', 'My tables')">
+					<template #actions>
+						<ActionButton icon="icon-add" @click="showModalCreateTable = true" />
+					</template>
+				</AppNavigationCaption>
+				<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
+
 				<NavigationTableItem
-					v-for="table in tables"
+					v-for="table in getOwnTables"
+					:key="table.id"
+					:table="table" />
+
+				<AppNavigationCaption
+					:title="t('tables', 'Shared tables')" />
+
+				<NavigationTableItem
+					v-for="table in getSharedTables"
 					:key="table.id"
 					:table="table" />
 			</ul>
@@ -43,7 +53,8 @@ import { mapState, mapGetters } from 'vuex'
 import AppNavigationSettings from '@nextcloud/vue/dist/Components/AppNavigationSettings'
 import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
 import { emit } from '@nextcloud/event-bus'
-import AppNavigationNew from '@nextcloud/vue/dist/Components/AppNavigationNew'
+import AppNavigationCaption from '@nextcloud/vue/dist/Components/AppNavigationCaption'
+import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 
 export default {
 	name: 'Navigation',
@@ -53,7 +64,8 @@ export default {
 		CreateTable,
 		AppNavigationSettings,
 		AppNavigationItem,
-		AppNavigationNew,
+		AppNavigationCaption,
+		ActionButton,
 	},
 	data() {
 		return {
@@ -65,6 +77,12 @@ export default {
 	computed: {
 		...mapState(['tables', 'tablesLoading']),
 		...mapGetters(['activeTable']),
+		getSharedTables() {
+			return this.tables.filter((item) => { return item.isShared === true })
+		},
+		getOwnTables() {
+			return this.tables.filter((item) => { return item.isShared === false })
+		},
 	},
 	methods: {
 		openLink(link) {

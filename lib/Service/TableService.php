@@ -29,13 +29,17 @@ class TableService extends SuperService {
     /** @var RowService */
     private $rowService;
 
+    /** @var ShareService */
+    private $shareService;
+
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, $userId,
-                                TableMapper $mapper, TableTemplateService $tableTemplateService, ColumnService $columnService, RowService $rowService) {
+                                TableMapper $mapper, TableTemplateService $tableTemplateService, ColumnService $columnService, RowService $rowService, ShareService $shareService) {
         parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
         $this->tableTemplateService = $tableTemplateService;
         $this->columnService = $columnService;
         $this->rowService = $rowService;
+        $this->shareService = $shareService;
 	}
 
 
@@ -44,11 +48,13 @@ class TableService extends SuperService {
      */
     public function findAll(): array {
         try {
-            return $this->mapper->findAll($this->userId);
+            $ownTables = $this->mapper->findAll($this->userId);
+            $sharedTables = $this->shareService->findTablesSharedWithMe();
         } catch (\OCP\DB\Exception $e) {
             $this->logger->error($e->getMessage());
             throw new InternalError($e->getMessage());
         }
+        return array_merge($ownTables, $sharedTables);
     }
 
 
@@ -79,7 +85,7 @@ class TableService extends SuperService {
      * @noinspection PhpUndefinedMethodInspection
      *
      * @throws \OCP\DB\Exception
-     * @throws InternalError
+     * @throws InternalError|PermissionError
      */
     public function create($title, $template) {
         $userId = $this->userId;

@@ -4,6 +4,8 @@ namespace OCA\Tables\Service;
 
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\Row;
+use OCA\Tables\Db\Share;
+use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Errors\InternalError;
@@ -19,9 +21,13 @@ class PermissionsService extends SuperService {
     /** @var TableMapper */
     private $tableMapper;
 
-	public function __construct(LoggerInterface $logger, $userId, TableMapper $tableMapper) {
+    /** @var ShareMapper */
+    private $shareMapper;
+
+	public function __construct(LoggerInterface $logger, $userId, TableMapper $tableMapper, ShareMapper $shareMapper) {
         parent::__construct($logger, $userId);
         $this->tableMapper = $tableMapper;
+        $this->shareMapper = $shareMapper;
 	}
 
 
@@ -36,7 +42,7 @@ class PermissionsService extends SuperService {
             $user = $this->userId;
         }
 
-        return $this->userIsTableOwner($user, $table);
+        return $this->userIsTableOwner($user, $table) || $this->userCanReadSharedTableByTableId($user, $table->getId());
     }
 
     public function canReadTableByTableId($tableId = null, $user = null): bool
@@ -51,7 +57,7 @@ class PermissionsService extends SuperService {
         }
 
         try {
-            return $this->userIsTableOwnerByTableId($user, $tableId);
+            return $this->userIsTableOwnerByTableId($user, $tableId) || $this->userCanReadSharedTableByTableId($user, $tableId);
         } catch (InternalError|NotFoundError $e) {
             return false;
         }
@@ -99,6 +105,25 @@ class PermissionsService extends SuperService {
 
         try {
             return $this->userIsTableOwnerByTableId($user, $row->getTableId());
+        } catch (InternalError|NotFoundError $e) {
+            return false;
+        }
+    }
+
+    /** @noinspection PhpUndefinedMethodInspection */
+    public function canReadRowsByTableId($tableId = null, $user = null): bool
+    {
+        if($tableId === null) {
+            $this->logger->warning('try to verify permission: '.__FUNCTION__.' -> no $tableId is set');
+            return false;
+        }
+
+        if($user === null) {
+            $user = $this->userId;
+        }
+
+        try {
+            return $this->userIsTableOwnerByTableId($user, $tableId) || $this->userCanReadSharedTableByTableId($user, $tableId);
         } catch (InternalError|NotFoundError $e) {
             return false;
         }
@@ -185,7 +210,7 @@ class PermissionsService extends SuperService {
         }
 
         try {
-            return $this->userIsTableOwnerByTableId($user, $tableId);
+            return $this->userIsTableOwnerByTableId($user, $tableId) || $this->userCanReadSharedTableByTableId($user, $tableId);
         } catch (InternalError|NotFoundError $e) {
             return false;
         }
@@ -204,7 +229,7 @@ class PermissionsService extends SuperService {
         }
 
         try {
-            return $this->userIsTableOwnerByTableId($user, $column->getTableId());
+            return $this->userIsTableOwnerByTableId($user, $column->getTableId()) || $this->userCanReadSharedTableByTableId($user, $column->getTableId());
         } catch (InternalError|NotFoundError $e) {
             return false;
         }
@@ -265,5 +290,27 @@ class PermissionsService extends SuperService {
     /** @noinspection PhpUndefinedMethodInspection */
     private function userIsTableOwner($user, Table $table): bool {
         return $table->getOwnership() === $user;
+    }
+
+    private function userCanReadSharedTableByTableId($user, $tableId): bool {
+        try {
+            $share = $this->shareMapper->findShareForNodeId($user, $tableId);
+        } catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+            return false;
+        }
+        /** @noinspection PhpUndefinedMethodInspection */
+        return !!$share->getPermissionRead();
+    }
+
+    public function canReadShare(Share $item): bool
+    {
+        // TODO
+        return true;
+    }
+
+    public function canUpdateShare(Share $item): bool
+    {
+        // TODO
+        return true;
     }
 }

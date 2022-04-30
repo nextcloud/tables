@@ -28,5 +28,12 @@ return [
         ['name' => 'row#update', 'url' => '/row/{id}/column/{columnId}', 'verb' => 'PUT'],
         ['name' => 'row#updateSet', 'url' => '/row/{id}', 'verb' => 'PUT'],
         ['name' => 'row#destroy', 'url' => '/row/{id}', 'verb' => 'DELETE'],
+
+        // shares
+        ['name' => 'share#index', 'url' => '/share', 'verb' => 'GET'],
+        ['name' => 'share#show', 'url' => '/share/{id}', 'verb' => 'GET'],
+        ['name' => 'share#create', 'url' => '/share', 'verb' => 'POST'],
+        ['name' => 'share#update', 'url' => '/share/{id}', 'verb' => 'PUT'],
+        ['name' => 'share#destroy', 'url' => '/share/{id}', 'verb' => 'DELETE'],
     ]
 ];

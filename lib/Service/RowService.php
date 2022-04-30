@@ -31,7 +31,7 @@ class RowService extends SuperService {
      */
     public function findAllByTable(int $tableId): array {
         try {
-            if($this->permissionsService->canReadTableByTableId($tableId)) {
+            if($this->permissionsService->canReadRowsByTableId($tableId)) {
                 return $this->mapper->findAllByTable($tableId);
             } else {
                 throw new PermissionError('no read access to table id = '.$tableId);
