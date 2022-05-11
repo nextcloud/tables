@@ -13,7 +13,7 @@ OC.L10N.register(
     "Feeling over all" : "Odczucie po wszystkim",
     "Comments" : "Komentarze",
     "Name" : "Nazwa",
-    "Position" : "Pozycja",
+    "Position" : "Stanowisko",
     "Skills" : "Umiejętności",
     "Birthday" : "Urodziny",
     "Task" : "Zadania",
