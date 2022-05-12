@@ -10,7 +10,7 @@ OC.L10N.register(
     "Body fat" : "Masse graisseuse",
     "Comments" : "Commentaires",
     "Name" : "Nom",
-    "Position" : "Emplacement",
+    "Position" : "Poste",
     "Skills" : "Compétences",
     "Birthday" : "Anniversaire",
     "Task" : "Tâche",
