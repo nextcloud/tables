@@ -115,10 +115,10 @@ OC.L10N.register(
     "New value successfully saved." : "Nouvelle valeur enregistrée avec succès.",
     "Could not save new value." : "Impossible d'enregistrer la nouvelle valeur",
     "Table copied to clipboard." : "Tableau copié dans le presse-papier",
-    "_Delete selected row_::_Delete %n rows_" : ["Supprimer %n ligne","Supprimer %n lignes"],
-    "_Are you sure you want to delete the selected row?_::_Are you sure you want to delete the %n selected rows?_" : ["Êtes-vous sûr de vouloir supprimer la ligne sélectionné ?","Êtes-vous sûr de vouloir supprimer les %n lignes sélectionnées ?"],
-    "_%n row was saved._::_%n rows were saved._" : ["%n ligne a été sauvegardée.","%n lignes ont été sauvegardées."],
-    "_Selected row was deleted._::_Selected %n rows were deleted._" : ["La ligne sélectionnée a été supprimée.","%n lignes sélectionnées ont été supprimées."],
+    "_Delete selected row_::_Delete %n rows_" : ["Supprimer %n ligne","Supprimer %n lignes","Supprimer %n lignes"],
+    "_Are you sure you want to delete the selected row?_::_Are you sure you want to delete the %n selected rows?_" : ["Êtes-vous sûr de vouloir supprimer la ligne sélectionné ?","Êtes-vous sûr de vouloir supprimer les %n lignes sélectionnées ?","Êtes-vous sûr de vouloir supprimer les %n lignes sélectionnées ?"],
+    "_%n row was saved._::_%n rows were saved._" : ["%n ligne a été sauvegardée.","%n lignes ont été sauvegardées.","%n lignes ont été sauvegardées."],
+    "_Selected row was deleted._::_Selected %n rows were deleted._" : ["La ligne sélectionnée a été supprimée.","%n lignes sélectionnées ont été supprimées.","%n lignes sélectionnées ont été supprimées."],
     "Add a new column" : "Ajouter une nouvelle colonne",
     "Last edit" : "Dernière modification",
     "Create" : "Créer",
@@ -129,4 +129,4 @@ OC.L10N.register(
     "There is a bug with the editor on mobile devices, that is why you see only a simple text box." : "Il y a un bug avec l'éditeur sur les appareils mobiles, c'est pourquoi vous ne voyez qu'une simple boîte de texte.",
     "Could not fetch tables" : "Impossible de récupérer les tables"
 },
-"nplurals=2; plural=(n > 1);");
+"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

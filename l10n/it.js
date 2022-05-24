@@ -152,7 +152,7 @@ OC.L10N.register(
     "New value successfully saved." : "Valore salvato correttamente",
     "Could not save new value." : "Impossibile salvare il nuovo valore.",
     "Table copied to clipboard." : "Tabella copiata negli appunti",
-    "_%n row was saved._::_%n rows were saved._" : ["%nriga è stata salvata."," %nriga è stata salvata."],
+    "_%n row was saved._::_%n rows were saved._" : ["%nriga è stata salvata."," %nriga è stata salvata."," %nriga è stata salvata."],
     "Add a new column" : "Aggiungi una nuova colonna",
     "Last edit" : "Ultima modifica",
     "Create" : "Crea",
@@ -162,4 +162,4 @@ OC.L10N.register(
     "length: {length}/{maxLength}" : "lunghezza: {length}/{maxLength}",
     "There is a bug with the editor on mobile devices, that is why you see only a simple text box." : "E' presente un bug nell'editor su smartphone; questo è il motivo per cui vedi solamente una semplice casella di testo."
 },
-"nplurals=2; plural=(n != 1);");
+"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

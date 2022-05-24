@@ -28,6 +28,7 @@ OC.L10N.register(
     "Close" : "Tutup",
     "Owner" : "Owner",
     "Created at" : "Dibuat saat",
+    "First" : "Pertama",
     "Previous" : "Sebelumnya",
     "Next" : "Berikutnya",
     "Create" : "Buat",

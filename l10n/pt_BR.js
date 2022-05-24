@@ -170,10 +170,10 @@ OC.L10N.register(
     "New value successfully saved." : "Novo valor salvo com sucesso.",
     "Could not save new value." : "Não foi possível salvar o novo valor.",
     "Table copied to clipboard." : "Tabela copiada para a área de transferência.",
-    "_Delete selected row_::_Delete %n rows_" : ["Excluir linha selecionada","Excluir %n linhas"],
-    "_Are you sure you want to delete the selected row?_::_Are you sure you want to delete the %n selected rows?_" : ["Tem certeza de que deseja excluir a linha selecionada?","Tem certeza de que deseja excluir as %n linhas selecionadas?"],
-    "_%n row was saved._::_%n rows were saved._" : ["%n linhas foram salva.","%n linhas foram salvas."],
-    "_Selected row was deleted._::_Selected %n rows were deleted._" : ["A linha selecionada foi excluída.","%n linhas selecionadas serão excluídas."],
+    "_Delete selected row_::_Delete %n rows_" : ["Excluir linha selecionada","Excluir %n linhas","Excluir %n linhas"],
+    "_Are you sure you want to delete the selected row?_::_Are you sure you want to delete the %n selected rows?_" : ["Tem certeza de que deseja excluir a linha selecionada?","Tem certeza de que deseja excluir as %n linhas selecionadas?","Tem certeza de que deseja excluir as %n linhas selecionadas?"],
+    "_%n row was saved._::_%n rows were saved._" : ["%n linhas foram salva.","%n linhas foram salvas.","%n linhas foram salvas."],
+    "_Selected row was deleted._::_Selected %n rows were deleted._" : ["A linha selecionada foi excluída.","%n linhas selecionadas serão excluídas.","%n linhas selecionadas serão excluídas."],
     "Add a new column" : "Adicionar uma nova coluna",
     "Last edit" : "Última edição",
     "Create" : "Criar",
@@ -184,4 +184,4 @@ OC.L10N.register(
     "There is a bug with the editor on mobile devices, that is why you see only a simple text box." : "Há um bug com o editor em dispositivos móveis, é por isso que você vê apenas uma caixa de texto simples.",
     "Could not fetch tables" : "Não foi possível buscar tabelas"
 },
-"nplurals=2; plural=(n > 1);");
+"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");
