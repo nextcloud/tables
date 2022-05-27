@@ -24,6 +24,7 @@ OC.L10N.register(
     "Edit" : "แก้ไข",
     "Close" : "ปิด",
     "Owner" : "เจ้าของ",
+    "Created at" : "สร้างเมื่อ",
     "Previous" : "ก่อนหน้า",
     "Next" : "ถัดไป",
     "Create" : "สร้าง",
