@@ -39,7 +39,7 @@ OC.L10N.register(
     "Delete" : "Sil",
     "Do you really want to delete the table \"{table}\"?" : "\"{table}\" tablosunu silmek istediğinize emin misiniz?",
     "Table \"{table}\" deleted." : "\"{table}\" tablosu silindi.",
-    "Sorry, something went wrong." : "Maalesef bir sorun çıktı.",
+    "Sorry, something went wrong." : "Ne yazık ki bir sorun çıktı.",
     "Table title is updated to \"{table}\"" : "Tablo başlığı \"{table}\" olarak güncellendi",
     "Could not update tables title" : "Tablo başlığı güncellenemedi",
     "Set today as default" : "Varsayılan olarak bugün ayarlansın",
