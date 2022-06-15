@@ -28,9 +28,9 @@ class TableTemplateService {
         return [
             [
                 'name'          => 'todo',
-                'title'         => $this->l->t('ToDo list'),
+                'title'         => $this->l->t('To-Do list'),
                 'icon'          => 'icon-checkmark',
-                'description'   => $this->l->t('Setup a simple todo-list.')
+                'description'   => $this->l->t('Setup a simple To-Do list.')
             ],
             [
                 'name'          => 'members',
