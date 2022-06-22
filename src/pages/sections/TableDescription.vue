@@ -16,6 +16,12 @@
 						</template>
 						{{ t('tables', 'Edit columns') }}
 					</ActionButton>
+					<ActionButton v-if="!activeTable.isShared"
+						:close-after-click="true"
+						icon="icon-share"
+						@click="$store.commit('setShowSidebar', true); $store.commit('setSidebarActiveTab', 'share')">
+						{{ t('tables', 'Sharing options') }}
+					</ActionButton>
 				</Actions>
 			</h1>
 		</div>

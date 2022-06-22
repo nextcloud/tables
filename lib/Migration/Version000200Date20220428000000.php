@@ -32,11 +32,15 @@ class Version000200Date20220428000000 extends SimpleMigrationStep {
                 'autoincrement' => true,
                 'notnull' => true,
             ]);
-            $table->addColumn('user_sender', Types::STRING, [
+            $table->addColumn('sender', Types::STRING, [
                 'notnull' => true,
                 'length' => 200
             ]);
-            $table->addColumn('user_receiver', Types::STRING, [
+            $table->addColumn('receiver', Types::STRING, [
+                'notnull' => true,
+                'length' => 200
+            ]);
+            $table->addColumn('receiver_type', Types::STRING, [
                 'notnull' => true,
                 'length' => 200
             ]);

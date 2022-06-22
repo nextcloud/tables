@@ -43,22 +43,40 @@ class ShareMapper extends QBMapper {
         $qb->select('*')
             ->from($this->table)
             ->where($qb->expr()->eq('node_id', $qb->createNamedParameter($nodeId, IQueryBuilder::PARAM_INT)))
-            ->andWhere($qb->expr()->eq('user_receiver', $qb->createNamedParameter($user, IQueryBuilder::PARAM_INT)));
+            ->andWhere($qb->expr()->eq('receiver', $qb->createNamedParameter($user, IQueryBuilder::PARAM_INT)));
         return $this->findEntity($qb);
     }
 
     /**
      * @param $nodeType
-     * @param $userReceiver
+     * @param $receiver
      * @return array
      * @throws Exception
      */
-	public function findAllSharesFor($nodeType, $userReceiver): array {
+    public function findAllSharesFor($nodeType, $receiver, $receiverType='user'): array {
         $qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->table)
-            ->where($qb->expr()->eq('user_receiver', $qb->createNamedParameter($userReceiver, IQueryBuilder::PARAM_STR)))
-            ->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_STR)));
+        $qb->select('*')
+            ->from($this->table)
+            ->where($qb->expr()->eq('receiver', $qb->createNamedParameter($receiver, IQueryBuilder::PARAM_STR)))
+            ->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_STR)))
+            ->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter($receiverType, IQueryBuilder::PARAM_STR)));
         return $this->findEntities($qb);
-	}
+    }
+
+    /**
+     * @param $nodeType
+     * @param int $nodeId
+     * @param $sender
+     * @return array
+     * @throws Exception
+     */
+    public function findAllSharesForNode($nodeType, int $nodeId, $sender): array {
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('*')
+            ->from($this->table)
+            ->where($qb->expr()->eq('sender', $qb->createNamedParameter($sender, IQueryBuilder::PARAM_STR)))
+            ->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_STR)))
+            ->andWhere($qb->expr()->eq('node_id', $qb->createNamedParameter($nodeId, IQueryBuilder::PARAM_INT)));
+        return $this->findEntities($qb);
+    }
 }

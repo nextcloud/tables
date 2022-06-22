@@ -10,6 +10,7 @@ use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 
@@ -19,25 +20,31 @@ use Psr\Log\LoggerInterface;
 
 class ShareService extends SuperService {
 
+    /** @var ShareMapper */
     protected $mapper;
 
     /** @var TableMapper */
     protected $tableMapper;
 
+    /** @var UserHelper */
+    protected $userHelper;
+
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, $userId,
-    ShareMapper $shareMapper, TableMapper $tableMapper) {
+    ShareMapper $shareMapper, TableMapper $tableMapper, UserHelper $userHelper) {
         parent::__construct($logger, $userId, $permissionsService);
         $this->mapper = $shareMapper;
         $this->tableMapper = $tableMapper;
+        $this->userHelper = $userHelper;
 	}
 
 
     /**
      * @throws InternalError
      */
-    public function findAll(): array {
+    public function findAll($nodeType, int $tableId): array {
         try {
-            return $this->mapper->findAll($this->userId);
+            $shares = $this->mapper->findAllSharesForNode($nodeType, $tableId, $this->userId);
+            return $this->addReceiverDisplayName($shares);
         } catch (\OCP\DB\Exception $e) {
             $this->logger->error($e->getMessage());
             throw new InternalError($e->getMessage());
@@ -128,7 +135,7 @@ class ShareService extends SuperService {
             $this->logger->error($e->getMessage());
             throw new InternalError($e->getMessage());
         }
-        return $newShare;
+        return $this->addReceiverDisplayName($newShare);
 	}
 
     /**
@@ -155,7 +162,7 @@ class ShareService extends SuperService {
             $item->setPermissionManage($permissionManage);
             $item->setLastEditAt($time->format('Y-m-d H:i:s'));
 
-			return $this->mapper->update($item);
+			return $this->addReceiverDisplayName($this->mapper->update($item));
 		} catch (Exception $e) {
             $this->logger->error($e->getMessage());
             throw new InternalError($e->getMessage());
@@ -180,10 +187,28 @@ class ShareService extends SuperService {
                 $this->columnService->delete($column->id, true);
             }
 			$this->mapper->delete($item);
-			return $item;
+			return $this->addReceiverDisplayName($item);
 		} catch (Exception $e) {
             $this->logger->error($e->getMessage());
             throw new InternalError($e->getMessage());
+        }
+    }
+
+    private function addReceiverDisplayName($shares) {
+        if(!$shares) {
+            $this->logger->error("Try to load receiverDisplayName, but no share is given");
+            return "";
+        }
+
+        if(is_array($shares)){
+            $return = [];
+            foreach ($shares as $share) {
+                $share->setReceiverDisplayName($this->userHelper->getUserDisplayName($share->getReceiver()));
+                $return[] = $share;
+            }
+            return $return;
+        } else {
+            return $shares->setReceiverDisplayName($this->userHelper->getUserDisplayName($shares->getReceiver()));
         }
     }
 }

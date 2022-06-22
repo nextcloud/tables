@@ -33,10 +33,10 @@ class ShareController extends Controller {
     /**
      * @NoAdminRequired
      */
-    public function index(): DataResponse
+    public function index(int $tableId): DataResponse
     {
-        return $this->handleError(function () {
-            return $this->service->findAll();
+        return $this->handleError(function () use ($tableId) {
+            return $this->service->findAll('table', $tableId);
         });
     }
 
