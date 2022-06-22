@@ -17,6 +17,7 @@ OC.L10N.register(
     "Save" : "Cadw",
     "Link" : "Dolen",
     "Time" : "Amser",
+    "Confirm" : "Cadarnhau",
     "Edit" : "Golygu",
     "Close" : "Cau",
     "Owner" : "Owner",
