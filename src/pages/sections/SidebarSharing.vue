@@ -3,7 +3,7 @@
 		<h1>{{ t('tables', 'Sharing') }}</h1>
 		<div v-if="!activeTable.isShared">
 			<ShareForm :shares="shares" @add="addShare" @update="updateShare" />
-			<ShareList :shares="shares" />
+			<ShareList :shares="shares" @remove="removeShare" @update="updateShare" />
 		</div>
 		<div v-else>
 			{{ t('tables', 'This table is shared with you. Resharing is not allowed.') }}
@@ -55,15 +55,22 @@ export default {
 			this.shares = await this.getSharedWithFromBE()
 			this.loading = false
 		},
-		removeShare(share) {
-			console.debug('remove share triggered', share)
+		async removeShare(shareId) {
+			console.debug('remove share triggered', shareId)
+			await this.removeShareFromBE(shareId)
+			await this.loadSharesFromBE()
 		},
-
-		addShare(share) {
+		async addShare(share) {
 			console.debug('add share triggered', share)
+			await this.sendNewShareToBE(share)
+			await this.loadSharesFromBE()
 		},
-		updateShare(share) {
-			console.debug('update share triggered', share)
+		async updateShare(data) {
+			console.debug('update share triggered', data)
+			const shareId = data.id
+			delete data.id
+			await this.updateShareToBE(shareId, data)
+			await this.loadSharesFromBE()
 		},
 	},
 }

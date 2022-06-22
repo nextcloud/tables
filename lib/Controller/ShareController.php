@@ -52,19 +52,18 @@ class ShareController extends Controller {
     /**
      * @NoAdminRequired
      */
-	public function create(int $nodeId, $nodeType, $user, bool $permissionRead = false, bool $permissionCreate = false, bool $permissionUpdate = false, bool $permissionDelete = false, bool $permissionManage = false): DataResponse {
-        return $this->handleError(function () use ($nodeId, $nodeType, $user, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage) {
-            return $this->service->create($nodeId, $nodeType, $user, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage);
+	public function create(int $nodeId, $nodeType, $receiver, $receiverType, bool $permissionRead = false, bool $permissionCreate = false, bool $permissionUpdate = false, bool $permissionDelete = false, bool $permissionManage = false): DataResponse {
+        return $this->handleError(function () use ($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage) {
+            return $this->service->create($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage);
         });
     }
 
 	/**
 	 * @NoAdminRequired
 	 */
-	public function update(int $id, string $title): DataResponse {
-        // TODO
-		return $this->handleError(function () use ($id, $title) {
-			return $this->service->update($id, $title, $this->userId);
+	public function updatePermission(int $id, string $permission, bool $value): DataResponse {
+		return $this->handleError(function () use ($id, $permission, $value) {
+			return $this->service->updatePermission($id, $permission, $value);
 		});
 	}
 

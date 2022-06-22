@@ -6,6 +6,14 @@
 		<table>
 			<tr>
 				<td>
+					{{ t('tables', 'Receiver type') }}
+				</td>
+				<td>
+					{{ share.receiverType }}
+				</td>
+			</tr>
+			<tr>
+				<td>
 					{{ t('tables', 'Last edit') }}
 				</td>
 				<td>

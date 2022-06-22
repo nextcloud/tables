@@ -115,11 +115,12 @@ class ShareService extends SuperService {
      * @throws \OCP\DB\Exception
      * @throws InternalError
      */
-    public function create($nodeId, $nodeType, $user, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage) {
+    public function create($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage) {
         $time = new DateTime();
 		$item = new Share();
-        $item->setUserSender($this->userId);
-        $item->setUserReceiver($user);
+        $item->setSender($this->userId);
+        $item->setReceiver($receiver);
+        $item->setReceiverType($receiverType);
         $item->setNodeId($nodeId);
         $item->setNodeType($nodeType);
         $item->setPermissionRead($permissionRead);
@@ -143,7 +144,7 @@ class ShareService extends SuperService {
      *
      * @throws InternalError
      */
-    public function update($id, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage) {
+    public function updatePermission($id, $permission, $value) {
 		try {
             $item = $this->mapper->find($id);
 
@@ -153,13 +154,22 @@ class ShareService extends SuperService {
 
             $userId = $this->userId;
             $time = new DateTime();
-            $item = new Table();
-            $item->setUser($userId);
-            $item->setPermissionRead($permissionRead);
-            $item->setPermissionCreate($permissionCreate);
-            $item->setPermissionUpdate($permissionUpdate);
-            $item->setPermissionDelete($permissionDelete);
-            $item->setPermissionManage($permissionManage);
+
+            if($permission === "read")
+                $item->setPermissionRead($value);
+
+            if($permission === "create")
+                $item->setPermissionCreate($value);
+
+            if($permission === "update")
+                $item->setPermissionUpdate($value);
+
+            if($permission === "delete")
+                $item->setPermissionDelete($value);
+
+            if($permission === "manage")
+                $item->setPermissionManage($value);
+
             $item->setLastEditAt($time->format('Y-m-d H:i:s'));
 
 			return $this->addReceiverDisplayName($this->mapper->update($item));
@@ -173,7 +183,6 @@ class ShareService extends SuperService {
      * @throws InternalError
      */
     public function delete($id) {
-        // TODO
 		try {
             $item = $this->mapper->find($id);
 
@@ -181,13 +190,8 @@ class ShareService extends SuperService {
             if(!$this->permissionsService->canDeleteShare($item))
                 throw new PermissionError('PermissionError: can not delete share with id '.$id);
 
-            $this->rowService->deleteAllByTable($id);
-            $columns = $this->columnService->findAllByTable($id);
-            foreach ($columns as $column) {
-                $this->columnService->delete($column->id, true);
-            }
 			$this->mapper->delete($item);
-			return $this->addReceiverDisplayName($item);
+            return $this->addReceiverDisplayName($item);
 		} catch (Exception $e) {
             $this->logger->error($e->getMessage());
             throw new InternalError($e->getMessage());
@@ -195,7 +199,7 @@ class ShareService extends SuperService {
     }
 
     private function addReceiverDisplayName($shares) {
-        if(!$shares) {
+        if(!$shares && !is_array($shares)) {
             $this->logger->error("Try to load receiverDisplayName, but no share is given");
             return "";
         }
@@ -208,7 +212,8 @@ class ShareService extends SuperService {
             }
             return $return;
         } else {
-            return $shares->setReceiverDisplayName($this->userHelper->getUserDisplayName($shares->getReceiver()));
+            $shares->setReceiverDisplayName($this->userHelper->getUserDisplayName($shares->getReceiver()));
+            return $shares;
         }
     }
 }

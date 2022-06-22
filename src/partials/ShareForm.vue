@@ -27,7 +27,7 @@
 		<h3>{{ t('tables', 'Add a new share') }}</h3>
 		<Multiselect
 			id="ajax"
-			:clear-on-select="false"
+			:clear-on-select="true"
 			:hide-selected="true"
 			:internal-search="false"
 			:loading="loading"

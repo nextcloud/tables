@@ -15,7 +15,7 @@
 		@update:title="updateTableTitle">
 		<template slot="actions">
 			<ActionButton
-				v-if="!table.isShared"
+				v-if="!table.isShared || table.onSharePermissions.manage"
 				icon="icon-delete"
 				:close-after-click="true"
 				@click="actionDelete">

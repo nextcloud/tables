@@ -178,7 +178,7 @@ export default {
 				}
 			} catch (e) {
 				console.error(e)
-				showError(t('tables', 'Could not create new column'))
+				showError(t('tables', 'Could not update row.'))
 			}
 		},
 		reset() {
