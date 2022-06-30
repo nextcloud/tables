@@ -50,11 +50,26 @@ class TableService extends SuperService {
         try {
             $ownTables = $this->mapper->findAll($this->userId);
             $sharedTables = $this->shareService->findTablesSharedWithMe();
+
+            // clean duplicates
+            $newSharedTables = [];
+            foreach ($sharedTables as $sharedTable) {
+                $found = false;
+                foreach ($ownTables as $ownTable) {
+                    if ($sharedTable->getId() === $ownTable->getId()) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if(!$found) {
+                    $newSharedTables[] = $sharedTable;
+                }
+            }
         } catch (\OCP\DB\Exception $e) {
             $this->logger->error($e->getMessage());
             throw new InternalError($e->getMessage());
         }
-        return array_merge($ownTables, $sharedTables);
+        return array_merge($ownTables, $newSharedTables);
     }
 
 

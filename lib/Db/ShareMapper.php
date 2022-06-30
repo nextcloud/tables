@@ -50,7 +50,8 @@ class ShareMapper extends QBMapper {
     /**
      * @param $nodeType
      * @param $receiver
-     * @return array
+     * @param string $receiverType
+     * @return Share[]
      * @throws Exception
      */
     public function findAllSharesFor($nodeType, $receiver, $receiverType='user'): array {

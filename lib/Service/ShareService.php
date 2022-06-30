@@ -84,7 +84,15 @@ class ShareService extends SuperService {
     {
         $returnArray = [];
         try {
+            // get all tables that are shared with me as user
             $tablesSharedWithMe = $this->mapper->findAllSharesFor('table', $this->userId);
+
+            // get all tables that are shared with me by group
+            $userGroups = $this->userHelper->getGroupsForUser($this->userId);
+            foreach ($userGroups as $userGroup) {
+                $shares = $this->mapper->findAllSharesFor('table', $userGroup->getDisplayName(), 'group');
+                $tablesSharedWithMe = array_merge($tablesSharedWithMe, $shares);
+            }
         } catch (\OCP\DB\Exception $e) {
             throw new InternalError($e->getMessage());
         }

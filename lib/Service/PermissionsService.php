@@ -311,7 +311,8 @@ class PermissionsService extends SuperService {
     public function canUpdateShare(Share $item): bool
     {
         /** @noinspection PhpUndefinedMethodInspection */
-        return $item->getSender() === $this->userId;    }
+        return $item->getSender() === $this->userId;
+    }
 
     public function canDeleteShare(Share $item): bool
     {
