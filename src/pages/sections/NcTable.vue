@@ -3,7 +3,10 @@
 		<div class="row space-LR space-T">
 			<div v-if="hasColumns" class="col-4" style="display: flex;">
 				<Actions>
-					<ActionButton :close-after-click="true" icon="icon-add" @click="newRow = true">
+					<ActionButton v-if="canCreateDataActiveTable"
+						:close-after-click="true"
+						icon="icon-add"
+						@click="newRow = true">
 						{{ t('tables', 'Add new row') }}
 					</ActionButton>
 				</Actions>
@@ -11,7 +14,10 @@
 					<ActionCheckbox :checked.sync="showFilter">
 						{{ t('tables', 'Show filter') }}
 					</ActionCheckbox>
-					<ActionButton :close-after-click="true" icon="icon-delete" @click="actionDeleteRows">
+					<ActionButton v-if="canDeleteDataActiveTable"
+						:close-after-click="true"
+						icon="icon-delete"
+						@click="actionDeleteRows">
 						{{ t('tables', 'Delete selected rows') }}
 					</ActionButton>
 					<ActionButton :close-after-click="true" icon="icon-download" @click="downloadCSV">
@@ -76,6 +82,7 @@ import PasteRowsInfo from '../../modals/PasteRowsInfo'
 import tabulatorTableMixin from '../../mixins/tabulatorTableMixin'
 import tabulatorPrintMixin from '../../mixins/tabulatorPrintMixin'
 import tabulatorClipboardMixin from '../../mixins/tabulatorClipboardMixin'
+import tablePermissions from '../../mixins/tablePermissions'
 
 export default {
 	name: 'NcTable',
@@ -89,7 +96,7 @@ export default {
 		ActionButton,
 		ActionCheckbox,
 	},
-	mixins: [tabulatorPrintMixin, tabulatorTableMixin, tabulatorClipboardMixin],
+	mixins: [tabulatorPrintMixin, tabulatorTableMixin, tabulatorClipboardMixin, tablePermissions],
 	props: {
 		columns: {
 			type: Array,
@@ -131,8 +138,13 @@ export default {
 		getColumnsDefinition() {
 			const def = [
 				this.getRowSelectionColumnDef(),
-				this.getRowEditColumnDef(),
+				// this.getRowEditColumnDef(),
 			]
+
+			if (this.canUpdateDataActiveTable) {
+				def.push(this.getRowEditColumnDef())
+			}
+
 			if (this.columns) {
 				this.columns.forEach(item => {
 					let formatter = null

@@ -4,13 +4,13 @@
 			<h1>
 				{{ activeTable.title }}&nbsp;
 				<Actions>
-					<ActionButton :close-after-click="true" @click="showCreateColumn = true">
+					<ActionButton v-if="canManageActiveTable" :close-after-click="true" @click="showCreateColumn = true">
 						<template #icon>
 							<TableColumnPlusAfter :size="20" decorative title="" />
 						</template>
 						{{ t('tables', 'Add a new column') }}
 					</ActionButton>
-					<ActionButton :close-after-click="true" @click="showEditColumns = true">
+					<ActionButton v-if="canManageActiveTable" :close-after-click="true" @click="showEditColumns = true">
 						<template #icon>
 							<ViewColumnOutline :size="20" decorative title="" />
 						</template>
@@ -45,6 +45,7 @@ import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter
 import ViewColumnOutline from 'vue-material-design-icons/ViewColumnOutline'
 import CreateColumn from '../../modals/CreateColumn'
 import EditColumns from '../../modals/EditColumns'
+import tablePermissions from '../../mixins/tablePermissions'
 
 export default {
 	name: 'TableDescription',
@@ -56,6 +57,7 @@ export default {
 		CreateColumn,
 		EditColumns,
 	},
+	mixins: [tablePermissions],
 	props: {
 		columns: {
 			type: Array,
@@ -66,6 +68,7 @@ export default {
 			default: false,
 		},
 	},
+
 	data() {
 		return {
 			showCreateColumn: false,
