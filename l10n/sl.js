@@ -120,7 +120,6 @@ OC.L10N.register(
     "Could not delete row." : "Vrstice ni mogoče izbrisati.",
     "Paste rows from clipboard" : "Prilepi vrstice iz odložišča",
     "Click inside the table." : "Kliknite v razpredelnico",
-    "If either of those options match, the app will assume the columns in the data are in the same order as the visible columns in the table and import them that way. There have to be two bling columns for the row numbers and edit-button-column." : "Če se katerakoli možnost ujema, so stolpci podatkov v enakem vrstnem redu kot vidni stolpci v tabeli, in poteka uvoz na ta način. Za številke vrstic in stolpec z gumbom za urejanje morata obstajati dva prazna stolpca.",
     "Hints" : "Namigi",
     "Could not fetch rows for table" : "Ni mogoče pridobiti vrstic razpredelnice",
     "All tables" : "Vse razpredelnice",

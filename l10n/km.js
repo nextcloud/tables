@@ -10,6 +10,7 @@ OC.L10N.register(
     "Delete" : "លុប",
     "Title" : "ចំណងជើង",
     "Default" : "លំនាំ​ដើម",
+    "Options" : "ជម្រើស",
     "Yes" : "Yes",
     "No" : "No",
     "Type" : "Type",

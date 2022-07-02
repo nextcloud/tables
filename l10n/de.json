@@ -131,6 +131,7 @@
     "Then push the buttons \"Ctrl + V\" or as a mac user \"⌘ + V\"." : "Dann drücke die Tasten \"STRG + V\" oder als Mac-Benutzer \"⌘ + V\"",
     "Column mapping" : "Spaltenzuordnung",
     "Hints" : "Hinweise",
+    "The format for a date has to be like YYYY-MM-DD, for example 2022-12-24." : "Das Format für ein Datum muss JJJJ-MM-TT sein, zum Beispiel 2022-12-24.",
     "If you try to import by column order, see the third point above. You need to add two dummy columns at the beginning." : "Wenn Du versuchst, mit der Reihenfolge der Spalten zu importieren, siehe dritter Punkt oben, musst Du zwei Dummy-Zeilen am Anfang hinzufügen.",
     "Could not fetch rows for table" : "Konnte Zeilen für die Tabelle nicht laden",
     "All tables" : "Alle Tabellen",
