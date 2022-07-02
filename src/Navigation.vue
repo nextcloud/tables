@@ -96,7 +96,6 @@ export default {
 			}
 		},
 		actionCloseModalNewTable() {
-			console.debug('I will close the modal now!')
 			this.showModalCreateTable = false
 		},
 	},

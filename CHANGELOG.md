@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0-rc1 - 2022-07-02
+### Added
+- sharing options
+
 ## 0.1.1 - 2022-04-04
 ### Updated
 - many css fixes
