@@ -35,7 +35,7 @@ class ColumnService extends SuperService {
      */
     public function findAllByTable(int $tableId): array {
         try {
-            if($this->permissionsService->canReadColumnsByTableId($tableId)) {
+            if($this->permissionsService->canReadColumns($tableId)) {
                 return $this->mapper->findAllByTable($tableId);
             } else {
                 throw new PermissionError('no read access to table id = '.$tableId);
@@ -57,7 +57,8 @@ class ColumnService extends SuperService {
             $column = $this->mapper->find($id);
 
             // security
-            if(!$this->permissionsService->canReadColumn($column))
+            /** @noinspection PhpUndefinedMethodInspection */
+            if(!$this->permissionsService->canReadColumns($column->getTableId()))
                 throw new PermissionError('PermissionError: can not read column with id '.$id);
 
             return $column;
@@ -99,7 +100,7 @@ class ColumnService extends SuperService {
         string $datetimeDefault = ''
     ) {
         // security
-        if(!$this->permissionsService->canCreateColumnAtTableById($tableId))
+        if(!$this->permissionsService->canCreateColumns($tableId))
             throw new PermissionError('create column at the table id = '.$tableId.' is not allowed.');
 
         $time = new DateTime();
@@ -166,7 +167,7 @@ class ColumnService extends SuperService {
 		try {
 
             // security
-            if(!$this->permissionsService->canUpdateColumn($this->mapper->find($id)))
+            if(!$this->permissionsService->canUpdateColumns($tableId))
                 throw new PermissionError('update column id = '.$id.' is not allowed.');
 
 
@@ -209,7 +210,8 @@ class ColumnService extends SuperService {
             $item = $this->mapper->find($id);
 
             // security
-            if(!$this->permissionsService->canDeleteColumn($item))
+            /** @noinspection PhpUndefinedMethodInspection */
+            if(!$this->permissionsService->canDeleteColumns($item->getTableId()))
                 throw new PermissionError('delete column id = '.$id.' is not allowed.');
 
             if(!$skipRowCleanup) {

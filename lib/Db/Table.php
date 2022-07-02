@@ -13,6 +13,8 @@ class Table extends Entity implements JsonSerializable {
     protected $createdAt;
     protected $lastEditBy;
     protected $lastEditAt;
+    protected $isShared;
+    protected $onSharePermissions;
 
     public function __construct() {
         $this->addType('id', 'integer');
@@ -27,6 +29,8 @@ class Table extends Entity implements JsonSerializable {
             'createdAt'     => $this->createdAt,
             'lastEditBy'    => $this->lastEditBy,
             'lastEditAt'    => $this->lastEditAt,
+            'isShared'      => !!$this->isShared,
+            'onSharePermissions' => $this->onSharePermissions,
 		];
 	}
 }

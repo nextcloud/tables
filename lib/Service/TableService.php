@@ -29,13 +29,17 @@ class TableService extends SuperService {
     /** @var RowService */
     private $rowService;
 
+    /** @var ShareService */
+    private $shareService;
+
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, $userId,
-                                TableMapper $mapper, TableTemplateService $tableTemplateService, ColumnService $columnService, RowService $rowService) {
+                                TableMapper $mapper, TableTemplateService $tableTemplateService, ColumnService $columnService, RowService $rowService, ShareService $shareService) {
         parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
         $this->tableTemplateService = $tableTemplateService;
         $this->columnService = $columnService;
         $this->rowService = $rowService;
+        $this->shareService = $shareService;
 	}
 
 
@@ -44,11 +48,28 @@ class TableService extends SuperService {
      */
     public function findAll(): array {
         try {
-            return $this->mapper->findAll($this->userId);
+            $ownTables = $this->mapper->findAll($this->userId);
+            $sharedTables = $this->shareService->findTablesSharedWithMe();
+
+            // clean duplicates
+            $newSharedTables = [];
+            foreach ($sharedTables as $sharedTable) {
+                $found = false;
+                foreach ($ownTables as $ownTable) {
+                    if ($sharedTable->getId() === $ownTable->getId()) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if(!$found) {
+                    $newSharedTables[] = $sharedTable;
+                }
+            }
         } catch (\OCP\DB\Exception $e) {
             $this->logger->error($e->getMessage());
             throw new InternalError($e->getMessage());
         }
+        return array_merge($ownTables, $newSharedTables);
     }
 
 
@@ -79,7 +100,7 @@ class TableService extends SuperService {
      * @noinspection PhpUndefinedMethodInspection
      *
      * @throws \OCP\DB\Exception
-     * @throws InternalError
+     * @throws InternalError|PermissionError
      */
     public function create($title, $template) {
         $userId = $this->userId;
@@ -138,11 +159,19 @@ class TableService extends SuperService {
             if(!$this->permissionsService->canDeleteTable($item))
                 throw new PermissionError('PermissionError: can not delete table with id '.$id);
 
+            // delete all rows for that table
             $this->rowService->deleteAllByTable($id);
+
+            // delete all columns for that table
             $columns = $this->columnService->findAllByTable($id);
             foreach ($columns as $column) {
                 $this->columnService->delete($column->id, true);
             }
+
+            // delete all shares for that table
+            $this->shareService->deleteAllForTable($item);
+
+            // delete table
 			$this->mapper->delete($item);
 			return $item;
 		} catch (Exception $e) {

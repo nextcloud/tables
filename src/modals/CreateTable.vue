@@ -114,10 +114,11 @@ export default {
 			} else {
 				const newTableId = await this.sendNewTableToBE(template)
 				if (newTableId) {
-					await this.$router.push('/table/' + newTableId)
 					showSuccess(t('tables', 'The table "{table}" was created.', { table: this.title }))
+					this.actionCancel()
+					await this.$store.dispatch('loadTablesFromBE')
+					await this.$router.push('/table/' + newTableId)
 				}
-				this.actionCancel()
 			}
 		},
 		async sendNewTableToBE(template) {
@@ -134,7 +135,7 @@ export default {
 					return false
 				}
 				ret = res.data.id
-				await this.$store.dispatch('loadTablesFromBE')
+				// await this.$store.dispatch('loadTablesFromBE')
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not create new table'))
