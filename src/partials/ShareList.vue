@@ -19,24 +19,28 @@
 						<ActionCaption :title="t('tables', 'Permissions')" />
 						<ActionCheckbox
 							:checked.sync="share.permissionRead"
+							:disabled="share.permissionManage"
 							@check="updatePermission(share.id, 'read', true)"
 							@uncheck="updatePermission(share.id, 'read', false)">
 							{{ t('tables', 'Read data') }}
 						</ActionCheckbox>
 						<ActionCheckbox
 							:checked.sync="share.permissionCreate"
+							:disabled="share.permissionManage"
 							@check="updatePermission(share.id, 'create', true)"
 							@uncheck="updatePermission(share.id, 'create', false)">
 							{{ t('tables', 'Create data') }}
 						</ActionCheckbox>
 						<ActionCheckbox
 							:checked.sync="share.permissionUpdate"
+							:disabled="share.permissionManage"
 							@check="updatePermission(share.id, 'update', true)"
 							@uncheck="updatePermission(share.id, 'update', false)">
 							{{ t('tables', 'Update data') }}
 						</ActionCheckbox>
 						<ActionCheckbox
 							:checked.sync="share.permissionDelete"
+							:disabled="share.permissionManage"
 							@check="updatePermission(share.id, 'delete', true)"
 							@uncheck="updatePermission(share.id, 'delete', false)">
 							{{ t('tables', 'Delete data') }}

@@ -58,7 +58,12 @@ export default {
 			if (this.activeTable.id !== this.lastActiveTableId) {
 				// console.debug('try to reload')
 				this.getColumnsForTableFromBE(this.activeTable.id)
-				this.getRowsForTableFromBE(this.activeTable.id)
+
+				// load rows only if permitted
+				if (this.activeTable.isShared === false
+						|| (this.activeTable.isShared === true && (this.activeTable.onSharePermissions.read || this.activeTable.onSharePermissions.manage))) {
+					this.getRowsForTableFromBE(this.activeTable.id)
+				}
 				this.lastActiveTableId = this.activeTable.id
 			}
 		},
@@ -99,6 +104,7 @@ export default {
 					console.error(e)
 					showError(t('tables', 'Could not fetch rows for table'))
 				}
+
 			}
 			this.loading = false
 		},

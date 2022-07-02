@@ -53,11 +53,11 @@
 					<button class="secondary" @click="actionCancel">
 						{{ t('tables', 'Cancel') }}
 					</button>
-					<button class="primary" @click="actionConfirm">
+					<button v-if="canUpdateDataActiveTable" class="primary" @click="actionConfirm">
 						{{ t('tables', 'Save') }}
 					</button>
 				</div>
-				<div class="fix-col-1" style="justify-content: end;">
+				<div v-if="canDeleteDataActiveTable" class="fix-col-1" style="justify-content: end;">
 					<button v-if="!prepareDeleteRow" class="error" @click="prepareDeleteRow = true">
 						{{ t('tables', 'Delete') }}
 					</button>
@@ -86,6 +86,7 @@ import SelectionCheckForm from '../rowTypePartials/SelectionCheckForm'
 import DatetimeForm from '../rowTypePartials/DatetimeForm'
 import DatetimeDateForm from '../rowTypePartials/DatetimeDateForm'
 import DatetimeTimeForm from '../rowTypePartials/DatetimeTimeForm'
+import tablePermissions from '../mixins/tablePermissions'
 
 export default {
 	name: 'EditRow',
@@ -102,6 +103,7 @@ export default {
 		DatetimeDateForm,
 		DatetimeTimeForm,
 	},
+	mixins: [tablePermissions],
 	props: {
 		showModal: {
 			type: Boolean,

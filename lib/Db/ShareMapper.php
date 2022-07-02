@@ -2,6 +2,7 @@
 
 namespace OCA\Tables\Db;
 
+use OCA\Tables\Errors\NotFoundError;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -33,18 +34,37 @@ class ShareMapper extends QBMapper {
     }
 
     /**
-     * @throws DoesNotExistException
-     * @throws MultipleObjectsReturnedException
+     * find share for a node
+     * look for all receiver types or limit it to one given type
+     *
+     * @param int $nodeId
+     * @param $nodeType
+     * @param $receiver
+     * @param null $receiverType
+     * @return Share
      * @throws Exception
      */
-    public function findShareForNodeId($user, int $nodeId): Share
+    public function findShareForNode(int $nodeId, $nodeType, $receiver, $receiverType = null): Share
     {
+        // if shared with user
         $qb = $this->db->getQueryBuilder();
         $qb->select('*')
             ->from($this->table)
             ->where($qb->expr()->eq('node_id', $qb->createNamedParameter($nodeId, IQueryBuilder::PARAM_INT)))
-            ->andWhere($qb->expr()->eq('receiver', $qb->createNamedParameter($user, IQueryBuilder::PARAM_INT)));
-        return $this->findEntity($qb);
+            ->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_STR)))
+            ->andWhere($qb->expr()->eq('receiver', $qb->createNamedParameter($receiver, IQueryBuilder::PARAM_STR)));
+        if($receiverType) {
+            $qb->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter($receiverType, IQueryBuilder::PARAM_STR)));
+        }
+        try {
+            $items = $this->findEntities($qb);
+            if(count($items) > 0){
+                return $items[0];
+            }
+        } catch (Exception $e) {
+        }
+
+        throw new Exception('no shares found as expected');
     }
 
     /**

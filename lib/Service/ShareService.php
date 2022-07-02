@@ -58,7 +58,6 @@ class ShareService extends SuperService {
      * @throws InternalError
      */
     public function find($id) {
-        // TODO
 		try {
 			$item = $this->mapper->find($id);
 

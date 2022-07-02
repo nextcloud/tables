@@ -138,12 +138,8 @@ export default {
 		getColumnsDefinition() {
 			const def = [
 				this.getRowSelectionColumnDef(),
-				// this.getRowEditColumnDef(),
+				this.getRowEditColumnDef(),
 			]
-
-			if (this.canUpdateDataActiveTable) {
-				def.push(this.getRowEditColumnDef())
-			}
 
 			if (this.columns) {
 				this.columns.forEach(item => {
