@@ -74,7 +74,7 @@ class ShareMapper extends QBMapper {
      * @return Share[]
      * @throws Exception
      */
-    public function findAllSharesFor($nodeType, $receiver, $receiverType='user'): array {
+    public function findAllSharesFor($nodeType, $receiver, string $receiverType='user'): array {
         $qb = $this->db->getQueryBuilder();
         $qb->select('*')
             ->from($this->table)
@@ -99,5 +99,16 @@ class ShareMapper extends QBMapper {
             ->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_STR)))
             ->andWhere($qb->expr()->eq('node_id', $qb->createNamedParameter($nodeId, IQueryBuilder::PARAM_INT)));
         return $this->findEntities($qb);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function deleteByNode(int $nodeId, string $nodeType) {
+        $qb = $this->db->getQueryBuilder();
+        $qb->delete($this->table)
+            ->where($qb->expr()->eq('node_id', $qb->createNamedParameter($nodeId, IQueryBuilder::PARAM_INT)))
+            ->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_STR)))
+            ->execute();
     }
 }

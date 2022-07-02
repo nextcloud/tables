@@ -8,7 +8,7 @@
 				:loading="loading"
 				@reload="getColumnsForTableFromBE(activeTable.id); getRowsForTableFromBE(activeTable.id)" />
 
-			<NcTable :rows="rows" :columns="columns" @update-rows="getRowsForTableFromBE(activeTable.id)" />
+			<NcTable :rows="rows" :columns="columns" @update-rows="actionUpdateRows" />
 		</div>
 	</div>
 </template>
@@ -56,14 +56,8 @@ export default {
 			}
 
 			if (this.activeTable.id !== this.lastActiveTableId) {
-				// console.debug('try to reload')
 				this.getColumnsForTableFromBE(this.activeTable.id)
-
-				// load rows only if permitted
-				if (this.activeTable.isShared === false
-						|| (this.activeTable.isShared === true && (this.activeTable.onSharePermissions.read || this.activeTable.onSharePermissions.manage))) {
-					this.getRowsForTableFromBE(this.activeTable.id)
-				}
+				this.actionUpdateRows()
 				this.lastActiveTableId = this.activeTable.id
 			}
 		},
@@ -112,6 +106,13 @@ export default {
 			if (a.orderWeight < b.orderWeight) { return 1 }
 			if (a.orderWeight > b.orderWeight) { return -1 }
 			return 0
+		},
+		actionUpdateRows() {
+			// load rows only if permitted
+			if (this.activeTable.isShared === false
+					|| (this.activeTable.isShared === true && (this.activeTable.onSharePermissions.read || this.activeTable.onSharePermissions.manage))) {
+				this.getRowsForTableFromBE(this.activeTable.id)
+			}
 		},
 	},
 }

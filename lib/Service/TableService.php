@@ -159,11 +159,19 @@ class TableService extends SuperService {
             if(!$this->permissionsService->canDeleteTable($item))
                 throw new PermissionError('PermissionError: can not delete table with id '.$id);
 
+            // delete all rows for that table
             $this->rowService->deleteAllByTable($id);
+
+            // delete all columns for that table
             $columns = $this->columnService->findAllByTable($id);
             foreach ($columns as $column) {
                 $this->columnService->delete($column->id, true);
             }
+
+            // delete all shares for that table
+            $this->shareService->deleteAllForTable($item);
+
+            // delete table
 			$this->mapper->delete($item);
 			return $item;
 		} catch (Exception $e) {

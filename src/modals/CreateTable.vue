@@ -114,10 +114,10 @@ export default {
 			} else {
 				const newTableId = await this.sendNewTableToBE(template)
 				if (newTableId) {
-					await this.$router.push('/table/' + newTableId)
 					showSuccess(t('tables', 'The table "{table}" was created.', { table: this.title }))
+					this.actionCancel()
+					await this.$router.push('/table/' + newTableId)
 				}
-				this.actionCancel()
 			}
 		},
 		async sendNewTableToBE(template) {

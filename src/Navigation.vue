@@ -14,14 +14,14 @@
 						<ActionButton icon="icon-add" @click="showModalCreateTable = true" />
 					</template>
 				</AppNavigationCaption>
-				<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
+				<CreateTable :show-modal="showModalCreateTable" @close="actionCloseModalNewTable" />
 
 				<NavigationTableItem
 					v-for="table in getOwnTables"
 					:key="table.id"
 					:table="table" />
 
-				<AppNavigationCaption
+				<AppNavigationCaption v-if="getSharedTables.length > 0"
 					:title="t('tables', 'Shared tables')" />
 
 				<NavigationTableItem
@@ -94,6 +94,10 @@ export default {
 					open: false,
 				})
 			}
+		},
+		actionCloseModalNewTable() {
+			console.debug('I will close the modal now!')
+			this.showModalCreateTable = false
 		},
 	},
 }

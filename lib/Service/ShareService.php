@@ -223,4 +223,13 @@ class ShareService extends SuperService {
             return $shares;
         }
     }
+
+    public function deleteAllForTable(Table $table)
+    {
+        try {
+            $this->mapper->deleteByNode($table->getId(), 'table');
+        } catch (\OCP\DB\Exception $e) {
+            $this->logger->error('something went wrong while deleting shares for table: '.$table->getId());
+        }
+    }
 }
