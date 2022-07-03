@@ -11,8 +11,11 @@
 						<p>{{ t('tables', 'There is a bug with the editor on mobile devices, that is why you see only a simple text box.') }}</p>
 					</Popover>
 				</div>
-				<div v-if="column.textMaxLength !== -1" class="fix-col-4 p span" style="padding-bottom: 0; padding-top: 0;">
-					{{ t('tables', 'length: {length}/{maxLength}', { length: localValue.length ? localValue.length : 0, maxLength: column.textMaxLength }) }}
+				<div v-if="column.textMaxLength !== -1"
+					class="fix-col-4 p span"
+					:class="{ error: textLengthLimit, light: !textLengthLimit }"
+					style="padding-bottom: 0; padding-top: 0;">
+					{{ t('tables', 'length: {length}/{maxLength}', { length: localValueTextOnly.length ? localValueTextOnly.length : 0, maxLength: column.textMaxLength }) }}
 				</div>
 			</div>
 		</div>
@@ -72,7 +75,15 @@ export default {
 						? this.column.textDefault
 						: '')
 			},
-			set(v) { this.$emit('update:value', v) },
+			set(v) {
+				this.$emit('update:value', v)
+			},
+		},
+		localValueTextOnly() {
+			return this.localValue.replace(/(<([^>]+)>)/gi, '')
+		},
+		textLengthLimit() {
+			return !!(this.column.textMaxLength && this.column.textMaxLength < this.localValueTextOnly.length)
 		},
 	},
 	methods: {
