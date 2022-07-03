@@ -81,7 +81,7 @@ export default {
 	},
 	mounted() {
 		if (this.columns && this.columns.length === 0) {
-			// this.showCreateColumn = true
+			this.showCreateColumn = true
 		}
 	},
 }

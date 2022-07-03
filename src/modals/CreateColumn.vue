@@ -123,8 +123,11 @@
 					<button class="secondary" @click="actionCancel">
 						{{ t('tables', 'Cancel') }}
 					</button>
-					<button class="primary" @click="actionConfirm">
+					<button class="primary" @click="actionConfirm(true)">
 						{{ t('tables', 'Save') }}
+					</button>
+					<button class="primary" @click="actionConfirm(false)">
+						{{ t('tables', 'Save and new') }}
 					</button>
 				</div>
 			</div>
@@ -241,7 +244,7 @@ export default {
 		},
 	},
 	methods: {
-		async actionConfirm() {
+		async actionConfirm(close) {
 			console.debug('try to submit new column', null)
 			if (!this.title) {
 				showInfo(t('tables', 'Please insert a title for the new column.'))
@@ -252,8 +255,10 @@ export default {
 				this.typeMissingError = true
 			} else {
 				await this.sendNewColumnToBE()
+				if (close) {
+					this.$emit('close')
+				}
 				this.reset()
-				this.$emit('close')
 			}
 		},
 		actionCancel() {
