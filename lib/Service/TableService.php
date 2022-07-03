@@ -8,6 +8,7 @@ use Exception;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 
@@ -32,14 +33,18 @@ class TableService extends SuperService {
     /** @var ShareService */
     private $shareService;
 
+    /** @var UserHelper */
+    protected $userHelper;
+
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, $userId,
-                                TableMapper $mapper, TableTemplateService $tableTemplateService, ColumnService $columnService, RowService $rowService, ShareService $shareService) {
+                                TableMapper $mapper, TableTemplateService $tableTemplateService, ColumnService $columnService, RowService $rowService, ShareService $shareService, UserHelper $userHelper) {
         parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
         $this->tableTemplateService = $tableTemplateService;
         $this->columnService = $columnService;
         $this->rowService = $rowService;
         $this->shareService = $shareService;
+        $this->userHelper = $userHelper;
 	}
 
 
@@ -72,7 +77,7 @@ class TableService extends SuperService {
             $this->logger->error($e->getMessage());
             throw new InternalError($e->getMessage());
         }
-        return array_merge($ownTables, $newSharedTables);
+        return $this->addOwnerDisplayName(array_merge($ownTables, $newSharedTables));
     }
 
 
@@ -89,7 +94,7 @@ class TableService extends SuperService {
             if(!$this->permissionsService->canReadTable($table))
                 throw new PermissionError('PermissionError: can not read table with id '.$id);
 
-            return $table;
+            return $this->addOwnerDisplayName($table);
         } catch (DoesNotExistException $e) {
             $this->logger->warning($e->getMessage());
             throw new NotFoundError($e->getMessage());
@@ -105,7 +110,8 @@ class TableService extends SuperService {
      * @throws \OCP\DB\Exception
      * @throws InternalError|PermissionError
      */
-    public function create($title, $template) {
+    public function create($title, $template): Table
+    {
         $userId = $this->userId;
         $time = new DateTime();
 		$item = new Table();
@@ -124,7 +130,7 @@ class TableService extends SuperService {
         if($template !== 'custom') {
             return $this->tableTemplateService->makeTemplate($newTable, $template);
         }
-        return $newTable;
+        return $this->addOwnerDisplayName($newTable);
 	}
 
     /**
@@ -144,7 +150,7 @@ class TableService extends SuperService {
             $item->setTitle($title);
             $item->setLastEditBy($userId);
             $item->setLastEditAt($time->format('Y-m-d H:i:s'));
-			return $this->mapper->update($item);
+			return $this->addOwnerDisplayName($this->mapper->update($item));
 		} catch (Exception $e) {
             $this->logger->error($e->getMessage());
             throw new InternalError($e->getMessage());
@@ -180,6 +186,23 @@ class TableService extends SuperService {
 		} catch (Exception $e) {
             $this->logger->error($e->getMessage());
             throw new InternalError($e->getMessage());
+        }
+    }
+
+    /** @noinspection PhpUndefinedMethodInspection */
+    private function addOwnerDisplayName($tables) {
+        // return $table->setOwnerDisplayName($this->userHelper->getUserDisplayName($table->getOwnership()));
+
+        if(is_array($tables)){
+            $return = [];
+            foreach ($tables as $table) {
+                $table->setOwnerDisplayName($this->userHelper->getUserDisplayName($table->getOwnership()));
+                $return[] = $table;
+            }
+            return $return;
+        } else {
+            $tables->setOwnerDisplayName($this->userHelper->getUserDisplayName($tables->getOwnership()));
+            return $tables;
         }
     }
 }
