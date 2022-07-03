@@ -53,8 +53,11 @@
 					<button class="secondary" @click="actionCancel">
 						{{ t('tables', 'Cancel') }}
 					</button>
-					<button class="primary" @click="actionConfirm">
+					<button class="primary" @click="actionConfirm(true)">
 						{{ t('tables', 'Save') }}
+					</button>
+					<button class="primary" @click="actionConfirm(false)">
+						{{ t('tables', 'Save and new') }}
 					</button>
 				</div>
 			</div>
@@ -117,7 +120,7 @@ export default {
 			this.reset()
 			this.$emit('close')
 		},
-		async actionConfirm() {
+		async actionConfirm(closeModal) {
 			let mandatoryFieldsEmpty = false
 			this.columns.forEach(col => {
 				if (col.mandatory) {
@@ -126,8 +129,11 @@ export default {
 			})
 			if (!mandatoryFieldsEmpty) {
 				await this.sendNewRowToBE()
-				this.$emit('update-rows')
-				this.actionCancel()
+				this.reset()
+				if (closeModal) {
+					this.$emit('update-rows')
+					this.$emit('close')
+				}
 			} else {
 				showWarning(t('tables', 'Please fill in the mandatory fields.'))
 			}
