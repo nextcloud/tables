@@ -14,6 +14,8 @@ OC.L10N.register(
     "Target" : "Doel",
     "Progress" : "Voortgang",
     "Tables" : "Tabellen",
+    "Activity" : "Activiteit",
+    "Sharing" : "Delen",
     "Information" : "Informatie",
     "Documentation" : "Documentatie",
     "Edit title" : "Titel bewerken",
@@ -47,6 +49,15 @@ OC.L10N.register(
     "Previous" : "Vorige",
     "Next" : "Volgende",
     "Create" : "Creëer",
-    "Today" : "Vandaag"
+    "Today" : "Vandaag",
+    "User or group name …" : "Gebruiker of groepsnaam …",
+    "No recommendations. Start typing." : "Geen aanbevelingen. Begin te typen.",
+    "Searching …" : "Zoeken ...",
+    "No elements found." : "Geen elementen gevonden.",
+    "Shares" : "Shares",
+    "Permissions" : "Machtigingen",
+    "Delete data" : "Verwijder data",
+    "No shares" : "Geen shares",
+    "Could not delete share" : "Kan gedeelde folder niet verwijderen"
 },
 "nplurals=2; plural=(n != 1);");

@@ -8,6 +8,7 @@ OC.L10N.register(
     "Position" : "Posisie",
     "Birthday" : "Verjaardag",
     "Description" : "Beskrywing",
+    "Activity" : "Aktiwiteit",
     "Information" : "Inligting",
     "Documentation" : "Dokumentasie",
     "Cancel" : "Kanselleer",

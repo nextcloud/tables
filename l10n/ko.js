@@ -38,6 +38,8 @@ OC.L10N.register(
     "Previous" : "이전",
     "Next" : "다음",
     "Create" : "생성",
-    "Today" : "오늘"
+    "Today" : "오늘",
+    "Searching …" : "검색 ...",
+    "Permissions" : "권한"
 },
 "nplurals=1; plural=0;");

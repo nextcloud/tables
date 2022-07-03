@@ -5,6 +5,8 @@ OC.L10N.register(
     "Name" : "ឈ្មោះ",
     "Birthday" : "ថ្ងៃ​កំណើត",
     "Description" : "ការ​អធិប្បាយ",
+    "Activity" : "សកម្មភាព",
+    "Sharing" : "ការ​ចែក​រំលែក",
     "Documentation" : "កម្រង​ឯកសារ",
     "Cancel" : "បោះបង់",
     "Delete" : "លុប",
@@ -23,6 +25,8 @@ OC.L10N.register(
     "Previous" : "មុន",
     "Next" : "បន្ទាប់",
     "Create" : "បង្កើត",
-    "Today" : "ថ្ងៃ​នេះ"
+    "Today" : "ថ្ងៃ​នេះ",
+    "Shares" : "ចែក​រំលែក",
+    "Delete data" : "លុបទិន្នន័យ"
 },
 "nplurals=1; plural=0;");

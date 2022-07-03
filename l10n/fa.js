@@ -9,6 +9,8 @@ OC.L10N.register(
     "Description" : "توضیحات",
     "Progress" : "پیشرفت",
     "Tables" : "جدول‌ها",
+    "Activity" : "فعالیت",
+    "Sharing" : "هم‌رسانی",
     "Information" : "اطلاعات",
     "Documentation" : "مستندسازی",
     "Edit title" : "ویرایش عنوان",
@@ -33,6 +35,13 @@ OC.L10N.register(
     "Previous" : "قبلی",
     "Next" : "بعدی",
     "Create" : "ساخت",
-    "Today" : "امروز"
+    "Today" : "امروز",
+    "No recommendations. Start typing." : "هیچ توصیه ای نیست شروع به تایپ کنید.",
+    "Searching …" : "جستجوکردن …",
+    "No elements found." : "عنصری یافت نشد",
+    "Shares" : "اشتراک گذاری ها",
+    "Permissions" : "مجوزها",
+    "No shares" : "اشتراک گذاری وجود ندارد",
+    "Could not delete share" : "اشتراک گذاری حذف نشد"
 },
 "nplurals=2; plural=(n > 1);");

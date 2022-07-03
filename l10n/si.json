@@ -4,6 +4,7 @@
     "Name" : "නම",
     "Birthday" : "උපන් දිනය",
     "Description" : "විස්තරය",
+    "Activity" : "ක්‍රියාකාරකම",
     "Information" : "තොරතුරු",
     "Cancel" : "අවලංගු කරන්න",
     "Yes" : "ඔව්",
@@ -19,6 +20,7 @@
     "Previous" : "පෙර",
     "Next" : "ඊළඟ",
     "Create" : "සාදන්න",
-    "Today" : "අද"
+    "Today" : "අද",
+    "Shares" : "බෙදාගැනීම්"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

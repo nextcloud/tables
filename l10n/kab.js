@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Name" : "Nom",
     "Progress" : "Asfari",
+    "Sharing" : "Beṭṭu",
     "Cancel" : "Sefsex",
     "Delete" : "Kkes",
     "Title" : "Azwel",

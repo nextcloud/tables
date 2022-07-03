@@ -11,6 +11,8 @@ OC.L10N.register(
     "Task" : "Prètzfach",
     "Description" : "Descripcion",
     "Tables" : "Tablèus",
+    "Activity" : "Activitat",
+    "Sharing" : "Partiment",
     "Information" : "Informacions",
     "Documentation" : "Documentacion",
     "Edit title" : "Modificar lo títol",
@@ -37,6 +39,9 @@ OC.L10N.register(
     "Previous" : "Precedent",
     "Next" : "Seguent",
     "Create" : "Crear",
-    "Today" : "Uèi"
+    "Today" : "Uèi",
+    "Searching …" : "Recèrca…",
+    "Shares" : "Partatges",
+    "Delete data" : "Suprimir donada"
 },
 "nplurals=2; plural=(n > 1);");

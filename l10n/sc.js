@@ -14,6 +14,8 @@ OC.L10N.register(
     "Target" : "Obietivu",
     "Progress" : "Progressu",
     "Tables" : "Tabellas",
+    "Activity" : "Atividade",
+    "Sharing" : "Cumpartzidura",
     "Information" : "Informatziones",
     "Documentation" : "Documentatzione",
     "Edit title" : "Modìfica tìtulu",
@@ -46,6 +48,14 @@ OC.L10N.register(
     "Previous" : "Pretzedente",
     "Next" : "Imbeniente",
     "Create" : "Crea",
-    "Today" : "Oe"
+    "Today" : "Oe",
+    "User or group name …" : "Nùmene de utente o grupu ...",
+    "No recommendations. Start typing." : "Peruna racumandatzione. Cumintza a iscrìere.",
+    "Searching …" : "Chirchende …",
+    "No elements found." : "Perunu elementu agatadu.",
+    "Shares" : "Cumpartziduras",
+    "Permissions" : "Permissos",
+    "No shares" : "Peruna cumpartzidura",
+    "Could not delete share" : "No at fatu a cantzellare sa cumpartzidura"
 },
 "nplurals=2; plural=(n != 1);");

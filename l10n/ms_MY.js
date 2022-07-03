@@ -5,6 +5,7 @@ OC.L10N.register(
     "Name" : "Nama",
     "Birthday" : "Hari lahir",
     "Description" : "Keterangan",
+    "Activity" : "Aktiviti",
     "Documentation" : "Dokumentasi",
     "Cancel" : "Batal",
     "Delete" : "Padam",
@@ -20,6 +21,7 @@ OC.L10N.register(
     "Previous" : "Sebelum",
     "Next" : "Seterus",
     "Create" : "Buat",
-    "Today" : "Hari ini"
+    "Today" : "Hari ini",
+    "Shares" : "Kongsi"
 },
 "nplurals=1; plural=0;");

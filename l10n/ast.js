@@ -8,6 +8,8 @@ OC.L10N.register(
     "Position" : "Posición",
     "Birthday" : "Data de nacencia",
     "Description" : "Descripción",
+    "Activity" : "Actividá",
+    "Sharing" : "Compartiendo",
     "Information" : "Información",
     "Documentation" : "Documentación",
     "Cancel" : "Encaboxar",
@@ -30,6 +32,9 @@ OC.L10N.register(
     "Previous" : "Anterior",
     "Next" : "Siguiente",
     "Create" : "Crear",
-    "Today" : "Güei"
+    "Today" : "Güei",
+    "Shares" : "Comparticiones",
+    "Permissions" : "Permisos",
+    "Could not delete share" : "Nun pudo desaniciase la compartición"
 },
 "nplurals=2; plural=(n != 1);");

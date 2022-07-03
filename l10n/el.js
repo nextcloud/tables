@@ -21,7 +21,6 @@ OC.L10N.register(
     "Progress" : "Πρόοδος",
     "Tables" : "Πίνακες",
     "Manage data within tables." : "Διαχείριση δεδομένων μέσα σε πίνακες.",
-    "New table" : "Νέος πίνακας",
     "Information" : "Πληροφορίες",
     "Documentation" : "Τεκμηρίωση",
     "Donations" : "Δωρεές",
@@ -138,6 +137,7 @@ OC.L10N.register(
     "Column ID" : "ID στήλης",
     "Table ID" : "ID πίνακα",
     "Today" : "Σήμερα",
+    "Searching …" : "Αναζήτηση ...",
     "Could not fetch tables" : "Αδυναμία ανάκτησης πινάκων"
 },
 "nplurals=2; plural=(n != 1);");

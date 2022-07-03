@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Comments" : "تبصرې",
     "Name" : "نوم",
+    "Activity" : "کړنې",
     "Cancel" : "پرېښول",
     "Delete" : "ړنګول",
     "Yes" : "هو",
@@ -10,6 +11,7 @@ OC.L10N.register(
     "Save" : "ساتل",
     "Link" : "لېنک",
     "Close" : "بندول",
-    "Today" : "نن"
+    "Today" : "نن",
+    "Shares" : "شريک شوي"
 },
 "nplurals=2; plural=(n != 1);");

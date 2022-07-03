@@ -2,6 +2,7 @@ OC.L10N.register(
     "tables",
     {
     "Date" : "Date",
+    "Activity" : "Падзеі",
     "Cancel" : "Cancel",
     "Delete" : "Delete",
     "Title" : "Title",

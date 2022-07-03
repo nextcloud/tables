@@ -12,6 +12,8 @@ OC.L10N.register(
     "Description" : "Descrición",
     "Progress" : "Progreso",
     "Tables" : "Táboas",
+    "Activity" : "Actividade",
+    "Sharing" : "Compartindo",
     "Information" : "Información",
     "Documentation" : "Documentación",
     "Edit title" : "Editar o título",
@@ -41,6 +43,14 @@ OC.L10N.register(
     "Previous" : "Anterior",
     "Next" : "Seguinte",
     "Create" : "Crear",
-    "Today" : "Hoxe"
+    "Today" : "Hoxe",
+    "User or group name …" : "Nome de usuario ou grupo…",
+    "No recommendations. Start typing." : "Non hai recomendacións. Comece a escribir.",
+    "Searching …" : "Buscando…",
+    "No elements found." : "Non se atoparon elementos.",
+    "Shares" : "Comparticións",
+    "Permissions" : "Permisos",
+    "No shares" : "Ningún recurso compartido",
+    "Could not delete share" : "Non foi posíbel eliminar o recurso compartido"
 },
 "nplurals=2; plural=(n != 1);");

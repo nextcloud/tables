@@ -17,6 +17,8 @@ OC.L10N.register(
     "Progress" : "Прогресс",
     "Tables" : "Таблицы",
     "Manage data within tables." : "Управление данными в таблицах.",
+    "Activity" : "Нагрузка",
+    "Sharing" : "Параметры публикации",
     "Information" : "Информация",
     "Documentation" : "Документация",
     "Donations" : "Пожертвования",
@@ -57,6 +59,15 @@ OC.L10N.register(
     "_Delete selected row_::_Delete %n rows_" : ["Удалить выбранную строку","Удалить несколько строк","Удалить строки","Удалить %n строк"],
     "_Selected row was deleted._::_Selected %n rows were deleted._" : ["Выбранная строка удалена","Удалено несколько строк.","Удалено много строк","Удалено %n выбранных строк."],
     "Create" : "Создать",
-    "Today" : "Сегодня"
+    "Today" : "Сегодня",
+    "User or group name …" : "Имя пользователя или группы…",
+    "No recommendations. Start typing." : "Начните вводить имя...",
+    "Searching …" : "Поиск…",
+    "No elements found." : "Ничего не найдено.",
+    "Shares" : "Приглашения",
+    "Permissions" : "Права доступа",
+    "Delete data" : "Удалить данные",
+    "No shares" : "Нет ресурсов общего доступа",
+    "Could not delete share" : "Не удалось удалить общий ресурс"
 },
 "nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);");

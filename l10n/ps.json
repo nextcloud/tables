@@ -1,6 +1,7 @@
 { "translations": {
     "Comments" : "تبصرې",
     "Name" : "نوم",
+    "Activity" : "کړنې",
     "Cancel" : "پرېښول",
     "Delete" : "ړنګول",
     "Yes" : "هو",
@@ -8,6 +9,7 @@
     "Save" : "ساتل",
     "Link" : "لېنک",
     "Close" : "بندول",
-    "Today" : "نن"
+    "Today" : "نن",
+    "Shares" : "شريک شوي"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

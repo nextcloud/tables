@@ -9,6 +9,8 @@ OC.L10N.register(
     "Birthday" : "Naskiĝotago",
     "Description" : "Priskribo",
     "Tables" : "Tabeloj",
+    "Activity" : "Aktivaĵoj",
+    "Sharing" : "Kunhavigo",
     "Documentation" : "Dokumentaro",
     "Cancel" : "Nuligi",
     "Delete" : "Forigi",
@@ -30,6 +32,11 @@ OC.L10N.register(
     "Previous" : "Antaŭa",
     "Next" : "Sekva",
     "Create" : "Krei",
-    "Today" : "Hodiaŭ"
+    "Today" : "Hodiaŭ",
+    "No recommendations. Start typing." : "Neniu propono. Ektajpu.",
+    "No elements found." : "Nenio trovita.",
+    "Shares" : "Kunhavoj",
+    "No shares" : "Neniu kunhavo",
+    "Could not delete share" : "Ne eblis forigi kunhavon"
 },
 "nplurals=2; plural=(n != 1);");

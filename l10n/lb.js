@@ -6,6 +6,8 @@ OC.L10N.register(
     "Name" : "Numm",
     "Birthday" : "Gebuertsdag",
     "Description" : "Beschreiwung",
+    "Activity" : "Aktivitéit",
+    "Sharing" : "Gedeelt",
     "Documentation" : "Dokumentatioun",
     "Cancel" : "Ofbriechen",
     "Delete" : "Läschen",

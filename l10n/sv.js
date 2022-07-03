@@ -19,6 +19,8 @@ OC.L10N.register(
     "Progress" : "Status",
     "No title given" : "Ingen titel har angivits",
     "Tables" : "Tabeller",
+    "Activity" : "Aktivitet",
+    "Sharing" : "Delning",
     "Information" : "Information",
     "Documentation" : "Dokumentation",
     "Edit title" : "Redigera titel",
@@ -94,6 +96,15 @@ OC.L10N.register(
     "Create" : "Skapa",
     "Column ID" : "Kolumn-ID",
     "Table ID" : "Tabell-ID",
-    "Today" : "Idag"
+    "Today" : "Idag",
+    "User or group name …" : "Användar- eller gruppnamn ...",
+    "No recommendations. Start typing." : "Inga rekommendationer. Börja skriva.",
+    "Searching …" : "Söker ...",
+    "No elements found." : "Inga element hittades.",
+    "Shares" : "Delat",
+    "Permissions" : "Behörigheter",
+    "Delete data" : "Radera data",
+    "No shares" : "Inga delningar",
+    "Could not delete share" : "Kunde inte ta bort delningen"
 },
 "nplurals=2; plural=(n != 1);");

@@ -11,6 +11,8 @@ OC.L10N.register(
     "Description" : "Опис",
     "Progress" : "Напредак",
     "Tables" : "Табеле",
+    "Activity" : "Активност",
+    "Sharing" : "Дељење",
     "Information" : "Информације",
     "Documentation" : "Документација",
     "Edit title" : "Измени наслов",
@@ -35,6 +37,14 @@ OC.L10N.register(
     "Previous" : "Претходно",
     "Next" : "Следећа",
     "Create" : "Направи",
-    "Today" : "Данас"
+    "Today" : "Данас",
+    "User or group name …" : "Корисник или име групе…",
+    "No recommendations. Start typing." : "Нема препорука. Започните куцање.",
+    "Searching …" : "Тражим…",
+    "No elements found." : "Нема нађених елемената.",
+    "Shares" : "Дељења",
+    "Permissions" : "Дозволе",
+    "No shares" : "Нема дељења",
+    "Could not delete share" : "Не могу да обришем дељење"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);");

@@ -17,7 +17,9 @@
     "Progress" : "Progrès",
     "Tables" : "Tables",
     "Manage data within tables." : "Gérer des données à l'aide de tables.",
-    "New table" : "Nouvelle table",
+    "No table in context" : "Aucun tableau dans le contexte",
+    "Activity" : "Activité",
+    "Sharing" : "Partage",
     "Information" : "Information",
     "Documentation" : "Documentation",
     "Donations" : "Dons",
@@ -123,8 +125,17 @@
     "Column ID" : "ID colonne",
     "Table ID" : "ID table",
     "Today" : "Aujourd'hui",
+    "User or group name …" : "Nom d'utilisateur ou de groupe …",
+    "No recommendations. Start typing." : "Pas de suggestion. Commencez à écrire.",
+    "Searching …" : "Recherche…",
+    "No elements found." : "Aucun élément trouvé.",
+    "Shares" : "Partages",
+    "Permissions" : "Permissions",
+    "Delete data" : "Supprimer la donnée",
+    "No shares" : "Aucun partage",
     "length: {length}/{maxLength}" : "longueur : {length}/{maxLength}",
     "There is a bug with the editor on mobile devices, that is why you see only a simple text box." : "Il y a un bug avec l'éditeur sur les appareils mobiles, c'est pourquoi vous ne voyez qu'une simple boîte de texte.",
+    "Could not delete share" : "Impossible de supprimer le partage",
     "Could not fetch tables" : "Impossible de récupérer les tables"
 },"pluralForm" :"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

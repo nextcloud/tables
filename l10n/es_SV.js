@@ -8,6 +8,8 @@ OC.L10N.register(
     "Position" : "Posición",
     "Birthday" : "Fecha de nacimiento",
     "Description" : "Descripción",
+    "Activity" : "Actividad",
+    "Sharing" : "Compartiendo",
     "Information" : "Información",
     "Documentation" : "Documentación",
     "Cancel" : "Cancelar",
@@ -30,6 +32,9 @@ OC.L10N.register(
     "Previous" : "Previo",
     "Next" : "Siguiente",
     "Create" : "Crear",
-    "Today" : "Hoy"
+    "Today" : "Hoy",
+    "Shares" : "Elementos compartidos",
+    "Permissions" : "Permisos",
+    "Could not delete share" : "No fue posible borrar el elemento compartido"
 },
 "nplurals=2; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

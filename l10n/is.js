@@ -10,6 +10,8 @@ OC.L10N.register(
     "Birthday" : "Afmælisdagur",
     "Description" : "Lýsing",
     "Progress" : "Framvinda",
+    "Activity" : "Virkni",
+    "Sharing" : "Deiling",
     "Information" : "Upplýsingar",
     "Documentation" : "Hjálparskjöl",
     "Cancel" : "Hætta við",
@@ -34,6 +36,12 @@ OC.L10N.register(
     "Previous" : "Fyrra",
     "Next" : "Næsta",
     "Create" : "Búa til",
-    "Today" : "Í dag"
+    "Today" : "Í dag",
+    "User or group name …" : "Notandi eða heiti hóps …",
+    "Searching …" : "Leita …",
+    "Shares" : "Sameignir",
+    "Permissions" : "Heimildir",
+    "No shares" : "Engar sameignir",
+    "Could not delete share" : "Tókst ekki að eyða sameign"
 },
 "nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);");

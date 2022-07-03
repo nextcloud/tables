@@ -12,6 +12,8 @@ OC.L10N.register(
     "Description" : "Descripció",
     "Progress" : "Progrés",
     "Tables" : "Taules",
+    "Activity" : "Activitat",
+    "Sharing" : "Ús compartit",
     "Information" : "Informació",
     "Documentation" : "Documentació",
     "Edit title" : "Edita el títol",
@@ -45,6 +47,14 @@ OC.L10N.register(
     "Previous" : "Anterior",
     "Next" : "Següent",
     "Create" : "Crea",
-    "Today" : "Avui"
+    "Today" : "Avui",
+    "User or group name …" : "Nom de l'usuari o del grup...",
+    "No recommendations. Start typing." : "No hi ha recomanacions. Comenceu a escriure.",
+    "Searching …" : "S'està cercant...",
+    "No elements found." : "No s'ha trobat cap element.",
+    "Shares" : "Elements compartits",
+    "Permissions" : "Permisos",
+    "No shares" : "No hi ha comparticions",
+    "Could not delete share" : "No s'ha pogut suprimir la compartició"
 },
 "nplurals=2; plural=(n != 1);");

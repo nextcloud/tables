@@ -9,6 +9,8 @@ OC.L10N.register(
     "Description" : "Descriere",
     "Progress" : "Progres",
     "Tables" : "Tabele",
+    "Activity" : "Activitate",
+    "Sharing" : "Partajare",
     "Information" : "Informații",
     "Documentation" : "Documentație",
     "Edit title" : "Editează titlul",
@@ -33,6 +35,9 @@ OC.L10N.register(
     "Previous" : "Precedentul",
     "Next" : "Următorul",
     "Create" : "Crează",
-    "Today" : "Astăzi"
+    "Today" : "Astăzi",
+    "Shares" : "Partajări",
+    "No shares" : "Nicio partajare",
+    "Could not delete share" : "Nu s-a putut șterge elementul partajat"
 },
 "nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));");

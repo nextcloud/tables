@@ -9,6 +9,8 @@ OC.L10N.register(
     "Birthday" : "Datëlindje",
     "Description" : "Përshkrim",
     "Progress" : "Progresi",
+    "Activity" : "Aktiviteti",
+    "Sharing" : "Ndarje",
     "Information" : "Informacion",
     "Documentation" : "Dokumentacioni",
     "Cancel" : "Anullo",
@@ -31,6 +33,9 @@ OC.L10N.register(
     "Previous" : "I mëparshëm",
     "Next" : "Tjetër",
     "Create" : "Krijo",
-    "Today" : "Sot"
+    "Today" : "Sot",
+    "Shares" : "Shpërndarje",
+    "Permissions" : "Lejet",
+    "Could not delete share" : "Ndarja s’u fshi dot"
 },
 "nplurals=2; plural=(n != 1);");

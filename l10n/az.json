@@ -3,6 +3,8 @@
     "Name" : "Ad",
     "Birthday" : "Ad günü",
     "Description" : "Açıqlanma",
+    "Activity" : "Fəallıq",
+    "Sharing" : "Paylaşılır",
     "Documentation" : "Sənədlər",
     "Cancel" : "Dayandır",
     "Delete" : "Sil",
@@ -20,6 +22,7 @@
     "Previous" : "Əvvələ",
     "Next" : "Növbəti",
     "Create" : "Yarat",
-    "Today" : "Bu gün"
+    "Today" : "Bu gün",
+    "Shares" : "Yayımlanmalar"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

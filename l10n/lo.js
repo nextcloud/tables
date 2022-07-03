@@ -5,6 +5,8 @@ OC.L10N.register(
     "Comments" : "ຄໍາເຫັນ",
     "Name" : "ຊື່",
     "Progress" : "ດຳເນີນການ",
+    "Activity" : "ກິດຈະກໍາ",
+    "Sharing" : "ການແບ່ງປັນ",
     "Information" : "ຂໍ້ມຸນ",
     "Cancel" : "ຍົກເລີກ",
     "Delete" : "ລຶບ",
@@ -22,6 +24,7 @@ OC.L10N.register(
     "Previous" : "ກ່ອນໜ້າ",
     "Next" : "ທັດໄປ",
     "Create" : "ສ້າງ",
-    "Today" : "ມື້ນີ້"
+    "Today" : "ມື້ນີ້",
+    "Shares" : "ການແບ່ງປັນ"
 },
 "nplurals=1; plural=0;");

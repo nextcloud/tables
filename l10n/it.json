@@ -20,7 +20,8 @@
     "No title given" : "Nessun titolo specificato",
     "Tables" : "Tabelle",
     "Manage data within tables." : "Gestisci dati all'interno delle tabelle.",
-    "New table" : "Nuova tabella",
+    "Activity" : "Attività",
+    "Sharing" : "Condivisione",
     "Start page" : "Pagina iniziale",
     "Information" : "Informazioni",
     "Documentation" : "Documentazione",
@@ -157,7 +158,16 @@
     "Column ID" : "ID Colonna",
     "Table ID" : "ID Tabella",
     "Today" : "Oggi",
+    "User or group name …" : "Nome utente o gruppo…",
+    "No recommendations. Start typing." : "Nessun consiglio. Inizia a scrivere.",
+    "Searching …" : "Ricerca in corso…",
+    "No elements found." : "Nessun elemento trovato.",
+    "Shares" : "Condivisioni",
+    "Permissions" : "Permessi",
+    "Delete data" : "Elimina dati",
+    "No shares" : "Nessuna condivisione",
     "length: {length}/{maxLength}" : "lunghezza: {length}/{maxLength}",
-    "There is a bug with the editor on mobile devices, that is why you see only a simple text box." : "E' presente un bug nell'editor su smartphone; questo è il motivo per cui vedi solamente una semplice casella di testo."
+    "There is a bug with the editor on mobile devices, that is why you see only a simple text box." : "E' presente un bug nell'editor su smartphone; questo è il motivo per cui vedi solamente una semplice casella di testo.",
+    "Could not delete share" : "impossibile eliminare la condivisione"
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

@@ -3,6 +3,8 @@ OC.L10N.register(
     {
     "Name" : "Ady",
     "Progress" : "Ösüş",
+    "Activity" : "işjeňlik we hereket",
+    "Sharing" : "Paýlaşmak",
     "Cancel" : "ýatyrmak",
     "Delete" : "Pozmak",
     "Default" : "Bellenen",

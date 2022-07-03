@@ -5,6 +5,8 @@ OC.L10N.register(
     "Name" : "Ad",
     "Birthday" : "Ad günü",
     "Description" : "Açıqlanma",
+    "Activity" : "Fəallıq",
+    "Sharing" : "Paylaşılır",
     "Documentation" : "Sənədlər",
     "Cancel" : "Dayandır",
     "Delete" : "Sil",
@@ -22,6 +24,7 @@ OC.L10N.register(
     "Previous" : "Əvvələ",
     "Next" : "Növbəti",
     "Create" : "Yarat",
-    "Today" : "Bu gün"
+    "Today" : "Bu gün",
+    "Shares" : "Yayımlanmalar"
 },
 "nplurals=2; plural=(n != 1);");

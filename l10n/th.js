@@ -7,6 +7,8 @@ OC.L10N.register(
     "Position" : "ตำแหน่ง",
     "Birthday" : "วันเกิด",
     "Description" : "รายละเอียด",
+    "Activity" : "กิจกรรม",
+    "Sharing" : "การแชร์",
     "Documentation" : "เอกสารประกอบ",
     "Cancel" : "ยกเลิก",
     "Delete" : "ลบ",
@@ -28,6 +30,11 @@ OC.L10N.register(
     "Previous" : "ก่อนหน้า",
     "Next" : "ถัดไป",
     "Create" : "สร้าง",
-    "Today" : "วันนี้"
+    "Today" : "วันนี้",
+    "User or group name …" : "ชื่อผู้ใช้หรือกลุ่ม …",
+    "No recommendations. Start typing." : "ไม่มีคำแนะนำ เริ่มพิมพ์เลย",
+    "Searching …" : "กำลังค้นหา …",
+    "Shares" : "การแชร์",
+    "Could not delete share" : "ไม่สามารถลบแชร์"
 },
 "nplurals=1; plural=0;");

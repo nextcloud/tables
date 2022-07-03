@@ -8,6 +8,8 @@ OC.L10N.register(
     "Position" : "Байр",
     "Birthday" : "Төрсөн өдөр",
     "Description" : "Тайлбар",
+    "Activity" : "Үйлдлүүд",
+    "Sharing" : "Түгээх",
     "Information" : "Мэдээлэл",
     "Cancel" : "болиулах",
     "Delete" : "Устгах",
@@ -26,6 +28,7 @@ OC.L10N.register(
     "Previous" : "өмнөх",
     "Next" : "дараагийх",
     "Create" : "Үүсгэх",
-    "Today" : "өнөөдөр"
+    "Today" : "өнөөдөр",
+    "Shares" : "Түгээлтүүд"
 },
 "nplurals=2; plural=(n != 1);");

@@ -12,6 +12,8 @@ OC.L10N.register(
     "Description" : "Descrição",
     "Target" : "Objectivo",
     "Progress" : "Progresso",
+    "Activity" : "Actividade",
+    "Sharing" : "Partilha",
     "Information" : "Informação",
     "Documentation" : "Documentação",
     "Cancel" : "Cancelar",
@@ -38,6 +40,12 @@ OC.L10N.register(
     "Previous" : "Anterior",
     "Next" : "Seguinte",
     "Create" : "Criar",
-    "Today" : "Hoje"
+    "Today" : "Hoje",
+    "User or group name …" : "Nome do utilizador ou grupo …",
+    "No recommendations. Start typing." : "Nenhuma recomendação. Comece a escrever ",
+    "Searching …" : "À procura …",
+    "No elements found." : "Não foram encontrados elementos.",
+    "Shares" : "Partilhas",
+    "Could not delete share" : "Não foi possível eliminar a partilha"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

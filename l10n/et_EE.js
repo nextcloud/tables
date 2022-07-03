@@ -7,6 +7,8 @@ OC.L10N.register(
     "Position" : "Asukoht",
     "Birthday" : "Sünnipäev",
     "Description" : "Kirjeldus",
+    "Activity" : "Tegevus",
+    "Sharing" : "Jagamine",
     "Information" : "Informatsioon",
     "Documentation" : "Dokumentatsioon",
     "Cancel" : "Loobu",
@@ -29,6 +31,11 @@ OC.L10N.register(
     "Previous" : "Eelmine",
     "Next" : "Järgmine",
     "Create" : "Loo",
-    "Today" : "Täna"
+    "Today" : "Täna",
+    "Searching …" : "Otsin ...",
+    "Shares" : "Jagamisi",
+    "Delete data" : "Kustuta andmed",
+    "No shares" : "Jagamisi pole",
+    "Could not delete share" : "Ei saanud jagamist eemaldada"
 },
 "nplurals=2; plural=(n != 1);");

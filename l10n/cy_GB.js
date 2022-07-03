@@ -5,6 +5,7 @@ OC.L10N.register(
     "Name" : "Enw",
     "Birthday" : "Pen-blwydd",
     "Description" : "Disgrifiad",
+    "Activity" : "Gweithred",
     "Documentation" : "Dogfennaeth",
     "Cancel" : "Diddymu",
     "Delete" : "Dileu",

@@ -10,6 +10,8 @@ OC.L10N.register(
     "Birthday" : "Fødselsdag",
     "Description" : "Beskrivelse",
     "Progress" : "Progress",
+    "Activity" : "Aktivitet",
+    "Sharing" : "Deling",
     "Information" : "Information",
     "Documentation" : "Dokumentation",
     "Edit title" : "Rediger titel",
@@ -38,6 +40,12 @@ OC.L10N.register(
     "Previous" : "Tidligere",
     "Next" : "Næste",
     "Create" : "Opret",
-    "Today" : "I dag"
+    "Today" : "I dag",
+    "Searching …" : "Søger ...",
+    "Shares" : "Delinger",
+    "Permissions" : "Rettigheder",
+    "Delete data" : "Slet data",
+    "No shares" : "Ingen delinger",
+    "Could not delete share" : "Kunne ikke slette deling"
 },
 "nplurals=2; plural=(n != 1);");

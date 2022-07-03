@@ -5,6 +5,8 @@
     "Position" : "Asukoht",
     "Birthday" : "Sünnipäev",
     "Description" : "Kirjeldus",
+    "Activity" : "Tegevus",
+    "Sharing" : "Jagamine",
     "Information" : "Informatsioon",
     "Documentation" : "Dokumentatsioon",
     "Cancel" : "Loobu",
@@ -27,6 +29,11 @@
     "Previous" : "Eelmine",
     "Next" : "Järgmine",
     "Create" : "Loo",
-    "Today" : "Täna"
+    "Today" : "Täna",
+    "Searching …" : "Otsin ...",
+    "Shares" : "Jagamisi",
+    "Delete data" : "Kustuta andmed",
+    "No shares" : "Jagamisi pole",
+    "Could not delete share" : "Ei saanud jagamist eemaldada"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

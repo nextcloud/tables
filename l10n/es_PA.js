@@ -8,6 +8,7 @@ OC.L10N.register(
     "Position" : "Posición",
     "Birthday" : "Fecha de nacimiento",
     "Description" : "Descripción",
+    "Sharing" : "Compartiendo",
     "Information" : "Información",
     "Documentation" : "Documentación",
     "Cancel" : "Cancelar",
@@ -30,6 +31,7 @@ OC.L10N.register(
     "Previous" : "Anterior",
     "Next" : "Siguiente",
     "Create" : "Crear",
-    "Today" : "Hoy"
+    "Today" : "Hoy",
+    "Permissions" : "Permisos"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

@@ -6,6 +6,8 @@
     "Position" : "Posición",
     "Birthday" : "Data de nacencia",
     "Description" : "Descripción",
+    "Activity" : "Actividá",
+    "Sharing" : "Compartiendo",
     "Information" : "Información",
     "Documentation" : "Documentación",
     "Cancel" : "Encaboxar",
@@ -28,6 +30,9 @@
     "Previous" : "Anterior",
     "Next" : "Siguiente",
     "Create" : "Crear",
-    "Today" : "Güei"
+    "Today" : "Güei",
+    "Shares" : "Comparticiones",
+    "Permissions" : "Permisos",
+    "Could not delete share" : "Nun pudo desaniciase la compartición"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

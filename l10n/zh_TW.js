@@ -12,6 +12,8 @@ OC.L10N.register(
     "Description" : "描述",
     "Progress" : "進度",
     "Tables" : "表格",
+    "Activity" : "活動",
+    "Sharing" : "分享",
     "Information" : "資訊",
     "Documentation" : "文件",
     "Edit title" : "編輯標題",
@@ -43,6 +45,13 @@ OC.L10N.register(
     "Previous" : "上一步",
     "Next" : "下一步",
     "Create" : "建立",
-    "Today" : "今天"
+    "Today" : "今天",
+    "User or group name …" : "使用者或群組名稱……",
+    "No recommendations. Start typing." : "無建議。開始輸入。",
+    "Searching …" : "正在搜尋……",
+    "No elements found." : "找不到元素。",
+    "Shares" : "分享",
+    "No shares" : "無分享",
+    "Could not delete share" : "無法刪除分享"
 },
 "nplurals=1; plural=0;");

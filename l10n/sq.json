@@ -7,6 +7,8 @@
     "Birthday" : "Datëlindje",
     "Description" : "Përshkrim",
     "Progress" : "Progresi",
+    "Activity" : "Aktiviteti",
+    "Sharing" : "Ndarje",
     "Information" : "Informacion",
     "Documentation" : "Dokumentacioni",
     "Cancel" : "Anullo",
@@ -29,6 +31,9 @@
     "Previous" : "I mëparshëm",
     "Next" : "Tjetër",
     "Create" : "Krijo",
-    "Today" : "Sot"
+    "Today" : "Sot",
+    "Shares" : "Shpërndarje",
+    "Permissions" : "Lejet",
+    "Could not delete share" : "Ndarja s’u fshi dot"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

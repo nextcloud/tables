@@ -16,6 +16,8 @@ OC.L10N.register(
     "Target" : "Tavoite",
     "Progress" : "Edistyminen",
     "Tables" : "Taulukot",
+    "Activity" : "Tapahtumat",
+    "Sharing" : "Jakaminen",
     "Information" : "Tiedot",
     "Documentation" : "Dokumentaatio",
     "Edit title" : "Muokkaa otsikkoa",
@@ -48,6 +50,14 @@ OC.L10N.register(
     "Previous" : "Edellinen",
     "Next" : "Seuraava",
     "Create" : "Luo",
-    "Today" : "Tänään"
+    "Today" : "Tänään",
+    "User or group name …" : "Käyttäjän tai ryhmän nimi…",
+    "No recommendations. Start typing." : "Ei suosituksia. Aloita kirjoittaminen.",
+    "Searching …" : "Haetaan…",
+    "No elements found." : "Elementtejä ei löytynyt.",
+    "Shares" : "Jaot",
+    "Permissions" : "Oikeudet",
+    "Delete data" : "Poista data",
+    "Could not delete share" : "Jaon poistaminen epäonnistui"
 },
 "nplurals=2; plural=(n != 1);");

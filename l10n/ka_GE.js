@@ -8,6 +8,8 @@ OC.L10N.register(
     "Position" : "პოზიცია",
     "Birthday" : "დაბადების დრე",
     "Description" : "აღწერილობა",
+    "Activity" : "აქტივობა",
+    "Sharing" : "გაზიარება",
     "Information" : "ინფორმაცია",
     "Documentation" : "დოკუმენტაცია",
     "Cancel" : "უარყოფა",
@@ -30,6 +32,9 @@ OC.L10N.register(
     "Previous" : "წინა",
     "Next" : "შემდეგი",
     "Create" : "შექმნა",
-    "Today" : "დღეს"
+    "Today" : "დღეს",
+    "Shares" : "გაზიარებები",
+    "Permissions" : "უფლებები",
+    "Could not delete share" : "გაზიარების გაუქმება ვერ მოხერხდა"
 },
 "nplurals=2; plural=(n!=1);");

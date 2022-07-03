@@ -4,6 +4,8 @@ OC.L10N.register(
     "Date" : "Date",
     "Name" : "Ime",
     "Description" : "Opis",
+    "Activity" : "Aktivnost",
+    "Sharing" : "Deljenje",
     "Documentation" : "Dokumentacija",
     "Cancel" : "Otkaži",
     "Delete" : "Obriši",

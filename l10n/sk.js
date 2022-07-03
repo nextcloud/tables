@@ -22,7 +22,6 @@ OC.L10N.register(
     "Progress" : "Pokrok",
     "Tables" : "Tabuľky",
     "Manage data within tables." : "Spravujte údaje v tabuľkách.",
-    "New table" : "Nová tabuľka",
     "Information" : "Informácie",
     "Documentation" : "Dokumentácia",
     "Donations" : "Dary",
@@ -106,6 +105,9 @@ OC.L10N.register(
     "_Delete selected row_::_Delete %n rows_" : ["Zmazať %n riadok","Zmazať %n riadky","Zmazať %n riadkov","Zmazať %n riadkov"],
     "Create" : "Vytvoriť",
     "Today" : "Dnes",
+    "User or group name …" : "Meno používateľa alebo názov skupiny…",
+    "Searching …" : "Hľadá sa …",
+    "No elements found." : "Nenájdené žiadne prvky.",
     "Could not fetch tables" : "Nepodarilo sa získať tabuľky."
 },
 "nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);");

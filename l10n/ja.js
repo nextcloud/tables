@@ -15,6 +15,8 @@ OC.L10N.register(
     "Target" : "目標",
     "Progress" : "進捗状況",
     "Tables" : "テーブル",
+    "Activity" : "アクティビティ",
+    "Sharing" : "共有",
     "Information" : "情報",
     "Documentation" : "ドキュメント",
     "Donations" : "寄付",
@@ -46,6 +48,15 @@ OC.L10N.register(
     "Previous" : "前へ",
     "Next" : "次へ",
     "Create" : "作成",
-    "Today" : "今日"
+    "Today" : "今日",
+    "User or group name …" : "ユーザーかグループ名 ...",
+    "No recommendations. Start typing." : "推奨事項はありません。 入力を開始します。",
+    "Searching …" : "検索しています…",
+    "No elements found." : "要素が見つかりませんでした。",
+    "Shares" : "共有",
+    "Permissions" : "アクセス権限",
+    "Delete data" : "データを削除",
+    "No shares" : "共有なし",
+    "Could not delete share" : "共有を削除できませんでした"
 },
 "nplurals=1; plural=0;");

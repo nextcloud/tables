@@ -14,6 +14,8 @@ OC.L10N.register(
     "Target" : "יעד",
     "Progress" : "תהליך",
     "Tables" : "טבלאות",
+    "Activity" : "פעילות",
+    "Sharing" : "שיתוף",
     "Information" : "מידע",
     "Documentation" : "תיעוד",
     "Edit title" : "עריכת כותרת",
@@ -41,6 +43,14 @@ OC.L10N.register(
     "Previous" : "הקודם",
     "Next" : "הבא",
     "Create" : "יצירה",
-    "Today" : "היום"
+    "Today" : "היום",
+    "User or group name …" : "שם משתמש או קבוצה…",
+    "No recommendations. Start typing." : "אין המלצות. נא להתחיל להקליד.",
+    "Searching …" : "מתבצע חיפוש…",
+    "No elements found." : "לא נמצאו רכיבים.",
+    "Shares" : "שיתופים",
+    "Permissions" : "הרשאות",
+    "No shares" : "אין שיתופים",
+    "Could not delete share" : "לא ניתן היה למחוק את השיתוף"
 },
 "nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;");

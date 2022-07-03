@@ -23,7 +23,9 @@
     "No title given" : "Kein Titel angegeben",
     "Tables" : "Tabellen",
     "Manage data within tables." : "Daten in Tabellen verwalten",
-    "New table" : "Neue Tabelle",
+    "No table in context" : "Keine Tabelle im Kontext",
+    "Activity" : "Benötigt keine Übersetzung. Hier wird nur die formelle Übersetzung verwendet (de_DE).",
+    "Sharing" : "Benötigt keine Übersetzung. Hier wird nur die formelle Übersetzung verwendet (de_DE).",
     "Start page" : "Startseite",
     "Information" : "Informationen",
     "Documentation" : "Dokumentation",
@@ -170,8 +172,17 @@
     "Column ID" : "Spalten-ID",
     "Table ID" : "Tabellen-ID",
     "Today" : "Heute",
+    "User or group name …" : "Benutzer oder Gruppenname …",
+    "No recommendations. Start typing." : "Keine Empfehlungen. Beginne mit der Eingabe.",
+    "Searching …" : "Suche …",
+    "No elements found." : "Keine Elemente gefunden.",
+    "Shares" : "Freigaben",
+    "Permissions" : "Benötigt keine Übersetzung. Hier wird nur die formelle Übersetzung verwendet (de_DE).",
+    "Delete data" : "Daten löschen",
+    "No shares" : "Keine Freigaben",
     "length: {length}/{maxLength}" : "Länge: {length}/{maxLength}",
     "There is a bug with the editor on mobile devices, that is why you see only a simple text box." : "Es gibt einen Fehler im Editor auf Mobilgeräten, deshalb siehst Du nur ein einfaches Textfeld",
+    "Could not delete share" : "Freigabe konnte nicht gelöscht werden",
     "Could not fetch tables" : "Tabellen konnten nicht geladen werden"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

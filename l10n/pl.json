@@ -24,7 +24,9 @@
     "Tables" : "Tabele",
     "Manage data within tables." : "Zarządzaj danymi w tabelach.",
     "Manage data within tables.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or long text\n- Link\n- Number\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n\nHave a good time and manage whatever you want." : "Zarządzaj danymi w tabelach.\n\nDzięki tej aplikacji możesz tworzyć własne tabele z pojedynczymi kolumnami. Możesz zacząć od szablonu lub od zera i dodać żądane kolumny.\nDo wyboru są następujące typy kolumn:\n- Linia tekstowa lub długi tekst\n- Link\n- Numer\n- Pasek postępu\n- Ocena gwiazdek\n- Tak/Nie zaznaczenie\n- Data i/lub godzina\n\nBaw się dobrze i zarządzaj tym, co chcesz.",
-    "New table" : "Nowa tabela",
+    "No table in context" : "Brak tabeli w kontekście",
+    "Activity" : "Aktywność",
+    "Sharing" : "Udostępnianie",
     "Start page" : "Strona startowa",
     "Information" : "Informacje",
     "Documentation" : "Dokumentacja",
@@ -178,8 +180,17 @@
     "Column ID" : "ID kolumny",
     "Table ID" : "ID tabeli",
     "Today" : "Dzisiaj",
+    "User or group name …" : "Nazwa użytkownika lub grupy…",
+    "No recommendations. Start typing." : "Brak rekomendacji. Możesz napisać.",
+    "Searching …" : "Wyszukiwanie…",
+    "No elements found." : "Nie znaleziono elementów.",
+    "Shares" : "Udostępnienia",
+    "Permissions" : "Uprawnienia",
+    "Delete data" : "Usuń dane",
+    "No shares" : "Brak udostępnień",
     "length: {length}/{maxLength}" : "długość: {length}/{maxLength}",
     "There is a bug with the editor on mobile devices, that is why you see only a simple text box." : "W edytorze na urządzeniach mobilnych jest błąd, dlatego widzisz tylko proste pole tekstowe.",
+    "Could not delete share" : "Nie można usunąć udostępniania",
     "Could not fetch tables" : "Nie udało się pobrać tabel"
 },"pluralForm" :"nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);"
 }

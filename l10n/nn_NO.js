@@ -6,6 +6,8 @@ OC.L10N.register(
     "Name" : "Namn",
     "Birthday" : "Bursdag",
     "Description" : "Skildring",
+    "Activity" : "Aktivitet",
+    "Sharing" : "Deling",
     "Information" : "Informasjon",
     "Documentation" : "Dokumentasjon",
     "Cancel" : "Avbryt",
@@ -25,6 +27,8 @@ OC.L10N.register(
     "Previous" : "Førre",
     "Next" : "Neste",
     "Create" : "Lag",
-    "Today" : "I dag"
+    "Today" : "I dag",
+    "Shares" : "Delingar",
+    "Delete data" : "Slett data"
 },
 "nplurals=2; plural=(n != 1);");

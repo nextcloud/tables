@@ -24,7 +24,8 @@
     "Tables" : "Tabelas",
     "Manage data within tables." : "Gerenciar dados nas tabelas",
     "Manage data within tables.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or long text\n- Link\n- Number\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n\nHave a good time and manage whatever you want." : "Gerencie dados dentro de tabelas.\n\nCom este aplicativo você pode criar suas próprias tabelas com colunas individuais. Você pode começar com um modelo ou do zero e adicionar as colunas desejadas.\nVocê pode escolher entre os seguintes tipos de coluna:\n- Linha de texto ou texto longo\n- Link\n- Número\n- Barra de progresso\n- Classificação de estrelas\n- Sim/Não marca\n- Data e/ou hora\n\nDivirta-se e gerencie o que quiser.",
-    "New table" : "Nova tabela",
+    "Activity" : "Atividade",
+    "Sharing" : "Compartilhando",
     "Start page" : "Página inicial",
     "Information" : "Informação",
     "Documentation" : "Documentação",
@@ -178,8 +179,17 @@
     "Column ID" : "ID da coluna",
     "Table ID" : "ID da tabela",
     "Today" : "Hoje",
+    "User or group name …" : "Usuário ou nome de grupo...",
+    "No recommendations. Start typing." : "Sem recomendações. Começe a digitar.",
+    "Searching …" : "Pesquisando...",
+    "No elements found." : "Nenhum elemento encontrado.",
+    "Shares" : "Compartilhamentos",
+    "Permissions" : "Permissões",
+    "Delete data" : "Apagar dados",
+    "No shares" : "Sem compartilhamentos",
     "length: {length}/{maxLength}" : "comprimento: {length}/{maxLength}",
     "There is a bug with the editor on mobile devices, that is why you see only a simple text box." : "Há um bug com o editor em dispositivos móveis, é por isso que você vê apenas uma caixa de texto simples.",
+    "Could not delete share" : "Não foi possível excluir o compartilhamento",
     "Could not fetch tables" : "Não foi possível buscar tabelas"
 },"pluralForm" :"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

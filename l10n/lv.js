@@ -7,6 +7,8 @@ OC.L10N.register(
     "Name" : "Vārds",
     "Birthday" : "Dzimšanas diena",
     "Description" : "Apraksts",
+    "Activity" : "Darbības",
+    "Sharing" : "Koplietošana",
     "Information" : "Informācija",
     "Documentation" : "Dokumentācija",
     "Cancel" : "Atcelt",
@@ -29,6 +31,12 @@ OC.L10N.register(
     "Previous" : "Iepriekšējā",
     "Next" : "Nākamā",
     "Create" : "Izveidot",
-    "Today" : "Šodien"
+    "Today" : "Šodien",
+    "Searching …" : "Meklē...",
+    "No elements found." : "Elementi netika atrasti.",
+    "Shares" : "Koplietots",
+    "Permissions" : "Atļaujas",
+    "No shares" : "Nav koplietojumu",
+    "Could not delete share" : "Neizdevās dzēst koplietotni"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);");

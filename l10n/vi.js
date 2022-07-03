@@ -10,6 +10,8 @@ OC.L10N.register(
     "Description" : "Mô tả",
     "Progress" : "Tiến trình",
     "Tables" : "Bảng",
+    "Activity" : "Hoạt động",
+    "Sharing" : "Đang chia sẽ",
     "Documentation" : "Tài liệu",
     "Edit title" : "Chỉnh sửa tiêu đề",
     "Cancel" : "Hủy",
@@ -33,6 +35,9 @@ OC.L10N.register(
     "Previous" : "Trước",
     "Next" : "Tiếp theo",
     "Create" : "‎Tạo‎",
-    "Today" : "Hôm nay"
+    "Today" : "Hôm nay",
+    "Searching …" : "Đang tìm kiếm ...",
+    "Shares" : "Chia sẻ",
+    "Delete data" : "Xóa dữ liệu"
 },
 "nplurals=1; plural=0;");

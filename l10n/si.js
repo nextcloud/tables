@@ -6,6 +6,7 @@ OC.L10N.register(
     "Name" : "නම",
     "Birthday" : "උපන් දිනය",
     "Description" : "විස්තරය",
+    "Activity" : "ක්‍රියාකාරකම",
     "Information" : "තොරතුරු",
     "Cancel" : "අවලංගු කරන්න",
     "Yes" : "ඔව්",
@@ -21,6 +22,7 @@ OC.L10N.register(
     "Previous" : "පෙර",
     "Next" : "ඊළඟ",
     "Create" : "සාදන්න",
-    "Today" : "අද"
+    "Today" : "අද",
+    "Shares" : "බෙදාගැනීම්"
 },
 "nplurals=2; plural=(n != 1);");

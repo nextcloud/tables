@@ -5,6 +5,7 @@ OC.L10N.register(
     "Name" : "ئاتى",
     "Birthday" : "تۇغۇلغان كۈن",
     "Description" : "چۈشەندۈرۈش",
+    "Sharing" : "ھەمبەھىر",
     "Documentation" : "قوللانما",
     "Cancel" : "ۋاز كەچ",
     "Delete" : "ئۆچۈر",

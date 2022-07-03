@@ -9,6 +9,8 @@ OC.L10N.register(
     "Birthday" : "Роденден",
     "Description" : "Опис",
     "Progress" : "Напредок",
+    "Activity" : "Активност",
+    "Sharing" : "Споделување",
     "Documentation" : "Документација",
     "Cancel" : "Откажи",
     "Delete" : "Избриши",
@@ -34,6 +36,13 @@ OC.L10N.register(
     "Previous" : "Предходна",
     "Next" : "Следна",
     "Create" : "Креирај",
-    "Today" : "Денес"
+    "Today" : "Денес",
+    "User or group name …" : "Корисник или име на група ...",
+    "No recommendations. Start typing." : "Нема препораки. Започнете со пишување.",
+    "Searching …" : "Пребарување ...",
+    "No elements found." : "Нема пронајдено елементи.",
+    "Shares" : "Споделувања",
+    "No shares" : "Нема споделувања",
+    "Could not delete share" : "Неможе да се избрише споделувањето"
 },
 "nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;");

@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Date" : "Date",
     "Name" : "﻿ಹೆಸರು",
+    "Sharing" : "﻿ಹಂಚಿಕೆ",
     "Documentation" : "ದಸ್ತಾವೇಜು",
     "Cancel" : "﻿ರದ್ದು",
     "Delete" : "﻿ಅಳಿಸಿ",
