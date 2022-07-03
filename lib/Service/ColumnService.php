@@ -205,13 +205,13 @@ class ColumnService extends SuperService {
     /**
      * @throws InternalError
      */
-    public function delete($id, bool $skipRowCleanup = false) {
+    public function delete($id, bool $skipRowCleanup = false, $userId = null) {
 		try {
             $item = $this->mapper->find($id);
 
             // security
             /** @noinspection PhpUndefinedMethodInspection */
-            if(!$this->permissionsService->canDeleteColumns($item->getTableId()))
+            if(!$this->permissionsService->canDeleteColumns($item->getTableId(), $userId))
                 throw new PermissionError('delete column id = '.$id.' is not allowed.');
 
             if(!$skipRowCleanup) {

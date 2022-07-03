@@ -211,19 +211,21 @@ class PermissionsService extends SuperService {
     // ***** SHARE permissions *****
 
     /** @noinspection PhpUndefinedMethodInspection */
-    public function canReadShare(Share $share): bool
+    public function canReadShare(Share $share, string $userId = null): bool
     {
-        if($share->getSender() === $this->userId) {
+        $userId = $userId ?: $this->userId;
+
+        if($share->getSender() === $userId) {
             return true;
         }
 
-        if($share->getReceiverType() === 'user' && $share->getReceiver() === $this->userId) {
+        if($share->getReceiverType() === 'user' && $share->getReceiver() === $userId) {
             return true;
         }
 
         if($share->getReceiverType() === 'group') {
             try {
-                $userGroups = $this->userHelper->getGroupsForUser($this->userId);
+                $userGroups = $this->userHelper->getGroupsForUser($userId);
                 foreach ($userGroups as $userGroup) {
                     if($userGroup->getDisplayName() === $share->getReceiver()) {
                         return true;
@@ -237,16 +239,20 @@ class PermissionsService extends SuperService {
         return false;
     }
 
-    public function canUpdateShare(Share $item): bool
+    public function canUpdateShare(Share $item, string $userId = null): bool
     {
+        $userId = $userId ?: $this->userId;
+
         /** @noinspection PhpUndefinedMethodInspection */
-        return $item->getSender() === $this->userId;
+        return $item->getSender() === $userId;
     }
 
-    public function canDeleteShare(Share $item): bool
+    public function canDeleteShare(Share $item, string $userId = null): bool
     {
+        $userId = $userId ?: $this->userId;
+
         /** @noinspection PhpUndefinedMethodInspection */
-        return $item->getSender() === $this->userId;
+        return $item->getSender() === $userId;
     }
 
 

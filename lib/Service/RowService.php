@@ -253,10 +253,10 @@ class RowService extends SuperService {
      * @throws \OCP\DB\Exception
      * @throws PermissionError
      */
-    public function deleteAllByTable(int $tableId): int
+    public function deleteAllByTable(int $tableId, $userId = null): int
     {
         // security
-        if(!$this->permissionsService->canDeleteRows($tableId))
+        if(!$this->permissionsService->canDeleteRows($tableId, $userId))
             throw new PermissionError('delete all rows for table id = '.$tableId.' is not allowed.');
 
         return $this->mapper->deleteAllByTable($tableId);
