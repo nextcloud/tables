@@ -5,6 +5,8 @@
     "Name" : "Nama",
     "Birthday" : "Tanggal lahir",
     "Description" : "Deskrisi",
+    "Activity" : "Aktivitas",
+    "Sharing" : "Berbagi",
     "Information" : "Informasi",
     "Documentation" : "Dokumentasi",
     "Cancel" : "Membatalkan",
@@ -30,6 +32,8 @@
     "Previous" : "Sebelumnya",
     "Next" : "Berikutnya",
     "Create" : "Buat",
-    "Today" : "Hari ini"
+    "Today" : "Hari ini",
+    "Shares" : "Dibagikan",
+    "Could not delete share" : "Tidak dapat menghapus pembagian"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

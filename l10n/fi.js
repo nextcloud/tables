@@ -58,6 +58,7 @@ OC.L10N.register(
     "Shares" : "Jaot",
     "Permissions" : "Oikeudet",
     "Delete data" : "Poista data",
+    "No shares" : "Ei jakoja",
     "Could not delete share" : "Jaon poistaminen epäonnistui"
 },
 "nplurals=2; plural=(n != 1);");

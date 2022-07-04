@@ -19,6 +19,9 @@
     "Progress" : "Πρόοδος",
     "Tables" : "Πίνακες",
     "Manage data within tables." : "Διαχείριση δεδομένων μέσα σε πίνακες.",
+    "No table in context" : "Δεν υπάρχει πίνακας στο πλαίσιο",
+    "Activity" : "Δραστηριότητα",
+    "Sharing" : "Διαμοιρασμός",
     "Information" : "Πληροφορίες",
     "Documentation" : "Τεκμηρίωση",
     "Donations" : "Δωρεές",
@@ -135,7 +138,15 @@
     "Column ID" : "ID στήλης",
     "Table ID" : "ID πίνακα",
     "Today" : "Σήμερα",
+    "User or group name …" : "Όνομα χρήστη ή ομάδας",
+    "No recommendations. Start typing." : "Δεν υπάρχουν συστάσεις. Αρχίστε να πληκτρολογείτε.",
     "Searching …" : "Αναζήτηση ...",
+    "No elements found." : "Δεν βρέθηκαν στοιχεία.",
+    "Shares" : "Κοινόχρηστα",
+    "Permissions" : "Δικαιώματα",
+    "Delete data" : "Διαγραφή δεδομένων",
+    "No shares" : "Κανένα κοινόχρηστο",
+    "Could not delete share" : "Αδυναμία διαγραφής κοινόχρηστου φακέλου",
     "Could not fetch tables" : "Αδυναμία ανάκτησης πινάκων"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

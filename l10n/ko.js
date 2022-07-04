@@ -13,6 +13,8 @@ OC.L10N.register(
     "Description" : "설명",
     "Progress" : "진행 상황",
     "Tables" : "표",
+    "Activity" : "활동",
+    "Sharing" : "공유",
     "Information" : "정보",
     "Documentation" : "문서",
     "Edit title" : "제목 수정",
@@ -39,7 +41,12 @@ OC.L10N.register(
     "Next" : "다음",
     "Create" : "생성",
     "Today" : "오늘",
+    "No recommendations. Start typing." : "추천 없음. 타이핑을 시작하십시오",
     "Searching …" : "검색 ...",
-    "Permissions" : "권한"
+    "Shares" : "공유",
+    "Permissions" : "권한",
+    "Delete data" : "데이터 삭제",
+    "No shares" : "공유 없음",
+    "Could not delete share" : "공유를 삭제할 수 없음"
 },
 "nplurals=1; plural=0;");

@@ -36,6 +36,8 @@ OC.L10N.register(
     "Confirm" : "Confirmar",
     "Edit" : "Editar",
     "Close" : "Pechar",
+    "Row deleted." : "Fila eliminada",
+    "Could not delete row." : "Non foi posíbel eliminar a fila.",
     "Owner" : "Propietario",
     "Created at" : "Creado ás",
     "Download CSV" : "Descargar CSV",

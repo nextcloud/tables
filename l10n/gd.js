@@ -3,6 +3,8 @@ OC.L10N.register(
     {
     "Name" : "Ainm",
     "Progress" : "Adhartas",
+    "Activity" : "Gnìomhachd",
+    "Sharing" : "Co-roinneadh",
     "Cancel" : "Sguir dheth",
     "Delete" : "Sguab às",
     "Default" : "Bunaiteach",

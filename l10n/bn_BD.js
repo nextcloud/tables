@@ -5,6 +5,8 @@ OC.L10N.register(
     "Name" : "নাম",
     "Birthday" : "জন্মদিন",
     "Description" : "বিবরণ",
+    "Activity" : "সক্রিয়তা",
+    "Sharing" : "ভাগাভাগিরত",
     "Documentation" : "নথিবদ্ধকরণ",
     "Cancel" : "বাতির",
     "Delete" : "মুছে",
@@ -22,6 +24,7 @@ OC.L10N.register(
     "Previous" : "পূর্ববর্তী",
     "Next" : "পরবর্তী",
     "Create" : "তৈরী কর",
-    "Today" : "আজ"
+    "Today" : "আজ",
+    "Shares" : "ভাগাভাগি"
 },
 "nplurals=2; plural=(n != 1);");

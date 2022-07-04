@@ -3,6 +3,8 @@
     "Name" : "নাম",
     "Birthday" : "জন্মদিন",
     "Description" : "বিবরণ",
+    "Activity" : "সক্রিয়তা",
+    "Sharing" : "ভাগাভাগিরত",
     "Documentation" : "নথিবদ্ধকরণ",
     "Cancel" : "বাতির",
     "Delete" : "মুছে",
@@ -20,6 +22,7 @@
     "Previous" : "পূর্ববর্তী",
     "Next" : "পরবর্তী",
     "Create" : "তৈরী কর",
-    "Today" : "আজ"
+    "Today" : "আজ",
+    "Shares" : "ভাগাভাগি"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

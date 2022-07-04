@@ -24,6 +24,9 @@
     "Tables" : "Tablolar",
     "Manage data within tables." : "Tablolar içindeki verileri işleyin.",
     "Manage data within tables.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or long text\n- Link\n- Number\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n\nHave a good time and manage whatever you want." : "Tablolar içindeki verileri yönetin.\n\nBu uygulama ile belirleyeceğiniz sütunlar ile kendi tablolarınızı oluşturabilirsiniz. Bir kalıp kullanabilir ya da sıfırdan başlayarak ve istediğiniz sütunları ekleyebilirsiniz.\nAşağıdaki sütun türlerini seçebilirsiniz:\n- Metin satırı ya da uzun metin\n- Bağlantı\n- Numara\n- İlerleme çubuğu\n- Yıldız değerlendirmesi\n- Evet/hayır işareti\n- Tarih ve/veya saat\n\nİyi eğlenceler, istediğiniz gibi yönetin.",
+    "No table in context" : "Bağlamda bir tablo bulunamadı",
+    "Activity" : "İşlem",
+    "Sharing" : "Paylaşım",
     "Start page" : "Başlangıç sayfası",
     "Information" : "Bilgiler",
     "Documentation" : "Belgeler",
@@ -177,8 +180,17 @@
     "Column ID" : "Sütun kodu",
     "Table ID" : "Tablo kodu",
     "Today" : "Bugün",
+    "User or group name …" : "Kullanıcı ya da grup adı…",
+    "No recommendations. Start typing." : "Herhangi bir öneri yok. Yazmaya başlayın.",
+    "Searching …" : "Aranıyor…",
+    "No elements found." : "Herhangi bir bileşen bulunamadı.",
+    "Shares" : "Paylaşımlar",
+    "Permissions" : "İzinler",
+    "Delete data" : "Verileri sil",
+    "No shares" : "Henüz bir şey paylaşılmamış",
     "length: {length}/{maxLength}" : "Uzunluk: {length}/{maxLength}",
     "There is a bug with the editor on mobile devices, that is why you see only a simple text box." : "Mobil aygıtlarda düzenleyicide bir sorun var. Bu yüzden yalnızca basit bir metin kutusu görüyorsunuz.",
+    "Could not delete share" : "Paylaşım silinemedi",
     "Could not fetch tables" : "Tablolar alınamadı"
 },"pluralForm" :"nplurals=2; plural=(n > 1);"
 }

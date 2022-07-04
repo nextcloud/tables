@@ -180,12 +180,16 @@
     "Table ID" : "ID de tabla",
     "Today" : "Hoy",
     "User or group name …" : "Nombre de usuario o grupo …",
+    "No recommendations. Start typing." : "Sin recomendaciones. Empiece a escribir.",
     "Searching …" : "Buscando  …",
     "No elements found." : "No se encontraron elementos.",
     "Shares" : "Compartidos",
     "Permissions" : "Permisos",
+    "Delete data" : "Eliminar datos",
+    "No shares" : "No compartidos",
     "length: {length}/{maxLength}" : "longitud: {length}/{maxLength}",
     "There is a bug with the editor on mobile devices, that is why you see only a simple text box." : "Hay un error con el editor en los dispositivos móviles, por eso sólo se ve un simple cuadro de texto.",
+    "Could not delete share" : "No se ha podido eliminar el recurso compartido",
     "Could not fetch tables" : "No se ha podido obtener las tablas."
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

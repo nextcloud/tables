@@ -5,6 +5,8 @@
     "Name" : "Nomine",
     "Birthday" : "Anniversario de nativitate",
     "Description" : "Description",
+    "Activity" : "Activitate",
+    "Sharing" : "Compartente",
     "Documentation" : "Documentation",
     "Cancel" : "Cancellar",
     "Delete" : "Deler",
@@ -24,6 +26,7 @@
     "Previous" : "Previe",
     "Next" : "Sequente",
     "Create" : "Crear",
-    "Today" : "Hodie"
+    "Today" : "Hodie",
+    "Shares" : "Compartimentos"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

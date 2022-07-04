@@ -7,6 +7,8 @@ OC.L10N.register(
     "Name" : "Nama",
     "Birthday" : "Tanggal lahir",
     "Description" : "Deskrisi",
+    "Activity" : "Aktivitas",
+    "Sharing" : "Berbagi",
     "Information" : "Informasi",
     "Documentation" : "Dokumentasi",
     "Cancel" : "Membatalkan",
@@ -32,6 +34,8 @@ OC.L10N.register(
     "Previous" : "Sebelumnya",
     "Next" : "Berikutnya",
     "Create" : "Buat",
-    "Today" : "Hari ini"
+    "Today" : "Hari ini",
+    "Shares" : "Dibagikan",
+    "Could not delete share" : "Tidak dapat menghapus pembagian"
 },
 "nplurals=1; plural=0;");

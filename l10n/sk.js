@@ -22,6 +22,8 @@ OC.L10N.register(
     "Progress" : "Pokrok",
     "Tables" : "Tabuľky",
     "Manage data within tables." : "Spravujte údaje v tabuľkách.",
+    "Activity" : "Aktivita",
+    "Sharing" : "Zdieľanie",
     "Information" : "Informácie",
     "Documentation" : "Dokumentácia",
     "Donations" : "Dary",
@@ -106,8 +108,14 @@ OC.L10N.register(
     "Create" : "Vytvoriť",
     "Today" : "Dnes",
     "User or group name …" : "Meno používateľa alebo názov skupiny…",
+    "No recommendations. Start typing." : "Žiadne odporúčania. Môžete začať písať.",
     "Searching …" : "Hľadá sa …",
     "No elements found." : "Nenájdené žiadne prvky.",
+    "Shares" : "Sprístupnené položky",
+    "Permissions" : "Oprávnenia",
+    "Delete data" : "Zmazať údaje",
+    "No shares" : "Žiadne sprístupnené položky",
+    "Could not delete share" : "Nie je možné zmazať sprístupnenie",
     "Could not fetch tables" : "Nepodarilo sa získať tabuľky."
 },
 "nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);");

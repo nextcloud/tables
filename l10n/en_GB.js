@@ -10,6 +10,8 @@ OC.L10N.register(
     "Birthday" : "Birthday",
     "Description" : "Description",
     "Progress" : "Progress",
+    "Activity" : "Activity",
+    "Sharing" : "Sharing",
     "Information" : "Information",
     "Documentation" : "Documentation",
     "Cancel" : "Cancel",
@@ -35,6 +37,10 @@ OC.L10N.register(
     "Previous" : "Previous",
     "Next" : "Next",
     "Create" : "Create",
-    "Today" : "Today"
+    "Today" : "Today",
+    "No recommendations. Start typing." : "No recommendations. Start typing.",
+    "Shares" : "Shares",
+    "Permissions" : "Permissions",
+    "Could not delete share" : "Could not delete share"
 },
 "nplurals=2; plural=(n != 1);");

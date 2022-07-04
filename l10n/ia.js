@@ -7,6 +7,8 @@ OC.L10N.register(
     "Name" : "Nomine",
     "Birthday" : "Anniversario de nativitate",
     "Description" : "Description",
+    "Activity" : "Activitate",
+    "Sharing" : "Compartente",
     "Documentation" : "Documentation",
     "Cancel" : "Cancellar",
     "Delete" : "Deler",
@@ -26,6 +28,7 @@ OC.L10N.register(
     "Previous" : "Previe",
     "Next" : "Sequente",
     "Create" : "Crear",
-    "Today" : "Hodie"
+    "Today" : "Hodie",
+    "Shares" : "Compartimentos"
 },
 "nplurals=2; plural=(n != 1);");

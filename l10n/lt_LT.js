@@ -11,6 +11,8 @@ OC.L10N.register(
     "Description" : "Aprašas",
     "Progress" : "Eiga",
     "Tables" : "Lentelės",
+    "Activity" : "Veikla",
+    "Sharing" : "Bendrinimas",
     "Information" : "Informacija",
     "Documentation" : "Dokumentacija",
     "Edit title" : "Redaguoti pavadinimą",
@@ -43,6 +45,14 @@ OC.L10N.register(
     "Previous" : "Ankstesnis",
     "Next" : "Kitas",
     "Create" : "Sukurti",
-    "Today" : "Šiandiena"
+    "Today" : "Šiandiena",
+    "User or group name …" : "Naudotojo ar grupės vardas…",
+    "No recommendations. Start typing." : "Rekomendacijų nėra. Pradėkite rašyti.",
+    "Searching …" : "Ieškoma…",
+    "No elements found." : "Nerasta jokių elementų.",
+    "Shares" : "Viešiniai",
+    "Permissions" : "Leidimai",
+    "No shares" : "Nėra jokių viešinių",
+    "Could not delete share" : "Nepavyko nustoti dalintis duomenimis"
 },
 "nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);");

@@ -154,12 +154,16 @@ OC.L10N.register(
     "Table ID" : "ID Razpredelnice",
     "Today" : "Danes",
     "User or group name …" : "Ime uporabnika oziroma skupine ...",
+    "No recommendations. Start typing." : "Ni priporočil; začnite z vpisovanjem",
     "Searching …" : "Poteka iskanje ...",
     "No elements found." : "Ni najdenih predmetov",
     "Shares" : "‧ V Souporabi",
     "Permissions" : "Dovoljenja",
+    "Delete data" : "Izbriši podatke",
+    "No shares" : "Ni še vpisanih mest souporabe",
     "length: {length}/{maxLength}" : "dolžina: {length}/{maxLength}",
     "There is a bug with the editor on mobile devices, that is why you see only a simple text box." : "Na mobilnih napravah se v urejevalniku pojavi napaka, zato se prikaže le preprosto besedilno polje.",
+    "Could not delete share" : "Mesta souporabe ni mogoče izbrisati",
     "Could not fetch tables" : "Razpredelnic ni mogoče pridobiti."
 },
 "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);");
