@@ -86,6 +86,7 @@ OC.L10N.register(
     "Date column specific parameters" : "Parametry určené pouze pro sloupec s datumy",
     "Time column specific parameters" : "Parametry určené pouze pro sloupec s časy",
     "Save" : "Uložit",
+    "Save and new" : "Uložit a nové",
     "Text line" : "Testový řádek",
     "Long text" : "Dlouhý text",
     "Link" : "Odkaz",

@@ -86,6 +86,7 @@ OC.L10N.register(
     "Date column specific parameters" : "Spezifische Parameter für die Datum-Spalten",
     "Time column specific parameters" : "Spezifische Parameter für die Zeit-Spalten",
     "Save" : "Speichern",
+    "Save and new" : "Speichern und neu",
     "Text line" : "Textzeile",
     "Long text" : "Langtext",
     "Link" : "Verknüpfung",
