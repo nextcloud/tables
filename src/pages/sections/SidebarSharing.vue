@@ -1,5 +1,5 @@
 <template>
-	<div class="sharing">
+	<div v-if="activeTable" class="sharing">
 		<h1>{{ t('tables', 'Sharing') }}</h1>
 		<div v-if="!activeTable.isShared">
 			<ShareForm :shares="shares" @add="addShare" @update="updateShare" />
@@ -41,12 +41,16 @@ export default {
 
 	watch: {
 		activeTable() {
-			this.loadSharesFromBE()
+			if (this.activeTable) {
+				this.loadSharesFromBE()
+			}
 		},
 	},
 
 	mounted() {
-		this.loadSharesFromBE()
+		if (this.activeTable) {
+			this.loadSharesFromBE()
+		}
 	},
 
 	methods: {
