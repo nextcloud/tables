@@ -1,8 +1,12 @@
 # Changelog
 
-## 0.2.0-rc1 - 2022-07-02
+## 0.2.0 - 2022-07-10
 ### Added
-- sharing options
+- sharing options for users and groups
+
+### Updated
+- translations
+- npm dependencies
 
 ## 0.1.2 - 2022-04-28
 ### Updated

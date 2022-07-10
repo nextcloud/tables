@@ -16,10 +16,12 @@ You can choose from the following column types:
 - Yes/No tick
 - Date and/or time
 
+Share your tables with users and groups within your cloud.
+
 Have a good time and manage whatever you want.
 
 ]]></description>
-    <version>0.2.0-RC1</version>
+    <version>0.2.0</version>
     <licence>agpl</licence>
     <author mail="flost-dev@mailbox.org" >Florian Steffens</author>
     <namespace>Tables</namespace>
