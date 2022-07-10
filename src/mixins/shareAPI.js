@@ -70,7 +70,7 @@ export default {
 					return false
 				}
 				// console.debug('Share was deleted', res)
-				showSuccess(t('tables', 'Share permission was updated.'))
+				showSuccess(t('tables', 'Share permission was updated'))
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not update share permission'))
