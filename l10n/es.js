@@ -25,7 +25,6 @@ OC.L10N.register(
     "No title given" : "No se ha puesto título",
     "Tables" : "Tablas",
     "Manage data within tables." : "Gestiona datos dentro de tablas",
-    "Manage data within tables.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or long text\n- Link\n- Number\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n\nHave a good time and manage whatever you want." : "Organiza datos dentro de tablas.\n\nCon esta app puedes crear tus propias tablas con columnas individuales. Puedes empezar con una plantilla o desde cero y añadir las columnas que desees.\nPuedes escoger entre los siguientes tipos de columnas:\n- Línea de texto o texto largo\n- Enlace\n- Número\n- Barra de progreso\n- Valoración por estrellas\n- Sí/No\n- Fecha y/o hora\n\nDisfrúuta y organiza lo que tú quieras.",
     "Activity" : "Actividad",
     "Sharing" : "Compartir",
     "Start page" : "Página de inicio",

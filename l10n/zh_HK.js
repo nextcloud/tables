@@ -25,7 +25,6 @@ OC.L10N.register(
     "No title given" : "没有指定標題",
     "Tables" : "數據庫表",
     "Manage data within tables." : "管理表中的數據。",
-    "Manage data within tables.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or long text\n- Link\n- Number\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n\nHave a good time and manage whatever you want." : "管理表中的數據。\n\n使用此應用程序，您可以創建自己的包含各個列的表格。 您可以從模板開始，也可以從頭開始添加您想要的列。\n您可以從以下列類型中進行選擇：\n- 文本行或長文本\n- 連結\n- 數字\n- 進度條\n- 星級\n- 是/否\n- 日期和/或時間\n\n玩得開心，隨心所欲地管理。",
     "No table in context" : "上下文中沒有表格",
     "From {ownerName}" : "從 {ownerName}",
     "Activity" : "活動",
@@ -213,7 +212,6 @@ OC.L10N.register(
     "Could not create new share" : "無法建立新分享",
     "Share was deleted" : "分享已刪除",
     "Could not delete share" : "無法刪除分享",
-    "Share permission was updated." : "分享權限已更新。",
     "Could not update share permission" : "無法更新分享權限",
     "Could not fetch tables" : "無法擷取數據庫表"
 },
