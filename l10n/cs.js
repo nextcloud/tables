@@ -25,6 +25,7 @@ OC.L10N.register(
     "No title given" : "Nezadán žádný nadpis",
     "Tables" : "Tabulky",
     "Manage data within tables." : "Spravujte data pomocí tabulek.",
+    "Manage data within tables.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or long text\n- Link\n- Number\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n\nShare your tables with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Spravujte data v tabulkách.\n\nPomocí této aplikace je možné si vytvářet své vlastní tabulky s jednotlivými sloupci. Je možné začít ze šablony nebo zcela od začátku a přidávat potřebné sloupce.\nJe možné vybírat z následujících typů sloupců:\n- řádek textu nebo dlouhý text\n- odkaz\n- číslo\n- ukazatel stavu dokončenosti\n- hodnocení hvězdičkami\n- zaškrtávací kolonka ano / ne\n- datum a/nebo čas\n\nSdílejte své tabulky uživatelům a skupinám v rámci cloudu.\n\nMějte se fajn a spravujte cokoli chcete.",
     "No table in context" : "V kontextu není žádná tabulka",
     "From {ownerName}" : "Od {ownerName}",
     "Activity" : "Aktivita",
@@ -212,6 +213,7 @@ OC.L10N.register(
     "Could not create new share" : "Nepodařilo se vytvořit nové sdílení",
     "Share was deleted" : "Sdílení bylo smazáno",
     "Could not delete share" : "Sdílení se nedaří smazat",
+    "Share permission was updated" : "Oprávnění ke sdílení bylo zaktualizováno",
     "Could not update share permission" : "Oprávnění ke sdílení se nepodařilo zaktualizovat",
     "Could not fetch tables" : "Nepodařilo se získat tabulky"
 },

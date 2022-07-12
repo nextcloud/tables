@@ -25,6 +25,7 @@ OC.L10N.register(
     "No title given" : "Nie podano tytułu",
     "Tables" : "Tabele",
     "Manage data within tables." : "Zarządzaj danymi w tabelach.",
+    "Manage data within tables.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or long text\n- Link\n- Number\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n\nShare your tables with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Zarządzaj danymi w tabelach.\n\nDzięki tej aplikacji możesz tworzyć własne tabele z pojedynczymi kolumnami. Możesz zacząć od szablonu lub od zera i dodać żądane kolumny.\nDo wyboru są następujące typy kolumn:\n- Linia tekstowa lub długi tekst\n- Link\n- Numer\n- Pasek postępu\n- Ocena gwiazdek\n- Tak/Nie zaznaczenie\n- Data i/lub godzina\n\nUdostępniaj swoje tabele użytkownikom i grupom w chmurze.\n\nBaw się dobrze i zarządzaj tym, co chcesz.",
     "No table in context" : "Brak tabeli w kontekście",
     "From {ownerName}" : "Od {ownerName}",
     "Activity" : "Aktywność",
@@ -212,6 +213,7 @@ OC.L10N.register(
     "Could not create new share" : "Nie udało się utworzyć nowego udostępnienia",
     "Share was deleted" : "Udostępnienie zostało usunięte",
     "Could not delete share" : "Nie można usunąć udostępniania",
+    "Share permission was updated" : "Uprawnienie do udostępnienia zostało zaktualizowane",
     "Could not update share permission" : "Nie udało się zaktualizować uprawnień do udostępnienia",
     "Could not fetch tables" : "Nie udało się pobrać tabel"
 },
