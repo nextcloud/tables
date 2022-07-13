@@ -212,6 +212,7 @@ OC.L10N.register(
     "Could not create new share" : "Ezin izan da partekatze berria sortu",
     "Share was deleted" : "Partekatzea ezabatu da",
     "Could not delete share" : "Ezin izan da partekatzea ezabatu",
+    "Share permission was updated" : "Partekatze baimena eguneratu da",
     "Could not update share permission" : "Ezin izan dira partekatzearen baimenak aldatu",
     "Could not fetch tables" : "Ezin izan dira taulak eskuratu"
 },
