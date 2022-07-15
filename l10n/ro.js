@@ -20,6 +20,7 @@ OC.L10N.register(
     "Default" : "Implicit",
     "Prefix" : "Prefix",
     "Suffix" : "Sufix",
+    "Options" : "Opțiuni",
     "Yes" : "a",
     "No" : "Nu",
     "Type" : "Tip",

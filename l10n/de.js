@@ -25,6 +25,7 @@ OC.L10N.register(
     "No title given" : "Kein Titel angegeben",
     "Tables" : "Tabellen",
     "Manage data within tables." : "Daten in Tabellen verwalten",
+    "Manage data within tables.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or long text\n- Link\n- Number\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n\nShare your tables with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Daten in Tabellen verwalten.\n\nMit dieser App kannst Du Deine eigenen Tabellen mit individuellen Spalten erstellen. Du kannst mit einer Vorlage oder von Grund auf neu beginnen und Deine gewünschten Spalten hinzufügen.\nDu kannst aus folgenden Spaltentypen wählen:\n- Textzeile oder Langtext\n- Verknüpfung\n- Zahl-Feld\n- Fortschrittsanzeige\n- Sternebewertung\n- Ja/Nein -Information\n- Datum und/oder Zeit\n\nTeile Deine Tabellen mit Benutzern und Gruppen in Deiner Cloud. \n\nViel Spaß damit und verwalte, was Du möchtest.",
     "From {ownerName}" : "Von {ownerName}",
     "Activity" : "Aktivität",
     "Coming soon" : "Demnächst",
