@@ -25,6 +25,7 @@ OC.L10N.register(
     "No title given" : "Няма зададено заглавие",
     "Tables" : "Таблици",
     "Manage data within tables." : "Управление на данни в таблици.",
+    "Manage data within tables.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or long text\n- Link\n- Number\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n\nShare your tables with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Управление на данни в таблици.\nС това приложение можете да създавате свои собствени таблици с отделни колони. Можете да започнете с шаблон или от нулата и да добавите желаните колони.\nМожете да избирате от следните типове колони:\n- Текст на един ред или дълъг текст\n- Връзка\n- Номер\n- Лента за напредък\n- Оценка със звезди\n- С/ Без отметка\n- Дата и/или час\n\nСподеляйте вашите таблици с потребители и групи във вашия облак.\n\nПриятно прекарване и управлявайте каквото искате.",
     "No table in context" : "Няма таблица в контекста",
     "From {ownerName}" : "От {ownerName}",
     "Activity" : "Активност",
@@ -85,6 +86,7 @@ OC.L10N.register(
     "Date column specific parameters" : "Специфични параметри на колона за дата",
     "Time column specific parameters" : "Специфични параметри на колона за време",
     "Save" : "Запиши",
+    "Save and new" : "Записани и нови",
     "Text line" : "Текстов ред",
     "Long text" : "Дълъг текст",
     "Link" : "Връзка",
@@ -211,6 +213,7 @@ OC.L10N.register(
     "Could not create new share" : "Не можа да се създаде ново споделяне",
     "Share was deleted" : "Споделянето беше изтрито",
     "Could not delete share" : "Не е възможно изтриване на споделянето",
+    "Share permission was updated" : "Право за споделяне беше актуализирано",
     "Could not update share permission" : "Не можа да се актуализира право за споделяне",
     "Could not fetch tables" : "Таблиците не можаха да бъдат извлечени"
 },
