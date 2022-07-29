@@ -31,6 +31,7 @@ OC.L10N.register(
     "Save" : "儲存",
     "Long text" : "長文",
     "Link" : "連結",
+    "Selection" : "選取",
     "Date and time" : "日期與時間",
     "Time" : "時間",
     "Confirm" : "確認",
@@ -51,6 +52,7 @@ OC.L10N.register(
     "Searching …" : "正在搜尋……",
     "No elements found." : "找不到元素。",
     "Shares" : "分享",
+    "Delete data" : "刪除資料",
     "No shares" : "無分享",
     "Could not delete share" : "無法刪除分享"
 },
