@@ -25,6 +25,7 @@ OC.L10N.register(
     "No title given" : "No s'ha donat cap títol",
     "Tables" : "Taules",
     "Manage data within tables." : "Gestioneu les dades dins de les taules.",
+    "Manage data within tables.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or long text\n- Link\n- Number\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n\nShare your tables with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Gestioneu les dades dins de les taules.\n\nAmb aquesta aplicació podeu crear les vostres pròpies taules amb columnes individuals. Podeu començar amb una plantilla o des de zero i afegir les columnes que vulgueu.\nPodeu triar entre els tipus de columnes següents:\n- Línia de text o text llarg\n- Enllaç\n- Número\n- Barra de progrés\n- Valoració d'estrelles\n- Marcar Sí/No\n- Data i/o hora\n\nComparteix les teves taules amb usuaris i grups del teu núvol.\n\nPassa-ho bé i gestiona el que vulguis.",
     "No table in context" : "No hi ha taula en context",
     "From {ownerName}" : "Des de {ownerName}",
     "Activity" : "Activitat",
@@ -85,6 +86,7 @@ OC.L10N.register(
     "Date column specific parameters" : "Paràmetres específics de data de la columna",
     "Time column specific parameters" : "Paràmetres específics de temps de la columna",
     "Save" : "Desar",
+    "Save and new" : "Desa i nou",
     "Text line" : "Línia de text",
     "Long text" : "Text llarg",
     "Link" : "Enllaç",
@@ -211,6 +213,7 @@ OC.L10N.register(
     "Could not create new share" : "No s'ha pogut crear una compartició nova",
     "Share was deleted" : "S'ha suprimit la compartició",
     "Could not delete share" : "No s'ha pogut suprimir la compartició",
+    "Share permission was updated" : "S'ha actualitzat el permís per compartir",
     "Could not update share permission" : "No s'ha pogut actualitzar el permís per compartir",
     "Could not fetch tables" : "No s'han pogut recuperar les taules"
 },
