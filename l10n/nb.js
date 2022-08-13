@@ -6,6 +6,7 @@ OC.L10N.register(
     "Members" : "Medlemmer",
     "List of members with some basic attributes." : "Liste av medlemmer med noen enkle attributter.",
     "Date" : "Dato",
+    "Weight" : "Vekt",
     "Comments" : "Kommentarer",
     "Name" : "Navn",
     "Position" : "Posisjon",
