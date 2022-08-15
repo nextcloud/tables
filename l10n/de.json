@@ -126,7 +126,7 @@
     "Close" : "Schließen",
     "Could not fetch columns for table" : "Spalten der Tabelle konnten nicht abgerufen werden",
     "Cannot update column. Title is missing." : "Spalte kann nicht aktualisiert werden. Titel fehlt.",
-    "An error occurred. See the logs." : "Ein Fehler ist aufgetreten, siehe Protokolle.",
+    "An error occurred. See the logs." : "Es ist ein Fehler aufgetreten. Siehe in den Protokollen nach.",
     "The column \"{column}\" was updated." : "Die Spalte \"{column}\" wurde aktualisiert.",
     "Could not update column" : "Spalte konnte nicht aktualisiert werden",
     "The column is removed." : "Die Spalte wurde entfernt.",
