@@ -7,6 +7,7 @@ OC.L10N.register(
     "Name" : "Nama",
     "Birthday" : "Tanggal lahir",
     "Description" : "Deskrisi",
+    "Progress" : "Kemajuan",
     "Activity" : "Aktivitas",
     "Sharing" : "Berbagi",
     "Information" : "Informasi",
