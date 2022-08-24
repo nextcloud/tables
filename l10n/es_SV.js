@@ -37,4 +37,4 @@ OC.L10N.register(
     "Permissions" : "Permisos",
     "Could not delete share" : "No fue posible borrar el elemento compartido"
 },
-"nplurals=2; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");
+"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");
