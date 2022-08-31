@@ -1,5 +1,5 @@
 <template>
-	<div id="content">
+	<div id="content" class="content app-tables">
 		<Navigation />
 		<AppContent>
 			<div v-if="somethingIsLoading" class="icon-loading" />
