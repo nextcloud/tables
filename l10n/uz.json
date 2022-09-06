@@ -1,0 +1,14 @@
+{ "translations": {
+    "Comments" : "Fikrlar",
+    "Name" : "Ism...",
+    "Cancel" : "Bekor qilish",
+    "Delete" : "O'chir",
+    "Yes" : "Ha",
+    "No" : "Yo'q",
+    "Save" : "Saqlash",
+    "Link" : "Ulanish",
+    "Confirm" : "Tasdiqlash",
+    "Close" : "yopish",
+    "Owner" : "egasi"
+},"pluralForm" :"nplurals=1; plural=0;"
+}

@@ -28,6 +28,7 @@ OC.L10N.register(
     "Type" : "Тип",
     "Save" : "Зберегти",
     "Link" : "Посилання",
+    "Selection" : "Вибір",
     "Time" : "Час",
     "Confirm" : "Підтвердити",
     "Edit" : "Редагувати",
@@ -40,6 +41,7 @@ OC.L10N.register(
     "Today" : "Сьогодні",
     "Searching …" : "Пошук...",
     "Shares" : "Спільний доступ",
+    "Delete data" : "Видалити дані",
     "No shares" : "Відсутні спільні дані",
     "Could not delete share" : "Не вдалося видалити спільний доступ"
 },
