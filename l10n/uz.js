@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Comments" : "Comments",
     "Name" : "Name",
+    "Sharing" : "Ulashish",
     "Cancel" : "Cancel",
     "Delete" : "Delete",
     "Yes" : "Yes",
