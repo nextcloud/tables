@@ -7,9 +7,9 @@
 		:editable="canEditTableTitle"
 		:edit-placeholder="t('tables', 'Tables title')"
 		:edit-label="t('tables', 'Edit title')"
-		:allow-collapse="true"
+		:allow-collapse="false"
 		:open="false"
-		:force-menu="true"
+		:force-menu="false"
 		:to="'/table/' + parseInt(table.id)"
 		@click="closeNav"
 		@update:title="updateTableTitle">

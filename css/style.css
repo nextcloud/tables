@@ -90,3 +90,7 @@ p code {
 .align-right {
     text-align: right;
 }
+
+.app-navigation-entry__children {
+    display: none !important;
+}
