@@ -3,7 +3,7 @@
 		v-if="table"
 		:title="table.title"
 		:class="{active: activeTable && table.id === activeTable.id}"
-		icon="icon-triangle-e"
+		icon="icon-category-organization"
 		:editable="canEditTableTitle"
 		:edit-placeholder="t('tables', 'Tables title')"
 		:edit-label="t('tables', 'Edit title')"
