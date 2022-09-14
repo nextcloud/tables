@@ -116,7 +116,13 @@
 								<DatetimeTimeTableDisplay v-if="column.type === 'datetime' && column.subtype === 'time'" :column="column" />
 							</div>
 							<div class="col-1">
-								<Actions v-if="!otherActionPerformed">
+								<Actions v-if="!otherActionPerformed" :inline="2">
+									<ActionButton icon="icon-triangle-n" :close-after-click="false" @click="moveUp(column)">
+										{{ t('tables', 'Move up') }}
+									</ActionButton>
+									<ActionButton icon="icon-triangle-s" :close-after-click="false" @click="moveDown(column)">
+										{{ t('tables', 'Move down') }}
+									</ActionButton>
 									<ActionButton icon="icon-rename" :close-after-click="true" @click="editColumn = column">
 										{{ t('tables', 'Edit') }}
 									</ActionButton>
@@ -281,7 +287,6 @@ export default {
 			}
 			this.editErrorTitle = false
 			await this.sendEditColumnToBE()
-			this.editColumn = null
 		},
 		reset() {
 			this.loading = false
@@ -290,17 +295,50 @@ export default {
 			this.deleteId = null
 			this.editErrorTitle = false
 		},
+		async moveUp(column) {
+			let nextColumn = null
+			this.columns.forEach(c => {
+				if (c.orderWeight > column.orderWeight && (!nextColumn || c.orderWeight < nextColumn.orderWeight)) {
+					nextColumn = c
+				}
+			})
+			if (nextColumn) {
+				column.orderWeight = nextColumn.orderWeight + 1
+			} else {
+				column.orderWeight++
+			}
+			this.editColumn = column
+			await this.sendEditColumnToBE()
+		},
+		async moveDown(column) {
+			let nextColumn = null
+			this.columns.forEach(c => {
+				if (c.orderWeight < column.orderWeight && (!nextColumn || c.orderWeight > nextColumn.orderWeight)) {
+					nextColumn = c
+				}
+			})
+			if (nextColumn) {
+				column.orderWeight = nextColumn.orderWeight - 1
+			} else {
+				column.orderWeight--
+			}
+			this.editColumn = column
+			await this.sendEditColumnToBE()
+		},
 		async sendEditColumnToBE() {
-			if (!this.editColumn) {
+			const editColumn = this.editColumn
+			// hide edit menu immediately
+			this.editColumn = null
+			if (!editColumn) {
 				showError(t('tables', 'An error occurred. See the logs.'))
-				console.debug('tried to send editColumn to BE, but it is null', this.editColumn)
+				console.debug('tried to send editColumn to BE, but it is null', editColumn)
 				return
 			}
 			try {
-				// console.debug('try so send column', this.editColumn)
-				const res = await axios.put(generateUrl('/apps/tables/column/' + this.editColumn.id), this.editColumn)
+				// console.debug('try so send column', editColumn)
+				const res = await axios.put(generateUrl('/apps/tables/column/' + editColumn.id), editColumn)
 				if (res.status === 200) {
-					showSuccess(t('tables', 'The column "{column}" was updated.', { column: this.editColumn.title }))
+					showSuccess(t('tables', 'The column "{column}" was updated.', { column: editColumn.title }))
 					await this.getColumnsForTableFromBE()
 				} else {
 					showWarning(t('tables', 'Sorry, something went wrong.'))
