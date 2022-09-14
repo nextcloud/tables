@@ -7,7 +7,7 @@
 		</div>
 		<div class="row space-LR space-T">
 			<div class="fix-col-4" style="display: block;">
-				<TableBox v-for="table in tables"
+				<TableBox v-for="table in sortedTables"
 					:key="table.id"
 					:header="table.title"
 					:table-id="table.id">
@@ -65,6 +65,9 @@ export default {
 	computed: {
 		...mapState(['tables']),
 		...mapGetters(['activeTable']),
+		sortedTables() {
+			return [...this.tables].sort((a, b) => a.title.localeCompare(b.title))
+		},
 	},
 }
 </script>
