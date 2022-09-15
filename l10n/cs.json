@@ -44,7 +44,7 @@
     "Do you really want to delete the table \"{table}\"?" : "Opravdu chcete tabulku „{table}“ smazat?",
     "Table \"{table}\" deleted." : "Tabulka „{table}“ smazána.",
     "Sorry, something went wrong." : "Omlouváme se, něco se pokazilo.",
-    "Table title is updated to \"{table}\"" : "Nadpis tabulky je aktualizován na „{table}",
+    "Table title is updated to \"{table}\"" : "Nadpis tabulky je aktualizován na „{table}“",
     "Could not update tables title" : "Nepodařilo se změnit nadpis tabulky",
     "Set today as default" : "Nastavit dnes jako výchozí",
     "Set now as default" : "Nastavit nyní jako výchozí",

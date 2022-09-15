@@ -39,6 +39,7 @@ OC.L10N.register(
     "Next" : "Далі",
     "Create" : "Створити",
     "Today" : "Сьогодні",
+    "No recommendations. Start typing." : "Немає рекомендацій. Почніть друкувати.",
     "Searching …" : "Пошук...",
     "Shares" : "Спільний доступ",
     "Delete data" : "Видалити дані",
