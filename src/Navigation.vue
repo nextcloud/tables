@@ -78,10 +78,10 @@ export default {
 		...mapState(['tables', 'tablesLoading']),
 		...mapGetters(['activeTable']),
 		getSharedTables() {
-			return this.tables.filter((item) => { return item.isShared === true })
+			return this.tables.filter((item) => { return item.isShared === true }).sort((a, b) => a.title.localeCompare(b.title))
 		},
 		getOwnTables() {
-			return this.tables.filter((item) => { return item.isShared === false })
+			return this.tables.filter((item) => { return item.isShared === false }).sort((a, b) => a.title.localeCompare(b.title))
 		},
 	},
 	methods: {
