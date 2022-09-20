@@ -42,6 +42,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Немає рекомендацій. Почніть друкувати.",
     "Searching …" : "Пошук...",
     "Shares" : "Спільний доступ",
+    "Permissions" : "Дозволи ",
     "Delete data" : "Видалити дані",
     "No shares" : "Відсутні спільні дані",
     "Could not delete share" : "Не вдалося видалити спільний доступ"
