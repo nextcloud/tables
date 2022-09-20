@@ -5,7 +5,7 @@
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
-					<h2>Add table</h2>
+					<h2>{{ t('tables', 'Add table') }}</h2>
 				</div>
 				<div class="col-4">
 					<p>{{ t('tables', 'Please choose one of the templates or create a table from scratch.') }}</p>
