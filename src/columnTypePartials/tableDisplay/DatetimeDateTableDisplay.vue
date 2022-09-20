@@ -1,12 +1,6 @@
 <template>
 	<table v-if="column" style="width: 100%;">
 		<tr>
-			<td>{{ t('tables', 'Order weight') }}</td><td class="align-right">
-				{{ column.orderWeight }}
-			</td>
-		</tr>
-
-		<tr>
 			<td>{{ t('tables', 'Today as default') }}</td><td class="align-right">
 				{{ localValue }}
 			</td>

@@ -1,11 +1,6 @@
 <template>
 	<table v-if="column">
 		<tr>
-			<td>{{ t('tables', 'Order weight') }}</td><td class="align-right">
-				{{ column.orderWeight }}
-			</td>
-		</tr>
-		<tr>
 			<td>{{ t('tables', 'Decimals') }}</td><td class="align-right">
 				{{ column.numberDecimals }}
 			</td>

@@ -117,10 +117,10 @@
 							</div>
 							<div class="col-1">
 								<Actions v-if="!otherActionPerformed" :inline="2">
-									<ActionButton icon="icon-triangle-n" :close-after-click="false" @click="moveUp(column)">
+									<ActionButton icon="icon-triangle-n" :close-after-click="true" @click="moveUp(column)">
 										{{ t('tables', 'Move up') }}
 									</ActionButton>
-									<ActionButton icon="icon-triangle-s" :close-after-click="false" @click="moveDown(column)">
+									<ActionButton icon="icon-triangle-s" :close-after-click="true" @click="moveDown(column)">
 										{{ t('tables', 'Move down') }}
 									</ActionButton>
 									<ActionButton icon="icon-rename" :close-after-click="true" @click="editColumn = column">
