@@ -172,7 +172,7 @@ OC.L10N.register(
     "Previous page" : "Poprzednia strona",
     "Next" : "Następna",
     "Next page" : "Następna strona",
-    "Number items" : "Liczba elementów",
+    "Number items" : "Liczba pozycji",
     "Text filter" : "Plik tekstowy",
     "No selected rows to delete." : "Brak wybranych wierszy do usunięcia.",
     "New value successfully saved." : "Nowa wartość została pomyślnie zapisana.",
