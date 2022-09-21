@@ -46,8 +46,7 @@
 				@cell-click="actionCellClick"
 				@row-added="callbackRowAdded" />
 		</div>
-		<DialogConfirmation
-			:show-modal="deleteRows"
+		<DialogConfirmation :show-modal="deleteRows"
 			confirm-class="error"
 			:title="n('tables', 'Delete selected row', 'Delete %n rows', deleteRowsCount, {})"
 			:description="n('tables', 'Are you sure you want to delete the selected row?', 'Are you sure you want to delete the %n selected rows?', deleteRowsCount, {})"
@@ -72,7 +71,7 @@ import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showInfo, showSuccess, showWarning } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
-import DialogConfirmation from '../../modals/DialogConfirmation'
+import DialogConfirmation from './../../modals/DialogConfirmation'
 import CreateRow from '../../modals/CreateRow'
 import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'

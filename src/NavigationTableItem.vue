@@ -13,12 +13,12 @@
 		:to="'/table/' + parseInt(table.id)"
 		@click="closeNav"
 		@update:title="updateTableTitle">
-		<template slot="actions">
+		<template v-slot:actions>
 			<ActionButton
-				v-if="!table.isShared"
-				icon="icon-delete"
-				:close-after-click="true"
-				@click="actionDelete">
+					v-if="!table.isShared"
+					icon="icon-delete"
+					:close-after-click="true"
+					@click="actionDelete">
 				{{ t('tables', 'Delete table') }}
 			</ActionButton>
 		</template>
