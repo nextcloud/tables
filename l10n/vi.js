@@ -28,6 +28,8 @@ OC.L10N.register(
     "Link" : "Liên kết",
     "Time" : "Thời gian",
     "Confirm" : "Xác nhận",
+    "Move up" : "Di chuyển lên",
+    "Move down" : "Di chuyển xuống",
     "Edit" : "Chỉnh sửa",
     "Close" : "Đóng",
     "Owner" : "Chủ",

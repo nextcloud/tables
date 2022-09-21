@@ -78,6 +78,8 @@
     "Confirm" : "Hyväksy",
     "Edit columns" : "Muokkaa sarakkeita",
     "Star rating" : "Tähtiarvostelu",
+    "Move up" : "Siirrä ylös",
+    "Move down" : "Siirrä alas",
     "Edit" : "Muokkaa",
     "Do you really want to delete the column \"{column}\"?" : "Haluatko varmasti poistaa sarakkeen \"{column}\"?",
     "Close" : "Sulje",

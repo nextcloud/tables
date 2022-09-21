@@ -98,6 +98,8 @@ OC.L10N.register(
     "There are no columns yet, click on the three-dot menu next to the table title ahead and create some." : "Δεν υπάρχουν ακόμη στήλες, κάντε κλικ στο μενού με τις τρεις κουκκίδες δίπλα στον τίτλο του πίνακα και δημιουργήστε μερικές.",
     "Star rating" : "Αξιολόγηση με αστέρι",
     "Textline" : "Γραμμή κειμένου",
+    "Move up" : "Μετακίνηση επάνω",
+    "Move down" : "Μετακίνηση Κάτω",
     "Edit" : "Επεξεργασία",
     "Close" : "Κλείσιμο",
     "Could not fetch columns for table" : "Αδυναμία ανάκτησης στηλών για τον πίνακα",

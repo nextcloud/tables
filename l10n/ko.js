@@ -32,6 +32,8 @@ OC.L10N.register(
     "Link" : "링크",
     "Time" : "시간",
     "Confirm" : "확인",
+    "Move up" : "위로 이동",
+    "Move down" : "아래로 이동",
     "Edit" : "편집",
     "Close" : "닫기",
     "Owner" : "소유자",

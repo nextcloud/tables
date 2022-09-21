@@ -25,6 +25,7 @@ OC.L10N.register(
     "Link" : "Ligilo",
     "Time" : "Dato",
     "Confirm" : "Konfirmi",
+    "Move down" : "Movi malsupren",
     "Edit" : "Modifi",
     "Close" : "Malfermi",
     "Owner" : "Posedanto",

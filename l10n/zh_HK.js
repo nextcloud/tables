@@ -123,6 +123,8 @@ OC.L10N.register(
     "There are no columns yet, click on the three-dot menu next to the table title ahead and create some." : "還沒有列，單擊前面表格標題旁邊的三點菜單並創建一些。",
     "Star rating" : "星級評分",
     "Textline" : "文本行",
+    "Move up" : "向上移動",
+    "Move down" : "向下移動",
     "Edit" : "編輯",
     "Do you really want to delete the column \"{column}\"?" : "您確定要刪除 \"{column}\" 縱列嗎？",
     "Close" : "關閉",

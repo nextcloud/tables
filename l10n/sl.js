@@ -123,6 +123,8 @@ OC.L10N.register(
     "There are no columns yet, click on the three-dot menu next to the table title ahead and create some." : "Ni še ustvarjenih stolpcev. S klikom na tri pike ob naslovu je pokaže možnost dodajanja.",
     "Star rating" : "Ocena z zvezdico",
     "Textline" : "Besedilni",
+    "Move up" : "Premakni višje",
+    "Move down" : "Premakni navzdol",
     "Edit" : "Uredi",
     "Do you really want to delete the column \"{column}\"?" : "Ali ste prepričani, da želite izbrisati stolpec »{column}«?",
     "Close" : "Zapri",

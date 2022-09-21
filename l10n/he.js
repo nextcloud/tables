@@ -36,6 +36,7 @@ OC.L10N.register(
     "Link" : "קישור",
     "Time" : "זמן",
     "Confirm" : "אימות",
+    "Move down" : "להוריד למטה",
     "Edit" : "עריכה",
     "Close" : "סגירה",
     "Owner" : "בעלות",

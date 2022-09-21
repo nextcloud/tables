@@ -37,6 +37,8 @@ OC.L10N.register(
     "Could not create new column" : "Nepavyko sukurti naujo stulpelio",
     "Create row" : "Sukurti eilutę",
     "Confirm" : "Patvirtinti",
+    "Move up" : "Pakelti",
+    "Move down" : "Nuleisti",
     "Edit" : "Taisyti",
     "Close" : "Užverti",
     "Owner" : "Savininkas",

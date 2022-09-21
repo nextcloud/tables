@@ -37,6 +37,8 @@ OC.L10N.register(
     "Date and time" : "Data e ora",
     "Time" : "Ora",
     "Confirm" : "Cunfirma",
+    "Move up" : "Tràmuda fache a susu",
+    "Move down" : "Tràmuda fache a bàsciu",
     "Edit" : "Modìfica",
     "Close" : "Serra",
     "Owner" : "Mere",

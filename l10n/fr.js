@@ -84,6 +84,8 @@ OC.L10N.register(
     "Confirm" : "Confirmer",
     "Edit columns" : "Modifier les colonnes",
     "Textline" : "Ligne de texte",
+    "Move up" : "Monter",
+    "Move down" : "Descendre",
     "Edit" : "Modifier",
     "Close" : "Fermer",
     "Could not fetch columns for table" : "Impossible de récupérer les colonnes de la table",

@@ -42,6 +42,8 @@ OC.L10N.register(
     "Date and time" : "Datum en Tijd",
     "Time" : "Tijd",
     "Confirm" : "Bevestigen",
+    "Move up" : "Verplaats naar boven",
+    "Move down" : "Lager zetten",
     "Edit" : "Bewerk",
     "Close" : "Sluit",
     "Hints" : "Hints",

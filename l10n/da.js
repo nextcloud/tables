@@ -32,6 +32,8 @@ OC.L10N.register(
     "Date and time" : "Dato og tid",
     "Time" : "Tid",
     "Confirm" : "Bekræft",
+    "Move up" : "Flyt op",
+    "Move down" : "Flyt ned",
     "Edit" : "Rediger",
     "Close" : "Luk",
     "Owner" : "Ejer",

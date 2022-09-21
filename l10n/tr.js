@@ -123,6 +123,8 @@ OC.L10N.register(
     "There are no columns yet, click on the three-dot menu next to the table title ahead and create some." : "Henüz bir sütun eklenmemiş. Tablo başlığının yanındaki üç nokta menüsüne tıklayın ve bazı sütunlar ekleyin.",
     "Star rating" : "Yıldız değerlendirmesi",
     "Textline" : "Metin satırı",
+    "Move up" : "Yukarı taşı",
+    "Move down" : "Aşağı taşı",
     "Edit" : "Düzenle",
     "Do you really want to delete the column \"{column}\"?" : "\"{column}\" sütununu silmek istediğinize emin misiniz?",
     "Close" : "Kapat",

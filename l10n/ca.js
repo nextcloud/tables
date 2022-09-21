@@ -123,6 +123,8 @@ OC.L10N.register(
     "There are no columns yet, click on the three-dot menu next to the table title ahead and create some." : "Encara no hi ha columnes, feu clic al menú de tres punts que hi ha al costat del títol de la taula i creeu-ne.",
     "Star rating" : "Puntuació amb estrelles",
     "Textline" : "Línia de text",
+    "Move up" : "Mou cap amunt",
+    "Move down" : "Mou avall",
     "Edit" : "Edita",
     "Do you really want to delete the column \"{column}\"?" : "Realment voleu suprimir la columna \"{column}\"?",
     "Close" : "Tanca",

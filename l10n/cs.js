@@ -123,6 +123,8 @@ OC.L10N.register(
     "There are no columns yet, click on the three-dot menu next to the table title ahead and create some." : "Zatím tu ještě nejsou žádné sloupce – klikněte na nabídku, nacházející se pod třemi tečkami vedle nadpisu tabulky a vytvořte nějaké.",
     "Star rating" : "Hodnocení hvězdičkami",
     "Textline" : "Řádek textu",
+    "Move up" : "Přesunout výše",
+    "Move down" : "Přesunout dolů",
     "Edit" : "Upravit",
     "Do you really want to delete the column \"{column}\"?" : "Opravdu chcete sloupec „{column}“ upravit?",
     "Close" : "Zavřít",

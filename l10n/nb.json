@@ -94,6 +94,8 @@
     "There are no columns yet, click on the three-dot menu next to the table title ahead and create some." : "Tabellen har ingen kolonner ennå, klikk på trippel-prikk-menyen ved siden av tittelen på tabellen og lag noen.",
     "Star rating" : "Stjernevurdering",
     "Textline" : "Tekstlinje",
+    "Move up" : "Flytt opp",
+    "Move down" : "Flytt ned",
     "Edit" : "Rediger",
     "Close" : "Lukk",
     "Could not fetch columns for table" : "Kunne ikke hente kolonner for tabellen",

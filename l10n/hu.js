@@ -123,6 +123,8 @@ OC.L10N.register(
     "There are no columns yet, click on the three-dot menu next to the table title ahead and create some." : "Még nincsenek oszlopok, kattintson a táblázatcím melletti hárompontos menüre, és hozzon létre párat.",
     "Star rating" : "Csillagos értékelés",
     "Textline" : "Szövegsor",
+    "Move up" : "Mozgatás fel",
+    "Move down" : "Mozgatás le",
     "Edit" : "Szerkesztés",
     "Do you really want to delete the column \"{column}\"?" : "Biztos, hogy törli a(z) „{column}” oszlopot?",
     "Close" : "Bezárás",

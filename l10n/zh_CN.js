@@ -44,6 +44,8 @@ OC.L10N.register(
     "Time" : "时间",
     "Add an icon as prefix" : "在标题前添加一个图标",
     "Confirm" : "确认",
+    "Move up" : "上移",
+    "Move down" : "下移",
     "Edit" : "编辑",
     "Close" : "关闭",
     "Owner" : "所有者",

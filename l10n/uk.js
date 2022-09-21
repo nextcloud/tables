@@ -31,6 +31,7 @@ OC.L10N.register(
     "Selection" : "Вибір",
     "Time" : "Час",
     "Confirm" : "Підтвердити",
+    "Move down" : "Пересунути вниз",
     "Edit" : "Редагувати",
     "Close" : "закрити",
     "Owner" : "Власник",

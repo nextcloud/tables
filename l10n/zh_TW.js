@@ -35,6 +35,8 @@ OC.L10N.register(
     "Date and time" : "日期與時間",
     "Time" : "時間",
     "Confirm" : "確認",
+    "Move up" : "向上移動",
+    "Move down" : "向下移動",
     "Edit" : "編輯",
     "Close" : "關閉",
     "Owner" : "擁有者",

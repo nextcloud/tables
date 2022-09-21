@@ -108,6 +108,8 @@ OC.L10N.register(
     "Edit columns" : "Modifica colonne",
     "Star rating" : "Valutazione",
     "Textline" : "Linea di testo",
+    "Move up" : "Sposta su",
+    "Move down" : "Sposta giù",
     "Edit" : "Modifica",
     "Do you really want to delete the column \"{column}\"?" : "Vuoi davvero eliminare la colonna \"{column}\"?",
     "Close" : "Chiudi",

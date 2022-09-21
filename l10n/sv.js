@@ -60,6 +60,8 @@ OC.L10N.register(
     "Confirm" : "Bekräfta",
     "Edit columns" : "Redigera kolumner",
     "Textline" : "Textrad",
+    "Move up" : "Flytta upp",
+    "Move down" : "Flytta ner",
     "Edit" : "Ändra",
     "Close" : "Stäng",
     "The column \"{column}\" was updated." : "Kolumnen ”{column}” har uppdaterats.",

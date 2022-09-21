@@ -28,6 +28,7 @@ OC.L10N.register(
     "Link" : "پیوند",
     "Time" : "زمان",
     "Confirm" : "تائید",
+    "Move down" : "حرکت به پایین",
     "Edit" : "ویرایش",
     "Close" : "بسته",
     "Owner" : "مالک",

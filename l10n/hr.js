@@ -37,6 +37,8 @@ OC.L10N.register(
     "Date and time" : "Datum i vrijeme",
     "Time" : "Vrijeme",
     "Confirm" : "Potvrdi",
+    "Move up" : "Premjesti gore",
+    "Move down" : "Premjesti dolje",
     "Edit" : "Uredi",
     "Close" : "Zatvori",
     "Owner" : "Vlasnik",

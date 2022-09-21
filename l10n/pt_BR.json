@@ -121,6 +121,8 @@
     "There are no columns yet, click on the three-dot menu next to the table title ahead and create some." : "Ainda não há colunas, clique no menu de três pontos ao lado do título da tabela à frente e crie algumas.",
     "Star rating" : "Classificação por estrelas",
     "Textline" : "Linha de texto",
+    "Move up" : "Mover para cima",
+    "Move down" : "Mover para baixo",
     "Edit" : "Editar",
     "Do you really want to delete the column \"{column}\"?" : "Você realmente deseja excluir a coluna \"{column}\"?",
     "Close" : "Fechar",

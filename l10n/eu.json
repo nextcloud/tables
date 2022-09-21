@@ -121,6 +121,8 @@
     "There are no columns yet, click on the three-dot menu next to the table title ahead and create some." : "Oraindik ez dago zutaberik, egin klik hurrengo taularen izenburuaren ondoan dagoen hiru puntuko menuan eta sortu batzuk.",
     "Star rating" : "Izar balorazioa",
     "Textline" : "Testu-lerroa",
+    "Move up" : "Eraman gora",
+    "Move down" : "Eraman behera",
     "Edit" : "Aldatu",
     "Do you really want to delete the column \"{column}\"?" : "Benetan nahi al duzu \"{column}\" zutabea ezabatu?",
     "Close" : "Itxi",
