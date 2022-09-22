@@ -106,6 +106,7 @@ OC.L10N.register(
     "Please fill in the mandatory fields." : "Vyplňte nezbytné kolonky.",
     "The row was saved." : "Řádek byl uložen.",
     "Could not create new row" : "Nedaří se vytvořit nový řádek",
+    "Add table" : "Přidat tabulku",
     "Please choose one of the templates or create a table from scratch." : "Vyberte nějakou ze šablon nebo ji vytvořte od začátku.",
     "Title of the new table" : "Nadpis nové tabulky",
     "Add an icon as prefix" : "Přidat ikonu jako předponu",

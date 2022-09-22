@@ -106,6 +106,7 @@ OC.L10N.register(
     "Please fill in the mandatory fields." : "Bete nahitaezko eremuak.",
     "The row was saved." : "Errenkada gorde da.",
     "Could not create new row" : "Ezin izan da errenkada sortu",
+    "Add table" : "Gehitu taula",
     "Please choose one of the templates or create a table from scratch." : "Aukeratu txantiloietako bat edo sortu taula bat hutsetik.",
     "Title of the new table" : "Taula berriaren izenburua",
     "Add an icon as prefix" : "Gehitu ikono bat aurrizki gisa",

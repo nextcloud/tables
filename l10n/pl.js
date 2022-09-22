@@ -106,6 +106,7 @@ OC.L10N.register(
     "Please fill in the mandatory fields." : "Wypełnij obowiązkowe pola.",
     "The row was saved." : "Wiersz został zapisany.",
     "Could not create new row" : "Nie można utworzyć nowego wiersza",
+    "Add table" : "Dodaj tabelę",
     "Please choose one of the templates or create a table from scratch." : "Wybierz jeden z szablonów lub utwórz tabelę od podstaw.",
     "Title of the new table" : "Tytuł nowej tabeli",
     "Add an icon as prefix" : "Dodaj ikonę jako przedrostek",

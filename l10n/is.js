@@ -29,6 +29,8 @@ OC.L10N.register(
     "Link" : "Tengill",
     "Time" : "Tími",
     "Confirm" : "Staðfesta",
+    "Move up" : "Færa upp",
+    "Move down" : "Færa niður",
     "Edit" : "Breyta",
     "Close" : "Loka",
     "Owner" : "Eigandi",
