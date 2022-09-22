@@ -106,6 +106,7 @@ OC.L10N.register(
     "Please fill in the mandatory fields." : "請填寫必填字段。",
     "The row was saved." : "列已保存。",
     "Could not create new row" : "無法創建新列",
+    "Add table" : "添加數據庫表",
     "Please choose one of the templates or create a table from scratch." : "請選擇其中一個模板或從頭開始創建表格。",
     "Title of the new table" : "新表標題",
     "Add an icon as prefix" : "添加一個圖標作為前綴",
