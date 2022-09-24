@@ -106,6 +106,7 @@ OC.L10N.register(
     "Please fill in the mandatory fields." : "Ompliu els camps obligatoris.",
     "The row was saved." : "La fila es va desar.",
     "Could not create new row" : "No s'ha pogut crear una fila nova",
+    "Add table" : "Afegeix taula",
     "Please choose one of the templates or create a table from scratch." : "Si us plau, trieu una de les plantilles o creeu una taula des de zero.",
     "Title of the new table" : "Títol de la nova taula",
     "Add an icon as prefix" : "Afegeix una icona com a prefix",
