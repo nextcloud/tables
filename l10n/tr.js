@@ -106,6 +106,7 @@ OC.L10N.register(
     "Please fill in the mandatory fields." : "Lütfen zorunlu alanları doldurun.",
     "The row was saved." : "Satır kaydedildi.",
     "Could not create new row" : "Yeni satır eklenemedi",
+    "Add table" : "Tablo ekle",
     "Please choose one of the templates or create a table from scratch." : "Kalıplardan birini seçin ya da sıfırdan bir tablo oluşturun.",
     "Title of the new table" : "Yeni tablonun başlığı",
     "Add an icon as prefix" : "Ön ek olarak bir simge ekle",
