@@ -106,6 +106,7 @@ OC.L10N.register(
     "Please fill in the mandatory fields." : "Моля, попълнете задължителните полета.",
     "The row was saved." : "Редът беше запазен.",
     "Could not create new row" : "Не можа да се създаде нов ред",
+    "Add table" : "Добавяне на таблица",
     "Please choose one of the templates or create a table from scratch." : "Моля, изберете един от шаблоните или създайте изцяло нова таблица.",
     "Title of the new table" : "Заглавие на новата таблица",
     "Add an icon as prefix" : "Добавяне на икона като префикс",
