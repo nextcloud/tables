@@ -1,5 +1,5 @@
 <template>
-	<Modal v-if="showModal" @close="actionClose">
+	<Modal v-if="showModal" size="large" @close="actionClose">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">

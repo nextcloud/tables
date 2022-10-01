@@ -1,5 +1,5 @@
 <template>
-	<Modal v-if="showModal" @close="actionCancel">
+	<Modal v-if="showModal" size="large" @close="actionCancel">
 		<div class="modal__content">
 			<div v-if="loading" class="icon-loading" />
 

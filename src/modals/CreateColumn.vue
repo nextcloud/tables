@@ -1,5 +1,5 @@
 <template>
-	<Modal v-if="showModal" @close="actionCancel">
+	<Modal v-if="showModal" size="large" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
@@ -33,8 +33,7 @@
 						<div class="col-4 space-T space-B">
 							<h4>{{ t('tables', 'Number column specific parameters') }}</h4>
 						</div>
-						<NumberForm
-							:number-default.sync="numberDefault"
+						<NumberForm :number-default.sync="numberDefault"
 							:number-min.sync="numberMin"
 							:number-max.sync="numberMax"
 							:number-decimals.sync="numberDecimals"

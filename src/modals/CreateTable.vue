@@ -1,6 +1,6 @@
 <template>
-	<Modal
-		v-if="showModal"
+	<Modal v-if="showModal"
+		size="large"
 		@close="actionCancel">
 		<div class="modal__content">
 			<div class="row">

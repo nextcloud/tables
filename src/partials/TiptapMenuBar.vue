@@ -1,34 +1,92 @@
 <template>
 	<div class="tiptap-wrapper">
 		<div v-if="editor" class="menuBar">
-			<button class="icon-undo" @click="editor.chain().focus().undo().run()" />
-			<button class="icon-redo" @click="editor.chain().focus().redo().run()" />
-			<button :class="{ 'is-active': editor.isActive('bold') }" class="icon-bold" @click="editor.chain().focus().toggleBold().run()" />
-			<button :class="{ 'is-active': editor.isActive('italic') }" class="icon-italic" @click="editor.chain().focus().toggleItalic().run()" />
-			<button v-if="big"
-				:class="{ 'is-active': editor.isActive('strike') }"
-				class="icon-strike"
-				@click="editor.chain().focus().toggleStrike().run()" />
-			<button :class="{ 'is-active': editor.isActive('bulletList') }" class="icon-ul" @click="editor.chain().focus().toggleBulletList().run()" />
-			<button v-if="big"
+			<Button type="tertiary-no-background" @click="editor.chain().focus().undo().run()">
+				<template #icon>
+					<Undo :size="20" />
+				</template>
+			</Button>
+			<Button type="tertiary-no-background" @click="editor.chain().focus().redo().run()">
+				<template #icon>
+					<Redo :size="20" />
+				</template>
+			</Button>
+			<Button :class="{ 'is-active': editor.isActive('bold') }" type="tertiary-no-background" @click="editor.chain().focus().toggleBold().run()">
+				<template #icon>
+					<FormatBold :size="20" />
+				</template>
+			</Button>
+			<Button :class="{ 'is-active': editor.isActive('italic') }" type="tertiary-no-background" @click="editor.chain().focus().toggleItalic().run()">
+				<template #icon>
+					<FormatItalic :size="20" />
+				</template>
+			</Button>
+			<Button :class="{ 'is-active': editor.isActive('bulletList') }" type="tertiary-no-background" @click="editor.chain().focus().toggleBulletList().run()">
+				<template #icon>
+					<FormatListBulletedSquare :size="20" />
+				</template>
+			</Button>
+			<Button v-if="big"
 				:class="{ 'is-active': editor.isActive('orderedList') }"
-				class="icon-ol"
-				@click="editor.chain().focus().toggleOrderedList().run()" />
-			<button :class="{ 'is-active': editor.isActive('heading', { level: 1 }) }" class="icon-h1" @click="editor.chain().focus().toggleHeading({ level: 1 }).run()" />
-			<button :class="{ 'is-active': editor.isActive('heading', { level: 2 }) }" class="icon-h2" @click="editor.chain().focus().toggleHeading({ level: 2 }).run()" />
-			<button v-if="big"
+				type="tertiary-no-background"
+				@click="editor.chain().focus().toggleOrderedList().run()">
+				<template #icon>
+					<FormatListNumbered :size="20" />
+				</template>
+			</Button>
+			<Button v-if="big"
+				:class="{ 'is-active': editor.isActive('strike') }"
+				type="tertiary-no-background"
+				@click="editor.chain().focus().toggleStrike().run()">
+				<template #icon>
+					<FormatStrikethrough :size="20" />
+				</template>
+			</Button>
+			<Button v-if="big"
+				type="tertiary-no-background"
+				:class="{ 'is-active': editor.isActive('heading', { level: 1 }) }"
+				@click="editor.chain().focus().toggleHeading({ level: 1 }).run()">
+				<template #icon>
+					<FormatHeader1 :size="20" />
+				</template>
+			</Button>
+			<Button v-if="big"
+				type="tertiary-no-background"
+				:class="{ 'is-active': editor.isActive('heading', { level: 2 }) }"
+				@click="editor.chain().focus().toggleHeading({ level: 2 }).run()">
+				<template #icon>
+					<FormatHeader2 :size="20" />
+				</template>
+			</Button>
+			<Button v-if="big"
+				type="tertiary-no-background"
 				:class="{ 'is-active': editor.isActive('heading', { level: 3 }) }"
-				class="icon-h3"
-				@click="editor.chain().focus().toggleHeading({ level: 3 }).run()" />
-			<button v-if="big"
+				@click="editor.chain().focus().toggleHeading({ level: 3 }).run()">
+				<template #icon>
+					<FormatHeader3 :size="20" />
+				</template>
+			</Button>
+			<Button v-if="big"
+				type="tertiary-no-background"
 				:class="{ 'is-active': editor.isActive('code') }"
-				class="icon-code"
-				@click="editor.chain().focus().toggleCode().run()" />
-			<button v-if="big"
-				class="icon-checkbox-mark"
+				@click="editor.chain().focus().toggleCode().run()">
+				<template #icon>
+					<CodeTags :size="20" />
+				</template>
+			</Button>
+			<Button v-if="big"
+				type="tertiary-no-background"
 				:class="{ 'is-active': editor.isActive('taskList') }"
-				@click="editor.chain().focus().toggleTaskList().run()" />
-			<button :class="{ 'is-active': big }" class="icon-fullscreen" @click="big = !big" />
+				@click="editor.chain().focus().toggleTaskList().run()">
+				<template #icon>
+					<CheckboxMultipleMarkedOutline :size="20" />
+				</template>
+			</Button>
+			<Button type="tertiary-no-background" :class="{ 'is-active': big }" @click="big = !big">
+				<template #icon>
+					<Fullscreen :size="20" />
+				</template>
+			</Button>
 		</div>
 		<EditorContent :editor="editor" />
 	</div>
@@ -41,10 +99,38 @@ import StarterKit from '@tiptap/starter-kit'
 import TaskList from '@tiptap/extension-task-list'
 // eslint-disable-next-line import/no-named-as-default
 import TaskItem from '@tiptap/extension-task-item'
+import Button from '@nextcloud/vue/dist/Components/Button'
+import Undo from 'vue-material-design-icons/Undo'
+import Redo from 'vue-material-design-icons/Redo'
+import FormatBold from 'vue-material-design-icons/FormatBold'
+import FormatItalic from 'vue-material-design-icons/FormatItalic'
+import FormatStrikethrough from 'vue-material-design-icons/FormatStrikethrough'
+import FormatListBulletedSquare from 'vue-material-design-icons/FormatListBulletedSquare'
+import FormatListNumbered from 'vue-material-design-icons/FormatListNumbered'
+import FormatHeader1 from 'vue-material-design-icons/FormatHeader1'
+import FormatHeader2 from 'vue-material-design-icons/FormatHeader2'
+import FormatHeader3 from 'vue-material-design-icons/FormatHeader3'
+import CodeTags from 'vue-material-design-icons/CodeTags'
+import CheckboxMultipleMarkedOutline from 'vue-material-design-icons/CheckboxMultipleMarkedOutline'
+import Fullscreen from 'vue-material-design-icons/Fullscreen'
 
 export default {
 	components: {
 		EditorContent,
+		Button,
+		Undo,
+		Redo,
+		FormatBold,
+		FormatItalic,
+		FormatStrikethrough,
+		FormatListBulletedSquare,
+		FormatListNumbered,
+		FormatHeader1,
+		FormatHeader2,
+		FormatHeader3,
+		CodeTags,
+		CheckboxMultipleMarkedOutline,
+		Fullscreen,
 	},
 
 	props: {
@@ -95,6 +181,10 @@ export default {
 </script>
 
 <style lang="scss">
+.menuBar {
+	display: inline-flex;
+}
+
 /* Basic editor styles */
 .tiptap-wrapper .ProseMirror, .tabulator-cell .ProseMirror {
 	> * + * {

@@ -1,5 +1,5 @@
 <template>
-	<Modal v-if="showModal" @close="actionCancel">
+	<Modal v-if="showModal" size="large" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
@@ -7,44 +7,34 @@
 				</div>
 			</div>
 			<div v-for="column in columns" :key="column.id">
-				<TextLineForm
-					v-if="column.type === 'text' && column.subtype === 'line'"
+				<TextLineForm v-if="column.type === 'text' && column.subtype === 'line'"
 					:column="column"
 					:value.sync="row[column.id]" />
-				<TextLongForm
-					v-if="column.type === 'text' && column.subtype === 'long'"
+				<TextLongForm v-if="column.type === 'text' && column.subtype === 'long'"
 					:column="column"
 					:value.sync="row[column.id]" />
-				<TextLinkForm
-					v-if="column.type === 'text' && column.subtype === 'link'"
+				<TextLinkForm v-if="column.type === 'text' && column.subtype === 'link'"
 					:column="column"
 					:value.sync="row[column.id]" />
-				<NumberForm
-					v-if="column.type === 'number' && !column.subtype"
+				<NumberForm v-if="column.type === 'number' && !column.subtype"
 					:column="column"
 					:value.sync="row[column.id]" />
-				<NumberStarsForm
-					v-if="column.type === 'number' && column.subtype === 'stars'"
+				<NumberStarsForm v-if="column.type === 'number' && column.subtype === 'stars'"
 					:column="column"
 					:value.sync="row[column.id]" />
-				<NumberProgressForm
-					v-if="column.type === 'number' && column.subtype === 'progress'"
+				<NumberProgressForm v-if="column.type === 'number' && column.subtype === 'progress'"
 					:column="column"
 					:value.sync="row[column.id]" />
-				<SelectionCheckForm
-					v-if="column.type === 'selection' && column.subtype === 'check'"
+				<SelectionCheckForm v-if="column.type === 'selection' && column.subtype === 'check'"
 					:column="column"
 					:value.sync="row[column.id]" />
-				<DatetimeForm
-					v-if="column.type === 'datetime' && !column.subtype"
+				<DatetimeForm v-if="column.type === 'datetime' && !column.subtype"
 					:column="column"
 					:value.sync="row[column.id]" />
-				<DatetimeDateForm
-					v-if="column.type === 'datetime' && column.subtype === 'date'"
+				<DatetimeDateForm v-if="column.type === 'datetime' && column.subtype === 'date'"
 					:column="column"
 					:value.sync="row[column.id]" />
-				<DatetimeTimeForm
-					v-if="column.type === 'datetime' && column.subtype === 'time'"
+				<DatetimeTimeForm v-if="column.type === 'datetime' && column.subtype === 'time'"
 					:column="column"
 					:value.sync="row[column.id]" />
 			</div>
