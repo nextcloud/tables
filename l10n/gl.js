@@ -54,6 +54,7 @@ OC.L10N.register(
     "No elements found." : "Non se atoparon elementos.",
     "Shares" : "Comparticións",
     "Permissions" : "Permisos",
+    "Delete data" : "Eliminar datos",
     "No shares" : "Ningún recurso compartido",
     "Could not delete share" : "Non foi posíbel eliminar o recurso compartido"
 },
