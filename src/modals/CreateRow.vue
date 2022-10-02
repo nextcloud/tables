@@ -1,5 +1,5 @@
 <template>
-	<Modal v-if="showModal" size="large" @close="actionCancel">
+	<NcModal v-if="showModal" size="large" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
@@ -52,31 +52,31 @@
 				</div>
 			</div>
 		</div>
-	</Modal>
+	</NcModal>
 </template>
 
 <script>
-import Modal from '@nextcloud/vue/dist/Components/Modal'
+import { NcModal } from '@nextcloud/vue'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
-import TextLineForm from '../rowTypePartials/TextLineForm'
-import TextLongForm from '../rowTypePartials/TextLongForm'
-import TextLinkForm from '../rowTypePartials/TextLinkForm'
-import NumberForm from '../rowTypePartials/NumberForm'
-import NumberStarsForm from '../rowTypePartials/NumberStarsForm'
-import NumberProgressForm from '../rowTypePartials/NumberProgressForm'
-import SelectionCheckForm from '../rowTypePartials/SelectionCheckForm'
-import DatetimeForm from '../rowTypePartials/DatetimeForm'
-import DatetimeDateForm from '../rowTypePartials/DatetimeDateForm'
-import DatetimeTimeForm from '../rowTypePartials/DatetimeTimeForm'
+import TextLineForm from '../rowTypePartials/TextLineForm.vue'
+import TextLongForm from '../rowTypePartials/TextLongForm.vue'
+import TextLinkForm from '../rowTypePartials/TextLinkForm.vue'
+import NumberForm from '../rowTypePartials/NumberForm.vue'
+import NumberStarsForm from '../rowTypePartials/NumberStarsForm.vue'
+import NumberProgressForm from '../rowTypePartials/NumberProgressForm.vue'
+import SelectionCheckForm from '../rowTypePartials/SelectionCheckForm.vue'
+import DatetimeForm from '../rowTypePartials/DatetimeForm.vue'
+import DatetimeDateForm from '../rowTypePartials/DatetimeDateForm.vue'
+import DatetimeTimeForm from '../rowTypePartials/DatetimeTimeForm.vue'
 
 export default {
 	name: 'CreateRow',
 	components: {
 		SelectionCheckForm,
-		Modal,
+		NcModal,
 		TextLineForm,
 		TextLongForm,
 		TextLinkForm,

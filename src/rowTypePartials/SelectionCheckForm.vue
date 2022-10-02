@@ -4,7 +4,7 @@
 			{{ column.title }}
 		</div>
 		<div class="fix-col-1" :class="{ 'space-B': !column.description }">
-			<CheckboxRadioSwitch type="switch" :checked.sync="localValue" />
+			<NcCheckboxRadioSwitch type="switch" :checked.sync="localValue" />
 		</div>
 		<div class="fix-col-1 hide-s">
 			&nbsp;
@@ -21,12 +21,12 @@
 </template>
 
 <script>
-import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch'
+import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 
 export default {
 	name: 'SelectionCheckForm',
 	components: {
-		CheckboxRadioSwitch,
+		NcCheckboxRadioSwitch,
 	},
 	props: {
 		column: {

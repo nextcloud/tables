@@ -1,5 +1,5 @@
 <template>
-	<Modal v-if="showModal"
+	<NcModal v-if="showModal"
 		size="large"
 		@close="actionCancel">
 		<div class="modal__content">
@@ -22,9 +22,9 @@
 						:placeholder="t('tables', 'Title of the new table')">
 				</div>
 				<div class="col-2">
-					<EmojiPicker @select="addIconToTitle">
+					<NcEmojiPicker :close-on-select="true" @select="addIconToTitle">
 						<button>{{ t('tables', 'Add an icon as prefix') }}</button>
-					</EmojiPicker>
+					</NcEmojiPicker>
 				</div>
 			</div>
 			<div class="row space-T">
@@ -61,21 +61,20 @@
 				</div>
 			</div>
 		</div>
-	</Modal>
+	</NcModal>
 </template>
 
 <script>
-import Modal from '@nextcloud/vue/dist/Components/Modal'
+import { NcModal, NcEmojiPicker } from '@nextcloud/vue'
 import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
-import EmojiPicker from '@nextcloud/vue/dist/Components/EmojiPicker'
 
 export default {
 	name: 'CreateTable',
 	components: {
-		Modal,
-		EmojiPicker,
+		NcModal,
+		NcEmojiPicker,
 	},
 	props: {
 		showModal: {
@@ -92,7 +91,7 @@ export default {
 		}
 	},
 	watch: {
-		title(val) {
+		title() {
 			if (this.title.length >= 200) {
 				showError(t('tables', 'The title limit is reached with 200 characters. Please use a shorter title.'))
 				this.title = this.title.slice(0, 199)

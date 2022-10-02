@@ -1,6 +1,5 @@
 <template>
-	<div
-		:class="{ 'box-1': size === 1, 'box-2': size === 2, 'box-3': size === 3, 'box-4': size === 4, 'light': background === 'light' }"
+	<div :class="{ 'box-1': size === 1, 'box-2': size === 2, 'box-3': size === 3, 'box-4': size === 4, 'light': background === 'light' }"
 		:style="{ minHeight: `${minHeight}px` }">
 		<h2 v-if="header">
 			<router-link :to="'/table/' + tableId">

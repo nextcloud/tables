@@ -13,9 +13,9 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import shareAPI from '../../mixins/shareAPI'
-import ShareForm from '../../partials/ShareForm'
-import ShareList from '../../partials/ShareList'
+import shareAPI from '../../mixins/shareAPI.js'
+import ShareForm from '../../partials/ShareForm.vue'
+import ShareList from '../../partials/ShareList.vue'
 
 export default {
 	components: {

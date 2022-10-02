@@ -1,5 +1,5 @@
 <template>
-	<Modal v-if="showModal" size="large" @close="actionCancel">
+	<NcModal v-if="showModal" size="large" @close="actionCancel">
 		<div class="modal__content">
 			<div v-if="loading" class="icon-loading" />
 
@@ -116,20 +116,20 @@
 								<DatetimeTimeTableDisplay v-if="column.type === 'datetime' && column.subtype === 'time'" :column="column" />
 							</div>
 							<div class="col-1">
-								<Actions v-if="!otherActionPerformed" :inline="2">
-									<ActionButton icon="icon-triangle-n" :close-after-click="true" @click="moveUp(column)">
+								<NcActions v-if="!otherActionPerformed" :inline="2">
+									<NcActionButton icon="icon-triangle-n" :close-after-click="true" @click="moveUp(column)">
 										{{ t('tables', 'Move up') }}
-									</ActionButton>
-									<ActionButton icon="icon-triangle-s" :close-after-click="true" @click="moveDown(column)">
+									</NcActionButton>
+									<NcActionButton icon="icon-triangle-s" :close-after-click="true" @click="moveDown(column)">
 										{{ t('tables', 'Move down') }}
-									</ActionButton>
-									<ActionButton icon="icon-rename" :close-after-click="true" @click="editColumn = column">
+									</NcActionButton>
+									<NcActionButton icon="icon-rename" :close-after-click="true" @click="editColumn = column">
 										{{ t('tables', 'Edit') }}
-									</ActionButton>
-									<ActionButton :close-after-click="true" icon="icon-delete" @click="deleteId = column.id">
+									</NcActionButton>
+									<NcActionButton :close-after-click="true" icon="icon-delete" @click="deleteId = column.id">
 										{{ t('tables', 'Delete') }}
-									</ActionButton>
-								</Actions>
+									</NcActionButton>
+								</NcActions>
 							</div>
 						</div>
 					</div>
@@ -156,38 +156,36 @@
 				</div>
 			</div>
 		</div>
-	</Modal>
+	</NcModal>
 </template>
 
 <script>
-import Modal from '@nextcloud/vue/dist/Components/Modal'
+import { NcModal, NcActions, NcActionButton } from '@nextcloud/vue'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
-import Actions from '@nextcloud/vue/dist/Components/Actions'
-import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
-import ColumnInfoPopover from '../partials/ColumnInfoPopover'
-import NumberTableDisplay from '../columnTypePartials/tableDisplay/NumberTableDisplay'
-import NumberStarsTableDisplay from '../columnTypePartials/tableDisplay/NumberStarsTableDisplay'
-import NumberProgressTableDisplay from '../columnTypePartials/tableDisplay/NumberProgressTableDisplay'
-import TextLineTableDisplay from '../columnTypePartials/tableDisplay/TextLineTableDisplay'
-import TextLongTableDisplay from '../columnTypePartials/tableDisplay/TextLongTableDisplay'
-import TextLinkTableDisplay from '../columnTypePartials/tableDisplay/TextLinkTableDisplay'
-import NumberForm from '../columnTypePartials/forms/NumberForm'
-import NumberStarsForm from '../columnTypePartials/forms/NumberStarsForm'
-import NumberProgressForm from '../columnTypePartials/forms/NumberProgressForm'
-import TextLineForm from '../columnTypePartials/forms/TextLineForm'
-import TextLongForm from '../columnTypePartials/forms/TextLongForm'
-import MainForm from '../columnTypePartials/forms/MainForm'
-import SelectionCheckTableDisplay from '../columnTypePartials/tableDisplay/SelectionCheckTableDisplay'
-import SelectionCheckForm from '../columnTypePartials/forms/SelectionCheckForm'
-import DatetimeForm from '../columnTypePartials/forms/DatetimeForm'
-import DatetimeDateForm from '../columnTypePartials/forms/DatetimeDateForm'
-import DatetimeTimeForm from '../columnTypePartials/forms/DatetimeTimeForm'
-import DatetimeTableDisplay from '../columnTypePartials/tableDisplay/DatetimeTableDisplay'
-import DatetimeDateTableDisplay from '../columnTypePartials/tableDisplay/DatetimeDateTableDisplay'
-import DatetimeTimeTableDisplay from '../columnTypePartials/tableDisplay/DatetimeTimeTableDisplay'
+import ColumnInfoPopover from '../partials/ColumnInfoPopover.vue'
+import NumberTableDisplay from '../columnTypePartials/tableDisplay/NumberTableDisplay.vue'
+import NumberStarsTableDisplay from '../columnTypePartials/tableDisplay/NumberStarsTableDisplay.vue'
+import NumberProgressTableDisplay from '../columnTypePartials/tableDisplay/NumberProgressTableDisplay.vue'
+import TextLineTableDisplay from '../columnTypePartials/tableDisplay/TextLineTableDisplay.vue'
+import TextLongTableDisplay from '../columnTypePartials/tableDisplay/TextLongTableDisplay.vue'
+import TextLinkTableDisplay from '../columnTypePartials/tableDisplay/TextLinkTableDisplay.vue'
+import NumberForm from '../columnTypePartials/forms/NumberForm.vue'
+import NumberStarsForm from '../columnTypePartials/forms/NumberStarsForm.vue'
+import NumberProgressForm from '../columnTypePartials/forms/NumberProgressForm.vue'
+import TextLineForm from '../columnTypePartials/forms/TextLineForm.vue'
+import TextLongForm from '../columnTypePartials/forms/TextLongForm.vue'
+import MainForm from '../columnTypePartials/forms/MainForm.vue'
+import SelectionCheckTableDisplay from '../columnTypePartials/tableDisplay/SelectionCheckTableDisplay.vue'
+import SelectionCheckForm from '../columnTypePartials/forms/SelectionCheckForm.vue'
+import DatetimeForm from '../columnTypePartials/forms/DatetimeForm.vue'
+import DatetimeDateForm from '../columnTypePartials/forms/DatetimeDateForm.vue'
+import DatetimeTimeForm from '../columnTypePartials/forms/DatetimeTimeForm.vue'
+import DatetimeTableDisplay from '../columnTypePartials/tableDisplay/DatetimeTableDisplay.vue'
+import DatetimeDateTableDisplay from '../columnTypePartials/tableDisplay/DatetimeDateTableDisplay.vue'
+import DatetimeTimeTableDisplay from '../columnTypePartials/tableDisplay/DatetimeTimeTableDisplay.vue'
 
 export default {
 	name: 'EditColumns',
@@ -200,9 +198,9 @@ export default {
 		DatetimeDateTableDisplay,
 		SelectionCheckTableDisplay,
 		SelectionCheckForm,
-		Modal,
-		Actions,
-		ActionButton,
+		NcModal,
+		NcActions,
+		NcActionButton,
 		ColumnInfoPopover,
 		NumberTableDisplay,
 		NumberStarsTableDisplay,

@@ -1,6 +1,5 @@
 <template>
-	<AppNavigationItem
-		v-if="table"
+	<NcAppNavigationItem v-if="table"
 		:title="table.title"
 		:class="{active: activeTable && table.id === activeTable.id}"
 		icon="icon-category-organization"
@@ -13,17 +12,15 @@
 		:to="'/table/' + parseInt(table.id)"
 		@click="closeNav"
 		@update:title="updateTableTitle">
-		<template v-slot:actions>
-			<ActionButton
-					v-if="!table.isShared"
-					icon="icon-delete"
-					:close-after-click="true"
-					@click="actionDelete">
+		<template #actions>
+			<NcActionButton v-if="!table.isShared"
+				icon="icon-delete"
+				:close-after-click="true"
+				@click="actionDelete">
 				{{ t('tables', 'Delete table') }}
-			</ActionButton>
+			</NcActionButton>
 		</template>
-		<DialogConfirmation
-			:description="getTranslatedDescription"
+		<DialogConfirmation :description="getTranslatedDescription"
 			:title="t('tables', 'Confirm table deletion')"
 			:cancel-title="t('tables', 'Cancel')"
 			:confirm-title="t('tables', 'Delete')"
@@ -31,15 +28,15 @@
 			:show-modal="showDeletionConfirmation"
 			@confirm="deleteMe"
 			@cancel="cancelDeletion" />
-	</appnavigationitem>
+		</appnavigationitem>
+	</ncappnavigationitem>
 </template>
 <script>
-import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
-import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
+import { NcActionButton, NcAppNavigationItem } from '@nextcloud/vue'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
-import DialogConfirmation from './modals/DialogConfirmation'
+import DialogConfirmation from './modals/DialogConfirmation.vue'
 import { mapGetters } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
 
@@ -47,8 +44,8 @@ export default {
 	name: 'NavigationTableItem',
 	components: {
 		DialogConfirmation,
-		ActionButton,
-		AppNavigationItem,
+		NcActionButton,
+		NcAppNavigationItem,
 	},
 	props: {
 		table: {

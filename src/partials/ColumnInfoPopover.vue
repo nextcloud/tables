@@ -1,5 +1,5 @@
 <template>
-	<Popover v-if="column">
+	<NcPopover v-if="column">
 		<template #trigger>
 			<button class="icon-details" />
 		</template>
@@ -10,7 +10,7 @@
 				</td>
 				<td>
 					{{ updateTime }}<br>
-					<UserBubble :user="column.lastEditBy" :display-name="column.lastEditBy" />
+					<NcUserBubble :user="column.lastEditBy" :display-name="column.lastEditBy" />
 				</td>
 			</tr>
 			<tr>
@@ -19,7 +19,7 @@
 				</td>
 				<td>
 					{{ createTime }}<br>
-					<UserBubble :user="column.createdBy" :display-name="column.createdBy" />
+					<NcUserBubble :user="column.createdBy" :display-name="column.createdBy" />
 				</td>
 			</tr>
 			<tr>
@@ -39,19 +39,18 @@
 				</td>
 			</tr>
 		</table>
-	</Popover>
+	</NcPopover>
 </template>
 
 <script>
-import Popover from '@nextcloud/vue/dist/Components/Popover'
+import { NcPopover, NcUserBubble } from '@nextcloud/vue'
 import moment from '@nextcloud/moment'
-import UserBubble from '@nextcloud/vue/dist/Components/UserBubble'
 
 export default {
 	name: 'ColumnInfoPopover',
 	components: {
-		Popover,
-		UserBubble,
+		NcPopover,
+		NcUserBubble,
 	},
 	props: {
 		column: {

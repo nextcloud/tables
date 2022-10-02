@@ -25,8 +25,7 @@
 <template>
 	<div class="row space-B">
 		<h3>{{ t('tables', 'Add a new share') }}</h3>
-		<Multiselect
-			id="ajax"
+		<NcMultiselect id="ajax"
 			:clear-on-select="true"
 			:hide-selected="true"
 			:internal-search="false"
@@ -48,7 +47,7 @@
 			<template #noResult>
 				{{ noResultText }}
 			</template>
-		</Multiselect>
+		</NcMultiselect>
 	</div>
 </template>
 
@@ -57,14 +56,14 @@ import { generateOcsUrl } from '@nextcloud/router'
 import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
 import debounce from 'debounce'
-import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
-import ShareTypes from '../mixins/shareTypesMixin'
+import { NcMultiselect } from '@nextcloud/vue'
 import { mapGetters, mapState } from 'vuex'
-import formatting from '../mixins/formatting'
+import formatting from '../mixins/formatting.js'
+import ShareTypes from '../mixins/shareTypesMixin.js'
 
 export default {
 	components: {
-		Multiselect,
+		NcMultiselect,
 	},
 
 	mixins: [ShareTypes, formatting],

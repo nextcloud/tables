@@ -1,5 +1,5 @@
 <template>
-	<Popover v-if="share">
+	<NcPopover v-if="share">
 		<template #trigger>
 			<button class="icon-details" />
 		</template>
@@ -37,17 +37,17 @@
 				</td>
 			</tr>
 		</table>
-	</Popover>
+	</NcPopover>
 </template>
 
 <script>
-import Popover from '@nextcloud/vue/dist/Components/Popover'
+import { NcPopover } from '@nextcloud/vue'
 import moment from '@nextcloud/moment'
 
 export default {
 	name: 'ShareInfoPopover',
 	components: {
-		Popover,
+		NcPopover,
 	},
 	props: {
 		share: {

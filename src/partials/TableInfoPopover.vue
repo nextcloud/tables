@@ -1,5 +1,5 @@
 <template>
-	<Popover v-if="table">
+	<NcPopover v-if="table">
 		<template #trigger>
 			<button class="icon-details" />
 		</template>
@@ -10,7 +10,7 @@
 				</td>
 				<td>
 					{{ updateTime }}<br>
-					<UserBubble :user="table.lastEditBy" :display-name="table.lastEditBy" />
+					<NcUserBubble :user="table.lastEditBy" :display-name="table.lastEditBy" />
 				</td>
 			</tr>
 			<tr>
@@ -19,7 +19,7 @@
 				</td>
 				<td>
 					{{ createTime }}<br>
-					<UserBubble :user="table.createdBy" :display-name="table.createdBy" />
+					<NcUserBubble :user="table.createdBy" :display-name="table.createdBy" />
 				</td>
 			</tr>
 			<tr>
@@ -31,19 +31,18 @@
 				</td>
 			</tr>
 		</table>
-	</Popover>
+	</NcPopover>
 </template>
 
 <script>
-import Popover from '@nextcloud/vue/dist/Components/Popover'
+import { NcPopover, NcUserBubble } from '@nextcloud/vue'
 import moment from '@nextcloud/moment'
-import UserBubble from '@nextcloud/vue/dist/Components/UserBubble'
 
 export default {
 	name: 'TableInfoPopover',
 	components: {
-		Popover,
-		UserBubble,
+		NcPopover,
+		NcUserBubble,
 	},
 	props: {
 		table: {

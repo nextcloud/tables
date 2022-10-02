@@ -4,7 +4,7 @@
 			{{ column.title }}
 		</div>
 		<div class="fix-col-2" :class="{ 'space-B': !column.description }">
-			<DatetimePicker v-model="localValue"
+			<NcDatetimePicker v-model="localValue"
 				type="time"
 				format="HH:mm"
 				:clearable="false"
@@ -26,13 +26,13 @@
 </template>
 
 <script>
-import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
+import { NcDatetimePicker } from '@nextcloud/vue'
 import Moment from '@nextcloud/moment'
 
 export default {
 	name: 'DatetimeTimeForm',
 	components: {
-		DatetimePicker,
+		NcDatetimePicker,
 	},
 	props: {
 		column: {

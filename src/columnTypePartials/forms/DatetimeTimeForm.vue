@@ -4,18 +4,18 @@
 			{{ t('tables', 'Set now as default') }}
 		</div>
 		<div class="fix-col-4">
-			<CheckboxRadioSwitch type="switch" :checked.sync="localDefault" />
+			<NcCheckboxRadioSwitch type="switch" :checked.sync="localDefault" />
 		</div>
 	</div>
 </template>
 
 <script>
-import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch'
+import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 
 export default {
 	name: 'DatetimeTimeForm',
 	components: {
-		CheckboxRadioSwitch,
+		NcCheckboxRadioSwitch,
 	},
 	props: {
 		datetimeDefault: {

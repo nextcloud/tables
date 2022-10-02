@@ -14,8 +14,8 @@
 </template>
 
 <script>
-import TableDescription from './sections/TableDescription'
-import NcTable from './sections/NcTable'
+import TableDescription from './sections/TableDescription.vue'
+import NcTable from './sections/NcTable.vue'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showWarning } from '@nextcloud/dialogs'

@@ -4,12 +4,12 @@
 			<div class="row">
 				<div class="fix-col-4">
 					{{ column.title }}
-					<Popover v-if="isMobileDevice">
+					<NcPopover v-if="isMobileDevice">
 						<template #trigger>
 							<button class="icon-info" />
 						</template>
 						<p>{{ t('tables', 'There is a bug with the editor on mobile devices, that is why you see only a simple text box.') }}</p>
-					</Popover>
+					</NcPopover>
 				</div>
 				<div v-if="column.textMaxLength !== -1"
 					class="fix-col-4 p span"
@@ -38,14 +38,14 @@
 </template>
 
 <script>
-import TiptapMenuBar from '../partials/TiptapMenuBar'
-import Popover from '@nextcloud/vue/dist/Components/Popover'
+import TiptapMenuBar from '../partials/TiptapMenuBar.vue'
+import { NcPopover } from '@nextcloud/vue'
 
 export default {
 	name: 'TextLongForm',
 	components: {
 		TiptapMenuBar,
-		Popover,
+		NcPopover,
 	},
 	props: {
 		column: {

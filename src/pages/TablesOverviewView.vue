@@ -16,7 +16,7 @@
 							{{ t('tables', 'Owner') }}
 						</div>
 						<div class="col-2">
-							<UserBubble :user="table.ownership" :display-name="table.ownerDisplayName" />
+							<NcUserBubble :user="table.ownership" :display-name="table.ownerDisplayName" />
 						</div>
 						<div class="col-2">
 							{{ t('tables', 'Created at') }}
@@ -32,30 +32,29 @@
 				</TableBox>
 			</div>
 		</div>
-		<EmptyContent v-if="!tables || tables.length === 0" icon="icon-category-organization">
+		<NcEmptyContent v-if="!tables || tables.length === 0" icon="icon-category-organization">
 			{{ t('tables', 'No tables') }}
 			<template #desc>
 				{{ t('tables', 'Please create a table on the left.') }}
 			</template>
-		</EmptyContent>
+		</NcEmptyContent>
 	</div>
 </template>
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import TableBox from '../partials/TableBox'
-import EmptyContent from '@nextcloud/vue/dist/Components/EmptyContent'
-import UserBubble from '@nextcloud/vue/dist/Components/UserBubble'
-import formatting from '../mixins/formatting'
-import TableInfoPopover from '../partials/TableInfoPopover'
+import TableBox from '../partials/TableBox.vue'
+import { NcEmptyContent, NcUserBubble } from '@nextcloud/vue'
+import formatting from '../mixins/formatting.js'
+import TableInfoPopover from '../partials/TableInfoPopover.vue'
 
 export default {
 	name: 'TablesOverviewView',
 	components: {
 		TableInfoPopover,
 		TableBox,
-		EmptyContent,
-		UserBubble,
+		NcEmptyContent,
+		NcUserBubble,
 	},
 	mixins: [formatting],
 	data() {

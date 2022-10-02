@@ -1,5 +1,5 @@
 <template>
-	<Modal v-if="showModal" size="large" @close="actionClose">
+	<NcModal v-if="showModal" size="large" @close="actionClose">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
@@ -59,16 +59,16 @@
 				</div>
 			</div>
 		</div>
-	</Modal>
+	</NcModal>
 </template>
 
 <script>
-import Modal from '@nextcloud/vue/dist/Components/Modal'
+import { NcModal } from '@nextcloud/vue'
 
 export default {
 	name: 'PasteRowsInfo',
 	components: {
-		Modal,
+		NcModal,
 	},
 	props: {
 		showModal: {

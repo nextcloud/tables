@@ -7,7 +7,7 @@
 				:key="share.id"
 				class="row">
 				<div class="fix-col-2">
-					<Avatar :user="share.receiver" :display-name="share.receiver" />
+					<NcAvatar :user="share.receiver" :display-name="share.receiver" />
 					<div class="userDisplayName">
 						{{ share.receiverDisplayName }}
 					</div>
@@ -15,47 +15,42 @@
 				<div class="fix-col-2" style="justify-content: end;">
 					<ShareInfoPopover :share="share" />
 
-					<Actions :force-menu="true">
-						<ActionCaption :title="t('tables', 'Permissions')" />
-						<ActionCheckbox
-							:checked.sync="share.permissionRead"
+					<NcActions :force-menu="true">
+						<NcActionCaption :title="t('tables', 'Permissions')" />
+						<NcActionCheckbox :checked.sync="share.permissionRead"
 							:disabled="share.permissionManage"
 							@check="updatePermission(share.id, 'read', true)"
 							@uncheck="updatePermission(share.id, 'read', false)">
 							{{ t('tables', 'Read data') }}
-						</ActionCheckbox>
-						<ActionCheckbox
-							:checked.sync="share.permissionCreate"
+						</NcActionCheckbox>
+						<NcActionCheckbox :checked.sync="share.permissionCreate"
 							:disabled="share.permissionManage"
 							@check="updatePermission(share.id, 'create', true)"
 							@uncheck="updatePermission(share.id, 'create', false)">
 							{{ t('tables', 'Create data') }}
-						</ActionCheckbox>
-						<ActionCheckbox
-							:checked.sync="share.permissionUpdate"
+						</NcActionCheckbox>
+						<NcActionCheckbox :checked.sync="share.permissionUpdate"
 							:disabled="share.permissionManage"
 							@check="updatePermission(share.id, 'update', true)"
 							@uncheck="updatePermission(share.id, 'update', false)">
 							{{ t('tables', 'Update data') }}
-						</ActionCheckbox>
-						<ActionCheckbox
-							:checked.sync="share.permissionDelete"
+						</NcActionCheckbox>
+						<NcActionCheckbox :checked.sync="share.permissionDelete"
 							:disabled="share.permissionManage"
 							@check="updatePermission(share.id, 'delete', true)"
 							@uncheck="updatePermission(share.id, 'delete', false)">
 							{{ t('tables', 'Delete data') }}
-						</ActionCheckbox>
-						<ActionCheckbox
-							:checked.sync="share.permissionManage"
+						</NcActionCheckbox>
+						<NcActionCheckbox :checked.sync="share.permissionManage"
 							@check="updatePermission(share.id, 'manage', true)"
 							@uncheck="updatePermission(share.id, 'manage', false)">
 							{{ t('tables', 'Manage table') }}
-						</ActionCheckbox>
-						<ActionSeparator />
-						<ActionButton :close-after-click="true" icon="icon-delete" @click="actionDelete(share.id)">
+						</NcActionCheckbox>
+						<NcActionSeparator />
+						<NcActionButton :close-after-click="true" icon="icon-delete" @click="actionDelete(share.id)">
 							{{ t('tables', 'Delete') }}
-						</ActionButton>
-					</Actions>
+						</NcActionButton>
+					</NcActions>
 				</div>
 			</div>
 		</ul>
@@ -67,26 +62,20 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-// import UserBubble from '@nextcloud/vue/dist/Components/UserBubble'
-import formatting from '../mixins/formatting'
-import Actions from '@nextcloud/vue/dist/Components/Actions'
-import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
-import Avatar from '@nextcloud/vue/dist/Components/Avatar'
-import ShareInfoPopover from '../partials/ShareInfoPopover'
-import ActionCheckbox from '@nextcloud/vue/dist/Components/ActionCheckbox'
-import ActionCaption from '@nextcloud/vue/dist/Components/ActionCaption'
-import ActionSeparator from '@nextcloud/vue/dist/Components/ActionSeparator'
+import formatting from '../mixins/formatting.js'
+import { NcActions, NcActionButton, NcAvatar, NcActionCheckbox, NcActionCaption, NcActionSeparator } from '@nextcloud/vue'
+import ShareInfoPopover from '../partials/ShareInfoPopover.vue'
 
 export default {
 	components: {
 		// UserBubble,
-		Avatar,
-		ActionButton,
-		Actions,
+		NcAvatar,
+		NcActionButton,
+		NcActions,
 		ShareInfoPopover,
-		ActionCheckbox,
-		ActionCaption,
-		ActionSeparator,
+		NcActionCheckbox,
+		NcActionCaption,
+		NcActionSeparator,
 	},
 
 	mixins: [formatting],

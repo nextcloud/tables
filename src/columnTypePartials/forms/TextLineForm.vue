@@ -41,7 +41,6 @@
 </template>
 
 <script>
-// import { showError, showInfo, showSuccess } from '@nextcloud/dialogs'
 
 export default {
 	name: 'TextLineForm',

@@ -42,14 +42,14 @@
 		<!-- suffix -->
 		<div class="fix-col-4 title" style="display: flex;">
 			{{ t('tables', 'Suffix') }}
-			<Popover>
+			<NcPopover>
 				<template #trigger>
 					<button class="icon-details" />
 				</template>
 				<p>
 					{{ t('tables', 'Here is a good place for a unit.') }}
 				</p>
-			</Popover>
+			</NcPopover>
 		</div>
 		<div class="fix-col-4">
 			<input v-model="localSuffix">
@@ -58,13 +58,12 @@
 </template>
 
 <script>
-// import { showError, showInfo, showSuccess } from '@nextcloud/dialogs'
-import Popover from '@nextcloud/vue/dist/Components/Popover'
+import { NcPopover } from '@nextcloud/vue'
 
 export default {
 	name: 'NumberForm',
 	components: {
-		Popover,
+		NcPopover,
 	},
 	props: {
 		numberDefault: {

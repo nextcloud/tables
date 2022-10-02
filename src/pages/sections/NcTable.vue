@@ -2,37 +2,37 @@
 	<div>
 		<div class="row space-LR space-T">
 			<div v-if="hasColumns" class="col-4" style="display: flex;">
-				<Actions>
-					<ActionButton v-if="canCreateDataActiveTable"
+				<NcActions>
+					<NcActionButton v-if="canCreateDataActiveTable"
 						:close-after-click="true"
 						icon="icon-add"
 						@click="newRow = true">
 						{{ t('tables', 'Add new row') }}
-					</ActionButton>
-				</Actions>
-				<Actions>
-					<ActionCheckbox :checked.sync="showFilter">
+					</NcActionButton>
+				</NcActions>
+				<NcActions>
+					<NcActionCheckbox :checked.sync="showFilter">
 						{{ t('tables', 'Show filter') }}
-					</ActionCheckbox>
-					<ActionButton v-if="canDeleteDataActiveTable"
+					</NcActionCheckbox>
+					<NcActionButton v-if="canDeleteDataActiveTable"
 						:close-after-click="true"
 						icon="icon-delete"
 						@click="actionDeleteRows">
 						{{ t('tables', 'Delete selected rows') }}
-					</ActionButton>
-					<ActionButton :close-after-click="true" icon="icon-download" @click="downloadCSV">
+					</NcActionButton>
+					<NcActionButton :close-after-click="true" icon="icon-download" @click="downloadCSV">
 						{{ t('tables', 'Download CSV') }}
-					</ActionButton>
-					<ActionButton :close-after-click="true" icon="icon-external" @click="copyClipboard">
+					</NcActionButton>
+					<NcActionButton :close-after-click="true" icon="icon-external" @click="copyClipboard">
 						{{ t('tables', 'Copy table to clipboard') }}
-					</ActionButton>
-					<ActionButton :close-after-click="true" icon="icon-clippy" @click="importClipboard">
+					</NcActionButton>
+					<NcActionButton :close-after-click="true" icon="icon-clippy" @click="importClipboard">
 						{{ t('tables', 'Paste from clipboard') }}
-					</ActionButton>
-					<ActionButton :close-after-click="true" icon="icon-file" @click="print">
+					</NcActionButton>
+					<NcActionButton :close-after-click="true" icon="icon-file" @click="print">
 						{{ t('tables', 'Print') }}
-					</ActionButton>
-				</Actions>
+					</NcActionButton>
+				</NcActions>
 				<div v-if="insertedRows" class="insertedRowsInfo">
 					Inserted rows: {{ insertedRows }}
 				</div>
@@ -66,22 +66,20 @@
 </template>
 
 <script>
+import { NcActions, NcActionButton, NcActionCheckbox } from '@nextcloud/vue'
 import { TabulatorComponent } from 'vue-tabulator'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showInfo, showSuccess, showWarning } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
-import DialogConfirmation from './../../modals/DialogConfirmation'
-import CreateRow from '../../modals/CreateRow'
-import Actions from '@nextcloud/vue/dist/Components/Actions'
-import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
-import ActionCheckbox from '@nextcloud/vue/dist/Components/ActionCheckbox'
-import EditRow from '../../modals/EditRow'
-import PasteRowsInfo from '../../modals/PasteRowsInfo'
-import tabulatorTableMixin from '../../mixins/tabulatorTableMixin'
-import tabulatorPrintMixin from '../../mixins/tabulatorPrintMixin'
-import tabulatorClipboardMixin from '../../mixins/tabulatorClipboardMixin'
-import tablePermissions from '../../mixins/tablePermissions'
+import DialogConfirmation from './../../modals/DialogConfirmation.vue'
+import CreateRow from '../../modals/CreateRow.vue'
+import EditRow from '../../modals/EditRow.vue'
+import PasteRowsInfo from '../../modals/PasteRowsInfo.vue'
+import tabulatorTableMixin from '../../mixins/tabulatorTableMixin.js'
+import tabulatorPrintMixin from '../../mixins/tabulatorPrintMixin.js'
+import tabulatorClipboardMixin from '../../mixins/tabulatorClipboardMixin.js'
+import tablePermissions from '../../mixins/tablePermissions.js'
 
 export default {
 	name: 'NcTable',
@@ -91,9 +89,9 @@ export default {
 		CreateRow,
 		DialogConfirmation,
 		TabulatorComponent,
-		Actions,
-		ActionButton,
-		ActionCheckbox,
+		NcActions,
+		NcActionButton,
+		NcActionCheckbox,
 	},
 	mixins: [tabulatorPrintMixin, tabulatorTableMixin, tabulatorClipboardMixin, tablePermissions],
 	props: {

@@ -21,7 +21,7 @@
 			{{ t('tables', 'Mandatory') }}
 		</div>
 		<div class="fix-col-4">
-			<CheckboxRadioSwitch type="switch" :checked.sync="localMandatory" />
+			<NcCheckboxRadioSwitch type="switch" :checked.sync="localMandatory" />
 		</div>
 
 		<!-- order weight -->
@@ -39,12 +39,12 @@
 </template>
 
 <script>
-import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch'
+import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 
 export default {
 	name: 'MainForm',
 	components: {
-		CheckboxRadioSwitch,
+		NcCheckboxRadioSwitch,
 	},
 	props: {
 		title: {

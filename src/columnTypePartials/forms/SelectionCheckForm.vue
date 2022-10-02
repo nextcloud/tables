@@ -9,19 +9,19 @@
 				&nbsp;
 			</div>
 			<div class="fix-col-2 margin-bottom">
-				<CheckboxRadioSwitch type="switch" :checked.sync="localSelectionDefault" />
+				<NcCheckboxRadioSwitch type="switch" :checked.sync="localSelectionDefault" />
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch'
+import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 
 export default {
 	name: 'SelectionCheckForm',
 	components: {
-		CheckboxRadioSwitch,
+		NcCheckboxRadioSwitch,
 	},
 	props: {
 		selectionDefault: {

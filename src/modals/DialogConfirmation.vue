@@ -1,5 +1,5 @@
 <template>
-	<Modal v-if="showModal" @close="actionCancel">
+	<NcModal v-if="showModal" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div v-if="title" class="col-4">
@@ -20,16 +20,16 @@
 				</div>
 			</div>
 		</div>
-	</Modal>
+	</NcModal>
 </template>
 
 <script>
-import Modal from '@nextcloud/vue/dist/Components/Modal'
+import { NcModal } from '@nextcloud/vue'
 
 export default {
 	name: 'DialogConfirmation',
 	components: {
-		Modal,
+		NcModal,
 	},
 	props: {
 		showModal: {

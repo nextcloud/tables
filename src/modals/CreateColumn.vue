@@ -1,5 +1,5 @@
 <template>
-	<Modal v-if="showModal" size="large" @close="actionCancel">
+	<NcModal v-if="showModal" size="large" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
@@ -19,7 +19,7 @@
 							{{ t('tables', 'Type') }}
 						</div>
 						<div class="col-4">
-							<Multiselect v-model="combinedTypeObject"
+							<NcMultiselect v-model="combinedTypeObject"
 								:options="typeOptions"
 								track-by="id"
 								label="label"
@@ -131,42 +131,37 @@
 				</div>
 			</div>
 		</div>
-	</Modal>
+	</NcModal>
 </template>
 
 <script>
-import NumberForm from '../columnTypePartials/forms/NumberForm'
-import NumberStarsForm from '../columnTypePartials/forms/NumberStarsForm'
-import NumberProgressForm from '../columnTypePartials/forms/NumberProgressForm'
-import TextLineForm from '../columnTypePartials/forms/TextLineForm'
-import TextLongForm from '../columnTypePartials/forms/TextLongForm'
-// import SelectionForm from '../columnTypePartials/forms/SelectionForm'
-// import SelectionMultiForm from '../columnTypePartials/forms/SelectionMultiForm'
-import SelectionCheckForm from '../columnTypePartials/forms/SelectionCheckForm'
-import MainForm from '../columnTypePartials/forms/MainForm'
-import Modal from '@nextcloud/vue/dist/Components/Modal'
+import NumberForm from './../columnTypePartials/forms/NumberForm.vue'
+import NumberStarsForm from '../columnTypePartials/forms/NumberStarsForm.vue'
+import NumberProgressForm from '../columnTypePartials/forms/NumberProgressForm.vue'
+import TextLineForm from '../columnTypePartials/forms/TextLineForm.vue'
+import TextLongForm from '../columnTypePartials/forms/TextLongForm.vue'
+import SelectionCheckForm from '../columnTypePartials/forms/SelectionCheckForm.vue'
+import MainForm from '../columnTypePartials/forms/MainForm.vue'
+import DatetimeForm from '../columnTypePartials/forms/DatetimeForm.vue'
+import DatetimeDateForm from '../columnTypePartials/forms/DatetimeDateForm.vue'
+import DatetimeTimeForm from '../columnTypePartials/forms/DatetimeTimeForm.vue'
+import { NcModal, NcMultiselect } from '@nextcloud/vue'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showInfo, showSuccess, showWarning } from '@nextcloud/dialogs'
 import { mapGetters } from 'vuex'
-import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
-import DatetimeForm from '../columnTypePartials/forms/DatetimeForm'
-import DatetimeDateForm from '../columnTypePartials/forms/DatetimeDateForm'
-import DatetimeTimeForm from '../columnTypePartials/forms/DatetimeTimeForm'
 
 export default {
 	name: 'CreateColumn',
 	components: {
-		Modal,
+		NcModal,
 		NumberForm,
 		TextLineForm,
 		TextLongForm,
 		MainForm,
-		Multiselect,
+		NcMultiselect,
 		NumberStarsForm,
 		NumberProgressForm,
-		// SelectionForm,
-		// SelectionMultiForm,
 		SelectionCheckForm,
 		DatetimeDateForm,
 		DatetimeForm,
