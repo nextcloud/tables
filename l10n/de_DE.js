@@ -53,7 +53,7 @@ OC.L10N.register(
     "Title" : "Titel",
     "Enter a column title" : "Spaltentitel eingeben",
     "Mandatory" : "Pflichtfeld",
-    "Order weight" : "Bestellungsgewicht",
+    "Order weight" : "Sortiergewichtung",
     "Default" : "Standard",
     "Decimals" : "Dezimalstellen",
     "Minimum" : "Minimum",
