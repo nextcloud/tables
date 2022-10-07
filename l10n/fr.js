@@ -53,6 +53,7 @@ OC.L10N.register(
     "Title" : "Titre",
     "Enter a column title" : "Saisir un intitulé de colonne",
     "Mandatory" : "Obligatoire",
+    "Order weight" : "Poids de la commande",
     "Default" : "Par défaut",
     "Decimals" : "Décimales",
     "Minimum" : "Minimum",
