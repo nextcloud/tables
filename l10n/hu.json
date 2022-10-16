@@ -104,6 +104,7 @@
     "Please fill in the mandatory fields." : "Töltse ki a kötelező mezőket.",
     "The row was saved." : "A sor mentve.",
     "Could not create new row" : "Nem hozható létre új sor",
+    "Add table" : "Táblázat hozzáadása",
     "Please choose one of the templates or create a table from scratch." : "Válasszon egyet a sablonok közül, vagy hozzon létre egy teljesen új táblázatot.",
     "Title of the new table" : "Az új táblázat címe",
     "Add an icon as prefix" : "Ikon hozzáadása előtagként",
