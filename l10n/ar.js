@@ -44,6 +44,7 @@ OC.L10N.register(
     "No elements found." : "لم يتم العثور على أي عناصر",
     "Shares" : "التي قمتَ بمشاركتها",
     "Permissions" : "التصريحات",
+    "Delete data" : "إحذف البيانات",
     "No shares" : "لا يوجد مشاركات",
     "Could not delete share" : "لا يمكن حذف المشاركة"
 },
