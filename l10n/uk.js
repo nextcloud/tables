@@ -14,7 +14,7 @@ OC.L10N.register(
     "Activity" : "Події",
     "Sharing" : "Спільне",
     "Documentation" : "Документація",
-    "Edit title" : "Редагувати нотатку",
+    "Edit title" : "Редагувати заголовок",
     "Cancel" : "Скасувати",
     "Delete" : "Вилучити",
     "Title" : "Назва",
