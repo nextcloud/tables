@@ -14,8 +14,10 @@ OC.L10N.register(
     "Type" : "Anaw",
     "Save" : "Sekles",
     "Link" : "Aseɣwen",
+    "Confirm" : "Serggeg",
     "Edit" : "Ẓreg",
     "Close" : "Mdel",
+    "Previous" : "Ɣer deffir",
     "Create" : "Snulfu-d",
     "Today" : "Ass-a"
 },
