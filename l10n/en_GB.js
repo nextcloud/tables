@@ -41,6 +41,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "No recommendations. Start typing.",
     "Shares" : "Shares",
     "Permissions" : "Permissions",
+    "Delete data" : "Delete data",
     "Could not delete share" : "Could not delete share"
 },
 "nplurals=2; plural=(n != 1);");
