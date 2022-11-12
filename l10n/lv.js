@@ -28,6 +28,7 @@ OC.L10N.register(
     "Edit" : "Rediģēt",
     "Close" : "Aizvērt",
     "Owner" : "Īpašnieks",
+    "Created at" : "Izveidots plkst.",
     "Previous" : "Iepriekšējā",
     "Next" : "Nākamā",
     "Create" : "Izveidot",
