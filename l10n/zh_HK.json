@@ -1,10 +1,10 @@
 { "translations": {
     "ToDo list" : "待辦清單",
-    "Setup a simple todo-list." : "設置一個簡單的待辦事項列表。",
+    "Setup a simple todo-list." : "設置一個簡單的待辦事項清單。",
     "Members" : "成員",
-    "List of members with some basic attributes." : "具有一些基本屬性的成員列表。",
+    "List of members with some basic attributes." : "具有一些基本屬性的成員清單。",
     "Weight tracking" : "體重記錄",
-    "Track your weight and other health measures." : "跟踪您的體重和其他健康措施。",
+    "Track your weight and other health measures." : "記錄您的體重和其他健康數據。",
     "Date" : "日期",
     "Weight" : "體重",
     "Body fat" : "體脂",

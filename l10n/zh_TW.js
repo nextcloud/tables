@@ -25,6 +25,7 @@ OC.L10N.register(
     "Delete" : "刪除",
     "Title" : "標題",
     "Default" : "預設",
+    "Decimals" : "小數點",
     "Prefix" : "前綴",
     "Suffix" : "後綴",
     "Options" : "選項",
