@@ -37,6 +37,7 @@ OC.L10N.register(
     "Create" : "Buat",
     "Today" : "Hari ini",
     "Shares" : "Dibagikan",
+    "Delete data" : "Hapus data",
     "Could not delete share" : "Tidak dapat menghapus pembagian"
 },
 "nplurals=1; plural=0;");
