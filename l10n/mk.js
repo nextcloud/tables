@@ -16,6 +16,7 @@ OC.L10N.register(
     "Delete" : "Избриши",
     "Title" : "Наслов",
     "Default" : "Стандардно",
+    "Decimals" : "Децимали",
     "Prefix" : "Префикс",
     "Suffix" : "Суфикс",
     "Options" : "Опции",
