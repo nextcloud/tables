@@ -35,6 +35,7 @@ OC.L10N.register(
     "Next" : "Siguiente",
     "Create" : "Crear",
     "Today" : "Hoy",
+    "No recommendations. Start typing." : "Sin recomendaciones. Empiece a escribir.",
     "Shares" : "Elementos compartidos",
     "Permissions" : "Permisos",
     "Could not delete share" : "No fue posible borrar el elemento compartido"
