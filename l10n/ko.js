@@ -24,6 +24,7 @@ OC.L10N.register(
     "Default" : "기본값",
     "Prefix" : "접두사",
     "Suffix" : "접미사",
+    "Options" : "옵션들",
     "Yes" : "예",
     "No" : "아니오",
     "Max" : "최대치",
