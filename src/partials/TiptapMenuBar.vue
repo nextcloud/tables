@@ -94,9 +94,9 @@
 
 <script>
 import { Editor, EditorContent } from '@tiptap/vue-2'
-import StarterKit from '@tiptap/starter-kit'
-import TaskList from '@tiptap/extension-task-list'
-import TaskItem from '@tiptap/extension-task-item'
+import { StarterKit } from '@tiptap/starter-kit'
+import { TaskList } from '@tiptap/extension-task-list'
+import { TaskItem } from '@tiptap/extension-task-item'
 import { NcButton } from '@nextcloud/vue'
 import Undo from 'vue-material-design-icons/Undo.vue'
 import Redo from 'vue-material-design-icons/Redo.vue'

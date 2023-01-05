@@ -28,8 +28,7 @@
 			:show-modal="showDeletionConfirmation"
 			@confirm="deleteMe"
 			@cancel="cancelDeletion" />
-		</appnavigationitem>
-	</ncappnavigationitem>
+	</NcAppNavigationItem>
 </template>
 <script>
 import { NcActionButton, NcAppNavigationItem } from '@nextcloud/vue'
