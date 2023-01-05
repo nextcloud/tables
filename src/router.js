@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import { generateUrl } from '@nextcloud/router'
-import TableDefaultView from './pages/TableDefaultView'
-import TablesOverviewView from './pages/TablesOverviewView'
+import TableDefaultView from './pages/TableDefaultView.vue'
+import TablesOverviewView from './pages/TablesOverviewView.vue'
 
 Vue.use(Router)
 
