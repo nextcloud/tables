@@ -29,7 +29,7 @@
 		"@nextcloud/dialogs": "^3.2.0",
 		"@nextcloud/event-bus": "^3.0.2",
 		"@nextcloud/moment": "^1.1.1",
-		"@nextcloud/router": "^2.0.0",
+		"@nextcloud/router": "^2.0.1",
 		"@nextcloud/vue": "^7.0.0-beta.7",
 		"@tiptap/extension-task-item": "^2.0.0-beta.209",
 		"@tiptap/extension-task-list": "^2.0.0-beta.209",
