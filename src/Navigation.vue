@@ -30,10 +30,7 @@
 			<NcAppNavigationSettings :title="t('tables', 'Information')">
 				<NcAppNavigationItem :title="t('tables', 'Documentation')"
 					icon="icon-info"
-					@click="openLink('https://github.com/datenangebot/tables/wiki')" />
-				<NcAppNavigationItem :title="t('tables', 'Donations')"
-					icon="icon-category-workflow"
-					@click="openLink('https://github.com/datenangebot/tables/wiki/Donations')" />
+					@click="openLink('https://github.com/nextcloud/tables/wiki')" />
 			</NcAppNavigationSettings>
 		</template>
 	</NcAppNavigation>
