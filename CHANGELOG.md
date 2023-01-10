@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.2 - 2023-01-10
+### Updated
+- translation
+- npm dependencies
+- some UI fixes for Nextcloud 25 support
+- Updated app meta data
+
 ## 0.2.1 - 2022-09-27
 ### Updated
 - translation

@@ -21,22 +21,22 @@ Share your tables with users and groups within your cloud.
 Have a good time and manage whatever you want.
 
 ]]></description>
-    <version>0.2.1</version>
+    <version>0.2.2</version>
     <licence>agpl</licence>
-    <author mail="flost-dev@mailbox.org" >Florian Steffens</author>
+    <author mail="florian@nextcloud.com" >Florian Steffens</author>
     <namespace>Tables</namespace>
 	<documentation>
-		<user>https://github.com/datenangebot/tables/wiki</user>
-		<admin>https://github.com/datenangebot/tables/wiki/Administration</admin>
+		<user>https://github.com/nextcloud/tables/wiki</user>
+		<admin>https://github.com/nextcloud/tables/wiki/Administration</admin>
 	</documentation>
     <category>office</category>
-    <website>https://github.com/datenangebot/tables</website>
-    <bugs>https://github.com/datenangebot/tables/issues</bugs>
+    <website>https://github.com/nextcloud/tables</website>
+    <bugs>https://github.com/nextcloud/tables/issues</bugs>
 	<screenshot small-thumbnail="https://dl.datenangebot.de/nc%20tables/screenshots/tables-overview-small.png">https://dl.datenangebot.de/nc%20tables/screenshots/tables-overview.png</screenshot>
 	<screenshot>https://dl.datenangebot.de/nc%20tables/screenshots/tables-newtable.png</screenshot>
 	<screenshot>https://dl.datenangebot.de/nc%20tables/screenshots/tables-menu.png</screenshot>
 	<dependencies>
-        <nextcloud min-version="25" max-version="25"/>
+        <nextcloud min-version="25" max-version="26"/>
     </dependencies>
     <navigations>
         <navigation>
