@@ -36,7 +36,6 @@ OC.L10N.register(
     "Shared tables" : "Taules compartides",
     "Information" : "Informació",
     "Documentation" : "Documentació",
-    "Donations" : "Donatius",
     "Tables title" : "Títol de les taules",
     "Edit title" : "Edició del títol",
     "Delete table" : "Suprimeix la taula",

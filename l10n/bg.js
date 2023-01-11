@@ -36,7 +36,6 @@ OC.L10N.register(
     "Shared tables" : "Споделени таблици",
     "Information" : "Информация",
     "Documentation" : "Документация",
-    "Donations" : "Дарения",
     "Tables title" : "Заглавие на таблици",
     "Edit title" : "Редактиране на заглавието",
     "Delete table" : "Изтриване на таблица",

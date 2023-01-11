@@ -21,7 +21,6 @@ OC.L10N.register(
     "Sharing" : "Параметры публикации",
     "Information" : "Информация",
     "Documentation" : "Документация",
-    "Donations" : "Пожертвования",
     "Tables title" : "Названия таблиц",
     "Edit title" : "Редактировать заголовок",
     "Delete table" : "Удалить таблицу",

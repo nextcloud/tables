@@ -23,7 +23,6 @@ OC.L10N.register(
     "Shared tables" : "Jaetut taulukot",
     "Information" : "Tiedot",
     "Documentation" : "Dokumentaatio",
-    "Donations" : "Lahjoitukset",
     "Edit title" : "Muokkaa otsikkoa",
     "Delete table" : "Poista taulukko",
     "Confirm table deletion" : "Vahvista taulukon poisto",

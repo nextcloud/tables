@@ -36,7 +36,6 @@ OC.L10N.register(
     "Shared tables" : "Paylaşılmış tablolar",
     "Information" : "Bilgiler",
     "Documentation" : "Belgeler",
-    "Donations" : "Bağışlar",
     "Tables title" : "Tablo başlığı",
     "Edit title" : "Başlığı düzenle",
     "Delete table" : "Tabloyu sil",

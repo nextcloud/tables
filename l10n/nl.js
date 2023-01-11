@@ -21,7 +21,6 @@ OC.L10N.register(
     "Start page" : "Startpagina",
     "Information" : "Informatie",
     "Documentation" : "Documentatie",
-    "Donations" : "Giften",
     "Tables title" : "Tabeltitels",
     "Edit title" : "Titel bewerken",
     "Delete table" : "Verwijder tabel",

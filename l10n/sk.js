@@ -36,7 +36,6 @@ OC.L10N.register(
     "Shared tables" : "Zdieľané tabuľky",
     "Information" : "Informácie",
     "Documentation" : "Dokumentácia",
-    "Donations" : "Dary",
     "Tables title" : "Názov tabuľky",
     "Edit title" : "Upraviť názov",
     "Delete table" : "Vymazať tabuľku",

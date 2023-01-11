@@ -27,7 +27,6 @@ OC.L10N.register(
     "Start page" : "Pagina iniziale",
     "Information" : "Informazioni",
     "Documentation" : "Documentazione",
-    "Donations" : "Donazioni",
     "Edit title" : "Modifica titolo",
     "Delete table" : "Elimina tabella",
     "Confirm table deletion" : "Conferma eliminazione della tabella",

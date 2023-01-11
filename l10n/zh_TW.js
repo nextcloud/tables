@@ -19,7 +19,6 @@ OC.L10N.register(
     "Sharing" : "分享",
     "Information" : "資訊",
     "Documentation" : "文件",
-    "Donations" : "捐款",
     "Edit title" : "編輯標題",
     "Cancel" : "取消",
     "Delete" : "刪除",

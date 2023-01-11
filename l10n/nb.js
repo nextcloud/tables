@@ -23,7 +23,6 @@ OC.L10N.register(
     "Sharing" : "Deling",
     "Information" : "Informasjo",
     "Documentation" : "Dokumentasjo",
-    "Donations" : "Donasjoner",
     "Tables title" : "Tabelltittel",
     "Edit title" : "Rediger tittel",
     "Delete table" : "Slett tabell",

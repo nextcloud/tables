@@ -19,7 +19,6 @@ OC.L10N.register(
     "Sharing" : "共有",
     "Information" : "情報",
     "Documentation" : "ドキュメント",
-    "Donations" : "寄付",
     "Edit title" : "タイトルを編集",
     "Cancel" : "キャンセル",
     "Delete" : "削除",

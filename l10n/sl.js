@@ -36,7 +36,6 @@ OC.L10N.register(
     "Shared tables" : "Razpredelnice v souporabi",
     "Information" : "Podrobnosti",
     "Documentation" : "Dokumentacija",
-    "Donations" : "Donacije",
     "Tables title" : "Naslov razpredelnice",
     "Edit title" : "Uredi naslov",
     "Delete table" : "Izbriši razpredelnico",

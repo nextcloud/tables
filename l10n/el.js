@@ -26,7 +26,6 @@ OC.L10N.register(
     "Sharing" : "Διαμοιρασμός",
     "Information" : "Πληροφορίες",
     "Documentation" : "Τεκμηρίωση",
-    "Donations" : "Δωρεές",
     "Tables title" : "Τίτλος πινάκων",
     "Edit title" : "Επεξεργασία τίτλου",
     "Delete table" : "Διαγραφή πίνακα",

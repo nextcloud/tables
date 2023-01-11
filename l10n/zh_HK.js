@@ -36,7 +36,6 @@ OC.L10N.register(
     "Shared tables" : "共享數據庫表",
     "Information" : "資訊",
     "Documentation" : "說明書",
-    "Donations" : "捐款",
     "Tables title" : "數據庫表標題",
     "Edit title" : "編輯標題",
     "Delete table" : "刪除數據庫表",

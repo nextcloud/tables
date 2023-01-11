@@ -36,7 +36,6 @@ OC.L10N.register(
     "Shared tables" : "Partekatutako taulak",
     "Information" : "Informazioa",
     "Documentation" : "Dokumentazioa",
-    "Donations" : "Dohaintzak",
     "Tables title" : "Taulen izenburua",
     "Edit title" : "Editatu izenburua",
     "Delete table" : "Ezabatu taula",

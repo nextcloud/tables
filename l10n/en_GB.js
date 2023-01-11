@@ -36,7 +36,6 @@ OC.L10N.register(
     "Shared tables" : "Shared tables",
     "Information" : "Information",
     "Documentation" : "Documentation",
-    "Donations" : "Donations",
     "Tables title" : "Tables title",
     "Edit title" : "Edit title",
     "Delete table" : "Delete table",

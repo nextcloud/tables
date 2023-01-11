@@ -36,7 +36,6 @@ OC.L10N.register(
     "Shared tables" : "Megosztott táblázatok",
     "Information" : "Információ",
     "Documentation" : "Dokumentáció",
-    "Donations" : "Adományok",
     "Tables title" : "A táblázatok címe",
     "Edit title" : "Cím szerkesztése",
     "Delete table" : "Táblázat törlése",
