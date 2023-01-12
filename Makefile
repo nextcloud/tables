@@ -70,6 +70,7 @@ assemble:
 	--exclude=.idea \
 	--exclude=vendor \
 	--exclude=webpack*.js \
+	--exclude=doc \
 	$(project_dir) $(build_dir)
 
 build-js:
@@ -162,7 +163,3 @@ clean:
 clean-dev:
 	rm -rf node_modules
 	rm -rf vendor
-
-# logging
-log:
-	sudo -u www-data php /var/www/html/nextcloud/23/occ log:watch
