@@ -46,6 +46,10 @@ p code {
     */
 }
 
+button[class^='icon-'] {
+    min-width: 36px !important;
+}
+
 [class^='col-'] span {
     color: var(--color-text-lighter);
     font-weight: 100;
@@ -67,8 +71,12 @@ p code {
     border: none;
 }
 
-.popover__inner p {
+.popover__inner p, .v-popper__inner table {
     padding: 15px;
+}
+
+.v-popper__inner table td {
+    padding-right: 15px;
 }
 
 .error {
