@@ -6,12 +6,11 @@ use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Service\RowService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
-use OCP\DB\Exception;
 use OCP\IRequest;
 
 class RowController extends Controller {
 
-    /** @var RowService */
+	/** @var RowService */
 	private $service;
 
 	/** @var string */
@@ -20,20 +19,20 @@ class RowController extends Controller {
 	use Errors;
 
 	public function __construct(IRequest     $request,
-                                RowService $service,
-                                             $userId) {
+								RowService $service,
+											 $userId) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->service = $service;
 		$this->userId = $userId;
 	}
 
-    /**
-     * @NoAdminRequired
-     */
+	/**
+	 * @NoAdminRequired
+	 */
 	public function index(int $tableId): DataResponse {
-        return $this->handleError(function () use ($tableId) {
-            return $this->service->findAllByTable($tableId);
-        });
+		return $this->handleError(function () use ($tableId) {
+			return $this->service->findAllByTable($tableId);
+		});
 	}
 
 	/**
@@ -45,73 +44,72 @@ class RowController extends Controller {
 		});
 	}
 
-    /**
-     * @NoAdminRequired
-     */
-    public function create(
-        int $tableId,
-        int $columnId,
-        string $data
-    ): DataResponse {
-        return $this->handleError(function () use ($tableId, $columnId, $data) {
-            return $this->service->create(
-                $tableId,
-                $columnId,
-                $data);
-        });
-    }
+	/**
+	 * @NoAdminRequired
+	 */
+	public function create(
+		int $tableId,
+		int $columnId,
+		string $data
+	): DataResponse {
+		return $this->handleError(function () use ($tableId, $columnId, $data) {
+			return $this->service->create(
+				$tableId,
+				$columnId,
+				$data);
+		});
+	}
 
-    /**
-     * @NoAdminRequired
-     */
-    public function createComplete(
-        int $tableId,
-        Array $data
-    ): DataResponse {
-        return $this->handleError(function () use ($tableId, $data) {
-            return $this->service->createComplete(
-                $tableId,
-                $data);
-        });
+	/**
+	 * @NoAdminRequired
+	 */
+	public function createComplete(
+		int $tableId,
+		array $data
+	): DataResponse {
+		return $this->handleError(function () use ($tableId, $data) {
+			return $this->service->createComplete(
+				$tableId,
+				$data);
+		});
+	}
 
-    }
+	/**
+	 * @NoAdminRequired
+	 */
+	public function update(
+		int $id,
+		int $columnId,
+		string $data
+	): DataResponse {
+		return $this->handleError(function () use (
+			$id,
+			$columnId,
+			$data
+		) {
+			return $this->service->update(
+				$id,
+				$columnId,
+				$data);
+		});
+	}
 
-    /**
-     * @NoAdminRequired
-     */
-    public function update(
-        int $id,
-        int $columnId,
-        string $data
-    ): DataResponse {
-        return $this->handleError(function () use (
-            $id,
-            $columnId,
-            $data
-        ) {
-            return $this->service->update(
-                $id,
-                $columnId,
-                $data);
-        });
-    }
-
-    /**
-     * @NoAdminRequired
-     */
-    public function updateSet(
-        int $id,
-        array $data
-    ): DataResponse {
-        return $this->handleError(function () use (
-            $id,
-            $data
-        ) {
-            return $this->service->updateSet(
-                $id,
-                $data);
-        });
-    }
+	/**
+	 * @NoAdminRequired
+	 */
+	public function updateSet(
+		int $id,
+		array $data
+	): DataResponse {
+		return $this->handleError(function () use (
+			$id,
+			$data
+		) {
+			return $this->service->updateSet(
+				$id,
+				$data);
+		});
+	}
 
 	/**
 	 * @NoAdminRequired

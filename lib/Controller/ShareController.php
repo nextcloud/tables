@@ -4,11 +4,9 @@ namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Service\ShareService;
-use OCA\Tables\Service\TableService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
-
 
 class ShareController extends Controller {
 
@@ -18,29 +16,28 @@ class ShareController extends Controller {
 	/** @var string */
 	private $userId;
 
-    use Errors;
+	use Errors;
 
 
 	public function __construct(IRequest     $request,
-                                ShareService $service,
-                                             $userId) {
+								ShareService $service,
+											 $userId) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->service = $service;
 		$this->userId = $userId;
 	}
 
 
-    /**
-     * @NoAdminRequired
-     */
-    public function index(int $tableId): DataResponse
-    {
-        return $this->handleError(function () use ($tableId) {
-            return $this->service->findAll('table', $tableId);
-        });
-    }
+	/**
+	 * @NoAdminRequired
+	 */
+	public function index(int $tableId): DataResponse {
+		return $this->handleError(function () use ($tableId) {
+			return $this->service->findAll('table', $tableId);
+		});
+	}
 
-    /**
+	/**
 	 * @NoAdminRequired
 	 */
 	public function show(int $id): DataResponse {
@@ -49,14 +46,14 @@ class ShareController extends Controller {
 		});
 	}
 
-    /**
-     * @NoAdminRequired
-     */
+	/**
+	 * @NoAdminRequired
+	 */
 	public function create(int $nodeId, $nodeType, $receiver, $receiverType, bool $permissionRead = false, bool $permissionCreate = false, bool $permissionUpdate = false, bool $permissionDelete = false, bool $permissionManage = false): DataResponse {
-        return $this->handleError(function () use ($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage) {
-            return $this->service->create($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage);
-        });
-    }
+		return $this->handleError(function () use ($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage) {
+			return $this->service->create($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage);
+		});
+	}
 
 	/**
 	 * @NoAdminRequired

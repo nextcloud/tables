@@ -8,7 +8,6 @@ use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 
-
 class TableController extends Controller {
 
 	/** @var TableService */
@@ -17,29 +16,28 @@ class TableController extends Controller {
 	/** @var string */
 	private $userId;
 
-    use Errors;
+	use Errors;
 
 
 	public function __construct(IRequest     $request,
-                                TableService $service,
-                                             $userId) {
+								TableService $service,
+											 $userId) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->service = $service;
 		$this->userId = $userId;
 	}
 
 
-    /**
-     * @NoAdminRequired
-     */
-    public function index(): DataResponse
-    {
-        return $this->handleError(function () {
-            return $this->service->findAll();
-        });
-    }
+	/**
+	 * @NoAdminRequired
+	 */
+	public function index(): DataResponse {
+		return $this->handleError(function () {
+			return $this->service->findAll();
+		});
+	}
 
-    /**
+	/**
 	 * @NoAdminRequired
 	 */
 	public function show(int $id): DataResponse {
@@ -48,14 +46,14 @@ class TableController extends Controller {
 		});
 	}
 
-    /**
-     * @NoAdminRequired
-     */
+	/**
+	 * @NoAdminRequired
+	 */
 	public function create(string $title, string $template): DataResponse {
-        return $this->handleError(function () use ($title, $template) {
-            return $this->service->create($title, $template);
-        });
-    }
+		return $this->handleError(function () use ($title, $template) {
+			return $this->service->create($title, $template);
+		});
+	}
 
 	/**
 	 * @NoAdminRequired

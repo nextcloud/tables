@@ -13,8 +13,8 @@ class Application extends App {
 	public function __construct() {
 		parent::__construct(self::APP_ID);
 
-        /* @var IEventDispatcher $eventDispatcher */
-        $dispatcher = $this->getContainer()->query(IEventDispatcher::class);
-        $dispatcher->addServiceListener(BeforeUserDeletedEvent::class, UserDeletedListener::class);
+		/* @var IEventDispatcher $eventDispatcher */
+		$dispatcher = $this->getContainer()->query(IEventDispatcher::class);
+		$dispatcher->addServiceListener(BeforeUserDeletedEvent::class, UserDeletedListener::class);
 	}
 }

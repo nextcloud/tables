@@ -9,30 +9,30 @@ use OCP\AppFramework\Db\Entity;
 class Table extends Entity implements JsonSerializable {
 	protected $title;
 	protected $ownership;
-    protected $ownerDisplayName;
+	protected $ownerDisplayName;
 	protected $createdBy;
-    protected $createdAt;
-    protected $lastEditBy;
-    protected $lastEditAt;
-    protected $isShared;
-    protected $onSharePermissions;
+	protected $createdAt;
+	protected $lastEditBy;
+	protected $lastEditAt;
+	protected $isShared;
+	protected $onSharePermissions;
 
-    public function __construct() {
-        $this->addType('id', 'integer');
-    }
+	public function __construct() {
+		$this->addType('id', 'integer');
+	}
 
 	public function jsonSerialize(): array {
 		return [
-			'id'            => $this->id,
-            'title'         => $this->title,
-			'ownership'     => $this->ownership,
-            'ownerDisplayName'  => $this->ownerDisplayName,
-			'createdBy'     => $this->createdBy,
-            'createdAt'     => $this->createdAt,
-            'lastEditBy'    => $this->lastEditBy,
-            'lastEditAt'    => $this->lastEditAt,
-            'isShared'      => !!$this->isShared,
-            'onSharePermissions' => $this->onSharePermissions,
+			'id' => $this->id,
+			'title' => $this->title,
+			'ownership' => $this->ownership,
+			'ownerDisplayName' => $this->ownerDisplayName,
+			'createdBy' => $this->createdBy,
+			'createdAt' => $this->createdAt,
+			'lastEditBy' => $this->lastEditBy,
+			'lastEditAt' => $this->lastEditAt,
+			'isShared' => !!$this->isShared,
+			'onSharePermissions' => $this->onSharePermissions,
 		];
 	}
 }

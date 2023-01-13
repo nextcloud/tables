@@ -9,277 +9,272 @@ use OCP\IL10N;
 
 class TableTemplateService {
 
-    /** @var IL10N */
-    private $l;
+	/** @var IL10N */
+	private $l;
 
-    /** @var ColumnService */
-    private $columnService;
+	/** @var ColumnService */
+	private $columnService;
 
-    private $userId;
+	private $userId;
 
-    public function __construct(IL10N $l, ColumnService $columnService, $userId) {
-        $this->l = $l;
-        $this->columnService = $columnService;
-        $this->userId = $userId;
-    }
+	public function __construct(IL10N $l, ColumnService $columnService, $userId) {
+		$this->l = $l;
+		$this->columnService = $columnService;
+		$this->userId = $userId;
+	}
 
-    public function getTemplateList(): array
-    {
-        return [
-            [
-                'name'          => 'todo',
-                'title'         => $this->l->t('ToDo list'),
-                'icon'          => 'icon-checkmark',
-                'description'   => $this->l->t('Setup a simple todo-list.')
-            ],
-            [
-                'name'          => 'members',
-                'title'         => $this->l->t('Members'),
-                'icon'          => 'icon-menu-sidebar',
-                'description'   => $this->l->t('List of members with some basic attributes.')
-            ],
-            [
-                'name'          => 'weight',
-                'title'         => $this->l->t('Weight tracking'),
-                'icon'          => 'icon-category-monitoring',
-                'description'   => $this->l->t('Track your weight and other health measures.')
-            ],
-        ];
-    }
+	public function getTemplateList(): array {
+		return [
+			[
+				'name' => 'todo',
+				'title' => $this->l->t('ToDo list'),
+				'icon' => 'icon-checkmark',
+				'description' => $this->l->t('Setup a simple todo-list.')
+			],
+			[
+				'name' => 'members',
+				'title' => $this->l->t('Members'),
+				'icon' => 'icon-menu-sidebar',
+				'description' => $this->l->t('List of members with some basic attributes.')
+			],
+			[
+				'name' => 'weight',
+				'title' => $this->l->t('Weight tracking'),
+				'icon' => 'icon-category-monitoring',
+				'description' => $this->l->t('Track your weight and other health measures.')
+			],
+		];
+	}
 
-    /**
-     * @throws InternalError|PermissionError
-     */
-    public function makeTemplate(Table $table, string $template): Table {
-        if($template === 'todo') {
-            $this->makeTodo($table);
-        } elseif ($template === 'members') {
-            $this->makeMembers($table);
-        } elseif ($template === 'weight') {
-            $this->makeWeight($table);
-        }
-        return $table;
-    }
+	/**
+	 * @throws InternalError|PermissionError
+	 */
+	public function makeTemplate(Table $table, string $template): Table {
+		if ($template === 'todo') {
+			$this->makeTodo($table);
+		} elseif ($template === 'members') {
+			$this->makeMembers($table);
+		} elseif ($template === 'weight') {
+			$this->makeWeight($table);
+		}
+		return $table;
+	}
 
-    /**
-     * @throws InternalError
-     * @throws PermissionError
-     */
-    private function makeWeight(Table $table) {
+	/**
+	 * @throws InternalError
+	 * @throws PermissionError
+	 */
+	private function makeWeight(Table $table) {
+		$params = [
+			'title' => $this->l->t('Date'),
+			'type' => 'datetime',
+			'subtype' => 'date',
+			'mandatory' => true,
+			'datetimeDefault' => 'today',
+			'orderWeight' => 50,
+		];
+		$this->createColumn($table->id, $params);
 
-        $params = [
-            'title' => $this->l->t('Date'),
-            'type' => 'datetime',
-            'subtype' => 'date',
-            'mandatory' => true,
-            'datetimeDefault' => 'today',
-            'orderWeight' => 50,
-        ];
-        $this->createColumn($table->id, $params);
+		$params = [
+			'title' => $this->l->t('Weight'),
+			'type' => 'number',
+			'suffix' => 'kg',
+			'numberMin' => 0,
+			'numberMax' => 200,
+			'orderWeight' => 40,
+		];
+		$this->createColumn($table->id, $params);
 
-        $params = [
-            'title' => $this->l->t('Weight'),
-            'type' => 'number',
-            'suffix' => 'kg',
-            'numberMin' => 0,
-            'numberMax' => 200,
-            'orderWeight' => 40,
-        ];
-        $this->createColumn($table->id, $params);
+		$params = [
+			'title' => $this->l->t('Body fat'),
+			'type' => 'number',
+			'numberMin' => 0,
+			'numberMax' => 100,
+			'suffix' => '%',
+			'orderWeight' => 30,
+		];
+		$this->createColumn($table->id, $params);
 
-        $params = [
-            'title' => $this->l->t('Body fat'),
-            'type' => 'number',
-            'numberMin' => 0,
-            'numberMax' => 100,
-            'suffix' => '%',
-            'orderWeight' => 30,
-        ];
-        $this->createColumn($table->id, $params);
+		$params = [
+			'title' => $this->l->t('Feeling over all'),
+			'type' => 'number',
+			'subtype' => 'stars',
+			'orderWeight' => 20,
+		];
+		$this->createColumn($table->id, $params);
 
-        $params = [
-            'title' => $this->l->t('Feeling over all'),
-            'type' => 'number',
-            'subtype' => 'stars',
-            'orderWeight' => 20,
-        ];
-        $this->createColumn($table->id, $params);
+		$params = [
+			'title' => $this->l->t('Comments'),
+			'type' => 'text',
+			'subtype' => 'long',
+			'orderWeight' => 10,
+		];
+		$this->createColumn($table->id, $params);
+	}
 
-        $params = [
-            'title' => $this->l->t('Comments'),
-            'type' => 'text',
-            'subtype' => 'long',
-            'orderWeight' => 10,
-        ];
-        $this->createColumn($table->id, $params);
-    }
+	/**
+	 * @throws InternalError
+	 * @throws PermissionError
+	 */
+	private function makeMembers(Table $table) {
+		$params = [
+			'title' => $this->l->t('Name'),
+			'type' => 'text',
+			'subtype' => 'line',
+			'mandatory' => true,
+			'orderWeight' => 50,
+		];
+		$this->createColumn($table->id, $params);
 
-    /**
-     * @throws InternalError
-     * @throws PermissionError
-     */
-    private function makeMembers(Table $table) {
+		$params = [
+			'title' => $this->l->t('Position'),
+			'type' => 'text',
+			'subtype' => 'line',
+			'orderWeight' => 40,
+		];
+		$this->createColumn($table->id, $params);
 
-        $params = [
-            'title' => $this->l->t('Name'),
-            'type' => 'text',
-            'subtype' => 'line',
-            'mandatory' => true,
-            'orderWeight' => 50,
-        ];
-        $this->createColumn($table->id, $params);
+		$params = [
+			'title' => $this->l->t('Skills'),
+			'type' => 'text',
+			'subtype' => 'long',
+			'orderWeight' => 30,
+		];
+		$this->createColumn($table->id, $params);
 
-        $params = [
-            'title' => $this->l->t('Position'),
-            'type' => 'text',
-            'subtype' => 'line',
-            'orderWeight' => 40,
-        ];
-        $this->createColumn($table->id, $params);
+		$params = [
+			'title' => $this->l->t('Birthday'),
+			'type' => 'text',
+			'subtype' => 'line',
+			'orderWeight' => 20,
+		];
+		$this->createColumn($table->id, $params);
 
-        $params = [
-            'title' => $this->l->t('Skills'),
-            'type' => 'text',
-            'subtype' => 'long',
-            'orderWeight' => 30,
-        ];
-        $this->createColumn($table->id, $params);
+		$params = [
+			'title' => $this->l->t('Comments'),
+			'type' => 'text',
+			'subtype' => 'long',
+			'orderWeight' => 10,
+		];
+		$this->createColumn($table->id, $params);
+	}
 
-        $params = [
-            'title' => $this->l->t('Birthday'),
-            'type' => 'text',
-            'subtype' => 'line',
-            'orderWeight' => 20,
-        ];
-        $this->createColumn($table->id, $params);
+	/**
+	 * @throws InternalError
+	 * @throws PermissionError
+	 */
+	private function makeTodo(Table $table) {
+		$params = [
+			'title' => $this->l->t('Task'),
+			'type' => 'text',
+			'subtype' => 'line',
+			'mandatory' => true,
+			'orderWeight' => 50,
+		];
+		$this->createColumn($table->id, $params);
 
-        $params = [
-            'title' => $this->l->t('Comments'),
-            'type' => 'text',
-            'subtype' => 'long',
-            'orderWeight' => 10,
-        ];
-        $this->createColumn($table->id, $params);
-    }
+		$params = [
+			'title' => $this->l->t('Description'),
+			'type' => 'text',
+			'subtype' => 'long',
+			'description' => $this->l->t('Title or short description'),
+			'textMultiline' => true,
+			'orderWeight' => 40,
+		];
+		$this->createColumn($table->id, $params);
 
-    /**
-     * @throws InternalError
-     * @throws PermissionError
-     */
-    private function makeTodo(Table $table) {
+		$params = [
+			'title' => $this->l->t('Target'),
+			'type' => 'text',
+			'subtype' => 'long',
+			'description' => $this->l->t('Date, time or whatever'),
+			'orderWeight' => 30,
+		];
+		$this->createColumn($table->id, $params);
 
-        $params = [
-            'title' => $this->l->t('Task'),
-            'type' => 'text',
-            'subtype' => 'line',
-            'mandatory' => true,
-            'orderWeight' => 50,
-        ];
-        $this->createColumn($table->id, $params);
+		$params = [
+			'title' => $this->l->t('Progress'),
+			'type' => 'number',
+			'subtype' => 'progress',
+			'orderWeight' => 20,
+			'numberDefault' => 0,
+		];
+		$this->createColumn($table->id, $params);
 
-        $params = [
-            'title' => $this->l->t('Description'),
-            'type' => 'text',
-            'subtype' => 'long',
-            'description' => $this->l->t('Title or short description'),
-            'textMultiline' => true,
-            'orderWeight' => 40,
-        ];
-        $this->createColumn($table->id, $params);
+		$params = [
+			'title' => $this->l->t('Comments'),
+			'type' => 'text',
+			'subtype' => 'long',
+			'orderWeight' => 10,
+		];
+		$this->createColumn($table->id, $params);
+	}
 
-        $params = [
-            'title' => $this->l->t('Target'),
-            'type' => 'text',
-            'subtype' => 'long',
-            'description' => $this->l->t('Date, time or whatever'),
-            'orderWeight' => 30,
-        ];
-        $this->createColumn($table->id, $params);
+	/**
+	 * @throws InternalError|PermissionError
+	 */
+	private function createColumn($tableId, $parameters): void {
+		$this->columnService->create(
 
-        $params = [
-            'title' => $this->l->t('Progress'),
-            'type' => 'number',
-            'subtype' => 'progress',
-            'orderWeight' => 20,
-            'numberDefault' => 0,
-        ];
-        $this->createColumn($table->id, $params);
+			// tableId
+			$tableId,
 
-        $params = [
-            'title' => $this->l->t('Comments'),
-            'type' => 'text',
-            'subtype' => 'long',
-            'orderWeight' => 10,
-        ];
-        $this->createColumn($table->id, $params);
-    }
+			// title
+			(isset($parameters['title']) && $parameters['title'] != '') ? $parameters['title'] : $this->l->t('No title given'),
 
-    /**
-     * @throws InternalError|PermissionError
-     */
-    private function createColumn($tableId, $parameters): void
-    {
-        $this->columnService->create(
+			// userId
+			$this->userId,
 
-            // tableId
-            $tableId,
+			// column type
+			(isset($parameters['type'])) ? $parameters['type'] : 'text',
 
-            // title
-            (isset($parameters['title']) && $parameters['title'] != '') ? $parameters['title'] : $this->l->t('No title given'),
+			// column subtype
+			(isset($parameters['subtype'])) ? $parameters['subtype'] : '',
 
-            // userId
-            $this->userId,
+			// prefix
+			(isset($parameters['numberPrefix'])) ? $parameters['numberPrefix'] : '',
 
-            // column type
-            (isset($parameters['type'])) ? $parameters['type'] : 'text',
+			// suffix
+			(isset($parameters['numberSuffix'])) ? $parameters['numberSuffix'] : '',
 
-            // column subtype
-            (isset($parameters['subtype'])) ? $parameters['subtype'] : '',
+			// mandatory
+			isset($parameters['mandatory']) && !!$parameters['mandatory'],
 
-            // prefix
-            (isset($parameters['numberPrefix'])) ? $parameters['numberPrefix'] : '',
+			// description
+			(isset($parameters['description'])) ? $parameters['description'] : '',
 
-            // suffix
-            (isset($parameters['numberSuffix'])) ? $parameters['numberSuffix'] : '',
+			// textDefault
+			(isset($parameters['textDefault'])) ? $parameters['textDefault'] : '',
 
-            // mandatory
-            isset($parameters['mandatory']) && !!$parameters['mandatory'],
+			// textAllowedPattern
+			(isset($parameters['textAllowedPattern'])) ? $parameters['textAllowedPattern'] : '',
 
-            // description
-            (isset($parameters['description'])) ? $parameters['description'] : '',
+			// textMaxLength
+			(isset($parameters['textMaxLength'])) ? $parameters['textMaxLength'] : -1,
 
-            // textDefault
-            (isset($parameters['textDefault'])) ? $parameters['textDefault'] : '',
+			// numberDefault
+			(isset($parameters['numberDefault'])) ? $parameters['numberDefault'] : null,
 
-            // textAllowedPattern
-            (isset($parameters['textAllowedPattern'])) ? $parameters['textAllowedPattern'] : '',
+			// numberMin
+			(isset($parameters['numberMin'])) ? $parameters['numberMin'] : null,
 
-            // textMaxLength
-            (isset($parameters['textMaxLength'])) ? $parameters['textMaxLength'] : -1,
+			// numberMax
+			(isset($parameters['numberMax'])) ? $parameters['numberMax'] : null,
 
-            // numberDefault
-            (isset($parameters['numberDefault'])) ? $parameters['numberDefault'] : null,
+			// numberDecimals
+			(isset($parameters['numberDecimals'])) ? $parameters['numberDecimals'] : null,
 
-            // numberMin
-            (isset($parameters['numberMin'])) ? $parameters['numberMin'] : null,
+			// selectionOptions
+			(isset($parameters['selectionOptions'])) ? $parameters['selectionOptions'] : '',
 
-            // numberMax
-            (isset($parameters['numberMax'])) ? $parameters['numberMax'] : null,
+			// selectionDefault
+			(isset($parameters['selectionDefault'])) ? $parameters['selectionDefault'] : '',
 
-            // numberDecimals
-            (isset($parameters['numberDecimals'])) ? $parameters['numberDecimals'] : null,
+			// orderWeight
+			(isset($parameters['orderWeight'])) ? $parameters['orderWeight'] : 0,
 
-            // selectionOptions
-            (isset($parameters['selectionOptions'])) ? $parameters['selectionOptions'] : '',
-
-            // selectionDefault
-            (isset($parameters['selectionDefault'])) ? $parameters['selectionDefault'] : '',
-
-            // orderWeight
-            (isset($parameters['orderWeight'])) ? $parameters['orderWeight'] : 0,
-
-            // datetimeDefault
-            (isset($parameters['datetimeDefault'])) ? $parameters['datetimeDefault'] : '',
-        );
-    }
+			// datetimeDefault
+			(isset($parameters['datetimeDefault'])) ? $parameters['datetimeDefault'] : '',
+		);
+	}
 }
