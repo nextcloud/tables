@@ -49,6 +49,7 @@ class TableService extends SuperService {
 
 
     /**
+	 * @return Table[]
      * @throws InternalError
      */
     public function findAll($userId = null): array {
