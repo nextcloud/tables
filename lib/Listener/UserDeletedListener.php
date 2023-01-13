@@ -11,7 +11,6 @@ use OCP\User\Events\BeforeUserDeletedEvent;
 use Psr\Log\LoggerInterface;
 
 class UserDeletedListener implements IEventListener {
-
 	/** @var TableService */
 	private $tableService;
 

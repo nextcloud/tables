@@ -10,7 +10,6 @@ use OCP\IUserManager;
 use Psr\Log\LoggerInterface;
 
 class UserHelper {
-
 	/** @var IUserManager @var IUserManager */
 	private $userManager;
 

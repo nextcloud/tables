@@ -9,7 +9,6 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 
 class TableController extends Controller {
-
 	/** @var TableService */
 	private $service;
 

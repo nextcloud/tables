@@ -14,7 +14,6 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use Psr\Log\LoggerInterface;
 
 class ColumnService extends SuperService {
-
 	/** @var ColumnMapper */
 	private $mapper;
 
@@ -167,7 +166,6 @@ class ColumnService extends SuperService {
 		$datetimeDefault = ''
 	) {
 		try {
-
 			// security
 			if (!$this->permissionsService->canUpdateColumns($tableId)) {
 				throw new PermissionError('update column id = '.$id.' is not allowed.');

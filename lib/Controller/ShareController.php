@@ -9,7 +9,6 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 
 class ShareController extends Controller {
-
 	/** @var ShareService */
 	private $service;
 

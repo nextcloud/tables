@@ -9,7 +9,6 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 
 class RowController extends Controller {
-
 	/** @var RowService */
 	private $service;
 

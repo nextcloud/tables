@@ -15,7 +15,6 @@ use OCP\DB\Exception;
 use Psr\Log\LoggerInterface;
 
 class PermissionsService extends SuperService {
-
 	/** @var TableMapper */
 	private $tableMapper;
 

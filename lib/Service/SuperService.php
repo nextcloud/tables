@@ -5,7 +5,6 @@ namespace OCA\Tables\Service;
 use Psr\Log\LoggerInterface;
 
 class SuperService {
-
 	/** @var PermissionsService */
 	protected $permissionsService;
 

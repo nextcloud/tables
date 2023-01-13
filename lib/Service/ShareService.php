@@ -19,7 +19,6 @@ use OCA\Tables\Db\TableMapper;
 use Psr\Log\LoggerInterface;
 
 class ShareService extends SuperService {
-
 	/** @var ShareMapper */
 	protected $mapper;
 

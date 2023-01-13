@@ -8,7 +8,6 @@ use OCA\Tables\Errors\PermissionError;
 use OCP\IL10N;
 
 class TableTemplateService {
-
 	/** @var IL10N */
 	private $l;
 

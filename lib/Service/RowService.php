@@ -14,7 +14,6 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use Psr\Log\LoggerInterface;
 
 class RowService extends SuperService {
-
 	/** @var RowMapper */
 	private $mapper;
 
@@ -79,7 +78,6 @@ class RowService extends SuperService {
 		int $columnId,
 		string $data
 	) {
-
 		// security
 		if (!$this->permissionsService->canCreateRows($tableId)) {
 			throw new PermissionError('create row at the table id = '.$tableId.' is not allowed.');
@@ -111,7 +109,6 @@ class RowService extends SuperService {
 		int $tableId,
 		array $data
 	) {
-
 		// security
 		if (!$this->permissionsService->canCreateRows($tableId)) {
 			throw new PermissionError('create row at the table id = '.$tableId.' is not allowed.');

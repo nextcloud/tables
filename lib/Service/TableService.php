@@ -17,7 +17,6 @@ use OCA\Tables\Db\TableMapper;
 use Psr\Log\LoggerInterface;
 
 class TableService extends SuperService {
-
 	/** @var TableMapper */
 	private $mapper;
 
