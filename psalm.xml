@@ -12,5 +12,8 @@
         <ignoreFiles>
             <directory name="vendor" />
         </ignoreFiles>
-    </projectFiles>
+	</projectFiles>
+	<extraFiles>
+		<directory name="vendor" />
+	</extraFiles>
 </psalm>
