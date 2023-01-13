@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files psalm-version="dev-master@">
+  <file src="lib/AppInfo/Application.php">
+    <UndefinedClass occurrences="1">
+      <code>App</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Controller/ColumnController.php">
+    <UndefinedClass occurrences="1">
+      <code>Controller</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Controller/PageController.php">
+    <UndefinedClass occurrences="1">
+      <code>Controller</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Controller/RowController.php">
+    <UndefinedClass occurrences="1">
+      <code>Controller</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Controller/ShareController.php">
+    <UndefinedClass occurrences="1">
+      <code>Controller</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Controller/TableController.php">
+    <UndefinedClass occurrences="1">
+      <code>Controller</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Controller/TableTemplateController.php">
+    <UndefinedClass occurrences="1">
+      <code>Controller</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Db/Column.php">
+    <UndefinedClass occurrences="1">
+      <code>Entity</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Db/ColumnMapper.php">
+    <UndefinedClass occurrences="1">
+      <code>QBMapper</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Db/LogItem.php">
+    <UndefinedClass occurrences="1">
+      <code>Entity</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Db/LogItemMapper.php">
+    <UndefinedClass occurrences="1">
+      <code>QBMapper</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Db/Row.php">
+    <UndefinedClass occurrences="1">
+      <code>Entity</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Db/RowMapper.php">
+    <UndefinedClass occurrences="1">
+      <code>QBMapper</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Db/Share.php">
+    <UndefinedClass occurrences="1">
+      <code>Entity</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Db/ShareMapper.php">
+    <UndefinedClass occurrences="1">
+      <code>QBMapper</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Db/Table.php">
+    <UndefinedClass occurrences="1">
+      <code>Entity</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Db/TableMapper.php">
+    <UndefinedClass occurrences="1">
+      <code>QBMapper</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Helper/UserHelper.php">
+    <UndefinedClass occurrences="6">
+      <code>$user</code>
+      <code>$user</code>
+      <code>IGroupManager</code>
+      <code>IUser</code>
+      <code>IUser</code>
+      <code>IUserManager</code>
+    </UndefinedClass>
+    <UndefinedDocblockClass occurrences="4">
+      <code>$this-&gt;userManager</code>
+      <code>IGroupManager</code>
+      <code>IGroup[]</code>
+      <code>IUserManager</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/Listener/UserDeletedListener.php">
+    <UndefinedClass occurrences="1">
+      <code>IEventListener</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Migration/Version000000Date20210921000000.php">
+    <UndefinedClass occurrences="1">
+      <code>SimpleMigrationStep</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Migration/Version000200Date20220428000000.php">
+    <UndefinedClass occurrences="1">
+      <code>SimpleMigrationStep</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Service/ColumnService.php">
+    <MissingDependency occurrences="10">
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>Column</code>
+      <code>Column</code>
+      <code>ColumnMapper</code>
+      <code>ColumnMapper</code>
+    </MissingDependency>
+    <UndefinedClass occurrences="15">
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>DoesNotExistException</code>
+      <code>MultipleObjectsReturnedException</code>
+      <code>\OCP\DB\Exception</code>
+      <code>\OCP\DB\Exception</code>
+      <code>\OCP\DB\Exception</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Service/PermissionsService.php">
+    <MissingDependency occurrences="22">
+      <code>$share</code>
+      <code>$share</code>
+      <code>$share</code>
+      <code>$share</code>
+      <code>$share</code>
+      <code>$share</code>
+      <code>$share</code>
+      <code>$share</code>
+      <code>$share</code>
+      <code>$this-&gt;tableMapper</code>
+      <code>Share</code>
+      <code>Share</code>
+      <code>Share</code>
+      <code>Share</code>
+      <code>ShareMapper</code>
+      <code>ShareMapper</code>
+      <code>Table</code>
+      <code>Table</code>
+      <code>Table</code>
+      <code>Table</code>
+      <code>TableMapper</code>
+      <code>TableMapper</code>
+    </MissingDependency>
+    <UndefinedClass occurrences="3">
+      <code>DoesNotExistException</code>
+      <code>Exception</code>
+      <code>MultipleObjectsReturnedException</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Service/RowService.php">
+    <MissingDependency occurrences="16">
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>Row</code>
+      <code>Row</code>
+      <code>RowMapper</code>
+      <code>RowMapper</code>
+    </MissingDependency>
+    <UndefinedClass occurrences="20">
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>DoesNotExistException</code>
+      <code>DoesNotExistException</code>
+      <code>MultipleObjectsReturnedException</code>
+      <code>MultipleObjectsReturnedException</code>
+      <code>\OCP\DB\Exception</code>
+      <code>\OCP\DB\Exception</code>
+      <code>\OCP\DB\Exception</code>
+      <code>\OCP\DB\Exception</code>
+    </UndefinedClass>
+    <UndefinedDocblockClass occurrences="4">
+      <code>\OCP\DB\Exception</code>
+      <code>\OCP\DB\Exception</code>
+      <code>\OCP\DB\Exception</code>
+      <code>\OCP\DB\Exception</code>
+    </UndefinedDocblockClass>
+    <UndefinedMethod occurrences="1">
+      <code>update</code>
+    </UndefinedMethod>
+  </file>
+  <file src="lib/Service/ShareService.php">
+    <MissingDependency occurrences="24">
+      <code>$item</code>
+      <code>$item</code>
+      <code>$item</code>
+      <code>$item</code>
+      <code>$item</code>
+      <code>$item</code>
+      <code>$table</code>
+      <code>$table</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;tableMapper</code>
+      <code>Share</code>
+      <code>ShareMapper</code>
+      <code>ShareMapper</code>
+      <code>Table</code>
+      <code>TableMapper</code>
+      <code>TableMapper</code>
+    </MissingDependency>
+    <UndefinedClass occurrences="23">
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>DoesNotExistException</code>
+      <code>DoesNotExistException</code>
+      <code>MultipleObjectsReturnedException</code>
+      <code>MultipleObjectsReturnedException</code>
+      <code>\OCP\DB\Exception</code>
+      <code>\OCP\DB\Exception</code>
+      <code>\OCP\DB\Exception</code>
+      <code>\OCP\DB\Exception</code>
+      <code>\OCP\DB\Exception</code>
+    </UndefinedClass>
+    <UndefinedDocblockClass occurrences="4">
+      <code>$table</code>
+      <code>$table</code>
+      <code>$userGroup</code>
+      <code>\OCP\DB\Exception</code>
+    </UndefinedDocblockClass>
+    <UndefinedMethod occurrences="2">
+      <code>setIsShared</code>
+      <code>setOnSharePermissions</code>
+    </UndefinedMethod>
+  </file>
+  <file src="lib/Service/TableService.php">
+    <MissingDependency occurrences="11">
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>$this-&gt;mapper</code>
+      <code>Table</code>
+      <code>Table</code>
+      <code>TableMapper</code>
+      <code>TableMapper</code>
+    </MissingDependency>
+    <UndefinedClass occurrences="15">
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>$e</code>
+      <code>DoesNotExistException</code>
+      <code>MultipleObjectsReturnedException</code>
+      <code>\OCP\DB\Exception</code>
+      <code>\OCP\DB\Exception</code>
+      <code>\OCP\DB\Exception</code>
+    </UndefinedClass>
+    <UndefinedDocblockClass occurrences="1">
+      <code>\OCP\DB\Exception</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/Service/TableTemplateService.php">
+    <MissingDependency occurrences="5">
+      <code>Table</code>
+      <code>Table</code>
+      <code>Table</code>
+      <code>Table</code>
+      <code>Table</code>
+    </MissingDependency>
+    <UndefinedClass occurrences="1">
+      <code>IL10N</code>
+    </UndefinedClass>
+    <UndefinedDocblockClass occurrences="8">
+      <code>$this-&gt;l</code>
+      <code>$this-&gt;l</code>
+      <code>$this-&gt;l</code>
+      <code>$this-&gt;l</code>
+      <code>$this-&gt;l</code>
+      <code>$this-&gt;l</code>
+      <code>$this-&gt;l</code>
+      <code>IL10N</code>
+    </UndefinedDocblockClass>
+  </file>
+</files>
