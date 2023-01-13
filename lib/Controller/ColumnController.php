@@ -191,7 +191,7 @@ class ColumnController extends Controller {
 	 */
 	public function destroy(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
-			return $this->service->delete($id, $this->userId);
+			return $this->service->delete($id, false, $this->userId);
 		});
 	}
 }
