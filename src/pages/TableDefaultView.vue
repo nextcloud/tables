@@ -8,18 +8,18 @@
 				:loading="loading"
 				@reload="getColumnsForTableFromBE(activeTable.id); getRowsForTableFromBE(activeTable.id)" />
 
-			<NcTable :rows="rows" :columns="columns" @update-rows="actionUpdateRows" />
+			<NcTable :rows="rows" :columns="columns" />
 		</div>
 	</div>
 </template>
 
 <script>
 import TableDescription from './sections/TableDescription.vue'
-import NcTable from './sections/NcTable.vue'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showWarning } from '@nextcloud/dialogs'
 import { mapState, mapGetters } from 'vuex'
+import NcTable from '../components/NcTable/NcTable.vue'
 
 export default {
 	name: 'TableDefaultView',
