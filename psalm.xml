@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="4"
+    resolveFromConfigFile="true"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+    errorBaseline="tests/psalm-baseline.xml"
+>
+	<stubs>
+		<file name="tests/stub.phpstub" preloadClasses="true"/>
+	</stubs>
+    <projectFiles>
+        <directory name="lib" />
+        <ignoreFiles>
+            <directory name="vendor" />
+        </ignoreFiles>
+	</projectFiles>
+	<extraFiles>
+		<directory name="vendor" />
+	</extraFiles>
+	<issueHandlers>
+		<UndefinedMagicMethod>
+			<errorLevel type="suppress">
+				<directory name="lib/" />
+			</errorLevel>
+		</UndefinedMagicMethod>
+		<UndefinedClass>
+			<errorLevel type="suppress">
+				<referencedClass name="Doctrine\DBAL\Exception" />
+				<referencedClass name="Doctrine\DBAL\Exception\InvalidFieldNameException" />
+				<referencedClass name="Doctrine\DBAL\Exception\TableNotFoundException" />
+				<referencedClass name="Doctrine\DBAL\Exception\UniqueConstraintViolationException" />
+				<referencedClass name="Doctrine\DBAL\Platforms\PostgreSQL94Platform" />
+				<referencedClass name="Doctrine\DBAL\Types\Types" />
+			</errorLevel>
+		</UndefinedClass>
+		<UndefinedDocblockClass>
+			<errorLevel type="suppress">
+				<referencedClass name="Doctrine\DBAL\Driver\Statement" />
+				<referencedClass name="Doctrine\DBAL\Exception" />
+				<referencedClass name="Doctrine\DBAL\Exception\UniqueConstraintViolationException" />
+				<referencedClass name="Doctrine\DBAL\Platforms\AbstractPlatform" />
+				<referencedClass name="Doctrine\DBAL\Schema\Schema" />
+				<referencedClass name="Doctrine\DBAL\Schema\SchemaException" />
+				<referencedClass name="Doctrine\DBAL\Schema\Table" />
+			</errorLevel>
+		</UndefinedDocblockClass>
+	</issueHandlers>
+</psalm>
