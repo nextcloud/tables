@@ -1,5 +1,5 @@
 <template>
-	<div id="content" class="content app-tables">
+	<NcContent app-name="tables">
 		<Navigation />
 		<NcAppContent>
 			<div v-if="somethingIsLoading" class="icon-loading" />
@@ -31,11 +31,11 @@
 				<SidebarSharing />
 			</NcAppSidebarTab>
 		</NcAppSidebar>
-	</div>
+	</NcContent>
 </template>
 
 <script>
-import { NcAppContent, NcAppSidebar, NcAppSidebarTab } from '@nextcloud/vue'
+import { NcContent, NcAppContent, NcAppSidebar, NcAppSidebarTab } from '@nextcloud/vue'
 import Navigation from './Navigation.vue'
 import { mapGetters, mapState } from 'vuex'
 import axios from '@nextcloud/axios'
@@ -46,6 +46,7 @@ export default {
 	name: 'App',
 	components: {
 		SidebarSharing,
+		NcContent,
 		NcAppContent,
 		Navigation,
 		NcAppSidebar,
