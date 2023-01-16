@@ -10,6 +10,7 @@ use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
+/** @template-extends QBMapper<LogItem> */
 class LogItemMapper extends QBMapper {
 	protected $table = 'tables_log';
 

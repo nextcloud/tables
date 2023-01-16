@@ -10,6 +10,7 @@ use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
+/** @template-extends QBMapper<Column> */
 class ColumnMapper extends QBMapper {
 	protected $table = 'tables_columns';
 
