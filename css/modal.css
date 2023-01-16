@@ -1,39 +1,39 @@
 .x_modal-container {
-    overflow: auto !important;
+	overflow: auto !important;
 }
 
 .modal__content {
-    padding: 20px;
+	padding: 20px;
 }
 
 .modal__content h2 {
-    margin-top: 0;
+	margin-top: 0;
 }
 
 @media only screen and (max-width: 1025px) {
-    .x_modal__content {
-        width: calc(100% - 40px);
-    }
+	.x_modal__content {
+		width: calc(100% - 40px);
+	}
 }
 
 @media only screen and (max-width: 641px) {
-    .x_modal__content {
-        width: calc(100% - 40px);
-        max-height: 90vh !important;
-    }
+	.x_modal__content {
+		width: calc(100% - 40px);
+		max-height: 90vh !important;
+	}
 
-    .x_modal-wrapper .prev, .modal-wrapper .next {
-        min-width: 20px !important;
-    }
+	.x_modal-wrapper .prev, .modal-wrapper .next {
+		min-width: 20px !important;
+	}
 }
 
 @media only screen and (max-width: 460px) {
-    .x_modal__content {
-        width: calc(100% - 40px);
-        max-height: 90% !important;
-    }
+	.x_modal__content {
+		width: calc(100% - 40px);
+		max-height: 90% !important;
+	}
 
-    .x_modal-wrapper .prev, .modal-wrapper .next {
-        min-width: 10px !important;
-    }
+	.x_modal-wrapper .prev, .modal-wrapper .next {
+		min-width: 10px !important;
+	}
 }

@@ -11,6 +11,11 @@
 
 .tabulator .tabulator-tableHolder {
 	min-height: 74px;
+	position: relative;
+	width: 100%;
+	white-space: nowrap;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
 }
 
 .tabulator .tabulator-cell.tabulator-editing textarea {
@@ -294,14 +299,6 @@
 
 .tabulator .tabulator-header .tabulator-frozen-rows-holder:empty {
 	display: none;
-}
-
-.tabulator .tabulator-tableHolder {
-	position: relative;
-	width: 100%;
-	white-space: nowrap;
-	overflow: auto;
-	-webkit-overflow-scrolling: touch;
 }
 
 .tabulator .tabulator-tableHolder:focus {
