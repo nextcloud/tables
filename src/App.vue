@@ -1,7 +1,6 @@
 <template>
 	<NcContent app-name="tables">
 		<Navigation />
-
 		<NcAppContent>
 			<div v-if="somethingIsLoading" class="icon-loading" />
 
@@ -37,9 +36,11 @@
 
 <script>
 import { NcContent, NcAppContent, NcAppSidebar, NcAppSidebarTab } from '@nextcloud/vue'
-import Navigation from './modules/navigation/sections/Navigation.vue'
+import Navigation from './Navigation.vue'
 import { mapGetters, mapState } from 'vuex'
-import SidebarSharing from './modules/sidebar/sections/SidebarSharing.vue'
+import axios from '@nextcloud/axios'
+import { generateOcsUrl } from '@nextcloud/router'
+import SidebarSharing from './pages/sections/SidebarSharing.vue'
 
 export default {
 	name: 'App',
@@ -68,6 +69,9 @@ export default {
 		somethingIsLoading() {
 			return this.tablesLoading || this.loading
 		},
+		getSidebarActiveTab() {
+			return this.sidebarActiveTab
+		},
 	},
 	watch: {
 		'$route'(to, from) {
@@ -78,6 +82,24 @@ export default {
 	async created() {
 		await this.$store.dispatch('loadTablesFromBE')
 		this.$store.commit('setActiveTableId', parseInt(this.$router.currentRoute.params.tableId))
+	},
+	methods: {
+		setActiveSidebarTab(activeTab) {
+			this.$store.commit('setSidebarActiveTab', activeTab)
+		},
+		async loadSharees(query) {
+
+			const response = await axios.get(generateOcsUrl('apps/files_sharing/api/v1/sharees'), {
+				params: {
+					format: 'json',
+					itemType: 'file',
+					search: '',
+					lookup: false,
+					perPage: 10,
+				},
+			})
+			console.debug('sharees', response)
+		},
 	},
 }
 </script>
