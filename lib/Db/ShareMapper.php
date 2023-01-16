@@ -11,6 +11,7 @@ use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
+/** @template-extends QBMapper<Share> */
 class ShareMapper extends QBMapper {
     protected $table = 'tables_shares';
 
@@ -19,8 +20,6 @@ class ShareMapper extends QBMapper {
 	}
 
     /**
-     * @param int $id
-     * @return Entity|Share
      * @throws MultipleObjectsReturnedException
      * @throws Exception
      * @throws DoesNotExistException
@@ -40,7 +39,7 @@ class ShareMapper extends QBMapper {
      * @param int $nodeId
      * @param $nodeType
      * @param $receiver
-     * @param null $receiverType
+     * @param ?string $receiverType
      * @return Share
      * @throws Exception
      */

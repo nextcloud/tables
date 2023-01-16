@@ -10,6 +10,7 @@ use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
+/** @template-extends QBMapper<Table> */
 class TableMapper extends QBMapper {
     protected $table = 'tables_tables';
 
@@ -18,8 +19,6 @@ class TableMapper extends QBMapper {
 	}
 
     /**
-     * @param int $id
-     * @return Entity|Table
      * @throws MultipleObjectsReturnedException
      * @throws Exception
      * @throws DoesNotExistException

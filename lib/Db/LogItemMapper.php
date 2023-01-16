@@ -10,6 +10,7 @@ use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
+/** @template-extends QBMapper<LogItem> */
 class LogItemMapper extends QBMapper {
     protected $table = 'tables_log';
 
@@ -18,13 +19,11 @@ class LogItemMapper extends QBMapper {
 	}
 
     /**
-     * @param int $id
-     * @return Entity|Table
      * @throws MultipleObjectsReturnedException
      * @throws Exception
      * @throws DoesNotExistException
      */
-	public function find(int $id): Table {
+	public function find(int $id): LogItem{
         $qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
