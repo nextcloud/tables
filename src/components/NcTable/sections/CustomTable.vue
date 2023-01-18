@@ -2,13 +2,19 @@
 	<div class="container">
 		<table>
 			<thead>
-				<TableHeader :columns="columns" />
+				<TableHeader :columns="columns"
+					:selected-rows="selectedRows"
+					:rows="rows"
+					@select-all-rows="selectAllRows" />
 			</thead>
 			<tbody>
 				<TableRow v-for="(row, index) in rows"
 					:key="index"
 					:row="row"
-					:columns="columns" />
+					:columns="columns"
+					:selected="isRowSelected(row.id)"
+					@update-row-selection="updateRowSelection"
+					@edit-row="rowId => $emit('edit-row', rowId)" />
 			</tbody>
 		</table>
 	</div>
@@ -32,6 +38,37 @@ export default {
 		columns: {
 			type: Array,
 			default: () => [],
+		},
+	},
+	data() {
+		return {
+			selectedRows: [],
+		}
+	},
+	methods: {
+		selectAllRows(value) {
+			console.debug('selectAllRows called', value)
+			this.selectedRows = []
+			if (value) {
+				this.rows.forEach(item => { this.selectedRows.push(item.id) })
+			}
+		},
+		isRowSelected(id) {
+			return this.selectedRows.includes(id)
+		},
+		updateRowSelection(values) {
+			const id = values.rowId
+			const v = values.value
+
+			if (this.selectedRows.includes(id) && !v) {
+				const index = this.selectedRows.indexOf(id)
+				if (index > -1) {
+					this.selectedRows.splice(index, 1)
+				}
+			}
+			if (!this.selectedRows.includes(id) && v) {
+				this.selectedRows.push(values.rowId)
+			}
 		},
 	},
 }
@@ -89,7 +126,7 @@ export default {
   tr>th:first-child,tr>td:first-child {
     position: sticky;
     left: 0;
-    width: 50px;
+    width: 60px;
     padding-left: 15px;
     background-color: inherit;
   }

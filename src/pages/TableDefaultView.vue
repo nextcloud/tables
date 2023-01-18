@@ -8,7 +8,7 @@
 				:loading="loading"
 				@reload="getColumnsForTableFromBE(activeTable.id); getRowsForTableFromBE(activeTable.id)" />
 
-			<NcTable :rows="rows" :columns="columns" />
+			<NcTable :rows="rows" :columns="columns" @edit-row="editRow" />
 		</div>
 	</div>
 </template>
@@ -49,6 +49,9 @@ export default {
 		this.reload()
 	},
 	methods: {
+		editRow(rowId) {
+			console.debug('action editRow', rowId)
+		},
 		reload() {
 			if (!this.activeTable) {
 				console.debug('no active table set, but expected')
