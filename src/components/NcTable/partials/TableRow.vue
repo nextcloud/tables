@@ -1,13 +1,18 @@
 <template>
-	<tr v-if="row">
-		<td><NcCheckboxRadioSwitch /></td>
+	<tr v-if="row" :class="{ selected }">
+		<td><NcCheckboxRadioSwitch :checked="selected" @update:checked="v => $emit('update-row-selection', { rowId: row.id, value: v })" /></td>
 		<td v-for="col in columns" :key="col.id">
-			<TableCell :value="getCellValue(col.id)"
+			<TableCellProgress v-if="col.type === 'number' && col.subtype === 'progress'"
+				:column="col"
 				:row-id="row.id"
-				:column-id="col.id" />
+				:value="parseInt(getCellValue(col.id))" />
+			<TableCellHtml v-else
+				:value="getCellValue(col.id)"
+				:row-id="row.id"
+				:column="col" />
 		</td>
 		<td>
-			<NcButton type="tertiary">
+			<NcButton type="tertiary" @click="$emit('edit-row', row.id)">
 				<template #icon>
 					<Pencil :size="20" />
 				</template>
@@ -19,12 +24,14 @@
 <script>
 import { NcCheckboxRadioSwitch, NcButton } from '@nextcloud/vue'
 import Pencil from 'vue-material-design-icons/Pencil.vue'
-import TableCell from './TableCell.vue'
+import TableCellHtml from './TableCellHtml.vue'
+import TableCellProgress from './TableCellProgress.vue'
 
 export default {
 	name: 'TableRow',
 	components: {
-		TableCell,
+		TableCellProgress,
+		TableCellHtml,
 		NcButton,
 		Pencil,
 		NcCheckboxRadioSwitch,
@@ -37,6 +44,16 @@ export default {
 		columns: {
 			type: Array,
 			default: () => [],
+		},
+		selected: {
+			type: Boolean,
+			default: false,
+		},
+	},
+	computed: {
+		getSelection: {
+			get: () => { return this.selected },
+			set: () => { alert('updating selection') },
 		},
 	},
 	methods: {
@@ -53,5 +70,9 @@ export default {
 </script>
 
 <style scoped>
+
+tr.selected {
+  background-color: var(--color-primary-light) !important;
+}
 
 </style>
