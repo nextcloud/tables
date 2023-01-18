@@ -1,16 +1,14 @@
 <template>
-	<div v-if="value">
-		{{ value }}
-	</div>
+	<div v-if="value" v-html="value" />
 </template>
 
 <script>
 export default {
-	name: 'TableCell',
+	name: 'TableCellHtml',
 	props: {
-		columnId: {
-			type: Number,
-			default: null,
+		column: {
+			type: Object,
+			default: () => {},
 		},
 		rowId: {
 			type: Number,
