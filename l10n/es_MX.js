@@ -18,6 +18,7 @@ OC.L10N.register(
     "Delete" : "Eliminar",
     "Title" : "Título",
     "Default" : "Predeterminado",
+    "Decimals" : "Decimales",
     "Prefix" : "Prefijo",
     "Suffix" : "Sufijo",
     "Yes" : "Sí",
