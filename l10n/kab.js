@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Comments" : "Commentaires",
     "Name" : "Nom",
     "Progress" : "Asfari",
     "Activity" : "Armud",
@@ -9,6 +10,7 @@ OC.L10N.register(
     "Delete" : "Kkes",
     "Title" : "Azwel",
     "Default" : "Prédéfini(e)",
+    "Options" : "Iɣewwaṛen",
     "Yes" : "Oui",
     "No" : "Uhu",
     "Type" : "Anaw",
@@ -17,7 +19,9 @@ OC.L10N.register(
     "Confirm" : "Serggeg",
     "Edit" : "Ẓreg",
     "Close" : "Mdel",
+    "Owner" : "Bab",
     "Previous" : "Ɣer deffir",
+    "Next" : "Uḍfir",
     "Create" : "Snulfu-d",
     "Today" : "Ass-a"
 },
