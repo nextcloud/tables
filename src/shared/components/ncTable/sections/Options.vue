@@ -18,7 +18,8 @@
 				{{ t('tables', 'Export as CSV') }}
 			</NcActionButton>
 			<NcActionButton :close-after-click="true"
-				icon="icon-delete">
+				icon="icon-delete"
+				@click="deleteSelectedRows">
 				{{ t('tables', 'Delete selected rows') }}
 			</NcActionButton>
 		</NcActions>
@@ -63,6 +64,9 @@ export default {
 		getRowById(rowId) {
 			const index = this.rows.findIndex(row => row.id === rowId)
 			return this.rows[index]
+		},
+		deleteSelectedRows() {
+			this.$emit('delete-selected-rows', this.selectedRows)
 		},
 	},
 }

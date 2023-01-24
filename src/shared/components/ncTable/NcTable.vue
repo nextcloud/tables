@@ -9,10 +9,7 @@ update-selected-rows    -> send an array with selected row IDs
 create-row              -> click on create (plus) button
 create-column
 edit-columns
-
-not yet implemented events:
-delete-rows <array>     -> Array of rowIDs to delete
-create-row              -> trigger
+delete-selected-rows
 
 Props
 =====
@@ -39,7 +36,8 @@ config                  -> config object for the table
 			<Options :rows="rows"
 				:selected-rows="selectedRows"
 				@create-row="$emit('create-row')"
-				@download-csv="data => downloadCsv(data, columns, table)" />
+				@download-csv="data => downloadCsv(data, columns, table)"
+				@delete-selected-rows="rowIds => $emit('delete-selected-rows', rowIds)" />
 		</div>
 		<div class="custom-table row">
 			<CustomTable :columns="columns"
