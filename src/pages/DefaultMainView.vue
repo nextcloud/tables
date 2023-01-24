@@ -11,7 +11,8 @@
 				@edit-row="rowId => editRowId = rowId"
 				@create-column="showCreateColumn = true"
 				@edit-columns="showEditColumns = true"
-				@create-row="showCreateRow = true" />
+				@create-row="showCreateRow = true"
+				@delete-selected-rows="deleteRows" />
 
 			<CreateRow :columns="columns"
 				:show-modal="showCreateRow"
@@ -23,6 +24,7 @@
 				@close="editRowId = null" />
 			<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false" />
 			<EditColumns :show-modal="showEditColumns" @close="showEditColumns = false" />
+			<DeleteRows v-if="rowsToDelete" :rows-to-delete="rowsToDelete" @cancel="rowsToDelete = null" />
 		</div>
 	</div>
 </template>
@@ -35,10 +37,12 @@ import CreateRow from '../modules/main/modals/CreateRow.vue'
 import EditRow from '../modules/main/modals/EditRow.vue'
 import CreateColumn from '../modules/main/modals/CreateColumn.vue'
 import EditColumns from '../modules/main/modals/EditColumns.vue'
+import DeleteRows from '../modules/main/modals/DeleteRows.vue'
 
 export default {
 	name: 'DefaultMainView',
 	components: {
+		DeleteRows,
 		TableDescription,
 		NcTable,
 		CreateRow,
@@ -54,6 +58,7 @@ export default {
 			editRowId: null,
 			showCreateColumn: false,
 			showEditColumns: false,
+			rowsToDelete: null,
 		}
 	},
 	computed: {
@@ -85,6 +90,9 @@ export default {
 		this.reload()
 	},
 	methods: {
+		deleteRows(rowIds) {
+			this.rowsToDelete = rowIds
+		},
 		async reload() {
 			if (!this.activeTable) {
 				return
