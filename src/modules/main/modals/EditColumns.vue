@@ -330,6 +330,7 @@ export default {
 			} else {
 				showWarning(t('tables', 'Sorry, something went wrong.'))
 			}
+			this.deleteId = null
 		},
 	},
 }
