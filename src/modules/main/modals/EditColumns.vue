@@ -277,7 +277,6 @@ export default {
 		},
 		reset() {
 			this.loading = false
-			this.columns = null
 			this.editColumn = null
 			this.deleteId = null
 			this.editErrorTitle = false
