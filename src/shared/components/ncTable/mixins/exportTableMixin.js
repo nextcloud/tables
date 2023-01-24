@@ -5,7 +5,6 @@ export default {
 	methods: {
 
 		downloadCsv(rows, columns, table) {
-			console.debug('download csv in mixin - start', rows)
 			if (!rows || rows.length === 0) {
 				console.debug('downloadCSV has empty parameter, expected array ob row objects', rows)
 			}
@@ -22,7 +21,6 @@ export default {
 				})
 				data.push(rowData)
 			})
-			console.debug('data to export', data)
 
 			const csv = this.$papa.unparse(data)
 
