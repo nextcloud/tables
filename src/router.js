@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import { generateUrl } from '@nextcloud/router'
-import TableDefaultView from './pages/TableDefaultView.vue'
-import TablesOverviewView from './pages/TablesOverviewView.vue'
+import DefaultMainView from './pages/DefaultMainView.vue'
+import Startpage from './pages/Startpage.vue'
 
 Vue.use(Router)
 
@@ -12,11 +12,11 @@ export default new Router({
 	routes: [
 		{
 			path: '/',
-			component: TablesOverviewView,
+			component: Startpage,
 		},
 		{
 			path: '/table/:tableId',
-			component: TableDefaultView,
+			component: DefaultMainView,
 			name: 'table',
 		},
 	],
