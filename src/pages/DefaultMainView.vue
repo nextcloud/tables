@@ -1,0 +1,105 @@
+<template>
+	<div>
+		<div v-if="isLoading" class="icon-loading" />
+
+		<div v-if="!isLoading && activeTable">
+			<TableDescription />
+
+			<NcTable :rows="rows"
+				:columns="columns"
+				:table="activeTable"
+				@edit-row="rowId => editRowId = rowId"
+				@create-column="showCreateColumn = true"
+				@edit-columns="showEditColumns = true"
+				@create-row="showCreateRow = true" />
+
+			<CreateRow :columns="columns"
+				:show-modal="showCreateRow"
+				@close="showCreateRow = false" />
+			<EditRow :columns="columns"
+				:row="getEditRow"
+				:show-modal="editRowId !== null"
+				:out-transition="true"
+				@close="editRowId = null" />
+			<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false" />
+			<EditColumns :show-modal="showEditColumns" @close="showEditColumns = false" />
+		</div>
+	</div>
+</template>
+
+<script>
+import TableDescription from '../modules/main/sections/TableDescription.vue'
+import { mapState, mapGetters } from 'vuex'
+import NcTable from '../shared/components/ncTable/NcTable.vue'
+import CreateRow from '../modules/main/modals/CreateRow.vue'
+import EditRow from '../modules/main/modals/EditRow.vue'
+import CreateColumn from '../modules/main/modals/CreateColumn.vue'
+import EditColumns from '../modules/main/modals/EditColumns.vue'
+
+export default {
+	name: 'DefaultMainView',
+	components: {
+		TableDescription,
+		NcTable,
+		CreateRow,
+		EditRow,
+		CreateColumn,
+		EditColumns,
+	},
+	data() {
+		return {
+			localLoading: false,
+			lastActiveTableId: null,
+			showCreateRow: false,
+			editRowId: null,
+			showCreateColumn: false,
+			showEditColumns: false,
+		}
+	},
+	computed: {
+		...mapState({
+			columns: state => state.data.columns,
+			loading: state => state.data.loading,
+			rows: state => state.data.rows,
+		}),
+		...mapGetters(['activeTable']),
+		isLoading() {
+			return this.loading || this.localLoading
+		},
+		getEditRow() {
+			if (this.editRowId !== null) {
+				return this.rows.filter(item => {
+					return item.id === this.editRowId
+				})[0]
+			} else {
+				return null
+			}
+		},
+	},
+	watch: {
+		activeTable() {
+			this.reload()
+		},
+	},
+	mounted() {
+		this.reload()
+	},
+	methods: {
+		async reload() {
+			if (!this.activeTable) {
+				return
+			}
+
+			if (this.activeTable.id !== this.lastActiveTableId) {
+				this.localLoading = true
+				await this.$store.dispatch('loadColumnsFromBE', { tableId: this.activeTable.id })
+				await this.$store.dispatch('loadRowsFromBE', { tableId: this.activeTable.id })
+				this.lastActiveTableId = this.activeTable.id
+				this.localLoading = false
+			} else {
+				console.debug('activeTable is new set, but same as before', this.activeTable.id)
+			}
+		},
+	},
+}
+</script>
