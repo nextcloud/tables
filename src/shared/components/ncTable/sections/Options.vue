@@ -1,5 +1,5 @@
 <template>
-	<div class="space-LR-small" style="display: inline-flex;">
+	<div class="space-LR-small sticky">
 		<NcActions>
 			<NcActionButton :close-after-click="true"
 				icon="icon-add"
@@ -73,5 +73,11 @@ export default {
 </script>
 
 <style scoped>
+
+.sticky {
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top: 10px;
+}
 
 </style>

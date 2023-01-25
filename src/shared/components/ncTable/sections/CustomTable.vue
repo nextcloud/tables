@@ -11,7 +11,7 @@
 					@download-csv="data => $emit('download-csv', data)"
 					@select-all-rows="selectAllRows" />
 			</thead>
-			<tbody>
+			<tbody style="overflow-x: auto;">
 				<TableRow v-for="(row, index) in rows"
 					:key="index"
 					:row="row"
@@ -88,7 +88,7 @@ export default {
 
 .container {
   //margin: auto;
-  overflow-x: auto;
+  //overflow-x: auto;
 }
 
 ::v-deep table {
@@ -115,11 +115,15 @@ export default {
     th {
       vertical-align: middle;
       color: var(--color-text-maxcontrast);
-    }
-  }
 
-  th, td {
-    border-bottom: 1px solid var(--color-border);
+      // sticky head
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
+      box-shadow: inset 0 -1px 0 var(--color-border); // use box-shadow instead of border to be compatible with sticky heads
+      background-color: var(--color-main-background-translucent);
+      z-index: 5;
+    }
   }
 
   tbody {
@@ -127,6 +131,7 @@ export default {
     td {
       text-align: left;
       vertical-align: middle;
+      border-bottom: 1px solid var(--color-border);
     }
     tr:active, tr:hover, tr:focus {
       background-color: var(--color-background-dark);
