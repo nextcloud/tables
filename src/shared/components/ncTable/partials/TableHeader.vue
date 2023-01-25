@@ -1,6 +1,8 @@
 <template>
 	<tr>
-		<th><NcCheckboxRadioSwitch :checked="allRowsAreSelected" @update:checked="value => $emit('select-all-rows', value)" /> </th>
+		<th style="z-index: 6;">
+			<NcCheckboxRadioSwitch :checked="allRowsAreSelected" @update:checked="value => $emit('select-all-rows', value)" />
+		</th>
 		<th v-for="col in columns" :key="col.id">
 			{{ col.title }}
 		</th>
