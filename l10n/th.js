@@ -6,7 +6,7 @@ OC.L10N.register(
     "Name" : "ชื่อ",
     "Position" : "ตำแหน่ง",
     "Birthday" : "วันเกิด",
-    "Description" : "รายละเอียด",
+    "Description" : "คำอธิบาย",
     "Activity" : "กิจกรรม",
     "Sharing" : "การแชร์",
     "Documentation" : "เอกสารประกอบ",
