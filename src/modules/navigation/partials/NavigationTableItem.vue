@@ -2,17 +2,27 @@
 	<NcAppNavigationItem v-if="table"
 		:title="table.title"
 		:class="{active: activeTable && table.id === activeTable.id}"
-		icon="icon-category-organization"
-		:editable="canEditTableTitle"
-		:edit-placeholder="t('tables', 'Tables title')"
-		:edit-label="t('tables', 'Edit title')"
 		:allow-collapse="false"
 		:open="false"
 		:force-menu="false"
 		:to="'/table/' + parseInt(table.id)"
-		@click="closeNav"
-		@update:title="updateTableTitle">
+		@click="closeNav">
+		<template #icon>
+			<template v-if="table.emoji">
+				{{ table.emoji }}
+			</template>
+			<template v-else>
+				<Table :size="20" />
+			</template>
+		</template>
+
 		<template #actions>
+			<NcActionButton v-if="canEditTableTitle"
+				icon="icon-rename"
+				:close-after-click="true"
+				@click="$emit('edit-table', table.id)">
+				{{ t('tables', 'Edit table') }}
+			</NcActionButton>
 			<NcActionButton v-if="!table.isShared"
 				icon="icon-share"
 				:close-after-click="true"
@@ -22,7 +32,7 @@
 			<NcActionButton v-if="!table.isShared"
 				icon="icon-delete"
 				:close-after-click="true"
-				@click="actionDelete">
+				@click="showDeletionConfirmation = true">
 				{{ t('tables', 'Delete table') }}
 			</NcActionButton>
 		</template>
@@ -33,21 +43,22 @@
 			confirm-class="error"
 			:show-modal="showDeletionConfirmation"
 			@confirm="deleteMe"
-			@cancel="cancelDeletion" />
+			@cancel="showDeletionConfirmation = false" />
 	</NcAppNavigationItem>
 </template>
 <script>
 import { NcActionButton, NcAppNavigationItem } from '@nextcloud/vue'
-import axios from '@nextcloud/axios'
-import { generateUrl } from '@nextcloud/router'
-import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
+import { showSuccess } from '@nextcloud/dialogs'
 import DialogConfirmation from '../../../shared/modals/DialogConfirmation.vue'
 import { mapGetters } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
+import Table from 'vue-material-design-icons/Table.vue'
 
 export default {
 	name: 'NavigationTableItem',
 	components: {
+		// eslint-disable-next-line vue/no-reserved-component-names
+		Table,
 		DialogConfirmation,
 		NcActionButton,
 		NcAppNavigationItem,
@@ -89,45 +100,19 @@ export default {
 				})
 			}
 		},
-		cancelDeletion() {
-			// console.debug('click on cancel', null)
-			this.showDeletionConfirmation = false
-		},
-		actionDelete() {
-			this.showDeletionConfirmation = true
-		},
 		async deleteMe() {
+			const deleteId = this.table.id
+			const activeTableId = this.activeTable.id
 
-			const res = await axios.delete(generateUrl('/apps/tables/table/' + this.table.id))
-			if (res.status === 200) {
-				showWarning(t('tables', 'Table "{table}" deleted.', { table: res.data.title }))
-				await this.$store.dispatch('loadTablesFromBE')
-			} else {
-				showWarning(t('tables', 'Sorry, something went wrong.'))
-				console.debug('axios error', res)
-			}
-			await this.$router.push('/').catch(err => err)
+			const res = await this.$store.dispatch('removeTable', { tableId: this.table.id })
+			if (res) {
+				showSuccess(t('tables', 'Table "{emoji}{table}" removed.', { emoji: this.table.emoji ? this.table.emoji + ' ' : '', table: this.table.title }))
 
-			this.showDeletionConfirmation = false
-		},
-		async updateTableTitle(newTitle) {
-			// console.debug('try to set new table title: ', newTitle)
-			try {
-				// const data = { title: newTitle }
-				const data = this.table
-				data.title = newTitle
-				// console.debug('data to update', data)
-				const res = await axios.put(generateUrl('/apps/tables/table/' + this.table.id), data)
-				if (res.status === 200) {
-					showSuccess(t('tables', 'Table title is updated to "{table}"', { table: res.data.title }))
-					await this.$store.dispatch('loadTablesFromBE')
-				} else {
-					showWarning(t('tables', 'Sorry, something went wrong.'))
-					console.debug('axios error', res)
+				// if the actual table was deleted, go to startpage
+				if (deleteId === activeTableId) {
+					await this.$router.push('/').catch(err => err)
 				}
-			} catch (e) {
-				console.error(e)
-				showError(t('tables', 'Could not update tables title'))
+				this.showDeletionConfirmation = false
 			}
 		},
 	},

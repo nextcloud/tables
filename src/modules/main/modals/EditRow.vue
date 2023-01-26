@@ -39,7 +39,7 @@
 					:value.sync="localRow[column.id]" />
 			</div>
 			<div class="row">
-				<div class="fix-col-3 space-B space-T">
+				<div class="fix-col-2 space-B space-T">
 					<NcButton type="secondary" @click="actionCancel">
 						{{ t('tables', 'Cancel') }}
 					</NcButton>
@@ -49,7 +49,7 @@
 					</NcButton>
 					<div v-if="localLoading" class="icon-loading" style="margin-left: 20px;" />
 				</div>
-				<div v-if="canDeleteDataActiveTable && !localLoading" class="fix-col-1 space-B space-T" style="justify-content: end;">
+				<div v-if="canDeleteDataActiveTable && !localLoading" class="fix-col-2 space-B space-T" style="justify-content: end;">
 					<NcButton v-if="!prepareDeleteRow" type="error" @click="prepareDeleteRow = true">
 						{{ t('tables', 'Delete') }}
 					</NcButton>

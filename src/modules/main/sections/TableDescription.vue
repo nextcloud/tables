@@ -2,7 +2,7 @@
 	<div>
 		<div class="row first-row">
 			<h1>
-				{{ activeTable.title }}
+				{{ activeTable.emoji }}&nbsp;{{ activeTable.title }}
 			</h1>
 		</div>
 		<div class="row space-LR space-T">
