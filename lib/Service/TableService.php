@@ -111,11 +111,12 @@ class TableService extends SuperService {
 	 * @throws \OCP\DB\Exception
 	 * @throws InternalError|PermissionError
 	 */
-	public function create($title, $template): Table {
+	public function create($title, $template, $emoji): Table {
 		$userId = $this->userId;
 		$time = new DateTime();
 		$item = new Table();
 		$item->setTitle($title);
+        $item->setEmoji($emoji);
 		$item->setOwnership($userId);
 		$item->setCreatedBy($userId);
 		$item->setLastEditBy($userId);
@@ -138,7 +139,7 @@ class TableService extends SuperService {
 	 *
 	 * @throws InternalError
 	 */
-	public function update($id, $title, $userId) {
+	public function update($id, $title, $emoji, $userId) {
 		try {
 			$item = $this->mapper->find($id);
 
@@ -149,6 +150,7 @@ class TableService extends SuperService {
 
 			$time = new DateTime();
 			$item->setTitle($title);
+            $item->setEmoji($emoji);
 			$item->setLastEditBy($userId);
 			$item->setLastEditAt($time->format('Y-m-d H:i:s'));
 			return $this->addOwnerDisplayName($this->mapper->update($item));

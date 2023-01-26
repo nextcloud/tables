@@ -3,11 +3,12 @@
 namespace OCA\Tables\Db;
 
 use JsonSerializable;
-
 use OCP\AppFramework\Db\Entity;
 
 class Table extends Entity implements JsonSerializable {
 	protected $title;
+
+    protected $emoji;
 	protected $ownership;
 	protected $ownerDisplayName;
 	protected $createdBy;
@@ -25,6 +26,7 @@ class Table extends Entity implements JsonSerializable {
 		return [
 			'id' => $this->id,
 			'title' => $this->title,
+            'emoji' => $this->emoji,
 			'ownership' => $this->ownership,
 			'ownerDisplayName' => $this->ownerDisplayName,
 			'createdBy' => $this->createdBy,

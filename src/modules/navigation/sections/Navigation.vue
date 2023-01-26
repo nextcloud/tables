@@ -9,14 +9,14 @@
 
 				<NcAppNavigationCaption :title="t('tables', 'My tables')">
 					<template #actions>
-						<NcActionButton icon="icon-add" @click="showModalCreateTable = true" />
+						<NcActionButton icon="icon-add" @click.prevent="showModalCreateTable = true" />
 					</template>
 				</NcAppNavigationCaption>
-				<CreateTable :show-modal="showModalCreateTable" @close="actionCloseModalNewTable" />
 
 				<NavigationTableItem v-for="table in getOwnTables"
 					:key="table.id"
-					:table="table" />
+					:table="table"
+					@edit-table="id => editTableId = id" />
 
 				<NcAppNavigationCaption v-if="getSharedTables.length > 0"
 					:title="t('tables', 'Shared tables')" />
@@ -25,6 +25,9 @@
 					:key="table.id"
 					:table="table" />
 			</ul>
+
+			<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
+			<EditTable :show-modal="editTableId !== null" :table-id="editTableId" @close="editTableId = null " />
 		</template>
 	</NcAppNavigation>
 </template>
@@ -32,6 +35,7 @@
 <script>
 import { NcAppNavigation, NcAppNavigationItem, NcAppNavigationCaption, NcActionButton } from '@nextcloud/vue'
 import CreateTable from '../modals/CreateTable.vue'
+import EditTable from '../modals/EditTable.vue'
 import NavigationTableItem from '../partials/NavigationTableItem.vue'
 import { mapState, mapGetters } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
@@ -42,6 +46,7 @@ export default {
 		NavigationTableItem,
 		NcAppNavigation,
 		CreateTable,
+		EditTable,
 		NcAppNavigationItem,
 		NcAppNavigationCaption,
 		NcActionButton,
@@ -49,8 +54,8 @@ export default {
 	data() {
 		return {
 			loading: true,
-			showModalAddNewTable: false,
 			showModalCreateTable: false,
+			editTableId: null, // if null, no modal open
 		}
 	},
 	computed: {
@@ -70,9 +75,6 @@ export default {
 					open: false,
 				})
 			}
-		},
-		actionCloseModalNewTable() {
-			this.showModalCreateTable = false
 		},
 	},
 }
