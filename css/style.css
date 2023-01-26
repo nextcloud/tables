@@ -50,7 +50,7 @@ button[class^='icon-'] {
 	min-width: 36px !important;
 }
 
-[class^='col-'] span {
+[class^='col-'] > span {
 	color: var(--color-text-lighter);
 	font-weight: 100;
 }
