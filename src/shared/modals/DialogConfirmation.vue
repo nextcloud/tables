@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal" @close="actionCancel">
+	<NcModal v-if="showModal" @close="$emit('cancel')">
 		<div class="modal__content">
 			<div class="row">
 				<div v-if="title" class="col-4">
@@ -10,13 +10,15 @@
 				</div>
 			</div>
 			<div class="row space-T">
-				<div class="col-4 col-stretch-elements">
-					<button :class="{ error: cancelClass === 'error', success: cancelClass === 'success', warning: cancelClass === 'warning' }" @click="actionCancel">
+				<div class="col-4 col-stretch-elements" style="display: inline-flex;">
+					<NcButton :type="cancelClass"
+						@click="$emit('cancel')">
 						{{ cancelTitle }}
-					</button>
-					<button :class="{ error: confirmClass === 'error', success: confirmClass === 'success', warning: confirmClass === 'warning' }" @click="actionConfirm">
+					</NcButton>
+          &nbsp;&nbsp;
+					<NcButton :type="confirmClass" @click="$emit('confirm')">
 						{{ confirmTitle }}
-					</button>
+					</NcButton>
 				</div>
 			</div>
 		</div>
@@ -24,12 +26,13 @@
 </template>
 
 <script>
-import { NcModal } from '@nextcloud/vue'
+import { NcModal, NcButton } from '@nextcloud/vue'
 
 export default {
 	name: 'DialogConfirmation',
 	components: {
 		NcModal,
+		NcButton,
 	},
 	props: {
 		showModal: {
@@ -50,7 +53,7 @@ export default {
 		},
 		confirmClass: {
 			type: String,
-			default: 'success', // error, warning, success
+			default: 'success', // primary, secondary, tertiary, tertiary-no-background, tertiary-on-primary, error, warning, success
 		},
 		cancelTitle: {
 			type: String,
@@ -58,15 +61,7 @@ export default {
 		},
 		cancelClass: {
 			type: String,
-			default: null, // error, warning, success
-		},
-	},
-	methods: {
-		actionConfirm() {
-			this.$emit('confirm')
-		},
-		actionCancel() {
-			this.$emit('cancel')
+			default: 'secondary', // primary, secondary, tertiary, tertiary-no-background, tertiary-on-primary, error, warning, success
 		},
 	},
 }
