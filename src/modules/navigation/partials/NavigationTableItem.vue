@@ -1,6 +1,6 @@
 <template>
 	<NcAppNavigationItem v-if="table"
-		:title="table.title"
+		:name="table.title"
 		:class="{active: activeTable && table.id === activeTable.id}"
 		:allow-collapse="false"
 		:open="false"
