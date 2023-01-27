@@ -3,13 +3,9 @@
 		<template #list>
 			<div v-if="tablesLoading" class="icon-loading" />
 			<ul v-if="!tablesLoading">
-				<NcAppNavigationItem :title="t('tables', 'Start page')"
-					icon="icon-home"
-					@click="$router.push('/').catch(() => {}); closeNav()" />
-
 				<NcAppNavigationCaption :title="t('tables', 'My tables')">
 					<template #actions>
-						<NcActionButton icon="icon-add" @click.prevent="showModalCreateTable = true" />
+						<NcActionButton icon="icon-add" @click.prevent="createTable" />
 					</template>
 				</NcAppNavigationCaption>
 
@@ -33,12 +29,12 @@
 </template>
 
 <script>
-import { NcAppNavigation, NcAppNavigationItem, NcAppNavigationCaption, NcActionButton } from '@nextcloud/vue'
+import { NcAppNavigation, NcAppNavigationCaption, NcActionButton } from '@nextcloud/vue'
 import CreateTable from '../modals/CreateTable.vue'
 import EditTable from '../modals/EditTable.vue'
 import NavigationTableItem from '../partials/NavigationTableItem.vue'
 import { mapState, mapGetters } from 'vuex'
-import { emit } from '@nextcloud/event-bus'
+import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 
 export default {
 	name: 'Navigation',
@@ -47,7 +43,6 @@ export default {
 		NcAppNavigation,
 		CreateTable,
 		EditTable,
-		NcAppNavigationItem,
 		NcAppNavigationCaption,
 		NcActionButton,
 	},
@@ -68,7 +63,16 @@ export default {
 			return this.tables.filter((item) => { return item.isShared === false }).sort((a, b) => a.title.localeCompare(b.title))
 		},
 	},
+	mounted() {
+		subscribe('create-table', this.createTable)
+	},
+	beforeDestroy() {
+		unsubscribe('create-table', this.createTable)
+	},
 	methods: {
+		createTable() {
+			this.showModalCreateTable = true
+		},
 		closeNav() {
 			if (window.innerWidth < 960) {
 				emit('toggle-navigation', {
