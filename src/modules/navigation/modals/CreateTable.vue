@@ -1,6 +1,5 @@
 <template>
 	<NcModal v-if="showModal"
-		size="large"
 		@close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
@@ -28,7 +27,7 @@
 				</div>
 			</div>
 			<div class="row space-T">
-				<div class="box-1" style="min-height:180px;">
+				<div class="box-1" style="height:120px;">
 					<div class="header">
 						<NcCheckboxRadioSwitch name="template"
 							type="radio"
@@ -46,7 +45,7 @@
 				<div v-for="template in templates"
 					:key="template.name"
 					class="box-1"
-					style="min-height:180px;">
+					style="height:120px; overflow: auto;">
 					<div class="header">
 						<NcCheckboxRadioSwitch name="template"
 							type="radio"
@@ -61,9 +60,15 @@
 				</div>
 			</div>
 			<div class="row">
-				<NcButton type="primary" @click="submit">
-					{{ t('tables', 'Create table') }}
-				</NcButton>
+				<div class="fix-col-4 space-B space-T">
+					<NcButton type="secondary" @click="$emit('close')">
+						{{ t('tables', 'Cancel') }}
+					</NcButton>
+        &nbsp;&nbsp;
+					<NcButton type="primary" @click="submit">
+						{{ t('tables', 'Create table') }}
+					</NcButton>
+				</div>
 			</div>
 		</div>
 	</NcModal>
@@ -71,7 +76,7 @@
 
 <script>
 import { NcModal, NcEmojiPicker, NcButton, NcCheckboxRadioSwitch } from '@nextcloud/vue'
-import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
+import { showError, showWarning } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 
