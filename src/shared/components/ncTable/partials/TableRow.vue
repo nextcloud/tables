@@ -62,8 +62,15 @@ export default {
 				return null
 			}
 
+			// lets see if we have a value
 			const cell = this.row.data.find(item => item.columnId === columnId)
-			return cell ? '' + cell.value : null
+
+			// if no value is given, try to get the default value from the column definition
+			if (!cell) {
+				const column = this.columns.filter(column => column.id === columnId)[0]
+				return column[column.type + 'Default']
+			}
+			return cell.value
 		},
 	},
 }

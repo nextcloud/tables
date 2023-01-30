@@ -274,6 +274,7 @@ export default {
 			}
 			this.editErrorTitle = false
 			await this.updateColumn()
+			this.editColumn = null
 		},
 		reset() {
 			this.loading = false
