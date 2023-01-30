@@ -20,6 +20,16 @@ export default {
 		},
 	},
 
+	getters: {
+		getColumnById: (state) => (id) => {
+			return state.columns.filter(column => column.id === id)[0]
+		},
+		getDefaultValueFromColumn: (state) => (id) => {
+			const column = this.getColumnById(id)
+			return column[column.type + 'Default']
+		},
+	},
+
 	actions: {
 
 		// COLUMNS

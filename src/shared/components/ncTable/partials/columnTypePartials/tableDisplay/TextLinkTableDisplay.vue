@@ -1,5 +1,7 @@
 <template>
-	<table v-if="column" style="width: 100%;" />
+	<table v-if="column" style="width: 100%;">
+		<tr><td>{{ t('tables', 'Type') }}</td><td>{{ t('tables', 'URL') }}</td></tr>
+	</table>
 </template>
 
 <script>
