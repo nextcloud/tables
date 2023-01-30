@@ -18,7 +18,6 @@ export default {
 						set = row.data.find(d => d.columnId === column.id)
 					}
 					let value = ''
-					console.debug('try to export csv', column)
 					if (column.type === 'text' && column.subtype === 'long' && set) {
 						value = set.value.replace(/(<([^>]+)>)/ig, '')
 					} else {
