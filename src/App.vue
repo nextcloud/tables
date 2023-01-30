@@ -37,16 +37,14 @@
 
 <script>
 import { NcContent, NcAppContent, NcAppSidebar, NcAppSidebarTab } from '@nextcloud/vue'
-import Navigation from './Navigation.vue'
+import Navigation from './modules/navigation/sections/Navigation.vue'
 import { mapGetters, mapState } from 'vuex'
-import axios from '@nextcloud/axios'
-import { generateOcsUrl } from '@nextcloud/router'
-import SidebarSharing from './pages/sections/SidebarSharing.vue'
+import SidebarSharing from './modules/sidebar/sections/SidebarSharing.vue'
 
 export default {
 	name: 'App',
 	components: {
-    SidebarSharing,
+		SidebarSharing,
 		NcContent,
 		NcAppContent,
 		Navigation,
