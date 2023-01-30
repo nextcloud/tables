@@ -13,19 +13,19 @@
 				@edit-columns="showEditColumns = true"
 				@create-row="showCreateRow = true"
 				@delete-selected-rows="deleteRows" />
-
-			<CreateRow :columns="columns"
-				:show-modal="showCreateRow"
-				@close="showCreateRow = false" />
-			<EditRow :columns="columns"
-				:row="getEditRow"
-				:show-modal="editRowId !== null"
-				:out-transition="true"
-				@close="editRowId = null" />
-			<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false" />
-			<EditColumns :show-modal="showEditColumns" @close="showEditColumns = false" />
-			<DeleteRows v-if="rowsToDelete" :rows-to-delete="rowsToDelete" @cancel="rowsToDelete = null" />
 		</div>
+
+		<CreateRow :columns="columns"
+			:show-modal="showCreateRow"
+			@close="showCreateRow = false" />
+		<EditRow :columns="columns"
+			:row="getEditRow"
+			:show-modal="editRowId !== null"
+			:out-transition="true"
+			@close="editRowId = null" />
+		<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false" />
+		<EditColumns :show-modal="showEditColumns" @close="showEditColumns = false" />
+		<DeleteRows v-if="rowsToDelete" :rows-to-delete="rowsToDelete" @cancel="rowsToDelete = null" />
 	</div>
 </template>
 
