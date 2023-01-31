@@ -5,7 +5,8 @@
 		<div v-if="!isLoading && activeTable">
 			<TableDescription />
 
-			<NcTable :rows="rows"
+			<NcTable v-if="columns.length > 0"
+				:rows="rows"
 				:columns="columns"
 				:table="activeTable"
 				@edit-row="rowId => editRowId = rowId"
@@ -13,6 +14,8 @@
 				@edit-columns="showEditColumns = true"
 				@create-row="showCreateRow = true"
 				@delete-selected-rows="deleteRows" />
+
+			<EmptyTable v-if="columns.length === 0" @create-column="showCreateColumn = true" />
 		</div>
 
 		<CreateRow :columns="columns"
@@ -38,10 +41,12 @@ import EditRow from '../modules/main/modals/EditRow.vue'
 import CreateColumn from '../modules/main/modals/CreateColumn.vue'
 import EditColumns from '../modules/main/modals/EditColumns.vue'
 import DeleteRows from '../modules/main/modals/DeleteRows.vue'
+import EmptyTable from '../modules/main/sections/EmptyTable.vue'
 
 export default {
 	name: 'DefaultMainView',
 	components: {
+		EmptyTable,
 		DeleteRows,
 		TableDescription,
 		NcTable,
@@ -86,6 +91,12 @@ export default {
 			this.reload()
 		},
 	},
+	updated() {
+		console.debug('updated: new table, lets check if we have columns', this.columns)
+		if (this.columns && this.columns.length === 0) {
+			// this.showCreateColumn = true
+		}
+	},
 	mounted() {
 		this.reload()
 	},
@@ -104,8 +115,6 @@ export default {
 				await this.$store.dispatch('loadRowsFromBE', { tableId: this.activeTable.id })
 				this.lastActiveTableId = this.activeTable.id
 				this.localLoading = false
-			} else {
-				console.debug('activeTable is new set, but same as before', this.activeTable.id)
 			}
 		},
 	},
