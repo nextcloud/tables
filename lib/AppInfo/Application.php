@@ -14,7 +14,7 @@ class Application extends App {
 		parent::__construct(self::APP_ID);
 
 		/* @var IEventDispatcher $eventDispatcher */
-		$dispatcher = $this->getContainer()->query(IEventDispatcher::class);
+		$dispatcher = $this->getContainer()->get(IEventDispatcher::class);
 		$dispatcher->addServiceListener(BeforeUserDeletedEvent::class, UserDeletedListener::class);
 	}
 }

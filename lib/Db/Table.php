@@ -5,6 +5,9 @@ namespace OCA\Tables\Db;
 use JsonSerializable;
 use OCP\AppFramework\Db\Entity;
 
+/**
+ * @psalm-suppress PropertyNotSetInConstructor
+ */
 class Table extends Entity implements JsonSerializable {
 	protected ?string $title = null;
 

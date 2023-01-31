@@ -6,6 +6,9 @@ use JsonSerializable;
 
 use OCP\AppFramework\Db\Entity;
 
+/**
+ * @psalm-suppress PropertyNotSetInConstructor
+ */
 class Share extends Entity implements JsonSerializable {
 	protected ?string $sender = null; // is also owner
 
