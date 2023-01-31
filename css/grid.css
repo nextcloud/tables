@@ -4,9 +4,10 @@
 }
 
 .row.first-row {
-	padding-top: 35px;
-	padding-left: 45px;
+	padding-top: 18px;
+	padding-left: 60px;
 	width: calc(100% - 45px);
+	margin-bottom: 30px;
 }
 
 .row::after {
