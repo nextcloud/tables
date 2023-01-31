@@ -1,7 +1,8 @@
 <template>
 	<div class="space-LR-small sticky">
 		<NcActions>
-			<NcActionButton :close-after-click="true"
+			<NcActionButton v-if="showOptions"
+				:close-after-click="true"
 				icon="icon-add"
 				@click="$emit('create-row')">
 				{{ t('tables', 'Create row') }}
@@ -44,6 +45,10 @@ export default {
 		rows: {
 			type: Array,
 			default: () => [],
+		},
+		showOptions: {
+			type: Boolean,
+			default: true,
 		},
 	},
 	computed: {

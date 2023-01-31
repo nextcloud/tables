@@ -35,6 +35,7 @@ config                  -> config object for the table
 		<div class="options row">
 			<Options :rows="rows"
 				:selected-rows="selectedRows"
+				:show-options="columns.length !== 0"
 				@create-row="$emit('create-row')"
 				@download-csv="data => downloadCsv(data, columns, table)"
 				@delete-selected-rows="rowIds => $emit('delete-selected-rows', rowIds)" />
