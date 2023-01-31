@@ -4,10 +4,12 @@
 }
 
 .row.first-row {
-	padding-top: 18px;
+	padding-top: 10px;
 	padding-left: 60px;
 	width: calc(100% - 45px);
 	margin-bottom: 30px;
+	align-items: center;
+	display: inline-flex;
 }
 
 .row::after {
@@ -189,10 +191,6 @@
 @media only screen and (max-width: 1025px) {
 	.hide-m {
 		display: none;
-	}
-
-	.row.first-row {
-		padding-top: 20px;
 	}
 }
 
