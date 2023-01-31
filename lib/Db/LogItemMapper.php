@@ -3,7 +3,6 @@
 namespace OCA\Tables\Db;
 
 use OCP\AppFramework\Db\DoesNotExistException;
-use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
@@ -12,7 +11,7 @@ use OCP\IDBConnection;
 
 /** @template-extends QBMapper<LogItem> */
 class LogItemMapper extends QBMapper {
-	protected $table = 'tables_log';
+	protected string $table = 'tables_log';
 
 	public function __construct(IDBConnection $db) {
 		parent::__construct($db, $this->table, LogItem::class);
@@ -20,12 +19,13 @@ class LogItemMapper extends QBMapper {
 
 	/**
 	 * @param int $id
-	 * @return Entity|Table
-	 * @throws MultipleObjectsReturnedException
-	 * @throws Exception
+	 *
+	 * @return LogItem
 	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @throws MultipleObjectsReturnedException
 	 */
-	public function find(int $id): Table {
+	public function find(int $id): LogItem {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)

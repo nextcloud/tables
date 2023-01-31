@@ -12,7 +12,7 @@ use OCP\IDBConnection;
 
 /** @template-extends QBMapper<Column> */
 class ColumnMapper extends QBMapper {
-	protected $table = 'tables_columns';
+	protected string $table = 'tables_columns';
 
 	public function __construct(IDBConnection $db) {
 		parent::__construct($db, $this->table, Column::class);
@@ -20,7 +20,7 @@ class ColumnMapper extends QBMapper {
 
 	/**
 	 * @param int $id
-	 * @return Entity|Table
+	 *
 	 * @throws MultipleObjectsReturnedException
 	 * @throws Exception
 	 * @throws DoesNotExistException

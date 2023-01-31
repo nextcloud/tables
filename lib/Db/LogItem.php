@@ -6,13 +6,16 @@ use JsonSerializable;
 
 use OCP\AppFramework\Db\Entity;
 
+/**
+ * @psalm-suppress PropertyNotSetInConstructor
+ */
 class LogItem extends Entity implements JsonSerializable {
-	protected $userId;
-	protected $time;
-	protected $actionType;
-	protected $actionData;
-	protected $triggerType;
-	protected $dataType;
+	protected ?string $userId = null;
+	protected ?string $time = null;
+	protected ?string $actionType = null;
+	protected ?string $actionData = null;
+	protected ?string $triggerType = null;
+	protected ?string $dataType = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');
