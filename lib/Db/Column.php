@@ -62,7 +62,7 @@ class Column extends Entity implements JsonSerializable {
 	public function getSelectionOptionsArray():array {
 		$options = $this->getSelectionOptions();
 		if ($options !== "") {
-			return \json_decode($options ?: [], true);
+			return \json_decode($options, true);
 		} else {
 			return [];
 		}
