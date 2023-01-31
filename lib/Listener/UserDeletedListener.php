@@ -10,12 +10,13 @@ use OCP\EventDispatcher\Event;
 use OCP\User\Events\BeforeUserDeletedEvent;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @template-implements IEventListener<Event|BeforeUserDeletedEvent>
+ */
 class UserDeletedListener implements IEventListener {
-	/** @var TableService */
-	private $tableService;
+	private TableService $tableService;
 
-	/** @var LoggerInterface */
-	private $logger;
+	private LoggerInterface $logger;
 
 	public function __construct(TableService $tableService, LoggerInterface $logger) {
 		$this->tableService = $tableService;
@@ -34,7 +35,6 @@ class UserDeletedListener implements IEventListener {
 			// delete tables
 			$this->logger->debug('found '.count($tables).' tables for the user');
 			foreach ($tables as $table) {
-				/** @var $table Table */
 				$this->tableService->delete($table->getId(), $event->getUser()->getUID());
 			}
 			$this->logger->debug('tables for the deleted user removed');

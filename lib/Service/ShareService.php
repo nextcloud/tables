@@ -19,16 +19,13 @@ use OCA\Tables\Db\TableMapper;
 use Psr\Log\LoggerInterface;
 
 class ShareService extends SuperService {
-	/** @var ShareMapper */
-	protected $mapper;
+	protected ShareMapper $mapper;
 
-	/** @var TableMapper */
-	protected $tableMapper;
+	protected TableMapper $tableMapper;
 
-	/** @var UserHelper */
-	protected $userHelper;
+	protected UserHelper $userHelper;
 
-	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, $userId,
+	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, string $userId,
 	ShareMapper $shareMapper, TableMapper $tableMapper, UserHelper $userHelper) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $shareMapper;
@@ -39,11 +36,13 @@ class ShareService extends SuperService {
 
 	/**
 	 * @throws InternalError
+	 *
+	 * @psalm-param 'table' $nodeType
 	 */
-	public function findAll($nodeType, int $tableId): array {
+	public function findAll(string $nodeType, int $tableId): array {
 		try {
 			$shares = $this->mapper->findAllSharesForNode($nodeType, $tableId, $this->userId);
-			return $this->addReceiverDisplayName($shares);
+			return $this->addReceiverDisplayNames($shares);
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
@@ -52,11 +51,13 @@ class ShareService extends SuperService {
 
 
 	/**
-	 * @throws PermissionError
-	 * @throws NotFoundError
+	 * @param int $id
+	 * @return Share
 	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
 	 */
-	public function find($id) {
+	public function find(int $id):Share {
 		try {
 			$item = $this->mapper->find($id);
 
@@ -118,10 +119,19 @@ class ShareService extends SuperService {
 	/**
 	 * @noinspection PhpUndefinedMethodInspection
 	 *
-	 * @throws \OCP\DB\Exception
+	 * @param int $nodeId
+	 * @param string $nodeType
+	 * @param string $receiver
+	 * @param string $receiverType
+	 * @param bool $permissionRead
+	 * @param bool $permissionCreate
+	 * @param bool $permissionUpdate
+	 * @param bool $permissionDelete
+	 * @param bool $permissionManage
+	 * @return Share
 	 * @throws InternalError
 	 */
-	public function create($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage) {
+	public function create(int $nodeId, string $nodeType, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage):Share {
 		$time = new DateTime();
 		$item = new Share();
 		$item->setSender($this->userId);
@@ -148,9 +158,13 @@ class ShareService extends SuperService {
 	/**
 	 * @noinspection PhpUndefinedMethodInspection
 	 *
+	 * @param int $id
+	 * @param string $permission
+	 * @param bool $value
+	 * @return Share
 	 * @throws InternalError
 	 */
-	public function updatePermission($id, $permission, $value) {
+	public function updatePermission(int $id, string $permission, bool $value): Share {
 		try {
 			$item = $this->mapper->find($id);
 
@@ -192,9 +206,11 @@ class ShareService extends SuperService {
 	}
 
 	/**
+	 * @param int $id
+	 * @return Share
 	 * @throws InternalError
 	 */
-	public function delete($id) {
+	public function delete(int $id): Share {
 		try {
 			$item = $this->mapper->find($id);
 
@@ -211,26 +227,26 @@ class ShareService extends SuperService {
 		}
 	}
 
-	private function addReceiverDisplayName($shares) {
-		if (!$shares && !is_array($shares)) {
-			$this->logger->error("Try to load receiverDisplayName, but no share is given");
-			return "";
-		}
-
-		if (is_array($shares)) {
-			$return = [];
-			foreach ($shares as $share) {
-				$share->setReceiverDisplayName($this->userHelper->getUserDisplayName($share->getReceiver()));
-				$return[] = $share;
-			}
-			return $return;
-		} else {
-			$shares->setReceiverDisplayName($this->userHelper->getUserDisplayName($shares->getReceiver()));
-			return $shares;
-		}
+	/**
+	 * @param Share $share
+	 * @return Share
+	 * @noinspection PhpUndefinedMethodInspection
+	 */
+	private function addReceiverDisplayName(Share $share):Share {
+		$share->setReceiverDisplayName($this->userHelper->getUserDisplayName($share->getReceiver()));
+		return $share;
 	}
 
-	public function deleteAllForTable(Table $table) {
+	private function addReceiverDisplayNames(array $shares): array {
+		$return = [];
+		foreach ($shares as $share) {
+			$share->setReceiverDisplayName($this->userHelper->getUserDisplayName($share->getReceiver()));
+			$return[] = $share;
+		}
+		return $return;
+	}
+
+	public function deleteAllForTable(Table $table):void {
 		try {
 			$this->mapper->deleteByNode($table->getId(), 'table');
 		} catch (\OCP\DB\Exception $e) {

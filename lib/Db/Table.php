@@ -6,17 +6,17 @@ use JsonSerializable;
 use OCP\AppFramework\Db\Entity;
 
 class Table extends Entity implements JsonSerializable {
-	protected $title;
+	protected ?string $title = null;
 
-	protected $emoji;
-	protected $ownership;
-	protected $ownerDisplayName;
-	protected $createdBy;
-	protected $createdAt;
-	protected $lastEditBy;
-	protected $lastEditAt;
-	protected $isShared;
-	protected $onSharePermissions;
+	protected ?string $emoji = null;
+	protected ?string $ownership = null;
+	protected ?string $ownerDisplayName = null;
+	protected ?string $createdBy = null;
+	protected ?string $createdAt = null;
+	protected ?string $lastEditBy = null;
+	protected ?string $lastEditAt = null;
+	protected ?bool $isShared = null;
+	protected ?array $onSharePermissions = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');

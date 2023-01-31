@@ -3,28 +3,23 @@
 namespace OCA\Tables\Helper;
 
 use OCA\Tables\Errors\InternalError;
-use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IUser;
 use OCP\IUserManager;
 use Psr\Log\LoggerInterface;
 
 class UserHelper {
-	/** @var IUserManager @var IUserManager */
-	private $userManager;
+	private IUserManager $userManager;
 
-	/** @var LoggerInterface */
-	private $logger;
-
-	/** @var IGroupManager */
-	private $groupManager;
+	private LoggerInterface $logger;
+	private IGroupManager $groupManager;
 
 	public function __construct(IUserManager $userManager, LoggerInterface $logger, IGroupManager $groupManager) {
 		$this->userManager = $userManager;
 		$this->logger = $logger;
 		$this->groupManager = $groupManager;
 	}
-	public function getUserDisplayName($userId): string {
+	public function getUserDisplayName(string $userId): string {
 		try {
 			$user = $this->getUser($userId);
 			return $user->getDisplayName() ? $user->getDisplayName() : $userId;
@@ -46,10 +41,11 @@ class UserHelper {
 	}
 
 	/**
+	 * @param string $userId
+	 * @return array
 	 * @throws InternalError
-	 * @return IGroup[]
 	 */
-	public function getGroupsForUser($userId): array {
+	public function getGroupsForUser(string $userId): array {
 		$user = $this->getUser($userId);
 		return $this->groupManager->getUserGroups($user);
 	}

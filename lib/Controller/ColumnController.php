@@ -19,7 +19,7 @@ class ColumnController extends Controller {
 
 	public function __construct(IRequest     $request,
 								ColumnService $service,
-											 $userId) {
+											 string $userId) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->service = $service;
 		$this->userId = $userId;
