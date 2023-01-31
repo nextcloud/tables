@@ -98,9 +98,11 @@ export default {
 	},
 	mounted() {
 		subscribe('create-table', this.createTable)
+		subscribe('edit-table', tableId => { this.editTableId = tableId })
 	},
 	beforeDestroy() {
 		unsubscribe('create-table', this.createTable)
+		subscribe('edit-table', tableId => { this.editTableId = tableId })
 	},
 	methods: {
 		createTable() {
