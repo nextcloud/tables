@@ -91,12 +91,6 @@ export default {
 			this.reload()
 		},
 	},
-	updated() {
-		console.debug('updated: new table, lets check if we have columns', this.columns)
-		if (this.columns && this.columns.length === 0) {
-			// this.showCreateColumn = true
-		}
-	},
 	mounted() {
 		this.reload()
 	},

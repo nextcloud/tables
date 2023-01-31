@@ -6,6 +6,26 @@
 				:column="col"
 				:row-id="row.id"
 				:value="parseInt(getCellValue(col.id))" />
+			<TableCellLink v-else-if="col.type === 'text' && col.subtype === 'link'"
+				:column="col"
+				:row-id="row.id"
+				:value="getCellValue(col.id)" />
+			<TableCellNumber v-else-if="col.type === 'number' && !col.subtype"
+				:column="col"
+				:row-id="row.id"
+				:value="getCellValue(col.id)" />
+			<TableCellStars v-else-if="col.type === 'number' && col.subtype === 'stars'"
+				:column="col"
+				:row-id="row.id"
+				:value="getCellValue(col.id)" />
+			<TableCellYesNo v-else-if="col.type === 'selection' && col.subtype === 'check'"
+				:column="col"
+				:row-id="row.id"
+				:value="getCellValue(col.id) === 'true'" />
+			<TableCellDateTime v-else-if="col.type === 'datetime'"
+				:column="col"
+				:row-id="row.id"
+				:value="getCellValue(col.id)" />
 			<TableCellHtml v-else
 				:value="getCellValue(col.id)"
 				:row-id="row.id"
@@ -26,15 +46,25 @@ import { NcCheckboxRadioSwitch, NcButton } from '@nextcloud/vue'
 import Pencil from 'vue-material-design-icons/Pencil.vue'
 import TableCellHtml from './TableCellHtml.vue'
 import TableCellProgress from './TableCellProgress.vue'
+import TableCellLink from './TableCellLink.vue'
+import TableCellNumber from './TableCellNumber.vue'
+import TableCellStars from './TableCellStars.vue'
+import TableCellYesNo from './TableCellYesNo.vue'
+import TableCellDateTime from './TableCellDateTime.vue'
 
 export default {
 	name: 'TableRow',
 	components: {
+		TableCellYesNo,
+		TableCellStars,
+		TableCellNumber,
+		TableCellLink,
 		TableCellProgress,
 		TableCellHtml,
 		NcButton,
 		Pencil,
 		NcCheckboxRadioSwitch,
+		TableCellDateTime,
 	},
 	props: {
 		row: {

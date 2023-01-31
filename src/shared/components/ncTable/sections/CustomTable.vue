@@ -104,6 +104,14 @@ export default {
   }
   white-space: nowrap;
 
+  td, th {
+    padding-right: 5px;
+  }
+
+  td:not(:first-child), th:not(:first-child) {
+    padding-right: 15px;
+  }
+
   tr {
     height: 51px;
     background-color: var(--color-main-background);
