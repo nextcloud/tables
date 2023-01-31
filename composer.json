@@ -11,8 +11,9 @@
     ],
     "require-dev": {
         "nextcloud/coding-standard": "^0.5.0",
-        "psalm/phar": "^5.4",
-        "nextcloud/ocp": "dev-master"
+        "vimeo/psalm": "^5.6.0",
+        "nextcloud/ocp": "dev-master",
+        "phan/phan": "5.x"
     },
     "config": {
         "optimize-autoloader": true,
@@ -25,8 +26,8 @@
         "lint": "find . -name \\*.php -not -path './vendor/*' -not -path './build/*' -print0 | xargs -0 -n1 php -l",
         "cs:check": "php-cs-fixer fix --dry-run --diff",
         "cs:fix": "php-cs-fixer fix",
-        "psalm": "psalm.phar",
-        "psalm:update-baseline": "psalm.phar --update-baseline",
-        "psalm:fix": "psalm.phar --alter --issues=InvalidReturnType,InvalidNullableReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingParamType,InvalidFalsableReturnType"
+        "psalm": "./vendor/bin/psalm --show-info=true",
+        "psalm:update-baseline": "./vendor/bin/psalm --update-baseline",
+        "psalm:fix": "./vendor/bin/psalm --alter --issues=InvalidReturnType,InvalidNullableReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingParamType,InvalidFalsableReturnType"
 	}
 }

@@ -93,18 +93,14 @@ lint: lint-php lint-js lint-css lint-xml
 
 
 lint-php: lint-phpfast lint-php-phan
-lint-phpfast: lint-php-lint lint-php-ncversion lint-php-cs-fixer lint-php-phpcs
+lint-phpfast: lint-php-lint lint-php-cs-fixer lint-php-phpcs
 
 lint-php-lint:
 	# Check PHP syntax errors
 	@! find $(php_dirs) -name "*.php" | xargs -I{} php -l '{}' | grep -v "No syntax errors detected"
 
-lint-php-ncversion:
-	# Check min-version consistency
-	# php tests/nextcloud-version.php
-
 lint-php-phan:
-	# PHAN
+	# PHAN - TODO
 	vendor/bin/phan --allow-polyfill-parser -k tests/phan-config.php --no-progress-bar -m checkstyle | vendor/bin/cs2pr --graceful-warnings --colorize
 
 lint-php-phpcs:
