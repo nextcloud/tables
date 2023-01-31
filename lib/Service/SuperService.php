@@ -5,15 +5,13 @@ namespace OCA\Tables\Service;
 use Psr\Log\LoggerInterface;
 
 class SuperService {
-	/** @var PermissionsService */
-	protected $permissionsService;
+	protected PermissionsService $permissionsService;
 
-	/** @var LoggerInterface */
-	protected $logger;
+	protected LoggerInterface $logger;
 
-	protected $userId;
+	protected string $userId;
 
-	public function __construct(LoggerInterface $logger, $userId, PermissionsService $permissionsService = null) {
+	public function __construct(LoggerInterface $logger, string $userId, PermissionsService $permissionsService) {
 		$this->permissionsService = $permissionsService;
 		$this->logger = $logger;
 		$this->userId = $userId;

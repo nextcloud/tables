@@ -17,25 +17,19 @@ use OCA\Tables\Db\TableMapper;
 use Psr\Log\LoggerInterface;
 
 class TableService extends SuperService {
-	/** @var TableMapper */
-	private $mapper;
+	private TableMapper $mapper;
 
-	/** @var TableTemplateService */
-	private $tableTemplateService;
+	private TableTemplateService $tableTemplateService;
 
-	/** @var ColumnService */
-	private $columnService;
+	private ColumnService $columnService;
 
-	/** @var RowService */
-	private $rowService;
+	private RowService $rowService;
 
-	/** @var ShareService */
-	private $shareService;
+	private ShareService $shareService;
 
-	/** @var UserHelper */
-	protected $userHelper;
+	protected UserHelper $userHelper;
 
-	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, $userId,
+	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, string $userId,
 								TableMapper $mapper, TableTemplateService $tableTemplateService, ColumnService $columnService, RowService $rowService, ShareService $shareService, UserHelper $userHelper) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
@@ -48,9 +42,11 @@ class TableService extends SuperService {
 
 
 	/**
+	 * @param string|null $userId
+	 * @return array<Table>
 	 * @throws InternalError
 	 */
-	public function findAll($userId = null): array {
+	public function findAll(?string $userId = null): array {
 		if ($userId === null) {
 			$userId = $this->userId;
 		}
@@ -77,16 +73,18 @@ class TableService extends SuperService {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
 		}
-		return $this->addOwnerDisplayName(array_merge($ownTables, $newSharedTables));
+		return $this->addOwnersDisplayName(array_merge($ownTables, $newSharedTables));
 	}
 
 
 	/**
-	 * @throws PermissionError
-	 * @throws NotFoundError
+	 * @param int $id
+	 * @return Table
 	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
 	 */
-	public function find($id) {
+	public function find(int $id): Table {
 		try {
 			$table = $this->mapper->find($id);
 
@@ -111,7 +109,7 @@ class TableService extends SuperService {
 	 * @throws \OCP\DB\Exception
 	 * @throws InternalError|PermissionError
 	 */
-	public function create($title, $template, $emoji): Table {
+	public function create(string $title, string $template, string $emoji): Table {
 		$userId = $this->userId;
 		$time = new DateTime();
 		$item = new Table();
@@ -137,9 +135,14 @@ class TableService extends SuperService {
 	/**
 	 * @noinspection PhpUndefinedMethodInspection
 	 *
+	 * @param int $id
+	 * @param string $title
+	 * @param string $emoji
+	 * @param string $userId
+	 * @return Table
 	 * @throws InternalError
 	 */
-	public function update($id, $title, $emoji, $userId) {
+	public function update(int $id, string $title, string $emoji, string $userId): Table {
 		try {
 			$item = $this->mapper->find($id);
 
@@ -161,9 +164,12 @@ class TableService extends SuperService {
 	}
 
 	/**
+	 * @param int $id
+	 * @param null|string $userId
+	 * @return Table
 	 * @throws InternalError
 	 */
-	public function delete($id, $userId = null) {
+	public function delete(int $id, ?string $userId = null): Table {
 		try {
 			$item = $this->mapper->find($id);
 
@@ -193,20 +199,22 @@ class TableService extends SuperService {
 		}
 	}
 
-	/** @noinspection PhpUndefinedMethodInspection */
-	private function addOwnerDisplayName($tables) {
-		// return $table->setOwnerDisplayName($this->userHelper->getUserDisplayName($table->getOwnership()));
+	/**
+	 * @noinspection PhpUndefinedMethodInspection
+	 *
+	 * @param mixed $tables
+	 */
+	private function addOwnerDisplayName($tables): Table {
+		$tables->setOwnerDisplayName($this->userHelper->getUserDisplayName($tables->getOwnership()));
+		return $tables;
+	}
 
-		if (is_array($tables)) {
-			$return = [];
-			foreach ($tables as $table) {
-				$table->setOwnerDisplayName($this->userHelper->getUserDisplayName($table->getOwnership()));
-				$return[] = $table;
-			}
-			return $return;
-		} else {
-			$tables->setOwnerDisplayName($this->userHelper->getUserDisplayName($tables->getOwnership()));
-			return $tables;
+	private function addOwnersDisplayName(array $tables): array {
+		$return = [];
+		foreach ($tables as $table) {
+			$table->setOwnerDisplayName($this->userHelper->getUserDisplayName($table->getOwnership()));
+			$return[] = $table;
 		}
+		return $return;
 	}
 }

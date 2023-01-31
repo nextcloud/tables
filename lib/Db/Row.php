@@ -6,13 +6,17 @@ use JsonSerializable;
 
 use OCP\AppFramework\Db\Entity;
 
+/**
+ * @psalm-suppress PropertyNotSetInConstructor
+ */
 class Row extends Entity implements JsonSerializable {
-	protected $tableId;
-	protected $createdBy;
-	protected $createdAt;
-	protected $lastEditBy;
-	protected $lastEditAt;
-	protected $data;
+	protected ?int $tableId = null;
+	protected ?string $createdBy = null;
+	protected ?string $createdAt = null;
+	protected ?string $lastEditBy = null;
+	protected ?string $lastEditAt = null;
+
+	protected ?string $data = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');
@@ -32,12 +36,12 @@ class Row extends Entity implements JsonSerializable {
 	}
 
 	/** @noinspection PhpUndefinedMethodInspection */
-	public function getDataArray() {
+	public function getDataArray():array {
 		return \json_decode($this->getData(), true);
 	}
 
 	/** @noinspection PhpUndefinedMethodInspection */
-	public function setDataArray($array) {
+	public function setDataArray(array $array):void {
 		$new = [];
 		foreach ($array as $a) {
 			$new[] = [

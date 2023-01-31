@@ -8,20 +8,22 @@ use OCA\Tables\Errors\PermissionError;
 use OCP\IL10N;
 
 class TableTemplateService {
-	/** @var IL10N */
-	private $l;
 
-	/** @var ColumnService */
-	private $columnService;
+	private IL10N $l;
 
-	private $userId;
+	private ColumnService $columnService;
 
-	public function __construct(IL10N $l, ColumnService $columnService, $userId) {
+	private string $userId;
+
+	public function __construct(IL10N $l, ColumnService $columnService, string $userId) {
 		$this->l = $l;
 		$this->columnService = $columnService;
 		$this->userId = $userId;
 	}
 
+    /**
+     * @return array[]
+     */
 	public function getTemplateList(): array {
 		return [
 			[
@@ -45,9 +47,13 @@ class TableTemplateService {
 		];
 	}
 
-	/**
-	 * @throws InternalError|PermissionError
-	 */
+    /**
+     * @param Table $table
+     * @param string $template
+     * @return Table
+     * @throws InternalError
+     * @throws PermissionError
+     */
 	public function makeTemplate(Table $table, string $template): Table {
 		if ($template === 'todo') {
 			$this->makeTodo($table);
@@ -59,11 +65,12 @@ class TableTemplateService {
 		return $table;
 	}
 
-	/**
-	 * @throws InternalError
-	 * @throws PermissionError
-	 */
-	private function makeWeight(Table $table) {
+    /**
+     * @param Table $table
+     * @throws InternalError
+     * @throws PermissionError
+     */
+	private function makeWeight(Table $table):void {
 		$params = [
 			'title' => $this->l->t('Date'),
 			'type' => 'datetime',
@@ -111,11 +118,12 @@ class TableTemplateService {
 		$this->createColumn($table->id, $params);
 	}
 
-	/**
-	 * @throws InternalError
-	 * @throws PermissionError
-	 */
-	private function makeMembers(Table $table) {
+    /**
+     * @param Table $table
+     * @throws InternalError
+     * @throws PermissionError
+     */
+	private function makeMembers(Table $table):void {
 		$params = [
 			'title' => $this->l->t('Name'),
 			'type' => 'text',
@@ -159,10 +167,11 @@ class TableTemplateService {
 	}
 
 	/**
+	 * @param Table $table
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	private function makeTodo(Table $table) {
+	private function makeTodo(Table $table): void {
 		$params = [
 			'title' => $this->l->t('Task'),
 			'type' => 'text',
@@ -210,9 +219,12 @@ class TableTemplateService {
 	}
 
 	/**
-	 * @throws InternalError|PermissionError
+	 * @param int $tableId
+	 * @param (mixed)[] $parameters
+	 * @throws InternalError
+	 * @throws PermissionError
 	 */
-	private function createColumn($tableId, $parameters): void {
+	private function createColumn(int $tableId, array $parameters): void {
 		$this->columnService->create(
 
 			// tableId

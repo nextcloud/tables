@@ -14,13 +14,11 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use Psr\Log\LoggerInterface;
 
 class ColumnService extends SuperService {
-	/** @var ColumnMapper */
-	private $mapper;
+	private ColumnMapper $mapper;
 
-	/** @var RowService */
-	private $rowService;
+	private RowService $rowService;
 
-	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, $userId,
+	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, string $userId,
 								ColumnMapper $mapper, RowService $rowService) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
@@ -34,7 +32,7 @@ class ColumnService extends SuperService {
 	 */
 	public function findAllByTable(int $tableId): array {
 		try {
-			if ($this->permissionsService->canReadColumns($tableId)) {
+			if ($this->permissionsService->canReadColumnsByTableId($tableId)) {
 				return $this->mapper->findAllByTable($tableId);
 			} else {
 				throw new PermissionError('no read access to table id = '.$tableId);
@@ -51,13 +49,13 @@ class ColumnService extends SuperService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function find($id) {
+	public function find(int $id): Column {
 		try {
 			$column = $this->mapper->find($id);
 
 			// security
 			/** @noinspection PhpUndefinedMethodInspection */
-			if (!$this->permissionsService->canReadColumns($column->getTableId())) {
+			if (!$this->permissionsService->canReadColumnsByTableId($column->getTableId())) {
 				throw new PermissionError('PermissionError: can not read column with id '.$id);
 			}
 
@@ -74,6 +72,27 @@ class ColumnService extends SuperService {
 	/**
 	 * @noinspection PhpUndefinedMethodInspection
 	 * @noinspection DuplicatedCode
+	 * @param int $tableId
+	 * @param string $title
+	 * @param string $userId
+	 * @param string $type
+	 * @param string $subtype
+	 * @param string $numberPrefix
+	 * @param string $numberSuffix
+	 * @param bool $mandatory
+	 * @param string $description
+	 * @param string $textDefault
+	 * @param string $textAllowedPattern
+	 * @param int $textMaxLength
+	 * @param float|null $numberDefault
+	 * @param float|null $numberMin
+	 * @param float|null $numberMax
+	 * @param int|null $numberDecimals
+	 * @param string $selectionOptions
+	 * @param string $selectionDefault
+	 * @param int $orderWeight
+	 * @param string $datetimeDefault
+	 * @return Column
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
@@ -90,17 +109,17 @@ class ColumnService extends SuperService {
 		string $textDefault,
 		string $textAllowedPattern,
 		int $textMaxLength,
-		float $numberDefault = null,
-		float $numberMin = null,
-		float $numberMax = null,
-		int $numberDecimals = null,
+		?float $numberDefault = null,
+		?float $numberMin = null,
+		?float $numberMax = null,
+		?int $numberDecimals = null,
 		string $selectionOptions = '',
 		string $selectionDefault = '',
 		int $orderWeight = 0,
 		string $datetimeDefault = ''
-	) {
+	):Column {
 		// security
-		if (!$this->permissionsService->canCreateColumns($tableId)) {
+		if (!$this->permissionsService->canCreateColumnsByTableId($tableId)) {
 			throw new PermissionError('create column at the table id = '.$tableId.' is not allowed.');
 		}
 
@@ -140,34 +159,56 @@ class ColumnService extends SuperService {
 	/**
 	 * @noinspection PhpUndefinedMethodInspection
 	 * @noinspection DuplicatedCode
+	 * @param int $id
+	 * @param int $tableId
+	 * @param string $userId
+	 * @param string $title
+	 * @param string $type
+	 * @param string $subtype
+	 * @param string $numberPrefix
+	 * @param string $numberSuffix
+	 * @param bool $mandatory
+	 * @param string $description
+	 * @param string $textDefault
+	 * @param string $textAllowedPattern
+	 * @param int|null $textMaxLength
+	 * @param float|null $numberDefault
+	 * @param float|null $numberMin
+	 * @param float|null $numberMax
+	 * @param int|null $numberDecimals
+	 * @param string $selectionOptions
+	 * @param string $selectionDefault
+	 * @param int $orderWeight
+	 * @param string $datetimeDefault
+	 * @return Column
 	 * @throws InternalError
 	 */
 	public function update(
-		$id,
-		$tableId,
-		$userId,
-		$title,
-		$type,
-		$subtype,
-		$numberPrefix,
-		$numberSuffix,
-		$mandatory,
-		$description,
-		$textDefault,
-		$textAllowedPattern,
-		$textMaxLength,
-		$numberDefault = null,
-		$numberMin = null,
-		$numberMax = null,
-		$numberDecimals = null,
-		$selectionOptions = '',
-		$selectionDefault = '',
-		$orderWeight = 0,
-		$datetimeDefault = ''
-	) {
+		int $id,
+		int $tableId,
+		string $userId,
+		string $title,
+		string $type,
+		string $subtype,
+		string $numberPrefix,
+		string $numberSuffix,
+		bool $mandatory,
+		string $description,
+		string $textDefault,
+		string $textAllowedPattern,
+		?int $textMaxLength,
+		?float $numberDefault = null,
+		?float $numberMin = null,
+		?float $numberMax = null,
+		?int $numberDecimals = null,
+		string $selectionOptions = '',
+		string $selectionDefault = '',
+		int $orderWeight = 0,
+		string $datetimeDefault = ''
+	):Column {
 		try {
 			// security
-			if (!$this->permissionsService->canUpdateColumns($tableId)) {
+			if (!$this->permissionsService->canUpdateColumnsByTableId($tableId)) {
 				throw new PermissionError('update column id = '.$id.' is not allowed.');
 			}
 
@@ -204,15 +245,19 @@ class ColumnService extends SuperService {
 	}
 
 	/**
+	 * @param int $id
+	 * @param bool $skipRowCleanup
+	 * @param null|string $userId
+	 * @return Column
 	 * @throws InternalError
 	 */
-	public function delete($id, bool $skipRowCleanup = false, $userId = null) {
+	public function delete(int $id, bool $skipRowCleanup = false, ?string $userId = null): Column {
 		try {
 			$item = $this->mapper->find($id);
 
 			// security
 			/** @noinspection PhpUndefinedMethodInspection */
-			if (!$this->permissionsService->canDeleteColumns($item->getTableId(), $userId)) {
+			if (!$this->permissionsService->canDeleteColumnsByTableId($item->getTableId(), $userId)) {
 				throw new PermissionError('delete column id = '.$id.' is not allowed.');
 			}
 

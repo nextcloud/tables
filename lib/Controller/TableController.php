@@ -9,18 +9,16 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 
 class TableController extends Controller {
-	/** @var TableService */
-	private $service;
+	private TableService $service;
 
-	/** @var string */
-	private $userId;
+	private string $userId;
 
 	use Errors;
 
 
 	public function __construct(IRequest     $request,
 								TableService $service,
-											 $userId) {
+											 string $userId) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->service = $service;
 		$this->userId = $userId;
