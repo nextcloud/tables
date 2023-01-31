@@ -27,7 +27,7 @@ class Version000203Date20230124000000 extends SimpleMigrationStep {
 
 		$table = 'tables_tables';
 		if ($schema->hasTable($table)) {
-            $table = $schema->getTable($table);
+			$table = $schema->getTable($table);
 			$table->addColumn('emoji', Types::STRING, [
 				'notnull' => false,
 				'length' => 20
