@@ -6,7 +6,7 @@
 		<th v-for="col in columns" :key="col.id">
 			{{ col.title }}
 		</th>
-		<th>
+		<th style="text-align: end;">
 			<NcActions>
 				<NcActionButton :close-after-click="true"
 					icon="icon-add"
