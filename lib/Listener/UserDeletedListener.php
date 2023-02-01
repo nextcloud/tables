@@ -2,7 +2,6 @@
 
 namespace OCA\Tables\Listener;
 
-use OCA\Tables\Db\Table;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Service\TableService;
 use OCP\EventDispatcher\IEventListener;

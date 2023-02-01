@@ -8,7 +8,6 @@ use OCA\Tables\Errors\PermissionError;
 use OCP\IL10N;
 
 class TableTemplateService {
-
 	private IL10N $l;
 
 	private ColumnService $columnService;
@@ -21,9 +20,9 @@ class TableTemplateService {
 		$this->userId = $userId;
 	}
 
-    /**
-     * @return array[]
-     */
+	/**
+	 * @return array[]
+	 */
 	public function getTemplateList(): array {
 		return [
 			[
@@ -47,13 +46,13 @@ class TableTemplateService {
 		];
 	}
 
-    /**
-     * @param Table $table
-     * @param string $template
-     * @return Table
-     * @throws InternalError
-     * @throws PermissionError
-     */
+	/**
+	 * @param Table $table
+	 * @param string $template
+	 * @return Table
+	 * @throws InternalError
+	 * @throws PermissionError
+	 */
 	public function makeTemplate(Table $table, string $template): Table {
 		if ($template === 'todo') {
 			$this->makeTodo($table);
@@ -65,11 +64,11 @@ class TableTemplateService {
 		return $table;
 	}
 
-    /**
-     * @param Table $table
-     * @throws InternalError
-     * @throws PermissionError
-     */
+	/**
+	 * @param Table $table
+	 * @throws InternalError
+	 * @throws PermissionError
+	 */
 	private function makeWeight(Table $table):void {
 		$params = [
 			'title' => $this->l->t('Date'),
@@ -118,11 +117,11 @@ class TableTemplateService {
 		$this->createColumn($table->id, $params);
 	}
 
-    /**
-     * @param Table $table
-     * @throws InternalError
-     * @throws PermissionError
-     */
+	/**
+	 * @param Table $table
+	 * @throws InternalError
+	 * @throws PermissionError
+	 */
 	private function makeMembers(Table $table):void {
 		$params = [
 			'title' => $this->l->t('Name'),
