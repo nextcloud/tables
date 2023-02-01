@@ -315,13 +315,13 @@ class PermissionsService {
 
 	//  private methods ==========================================================================
 
-    /**
-     * @param Table $table
-     * @param string $userId
-     * @return Share
-     * @throws InternalError
-     * @throws NotFoundError
-     */
+	/**
+	 * @param Table $table
+	 * @param string $userId
+	 * @return Share
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 */
 	private function getShareForTable(Table $table, string $userId): Share {
 		// if shared by user
 		try {
