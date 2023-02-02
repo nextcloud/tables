@@ -85,7 +85,7 @@ test: test-api
 test-api:
 	phpunit --bootstrap vendor/autoload.php --testdox tests/api/
 
-
+ci: lint-js lint-xml lint-php-cs-fixer lint-php-psalm
 
 ##### Linting #####
 
@@ -111,6 +111,8 @@ lint-php-cs-fixer:
 	# PHP Coding Standards Fixer (with Nextcloud coding standards)
 	vendor/bin/php-cs-fixer fix --dry-run --diff
 
+lint-php-psalm:
+	composer psalm
 
 lint-js:
 	npm run lint
