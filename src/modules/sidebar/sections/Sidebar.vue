@@ -28,7 +28,7 @@
 	</div>
 </template>
 <script>
-import { subscribe } from '@nextcloud/event-bus'
+import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import SidebarSharing from './SidebarSharing.vue'
 import { NcAppSidebar, NcAppSidebarTab } from '@nextcloud/vue'
 import { mapGetters, mapState } from 'vuex'
@@ -51,7 +51,10 @@ export default {
 		...mapGetters(['activeTable']),
 	},
 	mounted() {
-		subscribe('toggle-sidebar', data => this.handleToggleSidebar(data))
+		subscribe('tables:sidebar:sharing', data => this.handleToggleSidebar(data))
+	},
+	beforeDestroy() {
+		unsubscribe('tables:sidebar:sharing', data => this.handleToggleSidebar(data))
 	},
 	methods: {
 		handleToggleSidebar(data) {
