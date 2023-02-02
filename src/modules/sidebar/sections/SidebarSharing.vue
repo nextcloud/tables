@@ -35,7 +35,7 @@ export default {
 	},
 
 	computed: {
-		...mapState(['tables', 'tablesLoading', 'showSidebar']),
+		...mapState(['tables', 'tablesLoading']),
 		...mapGetters(['activeTable']),
 	},
 
