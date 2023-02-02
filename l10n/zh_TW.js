@@ -68,6 +68,7 @@ OC.L10N.register(
     "Searching …" : "正在搜尋……",
     "No elements found." : "找不到元素。",
     "Shares" : "分享",
+    "Permissions" : "權限",
     "Delete data" : "刪除資料",
     "No shares" : "無分享",
     "Share was deleted" : "分享已刪除",
