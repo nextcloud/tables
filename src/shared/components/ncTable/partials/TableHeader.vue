@@ -86,7 +86,7 @@ export default {
 			this.$emit('download-csv', this.rows)
 		},
 		toggleShare() {
-			emit('toggle-sidebar', { open: true, tab: 'sharing' })
+			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
 		},
 	},
 }

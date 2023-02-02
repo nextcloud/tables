@@ -89,9 +89,8 @@ export default {
 	},
 	methods: {
 		async actionShowShare() {
-			// this.$store.commit('setActiveTableId', this.table.id)
+			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
 			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
-			emit('toggle-sidebar', { open: true, tab: 'sharing' })
 		},
 		closeNav(e) {
 			if (window.innerWidth < 960) {
