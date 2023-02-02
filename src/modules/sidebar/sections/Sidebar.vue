@@ -2,7 +2,7 @@
 	<div>
 		<NcAppSidebar v-show="showSidebar"
 			:active="activeSidebarTab"
-			:title="(activeTable) ? activeTable.title : t('tables', 'No table in context')"
+			:title="(activeTable) ? activeTable.emoji + ' ' + activeTable.title : t('tables', 'No table in context')"
 			:subtitle="(activeTable) ? t('tables', 'From {ownerName}', { ownerName: activeTable.ownership }) : ''"
 			@update:active="tab => activeSidebarTab = tab"
 			@close="showSidebar = false">
@@ -58,6 +58,7 @@ export default {
 	},
 	methods: {
 		handleToggleSidebar(data) {
+			console.debug('toggle sidebar in nav', data)
 			this.showSidebar = data.open ? data.open : false
 			this.activeSidebarTab = data.tab ? data.tab : ''
 		},
