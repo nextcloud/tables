@@ -2,9 +2,21 @@
 
 return [
 	'routes' => [
+
+		// enable CORS for api calls (API version 1)
+		['name' => 'api1#preflighted_cors', 'url' => '/api/1/{path}',
+			'verb' => 'OPTIONS', 'requirements' => ['path' => '.+']],
+
 		['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
 
 		['name' => 'tableTemplate#list', 'url' => '/table/templates', 'verb' => 'GET'],
+
+		// API
+		['name' => 'api1#index', 'url' => '/api/1/tables', 'verb' => 'GET'],
+
+		['name' => 'api1#data', 'url' => '/api/1/table/{tableId}', 'verb' => 'GET', 'postfix' => 'tableOnly'],
+		['name' => 'api1#data', 'url' => '/api/1/table/{tableId}/limit/{limit}', 'verb' => 'GET', 'postfix' => 'tableAndLimit'],
+		['name' => 'api1#data', 'url' => '/api/1/table/{tableId}/limit/{limit}/offset/{offset}', 'verb' => 'GET', 'postfix' => 'tableAndLimitAndOffset'],
 
 		// table
 		['name' => 'table#index', 'url' => '/table', 'verb' => 'GET'],

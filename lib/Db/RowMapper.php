@@ -20,6 +20,7 @@ class RowMapper extends QBMapper {
 	/**
 	 * @param int $id
 	 *
+	 * @return Row
 	 * @throws DoesNotExistException
 	 * @throws Exception
 	 * @throws MultipleObjectsReturnedException
@@ -34,14 +35,24 @@ class RowMapper extends QBMapper {
 
 	/**
 	 * @param int $tableId
+	 * @param int|null $limit
+	 * @param int|null $offset
 	 * @return array
 	 * @throws Exception
 	 */
-	public function findAllByTable(int $tableId): array {
+	public function findAllByTable(int $tableId, ?int $limit = null, ?int $offset = null): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId)));
+
+		if ($limit !== null) {
+			$qb->setMaxResults($limit);
+		}
+		if ($offset !== null) {
+			$qb->setFirstResult($offset);
+		}
+
 		return $this->findEntities($qb);
 	}
 
