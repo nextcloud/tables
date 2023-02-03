@@ -15,6 +15,14 @@
 				<Table :size="20" />
 			</template>
 		</template>
+		<template v-if="table.hasShares" #extra>
+			<NcActionButton icon="icon-share" @click="actionShowShare" />
+		</template>
+		<template #counter>
+			<NcCounterBubble>
+				{{ table.rowsCount }}
+			</NcCounterBubble>
+		</template>
 
 		<template #actions>
 			<NcActionButton v-if="canEditTableTitle"
@@ -47,7 +55,7 @@
 	</NcAppNavigationItem>
 </template>
 <script>
-import { NcActionButton, NcAppNavigationItem } from '@nextcloud/vue'
+import { NcActionButton, NcAppNavigationItem, NcCounterBubble } from '@nextcloud/vue'
 import { showSuccess } from '@nextcloud/dialogs'
 import DialogConfirmation from '../../../shared/modals/DialogConfirmation.vue'
 import { mapGetters } from 'vuex'
@@ -62,6 +70,7 @@ export default {
 		DialogConfirmation,
 		NcActionButton,
 		NcAppNavigationItem,
+		NcCounterBubble,
 	},
 	props: {
 		table: {

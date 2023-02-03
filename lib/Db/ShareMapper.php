@@ -94,7 +94,7 @@ class ShareMapper extends QBMapper {
 	 * @return array
 	 * @throws Exception
 	 */
-	public function findAllSharesForNode(string $nodeType, int $nodeId, string $sender): array {
+	public function findAllSharesForNode(string $nodeType, int $nodeId, string $sender, ?int $limit = null): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
