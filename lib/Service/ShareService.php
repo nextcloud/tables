@@ -10,6 +10,7 @@ use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -25,12 +26,15 @@ class ShareService extends SuperService {
 
 	protected UserHelper $userHelper;
 
+	protected GroupHelper $groupHelper;
+
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, string $userId,
-	ShareMapper $shareMapper, TableMapper $tableMapper, UserHelper $userHelper) {
+	ShareMapper $shareMapper, TableMapper $tableMapper, UserHelper $userHelper, GroupHelper $groupHelper) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $shareMapper;
 		$this->tableMapper = $tableMapper;
 		$this->userHelper = $userHelper;
+		$this->groupHelper = $groupHelper;
 	}
 
 
@@ -89,7 +93,7 @@ class ShareService extends SuperService {
 			// get all tables that are shared with me by group
 			$userGroups = $this->userHelper->getGroupsForUser($this->userId);
 			foreach ($userGroups as $userGroup) {
-				$shares = $this->mapper->findAllSharesFor('table', $userGroup->getDisplayName(), 'group');
+				$shares = $this->mapper->findAllSharesFor('table', $userGroup->getGid(), 'group');
 				$tablesSharedWithMe = array_merge($tablesSharedWithMe, $shares);
 			}
 		} catch (\OCP\DB\Exception $e) {
@@ -173,7 +177,6 @@ class ShareService extends SuperService {
 				throw new PermissionError('PermissionError: can not update share with id '.$id);
 			}
 
-			$userId = $this->userId;
 			$time = new DateTime();
 
 			if ($permission === "read") {
@@ -198,7 +201,8 @@ class ShareService extends SuperService {
 
 			$item->setLastEditAt($time->format('Y-m-d H:i:s'));
 
-			return $this->addReceiverDisplayName($this->mapper->update($item));
+			$share = $this->mapper->update($item);
+			return $this->addReceiverDisplayName($share);
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
@@ -232,18 +236,23 @@ class ShareService extends SuperService {
 	 * @return Share
 	 * @noinspection PhpUndefinedMethodInspection
 	 */
-	private function addReceiverDisplayName(Share $share):Share {
-		$share->setReceiverDisplayName($this->userHelper->getUserDisplayName($share->getReceiver()));
+	private function addReceiverDisplayName(Share &$share):Share {
+		if ($share->getReceiverType() === 'user') {
+			$share->setReceiverDisplayName($this->userHelper->getUserDisplayName($share->getReceiver()));
+		} elseif ($share->getReceiverType() === 'group') {
+			$share->setReceiverDisplayName($this->groupHelper->getGroupDisplayName($share->getReceiver()));
+		} else {
+			$this->logger->info('can not use receiver type to get display name');
+			$share->setReceiverDisplayName($share->getReceiver());
+		}
 		return $share;
 	}
 
 	private function addReceiverDisplayNames(array $shares): array {
-		$return = [];
 		foreach ($shares as $share) {
-			$share->setReceiverDisplayName($this->userHelper->getUserDisplayName($share->getReceiver()));
-			$return[] = $share;
+			$this->addReceiverDisplayName($share);
 		}
-		return $return;
+		return $shares;
 	}
 
 	public function deleteAllForTable(Table $table):void {
