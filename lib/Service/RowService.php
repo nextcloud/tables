@@ -311,4 +311,17 @@ class RowService extends SuperService {
 			$this->mapper->update($row);
 		}
 	}
+
+	public function getRowsCount(int $tableId): int {
+		try {
+			if ($this->permissionsService->canReadRowsByTableId($tableId)) {
+				return $this->mapper->countRows($tableId);
+			} else {
+				throw new PermissionError('no read access for counting to table id = '.$tableId);
+			}
+		} catch (\OCP\DB\Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
+		}
+	}
 }

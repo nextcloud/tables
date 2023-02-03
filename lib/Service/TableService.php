@@ -73,7 +73,30 @@ class TableService extends SuperService {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
 		}
-		return $this->addOwnersDisplayName(array_merge($ownTables, $newSharedTables));
+
+		// enhance table objects with additional data
+		$allTables = array_merge($ownTables, $newSharedTables);
+		foreach ($allTables as $table) {
+			$this->enhanceTable($table);
+		}
+
+		return $allTables;
+	}
+
+	/** @noinspection PhpUndefinedMethodInspection */
+	private function enhanceTable(Table &$table): void {
+		$this->addOwnerDisplayName($table);
+		try {
+			$shares = $this->shareService->findAll('table', $table->getId());
+			$table->setHasShares(count($shares) !== 0);
+		} catch (InternalError $e) {
+		}
+
+		try {
+			$table->setRowsCount($this->rowService->getRowsCount($table->getId()));
+		} catch (InternalError|PermissionError $e) {
+			$table->setRowsCount(0);
+		}
 	}
 
 

@@ -21,6 +21,9 @@ class Table extends Entity implements JsonSerializable {
 	protected ?bool $isShared = null;
 	protected ?array $onSharePermissions = null;
 
+	protected ?bool $hasShares = false;
+	protected ?int $rowsCount = 0;
+
 	public function __construct() {
 		$this->addType('id', 'integer');
 	}
@@ -38,6 +41,8 @@ class Table extends Entity implements JsonSerializable {
 			'lastEditAt' => $this->lastEditAt,
 			'isShared' => !!$this->isShared,
 			'onSharePermissions' => $this->onSharePermissions,
+			'hasShares' => $this->hasShares,
+			'rowsCount' => $this->rowsCount
 		];
 	}
 }
