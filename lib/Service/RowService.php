@@ -24,13 +24,17 @@ class RowService extends SuperService {
 
 
 	/**
+	 * @param int $tableId
+	 * @param ?int $limit
+	 * @param ?int $offset
+	 * @return array
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function findAllByTable(int $tableId): array {
+	public function findAllByTable(int $tableId, ?int $limit = null, ?int $offset = null): array {
 		try {
 			if ($this->permissionsService->canReadRowsByTableId($tableId)) {
-				return $this->mapper->findAllByTable($tableId);
+				return $this->mapper->findAllByTable($tableId, $limit, $offset);
 			} else {
 				throw new PermissionError('no read access to table id = '.$tableId);
 			}
