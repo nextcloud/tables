@@ -5,8 +5,8 @@
 			<ShareForm :shares="shares" @add="addShare" @update="updateShare" />
 			<ShareList :shares="shares" @remove="removeShare" @update="updateShare" />
 		</div>
-		<div v-else>
-			{{ t('tables', 'This table is shared with you. Resharing is not allowed.') }}
+		<div v-else style="margin-top: 12px;">
+			{{ t('tables', 'This table is shared with you. Resharing is not possible.') }}
 		</div>
 	</div>
 </template>

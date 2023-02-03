@@ -9,7 +9,7 @@
 				<div class="fix-col-2">
 					<NcAvatar :user="share.receiver" :display-name="share.receiver" />
 					<div class="userDisplayName">
-						{{ share.receiverDisplayName }}
+						{{ share.receiverDisplayName }}{{ share.receiverType === 'group' ? ' (' + t('tables', 'group') + ')' : '' }}
 					</div>
 				</div>
 				<div class="fix-col-2" style="justify-content: end;">
