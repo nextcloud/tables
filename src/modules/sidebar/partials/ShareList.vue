@@ -7,7 +7,7 @@
 				:key="share.id"
 				class="row">
 				<div class="fix-col-2">
-					<NcAvatar :user="share.receiver" :display-name="share.receiver" />
+					<NcAvatar :user="share.receiver" :is-no-user="share.receiverType !== 'user'" />
 					<div class="userDisplayName">
 						{{ share.receiverDisplayName }}{{ share.receiverType === 'group' ? ' (' + t('tables', 'group') + ')' : '' }}
 					</div>
