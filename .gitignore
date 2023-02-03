@@ -7,3 +7,4 @@ node_modules/
 js/*hot-update.*
 # Project exclude paths
 /js/
+/appinfo/info.xsd
