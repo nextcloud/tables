@@ -28,7 +28,6 @@ class V1Api {
 	public function getData(int $tableId, ?int $limit, ?int $offset): array {
 		$columns = $this->columnService->findAllByTable($tableId);
 
-		// TODO add limit and offset
 		$rows = $this->rowService->findAllByTable($tableId, $limit, $offset);
 
 		$data = [];
