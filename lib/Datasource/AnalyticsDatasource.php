@@ -105,12 +105,12 @@ class AnalyticsDatasource implements IDatasource
      *      'error' => 0,         // INT 0 = no error
      *  ]
      *
-     * @param array $option
+     * @param $option
      * @return array available options of the data source
      * @throws InternalError
      * @throws PermissionError
      */
-    public function readData(array $option): array
+    public function readData($option): array
     {
         // get the data for the selected table
         $tableId = $option['tableId'];
@@ -124,7 +124,7 @@ class AnalyticsDatasource implements IDatasource
         // get the selected columns from the data source options
         $selectedColumns = array();
         if (isset($option['columns']) && strlen($option['columns']) > 0) {
-            $selectedColumns = str_getcsv($option['columns'], ',');
+            $selectedColumns = str_getcsv($option['columns']);
         }
 
         $data = array();
@@ -157,7 +157,7 @@ class AnalyticsDatasource implements IDatasource
      * @param $row
      * @return array
      */
-    private function minimizeRow($selectedColumns, $row)
+    private function minimizeRow($selectedColumns, $row): array
     {
         $rowMinimized = array();
         foreach ($selectedColumns as $selectedColumn) {
