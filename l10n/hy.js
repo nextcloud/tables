@@ -6,6 +6,7 @@ OC.L10N.register(
     "Name" : "Անուն",
     "Birthday" : "Ծննդյան օր",
     "Description" : "Նկարագրություն",
+    "Activity" : "Գործունեություն",
     "Cancel" : "ընդհատել",
     "Delete" : "հեռացնել",
     "Title" : "Վերնագիր",
