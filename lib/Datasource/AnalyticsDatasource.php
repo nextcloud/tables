@@ -1,7 +1,7 @@
 <?php
 /**
  * Analytics data source
- * Report Table App data with the Analytics App
+ * Report Table App data with the Analytics App.
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the LICENSE.md file.
