@@ -12,22 +12,18 @@ use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\User\Events\BeforeUserDeletedEvent;
 use OCA\Analytics\Datasource\DatasourceEvent;
 
-class Application extends App implements IBootstrap
-{
-    public const APP_ID = 'tables';
+class Application extends App implements IBootstrap {
+	public const APP_ID = 'tables';
 
-    public function __construct()
-    {
-        parent::__construct(self::APP_ID);
-    }
+	public function __construct() {
+		parent::__construct(self::APP_ID);
+	}
 
-    public function register(IRegistrationContext $context): void
-    {
-        $context->registerEventListener(BeforeUserDeletedEvent::class, UserDeletedListener::class);
-        $context->registerEventListener(DatasourceEvent::class, AnalyticsDatasourceListener::class);
-    }
+	public function register(IRegistrationContext $context): void {
+		$context->registerEventListener(BeforeUserDeletedEvent::class, UserDeletedListener::class);
+		$context->registerEventListener(DatasourceEvent::class, AnalyticsDatasourceListener::class);
+	}
 
-    public function boot(IBootContext $context): void
-    {
-    }
+	public function boot(IBootContext $context): void {
+	}
 }
