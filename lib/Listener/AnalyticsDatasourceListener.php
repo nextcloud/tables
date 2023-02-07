@@ -17,14 +17,12 @@ use OCA\Analytics\Datasource\DatasourceEvent;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 
-class AnalyticsDatasourceListener implements IEventListener
-{
-    public function handle(Event $event): void
-    {
-        if (!($event instanceof DatasourceEvent)) {
-            // Unrelated
-            return;
-        }
-        $event->registerDatasource(AnalyticsDatasource::class);
-    }
+class AnalyticsDatasourceListener implements IEventListener {
+	public function handle(Event $event): void {
+		if (!($event instanceof DatasourceEvent)) {
+			// Unrelated
+			return;
+		}
+		$event->registerDatasource(AnalyticsDatasource::class);
+	}
 }
