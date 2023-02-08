@@ -78,8 +78,8 @@ class RowMapper extends QBMapper {
 		$qb->select($qb->createFunction('COUNT(*)'));
 		$qb->from($this->table);
 		$qb->where(
-				$qb->expr()->eq('table_id', $qb->createNamedParameter($tableId))
-			);
+			$qb->expr()->eq('table_id', $qb->createNamedParameter($tableId))
+		);
 
 		try {
 			$result = $this->findOneQuery($qb);

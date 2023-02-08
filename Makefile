@@ -132,7 +132,7 @@ lint-xml:
 lint-fix: lint-php-fix lint-js-fix lint-css-fix
 
 lint-php-fix:
-	vendor/bin/phpcbf --standard=tests/phpcs.xml $(php_dirs)
+	# vendor/bin/phpcbf --standard=tests/phpcs.xml $(php_dirs)
 	vendor/bin/php-cs-fixer fix
 
 lint-js-fix:
