@@ -10,17 +10,16 @@
         }
     ],
     "require-dev": {
-        "nextcloud/coding-standard": "^0.5.0",
+        "nextcloud/coding-standard": "^v1.0.0",
         "vimeo/psalm": "^5.6.0",
         "nextcloud/ocp": "dev-master",
-        "phan/phan": "5.x",
-        "friendsofphp/php-cs-fixer": "^2.19"
+        "phan/phan": "5.x"
     },
     "config": {
         "optimize-autoloader": true,
         "classmap-authoritative": true,
         "platform": {
-            "php": "7.4"
+            "php": "8.0"
         }
     },
     "scripts": {

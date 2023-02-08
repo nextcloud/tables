@@ -8,6 +8,7 @@ import data from './data.js'
 
 Vue.use(Vuex)
 
+// eslint-disable-next-line import/no-named-as-default-member
 export default new Vuex.Store({
 	modules: {
 		data,
