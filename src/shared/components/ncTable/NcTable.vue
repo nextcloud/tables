@@ -32,7 +32,7 @@ config                  -> config object for the table
 
 <template>
 	<div class="NcTable">
-		<div class="options row">
+		<div class="options row" style="position: sticky; top: 58px; left: 0; z-index: 10; background-color: var(--color-main-background-translucent);">
 			<Options :rows="rows"
 				:selected-rows="selectedRows"
 				:show-options="columns.length !== 0"

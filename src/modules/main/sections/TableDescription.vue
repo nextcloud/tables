@@ -1,5 +1,5 @@
 <template>
-	<div class="row first-row">
+	<div class="row first-row" style="position: sticky; left: 0; top: 0; z-index: 15; background-color: var(--color-main-background-translucent);">
 		<h1>
 			{{ activeTable.emoji }}&nbsp;{{ activeTable.title }}
 		</h1>

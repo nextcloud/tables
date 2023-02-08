@@ -6,7 +6,8 @@
 .row.first-row {
 	padding-top: 10px;
 	padding-left: 60px;
-	width: calc(100% - 45px);
+	/*width: calc(100% - 45px);*/
+	width: 100%;
 	margin-bottom: 30px;
 	align-items: center;
 	display: inline-flex;

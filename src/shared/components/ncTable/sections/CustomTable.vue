@@ -105,11 +105,11 @@ export default {
   white-space: nowrap;
 
   td, th {
-    padding-right: 5px;
+    padding-right: 8px;
   }
 
   td:not(:first-child), th:not(:first-child) {
-    padding-right: 15px;
+    padding-right: 16px;
   }
 
   tr {
@@ -127,7 +127,7 @@ export default {
       // sticky head
       position: -webkit-sticky;
       position: sticky;
-      top: 0;
+      top: 100px;
       box-shadow: inset 0 -1px 0 var(--color-border); // use box-shadow instead of border to be compatible with sticky heads
       background-color: var(--color-main-background-translucent);
       z-index: 5;
@@ -150,7 +150,7 @@ export default {
     position: sticky;
     left: 0;
     width: 60px;
-    padding-left: 15px;
+    padding-left: 16px;
     background-color: inherit;
   }
 
@@ -159,7 +159,7 @@ export default {
     right: 0;
     width: 55px;
     background-color: inherit;
-    padding-right: 15px;
+    padding-right: 16px;
   }
 
 }
