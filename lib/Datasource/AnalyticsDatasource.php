@@ -100,7 +100,7 @@ class AnalyticsDatasource implements IDatasource {
 	 *      'error' => 0,         // INT 0 = no error
 	 *  ]
 	 *
-	 * @param $option
+	 * @param array $option
 	 * @return array available options of the data source
 	 * @throws InternalError
 	 * @throws PermissionError
@@ -147,14 +147,14 @@ class AnalyticsDatasource implements IDatasource {
 	/**
 	 * filter only the selected columns in the given sequence
 	 *
-	 * @param $selectedColumns
-	 * @param $row
+	 * @param array $selectedColumns
+	 * @param array $row
 	 * @return array
 	 */
-	private function minimizeRow($selectedColumns, $row): array {
+	private function minimizeRow(array $selectedColumns, array $row): array {
 		$rowMinimized = [];
 		foreach ($selectedColumns as $selectedColumn) {
-			if (is_numeric($selectedColumn)) {
+			if (intval($selectedColumn)) {
 				$rowMinimized[] = $row[$selectedColumn - 1];
 			} else {
 				$rowMinimized[] = $selectedColumn;
