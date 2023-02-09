@@ -55,7 +55,7 @@
 		"@nextcloud/eslint-config": "^8.2.1",
 		"@nextcloud/stylelint-config": "^2.3.0",
 		"@nextcloud/webpack-vue-config": "^5.4.0",
-		"node-sass": "^8.0.0",
+		"sass": "^1.58.0",
 		"sass-loader": "^13.2.0"
 	}
 }
