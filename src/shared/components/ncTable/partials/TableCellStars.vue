@@ -27,21 +27,7 @@ export default {
 			const starEmpty = '☆'
 			const starFull = '★'
 			const v = this.value
-			let res = ''
-			if (v && v === 1) {
-				res = starFull + starEmpty + starEmpty + starEmpty + starEmpty
-			} else if (v && v === 2) {
-				res = starFull + starFull + starEmpty + starEmpty + starEmpty
-			} else if (v && v === 3) {
-				res = starFull + starFull + starFull + starEmpty + starEmpty
-			} else if (v && v === 4) {
-				res = starFull + starFull + starFull + starFull + starEmpty
-			} else if (v && v === 5) {
-				res = starFull + starFull + starFull + starFull + starFull
-			} else {
-				res = starEmpty + starEmpty + starEmpty + starEmpty + starEmpty
-			}
-			return res
+			return starFull.repeat(v) + starEmpty.repeat(5-v)
 		},
 	},
 }
