@@ -3,7 +3,7 @@
 		<th style="z-index: 6;">
 			<NcCheckboxRadioSwitch :checked="allRowsAreSelected" @update:checked="value => $emit('select-all-rows', value)" />
 		</th>
-		<th v-for="col in columns" :key="col.id">
+		<th v-for="col in columns" :key="col.id" :style="{ 'min-width': col.minWidth ? col.minWidth : '50px', 'max-width': col.maxWidth ? col.maxWidth : '350px', }">
 			{{ col.title }}
 		</th>
 		<th style="text-align: end;">
