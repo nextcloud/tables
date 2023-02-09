@@ -198,7 +198,7 @@ OC.L10N.register(
     "Searching …" : "Hledání…",
     "No elements found." : "Nenalezeny žádné prvky.",
     "Receiver type" : "Typ přijímače",
-    "Create time" : "Okamžik vytvoření",
+    "Create time" : "Čas vytvoření",
     "Share ID" : "Identifikátor sdílení",
     "Shares" : "Sdílení",
     "Permissions" : "Oprávnění",
