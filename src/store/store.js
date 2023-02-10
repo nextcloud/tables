@@ -41,6 +41,10 @@ export default new Vuex.Store({
 		setTables(state, tables) {
 			state.tables = tables
 		},
+		setTable(state, table) {
+			const index = state.tables.findIndex(t => t.id === table.id)
+			state.tables[index] = table
+		},
 	},
 	actions: {
 		async insertNewTable({ commit, state }, { data }) {
@@ -113,6 +117,24 @@ export default new Vuex.Store({
 				return false
 			}
 			return true
+		},
+		increaseRowsCountForTable({ state, commit, getters }, { tableId }) {
+			const table = getters.getTable(tableId)
+			if (table.rowsCount) {
+				table.rowsCount++
+			} else {
+				table.rowsCount = 1
+			}
+			commit('setTable', table)
+		},
+		decreaseRowsCountForTable({ state, commit, getters }, { tableId }) {
+			const table = getters.getTable(tableId)
+			if (table.rowsCount) {
+				table.rowsCount--
+			} else {
+				table.rowsCount = 0
+			}
+			commit('setTable', table)
 		},
 	},
 })

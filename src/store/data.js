@@ -157,6 +157,7 @@ export default {
 					const rows = state.rows
 					rows.push(row)
 					commit('setRows', [...rows])
+					dispatch('increaseRowsCountForTable', { tableId })
 				} else {
 					console.debug('axios error', res)
 					return false
@@ -167,7 +168,7 @@ export default {
 			}
 			return true
 		},
-		async removeRow({ state, commit }, { rowId }) {
+		async removeRow({ state, commit, dispatch }, { rowId }) {
 			try {
 				const res = await axios.delete(generateUrl('/apps/tables/row/' + rowId))
 				if (res.status === 200) {
@@ -175,6 +176,7 @@ export default {
 					const index = rows.findIndex(r => r.id === rowId)
 					rows.splice(index, 1)
 					commit('setRows', [...rows])
+					dispatch('decreaseRowsCountForTable', { tableId: res.data.tableId })
 				} else {
 					console.debug('axios error', res)
 					return false
