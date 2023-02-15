@@ -11,7 +11,7 @@
 					@download-csv="data => $emit('download-csv', data)"
 					@select-all-rows="selectAllRows" />
 			</thead>
-			<tbody style="overflow-x: auto;">
+			<tbody>
 				<TableRow v-for="(row, index) in rows"
 					:key="index"
 					:row="row"
@@ -88,7 +88,7 @@ export default {
 
 .container {
   //margin: auto;
-  //overflow-x: auto;
+  overflow-x: auto;
 }
 
 ::v-deep table {
@@ -102,7 +102,7 @@ export default {
   * {
     border: none;
   }
-  white-space: nowrap;
+  // white-space: nowrap;
 
   td, th {
     padding-right: 8px;
@@ -110,6 +110,11 @@ export default {
 
   td:not(:first-child), th:not(:first-child) {
     padding-right: 16px;
+    // max-width: 20vw;
+  }
+
+  th:not(:first-child) {
+    // text-align: end;
   }
 
   tr {
@@ -118,19 +123,22 @@ export default {
   }
 
   thead tr {
-    text-align: left;
+    // text-align: left;
 
     th {
       vertical-align: middle;
       color: var(--color-text-maxcontrast);
 
       // sticky head
-      position: -webkit-sticky;
-      position: sticky;
-      top: 100px;
+      // position: -webkit-sticky;
+      // position: sticky;
+      // top: 80px;
       box-shadow: inset 0 -1px 0 var(--color-border); // use box-shadow instead of border to be compatible with sticky heads
       background-color: var(--color-main-background-translucent);
       z-index: 5;
+
+      // always fit to title
+      // min-width: max-content;
     }
   }
 
@@ -149,9 +157,10 @@ export default {
   tr>th:first-child,tr>td:first-child {
     position: sticky;
     left: 0;
-    width: 60px;
     padding-left: 16px;
+    padding-right: 16px;
     background-color: inherit;
+    z-index: 5;
   }
 
   tr>th:last-child,tr>td:last-child {
@@ -160,6 +169,16 @@ export default {
     width: 55px;
     background-color: inherit;
     padding-right: 16px;
+  }
+
+  tr>td:last-child {
+    // visibility: hidden;
+    opacity: 0;
+  }
+
+  tr:hover>td:last-child {
+    // visibility: visible;
+    opacity: 1;
   }
 
 }

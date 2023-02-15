@@ -1,5 +1,5 @@
 <template>
-	<div class="wrapper">
+	<div>
 		<NcProgressBar v-if="getValue !== null" :value="getValue" />
 	</div>
 </template>
@@ -41,8 +41,9 @@ export default {
 
 <style scoped>
 
-.wrapper {
+div {
   padding-right: 10px;
+  min-width: 12vw;
 }
 
 </style>

@@ -27,7 +27,7 @@ export default {
 			const starEmpty = '☆'
 			const starFull = '★'
 			const v = this.value
-			return starFull.repeat(v) + starEmpty.repeat(5-v)
+			return starFull.repeat(v) + starEmpty.repeat(5 - v)
 		},
 	},
 }

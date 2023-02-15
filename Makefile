@@ -93,6 +93,7 @@ lint: lint-php lint-js lint-css lint-xml
 
 
 lint-php: lint-phpfast lint-php-phan
+
 lint-phpfast: lint-php-lint lint-php-cs-fixer lint-php-phpcs
 
 lint-php-lint:

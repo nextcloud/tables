@@ -1,7 +1,7 @@
 <template>
 	<tr v-if="row" :class="{ selected }">
 		<td><NcCheckboxRadioSwitch :checked="selected" @update:checked="v => $emit('update-row-selection', { rowId: row.id, value: v })" /></td>
-		<td v-for="col in columns" :key="col.id" :style="{ 'min-width': col.minWidth ? col.minWidth : '50px', 'max-width': col.maxWidth ? col.maxWidth : '350px', 'white-space': 'break-spaces' }">
+		<td v-for="col in columns" :key="col.id">
 			<TableCellProgress v-if="col.type === 'number' && col.subtype === 'progress'"
 				:column="col"
 				:row-id="row.id"
@@ -23,6 +23,10 @@
 				:row-id="row.id"
 				:value="getCellValue(col.id) === 'true'" />
 			<TableCellDateTime v-else-if="col.type === 'datetime'"
+				:column="col"
+				:row-id="row.id"
+				:value="getCellValue(col.id)" />
+			<TableCellTextLine v-else-if="col.type === 'text' && col.subtype === 'line'"
 				:column="col"
 				:row-id="row.id"
 				:value="getCellValue(col.id)" />
@@ -51,6 +55,7 @@ import TableCellNumber from './TableCellNumber.vue'
 import TableCellStars from './TableCellStars.vue'
 import TableCellYesNo from './TableCellYesNo.vue'
 import TableCellDateTime from './TableCellDateTime.vue'
+import TableCellTextLine from './TableCellTextLine.vue'
 
 export default {
 	name: 'TableRow',
@@ -65,6 +70,7 @@ export default {
 		Pencil,
 		NcCheckboxRadioSwitch,
 		TableCellDateTime,
+		TableCellTextLine,
 	},
 	props: {
 		row: {
@@ -100,7 +106,7 @@ export default {
 				const column = this.columns.filter(column => column.id === columnId)[0]
 				return column[column.type + 'Default']
 			}
-			return this.truncate(cell.value)
+			return cell.value
 		},
 		truncate(text) {
 			if (text.length >= 400) {

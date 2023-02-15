@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<a :href="value" target="_blank">{{ value }}</a>
+		<a :href="value" target="_blank">{{ value | truncate(40) }}</a>
 	</div>
 </template>
 
@@ -8,6 +8,17 @@
 
 export default {
 	name: 'TableCellLink',
+
+	filters: {
+		truncate(string, num) {
+			if (string.length >= num) {
+				return string.substring(0, num) + '...'
+			} else {
+				return string
+			}
+		},
+	},
+
 	props: {
 		column: {
 			type: Object,
@@ -22,13 +33,14 @@ export default {
 			default: null,
 		},
 	},
+
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 
-.wrapper {
-  padding-right: 10px;
+div {
+  // min-width: 80px;
 }
 
 </style>

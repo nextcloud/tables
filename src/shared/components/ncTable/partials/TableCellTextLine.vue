@@ -1,11 +1,23 @@
 <template>
 	<!-- eslint-disable-next-line vue/no-v-html -->
-	<div v-if="value" v-html="value" />
+	<div v-if="value">
+		{{ value | truncate(50) }}
+	</div>
 </template>
 
 <script>
 export default {
-	name: 'TableCellHtml',
+	name: 'TableCellTextLine',
+
+	filters: {
+		truncate(string, num) {
+			if (string.length >= num) {
+				return string.substring(0, num) + '...'
+			} else {
+				return string
+			}
+		},
+	},
 
 	props: {
 		column: {
@@ -23,14 +35,3 @@ export default {
 	},
 }
 </script>
-
-<style scoped>
-
-div {
-  max-height: calc(var(--default-line-height) * 6);
-  overflow: auto;
-  min-width: 100px;
-  max-width: 30vw;
-}
-
-</style>

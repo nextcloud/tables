@@ -1,7 +1,7 @@
 <template>
 	<div class="options">
 		<div v-if="showOptions" class="fix-col-4" style="justify-content: space-between;">
-			<div>
+			<div :class="{'add-padding-left': isSmallMobile }">
 				<NcButton v-if="!isSmallMobile"
 					:close-after-click="true"
 					type="tertiary"
@@ -134,6 +134,10 @@ export default {
 .selected-rows-option {
   justify-content: flex-end;
   display: inline-flex;
+}
+
+.add-padding-left {
+  padding-left: calc(var(--default-grid-baseline) * 1);
 }
 
 </style>

@@ -32,7 +32,7 @@ config                  -> config object for the table
 
 <template>
 	<div class="NcTable">
-		<div class="options row" style="position: sticky; top: 58px; left: 0; z-index: 10; background-color: var(--color-main-background-translucent);">
+		<div class="options row">
 			<Options :rows="rows"
 				:selected-rows="selectedRows"
 				:show-options="columns.length !== 0"
@@ -88,6 +88,15 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 
+.options.row {
+  position: sticky;
+  top: 52px;
+  left: 0;
+  z-index: 10;
+  background-color: var(--color-main-background-translucent);
+  padding-top: 4px; // fix to show buttons completely
+  padding-bottom: 4px; // to make it nice with the padding-top
+}
 </style>

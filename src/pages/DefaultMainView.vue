@@ -5,15 +5,17 @@
 		<div v-if="!isLoading && activeTable">
 			<TableDescription />
 
-			<NcTable v-if="columns.length > 0"
-				:rows="rows"
-				:columns="columns"
-				:table="activeTable"
-				@edit-row="rowId => editRowId = rowId"
-				@create-column="showCreateColumn = true"
-				@edit-columns="showEditColumns = true"
-				@create-row="showCreateRow = true"
-				@delete-selected-rows="deleteRows" />
+			<div class="table-wrapper">
+				<NcTable v-if="columns.length > 0"
+					:rows="rows"
+					:columns="columns"
+					:table="activeTable"
+					@edit-row="rowId => editRowId = rowId"
+					@create-column="showCreateColumn = true"
+					@edit-columns="showEditColumns = true"
+					@create-row="showCreateRow = true"
+					@delete-selected-rows="deleteRows" />
+			</div>
 
 			<EmptyTable v-if="columns.length === 0" @create-column="showCreateColumn = true" />
 		</div>
