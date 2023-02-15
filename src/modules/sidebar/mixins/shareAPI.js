@@ -34,7 +34,9 @@ export default {
 				}
 				// console.debug('data array', data)
 				const res = await axios.post(generateUrl('/apps/tables/share'), data)
-				if (res.status !== 200) {
+				if (res.status === 200) {
+					await this.$store.dispatch('setTableHasShares', { tableId: res.data.nodeId, hasSHares: true })
+				} else {
 					showWarning(t('tables', 'Sorry, something went wrong.'))
 					console.debug('axios error', res)
 					return false

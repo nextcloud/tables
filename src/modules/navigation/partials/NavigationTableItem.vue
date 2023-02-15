@@ -4,7 +4,7 @@
 		:class="{active: activeTable && table.id === activeTable.id}"
 		:allow-collapse="false"
 		:open="false"
-		:force-menu="false"
+		:force-menu="true"
 		:to="'/table/' + parseInt(table.id)"
 		@click="closeNav">
 		<template #icon>
@@ -19,13 +19,16 @@
 			<NcActionButton icon="icon-share" @click="actionShowShare" />
 		</template>
 		<template #counter>
+			<div v-if="table.isShared" style="padding-right: var(--default-grid-baseline);">
+				<NcUserBubble :display-name="table.ownerDisplayName | truncate(8)" :show-user-status="true" :user="table.ownership" />
+			</div>
 			<NcCounterBubble>
 				{{ table.rowsCount }}
 			</NcCounterBubble>
 		</template>
 
 		<template #actions>
-			<NcActionButton v-if="canEditTableTitle"
+			<NcActionButton v-if="canManageTable(table)"
 				icon="icon-rename"
 				:close-after-click="true"
 				@click="$emit('edit-table', table.id)">
@@ -55,15 +58,17 @@
 	</NcAppNavigationItem>
 </template>
 <script>
-import { NcActionButton, NcAppNavigationItem, NcCounterBubble } from '@nextcloud/vue'
+import { NcActionButton, NcAppNavigationItem, NcCounterBubble, NcUserBubble } from '@nextcloud/vue'
 import { showSuccess } from '@nextcloud/dialogs'
 import DialogConfirmation from '../../../shared/modals/DialogConfirmation.vue'
 import { mapGetters } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
 import Table from 'vue-material-design-icons/Table.vue'
+import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 
 export default {
 	name: 'NavigationTableItem',
+
 	components: {
 		// eslint-disable-next-line vue/no-reserved-component-names
 		Table,
@@ -71,31 +76,41 @@ export default {
 		NcActionButton,
 		NcAppNavigationItem,
 		NcCounterBubble,
+		NcUserBubble,
 	},
+
+	filters: {
+		truncate(string, num) {
+			if (string.length >= num) {
+				return string.substring(0, num) + '...'
+			} else {
+				return string
+			}
+		},
+	},
+
+	mixins: [permissionsMixin],
+
 	props: {
 		table: {
 			type: Object,
 			default: null,
 		},
 	},
+
 	data() {
 		return {
 			showDeletionConfirmation: false,
 		}
 	},
+
 	computed: {
 		...mapGetters(['activeTable']),
 		getTranslatedDescription() {
 			return t('tables', 'Do you really want to delete the table "{table}"?', { table: this.table.title })
 		},
-		canEditTableTitle() {
-			if (!this.table.isShared) {
-				return true
-			}
-
-			return !!this.table.onSharePermissions.manage
-		},
 	},
+
 	methods: {
 		async actionShowShare() {
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
@@ -124,5 +139,6 @@ export default {
 			}
 		},
 	},
+
 }
 </script>

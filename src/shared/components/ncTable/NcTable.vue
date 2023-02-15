@@ -36,19 +36,37 @@ config                  -> config object for the table
 			<Options :rows="rows"
 				:selected-rows="selectedRows"
 				:show-options="columns.length !== 0"
+				:table="table"
 				@create-row="$emit('create-row')"
 				@download-csv="data => downloadCsv(data, columns, table)"
 				@delete-selected-rows="rowIds => $emit('delete-selected-rows', rowIds)" />
 		</div>
 		<div class="custom-table row">
-			<CustomTable :columns="columns"
+			<CustomTable v-if="canReadTable(table)"
+				:columns="columns"
 				:rows="rows"
+				:table="table"
 				@create-row="$emit('create-row')"
 				@edit-row="rowId => $emit('edit-row', rowId)"
 				@create-column="$emit('create-column')"
 				@edit-columns="$emit('edit-columns')"
 				@update-selected-rows="rowIds => selectedRows = rowIds"
 				@download-csv="data => downloadCsv(data, columns, table)" />
+			<NcEmptyContent v-else
+				:title="t('tables', 'Create rows')"
+				:description="t('tables', 'You are not allowed to read this table, but you can still create rows.')">
+				<template #icon>
+					<Plus :size="25" />
+				</template>
+				<template #action>
+					<NcButton :aria-label="t('table', 'Create row')" type="primary" @click="$emit('create-row')">
+						<template #icon>
+							<Plus :size="25" />
+						</template>
+						{{ t('table', 'Create row') }}
+					</NcButton>
+				</template>
+			</NcEmptyContent>
 		</div>
 	</div>
 </template>
@@ -57,13 +75,16 @@ config                  -> config object for the table
 import Options from './sections/Options.vue'
 import CustomTable from './sections/CustomTable.vue'
 import exportTableMixin from './mixins/exportTableMixin.js'
+import permissionsMixin from './mixins/permissionsMixin.js'
+import { NcEmptyContent, NcButton } from '@nextcloud/vue'
+import Plus from 'vue-material-design-icons/Plus.vue'
 
 export default {
 	name: 'NcTable',
 
-	components: { CustomTable, Options },
+	components: { CustomTable, Options, NcButton, NcEmptyContent, Plus },
 
-	mixins: [exportTableMixin],
+	mixins: [exportTableMixin, permissionsMixin],
 
 	props: {
 		rows: {

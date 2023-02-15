@@ -85,17 +85,38 @@ class TableService extends SuperService {
 
 	/** @noinspection PhpUndefinedMethodInspection */
 	private function enhanceTable(Table &$table): void {
+		// add owner display name for UI
 		$this->addOwnerDisplayName($table);
+
+		// set if this table is shared by you (you share it with somebody else)
+		// a table can have other shares, we are looking here for shares from the userId in context
 		try {
 			$shares = $this->shareService->findAll('table', $table->getId());
 			$table->setHasShares(count($shares) !== 0);
 		} catch (InternalError $e) {
 		}
 
+		// add the rows count
 		try {
 			$table->setRowsCount($this->rowService->getRowsCount($table->getId()));
 		} catch (InternalError|PermissionError $e) {
 			$table->setRowsCount(0);
+		}
+
+		// set if this is a shared table with you (somebody else shared it with you)
+		try {
+			$share = $this->shareService->findTableShareIfSharedWithMe($table->getId());
+			/** @noinspection PhpUndefinedMethodInspection */
+			$table->setIsShared(true);
+			/** @noinspection PhpUndefinedMethodInspection */
+			$table->setOnSharePermissions([
+				'read' => $share->getPermissionRead(),
+				'create' => $share->getPermissionCreate(),
+				'update' => $share->getPermissionUpdate(),
+				'delete' => $share->getPermissionDelete(),
+				'manage' => $share->getPermissionManage(),
+			]);
+		} catch (\Exception $e) {
 		}
 	}
 
@@ -110,6 +131,7 @@ class TableService extends SuperService {
 	public function find(int $id): Table {
 		try {
 			$table = $this->mapper->find($id);
+			$this->enhanceTable($table);
 
 			// security
 			if (!$this->permissionsService->canReadTable($table)) {
@@ -167,19 +189,22 @@ class TableService extends SuperService {
 	 */
 	public function update(int $id, string $title, string $emoji, string $userId): Table {
 		try {
-			$item = $this->mapper->find($id);
+			$table = $this->mapper->find($id);
+			// $this->enhanceTable($table);
 
 			// security
-			if (!$this->permissionsService->canUpdateTable($item)) {
+			if (!$this->permissionsService->canUpdateTable($table)) {
 				throw new PermissionError('PermissionError: can not update table with id '.$id);
 			}
 
 			$time = new DateTime();
-			$item->setTitle($title);
-			$item->setEmoji($emoji);
-			$item->setLastEditBy($userId);
-			$item->setLastEditAt($time->format('Y-m-d H:i:s'));
-			return $this->addOwnerDisplayName($this->mapper->update($item));
+			$table->setTitle($title);
+			$table->setEmoji($emoji);
+			$table->setLastEditBy($userId);
+			$table->setLastEditAt($time->format('Y-m-d H:i:s'));
+			$table = $this->mapper->update($table);
+			$this->enhanceTable($table);
+			return $table;
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
@@ -225,11 +250,12 @@ class TableService extends SuperService {
 	/**
 	 * @noinspection PhpUndefinedMethodInspection
 	 *
-	 * @param mixed $tables
+	 * @param Table $table
+	 * @return Table
 	 */
-	private function addOwnerDisplayName($tables): Table {
-		$tables->setOwnerDisplayName($this->userHelper->getUserDisplayName($tables->getOwnership()));
-		return $tables;
+	private function addOwnerDisplayName(Table $table): Table {
+		$table->setOwnerDisplayName($this->userHelper->getUserDisplayName($table->getOwnership()));
+		return $table;
 	}
 
 	private function addOwnersDisplayName(array $tables): array {

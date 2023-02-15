@@ -1,23 +1,30 @@
 <template>
-	<div class="row first-row" style="position: sticky; left: 0; top: 0; z-index: 15; background-color: var(--color-main-background-translucent);">
+	<div class="row first-row">
 		<h1>
 			{{ activeTable.emoji }}&nbsp;{{ activeTable.title }}
 		</h1>
 		<div class="light">
 			<NcActions>
-				<NcActionButton icon="icon-rename"
+				<NcActionButton v-if="!activeTable.isShared || (activeTable.isShared && activeTable.onSharePermissions.manage)"
+					icon="icon-rename"
 					:close-after-click="true"
 					@click="editTable">
 					{{ t('tables', 'Edit table') }}
 				</NcActionButton>
 			</NcActions>
 		</div>
+		<div class="user-bubble">
+			<NcUserBubble v-if="activeTable.isShared"
+				:display-name="activeTable.ownerDisplayName"
+				:show-user-status="true"
+				:user="activeTable.ownership" />
+		</div>
 	</div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import { NcActions, NcActionButton } from '@nextcloud/vue'
+import { NcActions, NcActionButton, NcUserBubble } from '@nextcloud/vue'
 import { emit } from '@nextcloud/event-bus'
 
 export default {
@@ -25,6 +32,7 @@ export default {
 	components: {
 		NcActions,
 		NcActionButton,
+		NcUserBubble,
 	},
 	computed: {
 		...mapGetters(['activeTable']),
@@ -45,6 +53,19 @@ export default {
 
 .first-row:hover .light {
   opacity: 1;
+}
+
+.row.first-row {
+  position: sticky;
+  left: 0;
+  top: 0;
+  z-index: 15;
+  background-color: var(--color-main-background-translucent);
+  align-items: baseline;
+}
+
+.user-bubble {
+  padding-left: calc(var(--default-grid-baseline) * 2);
 }
 
 </style>

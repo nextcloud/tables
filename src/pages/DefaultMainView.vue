@@ -44,6 +44,7 @@ import CreateColumn from '../modules/main/modals/CreateColumn.vue'
 import EditColumns from '../modules/main/modals/EditColumns.vue'
 import DeleteRows from '../modules/main/modals/DeleteRows.vue'
 import EmptyTable from '../modules/main/sections/EmptyTable.vue'
+import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
 
 export default {
 	name: 'DefaultMainView',
@@ -57,6 +58,9 @@ export default {
 		CreateColumn,
 		EditColumns,
 	},
+
+	mixins: [permissionsMixin],
+
 	data() {
 		return {
 			localLoading: false,
@@ -108,7 +112,10 @@ export default {
 			if (this.activeTable.id !== this.lastActiveTableId) {
 				this.localLoading = true
 				await this.$store.dispatch('loadColumnsFromBE', { tableId: this.activeTable.id })
-				await this.$store.dispatch('loadRowsFromBE', { tableId: this.activeTable.id })
+
+				if (this.canReadTable(this.activeTable)) {
+					await this.$store.dispatch('loadRowsFromBE', { tableId: this.activeTable.id })
+				}
 				this.lastActiveTableId = this.activeTable.id
 				this.localLoading = false
 			}

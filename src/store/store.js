@@ -136,5 +136,10 @@ export default new Vuex.Store({
 			}
 			commit('setTable', table)
 		},
+		setTableHasShares({ state, commit, getters }, { tableId, hasSHares }) {
+			const table = getters.getTable(tableId)
+			table.hasShares = !!hasSHares
+			commit('setTable', table)
+		},
 	},
 })

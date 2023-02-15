@@ -120,6 +120,43 @@ class ShareService extends SuperService {
 		return $returnArray;
 	}
 
+
+	/**
+	 * @throws NotFoundError
+	 */
+	public function findTableShareIfSharedWithMe(int $tableId): Share {
+		// try to find a share with my userId
+		try {
+			return $this->mapper->findShareForNode($tableId, 'table', $this->userId, 'user');
+		} catch (Exception $e) {
+		}
+
+		// try to find a share with one of my groups
+		try {
+			$userGroups = $this->userHelper->getGroupsForUser($this->userId);
+			foreach ($userGroups as $userGroup) {
+				return $this->mapper->findShareForNode($tableId, 'table', $userGroup->getGid(), 'group');
+				// $shares = $this->mapper->findAllSharesFor('table', $userGroup->getGid(), 'group');
+				// $tablesSharedWithMe = array_merge($tablesSharedWithMe, $shares);
+			}
+		} catch (Exception $e) {
+		}
+
+		// else throw error
+		throw new NotFoundError('No share for table and given user id found.');
+	}
+
+
+
+
+
+
+
+
+
+
+
+
 	/**
 	 * @noinspection PhpUndefinedMethodInspection
 	 *

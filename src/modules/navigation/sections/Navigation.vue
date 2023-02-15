@@ -30,7 +30,8 @@
 
 				<NavigationTableItem v-for="table in getSharedTables"
 					:key="table.id"
-					:table="table" />
+					:table="table"
+					@edit-table="id => editTableId = id" />
 			</ul>
 
 			<div v-if="filterString !== ''" class="search-info">

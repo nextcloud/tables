@@ -91,6 +91,7 @@ class ShareMapper extends QBMapper {
 	 * @param string $nodeType
 	 * @param int $nodeId
 	 * @param string $sender
+	 * @param int|null $limit
 	 * @return array
 	 * @throws Exception
 	 */

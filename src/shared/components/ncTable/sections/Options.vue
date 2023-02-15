@@ -1,7 +1,7 @@
 <template>
 	<div class="options">
-		<div v-if="showOptions" class="fix-col-4" style="justify-content: space-between;">
-			<div :class="{'add-padding-left': isSmallMobile }">
+		<div v-if="showOptions && canReadTable(table)" class="fix-col-4" style="justify-content: space-between;">
+			<div v-if="canCreateRowInTable(table)" :class="{'add-padding-left': isSmallMobile }">
 				<NcButton v-if="!isSmallMobile"
 					:close-after-click="true"
 					type="tertiary"
@@ -19,6 +19,9 @@
 						<Plus :size="25" />
 					</template>
 				</NcButton>
+			</div>
+			<div v-else style="height: 44px; ">
+				&nbsp;
 			</div>
 
 			<div v-if="selectedRows.length > 0" class="selected-rows-option">
@@ -72,16 +75,20 @@ import Plus from 'vue-material-design-icons/Plus.vue'
 import Delete from 'vue-material-design-icons/Delete.vue'
 import Export from 'vue-material-design-icons/Export.vue'
 import viewportHelper from '../../../mixins/viewportHelper.js'
+import permissionsMixin from '../mixins/permissionsMixin.js'
 
 export default {
 	name: 'Options',
+
 	components: {
 		NcButton,
 		Plus,
 		Delete,
 		Export,
 	},
-	mixins: [viewportHelper],
+
+	mixins: [viewportHelper, permissionsMixin],
+
 	props: {
 		selectedRows: {
 			type: Array,
@@ -95,7 +102,12 @@ export default {
 			type: Boolean,
 			default: true,
 		},
+		table: {
+			type: Object,
+			default: () => {},
+		},
 	},
+
 	computed: {
 		getSelectedRows() {
 			const rows = []
@@ -105,6 +117,7 @@ export default {
 			return rows
 		},
 	},
+
 	methods: {
 		exportCsv() {
 			console.debug('export csv by selected rows', this.selectedRows)

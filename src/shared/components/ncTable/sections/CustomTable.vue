@@ -5,6 +5,7 @@
 				<TableHeader :columns="columns"
 					:selected-rows="selectedRows"
 					:rows="rows"
+					:table="table"
 					@create-row="$emit('create-row')"
 					@create-column="$emit('create-column')"
 					@edit-columns="$emit('edit-columns')"
@@ -44,6 +45,10 @@ export default {
 		columns: {
 			type: Array,
 			default: () => [],
+		},
+		table: {
+			type: Object,
+			default: () => {},
 		},
 	},
 
@@ -157,8 +162,9 @@ export default {
   tr>th:first-child,tr>td:first-child {
     position: sticky;
     left: 0;
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: calc(var(--default-grid-baseline) * 4);
+    padding-right: calc(var(--default-grid-baseline) * 4);
+    width: 60px;
     background-color: inherit;
     z-index: 5;
   }

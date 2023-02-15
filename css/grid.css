@@ -4,11 +4,11 @@
 }
 
 .row.first-row {
-	padding-top: 10px;
+	padding-top: calc(var(--default-grid-baseline) * 4);
 	padding-left: 60px;
 	/*width: calc(100% - 45px);*/
 	width: 100%;
-	margin-bottom: 30px;
+	margin-bottom: 20px;
 	align-items: center;
 	display: inline-flex;
 }
