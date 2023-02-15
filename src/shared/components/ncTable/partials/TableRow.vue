@@ -36,7 +36,7 @@
 				:column="col" />
 		</td>
 		<td>
-			<NcButton type="tertiary" @click="$emit('edit-row', row.id)">
+			<NcButton type="primary" @click="$emit('edit-row', row.id)">
 				<template #icon>
 					<Pencil :size="20" />
 				</template>
