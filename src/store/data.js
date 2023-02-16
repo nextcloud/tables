@@ -133,16 +133,17 @@ export default {
 		async updateRow({ state, commit, dispatch }, { id, data }) {
 			try {
 				const res = await axios.put(generateUrl('/apps/tables/row/' + id), { data })
-				if (res.status === 200) {
-					const row = res.data
-					const rows = state.rows
-					const index = rows.findIndex(r => r.id === row.id)
-					rows[index] = row
-					commit('setRows', [...rows])
-				} else {
+				if (res.status !== 200) {
 					console.debug('axios error', res)
 					return false
 				}
+				
+				const row = res.data
+				const rows = state.rows
+				const index = rows.findIndex(r => r.id === row.id)
+				rows[index] = row
+				commit('setRows', [...rows])
+				return true
 			} catch (e) {
 				console.error(e)
 				return false
