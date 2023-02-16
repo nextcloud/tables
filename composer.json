@@ -14,7 +14,7 @@
         "vimeo/psalm": "^5.6.0",
         "nextcloud/ocp": "dev-master",
         "phan/phan": "5.x",
-        "squizlabs/php_codesniffer": "^3.7.1"
+        "staabm/annotate-pull-request-from-checkstyle": "^1.8"
     },
     "config": {
         "optimize-autoloader": true,

@@ -13,10 +13,7 @@ return [
 
 		// API
 		['name' => 'api1#index', 'url' => '/api/1/tables', 'verb' => 'GET'],
-
-		['name' => 'api1#data', 'url' => '/api/1/table/{tableId}', 'verb' => 'GET', 'postfix' => 'tableOnly'],
-		['name' => 'api1#data', 'url' => '/api/1/table/{tableId}/limit/{limit}', 'verb' => 'GET', 'postfix' => 'tableAndLimit'],
-		['name' => 'api1#data', 'url' => '/api/1/table/{tableId}/limit/{limit}/offset/{offset}', 'verb' => 'GET', 'postfix' => 'tableAndLimitAndOffset'],
+		['name' => 'api1#data',	'url' => '/api/1/table/{tableId}', 'verb' => 'GET'],
 
 		// table
 		['name' => 'table#index', 'url' => '/table', 'verb' => 'GET'],
