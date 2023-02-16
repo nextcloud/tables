@@ -105,8 +105,9 @@ lint-php-phan:
 	vendor/bin/phan --allow-polyfill-parser -k tests/phan-config.php --no-progress-bar -m checkstyle | vendor/bin/cs2pr --graceful-warnings --colorize
 
 lint-php-phpcs:
-	# PHP CodeSniffer
+	# PHP CodeSniffer - TODO
 	vendor/bin/phpcs --standard=tests/phpcs.xml $(php_dirs) --report=checkstyle | vendor/bin/cs2pr --graceful-warnings --colorize
+	# vendor/bin/phpcs --standard=tests/phpcs.xml $(php_dirs) --report=checkstyle
 
 lint-php-cs-fixer:
 	# PHP Coding Standards Fixer (with Nextcloud coding standards)

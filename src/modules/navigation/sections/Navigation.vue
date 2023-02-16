@@ -103,7 +103,7 @@ export default {
 	},
 	beforeDestroy() {
 		unsubscribe('create-table', this.createTable)
-		subscribe('edit-table', tableId => { this.editTableId = tableId })
+		unsubscribe('edit-table', tableId => { this.editTableId = tableId })
 	},
 	methods: {
 		createTable() {

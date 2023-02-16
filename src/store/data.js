@@ -137,7 +137,7 @@ export default {
 					console.debug('axios error', res)
 					return false
 				}
-				
+
 				const row = res.data
 				const rows = state.rows
 				const index = rows.findIndex(r => r.id === row.id)
@@ -148,7 +148,6 @@ export default {
 				console.error(e)
 				return false
 			}
-			return true
 		},
 		async insertNewRow({ state, commit, dispatch }, { tableId, data }) {
 			try {
