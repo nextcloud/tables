@@ -28,7 +28,7 @@ class ShareService extends SuperService {
 
 	protected GroupHelper $groupHelper;
 
-	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, string $userId,
+	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
 	ShareMapper $shareMapper, TableMapper $tableMapper, UserHelper $userHelper, GroupHelper $groupHelper) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $shareMapper;
@@ -84,14 +84,19 @@ class ShareService extends SuperService {
 	/**
 	 * @throws InternalError
 	 */
-	public function findTablesSharedWithMe(): array {
+	public function findTablesSharedWithMe(?string $userId = null): array {
+		if ($userId === null) {
+			$userId = $this->userId;
+		}
+
 		$returnArray = [];
+
 		try {
 			// get all tables that are shared with me as user
-			$tablesSharedWithMe = $this->mapper->findAllSharesFor('table', $this->userId);
+			$tablesSharedWithMe = $this->mapper->findAllSharesFor('table', $userId);
 
 			// get all tables that are shared with me by group
-			$userGroups = $this->userHelper->getGroupsForUser($this->userId);
+			$userGroups = $this->userHelper->getGroupsForUser($userId);
 			foreach ($userGroups as $userGroup) {
 				$shares = $this->mapper->findAllSharesFor('table', $userGroup->getGid(), 'group');
 				$tablesSharedWithMe = array_merge($tablesSharedWithMe, $shares);

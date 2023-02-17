@@ -23,9 +23,9 @@ class PermissionsService {
 
 	protected LoggerInterface $logger;
 
-	protected string $userId;
+	protected ?string $userId = null;
 
-	public function __construct(LoggerInterface $logger, string $userId, TableMapper $tableMapper, ShareMapper $shareMapper, UserHelper $userHelper) {
+	public function __construct(LoggerInterface $logger, ?string $userId, TableMapper $tableMapper, ShareMapper $shareMapper, UserHelper $userHelper) {
 		$this->tableMapper = $tableMapper;
 		$this->shareMapper = $shareMapper;
 		$this->userHelper = $userHelper;

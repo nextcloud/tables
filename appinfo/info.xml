@@ -38,6 +38,9 @@ Have a good time and manage whatever you want.
 	<dependencies>
         <nextcloud min-version="25" max-version="26"/>
     </dependencies>
+    <commands>
+        <command>OCA\Tables\Command\ListTables</command>
+    </commands>
     <navigations>
         <navigation>
             <name>Tables</name>

@@ -34,15 +34,17 @@ class TableMapper extends QBMapper {
 	}
 
 	/**
-	 * @param string $userId
+	 * @param string|null $userId
 	 * @return array
 	 * @throws Exception
 	 */
-	public function findAll(string $userId): array {
+	public function findAll(?string $userId = null): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
-			->from($this->table)
-			->where($qb->expr()->eq('ownership', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
+			->from($this->table);
+		if ($userId != null) {
+			$qb->where($qb->expr()->eq('ownership', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
+		}
 		return $this->findEntities($qb);
 	}
 }

@@ -29,7 +29,7 @@ class TableService extends SuperService {
 
 	protected UserHelper $userHelper;
 
-	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, string $userId,
+	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
 								TableMapper $mapper, TableTemplateService $tableTemplateService, ColumnService $columnService, RowService $rowService, ShareService $shareService, UserHelper $userHelper) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
@@ -40,20 +40,44 @@ class TableService extends SuperService {
 		$this->userHelper = $userHelper;
 	}
 
+	/**
+	 * @throws InternalError
+	 */
+	public function findAllForAdmins(?bool $skipTableEnhancement = false): array {
+		try {
+			$tables = $this->mapper->findAll();
+		} catch (\OCP\DB\Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
+		}
+
+		// enhance table objects with additional data
+		if (!$skipTableEnhancement) {
+			foreach ($tables as $table) {
+				$this->enhanceTable($table);
+			}
+		}
+
+		return $tables;
+	}
 
 	/**
 	 * @param string|null $userId
+	 * @param bool|null $skipTableEnhancement
+	 * @param bool|null $skipSharedTables
 	 * @return array<Table>
 	 * @throws InternalError
 	 */
-	public function findAll(?string $userId = null): array {
+	public function findAll(?string $userId = null, ?bool $skipTableEnhancement = false, ?bool $skipSharedTables = false): array {
 		if ($userId === null) {
 			$userId = $this->userId;
 		}
 
 		try {
 			$ownTables = $this->mapper->findAll($userId);
-			$sharedTables = $this->shareService->findTablesSharedWithMe();
+			if (!$skipSharedTables) {
+				$sharedTables = $this->shareService->findTablesSharedWithMe($userId);
+			}
 
 			// clean duplicates
 			$newSharedTables = [];
@@ -76,8 +100,10 @@ class TableService extends SuperService {
 
 		// enhance table objects with additional data
 		$allTables = array_merge($ownTables, $newSharedTables);
-		foreach ($allTables as $table) {
-			$this->enhanceTable($table);
+		if (!$skipTableEnhancement) {
+			foreach ($allTables as $table) {
+				$this->enhanceTable($table);
+			}
 		}
 
 		return $allTables;
@@ -90,10 +116,13 @@ class TableService extends SuperService {
 
 		// set if this table is shared by you (you share it with somebody else)
 		// a table can have other shares, we are looking here for shares from the userId in context
-		try {
-			$shares = $this->shareService->findAll('table', $table->getId());
-			$table->setHasShares(count($shares) !== 0);
-		} catch (InternalError $e) {
+		// (only if userId is given, otherwise it's an anonymize call maybe from the occ -> no shares relevant
+		if ($this->userId) {
+			try {
+				$shares = $this->shareService->findAll('table', $table->getId());
+				$table->setHasShares(count($shares) !== 0);
+			} catch (InternalError $e) {
+			}
 		}
 
 		// add the rows count

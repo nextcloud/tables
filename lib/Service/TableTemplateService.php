@@ -12,9 +12,9 @@ class TableTemplateService {
 
 	private ColumnService $columnService;
 
-	private string $userId;
+	private ?string $userId;
 
-	public function __construct(IL10N $l, ColumnService $columnService, string $userId) {
+	public function __construct(IL10N $l, ColumnService $columnService, ?string $userId) {
 		$this->l = $l;
 		$this->columnService = $columnService;
 		$this->userId = $userId;

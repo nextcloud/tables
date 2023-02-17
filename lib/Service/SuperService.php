@@ -9,9 +9,9 @@ class SuperService {
 
 	protected LoggerInterface $logger;
 
-	protected string $userId;
+	protected ?string $userId;
 
-	public function __construct(LoggerInterface $logger, string $userId, PermissionsService $permissionsService) {
+	public function __construct(LoggerInterface $logger, ?string $userId, PermissionsService $permissionsService) {
 		$this->permissionsService = $permissionsService;
 		$this->logger = $logger;
 		$this->userId = $userId;
