@@ -32,7 +32,7 @@ config                  -> config object for the table
 
 <template>
 	<div class="NcTable">
-		<div class="options row">
+		<div class="options row space-R-small">
 			<Options :rows="rows"
 				:selected-rows="selectedRows"
 				:show-options="columns.length !== 0"
