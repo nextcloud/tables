@@ -38,6 +38,7 @@ OC.L10N.register(
     "Last" : "Darrièr",
     "Previous" : "Precedent",
     "Next" : "Seguent",
+    "Sharing options" : "Opcions de partatge",
     "Create" : "Crear",
     "Today" : "Uèi",
     "Searching …" : "Recèrca…",

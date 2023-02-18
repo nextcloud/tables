@@ -46,6 +46,7 @@ OC.L10N.register(
     "No elements found." : "Нема нађених елемената.",
     "Shares" : "Дељења",
     "Permissions" : "Дозволе",
+    "Delete data" : "Брисање података",
     "No shares" : "Нема дељења",
     "Could not delete share" : "Не могу да обришем дељење"
 },
