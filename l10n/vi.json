@@ -38,6 +38,7 @@
     "Today" : "Hôm nay",
     "Searching …" : "Đang tìm kiếm ...",
     "Shares" : "Chia sẻ",
-    "Delete data" : "Xóa dữ liệu"
+    "Delete data" : "Xóa dữ liệu",
+    "Could not delete share" : "Không thể xoá chia sẻ"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

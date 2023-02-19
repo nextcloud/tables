@@ -40,6 +40,7 @@ OC.L10N.register(
     "Today" : "Hôm nay",
     "Searching …" : "Đang tìm kiếm ...",
     "Shares" : "Chia sẻ",
-    "Delete data" : "Xóa dữ liệu"
+    "Delete data" : "Xóa dữ liệu",
+    "Could not delete share" : "Không thể xoá chia sẻ"
 },
 "nplurals=1; plural=0;");
