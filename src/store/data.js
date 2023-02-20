@@ -75,6 +75,7 @@ export default {
 			return true
 		},
 		async updateColumn({ state, commit }, { id, data }) {
+			data.selectionOptions = JSON.stringify(data.selectionOptions)
 			try {
 				const res = await axios.put(generateUrl('/apps/tables/column/' + id), data)
 				if (res.status === 200) {
