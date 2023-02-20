@@ -8,27 +8,27 @@
 		</th>
 		<th>
 			<NcActions :force-menu="true">
-				<NcActionButton v-if="table.isShared && table.onSharePermissions.create"
+				<NcActionButton v-if="!table.isShared || table.isShared && table.onSharePermissions.create"
 					:close-after-click="true"
 					icon="icon-add"
 					@click="$emit('create-row')">
 					{{ t('tables', 'Create row') }}
 				</NcActionButton>
-				<NcActionSeparator v-if="table.isShared && table.onSharePermissions.create" />
-				<NcActionButton v-if="table.isShared && table.onSharePermissions.manage" :close-after-click="true" @click="$emit('create-column')">
+				<NcActionSeparator v-if="!table.isShared || table.isShared && table.onSharePermissions.create" />
+				<NcActionButton v-if="!table.isShared || table.isShared && table.onSharePermissions.manage" :close-after-click="true" @click="$emit('create-column')">
 					<template #icon>
 						<TableColumnPlusAfter :size="20" decorative title="" />
 					</template>
 					{{ t('tables', 'Create column') }}
 				</NcActionButton>
-				<NcActionButton v-if="table.isShared && table.onSharePermissions.manage" :close-after-click="true" @click="$emit('edit-columns')">
+				<NcActionButton v-if="!table.isShared || table.isShared && table.onSharePermissions.manage" :close-after-click="true" @click="$emit('edit-columns')">
 					<template #icon>
 						<TableEdit :size="20" decorative title="" />
 					</template>
 					{{ t('tables', 'Edit columns') }}
 				</NcActionButton>
-				<NcActionSeparator v-if="table.isShared && table.onSharePermissions.manage" />
-				<NcActionButton v-if="table.isShared && table.onSharePermissions.manage"
+				<NcActionSeparator v-if="!table.isShared || table.isShared && table.onSharePermissions.manage" />
+				<NcActionButton v-if="!table.isShared || table.isShared && table.onSharePermissions.manage"
 					:close-after-click="true"
 					icon="icon-share"
 					@click="toggleShare">
