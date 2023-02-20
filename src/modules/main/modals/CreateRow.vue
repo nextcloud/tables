@@ -112,8 +112,10 @@ export default {
 		async actionConfirm(closeModal) {
 			let mandatoryFieldsEmpty = false
 			this.columns.forEach(col => {
+				console.debug('check for mandatory columns', col)
 				if (col.mandatory) {
-					mandatoryFieldsEmpty = mandatoryFieldsEmpty || !(this.row[col.id] && this.row[col.id] !== 0)
+					const validValue = (!!this.row[col.id] || this.row[col.id] === 0)
+					mandatoryFieldsEmpty = mandatoryFieldsEmpty || !validValue
 				}
 			})
 			if (!mandatoryFieldsEmpty) {

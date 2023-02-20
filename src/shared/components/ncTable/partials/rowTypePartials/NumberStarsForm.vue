@@ -49,7 +49,7 @@ export default {
 	computed: {
 		localValue: {
 			get() {
-				if (this.value) {
+				if (this.value !== null) {
 					return this.value
 				} else {
 					if (this.column.numberDefault !== undefined) {
@@ -63,22 +63,7 @@ export default {
 			set(v) { this.$emit('update:value', v) },
 		},
 		getStars() {
-			const starEmpty = '☆'
-			const starFull = '★'
-			const v = this.localValue
-			let res = starEmpty + starEmpty + starEmpty + starEmpty + starEmpty
-			if (v && v === 1) {
-				res = starFull + starEmpty + starEmpty + starEmpty + starEmpty
-			} else if (v && v === 2) {
-				res = starFull + starFull + starEmpty + starEmpty + starEmpty
-			} else if (v && v === 3) {
-				res = starFull + starFull + starFull + starEmpty + starEmpty
-			} else if (v && v === 4) {
-				res = starFull + starFull + starFull + starFull + starEmpty
-			} else if (v && v === 5) {
-				res = starFull + starFull + starFull + starFull + starFull
-			}
-			return res
+			return '★'.repeat(this.localValue) + '☆'.repeat(5 - this.localValue)
 		},
 	},
 	methods: {

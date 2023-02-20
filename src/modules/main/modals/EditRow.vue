@@ -145,7 +145,8 @@ export default {
 			let mandatoryFieldsEmpty = false
 			this.columns.forEach(col => {
 				if (col.mandatory) {
-					mandatoryFieldsEmpty = mandatoryFieldsEmpty || !(this.localRow[col.id] && this.localRow[col.id] !== 0)
+					const validValue = (!!this.localRow[col.id] || this.localRow[col.id] === 0)
+					mandatoryFieldsEmpty = mandatoryFieldsEmpty || !validValue
 				}
 			})
 			if (!mandatoryFieldsEmpty) {
