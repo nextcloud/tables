@@ -224,6 +224,10 @@ class TableTemplateService {
 	 * @throws PermissionError
 	 */
 	private function createColumn(int $tableId, array $parameters): void {
+		if ($this->userId === null) {
+			return;
+		}
+
 		$this->columnService->create(
 
 			// tableId

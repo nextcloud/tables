@@ -30,7 +30,7 @@ class TableController extends Controller {
 	 */
 	public function index(): DataResponse {
 		return $this->handleError(function () {
-			return $this->service->findAll();
+			return $this->service->findAll($this->userId);
 		});
 	}
 

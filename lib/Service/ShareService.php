@@ -43,9 +43,12 @@ class ShareService extends SuperService {
 	 *
 	 * @psalm-param 'table' $nodeType
 	 */
-	public function findAll(string $nodeType, int $tableId): array {
+	public function findAll(string $nodeType, int $tableId, ?string $userId = null): array {
+		$this->permissionsService->preCheckUserId($userId);
+
 		try {
-			$shares = $this->mapper->findAllSharesForNode($nodeType, $tableId, $this->userId);
+			/** @var string $userId */
+			$shares = $this->mapper->findAllSharesForNode($nodeType, $tableId, $userId);
 			return $this->addReceiverDisplayNames($shares);
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage());
@@ -85,13 +88,12 @@ class ShareService extends SuperService {
 	 * @throws InternalError
 	 */
 	public function findTablesSharedWithMe(?string $userId = null): array {
-		if ($userId === null) {
-			$userId = $this->userId;
-		}
+		$this->permissionsService->preCheckUserId($userId);
 
 		$returnArray = [];
 
 		try {
+			/** @var string $userId */
 			// get all tables that are shared with me as user
 			$tablesSharedWithMe = $this->mapper->findAllSharesFor('table', $userId);
 
@@ -128,17 +130,22 @@ class ShareService extends SuperService {
 
 	/**
 	 * @throws NotFoundError
+	 * @throws InternalError
 	 */
-	public function findTableShareIfSharedWithMe(int $tableId): Share {
+	public function findTableShareIfSharedWithMe(int $tableId, ?string $userId = null): Share {
+		$this->permissionsService->preCheckUserId($userId);
+
 		// try to find a share with my userId
 		try {
-			return $this->mapper->findShareForNode($tableId, 'table', $this->userId, 'user');
+			/** @var string $userId */
+			return $this->mapper->findShareForNode($tableId, 'table', $userId, 'user');
 		} catch (Exception $e) {
 		}
 
 		// try to find a share with one of my groups
 		try {
-			$userGroups = $this->userHelper->getGroupsForUser($this->userId);
+			/** @var string $userId */
+			$userGroups = $this->userHelper->getGroupsForUser($userId);
 			foreach ($userGroups as $userGroup) {
 				return $this->mapper->findShareForNode($tableId, 'table', $userGroup->getGid(), 'group');
 				// $shares = $this->mapper->findAllSharesFor('table', $userGroup->getGid(), 'group');

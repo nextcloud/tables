@@ -9,11 +9,9 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 
 class ColumnController extends Controller {
-	/** @var ColumnService */
-	private $service;
+	private ColumnService $service;
 
-	/** @var string */
-	private $userId;
+	private string $userId;
 
 	use Errors;
 

@@ -25,13 +25,39 @@ class PermissionsService {
 
 	protected ?string $userId = null;
 
-	public function __construct(LoggerInterface $logger, ?string $userId, TableMapper $tableMapper, ShareMapper $shareMapper, UserHelper $userHelper) {
+	protected bool $isCli = false;
+
+	public function __construct(LoggerInterface $logger, ?string $userId, TableMapper $tableMapper, ShareMapper $shareMapper, UserHelper $userHelper, bool $isCLI) {
 		$this->tableMapper = $tableMapper;
 		$this->shareMapper = $shareMapper;
 		$this->userHelper = $userHelper;
 		$this->logger = $logger;
 		$this->userId = $userId;
+		$this->isCli = $isCLI;
 	}
+
+
+	/**
+	 * @throws InternalError
+	 */
+	public function preCheckUserId(?string &$userId, bool $canBeEmpty = true): void {
+		if ($userId === null) {
+			$userId = $this->userId;
+		}
+
+		if ($userId === null) {
+			$error = 'PreCheck for userId failed, requested in '. get_class($this) .'.';
+			$this->logger->debug($error);
+			throw new InternalError($error);
+		}
+
+		if ($userId === '' && !$this->isCli && !$canBeEmpty) {
+			$error = 'Try to set no user in context, but request is not allowed.';
+			$this->logger->warning($error);
+			throw new InternalError($error);
+		}
+	}
+
 
 	// ***** TABLES permissions *****
 
@@ -41,8 +67,17 @@ class PermissionsService {
 	 * @return bool
 	 */
 	public function canReadTable(Table $table, ?string $userId = null): bool {
-		$userId = $userId ?: $this->userId;
+		try {
+			$this->preCheckUserId($userId);
+		} catch (InternalError $e) {
+			return false;
+		}
 
+		if ($userId === '') {
+			return true;
+		}
+
+		/** @var string $userId */
 		if ($this->userIsTableOwner($userId, $table)) {
 			return true;
 		}
@@ -62,8 +97,17 @@ class PermissionsService {
 	 * @return bool
 	 */
 	public function canUpdateTable(Table $table, ?string $userId = null): bool {
-		$userId = $userId ?: $this->userId;
+		try {
+			$this->preCheckUserId($userId);
+		} catch (InternalError $e) {
+			return false;
+		}
 
+		if ($userId === '') {
+			return true;
+		}
+
+		/** @var string $userId */
 		if ($this->userIsTableOwner($userId, $table)) {
 			return true;
 		}
@@ -84,8 +128,17 @@ class PermissionsService {
 	 * @return bool
 	 */
 	public function canDeleteTable(Table $table, ?string $userId = null): bool {
-		$userId = $userId ?: $this->userId;
+		try {
+			$this->preCheckUserId($userId);
+		} catch (InternalError $e) {
+			return false;
+		}
 
+		if ($userId === '') {
+			return true;
+		}
+
+		/** @var string $userId */
 		if ($this->userIsTableOwner($userId, $table)) {
 			return true;
 		}
@@ -170,9 +223,19 @@ class PermissionsService {
 	 */
 	public function canReadRowsByTableId(int $tableId, ?string $userId = null): bool {
 		try {
-			$table = $this->tableMapper->find($tableId);
-			$userId = $userId ?: $this->userId;
+			$this->preCheckUserId($userId);
+		} catch (InternalError $e) {
+			return false;
+		}
 
+		if ($userId === '') {
+			return true;
+		}
+
+		try {
+			$table = $this->tableMapper->find($tableId);
+
+			/** @var string $userId */
 			if ($this->userIsTableOwner($userId, $table)) {
 				return true;
 			}
@@ -196,9 +259,19 @@ class PermissionsService {
 	 */
 	public function canCreateRowsByTableId(int $tableId, ?string $userId = null): bool {
 		try {
-			$table = $this->tableMapper->find($tableId);
-			$userId = $userId ?: $this->userId;
+			$this->preCheckUserId($userId);
+		} catch (InternalError $e) {
+			return false;
+		}
 
+		if ($userId === '') {
+			return true;
+		}
+
+		try {
+			$table = $this->tableMapper->find($tableId);
+
+			/** @var string $userId */
 			if ($this->userIsTableOwner($userId, $table)) {
 				return true;
 			}
@@ -222,9 +295,19 @@ class PermissionsService {
 	 */
 	public function canUpdateRowsByTableId(int $tableId, ?string $userId = null): bool {
 		try {
-			$table = $this->tableMapper->find($tableId);
-			$userId = $userId ?: $this->userId;
+			$this->preCheckUserId($userId);
+		} catch (InternalError $e) {
+			return false;
+		}
 
+		if ($userId === '') {
+			return true;
+		}
+
+		try {
+			$table = $this->tableMapper->find($tableId);
+
+			/** @var string $userId */
 			if ($this->userIsTableOwner($userId, $table)) {
 				return true;
 			}
@@ -248,9 +331,19 @@ class PermissionsService {
 	 */
 	public function canDeleteRowsByTableId(int $tableId, ?string $userId = null): bool {
 		try {
-			$table = $this->tableMapper->find($tableId);
-			$userId = $userId ?: $this->userId;
+			$this->preCheckUserId($userId);
+		} catch (InternalError $e) {
+			return false;
+		}
 
+		if ($userId === '') {
+			return true;
+		}
+
+		try {
+			$table = $this->tableMapper->find($tableId);
+
+			/** @var string $userId */
 			if ($this->userIsTableOwner($userId, $table)) {
 				return true;
 			}
@@ -272,7 +365,15 @@ class PermissionsService {
 
 	/** @noinspection PhpUndefinedMethodInspection */
 	public function canReadShare(Share $share, ?string $userId = null): bool {
-		$userId = $userId ?: $this->userId;
+		try {
+			$this->preCheckUserId($userId);
+		} catch (InternalError $e) {
+			return false;
+		}
+
+		if ($userId === '') {
+			return true;
+		}
 
 		if ($share->getSender() === $userId) {
 			return true;
@@ -284,6 +385,7 @@ class PermissionsService {
 
 		if ($share->getReceiverType() === 'group') {
 			try {
+				/** @var string $userId */
 				$userGroups = $this->userHelper->getGroupsForUser($userId);
 				foreach ($userGroups as $userGroup) {
 					if ($userGroup->getDisplayName() === $share->getReceiver()) {
@@ -299,14 +401,30 @@ class PermissionsService {
 	}
 
 	public function canUpdateShare(Share $item, ?string $userId = null): bool {
-		$userId = $userId ?: $this->userId;
+		try {
+			$this->preCheckUserId($userId);
+		} catch (InternalError $e) {
+			return false;
+		}
+
+		if ($userId === '') {
+			return true;
+		}
 
 		/** @noinspection PhpUndefinedMethodInspection */
 		return $item->getSender() === $userId;
 	}
 
 	public function canDeleteShare(Share $item, ?string $userId = null): bool {
-		$userId = $userId ?: $this->userId;
+		try {
+			$this->preCheckUserId($userId);
+		} catch (InternalError $e) {
+			return false;
+		}
+
+		if ($userId === '') {
+			return true;
+		}
 
 		/** @noinspection PhpUndefinedMethodInspection */
 		return $item->getSender() === $userId;

@@ -14,7 +14,7 @@ class Api1Controller extends ApiController {
 
 	private V1Api $v1Api;
 
-	private ?string $userId = null;
+	private string $userId;
 
 	use Errors;
 
@@ -37,7 +37,7 @@ class Api1Controller extends ApiController {
 	 */
 	public function index(): DataResponse {
 		return $this->handleError(function () {
-			return $this->tableService->findAll();
+			return $this->tableService->findAll($this->userId);
 		});
 	}
 

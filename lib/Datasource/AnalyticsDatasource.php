@@ -25,16 +25,20 @@ class AnalyticsDatasource implements IDatasource {
 	private TableService $tableService;
 	private V1Api $api;
 
+	protected ?string $userId;
+
 	public function __construct(
 		IL10N           $l10n,
 		LoggerInterface $logger,
 		TableService    $tableService,
-		V1Api           $api
+		V1Api           $api,
+		string          $userId
 	) {
 		$this->l10n = $l10n;
 		$this->logger = $logger;
 		$this->tableService = $tableService;
 		$this->api = $api;
+		$this->userId = $userId;
 	}
 
 	/**
@@ -78,7 +82,11 @@ class AnalyticsDatasource implements IDatasource {
 		$template = [];
 
 		// get all tables for the current user and concatenate the placeholder string
-		$tables = $this->tableService->findAll();
+		if ($this->userId) {
+			$tables = $this->tableService->findAll($this->userId);
+		} else {
+			$tables = [];
+		}
 		foreach ($tables as $table) {
 			$tableString = $tableString . $table->jsonSerialize()['id'] . '-' . $table->jsonSerialize()['title'] . '/';
 		}

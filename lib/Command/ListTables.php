@@ -39,7 +39,7 @@ class ListTables extends Command {
 		$this->tableService = $tableService;
 	}
 
-	protected function configure() {
+	protected function configure(): void {
 		$this
 			->setName('tables:list')
 			->setDescription('List all tables.')
@@ -56,7 +56,7 @@ class ListTables extends Command {
 			)
 			->addOption(
 				'no-shares',
-				'',
+				's',
 				InputOption::VALUE_NONE,
 				'No shared tables'
 			)
@@ -66,9 +66,9 @@ class ListTables extends Command {
 	/**
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
-	 * @return void
+	 * @return int
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$userId = $input->getArgument('user-id');
 		$showCounter = !!$input->getOption('count');
 		$noSharedTables = !!$input->getOption('no-shares');
@@ -76,7 +76,7 @@ class ListTables extends Command {
 		$tables = [];
 		try {
 			if ($userId === null) {
-				$tables = $this->tableService->findAllForAdmins(true);
+				$tables = $this->tableService->findAll('', true, true);
 			} else {
 				$tables = $this->tableService->findAll($userId, true, $noSharedTables);
 			}
@@ -99,5 +99,6 @@ class ListTables extends Command {
 			}
 			$output->writeln(json_encode($out, JSON_PRETTY_PRINT));
 		}
+		return 0;
 	}
 }
