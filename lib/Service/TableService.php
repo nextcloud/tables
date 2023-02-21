@@ -181,6 +181,28 @@ class TableService extends SuperService {
 	}
 
 	/**
+	 * @param string|null $userId
+	 * @param string $term
+	 * @param int $offset
+	 * @param int $limit
+	 * @param bool $skipTableEnhancement
+	 * @param bool $skipSharedTables
+	 * @return array
+	 * @throws InternalError
+	 */
+	public function search(?string $userId, string $term, int $offset = 0, int $limit = 5,
+						   bool $skipTableEnhancement = false, bool $skipSharedTables = false): array {
+		$allTables = $this->findAll($userId, $skipTableEnhancement, $skipSharedTables);
+		$allTables = array_map(static function (Table $table) {
+			return $table->jsonSerialize();
+		}, $allTables);
+		$results = array_filter($allTables, static function (array $table) use ($term) {
+			return strpos($table['title'], $term) !== false;
+		});
+		return array_slice($results, $offset, $limit);
+	}
+
+	/**
 	 * @noinspection PhpUndefinedMethodInspection
 	 *
 	 * @throws \OCP\DB\Exception
