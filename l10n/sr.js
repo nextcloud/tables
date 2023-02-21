@@ -28,6 +28,7 @@ OC.L10N.register(
     "Type" : "Тип",
     "Save" : "Сачувај",
     "Link" : "Веза",
+    "Selection" : "Избор",
     "Time" : "Време",
     "Confirm" : "Потврди",
     "Move up" : "Помери нагоре",
