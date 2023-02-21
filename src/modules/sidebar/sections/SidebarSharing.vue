@@ -1,7 +1,7 @@
 <template>
 	<div v-if="activeTable" class="sharing">
 		<h1>{{ t('tables', 'Sharing') }}</h1>
-		<div v-if="!activeTable.isShared">
+		<div v-if="!activeTable.isShared || activeTable.ownership === getCurrentUser().uid">
 			<ShareForm :shares="shares" @add="addShare" @update="updateShare" />
 			<ShareList :shares="shares" @remove="removeShare" @update="updateShare" />
 		</div>
@@ -16,6 +16,7 @@ import { mapGetters, mapState } from 'vuex'
 import shareAPI from '../mixins/shareAPI.js'
 import ShareForm from '../partials/ShareForm.vue'
 import ShareList from '../partials/ShareList.vue'
+import { getCurrentUser } from '@nextcloud/auth'
 
 export default {
 	components: {
@@ -54,6 +55,7 @@ export default {
 	},
 
 	methods: {
+		getCurrentUser,
 		async loadSharesFromBE() {
 			this.loading = true
 			this.shares = await this.getSharedWithFromBE()

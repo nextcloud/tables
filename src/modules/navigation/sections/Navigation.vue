@@ -61,6 +61,7 @@ import NavigationTableItem from '../partials/NavigationTableItem.vue'
 import { mapState, mapGetters } from 'vuex'
 import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
+import { getCurrentUser } from '@nextcloud/auth'
 
 export default {
 	name: 'Navigation',
@@ -88,10 +89,10 @@ export default {
 		...mapState(['tables', 'tablesLoading']),
 		...mapGetters(['activeTable']),
 		getSharedTables() {
-			return this.getFilteredTables.filter((item) => { return item.isShared === true }).sort((a, b) => a.title.localeCompare(b.title))
+			return this.getFilteredTables.filter((item) => { return item.isShared === true && item.ownership !== getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
 		},
 		getOwnTables() {
-			return this.getFilteredTables.filter((item) => { return item.isShared === false }).sort((a, b) => a.title.localeCompare(b.title))
+			return this.getFilteredTables.filter((item) => { return item.isShared === false || item.ownership === getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
 		},
 		getFilteredTables() {
 			return this.tables.filter(table => { return table.title.toLowerCase().includes(this.filterString.toLowerCase()) })
