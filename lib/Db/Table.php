@@ -3,19 +3,26 @@
 namespace OCA\Tables\Db;
 
 use JsonSerializable;
-
 use OCP\AppFramework\Db\Entity;
 
+/**
+ * @psalm-suppress PropertyNotSetInConstructor
+ */
 class Table extends Entity implements JsonSerializable {
-	protected $title;
-	protected $ownership;
-	protected $ownerDisplayName;
-	protected $createdBy;
-	protected $createdAt;
-	protected $lastEditBy;
-	protected $lastEditAt;
-	protected $isShared;
-	protected $onSharePermissions;
+	protected ?string $title = null;
+
+	protected ?string $emoji = null;
+	protected ?string $ownership = null;
+	protected ?string $ownerDisplayName = null;
+	protected ?string $createdBy = null;
+	protected ?string $createdAt = null;
+	protected ?string $lastEditBy = null;
+	protected ?string $lastEditAt = null;
+	protected ?bool $isShared = null;
+	protected ?array $onSharePermissions = null;
+
+	protected ?bool $hasShares = false;
+	protected ?int $rowsCount = 0;
 
 	public function __construct() {
 		$this->addType('id', 'integer');
@@ -25,6 +32,7 @@ class Table extends Entity implements JsonSerializable {
 		return [
 			'id' => $this->id,
 			'title' => $this->title,
+			'emoji' => $this->emoji,
 			'ownership' => $this->ownership,
 			'ownerDisplayName' => $this->ownerDisplayName,
 			'createdBy' => $this->createdBy,
@@ -33,6 +41,8 @@ class Table extends Entity implements JsonSerializable {
 			'lastEditAt' => $this->lastEditAt,
 			'isShared' => !!$this->isShared,
 			'onSharePermissions' => $this->onSharePermissions,
+			'hasShares' => $this->hasShares,
+			'rowsCount' => $this->rowsCount
 		];
 	}
 }

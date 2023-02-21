@@ -6,38 +6,41 @@ use JsonSerializable;
 
 use OCP\AppFramework\Db\Entity;
 
+/**
+ * @psalm-suppress PropertyNotSetInConstructor
+ */
 class Column extends Entity implements JsonSerializable {
-	protected $title;
-	protected $tableId;
-	protected $createdBy;
-	protected $createdAt;
-	protected $lastEditBy;
-	protected $lastEditAt;
-	protected $type;
-	protected $subtype;
-	protected $mandatory;
-	protected $description;
-	protected $orderWeight;
+	protected ?string $title = null;
+	protected ?int $tableId = null;
+	protected ?string $createdBy = null;
+	protected ?string $createdAt = null;
+	protected ?string $lastEditBy = null;
+	protected ?string $lastEditAt = null;
+	protected ?string $type = null;
+	protected ?string $subtype = null;
+	protected ?bool $mandatory = null;
+	protected ?string $description = null;
+	protected ?int $orderWeight = null;
 
 	// type number
-	protected $numberDefault;
-	protected $numberMin;
-	protected $numberMax;
-	protected $numberDecimals;
-	protected $numberPrefix;
-	protected $numberSuffix;
+	protected ?float $numberDefault = null;
+	protected ?float $numberMin = null;
+	protected ?float $numberMax = null;
+	protected ?int $numberDecimals = null;
+	protected ?string $numberPrefix = null;
+	protected ?string $numberSuffix = null;
 
 	// type text
-	protected $textDefault;
-	protected $textAllowedPattern;
-	protected $textMaxLength;
+	protected ?string $textDefault = null;
+	protected ?string $textAllowedPattern = null;
+	protected ?int $textMaxLength = null;
 
 	// type selection
-	protected $selectionOptions;
-	protected $selectionDefault;
+	protected ?string $selectionOptions = null;
+	protected ?string $selectionDefault = null;
 
 	// type datetime
-	protected $datetimeDefault;
+	protected ?string $datetimeDefault = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');
@@ -56,12 +59,17 @@ class Column extends Entity implements JsonSerializable {
 	}
 
 	/** @noinspection PhpUndefinedMethodInspection */
-	public function getSelectionOptionsArray() {
-		return \json_decode($this->getSelectionOptions(), true);
+	public function getSelectionOptionsArray():array {
+		$options = $this->getSelectionOptions();
+		if ($options !== "") {
+			return \json_decode($options, true);
+		} else {
+			return [];
+		}
 	}
 
 	/** @noinspection PhpUndefinedMethodInspection */
-	public function setSelectionOptionsArray($array) {
+	public function setSelectionOptionsArray(array $array):void {
 		$json = \json_encode($array);
 		$this->setSelectionOptions($json);
 	}

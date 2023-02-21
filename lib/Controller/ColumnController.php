@@ -9,17 +9,15 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 
 class ColumnController extends Controller {
-	/** @var ColumnService */
-	private $service;
+	private ColumnService $service;
 
-	/** @var string */
-	private $userId;
+	private string $userId;
 
 	use Errors;
 
 	public function __construct(IRequest     $request,
 								ColumnService $service,
-											 $userId) {
+											 string $userId) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->service = $service;
 		$this->userId = $userId;
@@ -188,7 +186,7 @@ class ColumnController extends Controller {
 	 */
 	public function destroy(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
-			return $this->service->delete($id, $this->userId);
+			return $this->service->delete($id, false, $this->userId);
 		});
 	}
 }

@@ -3,15 +3,15 @@
 namespace OCA\Tables\Db;
 
 use OCP\AppFramework\Db\DoesNotExistException;
-use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
+/** @template-extends QBMapper<Share> */
 class ShareMapper extends QBMapper {
-	protected $table = 'tables_shares';
+	protected string $table = 'tables_shares';
 
 	public function __construct(IDBConnection $db) {
 		parent::__construct($db, $this->table, Share::class);
@@ -19,10 +19,11 @@ class ShareMapper extends QBMapper {
 
 	/**
 	 * @param int $id
-	 * @return Entity|Share
-	 * @throws MultipleObjectsReturnedException
-	 * @throws Exception
+	 *
+	 * @return Share
 	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @throws MultipleObjectsReturnedException
 	 */
 	public function find(int $id): Share {
 		$qb = $this->db->getQueryBuilder();
@@ -37,13 +38,15 @@ class ShareMapper extends QBMapper {
 	 * look for all receiver types or limit it to one given type
 	 *
 	 * @param int $nodeId
-	 * @param $nodeType
-	 * @param $receiver
-	 * @param null $receiverType
+	 * @param string $nodeType
+	 * @param string $receiver
+	 * @param string|null $receiverType
+	 *
 	 * @return Share
+	 *
 	 * @throws Exception
 	 */
-	public function findShareForNode(int $nodeId, $nodeType, $receiver, $receiverType = null): Share {
+	public function findShareForNode(int $nodeId, string $nodeType, string $receiver, ?string $receiverType = null): Share {
 		// if shared with user
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
@@ -66,13 +69,15 @@ class ShareMapper extends QBMapper {
 	}
 
 	/**
-	 * @param $nodeType
-	 * @param $receiver
-	 * @param string $receiverType
-	 * @return Share[]
+	 * @param string $nodeType
+	 * @param string $receiver
+	 * @param string|null $receiverType
+	 *
+	 * @return array
+	 *
 	 * @throws Exception
 	 */
-	public function findAllSharesFor($nodeType, $receiver, string $receiverType = 'user'): array {
+	public function findAllSharesFor(string $nodeType, string $receiver, ?string $receiverType = 'user'): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
@@ -83,13 +88,14 @@ class ShareMapper extends QBMapper {
 	}
 
 	/**
-	 * @param $nodeType
+	 * @param string $nodeType
 	 * @param int $nodeId
-	 * @param $sender
+	 * @param string $sender
+	 * @param int|null $limit
 	 * @return array
 	 * @throws Exception
 	 */
-	public function findAllSharesForNode($nodeType, int $nodeId, $sender): array {
+	public function findAllSharesForNode(string $nodeType, int $nodeId, string $sender, ?int $limit = null): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
@@ -100,13 +106,15 @@ class ShareMapper extends QBMapper {
 	}
 
 	/**
+	 * @param int $nodeId
+	 * @param string $nodeType
 	 * @throws Exception
 	 */
-	public function deleteByNode(int $nodeId, string $nodeType) {
+	public function deleteByNode(int $nodeId, string $nodeType):void {
 		$qb = $this->db->getQueryBuilder();
 		$qb->delete($this->table)
 			->where($qb->expr()->eq('node_id', $qb->createNamedParameter($nodeId, IQueryBuilder::PARAM_INT)))
 			->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType, IQueryBuilder::PARAM_STR)))
-			->execute();
+			->executeStatement();
 	}
 }

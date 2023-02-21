@@ -3,15 +3,15 @@
 namespace OCA\Tables\Db;
 
 use OCP\AppFramework\Db\DoesNotExistException;
-use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
+/** @template-extends QBMapper<Row> */
 class RowMapper extends QBMapper {
-	protected $table = 'tables_rows';
+	protected string $table = 'tables_rows';
 
 	public function __construct(IDBConnection $db) {
 		parent::__construct($db, $this->table, Row::class);
@@ -19,7 +19,8 @@ class RowMapper extends QBMapper {
 
 	/**
 	 * @param int $id
-	 * @return Entity|Table
+	 *
+	 * @return Row
 	 * @throws DoesNotExistException
 	 * @throws Exception
 	 * @throws MultipleObjectsReturnedException
@@ -34,14 +35,24 @@ class RowMapper extends QBMapper {
 
 	/**
 	 * @param int $tableId
+	 * @param int|null $limit
+	 * @param int|null $offset
 	 * @return array
 	 * @throws Exception
 	 */
-	public function findAllByTable(int $tableId): array {
+	public function findAllByTable(int $tableId, ?int $limit = null, ?int $offset = null): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId)));
+
+		if ($limit !== null) {
+			$qb->setMaxResults($limit);
+		}
+		if ($offset !== null) {
+			$qb->setFirstResult($offset);
+		}
+
 		return $this->findEntities($qb);
 	}
 
@@ -68,5 +79,24 @@ class RowMapper extends QBMapper {
 		$qb->where('JSON_CONTAINS(JSON_EXTRACT(data, \'$[*].columnId\'), :columnId, \'$\') = 1');
 		$qb->setParameter('columnId', $columnId);
 		return $this->findEntities($qb);
+	}
+
+	/**
+	 *
+	 */
+	public function countRows(int $tableId): int {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select($qb->createFunction('COUNT(*)'));
+		$qb->from($this->table);
+		$qb->where(
+			$qb->expr()->eq('table_id', $qb->createNamedParameter($tableId))
+		);
+
+		try {
+			$result = $this->findOneQuery($qb);
+			return (int)$result['COUNT(*)'];
+		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+			return 0;
+		}
 	}
 }

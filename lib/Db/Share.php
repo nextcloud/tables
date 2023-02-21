@@ -6,20 +6,24 @@ use JsonSerializable;
 
 use OCP\AppFramework\Db\Entity;
 
+/**
+ * @psalm-suppress PropertyNotSetInConstructor
+ */
 class Share extends Entity implements JsonSerializable {
-	protected $sender; // is also owner
-	protected $receiver;
-	protected $receiverDisplayName;
-	protected $receiverType; // user, group
-	protected $nodeId;
-	protected $nodeType;
-	protected $permissionRead;
-	protected $permissionCreate;
-	protected $permissionUpdate;
-	protected $permissionDelete;
-	protected $permissionManage;
-	protected $createdAt;
-	protected $lastEditAt;
+	protected ?string $sender = null; // is also owner
+
+	protected ?string $receiver = null;
+	protected ?string $receiverDisplayName = null;
+	protected ?string $receiverType = null; // user, group
+	protected ?int $nodeId = null;
+	protected ?string $nodeType = null;
+	protected ?bool $permissionRead = null;
+	protected ?bool $permissionCreate = null;
+	protected ?bool $permissionUpdate = null;
+	protected ?bool $permissionDelete = null;
+	protected ?bool $permissionManage = null;
+	protected ?string $createdAt = null;
+	protected ?string $lastEditAt = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');

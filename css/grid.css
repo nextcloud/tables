@@ -4,9 +4,13 @@
 }
 
 .row.first-row {
-	padding-top: 35px;
-	padding-left: 45px;
-	width: calc(100% - 45px);
+	padding-top: calc(var(--default-grid-baseline) * 4);
+	padding-left: 60px;
+	/*width: calc(100% - 45px);*/
+	width: 100%;
+	margin-bottom: 20px;
+	align-items: center;
+	display: inline-flex;
 }
 
 .row::after {
@@ -188,10 +192,6 @@
 @media only screen and (max-width: 1025px) {
 	.hide-m {
 		display: none;
-	}
-
-	.row.first-row {
-		padding-top: 20px;
 	}
 }
 

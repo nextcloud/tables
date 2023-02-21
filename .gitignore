@@ -1,9 +1,10 @@
-.idea
+\.idea/
 *.iml
-/vendor/
-/build/
+vendor/
+build/
 node_modules/
-/.php_cs.cache
+.php_cs.cache
+.php-cs-fixer.cache
 js/*hot-update.*
-# Project exclude paths
-/js/
+js/
+appinfo/info.xsd

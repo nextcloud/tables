@@ -14,10 +14,9 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use Psr\Log\LoggerInterface;
 
 class RowService extends SuperService {
-	/** @var RowMapper */
-	private $mapper;
+	private RowMapper $mapper;
 
-	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, $userId,
+	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
 								RowMapper $mapper) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
@@ -25,13 +24,17 @@ class RowService extends SuperService {
 
 
 	/**
+	 * @param int $tableId
+	 * @param ?int $limit
+	 * @param ?int $offset
+	 * @return array
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function findAllByTable(int $tableId): array {
+	public function findAllByTable(int $tableId, ?int $limit = null, ?int $offset = null): array {
 		try {
-			if ($this->permissionsService->canReadRows($tableId)) {
-				return $this->mapper->findAllByTable($tableId);
+			if ($this->permissionsService->canReadRowsByTableId($tableId)) {
+				return $this->mapper->findAllByTable($tableId, $limit, $offset);
 			} else {
 				throw new PermissionError('no read access to table id = '.$tableId);
 			}
@@ -43,17 +46,19 @@ class RowService extends SuperService {
 
 
 	/**
-	 * @throws NotFoundError
+	 * @param int $id
+	 * @return Row
 	 * @throws InternalError
+	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function find($id) {
+	public function find(int $id): Row {
 		try {
 			$row = $this->mapper->find($id);
 
 			// security
 			/** @noinspection PhpUndefinedMethodInspection */
-			if (!$this->permissionsService->canReadRows($row->getTableId())) {
+			if (!$this->permissionsService->canReadRowsByTableId($row->getTableId())) {
 				throw new PermissionError('PermissionError: can not read row with id '.$id);
 			}
 
@@ -68,8 +73,12 @@ class RowService extends SuperService {
 	}
 
 	/**
-	 * @throws \OCP\DB\Exception
+	 * @param int $tableId
+	 * @param int $columnId
+	 * @param string $data
+	 * @return Row
 	 * @throws PermissionError
+	 * @throws \OCP\DB\Exception
 	 * @noinspection PhpUndefinedMethodInspection
 	 * @noinspection DuplicatedCode
 	 */
@@ -77,9 +86,9 @@ class RowService extends SuperService {
 		int $tableId,
 		int $columnId,
 		string $data
-	) {
+	):Row {
 		// security
-		if (!$this->permissionsService->canCreateRows($tableId)) {
+		if (!$this->permissionsService->canCreateRowsByTableId($tableId)) {
 			throw new PermissionError('create row at the table id = '.$tableId.' is not allowed.');
 		}
 
@@ -100,17 +109,20 @@ class RowService extends SuperService {
 	}
 
 	/**
-	 * @throws \OCP\DB\Exception
+	 * @param int $tableId
+	 * @param array $data
+	 * @return Row
 	 * @throws PermissionError
+	 * @throws \OCP\DB\Exception
 	 * @noinspection PhpUndefinedMethodInspection
 	 * @noinspection DuplicatedCode
 	 */
 	public function createComplete(
 		int $tableId,
 		array $data
-	) {
+	):Row {
 		// security
-		if (!$this->permissionsService->canCreateRows($tableId)) {
+		if (!$this->permissionsService->canCreateRowsByTableId($tableId)) {
 			throw new PermissionError('create row at the table id = '.$tableId.' is not allowed.');
 		}
 
@@ -128,19 +140,24 @@ class RowService extends SuperService {
 	/**
 	 * @noinspection PhpUndefinedMethodInspection
 	 * @noinspection DuplicatedCode
+	 * @param int $id
+	 * @param int $columnId
+	 * @param string $data
+	 * @return Row
 	 * @throws InternalError
-	 * @throws NotFoundError|PermissionError
+	 * @throws NotFoundError
+	 * @throws PermissionError
 	 */
 	public function update(
 		int $id,
 		int $columnId,
 		string $data
-	) {
+	):Row {
 		try {
 			$item = $this->find($id);
 
 			// security
-			if (!$this->permissionsService->canUpdateRows($item->getTableId())) {
+			if (!$this->permissionsService->canUpdateRowsByTableId($item->getTableId())) {
 				throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
 			}
 
@@ -175,17 +192,20 @@ class RowService extends SuperService {
 	/**
 	 * @noinspection PhpUndefinedMethodInspection
 	 * @noinspection DuplicatedCode
+	 * @param int $id
+	 * @param array $data
+	 * @return Row
 	 * @throws InternalError
 	 */
 	public function updateSet(
 		int $id,
 		array $data
-	) {
+	):Row {
 		try {
 			$item = $this->mapper->find($id);
 
 			// security
-			if (!$this->permissionsService->canUpdateRows($item->getTableId())) {
+			if (!$this->permissionsService->canUpdateRowsByTableId($item->getTableId())) {
 				throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
 			}
 
@@ -204,7 +224,7 @@ class RowService extends SuperService {
 		}
 	}
 
-	private function replaceOrAddData($dataArray, $newDataObject): array {
+	private function replaceOrAddData(array $dataArray, array $newDataObject): array {
 		$columnId = intval($newDataObject['columnId']);
 		$value = $newDataObject['value'];
 
@@ -227,17 +247,19 @@ class RowService extends SuperService {
 	}
 
 	/**
-	 * @throws PermissionError
-	 * @throws NotFoundError
+	 * @param int $id
+	 * @return Row
 	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
 	 */
-	public function delete($id) {
+	public function delete(int $id): Row {
 		try {
 			$item = $this->mapper->find($id);
 
 			// security
 			/** @noinspection PhpUndefinedMethodInspection */
-			if (!$this->permissionsService->canDeleteRows($item->getTableId())) {
+			if (!$this->permissionsService->canDeleteRowsByTableId($item->getTableId())) {
 				throw new PermissionError('delete row id = '.$item->getId().' is not allowed.');
 			}
 
@@ -251,12 +273,15 @@ class RowService extends SuperService {
 	}
 
 	/**
-	 * @throws \OCP\DB\Exception
+	 * @param int $tableId
+	 * @param null|string $userId
+	 * @return int
 	 * @throws PermissionError
+	 * @throws \OCP\DB\Exception
 	 */
-	public function deleteAllByTable(int $tableId, $userId = null): int {
+	public function deleteAllByTable(int $tableId, ?string $userId = null): int {
 		// security
-		if (!$this->permissionsService->canDeleteRows($tableId, $userId)) {
+		if (!$this->permissionsService->canDeleteRowsByTableId($tableId, $userId)) {
 			throw new PermissionError('delete all rows for table id = '.$tableId.' is not allowed.');
 		}
 
@@ -264,15 +289,16 @@ class RowService extends SuperService {
 	}
 
 	/**
-	 * @throws \OCP\DB\Exception
+	 * @param int $columnId
 	 * @throws PermissionError
+	 * @throws \OCP\DB\Exception
 	 */
-	public function deleteColumnDataFromRows(int $columnId) {
+	public function deleteColumnDataFromRows(int $columnId):void {
 		$rows = $this->mapper->findAllWithColumn($columnId);
 
 		// security
 		if (count($rows) > 0) {
-			if (!$this->permissionsService->canUpdateRows($rows[0]->getTableId())) {
+			if (!$this->permissionsService->canUpdateRowsByTableId($rows[0]->getTableId())) {
 				throw new PermissionError('update row id = '.$rows[0]->getId().' within '.__FUNCTION__.' is not allowed.');
 			}
 		}
@@ -287,6 +313,19 @@ class RowService extends SuperService {
 			}
 			$row->setDataArray($data);
 			$this->mapper->update($row);
+		}
+	}
+
+	public function getRowsCount(int $tableId): int {
+		try {
+			if ($this->permissionsService->canReadRowsByTableId($tableId)) {
+				return $this->mapper->countRows($tableId);
+			} else {
+				throw new PermissionError('no read access for counting to table id = '.$tableId);
+			}
+		} catch (\OCP\DB\Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
 		}
 	}
 }

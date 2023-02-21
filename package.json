@@ -1,7 +1,7 @@
 {
 	"name": "tables",
 	"description": "Manage data within tables.",
-	"version": "0.2.2",
+	"version": "0.3.0",
 	"author": "Florian Steffens <florian@nextcloud.com",
 	"bugs": {
 		"url": "https://github.com/nextcloud/tables/issues"
@@ -37,9 +37,9 @@
 		"@tiptap/vue-2": "^2.0.0-beta.217",
 		"debounce": "^1.2.1",
 		"vue": "^2.7.14",
+		"vue-papa-parse": "^3.1.0",
 		"vue-material-design-icons": "^5.2.0",
 		"vue-router": "^3.6.5",
-		"vue-tabulator": "^1.3.0",
 		"vuex": "^3.6.2"
 	},
 	"browserslist": [
@@ -54,6 +54,8 @@
 		"@nextcloud/browserslist-config": "^2.3.0",
 		"@nextcloud/eslint-config": "^8.2.1",
 		"@nextcloud/stylelint-config": "^2.3.0",
-		"@nextcloud/webpack-vue-config": "^5.4.0"
+		"@nextcloud/webpack-vue-config": "^5.4.0",
+		"sass": "^1.58.0",
+		"sass-loader": "^13.2.0"
 	}
 }

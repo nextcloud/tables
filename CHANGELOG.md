@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 - 2023-02-03
+### Updated
+- Table component replaced
+- code cleanup
+- initial CI setup
+- UI and UX improvements
+
 ## 0.2.2 - 2023-01-10
 ### Updated
 - translation

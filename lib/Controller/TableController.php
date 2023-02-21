@@ -9,18 +9,16 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 
 class TableController extends Controller {
-	/** @var TableService */
-	private $service;
+	private TableService $service;
 
-	/** @var string */
-	private $userId;
+	private string $userId;
 
 	use Errors;
 
 
 	public function __construct(IRequest     $request,
 								TableService $service,
-											 $userId) {
+											 string $userId) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->service = $service;
 		$this->userId = $userId;
@@ -32,7 +30,7 @@ class TableController extends Controller {
 	 */
 	public function index(): DataResponse {
 		return $this->handleError(function () {
-			return $this->service->findAll();
+			return $this->service->findAll($this->userId);
 		});
 	}
 
@@ -48,18 +46,18 @@ class TableController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function create(string $title, string $template): DataResponse {
-		return $this->handleError(function () use ($title, $template) {
-			return $this->service->create($title, $template);
+	public function create(string $title, string $template, string $emoji): DataResponse {
+		return $this->handleError(function () use ($title, $template, $emoji) {
+			return $this->service->create($title, $template, $emoji);
 		});
 	}
 
 	/**
 	 * @NoAdminRequired
 	 */
-	public function update(int $id, string $title): DataResponse {
-		return $this->handleError(function () use ($id, $title) {
-			return $this->service->update($id, $title, $this->userId);
+	public function update(int $id, string $title, string $emoji): DataResponse {
+		return $this->handleError(function () use ($id, $title, $emoji) {
+			return $this->service->update($id, $title, $emoji, $this->userId);
 		});
 	}
 

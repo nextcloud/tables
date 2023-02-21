@@ -9,20 +9,27 @@
             "email": "florian@nextcloud.com"
         }
     ],
-    "require": {},
     "require-dev": {
-        "nextcloud/coding-standard": "^1.0.0"
+        "nextcloud/coding-standard": "^v1.0.0",
+        "vimeo/psalm": "^5.6.0",
+        "nextcloud/ocp": "dev-master",
+        "phan/phan": "5.x",
+        "staabm/annotate-pull-request-from-checkstyle": "^1.8"
     },
     "config": {
         "optimize-autoloader": true,
         "classmap-authoritative": true,
         "platform": {
-            "php": "7.4"
+            "php": "8.0"
         }
     },
     "scripts": {
         "lint": "find . -name \\*.php -not -path './vendor/*' -not -path './build/*' -print0 | xargs -0 -n1 php -l",
         "cs:check": "php-cs-fixer fix --dry-run --diff",
-        "cs:fix": "php-cs-fixer fix"
+        "cs:fix": "php-cs-fixer fix",
+        "psalm": "./vendor/bin/psalm --show-info=true --no-cache",
+        "psalm:update-baseline": "./vendor/bin/psalm --update-baseline",
+        "psalm:fix": "./vendor/bin/psalm --no-cache --alter --issues=InvalidReturnType,InvalidNullableReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingParamType,InvalidFalsableReturnType",
+        "psalm:fix:dry": "./vendor/bin/psalm --no-cache --alter --issues=InvalidReturnType,InvalidNullableReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingParamType,InvalidFalsableReturnType --dry-run"
     }
 }

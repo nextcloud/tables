@@ -14,34 +14,70 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
 use Psr\Log\LoggerInterface;
 
-class PermissionsService extends SuperService {
-	/** @var TableMapper */
-	private $tableMapper;
+class PermissionsService {
+	private TableMapper $tableMapper;
 
-	/** @var ShareMapper */
-	private $shareMapper;
+	private ShareMapper $shareMapper;
 
-	/** @var UserHelper */
-	private $userHelper;
+	private UserHelper $userHelper;
 
-	public function __construct(LoggerInterface $logger, $userId, TableMapper $tableMapper, ShareMapper $shareMapper, UserHelper $userHelper) {
-		parent::__construct($logger, $userId);
+	protected LoggerInterface $logger;
+
+	protected ?string $userId = null;
+
+	protected bool $isCli = false;
+
+	public function __construct(LoggerInterface $logger, ?string $userId, TableMapper $tableMapper, ShareMapper $shareMapper, UserHelper $userHelper, bool $isCLI) {
 		$this->tableMapper = $tableMapper;
 		$this->shareMapper = $shareMapper;
 		$this->userHelper = $userHelper;
+		$this->logger = $logger;
+		$this->userId = $userId;
+		$this->isCli = $isCLI;
 	}
+
+
+	/**
+	 * @throws InternalError
+	 */
+	public function preCheckUserId(?string &$userId, bool $canBeEmpty = true): void {
+		if ($userId === null) {
+			$userId = $this->userId;
+		}
+
+		if ($userId === null) {
+			$error = 'PreCheck for userId failed, requested in '. get_class($this) .'.';
+			$this->logger->debug($error);
+			throw new InternalError($error);
+		}
+
+		if ($userId === '' && !$this->isCli && !$canBeEmpty) {
+			$error = 'Try to set no user in context, but request is not allowed.';
+			$this->logger->warning($error);
+			throw new InternalError($error);
+		}
+	}
+
 
 	// ***** TABLES permissions *****
 
-	public function canReadTable($table, string $userId = null): bool {
+	/**
+	 * @param Table $table
+	 * @param string|null $userId
+	 * @return bool
+	 */
+	public function canReadTable(Table $table, ?string $userId = null): bool {
 		try {
-			$table = $this->getTableObject($table);
+			$this->preCheckUserId($userId);
 		} catch (InternalError $e) {
-			$this->logger->warning('try to verify permission: '.__FUNCTION__.' -> no $table is set');
 			return false;
 		}
-		$userId = $userId ?: $this->userId;
 
+		if ($userId === '') {
+			return true;
+		}
+
+		/** @var string $userId */
 		if ($this->userIsTableOwner($userId, $table)) {
 			return true;
 		}
@@ -55,15 +91,23 @@ class PermissionsService extends SuperService {
 		return false;
 	}
 
-	public function canUpdateTable($table, string $userId = null): bool {
+	/**
+	 * @param Table $table
+	 * @param string|null $userId
+	 * @return bool
+	 */
+	public function canUpdateTable(Table $table, ?string $userId = null): bool {
 		try {
-			$table = $this->getTableObject($table);
+			$this->preCheckUserId($userId);
 		} catch (InternalError $e) {
-			$this->logger->warning('try to verify permission: '.__FUNCTION__.' -> no $table is set');
 			return false;
 		}
-		$userId = $userId ?: $this->userId;
 
+		if ($userId === '') {
+			return true;
+		}
+
+		/** @var string $userId */
 		if ($this->userIsTableOwner($userId, $table)) {
 			return true;
 		}
@@ -78,15 +122,23 @@ class PermissionsService extends SuperService {
 		return false;
 	}
 
-	public function canDeleteTable($table, string $userId = null): bool {
+	/**
+	 * @param Table $table
+	 * @param string|null $userId
+	 * @return bool
+	 */
+	public function canDeleteTable(Table $table, ?string $userId = null): bool {
 		try {
-			$table = $this->getTableObject($table);
+			$this->preCheckUserId($userId);
 		} catch (InternalError $e) {
-			$this->logger->warning('try to verify permission: '.__FUNCTION__.' -> no $table is set');
 			return false;
 		}
-		$userId = $userId ?: $this->userId;
 
+		if ($userId === '') {
+			return true;
+		}
+
+		/** @var string $userId */
 		if ($this->userIsTableOwner($userId, $table)) {
 			return true;
 		}
@@ -97,116 +149,212 @@ class PermissionsService extends SuperService {
 
 	// ***** COLUMNS permissions *****
 
-	public function canReadColumns($table, string $userId = null): bool {
-		// if you can read the table, you also can read its columns
-		return $this->canReadTable($table, $userId);
+	public function canReadColumnsByTableId(int $tableId, ?string $userId = null): bool {
+		try {
+			$table = $this->tableMapper->find($tableId);
+			// if you can read the table, you also can read its columns
+			return $this->canReadTable($table, $userId);
+		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+		}
+		return false;
 	}
 
-	public function canCreateColumns($table, string $userId = null): bool {
+	/**
+	 * @param Table $table
+	 * @param string|null $userId
+	 * @return bool
+	 */
+	public function canCreateColumns(Table $table, ?string $userId = null): bool {
 		// this is the same permission as to update a table
 		return $this->canUpdateTable($table, $userId);
 	}
 
-	public function canUpdateColumns($table, string $userId = null): bool {
-		// this is the same permission as to update a table
-		return $this->canUpdateTable($table, $userId);
+	/**
+	 * @param int $tableId
+	 * @param string|null $userId
+	 * @return bool
+	 */
+	public function canCreateColumnsByTableId(int $tableId, ?string $userId = null): bool {
+		try {
+			$table = $this->tableMapper->find($tableId);
+			return $this->canCreateColumns($table, $userId);
+		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+		}
+		return false;
 	}
 
-	public function canDeleteColumns($table, string $userId = null): bool {
-		// this is the same permission as to update a table
-		return $this->canUpdateTable($table, $userId);
+	/**
+	 * @param int $tableId
+	 * @param string|null $userId
+	 * @return bool
+	 */
+	public function canUpdateColumnsByTableId(int $tableId, ?string $userId = null): bool {
+		try {
+			$table = $this->tableMapper->find($tableId);
+			// this is the same permission as to update a table
+			return $this->canUpdateTable($table, $userId);
+		} catch (\Exception $e) {
+		}
+		return false;
+	}
+
+	/**
+	 * @param int $tableId
+	 * @param string|null $userId
+	 * @return bool
+	 */
+	public function canDeleteColumnsByTableId(int $tableId, ?string $userId = null): bool {
+		try {
+			$table = $this->tableMapper->find($tableId);
+			// this is the same permission as to update a table
+			return $this->canUpdateTable($table, $userId);
+		} catch (\Exception $e) {
+		}
+		return false;
 	}
 
 
 	// ***** ROWS permissions *****
 
-	public function canReadRows($table, string $userId = null): bool {
+	/**
+	 * @param int $tableId
+	 * @param string|null $userId
+	 * @return bool
+	 */
+	public function canReadRowsByTableId(int $tableId, ?string $userId = null): bool {
 		try {
-			$table = $this->getTableObject($table);
+			$this->preCheckUserId($userId);
 		} catch (InternalError $e) {
-			$this->logger->warning('try to verify permission: '.__FUNCTION__.' -> no $table is set');
 			return false;
 		}
-		$userId = $userId ?: $this->userId;
 
-		if ($this->userIsTableOwner($userId, $table)) {
+		if ($userId === '') {
 			return true;
 		}
 
 		try {
-			$share = $this->getShareForTable($table, $userId);
-			/** @noinspection PhpUndefinedMethodInspection */
-			return !!$share->getPermissionRead() || !!$share->getPermissionManage();
-		} catch (InternalError|NotFoundError $e) {
+			$table = $this->tableMapper->find($tableId);
+
+			/** @var string $userId */
+			if ($this->userIsTableOwner($userId, $table)) {
+				return true;
+			}
+
+			try {
+				$share = $this->getShareForTable($table, $userId);
+				/** @noinspection PhpUndefinedMethodInspection */
+				return !!$share->getPermissionRead() || !!$share->getPermissionManage();
+			} catch (InternalError|NotFoundError $e) {
+			}
+		} catch (DoesNotExistException|MultipleObjectsReturnedException|\Exception $e) {
 		}
 
 		return false;
 	}
 
-	public function canCreateRows($table, string $userId = null): bool {
+	/**
+	 * @param int $tableId
+	 * @param string|null $userId
+	 * @return bool
+	 */
+	public function canCreateRowsByTableId(int $tableId, ?string $userId = null): bool {
 		try {
-			$table = $this->getTableObject($table);
+			$this->preCheckUserId($userId);
 		} catch (InternalError $e) {
-			$this->logger->warning('try to verify permission: '.__FUNCTION__.' -> no $table is set');
 			return false;
 		}
-		$userId = $userId ?: $this->userId;
 
-		if ($this->userIsTableOwner($userId, $table)) {
+		if ($userId === '') {
 			return true;
 		}
 
 		try {
-			$share = $this->getShareForTable($table, $userId);
-			/** @noinspection PhpUndefinedMethodInspection */
-			return !!$share->getPermissionCreate() || !!$share->getPermissionManage();
-		} catch (InternalError|NotFoundError $e) {
+			$table = $this->tableMapper->find($tableId);
+
+			/** @var string $userId */
+			if ($this->userIsTableOwner($userId, $table)) {
+				return true;
+			}
+
+			try {
+				$share = $this->getShareForTable($table, $userId);
+				/** @noinspection PhpUndefinedMethodInspection */
+				return !!$share->getPermissionCreate() || !!$share->getPermissionManage();
+			} catch (InternalError|NotFoundError $e) {
+			}
+		} catch (\Exception $e) {
 		}
 
 		return false;
 	}
 
-	public function canUpdateRows($table, string $userId = null): bool {
+	/**
+	 * @param int $tableId
+	 * @param string|null $userId
+	 * @return bool
+	 */
+	public function canUpdateRowsByTableId(int $tableId, ?string $userId = null): bool {
 		try {
-			$table = $this->getTableObject($table);
+			$this->preCheckUserId($userId);
 		} catch (InternalError $e) {
-			$this->logger->warning('try to verify permission: '.__FUNCTION__.' -> no $table is set');
 			return false;
 		}
-		$userId = $userId ?: $this->userId;
 
-		if ($this->userIsTableOwner($userId, $table)) {
+		if ($userId === '') {
 			return true;
 		}
 
 		try {
-			$share = $this->getShareForTable($table, $userId);
-			/** @noinspection PhpUndefinedMethodInspection */
-			return !!$share->getPermissionUpdate() || !!$share->getPermissionManage();
-		} catch (InternalError|NotFoundError $e) {
+			$table = $this->tableMapper->find($tableId);
+
+			/** @var string $userId */
+			if ($this->userIsTableOwner($userId, $table)) {
+				return true;
+			}
+
+			try {
+				$share = $this->getShareForTable($table, $userId);
+				/** @noinspection PhpUndefinedMethodInspection */
+				return !!$share->getPermissionUpdate() || !!$share->getPermissionManage();
+			} catch (InternalError|NotFoundError $e) {
+			}
+		} catch (\Exception $e) {
 		}
 
 		return false;
 	}
 
-	public function canDeleteRows($table, string $userId = null): bool {
+	/**
+	 * @param int $tableId
+	 * @param string|null $userId
+	 * @return bool
+	 */
+	public function canDeleteRowsByTableId(int $tableId, ?string $userId = null): bool {
 		try {
-			$table = $this->getTableObject($table);
+			$this->preCheckUserId($userId);
 		} catch (InternalError $e) {
-			$this->logger->warning('try to verify permission: '.__FUNCTION__.' -> no $table is set');
 			return false;
 		}
-		$userId = $userId ?: $this->userId;
 
-		if ($this->userIsTableOwner($userId, $table)) {
+		if ($userId === '') {
 			return true;
 		}
 
 		try {
-			$share = $this->getShareForTable($table, $userId);
-			/** @noinspection PhpUndefinedMethodInspection */
-			return !!$share->getPermissionDelete() || !!$share->getPermissionManage();
-		} catch (InternalError|NotFoundError $e) {
+			$table = $this->tableMapper->find($tableId);
+
+			/** @var string $userId */
+			if ($this->userIsTableOwner($userId, $table)) {
+				return true;
+			}
+
+			try {
+				$share = $this->getShareForTable($table, $userId);
+				/** @noinspection PhpUndefinedMethodInspection */
+				return !!$share->getPermissionDelete() || !!$share->getPermissionManage();
+			} catch (InternalError|NotFoundError $e) {
+			}
+		} catch (\Exception $e) {
 		}
 
 		return false;
@@ -216,8 +364,16 @@ class PermissionsService extends SuperService {
 	// ***** SHARE permissions *****
 
 	/** @noinspection PhpUndefinedMethodInspection */
-	public function canReadShare(Share $share, string $userId = null): bool {
-		$userId = $userId ?: $this->userId;
+	public function canReadShare(Share $share, ?string $userId = null): bool {
+		try {
+			$this->preCheckUserId($userId);
+		} catch (InternalError $e) {
+			return false;
+		}
+
+		if ($userId === '') {
+			return true;
+		}
 
 		if ($share->getSender() === $userId) {
 			return true;
@@ -229,6 +385,7 @@ class PermissionsService extends SuperService {
 
 		if ($share->getReceiverType() === 'group') {
 			try {
+				/** @var string $userId */
 				$userGroups = $this->userHelper->getGroupsForUser($userId);
 				foreach ($userGroups as $userGroup) {
 					if ($userGroup->getDisplayName() === $share->getReceiver()) {
@@ -243,15 +400,31 @@ class PermissionsService extends SuperService {
 		return false;
 	}
 
-	public function canUpdateShare(Share $item, string $userId = null): bool {
-		$userId = $userId ?: $this->userId;
+	public function canUpdateShare(Share $item, ?string $userId = null): bool {
+		try {
+			$this->preCheckUserId($userId);
+		} catch (InternalError $e) {
+			return false;
+		}
+
+		if ($userId === '') {
+			return true;
+		}
 
 		/** @noinspection PhpUndefinedMethodInspection */
 		return $item->getSender() === $userId;
 	}
 
-	public function canDeleteShare(Share $item, string $userId = null): bool {
-		$userId = $userId ?: $this->userId;
+	public function canDeleteShare(Share $item, ?string $userId = null): bool {
+		try {
+			$this->preCheckUserId($userId);
+		} catch (InternalError $e) {
+			return false;
+		}
+
+		if ($userId === '') {
+			return true;
+		}
 
 		/** @noinspection PhpUndefinedMethodInspection */
 		return $item->getSender() === $userId;
@@ -261,32 +434,13 @@ class PermissionsService extends SuperService {
 	//  private methods ==========================================================================
 
 	/**
-	 * give me a perfect object or a table id
-	 * I will respond with the perfect table object or an error
-	 *
+	 * @param Table $table
+	 * @param string $userId
+	 * @return Share
 	 * @throws InternalError
-	 */
-	private function getTableObject($table): Table {
-		if (is_int($table)) {
-			try {
-				$table = $this->tableMapper->find($table);
-			} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
-				$this->logger->error('could not get table object from db for: '.$table);
-				$table = null;
-			}
-		}
-		if ($table instanceof Table) {
-			return $table;
-		} else {
-			throw new InternalError('no table object: '.$table);
-		}
-	}
-
-	/**
 	 * @throws NotFoundError
-	 * @throws InternalError
 	 */
-	private function getShareForTable(Table $table, $userId): Share {
+	private function getShareForTable(Table $table, string $userId): Share {
 		// if shared by user
 		try {
 			return $this->shareMapper->findShareForNode($table->getId(), 'table', $userId, 'user');

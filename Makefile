@@ -35,10 +35,6 @@ build: clean build-js-production assemble
 
 appstore: build
 	@echo "Signing…"
-#	php ../server/occ integrity:sign-app \
-#		--privateKey=$(cert_dir)/$(app_name).key\
-#		--certificate=$(cert_dir)/$(app_name).crt\
-#		--path=$(build_dir)/$(app_name)
 	tar -czf $(build_dir)/$(app_name).tar.gz \
 		-C $(build_dir) $(app_name)
 	openssl dgst -sha512 -sign $(cert_dir)/$(app_name).key $(build_dir)/$(app_name).tar.gz | openssl base64
@@ -70,6 +66,7 @@ assemble:
 	--exclude=.idea \
 	--exclude=vendor \
 	--exclude=webpack*.js \
+	--exclude=doc \
 	$(project_dir) $(build_dir)
 
 build-js:
@@ -88,7 +85,7 @@ test: test-api
 test-api:
 	phpunit --bootstrap vendor/autoload.php --testdox tests/api/
 
-
+ci: lint-js lint-xml lint-php-cs-fixer lint-php-psalm
 
 ##### Linting #####
 
@@ -96,32 +93,23 @@ lint: lint-php lint-js lint-css lint-xml
 
 
 lint-php: lint-phpfast lint-php-phan
-lint-phpfast: lint-php-lint lint-php-ncversion lint-php-cs-fixer lint-php-phpcs
+
+lint-phpfast: lint-php-lint lint-php-cs-fixer lint-php-phpcs
 
 lint-php-lint:
 	# Check PHP syntax errors
 	@! find $(php_dirs) -name "*.php" | xargs -I{} php -l '{}' | grep -v "No syntax errors detected"
 
-lint-php-ncversion:
-	# Check min-version consistency
-	# TODO needs to be fixed
-	# php tests/nextcloud-version.php
-
 lint-php-phan:
-	# PHAN
-	# TODO needs to be fixed
-	# vendor/bin/phan --allow-polyfill-parser -k tests/phan-config.php --no-progress-bar -m checkstyle | vendor/bin/cs2pr --graceful-warnings --colorize
-
-lint-php-phpcs:
-	# PHP CodeSniffer
-	# TODO needs to be fixed
-	# vendor/bin/phpcs --standard=tests/phpcs.xml $(php_dirs) --report=checkstyle | vendor/bin/cs2pr --graceful-warnings --colorize
+	# PHAN - TODO
+	vendor/bin/phan --allow-polyfill-parser -k tests/phan-config.php --no-progress-bar -m checkstyle | vendor/bin/cs2pr --graceful-warnings --colorize
 
 lint-php-cs-fixer:
 	# PHP Coding Standards Fixer (with Nextcloud coding standards)
-	# vendor/bin/php-cs-fixer fix --dry-run --diff
-	PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix --dry-run --diff
+	vendor/bin/php-cs-fixer fix --dry-run --diff
 
+lint-php-psalm:
+	composer psalm
 
 lint-js:
 	npm run lint
@@ -141,9 +129,8 @@ lint-xml:
 lint-fix: lint-php-fix lint-js-fix lint-css-fix
 
 lint-php-fix:
-	# TODO needs to be fixed
 	# vendor/bin/phpcbf --standard=tests/phpcs.xml $(php_dirs)
-	PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix
+	vendor/bin/php-cs-fixer fix
 
 lint-js-fix:
 	npm run lint:fix
@@ -162,7 +149,3 @@ clean:
 clean-dev:
 	rm -rf node_modules
 	rm -rf vendor
-
-# logging
-log:
-	sudo -u www-data php /var/www/html/nextcloud/23/occ log:watch

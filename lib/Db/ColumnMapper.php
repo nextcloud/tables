@@ -3,15 +3,15 @@
 namespace OCA\Tables\Db;
 
 use OCP\AppFramework\Db\DoesNotExistException;
-use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
+/** @template-extends QBMapper<Column> */
 class ColumnMapper extends QBMapper {
-	protected $table = 'tables_columns';
+	protected string $table = 'tables_columns';
 
 	public function __construct(IDBConnection $db) {
 		parent::__construct($db, $this->table, Column::class);
@@ -19,7 +19,7 @@ class ColumnMapper extends QBMapper {
 
 	/**
 	 * @param int $id
-	 * @return Entity|Table
+	 *
 	 * @throws MultipleObjectsReturnedException
 	 * @throws Exception
 	 * @throws DoesNotExistException
