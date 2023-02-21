@@ -36,7 +36,6 @@ use OCP\Search\SearchResult;
 use OCP\Search\SearchResultEntry;
 
 class SearchTablesProvider implements IProvider {
-
 	private IAppManager $appManager;
 	private IL10N $l10n;
 	private TableService $tableService;

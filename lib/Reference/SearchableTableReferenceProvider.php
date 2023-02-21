@@ -5,33 +5,75 @@ namespace OCA\Tables\Reference;
 use Exception;
 use OC\Collaboration\Reference\LinkReferenceProvider;
 use OCA\Tables\Service\TableService;
-use OCP\Collaboration\Reference\IReferenceProvider;
+use OCP\Collaboration\Reference\ADiscoverableReferenceProvider;
+use OCP\Collaboration\Reference\ISearchableReferenceProvider;
 use OCP\Collaboration\Reference\Reference;
 use OC\Collaboration\Reference\ReferenceManager;
 use OCA\Tables\AppInfo\Application;
 use OCP\Collaboration\Reference\IReference;
+use OCP\IL10N;
 use OCP\IURLGenerator;
 use Throwable;
 
-class TableReferenceProvider implements IReferenceProvider {
+class SearchableTableReferenceProvider extends ADiscoverableReferenceProvider implements ISearchableReferenceProvider {
 	private const RICH_OBJECT_TYPE = Application::APP_ID . '_table';
 
 	private ?string $userId;
 	private ReferenceManager $referenceManager;
+	private IL10N $l10n;
 	private IURLGenerator $urlGenerator;
 	private LinkReferenceProvider $linkReferenceProvider;
 	private TableService $tableService;
 
-	public function __construct(IURLGenerator $urlGenerator,
+	public function __construct(IL10N $l10n,
+								IURLGenerator $urlGenerator,
 								TableService $tableService,
 								ReferenceManager $referenceManager,
 								LinkReferenceProvider $linkReferenceProvider,
 								?string $userId) {
 		$this->userId = $userId;
 		$this->referenceManager = $referenceManager;
+		$this->l10n = $l10n;
 		$this->urlGenerator = $urlGenerator;
 		$this->linkReferenceProvider = $linkReferenceProvider;
 		$this->tableService = $tableService;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function getId(): string {
+		return Application::APP_ID . '-ref-tables';
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function getTitle(): string {
+		return $this->l10n->t('Tables tables');
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function getOrder(): int {
+		return 10;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function getIconUrl(): string {
+		return $this->urlGenerator->getAbsoluteURL(
+			$this->urlGenerator->imagePath(Application::APP_ID, 'app-dark.svg')
+		);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function getSupportedSearchProviderIds(): array {
+		return ['tables-search-tables'];
 	}
 
 	/**
