@@ -3,16 +3,16 @@ OC.L10N.register(
     {
     "Comments" : "Comments",
     "Name" : "Name",
-    "Sharing" : "Ulashish",
     "Cancel" : "Cancel",
-    "Delete" : "Delete",
-    "Yes" : "Yes",
-    "No" : "No",
     "Save" : "Save",
     "Link" : "Link",
-    "Confirm" : "Confirm",
+    "Delete" : "Delete",
     "Close" : "Close",
-    "Owner" : "Owner",
-    "Today" : "Today"
+    "Today" : "Today",
+    "group" : "group",
+    "Sharing" : "Ulashish",
+    "Yes" : "Yes",
+    "No" : "No",
+    "Confirm" : "Confirm"
 },
 "nplurals=1; plural=0;");

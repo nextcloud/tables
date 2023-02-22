@@ -3,19 +3,20 @@ OC.L10N.register(
     {
     "Name" : "Ady",
     "Progress" : "Ösüş",
-    "Activity" : "işjeňlik we hereket",
-    "Sharing" : "Paýlaşmak",
-    "Cancel" : "ýatyrmak",
-    "Delete" : "Pozmak",
-    "Default" : "Bellenen",
-    "Yes" : "Hawa",
-    "No" : "Ýok",
     "Type" : "Görnüşi",
+    "Cancel" : "ýatyrmak",
     "Save" : "Saklamak",
     "Link" : "Baglanyşyk",
     "Edit" : "Redaktirläň",
+    "Delete" : "Pozmak",
     "Close" : "Ýap",
     "Create" : "Dörediň",
-    "Today" : "Şu gün"
+    "Today" : "Şu gün",
+    "Share" : "Paýlaş",
+    "Activity" : "işjeňlik we hereket",
+    "Sharing" : "Paýlaşmak",
+    "Default" : "Bellenen",
+    "Yes" : "Hawa",
+    "No" : "Ýok"
 },
 "nplurals=2; plural=(n != 1);");

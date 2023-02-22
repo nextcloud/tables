@@ -3,15 +3,16 @@ OC.L10N.register(
     {
     "Comments" : "تبصرې",
     "Name" : "نوم",
-    "Activity" : "کړنې",
     "Cancel" : "پرېښول",
-    "Delete" : "ړنګول",
-    "Yes" : "هو",
-    "No" : "نه",
     "Save" : "ساتل",
     "Link" : "لېنک",
+    "Delete" : "ړنګول",
     "Close" : "بندول",
     "Today" : "نن",
-    "Shares" : "شريک شوي"
+    "Shares" : "شريک شوي",
+    "group" : "ډله",
+    "Activity" : "کړنې",
+    "Yes" : "هو",
+    "No" : "نه"
 },
 "nplurals=2; plural=(n != 1);");
