@@ -19,6 +19,7 @@ OC.L10N.register(
     "Create" : "Buat",
     "Today" : "Hari ini",
     "Title" : "Judul",
+    "Share" : "Bagikan",
     "Clear filter" : "Bersihkan filter",
     "Shares" : "Dibagikan",
     "group" : "grup",

@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "Select columns" : "Vælg kolonner",
+    "e.g. 1,2,4 or leave empty" : "f.eks. 1,2,4 eller lad være tom",
     "ToDo list" : "To-Do liste",
     "Members" : "Medlemmer",
     "Date" : "Dato",
@@ -26,10 +28,14 @@ OC.L10N.register(
     "Create" : "Opret",
     "Today" : "I dag",
     "Title" : "Titel",
+    "Select emoji" : "Vælg emoji",
+    "Share" : "Del",
+    "Clear filter" : "Ryd filter",
     "No recommendations. Start typing." : "Ingen anbefalinger. Begynd at skrive.",
     "Searching …" : "Søger ...",
     "No elements found." : "Ingen elementer fundet.",
     "Shares" : "Delinger",
+    "group" : "gruppe",
     "Permissions" : "Rettigheder",
     "Delete data" : "Slet data",
     "No shares" : "Ingen delinger",

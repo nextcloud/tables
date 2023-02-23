@@ -104,6 +104,7 @@ OC.L10N.register(
     "Cannot create new table. Title is missing." : "Az új táblázat nem hozható létre. A cím hiányzik.",
     "Could not create new table" : "Nem sikerült az új táblázat létrehozása",
     "Could not fetch templates from backend" : "Nem sikerült lekérni a sablonokat a háttérszolgáltatástól",
+    "Share" : "Megosztás",
     "Delete table" : "Táblázat törlése",
     "Confirm table deletion" : "Erősítse meg a táblázat törlését",
     "Do you really want to delete the table \"{table}\"?" : "Biztos, hogy törli a(z) „{table}” táblázatot?",

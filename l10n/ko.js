@@ -26,6 +26,7 @@ OC.L10N.register(
     "Create" : "생성",
     "Today" : "오늘",
     "Title" : "제목",
+    "Share" : "공유",
     "No recommendations. Start typing." : "추천 없음. 타이핑을 시작하십시오",
     "Searching …" : "검색 ...",
     "Shares" : "공유",

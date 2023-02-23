@@ -31,6 +31,7 @@ OC.L10N.register(
     "Create" : "作成",
     "Today" : "今日",
     "Title" : "タイトル",
+    "Share" : "共有",
     "Clear filter" : "フィルターをクリア",
     "User or group name …" : "ユーザーかグループ名 ...",
     "No recommendations. Start typing." : "推奨事項はありません。 入力を開始します。",

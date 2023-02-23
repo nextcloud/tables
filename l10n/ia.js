@@ -18,6 +18,7 @@ OC.L10N.register(
     "Create" : "Crear",
     "Today" : "Hodie",
     "Title" : "Titulo",
+    "Share" : "Compartir",
     "Shares" : "Compartimentos",
     "group" : "gruppo",
     "Activity" : "Activitate",

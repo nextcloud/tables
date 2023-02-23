@@ -19,6 +19,7 @@ OC.L10N.register(
     "Create" : "შექმნა",
     "Today" : "დღეს",
     "Title" : "სათაური",
+    "Share" : "გაზიარება",
     "Shares" : "გაზიარებები",
     "group" : "ჯგუფი",
     "Permissions" : "უფლებები",

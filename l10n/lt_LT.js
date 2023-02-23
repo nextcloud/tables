@@ -30,6 +30,7 @@ OC.L10N.register(
     "Create" : "Sukurti",
     "Today" : "Šiandiena",
     "Title" : "Pavadinimas",
+    "Share" : "Bendrinti",
     "Clear filter" : "Išvalyti filtrą",
     "User or group name …" : "Naudotojo ar grupės vardas…",
     "No recommendations. Start typing." : "Rekomendacijų nėra. Pradėkite rašyti.",

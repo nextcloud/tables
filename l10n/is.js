@@ -24,6 +24,7 @@ OC.L10N.register(
     "Create" : "Búa til",
     "Today" : "Í dag",
     "Title" : "Titill",
+    "Share" : "Deila",
     "User or group name …" : "Notandi eða heiti hóps …",
     "Searching …" : "Leita …",
     "Shares" : "Sameignir",

@@ -18,6 +18,7 @@ OC.L10N.register(
     "Create" : "Izveidot",
     "Today" : "Šodien",
     "Title" : "Amats",
+    "Share" : "Koplietot",
     "Searching …" : "Meklē...",
     "No elements found." : "Elementi netika atrasti.",
     "Shares" : "Koplietots",

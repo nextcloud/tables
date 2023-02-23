@@ -12,6 +12,7 @@ OC.L10N.register(
     "Close" : "Dùin",
     "Create" : "Cruthaich",
     "Today" : "An-diugh",
+    "Share" : "Co-roinn",
     "Activity" : "Gnìomhachd",
     "Sharing" : "Co-roinneadh",
     "Default" : "Bunaiteach",

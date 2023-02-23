@@ -19,6 +19,7 @@ OC.L10N.register(
     "Create" : "Үүсгэх",
     "Today" : "өнөөдөр",
     "Title" : "Цол/Албан тушаал",
+    "Share" : "Түгээх",
     "Shares" : "Түгээлтүүд",
     "group" : "бүлэг",
     "Activity" : "Үйлдлүүд",

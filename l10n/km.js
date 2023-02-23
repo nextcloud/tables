@@ -18,6 +18,7 @@ OC.L10N.register(
     "Create" : "បង្កើត",
     "Today" : "ថ្ងៃ​នេះ",
     "Title" : "ចំណងជើង",
+    "Share" : "ចែក​រំលែក",
     "Shares" : "ចែក​រំលែក",
     "group" : "ក្រុម",
     "Delete data" : "លុបទិន្នន័យ",

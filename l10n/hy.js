@@ -17,6 +17,7 @@ OC.L10N.register(
     "Create" : "Ստեղծել",
     "Today" : "այսօր",
     "Title" : "Վերնագիր",
+    "Share" : "Կիսվել",
     "group" : "խումբ",
     "Activity" : "Գործունեություն",
     "Default" : "Լռելյայն",

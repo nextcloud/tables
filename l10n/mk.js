@@ -23,6 +23,7 @@ OC.L10N.register(
     "Create" : "Креирај",
     "Today" : "Денес",
     "Title" : "Наслов",
+    "Share" : "Сподели",
     "Clear filter" : "Исчисти филтри",
     "User or group name …" : "Корисник или име на група ...",
     "No recommendations. Start typing." : "Нема препораки. Започнете со пишување.",

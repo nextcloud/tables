@@ -19,6 +19,8 @@ OC.L10N.register(
     "Create" : "Skep",
     "Today" : "Vandag",
     "Title" : "Titel",
+    "Share" : "Deel",
+    "group" : "Groep",
     "Activity" : "Aktiwiteit",
     "Default" : "Verstek",
     "Prefix" : "Voorvoegsel",

@@ -14,6 +14,7 @@ OC.L10N.register(
     "Close" : "ປິດ",
     "Create" : "ສ້າງ",
     "Today" : "ມື້ນີ້",
+    "Share" : "ແບ່ງປັນ",
     "Shares" : "ການແບ່ງປັນ",
     "Activity" : "ກິດຈະກໍາ",
     "Sharing" : "ການແບ່ງປັນ",

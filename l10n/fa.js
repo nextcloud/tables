@@ -21,6 +21,7 @@ OC.L10N.register(
     "Create" : "ساخت",
     "Today" : "امروز",
     "Title" : "عنوان",
+    "Share" : "هم‌رسانی",
     "Clear filter" : "پاک کردن پالایه",
     "No recommendations. Start typing." : "هیچ توصیه ای نیست شروع به تایپ کنید.",
     "Searching …" : "جستجوکردن …",

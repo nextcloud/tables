@@ -28,6 +28,7 @@ OC.L10N.register(
     "Create" : "Crear",
     "Today" : "Hoxe",
     "Title" : "Título",
+    "Share" : "Compartir",
     "Clear filter" : "Limpar o filtro",
     "User or group name …" : "Nome de usuario ou grupo…",
     "No recommendations. Start typing." : "Non hai recomendacións. Comece a escribir.",

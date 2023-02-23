@@ -28,6 +28,7 @@ OC.L10N.register(
     "Create" : "יצירה",
     "Today" : "היום",
     "Title" : "תפקיד",
+    "Share" : "שתף",
     "Clear filter" : "מחיקת מסנן",
     "User or group name …" : "שם משתמש או קבוצה…",
     "No recommendations. Start typing." : "אין המלצות. נא להתחיל להקליד.",

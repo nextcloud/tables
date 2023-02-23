@@ -17,6 +17,7 @@ OC.L10N.register(
     "Create" : "Erstellen",
     "Today" : "Haut",
     "Title" : "Titel",
+    "Share" : "Deelen",
     "group" : "Grupp",
     "Activity" : "Aktivitéit",
     "Sharing" : "Gedeelt",

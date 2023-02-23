@@ -9,6 +9,7 @@ OC.L10N.register(
     "Delete" : "Delete",
     "Today" : "Сёння",
     "Title" : "Title",
+    "Share" : "Падзяліцца",
     "Activity" : "Падзеі",
     "Yes" : "Yes",
     "No" : "No"

@@ -14,6 +14,7 @@ OC.L10N.register(
     "Create" : "Snulfu-d",
     "Today" : "Ass-a",
     "Title" : "Azwel",
+    "Share" : "Bḍu",
     "Activity" : "Armud",
     "Sharing" : "Beṭṭu",
     "Default" : "Prédéfini(e)",

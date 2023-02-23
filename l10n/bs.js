@@ -17,6 +17,8 @@ OC.L10N.register(
     "Create" : "Ustvari",
     "Today" : "Danas",
     "Title" : "Naslov",
+    "Share" : "Podjeli",
+    "group" : "grupa",
     "Activity" : "Aktivnost",
     "Sharing" : "Dijeljenje",
     "Default" : "Zadano",

@@ -16,6 +16,8 @@ OC.L10N.register(
     "Create" : "Creu",
     "Today" : "Heddiw",
     "Title" : "Teitl",
+    "Share" : "Rhannu",
+    "group" : "grŵp",
     "Activity" : "Gweithred",
     "Prefix" : "Rhagddodiad",
     "Suffix" : "Ôl-ddodiad",
