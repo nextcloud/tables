@@ -14,3 +14,18 @@ namespace OCA\Analytics\Datasource {
         public function readData($option): array;
     }
 }
+
+namespace OC\Collaboration\Reference {
+    class LinkReferenceProvider implements IReferenceProvider {
+        abstract public function matchReference(string $referenceText): bool {}
+        abstract public function getCachePrefix(string $referenceId): string {}
+        abstract public function getCacheKey(string $referenceId): ?string {}
+        abstract public function resolveReference(string $referenceText): ?IReference {}
+    }
+    interface IReferenceProvider {
+        public function matchReference(string $referenceText): bool;
+        public function resolveReference(string $referenceText): ?IReference;
+        public function getCachePrefix(string $referenceId): string;
+        public function getCacheKey(string $referenceId): ?string;
+    }
+}

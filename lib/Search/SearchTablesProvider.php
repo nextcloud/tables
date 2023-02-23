@@ -25,6 +25,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Search;
 
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Db\Table;
 use OCA\Tables\Service\TableService;
 use OCP\App\IAppManager;
 use OCP\IL10N;
@@ -62,7 +63,7 @@ class SearchTablesProvider implements IProvider {
 	 * @inheritDoc
 	 */
 	public function getName(): string {
-		return $this->l10n->t('Tables tables');
+		return $this->l10n->t('Nextcloud tables');
 	}
 
 	/**
@@ -70,7 +71,7 @@ class SearchTablesProvider implements IProvider {
 	 */
 	public function getOrder(string $route, array $routeParameters): int {
 		if (strpos($route, Application::APP_ID . '.') === 0) {
-			// Active app, prefer Github results
+			// Active app, prefer GitHub results
 			return -1;
 		}
 
@@ -90,18 +91,18 @@ class SearchTablesProvider implements IProvider {
 		$offset = $query->getCursor();
 		$offset = $offset ? intval($offset) : 0;
 
-		$tables = $this->tableService->search($term);
+		$tables = $this->tableService->search($term, $limit, $offset);
 
 		$appIconUrl = $this->urlGenerator->getAbsoluteURL(
 			$this->urlGenerator->imagePath(Application::APP_ID, 'app-dark.svg')
 		);
 
-		$formattedResults = array_map(function (array $entry) use ($appIconUrl): SearchResultEntry {
+		$formattedResults = array_map(function (Table $table) use ($appIconUrl): SearchResultEntry {
 			return new SearchResultEntry(
 				$appIconUrl,
-				$this->getMainText($entry),
-				$this->getSubline($entry),
-				$this->getInternalLink($entry),
+				$table->getEmoji() .' '. $table->getTitle(),
+				($table->getOwnerDisplayName() ?? $table->getOwnership()) . ', ' . $this->l10n->n('%n row', '%n rows', $table->getRowsCount()),
+				$this->getInternalLink($table),
 				'',
 				false
 			);
@@ -115,29 +116,11 @@ class SearchTablesProvider implements IProvider {
 	}
 
 	/**
-	 * @param array $entry
+	 * @param Table $table
 	 * @return string
 	 */
-	protected function getMainText(array $entry): string {
-		return $entry['emoji']
-			? $entry['emoji'] . ' ' . $entry['title']
-			: $entry['title'];
-	}
-
-	/**
-	 * @param array $entry
-	 * @return string
-	 */
-	protected function getSubline(array $entry): string {
-		return $entry['createdBy'] ?? '';
-	}
-
-	/**
-	 * @param array $entry
-	 * @return string
-	 */
-	protected function getInternalLink(array $entry): string {
+	protected function getInternalLink(Table $table): string {
 		return $this->urlGenerator->linkToRouteAbsolute(Application::APP_ID . '.page.index')
-			. '#/table/' . $entry['id'];
+			. '#/table/' . $table->getId();
 	}
 }

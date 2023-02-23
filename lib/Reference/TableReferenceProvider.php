@@ -2,7 +2,6 @@
 
 namespace OCA\Tables\Reference;
 
-
 use OCP\Collaboration\Reference\IReferenceProvider;
 use OCP\Collaboration\Reference\IReference;
 

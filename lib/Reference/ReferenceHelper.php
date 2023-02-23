@@ -5,11 +5,10 @@ namespace OCA\Tables\Reference;
 use Exception;
 use OC\Collaboration\Reference\LinkReferenceProvider;
 use OCA\Tables\Service\TableService;
-use OCP\Collaboration\Reference\IReferenceProvider;
 use OCP\Collaboration\Reference\Reference;
-use OC\Collaboration\Reference\ReferenceManager;
 use OCA\Tables\AppInfo\Application;
 use OCP\Collaboration\Reference\IReference;
+use OCP\IConfig;
 use OCP\IURLGenerator;
 use Throwable;
 
@@ -17,21 +16,22 @@ class ReferenceHelper {
 	private const RICH_OBJECT_TYPE = Application::APP_ID . '_table';
 
 	private ?string $userId;
-	private ReferenceManager $referenceManager;
 	private IURLGenerator $urlGenerator;
 	private LinkReferenceProvider $linkReferenceProvider;
 	private TableService $tableService;
 
+	private IConfig $config;
+
 	public function __construct(IURLGenerator $urlGenerator,
 								TableService $tableService,
-								ReferenceManager $referenceManager,
 								LinkReferenceProvider $linkReferenceProvider,
-								?string $userId) {
+								?string $userId,
+								IConfig $config) {
 		$this->userId = $userId;
-		$this->referenceManager = $referenceManager;
 		$this->urlGenerator = $urlGenerator;
 		$this->linkReferenceProvider = $linkReferenceProvider;
 		$this->tableService = $tableService;
+		$this->config = $config;
 	}
 
 	public function matchReference(string $referenceText): bool {
@@ -50,20 +50,24 @@ class ReferenceHelper {
 	}
 
 	/** @noinspection PhpUndefinedMethodInspection */
+	/** @psalm-suppress InvalidReturnType */
 	public function resolveReference(string $referenceText): ?IReference {
 		if ($this->matchReference($referenceText)) {
 			$tableId = $this->getTableIdFromLink($referenceText);
 			if ($tableId === null || $this->userId === null) {
 				// fallback to opengraph if it matches, but somehow we can't resolve
+				/** @psalm-suppress InvalidReturnStatement */
 				return $this->linkReferenceProvider->resolveReference($referenceText);
 			}
 			try {
 				$table = $this->tableService->find($tableId, $this->userId);
 			} catch (Exception | Throwable $e) {
+				/** @psalm-suppress InvalidReturnStatement */
 				return $this->linkReferenceProvider->resolveReference($referenceText);
 			}
 
 			$reference = new Reference($referenceText);
+			$tableReferenceInfo = [];
 
 			if ($table->getEmoji()) {
 				$reference->setDescription($table->getEmoji() . ' ' . $table->getTitle());
@@ -122,9 +126,10 @@ class ReferenceHelper {
 	}
 
 	public function getCacheKey(string $referenceId): ?string {
-		// disable caching for development
-		return '-';
-		// return $referenceId;
+		if ($this->config->getSystemValue('debug')) {
+			return '-';
+		} else {
+			return $referenceId;
+		}
 	}
-
 }

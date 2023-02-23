@@ -182,26 +182,24 @@ class TableService extends SuperService {
 
 	/**
 	 * @param string $term
+	 * @param int $limit
+	 * @param int $offset
 	 * @param string|null $userId
 	 * @return array
 	 */
-	public function search(string $term, ?string $userId = null): array {
+	public function search(string $term, int $limit = 100, int $offset = 0, ?string $userId = null): array {
 		try {
+			/** @var string $userId */
 			$this->permissionsService->preCheckUserId($userId);
-			return $this->mapper->search($term, $userId);
+			$tables = $this->mapper->search($term, $userId, $limit, $offset);
+			foreach ($tables as &$table) {
+				/** @var string $userId */
+				$this->enhanceTable($table, $userId);
+			}
+			return $tables;
 		} catch (InternalError | \OCP\DB\Exception $e) {
 			return [];
 		}
-		/*
-		$allTables = $this->findAll($userId, $skipTableEnhancement, $skipSharedTables);
-		$allTables = array_map(static function (Table $table) {
-			return $table->jsonSerialize();
-		}, $allTables);
-		$results = array_filter($allTables, static function (array $table) use ($term) {
-			return strpos($table['title'], $term) !== false;
-		});
-		return array_slice($results, $offset, $limit);
-		*/
 	}
 
 	/**
