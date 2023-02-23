@@ -14,7 +14,8 @@
         "vimeo/psalm": "^5.6.0",
         "nextcloud/ocp": "dev-master",
         "phan/phan": "5.x",
-        "staabm/annotate-pull-request-from-checkstyle": "^1.8"
+        "staabm/annotate-pull-request-from-checkstyle": "^1.8",
+        "phpunit/phpunit": "^9"
     },
     "config": {
         "optimize-autoloader": true,
@@ -24,6 +25,7 @@
         }
     },
     "scripts": {
+        "test:unit": "./vendor/bin/phpunit -c tests/unit/phpunit.xml",
         "lint": "find . -name \\*.php -not -path './vendor/*' -not -path './build/*' -print0 | xargs -0 -n1 php -l",
         "cs:check": "php-cs-fixer fix --dry-run --diff",
         "cs:fix": "php-cs-fixer fix",

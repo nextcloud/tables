@@ -9,3 +9,4 @@ js/*hot-update.*
 js/
 appinfo/info.xsd
 releaseNotes.md
+tests/unit/.phpunit.result.cache
