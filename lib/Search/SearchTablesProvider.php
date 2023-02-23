@@ -90,7 +90,7 @@ class SearchTablesProvider implements IProvider {
 		$offset = $query->getCursor();
 		$offset = $offset ? intval($offset) : 0;
 
-		$tables = $this->tableService->search($user->getUID(), $term, $offset, $limit);
+		$tables = $this->tableService->search($term);
 
 		$appIconUrl = $this->urlGenerator->getAbsoluteURL(
 			$this->urlGenerator->imagePath(Application::APP_ID, 'app-dark.svg')

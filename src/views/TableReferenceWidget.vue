@@ -22,28 +22,21 @@
 <template>
 	<div v-if="richObject" class="tables-table">
 		<div class="tables-table--image">
-			<span v-if="emoji"
-				class="table-emoji">
-				{{ emoji }}
-			</span>
-			<TablesIcon v-else
+			<TablesIcon
 				:size="50" />
 		</div>
 		<div class="tables-table--info">
 			<div class="line">
 				<strong>
 					<a :href="richObject.link" target="_blank">
-						{{ richObject.title }}
+						{{ richObject.emoji + ' ' + richObject.title }}
 					</a>
 				</strong>
 			</div>
-			<div class="description">
-				{{ richObject.description }}
-			</div>
-			<div class="last-edited">
-				{{ richObject.lastEditBy }}
-				<NcUserBubble :user="richObject.lastEditBy"
-					:display-name="richObject.lastEditBy" />
+			<div class="details">
+				<NcUserBubble :user="richObject.ownership"
+					:display-name="richObject.ownerDisplayName" />&nbsp;
+				<NcCounterBubble>{{ richObject.rowsCount }}&nbsp;rows</NcCounterBubble>
 			</div>
 		</div>
 	</div>
@@ -51,7 +44,7 @@
 
 <script>
 import TablesIcon from '../icons/TablesIcon.vue'
-import NcUserBubble from '@nextcloud/vue/dist/Components/NcUserBubble.js'
+import { NcUserBubble, NcCounterBubble } from '@nextcloud/vue'
 
 export default {
 	name: 'TableReferenceWidget',
@@ -59,6 +52,7 @@ export default {
 	components: {
 		TablesIcon,
 		NcUserBubble,
+		NcCounterBubble,
 	},
 
 	props: {
@@ -96,9 +90,15 @@ export default {
 		&:not(:hover) {
 			text-decoration: unset !important;
 		}
+
 	}
 
-	&--image {
+  .line {
+    font-size: 1.3em;
+    padding-bottom: calc(var(--default-grid-baseline) * 2);
+  }
+
+  &--image {
 		margin-right: 12px;
 		display: flex;
 		align-items: center;
@@ -113,5 +113,14 @@ export default {
 	.spacer {
 		flex-grow: 1;
 	}
+
+  .details {
+    display: inline-flex;
+    align-items: self-start;
+  }
+}
+
+:deep(.counter-bubble__counter) {
+  max-width: fit-content !important;
 }
 </style>

@@ -17,6 +17,8 @@ use OCP\Collaboration\Reference\RenderReferenceEvent;
 use OCP\IConfig;
 use OCP\User\Events\BeforeUserDeletedEvent;
 use OCA\Analytics\Datasource\DatasourceEvent;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class Application extends App implements IBootstrap {
 	public const APP_ID = 'tables';
@@ -34,11 +36,14 @@ class Application extends App implements IBootstrap {
 
 		$container = $this->getContainer();
 		/** @var IConfig $config */
-		$config = $container->get(IConfig::class);
-		if (version_compare($config->getSystemValueString('version', '0.0.0'), '26.0.0', '<')) {
-			$context->registerReferenceProvider(TableReferenceProvider::class);
-		} else {
-			$context->registerReferenceProvider(SearchableTableReferenceProvider::class);
+		try {
+			$config = $container->get(IConfig::class);
+			if (version_compare($config->getSystemValueString('version', '0.0.0'), '26.0.0', '<')) {
+				$context->registerReferenceProvider(TableReferenceProvider::class);
+			} else {
+				$context->registerReferenceProvider(SearchableTableReferenceProvider::class);
+			}
+		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 		}
 	}
 

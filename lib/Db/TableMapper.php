@@ -47,4 +47,18 @@ class TableMapper extends QBMapper {
 		}
 		return $this->findEntities($qb);
 	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function search(string $term, ?string $userId = null): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->like('title', '%'.$qb->createNamedParameter($term, IQueryBuilder::PARAM_STR).'%'));
+		if ($userId != null) {
+			$qb->where($qb->expr()->eq('ownership', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
+		}
+		return $this->findEntities($qb);
+	}
 }
