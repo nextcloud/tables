@@ -27,13 +27,13 @@
 				</div>
 			</div>
 			<div class="row space-T">
-				<div class="box-1" style="height:120px;">
+				<div class="box-2" style="height:120px;">
 					<div class="header">
 						<NcCheckboxRadioSwitch name="template"
 							type="radio"
 							value="custom"
 							:checked.sync="templateChoice">
-							{{ t('tables', 'Custom table') }}
+							{{ t('tables', '🔧 Custom table') }}
 						</NcCheckboxRadioSwitch>
 					</div>
 					<p>
@@ -44,14 +44,15 @@
 				<!-- templates boxes -->
 				<div v-for="template in templates"
 					:key="template.name"
-					class="box-1"
+					class="box-2"
 					style="height:120px; overflow: auto;">
 					<div class="header">
 						<NcCheckboxRadioSwitch name="template"
 							type="radio"
 							:value="template.name"
-							:checked.sync="templateChoice">
-							{{ template.title }}
+							:checked.sync="templateChoice"
+							@update:checked="icon = template.icon">
+							{{ template.icon + ' ' + template.title }}
 						</NcCheckboxRadioSwitch>
 					</div>
 					<p>
