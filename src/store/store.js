@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
+import '@nextcloud/dialogs/dist/index.css'
 import data from './data.js'
 
 Vue.use(Vuex)

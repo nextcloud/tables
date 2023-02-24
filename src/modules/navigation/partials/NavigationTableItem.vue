@@ -60,6 +60,7 @@
 <script>
 import { NcActionButton, NcAppNavigationItem, NcCounterBubble, NcUserBubble } from '@nextcloud/vue'
 import { showSuccess } from '@nextcloud/dialogs'
+import '@nextcloud/dialogs/dist/index.css'
 import DialogConfirmation from '../../../shared/modals/DialogConfirmation.vue'
 import { mapGetters } from 'vuex'
 import { emit } from '@nextcloud/event-bus'

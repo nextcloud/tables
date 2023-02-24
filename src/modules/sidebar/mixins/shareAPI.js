@@ -1,6 +1,7 @@
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
+import '@nextcloud/dialogs/dist/index.css'
 
 export default {
 	methods: {

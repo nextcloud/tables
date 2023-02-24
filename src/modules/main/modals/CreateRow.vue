@@ -58,6 +58,7 @@
 <script>
 import { NcModal } from '@nextcloud/vue'
 import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
+import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
 import TextLineForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextLineForm.vue'
 import TextLongForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextLongForm.vue'
