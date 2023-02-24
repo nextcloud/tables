@@ -95,7 +95,7 @@ class RowService extends SuperService {
 		$time = new DateTime();
 		$item = new Row();
 		$d = [];
-		$d[] = (object) [
+		$d[] = [
 			"columnId" => $columnId,
 			"value" => $data
 		];

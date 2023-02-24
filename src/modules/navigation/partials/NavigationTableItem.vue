@@ -15,8 +15,8 @@
 				<Table :size="20" />
 			</template>
 		</template>
-		<template v-if="table.hasShares" #extra>
-			<NcActionButton icon="icon-share" @click="actionShowShare" />
+		<template #extra>
+			<NcActionButton v-if="table.hasShares" icon="icon-share" @click="actionShowShare" />
 		</template>
 		<template #counter>
 			<div v-if="table.isShared" style="padding-right: var(--default-grid-baseline);">
