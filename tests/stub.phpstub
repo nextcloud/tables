@@ -28,4 +28,14 @@ namespace OC\Collaboration\Reference {
         public function getCachePrefix(string $referenceId): string;
         public function getCacheKey(string $referenceId): ?string;
     }
+    interface ReferenceManager {
+        public function extractReferences(string $text): array;
+        public function resolveReference(string $referenceId): ?IReference;
+        public function getReferenceByCacheKey(string $cacheKey): ?IReference;
+        public function getReferenceFromCache(string $referenceId): ?IReference;
+        public function invalidateCache(string $cachePrefix, ?string $cacheKey = null): void;
+        public function getDiscoverableProviders(): array;
+        public function touchProvider(string $userId, string $providerId, ?int $timestamp = null): bool;
+        public function getUserProviderTimestamps(): array;
+    }
 }
