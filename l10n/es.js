@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Select table" : "Seleccionar tabla",
     "Select columns" : "Seleccionar columnas",
     "e.g. 1,2,4 or leave empty" : "por ejemplo 1,2,4 o déjalo vacío",
     "ToDo list" : "Lista de tareas",
@@ -59,8 +60,11 @@ OC.L10N.register(
     "The column \"{column}\" was created." : "Se ha creado la columna «{column}».",
     "Sorry, something went wrong." : "Lo sentimos, algo ha salido mal.",
     "Create row" : "Crear fila",
+    "Row successfully created." : "Fila creada exitosamente.",
     "Please fill in the mandatory fields." : "Por favor, rellena los campos obligatorios.",
     "Could not create new row" : "No se ha podido crear la fila nueva",
+    "Error occurred while deleting rows." : "Ocurrió un error al eliminar las filas.",
+    "_Delete row_::_Delete rows_" : ["Eliminar file","Eliminar filas","Eliminar filas"],
     "_Are you sure you want to delete the selected row?_::_Are you sure you want to delete the %n selected rows?_" : ["¿Está seguro de que quiere eliminar las %n fila seleccionada?","¿Está seguro de que quiere eliminar las %n filas seleccionadas?","¿Está seguro de que quiere eliminar las %n filas seleccionadas?"],
     "Edit columns" : "Editar columnas",
     "There are no columns yet, click on the three-dot menu next to the table title ahead and create some." : "Todavía no hay columnas, pulsa el menú de tres puntos junto al título de la tabla y crea alguna.",
@@ -95,6 +99,8 @@ OC.L10N.register(
     "Column ID" : "ID de columna",
     "Table ID" : "ID de tabla",
     "Today" : "Hoy",
+    "No columns" : "No hay columnas",
+    "Edit table" : "Editar tabla",
     "Create table" : "Crear tabla",
     "Title" : "Título.",
     "Select emoji" : "Seleccione el emoji",
