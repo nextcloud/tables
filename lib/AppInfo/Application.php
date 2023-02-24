@@ -35,8 +35,8 @@ class Application extends App implements IBootstrap {
 		$context->registerSearchProvider(SearchTablesProvider::class);
 
 		$container = $this->getContainer();
-		/** @var IConfig $config */
 		try {
+			/** @var IConfig $config */
 			$config = $container->get(IConfig::class);
 			if (version_compare($config->getSystemValueString('version', '0.0.0'), '26.0.0', '<')) {
 				$context->registerReferenceProvider(TableReferenceProvider::class);
