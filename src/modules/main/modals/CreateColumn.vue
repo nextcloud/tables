@@ -147,6 +147,7 @@ import DatetimeDateForm from '../../../shared/components/ncTable/partials/column
 import DatetimeTimeForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeTimeForm.vue'
 import { NcModal, NcMultiselect } from '@nextcloud/vue'
 import { showError, showInfo, showSuccess, showWarning } from '@nextcloud/dialogs'
+import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
 
 export default {

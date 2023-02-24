@@ -165,6 +165,7 @@
 <script>
 import { NcModal, NcActions, NcActionButton } from '@nextcloud/vue'
 import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
+import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters, mapState } from 'vuex'
 import ColumnInfoPopover from '../partials/ColumnInfoPopover.vue'
 import NumberTableDisplay from '../../../shared/components/ncTable/partials/columnTypePartials/tableDisplay/NumberTableDisplay.vue'

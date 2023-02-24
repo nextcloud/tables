@@ -77,6 +77,7 @@
 <script>
 import { NcModal, NcEmojiPicker, NcButton, NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import { showError, showWarning } from '@nextcloud/dialogs'
+import '@nextcloud/dialogs/dist/index.css'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 
