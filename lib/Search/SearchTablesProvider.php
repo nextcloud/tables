@@ -71,7 +71,7 @@ class SearchTablesProvider implements IProvider {
 	 */
 	public function getOrder(string $route, array $routeParameters): int {
 		if (strpos($route, Application::APP_ID . '.') === 0) {
-			// Active app, prefer GitHub results
+			// Active app, prefer Tables results
 			return -1;
 		}
 
