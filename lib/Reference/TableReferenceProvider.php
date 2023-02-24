@@ -2,14 +2,17 @@
 
 namespace OCA\Tables\Reference;
 
+use OC\Collaboration\Reference\ReferenceManager;
 use OCP\Collaboration\Reference\IReferenceProvider;
 use OCP\Collaboration\Reference\IReference;
 
 class TableReferenceProvider implements IReferenceProvider {
 	private ReferenceHelper $referenceHelper;
+	private ReferenceManager $referenceManager;
 
-	public function __construct(ReferenceHelper $referenceHelper) {
+	public function __construct(ReferenceHelper $referenceHelper, ReferenceManager $referenceManager) {
 		$this->referenceHelper = $referenceHelper;
+		$this->referenceManager = $referenceManager;
 	}
 
 	/**

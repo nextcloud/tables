@@ -2,6 +2,7 @@
 
 namespace OCA\Tables\Reference;
 
+use OC\Collaboration\Reference\ReferenceManager;
 use OCP\Collaboration\Reference\ADiscoverableReferenceProvider;
 use OCP\Collaboration\Reference\ISearchableReferenceProvider;
 use OCA\Tables\AppInfo\Application;
@@ -14,14 +15,18 @@ class SearchableTableReferenceProvider extends ADiscoverableReferenceProvider im
 	private IL10N $l10n;
 	private IURLGenerator $urlGenerator;
 
+	private ReferenceManager $referenceManager;
+
 	public function __construct(
 		IL10N $l10n,
 		IURLGenerator $urlGenerator,
-		ReferenceHelper $referenceHelper
+		ReferenceHelper $referenceHelper,
+		ReferenceManager $referenceManager
 	) {
 		$this->referenceHelper = $referenceHelper;
 		$this->l10n = $l10n;
 		$this->urlGenerator = $urlGenerator;
+		$this->referenceManager = $referenceManager;
 	}
 
 	/**
