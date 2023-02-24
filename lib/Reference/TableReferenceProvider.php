@@ -53,6 +53,6 @@ class TableReferenceProvider implements IReferenceProvider {
 	 * @return void
 	 */
 	public function invalidateUserCache(string $userId): void {
-		$this->referenceHelper->getTableIdFromLink($userId);
+		$this->referenceManager->invalidateCache($userId);
 	}
 }
