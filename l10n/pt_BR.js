@@ -105,6 +105,7 @@ OC.L10N.register(
     "Cannot create new table. Title is missing." : "Não é possível criar uma nova tabela. Está faltando o título.",
     "Could not create new table" : "Não foi possível criar uma nova tabela",
     "Could not fetch templates from backend" : "Não foi possível buscar modelos do back-end",
+    "Share" : "Compartilhar",
     "Delete table" : "Excluir tabela",
     "Confirm table deletion" : "Confirmar exclusão da tabela",
     "Do you really want to delete the table \"{table}\"?" : "Você realmente deseja excluir a tabela \"{table}\"?",

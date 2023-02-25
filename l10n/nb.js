@@ -73,6 +73,7 @@ OC.L10N.register(
     "Custom table from scratch." : "Egendefinert tabell fra bunnen av",
     "The title limit is reached with 200 characters. Please use a shorter title." : "Tittel har en grense på 200 tegn. Bruk en kortere tittel.",
     "Could not create new table" : "Kunne ikke opprette ny tabell",
+    "Share" : "Del",
     "Delete table" : "Slett tabell",
     "Clear filter" : "Tøm filter",
     "User or group name …" : "Bruker eller gruppenavn ...",

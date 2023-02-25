@@ -55,6 +55,7 @@ OC.L10N.register(
     "Title of the new table" : "Titel van de nieuwe tabel",
     "Custom table" : "Maatwerktabel",
     "Custom table from scratch." : "Lege maatwerktabel",
+    "Share" : "Delen",
     "Delete table" : "Verwijder tabel",
     "Confirm table deletion" : "Bevestig verwijderen van tabel",
     "My tables" : "Mijn tabellen",

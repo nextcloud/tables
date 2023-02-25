@@ -9,6 +9,7 @@ OC.L10N.register(
     "Delete" : "ړنګول",
     "Close" : "بندول",
     "Today" : "نن",
+    "Share" : "شریکول",
     "Shares" : "شريک شوي",
     "group" : "ډله",
     "Activity" : "کړنې",

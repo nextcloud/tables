@@ -20,6 +20,7 @@ OC.L10N.register(
     "Create" : "Crează",
     "Today" : "Astăzi",
     "Title" : "Titlu",
+    "Share" : "Partajează",
     "Shares" : "Partajări",
     "group" : "grup",
     "No shares" : "Nicio partajare",

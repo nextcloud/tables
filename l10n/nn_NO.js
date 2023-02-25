@@ -17,6 +17,7 @@ OC.L10N.register(
     "Create" : "Lag",
     "Today" : "I dag",
     "Title" : "Tittel",
+    "Share" : "Del",
     "Shares" : "Delingar",
     "group" : "gruppe",
     "Delete data" : "Slett data",

@@ -23,6 +23,7 @@ OC.L10N.register(
     "Create" : "Crear",
     "Today" : "Uèi",
     "Title" : "Títol",
+    "Share" : "Partejar",
     "Searching …" : "Recèrca…",
     "Shares" : "Partatges",
     "group" : "grop",

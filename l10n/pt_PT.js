@@ -26,6 +26,7 @@ OC.L10N.register(
     "Create" : "Criar",
     "Today" : "Hoje",
     "Title" : "Título",
+    "Share" : "Partilhar",
     "User or group name …" : "Nome do utilizador ou grupo …",
     "No recommendations. Start typing." : "Nenhuma recomendação. Comece a escrever ",
     "Searching …" : "À procura …",
