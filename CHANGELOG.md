@@ -1,11 +1,24 @@
 # Changelog
 
-## 0.3.0 - 2023-02-03
+## 0.3.0 - 2023-02-27
+### Added
+- Read data via API
+- Filter tables in navigation
+- 2 new templates and template dummy data
+- emoji for tables
+- render widget links in rich text editor
+- search integration
+- reference provider for NC26
+
 ### Updated
 - Table component replaced
 - code cleanup
 - initial CI setup
 - UI and UX improvements
+- translations
+
+### Removed
+- Some functions are not replaced due to the replacement of the table component (paste data, instant sorting and filtering)
 
 ## 0.2.2 - 2023-01-10
 ### Updated
