@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [16.x]
 
     steps:
       - uses: actions/checkout@v3
@@ -21,8 +21,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Set up npm7
-        run: npm i -g npm@7
+      - name: Set up npm8
+        run: npm i -g npm@8
       - name: Setup PHP
         uses: shivammathur/setup-php@2.24.0
         with:
@@ -39,5 +39,5 @@ jobs:
           RUST_BACKTRACE=1 krankerl package
       - uses: actions/upload-artifact@v3
         with:
-          name: Deck app tarball
-          path: build/artifacts/deck.tar.gz
+          name: Tables app tarball
+          path: build/artifacts/tables.tar.gz
