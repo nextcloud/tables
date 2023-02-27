@@ -26,3 +26,13 @@
 /package-lock.json
 /node_modules/
 /src/
+.gitattributes
+.l10nignore
+.php-cs-fixer.dist.php
+.tx
+phpunit.integration.xml
+phpunit.xml
+psalm.xml
+stylelint.config.js
+webpack.js
+releaseNotes.md
