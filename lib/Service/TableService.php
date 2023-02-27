@@ -228,7 +228,9 @@ class TableService extends SuperService {
 			throw new InternalError($e->getMessage());
 		}
 		if ($template !== 'custom') {
-			return $this->tableTemplateService->makeTemplate($newTable, $template);
+			$table = $this->tableTemplateService->makeTemplate($newTable, $template);
+			$this->enhanceTable($table, $userId);
+			return $table;
 		}
 		return $this->addOwnerDisplayName($newTable);
 	}
