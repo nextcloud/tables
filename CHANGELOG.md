@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1 - 2023-02-28
+### Updated
+- Clean up navigation UI
+- Fix bug that loads wrong template "Customers"
+- updated translations
+
 ## 0.3.0 - 2023-02-27
 ### Added
 - Read data via API
