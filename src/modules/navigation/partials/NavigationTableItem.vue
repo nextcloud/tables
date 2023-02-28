@@ -20,7 +20,7 @@
 		</template>
 		<template #counter>
 			<div v-if="table.isShared" style="padding-right: var(--default-grid-baseline);">
-				<NcUserBubble :display-name="table.ownerDisplayName | truncate(8)" :show-user-status="true" :user="table.ownership" />
+				<NcAvatar :user="table.ownership" />
 			</div>
 			<NcCounterBubble>
 				{{ table.rowsCount }}
@@ -58,7 +58,7 @@
 	</NcAppNavigationItem>
 </template>
 <script>
-import { NcActionButton, NcAppNavigationItem, NcCounterBubble, NcUserBubble } from '@nextcloud/vue'
+import { NcActionButton, NcAppNavigationItem, NcCounterBubble, NcAvatar } from '@nextcloud/vue'
 import { showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import DialogConfirmation from '../../../shared/modals/DialogConfirmation.vue'
@@ -77,7 +77,7 @@ export default {
 		NcActionButton,
 		NcAppNavigationItem,
 		NcCounterBubble,
-		NcUserBubble,
+		NcAvatar,
 	},
 
 	filters: {
