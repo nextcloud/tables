@@ -179,79 +179,112 @@ class TableTemplateService {
 		$columns = [];
 
 		$params = [
-			'title' => $this->l->t('Date'),
+			'title' => $this->l->t('Name'),
+			'type' => 'text',
+			'subtype' => 'line',
+			'orderWeight' => 100,
+		];
+		$columns['name'] = $this->createColumn($table->id, $params);
+
+		$params = [
+			'title' => $this->l->t('Account manager'),
+			'type' => 'text',
+			'subtype' => 'line',
+			'orderWeight' => 90,
+		];
+		$columns['accountManager'] = $this->createColumn($table->id, $params);
+
+		$params = [
+			'title' => $this->l->t('Contract type'),
+			'type' => 'text',
+			'subtype' => 'line',
+			'orderWeight' => 80,
+		];
+		$columns['contractType'] = $this->createColumn($table->id, $params);
+
+		$params = [
+			'title' => $this->l->t('Contract start'),
 			'type' => 'datetime',
 			'subtype' => 'date',
-			'mandatory' => true,
 			'datetimeDefault' => 'today',
-			'orderWeight' => 50,
+			'orderWeight' => 70,
 		];
-		$columns['date'] = $this->createColumn($table->id, $params);
+		$columns['contractStart'] = $this->createColumn($table->id, $params);
 
 		$params = [
-			'title' => $this->l->t('Weight'),
-			'type' => 'number',
-			'numberSuffix' => 'kg',
-			'numberMin' => 0,
-			'numberMax' => 200,
-			'orderWeight' => 40,
+			'title' => $this->l->t('Contract end'),
+			'type' => 'datetime',
+			'subtype' => 'date',
+			'orderWeight' => 60,
 		];
-		$columns['weight'] = $this->createColumn($table->id, $params);
+		$columns['contractEnd'] = $this->createColumn($table->id, $params);
 
 		$params = [
-			'title' => $this->l->t('Body fat'),
-			'type' => 'number',
-			'numberMin' => 0,
-			'numberMax' => 100,
-			'numberSuffix' => '%',
-			'orderWeight' => 30,
-		];
-		$columns['bodyFat'] = $this->createColumn($table->id, $params);
-
-		$params = [
-			'title' => $this->l->t('Feeling over all'),
-			'type' => 'number',
-			'subtype' => 'stars',
-			'orderWeight' => 20,
-		];
-		$columns['feeling'] = $this->createColumn($table->id, $params);
-
-		$params = [
-			'title' => $this->l->t('Comments'),
+			'title' => $this->l->t('Description'),
 			'type' => 'text',
 			'subtype' => 'long',
-			'orderWeight' => 10,
+			'orderWeight' => 50,
+		];
+		$columns['description'] = $this->createColumn($table->id, $params);
+
+		$params = [
+			'title' => $this->l->t('Contact information'),
+			'type' => 'text',
+			'subtype' => 'long',
+			'orderWeight' => 40,
+		];
+		$columns['contactInformation'] = $this->createColumn($table->id, $params);
+
+		$params = [
+			'title' => $this->l->t('Quality of relationship'),
+			'type' => 'number',
+			'subtype' => 'progress',
+			'orderWeight' => 30,
+			'numberDefault' => 30,
+		];
+		$columns['qualityRelationship'] = $this->createColumn($table->id, $params);
+
+		$params = [
+			'title' => $this->l->t('Comment'),
+			'type' => 'text',
+			'subtype' => 'long',
+			'orderWeight' => 20,
 		];
 		$columns['comment'] = $this->createColumn($table->id, $params);
 
 		// let's add some example rows
 		$this->createRow($table, [
-			$columns['date']->getId() => '2022-03-01',
-			$columns['weight']->getId() => 92.5,
-			$columns['bodyFat']->getId() => 30,
-			$columns['feeling']->getId() => 4,
-			$columns['comment']->getId() => '',
+			$columns['name']->getId() => $this->l->t('Dog'),
+			$columns['accountManager']->getId() => 'Mr. Smith',
+			$columns['contractType']->getId() => $this->l->t('Dog food every week'),
+			$columns['contractStart']->getId() => '2023-01-01',
+			$columns['contractEnd']->getId() => '2023-12-31',
+			$columns['description']->getId() => $this->l->t('The dog is our best friend.'),
+			$columns['contactInformation']->getId() => $this->l->t('Standard, SLA Level 2'),
+			$columns['qualityRelationship']->getId() => 80,
+			$columns['comment']->getId() => $this->l->t('Likes treats'),
 		]);
 		$this->createRow($table, [
-			$columns['date']->getId() => '2022-03-02',
-			$columns['weight']->getId() => 92.7,
-			$columns['bodyFat']->getId() => 30.3,
-			$columns['feeling']->getId() => 3,
-			$columns['comment']->getId() => $this->l->t('feel sick'),
+			$columns['name']->getId() => $this->l->t('Cat'),
+			$columns['accountManager']->getId() => 'Mr. Smith',
+			$columns['contractType']->getId() => $this->l->t('Cat food every week'),
+			$columns['contractStart']->getId() => '2023-03-01',
+			$columns['contractEnd']->getId() => '2023-09-15',
+			$columns['description']->getId() => $this->l->t('The cat is also our best friend.'),
+			$columns['contactInformation']->getId() => $this->l->t('Standard, SLA Level 1'),
+			$columns['qualityRelationship']->getId() => 40,
+			$columns['comment']->getId() => $this->l->t('New customer, lets see if there is more.'),
 		]);
 		$this->createRow($table, [
-			$columns['date']->getId() => '2022-03-10',
-			$columns['weight']->getId() => 91,
-			$columns['bodyFat']->getId() => 33.1,
-			$columns['feeling']->getId() => 4,
-			$columns['comment']->getId() => '',
-		]);
-		$this->createRow($table, [
-			$columns['date']->getId() => '2022-03-19',
-			$columns['weight']->getId() => 92.5,
-			$columns['bodyFat']->getId() => 30.7,
-			$columns['feeling']->getId() => 5,
-			$columns['comment']->getId() => $this->l->t('party-time'),
+			$columns['name']->getId() => $this->l->t('Horse'),
+			$columns['accountManager']->getId() => 'Alice',
+			$columns['contractType']->getId() => $this->l->t('Hay and straw'),
+			$columns['contractStart']->getId() => '2023-06-01',
+			$columns['contractEnd']->getId() => '2023-08-31',
+			$columns['description']->getId() => $this->l->t('Summer only'),
+			$columns['contactInformation']->getId() => $this->l->t('Special'),
+			$columns['qualityRelationship']->getId() => 60,
+			$columns['comment']->getId() => $this->l->t('Maybe we can make it fix for every year?!'),
 		]);
 	}
 
@@ -350,8 +383,8 @@ class TableTemplateService {
 			$columns['dateRequest']->getId() => '2023-01-08',
 			$columns['approved']->getId() => 'true',
 			$columns['dateApprove']->getId() => '2023-02-02',
-			$columns['approveBy']->getId() => 'The Boss',
-			$columns['comment']->getId() => 'Bob will help for this time',
+			$columns['approveBy']->getId() => $this->l->t('The Boss'),
+			$columns['comment']->getId() => $this->l->t('Bob will help for this time'),
 		]);
 		$this->createRow($table, [
 			$columns['employee']->getId() => 'Bob',
@@ -361,7 +394,7 @@ class TableTemplateService {
 			$columns['dateRequest']->getId() => '2023-01-18',
 			$columns['approved']->getId() => 'true',
 			$columns['dateApprove']->getId() => '2023-02-02',
-			$columns['approveBy']->getId() => 'The Boss',
+			$columns['approveBy']->getId() => $this->l->t('The Boss'),
 			$columns['comment']->getId() => '',
 		]);
 		$this->createRow($table, [
@@ -373,7 +406,7 @@ class TableTemplateService {
 			$columns['approved']->getId() => 'false',
 			$columns['dateApprove']->getId() => '',
 			$columns['approveBy']->getId() => '',
-			$columns['comment']->getId() => 'We have to talk about that.',
+			$columns['comment']->getId() => $this->l->t('We have to talk about that.'),
 		]);
 	}
 
@@ -506,32 +539,32 @@ class TableTemplateService {
 
 		// let's add some example rows
 		$this->createRow($table, [
-			$columns['task']->getId() => 'Create initial milestones',
-			$columns['description']->getId() => 'Create some milestone to structure the project.',
-			$columns['target']->getId() => 'Plan to discuss for the kickoff meeting.',
-			$columns['comments']->getId() => 'Wow, that was hard work, but now it\'s done.',
+			$columns['task']->getId() => $this->l->t('Create initial milestones'),
+			$columns['description']->getId() => $this->l->t('Create some milestone to structure the project.'),
+			$columns['target']->getId() => $this->l->t('Plan to discuss for the kickoff meeting.'),
+			$columns['comments']->getId() => $this->l->t('Wow, that was hard work, but now it\'s done.'),
 			$columns['progress']->getId() => 100,
 			$columns['proofed']->getId() => 'true',
 		]);
 		$this->createRow($table, [
-			$columns['task']->getId() => 'Kickoff meeting',
-			$columns['description']->getId() => 'We will have a kickoff meeting in person.',
-			$columns['target']->getId() => 'Project is kicked-off and we know the vision and our first tasks.',
-			$columns['comments']->getId() => 'That was nice in person again. We collected some action points, have a look at the documentation...',
+			$columns['task']->getId() => $this->l->t('Kickoff meeting'),
+			$columns['description']->getId() => $this->l->t('We will have a kickoff meeting in person.'),
+			$columns['target']->getId() => $this->l->t('Project is kicked-off and we know the vision and our first tasks.'),
+			$columns['comments']->getId() => $this->l->t('That was nice in person again. We collected some action points, have a look at the documentation...'),
 			$columns['progress']->getId() => 80,
 			$columns['proofed']->getId() => 'true',
 		]);
 		$this->createRow($table, [
-			$columns['task']->getId() => 'Set up some documentation and collaboration tools',
-			$columns['description']->getId() => 'Where do we in what way collaborate?',
-			$columns['target']->getId() => 'We know what we are doing.',
-			$columns['comments']->getId() => 'We have heard that Nextcloud could be a nice solution for it, should give it a try.',
+			$columns['task']->getId() => $this->l->t('Set up some documentation and collaboration tools'),
+			$columns['description']->getId() => $this->l->t('Where do we in what way collaborate?'),
+			$columns['target']->getId() => $this->l->t('We know what we are doing.'),
+			$columns['comments']->getId() => $this->l->t('We have heard that Nextcloud could be a nice solution for it, should give it a try.'),
 			$columns['progress']->getId() => 10,
 			$columns['proofed']->getId() => 'false',
 		]);
 		$this->createRow($table, [
-			$columns['task']->getId() => 'Add more actions',
-			$columns['description']->getId() => 'I guess we need more actions in here...',
+			$columns['task']->getId() => $this->l->t('Add more actions'),
+			$columns['description']->getId() => $this->l->t('I guess we need more actions in here...'),
 		]);
 	}
 
