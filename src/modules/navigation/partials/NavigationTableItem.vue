@@ -15,16 +15,15 @@
 				<Table :size="20" />
 			</template>
 		</template>
-		<template #extra>
-			<NcActionButton v-if="table.hasShares" icon="icon-share" @click="actionShowShare" />
-		</template>
+		<template #extra />
 		<template #counter>
-			<div v-if="table.isShared" style="padding-right: var(--default-grid-baseline);">
+			<NcCounterBubble>
+				{{ n('tables', '%n row', '%n rows', table.rowsCount, {}) }}
+			</NcCounterBubble>
+			<NcActionButton v-if="table.hasShares" icon="icon-share" :class="{'margin-right': !(activeTable && table.id === activeTable.id)}" @click="actionShowShare" />
+			<div v-if="table.isShared" class="margin-left">
 				<NcAvatar :user="table.ownership" />
 			</div>
-			<NcCounterBubble>
-				{{ table.rowsCount }}
-			</NcCounterBubble>
 		</template>
 
 		<template #actions>
@@ -143,3 +142,37 @@ export default {
 
 }
 </script>
+<style lang="scss">
+
+.app-navigation-entry__counter-wrapper {
+  button.action-button {
+    padding-right: 0;
+  }
+
+  .counter-bubble__counter {
+    display: none;
+  }
+
+  margin-right: 0 !important;
+}
+
+.app-navigation-entry {
+  .margin-right {
+    margin-right: 44px;
+  }
+  .margin-left {
+    margin-left: calc(var(--default-grid-baseline) * 2);
+  }
+}
+
+.app-navigation-entry:hover {
+  .margin-right {
+    margin-right: 0;
+  }
+
+  .app-navigation-entry__counter-wrapper .counter-bubble__counter {
+    display: inline-flex;
+  }
+}
+
+</style>
