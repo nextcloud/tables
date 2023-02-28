@@ -30,35 +30,23 @@ use OCA\Tables\Errors\InternalError;
 use Test\TestCase;
 
 class PermissionsServiceTest extends TestCase {
-
 	private PermissionsService $permissionsService;
 
 	public function setUp(): void {
 		parent::setUp();
-		$this->permissionsService = $this->createMock(\OCA\Tables\Service\PermissionsService::class);
-		/*
-		$this->logger = $this->createMock(LoggerInterface::class);
-		$this->request = $this->createMock(IRequest::class);
-		$this->cardServiceValidator = $this->createMock(CardServiceValidator::class);
-
-		$this->logger->expects($this->any())->method('error');
-
-		$this->cardService = new CardService(
-			$this->logger,
-			$this->request,
-			$this->cardServiceValidator,
-			'user1'
-		);
-		*/
+		$this->permissionsService = $this->createMock(PermissionsService::class);
 	}
 
-	public function testPreCheckUserId() {
-		//self::assertEquals(1, 1);
-		$userId = 'john';
-		try {
-			$this->permissionsService->preCheckUserId($userId);
-		} catch (InternalError $e) {
-		}
-		self::assertEquals('john', $userId);
+	public function testPreCheckUserIdGivenUser() {
+		$this->permissionsService
+			->expects(self::any())
+			->method('preCheckUserId')
+			->willReturnCallback(function (&$userId, $canBeEmpty): bool {
+				self::assertEquals('bar', $userId);
+				return true;
+			});
+
+		$userId = 'foo';
+		self::assertNull($this->permissionsService->preCheckUserId($userId, true));
 	}
 }

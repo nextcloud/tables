@@ -57,7 +57,6 @@ class PermissionsService {
 			$this->logger->warning($error);
 			throw new InternalError($error);
 		}
-		return $userId;
 	}
 
 
