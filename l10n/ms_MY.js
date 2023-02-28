@@ -2,6 +2,8 @@ OC.L10N.register(
     "tables",
     {
     "Date" : "Date",
+    "from" : "dari",
+    "to" : "kepada",
     "Name" : "Nama",
     "Birthday" : "Hari lahir",
     "Description" : "Keterangan",

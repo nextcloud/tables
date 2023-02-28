@@ -1,6 +1,9 @@
 { "translations": {
     "Date" : "Kuupäev",
     "Comments" : "Kommentaarid",
+    "from" : "saatja",
+    "to" : "saaja",
+    "Approved" : "Heaks kiidetud",
     "Name" : "Nimi",
     "Position" : "Asukoht",
     "Birthday" : "Sünnipäev",

@@ -3,6 +3,9 @@ OC.L10N.register(
     {
     "Date" : "Kuupäev",
     "Comments" : "Kommentaarid",
+    "from" : "saatja",
+    "to" : "saaja",
+    "Approved" : "Heaks kiidetud",
     "Name" : "Nimi",
     "Position" : "Asukoht",
     "Birthday" : "Sünnipäev",

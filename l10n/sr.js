@@ -7,6 +7,8 @@ OC.L10N.register(
     "Members" : "Чланови",
     "Date" : "Датум",
     "Comments" : "Коментари",
+    "from" : "од",
+    "to" : "за",
     "Name" : "Име",
     "Position" : "Позиција",
     "Birthday" : "Рођендан",

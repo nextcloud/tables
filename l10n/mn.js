@@ -4,6 +4,8 @@ OC.L10N.register(
     "Members" : "Гишүүд",
     "Date" : "Он сар өдөр",
     "Comments" : "Сэтгэгдлүүд",
+    "from" : "тэндээс",
+    "to" : "Дуусах нь",
     "Name" : "Нэр",
     "Position" : "Байр",
     "Birthday" : "Төрсөн өдөр",

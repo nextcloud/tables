@@ -3,6 +3,9 @@ OC.L10N.register(
     {
     "Date" : "Date",
     "Comments" : "Comentarii",
+    "from" : "de la",
+    "to" : "către",
+    "Approved" : "Aprobat",
     "Name" : "Nume",
     "Position" : "Poziție",
     "Birthday" : "Zi de naștere",

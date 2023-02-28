@@ -2,6 +2,7 @@ OC.L10N.register(
     "tables",
     {
     "Date" : "Date",
+    "from" : "இலிருந்து",
     "Name" : "பெயர்",
     "Birthday" : "பிறந்த நாள்",
     "Description" : "விவரிப்பு",

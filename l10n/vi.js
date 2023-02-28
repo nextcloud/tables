@@ -5,6 +5,8 @@ OC.L10N.register(
     "Members" : "Thành viên",
     "Date" : "Date",
     "Comments" : "Các bình luận",
+    "from" : "từ",
+    "to" : "đến",
     "Name" : "Tên",
     "Birthday" : "Sinh nhật",
     "Description" : "Mô tả",

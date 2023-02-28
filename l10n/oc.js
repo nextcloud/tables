@@ -3,8 +3,13 @@ OC.L10N.register(
     {
     "ToDo list" : "Lista a far",
     "Members" : "Membres",
+    "Customers" : "Clients",
     "Date" : "Data",
     "Comments" : "Comentaris",
+    "from" : "de",
+    "to" : "a",
+    "Approved" : "Validat",
+    "Approved by" : "Validat per",
     "Name" : "Nom",
     "Position" : "Posicion",
     "Birthday" : "Data de naissença",

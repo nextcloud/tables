@@ -1,5 +1,7 @@
 { "translations": {
     "Date" : "Date",
+    "from" : "dari",
+    "to" : "kepada",
     "Name" : "Nama",
     "Birthday" : "Hari lahir",
     "Description" : "Keterangan",

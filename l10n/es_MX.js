@@ -7,6 +7,8 @@ OC.L10N.register(
     "Weight" : "Peso",
     "Body fat" : "Grasa corporal",
     "Comments" : "Comentarios",
+    "to" : "para",
+    "Approved" : "Aprobado",
     "Name" : "Nombre",
     "Position" : "Posición",
     "Birthday" : "Fecha de nacimiento",

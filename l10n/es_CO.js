@@ -4,6 +4,8 @@ OC.L10N.register(
     "Members" : "Miembros",
     "Date" : "Fecha",
     "Comments" : "Comentarios",
+    "to" : "para",
+    "Approved" : "Aprobado",
     "Name" : "Nombre",
     "Position" : "Posición",
     "Birthday" : "Fecha de nacimiento",

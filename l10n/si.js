@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Date" : "දිනය",
     "Comments" : "අදහස්",
+    "from" : "සිට",
     "Name" : "නම",
     "Birthday" : "උපන් දිනය",
     "Description" : "විස්තරය",

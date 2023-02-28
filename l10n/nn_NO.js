@@ -3,6 +3,8 @@ OC.L10N.register(
     {
     "Date" : "Dato",
     "Comments" : "Kommentarar",
+    "from" : "frå",
+    "to" : "til",
     "Name" : "Namn",
     "Birthday" : "Bursdag",
     "Description" : "Skildring",

@@ -3,6 +3,9 @@ OC.L10N.register(
     {
     "Date" : "วันที่",
     "Comments" : "ความคิดเห็น",
+    "from" : "จาก",
+    "to" : "ถึง",
+    "Approved" : "ได้รับการอนุมัติ",
     "Name" : "ชื่อ",
     "Position" : "ตำแหน่ง",
     "Birthday" : "วันเกิด",
