@@ -40,7 +40,8 @@ class PermissionsService {
 	/**
 	 * @throws InternalError
 	 */
-	public function preCheckUserId(?string &$userId, bool $canBeEmpty = true): void {
+	public function preCheckUserId(string $userId = null, bool $canBeEmpty = true): string
+	{
 		if ($userId === null) {
 			$userId = $this->userId;
 		}
@@ -56,6 +57,7 @@ class PermissionsService {
 			$this->logger->warning($error);
 			throw new InternalError($error);
 		}
+		return $userId;
 	}
 
 
@@ -68,7 +70,7 @@ class PermissionsService {
 	 */
 	public function canReadTable(Table $table, ?string $userId = null): bool {
 		try {
-			$this->preCheckUserId($userId);
+			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
 			return false;
 		}
@@ -98,7 +100,7 @@ class PermissionsService {
 	 */
 	public function canUpdateTable(Table $table, ?string $userId = null): bool {
 		try {
-			$this->preCheckUserId($userId);
+			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
 			return false;
 		}
@@ -129,7 +131,7 @@ class PermissionsService {
 	 */
 	public function canDeleteTable(Table $table, ?string $userId = null): bool {
 		try {
-			$this->preCheckUserId($userId);
+			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
 			return false;
 		}
@@ -223,7 +225,7 @@ class PermissionsService {
 	 */
 	public function canReadRowsByTableId(int $tableId, ?string $userId = null): bool {
 		try {
-			$this->preCheckUserId($userId);
+			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
 			return false;
 		}
@@ -259,7 +261,7 @@ class PermissionsService {
 	 */
 	public function canCreateRowsByTableId(int $tableId, ?string $userId = null): bool {
 		try {
-			$this->preCheckUserId($userId);
+			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
 			return false;
 		}
@@ -295,7 +297,7 @@ class PermissionsService {
 	 */
 	public function canUpdateRowsByTableId(int $tableId, ?string $userId = null): bool {
 		try {
-			$this->preCheckUserId($userId);
+			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
 			return false;
 		}
@@ -331,7 +333,7 @@ class PermissionsService {
 	 */
 	public function canDeleteRowsByTableId(int $tableId, ?string $userId = null): bool {
 		try {
-			$this->preCheckUserId($userId);
+			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
 			return false;
 		}
@@ -366,7 +368,7 @@ class PermissionsService {
 	/** @noinspection PhpUndefinedMethodInspection */
 	public function canReadShare(Share $share, ?string $userId = null): bool {
 		try {
-			$this->preCheckUserId($userId);
+			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
 			return false;
 		}
@@ -402,7 +404,7 @@ class PermissionsService {
 
 	public function canUpdateShare(Share $item, ?string $userId = null): bool {
 		try {
-			$this->preCheckUserId($userId);
+			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
 			return false;
 		}
@@ -417,7 +419,7 @@ class PermissionsService {
 
 	public function canDeleteShare(Share $item, ?string $userId = null): bool {
 		try {
-			$this->preCheckUserId($userId);
+			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
 			return false;
 		}
