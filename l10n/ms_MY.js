@@ -2,11 +2,11 @@ OC.L10N.register(
     "tables",
     {
     "Date" : "Date",
+    "Name" : "Nama",
+    "Description" : "Keterangan",
     "from" : "dari",
     "to" : "kepada",
-    "Name" : "Nama",
     "Birthday" : "Hari lahir",
-    "Description" : "Keterangan",
     "Type" : "Jenis",
     "Cancel" : "Batal",
     "Save" : "Simpan",

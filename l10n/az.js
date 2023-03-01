@@ -3,8 +3,10 @@ OC.L10N.register(
     {
     "Date" : "Date",
     "Name" : "Ad",
-    "Birthday" : "Ad günü",
     "Description" : "Açıqlanma",
+    "from" : "ondan",
+    "to" : "doğru",
+    "Birthday" : "Ad günü",
     "Type" : "Type",
     "Cancel" : "Dayandır",
     "Save" : "Saxla",

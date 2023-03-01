@@ -3,8 +3,10 @@ OC.L10N.register(
     {
     "Date" : "Date",
     "Name" : "Enw",
-    "Birthday" : "Pen-blwydd",
     "Description" : "Disgrifiad",
+    "from" : "oddi wrth",
+    "to" : "at",
+    "Birthday" : "Pen-blwydd",
     "Type" : "Math",
     "Cancel" : "Diddymu",
     "Save" : "Cadw",

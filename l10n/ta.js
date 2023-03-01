@@ -2,10 +2,10 @@ OC.L10N.register(
     "tables",
     {
     "Date" : "Date",
-    "from" : "இலிருந்து",
     "Name" : "பெயர்",
-    "Birthday" : "பிறந்த நாள்",
     "Description" : "விவரிப்பு",
+    "from" : "இலிருந்து",
+    "Birthday" : "பிறந்த நாள்",
     "Type" : "வகை",
     "Cancel" : "இரத்து செய்க",
     "Save" : "சேமிக்க ",

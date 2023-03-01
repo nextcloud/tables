@@ -3,8 +3,8 @@ OC.L10N.register(
     {
     "Date" : "Date",
     "Name" : "ئاتى",
-    "Birthday" : "تۇغۇلغان كۈن",
     "Description" : "چۈشەندۈرۈش",
+    "Birthday" : "تۇغۇلغان كۈن",
     "Type" : "Type",
     "Cancel" : "ۋاز كەچ",
     "Save" : "ساقلا",

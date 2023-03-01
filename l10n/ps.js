@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Comments" : "تبصرې",
     "Name" : "نوم",
+    "Comment" : "تبصره",
     "Cancel" : "پرېښول",
     "Save" : "ساتل",
     "Link" : "لېنک",

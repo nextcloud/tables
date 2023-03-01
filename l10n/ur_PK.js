@@ -3,8 +3,8 @@ OC.L10N.register(
     {
     "Date" : "Date",
     "Name" : "اسم",
-    "Birthday" : "سالگرہ",
     "Description" : "تصریح",
+    "Birthday" : "سالگرہ",
     "Type" : "Type",
     "Cancel" : "منسوخ کریں",
     "Save" : "حفظ",

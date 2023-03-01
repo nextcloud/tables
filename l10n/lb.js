@@ -3,11 +3,11 @@ OC.L10N.register(
     {
     "Date" : "Date",
     "Comments" : "Kommentarer",
+    "Name" : "Numm",
+    "Description" : "Beschreiwung",
     "from" : "vun",
     "to" : "bis",
-    "Name" : "Numm",
     "Birthday" : "Gebuertsdag",
-    "Description" : "Beschreiwung",
     "Type" : "Typ",
     "Cancel" : "Ofbriechen",
     "Save" : "Späicheren",

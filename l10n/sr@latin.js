@@ -4,6 +4,7 @@ OC.L10N.register(
     "Date" : "Date",
     "Name" : "Ime",
     "Description" : "Opis",
+    "Comment" : "Komentar",
     "Type" : "Tip",
     "Cancel" : "Otkaži",
     "Save" : "Sačuvaj",
