@@ -32,6 +32,9 @@ concurrency:
   group: phpunit-mysql-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+env:
+  GH_ACTION: true
+
 jobs:
   phpunit-mysql:
     runs-on: ubuntu-latest
