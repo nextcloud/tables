@@ -26,27 +26,71 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Service;
 
+use OCA\Tables\Db\ShareMapper;
+use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Helper\UserHelper;
+use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class PermissionsServiceTest extends TestCase {
-	private PermissionsService $permissionsService;
+	public function testPreCheckUserIdGivenUser() {
+		$logger = $this->createMock(LoggerInterface::class);
+		$userId = "TestUser";
+		$tableMapper = $this->createMock(TableMapper::class);
+		$shareMapper = $this->createMock(ShareMapper::class);
+		$userHelper = $this->createMock(UserHelper::class);
+		$permissionsService = new PermissionsService($logger, $userId, $tableMapper, $shareMapper, $userHelper, false);
 
-	public function setUp(): void {
-		parent::setUp();
-		$this->permissionsService = $this->createMock(PermissionsService::class);
+		self::assertEquals($userId, $permissionsService->preCheckUserId($userId));
 	}
 
-	public function testPreCheckUserIdGivenUser() {
-		$this->permissionsService
-			->expects(self::any())
-			->method('preCheckUserId')
-			->willReturnCallback(function (&$userId, $canBeEmpty): bool {
-				self::assertEquals('bar', $userId);
-				return true;
-			});
+	public function testPreCheckUserIdNoUser() {
+		$logger = $this->createMock(LoggerInterface::class);
+		$userId = null;
+		$tableMapper = $this->createMock(TableMapper::class);
+		$shareMapper = $this->createMock(ShareMapper::class);
+		$userHelper = $this->createMock(UserHelper::class);
+		$permissionsService = new PermissionsService($logger, $userId, $tableMapper, $shareMapper, $userHelper, false);
 
-		$userId = 'foo';
-		self::assertNull($this->permissionsService->preCheckUserId($userId, true));
+		self::expectException(InternalError::class);
+		$permissionsService->preCheckUserId($userId);
+	}
+
+	public function testPreCheckUserIdNoUserButContext() {
+		$logger = $this->createMock(LoggerInterface::class);
+		$userId = 'john';
+		$tableMapper = $this->createMock(TableMapper::class);
+		$shareMapper = $this->createMock(ShareMapper::class);
+		$userHelper = $this->createMock(UserHelper::class);
+		$permissionsService = new PermissionsService($logger, $userId, $tableMapper, $shareMapper, $userHelper, false);
+
+		self::assertEquals($userId, $permissionsService->preCheckUserId(null));
+	}
+
+	public function testPreCheckUserIdNoUserNotAllowed() {
+		$logger = $this->createMock(LoggerInterface::class);
+		$userId = '';
+		$tableMapper = $this->createMock(TableMapper::class);
+		$shareMapper = $this->createMock(ShareMapper::class);
+		$userHelper = $this->createMock(UserHelper::class);
+		$permissionsService = new PermissionsService($logger, $userId, $tableMapper, $shareMapper, $userHelper, false);
+
+		self::expectException(InternalError::class);
+		$permissionsService->preCheckUserId($userId, false);
+
+		self::expectException(InternalError::class);
+		$permissionsService->preCheckUserId($userId, true);
+	}
+
+	public function testPreCheckUserIdNoUserAllowed() {
+		$logger = $this->createMock(LoggerInterface::class);
+		$userId = '';
+		$tableMapper = $this->createMock(TableMapper::class);
+		$shareMapper = $this->createMock(ShareMapper::class);
+		$userHelper = $this->createMock(UserHelper::class);
+		$permissionsService = new PermissionsService($logger, $userId, $tableMapper, $shareMapper, $userHelper, true);
+
+		self::assertEquals($userId, $permissionsService->preCheckUserId($userId));
 	}
 }

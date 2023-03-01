@@ -40,8 +40,7 @@ class PermissionsService {
 	/**
 	 * @throws InternalError
 	 */
-	public function preCheckUserId(string $userId = null, bool $canBeEmpty = true): string
-	{
+	public function preCheckUserId(string $userId = null, bool $canBeEmpty = true): string {
 		if ($userId === null) {
 			$userId = $this->userId;
 		}
@@ -57,6 +56,7 @@ class PermissionsService {
 			$this->logger->warning($error);
 			throw new InternalError($error);
 		}
+		return $userId;
 	}
 
 
