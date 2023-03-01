@@ -86,7 +86,7 @@ class RowMapper extends QBMapper {
 	 */
 	public function countRows(int $tableId): int {
 		$qb = $this->db->getQueryBuilder();
-		$qb->select($qb->createFunction('COUNT(*)'));
+		$qb->select($qb->createFunction('COUNT(*) as counter'));
 		$qb->from($this->table);
 		$qb->where(
 			$qb->expr()->eq('table_id', $qb->createNamedParameter($tableId))
@@ -94,7 +94,7 @@ class RowMapper extends QBMapper {
 
 		try {
 			$result = $this->findOneQuery($qb);
-			return (int)$result['COUNT(*)'];
+			return (int)$result['counter'];
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
 			return 0;
 		}
