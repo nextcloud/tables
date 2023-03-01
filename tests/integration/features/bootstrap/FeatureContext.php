@@ -23,7 +23,7 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
-use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+// use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
