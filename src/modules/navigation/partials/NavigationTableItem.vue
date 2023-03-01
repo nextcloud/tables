@@ -125,7 +125,7 @@ export default {
 		},
 		async deleteMe() {
 			const deleteId = this.table.id
-			const activeTableId = this.activeTable.id
+			const activeTableId = this.activeTable?.id
 
 			const res = await this.$store.dispatch('removeTable', { tableId: this.table.id })
 			if (res) {
