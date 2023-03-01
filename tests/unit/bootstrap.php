@@ -24,7 +24,7 @@ if (!defined('PHPUNIT_RUN')) {
 }
 
 if (getenv('GH_ACTION')) {
-	require_once __DIR__.'/../../../tests/bootstrap.php';
+	require_once __DIR__.'/../../..';
 } else {
 	require_once __DIR__.'/../../../../../nextcloud-docker-dev/workspace/server/lib/base.php';
 }
