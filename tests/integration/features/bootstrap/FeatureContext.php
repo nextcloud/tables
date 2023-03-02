@@ -87,14 +87,22 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 
 		$data = $this->getDataFromResponse($this->response);
 
+		// check if tables are empty
 		if ($body === null) {
 			Assert::assertCount(0, $data);
 			return;
 		}
 
-		Assert::assertCount(count($body->getHash()), $body, 'Tables count does not match');
-		foreach ($body->getRows() as $row) {
-			// Compare table row
+		// we check if the given tables are available, not if they are equal
+		// Assert::assertCount(count($body->getRows()[0]), $data, 'Tables count does not match');
+
+		// check if given tables exists
+		$titles = [];
+		foreach ($data as $d) {
+			$titles[] = $d['title'];
+		}
+		foreach ($body->getRows()[0] as $tableTitle) {
+			Assert::assertTrue(in_array($tableTitle, $titles, true));
 		}
 	}
 
@@ -268,7 +276,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	 * @param string $user
 	 */
 	public function userLogsIn(string $user) {
-		$loginUrl = $this->baseUrl . '/login';
+		$loginUrl = $this->baseUrl . 'login';
 
 		$cookieJar = $this->getUserCookieJar($user);
 
@@ -384,6 +392,8 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 		$options['headers'] = array_merge($headers, [
 			'OCS-ApiRequest' => 'true',
 			'Accept' => 'application/json',
+			"Cookie" => "XDEBUG_SESSION=PHPSTORM",
+			"XDEBUG_SESSION" => "PHPSTORM",
 		]);
 
 		try {

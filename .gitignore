@@ -11,3 +11,4 @@ appinfo/info.xsd
 releaseNotes.md
 /tests/unit/.phpunit.result.cache
 tests/unit/.phpunit.result.cache
+/tests/integration/output/report.xml

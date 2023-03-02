@@ -27,6 +27,7 @@ npm-upgrade:
 npm-update:
 	npm update
 
+ci: lint test
 
 
 ##### Building #####
@@ -80,29 +81,29 @@ watch-js:
 
 
 ##### Testing #####
-test: test-api
+
+test: test-unit test-behat
 
 test-api:
 	phpunit --bootstrap vendor/autoload.php --testdox tests/api/
 
-ci: lint-js lint-xml lint-php-cs-fixer lint-php-psalm
+test-unit:
+	composer test
+
+test-behat:
+	# ./tests/integration/run.sh
+	TEST_SERVER_URL=http://nextcloud.local/ ./tests/integration/vendor/bin/behat --config ./tests/integration/config/behat.yml
+
 
 ##### Linting #####
 
 lint: lint-php lint-js lint-css lint-xml
 
-
-lint-php: lint-phpfast lint-php-phan
-
-lint-phpfast: lint-php-lint lint-php-cs-fixer lint-php-phpcs
+lint-php: lint-php-lint lint-php-cs-fixer lint-php-psalm
 
 lint-php-lint:
 	# Check PHP syntax errors
 	@! find $(php_dirs) -name "*.php" | xargs -I{} php -l '{}' | grep -v "No syntax errors detected"
-
-lint-php-phan:
-	# PHAN - TODO
-	vendor/bin/phan --allow-polyfill-parser -k tests/phan-config.php --no-progress-bar -m checkstyle | vendor/bin/cs2pr --graceful-warnings --colorize
 
 lint-php-cs-fixer:
 	# PHP Coding Standards Fixer (with Nextcloud coding standards)
@@ -129,7 +130,6 @@ lint-xml:
 lint-fix: lint-php-fix lint-js-fix lint-css-fix
 
 lint-php-fix:
-	# vendor/bin/phpcbf --standard=tests/phpcs.xml $(php_dirs)
 	vendor/bin/php-cs-fixer fix
 
 lint-js-fix:
