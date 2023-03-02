@@ -6,6 +6,7 @@ OC.L10N.register(
     "Comments" : "Komentari",
     "Name" : "Ime",
     "Description" : "Opis",
+    "Comment" : "Komentar",
     "from" : "od",
     "to" : "do",
     "Birthday" : "Rođendan",

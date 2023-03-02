@@ -8,6 +8,7 @@ OC.L10N.register(
     "Comments" : "Comentarios",
     "Name" : "Nome",
     "Description" : "Descrición",
+    "Comment" : "Comentario",
     "from" : "dende",
     "to" : "para",
     "Approved" : "Aprobado",

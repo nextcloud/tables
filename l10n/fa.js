@@ -6,6 +6,7 @@ OC.L10N.register(
     "Comments" : "نظرات",
     "Name" : "نام",
     "Description" : "توضیحات",
+    "Comment" : "دیدگاه",
     "from" : "از",
     "to" : "به",
     "Approved" : "تایید شده",

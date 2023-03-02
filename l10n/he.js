@@ -9,6 +9,7 @@ OC.L10N.register(
     "Comments" : "תגובות",
     "Name" : "שם",
     "Description" : "תיאור",
+    "Comment" : "הערה",
     "from" : "מאת",
     "to" : "אל",
     "Approved" : "מאושר",

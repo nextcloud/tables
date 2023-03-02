@@ -5,6 +5,7 @@ OC.L10N.register(
     "Comments" : "Displegadennoù",
     "Name" : "Anv",
     "Description" : "Deskrivadur",
+    "Comment" : "Displegadenn",
     "Birthday" : "Deiz-ha-bloaz",
     "Progress" : "Araokadenn",
     "Type" : "Stumm",

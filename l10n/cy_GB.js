@@ -4,6 +4,7 @@ OC.L10N.register(
     "Date" : "Date",
     "Name" : "Enw",
     "Description" : "Disgrifiad",
+    "Dog" : "Ci",
     "from" : "oddi wrth",
     "to" : "at",
     "Birthday" : "Pen-blwydd",

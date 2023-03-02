@@ -5,6 +5,7 @@ OC.L10N.register(
     "Comments" : "Կարծիքներ",
     "Name" : "Անուն",
     "Description" : "Նկարագրություն",
+    "Comment" : "Մեկնաբանել",
     "Birthday" : "Ծննդյան օր",
     "Type" : "Տիպ",
     "Cancel" : "ընդհատել",

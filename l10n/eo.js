@@ -6,6 +6,7 @@ OC.L10N.register(
     "Comments" : "Komentoj",
     "Name" : "Nomo",
     "Description" : "Priskribo",
+    "Comment" : "Komento",
     "from" : "de",
     "to" : "al",
     "Approved" : "Aprobita",

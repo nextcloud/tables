@@ -16,6 +16,8 @@ OC.L10N.register(
     "Comments" : "Σχόλια",
     "Name" : "Όνομα",
     "Description" : "Περιγραφή",
+    "Comment" : "Σχόλιο",
+    "Dog" : "Σκύλος",
     "from" : "από",
     "to" : "προς",
     "Approved" : "Εγκρίθηκε",

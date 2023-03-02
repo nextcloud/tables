@@ -11,6 +11,7 @@ OC.L10N.register(
     "Comments" : "Kommentit",
     "Name" : "Nimi",
     "Description" : "Kuvaus",
+    "Comment" : "Kommentti",
     "Dog" : "Koira",
     "Cat" : "Kissa",
     "from" : "Lähettäjä",

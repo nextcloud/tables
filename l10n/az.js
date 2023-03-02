@@ -4,6 +4,7 @@ OC.L10N.register(
     "Date" : "Date",
     "Name" : "Ad",
     "Description" : "Açıqlanma",
+    "Comment" : "Komentariya",
     "from" : "ondan",
     "to" : "doğru",
     "Birthday" : "Ad günü",

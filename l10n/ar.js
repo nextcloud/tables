@@ -6,6 +6,7 @@ OC.L10N.register(
     "Comments" : "تعليقات",
     "Name" : "الاسم",
     "Description" : "الوصف",
+    "Comment" : "تعليق",
     "from" : "مِن",
     "to" : "إلى",
     "Approved" : "تم قبوله",

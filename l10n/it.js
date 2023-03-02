@@ -15,6 +15,7 @@ OC.L10N.register(
     "Comments" : "Commenti",
     "Name" : "Nome",
     "Description" : "Descrizione",
+    "Comment" : "Commento",
     "Dog" : "Cane",
     "Cat" : "Gatto",
     "from" : "da",

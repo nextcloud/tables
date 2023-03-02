@@ -10,6 +10,7 @@ OC.L10N.register(
     "Comments" : "Komentari",
     "Name" : "Naziv",
     "Description" : "Opis",
+    "Comment" : "Komentar",
     "from" : "od",
     "to" : "do",
     "Approved" : "Odobreno",

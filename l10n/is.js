@@ -7,6 +7,7 @@ OC.L10N.register(
     "Comments" : "Athugasemdir",
     "Name" : "Heiti",
     "Description" : "Lýsing",
+    "Comment" : "Athugasemd",
     "Dog" : "Hundur",
     "from" : "frá",
     "to" : "til",

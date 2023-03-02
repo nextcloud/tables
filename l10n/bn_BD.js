@@ -4,6 +4,7 @@ OC.L10N.register(
     "Date" : "Date",
     "Name" : "নাম",
     "Description" : "বিবরণ",
+    "Comment" : "মন্তব্য",
     "from" : "হইতে",
     "to" : "প্রতি",
     "Birthday" : "জন্মদিন",

@@ -10,6 +10,8 @@ OC.L10N.register(
     "Comments" : "Kommentarer",
     "Name" : "Navn",
     "Description" : "Beskrivelse",
+    "Comment" : "Kommentér",
+    "Dog" : "Hund",
     "from" : "fra",
     "to" : "til",
     "Approved" : "Godkendt",

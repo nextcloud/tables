@@ -6,6 +6,7 @@ OC.L10N.register(
     "Comments" : "Kommentare",
     "Name" : "Naam",
     "Description" : "Beskrywing",
+    "Comment" : "Kommentaar",
     "from" : "van",
     "to" : "aan",
     "Position" : "Posisie",

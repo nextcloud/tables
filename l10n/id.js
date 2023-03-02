@@ -6,6 +6,7 @@ OC.L10N.register(
     "Comments" : "Komentar",
     "Name" : "Nama",
     "Description" : "Deskrisi",
+    "Comment" : "Komentar",
     "from" : "dari",
     "to" : "untuk",
     "Approved" : "Disetujui",

@@ -18,6 +18,7 @@ OC.L10N.register(
     "Name" : "Név",
     "Account manager" : "Fiókkezelő",
     "Description" : "Leírás",
+    "Comment" : "Megjegyzés",
     "Dog" : "Kutya",
     "Cat" : "Macska",
     "from" : "feladó",

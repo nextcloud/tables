@@ -6,6 +6,7 @@ OC.L10N.register(
     "Comments" : "Commentarios",
     "Name" : "Nomine",
     "Description" : "Description",
+    "Comment" : "Commentario",
     "from" : "ex",
     "to" : "a",
     "Approved" : "Approbate",

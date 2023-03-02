@@ -5,6 +5,7 @@ OC.L10N.register(
     "Comments" : "Kommentaarid",
     "Name" : "Nimi",
     "Description" : "Kirjeldus",
+    "Comment" : "Kommentaar",
     "from" : "saatja",
     "to" : "saaja",
     "Approved" : "Heaks kiidetud",
