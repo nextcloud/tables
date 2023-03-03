@@ -17,7 +17,7 @@ OC.L10N.register(
     "Approved" : "Схвалені",
     "Approved by" : "Затверджено",
     "Position" : "Позиція",
-    "Birthday" : "День народження",
+    "Birthday" : "Дата народження",
     "Progress" : "Перебіг",
     "Tables" : "Таблиці",
     "Type" : "Тип",
