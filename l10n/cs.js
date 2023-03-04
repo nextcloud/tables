@@ -63,6 +63,7 @@ OC.L10N.register(
     "Date, time or whatever" : "Datum, čas nebo cokoli",
     "Progress" : "Míra dokončenosti",
     "Proofed" : "Dokázáno",
+    "We know what we are doing." : "Víme co děláme.",
     "Add more actions" : "Přidat další akce",
     "I guess we need more actions in here..." : "Hádám, že jsou zde zapotřebí další akce…",
     "No title given" : "Nezadán žádný nadpis",

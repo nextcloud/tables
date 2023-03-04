@@ -12,6 +12,8 @@ OC.L10N.register(
     "Comment" : "Коментар",
     "from" : "од",
     "to" : "за",
+    "Approved" : "Одобрено",
+    "Approved by" : "Одобрио",
     "Position" : "Позиција",
     "Birthday" : "Рођендан",
     "Progress" : "Напредак",
