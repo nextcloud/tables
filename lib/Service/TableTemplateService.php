@@ -556,7 +556,7 @@ class TableTemplateService {
 		]);
 		$this->createRow($table, [
 			$columns['task']->getId() => $this->l->t('Set up some documentation and collaboration tools'),
-			$columns['description']->getId() => $this->l->t('Where do we in what way collaborate?'),
+			$columns['description']->getId() => $this->l->t('Where and in what way do we collaborate?'),
 			$columns['target']->getId() => $this->l->t('We know what we are doing.'),
 			$columns['comments']->getId() => $this->l->t('We have heard that Nextcloud could be a nice solution for it, should give it a try.'),
 			$columns['progress']->getId() => 10,
