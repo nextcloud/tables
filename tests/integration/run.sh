@@ -3,8 +3,8 @@
 APP_NAME=tables
 
 APP_INTEGRATION_DIR=$PWD
-# ROOT_DIR=${APP_INTEGRATION_DIR}/../../../..
-ROOT_DIR=${APP_INTEGRATION_DIR}/../../../nextcloud-docker-dev/workspace/server
+ROOT_DIR=${APP_INTEGRATION_DIR}/../..
+# ROOT_DIR=${APP_INTEGRATION_DIR}/../../../nextcloud-docker-dev/workspace/server
 echo ''
 echo '#'
 echo '# Installing composer dependencies from tests/integration/'
@@ -46,7 +46,7 @@ echo '# Setting up apps'
 echo '#'
 
 
-${ROOT_DIR}/occ app:enable tables || exit 1
+${ROOT_DIR}/occ app:enable tables --force || exit 1
 
 ${ROOT_DIR}/occ app:list | grep tables
 

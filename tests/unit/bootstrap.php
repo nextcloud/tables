@@ -23,11 +23,7 @@ if (!defined('PHPUNIT_RUN')) {
 	define('PHPUNIT_RUN', 1);
 }
 
-if (getenv('GH_ACTION')) {
-	require_once __DIR__.'/../../..';
-} else {
-	require_once __DIR__.'/../../../../../nextcloud-docker-dev/workspace/server/lib/base.php';
-}
+require_once __DIR__.'/../../../../lib/base.php';
 
 \OC::$loader->addValidRoot(\OC::$SERVERROOT . '/tests');
 \OC_App::loadApp('tables');

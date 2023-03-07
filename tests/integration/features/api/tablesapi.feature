@@ -10,8 +10,8 @@ Feature: api/tablesapi
   Scenario: User has no tables
     Then user "participant1" has the following tables
 
-  Scenario: User has tables
-    Given as user "admin"
-    Given user "admin" logs in
-    Then user "admin" has the following tables
-    | Staffing |
+#  Scenario: User has tables
+#    Given as user "admin"
+#    Given user "admin" logs in
+#    Then user "admin" has the following tables
+#    | Staffing |

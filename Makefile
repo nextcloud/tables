@@ -94,6 +94,9 @@ test-behat:
 	# ./tests/integration/run.sh
 	TEST_SERVER_URL=http://nextcloud.local/ ./tests/integration/vendor/bin/behat --config ./tests/integration/config/behat.yml
 
+test-behat-run:
+	./tests/integration/run.sh
+
 
 ##### Linting #####
 
