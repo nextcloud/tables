@@ -46,7 +46,7 @@ echo '# Setting up apps'
 echo '#'
 
 
-${ROOT_DIR}/occ app:enable tables --force || exit 1
+${ROOT_DIR}/../../occ app:enable tables --force || exit 1
 
 ${ROOT_DIR}/occ app:list | grep tables
 

@@ -17,7 +17,7 @@ on:
       - stable*
 
 env:
-  APP_NAME: deck
+  APP_NAME: tables
 
 jobs:
   integration:
