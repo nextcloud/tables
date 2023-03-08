@@ -70,7 +70,7 @@ OC.L10N.register(
     "Target" : "Target",
     "Date, time or whatever" : "Date, time or whatever",
     "Progress" : "Progress",
-    "Proofed" : "Proofed",
+    "Proofed" : "Verified",
     "Create initial milestones" : "Create initial milestones",
     "Create some milestone to structure the project." : "Create some milestone to structure the project.",
     "Plan to discuss for the kickoff meeting." : "Plan to discuss for the kickoff meeting.",

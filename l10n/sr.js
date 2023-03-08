@@ -10,6 +10,7 @@ OC.L10N.register(
     "Name" : "Име",
     "Description" : "Опис",
     "Comment" : "Коментар",
+    "Dog" : "Пас",
     "from" : "од",
     "to" : "за",
     "Approved" : "Одобрено",
