@@ -10,3 +10,6 @@ js/
 appinfo/info.xsd
 releaseNotes.md
 .vscode/settings.json
+/tests/unit/.phpunit.result.cache
+tests/unit/.phpunit.result.cache
+/tests/integration/output/report.xml

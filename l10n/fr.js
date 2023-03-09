@@ -40,7 +40,7 @@ OC.L10N.register(
     "Cat food every week" : "Nourriture pour chat chaque semaine",
     "The cat is also our best friend." : "Le chat est aussi votre meilleur ami.",
     "Standard, SLA Level 1" : "Standard, CNS Niveau 1",
-    "New customer, lets see if there is more." : "Nouveau client, voyons s'il y en a plus.",
+    "New customer, lets see if there is more." : "Nouveau client, voyons s'il y en a d'autres.",
     "Horse" : "Cheval",
     "Hay and straw" : "Foin et paille",
     "Summer only" : "Été seulement",
