@@ -86,7 +86,7 @@ class RowMapper extends QBMapper {
 	 */
 	public function countRows(int $tableId): int {
 		$qb = $this->db->getQueryBuilder();
-		$qb->select($qb->createFunction('COUNT(*) as counter'));
+		$qb->select($qb->func()->count('*', 'counter'));
 		$qb->from($this->table);
 		$qb->where(
 			$qb->expr()->eq('table_id', $qb->createNamedParameter($tableId))
