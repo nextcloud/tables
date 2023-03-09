@@ -44,7 +44,7 @@ class ShareService extends SuperService {
 	 * @psalm-param 'table' $nodeType
 	 */
 	public function findAll(string $nodeType, int $tableId, ?string $userId = null): array {
-		$this->permissionsService->preCheckUserId($userId);
+		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
 			/** @var string $userId */
@@ -88,7 +88,7 @@ class ShareService extends SuperService {
 	 * @throws InternalError
 	 */
 	public function findTablesSharedWithMe(?string $userId = null): array {
-		$this->permissionsService->preCheckUserId($userId);
+		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		$returnArray = [];
 
@@ -133,7 +133,7 @@ class ShareService extends SuperService {
 	 * @throws InternalError
 	 */
 	public function findTableShareIfSharedWithMe(int $tableId, ?string $userId = null): Share {
-		$this->permissionsService->preCheckUserId($userId);
+		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		// try to find a share with my userId
 		try {

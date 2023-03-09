@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<phpunit bootstrap="bootstrap.php"
+		 verbose="true"
+		 convertDeprecationsToExceptions="true"
+		 timeoutForSmallTests="900"
+		 timeoutForMediumTests="900"
+		 timeoutForLargeTests="900"
+		 xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+	<testsuite name="Tables App Tests">
+			<directory suffix="Test.php">.</directory>
+	</testsuite>
+	<coverage>
+		<!-- filters for code coverage -->
+		<include>
+			<directory suffix=".php">../../../tables/appinfo</directory>
+			<directory suffix=".php">../../../tables/lib</directory>
+		</include>
+		<report>
+			<!-- and this is where your report will be written -->
+			<clover outputFile="./clover.xml"/>
+		</report>
+	</coverage>
+	<logging>
+	</logging>
+</phpunit>

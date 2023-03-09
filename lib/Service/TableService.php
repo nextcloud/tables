@@ -54,7 +54,7 @@ class TableService extends SuperService {
 	 */
 	public function findAll(?string $userId = null, bool $skipTableEnhancement = false, bool $skipSharedTables = false): array {
 		/** @var string $userId */
-		$this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
+		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
 
 		try {
 			$ownTables = $this->mapper->findAll($userId);
@@ -155,7 +155,7 @@ class TableService extends SuperService {
 	 */
 	public function find(int $id, ?string $userId = null, bool $skipTableEnhancement = false): Table {
 		/** @var string $userId */
-		$this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
+		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
 
 		try {
 			$table = $this->mapper->find($id);
@@ -190,7 +190,7 @@ class TableService extends SuperService {
 	public function search(string $term, int $limit = 100, int $offset = 0, ?string $userId = null): array {
 		try {
 			/** @var string $userId */
-			$this->permissionsService->preCheckUserId($userId);
+			$userId = $this->permissionsService->preCheckUserId($userId);
 			$tables = $this->mapper->search($term, $userId, $limit, $offset);
 			foreach ($tables as &$table) {
 				/** @var string $userId */
@@ -210,7 +210,7 @@ class TableService extends SuperService {
 	 */
 	public function create(string $title, string $template, string $emoji, ?string $userId = null): Table {
 		/** @var string $userId */
-		$this->permissionsService->preCheckUserId($userId, false); // $userId is set
+		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
 
 		$time = new DateTime();
 		$item = new Table();
@@ -246,7 +246,7 @@ class TableService extends SuperService {
 	 * @throws InternalError
 	 */
 	public function update(int $id, string $title, string $emoji, ?string $userId): Table {
-		$this->permissionsService->preCheckUserId($userId, false); // $userId is set
+		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
 
 		try {
 			$table = $this->mapper->find($id);
@@ -280,7 +280,7 @@ class TableService extends SuperService {
 	 */
 	public function delete(int $id, ?string $userId = null): Table {
 		/** @var string $userId */
-		$this->permissionsService->preCheckUserId($userId); // $userId is set or ''
+		$userId = $this->permissionsService->preCheckUserId($userId); // $userId is set or ''
 
 		try {
 			$item = $this->mapper->find($id);
