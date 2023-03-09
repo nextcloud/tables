@@ -52,7 +52,7 @@ class TableTemplateService {
 				'name' => 'vacation-requests',
 				'title' => $this->l->t('Vacation requests'),
 				'icon' => '️🏝',
-				'description' => $this->l->t('Track your weight and other health measures.')
+				'description' => $this->l->t('Use this table to collect and manage vacation requests.')
 			],
 			[
 				'name' => 'weight',
