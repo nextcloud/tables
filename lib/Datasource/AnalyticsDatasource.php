@@ -93,7 +93,7 @@ class AnalyticsDatasource implements IDatasource {
 
 		// add the tables to a dropdown in the data source settings
 		$template[] = ['id' => 'tableId', 'name' => $this->l10n->t('Select table'), 'type' => 'tf', 'placeholder' => $tableString];
-		$template[] = ['id' => 'columns', 'name' => $this->l10n->t('Select columns'), 'placeholder' => $this->l10n->t('e.g. 1,2,4 or leave empty')];
+		$template[] = ['id' => 'columns', 'name' => $this->l10n->t('Select columns'), 'placeholder' => $this->l10n->t('e.g. 1,2,4 or leave empty'), 'type' => 'columnPicker'];
 		return $template;
 	}
 
