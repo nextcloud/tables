@@ -273,7 +273,7 @@ class TableTemplateService {
 			$columns['description']->getId() => $this->l->t('The cat is also our best friend.'),
 			$columns['contactInformation']->getId() => $this->l->t('Standard, SLA Level 1'),
 			$columns['qualityRelationship']->getId() => 40,
-			$columns['comment']->getId() => $this->l->t('New customer, lets see if there is more.'),
+			$columns['comment']->getId() => $this->l->t('New customer, let\'s see if there is more.'),
 		]);
 		$this->createRow($table, [
 			$columns['name']->getId() => $this->l->t('Horse'),
@@ -540,7 +540,7 @@ class TableTemplateService {
 		// let's add some example rows
 		$this->createRow($table, [
 			$columns['task']->getId() => $this->l->t('Create initial milestones'),
-			$columns['description']->getId() => $this->l->t('Create some milestone to structure the project.'),
+			$columns['description']->getId() => $this->l->t('Create some milestones to structure the project.'),
 			$columns['target']->getId() => $this->l->t('Plan to discuss for the kickoff meeting.'),
 			$columns['comments']->getId() => $this->l->t('Wow, that was hard work, but now it\'s done.'),
 			$columns['progress']->getId() => 100,
@@ -550,13 +550,13 @@ class TableTemplateService {
 			$columns['task']->getId() => $this->l->t('Kickoff meeting'),
 			$columns['description']->getId() => $this->l->t('We will have a kickoff meeting in person.'),
 			$columns['target']->getId() => $this->l->t('Project is kicked-off and we know the vision and our first tasks.'),
-			$columns['comments']->getId() => $this->l->t('That was nice in person again. We collected some action points, have a look at the documentation...'),
+			$columns['comments']->getId() => $this->l->t('That was nice in person again. We collected some action points, had a look at the documentation...'),
 			$columns['progress']->getId() => 80,
 			$columns['proofed']->getId() => 'true',
 		]);
 		$this->createRow($table, [
 			$columns['task']->getId() => $this->l->t('Set up some documentation and collaboration tools'),
-			$columns['description']->getId() => $this->l->t('Where do we in what way collaborate?'),
+			$columns['description']->getId() => $this->l->t('Where and in what way do we collaborate?'),
 			$columns['target']->getId() => $this->l->t('We know what we are doing.'),
 			$columns['comments']->getId() => $this->l->t('We have heard that Nextcloud could be a nice solution for it, should give it a try.'),
 			$columns['progress']->getId() => 10,
