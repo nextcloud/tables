@@ -3,7 +3,7 @@
 APP_NAME=tables
 
 APP_INTEGRATION_DIR=$PWD
-ROOT_DIR=${APP_INTEGRATION_DIR}/../..
+ROOT_DIR=${APP_INTEGRATION_DIR}/../../../..
 # ROOT_DIR=${APP_INTEGRATION_DIR}/../../../nextcloud-docker-dev/workspace/server
 echo ''
 echo '#'
@@ -46,7 +46,7 @@ echo '# Setting up apps'
 echo '#'
 
 
-${ROOT_DIR}/../../occ app:enable tables --force || exit 1
+${ROOT_DIR}/occ app:enable tables --force || exit 1
 
 ${ROOT_DIR}/occ app:list | grep tables
 
@@ -65,7 +65,7 @@ echo ''
 echo '#'
 echo '# Running tests'
 echo '#'
-${APP_INTEGRATION_DIR}/tests/integration/vendor/bin/behat --colors -f junit -f pretty --config ${APP_INTEGRATION_DIR}/tests/integration/config/behat.yml
+vendor/bin/behat --colors -f junit -f pretty
 RESULT=$?
 
 echo ''
