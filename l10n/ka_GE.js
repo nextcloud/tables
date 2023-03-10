@@ -6,6 +6,7 @@ OC.L10N.register(
     "Comments" : "კომენტარები",
     "Name" : "სახელი",
     "Description" : "აღწერილობა",
+    "Comment" : "კომენტარი",
     "from" : "ვისგან",
     "to" : "ვის",
     "Approved" : "დამოწმებულია",

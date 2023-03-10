@@ -6,6 +6,7 @@ OC.L10N.register(
     "Date" : "Date",
     "Name" : "ឈ្មោះ",
     "Description" : "ការ​អធិប្បាយ",
+    "Comment" : "មតិ",
     "from" : "ពី",
     "to" : "ទៅ",
     "Birthday" : "ថ្ងៃ​កំណើត",

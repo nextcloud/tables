@@ -9,6 +9,7 @@ OC.L10N.register(
     "Name" : "이름",
     "Account manager" : "계정 관리자",
     "Description" : "설명",
+    "Comment" : "설명",
     "from" : "보낸 사람",
     "to" : "에서",
     "Approved" : "승인됐습니다",

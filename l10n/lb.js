@@ -5,6 +5,7 @@ OC.L10N.register(
     "Comments" : "Kommentarer",
     "Name" : "Numm",
     "Description" : "Beschreiwung",
+    "Comment" : "Kommentar",
     "from" : "vun",
     "to" : "bis",
     "Birthday" : "Gebuertsdag",

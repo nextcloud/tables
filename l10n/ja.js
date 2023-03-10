@@ -9,6 +9,7 @@ OC.L10N.register(
     "Comments" : "コメント",
     "Name" : "名前",
     "Description" : "説明",
+    "Comment" : "コメント",
     "Dog" : "犬",
     "from" : "差出人",
     "to" : "宛先",

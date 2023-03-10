@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Comments" : "Commentaires",
     "Name" : "Nom",
+    "Comment" : "Commentaire",
     "Progress" : "Asfari",
     "Type" : "Anaw",
     "Cancel" : "Sefsex",
