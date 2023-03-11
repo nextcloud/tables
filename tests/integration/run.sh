@@ -3,8 +3,17 @@
 APP_NAME=tables
 
 APP_INTEGRATION_DIR=$PWD
-ROOT_DIR=${APP_INTEGRATION_DIR}/../../../..
-# ROOT_DIR=${APP_INTEGRATION_DIR}/../../../nextcloud-docker-dev/workspace/server
+
+if [ -f "${APP_INTEGRATION_DIR}/../../../../occ" ]; then
+    echo "set path for CI"
+    ROOT_DIR=${APP_INTEGRATION_DIR}/../../../..
+fi
+
+if [ -f "${APP_INTEGRATION_DIR}/../../occ" ]; then
+    ROOT_DIR=${APP_INTEGRATION_DIR}/../..
+    echo "set path for local testing"
+fi
+
 echo ''
 echo '#'
 echo '# Installing composer dependencies from tests/integration/'
