@@ -45,7 +45,7 @@ class AnalyticsDatasource implements IDatasource {
 	 * @return string Display Name of the datasource
 	 */
 	public function getName(): string {
-		return 'Tables App';
+		return $this->l10n->t('Nextcloud tables');
 	}
 
 	/**

@@ -86,6 +86,7 @@ class TableTemplateService {
 	}
 
 	/**
+	 * @psalm-suppress PossiblyNullReference
 	 * @param Table $table
 	 * @throws InternalError
 	 * @throws PermissionError
@@ -171,6 +172,7 @@ class TableTemplateService {
 	}
 
 	/**
+	 * @psalm-suppress PossiblyNullReference
 	 * @param Table $table
 	 * @throws InternalError
 	 * @throws PermissionError
@@ -289,6 +291,7 @@ class TableTemplateService {
 	}
 
 	/**
+	 * @psalm-suppress PossiblyNullReference
 	 * @param Table $table
 	 * @throws InternalError
 	 * @throws PermissionError
@@ -418,6 +421,7 @@ class TableTemplateService {
 
 
 	/**
+	 * @psalm-suppress PossiblyNullReference
 	 * @param Table $table
 	 * @throws InternalError
 	 * @throws PermissionError
@@ -477,6 +481,7 @@ class TableTemplateService {
 	}
 
 	/**
+	 * @psalm-suppress PossiblyNullReference
 	 * @param Table $table
 	 * @throws InternalError
 	 * @throws PermissionError
@@ -539,6 +544,7 @@ class TableTemplateService {
 
 		// let's add some example rows
 		$this->createRow($table, [
+			/** @psalm-suppress PossiblyNullArgument */
 			$columns['task']->getId() => $this->l->t('Create initial milestones'),
 			$columns['description']->getId() => $this->l->t('Create some milestones to structure the project.'),
 			$columns['target']->getId() => $this->l->t('Plan to discuss for the kickoff meeting.'),

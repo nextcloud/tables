@@ -93,12 +93,12 @@ export default {
 
 	}
 
-  .line {
-    font-size: 1.3em;
-    padding-bottom: calc(var(--default-grid-baseline) * 2);
-  }
+	.line {
+		font-size: 1.3em;
+		padding-bottom: calc(var(--default-grid-baseline) * 2);
+	}
 
-  &--image {
+	&--image {
 		margin-right: 12px;
 		display: flex;
 		align-items: center;
@@ -114,13 +114,13 @@ export default {
 		flex-grow: 1;
 	}
 
-  .details {
-    display: inline-flex;
-    align-items: self-start;
-  }
+	.details {
+		display: inline-flex;
+		align-items: self-start;
+	}
 }
 
 :deep(.counter-bubble__counter) {
-  max-width: fit-content !important;
+	max-width: fit-content !important;
 }
 </style>
