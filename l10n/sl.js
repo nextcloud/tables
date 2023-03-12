@@ -1,10 +1,10 @@
 OC.L10N.register(
     "tables",
     {
+    "Nextcloud tables" : "Razpredelnice Nextcloud",
     "Select table" : "Izbor razpredelnice",
     "Select columns" : "Izbor stolpcev",
     "e.g. 1,2,4 or leave empty" : "na primer 1, 2, 4, ali pa pustite prazno",
-    "Nextcloud tables" : "Razpredelnice Nextcloud",
     "_%n row_::_%n rows_" : ["%n vrstica","%n vrstici","%n vrstice","%n vrstic"],
     "ToDo list" : "Seznam opravil",
     "Setup a simple todo-list." : "Ustvari enostaven seznam nalog.",

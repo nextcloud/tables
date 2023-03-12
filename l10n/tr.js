@@ -1,10 +1,10 @@
 OC.L10N.register(
     "tables",
     {
+    "Nextcloud tables" : "Nextcloud tabloları",
     "Select table" : "Tabloyu seçin",
     "Select columns" : "Sütunları seçin",
     "e.g. 1,2,4 or leave empty" : "Örnek: 1,2,4 ya da boş bırakın",
-    "Nextcloud tables" : "Nextcloud tabloları",
     "_%n row_::_%n rows_" : ["%n satır","%n satır"],
     "ToDo list" : "Yapılacaklar listesi",
     "Setup a simple todo-list." : "Basit bir yapılacaklar listesi oluşturun",

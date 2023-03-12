@@ -1,8 +1,8 @@
 { "translations": {
+    "Nextcloud tables" : "Таблици на Nextcloud",
     "Select table" : "Избор на таблица",
     "Select columns" : "Избор на колони",
     "e.g. 1,2,4 or leave empty" : "напр. 1,2,4 или ги оставете празни",
-    "Nextcloud tables" : "Таблици на Nextcloud",
     "_%n row_::_%n rows_" : ["%n редове","%n редове"],
     "ToDo list" : "Списък със задачи",
     "Setup a simple todo-list." : "Настройка на списък със задачи",

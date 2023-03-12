@@ -1,8 +1,8 @@
 { "translations": {
+    "Nextcloud tables" : "Nextcloud taulak",
     "Select table" : "Hautatu taula",
     "Select columns" : "Hautatu zutabeak",
     "e.g. 1,2,4 or leave empty" : "adib. 1,2,4 edo hutsik",
-    "Nextcloud tables" : "Nextcloud taulak",
     "_%n row_::_%n rows_" : ["Errenkada %n","%n errenkada"],
     "ToDo list" : "Egitekoen zerrenda",
     "Setup a simple todo-list." : "Konfiguratu zeregin-zerrenda sinple bat.",

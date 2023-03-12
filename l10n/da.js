@@ -1,10 +1,10 @@
 OC.L10N.register(
     "tables",
     {
+    "Nextcloud tables" : "Nextcloud tabeller",
     "Select table" : "Vælg tabel",
     "Select columns" : "Vælg kolonner",
     "e.g. 1,2,4 or leave empty" : "f.eks. 1,2,4 eller lad være tom",
-    "Nextcloud tables" : "Nextcloud tabeller",
     "ToDo list" : "To-Do liste",
     "Setup a simple todo-list." : "Opsætning af en simpel todo-liste.",
     "Members" : "Medlemmer",

@@ -1,10 +1,10 @@
 OC.L10N.register(
     "tables",
     {
+    "Nextcloud tables" : "Tablas de Nextcloud",
     "Select table" : "Seleccionar tabla",
     "Select columns" : "Seleccionar columnas",
     "e.g. 1,2,4 or leave empty" : "por ejemplo 1,2,4 o déjalo vacío",
-    "Nextcloud tables" : "Tablas de Nextcloud",
     "_%n row_::_%n rows_" : ["%n fila","%n filas","%n filas"],
     "ToDo list" : "Lista de tareas",
     "Setup a simple todo-list." : "Configura una lista de tareas sencillas.",

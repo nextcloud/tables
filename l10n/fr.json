@@ -1,8 +1,8 @@
 { "translations": {
+    "Nextcloud tables" : "Tableaux Nextcloud",
     "Select table" : "Sélectionner un tableau",
     "Select columns" : "Sélectionner les colonnes",
     "e.g. 1,2,4 or leave empty" : "par ex. 1,2,4 ou laisser vide",
-    "Nextcloud tables" : "Tableaux Nextcloud",
     "_%n row_::_%n rows_" : ["%n ligne","%n lignes","%n lignes"],
     "ToDo list" : "Liste de tâches",
     "Setup a simple todo-list." : "Créez une liste de choses à faire.",
