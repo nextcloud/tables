@@ -36,6 +36,7 @@ OC.L10N.register(
     "Create" : "Направи",
     "Today" : "Данас",
     "Title" : "Звање",
+    "Select emoji" : "Изаберите емођи",
     "Share" : "Подели",
     "Clear filter" : "Очисти филтер",
     "User or group name …" : "Корисник или име групе…",
