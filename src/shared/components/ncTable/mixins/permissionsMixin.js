@@ -1,3 +1,4 @@
+import { getCurrentUser } from '@nextcloud/auth'
 
 export default {
 
@@ -7,7 +8,7 @@ export default {
 			if (!table.isShared) {
 				return true
 			}
-			if (table.isShared && table.onSharePermissions.manage) {
+			if ((table.isShared && table?.onSharePermissions?.manage) || table?.ownership === getCurrentUser().uid) {
 				return true
 			}
 			return false
@@ -17,7 +18,8 @@ export default {
 			if (!table.isShared) {
 				return true
 			}
-			if (table.isShared && table.onSharePermissions.read) {
+
+			if ((table.isShared && table.onSharePermissions.read) || table?.ownership === getCurrentUser().uid) {
 				return true
 			}
 			return false
@@ -27,10 +29,23 @@ export default {
 			if (!table.isShared) {
 				return true
 			}
-			if (table.isShared && table.onSharePermissions.create) {
+			if ((table.isShared && table.onSharePermissions.create) || table?.ownership === getCurrentUser().uid) {
 				return true
 			}
 			return false
+		},
+
+		canShareTable(table) {
+			if (!table.isShared || table.ownership === getCurrentUser().uid) {
+				return true
+			}
+
+			// resharing is not allowed
+			return false
+		},
+
+		canDeleteTable(table) {
+			return this.canManageTable(table)
 		},
 
 	},
