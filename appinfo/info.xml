@@ -3,7 +3,7 @@
       xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
     <id>tables</id>
     <name>Tables</name>
-    <summary>Manage data within tables.</summary>
+    <summary>Manage data the way you need it.</summary>
     <description><![CDATA[Manage data the way you need it.
 
 With this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.

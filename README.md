@@ -1,6 +1,6 @@
 # Nextcloud App »Tables«
 
-Manage data within tables.
+Manage data the way you need it.
 
 ## Documentation
 All documentations can be found here: https://github.com/nextcloud/tables/wiki
