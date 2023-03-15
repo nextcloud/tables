@@ -14,9 +14,11 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
+use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
-class TableService extends SuperService {
+class TableService extends SuperService
+{
 	private TableMapper $mapper;
 
 	private TableTemplateService $tableTemplateService;
@@ -29,8 +31,21 @@ class TableService extends SuperService {
 
 	protected UserHelper $userHelper;
 
-	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-								TableMapper $mapper, TableTemplateService $tableTemplateService, ColumnService $columnService, RowService $rowService, ShareService $shareService, UserHelper $userHelper) {
+	protected IL10N $l;
+
+	public function __construct(
+		PermissionsService $permissionsService,
+		LoggerInterface $logger,
+		?string $userId,
+		TableMapper $mapper,
+		TableTemplateService $tableTemplateService,
+		ColumnService $columnService,
+		RowService $rowService,
+		ShareService $shareService,
+		UserHelper $userHelper,
+		IL10N $l
+	)
+	{
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
 		$this->tableTemplateService = $tableTemplateService;
@@ -38,6 +53,7 @@ class TableService extends SuperService {
 		$this->rowService = $rowService;
 		$this->shareService = $shareService;
 		$this->userHelper = $userHelper;
+		$this->l = $l;
 	}
 
 	/**
@@ -52,17 +68,25 @@ class TableService extends SuperService {
 	 * @return array<Table>
 	 * @throws InternalError
 	 */
-	public function findAll(?string $userId = null, bool $skipTableEnhancement = false, bool $skipSharedTables = false): array {
+	public function findAll(?string $userId = null, bool $skipTableEnhancement = false, bool $skipSharedTables = false): array
+	{
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
+		$ownTables = [];
+		$newSharedTables = [];
 
 		try {
 			$ownTables = $this->mapper->findAll($userId);
+
+			// if there are no own tables found, create the tutorial table
+			if (count($ownTables) === 0) {
+				$ownTables = [$this->create($this->l->t('Tutorial'), 'tutorial', '🚀')];
+			}
+
 			if (!$skipSharedTables && $userId !== '') {
 				$sharedTables = $this->shareService->findTablesSharedWithMe($userId);
 
 				// clean duplicates
-				$newSharedTables = [];
 				foreach ($sharedTables as $sharedTable) {
 					$found = false;
 					foreach ($ownTables as $ownTable) {
@@ -75,12 +99,11 @@ class TableService extends SuperService {
 						$newSharedTables[] = $sharedTable;
 					}
 				}
-			} else {
-				$newSharedTables = [];
 			}
-		} catch (\OCP\DB\Exception $e) {
+		} catch (\OCP\DB\Exception|InternalError $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
+		} catch (PermissionError $e) {
 		}
 
 		// enhance table objects with additional data
@@ -92,6 +115,7 @@ class TableService extends SuperService {
 			}
 		}
 
+
 		return $allTables;
 	}
 
@@ -102,7 +126,8 @@ class TableService extends SuperService {
 	 *
 	 * @noinspection PhpUndefinedMethodInspection
 	 */
-	private function enhanceTable(Table &$table, string $userId): void {
+	private function enhanceTable(Table &$table, string $userId): void
+	{
 		// add owner display name for UI
 		$this->addOwnerDisplayName($table);
 
@@ -153,7 +178,8 @@ class TableService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function find(int $id, ?string $userId = null, bool $skipTableEnhancement = false): Table {
+	public function find(int $id, ?string $userId = null, bool $skipTableEnhancement = false): Table
+	{
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
 
@@ -187,7 +213,8 @@ class TableService extends SuperService {
 	 * @param string|null $userId
 	 * @return array
 	 */
-	public function search(string $term, int $limit = 100, int $offset = 0, ?string $userId = null): array {
+	public function search(string $term, int $limit = 100, int $offset = 0, ?string $userId = null): array
+	{
 		try {
 			/** @var string $userId */
 			$userId = $this->permissionsService->preCheckUserId($userId);
@@ -208,7 +235,8 @@ class TableService extends SuperService {
 	 * @throws \OCP\DB\Exception
 	 * @throws InternalError|PermissionError
 	 */
-	public function create(string $title, string $template, string $emoji, ?string $userId = null): Table {
+	public function create(string $title, string $template, string $emoji, ?string $userId = null): Table
+	{
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
 
@@ -245,7 +273,8 @@ class TableService extends SuperService {
 	 * @return Table
 	 * @throws InternalError
 	 */
-	public function update(int $id, string $title, string $emoji, ?string $userId): Table {
+	public function update(int $id, string $title, string $emoji, ?string $userId): Table
+	{
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
 
 		try {
@@ -278,7 +307,8 @@ class TableService extends SuperService {
 	 * @return Table
 	 * @throws InternalError
 	 */
-	public function delete(int $id, ?string $userId = null): Table {
+	public function delete(int $id, ?string $userId = null): Table
+	{
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId is set or ''
 
@@ -320,12 +350,14 @@ class TableService extends SuperService {
 	 * @param Table $table
 	 * @return Table
 	 */
-	private function addOwnerDisplayName(Table $table): Table {
+	private function addOwnerDisplayName(Table $table): Table
+	{
 		$table->setOwnerDisplayName($this->userHelper->getUserDisplayName($table->getOwnership()));
 		return $table;
 	}
 
-	private function addOwnersDisplayName(array $tables): array {
+	private function addOwnersDisplayName(array $tables): array
+	{
 		$return = [];
 		foreach ($tables as $table) {
 			$table->setOwnerDisplayName($this->userHelper->getUserDisplayName($table->getOwnership()));
