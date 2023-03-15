@@ -1,11 +1,5 @@
 # Changelog
 
-## 0.3.3 - 2023-03-20
-### Updated
-- Fix for deleting columns on postgres db backend #162
-- Update dependencies
-- Update translation
-
 ## 0.3.2 - 2023-03-15
 ### Updated
 - Add hints for translation #152
