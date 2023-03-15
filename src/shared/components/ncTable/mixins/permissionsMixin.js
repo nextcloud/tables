@@ -48,5 +48,12 @@ export default {
 			return this.canManageTable(table)
 		},
 
+		canDeleteData(table) {
+			return table.isShared === false
+				|| (table.isShared === true && table.onSharePermissions.delete === true)
+				|| (table.isShared === true && table.onSharePermissions.manage === true)
+				|| (table.isShared === true && table.ownership === getCurrentUser().uid)
+		},
+
 	},
 }
