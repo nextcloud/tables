@@ -9,7 +9,7 @@ Feature: api/tablesapi
 
   Scenario: User has no tables
     Then user "participant1" has the following tables
-
+      | Tutorial |
 #  Scenario: User has tables
 #    Given as user "admin"
 #    Given user "admin" logs in
