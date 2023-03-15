@@ -18,8 +18,13 @@ class ColumnService extends SuperService {
 
 	private RowService $rowService;
 
-	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-								ColumnMapper $mapper, RowService $rowService) {
+	public function __construct(
+		PermissionsService $permissionsService,
+		LoggerInterface $logger,
+		?string $userId,
+		ColumnMapper $mapper,
+		RowService $rowService
+	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
 		$this->rowService = $rowService;
@@ -30,9 +35,9 @@ class ColumnService extends SuperService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function findAllByTable(int $tableId): array {
+	public function findAllByTable(int $tableId, ?string $userId = null): array {
 		try {
-			if ($this->permissionsService->canReadColumnsByTableId($tableId)) {
+			if ($this->permissionsService->canReadColumnsByTableId($tableId, $userId)) {
 				return $this->mapper->findAllByTable($tableId);
 			} else {
 				throw new PermissionError('no read access to table id = '.$tableId);

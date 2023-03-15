@@ -40,7 +40,11 @@ Have a good time and manage whatever you want.
         <nextcloud min-version="25" max-version="27"/>
     </dependencies>
     <commands>
-        <command>OCA\Tables\Command\ListTables</command>
+		<command>OCA\Tables\Command\ListTables</command>
+		<command>OCA\Tables\Command\AddTable</command>
+		<command>OCA\Tables\Command\RemoveTable</command>
+		<command>OCA\Tables\Command\RenameTable</command>
+		<command>OCA\Tables\Command\ChangeOwnershipTable</command>
     </commands>
     <navigations>
         <navigation>
