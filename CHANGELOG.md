@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.2 - 2023-03-15
+### Updated
+- Add hints for translation #152
+- Fix bugs around show or hide options on shared tables
+- Fix and update npm dependencies
+
 ## 0.3.1 - 2023-02-28
 ### Updated
 - Clean up navigation UI
