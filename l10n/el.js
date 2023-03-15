@@ -29,7 +29,6 @@ OC.L10N.register(
     "Target" : "Στόχος",
     "Progress" : "Πρόοδος",
     "Tables" : "Πίνακες",
-    "Manage data within tables." : "Διαχείριση δεδομένων μέσα σε πίνακες.",
     "Create column" : "Δημιουργία στήλης",
     "Type" : "Τύπος",
     "Number column specific parameters" : "Συγκεκριμένες παράμετροι στήλης αριθμού",

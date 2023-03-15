@@ -35,7 +35,6 @@ OC.L10N.register(
     "Progress" : "Pokrok",
     "No title given" : "Nebol zadaný žiadny názov",
     "Tables" : "Tabuľky",
-    "Manage data within tables." : "Spravujte údaje v tabuľkách.",
     "Create column" : "Vytvoriť stĺpec",
     "Type" : "Typ",
     "Number column specific parameters" : "Parametre špecifické pre číselný stĺpec",

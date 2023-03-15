@@ -32,7 +32,6 @@ OC.L10N.register(
     "Progress" : "Voortgang",
     "No title given" : "Geen titel gegeven",
     "Tables" : "Tabellen",
-    "Manage data within tables." : "Beheer gegevens met tables.",
     "Create column" : "Aanmaken kolom",
     "Type" : "Type",
     "Cancel" : "Annuleren",

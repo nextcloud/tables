@@ -41,7 +41,6 @@ OC.L10N.register(
     "Progress" : "Aurrerapena",
     "No title given" : "Ez da izenbururik eman",
     "Tables" : "Taulak",
-    "Manage data within tables." : "Kudeatu taulako datuak.",
     "Create column" : "Sortu zutabea",
     "Type" : "Mota",
     "Number column specific parameters" : "Zenbaki-zutabeen parametro zehatzak",

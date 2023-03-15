@@ -35,7 +35,6 @@ OC.L10N.register(
     "Progress" : "Folyamat",
     "No title given" : "Nincs cím megadva",
     "Tables" : "Táblázatok",
-    "Manage data within tables." : "Adatok kezelése táblázatokban.",
     "Create column" : "Oszlop létrehozása",
     "Type" : "Típus",
     "Number column specific parameters" : "Számot tartalmazó oszlopok paraméterei",

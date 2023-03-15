@@ -34,7 +34,6 @@ OC.L10N.register(
     "Progress" : "Progrés",
     "No title given" : "No s'ha donat cap títol",
     "Tables" : "Taules",
-    "Manage data within tables." : "Gestioneu les dades dins de les taules.",
     "Create column" : "Crea una columna",
     "Type" : "Tipus",
     "Number column specific parameters" : "Numera els paràmetres específics de la columna",

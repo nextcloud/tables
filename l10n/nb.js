@@ -27,7 +27,6 @@ OC.L10N.register(
     "Target" : "Mål",
     "Progress" : "Fremdrift",
     "Tables" : "Tabeller",
-    "Manage data within tables." : "Håndter data i tabeller.",
     "Create column" : "Lag kolonne",
     "Type" : "Type",
     "Number column specific parameters" : "Spesifikke parametere for kolonne med numre",

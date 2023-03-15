@@ -26,7 +26,6 @@ OC.L10N.register(
     "Target" : "Цель",
     "Progress" : "Прогресс",
     "Tables" : "Таблицы",
-    "Manage data within tables." : "Управление данными в таблицах.",
     "Type" : "Тип",
     "Cancel" : "Отменить",
     "Save" : "Сохранить",

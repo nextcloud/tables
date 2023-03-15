@@ -35,7 +35,6 @@ OC.L10N.register(
     "Progress" : "Postęp",
     "No title given" : "Nie podano tytułu",
     "Tables" : "Tabele",
-    "Manage data within tables." : "Zarządzaj danymi w tabelach.",
     "Create column" : "Utwórz kolumnę",
     "Type" : "Rodzaj",
     "Number column specific parameters" : "Parametry szczegółowe dla kolumny liczb",
