@@ -78,7 +78,6 @@ class PermissionsService {
 			return true;
 		}
 
-		/** @var string $userId */
 		if ($this->userIsTableOwner($userId, $table)) {
 			return true;
 		}
@@ -108,7 +107,6 @@ class PermissionsService {
 			return true;
 		}
 
-		/** @var string $userId */
 		if ($this->userIsTableOwner($userId, $table)) {
 			return true;
 		}
@@ -139,7 +137,6 @@ class PermissionsService {
 			return true;
 		}
 
-		/** @var string $userId */
 		if ($this->userIsTableOwner($userId, $table)) {
 			return true;
 		}
@@ -236,7 +233,6 @@ class PermissionsService {
 		try {
 			$table = $this->tableMapper->find($tableId);
 
-			/** @var string $userId */
 			if ($this->userIsTableOwner($userId, $table)) {
 				return true;
 			}
@@ -272,7 +268,6 @@ class PermissionsService {
 		try {
 			$table = $this->tableMapper->find($tableId);
 
-			/** @var string $userId */
 			if ($this->userIsTableOwner($userId, $table)) {
 				return true;
 			}
@@ -308,7 +303,6 @@ class PermissionsService {
 		try {
 			$table = $this->tableMapper->find($tableId);
 
-			/** @var string $userId */
 			if ($this->userIsTableOwner($userId, $table)) {
 				return true;
 			}
@@ -344,7 +338,6 @@ class PermissionsService {
 		try {
 			$table = $this->tableMapper->find($tableId);
 
-			/** @var string $userId */
 			if ($this->userIsTableOwner($userId, $table)) {
 				return true;
 			}
@@ -386,7 +379,6 @@ class PermissionsService {
 
 		if ($share->getReceiverType() === 'group') {
 			try {
-				/** @var string $userId */
 				$userGroups = $this->userHelper->getGroupsForUser($userId);
 				foreach ($userGroups as $userGroup) {
 					if ($userGroup->getDisplayName() === $share->getReceiver()) {
@@ -467,5 +459,9 @@ class PermissionsService {
 	/** @noinspection PhpUndefinedMethodInspection */
 	private function userIsTableOwner(string $userId, Table $table): bool {
 		return $table->getOwnership() === $userId;
+	}
+
+	public function canChangeTableOwner(Table $table, string $userId): bool {
+		return $userId === '';
 	}
 }
