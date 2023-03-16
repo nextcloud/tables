@@ -47,7 +47,7 @@
 					</template>
 				</NcButton>
       &nbsp;&nbsp;
-				<NcButton v-if="!isSmallMobile"
+				<NcButton v-if="!isSmallMobile && canDeleteData(table)"
 					icon="icon-delete"
 					:title="t('tables', 'Delete')"
 					@click="deleteSelectedRows">
@@ -56,7 +56,7 @@
 						<Delete :size="20" />
 					</template>
 				</NcButton>
-				<NcButton v-if="isSmallMobile"
+				<NcButton v-if="isSmallMobile && canDeleteData(table)"
 					icon="icon-delete"
 					:title="t('tables', 'Delete')"
 					@click="deleteSelectedRows">

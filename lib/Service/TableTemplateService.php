@@ -52,7 +52,7 @@ class TableTemplateService {
 				'name' => 'vacation-requests',
 				'title' => $this->l->t('Vacation requests'),
 				'icon' => '️🏝',
-				'description' => $this->l->t('Track your weight and other health measures.')
+				'description' => $this->l->t('Use this table to collect and manage vacation requests.')
 			],
 			[
 				'name' => 'weight',
@@ -256,36 +256,54 @@ class TableTemplateService {
 
 		// let's add some example rows
 		$this->createRow($table, [
+			// TRANSLATORS This is an example name
 			$columns['name']->getId() => $this->l->t('Dog'),
+			// TRANSLATORS This is an example account manager
 			$columns['accountManager']->getId() => 'Mr. Smith',
+			// TRANSLATORS This is an example contract type
 			$columns['contractType']->getId() => $this->l->t('Dog food every week'),
 			$columns['contractStart']->getId() => '2023-01-01',
 			$columns['contractEnd']->getId() => '2023-12-31',
+			// TRANSLATORS This is an example description
 			$columns['description']->getId() => $this->l->t('The dog is our best friend.'),
+			// TRANSLATORS This is an example contract information
 			$columns['contactInformation']->getId() => $this->l->t('Standard, SLA Level 2'),
 			$columns['qualityRelationship']->getId() => 80,
+			// TRANSLATORS This is an example comment
 			$columns['comment']->getId() => $this->l->t('Likes treats'),
 		]);
 		$this->createRow($table, [
+			// TRANSLATORS This is an example name
 			$columns['name']->getId() => $this->l->t('Cat'),
+			// TRANSLATORS This is an example account manager
 			$columns['accountManager']->getId() => 'Mr. Smith',
+			// TRANSLATORS This is an example contract type
 			$columns['contractType']->getId() => $this->l->t('Cat food every week'),
 			$columns['contractStart']->getId() => '2023-03-01',
 			$columns['contractEnd']->getId() => '2023-09-15',
+			// TRANSLATORS This is an example description
 			$columns['description']->getId() => $this->l->t('The cat is also our best friend.'),
+			// TRANSLATORS This is an example contract information
 			$columns['contactInformation']->getId() => $this->l->t('Standard, SLA Level 1'),
 			$columns['qualityRelationship']->getId() => 40,
+			// TRANSLATORS This is an example comment
 			$columns['comment']->getId() => $this->l->t('New customer, let\'s see if there is more.'),
 		]);
 		$this->createRow($table, [
+			// TRANSLATORS This is an example name
 			$columns['name']->getId() => $this->l->t('Horse'),
+			// TRANSLATORS This is an example account manager
 			$columns['accountManager']->getId() => 'Alice',
+			// TRANSLATORS This is an example contract type
 			$columns['contractType']->getId() => $this->l->t('Hay and straw'),
 			$columns['contractStart']->getId() => '2023-06-01',
 			$columns['contractEnd']->getId() => '2023-08-31',
+			// TRANSLATORS This is an example description
 			$columns['description']->getId() => $this->l->t('Summer only'),
+			// TRANSLATORS This is an example contract information
 			$columns['contactInformation']->getId() => $this->l->t('Special'),
 			$columns['qualityRelationship']->getId() => 60,
+			// TRANSLATORS This is an example comment
 			$columns['comment']->getId() => $this->l->t('Maybe we can make it fix for every year?!'),
 		]);
 	}
@@ -386,7 +404,9 @@ class TableTemplateService {
 			$columns['dateRequest']->getId() => '2023-01-08',
 			$columns['approved']->getId() => 'true',
 			$columns['dateApprove']->getId() => '2023-02-02',
+			// TRANSLATORS This is an example for a name or role
 			$columns['approveBy']->getId() => $this->l->t('The Boss'),
+			// TRANSLATORS This is an example comment
 			$columns['comment']->getId() => $this->l->t('Bob will help for this time'),
 		]);
 		$this->createRow($table, [
@@ -397,6 +417,7 @@ class TableTemplateService {
 			$columns['dateRequest']->getId() => '2023-01-18',
 			$columns['approved']->getId() => 'true',
 			$columns['dateApprove']->getId() => '2023-02-02',
+			// TRANSLATORS This is an example for a name or role
 			$columns['approveBy']->getId() => $this->l->t('The Boss'),
 			$columns['comment']->getId() => '',
 		]);
@@ -409,16 +430,10 @@ class TableTemplateService {
 			$columns['approved']->getId() => 'false',
 			$columns['dateApprove']->getId() => '',
 			$columns['approveBy']->getId() => '',
+			// TRANSLATORS This is an example comment
 			$columns['comment']->getId() => $this->l->t('We have to talk about that.'),
 		]);
 	}
-
-
-
-
-
-
-
 
 	/**
 	 * @psalm-suppress PossiblyNullReference
@@ -472,8 +487,11 @@ class TableTemplateService {
 
 		// let's add some example rows
 		$this->createRow($table, [
+			// TRANSLATORS This is an example name
 			$columns['name']->getId() => $this->l->t('Santa Claus'),
+			// TRANSLATORS This is an example for a "position" for a member
 			$columns['position']->getId() => $this->l->t('Special'),
+			// TRANSLATORS This is an example for skills
 			$columns['skills']->getId() => $this->l->t('Make happy people'),
 			$columns['birthday']->getId() => '2000-12-24',
 			$columns['comment']->getId() => '',
@@ -545,31 +563,45 @@ class TableTemplateService {
 		// let's add some example rows
 		$this->createRow($table, [
 			/** @psalm-suppress PossiblyNullArgument */
+			// TRANSLATORS This is an example for a task
 			$columns['task']->getId() => $this->l->t('Create initial milestones'),
+			// TRANSLATORS This is an example description
 			$columns['description']->getId() => $this->l->t('Create some milestones to structure the project.'),
+			// TRANSLATORS This is an example target
 			$columns['target']->getId() => $this->l->t('Plan to discuss for the kickoff meeting.'),
+			// TRANSLATORS This is an example comment
 			$columns['comments']->getId() => $this->l->t('Wow, that was hard work, but now it\'s done.'),
 			$columns['progress']->getId() => 100,
 			$columns['proofed']->getId() => 'true',
 		]);
 		$this->createRow($table, [
+			// TRANSLATORS This is an example for a task
 			$columns['task']->getId() => $this->l->t('Kickoff meeting'),
+			// TRANSLATORS This is an example description
 			$columns['description']->getId() => $this->l->t('We will have a kickoff meeting in person.'),
+			// TRANSLATORS This is an example target
 			$columns['target']->getId() => $this->l->t('Project is kicked-off and we know the vision and our first tasks.'),
+			// TRANSLATORS This is an example comment
 			$columns['comments']->getId() => $this->l->t('That was nice in person again. We collected some action points, had a look at the documentation...'),
 			$columns['progress']->getId() => 80,
 			$columns['proofed']->getId() => 'true',
 		]);
 		$this->createRow($table, [
+			// TRANSLATORS This is an example for a task
 			$columns['task']->getId() => $this->l->t('Set up some documentation and collaboration tools'),
+			// TRANSLATORS This is an example description
 			$columns['description']->getId() => $this->l->t('Where and in what way do we collaborate?'),
+			// TRANSLATORS This is an example target
 			$columns['target']->getId() => $this->l->t('We know what we are doing.'),
+			// TRANSLATORS This is an example comment
 			$columns['comments']->getId() => $this->l->t('We have heard that Nextcloud could be a nice solution for it, should give it a try.'),
 			$columns['progress']->getId() => 10,
 			$columns['proofed']->getId() => 'false',
 		]);
 		$this->createRow($table, [
+			// TRANSLATORS This is an example for a task
 			$columns['task']->getId() => $this->l->t('Add more actions'),
+			// TRANSLATORS This is an example description
 			$columns['description']->getId() => $this->l->t('I guess we need more actions in here...'),
 		]);
 	}

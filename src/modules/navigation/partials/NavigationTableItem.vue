@@ -21,7 +21,7 @@
 				{{ n('tables', '%n row', '%n rows', table.rowsCount, {}) }}
 			</NcCounterBubble>
 			<NcActionButton v-if="table.hasShares" icon="icon-share" :class="{'margin-right': !(activeTable && table.id === activeTable.id)}" @click="actionShowShare" />
-			<div v-if="table.isShared" class="margin-left">
+			<div v-if="table.isShared && table.ownership !== userId" class="margin-left">
 				<NcAvatar :user="table.ownership" />
 			</div>
 		</template>
@@ -33,13 +33,13 @@
 				@click="$emit('edit-table', table.id)">
 				{{ t('tables', 'Edit table') }}
 			</NcActionButton>
-			<NcActionButton v-if="!table.isShared"
+			<NcActionButton v-if="canShareTable(table)"
 				icon="icon-share"
 				:close-after-click="true"
 				@click="actionShowShare">
 				{{ t('tables', 'Share') }}
 			</NcActionButton>
-			<NcActionButton v-if="!table.isShared"
+			<NcActionButton v-if="canDeleteTable(table)"
 				icon="icon-delete"
 				:close-after-click="true"
 				@click="showDeletionConfirmation = true">
@@ -65,6 +65,7 @@ import { mapGetters } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
 import Table from 'vue-material-design-icons/Table.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
+import { getCurrentUser } from '@nextcloud/auth'
 
 export default {
 	name: 'NavigationTableItem',
@@ -108,6 +109,9 @@ export default {
 		...mapGetters(['activeTable']),
 		getTranslatedDescription() {
 			return t('tables', 'Do you really want to delete the table "{table}"?', { table: this.table.title })
+		},
+		userId() {
+			return getCurrentUser().uid
 		},
 	},
 
