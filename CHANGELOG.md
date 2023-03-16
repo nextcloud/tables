@@ -1,5 +1,7 @@
 # Changelog
 
+## 0.4.0
+
 ## 0.3.2 - 2023-03-15
 ### Updated
 - Add hints for translation #152
