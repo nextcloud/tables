@@ -7,6 +7,7 @@ OC.L10N.register(
     "Members" : "Чланови",
     "Customers" : "Корисници",
     "Date" : "Датум",
+    "Weight" : "Тежина",
     "Comments" : "Коментари",
     "Name" : "Име",
     "Description" : "Опис",
