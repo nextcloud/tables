@@ -76,7 +76,15 @@ class RowMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table);
-		$qb->where('JSON_CONTAINS(JSON_EXTRACT(data, \'$[*].columnId\'), :columnId, \'$\') = 1');
+
+		if (str_contains(strtolower(get_class($this->db->getDatabasePlatform())), 'postgres')) {
+			// due to errors using doctrine with json, I paste the columnId inline.
+			// columnId is a number, ensured by the parameter definition
+			$qb->where('data::jsonb @> \'[{"columnId": '.$columnId.'}]\'::jsonb');
+		} else {
+			$qb->where('JSON_CONTAINS(JSON_VALUE(data, \'$.columnId\'), :columnId, \'$\') = 1');
+		}
+
 		$qb->setParameter('columnId', $columnId);
 		return $this->findEntities($qb);
 	}
