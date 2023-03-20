@@ -13,6 +13,7 @@ OC.L10N.register(
     "Customers" : "顧客",
     "Manage your customers." : "管理您的顧客。",
     "Vacation requests" : "休假申請",
+    "Use this table to collect and manage vacation requests." : "使用此表格來蒐集與管理休假請求。",
     "Weight tracking" : "體重追蹤",
     "Track your weight and other health measures." : "追蹤您的體重與其他健康資料。",
     "Date" : "日期",
