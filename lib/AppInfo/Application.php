@@ -2,6 +2,7 @@
 
 namespace OCA\Tables\AppInfo;
 
+use OCP\Server;
 use OCA\Tables\Listener\UserDeletedListener;
 use OCA\Tables\Listener\AnalyticsDatasourceListener;
 use OCA\Tables\Listener\TablesReferenceListener;
@@ -34,10 +35,9 @@ class Application extends App implements IBootstrap {
 
 		$context->registerSearchProvider(SearchTablesProvider::class);
 
-		$container = $this->getContainer();
 		try {
 			/** @var IConfig $config */
-			$config = $container->get(IConfig::class);
+			$config = Server::get(IConfig::class);
 			if (version_compare($config->getSystemValueString('version', '0.0.0'), '26.0.0', '<')) {
 				$context->registerReferenceProvider(TableReferenceProvider::class);
 			} else {
