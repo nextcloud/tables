@@ -12,8 +12,14 @@ return [
 		['name' => 'tableTemplate#list', 'url' => '/table/templates', 'verb' => 'GET'],
 
 		// API
+		// -> tables
 		['name' => 'api1#index', 'url' => '/api/1/tables', 'verb' => 'GET'],
-		['name' => 'api1#data',	'url' => '/api/1/table/{tableId}', 'verb' => 'GET'],
+		['name' => 'api1#createTable',	'url' => '/api/1/table', 'verb' => 'POST'],
+		['name' => 'api1#updateTable',	'url' => '/api/1/table/{tableId}', 'verb' => 'PUT'],
+		['name' => 'api1#getTable',	'url' => '/api/1/table/{tableId}', 'verb' => 'GET'],
+		['name' => 'api1#deleteTable',	'url' => '/api/1/table/{tableId}', 'verb' => 'DELETE'],
+		// -> rows
+		['name' => 'api1#data',	'url' => '/api/1/table/{tableId}/rows', 'verb' => 'GET'],
 
 		// table
 		['name' => 'table#index', 'url' => '/table', 'verb' => 'GET'],

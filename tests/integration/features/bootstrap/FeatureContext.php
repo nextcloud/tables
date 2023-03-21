@@ -82,7 +82,8 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	public function userTables(string $user, TableNode $body = null): void {
 		$this->setCurrentUser($user);
 		$this->sendRequest(
-			'GET', '/apps/tables/api/1/tables'
+			'GET',
+			'/apps/tables/api/1/tables'
 		);
 
 		$data = $this->getDataFromResponse($this->response);
@@ -104,6 +105,91 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 		foreach ($body->getRows()[0] as $tableTitle) {
 			Assert::assertTrue(in_array($tableTitle, $titles, true));
 		}
+	}
+
+	/**
+	 * @Then user :user creates a table with title :title and optionally emoji :emoji
+	 *
+	 * @param string $user
+	 * @param string $title
+	 * @param string|null $emoji
+	 */
+	public function createTable(string $user, string $title, string $emoji = null): void {
+		$this->setCurrentUser($user);
+		$this->sendRequest(
+			'POST',
+			'/apps/tables/api/1/table',
+			[
+				'title' => $title,
+				'emoji' => $emoji
+			]
+		);
+
+		$newTable = $this->getDataFromResponse($this->response);
+
+		Assert::assertEquals($newTable['title'], $title);
+		Assert::assertEquals($newTable['emoji'], $emoji);
+
+		$tableId = $newTable['id'];
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/table/'.$tableId,
+		);
+
+		$tableToVerify = $this->getDataFromResponse($this->response);
+		Assert::assertEquals($tableToVerify['title'], $title);
+		Assert::assertEquals($tableToVerify['emoji'], $emoji);
+	}
+
+	/**
+	 * @Then user :user deletes table with keyword :keyword
+	 *
+	 * @param string $user
+	 * @param string $keyword
+	 */
+	public function deleteTable(string $user, string $keyword): void {
+		$this->setCurrentUser($user);
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/tables?keyword='.$keyword
+		);
+
+		$tables = $this->getDataFromResponse($this->response);
+		$tableToDelete = $tables[0];
+		$this->sendRequest(
+			'DELETE',
+			'/apps/tables/api/1/table/'.$tableToDelete['id']
+		);
+		$deletedTable = $this->getDataFromResponse($this->response);
+
+		Assert::assertEquals($deletedTable['title'], $tableToDelete['title']);
+	}
+
+	/**
+	 * @Then user :user renames table with keyword :keyword with title :title and emoji :emoji
+	 *
+	 * @param string $user
+	 * @param string $keyword
+	 * @param string $title
+	 * @param string|null $emoji
+	 */
+	public function renameTable(string $user, string $keyword, string $title, string $emoji = null): void {
+		$this->setCurrentUser($user);
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/tables?keyword='.$keyword
+		);
+
+		$tables = $this->getDataFromResponse($this->response);
+		$table = $tables[0];
+		$this->sendRequest(
+			'PUT',
+			'/apps/tables/api/1/table/'.$table['id'].'?title='.$title.'&emoji='.$emoji
+		);
+		$updatedTable = $this->getDataFromResponse($this->response);
+
+		Assert::assertEquals($updatedTable['title'], $title);
+		Assert::assertEquals($updatedTable['emoji'], $emoji);
 	}
 
 	/*
@@ -392,8 +478,6 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 		$options['headers'] = array_merge($headers, [
 			'OCS-ApiRequest' => 'true',
 			'Accept' => 'application/json',
-			"Cookie" => "XDEBUG_SESSION=PHPSTORM",
-			"XDEBUG_SESSION" => "PHPSTORM",
 		]);
 
 		try {

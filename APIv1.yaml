@@ -1,0 +1,254 @@
+openapi: 3.0.3
+info:
+    title: Nextcloud tables API v1
+    description: Nextcloud tables API v1
+    version: 1.0.0
+servers:
+    -   url: 'http://nextcloud.local/index.php/apps/tables/api/1/'
+paths:
+    /tables:
+        get:
+            summary: Get a list of tables
+            description: Returns a list of tables for given user. Shipped with v0.3.0.
+            tags:
+                - Tables
+            operationId: listTables
+            parameters:
+                -   name: keyword
+                    in: query
+                    description: Term to search for
+                    required: false
+                    schema:
+                        type: string
+                        maximum: 255
+                -   name: limit
+                    in: query
+                    description: Limit the results
+                    required: false
+                    schema:
+                        type: integer
+                -   name: offset
+                    in: query
+                    description: Set an offset for pagination
+                    required: false
+                    schema:
+                        type: integer
+            responses:
+                '200':
+                    description: Json array with table objects
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Tables"
+    /table:
+        post:
+            summary: Create a new table
+            description: Shipped with v0.4.0.
+            tags:
+                - Tables
+            operationId: createTable
+            parameters:
+                -   name: title
+                    in: query
+                    description: Title for the table
+                    required: true
+                    schema:
+                        type: string
+                        maximum: 255
+                -   name: emoji
+                    in: query
+                    description: Emoji for the table
+                    required: false
+                    schema:
+                        type: string
+                        maximum: 1
+                -   name: template
+                    in: query
+                    description: Template name to use
+                    required: false
+                    schema:
+                        type: string
+                        maximum: 255
+            responses:
+                '201':
+                    description: Table object
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Table"
+
+    /table/{tableId}:
+        get:
+            summary: Get a table
+            description: Changed and shipped with v0.4.0.
+            tags:
+                - Tables
+            operationId: getTable
+            parameters:
+                -   name: tableId
+                    in: path
+                    description: ID for the requested table
+                    required: true
+                    schema:
+                        type: integer
+            responses:
+                '201':
+                    description: Table object
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Table"
+        delete:
+            summary: Delete a table
+            description: Shipped with v0.4.0.
+            tags:
+                - Tables
+            operationId: deleteTable
+            parameters:
+                -   name: tableId
+                    in: path
+                    description: ID for the requested table
+                    required: true
+                    schema:
+                        type: integer
+            responses:
+                '201':
+                    description: Deleted table object
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Table"
+        put:
+            summary: Update a table
+            description: Shipped with v0.4.0.
+            tags:
+                - Tables
+            operationId: updateTable
+            parameters:
+                -   name: tableId
+                    in: path
+                    description: ID for the requested table
+                    required: true
+                    schema:
+                        type: integer
+                -   name: title
+                    in: query
+                    description: Title for the table
+                    required: true
+                    schema:
+                        type: string
+                        maximum: 255
+                -   name: emoji
+                    in: query
+                    description: Emoji for the table
+                    required: false
+                    schema:
+                        type: string
+                        maximum: 1
+                -   name: template
+                    in: query
+                    description: Template name to use
+                    required: false
+                    schema:
+                        type: string
+                        maximum: 255
+            responses:
+                '201':
+                    description: Updated table object
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Table"
+
+    /table/{tableId}/rows:
+        get:
+            summary: Get an array of rows
+            description: The first row contains the column titles. There is a default row limit by 1000 rows. If you need more (or want to limit less), you can set a limit on your own. Additionally set an offset if needed, would be good for lazy loading etc. Shipped with v0.3.0.
+            tags:
+                - Rows
+            operationId: listRows
+            parameters:
+                -   name: tableId
+                    in: path
+                    description: Table ID
+                    required: true
+                    schema:
+                        type: integer
+                -   name: limit
+                    in: query
+                    description: Limit the rows
+                    required: false
+                    schema:
+                        type: integer
+                -   name: offset
+                    in: query
+                    description: Set the startng pointer
+                    required: false
+                    schema:
+                        type: integer
+            responses:
+                '200':
+                    description: Json array with row objects
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Row"
+
+
+
+
+
+components:
+    schemas:
+        Tables:
+            type: array
+            maxItems: 1000
+            items:
+                $ref: "#/components/schemas/Table"
+        Table:
+            type: object
+            required:
+                - id
+                - title
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                title:
+                    type: string
+                emoji:
+                    type: string
+                ownership:
+                    type: string
+                ownerDisplayName:
+                    type: string
+                createdBy:
+                    type: string
+                createdAt:
+                    type: string
+                lastEditBy:
+                    type: string
+                lastEditAt:
+                    type: string
+                isShared:
+                    type: boolean
+                onSharePermissions:
+                    type: object
+                    properties:
+                        read:
+                            type: boolean
+                        create:
+                            type: boolean
+                        update:
+                            type: boolean
+                        delete:
+                            type: boolean
+                        manage:
+                            type: boolean
+                rowsCount:
+                    type: integer
+
+        Row:
+            type: array
+            description: Values depending on the table definition.
+            items: {}

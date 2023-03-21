@@ -1,17 +1,17 @@
 Feature: api/tablesapi
   Background:
     Given user "participant1" exists
-    And user "participant2" exists
-    And user "participant3" exists
-    And user "admin" exists
-    And group "attendees1" exists
-    And user "participant2" is member of group "attendees1"
 
-  Scenario: User has no tables
+  Scenario: User has initial table
     Then user "participant1" has the following tables
       | Tutorial |
-#  Scenario: User has tables
-#    Given as user "admin"
-#    Given user "admin" logs in
-#    Then user "admin" has the following tables
-#    | Staffing |
+
+  Scenario: User creates, rename and delete a table
+    Then user "participant1" creates a table with title "my new awesome table" and optionally emoji "🤓"
+    Then user "participant1" renames table with keyword "awesome" with title "renamed table" and emoji "🍓"
+    Then user "participant1" deletes table with keyword "renamed"
+    Then user "participant1" has the following tables
+      | Tutorial |
+
+  Scenario: Cleanup
+      Given user "participant1" is deleted
