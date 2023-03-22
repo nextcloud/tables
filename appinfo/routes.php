@@ -18,6 +18,13 @@ return [
 		['name' => 'api1#updateTable',	'url' => '/api/1/table/{tableId}', 'verb' => 'PUT'],
 		['name' => 'api1#getTable',	'url' => '/api/1/table/{tableId}', 'verb' => 'GET'],
 		['name' => 'api1#deleteTable',	'url' => '/api/1/table/{tableId}', 'verb' => 'DELETE'],
+		// -> share
+		['name' => 'api1#getShare',	'url' => '/api/1/share/{shareId}', 'verb' => 'GET'],
+		['name' => 'api1#deleteShare',	'url' => '/api/1/share/{shareId}', 'verb' => 'DELETE'],
+		['name' => 'api1#updateSharePermissions',	'url' => '/api/1/share/{shareId}', 'verb' => 'PUT'],
+		// -> share -> table
+		['name' => 'api1#indexTableShares',	'url' => '/api/1/share/table/{tableId}', 'verb' => 'GET'],
+		['name' => 'api1#createTableShare',	'url' => '/api/1/share/table/{tableId}', 'verb' => 'POST'],
 		// -> rows
 		['name' => 'api1#data',	'url' => '/api/1/table/{tableId}/rows', 'verb' => 'GET'],
 

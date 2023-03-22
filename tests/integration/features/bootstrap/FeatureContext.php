@@ -108,7 +108,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	}
 
 	/**
-	 * @Then user :user creates a table with title :title and optionally emoji :emoji
+	 * @Given table :table with emoji :emoji exists for user :user
 	 *
 	 * @param string $user
 	 * @param string $title
@@ -163,6 +163,90 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 		$deletedTable = $this->getDataFromResponse($this->response);
 
 		Assert::assertEquals($deletedTable['title'], $tableToDelete['title']);
+	}
+
+	/**
+	 * @Then user :user shares table with keyword :keyword with user :receiver
+	 *
+	 * @param string $user
+	 * @param string $receiver
+	 * @param string $keyword
+	 */
+	public function shareTableWithUser(string $user, string $receiver, string $keyword): void {
+		$this->setCurrentUser($user);
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/tables?keyword='.$keyword
+		);
+
+		$tables = $this->getDataFromResponse($this->response);
+		$table = $tables[0];
+		$permissions = [
+			'permissionRead' => true,
+			'permissionCreate' => true,
+			'permissionUpdate' => true,
+			'permissionDelete' => false,
+			'permissionManage' => false
+		];
+		$this->sendRequest(
+			'POST',
+			'/apps/tables/api/1/share/table/'.$table['id'],
+			array_merge($permissions, [
+				'receiverType' => 'user',
+				'receiver' => $receiver
+			])
+		);
+		$share = $this->getDataFromResponse($this->response);
+
+		Assert::assertEquals($share['nodeType'], 'table');
+		Assert::assertEquals($share['nodeId'], $table['id']);
+		Assert::assertEquals($share['permissionRead'], $permissions['permissionRead']);
+		Assert::assertEquals($share['permissionCreate'], $permissions['permissionCreate']);
+		Assert::assertEquals($share['permissionUpdate'], $permissions['permissionUpdate']);
+		Assert::assertEquals($share['permissionDelete'], $permissions['permissionDelete']);
+		Assert::assertEquals($share['permissionManage'], $permissions['permissionManage']);
+	}
+
+	/**
+	 * @Then user :user shares table with keyword :keyword with group :receiver
+	 *
+	 * @param string $user
+	 * @param string $receiver
+	 * @param string $keyword
+	 */
+	public function shareTableWithGroup(string $user, string $receiver, string $keyword): void {
+		$this->setCurrentUser($user);
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/tables?keyword='.$keyword
+		);
+
+		$tables = $this->getDataFromResponse($this->response);
+		$table = $tables[0];
+		$permissions = [
+			'permissionRead' => true,
+			'permissionCreate' => true,
+			'permissionUpdate' => true,
+			'permissionDelete' => false,
+			'permissionManage' => false
+		];
+		$this->sendRequest(
+			'POST',
+			'/apps/tables/api/1/share/table/'.$table['id'],
+			array_merge($permissions, [
+				'receiverType' => 'group',
+				'receiver' => $receiver
+			])
+		);
+		$share = $this->getDataFromResponse($this->response);
+
+		Assert::assertEquals($share['nodeType'], 'table');
+		Assert::assertEquals($share['nodeId'], $table['id']);
+		Assert::assertEquals($share['permissionRead'], $permissions['permissionRead']);
+		Assert::assertEquals($share['permissionCreate'], $permissions['permissionCreate']);
+		Assert::assertEquals($share['permissionUpdate'], $permissions['permissionUpdate']);
+		Assert::assertEquals($share['permissionDelete'], $permissions['permissionDelete']);
+		Assert::assertEquals($share['permissionManage'], $permissions['permissionManage']);
 	}
 
 	/**

@@ -3,6 +3,7 @@
 namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Api\V1Api;
 use OCP\AppFramework\ApiController;
@@ -11,6 +12,7 @@ use OCP\IRequest;
 
 class Api1Controller extends ApiController {
 	private TableService $tableService;
+	private ShareService $shareService;
 
 	private V1Api $v1Api;
 
@@ -22,11 +24,13 @@ class Api1Controller extends ApiController {
 	public function __construct(
 		IRequest     $request,
 		TableService $service,
+		ShareService $shareService,
 		V1Api $v1Api,
 		string $userId
 	) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->tableService = $service;
+		$this->shareService = $shareService;
 		$this->userId = $userId;
 		$this->v1Api = $v1Api;
 	}
@@ -102,4 +106,61 @@ class Api1Controller extends ApiController {
 			return $this->tableService->delete($tableId);
 		});
 	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function getShare(int $shareId): DataResponse {
+		return $this->handleError(function () use ($shareId) {
+			return $this->shareService->find($shareId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function indexTableShares(int $tableId): DataResponse {
+		return $this->handleError(function () use ($tableId) {
+			return $this->shareService->findAll('table', $tableId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function createTableShare(int $tableId, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage): DataResponse {
+		return $this->handleError(function () use ($tableId, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage) {
+			return $this->shareService->create($tableId, 'table', $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function deleteShare(int $shareId): DataResponse {
+		return $this->handleError(function () use ($shareId) {
+			return $this->shareService->delete($shareId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function updateSharePermissions(int $shareId, string $permissionType, bool $permissionValue): DataResponse {
+		return $this->handleError(function () use ($shareId, $permissionType, $permissionValue) {
+			return $this->shareService->updatePermission($shareId, $permissionType, $permissionValue);
+		});
+	}
+
+
 }
