@@ -161,6 +161,4 @@ class Api1Controller extends ApiController {
 			return $this->shareService->updatePermission($shareId, $permissionType, $permissionValue);
 		});
 	}
-
-
 }

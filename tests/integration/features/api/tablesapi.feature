@@ -12,6 +12,8 @@ Feature: api/tablesapi
 
   Scenario: User creates, rename and delete a table
     Given table "my new awesome table" with emoji "🤓" exists for user "participant1"
+    Then user "participant1" has the following tables
+      | my new awesome table |
     Then user "participant1" renames table with keyword "awesome" with title "renamed table" and emoji "🍓"
     Then user "participant1" deletes table with keyword "renamed"
     Then user "participant1" has the following tables
@@ -38,9 +40,3 @@ Feature: api/tablesapi
       | Tutorial |
     Then user "participant2" has the following tables
       | Tutorial |
-
-
-  Scenario: Cleanup
-
-    Given user "participant1" is deleted
-    Given user "participant2" is deleted

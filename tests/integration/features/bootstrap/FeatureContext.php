@@ -74,6 +74,18 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	}
 
 	/**
+	 * @AfterScenario
+	 */
+	public function cleanupUsers() {
+		foreach ($this->createdUsers as $user) {
+			$this->deleteUser($user);
+		}
+		foreach ($this->createdGroups as $group) {
+			$this->deleteGroup($group);
+		}
+	}
+
+	/**
 	 * @Then user :user has the following tables
 	 *
 	 * @param string $user
