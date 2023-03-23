@@ -84,7 +84,7 @@ OC.L10N.register(
     "We know what we are doing." : "Vi ved, hvad vi laver.",
     "We have heard that Nextcloud could be a nice solution for it, should give it a try." : "Vi har hørt, at Nextcloud kunne være en god løsning - vi bør prøve det.",
     "Add more actions" : "Tilføj flere handlinger",
-    "I guess we need more actions in here..." : "Jeg tror, ​​at vi har brug for mere handlinger her...",
+    "I guess we need more actions in here..." : "Jeg tror, ​​at vi har brug for mere handling her...",
     "No title given" : "Ingen titel givet",
     "Tables" : "Tabeller",
     "Manage data the way you need it." : "Administrer data efter dine ønsker og behov…",

@@ -10,6 +10,7 @@ OC.L10N.register(
     "Weight" : "Тежина",
     "Comments" : "Коментари",
     "Name" : "Име",
+    "Account manager" : "Управљач налозима",
     "Description" : "Опис",
     "Comment" : "Коментар",
     "Dog" : "Пас",
