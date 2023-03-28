@@ -13,6 +13,7 @@ OC.L10N.register(
     "Customers" : "Клиенти",
     "Manage your customers." : "Управление на вашите клиенти.",
     "Vacation requests" : "Заявки за отпуск",
+    "Use this table to collect and manage vacation requests." : "Използване на тази таблица за събиране и управление на заявки за отпуск.",
     "Weight tracking" : "Проследяване на тегло",
     "Track your weight and other health measures." : "Проследявайте теглото си и други здравни мерки.",
     "Date" : "Дата",
