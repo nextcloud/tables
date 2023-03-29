@@ -55,6 +55,10 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	/** @var array */
 	protected $createdGroups = [];
 
+	private ?int $shareId = null;
+	private ?int $tableId = null;
+	private ?int $columnId = null;
+
 	use CommandLineTrait;
 
 	/**
@@ -85,6 +89,10 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 		}
 	}
 
+
+
+
+
 	/**
 	 * @Then user :user has the following tables
 	 *
@@ -99,6 +107,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 		);
 
 		$data = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
 
 		// check if tables are empty
 		if ($body === null) {
@@ -130,7 +139,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 		$this->setCurrentUser($user);
 		$this->sendRequest(
 			'POST',
-			'/apps/tables/api/1/table',
+			'/apps/tables/api/1/tables',
 			[
 				'title' => $title,
 				'emoji' => $emoji
@@ -138,19 +147,84 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 		);
 
 		$newTable = $this->getDataFromResponse($this->response);
+		$this->tableId = $newTable['id'];
 
+		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($newTable['title'], $title);
 		Assert::assertEquals($newTable['emoji'], $emoji);
+		Assert::assertEquals($newTable['ownership'], $user);
 
-		$tableId = $newTable['id'];
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/table/'.$tableId,
+			'/apps/tables/api/1/tables/'.$newTable['id'],
 		);
 
 		$tableToVerify = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($tableToVerify['title'], $title);
 		Assert::assertEquals($tableToVerify['emoji'], $emoji);
+		Assert::assertEquals($tableToVerify['ownership'], $user);
+	}
+
+	private function getTableByKeyword(string $keyword) {
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/tables?keyword='.$keyword
+		);
+
+		$tables = $this->getDataFromResponse($this->response);
+		return $tables[0];
+	}
+
+	private function getTableById(int $tableId): array {
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/tables/'.$tableId
+		);
+
+		return $this->getDataFromResponse($this->response);
+	}
+
+	/**
+	 * @Then user :user updates table with keyword :keyword set title :title and optional emoji :emoji
+	 *
+	 * @param string $user
+	 * @param string $title
+	 * @param string|null $emoji
+	 * @param string $keyword
+	 */
+	public function updateTable(string $user, string $title, ?string $emoji, string $keyword): void {
+		$this->setCurrentUser($user);
+		$table = $this->getTableByKeyword($keyword);
+
+		$data = ['title' => $title];
+		if ($emoji !== null) {
+			$data['emoji'] = $emoji;
+		}
+
+		$this->sendRequest(
+			'PUT',
+			'/apps/tables/api/1/tables/'.$table['id'],
+			$data
+		);
+
+		$updatedTable = $this->getDataFromResponse($this->response);
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($updatedTable['title'], $title);
+		Assert::assertEquals($updatedTable['emoji'], $emoji);
+		Assert::assertEquals($updatedTable['ownership'], $user);
+
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/tables/'.$updatedTable['id'],
+		);
+
+		$tableToVerify = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($tableToVerify['title'], $title);
+		Assert::assertEquals($tableToVerify['emoji'], $emoji);
+		Assert::assertEquals($tableToVerify['ownership'], $user);
 	}
 
 	/**
@@ -161,38 +235,35 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	 */
 	public function deleteTable(string $user, string $keyword): void {
 		$this->setCurrentUser($user);
-		$this->sendRequest(
-			'GET',
-			'/apps/tables/api/1/tables?keyword='.$keyword
-		);
+		$table = $this->getTableByKeyword($keyword);
 
-		$tables = $this->getDataFromResponse($this->response);
-		$tableToDelete = $tables[0];
 		$this->sendRequest(
 			'DELETE',
-			'/apps/tables/api/1/table/'.$tableToDelete['id']
+			'/apps/tables/api/1/tables/'.$table['id']
 		);
 		$deletedTable = $this->getDataFromResponse($this->response);
 
-		Assert::assertEquals($deletedTable['title'], $tableToDelete['title']);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($deletedTable['title'], $table['title']);
+		Assert::assertEquals($deletedTable['id'], $table['id']);
+
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/tables/'.$deletedTable['id'],
+		);
+		Assert::assertEquals(404, $this->response->getStatusCode());
 	}
 
 	/**
-	 * @Then user :user shares table with keyword :keyword with user :receiver
+	 * @Then user :user shares table with user :receiver
 	 *
 	 * @param string $user
 	 * @param string $receiver
-	 * @param string $keyword
 	 */
-	public function shareTableWithUser(string $user, string $receiver, string $keyword): void {
+	public function shareTableWithUser(string $user, string $receiver): void {
 		$this->setCurrentUser($user);
-		$this->sendRequest(
-			'GET',
-			'/apps/tables/api/1/tables?keyword='.$keyword
-		);
+		$table = $this->getTableById($this->tableId);
 
-		$tables = $this->getDataFromResponse($this->response);
-		$table = $tables[0];
 		$permissions = [
 			'permissionRead' => true,
 			'permissionCreate' => true,
@@ -202,91 +273,277 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 		];
 		$this->sendRequest(
 			'POST',
-			'/apps/tables/api/1/share/table/'.$table['id'],
+			'/apps/tables/api/1/tables/'.$table['id'].'/shares',
 			array_merge($permissions, [
 				'receiverType' => 'user',
 				'receiver' => $receiver
 			])
 		);
 		$share = $this->getDataFromResponse($this->response);
+		$this->shareId = $share['id'];
 
+		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($share['nodeType'], 'table');
 		Assert::assertEquals($share['nodeId'], $table['id']);
+		Assert::assertEquals($share['receiverType'], 'user');
+		Assert::assertEquals($share['receiver'], $receiver);
 		Assert::assertEquals($share['permissionRead'], $permissions['permissionRead']);
 		Assert::assertEquals($share['permissionCreate'], $permissions['permissionCreate']);
 		Assert::assertEquals($share['permissionUpdate'], $permissions['permissionUpdate']);
 		Assert::assertEquals($share['permissionDelete'], $permissions['permissionDelete']);
 		Assert::assertEquals($share['permissionManage'], $permissions['permissionManage']);
+
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/shares/'.$share['id'],
+		);
+
+		$shareToVerify = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($shareToVerify['nodeType'], 'table');
+		Assert::assertEquals($shareToVerify['nodeId'], $table['id']);
+		Assert::assertEquals($shareToVerify['receiverType'], 'user');
+		Assert::assertEquals($shareToVerify['receiver'], $receiver);
+		Assert::assertEquals($shareToVerify['permissionRead'], $permissions['permissionRead']);
+		Assert::assertEquals($shareToVerify['permissionCreate'], $permissions['permissionCreate']);
+		Assert::assertEquals($shareToVerify['permissionUpdate'], $permissions['permissionUpdate']);
+		Assert::assertEquals($shareToVerify['permissionDelete'], $permissions['permissionDelete']);
+		Assert::assertEquals($shareToVerify['permissionManage'], $permissions['permissionManage']);
 	}
 
 	/**
-	 * @Then user :user shares table with keyword :keyword with group :receiver
+	 * @Then user :user shares table with group :receiver
 	 *
 	 * @param string $user
 	 * @param string $receiver
-	 * @param string $keyword
 	 */
-	public function shareTableWithGroup(string $user, string $receiver, string $keyword): void {
+	public function shareTableWithGroup(string $user, string $receiver): void {
 		$this->setCurrentUser($user);
-		$this->sendRequest(
-			'GET',
-			'/apps/tables/api/1/tables?keyword='.$keyword
-		);
+		$table = $this->getTableById($this->tableId);
 
-		$tables = $this->getDataFromResponse($this->response);
-		$table = $tables[0];
 		$permissions = [
 			'permissionRead' => true,
 			'permissionCreate' => true,
 			'permissionUpdate' => true,
-			'permissionDelete' => false,
+			'permissionDelete' => true,
 			'permissionManage' => false
 		];
 		$this->sendRequest(
 			'POST',
-			'/apps/tables/api/1/share/table/'.$table['id'],
+			'/apps/tables/api/1/tables/'.$table['id'].'/shares',
 			array_merge($permissions, [
 				'receiverType' => 'group',
 				'receiver' => $receiver
 			])
 		);
 		$share = $this->getDataFromResponse($this->response);
+		$this->shareId = $share['id'];
 
+		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($share['nodeType'], 'table');
 		Assert::assertEquals($share['nodeId'], $table['id']);
+		Assert::assertEquals($share['receiverType'], 'group');
+		Assert::assertEquals($share['receiver'], $receiver);
 		Assert::assertEquals($share['permissionRead'], $permissions['permissionRead']);
 		Assert::assertEquals($share['permissionCreate'], $permissions['permissionCreate']);
 		Assert::assertEquals($share['permissionUpdate'], $permissions['permissionUpdate']);
 		Assert::assertEquals($share['permissionDelete'], $permissions['permissionDelete']);
 		Assert::assertEquals($share['permissionManage'], $permissions['permissionManage']);
+
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/shares/'.$share['id'],
+		);
+
+		$shareToVerify = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($shareToVerify['nodeType'], 'table');
+		Assert::assertEquals($shareToVerify['nodeId'], $table['id']);
+		Assert::assertEquals($shareToVerify['receiverType'], 'group');
+		Assert::assertEquals($shareToVerify['receiver'], $receiver);
+		Assert::assertEquals($shareToVerify['permissionRead'], $permissions['permissionRead']);
+		Assert::assertEquals($shareToVerify['permissionCreate'], $permissions['permissionCreate']);
+		Assert::assertEquals($shareToVerify['permissionUpdate'], $permissions['permissionUpdate']);
+		Assert::assertEquals($shareToVerify['permissionDelete'], $permissions['permissionDelete']);
+		Assert::assertEquals($shareToVerify['permissionManage'], $permissions['permissionManage']);
+	}
+
+
+	private function getShareById(int $shareId): array {
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/shares/'.$shareId
+		);
+
+		return $this->getDataFromResponse($this->response);
 	}
 
 	/**
-	 * @Then user :user renames table with keyword :keyword with title :title and emoji :emoji
+	 * @Then user :user has the following permissions
+	 */
+	public function checkSharePermissions($user, TableNode $permissions = null) {
+		$this->setCurrentUser($user);
+
+		$share = $this->getShareById($this->shareId);
+		$table = $this->getTableById($share['nodeId']);
+
+		foreach ($permissions->getRows() as $row) {
+			Assert::assertEquals($table['onSharePermissions'][$row[0]], boolval($row[1]));
+		}
+	}
+
+	/**
+	 * @Then user :user sets permission :permissionType to :value
 	 *
 	 * @param string $user
-	 * @param string $keyword
-	 * @param string $title
-	 * @param string|null $emoji
+	 * @param string $permissionType
+	 * @param bool $value
 	 */
-	public function renameTable(string $user, string $keyword, string $title, string $emoji = null): void {
+	public function updateSharePermission(string $user, string $permissionType, bool $value): void {
 		$this->setCurrentUser($user);
-		$this->sendRequest(
-			'GET',
-			'/apps/tables/api/1/tables?keyword='.$keyword
-		);
 
-		$tables = $this->getDataFromResponse($this->response);
-		$table = $tables[0];
 		$this->sendRequest(
 			'PUT',
-			'/apps/tables/api/1/table/'.$table['id'].'?title='.$title.'&emoji='.$emoji
+			'/apps/tables/api/1/shares/'.$this->shareId,
+			[
+				'permissionType' => $permissionType,
+				'permissionValue' => $value
+			]
 		);
-		$updatedTable = $this->getDataFromResponse($this->response);
+		$share = $this->getDataFromResponse($this->response);
 
-		Assert::assertEquals($updatedTable['title'], $title);
-		Assert::assertEquals($updatedTable['emoji'], $emoji);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($share['permission'.ucfirst($permissionType)], $value);
 	}
+
+	// COLUMNS --------------------------
+
+	/**
+	 * @Then column :title exists with following properties
+	 *
+	 * @param string $title
+	 * @param TableNode|null $properties
+	 */
+	public function createColumn(string $title, TableNode $properties = null): void {
+		$props = ['title' => $title];
+		foreach ($properties->getRows() as $row) {
+			$props[$row[0]] = $row[1];
+		}
+
+		$this->sendRequest(
+			'POST',
+			'/apps/tables/api/1/tables/'.$this->tableId.'/columns',
+			$props
+		);
+
+		$newColumn = $this->getDataFromResponse($this->response);
+		$this->columnId = $newColumn['id'];
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($newColumn['title'], $title);
+
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/columns/'.$newColumn['id'],
+		);
+
+		$columnToVerify = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($columnToVerify['title'], $title);
+	}
+
+	/**
+	 * @Then table has at least following columns
+	 *
+	 * @param TableNode|null $body
+	 */
+	public function tableColumns(TableNode $body = null): void {
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/tables/'.$this->tableId.'/columns'
+		);
+
+		$data = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		// check if no columns exists
+		if ($body === null) {
+			Assert::assertCount(0, $data);
+			return;
+		}
+
+
+		$titles = [];
+		foreach ($data as $d) {
+			$titles[] = $d['title'];
+		}
+		foreach ($body->getRows()[0] as $columnTitle) {
+			Assert::assertTrue(in_array($columnTitle, $titles, true));
+		}
+	}
+
+	/**
+	 * @Then user deletes last created column
+	 */
+	public function deleteColumn(): void {
+		$this->sendRequest(
+			'DELETE',
+			'/apps/tables/api/1/columns/'.$this->columnId
+		);
+		$column = $this->getDataFromResponse($this->response);
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($column['id'], $this->columnId);
+
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/columns/'.$column['id'],
+		);
+		Assert::assertEquals(404, $this->response->getStatusCode());
+	}
+
+	/**
+	 * @Then set following properties for last created column
+	 *
+	 * @param TableNode|null $properties
+	 */
+	public function updateColumn(TableNode $properties = null): void {
+		$props = [];
+		foreach ($properties->getRows() as $row) {
+			$props[$row[0]] = $row[1];
+		}
+
+		$this->sendRequest(
+			'PUT',
+			'/apps/tables/api/1/columns/'.$this->columnId,
+			$props
+		);
+
+		$column = $this->getDataFromResponse($this->response);
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		foreach ($props as $key => $value) {
+			Assert::assertEquals($column[$key], $value);
+		}
+
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/columns/'.$column['id'],
+		);
+
+		$columnToVerify = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		foreach ($props as $key => $value) {
+			Assert::assertEquals($columnToVerify[$key], $value);
+		}
+	}
+
+
+
+
+
+
+
 
 	/*
 	 * User management

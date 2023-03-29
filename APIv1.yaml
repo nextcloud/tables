@@ -9,7 +9,7 @@ paths:
     /tables:
         get:
             summary: Get a list of tables
-            description: Returns a list of tables for given user. Shipped with v0.3.0.
+            description: You can filter by a keyword, limit and offset. Shipped with v0.3.0.
             tags:
                 - Tables
             operationId: listTables
@@ -18,7 +18,7 @@ paths:
             parameters:
                 -   name: keyword
                     in: query
-                    description: Term to search for
+                    description: Term to look for
                     required: false
                     schema:
                         type: string
@@ -42,8 +42,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Tables"
-
-    /table:
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
         post:
             summary: Create a new table
             description: Shipped with v0.4.0.
@@ -53,36 +57,37 @@ paths:
             security:
                 - basicAuth: []
             parameters:
-                -   name: title
+                -   name: values
                     in: query
-                    description: Title for the table
+                    description: object of key-value pairs
                     required: true
                     schema:
-                        type: string
-                        maximum: 255
-                -   name: emoji
-                    in: query
-                    description: Emoji for the table
-                    required: false
-                    schema:
-                        type: string
-                        maximum: 1
-                -   name: template
-                    in: query
-                    description: Template name to use
-                    required: false
-                    schema:
-                        type: string
-                        maximum: 255
+                        type: object
+                        required:
+                            - title
+                        properties:
+                            title:
+                                type: string
+                                required: true
+                            emoji:
+                                type: string
+                                format: utf8 emoji
+                            template:
+                                type: string
+                                description: set if you want to create the table definition from a template
             responses:
-                '201':
-                    description: Table object
+                '200':
+                    description: Table created
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Table"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
 
-    /table/{tableId}:
+    /tables/{tableId}:
         get:
             summary: Get a table
             description: Changed and shipped with v0.4.0.
@@ -99,12 +104,58 @@ paths:
                     schema:
                         type: integer
             responses:
-                '201':
+                '200':
                     description: Table object
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Table"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
+        put:
+            summary: Update a table
+            description: Shipped with v0.4.0.
+            tags:
+                - Tables
+            operationId: updateTable
+            security:
+                - basicAuth: []
+            parameters:
+                -   name: tableId
+                    in: path
+                    description: ID for the requested table
+                    required: true
+                    schema:
+                        type: integer
+                -   name: values
+                    in: query
+                    description: object of key-value pairs
+                    required: true
+                    schema:
+                        type: object
+                        properties:
+                            title:
+                                type: string
+                            emoji:
+                                type: string
+                                format: utf8 emoji
+            responses:
+                '200':
+                    description: Updated table object
+                    content:
+                        application/json:
+                            $ref: "#/components/schemas/Table"
+                            schema:
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
         delete:
             summary: Delete a table
             description: Shipped with v0.4.0.
@@ -121,64 +172,55 @@ paths:
                     schema:
                         type: integer
             responses:
-                '201':
+                '200':
                     description: Deleted table object
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Table"
-        put:
-            summary: Update a table
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
+
+
+    /tables/{tableId}/columns:
+        get:
+            summary: Get a list of columns for a given table
             description: Shipped with v0.4.0.
             tags:
-                - Tables
-            operationId: updateTable
+                - Columns
+            operationId: listTableColumns
             security:
                 - basicAuth: []
             parameters:
                 -   name: tableId
                     in: path
-                    description: ID for the requested table
+                    description: Table ID
                     required: true
                     schema:
                         type: integer
-                -   name: title
-                    in: query
-                    description: Title for the table
-                    required: true
-                    schema:
-                        type: string
-                        maximum: 255
-                -   name: emoji
-                    in: query
-                    description: Emoji for the table
-                    required: false
-                    schema:
-                        type: string
-                        maximum: 1
-                -   name: template
-                    in: query
-                    description: Template name to use
-                    required: false
-                    schema:
-                        type: string
-                        maximum: 255
             responses:
-                '201':
-                    description: Updated table object
+                '200':
+                    description: Json array with column objects
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/Table"
-
-    /share/table/{tableId}:
-        get:
-            summary: Get shares for a table
+                                $ref: "#/components/schemas/Columns"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
+        post:
+            summary: Create a column for given table
             description: Shipped with v0.4.0.
             tags:
-                - Shareing
-                - Tables
-            operationId: listTableShares
+                - Columns
+            operationId: createTableColumn
             security:
                 - basicAuth: []
             parameters:
@@ -189,19 +231,156 @@ paths:
                     example: 5
                     schema:
                         type: integer
+                -   name: values
+                    in: query
+                    description: object of key-value pairs
+                    required: true
+                    schema:
+                        - $ref: "#/components/schemas/columnProperties"
+                        - type:
+                            type: string
+                            required: true
+                        - subtype:
+                            type: string
+
             responses:
-                '201':
-                    description: Share node object
+                '200':
+                    description: Column object
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Column"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+
+    /column/{columnId}:
+        get:
+            summary: Get a column
+            description: Shipped with v0.4.0.
+            tags:
+                - Columns
+            operationId: getColumn
+            security:
+                - basicAuth: []
+            parameters:
+                -   name: columnId
+                    in: path
+                    description: ID for the requested column
+                    required: true
+                    schema:
+                        type: integer
+            responses:
+                '200':
+                    description: Column object
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Column"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
+        put:
+            summary: Update a column
+            description: Shipped with v0.4.0.
+            tags:
+                - Columns
+            operationId: updateColumn
+            security:
+                - basicAuth: []
+            parameters:
+                -   name: columnId
+                    in: path
+                    description: ID for the column
+                    required: true
+                    schema:
+                        type: integer
+                -   name: values
+                    in: query
+                    description: object of key-value pairs
+                    required: true
+                    schema:
+                        $ref: "#/components/schemas/columnProperties"
+            responses:
+                '200':
+                    description: Updated column object
+                    content:
+                        application/json:
+                            $ref: "#/components/schemas/Column"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
+        delete:
+            summary: Delete a column
+            description: Shipped with v0.4.0.
+            tags:
+                - Columns
+            operationId: deleteColumn
+            security:
+                - basicAuth: []
+            parameters:
+                -   name: columnId
+                    in: path
+                    description: ID for the requested column
+                    required: true
+                    schema:
+                        type: integer
+            responses:
+                '200':
+                    description: Deleted column object
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Column"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
+
+
+    /tables/{tableId}/shares:
+        get:
+            summary: Get shares for a table
+            description: Shipped with v0.4.0.
+            tags:
+                - sharing
+            operationId: listTableShares
+            security:
+                - basicAuth: []
+            parameters:
+                -   name: tableId
+                    in: path
+                    description: ID for the table context
+                    required: true
+                    schema:
+                        type: integer
+            responses:
+                '200':
+                    description: Share node objects
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Shares"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
         post:
             summary: Share a table
             description: Shipped with v0.4.0.
             tags:
-                - Shareing
-                - Tables
+                - sharing
             operationId: createTableShare
             security:
                 - basicAuth: []
@@ -258,19 +437,25 @@ paths:
                     schema:
                         type: boolean
             responses:
-                '201':
+                '200':
                     description: Share node object
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Share"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
 
     /share/{shareId}:
         get:
             summary: Get a share node object
             description: Shipped with v0.4.0.
             tags:
-                - Shareing
+                - sharing
             operationId: getShare
             security:
                 -   basicAuth: [ ]
@@ -283,43 +468,23 @@ paths:
                     schema:
                         type: integer
             responses:
-                '201':
+                '200':
                     description: Share node object
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Share"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
                 '404':
                     description: Not found
-        delete:
-            summary: Unshare a table
-            description: Shipped with v0.4.0.
-            tags:
-                - Shareing
-                - Tables
-            operationId: deleteTableShare
-            security:
-                -   basicAuth: [ ]
-            parameters:
-                -   name: shareId
-                    in: path
-                    description: ID for the share
-                    required: true
-                    example: 5
-                    schema:
-                        type: integer
-            responses:
-                '201':
-                    description: Deleted share node object
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Share"
         put:
             summary: Update permission
             description: Shipped with v0.4.0.
             tags:
-                - Shareing
+                - sharing
             operationId: updateSharePermission
             security:
                 -   basicAuth: [ ]
@@ -344,12 +509,47 @@ paths:
                     schema:
                         type: boolean
             responses:
-                '201':
+                '200':
                     description: Share node object
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Share"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
+        delete:
+            summary: Unshare
+            description: Shipped with v0.4.0.
+            tags:
+                - sharing
+            operationId: deleteShare
+            security:
+                -   basicAuth: [ ]
+            parameters:
+                -   name: shareId
+                    in: path
+                    description: ID for the share
+                    required: true
+                    schema:
+                        type: integer
+            responses:
+                '200':
+                    description: Deleted share node object
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Share"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
+
 
     /table/{tableId}/rows:
         get:
@@ -385,7 +585,142 @@ paths:
                     content:
                         application/json:
                             schema:
+                                $ref: "#/components/schemas/Rows"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
+        post:
+            summary: Create a row
+            description: Shipped with v0.4.0.
+            tags:
+                - Rows
+            operationId: createRow
+            security:
+                - basicAuth: []
+            parameters:
+                -   name: tableId
+                    in: path
+                    description: ID for the table
+                    required: true
+                    schema:
+                        type: integer
+                -   name: data
+                    in: query
+                    description: json object with key-value pairs
+                    required: true
+                    schema:
+                        type: string
+            responses:
+                '200':
+                    description: Row object
+                    content:
+                        application/json:
+                            schema:
                                 $ref: "#/components/schemas/Row"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
+
+    /row/{rowId}:
+        get:
+            summary: Get row
+            description: Shipped with v0.4.0
+            tags:
+                - Rows
+            operationId: getRow
+            security:
+                - basicAuth: []
+            parameters:
+                -   name: rowId
+                    in: path
+                    description: Row ID
+                    required: true
+                    schema:
+                        type: integer
+            responses:
+                '200':
+                    description: Row object
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Row"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
+        put:
+            summary: Update row
+            description: Shipped with v0.4.0.
+            tags:
+                - Rows
+            operationId: updateRow
+            security:
+                -   basicAuth: [ ]
+            parameters:
+                -   name: rowId
+                    in: path
+                    description: Row ID
+                    required: true
+                    schema:
+                        type: integer
+                -   name: values
+                    in: query
+                    description: object of key-value pairs
+                    required: true
+                    schema:
+                        type: object
+                        properties:
+                            - key
+                            - value
+            responses:
+                '200':
+                    description: Row object
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Row"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
+        delete:
+            summary: Delete row
+            description: Shipped with v0.4.0.
+            tags:
+                - Rows
+            operationId: deleteRow
+            security:
+                -   basicAuth: [ ]
+            parameters:
+                -   name: rowId
+                    in: path
+                    description: ID for the row
+                    required: true
+                    schema:
+                        type: integer
+            responses:
+                '200':
+                    description: Deleted row object
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Row"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
 
 
 components:
@@ -484,7 +819,109 @@ components:
                     type: string
                 lastEditAt:
                     type: string
+        Columns:
+            type: array
+            maxItems: 1000
+            items:
+                $ref: "#/components/schemas/Column"
+        Column:
+            type: object
+            required:
+                - id
+                - title
+                - tableId
+                - mandatory
+                - type
+            properties:
+                id:
+                    type: integer
+                tableId:
+                    type: integer
+                createdBy:
+                    type: string
+                createdAt:
+                    type: string
+                lastEditBy:
+                    type: string
+                lastEditAt:
+                    type: string
+                type:
+                    type: string
+                subtype:
+                    type: string
+                mandatory:
+                    type: boolean
+                description:
+                    type: string
+                orderWeight:
+                    type: integer
+                numberDefault:
+                    type: number
+                numberMin:
+                    type: number
+                numberMax:
+                    type: number
+                numberDecimals:
+                    type: integer
+                numberPrefix:
+                    type: string
+                numberSuffix:
+                    type: string
+                textDefault:
+                    type: string
+                textAllowedPattern:
+                    type: string
+                textMaxLength:
+                    type: integer
+                selectionOptions:
+                    type: string
+                selectionDefault:
+                    type: integer
+                datetimeDefault:
+                    type: string
+        Rows:
+            type: array
+            maxItems: 1000
+            items:
+                $ref: "#/components/schemas/Row"
         Row:
             type: array
             description: Values depending on the table definition.
             items: {}
+        columnProperties:
+            type: object
+            properties:
+                title:
+                    type: string
+                    required: true
+                mandatory:
+                    type: boolean
+                    required: true
+                numberPrefix:
+                    type: string
+                numberSuffix:
+                    type: string
+                description:
+                    type: string
+                textDefault:
+                    type: string
+                textAllowedPattern:
+                    type: string
+                textMaxLength:
+                    type: integer
+                numberDefault:
+                    type: number
+                numberMin:
+                    type: number
+                numberMax:
+                    type: number
+                numberDecimals:
+                    type: integer
+                selectionOptions:
+                    type: string
+                selectionDefault:
+                    type: integer
+                orderWeight:
+                    type: integer
+                datetimeDefault:
+                    type: string

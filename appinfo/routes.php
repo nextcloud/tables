@@ -14,17 +14,23 @@ return [
 		// API
 		// -> tables
 		['name' => 'api1#index', 'url' => '/api/1/tables', 'verb' => 'GET'],
-		['name' => 'api1#createTable',	'url' => '/api/1/table', 'verb' => 'POST'],
-		['name' => 'api1#updateTable',	'url' => '/api/1/table/{tableId}', 'verb' => 'PUT'],
-		['name' => 'api1#getTable',	'url' => '/api/1/table/{tableId}', 'verb' => 'GET'],
-		['name' => 'api1#deleteTable',	'url' => '/api/1/table/{tableId}', 'verb' => 'DELETE'],
+		['name' => 'api1#createTable',	'url' => '/api/1/tables', 'verb' => 'POST'],
+		['name' => 'api1#updateTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'PUT'],
+		['name' => 'api1#getTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'GET'],
+		['name' => 'api1#deleteTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'DELETE'],
 		// -> share
-		['name' => 'api1#getShare',	'url' => '/api/1/share/{shareId}', 'verb' => 'GET'],
-		['name' => 'api1#deleteShare',	'url' => '/api/1/share/{shareId}', 'verb' => 'DELETE'],
-		['name' => 'api1#updateSharePermissions',	'url' => '/api/1/share/{shareId}', 'verb' => 'PUT'],
+		['name' => 'api1#getShare',	'url' => '/api/1/shares/{shareId}', 'verb' => 'GET'],
+		['name' => 'api1#deleteShare',	'url' => '/api/1/shares/{shareId}', 'verb' => 'DELETE'],
+		['name' => 'api1#updateSharePermissions',	'url' => '/api/1/shares/{shareId}', 'verb' => 'PUT'],
 		// -> share -> table
-		['name' => 'api1#indexTableShares',	'url' => '/api/1/share/table/{tableId}', 'verb' => 'GET'],
-		['name' => 'api1#createTableShare',	'url' => '/api/1/share/table/{tableId}', 'verb' => 'POST'],
+		['name' => 'api1#indexTableShares',	'url' => '/api/1/tables/{tableId}/shares', 'verb' => 'GET'],
+		['name' => 'api1#createTableShare',	'url' => '/api/1/tables/{tableId}/shares', 'verb' => 'POST'],
+		// -> columns
+		['name' => 'api1#indexTableColumns',	'url' => '/api/1/tables/{tableId}/columns', 'verb' => 'GET'],
+		['name' => 'api1#createTableColumn',	'url' => '/api/1/tables/{tableId}/columns', 'verb' => 'POST'],
+		['name' => 'api1#getColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'GET'],
+		['name' => 'api1#deleteColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'DELETE'],
+		['name' => 'api1#updateColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'PUT'],
 		// -> rows
 		['name' => 'api1#data',	'url' => '/api/1/table/{tableId}/rows', 'verb' => 'GET'],
 

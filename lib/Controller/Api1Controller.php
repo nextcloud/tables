@@ -3,6 +3,7 @@
 namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Api\V1Api;
@@ -13,6 +14,7 @@ use OCP\IRequest;
 class Api1Controller extends ApiController {
 	private TableService $tableService;
 	private ShareService $shareService;
+	private ColumnService $columnService;
 
 	private V1Api $v1Api;
 
@@ -25,12 +27,14 @@ class Api1Controller extends ApiController {
 		IRequest     $request,
 		TableService $service,
 		ShareService $shareService,
+		ColumnService $columnService,
 		V1Api $v1Api,
 		string $userId
 	) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->tableService = $service;
 		$this->shareService = $shareService;
+		$this->columnService = $columnService;
 		$this->userId = $userId;
 		$this->v1Api = $v1Api;
 	}
@@ -68,7 +72,7 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function createTable(string $title, string $emoji = null, string $template = 'custom'): DataResponse {
+	public function createTable(string $title, ?string $emoji, string $template = 'custom'): DataResponse {
 		return $this->handleError(function () use ($title, $emoji, $template) {
 			return $this->tableService->create($title, $template, $emoji);
 		});
@@ -159,6 +163,205 @@ class Api1Controller extends ApiController {
 	public function updateSharePermissions(int $shareId, string $permissionType, bool $permissionValue): DataResponse {
 		return $this->handleError(function () use ($shareId, $permissionType, $permissionValue) {
 			return $this->shareService->updatePermission($shareId, $permissionType, $permissionValue);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function indexTableColumns(int $tableId): DataResponse {
+		return $this->handleError(function () use ($tableId) {
+			return $this->columnService->findAllByTable($tableId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function createTableColumn(
+		int $tableId,
+		string $title,
+		string $type,
+		?string $subtype,
+		bool $mandatory,
+		?string $description,
+		?int $orderWeight,
+
+		?string $numberPrefix,
+		?string $numberSuffix,
+		?float $numberDefault,
+		?float $numberMin,
+		?float $numberMax,
+		?int $numberDecimals,
+
+		?string $textDefault,
+		?string $textAllowedPattern,
+		?int $textMaxLength,
+
+		?string $selectionOptions = '',
+		?string $selectionDefault = '',
+
+		?string $datetimeDefault = ''
+	): DataResponse {
+		return $this->handleError(function () use (
+			$tableId,
+			$type,
+			$subtype,
+			$title,
+			$mandatory,
+			$description,
+			$orderWeight,
+
+			$textDefault,
+			$textAllowedPattern,
+			$textMaxLength,
+
+			$numberPrefix,
+			$numberSuffix,
+			$numberDefault,
+			$numberMin,
+			$numberMax,
+			$numberDecimals,
+
+			$selectionOptions,
+			$selectionDefault,
+
+			$datetimeDefault
+		) {
+			return $this->columnService->create(
+				$this->userId,
+				$tableId,
+				$type,
+				$subtype,
+				$title,
+				$mandatory,
+				$description,
+				$orderWeight,
+
+				$textDefault,
+				$textAllowedPattern,
+				$textMaxLength,
+
+				$numberPrefix,
+				$numberSuffix,
+				$numberDefault,
+				$numberMin,
+				$numberMax,
+				$numberDecimals,
+
+				$selectionOptions,
+				$selectionDefault,
+
+				$datetimeDefault
+			);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function updateColumn(
+		int $columnId,
+		?string $title,
+		?string $subtype,
+		?bool $mandatory,
+		?string $description,
+		?int $orderWeight,
+
+		?string $numberPrefix,
+		?string $numberSuffix,
+		?float $numberDefault,
+		?float $numberMin,
+		?float $numberMax,
+		?int $numberDecimals,
+
+		?string $textDefault,
+		?string $textAllowedPattern,
+		?int $textMaxLength,
+
+		?string $selectionOptions,
+		?string $selectionDefault,
+
+		?string $datetimeDefault
+	): DataResponse {
+		return $this->handleError(function () use (
+			$columnId,
+			$title,
+			$subtype,
+			$mandatory,
+			$description,
+			$orderWeight,
+
+			$textDefault,
+			$textAllowedPattern,
+			$textMaxLength,
+
+			$numberPrefix,
+			$numberSuffix,
+			$numberDefault,
+			$numberMin,
+			$numberMax,
+			$numberDecimals,
+
+			$selectionOptions,
+			$selectionDefault,
+
+			$datetimeDefault
+		) {
+			return $this->columnService->update(
+				$columnId,
+				null,
+				$this->userId,
+				null,
+				$subtype,
+				$title,
+				$mandatory,
+				$description,
+				$orderWeight,
+
+				$textDefault,
+				$textAllowedPattern,
+				$textMaxLength,
+
+				$numberPrefix,
+				$numberSuffix,
+				$numberDefault,
+				$numberMin,
+				$numberMax,
+				$numberDecimals,
+
+				$selectionOptions,
+				$selectionDefault,
+				$datetimeDefault
+			);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function getColumn(int $columnId): DataResponse {
+		return $this->handleError(function () use ($columnId) {
+			return $this->columnService->find($columnId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function deleteColumn(int $columnId): DataResponse {
+		return $this->handleError(function () use ($columnId) {
+			return $this->columnService->delete($columnId);
 		});
 	}
 }
