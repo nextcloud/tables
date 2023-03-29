@@ -352,7 +352,7 @@ paths:
             summary: Get shares for a table
             description: Shipped with v0.4.0.
             tags:
-                - sharing
+                - Sharing
             operationId: listTableShares
             security:
                 - basicAuth: []
@@ -380,7 +380,7 @@ paths:
             summary: Share a table
             description: Shipped with v0.4.0.
             tags:
-                - sharing
+                - Sharing
             operationId: createTableShare
             security:
                 - basicAuth: []
@@ -455,7 +455,7 @@ paths:
             summary: Get a share node object
             description: Shipped with v0.4.0.
             tags:
-                - sharing
+                - Sharing
             operationId: getShare
             security:
                 -   basicAuth: [ ]
@@ -484,7 +484,7 @@ paths:
             summary: Update permission
             description: Shipped with v0.4.0.
             tags:
-                - sharing
+                - Sharing
             operationId: updateSharePermission
             security:
                 -   basicAuth: [ ]
@@ -525,7 +525,7 @@ paths:
             summary: Unshare
             description: Shipped with v0.4.0.
             tags:
-                - sharing
+                - Sharing
             operationId: deleteShare
             security:
                 -   basicAuth: [ ]
@@ -551,10 +551,48 @@ paths:
                     description: Not found
 
 
-    /table/{tableId}/rows:
+    /tables/{tableId}/rows/simple:
+        get:
+            summary: Get an array of row values with header row
+            description: The first row contains the column titles. There is a default row limit by 1000 rows. If you need more (or want to limit less), you can set a limit on your own. Additionally set an offset if needed, would be good for lazy loading etc. Shipped with v0.3.0.
+            tags:
+                - Rows
+            operationId: listRowsSimple
+            security:
+                - basicAuth: []
+            parameters:
+                -   name: tableId
+                    in: path
+                    description: Table ID
+                    required: true
+                    schema:
+                        type: integer
+                -   name: limit
+                    in: query
+                    description: Limit the rows
+                    required: false
+                    schema:
+                        type: integer
+                -   name: offset
+                    in: query
+                    description: Set the startng pointer
+                    required: false
+                    schema:
+                        type: integer
+            responses:
+                '200':
+                    description: Json array with row values
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
+
+    /tables/{tableId}/rows:
         get:
             summary: Get an array of rows
-            description: The first row contains the column titles. There is a default row limit by 1000 rows. If you need more (or want to limit less), you can set a limit on your own. Additionally set an offset if needed, would be good for lazy loading etc. Shipped with v0.3.0.
+            description: There is a default row limit by 1000 rows. If you need more (or want to limit less), you can set a limit on your own. Additionally set an offset if needed, would be good for lazy loading etc. Shipped with v0.3.0.
             tags:
                 - Rows
             operationId: listRows
@@ -609,7 +647,7 @@ paths:
                         type: integer
                 -   name: data
                     in: query
-                    description: json object with key-value pairs
+                    description: json object with key-value pairs, keys are the columnIds
                     required: true
                     schema:
                         type: string
@@ -627,7 +665,7 @@ paths:
                 '404':
                     description: Not found
 
-    /row/{rowId}:
+    /rows/{rowId}:
         get:
             summary: Get row
             description: Shipped with v0.4.0
@@ -673,13 +711,10 @@ paths:
                         type: integer
                 -   name: values
                     in: query
-                    description: object of key-value pairs
+                    description: object of key-value pairs, keys are the columnIds
                     required: true
                     schema:
                         type: object
-                        properties:
-                            - key
-                            - value
             responses:
                 '200':
                     description: Row object
@@ -879,15 +914,38 @@ components:
                     type: integer
                 datetimeDefault:
                     type: string
+        RowsSimple:
+            type: array
+            maxItems: 1000
+            items:
+                $ref: "#/components/schemas/RowSimple"
+        RowSimple:
+            type: array
+            description: Values depending on the table definition.
+            items: {}
         Rows:
             type: array
             maxItems: 1000
             items:
                 $ref: "#/components/schemas/Row"
         Row:
-            type: array
-            description: Values depending on the table definition.
-            items: {}
+            type: object
+            description: Object with row metadata. The values are inside of the property 'data'.
+            properties:
+                id:
+                    type: integer
+                tableId:
+                    type: integer
+                createdBy:
+                    type: string
+                createdAt:
+                    type: string
+                lastEditBy:
+                    type: string
+                lastEditAt:
+                    type: string
+                data:
+                    type: object
         columnProperties:
             type: object
             properties:

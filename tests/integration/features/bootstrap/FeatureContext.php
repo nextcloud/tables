@@ -28,6 +28,7 @@ use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 
@@ -58,6 +59,8 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	private ?int $shareId = null;
 	private ?int $tableId = null;
 	private ?int $columnId = null;
+	private ?int $rowId = null;
+	private ?array $tableColumns = [];
 
 	use CommandLineTrait;
 
@@ -252,6 +255,10 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 			'/apps/tables/api/1/tables/'.$deletedTable['id'],
 		);
 		Assert::assertEquals(404, $this->response->getStatusCode());
+
+		$this->tableId = null;
+		$this->columnId = null;
+		$this->tableColumns = [];
 	}
 
 	/**
@@ -438,6 +445,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 
 		$newColumn = $this->getDataFromResponse($this->response);
 		$this->columnId = $newColumn['id'];
+		$this->tableColumns[$newColumn['title']] = $newColumn['id'];
 
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($newColumn['title'], $title);
@@ -535,6 +543,104 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		foreach ($props as $key => $value) {
 			Assert::assertEquals($columnToVerify[$key], $value);
+		}
+	}
+
+	// ROWS --------------------------
+
+	/**
+	 * @Then row exists with following values
+	 *
+	 * @param TableNode|null $properties
+	 */
+	public function createRow(TableNode $properties = null): void {
+		$props = [];
+		foreach ($properties->getRows() as $row) {
+			$columnId = $this->tableColumns[$row[0]];
+			$props[$columnId] = $row[1];
+		}
+
+
+		$this->sendRequest(
+			'POST',
+			'/apps/tables/api/1/tables/'.$this->tableId.'/rows',
+			['data' => json_encode($props)]
+		);
+
+		$newRow = $this->getDataFromResponse($this->response);
+		$this->rowId = $newRow['id'];
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		foreach ($newRow['data'] as $cell) {
+			Assert::assertEquals($props[$cell['columnId']], $cell['value']);
+		}
+
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/rows/'.$newRow['id'],
+		);
+
+		$rowToVerify = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		foreach ($rowToVerify['data'] as $cell) {
+			Assert::assertEquals($props[$cell['columnId']], $cell['value']);
+		}
+	}
+
+	/**
+	 * @Then user deletes last created row
+	 */
+	public function deleteRow(): void {
+		$this->sendRequest(
+			'DELETE',
+			'/apps/tables/api/1/rows/'.$this->rowId
+		);
+		$row = $this->getDataFromResponse($this->response);
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($row['id'], $this->rowId);
+
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/rows/'.$row['id'],
+		);
+		Assert::assertEquals(404, $this->response->getStatusCode());
+	}
+
+	/**
+	 * @Then set following values for last created row
+	 *
+	 * @param TableNode|null $properties
+	 */
+	public function updateRow(TableNode $properties = null): void {
+		$props = [];
+		foreach ($properties->getRows() as $row) {
+			$columnId = $this->tableColumns[$row[0]];
+			$props[$columnId] = $row[1];
+		}
+
+		$this->sendRequest(
+			'PUT',
+			'/apps/tables/api/1/rows/'.$this->rowId,
+			['data' => json_encode($props)]
+		);
+
+		$row = $this->getDataFromResponse($this->response);
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		foreach ($row['data'] as $cell) {
+			Assert::assertEquals($props[$cell['columnId']], $cell['value']);
+		}
+
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/rows/'.$row['id'],
+		);
+
+		$rowToVerify = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		foreach ($rowToVerify['data'] as $cell) {
+			Assert::assertEquals($props[$cell['columnId']], $cell['value']);
 		}
 	}
 
@@ -641,6 +747,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	/**
 	 * @Given /^group "([^"]*)" exists$/
 	 * @param string $group
+	 * @throws Exception
 	 */
 	public function assureGroupExists($group) {
 		$currentUser = $this->currentUser;
@@ -713,6 +820,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	/**
 	 * @Given /^user "([^"]*)" logs in$/
 	 * @param string $user
+	 * @throws GuzzleException
 	 */
 	public function userLogsIn(string $user) {
 		$loginUrl = $this->baseUrl . 'login';
@@ -753,9 +861,8 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	 * @param ResponseInterface $response
 	 * @return array
 	 */
-	protected function getDataFromResponse(ResponseInterface $response) {
-		$jsonBody = json_decode($response->getBody()->getContents(), true);
-		return $jsonBody;
+	protected function getDataFromResponse(ResponseInterface $response): array {
+		return json_decode($response->getBody()->getContents(), true);
 	}
 
 	/**
@@ -789,6 +896,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	 * @param string $url
 	 * @param TableNode|array|null $body
 	 * @param array $headers
+	 * @param array $options
 	 */
 	public function sendRequest($verb, $url, $body = null, array $headers = [], array $options = []) {
 		$fullUrl = $this->baseUrl . 'index.php' . $url;
@@ -801,6 +909,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	 * @param string $url
 	 * @param TableNode|array|null $body
 	 * @param array $headers
+	 * @param array $options
 	 */
 	public function sendOcsRequest($verb, $url, $body = null, array $headers = [], array $options = []) {
 		$fullUrl = $this->baseUrl . 'ocs/v2.php' . $url;

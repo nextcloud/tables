@@ -92,3 +92,38 @@ Feature: api/tablesapi
     Then table has at least following columns
       | First column  |
     Then user "participant1" deletes table with keyword "Column test"
+
+  Scenario: Create, modify and delete rows
+    Given table "Rows check" with emoji "👨🏻‍💻" exists for user "participant1"
+    Then column "one" exists with following properties
+      | type          | text                    |
+      | subtype       | line                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    Then column "two" exists with following properties
+      | type          | number                  |
+      | mandatory     | 1                       |
+      | numberDefault | 10                      |
+      | description   | This is a description!  |
+    Then column "three" exists with following properties
+      | type          | selection               |
+      | subtype       | check                   |
+      | mandatory     | 1                       |
+      | description   | This is a description!  |
+    Then column "four" exists with following properties
+      | type          | datetime                |
+      | subtype       | date                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    Then row exists with following values
+      | one           | AHA                     |
+      | two           | 88                      |
+      | three         | 1                       |
+      | four          | 2023-12-24              |
+    Then set following values for last created row
+      | one           | AHA!                    |
+      | two           | 99                      |
+      | three         | 0                       |
+      | four          | 2020-02-04              |
+    Then user deletes last created row
+    Then user "participant1" deletes table with keyword "Rows check"

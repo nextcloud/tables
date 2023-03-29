@@ -4,6 +4,7 @@ namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Service\ColumnService;
+use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Api\V1Api;
@@ -15,6 +16,7 @@ class Api1Controller extends ApiController {
 	private TableService $tableService;
 	private ShareService $shareService;
 	private ColumnService $columnService;
+	private RowService $rowService;
 
 	private V1Api $v1Api;
 
@@ -28,6 +30,7 @@ class Api1Controller extends ApiController {
 		TableService $service,
 		ShareService $shareService,
 		ColumnService $columnService,
+		RowService $rowService,
 		V1Api $v1Api,
 		string $userId
 	) {
@@ -35,6 +38,7 @@ class Api1Controller extends ApiController {
 		$this->tableService = $service;
 		$this->shareService = $shareService;
 		$this->columnService = $columnService;
+		$this->rowService = $rowService;
 		$this->userId = $userId;
 		$this->v1Api = $v1Api;
 	}
@@ -54,17 +58,6 @@ class Api1Controller extends ApiController {
 				return $this->tableService->findAll($this->userId);
 			});
 		}
-	}
-
-	/**
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 */
-	public function data(int $tableId, ?int $limit, ?int $offset): DataResponse {
-		return $this->handleError(function () use ($tableId, $limit, $offset) {
-			return $this->v1Api->getData($tableId, $limit, $offset);
-		});
 	}
 
 	/**
@@ -362,6 +355,99 @@ class Api1Controller extends ApiController {
 	public function deleteColumn(int $columnId): DataResponse {
 		return $this->handleError(function () use ($columnId) {
 			return $this->columnService->delete($columnId);
+		});
+	}
+
+
+
+
+
+
+
+
+
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function indexTableRowsSimple(int $tableId, ?int $limit, ?int $offset): DataResponse {
+		return $this->handleError(function () use ($tableId, $limit, $offset) {
+			return $this->v1Api->getData($tableId, $limit, $offset);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function indexTableRows(int $tableId, ?int $limit, ?int $offset): DataResponse {
+		return $this->handleError(function () use ($tableId, $limit, $offset) {
+			return $this->rowService->findAllByTable($tableId, $limit, $offset);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function getRow(int $rowId): DataResponse {
+		return $this->handleError(function () use ($rowId) {
+			return $this->rowService->find($rowId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function createRow(int $tableId, string $data): DataResponse {
+		$dataNew = [];
+		$array = json_decode($data, true);
+		foreach ($array as $key => $value) {
+			$dataNew[] = [
+				'columnId' => intval($key),
+				'value' => $value
+			];
+		}
+
+		return $this->handleError(function () use ($dataNew, $tableId) {
+			return $this->rowService->createComplete($tableId, $dataNew);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function updateRow(int $rowId, string $data): DataResponse {
+		$dataNew = [];
+		$array = json_decode($data, true);
+		foreach ($array as $key => $value) {
+			$dataNew[] = [
+				'columnId' => intval($key),
+				'value' => $value
+			];
+		}
+
+		return $this->handleError(function () use ($rowId, $dataNew) {
+			return $this->rowService->updateSet($rowId, $dataNew);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function deleteRow(int $rowId): DataResponse {
+		return $this->handleError(function () use ($rowId) {
+			return $this->rowService->delete($rowId);
 		});
 	}
 }

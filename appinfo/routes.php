@@ -31,8 +31,15 @@ return [
 		['name' => 'api1#getColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'GET'],
 		['name' => 'api1#deleteColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'DELETE'],
 		['name' => 'api1#updateColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'PUT'],
-		// -> rows
-		['name' => 'api1#data',	'url' => '/api/1/table/{tableId}/rows', 'verb' => 'GET'],
+		// -> rows -> table
+		['name' => 'api1#indexTableRowsSimple',	'url' => '/api/1/tables/{tableId}/rows/simple', 'verb' => 'GET'],
+		['name' => 'api1#indexTableRows',	'url' => '/api/1/tables/{tableId}/rows', 'verb' => 'GET'],
+		['name' => 'api1#createRow',	'url' => '/api/1/tables/{tableId}/rows', 'verb' => 'POST'],
+		// -> row
+		['name' => 'api1#getRow',	'url' => '/api/1/rows/{rowId}', 'verb' => 'GET'],
+		['name' => 'api1#updateRow',	'url' => '/api/1/rows/{rowId}', 'verb' => 'PUT'],
+		['name' => 'api1#deleteRow',	'url' => '/api/1/rows/{rowId}', 'verb' => 'DELETE'],
+
 
 		// table
 		['name' => 'table#index', 'url' => '/table', 'verb' => 'GET'],
