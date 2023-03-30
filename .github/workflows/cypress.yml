@@ -76,7 +76,7 @@ jobs:
         node-version: [16]
         containers: [1]
         php-versions: [ '8.1' ]
-        databases: [ 'sqlite' ]
+        databases: [ 'mysql', 'pgsql' ]
         server-versions: [ 'master' ]
 
     steps:
