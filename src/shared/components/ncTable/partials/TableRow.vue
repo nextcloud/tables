@@ -22,6 +22,14 @@
 				:column="col"
 				:row-id="row.id"
 				:value="getCellValue(col.id) === 'true'" />
+			<TableCellSelection v-else-if="col.type === 'selection' && !col.subtype"
+				:column="col"
+				:row-id="row.id"
+				:value="getCellValue(col.id) === 'true'" />
+			<TableCellMultiSelection v-else-if="col.type === 'selection' && col.subtype === 'multi'"
+				:column="col"
+				:row-id="row.id"
+				:value="getCellValue(col.id) === 'true'" />
 			<TableCellDateTime v-else-if="col.type === 'datetime'"
 				:column="col"
 				:row-id="row.id"
@@ -56,6 +64,8 @@ import TableCellStars from './TableCellStars.vue'
 import TableCellYesNo from './TableCellYesNo.vue'
 import TableCellDateTime from './TableCellDateTime.vue'
 import TableCellTextLine from './TableCellTextLine.vue'
+import TableCellSelection from './TableCellSelection.vue'
+import TableCellMultiSelection from './TableCellMultiSelection.vue'
 
 export default {
 	name: 'TableRow',
@@ -71,6 +81,8 @@ export default {
 		NcCheckboxRadioSwitch,
 		TableCellDateTime,
 		TableCellTextLine,
+		TableCellSelection,
+		TableCellMultiSelection,
 	},
 	props: {
 		row: {

@@ -68,25 +68,19 @@
 							:text-max-length.sync="textMaxLength" />
 					</div>
 
-					<!--
-			<div v-if="combinedType === 'selection'">
-				<div class="row">
-					<div class="col-4">
-						<h4>{{ t('tables', 'Selection column specific parameters') }}</h4>
+					<div v-if="combinedType === 'selection'" class="row space-L no-padding-on-mobile">
+						<div class="col-4 space-T">
+							<h4>{{ t('tables', 'Selection column specific parameters') }}</h4>
+						</div>
+						<SelectionForm :selection-options.sync="selectionOptions" :selection-default.sync="selectionDefault" />
 					</div>
-				</div>
-				<SelectionForm :selection-options.sync="selectionOptions" :selection-default.sync="selectionDefault" />
-			</div>
 
-			<div v-if="combinedType === 'selection-multi'">
-				<div class="row">
-					<div class="col-4">
-						<h4>{{ t('tables', 'Multiple selection column specific parameters') }}</h4>
+					<div v-if="combinedType === 'selection-multi'" class="row space-L no-padding-on-mobile">
+						<div class="col-4 space-T space-B">
+							<h4>{{ t('tables', 'Multiple selection column specific parameters') }}</h4>
+						</div>
+						<SelectionMultiForm :selection-options.sync="selectionOptions" :selection-default.sync="selectionDefault" />
 					</div>
-				</div>
-				<SelectionMultiForm :selection-options.sync="selectionOptions" :selection-default.sync="selectionDefault" />
-			</div>
--->
 
 					<div v-if="combinedType === 'selection-check'" class="row space-L no-padding-on-mobile">
 						<div class="col-4 space-T space-B">
@@ -145,6 +139,8 @@ import MainForm from '../../../shared/components/ncTable/partials/columnTypePart
 import DatetimeForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeForm.vue'
 import DatetimeDateForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeTimeForm.vue'
+import SelectionForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionForm.vue'
+import SelectionMultiForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionMultiForm.vue'
 import { NcModal, NcMultiselect } from '@nextcloud/vue'
 import { showError, showInfo, showSuccess, showWarning } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
@@ -165,6 +161,8 @@ export default {
 		DatetimeDateForm,
 		DatetimeForm,
 		DatetimeTimeForm,
+		SelectionForm,
+		SelectionMultiForm,
 	},
 	props: {
 		showModal: {
@@ -203,8 +201,8 @@ export default {
 				{ id: 'number-stars', label: t('tables', 'Stars rating') },
 				{ id: 'number-progress', label: t('tables', 'Progress bar') },
 
-				// { id: 'selection', label: t('tables', 'Selection') },
-				// { id: 'selection-multi', label: t('tables', 'Multiselect') },
+				{ id: 'selection', label: t('tables', 'Selection') },
+				{ id: 'selection-multi', label: t('tables', 'Multiselect') },
 				{ id: 'selection-check', label: t('tables', 'Yes/No') },
 
 				{ id: 'datetime', label: t('tables', 'Date and time') },
