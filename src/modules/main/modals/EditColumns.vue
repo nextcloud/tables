@@ -44,6 +44,12 @@
 						<TextLongForm v-if="editColumn.type === 'text' && editColumn.subtype === 'long'"
 							:text-default.sync="editColumn.textDefault"
 							:text-max-length.sync="editColumn.textMaxLength" />
+						<SelectionForm v-if="editColumn.type === 'selection' && !editColumn.subtype"
+							:selection-options.sync="editColumn.selectionOptions"
+							:selection-default.sync="editColumn.selectionDefault" />
+						<SelectionMultiForm v-if="editColumn.type === 'selection' && editColumn.subtype === 'multi'"
+							:selection-options.sync="editColumn.selectionOptions"
+							:selection-default.sync="editColumn.selectionDefault" />
 						<SelectionCheckForm v-if="editColumn.type === 'selection' && editColumn.subtype === 'check'"
 							:selection-default.sync="editColumn.selectionDefault" />
 						<DatetimeForm v-if="editColumn.type === 'datetime' && !editColumn.subtype"
@@ -71,33 +77,53 @@
 					<div class="col-1 block space-T" :class="{mandatory: column.mandatory}">
 						{{ column.title }}
 
-						<span v-if="column.type === 'number' && !column.subtype" class="block">{{ t('tables', 'Number') }}
-							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
-						<span v-if="column.type === 'number' && column.subtype === 'stars'" class="block">{{ t('tables', 'Star rating') }}
-							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
-						<span v-if="column.type === 'number' && column.subtype === 'progress'" class="block">{{ t('tables', 'Progress bar') }}
-							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
+						<span v-if="column.type === 'number' && !column.subtype" class="block">
+							{{ (column.mandatory) ? t('tables', 'Number') + ', ' + t('tables', 'Mandatory'): t('tables', 'Number') }}
+						</span>
 
-						<span v-if="column.type === 'text' && column.subtype === 'line'" class="block">{{ t('tables', 'Textline') }}
-							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
-						<span v-if="column.type === 'text' && column.subtype === 'long'" class="block">{{ t('tables', 'Long text') }}
-							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
-						<span v-if="column.type === 'text' && column.subtype === 'link'" class="block">{{ t('tables', 'Link') }}
-							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
+						<span v-if="column.type === 'number' && column.subtype === 'stars'" class="block">
+							{{ (column.mandatory) ? t('tables', 'Star rating') + ', ' + t('tables', 'Mandatory'): t('tables', 'Star rating') }}
+						</span>
 
-						<span v-if="column.type === 'selection' && !column.subtype" class="block">{{ t('tables', 'Selection') }}
-							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
-						<span v-if="column.type === 'selection' && column.subtype === 'multi'" class="block">{{ t('tables', 'Multiselect') }}
-							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
-						<span v-if="column.type === 'selection' && column.subtype === 'check'" class="block">{{ t('tables', 'Yes/No') }}
-							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
+						<span v-if="column.type === 'number' && column.subtype === 'progress'" class="block">
+							{{ (column.mandatory) ? t('tables', 'Progress bar') + ', ' + t('tables', 'Mandatory'): t('tables', 'Progress bar') }}
+						</span>
 
-						<span v-if="column.type === 'datetime' && !column.subtype" class="block">{{ t('tables', 'Date and time') }}
-							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
-						<span v-if="column.type === 'datetime' && column.subtype === 'date'" class="block">{{ t('tables', 'Date') }}
-							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
-						<span v-if="column.type === 'datetime' && column.subtype === 'time'" class="block">{{ t('tables', 'Time') }}
-							{{ (column.mandatory) ? ', ' + t('tables', 'Mandatory'): '' }}</span>
+						<span v-if="column.type === 'text' && column.subtype === 'line'" class="block">
+							{{ (column.mandatory) ? t('tables', 'Textline') + ', ' + t('tables', 'Mandatory'): t('tables', 'Textline') }}
+						</span>
+
+						<span v-if="column.type === 'text' && column.subtype === 'long'" class="block">
+							{{ (column.mandatory) ? t('tables', 'Textline') + ', ' + t('tables', 'Mandatory'): t('tables', 'Textline') }}
+						</span>
+
+						<span v-if="column.type === 'text' && column.subtype === 'link'" class="block">
+							{{ (column.mandatory) ? t('tables', 'Link') + ', ' + t('tables', 'Mandatory'): t('tables', 'Link') }}
+						</span>
+
+						<span v-if="column.type === 'selection' && !column.subtype" class="block">
+							{{ (column.mandatory) ? t('tables', 'Selection') + ', ' + t('tables', 'Mandatory'): t('tables', 'Selection') }}
+						</span>
+
+						<span v-if="column.type === 'selection' && column.subtype === 'multi'" class="block">
+							{{ (column.mandatory) ? t('tables', 'Multiselect') + ', ' + t('tables', 'Mandatory'): t('tables', 'Multiselect') }}
+						</span>
+
+						<span v-if="column.type === 'selection' && column.subtype === 'check'" class="block">
+							{{ (column.mandatory) ? t('tables', 'Yes/No') + ', ' + t('tables', 'Mandatory'): t('tables', 'Yes/No') }}
+						</span>
+
+						<span v-if="column.type === 'datetime' && !column.subtype" class="block">
+							{{ (column.mandatory) ? t('tables', 'Date and time') + ', ' + t('tables', 'Mandatory'): t('tables', 'Date and time') }}
+						</span>
+
+						<span v-if="column.type === 'datetime' && column.subtype === 'date'" class="block">
+							{{ (column.mandatory) ? t('tables', 'Date') + ', ' + t('tables', 'Mandatory'): t('tables', 'Date') }}
+						</span>
+
+						<span v-if="column.type === 'datetime' && column.subtype === 'time'" class="block">
+							{{ (column.mandatory) ? t('tables', 'Time') + ', ' + t('tables', 'Mandatory'): t('tables', 'Time') }}
+						</span>
 					</div>
 					<div class="col-1 space-T">
 						{{ column.description | truncate(50, '...') }}
@@ -111,6 +137,8 @@
 								<TextLineTableDisplay v-if="column.type === 'text' && column.subtype === 'line'" :column="column" />
 								<TextLongTableDisplay v-if="column.type === 'text' && column.subtype === 'long'" :column="column" />
 								<TextLinkTableDisplay v-if="column.type === 'text' && column.subtype === 'link'" :column="column" />
+								<SelectionTableDisplay v-if="column.type === 'selection' && !column.subtype" :column="column" />
+								<SelectionMultiTableDisplay v-if="column.type === 'selection' && column.subtype === 'multi'" :column="column" />
 								<SelectionCheckTableDisplay v-if="column.type === 'selection' && column.subtype === 'check'" :column="column" />
 								<DatetimeTableDisplay v-if="column.type === 'datetime' && !column.subtype" :column="column" />
 								<DatetimeDateTableDisplay v-if="column.type === 'datetime' && column.subtype === 'date'" :column="column" />
@@ -181,7 +209,11 @@ import TextLineForm from '../../../shared/components/ncTable/partials/columnType
 import TextLongForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/TextLongForm.vue'
 import MainForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/MainForm.vue'
 import SelectionCheckTableDisplay from '../../../shared/components/ncTable/partials/columnTypePartials/tableDisplay/SelectionCheckTableDisplay.vue'
+import SelectionTableDisplay from '../../../shared/components/ncTable/partials/columnTypePartials/tableDisplay/SelectionTableDisplay.vue'
+import SelectionMultiTableDisplay from '../../../shared/components/ncTable/partials/columnTypePartials/tableDisplay/SelectionMultiTableDisplay.vue'
 import SelectionCheckForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionCheckForm.vue'
+import SelectionForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionForm.vue'
+import SelectionMultiForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionMultiForm.vue'
 import DatetimeForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeForm.vue'
 import DatetimeDateForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeTimeForm.vue'
@@ -216,6 +248,10 @@ export default {
 		TextLineForm,
 		TextLongForm,
 		MainForm,
+		SelectionForm,
+		SelectionMultiForm,
+		SelectionTableDisplay,
+		SelectionMultiTableDisplay,
 	},
 	filters: {
 		truncate(text, length, suffix) {
@@ -319,7 +355,7 @@ export default {
 			}
 		},
 		async updateColumn() {
-			const res = await this.$store.dispatch('updateColumn', { id: this.editColumn.id, data: this.editColumn })
+			const res = await this.$store.dispatch('updateColumn', { id: this.editColumn.id, data: { ...this.editColumn } })
 			if (res) {
 				showSuccess(t('tables', 'The column "{column}" was updated.', { column: this.editColumn.title }))
 			}

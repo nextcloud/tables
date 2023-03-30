@@ -22,6 +22,14 @@
 				:column="col"
 				:row-id="row.id"
 				:value="getCellValue(col.id) === 'true'" />
+			<TableCellSelection v-else-if="col.type === 'selection' && !col.subtype"
+				:column="col"
+				:row-id="row.id"
+				:value="parseInt(getCellValue(col.id))" />
+			<TableCellMultiSelection v-else-if="col.type === 'selection' && col.subtype === 'multi'"
+				:column="col"
+				:row-id="row.id"
+				:value="getCellValue(col.id)" />
 			<TableCellDateTime v-else-if="col.type === 'datetime'"
 				:column="col"
 				:row-id="row.id"
@@ -36,7 +44,7 @@
 				:column="col" />
 		</td>
 		<td>
-			<NcButton type="primary" @click="$emit('edit-row', row.id)">
+			<NcButton type="primary" :aria-label="t('tables', 'Edit row')" @click="$emit('edit-row', row.id)">
 				<template #icon>
 					<Pencil :size="20" />
 				</template>
@@ -56,6 +64,8 @@ import TableCellStars from './TableCellStars.vue'
 import TableCellYesNo from './TableCellYesNo.vue'
 import TableCellDateTime from './TableCellDateTime.vue'
 import TableCellTextLine from './TableCellTextLine.vue'
+import TableCellSelection from './TableCellSelection.vue'
+import TableCellMultiSelection from './TableCellMultiSelection.vue'
 
 export default {
 	name: 'TableRow',
@@ -71,6 +81,8 @@ export default {
 		NcCheckboxRadioSwitch,
 		TableCellDateTime,
 		TableCellTextLine,
+		TableCellSelection,
+		TableCellMultiSelection,
 	},
 	props: {
 		row: {
