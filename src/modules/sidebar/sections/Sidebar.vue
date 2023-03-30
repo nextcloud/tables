@@ -31,7 +31,7 @@ import SidebarIntegration from './SidebarIntegration.vue'
 import { NcAppSidebar, NcAppSidebarTab } from '@nextcloud/vue'
 import { mapGetters, mapState } from 'vuex'
 import Creation from 'vue-material-design-icons/Creation.vue'
-import tablePermissions from '../../main/mixins/tablePermissions'
+import tablePermissions from '../../main/mixins/tablePermissions.js'
 
 export default {
 	name: 'Sidebar',

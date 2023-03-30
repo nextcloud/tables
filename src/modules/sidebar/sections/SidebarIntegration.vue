@@ -33,15 +33,9 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import { generateUrl } from '@nextcloud/router'
-import tablePermissions from '../../main/mixins/tablePermissions'
-import RadioboxBlankIcon from 'vue-material-design-icons/RadioboxBlank.vue'
-import CheckCircleOutline from 'vue-material-design-icons/CheckCircleOutline.vue'
+import tablePermissions from '../../main/mixins/tablePermissions.js'
 
 export default {
-	components: {
-		RadioboxBlankIcon,
-		CheckCircleOutline,
-	},
 
 	mixins: [tablePermissions],
 
