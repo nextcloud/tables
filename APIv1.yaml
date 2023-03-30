@@ -592,7 +592,7 @@ paths:
     /tables/{tableId}/rows:
         get:
             summary: Get an array of rows
-            description: There is a default row limit by 1000 rows. If you need more (or want to limit less), you can set a limit on your own. Additionally set an offset if needed, would be good for lazy loading etc. Shipped with v0.3.0.
+            description: There is a default row limit by 1000 rows. If you need more (or want to limit less), you can set a limit on your own. Additionally set an offset if needed, would be good for lazy loading etc. Shipped with v0.4.0.
             tags:
                 - Rows
             operationId: listRows
@@ -945,7 +945,14 @@ components:
                 lastEditAt:
                     type: string
                 data:
-                    type: object
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            columnId:
+                                type: integer
+                            value:
+                                type: string
         columnProperties:
             type: object
             properties:
