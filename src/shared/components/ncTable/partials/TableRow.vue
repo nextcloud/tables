@@ -25,11 +25,11 @@
 			<TableCellSelection v-else-if="col.type === 'selection' && !col.subtype"
 				:column="col"
 				:row-id="row.id"
-				:value="getCellValue(col.id) === 'true'" />
+				:value="parseInt(getCellValue(col.id))" />
 			<TableCellMultiSelection v-else-if="col.type === 'selection' && col.subtype === 'multi'"
 				:column="col"
 				:row-id="row.id"
-				:value="getCellValue(col.id) === 'true'" />
+				:value="getCellValue(col.id)" />
 			<TableCellDateTime v-else-if="col.type === 'datetime'"
 				:column="col"
 				:row-id="row.id"

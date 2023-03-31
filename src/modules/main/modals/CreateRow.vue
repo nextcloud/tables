@@ -25,6 +25,12 @@
 				<NumberProgressForm v-if="column.type === 'number' && column.subtype === 'progress'"
 					:column="column"
 					:value.sync="row[column.id]" />
+				<SelectionForm v-if="column.type === 'selection' && !column.subtype"
+					:column="column"
+					:value.sync="row[column.id]" />
+				<SelectionMultiForm v-if="column.type === 'selection' && column.subtype === 'multi'"
+					:column="column"
+					:value.sync="row[column.id]" />
 				<SelectionCheckForm v-if="column.type === 'selection' && column.subtype === 'check'"
 					:column="column"
 					:value.sync="row[column.id]" />
@@ -67,6 +73,8 @@ import NumberForm from '../../../shared/components/ncTable/partials/rowTypeParti
 import NumberStarsForm from '../../../shared/components/ncTable/partials/rowTypePartials/NumberStarsForm.vue'
 import NumberProgressForm from '../../../shared/components/ncTable/partials/rowTypePartials/NumberProgressForm.vue'
 import SelectionCheckForm from '../../../shared/components/ncTable/partials/rowTypePartials/SelectionCheckForm.vue'
+import SelectionForm from '../../../shared/components/ncTable/partials/rowTypePartials/SelectionForm.vue'
+import SelectionMultiForm from '../../../shared/components/ncTable/partials/rowTypePartials/SelectionMultiForm.vue'
 import DatetimeForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeForm.vue'
 import DatetimeDateForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeTimeForm.vue'
@@ -75,6 +83,8 @@ export default {
 	name: 'CreateRow',
 	components: {
 		SelectionCheckForm,
+		SelectionForm,
+		SelectionMultiForm,
 		NcModal,
 		TextLineForm,
 		TextLongForm,

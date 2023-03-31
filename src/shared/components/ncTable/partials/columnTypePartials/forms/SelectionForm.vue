@@ -1,19 +1,25 @@
 <template>
 	<div style="width: 100%">
 		<div class="row">
+			<div class="col-4 title space-T">
+				{{ t('tables', 'Options') }}
+			</div>
 			<div v-for="opt in localSelectionOptions" :key="opt.id" class="col-4 inline">
 				<NcCheckboxRadioSwitch :value="'' + opt.id" type="radio" :checked.sync="localSelectionDefault" />
 				<input :value="opt.label" @input="updateLabel(opt.id, $event)">
-				<NcButton type="tertiary" @click="deleteOption(opt.id)">
+				<NcButton type="tertiary" :aria-label="t('tables', 'Delete option')" @click="deleteOption(opt.id)">
 					<template #icon>
 						<DeleteOutline :size="20" />
 					</template>
 				</NcButton>
 			</div>
-			<NcButton @click="addOption">
+			<NcButton :aria-label="t('tables', 'Add option')" @click="addOption">
 				{{ t('tables', 'Add option') }}
 			</NcButton>
-			<p>{{ t('tables', 'You can set a default value by clicking on one of the radio buttons next to the label fields.') }}</p>
+			<p class="span">
+				{{ t('tables', 'You can set a default value by clicking on one of the radio buttons next to the label fields.') }}
+				<a v-if="localSelectionDefault" @click="localSelectionDefault = ''">{{ t('tables', 'Click here to unset default selection.') }}</a>
+			</p>
 		</div>
 	</div>
 </template>
@@ -31,7 +37,7 @@ export default {
 	},
 	props: {
 		selectionOptions: {
-			type: String,
+			type: Array,
 			default: null,
 		},
 		selectionDefault: {
@@ -51,7 +57,7 @@ export default {
 		localSelectionOptions: {
 			get() {
 				if (this.selectionOptions) {
-					return [...JSON.parse(this.selectionOptions)]
+					return this.selectionOptions
 				}
 				return [
 					{
@@ -65,7 +71,7 @@ export default {
 				]
 			},
 			set(value) {
-				this.$emit('update:selectionOptions', JSON.stringify([...value]))
+				this.$emit('update:selectionOptions', [...value])
 			},
 		},
 	},

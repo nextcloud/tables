@@ -44,6 +44,12 @@
 						<TextLongForm v-if="editColumn.type === 'text' && editColumn.subtype === 'long'"
 							:text-default.sync="editColumn.textDefault"
 							:text-max-length.sync="editColumn.textMaxLength" />
+						<SelectionForm v-if="editColumn.type === 'selection' && !editColumn.subtype"
+							:selection-options.sync="editColumn.selectionOptions"
+							:selection-default.sync="editColumn.selectionDefault" />
+						<SelectionMultiForm v-if="editColumn.type === 'selection' && editColumn.subtype === 'multi'"
+							:selection-options.sync="editColumn.selectionOptions"
+							:selection-default.sync="editColumn.selectionDefault" />
 						<SelectionCheckForm v-if="editColumn.type === 'selection' && editColumn.subtype === 'check'"
 							:selection-default.sync="editColumn.selectionDefault" />
 						<DatetimeForm v-if="editColumn.type === 'datetime' && !editColumn.subtype"
@@ -111,6 +117,8 @@
 								<TextLineTableDisplay v-if="column.type === 'text' && column.subtype === 'line'" :column="column" />
 								<TextLongTableDisplay v-if="column.type === 'text' && column.subtype === 'long'" :column="column" />
 								<TextLinkTableDisplay v-if="column.type === 'text' && column.subtype === 'link'" :column="column" />
+								<SelectionTableDisplay v-if="column.type === 'selection' && !column.subtype" :column="column" />
+								<SelectionMultiTableDisplay v-if="column.type === 'selection' && column.subtype === 'multi'" :column="column" />
 								<SelectionCheckTableDisplay v-if="column.type === 'selection' && column.subtype === 'check'" :column="column" />
 								<DatetimeTableDisplay v-if="column.type === 'datetime' && !column.subtype" :column="column" />
 								<DatetimeDateTableDisplay v-if="column.type === 'datetime' && column.subtype === 'date'" :column="column" />
@@ -181,7 +189,11 @@ import TextLineForm from '../../../shared/components/ncTable/partials/columnType
 import TextLongForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/TextLongForm.vue'
 import MainForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/MainForm.vue'
 import SelectionCheckTableDisplay from '../../../shared/components/ncTable/partials/columnTypePartials/tableDisplay/SelectionCheckTableDisplay.vue'
+import SelectionTableDisplay from '../../../shared/components/ncTable/partials/columnTypePartials/tableDisplay/SelectionTableDisplay.vue'
+import SelectionMultiTableDisplay from '../../../shared/components/ncTable/partials/columnTypePartials/tableDisplay/SelectionMultiTableDisplay.vue'
 import SelectionCheckForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionCheckForm.vue'
+import SelectionForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionForm.vue'
+import SelectionMultiForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionMultiForm.vue'
 import DatetimeForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeForm.vue'
 import DatetimeDateForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeTimeForm.vue'
@@ -216,6 +228,10 @@ export default {
 		TextLineForm,
 		TextLongForm,
 		MainForm,
+		SelectionForm,
+		SelectionMultiForm,
+		SelectionTableDisplay,
+		SelectionMultiTableDisplay,
 	},
 	filters: {
 		truncate(text, length, suffix) {
@@ -319,7 +335,7 @@ export default {
 			}
 		},
 		async updateColumn() {
-			const res = await this.$store.dispatch('updateColumn', { id: this.editColumn.id, data: this.editColumn })
+			const res = await this.$store.dispatch('updateColumn', { id: this.editColumn.id, data: { ...this.editColumn } })
 			if (res) {
 				showSuccess(t('tables', 'The column "{column}" was updated.', { column: this.editColumn.title }))
 			}

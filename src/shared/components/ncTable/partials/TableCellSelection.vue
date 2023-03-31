@@ -1,13 +1,13 @@
 <template>
 	<div>
-		{{ value }}
+		{{ getLabel }}
 	</div>
 </template>
 
 <script>
 
 export default {
-	name: 'TableCellYesNo',
+	name: 'TableCellSelection',
 
 	props: {
 		column: {
@@ -21,8 +21,14 @@ export default {
 		},
 
 		value: {
-			type: Boolean,
-			default: false,
+			type: Number,
+			default: null,
+		},
+	},
+	computed: {
+		getLabel() {
+			const i = this.column?.selectionOptions?.findIndex((obj) => obj.id === this.value)
+			return this.column?.selectionOptions[i]?.label || null
 		},
 	},
 }

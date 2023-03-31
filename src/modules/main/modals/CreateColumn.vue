@@ -273,8 +273,8 @@ export default {
 					textDefault: this.textDefault,
 					textAllowedPattern: this.textAllowedPattern,
 					textMaxLength: this.textMaxLength,
-					selectionOptions: this.selectionOptions,
-					selectionDefault: this.selectionDefault ? 'true' : 'false',
+					selectionOptions: JSON.stringify(this.selectionOptions),
+					selectionDefault: this.selectionDefault,
 					datetimeDefault: this.datetimeDefault,
 					tableId: this.activeTable.id,
 				}
