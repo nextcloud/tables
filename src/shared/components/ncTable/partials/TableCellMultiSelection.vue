@@ -1,8 +1,8 @@
 <template>
 	<div>
 		<ul>
-			<li v-for="value in getDefaultObjects" :key="value.id">
-				{{ value.label }}
+			<li v-for="v in getDefaultObjects" :key="v.id">
+				{{ v.label }}
 			</li>
 		</ul>
 	</div>

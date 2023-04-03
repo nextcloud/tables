@@ -155,8 +155,8 @@ export default {
 		isValueValidForColumn(value, column) {
 			if (column.type === 'selection') {
 				if (
-					value instanceof Array && value.length > 0
-					|| value === parseInt(value)
+					(value instanceof Array && value.length > 0)
+					|| (value === parseInt(value))
 				) {
 					return true
 				}

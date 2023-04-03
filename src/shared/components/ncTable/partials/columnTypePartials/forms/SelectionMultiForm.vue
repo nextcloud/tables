@@ -37,7 +37,7 @@ export default {
 	props: {
 		selectionOptions: {
 			type: Array,
-			default: [],
+			default: () => [],
 		},
 		selectionDefault: {
 			type: String,

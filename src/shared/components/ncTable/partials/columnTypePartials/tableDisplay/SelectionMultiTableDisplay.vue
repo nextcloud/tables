@@ -60,7 +60,7 @@ export default {
 				return obj.id === id
 			})
 			console.debug('index is ', i)
-			if (i != undefined) {
+			if (i !== undefined) {
 				return this.column?.selectionOptions[i]
 			}
 

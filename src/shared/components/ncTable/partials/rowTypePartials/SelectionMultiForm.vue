@@ -88,7 +88,7 @@ export default {
 			const i = this.column?.selectionOptions?.findIndex(obj => {
 				return obj.id === id
 			})
-			if (i != undefined) {
+			if (i !== undefined) {
 				return this.column?.selectionOptions[i]
 			}
 		},
