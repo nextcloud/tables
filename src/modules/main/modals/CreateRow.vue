@@ -120,12 +120,23 @@ export default {
 			this.reset()
 			this.$emit('close')
 		},
+		isValueValidForColumn(value, column) {
+			if (column.type === 'selection') {
+				if (
+					value instanceof Array && value.length > 0
+					|| value === parseInt(value)
+				) {
+					return true
+				}
+				return false
+			}
+			return !!value || value === 0
+		},
 		async actionConfirm(closeModal) {
 			let mandatoryFieldsEmpty = false
 			this.columns.forEach(col => {
-				console.debug('check for mandatory columns', col)
 				if (col.mandatory) {
-					const validValue = (!!this.row[col.id] || this.row[col.id] === 0)
+					const validValue = this.isValueValidForColumn(this.row[col.id], col)
 					mandatoryFieldsEmpty = mandatoryFieldsEmpty || !validValue
 				}
 			})

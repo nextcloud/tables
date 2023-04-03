@@ -3,9 +3,8 @@
 		<div class="fix-col-1" :class="{ mandatory: column.mandatory }">
 			{{ column.title }}
 		</div>
-		<div class="fix-col-1" :class="{ 'space-B': !column.description }" />
-		<div class="fix-col-1 hide-s">
-			&nbsp;<NcMultiselect :option="column.selectionOptions" :close-on-select="true" />
+		<div class="fix-col-2" :class="{ 'space-B': !column.description }">
+			<NcMultiselect v-model="localValues" :tag-width="80" :options="column.selectionOptions" track-by="id" label="label" :multiple="true" />
 		</div>
 		<div v-if="column.description" class="fix-col-1 p span space-B">
 			<div class="space-L-small">
@@ -32,26 +31,73 @@ export default {
 			default: null,
 		},
 		value: {
-			type: String,
-			default: '',
+			type: Array,
+			default: null,
 		},
 	},
 	data() {
 		return {
+			localSelectedValue: null,
 		}
 	},
 	computed: {
-		localValue: {
+		localValues: {
 			get() {
-				if (this.value) {
-					return this.value === 'true'
+				if (this.value !== null) {
+					return this.getValueObjects
 				} else {
-					const defaultValueBool = this.column.selectionDefault === 'true'
-					this.$emit('update:value', '' + defaultValueBool)
-					return defaultValueBool
+					this.$emit('update:value', this.getDefaultIds)
+					return this.getDefaultObjects
 				}
 			},
-			set(v) { this.$emit('update:value', '' + v) },
+			set(v) { this.$emit('update:value', this.getIdArrayFromObjects(v)) },
+		},
+		getDefaultIds() {
+			const ids = []
+			if (this.column?.selectionDefault === null || this.column?.selectionDefault === '') {
+				return ids
+			}
+			JSON.parse(this.column?.selectionDefault).forEach(def => {
+				ids.push(parseInt(def))
+			})
+			return ids
+		},
+		getDefaultObjects() {
+			const defaultObjects = []
+			this.getDefaultIds.forEach(id => {
+				const o = this.getOptionObject(id)
+				if (o) {
+					defaultObjects.push(o)
+				}
+			})
+			return defaultObjects
+		},
+		getValueObjects() {
+			const objects = []
+			this.value.forEach(id => {
+				const o = this.getOptionObject(id)
+				if (o) {
+					objects.push(o)
+				}
+			})
+			return objects
+		},
+	},
+	methods: {
+		getOptionObject(id) {
+			const i = this.column?.selectionOptions?.findIndex(obj => {
+				return obj.id === id
+			})
+			if (i != undefined) {
+				return this.column?.selectionOptions[i]
+			}
+		},
+		getIdArrayFromObjects(objects) {
+			const ids = []
+			objects.forEach(o => {
+				ids.push(o.id)
+			})
+			return ids
 		},
 	},
 }
@@ -66,6 +112,10 @@ export default {
 	.hint-padding-left {
 		padding-left: 0;
 	}
+}
+
+.multiselect {
+	width: 100%;
 }
 
 </style>

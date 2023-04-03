@@ -25,11 +25,11 @@ export default {
 	},
 	computed: {
 		getLabelForDefault() {
-			const i = this.column.selectionOptions?.findIndex((obj) => obj.id === this.getDefaultValue) || null
+			const i = this.getSelectionOptions?.findIndex((obj) => obj.id === this.getDefaultValue)
 			return this.getSelectionOptions[i]?.label || null
 		},
 		getDefaultValue() {
-			return parseInt(this.column.selectionDefault) || null
+			return parseInt(this.column.selectionDefault)
 		},
 		getSelectionOptions() {
 			return this.column.selectionOptions

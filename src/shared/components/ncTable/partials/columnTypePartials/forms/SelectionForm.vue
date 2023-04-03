@@ -59,7 +59,7 @@ export default {
 				if (this.selectionOptions) {
 					return this.selectionOptions
 				}
-				return [
+				const options = [
 					{
 						id: 0,
 						label: t('tables', 'First option'),
@@ -69,6 +69,8 @@ export default {
 						label: t('tables', 'Second option'),
 					},
 				]
+				this.$emit('update:selectionOptions', options)
+				return options
 			},
 			set(value) {
 				this.$emit('update:selectionOptions', [...value])

@@ -1,13 +1,17 @@
 <template>
 	<div>
-		{{ value }}
+		<ul>
+			<li v-for="value in getDefaultObjects" :key="value.id">
+				{{ value.label }}
+			</li>
+		</ul>
 	</div>
 </template>
 
 <script>
 
 export default {
-	name: 'TableCellYesNo',
+	name: 'TableCellMultiSelection',
 
 	props: {
 		column: {
@@ -21,9 +25,36 @@ export default {
 		},
 
 		value: {
-			type: Boolean,
-			default: false,
+			type: Array,
+			default: null,
+		},
+	},
+	computed: {
+		getDefaultObjects() {
+			const defaultObjects = []
+			this.value.forEach(id => {
+				defaultObjects.push(this.getOptionObject(parseInt(id)))
+			})
+			return defaultObjects
+		},
+	},
+	methods: {
+		getOptionObject(id) {
+			const i = this.column?.selectionOptions?.findIndex(obj => {
+				return obj.id === id
+			})
+			if (i !== undefined) {
+				return this.column?.selectionOptions[i] || null
+			}
 		},
 	},
 }
 </script>
+<style lang="scss" scoped>
+
+ul {
+	list-style-type: square;
+	padding-left: calc(var(--default-grid-baseline) * 3);
+}
+
+</style>
