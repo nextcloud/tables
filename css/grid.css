@@ -200,7 +200,7 @@
 		display: none;
 	}
 	.col-1 { width: calc(50% - 20px); }
-	.col-2 { width: calc(100% - 0px); }
+	.col-2 { width: calc(100% - 20px); }
 	.fix-col-1 { width: 50%; }
 	.fix-col-2 { width: 100%; }
 
@@ -235,4 +235,12 @@ input.missing {
 
 .row .linebreak {
 	line-break: anywhere;
+}
+
+.block {
+	display: block;
+}
+
+.end {
+	justify-content: end;
 }

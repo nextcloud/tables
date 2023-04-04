@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal"
+	<NcModal v-if="showModal" size="normal"
 		@close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
@@ -11,8 +11,8 @@
 				<div class="col-4 mandatory">
 					{{ t('tables', 'Title') }}
 				</div>
-				<div class="col-3" style="display: inline-flex;">
-					<NcEmojiPicker :close-on-select="true" @select="emoji => icon = emoji">
+				<div class="col-4" style="display: inline-flex;">
+					<NcEmojiPicker :close-on-select="true" @select="setIcon">
 						<NcButton type="tertiary"
 							:aria-label="t('tables', 'Select emoji for table')"
 							:title="t('tables', 'Select emoji')"
@@ -27,45 +27,23 @@
 				</div>
 			</div>
 			<div class="row space-T">
-				<div class="box-2" style="height:120px;">
-					<div class="header">
-						<NcCheckboxRadioSwitch name="template"
-							type="radio"
-							value="custom"
-							:checked.sync="templateChoice">
-							{{ t('tables', '🔧 Custom table') }}
-						</NcCheckboxRadioSwitch>
-					</div>
-					<p>
-						{{ t('tables', 'Custom table from scratch.') }}
-					</p>
+				<div class="col-2 block space-R space-B">
+					<NcTile
+						:title="t('tables', '🔧 Custom table')"
+						:body="t('tables', 'Custom table from scratch.')"
+						:active="templateChoice === 'custom'"
+						@set-template="setTemplate('custom')" />
 				</div>
-
-				<!-- templates boxes -->
-				<div v-for="template in templates"
-					:key="template.name"
-					class="box-2"
-					style="height:120px; overflow: auto;">
-					<div class="header">
-						<NcCheckboxRadioSwitch name="template"
-							type="radio"
-							:value="template.name"
-							:checked.sync="templateChoice"
-							@update:checked="icon = template.icon">
-							{{ template.icon + ' ' + template.title }}
-						</NcCheckboxRadioSwitch>
-					</div>
-					<p>
-						{{ template.description }}
-					</p>
+				<div v-for="template in templates" :key="template.name" class="col-2 block space-R space-B">
+					<NcTile
+						:title="template.icon + ' ' + template.title"
+						:body="template.description"
+						:active="templateChoice === template.name"
+						@set-template="setTemplate(template.name)" />
 				</div>
 			</div>
-			<div class="row">
-				<div class="fix-col-4 space-B space-T">
-					<NcButton type="secondary" @click="$emit('close')">
-						{{ t('tables', 'Cancel') }}
-					</NcButton>
-        &nbsp;&nbsp;
+			<div class="row space-R">
+				<div class="fix-col-4 end">
 					<NcButton type="primary" @click="submit">
 						{{ t('tables', 'Create table') }}
 					</NcButton>
@@ -76,11 +54,12 @@
 </template>
 
 <script>
-import { NcModal, NcEmojiPicker, NcButton, NcCheckboxRadioSwitch } from '@nextcloud/vue'
+import { NcModal, NcEmojiPicker, NcButton } from '@nextcloud/vue'
 import { showError, showWarning } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
+import NcTile from '../../../shared/components/NcTile/NcTile.vue'
 
 export default {
 	name: 'CreateTable',
@@ -88,7 +67,7 @@ export default {
 		NcModal,
 		NcEmojiPicker,
 		NcButton,
-		NcCheckboxRadioSwitch,
+		NcTile,
 	},
 	props: {
 		showModal: {
@@ -103,6 +82,7 @@ export default {
 			errorTitle: false,
 			templates: null,
 			templateChoice: 'custom',
+			customIconChosen: false,
 		}
 	},
 	watch: {
@@ -121,6 +101,22 @@ export default {
 		this.loadTemplatesFromBE()
 	},
 	methods: {
+		setIcon(icon) {
+			this.icon = icon
+			this.customIconChosen = true
+		},
+		setTemplate(name) {
+			this.templateChoice = name
+
+			if (!this.customIconChosen) {
+				if (name === 'custom') {
+					this.icon = '🔧'
+				} else {
+					const templateObject = this.templates?.find(item => item.name === name) || ''
+					this.icon = templateObject?.icon
+				}
+			}
+		},
 		loadEmoji() {
 			const emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '🫠', '😉', '😊', '😇']
 			this.icon = emojis[~~(Math.random() * emojis.length)]
@@ -160,6 +156,7 @@ export default {
 			this.errorTitle = false
 			this.templateChoice = 'custom'
 			this.icon = ''
+			this.customIconChosen = false
 		},
 		async loadTemplatesFromBE() {
 			try {
@@ -177,3 +174,10 @@ export default {
 	},
 }
 </script>
+<style lang="scss" scoped>
+
+.modal__content {
+	padding-right: 0 !important;
+}
+
+</style>

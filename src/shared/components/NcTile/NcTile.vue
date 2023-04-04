@@ -1,0 +1,78 @@
+<template>
+	<div class="tile" :class="{active: localeActive}" @click="$emit('set-template')">
+		<h3>{{ title }}</h3>
+		<p>{{ body }}</p>
+	</div>
+</template>
+<script>
+
+export default {
+	components: {
+	},
+
+	filters: {
+		truncate(string, num) {
+			if (string.length >= num) {
+				return string.substring(0, num) + '...'
+			} else {
+				return string
+			}
+		},
+	},
+
+	mixins: [],
+
+	props: {
+		active: {
+		      type: Boolean,
+		      default: false,
+		    },
+		title: {
+		      type: String,
+		      default: '',
+		    },
+		body: {
+		      type: String,
+		      default: '',
+		    },
+	},
+
+	computed: {
+		localeActive: {
+			get() {
+				return this.active
+			},
+			set(v) {
+				this.$emit('update:active', !!v)
+			},
+		},
+	},
+
+	methods: {
+	},
+
+}
+</script>
+<style lang="scss" scoped>
+
+.tile {
+	background: var(--color-main-background);
+	border: 2px solid var(--color-border);
+	border-radius: var(--border-radius-large);
+	min-height: 110px;
+	padding: calc(var(--default-grid-baseline) * 3);
+}
+
+.tile, .tile > * {
+	cursor: pointer;
+}
+
+.tile:hover {
+	border-color: var(--color-primary-element);
+}
+
+.active {
+	border-color: var(--color-primary-element);
+}
+
+</style>
