@@ -76,7 +76,7 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function updateTable(int $tableId, string $title, string $emoji = null): DataResponse {
+	public function updateTable(int $tableId, ?string $title, ?string $emoji): DataResponse {
 		return $this->handleError(function () use ($tableId, $title, $emoji) {
 			return $this->tableService->update($tableId, $title, $emoji);
 		});
