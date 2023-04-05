@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal" size="large" @close="actionCancel">
+	<NcModal v-if="showModal" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
@@ -45,26 +45,22 @@
 					:value.sync="localRow[column.id]" />
 			</div>
 			<div class="row">
-				<div class="fix-col-2 space-B space-T">
-					<NcButton type="secondary" @click="actionCancel">
-						{{ t('tables', 'Cancel') }}
-					</NcButton>
-          &nbsp;&nbsp;
+				<div class="fix-col-4 space-T" :class="{'justify-between': showDeleteButton, 'end': !showDeleteButton}">
+					<div v-if="showDeleteButton">
+						<NcButton v-if="!prepareDeleteRow" type="error" @click="prepareDeleteRow = true">
+							{{ t('tables', 'Delete') }}
+						</NcButton>
+						<NcButton v-if="prepareDeleteRow"
+							:wide="true"
+							type="error"
+							@click="actionDeleteRow">
+							{{ t('tables', 'I really want to delete this row!') }}
+						</NcButton>
+					</div>
 					<NcButton v-if="canUpdateDataActiveTable && !localLoading" type="primary" @click="actionConfirm">
 						{{ t('tables', 'Save') }}
 					</NcButton>
 					<div v-if="localLoading" class="icon-loading" style="margin-left: 20px;" />
-				</div>
-				<div v-if="canDeleteDataActiveTable && !localLoading" class="fix-col-2 space-B space-T" style="justify-content: end;">
-					<NcButton v-if="!prepareDeleteRow" type="error" @click="prepareDeleteRow = true">
-						{{ t('tables', 'Delete') }}
-					</NcButton>
-					<NcButton v-if="prepareDeleteRow"
-						:wide="true"
-						type="error"
-						@click="actionDeleteRow">
-						{{ t('tables', 'I really want to delete this row!') }}
-					</NcButton>
 				</div>
 			</div>
 		</div>
@@ -132,6 +128,9 @@ export default {
 	},
 	computed: {
 		...mapGetters(['activeTable']),
+		showDeleteButton() {
+			return this.canDeleteDataActiveTable && !this.localLoading
+		},
 	},
 	watch: {
 		row() {

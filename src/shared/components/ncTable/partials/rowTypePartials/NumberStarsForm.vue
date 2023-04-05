@@ -1,37 +1,24 @@
 <template>
-	<div class="row">
-		<div class="fix-col-1" :class="{ mandatory: column.mandatory }">
-			{{ column.title }}
+	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description">
+		<button :aria-label="t('tables', 'reduce stars')" @click="less">
+			-
+		</button>
+		<div style="font-size: 1.4em; padding: 7px;">
+			{{ getStars }}
 		</div>
-		<div class="fix-col-1" :class="{ 'space-B': !column.description }" style="display: inline-flex;">
-			<button @click="less">
-				-
-			</button>
-			<div style="font-size: 1.4em; padding: 7px;">
-				{{ getStars }}
-			</div>
-			<button @click="more">
-				+
-			</button>
-		</div>
-		<div class="fix-col-1 hide-s">
-			&nbsp;
-		</div>
-		<div v-if="column.description" class="fix-col-1 p span space-B">
-			<div class="space-L-small">
-				{{ column.description }}
-			</div>
-		</div>
-		<div v-if="!column.description" class="fix-col-1 p span space-B hide-s">
-			&nbsp;
-		</div>
-	</div>
+		<button :aria-label="t('tables', 'increase stars')" @click="more">
+			+
+		</button>
+	</RowFormWrapper>
 </template>
 
 <script>
+import RowFormWrapper from './RowFormWrapper.vue'
 
 export default {
-	name: 'NumberStarsForm',
+	components: {
+		RowFormWrapper,
+	},
 	props: {
 		column: {
 			type: Object,

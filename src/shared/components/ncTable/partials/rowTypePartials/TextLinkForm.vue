@@ -1,29 +1,16 @@
 <template>
-	<div class="row">
-		<div class="fix-col-1" :class="{ mandatory: column.mandatory }">
-			{{ column.title }}
-		</div>
-		<div class="fix-col-2" :class="{ 'space-B': !column.description }">
-			<input v-model="localValue">
-		</div>
-		<div class="fix-col-1 hide-s">
-			&nbsp;
-		</div>
-		<div v-if="column.description" class="fix-col-1 p span space-B">
-			<div class="space-L-small">
-				{{ column.description }}
-			</div>
-		</div>
-		<div v-if="!column.description" class="fix-col-1 p span space-B hide-s">
-			&nbsp;
-		</div>
-	</div>
+	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description">
+		<input v-model="localValue">
+	</RowFormWrapper>
 </template>
 
 <script>
+import RowFormWrapper from './RowFormWrapper.vue'
 
 export default {
-	name: 'TextLinkForm',
+	components: {
+		RowFormWrapper,
+	},
 	props: {
 		column: {
 			type: Object,
