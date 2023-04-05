@@ -33,10 +33,10 @@
 		"@nextcloud/router": "^2.0.1",
 		"@nextcloud/vue": "^7.8.1",
 		"@nextcloud/vue-richtext": "^2.1.0-beta.6",
-		"@tiptap/extension-task-item": "^2.0.0-beta.220",
+		"@tiptap/extension-task-item": "^2.0.1",
 		"@tiptap/extension-task-list": "^2.0.0-beta.220",
 		"@tiptap/starter-kit": "^2.0.0-beta.220",
-		"@tiptap/vue-2": "^2.0.0-beta.220",
+		"@tiptap/vue-2": "^2.0.1",
 		"debounce": "^1.2.1",
 		"vue": "^2.7.14",
 		"vue-material-design-icons": "^5.2.0",
@@ -57,7 +57,7 @@
 		"@nextcloud/eslint-config": "^8.2.1",
 		"@nextcloud/stylelint-config": "^2.3.0",
 		"@nextcloud/webpack-vue-config": "^5.5.0",
-		"sass": "^1.59.3",
-		"sass-loader": "^13.2.0"
+		"sass": "^1.60.0",
+		"sass-loader": "^13.2.2"
 	}
 }
