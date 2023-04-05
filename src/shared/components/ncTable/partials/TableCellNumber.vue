@@ -1,6 +1,6 @@
 <template>
 	<div>
-		{{ column.numberPrefix }}{{ getValue }}{{ column.numberSuffix }}
+		{{ column.numberPrefix }}&nbsp;{{ getValue }}{{ column.numberSuffix }}
 	</div>
 </template>
 
