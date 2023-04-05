@@ -55,7 +55,7 @@ class TableController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function update(int $id, string $title, string $emoji): DataResponse {
+	public function update(int $id, string $title = null, string $emoji = null): DataResponse {
 		return $this->handleError(function () use ($id, $title, $emoji) {
 			return $this->service->update($id, $title, $emoji, $this->userId);
 		});

@@ -25,6 +25,7 @@ namespace OCA\Tables\Command;
 
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Service\TableService;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -33,10 +34,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ListTables extends Command {
 	protected TableService $tableService;
+	protected LoggerInterface $logger;
 
-	public function __construct(TableService $tableService) {
+	public function __construct(TableService $tableService, LoggerInterface $logger) {
 		parent::__construct();
 		$this->tableService = $tableService;
+		$this->logger = $logger;
 	}
 
 	protected function configure(): void {
@@ -82,6 +85,8 @@ class ListTables extends Command {
 			}
 		} catch (InternalError $e) {
 			$output->writeln('Error while reading tables from db.');
+			$this->logger->warning('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
+			return 1;
 		}
 
 		if ($showCounter) {

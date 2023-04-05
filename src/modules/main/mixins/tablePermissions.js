@@ -35,5 +35,13 @@ export default {
 				|| (this.activeTable.isShared === true && this.activeTable.onSharePermissions.manage === true)
 				|| (this.activeTable.isShared === true && this.activeTable.ownership === getCurrentUser().uid)
 		},
+		canShareActiveTable() {
+			if (!this.activeTable?.isShared || this.activeTable?.ownership === getCurrentUser().uid) {
+				return true
+			}
+
+			// resharing is not allowed
+			return false
+		},
 	},
 }
