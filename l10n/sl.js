@@ -44,7 +44,7 @@ OC.L10N.register(
     "Hay and straw" : "Seno in slama",
     "Summer only" : "Le poletje",
     "Special" : "Posebno",
-    "Maybe we can make it fix for every year?!" : "Morda lahko načrt uporabimo vsako leto?",
+    "Maybe we can make it fix for every year?!" : "Morda lahko načrt uporabimo vsako leto?!",
     "Employee name" : "Ime zaposlenega",
     "from" : "od",
     "When is your vacation starting?" : "Kdaj se začne dopust?",
