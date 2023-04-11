@@ -39,3 +39,9 @@ namespace OC\Collaboration\Reference {
         public function getUserProviderTimestamps(): array;
     }
 }
+
+namespace Doctrine\DBAL\Types {
+	class Type {
+		public static function getType($name): Type;
+	}
+}

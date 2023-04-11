@@ -35,7 +35,12 @@ export default {
 			return this.column.selectionOptions
 		},
 		getOptionsCount() {
-			return this.getSelectionOptions.length
+			return this.getAllNonDeletedOptions.length
+		},
+		getAllNonDeletedOptions() {
+			return this.getSelectionOptions.filter(item => {
+				return !item.deleted
+			})
 		},
 	},
 }

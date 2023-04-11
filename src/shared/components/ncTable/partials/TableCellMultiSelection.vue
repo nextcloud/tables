@@ -1,17 +1,20 @@
 <template>
 	<div>
 		<ul>
-			<li v-for="v in getObjects" :key="v.id">
-				{{ v.label }}
+			<li v-for="v in getObjectsForSelectionMulti()" :key="v.id">
+				{{ v.label }}<span v-if="v.deleted" :title="t('tables', 'This option is outdated.')">&nbsp;⚠️</span>
 			</li>
 		</ul>
 	</div>
 </template>
 
 <script>
+import selectionMultiMixin from '../mixins/columnsTypes/selectionMultiMixin.js'
 
 export default {
 	name: 'TableCellMultiSelection',
+
+	mixins: [selectionMultiMixin],
 
 	props: {
 		column: {
@@ -29,35 +32,7 @@ export default {
 			default: null,
 		},
 	},
-	computed: {
-		getDefaultObjects() {
-			const defaultObjects = []
-			JSON.parse(this.column?.selectionDefault)?.forEach(id => {
-				defaultObjects.push(this.getOptionObject(parseInt(id)))
-			})
-			return defaultObjects
-		},
-		getObjects() {
-			if (this.value === null) {
-				return this.getDefaultObjects
-			}
-			const objects = []
-			this.value?.forEach(id => {
-				objects.push(this.getOptionObject(parseInt(id)))
-			})
-			return objects
-		},
-	},
-	methods: {
-		getOptionObject(id) {
-			const i = this.column?.selectionOptions?.findIndex(obj => {
-				return obj.id === id
-			})
-			if (i !== undefined) {
-				return this.column?.selectionOptions[i] || null
-			}
-		},
-	},
+
 }
 </script>
 <style lang="scss" scoped>

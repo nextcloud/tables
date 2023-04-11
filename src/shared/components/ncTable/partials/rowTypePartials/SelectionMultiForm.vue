@@ -4,7 +4,7 @@
 			{{ column.title }}
 		</div>
 		<div class="fix-col-2" :class="{ 'space-B': !column.description }">
-			<NcMultiselect v-model="localValues" :tag-width="80" :options="column.selectionOptions" track-by="id" label="label" :multiple="true" />
+			<NcMultiselect v-model="localValues" :tag-width="80" :options="getAllNonDeletedOrSelectedOptions" track-by="id" label="label" :multiple="true" />
 		</div>
 		<div v-if="column.description" class="fix-col-1 p span space-B">
 			<div class="space-L-small">
@@ -35,11 +35,6 @@ export default {
 			default: null,
 		},
 	},
-	data() {
-		return {
-			localSelectedValue: null,
-		}
-	},
 	computed: {
 		localValues: {
 			get() {
@@ -50,7 +45,9 @@ export default {
 					return this.getDefaultObjects
 				}
 			},
-			set(v) { this.$emit('update:value', this.getIdArrayFromObjects(v)) },
+			set(v) {
+				this.$emit('update:value', this.getIdArrayFromObjects(v))
+			},
 		},
 		getDefaultIds() {
 			const ids = []
@@ -74,7 +71,7 @@ export default {
 		},
 		getValueObjects() {
 			const objects = []
-			this.value.forEach(id => {
+			this.value?.forEach(id => {
 				const o = this.getOptionObject(id)
 				if (o) {
 					objects.push(o)
@@ -82,14 +79,34 @@ export default {
 			})
 			return objects
 		},
+		getOptions() {
+			return this.column.selectionOptions.map(item => Object.assign({}, item)) || null
+		},
+		getAllNonDeletedOrSelectedOptions() {
+			const options = this.getOptions?.filter(item => {
+				return !item.deleted || this.optionIdIsSelected(item.id)
+			}) || []
+
+			options.forEach(opt => {
+				if (opt.deleted) {
+					opt.label += ' ⚠️'
+				}
+			})
+			return options
+		},
 	},
 	methods: {
+		optionIdIsSelected(id) {
+			// check if the given id is selected (in the value array)
+			const result = this.getValueObjects.findIndex(item => item.id === id)
+			return result !== -1
+		},
 		getOptionObject(id) {
-			const i = this.column?.selectionOptions?.findIndex(obj => {
+			const i = this.getOptions?.findIndex(obj => {
 				return obj.id === id
 			})
-			if (i !== undefined) {
-				return this.column?.selectionOptions[i]
+			if (i !== -1) {
+				return this.getOptions[i]
 			}
 		},
 		getIdArrayFromObjects(objects) {

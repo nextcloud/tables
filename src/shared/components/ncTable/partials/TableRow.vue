@@ -29,7 +29,7 @@
 			<TableCellMultiSelection v-else-if="col.type === 'selection' && col.subtype === 'multi'"
 				:column="col"
 				:row-id="row.id"
-				:value="getCellValue(col.id)" />
+				:value="getCellValue(col.id, false)" />
 			<TableCellDateTime v-else-if="col.type === 'datetime'"
 				:column="col"
 				:row-id="row.id"
@@ -105,7 +105,7 @@ export default {
 		},
 	},
 	methods: {
-		getCellValue(columnId) {
+		getCellValue(columnId, loadDefault = true) {
 			if (!this.row) {
 				return null
 			}
@@ -114,11 +114,13 @@ export default {
 			const cell = this.row.data.find(item => item.columnId === columnId)
 
 			// if no value is given, try to get the default value from the column definition
-			if (!cell) {
+			if (cell) {
+				return cell.value
+			} else if (!cell && loadDefault) {
 				const column = this.columns.filter(column => column.id === columnId)[0]
 				return column[column.type + 'Default']
 			}
-			return cell.value
+			return null
 		},
 		truncate(text) {
 			if (text.length >= 400) {

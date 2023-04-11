@@ -4,7 +4,7 @@
 			{{ column.title }}
 		</div>
 		<div class="fix-col-2" :class="{ 'space-B': !column.description }">
-			<NcMultiselect v-model="localValue" :options="column.selectionOptions" track-by="id" label="label" :close-on-select="true" />
+			<NcMultiselect v-model="localValue" :options="getAllNonDeletedOptions" track-by="id" label="label" :close-on-select="true" />
 		</div>
 		<div v-if="column.description" class="fix-col-1 p span space-B">
 			<div class="space-L-small">
@@ -55,6 +55,11 @@ export default {
 		},
 		getDefaultOptionObject() {
 			return this.getOptionObject(this.getDefaultId) || null
+		},
+		getAllNonDeletedOptions() {
+			return this.getOptions.filter(item => {
+				return !item.deleted
+			})
 		},
 	},
 	methods: {

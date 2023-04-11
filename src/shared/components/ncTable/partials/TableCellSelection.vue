@@ -1,13 +1,16 @@
 <template>
 	<div>
-		{{ getLabel }}
+		{{ getLabelForSelection() }}<span v-if="isDeletedLabelForSelection()" :title="t('tables', 'This option is outdated.')">&nbsp;⚠️</span>
 	</div>
 </template>
 
 <script>
+import selectionMixin from '../mixins/columnsTypes/selectionMixin.js'
 
 export default {
 	name: 'TableCellSelection',
+
+	mixins: [selectionMixin],
 
 	props: {
 		column: {
@@ -25,11 +28,13 @@ export default {
 			default: null,
 		},
 	},
-	computed: {
-		getLabel() {
-			const i = this.column?.selectionOptions?.findIndex((obj) => obj.id === this.value)
-			return this.column?.selectionOptions[i]?.label || null
-		},
-	},
 }
 </script>
+
+<style lang="scss" scoped>
+
+span {
+	cursor: help;
+}
+
+</style>

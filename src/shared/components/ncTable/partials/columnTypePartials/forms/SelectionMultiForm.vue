@@ -4,7 +4,7 @@
 			<div class="col-4 title space-T">
 				{{ t('tables', 'Options') }}
 			</div>
-			<div v-for="opt in localSelectionOptions" :key="opt.id" class="col-4 inline">
+			<div v-for="opt in getSelectionOptions" :key="opt.id" class="col-4 inline">
 				<NcCheckboxRadioSwitch :value="'' + opt.id" :checked.sync="localSelectionDefault" name="defaultValues" />
 				<input :value="opt.label" @input="updateLabel(opt.id, $event)">
 				<NcButton type="tertiary" :aria-label="t('tables', 'Delete option')" @click="deleteOption(opt.id)">
@@ -54,57 +54,78 @@ export default {
 				}
 			},
 			set(value) {
-				console.debug('try to set value', value)
 				this.$emit('update:selectionDefault', JSON.stringify(value))
 			},
 		},
-		localSelectionOptions: {
+		getSelectionOptions() {
+			// if we have or had options
+			if (this.allOptions.length > 0) {
+				return this.getAllNonDeletedOptions
+			}
+
+			// if running first time, load default options
+			return this.loadDefaultOptions()
+		},
+		allOptions: {
 			get() {
-				if (this.selectionOptions) {
-					return this.selectionOptions
-				}
-				const options = [
-					{
-						id: 0,
-						label: t('tables', 'First option'),
-					},
-					{
-						id: 1,
-						label: t('tables', 'Second option'),
-					},
-				]
-				this.$emit('update:selectionOptions', options)
-				return options
+				return this.selectionOptions || []
 			},
 			set(value) {
 				this.$emit('update:selectionOptions', [...value])
 			},
 		},
+		getAllNonDeletedOptions() {
+			return this.allOptions?.filter(item => {
+				return !item.deleted
+			}) || []
+		},
 	},
 	methods: {
+		loadDefaultOptions() {
+			const options = [
+				{
+					id: 0,
+					label: t('tables', 'First option'),
+				},
+				{
+					id: 1,
+					label: t('tables', 'Second option'),
+				},
+			]
+			this.$emit('update:selectionOptions', options)
+			return options
+		},
 		updateLabel(id, e) {
-			const i = this.localSelectionOptions.findIndex((obj) => obj.id === id)
-			const tmp = [...this.localSelectionOptions]
+			const i = this.allOptions.findIndex((obj) => obj.id === id)
+			const tmp = [...this.allOptions]
 			tmp[i].label = e.target.value
-			this.localSelectionOptions = tmp
+			this.allOptions = tmp
 		},
 		addOption() {
 			const nextId = this.getNextId()
-			const options = [...this.localSelectionOptions]
+			const options = [...this.allOptions]
 			options.push({
 				id: nextId,
 				label: '',
 			})
-			this.localSelectionOptions = options
+			this.allOptions = options
 		},
 		getNextId() {
-			return Math.max(...this.localSelectionOptions.map(item => item.id)) + 1
+			return Math.max(...this.allOptions.map(item => item.id)) + 1
 		},
 		deleteOption(id) {
-			const i = this.localSelectionOptions.findIndex((obj) => obj.id === id)
-			const tmpOptions = [...this.localSelectionOptions]
-			tmpOptions.splice(i, 1)
-			this.localSelectionOptions = tmpOptions
+			const i = this.allOptions.findIndex((obj) => obj.id === id)
+			const tmpOptions = [...this.allOptions]
+			tmpOptions[i].deleted = true
+			this.allOptions = tmpOptions
+
+			// if deleted option was default, remove default
+			const index = this.localSelectionDefault.findIndex(item => parseInt(item) === id)
+			if (index !== -1) {
+				const defaults = this.localSelectionDefault.slice()
+				defaults.splice(index, 1)
+				this.localSelectionDefault = defaults
+			}
 		},
 	},
 }

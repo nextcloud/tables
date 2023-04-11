@@ -38,7 +38,7 @@ export default {
 	props: {
 		selectionOptions: {
 			type: Array,
-			default: null,
+			default: () => [],
 		},
 		selectionDefault: {
 			type: String,
@@ -54,53 +54,72 @@ export default {
 				this.$emit('update:selectionDefault', '' + value)
 			},
 		},
-		localSelectionOptions: {
+		localSelectionOptions() {
+			// if we have or had options
+			if (this.allOptions?.length > 0) {
+				return this.getAllNonDeletedOptions
+			}
+
+			// if running first time, load default options
+			return this.loadDefaultOptions()
+		},
+		allOptions: {
 			get() {
-				if (this.selectionOptions) {
-					return this.selectionOptions
-				}
-				const options = [
-					{
-						id: 0,
-						label: t('tables', 'First option'),
-					},
-					{
-						id: 1,
-						label: t('tables', 'Second option'),
-					},
-				]
-				this.$emit('update:selectionOptions', options)
-				return options
+				return this.selectionOptions
 			},
 			set(value) {
 				this.$emit('update:selectionOptions', [...value])
 			},
 		},
+		getAllNonDeletedOptions() {
+			return this.allOptions?.filter(item => {
+				return !item.deleted
+			})
+		},
 	},
 	methods: {
+		loadDefaultOptions() {
+			const options = [
+				{
+					id: 0,
+					label: t('tables', 'First option'),
+				},
+				{
+					id: 1,
+					label: t('tables', 'Second option'),
+				},
+			]
+			this.$emit('update:selectionOptions', options)
+			return options
+		},
 		updateLabel(id, e) {
-			const i = this.localSelectionOptions.findIndex((obj) => obj.id === id)
-			const tmp = [...this.localSelectionOptions]
+			const i = this.allOptions.findIndex((obj) => obj.id === id)
+			const tmp = this.allOptions
 			tmp[i].label = e.target.value
-			this.localSelectionOptions = tmp
+			this.allOptions = tmp
 		},
 		addOption() {
 			const nextId = this.getNextId()
-			const options = [...this.localSelectionOptions]
+			const options = this.allOptions
 			options.push({
 				id: nextId,
 				label: '',
 			})
-			this.localSelectionOptions = options
+			this.allOptions = options
 		},
 		getNextId() {
-			return Math.max(...this.localSelectionOptions.map(item => item.id)) + 1
+			return Math.max(...this.allOptions.map(item => item.id)) + 1
 		},
 		deleteOption(id) {
-			const i = this.localSelectionOptions.findIndex((obj) => obj.id === id)
-			const tmpOptions = [...this.localSelectionOptions]
-			tmpOptions.splice(i, 1)
-			this.localSelectionOptions = tmpOptions
+			const i = this.allOptions.findIndex((obj) => obj.id === id)
+			const tmpOptions = this.allOptions
+			tmpOptions[i].deleted = true
+			this.allOptions = tmpOptions
+
+			// if deleted option was marked as default
+			if (id === parseInt(this.localSelectionDefault)) {
+				this.localSelectionDefault = ''
+			}
 		},
 	},
 }
