@@ -102,11 +102,11 @@
 						</span>
 
 						<span v-if="column.type === 'selection' && !column.subtype" class="block">
-							{{ (column.mandatory) ? t('tables', 'Selection') + ', ' + t('tables', 'Mandatory'): t('tables', 'Selection') }}
+							{{ (column.mandatory) ? t('tables', 'Selection') + ', ' + t('tables', 'Mandatory'): t('tables', 'Single select') }}
 						</span>
 
 						<span v-if="column.type === 'selection' && column.subtype === 'multi'" class="block">
-							{{ (column.mandatory) ? t('tables', 'Multiselect') + ', ' + t('tables', 'Mandatory'): t('tables', 'Multiselect') }}
+							{{ (column.mandatory) ? t('tables', 'Multiselect') + ', ' + t('tables', 'Mandatory'): t('tables', 'Multiple select') }}
 						</span>
 
 						<span v-if="column.type === 'selection' && column.subtype === 'check'" class="block">

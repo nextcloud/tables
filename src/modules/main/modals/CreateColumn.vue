@@ -201,8 +201,8 @@ export default {
 				{ id: 'number-stars', label: t('tables', 'Stars rating') },
 				{ id: 'number-progress', label: t('tables', 'Progress bar') },
 
-				{ id: 'selection', label: t('tables', 'Selection') },
-				{ id: 'selection-multi', label: t('tables', 'Multiselect') },
+				{ id: 'selection', label: t('tables', 'Single select') },
+				{ id: 'selection-multi', label: t('tables', 'Multiple select') },
 				{ id: 'selection-check', label: t('tables', 'Yes/No') },
 
 				{ id: 'datetime', label: t('tables', 'Date and time') },
