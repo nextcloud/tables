@@ -8,7 +8,7 @@
 		<p v-if="description" class="fix-col-4 span">
 			{{ description }}
 		</p>
-		<div class="slot" :class="{ 'fix-col-4': width === 4, 'fix-col-3': width === 3, 'fix-col-2': width === 2, 'fix-col-1': width === 1 }">
+		<div :class="[ `fix-col-${width}` ]" class="slot">
 			<slot />
 		</div>
 	</div>

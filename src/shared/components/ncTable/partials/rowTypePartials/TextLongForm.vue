@@ -4,7 +4,6 @@
 			:value.sync="localValue"
 			:text-length-limit="getTextLimit"
 			@input="updateText" />
-		<textarea v-if="isMobileDevice" v-model="localValue" />
 	</RowFormWrapper>
 </template>
 
@@ -27,19 +26,10 @@ export default {
 			default: null,
 		},
 	},
-	data() {
-		return {
-			showBigEditor: false,
-		}
-	},
 	computed: {
-		isMobileDevice() {
-			// return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
-			return false
-		},
 		localValue: {
 			get() {
-				return (this.value && true)
+				return (this.value)
 					? this.value
 					: ((this.column.textDefault !== undefined)
 						? this.column.textDefault
@@ -60,9 +50,6 @@ export default {
 	methods: {
 		updateText(text) {
 			this.localValue = text
-		},
-		setShowBigEditor(v) {
-			this.showBigEditor = !!v
 		},
 	},
 }
