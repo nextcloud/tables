@@ -1,7 +1,8 @@
 <template>
-	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :length="localValueTextOnly.length ? localValueTextOnly.length : 0" :max-length="column.textMaxLength" :description="column.description">
-		<TiptapMenuBar v-if="!isMobileDevice"
+	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description">
+		<TiptapMenuBar
 			:value.sync="localValue"
+			:text-length-limit="getTextLimit"
 			@input="updateText" />
 		<textarea v-if="isMobileDevice" v-model="localValue" />
 	</RowFormWrapper>
@@ -48,11 +49,12 @@ export default {
 				this.$emit('update:value', v)
 			},
 		},
-		localValueTextOnly() {
-			return this.localValue.replace(/(<([^>]+)>)/gi, '')
-		},
-		textLengthLimit() {
-			return !!(this.column.textMaxLength && this.column.textMaxLength < this.localValueTextOnly.length)
+		getTextLimit() {
+			if (this.column.textMaxLength === -1) {
+				return null
+			} else {
+				return this.column.textMaxLength
+			}
 		},
 	},
 	methods: {

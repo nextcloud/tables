@@ -91,11 +91,15 @@
 			</NcButton>
 		</div>
 		<EditorContent :editor="editor" />
+		<div v-if="editor && textLengthLimit" class="character-count p span end">
+			{{ editor.storage.characterCount.characters() }}/{{ textLengthLimit }}
+		</div>
 	</div>
 </template>
 
 <script>
 import { Editor, EditorContent } from '@tiptap/vue-2'
+import { CharacterCount } from '@tiptap/extension-character-count'
 import { StarterKit } from '@tiptap/starter-kit'
 import { TaskList } from '@tiptap/extension-task-list'
 import { TaskItem } from '@tiptap/extension-task-item'
@@ -136,6 +140,10 @@ export default {
 			type: String,
 			default: '',
 		},
+		textLengthLimit: {
+		      type: Number,
+		      default: null,
+		    },
 	},
 
 	data() {
@@ -151,6 +159,9 @@ export default {
 				TaskList,
 				TaskItem.configure({
 					nested: true,
+				}),
+				CharacterCount.configure({
+					limit: this.textLengthLimit,
 				}),
 			],
 			onUpdate: () => {
@@ -172,6 +183,13 @@ export default {
 </script>
 
 <style lang="scss">
+
+.character-count {
+	display: flex;
+	margin-right: calc(var(--default-grid-baseline) * 3);
+	padding: 0;
+}
+
 .menuBar {
 	display: inline-flex;
 	flex-wrap: wrap;

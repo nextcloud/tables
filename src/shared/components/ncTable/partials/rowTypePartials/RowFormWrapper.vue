@@ -1,11 +1,8 @@
 <template>
 	<div class="row space-T">
-		<div class="fix-col-4 justify-between">
+		<div class="fix-col-4">
 			<div class="title">
 				{{ title }}{{ mandatory ? '*': '' }}
-			</div>
-			<div v-if="length && maxLength !== -1" class="p span" style="padding-bottom: 0; padding-top: 0;">
-				{{ t('tables', 'length: {length}/{maxLength}', { length, maxLength }) }}
 			</div>
 		</div>
 		<p v-if="description" class="fix-col-4 span">
