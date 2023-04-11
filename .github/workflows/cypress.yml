@@ -20,6 +20,14 @@ jobs:
   init:
     runs-on: ubuntu-latest
 
+    mysql:
+      image: mariadb:10.5
+      ports:
+        - 4444:3306/tcp
+      env:
+        MYSQL_ROOT_PASSWORD: rootpassword
+      options: --health-cmd="mysqladmin ping" --health-interval 5s --health-timeout 2s --health-retries 5
+
     steps:
 
       - name: Checkout server
@@ -76,7 +84,7 @@ jobs:
         node-version: [16]
         containers: [1]
         php-versions: [ '8.1' ]
-        databases: [ 'mysql', 'pgsql' ]
+        databases: [ 'mysql' ]
         server-versions: [ 'master' ]
 
     steps:
