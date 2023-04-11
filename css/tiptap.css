@@ -1,6 +1,6 @@
 .tiptap-wrapper div[contenteditable=true] {
 	width: 100% !important;
-	min-height: 200px;
+	min-height: 150px;
 }
 
 .tiptap-wrapper .is-active {
