@@ -87,7 +87,8 @@ export default {
   }
 
   p span, .p span, p .span, .p .span, .p.span, p.span, .light {
-    font-weight: 100;
+    //font-weight: 100;
+	  color: var(--color-text-maxcontrast);
   }
 
   p code {
