@@ -46,65 +46,77 @@ class ColumnController extends Controller {
 	 */
 	public function create(
 		int $tableId,
-		string $title,
 		string $type,
-		string $subtype = '',
-		string $numberPrefix = '',
-		string $numberSuffix = '',
-		bool $mandatory = false,
-		string $description = '',
-		string $textDefault = '',
-		string $textAllowedPattern = '',
-		int $textMaxLength = -1,
-		float $numberDefault = null,
-		float $numberMin = null,
-		float $numberMax = null,
-		int $numberDecimals = null,
-		string $selectionOptions = '',
-		string $selectionDefault = '',
-		int $orderWeight = 0,
-		string $datetimeDefault = ''
+		?string $subtype,
+		string $title,
+		bool $mandatory,
+		?string $description,
+		?int $orderWeight,
+
+		?string $textDefault,
+		?string $textAllowedPattern,
+		?int $textMaxLength,
+
+		?string $numberPrefix,
+		?string $numberSuffix,
+		?float $numberDefault,
+		?float $numberMin,
+		?float $numberMax,
+		?int $numberDecimals,
+
+		?string $selectionOptions,
+		?string $selectionDefault,
+
+		?string $datetimeDefault
 	): DataResponse {
 		return $this->handleError(function () use (
 			$tableId,
-			$title,
 			$type,
 			$subtype,
-			$numberPrefix,
-			$numberSuffix,
+			$title,
 			$mandatory,
 			$description,
+			$orderWeight,
+
 			$textDefault,
 			$textAllowedPattern,
 			$textMaxLength,
+
+			$numberPrefix,
+			$numberSuffix,
 			$numberDefault,
 			$numberMin,
 			$numberMax,
 			$numberDecimals,
+
 			$selectionOptions,
 			$selectionDefault,
-			$orderWeight,
+
 			$datetimeDefault) {
 			return $this->service->create(
-				$tableId,
-				$title,
 				$this->userId,
+				$tableId,
 				$type,
 				$subtype,
-				$numberPrefix,
-				$numberSuffix,
+				$title,
 				$mandatory,
 				$description,
+				$orderWeight,
+
 				$textDefault,
 				$textAllowedPattern,
 				$textMaxLength,
+
+				$numberPrefix,
+				$numberSuffix,
 				$numberDefault,
 				$numberMin,
 				$numberMax,
 				$numberDecimals,
+
 				$selectionOptions,
 				$selectionDefault,
-				$orderWeight,
+
 				$datetimeDefault);
 		});
 	}
@@ -114,69 +126,81 @@ class ColumnController extends Controller {
 	 */
 	public function update(
 		int $id,
-		int $tableId,
-		string $title,
-		string $type,
-		string $subtype = '',
-		string $numberPrefix = '',
-		string $numberSuffix = '',
-		bool $mandatory = false,
-		string $description = '',
-		string $textDefault = '',
-		string $textAllowedPattern = '',
-		int $textMaxLength = null,
-		float $numberDefault = null,
-		float $numberMin = null,
-		float $numberMax = null,
-		int $numberDecimals = null,
-		string $selectionOptions = '',
-		string $selectionDefault = '',
-		int $orderWeight = 0,
-		string $datetimeDefault = ''
+		?int $tableId,
+		?string $type,
+		?string $subtype,
+		?string $title,
+		?bool $mandatory,
+		?string $description,
+		?int $orderWeight,
+
+		?string $textDefault,
+		?string $textAllowedPattern,
+		?int $textMaxLength,
+
+		?string $numberPrefix,
+		?string $numberSuffix,
+		?float $numberDefault,
+		?float $numberMin,
+		?float $numberMax,
+		?int $numberDecimals,
+
+		?string $selectionOptions,
+		?string $selectionDefault,
+
+		?string $datetimeDefault
 	): DataResponse {
 		return $this->handleError(function () use (
 			$id,
 			$tableId,
-			$title,
 			$type,
 			$subtype,
-			$numberPrefix,
-			$numberSuffix,
+			$title,
 			$mandatory,
 			$description,
+			$orderWeight,
+
 			$textDefault,
 			$textAllowedPattern,
 			$textMaxLength,
+
+			$numberPrefix,
+			$numberSuffix,
 			$numberDefault,
 			$numberMin,
 			$numberMax,
 			$numberDecimals,
+
 			$selectionOptions,
 			$selectionDefault,
-			$orderWeight,
+
 			$datetimeDefault
 		) {
 			return $this->service->update(
 				$id,
 				$tableId,
 				$this->userId,
-				$title,
 				$type,
 				$subtype,
-				$numberPrefix,
-				$numberSuffix,
+				$title,
 				$mandatory,
 				$description,
+				$orderWeight,
+
 				$textDefault,
 				$textAllowedPattern,
 				$textMaxLength,
+
+				$numberPrefix,
+				$numberSuffix,
 				$numberDefault,
 				$numberMin,
 				$numberMax,
 				$numberDecimals,
+
 				$selectionOptions,
 				$selectionDefault,
-				$orderWeight,
+
 				$datetimeDefault);
 		});
 	}
