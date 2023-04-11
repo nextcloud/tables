@@ -322,31 +322,6 @@ class TableService extends SuperService {
 	}
 
 	/**
-	 * @throws InternalError
-	 */
-	public function setOwner(int $id, string $newOwnerUserId, ?string $userId = null): Table {
-		$userId = $this->permissionsService->preCheckUserId($userId);
-
-		try {
-			$table = $this->mapper->find($id);
-
-			// security
-			if (!$this->permissionsService->canChangeTableOwner($table, $userId)) {
-				throw new PermissionError('PermissionError: can not change table owner with table id '.$id);
-			}
-
-			/** @noinspection PhpUndefinedMethodInspection */
-			$table->setOwnership($newOwnerUserId);
-			$table = $this->mapper->update($table);
-			$this->enhanceTable($table, $userId);
-			return $table;
-		} catch (Exception $e) {
-			$this->logger->error($e->getMessage());
-			throw new InternalError($e->getMessage());
-		}
-	}
-
-	/**
 	 * @param int $id
 	 * @param null|string $userId
 	 * @return Table
