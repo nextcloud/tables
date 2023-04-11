@@ -17,8 +17,17 @@ env:
   CYPRESS_baseUrl: http://localhost:8081/index.php
 
 jobs:
-  init:
+  cypress:
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [ 16 ]
+        containers: [ 1 ]
+        php-versions: [ '8.1' ]
+        databases: [ 'mysql' ]
+        server-versions: [ 'master' ]
 
     services:
       mysql:
@@ -69,36 +78,10 @@ jobs:
           npm ci
           TESTING=true npm run build --if-present
 
-      - name: Save context
-        uses: actions/cache@v3
-        with:
-          key: cypress-context-${{ github.run_id }}
-          path: /home/runner/work
-
-  cypress:
-    runs-on: ubuntu-latest
-    needs: init
-
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: [16]
-        containers: [1]
-        php-versions: [ '8.1' ]
-        databases: [ 'mysql' ]
-        server-versions: [ 'master' ]
-
-    steps:
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-
-      - name: Restore context
-        uses: actions/cache@v3
-        with:
-          key: cypress-context-${{ github.run_id }}
-          path: /home/runner/work
 
       - name: Set up php ${{ matrix.php-versions }}
         uses: shivammathur/setup-php@v2
@@ -115,16 +98,18 @@ jobs:
           PHP_CLI_SERVER_WORKERS: 10
         run: |
           mkdir data
-          echo '<?php $CONFIG=["memcache.local"=>"\OC\Memcache\APCu","hashing_default_password"=>true];' > config/config.php
-          php occ maintenance:install --verbose --database=${{ matrix.databases }} --database-name=nextcloud --database-host=127.0.0.1 --database-port=$DB_PORT --database-user=root --database-pass=rootpassword --admin-user admin --admin-pass admin
-          php -f index.php
-          php -S 0.0.0.0:8081 &
+          ./occ maintenance:install --verbose --database=${{ matrix.databases }} --database-name=nextcloud --database-host=127.0.0.1 --database-port=$DB_PORT --database-user=root --database-pass=rootpassword --admin-user admin --admin-pass admin
+          ./occ config:system:set hashing_default_password --value=true --type=boolean
+          ./occ config:system:set memcache.local --value="\\OC\\Memcache\\APCu"
+          ./occ config:system:set memcache.distributed --value="\\OC\\Memcache\\APCu"
+          cat config/config.php
+          ./occ user:list
+          ./occ app:enable --force ${{ env.APP_NAME }}
+          ./occ config:system:set query_log_file --value '/home/runner/work/${{ env.APP_NAME }}/${{ env.APP_NAME }}/query.log'
+          php -S localhost:8081 &
           export OC_PASS=1234561
           php occ user:add --password-from-env user1
           php occ user:add --password-from-env user2
-          php occ app:enable viewer
-          php occ app:enable tables
-          php occ app:list
           curl -v http://localhost:8081/index.php/login
           cat data/nextcloud.log
 
