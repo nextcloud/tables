@@ -39,7 +39,7 @@ export default {
 			if (error) {
 				showError(t('tables', 'Error occurred while deleting rows.'))
 			}
-			emit('deselect-all-rows', {})
+			emit('tables:selected-rows:deselect', {})
 			this.$emit('cancel')
 		},
 	},

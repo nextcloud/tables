@@ -113,10 +113,10 @@ export default {
 	},
 
 	mounted() {
-		subscribe('deselect-all-rows', this.deselectRows)
+		subscribe('tables:selected-rows:deselect', this.deselectRows)
 	},
 	beforeDestroy() {
-		unsubscribe('deselect-all-rows', this.deselectRows)
+		unsubscribe('tables:selected-rows:deselect', this.deselectRows)
 	},
 	methods: {
 		deselectRows() {
