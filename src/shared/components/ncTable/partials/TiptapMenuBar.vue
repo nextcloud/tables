@@ -1,27 +1,27 @@
 <template>
 	<div class="tiptap-wrapper">
 		<div v-if="editor" class="menuBar">
-			<NcButton type="tertiary-no-background" :aria-label="t('tables', 'undo')" @click="editor.chain().focus().undo().run()">
+			<NcButton type="tertiary-no-background" :aria-label="t('tables', 'Undo')" @click="editor.chain().focus().undo().run()">
 				<template #icon>
 					<Undo :size="20" />
 				</template>
 			</NcButton>
-			<NcButton type="tertiary-no-background" :aria-label="t('tables', 'redo')" @click="editor.chain().focus().redo().run()">
+			<NcButton type="tertiary-no-background" :aria-label="t('tables', 'Redo')" @click="editor.chain().focus().redo().run()">
 				<template #icon>
 					<Redo :size="20" />
 				</template>
 			</NcButton>
-			<NcButton :class="{ 'is-active': editor.isActive('bold') }" type="tertiary-no-background" :aria-label="t('tables', 'bold')" @click="editor.chain().focus().toggleBold().run()">
+			<NcButton :class="{ 'is-active': editor.isActive('bold') }" type="tertiary-no-background" :aria-label="t('tables', 'Bold')" @click="editor.chain().focus().toggleBold().run()">
 				<template #icon>
 					<FormatBold :size="20" />
 				</template>
 			</NcButton>
-			<NcButton :class="{ 'is-active': editor.isActive('italic') }" type="tertiary-no-background" :aria-label="t('tables', 'italic')" @click="editor.chain().focus().toggleItalic().run()">
+			<NcButton :class="{ 'is-active': editor.isActive('italic') }" type="tertiary-no-background" :aria-label="t('tables', 'Italic')" @click="editor.chain().focus().toggleItalic().run()">
 				<template #icon>
 					<FormatItalic :size="20" />
 				</template>
 			</NcButton>
-			<NcButton :class="{ 'is-active': editor.isActive('bulletList') }" type="tertiary-no-background" :aria-label="t('tables', 'bullet list')" @click="editor.chain().focus().toggleBulletList().run()">
+			<NcButton :class="{ 'is-active': editor.isActive('bulletList') }" type="tertiary-no-background" :aria-label="t('tables', 'Bullet list')" @click="editor.chain().focus().toggleBulletList().run()">
 				<template #icon>
 					<FormatListBulletedSquare :size="20" />
 				</template>
@@ -29,7 +29,7 @@
 			<NcButton
 				:class="{ 'is-active': editor.isActive('orderedList') }"
 				type="tertiary-no-background"
-				:aria-label="t('tables', 'ordered list')"
+				:aria-label="t('tables', 'Ordered list')"
 				@click="editor.chain().focus().toggleOrderedList().run()">
 				<template #icon>
 					<FormatListNumbered :size="20" />
@@ -38,7 +38,7 @@
 			<NcButton
 				:class="{ 'is-active': editor.isActive('strike') }"
 				type="tertiary-no-background"
-				:aria-label="t('tables', 'strike')"
+				:aria-label="t('tables', 'Strike')"
 				@click="editor.chain().focus().toggleStrike().run()">
 				<template #icon>
 					<FormatStrikethrough :size="20" />
@@ -47,7 +47,7 @@
 			<NcButton
 				type="tertiary-no-background"
 				:class="{ 'is-active': editor.isActive('heading', { level: 1 }) }"
-				:aria-label="t('tables', 'heading 1')"
+				:aria-label="t('tables', 'Heading 1')"
 				@click="editor.chain().focus().toggleHeading({ level: 1 }).run()">
 				<template #icon>
 					<FormatHeader1 :size="20" />
@@ -56,7 +56,7 @@
 			<NcButton
 				type="tertiary-no-background"
 				:class="{ 'is-active': editor.isActive('heading', { level: 2 }) }"
-				:aria-label="t('tables', 'heading 2')"
+				:aria-label="t('tables', 'Heading 2')"
 				@click="editor.chain().focus().toggleHeading({ level: 2 }).run()">
 				<template #icon>
 					<FormatHeader2 :size="20" />
@@ -65,7 +65,7 @@
 			<NcButton
 				type="tertiary-no-background"
 				:class="{ 'is-active': editor.isActive('heading', { level: 3 }) }"
-				:aria-label="t('tables', 'heading 3')"
+				:aria-label="t('tables', 'Heading 3')"
 				@click="editor.chain().focus().toggleHeading({ level: 3 }).run()">
 				<template #icon>
 					<FormatHeader3 :size="20" />
@@ -74,7 +74,7 @@
 			<NcButton
 				type="tertiary-no-background"
 				:class="{ 'is-active': editor.isActive('code') }"
-				:aria-label="t('tables', 'code')"
+				:aria-label="t('tables', 'Code')"
 				@click="editor.chain().focus().toggleCode().run()">
 				<template #icon>
 					<CodeTags :size="20" />
@@ -83,7 +83,7 @@
 			<NcButton
 				type="tertiary-no-background"
 				:class="{ 'is-active': editor.isActive('taskList') }"
-				:aria-label="t('tables', 'task list')"
+				:aria-label="t('tables', 'Task list')"
 				@click="editor.chain().focus().toggleTaskList().run()">
 				<template #icon>
 					<CheckboxMultipleMarkedOutline :size="20" />

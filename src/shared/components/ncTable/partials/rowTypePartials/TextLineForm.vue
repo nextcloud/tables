@@ -55,8 +55,4 @@ export default {
 	}
 }
 
-input {
-	margin-top:calc(var(--default-grid-baseline) * 2);
-}
-
 </style>

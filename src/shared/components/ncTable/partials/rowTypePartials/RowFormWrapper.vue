@@ -2,7 +2,7 @@
 	<div class="row space-T">
 		<div class="fix-col-4">
 			<div class="title">
-				{{ title }}{{ mandatory ? '*': '' }}
+				{{ title }}<span v-if="mandatory" :title="t('tables', 'This field is mandatory')">*</span>
 			</div>
 		</div>
 		<p v-if="description" class="fix-col-4 span">
@@ -28,21 +28,21 @@ export default {
 			default: '',
 		},
 		length: {
-		      type: Number,
-		      default: null,
-		    },
+			type: Number,
+			default: null,
+		},
 		maxLength: {
-		      type: Number,
-		      default: null,
-		    },
+			type: Number,
+			default: null,
+		},
 		description: {
-		      type: String,
-		      default: null,
-		    },
+			type: String,
+			default: null,
+		},
 		width: {
-		      type: Number,
-		      default: 4,
-		    },
+			type: Number,
+			default: 4,
+		},
 	},
 }
 </script>
@@ -50,6 +50,7 @@ export default {
 
 .title {
 	font-weight: bold;
+	margin-bottom: calc(var(--default-grid-baseline) * 1);
 }
 
 .slot {

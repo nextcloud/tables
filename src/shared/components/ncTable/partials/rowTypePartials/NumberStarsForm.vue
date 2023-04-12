@@ -1,23 +1,35 @@
 <template>
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description">
-		<button :aria-label="t('tables', 'reduce stars')" @click="less">
-			-
-		</button>
-		<div style="font-size: 1.4em; padding: 7px;">
-			{{ getStars }}
+		<div class="align-center">
+			<NcButton type="tertiary" :aria-label="t('tables', 'Reduce stars')" @click="less">
+				<template #icon>
+					<Minus :size="20" />
+				</template>
+			</NcButton>
+			<div class="stars">
+				{{ getStars }}
+			</div>
+			<NcButton type="tertiary" :aria-label="t('tables', 'Increase stars')" @click="more">
+				<template #icon>
+					<Plus :size="20" />
+				</template>
+			</NcButton>
 		</div>
-		<button :aria-label="t('tables', 'increase stars')" @click="more">
-			+
-		</button>
 	</RowFormWrapper>
 </template>
 
 <script>
+import { NcButton } from '@nextcloud/vue'
 import RowFormWrapper from './RowFormWrapper.vue'
+import Plus from 'vue-material-design-icons/Plus.vue'
+import Minus from 'vue-material-design-icons/Minus.vue'
 
 export default {
 	components: {
 		RowFormWrapper,
+		NcButton,
+		Plus,
+		Minus,
 	},
 	props: {
 		column: {
@@ -67,3 +79,16 @@ export default {
 	},
 }
 </script>
+<style lang="scss" scoped>
+
+.align-center {
+	align-items: center;
+	display: inline-flex;
+}
+
+.stars {
+	font-size: 1.4em;
+	padding: 7px;
+}
+
+</style>

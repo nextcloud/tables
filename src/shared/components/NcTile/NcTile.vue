@@ -24,17 +24,17 @@ export default {
 
 	props: {
 		active: {
-		      type: Boolean,
-		      default: false,
-		    },
+			type: Boolean,
+			default: false,
+		},
 		title: {
-		      type: String,
-		      default: '',
-		    },
+			type: String,
+			default: '',
+		},
 		body: {
-		      type: String,
-		      default: '',
-		    },
+			type: String,
+			default: '',
+		},
 	},
 
 	computed: {
