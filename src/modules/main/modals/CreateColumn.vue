@@ -111,16 +111,15 @@
 					</div>
 				</div>
 			</div>
-			<div class="row space-T space-B">
-				<div class="col-4">
-					<button class="secondary" @click="actionCancel">
-						{{ t('tables', 'Cancel') }}
-					</button>
-					<button class="primary" @click="actionConfirm(true)">
+			<div class="row space-T">
+				<div class="fix-col-4 end">
+					<div class="padding-right">
+						<NcCheckboxRadioSwitch :checked.sync="addNewAfterSave" type="switch">
+							{{ t('tables', 'Add more') }}
+						</NcCheckboxRadioSwitch>
+					</div>
+					<button class="primary" @click="actionConfirm()">
 						{{ t('tables', 'Save') }}
-					</button>
-					<button class="primary" @click="actionConfirm(false)">
-						{{ t('tables', 'Save and new') }}
 					</button>
 				</div>
 			</div>
@@ -139,6 +138,7 @@ import MainForm from '../../../shared/components/ncTable/partials/columnTypePart
 import DatetimeForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeForm.vue'
 import DatetimeDateForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeTimeForm.vue'
+import { NcModal, NcMultiselect, NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import SelectionForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionForm.vue'
 import SelectionMultiForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionMultiForm.vue'
 import { NcModal, NcMultiselect } from '@nextcloud/vue'
@@ -161,6 +161,7 @@ export default {
 		DatetimeDateForm,
 		DatetimeForm,
 		DatetimeTimeForm,
+		NcCheckboxRadioSwitch,
 		SelectionForm,
 		SelectionMultiForm,
 	},
@@ -172,32 +173,27 @@ export default {
 	},
 	data() {
 		return {
-			typeMissingError: false,
-			titleMissingError: false,
-
+			addNewAfterSave: false,
 			type: null,
 			subtype: null,
 			title: '',
 			description: '',
-			mandatory: false,
+			numberPrefix: '',
+			numberSuffix: '',
 			orderWeight: 0,
-
-			textDefault: '',
-			textAllowedPattern: '',
-			textMaxLength: null,
-
-			numberPrefix: null,
-			numberSuffix: null,
+			mandatory: false,
 			numberDefault: null,
 			numberMin: 0,
 			numberMax: 100,
 			numberDecimals: 2,
-
+			textDefault: '',
+			textAllowedPattern: '',
+			textMaxLength: null,
+			typeMissingError: false,
+			titleMissingError: false,
 			selectionOptions: null,
 			selectionDefault: null,
-
 			datetimeDefault: '',
-
 			typeOptions: [
 				{ id: 'text-line', label: t('tables', 'Text line') },
 				{ id: 'text-long', label: t('tables', 'Long text') },
@@ -241,7 +237,7 @@ export default {
 		},
 	},
 	methods: {
-		async actionConfirm(close) {
+		async actionConfirm() {
 			if (!this.title) {
 				showInfo(t('tables', 'Please insert a title for the new column.'))
 				this.titleMissingError = true
@@ -252,7 +248,7 @@ export default {
 			} else {
 				await this.sendNewColumnToBE()
 				this.reset()
-				if (close) {
+				if (!this.addNewAfterSave) {
 					this.$emit('close')
 				}
 			}
@@ -264,29 +260,25 @@ export default {
 		async sendNewColumnToBE() {
 			try {
 				const data = {
-					tableId: this.activeTable.id,
 					type: this.type,
 					subtype: this.subtype,
 					title: this.title,
 					description: this.description,
-					mandatory: this.mandatory,
-					orderWeight: this.orderWeight,
-
-					textDefault: this.textDefault,
-					textAllowedPattern: this.textAllowedPattern,
-					textMaxLength: this.textMaxLength,
-
 					numberPrefix: this.numberPrefix,
 					numberSuffix: this.numberSuffix,
+					orderWeight: this.orderWeight,
+					mandatory: this.mandatory,
 					numberDefault: this.numberDefault,
 					numberMin: this.numberMin,
 					numberMax: this.numberMax,
 					numberDecimals: this.numberDecimals,
-
+					textDefault: this.textDefault,
+					textAllowedPattern: this.textAllowedPattern,
+					textMaxLength: this.textMaxLength,
 					selectionOptions: JSON.stringify(this.selectionOptions),
 					selectionDefault: this.selectionDefault,
-
 					datetimeDefault: this.datetimeDefault,
+					tableId: this.activeTable.id,
 				}
 				const res = this.$store.dispatch('insertNewColumn', { data })
 				if (res) {
@@ -324,3 +316,10 @@ export default {
 	},
 }
 </script>
+<style lang="scss" scoped>
+
+.padding-right {
+	padding-right: calc(var(--default-grid-baseline) * 3);
+}
+
+</style>

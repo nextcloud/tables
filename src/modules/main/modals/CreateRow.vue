@@ -48,7 +48,7 @@
 			</div>
 			<div class="row">
 				<div class="fix-col-4 space-T end">
-					<div style="padding-right: 12px;">
+					<div class="padding-right">
 						<NcCheckboxRadioSwitch :checked.sync="addNewAfterSave" type="switch">
 							{{ t('tables', 'Add more') }}
 						</NcCheckboxRadioSwitch>
@@ -178,3 +178,10 @@ export default {
 	},
 }
 </script>
+<style lang="scss" scoped>
+
+.padding-right {
+	padding-right: calc(var(--default-grid-baseline) * 3);
+}
+
+</style>

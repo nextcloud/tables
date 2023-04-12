@@ -8,11 +8,11 @@
 					<h2>{{ t('tables', 'Edit table') }}</h2>
 				</div>
 			</div>
-			<div class="row space-T">
+			<div class="row">
 				<div class="col-4 mandatory">
 					{{ t('tables', 'Title') }}
 				</div>
-				<div class="col-3" style="display: inline-flex;">
+				<div class="col-3 inline">
 					<NcEmojiPicker :close-on-select="true" @select="emoji => icon = emoji">
 						<NcButton type="tertiary"
 							:aria-label="t('tables', 'Select emoji for table')"
@@ -28,16 +28,7 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="fix-col-2 space-B space-T">
-					<NcButton type="secondary" @click="$emit('close')">
-						{{ t('tables', 'Cancel') }}
-					</NcButton>
-        &nbsp;&nbsp;
-					<NcButton type="primary" @click="submit">
-						{{ t('tables', 'Save') }}
-					</NcButton>
-				</div>
-				<div class="fix-col-2 space-B space-T" style="justify-content: end;">
+				<div class="fix-col-4 space-T justify-between">
 					<NcButton v-if="!prepareDeleteTable" type="error" @click="prepareDeleteTable = true">
 						{{ t('tables', 'Delete') }}
 					</NcButton>
@@ -46,6 +37,9 @@
 						type="error"
 						@click="actionDeleteTable">
 						{{ t('tables', 'I really want to delete this table!') }}
+					</NcButton>
+					<NcButton type="primary" @click="submit">
+						{{ t('tables', 'Save') }}
 					</NcButton>
 				</div>
 			</div>
