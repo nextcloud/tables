@@ -2,6 +2,7 @@
 
 namespace OCA\Tables\AppInfo;
 
+use OCA\Tables\Capabilities;
 use OCP\Server;
 use OCA\Tables\Listener\UserDeletedListener;
 use OCA\Tables\Listener\AnalyticsDatasourceListener;
@@ -45,6 +46,8 @@ class Application extends App implements IBootstrap {
 			}
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 		}
+
+		$context->registerCapability(Capabilities::class);
 	}
 
 	public function boot(IBootContext $context): void {
