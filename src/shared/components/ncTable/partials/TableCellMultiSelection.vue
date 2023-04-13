@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<ul>
-			<li v-for="v in getObjectsForSelectionMulti()" :key="v.id">
+			<li v-for="v in getObjectsForSelectionMulti(value, column)" :key="v.id">
 				{{ v.label }}<span v-if="v.deleted" :title="t('tables', 'This option is outdated.')">&nbsp;⚠️</span>
 			</li>
 		</ul>

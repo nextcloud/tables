@@ -18,22 +18,16 @@ export default {
 		},
 
 		getObjectsForSelectionMulti(values, column) {
-			// value is array of option-ids as string
-
-			column = column || this.column || null
-			values = values || this.value || null
+			// values is an array of option-ids as string
 
 			const objects = []
-			values?.forEach(id => {
+			values.forEach(id => {
 				objects.push(this.getOptionObjectForSelectionMulti(parseInt(id), column))
 			})
 			return objects
 		},
 
 		getOptionObjectForSelectionMulti(id, column) {
-			column = column || this.column || null
-			id = id || this.value.id || this.value || null
-
 			const i = column?.selectionOptions?.findIndex(obj => {
 				return obj.id === id
 			})
