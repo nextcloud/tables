@@ -37,6 +37,8 @@ Have a good time and manage whatever you want.
     <screenshot>https://dl.datenangebot.de/nc%20tables/screenshots/v0.3.1/nc-tables-3.png</screenshot>
     <screenshot>https://dl.datenangebot.de/nc%20tables/screenshots/v0.3.1/nc-tables-4.png</screenshot>
 	<dependencies>
+		<database>pgsql</database>
+		<database>mysql</database>
         <nextcloud min-version="25" max-version="27"/>
     </dependencies>
     <commands>
