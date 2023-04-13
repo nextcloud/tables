@@ -283,10 +283,10 @@ export default {
 					numberMax: this.numberMax,
 					numberDecimals: this.numberDecimals,
 
-          selectionOptions: JSON.stringify(this.selectionOptions),
+					selectionOptions: JSON.stringify(this.selectionOptions),
 					selectionDefault: this.selectionDefault,
 
-          datetimeDefault: this.datetimeDefault,
+					datetimeDefault: this.datetimeDefault,
 				}
 				const res = this.$store.dispatch('insertNewColumn', { data })
 				if (res) {
