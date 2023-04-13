@@ -98,9 +98,10 @@ class TableService extends SuperService {
 				}
 			}
 		} catch (\OCP\DB\Exception|InternalError $e) {
-			$this->logger->error($e->getMessage());
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError($e->getMessage());
 		} catch (PermissionError $e) {
+			$this->logger->debug('permission error during looking for tables', ['exception' => $e]);
 		}
 
 		// enhance table objects with additional data
@@ -260,13 +261,13 @@ class TableService extends SuperService {
 	 * @noinspection PhpUndefinedMethodInspection
 	 *
 	 * @param int $id $userId
-	 * @param string $title
+	 * @param string|null $title
 	 * @param string|null $emoji
 	 * @param string|null $userId
 	 * @return Table
 	 * @throws InternalError
 	 */
-	public function update(int $id, string $title, string $emoji = null, ?string $userId = null): Table {
+	public function update(int $id, ?string $title, ?string $emoji, ?string $userId = null): Table {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
@@ -278,18 +279,19 @@ class TableService extends SuperService {
 			}
 
 			$time = new DateTime();
-			$table->setTitle($title);
+			if ($title !== null) {
+				$table->setTitle($title);
+			}
 			if ($emoji !== null) {
 				$table->setEmoji($emoji);
 			}
 			$table->setLastEditBy($userId);
 			$table->setLastEditAt($time->format('Y-m-d H:i:s'));
 			$table = $this->mapper->update($table);
-			/** @var string $userId */
 			$this->enhanceTable($table, $userId);
 			return $table;
 		} catch (Exception $e) {
-			$this->logger->error($e->getMessage());
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError($e->getMessage());
 		}
 	}
@@ -314,7 +316,7 @@ class TableService extends SuperService {
 			$this->enhanceTable($table, $userId);
 			return $table;
 		} catch (Exception $e) {
-			$this->logger->error($e->getMessage());
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError($e->getMessage());
 		}
 	}

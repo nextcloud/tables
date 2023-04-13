@@ -28,6 +28,10 @@ config                  -> config object for the table
     columns
       show-inline-edit-button [true]
 
+Bus events
+==========
+deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
+
 -->
 
 <template>
@@ -78,6 +82,7 @@ import exportTableMixin from './mixins/exportTableMixin.js'
 import permissionsMixin from './mixins/permissionsMixin.js'
 import { NcEmptyContent, NcButton } from '@nextcloud/vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
+import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 
 export default {
 	name: 'NcTable',
@@ -105,6 +110,18 @@ export default {
 		return {
 			selectedRows: [],
 		}
+	},
+
+	mounted() {
+		subscribe('tables:selected-rows:deselect', this.deselectRows)
+	},
+	beforeDestroy() {
+		unsubscribe('tables:selected-rows:deselect', this.deselectRows)
+	},
+	methods: {
+		deselectRows() {
+			this.selectedRows = []
+		},
 	},
 }
 </script>

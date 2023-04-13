@@ -1,6 +1,5 @@
 <template>
 	<div v-if="activeTable" class="sharing">
-		<h1>{{ t('tables', 'Sharing') }}</h1>
 		<div v-if="!activeTable.isShared || activeTable.ownership === getCurrentUser().uid">
 			<ShareForm :shares="shares" @add="addShare" @update="updateShare" />
 			<ShareList :shares="shares" @remove="removeShare" @update="updateShare" />

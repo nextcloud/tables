@@ -172,26 +172,32 @@ export default {
 	},
 	data() {
 		return {
+			typeMissingError: false,
+			titleMissingError: false,
+
 			type: null,
 			subtype: null,
 			title: '',
 			description: '',
-			numberPrefix: '',
-			numberSuffix: '',
-			orderWeight: 0,
 			mandatory: false,
+			orderWeight: 0,
+
+			textDefault: '',
+			textAllowedPattern: '',
+			textMaxLength: null,
+
+			numberPrefix: null,
+			numberSuffix: null,
 			numberDefault: null,
 			numberMin: 0,
 			numberMax: 100,
 			numberDecimals: 2,
-			textDefault: '',
-			textAllowedPattern: '',
-			textMaxLength: null,
-			typeMissingError: false,
-			titleMissingError: false,
+
 			selectionOptions: null,
 			selectionDefault: null,
+
 			datetimeDefault: '',
+
 			typeOptions: [
 				{ id: 'text-line', label: t('tables', 'Text line') },
 				{ id: 'text-long', label: t('tables', 'Long text') },
@@ -258,25 +264,29 @@ export default {
 		async sendNewColumnToBE() {
 			try {
 				const data = {
+					tableId: this.activeTable.id,
 					type: this.type,
 					subtype: this.subtype,
 					title: this.title,
 					description: this.description,
+					mandatory: this.mandatory,
+					orderWeight: this.orderWeight,
+
+					textDefault: this.textDefault,
+					textAllowedPattern: this.textAllowedPattern,
+					textMaxLength: this.textMaxLength,
+
 					numberPrefix: this.numberPrefix,
 					numberSuffix: this.numberSuffix,
-					orderWeight: this.orderWeight,
-					mandatory: this.mandatory,
 					numberDefault: this.numberDefault,
 					numberMin: this.numberMin,
 					numberMax: this.numberMax,
 					numberDecimals: this.numberDecimals,
-					textDefault: this.textDefault,
-					textAllowedPattern: this.textAllowedPattern,
-					textMaxLength: this.textMaxLength,
-					selectionOptions: JSON.stringify(this.selectionOptions),
+
+          selectionOptions: JSON.stringify(this.selectionOptions),
 					selectionDefault: this.selectionDefault,
-					datetimeDefault: this.datetimeDefault,
-					tableId: this.activeTable.id,
+
+          datetimeDefault: this.datetimeDefault,
 				}
 				const res = this.$store.dispatch('insertNewColumn', { data })
 				if (res) {
@@ -294,8 +304,8 @@ export default {
 			this.type = null
 			this.title = ''
 			this.description = ''
-			this.numberPrefix = ''
-			this.numberSuffix = ''
+			this.numberPrefix = null
+			this.numberSuffix = null
 			this.orderWeight = 0
 			this.mandatory = false
 			this.numberDefault = null

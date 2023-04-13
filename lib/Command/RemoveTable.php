@@ -27,6 +27,7 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\TableService;
 use OCP\DB\Exception;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -34,10 +35,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class RemoveTable extends Command {
 	protected TableService $tableService;
+	protected LoggerInterface $logger;
 
-	public function __construct(TableService $tableService) {
+	public function __construct(TableService $tableService, LoggerInterface $logger) {
 		parent::__construct();
 		$this->tableService = $tableService;
+		$this->logger = $logger;
 	}
 
 	protected function configure(): void {
@@ -61,10 +64,12 @@ class RemoveTable extends Command {
 		$id = $input->getArgument('ID');
 
 		try {
-			$table = $this->tableService->delete($id, '');
+			$this->tableService->delete($id, '');
 			$output->writeln('Table deleted.');
 		} catch (InternalError|PermissionError|Exception $e) {
 			$output->writeln('Error occurred: '.$e->getMessage());
+			$this->logger->warning('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
+			return 1;
 		}
 		return 0;
 	}

@@ -623,7 +623,7 @@ class TableTemplateService {
 			'title' => $this->l->t('What'),
 			'type' => 'text',
 			'subtype' => 'line',
-			'orderWeight' => 100,
+			'orderWeight' => 10,
 		];
 		$columns['what'] = $this->createColumn($table->id, $params);
 
@@ -631,7 +631,7 @@ class TableTemplateService {
 			'title' => $this->l->t('How to do'),
 			'type' => 'text',
 			'subtype' => 'long',
-			'orderWeight' => 100,
+			'orderWeight' => 10,
 		];
 		$columns['how'] = $this->createColumn($table->id, $params);
 
@@ -639,7 +639,7 @@ class TableTemplateService {
 			'title' => $this->l->t('Ease of use'),
 			'type' => 'number',
 			'subtype' => 'stars',
-			'orderWeight' => 20,
+			'orderWeight' => 10,
 		];
 		$columns['ease'] = $this->createColumn($table->id, $params);
 
@@ -648,7 +648,7 @@ class TableTemplateService {
 			'title' => $this->l->t('Done'),
 			'type' => 'selection',
 			'subtype' => 'check',
-			'orderWeight' => 100,
+			'orderWeight' => 10,
 		];
 		$columns['done'] = $this->createColumn($table->id, $params);
 
@@ -710,14 +710,11 @@ class TableTemplateService {
 
 		return $this->columnService->create(
 
-			// tableId
-			$tableId,
-
-			// title
-			(isset($parameters['title']) && $parameters['title'] != '') ? $parameters['title'] : $this->l->t('No title given'),
-
 			// userId
 			$this->userId,
+
+			// tableId
+			$tableId,
 
 			// column type
 			(isset($parameters['type'])) ? $parameters['type'] : 'text',
@@ -725,17 +722,17 @@ class TableTemplateService {
 			// column subtype
 			(isset($parameters['subtype'])) ? $parameters['subtype'] : '',
 
-			// prefix
-			(isset($parameters['numberPrefix'])) ? $parameters['numberPrefix'] : '',
-
-			// suffix
-			(isset($parameters['numberSuffix'])) ? $parameters['numberSuffix'] : '',
+			// title
+			(isset($parameters['title']) && $parameters['title'] != '') ? $parameters['title'] : $this->l->t('No title given'),
 
 			// mandatory
 			isset($parameters['mandatory']) && !!$parameters['mandatory'],
 
 			// description
 			(isset($parameters['description'])) ? $parameters['description'] : '',
+
+			// orderWeight
+			(isset($parameters['orderWeight'])) ? $parameters['orderWeight'] : 0,
 
 			// textDefault
 			(isset($parameters['textDefault'])) ? $parameters['textDefault'] : '',
@@ -745,6 +742,12 @@ class TableTemplateService {
 
 			// textMaxLength
 			(isset($parameters['textMaxLength'])) ? $parameters['textMaxLength'] : -1,
+
+			// numberPrefix
+			(isset($parameters['numberPrefix'])) ? $parameters['numberPrefix'] : '',
+
+			// numberSuffix
+			(isset($parameters['numberSuffix'])) ? $parameters['numberSuffix'] : '',
 
 			// numberDefault
 			(isset($parameters['numberDefault'])) ? $parameters['numberDefault'] : null,
@@ -763,9 +766,6 @@ class TableTemplateService {
 
 			// selectionDefault
 			(isset($parameters['selectionDefault'])) ? $parameters['selectionDefault'] : '',
-
-			// orderWeight
-			(isset($parameters['orderWeight'])) ? $parameters['orderWeight'] : 0,
 
 			// datetimeDefault
 			(isset($parameters['datetimeDefault'])) ? $parameters['datetimeDefault'] : '',

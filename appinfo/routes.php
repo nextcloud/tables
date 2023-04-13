@@ -12,8 +12,34 @@ return [
 		['name' => 'tableTemplate#list', 'url' => '/table/templates', 'verb' => 'GET'],
 
 		// API
+		// -> tables
 		['name' => 'api1#index', 'url' => '/api/1/tables', 'verb' => 'GET'],
-		['name' => 'api1#data',	'url' => '/api/1/table/{tableId}', 'verb' => 'GET'],
+		['name' => 'api1#createTable',	'url' => '/api/1/tables', 'verb' => 'POST'],
+		['name' => 'api1#updateTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'PUT'],
+		['name' => 'api1#getTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'GET'],
+		['name' => 'api1#deleteTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'DELETE'],
+		// -> share
+		['name' => 'api1#getShare',	'url' => '/api/1/shares/{shareId}', 'verb' => 'GET'],
+		['name' => 'api1#deleteShare',	'url' => '/api/1/shares/{shareId}', 'verb' => 'DELETE'],
+		['name' => 'api1#updateSharePermissions',	'url' => '/api/1/shares/{shareId}', 'verb' => 'PUT'],
+		// -> share -> table
+		['name' => 'api1#indexTableShares',	'url' => '/api/1/tables/{tableId}/shares', 'verb' => 'GET'],
+		['name' => 'api1#createTableShare',	'url' => '/api/1/tables/{tableId}/shares', 'verb' => 'POST'],
+		// -> columns
+		['name' => 'api1#indexTableColumns',	'url' => '/api/1/tables/{tableId}/columns', 'verb' => 'GET'],
+		['name' => 'api1#createTableColumn',	'url' => '/api/1/tables/{tableId}/columns', 'verb' => 'POST'],
+		['name' => 'api1#getColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'GET'],
+		['name' => 'api1#deleteColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'DELETE'],
+		['name' => 'api1#updateColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'PUT'],
+		// -> rows -> table
+		['name' => 'api1#indexTableRowsSimple',	'url' => '/api/1/tables/{tableId}/rows/simple', 'verb' => 'GET'],
+		['name' => 'api1#indexTableRows',	'url' => '/api/1/tables/{tableId}/rows', 'verb' => 'GET'],
+		['name' => 'api1#createRow',	'url' => '/api/1/tables/{tableId}/rows', 'verb' => 'POST'],
+		// -> row
+		['name' => 'api1#getRow',	'url' => '/api/1/rows/{rowId}', 'verb' => 'GET'],
+		['name' => 'api1#updateRow',	'url' => '/api/1/rows/{rowId}', 'verb' => 'PUT'],
+		['name' => 'api1#deleteRow',	'url' => '/api/1/rows/{rowId}', 'verb' => 'DELETE'],
+
 
 		// table
 		['name' => 'table#index', 'url' => '/table', 'verb' => 'GET'],

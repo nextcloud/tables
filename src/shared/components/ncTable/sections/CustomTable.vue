@@ -28,6 +28,7 @@
 <script>
 import TableHeader from '../partials/TableHeader.vue'
 import TableRow from '../partials/TableRow.vue'
+import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 
 export default {
 	name: 'CustomTable',
@@ -58,7 +59,17 @@ export default {
 		}
 	},
 
+	mounted() {
+		subscribe('tables:selected-rows:deselect', this.deselectAllRows)
+	},
+	beforeDestroy() {
+		unsubscribe('tables:selected-rows:deselect', this.deselectAllRows)
+	},
+
 	methods: {
+		deselectAllRows() {
+			this.selectedRows = []
+		},
 		selectAllRows(value) {
 			this.selectedRows = []
 			if (value) {
