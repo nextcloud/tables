@@ -27,10 +27,12 @@ export default {
 <style scoped>
 
 div {
-  max-height: calc(var(--default-line-height) * 6);
-  overflow: auto;
-  min-width: 100px;
-  max-width: 30vw;
+	max-height: calc(var(--default-line-height) * 6);
+	overflow-y: scroll;
+	min-width: 100px;
+	white-space: pre-wrap;
+	margin-top: calc(var(--default-grid-baseline) * 2);
+	margin-bottom: calc(var(--default-grid-baseline) * 2);
 }
 
 </style>
