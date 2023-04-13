@@ -141,7 +141,6 @@ import DatetimeTimeForm from '../../../shared/components/ncTable/partials/column
 import { NcModal, NcMultiselect, NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import SelectionForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionForm.vue'
 import SelectionMultiForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionMultiForm.vue'
-import { NcModal, NcMultiselect } from '@nextcloud/vue'
 import { showError, showInfo, showSuccess, showWarning } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
