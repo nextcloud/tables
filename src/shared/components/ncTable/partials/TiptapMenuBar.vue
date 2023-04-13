@@ -1,99 +1,105 @@
 <template>
 	<div class="tiptap-wrapper">
 		<div v-if="editor" class="menuBar">
-			<NcButton type="tertiary-no-background" @click="editor.chain().focus().undo().run()">
+			<NcButton type="tertiary-no-background" :aria-label="t('tables', 'Undo')" @click="editor.chain().focus().undo().run()">
 				<template #icon>
 					<Undo :size="20" />
 				</template>
 			</NcButton>
-			<NcButton type="tertiary-no-background" @click="editor.chain().focus().redo().run()">
+			<NcButton type="tertiary-no-background" :aria-label="t('tables', 'Redo')" @click="editor.chain().focus().redo().run()">
 				<template #icon>
 					<Redo :size="20" />
 				</template>
 			</NcButton>
-			<NcButton :class="{ 'is-active': editor.isActive('bold') }" type="tertiary-no-background" @click="editor.chain().focus().toggleBold().run()">
+			<NcButton :class="{ 'is-active': editor.isActive('bold') }" type="tertiary-no-background" :aria-label="t('tables', 'Bold')" @click="editor.chain().focus().toggleBold().run()">
 				<template #icon>
 					<FormatBold :size="20" />
 				</template>
 			</NcButton>
-			<NcButton :class="{ 'is-active': editor.isActive('italic') }" type="tertiary-no-background" @click="editor.chain().focus().toggleItalic().run()">
+			<NcButton :class="{ 'is-active': editor.isActive('italic') }" type="tertiary-no-background" :aria-label="t('tables', 'Italic')" @click="editor.chain().focus().toggleItalic().run()">
 				<template #icon>
 					<FormatItalic :size="20" />
 				</template>
 			</NcButton>
-			<NcButton :class="{ 'is-active': editor.isActive('bulletList') }" type="tertiary-no-background" @click="editor.chain().focus().toggleBulletList().run()">
+			<NcButton :class="{ 'is-active': editor.isActive('bulletList') }" type="tertiary-no-background" :aria-label="t('tables', 'Bullet list')" @click="editor.chain().focus().toggleBulletList().run()">
 				<template #icon>
 					<FormatListBulletedSquare :size="20" />
 				</template>
 			</NcButton>
-			<NcButton v-if="big"
+			<NcButton
 				:class="{ 'is-active': editor.isActive('orderedList') }"
 				type="tertiary-no-background"
+				:aria-label="t('tables', 'Ordered list')"
 				@click="editor.chain().focus().toggleOrderedList().run()">
 				<template #icon>
 					<FormatListNumbered :size="20" />
 				</template>
 			</NcButton>
-			<NcButton v-if="big"
+			<NcButton
 				:class="{ 'is-active': editor.isActive('strike') }"
 				type="tertiary-no-background"
+				:aria-label="t('tables', 'Strike')"
 				@click="editor.chain().focus().toggleStrike().run()">
 				<template #icon>
 					<FormatStrikethrough :size="20" />
 				</template>
 			</NcButton>
-			<NcButton v-if="big"
+			<NcButton
 				type="tertiary-no-background"
 				:class="{ 'is-active': editor.isActive('heading', { level: 1 }) }"
+				:aria-label="t('tables', 'Heading 1')"
 				@click="editor.chain().focus().toggleHeading({ level: 1 }).run()">
 				<template #icon>
 					<FormatHeader1 :size="20" />
 				</template>
 			</NcButton>
-			<NcButton v-if="big"
+			<NcButton
 				type="tertiary-no-background"
 				:class="{ 'is-active': editor.isActive('heading', { level: 2 }) }"
+				:aria-label="t('tables', 'Heading 2')"
 				@click="editor.chain().focus().toggleHeading({ level: 2 }).run()">
 				<template #icon>
 					<FormatHeader2 :size="20" />
 				</template>
 			</NcButton>
-			<NcButton v-if="big"
+			<NcButton
 				type="tertiary-no-background"
 				:class="{ 'is-active': editor.isActive('heading', { level: 3 }) }"
+				:aria-label="t('tables', 'Heading 3')"
 				@click="editor.chain().focus().toggleHeading({ level: 3 }).run()">
 				<template #icon>
 					<FormatHeader3 :size="20" />
 				</template>
 			</NcButton>
-			<NcButton v-if="big"
+			<NcButton
 				type="tertiary-no-background"
 				:class="{ 'is-active': editor.isActive('code') }"
+				:aria-label="t('tables', 'Code')"
 				@click="editor.chain().focus().toggleCode().run()">
 				<template #icon>
 					<CodeTags :size="20" />
 				</template>
 			</NcButton>
-			<NcButton v-if="big"
+			<NcButton
 				type="tertiary-no-background"
 				:class="{ 'is-active': editor.isActive('taskList') }"
+				:aria-label="t('tables', 'Task list')"
 				@click="editor.chain().focus().toggleTaskList().run()">
 				<template #icon>
 					<CheckboxMultipleMarkedOutline :size="20" />
 				</template>
 			</NcButton>
-			<NcButton type="tertiary-no-background" :class="{ 'is-active': big }" @click="big = !big">
-				<template #icon>
-					<Fullscreen :size="20" />
-				</template>
-			</NcButton>
 		</div>
 		<EditorContent :editor="editor" />
+		<div v-if="editor && textLengthLimit" class="character-count p span end">
+			{{ editor.storage.characterCount.characters() }}/{{ textLengthLimit }}
+		</div>
 	</div>
 </template>
 
 <script>
 import { Editor, EditorContent } from '@tiptap/vue-2'
+import { CharacterCount } from '@tiptap/extension-character-count'
 import { StarterKit } from '@tiptap/starter-kit'
 import { TaskList } from '@tiptap/extension-task-list'
 import { TaskItem } from '@tiptap/extension-task-item'
@@ -110,7 +116,6 @@ import FormatHeader2 from 'vue-material-design-icons/FormatHeader2.vue'
 import FormatHeader3 from 'vue-material-design-icons/FormatHeader3.vue'
 import CodeTags from 'vue-material-design-icons/CodeTags.vue'
 import CheckboxMultipleMarkedOutline from 'vue-material-design-icons/CheckboxMultipleMarkedOutline.vue'
-import Fullscreen from 'vue-material-design-icons/Fullscreen.vue'
 
 export default {
 	components: {
@@ -128,7 +133,6 @@ export default {
 		FormatHeader3,
 		CodeTags,
 		CheckboxMultipleMarkedOutline,
-		Fullscreen,
 	},
 
 	props: {
@@ -136,19 +140,16 @@ export default {
 			type: String,
 			default: '',
 		},
+		textLengthLimit: {
+		      type: Number,
+		      default: null,
+		    },
 	},
 
 	data() {
 		return {
 			editor: null,
-			big: false,
 		}
-	},
-
-	watch: {
-		big() {
-			this.$emit('big', this.big)
-		},
 	},
 
 	mounted() {
@@ -158,6 +159,9 @@ export default {
 				TaskList,
 				TaskItem.configure({
 					nested: true,
+				}),
+				CharacterCount.configure({
+					limit: this.textLengthLimit,
 				}),
 			],
 			onUpdate: () => {
@@ -179,8 +183,16 @@ export default {
 </script>
 
 <style lang="scss">
+
+.character-count {
+	display: flex;
+	margin-right: calc(var(--default-grid-baseline) * 3);
+	padding: 0;
+}
+
 .menuBar {
 	display: inline-flex;
+	flex-wrap: wrap;
 }
 
 /* Basic editor styles */

@@ -87,7 +87,7 @@ export default {
   }
 
   p span, .p span, p .span, .p .span, .p.span, p.span, .light {
-    font-weight: 100;
+	  color: var(--color-text-maxcontrast);
   }
 
   p code {
@@ -116,8 +116,7 @@ export default {
   }
 
   [class^='col-'] > span {
-    color: var(--color-text-lighter);
-    font-weight: 100;
+	  color: var(--color-text-maxcontrast);
   }
 
   .icon-left {

@@ -1,0 +1,144 @@
+name: Cypress
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+      - stable*
+
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  APP_NAME: tables
+  CYPRESS_baseUrl: http://localhost:8081/index.php
+
+jobs:
+  cypress:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [ 16 ]
+        containers: [ 1 ]
+        php-versions: [ '8.1' ]
+        databases: [ 'mysql' ]
+        server-versions: [ 'master' ]
+
+    services:
+      mysql:
+        image: mariadb:10.5
+        ports:
+          - 4444:3306/tcp
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+        options: --health-cmd="mysqladmin ping" --health-interval 5s --health-timeout 2s --health-retries 5
+
+    steps:
+
+      - name: Checkout server
+        uses: actions/checkout@v3
+        with:
+          repository: nextcloud/server
+          ref: ${{ matrix.server-versions }}
+
+      - name: Checkout submodules
+        shell: bash
+        run: |
+          auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+          git submodule sync --recursive
+          git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
+
+      - name: Checkout viewer
+        uses: actions/checkout@v3
+        with:
+          repository: nextcloud/viewer
+          ref: ${{ matrix.server-versions }}
+          path: apps/viewer
+
+      - name: Checkout app
+        uses: actions/checkout@v3
+        with:
+          path: apps/${{ env.APP_NAME }}
+
+      - name: Set up node 16
+        uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+          cache-dependency-path: apps/${{ env.APP_NAME}}/package-lock.json
+          node-version: 16
+
+      - name: Install dependencies & build app
+        working-directory: apps/${{ env.APP_NAME }}
+        run: |
+          npm ci
+          TESTING=true npm run build --if-present
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Set up php ${{ matrix.php-versions }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: mbstring, iconv, fileinfo, intl, sqlite, pdo_sqlite, zip, gd, apcu
+          ini-values:
+            apc.enable_cli=on
+          coverage: none
+
+      - name: Set up Nextcloud
+        env:
+          DB_PORT: 4444
+          PHP_CLI_SERVER_WORKERS: 10
+        run: |
+          mkdir data
+          ./occ maintenance:install --verbose --database=${{ matrix.databases }} --database-name=nextcloud --database-host=127.0.0.1 --database-port=$DB_PORT --database-user=root --database-pass=rootpassword --admin-user admin --admin-pass admin
+          ./occ config:system:set hashing_default_password --value=true --type=boolean
+          ./occ config:system:set memcache.local --value="\\OC\\Memcache\\APCu"
+          ./occ config:system:set memcache.distributed --value="\\OC\\Memcache\\APCu"
+          cat config/config.php
+          ./occ user:list
+          ./occ app:enable --force ${{ env.APP_NAME }}
+          ./occ config:system:set query_log_file --value '/home/runner/work/${{ env.APP_NAME }}/${{ env.APP_NAME }}/query.log'
+          php -S 0.0.0.0:8081 &
+          export OC_PASS=1234561
+          php occ user:add --password-from-env user1
+          php occ user:add --password-from-env user2
+          curl -v http://localhost:8081/index.php/login
+          cat data/nextcloud.log
+
+      - name: Cypress run
+        uses: cypress-io/github-action@v4
+        with:
+          record: false
+          wait-on: '${{ env.CYPRESS_baseUrl }}'
+          working-directory: 'apps/${{ env.APP_NAME }}'
+          config: defaultCommandTimeout=10000,video=false
+        env:
+          # https://github.com/cypress-io/github-action/issues/124
+          COMMIT_INFO_MESSAGE: ${{ github.event.pull_request.title }}
+          COMMIT_INFO_SHA: ${{ github.event.pull_request.head.sha }}
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          npm_package_name: ${{ env.APP_NAME }}
+
+      - name: Upload test failure screenshots
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: Upload screenshots
+          path: apps/${{ env.APP_NAME }}/cypress/screenshots/
+          retention-days: 5
+
+      - name: Upload nextcloud logs
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: Upload nextcloud log
+          path: data/nextcloud.log
+          retention-days: 5

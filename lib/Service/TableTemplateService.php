@@ -81,6 +81,8 @@ class TableTemplateService {
 			$this->makeVacationRequests($table);
 		} elseif ($template === 'customers') {
 			$this->makeCustomers($table);
+		} elseif ($template === 'tutorial') {
+			$this->makeStartupTable($table);
 		}
 		return $table;
 	}
@@ -606,6 +608,94 @@ class TableTemplateService {
 		]);
 	}
 
+
+	/**
+	 * @psalm-suppress PossiblyNullReference
+	 * @param Table $table
+	 * @throws InternalError
+	 * @throws PermissionError
+	 */
+	private function makeStartupTable(Table $table):void {
+		$columns = [];
+
+		$params = [
+			// TRANSLATORS This is the title of the first column for a list of actions
+			'title' => $this->l->t('What'),
+			'type' => 'text',
+			'subtype' => 'line',
+			'orderWeight' => 10,
+		];
+		$columns['what'] = $this->createColumn($table->id, $params);
+
+		$params = [
+			'title' => $this->l->t('How to do'),
+			'type' => 'text',
+			'subtype' => 'long',
+			'orderWeight' => 10,
+		];
+		$columns['how'] = $this->createColumn($table->id, $params);
+
+		$params = [
+			'title' => $this->l->t('Ease of use'),
+			'type' => 'number',
+			'subtype' => 'stars',
+			'orderWeight' => 10,
+		];
+		$columns['ease'] = $this->createColumn($table->id, $params);
+
+		$params = [
+			// TRANSLATORS This is an example title for a column to show if an action was done
+			'title' => $this->l->t('Done'),
+			'type' => 'selection',
+			'subtype' => 'check',
+			'orderWeight' => 10,
+		];
+		$columns['done'] = $this->createColumn($table->id, $params);
+
+
+		// let's add some example rows
+		$this->createRow($table, [
+			// TRANSLATORS This is an example name
+			$columns['what']->getId() => $this->l->t('Open the tables app'),
+			// TRANSLATORS This is an example account manager
+			$columns['how']->getId() => 'Click on tables icon in the menu bar.',
+			$columns['ease']->getId() => 5,
+			$columns['done']->getId() => 'true',
+		]);
+		$this->createRow($table, [
+			// TRANSLATORS This is an example name
+			$columns['what']->getId() => $this->l->t('Add your first row'),
+			// TRANSLATORS This is an example account manager
+			$columns['how']->getId() => 'Just click on "new row" and enter some data inside of the form. At the end click on the bottom "save".',
+			$columns['ease']->getId() => 5,
+			$columns['done']->getId() => 'false',
+		]);
+		$this->createRow($table, [
+			// TRANSLATORS This is an example name
+			$columns['what']->getId() => $this->l->t('Edit a row'),
+			// TRANSLATORS This is an example account manager
+			$columns['how']->getId() => 'Hover the mouse over a row you want to edit. Click on the pen on the right side. Maybe you want to add a "done" status to this row.',
+			$columns['ease']->getId() => 5,
+			$columns['done']->getId() => 'false',
+		]);
+		$this->createRow($table, [
+			// TRANSLATORS This is an example name
+			$columns['what']->getId() => $this->l->t('Add a new column'),
+			// TRANSLATORS This is an example account manager
+			$columns['how']->getId() => 'You can add, remove and adjust columns as you need it. Click on the three-dot-menu on the upper right of this table and choose "create column". Fill in the data you want, at least a title and column type.',
+			$columns['ease']->getId() => 4,
+			$columns['done']->getId() => 'false',
+		]);
+		$this->createRow($table, [
+			// TRANSLATORS This is an example name
+			$columns['what']->getId() => $this->l->t('Read the docs'),
+			// TRANSLATORS This is an example account manager
+			$columns['how']->getId() => 'If you want to go throw the documentation, this can be found here: https://github.com/nextcloud/tables/wiki',
+			$columns['ease']->getId() => 3,
+			$columns['done']->getId() => 'false',
+		]);
+	}
+
 	/**
 	 * @param int $tableId
 	 * @param (mixed)[] $parameters
@@ -620,14 +710,11 @@ class TableTemplateService {
 
 		return $this->columnService->create(
 
-			// tableId
-			$tableId,
-
-			// title
-			(isset($parameters['title']) && $parameters['title'] != '') ? $parameters['title'] : $this->l->t('No title given'),
-
 			// userId
 			$this->userId,
+
+			// tableId
+			$tableId,
 
 			// column type
 			(isset($parameters['type'])) ? $parameters['type'] : 'text',
@@ -635,17 +722,17 @@ class TableTemplateService {
 			// column subtype
 			(isset($parameters['subtype'])) ? $parameters['subtype'] : '',
 
-			// prefix
-			(isset($parameters['numberPrefix'])) ? $parameters['numberPrefix'] : '',
-
-			// suffix
-			(isset($parameters['numberSuffix'])) ? $parameters['numberSuffix'] : '',
+			// title
+			(isset($parameters['title']) && $parameters['title'] != '') ? $parameters['title'] : $this->l->t('No title given'),
 
 			// mandatory
 			isset($parameters['mandatory']) && !!$parameters['mandatory'],
 
 			// description
 			(isset($parameters['description'])) ? $parameters['description'] : '',
+
+			// orderWeight
+			(isset($parameters['orderWeight'])) ? $parameters['orderWeight'] : 0,
 
 			// textDefault
 			(isset($parameters['textDefault'])) ? $parameters['textDefault'] : '',
@@ -655,6 +742,12 @@ class TableTemplateService {
 
 			// textMaxLength
 			(isset($parameters['textMaxLength'])) ? $parameters['textMaxLength'] : -1,
+
+			// numberPrefix
+			(isset($parameters['numberPrefix'])) ? $parameters['numberPrefix'] : '',
+
+			// numberSuffix
+			(isset($parameters['numberSuffix'])) ? $parameters['numberSuffix'] : '',
 
 			// numberDefault
 			(isset($parameters['numberDefault'])) ? $parameters['numberDefault'] : null,
@@ -673,9 +766,6 @@ class TableTemplateService {
 
 			// selectionDefault
 			(isset($parameters['selectionDefault'])) ? $parameters['selectionDefault'] : '',
-
-			// orderWeight
-			(isset($parameters['orderWeight'])) ? $parameters['orderWeight'] : 0,
 
 			// datetimeDefault
 			(isset($parameters['datetimeDefault'])) ? $parameters['datetimeDefault'] : '',

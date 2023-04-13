@@ -1,7 +1,7 @@
 {
 	"name": "tables",
 	"description": "Manage data within tables.",
-	"version": "0.3.3",
+	"version": "0.4.0",
 	"author": "Florian Steffens <florian.steffens@nextcloud.com",
 	"bugs": {
 		"url": "https://github.com/nextcloud/tables/issues"
@@ -33,10 +33,11 @@
 		"@nextcloud/router": "^2.0.1",
 		"@nextcloud/vue": "^7.8.1",
 		"@nextcloud/vue-richtext": "^2.1.0-beta.6",
-		"@tiptap/extension-task-item": "^2.0.2",
-		"@tiptap/extension-task-list": "^2.0.2",
-		"@tiptap/starter-kit": "^2.0.2",
-		"@tiptap/vue-2": "^2.0.2",
+		"@tiptap/extension-character-count": "^2.0.2",
+		"@tiptap/extension-task-item": "^2.0.1",
+		"@tiptap/extension-task-list": "^2.0.0-beta.220",
+		"@tiptap/starter-kit": "^2.0.0-beta.220",
+		"@tiptap/vue-2": "^2.0.1",
 		"debounce": "^1.2.1",
 		"vue": "^2.7.14",
 		"vue-material-design-icons": "^5.2.0",
@@ -54,10 +55,12 @@
 	"devDependencies": {
 		"@nextcloud/babel-config": "^1.0.0",
 		"@nextcloud/browserslist-config": "^2.3.0",
+		"@nextcloud/cypress": "^1.0.0-beta.2",
 		"@nextcloud/eslint-config": "^8.2.1",
 		"@nextcloud/stylelint-config": "^2.3.0",
 		"@nextcloud/webpack-vue-config": "^5.5.0",
-		"sass": "^1.61.0",
-		"sass-loader": "^13.2.2"
+		"sass": "^1.60.0",
+		"sass-loader": "^13.2.2",
+		"cypress": "^12.8.1"
 	}
 }

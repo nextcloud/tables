@@ -45,6 +45,14 @@
 				@click="showDeletionConfirmation = true">
 				{{ t('tables', 'Delete table') }}
 			</NcActionButton>
+			<NcActionButton
+				:close-after-click="true"
+				@click="actionShowIntegration">
+				{{ t('tables', 'Integration') }}
+				<template #icon>
+					<Creation :size="20" />
+				</template>
+			</NcActionButton>
 		</template>
 		<DialogConfirmation :description="getTranslatedDescription"
 			:title="t('tables', 'Confirm table deletion')"
@@ -66,6 +74,7 @@ import { emit } from '@nextcloud/event-bus'
 import Table from 'vue-material-design-icons/Table.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import { getCurrentUser } from '@nextcloud/auth'
+import Creation from 'vue-material-design-icons/Creation.vue'
 
 export default {
 	name: 'NavigationTableItem',
@@ -78,6 +87,7 @@ export default {
 		NcAppNavigationItem,
 		NcCounterBubble,
 		NcAvatar,
+		Creation,
 	},
 
 	filters: {
@@ -118,6 +128,10 @@ export default {
 	methods: {
 		async actionShowShare() {
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
+			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
+		},
+		async actionShowIntegration() {
+			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
 			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
 		},
 		closeNav(e) {

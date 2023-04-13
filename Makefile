@@ -82,7 +82,7 @@ watch-js:
 
 ##### Testing #####
 
-test: test-unit test-behat
+test: test-unit test-behat test-cypress
 
 test-api:
 	phpunit --bootstrap vendor/autoload.php --testdox tests/api/
@@ -92,6 +92,9 @@ test-unit:
 
 test-behat:
 	cd ./tests/integration && ./run.sh && cd ../..
+
+test-cypress:
+	./node_modules/.bin/cypress run
 
 
 ##### Linting #####

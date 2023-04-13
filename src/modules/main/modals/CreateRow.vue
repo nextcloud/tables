@@ -1,9 +1,11 @@
 <template>
-	<NcModal v-if="showModal" size="large" @close="actionCancel">
+	<NcModal v-if="showModal" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
-					<h2>{{ t('tables', 'Create row') }}</h2>
+					<h2 style="padding: 0">
+						{{ t('tables', 'Create row') }}
+					</h2>
 				</div>
 			</div>
 			<div v-for="column in columns" :key="column.id">
@@ -25,6 +27,12 @@
 				<NumberProgressForm v-if="column.type === 'number' && column.subtype === 'progress'"
 					:column="column"
 					:value.sync="row[column.id]" />
+				<SelectionForm v-if="column.type === 'selection' && !column.subtype"
+					:column="column"
+					:value.sync="row[column.id]" />
+				<SelectionMultiForm v-if="column.type === 'selection' && column.subtype === 'multi'"
+					:column="column"
+					:value.sync="row[column.id]" />
 				<SelectionCheckForm v-if="column.type === 'selection' && column.subtype === 'check'"
 					:column="column"
 					:value.sync="row[column.id]" />
@@ -39,15 +47,14 @@
 					:value.sync="row[column.id]" />
 			</div>
 			<div class="row">
-				<div class="fix-col-4 space-B space-T">
-					<button class="secondary" @click="actionCancel">
-						{{ t('tables', 'Cancel') }}
-					</button>
-					<button v-if="!localLoading" class="primary" @click="actionConfirm(true)">
+				<div class="fix-col-4 space-T end">
+					<div class="padding-right">
+						<NcCheckboxRadioSwitch :checked.sync="addNewAfterSave" type="switch">
+							{{ t('tables', 'Add more') }}
+						</NcCheckboxRadioSwitch>
+					</div>
+					<button v-if="!localLoading" class="primary" :aria-label="t('tables', 'Save row')" @click="actionConfirm()">
 						{{ t('tables', 'Save') }}
-					</button>
-					<button v-if="!localLoading" class="primary" @click="actionConfirm(false)">
-						{{ t('tables', 'Save and new') }}
 					</button>
 				</div>
 			</div>
@@ -56,7 +63,7 @@
 </template>
 
 <script>
-import { NcModal } from '@nextcloud/vue'
+import { NcModal, NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
@@ -67,6 +74,8 @@ import NumberForm from '../../../shared/components/ncTable/partials/rowTypeParti
 import NumberStarsForm from '../../../shared/components/ncTable/partials/rowTypePartials/NumberStarsForm.vue'
 import NumberProgressForm from '../../../shared/components/ncTable/partials/rowTypePartials/NumberProgressForm.vue'
 import SelectionCheckForm from '../../../shared/components/ncTable/partials/rowTypePartials/SelectionCheckForm.vue'
+import SelectionForm from '../../../shared/components/ncTable/partials/rowTypePartials/SelectionForm.vue'
+import SelectionMultiForm from '../../../shared/components/ncTable/partials/rowTypePartials/SelectionMultiForm.vue'
 import DatetimeForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeForm.vue'
 import DatetimeDateForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeTimeForm.vue'
@@ -75,6 +84,8 @@ export default {
 	name: 'CreateRow',
 	components: {
 		SelectionCheckForm,
+		SelectionForm,
+		SelectionMultiForm,
 		NcModal,
 		TextLineForm,
 		TextLongForm,
@@ -85,6 +96,7 @@ export default {
 		DatetimeForm,
 		DatetimeDateForm,
 		DatetimeTimeForm,
+		NcCheckboxRadioSwitch,
 	},
 	props: {
 		showModal: {
@@ -100,6 +112,7 @@ export default {
 		return {
 			row: {},
 			localLoading: false,
+			addNewAfterSave: false,
 		}
 	},
 	computed: {
@@ -110,12 +123,23 @@ export default {
 			this.reset()
 			this.$emit('close')
 		},
-		async actionConfirm(closeModal) {
+		isValueValidForColumn(value, column) {
+			if (column.type === 'selection') {
+				if (
+					(value instanceof Array && value.length > 0)
+					|| (value === parseInt(value))
+				) {
+					return true
+				}
+				return false
+			}
+			return !!value || value === 0
+		},
+		async actionConfirm() {
 			let mandatoryFieldsEmpty = false
 			this.columns.forEach(col => {
-				console.debug('check for mandatory columns', col)
 				if (col.mandatory) {
-					const validValue = (!!this.row[col.id] || this.row[col.id] === 0)
+					const validValue = this.isValueValidForColumn(this.row[col.id], col)
 					mandatoryFieldsEmpty = mandatoryFieldsEmpty || !validValue
 				}
 			})
@@ -123,7 +147,7 @@ export default {
 				this.localLoading = true
 				await this.sendNewRowToBE()
 				this.localLoading = false
-				if (closeModal) {
+				if (!this.addNewAfterSave) {
 					this.actionCancel()
 				} else {
 					showSuccess(t('tables', 'Row successfully created.'))
@@ -154,3 +178,10 @@ export default {
 	},
 }
 </script>
+<style lang="scss" scoped>
+
+.padding-right {
+	padding-right: calc(var(--default-grid-baseline) * 3);
+}
+
+</style>

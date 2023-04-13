@@ -18,8 +18,13 @@ class ColumnService extends SuperService {
 
 	private RowService $rowService;
 
-	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-								ColumnMapper $mapper, RowService $rowService) {
+	public function __construct(
+		PermissionsService $permissionsService,
+		LoggerInterface $logger,
+		?string $userId,
+		ColumnMapper $mapper,
+		RowService $rowService
+	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
 		$this->rowService = $rowService;
@@ -30,9 +35,9 @@ class ColumnService extends SuperService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function findAllByTable(int $tableId): array {
+	public function findAllByTable(int $tableId, ?string $userId = null): array {
 		try {
-			if ($this->permissionsService->canReadColumnsByTableId($tableId)) {
+			if ($this->permissionsService->canReadColumnsByTableId($tableId, $userId)) {
 				return $this->mapper->findAllByTable($tableId);
 			} else {
 				throw new PermissionError('no read access to table id = '.$tableId);
@@ -72,51 +77,58 @@ class ColumnService extends SuperService {
 	/**
 	 * @noinspection PhpUndefinedMethodInspection
 	 * @noinspection DuplicatedCode
-	 * @param int $tableId
-	 * @param string $title
+	 *
 	 * @param string $userId
+	 * @param int $tableId
 	 * @param string $type
-	 * @param string $subtype
-	 * @param string $numberPrefix
-	 * @param string $numberSuffix
+	 * @param string|null $subtype
+	 * @param string $title
 	 * @param bool $mandatory
-	 * @param string $description
-	 * @param string $textDefault
-	 * @param string $textAllowedPattern
-	 * @param int $textMaxLength
+	 * @param string|null $description
+	 * @param int|null $orderWeight
+	 * @param string|null $numberPrefix
+	 * @param string|null $numberSuffix
 	 * @param float|null $numberDefault
 	 * @param float|null $numberMin
 	 * @param float|null $numberMax
 	 * @param int|null $numberDecimals
-	 * @param string $selectionOptions
-	 * @param string $selectionDefault
-	 * @param int $orderWeight
-	 * @param string $datetimeDefault
+	 * @param string|null $textDefault
+	 * @param string|null $textAllowedPattern
+	 * @param int|null $textMaxLength
+	 * @param string|null $selectionOptions
+	 * @param string|null $selectionDefault
+	 * @param string|null $datetimeDefault
+	 *
 	 * @return Column
+	 *
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
 	public function create(
-		int $tableId,
-		string $title,
 		string $userId,
+		int $tableId,
 		string $type,
-		string $subtype,
-		string $numberPrefix,
-		string $numberSuffix,
+		?string $subtype,
+		string $title,
 		bool $mandatory,
-		string $description,
-		string $textDefault,
-		string $textAllowedPattern,
-		int $textMaxLength,
-		?float $numberDefault = null,
-		?float $numberMin = null,
-		?float $numberMax = null,
-		?int $numberDecimals = null,
-		string $selectionOptions = '',
-		string $selectionDefault = '',
-		int $orderWeight = 0,
-		string $datetimeDefault = ''
+		?string $description,
+		?int $orderWeight,
+
+		?string $textDefault,
+		?string $textAllowedPattern,
+		?int $textMaxLength,
+
+		?string $numberPrefix,
+		?string $numberSuffix,
+		?float $numberDefault,
+		?float $numberMin,
+		?float $numberMax,
+		?int $numberDecimals,
+
+		?string $selectionOptions,
+		?string $selectionDefault,
+
+		?string $datetimeDefault
 	):Column {
 		// security
 		if (!$this->permissionsService->canCreateColumnsByTableId($tableId)) {
@@ -128,9 +140,7 @@ class ColumnService extends SuperService {
 		$item->setTitle($title);
 		$item->setTableId($tableId);
 		$item->setType($type);
-		$item->setSubtype($subtype);
-		$item->setNumberPrefix($numberPrefix);
-		$item->setNumberSuffix($numberSuffix);
+		$item->setSubtype($subtype !== null ? $subtype: '');
 		$item->setMandatory($mandatory);
 		$item->setDescription($description);
 		$item->setTextDefault($textDefault);
@@ -140,6 +150,8 @@ class ColumnService extends SuperService {
 		$item->setNumberMin($numberMin);
 		$item->setNumberMax($numberMax);
 		$item->setNumberDecimals($numberDecimals);
+		$item->setNumberPrefix($numberPrefix !== null ?: '');
+		$item->setNumberSuffix($numberSuffix !== null ?: '');
 		$item->setCreatedBy($userId);
 		$item->setLastEditBy($userId);
 		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
@@ -159,84 +171,125 @@ class ColumnService extends SuperService {
 	/**
 	 * @noinspection PhpUndefinedMethodInspection
 	 * @noinspection DuplicatedCode
-	 * @param int $id
-	 * @param int $tableId
-	 * @param string $userId
-	 * @param string $title
-	 * @param string $type
-	 * @param string $subtype
-	 * @param string $numberPrefix
-	 * @param string $numberSuffix
+	 * @param int $columnId
+	 * @param int|null $tableId
+	 * @param string|null $userId
+	 * @param string|null $type
+	 * @param string|null $subtype
+	 * @param string|null $title
 	 * @param bool $mandatory
-	 * @param string $description
-	 * @param string $textDefault
-	 * @param string $textAllowedPattern
+	 * @param string|null $description
+	 * @param int|null $orderWeight
+	 * @param string|null $textDefault
+	 * @param string|null $textAllowedPattern
 	 * @param int|null $textMaxLength
+	 * @param string|null $numberPrefix
+	 * @param string|null $numberSuffix
 	 * @param float|null $numberDefault
 	 * @param float|null $numberMin
 	 * @param float|null $numberMax
 	 * @param int|null $numberDecimals
-	 * @param string $selectionOptions
-	 * @param string $selectionDefault
-	 * @param int $orderWeight
-	 * @param string $datetimeDefault
+	 * @param string|null $selectionOptions
+	 * @param string|null $selectionDefault
+	 * @param string|null $datetimeDefault
 	 * @return Column
 	 * @throws InternalError
 	 */
 	public function update(
-		int $id,
-		int $tableId,
-		string $userId,
-		string $title,
-		string $type,
-		string $subtype,
-		string $numberPrefix,
-		string $numberSuffix,
-		bool $mandatory,
-		string $description,
-		string $textDefault,
-		string $textAllowedPattern,
+		int $columnId,
+		?int $tableId,
+		?string $userId,
+		?string $type,
+		?string $subtype,
+		?string $title,
+		?bool $mandatory,
+		?string $description,
+		?int $orderWeight,
+
+		?string $textDefault,
+		?string $textAllowedPattern,
 		?int $textMaxLength,
-		?float $numberDefault = null,
-		?float $numberMin = null,
-		?float $numberMax = null,
-		?int $numberDecimals = null,
-		string $selectionOptions = '',
-		string $selectionDefault = '',
-		int $orderWeight = 0,
-		string $datetimeDefault = ''
+
+		?string $numberPrefix,
+		?string $numberSuffix,
+		?float $numberDefault,
+		?float $numberMin,
+		?float $numberMax,
+		?int $numberDecimals,
+
+		?string $selectionOptions,
+		?string $selectionDefault,
+		?string $datetimeDefault
 	):Column {
 		try {
+			$item = $this->mapper->find($columnId);
+
 			// security
-			if (!$this->permissionsService->canUpdateColumnsByTableId($tableId)) {
-				throw new PermissionError('update column id = '.$id.' is not allowed.');
+			if (!$this->permissionsService->canUpdateColumnsByTableId($item->getTableId())) {
+				throw new PermissionError('update column id = '.$columnId.' is not allowed.');
 			}
 
+			if ($title !== null) {
+				$item->setTitle($title);
+			}
+			if ($tableId !== null) {
+				$item->setTableId($tableId);
+			}
+			if ($type !== null) {
+				$item->setType($type);
+			}
+			if ($subtype !== null) {
+				$item->setSubtype($subtype);
+			}
+			if ($numberPrefix !== null) {
+				$item->setNumberPrefix($numberPrefix);
+			}
+			if ($numberSuffix !== null) {
+				$item->setNumberSuffix($numberSuffix);
+			}
+			if ($mandatory !== null) {
+				$item->setMandatory($mandatory);
+			}
+			if ($description !== null) {
+				$item->setDescription($description);
+			}
+			if ($textDefault !== null) {
+				$item->setTextDefault($textDefault);
+			}
+			if ($textAllowedPattern !== null) {
+				$item->setTextAllowedPattern($textAllowedPattern);
+			}
+			if ($textMaxLength !== null) {
+				$item->setTextMaxLength($textMaxLength);
+			}
+			if ($numberDefault !== null) {
+				$item->setNumberDefault($numberDefault);
+			}
+			if ($numberMin !== null) {
+				$item->setNumberMin($numberMin);
+			}
+			if ($numberMax !== null) {
+				$item->setNumberMax($numberMax);
+			}
+			if ($numberDecimals !== null) {
+				$item->setNumberDecimals($numberDecimals);
+			}
+			if ($selectionOptions !== null) {
+				$item->setSelectionOptions($selectionOptions);
+			}
+			if ($selectionDefault !== null) {
+				$item->setSelectionDefault($selectionDefault);
+			}
+			if ($orderWeight !== null) {
+				$item->setOrderWeight($orderWeight);
+			}
+			if ($datetimeDefault !== null) {
+				$item->setDatetimeDefault($datetimeDefault);
+			}
 
 			$time = new DateTime();
-			$item = new Column();
-			$item->setId($id);
-			$item->setTitle($title);
-			$item->setTableId($tableId);
-			$item->setType($type);
-			$item->setSubtype($subtype);
-			$item->setNumberPrefix($numberPrefix);
-			$item->setNumberSuffix($numberSuffix);
-			$item->setMandatory($mandatory);
-			$item->setDescription($description);
-			$item->setTextDefault($textDefault);
-			$item->setTextAllowedPattern($textAllowedPattern);
-			$item->setTextMaxLength($textMaxLength);
-			$item->setNumberDefault($numberDefault);
-			$item->setNumberMin($numberMin);
-			$item->setNumberMax($numberMax);
-			$item->setNumberDecimals($numberDecimals);
-			$item->setLastEditBy($userId);
 			$item->setLastEditAt($time->format('Y-m-d H:i:s'));
-			$item->setSelectionOptions($selectionOptions);
-			$item->setSelectionDefault($selectionDefault);
-			$item->setOrderWeight($orderWeight);
-			$item->setDatetimeDefault($datetimeDefault);
+			$item->setLastEditBy($userId);
 			return $this->mapper->update($item);
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());

@@ -14,6 +14,7 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
+use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
 class TableService extends SuperService {
@@ -29,8 +30,20 @@ class TableService extends SuperService {
 
 	protected UserHelper $userHelper;
 
-	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-								TableMapper $mapper, TableTemplateService $tableTemplateService, ColumnService $columnService, RowService $rowService, ShareService $shareService, UserHelper $userHelper) {
+	protected IL10N $l;
+
+	public function __construct(
+		PermissionsService $permissionsService,
+		LoggerInterface $logger,
+		?string $userId,
+		TableMapper $mapper,
+		TableTemplateService $tableTemplateService,
+		ColumnService $columnService,
+		RowService $rowService,
+		ShareService $shareService,
+		UserHelper $userHelper,
+		IL10N $l
+	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
 		$this->tableTemplateService = $tableTemplateService;
@@ -38,6 +51,7 @@ class TableService extends SuperService {
 		$this->rowService = $rowService;
 		$this->shareService = $shareService;
 		$this->userHelper = $userHelper;
+		$this->l = $l;
 	}
 
 	/**
@@ -55,14 +69,21 @@ class TableService extends SuperService {
 	public function findAll(?string $userId = null, bool $skipTableEnhancement = false, bool $skipSharedTables = false): array {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
+		$ownTables = [];
+		$newSharedTables = [];
 
 		try {
 			$ownTables = $this->mapper->findAll($userId);
+
+			// if there are no own tables found, create the tutorial table
+			if (count($ownTables) === 0) {
+				$ownTables = [$this->create($this->l->t('Tutorial'), 'tutorial', '🚀')];
+			}
+
 			if (!$skipSharedTables && $userId !== '') {
 				$sharedTables = $this->shareService->findTablesSharedWithMe($userId);
 
 				// clean duplicates
-				$newSharedTables = [];
 				foreach ($sharedTables as $sharedTable) {
 					$found = false;
 					foreach ($ownTables as $ownTable) {
@@ -75,12 +96,12 @@ class TableService extends SuperService {
 						$newSharedTables[] = $sharedTable;
 					}
 				}
-			} else {
-				$newSharedTables = [];
 			}
-		} catch (\OCP\DB\Exception $e) {
-			$this->logger->error($e->getMessage());
+		} catch (\OCP\DB\Exception|InternalError $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError($e->getMessage());
+		} catch (PermissionError $e) {
+			$this->logger->debug('permission error during looking for tables', ['exception' => $e]);
 		}
 
 		// enhance table objects with additional data
@@ -91,6 +112,7 @@ class TableService extends SuperService {
 				$this->enhanceTable($table, $userId);
 			}
 		}
+
 
 		return $allTables;
 	}
@@ -238,36 +260,63 @@ class TableService extends SuperService {
 	/**
 	 * @noinspection PhpUndefinedMethodInspection
 	 *
-	 * @param int $id$userId
-	 * @param string $title
-	 * @param string $emoji
+	 * @param int $id $userId
+	 * @param string|null $title
+	 * @param string|null $emoji
 	 * @param string|null $userId
 	 * @return Table
 	 * @throws InternalError
 	 */
-	public function update(int $id, string $title, string $emoji, ?string $userId): Table {
-		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
+	public function update(int $id, ?string $title, ?string $emoji, ?string $userId = null): Table {
+		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
 			$table = $this->mapper->find($id);
-			// $this->enhanceTable($table);
 
 			// security
-			if (!$this->permissionsService->canUpdateTable($table)) {
+			if (!$this->permissionsService->canUpdateTable($table, $userId)) {
 				throw new PermissionError('PermissionError: can not update table with id '.$id);
 			}
 
 			$time = new DateTime();
-			$table->setTitle($title);
-			$table->setEmoji($emoji);
+			if ($title !== null) {
+				$table->setTitle($title);
+			}
+			if ($emoji !== null) {
+				$table->setEmoji($emoji);
+			}
 			$table->setLastEditBy($userId);
 			$table->setLastEditAt($time->format('Y-m-d H:i:s'));
 			$table = $this->mapper->update($table);
-			/** @var string $userId */
 			$this->enhanceTable($table, $userId);
 			return $table;
 		} catch (Exception $e) {
-			$this->logger->error($e->getMessage());
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError($e->getMessage());
+		}
+	}
+
+	/**
+	 * @throws InternalError
+	 */
+	public function setOwner(int $id, string $newOwnerUserId, ?string $userId = null): Table {
+		$userId = $this->permissionsService->preCheckUserId($userId);
+
+		try {
+			$table = $this->mapper->find($id);
+
+			// security
+			if (!$this->permissionsService->canChangeTableOwner($table, $userId)) {
+				throw new PermissionError('PermissionError: can not change table owner with table id '.$id);
+			}
+
+			/** @noinspection PhpUndefinedMethodInspection */
+			$table->setOwnership($newOwnerUserId);
+			$table = $this->mapper->update($table);
+			$this->enhanceTable($table, $userId);
+			return $table;
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError($e->getMessage());
 		}
 	}
@@ -294,7 +343,7 @@ class TableService extends SuperService {
 			$this->rowService->deleteAllByTable($id, $userId);
 
 			// delete all columns for that table
-			$columns = $this->columnService->findAllByTable($id);
+			$columns = $this->columnService->findAllByTable($id, $userId);
 			foreach ($columns as $column) {
 				$this->columnService->delete($column->id, true, $userId);
 			}

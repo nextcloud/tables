@@ -68,25 +68,19 @@
 							:text-max-length.sync="textMaxLength" />
 					</div>
 
-					<!--
-			<div v-if="combinedType === 'selection'">
-				<div class="row">
-					<div class="col-4">
-						<h4>{{ t('tables', 'Selection column specific parameters') }}</h4>
+					<div v-if="combinedType === 'selection'" class="row space-L no-padding-on-mobile">
+						<div class="col-4 space-T">
+							<h4>{{ t('tables', 'Selection column specific parameters') }}</h4>
+						</div>
+						<SelectionForm :selection-options.sync="selectionOptions" :selection-default.sync="selectionDefault" />
 					</div>
-				</div>
-				<SelectionForm :selection-options.sync="selectionOptions" :selection-default.sync="selectionDefault" />
-			</div>
 
-			<div v-if="combinedType === 'selection-multi'">
-				<div class="row">
-					<div class="col-4">
-						<h4>{{ t('tables', 'Multiple selection column specific parameters') }}</h4>
+					<div v-if="combinedType === 'selection-multi'" class="row space-L no-padding-on-mobile">
+						<div class="col-4 space-T space-B">
+							<h4>{{ t('tables', 'Multiple selection column specific parameters') }}</h4>
+						</div>
+						<SelectionMultiForm :selection-options.sync="selectionOptions" :selection-default.sync="selectionDefault" />
 					</div>
-				</div>
-				<SelectionMultiForm :selection-options.sync="selectionOptions" :selection-default.sync="selectionDefault" />
-			</div>
--->
 
 					<div v-if="combinedType === 'selection-check'" class="row space-L no-padding-on-mobile">
 						<div class="col-4 space-T space-B">
@@ -117,16 +111,15 @@
 					</div>
 				</div>
 			</div>
-			<div class="row space-T space-B">
-				<div class="col-4">
-					<button class="secondary" @click="actionCancel">
-						{{ t('tables', 'Cancel') }}
-					</button>
-					<button class="primary" @click="actionConfirm(true)">
+			<div class="row space-T">
+				<div class="fix-col-4 end">
+					<div class="padding-right">
+						<NcCheckboxRadioSwitch :checked.sync="addNewAfterSave" type="switch">
+							{{ t('tables', 'Add more') }}
+						</NcCheckboxRadioSwitch>
+					</div>
+					<button class="primary" @click="actionConfirm()">
 						{{ t('tables', 'Save') }}
-					</button>
-					<button class="primary" @click="actionConfirm(false)">
-						{{ t('tables', 'Save and new') }}
 					</button>
 				</div>
 			</div>
@@ -145,7 +138,9 @@ import MainForm from '../../../shared/components/ncTable/partials/columnTypePart
 import DatetimeForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeForm.vue'
 import DatetimeDateForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeTimeForm.vue'
-import { NcModal, NcMultiselect } from '@nextcloud/vue'
+import { NcModal, NcMultiselect, NcCheckboxRadioSwitch } from '@nextcloud/vue'
+import SelectionForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionForm.vue'
+import SelectionMultiForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionMultiForm.vue'
 import { showError, showInfo, showSuccess, showWarning } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
@@ -165,6 +160,9 @@ export default {
 		DatetimeDateForm,
 		DatetimeForm,
 		DatetimeTimeForm,
+		NcCheckboxRadioSwitch,
+		SelectionForm,
+		SelectionMultiForm,
 	},
 	props: {
 		showModal: {
@@ -174,6 +172,7 @@ export default {
 	},
 	data() {
 		return {
+			addNewAfterSave: false,
 			type: null,
 			subtype: null,
 			title: '',
@@ -203,8 +202,8 @@ export default {
 				{ id: 'number-stars', label: t('tables', 'Stars rating') },
 				{ id: 'number-progress', label: t('tables', 'Progress bar') },
 
-				// { id: 'selection', label: t('tables', 'Selection') },
-				// { id: 'selection-multi', label: t('tables', 'Multiselect') },
+				{ id: 'selection', label: t('tables', 'Single select') },
+				{ id: 'selection-multi', label: t('tables', 'Multiple select') },
 				{ id: 'selection-check', label: t('tables', 'Yes/No') },
 
 				{ id: 'datetime', label: t('tables', 'Date and time') },
@@ -237,7 +236,7 @@ export default {
 		},
 	},
 	methods: {
-		async actionConfirm(close) {
+		async actionConfirm() {
 			if (!this.title) {
 				showInfo(t('tables', 'Please insert a title for the new column.'))
 				this.titleMissingError = true
@@ -248,7 +247,7 @@ export default {
 			} else {
 				await this.sendNewColumnToBE()
 				this.reset()
-				if (close) {
+				if (!this.addNewAfterSave) {
 					this.$emit('close')
 				}
 			}
@@ -275,8 +274,8 @@ export default {
 					textDefault: this.textDefault,
 					textAllowedPattern: this.textAllowedPattern,
 					textMaxLength: this.textMaxLength,
-					selectionOptions: this.selectionOptions,
-					selectionDefault: this.selectionDefault ? 'true' : 'false',
+					selectionOptions: JSON.stringify(this.selectionOptions),
+					selectionDefault: this.selectionDefault,
 					datetimeDefault: this.datetimeDefault,
 					tableId: this.activeTable.id,
 				}
@@ -296,8 +295,8 @@ export default {
 			this.type = null
 			this.title = ''
 			this.description = ''
-			this.numberPrefix = ''
-			this.numberSuffix = ''
+			this.numberPrefix = null
+			this.numberSuffix = null
 			this.orderWeight = 0
 			this.mandatory = false
 			this.numberDefault = null
@@ -316,3 +315,10 @@ export default {
 	},
 }
 </script>
+<style lang="scss" scoped>
+
+.padding-right {
+	padding-right: calc(var(--default-grid-baseline) * 3);
+}
+
+</style>

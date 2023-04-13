@@ -1,37 +1,36 @@
 <template>
-	<div class="row">
-		<div class="fix-col-1" :class="{ mandatory: column.mandatory }">
-			{{ column.title }}
-		</div>
-		<div class="fix-col-1" :class="{ 'space-B': !column.description }" style="display: inline-flex;">
-			<button @click="less">
-				-
-			</button>
-			<div style="font-size: 1.4em; padding: 7px;">
+	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description">
+		<div class="align-center">
+			<NcButton type="tertiary" :aria-label="t('tables', 'Reduce stars')" @click="less">
+				<template #icon>
+					<Minus :size="20" />
+				</template>
+			</NcButton>
+			<div class="stars">
 				{{ getStars }}
 			</div>
-			<button @click="more">
-				+
-			</button>
+			<NcButton type="tertiary" :aria-label="t('tables', 'Increase stars')" @click="more">
+				<template #icon>
+					<Plus :size="20" />
+				</template>
+			</NcButton>
 		</div>
-		<div class="fix-col-1 hide-s">
-			&nbsp;
-		</div>
-		<div v-if="column.description" class="fix-col-1 p span space-B">
-			<div class="space-L-small">
-				{{ column.description }}
-			</div>
-		</div>
-		<div v-if="!column.description" class="fix-col-1 p span space-B hide-s">
-			&nbsp;
-		</div>
-	</div>
+	</RowFormWrapper>
 </template>
 
 <script>
+import { NcButton } from '@nextcloud/vue'
+import RowFormWrapper from './RowFormWrapper.vue'
+import Plus from 'vue-material-design-icons/Plus.vue'
+import Minus from 'vue-material-design-icons/Minus.vue'
 
 export default {
-	name: 'NumberStarsForm',
+	components: {
+		RowFormWrapper,
+		NcButton,
+		Plus,
+		Minus,
+	},
 	props: {
 		column: {
 			type: Object,
@@ -80,3 +79,16 @@ export default {
 	},
 }
 </script>
+<style lang="scss" scoped>
+
+.align-center {
+	align-items: center;
+	display: inline-flex;
+}
+
+.stars {
+	font-size: 1.4em;
+	padding: 7px;
+}
+
+</style>

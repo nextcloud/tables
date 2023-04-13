@@ -14,6 +14,7 @@
 import DialogConfirmation from '../../../shared/modals/DialogConfirmation.vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
+import { emit } from '@nextcloud/event-bus'
 
 export default {
 	name: 'DeleteRows',
@@ -38,6 +39,7 @@ export default {
 			if (error) {
 				showError(t('tables', 'Error occurred while deleting rows.'))
 			}
+			emit('tables:selected-rows:deselect', {})
 			this.$emit('cancel')
 		},
 	},

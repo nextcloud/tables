@@ -10,12 +10,7 @@
 				</div>
 			</div>
 			<div class="row space-T">
-				<div class="col-4 col-stretch-elements" style="display: inline-flex;">
-					<NcButton :type="cancelClass"
-						@click="$emit('cancel')">
-						{{ cancelTitle }}
-					</NcButton>
-          &nbsp;&nbsp;
+				<div class="fix-col-4 end">
 					<NcButton :type="confirmClass" @click="$emit('confirm')">
 						{{ confirmTitle }}
 					</NcButton>
@@ -54,14 +49,6 @@ export default {
 		confirmClass: {
 			type: String,
 			default: 'success', // primary, secondary, tertiary, tertiary-no-background, tertiary-on-primary, error, warning, success
-		},
-		cancelTitle: {
-			type: String,
-			default: t('tables', 'Cancel'),
-		},
-		cancelClass: {
-			type: String,
-			default: 'secondary', // primary, secondary, tertiary, tertiary-no-background, tertiary-on-primary, error, warning, success
 		},
 	},
 }

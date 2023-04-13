@@ -6,23 +6,20 @@
 			:subtitle="(activeTable) ? t('tables', 'From {ownerName}', { ownerName: activeTable.ownership }) : ''"
 			@update:active="tab => activeSidebarTab = tab"
 			@close="showSidebar = false">
-			<NcAppSidebarTab v-if="activeSidebarTab === 'activity'"
-				id="activity"
-				icon="icon-activity"
-				:name="t('tables', 'Activity')">
-				{{ t('tables', 'Coming soon') }}
-			</NcAppSidebarTab>
-			<NcAppSidebarTab v-if="activeSidebarTab === 'comments'"
-				id="comments"
-				icon="icon-comment"
-				:name="t('tables', 'Comments')">
-				{{ t('tables', 'Coming soon') }}
-			</NcAppSidebarTab>
-			<NcAppSidebarTab v-if="activeSidebarTab === 'sharing'"
-				id="share"
+			<NcAppSidebarTab v-if="canShareActiveTable"
+				id="sharing"
 				icon="icon-share"
 				:name="t('tables', 'Sharing')">
 				<SidebarSharing />
+			</NcAppSidebarTab>
+			<NcAppSidebarTab
+				id="integration"
+				icon="icon-share"
+				:name="t('tables', 'Integration')">
+				<SidebarIntegration />
+				<template #icon>
+					<Creation :size="20" />
+				</template>
 			</NcAppSidebarTab>
 		</NcAppSidebar>
 	</div>
@@ -30,16 +27,24 @@
 <script>
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import SidebarSharing from './SidebarSharing.vue'
+import SidebarIntegration from './SidebarIntegration.vue'
 import { NcAppSidebar, NcAppSidebarTab } from '@nextcloud/vue'
 import { mapGetters, mapState } from 'vuex'
+import Creation from 'vue-material-design-icons/Creation.vue'
+import tablePermissions from '../../main/mixins/tablePermissions.js'
 
 export default {
 	name: 'Sidebar',
 	components: {
 		SidebarSharing,
+		SidebarIntegration,
 		NcAppSidebar,
 		NcAppSidebarTab,
+		Creation,
 	},
+
+	mixins: [tablePermissions],
+
 	data() {
 		return {
 			showSidebar: false,
@@ -52,9 +57,11 @@ export default {
 	},
 	mounted() {
 		subscribe('tables:sidebar:sharing', data => this.handleToggleSidebar(data))
+		subscribe('tables:sidebar:integration', data => this.handleToggleSidebar(data))
 	},
 	beforeDestroy() {
 		unsubscribe('tables:sidebar:sharing', data => this.handleToggleSidebar(data))
+		unsubscribe('tables:sidebar:integration', data => this.handleToggleSidebar(data))
 	},
 	methods: {
 		handleToggleSidebar(data) {
