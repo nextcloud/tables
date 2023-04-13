@@ -1,6 +1,6 @@
 <template>
 	<RowFormWrapper :width="2" :title="column.title" :mandatory="column.mandatory" :description="column.description">
-		<div class="prefix">
+		<div v-if="column.numberPrefix" class="prefix">
 			{{ column.numberPrefix }}
 		</div>
 		<input v-model="localValue"
@@ -8,7 +8,7 @@
 			:min="column.numberMin"
 			:max="column.numberMax"
 			:step="column.numberDecimals === 0 ? '' : 'any'">
-		<div class="suffix">
+		<div v-if="column.numberSuffix" class="suffix">
 			{{ column.numberSuffix }}
 		</div>
 	</RowFormWrapper>
