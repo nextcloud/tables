@@ -1,35 +1,26 @@
 <template>
-	<div class="row">
-		<div class="fix-col-1" :class="{ mandatory: column.mandatory }">
-			{{ column.title }}
+	<RowFormWrapper :width="2" :title="column.title" :mandatory="column.mandatory" :description="column.description">
+		<div v-if="column.numberPrefix" class="prefix">
+			{{ column.numberPrefix }}
 		</div>
-		<div class="fix-col-1" :class="{ 'space-B': !column.description }" style="display: flex;">
-			{{ column.numberPrefix + ' ' }}
-			<input v-model="localValue"
-				type="number"
-				:min="column.numberMin"
-				:max="column.numberMax"
-				:step="column.numberDecimals === 0 ? '' : 'any'">
+		<input v-model="localValue"
+			type="number"
+			:min="column.numberMin"
+			:max="column.numberMax"
+			:step="column.numberDecimals === 0 ? '' : 'any'">
+		<div v-if="column.numberSuffix" class="suffix">
 			{{ column.numberSuffix }}
 		</div>
-		<div class="fix-col-1 hide-s">
-			&nbsp;
-		</div>
-		<div v-if="column.description" class="fix-col-1 p span space-B">
-			<div class="space-L-small">
-				{{ column.description }}
-			</div>
-		</div>
-		<div v-if="!column.description" class="fix-col-1 p span space-B hide-s">
-			&nbsp;
-		</div>
-	</div>
+	</RowFormWrapper>
 </template>
 
 <script>
+import RowFormWrapper from './RowFormWrapper.vue'
 
 export default {
-	name: 'NumberForm',
+	components: {
+		RowFormWrapper,
+	},
 	props: {
 		column: {
 			type: Object,
@@ -63,3 +54,14 @@ export default {
 	},
 }
 </script>
+<style lang="scss" scoped>
+
+.prefix {
+	padding-right: calc(var(--default-grid-baseline) * 2);
+}
+
+.suffix {
+	padding-left: calc(var(--default-grid-baseline) * 2);
+}
+
+</style>

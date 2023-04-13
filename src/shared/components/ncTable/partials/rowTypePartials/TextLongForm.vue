@@ -1,51 +1,20 @@
 <template>
-	<div class="row">
-		<div :class="{ mandatory: column.mandatory, 'fix-col-1': !showBigEditor, 'fix-col-4': showBigEditor }">
-			<div class="row">
-				<div class="fix-col-4">
-					{{ column.title }}
-					<NcPopover v-if="isMobileDevice">
-						<template #trigger>
-							<button class="icon-info" />
-						</template>
-						<p>{{ t('tables', 'There is a bug with the editor on mobile devices, that is why you see only a simple text box.') }}</p>
-					</NcPopover>
-				</div>
-				<div v-if="column.textMaxLength !== -1"
-					class="fix-col-4 p span"
-					:class="{ error: textLengthLimit, light: !textLengthLimit }"
-					style="padding-bottom: 0; padding-top: 0;">
-					{{ t('tables', 'length: {length}/{maxLength}', { length: localValueTextOnly.length ? localValueTextOnly.length : 0, maxLength: column.textMaxLength }) }}
-				</div>
-			</div>
-		</div>
-		<div :class="{ 'fix-col-2': !showBigEditor, 'fix-col-4': showBigEditor, 'space-B': !showBigEditor }" class="no-padding-on-mobile">
-			<TiptapMenuBar v-if="!isMobileDevice"
-				:value.sync="localValue"
-				@input="updateText"
-				@big="setShowBigEditor" />
-			<textarea v-if="isMobileDevice" v-model="localValue" />
-		</div>
-		<div v-if="column.description" class="p span space-B light" :class="{ 'fix-col-1': !showBigEditor, 'fix-col-4': showBigEditor }">
-			<div :class="{ 'space-L-small': !showBigEditor }" class="no-padding-on-mobile">
-				{{ column.description }}
-			</div>
-		</div>
-		<div v-if="!column.description" class="fix-col-1 p span space-B hide-s">
-			&nbsp;
-		</div>
-	</div>
+	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description">
+		<TiptapMenuBar
+			:value.sync="localValue"
+			:text-length-limit="getTextLimit"
+			@input="updateText" />
+	</RowFormWrapper>
 </template>
 
 <script>
 import TiptapMenuBar from '../TiptapMenuBar.vue'
-import { NcPopover } from '@nextcloud/vue'
+import RowFormWrapper from './RowFormWrapper.vue'
 
 export default {
-	name: 'TextLongForm',
 	components: {
 		TiptapMenuBar,
-		NcPopover,
+		RowFormWrapper,
 	},
 	props: {
 		column: {
@@ -57,19 +26,10 @@ export default {
 			default: null,
 		},
 	},
-	data() {
-		return {
-			showBigEditor: false,
-		}
-	},
 	computed: {
-		isMobileDevice() {
-			// return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
-			return false
-		},
 		localValue: {
 			get() {
-				return (this.value && true)
+				return (this.value)
 					? this.value
 					: ((this.column.textDefault !== undefined)
 						? this.column.textDefault
@@ -79,19 +39,17 @@ export default {
 				this.$emit('update:value', v)
 			},
 		},
-		localValueTextOnly() {
-			return this.localValue.replace(/(<([^>]+)>)/gi, '')
-		},
-		textLengthLimit() {
-			return !!(this.column.textMaxLength && this.column.textMaxLength < this.localValueTextOnly.length)
+		getTextLimit() {
+			if (this.column.textMaxLength === -1) {
+				return null
+			} else {
+				return this.column.textMaxLength
+			}
 		},
 	},
 	methods: {
 		updateText(text) {
 			this.localValue = text
-		},
-		setShowBigEditor(v) {
-			this.showBigEditor = !!v
 		},
 	},
 }

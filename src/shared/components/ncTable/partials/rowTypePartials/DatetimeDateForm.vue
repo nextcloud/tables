@@ -1,38 +1,23 @@
 <template>
-	<div class="row">
-		<div class="fix-col-1" :class="{ mandatory: column.mandatory }">
-			{{ column.title }}
-		</div>
-		<div class="fix-col-1" :class="{ 'space-B': !column.description }">
-			<NcDatetimePicker v-model="localValue"
-				type="date"
-				format="YYYY-MM-DD"
-				:clearable="false"
-				:show-week-number="true" />
-			<div v-if="canBeCleared" class="icon-close make-empty" @click="emptyValue" />
-		</div>
-		<div class="fix-col-1 hide-s">
-			&nbsp;
-		</div>
-		<div v-if="column.description" class="fix-col-1 p span space-B">
-			<div class="space-L-small">
-				{{ column.description }}
-			</div>
-		</div>
-		<div v-if="!column.description" class="fix-col-1 p span space-B hide-s">
-			&nbsp;
-		</div>
-	</div>
+	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :width="2">
+		<NcDatetimePicker v-model="localValue"
+			type="date"
+			format="YYYY-MM-DD"
+			:clearable="false"
+			:show-week-number="true" />
+		<div v-if="canBeCleared" class="icon-close make-empty" @click="emptyValue" />
+	</RowFormWrapper>
 </template>
 
 <script>
 import { NcDatetimePicker } from '@nextcloud/vue'
 import Moment from '@nextcloud/moment'
+import RowFormWrapper from './RowFormWrapper.vue'
 
 export default {
-	name: 'DatetimeDateForm',
 	components: {
 		NcDatetimePicker,
+		RowFormWrapper,
 	},
 	props: {
 		column: {
@@ -81,6 +66,10 @@ export default {
 }
 </script>
 <style scoped>
+
+.mx-datepicker {
+	width: 100%;
+}
 
 .make-empty {
 	padding-left: 15px;

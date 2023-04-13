@@ -15,7 +15,7 @@
 			<div v-for="column in getColumnsSorted"
 				:key="column.id"
 				:class="{ editRow: editColumn && editColumn.id === column.id, deleteRow: deleteId && deleteId === column.id }"
-				style="margin-bottom: 25px;">
+				class="rowForColumnDef">
 				<!-- edit mode -->
 				<div v-if="editColumn && editColumn.id === column.id" class="row space-L">
 					<div class="col-2">
@@ -177,13 +177,6 @@
 							</button>
 						</div>
 					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-4 space-B">
-					<button class="secondary" @click="actionCancel">
-						{{ t('tables', 'Close') }}
-					</button>
 				</div>
 			</div>
 		</div>
@@ -387,6 +380,14 @@ export default {
 	.column-details-table table {
 		width: 100%;
 		max-width: 200px;
+	}
+
+	.rowForColumnDef {
+		margin-bottom: calc(var(--default-grid-baseline) * 5);
+	}
+
+	.rowForColumnDef:last-child {
+		margin-bottom: 0;
 	}
 
 </style>

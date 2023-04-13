@@ -1,36 +1,16 @@
 <template>
-	<div class="row">
-		<div class="fix-col-1" :class="{ mandatory: column.mandatory }">
-			<div class="row">
-				<div class="fix-col-4">
-					{{ column.title }}
-				</div>
-				<div v-if="column.textMaxLength !== -1 && column.textMaxLength !== null" class="fix-col-4 p span" style="padding-bottom: 0; padding-top: 0;">
-					{{ t('tables', 'length: {length}/{maxLength}', { length, maxLength: column.textMaxLength }) }}
-				</div>
-			</div>
-		</div>
-		<div class="fix-col-2" :class="{ 'space-B': !column.description }">
-			<input v-model="localValue" :maxlength="column.textMaxLength">
-		</div>
-		<div class="fix-col-1 hide-s">
-			&nbsp;
-		</div>
-		<div v-if="column.description" class="fix-col-1 p span space-B">
-			<div class="space-L">
-				{{ column.description }}
-			</div>
-		</div>
-		<div v-if="!column.description" class="fix-col-1 p span space-B hide-s">
-			&nbsp;
-		</div>
-	</div>
+	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :length="length" :max-length="column.textMaxLength" :description="column.description">
+		<input v-model="localValue" :maxlength="column.textMaxLength">
+	</RowFormWrapper>
 </template>
 
 <script>
+import RowFormWrapper from './RowFormWrapper.vue'
 
 export default {
-	name: 'TextLineForm',
+	components: {
+		RowFormWrapper,
+	},
 	props: {
 		column: {
 			type: Object,
