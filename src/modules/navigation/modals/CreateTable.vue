@@ -23,7 +23,8 @@
 					<input v-model="title"
 						:class="{missing: errorTitle}"
 						type="text"
-						:placeholder="t('tables', 'Title of the new table')">
+						:placeholder="t('tables', 'Title of the new table')"
+						@input="titleChangedManually">
 				</div>
 			</div>
 			<div class="row space-T">
@@ -83,6 +84,7 @@ export default {
 			templates: null,
 			templateChoice: 'custom',
 			customIconChosen: false,
+			customTitleChosen: false,
 		}
 	},
 	watch: {
@@ -101,6 +103,9 @@ export default {
 		this.loadTemplatesFromBE()
 	},
 	methods: {
+		titleChangedManually() {
+			this.customTitleChosen = true
+		},
 		setIcon(icon) {
 			this.icon = icon
 			this.customIconChosen = true
@@ -114,6 +119,15 @@ export default {
 				} else {
 					const templateObject = this.templates?.find(item => item.name === name) || ''
 					this.icon = templateObject?.icon
+				}
+			}
+
+			if (!this.customTitleChosen) {
+				if (name === 'custom') {
+					this.title = ''
+				} else {
+					const templateObject = this.templates?.find(item => item.name === name) || ''
+					this.title = templateObject?.title || ''
 				}
 			}
 		},
@@ -157,6 +171,7 @@ export default {
 			this.templateChoice = 'custom'
 			this.icon = ''
 			this.customIconChosen = false
+			this.customTitleChosen = false
 		},
 		async loadTemplatesFromBE() {
 			try {
