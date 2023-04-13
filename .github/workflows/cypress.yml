@@ -106,7 +106,7 @@ jobs:
           ./occ user:list
           ./occ app:enable --force ${{ env.APP_NAME }}
           ./occ config:system:set query_log_file --value '/home/runner/work/${{ env.APP_NAME }}/${{ env.APP_NAME }}/query.log'
-          php -S localhost:8081 &
+          php -S 0.0.0.0:8081 &
           export OC_PASS=1234561
           php occ user:add --password-from-env user1
           php occ user:add --password-from-env user2
