@@ -22,6 +22,14 @@
 				:column="col"
 				:row-id="row.id"
 				:value="getCellValue(col.id) === 'true'" />
+			<TableCellSelection v-else-if="col.type === 'selection' && !col.subtype"
+				:column="col"
+				:row-id="row.id"
+				:value="parseInt(getCellValue(col.id))" />
+			<TableCellMultiSelection v-else-if="col.type === 'selection' && col.subtype === 'multi'"
+				:column="col"
+				:row-id="row.id"
+				:value="getCellValue(col.id, false)" />
 			<TableCellDateTime v-else-if="col.type === 'datetime'"
 				:column="col"
 				:row-id="row.id"
@@ -36,7 +44,7 @@
 				:column="col" />
 		</td>
 		<td>
-			<NcButton type="primary" @click="$emit('edit-row', row.id)">
+			<NcButton type="primary" :aria-label="t('tables', 'Edit row')" @click="$emit('edit-row', row.id)">
 				<template #icon>
 					<Pencil :size="20" />
 				</template>
@@ -56,6 +64,8 @@ import TableCellStars from './TableCellStars.vue'
 import TableCellYesNo from './TableCellYesNo.vue'
 import TableCellDateTime from './TableCellDateTime.vue'
 import TableCellTextLine from './TableCellTextLine.vue'
+import TableCellSelection from './TableCellSelection.vue'
+import TableCellMultiSelection from './TableCellMultiSelection.vue'
 
 export default {
 	name: 'TableRow',
@@ -71,6 +81,8 @@ export default {
 		NcCheckboxRadioSwitch,
 		TableCellDateTime,
 		TableCellTextLine,
+		TableCellSelection,
+		TableCellMultiSelection,
 	},
 	props: {
 		row: {
@@ -93,7 +105,7 @@ export default {
 		},
 	},
 	methods: {
-		getCellValue(columnId) {
+		getCellValue(columnId, loadDefault = true) {
 			if (!this.row) {
 				return null
 			}
@@ -102,11 +114,13 @@ export default {
 			const cell = this.row.data.find(item => item.columnId === columnId)
 
 			// if no value is given, try to get the default value from the column definition
-			if (!cell) {
+			if (cell) {
+				return cell.value
+			} else if (!cell && loadDefault) {
 				const column = this.columns.filter(column => column.id === columnId)[0]
 				return column[column.type + 'Default']
 			}
-			return cell.value
+			return null
 		},
 		truncate(text) {
 			if (text.length >= 400) {

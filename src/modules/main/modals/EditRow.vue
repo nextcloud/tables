@@ -25,6 +25,12 @@
 				<NumberProgressForm v-if="column.type === 'number' && column.subtype === 'progress'"
 					:column="column"
 					:value.sync="localRow[column.id]" />
+				<SelectionForm v-if="column.type === 'selection' && !column.subtype"
+					:column="column"
+					:value.sync="localRow[column.id]" />
+				<SelectionMultiForm v-if="column.type === 'selection' && column.subtype === 'multi'"
+					:column="column"
+					:value.sync="localRow[column.id]" />
 				<SelectionCheckForm v-if="column.type === 'selection' && column.subtype === 'check'"
 					:column="column"
 					:value.sync="localRow[column.id]" />
@@ -77,6 +83,8 @@ import NumberForm from '../../../shared/components/ncTable/partials/rowTypeParti
 import NumberStarsForm from '../../../shared/components/ncTable/partials/rowTypePartials/NumberStarsForm.vue'
 import NumberProgressForm from '../../../shared/components/ncTable/partials/rowTypePartials/NumberProgressForm.vue'
 import SelectionCheckForm from '../../../shared/components/ncTable/partials/rowTypePartials/SelectionCheckForm.vue'
+import SelectionForm from '../../../shared/components/ncTable/partials/rowTypePartials/SelectionForm.vue'
+import SelectionMultiForm from '../../../shared/components/ncTable/partials/rowTypePartials/SelectionMultiForm.vue'
 import DatetimeForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeForm.vue'
 import DatetimeDateForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeTimeForm.vue'
@@ -86,6 +94,8 @@ export default {
 	name: 'EditRow',
 	components: {
 		SelectionCheckForm,
+		SelectionForm,
+		SelectionMultiForm,
 		NcModal,
 		TextLineForm,
 		TextLongForm,
@@ -142,11 +152,23 @@ export default {
 			this.reset()
 			this.$emit('close')
 		},
+		isValueValidForColumn(value, column) {
+			if (column.type === 'selection') {
+				if (
+					(value instanceof Array && value.length > 0)
+					|| (value === parseInt(value))
+				) {
+					return true
+				}
+				return false
+			}
+			return !!value || value === 0
+		},
 		async actionConfirm() {
 			let mandatoryFieldsEmpty = false
 			this.columns.forEach(col => {
 				if (col.mandatory) {
-					const validValue = (!!this.localRow[col.id] || this.localRow[col.id] === 0)
+					const validValue = this.isValueValidForColumn(this.localRow[col.id], col)
 					mandatoryFieldsEmpty = mandatoryFieldsEmpty || !validValue
 				}
 			})

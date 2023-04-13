@@ -108,7 +108,7 @@ class Version000000Date20210921000000 extends SimpleMigrationStep {
 			]);
 
 			// type text
-			$table->addColumn('text_default', Types::STRING, [
+			$table->addColumn('text_default', Types::TEXT, [
 				'notnull' => false,
 			]);
 			$table->addColumn('text_allowed_pattern', Types::STRING, [
@@ -143,10 +143,10 @@ class Version000000Date20210921000000 extends SimpleMigrationStep {
 			]);
 
 			// type selection
-			$table->addColumn('selection_options', Types::STRING, [
+			$table->addColumn('selection_options', Types::TEXT, [
 				'notnull' => false,
 			]);
-			$table->addColumn('selection_default', Types::STRING, [
+			$table->addColumn('selection_default', Types::TEXT, [
 				'notnull' => false,
 			]);
 
