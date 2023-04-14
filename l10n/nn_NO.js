@@ -24,6 +24,7 @@ OC.L10N.register(
     "group" : "gruppe",
     "Delete data" : "Slett data",
     "Sharing" : "Deling",
+    "Update" : "Oppdater",
     "Default" : "Standard",
     "Yes" : "Ja",
     "No" : "Nei"

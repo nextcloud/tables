@@ -22,6 +22,7 @@ OC.L10N.register(
     "Share" : "Podjeli",
     "group" : "grupa",
     "Sharing" : "Dijeljenje",
+    "Update" : "Ažuriraj",
     "Default" : "Zadano",
     "Yes" : "Yes",
     "No" : "No"

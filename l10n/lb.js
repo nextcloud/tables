@@ -22,6 +22,7 @@ OC.L10N.register(
     "Share" : "Deelen",
     "group" : "Grupp",
     "Sharing" : "Gedeelt",
+    "Update" : "Update",
     "Default" : "Standard",
     "Yes" : "Yes",
     "No" : "No"

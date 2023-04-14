@@ -19,6 +19,9 @@ OC.L10N.register(
     "group" : "grupa",
     "Sharing" : "Deljenje",
     "Read" : "Čitaj",
+    "Undo" : "Opozovi",
+    "Bold" : "Podebljano",
+    "Italic" : "Kurziv",
     "Default" : "Podrazumevano",
     "Yes" : "Da",
     "No" : "Ne"

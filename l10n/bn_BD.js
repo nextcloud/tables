@@ -8,6 +8,7 @@ OC.L10N.register(
     "from" : "হইতে",
     "to" : "প্রতি",
     "Birthday" : "জন্মদিন",
+    "Done" : "শেষ হলো",
     "Type" : "ধরণ",
     "Save" : "সংরক্ষণ",
     "Link" : "Link",
@@ -22,6 +23,8 @@ OC.L10N.register(
     "Shares" : "ভাগাভাগি",
     "group" : "দল",
     "Sharing" : "ভাগাভাগিরত",
+    "Read" : "পড়",
+    "Update" : "পরিবর্ধন",
     "Default" : "পূর্বনির্ধারিত",
     "Yes" : "Yes",
     "No" : "No"

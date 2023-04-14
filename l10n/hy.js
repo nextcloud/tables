@@ -19,6 +19,7 @@ OC.L10N.register(
     "Title" : "Վերնագիր",
     "Share" : "Կիսվել",
     "group" : "խումբ",
+    "Update" : "Թարմացնել",
     "Default" : "Լռելյայն",
     "Yes" : "Yes",
     "No" : "No"

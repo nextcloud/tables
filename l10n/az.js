@@ -8,6 +8,7 @@ OC.L10N.register(
     "from" : "ondan",
     "to" : "doğru",
     "Birthday" : "Ad günü",
+    "Done" : "Edildi",
     "Type" : "Type",
     "Save" : "Saxla",
     "Link" : "Link",
@@ -22,6 +23,8 @@ OC.L10N.register(
     "Shares" : "Yayımlanmalar",
     "group" : "qrup",
     "Sharing" : "Paylaşılır",
+    "Read" : "Oxu",
+    "Update" : "Yenilənmə",
     "Default" : "Susmaya görə",
     "Yes" : "Yes",
     "No" : "No"

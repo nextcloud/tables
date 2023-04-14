@@ -25,6 +25,7 @@ OC.L10N.register(
     "group" : "ក្រុម",
     "Delete data" : "លុបទិន្នន័យ",
     "Sharing" : "ការ​ចែក​រំលែក",
+    "Update" : "ធ្វើ​បច្ចុប្បន្នភាព",
     "Default" : "លំនាំ​ដើម",
     "Options" : "ជម្រើស",
     "Yes" : "Yes",

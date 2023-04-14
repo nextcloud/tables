@@ -31,6 +31,7 @@ OC.L10N.register(
     "Sharing" : "Partajare",
     "Read" : "Citit",
     "Update" : "Actualizare",
+    "Undo" : "Anulează ultima acțiune",
     "Code" : "Cod",
     "Default" : "Implicit",
     "Prefix" : "Prefix",

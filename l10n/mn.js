@@ -25,6 +25,8 @@ OC.L10N.register(
     "Shares" : "Түгээлтүүд",
     "group" : "бүлэг",
     "Sharing" : "Түгээх",
+    "Manage" : "Зохицуулах",
+    "Undo" : "буцах",
     "Yes" : "Тийм",
     "No" : "Үгүй",
     "Confirm" : "Батлах"

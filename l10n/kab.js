@@ -5,6 +5,7 @@ OC.L10N.register(
     "Name" : "Nom",
     "Comment" : "Commentaire",
     "Progress" : "Asfari",
+    "Done" : "Immed",
     "Type" : "Anaw",
     "Save" : "Sekles",
     "Link" : "Aseɣwen",
