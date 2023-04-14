@@ -21,7 +21,7 @@ export default {
 			// values is an array of option-ids as string
 
 			const objects = []
-			values.forEach(id => {
+			values?.forEach(id => {
 				objects.push(this.getOptionObjectForSelectionMulti(parseInt(id), column))
 			})
 			return objects
