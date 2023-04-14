@@ -163,34 +163,33 @@ export default {
 <style lang="scss">
 
 .app-navigation-entry__counter-wrapper {
-  button.action-button {
-    padding-right: 0;
-  }
+	button.action-button {
+		padding-right: 0;
+	}
 
-  .counter-bubble__counter {
-    display: none;
-  }
-
-  margin-right: 0 !important;
+	.counter-bubble__counter {
+		display: none;
+	}
+	margin-right: 0 !important;
 }
 
 .app-navigation-entry {
-  .margin-right {
-    margin-right: 44px;
-  }
-  .margin-left {
-    margin-left: calc(var(--default-grid-baseline) * 2);
-  }
+	.margin-right {
+		margin-right: 44px;
+	}
+	.margin-left {
+		margin-left: calc(var(--default-grid-baseline) * 2);
+	}
 }
 
 .app-navigation-entry:hover {
-  .margin-right {
-    margin-right: 0;
-  }
+	.margin-right {
+		margin-right: 0;
+	}
 
-  .app-navigation-entry__counter-wrapper .counter-bubble__counter {
-    display: inline-flex;
-  }
+	.app-navigation-entry__counter-wrapper .counter-bubble__counter {
+		display: inline-flex;
+	}
 }
 
 </style>

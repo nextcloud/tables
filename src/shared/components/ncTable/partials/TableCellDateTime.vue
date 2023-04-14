@@ -70,7 +70,7 @@ export default {
 <style lang="scss" scoped>
 
 div {
-  text-align: right;
+	text-align: right;
 }
 
 </style>

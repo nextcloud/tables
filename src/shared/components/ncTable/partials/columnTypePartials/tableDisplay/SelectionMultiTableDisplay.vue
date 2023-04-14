@@ -74,13 +74,13 @@ export default {
 		padding-right: 10px;
 	}
 
-   ul {
-	   list-style-type: square;
-	   padding-left: calc(var(--default-grid-baseline) * 3);
-   }
+	ul {
+		list-style-type: square;
+		padding-left: calc(var(--default-grid-baseline) * 3);
+	}
 
-   td {
-	   vertical-align: top;
-   }
+	td {
+		vertical-align: top;
+	}
 
 </style>

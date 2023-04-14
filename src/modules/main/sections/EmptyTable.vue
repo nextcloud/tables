@@ -31,9 +31,9 @@ export default {
 
 <style scoped>
 
-::v-deep .empty-content__icon {
-  font-size: xxx-large;
-  opacity: 1;
+:deep(.empty-content__icon) {
+	font-size: xxx-large;
+	opacity: 1;
 }
 
 </style>

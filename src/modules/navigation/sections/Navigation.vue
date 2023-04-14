@@ -123,23 +123,23 @@ export default {
 
 <style lang="scss" scoped>
 
-::v-deep .filter-box {
-  .input-field {
-    padding: 8px;
-  }
+:deep(.filter-box) {
+	.input-field {
+		padding: 8px;
+	}
 
-  input.input-field__input {
-    background-color: var(--color-primary-element-light);
-  }
+	input.input-field__input {
+		background-color: var(--color-primary-element-light);
+	}
 }
 
 .search-info {
-  text-align: center;
-  justify-content: center;
+	text-align: center;
+	justify-content: center;
 
-  .empty-content {
-    margin-top: 3vh;
-  }
+	.empty-content {
+		margin-top: 3vh;
+	}
 }
 
 </style>

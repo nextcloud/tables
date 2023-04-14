@@ -40,7 +40,7 @@ export default {
 <style lang="scss" scoped>
 
 div {
-  // min-width: 80px;
+	// min-width: 80px;
 }
 
 </style>

@@ -138,19 +138,19 @@ export default {
 <style scoped lang="scss">
 
 .sticky {
-  position: -webkit-sticky; /* Safari */
-  position: sticky;
-  top: 90px;
-  left: 0;
+	position: -webkit-sticky; /* Safari */
+	position: sticky;
+	top: 90px;
+	left: 0;
 }
 
 .selected-rows-option {
-  justify-content: flex-end;
-  display: inline-flex;
+	justify-content: flex-end;
+	display: inline-flex;
 }
 
 .add-padding-left {
-  padding-left: calc(var(--default-grid-baseline) * 1);
+	padding-left: calc(var(--default-grid-baseline) * 1);
 }
 
 </style>

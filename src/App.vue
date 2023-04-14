@@ -64,107 +64,107 @@ export default {
 </style>
 <style lang="scss">
 
-  h1 {
-    font-size: 1.98em;
-  }
+	h1 {
+		font-size: 1.98em;
+	}
 
-  h2 {
-    font-size: larger;
-  }
+	h2 {
+		font-size: larger;
+	}
 
-  h3 {
-    font-size: large;
-  }
+	h3 {
+		font-size: large;
+	}
 
-  h4 {
-    font-size: medium;
-    font-weight: 300;
-  }
+	h4 {
+		font-size: medium;
+		font-weight: 300;
+	}
 
-  p, .p {
-    padding-top: 5px;
-    padding-bottom: 7px;
-  }
+	p, .p {
+		padding-top: 5px;
+		padding-bottom: 7px;
+	}
 
-  p span, .p span, p .span, .p .span, .p.span, p.span, .light {
-	  color: var(--color-text-maxcontrast);
-  }
+	p span, .p span, p .span, .p .span, .p.span, p.span, .light {
+		color: var(--color-text-maxcontrast);
+	}
 
-  p code {
-    white-space: pre-wrap;
-    background-color: var(--color-background-dark);
-    border-radius: var(--border-radius);
-    padding: 0.8em 1em;
-    margin-bottom: 0.8em;
-    font-family: 'Lucida Console', 'Lucida Sans Typewriter', 'DejaVu Sans Mono', monospace;
-  }
+	p code {
+		white-space: pre-wrap;
+		background-color: var(--color-background-dark);
+		border-radius: var(--border-radius);
+		padding: 0.8em 1em;
+		margin-bottom: 0.8em;
+		font-family: 'Lucida Console', 'Lucida Sans Typewriter', 'DejaVu Sans Mono', monospace;
+	}
 
-  .bold {
-    font-weight: bold;
-  }
+	.bold {
+		font-weight: bold;
+	}
 
-  .light {
-    font-weight: 100;
-    color: var(--color-text-lighter);
-    /*
+	.light {
+		font-weight: 100;
+		color: var(--color-text-lighter);
+		/*
       background-color: var(--color-background-hover);
       */
-  }
+	}
 
-  button[class^='icon-'] {
-    min-width: 36px !important;
-  }
+	button[class^='icon-'] {
+		min-width: 36px !important;
+	}
 
-  [class^='col-'] > span {
-	  color: var(--color-text-maxcontrast);
-  }
+	[class^='col-'] > span {
+		color: var(--color-text-maxcontrast);
+	}
 
-  .icon-left {
-    background-position: left;
-    padding-left: 22px;
-  }
+	.icon-left {
+		background-position: left;
+		padding-left: 22px;
+	}
 
-  .mandatory {
-    font-weight: bold;
-  }
+	.mandatory {
+		font-weight: bold;
+	}
 
-  .v-popover button {
-    height: 25px;
-    margin-left: 10px;
-    background-color: transparent;
-    border: none;
-  }
+	.v-popover button {
+		height: 25px;
+		margin-left: 10px;
+		background-color: transparent;
+		border: none;
+	}
 
-  .popover__inner p, .v-popper__inner table {
-    padding: 15px;
-  }
+	.popover__inner p, .v-popper__inner table {
+		padding: 15px;
+	}
 
-  .v-popper__inner table td {
-    padding-right: 15px;
-  }
+	.v-popper__inner table td {
+		padding-right: 15px;
+	}
 
-  .error {
-    color:  var(--color-error);
-  }
+	.error {
+		color:  var(--color-error);
+	}
 
-  .error input {
-    border-color: var(--color-error);
-  }
+	.error input {
+		border-color: var(--color-error);
+	}
 
-  .icon-loading:first-child {
-    top: 10vh;
-  }
+	.icon-loading:first-child {
+		top: 10vh;
+	}
 
-  .block {
-    display: block !important;
-  }
+	.block {
+		display: block !important;
+	}
 
-  .align-right {
-    text-align: right;
-  }
+	.align-right {
+		text-align: right;
+	}
 
-  .app-navigation-entry__children {
-    display: none !important;
-  }
+	.app-navigation-entry__children {
+		display: none !important;
+	}
 
 </style>

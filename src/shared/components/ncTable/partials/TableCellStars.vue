@@ -36,7 +36,7 @@ export default {
 <style scoped>
 
 .wrapper {
-  padding-right: 10px;
+	padding-right: 10px;
 }
 
 </style>

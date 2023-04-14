@@ -42,8 +42,8 @@ export default {
 <style scoped>
 
 div {
-  padding-right: 10px;
-  min-width: 12vw;
+	padding-right: 10px;
+	min-width: 12vw;
 }
 
 </style>

@@ -136,7 +136,7 @@ export default {
 <style scoped>
 
 tr.selected {
-  background-color: var(--color-primary-light) !important;
+	background-color: var(--color-primary-light) !important;
 }
 
 </style>

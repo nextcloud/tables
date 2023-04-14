@@ -103,100 +103,105 @@ export default {
 <style lang="scss" scoped>
 
 .container {
-  //margin: auto;
-  overflow-x: auto;
+	//margin: auto;
+	overflow-x: auto;
 }
 
-::v-deep table {
-  position: relative;
-  border-collapse: collapse;
-  border-spacing: 0;
-  table-layout: auto;
-  width: 100%;
-  border: none;
+:deep(table) {
+	position: relative;
+	border-collapse: collapse;
+	border-spacing: 0;
+	table-layout: auto;
+	width: 100%;
+	border: none;
 
-  * {
-    border: none;
-  }
-  // white-space: nowrap;
+	* {
+		border: none;
+	}
+	// white-space: nowrap;
 
-  td, th {
-    padding-right: 8px;
-  }
+	td, th {
+		padding-right: 8px;
+	}
 
-  td:not(:first-child), th:not(:first-child) {
-    padding-right: 16px;
-    // max-width: 20vw;
-  }
+	td:not(:first-child), th:not(:first-child) {
+		padding-right: 16px;
+		// max-width: 20vw;
+	}
 
-  th:not(:first-child) {
-    // text-align: end;
-  }
+	th:not(:first-child) {
+		// text-align: end;
+	}
 
-  tr {
-    height: 51px;
-    background-color: var(--color-main-background);
-  }
+	tr {
+		height: 51px;
+		background-color: var(--color-main-background);
+	}
 
-  thead tr {
-    // text-align: left;
+	thead tr {
+		// text-align: left;
 
-    th {
-      vertical-align: middle;
-      color: var(--color-text-maxcontrast);
+		th {
+			vertical-align: middle;
+			color: var(--color-text-maxcontrast);
 
-      // sticky head
-      // position: -webkit-sticky;
-      // position: sticky;
-      // top: 80px;
-      box-shadow: inset 0 -1px 0 var(--color-border); // use box-shadow instead of border to be compatible with sticky heads
-      background-color: var(--color-main-background-translucent);
-      z-index: 5;
+			// sticky head
+			// position: -webkit-sticky;
+			// position: sticky;
+			// top: 80px;
+			box-shadow: inset 0 -1px 0 var(--color-border); // use box-shadow instead of border to be compatible with sticky heads
+			background-color: var(--color-main-background-translucent);
+			z-index: 5;
 
-      // always fit to title
-      // min-width: max-content;
-    }
-  }
+			// always fit to title
+			// min-width: max-content;
+		}
+	}
 
-  tbody {
+	tbody {
 
-    td {
-      text-align: left;
-      vertical-align: middle;
-      border-bottom: 1px solid var(--color-border);
-    }
-    tr:active, tr:hover, tr:focus {
-      background-color: var(--color-background-dark);
-    }
-  }
+		td {
+			text-align: left;
+			vertical-align: middle;
+			border-bottom: 1px solid var(--color-border);
+		}
 
-  tr>th:first-child,tr>td:first-child {
-    position: sticky;
-    left: 0;
-    padding-left: calc(var(--default-grid-baseline) * 4);
-    padding-right: calc(var(--default-grid-baseline) * 4);
-    width: 60px;
-    background-color: inherit;
-    z-index: 5;
-  }
+		tr:active, tr:hover, tr:focus {
+			background-color: var(--color-background-dark);
+		}
 
-  tr>th:last-child,tr>td:last-child {
-    position: sticky;
-    right: 0;
-    width: 55px;
-    background-color: inherit;
-    padding-right: 16px;
-  }
+		tr:focus-within > td:last-child {
+			opacity: 1;
+		}
+	}
 
-  tr>td:last-child {
-    // visibility: hidden;
-    opacity: 0;
-  }
+	tr>th:first-child,tr>td:first-child {
+		position: sticky;
+		left: 0;
+		padding-left: calc(var(--default-grid-baseline) * 4);
+		padding-right: calc(var(--default-grid-baseline) * 4);
+		width: 60px;
+		background-color: inherit;
+		z-index: 5;
+	}
 
-  tr:hover>td:last-child {
-    // visibility: visible;
-    opacity: 1;
-  }
+	tr>th:last-child,tr>td:last-child {
+		position: sticky;
+		right: 0;
+		width: 55px;
+		background-color: inherit;
+		padding-right: 16px;
+	}
+
+	tr>td:last-child {
+		// visibility: hidden;
+		opacity: 0;
+	}
+
+	tr:hover>td:last-child {
+		// visibility: visible;
+		opacity: 1;
+	}
 
 }
 

@@ -48,24 +48,24 @@ export default {
 <style lang="scss" scoped>
 
 .light {
-  opacity: .3;
+	opacity: .3;
 }
 
 .first-row:hover .light {
-  opacity: 1;
+	opacity: 1;
 }
 
 .row.first-row {
-  position: sticky;
-  left: 0;
-  top: 0;
-  z-index: 15;
-  background-color: var(--color-main-background-translucent);
-  align-items: baseline;
+	position: sticky;
+	left: 0;
+	top: 0;
+	z-index: 15;
+	background-color: var(--color-main-background-translucent);
+	align-items: baseline;
 }
 
 .user-bubble {
-  padding-left: calc(var(--default-grid-baseline) * 2);
+	padding-left: calc(var(--default-grid-baseline) * 2);
 }
 
 </style>
