@@ -3,14 +3,15 @@ OC.L10N.register(
     {
     "Comments" : "Comments",
     "Name" : "Name",
-    "Cancel" : "Cancel",
+    "Done" : "Done",
     "Save" : "Save",
     "Link" : "Link",
+    "Cancel" : "Cancel",
     "Delete" : "Delete",
-    "Close" : "Close",
     "Today" : "Today",
     "group" : "group",
     "Sharing" : "Ulashish",
+    "Update" : "Update",
     "Yes" : "Yes",
     "No" : "No",
     "Confirm" : "Confirm"

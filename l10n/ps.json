@@ -2,16 +2,14 @@
     "Comments" : "تبصرې",
     "Name" : "نوم",
     "Comment" : "تبصره",
-    "Cancel" : "پرېښول",
     "Save" : "ساتل",
     "Link" : "لېنک",
+    "Cancel" : "پرېښول",
     "Delete" : "ړنګول",
-    "Close" : "بندول",
     "Today" : "نن",
     "Share" : "شریکول",
     "Shares" : "شريک شوي",
     "group" : "ډله",
-    "Activity" : "کړنې",
     "Yes" : "هو",
     "No" : "نه"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
