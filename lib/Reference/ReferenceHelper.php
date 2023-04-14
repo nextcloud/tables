@@ -127,9 +127,18 @@ class ReferenceHelper {
 
 	public function getCacheKey(string $referenceId): ?string {
 		if ($this->config->getSystemValue('debug')) {
-			return '-';
+			return $this->randomString(10);
 		} else {
 			return $referenceId;
 		}
+	}
+
+	private function randomString(int $length): string {
+		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		$randString = '';
+		for ($i = 0; $i < $length; $i++) {
+			$randString = $characters[rand(0, strlen($characters))];
+		}
+		return $randString;
 	}
 }
