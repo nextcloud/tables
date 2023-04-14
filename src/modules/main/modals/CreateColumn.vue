@@ -6,33 +6,26 @@
 					<h2>{{ t('tables', 'Create column') }}</h2>
 				</div>
 
-				<div class="col-2">
+				<div class="fix-col-2">
 					<MainForm :description.sync="description"
 						:mandatory.sync="mandatory"
 						:order-weight.sync="orderWeight"
 						:title.sync="title"
 						:title-missing-error="titleMissingError" />
 				</div>
-				<div class="col-2">
-					<div class="row space-L no-padding-on-mobile">
+				<div class="fix-col-2" style="display: block">
+					<div class="row no-padding-on-mobile space-L">
 						<div class="col-4 mandatory space-T" :class="{error: typeMissingError}">
 							{{ t('tables', 'Type') }}
 						</div>
 						<div class="col-4">
-							<NcMultiselect v-model="combinedTypeObject"
-								:options="typeOptions"
-								track-by="id"
-								label="label"
-								style="width: 100%" />
+							<ColumnTypeSelection :column-id.sync="combinedType" />
 						</div>
 					</div>
 
 					<!-- type specific parameter -------------------------------- -->
 
 					<div v-if="combinedType === 'number'" class="row space-L no-padding-on-mobile">
-						<div class="col-4 space-T space-B">
-							<h4>{{ t('tables', 'Number column specific parameters') }}</h4>
-						</div>
 						<NumberForm :number-default.sync="numberDefault"
 							:number-min.sync="numberMin"
 							:number-max.sync="numberMax"
@@ -42,23 +35,23 @@
 					</div>
 
 					<div v-if="combinedType === 'number-stars'" class="row space-L no-padding-on-mobile">
-						<div class="col-4 space-T space-B">
-							<h4>{{ t('tables', 'Stars rating column specific parameters') }}</h4>
-						</div>
 						<NumberStarsForm :number-default.sync="numberDefault" />
 					</div>
 
 					<div v-if="combinedType === 'number-progress'" class="row space-L no-padding-on-mobile">
-						<div class="col-4 space-T space-B">
-							<h4>{{ t('tables', 'Progress bar column specific parameters') }}</h4>
-						</div>
 						<NumberProgressForm :number-default.sync="numberDefault" />
 					</div>
 
-					<div v-if="type === 'text' && subtype !== 'link'" class="row space-L no-padding-on-mobile">
-						<div class="col-4 space-T space-B">
-							<h4>{{ t('tables', 'Text column specific parameters') }}</h4>
+					<div v-if="type === 'text' && subtype !== 'link'" class="row no-padding-on-mobile space-L">
+						<div class="col-4 typeSelections space-B space-T space-L">
+							<NcCheckboxRadioSwitch :checked.sync="subtype" value="line" name="textTypeSelection" type="radio">
+								{{ t('tables', 'Text line') }}
+							</NcCheckboxRadioSwitch>
+							<NcCheckboxRadioSwitch :checked.sync="subtype" value="long" name="textTypeSelection" type="radio">
+								{{ t('tables', 'Simple text') }}
+							</NcCheckboxRadioSwitch>
 						</div>
+
 						<TextLineForm v-if="subtype === 'line'"
 							:text-default.sync="textDefault"
 							:text-allowed-pattern.sync="textAllowedPattern"
@@ -68,46 +61,42 @@
 							:text-max-length.sync="textMaxLength" />
 					</div>
 
-					<div v-if="combinedType === 'selection'" class="row space-L no-padding-on-mobile">
-						<div class="col-4 space-T">
-							<h4>{{ t('tables', 'Selection column specific parameters') }}</h4>
+					<div v-if="type === 'selection'" class="row no-padding-on-mobile space-L">
+						<div class="col-4 typeSelections space-B space-T space-L">
+							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="selection" name="selectionTypeSelection" type="radio">
+								{{ t('tables', 'Single selection') }}
+							</NcCheckboxRadioSwitch>
+							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="selection-multi" name="selectionTypeSelection" type="radio">
+								{{ t('tables', 'Multiple selection') }}
+							</NcCheckboxRadioSwitch>
+							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="selection-check" name="selectionTypeSelection" type="radio">
+								{{ t('tables', 'Yes/No') }}
+							</NcCheckboxRadioSwitch>
 						</div>
-						<SelectionForm :selection-options.sync="selectionOptions" :selection-default.sync="selectionDefault" />
+
+						<SelectionForm v-if="combinedType === 'selection'" :selection-options.sync="selectionOptions" :selection-default.sync="selectionDefault" />
+
+						<SelectionMultiForm v-if="combinedType === 'selection-multi'" :selection-options.sync="selectionOptions" :selection-default.sync="selectionDefault" />
+
+						<SelectionCheckForm v-if="combinedType === 'selection-check'" :selection-default.sync="selectionDefault" />
 					</div>
 
-					<div v-if="combinedType === 'selection-multi'" class="row space-L no-padding-on-mobile">
-						<div class="col-4 space-T space-B">
-							<h4>{{ t('tables', 'Multiple selection column specific parameters') }}</h4>
+					<div v-if="type === 'datetime'" class="row no-padding-on-mobile space-L">
+						<div class="col-4 typeSelections space-B space-T space-L">
+							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="datetime-date" name="datetimeTypeSelection" type="radio">
+								{{ t('tables', 'Date') }}
+							</NcCheckboxRadioSwitch>
+							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="datetime-time" name="datetimeTypeSelection" type="radio">
+								{{ t('tables', 'Time') }}
+							</NcCheckboxRadioSwitch>
+							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="datetime" name="datetimeTypeSelection" type="radio">
+								{{ t('tables', 'Date and time') }}
+							</NcCheckboxRadioSwitch>
 						</div>
-						<SelectionMultiForm :selection-options.sync="selectionOptions" :selection-default.sync="selectionDefault" />
-					</div>
 
-					<div v-if="combinedType === 'selection-check'" class="row space-L no-padding-on-mobile">
-						<div class="col-4 space-T space-B">
-							<h4>{{ t('tables', 'Yes/No column specific parameters') }}</h4>
-						</div>
-						<SelectionCheckForm :selection-default.sync="selectionDefault" />
-					</div>
-
-					<div v-if="combinedType === 'datetime'" class="row space-L no-padding-on-mobile">
-						<div class="col-4 space-T space-B">
-							<h4>{{ t('tables', 'Date and time column specific parameters') }}</h4>
-						</div>
-						<DatetimeForm :datetime-default.sync="datetimeDefault" />
-					</div>
-
-					<div v-if="combinedType === 'datetime-date'" class="row space-L no-padding-on-mobile">
-						<div class="col-4 space-T space-B">
-							<h4>{{ t('tables', 'Date column specific parameters') }}</h4>
-						</div>
-						<DatetimeDateForm :datetime-default.sync="datetimeDefault" />
-					</div>
-
-					<div v-if="combinedType === 'datetime-time'" class="row space-L no-padding-on-mobile">
-						<div class="col-4 space-T space-B">
-							<h4>{{ t('tables', 'Time column specific parameters') }}</h4>
-						</div>
-						<DatetimeTimeForm :datetime-default.sync="datetimeDefault" />
+						<DatetimeForm v-if="combinedType === 'datetime'" :datetime-default.sync="datetimeDefault" />
+						<DatetimeDateForm v-if="combinedType === 'datetime-date'" :datetime-default.sync="datetimeDefault" />
+						<DatetimeTimeForm v-if="combinedType === 'datetime-time'" :datetime-default.sync="datetimeDefault" />
 					</div>
 				</div>
 			</div>
@@ -138,22 +127,23 @@ import MainForm from '../../../shared/components/ncTable/partials/columnTypePart
 import DatetimeForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeForm.vue'
 import DatetimeDateForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeTimeForm.vue'
-import { NcModal, NcMultiselect, NcCheckboxRadioSwitch } from '@nextcloud/vue'
+import { NcModal, NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import SelectionForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionForm.vue'
 import SelectionMultiForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionMultiForm.vue'
 import { showError, showInfo, showSuccess, showWarning } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
+import ColumnTypeSelection from '../partials/ColumnTypeSelection.vue'
 
 export default {
 	name: 'CreateColumn',
 	components: {
+		ColumnTypeSelection,
 		NcModal,
 		NumberForm,
 		TextLineForm,
 		TextLongForm,
 		MainForm,
-		NcMultiselect,
 		NumberStarsForm,
 		NumberProgressForm,
 		SelectionCheckForm,
@@ -173,8 +163,8 @@ export default {
 	data() {
 		return {
 			addNewAfterSave: false,
-			type: null,
-			subtype: null,
+			type: 'text',
+			subtype: 'line',
 			title: '',
 			description: '',
 			numberPrefix: '',
@@ -194,21 +184,16 @@ export default {
 			selectionDefault: null,
 			datetimeDefault: '',
 			typeOptions: [
-				{ id: 'text-line', label: t('tables', 'Text line') },
-				{ id: 'text-long', label: t('tables', 'Long text') },
+				{ id: 'text', label: t('tables', 'Text') },
 				{ id: 'text-link', label: t('tables', 'Link') },
 
 				{ id: 'number', label: t('tables', 'Number') },
 				{ id: 'number-stars', label: t('tables', 'Stars rating') },
 				{ id: 'number-progress', label: t('tables', 'Progress bar') },
 
-				{ id: 'selection', label: t('tables', 'Single select') },
-				{ id: 'selection-multi', label: t('tables', 'Multiple select') },
-				{ id: 'selection-check', label: t('tables', 'Yes/No') },
+				{ id: 'selection', label: t('tables', 'Selection') },
 
 				{ id: 'datetime', label: t('tables', 'Date and time') },
-				{ id: 'datetime-date', label: t('tables', 'Date') },
-				{ id: 'datetime-time', label: t('tables', 'Time') },
 			],
 		}
 	},
@@ -222,13 +207,33 @@ export default {
 				if (newValue) {
 					const types = newValue.split('-')
 					this.type = types[0]
-					this.subtype = types[1]
+					this.subtype = types[1] || ''
 				}
 			},
 		},
 		combinedTypeObject: {
 			get() {
-				return this.combinedType ? this.typeOptions.filter(item => item.id === this.combinedType) : null
+				const type = this.type
+				let subtype = this.subtype
+
+				if (type === 'text' && subtype !== 'link') {
+					subtype = null
+				}
+
+				if (type === 'selection') {
+					subtype = null
+				}
+
+				if (type === 'datetime') {
+					subtype = null
+				}
+
+				let id = type
+				if (subtype !== null && subtype !== '') {
+					id += '-' + subtype
+				}
+
+				return this.combinedType ? this.typeOptions.filter(item => item.id === id) : null
 			},
 			set(o) {
 				if (o) this.combinedType = o.id
@@ -319,6 +324,18 @@ export default {
 
 .padding-right {
 	padding-right: calc(var(--default-grid-baseline) * 3);
+}
+
+.typeSelections {
+	display: inline-flex;
+}
+
+.typeSelections span {
+	padding-right: 21px;
+}
+
+.multiSelectOptionLabel {
+	padding-left: calc(var(--default-grid-baseline) * 1);
 }
 
 </style>

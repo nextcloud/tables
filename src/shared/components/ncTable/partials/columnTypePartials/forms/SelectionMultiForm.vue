@@ -1,7 +1,7 @@
 <template>
 	<div style="width: 100%">
 		<div class="row">
-			<div class="col-4 title space-T">
+			<div class="col-4 title">
 				{{ t('tables', 'Options') }}
 			</div>
 			<div v-for="opt in getSelectionOptions" :key="opt.id" class="col-4 inline">

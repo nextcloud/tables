@@ -1,7 +1,7 @@
 <template>
 	<div style="width: 100%">
 		<!-- default -->
-		<div class="row">
+		<div class="row space-T">
 			<div class="fix-col-4 title">
 				{{ t('tables', 'Set today as default') }}
 			</div>

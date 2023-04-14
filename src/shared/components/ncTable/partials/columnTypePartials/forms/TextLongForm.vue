@@ -2,23 +2,20 @@
 	<div style="width: 100%">
 		<!-- default -->
 		<div class="row">
-			<div class="fix-col-1">
+			<div class="fix-col-4">
 				{{ t('tables', 'Default') }}
 			</div>
-			<div class="fix-col-3 margin-bottom">
+			<div class="fix-col-4 space-B">
 				<textarea v-model="defaultText" />
 			</div>
 		</div>
 
 		<!-- max text length -->
 		<div class="row">
-			<div class="fix-col-1">
+			<div class="fix-col-4">
 				{{ t('tables', 'Maximum text length') }}
 			</div>
-			<div class="fix-col-1">
-        &nbsp;
-			</div>
-			<div class="fix-col-2 margin-bottom">
+			<div class="fix-col-4">
 				<input v-model="maxLength"
 					type="number"
 					step="1"
