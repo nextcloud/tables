@@ -19,36 +19,7 @@
 							{{ t('tables', 'Type') }}
 						</div>
 						<div class="col-4">
-							<NcMultiselect v-model="combinedTypeObject"
-								:options="typeOptions"
-								track-by="id"
-								label="label"
-								style="width: 100%">
-								<template #option="props">
-									<TextLong v-if="props.option.id === 'text'" />
-									<Link v-if="props.option.id === 'text-link'" />
-									<Counter v-if="props.option.id === 'number'" />
-									<Star v-if="props.option.id === 'number-stars'" />
-									<Progress v-if="props.option.id === 'number-progress'" />
-									<Selection v-if="props.option.id === 'selection'" />
-									<Datetime v-if="props.option.id === 'datetime'" />
-									<div class="multiSelectOptionLabel">
-										{{ props.option.label }}
-									</div>
-								</template>
-								<template #singleLabel="props">
-									<TextLong v-if="props.option.id === 'text'" />
-									<Link v-if="props.option.id === 'text-link'" />
-									<Counter v-if="props.option.id === 'number'" />
-									<Star v-if="props.option.id === 'number-stars'" />
-									<Progress v-if="props.option.id === 'number-progress'" />
-									<Selection v-if="props.option.id === 'selection'" />
-									<Datetime v-if="props.option.id === 'datetime'" />
-									<div class="multiSelectOptionLabel">
-										{{ props.option.label }}
-									</div>
-								</template>
-							</NcMultiselect>
+							<ColumnTypeSelection :column-id.sync="combinedType" />
 						</div>
 					</div>
 
@@ -162,24 +133,12 @@ import SelectionMultiForm from '../../../shared/components/ncTable/partials/colu
 import { showError, showInfo, showSuccess, showWarning } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
-import TextLong from 'vue-material-design-icons/TextLong.vue'
-import Link from 'vue-material-design-icons/Link.vue'
-import Counter from 'vue-material-design-icons/Counter.vue'
-import Star from 'vue-material-design-icons/Star.vue'
-import Progress from 'vue-material-design-icons/ArrowRightThin.vue'
-import Selection from 'vue-material-design-icons/FormSelect.vue'
-import Datetime from 'vue-material-design-icons/ClipboardTextClockOutline.vue'
+import ColumnTypeSelection from '../partials/ColumnTypeSelection.vue'
 
 export default {
 	name: 'CreateColumn',
 	components: {
-		Selection,
-		Datetime,
-		Star,
-		Progress,
-		Counter,
-		Link,
-		TextLong,
+		ColumnTypeSelection,
 		NcModal,
 		NumberForm,
 		TextLineForm,
