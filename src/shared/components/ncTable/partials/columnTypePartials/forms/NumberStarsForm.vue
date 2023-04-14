@@ -1,14 +1,11 @@
 <template>
 	<div style="width: 100%">
 		<!-- default -->
-		<div class="row">
-			<div class="fix-col-1">
+		<div class="row space-T">
+			<div class="fix-col-4">
 				{{ t('tables', 'Default') }}
 			</div>
-			<div class="fix-col-1">
-      &nbsp;
-			</div>
-			<div class="fix-col-2 margin-bottom">
+			<div class="fix-col-2">
 				<input v-model="defaultNum"
 					type="number"
 					min="0"

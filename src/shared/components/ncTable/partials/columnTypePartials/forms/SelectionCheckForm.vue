@@ -1,14 +1,11 @@
 <template>
 	<div style="width: 100%">
 		<!-- options -->
-		<div class="row">
-			<div class="fix-col-1">
+		<div class="row space-T">
+			<div class="fix-col-4">
 				{{ t('tables', 'Default') }}
 			</div>
-			<div class="fix-col-1">
-				&nbsp;
-			</div>
-			<div class="fix-col-2 margin-bottom">
+			<div class="fix-col-4 space-L-small">
 				<NcCheckboxRadioSwitch type="switch" :checked.sync="localSelectionDefault" />
 			</div>
 		</div>

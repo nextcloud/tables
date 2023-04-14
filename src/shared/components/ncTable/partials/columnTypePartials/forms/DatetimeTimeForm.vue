@@ -1,9 +1,9 @@
 <template>
-	<div class="row">
+	<div class="row space-T">
 		<div class="fix-col-4 title">
 			{{ t('tables', 'Set now as default') }}
 		</div>
-		<div class="fix-col-4">
+		<div class="fix-col-4 space-L-small">
 			<NcCheckboxRadioSwitch type="switch" :checked.sync="localDefault" />
 		</div>
 	</div>

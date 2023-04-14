@@ -1,50 +1,65 @@
 <template>
 	<div>
-		<div class="fix-col-4 title">
-			{{ t('tables', 'Default') }}
-		</div>
-		<div class="fix-col-4 space-B">
-			<input v-model="defaultNum" type="number">
-		</div>
-
-		<!-- decimals -->
-		<div class="fix-col-4 title">
-			{{ t('tables', 'Decimals') }}
-		</div>
-		<div class="fix-col-4 space-B">
-			<input v-model="decimals" type="number">
-		</div>
-
-		<!-- min -->
-		<div class="fix-col-4 title">
-			{{ t('tables', 'Minimum') }}
-		</div>
-		<div class="fix-col-4 space-B">
-			<input v-model="min" type="number">
+		<div class="row space-T">
+			<div class="col-2 space-R" style="display: block">
+				<div class="fix-col-4 title">
+					{{ t('tables', 'Default value') }}
+				</div>
+				<div class="fix-col-4">
+					<input v-model="defaultNum" type="number">
+				</div>
+			</div>
+			<div class="col-2 space-R" style="display: block">
+				<!-- decimals -->
+				<div class="fix-col-4 title">
+					{{ t('tables', 'Decimals') }}
+				</div>
+				<div class="fix-col-4">
+					<input v-model="decimals" type="number">
+				</div>
+			</div>
 		</div>
 
-		<!-- max -->
-		<div class="fix-col-4 title">
-			{{ t('tables', 'Maximum') }}
-		</div>
-		<div class="fix-col-4 space-B">
-			<input v-model="max" type="number">
+		<div class="row space-T">
+			<div class="col-2 space-R" style="display: block">
+				<!-- min -->
+				<div class="fix-col-4 title">
+					{{ t('tables', 'Minimum') }}
+				</div>
+				<div class="fix-col-4">
+					<input v-model="min" type="number">
+				</div>
+			</div>
+			<div class="col-2 space-R" style="display: block">
+				<!-- max -->
+				<div class="fix-col-4 title">
+					{{ t('tables', 'Maximum') }}
+				</div>
+				<div class="fix-col-4">
+					<input v-model="max" type="number">
+				</div>
+			</div>
 		</div>
 
-		<!-- prefix -->
-		<div class="fix-col-4 title">
-			{{ t('tables', 'Prefix') }}
-		</div>
-		<div class="fix-col-4 space-B">
-			<input v-model="localPrefix">
-		</div>
-
-		<!-- suffix -->
-		<div class="fix-col-4 title" style="display: flex;">
-			{{ t('tables', 'Suffix') }}
-		</div>
-		<div class="fix-col-4">
-			<input v-model="localSuffix">
+		<div class="row space-T">
+			<div class="col-2 space-R" style="display: block">
+				<!-- prefix -->
+				<div class="fix-col-4 title">
+					{{ t('tables', 'Prefix') }}
+				</div>
+				<div class="fix-col-4 space-B">
+					<input v-model="localPrefix">
+				</div>
+			</div>
+			<div class="col-2 space-R" style="display: block">
+				<!-- suffix -->
+				<div class="fix-col-4 title" style="display: flex;">
+					{{ t('tables', 'Suffix') }}
+				</div>
+				<div class="fix-col-4">
+					<input v-model="localSuffix">
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
