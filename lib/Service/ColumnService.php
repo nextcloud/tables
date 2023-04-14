@@ -150,8 +150,8 @@ class ColumnService extends SuperService {
 		$item->setNumberMin($numberMin);
 		$item->setNumberMax($numberMax);
 		$item->setNumberDecimals($numberDecimals);
-		$item->setNumberPrefix($numberPrefix !== null ?: '');
-		$item->setNumberSuffix($numberSuffix !== null ?: '');
+		$item->setNumberPrefix($numberPrefix !== null ? $numberPrefix: '');
+		$item->setNumberSuffix($numberSuffix !== null ? $numberSuffix: '');
 		$item->setCreatedBy($userId);
 		$item->setLastEditBy($userId);
 		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
