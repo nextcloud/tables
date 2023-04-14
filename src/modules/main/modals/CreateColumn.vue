@@ -127,7 +127,7 @@ import MainForm from '../../../shared/components/ncTable/partials/columnTypePart
 import DatetimeForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeForm.vue'
 import DatetimeDateForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeTimeForm.vue'
-import { NcModal, NcMultiselect, NcCheckboxRadioSwitch, NcIconSvgWrapper } from '@nextcloud/vue'
+import { NcModal, NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import SelectionForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionForm.vue'
 import SelectionMultiForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionMultiForm.vue'
 import { showError, showInfo, showSuccess, showWarning } from '@nextcloud/dialogs'
@@ -144,7 +144,6 @@ export default {
 		TextLineForm,
 		TextLongForm,
 		MainForm,
-		NcMultiselect,
 		NumberStarsForm,
 		NumberProgressForm,
 		SelectionCheckForm,
@@ -154,7 +153,6 @@ export default {
 		NcCheckboxRadioSwitch,
 		SelectionForm,
 		SelectionMultiForm,
-		NcIconSvgWrapper,
 	},
 	props: {
 		showModal: {
