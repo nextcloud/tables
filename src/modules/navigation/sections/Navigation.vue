@@ -16,7 +16,7 @@
 			<ul v-if="!tablesLoading">
 				<NcAppNavigationCaption :title="t('tables', 'My tables')">
 					<template #actions>
-						<NcActionButton icon="icon-add" @click.prevent="createTable" />
+						<NcActionButton :aria-label="t('tables', 'Create table')" icon="icon-add" @click.prevent="createTable" />
 					</template>
 				</NcAppNavigationCaption>
 
