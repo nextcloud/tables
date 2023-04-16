@@ -18,6 +18,7 @@ OC.L10N.register(
     "Type" : "نوع",
     "Time" : "إلى وقت",
     "Save" : "Save",
+    "Text" : "نص",
     "Link" : "الرابط",
     "Cancel" : "إلغاء",
     "Edit" : "تعديل",

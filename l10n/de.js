@@ -95,7 +95,7 @@ OC.L10N.register(
     "Create column" : "Spalte erstellen",
     "Type" : "Typ",
     "Text line" : "Textzeile",
-    "Simple text" : "Benötigt keine Übersetzung. Hier wird nur die formelle Übersetzung verwendet (de_DE).",
+    "Simple text" : "Einfacher Text",
     "Yes/No" : "Ja/Nein",
     "Time" : "Zeit",
     "Date and time" : "Datum und Zeit",

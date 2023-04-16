@@ -53,6 +53,7 @@ OC.L10N.register(
     "Read" : "Skaityti",
     "Update" : "Atnaujinti",
     "Manage" : "Tvarkyti",
+    "Export as CSV" : "Eksportuoti kaip CSV",
     "Undo" : "Atšaukti",
     "Redo" : "Grąžinti",
     "Bold" : "Pusjuodis",

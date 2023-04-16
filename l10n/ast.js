@@ -15,6 +15,7 @@ OC.L10N.register(
     "Type" : "Type",
     "Time" : "Hora",
     "Save" : "Guardar",
+    "Text" : "Testu",
     "Link" : "Link",
     "Cancel" : "Encaboxar",
     "Edit" : "Editar",

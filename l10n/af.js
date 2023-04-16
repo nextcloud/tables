@@ -14,6 +14,7 @@ OC.L10N.register(
     "Type" : "Tipe",
     "Time" : "Tyd",
     "Save" : "Bewaar",
+    "Text" : "Teks",
     "Link" : "Skakel",
     "Cancel" : "Kanselleer",
     "Edit" : "Wysig",
