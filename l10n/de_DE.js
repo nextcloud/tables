@@ -261,7 +261,7 @@ OC.L10N.register(
     "Defaults" : "Standardeinstellungen",
     "Allowed pattern" : "Erlaubtes Muster",
     "Max length" : "Maximale Länge",
-    "This field is mandatory" : "Dieses Feld ist obligatorisch",
+    "This field is mandatory" : "Dieses Feld ist erforderlich",
     "Export CSV" : "CSV esportieren",
     "_%n selected row_::_%n selected rows_" : ["%n gewählte Zeile","%n gewählte Zeilen"],
     "Confirmation" : "Bestätigung",
