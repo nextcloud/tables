@@ -6,8 +6,9 @@ describe('The Home Page', () => {
 	// })
 
 	beforeEach(function() {
-		const user = new User('admin', 'admin')
-		cy.login(user)
+		cy.createRandomUser().then(user => {
+			cy.login(user)
+		})
 		cy.visit('apps/tables')
 	})
 
