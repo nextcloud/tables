@@ -54,7 +54,9 @@ OC.L10N.register(
     "Create row" : "Crea riga",
     "Please fill in the mandatory fields." : "Compilare i campi obbligatori.",
     "Could not create new row" : "Impossibile creare una nuova riga",
+    "_Are you sure you want to delete the selected row?_::_Are you sure you want to delete the %n selected rows?_" : ["Sei sicuro di voler eliminare la riga selezionata?","Sei sicuro di voler eliminare le %nrighe selezionate?","Sei sicuro di voler eliminare le %nrighe selezionate?"],
     "Edit columns" : "Modifica colonne",
+    "There are no columns yet, click on the three-dot menu next to the table title ahead and create some." : "Non ci sono ancora colonne, fai clic sul menu a tre punti accanto al titolo della tabella e creane alcune.",
     "Cancel" : "Annulla",
     "Mandatory" : "Obbligatorio",
     "Star rating" : "Valutazione",
@@ -122,6 +124,7 @@ OC.L10N.register(
     "Options" : "Opzioni",
     "Delete option" : "Elimina opzione",
     "Add option" : "Aggiungi opzione",
+    "Allowed pattern (regex)" : "Schema consentito (regex)",
     "Maximum text length" : "Lunghezza massima testo",
     "Today as default" : "Oggi come predefinito",
     "Yes" : "Si",
@@ -134,6 +137,7 @@ OC.L10N.register(
     "Max length" : "Lunghezza massima",
     "Confirmation" : "Conferma",
     "Confirm" : "Conferma",
-    "Could not delete share" : "impossibile eliminare la condivisione"
+    "Could not delete share" : "impossibile eliminare la condivisione",
+    "Could not fetch tables" : "Impossibile recuperare le tabelle"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");
