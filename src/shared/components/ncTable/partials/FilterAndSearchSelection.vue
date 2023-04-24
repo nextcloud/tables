@@ -80,17 +80,19 @@ export default {
 				return this.getPossibleMagicFields
 			}
 			if (this.isColumnChosen && !this.isOperatorChosen) {
-				const column = this.getChosenColumn
-				console.debug('try to load column for needed autocomplete', this.getChosenColumn)
-				const columnType = column.type + (column.subtype ? '-' + column.subtype : '')
-				return Object.values(this.operators).filter(item => item.goodFor.includes(columnType))
+				return this.getPossibleOperators
 			}
 			return this.getColumnsForAutocompletion
 		},
 		getPossibleMagicFields() {
+			return Object.values(this.magicFields).filter(item => item.goodFor.includes(this.getChosenColumnType))
+		},
+		getPossibleOperators() {
+			return Object.values(this.operators).filter(item => item.goodFor.includes(this.getChosenColumnType))
+		},
+		getChosenColumnType() {
 			const column = this.getChosenColumn
-			const columnType = column.type + (column.subtype ? '-' + column.subtype : '')
-			return Object.values(this.magicFields).filter(item => item.goodFor.includes(columnType))
+			return column.type + (column.subtype ? '-' + column.subtype : '')
 		},
 	},
 
@@ -110,14 +112,14 @@ export default {
 			const parts = this.localValue.match(/.*(@column-[0-9]*).*(@operator-[a-z-]*)(.*)/)
 			console.debug('parts', parts)
 			if (parts === null) {
-				showWarning(t('tables', 'You try to add a filter, make sure to chose a column, operator and search string.'))
+				showWarning(t('tables', 'You try to add a filter, make sure to chose a column, operator and filter value.'))
 				return
 			}
 			const columnToFilter = parts[1]?.trim() || ''
 			const operator = parts[2]?.trim() || ''
-			const searchString = parts[3]?.trim() || ''
-			if (searchString === '') {
-				showWarning(t('tables', 'Please specify a search string.'))
+			const filterValue = parts[3]?.trim() || ''
+			if (filterValue === '') {
+				showWarning(t('tables', 'Please specify a filter value.'))
 				return
 			}
 
@@ -127,7 +129,7 @@ export default {
 			const filterObject = {
 				columnId: parseInt(columnToFilter.split('-')[1]),
 				operator: newOperator.join('-'),
-				value: searchString,
+				value: filterValue,
 			}
 			this.$emit('add-filter', filterObject)
 			this.localValue = this.searchString ? this.searchString : ''

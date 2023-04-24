@@ -10,8 +10,9 @@ create-row              -> click on create (plus) button
 create-column
 edit-columns
 delete-selected-rows
-add-filter
+add-filter              -> @param filter { columnId, operator, value }
 delete-filter           -> @param id (columnId + operator + value)
+set-search-string       -> @param string
 
 Props
 =====

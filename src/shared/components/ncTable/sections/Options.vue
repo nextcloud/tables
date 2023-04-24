@@ -1,8 +1,8 @@
 <template>
 	<div class="options">
 		<div v-if="showOptions && canReadTable(table)" class="fix-col-4" style="justify-content: space-between;">
-			<div v-if="canCreateRowInTable(table)" :class="{'add-padding-left': isSmallMobile }" class="actionButtonsLeft">
-				<NcButton v-if="!isSmallMobile"
+			<div :class="{'add-padding-left': isSmallMobile }" class="actionButtonsLeft">
+				<NcButton v-if="!isSmallMobile && canCreateRowInTable(table)"
 					:close-after-click="true"
 					type="tertiary"
 					@click="$emit('create-row')">
@@ -11,7 +11,7 @@
 						<Plus :size="25" />
 					</template>
 				</NcButton>
-				<NcButton v-if="isSmallMobile"
+				<NcButton v-if="isSmallMobile && canCreateRowInTable(table)"
 					:close-after-click="true"
 					type="tertiary"
 					@click="$emit('create-row')">
@@ -19,14 +19,13 @@
 						<Plus :size="25" />
 					</template>
 				</NcButton>
-				<FilterAndSearchSelection
-					:columns="columns"
-					:search-string="getSearchString"
-					@add-filter="filter => $emit('add-filter', filter)"
-					@set-search-string="str => $emit('set-search-string', str)" />
-			</div>
-			<div v-else style="height: 44px; ">
-				&nbsp;
+				<div class="searchAndFilter">
+					<FilterAndSearchSelection
+						:columns="columns"
+						:search-string="getSearchString"
+						@add-filter="filter => $emit('add-filter', filter)"
+						@set-search-string="str => $emit('set-search-string', str)" />
+				</div>
 			</div>
 
 			<div v-if="selectedRows.length > 0" class="selected-rows-option">
@@ -123,12 +122,6 @@ export default {
 		    },
 	},
 
-	data() {
-		return {
-			filterAndSearchValue: '',
-		}
-	},
-
 	computed: {
 		getSelectedRows() {
 			const rows = []
@@ -188,7 +181,7 @@ export default {
 }
 
 .searchAndFilter {
-	margin-left: 5%;
+	margin-left: calc(var(--default-grid-baseline) * 3);
 }
 
 </style>
