@@ -4,7 +4,18 @@
 			<NcCheckboxRadioSwitch :checked="allRowsAreSelected" @update:checked="value => $emit('select-all-rows', value)" />
 		</th>
 		<th v-for="col in columns" :key="col.id">
-			{{ col.title }}
+			<div class="cell">
+				{{ col.title }}
+				<TableHeaderSort :column="col" />
+			</div>
+			<div v-if="getFilterForColumn(col)" class="filter-wrapper">
+				<FilterLabel v-for="filter in getFilterForColumn(col)"
+					:id="filter.columnId + filter.operator + filter.value"
+					:key="filter.columnId + filter.operator + filter.value"
+					:operator-label="getOperatorLabel(filter.operator)"
+					:value="filter.value"
+					@delete-filter="id => $emit('delete-filter', id)" />
+			</div>
 		</th>
 		<th>
 			<NcActions :force-menu="true">
@@ -49,17 +60,23 @@ import { NcCheckboxRadioSwitch, NcActions, NcActionButton, NcActionSeparator } f
 import { emit } from '@nextcloud/event-bus'
 import TableEdit from 'vue-material-design-icons/TableEdit.vue'
 import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
+import TableHeaderSort from './TableHeaderSort.vue'
+import searchAndFilterMixin from '../mixins/searchAndFilterMixin.js'
+import FilterLabel from './FilterLabel.vue'
 
 export default {
 	name: 'TableHeader',
 	components: {
+		FilterLabel,
 		NcCheckboxRadioSwitch,
+		TableHeaderSort,
 		NcActions,
 		NcActionButton,
 		NcActionSeparator,
 		TableEdit,
 		TableColumnPlusAfter,
 	},
+	mixins: [searchAndFilterMixin],
 	props: {
 		columns: {
 			type: Array,
@@ -77,6 +94,10 @@ export default {
 			type: Object,
 			default: () => {},
 		},
+		view: {
+		      type: Object,
+		      default: null,
+		    },
 	},
 	computed: {
 		allRowsAreSelected() {
@@ -88,6 +109,9 @@ export default {
 		},
 	},
 	methods: {
+		getFilterForColumn(column) {
+			return this.view?.filter?.filter(item => item.columnId === column.id)
+		},
 		downloadCSV() {
 			this.$emit('download-csv', this.rows)
 		},
@@ -97,3 +121,20 @@ export default {
 	},
 }
 </script>
+<style lang="scss" scoped>
+
+.cell {
+	display: inline-flex;
+	align-items: center;
+}
+
+.cell span {
+	padding-left: 12px;
+
+}
+
+.filter-wrapper {
+	margin-top: calc(var(--default-grid-baseline) * -2);
+}
+
+</style>

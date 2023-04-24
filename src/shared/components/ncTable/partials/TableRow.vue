@@ -1,11 +1,11 @@
 <template>
 	<tr v-if="row" :class="{ selected }">
 		<td><NcCheckboxRadioSwitch :checked="selected" @update:checked="v => $emit('update-row-selection', { rowId: row.id, value: v })" /></td>
-		<td v-for="col in columns" :key="col.id">
+		<td v-for="col in columns" :key="col.id" :class="{ 'search-result': getCell(col.id)?.searchStringFound, 'filter-result': getCell(col.id)?.filterFound }">
 			<TableCellProgress v-if="col.type === 'number' && col.subtype === 'progress'"
 				:column="col"
 				:row-id="row.id"
-				:value="parseInt(getCellValue(col.id))" />
+				:value="parseInt(getCellValue(col.id, false))" />
 			<TableCellLink v-else-if="col.type === 'text' && col.subtype === 'link'"
 				:column="col"
 				:row-id="row.id"
@@ -105,13 +105,16 @@ export default {
 		},
 	},
 	methods: {
+		getCell(columnId) {
+			return this.row.data.find(item => item.columnId === columnId) || null
+		},
 		getCellValue(columnId, loadDefault = true) {
 			if (!this.row) {
 				return null
 			}
 
 			// lets see if we have a value
-			const cell = this.row.data.find(item => item.columnId === columnId)
+			const cell = this.getCell(columnId)
 
 			// if no value is given, try to get the default value from the column definition
 			if (cell) {
@@ -137,6 +140,18 @@ export default {
 
 tr.selected {
 	background-color: var(--color-primary-light) !important;
+}
+
+.search-result {
+	border-left: 6px solid var(--color-success) !important;
+}
+
+.filter-result {
+	border-left: 6px solid var(--color-primary-element);
+}
+
+:deep(.search-result > div), :deep(.filter-result > div) {
+	padding-left: calc(var(--default-grid-baseline) * 1);
 }
 
 </style>

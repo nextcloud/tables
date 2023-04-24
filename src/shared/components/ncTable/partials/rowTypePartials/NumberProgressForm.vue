@@ -31,7 +31,7 @@ export default {
 	computed: {
 		localValue: {
 			get() {
-				if (this.value) {
+				if (this.value !== null) {
 					return this.value
 				} else {
 					if (this.column.numberDefault !== undefined) {
@@ -42,7 +42,7 @@ export default {
 					}
 				}
 			},
-			set(v) { this.$emit('update:value', parseFloat(v)) },
+			set(v) { this.$emit('update:value', parseInt(v)) },
 		},
 	},
 }

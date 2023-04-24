@@ -26,14 +26,10 @@ export default {
 	},
 	computed: {
 		getValue() {
-			if (this.value !== null) {
+			if (this.value !== null && !isNaN(this.value)) {
 				return this.value
 			}
-			if (this.column && this.column.numberDefault) {
-				return this.column.numberDefault
-			} else {
-				return null
-			}
+			return null
 		},
 	},
 }
