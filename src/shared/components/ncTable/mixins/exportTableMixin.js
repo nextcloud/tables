@@ -2,10 +2,11 @@ import moment from '@nextcloud/moment'
 import textLongMixin from '../mixins/columnsTypes/textLongMixin.js'
 import selectionMultiMixin from '../mixins/columnsTypes/selectionMultiMixin.js'
 import selectionMixin from '../mixins/columnsTypes/selectionMixin.js'
+import generalHelper from '../../../mixins/generalHelper.js'
 
 export default {
 
-	mixins: [textLongMixin, selectionMultiMixin, selectionMixin],
+	mixins: [textLongMixin, selectionMultiMixin, selectionMixin, generalHelper],
 
 	methods: {
 
@@ -32,19 +33,10 @@ export default {
 		},
 		getValueByColumnType(set, column) {
 			const methodName = 'getValueStringFor' + this.ucfirst(column.type) + this.ucfirst(column.subtype) || ''
-			console.debug('try to get toString methods', {
-				isFunction: this[methodName] instanceof Function,
-				methodName,
-				result: this[methodName](set, column),
-			})
 			if (this[methodName] instanceof Function) {
 				return this[methodName](set, column)
 			}
 			return set ? set.value : ''
-		},
-		ucfirst(str) {
-			// converting first letter to uppercase
-			return str.charAt(0).toUpperCase() + str.slice(1)
 		},
 	},
 }

@@ -10,11 +10,15 @@
 					:rows="rows"
 					:columns="columns"
 					:table="activeTable"
+					:view="view"
+					@add-filter="addFilter"
+					@set-search-string="setSearchString"
 					@edit-row="rowId => editRowId = rowId"
 					@create-column="showCreateColumn = true"
 					@edit-columns="showEditColumns = true"
 					@create-row="showCreateRow = true"
-					@delete-selected-rows="deleteRows" />
+					@delete-selected-rows="deleteRows"
+					@delete-filter="deleteFilter" />
 			</div>
 
 			<EmptyTable v-if="columns.length === 0" @create-column="showCreateColumn = true" />
@@ -77,6 +81,7 @@ export default {
 			columns: state => state.data.columns,
 			loading: state => state.data.loading,
 			rows: state => state.data.rows,
+			view: state => state.data.view,
 		}),
 		...mapGetters(['activeTable']),
 		isLoading() {
@@ -101,6 +106,9 @@ export default {
 		this.reload()
 	},
 	methods: {
+		deleteFilter(id) {
+			this.$store.dispatch('deleteFilter', { id })
+		},
 		deleteRows(rowIds) {
 			this.rowsToDelete = rowIds
 		},
@@ -119,6 +127,12 @@ export default {
 				this.lastActiveTableId = this.activeTable.id
 				this.localLoading = false
 			}
+		},
+		addFilter(filterObject) {
+			this.$store.dispatch('addFilter', filterObject)
+		},
+		setSearchString(str) {
+			this.$store.dispatch('setSearchString', { str })
 		},
 	},
 }

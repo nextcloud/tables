@@ -50,6 +50,27 @@ export default {
 			return defaultObjects
 		},
 
+		isSearchStringFoundForSelectionMulti(column, cell, searchString) {
+			if (cell.value !== null && (this.getValueStringForSelectionMulti(cell, column)).includes(searchString)) {
+				cell.searchStringFound = true
+				return true
+			}
+			return false
+		},
+		isFilterFoundForSelectionMulti(column, cell, filter) {
+			const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
+
+			if (filter.operator === 'contains' && (this.getValueStringForSelectionMulti(cell, column))?.includes(filterValue)) {
+				cell.filterFound = true
+				return true
+			}
+			if (filter.operator === 'is-equal' && this.getValueStringForSelectionMulti(cell, column) === filterValue) {
+				cell.filterFound = true
+				return true
+			}
+			return false
+		},
+
 	},
 
 }

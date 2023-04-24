@@ -1,7 +1,7 @@
 <template>
 	<div class="options">
 		<div v-if="showOptions && canReadTable(table)" class="fix-col-4" style="justify-content: space-between;">
-			<div v-if="canCreateRowInTable(table)" :class="{'add-padding-left': isSmallMobile }">
+			<div v-if="canCreateRowInTable(table)" :class="{'add-padding-left': isSmallMobile }" class="actionButtonsLeft">
 				<NcButton v-if="!isSmallMobile"
 					:close-after-click="true"
 					type="tertiary"
@@ -19,6 +19,11 @@
 						<Plus :size="25" />
 					</template>
 				</NcButton>
+				<FilterAndSearchSelection
+					:columns="columns"
+					:search-string="getSearchString"
+					@add-filter="filter => $emit('add-filter', filter)"
+					@set-search-string="str => $emit('set-search-string', str)" />
 			</div>
 			<div v-else style="height: 44px; ">
 				&nbsp;
@@ -76,11 +81,13 @@ import Delete from 'vue-material-design-icons/Delete.vue'
 import Export from 'vue-material-design-icons/Export.vue'
 import viewportHelper from '../../../mixins/viewportHelper.js'
 import permissionsMixin from '../mixins/permissionsMixin.js'
+import FilterAndSearchSelection from '../partials/FilterAndSearchSelection.vue'
 
 export default {
 	name: 'Options',
 
 	components: {
+		FilterAndSearchSelection,
 		NcButton,
 		Plus,
 		Delete,
@@ -106,6 +113,20 @@ export default {
 			type: Object,
 			default: () => {},
 		},
+		columns: {
+		      type: Array,
+		      default: null,
+		    },
+		view: {
+		      type: Object,
+		      default: null,
+		    },
+	},
+
+	data() {
+		return {
+			filterAndSearchValue: '',
+		}
 	},
 
 	computed: {
@@ -116,12 +137,13 @@ export default {
 			})
 			return rows
 		},
+		getSearchString() {
+			return this.view?.searchString || ''
+		},
 	},
 
 	methods: {
 		exportCsv() {
-			console.debug('export csv by selected rows', this.selectedRows)
-			console.debug('selected rows', this.getSelectedRows)
 			this.$emit('download-csv', this.getSelectedRows)
 		},
 		getRowById(rowId) {
@@ -151,6 +173,22 @@ export default {
 
 .add-padding-left {
 	padding-left: calc(var(--default-grid-baseline) * 1);
+}
+
+:deep(.counter-bubble__counter) {
+	max-width: fit-content;
+}
+
+.actionButtonsLeft {
+	display: inline-flex;
+}
+
+:deep(.actionButtonsLeft button) {
+	min-width: fit-content;
+}
+
+.searchAndFilter {
+	margin-left: 5%;
 }
 
 </style>

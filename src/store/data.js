@@ -6,6 +6,7 @@ export default {
 		loading: false,
 		rows: [],
 		columns: [],
+		view: {},
 	},
 
 	mutations: {
@@ -17,6 +18,9 @@ export default {
 		},
 		setLoading(state, value) {
 			state.loading = !!(value)
+		},
+		setView(state, view) {
+			state.view = Object.assign({}, view)
 		},
 	},
 
@@ -31,6 +35,56 @@ export default {
 	},
 
 	actions: {
+
+		addSorting({ commit, state }, { columnId, mode }) {
+			// mode can be 'asc' or 'desc'
+			if (mode !== 'asc' && mode !== 'desc') {
+				return
+			}
+
+			const view = state.view
+
+			const sorting = []
+			sorting.push({
+				columnId,
+				mode,
+			})
+
+			view.sorting = sorting
+
+			commit('setView', view)
+		},
+
+		addFilter({ commit, state }, { columnId, operator, value }) {
+			const view = state.view
+
+			if (!view.filter) {
+				view.filter = []
+			}
+
+			view.filter.push({
+				columnId,
+				operator,
+				value,
+			})
+
+			commit('setView', view)
+		},
+
+		deleteFilter({ commit, state }, { id }) {
+			const index = state.view?.filter?.findIndex(item => item.columnId + item.operator + item.value === id)
+			if (index !== -1) {
+				const localView = { ...state.view }
+				localView.filter.splice(index, 1)
+				commit('setView', localView)
+			}
+		},
+
+		setSearchString({ commit, state }, { str }) {
+			const view = state.view
+			view.searchString = str
+			commit('setView', view)
+		},
 
 		// COLUMNS
 		async loadColumnsFromBE({ commit }, { tableId }) {
