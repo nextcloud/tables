@@ -28,6 +28,11 @@ export default {
 	computed: {
 		localValue: {
 			get() {
+				if (this.value === null) {
+					const newValue = this.column?.textDefault ? this.column.textDefault : ''
+					this.$emit('update:value', newValue)
+					return newValue
+				}
 				return this.value
 			},
 			set(v) { this.$emit('update:value', v) },
@@ -35,11 +40,6 @@ export default {
 		length() {
 			return (this.localValue) ? this.localValue.length : 0
 		},
-	},
-	beforeMount() {
-		if (this.localValue === null) {
-			this.localValue = this.column.textDefault
-		}
 	},
 }
 </script>
