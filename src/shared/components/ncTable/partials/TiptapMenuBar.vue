@@ -152,6 +152,16 @@ export default {
 		}
 	},
 
+	watch: {
+		value(value) {
+			const isSame = this.editor.getHTML() === value
+			if (isSame) {
+				return
+			}
+			this.editor.commands.setContent(value, false)
+		},
+	},
+
 	mounted() {
 		this.editor = new Editor({
 			extensions: [
