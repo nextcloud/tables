@@ -32,11 +32,6 @@ export default {
 		},
 		getValueByColumnType(set, column) {
 			const methodName = 'getValueStringFor' + this.ucfirst(column.type) + this.ucfirst(column.subtype) || ''
-			console.debug('try to get toString methods', {
-				isFunction: this[methodName] instanceof Function,
-				methodName,
-				result: this[methodName](set, column),
-			})
 			if (this[methodName] instanceof Function) {
 				return this[methodName](set, column)
 			}
