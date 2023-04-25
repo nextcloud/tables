@@ -44,6 +44,8 @@
 						<TextLongForm v-if="editColumn.type === 'text' && editColumn.subtype === 'long'"
 							:text-default.sync="editColumn.textDefault"
 							:text-max-length.sync="editColumn.textMaxLength" />
+						<TextRichForm v-if="editColumn.type === 'text' && editColumn.subtype === 'rich'"
+							:text-default.sync="editColumn.textDefault" />
 						<SelectionForm v-if="editColumn.type === 'selection' && !editColumn.subtype"
 							:selection-options.sync="editColumn.selectionOptions"
 							:selection-default.sync="editColumn.selectionDefault" />
@@ -97,6 +99,10 @@
 							{{ (column.mandatory) ? t('tables', 'Textline') + ', ' + t('tables', 'Mandatory'): t('tables', 'Textline') }}
 						</span>
 
+						<span v-if="column.type === 'text' && column.subtype === 'rich'" class="block">
+							{{ (column.mandatory) ? t('tables', 'Rich text') + ', ' + t('tables', 'Mandatory'): t('tables', 'Rich text') }}
+						</span>
+
 						<span v-if="column.type === 'text' && column.subtype === 'link'" class="block">
 							{{ (column.mandatory) ? t('tables', 'Link') + ', ' + t('tables', 'Mandatory'): t('tables', 'Link') }}
 						</span>
@@ -136,6 +142,7 @@
 								<NumberProgressTableDisplay v-if="column.type === 'number' && column.subtype === 'progress'" :column="column" />
 								<TextLineTableDisplay v-if="column.type === 'text' && column.subtype === 'line'" :column="column" />
 								<TextLongTableDisplay v-if="column.type === 'text' && column.subtype === 'long'" :column="column" />
+								<TextRichTableDisplay v-if="column.type === 'text' && column.subtype === 'rich'" :column="column" />
 								<TextLinkTableDisplay v-if="column.type === 'text' && column.subtype === 'link'" :column="column" />
 								<SelectionTableDisplay v-if="column.type === 'selection' && !column.subtype" :column="column" />
 								<SelectionMultiTableDisplay v-if="column.type === 'selection' && column.subtype === 'multi'" :column="column" />
@@ -194,12 +201,14 @@ import NumberStarsTableDisplay from '../../../shared/components/ncTable/partials
 import NumberProgressTableDisplay from '../../../shared/components/ncTable/partials/columnTypePartials/tableDisplay/NumberProgressTableDisplay.vue'
 import TextLineTableDisplay from '../../../shared/components/ncTable/partials/columnTypePartials/tableDisplay/TextLineTableDisplay.vue'
 import TextLongTableDisplay from '../../../shared/components/ncTable/partials/columnTypePartials/tableDisplay/TextLongTableDisplay.vue'
+import TextRichTableDisplay from '../../../shared/components/ncTable/partials/columnTypePartials/tableDisplay/TextRichTableDisplay.vue'
 import TextLinkTableDisplay from '../../../shared/components/ncTable/partials/columnTypePartials/tableDisplay/TextLinkTableDisplay.vue'
 import NumberForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/NumberForm.vue'
 import NumberStarsForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/NumberStarsForm.vue'
 import NumberProgressForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/NumberProgressForm.vue'
 import TextLineForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/TextLineForm.vue'
 import TextLongForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/TextLongForm.vue'
+import TextRichForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/TextRichForm.vue'
 import MainForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/MainForm.vue'
 import SelectionCheckTableDisplay from '../../../shared/components/ncTable/partials/columnTypePartials/tableDisplay/SelectionCheckTableDisplay.vue'
 import SelectionTableDisplay from '../../../shared/components/ncTable/partials/columnTypePartials/tableDisplay/SelectionTableDisplay.vue'
@@ -234,12 +243,14 @@ export default {
 		NumberProgressTableDisplay,
 		TextLineTableDisplay,
 		TextLongTableDisplay,
+		TextRichTableDisplay,
 		TextLinkTableDisplay,
 		NumberForm,
 		NumberStarsForm,
 		NumberProgressForm,
 		TextLineForm,
 		TextLongForm,
+		TextRichForm,
 		MainForm,
 		SelectionForm,
 		SelectionMultiForm,

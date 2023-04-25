@@ -364,7 +364,7 @@ export default {
 			border-bottom: 1px solid var(--color-border);
 		}
 
-		tr:active, tr:hover, tr:focus {
+		tr:active, tr:hover, tr:focus, tr:hover .editor-wrapper .editor {
 			background-color: var(--color-background-dark);
 		}
 

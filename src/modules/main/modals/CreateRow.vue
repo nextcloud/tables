@@ -18,6 +18,9 @@
 				<TextLinkForm v-if="column.type === 'text' && column.subtype === 'link'"
 					:column="column"
 					:value.sync="row[column.id]" />
+				<TextRichForm v-if="column.type === 'text' && column.subtype === 'rich'"
+					:column="column"
+					:value.sync="row[column.id]" />
 				<NumberForm v-if="column.type === 'number' && !column.subtype"
 					:column="column"
 					:value.sync="row[column.id]" />
@@ -79,6 +82,7 @@ import SelectionMultiForm from '../../../shared/components/ncTable/partials/rowT
 import DatetimeForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeForm.vue'
 import DatetimeDateForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeTimeForm.vue'
+import TextRichForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextRichForm.vue'
 
 export default {
 	name: 'CreateRow',
@@ -90,6 +94,7 @@ export default {
 		TextLineForm,
 		TextLongForm,
 		TextLinkForm,
+		TextRichForm,
 		NumberForm,
 		NumberStarsForm,
 		NumberProgressForm,

@@ -50,6 +50,9 @@
 							<NcCheckboxRadioSwitch :checked.sync="subtype" value="long" name="textTypeSelection" type="radio">
 								{{ t('tables', 'Simple text') }}
 							</NcCheckboxRadioSwitch>
+							<NcCheckboxRadioSwitch :checked.sync="subtype" value="rich" name="textTypeSelection" type="radio">
+								{{ t('tables', 'Rich text') }}
+							</NcCheckboxRadioSwitch>
 						</div>
 
 						<TextLineForm v-if="subtype === 'line'"
@@ -59,6 +62,8 @@
 						<TextLongForm v-if="subtype === 'long'"
 							:text-default.sync="textDefault"
 							:text-max-length.sync="textMaxLength" />
+						<TextRichForm v-if="subtype === 'rich'"
+							:text-default.sync="textDefault" />
 					</div>
 
 					<div v-if="type === 'selection'" class="row no-padding-on-mobile space-L">
@@ -134,6 +139,7 @@ import { showError, showInfo, showSuccess, showWarning } from '@nextcloud/dialog
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
 import ColumnTypeSelection from '../partials/ColumnTypeSelection.vue'
+import TextRichForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/TextRichForm.vue'
 
 export default {
 	name: 'CreateColumn',
@@ -143,6 +149,7 @@ export default {
 		NumberForm,
 		TextLineForm,
 		TextLongForm,
+		TextRichForm,
 		MainForm,
 		NumberStarsForm,
 		NumberProgressForm,

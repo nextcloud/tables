@@ -13,6 +13,9 @@
 				<TextLongForm v-if="column.type === 'text' && column.subtype === 'long'"
 					:column="column"
 					:value.sync="localRow[column.id]" />
+				<TextRichForm v-if="column.type === 'text' && column.subtype === 'rich'"
+					:column="column"
+					:value.sync="localRow[column.id]" />
 				<TextLinkForm v-if="column.type === 'text' && column.subtype === 'link'"
 					:column="column"
 					:value.sync="localRow[column.id]" />
@@ -74,6 +77,7 @@ import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
 import TextLineForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextLineForm.vue'
 import TextLongForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextLongForm.vue'
+import TextRichForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextRichForm.vue'
 import TextLinkForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextLinkForm.vue'
 import NumberForm from '../../../shared/components/ncTable/partials/rowTypePartials/NumberForm.vue'
 import NumberStarsForm from '../../../shared/components/ncTable/partials/rowTypePartials/NumberStarsForm.vue'
@@ -95,6 +99,7 @@ export default {
 		NcModal,
 		TextLineForm,
 		TextLongForm,
+		TextRichForm,
 		TextLinkForm,
 		NumberForm,
 		NumberStarsForm,

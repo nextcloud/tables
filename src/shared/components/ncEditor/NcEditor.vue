@@ -1,0 +1,113 @@
+<template>
+	<div class="editor-wrapper" :class="{ border: showBorder, 'hide-readonly-bar': !showReadonlyBar, 'height-small': height === 'small' }">
+		<div v-if="textAppAvailable">
+			<div ref="editor" />
+		</div>
+		<div v-else>
+			{{ t('tables', 'Could not load editor.') }}
+		</div>
+	</div>
+</template>
+
+<script>
+
+export default {
+
+	props: {
+		canEdit: {
+		      type: Boolean,
+		      default: true,
+		    },
+		text: {
+		      type: String,
+		      default: '',
+		    },
+		showBorder: {
+		      type: Boolean,
+		      default: true,
+		    },
+		showReadonlyBar: {
+		      type: Boolean,
+		      default: true,
+		    },
+		height: {
+		      type: String,
+		      default: null, // null, 'small'
+		    },
+	},
+
+	data() {
+		return {
+			textAppAvailable: !!window.OCA?.Text?.createEditor,
+			editor: null,
+		}
+	},
+
+	computed: {
+		localText: {
+			get() {
+				return this.text
+			},
+			set(v) {
+				this.$emit('update:text', v)
+			},
+		},
+	},
+
+	watch: {
+		localText(value) {
+			this.editor.setContent(value, false)
+		},
+	},
+
+	mounted() {
+		this.setupEditor()
+	},
+
+	beforeDestroy() {
+		this?.editor?.destroy()
+	},
+
+	methods: {
+		async setupEditor() {
+			this?.editor?.destroy()
+			if (this.textAppAvailable) {
+				this.editor = await window.OCA.Text.createEditor({
+					el: this.$refs.editor,
+					content: this.localText,
+					readOnly: !this.canEdit,
+					onUpdate: ({ markdown }) => {
+						this.localText = markdown
+					},
+				})
+			} else {
+				console.debug('try to load editor, but not initialized')
+			}
+		},
+	},
+}
+</script>
+<style scoped>
+
+	:deep(.text-editor__wrapper button.entry-action__image-upload) {
+		display: none;
+	}
+
+	.editor-wrapper {
+		width: 100%;
+	}
+	.editor-wrapper.border {
+		border: 2px solid var(--color-border-maxcontrast);
+		border-radius: var(--border-radius-large);
+	}
+
+	:deep(.text-readonly-bar) {
+		display: none !important;
+	}
+
+	.height-small {
+		max-height: 320px;
+		overflow-y: auto;
+	}
+
+</style>
