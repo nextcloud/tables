@@ -84,6 +84,7 @@ OC.L10N.register(
     "Max" : "最大值",
     "Defaults" : "默认",
     "Confirm" : "确认",
-    "Could not delete share" : "不能删除共享"
+    "Could not delete share" : "不能删除共享",
+    "Unchecked" : "未选中"
 },
 "nplurals=1; plural=0;");

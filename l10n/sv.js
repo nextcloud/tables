@@ -237,6 +237,7 @@ OC.L10N.register(
     "Could not delete share" : "Kunde inte ta bort delningen",
     "Share permission was updated" : "Delningsbehörighet har uppdaterats",
     "Could not update share permission" : "Det gick inte att uppdatera delningsbehörigheten",
+    "Unchecked" : "Avmarkerade",
     "Could not fetch tables" : "Det gick inte att hämta tabeller"
 },
 "nplurals=2; plural=(n != 1);");

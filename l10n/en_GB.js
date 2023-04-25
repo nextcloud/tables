@@ -274,6 +274,7 @@ OC.L10N.register(
     "Could not delete share" : "Could not delete share",
     "Share permission was updated" : "Share permission was updated",
     "Could not update share permission" : "Could not update share permission",
+    "Unchecked" : "Unchecked",
     "Could not fetch tables" : "Could not fetch tables"
 },
 "nplurals=2; plural=(n != 1);");

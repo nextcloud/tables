@@ -138,6 +138,7 @@ OC.L10N.register(
     "Confirmation" : "Conferma",
     "Confirm" : "Conferma",
     "Could not delete share" : "impossibile eliminare la condivisione",
+    "Unchecked" : "Non selezionati",
     "Could not fetch tables" : "Impossibile recuperare le tabelle"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

@@ -81,8 +81,8 @@ OC.L10N.register(
     "We will have a kickoff meeting in person." : "Yüz yüze bir başlangıç toplantısı yapacağız.",
     "Project is kicked-off and we know the vision and our first tasks." : "Proje başladı ve vizyonumuz ile ilk görevlerimizi biliyoruz.",
     "That was nice in person again. We collected some action points, had a look at the documentation..." : "Yüz yüze olmak güzeldi. Bazı eylem noktaları belirledik. Belgelere göz atın...",
-    "Set up some documentation and collaboration tools" : "Bazı belgelendirme ve işbirliği araçları kurun",
-    "Where and in what way do we collaborate?" : "Nerede ne şekilde işbirliği yapıyoruz?",
+    "Set up some documentation and collaboration tools" : "Bazı belgelendirme ve iş birliği araçları kurun",
+    "Where and in what way do we collaborate?" : "Nerede ne şekilde iş birliği yapıyoruz?",
     "We know what we are doing." : "Ne yaptığımızı biliyoruz.",
     "We have heard that Nextcloud could be a nice solution for it, should give it a try." : "Nextcloud'un bunun için güzel bir çözüm olabileceğini duyduk, denemeliyiz.",
     "Add more actions" : "Başka eylemler ekle",
@@ -274,6 +274,7 @@ OC.L10N.register(
     "Could not delete share" : "Paylaşım silinemedi",
     "Share permission was updated" : "Paylaşım izni güncellendi",
     "Could not update share permission" : "Paylaşım izni güncellenemedi",
+    "Unchecked" : "Denetlenmemiş",
     "Could not fetch tables" : "Tablolar alınamadı"
 },
 "nplurals=2; plural=(n > 1);");

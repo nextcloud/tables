@@ -100,6 +100,7 @@ OC.L10N.register(
     "Time" : "Hora",
     "Date and time" : "Data i hora",
     "Save" : "Desar",
+    "Text" : "Text",
     "Link" : "Enllaç",
     "Number" : "Número",
     "Stars rating" : "Valoració d'estrelles",

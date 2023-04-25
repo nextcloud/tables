@@ -122,6 +122,7 @@ OC.L10N.register(
     "Confirmation" : "Bekreftelse",
     "Confirm" : "Bekreft",
     "Could not delete share" : "Kunne ikke slette ressursen",
+    "Unchecked" : "Usjekket",
     "Could not fetch tables" : "Kunne ikke hente tabeller"
 },
 "nplurals=2; plural=(n != 1);");

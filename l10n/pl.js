@@ -162,6 +162,7 @@ OC.L10N.register(
     "Could not delete share" : "Nie można usunąć udostępniania",
     "Share permission was updated" : "Uprawnienie do udostępnienia zostało zaktualizowane",
     "Could not update share permission" : "Nie udało się zaktualizować uprawnień do udostępnienia",
+    "Unchecked" : "Niesprawdzony",
     "Could not fetch tables" : "Nie udało się pobrać tabel"
 },
 "nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);");

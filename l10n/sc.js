@@ -67,6 +67,7 @@ OC.L10N.register(
     "No" : "No",
     "Max" : "Màssimu",
     "Confirm" : "Cunfirma",
-    "Could not delete share" : "No at fatu a cantzellare sa cumpartzidura"
+    "Could not delete share" : "No at fatu a cantzellare sa cumpartzidura",
+    "Unchecked" : "Chene verìfica"
 },
 "nplurals=2; plural=(n != 1);");

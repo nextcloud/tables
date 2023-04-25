@@ -274,6 +274,7 @@ OC.L10N.register(
     "Could not delete share" : "Не могу да обришем дељење",
     "Share permission was updated" : "Ажуриране су дозволе дељења",
     "Could not update share permission" : "Нису могле да се ажурирају дозволе дељења",
+    "Unchecked" : "Непроверени",
     "Could not fetch tables" : "Табеле нису могле да се добаве"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);");

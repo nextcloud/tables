@@ -274,6 +274,7 @@ OC.L10N.register(
     "Could not delete share" : "Kunne ikke slette deling",
     "Share permission was updated" : "Deltilladelsen blev opdateret",
     "Could not update share permission" : "Delingstilladelsen kunne ikke opdateres",
+    "Unchecked" : "Ukontrolleret",
     "Could not fetch tables" : "Kunne ikke hente tabeller"
 },
 "nplurals=2; plural=(n != 1);");

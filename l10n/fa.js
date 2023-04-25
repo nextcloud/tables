@@ -51,6 +51,7 @@ OC.L10N.register(
     "Yes" : "بله",
     "No" : "نه",
     "Confirm" : "تائید",
-    "Could not delete share" : "اشتراک گذاری حذف نشد"
+    "Could not delete share" : "اشتراک گذاری حذف نشد",
+    "Unchecked" : "بازرسی نشده"
 },
 "nplurals=2; plural=(n > 1);");

@@ -212,6 +212,7 @@ OC.L10N.register(
     "Could not delete share" : "Ezin izan da partekatzea ezabatu",
     "Share permission was updated" : "Partekatze baimena eguneratu da",
     "Could not update share permission" : "Ezin izan dira partekatzearen baimenak aldatu",
+    "Unchecked" : "Egiaztatu gabea",
     "Could not fetch tables" : "Ezin izan dira taulak eskuratu"
 },
 "nplurals=2; plural=(n != 1);");

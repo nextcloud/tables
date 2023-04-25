@@ -134,6 +134,7 @@ OC.L10N.register(
     "Could not create new share" : "Uutta jakoa ei voitu luoda",
     "Share was deleted" : "Jako poistettiin",
     "Could not delete share" : "Jaon poistaminen epäonnistui",
+    "Unchecked" : "Ei tarkistettu",
     "Could not fetch tables" : "Taulukkoja ei voitu noutaa"
 },
 "nplurals=2; plural=(n != 1);");

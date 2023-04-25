@@ -274,6 +274,7 @@ OC.L10N.register(
     "Could not delete share" : "無法刪除分享",
     "Share permission was updated" : "分享權限已更新",
     "Could not update share permission" : "無法更新分享權限",
+    "Unchecked" : "未檢查",
     "Could not fetch tables" : "無法擷取表格"
 },
 "nplurals=1; plural=0;");

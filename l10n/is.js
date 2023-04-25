@@ -60,6 +60,7 @@ OC.L10N.register(
     "No" : "Nei",
     "Defaults" : "Sjálfgefin gildi",
     "Confirm" : "Staðfesta",
-    "Could not delete share" : "Tókst ekki að eyða sameign"
+    "Could not delete share" : "Tókst ekki að eyða sameign",
+    "Unchecked" : "Ekki skoðað"
 },
 "nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);");

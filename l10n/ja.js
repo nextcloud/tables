@@ -70,6 +70,7 @@ OC.L10N.register(
     "No" : "いいえ",
     "Max" : "最大",
     "Confirm" : "承認",
-    "Could not delete share" : "共有を削除できませんでした"
+    "Could not delete share" : "共有を削除できませんでした",
+    "Unchecked" : "未チェック"
 },
 "nplurals=1; plural=0;");

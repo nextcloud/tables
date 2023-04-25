@@ -243,6 +243,7 @@ OC.L10N.register(
     "Could not delete share" : "Impossible de supprimer le partage",
     "Share permission was updated" : "Les permissions liées au partage ont été mises à jour",
     "Could not update share permission" : "Impossible de mettre à jour les permissions liées au partage",
+    "Unchecked" : "Non contrôlé",
     "Could not fetch tables" : "Impossible de récupérer les tableaux"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

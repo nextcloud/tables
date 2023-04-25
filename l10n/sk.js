@@ -162,6 +162,7 @@ OC.L10N.register(
     "Could not delete share" : "Nie je možné zmazať sprístupnenie",
     "Share permission was updated" : "Právo na zdieľanie bolo upravené",
     "Could not update share permission" : "Nepodarilo sa aktualizovať právo na zdieľanie",
+    "Unchecked" : "Nekontrolované",
     "Could not fetch tables" : "Nepodarilo sa získať tabuľky."
 },
 "nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);");

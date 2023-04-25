@@ -126,6 +126,7 @@ OC.L10N.register(
     "Confirmation" : "Επιβεβαίωση",
     "Confirm" : "Επιβεβαίωση",
     "Could not delete share" : "Αδυναμία διαγραφής κοινόχρηστου φακέλου",
+    "Unchecked" : "Δεν έχει ελεγχθεί",
     "Could not fetch tables" : "Αδυναμία ανάκτησης πινάκων"
 },
 "nplurals=2; plural=(n != 1);");

@@ -274,6 +274,7 @@ OC.L10N.register(
     "Could not delete share" : "No se ha podido eliminar el recurso compartido",
     "Share permission was updated" : "Los permisos para compartir se han actualizado",
     "Could not update share permission" : "No se han podido actualizar los permisos para compartir",
+    "Unchecked" : "Desmarcado",
     "Could not fetch tables" : "No se ha podido obtener las tablas."
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

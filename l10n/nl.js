@@ -114,6 +114,7 @@ OC.L10N.register(
     "Confirmation" : "Bevestiging",
     "Confirm" : "Bevestigen",
     "Could not delete share" : "Kan gedeelde folder niet verwijderen",
+    "Unchecked" : "Niet gecontroleerd",
     "Could not fetch tables" : "Kon tabellen niet ophalen"
 },
 "nplurals=2; plural=(n != 1);");

@@ -241,6 +241,7 @@ OC.L10N.register(
     "Could not delete share" : "A megosztás nem törölhető",
     "Share permission was updated" : "A megosztás jogosultsága frissítve lett",
     "Could not update share permission" : "Nem sikerült frissíteni a megosztás jogosultságát",
+    "Unchecked" : "Ellenőrizetlen",
     "Could not fetch tables" : "Nem sikerült a táblázatok lekérése"
 },
 "nplurals=2; plural=(n != 1);");

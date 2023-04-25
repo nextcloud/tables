@@ -9,6 +9,7 @@ OC.L10N.register(
     "Name" : "Nome",
     "Description" : "Descrición",
     "Comment" : "Comentario",
+    "Dog" : "Can",
     "from" : "dende",
     "to" : "para",
     "Approved" : "Aprobado",
@@ -66,6 +67,7 @@ OC.L10N.register(
     "Max" : "Máx",
     "Defaults" : "Predeterminados",
     "Confirm" : "Confirmar",
-    "Could not delete share" : "Non foi posíbel eliminar o recurso compartido"
+    "Could not delete share" : "Non foi posíbel eliminar o recurso compartido",
+    "Unchecked" : "Sen verificar"
 },
 "nplurals=2; plural=(n != 1);");

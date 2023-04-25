@@ -274,6 +274,7 @@ OC.L10N.register(
     "Could not delete share" : "Freigabe konnte nicht gelöscht werden",
     "Share permission was updated" : "Freigabeberechtigung wurde aktualisiert",
     "Could not update share permission" : "Freigabeberechtigung konnte nicht aktualisiert werden",
+    "Unchecked" : "Ungeprüft",
     "Could not fetch tables" : "Tabellen konnten nicht geladen werden"
 },
 "nplurals=2; plural=(n != 1);");

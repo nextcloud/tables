@@ -241,6 +241,7 @@ OC.L10N.register(
     "Could not delete share" : "Não foi possível excluir o compartilhamento",
     "Share permission was updated" : "A permissão de compartilhamento foi atualizada",
     "Could not update share permission" : "Não foi possível atualizar a permissão de compartilhamento",
+    "Unchecked" : "Não verificado",
     "Could not fetch tables" : "Não foi possível buscar tabelas"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");
