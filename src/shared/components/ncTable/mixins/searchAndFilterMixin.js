@@ -12,7 +12,7 @@ export default {
 					icon: 'icon-add',
 					source: 'operators',
 					subline: t('tables', 'Filter operator'),
-					goodFor: ['text-line', 'text-long', 'selection', 'selection-multi', 'text-link'],
+					goodFor: ['text-line', 'text-long', 'selection', 'selection-multi', 'text-link', 'text-rich'],
 				},
 				'operator-begins-with': {
 					id: 'operator-begins-with',
@@ -78,7 +78,7 @@ export default {
 					icon: 'icon-user',
 					source: 'magic-fields',
 					subline: t('tables', 'Magic field'),
-					goodFor: ['text-line', 'selection', 'selection-multi'],
+					goodFor: ['text-line', 'selection', 'selection-multi', 'text-rich'],
 					replace: getCurrentUser().uid,
 				},
 				'magic-field-my-name': {
@@ -87,7 +87,7 @@ export default {
 					icon: 'icon-user',
 					source: 'magic-fields',
 					subline: t('tables', 'Magic field'),
-					goodFor: ['text-line', 'selection', 'selection-multi'],
+					goodFor: ['text-line', 'selection', 'selection-multi', 'text-rich'],
 					replace: getCurrentUser().displayName,
 				},
 				'magic-field-checked': {

@@ -141,10 +141,10 @@ export default {
 
 }
 </script>
-<style lang="scss" scoped>
+<style scoped>
 
 .rich-contenteditable__input {
-	width: 30vw;
+	width: 30vw !important;
 	border-color: var(--color-primary-element);
 }
 

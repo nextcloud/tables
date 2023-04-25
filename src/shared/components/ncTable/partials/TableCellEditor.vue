@@ -1,5 +1,9 @@
 <template>
-	<NcEditor v-if="value !== '' && value !== null" :can-edit="false" :text="value" :show-border="false" :show-readonly-bar="false" />
+	<NcEditor v-if="value !== '' && value !== null"
+		:can-edit="false"
+		:text="value"
+		:show-border="false"
+		:show-readonly-bar="false" />
 </template>
 
 <script>

@@ -40,28 +40,34 @@ export default {
 		return {
 			textAppAvailable: !!window.OCA?.Text?.createEditor,
 			editor: null,
+			localValue: '',
 		}
 	},
 
 	computed: {
 		localText: {
 			get() {
-				return this.text
+				return this.localValue
 			},
 			set(v) {
+				this.localValue = v
 				this.$emit('update:text', v)
 			},
 		},
 	},
 
 	watch: {
-		localText(value) {
-			this.editor.setContent(value, false)
+		text(value) {
+			if (value.trim() !== this.localValue.trim()) {
+				this.editor.setContent(value, false)
+			}
 		},
 	},
 
-	mounted() {
-		this.setupEditor()
+	async mounted() {
+		await this.setupEditor()
+		this.localValue = this.text
+		this.editor.setContent(this.localValue, false)
 	},
 
 	beforeDestroy() {

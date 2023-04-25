@@ -8,7 +8,7 @@
 					</template>
 					{{ t('tables', 'Show big editor') }}
 				</NcButton>
-				<NcModal v-if="showBigEditorModal" size="large" :title="column.title" @close="showBigEditorModal = false">
+				<NcModal v-if="showBigEditorModal" :close-button-contained="true" size="large" :title="column.title" @close="showBigEditorModal = false">
 					<div class="row">
 						<div class="fix-col-4 space-T-big">
 							<NcEditor :text.sync="localValue" :show-border="false" />
@@ -75,6 +75,7 @@ export default {
 			},
 		},
 	},
+
 }
 </script>
 <style lang="scss" scoped>
