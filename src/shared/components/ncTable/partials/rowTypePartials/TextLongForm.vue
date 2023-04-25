@@ -29,7 +29,7 @@ export default {
 	computed: {
 		localValue: {
 			get() {
-				return (this.value)
+				return (this.value !== null)
 					? this.value
 					: ((this.column.textDefault !== undefined)
 						? this.column.textDefault

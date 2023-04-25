@@ -121,6 +121,7 @@ export default {
 	methods: {
 		actionCancel() {
 			this.reset()
+			this.addNewAfterSave = false
 			this.$emit('close')
 		},
 		isValueValidForColumn(value, column) {
