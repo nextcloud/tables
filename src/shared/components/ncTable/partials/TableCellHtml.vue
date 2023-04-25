@@ -1,6 +1,8 @@
 <template>
-	<!-- eslint-disable-next-line vue/no-v-html -->
-	<div v-if="value" v-html="value" />
+	<div>
+		<!-- eslint-disable-next-line vue/no-v-html -->
+		<div v-if="value" class="tiptap-reader-cell" v-html="value" />
+	</div>
 </template>
 
 <script>
@@ -24,15 +26,24 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 
-div {
+:deep(.tiptap-reader-cell) {
 	max-height: calc(var(--default-line-height) * 6);
 	overflow-y: scroll;
 	min-width: 100px;
 	white-space: pre-wrap;
 	margin-top: calc(var(--default-grid-baseline) * 2);
 	margin-bottom: calc(var(--default-grid-baseline) * 2);
+
+	li {
+		display: flex;
+		align-items: center;
+	}
+
+	li > div {
+		padding-left: calc(var(--default-grid-baseline) * 2);
+	}
 }
 
 </style>
