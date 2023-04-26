@@ -11,18 +11,16 @@
 					<Fullscreen :size="20" />
 				</template>
 			</NcButton>
-			<NcModal v-if="showBigEditorModal" :close-button-contained="true" size="large" :title="column.title" @close="showBigEditorModal = false">
+			<NcModal v-if="showBigEditorModal" :close-button-contained="true" size="full" :title="column.title" @close="showBigEditorModal = false">
 				<div class="row">
-					<div class="fix-col-4 space-T-big">
+					<div class="fix-col-4">
 						<NcEditor :text.sync="localValue" :show-border="false" />
 					</div>
-					<div class="col-4 end space-R space-B">
-						<div class="end">
-							<NcButton @click="showBigEditorModal = false">
-								{{ t('tables', 'Close editor') }}
-							</NcButton>
-						</div>
-					</div>
+				</div>
+				<div class="closeModalButton">
+					<NcButton @click="showBigEditorModal = false">
+						{{ t('tables', 'Close editor') }}
+					</NcButton>
 				</div>
 			</NcModal>
 		</template>
@@ -77,18 +75,3 @@ export default {
 
 }
 </script>
-<style lang="scss" scoped>
-
-	.space-R {
-		padding-right: calc(var(--default-grid-baseline) * 2);
-	}
-
-	.end {
-		float: right;
-	}
-
-	.space-T-big {
-		padding-top: 40px;
-	}
-
-</style>
