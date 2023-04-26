@@ -50,7 +50,7 @@
 							<NcCheckboxRadioSwitch :checked.sync="subtype" value="long" name="textTypeSelection" type="radio">
 								{{ t('tables', 'Simple text') }}
 							</NcCheckboxRadioSwitch>
-							<NcCheckboxRadioSwitch :checked.sync="subtype" value="rich" name="textTypeSelection" type="radio">
+							<NcCheckboxRadioSwitch v-if="textAppAvailable" :checked.sync="subtype" value="rich" name="textTypeSelection" type="radio">
 								{{ t('tables', 'Rich text') }}
 							</NcCheckboxRadioSwitch>
 						</div>
@@ -169,6 +169,7 @@ export default {
 	},
 	data() {
 		return {
+			textAppAvailable: !!window.OCA?.Text?.createEditor,
 			addNewAfterSave: false,
 			type: 'text',
 			subtype: 'line',
