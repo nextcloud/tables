@@ -4,14 +4,27 @@
 			<div ref="editor" />
 		</div>
 		<div v-else>
-			{{ t('tables', 'Could not load editor.') }}
+			<NcEmptyContent
+				:title="t('tables', 'Error')"
+				:description="t('tables', 'Could not load editor, text not available.')">
+				<template #icon>
+					<Alert :size="20" />
+				</template>
+			</NcEmptyContent>
 		</div>
 	</div>
 </template>
 
 <script>
+import { NcEmptyContent } from '@nextcloud/vue'
+import Alert from 'vue-material-design-icons/Alert.vue'
 
 export default {
+
+	components: {
+		NcEmptyContent,
+		Alert,
+	},
 
 	props: {
 		canEdit: {
