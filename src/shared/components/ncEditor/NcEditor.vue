@@ -114,6 +114,7 @@ export default {
 
 	.editor-wrapper {
 		width: 100%;
+		min-width: 200px;
 	}
 
 	.editor-wrapper.border {
