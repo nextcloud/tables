@@ -274,6 +274,7 @@ OC.L10N.register(
     "Could not delete share" : "Не е възможно изтриване на споделянето",
     "Share permission was updated" : "Право за споделяне беше актуализирано",
     "Could not update share permission" : "Не можа да се актуализира право за споделяне",
+    "Unchecked" : "Непроверен",
     "Could not fetch tables" : "Таблиците не можаха да бъдат извлечени"
 },
 "nplurals=2; plural=(n != 1);");

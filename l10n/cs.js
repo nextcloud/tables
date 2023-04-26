@@ -274,6 +274,7 @@ OC.L10N.register(
     "Could not delete share" : "Sdílení se nedaří smazat",
     "Share permission was updated" : "Oprávnění ke sdílení bylo zaktualizováno",
     "Could not update share permission" : "Oprávnění ke sdílení se nepodařilo zaktualizovat",
+    "Unchecked" : "Nezkontrolováno",
     "Could not fetch tables" : "Nepodařilo se získat tabulky"
 },
 "nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;");

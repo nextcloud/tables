@@ -243,6 +243,7 @@ OC.L10N.register(
     "Could not delete share" : "No s'ha pogut suprimir la compartició",
     "Share permission was updated" : "S'ha actualitzat el permís per compartir",
     "Could not update share permission" : "No s'ha pogut actualitzar el permís per compartir",
+    "Unchecked" : "Sense verificar",
     "Could not fetch tables" : "No s'han pogut recuperar les taules"
 },
 "nplurals=2; plural=(n != 1);");
