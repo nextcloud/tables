@@ -1,5 +1,5 @@
 <template>
-	<div class="tile" :class="{active: localeActive}" @click="$emit('set-template')">
+	<div :tabindex="tabbable ? 0 : null" class="tile" :class="{active: localeActive}" @click="$emit('set-template')">
 		<h3>{{ title }}</h3>
 		<p>{{ body }}</p>
 	</div>
@@ -35,6 +35,10 @@ export default {
 			type: String,
 			default: '',
 		},
+		tabbable: {
+		      type: Boolean,
+		      default: false,
+		    },
 	},
 
 	computed: {
@@ -67,8 +71,12 @@ export default {
 	cursor: pointer;
 }
 
-.tile:hover {
+.tile:hover, .tile:focus {
 	border-color: var(--color-primary-element);
+}
+
+.tile:hover h3, .tile:focus h3 {
+	font-weight: bold;
 }
 
 .active {
