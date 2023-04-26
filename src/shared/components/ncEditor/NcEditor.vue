@@ -115,6 +115,7 @@ export default {
 	.editor-wrapper {
 		width: 100%;
 	}
+
 	.editor-wrapper.border {
 		border: 2px solid var(--color-border-maxcontrast);
 		border-radius: var(--border-radius-large);
