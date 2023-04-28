@@ -128,7 +128,7 @@ class ImportService extends SuperService {
 			$i++;
 
 			// only add the dataset if column is known
-			if($this->columns[$i] === '') {
+			if($this->columns[$i] === '' || !isset($this->columns[$i])) {
 				$this->logger->debug('Column unknown while fetching rows data for importing.');
 				$this->countErrors++;
 				continue;

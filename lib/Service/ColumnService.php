@@ -356,6 +356,10 @@ class ColumnService extends SuperService {
 				}
 				$result[$i] = '';
 			}
+			// if there are no columns at all
+			if(!isset($result[$i])) {
+				$result[$i] = '';
+			}
 			// if column was not found
 			if($result[$i] === '' && $createUnknownColumns) {
 				$description = $this->l->t('This column was automatically created by the import service.');
