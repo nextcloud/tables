@@ -74,7 +74,7 @@ export default {
 			magicFields: {
 				'magic-field-me': {
 					id: 'magic-field-me',
-					label: t('tables', 'Me (user id)'),
+					label: t('tables', 'Me (user ID)'),
 					icon: 'icon-user',
 					source: 'magic-fields',
 					subline: t('tables', 'Magic field'),
