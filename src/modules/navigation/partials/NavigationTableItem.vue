@@ -45,6 +45,14 @@
 				@click="showDeletionConfirmation = true">
 				{{ t('tables', 'Delete table') }}
 			</NcActionButton>
+			<NcActionButton v-if="canCreateRowInTable(table)"
+				:close-after-click="true"
+				@click="actionShowImport(table)">
+				{{ t('tables', 'Import') }}
+				<template #icon>
+					<Import :size="20" />
+				</template>
+			</NcActionButton>
 			<NcActionButton
 				:close-after-click="true"
 				@click="actionShowIntegration">
@@ -75,6 +83,7 @@ import Table from 'vue-material-design-icons/Table.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import { getCurrentUser } from '@nextcloud/auth'
 import Creation from 'vue-material-design-icons/Creation.vue'
+import Import from 'vue-material-design-icons/Import.vue'
 
 export default {
 	name: 'NavigationTableItem',
@@ -82,6 +91,7 @@ export default {
 	components: {
 		// eslint-disable-next-line vue/no-reserved-component-names
 		Table,
+		Import,
 		DialogConfirmation,
 		NcActionButton,
 		NcAppNavigationItem,
@@ -129,6 +139,9 @@ export default {
 		async actionShowShare() {
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
 			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
+		},
+		async actionShowImport(table) {
+			emit('tables:modal:import', table)
 		},
 		async actionShowIntegration() {
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })

@@ -72,5 +72,8 @@ return [
 		['name' => 'share#create', 'url' => '/share', 'verb' => 'POST'],
 		['name' => 'share#updatePermission', 'url' => '/share/{id}/permission', 'verb' => 'PUT'],
 		['name' => 'share#destroy', 'url' => '/share/{id}', 'verb' => 'DELETE'],
+
+		// import
+		['name' => 'import#import', 'url' => '/import/table/{tableId}', 'verb' => 'POST'],
 	]
 ];

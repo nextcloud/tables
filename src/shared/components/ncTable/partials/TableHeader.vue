@@ -32,29 +32,40 @@
 				</NcActionButton>
 				<NcActionSeparator v-if="canCreateRowInTable(table)" />
 				<NcActionButton v-if="canManageTable(table)" :close-after-click="true" @click="$emit('create-column')">
-					<template #icon>
-						<TableColumnPlusAfter :size="20" decorative title="" />
-					</template>
-					{{ t('tables', 'Create column') }}
-				</NcActionButton>
-				<NcActionButton v-if="canManageTable(table)" :close-after-click="true" @click="$emit('edit-columns')">
-					<template #icon>
-						<TableEdit :size="20" decorative title="" />
-					</template>
-					{{ t('tables', 'Edit columns') }}
-				</NcActionButton>
-				<NcActionSeparator v-if="canManageTable(table)" />
-				<NcActionButton v-if="canManageTable(table)"
-					:close-after-click="true"
-					icon="icon-share"
-					@click="toggleShare">
-					{{ t('tables', 'Share') }}
-				</NcActionButton>
-				<NcActionButton v-if="canReadTable(table)" :close-after-click="true"
-					icon="icon-download"
-					@click="downloadCSV">
-					{{ t('tables', 'Export as CSV') }}
-				</NcActionButton>
+					<NcActionButton v-if="!table.isShared || table.isShared && table.onSharePermissions.create"
+						:close-after-click="true"
+						@click="$emit('import', table)">
+						<template #icon>
+							<IconImport :size="20" decorative title="Import" />
+						</template>
+						{{ t('tables', 'Import') }}
+					</NcActionButton>
+					<NcActionSeparator v-if="!table.isShared || table.isShared && table.onSharePermissions.create" />
+					<NcActionButton v-if="!table.isShared || table.isShared && table.onSharePermissions.manage" :close-after-click="true" @click="$emit('create-column')">
+						<template #icon>
+							<TableColumnPlusAfter :size="20" decorative title="" />
+						</template>
+						{{ t('tables', 'Create column') }}
+					</NcActionButton>
+					<NcActionButton v-if="canManageTable(table)" :close-after-click="true" @click="$emit('edit-columns')">
+						<template #icon>
+							<TableEdit :size="20" decorative title="" />
+						</template>
+						{{ t('tables', 'Edit columns') }}
+					</NcActionButton>
+					<NcActionSeparator v-if="canManageTable(table)" />
+					<NcActionButton v-if="canManageTable(table)"
+						:close-after-click="true"
+						icon="icon-share"
+						@click="toggleShare">
+						{{ t('tables', 'Share') }}
+					</NcActionButton>
+					<NcActionButton v-if="canReadTable(table)" :close-after-click="true"
+						icon="icon-download"
+						@click="downloadCSV">
+						{{ t('tables', 'Export as CSV') }}
+					</NcActionButton>
+				</ncactionbutton>
 			</NcActions>
 		</th>
 	</tr>
@@ -65,6 +76,7 @@ import { NcCheckboxRadioSwitch, NcActions, NcActionButton, NcActionSeparator } f
 import { emit } from '@nextcloud/event-bus'
 import TableEdit from 'vue-material-design-icons/TableEdit.vue'
 import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
+import IconImport from 'vue-material-design-icons/Import.vue'
 import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
 import searchAndFilterMixin from '../mixins/searchAndFilterMixin.js'
 import FilterLabel from './FilterLabel.vue'
@@ -73,6 +85,7 @@ import permissionsMixin from '../mixins/permissionsMixin.js'
 export default {
 
 	components: {
+		IconImport,
 		FilterLabel,
 		NcCheckboxRadioSwitch,
 		TableHeaderColumnOptions,

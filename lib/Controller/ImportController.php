@@ -28,9 +28,9 @@ class ImportController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function import(int $tableId, String $path): DataResponse {
-		return $this->handleError(function () use ($tableId, $path) {
-			return $this->service->import($tableId, $path);
+	public function import(int $tableId, String $path, bool $createMissingColumns = true): DataResponse {
+		return $this->handleError(function () use ($tableId, $path, $createMissingColumns) {
+			return $this->service->import($tableId, $path, $createMissingColumns);
 		});
 	}
 }
