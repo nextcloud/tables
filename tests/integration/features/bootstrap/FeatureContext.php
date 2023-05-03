@@ -105,7 +105,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	 */
 	public function createCsvFile(string $user, string $file, TableNode $table = null): void {
 		$this->setCurrentUser($user);
-		$url = $this->baseUrl.'remote.php/webdav/files/'.$user.$file;
+		$url = $this->baseUrl.'remote.php/dav/files/'.$user.$file;
 		$body = $this->tableNodeToCsv($table);
 		$headers = ['Content-Type' => 'text/csv'];
 
