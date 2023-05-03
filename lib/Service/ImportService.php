@@ -63,12 +63,11 @@ class ImportService extends SuperService {
 		$config = Server::get(IConfig::class);
 
 		try {
-			$storageHome = $this->rootFolder->getUserFolder($this->userId);
-			if ($storageHome->nodeExists($path)) {
-				// TODO is this working if a object storage is used?
-				$completePath = $storageHome->get($path)->getPath();
-				$basePath = $config->getSystemValue('datadirectory');
-				$spreadsheet = IOFactory::load($basePath.$completePath);
+			$userFolder = $this->rootFolder->getUserFolder($this->userId);
+			if ($userFolder->nodeExists($path)) {
+				$file = $storageHome->get($path);
+				$tmpFileName = $file->getStorage()->getLocalFile($file->getInternalPath());
+				$spreadsheet = IOFactory::load($tmpFileName);
 				$this->loop($spreadsheet->getActiveSheet());
 			}
 
