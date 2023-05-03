@@ -9,7 +9,7 @@
 
 			<!-- Starting -->
 			<div v-if="!loading && result === null && !waitForReload">
-				<RowFormWrapper :title="t('tables', 'File')" :description="t('tables', 'Chose a file that should be imported. Supported formats are xlsx, xls, html, xml and csv.')">
+				<RowFormWrapper :title="t('tables', 'File')" :description="t('tables', 'Choose a file that should be imported. Supported formats are xlsx, xls, html, xml and csv.')">
 					<div class="fix-col-4 space-T-small middle">
 						<NcButton @click="pickFile">
 							<template #icon>
