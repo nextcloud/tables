@@ -16,7 +16,7 @@ class ImportController extends Controller {
 	use Errors;
 
 
-	public function __construct(IRequest     $request,
+	public function __construct(IRequest $request,
 		ImportService $service,
 		string $userId) {
 		parent::__construct(Application::APP_ID, $request);
