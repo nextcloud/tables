@@ -13,7 +13,6 @@ use OCP\DB\Exception;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
-use OCP\IConfig;
 use OCP\Server;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
@@ -44,8 +43,10 @@ class ImportService extends SuperService {
 	}
 
 	/**
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
+	 * @param int $tableId
+	 * @param string $path
+	 * @param bool $createMissingColumns
+	 * @return array
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 */
@@ -59,27 +60,26 @@ class ImportService extends SuperService {
 		$this->tableId = $tableId;
 		$this->createUnknownColumns = $createMissingColumns;
 
-		/** @var IConfig $config */
-		$config = Server::get(IConfig::class);
-
 		try {
 			$userFolder = $this->rootFolder->getUserFolder($this->userId);
 			if ($userFolder->nodeExists($path)) {
-				$file = $storageHome->get($path);
+				$file = $userFolder->get($path);
 				$tmpFileName = $file->getStorage()->getLocalFile($file->getInternalPath());
 				$spreadsheet = IOFactory::load($tmpFileName);
 				$this->loop($spreadsheet->getActiveSheet());
+			} else {
+				throw new NotFoundError('File for import could not be found.');
 			}
 
 		} catch (NotFoundException|NotPermittedException|NoUserException|InternalError|PermissionError $e) {
-			throw new NotFoundError('path could not be found');
+			throw new NotFoundError('Storage for user could not be found', ['exception' => $e]);
 		}
 
 		return [
-			'found columns' => count($this->columns),
-			'created columns' => $this->countCreatedColumns,
-			'inserted rows' => $this->countInsertedRows,
-			'errors (see logs)' => $this->countErrors,
+			'found_columns_count' => count($this->columns),
+			'created_columns_count' => $this->countCreatedColumns,
+			'inserted_rows_count' => $this->countInsertedRows,
+			'errors_count' => $this->countErrors,
 		];
 	}
 
@@ -147,8 +147,11 @@ class ImportService extends SuperService {
 		try {
 			$this->rowService->createComplete($this->tableId, $data);
 			$this->countInsertedRows++;
-		} catch (PermissionError|Exception $e) {
-			$this->logger->error('Could not create row while importing.');
+		} catch (PermissionError $e) {
+			$this->logger->error('Could not create row while importing, no permission.', ['exception' => $e]);
+			$this->countErrors++;
+		} catch (Exception $e) {
+			$this->logger->error('Error while creating  new row for import.', ['exception' => $e]);
 			$this->countErrors++;
 		}
 
@@ -162,14 +165,14 @@ class ImportService extends SuperService {
 		$cellIterator = $row->getCellIterator();
 		$titles = [];
 		foreach ($cellIterator as $cell) {
-			if ($cell) {
+			if ($cell && $cell->getValue() !== null && $cell->getValue() !== '') {
 				$titles[] = $cell->getValue();
 			} else {
-				$this->logger->debug('no cell given while loading columns for importing');
+				$this->logger->debug('No cell given or cellValue is empty while loading columns for importing');
 				$this->countErrors++;
 			}
 		}
-		$this->columns = $this->columnService->findColumnsByTitleForTableAsArray($this->tableId, $titles, $this->userId, $this->createUnknownColumns, $this->countCreatedColumns);
+		$this->columns = $this->columnService->findOrCreateColumnsByTitleForTableAsArray($this->tableId, $titles, $this->userId, $this->createUnknownColumns, $this->countCreatedColumns);
 	}
 
 }
