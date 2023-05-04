@@ -339,7 +339,7 @@ class ColumnService extends SuperService {
 	 *
 	 * @return array with column object or null for given columns
 	 */
-	public function findColumnsByTitleForTableAsArray(int $tableId, array $titles, ?string $userId, bool $createUnknownColumns, int &$countCreatedColumns): array {
+	public function findOrCreateColumnsByTitleForTableAsArray(int $tableId, array $titles, ?string $userId, bool $createUnknownColumns, int &$countCreatedColumns): array {
 		$result = [];
 
 		if($userId === null) {
