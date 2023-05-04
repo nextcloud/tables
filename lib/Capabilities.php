@@ -48,6 +48,21 @@ class Capabilities implements ICapability {
 				'version' => $this->appManager->getAppVersion('tables'),
 				'apiVersions' => [
 					'1.0'
+				],
+				'column_types' => [
+					'text-line',
+					'text-long`',
+					'text-rich`',
+					'text-link',
+					'number',
+					'number-stars',
+					'number-progress',
+					'selection',
+					'selection-multi',
+					'selection-check',
+					'datetime',
+					'datetime-date',
+					'datetime-time',
 				]
 			],
 		];
