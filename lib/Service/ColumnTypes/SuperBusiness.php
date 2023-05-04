@@ -19,8 +19,12 @@ class SuperBusiness {
 	}
 
 	protected function isValidDate(string $dateString, string $format): bool {
-		$dateTime = DateTime::createFromFormat($format, $dateString);
-		$newString = $dateTime ? $dateTime->format($format) : '';
-		return $newString === $dateString;
+		try {
+			$dateTime = new DateTime($dateString);
+			$newString = $dateTime->format($format);
+			return $newString === $dateString;
+		} catch (\Exception $e) {
+			return false;
+		}
 	}
 }
