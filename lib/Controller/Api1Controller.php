@@ -425,7 +425,7 @@ class Api1Controller extends ApiController {
 		$array = json_decode($data, true);
 		foreach ($array as $key => $value) {
 			$dataNew[] = [
-				'columnId' => intval($key),
+				'columnId' => (int) $key,
 				'value' => $value
 			];
 		}
@@ -445,7 +445,7 @@ class Api1Controller extends ApiController {
 		$array = json_decode($data, true);
 		foreach ($array as $key => $value) {
 			$dataNew[] = [
-				'columnId' => intval($key),
+				'columnId' => (int) $key,
 				'value' => $value
 			];
 		}

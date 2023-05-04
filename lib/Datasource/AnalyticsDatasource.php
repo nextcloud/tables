@@ -162,7 +162,7 @@ class AnalyticsDatasource implements IDatasource {
 	private function minimizeRow(array $selectedColumns, array $row): array {
 		$rowMinimized = [];
 		foreach ($selectedColumns as $selectedColumn) {
-			if (intval($selectedColumn)) {
+			if ((int) $selectedColumn) {
 				$rowMinimized[] = $row[$selectedColumn - 1];
 			} else {
 				$rowMinimized[] = $selectedColumn;

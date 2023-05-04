@@ -45,7 +45,7 @@ class Row extends Entity implements JsonSerializable {
 		$new = [];
 		foreach ($array as $a) {
 			$new[] = [
-				'columnId' => intval($a['columnId']),
+				'columnId' => (int) $a['columnId'],
 				'value' => $a['value']
 			];
 		}
