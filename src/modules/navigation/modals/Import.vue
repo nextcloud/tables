@@ -33,6 +33,7 @@
 				</RowFormWrapper>
 
 				<p class="fix-col-4 span">
+					{{ t('tables', 'The first row has to be the column titles.') }}
 					{{ t('tables', 'Note that imported data will be added to the table. Updating of existing rows is not possible at the moment.') }}
 					{{ t('tables', 'The possible importing size depends on the system configuration and is only limited by execution time and memory.') }}
 				</p>
@@ -53,25 +54,25 @@
 						{{ t('tables', 'Found columns') }}
 					</div>
 					<div class="fix-col-3">
-						{{ result['found columns'] }}
+						{{ result['found_columns_count'] }}
 					</div>
 					<div class="fix-col-1">
 						{{ t('tables', 'Created columns') }}
 					</div>
 					<div class="fix-col-3">
-						{{ result['created columns'] }}
+						{{ result['created_columns_count'] }}
 					</div>
 					<div class="fix-col-1">
 						{{ t('tables', 'Inserted rows') }}
 					</div>
 					<div class="fix-col-3">
-						{{ result['inserted rows'] }}
+						{{ result['inserted_rows_count'] }}
 					</div>
 					<div class="fix-col-1">
 						{{ t('tables', 'Errors') }}
 					</div>
 					<div class="fix-col-3">
-						{{ result['errors (see logs)'] }}
+						{{ result['errors_count'] }}
 					</div>
 				</RowFormWrapper>
 
