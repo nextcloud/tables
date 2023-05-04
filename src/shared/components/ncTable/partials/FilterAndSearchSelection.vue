@@ -52,7 +52,7 @@ export default {
 					label: col.title,
 					icon: 'icon-rename',
 					source: 'columns',
-					subline: t('tables', 'Column to filter for'),
+					subline: t('tables', 'Column to filter by'),
 				}
 			})
 			return cols
@@ -112,7 +112,7 @@ export default {
 			const parts = this.localValue.match(/.*(@column-[0-9]*).*(@operator-[a-z-]*)(.*)/)
 			console.debug('parts', parts)
 			if (parts === null) {
-				showWarning(t('tables', 'You try to add a filter, make sure to chose a column, operator and filter value.'))
+				showWarning(t('tables', 'If you are trying to add a filter, make sure to choose a column, operator and filter value.'))
 				return
 			}
 			const columnToFilter = parts[1]?.trim() || ''

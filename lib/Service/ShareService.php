@@ -155,7 +155,7 @@ class ShareService extends SuperService {
 		}
 
 		// else throw error
-		throw new NotFoundError('No share for table and given user id found.');
+		throw new NotFoundError('No share for table and given user ID found.');
 	}
 
 
