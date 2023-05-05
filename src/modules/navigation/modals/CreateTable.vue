@@ -33,6 +33,7 @@
 						:title="t('tables', '🔧 Custom table')"
 						:body="t('tables', 'Custom table from scratch.')"
 						:active="templateChoice === 'custom'"
+						:tabbable="true"
 						@set-template="setTemplate('custom')" />
 				</div>
 				<div v-for="template in templates" :key="template.name" class="col-2 block space-R space-B">
@@ -40,6 +41,7 @@
 						:title="template.icon + ' ' + template.title"
 						:body="template.description"
 						:active="templateChoice === template.name"
+						:tabbable="true"
 						@set-template="setTemplate(template.name)" />
 				</div>
 			</div>
