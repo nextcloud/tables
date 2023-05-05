@@ -1042,12 +1042,6 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 			'Accept' => 'application/json',
 		]);
 
-		/*		print_r([
-					'verb' => $verb,
-					'url' => $fullUrl,
-					'option' => $options
-				]);*/
-
 		try {
 			$this->response = $client->{$verb}($fullUrl, $options);
 		} catch (ClientException $ex) {
