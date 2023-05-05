@@ -47,9 +47,6 @@
 							<NcCheckboxRadioSwitch :checked.sync="subtype" value="line" name="textTypeSelection" type="radio">
 								{{ t('tables', 'Text line') }}
 							</NcCheckboxRadioSwitch>
-							<NcCheckboxRadioSwitch :checked.sync="subtype" value="long" name="textTypeSelection" type="radio">
-								{{ t('tables', 'Simple text') }}
-							</NcCheckboxRadioSwitch>
 							<NcCheckboxRadioSwitch v-if="textAppAvailable" :checked.sync="subtype" value="rich" name="textTypeSelection" type="radio">
 								{{ t('tables', 'Rich text') }}
 							</NcCheckboxRadioSwitch>
@@ -58,9 +55,6 @@
 						<TextLineForm v-if="subtype === 'line'"
 							:text-default.sync="textDefault"
 							:text-allowed-pattern.sync="textAllowedPattern"
-							:text-max-length.sync="textMaxLength" />
-						<TextLongForm v-if="subtype === 'long'"
-							:text-default.sync="textDefault"
 							:text-max-length.sync="textMaxLength" />
 						<TextRichForm v-if="subtype === 'rich'"
 							:text-default.sync="textDefault" />
@@ -126,7 +120,6 @@ import NumberForm from '../../../shared/components/ncTable/partials/columnTypePa
 import NumberStarsForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/NumberStarsForm.vue'
 import NumberProgressForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/NumberProgressForm.vue'
 import TextLineForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/TextLineForm.vue'
-import TextLongForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/TextLongForm.vue'
 import SelectionCheckForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionCheckForm.vue'
 import MainForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/MainForm.vue'
 import DatetimeForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeForm.vue'
@@ -148,7 +141,6 @@ export default {
 		NcModal,
 		NumberForm,
 		TextLineForm,
-		TextLongForm,
 		TextRichForm,
 		MainForm,
 		NumberStarsForm,
