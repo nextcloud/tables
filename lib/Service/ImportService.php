@@ -62,17 +62,26 @@ class ImportService extends SuperService {
 
 		try {
 			$userFolder = $this->rootFolder->getUserFolder($this->userId);
+			$error = false;
 			if ($userFolder->nodeExists($path)) {
 				$file = $userFolder->get($path);
 				$tmpFileName = $file->getStorage()->getLocalFile($file->getInternalPath());
-				$spreadsheet = IOFactory::load($tmpFileName);
-				$this->loop($spreadsheet->getActiveSheet());
+				if($tmpFileName) {
+					$spreadsheet = IOFactory::load($tmpFileName);
+					$this->loop($spreadsheet->getActiveSheet());
+				} else {
+					$error = true;
+				}
 			} else {
+				$error = true;
+			}
+			if($error) {
 				throw new NotFoundError('File for import could not be found.');
 			}
 
 		} catch (NotFoundException|NotPermittedException|NoUserException|InternalError|PermissionError $e) {
-			throw new NotFoundError('Storage for user could not be found', ['exception' => $e]);
+			$this->logger->warning('Storage for user could not be found', ['exception' => $e]);
+			throw new NotFoundError('Storage for user could not be found');
 		}
 
 		return [
