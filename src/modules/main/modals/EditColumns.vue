@@ -92,11 +92,11 @@
 						</span>
 
 						<span v-if="column.type === 'text' && column.subtype === 'line'" class="block">
-							{{ (column.mandatory) ? t('tables', 'Textline') + ', ' + t('tables', 'Mandatory'): t('tables', 'Textline') }}
+							{{ (column.mandatory) ? t('tables', 'Text-line') + ', ' + t('tables', 'Mandatory'): t('tables', 'Text-line') }}
 						</span>
 
 						<span v-if="column.type === 'text' && column.subtype === 'long'" class="block">
-							{{ (column.mandatory) ? t('tables', 'Textline') + ', ' + t('tables', 'Mandatory'): t('tables', 'Textline') }}
+							{{ (column.mandatory) ? t('tables', 'Text long') + ', ' + t('tables', 'Mandatory'): t('tables', 'Text long') }}
 						</span>
 
 						<span v-if="column.type === 'text' && column.subtype === 'rich'" class="block">

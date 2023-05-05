@@ -297,7 +297,8 @@ export default {
 			}
 		},
 		reset() {
-			this.type = null
+			this.type = 'text'
+			this.subtype = 'line'
 			this.title = ''
 			this.description = ''
 			this.numberPrefix = null
