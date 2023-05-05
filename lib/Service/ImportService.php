@@ -13,6 +13,7 @@ use OCP\DB\Exception;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
+use OCP\IUserManager;
 use OCP\Server;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
@@ -26,6 +27,7 @@ class ImportService extends SuperService {
 	private IRootFolder $rootFolder;
 	private ColumnService $columnService;
 	private RowService $rowService;
+	private IUserManager $userManager;
 
 	private int $tableId = -1;
 	private array $columns = [];
@@ -35,11 +37,12 @@ class ImportService extends SuperService {
 	private int $countErrors = 0;
 
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-		IRootFolder $rootFolder, ColumnService $columnService, RowService $rowService) {
+		IRootFolder $rootFolder, ColumnService $columnService, RowService $rowService, IUserManager $userManager) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->rootFolder = $rootFolder;
 		$this->columnService = $columnService;
 		$this->rowService = $rowService;
+		$this->userManager = $userManager;
 	}
 
 	/**
@@ -51,7 +54,7 @@ class ImportService extends SuperService {
 	 * @throws NotFoundError
 	 */
 	public function import(int $tableId, string $path, bool $createMissingColumns = true): array {
-		if (!$this->userId) {
+		if ($this->userManager->get($this->userId) === null) {
 			$error = 'No user in context, can not import data. Cancel.';
 			$this->logger->debug($error);
 			throw new InternalError($error);
