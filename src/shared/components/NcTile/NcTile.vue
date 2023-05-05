@@ -7,8 +7,6 @@
 <script>
 
 export default {
-	components: {
-	},
 
 	filters: {
 		truncate(string, num) {
@@ -19,8 +17,6 @@ export default {
 			}
 		},
 	},
-
-	mixins: [],
 
 	props: {
 		active: {
@@ -52,9 +48,6 @@ export default {
 		},
 	},
 
-	methods: {
-	},
-
 }
 </script>
 <style lang="scss" scoped>
@@ -63,7 +56,8 @@ export default {
 	background: var(--color-main-background);
 	border: 2px solid var(--color-border);
 	border-radius: var(--border-radius-large);
-	min-height: 110px;
+	height: 135px;
+	overflow-y: auto;
 	padding: calc(var(--default-grid-baseline) * 3);
 }
 
