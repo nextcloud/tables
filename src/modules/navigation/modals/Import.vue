@@ -49,7 +49,7 @@
 
 			<!-- show results -->
 			<div v-if="!loading && result !== null && !waitForReload">
-				<RowFormWrapper :title="t('tables', 'Result')">
+				<RowFormWrapper v-if="result !== ''" :title="t('tables', 'Result')">
 					<div class="fix-col-1">
 						{{ t('tables', 'Found columns') }}
 					</div>
@@ -76,6 +76,10 @@
 					</div>
 				</RowFormWrapper>
 
+				<RowFormWrapper v-else :title="t('tables', 'Result')">
+					{{ t('tables', 'Error during importing. Please read the logs for more information.') }}
+				</RowFormWrapper>
+
 				<div class="row">
 					<div class="fix-col-4 space-T end">
 						<NcButton type="primary" @click="actionCloseAndReload">
@@ -89,9 +93,7 @@
 			<div v-if="loading && !waitForReload">
 				<NcEmptyContent :title="t('tables', 'Importing...')" :description="t('tables', 'Please wait while we try our best to import your data. This might take some time, depending on the server configuration.')">
 					<template #icon>
-						<IconTimerSand v-if="sandIcon === 0" :size="20" />
-						<IconTimerSandPaused v-if="sandIcon === 1" :size="20" />
-						<IconTimerSandComplete v-if="sandIcon === 2" :size="20" />
+						<NcIconTimerSand />
 					</template>
 				</NcEmptyContent>
 			</div>
@@ -109,20 +111,16 @@ import { FilePicker, FilePickerType, showError, showWarning } from '@nextcloud/d
 import RowFormWrapper from '../../../shared/components/ncTable/partials/rowTypePartials/RowFormWrapper.vue'
 import permissionMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import IconFolder from 'vue-material-design-icons/Folder.vue'
-import IconTimerSand from 'vue-material-design-icons/TimerSand.vue'
-import IconTimerSandPaused from 'vue-material-design-icons/TimerSandPaused.vue'
-import IconTimerSandComplete from 'vue-material-design-icons/TimerSandComplete.vue'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { mapGetters } from 'vuex'
+import NcIconTimerSand from '../../../shared/components/ncIconTimerSand/NcIconTimerSand.vue'
 
 export default {
 
 	components: {
+		NcIconTimerSand,
 		NcLoadingIcon,
-		IconTimerSand,
-		IconTimerSandComplete,
-		IconTimerSandPaused,
 		IconFolder,
 		NcModal,
 		NcButton,
@@ -150,10 +148,6 @@ export default {
 			createMissingColumns: true,
 			pathError: false,
 			loading: false,
-			sandIcon: 0,
-			sandIconTimer: null,
-			sandIconFactor: -1,
-			sandIconTimerInterval: 500, // milliseconds
 			result: null,
 			waitForReload: false,
 		}
@@ -182,16 +176,6 @@ export default {
 
 			this.actionCancel()
 		},
-		updateSandIcon() {
-			if (this.sandIcon === 2 || this.sandIcon === 0) {
-				this.sandIconFactor = this.sandIconFactor * -1
-			}
-			this.sandIcon = this.sandIcon + this.sandIconFactor
-			this.sandIconTimer = setTimeout(this.updateSandIcon, this.sandIconTimerInterval)
-		},
-		stopSandIconTimer() {
-			clearTimeout(this.sandIconTimer)
-		},
 		actionSubmit() {
 			if (this.path === '') {
 				showWarning(t('tables', 'Please select a file.'))
@@ -203,12 +187,10 @@ export default {
 		},
 		async import() {
 			this.loading = true
-			this.updateSandIcon()
 			try {
 				const res = await axios.post(generateUrl('/apps/tables/import/table/' + this.table.id), { path: this.path, createMissingColumns: this.getCreateMissingColumns })
 				if (res.status === 200) {
 					this.result = res.data
-					this.stopSandIconTimer()
 					this.loading = false
 				} else if (res.status === 401) {
 					console.debug('error while importing', res)
@@ -233,14 +215,11 @@ export default {
 			this.$emit('close')
 		},
 		reset() {
-			this.stopSandIconTimer()
 			this.path = ''
 			this.pathError = false
 			this.createMissingColumns = true
 			this.result = null
 			this.loading = false
-			this.sandIcon = 0
-			this.sandIconFactor = -1
 		},
 		pickFile() {
 			const filePicker = new FilePicker(
