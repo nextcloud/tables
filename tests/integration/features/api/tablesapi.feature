@@ -139,10 +139,10 @@ Feature: api/tablesapi
     Given table "Import test" with emoji "👨🏻‍💻" exists for user "participant1"
     When user imports file "/import.csv" into last created table
     Then import results have the following data
-      | found columns     | 6 |
-      | created columns   | 6 |
-      | inserted rows     | 2 |
-      | errors (see logs) | 0 |
+      | found_columns_count     | 6 |
+      | created_columns_count   | 6 |
+      | inserted_rows_count     | 2 |
+      | errors_count            | 0 |
     Then table has at least following columns
       | Col1    |
       | Col2    |
