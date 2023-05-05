@@ -38,6 +38,10 @@
 				:column="col"
 				:row-id="row.id"
 				:value="getCellValue(col.id)" />
+			<TableCellTextRich v-else-if="col.type === 'text' && col.subtype === 'rich'"
+				:column="col"
+				:row-id="row.id"
+				:value="getCellValue(col.id, false)" />
 			<TableCellHtml v-else
 				:value="getCellValue(col.id)"
 				:row-id="row.id"
@@ -66,6 +70,7 @@ import TableCellDateTime from './TableCellDateTime.vue'
 import TableCellTextLine from './TableCellTextLine.vue'
 import TableCellSelection from './TableCellSelection.vue'
 import TableCellMultiSelection from './TableCellMultiSelection.vue'
+import TableCellTextRich from './TableCellEditor.vue'
 
 export default {
 	name: 'TableRow',
@@ -83,6 +88,7 @@ export default {
 		TableCellTextLine,
 		TableCellSelection,
 		TableCellMultiSelection,
+		TableCellTextRich,
 	},
 	props: {
 		row: {

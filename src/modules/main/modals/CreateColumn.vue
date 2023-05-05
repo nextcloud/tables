@@ -47,8 +47,8 @@
 							<NcCheckboxRadioSwitch :checked.sync="subtype" value="line" name="textTypeSelection" type="radio">
 								{{ t('tables', 'Text line') }}
 							</NcCheckboxRadioSwitch>
-							<NcCheckboxRadioSwitch :checked.sync="subtype" value="long" name="textTypeSelection" type="radio">
-								{{ t('tables', 'Simple text') }}
+							<NcCheckboxRadioSwitch v-if="textAppAvailable" :checked.sync="subtype" value="rich" name="textTypeSelection" type="radio">
+								{{ t('tables', 'Rich text') }}
 							</NcCheckboxRadioSwitch>
 						</div>
 
@@ -56,9 +56,8 @@
 							:text-default.sync="textDefault"
 							:text-allowed-pattern.sync="textAllowedPattern"
 							:text-max-length.sync="textMaxLength" />
-						<TextLongForm v-if="subtype === 'long'"
-							:text-default.sync="textDefault"
-							:text-max-length.sync="textMaxLength" />
+						<TextRichForm v-if="subtype === 'rich'"
+							:text-default.sync="textDefault" />
 					</div>
 
 					<div v-if="type === 'selection'" class="row no-padding-on-mobile space-L">
@@ -121,7 +120,6 @@ import NumberForm from '../../../shared/components/ncTable/partials/columnTypePa
 import NumberStarsForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/NumberStarsForm.vue'
 import NumberProgressForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/NumberProgressForm.vue'
 import TextLineForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/TextLineForm.vue'
-import TextLongForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/TextLongForm.vue'
 import SelectionCheckForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionCheckForm.vue'
 import MainForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/MainForm.vue'
 import DatetimeForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeForm.vue'
@@ -134,6 +132,7 @@ import { showError, showInfo, showSuccess, showWarning } from '@nextcloud/dialog
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
 import ColumnTypeSelection from '../partials/ColumnTypeSelection.vue'
+import TextRichForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/TextRichForm.vue'
 
 export default {
 	name: 'CreateColumn',
@@ -142,7 +141,7 @@ export default {
 		NcModal,
 		NumberForm,
 		TextLineForm,
-		TextLongForm,
+		TextRichForm,
 		MainForm,
 		NumberStarsForm,
 		NumberProgressForm,
@@ -162,6 +161,7 @@ export default {
 	},
 	data() {
 		return {
+			textAppAvailable: !!window.OCA?.Text?.createEditor,
 			addNewAfterSave: false,
 			type: 'text',
 			subtype: 'line',
@@ -297,7 +297,8 @@ export default {
 			}
 		},
 		reset() {
-			this.type = null
+			this.type = 'text'
+			this.subtype = 'line'
 			this.title = ''
 			this.description = ''
 			this.numberPrefix = null

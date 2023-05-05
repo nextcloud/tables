@@ -86,6 +86,10 @@ export default {
 		padding-bottom: 7px;
 	}
 
+	.editor-wrapper p, .editor-wrapper .p {
+		padding: 0;
+	}
+
 	p span, .p span, p .span, .p .span, .p.span, p.span, .light {
 		color: var(--color-text-maxcontrast);
 	}

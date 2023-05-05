@@ -46,6 +46,7 @@ import datetimeTimeMixin from '../mixins/columnsTypes/datetimeTimeMixin.js'
 import datetimeMixin from '../mixins/columnsTypes/datetimeMixin.js'
 import generalHelper from '../../../mixins/generalHelper.js'
 import searchAndFilterMixin from '../mixins/searchAndFilterMixin.js'
+import textRichMixin from '../mixins/columnsTypes/textRichMixin.js'
 
 export default {
 	name: 'CustomTable',
@@ -58,6 +59,7 @@ export default {
 	mixins: [
 		textLineMixin,
 		textLongMixin,
+		textRichMixin,
 		selectionMixin,
 		selectionMultiMixin,
 		numberMixin,
@@ -364,7 +366,7 @@ export default {
 			border-bottom: 1px solid var(--color-border);
 		}
 
-		tr:active, tr:hover, tr:focus {
+		tr:active, tr:hover, tr:focus, tr:hover .editor-wrapper .editor {
 			background-color: var(--color-background-dark);
 		}
 
