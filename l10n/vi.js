@@ -16,7 +16,6 @@ OC.L10N.register(
     "Done" : "Hoàn thành",
     "Tables" : "Bảng",
     "Type" : "Loại",
-    "Simple text" : "Văn bản đơn giản",
     "Time" : "Thời gian",
     "Save" : "Lưu",
     "Text" : "Văn bản",
@@ -39,6 +38,7 @@ OC.L10N.register(
     "Read" : "Đọc",
     "Update" : "Cập nhật",
     "Manage" : "Quản lý",
+    "Error" : "Lỗi",
     "Undo" : "Hoàn tác",
     "Redo" : "Làm lại",
     "Bold" : "Đậm",
@@ -54,6 +54,7 @@ OC.L10N.register(
     "Yes" : "Có",
     "No" : "Không",
     "Max" : "Tối đa",
+    "Close editor" : "Đóng trình biên tập",
     "Confirm" : "Xác nhận",
     "Could not delete share" : "Không thể xoá chia sẻ"
 },

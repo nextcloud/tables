@@ -28,6 +28,7 @@ OC.L10N.register(
     "Sharing" : "Compartente",
     "Update" : "Actualisation",
     "Manage" : "Administrar",
+    "Error" : "Error",
     "Undo" : "Disfacer",
     "Prefix" : "Prefixo",
     "Suffix" : "Suffixo",

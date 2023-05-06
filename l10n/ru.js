@@ -28,7 +28,6 @@ OC.L10N.register(
     "Done" : "Выполненные",
     "Tables" : "Таблицы",
     "Type" : "Тип",
-    "Simple text" : "Простой текст",
     "Time" : "Время",
     "Date and time" : "Дата и время",
     "Save" : "Сохранить",
@@ -62,6 +61,7 @@ OC.L10N.register(
     "Read" : "Прочитать",
     "Update" : "Обновить",
     "Manage" : "Управлять",
+    "Error" : "Ошибка",
     "Bold" : "Жирный",
     "Italic" : "Курсив",
     "Ordered list" : "Упорядоченный список",
@@ -80,6 +80,7 @@ OC.L10N.register(
     "Yes" : "Да",
     "No" : "Нет",
     "Max" : "Макс",
+    "Close editor" : "Закрыть редактор",
     "Confirm" : "Подтвердить",
     "Could not delete share" : "Не удалось удалить общий ресурс",
     "Unchecked" : "Непроверено"

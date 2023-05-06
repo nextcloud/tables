@@ -17,7 +17,6 @@ OC.L10N.register(
     "Progress" : "Framvinda",
     "Done" : "Lokið",
     "Type" : "Tegund",
-    "Simple text" : "Einfaldur texti",
     "Time" : "Tími",
     "Save" : "Vista",
     "Text" : "Texti",
@@ -42,6 +41,7 @@ OC.L10N.register(
     "Read" : "Lesa",
     "Update" : "Uppfæra",
     "Manage" : "Skipuleggja",
+    "Error" : "Villa",
     "Undo" : "Afturkalla",
     "Redo" : "Endurtaka",
     "Bold" : "Feitletrað",
@@ -59,6 +59,7 @@ OC.L10N.register(
     "Yes" : "Já",
     "No" : "Nei",
     "Defaults" : "Sjálfgefin gildi",
+    "Close editor" : "Loka ritli",
     "Confirm" : "Staðfesta",
     "Could not delete share" : "Tókst ekki að eyða sameign",
     "Unchecked" : "Ekki skoðað"

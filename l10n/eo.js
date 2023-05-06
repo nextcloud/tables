@@ -37,6 +37,7 @@ OC.L10N.register(
     "Read" : "Legi",
     "Update" : "Ĝisdatigi",
     "Manage" : "Administri",
+    "Error" : "Eraro",
     "Undo" : "Malfari",
     "Redo" : "Refari",
     "Bold" : "Grasa",

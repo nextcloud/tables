@@ -13,6 +13,7 @@ OC.L10N.register(
     "Today" : "An-diugh",
     "Share" : "Co-roinn",
     "Sharing" : "Co-roinneadh",
+    "Error" : "Mearachd",
     "Undo" : "Neo-dhèan",
     "Default" : "Bunaiteach",
     "Yes" : "Tha",

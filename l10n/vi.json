@@ -14,7 +14,6 @@
     "Done" : "Hoàn thành",
     "Tables" : "Bảng",
     "Type" : "Loại",
-    "Simple text" : "Văn bản đơn giản",
     "Time" : "Thời gian",
     "Save" : "Lưu",
     "Text" : "Văn bản",
@@ -37,6 +36,7 @@
     "Read" : "Đọc",
     "Update" : "Cập nhật",
     "Manage" : "Quản lý",
+    "Error" : "Lỗi",
     "Undo" : "Hoàn tác",
     "Redo" : "Làm lại",
     "Bold" : "Đậm",
@@ -52,6 +52,7 @@
     "Yes" : "Có",
     "No" : "Không",
     "Max" : "Tối đa",
+    "Close editor" : "Đóng trình biên tập",
     "Confirm" : "Xác nhận",
     "Could not delete share" : "Không thể xoá chia sẻ"
 },"pluralForm" :"nplurals=1; plural=0;"

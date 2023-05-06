@@ -34,6 +34,7 @@ OC.L10N.register(
     "Read" : "Lexoni",
     "Update" : "Përditëso",
     "Manage" : "Menaxho",
+    "Error" : "Gabim",
     "Undo" : "Ktheje pas",
     "Redo" : "Ribëj",
     "Bold" : "I theksuar",

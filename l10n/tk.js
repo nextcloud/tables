@@ -13,6 +13,7 @@ OC.L10N.register(
     "Today" : "Şu gün",
     "Share" : "Paýlaş",
     "Sharing" : "Paýlaşmak",
+    "Error" : "ýalňyşlyk",
     "Default" : "Bellenen",
     "Yes" : "Hawa",
     "No" : "Ýok"

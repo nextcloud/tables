@@ -31,6 +31,7 @@ OC.L10N.register(
     "Sharing" : "การแชร์",
     "Read" : "อ่าน",
     "Update" : "อัปเดต",
+    "Error" : "ข้อผิดพลาด",
     "Undo" : "เลิกทำ",
     "Prefix" : "คำนำหน้า",
     "Suffix" : "คำต่อท้าย",

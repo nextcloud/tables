@@ -31,6 +31,7 @@ OC.L10N.register(
     "Sharing" : "Berbagi",
     "Read" : "Baca",
     "Update" : "Perbarui",
+    "Error" : "Galat",
     "Undo" : "Undo",
     "Prefix" : "Prefix",
     "Suffix" : "Suffix",

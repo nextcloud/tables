@@ -18,7 +18,6 @@ OC.L10N.register(
     "Progress" : "Progresso",
     "Done" : "Concluído",
     "Type" : "Tipo",
-    "Simple text" : "Texto simples",
     "Time" : "Tempo",
     "Save" : "Guardar",
     "Text" : "Texto",
@@ -44,6 +43,7 @@ OC.L10N.register(
     "Read" : "Ler",
     "Update" : "Atualizar",
     "Manage" : "Gerir",
+    "Error" : "Erro",
     "Undo" : "Desfazer",
     "Redo" : "Repetir",
     "Bold" : "Negrito",
@@ -57,6 +57,7 @@ OC.L10N.register(
     "Yes" : "Sim",
     "No" : "Não",
     "Max" : "Máx.",
+    "Close editor" : "Fechar editor",
     "Confirm" : "Confirmar",
     "Could not delete share" : "Não foi possível eliminar a partilha"
 },

@@ -41,6 +41,7 @@ OC.L10N.register(
     "Sharing" : "Compartiendo",
     "Read" : "Leer",
     "Manage" : "Administrar",
+    "Error" : "Error",
     "Undo" : "Deshacer",
     "Redo" : "Rehacer",
     "Bold" : "Negritas",

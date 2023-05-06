@@ -19,6 +19,7 @@ OC.L10N.register(
     "Share" : "பகிர்வு",
     "group" : "குழு",
     "Update" : "இற்றைப்படுத்தல்",
+    "Error" : "வழு",
     "Yes" : "Yes",
     "No" : "No"
 },

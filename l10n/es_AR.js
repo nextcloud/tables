@@ -39,6 +39,7 @@ OC.L10N.register(
     "Read" : "Leer",
     "Update" : "Actualizar",
     "Manage" : "Administrar",
+    "Error" : "Error",
     "Undo" : "Deshacer",
     "Bold" : "Negrita",
     "Italic" : "Itálico",

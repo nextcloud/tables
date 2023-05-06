@@ -16,7 +16,6 @@
     "Progress" : "Progresso",
     "Done" : "Concluído",
     "Type" : "Tipo",
-    "Simple text" : "Texto simples",
     "Time" : "Tempo",
     "Save" : "Guardar",
     "Text" : "Texto",
@@ -42,6 +41,7 @@
     "Read" : "Ler",
     "Update" : "Atualizar",
     "Manage" : "Gerir",
+    "Error" : "Erro",
     "Undo" : "Desfazer",
     "Redo" : "Repetir",
     "Bold" : "Negrito",
@@ -55,6 +55,7 @@
     "Yes" : "Sim",
     "No" : "Não",
     "Max" : "Máx.",
+    "Close editor" : "Fechar editor",
     "Confirm" : "Confirmar",
     "Could not delete share" : "Não foi possível eliminar a partilha"
 },"pluralForm" :"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"

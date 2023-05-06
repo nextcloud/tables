@@ -16,7 +16,6 @@
     "Progress" : "Progreso",
     "Tables" : "Táboas",
     "Type" : "Tipo",
-    "Simple text" : "Texto sinxelo",
     "Time" : "Hora",
     "Save" : "Gardar",
     "Text" : "Texto",
@@ -47,6 +46,7 @@
     "Read" : "Ler",
     "Update" : "Actualizar",
     "Manage" : "Xestionar",
+    "Error" : "Erro",
     "Bold" : "Grosa",
     "Italic" : "Cursiva",
     "Ordered list" : "Lista ordenada",
@@ -64,6 +64,7 @@
     "No" : "Non",
     "Max" : "Máx",
     "Defaults" : "Predeterminados",
+    "Close editor" : "Pechar o editor",
     "Confirm" : "Confirmar",
     "Could not delete share" : "Non foi posíbel eliminar o recurso compartido",
     "Unchecked" : "Sen verificar"

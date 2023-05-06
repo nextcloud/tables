@@ -30,7 +30,6 @@ OC.L10N.register(
     "Done" : "完成",
     "Tables" : "表格",
     "Type" : "类型",
-    "Simple text" : "简述文本",
     "Yes/No" : "是 / 否",
     "Time" : "时间",
     "Date and time" : "日期和时间",
@@ -64,6 +63,7 @@ OC.L10N.register(
     "Read" : "读取",
     "Update" : "更新",
     "Manage" : "管理",
+    "Error" : "错误",
     "Undo" : "撤消",
     "Redo" : "重做",
     "Bold" : "加粗",
@@ -83,6 +83,7 @@ OC.L10N.register(
     "No" : "否",
     "Max" : "最大值",
     "Defaults" : "默认",
+    "Close editor" : "关闭编辑器",
     "Confirm" : "确认",
     "Could not delete share" : "不能删除共享",
     "Unchecked" : "未选中"

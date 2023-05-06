@@ -17,6 +17,7 @@ OC.L10N.register(
     "Title" : "Azwel",
     "Share" : "Bḍu",
     "Sharing" : "Beṭṭu",
+    "Error" : "Erreur",
     "Default" : "Prédéfini(e)",
     "Options" : "Iɣewwaṛen",
     "Add option" : "Rnu aɣewwaṛ",

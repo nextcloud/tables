@@ -18,7 +18,6 @@ OC.L10N.register(
     "Progress" : "Progreso",
     "Tables" : "Táboas",
     "Type" : "Tipo",
-    "Simple text" : "Texto sinxelo",
     "Time" : "Hora",
     "Save" : "Gardar",
     "Text" : "Texto",
@@ -49,6 +48,7 @@ OC.L10N.register(
     "Read" : "Ler",
     "Update" : "Actualizar",
     "Manage" : "Xestionar",
+    "Error" : "Erro",
     "Bold" : "Grosa",
     "Italic" : "Cursiva",
     "Ordered list" : "Lista ordenada",
@@ -66,6 +66,7 @@ OC.L10N.register(
     "No" : "Non",
     "Max" : "Máx",
     "Defaults" : "Predeterminados",
+    "Close editor" : "Pechar o editor",
     "Confirm" : "Confirmar",
     "Could not delete share" : "Non foi posíbel eliminar o recurso compartido",
     "Unchecked" : "Sen verificar"

@@ -31,6 +31,7 @@ OC.L10N.register(
     "Sharing" : "Jagamine",
     "Read" : "Lugemine",
     "Update" : "Uuenda",
+    "Error" : "Viga",
     "Undo" : "Tühista",
     "Prefix" : "Eesliide",
     "Suffix" : "Järelliide",

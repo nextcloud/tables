@@ -15,7 +15,6 @@
     "Progress" : "Framvinda",
     "Done" : "Lokið",
     "Type" : "Tegund",
-    "Simple text" : "Einfaldur texti",
     "Time" : "Tími",
     "Save" : "Vista",
     "Text" : "Texti",
@@ -40,6 +39,7 @@
     "Read" : "Lesa",
     "Update" : "Uppfæra",
     "Manage" : "Skipuleggja",
+    "Error" : "Villa",
     "Undo" : "Afturkalla",
     "Redo" : "Endurtaka",
     "Bold" : "Feitletrað",
@@ -57,6 +57,7 @@
     "Yes" : "Já",
     "No" : "Nei",
     "Defaults" : "Sjálfgefin gildi",
+    "Close editor" : "Loka ritli",
     "Confirm" : "Staðfesta",
     "Could not delete share" : "Tókst ekki að eyða sameign",
     "Unchecked" : "Ekki skoðað"

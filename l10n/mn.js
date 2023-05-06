@@ -26,6 +26,7 @@ OC.L10N.register(
     "group" : "бүлэг",
     "Sharing" : "Түгээх",
     "Manage" : "Зохицуулах",
+    "Error" : "Алдаа",
     "Undo" : "буцах",
     "Yes" : "Тийм",
     "No" : "Үгүй",

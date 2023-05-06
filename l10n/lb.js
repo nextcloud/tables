@@ -23,6 +23,7 @@ OC.L10N.register(
     "group" : "Grupp",
     "Sharing" : "Gedeelt",
     "Update" : "Update",
+    "Error" : "Fehler",
     "Default" : "Standard",
     "Yes" : "Yes",
     "No" : "No"

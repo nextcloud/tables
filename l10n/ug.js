@@ -19,6 +19,7 @@ OC.L10N.register(
     "group" : "گۇرۇپپا",
     "Sharing" : "ھەمبەھىر",
     "Update" : "يېڭىلا",
+    "Error" : "خاتالىق",
     "Default" : "كۆڭۈلدىكى",
     "Yes" : "Yes",
     "No" : "No"

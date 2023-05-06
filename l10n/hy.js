@@ -20,6 +20,7 @@ OC.L10N.register(
     "Share" : "Կիսվել",
     "group" : "խումբ",
     "Update" : "Թարմացնել",
+    "Error" : "Սխալ",
     "Default" : "Լռելյայն",
     "Yes" : "Yes",
     "No" : "No"

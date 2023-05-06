@@ -15,6 +15,7 @@ OC.L10N.register(
     "Title" : "عنوان",
     "Share" : "تقسیم",
     "group" : "مجموعہ",
+    "Error" : "ایرر",
     "Yes" : "Yes",
     "No" : "No"
 },

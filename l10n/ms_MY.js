@@ -20,6 +20,7 @@ OC.L10N.register(
     "Shares" : "Kongsi",
     "group" : "kumpulan",
     "Update" : "Kemaskini",
+    "Error" : "Ralat",
     "Yes" : "Yes",
     "No" : "No"
 },

@@ -42,6 +42,7 @@ OC.L10N.register(
     "Sharing" : "Споделување",
     "Read" : "Прочитана",
     "Update" : "Ажурирај",
+    "Error" : "Грешка",
     "Undo" : "Назад",
     "Redo" : "Напред",
     "Bold" : "Болд",
@@ -58,6 +59,7 @@ OC.L10N.register(
     "Yes" : "Да",
     "No" : "Не",
     "Defaults" : "Стандарди",
+    "Close editor" : "Затвори го уредникот",
     "Confirm" : "Потврди",
     "Could not delete share" : "Неможе да се избрише споделувањето"
 },

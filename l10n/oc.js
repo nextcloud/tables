@@ -39,6 +39,7 @@ OC.L10N.register(
     "Sharing" : "Partiment",
     "Read" : "Legit",
     "Update" : "Actualizar",
+    "Error" : "Error",
     "Undo" : "Desfar",
     "Redo" : "Refar",
     "Bold" : "Gras",
