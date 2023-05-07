@@ -40,6 +40,7 @@ OC.L10N.register(
     "Sharing" : "المشاركة",
     "Read" : "القراءة",
     "Update" : "تحديث",
+    "Error" : "خطأ",
     "Bold" : "غامق",
     "Italic" : "مائل",
     "Code" : "الرمز",

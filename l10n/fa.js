@@ -14,6 +14,7 @@ OC.L10N.register(
     "Progress" : "پیشرفت",
     "Tables" : "جدول‌ها",
     "Type" : "نوع",
+    "Rich text" : "متن غنی",
     "Time" : "زمان",
     "Save" : "ذخیره",
     "Text" : "متن",

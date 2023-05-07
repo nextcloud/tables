@@ -21,6 +21,7 @@ OC.L10N.register(
     "Progress" : "Progressu",
     "Tables" : "Tabellas",
     "Type" : "Genia",
+    "Rich text" : "Testu formatadu",
     "Time" : "Ora",
     "Date and time" : "Data e ora",
     "Save" : "Sarva",

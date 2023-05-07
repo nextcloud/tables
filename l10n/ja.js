@@ -22,6 +22,7 @@ OC.L10N.register(
     "Done" : "完了",
     "Tables" : "テーブル",
     "Type" : "タイプ",
+    "Rich text" : "リッチテキスト",
     "Time" : "時間",
     "Date and time" : "日時",
     "Save" : "保存",

@@ -103,6 +103,7 @@ OC.L10N.register(
     "Create column" : "建立欄",
     "Type" : "類型",
     "Text line" : "文字行",
+    "Rich text" : "RTF",
     "Single selection" : "單選",
     "Multiple selection" : "多選",
     "Yes/No" : "是 / 否",

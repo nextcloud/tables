@@ -17,6 +17,7 @@ OC.L10N.register(
     "Progress" : "Framvinda",
     "Done" : "Lokið",
     "Type" : "Tegund",
+    "Rich text" : "Sniðinn texti",
     "Time" : "Tími",
     "Save" : "Vista",
     "Text" : "Texti",

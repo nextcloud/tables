@@ -40,6 +40,7 @@ OC.L10N.register(
     "Create column" : "Vytvoriť stĺpec",
     "Type" : "Typ",
     "Text line" : "Textový riadok",
+    "Rich text" : "Formátovaný text",
     "Yes/No" : "Áno/Nie",
     "Time" : "Čas",
     "Date and time" : "Dátum a čas",

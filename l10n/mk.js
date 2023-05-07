@@ -17,6 +17,7 @@ OC.L10N.register(
     "Progress" : "Напредок",
     "Done" : "Готово",
     "Type" : "Вид",
+    "Rich text" : "Богат текст",
     "Time" : "Време",
     "Save" : "Зачувај",
     "Text" : "Текст",

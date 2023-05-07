@@ -100,6 +100,7 @@ OC.L10N.register(
     "Create column" : "Créer la colonne",
     "Type" : "Type",
     "Text line" : "Ligne de texte",
+    "Rich text" : "Texte riche",
     "Yes/No" : "Oui / Non",
     "Time" : "Heure",
     "Date and time" : "Date et heure",

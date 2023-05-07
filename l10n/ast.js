@@ -32,6 +32,7 @@ OC.L10N.register(
     "Read" : "Lleer",
     "Update" : "Anovar",
     "Manage" : "Xestionar",
+    "Error" : "Error",
     "Undo" : "Desfacer",
     "Prefix" : "Prefixu",
     "Suffix" : "Sufixu",

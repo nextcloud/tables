@@ -20,6 +20,7 @@ OC.L10N.register(
     "Done" : "הסתיים",
     "Tables" : "טבלאות",
     "Type" : "סוג",
+    "Rich text" : "טקסט עשיר",
     "Time" : "זמן",
     "Save" : "שמירה",
     "Text" : "טקסט",

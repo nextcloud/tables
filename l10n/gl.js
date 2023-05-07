@@ -18,6 +18,7 @@ OC.L10N.register(
     "Progress" : "Progreso",
     "Tables" : "Táboas",
     "Type" : "Tipo",
+    "Rich text" : "Texto mellorado",
     "Time" : "Hora",
     "Save" : "Gardar",
     "Text" : "Texto",

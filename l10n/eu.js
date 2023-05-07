@@ -93,6 +93,7 @@ OC.L10N.register(
     "Create column" : "Sortu zutabea",
     "Type" : "Mota",
     "Text line" : "Testu-lerroa",
+    "Rich text" : "Testu aberastua",
     "Single selection" : "Hautapen bakarra",
     "Multiple selection" : "Hautapen anitza",
     "Yes/No" : "Bai/Ez",

@@ -13,6 +13,7 @@ OC.L10N.register(
     "Position" : "Posición",
     "Birthday" : "Fecha de nacimiento",
     "Type" : "Tipo",
+    "Rich text" : "Texto enriquecido",
     "Time" : "Hora",
     "Save" : "Guardar",
     "Text" : "Texto",

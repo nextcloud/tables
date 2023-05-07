@@ -25,6 +25,7 @@ OC.L10N.register(
     "Sharing" : "Paylaşılır",
     "Read" : "Oxu",
     "Update" : "Yenilənmə",
+    "Error" : "Səhv",
     "Default" : "Susmaya görə",
     "Yes" : "Yes",
     "No" : "No"

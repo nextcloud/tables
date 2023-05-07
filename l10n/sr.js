@@ -103,6 +103,7 @@ OC.L10N.register(
     "Create column" : "Креирај колону",
     "Type" : "Тип",
     "Text line" : "Текст линија",
+    "Rich text" : "Обогаћени текст",
     "Single selection" : "Појединачни избор",
     "Multiple selection" : "Вишеструки избор",
     "Yes/No" : "Да/Не",

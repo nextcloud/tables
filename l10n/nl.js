@@ -35,6 +35,7 @@ OC.L10N.register(
     "Tables" : "Tabellen",
     "Create column" : "Aanmaken kolom",
     "Type" : "Type",
+    "Rich text" : "Rijke tekst",
     "Yes/No" : "Ja/Nee",
     "Time" : "Tijd",
     "Date and time" : "Datum en Tijd",

@@ -103,6 +103,7 @@ OC.L10N.register(
     "Create column" : "Sütun ekle",
     "Type" : "Tür",
     "Text line" : "Metin satırı",
+    "Rich text" : "Zengin metin",
     "Single selection" : "Tek seçim",
     "Multiple selection" : "Çoklu seçim",
     "Yes/No" : "Evet/hayır",

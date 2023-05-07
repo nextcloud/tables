@@ -30,6 +30,7 @@ OC.L10N.register(
     "Create column" : "Luo sarake",
     "Type" : "Tyyppi",
     "Text line" : "Tekstirivi",
+    "Rich text" : "Rikas teksti",
     "Yes/No" : "Kyllä/Ei",
     "Time" : "Aika",
     "Date and time" : "Päivänmäärä ja aika",

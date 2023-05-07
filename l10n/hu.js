@@ -95,6 +95,7 @@ OC.L10N.register(
     "Create column" : "Oszlop létrehozása",
     "Type" : "Típus",
     "Text line" : "Szövegsor",
+    "Rich text" : "Formázott szöveg",
     "Yes/No" : "Igen/nem",
     "Time" : "Idő",
     "Date and time" : "Dátum és idő",
