@@ -3,12 +3,12 @@
 namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
+use OCA\Text\Event\LoadEditor;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\TemplateResponse;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IRequest;
 use OCP\Util;
-use OCA\Text\Event\LoadEditor;
-use OCP\EventDispatcher\IEventDispatcher;
 
 class PageController extends Controller {
 	private IEventDispatcher $eventDispatcher;

@@ -15,7 +15,7 @@ class TableTemplateController extends Controller {
 	use Errors;
 
 	public function __construct(IRequest     $request,
-								TableTemplateService $service) {
+		TableTemplateService $service) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->service = $service;
 	}

@@ -4,10 +4,10 @@ namespace OCA\Tables\Reference;
 
 use Exception;
 use OC\Collaboration\Reference\LinkReferenceProvider;
-use OCA\Tables\Service\TableService;
-use OCP\Collaboration\Reference\Reference;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Service\TableService;
 use OCP\Collaboration\Reference\IReference;
+use OCP\Collaboration\Reference\Reference;
 use OCP\IConfig;
 use OCP\IURLGenerator;
 use Throwable;
@@ -23,10 +23,10 @@ class ReferenceHelper {
 	private IConfig $config;
 
 	public function __construct(IURLGenerator $urlGenerator,
-								TableService $tableService,
-								LinkReferenceProvider $linkReferenceProvider,
-								?string $userId,
-								IConfig $config) {
+		TableService $tableService,
+		LinkReferenceProvider $linkReferenceProvider,
+		?string $userId,
+		IConfig $config) {
 		$this->userId = $userId;
 		$this->urlGenerator = $urlGenerator;
 		$this->linkReferenceProvider = $linkReferenceProvider;

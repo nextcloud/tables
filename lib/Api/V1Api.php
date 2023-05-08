@@ -4,8 +4,8 @@ namespace OCA\Tables\Api;
 
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\PermissionError;
-use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\ColumnService;
+use OCA\Tables\Service\RowService;
 
 class V1Api {
 	private RowService $rowService;

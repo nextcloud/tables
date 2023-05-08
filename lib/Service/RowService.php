@@ -17,7 +17,7 @@ class RowService extends SuperService {
 	private RowMapper $mapper;
 
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-								RowMapper $mapper) {
+		RowMapper $mapper) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
 	}

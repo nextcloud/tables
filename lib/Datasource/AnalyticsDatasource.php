@@ -12,10 +12,10 @@
 namespace OCA\Tables\Datasource;
 
 use OCA\Analytics\Datasource\IDatasource;
+use OCA\Tables\Api\V1Api;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\TableService;
-use OCA\Tables\Api\V1Api;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 

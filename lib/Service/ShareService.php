@@ -7,16 +7,16 @@ use Exception;
 
 use OCA\Tables\Db\Share;
 use OCA\Tables\Db\ShareMapper;
+use OCA\Tables\Db\Table;
+use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
+
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
-
-use OCA\Tables\Db\Table;
-use OCA\Tables\Db\TableMapper;
 use Psr\Log\LoggerInterface;
 
 class ShareService extends SuperService {
@@ -29,7 +29,7 @@ class ShareService extends SuperService {
 	protected GroupHelper $groupHelper;
 
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-	ShareMapper $shareMapper, TableMapper $tableMapper, UserHelper $userHelper, GroupHelper $groupHelper) {
+		ShareMapper $shareMapper, TableMapper $tableMapper, UserHelper $userHelper, GroupHelper $groupHelper) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $shareMapper;
 		$this->tableMapper = $tableMapper;

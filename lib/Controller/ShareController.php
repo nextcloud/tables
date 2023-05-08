@@ -19,8 +19,8 @@ class ShareController extends Controller {
 
 
 	public function __construct(IRequest     $request,
-								ShareService $service,
-											 string $userId) {
+		ShareService $service,
+		string $userId) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->service = $service;
 		$this->userId = $userId;

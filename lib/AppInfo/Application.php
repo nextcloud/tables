@@ -2,11 +2,11 @@
 
 namespace OCA\Tables\AppInfo;
 
+use OCA\Analytics\Datasource\DatasourceEvent;
 use OCA\Tables\Capabilities;
-use OCP\Server;
-use OCA\Tables\Listener\UserDeletedListener;
 use OCA\Tables\Listener\AnalyticsDatasourceListener;
 use OCA\Tables\Listener\TablesReferenceListener;
+use OCA\Tables\Listener\UserDeletedListener;
 use OCA\Tables\Reference\SearchableTableReferenceProvider;
 use OCA\Tables\Reference\TableReferenceProvider;
 use OCA\Tables\Search\SearchTablesProvider;
@@ -17,8 +17,8 @@ use OCP\AppFramework\Bootstrap\IRegistrationContext;
 
 use OCP\Collaboration\Reference\RenderReferenceEvent;
 use OCP\IConfig;
+use OCP\Server;
 use OCP\User\Events\BeforeUserDeletedEvent;
-use OCA\Analytics\Datasource\DatasourceEvent;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
