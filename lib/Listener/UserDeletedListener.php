@@ -4,8 +4,8 @@ namespace OCA\Tables\Listener;
 
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Service\TableService;
-use OCP\EventDispatcher\IEventListener;
 use OCP\EventDispatcher\Event;
+use OCP\EventDispatcher\IEventListener;
 use OCP\User\Events\BeforeUserDeletedEvent;
 use Psr\Log\LoggerInterface;
 

@@ -17,8 +17,8 @@ class TableController extends Controller {
 
 
 	public function __construct(IRequest     $request,
-								TableService $service,
-											 string $userId) {
+		TableService $service,
+		string $userId) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->service = $service;
 		$this->userId = $userId;

@@ -18,8 +18,8 @@ class RowController extends Controller {
 	use Errors;
 
 	public function __construct(IRequest     $request,
-								RowService $service,
-											 string $userId) {
+		RowService $service,
+		string $userId) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->service = $service;
 		$this->userId = $userId;

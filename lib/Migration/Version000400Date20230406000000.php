@@ -11,8 +11,8 @@ use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Types\Type;
 use OCP\DB\ISchemaWrapper;
-use OCP\Migration\SimpleMigrationStep;
 use OCP\Migration\IOutput;
+use OCP\Migration\SimpleMigrationStep;
 
 class Version000400Date20230406000000 extends SimpleMigrationStep {
 	/**

@@ -2,12 +2,12 @@
 
 namespace OCA\Tables\Controller;
 
+use OCA\Tables\Api\V1Api;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\TableService;
-use OCA\Tables\Api\V1Api;
 use OCP\AppFramework\ApiController;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;

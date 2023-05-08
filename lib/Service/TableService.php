@@ -5,15 +5,15 @@ namespace OCA\Tables\Service;
 use DateTime;
 use Exception;
 
+use OCA\Tables\Db\Table;
+use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\UserHelper;
+
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
-
-use OCA\Tables\Db\Table;
-use OCA\Tables\Db\TableMapper;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 

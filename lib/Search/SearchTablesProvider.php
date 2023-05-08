@@ -43,9 +43,9 @@ class SearchTablesProvider implements IProvider {
 	private IURLGenerator $urlGenerator;
 
 	public function __construct(IAppManager   $appManager,
-								IL10N         $l10n,
-								TableService  $tableService,
-								IURLGenerator $urlGenerator) {
+		IL10N         $l10n,
+		TableService  $tableService,
+		IURLGenerator $urlGenerator) {
 		$this->appManager = $appManager;
 		$this->l10n = $l10n;
 		$this->tableService = $tableService;

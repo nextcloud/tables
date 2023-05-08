@@ -3,8 +3,8 @@
 namespace OCA\Tables\Reference;
 
 use OC\Collaboration\Reference\ReferenceManager;
-use OCP\Collaboration\Reference\IReferenceProvider;
 use OCP\Collaboration\Reference\IReference;
+use OCP\Collaboration\Reference\IReferenceProvider;
 
 class TableReferenceProvider implements IReferenceProvider {
 	private ReferenceHelper $referenceHelper;

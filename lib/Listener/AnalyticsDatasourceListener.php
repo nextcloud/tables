@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Listener;
 
-use OCA\Tables\Datasource\AnalyticsDatasource;
 use OCA\Analytics\Datasource\DatasourceEvent;
+use OCA\Tables\Datasource\AnalyticsDatasource;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 

@@ -10,8 +10,8 @@ use Closure;
 use Doctrine\DBAL\Schema\SchemaException;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\Types;
-use OCP\Migration\SimpleMigrationStep;
 use OCP\Migration\IOutput;
+use OCP\Migration\SimpleMigrationStep;
 
 class Version000203Date20230124000000 extends SimpleMigrationStep {
 	/**
