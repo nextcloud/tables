@@ -269,7 +269,7 @@ OC.L10N.register(
     "Defaults" : "Standardeinstellungen",
     "Allowed pattern" : "Erlaubtes Muster",
     "Max length" : "Maximale Länge",
-    "Default text is set" : "Standarttext ist eingestellt",
+    "Default text is set" : "Standardtext ist eingestellt",
     "No default text" : "Kein Standardtext",
     "This field is mandatory" : "Dieses Feld ist erforderlich",
     "Close editor" : "Bearbeitung schließen",
