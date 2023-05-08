@@ -160,4 +160,8 @@ tr.selected {
 	padding-left: calc(var(--default-grid-baseline) * 1);
 }
 
+:deep(.checkbox-radio-switch__icon) {
+	margin: 0;
+}
+
 </style>
