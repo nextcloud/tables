@@ -324,12 +324,8 @@ export default {
 	}
 
 	td:not(:first-child), th:not(:first-child) {
-		padding-right: 16px;
-		// max-width: 20vw;
-	}
-
-	th:not(:first-child) {
-		// text-align: end;
+		padding-right: 8px;
+		padding-left: 8px;
 	}
 
 	tr {

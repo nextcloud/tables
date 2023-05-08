@@ -142,22 +142,16 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 
 tr.selected {
 	background-color: var(--color-primary-light) !important;
 }
 
-.search-result {
-	border-left: 6px solid var(--color-success) !important;
-}
-
-.filter-result {
-	border-left: 6px solid var(--color-primary-element);
-}
-
-:deep(.search-result > div), :deep(.filter-result > div) {
-	padding-left: calc(var(--default-grid-baseline) * 1);
+:deep(.search-result > div) {
+	background-color: var(--color-primary-element-light);
+	border-radius: var(--border-radius-large);
+	padding: calc(var(--default-grid-baseline) * 3);
 }
 
 :deep(.checkbox-radio-switch__icon) {
