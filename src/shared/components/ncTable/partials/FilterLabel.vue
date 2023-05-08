@@ -1,6 +1,6 @@
 <template>
 	<div class="filter" :class="[type]">
-		{{ operatorLabel }} "{{ getValue }}"
+		{{ operatorLabel }} {{ getValue }}
 		<button @click="actionDelete">
 			<Close :size="14" />
 		</button>
@@ -41,7 +41,7 @@ export default {
 		getValue() {
 			let value = this.value
 			Object.values(this.magicFields).forEach(field => {
-				value = value.replace(field.id, field.label)
+				value = value.replace('@' + field.id, field.label)
 			})
 			return value
 		},

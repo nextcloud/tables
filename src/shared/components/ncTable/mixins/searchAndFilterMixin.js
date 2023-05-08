@@ -33,6 +33,7 @@ export default {
 				'operator-is-equal': {
 					id: 'operator-is-equal',
 					label: t('tables', 'Is equal'),
+					shortLabel: '=',
 					icon: 'icon-add',
 					source: 'operators',
 					subline: t('tables', 'Filter operator'),
@@ -41,6 +42,7 @@ export default {
 				'operator-is-greater-than': {
 					id: 'operator-is-greater-than',
 					label: t('tables', 'Is greater than'),
+					shortLabel: '>',
 					icon: 'icon-add',
 					source: 'operators',
 					subline: t('tables', 'Filter operator'),
@@ -49,6 +51,7 @@ export default {
 				'operator-is-greater-than-or-equal': {
 					id: 'operator-is-greater-than-or-equal',
 					label: t('tables', 'Is greater than or equal'),
+					shortLabel: '>=',
 					icon: 'icon-add',
 					source: 'operators',
 					subline: t('tables', 'Filter operator'),
@@ -57,6 +60,7 @@ export default {
 				'operator-is-lower-than': {
 					id: 'operator-is-lower-than',
 					label: t('tables', 'Is lower than'),
+					shortLabel: '<',
 					icon: 'icon-add',
 					source: 'operators',
 					subline: t('tables', 'Filter operator'),
@@ -65,6 +69,7 @@ export default {
 				'operator-is-lower-than-or-equal': {
 					id: 'operator-is-lower-than-or-equal',
 					label: t('tables', 'Is lower than or equal'),
+					shortLabel: '<=',
 					icon: 'icon-add',
 					source: 'operators',
 					subline: t('tables', 'Filter operator'),
@@ -225,7 +230,7 @@ export default {
 			if (id.substring(0, 9) !== 'operator-') {
 				id = 'operator-' + id
 			}
-			return this.operators[id]?.label
+			return this.operators[id]?.shortLabel ?? this.operators[id]?.label
 		},
 	},
 
