@@ -20,7 +20,7 @@
 					</template>
 				</NcButton>
 				<div class="searchAndFilter">
-					<FilterAndSearchSelection
+					<SearchForm
 						:columns="columns"
 						:search-string="getSearchString"
 						@add-filter="filter => $emit('add-filter', filter)"
@@ -80,13 +80,13 @@ import Delete from 'vue-material-design-icons/Delete.vue'
 import Export from 'vue-material-design-icons/Export.vue'
 import viewportHelper from '../../../mixins/viewportHelper.js'
 import permissionsMixin from '../mixins/permissionsMixin.js'
-import FilterAndSearchSelection from '../partials/FilterAndSearchSelection.vue'
+import SearchForm from '../partials/SearchForm.vue'
 
 export default {
 	name: 'Options',
 
 	components: {
-		FilterAndSearchSelection,
+		SearchForm,
 		NcButton,
 		Plus,
 		Delete,
@@ -174,6 +174,7 @@ export default {
 
 .actionButtonsLeft {
 	display: inline-flex;
+	align-items: center;
 }
 
 :deep(.actionButtonsLeft button) {
