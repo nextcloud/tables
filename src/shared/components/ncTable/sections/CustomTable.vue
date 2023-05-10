@@ -10,6 +10,7 @@
 					@create-row="$emit('create-row')"
 					@create-column="$emit('create-column')"
 					@edit-columns="$emit('edit-columns')"
+					@add-filter="filter => $emit('add-filter', filter)"
 					@download-csv="data => $emit('download-csv', data)"
 					@select-all-rows="selectAllRows"
 					@delete-filter="id => $emit('delete-filter', id)" />

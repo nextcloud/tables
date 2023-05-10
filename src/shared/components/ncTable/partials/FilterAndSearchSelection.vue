@@ -77,18 +77,12 @@ export default {
 		},
 		getNeededAutocompletionOptions() {
 			if (this.isColumnChosen && this.isOperatorChosen) {
-				return this.getPossibleMagicFields
+				return this.getPossibleMagicFields(this.columns)
 			}
 			if (this.isColumnChosen && !this.isOperatorChosen) {
-				return this.getPossibleOperators
+				return this.getPossibleOperators(this.columns)
 			}
 			return this.getColumnsForAutocompletion
-		},
-		getPossibleMagicFields() {
-			return Object.values(this.magicFields).filter(item => item.goodFor.includes(this.getChosenColumnType))
-		},
-		getPossibleOperators() {
-			return Object.values(this.operators).filter(item => item.goodFor.includes(this.getChosenColumnType))
 		},
 		getChosenColumnType() {
 			const column = this.getChosenColumn

@@ -1,6 +1,6 @@
 <template>
 	<div class="filter" :class="[type]">
-		{{ operatorLabel }} {{ getValue }}
+		{{ operatorLabel }} "{{ getValue }}"
 		<button @click="actionDelete">
 			<Close :size="14" />
 		</button>

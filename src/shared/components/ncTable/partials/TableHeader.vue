@@ -5,8 +5,13 @@
 		</th>
 		<th v-for="col in columns" :key="col.id">
 			<div class="cell">
-				{{ col.title }}
-				<TableHeaderSort :column="col" />
+				<div class="clickable" @click="updateOpenState(col.id)">
+					{{ col.title }}
+				</div>
+				<TableHeaderColumnOptions
+					:column="col"
+					:open-state.sync="openedColumnHeaderMenus[col.id]"
+					@add-filter="filter => $emit('add-filter', filter)" />
 			</div>
 			<div v-if="getFilterForColumn(col)" class="filter-wrapper">
 				<FilterLabel v-for="filter in getFilterForColumn(col)"
@@ -60,23 +65,25 @@ import { NcCheckboxRadioSwitch, NcActions, NcActionButton, NcActionSeparator } f
 import { emit } from '@nextcloud/event-bus'
 import TableEdit from 'vue-material-design-icons/TableEdit.vue'
 import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
-import TableHeaderSort from './TableHeaderSort.vue'
+import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
 import searchAndFilterMixin from '../mixins/searchAndFilterMixin.js'
 import FilterLabel from './FilterLabel.vue'
 
 export default {
-	name: 'TableHeader',
+
 	components: {
 		FilterLabel,
 		NcCheckboxRadioSwitch,
-		TableHeaderSort,
+		TableHeaderColumnOptions,
 		NcActions,
 		NcActionButton,
 		NcActionSeparator,
 		TableEdit,
 		TableColumnPlusAfter,
 	},
+
 	mixins: [searchAndFilterMixin],
+
 	props: {
 		columns: {
 			type: Array,
@@ -99,6 +106,13 @@ export default {
 		      default: null,
 		    },
 	},
+
+	data() {
+		return {
+			openedColumnHeaderMenus: {},
+		}
+	},
+
 	computed: {
 		allRowsAreSelected() {
 			if (Array.isArray(this.rows) && Array.isArray(this.selectedRows) && this.rows.length !== 0) {
@@ -108,7 +122,12 @@ export default {
 			}
 		},
 	},
+
 	methods: {
+		updateOpenState(columnId) {
+			this.openedColumnHeaderMenus[columnId] = !this.openedColumnHeaderMenus[columnId]
+			this.openedColumnHeaderMenus = Object.assign({}, this.openedColumnHeaderMenus)
+		},
 		getFilterForColumn(column) {
 			return this.view?.filter?.filter(item => item.columnId === column.id)
 		},
@@ -134,11 +153,16 @@ export default {
 }
 
 .filter-wrapper {
-	margin-top: calc(var(--default-grid-baseline) * -2);
+	margin-top: calc(var(--default-grid-baseline) * -1);
+	margin-bottom: calc(var(--default-grid-baseline) * 2);
 }
 
 :deep(.checkbox-radio-switch__icon) {
 	margin: 0;
+}
+
+.clickable {
+	cursor: pointer;
 }
 
 </style>

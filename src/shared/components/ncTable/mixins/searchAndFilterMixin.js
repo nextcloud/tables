@@ -222,6 +222,10 @@ export default {
 					replace: new Moment().format('YYYY-MM-DD HH:mm'),
 				},
 			},
+			hideFilterInputForColumnTypes: [
+				'selection-check',
+				'number-stars',
+			],
 		}
 	},
 
@@ -232,6 +236,15 @@ export default {
 			}
 			return this.operators[id]?.shortLabel ?? this.operators[id]?.label
 		},
+		getPossibleOperators(column) {
+			const columnType = column.type + (column.subtype ? '-' + column.subtype : '')
+			return Object.values(this.operators).filter(item => item.goodFor.includes(columnType))
+		},
+		getPossibleMagicFields(column) {
+			const columnType = column.type + (column.subtype ? '-' + column.subtype : '')
+			return Object.values(this.magicFields).filter(item => item.goodFor.includes(columnType))
+		},
+
 	},
 
 }
