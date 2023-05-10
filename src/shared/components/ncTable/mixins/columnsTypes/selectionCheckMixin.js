@@ -2,7 +2,7 @@ export default {
 
 	methods: {
 		sortingSelectionCheck(column, mode) {
-			const factor = mode === 'desc' ? -1 : 1
+			const factor = mode === 'desc' ? 1 : -1
 			return function(rowA, rowB) {
 				const tmpA = rowA.data.find(item => item.columnId === column.id)?.value || ''
 				const valueA = (tmpA === true || tmpA === 'true')
