@@ -38,7 +38,7 @@ export default {
 <style lang="scss" scoped>
 
 ul {
-	list-style-type: square;
+	list-style-type: disc;
 	padding-left: calc(var(--default-grid-baseline) * 3);
 }
 
