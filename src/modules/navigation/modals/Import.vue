@@ -9,7 +9,7 @@
 
 			<!-- Starting -->
 			<div v-if="!loading && result === null && !waitForReload">
-				<RowFormWrapper :title="t('tables', 'File')" :description="t('tables', 'Choose a file that should be imported. Supported formats are xlsx, xls, html, xml and csv.')">
+				<RowFormWrapper :title="t('tables', 'File')" :description="t('tables', 'Supported formats are xlsx, xls, html, xml and csv.')">
 					<div class="fix-col-4 space-T-small middle">
 						<NcButton @click="pickFile">
 							<template #icon>
@@ -21,7 +21,7 @@
 					</div>
 				</RowFormWrapper>
 
-				<RowFormWrapper :title="t('tables', 'Create missing columns')" :description="t('tables', 'Columns are identifies by the titles. If there is no match, a new text-line column will be created.')">
+				<RowFormWrapper :title="t('tables', 'Create missing columns')" :description="t('tables', 'Columns are identified by the titles. If there is no match, a new text-line column will be created.')">
 					<div class="fix-col-2">
 						<NcCheckboxRadioSwitch :checked.sync="createMissingColumns" type="switch" :disabled="!canCreateMissingColumns">
 							{{ t('tables', 'Create missing columns') }}
@@ -32,14 +32,24 @@
 					</p>
 				</RowFormWrapper>
 
-				<p class="fix-col-4 span">
-					{{ t('tables', 'The first row has to be the column titles.') }}
-					{{ t('tables', 'Note that imported data will be added to the table. Updating of existing rows is not possible at the moment.') }}
-					{{ t('tables', 'The possible importing size depends on the system configuration and is only limited by execution time and memory.') }}
-				</p>
+				<div class="fix-col-4 space-T">
+					<p class="span">
+						{{ t('tables', 'The first row has to contain the column titles.') }}
+					</p>
+				</div>
+				<div class="fix-col-4">
+					<p class="span">
+						{{ t('tables', 'Note that imported data will be added to the table. Updating of existing rows is not possible at the moment.') }}
+					</p>
+				</div>
+				<div class="fix-col-4">
+					<p class="span">
+						{{ t('tables', 'The possible importing size depends on the system configuration and is only limited by execution time and memory.') }}
+					</p>
+				</div>
 
 				<div class="row">
-					<div class="fix-col-4 space-T end">
+					<div class="fix-col-4 end">
 						<NcButton type="primary" @click="actionSubmit">
 							{{ t('tables', 'Import') }}
 						</NcButton>

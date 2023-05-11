@@ -39,12 +39,6 @@
 				@click="actionShowShare">
 				{{ t('tables', 'Share') }}
 			</NcActionButton>
-			<NcActionButton v-if="canDeleteTable(table)"
-				icon="icon-delete"
-				:close-after-click="true"
-				@click="showDeletionConfirmation = true">
-				{{ t('tables', 'Delete table') }}
-			</NcActionButton>
 			<NcActionButton v-if="canCreateRowInTable(table)"
 				:close-after-click="true"
 				@click="actionShowImport(table)">
@@ -60,6 +54,12 @@
 				<template #icon>
 					<Creation :size="20" />
 				</template>
+			</NcActionButton>
+			<NcActionButton v-if="canDeleteTable(table)"
+				icon="icon-delete"
+				:close-after-click="true"
+				@click="showDeletionConfirmation = true">
+				{{ t('tables', 'Delete table') }}
 			</NcActionButton>
 		</template>
 		<DialogConfirmation :description="getTranslatedDescription"
