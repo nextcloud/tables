@@ -74,6 +74,7 @@ export default {
 	font-size: 0.9em;
 	border-radius: var(--border-radius-pill);
 	margin-bottom: calc(var(--default-grid-baseline) * 1);
+	margin-right: calc(var(--default-grid-baseline) * 1);
 	width: fit-content;
 	color: var(--color-primary-element-text-dark);
 	line-height: initial;

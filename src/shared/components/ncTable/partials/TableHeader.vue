@@ -155,6 +155,8 @@ export default {
 .filter-wrapper {
 	margin-top: calc(var(--default-grid-baseline) * -1);
 	margin-bottom: calc(var(--default-grid-baseline) * 2);
+	display: flex;
+	flex-wrap: wrap;
 }
 
 :deep(.checkbox-radio-switch__icon) {
