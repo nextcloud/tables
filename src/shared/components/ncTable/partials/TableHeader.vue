@@ -157,6 +157,7 @@ export default {
 	margin-bottom: calc(var(--default-grid-baseline) * 2);
 	display: flex;
 	flex-wrap: wrap;
+	gap: 0 calc(var(--default-grid-baseline) * 2);
 }
 
 :deep(.checkbox-radio-switch__icon) {
