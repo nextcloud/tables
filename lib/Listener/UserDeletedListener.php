@@ -28,7 +28,7 @@ class UserDeletedListener implements IEventListener {
 		}
 
 		try {
-			$tables = $this->tableService->findAll($event->getUser()->getUID());
+			$tables = $this->tableService->findAll($event->getUser()->getUID(), true, true, false);
 			$this->logger->info('event "user deleted" was triggered, will try to delete all data for the user: '.$event->getUser()->getUID().' ('.$event->getUser()->getDisplayName().')');
 
 			// delete tables

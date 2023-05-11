@@ -66,7 +66,7 @@ class TableService extends SuperService {
 	 * @return array<Table>
 	 * @throws InternalError
 	 */
-	public function findAll(?string $userId = null, bool $skipTableEnhancement = false, bool $skipSharedTables = false): array {
+	public function findAll(?string $userId = null, bool $skipTableEnhancement = false, bool $skipSharedTables = false, bool $createTutorial = true): array {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
 		$ownTables = [];
@@ -76,7 +76,7 @@ class TableService extends SuperService {
 			$ownTables = $this->mapper->findAll($userId);
 
 			// if there are no own tables found, create the tutorial table
-			if (count($ownTables) === 0) {
+			if (count($ownTables) === 0 && $createTutorial) {
 				$ownTables = [$this->create($this->l->t('Tutorial'), 'tutorial', '🚀')];
 			}
 
