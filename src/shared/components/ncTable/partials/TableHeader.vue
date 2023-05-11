@@ -24,33 +24,33 @@
 		</th>
 		<th>
 			<NcActions :force-menu="true">
-				<NcActionButton v-if="!table.isShared || table.isShared && table.onSharePermissions.create"
+				<NcActionButton v-if="canCreateRowInTable(table)"
 					:close-after-click="true"
 					icon="icon-add"
 					@click="$emit('create-row')">
 					{{ t('tables', 'Create row') }}
 				</NcActionButton>
-				<NcActionSeparator v-if="!table.isShared || table.isShared && table.onSharePermissions.create" />
-				<NcActionButton v-if="!table.isShared || table.isShared && table.onSharePermissions.manage" :close-after-click="true" @click="$emit('create-column')">
+				<NcActionSeparator v-if="canCreateRowInTable(table)" />
+				<NcActionButton v-if="canManageTable(table)" :close-after-click="true" @click="$emit('create-column')">
 					<template #icon>
 						<TableColumnPlusAfter :size="20" decorative title="" />
 					</template>
 					{{ t('tables', 'Create column') }}
 				</NcActionButton>
-				<NcActionButton v-if="!table.isShared || table.isShared && table.onSharePermissions.manage" :close-after-click="true" @click="$emit('edit-columns')">
+				<NcActionButton v-if="canManageTable(table)" :close-after-click="true" @click="$emit('edit-columns')">
 					<template #icon>
 						<TableEdit :size="20" decorative title="" />
 					</template>
 					{{ t('tables', 'Edit columns') }}
 				</NcActionButton>
-				<NcActionSeparator v-if="!table.isShared || table.isShared && table.onSharePermissions.manage" />
-				<NcActionButton v-if="!table.isShared || table.isShared && table.onSharePermissions.manage"
+				<NcActionSeparator v-if="canManageTable(table)" />
+				<NcActionButton v-if="canManageTable(table)"
 					:close-after-click="true"
 					icon="icon-share"
 					@click="toggleShare">
 					{{ t('tables', 'Share') }}
 				</NcActionButton>
-				<NcActionButton :close-after-click="true"
+				<NcActionButton v-if="canReadTable(table)" :close-after-click="true"
 					icon="icon-download"
 					@click="downloadCSV">
 					{{ t('tables', 'Export as CSV') }}
@@ -68,6 +68,7 @@ import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter
 import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
 import searchAndFilterMixin from '../mixins/searchAndFilterMixin.js'
 import FilterLabel from './FilterLabel.vue'
+import permissionsMixin from '../mixins/permissionsMixin.js'
 
 export default {
 
@@ -82,7 +83,7 @@ export default {
 		TableColumnPlusAfter,
 	},
 
-	mixins: [searchAndFilterMixin],
+	mixins: [searchAndFilterMixin, permissionsMixin],
 
 	props: {
 		columns: {
