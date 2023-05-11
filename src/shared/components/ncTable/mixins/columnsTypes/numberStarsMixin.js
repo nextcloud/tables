@@ -5,11 +5,11 @@ export default {
 		sortingNumberStars(column, mode) {
 			const factor = mode === 'desc' ? -1 : 1
 			return function(rowA, rowB) {
-				const tmpA = rowA.data.find(item => item.columnId === column.id)?.value || null
+				const tmpA = rowA.data.find(item => item.columnId === column.id)?.value
 				const valueA = parseInt(tmpA)
-				const tmpB = rowB.data.find(item => item.columnId === column.id)?.value || null
+				const tmpB = rowB.data.find(item => item.columnId === column.id)?.value
 				const valueB = parseInt(tmpB)
-				return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor
+				return ((valueA < valueB) ? 1 : (valueA > valueB) ? -1 : 0) * factor
 			}
 		},
 		isSearchStringFoundForNumberStars(column, cell, searchString) {

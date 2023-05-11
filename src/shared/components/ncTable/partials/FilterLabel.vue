@@ -41,7 +41,7 @@ export default {
 		getValue() {
 			let value = this.value
 			Object.values(this.magicFields).forEach(field => {
-				value = value.replace(field.id, field.label)
+				value = value.replace('@' + field.id, field.label)
 			})
 			return value
 		},
