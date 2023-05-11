@@ -42,6 +42,7 @@ Have a good time and manage whatever you want.
 	<dependencies>
 		<database>pgsql</database>
 		<database>mysql</database>
+		<database>sqlite</database>
         <nextcloud min-version="25" max-version="27"/>
     </dependencies>
     <commands>
