@@ -32,20 +32,24 @@
 					</p>
 				</RowFormWrapper>
 
-				<div class="fix-col-4 space-T">
-					<p class="span">
-						{{ t('tables', 'The first row has to contain the column titles.') }}
-					</p>
-				</div>
-				<div class="fix-col-4">
-					<p class="span">
-						{{ t('tables', 'Note that imported data will be added to the table. Updating of existing rows is not possible at the moment.') }}
-					</p>
-				</div>
-				<div class="fix-col-4">
-					<p class="span">
-						{{ t('tables', 'The possible importing size depends on the system configuration and is only limited by execution time and memory.') }}
-					</p>
+				<div class="information">
+					<RowFormWrapper :title="t('tables', 'Information')">
+						<div class="fix-col-4">
+							<p class="span">
+								{{ t('tables', 'The first row has to contain the column titles.') }}
+							</p>
+						</div>
+						<div class="fix-col-4">
+							<p class="span">
+								{{ t('tables', 'Note that imported data will be added to the table. Updating of existing rows is not possible at the moment.') }}
+							</p>
+						</div>
+						<div class="fix-col-4">
+							<p class="span">
+								{{ t('tables', 'The possible importing size depends on the system configuration and is only limited by execution time and memory.') }}
+							</p>
+						</div>
+					</RowFormWrapper>
 				</div>
 
 				<div class="row">
@@ -281,6 +285,10 @@ export default {
 
 	:deep(.slot) {
 		display: block;
+	}
+
+	.information :deep(.row.space-T) {
+		padding-top: calc(var(--default-grid-baseline) * 2);
 	}
 
 </style>
