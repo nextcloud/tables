@@ -32,6 +32,7 @@ OC.L10N.register(
     "Read" : "Leer",
     "Manage" : "Administrar",
     "Error" : "Error",
+    "Search" : "Buscar",
     "Undo" : "Deshacer",
     "Prefix" : "Prefijo",
     "Suffix" : "Sufijo",

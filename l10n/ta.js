@@ -20,6 +20,7 @@ OC.L10N.register(
     "group" : "குழு",
     "Update" : "இற்றைப்படுத்தல்",
     "Error" : "வழு",
+    "Search" : "தேடுதல்",
     "Yes" : "Yes",
     "No" : "No"
 },

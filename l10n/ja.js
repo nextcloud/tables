@@ -54,6 +54,8 @@ OC.L10N.register(
     "Update" : "更新",
     "Manage" : "管理",
     "Error" : "エラー",
+    "Search" : "検索",
+    "Sorting" : "並べ替え",
     "Bold" : "太字",
     "Italic" : "斜体",
     "Ordered list" : "順序付きリスト",

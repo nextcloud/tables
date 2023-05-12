@@ -18,6 +18,7 @@ OC.L10N.register(
     "Share" : "Bḍu",
     "Sharing" : "Beṭṭu",
     "Error" : "Erreur",
+    "Search" : "Nadi",
     "Default" : "Prédéfini(e)",
     "Options" : "Iɣewwaṛen",
     "Add option" : "Rnu aɣewwaṛ",

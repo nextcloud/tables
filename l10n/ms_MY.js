@@ -21,6 +21,7 @@ OC.L10N.register(
     "group" : "kumpulan",
     "Update" : "Kemaskini",
     "Error" : "Ralat",
+    "Search" : "Search",
     "Yes" : "Yes",
     "No" : "No"
 },

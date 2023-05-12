@@ -49,6 +49,8 @@ OC.L10N.register(
     "Update" : "עדכון",
     "Manage" : "ניהול",
     "Error" : "שגיאה",
+    "Search" : "חיפוש",
+    "Sorting" : "מיון",
     "Undo" : "ביטול",
     "Redo" : "שחזור",
     "Bold" : "מודגש",

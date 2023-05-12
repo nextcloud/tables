@@ -32,6 +32,7 @@ OC.L10N.register(
     "Read" : "อ่าน",
     "Update" : "อัปเดต",
     "Error" : "ข้อผิดพลาด",
+    "Search" : "ค้นหา",
     "Undo" : "เลิกทำ",
     "Prefix" : "คำนำหน้า",
     "Suffix" : "คำต่อท้าย",

@@ -20,6 +20,7 @@ OC.L10N.register(
     "Sharing" : "Deljenje",
     "Read" : "Čitaj",
     "Error" : "Greška",
+    "Search" : "Traži",
     "Undo" : "Opozovi",
     "Bold" : "Podebljano",
     "Italic" : "Kurziv",

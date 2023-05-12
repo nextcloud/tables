@@ -23,6 +23,7 @@ OC.L10N.register(
     "group" : "grupa",
     "Sharing" : "Dijeljenje",
     "Update" : "Ažuriraj",
+    "Error" : "Greška",
     "Default" : "Zadano",
     "Yes" : "Yes",
     "No" : "No"

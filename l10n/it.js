@@ -108,6 +108,8 @@ OC.L10N.register(
     "Update" : "Aggiorna",
     "Manage" : "Gestisci",
     "Error" : "Errore",
+    "Search" : "Cerca",
+    "Sorting" : "Ordina",
     "Bold" : "Grassetto",
     "Italic" : "Corsivo",
     "Ordered list" : "Elenco ordinato",

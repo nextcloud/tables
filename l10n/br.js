@@ -24,6 +24,7 @@ OC.L10N.register(
     "group" : "strollad",
     "Sharing" : "Rannan",
     "Update" : "Hizivaat",
+    "Error" : "Fazi",
     "Default" : "Dre ziouer",
     "Yes" : "Ya",
     "No" : "Nann",

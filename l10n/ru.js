@@ -63,6 +63,8 @@ OC.L10N.register(
     "Update" : "Обновить",
     "Manage" : "Управлять",
     "Error" : "Ошибка",
+    "Search" : "Поиск",
+    "Sorting" : "Сортировка",
     "Bold" : "Жирный",
     "Italic" : "Курсив",
     "Ordered list" : "Упорядоченный список",

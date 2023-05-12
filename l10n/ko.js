@@ -47,6 +47,8 @@ OC.L10N.register(
     "Update" : "업데이트",
     "Manage" : "관리",
     "Error" : "오류",
+    "Search" : "검색",
+    "Sorting" : "정렬",
     "Bold" : "굵게",
     "Italic" : "Italic체",
     "Code" : "코드",

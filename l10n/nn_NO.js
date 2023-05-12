@@ -26,6 +26,7 @@ OC.L10N.register(
     "Sharing" : "Deling",
     "Update" : "Oppdater",
     "Error" : "Feil",
+    "Search" : "Søk",
     "Default" : "Standard",
     "Yes" : "Ja",
     "No" : "Nei"

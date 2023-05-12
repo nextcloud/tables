@@ -21,6 +21,7 @@ OC.L10N.register(
     "Share" : "Rhannu",
     "group" : "grŵp",
     "Update" : "Diweddaru",
+    "Error" : "Gwall",
     "Undo" : "Dadwneud",
     "Bold" : "Trwm",
     "Italic" : "Italig",

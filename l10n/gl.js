@@ -50,6 +50,8 @@ OC.L10N.register(
     "Update" : "Actualizar",
     "Manage" : "Xestionar",
     "Error" : "Erro",
+    "Search" : "Buscar",
+    "Sorting" : "Ordenando",
     "Bold" : "Grosa",
     "Italic" : "Cursiva",
     "Ordered list" : "Lista ordenada",

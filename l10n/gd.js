@@ -14,6 +14,7 @@ OC.L10N.register(
     "Share" : "Co-roinn",
     "Sharing" : "Co-roinneadh",
     "Error" : "Mearachd",
+    "Search" : "Lorg",
     "Undo" : "Neo-dhèan",
     "Default" : "Bunaiteach",
     "Yes" : "Tha",

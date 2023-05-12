@@ -40,6 +40,7 @@ OC.L10N.register(
     "Read" : "Legit",
     "Update" : "Actualizar",
     "Error" : "Error",
+    "Search" : "Recercar",
     "Undo" : "Desfar",
     "Redo" : "Refar",
     "Bold" : "Gras",

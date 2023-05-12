@@ -83,6 +83,8 @@ OC.L10N.register(
     "Update" : "Update",
     "Manage" : "Beheren",
     "Error" : "Fout",
+    "Search" : "Zoeken",
+    "Sorting" : "Sorteren",
     "Bold" : "Vet",
     "Italic" : "Cursief",
     "Ordered list" : "Gesorteerde lijst",

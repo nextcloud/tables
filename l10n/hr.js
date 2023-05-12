@@ -52,6 +52,8 @@ OC.L10N.register(
     "Update" : "Ažuriraj",
     "Manage" : "Upravljanje",
     "Error" : "Pogreška",
+    "Search" : "Traži",
+    "Sorting" : "Razvrstavanje",
     "Bold" : "Podebljano",
     "Italic" : "U kurzivu",
     "Ordered list" : "Razvrstani popis",

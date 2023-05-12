@@ -51,6 +51,8 @@ OC.L10N.register(
     "Read" : "Leghe",
     "Update" : "Agiorna",
     "Error" : "Errore",
+    "Search" : "Chirca",
+    "Sorting" : "Assentende",
     "Bold" : "Grassetu",
     "Italic" : "Cursivu",
     "Ordered list" : "Lista ordinada",

@@ -32,6 +32,7 @@ OC.L10N.register(
     "Read" : "Baca",
     "Update" : "Perbarui",
     "Error" : "Galat",
+    "Search" : "Cari",
     "Undo" : "Undo",
     "Prefix" : "Prefix",
     "Suffix" : "Suffix",

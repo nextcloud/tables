@@ -33,6 +33,7 @@ OC.L10N.register(
     "Read" : "Citit",
     "Update" : "Actualizare",
     "Error" : "Eroare",
+    "Search" : "Căutare",
     "Undo" : "Anulează ultima acțiune",
     "Code" : "Cod",
     "Prefix" : "Prefix",

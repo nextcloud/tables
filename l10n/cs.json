@@ -215,7 +215,7 @@
     "You are not allowed to read this table, but you can still create rows." : "Není vám umožněno toto tabulku číst, ale i tak pořád můžete přidávat řádky.",
     "This option is outdated." : "Tato volba je zastaralá.",
     "Export as CSV" : "Exportovat jako CSV",
-    "Sort this column" : "Seřadit tento sloupec",
+    "Sorting" : "Řazení",
     "Undo" : "Zpět",
     "Redo" : "Zopakovat",
     "Bold" : "Tučné",

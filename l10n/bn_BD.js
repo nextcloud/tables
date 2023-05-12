@@ -25,6 +25,7 @@ OC.L10N.register(
     "Sharing" : "ভাগাভাগিরত",
     "Read" : "পড়",
     "Update" : "পরিবর্ধন",
+    "Error" : "সমস্যা",
     "Default" : "পূর্বনির্ধারিত",
     "Yes" : "Yes",
     "No" : "No"

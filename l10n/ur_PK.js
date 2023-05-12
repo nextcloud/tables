@@ -16,6 +16,7 @@ OC.L10N.register(
     "Share" : "تقسیم",
     "group" : "مجموعہ",
     "Error" : "ایرر",
+    "Search" : "Search",
     "Yes" : "Yes",
     "No" : "No"
 },

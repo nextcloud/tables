@@ -39,6 +39,7 @@ OC.L10N.register(
     "Update" : "Cập nhật",
     "Manage" : "Quản lý",
     "Error" : "Lỗi",
+    "Search" : "Tìm kiếm",
     "Undo" : "Hoàn tác",
     "Redo" : "Làm lại",
     "Bold" : "Đậm",

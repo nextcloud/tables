@@ -34,6 +34,7 @@ OC.L10N.register(
     "Update" : "Actualizar",
     "Manage" : "Administrar",
     "Error" : "Error",
+    "Search" : "Buscar",
     "Undo" : "Deshacer",
     "Prefix" : "Prefijo",
     "Suffix" : "Sufijo",

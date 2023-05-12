@@ -121,6 +121,8 @@ OC.L10N.register(
     "Update" : "Aktualizuj",
     "Manage" : "Zarządzanie",
     "Error" : "Błąd",
+    "Search" : "Szukaj",
+    "Sorting" : "Sortuj",
     "Redo" : "Powtórzenie",
     "Bold" : "Tekst pogrubiony",
     "Italic" : "Kursywa",

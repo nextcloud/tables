@@ -38,6 +38,7 @@ OC.L10N.register(
     "Update" : "Ĝisdatigi",
     "Manage" : "Administri",
     "Error" : "Eraro",
+    "Search" : "Serĉi",
     "Undo" : "Malfari",
     "Redo" : "Refari",
     "Bold" : "Grasa",

@@ -21,6 +21,7 @@ OC.L10N.register(
     "group" : "խումբ",
     "Update" : "Թարմացնել",
     "Error" : "Սխալ",
+    "Search" : "Search",
     "Default" : "Լռելյայն",
     "Yes" : "Yes",
     "No" : "No"

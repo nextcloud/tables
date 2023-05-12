@@ -44,6 +44,7 @@ OC.L10N.register(
     "Update" : "Atualizar",
     "Manage" : "Gerir",
     "Error" : "Erro",
+    "Search" : "Pesquisa sobre",
     "Undo" : "Desfazer",
     "Redo" : "Repetir",
     "Bold" : "Negrito",

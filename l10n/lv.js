@@ -35,6 +35,7 @@ OC.L10N.register(
     "Read" : "Lasīt",
     "Update" : "Atjaunināt",
     "Error" : "Kļūda",
+    "Search" : "Meklēt",
     "Undo" : "Atsaukt",
     "Redo" : "Atcelt atsaukšanu",
     "Bold" : "Treknraksts",

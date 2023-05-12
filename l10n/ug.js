@@ -20,6 +20,7 @@ OC.L10N.register(
     "Sharing" : "ھەمبەھىر",
     "Update" : "يېڭىلا",
     "Error" : "خاتالىق",
+    "Search" : "Search",
     "Default" : "كۆڭۈلدىكى",
     "Yes" : "Yes",
     "No" : "No"

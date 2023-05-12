@@ -40,6 +40,8 @@ OC.L10N.register(
     "Read" : "خواندن",
     "Update" : "به‌روز رسانی",
     "Error" : "خطا",
+    "Search" : "جستجو",
+    "Sorting" : "مرتب سازی",
     "Undo" : "برگرداندن",
     "Bold" : "درشت",
     "Italic" : "Italic",

@@ -43,6 +43,8 @@ OC.L10N.register(
     "Update" : "Uppfæra",
     "Manage" : "Skipuleggja",
     "Error" : "Villa",
+    "Search" : "Search",
+    "Sorting" : "Röðun",
     "Undo" : "Afturkalla",
     "Redo" : "Endurtaka",
     "Bold" : "Feitletrað",

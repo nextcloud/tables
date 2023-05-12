@@ -34,6 +34,7 @@ OC.L10N.register(
     "Update" : "განახლება",
     "Manage" : "მენეჯმენტი",
     "Error" : "შეცდომა",
+    "Search" : "ძიება",
     "Undo" : "დაბრუნება",
     "Prefix" : "პრეფიქსი",
     "Suffix" : "სუფიქსი",

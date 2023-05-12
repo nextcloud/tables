@@ -90,6 +90,8 @@ OC.L10N.register(
     "Update" : "Oppdater",
     "Manage" : "Håndtere",
     "Error" : "Feil",
+    "Search" : "Søk",
+    "Sorting" : "Sorter",
     "Undo" : "Angre",
     "Redo" : "Gjør om",
     "Bold" : "Uthevet",

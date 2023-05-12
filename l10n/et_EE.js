@@ -32,6 +32,7 @@ OC.L10N.register(
     "Read" : "Lugemine",
     "Update" : "Uuenda",
     "Error" : "Viga",
+    "Search" : "Otsi",
     "Undo" : "Tühista",
     "Prefix" : "Eesliide",
     "Suffix" : "Järelliide",

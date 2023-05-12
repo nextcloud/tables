@@ -27,6 +27,7 @@ OC.L10N.register(
     "Sharing" : "Түгээх",
     "Manage" : "Зохицуулах",
     "Error" : "Алдаа",
+    "Search" : "Хайх",
     "Undo" : "буцах",
     "Yes" : "Тийм",
     "No" : "Үгүй",

@@ -17,6 +17,7 @@ OC.L10N.register(
     "group" : "﻿ಗುಂಪು",
     "Sharing" : "﻿ಹಂಚಿಕೆ",
     "Error" : "﻿ತಪ್ಪಾಗಿದೆ",
+    "Search" : "Search",
     "Default" : "ಆರಂಭದ ಪ್ರತಿ",
     "Yes" : "Yes",
     "No" : "No"

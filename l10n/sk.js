@@ -120,6 +120,8 @@ OC.L10N.register(
     "Update" : "Aktualizovať",
     "Manage" : "Spravovať",
     "Error" : "Chyba",
+    "Search" : "Hľadať",
+    "Sorting" : "Triedenie",
     "Undo" : "Odvolať",
     "Redo" : "Obnoviť",
     "Bold" : "Tučné",

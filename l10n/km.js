@@ -27,6 +27,7 @@ OC.L10N.register(
     "Sharing" : "ការ​ចែក​រំលែក",
     "Update" : "ធ្វើ​បច្ចុប្បន្នភាព",
     "Error" : "កំហុស",
+    "Search" : "ស្វែងរក",
     "Default" : "លំនាំ​ដើម",
     "Options" : "ជម្រើស",
     "Yes" : "Yes",

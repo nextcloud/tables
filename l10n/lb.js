@@ -24,6 +24,7 @@ OC.L10N.register(
     "Sharing" : "Gedeelt",
     "Update" : "Update",
     "Error" : "Fehler",
+    "Search" : "Search",
     "Default" : "Standard",
     "Yes" : "Yes",
     "No" : "No"

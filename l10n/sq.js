@@ -35,6 +35,7 @@ OC.L10N.register(
     "Update" : "Përditëso",
     "Manage" : "Menaxho",
     "Error" : "Gabim",
+    "Search" : "Kërko",
     "Undo" : "Ktheje pas",
     "Redo" : "Ribëj",
     "Bold" : "I theksuar",

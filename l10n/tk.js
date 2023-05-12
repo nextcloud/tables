@@ -14,6 +14,7 @@ OC.L10N.register(
     "Share" : "Paýlaş",
     "Sharing" : "Paýlaşmak",
     "Error" : "ýalňyşlyk",
+    "Search" : "Gözlemek",
     "Default" : "Bellenen",
     "Yes" : "Hawa",
     "No" : "Ýok"
