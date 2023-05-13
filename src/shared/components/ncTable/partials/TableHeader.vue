@@ -30,42 +30,39 @@
 					@click="$emit('create-row')">
 					{{ t('tables', 'Create row') }}
 				</NcActionButton>
+				<NcActionButton v-if="canCreateRowInTable(table)"
+					:close-after-click="true"
+					@click="$emit('import', table)">
+					<template #icon>
+						<IconImport :size="20" decorative title="Import" />
+					</template>
+					{{ t('tables', 'Import') }}
+				</NcActionButton>
 				<NcActionSeparator v-if="canCreateRowInTable(table)" />
 				<NcActionButton v-if="canManageTable(table)" :close-after-click="true" @click="$emit('create-column')">
-					<NcActionButton v-if="!table.isShared || table.isShared && table.onSharePermissions.create"
-						:close-after-click="true"
-						@click="$emit('import', table)">
-						<template #icon>
-							<IconImport :size="20" decorative title="Import" />
-						</template>
-						{{ t('tables', 'Import') }}
-					</NcActionButton>
-					<NcActionSeparator v-if="!table.isShared || table.isShared && table.onSharePermissions.create" />
-					<NcActionButton v-if="!table.isShared || table.isShared && table.onSharePermissions.manage" :close-after-click="true" @click="$emit('create-column')">
-						<template #icon>
-							<TableColumnPlusAfter :size="20" decorative title="" />
-						</template>
-						{{ t('tables', 'Create column') }}
-					</NcActionButton>
-					<NcActionButton v-if="canManageTable(table)" :close-after-click="true" @click="$emit('edit-columns')">
-						<template #icon>
-							<TableEdit :size="20" decorative title="" />
-						</template>
-						{{ t('tables', 'Edit columns') }}
-					</NcActionButton>
-					<NcActionSeparator v-if="canManageTable(table)" />
-					<NcActionButton v-if="canManageTable(table)"
-						:close-after-click="true"
-						icon="icon-share"
-						@click="toggleShare">
-						{{ t('tables', 'Share') }}
-					</NcActionButton>
-					<NcActionButton v-if="canReadTable(table)" :close-after-click="true"
-						icon="icon-download"
-						@click="downloadCSV">
-						{{ t('tables', 'Export as CSV') }}
-					</NcActionButton>
-				</ncactionbutton>
+					<template #icon>
+						<TableColumnPlusAfter :size="20" decorative title="" />
+					</template>
+					{{ t('tables', 'Create column') }}
+				</NcActionButton>
+				<NcActionButton v-if="canManageTable(table)" :close-after-click="true" @click="$emit('edit-columns')">
+					<template #icon>
+						<TableEdit :size="20" decorative title="" />
+					</template>
+					{{ t('tables', 'Edit columns') }}
+				</NcActionButton>
+				<NcActionSeparator v-if="canManageTable(table)" />
+				<NcActionButton v-if="canManageTable(table)"
+					:close-after-click="true"
+					icon="icon-share"
+					@click="toggleShare">
+					{{ t('tables', 'Share') }}
+				</NcActionButton>
+				<NcActionButton v-if="canReadTable(table)" :close-after-click="true"
+					icon="icon-download"
+					@click="downloadCSV">
+					{{ t('tables', 'Export as CSV') }}
+				</NcActionButton>
 			</NcActions>
 		</th>
 	</tr>
