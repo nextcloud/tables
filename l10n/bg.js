@@ -215,6 +215,7 @@ OC.L10N.register(
     "Error" : "Грешка",
     "Create rows" : "Създаване на редове",
     "You are not allowed to read this table, but you can still create rows." : "Нямате право да четете тази таблица, но все пак можете да създавате редове.",
+    "Search" : "Търсене",
     "This option is outdated." : "Тази опция не е актуална.",
     "Export as CSV" : "Експортиране като CSV файл",
     "Undo" : "Отмяна",

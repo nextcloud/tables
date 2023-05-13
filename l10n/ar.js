@@ -41,6 +41,7 @@ OC.L10N.register(
     "Read" : "القراءة",
     "Update" : "تحديث",
     "Error" : "خطأ",
+    "Search" : "البحث",
     "Bold" : "غامق",
     "Italic" : "مائل",
     "Code" : "الرمز",

@@ -26,6 +26,7 @@ OC.L10N.register(
     "Read" : "পড়",
     "Update" : "পরিবর্ধন",
     "Error" : "সমস্যা",
+    "Search" : "Search",
     "Default" : "পূর্বনির্ধারিত",
     "Yes" : "Yes",
     "No" : "No"

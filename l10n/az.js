@@ -26,6 +26,7 @@ OC.L10N.register(
     "Read" : "Oxu",
     "Update" : "Yenilənmə",
     "Error" : "Səhv",
+    "Search" : "Axtarış",
     "Default" : "Susmaya görə",
     "Yes" : "Yes",
     "No" : "No"

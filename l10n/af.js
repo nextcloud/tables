@@ -26,6 +26,7 @@ OC.L10N.register(
     "Integration" : "Integrasie",
     "group" : "Groep",
     "Update" : "Werk by",
+    "Search" : "Soek",
     "Bold" : "Vet",
     "Italic" : "Skuins",
     "Ordered list" : "Gesorteerde lys",
