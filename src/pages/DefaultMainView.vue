@@ -14,6 +14,7 @@
 					@add-filter="addFilter"
 					@set-search-string="setSearchString"
 					@edit-row="rowId => editRowId = rowId"
+					@import="openImportModal"
 					@create-column="showCreateColumn = true"
 					@edit-columns="showEditColumns = true"
 					@create-row="showCreateRow = true"
@@ -49,6 +50,7 @@ import EditColumns from '../modules/main/modals/EditColumns.vue'
 import DeleteRows from '../modules/main/modals/DeleteRows.vue'
 import EmptyTable from '../modules/main/sections/EmptyTable.vue'
 import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
+import { emit } from '@nextcloud/event-bus'
 
 export default {
 	name: 'DefaultMainView',
@@ -106,6 +108,9 @@ export default {
 		this.reload()
 	},
 	methods: {
+		openImportModal(table) {
+			emit('tables:modal:import', table)
+		},
 		deleteFilter(id) {
 			this.$store.dispatch('deleteFilter', { id })
 		},

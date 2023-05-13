@@ -1,10 +1,10 @@
 Feature: api/tablesapi
   Background:
     Given user "participant1" exists
-    Given user "participant2" exists
-    And group "phoenix" exists
-    And user "participant1" is member of group "phoenix"
-    And user "participant2" is member of group "phoenix"
+     Given user "participant2" exists
+     And group "phoenix" exists
+     And user "participant1" is member of group "phoenix"
+     And user "participant2" is member of group "phoenix"
 
   Scenario: User has initial table
     Then user "participant1" has the following tables
@@ -127,3 +127,30 @@ Feature: api/tablesapi
       | four          | 2020-02-04              |
     Then user deletes last created row
     Then user "participant1" deletes table with keyword "Rows check"
+
+
+
+
+  Scenario: Import csv table
+    Given file "/import.csv" exists for user "participant1" with following data
+      | Col1    | Col2   | Col3   | num   | emoji | special  |
+      | Val1    | Val2   | Val3   | 1     | 💙    | Ä        |
+      | great   | news   | here   | 99    | ⚠️    | Ö        |
+    Given table "Import test" with emoji "👨🏻‍💻" exists for user "participant1"
+    When user imports file "/import.csv" into last created table
+    Then import results have the following data
+      | found_columns_count     | 6 |
+      | created_columns_count   | 6 |
+      | inserted_rows_count     | 2 |
+      | errors_count            | 0 |
+    Then table has at least following columns
+      | Col1    |
+      | Col2    |
+      | Col3    |
+      | num     |
+      | emoji   |
+      | special |
+    Then table contains at least following rows
+      | Col1    | Col2   | Col3   | num   | emoji | special  |
+      | Val1    | Val2   | Val3   | 1     | 💙    | Ä        |
+      | great   | news   | here   | 99    | ⚠️    | Ö        |

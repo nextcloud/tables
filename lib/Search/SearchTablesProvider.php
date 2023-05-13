@@ -89,7 +89,7 @@ class SearchTablesProvider implements IProvider {
 		$limit = $query->getLimit();
 		$term = $query->getTerm();
 		$offset = $query->getCursor();
-		$offset = $offset ? intval($offset) : 0;
+		$offset = $offset ? (int) $offset : 0;
 
 		$tables = $this->tableService->search($term, $limit, $offset);
 

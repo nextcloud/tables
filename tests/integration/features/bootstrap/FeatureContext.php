@@ -23,7 +23,6 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
-// use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
@@ -61,6 +60,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	private ?int $columnId = null;
 	private ?int $rowId = null;
 	private ?array $tableColumns = [];
+	private ?array $importResult = null;
 
 	use CommandLineTrait;
 
@@ -91,6 +91,103 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 			$this->deleteGroup($group);
 		}
 	}
+
+
+
+	// IMPORT --------------------------
+
+	/**
+	 * @Given file :file exists for user :user with following data
+	 *
+	 * @param string $user
+	 * @param string $file
+	 * @param TableNode|null $table
+	 */
+	public function createCsvFile(string $user, string $file, TableNode $table = null): void {
+		$this->setCurrentUser($user);
+		$url = $this->baseUrl.'remote.php/dav/files/'.$user.$file;
+		$body = $this->tableNodeToCsv($table);
+		$headers = ['Content-Type' => 'text/csv'];
+
+		$this->sendRequestFullUrl('PUT', $url, $body, $headers, []);
+
+		Assert::assertEquals(201, $this->response->getStatusCode());
+	}
+
+	private function tableNodeToCsv(TableNode $node): string {
+		$out = '';
+		foreach ($node->getRows() as $row) {
+			foreach ($row as $value) {
+				if($out !== '' && substr($out, -1) !== "\n") {
+					$out .= ",";
+				}
+				$out .= trim($value);
+			}
+			$out .= "\n";
+		}
+		return $out;
+	}
+
+	/**
+	 * @When user imports file :file into last created table
+	 *
+	 * @param string $file
+	 */
+	public function importTable(string $file): void {
+		$this->sendRequest(
+			'POST',
+			'/apps/tables/api/1/import/table/'.$this->tableId,
+			[
+				'path' => $file,
+				'createMissingColumns' => true,
+			]
+		);
+
+		$this->importResult = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+	}
+
+	/**
+	 * @Then import results have the following data
+	 *
+	 * @param TableNode $table
+	 */
+	public function checkImportResults(TableNode $table): void {
+		foreach ($table->getRows() as $item) {
+			Assert::assertEquals($item[1], $this->importResult[$item[0]]);
+		}
+	}
+
+	/**
+	 * @Then table contains at least following rows
+	 *
+	 * @param TableNode $table
+	 */
+	public function checkRowsExists(TableNode $table): void {
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/tables/'.$this->tableId.'/rows/simple',
+		);
+
+		$allRows = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		$tableRows = $table->getRows();
+		foreach ($tableRows[0] as $key => $colTitle) {
+			$indexForCol = array_search($colTitle, $allRows[0]);
+			$allValuesForColumn = [];
+			foreach ($allRows as $row) {
+				$allValuesForColumn[] = $row[$indexForCol];
+			}
+			foreach ($table->getColumn($key) as $item) {
+				Assert::assertTrue(in_array($item, $allValuesForColumn));
+			}
+		}
+	}
+
+
+
+
 
 
 
@@ -921,6 +1018,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	 * @param string $fullUrl
 	 * @param TableNode|array|null $body
 	 * @param array $headers
+	 * @param array $options
 	 */
 	public function sendRequestFullUrl($verb, $fullUrl, $body = null, array $headers = [], array $options = []) {
 		$client = new Client();
@@ -935,6 +1033,8 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 			$options['form_params'] = $fd;
 		} elseif (is_array($body)) {
 			$options['form_params'] = $body;
+		} else {
+			$options['body'] = $body;
 		}
 
 		$options['headers'] = array_merge($headers, [

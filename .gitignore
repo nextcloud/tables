@@ -15,3 +15,4 @@ tests/unit/.phpunit.result.cache
 /tests/integration/output/report.xml
 /gen/
 .DS_Store
+/cypress/videos

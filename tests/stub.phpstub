@@ -45,3 +45,15 @@ namespace Doctrine\DBAL\Types {
 		public static function getType($name): Type;
 	}
 }
+
+namespace OC\Hooks {
+	interface Emitter {
+		public function listen($scope, $method, callable $callback);
+		public function removeListener($scope = null, $method = null, callable $callback = null);
+	}
+}
+
+namespace OC\User {
+	class NoUserException extends \Exception {
+	}
+}

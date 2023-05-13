@@ -13,6 +13,7 @@ delete-selected-rows
 add-filter              -> @param filter { columnId, operator, value }
 delete-filter           -> @param id (columnId + operator + value)
 set-search-string       -> @param string
+import                  -> click on import button on tables menu
 
 Props
 =====
@@ -59,6 +60,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				:table="table"
 				:view="view"
 				@create-row="$emit('create-row')"
+				@import="table => $emit('import', table)"
 				@edit-row="rowId => $emit('edit-row', rowId)"
 				@create-column="$emit('create-column')"
 				@edit-columns="$emit('edit-columns')"

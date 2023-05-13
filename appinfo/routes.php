@@ -39,6 +39,8 @@ return [
 		['name' => 'api1#getRow',	'url' => '/api/1/rows/{rowId}', 'verb' => 'GET'],
 		['name' => 'api1#updateRow',	'url' => '/api/1/rows/{rowId}', 'verb' => 'PUT'],
 		['name' => 'api1#deleteRow',	'url' => '/api/1/rows/{rowId}', 'verb' => 'DELETE'],
+		// -> import
+		['name' => 'api1#createImport', 'url' => '/api/1/import/table/{tableId}', 'verb' => 'POST'],
 
 
 		// table
@@ -70,5 +72,8 @@ return [
 		['name' => 'share#create', 'url' => '/share', 'verb' => 'POST'],
 		['name' => 'share#updatePermission', 'url' => '/share/{id}/permission', 'verb' => 'PUT'],
 		['name' => 'share#destroy', 'url' => '/share/{id}', 'verb' => 'DELETE'],
+
+		// import
+		['name' => 'import#import', 'url' => '/import/table/{tableId}', 'verb' => 'POST'],
 	]
 ];

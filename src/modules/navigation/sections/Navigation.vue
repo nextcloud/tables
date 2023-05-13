@@ -49,6 +49,7 @@
 
 			<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
 			<EditTable :show-modal="editTableId !== null" :table-id="editTableId" @close="editTableId = null " />
+			<Import :show-modal="importTable !== null" :table="importTable" @close="importTable = null" />
 		</template>
 	</NcAppNavigation>
 </template>
@@ -62,10 +63,12 @@ import { mapState, mapGetters } from 'vuex'
 import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
 import { getCurrentUser } from '@nextcloud/auth'
+import Import from '../modals/Import.vue'
 
 export default {
 	name: 'Navigation',
 	components: {
+		Import,
 		NavigationTableItem,
 		NcAppNavigation,
 		CreateTable,
@@ -81,6 +84,7 @@ export default {
 		return {
 			loading: true,
 			showModalCreateTable: false,
+			importTable: null,
 			editTableId: null, // if null, no modal open
 			filterString: '',
 		}
@@ -101,10 +105,12 @@ export default {
 	mounted() {
 		subscribe('create-table', this.createTable)
 		subscribe('edit-table', tableId => { this.editTableId = tableId })
+		subscribe('tables:modal:import', table => { this.importTable = table })
 	},
 	beforeDestroy() {
 		unsubscribe('create-table', this.createTable)
 		unsubscribe('edit-table', tableId => { this.editTableId = tableId })
+		unsubscribe('tables:modal:import', table => { this.importTable = table })
 	},
 	methods: {
 		createTable() {

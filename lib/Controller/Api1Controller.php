@@ -5,6 +5,7 @@ namespace OCA\Tables\Controller;
 use OCA\Tables\Api\V1Api;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Service\ColumnService;
+use OCA\Tables\Service\ImportService;
 use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\TableService;
@@ -17,6 +18,7 @@ class Api1Controller extends ApiController {
 	private ShareService $shareService;
 	private ColumnService $columnService;
 	private RowService $rowService;
+	private ImportService $importService;
 
 	private V1Api $v1Api;
 
@@ -31,6 +33,7 @@ class Api1Controller extends ApiController {
 		ShareService $shareService,
 		ColumnService $columnService,
 		RowService $rowService,
+		ImportService $importService,
 		V1Api $v1Api,
 		string $userId
 	) {
@@ -39,6 +42,7 @@ class Api1Controller extends ApiController {
 		$this->shareService = $shareService;
 		$this->columnService = $columnService;
 		$this->rowService = $rowService;
+		$this->importService = $importService;
 		$this->userId = $userId;
 		$this->v1Api = $v1Api;
 	}
@@ -58,6 +62,17 @@ class Api1Controller extends ApiController {
 				return $this->tableService->findAll($this->userId);
 			});
 		}
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function createImport(int $tableId, string $path, bool $createMissingColumns = true): DataResponse {
+		return $this->handleError(function () use ($tableId, $path, $createMissingColumns) {
+			return $this->importService->import($tableId, $path, $createMissingColumns);
+		});
 	}
 
 	/**
@@ -410,7 +425,7 @@ class Api1Controller extends ApiController {
 		$array = json_decode($data, true);
 		foreach ($array as $key => $value) {
 			$dataNew[] = [
-				'columnId' => intval($key),
+				'columnId' => (int) $key,
 				'value' => $value
 			];
 		}
@@ -430,7 +445,7 @@ class Api1Controller extends ApiController {
 		$array = json_decode($data, true);
 		foreach ($array as $key => $value) {
 			$dataNew[] = [
-				'columnId' => intval($key),
+				'columnId' => (int) $key,
 				'value' => $value
 			];
 		}

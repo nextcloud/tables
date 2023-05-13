@@ -225,7 +225,7 @@ class RowService extends SuperService {
 	}
 
 	private function replaceOrAddData(array $dataArray, array $newDataObject): array {
-		$columnId = intval($newDataObject['columnId']);
+		$columnId = (int) $newDataObject['columnId'];
 		$value = $newDataObject['value'];
 
 		$columnFound = false;

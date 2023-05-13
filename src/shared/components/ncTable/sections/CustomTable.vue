@@ -8,6 +8,7 @@
 					:table="table"
 					:view="view"
 					@create-row="$emit('create-row')"
+					@import="table => $emit('import', table)"
 					@create-column="$emit('create-column')"
 					@edit-columns="$emit('edit-columns')"
 					@add-filter="filter => $emit('add-filter', filter)"

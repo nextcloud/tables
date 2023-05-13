@@ -11,6 +11,7 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
+use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
 class ColumnService extends SuperService {
@@ -18,16 +19,21 @@ class ColumnService extends SuperService {
 
 	private RowService $rowService;
 
+	private IL10N $l;
+
+
 	public function __construct(
 		PermissionsService $permissionsService,
 		LoggerInterface $logger,
 		?string $userId,
 		ColumnMapper $mapper,
-		RowService $rowService
+		RowService $rowService,
+		IL10N $l
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
 		$this->rowService = $rowService;
+		$this->l = $l;
 	}
 
 
@@ -105,7 +111,7 @@ class ColumnService extends SuperService {
 	 * @throws PermissionError
 	 */
 	public function create(
-		string $userId,
+		?string $userId,
 		int $tableId,
 		string $type,
 		?string $subtype,
@@ -324,5 +330,43 @@ class ColumnService extends SuperService {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
 		}
+	}
+
+	/**
+	 * @param array $titles example ['Test column 1', 'And so on', '3rd column title']
+	 * @throws PermissionError
+	 * @throws InternalError
+	 *
+	 * @return array with column object or null for given columns
+	 */
+	public function findOrCreateColumnsByTitleForTableAsArray(int $tableId, array $titles, ?string $userId, bool $createUnknownColumns, int &$countCreatedColumns): array {
+		$result = [];
+
+		if($userId === null) {
+			$userId = $this->userId;
+		}
+		$allColumns = $this->findAllByTable($tableId, $userId);
+		$i = -1;
+		foreach ($titles as $title) {
+			$i++;
+			foreach ($allColumns as $column) {
+				if($column->getTitle() === $title) {
+					$result[$i] = $column;
+					continue 2;
+				}
+				$result[$i] = '';
+			}
+			// if there are no columns at all
+			if(!isset($result[$i])) {
+				$result[$i] = '';
+			}
+			// if column was not found
+			if($result[$i] === '' && $createUnknownColumns) {
+				$description = $this->l->t('This column was automatically created by the import service.');
+				$result[$i] = $this->create($userId, $tableId, 'text', 'line', $title, false, $description, null, null, null, null, null, null, null, null, null, null, null, null, null);
+				$countCreatedColumns++;
+			}
+		}
+		return $result;
 	}
 }

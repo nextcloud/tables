@@ -757,6 +757,58 @@ paths:
                 '404':
                     description: Not found
 
+    /import/table/{tableId}:
+        post:
+            summary: Import from file
+            description: Shipped with v0.5.0. File has to be stored in nextcloud for given user.
+            tags:
+                - Import
+            operationId: importRows
+            security:
+                - basicAuth: []
+            parameters:
+                -   name: tableId
+                    in: path
+                    description: ID for the table
+                    required: true
+                    schema:
+                        type: integer
+                -   name: path
+                    in: query
+                    description: Path is relative to the root of the user context. Begin with a / for the root folder.
+                    required: true
+                    schema:
+                        type: string
+                -   name: createMissingColumns
+                    in: query
+                    description: Set to 1 if missing columns should be created. (Column type will be text-line.)
+                    required: false
+                    schema:
+                        type: boolean
+            responses:
+                '200':
+                    description: Statistic information
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    found columns:
+                                        type: integer
+                                    created columns:
+                                        type: integer
+                                    inserted rows:
+                                        type: integer
+                                    errors (see logs):
+                                        type: integer
+
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
+
 
 components:
     securitySchemes:

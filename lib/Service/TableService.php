@@ -230,14 +230,16 @@ class TableService extends SuperService {
 	 * @throws \OCP\DB\Exception
 	 * @throws InternalError|PermissionError
 	 */
-	public function create(string $title, string $template, string $emoji, ?string $userId = null): Table {
+	public function create(string $title, string $template, ?string $emoji, ?string $userId = null): Table {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
 
 		$time = new DateTime();
 		$item = new Table();
 		$item->setTitle($title);
-		$item->setEmoji($emoji);
+		if($emoji) {
+			$item->setEmoji($emoji);
+		}
 		$item->setOwnership($userId);
 		$item->setCreatedBy($userId);
 		$item->setLastEditBy($userId);
