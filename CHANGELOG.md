@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.5.0 - 2023-05-14
+### Updated
+- Fix bugs
+- Update translations
+- Update software dependencies
+- Accessibility improvements 
+
+### Added
+- 🔍 Search and filter in tables
+- ↕️ Sorting
+- ✨ New column type "rich text", using Nextclouds default text editor
+- ✨ New column type "multi selection" and "selection"
+- ⤵️ Import tables
+- 🛜 Serve some capabilities information
+
 ## 0.4.0
 
 ## 0.3.2 - 2023-03-15
