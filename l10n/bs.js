@@ -24,6 +24,7 @@ OC.L10N.register(
     "Sharing" : "Dijeljenje",
     "Update" : "Ažuriraj",
     "Error" : "Greška",
+    "Search" : "Search",
     "Default" : "Zadano",
     "Yes" : "Yes",
     "No" : "No"

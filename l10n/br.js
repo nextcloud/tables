@@ -25,6 +25,7 @@ OC.L10N.register(
     "Sharing" : "Rannan",
     "Update" : "Hizivaat",
     "Error" : "Fazi",
+    "Search" : "Klask",
     "Default" : "Dre ziouer",
     "Yes" : "Ya",
     "No" : "Nann",

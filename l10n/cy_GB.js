@@ -22,6 +22,7 @@ OC.L10N.register(
     "group" : "grŵp",
     "Update" : "Diweddaru",
     "Error" : "Gwall",
+    "Search" : "Chwilio",
     "Undo" : "Dadwneud",
     "Bold" : "Trwm",
     "Italic" : "Italig",
