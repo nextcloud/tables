@@ -690,7 +690,7 @@ class TableTemplateService {
 			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Read the docs'),
 			// TRANSLATORS This is an example account manager
-			$columns['how']->getId() => 'If you want to go throw the documentation, this can be found here: https://github.com/nextcloud/tables/wiki',
+			$columns['how']->getId() => 'If you want to go through the documentation, this can be found here: https://github.com/nextcloud/tables/wiki',
 			$columns['ease']->getId() => 3,
 			$columns['done']->getId() => 'false',
 		]);
