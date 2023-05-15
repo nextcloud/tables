@@ -19,6 +19,7 @@ OC.L10N.register(
     "Create" : "Ustvari",
     "Today" : "Danas",
     "Title" : "Naslov",
+    "Import" : "Uvezi",
     "Share" : "Podjeli",
     "group" : "grupa",
     "Sharing" : "Dijeljenje",

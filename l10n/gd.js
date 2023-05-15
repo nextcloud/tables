@@ -11,6 +11,8 @@ OC.L10N.register(
     "Delete" : "Sguab às",
     "Create" : "Cruthaich",
     "Today" : "An-diugh",
+    "File" : "Faidhle",
+    "Please select a file." : "Tagh faidhle.",
     "Share" : "Co-roinn",
     "Sharing" : "Co-roinneadh",
     "Error" : "Mearachd",

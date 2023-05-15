@@ -9,6 +9,8 @@ OC.L10N.register(
     "Cancel" : "Cancel",
     "Delete" : "Delete",
     "Today" : "Today",
+    "File" : "File",
+    "Please select a file." : "Iltimos, faylni tanlang.",
     "group" : "group",
     "Sharing" : "Ulashish",
     "Update" : "Update",

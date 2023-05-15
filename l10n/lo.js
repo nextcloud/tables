@@ -13,6 +13,8 @@ OC.L10N.register(
     "Delete" : "ລຶບ",
     "Create" : "ສ້າງ",
     "Today" : "ມື້ນີ້",
+    "File" : "ຟາຍ",
+    "Please select a file." : "ກະລຸນາເລືອກຟາຍ",
     "Share" : "ແບ່ງປັນ",
     "Shares" : "ການແບ່ງປັນ",
     "Sharing" : "ການແບ່ງປັນ",

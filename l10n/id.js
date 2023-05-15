@@ -23,6 +23,8 @@ OC.L10N.register(
     "Create" : "Buat",
     "Today" : "Hari ini",
     "Title" : "Judul",
+    "Import" : "Impor",
+    "Please select a file." : "Silakan pilih berkas",
     "Share" : "Bagikan",
     "Clear filter" : "Bersihkan filter",
     "Shares" : "Dibagikan",

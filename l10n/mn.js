@@ -21,6 +21,7 @@ OC.L10N.register(
     "Create" : "Үүсгэх",
     "Today" : "өнөөдөр",
     "Title" : "Цол/Албан тушаал",
+    "Please select a file." : "Файл сонгоно уу.",
     "Share" : "Түгээх",
     "Shares" : "Түгээлтүүд",
     "group" : "бүлэг",

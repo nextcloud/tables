@@ -19,6 +19,7 @@ OC.L10N.register(
     "Create" : "Yarat",
     "Today" : "Bu gün",
     "Title" : "Başlıq",
+    "Import" : "Əlavə et",
     "Share" : "Paylaş",
     "Shares" : "Yayımlanmalar",
     "group" : "qrup",

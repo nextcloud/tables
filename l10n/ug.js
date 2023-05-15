@@ -15,6 +15,7 @@ OC.L10N.register(
     "Create" : "قۇر",
     "Today" : "بۈگۈن",
     "Title" : "ماۋزۇ",
+    "Import" : "ئەكىر",
     "Share" : "ھەمبەھىر",
     "group" : "گۇرۇپپا",
     "Sharing" : "ھەمبەھىر",

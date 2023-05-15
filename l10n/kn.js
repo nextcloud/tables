@@ -13,6 +13,7 @@ OC.L10N.register(
     "Create" : "ಸೃಷ್ಟಿಸಿ",
     "Today" : "Today",
     "Title" : "ಶೀರ್ಷಿಕೆ",
+    "Import" : "ಆಮದು",
     "Share" : "﻿ಹಂಚಿಕೊಳ್ಳಿ",
     "group" : "﻿ಗುಂಪು",
     "Sharing" : "﻿ಹಂಚಿಕೆ",

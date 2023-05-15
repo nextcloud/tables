@@ -16,6 +16,8 @@ OC.L10N.register(
     "Create" : "உருவாக்குக",
     "Today" : "இன்று",
     "Title" : "தலைப்பு",
+    "Import" : "இறக்குமதி",
+    "File" : "File",
     "Share" : "பகிர்வு",
     "group" : "குழு",
     "Update" : "இற்றைப்படுத்தல்",

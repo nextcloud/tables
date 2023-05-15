@@ -15,6 +15,8 @@ OC.L10N.register(
     "Create" : "Snulfu-d",
     "Today" : "Ass-a",
     "Title" : "Azwel",
+    "File" : "Afaylu",
+    "Please select a file." : "Ttxil fren afaylu.",
     "Share" : "Bḍu",
     "Sharing" : "Beṭṭu",
     "Error" : "Erreur",

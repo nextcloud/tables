@@ -18,6 +18,7 @@ OC.L10N.register(
     "Create" : "Creu",
     "Today" : "Heddiw",
     "Title" : "Teitl",
+    "Import" : "Mewnforio",
     "Share" : "Rhannu",
     "group" : "grŵp",
     "Update" : "Diweddaru",

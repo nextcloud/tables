@@ -15,6 +15,8 @@ OC.L10N.register(
     "Edit" : "සංස්කරණය",
     "Create" : "සාදන්න",
     "Today" : "අද",
+    "File" : "ගොනුව",
+    "Please select a file." : "කරුණාකර ගොනුවක් තෝරන්න.",
     "Share" : "බෙදාගන්න",
     "Shares" : "බෙදාගැනීම්",
     "Read" : "කියවීම",

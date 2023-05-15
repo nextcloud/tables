@@ -19,6 +19,8 @@ OC.L10N.register(
     "Create" : "তৈরী কর",
     "Today" : "আজ",
     "Title" : "শিরোনাম",
+    "Import" : "আমদানি",
+    "Please select a file." : "একটি ফাইল নির্বাচন করুন",
     "Share" : "ভাগাভাগি কর",
     "Shares" : "ভাগাভাগি",
     "group" : "দল",

@@ -11,6 +11,7 @@ OC.L10N.register(
     "Delete" : "Pozmak",
     "Create" : "Dörediň",
     "Today" : "Şu gün",
+    "File" : "Faýl",
     "Share" : "Paýlaş",
     "Sharing" : "Paýlaşmak",
     "Error" : "ýalňyşlyk",

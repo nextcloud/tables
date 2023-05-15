@@ -19,6 +19,8 @@ OC.L10N.register(
     "Create" : "Erstellen",
     "Today" : "Haut",
     "Title" : "Titel",
+    "Import" : "Import",
+    "Please select a file." : "Wiel eng Datei aus.",
     "Share" : "Deelen",
     "group" : "Grupp",
     "Sharing" : "Gedeelt",

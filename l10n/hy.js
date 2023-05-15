@@ -17,6 +17,8 @@ OC.L10N.register(
     "Create" : "Ստեղծել",
     "Today" : "այսօր",
     "Title" : "Վերնագիր",
+    "Import" : "Ներմուծում",
+    "Please select a file." : "Խնդրում ենք ընտրել նիշք:",
     "Share" : "Կիսվել",
     "group" : "խումբ",
     "Update" : "Թարմացնել",

@@ -16,6 +16,7 @@ OC.L10N.register(
     "Create" : "Buat",
     "Today" : "Hari ini",
     "Title" : "Judul",
+    "Import" : "Import",
     "Share" : "Kongsi",
     "Shares" : "Kongsi",
     "group" : "kumpulan",

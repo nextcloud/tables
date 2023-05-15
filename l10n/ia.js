@@ -22,6 +22,7 @@ OC.L10N.register(
     "Create" : "Crear",
     "Today" : "Hodie",
     "Title" : "Titulo",
+    "Please select a file." : "Per favor selectiona un file.",
     "Share" : "Compartir",
     "Shares" : "Compartimentos",
     "group" : "gruppo",

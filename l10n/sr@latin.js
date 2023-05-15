@@ -15,6 +15,7 @@ OC.L10N.register(
     "Create" : "Napravi",
     "Today" : "Danas",
     "Title" : "Naslov",
+    "File" : "Fajl",
     "Share" : "Podeli",
     "group" : "grupa",
     "Sharing" : "Deljenje",
