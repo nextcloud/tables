@@ -28,6 +28,11 @@ jobs:
         php-versions: [ '7.4', '8.1' ]
         databases: [ 'mysql' ]
         server-versions: [ 'stable25', 'stable26', 'master' ]
+        exclude:
+          - php-version: 7.4
+            server-versions: stable26
+          - php-version: 7.4
+            server-versions: master
 
     services:
       mysql:
