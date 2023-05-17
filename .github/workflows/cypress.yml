@@ -33,6 +33,8 @@ jobs:
             server-versions: stable26
           - php-versions: 7.4
             server-versions: master
+          - php-versions: 8.2
+            server-versions: stable25
 
     services:
       mysql:
