@@ -175,7 +175,7 @@ OC.L10N.register(
     "Updated table \"{emoji}{table}\"." : "Tabelle \"{emoji}{table}\" aktualisiert.",
     "Table \"{emoji}{table}\" removed." : "Tabelle \"{emoji}{table}\" entfernt.",
     "Import" : "Importieren",
-    "File" : "Benötigt keine Übersetzung. Hier wird nur die formelle Übersetzung verwendet (de_DE).",
+    "File" : "Datei",
     "Select a file" : "Wähle eine Datei",
     "Information" : "Informationen",
     "Result" : "Ergebnis",
