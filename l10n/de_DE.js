@@ -196,7 +196,7 @@ OC.L10N.register(
     "Errors" : "Fehler",
     "Error during importing. Please read the logs for more information." : "Fehler beim Importieren. Weitere Informationen finden Sie in den Protokollen.",
     "Importing..." : "Importiere…",
-    "Please wait while we try our best to import your data. This might take some time, depending on the server configuration." : "Bitte warten Sie, während das Beste gegeben wird, Ihre Daten zu importieren. Dies kann je nach Serverkonfiguration einige Zeit dauern.",
+    "Please wait while we try our best to import your data. This might take some time, depending on the server configuration." : "Bitte warten Sie, während versucht wird, Ihre Daten zu importieren. Dies kann je nach Serverkonfiguration einige Zeit dauern.",
     "Loading table data" : "Tabellendaten werden geladen",
     "Please select a file." : "Bitte wählen Sie eine Datei aus.",
     "Could not import, not authorized. Are you logged in?" : "Fehler beim Import, nicht autorisiert. Sind Sie angemeldet?",
