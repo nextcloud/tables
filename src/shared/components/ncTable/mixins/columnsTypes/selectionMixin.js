@@ -33,7 +33,7 @@ export default {
 			}
 		},
 		isSearchStringFoundForSelection(column, cell, searchString) {
-			if (cell.value !== null && (this.getLabelForSelection(cell.value, column))?.includes(searchString)) {
+			if (cell.value !== null && (this.getLabelForSelection(cell.value, column))?.toLowerCase().includes(searchString)) {
 				cell.searchStringFound = true
 				return true
 			}

@@ -5,7 +5,7 @@ export default {
 			return valueObject.value.replace(/(<([^>]+)>)/ig, '')
 		},
 		isSearchStringFoundForTextLong(column, cell, searchString) {
-			if (cell.value.includes(searchString)) {
+			if (cell.value.toLowerCase().includes(searchString)) {
 				cell.searchStringFound = true
 				return true
 			}

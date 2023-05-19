@@ -13,7 +13,7 @@ export default {
 			}
 		},
 		isSearchStringFoundForNumberProgress(column, cell, searchString) {
-			if (('' + cell.value).includes(searchString)) {
+			if (('' + cell.value).toLowerCase().includes(searchString)) {
 				cell.searchStringFound = true
 				return true
 			}

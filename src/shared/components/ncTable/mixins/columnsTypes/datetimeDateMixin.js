@@ -24,7 +24,7 @@ export default {
 		},
 		isSearchStringFoundForDatetimeDate(column, cell, searchString) {
 			const date = new Moment(cell.value, 'YYYY-MM-DD').format('ll')
-			if (date.includes(searchString)) {
+			if (date.toLowerCase().includes(searchString)) {
 				cell.searchStringFound = true
 				return true
 			}
