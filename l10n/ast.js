@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Members" : "Miembros",
     "Date" : "Data",
+    "Weight" : "Pesu",
     "Name" : "Nome",
     "Description" : "Descripción",
     "Position" : "Posición",
