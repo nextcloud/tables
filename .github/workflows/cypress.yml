@@ -25,9 +25,16 @@ jobs:
       matrix:
         node-version: [ 16 ]
         containers: [ 1 ]
-        php-versions: [ '8.1' ]
+        php-versions: [ '7.4', '8.1' ]
         databases: [ 'mysql' ]
-        server-versions: [ 'master' ]
+        server-versions: [ 'stable25', 'stable26', 'stable27', 'master' ]
+        exclude:
+          - php-versions: 7.4
+            server-versions: stable26
+          - php-versions: 7.4
+            server-versions: stable27
+          - php-versions: 7.4
+            server-versions: master
 
     services:
       mysql:
