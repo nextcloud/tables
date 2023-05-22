@@ -101,6 +101,7 @@ OC.L10N.register(
     "Mandatory" : "Obligatorisk",
     "Star rating" : "Stjärnbetyg",
     "Text-line" : "Textrad",
+    "Text long" : "Text lång",
     "Single select" : "Enkelval",
     "Multiselect" : "Flera val",
     "Multiple select" : "Flerval",
