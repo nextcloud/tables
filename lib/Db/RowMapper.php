@@ -80,7 +80,10 @@ class RowMapper extends QBMapper {
 		if (str_contains(strtolower(get_class($this->db->getDatabasePlatform())), 'postgres')) {
 			// due to errors using doctrine with json, I paste the columnId inline.
 			// columnId is a number, ensured by the parameter definition
-			$qb->where('data::jsonb @> \'[{"columnId": '.$columnId.'}]\'::jsonb');
+			$qb->where('data::jsonb @> \'[{"columnId": ' . $columnId . '}]\'::jsonb');
+		} elseif (str_contains(strtolower(get_class($this->db->getDatabasePlatform())), 'sqlite')) {
+			$qb->from($qb->createFunction('json_each(data)'));
+			$qb->where('json_extract(value, "$.columnId") = :columnId');
 		} else {
 			$qb->where('JSON_CONTAINS(JSON_VALUE(data, \'$.columnId\'), :columnId, \'$\') = 1');
 		}
