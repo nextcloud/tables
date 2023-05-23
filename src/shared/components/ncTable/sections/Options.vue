@@ -1,8 +1,8 @@
 <template>
 	<div class="options">
 		<div v-if="showOptions && canReadTable(table)" class="fix-col-4" style="justify-content: space-between;">
-			<div :class="{'add-padding-left': isSmallMobile }" class="actionButtonsLeft">
-				<NcButton v-if="!isSmallMobile && canCreateRowInTable(table)"
+			<div :class="{'add-padding-left': isSmallMobile && selectedRows.length === 0 }" class="actionButtonsLeft">
+				<NcButton v-if="!isSmallMobile && canCreateRowInTable(table) && selectedRows.length === 0"
 					:close-after-click="true"
 					type="tertiary"
 					@click="$emit('create-row')">
@@ -11,7 +11,7 @@
 						<Plus :size="25" />
 					</template>
 				</NcButton>
-				<NcButton v-if="isSmallMobile && canCreateRowInTable(table)"
+				<NcButton v-if="isSmallMobile && canCreateRowInTable(table) && selectedRows.length === 0"
 					:close-after-click="true"
 					type="tertiary"
 					@click="$emit('create-row')">
@@ -162,6 +162,9 @@ export default {
 .selected-rows-option {
 	justify-content: flex-end;
 	display: inline-flex;
+	white-space: nowrap;
+	overflow: hidden;
+	min-width: fit-content;
 }
 
 .add-padding-left {
@@ -183,6 +186,7 @@ export default {
 
 .searchAndFilter {
 	margin-left: calc(var(--default-grid-baseline) * 3);
+	width: auto;
 }
 
 </style>

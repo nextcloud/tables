@@ -60,7 +60,6 @@ export default {
 <style scoped>
 
 :deep(.input-field input) {
-	width: 30vw !important;
 	border-color: var(--color-primary-element);
 }
 
