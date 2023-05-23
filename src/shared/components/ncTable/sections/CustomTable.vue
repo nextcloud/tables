@@ -256,8 +256,9 @@ export default {
 		isSearchStringFound(column, cell, searchString) {
 			const methodName = 'isSearchStringFoundFor' + this.ucfirst(column.type) + this.ucfirst(column.subtype)
 			if (this[methodName] instanceof Function) {
-				return this[methodName](column, cell, searchString)
+				return this[methodName](column, cell, searchString.toLowerCase())
 			}
+
 			return false
 		},
 		deselectAllRows() {

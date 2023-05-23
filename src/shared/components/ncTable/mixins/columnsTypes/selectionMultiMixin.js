@@ -51,7 +51,7 @@ export default {
 		},
 
 		isSearchStringFoundForSelectionMulti(column, cell, searchString) {
-			if (cell.value !== null && (this.getValueStringForSelectionMulti(cell, column)).includes(searchString)) {
+			if (cell.value !== null && (this.getValueStringForSelectionMulti(cell, column)).toLowerCase().includes(searchString)) {
 				cell.searchStringFound = true
 				return true
 			}
