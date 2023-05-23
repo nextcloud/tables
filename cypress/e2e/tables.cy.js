@@ -1,13 +1,15 @@
-import { User } from '@nextcloud/cypress'
+let localUser
 
 describe('The Home Page', () => {
 
-	// before(function() {
-	// })
+	before(function() {
+		cy.createRandomUser().then(user => {
+			localUser = user
+		})
+	})
 
 	beforeEach(function() {
-		const user = new User('admin', 'admin')
-		cy.login(user)
+		cy.login(localUser)
 		cy.visit('apps/tables')
 	})
 
