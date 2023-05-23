@@ -51,16 +51,21 @@ export default new Vuex.Store({
 		async insertNewTable({ commit, state }, { data }) {
 			try {
 				const res = await axios.post(generateUrl('/apps/tables/table'), data)
-				if (res.status === 200) {
-					const tables = state.tables
-					tables.push(res.data)
-					commit('setTables', tables)
-					return res.data.id
-				} else {
-					console.debug('axios error', res)
-					return false
-				}
+				const tables = state.tables
+				tables.push(res.data)
+				commit('setTables', tables)
+				return res.data.id
 			} catch (e) {
+				const res = e.response
+				if (res.status === 401) {
+					showError(t('tables', 'Could not insert table, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					showError(t('tables', 'Could not insert table, no permissions.'))
+				} else if (res.status === 404) {
+					showError(t('tables', 'Could not insert table, resource not found.'))
+				} else {
+					showError(t('tables', 'Could not insert table, unknown error.'))
+				}
 				console.error(e)
 				return false
 			}
@@ -69,13 +74,18 @@ export default new Vuex.Store({
 			commit('setTablesLoading', true)
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/table'))
-				if (res.status === 200) {
-					commit('setTables', res.data)
-				} else {
-					console.debug('axios error', res)
-					return false
-				}
+				commit('setTables', res.data)
 			} catch (e) {
+				const res = e.response
+				if (res.status === 401) {
+					showError(t('tables', 'Could not load tables, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					showError(t('tables', 'Could not load tables, no permissions.'))
+				} else if (res.status === 404) {
+					showError(t('tables', 'Could not load tables, resource not found.'))
+				} else {
+					showError(t('tables', 'Could not load tables, unknown error.'))
+				}
 				console.error(e)
 				showError(t('tables', 'Could not fetch tables'))
 			}
@@ -85,17 +95,22 @@ export default new Vuex.Store({
 		async updateTable({ state, commit, dispatch }, { id, data }) {
 			try {
 				const res = await axios.put(generateUrl('/apps/tables/table/' + id), data)
-				if (res.status === 200) {
-					const table = res.data
-					const tables = state.tables
-					const index = tables.findIndex(t => t.id === table.id)
-					tables[index] = table
-					commit('setTables', [...tables])
-				} else {
-					console.debug('axios error', res)
-					return false
-				}
+				const table = res.data
+				const tables = state.tables
+				const index = tables.findIndex(t => t.id === table.id)
+				tables[index] = table
+				commit('setTables', [...tables])
 			} catch (e) {
+				const res = e.response
+				if (res.status === 401) {
+					showError(t('tables', 'Could not update table, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					showError(t('tables', 'Could not update table, no permissions.'))
+				} else if (res.status === 404) {
+					showError(t('tables', 'Could not update table, resource not found.'))
+				} else {
+					showError(t('tables', 'Could not update table, unknown error.'))
+				}
 				console.error(e)
 				return false
 			}
@@ -103,17 +118,22 @@ export default new Vuex.Store({
 		},
 		async removeTable({ state, commit }, { tableId }) {
 			try {
-				const res = await axios.delete(generateUrl('/apps/tables/table/' + tableId))
-				if (res.status === 200) {
-					const tables = state.tables
-					const index = tables.findIndex(t => t.id === tableId)
-					tables.splice(index, 1)
-					commit('setTables', [...tables])
-				} else {
-					console.debug('axios error', res)
-					return false
-				}
+				await axios.delete(generateUrl('/apps/tables/table/' + tableId))
+				const tables = state.tables
+				const index = tables.findIndex(t => t.id === tableId)
+				tables.splice(index, 1)
+				commit('setTables', [...tables])
 			} catch (e) {
+				const res = e.response
+				if (res.status === 401) {
+					showError(t('tables', 'Could not remove table, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					showError(t('tables', 'Could not remove table, no permissions.'))
+				} else if (res.status === 404) {
+					showError(t('tables', 'Could not remove table, resource not found.'))
+				} else {
+					showError(t('tables', 'Could not remove table, unknown error.'))
+				}
 				console.error(e)
 				return false
 			}

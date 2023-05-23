@@ -1,5 +1,6 @@
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
+import { showError } from '@nextcloud/dialogs'
 
 export default {
 	state: {
@@ -99,10 +100,20 @@ export default {
 					})
 					commit('setColumns', columns)
 				} else {
-					console.debug('axios error', res)
+					console.debug('data error: format not valid', res)
 					return false
 				}
 			} catch (e) {
+				const res = e.response
+				if (res.status === 401) {
+					showError(t('tables', 'Could not load columns, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					showError(t('tables', 'Could not load columns, no permissions.'))
+				} else if (res.status === 404) {
+					showError(t('tables', 'Could not load columns, resource not found.'))
+				} else {
+					showError(t('tables', 'Could not load columns, unknown error.'))
+				}
 				console.error(e)
 				return false
 			}
@@ -113,15 +124,20 @@ export default {
 			commit('setLoading', true)
 			try {
 				const res = await axios.post(generateUrl('/apps/tables/column'), data)
-				if (res.status === 200) {
-					const columns = state.columns
-					columns.push(res.data)
-					commit('setColumns', columns)
-				} else {
-					console.debug('axios error', res)
-					return false
-				}
+				const columns = state.columns
+				columns.push(res.data)
+				commit('setColumns', columns)
 			} catch (e) {
+				const res = e.response
+				if (res.status === 401) {
+					showError(t('tables', 'Could not insert column, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					showError(t('tables', 'Could not insert column, no permissions.'))
+				} else if (res.status === 404) {
+					showError(t('tables', 'Could not insert column, resource not found.'))
+				} else {
+					showError(t('tables', 'Could not insert column, unknown error.'))
+				}
 				console.error(e)
 				return false
 			}
@@ -132,17 +148,22 @@ export default {
 			data.selectionOptions = JSON.stringify(data.selectionOptions)
 			try {
 				const res = await axios.put(generateUrl('/apps/tables/column/' + id), data)
-				if (res.status === 200) {
-					const col = res.data
-					const columns = state.columns
-					const index = columns.findIndex(c => c.id === col.id)
-					columns[index] = col
-					commit('setColumns', [...columns])
-				} else {
-					console.debug('axios error', res)
-					return false
-				}
+				const col = res.data
+				const columns = state.columns
+				const index = columns.findIndex(c => c.id === col.id)
+				columns[index] = col
+				commit('setColumns', [...columns])
 			} catch (e) {
+				const res = e.response
+				if (res.status === 401) {
+					showError(t('tables', 'Could not update column, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					showError(t('tables', 'Could not update column, no permissions.'))
+				} else if (res.status === 404) {
+					showError(t('tables', 'Could not update column, resource not found.'))
+				} else {
+					showError(t('tables', 'Could not update column, unknown error.'))
+				}
 				console.error(e)
 				return false
 			}
@@ -150,17 +171,22 @@ export default {
 		},
 		async removeColumn({ state, commit }, { id }) {
 			try {
-				const res = await axios.delete(generateUrl('/apps/tables/column/' + id))
-				if (res.status === 200) {
-					const columns = state.columns
-					const index = columns.findIndex(c => c.id === id)
-					columns.splice(index, 1)
-					commit('setColumns', [...columns])
-				} else {
-					console.debug('axios error', res)
-					return false
-				}
+				await axios.delete(generateUrl('/apps/tables/column/' + id))
+				const columns = state.columns
+				const index = columns.findIndex(c => c.id === id)
+				columns.splice(index, 1)
+				commit('setColumns', [...columns])
 			} catch (e) {
+				const res = e.response
+				if (res.status === 401) {
+					showError(t('tables', 'Could not remove column, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					showError(t('tables', 'Could not remove column, no permissions.'))
+				} else if (res.status === 404) {
+					showError(t('tables', 'Could not remove column, resource not found.'))
+				} else {
+					showError(t('tables', 'Could not remove column, unknown error.'))
+				}
 				console.error(e)
 				return false
 			}
@@ -172,13 +198,18 @@ export default {
 			commit('setLoading', true)
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/row/' + tableId))
-				if (res.status === 200 && res.data) {
-					commit('setRows', res.data)
-				} else {
-					console.debug('axios error', res)
-					return false
-				}
+				commit('setRows', res.data)
 			} catch (e) {
+				const res = e.response
+				if (res.status === 401) {
+					showError(t('tables', 'Could not load rows, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					showError(t('tables', 'Could not load rows, no permissions.'))
+				} else if (res.status === 404) {
+					showError(t('tables', 'Could not load rows, resource not found.'))
+				} else {
+					showError(t('tables', 'Could not load rows, unknown error.'))
+				}
 				console.error(e)
 				return false
 			}
@@ -188,11 +219,6 @@ export default {
 		async updateRow({ state, commit, dispatch }, { id, data }) {
 			try {
 				const res = await axios.put(generateUrl('/apps/tables/row/' + id), { data })
-				if (res.status !== 200) {
-					console.debug('axios error', res)
-					return false
-				}
-
 				const row = res.data
 				const rows = state.rows
 				const index = rows.findIndex(r => r.id === row.id)
@@ -200,6 +226,16 @@ export default {
 				commit('setRows', [...rows])
 				return true
 			} catch (e) {
+				const res = e.response
+				if (res.status === 401) {
+					showError(t('tables', 'Could not update row, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					showError(t('tables', 'Could not update row, no permissions.'))
+				} else if (res.status === 404) {
+					showError(t('tables', 'Could not update row, resource not found.'))
+				} else {
+					showError(t('tables', 'Could not update row, unknown error.'))
+				}
 				console.error(e)
 				return false
 			}
@@ -207,17 +243,22 @@ export default {
 		async insertNewRow({ state, commit, dispatch }, { tableId, data }) {
 			try {
 				const res = await axios.post(generateUrl('/apps/tables/row'), { tableId, data })
-				if (res.status === 200) {
-					const row = res.data
-					const rows = state.rows
-					rows.push(row)
-					commit('setRows', [...rows])
-					dispatch('increaseRowsCountForTable', { tableId })
-				} else {
-					console.debug('axios error', res)
-					return false
-				}
+				const row = res.data
+				const rows = state.rows
+				rows.push(row)
+				commit('setRows', [...rows])
+				dispatch('increaseRowsCountForTable', { tableId })
 			} catch (e) {
+				const res = e.response
+				if (res.status === 401) {
+					showError(t('tables', 'Could not insert row, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					showError(t('tables', 'Could not insert row, no permissions.'))
+				} else if (res.status === 404) {
+					showError(t('tables', 'Could not insert row, resource not found.'))
+				} else {
+					showError(t('tables', 'Could not insert row, unknown error.'))
+				}
 				console.error(e)
 				return false
 			}
@@ -226,17 +267,22 @@ export default {
 		async removeRow({ state, commit, dispatch }, { rowId }) {
 			try {
 				const res = await axios.delete(generateUrl('/apps/tables/row/' + rowId))
-				if (res.status === 200) {
-					const rows = state.rows
-					const index = rows.findIndex(r => r.id === rowId)
-					rows.splice(index, 1)
-					commit('setRows', [...rows])
-					dispatch('decreaseRowsCountForTable', { tableId: res.data.tableId })
-				} else {
-					console.debug('axios error', res)
-					return false
-				}
+				const rows = state.rows
+				const index = rows.findIndex(r => r.id === rowId)
+				rows.splice(index, 1)
+				commit('setRows', [...rows])
+				dispatch('decreaseRowsCountForTable', { tableId: res.data.tableId })
 			} catch (e) {
+				const res = e.response
+				if (res.status === 401) {
+					showError(t('tables', 'Could not remove row, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					showError(t('tables', 'Could not remove row, no permissions.'))
+				} else if (res.status === 404) {
+					showError(t('tables', 'Could not remove row, resource not found.'))
+				} else {
+					showError(t('tables', 'Could not remove row, unknown error.'))
+				}
 				console.error(e)
 				return false
 			}

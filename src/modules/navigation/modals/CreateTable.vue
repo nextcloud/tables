@@ -58,7 +58,7 @@
 
 <script>
 import { NcModal, NcEmojiPicker, NcButton } from '@nextcloud/vue'
-import { showError, showWarning } from '@nextcloud/dialogs'
+import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
@@ -178,14 +178,19 @@ export default {
 		async loadTemplatesFromBE() {
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/table/templates'))
-				if (res.status !== 200) {
-					showWarning(t('tables', 'Sorry, something went wrong.'))
-					console.debug('axios error', res)
-				}
 				this.templates = res.data
 			} catch (e) {
+				const res = e.response
+				if (res.status === 401) {
+					showError(t('tables', 'Could not load templates, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					showError(t('tables', 'Could not load templates, no permissions.'))
+				} else if (res.status === 404) {
+					showError(t('tables', 'Could not load templates, resource not found.'))
+				} else {
+					showError(t('tables', 'Could not load templates, unknown error.'))
+				}
 				console.error(e)
-				showError(t('tables', 'Could not fetch templates from backend'))
 			}
 		},
 	},

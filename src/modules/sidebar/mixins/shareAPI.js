@@ -1,6 +1,6 @@
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
-import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
+import { showError, showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 
 export default {
@@ -8,15 +8,19 @@ export default {
 		async getSharedWithFromBE() {
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/share/table/' + this.activeTable.id))
-				if (res.status !== 200) {
-					showWarning(t('tables', 'Sorry, something went wrong.'))
-					console.debug('axios error', res)
-				}
-				// this.sharedWith = res.data.sort((a, b) => { return a.userReceiver.localeCompare(b.userReceiver) })
 				return res.data
 			} catch (e) {
+				const res = e.response
+				if (res.status === 401) {
+					showError(t('tables', 'Could not fetch shares, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					showError(t('tables', 'Could not fetch shares, no permissions.'))
+				} else if (res.status === 404) {
+					showError(t('tables', 'Could not fetch shares, resource not found.'))
+				} else {
+					showError(t('tables', 'Could not fetch shares, unknown error.'))
+				}
 				console.error(e)
-				showError(t('tables', 'Could not load shares from back end'))
 			}
 		},
 
@@ -33,50 +37,57 @@ export default {
 					permissionDelete: false,
 					permissionManage: false,
 				}
-				// console.debug('data array', data)
 				const res = await axios.post(generateUrl('/apps/tables/share'), data)
-				if (res.status === 200) {
-					await this.$store.dispatch('setTableHasShares', { tableId: res.data.nodeId, hasSHares: true })
-				} else {
-					showWarning(t('tables', 'Sorry, something went wrong.'))
-					console.debug('axios error', res)
-					return false
-				}
-				// console.debug('new share was saved', res)
+				await this.$store.dispatch('setTableHasShares', { tableId: res.data.nodeId, hasSHares: true })
 				showSuccess(t('tables', 'Saved new share with "{userName}".', { userName: res.data.receiverDisplayName }))
 			} catch (e) {
+				const res = e.response
+				if (res.status === 401) {
+					showError(t('tables', 'Could not create share, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					showError(t('tables', 'Could not create share, no permissions.'))
+				} else if (res.status === 404) {
+					showError(t('tables', 'Could not create share, resource not found.'))
+				} else {
+					showError(t('tables', 'Could not create share, unknown error.'))
+				}
 				console.error(e)
-				showError(t('tables', 'Could not create new share'))
 			}
 		},
 		async removeShareFromBE(shareId) {
 			try {
-				const res = await axios.delete(generateUrl('/apps/tables/share/' + shareId))
-				if (res.status !== 200) {
-					showWarning(t('tables', 'Sorry, something went wrong.'))
-					console.debug('axios error', res)
-					return false
-				}
-				// console.debug('Share was deleted', res)
+				await axios.delete(generateUrl('/apps/tables/share/' + shareId))
 				showSuccess(t('tables', 'Share was deleted'))
 			} catch (e) {
+				const res = e.response
+				if (res.status === 401) {
+					showError(t('tables', 'Could not remove share, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					showError(t('tables', 'Could not remove share, no permissions.'))
+				} else if (res.status === 404) {
+					showError(t('tables', 'Could not remove share, resource not found.'))
+				} else {
+					showError(t('tables', 'Could not remove share, unknown error.'))
+				}
 				console.error(e)
-				showError(t('tables', 'Could not delete share'))
 			}
 		},
 		async updateShareToBE(shareId, data) {
 			try {
-				const res = await axios.put(generateUrl('/apps/tables/share/' + shareId + '/permission'), data)
-				if (res.status !== 200) {
-					showWarning(t('tables', 'Sorry, something went wrong.'))
-					console.debug('axios error', res)
-					return false
-				}
-				// console.debug('Share was deleted', res)
+				await axios.put(generateUrl('/apps/tables/share/' + shareId + '/permission'), data)
 				showSuccess(t('tables', 'Share permission was updated'))
 			} catch (e) {
+				const res = e.response
+				if (res.status === 401) {
+					showError(t('tables', 'Could not update share, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					showError(t('tables', 'Could not update share, no permissions.'))
+				} else if (res.status === 404) {
+					showError(t('tables', 'Could not update share, resource not found.'))
+				} else {
+					showError(t('tables', 'Could not update share, unknown error.'))
+				}
 				console.error(e)
-				showError(t('tables', 'Could not update share permission'))
 			}
 		},
 	},
