@@ -39,10 +39,12 @@ use Psr\Log\LoggerInterface;
 class Capabilities implements ICapability {
 	private IAppManager $appManager;
 	private LoggerInterface $logger;
+	private IConfig $config;
 
-	public function __construct(IAppManager $appManager, LoggerInterface $logger) {
+	public function __construct(IAppManager $appManager, LoggerInterface $logger, IConfig $config) {
 		$this->appManager = $appManager;
 		$this->logger = $logger;
+		$this->config = $config;
 	}
 
 	/**
@@ -50,10 +52,8 @@ class Capabilities implements ICapability {
 	 */
 	public function getCapabilities(): array {
 		$textColumnVariant = 'text-rich';
-		/** @var IConfig $config */
 		try {
-			$config = Server::get(IConfig::class);
-			if (version_compare($config->getSystemValueString('version', '0.0.0'), '26.0.0', '<')) {
+			if (version_compare($this->config->getSystemValueString('version', '0.0.0'), '26.0.0', '<')) {
 				$textColumnVariant = 'text-long';
 			}
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
