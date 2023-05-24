@@ -1,8 +1,9 @@
 <template>
 	<div class="options">
 		<div v-if="showOptions && canReadTable(table)" class="fix-col-4" style="justify-content: space-between;">
-			<div :class="{'add-padding-left': isSmallMobile && selectedRows.length === 0 }" class="actionButtonsLeft">
-				<NcButton v-if="!isSmallMobile && canCreateRowInTable(table) && selectedRows.length === 0"
+			<div :class="{'add-padding-left': isSmallMobile }"
+				class="actionButtonsLeft">
+				<NcButton v-if="!isSmallMobile && canCreateRowInTable(table)"
 					:close-after-click="true"
 					type="tertiary"
 					@click="$emit('create-row')">
@@ -11,7 +12,7 @@
 						<Plus :size="25" />
 					</template>
 				</NcButton>
-				<NcButton v-if="isSmallMobile && canCreateRowInTable(table) && selectedRows.length === 0"
+				<NcButton v-if="isSmallMobile && canCreateRowInTable(table)"
 					:close-after-click="true"
 					type="tertiary"
 					@click="$emit('create-row')">
@@ -32,25 +33,37 @@
 				<div style="padding: 10px; color: var(--color-text-maxcontrast);">
 					{{ n('tables', '%n selected row', '%n selected rows', selectedRows.length, {}) }}
 				</div>
-      &nbsp;&nbsp;
-				<NcButton v-if="!isSmallMobile"
-					icon="icon-download"
-					:title="t('tables', 'Export as CSV')"
+				<NcActions type="secondary">
+					<NcActionButton icon="icon-download"
+						@click="exportCsv">
+						<template #icon>
+							<Export :size="20" />
+						</template>
+						{{ t('tables', 'Export CSV') }}
+					</NcActionButton>
+					<NcActionButton v-if="canDeleteData(table)" icon="icon-delete"
+						@click="deleteSelectedRows">
+						{{ t('tables', 'Delete') }}
+						<template #icon>
+							<Delete :size="20" />
+						</template>
+					</NcActionButton>
+					<NcActionButton icon="icon-checkmark" @click="deselectAllRows">
+						{{ t('tables', 'Uncheck all') }}
+						<template #icon>
+							<Check :size="20" />
+						</template>
+					</NcActionButton>
+				</NcActions>
+				<!-- <NcButton v-if="!isSmallMobile"
+					icon="icon-download" :title="t('tables', 'Export as CSV')"
 					@click="exportCsv">
 					<template #icon>
 						<Export :size="20" />
 					</template>
 					{{ t('tables', 'Export CSV') }}
 				</NcButton>
-				<NcButton v-if="isSmallMobile"
-					icon="icon-download"
-					:title="t('tables', 'Export as CSV')"
-					@click="exportCsv">
-					<template #icon>
-						<Export :size="20" />
-					</template>
-				</NcButton>
-      &nbsp;&nbsp;
+				&nbsp;&nbsp;
 				<NcButton v-if="!isSmallMobile && canDeleteData(table)"
 					icon="icon-delete"
 					:title="t('tables', 'Delete')"
@@ -59,23 +72,17 @@
 					<template #icon>
 						<Delete :size="20" />
 					</template>
-				</NcButton>
-				<NcButton v-if="isSmallMobile && canDeleteData(table)"
-					icon="icon-delete"
-					:title="t('tables', 'Delete')"
-					@click="deleteSelectedRows">
-					<template #icon>
-						<Delete :size="20" />
-					</template>
-				</NcButton>
+				</NcButton> -->
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-import { NcButton } from '@nextcloud/vue'
+import { NcButton, NcActions, NcActionButton } from '@nextcloud/vue'
+import { emit } from '@nextcloud/event-bus'
 import Plus from 'vue-material-design-icons/Plus.vue'
+import Check from 'vue-material-design-icons/Check.vue'
 import Delete from 'vue-material-design-icons/Delete.vue'
 import Export from 'vue-material-design-icons/Export.vue'
 import viewportHelper from '../../../mixins/viewportHelper.js'
@@ -86,9 +93,12 @@ export default {
 	name: 'Options',
 
 	components: {
+		NcActions,
+		NcActionButton,
 		SearchForm,
 		NcButton,
 		Plus,
+		Check,
 		Delete,
 		Export,
 	},
@@ -113,13 +123,13 @@ export default {
 			default: () => {},
 		},
 		columns: {
-		      type: Array,
-		      default: null,
-		    },
+			type: Array,
+			default: null,
+		},
 		view: {
-		      type: Object,
-		      default: null,
-		    },
+			type: Object,
+			default: null,
+		},
 	},
 
 	computed: {
@@ -145,6 +155,9 @@ export default {
 		},
 		deleteSelectedRows() {
 			this.$emit('delete-selected-rows', this.selectedRows)
+		},
+		deselectAllRows() {
+			emit('tables:selected-rows:deselect', {})
 		},
 	},
 }
@@ -187,6 +200,7 @@ export default {
 .searchAndFilter {
 	margin-left: calc(var(--default-grid-baseline) * 3);
 	width: auto;
+	min-width: 100px;
 }
 
 </style>
