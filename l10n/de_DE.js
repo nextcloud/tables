@@ -104,6 +104,7 @@ OC.L10N.register(
     "Create column" : "Spalte erstellen",
     "Type" : "Typ",
     "Text line" : "Textzeile",
+    "Simple text" : "Einfacher Text",
     "Rich text" : "Rich-Text",
     "Single selection" : "Einzelauswahl",
     "Multiple selection" : "Mehrfachauswahl",

@@ -31,6 +31,7 @@ OC.L10N.register(
     "Done" : "完成",
     "Tables" : "表格",
     "Type" : "类型",
+    "Simple text" : "简述文本",
     "Rich text" : "富文本",
     "Yes/No" : "是 / 否",
     "Time" : "时间",

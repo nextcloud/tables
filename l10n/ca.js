@@ -94,6 +94,7 @@ OC.L10N.register(
     "Create column" : "Crea una columna",
     "Type" : "Tipus",
     "Text line" : "Línia de text",
+    "Simple text" : "Text simple",
     "Rich text" : "Text enriquit",
     "Yes/No" : "Sí/No",
     "Time" : "Hora",

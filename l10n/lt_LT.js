@@ -27,6 +27,7 @@ OC.L10N.register(
     "Done" : "Atlikta",
     "Tables" : "Lentelės",
     "Type" : "Tipas",
+    "Simple text" : "Paprastas tekstas",
     "Rich text" : "Raiškusis tekstas",
     "Yes/No" : "Taip/Ne",
     "Time" : "Laikas",

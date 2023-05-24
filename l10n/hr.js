@@ -21,6 +21,7 @@ OC.L10N.register(
     "Progress" : "Napredak",
     "Tables" : "Tablice",
     "Type" : "Vrsta",
+    "Simple text" : "Jednostavan tekst",
     "Rich text" : "Bogat tekst",
     "Time" : "Vrijeme",
     "Date and time" : "Datum i vrijeme",

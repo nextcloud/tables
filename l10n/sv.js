@@ -68,6 +68,7 @@ OC.L10N.register(
     "Create column" : "Skapa kolumn",
     "Type" : "Typ",
     "Text line" : "Textrad",
+    "Simple text" : "Enkel text",
     "Rich text" : "Formaterad text",
     "Single selection" : "Enstaka val",
     "Multiple selection" : "Flerval",

@@ -31,6 +31,7 @@ OC.L10N.register(
     "Tables" : "Tabeller",
     "Create column" : "Lag kolonne",
     "Type" : "Type",
+    "Simple text" : "Enkel tekst",
     "Rich text" : "Rik tekst",
     "Time" : "Tid",
     "Date and time" : "Dato og tid",

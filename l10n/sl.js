@@ -92,6 +92,7 @@ OC.L10N.register(
     "Create column" : "Dodaj stolpec",
     "Type" : "Vrsta",
     "Text line" : "Besedilna vrstica",
+    "Simple text" : "Enostavno besedilo",
     "Rich text" : "Obogateno besedilo",
     "Single selection" : "Enojni izbor",
     "Multiple selection" : "Izbira po meri",

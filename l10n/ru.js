@@ -28,6 +28,7 @@ OC.L10N.register(
     "Done" : "Выполненные",
     "Tables" : "Таблицы",
     "Type" : "Тип",
+    "Simple text" : "Простой текст",
     "Rich text" : "Текст с форматированием",
     "Time" : "Время",
     "Date and time" : "Дата и время",

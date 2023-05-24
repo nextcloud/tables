@@ -104,6 +104,7 @@ OC.L10N.register(
     "Create column" : "創建縱列",
     "Type" : "類型",
     "Text line" : "文字行",
+    "Simple text" : "簡單文字",
     "Rich text" : "RTF",
     "Single selection" : "單則選擇",
     "Multiple selection" : "多重選擇",

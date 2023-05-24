@@ -16,6 +16,7 @@ OC.L10N.register(
     "Done" : "Hoàn thành",
     "Tables" : "Bảng",
     "Type" : "Loại",
+    "Simple text" : "Văn bản đơn giản",
     "Time" : "Thời gian",
     "Save" : "Lưu",
     "Text" : "Văn bản",

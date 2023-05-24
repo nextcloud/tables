@@ -18,6 +18,7 @@ OC.L10N.register(
     "Progress" : "Progresso",
     "Done" : "Concluído",
     "Type" : "Tipo",
+    "Simple text" : "Texto simples",
     "Time" : "Tempo",
     "Save" : "Guardar",
     "Text" : "Texto",

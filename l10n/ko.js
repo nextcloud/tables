@@ -20,6 +20,7 @@ OC.L10N.register(
     "Progress" : "진행 상황",
     "Tables" : "표",
     "Type" : "종류",
+    "Simple text" : "간단한 텍스트",
     "Rich text" : "서식 있는 텍스트",
     "Time" : "시간",
     "Save" : "저장",

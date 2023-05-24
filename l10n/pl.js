@@ -40,6 +40,7 @@ OC.L10N.register(
     "Create column" : "Utwórz kolumnę",
     "Type" : "Rodzaj",
     "Text line" : "Linia tekstu",
+    "Simple text" : "Prosty tekst",
     "Rich text" : "Tekst sformatowany",
     "Yes/No" : "Tak/Nie",
     "Time" : "Godzina",

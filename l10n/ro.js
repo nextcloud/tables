@@ -15,6 +15,7 @@ OC.L10N.register(
     "Done" : "Realizat",
     "Tables" : "Tabele",
     "Type" : "Tip",
+    "Simple text" : "Text simplu",
     "Time" : "Timp",
     "Save" : "Salvează",
     "Text" : "Text",

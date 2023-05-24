@@ -7,6 +7,7 @@ OC.L10N.register(
     "Comment" : "Komentar",
     "Done" : "Gotovo",
     "Type" : "Tip",
+    "Simple text" : "Običan tekst",
     "Save" : "Sačuvaj",
     "Link" : "Veza",
     "Cancel" : "Otkaži",

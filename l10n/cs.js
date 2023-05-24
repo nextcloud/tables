@@ -103,6 +103,7 @@ OC.L10N.register(
     "Create column" : "Vytvořit sloupec",
     "Type" : "Typ",
     "Text line" : "Testový řádek",
+    "Simple text" : "Jen text",
     "Rich text" : "Formátovaný text",
     "Single selection" : "Jednotlivý výběr",
     "Multiple selection" : "Vícenásobný výběr",

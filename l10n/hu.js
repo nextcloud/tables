@@ -104,6 +104,7 @@ OC.L10N.register(
     "Create column" : "Oszlop létrehozása",
     "Type" : "Típus",
     "Text line" : "Szöveges sor",
+    "Simple text" : "Egyszerű szöveg",
     "Rich text" : "Formázott szöveg",
     "Single selection" : "Egyszerű kiválasztás",
     "Multiple selection" : "Többszörös kiválasztás",

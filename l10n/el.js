@@ -33,6 +33,7 @@ OC.L10N.register(
     "Tables" : "Πίνακες",
     "Create column" : "Δημιουργία στήλης",
     "Type" : "Τύπος",
+    "Simple text" : "Απλό κείμενο",
     "Rich text" : "Εμπλουτισμένο κείμενο",
     "Time" : "Ώρα",
     "Date and time" : "Ημερομηνία και ώρα",

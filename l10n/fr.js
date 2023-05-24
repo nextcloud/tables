@@ -102,6 +102,7 @@ OC.L10N.register(
     "Create column" : "Créer la colonne",
     "Type" : "Type",
     "Text line" : "Ligne de texte",
+    "Simple text" : "Texte simple",
     "Rich text" : "Texte riche",
     "Single selection" : "Sélection unique",
     "Multiple selection" : "Sélection multiple",

@@ -51,6 +51,7 @@ OC.L10N.register(
     "Create column" : "Luo sarake",
     "Type" : "Tyyppi",
     "Text line" : "Tekstirivi",
+    "Simple text" : "Yksinkertainen teksti",
     "Rich text" : "Rikas teksti",
     "Single selection" : "Yksittäisvalinta",
     "Multiple selection" : "Monivalinta",

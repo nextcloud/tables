@@ -19,6 +19,7 @@ OC.L10N.register(
     "Today" : "Güei",
     "Please select a file." : "Seleiciona un ficheru.",
     "Integration" : "Integración",
+    "Searching …" : "Buscando…",
     "Permissions" : "Permisos",
     "Sharing" : "Comparticiñon",
     "API" : "API",
