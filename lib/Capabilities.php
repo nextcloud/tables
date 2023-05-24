@@ -25,6 +25,11 @@ namespace OCA\Tables;
 
 use OCP\App\IAppManager;
 use OCP\Capabilities\ICapability;
+use OCP\IConfig;
+use OCP\Server;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class Capabilities
@@ -33,15 +38,28 @@ use OCP\Capabilities\ICapability;
  */
 class Capabilities implements ICapability {
 	private IAppManager $appManager;
+	private LoggerInterface $logger;
 
-	public function __construct(IAppManager $appManager) {
+	public function __construct(IAppManager $appManager, LoggerInterface $logger) {
 		$this->appManager = $appManager;
+		$this->logger = $logger;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function getCapabilities() {
+	public function getCapabilities(): array {
+		$textColumnVariant = 'text-rich';
+		/** @var IConfig $config */
+		try {
+			$config = Server::get(IConfig::class);
+			if (version_compare($config->getSystemValueString('version', '0.0.0'), '26.0.0', '<')) {
+				$textColumnVariant = 'text-long';
+			}
+		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+			$this->logger->error('Could not get IConfig class und thus not the version string. Will use default text-rich column type.');
+		}
+
 		return [
 			'tables' => [
 				'enabled' => $this->appManager->isEnabledForUser('tables'),
@@ -51,8 +69,7 @@ class Capabilities implements ICapability {
 				],
 				'column_types' => [
 					'text-line',
-					'text-long`',
-					'text-rich`',
+					$textColumnVariant,
 					'text-link',
 					'number',
 					'number-stars',
