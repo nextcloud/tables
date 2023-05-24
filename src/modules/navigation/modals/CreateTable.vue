@@ -63,6 +63,7 @@ import '@nextcloud/dialogs/dist/index.css'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import NcTile from '../../../shared/components/NcTile/NcTile.vue'
+import displayError from '../../../shared/utils/displayError.js'
 
 export default {
 	name: 'CreateTable',
@@ -180,17 +181,7 @@ export default {
 				const res = await axios.get(generateUrl('/apps/tables/table/templates'))
 				this.templates = res.data
 			} catch (e) {
-				const res = e.response
-				if (res.status === 401) {
-					showError(t('tables', 'Could not load templates, not authorized. Are you logged in?'))
-				} else if (res.status === 403) {
-					showError(t('tables', 'Could not load templates, no permissions.'))
-				} else if (res.status === 404) {
-					showError(t('tables', 'Could not load templates, resource not found.'))
-				} else {
-					showError(t('tables', 'Could not load templates, unknown error.'))
-				}
-				console.error(e)
+				displayError(e, t('tables', 'Could not load templates.'))
 			}
 		},
 	},

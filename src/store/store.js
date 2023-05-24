@@ -1,11 +1,11 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-// import Vuex, { Store } from 'vuex'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import data from './data.js'
+import displayError from '../shared/utils/displayError.js'
 
 Vue.use(Vuex)
 
@@ -56,17 +56,7 @@ export default new Vuex.Store({
 				commit('setTables', tables)
 				return res.data.id
 			} catch (e) {
-				const res = e.response
-				if (res.status === 401) {
-					showError(t('tables', 'Could not insert table, not authorized. Are you logged in?'))
-				} else if (res.status === 403) {
-					showError(t('tables', 'Could not insert table, no permissions.'))
-				} else if (res.status === 404) {
-					showError(t('tables', 'Could not insert table, resource not found.'))
-				} else {
-					showError(t('tables', 'Could not insert table, unknown error.'))
-				}
-				console.error(e)
+				displayError(e, t('tables', 'Could not insert table.'))
 				return false
 			}
 		},
@@ -76,17 +66,7 @@ export default new Vuex.Store({
 				const res = await axios.get(generateUrl('/apps/tables/table'))
 				commit('setTables', res.data)
 			} catch (e) {
-				const res = e.response
-				if (res.status === 401) {
-					showError(t('tables', 'Could not load tables, not authorized. Are you logged in?'))
-				} else if (res.status === 403) {
-					showError(t('tables', 'Could not load tables, no permissions.'))
-				} else if (res.status === 404) {
-					showError(t('tables', 'Could not load tables, resource not found.'))
-				} else {
-					showError(t('tables', 'Could not load tables, unknown error.'))
-				}
-				console.error(e)
+				displayError(e, t('tables', 'Could not load tables.'))
 				showError(t('tables', 'Could not fetch tables'))
 			}
 			commit('setTablesLoading', false)
@@ -101,17 +81,7 @@ export default new Vuex.Store({
 				tables[index] = table
 				commit('setTables', [...tables])
 			} catch (e) {
-				const res = e.response
-				if (res.status === 401) {
-					showError(t('tables', 'Could not update table, not authorized. Are you logged in?'))
-				} else if (res.status === 403) {
-					showError(t('tables', 'Could not update table, no permissions.'))
-				} else if (res.status === 404) {
-					showError(t('tables', 'Could not update table, resource not found.'))
-				} else {
-					showError(t('tables', 'Could not update table, unknown error.'))
-				}
-				console.error(e)
+				displayError(e, t('tables', 'Could not update table.'))
 				return false
 			}
 			return true
@@ -124,17 +94,7 @@ export default new Vuex.Store({
 				tables.splice(index, 1)
 				commit('setTables', [...tables])
 			} catch (e) {
-				const res = e.response
-				if (res.status === 401) {
-					showError(t('tables', 'Could not remove table, not authorized. Are you logged in?'))
-				} else if (res.status === 403) {
-					showError(t('tables', 'Could not remove table, no permissions.'))
-				} else if (res.status === 404) {
-					showError(t('tables', 'Could not remove table, resource not found.'))
-				} else {
-					showError(t('tables', 'Could not remove table, unknown error.'))
-				}
-				console.error(e)
+				displayError(e, t('tables', 'Could not remove table.'))
 				return false
 			}
 			return true

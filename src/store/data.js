@@ -1,6 +1,6 @@
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
-import { showError } from '@nextcloud/dialogs'
+import displayError from '../shared/utils/displayError.js'
 
 export default {
 	state: {
@@ -104,17 +104,7 @@ export default {
 					return false
 				}
 			} catch (e) {
-				const res = e.response
-				if (res.status === 401) {
-					showError(t('tables', 'Could not load columns, not authorized. Are you logged in?'))
-				} else if (res.status === 403) {
-					showError(t('tables', 'Could not load columns, no permissions.'))
-				} else if (res.status === 404) {
-					showError(t('tables', 'Could not load columns, resource not found.'))
-				} else {
-					showError(t('tables', 'Could not load columns, unknown error.'))
-				}
-				console.error(e)
+				displayError(e, t('tables', 'Could not load columns.'))
 				return false
 			}
 			commit('setLoading', false)
@@ -128,17 +118,7 @@ export default {
 				columns.push(res.data)
 				commit('setColumns', columns)
 			} catch (e) {
-				const res = e.response
-				if (res.status === 401) {
-					showError(t('tables', 'Could not insert column, not authorized. Are you logged in?'))
-				} else if (res.status === 403) {
-					showError(t('tables', 'Could not insert column, no permissions.'))
-				} else if (res.status === 404) {
-					showError(t('tables', 'Could not insert column, resource not found.'))
-				} else {
-					showError(t('tables', 'Could not insert column, unknown error.'))
-				}
-				console.error(e)
+				displayError(e, t('tables', 'Could not insert column.'))
 				return false
 			}
 			commit('setLoading', false)
@@ -154,17 +134,7 @@ export default {
 				columns[index] = col
 				commit('setColumns', [...columns])
 			} catch (e) {
-				const res = e.response
-				if (res.status === 401) {
-					showError(t('tables', 'Could not update column, not authorized. Are you logged in?'))
-				} else if (res.status === 403) {
-					showError(t('tables', 'Could not update column, no permissions.'))
-				} else if (res.status === 404) {
-					showError(t('tables', 'Could not update column, resource not found.'))
-				} else {
-					showError(t('tables', 'Could not update column, unknown error.'))
-				}
-				console.error(e)
+				displayError(e, t('tables', 'Could not update column.'))
 				return false
 			}
 			return true
@@ -177,17 +147,7 @@ export default {
 				columns.splice(index, 1)
 				commit('setColumns', [...columns])
 			} catch (e) {
-				const res = e.response
-				if (res.status === 401) {
-					showError(t('tables', 'Could not remove column, not authorized. Are you logged in?'))
-				} else if (res.status === 403) {
-					showError(t('tables', 'Could not remove column, no permissions.'))
-				} else if (res.status === 404) {
-					showError(t('tables', 'Could not remove column, resource not found.'))
-				} else {
-					showError(t('tables', 'Could not remove column, unknown error.'))
-				}
-				console.error(e)
+				displayError(e, t('tables', 'Could not remove column.'))
 				return false
 			}
 			return true
@@ -200,17 +160,7 @@ export default {
 				const res = await axios.get(generateUrl('/apps/tables/row/' + tableId))
 				commit('setRows', res.data)
 			} catch (e) {
-				const res = e.response
-				if (res.status === 401) {
-					showError(t('tables', 'Could not load rows, not authorized. Are you logged in?'))
-				} else if (res.status === 403) {
-					showError(t('tables', 'Could not load rows, no permissions.'))
-				} else if (res.status === 404) {
-					showError(t('tables', 'Could not load rows, resource not found.'))
-				} else {
-					showError(t('tables', 'Could not load rows, unknown error.'))
-				}
-				console.error(e)
+				displayError(e, t('tables', 'Could not load rows.'))
 				return false
 			}
 			commit('setLoading', false)
@@ -226,17 +176,7 @@ export default {
 				commit('setRows', [...rows])
 				return true
 			} catch (e) {
-				const res = e.response
-				if (res.status === 401) {
-					showError(t('tables', 'Could not update row, not authorized. Are you logged in?'))
-				} else if (res.status === 403) {
-					showError(t('tables', 'Could not update row, no permissions.'))
-				} else if (res.status === 404) {
-					showError(t('tables', 'Could not update row, resource not found.'))
-				} else {
-					showError(t('tables', 'Could not update row, unknown error.'))
-				}
-				console.error(e)
+				displayError(e, t('tables', 'Could not update row.'))
 				return false
 			}
 		},
@@ -249,17 +189,7 @@ export default {
 				commit('setRows', [...rows])
 				dispatch('increaseRowsCountForTable', { tableId })
 			} catch (e) {
-				const res = e.response
-				if (res.status === 401) {
-					showError(t('tables', 'Could not insert row, not authorized. Are you logged in?'))
-				} else if (res.status === 403) {
-					showError(t('tables', 'Could not insert row, no permissions.'))
-				} else if (res.status === 404) {
-					showError(t('tables', 'Could not insert row, resource not found.'))
-				} else {
-					showError(t('tables', 'Could not insert row, unknown error.'))
-				}
-				console.error(e)
+				displayError(e, t('tables', 'Could not insert row.'))
 				return false
 			}
 			return true
@@ -273,17 +203,7 @@ export default {
 				commit('setRows', [...rows])
 				dispatch('decreaseRowsCountForTable', { tableId: res.data.tableId })
 			} catch (e) {
-				const res = e.response
-				if (res.status === 401) {
-					showError(t('tables', 'Could not remove row, not authorized. Are you logged in?'))
-				} else if (res.status === 403) {
-					showError(t('tables', 'Could not remove row, no permissions.'))
-				} else if (res.status === 404) {
-					showError(t('tables', 'Could not remove row, resource not found.'))
-				} else {
-					showError(t('tables', 'Could not remove row, unknown error.'))
-				}
-				console.error(e)
+				displayError(e, t('tables', 'Could not remove row.'))
 				return false
 			}
 			return true
