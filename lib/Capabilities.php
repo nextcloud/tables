@@ -52,12 +52,8 @@ class Capabilities implements ICapability {
 	 */
 	public function getCapabilities(): array {
 		$textColumnVariant = 'text-rich';
-		try {
-			if (version_compare($this->config->getSystemValueString('version', '0.0.0'), '26.0.0', '<')) {
-				$textColumnVariant = 'text-long';
-			}
-		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
-			$this->logger->error('Could not get IConfig class und thus not the version string. Will use default text-rich column type.');
+		if (version_compare($this->config->getSystemValueString('version', '0.0.0'), '26.0.0', '<')) {
+			$textColumnVariant = 'text-long';
 		}
 
 		return [
