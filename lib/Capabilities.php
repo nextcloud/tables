@@ -25,6 +25,11 @@ namespace OCA\Tables;
 
 use OCP\App\IAppManager;
 use OCP\Capabilities\ICapability;
+use OCP\IConfig;
+use OCP\Server;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class Capabilities
@@ -33,15 +38,24 @@ use OCP\Capabilities\ICapability;
  */
 class Capabilities implements ICapability {
 	private IAppManager $appManager;
+	private LoggerInterface $logger;
+	private IConfig $config;
 
-	public function __construct(IAppManager $appManager) {
+	public function __construct(IAppManager $appManager, LoggerInterface $logger, IConfig $config) {
 		$this->appManager = $appManager;
+		$this->logger = $logger;
+		$this->config = $config;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function getCapabilities() {
+	public function getCapabilities(): array {
+		$textColumnVariant = 'text-rich';
+		if (version_compare($this->config->getSystemValueString('version', '0.0.0'), '26.0.0', '<')) {
+			$textColumnVariant = 'text-long';
+		}
+
 		return [
 			'tables' => [
 				'enabled' => $this->appManager->isEnabledForUser('tables'),
@@ -51,8 +65,7 @@ class Capabilities implements ICapability {
 				],
 				'column_types' => [
 					'text-line',
-					'text-long`',
-					'text-rich`',
+					$textColumnVariant,
 					'text-link',
 					'number',
 					'number-stars',
