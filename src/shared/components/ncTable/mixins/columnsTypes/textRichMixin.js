@@ -15,6 +15,11 @@ export default {
 				cell.filterFound = true
 				return true
 			}
+			console.debug('submit clicked', cell.value)
+			if (filter.operator === 'is-empty' && !cell.value) {
+				cell.filterFound = true
+				return true
+			}
 			return false
 		},
 

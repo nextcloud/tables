@@ -55,6 +55,10 @@ export default {
 				cell.filterFound = true
 				return true
 			}
+			if (filter.operator === 'is-empty' && !valueDate) {
+				cell.filterFound = true
+				return true
+			}
 			return false
 		},
 

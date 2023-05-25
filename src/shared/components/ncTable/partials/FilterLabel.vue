@@ -1,6 +1,6 @@
 <template>
 	<div class="filter" :class="[type]">
-		{{ operatorLabel }} "{{ getValue }}"
+		{{ labelText }}
 		<button @click="actionDelete">
 			<Close :size="14" />
 		</button>
@@ -19,7 +19,7 @@ export default {
 	mixins: [searchAndFilterMixin],
 
 	props: {
-		operatorLabel: {
+		operator: {
 		      type: String,
 		      default: '',
 		    },
@@ -44,6 +44,13 @@ export default {
 				value = value.replace('@' + field.id, field.label)
 			})
 			return value
+		},
+		labelText() {
+			if (this.operator === 'is-empty') {
+				return this.getOperatorLabel(this.operator)
+			} else {
+				return this.getOperatorLabel(this.operator) + ' "' + this.getValue + '"'
+			}
 		},
 	},
 
