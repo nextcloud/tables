@@ -33,7 +33,7 @@
 				<div style="padding: 10px; color: var(--color-text-maxcontrast);">
 					{{ n('tables', '%n selected row', '%n selected rows', selectedRows.length, {}) }}
 				</div>
-				<NcActions type="secondary" :force-name="true" :inline="showFullOptions ? 2 : 0">
+				<NcActions type="secondary" :force-title="true" :inline="showFullOptions ? 2 : 0">
 					<NcActionButton
 						@click="exportCsv">
 						<template #icon>
