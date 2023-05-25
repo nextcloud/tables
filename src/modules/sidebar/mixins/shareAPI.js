@@ -34,8 +34,10 @@ export default {
 				showSuccess(t('tables', 'Saved new share with "{userName}".', { userName: res.data.receiverDisplayName }))
 			} catch (e) {
 				displayError(e, t('tables', 'Could not create share.'))
+				return false
 			}
 			await this.$store.dispatch('setTableHasShares', { tableId, hasShares: true })
+			return true
 		},
 		async removeShareFromBE(shareId) {
 			try {
