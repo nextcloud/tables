@@ -26,9 +26,6 @@ namespace OCA\Tables;
 use OCP\App\IAppManager;
 use OCP\Capabilities\ICapability;
 use OCP\IConfig;
-use OCP\Server;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 
 /**
