@@ -3,10 +3,10 @@ import { showError } from '@nextcloud/dialogs'
 /**
  * @param {Error} e error object
  * @param {string} message Error print message
+ * @param {number} status http code
  */
-function handleAxiosError(e, message) {
+function handleAxiosError(e, message, status) {
 	console.error('Axios error', e)
-	const status = e.response?.status || null
 	showError(message + ' ' + statusMessage(status))
 }
 
@@ -27,11 +27,28 @@ function statusMessage(status) {
 }
 
 /**
+ * Handle errors that only have a msg
+ *
+ * @param {Error} e The error
+ * @param {string} msg as message to toast out
+ */
+function displaySimpleError(e, msg) {
+	console.error('Error occurred: ' + msg, e.message)
+	showError(msg)
+}
+
+/**
  * Print error to console and show toast
  *
  * @param {Error} e The error
  * @param {string} msg Message to print out
  */
 export default function(e, msg) {
-	handleAxiosError(e, msg)
+	const status = e?.response?.status || null
+
+	if (status) {
+		handleAxiosError(e, msg, status)
+	} else {
+		displaySimpleError(e, msg)
+	}
 }

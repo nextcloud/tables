@@ -16,24 +16,26 @@ export default {
 		},
 
 		async sendNewShareToBE(share) {
+			const data = {
+				nodeType: 'table',
+				nodeId: this.activeTable.id,
+				receiver: share.user,
+				receiverType: (share.isNoUser) ? 'group' : 'user',
+				permissionRead: true,
+				permissionCreate: true,
+				permissionUpdate: true,
+				permissionDelete: false,
+				permissionManage: false,
+			}
+			let tableId = null
 			try {
-				const data = {
-					nodeType: 'table',
-					nodeId: this.activeTable.id,
-					receiver: share.user,
-					receiverType: (share.isNoUser) ? 'group' : 'user',
-					permissionRead: true,
-					permissionCreate: true,
-					permissionUpdate: true,
-					permissionDelete: false,
-					permissionManage: false,
-				}
 				const res = await axios.post(generateUrl('/apps/tables/share'), data)
-				await this.$store.dispatch('setTableHasShares', { tableId: res.data.nodeId, hasSHares: true })
+				tableId = res.data.nodeId
 				showSuccess(t('tables', 'Saved new share with "{userName}".', { userName: res.data.receiverDisplayName }))
 			} catch (e) {
 				displayError(e, t('tables', 'Could not create share.'))
 			}
+			await this.$store.dispatch('setTableHasShares', { tableId, hasShares: true })
 		},
 		async removeShareFromBE(shareId) {
 			try {

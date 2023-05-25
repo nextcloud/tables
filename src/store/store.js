@@ -49,19 +49,23 @@ export default new Vuex.Store({
 	},
 	actions: {
 		async insertNewTable({ commit, state }, { data }) {
+			let res = null
+
 			try {
-				const res = await axios.post(generateUrl('/apps/tables/table'), data)
-				const tables = state.tables
-				tables.push(res.data)
-				commit('setTables', tables)
-				return res.data.id
+				res = await axios.post(generateUrl('/apps/tables/table'), data)
 			} catch (e) {
 				displayError(e, t('tables', 'Could not insert table.'))
 				return false
 			}
+
+			const tables = state.tables
+			tables.push(res.data)
+			commit('setTables', tables)
+			return res.data.id
 		},
 		async loadTablesFromBE({ commit }) {
 			commit('setTablesLoading', true)
+
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/table'))
 				commit('setTables', res.data)
@@ -69,34 +73,39 @@ export default new Vuex.Store({
 				displayError(e, t('tables', 'Could not load tables.'))
 				showError(t('tables', 'Could not fetch tables'))
 			}
+
 			commit('setTablesLoading', false)
 			return true
 		},
 		async updateTable({ state, commit, dispatch }, { id, data }) {
+			let res = null
+
 			try {
-				const res = await axios.put(generateUrl('/apps/tables/table/' + id), data)
-				const table = res.data
-				const tables = state.tables
-				const index = tables.findIndex(t => t.id === table.id)
-				tables[index] = table
-				commit('setTables', [...tables])
+				res = await axios.put(generateUrl('/apps/tables/table/' + id), data)
 			} catch (e) {
 				displayError(e, t('tables', 'Could not update table.'))
 				return false
 			}
+
+			const table = res.data
+			const tables = state.tables
+			const index = tables.findIndex(t => t.id === table.id)
+			tables[index] = table
+			commit('setTables', [...tables])
 			return true
 		},
 		async removeTable({ state, commit }, { tableId }) {
 			try {
 				await axios.delete(generateUrl('/apps/tables/table/' + tableId))
-				const tables = state.tables
-				const index = tables.findIndex(t => t.id === tableId)
-				tables.splice(index, 1)
-				commit('setTables', [...tables])
 			} catch (e) {
 				displayError(e, t('tables', 'Could not remove table.'))
 				return false
 			}
+
+			const tables = state.tables
+			const index = tables.findIndex(t => t.id === tableId)
+			tables.splice(index, 1)
+			commit('setTables', [...tables])
 			return true
 		},
 		increaseRowsCountForTable({ state, commit, getters }, { tableId }) {
