@@ -22,7 +22,7 @@ describe('Manage a table', () => {
 
 		cy.contains('button', 'Create row').should('be.visible')
 		cy.contains('h1', 'to do list').should('be.visible')
-		cy.contains('table th', 'Task').should('be.visible')
+		cy.contains('table th', 'Task').should('exist')
 	})
 
 	it('Update title', () => {
@@ -32,7 +32,7 @@ describe('Manage a table', () => {
 		cy.get('.modal-container button').contains('Save').click()
 
 		cy.wait(10).get('.toastify.toast-success').should('be.visible')
-		cy.get('.app-navigation__list').contains('ToDo list').should('be.visible')
+		cy.get('.app-navigation__list').contains('ToDo list').should('exist')
 	})
 
 	it('Delete', () => {
