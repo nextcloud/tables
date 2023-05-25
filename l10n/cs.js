@@ -100,6 +100,7 @@ OC.L10N.register(
     "No title given" : "Nezadán žádný nadpis",
     "Tables" : "Tabulky",
     "Manage data the way you need it." : "Spravujte data tak, jak potřebujete.",
+    "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link\n- Number\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n\nShare your tables with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Spravujte data tak, jak potřebujete.\n\nPomocí této aplikace můžete vytvářet vlastní tabulky s jednotlivými sloupci. Můžete začít se šablonou nebo od nuly a přidat požadované sloupce.\nMůžete si vybrat z následujících typů sloupců:\n- Textový řádek nebo formátovaný text\n- Odkaz\n- Číslo\n- Sloupec průběhu\n- Hodnocení hvězdičkami\n- Zaškrtnutí Ano/Ne\n- Datum a/nebo čas\n- (Vícenásobný) výběr\n\nSdílejte své tabulky s uživateli a skupinami ve vámi využívaném cloudu.\n\nBavte se a spravujte, co chcete.",
     "Create column" : "Vytvořit sloupec",
     "Type" : "Typ",
     "Text line" : "Testový řádek",
