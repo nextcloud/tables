@@ -33,26 +33,26 @@
 				<div style="padding: 10px; color: var(--color-text-maxcontrast);">
 					{{ n('tables', '%n selected row', '%n selected rows', selectedRows.length, {}) }}
 				</div>
-				<NcActions type="secondary">
-					<NcActionButton icon="icon-download"
+				<NcActions type="secondary" :force-name="true" :inline="showFullOptions ? 2 : 0">
+					<NcActionButton
 						@click="exportCsv">
 						<template #icon>
 							<Export :size="20" />
 						</template>
 						{{ t('tables', 'Export CSV') }}
 					</NcActionButton>
-					<NcActionButton v-if="canDeleteData(table)" icon="icon-delete"
+					<NcActionButton v-if="canDeleteData(table)"
 						@click="deleteSelectedRows">
-						{{ t('tables', 'Delete') }}
 						<template #icon>
 							<Delete :size="20" />
 						</template>
+						{{ t('tables', 'Delete') }}
 					</NcActionButton>
-					<NcActionButton icon="icon-checkmark" @click="deselectAllRows">
-						{{ t('tables', 'Uncheck all') }}
+					<NcActionButton v-if="!showFullOptions" @click="deselectAllRows">
 						<template #icon>
 							<Check :size="20" />
 						</template>
+						{{ t('tables', 'Uncheck all') }}
 					</NcActionButton>
 				</NcActions>
 				<!-- <NcButton v-if="!isSmallMobile"
@@ -82,7 +82,7 @@
 import { NcButton, NcActions, NcActionButton } from '@nextcloud/vue'
 import { emit } from '@nextcloud/event-bus'
 import Plus from 'vue-material-design-icons/Plus.vue'
-import Check from 'vue-material-design-icons/Check.vue'
+import Check from 'vue-material-design-icons/CheckboxBlankOutline.vue'
 import Delete from 'vue-material-design-icons/Delete.vue'
 import Export from 'vue-material-design-icons/Export.vue'
 import viewportHelper from '../../../mixins/viewportHelper.js'
@@ -142,6 +142,9 @@ export default {
 		},
 		getSearchString() {
 			return this.view?.searchString || ''
+		},
+		showFullOptions() {
+			 return this.wsize > 640
 		},
 	},
 
