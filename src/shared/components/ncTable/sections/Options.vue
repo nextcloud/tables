@@ -132,6 +132,12 @@ export default {
 		},
 	},
 
+	data() {
+		return {
+			optionsDivWidth: null,
+		}
+	},
+
 	computed: {
 		getSelectedRows() {
 			const rows = []
@@ -144,11 +150,19 @@ export default {
 			return this.view?.searchString || ''
 		},
 		showFullOptions() {
-			 return this.wsize > 640
+			 return this.optionsDivWidth > 800
 		},
 	},
 
+	created() {
+		this.updateOptionsDivWidth()
+		window.addEventListener('resize', this.updateOptionsDivWidth)
+	},
+
 	methods: {
+		updateOptionsDivWidth() {
+			this.optionsDivWidth = document.getElementsByClassName('options row')[0]?.offsetWidth
+		},
 		exportCsv() {
 			this.$emit('download-csv', this.getSelectedRows)
 		},
