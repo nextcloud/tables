@@ -19,6 +19,7 @@ OC.L10N.register(
     "Description" : "Beschrijving",
     "Comment" : "Notitie",
     "Dog" : "Hond",
+    "Cat" : "Kat",
     "from" : "van",
     "to" : "aan",
     "Approved" : "Goedgekeurd",
