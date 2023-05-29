@@ -6,7 +6,7 @@
 		</template>
 		<template #action>
 			<NcButton :aria-label="t('table', 'Create column')" type="primary" @click="$emit('create-column')">
-				{{ t('table', 'Create column') }}
+				{{ t('tables', 'Create column') }}
 			</NcButton>
 		</template>
 	</NcEmptyContent>
