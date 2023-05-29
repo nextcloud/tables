@@ -75,11 +75,11 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 					<Plus :size="25" />
 				</template>
 				<template #action>
-					<NcButton :aria-label="t('table', 'Create row')" type="primary" @click="$emit('create-row')">
+					<NcButton :aria-label="t('tables', 'Create row')" type="primary" @click="$emit('create-row')">
 						<template #icon>
 							<Plus :size="25" />
 						</template>
-						{{ t('table', 'Create row') }}
+						{{ t('tables', 'Create row') }}
 					</NcButton>
 				</template>
 			</NcEmptyContent>
