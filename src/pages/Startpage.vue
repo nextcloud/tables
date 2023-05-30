@@ -6,8 +6,8 @@
 				<IconTables />
 			</template>
 			<template #action>
-				<NcButton :aria-label="t('table', 'Create new table')" type="primary" @click="addTable">
-					{{ t('table', 'Create new table') }}
+				<NcButton :aria-label="t('tables', 'Create new table')" type="primary" @click="addTable">
+					{{ t('tables', 'Create new table') }}
 				</NcButton>
 			</template>
 		</NcEmptyContent>
