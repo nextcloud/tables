@@ -1,11 +1,11 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-// import Vuex, { Store } from 'vuex'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import data from './data.js'
+import displayError from '../shared/utils/displayError.js'
 
 Vue.use(Vuex)
 
@@ -49,74 +49,63 @@ export default new Vuex.Store({
 	},
 	actions: {
 		async insertNewTable({ commit, state }, { data }) {
+			let res = null
+
 			try {
-				const res = await axios.post(generateUrl('/apps/tables/table'), data)
-				if (res.status === 200) {
-					const tables = state.tables
-					tables.push(res.data)
-					commit('setTables', tables)
-					return res.data.id
-				} else {
-					console.debug('axios error', res)
-					return false
-				}
+				res = await axios.post(generateUrl('/apps/tables/table'), data)
 			} catch (e) {
-				console.error(e)
+				displayError(e, t('tables', 'Could not insert table.'))
 				return false
 			}
+
+			const tables = state.tables
+			tables.push(res.data)
+			commit('setTables', tables)
+			return res.data.id
 		},
 		async loadTablesFromBE({ commit }) {
 			commit('setTablesLoading', true)
+
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/table'))
-				if (res.status === 200) {
-					commit('setTables', res.data)
-				} else {
-					console.debug('axios error', res)
-					return false
-				}
+				commit('setTables', res.data)
 			} catch (e) {
-				console.error(e)
+				displayError(e, t('tables', 'Could not load tables.'))
 				showError(t('tables', 'Could not fetch tables'))
 			}
+
 			commit('setTablesLoading', false)
 			return true
 		},
 		async updateTable({ state, commit, dispatch }, { id, data }) {
+			let res = null
+
 			try {
-				const res = await axios.put(generateUrl('/apps/tables/table/' + id), data)
-				if (res.status === 200) {
-					const table = res.data
-					const tables = state.tables
-					const index = tables.findIndex(t => t.id === table.id)
-					tables[index] = table
-					commit('setTables', [...tables])
-				} else {
-					console.debug('axios error', res)
-					return false
-				}
+				res = await axios.put(generateUrl('/apps/tables/table/' + id), data)
 			} catch (e) {
-				console.error(e)
+				displayError(e, t('tables', 'Could not update table.'))
 				return false
 			}
+
+			const table = res.data
+			const tables = state.tables
+			const index = tables.findIndex(t => t.id === table.id)
+			tables[index] = table
+			commit('setTables', [...tables])
 			return true
 		},
 		async removeTable({ state, commit }, { tableId }) {
 			try {
-				const res = await axios.delete(generateUrl('/apps/tables/table/' + tableId))
-				if (res.status === 200) {
-					const tables = state.tables
-					const index = tables.findIndex(t => t.id === tableId)
-					tables.splice(index, 1)
-					commit('setTables', [...tables])
-				} else {
-					console.debug('axios error', res)
-					return false
-				}
+				await axios.delete(generateUrl('/apps/tables/table/' + tableId))
 			} catch (e) {
-				console.error(e)
+				displayError(e, t('tables', 'Could not remove table.'))
 				return false
 			}
+
+			const tables = state.tables
+			const index = tables.findIndex(t => t.id === tableId)
+			tables.splice(index, 1)
+			commit('setTables', [...tables])
 			return true
 		},
 		increaseRowsCountForTable({ state, commit, getters }, { tableId }) {
