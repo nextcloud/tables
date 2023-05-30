@@ -5,7 +5,7 @@
 
 			<div class="filter-box">
 				<NcTextField :value.sync="filterString"
-					label="Filter tables"
+					:label="t('tables', 'Filter tables')"
 					trailing-button-icon="close"
 					:show-trailing-button="filterString !== ''"
 					@trailing-button-click="filterString = ''">
