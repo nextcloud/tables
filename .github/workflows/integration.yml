@@ -115,7 +115,7 @@ jobs:
         run: ./run.sh
 
       - name: Query count
-        if: ${{ matrix.databases == 'mysql' && github.event_name == 'pull_request' }}
+        if: ${{ matrix.databases == 'mysql' && matrix.php-versions == '8.2' && matrix.server-versions == 'master' && github.event_name == 'pull_request' }}
         uses: actions/github-script@v6
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
