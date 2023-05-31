@@ -67,7 +67,6 @@ OC.L10N.register(
     "No" : "아니오",
     "Max" : "최대치",
     "Confirm" : "확인",
-    "Could not delete share" : "공유를 삭제할 수 없음",
     "Unchecked" : "검사되지 않음"
 },
 "nplurals=1; plural=0;");

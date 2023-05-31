@@ -94,7 +94,6 @@ OC.L10N.register(
     "Defaults" : "默认",
     "Close editor" : "关闭编辑器",
     "Confirm" : "确认",
-    "Could not delete share" : "不能删除共享",
     "Unchecked" : "未选中"
 },
 "nplurals=1; plural=0;");

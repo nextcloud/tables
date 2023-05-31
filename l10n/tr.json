@@ -172,7 +172,6 @@
     "Cannot create new table. Title is missing." : "Yeni tablo oluşturulamadı. Başlık eksik.",
     "The table \"{emoji} {table}\" is ready to use." : "\"{emoji} {table}\" tablosu kullanılmaya hazır.",
     "Could not create new table" : "Yeni tablo oluşturulamadı",
-    "Could not fetch templates from backend" : "Yönetim bölümünden temalar alınamadı",
     "I really want to delete this table!" : "Bu tabloyu silmek istediğime eminim!",
     "Cannot update table. Title is missing." : "Tablo güncellenemedi. Başlık eksik.",
     "Updated table \"{emoji}{table}\"." : "\"{emoji}{table}\" tablosu güncellendi.",
@@ -307,13 +306,9 @@
     "Confirmation" : "Onaylama",
     "Confirm" : "Onayla",
     "_{nb} row_::_{nb} rows_" : ["{nb} satır","{nb} satır"],
-    "Could not load shares from back end" : "Paylaşımlar yönetim bölümünden yüklenemedi",
     "Saved new share with \"{userName}\"." : "Yeni paylaşım \"{userName}\" ile kaydedildi.",
-    "Could not create new share" : "Yeni paylaşım oluşturulamadı",
     "Share was deleted" : "Paylaşım silindi",
-    "Could not delete share" : "Paylaşım silinemedi",
     "Share permission was updated" : "Paylaşım izni güncellendi",
-    "Could not update share permission" : "Paylaşım izni güncellenemedi",
     "Contains" : "Şunu içeren",
     "Filter operator" : "Süzgeç işlemi",
     "Begins with" : "Şununla başlayan",
@@ -332,6 +327,7 @@
     "Start of the month" : "Ayın başlangıcı",
     "Start of the week" : "Haftanın başlangıcı",
     "Now" : "Şimdi",
+    "Could not update row." : "Satır güncellenemedi.",
     "Could not fetch tables" : "Tablolar alınamadı"
 },"pluralForm" :"nplurals=2; plural=(n > 1);"
 }

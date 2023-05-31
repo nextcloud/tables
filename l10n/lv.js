@@ -51,7 +51,6 @@ OC.L10N.register(
     "No" : "Nē",
     "Max" : "Maksimāli",
     "Confirm" : "Apstiprināt",
-    "Could not delete share" : "Neizdevās dzēst koplietotni",
     "Unchecked" : "Neatzīmēts"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);");

@@ -43,7 +43,6 @@ OC.L10N.register(
     "Yes" : "Ya",
     "No" : "Tidak",
     "Max" : "Maksimum",
-    "Confirm" : "Konfirmasi",
-    "Could not delete share" : "Tidak dapat menghapus pembagian"
+    "Confirm" : "Konfirmasi"
 },
 "nplurals=1; plural=0;");

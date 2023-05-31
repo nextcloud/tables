@@ -42,7 +42,6 @@ OC.L10N.register(
     "Default" : "Vaikeväärtus",
     "Yes" : "Jah",
     "No" : "Ei",
-    "Confirm" : "Kinnita",
-    "Could not delete share" : "Ei saanud jagamist eemaldada"
+    "Confirm" : "Kinnita"
 },
 "nplurals=2; plural=(n != 1);");

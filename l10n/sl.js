@@ -160,7 +160,6 @@ OC.L10N.register(
     "Cannot create new table. Title is missing." : "Razpredelnice ni mogoče ustvariti, ker ni vpisanega naslova.",
     "The table \"{emoji} {table}\" is ready to use." : "Razpredelnica »{emoji} {table}« je pripravljena za uporabo.",
     "Could not create new table" : "Razpredelnice ni mogoče ustvariti.",
-    "Could not fetch templates from backend" : "Ni mogoče naložiti predlog.",
     "I really want to delete this table!" : "Zares hočem izbrisati to razpredelnico!",
     "Cannot update table. Title is missing." : "Razpredelnice ni mogoče ustvariti, ker ni vpisanega naslova.",
     "Updated table \"{emoji}{table}\"." : "Posodobljena je razpredelnica »{emoji} {table}«",
@@ -261,14 +260,11 @@ OC.L10N.register(
     "Confirmation" : "Potrjevanje",
     "Confirm" : "Potrdi",
     "_{nb} row_::_{nb} rows_" : ["{nb} vrstica","{nb} vrstici","{nb} vrstice","{nb} vrstic"],
-    "Could not load shares from back end" : "Razpredelnic v souporabi ni mogoče naložiti.",
     "Saved new share with \"{userName}\"." : "Shranjena je skupna razpredelnica z »{userName}«",
-    "Could not create new share" : "Za razpredelnico ni mogoče določiti souporabe.",
     "Share was deleted" : "Razpredelnica v souporabi je izbrisana.",
-    "Could not delete share" : "Mesta souporabe ni mogoče izbrisati",
     "Share permission was updated" : "Dovoljenja souporabe so shranjena",
-    "Could not update share permission" : "Dovoljenj souporabe ni mogoče posodobiti",
     "Unchecked" : "Nepregledano",
+    "Could not update row." : "Vrstice ni mogoče posodobiti.",
     "Could not fetch tables" : "Razpredelnic ni mogoče pridobiti."
 },
 "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);");

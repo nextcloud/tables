@@ -56,7 +56,6 @@ OC.L10N.register(
     "Add option" : "Aldoni opcion",
     "Yes" : "Yes",
     "No" : "No",
-    "Confirm" : "Konfirmi",
-    "Could not delete share" : "Ne eblis forigi kunhavon"
+    "Confirm" : "Konfirmi"
 },
 "nplurals=2; plural=(n != 1);");

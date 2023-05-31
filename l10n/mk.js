@@ -65,7 +65,6 @@ OC.L10N.register(
     "No" : "Не",
     "Defaults" : "Стандарди",
     "Close editor" : "Затвори го уредникот",
-    "Confirm" : "Потврди",
-    "Could not delete share" : "Неможе да се избрише споделувањето"
+    "Confirm" : "Потврди"
 },
 "nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;");

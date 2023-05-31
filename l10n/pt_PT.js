@@ -63,7 +63,6 @@ OC.L10N.register(
     "No" : "Não",
     "Max" : "Máx.",
     "Close editor" : "Fechar editor",
-    "Confirm" : "Confirmar",
-    "Could not delete share" : "Não foi possível eliminar a partilha"
+    "Confirm" : "Confirmar"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

@@ -42,7 +42,6 @@ OC.L10N.register(
     "Default" : "ค่าเริ่มต้น",
     "Yes" : "ใช่",
     "No" : "ไม่",
-    "Confirm" : "ยืนยัน",
-    "Could not delete share" : "ไม่สามารถลบแชร์"
+    "Confirm" : "ยืนยัน"
 },
 "nplurals=1; plural=0;");

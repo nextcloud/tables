@@ -130,7 +130,6 @@ OC.L10N.register(
     "Close editor" : "Lukk tekstredigerer",
     "Confirmation" : "Bekreftelse",
     "Confirm" : "Bekreft",
-    "Could not delete share" : "Kunne ikke slette ressursen",
     "Unchecked" : "Usjekket",
     "Could not fetch tables" : "Kunne ikke hente tabeller"
 },

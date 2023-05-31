@@ -68,7 +68,6 @@ OC.L10N.register(
     "Defaults" : "Sjálfgefin gildi",
     "Close editor" : "Loka ritli",
     "Confirm" : "Staðfesta",
-    "Could not delete share" : "Tókst ekki að eyða sameign",
     "Unchecked" : "Ekki skoðað"
 },
 "nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);");

@@ -88,7 +88,6 @@ OC.L10N.register(
     "The title limit is reached with 200 characters. Please use a shorter title." : "Il limite di 200 caratteri per il titolo è stato raggiunto. Inserisci un titolo più breve.",
     "Cannot create new table. Title is missing." : "Impossibile creare una nuova tabella. Titolo mancante.",
     "Could not create new table" : "Impossibile creare una nuova tabella",
-    "Could not fetch templates from backend" : "Impossibile recuperare i modelli dal back-end",
     "Import" : "Importa",
     "File" : "File",
     "Select a file" : "Seleziona un file",
@@ -151,7 +150,6 @@ OC.L10N.register(
     "Close editor" : "Chiudi editor",
     "Confirmation" : "Conferma",
     "Confirm" : "Conferma",
-    "Could not delete share" : "impossibile eliminare la condivisione",
     "Unchecked" : "Non selezionati",
     "Could not fetch tables" : "Impossibile recuperare le tabelle"
 },
