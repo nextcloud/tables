@@ -1,12 +1,9 @@
 import moment from '@nextcloud/moment'
-import textLongMixin from '../mixins/columnsTypes/textLongMixin.js'
-import selectionMultiMixin from '../mixins/columnsTypes/selectionMultiMixin.js'
-import selectionMixin from '../mixins/columnsTypes/selectionMixin.js'
 import generalHelper from '../../../mixins/generalHelper.js'
 
 export default {
 
-	mixins: [textLongMixin, selectionMultiMixin, selectionMixin, generalHelper],
+	mixins: [generalHelper],
 
 	methods: {
 
@@ -32,11 +29,7 @@ export default {
 			this.$papa.download(csv, moment().format('YY-MM-DD_HH-mm') + '_' + tableTitle)
 		},
 		getValueByColumnType(set, column) {
-			const methodName = 'getValueStringFor' + this.ucfirst(column.type) + this.ucfirst(column.subtype) || ''
-			if (this[methodName] instanceof Function) {
-				return this[methodName](set, column)
-			}
-			return set ? set.value : ''
+			return column.getValueString(set)
 		},
 	},
 }

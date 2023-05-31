@@ -8,15 +8,13 @@
 </template>
 <script>
 import Close from 'vue-material-design-icons/Close.vue'
-import searchAndFilterMixin from '../mixins/searchAndFilterMixin.js'
+import { MagicFields } from '../mixins/magicFields.js'
 
 export default {
 
 	components: {
 		Close,
 	},
-
-	mixins: [searchAndFilterMixin],
 
 	props: {
 		operator: {
@@ -40,7 +38,7 @@ export default {
 	computed: {
 		getValue() {
 			let value = this.value
-			Object.values(this.magicFields).forEach(field => {
+			Object.values(MagicFields).forEach(field => {
 				value = value.replace('@' + field.id, field.label)
 			})
 			return value

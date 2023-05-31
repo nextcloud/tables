@@ -41,10 +41,10 @@
 				</template>
 			</NcActionInput>
 			<NcActionCaption
-				v-if="getPossibleMagicFields(column).length > 0 && canFilterWithTextInput && haveOperators"
+				v-if="column.getPossibleMagicFields().length > 0 && canFilterWithTextInput"
 				:title="t('tables', 'Or use magic values')" />
 			<NcActionCaption
-				v-if="getPossibleMagicFields(column).length > 0 && !canFilterWithTextInput && haveOperators"
+				v-if="column.getPossibleMagicFields().length > 0 && !canFilterWithTextInput"
 				:title="t('tables', 'Choose value')" />
 			<NcActionButton
 				v-for="(magicField, index) in getMagicFields"
@@ -60,23 +60,14 @@
 </template>
 
 <script>
-import textLineMixin from '../mixins/columnsTypes/textLineMixin.js'
-import textLinkMixin from '../mixins/columnsTypes/textLinkMixin.js'
-import selectionMixin from '../mixins/columnsTypes/selectionMixin.js'
-import numberMixin from '../mixins/columnsTypes/numberMixin.js'
-import selectionCheckMixin from '../mixins/columnsTypes/selectionCheckMixin.js'
-import numberStarsMixin from '../mixins/columnsTypes/numberStarsMixin.js'
-import numberProgressMixin from '../mixins/columnsTypes/numberProgressMixin.js'
-import datetimeDateMixin from '../mixins/columnsTypes/datetimeDateMixin.js'
-import datetimeTimeMixin from '../mixins/columnsTypes/datetimeTimeMixin.js'
-import datetimeMixin from '../mixins/columnsTypes/datetimeMixin.js'
 import generalHelper from '../../../mixins/generalHelper.js'
 import SortAsc from 'vue-material-design-icons/SortAscending.vue'
 import SortDesc from 'vue-material-design-icons/SortDescending.vue'
 import Pencil from 'vue-material-design-icons/Pencil.vue'
 import { NcActions, NcActionButton, NcActionInput, NcActionButtonGroup, NcActionSeparator, NcActionCaption, NcActionRadio } from '@nextcloud/vue'
 import { mapState } from 'vuex'
-import searchAndFilterMixin from '../mixins/searchAndFilterMixin.js'
+import { AbstractColumn } from '../mixins/columnClass.js'
+import { ColumnTypes } from '../mixins/columnHandler.js'
 
 export default {
 
@@ -93,24 +84,11 @@ export default {
 		NcActionSeparator,
 	},
 
-	mixins: [
-		textLineMixin,
-		selectionMixin,
-		numberMixin,
-		generalHelper,
-		selectionCheckMixin,
-		textLinkMixin,
-		numberStarsMixin,
-		numberProgressMixin,
-		datetimeDateMixin,
-		datetimeTimeMixin,
-		datetimeMixin,
-		searchAndFilterMixin,
-	],
+	mixins: [generalHelper],
 
 	props: {
 		column: {
-		      type: Object,
+		      type: AbstractColumn,
 		      default: null,
 		    },
 		openState: {
@@ -123,6 +101,10 @@ export default {
 		return {
 			filterValue: '',
 			operator: '',
+			hideFilterInputForColumnTypes: [
+				ColumnTypes.SelectionCheck,
+				ColumnTypes.NumberStars,
+			],
 		}
 	},
 
@@ -142,11 +124,14 @@ export default {
 		},
 		getOperators() {
 			console.debug('getOperators requested')
-			const possibleOperators = this.getPossibleOperators(this.column)
+			const possibleOperators = this.column.getPossibleOperators()
 
+			if (possibleOperators.length === 0) {
+				return null
+			}
 			// preselect first operator, even if it's not displayed
 			if (this.operator === '') {
-				console.debug('operator is empty, try to set first option', possibleOperators)
+				console.debug(this.column.title, 'operator is empty, try to set first option', possibleOperators)
 				// eslint-disable-next-line vue/no-side-effects-in-computed-properties
 				this.operator = possibleOperators[0]?.id ?? ''
 				console.debug('operator', this.operator)
@@ -166,18 +151,10 @@ export default {
 			return []
 		},
 		getMagicFields() {
-			if (!this.haveOperators) {
-				return []
-			}
-			return this.getPossibleMagicFields(this.column)
+			return this.column.getPossibleMagicFields()
 		},
 		canSort() {
-			const sortFuncName = 'sorting' + this.ucfirst(this.column?.type) + this.ucfirst(this.column?.subtype)
-			if (this[sortFuncName] instanceof Function) {
-				return true
-			}
-			console.info('no sort function for column found', { columnId: this.column.id, expectedSortMethod: sortFuncName })
-			return false
+			return this.column.canSort()
 		},
 		getSortMode() {
 			const sortObject = this.view.sorting?.find(item => item.columnId === this.column?.id)
@@ -195,13 +172,7 @@ export default {
 			},
 		},
 		canFilterWithTextInput() {
-			const columnType = this.column.type + (this.column.subtype ? '-' + this.column.subtype : '')
-			return !this.hideFilterInputForColumnTypes.includes(columnType)
-		},
-		getFilterOperator() {
-			const tmp = this.operator.split('-')
-			tmp.shift()
-			return tmp.join('-')
+			return !this.hideFilterInputForColumnTypes.includes(this.column.type)
 		},
 	},
 
@@ -241,7 +212,7 @@ export default {
 		createFilter() {
 			const filterObject = {
 				columnId: this.column.id,
-				operator: this.getFilterOperator,
+				operator: this.operator,
 				value: this.filterValue,
 			}
 			console.debug('emitting new filterObject', filterObject)

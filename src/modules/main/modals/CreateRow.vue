@@ -9,43 +9,7 @@
 				</div>
 			</div>
 			<div v-for="column in columns" :key="column.id">
-				<TextLineForm v-if="column.type === 'text' && column.subtype === 'line'"
-					:column="column"
-					:value.sync="row[column.id]" />
-				<TextLongForm v-if="column.type === 'text' && column.subtype === 'long'"
-					:column="column"
-					:value.sync="row[column.id]" />
-				<TextLinkForm v-if="column.type === 'text' && column.subtype === 'link'"
-					:column="column"
-					:value.sync="row[column.id]" />
-				<TextRichForm v-if="column.type === 'text' && column.subtype === 'rich'"
-					:column="column"
-					:value.sync="row[column.id]" />
-				<NumberForm v-if="column.type === 'number' && !column.subtype"
-					:column="column"
-					:value.sync="row[column.id]" />
-				<NumberStarsForm v-if="column.type === 'number' && column.subtype === 'stars'"
-					:column="column"
-					:value.sync="row[column.id]" />
-				<NumberProgressForm v-if="column.type === 'number' && column.subtype === 'progress'"
-					:column="column"
-					:value.sync="row[column.id]" />
-				<SelectionForm v-if="column.type === 'selection' && !column.subtype"
-					:column="column"
-					:value.sync="row[column.id]" />
-				<SelectionMultiForm v-if="column.type === 'selection' && column.subtype === 'multi'"
-					:column="column"
-					:value.sync="row[column.id]" />
-				<SelectionCheckForm v-if="column.type === 'selection' && column.subtype === 'check'"
-					:column="column"
-					:value.sync="row[column.id]" />
-				<DatetimeForm v-if="column.type === 'datetime' && !column.subtype"
-					:column="column"
-					:value.sync="row[column.id]" />
-				<DatetimeDateForm v-if="column.type === 'datetime' && column.subtype === 'date'"
-					:column="column"
-					:value.sync="row[column.id]" />
-				<DatetimeTimeForm v-if="column.type === 'datetime' && column.subtype === 'time'"
+				<component :is="getFormComponent(column)"
 					:column="column"
 					:value.sync="row[column.id]" />
 			</div>
@@ -83,6 +47,7 @@ import DatetimeForm from '../../../shared/components/ncTable/partials/rowTypePar
 import DatetimeDateForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeTimeForm.vue'
 import TextRichForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextRichForm.vue'
+import { ColumnTypes } from '../../../shared/components/ncTable/mixins/columnHandler.js'
 
 export default {
 	name: 'CreateRow',
@@ -124,6 +89,24 @@ export default {
 		...mapGetters(['activeTable']),
 	},
 	methods: {
+		getFormComponent(column) {
+			switch (column.type) {
+			case ColumnTypes.TextLine: return 'TextLineForm'
+			case ColumnTypes.TextLong: return 'TextLongForm'
+			case ColumnTypes.TextLink: return 'TextLinkForm'
+			case ColumnTypes.TextRich: return 'TextRichForm'
+			case ColumnTypes.Number: return 'NumberForm'
+			case ColumnTypes.NumberStars: return 'NumberStarsForm'
+			case ColumnTypes.NumberProgress: return 'NumberProgressForm'
+			case ColumnTypes.Selection: return 'SelectionForm'
+			case ColumnTypes.SelectionMulti: return 'SelectionMultiForm'
+			case ColumnTypes.SelectionCheck: return 'SelectionCheckForm'
+			case ColumnTypes.Datetime: return 'DatetimeForm'
+			case ColumnTypes.DatetimeDate: return 'DatetimeDateForm'
+			case ColumnTypes.DatetimeTime: return 'DatetimeTimeForm'
+			default: throw Error('No form exists for the column type ' + column.type)
+			}
+		},
 		actionCancel() {
 			this.reset()
 			this.addNewAfterSave = false

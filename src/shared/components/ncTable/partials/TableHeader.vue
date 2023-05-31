@@ -18,8 +18,10 @@
 					:id="filter.columnId + filter.operator + filter.value"
 					:key="filter.columnId + filter.operator + filter.value"
 					:operator="filter.operator"
+					:operator-label="getFilterWithId(filter.operator).getOperatorLabel()"
 					:value="filter.value"
 					@delete-filter="id => $emit('delete-filter', id)" />
+				<!-- Operator AND operator-label?? -->
 			</div>
 		</th>
 		<th>
@@ -75,9 +77,9 @@ import TableEdit from 'vue-material-design-icons/TableEdit.vue'
 import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
 import IconImport from 'vue-material-design-icons/Import.vue'
 import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
-import searchAndFilterMixin from '../mixins/searchAndFilterMixin.js'
 import FilterLabel from './FilterLabel.vue'
 import permissionsMixin from '../mixins/permissionsMixin.js'
+import { Filters } from '../mixins/filter.js'
 
 export default {
 
@@ -93,7 +95,7 @@ export default {
 		TableColumnPlusAfter,
 	},
 
-	mixins: [searchAndFilterMixin, permissionsMixin],
+	mixins: [permissionsMixin],
 
 	props: {
 		columns: {
@@ -141,6 +143,9 @@ export default {
 		},
 		getFilterForColumn(column) {
 			return this.view?.filter?.filter(item => item.columnId === column.id)
+		},
+		getFilterWithId(id) {
+			return Object.values(Filters).find(fil => fil.id === id) || null
 		},
 		downloadCSV() {
 			this.$emit('download-csv', this.rows)

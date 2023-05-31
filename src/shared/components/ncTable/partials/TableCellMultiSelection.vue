@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<ul>
-			<li v-for="v in getObjectsForSelectionMulti(value, column)" :key="v.id">
+			<li v-for="v in getObjects()" :key="v.id">
 				{{ v.label }}<span v-if="v.deleted" :title="t('tables', 'This option is outdated.')">&nbsp;⚠️</span>
 			</li>
 		</ul>
@@ -9,12 +9,9 @@
 </template>
 
 <script>
-import selectionMultiMixin from '../mixins/columnsTypes/selectionMultiMixin.js'
 
 export default {
 	name: 'TableCellMultiSelection',
-
-	mixins: [selectionMultiMixin],
 
 	props: {
 		column: {
@@ -30,6 +27,11 @@ export default {
 		value: {
 			type: Array,
 			default: null,
+		},
+	},
+	methods: {
+		getObjects() {
+			return this.column.getObjects(this.value)
 		},
 	},
 

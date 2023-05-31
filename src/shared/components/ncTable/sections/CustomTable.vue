@@ -34,21 +34,7 @@ import TableHeader from '../partials/TableHeader.vue'
 import TableRow from '../partials/TableRow.vue'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { mapGetters } from 'vuex'
-import textLineMixin from '../mixins/columnsTypes/textLineMixin.js'
-import textLinkMixin from '../mixins/columnsTypes/textLinkMixin.js'
-import selectionMixin from '../mixins/columnsTypes/selectionMixin.js'
-import selectionMultiMixin from '../mixins/columnsTypes/selectionMultiMixin.js'
-import numberMixin from '../mixins/columnsTypes/numberMixin.js'
-import numberStarsMixin from '../mixins/columnsTypes/numberStarsMixin.js'
-import numberProgressMixin from '../mixins/columnsTypes/numberProgressMixin.js'
-import textLongMixin from '../mixins/columnsTypes/textLongMixin.js'
-import selectionCheckMixin from '../mixins/columnsTypes/selectionCheckMixin.js'
-import datetimeDateMixin from '../mixins/columnsTypes/datetimeDateMixin.js'
-import datetimeTimeMixin from '../mixins/columnsTypes/datetimeTimeMixin.js'
-import datetimeMixin from '../mixins/columnsTypes/datetimeMixin.js'
-import generalHelper from '../../../mixins/generalHelper.js'
-import searchAndFilterMixin from '../mixins/searchAndFilterMixin.js'
-import textRichMixin from '../mixins/columnsTypes/textRichMixin.js'
+import { MagicFields } from '../mixins/magicFields.js'
 
 export default {
 	name: 'CustomTable',
@@ -57,24 +43,6 @@ export default {
 		TableRow,
 		TableHeader,
 	},
-
-	mixins: [
-		textLineMixin,
-		textLongMixin,
-		textRichMixin,
-		selectionMixin,
-		selectionMultiMixin,
-		numberMixin,
-		generalHelper,
-		searchAndFilterMixin,
-		selectionCheckMixin,
-		textLinkMixin,
-		numberStarsMixin,
-		numberProgressMixin,
-		datetimeDateMixin,
-		datetimeTimeMixin,
-		datetimeMixin,
-	],
 
 	props: {
 		rows: {
@@ -110,11 +78,7 @@ export default {
 			// if we have to sort
 			if (this.view.sorting) {
 				const sortColumn = this.columns.find(item => item.id === this.view.sorting[0].columnId)
-				const sortMethodName = 'sorting' + this.ucfirst(sortColumn.type) + this.ucfirst(sortColumn.subtype)
-				if (!(this[sortMethodName] instanceof Function)) {
-					console.error('the needed method is missing', { sortColumn, sortMethodName, method: this[sortMethodName], this: this })
-				}
-				return [...this.getSearchedAndFilteredRows].sort(this[sortMethodName](sortColumn, this.view.sorting[0].mode))
+				return [...this.getSearchedAndFilteredRows].sort(sortColumn.sort(this.view.sorting[0].mode))
 			}
 			return this.getSearchedAndFilteredRows
 		},
@@ -177,10 +141,20 @@ export default {
 						delete cell.searchStringFound
 						delete cell.filterFound
 
+						// if we should filter
+						if (filters !== null) {
+							filters.forEach(fil => {
+								this.addMagicFieldsValues(fil)
+								if (filterStatus === null || filterStatus === true) {
+									filterStatus = column.isFilterFound(cell, fil)
+								}
+								// filterStatus = filterStatus || this.isFilterFound(column, cell, fil)
+							})
+						}
 						// if we should search
 						if (searchString) {
 							console.debug('look for searchString', searchString)
-							searchStatus = this.isSearchStringFound(column, cell, searchString)
+							searchStatus = column.isSearchStringFound(cell, searchString.toLowerCase())
 						}
 					}
 
@@ -222,7 +196,7 @@ export default {
 
 	methods: {
 		addMagicFieldsValues(filter) {
-			Object.values(this.magicFields).forEach(field => {
+			Object.values(MagicFields).forEach(field => {
 				const newFilterValue = filter.value.replace('@' + field.id, field.replace)
 				if (filter.value !== newFilterValue) {
 					filter.magicValuesEnriched = newFilterValue
@@ -237,21 +211,6 @@ export default {
 				}
 			}
 			return null
-		},
-		isFilterFound(column, cell, filter) {
-			const methodName = 'isFilterFoundFor' + this.ucfirst(column.type) + this.ucfirst(column.subtype)
-			if (this[methodName] instanceof Function) {
-				return this[methodName](column, cell, filter)
-			}
-			return false
-		},
-		isSearchStringFound(column, cell, searchString) {
-			const methodName = 'isSearchStringFoundFor' + this.ucfirst(column.type) + this.ucfirst(column.subtype)
-			if (this[methodName] instanceof Function) {
-				return this[methodName](column, cell, searchString.toLowerCase())
-			}
-
-			return false
 		},
 		deselectAllRows() {
 			this.selectedRows = []
