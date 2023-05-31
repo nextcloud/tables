@@ -131,4 +131,10 @@ export default {
 		overflow-y: auto;
 	}
 
+	/* This can be deleted when the patch from text is integrated,
+	that sets the z-index of the text-menubar to 1 by default*/
+	:deep(.text-menubar ) {
+		z-index: 1 !important;
+	}
+
 </style>
