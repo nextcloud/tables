@@ -20,11 +20,12 @@
 			<NcActionSeparator v-if="canSort && haveOperators" />
 			<NcActionCaption v-if="haveOperators" :title="t('tables', 'Filtering')" />
 			<NcActionRadio
-				v-for="(op, index) in getOperators"
+				v-for="(op, index) in visibleOperators"
 				:key="index"
 				:name="'filter-operators-column-' + column.id"
 				:value="op.id"
 				:checked="operator === op.id"
+				:disabled="isDisabled(op.id)"
 				@change="changeFilterOperator">
 				{{ op.label }}
 			</NcActionRadio>
@@ -131,7 +132,13 @@ export default {
 		}),
 		haveOperators() {
 			const columnOperators = this.getOperators
-			return columnOperators && columnOperators.length > 0
+			return columnOperators && columnOperators.length > this.getDisabledOperators.length
+		},
+		visibleOperators() {
+			if (this.haveOperators && this.getOperators.length >= 2) {
+				return this.getOperators
+			}
+			return []
 		},
 		getOperators() {
 			console.debug('getOperators requested')
@@ -144,7 +151,9 @@ export default {
 				this.operator = possibleOperators[0]?.id ?? ''
 				console.debug('operator', this.operator)
 			}
-
+			return possibleOperators
+		},
+		getDisabledOperators() {
 			// filter filters that cannot be combined
 			const filters = this.getFilterForColumn(this.column)
 			if (filters && filters.length > 0) {
@@ -152,9 +161,9 @@ export default {
 				filters.forEach(fil => {
 					this.getIncompatibleFilters(fil.operator).forEach(item => incompatibleFilters.add(item))
 				})
-				return possibleOperators.filter(op => !incompatibleFilters.has(op.id))
+				return this.getOperators.filter(op => incompatibleFilters.has(op.id))
 			}
-			return possibleOperators
+			return []
 		},
 		getMagicFields() {
 			if (!this.haveOperators) {
@@ -245,6 +254,9 @@ export default {
 		},
 		sort(mode) {
 			this.$store.dispatch('addSorting', { columnId: this.column.id, mode })
+		},
+		isDisabled(op) {
+			return this.getDisabledOperators.map(o => o.id).includes(op)
 		},
 	},
 
