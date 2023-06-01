@@ -293,6 +293,7 @@ OC.L10N.register(
     "Start of the month" : "Начало на месеца",
     "Start of the week" : "Начало на седмицата",
     "Now" : "Сега",
+    "Could not update row." : "Редът не можа да се актуализира.",
     "Could not fetch tables" : "Таблиците не можаха да бъдат извлечени"
 },
 "nplurals=2; plural=(n != 1);");
