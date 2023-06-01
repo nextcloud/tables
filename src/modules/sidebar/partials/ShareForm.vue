@@ -25,29 +25,29 @@
 <template>
 	<div class="row space-B">
 		<h3>{{ t('tables', 'Add a new share') }}</h3>
-		<NcMultiselect id="ajax"
+		<NcSelect id="ajax"
+			style="width: 100%;"
 			:clear-on-select="true"
 			:hide-selected="true"
 			:internal-search="false"
 			:loading="loading"
-			:multiple="true"
 			:options="options"
 			:placeholder="t('tables', 'User or group name …')"
 			:preselect-first="true"
 			:preserve-search="true"
 			:searchable="true"
 			:user-select="true"
+			:get-option-key="(option) => option.key"
 			label="displayName"
-			track-by="shareWith"
-			@search-change="asyncFind"
-			@select="addShare">
-			<template #noOptions>
+			@search="asyncFind"
+			@input="addShare">
+			<template #no-options>
 				{{ t('tables', 'No recommendations. Start typing.') }}
 			</template>
 			<template #noResult>
 				{{ noResultText }}
 			</template>
-		</NcMultiselect>
+		</NcSelect>
 	</div>
 </template>
 
@@ -56,14 +56,14 @@ import { generateOcsUrl } from '@nextcloud/router'
 import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
 import debounce from 'debounce'
-import { NcMultiselect } from '@nextcloud/vue'
+import { NcSelect } from '@nextcloud/vue'
 import { mapGetters, mapState } from 'vuex'
 import formatting from '../../../shared/mixins/formatting.js'
 import ShareTypes from '../mixins/shareTypesMixin.js'
 
 export default {
 	components: {
-		NcMultiselect,
+		NcSelect,
 	},
 
 	mixins: [ShareTypes, formatting],

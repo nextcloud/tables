@@ -1,17 +1,17 @@
 <template>
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description">
-		<NcMultiselect v-model="localValue" :options="getAllNonDeletedOptions" track-by="id" label="label" :close-on-select="true" />
+		<NcSelect v-model="localValue" :options="getAllNonDeletedOptions" />
 	</RowFormWrapper>
 </template>
 
 <script>
-import { NcMultiselect } from '@nextcloud/vue'
+import { NcSelect } from '@nextcloud/vue'
 import RowFormWrapper from './RowFormWrapper.vue'
 
 export default {
 	name: 'SelectionForm',
 	components: {
-		NcMultiselect,
+		NcSelect,
 		RowFormWrapper,
 	},
 	props: {
@@ -34,7 +34,7 @@ export default {
 					return this.getDefaultOptionObject
 				}
 			},
-			set(v) { this.$emit('update:value', v.id) },
+			set(v) { this.$emit('update:value', v?.id) },
 		},
 		getOptions() {
 			return this.column?.selectionOptions || null
