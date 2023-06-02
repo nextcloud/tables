@@ -39,7 +39,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 -->
 
 <template>
-	<div class="NcTable">
+	<div class="NcTable nctable-wrapper">
 		<div class="options row" style="padding-right: calc(var(--default-grid-baseline) * 2);">
 			<Options :rows="rows"
 				:columns="columns"
@@ -53,7 +53,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				@set-search-string="str => $emit('set-search-string', str)"
 				@delete-selected-rows="rowIds => $emit('delete-selected-rows', rowIds)" />
 		</div>
-		<div class="custom-table row">
+		<div class="custom-table row scrollable-view">
 			<CustomTable v-if="canReadTable(table)"
 				:columns="columns"
 				:rows="rows"
@@ -145,12 +145,20 @@ export default {
 <style scoped lang="scss">
 
 .options.row {
-	position: sticky;
-	top: 52px;
-	left: 0;
 	z-index: 15;
 	background-color: var(--color-main-background-translucent);
 	padding-top: 4px; // fix to show buttons completely
 	padding-bottom: 4px; // to make it nice with the padding-top
 }
+
+.nctable-wrapper {
+	display: flex;
+	flex-flow: column;
+	height: 100%;
+}
+
+.scrollable-view {
+	overflow: auto;
+}
+
 </style>

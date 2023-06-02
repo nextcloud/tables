@@ -1,8 +1,8 @@
 <template>
-	<div>
+	<div style="height:100%">
 		<div v-if="isLoading" class="icon-loading" />
 
-		<div v-if="!isLoading && activeTable">
+		<div v-if="!isLoading && activeTable" class="table-page-view">
 			<TableDescription />
 
 			<div class="table-wrapper">
@@ -142,3 +142,15 @@ export default {
 	},
 }
 </script>
+
+<style>
+.table-page-view {
+	display: flex;
+	flex-flow: column;
+	height: 100%;
+}
+
+.table-wrapper {
+	overflow: hidden;
+}
+</style>
