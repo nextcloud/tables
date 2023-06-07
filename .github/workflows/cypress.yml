@@ -14,7 +14,7 @@ concurrency:
 
 env:
   APP_NAME: tables
-  CYPRESS_baseUrl: http://localhost:8081/index.php
+  CYPRESS_baseUrl: http://127.0.0.1:8081/index.php
 
 jobs:
   cypress:
@@ -38,7 +38,7 @@ jobs:
 
     services:
       mysql:
-        image: mariadb:10.5
+        image: ghcr.io/nextcloud/continuous-integration-mariadb-10.6:latest
         ports:
           - 4444:3306/tcp
         env:
@@ -94,7 +94,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          extensions: mbstring, iconv, fileinfo, intl, sqlite, pdo_sqlite, zip, gd, apcu
+          extensions: bz2, ctype, curl, dom, fileinfo, gd, iconv, intl, json, libxml, mbstring, openssl, pcntl, posix, session, simplexml, xmlreader, zip, zlib, sqlite, pdo_sqlite, apcu, pgsql, pdo_pgsql,mysql, pdo_mysql
           ini-values:
             apc.enable_cli=on
           coverage: none
@@ -102,7 +102,7 @@ jobs:
       - name: Set up Nextcloud
         env:
           DB_PORT: 4444
-          PHP_CLI_SERVER_WORKERS: 10
+          PHP_CLI_SERVER_WORKERS: 20
         run: |
           mkdir data
           ./occ maintenance:install --verbose --database=${{ matrix.databases }} --database-name=nextcloud --database-host=127.0.0.1 --database-port=$DB_PORT --database-user=root --database-pass=rootpassword --admin-user admin --admin-pass admin
@@ -113,11 +113,11 @@ jobs:
           ./occ user:list
           ./occ app:enable --force ${{ env.APP_NAME }}
           ./occ config:system:set query_log_file --value '/home/runner/work/${{ env.APP_NAME }}/${{ env.APP_NAME }}/query.log'
-          php -S 0.0.0.0:8081 &
+          php -S 127.0.0.1:8081 > /tmp/requestlog 2>&1 &
           export OC_PASS=1234561
           php occ user:add --password-from-env user1
           php occ user:add --password-from-env user2
-          curl -v http://localhost:8081/index.php/login
+          curl -v http://127.0.0.1:8081/index.php/login
           cat data/nextcloud.log
 
       - name: Cypress run
@@ -133,6 +133,13 @@ jobs:
           COMMIT_INFO_SHA: ${{ github.event.pull_request.head.sha }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           npm_package_name: ${{ env.APP_NAME }}
+          DEBUG: 'cypress:*'
+
+      - name: Print logs
+        if: always()
+        run: |
+          cat /tmp/requestlog
+          cat data/nextcloud.log
 
       - name: Upload test failure screenshots
         uses: actions/upload-artifact@v2
