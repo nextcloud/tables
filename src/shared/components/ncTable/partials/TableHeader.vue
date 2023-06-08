@@ -17,7 +17,7 @@
 				<FilterLabel v-for="filter in getFilterForColumn(col)"
 					:id="filter.columnId + filter.operator + filter.value"
 					:key="filter.columnId + filter.operator + filter.value"
-					:operator-label="getOperatorLabel(filter.operator)"
+					:operator="filter.operator"
 					:value="filter.value"
 					@delete-filter="id => $emit('delete-filter', id)" />
 			</div>

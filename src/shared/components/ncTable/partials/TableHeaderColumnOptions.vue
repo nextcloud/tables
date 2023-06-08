@@ -17,19 +17,20 @@
 					</template>
 				</NcActionButton>
 			</NcActionButtonGroup>
-			<NcActionSeparator v-if="canSort" />
-			<NcActionCaption :title="t('tables', 'Filtering')" />
+			<NcActionSeparator v-if="canSort && haveOperators" />
+			<NcActionCaption v-if="haveOperators" :title="t('tables', 'Filtering')" />
 			<NcActionRadio
-				v-for="(op, index) in getOperators"
+				v-for="(op, index) in visibleOperators"
 				:key="index"
 				:name="'filter-operators-column-' + column.id"
 				:value="op.id"
 				:checked="operator === op.id"
+				:disabled="isDisabled(op.id)"
 				@change="changeFilterOperator">
 				{{ op.label }}
 			</NcActionRadio>
 			<NcActionInput
-				v-if="canFilterWithTextInput"
+				v-if="canFilterWithTextInput && haveOperators"
 				:label-visible="false"
 				:label="t('tables', 'Keyword and submit')"
 				:value.sync="filterValue"
@@ -40,10 +41,10 @@
 				</template>
 			</NcActionInput>
 			<NcActionCaption
-				v-if="getPossibleMagicFields(column).length > 0 && canFilterWithTextInput"
+				v-if="getPossibleMagicFields(column).length > 0 && canFilterWithTextInput && haveOperators"
 				:title="t('tables', 'Or use magic values')" />
 			<NcActionCaption
-				v-if="getPossibleMagicFields(column).length > 0 && !canFilterWithTextInput"
+				v-if="getPossibleMagicFields(column).length > 0 && !canFilterWithTextInput && haveOperators"
 				:title="t('tables', 'Choose value')" />
 			<NcActionButton
 				v-for="(magicField, index) in getMagicFields"
@@ -129,6 +130,16 @@ export default {
 		...mapState({
 			view: state => state.data.view,
 		}),
+		haveOperators() {
+			const columnOperators = this.getOperators
+			return columnOperators && columnOperators.length > this.getDisabledOperators.length
+		},
+		visibleOperators() {
+			if (this.haveOperators && this.getOperators.length >= 2) {
+				return this.getOperators
+			}
+			return []
+		},
 		getOperators() {
 			console.debug('getOperators requested')
 			const possibleOperators = this.getPossibleOperators(this.column)
@@ -140,15 +151,24 @@ export default {
 				this.operator = possibleOperators[0]?.id ?? ''
 				console.debug('operator', this.operator)
 			}
-
-			// only provide a selection, if there is something to select (more than 1 operator)
-			if (possibleOperators.length <= 1) {
-				console.debug('not enough operators', possibleOperators)
-				return null
-			}
 			return possibleOperators
 		},
+		getDisabledOperators() {
+			// filter filters that cannot be combined
+			const filters = this.getFilterForColumn(this.column)
+			if (filters && filters.length > 0) {
+				const incompatibleFilters = new Set()
+				filters.forEach(fil => {
+					this.getIncompatibleFilters(fil.operator).forEach(item => incompatibleFilters.add(item))
+				})
+				return this.getOperators.filter(op => incompatibleFilters.has(op.id))
+			}
+			return []
+		},
 		getMagicFields() {
+			if (!this.haveOperators) {
+				return []
+			}
 			return this.getPossibleMagicFields(this.column)
 		},
 		canSort() {
@@ -189,19 +209,34 @@ export default {
 		submitMagicField(magicFieldId) {
 			console.debug('submitted magic field', magicFieldId)
 			this.filterValue = '@' + magicFieldId
-			this.submitFilter()
+			this.submitFilterInput()
 		},
 		changeFilterOperator(event) {
 			console.debug('operator changed', event?.target?.value)
 			this.operator = event?.target?.value
+			if (this.operator === 'operator-is-empty') {
+				this.submitFilter()
+			}
 		},
 		submitFilterInput() {
 			console.debug('submit clicked', this.filterValue)
+
+			if (this.operator === 'operator-contains') {
+				const columnFilters = this.getFilterForColumn(this.column)
+				if (columnFilters && columnFilters.filter(fil => fil.operator === 'contains').map(fil => fil.value).includes(this.filterValue)) {
+					this.localOpenState = false
+					this.reset()
+					return
+				}
+			}
 			this.submitFilter()
 		},
 		submitFilter() {
 			this.createFilter()
 			this.localOpenState = false
+		},
+		getFilterForColumn(column) {
+			return this.view?.filter?.filter(item => item.columnId === column.id)
 		},
 		createFilter() {
 			const filterObject = {
@@ -219,6 +254,9 @@ export default {
 		},
 		sort(mode) {
 			this.$store.dispatch('addSorting', { columnId: this.column.id, mode })
+		},
+		isDisabled(op) {
+			return this.getDisabledOperators.map(o => o.id).includes(op)
 		},
 	},
 

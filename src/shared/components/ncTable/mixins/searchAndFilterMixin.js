@@ -13,6 +13,7 @@ export default {
 					source: 'operators',
 					subline: t('tables', 'Filter operator'),
 					goodFor: ['text-line', 'text-long', 'selection', 'selection-multi', 'text-link', 'text-rich'],
+					incompatibleWith: ['operator-is-empty', 'operator-is-equal'],
 				},
 				'operator-begins-with': {
 					id: 'operator-begins-with',
@@ -21,6 +22,7 @@ export default {
 					source: 'operators',
 					subline: t('tables', 'Filter operator'),
 					goodFor: ['text-line', 'selection', 'text-link'],
+					incompatibleWith: ['operator-is-empty', 'operator-is-equal', 'operator-begins-with'],
 				},
 				'operator-ends-with': {
 					id: 'operator-ends-with',
@@ -29,6 +31,7 @@ export default {
 					source: 'operators',
 					subline: t('tables', 'Filter operator'),
 					goodFor: ['text-line', 'selection', 'text-link'],
+					incompatibleWith: ['operator-is-empty', 'operator-is-equal', 'operator-ends-with'],
 				},
 				'operator-is-equal': {
 					id: 'operator-is-equal',
@@ -38,6 +41,7 @@ export default {
 					source: 'operators',
 					subline: t('tables', 'Filter operator'),
 					goodFor: ['text-line', 'selection', 'selection-multi', 'number', 'selection-check', 'text-link', 'number-stars', 'number-progress', 'datetime-date', 'datetime-time', 'datetime'],
+					incompatibleWith: ['operator-is-empty', 'operator-is-equal', 'operator-begins-with', 'operator-ends-with', 'operator-contains', 'operator-is-greater-than', 'operator-is-greater-than-or-equal', 'operator-is-lower-than', 'operator-is-lower-than-or-equal'],
 				},
 				'operator-is-greater-than': {
 					id: 'operator-is-greater-than',
@@ -47,6 +51,7 @@ export default {
 					source: 'operators',
 					subline: t('tables', 'Filter operator'),
 					goodFor: ['number', 'number-stars', 'number-progress', 'datetime-date', 'datetime-time', 'datetime'],
+					incompatibleWith: ['operator-is-empty', 'operator-is-equal', 'operator-is-greater-than', 'operator-is-greater-than-or-equal'],
 				},
 				'operator-is-greater-than-or-equal': {
 					id: 'operator-is-greater-than-or-equal',
@@ -56,6 +61,7 @@ export default {
 					source: 'operators',
 					subline: t('tables', 'Filter operator'),
 					goodFor: ['number', 'number-stars', 'number-progress', 'datetime-date', 'datetime-time', 'datetime'],
+					incompatibleWith: ['operator-is-empty', 'operator-is-equal', 'operator-is-greater-than', 'operator-is-greater-than-or-equal'],
 				},
 				'operator-is-lower-than': {
 					id: 'operator-is-lower-than',
@@ -65,6 +71,7 @@ export default {
 					source: 'operators',
 					subline: t('tables', 'Filter operator'),
 					goodFor: ['number', 'number-stars', 'number-progress', 'datetime-date', 'datetime-time', 'datetime'],
+					incompatibleWith: ['operator-is-empty', 'operator-is-equal', 'operator-is-lower-than', 'operator-is-lower-than-or-equal'],
 				},
 				'operator-is-lower-than-or-equal': {
 					id: 'operator-is-lower-than-or-equal',
@@ -74,6 +81,16 @@ export default {
 					source: 'operators',
 					subline: t('tables', 'Filter operator'),
 					goodFor: ['number', 'number-stars', 'number-progress', 'datetime-date', 'datetime-time', 'datetime'],
+					incompatibleWith: ['operator-is-empty', 'operator-is-equal', 'operator-is-lower-than', 'operator-is-lower-than-or-equal'],
+				},
+				'operator-is-empty': {
+					id: 'operator-is-empty',
+					label: t('tables', 'Is empty'),
+					icon: 'icon-add',
+					source: 'operators',
+					subline: t('tables', 'Filter operator'),
+					goodFor: ['text-line', 'text-rich', 'selection', 'selection-multi', 'number', 'text-link', 'number-progress', 'datetime-date', 'datetime-time', 'datetime'],
+					incompatibleWith: ['operator-contains', 'operator-begins-with', 'operator-ends-with', 'operator-is-equal', 'operator-is-greater-than', 'operator-is-greater-than-or-equal', 'operator-is-lower-than', 'operator-is-lower-than-or-equal', 'operator-is-empty'],
 				},
 			},
 			magicFields: {
@@ -243,6 +260,12 @@ export default {
 		getPossibleMagicFields(column) {
 			const columnType = column.type + (column.subtype ? '-' + column.subtype : '')
 			return Object.values(this.magicFields).filter(item => item.goodFor.includes(columnType))
+		},
+		getIncompatibleFilters(id) {
+			if (id.substring(0, 9) !== 'operator-') {
+				id = 'operator-' + id
+			}
+			return this.operators[id]?.incompatibleWith
 		},
 
 	},

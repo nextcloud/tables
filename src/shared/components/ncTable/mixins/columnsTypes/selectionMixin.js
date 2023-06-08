@@ -10,7 +10,7 @@ export default {
 
 		getLabelForSelection(id, column) {
 			column = column || this.column
-			id = id || this.value
+			id = this.value || this.value === 0 ? this.value : id
 			const i = column?.selectionOptions?.findIndex((obj) => obj.id === id)
 			return column?.selectionOptions[i]?.label
 		},
@@ -42,6 +42,8 @@ export default {
 		isFilterFoundForSelection(column, cell, filter) {
 			const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
 
+			console.debug('Selection:', this.getLabelForSelection(cell.value, column), cell.value, column, filterValue)
+
 			if (filter.operator === 'contains' && (this.getLabelForSelection(cell.value, column))?.includes(filterValue)) {
 				cell.filterFound = true
 				return true
@@ -58,6 +60,11 @@ export default {
 				cell.filterFound = true
 				return true
 			}
+			if (filter.operator === 'is-empty' && !this.getLabelForSelection(cell.value, column)) {
+				cell.filterFound = true
+				return true
+			}
+
 			return false
 		},
 

@@ -68,6 +68,10 @@ export default {
 				cell.filterFound = true
 				return true
 			}
+			if (filter.operator === 'is-empty' && !this.getValueStringForSelectionMulti(cell, column)) {
+				cell.filterFound = true
+				return true
+			}
 			return false
 		},
 

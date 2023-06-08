@@ -160,12 +160,12 @@ export default {
 					// if we don't have a value for this cell
 					if (cell === undefined) {
 
-						// if we have a filter for this column, but the cell is null/undefined, we can not have a match
+						// if we have a filter for this column, but the cell is null/undefined, we only can have a match if the filter filters empty cells
 						if (filters !== null) {
-							if (debug) {
+							filterStatus = filters.some(fil => fil.operator === 'is-empty')
+							if (debug && !filterStatus) {
 								console.debug('set row status to false (hard), cell is empty', { filters })
 							}
-							filterStatus = false
 						}
 						if (searchString) {
 							searchStatus = false

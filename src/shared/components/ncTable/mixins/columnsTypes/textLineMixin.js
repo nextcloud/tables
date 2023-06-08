@@ -37,6 +37,10 @@ export default {
 				cell.filterFound = true
 				return true
 			}
+			if (filter.operator === 'is-empty' && !cell.value) {
+				cell.filterFound = true
+				return true
+			}
 			return false
 		},
 	},
