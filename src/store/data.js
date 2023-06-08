@@ -87,6 +87,10 @@ export default {
 			commit('setView', view)
 		},
 
+		resetView({ commit }) {
+			commit('setView', {})
+		},
+
 		// COLUMNS
 		async loadColumnsFromBE({ commit }, { tableId }) {
 			commit('setLoading', true)

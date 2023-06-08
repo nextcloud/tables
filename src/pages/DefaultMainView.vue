@@ -124,6 +124,9 @@ export default {
 
 			if (this.activeTable.id !== this.lastActiveTableId) {
 				this.localLoading = true
+
+				await this.$store.dispatch('resetView')
+
 				await this.$store.dispatch('loadColumnsFromBE', { tableId: this.activeTable.id })
 
 				if (this.canReadTable(this.activeTable)) {
