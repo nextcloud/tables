@@ -337,6 +337,7 @@ export default {
 
 .typeSelections {
 	display: inline-flex;
+	flex-wrap: wrap;
 }
 
 .typeSelections span {
