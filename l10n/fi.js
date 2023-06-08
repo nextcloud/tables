@@ -189,12 +189,11 @@ OC.L10N.register(
     "Confirmation" : "Vahvistus",
     "Confirm" : "Hyväksy",
     "_{nb} row_::_{nb} rows_" : ["{nb} rivi","{nb} riviä"],
-    "Could not create new share" : "Uutta jakoa ei voitu luoda",
     "Share was deleted" : "Jako poistettiin",
-    "Could not delete share" : "Jaon poistaminen epäonnistui",
     "Contains" : "Sisältää",
     "Unchecked" : "Ei tarkistettu",
     "Now" : "Nyt",
+    "Could not update row." : "Riviä ei voitu päivittää.",
     "Could not fetch tables" : "Taulukkoja ei voitu noutaa"
 },
 "nplurals=2; plural=(n != 1);");

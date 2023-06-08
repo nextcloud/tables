@@ -123,7 +123,6 @@ OC.L10N.register(
     "Close editor" : "Sluit editor",
     "Confirmation" : "Bevestiging",
     "Confirm" : "Bevestigen",
-    "Could not delete share" : "Kan gedeelde folder niet verwijderen",
     "Unchecked" : "Niet gecontroleerd",
     "Could not fetch tables" : "Kon tabellen niet ophalen"
 },

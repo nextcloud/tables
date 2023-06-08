@@ -46,7 +46,6 @@ OC.L10N.register(
     "Yes" : "კი",
     "No" : "არა",
     "Confirm" : "დადასტურება",
-    "Could not delete share" : "გაზიარების გაუქმება ვერ მოხერხდა",
     "Unchecked" : "შეუმოწმებელია"
 },
 "nplurals=2; plural=(n!=1);");

@@ -43,7 +43,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:14
+        image: ghcr.io/nextcloud/continuous-integration-postgres-14:latest
         ports:
           - 4445:5432/tcp
         env:
@@ -52,7 +52,7 @@ jobs:
           POSTGRES_DB: nextcloud
         options: --health-cmd pg_isready --health-interval 5s --health-timeout 2s --health-retries 5
       mysql:
-        image: mariadb:10.5
+        image: ghcr.io/nextcloud/continuous-integration-mariadb-10.6:latest
         ports:
           - 4444:3306/tcp
         env:
@@ -83,7 +83,7 @@ jobs:
         uses: shivammathur/setup-php@2.24.0
         with:
           php-version: ${{ matrix.php-versions }}
-          extensions: mbstring, iconv, fileinfo, intl, sqlite, pdo_sqlite, mysql, pdo_mysql, pgsql, pdo_pgsql, apcu
+          extensions: bz2, ctype, curl, dom, fileinfo, gd, iconv, intl, json, libxml, mbstring, openssl, pcntl, posix, session, simplexml, xmlreader, zip, zlib, sqlite, pdo_sqlite, apcu, pgsql, pdo_pgsql,mysql, pdo_mysql
           ini-values:
             apc.enable_cli=on
           coverage: none
@@ -115,7 +115,7 @@ jobs:
         run: ./run.sh
 
       - name: Query count
-        if: ${{ matrix.databases == 'mysql' && github.event_name == 'pull_request' }}
+        if: ${{ matrix.databases == 'mysql' && matrix.php-versions == '8.2' && matrix.server-versions == 'master' && github.event_name == 'pull_request' }}
         uses: actions/github-script@v6
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}

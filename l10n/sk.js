@@ -88,7 +88,6 @@ OC.L10N.register(
     "The title limit is reached with 200 characters. Please use a shorter title." : "Limit názvu je dosiahnutý s 200 znakmi. Použite kratší názov.",
     "Cannot create new table. Title is missing." : "Novú tabuľku nie je možné vytvoriť. Chýba názov.",
     "Could not create new table" : "Nepodarilo sa vytvoriť novú tabuľku",
-    "Could not fetch templates from backend" : "Nepodarilo sa načítať šablóny z backendu",
     "Import" : "Import",
     "File" : "Súbor",
     "Select a file" : "Vybrať súbor",
@@ -165,14 +164,11 @@ OC.L10N.register(
     "Close editor" : "Zavrieť editor",
     "Confirmation" : "Potvrdenie",
     "Confirm" : "Potvrdiť",
-    "Could not load shares from back end" : "Nepodarilo sa načítať zdieľania z backendu",
     "Saved new share with \"{userName}\"." : "Uložené nové zdieľanie s \"{userName}\".",
-    "Could not create new share" : "Nie je možné vytvoriť nové zdieľanie",
     "Share was deleted" : "Zdieľanie bolo vymazané",
-    "Could not delete share" : "Nie je možné zmazať sprístupnenie",
     "Share permission was updated" : "Právo na zdieľanie bolo upravené",
-    "Could not update share permission" : "Nepodarilo sa aktualizovať právo na zdieľanie",
     "Unchecked" : "Nekontrolované",
+    "Could not update row." : "Nepodarilo sa upraviť riadok.",
     "Could not fetch tables" : "Nepodarilo sa získať tabuľky."
 },
 "nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);");

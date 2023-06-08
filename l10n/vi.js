@@ -60,7 +60,6 @@ OC.L10N.register(
     "No" : "Không",
     "Max" : "Tối đa",
     "Close editor" : "Đóng trình biên tập",
-    "Confirm" : "Xác nhận",
-    "Could not delete share" : "Không thể xoá chia sẻ"
+    "Confirm" : "Xác nhận"
 },
 "nplurals=1; plural=0;");

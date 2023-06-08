@@ -50,7 +50,6 @@ OC.L10N.register(
     "Default" : "E paracaktuar",
     "Yes" : "Yes",
     "No" : "Jo",
-    "Confirm" : "Konfirmo",
-    "Could not delete share" : "Ndarja s’u fshi dot"
+    "Confirm" : "Konfirmo"
 },
 "nplurals=2; plural=(n != 1);");

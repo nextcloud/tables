@@ -58,11 +58,12 @@
 
 <script>
 import { NcModal, NcEmojiPicker, NcButton } from '@nextcloud/vue'
-import { showError, showWarning } from '@nextcloud/dialogs'
+import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import NcTile from '../../../shared/components/NcTile/NcTile.vue'
+import displayError from '../../../shared/utils/displayError.js'
 
 export default {
 	name: 'CreateTable',
@@ -178,14 +179,9 @@ export default {
 		async loadTemplatesFromBE() {
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/table/templates'))
-				if (res.status !== 200) {
-					showWarning(t('tables', 'Sorry, something went wrong.'))
-					console.debug('axios error', res)
-				}
 				this.templates = res.data
 			} catch (e) {
-				console.error(e)
-				showError(t('tables', 'Could not fetch templates from backend'))
+				displayError(e, t('tables', 'Could not load templates.'))
 			}
 		},
 	},

@@ -133,7 +133,6 @@ OC.L10N.register(
     "Close editor" : "Κλείσιμο του επεξεργαστή",
     "Confirmation" : "Επιβεβαίωση",
     "Confirm" : "Επιβεβαίωση",
-    "Could not delete share" : "Αδυναμία διαγραφής κοινόχρηστου φακέλου",
     "Unchecked" : "Δεν έχει ελεγχθεί",
     "Could not fetch tables" : "Αδυναμία ανάκτησης πινάκων"
 },

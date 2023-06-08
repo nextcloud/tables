@@ -48,7 +48,6 @@
     "Default" : "E paracaktuar",
     "Yes" : "Yes",
     "No" : "Jo",
-    "Confirm" : "Konfirmo",
-    "Could not delete share" : "Ndarja s’u fshi dot"
+    "Confirm" : "Konfirmo"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

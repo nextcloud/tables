@@ -40,7 +40,6 @@
     "Default" : "Vaikeväärtus",
     "Yes" : "Jah",
     "No" : "Ei",
-    "Confirm" : "Kinnita",
-    "Could not delete share" : "Ei saanud jagamist eemaldada"
+    "Confirm" : "Kinnita"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

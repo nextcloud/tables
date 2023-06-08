@@ -46,7 +46,6 @@ OC.L10N.register(
     "Options" : "Opțiuni",
     "Yes" : "a",
     "No" : "Nu",
-    "Confirm" : "Confirmă",
-    "Could not delete share" : "Nu s-a putut șterge elementul partajat"
+    "Confirm" : "Confirmă"
 },
 "nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));");

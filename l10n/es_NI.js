@@ -44,7 +44,6 @@ OC.L10N.register(
     "Default" : "Predeterminado",
     "Yes" : "Sí",
     "No" : "No",
-    "Confirm" : "Confirmar",
-    "Could not delete share" : "No fue posible borrar el elemento compartido"
+    "Confirm" : "Confirmar"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

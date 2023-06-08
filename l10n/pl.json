@@ -87,7 +87,6 @@
     "The title limit is reached with 200 characters. Please use a shorter title." : "Limit tytułu został osiągnięty przy 200 znakach. Użyj krótszego tytułu.",
     "Cannot create new table. Title is missing." : "Nie można utworzyć nowej tabeli. Brak tytułu.",
     "Could not create new table" : "Nie można utworzyć nowej tabeli",
-    "Could not fetch templates from backend" : "Nie udało się pobrać szablonów z zaplecza",
     "Import" : "Importuj",
     "File" : "Plik",
     "Select a file" : "Wybierz plik",
@@ -163,14 +162,11 @@
     "Close editor" : "Zamknij edytor",
     "Confirmation" : "Potwierdzenie",
     "Confirm" : "Potwierdź",
-    "Could not load shares from back end" : "Nie udało się wczytać udostępnienia z zaplecza",
     "Saved new share with \"{userName}\"." : "Zapisano nowe udostępnienie dla użytkownika \"{userName}\".",
-    "Could not create new share" : "Nie udało się utworzyć nowego udostępnienia",
     "Share was deleted" : "Udostępnienie zostało usunięte",
-    "Could not delete share" : "Nie można usunąć udostępniania",
     "Share permission was updated" : "Uprawnienie do udostępnienia zostało zaktualizowane",
-    "Could not update share permission" : "Nie udało się zaktualizować uprawnień do udostępnienia",
     "Unchecked" : "Niesprawdzony",
+    "Could not update row." : "Nie udało się zaktualizować wiersza.",
     "Could not fetch tables" : "Nie udało się pobrać tabel"
 },"pluralForm" :"nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);"
 }

@@ -86,7 +86,6 @@ OC.L10N.register(
     "Max" : "最大",
     "Close editor" : "エディタを閉じる",
     "Confirm" : "承認",
-    "Could not delete share" : "共有を削除できませんでした",
     "Unchecked" : "未チェック"
 },
 "nplurals=1; plural=0;");

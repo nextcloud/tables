@@ -174,7 +174,6 @@ OC.L10N.register(
     "Cannot create new table. Title is missing." : "Az új táblázat nem hozható létre. A cím hiányzik.",
     "The table \"{emoji} {table}\" is ready to use." : "A(z) „{emoji} {table}” táblázat használatra kész.",
     "Could not create new table" : "Nem sikerült az új táblázat létrehozása",
-    "Could not fetch templates from backend" : "Nem sikerült lekérni a sablonokat a háttérszolgáltatástól",
     "I really want to delete this table!" : "Mindenképp törlöm ezt a táblát.",
     "Cannot update table. Title is missing." : "A táblázat nem frissíthető. A cím hiányzik.",
     "Updated table \"{emoji}{table}\"." : "A(z) „{emoji}{table}” táblázat frissítve.",
@@ -267,14 +266,11 @@ OC.L10N.register(
     "Confirmation" : "Megerősítés",
     "Confirm" : "Megerősítés",
     "_{nb} row_::_{nb} rows_" : ["{nb} sor","{nb} sor"],
-    "Could not load shares from back end" : "Nem sikerült lekérni a megosztásokat a háttérszolgáltatástól",
     "Saved new share with \"{userName}\"." : "Az új megosztás mentve „{userName}” néven.",
-    "Could not create new share" : "Nem sikerült az új megosztás létrehozása",
     "Share was deleted" : "A megosztás törölve lett",
-    "Could not delete share" : "A megosztás nem törölhető",
     "Share permission was updated" : "A megosztás jogosultsága frissítve lett",
-    "Could not update share permission" : "Nem sikerült frissíteni a megosztás jogosultságát",
     "Unchecked" : "Ellenőrizetlen",
+    "Could not update row." : "Nem sikerült a sor frissítése.",
     "Could not fetch tables" : "Nem sikerült a táblázatok lekérése"
 },
 "nplurals=2; plural=(n != 1);");

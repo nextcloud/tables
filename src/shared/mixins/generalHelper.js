@@ -8,6 +8,6 @@ export default {
 			// converting first letter to uppercase
 			return str.charAt(0).toUpperCase() + str.slice(1)
 		},
-	},
 
+	},
 }

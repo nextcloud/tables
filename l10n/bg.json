@@ -100,6 +100,7 @@
     "Create column" : "Създаване на колона",
     "Type" : "Тип",
     "Text line" : "Текстов ред",
+    "Simple text" : "Обикновен текст",
     "Rich text" : "Форматиран текст",
     "Single selection" : "Единична селекция",
     "Multiple selection" : "Множествена селекция",
@@ -167,7 +168,6 @@
     "Cannot create new table. Title is missing." : "Не може да се създаде нова таблица. Липсва заглавие.",
     "The table \"{emoji} {table}\" is ready to use." : "Таблицата „{emoji} {table}“ е готова за използване.",
     "Could not create new table" : "Не можа да се създаде нова таблица",
-    "Could not fetch templates from backend" : "Не можаха да се извлекът шаблони от сървъра",
     "I really want to delete this table!" : "Наистина искам да изтрия тази таблица!",
     "Cannot update table. Title is missing." : "Не може да се обнови таблицата. Липсва заглавие.",
     "Updated table \"{emoji}{table}\"." : "Таблицата „{emoji}{table}“ е актуализирана.",
@@ -271,13 +271,9 @@
     "Confirmation" : "Потвърждение",
     "Confirm" : "Потвърдете",
     "_{nb} row_::_{nb} rows_" : ["{nb} редове","{nb} редове"],
-    "Could not load shares from back end" : "Не можаха да се заредят споделянията от сървъра",
     "Saved new share with \"{userName}\"." : "Запазено е ново споделяне с „{userName}“.",
-    "Could not create new share" : "Не можа да се създаде ново споделяне",
     "Share was deleted" : "Споделянето беше изтрито",
-    "Could not delete share" : "Не е възможно изтриване на споделянето",
     "Share permission was updated" : "Право за споделяне беше актуализирано",
-    "Could not update share permission" : "Не можа да се актуализира право за споделяне",
     "Contains" : "Съдържа",
     "Filter operator" : "Оператор на филтър",
     "Begins with" : "Започва с",
@@ -295,6 +291,7 @@
     "Start of the month" : "Начало на месеца",
     "Start of the week" : "Начало на седмицата",
     "Now" : "Сега",
+    "Could not update row." : "Редът не можа да се актуализира.",
     "Could not fetch tables" : "Таблиците не можаха да бъдат извлечени"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

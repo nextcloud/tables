@@ -156,7 +156,6 @@ OC.L10N.register(
     "Cannot create new table. Title is missing." : "No es pot crear una taula nova. Falta el títol.",
     "The table \"{emoji} {table}\" is ready to use." : "La taula \"{emoji} {table}\" està a punt per utilitzar-se.",
     "Could not create new table" : "No s'ha pogut crear una taula nova",
-    "Could not fetch templates from backend" : "No s'han pogut obtenir plantilles del servidor rerefons",
     "I really want to delete this table!" : "Tinc moltes ganes d'esborrar aquesta taula!",
     "Cannot update table. Title is missing." : "No es pot actualitzar la taula. Falta el títol.",
     "Updated table \"{emoji}{table}\"." : "S'ha actualitzat la taula \"{emoji}{table}\".",
@@ -243,14 +242,11 @@ OC.L10N.register(
     "Confirmation" : "Confirmació",
     "Confirm" : "Confirma",
     "_{nb} row_::_{nb} rows_" : ["{nb} fila","{nb} files"],
-    "Could not load shares from back end" : "No s'han pogut carregar els elements compartits des del servidor",
     "Saved new share with \"{userName}\"." : "S'ha desat una nova compartició amb \"{userName}\".",
-    "Could not create new share" : "No s'ha pogut crear una compartició nova",
     "Share was deleted" : "S'ha suprimit la compartició",
-    "Could not delete share" : "No s'ha pogut suprimir la compartició",
     "Share permission was updated" : "S'ha actualitzat el permís per compartir",
-    "Could not update share permission" : "No s'ha pogut actualitzar el permís per compartir",
     "Unchecked" : "Sense verificar",
+    "Could not update row." : "No s'ha pogut actualitzar la fila.",
     "Could not fetch tables" : "No s'han pogut recuperar les taules"
 },
 "nplurals=2; plural=(n != 1);");
