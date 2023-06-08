@@ -18,13 +18,13 @@ env:
 
 jobs:
   cypress:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     strategy:
       fail-fast: false
       matrix:
         node-version: [ 16 ]
-        containers: [ 1 ]
+        containers: [ 1, 2, 3, 4, 5, 6, 7, 8 ]
         php-versions: [ '7.4', '8.1' ]
         databases: [ 'mysql', 'sqlite' ]
         server-versions: [ 'stable25', 'stable26', 'stable27', 'master' ]
