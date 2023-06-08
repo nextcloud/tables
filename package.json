@@ -60,6 +60,6 @@
 		"@nextcloud/webpack-vue-config": "^5.5.1",
 		"cypress": "^12.13.0",
 		"sass": "^1.62.1",
-		"sass-loader": "^13.3.0"
+		"sass-loader": "^13.3.1"
 	}
 }
