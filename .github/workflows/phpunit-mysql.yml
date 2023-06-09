@@ -138,7 +138,7 @@ jobs:
       - name: Print logs
         if: always()
         run: |
-          cat data/nextcloud.log
+          [ -f "data/nextcloud.log" ] && cat data/nextcloud.log || echo "No log file"
 
       - name: Skipped
         # Fail the action when neither unit nor integration tests ran
