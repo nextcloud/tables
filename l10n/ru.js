@@ -81,6 +81,7 @@ OC.L10N.register(
     "Heading 2" : "Заголовок 2",
     "Heading 3" : "Заголовок 3",
     "Code" : "Код",
+    "Order weight" : "Порядковый номер",
     "Minimum" : "Минимум",
     "Maximum" : "Максимум",
     "Prefix" : "Префикс",
