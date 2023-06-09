@@ -11,16 +11,14 @@ export default {
 				return (valueA - valueB) * factor
 			}
 		},
-		isFilterFoundForSelectionCheck(column, cell, filter) {
-			const yesPossibilities = ['yes', 'true', 'check', 'checked', 'y']
-			const noPossibilities = ['no', 'false', 'unchecked', 'uncheck', 'n']
-			const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
 
-			if (filter.operator === 'is-equal' && cell.value === 'true' && yesPossibilities.findIndex(item => item === filterValue) !== -1) {
+		isFilterFoundForSelectionCheck(column, cell, filter) {
+			const filterValue = '' + filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
+			if (filter.operator === 'is-equal' && cell?.value === 'true' && filterValue === 'yes') {
 				cell.filterFound = true
 				return true
 			}
-			if (filter.operator === 'is-equal' && cell.value === 'false' && noPossibilities.findIndex(item => item === filterValue) !== -1) {
+			if (filter.operator === 'is-equal' && cell?.value !== 'true' && filterValue === 'no') {
 				cell.filterFound = true
 				return true
 			}

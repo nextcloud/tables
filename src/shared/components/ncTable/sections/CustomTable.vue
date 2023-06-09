@@ -157,16 +157,18 @@ export default {
 					const filters = this.getFiltersForColumn(column)
 					const cell = row.data.find(item => item.columnId === column.id)
 
+					// if we should filter
+					if (filters !== null) {
+						filters.forEach(fil => {
+							this.addMagicFieldsValues(fil)
+							if (filterStatus === null || filterStatus === true) {
+								filterStatus = this.isFilterFound(column, cell || {}, fil)
+							}
+						})
+					}
+
 					// if we don't have a value for this cell
 					if (cell === undefined) {
-
-						// if we have a filter for this column, but the cell is null/undefined, we only can have a match if the filter filters empty cells
-						if (filters !== null) {
-							filterStatus = filters.some(fil => fil.operator === 'is-empty')
-							if (debug && !filterStatus) {
-								console.debug('set row status to false (hard), cell is empty', { filters })
-							}
-						}
 						if (searchString) {
 							searchStatus = false
 						}
@@ -175,25 +177,15 @@ export default {
 						delete cell.searchStringFound
 						delete cell.filterFound
 
-						// if we should filter
-						if (filters !== null) {
-							filters.forEach(fil => {
-								this.addMagicFieldsValues(fil)
-								if (filterStatus === null || filterStatus === true) {
-									filterStatus = this.isFilterFound(column, cell, fil)
-								}
-								// filterStatus = filterStatus || this.isFilterFound(column, cell, fil)
-							})
-						}
 						// if we should search
 						if (searchString) {
 							console.debug('look for searchString', searchString)
 							searchStatus = this.isSearchStringFound(column, cell, searchString)
 						}
+					}
 
-						if (debug) {
-							console.debug('filterStatus for cell', { cell: cell.value, filterStatusCell: filterStatus, filterStatusRowBefore: filterStatusRow })
-						}
+					if (debug) {
+						console.debug('filterStatus for cell', { cell: cell?.value, filterStatusCell: filterStatus, filterStatusRowBefore: filterStatusRow })
 					}
 
 					// if filterStatus is null, this result should be ignored
