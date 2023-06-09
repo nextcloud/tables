@@ -11,7 +11,7 @@
 					<Fullscreen :size="20" />
 				</template>
 			</NcButton>
-			<NcModal v-if="showBigEditorModal" :close-button-contained="true" size="full" :title="column.title" @close="showBigEditorModal = false">
+			<NcModal v-if="showBigEditorModal" :close-button-contained="false" size="full" :title="column.title" @close="showBigEditorModal = false">
 				<div class="row">
 					<div class="fix-col-4">
 						<NcEditor :text.sync="localValue" :show-border="false" />
@@ -75,3 +75,12 @@ export default {
 
 }
 </script>
+<style lang="scss" scoped>
+
+	.closeModalButton {
+		position: fixed;
+		bottom: calc(var(--default-grid-baseline) * 2);
+		right: calc(var(--default-grid-baseline) * 2);
+	}
+
+</style>
