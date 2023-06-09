@@ -1,34 +1,35 @@
 <template>
-	<NcMultiselect v-model="combinedTypeObject"
+	<NcSelect v-model="combinedTypeObject"
 		:options="typeOptions"
-		track-by="id"
-		label="label"
+		:clearable="false"
 		style="width: 100%">
 		<template #option="props">
-			<TextLongIcon v-if="props.option.id === 'text'" />
-			<LinkIcon v-if="props.option.id === 'text-link'" />
-			<CounterIcon v-if="props.option.id === 'number'" />
-			<StarIcon v-if="props.option.id === 'number-stars'" />
-			<ProgressIcon v-if="props.option.id === 'number-progress'" />
-			<SelectionIcon v-if="props.option.id === 'selection'" />
-			<DatetimeIcon v-if="props.option.id === 'datetime'" />
-			<div class="multiSelectOptionLabel">
-				{{ props.option.label }}
+			<div class="icon-label-container">
+				<TextLongIcon v-if="props.id === 'text'" />
+				<LinkIcon v-if="props.id === 'text-link'" />
+				<CounterIcon v-if="props.id === 'number'" />
+				<StarIcon v-if="props.id === 'number-stars'" />
+				<ProgressIcon v-if="props.id === 'number-progress'" />
+				<SelectionIcon v-if="props.id === 'selection'" />
+				<DatetimeIcon v-if="props.id === 'datetime'" />
+				<div class="multiSelectOptionLabel">
+					{{ props.label }}
+				</div>
 			</div>
 		</template>
-		<template #singleLabel="props">
-			<TextLongIcon v-if="props.option.id === 'text'" />
-			<LinkIcon v-if="props.option.id === 'text-link'" />
-			<CounterIcon v-if="props.option.id === 'number'" />
-			<StarIcon v-if="props.option.id === 'number-stars'" />
-			<ProgressIcon v-if="props.option.id === 'number-progress'" />
-			<SelectionIcon v-if="props.option.id === 'selection'" />
-			<DatetimeIcon v-if="props.option.id === 'datetime'" />
+		<template #selected-option="props">
+			<TextLongIcon v-if="props.id === 'text'" />
+			<LinkIcon v-if="props.id === 'text-link'" />
+			<CounterIcon v-if="props.id === 'number'" />
+			<StarIcon v-if="props.id === 'number-stars'" />
+			<ProgressIcon v-if="props.id === 'number-progress'" />
+			<SelectionIcon v-if="props.id === 'selection'" />
+			<DatetimeIcon v-if="props.id === 'datetime'" />
 			<div class="multiSelectOptionLabel">
-				{{ props.option.label }}
+				{{ props.label }}
 			</div>
 		</template>
-	</NcMultiselect>
+	</NcSelect>
 </template>
 
 <script>
@@ -40,7 +41,7 @@ import StarIcon from 'vue-material-design-icons/Star.vue'
 import ProgressIcon from 'vue-material-design-icons/ArrowRightThin.vue'
 import SelectionIcon from 'vue-material-design-icons/FormSelect.vue'
 import DatetimeIcon from 'vue-material-design-icons/ClipboardTextClockOutline.vue'
-import { NcMultiselect } from '@nextcloud/vue'
+import { NcSelect } from '@nextcloud/vue'
 
 export default {
 	components: {
@@ -51,7 +52,7 @@ export default {
 		CounterIcon,
 		LinkIcon,
 		TextLongIcon,
-		NcMultiselect,
+		NcSelect,
 	},
 	props: {
 		columnId: {
@@ -137,6 +138,11 @@ export default {
 
 .multiSelectOptionLabel {
 	padding-left: calc(var(--default-grid-baseline) * 1);
+}
+
+.icon-label-container {
+	display: flex;
+	align-items: center;
 }
 
 </style>

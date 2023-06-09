@@ -1,17 +1,17 @@
 <template>
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description">
-		<NcMultiselect v-model="localValues" :tag-width="80" :options="getAllNonDeletedOrSelectedOptions" track-by="id" label="label" :multiple="true" />
+		<NcSelect v-model="localValues" :tag-width="80" :options="getAllNonDeletedOrSelectedOptions" :multiple="true" />
 	</RowFormWrapper>
 </template>
 
 <script>
-import { NcMultiselect } from '@nextcloud/vue'
+import { NcSelect } from '@nextcloud/vue'
 import RowFormWrapper from './RowFormWrapper.vue'
 
 export default {
 	name: 'SelectionMultiForm',
 	components: {
-		NcMultiselect,
+		NcSelect,
 		RowFormWrapper,
 	},
 	props: {
