@@ -7,7 +7,7 @@
 			type="number"
 			:min="column.numberMin"
 			:max="column.numberMax"
-			:step="column.numberDecimals === 0 ? '' : 'any'">
+			:step="getStep">
 		<div v-if="column.numberSuffix" class="suffix">
 			{{ column.numberSuffix }}
 		</div>
@@ -18,9 +18,11 @@
 import RowFormWrapper from './RowFormWrapper.vue'
 
 export default {
+
 	components: {
 		RowFormWrapper,
 	},
+
 	props: {
 		column: {
 			type: Object,
@@ -31,25 +33,45 @@ export default {
 			default: null,
 		},
 	},
+
 	data() {
 		return {
+			localValue: null,
 		}
 	},
+
 	computed: {
-		localValue: {
-			get() {
-				if (this.value) {
-					return this.value
-				} else {
-					if (this.column.numberDefault !== undefined) {
-						this.$emit('update:value', this.column.numberDefault)
-						return this.column.numberDefault
-					} else {
-						return null
-					}
-				}
-			},
-			set(v) { this.$emit('update:value', parseFloat(v)) },
+		getStep() {
+			if (this.column?.numberDecimals === 0) {
+				return '1'
+			} else if (this.column?.numberDecimals > 0) {
+				return '.' + '0'.repeat(this.column.numberDecimals - 1) + '1'
+			} else {
+				return 'any'
+			}
+		},
+	},
+
+	watch: {
+		localValue() {
+			const value = this.parseValue(this.localValue)
+			this.localValue = value
+			this.$emit('update:value', value)
+		},
+		value() {
+			this.localValue = this.value
+		},
+	},
+
+	mounted() {
+		this.localValue = this.value
+	},
+
+	methods: {
+		parseValue(inputValue) {
+			const parsedValue = parseFloat(inputValue)
+			const roundedValue = parsedValue.toFixed(this.column?.numberDecimals)
+			return parseFloat(roundedValue)
 		},
 	},
 }
