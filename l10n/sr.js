@@ -327,6 +327,7 @@ OC.L10N.register(
     "Is greater than or equal" : "Веће или једнако",
     "Is lower than" : "Мање од",
     "Is lower than or equal" : "Мање или једнако",
+    "Is empty" : "Празно је",
     "Me (user ID)" : "Ја (ID корисника)",
     "Magic field" : "Магично поље",
     "Me (name)" : "Ја (име)",

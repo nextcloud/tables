@@ -327,6 +327,7 @@ OC.L10N.register(
     "Is greater than or equal" : "Is greater than or equal",
     "Is lower than" : "Is lower than",
     "Is lower than or equal" : "Is lower than or equal",
+    "Is empty" : "Is empty",
     "Me (user ID)" : "Me (user ID)",
     "Magic field" : "Magic field",
     "Me (name)" : "Me (name)",

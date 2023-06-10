@@ -327,6 +327,7 @@ OC.L10N.register(
     "Is greater than or equal" : "是大於或等於",
     "Is lower than" : "是低於",
     "Is lower than or equal" : "是低於或等於",
+    "Is empty" : "為空",
     "Me (user ID)" : "我（用戶 ID）",
     "Magic field" : "魔法欄位",
     "Me (name)" : "我（名字）",
