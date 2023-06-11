@@ -35,6 +35,7 @@ OC.L10N.register(
     "Delete" : "Вилучити",
     "Create" : "Створити",
     "Today" : "Сьогодні",
+    "Edit table" : "Редагувати таблицю",
     "Title" : "Назва",
     "Select emoji" : "Виберіть емоційку",
     "Import" : "Імпорт",
