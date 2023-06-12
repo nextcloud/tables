@@ -53,11 +53,12 @@ class Clean extends Command {
 	protected RowMapper $rowMapper;
 
 	private bool $dry = false;
-	private bool $showOnlyErrors = false;
 	private int $truncateLength = 20;
 
 	private ?Row $row = null;
 	private int $offset = -1;
+
+	private OutputInterface $output;
 
 	public function __construct(LoggerInterface $logger, ColumnService $columnService, RowService $rowService, TableService $tableService, RowMapper $rowMapper) {
 		parent::__construct();
@@ -73,16 +74,10 @@ class Clean extends Command {
 			->setName('tables:clean')
 			->setDescription('Clean the tables data.')
 			->addOption(
-				'dry-run',
+				'dry',
 				'd',
 				InputOption::VALUE_NONE,
 				'Prints all wanted changes, but do not write anything to the database.'
-			)
-			->addOption(
-				'only-errors',
-				'e',
-				InputOption::VALUE_NONE,
-				'Show only errors.'
 			)
 		;
 	}
@@ -93,14 +88,14 @@ class Clean extends Command {
 	 * @return int
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output): int {
-		$this->dry = !!$input->getOption('dry-run');
-		$this->showOnlyErrors = !!$input->getOption('only-errors');
+		$this->output = $output;
+		$this->dry = !!$input->getOption('dry');
 
 		if ($this->dry) {
 			$this->print("Dry run activated.");
 		}
-		if ($this->showOnlyErrors) {
-			$this->print("Print only errors mode activated.");
+		if ($output->isVerbose()) {
+			$this->print("Verbose mode activated.");
 		}
 
 		// check action, starting point for magic
@@ -153,16 +148,16 @@ class Clean extends Command {
 
 			try {
 				$this->columnService->find($date->columnId, '');
-				if(!$this->showOnlyErrors) {
+				if($this->output->isVerbose()) {
 					$this->print("column found", self::PRINT_LEVEL_SUCCESS);
 				}
 			} catch (InternalError $e) {
 				$this->print("😱️ internal error while looking for column", self::PRINT_LEVEL_ERROR);
 			} catch (NotFoundError $e) {
-				if($this->showOnlyErrors) {
-					$this->print("columnId: " . $date->columnId . " not found, but needed by row ".$this->row->getId(), self::PRINT_LEVEL_WARNING);
-				} else {
+				if($this->output->isVerbose()) {
 					$this->print("corresponding column not found.", self::PRINT_LEVEL_ERROR);
+				} else {
+					$this->print("columnId: " . $date->columnId . " not found, but needed by row ".$this->row->getId(), self::PRINT_LEVEL_WARNING);
 				}
 				// if the corresponding column is not found, lets delete the data from the row.
 				$this->deleteDataFromRow($date->columnId);
@@ -203,7 +198,7 @@ class Clean extends Command {
 		if($level === self::PRINT_LEVEL_SUCCESS) {
 			echo "✅ ".$message;
 			echo "\n";
-		} elseif ($level === self::PRINT_LEVEL_INFO && !$this->showOnlyErrors) {
+		} elseif ($level === self::PRINT_LEVEL_INFO && $this->output->isVerbose()) {
 			echo "ℹ️  ".$message;
 			echo "\n";
 		} elseif ($level === self::PRINT_LEVEL_WARNING) {
@@ -212,7 +207,7 @@ class Clean extends Command {
 		} elseif ($level === self::PRINT_LEVEL_ERROR) {
 			echo "❌ ".$message;
 			echo "\n";
-		} elseif (!$this->showOnlyErrors) {
+		} elseif ($this->output->isVerbose()) {
 			echo $message;
 			echo "\n";
 		}
