@@ -110,6 +110,7 @@ class Clean extends Command {
 			$this->offset = $this->row->getId();
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->print('Error while fetching row', self::PRINT_LEVEL_ERROR);
+			$this->logger->error('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
 		} catch (DoesNotExistException $e) {
 			$this->print("");
 			$this->print("No more rows found.", self::PRINT_LEVEL_INFO);
@@ -153,6 +154,7 @@ class Clean extends Command {
 				}
 			} catch (InternalError $e) {
 				$this->print("😱️ internal error while looking for column", self::PRINT_LEVEL_ERROR);
+				$this->logger->error('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
 			} catch (NotFoundError $e) {
 				if($this->output->isVerbose()) {
 					$this->print("corresponding column not found.", self::PRINT_LEVEL_ERROR);
@@ -163,6 +165,7 @@ class Clean extends Command {
 				$this->deleteDataFromRow($date->columnId);
 			} catch (PermissionError $e) {
 				$this->print("😱️ permission error while looking for column", self::PRINT_LEVEL_ERROR);
+				$this->logger->error('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
 			}
 		}
 	}
@@ -191,6 +194,7 @@ class Clean extends Command {
 			$this->print("Row successfully updated", self::PRINT_LEVEL_SUCCESS);
 		} catch (Exception $e) {
 			$this->print("Error while updating row to db.", self::PRINT_LEVEL_ERROR);
+			$this->logger->error('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
 		}
 	}
 
