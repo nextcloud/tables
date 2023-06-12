@@ -8,6 +8,7 @@ use OCP\AppFramework\Db\Entity;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
+ * @method getTableId()
  */
 class Row extends Entity implements JsonSerializable {
 	protected ?int $tableId = null;

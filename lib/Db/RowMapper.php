@@ -57,6 +57,22 @@ class RowMapper extends QBMapper {
 	}
 
 	/**
+	 * @throws MultipleObjectsReturnedException
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 */
+	public function findNext(int $offsetId = -1): Row {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->gt('id', $qb->createNamedParameter($offsetId)))
+			->setMaxResults(1)
+			->orderBy('id', 'ASC');
+
+		return $this->findEntity($qb);
+	}
+
+	/**
 	 * @return int affected rows
 	 * @throws Exception
 	 */
