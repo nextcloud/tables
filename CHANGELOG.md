@@ -1,11 +1,22 @@
 # Changelog
 
+## 0.5.1 - 2023-06-12
+### Added
+- 💻 OCC command to clean up row data
+- ✨ Filter for empty cells
+
+### Updated
+- 🏳️ Translations
+- 🐞 A lot of bug fixing
+- ✨ Small design adjustments
+- 💾 Update software dependencies
+
 ## 0.5.0 - 2023-05-14
 ### Updated
 - Fix bugs
 - Update translations
 - Update software dependencies
-- Accessibility improvements 
+- Accessibility improvements
 
 ### Added
 - 🔍 Search and filter in tables
