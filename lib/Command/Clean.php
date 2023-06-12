@@ -1,0 +1,221 @@
+<?php
+/**
+ * @copyright Copyright (c) 2023 Florian Steffens <flost-dev@mailbox.org>
+ *
+ * @author Florian Steffens <flost-dev@mailbox.org>
+ *
+ * @license GNU AGPL version 3 or any later version
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+namespace OCA\Tables\Command;
+
+use OCA\Tables\Db\Row;
+use OCA\Tables\Db\RowMapper;
+use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Service\ColumnService;
+use OCA\Tables\Service\RowService;
+use OCA\Tables\Service\TableService;
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
+use OCP\DB\Exception;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+
+class Clean extends Command {
+	public const PRINT_LEVEL_SUCCESS = 1;
+	public const PRINT_LEVEL_INFO = 2;
+	public const PRINT_LEVEL_WARNING = 3;
+	public const PRINT_LEVEL_ERROR = 4;
+
+	protected ColumnService $columnService;
+	protected RowService $rowService;
+	protected TableService $tableService;
+	protected LoggerInterface $logger;
+	protected RowMapper $rowMapper;
+
+	private bool $dry = false;
+	private bool $showOnlyErrors = false;
+	private int $truncateLength = 20;
+
+	private ?Row $row = null;
+	private int $offset = -1;
+
+	public function __construct(LoggerInterface $logger, ColumnService $columnService, RowService $rowService, TableService $tableService, RowMapper $rowMapper) {
+		parent::__construct();
+		$this->logger = $logger;
+		$this->columnService = $columnService;
+		$this->rowService = $rowService;
+		$this->tableService = $tableService;
+		$this->rowMapper = $rowMapper;
+	}
+
+	protected function configure(): void {
+		$this
+			->setName('tables:clean')
+			->setDescription('Clean the tables data.')
+			->addOption(
+				'dry-run',
+				'd',
+				InputOption::VALUE_NONE,
+				'Prints all wanted changes, but do not write anything to the database.'
+			)
+			->addOption(
+				'only-errors',
+				'e',
+				InputOption::VALUE_NONE,
+				'Show only errors.'
+			)
+		;
+	}
+
+	/**
+	 * @param InputInterface $input
+	 * @param OutputInterface $output
+	 * @return int
+	 */
+	protected function execute(InputInterface $input, OutputInterface $output): int {
+		$this->dry = !!$input->getOption('dry-run');
+		$this->showOnlyErrors = !!$input->getOption('only-errors');
+
+		if ($this->dry) {
+			$this->print("Dry run activated.");
+		}
+		if ($this->showOnlyErrors) {
+			$this->print("Print only errors mode activated.");
+		}
+
+		// check action, starting point for magic
+		$this->checkIfColumnsForRowsExists();
+
+		return 0;
+	}
+
+	private function getNextRow():void {
+		try {
+			$this->row = $this->rowMapper->findNext($this->offset);
+			$this->offset = $this->row->getId();
+		} catch (MultipleObjectsReturnedException|Exception $e) {
+			$this->print('Error while fetching row', self::PRINT_LEVEL_ERROR);
+		} catch (DoesNotExistException $e) {
+			$this->print("");
+			$this->print("No more rows found.", self::PRINT_LEVEL_INFO);
+			$this->print("");
+			$this->row = null;
+		}
+	}
+
+
+	/**
+	 * Take each data set from all rows and check if the column (mapped by id) exists
+	 *
+	 * @return void
+	 */
+	private function checkIfColumnsForRowsExists(): void {
+
+		$this->getNextRow();
+		while ($this->row) {
+			$this->print("");
+			$this->print("");
+			$this->print("Lets check row with id = " . $this->row->getId());
+			$this->print("==========================================");
+
+			$this->checkColumns();
+
+			$this->getNextRow();
+		}
+	}
+
+	private function checkColumns(): void {
+		$data = json_decode($this->row->getData());
+		foreach ($data as $date) {
+			$suffix = strlen($date->value) > $this->truncateLength ? "...": "";
+			$this->print("");
+			$this->print("columnId: " . $date->columnId . " -> " . substr($date->value, 0, $this->truncateLength) . $suffix, self::PRINT_LEVEL_INFO);
+
+			try {
+				$this->columnService->find($date->columnId, '');
+				if(!$this->showOnlyErrors) {
+					$this->print("column found", self::PRINT_LEVEL_SUCCESS);
+				}
+			} catch (InternalError $e) {
+				$this->print("😱️ internal error while looking for column", self::PRINT_LEVEL_ERROR);
+			} catch (NotFoundError $e) {
+				if($this->showOnlyErrors) {
+					$this->print("columnId: " . $date->columnId . " not found, but needed by row ".$this->row->getId(), self::PRINT_LEVEL_WARNING);
+				} else {
+					$this->print("corresponding column not found.", self::PRINT_LEVEL_ERROR);
+				}
+				// if the corresponding column is not found, lets delete the data from the row.
+				$this->deleteDataFromRow($date->columnId);
+			} catch (PermissionError $e) {
+				$this->print("😱️ permission error while looking for column", self::PRINT_LEVEL_ERROR);
+			}
+		}
+	}
+
+	/**
+	 * Deletes the data for a given columnID from the dataset within a row
+	 * @param int $columnId
+	 * @return void
+	 */
+	private function deleteDataFromRow(int $columnId): void {
+		if ($this->dry) {
+			$this->print("Is dry run, will not remove the column data from row dataset.", self::PRINT_LEVEL_INFO);
+			return;
+		}
+
+		$this->print("DANGER, start deleting", self::PRINT_LEVEL_WARNING);
+		$data = json_decode($this->row->getData(), true);
+
+		// $this->print("Data before: \t".json_encode(array_values($data), 0), self::PRINT_LEVEL_INFO);
+		$key = array_search($columnId, array_column($data, 'columnId'));
+		unset($data[$key]);
+		// $this->print("Data after: \t".json_encode(array_values($data), 0), self::PRINT_LEVEL_INFO);
+		$this->row->setDataArray(array_values($data));
+		try {
+			$this->rowMapper->update($this->row);
+			$this->print("Row successfully updated", self::PRINT_LEVEL_SUCCESS);
+		} catch (Exception $e) {
+			$this->print("Error while updating row to db.", self::PRINT_LEVEL_ERROR);
+		}
+	}
+
+	private function print(string $message, int $level = null): void {
+		if($level === self::PRINT_LEVEL_SUCCESS) {
+			echo "✅ ".$message;
+			echo "\n";
+		} elseif ($level === self::PRINT_LEVEL_INFO && !$this->showOnlyErrors) {
+			echo "ℹ️  ".$message;
+			echo "\n";
+		} elseif ($level === self::PRINT_LEVEL_WARNING) {
+			echo "⚠️ ".$message;
+			echo "\n";
+		} elseif ($level === self::PRINT_LEVEL_ERROR) {
+			echo "❌ ".$message;
+			echo "\n";
+		} elseif (!$this->showOnlyErrors) {
+			echo $message;
+			echo "\n";
+		}
+	}
+
+}

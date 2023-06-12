@@ -60,13 +60,13 @@ class ColumnService extends SuperService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function find(int $id): Column {
+	public function find(int $id, string $userId = null): Column {
 		try {
 			$column = $this->mapper->find($id);
 
 			// security
 			/** @noinspection PhpUndefinedMethodInspection */
-			if (!$this->permissionsService->canReadColumnsByTableId($column->getTableId())) {
+			if (!$this->permissionsService->canReadColumnsByTableId($column->getTableId(), $userId)) {
 				throw new PermissionError('PermissionError: can not read column with id '.$id);
 			}
 
