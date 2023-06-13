@@ -5,6 +5,9 @@ namespace OCA\Tables\Reference;
 use Exception;
 use OC\Collaboration\Reference\LinkReferenceProvider;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\TableService;
 use OCP\Collaboration\Reference\IReference;
 use OCP\Collaboration\Reference\Reference;
@@ -19,11 +22,13 @@ class ReferenceHelper {
 	private IURLGenerator $urlGenerator;
 	private LinkReferenceProvider $linkReferenceProvider;
 	private TableService $tableService;
+	private RowService $rowService;
 
 	private IConfig $config;
 
 	public function __construct(IURLGenerator $urlGenerator,
 		TableService $tableService,
+		RowService $rowService,
 		LinkReferenceProvider $linkReferenceProvider,
 		?string $userId,
 		IConfig $config) {
@@ -31,6 +36,7 @@ class ReferenceHelper {
 		$this->urlGenerator = $urlGenerator;
 		$this->linkReferenceProvider = $linkReferenceProvider;
 		$this->tableService = $tableService;
+		$this->rowService = $rowService;
 		$this->config = $config;
 	}
 
@@ -91,6 +97,13 @@ class ReferenceHelper {
 
 			$tableReferenceInfo['link'] = $referenceText;
 			$reference->setUrl($referenceText);
+
+			// add rows data
+			try {
+				$tableReferenceInfo['rows'] = $this->rowService->findAllByTable($tableId, 10, 0);
+			} catch (InternalError $e) {
+			} catch (PermissionError $e) {
+			}
 
 			$reference->setRichObject(
 				$this::RICH_OBJECT_TYPE,
