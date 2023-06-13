@@ -327,6 +327,7 @@ OC.L10N.register(
     "Is greater than or equal" : "Je větší než nebo rovno",
     "Is lower than" : "Je menší než",
     "Is lower than or equal" : "Je menší nebo rovno",
+    "Is empty" : "je prázdné",
     "Me (user ID)" : "Já (Identif. uživatele)",
     "Magic field" : "Magická kolonka",
     "Me (name)" : "Já (name)",
