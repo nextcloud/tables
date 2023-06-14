@@ -9,6 +9,7 @@ use OCA\Tables\Service\ImportService;
 use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\TableService;
+use OCA\Tables\Service\ViewService;
 use OCP\AppFramework\ApiController;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
@@ -19,6 +20,7 @@ class Api1Controller extends ApiController {
 	private ColumnService $columnService;
 	private RowService $rowService;
 	private ImportService $importService;
+	private ViewService $viewService;
 
 	private V1Api $v1Api;
 
@@ -34,6 +36,7 @@ class Api1Controller extends ApiController {
 		ColumnService $columnService,
 		RowService $rowService,
 		ImportService $importService,
+		ViewService $viewService,
 		V1Api $v1Api,
 		string $userId
 	) {
@@ -43,6 +46,7 @@ class Api1Controller extends ApiController {
 		$this->columnService = $columnService;
 		$this->rowService = $rowService;
 		$this->importService = $importService;
+		$this->viewService = $viewService;
 		$this->userId = $userId;
 		$this->v1Api = $v1Api;
 	}
@@ -171,6 +175,61 @@ class Api1Controller extends ApiController {
 	public function updateSharePermissions(int $shareId, string $permissionType, bool $permissionValue): DataResponse {
 		return $this->handleError(function () use ($shareId, $permissionType, $permissionValue) {
 			return $this->shareService->updatePermission($shareId, $permissionType, $permissionValue);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function indexViews(int $tableId): DataResponse {
+		return $this->handleError(function () use ($tableId) {
+			return $this->viewService->findAll($tableId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function createView(int $tableId, string $title, ?string $emoji): DataResponse {
+		return $this->handleError(function () use ($tableId, $title, $emoji) {
+			return $this->viewService->create($tableId, $title, $emoji);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function getView(int $id): DataResponse {
+		return $this->handleError(function () use ($id) {
+			return $this->viewService->find($id);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function updateView(int $id, array $data): DataResponse {
+		return $this->handleError(function () use ($id, $data) {
+			return $this->viewService->update($id, $data);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function deleteView(int $id): DataResponse {
+		return $this->handleError(function () use ($id) {
+			return $this->viewService->delete($id);
 		});
 	}
 
