@@ -327,6 +327,7 @@ OC.L10N.register(
     "Is greater than or equal" : "É maior ou igual a",
     "Is lower than" : "É menor que",
     "Is lower than or equal" : "É menor ou igual a",
+    "Is empty" : "Está vazia",
     "Me (user ID)" : "Eu (ID de usuário)",
     "Magic field" : "Campo mágico",
     "Me (name)" : "Eu (nome)",
