@@ -39,7 +39,11 @@ jobs:
             php-versions: '8.1'
             databases: 'mysql'
           - server-versions: 'master'
-            databases: ['mysql', 'pgsql', 'sqlite']
+            databases: 'sqlite'
+          - server-versions: 'master'
+            databases: 'mysql'
+          - server-versions: 'master'
+            databases: 'pgsql'
 
     name: php${{ matrix.php-versions }}-${{ matrix.databases }}-${{ matrix.server-versions }}
 
