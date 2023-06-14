@@ -9,7 +9,6 @@ namespace OCA\Tables\Migration;
 use Closure;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Schema\SchemaException;
-use Doctrine\DBAL\Types\Type;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\Types;
 use OCP\Migration\IOutput;
@@ -33,6 +32,9 @@ class Version000600Date20230613000000 extends SimpleMigrationStep {
 			$table = $schema->createTable($table);
 			$table->addColumn('id', Types::INTEGER, [
 				'autoincrement' => true,
+				'notnull' => true,
+			]);
+			$table->addColumn('table_id', Types::INTEGER, [
 				'notnull' => true,
 			]);
 			$table->addColumn('title', Types::STRING, [

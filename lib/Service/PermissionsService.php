@@ -144,6 +144,15 @@ class PermissionsService {
 		return false;
 	}
 
+	/**
+	 * @param Table $table
+	 * @param string|null $userId
+	 * @return bool
+	 */
+	public function canReadViews(Table $table, ?string $userId = null): bool {
+		return $this->canReadTable($table, $userId) || $this->canUpdateTable($table, $userId) || $this->canDeleteTable($table, $userId);
+	}
+
 
 	// ***** COLUMNS permissions *****
 

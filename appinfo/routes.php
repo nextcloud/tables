@@ -18,6 +18,12 @@ return [
 		['name' => 'api1#updateTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'PUT'],
 		['name' => 'api1#getTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'GET'],
 		['name' => 'api1#deleteTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'DELETE'],
+		// -> views
+		['name' => 'api1#indexViews', 'url' => '/api/1/tables/{tableId}/views', 'verb' => 'GET'],
+		['name' => 'api1#createView',	'url' => '/api/1/tables/{tableId}/views', 'verb' => 'POST'],
+		['name' => 'api1#getView',	'url' => '/api/1/views/{viewId}', 'verb' => 'GET'],
+		['name' => 'api1#deleteView',	'url' => '/api/1/views/{viewId}', 'verb' => 'DELETE'],
+		['name' => 'api1#updateView',	'url' => '/api/1/views/{viewId}', 'verb' => 'PUT'],
 		// -> share
 		['name' => 'api1#getShare',	'url' => '/api/1/shares/{shareId}', 'verb' => 'GET'],
 		['name' => 'api1#deleteShare',	'url' => '/api/1/shares/{shareId}', 'verb' => 'DELETE'],
@@ -49,6 +55,13 @@ return [
 		['name' => 'table#create', 'url' => '/table', 'verb' => 'POST'],
 		['name' => 'table#update', 'url' => '/table/{id}', 'verb' => 'PUT'],
 		['name' => 'table#destroy', 'url' => '/table/{id}', 'verb' => 'DELETE'],
+
+		// view
+		['name' => 'view#index', 'url' => '/view/{tableId}', 'verb' => 'GET'],
+		['name' => 'view#show', 'url' => '/view/{id}', 'verb' => 'GET'],
+		['name' => 'view#create', 'url' => '/view', 'verb' => 'POST'],
+		['name' => 'view#update', 'url' => '/view/{id}', 'verb' => 'PUT'],
+		['name' => 'view#destroy', 'url' => '/view/{id}', 'verb' => 'DELETE'],
 
 		// columns
 		['name' => 'column#index', 'url' => '/column/{tableId}', 'verb' => 'GET'],
