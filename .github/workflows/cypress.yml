@@ -24,13 +24,13 @@ jobs:
       fail-fast: false
       matrix:
         node-version: [ 16 ]
-        containers: [ 1 ]
-        php-versions: [ '8.1' ]
         databases: [ 'mysql' ]
-        server-versions: [ 'master' ]
-        exclude:
-          - php-versions: 7.4
-            server-versions: master
+        server-versions: [ 'stable25', 'master' ]
+        include:
+          - php-versions: 8.1
+          - server-versions: 'stable25'
+            php-versions: 7.4
+
 
     services:
       mysql:
