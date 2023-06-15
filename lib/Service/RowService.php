@@ -6,6 +6,7 @@ use DateTime;
 use Exception;
 use OCA\Tables\Db\Row;
 use OCA\Tables\Db\RowMapper;
+use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -15,11 +16,13 @@ use Psr\Log\LoggerInterface;
 
 class RowService extends SuperService {
 	private RowMapper $mapper;
+	private ViewMapper $viewMapper;
 
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-		RowMapper $mapper) {
+		RowMapper $mapper, ViewMapper $viewMapper) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
+		$this->viewMapper = $viewMapper;
 	}
 
 
@@ -35,6 +38,30 @@ class RowService extends SuperService {
 		try {
 			if ($this->permissionsService->canReadRowsByTableId($tableId)) {
 				return $this->mapper->findAllByTable($tableId, $limit, $offset);
+			} else {
+				throw new PermissionError('no read access to table id = '.$tableId);
+			}
+		} catch (\OCP\DB\Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
+		}
+	}
+
+	/**
+	 * @param int $viewId
+	 * @param string|null $userId
+	 * @return array
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
+	public function findAllByView(int $viewId, ?int $limit = null, ?int $offset = null): array {
+		try {
+			$view = $this->viewMapper->find($viewId);
+			$tableId = $view->getTableId();
+			if ($this->permissionsService->canReadRowsByTableId($tableId)) {
+				return $this->mapper->findAllByTable($tableId, $limit, $offset);
+				// TODO: Sort out not shown column values?!
 			} else {
 				throw new PermissionError('no read access to table id = '.$tableId);
 			}

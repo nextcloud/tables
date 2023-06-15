@@ -36,20 +36,36 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(['tables', 'tablesLoading']),
-		...mapGetters(['activeTable']),
+		...mapState(['tablesLoading']),
+		// ...mapState(['tables', 'tablesLoading']),
+		// ...mapGetters(['activeTable']),
 		somethingIsLoading() {
 			return this.tablesLoading || this.loading
 		},
 	},
 	watch: {
 		'$route'(to, from) {
-			this.$store.commit('setActiveTableId', parseInt(to.params.tableId))
+			if (to.name === 'table') {
+				this.$store.commit('setActiveTableId', parseInt(to.params.tableId))
+			} else if (to.name === 'view') {
+				this.$store.commit('setActiveViewId', parseInt(to.params.viewId))
+			} else {
+				throw new Error(to.name + ' is not a valid path')// TODO: Throw error?
+			}
+			// console.debug("Setting table ID to value",to.params.tableId, to)
 		},
 	},
 	async created() {
 		await this.$store.dispatch('loadTablesFromBE')
-		this.$store.commit('setActiveTableId', parseInt(this.$router.currentRoute.params.tableId))
+		await this.$store.dispatch('loadViewsFromBE')
+		const $currentRoute = this.$router.currentRoute
+		if ($currentRoute.name === 'table') {
+			this.$store.commit('setActiveTableId', parseInt($currentRoute.params.tableId))
+		} else if ($currentRoute.name === 'view') {
+			this.$store.commit('setActiveViewId', parseInt($currentRoute.params.viewId))
+		} else {
+			throw new Error($currentRoute.name + ' is not a valid path')// TODO: Throw error?
+		}
 	},
 }
 </script>

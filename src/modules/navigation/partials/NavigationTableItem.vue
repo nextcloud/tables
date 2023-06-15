@@ -2,7 +2,7 @@
 	<NcAppNavigationItem v-if="table"
 		:name="table.title"
 		:class="{active: activeTable && table.id === activeTable.id}"
-		:allow-collapse="false"
+		:allow-collapse="true"
 		:open="false"
 		:force-menu="true"
 		:to="'/table/' + parseInt(table.id)"

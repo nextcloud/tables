@@ -14,6 +14,13 @@
 			</div>
 
 			<ul v-if="!tablesLoading">
+				<NcAppNavigationCaption :title="t('tables', 'My views')" />
+				<NavigationViewItem v-for="view in getViews"
+					:key="view.id"
+					:view="view" />
+			</ul>
+
+			<ul v-if="!tablesLoading">
 				<NcAppNavigationCaption :title="t('tables', 'My tables')">
 					<template #actions>
 						<NcActionButton :aria-label="t('tables', 'Create table')" icon="icon-add" @click.prevent="createTable" />
@@ -23,7 +30,11 @@
 				<NavigationTableItem v-for="table in getOwnTables"
 					:key="table.id"
 					:table="table"
-					@edit-table="id => editTableId = id" />
+					@edit-table="id => editTableId = id">
+					<!-- <NavigationViewItem v-for="view in getViews"
+						:key="view.id"
+						:view="view" /> -->
+				</NavigationTableItem>
 
 				<NcAppNavigationCaption v-if="getSharedTables.length > 0"
 					:title="t('tables', 'Shared tables')" />
@@ -55,10 +66,11 @@
 </template>
 
 <script>
-import { NcAppNavigation, NcAppNavigationCaption, NcActionButton, NcTextField, NcButton, NcEmptyContent } from '@nextcloud/vue'
+import { NcAppNavigation, NcAppNavigationItem, NcAppNavigationCaption, NcActionButton, NcTextField, NcButton, NcEmptyContent } from '@nextcloud/vue'
 import CreateTable from '../modals/CreateTable.vue'
 import EditTable from '../modals/EditTable.vue'
 import NavigationTableItem from '../partials/NavigationTableItem.vue'
+import NavigationViewItem from '../partials/NavigationViewItem.vue'
 import { mapState, mapGetters } from 'vuex'
 import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
@@ -70,6 +82,7 @@ export default {
 	components: {
 		Import,
 		NavigationTableItem,
+		NavigationViewItem,
 		NcAppNavigation,
 		CreateTable,
 		EditTable,
@@ -90,13 +103,17 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(['tables', 'tablesLoading']),
-		...mapGetters(['activeTable']),
+		...mapState(['tables', 'views', 'tablesLoading']),
+		// ...mapGetters(['activeTable']),
 		getSharedTables() {
 			return this.getFilteredTables.filter((item) => { return item.isShared === true && item.ownership !== getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
 		},
 		getOwnTables() {
 			return this.getFilteredTables.filter((item) => { return item.isShared === false || item.ownership === getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
+		},
+		getViews() {
+			console.debug('Views:', this.views)
+			return this.views
 		},
 		getFilteredTables() {
 			return this.tables.filter(table => { return table.title.toLowerCase().includes(this.filterString.toLowerCase()) })
