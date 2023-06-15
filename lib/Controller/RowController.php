@@ -37,6 +37,15 @@ class RowController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	public function indexView(int $viewId): DataResponse {
+		return $this->handleError(function () use ($viewId) {
+			return $this->service->findAllByView($viewId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
 	public function show(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
 			return $this->service->find($id);

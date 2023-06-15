@@ -6,6 +6,7 @@ use DateTime;
 use Exception;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
+use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -16,6 +17,7 @@ use Psr\Log\LoggerInterface;
 
 class ColumnService extends SuperService {
 	private ColumnMapper $mapper;
+	private ViewMapper $viewMapper;
 
 	private RowService $rowService;
 
@@ -27,11 +29,13 @@ class ColumnService extends SuperService {
 		LoggerInterface $logger,
 		?string $userId,
 		ColumnMapper $mapper,
+		ViewMapper $viewMapper,
 		RowService $rowService,
 		IL10N $l
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
+		$this->viewMapper = $viewMapper;
 		$this->rowService = $rowService;
 		$this->l = $l;
 	}
@@ -45,6 +49,43 @@ class ColumnService extends SuperService {
 		try {
 			if ($this->permissionsService->canReadColumnsByTableId($tableId, $userId)) {
 				return $this->mapper->findAllByTable($tableId);
+			} else {
+				throw new PermissionError('no read access to table id = '.$tableId);
+			}
+		} catch (\OCP\DB\Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
+		}
+	}
+
+	/**
+	 * @param int $viewId
+	 * @param string|null $userId
+	 * @return array
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
+	public function findAllByView(int $viewId, ?string $userId = null): array {
+		try {
+			$view = $this->viewMapper->find($viewId);
+			$tableId = $view->getTableId();
+			if ($this->permissionsService->canReadColumnsByTableId($tableId, $userId)) {
+				//TODO: Adjust Permission
+				$viewColumnIds = $view->getColumnsArray();
+				$viewColumns = [];
+				foreach ($viewColumnIds as $viewColumnId) {
+					try {
+						$viewColumns[] = $this->mapper->find($viewColumnId);
+					} catch (DoesNotExistException $e) {
+							$this->logger->warning($e->getMessage());
+							throw new NotFoundError($e->getMessage());
+					} catch (MultipleObjectsReturnedException $e) {
+						$this->logger->error($e->getMessage());
+						throw new InternalError($e->getMessage());
+					}
+				}
+				return $viewColumns;
 			} else {
 				throw new PermissionError('no read access to table id = '.$tableId);
 			}

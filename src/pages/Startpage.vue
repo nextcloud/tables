@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+// import { mapState, mapGetters } from 'vuex'
 import { NcEmptyContent, NcButton } from '@nextcloud/vue'
 import IconTables from '../shared/assets/icons/IconTables.vue'
 import { emit } from '@nextcloud/event-bus'
@@ -27,10 +27,10 @@ export default {
 		NcButton,
 		IconTables,
 	},
-	computed: {
-		...mapState(['tables']),
-		...mapGetters(['activeTable']),
-	},
+	// computed: {
+	// 	...mapState(['tables']),
+	// 	...mapGetters(['activeTable']),
+	// },
 	methods: {
 		addTable() {
 			emit('create-table', {})

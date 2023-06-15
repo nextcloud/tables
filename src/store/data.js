@@ -92,12 +92,16 @@ export default {
 		},
 
 		// COLUMNS
-		async loadColumnsFromBE({ commit }, { tableId }) {
+		async loadColumnsFromBE({ commit }, { tableId, viewId }) {
 			commit('setLoading', true)
 			let res = null
 
 			try {
-				res = await axios.get(generateUrl('/apps/tables/column/' + tableId))
+				if (tableId) {
+					res = await axios.get(generateUrl('/apps/tables/column/' + tableId))
+				  } else {
+					res = await axios.get(generateUrl('/apps/tables/column/view/' + viewId))
+				  }
 				if (!Array.isArray(res.data)) {
 					const e = new Error('Expected array, but is not')
 					displayError(e, 'Format for loaded columns not valid.')
@@ -172,12 +176,16 @@ export default {
 		},
 
 		// ROWS
-		async loadRowsFromBE({ commit }, { tableId }) {
+		async loadRowsFromBE({ commit }, { tableId, viewId }) {
 			commit('setLoading', true)
 			let res = null
 
 			try {
-				res = await axios.get(generateUrl('/apps/tables/row/' + tableId))
+				if (tableId) {
+					res = await axios.get(generateUrl('/apps/tables/row/' + tableId))
+				} else {
+					res = await axios.get(generateUrl('/apps/tables/row/view/' + viewId))
+				}
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load rows.'))
 				return false

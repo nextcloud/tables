@@ -18,16 +18,26 @@ export default new Vuex.Store({
 	state: {
 		tablesLoading: false,
 		tables: [],
+		views: [],
 		activeTableId: null,
+		activeViewId: null,
 	},
 
 	getters: {
 		activeTable(state) {
-			if (state.tables && state.tables.filter(item => item.id === state.activeTableId).length > 0) { return state.tables.filter(item => item.id === state.activeTableId)[0] }
+			if (state.tables && state.tables.filter(item => item.id === state.activeTableId).length > 0) {
+				return state.tables.filter(item => item.id === state.activeTableId)[0]
+			}
 			return null
 		},
 		getTable: (state) => (id) => {
 			return state.tables.filter(table => table.id === id)[0]
+		},
+		activeView(state) {
+			if (state.views && state.views.filter(item => item.id === state.activeViewId).length > 0) {
+				return state.views.filter(item => item.id === state.activeViewId)[0]
+			}
+			return null
 		},
 	},
 	mutations: {
@@ -37,10 +47,20 @@ export default new Vuex.Store({
 		setActiveTableId(state, tableId) {
 			if (state.activeTableId !== tableId) {
 				state.activeTableId = tableId
+				state.activeViewId = null
+			}
+		},
+		setActiveViewId(state, viewId) {
+			if (state.activeViewId !== viewId) {
+				state.activeViewId = viewId
+				state.activeTableId = null
 			}
 		},
 		setTables(state, tables) {
 			state.tables = tables
+		},
+		setViews(state, views) {
+			state.views = views
 		},
 		setTable(state, table) {
 			const index = state.tables.findIndex(t => t.id === table.id)
@@ -72,6 +92,20 @@ export default new Vuex.Store({
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load tables.'))
 				showError(t('tables', 'Could not fetch tables'))
+			}
+
+			commit('setTablesLoading', false)
+			return true
+		},
+		async loadViewsFromBE({ commit }) {
+			commit('setTablesLoading', true)
+
+			try {
+				const res = await axios.get(generateUrl('/apps/tables/view/1')) //TODO
+				commit('setViews', res.data)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load views.'))
+				showError(t('tables', 'Could not fetch views'))
 			}
 
 			commit('setTablesLoading', false)
