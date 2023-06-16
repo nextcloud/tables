@@ -152,6 +152,8 @@ class ViewService extends SuperService {
 		if($emoji) {
 			$item->setEmoji($emoji);
 		}
+		$item->setDescription('');
+		$item->setTableId($tableId);
 		$item->setCreatedBy($userId);
 		$item->setLastEditBy($userId);
 		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
@@ -162,6 +164,7 @@ class ViewService extends SuperService {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
 		}
+
 		return $newItem;
 	}
 

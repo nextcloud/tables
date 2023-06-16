@@ -10,7 +10,7 @@
 					:rows="rows"
 					:columns="columns"
 					:table="activeTable"
-					:view="view"
+					:viewSetting="viewSetting"
 					@add-filter="addFilter"
 					@set-search-string="setSearchString"
 					@edit-row="rowId => editRowId = rowId"
@@ -18,6 +18,7 @@
 					@create-column="showCreateColumn = true"
 					@edit-columns="showEditColumns = true"
 					@create-row="showCreateRow = true"
+					@create-view="showCreateView = true"
 					@delete-selected-rows="deleteRows"
 					@delete-filter="deleteFilter" />
 			</div>
@@ -28,6 +29,9 @@
 		<CreateRow :columns="columns"
 			:show-modal="showCreateRow"
 			@close="showCreateRow = false" />
+		<CreateView :columns="columns"
+			:show-modal="showCreateView"
+			@close="showCreateView = false" />
 		<EditRow :columns="columns"
 			:row="getEditRow"
 			:show-modal="editRowId !== null"
@@ -44,6 +48,7 @@ import TableDescription from '../modules/main/sections/TableDescription.vue'
 import { mapState, mapGetters } from 'vuex'
 import NcTable from '../shared/components/ncTable/NcTable.vue'
 import CreateRow from '../modules/main/modals/CreateRow.vue'
+import CreateView from '../modules/main/modals/CreateView.vue'
 import EditRow from '../modules/main/modals/EditRow.vue'
 import CreateColumn from '../modules/main/modals/CreateColumn.vue'
 import EditColumns from '../modules/main/modals/EditColumns.vue'
@@ -61,6 +66,7 @@ export default {
 		TableDescription,
 		NcTable,
 		CreateRow,
+		CreateView,
 		EditRow,
 		CreateColumn,
 		EditColumns,
@@ -73,6 +79,7 @@ export default {
 			localLoading: false,
 			lastActiveTableId: null,
 			showCreateRow: false,
+			showCreateView: false,
 			editRowId: null,
 			showCreateColumn: false,
 			showEditColumns: false,
@@ -84,7 +91,7 @@ export default {
 			columns: state => state.data.columns.map(col => parseCol(col)),
 			loading: state => state.data.loading,
 			rows: state => state.data.rows,
-			view: state => state.data.view,
+			viewSetting: state => state.data.viewSetting,
 		}),
 		...mapGetters(['activeTable']),
 		isLoading() {
@@ -126,7 +133,7 @@ export default {
 			if (this.activeTable.id !== this.lastActiveTableId) {
 				this.localLoading = true
 
-				await this.$store.dispatch('resetView')
+				await this.$store.dispatch('resetViewSetting')
 
 				await this.$store.dispatch('loadColumnsFromBE', { tableId: this.activeTable.id })
 

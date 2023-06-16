@@ -33,6 +33,9 @@ export default new Vuex.Store({
 		getTable: (state) => (id) => {
 			return state.tables.filter(table => table.id === id)[0]
 		},
+		getView: (state) => (id) => {
+			return state.views.filter(view => view.id === id)[0]
+		},
 		activeView(state) {
 			if (state.views && state.views.filter(item => item.id === state.activeViewId).length > 0) {
 				return state.views.filter(item => item.id === state.activeViewId)[0]
@@ -97,6 +100,22 @@ export default new Vuex.Store({
 			commit('setTablesLoading', false)
 			return true
 		},
+		async insertNewView({ commit, state }, { data }) {
+			console.debug(data)
+			let res = null
+
+			try {
+				res = await axios.post(generateUrl('/apps/tables/view'), data)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not insert view.'))
+				return false
+			}
+
+			const views = state.views
+			views.push(res.data)
+			commit('setViews', views)
+			return res.data.id
+		},
 		async loadViewsFromBE({ commit }) {
 			commit('setTablesLoading', true)
 
@@ -109,6 +128,39 @@ export default new Vuex.Store({
 			}
 
 			commit('setTablesLoading', false)
+			return true
+		},
+		async updateView({ state, commit, dispatch }, { id, data }) {
+			let res = null
+
+			try {
+				res = await axios.put(generateUrl('/apps/tables/view/' + id), data)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not update view.'))
+				return false
+			}
+
+			console.debug("ANSWER",res)
+
+			const view = res.data
+			const views = state.views
+			const index = views.findIndex(v => v.id === view.id)
+			views[index] = view
+			commit('setViews', [...views])
+			return true
+		},
+		async removeView({ state, commit }, { viewId }) {
+			try {
+				await axios.delete(generateUrl('/apps/tables/view/' + viewId))
+			} catch (e) {
+				displayError(e, t('tables', 'Could not remove view.'))
+				return false
+			}
+
+			const views = state.views
+			const index = views.findIndex(v => v.id === viewId)
+			views.splice(index, 1)
+			commit('setViews', [...views])
 			return true
 		},
 		async updateTable({ state, commit, dispatch }, { id, data }) {

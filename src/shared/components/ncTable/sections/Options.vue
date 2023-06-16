@@ -126,7 +126,7 @@ export default {
 			type: Array,
 			default: null,
 		},
-		view: {
+		viewSetting: {
 			type: Object,
 			default: null,
 		},
@@ -147,7 +147,7 @@ export default {
 			return rows
 		},
 		getSearchString() {
-			return this.view?.searchString || ''
+			return this.viewSetting?.searchString || ''
 		},
 		showFullOptions() {
 			 return this.optionsDivWidth > 800

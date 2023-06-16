@@ -24,6 +24,18 @@
 		</th>
 		<th data-cy="customTableAction">
 			<NcActions :force-menu="true">
+				<NcActionButton v-if="canManageTable(table) && !isView"
+					:close-after-click="true"
+					icon="icon-add"
+					@click="$emit('create-view')">
+					{{ t('tables', 'Create view') }}
+				</NcActionButton>
+				<NcActionButton v-if="canManageTable(table) && isView"
+					:close-after-click="true"
+					icon="icon-rename"
+					@click="$emit('edit-view')">
+					{{ t('tables', 'Edit view') }}
+				</NcActionButton>
 				<NcActionButton v-if="canCreateRowInTable(table)"
 					:close-after-click="true"
 					icon="icon-add"
@@ -111,10 +123,14 @@ export default {
 			type: Object,
 			default: () => {},
 		},
-		view: {
-		      type: Object,
-		      default: null,
-		    },
+		viewSetting: {
+			type: Object,
+			default: null,
+		},
+		isView: {
+			type: Boolean,
+			default: false,
+		},
 	},
 
 	data() {
@@ -139,7 +155,7 @@ export default {
 			this.openedColumnHeaderMenus = Object.assign({}, this.openedColumnHeaderMenus)
 		},
 		getFilterForColumn(column) {
-			return this.view?.filter?.filter(item => item.columnId === column.id)
+			return this.viewSetting?.filter?.filter(item => item.columnId === column.id)
 		},
 		downloadCSV() {
 			this.$emit('download-csv', this.rows)

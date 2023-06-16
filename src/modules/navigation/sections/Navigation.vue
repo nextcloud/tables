@@ -17,7 +17,8 @@
 				<NcAppNavigationCaption :title="t('tables', 'My views')" />
 				<NavigationViewItem v-for="view in getViews"
 					:key="view.id"
-					:view="view" />
+					:view="view"
+					@edit-view="id => editViewId = id" />
 			</ul>
 
 			<ul v-if="!tablesLoading">
@@ -31,9 +32,10 @@
 					:key="table.id"
 					:table="table"
 					@edit-table="id => editTableId = id">
-					<!-- <NavigationViewItem v-for="view in getViews"
+					<NavigationViewItem v-for="view in getViewsOfTable(table.id)"
 						:key="view.id"
-						:view="view" /> -->
+						:view="view"
+						@edit-view="id => editViewId = id" />
 				</NavigationTableItem>
 
 				<NcAppNavigationCaption v-if="getSharedTables.length > 0"
@@ -60,6 +62,7 @@
 
 			<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
 			<EditTable :show-modal="editTableId !== null" :table-id="editTableId" @close="editTableId = null " />
+			<EditView :show-modal="editViewId !== null" :view-id="editViewId" @close="editViewId = null " />
 			<Import :show-modal="importTable !== null" :table="importTable" @close="importTable = null" />
 		</template>
 	</NcAppNavigation>
@@ -69,6 +72,7 @@
 import { NcAppNavigation, NcAppNavigationItem, NcAppNavigationCaption, NcActionButton, NcTextField, NcButton, NcEmptyContent } from '@nextcloud/vue'
 import CreateTable from '../modals/CreateTable.vue'
 import EditTable from '../modals/EditTable.vue'
+import EditView from '../modals/EditView.vue'
 import NavigationTableItem from '../partials/NavigationTableItem.vue'
 import NavigationViewItem from '../partials/NavigationViewItem.vue'
 import { mapState, mapGetters } from 'vuex'
@@ -86,6 +90,7 @@ export default {
 		NcAppNavigation,
 		CreateTable,
 		EditTable,
+		EditView,
 		NcAppNavigationCaption,
 		NcActionButton,
 		NcTextField,
@@ -99,6 +104,7 @@ export default {
 			showModalCreateTable: false,
 			importTable: null,
 			editTableId: null, // if null, no modal open
+			editViewId: null, // if null, no modal open
 			filterString: '',
 		}
 	},
@@ -122,11 +128,13 @@ export default {
 	mounted() {
 		subscribe('create-table', this.createTable)
 		subscribe('edit-table', tableId => { this.editTableId = tableId })
+		subscribe('edit-view', viewId => { this.editViewId = viewId })
 		subscribe('tables:modal:import', table => { this.importTable = table })
 	},
 	beforeDestroy() {
 		unsubscribe('create-table', this.createTable)
 		unsubscribe('edit-table', tableId => { this.editTableId = tableId })
+		unsubscribe('edit-view', viewId => { this.editViewId = viewId })
 		unsubscribe('tables:modal:import', table => { this.importTable = table })
 	},
 	methods: {
@@ -139,6 +147,10 @@ export default {
 					open: false,
 				})
 			}
+		},
+		getViewsOfTable(id) {
+			console.debug('Views:', this.views)
+			return this.views
 		},
 	},
 }
