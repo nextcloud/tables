@@ -111,7 +111,7 @@ export default {
 
 	computed: {
 		...mapState({
-			view: state => state.data.view,
+			viewSetting: state => state.data.viewSetting,
 		}),
 		haveOperators() {
 			const columnOperators = this.getOperators
@@ -157,7 +157,7 @@ export default {
 			return this.column.canSort()
 		},
 		getSortMode() {
-			const sortObject = this.view.sorting?.find(item => item.columnId === this.column?.id)
+			const sortObject = this.viewSetting.sorting?.find(item => item.columnId === this.column?.id)
 			if (sortObject) {
 				return sortObject.mode
 			}
@@ -207,7 +207,7 @@ export default {
 			this.localOpenState = false
 		},
 		getFilterForColumn(column) {
-			return this.view?.filter?.filter(item => item.columnId === column.id)
+			return this.viewSetting?.filter?.filter(item => item.columnId === column.id)
 		},
 		createFilter() {
 			const filterObject = {

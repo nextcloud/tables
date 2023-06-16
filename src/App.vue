@@ -49,8 +49,6 @@ export default {
 				this.$store.commit('setActiveTableId', parseInt(to.params.tableId))
 			} else if (to.name === 'view') {
 				this.$store.commit('setActiveViewId', parseInt(to.params.viewId))
-			} else {
-				throw new Error(to.name + ' is not a valid path')// TODO: Throw error?
 			}
 			// console.debug("Setting table ID to value",to.params.tableId, to)
 		},
@@ -63,8 +61,6 @@ export default {
 			this.$store.commit('setActiveTableId', parseInt($currentRoute.params.tableId))
 		} else if ($currentRoute.name === 'view') {
 			this.$store.commit('setActiveViewId', parseInt($currentRoute.params.viewId))
-		} else {
-			throw new Error($currentRoute.name + ' is not a valid path')// TODO: Throw error?
 		}
 	},
 }

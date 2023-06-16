@@ -5,32 +5,34 @@
 				:columns="columns"
 				:selected-rows="selectedRows"
 				:show-options="columns.length !== 0"
-				:table="table"
-				:view="view"
+				:table="view"
+				:view-setting="viewSetting"
 				@create-row="$emit('create-row')"
-				@download-csv="data => downloadCsv(data, columns, table)"
+				@download-csv="data => downloadCsv(data, columns, view)"
 				@add-filter="filter => $emit('add-filter', filter)"
 				@set-search-string="str => $emit('set-search-string', str)"
 				@delete-selected-rows="rowIds => $emit('delete-selected-rows', rowIds)" />
 		</div>
 		<div class="custom-table row">
-			<CustomTable v-if="canReadTable(table)"
+			<CustomTable v-if="canReadTable(view)"
 				:columns="columns"
 				:rows="rows"
-				:table="table"
-				:view="view"
+				:table="view"
+				:view-setting="viewSetting"
+				:is-view="true"
 				@create-row="$emit('create-row')"
-				@import="table => $emit('import', table)"
+				@edit-view="$emit('edit-view')"
+				@import="table => $emit('import', view)"
 				@edit-row="rowId => $emit('edit-row', rowId)"
 				@create-column="$emit('create-column')"
 				@edit-columns="$emit('edit-columns')"
 				@add-filter="filter => $emit('add-filter', filter)"
 				@update-selected-rows="rowIds => selectedRows = rowIds"
-				@download-csv="data => downloadCsv(data, columns, table)"
+				@download-csv="data => downloadCsv(data, columns, view)"
 				@delete-filter="id => $emit('delete-filter', id)" />
 			<NcEmptyContent v-else
 				:title="t('tables', 'Create rows')"
-				:description="t('tables', 'You are not allowed to read this table, but you can still create rows.')">
+				:description="t('tables', 'You are not allowed to read this view, but you can still create rows.')">
 				<template #icon>
 					<Plus :size="25" />
 				</template>
@@ -72,11 +74,11 @@ export default {
 			type: Array,
 			default: () => [],
 		},
-		table: {
+		view: {
 			type: Object,
 			default: () => {},
 		},
-		view: {
+		viewSetting: {
 		      type: Object,
 		      default: null,
 		    },
@@ -89,7 +91,6 @@ export default {
 
 	mounted() {
 		subscribe('tables:selected-rows:deselect', this.deselectRows)
-		console.debug("Build View: Columns: ",this.columns,"Rows:", this.rows)
 	},
 	beforeDestroy() {
 		unsubscribe('tables:selected-rows:deselect', this.deselectRows)

@@ -7,7 +7,7 @@ export default {
 		loading: false,
 		rows: [],
 		columns: [],
-		view: {},
+		viewSetting: {},
 	},
 
 	mutations: {
@@ -20,8 +20,8 @@ export default {
 		setLoading(state, value) {
 			state.loading = !!(value)
 		},
-		setView(state, view) {
-			state.view = Object.assign({}, view)
+		setViewSetting(state, viewSetting) {
+			state.viewSetting = Object.assign({}, viewSetting)
 		},
 	},
 
@@ -43,7 +43,7 @@ export default {
 				return
 			}
 
-			const view = state.view
+			const viewSetting = state.viewSetting
 
 			const sorting = []
 			sorting.push({
@@ -51,48 +51,48 @@ export default {
 				mode,
 			})
 
-			view.sorting = sorting
+			viewSetting.sorting = sorting
 
-			commit('setView', view)
+			commit('setViewSetting', viewSetting)
 		},
 
 		addFilter({ commit, state }, { columnId, operator, value }) {
-			const view = state.view
+			const viewSetting = state.viewSetting
 
-			if (!view.filter) {
-				view.filter = []
+			if (!viewSetting.filter) {
+				viewSetting.filter = []
 			}
 
-			view.filter.push({
+			viewSetting.filter.push({
 				columnId,
 				operator,
 				value,
 			})
 
-			commit('setView', view)
+			commit('setViewSetting', viewSetting)
 		},
 
 		deleteFilter({ commit, state }, { id }) {
-			const index = state.view?.filter?.findIndex(item => item.columnId + item.operator + item.value === id)
+			const index = state.viewSetting?.filter?.findIndex(item => item.columnId + item.operator + item.value === id)
 			if (index !== -1) {
-				const localView = { ...state.view }
-				localView.filter.splice(index, 1)
-				commit('setView', localView)
+				const localViewSetting = { ...state.viewSetting }
+				localViewSetting.filter.splice(index, 1)
+				commit('setViewSetting', localViewSetting)
 			}
 		},
 
 		setSearchString({ commit, state }, { str }) {
-			const view = state.view
-			view.searchString = str
-			commit('setView', view)
+			const viewSetting = state.viewSetting
+			viewSetting.searchString = str
+			commit('setViewSetting', viewSetting)
 		},
 
-		resetView({ commit }) {
-			commit('setView', {})
+		resetViewSetting({ commit }) {
+			commit('setViewSetting', {})
 		},
 
 		// COLUMNS
-		async loadColumnsFromBE({ commit }, { tableId, viewId }) {
+		async getColumnsFromBE({ commit }, { tableId, viewId }) {
 			commit('setLoading', true)
 			let res = null
 
@@ -117,9 +117,12 @@ export default {
 				if (a.orderWeight > b.orderWeight) { return -1 }
 				return 0
 			})
-			commit('setColumns', columns)
-
 			commit('setLoading', false)
+			return columns
+		},
+		async loadColumnsFromBE({ commit, dispatch }, { tableId, viewId }) {
+			const columns = await dispatch('getColumnsFromBE', { tableId, viewId })
+			commit('setColumns', columns)
 			return true
 		},
 		async insertNewColumn({ commit, state }, { data }) {

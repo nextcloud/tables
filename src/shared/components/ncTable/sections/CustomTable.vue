@@ -6,8 +6,11 @@
 					:selected-rows="selectedRows"
 					:rows="getSearchedAndFilteredAndSortedRows"
 					:table="table"
-					:view="view"
+					:view-setting="viewSetting"
+					:is-view="isView"
 					@create-row="$emit('create-row')"
+					@create-view="$emit('create-view')"
+					@edit-view="$emit('edit-view')"
 					@import="table => $emit('import', table)"
 					@create-column="$emit('create-column')"
 					@edit-columns="$emit('edit-columns')"
@@ -57,10 +60,14 @@ export default {
 			type: Object,
 			default: () => {},
 		},
-		view: {
-		      type: Object,
-		      default: null,
-		    },
+		viewSetting: {
+			type: Object,
+			default: null,
+		},
+		isView: {
+			type: Boolean,
+			default: false,
+		},
 	},
 
 	data() {
@@ -76,16 +83,16 @@ export default {
 
 		getSearchedAndFilteredAndSortedRows() {
 			// if we have to sort
-			if (this.view.sorting) {
-				const sortColumn = this.columns.find(item => item.id === this.view.sorting[0].columnId)
-				return [...this.getSearchedAndFilteredRows].sort(sortColumn.sort(this.view.sorting[0].mode))
+			if (this.viewSetting.sorting) {
+				const sortColumn = this.columns.find(item => item.id === this.viewSetting.sorting[0].columnId)
+				return [...this.getSearchedAndFilteredRows].sort(sortColumn.sort(this.viewSetting.sorting[0].mode))
 			}
 			return this.getSearchedAndFilteredRows
 		},
 		getSearchedAndFilteredRows() {
 			const debug = false
 			// if we don't have to search and/or filter
-			if (!this.view?.filter?.length > 0 && !this.view?.searchString) {
+			if (!this.viewSetting?.filter?.length > 0 && !this.viewSetting?.searchString) {
 				// cleanup markers
 				this.rows?.forEach(row => {
 					this.columns?.forEach(column => {
@@ -101,7 +108,7 @@ export default {
 			}
 
 			const data = [] // array of rows
-			const searchString = this.view?.searchString
+			const searchString = this.viewSetting?.searchString
 
 			// each row
 			this.rows?.forEach(row => {
@@ -193,8 +200,8 @@ export default {
 			})
 		},
 		getFiltersForColumn(column) {
-			if (this.view?.filter?.length > 0) {
-				const columnFilter = this.view.filter.filter(item => item.columnId === column.id)
+			if (this.viewSetting?.filter?.length > 0) {
+				const columnFilter = this.viewSetting.filter.filter(item => item.columnId === column.id)
 				if (columnFilter.length > 0) {
 					return columnFilter
 				}

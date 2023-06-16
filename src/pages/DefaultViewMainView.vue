@@ -9,11 +9,12 @@
 				<NcView v-if="columns.length > 0"
 					:rows="rows"
 					:columns="columns"
-					:table="activeView"
-					:view="view"
+					:view="activeView"
+					:view-setting="viewSetting"
 					@add-filter="addFilter"
 					@set-search-string="setSearchString"
 					@edit-row="rowId => editRowId = rowId"
+					@edit-view="viewId => editViewId = viewId"
 					@import="openImportModal"
 					@create-column="showCreateColumn = true"
 					@edit-columns="showEditColumns = true"
@@ -22,7 +23,6 @@
 					@delete-filter="deleteFilter" />
 			</div>
 
-			<!-- <EmptyTable v-if="columns.length === 0" @create-column="showCreateColumn = true" /># -->
 			<div v-if="columns.length === 0" @create-column="showCreateColumn = true">
 				Empty View
 			</div>
@@ -36,6 +36,10 @@
 			:show-modal="editRowId !== null"
 			:out-transition="true"
 			@close="editRowId = null" />
+		<EditView
+			:show-modal="editViewId !== null"
+			:view="activeView"
+			@close="editViewId = null" />
 		<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false" />
 		<EditColumns :show-modal="showEditColumns" @close="showEditColumns = false" />
 		<DeleteRows v-if="rowsToDelete" :rows-to-delete="rowsToDelete" @cancel="rowsToDelete = null" />
@@ -48,17 +52,17 @@ import { mapState, mapGetters } from 'vuex'
 import NcView from '../shared/components/ncTable/NcView.vue'
 import CreateRow from '../modules/main/modals/CreateRow.vue'
 import EditRow from '../modules/main/modals/EditRow.vue'
+import EditView from '../modules/main/modals/EditView.vue'
 import CreateColumn from '../modules/main/modals/CreateColumn.vue'
 import EditColumns from '../modules/main/modals/EditColumns.vue'
 import DeleteRows from '../modules/main/modals/DeleteRows.vue'
-import EmptyTable from '../modules/main/sections/EmptyTable.vue'
 import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
 import { emit } from '@nextcloud/event-bus'
 
 export default {
 	name: 'DefaultViewMainView',
 	components: {
-		EmptyTable,
+		EditView,
 		DeleteRows,
 		ViewDescription,
 		NcView,
@@ -76,6 +80,7 @@ export default {
 			lastActiveViewId: null,
 			showCreateRow: false,
 			editRowId: null,
+			editViewId: null,
 			showCreateColumn: false,
 			showEditColumns: false,
 			rowsToDelete: null,
@@ -86,7 +91,7 @@ export default {
 			columns: state => state.data.columns,
 			loading: state => state.data.loading,
 			rows: state => state.data.rows,
-			view: state => state.data.view,
+			viewSetting: state => state.data.viewSetting,
 		}),
 		...mapGetters(['activeView']),
 		isLoading() {
@@ -128,7 +133,7 @@ export default {
 			if (this.activeView.id !== this.lastActiveViewId) {
 				this.localLoading = true
 
-				await this.$store.dispatch('resetView')
+				await this.$store.dispatch('resetViewSetting')
 
 				await this.$store.dispatch('loadColumnsFromBE', { viewId: this.activeView.id })
 				if (this.canReadTable(this.activeView)) {
