@@ -65,6 +65,7 @@ OC.L10N.register(
     "Select a file" : "Seleccione un ficheiro",
     "Result" : "Resultado",
     "Please select a file." : "Seleccione un ficheiro.",
+    "Could not import, not authorized. Are you logged in?" : "Non foi posíbel importar, non está autorizado. Está vostede autenticado?",
     "Share" : "Compartir",
     "Integration" : "Integración",
     "Clear filter" : "Limpar o filtro",
@@ -107,6 +108,7 @@ OC.L10N.register(
     "Defaults" : "Predeterminados",
     "Close editor" : "Pechar o editor",
     "Confirm" : "Confirmar",
-    "Unchecked" : "Sen verificar"
+    "Unchecked" : "Sen verificar",
+    "Request is not authorized. Are you logged in?" : "A solicitude non está autorizada. Está vostede autenticado?"
 },
 "nplurals=2; plural=(n != 1);");
