@@ -33,7 +33,7 @@ OC.L10N.register(
     "Approved" : "Aprobado",
     "Approve date" : "Data de aprobación",
     "Approved by" : "Aprobado por",
-    "The Boss" : "A Xefa",
+    "The Boss" : "O xefe",
     "Position" : "Posicion",
     "Skills" : "Destrezas",
     "Birthday" : "Aniversario (nacemento)",

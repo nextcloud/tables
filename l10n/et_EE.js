@@ -26,6 +26,7 @@ OC.L10N.register(
     "File" : "Fail",
     "Please select a file." : "Palun vali fail.",
     "Share" : "Jaga",
+    "No recommendations. Start typing." : "Soovitusi pole. Alusta trükkimist.",
     "Searching …" : "Otsin ...",
     "Shares" : "Jagamisi",
     "group" : "grupp",
