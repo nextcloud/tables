@@ -61,7 +61,7 @@ export default {
 	top: 0;
 	z-index: 15;
 	background-color: var(--color-main-background-translucent);
-	align-items: baseline;
+	align-items: center;
 }
 
 .user-bubble {
