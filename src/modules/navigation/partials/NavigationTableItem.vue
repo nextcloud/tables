@@ -2,7 +2,7 @@
 	<NcAppNavigationItem v-if="table"
 		:name="table.title"
 		:class="{active: activeTable && table.id === activeTable.id}"
-		:allow-collapse="true"
+		:allow-collapse="table.views.length > 0"
 		:open="false"
 		:force-menu="true"
 		:to="'/table/' + parseInt(table.id)"
@@ -62,6 +62,10 @@
 				{{ t('tables', 'Delete table') }}
 			</NcActionButton>
 		</template>
+		<NavigationViewItem v-for="view in table.views"
+			:key="view.id"
+			:view="view"
+			@edit-view="id => editViewId = id" />
 		<DialogConfirmation :description="getTranslatedDescription"
 			:title="t('tables', 'Confirm table deletion')"
 			:cancel-title="t('tables', 'Cancel')"
@@ -77,13 +81,14 @@ import { NcActionButton, NcAppNavigationItem, NcCounterBubble, NcAvatar } from '
 import { showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import DialogConfirmation from '../../../shared/modals/DialogConfirmation.vue'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
 import Table from 'vue-material-design-icons/Table.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import { getCurrentUser } from '@nextcloud/auth'
 import Creation from 'vue-material-design-icons/Creation.vue'
 import Import from 'vue-material-design-icons/Import.vue'
+import NavigationViewItem from './NavigationViewItem.vue'
 
 export default {
 	name: 'NavigationTableItem',
@@ -93,6 +98,7 @@ export default {
 		Table,
 		Import,
 		DialogConfirmation,
+		NavigationViewItem,
 		NcActionButton,
 		NcAppNavigationItem,
 		NcCounterBubble,

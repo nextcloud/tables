@@ -57,6 +57,17 @@ class RowMapper extends QBMapper {
 	}
 
 	/**
+	 * @param View $view
+	 * @param int|null $limit
+	 * @param int|null $offset
+	 * @return array
+	 * @throws Exception
+	 */
+	public function findAllByView(View $view, ?int $limit = null, ?int $offset = null): array {
+		return $this->findAllByTable($view->getTableId(),$limit,$offset);
+	}
+
+	/**
 	 * @throws MultipleObjectsReturnedException
 	 * @throws DoesNotExistException
 	 * @throws Exception

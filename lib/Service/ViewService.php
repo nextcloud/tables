@@ -18,7 +18,6 @@ use Psr\Log\LoggerInterface;
 
 class ViewService extends SuperService {
 	private ViewMapper $mapper;
-	private TableService $tableService;
 
 	protected IL10N $l;
 
@@ -27,13 +26,12 @@ class ViewService extends SuperService {
 		LoggerInterface $logger,
 		?string $userId,
 		ViewMapper $mapper,
-		TableService $tableService,
 		IL10N $l
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->l = $l;
+
 		$this->mapper = $mapper;
-		$this->tableService = $tableService;
 
 	}
 
@@ -50,19 +48,17 @@ class ViewService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function findAll(?int $tableId, ?string $userId = null): array {
+	public function findAll(Table $table, ?string $userId = null): array {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
-
-		$table = $this->getTable($tableId);
 
 		try {
 			// security
 			if (!$this->permissionsService->canReadViews($table, $userId)) {
-				throw new PermissionError('PermissionError: can not read views for tableId '.$tableId);
+				throw new PermissionError('PermissionError: can not read views for tableId '.$table->getId());
 			}
 
-			return $this->mapper->findAll($tableId);
+			return $this->mapper->findAll($table->getId());
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError($e->getMessage());
@@ -81,7 +77,7 @@ class ViewService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws InternalError
 	 */
-	public function find(int $id, ?string $userId = null): View {
+	public function find(int $id, Table $table, ?string $userId = null): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
 
@@ -92,36 +88,12 @@ class ViewService extends SuperService {
 			throw new InternalError($e->getMessage());
 		}
 
-		$table = $this->getTable($view->getTableId());
-
 		// security
 		if (!$this->permissionsService->canReadViews($table, $userId)) {
 			throw new PermissionError('PermissionError: can not read view with id '.$id);
 		}
 
 		return $view;
-	}
-
-	/**
-	 * @param $tableId
-	 * @return Table
-	 * @throws InternalError
-	 * @throws NotFoundError
-	 * @throws PermissionError
-	 */
-	private function getTable($tableId): Table {
-		try {
-			return $this->tableService->find($tableId);
-		} catch (InternalError $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError($e->getMessage());
-		} catch (NotFoundError $e) {
-			$this->logger->warning($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError($e->getMessage());
-		} catch (PermissionError $e) {
-			$this->logger->warning($e->getMessage(), ['exception' => $e]);
-			throw new PermissionError($e->getMessage());
-		}
 	}
 
 
@@ -135,11 +107,9 @@ class ViewService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function create(int $tableId, string $title, ?string $emoji, ?string $userId = null): View {
+	public function create(string $title, ?string $emoji, Table $table, ?string $userId = null): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
-
-		$table = $this->getTable($tableId);
 
 		// security
 		if (!$this->permissionsService->canUpdateTable($table, $userId)) {
@@ -153,7 +123,7 @@ class ViewService extends SuperService {
 			$item->setEmoji($emoji);
 		}
 		$item->setDescription('');
-		$item->setTableId($tableId);
+		$item->setTableId($table->getId());
 		$item->setCreatedBy($userId);
 		$item->setLastEditBy($userId);
 		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
@@ -177,8 +147,8 @@ class ViewService extends SuperService {
 	 * @return View
 	 * @throws InternalError
 	 */
-	public function updateSingle(int $id, string $key, ?string $value, ?string $userId = null): View {
-		return $this->update($id, [$key => $value], $userId);
+	public function updateSingle(int $id, string $key, ?string $value, Table $table, ?string $userId = null): View {
+		return $this->update($id, [$key => $value], $table, $userId);
 	}
 
 	/**
@@ -188,13 +158,11 @@ class ViewService extends SuperService {
 	 * @return View
 	 * @throws InternalError
 	 */
-	public function update(int $id, array $data, ?string $userId = null): View {
+	public function update(int $id, array $data, Table $table, ?string $userId = null): View {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
 			$view = $this->mapper->find($id);
-
-			$table = $this->getTable($view->getTableId());
 
 			// security
 			if (!$this->permissionsService->canUpdateTable($table, $userId)) {
@@ -206,8 +174,8 @@ class ViewService extends SuperService {
 				$view->$setterMethod($value);
 			}
 			$time = new DateTime();
-			$table->setLastEditBy($userId);
-			$table->setLastEditAt($time->format('Y-m-d H:i:s'));
+			$view->setLastEditBy($userId);
+			$view->setLastEditAt($time->format('Y-m-d H:i:s'));
 
 			return $this->mapper->update($view);
 		} catch (Exception $e) {
@@ -222,13 +190,12 @@ class ViewService extends SuperService {
 	 * @return View
 	 * @throws InternalError
 	 */
-	public function delete(int $id, ?string $userId = null): View {
+	public function delete(int $id, Table $table, ?string $userId = null): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId is set or ''
 
 		try {
 			$view = $this->mapper->find($id);
-			$table = $this->getTable($view->getTableId());
 
 			// security
 			if (!$this->permissionsService->canUpdateTable($table, $userId)) {

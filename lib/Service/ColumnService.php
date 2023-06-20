@@ -70,8 +70,8 @@ class ColumnService extends SuperService {
 		try {
 			$view = $this->viewMapper->find($viewId);
 			$tableId = $view->getTableId();
+			// No need to check for columns outside the view since they cannot be addressed
 			if ($this->permissionsService->canReadColumnsByTableId($tableId, $userId)) {
-				//TODO: Adjust Permission
 				$viewColumnIds = $view->getColumnsArray();
 				$viewColumns = [];
 				foreach ($viewColumnIds as $viewColumnId) {

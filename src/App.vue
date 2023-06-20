@@ -55,7 +55,7 @@ export default {
 	},
 	async created() {
 		await this.$store.dispatch('loadTablesFromBE')
-		await this.$store.dispatch('loadViewsFromBE')
+		// await this.$store.dispatch('loadViewsFromBE')
 		const $currentRoute = this.$router.currentRoute
 		if ($currentRoute.name === 'table') {
 			this.$store.commit('setActiveTableId', parseInt($currentRoute.params.tableId))
@@ -177,10 +177,6 @@ export default {
 
 	.align-right {
 		text-align: right;
-	}
-
-	.app-navigation-entry__children {
-		display: none !important;
 	}
 
 </style>
