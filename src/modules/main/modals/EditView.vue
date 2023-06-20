@@ -9,35 +9,38 @@
 				</div>
 			</div>
 
-			<div class="row space-T">
+			<div v-if="columns === null" class="icon-loading" />
+
+			<div v-else>
+				<div class="row space-T">
+					<div class="col-4 mandatory">
+						{{ t('tables', 'Title') }}
+					</div>
+					<div class="col-4" style="display: inline-flex;">
+						<NcEmojiPicker :close-on-select="true" @select="setIcon">
+							<NcButton type="tertiary"
+								:aria-label="t('tables', 'Select emoji for view')"
+								:title="t('tables', 'Select emoji')"
+								@click.prevent>
+								{{ icon }}
+							</NcButton>
+						</NcEmojiPicker>
+						<input v-model="title"
+							:class="{missing: errorTitle}"
+							type="text"
+							:placeholder="t('tables', 'Title of the new view')">
+					</div>
+				</div>
 				<div class="col-4 mandatory">
-					{{ t('tables', 'Title') }}
+					{{ t('tables', 'Columns to be displayed') }}
 				</div>
-				<div class="col-4" style="display: inline-flex;">
-					<NcEmojiPicker :close-on-select="true" @select="setIcon">
-						<NcButton type="tertiary"
-							:aria-label="t('tables', 'Select emoji for view')"
-							:title="t('tables', 'Select emoji')"
-							@click.prevent>
-							{{ icon }}
-						</NcButton>
-					</NcEmojiPicker>
-					<input v-model="title"
-						:class="{missing: errorTitle}"
-						type="text"
-						:placeholder="t('tables', 'Title of the new view')">
+				<div v-for="column in columns" :key="column.id" style="display: flex; align-items: center;">
+					<NcCheckboxRadioSwitch
+						:checked="selectedColumns.includes(column.id)"
+						style="padding-right: 10px;"
+						@update:checked="onToggle(column.id)" />
+					{{ column.title }}
 				</div>
-			</div>
-			<div class="col-4 mandatory">
-				{{ t('tables', 'Columns to be displayed') }}
-			</div>
-			<div v-if="columns==null"> Loading ...</div>
-			<div v-else v-for="column in columns" :key="column.id" style="display: flex; align-items: center;">
-				<NcCheckboxRadioSwitch
-					:checked="selectedColumns.includes(column.id)"
-					style="padding-right: 10px;"
-					@update:checked="onToggle(column.id)" />
-				{{ column.title }}
 			</div>
 			<!-- <div class="row">
 				<div class="fix-col-4 space-T" :class="{'justify-between': showDeleteButton, 'end': !showDeleteButton}">
@@ -122,10 +125,8 @@ export default {
 			}
 		},
 		async showModal() {
-			if (this.columns == null) {
-				await this.loadTableColumnsFromBE()
-			}
 			this.reset()
+			await this.loadTableColumnsFromBE()
 		},
 	},
 	methods: {
@@ -196,6 +197,7 @@ export default {
 			this.errorTitle = false
 			this.selectedColumns = [...this.view.columns]
 			this.localLoading = false
+			this.columns = null
 		},
 	},
 }

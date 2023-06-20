@@ -19,7 +19,7 @@
 			<NcActionButton
 				icon="icon-rename"
 				:close-after-click="true"
-				@click="$emit('edit-view', view.id)">
+				@click="editView">
 				{{ t('tables', 'Edit view') }}
 			</NcActionButton>
 			<!-- <NcActionButton
@@ -69,6 +69,7 @@ import { showSuccess } from '@nextcloud/dialogs'
 import Table from 'vue-material-design-icons/Table.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import DialogConfirmation from '../../../shared/modals/DialogConfirmation.vue'
+import { emit } from '@nextcloud/event-bus'
 
 export default {
 	name: 'NavigationViewItem',
@@ -126,6 +127,9 @@ export default {
 				}
 				this.showDeletionConfirmation = false
 			}
+		},
+		editView() {
+			emit('edit-view', this.view)
 		},
 	},
 

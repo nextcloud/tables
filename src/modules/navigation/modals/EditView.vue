@@ -65,8 +65,8 @@ export default {
 			type: Boolean,
 			default: false,
 		},
-		viewId: {
-			type: Number,
+		view: {
+			type: Object,
 			default: null,
 		},
 	},
@@ -79,7 +79,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['getView', 'activeView']),
+		...mapGetters(['activeView']),
 	},
 	watch: {
 		title() {
@@ -88,12 +88,8 @@ export default {
 				this.title = this.title.slice(0, 199)
 			}
 		},
-		viewId() {
-			if (this.viewId) {
-				const view = this.getView(this.viewId)
-				this.title = view.title
-				this.icon = view.emoji
-			}
+		view() {
+			this.reset()
 		},
 	},
 	methods: {
@@ -106,7 +102,7 @@ export default {
 				showError(t('tables', 'Cannot update view. Title is missing.'))
 				this.errorTitle = true
 			} else {
-				const res = await this.$store.dispatch('updateView', { id: this.viewId, data: { data: { title: this.title, emoji: this.icon } } })
+				const res = await this.$store.dispatch('updateView', { id: this.view.id, data: { data: { title: this.title, emoji: this.icon } } })
 				if (res) {
 					showSuccess(t('tables', 'Updated view "{emoji}{view}".', { emoji: this.icon ? this.icon + ' ' : '', view: this.title }))
 					this.actionCancel()
@@ -114,17 +110,16 @@ export default {
 			}
 		},
 		reset() {
-			this.title = ''
+			this.title = this.view.title
+			this.icon = this.view.emoji
 			this.errorTitle = false
-			this.templateChoice = 'custom'
-			this.icon = ''
 			this.prepareDelete = false
 		},
 		async actionDeleteView() {
-			const deleteId = this.viewId
+			const deleteId = this.view.id
 			const activeViewId = this.activeView.id
 			this.prepareDelete = false
-			const res = await this.$store.dispatch('removeView', { viewId: this.viewId })
+			const res = await this.$store.dispatch('removeView', { viewId: this.view.id })
 			if (res) {
 				showSuccess(t('tables', 'View "{emoji}{view}" removed.', { emoji: this.icon ? this.icon + ' ' : '', view: this.title }))
 

@@ -2,7 +2,7 @@
 	<NcAppNavigationItem v-if="table"
 		:name="table.title"
 		:class="{active: activeTable && table.id === activeTable.id}"
-		:allow-collapse="table.views.length > 0"
+		:allow-collapse="hasViews"
 		:open="false"
 		:force-menu="true"
 		:to="'/table/' + parseInt(table.id)"
@@ -62,7 +62,7 @@
 				{{ t('tables', 'Delete table') }}
 			</NcActionButton>
 		</template>
-		<NavigationViewItem v-for="view in table.views"
+		<NavigationViewItem v-for="view in getViews"
 			:key="view.id"
 			:view="view"
 			@edit-view="id => editViewId = id" />
@@ -133,11 +133,19 @@ export default {
 
 	computed: {
 		...mapGetters(['activeTable']),
+		...mapState(['views']),
 		getTranslatedDescription() {
 			return t('tables', 'Do you really want to delete the table "{table}"?', { table: this.table.title })
 		},
 		userId() {
 			return getCurrentUser().uid
+		},
+		getViews() {
+			//TODO: this.table.views exists, but the views are also stored in store views. When changed there the change does not appear in the views attribute of this.table. Use it like done here instead?:
+			return this.views.filter(v => v.tableId === this.table.id)
+		},
+		hasViews() {
+			return this.getViews.length > 0
 		},
 	},
 
