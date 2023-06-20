@@ -1,0 +1,128 @@
+<template>
+	<div style="width: 100%">
+		<div v-if="loading" class="icon-loading" />
+
+		<!-- default -->
+		<div v-if="!loading" class="row space-T">
+			<div class="fix-col-4">
+				{{ t('tables', 'Allowed types') }}
+			</div>
+			<div class="col-4 space-B typeSelection">
+				<NcCheckboxRadioSwitch v-for="provider in getProviders" :key="provider.id" :checked.sync="provider.active" type="switch">
+					{{ provider.label }}
+				</NcCheckboxRadioSwitch>
+			</div>
+			<p class="span">
+				{{ t('tables', 'The provided types depends on your system setup. You can use the same providers like the fulltext-search.') }}
+			</p>
+		</div>
+	</div>
+</template>
+
+<script>
+import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
+import axios from '@nextcloud/axios'
+import displayError from '../../../../../utils/displayError.js'
+import { generateOcsUrl } from '@nextcloud/router'
+
+export default {
+
+	components: {
+		NcCheckboxRadioSwitch,
+	},
+	props: {
+		textDefault: {
+			type: String,
+			default: '',
+		},
+	},
+
+	data() {
+		return {
+			loading: false,
+			providers: [
+				{
+					id: 'url',
+					label: t('tables', 'Url'),
+					active: true,
+				},
+			],
+			preActivatedProviders: [
+				'url',
+				'files',
+				'contacts',
+			],
+		}
+	},
+
+	computed: {
+		defaultText: {
+			get() { return this.textDefault },
+			set(defaultText) { this.$emit('update:textDefault', defaultText) },
+		},
+		getProviders() {
+			return this.providers
+		},
+		getSelectedProviderIds() {
+			const activeProviderIds = []
+			this.providers.filter(item => item.active === true).forEach(item => {
+				activeProviderIds.push(item.id)
+			})
+			return activeProviderIds
+		},
+	},
+
+	watch: {
+		getSelectedProviderIds() {
+			this.$emit('update:textAllowedPattern', this.getSelectedProviderIds.join(','))
+		},
+	},
+
+	async mounted() {
+		this.loading = true
+		await this.loadProviders()
+		this.loading = false
+	},
+
+	methods: {
+		async loadProviders() {
+			let res = null
+			try {
+				res = await axios.get(generateOcsUrl('/search/providers'))
+				console.debug('search providers', res.data)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load link providers.'))
+				return
+			}
+			res.data?.ocs?.data?.forEach(item => {
+				this.providers.push(
+					{
+						id: item.id,
+						label: item.name,
+						active: this.preActivatedProviders.indexOf(item.id) !== -1,
+					}
+				)
+			})
+			this.providers.sort((a, b) => {
+				return b.active - a.active
+			})
+		},
+	},
+}
+</script>
+<style lang="scss" scoped>
+
+	.typeSelection {
+		display: inline-flex;
+		flex-wrap: wrap;
+		max-height: 137px;
+		padding-left: calc(var(--default-grid-baseline) * 4);
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+
+	.typeSelection > :deep(span) {
+		width: 33%;
+	}
+
+</style>
