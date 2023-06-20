@@ -86,12 +86,16 @@ export default new Vuex.Store({
 			commit('setTables', tables)
 			return res.data.id
 		},
-		async loadTablesFromBE({ commit }) {
+		async loadTablesFromBE({ commit, state }) {
 			commit('setTablesLoading', true)
 
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/table'))
 				commit('setTables', res.data)
+				// Set Views
+				res.data.forEach(table => {
+					state.views = state.views.concat(table.views)
+				})
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load tables.'))
 				showError(t('tables', 'Could not fetch tables'))
@@ -116,20 +120,6 @@ export default new Vuex.Store({
 			commit('setViews', views)
 			return res.data.id
 		},
-		async loadViewsFromBE({ commit }) {
-			commit('setTablesLoading', true)
-
-			try {
-				const res = await axios.get(generateUrl('/apps/tables/view/1')) //TODO
-				commit('setViews', res.data)
-			} catch (e) {
-				displayError(e, t('tables', 'Could not load views.'))
-				showError(t('tables', 'Could not fetch views'))
-			}
-
-			commit('setTablesLoading', false)
-			return true
-		},
 		async updateView({ state, commit, dispatch }, { id, data }) {
 			let res = null
 
@@ -139,8 +129,6 @@ export default new Vuex.Store({
 				displayError(e, t('tables', 'Could not update view.'))
 				return false
 			}
-
-			console.debug("ANSWER",res)
 
 			const view = res.data
 			const views = state.views

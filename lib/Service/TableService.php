@@ -26,6 +26,8 @@ class TableService extends SuperService {
 
 	private RowService $rowService;
 
+	private ViewService $viewService;
+
 	private ShareService $shareService;
 
 	protected UserHelper $userHelper;
@@ -40,6 +42,7 @@ class TableService extends SuperService {
 		TableTemplateService $tableTemplateService,
 		ColumnService $columnService,
 		RowService $rowService,
+		ViewService $viewService,
 		ShareService $shareService,
 		UserHelper $userHelper,
 		IL10N $l
@@ -49,6 +52,7 @@ class TableService extends SuperService {
 		$this->tableTemplateService = $tableTemplateService;
 		$this->columnService = $columnService;
 		$this->rowService = $rowService;
+		$this->viewService = $viewService;
 		$this->shareService = $shareService;
 		$this->userHelper = $userHelper;
 		$this->l = $l;
@@ -162,6 +166,13 @@ class TableService extends SuperService {
 				]);
 			} catch (\Exception $e) {
 			}
+		}
+
+		// add the corresponding views
+		try {
+			$table->setViews($this->viewService->findAll($table));
+		} catch (InternalError | NotFoundError | PermissionError $e) {
+			//TODO: Error handling
 		}
 	}
 

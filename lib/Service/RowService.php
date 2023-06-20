@@ -49,10 +49,10 @@ class RowService extends SuperService {
 
 	/**
 	 * @param int $viewId
-	 * @param string|null $userId
+	 * @param int|null $limit
+	 * @param int|null $offset
 	 * @return array
 	 * @throws InternalError
-	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
 	public function findAllByView(int $viewId, ?int $limit = null, ?int $offset = null): array {
@@ -60,10 +60,9 @@ class RowService extends SuperService {
 			$view = $this->viewMapper->find($viewId);
 			$tableId = $view->getTableId();
 			if ($this->permissionsService->canReadRowsByTableId($tableId)) {
-				return $this->mapper->findAllByTable($tableId, $limit, $offset);
-				// TODO: Sort out not shown column values?!
+				return $this->mapper->findAllByView($this->viewMapper->find($viewId), $limit, $offset);
 			} else {
-				throw new PermissionError('no read access to table id = '.$tableId);
+				throw new PermissionError('no read access to table id = '.$tableId.' and related views');
 			}
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage());

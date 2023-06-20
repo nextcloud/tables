@@ -4,6 +4,11 @@ namespace OCA\Tables\Controller;
 
 use OCA\Tables\Api\V1Api;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Db\Table;
+use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ImportService;
 use OCA\Tables\Service\RowService;
@@ -12,6 +17,7 @@ use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
 use OCP\AppFramework\ApiController;
 use OCP\AppFramework\Http\DataResponse;
+use OCP\DB\Exception;
 use OCP\IRequest;
 
 class Api1Controller extends ApiController {
@@ -21,6 +27,7 @@ class Api1Controller extends ApiController {
 	private RowService $rowService;
 	private ImportService $importService;
 	private ViewService $viewService;
+	private ViewMapper $viewMapper;
 
 	private V1Api $v1Api;
 
@@ -37,6 +44,7 @@ class Api1Controller extends ApiController {
 		RowService $rowService,
 		ImportService $importService,
 		ViewService $viewService,
+		ViewMapper $viewMapper,
 		V1Api $v1Api,
 		string $userId
 	) {
@@ -47,6 +55,7 @@ class Api1Controller extends ApiController {
 		$this->rowService = $rowService;
 		$this->importService = $importService;
 		$this->viewService = $viewService;
+		$this->viewMapper = $viewMapper;
 		$this->userId = $userId;
 		$this->v1Api = $v1Api;
 	}
@@ -185,7 +194,7 @@ class Api1Controller extends ApiController {
 	 */
 	public function indexViews(int $tableId): DataResponse {
 		return $this->handleError(function () use ($tableId) {
-			return $this->viewService->findAll($tableId);
+			return $this->viewService->findAll($this->tableService->find($tableId));
 		});
 	}
 
@@ -196,7 +205,32 @@ class Api1Controller extends ApiController {
 	 */
 	public function createView(int $tableId, string $title, ?string $emoji): DataResponse {
 		return $this->handleError(function () use ($tableId, $title, $emoji) {
-			return $this->viewService->create($tableId, $title, $emoji);
+			return $this->viewService->create($title, $emoji, $this->tableService->find($tableId));
+		});
+	}
+
+	/**
+	 * @param int $id
+	 * @return Table
+	 * @throws Exception
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
+	private function getTableFromViewId(int $id): Table {
+		$view = $this->viewMapper->find($id);
+		return $this->tableService->find($view->getTableId());
+
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function getView(int $viewId): DataResponse {
+		return $this->handleError(function () use ($viewId) {
+			return $this->viewService->find($viewId, $this->getTableFromViewId($viewId));
 		});
 	}
 
@@ -205,9 +239,9 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function getView(int $id): DataResponse {
-		return $this->handleError(function () use ($id) {
-			return $this->viewService->find($id);
+	public function updateView(int $viewId, array $data): DataResponse {
+		return $this->handleError(function () use ($viewId, $data) {
+			return $this->viewService->update($viewId, $data, $this->getTableFromViewId($viewId));
 		});
 	}
 
@@ -216,20 +250,9 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function updateView(int $id, array $data): DataResponse {
-		return $this->handleError(function () use ($id, $data) {
-			return $this->viewService->update($id, $data);
-		});
-	}
-
-	/**
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 */
-	public function deleteView(int $id): DataResponse {
-		return $this->handleError(function () use ($id) {
-			return $this->viewService->delete($id);
+	public function deleteView(int $viewId): DataResponse {
+		return $this->handleError(function () use ($viewId) {
+			return $this->viewService->delete($viewId, $this->getTableFromViewId($viewId));
 		});
 	}
 
