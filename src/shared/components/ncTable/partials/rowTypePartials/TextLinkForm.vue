@@ -7,36 +7,10 @@
 			style="width: 100%"
 			@search="v => term = v">
 			<template #option="props">
-				<div class="icon-label-container">
-					<img v-if="props.thumbnailUrl" :src="props.thumbnailUrl" width="35" height="35">
-					<img v-else-if="props.icon" :src="props.icon" width="35" height="35">
-					<LinkIcon v-else :size="35" />
-
-					<div class="labels">
-						<div class="multiSelectOptionLabel">
-							{{ props.title }}
-						</div>
-						<p v-if="props.subline" class="multiSelectOptionLabel span">
-							{{ props.subline }}
-						</p>
-					</div>
-				</div>
+				<LinkWidget :thumbnail-url="props.thumbnailUrl" :icon-url="props.icon" :title="props.title" :subline="props.subline" :icon-size="40" />
 			</template>
 			<template #selected-option="props">
-				<div class="icon-label-container">
-					<img v-if="props.thumbnailUrl" :src="props.thumbnailUrl" width="35" height="35">
-					<img v-else-if="props.icon" :src="props.icon" width="35" height="35">
-					<LinkIcon v-else :size="35" />
-
-					<div class="labels">
-						<div class="multiSelectOptionLabel">
-							{{ props.title }}
-						</div>
-						<p v-if="props.subline" class="multiSelectOptionLabel span">
-							{{ props.subline }}
-						</p>
-					</div>
-				</div>
+				<LinkWidget :thumbnail-url="props.thumbnailUrl" :icon-url="props.icon" :title="props.title" :subline="props.subline" :icon-size="40" />
 			</template>
 		</NcSelect>
 	</RowFormWrapper>
@@ -49,15 +23,15 @@ import { generateOcsUrl } from '@nextcloud/router'
 import displayError from '../../../../utils/displayError.js'
 import { NcSelect } from '@nextcloud/vue'
 import debounce from 'debounce'
-import LinkIcon from 'vue-material-design-icons/Link.vue'
 import generalHelper from '../../../../mixins/generalHelper.js'
+import LinkWidget from '../LinkWidget.vue'
 
 export default {
 
 	components: {
 		RowFormWrapper,
 		NcSelect,
-		LinkIcon,
+		LinkWidget,
 	},
 
 	mixins: [generalHelper],
@@ -97,10 +71,10 @@ export default {
 				return JSON.parse(this.value)
 			},
 			set(v) {
-				if (v === null) {
-					v = ''
+				let value = null
+				if (v !== null) {
+					value = JSON.stringify(v)
 				}
-				const value = JSON.stringify(v)
 				this.$emit('update:value', value)
 			},
 		},
@@ -186,23 +160,3 @@ export default {
 	},
 }
 </script>
-<style scoped>
-
-.typeSelections span {
-	padding-right: 21px;
-}
-
-.multiSelectOptionLabel {
-	padding-left: calc(var(--default-grid-baseline) * 2);
-}
-
-.icon-label-container {
-	display: flex;
-	align-items: center;
-}
-
-.labels {
-	display: block;
-}
-
-</style>

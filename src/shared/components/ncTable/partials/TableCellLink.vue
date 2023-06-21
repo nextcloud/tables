@@ -1,23 +1,25 @@
 <template>
 	<div>
-		<a :href="getValue" target="_blank">{{ getValue | truncate(40) }}</a>
+		<LinkWidget :thumbnail-url="getValueObject.thumbnailUrl"
+			:icon-url="getValueObject.icon"
+			:title="getValueObject.title"
+			:subline="getValueObject.subline"
+			:url="getValueObject.resourceUrl"
+			:truncate-length="20"
+			:icon-size="25"
+			:hide-default-icon="true" />
 	</div>
 </template>
 
 <script>
 import generalHelper from '../../../mixins/generalHelper.js'
+import LinkWidget from './LinkWidget.vue'
 
 export default {
 	name: 'TableCellLink',
 
-	filters: {
-		truncate(string, num) {
-			if (string.length >= num) {
-				return string.substring(0, num) + '...'
-			} else {
-				return string
-			}
-		},
+	components: {
+		LinkWidget,
 	},
 
 	mixins: [generalHelper],
@@ -38,12 +40,21 @@ export default {
 	},
 
 	computed: {
-		getValue() {
+		getValueObject() {
 			if (this.hasJsonStructure(this.value)) {
 				const valueObject = JSON.parse(this.value)
-				return valueObject.resourceUrl || valueObject.title
+				delete valueObject.subline
+				if (!valueObject.resourceUrl && valueObject.value) {
+					valueObject.resourceUrl = valueObject.value
+				}
+				return valueObject || {}
 			} else {
-				return this.value
+				return {
+					thumbnailUrl: null,
+					iconUrl: null,
+					title: this.value,
+					resourceUrl: this.value,
+				}
 			}
 		},
 	},
