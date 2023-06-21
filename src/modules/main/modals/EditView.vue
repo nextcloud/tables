@@ -34,7 +34,18 @@
 				<div class="col-4 mandatory">
 					{{ t('tables', 'Columns to be displayed') }}
 				</div>
-				<div v-for="column in columns" :key="column.id" style="display: flex; align-items: center;">
+				<div v-for="(column, index) in columns"
+					:key="column.id"
+					:draggable="true"
+					style="display: flex; align-items: center;"
+					@dragstart="dragStart(index)"
+					@dragover="dragOver(index)"
+					@dragend="dragEnd(index)">
+					<NcButton aria-label="Move" type="tertiary-no-background" style="padding-right: 10px;">
+						<template #icon>
+							<MenuIcon :size="20" />
+						</template>
+					</NcButton>
 					<NcCheckboxRadioSwitch
 						:checked="selectedColumns.includes(column.id)"
 						style="padding-right: 10px;"
@@ -79,6 +90,7 @@ import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
 import tablePermissions from '../mixins/tablePermissions.js'
+import MenuIcon from 'vue-material-design-icons/Menu.vue'
 
 export default {
 	name: 'EditView',
@@ -86,6 +98,7 @@ export default {
 		NcModal,
 		NcEmojiPicker,
 		NcButton,
+		MenuIcon,
 		NcCheckboxRadioSwitch,
 	},
 	mixins: [tablePermissions],
@@ -108,6 +121,8 @@ export default {
 			localLoading: false,
 			prepareDelete: false,
 			columns: null,
+			draggedItem: null,
+			startDragIndex: null,
 		}
 	},
 	computed: {
@@ -158,6 +173,18 @@ export default {
 		},
 		async loadTableColumnsFromBE() {
 			this.columns = await this.$store.dispatch('getColumnsFromBE', { tableId: this.view.tableId })
+			// Show columns of view first
+			this.columns.sort((a, b) => {
+				const aSelected = this.selectedColumns.includes(a.id)
+				const bSelected = this.selectedColumns.includes(b.id)
+				if (aSelected && !bSelected) {
+					return -1
+				} else if (!aSelected && bSelected) {
+					return 1
+				} else {
+					return 0
+				}
+			})
 		},
 		async actionConfirm() {
 			if (this.title === '') {
@@ -173,17 +200,18 @@ export default {
 			}
 		},
 		async updateViewToBE(id) {
+			const newSelectedColumnIds = this.columns.map(col => col.id).filter(id => this.selectedColumns.includes(id))
 			const data = {
 				data: {
 					title: this.title,
 					emoji: this.icon,
-					columns: JSON.stringify(this.selectedColumns),
+					columns: JSON.stringify(newSelectedColumnIds),
 				},
 			}
 			const res = await this.$store.dispatch('updateView', { id, data })
 			if (res) {
 				console.debug(res, this.view)
-				if (this.selectedColumns !== this.view.columns) {
+				if (newSelectedColumnIds !== this.view.columns) {
 					await this.$store.dispatch('loadColumnsFromBE', { viewId: this.view.id })
 				}
 				return res
@@ -198,6 +226,25 @@ export default {
 			this.selectedColumns = [...this.view.columns]
 			this.localLoading = false
 			this.columns = null
+		},
+		dragStart(index) {
+			this.draggedItem = this.columns[index]
+			this.startDragIndex = index
+		},
+		dragOver(index) {
+			if (this.draggedItem === null) return
+			const draggedIndex = this.columns.indexOf(this.draggedItem)
+			if (index !== draggedIndex) {
+				this.columns.splice(draggedIndex, 1)
+				this.columns.splice(index, 0, this.draggedItem)
+			}
+		},
+		async dragEnd(goalIndex) {
+			if (this.draggedItem === null) return
+			const goal = goalIndex !== undefined ? goalIndex : this.list.indexOf(this.draggedItem)
+			if (this.startDragIndex === goal) return
+			this.draggedItem = null
+			this.startDragIndex = null
 		},
 	},
 }

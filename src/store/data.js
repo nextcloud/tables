@@ -111,12 +111,14 @@ export default {
 				displayError(e, t('tables', 'Could not load columns.'))
 				return false
 			}
-
-			const columns = res.data.sort((a, b) => {
-				if (a.orderWeight < b.orderWeight) { return 1 }
-				if (a.orderWeight > b.orderWeight) { return -1 }
-				return 0
-			})
+			let columns = res.data
+			if (tableId) {
+				columns = columns.sort((a, b) => {
+					if (a.orderWeight < b.orderWeight) { return 1 }
+					if (a.orderWeight > b.orderWeight) { return -1 }
+					return 0
+				})
+			}
 			commit('setLoading', false)
 			return columns
 		},
