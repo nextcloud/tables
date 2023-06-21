@@ -31,7 +31,7 @@ export default {
 		NcCheckboxRadioSwitch,
 	},
 	props: {
-		textDefault: {
+		textAllowedPattern: {
 			type: String,
 			default: '',
 		},
@@ -56,10 +56,6 @@ export default {
 	},
 
 	computed: {
-		defaultText: {
-			get() { return this.textDefault },
-			set(defaultText) { this.$emit('update:textDefault', defaultText) },
-		},
 		getProviders() {
 			return this.providers
 		},
@@ -89,7 +85,6 @@ export default {
 			let res = null
 			try {
 				res = await axios.get(generateOcsUrl('/search/providers'))
-				console.debug('search providers', res.data)
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load link providers.'))
 				return
@@ -99,13 +94,21 @@ export default {
 					{
 						id: item.id,
 						label: item.name,
-						active: this.preActivatedProviders.indexOf(item.id) !== -1,
+						active: this.isActive(item.id),
 					}
 				)
 			})
 			this.providers.sort((a, b) => {
 				return b.active - a.active
 			})
+		},
+		isActive(providerId) {
+			if (this.textAllowedPattern) {
+				const selectedProviders = this.textAllowedPattern.split(',')
+				return selectedProviders.indexOf(providerId) !== -1
+			} else {
+				return this.preActivatedProviders.indexOf(providerId) !== -1
+			}
 		},
 	},
 }
@@ -122,7 +125,7 @@ export default {
 	}
 
 	.typeSelection > :deep(span) {
-		width: 33%;
+		width: 49%;
 	}
 
 </style>

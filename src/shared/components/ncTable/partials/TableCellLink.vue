@@ -1,10 +1,11 @@
 <template>
 	<div>
-		<a :href="value" target="_blank">{{ value | truncate(40) }}</a>
+		<a :href="getValue" target="_blank">{{ getValue | truncate(40) }}</a>
 	</div>
 </template>
 
 <script>
+import generalHelper from '../../../mixins/generalHelper.js'
 
 export default {
 	name: 'TableCellLink',
@@ -19,6 +20,8 @@ export default {
 		},
 	},
 
+	mixins: [generalHelper],
+
 	props: {
 		column: {
 			type: Object,
@@ -31,6 +34,17 @@ export default {
 		value: {
 			type: String,
 			default: null,
+		},
+	},
+
+	computed: {
+		getValue() {
+			if (this.hasJsonStructure(this.value)) {
+				const valueObject = JSON.parse(this.value)
+				return valueObject.resourceUrl || valueObject.title
+			} else {
+				return this.value
+			}
 		},
 	},
 

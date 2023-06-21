@@ -41,6 +41,8 @@
 							:text-default.sync="editColumn.textDefault"
 							:text-allowed-pattern.sync="editColumn.textAllowedPattern"
 							:text-max-length.sync="editColumn.textMaxLength" />
+						<TextLinkForm v-if="editColumn.type === 'text' && editColumn.subtype === 'link'"
+							:text-allowed-pattern.sync="editColumn.textAllowedPattern" />
 						<TextLongForm v-if="editColumn.type === 'text' && editColumn.subtype === 'long'"
 							:text-default.sync="editColumn.textDefault"
 							:text-max-length.sync="editColumn.textMaxLength" />
@@ -207,6 +209,7 @@ import NumberForm from '../../../shared/components/ncTable/partials/columnTypePa
 import NumberStarsForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/NumberStarsForm.vue'
 import NumberProgressForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/NumberProgressForm.vue'
 import TextLineForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/TextLineForm.vue'
+import TextLinkForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/TextLinkForm.vue'
 import TextLongForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/TextLongForm.vue'
 import TextRichForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/TextRichForm.vue'
 import MainForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/MainForm.vue'
@@ -251,6 +254,7 @@ export default {
 		TextLineForm,
 		TextLongForm,
 		TextRichForm,
+		TextLinkForm,
 		MainForm,
 		SelectionForm,
 		SelectionMultiForm,

@@ -43,7 +43,7 @@
 					</div>
 
 					<div v-if="combinedType === 'text-link'" class="row space-L no-padding-on-mobile">
-						<TextLinkForm :text-default.sync="numberDefault" :text-allowed-pattern.sync="textAllowedPattern" />
+						<TextLinkForm :text-allowed-pattern.sync="textAllowedPattern" />
 					</div>
 
 					<div v-if="type === 'text' && subtype !== 'link'" class="row no-padding-on-mobile space-L">
