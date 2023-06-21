@@ -9,6 +9,7 @@
 <script>
 import Close from 'vue-material-design-icons/Close.vue'
 import { MagicFields } from '../mixins/magicFields.js'
+import { Filter, FilterIds } from '../mixins/filter.js'
 
 export default {
 
@@ -18,8 +19,8 @@ export default {
 
 	props: {
 		operator: {
-		      type: String,
-		      default: '',
+		      type: Filter,
+		      default: null,
 		    },
 		value: {
 		      type: String,
@@ -44,10 +45,10 @@ export default {
 			return value
 		},
 		labelText() {
-			if (this.operator === 'is-empty') {
-				return this.getOperatorLabel(this.operator)
+			if (this.operator.id === FilterIds.IsEmpty) {
+				return this.operator.getOperatorLabel()
 			} else {
-				return this.getOperatorLabel(this.operator) + ' "' + this.getValue + '"'
+				return this.operator.getOperatorLabel() + ' "' + this.getValue + '"'
 			}
 		},
 	},

@@ -1,6 +1,6 @@
 import { AbstractSelectionColumn } from '../columnClass.js'
 import { ColumnTypes } from '../columnHandler.js'
-import { Filters } from '../filter.js'
+import { FilterIds } from '../filter.js'
 
 export default class SelectionColumn extends AbstractSelectionColumn {
 
@@ -42,13 +42,14 @@ export default class SelectionColumn extends AbstractSelectionColumn {
 
 	isFilterFound(cell, filter) {
 		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
-
+		const cellLabel = this.getLabel(cell.value)
 		const filterMethod = {
-			[Filters.Contains.id]() { return this.getLabel(cell.value)?.includes(filterValue) },
-			[Filters.BeginsWith.id]() { return this.getLabel(cell.value)?.startsWith(filterValue) },
-			[Filters.EndsWith.id]() { return this.getLabel(cell.value)?.endsWith(filterValue) },
-			[Filters.IsEqual.id]() { return this.getLabel(cell.value) === filterValue },
-		}[filter.operator]
+			[FilterIds.Contains]() { return cellLabel?.includes(filterValue) },
+			[FilterIds.BeginsWith]() { return cellLabel?.startsWith(filterValue) },
+			[FilterIds.EndsWith]() { return cellLabel?.endsWith(filterValue) },
+			[FilterIds.IsEqual]() { return cellLabel === filterValue },
+			[FilterIds.IsEmpty]() { return !cellLabel },
+		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)
 	}
 

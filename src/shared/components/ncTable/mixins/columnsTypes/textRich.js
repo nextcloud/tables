@@ -1,6 +1,6 @@
 import { AbstractTextColumn } from '../columnClass.js'
 import { ColumnTypes } from '../columnHandler.js'
-import { Filters } from '../filter.js'
+import { FilterIds } from '../filter.js'
 
 export default class TextRichColumn extends AbstractTextColumn {
 
@@ -17,8 +17,9 @@ export default class TextRichColumn extends AbstractTextColumn {
 		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
 
 		const filterMethod = {
-			[Filters.Contains.id]() { return cell.value.includes(filterValue) },
-		}[filter.operator][filter.operator]
+			[FilterIds.Contains]() { return cell.value.includes(filterValue) },
+			[FilterIds.IsEmpty]() { return !cell.value },
+		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)
 	}
 

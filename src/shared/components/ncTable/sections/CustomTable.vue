@@ -121,16 +121,6 @@ export default {
 					const filters = this.getFiltersForColumn(column)
 					const cell = row.data.find(item => item.columnId === column.id)
 
-					// if we should filter
-					if (filters !== null) {
-						filters.forEach(fil => {
-							this.addMagicFieldsValues(fil)
-							if (filterStatus === null || filterStatus === true) {
-								filterStatus = this.isFilterFound(column, cell || {}, fil)
-							}
-						})
-					}
-
 					// if we don't have a value for this cell
 					if (cell === undefined) {
 						if (searchString) {
@@ -148,7 +138,6 @@ export default {
 								if (filterStatus === null || filterStatus === true) {
 									filterStatus = column.isFilterFound(cell, fil)
 								}
-								// filterStatus = filterStatus || this.isFilterFound(column, cell, fil)
 							})
 						}
 						// if we should search

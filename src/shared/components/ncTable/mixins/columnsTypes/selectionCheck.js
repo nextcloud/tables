@@ -1,6 +1,6 @@
 import { AbstractSelectionColumn } from '../columnClass.js'
 import { ColumnTypes } from '../columnHandler.js'
-import { Filters } from '../filter.js'
+import { FilterIds } from '../filter.js'
 
 export default class SelectionCheckColumn extends AbstractSelectionColumn {
 
@@ -25,13 +25,11 @@ export default class SelectionCheckColumn extends AbstractSelectionColumn {
 	}
 
 	isFilterFound(cell, filter) {
-		const yesPossibilities = ['yes', 'true', 'check', 'checked', 'y']
-		const noPossibilities = ['no', 'false', 'unchecked', 'uncheck', 'n']
-		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
+		const filterValue = '' + filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
 
 		const filterMethod = {
-			[Filters.Contains.id]() { return (cell.value === 'true' && yesPossibilities.findIndex(item => item === filterValue) !== -1) || (cell.value === 'false' && noPossibilities.findIndex(item => item === filterValue) !== -1) },
-		}[filter.operator]
+			[FilterIds.IsEqual]() { return (cell.value === 'true' && filterValue === 'yes') || (cell.value === 'false' && filterValue === 'no') },
+		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)
 	}
 

@@ -1,6 +1,6 @@
 import { AbstractNumberColumn } from '../columnClass.js'
 import { ColumnTypes } from '../columnHandler.js'
-import { Filters } from '../filter.js'
+import { FilterIds } from '../filter.js'
 
 export default class NumberStarsColumn extends AbstractNumberColumn {
 
@@ -28,12 +28,12 @@ export default class NumberStarsColumn extends AbstractNumberColumn {
 		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
 
 		const filterMethod = {
-			[Filters.IsEqual.id]() { return parseInt(cell.value) === parseInt(filterValue) },
-			[Filters.IsGreaterThan.id]() { return parseInt(cell.value) > parseInt(filterValue) },
-			[Filters.IsGreaterThanOrEqual.id]() { return parseInt(cell.value) >= parseInt(filterValue) },
-			[Filters.IsLowerThan.id]() { return parseInt(cell.value) < parseInt(filterValue) },
-			[Filters.IsLowerThanOrEqual.id]() { return parseInt(cell.value) <= parseInt(filterValue) },
-		}[filter.operator]
+			[FilterIds.IsEqual]() { return parseInt(cell.value) === parseInt(filterValue) },
+			[FilterIds.IsGreaterThan]() { return parseInt(cell.value) > parseInt(filterValue) },
+			[FilterIds.IsGreaterThanOrEqual]() { return parseInt(cell.value) >= parseInt(filterValue) },
+			[FilterIds.IsLowerThan]() { return parseInt(cell.value) < parseInt(filterValue) },
+			[FilterIds.IsLowerThanOrEqual]() { return parseInt(cell.value) <= parseInt(filterValue) },
+		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)
 	}
 

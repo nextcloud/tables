@@ -1,16 +1,24 @@
 import { ColumnTypes } from './columnHandler.js'
 
-class Filter {
+class BaseFilter {
 
-	constructor({ id, label, icon, source, subline, goodFor, shortLabel = null, replace = null } = {}) {
+	constructor() {
+		this.icon = 'icon-add'
+		this.source = 'operators'
+		this.subline = t('tables', 'Filter operator')
+	}
+
+}
+
+export class Filter extends BaseFilter {
+
+	constructor({ id, label, goodFor, incompatibleWith, shortLabel = null } = {}) {
+		super()
 		this.id = id
 		this.label = label
 		this.shortLabel = shortLabel
-		this.icon = icon
-		this.source = source
-		this.subline = subline
 		this.goodFor = goodFor
-		this.replace = replace
+		this.incompatibleWith = incompatibleWith
 	}
 
 	getOperatorLabel() {
@@ -23,74 +31,76 @@ export function getFilterWithId(id) {
 	return Object.values(Filters).find(fil => fil.id === id)
 }
 
+export const FilterIds = {
+	Contains: 'contains',
+	BeginsWith: 'begins-with',
+	EndsWith: 'ends-with',
+	IsEqual: 'is-equal',
+	IsGreaterThan: 'is-greater-than',
+	IsGreaterThanOrEqual: 'is-greater-than-or-equal',
+	IsLowerThan: 'is-lower-than',
+	IsLowerThanOrEqual: 'is-lower-than-or-equal',
+	IsEmpty: 'is-empty',
+}
+
 export const Filters = {
 	Contains: new Filter({
-		id: 'contains',
+		id: FilterIds.Contains,
 		label: t('tables', 'Contains'),
-		icon: 'icon-add',
-		source: 'operators',
-		subline: t('tables', 'Filter operator'),
 		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextLong, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.TextLink, ColumnTypes.TextRich],
+		incompatibleWith: [FilterIds.IsEmpty, FilterIds.IsEqual],
 	}),
 	BeginsWith: new Filter({
-		id: 'begins-with',
+		id: FilterIds.BeginsWith,
 		label: t('tables', 'Begins with'),
-		icon: 'icon-add',
-		source: 'operators',
-		subline: t('tables', 'Filter operator'),
 		goodFor: [ColumnTypes.TextLine, ColumnTypes.Selection, ColumnTypes.TextLink],
+		incompatibleWith: [FilterIds.IsEmpty, FilterIds.IsEqual, FilterIds.BeginsWith],
 	}),
 	EndsWith: new Filter({
-		id: 'ends-with',
+		id: FilterIds.EndsWith,
 		label: t('tables', 'Ends with'),
-		icon: 'icon-add',
-		source: 'operators',
-		subline: t('tables', 'Filter operator'),
 		goodFor: [ColumnTypes.TextLine, ColumnTypes.Selection, ColumnTypes.TextLink],
+		incompatibleWith: [FilterIds.IsEmpty, FilterIds.IsEqual, FilterIds.EndsWith],
 	}),
 	IsEqual: new Filter({
-		id: 'is-equal',
+		id: FilterIds.IsEqual,
 		label: t('tables', 'Is equal'),
 		shortLabel: '=',
-		icon: 'icon-add',
-		source: 'operators',
-		subline: t('tables', 'Filter operator'),
 		goodFor: [ColumnTypes.TextLine, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.Number, ColumnTypes.SelectionCheck, ColumnTypes.TextLink, ColumnTypes.NumberStars, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime],
+		incompatibleWith: [FilterIds.IsEmpty, FilterIds.IsEqual, FilterIds.BeginsWith, FilterIds.EndsWith, FilterIds.Contains, FilterIds.IsGreaterThan, FilterIds.IsGreaterThanOrEqual, FilterIds.IsLowerThan, FilterIds.IsLowerThanOrEqual],
 	}),
 	IsGreaterThan: new Filter({
-		id: 'is-greater-than',
+		id: FilterIds.IsGreaterThan,
 		label: t('tables', 'Is greater than'),
 		shortLabel: '>',
-		icon: 'icon-add',
-		source: 'operators',
-		subline: t('tables', 'Filter operator'),
 		goodFor: [ColumnTypes.Number, ColumnTypes.NumberStars, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime],
+		incompatibleWith: [FilterIds.IsEmpty, FilterIds.IsEqual, FilterIds.IsGreaterThan, FilterIds.IsGreaterThanOrEqual],
 	}),
 	IsGreaterThanOrEqual: new Filter({
-		id: 'is-greater-than-or-equal',
+		id: FilterIds.IsGreaterThanOrEqual,
 		label: t('tables', 'Is greater than or equal'),
 		shortLabel: '>=',
-		icon: 'icon-add',
-		source: 'operators',
-		subline: t('tables', 'Filter operator'),
 		goodFor: [ColumnTypes.Number, ColumnTypes.NumberStars, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime],
+		incompatibleWith: [FilterIds.IsEmpty, FilterIds.IsEqual, FilterIds.IsGreaterThan, FilterIds.IsGreaterThanOrEqual],
 	}),
 	IsLowerThan: new Filter({
-		id: 'is-lower-than',
+		id: FilterIds.IsLowerThan,
 		label: t('tables', 'Is lower than'),
 		shortLabel: '<',
-		icon: 'icon-add',
-		source: 'operators',
-		subline: t('tables', 'Filter operator'),
 		goodFor: [ColumnTypes.Number, ColumnTypes.NumberStars, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime],
+		incompatibleWith: [FilterIds.IsEmpty, FilterIds.IsEqual, FilterIds.IsLowerThan, FilterIds.IsLowerThanOrEqual],
 	}),
 	IsLowerThanOrEqual: new Filter({
-		id: 'is-lower-than-or-equal',
+		id: FilterIds.IsLowerThanOrEqual,
 		label: t('tables', 'Is lower than or equal'),
 		shortLabel: '<=',
-		icon: 'icon-add',
-		source: 'operators',
-		subline: t('tables', 'Filter operator'),
 		goodFor: [ColumnTypes.Number, ColumnTypes.NumberStars, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime],
+		incompatibleWith: [FilterIds.IsEmpty, FilterIds.IsEqual, FilterIds.IsLowerThan, FilterIds.IsLowerThanOrEqual],
+	}),
+	IsEmpty: new Filter({
+		id: FilterIds.IsEmpty,
+		label: t('tables', 'Is empty'),
+		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextRich, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.Number, ColumnTypes.TextLink, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime],
+		incompatibleWith: [FilterIds.Contains, FilterIds.BeginsWith, FilterIds.EndsWith, FilterIds.IsEqual, FilterIds.IsGreaterThan, FilterIds.IsGreaterThanOrEqual, FilterIds.IsLowerThan, FilterIds.IsLowerThanOrEqual, FilterIds.IsEmpty],
 	}),
 }

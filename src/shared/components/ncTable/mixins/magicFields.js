@@ -2,14 +2,22 @@ import { getCurrentUser } from '@nextcloud/auth'
 import Moment from '@nextcloud/moment'
 import { ColumnTypes } from './columnHandler.js'
 
-class MagicField {
+class BaseMagicField {
 
-	constructor({ id, label, icon, source, subline, goodFor, replace } = {}) {
+	constructor() {
+		this.source = 'magic-fields'
+		this.subline = t('tables', 'Magic field')
+	}
+
+}
+
+class MagicField extends BaseMagicField {
+
+	constructor({ id, label, icon, goodFor, replace } = {}) {
+		super()
 		this.id = id
 		this.label = label
 		this.icon = icon
-		this.source = source
-		this.subline = subline
 		this.goodFor = goodFor
 		this.replace = replace
 	}
@@ -21,8 +29,6 @@ export const MagicFields = {
 		id: 'me',
 		label: t('tables', 'Me (user ID)'),
 		icon: 'icon-user',
-		source: 'magic-fields',
-		subline: t('tables', 'Magic field'),
 		goodFor: [ColumnTypes.TextLine, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.TextRich],
 		replace: getCurrentUser().uid,
 	}),
@@ -30,8 +36,6 @@ export const MagicFields = {
 		id: 'my-name',
 		label: t('tables', 'Me (name)'),
 		icon: 'icon-user',
-		source: 'magic-fields',
-		subline: t('tables', 'Magic field'),
 		goodFor: [ColumnTypes.TextLine, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.TextRich],
 		replace: getCurrentUser().displayName,
 	}),
@@ -39,8 +43,6 @@ export const MagicFields = {
 		id: 'checked',
 		label: t('tables', 'Checked'),
 		icon: 'icon-checkmark',
-		source: 'magic-fields',
-		subline: t('tables', 'Magic field'),
 		goodFor: [ColumnTypes.SelectionCheck],
 		replace: 'yes',
 	}),
@@ -48,8 +50,6 @@ export const MagicFields = {
 		id: 'unchecked',
 		label: t('tables', 'Unchecked'),
 		icon: 'icon-close',
-		source: 'magic-fields',
-		subline: t('tables', 'Magic field'),
 		goodFor: [ColumnTypes.SelectionCheck],
 		replace: 'no',
 	}),
@@ -57,8 +57,6 @@ export const MagicFields = {
 		id: 'stars-0',
 		label: '☆☆☆☆☆',
 		icon: 'icon-star',
-		source: 'magic-fields',
-		subline: t('tables', 'Magic field'),
 		goodFor: [ColumnTypes.NumberStars],
 		replace: '0',
 	}),
@@ -66,8 +64,6 @@ export const MagicFields = {
 		id: 'stars-1',
 		label: '★☆☆☆☆',
 		icon: 'icon-star',
-		source: 'magic-fields',
-		subline: t('tables', 'Magic field'),
 		goodFor: [ColumnTypes.NumberStars],
 		replace: '1',
 	}),
@@ -75,8 +71,6 @@ export const MagicFields = {
 		id: 'stars-2',
 		label: '★★☆☆☆',
 		icon: 'icon-star',
-		source: 'magic-fields',
-		subline: t('tables', 'Magic field'),
 		goodFor: [ColumnTypes.NumberStars],
 		replace: '2',
 	}),
@@ -84,8 +78,6 @@ export const MagicFields = {
 		id: 'stars-3',
 		label: '★★★☆☆',
 		icon: 'icon-star',
-		source: 'magic-fields',
-		subline: t('tables', 'Magic field'),
 		goodFor: [ColumnTypes.NumberStars],
 		replace: '3',
 	}),
@@ -93,8 +85,6 @@ export const MagicFields = {
 		id: 'stars-4',
 		label: '★★★★☆',
 		icon: 'icon-star',
-		source: 'magic-fields',
-		subline: t('tables', 'Magic field'),
 		goodFor: [ColumnTypes.NumberStars],
 		replace: '4',
 	}),
@@ -102,8 +92,6 @@ export const MagicFields = {
 		id: 'stars-5',
 		label: '★★★★★',
 		icon: 'icon-star',
-		source: 'magic-fields',
-		subline: t('tables', 'Magic field'),
 		goodFor: [ColumnTypes.NumberStars],
 		replace: '5',
 	}),
@@ -111,8 +99,6 @@ export const MagicFields = {
 		id: 'datetime-date-today',
 		label: t('tables', 'Today'),
 		icon: 'icon-calendar-dark',
-		source: 'magic-fields',
-		subline: t('tables', 'Magic field'),
 		goodFor: [ColumnTypes.DatetimeDate],
 		replace: new Moment().format('YYYY-MM-DD'),
 	}),
@@ -120,8 +106,6 @@ export const MagicFields = {
 		id: 'datetime-date-start-of-year',
 		label: t('tables', 'Start of the year'),
 		icon: 'icon-history',
-		source: 'magic-fields',
-		subline: t('tables', 'Magic field'),
 		goodFor: [ColumnTypes.DatetimeDate],
 		replace: new Moment().startOf('year').format('YYYY-MM-DD'),
 	}),
@@ -129,8 +113,6 @@ export const MagicFields = {
 		id: 'datetime-date-start-of-month',
 		label: t('tables', 'Start of the month'),
 		icon: 'icon-history',
-		source: 'magic-fields',
-		subline: t('tables', 'Magic field'),
 		goodFor: [ColumnTypes.DatetimeDate],
 		replace: new Moment().startOf('month').format('YYYY-MM-DD'),
 	}),
@@ -138,8 +120,6 @@ export const MagicFields = {
 		id: 'datetime-date-start-of-week',
 		label: t('tables', 'Start of the week'),
 		icon: 'icon-history',
-		source: 'magic-fields',
-		subline: t('tables', 'Magic field'),
 		goodFor: [ColumnTypes.DatetimeDate],
 		replace: new Moment().startOf('week').format('YYYY-MM-DD'),
 	}),
@@ -147,8 +127,6 @@ export const MagicFields = {
 		id: 'datetime-time-now',
 		label: t('tables', 'Now'),
 		icon: 'icon-calendar-dark',
-		source: 'magic-fields',
-		subline: t('tables', 'Magic field'),
 		goodFor: [ColumnTypes.DatetimeTime],
 		replace: new Moment().format('HH:mm'),
 	}),
@@ -156,8 +134,6 @@ export const MagicFields = {
 		id: 'datetime-now',
 		label: t('tables', 'Now'),
 		icon: 'icon-calendar-dark',
-		source: 'magic-fields',
-		subline: t('tables', 'Magic field'),
 		goodFor: [ColumnTypes.Datetime],
 		replace: new Moment().format('YYYY-MM-DD HH:mm'),
 	}),

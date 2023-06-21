@@ -1,7 +1,7 @@
 import { AbstractDatetimeColumn } from '../columnClass.js'
 import { ColumnTypes } from '../columnHandler.js'
 import Moment from '@nextcloud/moment'
-import { Filters } from '../filter.js'
+import { FilterIds } from '../filter.js'
 
 export default class DatetimeColumn extends AbstractDatetimeColumn {
 
@@ -45,12 +45,13 @@ export default class DatetimeColumn extends AbstractDatetimeColumn {
 		const valueDate = new Moment(cell.value, 'YYY-MM-DD HH:mm')
 
 		const filterMethod = {
-			[Filters.IsEqual.id]() { return filterDate.isSame(valueDate) },
-			[Filters.IsGreaterThan.id]() { return filterDate.isBefore(valueDate) },
-			[Filters.IsGreaterThanOrEqual.id]() { return filterDate.isSameOrBefore(valueDate) },
-			[Filters.IsLowerThan.id]() { return filterDate.isAfter(valueDate) },
-			[Filters.IsLowerThanOrEqual.id]() { return filterDate.isSameOrAfter(valueDate) },
-		}[filter.operator]
+			[FilterIds.IsEqual]() { return filterDate.isSame(valueDate) },
+			[FilterIds.IsGreaterThan]() { return filterDate.isBefore(valueDate) },
+			[FilterIds.IsGreaterThanOrEqual]() { return filterDate.isSameOrBefore(valueDate) },
+			[FilterIds.IsLowerThan]() { return filterDate.isAfter(valueDate) },
+			[FilterIds.IsLowerThanOrEqual]() { return filterDate.isSameOrAfter(valueDate) },
+			[FilterIds.IsEmpty]() { return !cell.value },
+		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)
 	}
 

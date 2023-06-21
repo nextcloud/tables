@@ -24,9 +24,9 @@
 				:key="index"
 				:name="'filter-operators-column-' + column.id"
 				:value="op.id"
-				:checked="operator === op.id"
+				:checked="operator.id === op.id"
 				:disabled="isDisabled(op.id)"
-				@change="changeFilterOperator">
+				@change="changeFilterOperator(op)">
 				{{ op.label }}
 			</NcActionRadio>
 			<NcActionInput
@@ -68,6 +68,7 @@ import { NcActions, NcActionButton, NcActionInput, NcActionButtonGroup, NcAction
 import { mapState } from 'vuex'
 import { AbstractColumn } from '../mixins/columnClass.js'
 import { ColumnTypes } from '../mixins/columnHandler.js'
+import { FilterIds } from '../mixins/filter.js'
 
 export default {
 
@@ -100,7 +101,7 @@ export default {
 	data() {
 		return {
 			filterValue: '',
-			operator: '',
+			operator: null,
 			hideFilterInputForColumnTypes: [
 				ColumnTypes.SelectionCheck,
 				ColumnTypes.NumberStars,
@@ -130,11 +131,9 @@ export default {
 				return null
 			}
 			// preselect first operator, even if it's not displayed
-			if (this.operator === '') {
-				console.debug(this.column.title, 'operator is empty, try to set first option', possibleOperators)
+			if (this.operator === null) {
 				// eslint-disable-next-line vue/no-side-effects-in-computed-properties
-				this.operator = possibleOperators[0]?.id ?? ''
-				console.debug('operator', this.operator)
+				this.operator = possibleOperators[0]
 			}
 			return possibleOperators
 		},
@@ -144,7 +143,8 @@ export default {
 			if (filters && filters.length > 0) {
 				const incompatibleFilters = new Set()
 				filters.forEach(fil => {
-					this.getIncompatibleFilters(fil.operator).forEach(item => incompatibleFilters.add(item))
+
+					fil.operator.incompatibleWith.forEach(item => incompatibleFilters.add(item))
 				})
 				return this.getOperators.filter(op => incompatibleFilters.has(op.id))
 			}
@@ -182,19 +182,19 @@ export default {
 			this.filterValue = '@' + magicFieldId
 			this.submitFilterInput()
 		},
-		changeFilterOperator(event) {
-			console.debug('operator changed', event?.target?.value)
-			this.operator = event?.target?.value
-			if (this.operator === 'operator-is-empty') {
+		changeFilterOperator(operator) {
+			this.operator = operator
+			if (this.operator.id === FilterIds.IsEmpty) {
 				this.submitFilter()
 			}
 		},
 		submitFilterInput() {
 			console.debug('submit clicked', this.filterValue)
 
-			if (this.operator === 'operator-contains') {
+			// Ignore contains filter with the same value es old contain filters
+			if (this.operator.id === FilterIds.Contains) {
 				const columnFilters = this.getFilterForColumn(this.column)
-				if (columnFilters && columnFilters.filter(fil => fil.operator === 'contains').map(fil => fil.value).includes(this.filterValue)) {
+				if (columnFilters && columnFilters.filter(fil => fil.operator.id === FilterIds.Contains).map(fil => fil.value).includes(this.filterValue)) {
 					this.localOpenState = false
 					this.reset()
 					return
@@ -220,7 +220,7 @@ export default {
 			this.reset()
 		},
 		reset() {
-			this.operator = ''
+			this.operator = null
 			this.filterValue = ''
 		},
 		sort(mode) {

@@ -51,7 +51,7 @@ import DeleteRows from '../modules/main/modals/DeleteRows.vue'
 import EmptyTable from '../modules/main/sections/EmptyTable.vue'
 import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
 import { emit } from '@nextcloud/event-bus'
-import { parseCol } from '../shared/components/ncTable/mixins/columnHandler.js'
+import { parseCol } from '../shared/components/ncTable/mixins/columnParser.js'
 
 export default {
 	name: 'DefaultMainView',
