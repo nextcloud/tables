@@ -5,7 +5,7 @@
 		<LinkIcon v-else-if="!hideDefaultIcon" :size="iconSize" />
 
 		<div class="labels">
-			<div>
+			<div :class="{underline: underlineTitle}">
 				<a :href="url" target="_blank" :title="title">{{ title | truncate(truncateLength) }}</a>
 			</div>
 			<p v-if="subline" class="multiSelectOptionLabel span">
@@ -71,6 +71,10 @@ export default {
 		      type: Boolean,
 		      default: false,
 		    },
+		underlineTitle: {
+		      type: Boolean,
+		      default: false,
+		    },
 	},
 
 }
@@ -88,6 +92,10 @@ export default {
 
 .labels {
 	display: block;
+}
+
+.underline a {
+	text-decoration: underline;
 }
 
 </style>

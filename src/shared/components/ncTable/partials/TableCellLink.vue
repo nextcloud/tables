@@ -7,7 +7,8 @@
 			:url="getValueObject.resourceUrl"
 			:truncate-length="20"
 			:icon-size="25"
-			:hide-default-icon="true" />
+			:hide-default-icon="true"
+			:underline-title="true" />
 	</div>
 </template>
 
