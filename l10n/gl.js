@@ -51,6 +51,7 @@ OC.L10N.register(
     "Save" : "Gardar",
     "Text" : "Texto",
     "Link" : "Ligazón",
+    "Sorry, something went wrong." : "Desculpe, algo foi mal.",
     "Cancel" : "Cancelar",
     "Mandatory" : "Obrigatorio",
     "Move up" : "Mover cara arriba",
