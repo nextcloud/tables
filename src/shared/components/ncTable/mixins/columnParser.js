@@ -1,3 +1,4 @@
+import { ColumnTypes } from './columnHandler.js'
 import DatetimeDateColumn from './columnsTypes/datetimeDate.js'
 import DatetimeColumn from './columnsTypes/datetime.js'
 import DatetimeTimeColumn from './columnsTypes/datetimeTime.js'
@@ -15,19 +16,19 @@ import TextRichColumn from './columnsTypes/textRich.js'
 export function parseCol(col) {
 	const columnType = col.type + (col.subtype === '' ? '' : '-' + col.subtype)
 	switch (columnType) {
-	case 'text-line': return new TextLineColumn(col)
-	case 'text-link': return new TextLinkColumn(col)
-	case 'text-long': return new TextLongColumn(col)
-	case 'text-rich': return new TextRichColumn(col)
-	case 'number': return new NumberColumn(col)
-	case 'number-stars': return new NumberStarsColumn(col)
-	case 'number-progress': return new NumberProgressColumn(col)
-	case 'selection': return new SelectionColumn(col)
-	case 'selection-multi': return new SelectionMutliColumn(col)
-	case 'selection-check': return new SelectionCheckColumn(col)
-	case 'datetime': return new DatetimeColumn(col)
-	case 'datetime-date': return new DatetimeDateColumn(col)
-	case 'datetime-time': return new DatetimeTimeColumn(col)
-	default: throw Error(col.type + '-' + col.subtype + ' is not a valid column type!')
+	case ColumnTypes.TextLine: return new TextLineColumn(col)
+	case ColumnTypes.TextLink: return new TextLinkColumn(col)
+	case ColumnTypes.TextLong: return new TextLongColumn(col)
+	case ColumnTypes.TextRich: return new TextRichColumn(col)
+	case ColumnTypes.Number: return new NumberColumn(col)
+	case ColumnTypes.NumberStars: return new NumberStarsColumn(col)
+	case ColumnTypes.NumberProgress: return new NumberProgressColumn(col)
+	case ColumnTypes.Selection: return new SelectionColumn(col)
+	case ColumnTypes.SelectionMulti: return new SelectionMutliColumn(col)
+	case ColumnTypes.SelectionCheck: return new SelectionCheckColumn(col)
+	case ColumnTypes.Datetime: return new DatetimeColumn(col)
+	case ColumnTypes.DatetimeDate: return new DatetimeDateColumn(col)
+	case ColumnTypes.DatetimeTime: return new DatetimeTimeColumn(col)
+	default: throw Error(columnType + ' is not a valid column type!')
 	}
 }
