@@ -43,6 +43,7 @@ OC.L10N.register(
     "Target" : "Destino",
     "Date, time or whatever" : "Data, hora ou o que sexa",
     "Progress" : "Progreso",
+    "Done" : "Feito",
     "Tables" : "Táboas",
     "Type" : "Tipo",
     "Simple text" : "Texto sinxelo",
