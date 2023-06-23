@@ -44,4 +44,28 @@ class ColumnMapper extends QBMapper {
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableID)));
 		return $this->findEntities($qb);
 	}
+
+	/**
+	 * @param array $neededColumnIds
+	 * @return array<string> Array with key = columnId and value = [column-type]-[column-subtype]
+	 * @throws Exception
+	 */
+	public function getColumnTypes(array $neededColumnIds): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('id', 'type', 'subtype')
+			->from($this->table)
+			->where('id IN (:columnIds)')
+			->setParameter('columnIds', $neededColumnIds, IQueryBuilder::PARAM_INT_ARRAY);
+
+		$out = [];
+		$result = $qb->executeQuery();
+		try {
+			while ($row = $result->fetch()) {
+				$out[$row['id']] = $row['type'].($row['subtype'] ? '-'.$row['subtype']: '');
+			}
+		} finally {
+			$result->closeCursor();
+		}
+		return $out;
+	}
 }
