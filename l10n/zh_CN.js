@@ -52,6 +52,7 @@ OC.L10N.register(
     "Create" : "创建",
     "Today" : "今天",
     "Title" : "标题",
+    "Select emoji" : "选择表情符号",
     "Import" : "导入",
     "File" : "文件",
     "Result" : "结果",

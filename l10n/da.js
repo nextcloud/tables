@@ -327,6 +327,7 @@ OC.L10N.register(
     "Is greater than or equal" : "Er større end eller lig med",
     "Is lower than" : "Er mindre end",
     "Is lower than or equal" : "Er mindre end eller lig",
+    "Is empty" : "Er tom",
     "Me (user ID)" : "Mig (bruger ID)",
     "Magic field" : "Magisk felt",
     "Me (name)" : "Mig (navn)",

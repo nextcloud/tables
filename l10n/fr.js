@@ -183,7 +183,7 @@ OC.L10N.register(
     "File" : "Fichier",
     "Supported formats are xlsx, xls, html, xml and csv." : "Les formats pris en charge sont xlsx, xls, html, xml et csv.",
     "Select a file" : "Sélectionner un fichier",
-    "Create missing columns" : "Créer des colonnes manquantes",
+    "Create missing columns" : "Créer les colonnes manquantes",
     "Columns are identified by the titles. If there is no match, a new text-line column will be created." : "Les colonnes sont identifiées par leur titre. S'il n'y a pas de correspondance, une nouvelle colonne de lignes de texte sera créée.",
     "⚠️ You don't have the permission to create columns." : "⚠️ Vous n'avez pas le droit de créer des colonnes.",
     "Information" : "Information",
