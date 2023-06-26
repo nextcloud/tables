@@ -3,14 +3,14 @@
 		<div v-if="isLoading" class="icon-loading" />
 
 		<div v-if="!isLoading && activeTable">
-			<TableDescription />
+			<ElementDescription />
 
 			<div class="table-wrapper">
 				<NcTable v-if="columns.length > 0"
 					:rows="rows"
 					:columns="columns"
 					:table="activeTable"
-					:viewSetting="viewSetting"
+					:view-setting="viewSetting"
 					@add-filter="addFilter"
 					@set-search-string="setSearchString"
 					@edit-row="rowId => editRowId = rowId"
@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import TableDescription from '../modules/main/sections/TableDescription.vue'
+import ElementDescription from '../modules/main/sections/ElementDescription.vue'
 import { mapState, mapGetters } from 'vuex'
 import NcTable from '../shared/components/ncTable/NcTable.vue'
 import CreateRow from '../modules/main/modals/CreateRow.vue'
@@ -63,7 +63,7 @@ export default {
 	components: {
 		EmptyTable,
 		DeleteRows,
-		TableDescription,
+		ElementDescription,
 		NcTable,
 		CreateRow,
 		CreateView,
@@ -137,7 +137,7 @@ export default {
 
 				await this.$store.dispatch('loadColumnsFromBE', { tableId: this.activeTable.id })
 
-				if (this.canReadTable(this.activeTable)) {
+				if (this.canReadElement(this.activeTable)) {
 					await this.$store.dispatch('loadRowsFromBE', { tableId: this.activeTable.id })
 				}
 				this.lastActiveTableId = this.activeTable.id

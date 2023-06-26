@@ -13,29 +13,36 @@
 			</template>
 		</template>
 		<template #extra />
-		<template #counter />
+		<template #counter>
+			<NcCounterBubble>
+				{{ n('tables', '%n row', '%n rows', view.rowsCount, {}) }}
+			</NcCounterBubble>
+			<NcActionButton v-if="view.hasShares" icon="icon-share" :class="{'margin-right': !(activeView && view.id === activeView.id)}" @click="actionShowShare" />
+			<div v-if="view.isShared && view.ownership !== userId" class="margin-left">
+				<NcAvatar :user="view.ownership" />
+			</div>
+		</template>
 		<template #actions>
-			<!-- TODO: Add permissions to buttons -->
-			<NcActionButton
+			<NcActionButton v-if="canManageElement(view)"
 				icon="icon-rename"
 				:close-after-click="true"
 				@click="editView">
 				{{ t('tables', 'Edit view') }}
 			</NcActionButton>
-			<!-- <NcActionButton
+			<NcActionButton v-if="canShareElement(view)"
 				icon="icon-share"
 				:close-after-click="true"
 				@click="actionShowShare">
 				{{ t('tables', 'Share') }}
 			</NcActionButton>
-			<NcActionButton v-if="true"
+			<!--TODO: <NcActionButton v-if="true"
 				:close-after-click="true"
 				@click="actionShowImport(table)">
 				{{ t('tables', 'Import') }}
 				<template #icon>
 					<Import :size="20" />
 				</template>
-			</NcActionButton>
+			</NcActionButton> -->
 			<NcActionButton
 				:close-after-click="true"
 				@click="actionShowIntegration">
@@ -43,8 +50,8 @@
 				<template #icon>
 					<Creation :size="20" />
 				</template>
-			</NcActionButton> -->
-			<NcActionButton
+			</NcActionButton>
+			<NcActionButton v-if="canDeleteElement(view)"
 				icon="icon-delete"
 				:close-after-click="true"
 				@click="showDeletionConfirmation = true">
@@ -62,13 +69,16 @@
 	</NcAppNavigationItem>
 </template>
 <script>
-import { NcAppNavigationItem, NcActionButton } from '@nextcloud/vue'
+import { NcAppNavigationItem, NcActionButton, NcCounterBubble, NcAvatar } from '@nextcloud/vue'
 import '@nextcloud/dialogs/dist/index.css'
+import { getCurrentUser } from '@nextcloud/auth'
 import { mapGetters } from 'vuex'
 import { showSuccess } from '@nextcloud/dialogs'
 import Table from 'vue-material-design-icons/Table.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import DialogConfirmation from '../../../shared/modals/DialogConfirmation.vue'
+import Creation from 'vue-material-design-icons/Creation.vue'
+import Import from 'vue-material-design-icons/Import.vue'
 import { emit } from '@nextcloud/event-bus'
 
 export default {
@@ -79,7 +89,11 @@ export default {
 		Table,
 		NcAppNavigationItem,
 		DialogConfirmation,
+		NcCounterBubble,
 		NcActionButton,
+		Creation,
+		NcAvatar,
+		Import,
 	},
 
 	filters: {
@@ -112,8 +126,22 @@ export default {
 		getTranslatedDescription() {
 			return t('tables', 'Do you really want to delete the view "{view}"?', { view: this.view.title })
 		},
+		userId() {
+			return getCurrentUser().uid
+		},
 	},
 	methods: {
+		async actionShowShare() {
+			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
+			await this.$router.push('/view/' + parseInt(this.view.id)).catch(err => err)
+		},
+		// async actionShowImport(table) {
+		// 	emit('tables:modal:import', table)
+		// },
+		async actionShowIntegration() {
+			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
+			await this.$router.push('/view/' + parseInt(this.view.id)).catch(err => err)
+		},
 		async deleteMe() {
 			const viewId = this.view.id
 			const activeViewId = this.activeView?.id

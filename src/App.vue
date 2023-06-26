@@ -55,7 +55,7 @@ export default {
 	},
 	async created() {
 		await this.$store.dispatch('loadTablesFromBE')
-		// await this.$store.dispatch('loadViewsFromBE')
+		await this.$store.dispatch('loadViewsSharedWithMeFromBE')
 		const $currentRoute = this.$router.currentRoute
 		if ($currentRoute.name === 'table') {
 			this.$store.commit('setActiveTableId', parseInt($currentRoute.params.tableId))

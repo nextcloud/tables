@@ -22,6 +22,13 @@ class View extends Entity implements JsonSerializable {
 	protected ?string $sort = null; // json
 	protected ?string $filter = null; // json
 
+	protected ?bool $isShared = null;
+	protected ?array $onSharePermissions = null;
+	protected ?bool $hasShares = false;
+	protected ?int $rowsCount = 0;
+	protected ?string $ownership = null;
+	protected ?string $ownerDisplayName = null;
+
 
 	public function __construct() {
 		$this->addType('id', 'integer');
@@ -73,13 +80,19 @@ class View extends Entity implements JsonSerializable {
 			'title' => $this->title,
 			'description' => $this->description,
 			'emoji' => $this->emoji,
+			'ownership' => $this->ownership,
 			'createdBy' => $this->createdBy,
 			'createdAt' => $this->createdAt,
 			'lastEditBy' => $this->lastEditBy,
 			'lastEditAt' => $this->lastEditAt,
 			'columns' => $this->getColumnsArray(),
 			'sort' => $this->getSortArray(),
-			'filter' => $this->getFilterArray()
+			'filter' => $this->getFilterArray(),
+			'isShared' => !!$this->isShared,
+			'onSharePermissions' => $this->onSharePermissions,
+			'hasShares' => $this->hasShares,
+			'rowsCount' => $this->rowsCount,
+			'ownerDisplayName' => $this->ownerDisplayName,
 		];
 	}
 }

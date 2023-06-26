@@ -1,45 +1,53 @@
 <template>
 	<div class="row first-row">
 		<h1>
-			{{ activeTable.emoji }}&nbsp;{{ activeTable.title }}
+			{{ activeElement.emoji }}&nbsp;{{ activeElement.title }}
 		</h1>
 		<div class="light">
 			<NcActions>
-				<NcActionButton v-if="!activeTable.isShared || (activeTable.isShared && activeTable.onSharePermissions.manage)"
+				<NcActionButton v-if="!activeElement.isShared || (activeElement.isShared && activeElement.onSharePermissions.manage)"
 					icon="icon-rename"
 					:close-after-click="true"
-					@click="editTable">
+					@click="editElement">
 					{{ t('tables', 'Edit table') }}
 				</NcActionButton>
 			</NcActions>
 		</div>
 		<div class="user-bubble">
-			<NcUserBubble v-if="activeTable.isShared"
-				:display-name="activeTable.ownerDisplayName"
+			<NcUserBubble v-if="activeElement.isShared"
+				:display-name="activeElement.ownerDisplayName"
 				:show-user-status="true"
-				:user="activeTable.ownership" />
+				:user="activeElement.ownership" />
 		</div>
 	</div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import { NcActions, NcActionButton, NcUserBubble } from '@nextcloud/vue'
-import { emit } from '@nextcloud/event-bus'
 
+import { mapGetters } from 'vuex'
+import { emit } from '@nextcloud/event-bus'
+import { NcActions, NcActionButton, NcUserBubble } from '@nextcloud/vue'
 export default {
-	name: 'TableDescription',
+	name: 'ElementDescription',
 	components: {
 		NcActions,
 		NcActionButton,
 		NcUserBubble,
 	},
 	computed: {
-		...mapGetters(['activeTable']),
+		...mapGetters(['activeTable', 'activeView']),
+		activeElement() {
+			if (this.activeTable) return this.activeTable
+			else return this.activeView
+		},
+		isTable() {
+			return !this.activeView
+		},
 	},
+
 	methods: {
-		editTable() {
-			emit('edit-table', this.activeTable.id)
+		editElement() {
+			emit(this.isTable ? 'edit-table' : 'edit-view', this.activeElement.id)
 		},
 	},
 }

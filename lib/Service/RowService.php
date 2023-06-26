@@ -36,7 +36,7 @@ class RowService extends SuperService {
 	 */
 	public function findAllByTable(int $tableId, ?int $limit = null, ?int $offset = null): array {
 		try {
-			if ($this->permissionsService->canReadRowsByTableId($tableId)) {
+			if ($this->permissionsService->canReadRowsByElementId($tableId, 'table')) {
 				return $this->mapper->findAllByTable($tableId, $limit, $offset);
 			} else {
 				throw new PermissionError('no read access to table id = '.$tableId);
@@ -57,12 +57,10 @@ class RowService extends SuperService {
 	 */
 	public function findAllByView(int $viewId, ?int $limit = null, ?int $offset = null): array {
 		try {
-			$view = $this->viewMapper->find($viewId);
-			$tableId = $view->getTableId();
-			if ($this->permissionsService->canReadRowsByTableId($tableId)) {
+			if ($this->permissionsService->canReadRowsByElementId($viewId, 'view')) {
 				return $this->mapper->findAllByView($this->viewMapper->find($viewId), $limit, $offset);
 			} else {
-				throw new PermissionError('no read access to table id = '.$tableId.' and related views');
+				throw new PermissionError('no read access to view id = '.$viewId);
 			}
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage());
@@ -84,7 +82,7 @@ class RowService extends SuperService {
 
 			// security
 			/** @noinspection PhpUndefinedMethodInspection */
-			if (!$this->permissionsService->canReadRowsByTableId($row->getTableId())) {
+			if (!$this->permissionsService->canReadRowsByElementId($row->getTableId(), 'table')) {
 				throw new PermissionError('PermissionError: can not read row with id '.$id);
 			}
 
@@ -344,7 +342,7 @@ class RowService extends SuperService {
 
 	public function getRowsCount(int $tableId): int {
 		try {
-			if ($this->permissionsService->canReadRowsByTableId($tableId)) {
+			if ($this->permissionsService->canReadRowsByElementId($tableId, 'table')) {
 				return $this->mapper->countRows($tableId);
 			} else {
 				throw new PermissionError('no read access for counting to table id = '.$tableId);

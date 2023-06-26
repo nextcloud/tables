@@ -170,10 +170,10 @@ export default {
 	computed: {
 		...mapGetters(['activeTable']),
 		canCreateMissingColumns() {
-			return this.canManageTable(this.table)
+			return this.canManageElement(this.table)
 		},
 		getCreateMissingColumns() {
-			return this.canManageTable(this.table) && this.createMissingColumns
+			return this.canManageElement(this.table) && this.createMissingColumns
 		},
 	},
 
@@ -183,6 +183,7 @@ export default {
 			if (this.activeTable.id === this.table.id) {
 				this.waitForReload = true
 				await this.$store.dispatch('loadTablesFromBE')
+				await this.$store.dispatch('loadViewsSharedWithMeFromBE')
 				await this.$store.dispatch('loadColumnsFromBE', { tableId: this.table.id })
 				await this.$store.dispatch('loadRowsFromBE', { tableId: this.table.id })
 				this.waitForReload = false

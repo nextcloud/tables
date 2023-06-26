@@ -20,16 +20,24 @@
 					</template>
 				</NcAppNavigationCaption>
 				<NavigationTableItem v-for="table in getOwnTables"
-					:key="table.id"
+					:key="'table'+table.id"
 					:table="table"
 					@edit-table="id => editTableId = id" />
 				<NcAppNavigationCaption v-if="getSharedTables.length > 0"
 					:title="t('tables', 'Shared tables')" />
 
 				<NavigationTableItem v-for="table in getSharedTables"
-					:key="table.id"
+					:key="'table'+table.id"
 					:table="table"
 					@edit-table="id => editTableId = id" />
+
+				<NcAppNavigationCaption v-if="getSharedViews.length > 0"
+					:title="t('tables', 'Shared views')" />
+
+				<NavigationViewItem v-for="view in getSharedViews"
+					:key="'view'+view.id"
+					:view="view"
+					@edit-view="id => editViewId = id" />
 			</ul>
 
 			<div v-if="filterString !== ''" class="search-info">
@@ -58,6 +66,7 @@ import { NcAppNavigation, NcAppNavigationCaption, NcActionButton, NcTextField, N
 import CreateTable from '../modals/CreateTable.vue'
 import EditTable from '../modals/EditTable.vue'
 import EditView from '../modals/EditView.vue'
+import NavigationViewItem from '../partials/NavigationViewItem.vue'
 import NavigationTableItem from '../partials/NavigationTableItem.vue'
 import { mapState, mapGetters } from 'vuex'
 import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
@@ -70,6 +79,7 @@ export default {
 	components: {
 		Import,
 		NavigationTableItem,
+		NavigationViewItem,
 		NcAppNavigation,
 		CreateTable,
 		EditTable,
@@ -96,6 +106,9 @@ export default {
 		// ...mapGetters(['activeTable']),
 		getSharedTables() {
 			return this.getFilteredTables.filter((item) => { return item.isShared === true && item.ownership !== getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
+		},
+		getSharedViews() {
+			return this.views.filter((item) => { return item.isShared === true && item.ownership !== getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
 		},
 		getOwnTables() {
 			const x = this.getFilteredTables.filter((item) => { return item.isShared === false || item.ownership === getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))

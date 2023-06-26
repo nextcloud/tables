@@ -4,39 +4,39 @@ export default {
 
 	methods: {
 
-		canManageTable(table) {
-			if (!table.isShared) {
+		canManageElement(element) {
+			if (!element.isShared) {
 				return true
 			}
-			if ((table.isShared && table?.onSharePermissions?.manage) || table?.ownership === getCurrentUser().uid) {
-				return true
-			}
-			return false
-		},
-
-		canReadTable(table) {
-			if (!table.isShared) {
-				return true
-			}
-
-			if ((table.isShared && table.onSharePermissions.read) || table?.ownership === getCurrentUser().uid) {
+			if ((element.isShared && element?.onSharePermissions?.manage) || element?.ownership === getCurrentUser().uid) {
 				return true
 			}
 			return false
 		},
 
-		canCreateRowInTable(table) {
-			if (!table.isShared) {
+		canReadElement(element) {
+			if (!element.isShared) {
 				return true
 			}
-			if ((table.isShared && table.onSharePermissions.create) || table?.ownership === getCurrentUser().uid) {
+
+			if ((element.isShared && element.onSharePermissions.read) || element?.ownership === getCurrentUser().uid) {
 				return true
 			}
 			return false
 		},
 
-		canShareTable(table) {
-			if (!table.isShared || table.ownership === getCurrentUser().uid) {
+		canCreateRowInElement(element) {
+			if (!element.isShared) {
+				return true
+			}
+			if ((element.isShared && element.onSharePermissions.create) || element?.ownership === getCurrentUser().uid) {
+				return true
+			}
+			return false
+		},
+
+		canShareElement(element) {
+			if (!element.isShared || element.ownership === getCurrentUser().uid) {
 				return true
 			}
 
@@ -44,15 +44,15 @@ export default {
 			return false
 		},
 
-		canDeleteTable(table) {
-			return this.canManageTable(table)
+		canDeleteElement(element) {
+			return this.canManageElement(element)
 		},
 
-		canDeleteData(table) {
-			return table.isShared === false
-				|| (table.isShared === true && table.onSharePermissions.delete === true)
-				|| (table.isShared === true && table.onSharePermissions.manage === true)
-				|| (table.isShared === true && table.ownership === getCurrentUser().uid)
+		canDeleteData(element) {
+			return element.isShared === false
+				|| (element.isShared === true && element.onSharePermissions.delete === true)
+				|| (element.isShared === true && element.onSharePermissions.manage === true)
+				|| (element.isShared === true && element.ownership === getCurrentUser().uid)
 		},
 
 	},

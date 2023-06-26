@@ -58,6 +58,7 @@ return [
 
 		// view
 		['name' => 'view#index', 'url' => '/view/{tableId}', 'verb' => 'GET'],
+		['name' => 'view#indexSharedWithMe', 'url' => '/view', 'verb' => 'GET'],
 		['name' => 'view#show', 'url' => '/view/{id}', 'verb' => 'GET'],
 		['name' => 'view#create', 'url' => '/view', 'verb' => 'POST'],
 		['name' => 'view#update', 'url' => '/view/{id}', 'verb' => 'PUT'],
@@ -83,6 +84,7 @@ return [
 
 		// shares
 		['name' => 'share#index', 'url' => '/share/table/{tableId}', 'verb' => 'GET'],
+		['name' => 'share#indexView', 'url' => '/share/view/{viewId}', 'verb' => 'GET'],
 		['name' => 'share#show', 'url' => '/share/{id}', 'verb' => 'GET'],
 		['name' => 'share#create', 'url' => '/share', 'verb' => 'POST'],
 		['name' => 'share#updatePermission', 'url' => '/share/{id}/permission', 'verb' => 'PUT'],

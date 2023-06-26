@@ -27,19 +27,19 @@
 		</template>
 
 		<template #actions>
-			<NcActionButton v-if="canManageTable(table)"
+			<NcActionButton v-if="canManageElement(table)"
 				icon="icon-rename"
 				:close-after-click="true"
 				@click="$emit('edit-table', table.id)">
 				{{ t('tables', 'Edit table') }}
 			</NcActionButton>
-			<NcActionButton v-if="canShareTable(table)"
+			<NcActionButton v-if="canShareElement(table)"
 				icon="icon-share"
 				:close-after-click="true"
 				@click="actionShowShare">
 				{{ t('tables', 'Share') }}
 			</NcActionButton>
-			<NcActionButton v-if="canCreateRowInTable(table)"
+			<NcActionButton v-if="canCreateRowInElement(table)"
 				:close-after-click="true"
 				@click="actionShowImport(table)">
 				{{ t('tables', 'Import') }}
@@ -55,7 +55,7 @@
 					<Creation :size="20" />
 				</template>
 			</NcActionButton>
-			<NcActionButton v-if="canDeleteTable(table)"
+			<NcActionButton v-if="canDeleteElement(table)"
 				icon="icon-delete"
 				:close-after-click="true"
 				@click="showDeletionConfirmation = true">
@@ -63,7 +63,7 @@
 			</NcActionButton>
 		</template>
 		<NavigationViewItem v-for="view in getViews"
-			:key="view.id"
+			:key="'view'+view.id"
 			:view="view"
 			@edit-view="id => editViewId = id" />
 		<DialogConfirmation :description="getTranslatedDescription"
@@ -141,7 +141,7 @@ export default {
 			return getCurrentUser().uid
 		},
 		getViews() {
-			//TODO: this.table.views exists, but the views are also stored in store views. When changed there the change does not appear in the views attribute of this.table. Use it like done here instead?:
+			// TODO: this.table.views exists, but the views are also stored in store views. When changed there the change does not appear in the views attribute of this.table. Use it like done here instead? -> this.table.views unnecessary?:
 			return this.views.filter(v => v.tableId === this.table.id)
 		},
 		hasViews() {

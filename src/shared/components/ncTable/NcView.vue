@@ -14,7 +14,7 @@
 				@delete-selected-rows="rowIds => $emit('delete-selected-rows', rowIds)" />
 		</div>
 		<div class="custom-table row">
-			<CustomTable v-if="canReadTable(view)"
+			<CustomTable v-if="canReadElement(view)"
 				:columns="columns"
 				:rows="rows"
 				:table="view"

@@ -1,8 +1,8 @@
 <template>
-	<div v-if="activeTable" class="integration">
+	<div v-if="activeTable || activeView" class="integration">
 		<h3>{{ t('tables', 'API') }}</h3>
 		<p>
-			{{ t('tables', 'This is your API endpoint for this table') }}
+			{{ activeTable ? t('tables', 'This is your API endpoint for this table') : t('tables', 'This is your API endpoint for this view') }}
 		</p>
 		<p class="url">
 			{{ apiEndpointUrl }}
@@ -47,12 +47,12 @@ export default {
 
 	computed: {
 		...mapState(['tables', 'tablesLoading']),
-		...mapGetters(['activeTable']),
+		...mapGetters(['activeTable', 'activeView']),
 		apiEndpointUrl() {
 			const params = {
-				tableId: this.activeTable.id,
+				elementId: (this.activeTable ? this.activeTable : this.activeView).id,
 			}
-			const url = '/apps/tables/api/1/tables/{tableId}'
+			const url = `/apps/tables/api/1/${this.activeTable ? 'tables' : 'views'}/{elementId}`
 			return window.location.protocol + '//' + window.location.host + generateUrl(url, params)
 		},
 	},
