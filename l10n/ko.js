@@ -18,6 +18,7 @@ OC.L10N.register(
     "Skills" : "스킬",
     "Birthday" : "생일",
     "Progress" : "진행 상황",
+    "Done" : "완료",
     "Tables" : "표",
     "Type" : "종류",
     "Simple text" : "간단한 텍스트",

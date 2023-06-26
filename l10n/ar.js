@@ -33,6 +33,7 @@ OC.L10N.register(
     "File" : "ملف",
     "Please select a file." : "من فضلك حدد الملف",
     "Share" : "مشاركة",
+    "Integration" : "مُكاملة",
     "Delete table" : "حذف جدول",
     "My tables" : "جداولي",
     "Shared tables" : "جداول مشتركة",

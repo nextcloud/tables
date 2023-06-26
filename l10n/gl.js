@@ -49,6 +49,7 @@ OC.L10N.register(
     "Simple text" : "Texto sinxelo",
     "Rich text" : "Texto mellorado",
     "Time" : "Hora",
+    "Date and time" : "Día e hora",
     "Save" : "Gardar",
     "Text" : "Texto",
     "Link" : "Ligazón",
