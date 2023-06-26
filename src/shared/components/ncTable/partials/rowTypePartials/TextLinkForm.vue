@@ -59,7 +59,7 @@ export default {
 		localValue: {
 			get() {
 				// if we got an old value (string not object as json)
-				if (!this.hasJsonStructure(this.value) && this.value !== '') {
+				if (!this.hasJsonStructure(this.value) && this.value !== '' && this.value !== null && this.value !== '""') {
 					return {
 						title: this.value,
 						subline: t('tables', 'Url'),
