@@ -3,7 +3,7 @@
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
-					<h2 style="padding: 0">
+					<h2 style="padding: 0" tabindex="0">
 						{{ t('tables', 'Create row') }}
 					</h2>
 				</div>
