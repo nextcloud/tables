@@ -1,5 +1,5 @@
 <template>
-	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description">
+	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :loading="isLoadingResults">
 		<NcSelect v-model="localValue"
 			:options="results"
 			:clearable="true"
@@ -52,6 +52,7 @@ export default {
 			providers: null,
 			results: [],
 			term: '',
+			providerLoading: {},
 		}
 	},
 
@@ -78,6 +79,15 @@ export default {
 				this.$emit('update:value', value)
 			},
 		},
+		isLoadingResults() {
+			for (const [key, value] of Object.entries(this.providerLoading)) {
+				console.debug('is still loading results at least for: ' + key, value)
+				if (value) {
+					return true
+				}
+			}
+			return false
+		},
 	},
 
 	watch: {
@@ -97,12 +107,17 @@ export default {
 	},
 
 	methods: {
+		setProviderLoading(providerId, status) {
+			this.providerLoading[providerId] = !!status
+			this.providerLoading = { ...this.providerLoading }
+		},
+
 		debounceSubmit: debounce(function() {
 			this.loadResults()
 		}, 500),
 
 		loadResults() {
-			if (this.term.length >= 3) {
+			if (this.term.length >= 3 || this.term === '') {
 				this.providers?.forEach(provider => this.loadResultsForProvider(provider, this.term))
 			}
 		},
@@ -110,13 +125,17 @@ export default {
 		async loadResultsForProvider(providerId, term) {
 			if (term === null || term === '') {
 				this.results = []
+				this.providerLoading = {}
 				return
 			}
+
+			this.setProviderLoading(providerId, true)
 
 			this.removeResultsByProviderId(providerId)
 
 			if (providerId === 'url') {
 				this.addUrlResult(term)
+				this.setProviderLoading(providerId, false)
 				return
 			}
 
@@ -143,6 +162,7 @@ export default {
 				item.value = item.resourceUrl
 			}
 			this.results = this.results.concat(res.data?.ocs?.data?.entries)
+			this.setProviderLoading(providerId, false)
 		},
 
 		addUrlResult(term) {

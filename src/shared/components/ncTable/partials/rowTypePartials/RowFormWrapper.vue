@@ -4,6 +4,7 @@
 			<div class="row">
 				<div class="title fix-col-4">
 					{{ title }}<span v-if="mandatory" :title="t('tables', 'This field is mandatory')">*</span>
+					<NcLoadingIcon v-if="loading" />
 				</div>
 				<p v-if="description" class="fix-col-4 span">
 					{{ description }}
@@ -20,9 +21,13 @@
 </template>
 
 <script>
+import { NcLoadingIcon } from '@nextcloud/vue'
 
 export default {
-	name: 'RowFormWrapper',
+
+	components: {
+		NcLoadingIcon,
+	},
 
 	props: {
 		mandatory: {
@@ -49,6 +54,10 @@ export default {
 			type: Number,
 			default: 4,
 		},
+		loading: {
+		      type: Boolean,
+		      default: false,
+		    },
 	},
 
 	computed: {
@@ -67,6 +76,10 @@ export default {
 
 .slot {
 	align-items: baseline;
+}
+
+.material-design-icon.loading-icon {
+	margin-left: calc(var(--default-grid-baseline) * 1);
 }
 
 </style>
