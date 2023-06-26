@@ -73,7 +73,7 @@ export default {
 			},
 			set(v) {
 				let value = null
-				if (v !== null) {
+				if (v !== null && v !== '') {
 					value = JSON.stringify(v)
 				}
 				this.$emit('update:value', value)
