@@ -491,6 +491,18 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
+	public function indexViewRows(int $viewId, ?int $limit, ?int $offset): DataResponse {
+		return $this->handleError(function () use ($viewId, $limit, $offset) {
+			return $this->rowService->findAllByView($viewId, $limit, $offset);
+		});
+	}
+
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
 	public function getRow(int $rowId): DataResponse {
 		return $this->handleError(function () use ($rowId) {
 			return $this->rowService->find($rowId);
