@@ -105,25 +105,12 @@ class RowMapper extends QBMapper {
 
 		$qb->andWhere(
 			$qb->expr()->orX(
-				$qb->expr()->eq('category1', ':category1'),
-				$qb->expr()->eq('category2', ':category2'),
-				$qb->expr()->eq('category3', ':category3')
+				$qb->expr()->andX(
+					$qb->createFunction('JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'.$[*].columnId\'), \'one\', 5)), \'.value\')) LIKE \'%meeting%\''),
+					$qb->createFunction('JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'.$[*].columnId\'), \'one\', 10)), \'.value\')) LIKE \'true\'')
+				),
 			)
-
-		try {
-			$businessClassName = 'OCA\Tables\Service\ColumnTypes\\';
-			/** @noinspection PhpUndefinedMethodInspection */
-			$businessClassName .= ucfirst($column->getType()).ucfirst($column->getSubtype()).'Business';
-			/** @var TextLineBusiness $columnBusiness */
-			$columnBusiness = Server::get($businessClassName);
-			return $columnBusiness->parseValue($value, $column);
-		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
-			$this->logger->debug('Column type business class not found');
-		}
-
-
-		// how do we know what column type it is and which ColumnQB we have to use?
-		$this->textColumnQB->addWhereForFindAllByView($qb, $view);
+		);
 
 		if ($limit !== null) {
 			$qb->setMaxResults($limit);

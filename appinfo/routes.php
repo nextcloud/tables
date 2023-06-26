@@ -41,6 +41,8 @@ return [
 		['name' => 'api1#indexTableRowsSimple',	'url' => '/api/1/tables/{tableId}/rows/simple', 'verb' => 'GET'],
 		['name' => 'api1#indexTableRows',	'url' => '/api/1/tables/{tableId}/rows', 'verb' => 'GET'],
 		['name' => 'api1#createRow',	'url' => '/api/1/tables/{tableId}/rows', 'verb' => 'POST'],
+		// -> rows -> view
+		['name' => 'api1#indexViewRows',	'url' => '/api/1/views/{viewId}/rows', 'verb' => 'GET'],
 		// -> row
 		['name' => 'api1#getRow',	'url' => '/api/1/rows/{rowId}', 'verb' => 'GET'],
 		['name' => 'api1#updateRow',	'url' => '/api/1/rows/{rowId}', 'verb' => 'PUT'],
