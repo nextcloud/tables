@@ -69,6 +69,10 @@ export default new Vuex.Store({
 			const index = state.tables.findIndex(t => t.id === table.id)
 			state.tables[index] = table
 		},
+		setView(state, view) {
+			const index = state.views.findIndex(v => v.id === view.id)
+			state.views[index] = view
+		},
 	},
 	actions: {
 		async insertNewTable({ commit, state }, { data }) {
@@ -99,6 +103,25 @@ export default new Vuex.Store({
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load tables.'))
 				showError(t('tables', 'Could not fetch tables'))
+			}
+
+			commit('setTablesLoading', false)
+			return true
+		},
+		async loadViewsSharedWithMeFromBE({ commit, state }) {
+			commit('setTablesLoading', true)
+
+			try {
+				const res = await axios.get(generateUrl('/apps/tables/view'))
+				console.debug(res.data)
+				res.data.forEach(view => {
+					if (state.views.filter(v => v.id === view.id).length === 0) {
+						state.views = state.views.concat(view)
+					}
+				})
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load shared views.'))
+				showError(t('tables', 'Could not load shared views'))
 			}
 
 			commit('setTablesLoading', false)
@@ -200,10 +223,17 @@ export default new Vuex.Store({
 			}
 			commit('setTable', table)
 		},
-		setTableHasShares({ state, commit, getters }, { tableId, hasSHares }) {
-			const table = getters.getTable(tableId)
-			table.hasShares = !!hasSHares
+		setTableHasShares({ state, commit, getters }, { elementId, hasShares }) {
+			const table = getters.getTable(elementId)
+			table.hasShares = !!hasShares
 			commit('setTable', table)
+		},
+
+		setViewHasShares({ state, commit, getters }, { elementId, hasShares }) {
+			console.debug(elementId, hasShares, getters.getView(elementId))
+			const view = getters.getView(elementId)
+			view.hasShares = !!hasShares
+			commit('setView', view)
 		},
 	},
 })

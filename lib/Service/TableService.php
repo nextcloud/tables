@@ -194,7 +194,7 @@ class TableService extends SuperService {
 			$table = $this->mapper->find($id);
 
 			// security
-			if (!$this->permissionsService->canReadTable($table, $userId)) {
+			if (!$this->permissionsService->canReadElement($table, 'table', $userId)) {
 				throw new PermissionError('PermissionError: can not read table with id '.$id);
 			}
 
@@ -287,7 +287,7 @@ class TableService extends SuperService {
 			$table = $this->mapper->find($id);
 
 			// security
-			if (!$this->permissionsService->canUpdateTable($table, $userId)) {
+			if (!$this->permissionsService->canUpdateElement($table, 'table', $userId)) {
 				throw new PermissionError('PermissionError: can not update table with id '.$id);
 			}
 
@@ -319,7 +319,7 @@ class TableService extends SuperService {
 			$table = $this->mapper->find($id);
 
 			// security
-			if (!$this->permissionsService->canChangeTableOwner($table, $userId)) {
+			if (!$this->permissionsService->canChangeElementOwner($table, $userId)) {
 				throw new PermissionError('PermissionError: can not change table owner with table id '.$id);
 			}
 
@@ -348,7 +348,7 @@ class TableService extends SuperService {
 			$item = $this->mapper->find($id);
 
 			// security
-			if (!$this->permissionsService->canDeleteTable($item, $userId)) {
+			if (!$this->permissionsService->canDeleteElement($item, $userId)) {
 				throw new PermissionError('PermissionError: can not delete table with id '.$id);
 			}
 

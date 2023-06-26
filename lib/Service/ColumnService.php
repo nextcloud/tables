@@ -17,6 +17,7 @@ use Psr\Log\LoggerInterface;
 
 class ColumnService extends SuperService {
 	private ColumnMapper $mapper;
+
 	private ViewMapper $viewMapper;
 
 	private RowService $rowService;
@@ -68,10 +69,9 @@ class ColumnService extends SuperService {
 	 */
 	public function findAllByView(int $viewId, ?string $userId = null): array {
 		try {
-			$view = $this->viewMapper->find($viewId);
-			$tableId = $view->getTableId();
 			// No need to check for columns outside the view since they cannot be addressed
-			if ($this->permissionsService->canReadColumnsByTableId($tableId, $userId)) {
+			if ($this->permissionsService->canReadColumnsByViewId($viewId, $userId)) {
+				$view = $this->viewMapper->find($viewId);
 				$viewColumnIds = $view->getColumnsArray();
 				$viewColumns = [];
 				foreach ($viewColumnIds as $viewColumnId) {
@@ -87,7 +87,7 @@ class ColumnService extends SuperService {
 				}
 				return $viewColumns;
 			} else {
-				throw new PermissionError('no read access to table id = '.$tableId);
+				throw new PermissionError('no read access to view id = '.$viewId);
 			}
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage());

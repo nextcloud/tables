@@ -3,7 +3,7 @@
 		<div v-if="isLoading" class="icon-loading" />
 
 		<div v-if="!isLoading && activeView">
-			<ViewDescription :active-element="activeView" />
+			<ElementDescription />
 
 			<div class="table-wrapper">
 				<NcView v-if="columns.length > 0"
@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import ViewDescription from '../modules/main/sections/ViewDescription.vue'
+import ElementDescription from '../modules/main/sections/ElementDescription.vue'
 import { mapState, mapGetters } from 'vuex'
 import NcView from '../shared/components/ncTable/NcView.vue'
 import CreateRow from '../modules/main/modals/CreateRow.vue'
@@ -64,7 +64,7 @@ export default {
 	components: {
 		EditView,
 		DeleteRows,
-		ViewDescription,
+		ElementDescription,
 		NcView,
 		CreateRow,
 		EditRow,
@@ -136,7 +136,7 @@ export default {
 				await this.$store.dispatch('resetViewSetting')
 
 				await this.$store.dispatch('loadColumnsFromBE', { viewId: this.activeView.id })
-				if (this.canReadTable(this.activeView)) {
+				if (this.canReadElement(this.activeView)) {
 					await this.$store.dispatch('loadRowsFromBE', { viewId: this.activeView.id })
 				}
 				this.lastActiveViewId = this.activeView.id

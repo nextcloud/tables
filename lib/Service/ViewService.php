@@ -13,11 +13,16 @@ use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Helper\UserHelper;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
 class ViewService extends SuperService {
 	private ViewMapper $mapper;
+
+	private ShareService $shareService;
+
+	protected UserHelper $userHelper;
 
 	protected IL10N $l;
 
@@ -26,13 +31,15 @@ class ViewService extends SuperService {
 		LoggerInterface $logger,
 		?string $userId,
 		ViewMapper $mapper,
+		ShareService $shareService,
+		UserHelper $userHelper,
 		IL10N $l
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->l = $l;
-
 		$this->mapper = $mapper;
-
+		$this->shareService = $shareService;
+		$this->userHelper = $userHelper;
 	}
 
 	/**
@@ -58,7 +65,11 @@ class ViewService extends SuperService {
 				throw new PermissionError('PermissionError: can not read views for tableId '.$table->getId());
 			}
 
-			return $this->mapper->findAll($table->getId());
+			$allViews = $this->mapper->findAll($table->getId());
+			foreach ($allViews as $view) {
+				$this->enhanceView($view, $userId);
+			}
+			return $allViews;
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError($e->getMessage());
@@ -89,11 +100,29 @@ class ViewService extends SuperService {
 		}
 
 		// security
-		if (!$this->permissionsService->canReadViews($table, $userId)) {
+		if (!$this->permissionsService->canReadElement($view, $userId, 'view')) {
 			throw new PermissionError('PermissionError: can not read view with id '.$id);
 		}
 
+		$this->enhanceView($view, $userId);
+
 		return $view;
+	}
+
+	/**
+	 * @throws InternalError
+	 */
+	public function findSharedViewsWithMe(?string $userId = null): array {
+		/** @var string $userId */
+		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
+		if ($userId === '') {
+			return [];
+		}
+		$sharedViews = $this->shareService->findViewsSharedWithMe($userId);
+		foreach ($sharedViews as $view) {
+			$this->enhanceView($view, $userId);
+		}
+		return $sharedViews;
 	}
 
 
@@ -112,7 +141,7 @@ class ViewService extends SuperService {
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
 
 		// security
-		if (!$this->permissionsService->canUpdateTable($table, $userId)) {
+		if (!$this->permissionsService->canUpdateElement($table, 'table', $userId)) {
 			throw new PermissionError('PermissionError: can not create view');
 		}
 
@@ -165,7 +194,7 @@ class ViewService extends SuperService {
 			$view = $this->mapper->find($id);
 
 			// security
-			if (!$this->permissionsService->canUpdateTable($table, $userId)) {
+			if (!$this->permissionsService->canUpdateElement($table, 'table', $userId)) {
 				throw new PermissionError('PermissionError: can not update view with id '.$id);
 			}
 
@@ -177,7 +206,9 @@ class ViewService extends SuperService {
 			$view->setLastEditBy($userId);
 			$view->setLastEditAt($time->format('Y-m-d H:i:s'));
 
-			return $this->mapper->update($view);
+			$view = $this->mapper->update($view);
+			$this->enhanceView($view, $userId);
+			return $view;
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError($e->getMessage());
@@ -198,9 +229,12 @@ class ViewService extends SuperService {
 			$view = $this->mapper->find($id);
 
 			// security
-			if (!$this->permissionsService->canUpdateTable($table, $userId)) {
+			if (!$this->permissionsService->canUpdateElement($table, 'table', $userId)) {
 				throw new PermissionError('PermissionError: can not delete view with id '.$id);
 			}
+
+			// delete all shares for that table
+			$this->shareService->deleteAllForView($view);
 
 			$this->mapper->delete($view);
 			return $view;
@@ -208,5 +242,59 @@ class ViewService extends SuperService {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
 		}
+	}
+
+	/**
+	 * add some basic values related to this view in context
+	 *
+	 * $userId can be set or ''
+	 *
+	 * @noinspection PhpUndefinedMethodInspection
+	 */
+	private function enhanceView(View &$view, string $userId): void {
+		$view->setOwnership($view->getCreatedBy()); //TODO
+		// add owner display name for UI
+		$this->addOwnerDisplayName($view); //TODO: ?
+
+		// set hasShares if this table is shared by you (you share it with somebody else)
+		// (senseless if we have no user in context)
+		if ($userId !== '') {
+			try {
+				$shares = $this->shareService->findAll('view', $view->getId());
+				$view->setHasShares(count($shares) !== 0);
+			} catch (InternalError $e) {
+			}
+		}
+
+		// add the rows count
+		//try {
+		//	$table->setRowsCount($this->rowService->getRowsCount($table->getId()));
+		//} catch (InternalError|PermissionError $e) {
+		$view->setRowsCount(0);	//TODO
+		//}
+
+		// set if this is a shared table with you (somebody else shared it with you)
+		// (senseless if we have no user in context)
+		if ($userId !== '') {
+			try {
+				$share = $this->shareService->findViewShareIfSharedWithMe($view->getId());
+				/** @noinspection PhpUndefinedMethodInspection */
+				$view->setIsShared(true);
+				/** @noinspection PhpUndefinedMethodInspection */
+				$view->setOnSharePermissions([
+					'read' => $share->getPermissionRead(),
+					'create' => $share->getPermissionCreate(),
+					'update' => $share->getPermissionUpdate(),
+					'delete' => $share->getPermissionDelete(),
+					'manage' => $share->getPermissionManage(),
+				]);
+			} catch (\Exception $e) {
+			}
+		}
+	}
+
+	private function addOwnerDisplayName(View $view): View {
+		$view->setOwnerDisplayName($this->userHelper->getUserDisplayName($view->getOwnership()));
+		return $view;
 	}
 }

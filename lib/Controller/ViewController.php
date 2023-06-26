@@ -56,6 +56,15 @@ class ViewController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	public function indexSharedWithMe(): DataResponse {
+		return $this->handleError(function () {
+			return $this->service->findSharedViewsWithMe($this->userId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
 	public function show(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
 			return $this->service->find($id, $this->getTableFromViewId($id));

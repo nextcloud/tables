@@ -2,8 +2,8 @@
 	<div>
 		<NcAppSidebar v-show="showSidebar"
 			:active="activeSidebarTab"
-			:title="(activeTable) ? activeTable.emoji + ' ' + activeTable.title : t('tables', 'No table in context')"
-			:subtitle="(activeTable) ? t('tables', 'From {ownerName}', { ownerName: activeTable.ownership }) : ''"
+			:title="elementTitle"
+			:subtitle="elementSubtitle"
 			@update:active="tab => activeSidebarTab = tab"
 			@close="showSidebar = false">
 			<NcAppSidebarTab v-if="canShareActiveTable"
@@ -53,7 +53,26 @@ export default {
 	},
 	computed: {
 		...mapState(['tables']),
-		...mapGetters(['activeTable']),
+		...mapGetters(['activeTable', 'activeView']),
+		elementTitle() {
+			if (this.activeTable) {
+				return this.activeTable.emoji + ' ' + this.activeTable.title
+			} else if (this.activeView) {
+				return this.activeView.emoji + ' ' + this.activeView.title
+			} else {
+				return t('tables', 'No table in context')
+			}
+		},
+		elementSubtitle() {
+			if (this.activeTable) {
+				return t('tables', 'From {ownerName}', { ownerName: this.activeTable.ownership })
+			} else if (this.activeView) {
+				return t('tables', 'From {ownerName}', { ownerName: this.activeView.createdBy })
+				// TODO: Created By?
+			} else {
+				return ''
+			}
+		},
 	},
 	mounted() {
 		subscribe('tables:sidebar:sharing', data => this.handleToggleSidebar(data))

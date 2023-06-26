@@ -54,7 +54,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				@delete-selected-rows="rowIds => $emit('delete-selected-rows', rowIds)" />
 		</div>
 		<div class="custom-table row">
-			<CustomTable v-if="canReadTable(table)"
+			<CustomTable v-if="canReadElement(table)"
 				:columns="columns"
 				:rows="rows"
 				:table="table"
