@@ -2,50 +2,10 @@
 	<tr v-if="row" :class="{ selected }">
 		<td><NcCheckboxRadioSwitch :checked="selected" @update:checked="v => $emit('update-row-selection', { rowId: row.id, value: v })" /></td>
 		<td v-for="col in columns" :key="col.id" :class="{ 'search-result': getCell(col.id)?.searchStringFound, 'filter-result': getCell(col.id)?.filterFound }">
-			<TableCellProgress v-if="col.type === 'number' && col.subtype === 'progress'"
+			<component :is="getTableCell(col)"
 				:column="col"
 				:row-id="row.id"
-				:value="parseInt(getCellValue(col.id, false))" />
-			<TableCellLink v-else-if="col.type === 'text' && col.subtype === 'link'"
-				:column="col"
-				:row-id="row.id"
-				:value="getCellValue(col.id)" />
-			<TableCellNumber v-else-if="col.type === 'number' && !col.subtype"
-				:column="col"
-				:row-id="row.id"
-				:value="getCellValue(col.id)" />
-			<TableCellStars v-else-if="col.type === 'number' && col.subtype === 'stars'"
-				:column="col"
-				:row-id="row.id"
-				:value="getCellValue(col.id)" />
-			<TableCellYesNo v-else-if="col.type === 'selection' && col.subtype === 'check'"
-				:column="col"
-				:row-id="row.id"
-				:value="getCellValue(col.id) === 'true'" />
-			<TableCellSelection v-else-if="col.type === 'selection' && !col.subtype"
-				:column="col"
-				:row-id="row.id"
-				:value="parseInt(getCellValue(col.id))" />
-			<TableCellMultiSelection v-else-if="col.type === 'selection' && col.subtype === 'multi'"
-				:column="col"
-				:row-id="row.id"
-				:value="getCellValue(col.id, false)" />
-			<TableCellDateTime v-else-if="col.type === 'datetime'"
-				:column="col"
-				:row-id="row.id"
-				:value="getCellValue(col.id)" />
-			<TableCellTextLine v-else-if="col.type === 'text' && col.subtype === 'line'"
-				:column="col"
-				:row-id="row.id"
-				:value="getCellValue(col.id)" />
-			<TableCellTextRich v-else-if="col.type === 'text' && col.subtype === 'rich'"
-				:column="col"
-				:row-id="row.id"
-				:value="getCellValue(col.id, false)" />
-			<TableCellHtml v-else
-				:value="getCellValue(col.id)"
-				:row-id="row.id"
-				:column="col" />
+				:value="getCellValue(col)" />
 		</td>
 		<td>
 			<NcButton type="primary" :aria-label="t('tables', 'Edit row')" @click="$emit('edit-row', row.id)">
@@ -71,6 +31,7 @@ import TableCellTextLine from './TableCellTextLine.vue'
 import TableCellSelection from './TableCellSelection.vue'
 import TableCellMultiSelection from './TableCellMultiSelection.vue'
 import TableCellTextRich from './TableCellEditor.vue'
+import { ColumnTypes } from './../mixins/columnHandler.js'
 
 export default {
 	name: 'TableRow',
@@ -111,25 +72,50 @@ export default {
 		},
 	},
 	methods: {
+		getTableCell(column) {
+			switch (column.type) {
+			case ColumnTypes.TextLine: return 'TableCellTextLine'
+			case ColumnTypes.TextLink: return 'TableCellLink'
+			case ColumnTypes.TextRich:return 'TableCellTextRich'
+			case ColumnTypes.Number: return 'TableCellNumber'
+			case ColumnTypes.NumberStars: return 'TableCellStars'
+			case ColumnTypes.NumberProgress: return 'TableCellProgress'
+			case ColumnTypes.Selection: return 'TableCellSelection'
+			case ColumnTypes.SelectionMulti: return 'TableCellMultiSelection'
+			case ColumnTypes.SelectionCheck: return 'TableCellYesNo'
+			case ColumnTypes.Datetime: return 'TableCellDateTime'
+			case ColumnTypes.DatetimeDate: return 'TableCellDateTime'
+			case ColumnTypes.DatetimeTime: return 'TableCellDateTime'
+			default: return 'TableCellHtml'
+			}
+		},
 		getCell(columnId) {
 			return this.row.data.find(item => item.columnId === columnId) || null
 		},
-		getCellValue(columnId, loadDefault = true) {
+		getCellValue(column) {
 			if (!this.row) {
 				return null
 			}
 
 			// lets see if we have a value
-			const cell = this.getCell(columnId)
+			const cell = this.getCell(column.id)
+			let value
 
-			// if no value is given, try to get the default value from the column definition
 			if (cell) {
-				return cell.value
-			} else if (!cell && loadDefault) {
-				const column = this.columns.filter(column => column.id === columnId)[0]
-				return column[column.type + 'Default']
+				value = cell.value
+			} else if (![ColumnTypes.NumberProgress, ColumnTypes.SelectionMulti, ColumnTypes.TextRich].includes(column.type)) {
+				// if no value is given, try to get the default value from the column definition
+				value = column.default()
+			} else {
+				return null
 			}
-			return null
+
+			if ([ColumnTypes.NumberProgress, ColumnTypes.Selection].includes(column.type)) {
+				return parseInt(value)
+			} else if (column.type === ColumnTypes.SelectionCheck) {
+				return value === 'true'
+			}
+			return value
 		},
 		truncate(text) {
 			if (text.length >= 400) {

@@ -75,7 +75,6 @@ import TableEdit from 'vue-material-design-icons/TableEdit.vue'
 import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
 import IconImport from 'vue-material-design-icons/Import.vue'
 import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
-import searchAndFilterMixin from '../mixins/searchAndFilterMixin.js'
 import FilterLabel from './FilterLabel.vue'
 import permissionsMixin from '../mixins/permissionsMixin.js'
 
@@ -93,7 +92,7 @@ export default {
 		TableColumnPlusAfter,
 	},
 
-	mixins: [searchAndFilterMixin, permissionsMixin],
+	mixins: [permissionsMixin],
 
 	props: {
 		columns: {

@@ -8,7 +8,8 @@
 </template>
 <script>
 import Close from 'vue-material-design-icons/Close.vue'
-import searchAndFilterMixin from '../mixins/searchAndFilterMixin.js'
+import { MagicFields } from '../mixins/magicFields.js'
+import { Filter, FilterIds } from '../mixins/filter.js'
 
 export default {
 
@@ -16,12 +17,10 @@ export default {
 		Close,
 	},
 
-	mixins: [searchAndFilterMixin],
-
 	props: {
 		operator: {
-		      type: String,
-		      default: '',
+		      type: Filter,
+		      default: null,
 		    },
 		value: {
 		      type: String,
@@ -40,16 +39,16 @@ export default {
 	computed: {
 		getValue() {
 			let value = this.value
-			Object.values(this.magicFields).forEach(field => {
+			Object.values(MagicFields).forEach(field => {
 				value = value.replace('@' + field.id, field.label)
 			})
 			return value
 		},
 		labelText() {
-			if (this.operator === 'is-empty') {
-				return this.getOperatorLabel(this.operator)
+			if (this.operator.id === FilterIds.IsEmpty) {
+				return this.operator.getOperatorLabel()
 			} else {
-				return this.getOperatorLabel(this.operator) + ' "' + this.getValue + '"'
+				return this.operator.getOperatorLabel() + ' "' + this.getValue + '"'
 			}
 		},
 	},

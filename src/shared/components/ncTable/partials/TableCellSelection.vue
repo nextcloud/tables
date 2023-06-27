@@ -1,16 +1,13 @@
 <template>
 	<div>
-		{{ getLabelForSelection() }}<span v-if="isDeletedLabelForSelection()" :title="t('tables', 'This option is outdated.')">&nbsp;⚠️</span>
+		{{ column.getLabel(value) }}<span v-if="isDeleted()" :title="t('tables', 'This option is outdated.')">&nbsp;⚠️</span>
 	</div>
 </template>
 
 <script>
-import selectionMixin from '../mixins/columnsTypes/selectionMixin.js'
 
 export default {
 	name: 'TableCellSelection',
-
-	mixins: [selectionMixin],
 
 	props: {
 		column: {
@@ -26,6 +23,11 @@ export default {
 		value: {
 			type: Number,
 			default: null,
+		},
+	},
+	methods: {
+		isDeleted() {
+			this.column.isDeletedLabel(this.value)
 		},
 	},
 }

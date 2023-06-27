@@ -24,9 +24,9 @@
 				:key="index"
 				:name="'filter-operators-column-' + column.id"
 				:value="op.id"
-				:checked="operator === op.id"
+				:checked="operator.id === op.id"
 				:disabled="isDisabled(op.id)"
-				@change="changeFilterOperator">
+				@change="changeFilterOperator(op)">
 				{{ op.label }}
 			</NcActionRadio>
 			<NcActionInput
@@ -41,10 +41,10 @@
 				</template>
 			</NcActionInput>
 			<NcActionCaption
-				v-if="getPossibleMagicFields(column).length > 0 && canFilterWithTextInput && haveOperators"
+				v-if="column.getPossibleMagicFields().length > 0 && canFilterWithTextInput"
 				:title="t('tables', 'Or use magic values')" />
 			<NcActionCaption
-				v-if="getPossibleMagicFields(column).length > 0 && !canFilterWithTextInput && haveOperators"
+				v-if="column.getPossibleMagicFields().length > 0 && !canFilterWithTextInput"
 				:title="t('tables', 'Choose value')" />
 			<NcActionButton
 				v-for="(magicField, index) in getMagicFields"
@@ -60,23 +60,15 @@
 </template>
 
 <script>
-import textLineMixin from '../mixins/columnsTypes/textLineMixin.js'
-import textLinkMixin from '../mixins/columnsTypes/textLinkMixin.js'
-import selectionMixin from '../mixins/columnsTypes/selectionMixin.js'
-import numberMixin from '../mixins/columnsTypes/numberMixin.js'
-import selectionCheckMixin from '../mixins/columnsTypes/selectionCheckMixin.js'
-import numberStarsMixin from '../mixins/columnsTypes/numberStarsMixin.js'
-import numberProgressMixin from '../mixins/columnsTypes/numberProgressMixin.js'
-import datetimeDateMixin from '../mixins/columnsTypes/datetimeDateMixin.js'
-import datetimeTimeMixin from '../mixins/columnsTypes/datetimeTimeMixin.js'
-import datetimeMixin from '../mixins/columnsTypes/datetimeMixin.js'
 import generalHelper from '../../../mixins/generalHelper.js'
 import SortAsc from 'vue-material-design-icons/SortAscending.vue'
 import SortDesc from 'vue-material-design-icons/SortDescending.vue'
 import Pencil from 'vue-material-design-icons/Pencil.vue'
 import { NcActions, NcActionButton, NcActionInput, NcActionButtonGroup, NcActionSeparator, NcActionCaption, NcActionRadio } from '@nextcloud/vue'
 import { mapState } from 'vuex'
-import searchAndFilterMixin from '../mixins/searchAndFilterMixin.js'
+import { AbstractColumn } from '../mixins/columnClass.js'
+import { ColumnTypes } from '../mixins/columnHandler.js'
+import { FilterIds } from '../mixins/filter.js'
 
 export default {
 
@@ -93,24 +85,11 @@ export default {
 		NcActionSeparator,
 	},
 
-	mixins: [
-		textLineMixin,
-		selectionMixin,
-		numberMixin,
-		generalHelper,
-		selectionCheckMixin,
-		textLinkMixin,
-		numberStarsMixin,
-		numberProgressMixin,
-		datetimeDateMixin,
-		datetimeTimeMixin,
-		datetimeMixin,
-		searchAndFilterMixin,
-	],
+	mixins: [generalHelper],
 
 	props: {
 		column: {
-		      type: Object,
+		      type: AbstractColumn,
 		      default: null,
 		    },
 		openState: {
@@ -122,7 +101,11 @@ export default {
 	data() {
 		return {
 			filterValue: '',
-			operator: '',
+			operator: null,
+			hideFilterInputForColumnTypes: [
+				ColumnTypes.SelectionCheck,
+				ColumnTypes.NumberStars,
+			],
 		}
 	},
 
@@ -142,14 +125,15 @@ export default {
 		},
 		getOperators() {
 			console.debug('getOperators requested')
-			const possibleOperators = this.getPossibleOperators(this.column)
+			const possibleOperators = this.column.getPossibleOperators()
 
+			if (possibleOperators.length === 0) {
+				return null
+			}
 			// preselect first operator, even if it's not displayed
-			if (this.operator === '') {
-				console.debug('operator is empty, try to set first option', possibleOperators)
+			if (this.operator === null) {
 				// eslint-disable-next-line vue/no-side-effects-in-computed-properties
-				this.operator = possibleOperators[0]?.id ?? ''
-				console.debug('operator', this.operator)
+				this.operator = possibleOperators[0]
 			}
 			return possibleOperators
 		},
@@ -159,25 +143,18 @@ export default {
 			if (filters && filters.length > 0) {
 				const incompatibleFilters = new Set()
 				filters.forEach(fil => {
-					this.getIncompatibleFilters(fil.operator).forEach(item => incompatibleFilters.add(item))
+
+					fil.operator.incompatibleWith.forEach(item => incompatibleFilters.add(item))
 				})
 				return this.getOperators.filter(op => incompatibleFilters.has(op.id))
 			}
 			return []
 		},
 		getMagicFields() {
-			if (!this.haveOperators) {
-				return []
-			}
-			return this.getPossibleMagicFields(this.column)
+			return this.column.getPossibleMagicFields()
 		},
 		canSort() {
-			const sortFuncName = 'sorting' + this.ucfirst(this.column?.type) + this.ucfirst(this.column?.subtype)
-			if (this[sortFuncName] instanceof Function) {
-				return true
-			}
-			console.info('no sort function for column found', { columnId: this.column.id, expectedSortMethod: sortFuncName })
-			return false
+			return this.column.canSort()
 		},
 		getSortMode() {
 			const sortObject = this.view.sorting?.find(item => item.columnId === this.column?.id)
@@ -195,13 +172,7 @@ export default {
 			},
 		},
 		canFilterWithTextInput() {
-			const columnType = this.column.type + (this.column.subtype ? '-' + this.column.subtype : '')
-			return !this.hideFilterInputForColumnTypes.includes(columnType)
-		},
-		getFilterOperator() {
-			const tmp = this.operator.split('-')
-			tmp.shift()
-			return tmp.join('-')
+			return !this.hideFilterInputForColumnTypes.includes(this.column.type)
 		},
 	},
 
@@ -211,19 +182,19 @@ export default {
 			this.filterValue = '@' + magicFieldId
 			this.submitFilterInput()
 		},
-		changeFilterOperator(event) {
-			console.debug('operator changed', event?.target?.value)
-			this.operator = event?.target?.value
-			if (this.operator === 'operator-is-empty') {
+		changeFilterOperator(operator) {
+			this.operator = operator
+			if (this.operator.id === FilterIds.IsEmpty) {
 				this.submitFilter()
 			}
 		},
 		submitFilterInput() {
 			console.debug('submit clicked', this.filterValue)
 
-			if (this.operator === 'operator-contains') {
+			// Ignore contains filter with the same value es old contain filters
+			if (this.operator.id === FilterIds.Contains) {
 				const columnFilters = this.getFilterForColumn(this.column)
-				if (columnFilters && columnFilters.filter(fil => fil.operator === 'contains').map(fil => fil.value).includes(this.filterValue)) {
+				if (columnFilters && columnFilters.filter(fil => fil.operator.id === FilterIds.Contains).map(fil => fil.value).includes(this.filterValue)) {
 					this.localOpenState = false
 					this.reset()
 					return
@@ -241,7 +212,7 @@ export default {
 		createFilter() {
 			const filterObject = {
 				columnId: this.column.id,
-				operator: this.getFilterOperator,
+				operator: this.operator,
 				value: this.filterValue,
 			}
 			console.debug('emitting new filterObject', filterObject)
@@ -249,7 +220,7 @@ export default {
 			this.reset()
 		},
 		reset() {
-			this.operator = ''
+			this.operator = null
 			this.filterValue = ''
 		},
 		sort(mode) {

@@ -7,43 +7,7 @@
 				</div>
 			</div>
 			<div v-for="column in columns" :key="column.id">
-				<TextLineForm v-if="column.type === 'text' && column.subtype === 'line'"
-					:column="column"
-					:value.sync="localRow[column.id]" />
-				<TextLongForm v-if="column.type === 'text' && column.subtype === 'long'"
-					:column="column"
-					:value.sync="localRow[column.id]" />
-				<TextRichForm v-if="column.type === 'text' && column.subtype === 'rich'"
-					:column="column"
-					:value.sync="localRow[column.id]" />
-				<TextLinkForm v-if="column.type === 'text' && column.subtype === 'link'"
-					:column="column"
-					:value.sync="localRow[column.id]" />
-				<NumberForm v-if="column.type === 'number' && !column.subtype"
-					:column="column"
-					:value.sync="localRow[column.id]" />
-				<NumberStarsForm v-if="column.type === 'number' && column.subtype === 'stars'"
-					:column="column"
-					:value.sync="localRow[column.id]" />
-				<NumberProgressForm v-if="column.type === 'number' && column.subtype === 'progress'"
-					:column="column"
-					:value.sync="localRow[column.id]" />
-				<SelectionForm v-if="column.type === 'selection' && !column.subtype"
-					:column="column"
-					:value.sync="localRow[column.id]" />
-				<SelectionMultiForm v-if="column.type === 'selection' && column.subtype === 'multi'"
-					:column="column"
-					:value.sync="localRow[column.id]" />
-				<SelectionCheckForm v-if="column.type === 'selection' && column.subtype === 'check'"
-					:column="column"
-					:value.sync="localRow[column.id]" />
-				<DatetimeForm v-if="column.type === 'datetime' && !column.subtype"
-					:column="column"
-					:value.sync="localRow[column.id]" />
-				<DatetimeDateForm v-if="column.type === 'datetime' && column.subtype === 'date'"
-					:column="column"
-					:value.sync="localRow[column.id]" />
-				<DatetimeTimeForm v-if="column.type === 'datetime' && column.subtype === 'time'"
+				<ColumnFormComponent
 					:column="column"
 					:value.sync="localRow[column.id]" />
 			</div>
@@ -75,39 +39,15 @@ import { NcModal, NcButton } from '@nextcloud/vue'
 import { showError, showWarning } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
-import TextLineForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextLineForm.vue'
-import TextLongForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextLongForm.vue'
-import TextRichForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextRichForm.vue'
-import TextLinkForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextLinkForm.vue'
-import NumberForm from '../../../shared/components/ncTable/partials/rowTypePartials/NumberForm.vue'
-import NumberStarsForm from '../../../shared/components/ncTable/partials/rowTypePartials/NumberStarsForm.vue'
-import NumberProgressForm from '../../../shared/components/ncTable/partials/rowTypePartials/NumberProgressForm.vue'
-import SelectionCheckForm from '../../../shared/components/ncTable/partials/rowTypePartials/SelectionCheckForm.vue'
-import SelectionForm from '../../../shared/components/ncTable/partials/rowTypePartials/SelectionForm.vue'
-import SelectionMultiForm from '../../../shared/components/ncTable/partials/rowTypePartials/SelectionMultiForm.vue'
-import DatetimeForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeForm.vue'
-import DatetimeDateForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeDateForm.vue'
-import DatetimeTimeForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeTimeForm.vue'
+import ColumnFormComponent from '../partials/ColumnFormComponent.vue'
 import tablePermissions from '../mixins/tablePermissions.js'
 
 export default {
 	name: 'EditRow',
 	components: {
-		SelectionCheckForm,
-		SelectionForm,
-		SelectionMultiForm,
 		NcModal,
-		TextLineForm,
-		TextLongForm,
-		TextRichForm,
-		TextLinkForm,
-		NumberForm,
-		NumberStarsForm,
-		NumberProgressForm,
-		DatetimeForm,
-		DatetimeDateForm,
-		DatetimeTimeForm,
 		NcButton,
+		ColumnFormComponent,
 	},
 	mixins: [tablePermissions],
 	props: {
