@@ -64,6 +64,11 @@ Feature: api/tablesapi
       | subtype       | line                    |
       | mandatory     | 0                       |
       | description   | This is a description!  |
+    Then column "Resources" exists with following properties
+      | type               | text                    |
+      | subtype            | link                    |
+      | mandatory          | 0                       |
+      | textAllowedPattern | files,tables,url        |
     Then column "Second column" exists with following properties
       | type          | number                  |
       | mandatory     | 1                       |
@@ -80,7 +85,8 @@ Feature: api/tablesapi
     Then table has at least following columns
       | First column  |
       | Second column |
-      | Third column |
+      | Third column  |
+      | Resources     |
     Then set following properties for last created column
       | title         | Second column renamed   |
       | mandatory     | 0                       |

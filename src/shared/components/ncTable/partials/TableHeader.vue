@@ -22,7 +22,7 @@
 					@delete-filter="id => $emit('delete-filter', id)" />
 			</div>
 		</th>
-		<th>
+		<th class="customTableAction">
 			<NcActions :force-menu="true">
 				<NcActionButton v-if="canCreateRowInTable(table)"
 					:close-after-click="true"
