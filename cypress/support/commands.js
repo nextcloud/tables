@@ -27,7 +27,6 @@ import { addCommands } from '@nextcloud/cypress'
 
 addCommands()
 
-
 Cypress.Commands.add('createTable', (title) => {
 	cy.contains('.app-menu-entry--label', 'Tables').click()
 	cy.contains('button', 'Create new table').click()
@@ -46,7 +45,7 @@ Cypress.Commands.add('createTextLinkColumn', (title, ressourceProvider, firstCol
 	if (firstColumn) {
 		cy.get('.button-vue__text').contains('Create column').click({ force: true })
 	} else {
-		cy.get('.customTableAction button').click()
+		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
 	}
 
@@ -66,4 +65,3 @@ Cypress.Commands.add('createTextLinkColumn', (title, ressourceProvider, firstCol
 	cy.wait(10).get('.toastify.toast-success').should('be.visible')
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
-
