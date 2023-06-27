@@ -6,7 +6,7 @@ use OCA\Tables\Db\View;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use Psr\Log\LoggerInterface;
 
-class TextColumnQB extends SuperColumnQB implements IColumnTypeQB {
+class SelectionColumnQB extends SuperColumnQB implements IColumnTypeQB {
 	protected LoggerInterface $logger;
 	protected int $platform;
 }

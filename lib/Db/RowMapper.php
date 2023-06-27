@@ -2,9 +2,12 @@
 
 namespace OCA\Tables\Db;
 
-use OCA\Tables\DB\ColumnTypes\IColumnTypeQB;
-use OCA\Tables\DB\ColumnTypes\SuperColumnQB;
-use OCA\Tables\DB\ColumnTypes\TextColumnQB;
+use OCA\Tables\Db\ColumnTypes\DatetimeColumnQB;
+use OCA\Tables\Db\ColumnTypes\IColumnTypeQB;
+use OCA\Tables\Db\ColumnTypes\NumberColumnQB;
+use OCA\Tables\Db\ColumnTypes\SelectionColumnQB;
+use OCA\Tables\Db\ColumnTypes\SuperColumnQB;
+use OCA\Tables\Db\ColumnTypes\TextColumnQB;
 use OCA\Tables\Service\ColumnTypes\TextLineBusiness;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -15,17 +18,26 @@ use OCP\IDBConnection;
 use OCP\Server;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\Log\LoggerInterface;
 
 /** @template-extends QBMapper<Row> */
 class RowMapper extends QBMapper {
 	protected string $table = 'tables_rows';
 	protected TextColumnQB $textColumnQB;
+	protected SelectionColumnQB $selectionColumnQB;
+	protected NumberColumnQB $numberColumnQB;
+	protected DatetimeColumnQB $datetimeColumnQB;
 	protected SuperColumnQB $genericColumnQB;
 	protected ColumnMapper $columnMapper;
+	protected LoggerInterface $logger;
 
-	public function __construct(IDBConnection $db, TextColumnQB $textColumnQB, SuperColumnQB $columnQB, ColumnMapper $columnMapper) {
+	public function __construct(IDBConnection $db, LoggerInterface $logger, TextColumnQB $textColumnQB, SelectionColumnQB $selectionColumnQB, NumberColumnQB $numberColumnQB, DatetimeColumnQB $datetimeColumnQB, SuperColumnQB $columnQB, ColumnMapper $columnMapper) {
 		parent::__construct($db, $this->table, Row::class);
+		$this->logger = $logger;
 		$this->textColumnQB = $textColumnQB;
+		$this->numberColumnQB = $numberColumnQB;
+		$this->selectionColumnQB = $selectionColumnQB;
+		$this->datetimeColumnQB= $datetimeColumnQB;
 		$this->genericColumnQB = $columnQB;
 		$this->columnMapper = $columnMapper;
 		$this->setPlatform();
@@ -35,12 +47,21 @@ class RowMapper extends QBMapper {
 		if (str_contains(strtolower(get_class($this->db->getDatabasePlatform())), 'postgres')) {
 			$this->genericColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_PGSQL);
 			$this->textColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_PGSQL);
+			$this->numberColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_PGSQL);
+			$this->selectionColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_PGSQL);
+			$this->datetimeColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_PGSQL);
 		} elseif (str_contains(strtolower(get_class($this->db->getDatabasePlatform())), 'sqlite')) {
 			$this->genericColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_SQLITE);
 			$this->textColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_SQLITE);
+			$this->numberColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_SQLITE);
+			$this->selectionColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_SQLITE);
+			$this->datetimeColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_SQLITE);
 		} else {
 			$this->genericColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_MYSQL);
 			$this->textColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_MYSQL);
+			$this->numberColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_MYSQL);
+			$this->selectionColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_MYSQL);
+			$this->datetimeColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_MYSQL);
 		}
 	}
 
@@ -83,12 +104,40 @@ class RowMapper extends QBMapper {
 		return $this->findEntities($qb);
 	}
 
-	private function getInnerFilterExpressions(): array {
+	private function buildFilterByColumnType(&$qb, array $filter): string {
+		try {
+			$qbClassName = 'OCA\Tables\Db\ColumnTypes\\';
+			$type = explode("-", $filter['columnType'])[0];
 
+			$qbClassName .= ucfirst($type).'ColumnQB';
+
+			$qbClass = Server::get($qbClassName);
+			return $qbClass->addWhereFilterExpression($qb, $filter);
+		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+			$this->logger->debug('Column type query builder class not found');
+		}
+		return '';
+	}
+
+	private function getInnerFilterExpressions(&$qb, $filterGroup): array {
+		$innerFilterExpressions = [];
+		foreach ($filterGroup as $filter) {
+			$innerFilterExpressions[] =  $this->buildFilterByColumnType($qb, $filter);
+			//$innerFilterExpressions[] =  $qb->createFunction('1=1');
+		}
+		return $innerFilterExpressions;
+	}
+
+	private function getFilterGroups(&$qb, $filters): array {
+		$filterGroups = [];
+		foreach ($filters as $filterGroup) {
+			$filterGroups[] = $qb->expr()->andX(...$this->getInnerFilterExpressions($qb, $filterGroup));
+		}
+		return $filterGroups;
 	}
 
 	/**
-	 * @param View $view
+	 * @param View $viewrows
 	 * @param int|null $limit
 	 * @param int|null $offset
 	 * @return array
@@ -102,15 +151,20 @@ class RowMapper extends QBMapper {
 
 		$neededColumnIds = $this->getAllColumnIdsFromView($view);
 		$neededColumns = $this->columnMapper->getColumnTypes($neededColumnIds);
+		$enrichedFilters = $view->getFilterArray();
+		if (count($enrichedFilters) > 0) {
+			foreach ($enrichedFilters as &$filterGroup) {
+				foreach ($filterGroup as &$filter) {
+					$filter['columnType'] = $neededColumns[$filter['columnId']];
 
-		$qb->andWhere(
-			$qb->expr()->orX(
-				$qb->expr()->andX(
-					$qb->createFunction('JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'.$[*].columnId\'), \'one\', 5)), \'.value\')) LIKE \'%meeting%\''),
-					$qb->createFunction('JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'.$[*].columnId\'), \'one\', 10)), \'.value\')) LIKE \'true\'')
-				),
-			)
-		);
+				}
+			}
+			$qb->andWhere(
+				$qb->expr()->orX(
+					...$this->getFilterGroups($qb, $enrichedFilters)
+				)
+			);
+		}
 
 		if ($limit !== null) {
 			$qb->setMaxResults($limit);
