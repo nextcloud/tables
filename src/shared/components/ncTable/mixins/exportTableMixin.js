@@ -1,13 +1,9 @@
 import moment from '@nextcloud/moment'
-import textLongMixin from '../mixins/columnsTypes/textLongMixin.js'
-import selectionMultiMixin from '../mixins/columnsTypes/selectionMultiMixin.js'
-import selectionMixin from '../mixins/columnsTypes/selectionMixin.js'
-import textLinkMixin from '../mixins/columnsTypes/textLinkMixin.js'
 import generalHelper from '../../../mixins/generalHelper.js'
 
 export default {
 
-	mixins: [textLongMixin, selectionMultiMixin, selectionMixin, generalHelper, textLinkMixin],
+	mixins: [generalHelper],
 
 	methods: {
 

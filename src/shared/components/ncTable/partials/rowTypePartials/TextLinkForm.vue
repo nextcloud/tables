@@ -103,7 +103,7 @@ export default {
 	},
 
 	mounted() {
-		this.providers = this.column?.textAllowedPattern.split(',')
+		this.providers = this.column?.textAllowedPattern?.split(',')
 	},
 
 	methods: {
