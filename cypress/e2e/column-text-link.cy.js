@@ -6,8 +6,8 @@ describe('Test column text-link', () => {
 		cy.createRandomUser().then(user => {
 			localUser = user
 			cy.login(localUser)
-			cy.uploadFile('photo-1.jpeg', 'image/jpeg', '/photo-test-1.jpeg')
-			cy.uploadFile('Nextcloud_Server-Administration-Manual_page1.pdf', 'application/pdf', '/NC_server_test.pdf')
+			cy.uploadFile('photo-test-1.jpeg', 'image/jpeg', '/photo-test-1.jpeg')
+			cy.uploadFile('NC_server_test.pdf', 'application/pdf', '/NC_server_test.pdf')
 		})
 	})
 
