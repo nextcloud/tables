@@ -1,5 +1,6 @@
 <template>
 	<NcSelect v-model="combinedTypeObject"
+		class="columnTypeSelection"
 		:options="typeOptions"
 		:clearable="false"
 		style="width: 100%">

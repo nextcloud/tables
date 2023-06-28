@@ -7,14 +7,39 @@ export default class TextLinkColumn extends AbstractTextColumn {
 	constructor(data) {
 		super(data)
 		this.type = ColumnTypes.TextLink
+		this.textAllowedPattern = data.textAllowedPattern
 	}
 
 	sort(mode) {
 		const factor = mode === 'desc' ? -1 : 1
 		return (rowA, rowB) => {
-			const valueA = rowA.data.find(item => item.columnId === this.id)?.value || ''
-			const valueB = rowB.data.find(item => item.columnId === this.id)?.value || ''
+			const tmpA = rowA.data.find(item => item.columnId === this.id)?.value || ''
+			const valueA = this.getValueFromCellValue(tmpA)
+			const tmpB = rowB.data.find(item => item.columnId === this.id)?.value || ''
+			const valueB = this.getValueFromCellValue(tmpB)
 			return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor
+		}
+	}
+
+	getValueFromCellValue(cellValue) {
+		// check if the value is the old string or the new object
+		try {
+			const parseResult = JSON.parse(cellValue)
+			return parseResult?.title || ''
+		} catch (err) {
+			// old string value
+			return cellValue
+		}
+	}
+
+	getValueString(valueObject) {
+		try {
+			const parseResult = JSON.parse(valueObject.value)
+			const link = parseResult?.resourceUrl ? ' (' + parseResult?.resourceUrl + ')' : ''
+			return parseResult?.title + link || ''
+		} catch (err) {
+			// old string value
+			return valueObject.value
 		}
 	}
 
@@ -24,13 +49,14 @@ export default class TextLinkColumn extends AbstractTextColumn {
 
 	isFilterFound(cell, filter) {
 		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
+		const value = this.getValueFromCellValue(cell.value)
 
 		const filterMethod = {
-			[FilterIds.Contains]() { return cell.value.includes(filterValue) },
-			[FilterIds.BeginsWith]() { return cell.value.startsWith(filterValue) },
-			[FilterIds.EndsWith]() { return cell.value.endsWith(filterValue) },
-			[FilterIds.IsEqual]() { return cell.value === filterValue },
-			[FilterIds.IsEmpty]() { return !cell.value },
+			[FilterIds.Contains]() { return value.includes(filterValue) },
+			[FilterIds.BeginsWith]() { return value.startsWith(filterValue) },
+			[FilterIds.EndsWith]() { return value.endsWith(filterValue) },
+			[FilterIds.IsEqual]() { return value === filterValue },
+			[FilterIds.IsEmpty]() { return !value },
 		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)
 	}

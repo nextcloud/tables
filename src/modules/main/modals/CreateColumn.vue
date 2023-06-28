@@ -42,6 +42,10 @@
 						<NumberProgressForm :number-default.sync="numberDefault" />
 					</div>
 
+					<div v-if="combinedType === 'text-link'" class="row space-L no-padding-on-mobile">
+						<TextLinkForm :text-allowed-pattern.sync="textAllowedPattern" />
+					</div>
+
 					<div v-if="type === 'text' && subtype !== 'link'" class="row no-padding-on-mobile space-L">
 						<div class="col-4 typeSelections space-B space-T space-L">
 							<NcCheckboxRadioSwitch :checked.sync="subtype" value="line" name="textTypeSelection" type="radio">
@@ -126,6 +130,7 @@ import NumberForm from '../../../shared/components/ncTable/partials/columnTypePa
 import NumberStarsForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/NumberStarsForm.vue'
 import NumberProgressForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/NumberProgressForm.vue'
 import TextLineForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/TextLineForm.vue'
+import TextLinkForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/TextLinkForm.vue'
 import TextLongForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/TextLongForm.vue'
 import SelectionCheckForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionCheckForm.vue'
 import MainForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/MainForm.vue'
@@ -148,6 +153,7 @@ export default {
 		NcModal,
 		NumberForm,
 		TextLineForm,
+		TextLinkForm,
 		TextLongForm,
 		TextRichForm,
 		MainForm,

@@ -3,7 +3,9 @@
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
-					<h2>{{ t('tables', 'Edit row') }}</h2>
+					<h2 tabindex="0">
+						{{ t('tables', 'Edit row') }}
+					</h2>
 				</div>
 			</div>
 			<div v-for="column in columns" :key="column.id">

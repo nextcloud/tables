@@ -84,7 +84,7 @@ class ColumnService extends SuperService {
 	 * @noinspection PhpUndefinedMethodInspection
 	 * @noinspection DuplicatedCode
 	 *
-	 * @param string $userId
+	 * @param string|null $userId
 	 * @param int $tableId
 	 * @param string $type
 	 * @param string|null $subtype
@@ -92,15 +92,15 @@ class ColumnService extends SuperService {
 	 * @param bool $mandatory
 	 * @param string|null $description
 	 * @param int|null $orderWeight
+	 * @param string|null $textDefault
+	 * @param string|null $textAllowedPattern
+	 * @param int|null $textMaxLength
 	 * @param string|null $numberPrefix
 	 * @param string|null $numberSuffix
 	 * @param float|null $numberDefault
 	 * @param float|null $numberMin
 	 * @param float|null $numberMax
 	 * @param int|null $numberDecimals
-	 * @param string|null $textDefault
-	 * @param string|null $textAllowedPattern
-	 * @param int|null $textMaxLength
 	 * @param string|null $selectionOptions
 	 * @param string|null $selectionDefault
 	 * @param string|null $datetimeDefault
