@@ -25,6 +25,8 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 import { addCommands } from '@nextcloud/cypress'
 
+const url = Cypress.config('baseUrl').replace(/\/index.php\/?$/g, '')
+
 addCommands()
 
 Cypress.Commands.add('createTable', (title) => {
@@ -64,4 +66,39 @@ Cypress.Commands.add('createTextLinkColumn', (title, ressourceProvider, firstCol
 
 	cy.wait(10).get('.toastify.toast-success').should('be.visible')
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
+})
+
+Cypress.Commands.add('uploadFile', (fileName, mimeType, target) => {
+	return cy.fixture(fileName, 'binary')
+		.then(Cypress.Blob.binaryStringToBlob)
+		.then(blob => {
+			if (typeof target !== 'undefined') {
+				fileName = target
+			}
+			cy.request('/csrftoken')
+				.then(({ body }) => {
+					return cy.wrap(body.token)
+				})
+				.then(async (requesttoken) => {
+					return cy.request({
+						url: `${url}/remote.php/webdav/${fileName}`,
+						method: 'put',
+						body: blob.size > 0 ? blob : '',
+						// auth,
+						headers: {
+							requesttoken,
+							'Content-Type': mimeType,
+						},
+					})
+				}).then(response => {
+					const fileId = Number(
+						response.headers['oc-fileid']?.split('oc')?.[0],
+					)
+					cy.log(`Uploaded ${fileName}`,
+						response.status,
+						{ fileId },
+					)
+					return cy.wrap(fileId)
+				})
+		})
 })

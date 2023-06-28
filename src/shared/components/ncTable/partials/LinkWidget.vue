@@ -1,5 +1,5 @@
 <template>
-	<div class="icon-label-container">
+	<div class="icon-label-container" :data-cy="title">
 		<img v-if="thumbnailUrl" :src="thumbnailUrl" :width="iconSize" :height="iconSize">
 		<img v-else-if="iconUrl" :src="iconUrl" :width="iconSize" :height="iconSize">
 		<LinkIcon v-else-if="!hideDefaultIcon" :size="iconSize" />

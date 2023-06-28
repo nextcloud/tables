@@ -5,6 +5,9 @@ describe('Test column text-link', () => {
 	before(function() {
 		cy.createRandomUser().then(user => {
 			localUser = user
+			cy.login(localUser)
+			cy.uploadFile('photo-1.jpeg', 'image/jpeg', '/photo-test-1.jpeg')
+			cy.uploadFile('Nextcloud_Server-Administration-Manual_page1.pdf', 'application/pdf', '/NC_server_test.pdf')
 		})
 	})
 
@@ -31,17 +34,17 @@ describe('Test column text-link', () => {
 		cy.loadTable('Test text-link')
 		cy.get('.NcTable').contains('Create row').click({ force: true })
 		cy.get('.modal__content .slot input').first().type('https://nextcloud.com').tick(500)
-		cy.get('.icon-label-container .labels a').contains('https://nextcloud.com').click()
+		cy.get('.icon-label-container .labels').contains('https://nextcloud.com').click()
 
 		cy.intercept({ method: 'GET', url: '**/search/providers/files/*' }).as('filesResults')
 		cy.get('.modal__content .slot input').eq(1).type('pdf').tick(500)
 		cy.wait('@filesResults')
-		cy.get('.icon-label-container .labels a').contains('Nextcloud_Server').click()
+		cy.get('[data-cy*="NC_server_test"]').click()
 
 		cy.get('.modal-container button').contains('Save').click()
 
 		cy.get('tr td a').contains('nextcloud').should('exist')
-		cy.get('tr td a').contains('Nextcloud_Server').should('exist')
+		cy.get('tr td a').contains('NC_server_test').should('exist')
 	})
 
 	it('Edit row', () => {
@@ -52,10 +55,10 @@ describe('Test column text-link', () => {
 		cy.get('.NcTable tr td button').click({ force: true })
 
 		cy.get('.modal__content .slot input').first().clear().type('https://github.com').tick(500)
-		cy.get('.icon-label-container .labels a').contains('github').click()
+		cy.get('[data-cy*="github"]').click()
 
-		cy.get('.modal__content .slot input').eq(1).type('photo').tick(500)
-		cy.get('.icon-label-container .labels a').contains('photo').click()
+		cy.get('.modal__content .slot input').eq(1).type('photo-test').tick(500)
+		cy.get('[data-cy*="photo-test"]').first().click()
 
 		cy.get('.modal-container button').contains('Save').click()
 
