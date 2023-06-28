@@ -7,6 +7,7 @@ OC.L10N.register(
     "Name" : "الاسم",
     "Description" : "الوصف",
     "Comment" : "تعليق",
+    "Dog" : "كلب",
     "from" : "مِن",
     "to" : "إلى",
     "Approved" : "تم قبوله",
@@ -63,6 +64,8 @@ OC.L10N.register(
     "Yes" : "نعم",
     "No" : "لا",
     "Defaults" : "الافتراضي",
-    "Confirm" : "تأكيد"
+    "Close editor" : "أغلِق المُحرِّر",
+    "Confirm" : "تأكيد",
+    "Is empty" : "فارغ"
 },
 "nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;");

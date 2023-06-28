@@ -67,6 +67,7 @@ OC.L10N.register(
     "Create" : "Crear",
     "Today" : "Hoxe",
     "Title" : "Título",
+    "The table \"{emoji} {table}\" is ready to use." : "A táboa «{emoji} {table} está preparada para usar.",
     "File" : "Ficheiro",
     "Select a file" : "Seleccione un ficheiro",
     "Result" : "Resultado",
