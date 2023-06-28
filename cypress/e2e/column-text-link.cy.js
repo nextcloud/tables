@@ -25,14 +25,18 @@ describe('Test column text-link', () => {
 	})
 
 	it('Create row', () => {
+		const now = new Date()
+		cy.clock(now)
+
 		cy.loadTable('Test text-link')
 		cy.get('.NcTable').contains('Create row').click({ force: true })
-		cy.get('.modal__content .slot input').first().type('https://nextcloud.com').wait(510).type('{downArrow}{enter}')
+		cy.get('.modal__content .slot input').first().type('https://nextcloud.com').tick(500)
+		cy.get('.icon-label-container .labels').contains('https://nextcloud.com').click()
 
 		cy.intercept({ method: 'GET', url: '**/search/providers/files/*' }).as('filesResults')
-		cy.get('.modal__content .slot input').eq(1).type('pdf')
+		cy.get('.modal__content .slot input').eq(1).type('pdf').tick(500)
 		cy.wait('@filesResults')
-		cy.get('.modal__content .slot input').eq(1).type('{downArrow}').wait(100).type('{enter}')
+		cy.get('.icon-label-container .labels').contains('Nextcloud_Server').click()
 
 		cy.get('.modal-container button').contains('Save').click()
 
@@ -41,11 +45,18 @@ describe('Test column text-link', () => {
 	})
 
 	it('Edit row', () => {
+		const now = new Date()
+		cy.clock(now)
+
 		cy.loadTable('Test text-link')
 		cy.get('.NcTable tr td button').click({ force: true })
 
-		cy.get('.modal__content .slot input').first().clear().type('https://github.com').wait(510).type('{downArrow}{enter}')
-		cy.get('.modal__content .slot input').eq(1).type('photo').wait(2000).type('{downArrow}{downArrow}').wait(100).type('{enter}')
+		cy.get('.modal__content .slot input').first().clear().type('https://github.com').tick(500)
+		cy.get('.icon-label-container .labels').contains('github').click()
+
+		cy.get('.modal__content .slot input').eq(1).type('photo').tick(500)
+		cy.get('.icon-label-container .labels').contains('photo').click()
+
 		cy.get('.modal-container button').contains('Save').click()
 
 		cy.get('tr td a').contains('github').should('exist')
