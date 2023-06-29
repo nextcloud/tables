@@ -7,26 +7,29 @@
 				:columns="columns"
 				@delete-filter="deleteFilter(index)" />
 		</div>
-		<NcActions>
-			<NcActionButton
-				icon="icon-add"
-				@click="addFilter">
-				{{ t('tables', 'Add new filter') }}
-			</NcActionButton>
-		</NcActions>
+		<NcButton
+			:close-after-click="true"
+			type="tertiary"
+			@click="addFilter">
+			{{ t('tables', 'Add new filter') }}
+			<template #icon>
+				<Plus :size="25" />
+			</template>
+		</NcButton>
 	</div>
 </template>
 
 <script>
 import FilterEntry from './FilterEntry.vue'
-import { NcActions, NcActionButton } from '@nextcloud/vue'
+import { NcButton } from '@nextcloud/vue'
+import Plus from 'vue-material-design-icons/Plus.vue'
 
 export default {
 	name: 'FilterGroup',
 	components: {
 		FilterEntry,
-		NcActions,
-		NcActionButton,
+		NcButton,
+		Plus,
 	},
 	props: {
 		filterGroup: {

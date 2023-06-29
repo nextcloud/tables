@@ -39,7 +39,8 @@
 		<EditView
 			:show-modal="editViewId !== null"
 			:view="activeView"
-			@close="editViewId = null" />
+			@close="editViewId = null"
+			@reload-view="reload(true)" />
 		<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false" />
 		<EditColumns :show-modal="showEditColumns" @close="showEditColumns = false" />
 		<DeleteRows v-if="rowsToDelete" :rows-to-delete="rowsToDelete" @cancel="rowsToDelete = null" />
@@ -58,7 +59,6 @@ import EditColumns from '../modules/main/modals/EditColumns.vue'
 import DeleteRows from '../modules/main/modals/DeleteRows.vue'
 import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
 import { emit } from '@nextcloud/event-bus'
-import { parseCol } from '../shared/components/ncTable/mixins/columnParser.js'
 
 export default {
 	name: 'DefaultViewMainView',
@@ -89,7 +89,7 @@ export default {
 	},
 	computed: {
 		...mapState({
-			columns: state => state.data.columns.map(col => parseCol(col)),
+			columns: state => state.data.columns,
 			loading: state => state.data.loading,
 			rows: state => state.data.rows,
 			viewSetting: state => state.data.viewSetting,
@@ -126,12 +126,12 @@ export default {
 		deleteRows(rowIds) {
 			this.rowsToDelete = rowIds
 		},
-		async reload() {
+		async reload(force = false) {
 			if (!this.activeView) {
 				return
 			}
 
-			if (this.activeView.id !== this.lastActiveViewId) {
+			if (this.activeView.id !== this.lastActiveViewId || force) {
 				this.localLoading = true
 
 				await this.$store.dispatch('resetViewSetting')

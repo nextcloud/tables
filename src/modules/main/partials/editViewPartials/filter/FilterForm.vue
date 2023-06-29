@@ -13,26 +13,32 @@
 				{{ t('tables', 'OR') }}
 			</div>
 		</div>
-		<NcActions>
-			<NcActionButton
-				icon="icon-add"
-				@click="addFilterGroup">
-				{{ t('tables', 'Add new filter') }}
-			</NcActionButton>
-		</NcActions>
+		<div v-if="filters.length > 0">
+			{{ t('tables', 'OR') }}
+		</div>
+		<NcButton
+			:close-after-click="true"
+			type="tertiary"
+			@click="addFilterGroup">
+			{{ t('tables', 'Add new filter group') }}
+			<template #icon>
+				<Plus :size="25" />
+			</template>
+		</NcButton>
 	</div>
 </template>
 
 <script>
 import FilterGroup from './FilterGroup.vue'
-import { NcActions, NcActionButton } from '@nextcloud/vue'
+import { NcButton } from '@nextcloud/vue'
+import Plus from 'vue-material-design-icons/Plus.vue'
 
 export default {
 	name: 'FilterForm',
 	components: {
 		FilterGroup,
-		NcActions,
-		NcActionButton,
+		NcButton,
+		Plus,
 	},
 	props: {
 		filters: {
@@ -62,3 +68,7 @@ export default {
 	},
 }
 </script>
+
+<style scoped>
+
+</style>

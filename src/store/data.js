@@ -1,6 +1,7 @@
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import displayError from '../shared/utils/displayError.js'
+import { parseCol } from '../shared/components/ncTable/mixins/columnParser.js'
 
 export default {
 	state: {
@@ -111,7 +112,7 @@ export default {
 				displayError(e, t('tables', 'Could not load columns.'))
 				return false
 			}
-			let columns = res.data
+			let columns = res.data.map(col => parseCol(col))
 			if (tableId) {
 				columns = columns.sort((a, b) => {
 					if (a.orderWeight < b.orderWeight) { return 1 }

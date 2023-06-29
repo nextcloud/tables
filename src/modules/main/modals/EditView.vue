@@ -32,29 +32,15 @@
 					</div>
 				</div>
 				<!--columns & order-->
-				<div class="col-4 mandatory">
-					{{ t('tables', 'Columns to be displayed') }}
-				</div>
-				<div v-for="(column, index) in columns"
-					:key="column.id"
-					:draggable="true"
-					style="display: flex; align-items: center;"
-					@dragstart="dragStart(index)"
-					@dragover="dragOver(index)"
-					@dragend="dragEnd(index)">
-					<NcButton aria-label="Move" type="tertiary-no-background" style="padding-right: 10px;">
-						<template #icon>
-							<MenuIcon :size="20" />
-						</template>
-					</NcButton>
-					<NcCheckboxRadioSwitch
-						:checked="selectedColumns.includes(column.id)"
-						style="padding-right: 10px;"
-						@update:checked="onToggle(column.id)" />
-					{{ column.title }}
+				<div class="row space-T">
+					<SelectedViewColumns
+						:columns="columns"
+						:selected-columns="selectedColumns" />
 				</div>
 				<!--filtering-->
-				<FilterForm :filters="view.filter" :columns="columns" />
+				<div class="row space-T">
+					<FilterForm :filters="view.filter" :columns="columns" />
+				</div>
 				<!--sorting-->
 			</div>
 			<!-- <div class="row">
@@ -89,13 +75,13 @@
 </template>
 
 <script>
-import { NcModal, NcEmojiPicker, NcButton, NcCheckboxRadioSwitch } from '@nextcloud/vue'
+import { NcModal, NcEmojiPicker, NcButton } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
 import tablePermissions from '../mixins/tablePermissions.js'
-import MenuIcon from 'vue-material-design-icons/Menu.vue'
-import FilterForm from '../partials/filter/FilterForm.vue'
+import FilterForm from '../partials/editViewPartials/filter/FilterForm.vue'
+import SelectedViewColumns from '../partials/editViewPartials/SelectedViewColumns.vue'
 
 export default {
 	name: 'EditView',
@@ -103,9 +89,8 @@ export default {
 		NcModal,
 		NcEmojiPicker,
 		NcButton,
-		MenuIcon,
-		NcCheckboxRadioSwitch,
 		FilterForm,
+		SelectedViewColumns,
 	},
 	mixins: [tablePermissions],
 	props: {
@@ -158,25 +143,6 @@ export default {
 			this.reset()
 			this.$emit('close')
 		},
-		onToggle(columnId) {
-			if (this.selectedColumns.includes(columnId)) {
-				this.selectedColumns.splice(this.selectedColumns.indexOf(columnId), 1)
-			} else {
-				this.selectedColumns.push(columnId)
-			}
-		},
-		isValueValidForColumn(value, column) {
-			if (column.type === 'selection') {
-				if (
-					(value instanceof Array && value.length > 0)
-					|| (value === parseInt(value))
-				) {
-					return true
-				}
-				return false
-			}
-			return !!value || value === 0
-		},
 		async loadTableColumnsFromBE() {
 			this.columns = await this.$store.dispatch('getColumnsFromBE', { tableId: this.view.tableId })
 			// Show columns of view first
@@ -193,6 +159,7 @@ export default {
 			})
 		},
 		async actionConfirm() {
+			// TODO: Validate filter
 			if (this.title === '') {
 				showError(t('tables', 'Cannot update view. Title is missing.'))
 				this.errorTitle = true
@@ -212,14 +179,14 @@ export default {
 					title: this.title,
 					emoji: this.icon,
 					columns: JSON.stringify(newSelectedColumnIds),
+					filter: JSON.stringify(this.view.filter),
 				},
 			}
 			const res = await this.$store.dispatch('updateView', { id, data })
 			if (res) {
 				console.debug(res, this.view)
-				if (newSelectedColumnIds !== this.view.columns) {
-					await this.$store.dispatch('loadColumnsFromBE', { viewId: this.view.id })
-				}
+				// TODO: Only reload if something changed
+				this.$emit('reload-view')
 				return res
 			} else {
 				showError(t('tables', 'Could not update view'))
@@ -232,25 +199,6 @@ export default {
 			this.selectedColumns = [...this.view.columns]
 			this.localLoading = false
 			this.columns = null
-		},
-		dragStart(index) {
-			this.draggedItem = this.columns[index]
-			this.startDragIndex = index
-		},
-		dragOver(index) {
-			if (this.draggedItem === null) return
-			const draggedIndex = this.columns.indexOf(this.draggedItem)
-			if (index !== draggedIndex) {
-				this.columns.splice(draggedIndex, 1)
-				this.columns.splice(index, 0, this.draggedItem)
-			}
-		},
-		async dragEnd(goalIndex) {
-			if (this.draggedItem === null) return
-			const goal = goalIndex !== undefined ? goalIndex : this.list.indexOf(this.draggedItem)
-			if (this.startDragIndex === goal) return
-			this.draggedItem = null
-			this.startDragIndex = null
 		},
 	},
 }
