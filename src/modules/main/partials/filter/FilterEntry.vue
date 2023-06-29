@@ -32,7 +32,8 @@
 <script>
 import debounce from 'debounce'
 import { NcActions, NcActionButton, NcSelect } from '@nextcloud/vue'
-import searchAndFilterMixin from '../../../../shared/components/ncTable/mixins/searchAndFilterMixin.js'
+import { Filters } from '../../../../shared/components/ncTable/mixins/filter.js'
+import { MagicFields } from '../../../../shared/components/ncTable/mixins/magicFields.js'
 import FilterValueField from './FilterValueField.vue'
 
 export default {
@@ -43,7 +44,6 @@ export default {
 		NcActionButton,
 		FilterValueField,
 	},
-	mixins: [searchAndFilterMixin],
 	props: {
 		filterEntry: {
 			type: Object,
@@ -63,10 +63,10 @@ export default {
 	},
 	computed: {
 		operatorArray() {
-			return Object.values(this.operators)
+			return Object.values(Filters)
 		},
 		magicFieldsArray() {
-			return [this.searchValue, ...Object.values(this.magicFields)]
+			return [this.searchValue, ...Object.values(MagicFields)]
 		},
 	},
 	mounted() {
@@ -82,7 +82,7 @@ export default {
 		}, 500),
 		reset() {
 			this.selectedColumnId = this.columns.find(col => col.id === this.filterEntry.columnId)
-			this.selectedOperator = Object.values(this.operators).find(op => op.id.substring(9) === this.filterEntry.operator)
+			this.selectedOperator = Object.values(Filters).find(fil => fil.id === this.filterEntry.operator)
 			this.searchValue = this.filterEntry.value
 		},
 	},

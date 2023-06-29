@@ -11,15 +11,14 @@
 
 <script>
 import { NcRichContenteditable } from '@nextcloud/vue'
-import searchAndFilterMixin from '../../../../shared/components/ncTable/mixins/searchAndFilterMixin.js'
+import { MagicFields } from '../../../../shared/components/ncTable/mixins/magicFields.js'
+
 
 export default {
 	name: 'FilterValueField',
 	components: {
 		NcRichContenteditable,
 	},
-
-	mixins: [searchAndFilterMixin],
 
 	props: {
 		searchString: {
@@ -36,7 +35,7 @@ export default {
 
 	computed: {
 		getAllAutocompleteOptions() {
-			return this.magicFields
+			return MagicFields
 		},
 		isOperatorChosen() {
 			return this.localValue?.includes('@operator-')
@@ -48,11 +47,10 @@ export default {
 		// 	return Object.values(this.magicFields) // .filter(item => item.goodFor.includes(this.getChosenColumnType))
 		// },
 	},
-
 	methods: {
 		autoComplete(search, callback) {
 			console.debug('autocomplete search', search)
-			callback(Object.values(this.magicFields))
+			callback(Object.values(MagicFields))
 		},
 	},
 

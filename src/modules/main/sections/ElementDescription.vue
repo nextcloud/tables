@@ -9,7 +9,7 @@
 					icon="icon-rename"
 					:close-after-click="true"
 					@click="editElement">
-					{{ t('tables', 'Edit table') }}
+					{{ isTable ? t('tables', 'Edit table') : t('tables', 'Edit view') }}
 				</NcActionButton>
 			</NcActions>
 		</div>
@@ -47,7 +47,7 @@ export default {
 
 	methods: {
 		editElement() {
-			emit(this.isTable ? 'edit-table' : 'edit-view', this.activeElement.id)
+			emit(this.isTable ? 'edit-table' : 'edit-view', this.activeElement)
 		},
 	},
 }

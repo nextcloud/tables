@@ -21,23 +21,20 @@
 				</NcAppNavigationCaption>
 				<NavigationTableItem v-for="table in getOwnTables"
 					:key="'table'+table.id"
-					:table="table"
-					@edit-table="id => editTableId = id" />
+					:table="table" />
 				<NcAppNavigationCaption v-if="getSharedTables.length > 0"
 					:title="t('tables', 'Shared tables')" />
 
 				<NavigationTableItem v-for="table in getSharedTables"
 					:key="'table'+table.id"
-					:table="table"
-					@edit-table="id => editTableId = id" />
+					:table="table" />
 
 				<NcAppNavigationCaption v-if="getSharedViews.length > 0"
 					:title="t('tables', 'Shared views')" />
 
 				<NavigationViewItem v-for="view in getSharedViews"
 					:key="'view'+view.id"
-					:view="view"
-					@edit-view="id => editViewId = id" />
+					:view="view" />
 			</ul>
 
 			<div v-if="filterString !== ''" class="search-info">
@@ -54,7 +51,7 @@
 			</div>
 
 			<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
-			<EditTable :show-modal="editTableId !== null" :table-id="editTableId" @close="editTableId = null " />
+			<EditTable :show-modal="editTable !== null" :table="editTable" @close="editTable = null " />
 			<EditView :show-modal="editView !== null" :view="editView" @close="editView = null " />
 			<Import :show-modal="importTable !== null" :table="importTable" @close="importTable = null" />
 		</template>
@@ -96,7 +93,7 @@ export default {
 			loading: true,
 			showModalCreateTable: false,
 			importTable: null,
-			editTableId: null, // if null, no modal open
+			editTable: null, // if null, no modal open
 			editView: null, // if null, no modal open
 			filterString: '',
 		}
@@ -111,9 +108,7 @@ export default {
 			return this.views.filter((item) => { return item.isShared === true && item.ownership !== getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
 		},
 		getOwnTables() {
-			const x = this.getFilteredTables.filter((item) => { return item.isShared === false || item.ownership === getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
-			console.debug("Table. ",x)
-			return x
+			return this.getFilteredTables.filter((item) => { return item.isShared === false || item.ownership === getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
 		},
 		getFilteredTables() {
 			return this.tables.filter(table => { return table.title.toLowerCase().includes(this.filterString.toLowerCase()) })
@@ -121,13 +116,13 @@ export default {
 	},
 	mounted() {
 		subscribe('create-table', this.createTable)
-		subscribe('edit-table', tableId => { this.editTableId = tableId })
+		subscribe('edit-table', table => { this.editTable = table })
 		subscribe('edit-view', view => { this.editView = view })
 		subscribe('tables:modal:import', table => { this.importTable = table })
 	},
 	beforeDestroy() {
 		unsubscribe('create-table', this.createTable)
-		unsubscribe('edit-table', tableId => { this.editTableId = tableId })
+		unsubscribe('edit-table', table => { this.editTable = table })
 		unsubscribe('edit-view', view => { this.editView = view })
 		unsubscribe('tables:modal:import', table => { this.importTable = table })
 	},
