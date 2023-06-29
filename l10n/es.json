@@ -290,6 +290,7 @@
     "You can set default values by marking the checkboxes next to the label fields." : "Puede definir valores por defecto marcando las casillas de verificación que están junto a los campos de etiqueta.",
     "Allowed pattern (regex)" : "Patrón permitido (regex)",
     "Maximum text length" : "Longitud máxima del texto",
+    "Url" : "URL",
     "Today as default" : "Hoy como por defecto",
     "Yes" : "Sí",
     "No" : "No",

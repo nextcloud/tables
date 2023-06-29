@@ -106,6 +106,7 @@ OC.L10N.register(
     "Options" : "Parinktys",
     "Delete option" : "Ištrinti variantą",
     "Add option" : "Pridėti variantą",
+    "Url" : "Url",
     "Yes" : "Taip",
     "No" : "Ne",
     "Close editor" : "Užverti redaktorių",

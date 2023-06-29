@@ -290,6 +290,7 @@
     "You can set default values by marking the checkboxes next to the label fields." : "Sie können Standardwerte festlegen, indem Sie die Kontrollkästchen neben den Bezeichnungsfeldern markieren.",
     "Allowed pattern (regex)" : "Erlaubtes Muster (regex)",
     "Maximum text length" : "Maximale Textlänge",
+    "Url" : "URL",
     "Today as default" : "Heute als Standard",
     "Yes" : "Ja",
     "No" : "Nein",

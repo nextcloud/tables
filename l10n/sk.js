@@ -152,6 +152,7 @@ OC.L10N.register(
     "Add option" : "Pridajte možnosť",
     "Allowed pattern (regex)" : "Povolený vzor (regulárny výraz)",
     "Maximum text length" : "Maximálna dĺžka textu",
+    "Url" : "URL",
     "Today as default" : "Dnešok ako predvolený",
     "Yes" : "Áno",
     "No" : "Nie",

@@ -117,6 +117,7 @@ OC.L10N.register(
     "Default" : "בררת מחדל",
     "Options" : "אפשרויות",
     "Delete option" : "מחיקת אפשרות",
+    "Url" : "כתובת",
     "Yes" : "כן",
     "No" : "לא",
     "Max" : "מרבי",

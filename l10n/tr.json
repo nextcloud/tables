@@ -290,6 +290,7 @@
     "You can set default values by marking the checkboxes next to the label fields." : "Etiket alanlarının yanındaki işaret kutularına tıklayarak varsayılan değeri ayarlayabilirsiniz.",
     "Allowed pattern (regex)" : "İzin verilen model (kurallı ifade)",
     "Maximum text length" : "En fazla metin uzunluğu",
+    "Url" : "Adres",
     "Today as default" : "Varsayılan olarak bugün",
     "Yes" : "Evet",
     "No" : "Hayır",

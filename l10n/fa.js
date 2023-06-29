@@ -56,6 +56,7 @@ OC.L10N.register(
     "Default" : "پیش‌فرض",
     "Options" : "گزینه‌ها",
     "Delete option" : "گزینه حذف",
+    "Url" : "آدرس",
     "Yes" : "بله",
     "No" : "نه",
     "Confirm" : "تائید",

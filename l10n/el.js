@@ -121,6 +121,7 @@ OC.L10N.register(
     "Add option" : "Προσθήκη επιλογής",
     "Allowed pattern (regex)" : "Επιτρεπόμενο μοτίβο (regex)",
     "Maximum text length" : "Μέγιστο μήκος κειμένου",
+    "Url" : "Url",
     "Today as default" : "Σήμερα ως προεπιλογή",
     "Yes" : "Ναι",
     "No" : "Όχι",

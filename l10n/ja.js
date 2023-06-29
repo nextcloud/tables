@@ -81,6 +81,7 @@ OC.L10N.register(
     "Options" : "オプション",
     "Delete option" : "選択肢を削除",
     "Add option" : "オプションを追加",
+    "Url" : "URL",
     "Yes" : "はい",
     "No" : "いいえ",
     "Max" : "最大",

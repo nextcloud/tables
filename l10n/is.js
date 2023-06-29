@@ -63,6 +63,7 @@ OC.L10N.register(
     "Options" : "Valkostir",
     "Delete option" : "Eyða valkosti",
     "Add option" : "Bæta við valkosti",
+    "Url" : "Slóð (URL)",
     "Yes" : "Já",
     "No" : "Nei",
     "Defaults" : "Sjálfgefin gildi",

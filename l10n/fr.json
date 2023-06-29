@@ -290,6 +290,7 @@
     "You can set default values by marking the checkboxes next to the label fields." : "Vous pouvez définir des valeurs par défaut en cliquant sur les cases à cocher suivant·e·s le champs étiquette.",
     "Allowed pattern (regex)" : "Motif autorisé (regex)",
     "Maximum text length" : "Longueur maximum du texte",
+    "Url" : "URL",
     "Today as default" : "Aujourd'hui par défaut",
     "Yes" : "Oui",
     "No" : "Non",

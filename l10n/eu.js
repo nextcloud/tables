@@ -230,6 +230,7 @@ OC.L10N.register(
     "Second option" : "Bigarren aukera",
     "Allowed pattern (regex)" : "Baimendutako eredua (regex)",
     "Maximum text length" : "Testuaren gehienezko luzera",
+    "Url" : "Url",
     "Today as default" : "Gaur lehenetsi bezala",
     "Yes" : "Bai",
     "No" : "Ez",

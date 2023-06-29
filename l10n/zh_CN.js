@@ -92,6 +92,7 @@ OC.L10N.register(
     "Options" : "选项",
     "Delete option" : "删除选项",
     "Add option" : "添加选项",
+    "Url" : "Url",
     "Yes" : "是",
     "No" : "否",
     "Max" : "最大值",

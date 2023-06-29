@@ -290,6 +290,7 @@ OC.L10N.register(
     "You can set default values by marking the checkboxes next to the label fields." : "Du kannst Standardwerte festlegen, indem du die Kontrollkästchen neben den Bezeichnungsfeldern markierst.",
     "Allowed pattern (regex)" : "Erlaubtes Muster (regex)",
     "Maximum text length" : "Maximale Textlänge",
+    "Url" : "URL",
     "Today as default" : "Heute als Standard",
     "Yes" : "Ja",
     "No" : "Nein",

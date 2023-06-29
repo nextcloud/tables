@@ -292,6 +292,7 @@ OC.L10N.register(
     "You can set default values by marking the checkboxes next to the label fields." : "Výchozí hodnoty je možné nastavit označením zaškrtávacích kolonek vedle kolonek popisků.",
     "Allowed pattern (regex)" : "Vzor umožněného (regulární výraz)",
     "Maximum text length" : "Maximální délka textu",
+    "Url" : "URL adresa",
     "Today as default" : "Dnešek jako výchozí",
     "Yes" : "Ano",
     "No" : "Ne",

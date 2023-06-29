@@ -109,6 +109,7 @@ OC.L10N.register(
     "Click here to unset default selection." : "Prema aquí para anular a selección predeterminada.",
     "First option" : "Primeira opción",
     "Second option" : "Segunda opción",
+    "Url" : "URL",
     "Yes" : "Si",
     "No" : "Non",
     "Max" : "Máx",

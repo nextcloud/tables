@@ -290,6 +290,7 @@
     "You can set default values by marking the checkboxes next to the label fields." : "Обележавањем поља за штиклирање поред ознака поља можете да поставите подразумеване вредности.",
     "Allowed pattern (regex)" : "Шаблон дозвољених (регуларни израз)",
     "Maximum text length" : "Максимална дужина текста",
+    "Url" : "Адреса",
     "Today as default" : "Данас као подразумевано",
     "Yes" : "Да",
     "No" : "Не",

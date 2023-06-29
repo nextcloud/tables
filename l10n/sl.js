@@ -255,6 +255,7 @@ OC.L10N.register(
     "Second option" : "Druga možnost",
     "Allowed pattern (regex)" : "Dovoljen vzorec (logični izraz)",
     "Maximum text length" : "Najdaljša dolžina besedila",
+    "Url" : "Naslov URL",
     "Today as default" : "Današnji dan kot privzeta vrednost",
     "Yes" : "Da",
     "No" : "Ne",
