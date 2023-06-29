@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal" @close="actionCancel">
+	<NcModal v-if="showModal" class="edit-view-modal" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
@@ -8,10 +8,10 @@
 					</h2>
 				</div>
 			</div>
-
 			<div v-if="columns === null" class="icon-loading" />
 
 			<div v-else>
+				<!--title & emoji-->
 				<div class="row space-T">
 					<div class="col-4 mandatory">
 						{{ t('tables', 'Title') }}
@@ -31,6 +31,7 @@
 							:placeholder="t('tables', 'Title of the new view')">
 					</div>
 				</div>
+				<!--columns & order-->
 				<div class="col-4 mandatory">
 					{{ t('tables', 'Columns to be displayed') }}
 				</div>
@@ -52,6 +53,9 @@
 						@update:checked="onToggle(column.id)" />
 					{{ column.title }}
 				</div>
+				<!--filtering-->
+				<FilterForm :filters="view.filter" :columns="columns" />
+				<!--sorting-->
 			</div>
 			<!-- <div class="row">
 				<div class="fix-col-4 space-T" :class="{'justify-between': showDeleteButton, 'end': !showDeleteButton}">
@@ -91,6 +95,7 @@ import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
 import tablePermissions from '../mixins/tablePermissions.js'
 import MenuIcon from 'vue-material-design-icons/Menu.vue'
+import FilterForm from '../partials/filter/FilterForm.vue'
 
 export default {
 	name: 'EditView',
@@ -100,6 +105,7 @@ export default {
 		NcButton,
 		MenuIcon,
 		NcCheckboxRadioSwitch,
+		FilterForm,
 	},
 	mixins: [tablePermissions],
 	props: {
@@ -249,3 +255,11 @@ export default {
 	},
 }
 </script>
+
+<style lang="scss" scoped>
+
+:deep(.modal-container) {
+	min-width: 60% !important;
+}
+
+</style>
