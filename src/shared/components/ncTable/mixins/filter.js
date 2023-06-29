@@ -12,13 +12,14 @@ class BaseFilter {
 
 export class Filter extends BaseFilter {
 
-	constructor({ id, label, goodFor, incompatibleWith, shortLabel = null } = {}) {
+	constructor({ id, label, goodFor, incompatibleWith, shortLabel = null, noSearchValue = false } = {}) {
 		super()
 		this.id = id
 		this.label = label
 		this.shortLabel = shortLabel
 		this.goodFor = goodFor
 		this.incompatibleWith = incompatibleWith
+		this.noSearchValue = noSearchValue
 	}
 
 	getOperatorLabel() {
@@ -102,5 +103,6 @@ export const Filters = {
 		label: t('tables', 'Is empty'),
 		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextRich, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.Number, ColumnTypes.TextLink, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime],
 		incompatibleWith: [FilterIds.Contains, FilterIds.BeginsWith, FilterIds.EndsWith, FilterIds.IsEqual, FilterIds.IsGreaterThan, FilterIds.IsGreaterThanOrEqual, FilterIds.IsLowerThan, FilterIds.IsLowerThanOrEqual, FilterIds.IsEmpty],
+		noSearchValue: true,
 	}),
 }

@@ -24,6 +24,10 @@ class MagicField extends BaseMagicField {
 
 }
 
+export function getMagicFieldWithId(id) {
+	return Object.values(MagicFields).find(mf => mf.id === id)
+}
+
 export const MagicFields = {
 	Me: new MagicField({
 		id: 'me',

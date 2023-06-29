@@ -11,8 +11,7 @@
 
 <script>
 import { NcRichContenteditable } from '@nextcloud/vue'
-import { MagicFields } from '../../../../shared/components/ncTable/mixins/magicFields.js'
-
+import { MagicFields } from '../../../../../shared/components/ncTable/mixins/magicFields.js'
 
 export default {
 	name: 'FilterValueField',
