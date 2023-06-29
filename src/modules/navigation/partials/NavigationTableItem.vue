@@ -30,7 +30,7 @@
 			<NcActionButton v-if="canManageElement(table)"
 				icon="icon-rename"
 				:close-after-click="true"
-				@click="$emit('edit-table', table.id)">
+				@click="editTable">
 				{{ t('tables', 'Edit table') }}
 			</NcActionButton>
 			<NcActionButton v-if="canShareElement(table)"
@@ -64,8 +64,7 @@
 		</template>
 		<NavigationViewItem v-for="view in getViews"
 			:key="'view'+view.id"
-			:view="view"
-			@edit-view="id => editViewId = id" />
+			:view="view" />
 		<DialogConfirmation :description="getTranslatedDescription"
 			:title="t('tables', 'Confirm table deletion')"
 			:cancel-title="t('tables', 'Cancel')"
@@ -182,6 +181,9 @@ export default {
 				}
 				this.showDeletionConfirmation = false
 			}
+		},
+		editTable() {
+			emit('edit-table', this.table)
 		},
 	},
 

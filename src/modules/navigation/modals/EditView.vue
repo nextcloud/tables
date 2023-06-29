@@ -94,7 +94,6 @@ export default {
 	},
 	methods: {
 		actionCancel() {
-			this.reset()
 			this.$emit('close')
 		},
 		async submit() {
@@ -110,10 +109,12 @@ export default {
 			}
 		},
 		reset() {
-			this.title = this.view.title
-			this.icon = this.view.emoji
-			this.errorTitle = false
-			this.prepareDelete = false
+			if (this.view) {
+				this.title = this.view.title
+				this.icon = this.view.emoji
+				this.errorTitle = false
+				this.prepareDelete = false
+			}
 		},
 		async actionDeleteView() {
 			const deleteId = this.view.id

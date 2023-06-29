@@ -65,8 +65,8 @@ export default {
 			type: Boolean,
 			default: false,
 		},
-		tableId: {
-			type: Number,
+		table: {
+			type: Object,
 			default: null,
 		},
 	},
@@ -79,7 +79,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['getTable', 'activeTable']),
+		...mapGetters(['activeTable']),
 	},
 	watch: {
 		title() {
@@ -88,12 +88,8 @@ export default {
 				this.title = this.title.slice(0, 199)
 			}
 		},
-		tableId() {
-			if (this.tableId) {
-				const table = this.getTable(this.tableId)
-				this.title = table.title
-				this.icon = table.emoji
-			}
+		table() {
+			this.reset()
 		},
 	},
 	methods: {
@@ -106,7 +102,7 @@ export default {
 				showError(t('tables', 'Cannot update table. Title is missing.'))
 				this.errorTitle = true
 			} else {
-				const res = await this.$store.dispatch('updateTable', { id: this.tableId, data: { title: this.title, emoji: this.icon } })
+				const res = await this.$store.dispatch('updateTable', { id: this.table.id, data: { title: this.title, emoji: this.icon } })
 				if (res) {
 					showSuccess(t('tables', 'Updated table "{emoji}{table}".', { emoji: this.icon ? this.icon + ' ' : '', table: this.title }))
 					this.actionCancel()
@@ -114,17 +110,19 @@ export default {
 			}
 		},
 		reset() {
-			this.title = ''
-			this.errorTitle = false
-			this.templateChoice = 'custom'
-			this.icon = ''
-			this.prepareDeleteTable = false
+			if (this.table) {
+				this.title = this.table.title
+				this.icon = this.table.emoji
+				this.errorTitle = false
+				this.templateChoice = 'custom'
+				this.prepareDeleteTable = false
+			}
 		},
 		async actionDeleteTable() {
-			const deleteId = this.tableId
+			const deleteId = this.table.id
 			const activeTableId = this.activeTable.id
 			this.prepareDeleteTable = false
-			const res = await this.$store.dispatch('removeTable', { tableId: this.tableId })
+			const res = await this.$store.dispatch('removeTable', { tableId: this.table.id })
 			if (res) {
 				showSuccess(t('tables', 'Table "{emoji}{table}" removed.', { emoji: this.icon ? this.icon + ' ' : '', table: this.title }))
 

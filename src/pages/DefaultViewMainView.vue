@@ -58,6 +58,7 @@ import EditColumns from '../modules/main/modals/EditColumns.vue'
 import DeleteRows from '../modules/main/modals/DeleteRows.vue'
 import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
 import { emit } from '@nextcloud/event-bus'
+import { parseCol } from '../shared/components/ncTable/mixins/columnParser.js'
 
 export default {
 	name: 'DefaultViewMainView',
@@ -88,7 +89,7 @@ export default {
 	},
 	computed: {
 		...mapState({
-			columns: state => state.data.columns,
+			columns: state => state.data.columns.map(col => parseCol(col)),
 			loading: state => state.data.loading,
 			rows: state => state.data.rows,
 			viewSetting: state => state.data.viewSetting,
