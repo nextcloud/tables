@@ -256,6 +256,7 @@ OC.L10N.register(
     "You can set default values by marking the checkboxes next to the label fields." : "Du kan ställa in standardvärden genom att markera kryssrutorna bredvid etikettfälten.",
     "Allowed pattern (regex)" : "Tillåtet mönster (regex)",
     "Maximum text length" : "Maximal textlängd",
+    "Allowed types" : "Tillåtna typer",
     "Url" : "Webbadress",
     "Today as default" : "Idag som standard",
     "Yes" : "Ja",
