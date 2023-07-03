@@ -169,7 +169,12 @@ class RowMapper extends QBMapper {
 				continue;
 			}
 			$sortColumnPlaceholder = 'sortColumn'.$index;
-			$qb->addOrderBy($qb->createFunction('JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'$[*].columnId\'), \'one\', :'.$sortColumnPlaceholder.')), \'.value\'))'),$sortMode);
+			$orderString = 'JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'$[*].columnId\'), \'one\', :'.$sortColumnPlaceholder.')), \'.value\'))';
+			if (str_starts_with($sortRule['columnType'],'number')) {
+				$orderString = 'CAST('.$orderString.' as int)';
+				//TODO: Better solution?
+			}
+			$qb->addOrderBy($qb->createFunction($orderString),$sortMode);
 			$qb->setParameter($sortColumnPlaceholder,$sortRule['columnId'], $qb::PARAM_INT);
 		}
 	}
@@ -190,6 +195,7 @@ class RowMapper extends QBMapper {
 		$neededColumnIds = $this->getAllColumnIdsFromView($view);
 		$neededColumns = $this->columnMapper->getColumnTypes($neededColumnIds);
 		$enrichedFilters = $view->getFilterArray();
+		$enrichedSort = $view->getSortArray();
 		if (count($enrichedFilters) > 0) {
 			foreach ($enrichedFilters as &$filterGroup) {
 				foreach ($filterGroup as &$filter) {
@@ -207,7 +213,11 @@ class RowMapper extends QBMapper {
 		}
 
 		// Sorting
-		$this->addOrderByRules($qb, $view->getSortArray());
+
+		foreach ($enrichedSort as &$sort) {
+			$sort['columnType'] = $neededColumns[$sort['columnId']];
+		}
+		$this->addOrderByRules($qb, $enrichedSort);
 
 		if ($limit !== null) {
 			$qb->setMaxResults($limit);
@@ -221,10 +231,14 @@ class RowMapper extends QBMapper {
 	private function getAllColumnIdsFromView(View $view): array {
 		$neededColumnIds = [];
 		$filters = $view->getFilterArray();
+		$sorts = $view->getSortArray();
 		foreach ($filters as $filterGroup) {
 			foreach ($filterGroup as $filter) {
 				$neededColumnIds[] = $filter['columnId'];
 			}
+		}
+		foreach ($sorts as $sortRule) {
+			$neededColumnIds[] = $sortRule['columnId'];
 		}
 		// TODO add sorting ids
 		return array_unique($neededColumnIds);
