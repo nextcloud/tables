@@ -1,31 +1,33 @@
 <template>
 	<div class="filter-entry">
-		<NcSelect
-			v-model="selectedColumn"
-			class="select-field"
-			:options="columns"
-			:get-option-key="(option) => option.id"
-			:placeholder="t('tables', 'Column')"
-			label="title" />
-		<NcSelect
-			v-model="selectedOperator"
-			class="select-field"
-			:options="operatorArray"
-			:get-option-key="(option) => option.id"
-			:placeholder="t('tables', 'Operator')"
-			label="label" />
-		<NcSelect
-			v-if="selectedOperator && !selectedOperator.noSearchValue"
-			v-model="searchValue"
-			class="select-field"
-			:options="magicFieldsArray"
-			:placeholder="t('tables', 'Search Value')"
-			@search="v => term = v" />
-		<!-- <FilterValueField
-			:search-string="filterEntry.value" /> -->
+		<div class="selection-fields">
+			<NcSelect
+				v-model="selectedColumn"
+				class="select-field"
+				:options="columns"
+				:get-option-key="(option) => option.id"
+				:placeholder="t('tables', 'Column')"
+				label="title" />
+			<NcSelect
+				v-if="selectedColumn"
+				v-model="selectedOperator"
+				class="select-field"
+				:options="operatorArray"
+				:get-option-key="(option) => option.id"
+				:placeholder="t('tables', 'Operator')"
+				label="label" />
+			<NcSelect
+				v-if="selectedOperator && !selectedOperator.noSearchValue"
+				v-model="searchValue"
+				class="select-field"
+				:options="magicFieldsArray"
+				:placeholder="valuePlaceHolder"
+				@search="v => term = v" />
+		</div>
 		<NcButton
 			:close-after-click="true"
 			type="tertiary"
+			class="delete-button"
 			@click="$emit('delete-filter')">
 			<template #icon>
 				<Delete :size="25" />
@@ -38,8 +40,8 @@
 import { NcButton, NcSelect } from '@nextcloud/vue'
 import { getFilterWithId } from '../../../../../shared/components/ncTable/mixins/filter.js'
 import { getMagicFieldWithId } from '../../../../../shared/components/ncTable/mixins/magicFields.js'
-import FilterValueField from './FilterValueField.vue'
 import Delete from 'vue-material-design-icons/Delete.vue'
+import { ColumnTypes } from '../../../../../shared/components/ncTable/mixins/columnHandler.js'
 
 export default {
 	name: 'FilterEntry',
@@ -47,7 +49,6 @@ export default {
 		NcSelect,
 		NcButton,
 		Delete,
-		FilterValueField,
 	},
 	props: {
 		filterEntry: {
@@ -86,6 +87,16 @@ export default {
 				return []
 			}
 		},
+		valuePlaceHolder() {
+			if (this.selectedColumn.type === ColumnTypes.Datetime) {
+				return t('tables', 'JJJJ-MM-DD hh:mm')
+			} else if (this.selectedColumn.type === ColumnTypes.DatetimeDate) {
+				return t('tables', 'JJJJ-MM-DD')
+			} else if (this.selectedColumn.type === ColumnTypes.DatetimeTime) {
+				return t('tables', 'hh:mm')
+			}
+			return t('tables', 'Search Value')
+		},
 	},
 	watch: {
 		selectedColumn() {
@@ -106,7 +117,7 @@ export default {
 		},
 		searchValue() {
 			if (this.searchValue) {
-				this.mutableFilterEntry.value = typeof this.searchValue === 'object' ? this.searchValue.id : this.searchValue
+				this.mutableFilterEntry.value = typeof this.searchValue === 'object' ? '@' + this.searchValue.id : this.searchValue
 			} else {
 				this.mutableFilterEntry.value = undefined
 			}
@@ -123,7 +134,7 @@ export default {
 		reset() {
 			this.selectedColumn = this.columns.find(col => col.id === this.filterEntry.columnId)
 			this.selectedOperator = getFilterWithId(this.filterEntry.operator)
-			this.searchValue = getMagicFieldWithId(this.filterEntry.value) ?? this.filterEntry.value
+			this.searchValue = this.filterEntry.value && this.filterEntry.value.startsWith('@') ? getMagicFieldWithId(this.filterEntry.value.substring(1)) : this.filterEntry.value
 		},
 	},
 }
@@ -131,13 +142,23 @@ export default {
 
 <style>
 .filter-entry {
-	display: flex
+	display: flex;
+	justify-content: space-between;
 }
 
 .select-field {
 	width: 30%;
+	/* flex: 1; */
 	padding: 8px;
 	min-width: auto !important;
+}
+
+.selection-fields {
+	flex: 1;
+	display: flex;
+}
+.delete-button {
+	margin-left: auto;
 }
 
 </style>

@@ -1,81 +1,71 @@
 <template>
-	<NcModal v-if="showModal" class="edit-view-modal" @close="actionCancel">
-		<div class="modal__content">
-			<div class="row">
-				<div class="col-4">
-					<h2 style="padding: 0">
-						{{ t('tables', 'Edit view') }}
-					</h2>
-				</div>
-			</div>
-			<div v-if="columns === null" class="icon-loading" />
-
-			<div v-else>
-				<!--title & emoji-->
-				<div class="row space-T">
-					<div class="col-4 mandatory">
-						{{ t('tables', 'Title') }}
-					</div>
-					<div class="col-4" style="display: inline-flex;">
-						<NcEmojiPicker :close-on-select="true" @select="setIcon">
-							<NcButton type="tertiary"
-								:aria-label="t('tables', 'Select emoji for view')"
-								:title="t('tables', 'Select emoji')"
-								@click.prevent>
-								{{ icon }}
-							</NcButton>
-						</NcEmojiPicker>
-						<input v-model="title"
-							:class="{missing: errorTitle}"
-							type="text"
-							:placeholder="t('tables', 'Title of the new view')">
-					</div>
-				</div>
-				<!--columns & order-->
-				<div class="row space-T">
-					<SelectedViewColumns
-						:columns="columns"
-						:selected-columns="selectedColumns" />
-				</div>
-				<!--filtering-->
-				<div class="row space-T">
-					<FilterForm :filters="view.filter" :columns="columns" />
-				</div>
-				<!--sorting-->
-			</div>
-			<!-- <div class="row">
-				<div class="fix-col-4 space-T" :class="{'justify-between': showDeleteButton, 'end': !showDeleteButton}">
-					<div v-if="showDeleteButton">
-						<NcButton v-if="!prepareDeleteRow" type="error" @click="prepareDeleteRow = true">
-							{{ t('tables', 'Delete') }}
-						</NcButton>
-						<NcButton v-if="prepareDeleteRow"
-							:wide="true"
-							type="error"
-							@click="actionDeleteView">
-							{{ t('tables', 'I really want to delete this view!') }}
-						</NcButton>
-					</div>
-					<NcButton v-if="canUpdateDataActiveTable && !localLoading" type="primary" @click="actionConfirm">
-						{{ t('tables', 'Save') }}
+	<NcAppSettingsDialog :open.sync="open" :show-navigation="true" :title="t('tables', 'Edit view')">
+		<NcAppSettingsSection v-if="columns === null" id="loading" :title="t('tables', 'Loading')">
+			<div class="icon-loading" />
+		</NcAppSettingsSection>
+		<!--title & emoji-->
+		<NcAppSettingsSection v-if="columns != null" id="title" :title="t('tables', 'Title')">
+			<div class="col-4" style="display: inline-flex;">
+				<NcEmojiPicker :close-on-select="true" @select="setIcon">
+					<NcButton type="tertiary"
+						:aria-label="t('tables', 'Select emoji for view')"
+						:title="t('tables', 'Select emoji')"
+						@click.prevent>
+						{{ icon }}
 					</NcButton>
-					<div v-if="localLoading" class="icon-loading" style="margin-left: 20px;" />
+				</NcEmojiPicker>
+				<input v-model="title"
+					:class="{missing: errorTitle}"
+					type="text"
+					:placeholder="t('tables', 'Title of the new view')">
+			</div>
+		</NcAppSettingsSection>
+		<!--columns & order-->
+		<NcAppSettingsSection v-if="columns != null" id="columns-and-order" :title="t('tables', 'Columns')">
+			<SelectedViewColumns
+				:columns="columns"
+				:selected-columns="selectedColumns" />
+		</NcAppSettingsSection>
+		<!--filtering-->
+		<NcAppSettingsSection v-if="columns != null" id="filter" :title="t('tables', 'Filter')">
+			<FilterForm :filters="view.filter" :columns="columns" />
+		</NcAppSettingsSection>
+		<!--sorting-->
+		<NcAppSettingsSection v-if="columns != null" id="sort" :title="t('tables', 'Sort')">
+			Sorting
+		</NcAppSettingsSection>
+		<!-- <div class="row">
+			<div class="fix-col-4 space-T" :class="{'justify-between': showDeleteButton, 'end': !showDeleteButton}">
+				<div v-if="showDeleteButton">
+					<NcButton v-if="!prepareDeleteRow" type="error" @click="prepareDeleteRow = true">
+						{{ t('tables', 'Delete') }}
+					</NcButton>
+					<NcButton v-if="prepareDeleteRow"
+						:wide="true"
+						type="error"
+						@click="actionDeleteView">
+						{{ t('tables', 'I really want to delete this view!') }}
+					</NcButton>
 				</div>
-			</div> -->
+				<NcButton v-if="canUpdateDataActiveTable && !localLoading" type="primary" @click="actionConfirm">
+					{{ t('tables', 'Save') }}
+				</NcButton>
+				<div v-if="localLoading" class="icon-loading" style="margin-left: 20px;" />
+			</div>
+		</div> -->
 
-			<div class="row">
-				<div class="fix-col-4 space-T end">
-					<button v-if="!localLoading" class="primary" :aria-label="t('tables', 'Save View')" @click="actionConfirm()">
-						{{ t('tables', 'Save') }}
-					</button>
-				</div>
+		<div class="row">
+			<div class="fix-col-4 space-T end">
+				<button v-if="!localLoading" class="primary" :aria-label="t('tables', 'Save View')" @click="actionConfirm()">
+					{{ t('tables', 'Save') }}
+				</button>
 			</div>
 		</div>
-	</NcModal>
+	</NcAppSettingsDialog>
 </template>
 
 <script>
-import { NcModal, NcEmojiPicker, NcButton } from '@nextcloud/vue'
+import { NcAppSettingsDialog, NcAppSettingsSection, NcEmojiPicker, NcButton } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
@@ -86,7 +76,8 @@ import SelectedViewColumns from '../partials/editViewPartials/SelectedViewColumn
 export default {
 	name: 'EditView',
 	components: {
-		NcModal,
+		NcAppSettingsDialog,
+		NcAppSettingsSection,
 		NcEmojiPicker,
 		NcButton,
 		FilterForm,
@@ -105,6 +96,7 @@ export default {
 	},
 	data() {
 		return {
+			open: false,
 			title: '',
 			icon: '',
 			errorTitle: false,
@@ -130,9 +122,17 @@ export default {
 				this.title = this.title.slice(0, 199)
 			}
 		},
-		async showModal() {
-			this.reset()
-			await this.loadTableColumnsFromBE()
+		async showModal(value) {
+			if (value) {
+				this.reset()
+				await this.loadTableColumnsFromBE()
+				this.open = true
+			}
+		},
+		open(value) {
+			if (!value) {
+				this.$emit('close')
+			}
 		},
 	},
 	methods: {
@@ -141,7 +141,7 @@ export default {
 		},
 		actionCancel() {
 			this.reset()
-			this.$emit('close')
+			this.open = false
 		},
 		async loadTableColumnsFromBE() {
 			this.columns = await this.$store.dispatch('getColumnsFromBE', { tableId: this.view.tableId })
@@ -206,8 +206,14 @@ export default {
 
 <style lang="scss" scoped>
 
-:deep(.modal-container) {
-	min-width: 60% !important;
+:deep(.app-settings__navigation) {
+	margin-right: 0;
+	min-width: auto;
 }
 
+:deep(.app-settings__content) {
+	width: auto;
+	flex: 1;
+	padding: calc(var(--default-grid-baseline) * 2);
+}
 </style>

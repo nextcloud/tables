@@ -1,8 +1,5 @@
 <template>
 	<div class="selected-columns-wrapper">
-		<div class="col-4 mandatory">
-			{{ t('tables', 'Columns to be displayed') }}
-		</div>
 		<div v-for="(column, index) in columns" :key="column.id" :draggable="true"
 			style="display: flex; align-items: center;" @dragstart="dragStart(index)"
 			@dragover="dragOver(index)" @dragend="dragEnd(index)">

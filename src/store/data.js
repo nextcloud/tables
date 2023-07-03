@@ -140,7 +140,7 @@ export default {
 			}
 
 			const columns = state.columns
-			columns.push(res.data)
+			columns.push(parseCol(res.data))
 			commit('setColumns', columns)
 
 			commit('setLoading', false)

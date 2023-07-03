@@ -55,10 +55,10 @@ class RowService extends SuperService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function findAllByView(int $viewId, ?int $limit = null, ?int $offset = null): array {
+	public function findAllByView(int $viewId, string $userId, ?int $limit = null, ?int $offset = null): array {
 		try {
 			if ($this->permissionsService->canReadRowsByElementId($viewId, 'view')) {
-				return $this->mapper->findAllByView($this->viewMapper->find($viewId), $limit, $offset);
+				return $this->mapper->findAllByView($this->viewMapper->find($viewId), $userId, $limit, $offset);
 			} else {
 				throw new PermissionError('no read access to view id = '.$viewId);
 			}
