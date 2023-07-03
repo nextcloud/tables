@@ -162,6 +162,18 @@ class RowMapper extends QBMapper {
 		}
 	}
 
+	private function addOrderByRules(IQueryBuilder &$qb, $sortArray) {
+		foreach ($sortArray as $index=>$sortRule) {
+			$sortMode = $sortRule['mode'];
+			if (!in_array($sortMode, ['ASC', 'DESC'])) {
+				continue;
+			}
+			$sortColumnPlaceholder = 'sortColumn'.$index;
+			$qb->addOrderBy($qb->createFunction('JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'$[*].columnId\'), \'one\', :'.$sortColumnPlaceholder.')), \'.value\'))'),$sortMode);
+			$qb->setParameter($sortColumnPlaceholder,$sortRule['columnId'], $qb::PARAM_INT);
+		}
+	}
+
 	/**
 	 * @param View $viewrows
 	 * @param int|null $limit
@@ -173,7 +185,7 @@ class RowMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
-			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId())));
+			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), $qb::PARAM_INT)));
 
 		$neededColumnIds = $this->getAllColumnIdsFromView($view);
 		$neededColumns = $this->columnMapper->getColumnTypes($neededColumnIds);
@@ -193,6 +205,9 @@ class RowMapper extends QBMapper {
 				)
 			);
 		}
+
+		// Sorting
+		$this->addOrderByRules($qb, $view->getSortArray());
 
 		if ($limit !== null) {
 			$qb->setMaxResults($limit);
