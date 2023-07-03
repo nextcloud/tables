@@ -39,7 +39,7 @@ class RowController extends Controller {
 	 */
 	public function indexView(int $viewId): DataResponse {
 		return $this->handleError(function () use ($viewId) {
-			return $this->service->findAllByView($viewId);
+			return $this->service->findAllByView($viewId, $this->userId);
 		});
 	}
 

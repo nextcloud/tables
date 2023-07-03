@@ -8,6 +8,7 @@ use OCA\Tables\Db\ColumnTypes\NumberColumnQB;
 use OCA\Tables\Db\ColumnTypes\SelectionColumnQB;
 use OCA\Tables\Db\ColumnTypes\SuperColumnQB;
 use OCA\Tables\Db\ColumnTypes\TextColumnQB;
+use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Service\ColumnTypes\TextLineBusiness;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -30,8 +31,9 @@ class RowMapper extends QBMapper {
 	protected SuperColumnQB $genericColumnQB;
 	protected ColumnMapper $columnMapper;
 	protected LoggerInterface $logger;
+	protected UserHelper $userHelper;
 
-	public function __construct(IDBConnection $db, LoggerInterface $logger, TextColumnQB $textColumnQB, SelectionColumnQB $selectionColumnQB, NumberColumnQB $numberColumnQB, DatetimeColumnQB $datetimeColumnQB, SuperColumnQB $columnQB, ColumnMapper $columnMapper) {
+	public function __construct(IDBConnection $db, LoggerInterface $logger, TextColumnQB $textColumnQB, SelectionColumnQB $selectionColumnQB, NumberColumnQB $numberColumnQB, DatetimeColumnQB $datetimeColumnQB, SuperColumnQB $columnQB, ColumnMapper $columnMapper, UserHelper $userHelper) {
 		parent::__construct($db, $this->table, Row::class);
 		$this->logger = $logger;
 		$this->textColumnQB = $textColumnQB;
@@ -40,6 +42,7 @@ class RowMapper extends QBMapper {
 		$this->datetimeColumnQB= $datetimeColumnQB;
 		$this->genericColumnQB = $columnQB;
 		$this->columnMapper = $columnMapper;
+		$this->userHelper = $userHelper;
 		$this->setPlatform();
 	}
 
@@ -104,7 +107,7 @@ class RowMapper extends QBMapper {
 		return $this->findEntities($qb);
 	}
 
-	private function buildFilterByColumnType(&$qb, array $filter): string {
+	private function buildFilterByColumnType(&$qb, array $filter, string $filterId): string {
 		try {
 			$qbClassName = 'OCA\Tables\Db\ColumnTypes\\';
 			$type = explode("-", $filter['columnType'])[0];
@@ -112,28 +115,51 @@ class RowMapper extends QBMapper {
 			$qbClassName .= ucfirst($type).'ColumnQB';
 
 			$qbClass = Server::get($qbClassName);
-			return $qbClass->addWhereFilterExpression($qb, $filter);
+			return $qbClass->addWhereFilterExpression($qb, $filter, $filterId);
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 			$this->logger->debug('Column type query builder class not found');
 		}
 		return '';
 	}
 
-	private function getInnerFilterExpressions(&$qb, $filterGroup): array {
+	private function getInnerFilterExpressions(&$qb, $filterGroup, int $groupIndex): array {
 		$innerFilterExpressions = [];
-		foreach ($filterGroup as $filter) {
-			$innerFilterExpressions[] =  $this->buildFilterByColumnType($qb, $filter);
-			//$innerFilterExpressions[] =  $qb->createFunction('1=1');
+		foreach ($filterGroup as $index=>$filter) {
+			$innerFilterExpressions[] =  $this->buildFilterByColumnType($qb, $filter, $groupIndex.$index);
 		}
 		return $innerFilterExpressions;
 	}
 
 	private function getFilterGroups(&$qb, $filters): array {
 		$filterGroups = [];
-		foreach ($filters as $filterGroup) {
-			$filterGroups[] = $qb->expr()->andX(...$this->getInnerFilterExpressions($qb, $filterGroup));
+		foreach ($filters as $groupIndex=>$filterGroup) {
+			$filterGroups[] = $qb->expr()->andX(...$this->getInnerFilterExpressions($qb, $filterGroup, $groupIndex));
 		}
 		return $filterGroups;
+	}
+
+	private function resolveSearchValue(string $unresolvedSearchValue, string $userId): string {
+		switch (ltrim($unresolvedSearchValue, '@')) {
+			case 'me': return $userId;
+			case 'my-name': return $this->userHelper->getUserDisplayName($userId);
+			case 'checked': return 'true';
+			case 'unchecked': return 'false';
+			case 'stars-0': return '0';
+			case 'stars-1': return '1';
+			case 'stars-2': return '2';
+			case 'stars-3': return '3';
+			case 'stars-4': return '4';
+			case 'stars-5': return '5';
+			case 'datetime-date-today': return date('Y-m-d');
+			case 'datetime-date-start-of-year': return date('Y-01-01');
+			case 'datetime-date-start-of-month': return date('Y-m-01');
+			case 'datetime-date-start-of-week':
+				$day = date('w');
+				return date('m-d-Y', strtotime('-'.$day.' days'));
+			case 'datetime-time-now': return date('H:i');
+			case 'datetime-now': return date('Y-m-d H:i');
+			default: return $unresolvedSearchValue;
+		}
 	}
 
 	/**
@@ -143,7 +169,7 @@ class RowMapper extends QBMapper {
 	 * @return array
 	 * @throws Exception
 	 */
-	public function findAllByView(View $view, ?int $limit = null, ?int $offset = null): array {
+	public function findAllByView(View $view, string $userId, ?int $limit = null, ?int $offset = null): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
@@ -156,7 +182,9 @@ class RowMapper extends QBMapper {
 			foreach ($enrichedFilters as &$filterGroup) {
 				foreach ($filterGroup as &$filter) {
 					$filter['columnType'] = $neededColumns[$filter['columnId']];
-
+					if(str_starts_with($filter['value'], '@')) {
+						$filter['value'] = $this->resolveSearchValue($filter['value'], $userId);
+					}
 				}
 			}
 			$qb->andWhere(

@@ -493,7 +493,7 @@ class Api1Controller extends ApiController {
 	 */
 	public function indexViewRows(int $viewId, ?int $limit, ?int $offset): DataResponse {
 		return $this->handleError(function () use ($viewId, $limit, $offset) {
-			return $this->rowService->findAllByView($viewId, $limit, $offset);
+			return $this->rowService->findAllByView($viewId, $this->userId, $limit, $offset);
 		});
 	}
 

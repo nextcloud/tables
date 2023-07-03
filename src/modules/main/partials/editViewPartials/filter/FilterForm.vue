@@ -1,19 +1,19 @@
 <template>
-	<div>
-		<div class="col-4 mandatory">
+	<div class="filter-section">
+		<div class="filter-text">
 			{{ t('tables', 'Filtering rows') }}
 		</div>
 		<div v-for="(filterGroup, i) in filters" :key="i">
-			{{ t('tables', 'Group') }} {{ i + 1 }}
+			<!-- {{ t('tables', 'Group') }} {{ i + 1 }} -->
 			<FilterGroup
 				:filter-group="filterGroup"
 				:columns="columns"
 				@delete-filter-group="deleteFilterGroup(i)" />
-			<div v-if="i < filters.length - 1">
+			<div v-if="i < filters.length - 1" class="filter-text">
 				{{ t('tables', 'OR') }}
 			</div>
 		</div>
-		<div v-if="filters.length > 0">
+		<div v-if="filters.length > 0" class="filter-text">
 			{{ t('tables', 'OR') }}
 		</div>
 		<NcButton
@@ -70,5 +70,13 @@ export default {
 </script>
 
 <style scoped>
+.filter-section {
+	display: flex;
+	flex-direction: column;
+}
+.filter-text {
+	padding-top: 8px;
+	padding-bottom: 8px;
+}
 
 </style>

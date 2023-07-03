@@ -1,5 +1,8 @@
 <template>
-	<div>
+	<div class="filter-group">
+		<div class="group-text">
+			{{ t('tables', '... that meet all of the following conditions') }}
+		</div>
 		<div v-for="(filter, index) in filterGroup"
 			:key="filter.columnId + filter.operator + filter.value + index">
 			<FilterEntry
@@ -68,3 +71,14 @@ export default {
 	},
 }
 </script>
+
+<style>
+
+.group-text {
+	padding-left: calc(var(--default-grid-baseline) * 2);
+}
+.filter-group {
+	border-left: 6px solid var(--color-primary) !important;
+	padding-left: calc(var(--default-grid-baseline) * 2);
+}
+</style>
