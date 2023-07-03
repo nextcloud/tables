@@ -32,7 +32,7 @@
 		</NcAppSettingsSection>
 		<!--sorting-->
 		<NcAppSettingsSection v-if="columns != null" id="sort" :title="t('tables', 'Sort')">
-			Sorting
+			<SortForm :sort="view.sort" :columns="columns" />
 		</NcAppSettingsSection>
 		<!-- <div class="row">
 			<div class="fix-col-4 space-T" :class="{'justify-between': showDeleteButton, 'end': !showDeleteButton}">
@@ -71,6 +71,7 @@ import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
 import tablePermissions from '../mixins/tablePermissions.js'
 import FilterForm from '../partials/editViewPartials/filter/FilterForm.vue'
+import SortForm from '../partials/editViewPartials/sort/SortForm.vue'
 import SelectedViewColumns from '../partials/editViewPartials/SelectedViewColumns.vue'
 
 export default {
@@ -82,6 +83,7 @@ export default {
 		NcButton,
 		FilterForm,
 		SelectedViewColumns,
+		SortForm,
 	},
 	mixins: [tablePermissions],
 	props: {
@@ -180,6 +182,7 @@ export default {
 					emoji: this.icon,
 					columns: JSON.stringify(newSelectedColumnIds),
 					filter: JSON.stringify(this.view.filter),
+					sort: JSON.stringify(this.view.sort),
 				},
 			}
 			const res = await this.$store.dispatch('updateView', { id, data })
