@@ -83,6 +83,7 @@ OC.L10N.register(
     "Could not remove share." : "تعذر نقل/ إزالة المشاركة.",
     "Could not update share." : "تعذر تحديث المشاركة.",
     "Is empty" : "فارغ",
+    "Unchecked" : "لم يتم التحقق منه",
     "Request is not authorized. Are you logged in?" : "طلب غير مصرح به. هل قمت بتسجيل الدخول؟",
     "Request not allowed." : "الطلب غير مسموح به.",
     "Resource not found." : "تعذّر العثور على المصدر.",
