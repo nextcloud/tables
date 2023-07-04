@@ -46,7 +46,6 @@ export default {
 	},
 	methods: {
 		deleteSortingRule(index) {
-			console.debug('Delete sorting rule at index ', index)
 			this.mutableSort.splice(index, 1)
 		},
 		addSortingRule() {
