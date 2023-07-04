@@ -119,7 +119,7 @@ export default {
 			if (this.searchValue) {
 				this.mutableFilterEntry.value = typeof this.searchValue === 'object' ? '@' + this.searchValue.id : this.searchValue
 			} else {
-				this.mutableFilterEntry.value = undefined
+				this.mutableFilterEntry.value = ''
 			}
 		},
 	},

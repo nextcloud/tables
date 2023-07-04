@@ -177,13 +177,17 @@ export default {
 		},
 		async updateViewToBE(id) {
 			const newSelectedColumnIds = this.columns.map(col => col.id).filter(id => this.selectedColumns.includes(id))
+			const filteredSortingRules = this.view.sort.filter(sortRule => sortRule.columnId !== undefined)
+			const filteredFilteringRules = this.view.filter.map(filterGroup =>
+				filterGroup.filter(fil => fil.columnId !== undefined && fil.operator !== undefined)).filter(filterGroup => filterGroup.length > 0)
+
 			const data = {
 				data: {
 					title: this.title,
 					emoji: this.icon,
 					columns: JSON.stringify(newSelectedColumnIds),
-					filter: JSON.stringify(this.view.filter),
-					sort: JSON.stringify(this.view.sort),
+					filter: JSON.stringify(filteredFilteringRules),
+					sort: JSON.stringify(filteredSortingRules),
 				},
 			}
 			const res = await this.$store.dispatch('updateView', { id, data })
