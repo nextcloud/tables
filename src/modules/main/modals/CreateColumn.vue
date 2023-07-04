@@ -11,6 +11,7 @@
 						:mandatory.sync="mandatory"
 						:order-weight.sync="orderWeight"
 						:title.sync="title"
+						:selected-views.sync="selectedViews"
 						:title-missing-error="titleMissingError" />
 				</div>
 				<div class="fix-col-2" style="display: block">
@@ -184,6 +185,7 @@ export default {
 			numberPrefix: '',
 			numberSuffix: '',
 			orderWeight: 0,
+			selectedViews: [],
 			mandatory: false,
 			numberDefault: null,
 			numberMin: 0,
@@ -285,6 +287,7 @@ export default {
 					numberPrefix: this.numberPrefix,
 					numberSuffix: this.numberSuffix,
 					orderWeight: this.orderWeight,
+					selectedViewIds: this.selectedViews.map(view => view.id),
 					mandatory: this.mandatory,
 					numberDefault: this.numberDefault,
 					numberMin: this.numberMin,
@@ -297,6 +300,7 @@ export default {
 					selectionDefault: this.selectionDefault,
 					datetimeDefault: this.datetimeDefault,
 					tableId: this.activeView.tableId,
+					viewId: this.activeView.id,
 				}
 				const res = this.$store.dispatch('insertNewColumn', { data })
 				if (res) {
@@ -318,6 +322,7 @@ export default {
 			this.numberPrefix = null
 			this.numberSuffix = null
 			this.orderWeight = 0
+			this.selectedViews = []
 			this.mandatory = false
 			this.numberDefault = null
 			this.numberMin = 0

@@ -63,6 +63,7 @@ class ColumnController extends Controller {
 		?string $description,
 		?int $orderWeight,
 
+
 		?string $textDefault,
 		?string $textAllowedPattern,
 		?int $textMaxLength,
@@ -77,7 +78,10 @@ class ColumnController extends Controller {
 		?string $selectionOptions,
 		?string $selectionDefault,
 
-		?string $datetimeDefault
+		?string $datetimeDefault,
+
+		int $viewId,
+		?array $selectedViewIds
 	): DataResponse {
 		return $this->handleError(function () use (
 			$tableId,
@@ -102,7 +106,10 @@ class ColumnController extends Controller {
 			$selectionOptions,
 			$selectionDefault,
 
-			$datetimeDefault) {
+			$datetimeDefault,
+
+			$viewId,
+			$selectedViewIds) {
 			return $this->service->create(
 				$this->userId,
 				$tableId,
@@ -127,7 +134,10 @@ class ColumnController extends Controller {
 				$selectionOptions,
 				$selectionDefault,
 
-				$datetimeDefault);
+				$datetimeDefault,
+
+				$viewId,
+				$selectedViewIds);
 		});
 	}
 

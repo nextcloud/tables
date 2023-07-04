@@ -24,27 +24,44 @@
 			<NcCheckboxRadioSwitch type="switch" :checked.sync="localMandatory" />
 		</div>
 
-		<!-- order weight -->
+		<!-- add to views -->
 		<div class="fix-col-4 title space-T">
-			{{ t('tables', 'Order weight') }}
+			{{ activeView.isBaseView? t('tables', 'Add column to views') : t('tables', 'Add column to other views') }}
 		</div>
 		<div class="fix-col-4">
-			<input v-model="localOrderWeight"
-				type="number"
-				max="100"
-				min="0"
-				step="1">
+			<NcSelect
+				v-model="localSelectedViews"
+				:multiple="true"
+				:options="viewsForTable"
+				:get-option-key="(option) => option.id"
+				:placeholder="t('tables', 'Column')"
+				label="title">
+				<template #option="props">
+					<div>
+						{{ props.emoji }}
+						{{ props.title }}
+					</div>
+				</template>
+				<template #selected-option="props">
+					<div>
+						{{ props.emoji }}
+						{{ props.title }}
+					</div>
+				</template>
+			</NcSelect>
 		</div>
 	</div>
 </template>
 
 <script>
-import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
+import { NcCheckboxRadioSwitch, NcSelect } from '@nextcloud/vue'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
 	name: 'MainForm',
 	components: {
 		NcCheckboxRadioSwitch,
+		NcSelect,
 	},
 	props: {
 		title: {
@@ -63,12 +80,18 @@ export default {
 			type: Number,
 			default: null,
 		},
+		selectedViews: {
+			type: Array,
+			default: null,
+		},
 		titleMissingError: {
 			type: Boolean,
 			default: false,
 		},
 	},
 	computed: {
+		...mapGetters(['activeView']),
+		...mapState(['views']),
 		localTitle: {
 			get() { return this.title },
 			set(title) { this.$emit('update:title', title) },
@@ -85,6 +108,24 @@ export default {
 			get() { return this.orderWeight },
 			set(orderWeight) { this.$emit('update:orderWeight', parseInt(orderWeight)) },
 		},
+		localSelectedViews: {
+			get() { return this.selectedViews },
+			set(selectedViews) {
+				console.debug(selectedViews)
+				this.$emit('update:selectedViews', selectedViews)
+			},
+		},
+		viewsForTable() {
+			return this.views.filter(view => view.tableId === this.activeView.tableId && view !== this.activeView && !view.isBaseView).filter(view => !this.localSelectedViews.includes(view))
+		},
+	},
+
+	mounted() {
+		if (this.activeView.isBaseView) {
+			this.localSelectedViews = this.viewsForTable
+		} else {
+			this.localSelectedViews = []
+		}
 	},
 }
 </script>

@@ -180,7 +180,10 @@ class ColumnService extends SuperService {
 		?string $selectionOptions,
 		?string $selectionDefault,
 
-		?string $datetimeDefault
+		?string $datetimeDefault,
+
+		int $viewId,
+		array $selectedViewIds
 	):Column {
 		// security
 		$table = $this->tableMapper->find($tableId);
@@ -217,7 +220,16 @@ class ColumnService extends SuperService {
 			$entity = $this->mapper->insert($item);
 			// Add columns to view(s)
 			$baseView = $this->viewService->findBaseView($table, true);
-			$this->viewService->update($baseView->getId(), ['columns' => json_encode(array_merge($baseView->getColumnsArray(), [$entity->getId()]))], $table,true, $userId);
+			$this->viewService->update($baseView->getId(), ['columns' => json_encode(array_merge($baseView->getColumnsArray(), [$entity->getId()]))], $table, true, $userId);
+			if($viewId != $baseView->getId()) {
+				$view = $this->viewService->find($viewId);
+				$this->viewService->update($viewId, ['columns' => json_encode(array_merge($view->getColumnsArray(), [$entity->getId()]))], $table, true, $userId);
+			}
+			foreach ($selectedViewIds as $viewId) {
+				$view = $this->viewService->find($viewId);
+				$this->viewService->update($viewId, ['columns' => json_encode(array_merge($view->getColumnsArray(), [$entity->getId()]))], $table, true, $userId);
+			}
+
 			return $entity;
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage());
