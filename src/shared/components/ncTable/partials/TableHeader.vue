@@ -24,12 +24,6 @@
 		</th>
 		<th data-cy="customTableAction">
 			<NcActions :force-menu="true">
-				<NcActionButton v-if="canManageElement(table) && !isView"
-					:close-after-click="true"
-					icon="icon-add"
-					@click="$emit('create-view')">
-					{{ t('tables', 'Create view') }}
-				</NcActionButton>
 				<NcActionButton v-if="canManageElement(table) && isView"
 					:close-after-click="true"
 					icon="icon-rename"

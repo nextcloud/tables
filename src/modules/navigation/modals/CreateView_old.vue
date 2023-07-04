@@ -56,7 +56,7 @@ import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
 
 export default {
-	name: 'CreateView',
+	name: 'CreateView_old',
 	components: {
 		NcModal,
 		NcEmojiPicker,
@@ -68,8 +68,8 @@ export default {
 			type: Boolean,
 			default: false,
 		},
-		columns: {
-			type: Array,
+		baseView: {
+			type: Object,
 			default: null,
 		},
 	},

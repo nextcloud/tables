@@ -170,10 +170,11 @@ class TableService extends SuperService {
 
 		// add the corresponding views
 		try {
-			$table->setViews($this->viewService->findAll($table));
-		} catch (InternalError | NotFoundError | PermissionError $e) {
-			//TODO: Error handling
+			$table->setBaseView($this->viewService->findBaseView($table));
+		} catch (NotFoundError $e) {
+			//TODO: Create new base view if none exists
 		}
+		$table->setViews($this->viewService->findAll($table));
 	}
 
 
@@ -186,7 +187,7 @@ class TableService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function find(int $id, ?string $userId = null, bool $skipTableEnhancement = false): Table {
+	public function find(int $id, bool $skipTableEnhancement = false, ?string $userId = null): Table {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
 
@@ -247,10 +248,7 @@ class TableService extends SuperService {
 
 		$time = new DateTime();
 		$item = new Table();
-		$item->setTitle($title);
-		if($emoji) {
-			$item->setEmoji($emoji);
-		}
+		$item->setTitle('TODO: DELETE');
 		$item->setOwnership($userId);
 		$item->setCreatedBy($userId);
 		$item->setLastEditBy($userId);
@@ -262,12 +260,19 @@ class TableService extends SuperService {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
 		}
+		$baseView = $this->viewService->create($title, $emoji, $newTable, true, $userId);
 		if ($template !== 'custom') {
 			$table = $this->tableTemplateService->makeTemplate($newTable, $template);
-			$this->enhanceTable($table, $userId);
-			return $table;
+		} else {
+			$table = $this->addOwnerDisplayName($newTable);
 		}
-		return $this->addOwnerDisplayName($newTable);
+
+		//$tableColumns = $this->columnService->findAllByTable($table->getId(), $userId);
+		//$columnArray = array_column($tableColumns, 'id');
+		//$baseView = $this->viewService->update($baseView->getId(), ['columns' => json_encode($columnArray)], $table, $userId);
+
+		$this->enhanceTable($table, $userId);
+		return $table;
 	}
 
 	/**

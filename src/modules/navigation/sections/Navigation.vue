@@ -19,15 +19,15 @@
 						<NcActionButton :aria-label="t('tables', 'Create table')" icon="icon-add" @click.prevent="createTable" />
 					</template>
 				</NcAppNavigationCaption>
-				<NavigationTableItem v-for="table in getOwnTables"
-					:key="'table'+table.id"
-					:table="table" />
-				<NcAppNavigationCaption v-if="getSharedTables.length > 0"
+				<NavigationBaseViewItem v-for="view in getOwnBaseViews"
+					:key="view.id"
+					:base-view="view" />
+				<NcAppNavigationCaption v-if="getSharedBaseViews.length > 0"
 					:title="t('tables', 'Shared tables')" />
 
-				<NavigationTableItem v-for="table in getSharedTables"
-					:key="'table'+table.id"
-					:table="table" />
+				<NavigationBaseViewItem v-for="view in getSharedBaseViews"
+					:key="view.id"
+					:base-view="view" />
 
 				<NcAppNavigationCaption v-if="getSharedViews.length > 0"
 					:title="t('tables', 'Shared views')" />
@@ -51,9 +51,10 @@
 			</div>
 
 			<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
-			<EditTable :show-modal="editTable !== null" :table="editTable" @close="editTable = null " />
-			<EditView :show-modal="editView !== null" :view="editView" @close="editView = null " />
+			<!-- <EditTable :show-modal="editTable !== null" :table="editTable" @close="editTable = null " /> -->
+			<EditViewTitle :show-modal="editView !== null" :view="editView" @close="editView = null " />
 			<Import :show-modal="importTable !== null" :table="importTable" @close="importTable = null" />
+			<CreateView :show-modal="createView !== null" :table-id="createView?.tableId" @close="createView = null" />
 		</template>
 	</NcAppNavigation>
 </template>
@@ -61,10 +62,11 @@
 <script>
 import { NcAppNavigation, NcAppNavigationCaption, NcActionButton, NcTextField, NcButton, NcEmptyContent } from '@nextcloud/vue'
 import CreateTable from '../modals/CreateTable.vue'
-import EditTable from '../modals/EditTable.vue'
-import EditView from '../modals/EditView.vue'
+// import EditTable from '../modals/EditTable.vue'
+import EditViewTitle from '../modals/EditViewTitle.vue'
+import CreateView from '../modals/CreateView.vue'
 import NavigationViewItem from '../partials/NavigationViewItem.vue'
-import NavigationTableItem from '../partials/NavigationTableItem.vue'
+import NavigationBaseViewItem from '../partials/NavigationBaseViewItem.vue'
 import { mapState, mapGetters } from 'vuex'
 import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
@@ -75,18 +77,19 @@ export default {
 	name: 'Navigation',
 	components: {
 		Import,
-		NavigationTableItem,
+		NavigationBaseViewItem,
 		NavigationViewItem,
 		NcAppNavigation,
 		CreateTable,
-		EditTable,
-		EditView,
+		// EditTable,
+		EditViewTitle,
 		NcAppNavigationCaption,
 		NcActionButton,
 		NcTextField,
 		Magnify,
 		NcButton,
 		NcEmptyContent,
+		CreateView,
 	},
 	data() {
 		return {
@@ -95,34 +98,37 @@ export default {
 			importTable: null,
 			editTable: null, // if null, no modal open
 			editView: null, // if null, no modal open
+			createView: null, // if null, no modal open
 			filterString: '',
 		}
 	},
 	computed: {
 		...mapState(['tables', 'views', 'tablesLoading']),
 		// ...mapGetters(['activeTable']),
-		getSharedTables() {
-			return this.getFilteredTables.filter((item) => { return item.isShared === true && item.ownership !== getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
+		getSharedBaseViews() {
+			return this.getFilteredBaseViews.filter((item) => { return item.isShared === true && item.ownership !== getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
 		},
 		getSharedViews() {
 			return this.views.filter((item) => { return item.isShared === true && item.ownership !== getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
 		},
-		getOwnTables() {
-			return this.getFilteredTables.filter((item) => { return item.isShared === false || item.ownership === getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
+		getOwnBaseViews() {
+			return this.getFilteredBaseViews.filter((item) => { return item.isShared === false || item.ownership === getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
 		},
-		getFilteredTables() {
-			return this.tables.filter(table => { return table.title.toLowerCase().includes(this.filterString.toLowerCase()) })
+		getFilteredBaseViews() {
+			return this.tables.map(table => this.views.find(view => view.id === table.baseView.id)).filter(view => { return view.title.toLowerCase().includes(this.filterString.toLowerCase()) })
 		},
 	},
 	mounted() {
+		subscribe('create-view', baseView => { this.createView = baseView })
 		subscribe('create-table', this.createTable)
-		subscribe('edit-table', table => { this.editTable = table })
+		// subscribe('edit-table', table => { this.editTable = table })
 		subscribe('edit-view', view => { this.editView = view })
 		subscribe('tables:modal:import', table => { this.importTable = table })
 	},
 	beforeDestroy() {
+		unsubscribe('create-view', baseView => { this.createView = baseView })
 		unsubscribe('create-table', this.createTable)
-		unsubscribe('edit-table', table => { this.editTable = table })
+		// unsubscribe('edit-table', table => { this.editTable = table })
 		unsubscribe('edit-view', view => { this.editView = view })
 		unsubscribe('tables:modal:import', table => { this.importTable = table })
 	},

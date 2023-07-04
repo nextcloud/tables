@@ -212,7 +212,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['activeTable']),
+		...mapGetters(['activeView']),
 		combinedType: {
 			get() {
 				return this.type ? this.type + ((this.subtype) ? ('-' + this.subtype) : '') : null
@@ -296,7 +296,7 @@ export default {
 					selectionOptions: JSON.stringify(this.selectionOptions),
 					selectionDefault: this.selectionDefault,
 					datetimeDefault: this.datetimeDefault,
-					tableId: this.activeTable.id,
+					tableId: this.activeView.tableId,
 				}
 				const res = this.$store.dispatch('insertNewColumn', { data })
 				if (res) {

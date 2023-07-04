@@ -272,6 +272,17 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
+	public function indexViewColumns(int $viewId): DataResponse {
+		return $this->handleError(function () use ($viewId) {
+			return $this->columnService->findAllByView($viewId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
 	public function createTableColumn(
 		int $tableId,
 		string $title,

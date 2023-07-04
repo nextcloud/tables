@@ -23,6 +23,7 @@ class Table extends Entity implements JsonSerializable {
 
 	protected ?bool $hasShares = false;
 	protected ?int $rowsCount = 0;
+	protected ?View $baseView = null;
 	protected ?array $views = null;
 
 	public function __construct() {
@@ -32,8 +33,6 @@ class Table extends Entity implements JsonSerializable {
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->id,
-			'title' => $this->title,
-			'emoji' => $this->emoji,
 			'ownership' => $this->ownership,
 			'ownerDisplayName' => $this->ownerDisplayName,
 			'createdBy' => $this->createdBy,
@@ -44,6 +43,7 @@ class Table extends Entity implements JsonSerializable {
 			'onSharePermissions' => $this->onSharePermissions,
 			'hasShares' => $this->hasShares,
 			'rowsCount' => $this->rowsCount,
+			'baseView' => $this->baseView,
 			'views' => $this->views,
 		];
 	}

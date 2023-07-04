@@ -67,16 +67,17 @@ class ViewController extends Controller {
 	 */
 	public function show(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
-			return $this->service->find($id, $this->getTableFromViewId($id));
+			return $this->service->find($id);
 		});
 	}
 
 	/**
 	 * @NoAdminRequired
+	 * @NoCSRFRequired
 	 */
 	public function create(int $tableId, string $title, string $emoji): DataResponse {
 		return $this->handleError(function () use ($tableId, $title, $emoji) {
-			return $this->service->create($title, $emoji, $this->getTable($tableId));
+			return $this->service->create($title, $emoji, $this->getTable($tableId, true));
 		});
 	}
 
@@ -106,9 +107,9 @@ class ViewController extends Controller {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	private function getTable(int $tableId): Table {
+	private function getTable(int $tableId, bool $skipTableEnhancement = false): Table {
 		try {
-			return $this->tableService->find($tableId);
+			return $this->tableService->find($tableId, $skipTableEnhancement);
 		} catch (InternalError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError($e->getMessage());

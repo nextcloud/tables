@@ -1,23 +1,23 @@
 <template>
 	<div class="row first-row">
 		<h1>
-			{{ activeElement.emoji }}&nbsp;{{ activeElement.title }}
+			{{ activeView.emoji }}&nbsp;{{ activeView.title }}
 		</h1>
 		<div class="light">
 			<NcActions>
-				<NcActionButton v-if="!activeElement.isShared || (activeElement.isShared && activeElement.onSharePermissions.manage)"
+				<NcActionButton v-if="!activeView.isShared || (activeView.isShared && activeView.onSharePermissions.manage)"
 					icon="icon-rename"
 					:close-after-click="true"
 					@click="editElement">
-					{{ isTable ? t('tables', 'Edit table') : t('tables', 'Edit view') }}
+					{{ activeView.isBaseView ? t('tables', 'Edit table') : t('tables', 'Edit view') }}
 				</NcActionButton>
 			</NcActions>
 		</div>
 		<div class="user-bubble">
-			<NcUserBubble v-if="activeElement.isShared"
-				:display-name="activeElement.ownerDisplayName"
+			<NcUserBubble v-if="activeView.isShared"
+				:display-name="activeView.ownerDisplayName"
 				:show-user-status="true"
-				:user="activeElement.ownership" />
+				:user="activeView.ownership" />
 		</div>
 	</div>
 </template>
@@ -35,19 +35,12 @@ export default {
 		NcUserBubble,
 	},
 	computed: {
-		...mapGetters(['activeTable', 'activeView']),
-		activeElement() {
-			if (this.activeTable) return this.activeTable
-			else return this.activeView
-		},
-		isTable() {
-			return !this.activeView
-		},
+		...mapGetters(['activeView']),
 	},
 
 	methods: {
 		editElement() {
-			emit(this.isTable ? 'edit-table' : 'edit-view', this.activeElement)
+			emit('edit-view', this.activeElemen)
 		},
 	},
 }

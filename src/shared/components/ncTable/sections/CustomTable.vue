@@ -9,7 +9,6 @@
 					:view-setting="viewSetting"
 					:is-view="isView"
 					@create-row="$emit('create-row')"
-					@create-view="$emit('create-view')"
 					@edit-view="$emit('edit-view')"
 					@import="table => $emit('import', table)"
 					@create-column="$emit('create-column')"
