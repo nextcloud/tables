@@ -9,7 +9,7 @@
 					<MenuIcon :size="20" />
 				</template>
 			</NcButton>
-			<NcCheckboxRadioSwitch :checked="selectedColumns.includes(column.id)"
+			<NcCheckboxRadioSwitch v-if="!isBaseView" :checked="selectedColumns.includes(column.id)"
 				style="padding-right: 10px;" @update:checked="onToggle(column.id)" />
 			{{ column.title }}
 		</div>
@@ -35,6 +35,10 @@ export default {
 		selectedColumns: {
 			type: Array,
 			default: null,
+		},
+		isBaseView: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	data() {

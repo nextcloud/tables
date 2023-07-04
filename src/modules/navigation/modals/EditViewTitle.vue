@@ -54,7 +54,7 @@ import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
 
 export default {
-	name: 'EditView',
+	name: 'EditViewTitle',
 	components: {
 		NcModal,
 		NcEmojiPicker,

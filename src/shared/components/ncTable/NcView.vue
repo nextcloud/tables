@@ -1,3 +1,43 @@
+<!--
+
+This is a reusable component. There are no outside dependency's.
+
+Emitted events
+==============
+edit-row                -> click on edit button in a row
+update-selected-rows    -> send an array with selected row IDs
+create-row              -> click on create (plus) button
+create-column
+edit-columns
+delete-selected-rows
+add-filter              -> @param filter { columnId, operator, value }
+delete-filter           -> @param id (columnId + operator + value)
+set-search-string       -> @param string
+import                  -> click on import button on tables menu
+
+Props
+=====
+rows <array>            -> Array with row-objects { "columnId": 1, "value": "some" }
+columns <array>         -> Array with column-objects { "id":2, "tableId":1, "title":"Description", ... }
+config                  -> config object for the table
+  options
+    show-create-row [true]
+    show-delete-rows [true]
+  table
+    rows
+      show-delete-button [false]
+      show-edit-button [true]
+      action-buttons-position [right]
+      action-button-sticky [true]
+    columns
+      show-inline-edit-button [true]
+
+Bus events
+==========
+deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
+
+-->
+
 <template>
 	<div class="NcTable">
 		<div class="options row" style="padding-right: calc(var(--default-grid-baseline) * 2);">

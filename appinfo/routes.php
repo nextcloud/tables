@@ -34,6 +34,7 @@ return [
 		// -> columns
 		['name' => 'api1#indexTableColumns',	'url' => '/api/1/tables/{tableId}/columns', 'verb' => 'GET'],
 		['name' => 'api1#createTableColumn',	'url' => '/api/1/tables/{tableId}/columns', 'verb' => 'POST'],
+		['name' => 'api1#indexViewColumns', 'url' => '/api/1/views/{viewId}/columns', 'verb' => 'GET'],
 		['name' => 'api1#getColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'GET'],
 		['name' => 'api1#deleteColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'DELETE'],
 		['name' => 'api1#updateColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'PUT'],

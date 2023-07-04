@@ -16,6 +16,7 @@ import EditRow from '../modals/EditRow.vue'
 import { mapGetters, mapState } from 'vuex'
 
 export default {
+	// TODO: outdated?
 	name: 'Modals',
 	components: {
 		CreateRow,

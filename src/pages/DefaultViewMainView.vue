@@ -14,7 +14,7 @@
 					@add-filter="addFilter"
 					@set-search-string="setSearchString"
 					@edit-row="rowId => editRowId = rowId"
-					@edit-view="viewId => editViewId = viewId"
+					@edit-view="editView = activeView"
 					@import="openImportModal"
 					@create-column="showCreateColumn = true"
 					@edit-columns="showEditColumns = true"
@@ -23,9 +23,8 @@
 					@delete-filter="deleteFilter" />
 			</div>
 
-			<div v-if="columns.length === 0" @create-column="showCreateColumn = true">
-				Empty View
-			</div>
+			<EmptyTable v-if="columns.length === 0 && activeView.isBaseView" @create-column="showCreateColumn = true" />
+			<EmptyView v-if="columns.length === 0 && !activeView.isBaseView" @open-edit-view=" editView = activeView" />
 		</div>
 
 		<CreateRow :columns="columns"
@@ -37,9 +36,14 @@
 			:out-transition="true"
 			@close="editRowId = null" />
 		<EditView
-			:show-modal="editViewId !== null"
-			:view="activeView"
-			@close="editViewId = null"
+			:show-modal="editView !== null && !editView.isBaseView"
+			:view="editView"
+			@close="editView = null"
+			@reload-view="reload(true)" />
+		<EditBaseView
+			:show-modal="editView !== null && editView.isBaseView"
+			:view="editView"
+			@close="editView = null"
 			@reload-view="reload(true)" />
 		<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false" />
 		<EditColumns :show-modal="showEditColumns" @close="showEditColumns = false" />
@@ -54,15 +58,20 @@ import NcView from '../shared/components/ncTable/NcView.vue'
 import CreateRow from '../modules/main/modals/CreateRow.vue'
 import EditRow from '../modules/main/modals/EditRow.vue'
 import EditView from '../modules/main/modals/EditView.vue'
+import EditBaseView from '../modules/main/modals/EditBaseView.vue'
 import CreateColumn from '../modules/main/modals/CreateColumn.vue'
 import EditColumns from '../modules/main/modals/EditColumns.vue'
 import DeleteRows from '../modules/main/modals/DeleteRows.vue'
+import EmptyTable from '../modules/main/sections/EmptyTable.vue'
+import EmptyView from '../modules/main/sections/EmptyView.vue'
 import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
 import { emit } from '@nextcloud/event-bus'
 
 export default {
 	name: 'DefaultViewMainView',
 	components: {
+		EmptyTable,
+		EmptyView,
 		EditView,
 		DeleteRows,
 		ElementDescription,
@@ -71,6 +80,7 @@ export default {
 		EditRow,
 		CreateColumn,
 		EditColumns,
+		EditBaseView,
 	},
 
 	mixins: [permissionsMixin],
@@ -81,7 +91,7 @@ export default {
 			lastActiveViewId: null,
 			showCreateRow: false,
 			editRowId: null,
-			editViewId: null,
+			editView: null,
 			showCreateColumn: false,
 			showEditColumns: false,
 			rowsToDelete: null,

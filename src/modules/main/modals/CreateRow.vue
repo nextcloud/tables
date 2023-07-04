@@ -61,7 +61,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['activeTable']),
+		...mapGetters(['activeView']),
 	},
 	methods: {
 		actionCancel() {
@@ -112,7 +112,7 @@ export default {
 						value,
 					})
 				}
-				await this.$store.dispatch('insertNewRow', { tableId: this.activeTable.id, data })
+				await this.$store.dispatch('insertNewRow', { tableId: this.activeView.tableId, data })
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not create new row'))

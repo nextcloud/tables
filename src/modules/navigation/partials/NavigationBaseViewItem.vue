@@ -1,15 +1,14 @@
 <template>
-	<NcAppNavigationItem v-if="table"
-		:name="table.title"
-		:class="{active: activeTable && table.id === activeTable.id}"
+	<NcAppNavigationItem v-if="baseView"
+		:name="baseView.title"
+		:class="{active: activeView && baseView.id === activeView.id}"
 		:allow-collapse="hasViews"
-		:open="false"
 		:force-menu="true"
-		:to="'/table/' + parseInt(table.id)"
+		:to="'/view/' + parseInt(baseView.id)"
 		@click="closeNav">
 		<template #icon>
-			<template v-if="table.emoji">
-				{{ table.emoji }}
+			<template v-if="baseView.emoji">
+				{{ baseView.emoji }}
 			</template>
 			<template v-else>
 				<Table :size="20" />
@@ -18,30 +17,36 @@
 		<template #extra />
 		<template #counter>
 			<NcCounterBubble>
-				{{ n('tables', '%n row', '%n rows', table.rowsCount, {}) }}
+				{{ n('tables', '%n row', '%n rows', baseView.rowsCount, {}) }}
 			</NcCounterBubble>
-			<NcActionButton v-if="table.hasShares" icon="icon-share" :class="{'margin-right': !(activeTable && table.id === activeTable.id)}" @click="actionShowShare" />
-			<div v-if="table.isShared && table.ownership !== userId" class="margin-left">
-				<NcAvatar :user="table.ownership" />
+			<NcActionButton v-if="baseView.hasShares" icon="icon-share" :class="{'margin-right': !(activeView && baseView.id === activeView.id)}" @click="actionShowShare" />
+			<div v-if="baseView.isShared && baseView.ownership !== userId" class="margin-left">
+				<NcAvatar :user="baseView.ownership" />
 			</div>
 		</template>
 
 		<template #actions>
-			<NcActionButton v-if="canManageElement(table)"
+			<NcActionButton v-if="canManageElement(baseView)"
+				icon="icon-add"
+				:close-after-click="true"
+				@click="createView">
+				{{ t('tables', 'Create view') }}
+			</NcActionButton>
+			<NcActionButton v-if="canManageElement(baseView)"
 				icon="icon-rename"
 				:close-after-click="true"
 				@click="editTable">
 				{{ t('tables', 'Edit table') }}
 			</NcActionButton>
-			<NcActionButton v-if="canShareElement(table)"
+			<NcActionButton v-if="canShareElement(baseView)"
 				icon="icon-share"
 				:close-after-click="true"
 				@click="actionShowShare">
 				{{ t('tables', 'Share') }}
 			</NcActionButton>
-			<NcActionButton v-if="canCreateRowInElement(table)"
+			<NcActionButton v-if="canCreateRowInElement(baseView)"
 				:close-after-click="true"
-				@click="actionShowImport(table)">
+				@click="actionShowImport(baseView)">
 				{{ t('tables', 'Import') }}
 				<template #icon>
 					<Import :size="20" />
@@ -55,7 +60,7 @@
 					<Creation :size="20" />
 				</template>
 			</NcActionButton>
-			<NcActionButton v-if="canDeleteElement(table)"
+			<NcActionButton v-if="canDeleteElement(baseView)"
 				icon="icon-delete"
 				:close-after-click="true"
 				@click="showDeletionConfirmation = true">
@@ -90,7 +95,7 @@ import Import from 'vue-material-design-icons/Import.vue'
 import NavigationViewItem from './NavigationViewItem.vue'
 
 export default {
-	name: 'NavigationTableItem',
+	name: 'NavigationBaseViewItem',
 
 	components: {
 		// eslint-disable-next-line vue/no-reserved-component-names
@@ -118,7 +123,7 @@ export default {
 	mixins: [permissionsMixin],
 
 	props: {
-		table: {
+		baseView: {
 			type: Object,
 			default: null,
 		},
@@ -131,17 +136,17 @@ export default {
 	},
 
 	computed: {
-		...mapGetters(['activeTable']),
+		...mapGetters(['activeView']),
 		...mapState(['views']),
 		getTranslatedDescription() {
-			return t('tables', 'Do you really want to delete the table "{table}"?', { table: this.table.title })
+			return t('tables', 'Do you really want to delete the table "{table}"?', { table: this.baseView.title })
 		},
 		userId() {
 			return getCurrentUser().uid
 		},
 		getViews() {
 			// TODO: this.table.views exists, but the views are also stored in store views. When changed there the change does not appear in the views attribute of this.table. Use it like done here instead? -> this.table.views unnecessary?:
-			return this.views.filter(v => v.tableId === this.table.id)
+			return this.views.filter(v => !v.isBaseView && v.tableId === this.baseView.tableId)
 		},
 		hasViews() {
 			return this.getViews.length > 0
@@ -149,16 +154,22 @@ export default {
 	},
 
 	methods: {
+		createView() {
+			emit('create-view', this.baseView)
+		},
+		editTable() {
+			emit('edit-view', this.baseView) //TODO
+		},
 		async actionShowShare() {
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
-			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
+			await this.$router.push('/view/' + parseInt(this.baseView.id)).catch(err => err)
 		},
-		async actionShowImport(table) {
-			emit('tables:modal:import', table)
+		async actionShowImport(view) {
+			emit('tables:modal:import', view)
 		},
 		async actionShowIntegration() {
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
-			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
+			await this.$router.push('/view/' + parseInt(this.baseView.id)).catch(err => err)
 		},
 		closeNav(e) {
 			if (window.innerWidth < 960) {
@@ -168,22 +179,19 @@ export default {
 			}
 		},
 		async deleteMe() {
-			const deleteId = this.table.id
-			const activeTableId = this.activeTable?.id
+			const deleteId = this.baseView.id
+			const activeViewId = this.activeView?.id
 
-			const res = await this.$store.dispatch('removeTable', { tableId: this.table.id })
+			const res = await this.$store.dispatch('removeTable', { tableId: this.baseView.tableId })
 			if (res) {
-				showSuccess(t('tables', 'Table "{emoji}{table}" removed.', { emoji: this.table.emoji ? this.table.emoji + ' ' : '', table: this.table.title }))
+				showSuccess(t('tables', 'Table "{emoji}{table}" removed.', { emoji: this.baseView.emoji ? this.baseView.emoji + ' ' : '', table: this.baseView.title }))
 
 				// if the actual table was deleted, go to startpage
-				if (deleteId === activeTableId) {
+				if (deleteId === activeViewId) {
 					await this.$router.push('/').catch(err => err)
 				}
 				this.showDeletionConfirmation = false
 			}
-		},
-		editTable() {
-			emit('edit-table', this.table)
 		},
 	},
 

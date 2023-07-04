@@ -87,8 +87,9 @@ export default new Vuex.Store({
 
 			const tables = state.tables
 			tables.push(res.data)
+			state.views.push(res.data.baseView)
 			commit('setTables', tables)
-			return res.data.id
+			return res.data.baseView.id
 		},
 		async loadTablesFromBE({ commit, state }) {
 			commit('setTablesLoading', true)
@@ -98,7 +99,7 @@ export default new Vuex.Store({
 				commit('setTables', res.data)
 				// Set Views
 				res.data.forEach(table => {
-					state.views = state.views.concat(table.views)
+					state.views = state.views.concat([table.baseView, ...table.views])
 				})
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load tables.'))

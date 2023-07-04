@@ -6,6 +6,7 @@ use DateTime;
 use Exception;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
+use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
@@ -18,7 +19,9 @@ use Psr\Log\LoggerInterface;
 class ColumnService extends SuperService {
 	private ColumnMapper $mapper;
 
-	private ViewMapper $viewMapper;
+	private TableMapper $tableMapper;
+
+	private ViewService $viewService;
 
 	private RowService $rowService;
 
@@ -30,13 +33,15 @@ class ColumnService extends SuperService {
 		LoggerInterface $logger,
 		?string $userId,
 		ColumnMapper $mapper,
-		ViewMapper $viewMapper,
+		TableMapper $tableMapper,
+		ViewService $viewService,
 		RowService $rowService,
 		IL10N $l
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
-		$this->viewMapper = $viewMapper;
+		$this->tableMapper = $tableMapper;
+		$this->viewService = $viewService;
 		$this->rowService = $rowService;
 		$this->l = $l;
 	}
@@ -71,7 +76,7 @@ class ColumnService extends SuperService {
 		try {
 			// No need to check for columns outside the view since they cannot be addressed
 			if ($this->permissionsService->canReadColumnsByViewId($viewId, $userId)) {
-				$view = $this->viewMapper->find($viewId);
+				$view = $this->viewService->find($viewId);
 				$viewColumnIds = $view->getColumnsArray();
 				$viewColumns = [];
 				foreach ($viewColumnIds as $viewColumnId) {
@@ -178,7 +183,8 @@ class ColumnService extends SuperService {
 		?string $datetimeDefault
 	):Column {
 		// security
-		if (!$this->permissionsService->canCreateColumnsByTableId($tableId)) {
+		$table = $this->tableMapper->find($tableId);
+		if (!$this->permissionsService->canCreateColumns($table)) {
 			throw new PermissionError('create column at the table id = '.$tableId.' is not allowed.');
 		}
 
@@ -208,7 +214,11 @@ class ColumnService extends SuperService {
 		$item->setOrderWeight($orderWeight);
 		$item->setDatetimeDefault($datetimeDefault);
 		try {
-			return $this->mapper->insert($item);
+			$entity = $this->mapper->insert($item);
+			// Add columns to view(s)
+			$baseView = $this->viewService->findBaseView($table, true);
+			$this->viewService->update($baseView->getId(), ['columns' => json_encode(array_merge($baseView->getColumnsArray(), [$entity->getId()]))], $table,true, $userId);
+			return $entity;
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());

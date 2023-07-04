@@ -1,5 +1,5 @@
 <template>
-	<NcAppSettingsDialog :open.sync="open" :show-navigation="true" :title="t('tables', 'Edit view')">
+	<NcAppSettingsDialog :open.sync="open" :show-navigation="true" :title="t('tables', 'Edit table')">
 		<NcAppSettingsSection v-if="columns === null" id="loading" :title="t('tables', 'Loading')">
 			<div class="icon-loading" />
 		</NcAppSettingsSection>
@@ -24,11 +24,7 @@
 		<NcAppSettingsSection v-if="columns != null" id="columns-and-order" :title="t('tables', 'Columns')">
 			<SelectedViewColumns
 				:columns="columns"
-				:selected-columns="selectedColumns" />
-		</NcAppSettingsSection>
-		<!--filtering-->
-		<NcAppSettingsSection v-if="columns != null" id="filter" :title="t('tables', 'Filter')">
-			<FilterForm :filters="view.filter" :columns="columns" />
+				:is-base-view="true" />
 		</NcAppSettingsSection>
 		<!--sorting-->
 		<NcAppSettingsSection v-if="columns != null" id="sort" :title="t('tables', 'Sort')">
@@ -70,18 +66,16 @@ import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
 import tablePermissions from '../mixins/tablePermissions.js'
-import FilterForm from '../partials/editViewPartials/filter/FilterForm.vue'
 import SortForm from '../partials/editViewPartials/sort/SortForm.vue'
 import SelectedViewColumns from '../partials/editViewPartials/SelectedViewColumns.vue'
 
 export default {
-	name: 'EditView',
+	name: 'EditBaseView',
 	components: {
 		NcAppSettingsDialog,
 		NcAppSettingsSection,
 		NcEmojiPicker,
 		NcButton,
-		FilterForm,
 		SelectedViewColumns,
 		SortForm,
 	},
@@ -102,7 +96,6 @@ export default {
 			title: '',
 			icon: '',
 			errorTitle: false,
-			selectedColumns: [],
 			localLoading: false,
 			prepareDelete: false,
 			columns: null,
@@ -148,21 +141,8 @@ export default {
 		},
 		async loadTableColumnsFromBE() {
 			this.columns = await this.$store.dispatch('getColumnsFromBE', { tableId: this.view.tableId })
-			// Show columns of view first
-			this.columns.sort((a, b) => {
-				const aSelected = this.selectedColumns.includes(a.id)
-				const bSelected = this.selectedColumns.includes(b.id)
-				if (aSelected && !bSelected) {
-					return -1
-				} else if (!aSelected && bSelected) {
-					return 1
-				} else {
-					return 0
-				}
-			})
 		},
 		async actionConfirm() {
-			// TODO: Validate filter
 			if (this.title === '') {
 				showError(t('tables', 'Cannot update view. Title is missing.'))
 				this.errorTitle = true
@@ -176,13 +156,11 @@ export default {
 			}
 		},
 		async updateViewToBE(id) {
-			const newSelectedColumnIds = this.columns.map(col => col.id).filter(id => this.selectedColumns.includes(id))
 			const data = {
 				data: {
 					title: this.title,
 					emoji: this.icon,
-					columns: JSON.stringify(newSelectedColumnIds),
-					filter: JSON.stringify(this.view.filter),
+					columns: JSON.stringify(this.columns.map(col => col.id)),
 					sort: JSON.stringify(this.view.sort),
 				},
 			}
@@ -200,7 +178,6 @@ export default {
 			this.title = this.view.title
 			this.icon = this.view.emoji
 			this.errorTitle = false
-			this.selectedColumns = [...this.view.columns]
 			this.localLoading = false
 			this.columns = null
 		},

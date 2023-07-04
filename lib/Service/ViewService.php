@@ -42,6 +42,28 @@ class ViewService extends SuperService {
 		$this->userHelper = $userHelper;
 	}
 
+	public function findBaseView(Table $table, bool $skipTableEnhancement = false, ?string $userId = null): View {
+		/** @var string $userId */
+		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
+
+		try {
+			// security
+			if (!$this->permissionsService->canReadViews($table, $userId)) {
+				throw new PermissionError('PermissionError: can not read views for tableId '.$table->getId());
+			}
+
+			$baseView = $this->mapper->findBaseView($table->getId());
+			if(!$skipTableEnhancement) $this->enhanceView($baseView, $userId);
+			return $baseView;
+		} catch (\OCP\DB\Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError($e->getMessage());
+		} catch (PermissionError $e) {
+			$this->logger->debug('permission error during looking for views', ['exception' => $e]);
+			throw new PermissionError($e->getMessage());
+		}
+	}
+
 	/**
 	 * Find all tables for a user
 	 *
@@ -88,7 +110,7 @@ class ViewService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws InternalError
 	 */
-	public function find(int $id, Table $table, ?string $userId = null): View {
+	public function find(int $id, ?string $userId = null): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
 
@@ -100,7 +122,7 @@ class ViewService extends SuperService {
 		}
 
 		// security
-		if (!$this->permissionsService->canReadElement($view, $userId, 'view')) {
+		if (!$this->permissionsService->canReadElement($view, 'view', $userId)) {
 			throw new PermissionError('PermissionError: can not read view with id '.$id);
 		}
 
@@ -136,7 +158,7 @@ class ViewService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function create(string $title, ?string $emoji, Table $table, ?string $userId = null): View {
+	public function create(string $title, ?string $emoji, Table $table, bool $isBaseView = false, ?string $userId = null): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
 
@@ -152,6 +174,7 @@ class ViewService extends SuperService {
 			$item->setEmoji($emoji);
 		}
 		$item->setDescription('');
+		$item->setIsBaseView($isBaseView);
 		$item->setTableId($table->getId());
 		$item->setCreatedBy($userId);
 		$item->setLastEditBy($userId);
@@ -187,7 +210,7 @@ class ViewService extends SuperService {
 	 * @return View
 	 * @throws InternalError
 	 */
-	public function update(int $id, array $data, Table $table, ?string $userId = null): View {
+	public function update(int $id, array $data, Table $table, bool $skipTableEnhancement = false, ?string $userId = null): View {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
@@ -207,7 +230,7 @@ class ViewService extends SuperService {
 			$view->setLastEditAt($time->format('Y-m-d H:i:s'));
 
 			$view = $this->mapper->update($view);
-			$this->enhanceView($view, $userId);
+			if(!$skipTableEnhancement) $this->enhanceView($view, $userId);
 			return $view;
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);

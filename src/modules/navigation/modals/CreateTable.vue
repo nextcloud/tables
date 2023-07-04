@@ -147,10 +147,10 @@ export default {
 				showError(t('tables', 'Cannot create new table. Title is missing.'))
 				this.errorTitle = true
 			} else {
-				const newTableId = await this.sendNewTableToBE(this.templateChoice)
-				if (newTableId) {
+				const newBaseViewId = await this.sendNewTableToBE(this.templateChoice)
+				if (newBaseViewId) {
 					// showSuccess(t('tables', 'The table "{emoji} {table}" is ready to use.', { emoji: this.icon, table: this.title }))
-					await this.$router.push('/table/' + newTableId)
+					await this.$router.push('/view/' + newBaseViewId)
 					this.actionCancel()
 				}
 			}

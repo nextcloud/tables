@@ -14,7 +14,7 @@ use OCP\DB\Types;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
-class Version000600Date20230613000000 extends SimpleMigrationStep {
+class Version000603Date20230703000000 extends SimpleMigrationStep {
 	/**
 	 * @param IOutput $output
 	 * @param Closure $schemaClosure The `\Closure` returns a `ISchemaWrapper`
@@ -47,6 +47,10 @@ class Version000600Date20230613000000 extends SimpleMigrationStep {
 			]);
 			$table->addColumn('description', Types::TEXT, [
 				'notnull' => true,
+			]);
+			$table->addColumn('is_base_view', Types::BOOLEAN, [
+				'notnull' => true,
+				'default' => false,
 			]);
 			$table->addColumn('created_by', Types::STRING, [
 				'notnull' => true,
