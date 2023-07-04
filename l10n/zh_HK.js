@@ -294,6 +294,7 @@ OC.L10N.register(
     "Maximum text length" : "最長文本長度",
     "Allowed types" : "允許類型",
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "提供的類型取決於您的系統設定。您可以使用相同的提供者，如 fulltext-search。",
+    "Url" : "URL",
     "Could not load link providers." : "無法加載連結提供者。",
     "Today as default" : "將今日設置為默認值",
     "Yes" : "是",
