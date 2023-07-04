@@ -23,6 +23,7 @@
 							:mandatory.sync="editColumn.mandatory"
 							:order-weight.sync="editColumn.orderWeight"
 							:title.sync="editColumn.title"
+							:selected-views.sync="editColumn.selectedViews"
 							:title-missing-error="editErrorTitle" />
 					</div>
 					<div class="col-2 space-LR space-T">
