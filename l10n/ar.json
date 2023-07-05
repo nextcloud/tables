@@ -1,5 +1,6 @@
 { "translations": {
     "Members" : "الاعضاء",
+    "Customers" : "زبائن",
     "Date" : "التاريخ ",
     "Comments" : "تعليقات",
     "Name" : "الاسم",
@@ -17,9 +18,11 @@
     "Type" : "نوع",
     "Simple text" : "نص بسيط",
     "Time" : "إلى وقت",
+    "Date and time" : "التاريخ و الوقت",
     "Save" : "Save",
     "Text" : "نص",
     "Link" : "الرابط",
+    "Selection" : "اختيار",
     "Cancel" : "إلغاء",
     "Mandatory" : "إلزامي",
     "Edit" : "تعديل",
