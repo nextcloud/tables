@@ -38,21 +38,23 @@ export default {
 
 	actions: {
 
-		addSorting({ commit, state }, { columnId, mode }) {
+		removeSorting({ commit, state }, { columnId }) {
+			const viewSetting = state.viewSetting
+			viewSetting.sorting = null
+			commit('setViewSetting', viewSetting)
+		},
+
+		setSorting({ commit, state }, { columnId, mode }) {
 			// mode can be 'asc' or 'desc'
 			if (mode !== 'asc' && mode !== 'desc') {
 				return
 			}
 
 			const viewSetting = state.viewSetting
-
-			const sorting = []
-			sorting.push({
+			viewSetting.sorting = [{
 				columnId,
 				mode,
-			})
-
-			viewSetting.sorting = sorting
+			}]
 
 			commit('setViewSetting', viewSetting)
 		},
@@ -80,6 +82,25 @@ export default {
 				localViewSetting.filter.splice(index, 1)
 				commit('setViewSetting', localViewSetting)
 			}
+		},
+
+		unhideColumn({ commit, state }, { columnId }) {
+			const viewSetting = state.viewSetting
+			const index = viewSetting.hiddenColumns.indexOf(columnId)
+			if (index > -1) {
+				viewSetting.hiddenColumns.splice(index, 1)
+			}
+			commit('setViewSetting', viewSetting)
+		},
+
+		hideColumn({ commit, state }, { columnId }) {
+			const viewSetting = state.viewSetting
+			if (!viewSetting.hiddenColumns) {
+				viewSetting.hiddenColumns = [columnId]
+			} else {
+				viewSetting.hiddenColumns.push(columnId)
+			}
+			commit('setViewSetting', viewSetting)
 		},
 
 		setSearchString({ commit, state }, { str }) {

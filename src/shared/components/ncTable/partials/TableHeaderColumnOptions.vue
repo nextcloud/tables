@@ -1,88 +1,114 @@
 <template>
-	<div class="menu" :class="{showOnHover: getSortMode === null}">
-		<NcActions :open.sync="localOpenState" :force-menu="true">
-			<template v-if="getSortMode !== null" #icon>
-				<SortDesc v-if="getSortMode === 'desc'" :size="20" />
-				<SortAsc v-else-if="getSortMode === 'asc'" :size="20" />
-			</template>
-			<NcActionButtonGroup v-if="canSort" :title="t('tables', 'Sorting')">
-				<NcActionButton :class="{ selected: getSortMode === 'asc' }" :aria-label="t('tables', 'Sort asc')" @click="sort('asc')">
-					<template #icon>
-						<SortAsc :size="20" />
-					</template>
-				</NcActionButton>
-				<NcActionButton :class="{ selected: getSortMode === 'desc' }" :aria-label="t('tables', 'Sort desc')" @click="sort('desc')">
-					<template #icon>
-						<SortDesc :size="20" />
-					</template>
-				</NcActionButton>
-			</NcActionButtonGroup>
-			<NcActionSeparator v-if="canSort && haveOperators" />
-			<NcActionCaption v-if="haveOperators" :title="t('tables', 'Filtering')" />
-			<NcActionRadio
-				v-for="(op, index) in visibleOperators"
-				:key="index"
-				:name="'filter-operators-column-' + column.id"
-				:value="op.id"
-				:checked="operator.id === op.id"
-				:disabled="isDisabled(op.id)"
-				@change="changeFilterOperator(op)">
-				{{ op.label }}
-			</NcActionRadio>
-			<NcActionInput
-				v-if="canFilterWithTextInput && haveOperators"
-				:label-visible="false"
-				:label="t('tables', 'Keyword and submit')"
-				:value.sync="filterValue"
-				:show-trailing-button="true"
-				@submit="submitFilterInput">
+	<NcPopover :auto-hide="!isDropDownOpen" :focus-trap="false" :shown.sync="showPopover">
+		<template #trigger>
+			<NcButton
+				type="tertiary">
 				<template #icon>
-					<Pencil :size="20" />
+					<SortDesc v-if="getSortMode === 'desc'" :size="20" />
+					<SortAsc v-else-if="getSortMode === 'asc'" :size="20" />
+					<DotsHorizontal v-else :size="20" />
 				</template>
-			</NcActionInput>
-			<NcActionCaption
-				v-if="column.getPossibleMagicFields().length > 0 && canFilterWithTextInput"
-				:title="t('tables', 'Or use magic values')" />
-			<NcActionCaption
-				v-if="column.getPossibleMagicFields().length > 0 && !canFilterWithTextInput"
-				:title="t('tables', 'Choose value')" />
-			<NcActionButton
-				v-for="(magicField, index) in getMagicFields"
-				:key="'magic-field-' + index"
-				:value="magicField.id"
-				:checked="index === 0"
-				:icon="magicField.icon"
-				@click="submitMagicField(magicField.id)">
-				{{ magicField.label }}
-			</NcActionButton>
-		</NcActions>
-	</div>
+			</NcButton>
+		</template>
+		<div class="column-option-wrapper">
+			<div v-if="canSort">
+				{{ t('tables', 'Sorting') }}
+				<div class="mode-switch">
+					<NcCheckboxRadioSwitch
+						:button-variant="true"
+						:checked.sync="sortMode"
+						value="asc"
+						type="checkbox"
+						button-variant-grouped="horizontal"
+						class="mode-checkbox"
+						:class="{'mode-selected': sortMode === 'asc'}"
+						@update:checked="sort('asc')">
+						<SortAsc :size="20" class="mode-icon" />
+					</NcCheckboxRadioSwitch>
+					<NcCheckboxRadioSwitch
+						:button-variant="true"
+						:checked.sync="sortMode"
+						value="desc"
+						type="checkbox"
+						button-variant-grouped="horizontal"
+						class="mode-checkbox"
+						:class="{'mode-selected': sortMode === 'desc'}"
+						@update:checked="sort('desc')">
+						<SortDesc :size="20" class="mode-icon" />
+					</NcCheckboxRadioSwitch>
+				</div>
+			</div>
+			<div class="inter-header">
+				{{ t('tables', 'Filtering') }}
+			</div>
+
+			<NcSelect
+				v-model="selectedOperator"
+				class="select-field"
+				:options="getOperators"
+				:get-option-key="(option) => option.id"
+				:placeholder="t('tables', 'Operator')"
+				label="label"
+				@search:focus="isDropDownOpen = true"
+				@search:blur="isDropDownOpen = false"
+				@option:selected="changeFilterOperator" />
+			<NcSelect
+				v-if="selectedOperator && !selectedOperator.noSearchValue"
+				v-model="searchValue"
+				class="select-field"
+				:options="magicFieldsArray"
+				:placeholder="t('tables', 'Search Value')"
+				@search="v => term = v"
+				@search:focus="isDropDownOpen = true"
+				@search:blur="isDropDownOpen = false"
+				@option:selected="submitFilterInput" />
+			<div class="bottom-buttons">
+				<NcButton
+					type="secondary"
+					class="column-button"
+					:wide="true"
+					:disabled="!canHide"
+					@click="hideColumn()">
+					<template #icon>
+						<EyeOff :size="25" />
+					</template>
+				</NcButton>
+				<NcButton type="error" class="column-button" :wide="true" @click="deleteColumn()">
+					<template #icon>
+						<Delete :size="25" />
+					</template>
+				</NcButton>
+			</div>
+		</div>
+	</NcPopover>
 </template>
 
 <script>
 import generalHelper from '../../../mixins/generalHelper.js'
 import SortAsc from 'vue-material-design-icons/SortAscending.vue'
 import SortDesc from 'vue-material-design-icons/SortDescending.vue'
-import Pencil from 'vue-material-design-icons/Pencil.vue'
-import { NcActions, NcActionButton, NcActionInput, NcActionButtonGroup, NcActionSeparator, NcActionCaption, NcActionRadio } from '@nextcloud/vue'
+import Delete from 'vue-material-design-icons/Delete.vue'
+import EyeOff from 'vue-material-design-icons/EyeOff.vue'
+import DotsHorizontal from 'vue-material-design-icons/DotsHorizontal.vue'
+import { NcPopover, NcCheckboxRadioSwitch, NcButton, NcSelect } from '@nextcloud/vue'
 import { mapState } from 'vuex'
 import { AbstractColumn } from '../mixins/columnClass.js'
 import { ColumnTypes } from '../mixins/columnHandler.js'
 import { FilterIds } from '../mixins/filter.js'
+import { emit } from '@nextcloud/event-bus'
 
 export default {
 
 	components: {
-		Pencil,
-		NcActionInput,
-		NcActionRadio,
-		NcActionCaption,
-		NcActionButton,
-		NcActions,
+		NcCheckboxRadioSwitch,
+		EyeOff,
+		Delete,
 		SortAsc,
 		SortDesc,
-		NcActionButtonGroup,
-		NcActionSeparator,
+		DotsHorizontal,
+		NcSelect,
+		NcPopover,
+		NcButton,
 	},
 
 	mixins: [generalHelper],
@@ -92,20 +118,25 @@ export default {
 		      type: AbstractColumn,
 		      default: null,
 		    },
-		openState: {
-		      type: Boolean,
-		      default: false,
-		    },
+		canHide: {
+			type: Boolean,
+			default: false,
+		},
 	},
 
 	data() {
 		return {
-			filterValue: '',
-			operator: null,
+			showPopover: false,
+			isDropDownOpen: false,
+			test: '',
+			sortMode: null,
+			searchValue: '',
+			selectedOperator: null,
 			hideFilterInputForColumnTypes: [
 				ColumnTypes.SelectionCheck,
 				ColumnTypes.NumberStars,
 			],
+			term: '',
 		}
 	},
 
@@ -113,45 +144,24 @@ export default {
 		...mapState({
 			viewSetting: state => state.data.viewSetting,
 		}),
-		haveOperators() {
-			const columnOperators = this.getOperators
-			return columnOperators && columnOperators.length > this.getDisabledOperators.length
-		},
-		visibleOperators() {
-			if (this.haveOperators && this.getOperators.length >= 2) {
-				return this.getOperators
-			}
-			return []
-		},
 		getOperators() {
-			console.debug('getOperators requested')
 			const possibleOperators = this.column.getPossibleOperators()
-
-			if (possibleOperators.length === 0) {
-				return null
-			}
 			// preselect first operator, even if it's not displayed
-			if (this.operator === null) {
+			if (this.selectedOperator === null) {
 				// eslint-disable-next-line vue/no-side-effects-in-computed-properties
-				this.operator = possibleOperators[0]
+				this.selectedOperator = possibleOperators[0]
 			}
 			return possibleOperators
 		},
-		getDisabledOperators() {
-			// filter filters that cannot be combined
-			const filters = this.getFilterForColumn(this.column)
-			if (filters && filters.length > 0) {
-				const incompatibleFilters = new Set()
-				filters.forEach(fil => {
-
-					fil.operator.incompatibleWith.forEach(item => incompatibleFilters.add(item))
-				})
-				return this.getOperators.filter(op => incompatibleFilters.has(op.id))
+		magicFieldsArray() {
+			if (this.selectedOperator) {
+				if (this.term) {
+					return [this.term, ...this.column.getPossibleMagicFields()]
+				}
+				return this.column.getPossibleMagicFields()
+			} else {
+				return []
 			}
-			return []
-		},
-		getMagicFields() {
-			return this.column.getPossibleMagicFields()
 		},
 		canSort() {
 			return this.column.canSort()
@@ -163,48 +173,30 @@ export default {
 			}
 			return null
 		},
-		localOpenState: {
-			get() {
-				return this.openState
-			},
-			set(v) {
-				this.$emit('update:open-state', !!v)
-			},
-		},
-		canFilterWithTextInput() {
-			return !this.hideFilterInputForColumnTypes.includes(this.column.type)
+	},
+	watch: {
+		showPopover() {
+			if (this.showPopover) {
+				this.reset()
+			}
 		},
 	},
-
 	methods: {
-		submitMagicField(magicFieldId) {
-			console.debug('submitted magic field', magicFieldId)
-			this.filterValue = '@' + magicFieldId
-			this.submitFilterInput()
-		},
-		changeFilterOperator(operator) {
-			this.operator = operator
-			if (this.operator.id === FilterIds.IsEmpty) {
-				this.submitFilter()
+		changeFilterOperator() {
+			if (this.selectedOperator.id === FilterIds.IsEmpty) {
+				this.createFilter()
 			}
 		},
 		submitFilterInput() {
-			console.debug('submit clicked', this.filterValue)
-
 			// Ignore contains filter with the same value es old contain filters
-			if (this.operator.id === FilterIds.Contains) {
+			if (this.selectedOperator.id === FilterIds.Contains) {
 				const columnFilters = this.getFilterForColumn(this.column)
-				if (columnFilters && columnFilters.filter(fil => fil.operator.id === FilterIds.Contains).map(fil => fil.value).includes(this.filterValue)) {
-					this.localOpenState = false
+				if (columnFilters && columnFilters.filter(fil => fil.operator.id === FilterIds.Contains).map(fil => fil.value).includes(this.searchValue)) {
 					this.reset()
 					return
 				}
 			}
-			this.submitFilter()
-		},
-		submitFilter() {
 			this.createFilter()
-			this.localOpenState = false
 		},
 		getFilterForColumn(column) {
 			return this.viewSetting?.filter?.filter(item => item.columnId === column.id)
@@ -212,28 +204,53 @@ export default {
 		createFilter() {
 			const filterObject = {
 				columnId: this.column.id,
-				operator: this.operator,
-				value: this.filterValue,
+				operator: this.selectedOperator,
+				value: typeof this.searchValue === 'object' ? '@' + this.searchValue.id : this.searchValue,
 			}
 			console.debug('emitting new filterObject', filterObject)
 			this.$emit('add-filter', filterObject)
+			this.close()
+		},
+		close() {
 			this.reset()
+			this.showPopover = false
 		},
 		reset() {
-			this.operator = null
-			this.filterValue = ''
+			this.selectedOperator = null
+			this.searchValue = ''
+			this.sortMode = this.getSortMode
 		},
 		sort(mode) {
-			this.$store.dispatch('addSorting', { columnId: this.column.id, mode })
+			if (mode === this.getSortMode) {
+				this.sortMode = null
+				this.$store.dispatch('removeSorting', { columnId: this.column.id })
+			} else {
+				this.sortMode = mode
+				this.$store.dispatch('setSorting', { columnId: this.column.id, mode })
+			}
+			this.close()
 		},
-		isDisabled(op) {
-			return this.getDisabledOperators.map(o => o.id).includes(op)
+		hideColumn() {
+			this.close()
+			this.$store.dispatch('hideColumn', { columnId: this.column.id })
+		},
+		deleteColumn() {
+			this.close()
+			emit('tables:column:delete', this.column)
 		},
 	},
 
 }
 </script>
 <style lang="scss" scoped>
+
+.column-option-wrapper {
+	padding: calc(var(--default-grid-baseline) * 2);
+	display: flex;
+    flex-direction: column;
+    align-items: center;
+	width: 200px;
+}
 
 .menu {
 	padding-left: calc(var(--default-grid-baseline) * 1);
@@ -244,4 +261,37 @@ export default {
 	border-radius: 6px;
 }
 
+.select-field {
+	width: 100%;
+	padding: 8px;
+}
+
+.mode-switch {
+	width: 100%;
+	display: flex;
+	padding: calc(var(--default-grid-baseline) * 2);
+}
+
+.mode-checkbox {
+	width: 50%;
+}
+
+:deep(.checkbox-radio-switch--button-variant.checkbox-radio-switch--checked) {
+	border: 2px solid var(--color-border-dark);
+}
+
+:deep(.checkbox-radio-switch__label) {
+	display: flex;
+    justify-content: center;
+}
+
+.inter-header {
+	padding-top: calc(var(--default-grid-baseline) * 2);
+}
+.bottom-buttons {
+	width: 100%;
+	padding-top:  calc(var(--default-grid-baseline) * 4);
+	display: flex;
+	justify-content: space-between;
+}
 </style>

@@ -48,6 +48,19 @@ class ViewMapper extends QBMapper {
 		$qb->select('*')
 			->from($this->table);
 		if ($tableId !== null) {
+			$qb->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)));
+		}
+		return $this->findEntities($qb);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function findAllNotBaseViews(?int $tableId = null): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table);
+		if ($tableId !== null) {
 			$qb->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)))
 				->andWhere($qb->expr()->eq('is_base_view', $qb->createNamedParameter(false, IQueryBuilder::PARAM_BOOL)));
 		}

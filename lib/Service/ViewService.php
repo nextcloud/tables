@@ -42,6 +42,39 @@ class ViewService extends SuperService {
 		$this->userHelper = $userHelper;
 	}
 
+
+	public function findAll(Table $table, ?string $userId = null): array {
+		return $this->findAllGeneralised($table, true, $userId);
+	}
+
+	public function findAllNotBaseViews(Table $table, ?string $userId = null): array {
+		return $this->findAllGeneralised($table, false, $userId);
+	}
+
+	private function findAllGeneralised(Table $table, bool $includeBaseView = true, ?string $userId = null): array {
+		/** @var string $userId */
+		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
+
+		try {
+			// security
+			if (!$this->permissionsService->canReadViews($table, $userId)) {
+				throw new PermissionError('PermissionError: can not read views for tableId '.$table->getId());
+			}
+
+			$allViews = $includeBaseView ? $allViews = $this->mapper->findAll($table->getId()) : $this->mapper->findAllNotBaseViews($table->getId());
+			foreach ($allViews as $view) {
+				$this->enhanceView($view, $userId);
+			}
+			return $allViews;
+		} catch (\OCP\DB\Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError($e->getMessage());
+		} catch (PermissionError $e) {
+			$this->logger->debug('permission error during looking for views', ['exception' => $e]);
+			throw new PermissionError($e->getMessage());
+		}
+	}
+
 	public function findBaseView(Table $table, bool $skipTableEnhancement = false, ?string $userId = null): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
@@ -63,44 +96,6 @@ class ViewService extends SuperService {
 			throw new PermissionError($e->getMessage());
 		}
 	}
-
-	/**
-	 * Find all tables for a user
-	 *
-	 * takes the user from actual context or the given user
-	 * it is possible to get all tables, but only if requested by cli
-	 *
-	 * @param int|null $tableId
-	 * @param string|null $userId (null -> take from session, '' -> no user in context)
-	 * @return array<View>
-	 * @throws InternalError
-	 * @throws NotFoundError
-	 * @throws PermissionError
-	 */
-	public function findAll(Table $table, ?string $userId = null): array {
-		/** @var string $userId */
-		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
-
-		try {
-			// security
-			if (!$this->permissionsService->canReadViews($table, $userId)) {
-				throw new PermissionError('PermissionError: can not read views for tableId '.$table->getId());
-			}
-
-			$allViews = $this->mapper->findAll($table->getId());
-			foreach ($allViews as $view) {
-				$this->enhanceView($view, $userId);
-			}
-			return $allViews;
-		} catch (\OCP\DB\Exception $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError($e->getMessage());
-		} catch (PermissionError $e) {
-			$this->logger->debug('permission error during looking for views', ['exception' => $e]);
-			throw new PermissionError($e->getMessage());
-		}
-	}
-
 
 	/**
 	 * @param int $id
@@ -255,6 +250,35 @@ class ViewService extends SuperService {
 			if (!$this->permissionsService->canUpdateElement($table, 'table', $userId)) {
 				throw new PermissionError('PermissionError: can not delete view with id '.$id);
 			}
+			if ($view->getIsBaseView()) {
+				$this->deleteAllByTable($table, $userId);
+			} else {
+				return $this->deleteByObject($view, $table, $userId);
+			}
+
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
+		}
+	}
+
+
+
+	/**
+	 * @param int $id
+	 * @param string|null $userId
+	 * @return View
+	 * @throws InternalError
+	 */
+	public function deleteByObject(View $view, Table $table, ?string $userId = null): View {
+		/** @var string $userId */
+		$userId = $this->permissionsService->preCheckUserId($userId); // $userId is set or ''
+
+		try {
+			// security
+			if (!$this->permissionsService->canUpdateElement($table, 'table', $userId)) {
+				throw new PermissionError('PermissionError: can not delete view with id '.$view->getId());
+			}
 
 			// delete all shares for that table
 			$this->shareService->deleteAllForView($view);
@@ -319,5 +343,52 @@ class ViewService extends SuperService {
 	private function addOwnerDisplayName(View $view): View {
 		$view->setOwnerDisplayName($this->userHelper->getUserDisplayName($view->getOwnership()));
 		return $view;
+	}
+
+	/**
+	 * @param Table $tableId
+	 * @param null|string $userId
+	 * @return int
+	 * @throws PermissionError
+	 * @throws \OCP\DB\Exception
+	 */
+	public function deleteAllByTable(Table $table, ?string $userId = null): View {
+		// security
+		/*if (!$this->permissionsService->canDeleteRowsByTableId($tableId, $userId)) {
+			throw new PermissionError('delete all rows for table id = '.$tableId.' is not allowed.');
+		} TODO: If you can delete a table you should be allowed to delete the views?!*/
+		$views = $this->findAll($table,$userId);
+		foreach ($views as $view) {
+			if($view->getIsBaseView()) {
+				$baseView = $view;
+			} else {
+				$this->deleteByObject($view, $table, $userId);
+			}
+		}
+		return $this->deleteByObject($baseView, $table, $userId);
+	}
+
+	public function deleteColumnDataFromViews(int $columnId, Table $table) {
+		$views = $this->mapper->findAll($table->getId());
+		foreach ($views as $view) {
+			$filteredSortingRules = array_filter($view->getSortArray(), function($sort) use ($columnId){
+				return $sort['columnId'] !== $columnId;
+			});
+			$filteredSortingRules = array_values($filteredSortingRules);
+			$filteredFilters = array_filter($view->getFilterArray(), function($filterGroup) use ($columnId){
+				array_filter($filterGroup, function($filter) use ($columnId){
+					return $filter['columnId'] !== $columnId;
+				});
+			});
+			$data = [
+				'columns' => json_encode(array_values(array_diff($view->getColumnsArray(), [$columnId]))),
+				'sort' => json_encode($filteredSortingRules),
+				'filter' => json_encode($filteredFilters),
+			];
+
+			$this->update($view->getId(), $data, $table);
+
+			//TODODODOTODOTODOTODOTODOTOD
+		}
 	}
 }

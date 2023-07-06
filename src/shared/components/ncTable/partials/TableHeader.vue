@@ -1,30 +1,39 @@
 <template>
 	<tr>
 		<th>
-			<NcCheckboxRadioSwitch :checked="allRowsAreSelected" @update:checked="value => $emit('select-all-rows', value)" />
-		</th>
-		<th v-for="col in columns" :key="col.id">
-			<div class="cell">
-				<div class="clickable" @click="updateOpenState(col.id)">
-					{{ col.title }}
-				</div>
-				<TableHeaderColumnOptions
-					:column="col"
-					:open-state.sync="openedColumnHeaderMenus[col.id]"
-					@add-filter="filter => $emit('add-filter', filter)" />
+			<div class="cell-wrapper">
+				<NcCheckboxRadioSwitch :checked="allRowsAreSelected" @update:checked="value => $emit('select-all-rows', value)" />
+				<div v-if="hasRightHiddenNeighbor(-1)" class="hidden-indicator-first" @click="unhide(-1)" />
 			</div>
-			<div v-if="getFilterForColumn(col)" class="filter-wrapper">
-				<FilterLabel v-for="filter in getFilterForColumn(col)"
-					:id="filter.columnId + filter.operator + filter.value"
-					:key="filter.columnId + filter.operator + filter.value"
-					:operator="filter.operator"
-					:value="filter.value"
-					@delete-filter="id => $emit('delete-filter', id)" />
+		</th>
+		<th v-for="col in visibleColums" :key="col.id">
+			<div class="cell-wrapper">
+				<div class="cell-options-wrapper">
+					<div class="cell">
+						<div class="clickable" @click="updateOpenState(col.id)">
+							{{ col.title }}
+						</div>
+						<TableHeaderColumnOptions
+							:column="col"
+							:open-state.sync="openedColumnHeaderMenus[col.id]"
+							:can-hide="visibleColums.length > 1"
+							@add-filter="filter => $emit('add-filter', filter)" />
+					</div>
+					<div v-if="getFilterForColumn(col)" class="filter-wrapper">
+						<FilterLabel v-for="filter in getFilterForColumn(col)"
+							:id="filter.columnId + filter.operator + filter.value"
+							:key="filter.columnId + filter.operator + filter.value"
+							:operator="filter.operator"
+							:value="filter.value"
+							@delete-filter="id => $emit('delete-filter', id)" />
+					</div>
+				</div>
+				<div v-if="hasRightHiddenNeighbor(col.id)" class="hidden-indicator" @click="unhide(col.id)" />
 			</div>
 		</th>
 		<th data-cy="customTableAction">
 			<NcActions :force-menu="true">
-				<NcActionButton v-if="canManageElement(table) && isView"
+				<NcActionButton v-if="canManageElement(table)"
 					:close-after-click="true"
 					icon="icon-rename"
 					@click="$emit('edit-view')">
@@ -121,10 +130,6 @@ export default {
 			type: Object,
 			default: null,
 		},
-		isView: {
-			type: Boolean,
-			default: false,
-		},
 	},
 
 	data() {
@@ -141,6 +146,9 @@ export default {
 				return false
 			}
 		},
+		visibleColums() {
+			return this.columns.filter(col => !this.viewSetting?.hiddenColumns?.includes(col.id))
+		},
 	},
 
 	methods: {
@@ -156,6 +164,12 @@ export default {
 		},
 		toggleShare() {
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
+		},
+		hasRightHiddenNeighbor(colId) {
+			return this.viewSetting?.hiddenColumns?.includes(this.columns[this.columns.indexOf(this.columns.find(col => col.id === colId)) + 1]?.id)
+		},
+		unhide(colId) {
+			this.$store.dispatch('unhideColumn', { columnId: this.columns[this.columns.indexOf(this.columns.find(col => col.id === colId)) + 1]?.id })
 		},
 	},
 }
@@ -186,6 +200,32 @@ export default {
 
 .clickable {
 	cursor: pointer;
+}
+
+.hidden-indicator {
+	border-right: solid;
+	border-color: var(--color-primary);
+	border-width: 3px;
+	padding-left: calc(var(--default-grid-baseline) * 1);
+	cursor: pointer;
+}
+
+.hidden-indicator-first {
+	border-right: solid;
+	border-color: var(--color-primary);
+	border-width: 3px;
+	padding-left: calc(var(--default-grid-baseline) * 4);
+	cursor: pointer;
+}
+
+.cell-wrapper {
+	display: flex;
+	justify-content: space-between;
+}
+.cell-options-wrapper {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
 }
 
 </style>
