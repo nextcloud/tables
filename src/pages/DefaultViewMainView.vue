@@ -130,9 +130,11 @@ export default {
 	mounted() {
 		this.reload()
 		subscribe('tables:column:delete', column => { this.columnToDelete = column })
+		subscribe('tables:view:reload', () => { this.reload(true) })
 	},
 	unmounted() {
 		unsubscribe('tables:column:delete', column => { this.columnToDelete = column })
+		unsubscribe('tables:view:reload', () => { this.reload(true) })
 	},
 	methods: {
 		openImportModal(table) {
