@@ -1,7 +1,7 @@
 <template>
 	<tr v-if="row" :class="{ selected }">
 		<td><NcCheckboxRadioSwitch :checked="selected" @update:checked="v => $emit('update-row-selection', { rowId: row.id, value: v })" /></td>
-		<td v-for="col in columns" :key="col.id" :class="{ 'search-result': getCell(col.id)?.searchStringFound, 'filter-result': getCell(col.id)?.filterFound }">
+		<td v-for="col in visibleColums" :key="col.id" :class="{ 'search-result': getCell(col.id)?.searchStringFound, 'filter-result': getCell(col.id)?.filterFound }">
 			<component :is="getTableCell(col)"
 				:column="col"
 				:row-id="row.id"
@@ -64,11 +64,18 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		viewSetting: {
+			type: Object,
+			default: null,
+		},
 	},
 	computed: {
 		getSelection: {
 			get: () => { return this.selected },
 			set: () => { alert('updating selection') },
+		},
+		visibleColums() {
+			return this.columns.filter(col => !this.viewSetting?.hiddenColumns?.includes(col.id))
 		},
 	},
 	methods: {

@@ -48,6 +48,7 @@
 		<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false" />
 		<EditColumns :show-modal="showEditColumns" @close="showEditColumns = false" />
 		<DeleteRows v-if="rowsToDelete" :rows-to-delete="rowsToDelete" @cancel="rowsToDelete = null" />
+		<DeleteColumn v-if="columnToDelete" :column-to-delete="columnToDelete" @cancel="columnToDelete = null" />
 	</div>
 </template>
 
@@ -62,10 +63,11 @@ import EditBaseView from '../modules/main/modals/EditBaseView.vue'
 import CreateColumn from '../modules/main/modals/CreateColumn.vue'
 import EditColumns from '../modules/main/modals/EditColumns.vue'
 import DeleteRows from '../modules/main/modals/DeleteRows.vue'
+import DeleteColumn from '../modules/main/modals/DeleteColumn.vue'
 import EmptyTable from '../modules/main/sections/EmptyTable.vue'
 import EmptyView from '../modules/main/sections/EmptyView.vue'
 import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
-import { emit } from '@nextcloud/event-bus'
+import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 
 export default {
 	name: 'DefaultViewMainView',
@@ -74,6 +76,7 @@ export default {
 		EmptyView,
 		EditView,
 		DeleteRows,
+		DeleteColumn,
 		ElementDescription,
 		NcView,
 		CreateRow,
@@ -94,6 +97,7 @@ export default {
 			editView: null,
 			showCreateColumn: false,
 			showEditColumns: false,
+			columnToDelete: null,
 			rowsToDelete: null,
 		}
 	},
@@ -125,6 +129,10 @@ export default {
 	},
 	mounted() {
 		this.reload()
+		subscribe('tables:column:delete', column => { this.columnToDelete = column })
+	},
+	unmounted() {
+		unsubscribe('tables:column:delete', column => { this.columnToDelete = column })
 	},
 	methods: {
 		openImportModal(table) {

@@ -262,7 +262,7 @@ class TableService extends SuperService {
 		}
 		$baseView = $this->viewService->create($title, $emoji, $newTable, true, $userId);
 		if ($template !== 'custom') {
-			$table = $this->tableTemplateService->makeTemplate($newTable, $template);
+			$table = $this->tableTemplateService->makeTemplate($newTable, $template, $baseView->getId());
 		} else {
 			$table = $this->addOwnerDisplayName($newTable);
 		}
@@ -365,6 +365,9 @@ class TableService extends SuperService {
 			foreach ($columns as $column) {
 				$this->columnService->delete($column->id, true, $userId);
 			}
+
+			// delete all views for that table
+			$this->viewService->deleteAllByTable($item,$userId);
 
 			// delete all shares for that table
 			$this->shareService->deleteAllForTable($item);

@@ -69,7 +69,7 @@ class SuperColumnQB implements IColumnTypeQB {
 				case 'is-lower-than-or-equal':
 					return $formattedCellValue.' <= :'.$searchValuePlaceHolder;
 				case 'is-empty':
-					return $formattedCellValue.' = \'\' OR :'.$searchValuePlaceHolder.' IS NULL';
+					return $formattedCellValue.' = \'\' OR '.$formattedCellValue.' IS NULL';
 				default:
 					throw new InternalError('Operator '.$operator.' is not supported.');
 			}
@@ -93,7 +93,7 @@ class SuperColumnQB implements IColumnTypeQB {
 			$qb->from($qb->createFunction('json_each(data)'));
 			$qb->where('json_extract(value, "$.columnId") = :columnId');
 		} else {
-			$qb->where('JSON_CONTAINS(JSON_VALUE(data, \'$.columnId\'), :columnId, \'$\') = 1');
+			$qb->where('JSON_CONTAINS(JSON_EXTRACT(data, \'$[*].columnId\'), :columnId, \'$\') = 1');
 		}
 		$qb->setParameter('columnId', $columnId);
 	}

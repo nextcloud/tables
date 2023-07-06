@@ -40,7 +40,6 @@
 import { NcModal, NcButton } from '@nextcloud/vue'
 import { showError, showWarning } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
-import { mapGetters } from 'vuex'
 import ColumnFormComponent from '../partials/ColumnFormComponent.vue'
 import tablePermissions from '../mixins/tablePermissions.js'
 
@@ -74,7 +73,6 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['activeTable']),
 		showDeleteButton() {
 			return this.canDeleteDataActiveTable && !this.localLoading
 		},

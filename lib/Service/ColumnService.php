@@ -183,7 +183,7 @@ class ColumnService extends SuperService {
 		?string $datetimeDefault,
 
 		int $viewId,
-		array $selectedViewIds
+		?array $selectedViewIds
 	):Column {
 		// security
 		$table = $this->tableMapper->find($tableId);
@@ -385,6 +385,8 @@ class ColumnService extends SuperService {
 
 			if (!$skipRowCleanup) {
 				$this->rowService->deleteColumnDataFromRows($id);
+				$table = $this->tableMapper->find($item->getTableId());
+				$this->viewService->deleteColumnDataFromViews($id, $table);
 			}
 
 			$this->mapper->delete($item);

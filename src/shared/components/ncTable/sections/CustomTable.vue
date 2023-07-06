@@ -7,7 +7,6 @@
 					:rows="getSearchedAndFilteredAndSortedRows"
 					:table="table"
 					:view-setting="viewSetting"
-					:is-view="isView"
 					@create-row="$emit('create-row')"
 					@edit-view="$emit('edit-view')"
 					@import="table => $emit('import', table)"
@@ -24,6 +23,7 @@
 					:row="row"
 					:columns="columns"
 					:selected="isRowSelected(row.id)"
+					:view-setting="viewSetting"
 					@update-row-selection="updateRowSelection"
 					@edit-row="rowId => $emit('edit-row', rowId)" />
 			</tbody>

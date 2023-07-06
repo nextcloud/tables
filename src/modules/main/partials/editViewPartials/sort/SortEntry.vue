@@ -9,7 +9,6 @@
 					:button-variant="true"
 					:checked.sync="sortMode"
 					value="ASC"
-					name="sharing_permission_radio"
 					type="radio"
 					button-variant-grouped="horizontal"
 					class="mode-checkbox">
@@ -22,7 +21,6 @@
 					:button-variant="true"
 					:checked.sync="sortMode"
 					value="DESC"
-					name="sharing_permission_radio"
 					type="radio"
 					button-variant-grouped="horizontal"
 					class="mode-checkbox">
