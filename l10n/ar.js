@@ -19,6 +19,7 @@ OC.L10N.register(
     "Tables" : "الجداول",
     "Type" : "نوع",
     "Simple text" : "نص بسيط",
+    "Rich text" : "نص ريتش",
     "Time" : "إلى وقت",
     "Date and time" : "التاريخ و الوقت",
     "Save" : "Save",
