@@ -51,6 +51,14 @@
 					<Creation :size="20" />
 				</template>
 			</NcActionButton>
+			<NcActionButton
+				:close-after-click="true"
+				@click="cloneView">
+				<template #icon>
+					<TableMultiple :size="20" decorative />
+				</template>
+				{{ t('tables', 'Clone view') }}
+			</NcActionButton>
 			<NcActionButton v-if="canDeleteElement(view)"
 				icon="icon-delete"
 				:close-after-click="true"
@@ -73,12 +81,13 @@ import { NcAppNavigationItem, NcActionButton, NcCounterBubble, NcAvatar } from '
 import '@nextcloud/dialogs/dist/index.css'
 import { getCurrentUser } from '@nextcloud/auth'
 import { mapGetters } from 'vuex'
-import { showSuccess } from '@nextcloud/dialogs'
+import { showSuccess, showError } from '@nextcloud/dialogs'
 import Table from 'vue-material-design-icons/Table.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import DialogConfirmation from '../../../shared/modals/DialogConfirmation.vue'
 import Creation from 'vue-material-design-icons/Creation.vue'
 import Import from 'vue-material-design-icons/Import.vue'
+import TableMultiple from 'vue-material-design-icons/TableMultiple.vue'
 import { emit } from '@nextcloud/event-bus'
 
 export default {
@@ -94,6 +103,7 @@ export default {
 		Creation,
 		NcAvatar,
 		Import,
+		TableMultiple,
 	},
 
 	filters: {
@@ -158,6 +168,31 @@ export default {
 		},
 		editView() {
 			emit('edit-view', this.view)
+		},
+		async cloneView() {
+			let data = {
+				tableId: this.view.tableId,
+				title: this.view.title + ' ' + t('tables', 'Copy'),
+				emoji: this.view.emoji,
+			}
+			const newViewId = await this.$store.dispatch('insertNewView', { data })
+			if (newViewId) {
+				data = {
+					data: {
+						columns: JSON.stringify(this.view.columns),
+						filter: JSON.stringify(this.view.filter),
+						sort: JSON.stringify(this.view.sort),
+					},
+				}
+				const res = await this.$store.dispatch('updateView', { id: newViewId, data })
+				if (res) {
+					await this.$router.push('/view/' + newViewId)
+				} else {
+					showError(t('tables', 'Could not configure new view'))
+				}
+			} else {
+				showError(t('tables', 'Could not create new view'))
+			}
 		},
 	},
 

@@ -6,6 +6,7 @@ use DateTime;
 use Exception;
 use OCA\Tables\Db\Row;
 use OCA\Tables\Db\RowMapper;
+use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
@@ -346,6 +347,23 @@ class RowService extends SuperService {
 				return $this->mapper->countRows($tableId);
 			} else {
 				throw new PermissionError('no read access for counting to table id = '.$tableId);
+			}
+		} catch (\OCP\DB\Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
+		}
+	}
+
+	public function getViewRowsCount(View $view, string $userId): int {
+		try {
+			if ($this->permissionsService->canReadRowsByElementId($view->getId(), 'view')) {
+				if ($view->getIsBaseView()) {
+					return $this->mapper->countRowsForBaseView($view);
+				} else {
+					return $this->mapper->countRowsForNotBaseView($view, $userId);
+				}
+			} else {
+				throw new PermissionError('no read access for counting to view id = '.$view->getId());
 			}
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage());

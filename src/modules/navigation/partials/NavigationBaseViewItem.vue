@@ -155,7 +155,7 @@ export default {
 
 	methods: {
 		createView() {
-			emit('create-view', this.baseView)
+			emit('create-view', this.baseView.tableId)
 		},
 		editTable() {
 			emit('edit-view', this.baseView) //TODO
