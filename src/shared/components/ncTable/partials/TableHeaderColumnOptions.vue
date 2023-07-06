@@ -258,9 +258,8 @@ export default {
 	padding-left: calc(var(--default-grid-baseline) * 1);
 }
 
-.selected {
+.mode-selected {
 	background-color: var(--color-primary-element-light) !important;
-	border-radius: 6px;
 }
 
 .select-field {

@@ -54,7 +54,7 @@
 			<!-- <EditTable :show-modal="editTable !== null" :table="editTable" @close="editTable = null " /> -->
 			<EditViewTitle :show-modal="editView !== null" :view="editView" @close="editView = null " />
 			<Import :show-modal="importTable !== null" :table="importTable" @close="importTable = null" />
-			<CreateView :show-modal="createView !== null" :table-id="createView?.tableId" @close="createView = null" />
+			<CreateView :show-modal="createViewTableId !== null" :table-id="createViewTableId" @close="createViewTableId = null" />
 		</template>
 	</NcAppNavigation>
 </template>
@@ -98,7 +98,7 @@ export default {
 			importTable: null,
 			editTable: null, // if null, no modal open
 			editView: null, // if null, no modal open
-			createView: null, // if null, no modal open
+			createViewTableId: null, // if null, no modal open
 			filterString: '',
 		}
 	},
@@ -119,14 +119,14 @@ export default {
 		},
 	},
 	mounted() {
-		subscribe('create-view', baseView => { this.createView = baseView })
+		subscribe('create-view', tableId => { this.createViewTableId = tableId })
 		subscribe('create-table', this.createTable)
 		// subscribe('edit-table', table => { this.editTable = table })
 		subscribe('edit-view', view => { this.editView = view })
 		subscribe('tables:modal:import', table => { this.importTable = table })
 	},
 	beforeDestroy() {
-		unsubscribe('create-view', baseView => { this.createView = baseView })
+		unsubscribe('create-view', tableId => { this.createViewTableId = tableId })
 		unsubscribe('create-table', this.createTable)
 		// unsubscribe('edit-table', table => { this.editTable = table })
 		unsubscribe('edit-view', view => { this.editView = view })

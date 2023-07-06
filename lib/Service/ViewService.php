@@ -22,6 +22,8 @@ class ViewService extends SuperService {
 
 	private ShareService $shareService;
 
+	private RowService $rowService;
+
 	protected UserHelper $userHelper;
 
 	protected IL10N $l;
@@ -32,6 +34,7 @@ class ViewService extends SuperService {
 		?string $userId,
 		ViewMapper $mapper,
 		ShareService $shareService,
+		RowService $rowService,
 		UserHelper $userHelper,
 		IL10N $l
 	) {
@@ -39,6 +42,7 @@ class ViewService extends SuperService {
 		$this->l = $l;
 		$this->mapper = $mapper;
 		$this->shareService = $shareService;
+		$this->rowService = $rowService;
 		$this->userHelper = $userHelper;
 	}
 
@@ -314,11 +318,10 @@ class ViewService extends SuperService {
 		}
 
 		// add the rows count
-		//try {
-		//	$table->setRowsCount($this->rowService->getRowsCount($table->getId()));
-		//} catch (InternalError|PermissionError $e) {
-		$view->setRowsCount(0);	//TODO
-		//}
+		try {
+			$view->setRowsCount($this->rowService->getViewRowsCount($view, $userId));
+		} catch (InternalError|PermissionError $e) {
+		}
 
 		// set if this is a shared table with you (somebody else shared it with you)
 		// (senseless if we have no user in context)

@@ -33,53 +33,10 @@
 		</th>
 		<th data-cy="customTableAction">
 			<NcActions :force-menu="true" :type="isViewSettingSet ? 'secondary' : 'tertiary'">
-				<NcActionButton v-if="canManageElement(table)"
-					:close-after-click="true"
-					icon="icon-rename"
-					@click="$emit('edit-view')">
-					{{ t('tables', 'Edit view') }}
-				</NcActionButton>
-				<NcActionButton v-if="canCreateRowInElement(table)"
-					:close-after-click="true"
-					icon="icon-add"
-					@click="$emit('create-row')">
-					{{ t('tables', 'Create row') }}
-				</NcActionButton>
-				<NcActionButton v-if="canCreateRowInElement(table)"
-					:close-after-click="true"
-					@click="$emit('import', table)">
-					<template #icon>
-						<IconImport :size="20" decorative title="Import" />
-					</template>
-					{{ t('tables', 'Import') }}
-				</NcActionButton>
-				<NcActionSeparator v-if="canCreateRowInElement(table)" />
-				<NcActionButton v-if="canManageElement(table)" :close-after-click="true" @click="$emit('create-column')">
-					<template #icon>
-						<TableColumnPlusAfter :size="20" decorative title="" />
-					</template>
-					{{ t('tables', 'Create column') }}
-				</NcActionButton>
-				<NcActionButton v-if="canManageElement(table)" :close-after-click="true" @click="$emit('edit-columns')">
-					<template #icon>
-						<TableEdit :size="20" decorative title="" />
-					</template>
-					{{ t('tables', 'Edit columns') }}
-				</NcActionButton>
-				<NcActionSeparator v-if="canManageElement(table)" />
-				<NcActionButton v-if="canManageElement(table)"
-					:close-after-click="true"
-					icon="icon-share"
-					@click="toggleShare">
-					{{ t('tables', 'Share') }}
-				</NcActionButton>
-				<NcActionButton v-if="canReadElement(table)" :close-after-click="true"
-					icon="icon-download"
-					@click="downloadCSV">
-					{{ t('tables', 'Export as CSV') }}
-				</NcActionButton>
+				<NcActionCaption :title="t('tables', 'Manage view')" />
 				<NcActionButton v-if="isViewSettingSet"
 					:close-after-click="true"
+					class="view-changed"
 					@click="resetView">
 					<template #icon>
 						<ArrowULeftTop :size="20" decorative />
@@ -88,6 +45,7 @@
 				</NcActionButton>
 				<NcActionButton v-if="isViewSettingSet && !activeView.isBaseView"
 					:close-after-click="true"
+					class="view-changed"
 					@click="applyViewConfig">
 					<template #icon>
 						<TableCheck :size="20" decorative />
@@ -96,11 +54,70 @@
 				</NcActionButton>
 				<NcActionButton v-if="isViewSettingSet"
 					:close-after-click="true"
+					class="view-changed"
 					@click="createWithViewConfig">
 					<template #icon>
 						<TablePlus :size="20" decorative />
 					</template>
 					{{ t('tables', 'Create view with config') }}
+				</NcActionButton>
+
+				<NcActionSeparator v-if="isViewSettingSet" />
+
+				<NcActionButton v-if="canManageElement(table)" :close-after-click="true" @click="$emit('create-column')">
+					<template #icon>
+						<TableColumnPlusAfter :size="20" decorative title="" />
+					</template>
+					{{ t('tables', 'Create column') }}
+				</NcActionButton>
+				<NcActionButton v-if="canManageElement(table)"
+					:close-after-click="true"
+					icon="icon-rename"
+					@click="$emit('edit-view')">
+					{{ t('tables', 'Edit view') }}
+				</NcActionButton>
+				<NcActionButton v-if="canManageElement(table)"
+					:close-after-click="true"
+					@click="createView()">
+					<template #icon>
+						<TablePlus :size="20" decorative />
+					</template>
+					{{ t('tables', 'Create view') }}
+				</NcActionButton>
+				<NcActionButton v-if="canManageElement(table)" :close-after-click="true" @click="$emit('edit-columns')">
+					<template #icon>
+						<TableEdit :size="20" decorative title="" />
+					</template>
+					{{ t('tables', 'Edit columns') }}
+				</NcActionButton>
+
+				<NcActionCaption :title="t('tables', 'Integration')" />
+				<NcActionButton v-if="canCreateRowInElement(table)"
+					:close-after-click="true"
+					@click="$emit('import', table)">
+					<template #icon>
+						<IconImport :size="20" decorative title="Import" />
+					</template>
+					{{ t('tables', 'Import') }}
+				</NcActionButton>
+				<NcActionButton v-if="canReadElement(table)" :close-after-click="true"
+					icon="icon-download"
+					@click="downloadCSV">
+					{{ t('tables', 'Export as CSV') }}
+				</NcActionButton>
+				<NcActionButton v-if="canManageElement(table)"
+					:close-after-click="true"
+					icon="icon-share"
+					@click="toggleShare">
+					{{ t('tables', 'Share') }}
+				</NcActionButton>
+				<NcActionButton
+					:close-after-click="true"
+					@click="actionShowIntegration">
+					{{ t('tables', 'Integration') }}
+					<template #icon>
+						<Creation :size="20" />
+					</template>
 				</NcActionButton>
 			</NcActions>
 		</th>
@@ -108,11 +125,12 @@
 </template>
 
 <script>
-import { NcCheckboxRadioSwitch, NcActions, NcActionButton, NcActionSeparator } from '@nextcloud/vue'
+import { NcCheckboxRadioSwitch, NcActions, NcActionButton, NcActionSeparator, NcActionCaption } from '@nextcloud/vue'
 import { emit } from '@nextcloud/event-bus'
 import TableEdit from 'vue-material-design-icons/TableEdit.vue'
 import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
 import IconImport from 'vue-material-design-icons/Import.vue'
+import Creation from 'vue-material-design-icons/Creation.vue'
 import ArrowULeftTop from 'vue-material-design-icons/TableRefresh.vue'
 import TableCheck from 'vue-material-design-icons/TableCheck.vue'
 import TablePlus from 'vue-material-design-icons/TablePlus.vue'
@@ -137,6 +155,8 @@ export default {
 		ArrowULeftTop,
 		TableCheck,
 		TablePlus,
+		NcActionCaption,
+		Creation,
 	},
 
 	mixins: [permissionsMixin],
@@ -210,6 +230,9 @@ export default {
 		resetView() {
 			this.$store.dispatch('resetViewSetting')
 		},
+		createView() {
+			emit('create-view', this.activeView.tableId)
+		},
 		generateViewConfigData() {
 			const data = { data: {} }
 			if (this.viewSetting.hiddenColumns && this.viewSetting.hiddenColumns.length !== 0) {
@@ -245,11 +268,14 @@ export default {
 				if (res) {
 					await this.$router.push('/view/' + newViewId)
 				} else {
-					showError(t('tables', 'Could not create new view2'))
+					showError(t('tables', 'Could not configure new view'))
 				}
 			} else {
 				showError(t('tables', 'Could not create new view'))
 			}
+		},
+		async actionShowIntegration() {
+			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
 		},
 	},
 }

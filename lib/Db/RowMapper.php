@@ -180,22 +180,51 @@ class RowMapper extends QBMapper {
 	}
 
 	/**
-	 * @param View $viewrows
-	 * @param int|null $limit
-	 * @param int|null $offset
-	 * @return array
-	 * @throws Exception
+	 *
 	 */
-	public function findAllByView(View $view, string $userId, ?int $limit = null, ?int $offset = null): array {
+	public function countRowsForBaseView(View $view): int {
 		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
+		$qb->select($qb->func()->count('*', 'counter'));
+		$qb->from($this->table);
+		$qb->where(
+			$qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId()))
+		);
+
+		try {
+			$result = $this->findOneQuery($qb);
+			return (int)$result['counter'];
+		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+			return 0;
+		}
+	}
+
+	/**
+	 *
+	 */
+	public function countRowsForNotBaseView(View $view, $userId): int {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select($qb->func()->count('*', 'counter'))
 			->from($this->table)
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), $qb::PARAM_INT)));
 
 		$neededColumnIds = $this->getAllColumnIdsFromView($view);
 		$neededColumns = $this->columnMapper->getColumnTypes($neededColumnIds);
+
+		// Filter
+
+		$this->addFilterToQuery($qb, $view, $neededColumns, $userId);
+
+		try {
+			$result = $this->findOneQuery($qb);
+			return (int)$result['counter'];
+		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+			return 0;
+		}
+	}
+
+
+	private function addFilterToQuery(IQueryBuilder &$qb, View $view, array $neededColumns, string $userId): void {
 		$enrichedFilters = $view->getFilterArray();
-		$enrichedSort = $view->getSortArray();
 		if (count($enrichedFilters) > 0) {
 			foreach ($enrichedFilters as &$filterGroup) {
 				foreach ($filterGroup as &$filter) {
@@ -211,9 +240,32 @@ class RowMapper extends QBMapper {
 				)
 			);
 		}
+	}
+
+	/**
+	 * @param View $viewrows
+	 * @param int|null $limit
+	 * @param int|null $offset
+	 * @return array
+	 * @throws Exception
+	 */
+	public function findAllByView(View $view, string $userId, ?int $limit = null, ?int $offset = null): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), $qb::PARAM_INT)));
+
+
+		$neededColumnIds = $this->getAllColumnIdsFromView($view);
+		$neededColumns = $this->columnMapper->getColumnTypes($neededColumnIds);
+
+		// Filter
+
+		$this->addFilterToQuery($qb, $view, $neededColumns, $userId);
 
 		// Sorting
 
+		$enrichedSort = $view->getSortArray();
 		foreach ($enrichedSort as &$sort) {
 			$sort['columnType'] = $neededColumns[$sort['columnId']];
 		}
