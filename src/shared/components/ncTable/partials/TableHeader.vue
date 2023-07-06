@@ -32,7 +32,7 @@
 			</div>
 		</th>
 		<th data-cy="customTableAction">
-			<NcActions :force-menu="true">
+			<NcActions :force-menu="true" :type="isViewSettingSet ? 'secondary' : 'tertiary'">
 				<NcActionButton v-if="canManageElement(table)"
 					:close-after-click="true"
 					icon="icon-rename"
@@ -78,6 +78,30 @@
 					@click="downloadCSV">
 					{{ t('tables', 'Export as CSV') }}
 				</NcActionButton>
+				<NcActionButton v-if="isViewSettingSet"
+					:close-after-click="true"
+					@click="resetView">
+					<template #icon>
+						<ArrowULeftTop :size="20" decorative />
+					</template>
+					{{ t('tables', 'Reset view config') }}
+				</NcActionButton>
+				<NcActionButton v-if="isViewSettingSet && !activeView.isBaseView"
+					:close-after-click="true"
+					@click="applyViewConfig">
+					<template #icon>
+						<TableCheck :size="20" decorative />
+					</template>
+					{{ t('tables', 'Apply view config') }}
+				</NcActionButton>
+				<NcActionButton v-if="isViewSettingSet"
+					:close-after-click="true"
+					@click="createWithViewConfig">
+					<template #icon>
+						<TablePlus :size="20" decorative />
+					</template>
+					{{ t('tables', 'Create view with config') }}
+				</NcActionButton>
 			</NcActions>
 		</th>
 	</tr>
@@ -89,9 +113,14 @@ import { emit } from '@nextcloud/event-bus'
 import TableEdit from 'vue-material-design-icons/TableEdit.vue'
 import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
 import IconImport from 'vue-material-design-icons/Import.vue'
+import ArrowULeftTop from 'vue-material-design-icons/TableRefresh.vue'
+import TableCheck from 'vue-material-design-icons/TableCheck.vue'
+import TablePlus from 'vue-material-design-icons/TablePlus.vue'
 import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
 import FilterLabel from './FilterLabel.vue'
 import permissionsMixin from '../mixins/permissionsMixin.js'
+import { mapGetters } from 'vuex'
+import { showSuccess, showError } from '@nextcloud/dialogs'
 
 export default {
 
@@ -105,6 +134,9 @@ export default {
 		NcActionSeparator,
 		TableEdit,
 		TableColumnPlusAfter,
+		ArrowULeftTop,
+		TableCheck,
+		TablePlus,
 	},
 
 	mixins: [permissionsMixin],
@@ -139,6 +171,7 @@ export default {
 	},
 
 	computed: {
+		...mapGetters(['activeView']),
 		allRowsAreSelected() {
 			if (Array.isArray(this.rows) && Array.isArray(this.selectedRows) && this.rows.length !== 0) {
 				return this.rows.length === this.selectedRows.length
@@ -148,6 +181,9 @@ export default {
 		},
 		visibleColums() {
 			return this.columns.filter(col => !this.viewSetting?.hiddenColumns?.includes(col.id))
+		},
+		isViewSettingSet() {
+			return !(!this.viewSetting || ((!this.viewSetting.hiddenColumns || this.viewSetting.hiddenColumns.length === 0) && (!this.viewSetting.sorting) && (!this.viewSetting.filter || this.viewSetting.filter.length === 0)))
 		},
 	},
 
@@ -170,6 +206,50 @@ export default {
 		},
 		unhide(colId) {
 			this.$store.dispatch('unhideColumn', { columnId: this.columns[this.columns.indexOf(this.columns.find(col => col.id === colId)) + 1]?.id })
+		},
+		resetView() {
+			this.$store.dispatch('resetViewSetting')
+		},
+		generateViewConfigData() {
+			const data = { data: {} }
+			if (this.viewSetting.hiddenColumns && this.viewSetting.hiddenColumns.length !== 0) {
+				data.data.columns = JSON.stringify(this.columns.map(col => col.id).filter(id => !this.viewSetting.hiddenColumns.includes(id)))
+			}
+			if (this.viewSetting.sorting) {
+				data.data.sort = JSON.stringify([this.viewSetting.sorting[0]])
+			}
+			if (this.viewSetting.filter && this.viewSetting.filter.length !== 0) {
+				const filteringRules = [this.viewSetting.filter.map(fil => ({
+					columnId: fil.columnId,
+					operator: fil.operator.id,
+					value: fil.value,
+				}))]
+				data.data.filter = JSON.stringify(filteringRules)
+			}
+			return data
+		},
+		async applyViewConfig() {
+			await this.$store.dispatch('updateView', { id: this.activeView.id, data: this.generateViewConfigData() })
+			emit('tables:view:reload')
+			showSuccess(t('tables', 'The configuration of view "{view}" was updated.', { view: this.activeView.title }))
+		},
+		async createWithViewConfig() {
+			const data = {
+				tableId: this.activeView.tableId,
+				title: this.activeView.title + ' ' + t('tables', 'Copy'),
+				emoji: this.activeView.emoji,
+			}
+			const newViewId = await this.$store.dispatch('insertNewView', { data })
+			if (newViewId) {
+				const res = await this.$store.dispatch('updateView', { id: newViewId, data: this.generateViewConfigData() })
+				if (res) {
+					await this.$router.push('/view/' + newViewId)
+				} else {
+					showError(t('tables', 'Could not create new view2'))
+				}
+			} else {
+				showError(t('tables', 'Could not create new view'))
+			}
 		},
 	},
 }

@@ -11,7 +11,7 @@ export default class TextLinkColumn extends AbstractTextColumn {
 	}
 
 	sort(mode) {
-		const factor = mode === 'desc' ? -1 : 1
+		const factor = mode === 'DESC' ? -1 : 1
 		return (rowA, rowB) => {
 			const tmpA = rowA.data.find(item => item.columnId === this.id)?.value || ''
 			const valueA = this.getValueFromCellValue(tmpA)

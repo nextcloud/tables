@@ -129,7 +129,6 @@ export default new Vuex.Store({
 			return true
 		},
 		async insertNewView({ commit, state }, { data }) {
-			console.debug(data)
 			let res = null
 
 			try {

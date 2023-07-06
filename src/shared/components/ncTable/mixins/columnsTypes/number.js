@@ -15,7 +15,7 @@ export default class NumberColumn extends AbstractNumberColumn {
 	}
 
 	sort(mode) {
-		const factor = mode === 'desc' ? -1 : 1
+		const factor = mode === 'DESC' ? -1 : 1
 		return (rowA, rowB) => {
 			const valueA = rowA.data.find(item => item.columnId === this.id)?.value || null
 			const valueB = rowB.data.find(item => item.columnId === this.id)?.value || null

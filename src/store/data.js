@@ -45,8 +45,8 @@ export default {
 		},
 
 		setSorting({ commit, state }, { columnId, mode }) {
-			// mode can be 'asc' or 'desc'
-			if (mode !== 'asc' && mode !== 'desc') {
+			// mode can be 'ASC' or 'DESC'
+			if (mode !== 'ASC' && mode !== 'DESC') {
 				return
 			}
 

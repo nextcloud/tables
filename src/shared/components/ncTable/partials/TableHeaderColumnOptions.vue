@@ -1,19 +1,21 @@
 <template>
-	<NcPopover :auto-hide="!isDropDownOpen" :focus-trap="false" :shown.sync="showPopover">
-		<template #trigger>
-			<NcButton
-				type="tertiary">
-				<template #icon>
-					<SortDesc v-if="getSortMode === 'desc'" :size="20" />
-					<SortAsc v-else-if="getSortMode === 'asc'" :size="20" />
-					<DotsHorizontal v-else :size="20" />
-				</template>
-			</NcButton>
-		</template>
-		<div class="column-option-wrapper">
-			<div v-if="canSort">
-				{{ t('tables', 'Sorting') }}
-				<div class="mode-switch">
+	<div class="menu" :class="{showOnHover: getSortMode === null}">
+		<NcPopover :auto-hide="!isDropDownOpen" :focus-trap="false" :shown.sync="showPopover">
+			<template #trigger>
+				<NcButton
+					type="tertiary">
+					<template #icon>
+						<SortDesc v-if="getSortMode === 'DESC'" :size="20" />
+						<SortAsc v-else-if="getSortMode === 'ASC'" :size="20" />
+						<DotsHorizontal v-else :size="20" />
+					</template>
+				</NcButton>
+			</template>
+			<div class="column-option-wrapper">
+				<div v-if="canSort" class="order-mode">
+					{{ t('tables', 'Sorting') }}
+				</div>
+				<div v-if="canSort" class="mode-switch">
 					<NcCheckboxRadioSwitch
 						:button-variant="true"
 						:checked.sync="sortMode"
@@ -21,8 +23,8 @@
 						type="checkbox"
 						button-variant-grouped="horizontal"
 						class="mode-checkbox"
-						:class="{'mode-selected': sortMode === 'asc'}"
-						@update:checked="sort('asc')">
+						:class="{'mode-selected': sortMode === 'ASC'}"
+						@update:checked="sort('ASC')">
 						<SortAsc :size="20" class="mode-icon" />
 					</NcCheckboxRadioSwitch>
 					<NcCheckboxRadioSwitch
@@ -32,55 +34,55 @@
 						type="checkbox"
 						button-variant-grouped="horizontal"
 						class="mode-checkbox"
-						:class="{'mode-selected': sortMode === 'desc'}"
-						@update:checked="sort('desc')">
+						:class="{'mode-selected': sortMode === 'DESC'}"
+						@update:checked="sort('DESC')">
 						<SortDesc :size="20" class="mode-icon" />
 					</NcCheckboxRadioSwitch>
 				</div>
-			</div>
-			<div class="inter-header">
-				{{ t('tables', 'Filtering') }}
-			</div>
+				<div class="inter-header">
+					{{ t('tables', 'Filtering') }}
+				</div>
 
-			<NcSelect
-				v-model="selectedOperator"
-				class="select-field"
-				:options="getOperators"
-				:get-option-key="(option) => option.id"
-				:placeholder="t('tables', 'Operator')"
-				label="label"
-				@search:focus="isDropDownOpen = true"
-				@search:blur="isDropDownOpen = false"
-				@option:selected="changeFilterOperator" />
-			<NcSelect
-				v-if="selectedOperator && !selectedOperator.noSearchValue"
-				v-model="searchValue"
-				class="select-field"
-				:options="magicFieldsArray"
-				:placeholder="t('tables', 'Search Value')"
-				@search="v => term = v"
-				@search:focus="isDropDownOpen = true"
-				@search:blur="isDropDownOpen = false"
-				@option:selected="submitFilterInput" />
-			<div class="bottom-buttons">
-				<NcButton
-					type="secondary"
-					class="column-button"
-					:wide="true"
-					:disabled="!canHide"
-					@click="hideColumn()">
-					<template #icon>
-						<EyeOff :size="25" />
-					</template>
-				</NcButton>
-				<NcButton type="error" class="column-button" :wide="true" @click="deleteColumn()">
-					<template #icon>
-						<Delete :size="25" />
-					</template>
-				</NcButton>
+				<NcSelect
+					v-model="selectedOperator"
+					class="select-field"
+					:options="getOperators"
+					:get-option-key="(option) => option.id"
+					:placeholder="t('tables', 'Operator')"
+					label="label"
+					@search:focus="isDropDownOpen = true"
+					@search:blur="isDropDownOpen = false"
+					@option:selected="changeFilterOperator" />
+				<NcSelect
+					v-if="selectedOperator && !selectedOperator.noSearchValue"
+					v-model="searchValue"
+					class="select-field"
+					:options="magicFieldsArray"
+					:placeholder="t('tables', 'Search Value')"
+					@search="v => term = v"
+					@search:focus="isDropDownOpen = true"
+					@search:blur="isDropDownOpen = false"
+					@option:selected="submitFilterInput" />
+				<div class="bottom-buttons">
+					<NcButton
+						type="secondary"
+						class="column-button"
+						:wide="true"
+						:disabled="!canHide"
+						@click="hideColumn()">
+						<template #icon>
+							<EyeOff :size="25" />
+						</template>
+					</NcButton>
+					<NcButton type="error" class="column-button" :wide="true" @click="deleteColumn()">
+						<template #icon>
+							<Delete :size="25" />
+						</template>
+					</NcButton>
+				</div>
 			</div>
-		</div>
-	</NcPopover>
+		</NcPopover>
+	</div>
 </template>
 
 <script>
@@ -293,5 +295,16 @@ export default {
 	padding-top:  calc(var(--default-grid-baseline) * 4);
 	display: flex;
 	justify-content: space-between;
+}
+
+.menu {
+	padding-left: calc(var(--default-grid-baseline) * 1);
+}
+
+.order-mode {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
 }
 </style>
