@@ -8,7 +8,7 @@
 					</h2>
 				</div>
 			</div>
-			<div v-for="column in columns" :key="column.id">
+			<div v-for="column in nonMetaColumns" :key="column.id">
 				<ColumnFormComponent
 					:column="column"
 					:value.sync="localRow[column.id]" />
@@ -75,6 +75,9 @@ export default {
 	computed: {
 		showDeleteButton() {
 			return this.canDeleteDataActiveTable && !this.localLoading
+		},
+		nonMetaColumns() {
+			return this.columns.filter(col => col.id >= 0)
 		},
 	},
 	watch: {

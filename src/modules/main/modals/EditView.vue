@@ -23,16 +23,17 @@
 		<!--columns & order-->
 		<NcAppSettingsSection v-if="columns != null" id="columns-and-order" :title="t('tables', 'Columns')">
 			<SelectedViewColumns
-				:columns="columns"
-				:selected-columns="selectedColumns" />
+				:columns="allColumns"
+				:selected-columns="selectedColumns"
+				:is-base-view="view.isBaseView" />
 		</NcAppSettingsSection>
 		<!--filtering-->
-		<NcAppSettingsSection v-if="columns != null" id="filter" :title="t('tables', 'Filter')">
-			<FilterForm :filters="view.filter" :columns="columns" />
+		<NcAppSettingsSection v-if="columns != null && !view.isBaseView" id="filter" :title="t('tables', 'Filter')">
+			<FilterForm :filters="view.filter" :columns="allColumns" />
 		</NcAppSettingsSection>
 		<!--sorting-->
 		<NcAppSettingsSection v-if="columns != null" id="sort" :title="t('tables', 'Sort')">
-			<SortForm :sort="view.sort" :columns="columns" />
+			<SortForm :sort="view.sort" :columns="allColumns" />
 		</NcAppSettingsSection>
 		<!-- <div class="row">
 			<div class="fix-col-4 space-T" :class="{'justify-between': showDeleteButton, 'end': !showDeleteButton}">
@@ -73,6 +74,7 @@ import tablePermissions from '../mixins/tablePermissions.js'
 import FilterForm from '../partials/editViewPartials/filter/FilterForm.vue'
 import SortForm from '../partials/editViewPartials/sort/SortForm.vue'
 import SelectedViewColumns from '../partials/editViewPartials/SelectedViewColumns.vue'
+import { MetaColumns } from '../../../shared/components/ncTable/mixins/metaColumns.js'
 
 export default {
 	name: 'EditView',
@@ -103,6 +105,7 @@ export default {
 			icon: '',
 			errorTitle: false,
 			selectedColumns: [],
+			allColumns: [],
 			localLoading: false,
 			prepareDelete: false,
 			columns: null,
@@ -115,6 +118,9 @@ export default {
 		showDeleteButton() {
 			return true // TODO
 			// return this.canDeleteDataActiveTable && !this.localLoading
+		},
+		getMetaColumns() {
+			return MetaColumns
 		},
 	},
 	watch: {
@@ -149,20 +155,10 @@ export default {
 		async loadTableColumnsFromBE() {
 			this.columns = await this.$store.dispatch('getColumnsFromBE', { tableId: this.view.tableId })
 			// Show columns of view first
-			this.columns.sort((a, b) => {
-				const aSelected = this.selectedColumns.includes(a.id)
-				const bSelected = this.selectedColumns.includes(b.id)
-				if (aSelected && !bSelected) {
-					return -1
-				} else if (!aSelected && bSelected) {
-					return 1
-				} else {
-					return 0
-				}
-			})
+			this.allColumns = this.columns.concat(this.getMetaColumns)
+			this.allColumns = this.view.columns.map(id => this.allColumns.find(col => col.id === id)).concat(this.allColumns.filter(col => !this.view.columns.includes(col.id)))
 		},
 		async actionConfirm() {
-			// TODO: Validate filter
 			if (this.title === '') {
 				showError(t('tables', 'Cannot update view. Title is missing.'))
 				this.errorTitle = true
@@ -176,19 +172,20 @@ export default {
 			}
 		},
 		async updateViewToBE(id) {
-			const newSelectedColumnIds = this.columns.map(col => col.id).filter(id => this.selectedColumns.includes(id))
+			const newSelectedColumnIds = this.allColumns.map(col => col.id).filter(id => this.selectedColumns.includes(id))
 			const filteredSortingRules = this.view.sort.filter(sortRule => sortRule.columnId !== undefined)
-			const filteredFilteringRules = this.view.filter.map(filterGroup =>
-				filterGroup.filter(fil => fil.columnId !== undefined && fil.operator !== undefined)).filter(filterGroup => filterGroup.length > 0)
-
 			const data = {
 				data: {
 					title: this.title,
 					emoji: this.icon,
 					columns: JSON.stringify(newSelectedColumnIds),
-					filter: JSON.stringify(filteredFilteringRules),
 					sort: JSON.stringify(filteredSortingRules),
 				},
+			}
+
+			if (!this.view.isBaseView) {
+				const filteredFilteringRules = this.view.filter.map(filterGroup => filterGroup.filter(fil => fil.columnId !== undefined && fil.operator !== undefined)).filter(filterGroup => filterGroup.length > 0)
+				data.data.filter = JSON.stringify(filteredFilteringRules)
 			}
 			const res = await this.$store.dispatch('updateView', { id, data })
 			if (res) {
@@ -205,6 +202,7 @@ export default {
 			this.icon = this.view.emoji
 			this.errorTitle = false
 			this.selectedColumns = [...this.view.columns]
+			this.allColumns = []
 			this.localLoading = false
 			this.columns = null
 		},

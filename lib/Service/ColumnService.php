@@ -80,6 +80,7 @@ class ColumnService extends SuperService {
 				$viewColumnIds = $view->getColumnsArray();
 				$viewColumns = [];
 				foreach ($viewColumnIds as $viewColumnId) {
+					if ($viewColumnId < 0) continue;
 					try {
 						$viewColumns[] = $this->mapper->find($viewColumnId);
 					} catch (DoesNotExistException $e) {
