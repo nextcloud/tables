@@ -2,6 +2,7 @@ import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import displayError from '../shared/utils/displayError.js'
 import { parseCol } from '../shared/components/ncTable/mixins/columnParser.js'
+import { MetaColumns } from '../shared/components/ncTable/mixins/metaColumns.js'
 
 export default {
 	state: {
@@ -133,20 +134,18 @@ export default {
 				displayError(e, t('tables', 'Could not load columns.'))
 				return false
 			}
-			let columns = res.data.map(col => parseCol(col))
-			if (tableId) {
-				columns = columns.sort((a, b) => {
-					if (a.orderWeight < b.orderWeight) { return 1 }
-					if (a.orderWeight > b.orderWeight) { return -1 }
-					return 0
-				})
-			}
+			const columns = res.data.map(col => parseCol(col))
 			commit('setLoading', false)
 			return columns
 		},
-		async loadColumnsFromBE({ commit, dispatch }, { tableId, viewId }) {
-			const columns = await dispatch('getColumnsFromBE', { tableId, viewId })
-			commit('setColumns', columns)
+		async loadColumnsFromBE({ commit, dispatch }, { view }) {
+			const columns = await dispatch('getColumnsFromBE', { viewId: view.id })
+			let allColumns = columns.concat(MetaColumns.filter(col => view.columns.includes(col.id)))
+			allColumns = allColumns.sort(function(a, b) {
+				return view.columns.indexOf(a.id) - view.columns.indexOf(b.id)
+			  })
+
+			commit('setColumns', allColumns)
 			return true
 		},
 		async insertNewColumn({ commit, state }, { data }) {

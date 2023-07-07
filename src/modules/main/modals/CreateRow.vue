@@ -8,7 +8,7 @@
 					</h2>
 				</div>
 			</div>
-			<div v-for="column in columns" :key="column.id">
+			<div v-for="column in nonMetaColumns" :key="column.id">
 				<ColumnFormComponent
 					:column="column"
 					:value.sync="row[column.id]" />
@@ -62,6 +62,9 @@ export default {
 	},
 	computed: {
 		...mapGetters(['activeView']),
+		nonMetaColumns() {
+			return this.columns.filter(col => col.id >= 0)
+		},
 	},
 	methods: {
 		actionCancel() {

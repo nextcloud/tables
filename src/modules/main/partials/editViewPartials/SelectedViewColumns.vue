@@ -1,16 +1,21 @@
 <template>
-	<div class="selected-columns-wrapper">
+	<div class="selected-columns-wrapper"
+		@dragenter.prevent
+		@dragover.prevent>
 		<div v-for="(column, index) in columns" :key="column.id" :draggable="true"
-			style="display: flex; align-items: center;" @dragstart="dragStart(index)"
+			class="column-entry" @dragstart="dragStart(index)"
 			@dragover="dragOver(index)" @dragend="dragEnd(index)">
 			<NcButton aria-label="Move" type="tertiary-no-background"
-				style="padding-right: 10px;">
+				class="move-button">
 				<template #icon>
 					<MenuIcon :size="20" />
 				</template>
 			</NcButton>
-			<NcCheckboxRadioSwitch v-if="!isBaseView" :checked="selectedColumns.includes(column.id)"
-				style="padding-right: 10px;" @update:checked="onToggle(column.id)" />
+			<NcCheckboxRadioSwitch
+				:disabled="isBaseView && column.id >= 0"
+				:checked="selectedColumns.includes(column.id)"
+				class="display-checkbox"
+				@update:checked="onToggle(column.id)" />
 			{{ column.title }}
 		</div>
 	</div>
@@ -85,12 +90,50 @@ export default {
 
 <style lang="scss" scoped>
 
+.column-entry {
+	display: flex;
+	align-items: center;
+	padding: calc(var(--default-grid-baseline) * 1) 0;
+}
+
+.display-checkbox {
+	padding-right: calc(var(--default-grid-baseline) * 4);
+}
+
 :deep(.modal-container) {
 	min-width: 60% !important;
+}
+
+:deep(.button-vue) {
+	cursor: move;
+    min-height: auto !important;
+    min-width: auto !important;
+}
+
+:deep(.button-vue__icon) {
+	height: auto !important;
+    width: auto !important;
+    min-height: auto !important;
+    min-width: auto !important;
+}
+
+:deep(.checkbox-radio-switch__label) {
+	min-height: auto;
+	padding: 4px;
+}
+
+:deep(.checkbox-radio-switch__icon) {
+	margin-right: 0 !important;
+	margin-left: 0 !important;
 }
 .selected-columns-wrapper {
 	display: flex;
 	flex-direction: column;
+}
+
+.move-button {
+	padding-right: 10px !important;
+	cursor: move !important;
 }
 
 </style>

@@ -97,6 +97,28 @@ export default {
 			}
 		},
 		getCell(columnId) {
+			if (columnId < 0) {
+				// See metaColumns.js for mapping
+				let value
+				switch (columnId) {
+				case -1:
+					value = this.row.id
+					break
+				case -2:
+					value = this.row.createdBy
+					break
+				case -3:
+					value = this.row.lastEditBy
+					break
+				case -4:
+					value = this.row.createdAt
+					break
+				case -5:
+					value = this.row.lastEditAt
+					break
+				}
+				return { columnId, value }
+			}
 			return this.row.data.find(item => item.columnId === columnId) || null
 		},
 		getCellValue(column) {

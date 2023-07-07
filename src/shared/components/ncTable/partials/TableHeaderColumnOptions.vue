@@ -63,18 +63,25 @@
 					@search:focus="isDropDownOpen = true"
 					@search:blur="isDropDownOpen = false"
 					@option:selected="submitFilterInput" />
+				<div class="inter-header">
+					{{ t('tables', 'Manage column') }}
+				</div>
 				<div class="bottom-buttons">
 					<NcButton
 						type="secondary"
 						class="column-button"
-						:wide="true"
 						:disabled="!canHide"
 						@click="hideColumn()">
 						<template #icon>
 							<EyeOff :size="25" />
 						</template>
 					</NcButton>
-					<NcButton type="error" class="column-button" :wide="true" @click="deleteColumn()">
+					<NcButton type="secondary" class="column-button" @click="editColumn()">
+						<template #icon>
+							<Pencil :size="25" />
+						</template>
+					</NcButton>
+					<NcButton type="error" class="column-button" @click="deleteColumn()">
 						<template #icon>
 							<Delete :size="25" />
 						</template>
@@ -90,6 +97,7 @@ import generalHelper from '../../../mixins/generalHelper.js'
 import SortAsc from 'vue-material-design-icons/SortAscending.vue'
 import SortDesc from 'vue-material-design-icons/SortDescending.vue'
 import Delete from 'vue-material-design-icons/Delete.vue'
+import Pencil from 'vue-material-design-icons/Pencil.vue'
 import EyeOff from 'vue-material-design-icons/EyeOff.vue'
 import DotsHorizontal from 'vue-material-design-icons/DotsHorizontal.vue'
 import { NcPopover, NcCheckboxRadioSwitch, NcButton, NcSelect } from '@nextcloud/vue'
@@ -105,6 +113,7 @@ export default {
 		NcCheckboxRadioSwitch,
 		EyeOff,
 		Delete,
+		Pencil,
 		SortAsc,
 		SortDesc,
 		DotsHorizontal,
@@ -236,6 +245,10 @@ export default {
 			this.close()
 			this.$store.dispatch('hideColumn', { columnId: this.column.id })
 		},
+		editColumn() {
+			this.close()
+			console.debug("TODO: EDIT COLUMN")
+		},
 		deleteColumn() {
 			this.close()
 			emit('tables:column:delete', this.column)
@@ -291,7 +304,7 @@ export default {
 }
 .bottom-buttons {
 	width: 100%;
-	padding-top:  calc(var(--default-grid-baseline) * 4);
+	padding-top:  calc(var(--default-grid-baseline) * 2);
 	display: flex;
 	justify-content: space-between;
 }

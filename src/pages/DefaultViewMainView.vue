@@ -36,12 +36,7 @@
 			:out-transition="true"
 			@close="editRowId = null" />
 		<EditView
-			:show-modal="editView !== null && !editView.isBaseView"
-			:view="editView"
-			@close="editView = null"
-			@reload-view="reload(true)" />
-		<EditBaseView
-			:show-modal="editView !== null && editView.isBaseView"
+			:show-modal="editView !== null"
 			:view="editView"
 			@close="editView = null"
 			@reload-view="reload(true)" />
@@ -59,7 +54,6 @@ import NcView from '../shared/components/ncTable/NcView.vue'
 import CreateRow from '../modules/main/modals/CreateRow.vue'
 import EditRow from '../modules/main/modals/EditRow.vue'
 import EditView from '../modules/main/modals/EditView.vue'
-import EditBaseView from '../modules/main/modals/EditBaseView.vue'
 import CreateColumn from '../modules/main/modals/CreateColumn.vue'
 import EditColumns from '../modules/main/modals/EditColumns.vue'
 import DeleteRows from '../modules/main/modals/DeleteRows.vue'
@@ -83,7 +77,6 @@ export default {
 		EditRow,
 		CreateColumn,
 		EditColumns,
-		EditBaseView,
 	},
 
 	mixins: [permissionsMixin],
@@ -156,7 +149,7 @@ export default {
 
 				await this.$store.dispatch('resetViewSetting')
 
-				await this.$store.dispatch('loadColumnsFromBE', { viewId: this.activeView.id })
+				await this.$store.dispatch('loadColumnsFromBE', { view: this.activeView })
 				if (this.canReadElement(this.activeView)) {
 					await this.$store.dispatch('loadRowsFromBE', { viewId: this.activeView.id })
 				}
