@@ -5,6 +5,7 @@ OC.L10N.register(
     "Customers" : "زبائن",
     "Date" : "التاريخ ",
     "Weight" : "الوزن",
+    "Body fat" : "دهون الجسم",
     "Comments" : "تعليقات",
     "Name" : "الاسم",
     "Description" : "الوصف",
