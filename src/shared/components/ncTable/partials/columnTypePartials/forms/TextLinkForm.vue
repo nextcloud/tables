@@ -31,14 +31,14 @@ export default {
 		NcCheckboxRadioSwitch,
 	},
 	props: {
-		textAllowedPattern: {
-			type: String,
-			default: '',
+		column: {
+			type: Object,
+			default: null,
 		},
 	},
-
 	data() {
 		return {
+			mutableColumn: this.column,
 			loading: false,
 			providers: [
 				{
@@ -54,7 +54,6 @@ export default {
 			],
 		}
 	},
-
 	computed: {
 		getProviders() {
 			return this.providers
@@ -70,7 +69,10 @@ export default {
 
 	watch: {
 		getSelectedProviderIds() {
-			this.$emit('update:textAllowedPattern', this.getSelectedProviderIds.join(','))
+			this.mutableColumn.textAllowedPattern = this.getSelectedProviderIds.join(',')
+		},
+		column() {
+			this.mutableColumn = this.column
 		},
 	},
 
@@ -103,8 +105,8 @@ export default {
 			})
 		},
 		isActive(providerId) {
-			if (this.textAllowedPattern) {
-				const selectedProviders = this.textAllowedPattern.split(',')
+			if (this.column.textAllowedPattern) {
+				const selectedProviders = this.column.textAllowedPattern.split(',')
 				return selectedProviders.indexOf(providerId) !== -1
 			} else {
 				return this.preActivatedProviders.indexOf(providerId) !== -1
