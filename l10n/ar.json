@@ -1,4 +1,6 @@
 { "translations": {
+    "Select columns" : "حدد الأعمدة",
+    "e.g. 1,2,4 or leave empty" : "على سبيل المثال 1، 2، 4 أو اتركه فارغا",
     "Members" : "الاعضاء",
     "Customers" : "زبائن",
     "Date" : "التاريخ ",
@@ -6,6 +8,7 @@
     "Body fat" : "دهون الجسم",
     "Comments" : "تعليقات",
     "Name" : "الاسم",
+    "Account manager" : "مدير الحسابات",
     "Description" : "الوصف",
     "Comment" : "تعليق",
     "Dog" : "كلب",
@@ -64,6 +67,7 @@
     "Sharing" : "المشاركة",
     "Read" : "القراءة",
     "Update" : "تحديث",
+    "Manage" : "يدير",
     "Error" : "خطأ",
     "Search" : "البحث",
     "Bold" : "غامق",

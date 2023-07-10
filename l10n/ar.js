@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "Select columns" : "حدد الأعمدة",
+    "e.g. 1,2,4 or leave empty" : "على سبيل المثال 1، 2، 4 أو اتركه فارغا",
     "Members" : "الاعضاء",
     "Customers" : "زبائن",
     "Date" : "التاريخ ",
@@ -8,6 +10,7 @@ OC.L10N.register(
     "Body fat" : "دهون الجسم",
     "Comments" : "تعليقات",
     "Name" : "الاسم",
+    "Account manager" : "مدير الحسابات",
     "Description" : "الوصف",
     "Comment" : "تعليق",
     "Dog" : "كلب",
@@ -66,6 +69,7 @@ OC.L10N.register(
     "Sharing" : "المشاركة",
     "Read" : "القراءة",
     "Update" : "تحديث",
+    "Manage" : "يدير",
     "Error" : "خطأ",
     "Search" : "البحث",
     "Bold" : "غامق",
