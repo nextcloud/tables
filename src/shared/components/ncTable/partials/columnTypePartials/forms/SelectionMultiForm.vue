@@ -4,8 +4,8 @@
 			<div class="col-4 title">
 				{{ t('tables', 'Options') }}
 			</div>
-			<div v-for="opt in getSelectionOptions" :key="opt.id" class="col-4 inline">
-				<NcCheckboxRadioSwitch :value="'' + opt.id" :checked.sync="localSelectionDefault" name="defaultValues" />
+			<div v-for="opt in mutableColumn.selectionOptions" :key="opt.id" class="col-4 inline">
+				<NcCheckboxRadioSwitch :value="'' + opt.id" :checked.sync="mutableColumn.selectionDefault" name="defaultValues" />
 				<input :value="opt.label" @input="updateLabel(opt.id, $event)">
 				<NcButton type="tertiary" :aria-label="t('tables', 'Delete option')" @click="deleteOption(opt.id)">
 					<template #icon>
@@ -35,50 +35,33 @@ export default {
 		DeleteOutline,
 	},
 	props: {
-		selectionOptions: {
-			type: Array,
-			default: () => [],
-		},
-		selectionDefault: {
-			type: String,
-			default: '[]',
+		column: {
+			type: Object,
+			default: null,
 		},
 	},
-	computed: {
-		localSelectionDefault: {
-			get() {
-				if (this.selectionDefault !== null && this.selectionDefault !== '') {
-					return JSON.parse(this.selectionDefault)
-				} else {
-					return []
-				}
-			},
-			set(value) {
-				this.$emit('update:selectionDefault', JSON.stringify(value))
-			},
+	data() {
+		return {
+			mutableColumn: this.column,
+		}
+	},
+	watch: {
+		column() {
+			this.mutableColumn = this.column
 		},
-		getSelectionOptions() {
-			// if we have or had options
-			if (this.allOptions.length > 0) {
-				return this.getAllNonDeletedOptions
-			}
-
-			// if running first time, load default options
-			return this.loadDefaultOptions()
-		},
-		allOptions: {
-			get() {
-				return this.selectionOptions || []
-			},
-			set(value) {
-				this.$emit('update:selectionOptions', [...value])
-			},
-		},
-		getAllNonDeletedOptions() {
-			return this.allOptions?.filter(item => {
-				return !item.deleted
-			}) || []
-		},
+	},
+	created() {
+		if (!this.mutableColumn.selectionOptions || this.mutableColumn.selectionOptions?.length === 0) {
+			this.mutableColumn.selectionOptions = this.loadDefaultOptions()
+		}
+		if (!this.mutableColumn.selectionDefault) {
+			this.mutableColumn.selectionDefault = []
+		} else if (typeof this.mutableColumn.selectionDefault === 'string') {
+			this.mutableColumn.selectionDefault = JSON.parse(this.mutableColumn.selectionDefault)
+		}
+		if (!Array.isArray(this.mutableColumn.selectionDefault)) {
+			this.mutableColumn.selectionDefault = []
+		}
 	},
 	methods: {
 		loadDefaultOptions() {
@@ -92,39 +75,35 @@ export default {
 					label: t('tables', 'Second option'),
 				},
 			]
-			this.$emit('update:selectionOptions', options)
 			return options
 		},
 		updateLabel(id, e) {
-			const i = this.allOptions.findIndex((obj) => obj.id === id)
-			const tmp = [...this.allOptions]
+			const i = this.mutableColumn.selectionOptions.findIndex((obj) => obj.id === id)
+			const tmp = [...this.mutableColumn.selectionOptions]
 			tmp[i].label = e.target.value
-			this.allOptions = tmp
+			this.mutableColumn.selectionOptions = tmp
 		},
 		addOption() {
 			const nextId = this.getNextId()
-			const options = [...this.allOptions]
+			const options = [...this.mutableColumn.selectionOptions]
 			options.push({
 				id: nextId,
 				label: '',
 			})
-			this.allOptions = options
+			this.mutableColumn.selectionOptions = options
 		},
 		getNextId() {
-			return Math.max(...this.allOptions.map(item => item.id)) + 1
+			return Math.max(...this.mutableColumn.selectionOptions.map(item => item.id)) + 1
 		},
 		deleteOption(id) {
-			const i = this.allOptions.findIndex((obj) => obj.id === id)
-			const tmpOptions = [...this.allOptions]
-			tmpOptions[i].deleted = true
-			this.allOptions = tmpOptions
+			this.mutableColumn.selectionOptions = this.mutableColumn.selectionOptions.filter(opt => opt.id !== id)
 
 			// if deleted option was default, remove default
-			const index = this.localSelectionDefault.findIndex(item => parseInt(item) === id)
+			const index = this.mutableColumn.selectionDefault.findIndex(item => parseInt(item) === id)
 			if (index !== -1) {
-				const defaults = this.localSelectionDefault.slice()
+				const defaults = this.mutableColumn.selectionDefault.slice()
 				defaults.splice(index, 1)
-				this.localSelectionDefault = defaults
+				this.mutableColumn.selectionDefault = defaults
 			}
 		},
 	},

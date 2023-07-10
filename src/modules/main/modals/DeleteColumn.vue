@@ -14,6 +14,7 @@
 import DialogConfirmation from '../../../shared/modals/DialogConfirmation.vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
+import { mapGetters } from 'vuex'
 
 export default {
 	name: 'DeleteColumn',
@@ -27,16 +28,18 @@ export default {
 		},
 	},
 	computed: {
+		...mapGetters(['activeView']),
 		deleteDescription() {
 			return t('tables', 'Are you sure you want to delete column "{column}"?', { column: this.columnToDelete.title })
 		},
 	},
 	methods: {
-		deleteColumn() {
-			const res = this.$store.dispatch('removeColumn', { id: this.columnToDelete.id })
+		async deleteColumn() {
+			const res = await this.$store.dispatch('removeColumn', { id: this.columnToDelete.id })
 			if (!res) {
 				showError(t('tables', 'Error occurred while deleting column "{column}".', { column: this.column.title }))
 			}
+			await this.$store.dispatch('reloadViewsOfTable', { tableId: this.activeView.tableId })
 			this.$emit('cancel')
 		},
 	},

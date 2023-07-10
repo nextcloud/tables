@@ -214,7 +214,7 @@ class PermissionsService {
 		try {
 			$table = $this->tableMapper->find($tableId);
 			// this is the same permission as to update a table
-			return $this->canUpdateElement($table, $userId);
+			return $this->canUpdateElement($table, 'table', $userId);
 		} catch (\Exception $e) {
 		}
 		return false;

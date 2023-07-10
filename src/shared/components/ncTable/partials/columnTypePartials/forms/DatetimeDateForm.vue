@@ -6,7 +6,7 @@
 				{{ t('tables', 'Set today as default') }}
 			</div>
 			<div class="fix-col-4 margin-bottom">
-				<NcCheckboxRadioSwitch type="switch" :checked.sync="localDefault" />
+				<NcCheckboxRadioSwitch type="switch" :checked.sync="mutableColumn.datetimeDefault" />
 			</div>
 		</div>
 	</div>
@@ -21,15 +21,19 @@ export default {
 		NcCheckboxRadioSwitch,
 	},
 	props: {
-		datetimeDefault: {
-			type: String,
-			default: 'false',
+		column: {
+			type: Object,
+			default: null,
 		},
 	},
-	computed: {
-		localDefault: {
-			get() { return this.datetimeDefault === 'today' },
-			set(def) { this.$emit('update:datetimeDefault', def ? 'today' : '') },
+	data() {
+		return {
+			mutableColumn: this.column,
+		}
+	},
+	watch: {
+		column() {
+			this.mutableColumn = this.column
 		},
 	},
 }

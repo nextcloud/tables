@@ -180,7 +180,7 @@ export default {
 			const col = res.data
 			const columns = state.columns
 			const index = columns.findIndex(c => c.id === col.id)
-			columns[index] = col
+			columns[index] = parseCol(col)
 			commit('setColumns', [...columns])
 
 			return true

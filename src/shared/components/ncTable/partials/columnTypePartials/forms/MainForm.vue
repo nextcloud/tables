@@ -25,10 +25,10 @@
 		</div>
 
 		<!-- add to views -->
-		<div class="fix-col-4 title space-T">
+		<div v-if="!editColumn" class="fix-col-4 title space-T">
 			{{ activeView.isBaseView? t('tables', 'Add column to views') : t('tables', 'Add column to other views') }}
 		</div>
-		<div class="fix-col-4">
+		<div v-if="!editColumn" class="fix-col-4">
 			<NcSelect
 				v-model="localSelectedViews"
 				:multiple="true"
@@ -88,6 +88,10 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		editColumn: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	computed: {
 		...mapGetters(['activeView']),
@@ -121,6 +125,7 @@ export default {
 	},
 
 	mounted() {
+		if (this.editColumn) return
 		if (this.activeView.isBaseView) {
 			this.localSelectedViews = this.viewsForTable
 		} else {

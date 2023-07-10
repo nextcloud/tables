@@ -60,7 +60,7 @@ return [
 		['name' => 'table#destroy', 'url' => '/table/{id}', 'verb' => 'DELETE'],
 
 		// view
-		['name' => 'view#index', 'url' => '/view/{tableId}', 'verb' => 'GET'],
+		['name' => 'view#index', 'url' => '/view/table/{tableId}', 'verb' => 'GET'],
 		['name' => 'view#indexSharedWithMe', 'url' => '/view', 'verb' => 'GET'],
 		['name' => 'view#show', 'url' => '/view/{id}', 'verb' => 'GET'],
 		['name' => 'view#create', 'url' => '/view', 'verb' => 'POST'],

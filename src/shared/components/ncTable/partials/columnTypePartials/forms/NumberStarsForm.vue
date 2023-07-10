@@ -37,32 +37,36 @@ export default {
 		Minus,
 		NcButton,
 	},
-
 	props: {
-		numberDefault: {
-			type: Number,
-			default: 0,
+		column: {
+			type: Object,
+			default: null,
 		},
+	},
+	data() {
+		return {
+			mutableColumn: this.column,
+		}
 	},
 	computed: {
-		defaultNum: {
-			get() { return this.numberDefault },
-			set(defaultNum) { this.$emit('update:numberDefault', parseFloat(defaultNum)) },
-		},
 		getStars() {
-			return '★'.repeat(this.defaultNum) + '☆'.repeat(5 - this.defaultNum)
+			return '★'.repeat(this.mutableColumn.numberDefault) + '☆'.repeat(5 - this.mutableColumn.numberDefault)
 		},
 	},
-
+	watch: {
+		column() {
+			this.mutableColumn = this.column
+		},
+	},
 	methods: {
 		more() {
-			if (this.defaultNum < 5) {
-				this.defaultNum++
+			if (this.mutableColumn.numberDefault < 5) {
+				this.mutableColumn.numberDefault++
 			}
 		},
 		less() {
-			if (this.defaultNum > 0) {
-				this.defaultNum--
+			if (this.mutableColumn.numberDefault > 0) {
+				this.mutableColumn.numberDefault--
 			}
 		},
 	},

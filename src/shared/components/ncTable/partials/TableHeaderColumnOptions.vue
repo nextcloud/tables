@@ -76,7 +76,7 @@
 							<EyeOff :size="25" />
 						</template>
 					</NcButton>
-					<NcButton type="secondary" class="column-button" @click="editColumn()">
+					<NcButton v-if="column.id >= 0" type="secondary" class="column-button" @click="editColumn()">
 						<template #icon>
 							<Pencil :size="25" />
 						</template>
@@ -247,7 +247,7 @@ export default {
 		},
 		editColumn() {
 			this.close()
-			console.debug("TODO: EDIT COLUMN")
+			emit('tables:column:edit', this.column)
 		},
 		deleteColumn() {
 			this.close()
