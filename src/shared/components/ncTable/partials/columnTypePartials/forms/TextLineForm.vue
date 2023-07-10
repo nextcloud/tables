@@ -6,7 +6,7 @@
 				{{ t('tables', 'Default') }}
 			</div>
 			<div class="fix-col-4 space-B">
-				<input v-model="defaultText">
+				<input v-model="mutableColumn.textDefault">
 			</div>
 		</div>
 
@@ -17,7 +17,7 @@
 				{{ t('tables', 'Allowed pattern (regex)') }}
 			</div>
 			<div class="fix-col-3 margin-bottom">
-				<input v-model="allowedPattern">
+				<input v-model="mutableColumn.textAllowedPattern">
 			</div>
 		</div>
 -->
@@ -28,7 +28,7 @@
 				{{ t('tables', 'Maximum text length') }}
 			</div>
 			<div class="fix-col-4">
-				<input v-model="maxLength"
+				<input v-model="mutableColumn.textMaxLength"
 					type="number"
 					step="1"
 					min="0">
@@ -42,31 +42,19 @@
 export default {
 	name: 'TextLineForm',
 	props: {
-		textDefault: {
-			type: String,
-			default: '',
-		},
-		textAllowedPattern: {
-			type: String,
-			default: '',
-		},
-		textMaxLength: {
-			type: Number,
+		column: {
+			type: Object,
 			default: null,
 		},
 	},
-	computed: {
-		defaultText: {
-			get() { return this.textDefault },
-			set(defaultText) { this.$emit('update:textDefault', defaultText) },
-		},
-		allowedPattern: {
-			get() { return this.textAllowedPattern },
-			set(allowedPattern) { this.$emit('update:textAllowedPattern', allowedPattern) },
-		},
-		maxLength: {
-			get() { return (this.textMaxLength && this.textMaxLength === -1) ? '' : this.textMaxLength },
-			set(maxLength) { this.$emit('update:textMaxLength', parseFloat(maxLength)) },
+	data() {
+		return {
+			mutableColumn: this.column,
+		}
+	},
+	watch: {
+		column() {
+			this.mutableColumn = this.column
 		},
 	},
 }

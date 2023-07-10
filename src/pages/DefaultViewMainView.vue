@@ -42,6 +42,7 @@
 			@reload-view="reload(true)" />
 		<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false" />
 		<EditColumns :show-modal="showEditColumns" @close="showEditColumns = false" />
+		<EditColumn v-if="columnToEdit" :column="columnToEdit" @close="columnToEdit = false" />
 		<DeleteRows v-if="rowsToDelete" :rows-to-delete="rowsToDelete" @cancel="rowsToDelete = null" />
 		<DeleteColumn v-if="columnToDelete" :column-to-delete="columnToDelete" @cancel="columnToDelete = null" />
 	</div>
@@ -56,6 +57,7 @@ import EditRow from '../modules/main/modals/EditRow.vue'
 import EditView from '../modules/main/modals/EditView.vue'
 import CreateColumn from '../modules/main/modals/CreateColumn.vue'
 import EditColumns from '../modules/main/modals/EditColumns.vue'
+import EditColumn from '../modules/main/modals/EditColumn.vue'
 import DeleteRows from '../modules/main/modals/DeleteRows.vue'
 import DeleteColumn from '../modules/main/modals/DeleteColumn.vue'
 import EmptyTable from '../modules/main/sections/EmptyTable.vue'
@@ -77,6 +79,7 @@ export default {
 		EditRow,
 		CreateColumn,
 		EditColumns,
+		EditColumn,
 	},
 
 	mixins: [permissionsMixin],
@@ -90,6 +93,7 @@ export default {
 			editView: null,
 			showCreateColumn: false,
 			showEditColumns: false,
+			columnToEdit: null,
 			columnToDelete: null,
 			rowsToDelete: null,
 		}
@@ -122,10 +126,12 @@ export default {
 	},
 	mounted() {
 		this.reload()
+		subscribe('tables:column:edit', column => { this.columnToEdit = column })
 		subscribe('tables:column:delete', column => { this.columnToDelete = column })
 		subscribe('tables:view:reload', () => { this.reload(true) })
 	},
 	unmounted() {
+		unsubscribe('tables:column:edit', column => { this.columnToEdit = column })
 		unsubscribe('tables:column:delete', column => { this.columnToDelete = column })
 		unsubscribe('tables:view:reload', () => { this.reload(true) })
 	},

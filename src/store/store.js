@@ -174,6 +174,23 @@ export default new Vuex.Store({
 			commit('setViews', [...views])
 			return true
 		},
+		async reloadViewsOfTable({ state, commit }, { tableId }) {
+			let res = null
+			try {
+				res = await axios.get(generateUrl('/apps/tables/view/table/' + tableId))
+				// Set Views
+				const views = state.views
+				res.data.forEach(view => {
+					const index = views.findIndex(v => v.id === view.id)
+					views[index] = view
+				})
+				commit('setViews', [...views])
+			} catch (e) {
+				displayError(e, t('tables', 'Could not reload view.'))
+				return false
+			}
+			return true
+		},
 		async updateTable({ state, commit, dispatch }, { id, data }) {
 			let res = null
 

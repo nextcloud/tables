@@ -49,8 +49,6 @@ export default {
 			mutableFilterGroup: this.filterGroup,
 		}
 	},
-	computed: {
-	},
 	watch: {
 		filterGroup() {
 			this.mutableFilterGroup = this.filterGroup

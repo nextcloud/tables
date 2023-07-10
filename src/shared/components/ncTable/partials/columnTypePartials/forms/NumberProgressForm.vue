@@ -6,7 +6,7 @@
 				{{ t('tables', 'Default') }}
 			</div>
 			<div class="fix-col-2">
-				<input v-model="defaultNum"
+				<input v-model="mutableColumn.numberDefault"
 					type="number"
 					min="0"
 					max="100">
@@ -19,17 +19,20 @@
 
 export default {
 	name: 'NumberProgressForm',
-
 	props: {
-		numberDefault: {
-			type: Number,
-			default: 0,
+		column: {
+			type: Object,
+			default: null,
 		},
 	},
-	computed: {
-		defaultNum: {
-			get() { return this.numberDefault },
-			set(defaultNum) { this.$emit('update:numberDefault', parseFloat(defaultNum)) },
+	data() {
+		return {
+			mutableColumn: this.column,
+		}
+	},
+	watch: {
+		column() {
+			this.mutableColumn = this.column
 		},
 	},
 }
