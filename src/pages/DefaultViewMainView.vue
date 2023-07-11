@@ -61,6 +61,7 @@ import EmptyTable from '../modules/main/sections/EmptyTable.vue'
 import EmptyView from '../modules/main/sections/EmptyView.vue'
 import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
 import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
+import { Filters } from '../shared/components/ncTable/mixins/filter.js'
 
 export default {
 	name: 'DefaultViewMainView',
@@ -100,6 +101,7 @@ export default {
 			rows: state => state.data.rows,
 			viewSetting: state => state.data.viewSetting,
 		}),
+		...mapState(['activeRowId']),
 		...mapGetters(['activeView']),
 		isLoading() {
 			return this.loading || this.localLoading
@@ -117,7 +119,26 @@ export default {
 	watch: {
 		activeView() {
 			this.reload()
+			if (this.activeRowId) {
+				this.addFilter({
+					columnId: -1,
+					operator: Filters.IsEqual,
+					value: this.activeRowId.toString(),
+				})
+				this.$store.commit('setActiveRowId', null)
+			}
 		},
+		activeRowId() {
+			if (this.activeRowId) {
+				this.viewSetting.filter = null
+				this.addFilter({
+					columnId: -1,
+					operator: Filters.IsEqual,
+					value: this.activeRowId.toString(),
+				})
+				this.$store.commit('setActiveRowId', null)
+			}
+		}
 	},
 	mounted() {
 		this.reload()

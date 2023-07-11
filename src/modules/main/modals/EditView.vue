@@ -95,7 +95,6 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['activeTable']),
 		getMetaColumns() {
 			return MetaColumns
 		},

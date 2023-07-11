@@ -125,7 +125,29 @@ export default {
 					let filterStatus = null
 					let searchStatus = true
 					const filters = this.getFiltersForColumn(column)
-					const cell = row.data.find(item => item.columnId === column.id)
+					let cell
+					if (column.id < 0) {
+						cell = { columnId: column.id }
+						switch (column.id) {
+						case -1:
+							cell.value = row.id
+							break
+						case -2:
+							cell.value = row.createdBy
+							break
+						case -3:
+							cell.value = row.editedBy
+							break
+						case -4:
+							cell.value = row.createdAt
+							break
+						case -5:
+							cell.value = row.editedAt
+							break
+						}
+					} else {
+						cell = row.data.find(item => item.columnId === column.id)
+					}
 
 					// if we don't have a value for this cell
 					if (cell === undefined) {

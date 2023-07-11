@@ -1,11 +1,11 @@
 <template>
-	<div v-if="activeElement" class="sharing">
-		<div v-if="!activeElement.isShared || activeElement.ownership === getCurrentUser().uid">
+	<div v-if="activeView" class="sharing">
+		<div v-if="!activeView.isShared || activeView.ownership === getCurrentUser().uid">
 			<ShareForm :shares="shares" @add="addShare" @update="updateShare" />
 			<ShareList :shares="shares" @remove="removeShare" @update="updateShare" />
 		</div>
 		<div v-else style="margin-top: 12px;">
-			{{ activeTable ? t('tables', 'This table is shared with you. Resharing is not possible.') : t('tables', 'This view is shared with you. Resharing is not possible.') }}
+			{{ activeView ? t('tables', 'This table is shared with you. Resharing is not possible.') : t('tables', 'This view is shared with you. Resharing is not possible.') }}
 		</div>
 	</div>
 </template>
@@ -35,23 +35,19 @@ export default {
 	},
 
 	computed: {
-		...mapGetters(['activeTable', 'activeView']),
-		activeElement() {
-			if (this.activeTable) return this.activeTable
-			else return this.activeView
-		},
+		...mapGetters(['activeView']),
 	},
 
 	watch: {
-		activeElement() {
-			if (this.activeElement) {
+		activeView() {
+			if (this.activeView) {
 				this.loadSharesFromBE()
 			}
 		},
 	},
 
 	mounted() {
-		if (this.activeElement) {
+		if (this.activeView) {
 			this.loadSharesFromBE()
 		}
 	},

@@ -5,21 +5,10 @@ import '@nextcloud/dialogs/dist/index.css'
 import displayError from '../../../shared/utils/displayError.js'
 
 export default {
-	computed: {
-		getNodeType() {
-			if (this.activeTable) {
-				return 'table'
-			} else if (this.activeView) {
-				return 'view'
-			} else {
-				throw new Error('No active element!')
-			}
-		},
-	},
 	methods: {
 		async getSharedWithFromBE() {
 			try {
-				const res = await axios.get(generateUrl(`/apps/tables/share/${this.getNodeType}/` + this.activeElement.id))
+				const res = await axios.get(generateUrl('/apps/tables/share/view/' + this.activeView.id))
 				return res.data
 			} catch (e) {
 				displayError(e, t('tables', 'Could not fetch shares.'))
@@ -29,7 +18,7 @@ export default {
 		async sendNewShareToBE(share) {
 			const data = {
 				nodeType: this.getNodeType,
-				nodeId: this.activeElement.id,
+				nodeId: this.activeView.id,
 				receiver: share.user,
 				receiverType: (share.isNoUser) ? 'group' : 'user',
 				permissionRead: true,
@@ -38,18 +27,18 @@ export default {
 				permissionDelete: false,
 				permissionManage: false,
 			}
-			let elementId = null
+			let viewId = null
 			try {
 				console.debug("Try to add share: ", '/apps/tables/share', data)
 				const res = await axios.post(generateUrl('/apps/tables/share'), data)
 				console.debug("ANSWER:::", res, res.data, res.data.nodeId)
-				elementId = res.data.nodeId
+				viewId = res.data.nodeId
 				showSuccess(t('tables', 'Saved new share with "{userName}".', { userName: res.data.receiverDisplayName }))
 			} catch (e) {
 				displayError(e, t('tables', 'Could not create share.'))
 				return false
 			}
-			await this.$store.dispatch(this.getNodeType === 'table' ? 'setTableHasShares' : 'setViewHasShares', { elementId, hasShares: true })
+			await this.$store.dispatch('setViewHasShares', { viewId, hasShares: true })
 			return true
 		},
 		async removeShareFromBE(shareId) {

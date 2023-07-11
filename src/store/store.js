@@ -19,17 +19,11 @@ export default new Vuex.Store({
 		tablesLoading: false,
 		tables: [],
 		views: [],
-		activeTableId: null,
 		activeViewId: null,
+		activeRowId: null,
 	},
 
 	getters: {
-		activeTable(state) {
-			if (state.tables && state.tables.filter(item => item.id === state.activeTableId).length > 0) {
-				return state.tables.filter(item => item.id === state.activeTableId)[0]
-			}
-			return null
-		},
 		getTable: (state) => (id) => {
 			return state.tables.filter(table => table.id === id)[0]
 		},
@@ -47,16 +41,9 @@ export default new Vuex.Store({
 		setTablesLoading(state, value) {
 			state.tablesLoading = !!(value)
 		},
-		setActiveTableId(state, tableId) {
-			if (state.activeTableId !== tableId) {
-				state.activeTableId = tableId
-				state.activeViewId = null
-			}
-		},
 		setActiveViewId(state, viewId) {
 			if (state.activeViewId !== viewId) {
 				state.activeViewId = viewId
-				state.activeTableId = null
 			}
 		},
 		setTables(state, tables) {
@@ -72,6 +59,9 @@ export default new Vuex.Store({
 		setView(state, view) {
 			const index = state.views.findIndex(v => v.id === view.id)
 			state.views[index] = view
+		},
+		setActiveRowId(state, rowId) {
+			state.activeRowId = rowId
 		},
 	},
 	actions: {

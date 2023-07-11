@@ -4,7 +4,7 @@
 			{{ t('tables', '... that meet all of the following conditions') }}
 		</div>
 		<div v-for="(filter, index) in filterGroup"
-			:key="filter.columnId + filter.operator + filter.value + index">
+			:key="filter.columnId + filter.operator.id+ filter.value + index">
 			<FilterEntry
 				:filter-entry="filter"
 				:columns="columns"

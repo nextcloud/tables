@@ -91,7 +91,6 @@ export default {
 
 	computed: {
 		...mapState(['tables', 'tablesLoading', 'showSidebar']),
-		...mapGetters(['activeTable']),
 
 		/**
 		 * Is the search valid ?

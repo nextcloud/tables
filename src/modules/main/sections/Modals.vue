@@ -36,7 +36,6 @@ export default {
 	},
 	computed: {
 		...mapState(['rows']),
-		...mapGetters(['activeTable']),
 		getEditRow(id) {
 			return this.$store.dispatch('getRow', { id })
 		},

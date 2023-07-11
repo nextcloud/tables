@@ -53,20 +53,16 @@ export default {
 	},
 	computed: {
 		...mapState(['tables']),
-		...mapGetters(['activeTable', 'activeView']),
+		...mapGetters(['activeView']),
 		elementTitle() {
-			if (this.activeTable) {
-				return this.activeTable.emoji + ' ' + this.activeTable.title
-			} else if (this.activeView) {
+			if (this.activeView) {
 				return this.activeView.emoji + ' ' + this.activeView.title
 			} else {
-				return t('tables', 'No table in context')
+				return t('tables', 'No view in context')
 			}
 		},
 		elementSubtitle() {
-			if (this.activeTable) {
-				return t('tables', 'From {ownerName}', { ownerName: this.activeTable.ownership })
-			} else if (this.activeView) {
+			if (this.activeView) {
 				return t('tables', 'From {ownerName}', { ownerName: this.activeView.createdBy })
 				// TODO: Created By?
 			} else {

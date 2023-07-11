@@ -27,10 +27,6 @@ export default {
 		NcButton,
 		IconTables,
 	},
-	// computed: {
-	// 	...mapState(['tables']),
-	// 	...mapGetters(['activeTable']),
-	// },
 	methods: {
 		addTable() {
 			emit('create-table', {})

@@ -21,8 +21,8 @@
 					</div>
 					<div v-if="getFilterForColumn(col)" class="filter-wrapper">
 						<FilterLabel v-for="filter in getFilterForColumn(col)"
-							:id="filter.columnId + filter.operator + filter.value"
-							:key="filter.columnId + filter.operator + filter.value"
+							:id="filter.columnId + filter.operator.id+ filter.value"
+							:key="filter.columnId + filter.operator.id+ filter.value"
 							:operator="filter.operator"
 							:value="filter.value"
 							@delete-filter="id => $emit('delete-filter', id)" />
