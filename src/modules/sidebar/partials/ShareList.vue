@@ -95,7 +95,6 @@ export default {
 
 	computed: {
 		...mapState(['tables', 'tablesLoading', 'showSidebar']),
-		...mapGetters(['activeTable']),
 		sortedShares() {
 			return [...this.userShares, ...this.groupShares].slice()
 				.sort(this.sortByDisplayName)

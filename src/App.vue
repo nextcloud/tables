@@ -13,7 +13,7 @@
 <script>
 import { NcContent, NcAppContent } from '@nextcloud/vue'
 import Navigation from './modules/navigation/sections/Navigation.vue'
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import Sidebar from './modules/sidebar/sections/Sidebar.vue'
 
 export default {
@@ -37,18 +37,17 @@ export default {
 	},
 	computed: {
 		...mapState(['tablesLoading']),
-		// ...mapState(['tables', 'tablesLoading']),
-		// ...mapGetters(['activeTable']),
 		somethingIsLoading() {
 			return this.tablesLoading || this.loading
 		},
 	},
 	watch: {
 		'$route'(to, from) {
-			if (to.name === 'table') {
-				this.$store.commit('setActiveTableId', parseInt(to.params.tableId))
-			} else if (to.name === 'view') {
+			if (to.name === 'view') {
 				this.$store.commit('setActiveViewId', parseInt(to.params.viewId))
+			} else if (to.name === 'row') {
+				this.$store.commit('setActiveViewId', parseInt(to.params.viewId))
+				this.$store.commit('setActiveRowId', parseInt(to.params.rowId))
 			}
 			// console.debug("Setting table ID to value",to.params.tableId, to)
 		},
@@ -57,10 +56,11 @@ export default {
 		await this.$store.dispatch('loadTablesFromBE')
 		await this.$store.dispatch('loadViewsSharedWithMeFromBE')
 		const $currentRoute = this.$router.currentRoute
-		if ($currentRoute.name === 'table') {
-			this.$store.commit('setActiveTableId', parseInt($currentRoute.params.tableId))
-		} else if ($currentRoute.name === 'view') {
+		if ($currentRoute.name === 'view') {
 			this.$store.commit('setActiveViewId', parseInt($currentRoute.params.viewId))
+		} else if ($currentRoute.name === 'row') {
+			this.$store.commit('setActiveViewId', parseInt($currentRoute.params.viewId))
+			this.$store.commit('setActiveRowId', parseInt($currentRoute.params.rowId))
 		}
 	},
 }

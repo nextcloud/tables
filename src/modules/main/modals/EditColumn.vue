@@ -149,7 +149,6 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['activeTable']),
 		otherActionPerformed() {
 			return !!(this.editColumn !== null || this.deleteId !== null)
 		},

@@ -77,7 +77,7 @@ export default {
 		},
 
 		deleteFilter({ commit, state }, { id }) {
-			const index = state.viewSetting?.filter?.findIndex(item => item.columnId + item.operator + item.value === id)
+			const index = state.viewSetting?.filter?.findIndex(item => item.columnId + item.operator.id + item.value === id)
 			if (index !== -1) {
 				const localViewSetting = { ...state.viewSetting }
 				localViewSetting.filter.splice(index, 1)

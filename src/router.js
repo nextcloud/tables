@@ -19,5 +19,10 @@ export default new Router({
 			component: DefaultViewMainView,
 			name: 'view',
 		},
+		{
+			path: '/view/:viewId/row/:rowId',
+			component: DefaultViewMainView,
+			name: 'row',
+		},
 	],
 })
