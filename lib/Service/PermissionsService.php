@@ -278,8 +278,8 @@ class PermissionsService {
 	 * @param string|null $userId
 	 * @return bool
 	 */
-	public function canCreateRowsByTableId(int $tableId, ?string $userId = null): bool {
-		try {
+	public function canCreateRowsByViewId(int $viewId, ?string $userId = null): bool {
+		try { //TODO: Make to byViewId, currently tableId!!
 			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
 			return false;
@@ -290,14 +290,14 @@ class PermissionsService {
 		}
 
 		try {
-			$table = $this->tableMapper->find($tableId);
+			$view = $this->viewMapper->find($viewId);
 
-			if ($this->userIsElementOwner($userId, $table)) {
+			if ($this->userIsElementOwner($userId, $view)) {
 				return true;
 			}
 
 			try {
-				$share = $this->getShareForElement($table, 'table', $userId);
+				$share = $this->getShareForElement($view, 'view', $userId);
 				/** @noinspection PhpUndefinedMethodInspection */
 				return !!$share->getPermissionCreate() || !!$share->getPermissionManage();
 			} catch (InternalError|NotFoundError $e) {

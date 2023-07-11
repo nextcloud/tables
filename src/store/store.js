@@ -98,6 +98,7 @@ export default new Vuex.Store({
 				const res = await axios.get(generateUrl('/apps/tables/table'))
 				commit('setTables', res.data)
 				// Set Views
+				state.views = []
 				res.data.forEach(table => {
 					state.views = state.views.concat([table.baseView, ...table.views])
 				})

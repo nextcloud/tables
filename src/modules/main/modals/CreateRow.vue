@@ -115,7 +115,7 @@ export default {
 						value,
 					})
 				}
-				await this.$store.dispatch('insertNewRow', { tableId: this.activeView.tableId, data })
+				await this.$store.dispatch('insertNewRow', { tableId: this.activeView.tableId, viewId: this.activeView.id, data })
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not create new row'))

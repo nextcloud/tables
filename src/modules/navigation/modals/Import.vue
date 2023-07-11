@@ -150,7 +150,7 @@ export default {
 			type: Boolean,
 			default: false,
 		},
-		table: {
+		view: {
 		      type: Object,
 		      default: null,
 		    },
@@ -168,24 +168,24 @@ export default {
 	},
 
 	computed: {
-		...mapGetters(['activeTable']),
+		...mapGetters(['activeView']),
 		canCreateMissingColumns() {
-			return this.canManageElement(this.table)
+			return this.canManageElement(this.view)
 		},
 		getCreateMissingColumns() {
-			return this.canManageElement(this.table) && this.createMissingColumns
+			return this.canManageElement(this.view) && this.createMissingColumns
 		},
 	},
 
 	methods: {
 		async actionCloseAndReload() {
-			// reload data if active table was affected
-			if (this.activeTable.id === this.table.id) {
+			// reload data if active view was affected
+			if (this.activeView.tableId === this.view.tableId) {
 				this.waitForReload = true
 				await this.$store.dispatch('loadTablesFromBE')
-				await this.$store.dispatch('loadViewsSharedWithMeFromBE')
-				await this.$store.dispatch('loadColumnsFromBE', { tableId: this.table.id })
-				await this.$store.dispatch('loadRowsFromBE', { tableId: this.table.id })
+				await this.$store.dispatch('loadViewsSharedWithMeFromBE') //TODO: Test if importing in shared Table 
+				await this.$store.dispatch('loadColumnsFromBE', { view: this.view })
+				await this.$store.dispatch('loadRowsFromBE', { viewId: this.view.id })
 				this.waitForReload = false
 			}
 
@@ -203,7 +203,7 @@ export default {
 		async import() {
 			this.loading = true
 			try {
-				const res = await axios.post(generateUrl('/apps/tables/import/table/' + this.table.id), { path: this.path, createMissingColumns: this.getCreateMissingColumns })
+				const res = await axios.post(generateUrl('/apps/tables/import/table/' + this.view.tableId), { viewId: this.view.id, path: this.path, createMissingColumns: this.getCreateMissingColumns })
 				if (res.status === 200) {
 					this.result = res.data
 					this.loading = false

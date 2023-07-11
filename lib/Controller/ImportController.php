@@ -27,10 +27,11 @@ class ImportController extends Controller {
 
 	/**
 	 * @NoAdminRequired
+	 * @NoCSRFRequired
 	 */
-	public function import(int $tableId, String $path, bool $createMissingColumns = true): DataResponse {
-		return $this->handleError(function () use ($tableId, $path, $createMissingColumns) {
-			return $this->service->import($tableId, $path, $createMissingColumns);
+	public function import(int $tableId, int $viewId, String $path, bool $createMissingColumns = true): DataResponse {
+		return $this->handleError(function () use ($tableId, $viewId, $path, $createMissingColumns) {
+			return $this->service->import($tableId, $viewId, $path, $createMissingColumns);
 		});
 	}
 }

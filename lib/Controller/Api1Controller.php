@@ -525,7 +525,7 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function createRow(int $tableId, string $data): DataResponse {
+	public function createRow(int $tableId, int $viewId, string $data): DataResponse {
 		$dataNew = [];
 		$array = json_decode($data, true);
 		foreach ($array as $key => $value) {
@@ -535,8 +535,8 @@ class Api1Controller extends ApiController {
 			];
 		}
 
-		return $this->handleError(function () use ($dataNew, $tableId) {
-			return $this->rowService->createComplete($tableId, $dataNew);
+		return $this->handleError(function () use ($dataNew, $viewId, $tableId) {
+			return $this->rowService->createComplete($viewId, $tableId, $dataNew);
 		});
 	}
 

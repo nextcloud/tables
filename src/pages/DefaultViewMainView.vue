@@ -17,7 +17,6 @@
 					@edit-view="editView = activeView"
 					@import="openImportModal"
 					@create-column="showCreateColumn = true"
-					@edit-columns="showEditColumns = true"
 					@create-row="showCreateRow = true"
 					@delete-selected-rows="deleteRows"
 					@delete-filter="deleteFilter" />
@@ -41,7 +40,6 @@
 			@close="editView = null"
 			@reload-view="reload(true)" />
 		<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false" />
-		<EditColumns :show-modal="showEditColumns" @close="showEditColumns = false" />
 		<EditColumn v-if="columnToEdit" :column="columnToEdit" @close="columnToEdit = false" />
 		<DeleteRows v-if="rowsToDelete" :rows-to-delete="rowsToDelete" @cancel="rowsToDelete = null" />
 		<DeleteColumn v-if="columnToDelete" :column-to-delete="columnToDelete" @cancel="columnToDelete = null" />
@@ -56,7 +54,6 @@ import CreateRow from '../modules/main/modals/CreateRow.vue'
 import EditRow from '../modules/main/modals/EditRow.vue'
 import EditView from '../modules/main/modals/EditView.vue'
 import CreateColumn from '../modules/main/modals/CreateColumn.vue'
-import EditColumns from '../modules/main/modals/EditColumns.vue'
 import EditColumn from '../modules/main/modals/EditColumn.vue'
 import DeleteRows from '../modules/main/modals/DeleteRows.vue'
 import DeleteColumn from '../modules/main/modals/DeleteColumn.vue'
@@ -78,7 +75,6 @@ export default {
 		CreateRow,
 		EditRow,
 		CreateColumn,
-		EditColumns,
 		EditColumn,
 	},
 
@@ -92,7 +88,6 @@ export default {
 			editRowId: null,
 			editView: null,
 			showCreateColumn: false,
-			showEditColumns: false,
 			columnToEdit: null,
 			columnToDelete: null,
 			rowsToDelete: null,
@@ -136,8 +131,8 @@ export default {
 		unsubscribe('tables:view:reload', () => { this.reload(true) })
 	},
 	methods: {
-		openImportModal(table) {
-			emit('tables:modal:import', table)
+		openImportModal(view) {
+			emit('tables:modal:import', view)
 		},
 		deleteFilter(id) {
 			this.$store.dispatch('deleteFilter', { id })

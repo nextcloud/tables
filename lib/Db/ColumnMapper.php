@@ -57,7 +57,13 @@ class ColumnMapper extends QBMapper {
 			->where('id IN (:columnIds)')
 			->setParameter('columnIds', $neededColumnIds, IQueryBuilder::PARAM_INT_ARRAY);
 
-		$out = [];
+		$out = [
+			-1 => 'number',
+			-2 => 'text-line',
+			-3 => 'datetime',
+			-4 => 'text-line',
+			-5 => 'datetime',
+		];
 		$result = $qb->executeQuery();
 		try {
 			while ($row = $result->fetch()) {
