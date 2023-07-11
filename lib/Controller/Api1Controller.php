@@ -65,16 +65,10 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function index(string $keyword = null, int $limit = 100, int $offset = 0): DataResponse {
-		if ($keyword) {
-			return $this->handleError(function () use ($keyword, $limit, $offset) {
-				return $this->tableService->search($keyword, $limit, $offset);
-			});
-		} else {
-			return $this->handleError(function () {
-				return $this->tableService->findAll($this->userId);
-			});
-		}
+	public function index(): DataResponse {
+		return $this->handleError(function () {
+			return $this->tableService->findAll($this->userId);
+		});
 	}
 
 	/**
@@ -192,10 +186,17 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function indexViews(int $tableId): DataResponse {
-		return $this->handleError(function () use ($tableId) {
-			return $this->viewService->findAll($this->tableService->find($tableId));
-		});
+	public function indexViews(int $tableId, string $keyword = null, int $limit = 100, int $offset = 0): DataResponse {
+		if ($keyword) {
+			return $this->handleError(function () use ($keyword, $limit, $offset) {
+				return $this->viewService->search($keyword, $limit, $offset);
+			});
+		} else {
+			return $this->handleError(function () use ($tableId) {
+				return $this->viewService->findAll($this->tableService->find($tableId));
+			});
+		}
+
 	}
 
 	/**

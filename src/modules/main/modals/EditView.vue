@@ -35,25 +35,6 @@
 		<NcAppSettingsSection v-if="columns != null" id="sort" :title="t('tables', 'Sort')">
 			<SortForm :sort="view.sort" :columns="allColumns" />
 		</NcAppSettingsSection>
-		<!-- <div class="row">
-			<div class="fix-col-4 space-T" :class="{'justify-between': showDeleteButton, 'end': !showDeleteButton}">
-				<div v-if="showDeleteButton">
-					<NcButton v-if="!prepareDeleteRow" type="error" @click="prepareDeleteRow = true">
-						{{ t('tables', 'Delete') }}
-					</NcButton>
-					<NcButton v-if="prepareDeleteRow"
-						:wide="true"
-						type="error"
-						@click="actionDeleteView">
-						{{ t('tables', 'I really want to delete this view!') }}
-					</NcButton>
-				</div>
-				<NcButton v-if="canUpdateDataActiveTable && !localLoading" type="primary" @click="actionConfirm">
-					{{ t('tables', 'Save') }}
-				</NcButton>
-				<div v-if="localLoading" class="icon-loading" style="margin-left: 20px;" />
-			</div>
-		</div> -->
 
 		<div class="row">
 			<div class="fix-col-4 space-T end">
@@ -115,10 +96,6 @@ export default {
 	},
 	computed: {
 		...mapGetters(['activeTable']),
-		showDeleteButton() {
-			return true // TODO
-			// return this.canDeleteDataActiveTable && !this.localLoading
-		},
 		getMetaColumns() {
 			return MetaColumns
 		},

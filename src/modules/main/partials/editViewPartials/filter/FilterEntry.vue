@@ -28,6 +28,7 @@
 			:close-after-click="true"
 			type="tertiary"
 			class="delete-button"
+			:aria-label="t('tables', 'Delete filter')"
 			@click="$emit('delete-filter')">
 			<template #icon>
 				<Delete :size="25" />

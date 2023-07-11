@@ -37,11 +37,11 @@
 				<ColumnInfoPopover :column="column" />
 				<div style="display: flex">
 					<div class="button-padding-right">
-						<NcButton type="secondary" @click="actionCancel">
+						<NcButton type="secondary" :aria-label="t('tables', 'Cancel')" @click="actionCancel">
 							{{ t('tables', 'Cancel') }}
 						</NcButton>
 					</div>
-					<NcButton type="primary" @click="saveColumn">
+					<NcButton type="primary" :aria-label="t('tables', 'Save')" @click="saveColumn">
 						{{ t('tables', 'Save') }}
 					</NcButton>
 				</div>

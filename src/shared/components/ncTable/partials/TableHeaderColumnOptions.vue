@@ -3,6 +3,7 @@
 		<NcPopover :auto-hide="!isDropDownOpen" :focus-trap="false" :shown.sync="showPopover">
 			<template #trigger>
 				<NcButton
+					:aria-label="t('tables', 'Column menu')"
 					type="tertiary">
 					<template #icon>
 						<SortDesc v-if="getSortMode === 'DESC'" :size="20" />
@@ -70,18 +71,19 @@
 					<NcButton
 						type="secondary"
 						class="column-button"
+						:aria-label="t('tables', 'Hide column')"
 						:disabled="!canHide"
 						@click="hideColumn()">
 						<template #icon>
 							<EyeOff :size="25" />
 						</template>
 					</NcButton>
-					<NcButton v-if="column.id >= 0" type="secondary" class="column-button" @click="editColumn()">
+					<NcButton v-if="column.id >= 0" :aria-label="t('tables', 'Edit Column')" type="secondary" class="column-button" @click="editColumn()">
 						<template #icon>
 							<Pencil :size="25" />
 						</template>
 					</NcButton>
-					<NcButton type="error" class="column-button" @click="deleteColumn()">
+					<NcButton type="error" :aria-label="t('tables', 'Delete Column')" class="column-button" @click="deleteColumn()">
 						<template #icon>
 							<Delete :size="25" />
 						</template>

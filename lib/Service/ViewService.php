@@ -394,4 +394,26 @@ class ViewService extends SuperService {
 			//TODODODOTODOTODOTODOTODOTOD
 		}
 	}
+
+	/**
+	 * @param string $term
+	 * @param int $limit
+	 * @param int $offset
+	 * @param string|null $userId
+	 * @return array
+	 */
+	public function search(string $term, int $limit = 100, int $offset = 0, ?string $userId = null): array {
+		try {
+			/** @var string $userId */
+			$userId = $this->permissionsService->preCheckUserId($userId);
+			$views = $this->mapper->search($term, $userId, $limit, $offset);
+			foreach ($views as &$view) {
+				/** @var string $userId */
+				$this->enhanceView($view, $userId);
+			}
+			return $views;
+		} catch (InternalError | \OCP\DB\Exception $e) {
+			return [];
+		}
+	}
 }

@@ -4,6 +4,7 @@
 			<div :class="{'add-padding-left': isSmallMobile }"
 				class="actionButtonsLeft">
 				<NcButton v-if="!isSmallMobile && canCreateRowInElement(table)"
+					:aria-label="t('tables', 'Create row')"
 					:close-after-click="true"
 					type="tertiary"
 					@click="$emit('create-row')">
@@ -14,6 +15,7 @@
 				</NcButton>
 				<NcButton v-if="isSmallMobile && canCreateRowInElement(table)"
 					:close-after-click="true"
+					:aria-label="t('tables', 'Create Row')"
 					type="tertiary"
 					@click="$emit('create-row')">
 					<template #icon>
@@ -55,24 +57,6 @@
 						{{ t('tables', 'Uncheck all') }}
 					</NcActionButton>
 				</NcActions>
-				<!-- <NcButton v-if="!isSmallMobile"
-					icon="icon-download" :title="t('tables', 'Export as CSV')"
-					@click="exportCsv">
-					<template #icon>
-						<Export :size="20" />
-					</template>
-					{{ t('tables', 'Export CSV') }}
-				</NcButton>
-				&nbsp;&nbsp;
-				<NcButton v-if="!isSmallMobile && canDeleteData(table)"
-					icon="icon-delete"
-					:title="t('tables', 'Delete')"
-					@click="deleteSelectedRows">
-					{{ t('tables', 'Delete') }}
-					<template #icon>
-						<Delete :size="20" />
-					</template>
-				</NcButton> -->
 			</div>
 		</div>
 	</div>

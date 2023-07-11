@@ -16,17 +16,18 @@
 			<div class="row">
 				<div class="fix-col-4 space-T" :class="{'justify-between': showDeleteButton, 'end': !showDeleteButton}">
 					<div v-if="showDeleteButton">
-						<NcButton v-if="!prepareDeleteRow" type="error" @click="prepareDeleteRow = true">
+						<NcButton v-if="!prepareDeleteRow" :aria-label="t('tables', 'Delete')" type="error" @click="prepareDeleteRow = true">
 							{{ t('tables', 'Delete') }}
 						</NcButton>
 						<NcButton v-if="prepareDeleteRow"
 							:wide="true"
+							:aria-label="t('tables', 'I really want to delete this row!')"
 							type="error"
 							@click="actionDeleteRow">
 							{{ t('tables', 'I really want to delete this row!') }}
 						</NcButton>
 					</div>
-					<NcButton v-if="canUpdateDataActiveTable && !localLoading" type="primary" @click="actionConfirm">
+					<NcButton v-if="canUpdateDataActiveTable && !localLoading" :aria-label="t('tables', 'Save')" type="primary" @click="actionConfirm">
 						{{ t('tables', 'Save') }}
 					</NcButton>
 					<div v-if="localLoading" class="icon-loading" style="margin-left: 20px;" />

@@ -18,6 +18,7 @@
 		</div>
 		<NcButton
 			:close-after-click="true"
+			:aria-label="t('tables', 'Add new filter group')"
 			type="tertiary"
 			@click="addFilterGroup">
 			{{ t('tables', 'Add new filter group') }}

@@ -11,7 +11,7 @@
 			<div v-if="!loading && result === null && !waitForReload">
 				<RowFormWrapper :title="t('tables', 'File')" :description="t('tables', 'Supported formats are xlsx, xls, html, xml and csv.')">
 					<div class="fix-col-4 space-T-small middle">
-						<NcButton @click="pickFile">
+						<NcButton :aria-label="t('tables', 'Select a file')" @click="pickFile">
 							<template #icon>
 								<IconFolder :size="20" />
 							</template>
@@ -54,7 +54,7 @@
 
 				<div class="row">
 					<div class="fix-col-4 end">
-						<NcButton type="primary" @click="actionSubmit">
+						<NcButton :aria-label="t('tables', 'Import')" type="primary" @click="actionSubmit">
 							{{ t('tables', 'Import') }}
 						</NcButton>
 					</div>
@@ -96,7 +96,7 @@
 
 				<div class="row">
 					<div class="fix-col-4 space-T end">
-						<NcButton type="primary" @click="actionCloseAndReload">
+						<NcButton :aria-label="t('tables', 'Done')" type="primary" @click="actionCloseAndReload">
 							{{ t('tables', 'Done') }}
 						</NcButton>
 					</div>

@@ -31,7 +31,11 @@
 				</NcCheckboxRadioSwitch>
 			</div>
 		</div>
-		<NcButton :close-after-click="true" type="tertiary" class="delete-button"
+		<NcButton
+			:close-after-click="true"
+			:aria-label="t('tables', 'Delete sorting rule')"
+			type="tertiary"
+			class="delete-button"
 			@click="$emit('delete-sorting-rule')">
 			<template #icon>
 				<Delete :size="25" />

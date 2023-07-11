@@ -4,6 +4,7 @@
 		:class="{active: activeView && baseView.id === activeView.id}"
 		:allow-collapse="hasViews"
 		:force-menu="true"
+		:open="isParentOfActiveView"
 		:to="'/view/' + parseInt(baseView.id)"
 		@click="closeNav">
 		<template #icon>
@@ -35,7 +36,7 @@
 			<NcActionButton v-if="canManageElement(baseView)"
 				icon="icon-rename"
 				:close-after-click="true"
-				@click="editTable">
+				@click="editView">
 				{{ t('tables', 'Edit table') }}
 			</NcActionButton>
 			<NcActionButton v-if="canShareElement(baseView)"
@@ -132,6 +133,7 @@ export default {
 	data() {
 		return {
 			showDeletionConfirmation: false,
+			isParentOfActiveView: false,
 		}
 	},
 
@@ -152,12 +154,18 @@ export default {
 			return this.getViews.length > 0
 		},
 	},
-
+	watch: {
+		activeView() {
+			if (!this.isParentOfActiveView && this.activeView?.id !== this.baseView?.id && this.activeView?.tableId === this.baseView?.tableId) {
+				this.isParentOfActiveView = true
+			}
+		},
+	},
 	methods: {
 		createView() {
 			emit('create-view', this.baseView.tableId)
 		},
-		editTable() {
+		editView() {
 			emit('edit-view', this.baseView) //TODO
 		},
 		async actionShowShare() {

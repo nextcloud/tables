@@ -14,18 +14,12 @@
 			</div>
 
 			<ul v-if="!tablesLoading">
-				<NcAppNavigationCaption :title="t('tables', 'My tables')">
+				<NcAppNavigationCaption v-if="getOwnBaseViews.length > 0" :title="t('tables', 'My tables')">
 					<template #actions>
 						<NcActionButton :aria-label="t('tables', 'Create table')" icon="icon-add" @click.prevent="createTable" />
 					</template>
 				</NcAppNavigationCaption>
 				<NavigationBaseViewItem v-for="view in getOwnBaseViews"
-					:key="view.id"
-					:base-view="view" />
-				<NcAppNavigationCaption v-if="getSharedBaseViews.length > 0"
-					:title="t('tables', 'Shared tables')" />
-
-				<NavigationBaseViewItem v-for="view in getSharedBaseViews"
 					:key="view.id"
 					:base-view="view" />
 
@@ -43,7 +37,7 @@
 						<Magnify :size="10" />
 					</template>
 					<template #action>
-						<NcButton @click="filterString = ''">
+						<NcButton :aria-label="t('tables', 'Clear filter')" @click="filterString = ''">
 							{{ t('tables', 'Clear filter') }}
 						</NcButton>
 					</template>
@@ -51,7 +45,6 @@
 			</div>
 
 			<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
-			<!-- <EditTable :show-modal="editTable !== null" :table="editTable" @close="editTable = null " /> -->
 			<EditViewTitle :show-modal="editView !== null" :view="editView" @close="editView = null " />
 			<Import :show-modal="importToView !== null" :view="importToView" @close="importToView = null" />
 			<CreateView :show-modal="createViewTableId !== null" :table-id="createViewTableId" @close="createViewTableId = null" />
@@ -62,7 +55,6 @@
 <script>
 import { NcAppNavigation, NcAppNavigationCaption, NcActionButton, NcTextField, NcButton, NcEmptyContent } from '@nextcloud/vue'
 import CreateTable from '../modals/CreateTable.vue'
-// import EditTable from '../modals/EditTable.vue'
 import EditViewTitle from '../modals/EditViewTitle.vue'
 import CreateView from '../modals/CreateView.vue'
 import NavigationViewItem from '../partials/NavigationViewItem.vue'
@@ -81,7 +73,6 @@ export default {
 		NavigationViewItem,
 		NcAppNavigation,
 		CreateTable,
-		// EditTable,
 		EditViewTitle,
 		NcAppNavigationCaption,
 		NcActionButton,
@@ -96,7 +87,6 @@ export default {
 			loading: true,
 			showModalCreateTable: false,
 			importToView: null,
-			editTable: null, // if null, no modal open
 			editView: null, // if null, no modal open
 			createViewTableId: null, // if null, no modal open
 			filterString: '',
@@ -104,12 +94,8 @@ export default {
 	},
 	computed: {
 		...mapState(['tables', 'views', 'tablesLoading']),
-		// ...mapGetters(['activeTable']),
-		getSharedBaseViews() {
-			return this.getFilteredBaseViews.filter((item) => { return item.isShared === true && item.ownership !== getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
-		},
 		getSharedViews() {
-			return this.views.filter((item) => { return item.isShared === true && item.ownership !== getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
+			return this.views.filter((item) => { return item.isShared === true && item.ownership !== getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title)).filter(view => { return view.title.toLowerCase().includes(this.filterString.toLowerCase()) })
 		},
 		getOwnBaseViews() {
 			return this.getFilteredBaseViews.filter((item) => { return item.isShared === false || item.ownership === getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
@@ -121,14 +107,12 @@ export default {
 	mounted() {
 		subscribe('create-view', tableId => { this.createViewTableId = tableId })
 		subscribe('create-table', this.createTable)
-		// subscribe('edit-table', table => { this.editTable = table })
 		subscribe('edit-view', view => { this.editView = view })
 		subscribe('tables:modal:import', table => { this.importToView = table })
 	},
 	beforeDestroy() {
 		unsubscribe('create-view', tableId => { this.createViewTableId = tableId })
 		unsubscribe('create-table', this.createTable)
-		// unsubscribe('edit-table', table => { this.editTable = table })
 		unsubscribe('edit-view', view => { this.editView = view })
 		unsubscribe('tables:modal:import', table => { this.importToView = table })
 	},
