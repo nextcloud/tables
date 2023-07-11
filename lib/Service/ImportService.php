@@ -30,6 +30,7 @@ class ImportService extends SuperService {
 	private IUserManager $userManager;
 
 	private int $tableId = -1;
+	private int $viewId = -1;
 	private array $columns = [];
 	private bool $createUnknownColumns = true;
 	private int $countCreatedColumns = 0;
@@ -53,7 +54,8 @@ class ImportService extends SuperService {
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 */
-	public function import(int $tableId, string $path, bool $createMissingColumns = true): array {
+	public function import(int $tableId, int $viewId, string $path, bool $createMissingColumns = true): array {
+		//TODO: Permission add to this view
 		if ($this->userManager->get($this->userId) === null) {
 			$error = 'No user in context, can not import data. Cancel.';
 			$this->logger->debug($error);
@@ -61,6 +63,7 @@ class ImportService extends SuperService {
 		}
 
 		$this->tableId = $tableId;
+		$this->viewId = $viewId;
 		$this->createUnknownColumns = $createMissingColumns;
 
 		try {
@@ -157,7 +160,7 @@ class ImportService extends SuperService {
 			];
 		}
 		try {
-			$this->rowService->createComplete($this->tableId, $data);
+			$this->rowService->createComplete($this->viewId, $this->tableId, $data);
 			$this->countInsertedRows++;
 		} catch (PermissionError $e) {
 			$this->logger->error('Could not create row while importing, no permission.', ['exception' => $e]);
@@ -184,7 +187,7 @@ class ImportService extends SuperService {
 				$this->countErrors++;
 			}
 		}
-		$this->columns = $this->columnService->findOrCreateColumnsByTitleForTableAsArray($this->tableId, $titles, $this->userId, $this->createUnknownColumns, $this->countCreatedColumns);
+		$this->columns = $this->columnService->findOrCreateColumnsByTitleForTableAsArray($this->tableId, $this->viewId, $titles, $this->userId, $this->createUnknownColumns, $this->countCreatedColumns);
 	}
 
 }

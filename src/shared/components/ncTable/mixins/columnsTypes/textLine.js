@@ -13,8 +13,8 @@ export default class TextLineColumn extends AbstractTextColumn {
 	sort(mode) {
 		const factor = mode === 'DESC' ? -1 : 1
 		return (rowA, rowB) => {
-			const valueA = rowA.data.find(item => item.columnId === this.id)?.value || ''
-			const valueB = rowB.data.find(item => item.columnId === this.id)?.value || ''
+			const valueA = rowA.data.find(item => item.columnId === this.id)?.value?.toLowerCase() || ''
+			const valueB = rowB.data.find(item => item.columnId === this.id)?.value?.toLowerCase() || ''
 			return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor
 		}
 	}
@@ -28,8 +28,9 @@ export default class TextLineColumn extends AbstractTextColumn {
 	}
 
 	isFilterFound(cell, filter) {
+		console.debug("Test if filter value is found:",cell, filter)
 		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
-
+		console.debug(cell.value, filterValue)
 		const filterMethod = {
 			[FilterIds.Contains]() { return cell.value.includes(filterValue) },
 			[FilterIds.BeginsWith]() { return cell.value.startsWith(filterValue) },

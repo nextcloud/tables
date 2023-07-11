@@ -84,12 +84,6 @@
 					</template>
 					{{ t('tables', 'Create view') }}
 				</NcActionButton>
-				<NcActionButton v-if="canManageElement(table)" :close-after-click="true" @click="$emit('edit-columns')">
-					<template #icon>
-						<TableEdit :size="20" decorative title="" />
-					</template>
-					{{ t('tables', 'Edit columns') }}
-				</NcActionButton>
 
 				<NcActionCaption :title="t('tables', 'Integration')" />
 				<NcActionButton v-if="canCreateRowInElement(table)"
@@ -127,7 +121,6 @@
 <script>
 import { NcCheckboxRadioSwitch, NcActions, NcActionButton, NcActionSeparator, NcActionCaption } from '@nextcloud/vue'
 import { emit } from '@nextcloud/event-bus'
-import TableEdit from 'vue-material-design-icons/TableEdit.vue'
 import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
 import IconImport from 'vue-material-design-icons/Import.vue'
 import Creation from 'vue-material-design-icons/Creation.vue'
@@ -150,7 +143,6 @@ export default {
 		NcActions,
 		NcActionButton,
 		NcActionSeparator,
-		TableEdit,
 		TableColumnPlusAfter,
 		ArrowULeftTop,
 		TableCheck,
@@ -237,6 +229,8 @@ export default {
 			const data = { data: {} }
 			if (this.viewSetting.hiddenColumns && this.viewSetting.hiddenColumns.length !== 0) {
 				data.data.columns = JSON.stringify(this.columns.map(col => col.id).filter(id => !this.viewSetting.hiddenColumns.includes(id)))
+			} else {
+				data.data.columns = JSON.stringify(this.columns.map(col => col.id))
 			}
 			if (this.viewSetting.sorting) {
 				data.data.sort = JSON.stringify([this.viewSetting.sorting[0]])

@@ -45,14 +45,12 @@ class SuperColumnQB implements IColumnTypeQB {
 	 * @return string
 	 * @throws InternalError
 	 */
-	private function buildSQLString(string $operator, string $columnPlaceHolder, string $searchValuePlaceHolder) : string{
+	private function buildSQLString(string $operator, string $formattedCellValue, string $searchValuePlaceHolder) : string{
 		if ($this->platform === self::DB_PLATFORM_PGSQL) {
 			return '';
 		} elseif ($this->platform === self::DB_PLATFORM_SQLITE) {
 			return '';
 		} else {
-			$cellValue = 'JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'$[*].columnId\'), \'one\', :'.$columnPlaceHolder.')), \'.value\'))';
-			$formattedCellValue = $this->formatCellValue($cellValue);
 			switch ($operator) {
 				case 'begins-with':
 				case 'ends-with':
@@ -76,12 +74,33 @@ class SuperColumnQB implements IColumnTypeQB {
 		}
 	}
 
+	private function getFormattedDataCellValue(string $columnPlaceHolder) {
+		$cellValue = 'JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'$[*].columnId\'), \'one\', :'.$columnPlaceHolder.')), \'.value\'))';
+		return $this->formatCellValue($cellValue);
+	}
+	private function getFormattedMetaDataCellValue(int $metaId) {
+		switch($metaId) {
+			case -1: return 'id';
+			case -2: return 'created_by';
+			case -3: return 'last_edit_by';
+			case -4: return 'created_at';
+			case -5: return 'last_edit_at';
+		}
+	}
+
 	public function addWhereFilterExpression(IQueryBuilder &$qb, array $filter, string $filterId): IQueryFunction {
 		$searchValuePlaceHolder = 'searchValue'.$filterId;
 		$columnPlaceHolder = 'column'.$filterId;
-		$qb->setParameter($columnPlaceHolder, $filter['columnId'], $qb::PARAM_INT);
+		if($filter['columnId'] >= 0) {
+			$qb->setParameter($columnPlaceHolder, $filter['columnId'], $qb::PARAM_INT);
+			$formattedCellValue = $this->getFormattedDataCellValue($columnPlaceHolder);
+		} else {
+			$formattedCellValue = $this->getFormattedMetaDataCellValue($filter['columnId']);
+		}
+
 		$this->passSearchValue($qb, $filter['value'], $filter['operator'], $searchValuePlaceHolder);
-		return $qb->createFunction($this->buildSQLString($filter['operator'], $columnPlaceHolder, $searchValuePlaceHolder));
+		return $qb->createFunction($this->buildSQLString($filter['operator'], $formattedCellValue, $searchValuePlaceHolder));
+
 	}
 
 	public function addWhereForFindAllWithColumn(IQueryBuilder &$qb, int $columnId): void {

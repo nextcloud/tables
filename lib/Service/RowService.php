@@ -109,12 +109,13 @@ class RowService extends SuperService {
 	 */
 	public function create(
 		int $tableId,
+		int $viewId,
 		int $columnId,
 		string $data
 	):Row {
 		// security
-		if (!$this->permissionsService->canCreateRowsByTableId($tableId)) {
-			throw new PermissionError('create row at the table id = '.$tableId.' is not allowed.');
+		if (!$this->permissionsService->canCreateRowsByViewId($viewId)) {
+			throw new PermissionError('create row at the view id = '.$viewId.' is not allowed.');
 		}
 
 		$time = new DateTime();
@@ -143,12 +144,13 @@ class RowService extends SuperService {
 	 * @noinspection DuplicatedCode
 	 */
 	public function createComplete(
+		int $viewId,
 		int $tableId,
 		array $data
 	):Row {
 		// security
-		if (!$this->permissionsService->canCreateRowsByTableId($tableId)) {
-			throw new PermissionError('create row at the table id = '.$tableId.' is not allowed.');
+		if (!$this->permissionsService->canCreateRowsByViewId($viewId)) {
+			throw new PermissionError('create row at the view id = '.$viewId.' is not allowed.');
 		}
 
 		$time = new DateTime();

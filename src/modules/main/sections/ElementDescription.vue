@@ -40,7 +40,7 @@ export default {
 
 	methods: {
 		editElement() {
-			emit('edit-view', this.activeElemen)
+			emit('edit-view', this.activeView)
 		},
 	},
 }

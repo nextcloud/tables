@@ -72,18 +72,19 @@ class TableTemplateService {
 	 */
 	public function makeTemplate(Table $table, string $template, int $baseViewId): Table {
 		$createColumn = function ($params) use ($table, $baseViewId) {return $this->createColumn($table->getId(), $params, $baseViewId);};
+		$createRow = function ($data) use ($table, $baseViewId) {$this->createRow($table, $baseViewId, $data);};
 		if ($template === 'todo') {
-			$this->makeTodo($table, $createColumn);
+			$this->makeTodo($table, $createColumn, $createRow);
 		} elseif ($template === 'members') {
-			$this->makeMembers($table, $createColumn);
+			$this->makeMembers($table, $createColumn, $createRow);
 		} elseif ($template === 'weight') {
-			$this->makeWeight($table, $createColumn);
+			$this->makeWeight($table, $createColumn, $createRow);
 		} elseif ($template === 'vacation-requests') {
-			$this->makeVacationRequests($table, $createColumn);
+			$this->makeVacationRequests($table, $createColumn, $createRow);
 		} elseif ($template === 'customers') {
-			$this->makeCustomers($table, $createColumn);
+			$this->makeCustomers($table, $createColumn, $createRow);
 		} elseif ($template === 'tutorial') {
-			$this->makeStartupTable($table, $createColumn);
+			$this->makeStartupTable($table, $createColumn, $createRow);
 		}
 		return $table;
 	}
@@ -94,7 +95,7 @@ class TableTemplateService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	private function makeWeight(Table $table, $createColumn):void {
+	private function makeWeight($createColumn, $createRow):void {
 		$columns = [];
 
 		$params = [
@@ -144,28 +145,28 @@ class TableTemplateService {
 		$columns['comment'] = $createColumn($params);
 
 		// let's add some example rows
-		$this->createRow($table, [
+		$createRow([
 			$columns['date']->getId() => '2022-03-01',
 			$columns['weight']->getId() => 92.5,
 			$columns['bodyFat']->getId() => 30,
 			$columns['feeling']->getId() => 4,
 			$columns['comment']->getId() => '',
 		]);
-		$this->createRow($table, [
+		$createRow([
 			$columns['date']->getId() => '2022-03-02',
 			$columns['weight']->getId() => 92.7,
 			$columns['bodyFat']->getId() => 30.3,
 			$columns['feeling']->getId() => 3,
 			$columns['comment']->getId() => $this->l->t('feel sick'),
 		]);
-		$this->createRow($table, [
+		$createRow([
 			$columns['date']->getId() => '2022-03-10',
 			$columns['weight']->getId() => 91,
 			$columns['bodyFat']->getId() => 33.1,
 			$columns['feeling']->getId() => 4,
 			$columns['comment']->getId() => '',
 		]);
-		$this->createRow($table, [
+		$createRow([
 			$columns['date']->getId() => '2022-03-19',
 			$columns['weight']->getId() => 92.5,
 			$columns['bodyFat']->getId() => 30.7,
@@ -180,7 +181,7 @@ class TableTemplateService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	private function makeCustomers(Table $table, $createColumn):void {
+	private function makeCustomers($createColumn, $createRow):void {
 		$columns = [];
 
 		$params = [
@@ -258,7 +259,7 @@ class TableTemplateService {
 		$columns['comment'] = $createColumn($params);
 
 		// let's add some example rows
-		$this->createRow($table, [
+		$createRow([
 			// TRANSLATORS This is an example name
 			$columns['name']->getId() => $this->l->t('Dog'),
 			// TRANSLATORS This is an example account manager
@@ -275,7 +276,7 @@ class TableTemplateService {
 			// TRANSLATORS This is an example comment
 			$columns['comment']->getId() => $this->l->t('Likes treats'),
 		]);
-		$this->createRow($table, [
+		$createRow([
 			// TRANSLATORS This is an example name
 			$columns['name']->getId() => $this->l->t('Cat'),
 			// TRANSLATORS This is an example account manager
@@ -292,7 +293,7 @@ class TableTemplateService {
 			// TRANSLATORS This is an example comment
 			$columns['comment']->getId() => $this->l->t('New customer, let\'s see if there is more.'),
 		]);
-		$this->createRow($table, [
+		$createRow([
 			// TRANSLATORS This is an example name
 			$columns['name']->getId() => $this->l->t('Horse'),
 			// TRANSLATORS This is an example account manager
@@ -317,7 +318,7 @@ class TableTemplateService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	private function makeVacationRequests(Table $table, $createColumn):void {
+	private function makeVacationRequests($createColumn, $createRow):void {
 		$columns = [];
 
 		$params = [
@@ -399,7 +400,7 @@ class TableTemplateService {
 		$columns['comment'] = $createColumn($params);
 
 		// let's add some example rows
-		$this->createRow($table, [
+		$createRow([
 			$columns['employee']->getId() => 'Alice',
 			$columns['from']->getId() => '2023-02-05',
 			$columns['to']->getId() => '2023-02-10',
@@ -412,7 +413,7 @@ class TableTemplateService {
 			// TRANSLATORS This is an example comment
 			$columns['comment']->getId() => $this->l->t('Bob will help for this time'),
 		]);
-		$this->createRow($table, [
+		$createRow([
 			$columns['employee']->getId() => 'Bob',
 			$columns['from']->getId() => '2023-04-05',
 			$columns['to']->getId() => '2023-04-12',
@@ -424,7 +425,7 @@ class TableTemplateService {
 			$columns['approveBy']->getId() => $this->l->t('The Boss'),
 			$columns['comment']->getId() => '',
 		]);
-		$this->createRow($table, [
+		$createRow([
 			$columns['employee']->getId() => 'Evil',
 			$columns['from']->getId() => '2023-03-05',
 			$columns['to']->getId() => '2023-04-10',
@@ -444,7 +445,7 @@ class TableTemplateService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	private function makeMembers(Table $table, $createColumn):void {
+	private function makeMembers($createColumn, $createRow):void {
 		$columns = [];
 
 		$params = [
@@ -489,7 +490,7 @@ class TableTemplateService {
 		$columns['comment'] = $createColumn($params);
 
 		// let's add some example rows
-		$this->createRow($table, [
+		$createRow([
 			// TRANSLATORS This is an example name
 			$columns['name']->getId() => $this->l->t('Santa Claus'),
 			// TRANSLATORS This is an example for a "position" for a member
@@ -507,7 +508,7 @@ class TableTemplateService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	private function makeTodo(Table $table, $createColumn): void {
+	private function makeTodo($createColumn, $createRow): void {
 		$columns = [];
 
 		$params = [
@@ -564,7 +565,7 @@ class TableTemplateService {
 		$columns['proofed'] = $createColumn($params);
 
 		// let's add some example rows
-		$this->createRow($table, [
+		$createRow([
 			/** @psalm-suppress PossiblyNullArgument */
 			// TRANSLATORS This is an example for a task
 			$columns['task']->getId() => $this->l->t('Create initial milestones'),
@@ -577,7 +578,7 @@ class TableTemplateService {
 			$columns['progress']->getId() => 100,
 			$columns['proofed']->getId() => 'true',
 		]);
-		$this->createRow($table, [
+		$createRow([
 			// TRANSLATORS This is an example for a task
 			$columns['task']->getId() => $this->l->t('Kickoff meeting'),
 			// TRANSLATORS This is an example description
@@ -589,7 +590,7 @@ class TableTemplateService {
 			$columns['progress']->getId() => 80,
 			$columns['proofed']->getId() => 'true',
 		]);
-		$this->createRow($table, [
+		$createRow([
 			// TRANSLATORS This is an example for a task
 			$columns['task']->getId() => $this->l->t('Set up some documentation and collaboration tools'),
 			// TRANSLATORS This is an example description
@@ -601,7 +602,7 @@ class TableTemplateService {
 			$columns['progress']->getId() => 10,
 			$columns['proofed']->getId() => 'false',
 		]);
-		$this->createRow($table, [
+		$createRow([
 			// TRANSLATORS This is an example for a task
 			$columns['task']->getId() => $this->l->t('Add more actions'),
 			// TRANSLATORS This is an example description
@@ -616,7 +617,7 @@ class TableTemplateService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	private function makeStartupTable(Table $table, $createColumn):void {
+	private function makeStartupTable($createColumn, $createRow):void {
 		$columns = [];
 
 		$params = [
@@ -655,7 +656,7 @@ class TableTemplateService {
 
 
 		// let's add some example rows
-		$this->createRow($table, [
+		$createRow([
 			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Open the tables app'),
 			// TRANSLATORS This is an example account manager
@@ -663,7 +664,7 @@ class TableTemplateService {
 			$columns['ease']->getId() => 5,
 			$columns['done']->getId() => 'true',
 		]);
-		$this->createRow($table, [
+		$createRow([
 			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Add your first row'),
 			// TRANSLATORS This is an example account manager
@@ -671,7 +672,7 @@ class TableTemplateService {
 			$columns['ease']->getId() => 5,
 			$columns['done']->getId() => 'false',
 		]);
-		$this->createRow($table, [
+		$createRow([
 			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Edit a row'),
 			// TRANSLATORS This is an example account manager
@@ -679,7 +680,7 @@ class TableTemplateService {
 			$columns['ease']->getId() => 5,
 			$columns['done']->getId() => 'false',
 		]);
-		$this->createRow($table, [
+		$createRow([
 			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Add a new column'),
 			// TRANSLATORS This is an example account manager
@@ -687,7 +688,7 @@ class TableTemplateService {
 			$columns['ease']->getId() => 4,
 			$columns['done']->getId() => 'false',
 		]);
-		$this->createRow($table, [
+		$createRow([
 			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Read the docs'),
 			// TRANSLATORS This is an example account manager
@@ -779,7 +780,7 @@ class TableTemplateService {
 		);
 	}
 
-	private function createRow(Table $table, array $values): void {
+	private function createRow(Table $table, int $viewId, array $values): void {
 		$data = [];
 		foreach ($values as $columnId => $value) {
 			$data[] = [
@@ -788,7 +789,7 @@ class TableTemplateService {
 			];
 		}
 		try {
-			$this->rowService->createComplete($table->getId(), $data);
+			$this->rowService->createComplete($viewId, $table->getId(), $data);
 		} catch (PermissionError|Exception $e) {
 		}
 	}

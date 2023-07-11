@@ -54,15 +54,18 @@ class RowController extends Controller {
 
 	/**
 	 * @NoAdminRequired
+	 * @NoCSRFRequired
 	 */
 	public function create(
 		int $tableId,
+		int $viewId,
 		int $columnId,
 		string $data
 	): DataResponse {
-		return $this->handleError(function () use ($tableId, $columnId, $data) {
+		return $this->handleError(function () use ($tableId, $viewId, $columnId, $data) {
 			return $this->service->create(
 				$tableId,
+				$viewId,
 				$columnId,
 				$data);
 		});
@@ -70,13 +73,16 @@ class RowController extends Controller {
 
 	/**
 	 * @NoAdminRequired
+	 * @NoCSRFRequired
 	 */
 	public function createComplete(
 		int $tableId,
+		int $viewId,
 		array $data
 	): DataResponse {
-		return $this->handleError(function () use ($tableId, $data) {
+		return $this->handleError(function () use ($tableId, $viewId, $data) {
 			return $this->service->createComplete(
+				$viewId,
 				$tableId,
 				$data);
 		});
