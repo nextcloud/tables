@@ -4,7 +4,10 @@
 			<SortEntry :sort-entry="sortingRule" :columns="columns"
 				@delete-sorting-rule="deleteSortingRule(i)" />
 		</div>
-		<NcButton :close-after-click="true" type="tertiary"
+		<NcButton
+			:close-after-click="true"
+			:aria-label="t('tables', 'Add new sorting rule')"
+			type="tertiary"
 			@click="addSortingRule">
 			{{ t('tables', 'Add new sorting rule') }}
 			<template #icon>

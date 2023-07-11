@@ -13,6 +13,7 @@
 		<NcButton
 			:close-after-click="true"
 			type="tertiary"
+			:aria-label="t('tables', 'Add new filter')"
 			@click="addFilter">
 			{{ t('tables', 'Add new filter') }}
 			<template #icon>

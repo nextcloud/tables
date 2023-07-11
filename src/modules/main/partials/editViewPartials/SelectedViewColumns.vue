@@ -17,6 +17,9 @@
 				class="display-checkbox"
 				@update:checked="onToggle(column.id)" />
 			{{ column.title }}
+			<div v-if="column.id < 0" class="meta-info">
+				({{ t('tables', 'Meta Data') }})
+			</div>
 		</div>
 	</div>
 </template>
@@ -134,6 +137,12 @@ export default {
 .move-button {
 	padding-right: 10px !important;
 	cursor: move !important;
+}
+
+.meta-info {
+	font-style: italic;
+	padding-left:  calc(var(--default-grid-baseline) * 1);
+	color: var(--color-info);
 }
 
 </style>

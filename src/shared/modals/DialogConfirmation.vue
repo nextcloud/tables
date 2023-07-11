@@ -11,7 +11,7 @@
 			</div>
 			<div class="row space-T">
 				<div class="fix-col-4 end">
-					<NcButton :type="confirmClass" @click="$emit('confirm')">
+					<NcButton :type="confirmClass" :aria-label="confirmTitle" @click="$emit('confirm')">
 						{{ confirmTitle }}
 					</NcButton>
 				</div>

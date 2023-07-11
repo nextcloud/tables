@@ -6,7 +6,7 @@
 			</div>
 		</div>
 		<template #head>
-			<NcButton type="tertiary" @click="showBigEditorModal = true">
+			<NcButton :aria-label="t('tables', 'Show fullscreen')" type="tertiary" @click="showBigEditorModal = true">
 				<template #icon>
 					<Fullscreen :size="20" />
 				</template>
@@ -18,7 +18,7 @@
 					</div>
 				</div>
 				<div class="closeModalButton">
-					<NcButton @click="showBigEditorModal = false">
+					<NcButton :aria-label="t('tables', 'Close editor')" @click="showBigEditorModal = false">
 						{{ t('tables', 'Close editor') }}
 					</NcButton>
 				</div>

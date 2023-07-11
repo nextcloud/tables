@@ -47,7 +47,7 @@
 			</div>
 			<div class="row space-R">
 				<div class="fix-col-4 end">
-					<NcButton type="primary" @click="submit">
+					<NcButton type="primary" :aria-label="t('tables', 'Create table')" @click="submit">
 						{{ t('tables', 'Create table') }}
 					</NcButton>
 				</div>

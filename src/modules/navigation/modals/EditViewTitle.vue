@@ -29,16 +29,17 @@
 			</div>
 			<div class="row">
 				<div class="fix-col-4 space-T justify-between">
-					<NcButton v-if="!prepareDelete" type="error" @click="prepareDelete = true">
+					<NcButton v-if="!prepareDelete" :aria-label="t('tables', 'Delete')" type="error" @click="prepareDelete = true">
 						{{ t('tables', 'Delete') }}
 					</NcButton>
 					<NcButton v-if="prepareDelete"
+						:aria-label="t('tables', 'I really want to delete this view!')"
 						:wide="true"
 						type="error"
 						@click="actionDeleteView">
 						{{ t('tables', 'I really want to delete this view!') }}
 					</NcButton>
-					<NcButton type="primary" @click="submit">
+					<NcButton type="primary" :aria-label="t('tables', 'Save')" @click="submit">
 						{{ t('tables', 'Save') }}
 					</NcButton>
 				</div>
