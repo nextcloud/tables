@@ -29,6 +29,7 @@ export default class SelectionCheckColumn extends AbstractSelectionColumn {
 
 		const filterMethod = {
 			[FilterIds.IsEqual]() { return (cell.value === 'true' && filterValue === 'yes') || (cell.value === 'false' && filterValue === 'no') },
+			[FilterIds.IsEmpty]() { return !cell.value },
 		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)
 	}

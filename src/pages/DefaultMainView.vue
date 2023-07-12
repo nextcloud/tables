@@ -64,7 +64,7 @@ import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { Filters } from '../shared/components/ncTable/mixins/filter.js'
 
 export default {
-	name: 'DefaultViewMainView',
+	name: 'DefaultMainView',
 	components: {
 		EmptyTable,
 		EmptyView,
@@ -138,7 +138,7 @@ export default {
 				})
 				this.$store.commit('setActiveRowId', null)
 			}
-		}
+		},
 	},
 	mounted() {
 		this.reload()

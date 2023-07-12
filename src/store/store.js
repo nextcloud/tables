@@ -213,33 +213,15 @@ export default new Vuex.Store({
 			commit('setTables', [...tables])
 			return true
 		},
-		increaseRowsCountForTable({ state, commit, getters }, { tableId }) {
-			const table = getters.getTable(tableId)
-			if (table.rowsCount) {
-				table.rowsCount++
-			} else {
-				table.rowsCount = 1
-			}
-			commit('setTable', table)
-		},
-		decreaseRowsCountForTable({ state, commit, getters }, { tableId }) {
-			const table = getters.getTable(tableId)
-			if (table.rowsCount) {
-				table.rowsCount--
-			} else {
-				table.rowsCount = 0
-			}
-			commit('setTable', table)
-		},
 		setTableHasShares({ state, commit, getters }, { elementId, hasShares }) {
 			const table = getters.getTable(elementId)
 			table.hasShares = !!hasShares
 			commit('setTable', table)
 		},
 
-		setViewHasShares({ state, commit, getters }, { elementId, hasShares }) {
-			console.debug(elementId, hasShares, getters.getView(elementId))
-			const view = getters.getView(elementId)
+		setViewHasShares({ state, commit, getters }, { viewId, hasShares }) {
+			console.debug(viewId, hasShares, getters.getView(viewId))
+			const view = getters.getView(viewId)
 			view.hasShares = !!hasShares
 			commit('setView', view)
 		},
