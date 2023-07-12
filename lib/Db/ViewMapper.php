@@ -11,8 +11,11 @@ use OCP\IDBConnection;
 class ViewMapper extends QBMapper {
 	protected string $table = 'tables_views';
 
-	public function __construct(IDBConnection $db) {
+	protected TableMapper $tableMapper;
+
+	public function __construct(IDBConnection $db, TableMapper $tableMapper) {
 		parent::__construct($db, $this->table, View::class);
+		$this->tableMapper = $tableMapper;
 	}
 
 	/**
@@ -23,7 +26,9 @@ class ViewMapper extends QBMapper {
 		$qb->select('*')
 			->from($this->table)
 			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
-		return $this->findEntity($qb);
+		$view = $this->findEntity($qb);
+		$this->enhanceByOwnership($view);
+		return $view;
 	}
 
 	/**
@@ -37,7 +42,9 @@ class ViewMapper extends QBMapper {
 			$qb->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)))
 			->andWhere($qb->expr()->eq('is_base_view', $qb->createNamedParameter(true, IQueryBuilder::PARAM_BOOL)));
 		}
-		return $this->findEntity($qb);
+		$view = $this->findEntity($qb);
+		$this->enhanceByOwnership($view);
+		return $view;
 	}
 
 	/**
@@ -50,7 +57,11 @@ class ViewMapper extends QBMapper {
 		if ($tableId !== null) {
 			$qb->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)));
 		}
-		return $this->findEntities($qb);
+		$views = $this->findEntities($qb);
+		foreach($views as $view) {
+			$this->enhanceByOwnership($view);
+		}
+		return $views;
 	}
 
 	/**
@@ -64,7 +75,11 @@ class ViewMapper extends QBMapper {
 			$qb->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)))
 				->andWhere($qb->expr()->eq('is_base_view', $qb->createNamedParameter(false, IQueryBuilder::PARAM_BOOL)));
 		}
-		return $this->findEntities($qb);
+		$views = $this->findEntities($qb);
+		foreach($views as $view) {
+			$this->enhanceByOwnership($view);
+		}
+		return $views;
 	}
 
 	/**
@@ -111,6 +126,14 @@ class ViewMapper extends QBMapper {
 
 		$sql = $qb->getSQL();
 
-		return $this->findEntities($qb);
+		$views = $this->findEntities($qb);
+		foreach($views as $view) {
+			$this->enhanceByOwnership($view);
+		}
+		return $views;
+	}
+
+	private function enhanceByOwnership(View &$view): void {
+		$view->setOwnership($this->tableMapper->findOwnership($view->getTableId()));
 	}
 }

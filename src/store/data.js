@@ -198,16 +198,12 @@ export default {
 		},
 
 		// ROWS
-		async loadRowsFromBE({ commit }, { tableId, viewId }) {
+		async loadRowsFromBE({ commit }, { viewId }) {
 			commit('setLoading', true)
 			let res = null
 
 			try {
-				if (tableId) {
-					res = await axios.get(generateUrl('/apps/tables/row/' + tableId))
-				} else {
-					res = await axios.get(generateUrl('/apps/tables/row/view/' + viewId))
-				}
+				res = await axios.get(generateUrl('/apps/tables/row/view/' + viewId))
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load rows.'))
 				return false
@@ -218,11 +214,11 @@ export default {
 			commit('setLoading', false)
 			return true
 		},
-		async updateRow({ state, commit, dispatch }, { id, data }) {
+		async updateRow({ state, commit, dispatch }, { id, viewId, data }) {
 			let res = null
 
 			try {
-				res = await axios.put(generateUrl('/apps/tables/row/' + id), { data })
+				res = await axios.put(generateUrl('/apps/tables/row/' + id), { viewId, data })
 			} catch (e) {
 				displayError(e, t('tables', 'Could not update row.'))
 				return false
@@ -251,11 +247,9 @@ export default {
 			commit('setRows', [...rows])
 			return true
 		},
-		async removeRow({ state, commit, dispatch }, { rowId }) {
-			let res = null
-
+		async removeRow({ state, commit, dispatch }, { rowId, viewId }) {
 			try {
-				res = await axios.delete(generateUrl('/apps/tables/row/' + rowId))
+				await axios.delete(generateUrl('/apps/tables/view/' + viewId + '/row/' + rowId))
 			} catch (e) {
 				displayError(e, t('tables', 'Could not remove row.'))
 				return false

@@ -492,17 +492,6 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function indexTableRows(int $tableId, ?int $limit, ?int $offset): DataResponse {
-		return $this->handleError(function () use ($tableId, $limit, $offset) {
-			return $this->rowService->findAllByTable($tableId, $limit, $offset);
-		});
-	}
-
-	/**
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 */
 	public function indexViewRows(int $viewId, ?int $limit, ?int $offset): DataResponse {
 		return $this->handleError(function () use ($viewId, $limit, $offset) {
 			return $this->rowService->findAllByView($viewId, $this->userId, $limit, $offset);
@@ -546,7 +535,7 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function updateRow(int $rowId, string $data): DataResponse {
+	public function updateRow(int $rowId, int $viewId, string $data): DataResponse {
 		$dataNew = [];
 		$array = json_decode($data, true);
 		foreach ($array as $key => $value) {
@@ -556,8 +545,8 @@ class Api1Controller extends ApiController {
 			];
 		}
 
-		return $this->handleError(function () use ($rowId, $dataNew) {
-			return $this->rowService->updateSet($rowId, $dataNew);
+		return $this->handleError(function () use ($rowId, $viewId, $dataNew) {
+			return $this->rowService->updateSet($rowId, $viewId, $dataNew);
 		});
 	}
 

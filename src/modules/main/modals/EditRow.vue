@@ -43,6 +43,7 @@ import { showError, showWarning } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import ColumnFormComponent from '../partials/ColumnFormComponent.vue'
 import tablePermissions from '../mixins/tablePermissions.js'
+import { mapGetters } from 'vuex'
 
 export default {
 	name: 'EditRow',
@@ -74,6 +75,7 @@ export default {
 		}
 	},
 	computed: {
+		...mapGetters(['activeView']),
 		showDeleteButton() {
 			return this.canDeleteDataActiveTable && !this.localLoading
 		},
@@ -137,7 +139,7 @@ export default {
 					value,
 				})
 			}
-			const res = await this.$store.dispatch('updateRow', { id: this.row.id, data })
+			const res = await this.$store.dispatch('updateRow', { id: this.row.id, viewId: this.activeView.id, data })
 			if (!res) {
 				showError(t('tables', 'Could not update row'))
 			}
@@ -152,7 +154,7 @@ export default {
 		},
 		async deleteRowAtBE(rowId) {
 			this.localLoading = true
-			const res = await this.$store.dispatch('removeRow', { rowId })
+			const res = await this.$store.dispatch('removeRow', { rowId, viewId: this.activeView.id })
 			if (!res) {
 				showError(t('tables', 'Could not delete row.'))
 			}

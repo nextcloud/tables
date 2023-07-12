@@ -25,10 +25,10 @@ class V1Api {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function getData(int $tableId, ?int $limit, ?int $offset): array {
-		$columns = $this->columnService->findAllByTable($tableId);
+	public function getData(int $viewId, ?int $limit, ?int $offset): array {
+		$columns = $this->columnService->findAllByView($viewId);
 
-		$rows = $this->rowService->findAllByTable($tableId, $limit, $offset);
+		$rows = $this->rowService->findAllByView($viewId, $limit, $offset);
 
 		$data = [];
 

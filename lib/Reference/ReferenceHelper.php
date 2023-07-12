@@ -100,7 +100,7 @@ class ReferenceHelper {
 
 			// add rows data
 			try {
-				$viewReferenceInfo['rows'] = $this->rowService->findAllByTable($viewId, 10, 0);
+				$viewReferenceInfo['rows'] = $this->rowService->findAllByView($viewId, 10, 0);
 			} catch (InternalError $e) {
 			} catch (PermissionError $e) {
 			}

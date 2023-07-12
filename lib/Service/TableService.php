@@ -331,7 +331,7 @@ class TableService extends SuperService {
 			$item = $this->mapper->find($id);
 
 			// security
-			if (!$this->permissionsService->canDeleteElement($item, $userId)) {
+			if (!$this->permissionsService->canDeleteElement($item, 'table', $userId)) {
 				throw new PermissionError('PermissionError: can not delete table with id '.$id);
 			}
 
