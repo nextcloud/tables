@@ -30,6 +30,9 @@ export default new Vuex.Store({
 		getView: (state) => (id) => {
 			return state.views.filter(view => view.id === id)[0]
 		},
+		getBaseView: (state) => (tableId) => {
+			return state.views.filter(view => view.tableId === tableId).find(view => view.isBaseView)
+		},
 		activeView(state) {
 			if (state.views && state.views.filter(item => item.id === state.activeViewId).length > 0) {
 				return state.views.filter(item => item.id === state.activeViewId)[0]

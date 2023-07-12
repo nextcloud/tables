@@ -2,7 +2,7 @@
 	<div v-if="activeView" class="sharing">
 		<div v-if="!activeView.isShared || activeView.ownership === getCurrentUser().uid">
 			<ShareForm :shares="shares" @add="addShare" @update="updateShare" />
-			<ShareList :shares="shares" @remove="removeShare" @update="updateShare" />
+			<ShareList :shares="shares" @add-table-share="addTableShare" @remove="removeShare" @update="updateShare" />
 		</div>
 		<div v-else style="margin-top: 12px;">
 			{{ activeView ? t('tables', 'This table is shared with you. Resharing is not possible.') : t('tables', 'This view is shared with you. Resharing is not possible.') }}
@@ -74,6 +74,10 @@ export default {
 			const shareId = data.id
 			delete data.id
 			await this.updateShareToBE(shareId, data)
+			await this.loadSharesFromBE()
+		},
+		async addTableShare(share) {
+			await this.sendNewTableShareToBE(share)
 			await this.loadSharesFromBE()
 		},
 	},

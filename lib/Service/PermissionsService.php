@@ -74,22 +74,14 @@ class PermissionsService {
 	 */
 	public function canReadElement($element, string $nodeType, ?string $userId = null): bool {
 		try {
-			$userId = $this->preCheckUserId($userId);
+			if($this->basisCheck($element, $userId)) return true;
 		} catch (InternalError $e) {
 			return false;
 		}
 
-		if ($userId === '') {
-			return true;
-		}
-
-		if ($this->userIsElementOwner($userId, $element)) {
-			return true;
-		}
-
 		try {
-			$this->getShareForElement($element, $nodeType,  $userId);
-			return true;
+			$share = $this->getShareForElement($element, $nodeType,  $userId);
+			return !!$share->getPermissionRead();
 		} catch (InternalError|NotFoundError $e) {
 		}
 
@@ -103,17 +95,54 @@ class PermissionsService {
 	 */
 	public function canUpdateElement($element, string $nodeType, ?string $userId = null): bool {
 		try {
-			$userId = $this->preCheckUserId($userId);
+			if($this->basisCheck($element, $userId)) return true;
 		} catch (InternalError $e) {
 			return false;
 		}
 
-		if ($userId === '') {
-			return true;
+		try {
+			$share = $this->getShareForElement($element, $nodeType, $userId);
+			/** @noinspection PhpUndefinedMethodInspection */
+			return !!$share->getPermissionUpdate();
+		} catch (InternalError|NotFoundError $e) {
 		}
 
-		if ($this->userIsElementOwner($userId, $element)) {
-			return true;
+		return false;
+	}
+
+	/**
+	 * @param Table|View $element
+	 * @param string|null $userId
+	 * @return bool
+	 */
+	public function canDeleteElement($element, string $nodeType, ?string $userId = null): bool {
+		try {
+			if($this->basisCheck($element, $userId)) return true;
+		} catch (InternalError $e) {
+			return false;
+		}
+
+		try {
+			$share = $this->getShareForElement($element, $nodeType, $userId);
+			/** @noinspection PhpUndefinedMethodInspection */
+			return !!$share->getPermissionDelete();
+		} catch (InternalError|NotFoundError $e) {
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * @param Table|View $element
+	 * @param string|null $userId
+	 * @return bool
+	 */
+	public function canManageElement($element, string $nodeType, ?string $userId = null): bool {
+		try {
+			if($this->basisCheck($element, $userId)) return true;
+		} catch (InternalError $e) {
+			return false;
 		}
 
 		try {
@@ -127,16 +156,13 @@ class PermissionsService {
 	}
 
 	/**
-	 * @param Table|View $element
-	 * @param string|null $userId
+	 * @param $element
+	 * @param string $userId
 	 * @return bool
+	 * @throws InternalError
 	 */
-	public function canDeleteElement($element, ?string $userId = null): bool {
-		try {
-			$userId = $this->preCheckUserId($userId);
-		} catch (InternalError $e) {
-			return false;
-		}
+	public function basisCheck($element, ?string &$userId) {
+		$userId = $this->preCheckUserId($userId);
 
 		if ($userId === '') {
 			return true;
@@ -145,17 +171,7 @@ class PermissionsService {
 		if ($this->userIsElementOwner($userId, $element)) {
 			return true;
 		}
-
 		return false;
-	}
-
-	/**
-	 * @param Table $table
-	 * @param string|null $userId
-	 * @return bool
-	 */
-	public function canReadViews(Table $table, ?string $userId = null): bool {
-		return $this->canReadElement($table, 'table', $userId) || $this->canUpdateElement($table, 'table', $userId) || $this->canDeleteElement($table, 'table', $userId);
 	}
 
 
@@ -188,7 +204,7 @@ class PermissionsService {
 	 */
 	public function canCreateColumns(Table $table, ?string $userId = null): bool {
 		// this is the same permission as to update a table
-		return $this->canUpdateElement($table, 'table', $userId);
+		return $this->canManageElement($table, 'table', $userId);
 	}
 
 	/**
@@ -214,7 +230,7 @@ class PermissionsService {
 		try {
 			$table = $this->tableMapper->find($tableId);
 			// this is the same permission as to update a table
-			return $this->canUpdateElement($table, 'table', $userId);
+			return $this->canManageElement($table, 'table', $userId);
 		} catch (\Exception $e) {
 		}
 		return false;
@@ -229,7 +245,7 @@ class PermissionsService {
 		try {
 			$table = $this->tableMapper->find($tableId);
 			// this is the same permission as to update a table
-			return $this->canUpdateElement($table, 'table', $userId);
+			return $this->canManageElement($table, 'table', $userId);
 		} catch (\Exception $e) {
 		}
 		return false;
@@ -237,6 +253,7 @@ class PermissionsService {
 
 
 	// ***** ROWS permissions *****
+
 
 	/**
 	 * @param int $elementId
@@ -264,7 +281,7 @@ class PermissionsService {
 			try {
 				$share = $this->getShareForElement($element, $nodeType, $userId);
 				/** @noinspection PhpUndefinedMethodInspection */
-				return !!$share->getPermissionRead() || !!$share->getPermissionManage();
+				return !!$share->getPermissionRead();
 			} catch (InternalError|NotFoundError $e) {
 			}
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|\Exception $e) {
@@ -279,7 +296,7 @@ class PermissionsService {
 	 * @return bool
 	 */
 	public function canCreateRowsByViewId(int $viewId, ?string $userId = null): bool {
-		try { //TODO: Make to byViewId, currently tableId!!
+		try {
 			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
 			return false;
@@ -299,7 +316,7 @@ class PermissionsService {
 			try {
 				$share = $this->getShareForElement($view, 'view', $userId);
 				/** @noinspection PhpUndefinedMethodInspection */
-				return !!$share->getPermissionCreate() || !!$share->getPermissionManage();
+				return !!$share->getPermissionCreate();
 			} catch (InternalError|NotFoundError $e) {
 			}
 		} catch (\Exception $e) {
@@ -313,7 +330,7 @@ class PermissionsService {
 	 * @param string|null $userId
 	 * @return bool
 	 */
-	public function canUpdateRowsByTableId(int $tableId, ?string $userId = null): bool {
+	public function canUpdateRowsByViewId(int $viewId, ?string $userId = null): bool {
 		try {
 			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
@@ -325,16 +342,16 @@ class PermissionsService {
 		}
 
 		try {
-			$table = $this->tableMapper->find($tableId);
+			$view = $this->viewMapper->find($viewId);
 
-			if ($this->userIsElementOwner($userId, $table)) {
+			if ($this->userIsElementOwner($userId, $view)) {
 				return true;
 			}
 
 			try {
-				$share = $this->getShareForElement($table, 'table', $userId);
+				$share = $this->getShareForElement($view, 'view', $userId);
 				/** @noinspection PhpUndefinedMethodInspection */
-				return !!$share->getPermissionUpdate() || !!$share->getPermissionManage();
+				return !!$share->getPermissionUpdate();
 			} catch (InternalError|NotFoundError $e) {
 			}
 		} catch (\Exception $e) {
@@ -348,7 +365,7 @@ class PermissionsService {
 	 * @param string|null $userId
 	 * @return bool
 	 */
-	public function canDeleteRowsByTableId(int $tableId, ?string $userId = null): bool {
+	public function canDeleteRowsByViewId(int $viewId, ?string $userId = null): bool {
 		try {
 			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
@@ -360,14 +377,14 @@ class PermissionsService {
 		}
 
 		try {
-			$table = $this->tableMapper->find($tableId);
+			$view = $this->viewMapper->find($viewId);
 
-			if ($this->userIsElementOwner($userId, $table)) {
+			if ($this->userIsElementOwner($userId, $view)) {
 				return true;
 			}
 
 			try {
-				$share = $this->getShareForElement($table, 'table', $userId);
+				$share = $this->getShareForElement($view, 'view', $userId);
 				/** @noinspection PhpUndefinedMethodInspection */
 				return !!$share->getPermissionDelete() || !!$share->getPermissionManage();
 			} catch (InternalError|NotFoundError $e) {
@@ -483,8 +500,7 @@ class PermissionsService {
 
 	/** @noinspection PhpUndefinedMethodInspection */
 	private function userIsElementOwner(string $userId, $element): bool {
-		return $element->getCreatedBy() === $userId;
-		// TODO: Add Ownership to View?!
+		return $element->getOwnership() === $userId;
 	}
 
 	public function canChangeElementOwner($element, string $userId): bool {

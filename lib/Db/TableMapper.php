@@ -33,6 +33,14 @@ class TableMapper extends QBMapper {
 		return $this->findEntity($qb);
 	}
 
+	public function findOwnership(int $id): string {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('ownership')
+			->from($this->table)
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
+		return $qb->executeQuery()->fetch()['ownership'];
+	}
+
 	/**
 	 * @param string|null $userId
 	 * @return array

@@ -28,15 +28,6 @@ class RowController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function index(int $tableId): DataResponse {
-		return $this->handleError(function () use ($tableId) {
-			return $this->service->findAllByTable($tableId);
-		});
-	}
-
-	/**
-	 * @NoAdminRequired
-	 */
 	public function indexView(int $viewId): DataResponse {
 		return $this->handleError(function () use ($viewId) {
 			return $this->service->findAllByView($viewId, $this->userId);
@@ -94,15 +85,18 @@ class RowController extends Controller {
 	public function update(
 		int $id,
 		int $columnId,
+		int $viewId,
 		string $data
 	): DataResponse {
 		return $this->handleError(function () use (
 			$id,
+			$viewId,
 			$columnId,
 			$data
 		) {
 			return $this->service->update(
 				$id,
+				$viewId,
 				$columnId,
 				$data);
 		});
@@ -113,14 +107,17 @@ class RowController extends Controller {
 	 */
 	public function updateSet(
 		int $id,
+		int $viewId,
 		array $data
 	): DataResponse {
 		return $this->handleError(function () use (
 			$id,
+			$viewId,
 			$data
 		) {
 			return $this->service->updateSet(
 				$id,
+				$viewId,
 				$data);
 		});
 	}
@@ -128,9 +125,9 @@ class RowController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function destroy(int $id): DataResponse {
-		return $this->handleError(function () use ($id) {
-			return $this->service->delete($id);
+	public function destroy(int $id, int $viewId): DataResponse {
+		return $this->handleError(function () use ($id, $viewId) {
+			return $this->service->delete($id, $viewId);
 		});
 	}
 }

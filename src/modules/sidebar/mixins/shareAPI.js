@@ -8,13 +8,40 @@ export default {
 	methods: {
 		async getSharedWithFromBE() {
 			try {
-				const res = await axios.get(generateUrl('/apps/tables/share/view/' + this.activeView.id))
-				return res.data
+				let res = await axios.get(generateUrl('/apps/tables/share/view/' + this.activeView.id))
+				const shares = res.data
+				res = await axios.get(generateUrl('/apps/tables/share/table/' + this.activeView.tableId))
+				return shares.concat(res.data)
 			} catch (e) {
 				displayError(e, t('tables', 'Could not fetch shares.'))
 			}
 		},
 
+		async sendNewTableShareToBE(share) {
+			console.debug(share)
+			const data = {
+				nodeType: 'table',
+				nodeId: this.activeView.tableId,
+				receiver: share.receiver,
+				receiverType: share.receiverType,
+				permissionRead: false,
+				permissionCreate: false,
+				permissionUpdate: false,
+				permissionDelete: false,
+				permissionManage: true,
+			}
+			let viewId = null
+			try {
+				const res = await axios.post(generateUrl('/apps/tables/share'), data)
+				viewId = res.data.nodeId
+				showSuccess(t('tables', 'Saved new share with "{userName}".', { userName: res.data.receiverDisplayName }))
+			} catch (e) {
+				displayError(e, t('tables', 'Could not create share.'))
+				return false
+			}
+			await this.$store.dispatch('setViewHasShares', { viewId, hasShares: true })
+			return true
+		},
 		async sendNewShareToBE(share) {
 			const data = {
 				nodeType: 'view',
@@ -29,9 +56,7 @@ export default {
 			}
 			let viewId = null
 			try {
-				console.debug("Try to add share: ", '/apps/tables/share', data)
 				const res = await axios.post(generateUrl('/apps/tables/share'), data)
-				console.debug("ANSWER:::", res, res.data, res.data.nodeId)
 				viewId = res.data.nodeId
 				showSuccess(t('tables', 'Saved new share with "{userName}".', { userName: res.data.receiverDisplayName }))
 			} catch (e) {

@@ -26,28 +26,6 @@ class RowService extends SuperService {
 		$this->viewMapper = $viewMapper;
 	}
 
-
-	/**
-	 * @param int $tableId
-	 * @param ?int $limit
-	 * @param ?int $offset
-	 * @return array
-	 * @throws InternalError
-	 * @throws PermissionError
-	 */
-	public function findAllByTable(int $tableId, ?int $limit = null, ?int $offset = null): array {
-		try {
-			if ($this->permissionsService->canReadRowsByElementId($tableId, 'table')) {
-				return $this->mapper->findAllByTable($tableId, $limit, $offset);
-			} else {
-				throw new PermissionError('no read access to table id = '.$tableId);
-			}
-		} catch (\OCP\DB\Exception $e) {
-			$this->logger->error($e->getMessage());
-			throw new InternalError($e->getMessage());
-		}
-	}
-
 	/**
 	 * @param int $viewId
 	 * @param int|null $limit
@@ -177,6 +155,7 @@ class RowService extends SuperService {
 	 */
 	public function update(
 		int $id,
+		int $viewId,
 		int $columnId,
 		string $data
 	):Row {
@@ -184,7 +163,7 @@ class RowService extends SuperService {
 			$item = $this->find($id);
 
 			// security
-			if (!$this->permissionsService->canUpdateRowsByTableId($item->getTableId())) {
+			if (!$this->permissionsService->canUpdateRowsByViewId($viewId)) {
 				throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
 			}
 
@@ -226,13 +205,14 @@ class RowService extends SuperService {
 	 */
 	public function updateSet(
 		int $id,
+		int $viewId,
 		array $data
 	):Row {
 		try {
 			$item = $this->mapper->find($id);
 
 			// security
-			if (!$this->permissionsService->canUpdateRowsByTableId($item->getTableId())) {
+			if (!$this->permissionsService->canUpdateRowsByViewId($viewId)) {
 				throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
 			}
 
@@ -280,13 +260,13 @@ class RowService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function delete(int $id): Row {
+	public function delete(int $id, int $viewId): Row {
 		try {
 			$item = $this->mapper->find($id);
 
 			// security
 			/** @noinspection PhpUndefinedMethodInspection */
-			if (!$this->permissionsService->canDeleteRowsByTableId($item->getTableId())) {
+			if (!$this->permissionsService->canDeleteRowsByViewId($viewId)) {
 				throw new PermissionError('delete row id = '.$item->getId().' is not allowed.');
 			}
 
@@ -307,10 +287,10 @@ class RowService extends SuperService {
 	 * @throws \OCP\DB\Exception
 	 */
 	public function deleteAllByTable(int $tableId, ?string $userId = null): int {
-		// security
+		/*// security
 		if (!$this->permissionsService->canDeleteRowsByTableId($tableId, $userId)) {
 			throw new PermissionError('delete all rows for table id = '.$tableId.' is not allowed.');
-		}
+		}TODO: If you can delete a table you should be allowed to delete the rows?! */
 
 		return $this->mapper->deleteAllByTable($tableId);
 	}
@@ -324,11 +304,11 @@ class RowService extends SuperService {
 		$rows = $this->mapper->findAllWithColumn($columnId);
 
 		// security
-		if (count($rows) > 0) {
+		/*if (count($rows) > 0) {
 			if (!$this->permissionsService->canUpdateRowsByTableId($rows[0]->getTableId())) {
 				throw new PermissionError('update row id = '.$rows[0]->getId().' within '.__FUNCTION__.' is not allowed.');
 			}
-		}
+		} TODO: Is this necessary? You only do that if you are allowed to delete columns. Then you should also be allowed to delete rows*/
 
 		foreach ($rows as $row) {
 			/* @var $row Row */

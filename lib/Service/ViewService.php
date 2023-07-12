@@ -6,6 +6,7 @@ use DateTime;
 use Exception;
 
 use OCA\Tables\Db\Table;
+use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 
@@ -20,6 +21,8 @@ use Psr\Log\LoggerInterface;
 class ViewService extends SuperService {
 	private ViewMapper $mapper;
 
+	private TableMapper $tableMapper;
+
 	private ShareService $shareService;
 
 	private RowService $rowService;
@@ -33,6 +36,7 @@ class ViewService extends SuperService {
 		LoggerInterface $logger,
 		?string $userId,
 		ViewMapper $mapper,
+		TableMapper $tableMapper,
 		ShareService $shareService,
 		RowService $rowService,
 		UserHelper $userHelper,
@@ -41,6 +45,7 @@ class ViewService extends SuperService {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->l = $l;
 		$this->mapper = $mapper;
+		$this->tableMapper = $tableMapper;
 		$this->shareService = $shareService;
 		$this->rowService = $rowService;
 		$this->userHelper = $userHelper;
@@ -61,7 +66,7 @@ class ViewService extends SuperService {
 
 		try {
 			// security
-			if (!$this->permissionsService->canReadViews($table, $userId)) {
+			if (!$this->permissionsService->canReadElement($table, 'table', $userId)) {
 				throw new PermissionError('PermissionError: can not read views for tableId '.$table->getId());
 			}
 
@@ -84,12 +89,11 @@ class ViewService extends SuperService {
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
 
 		try {
+			$baseView = $this->mapper->findBaseView($table->getId());
 			// security
-			if (!$this->permissionsService->canReadViews($table, $userId)) {
+			if (!$this->permissionsService->canReadElement($baseView, 'view', $userId)) {
 				throw new PermissionError('PermissionError: can not read views for tableId '.$table->getId());
 			}
-
-			$baseView = $this->mapper->findBaseView($table->getId());
 			if(!$skipTableEnhancement) $this->enhanceView($baseView, $userId);
 			return $baseView;
 		} catch (\OCP\DB\Exception $e) {
@@ -303,9 +307,8 @@ class ViewService extends SuperService {
 	 * @noinspection PhpUndefinedMethodInspection
 	 */
 	private function enhanceView(View &$view, string $userId): void {
-		$view->setOwnership($view->getCreatedBy()); //TODO
 		// add owner display name for UI
-		$this->addOwnerDisplayName($view); //TODO: ?
+		$view->setOwnerDisplayName($this->userHelper->getUserDisplayName($view->getOwnership()));
 
 		// set hasShares if this table is shared by you (you share it with somebody else)
 		// (senseless if we have no user in context)
@@ -341,11 +344,6 @@ class ViewService extends SuperService {
 			} catch (\Exception $e) {
 			}
 		}
-	}
-
-	private function addOwnerDisplayName(View $view): View {
-		$view->setOwnerDisplayName($this->userHelper->getUserDisplayName($view->getOwnership()));
-		return $view;
 	}
 
 	/**
