@@ -101,7 +101,7 @@ export const Filters = {
 	IsEmpty: new Filter({
 		id: FilterIds.IsEmpty,
 		label: t('tables', 'Is empty'),
-		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextRich, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.Number, ColumnTypes.TextLink, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime],
+		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextRich, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.Number, ColumnTypes.TextLink, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime, ColumnTypes.NumberStars, ColumnTypes.SelectionCheck],
 		incompatibleWith: [FilterIds.Contains, FilterIds.BeginsWith, FilterIds.EndsWith, FilterIds.IsEqual, FilterIds.IsGreaterThan, FilterIds.IsGreaterThanOrEqual, FilterIds.IsLowerThan, FilterIds.IsLowerThanOrEqual, FilterIds.IsEmpty],
 		noSearchValue: true,
 	}),

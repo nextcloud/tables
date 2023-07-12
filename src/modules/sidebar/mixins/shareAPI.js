@@ -17,7 +17,7 @@ export default {
 
 		async sendNewShareToBE(share) {
 			const data = {
-				nodeType: this.getNodeType,
+				nodeType: 'view',
 				nodeId: this.activeView.id,
 				receiver: share.user,
 				receiverType: (share.isNoUser) ? 'group' : 'user',

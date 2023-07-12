@@ -141,8 +141,6 @@ export default {
 
 			if ([ColumnTypes.NumberProgress, ColumnTypes.Selection].includes(column.type)) {
 				return parseInt(value)
-			} else if (column.type === ColumnTypes.SelectionCheck) {
-				return value === 'true'
 			}
 			return value
 		},

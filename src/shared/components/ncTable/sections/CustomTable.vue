@@ -154,25 +154,25 @@ export default {
 						if (searchString) {
 							searchStatus = false
 						}
-					} else {
-						// cleanup possible old markers
-						delete cell.searchStringFound
-						delete cell.filterFound
+						cell = { columnId: column.id, value: null }
+					}
+					// cleanup possible old markers
+					delete cell.searchStringFound
+					delete cell.filterFound
 
-						// if we should filter
-						if (filters !== null) {
-							filters.forEach(fil => {
-								this.addMagicFieldsValues(fil)
-								if (filterStatus === null || filterStatus === true) {
-									filterStatus = column.isFilterFound(cell, fil)
-								}
-							})
-						}
-						// if we should search
-						if (searchString) {
-							console.debug('look for searchString', searchString)
-							searchStatus = column.isSearchStringFound(cell, searchString.toLowerCase())
-						}
+					// if we should filter
+					if (filters !== null) {
+						filters.forEach(fil => {
+							this.addMagicFieldsValues(fil)
+							if (filterStatus === null || filterStatus === true) {
+								filterStatus = column.isFilterFound(cell, fil)
+							}
+						})
+					}
+					// if we should search
+					if (searchString) {
+						console.debug('look for searchString', searchString)
+						searchStatus = column.isSearchStringFound(cell, searchString.toLowerCase())
 					}
 
 					if (debug) {

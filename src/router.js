@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import { generateUrl } from '@nextcloud/router'
-import DefaultViewMainView from './pages/DefaultViewMainView.vue'
+import DefaultMainView from './pages/DefaultMainView.vue'
 import Startpage from './pages/Startpage.vue'
 
 Vue.use(Router)
@@ -16,12 +16,12 @@ export default new Router({
 		},
 		{
 			path: '/view/:viewId',
-			component: DefaultViewMainView,
+			component: DefaultMainView,
 			name: 'view',
 		},
 		{
 			path: '/view/:viewId/row/:rowId',
-			component: DefaultViewMainView,
+			component: DefaultMainView,
 			name: 'row',
 		},
 	],

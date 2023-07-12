@@ -31,10 +31,6 @@ export default {
 		getColumnById: (state) => (id) => {
 			return state.columns.filter(column => column.id === id)[0]
 		},
-		getDefaultValueFromColumn: (state) => (id) => {
-			const column = this.getColumnById(id)
-			return column[column.type + 'Default']
-		},
 	},
 
 	actions: {
@@ -253,7 +249,6 @@ export default {
 			const rows = state.rows
 			rows.push(row)
 			commit('setRows', [...rows])
-			dispatch('increaseRowsCountForTable', { tableId })
 			return true
 		},
 		async removeRow({ state, commit, dispatch }, { rowId }) {
@@ -270,7 +265,6 @@ export default {
 			const index = rows.findIndex(r => r.id === rowId)
 			rows.splice(index, 1)
 			commit('setRows', [...rows])
-			dispatch('decreaseRowsCountForTable', { tableId: res.data.tableId })
 
 			return true
 		},

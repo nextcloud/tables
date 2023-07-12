@@ -1,7 +1,7 @@
 <template>
 	<div>
-		<RadioboxBlankIcon v-if="!value" />
-		<CheckCircleOutline v-if="value" />
+		<RadioboxBlankIcon v-if="value !== null && value === 'false'" />
+		<CheckCircleOutline v-if="value !== null && value === 'true'" />
 	</div>
 </template>
 
@@ -25,8 +25,8 @@ export default {
 			default: null,
 		},
 		value: {
-			type: Boolean,
-			default: false,
+			type: String,
+			default: 'false',
 		},
 	},
 }

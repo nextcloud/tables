@@ -28,15 +28,15 @@ export default class TextLineColumn extends AbstractTextColumn {
 	}
 
 	isFilterFound(cell, filter) {
-		console.debug("Test if filter value is found:",cell, filter)
-		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
-		console.debug(cell.value, filterValue)
+		const filterValue = (filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value).toLowerCase()
+		const cellValue = cell.value?.toLowerCase()
+		if (!cellValue & filter.operator.id !== FilterIds.IsEmpty) return false
 		const filterMethod = {
-			[FilterIds.Contains]() { return cell.value.includes(filterValue) },
-			[FilterIds.BeginsWith]() { return cell.value.startsWith(filterValue) },
-			[FilterIds.EndsWith]() { return cell.value.endsWith(filterValue) },
-			[FilterIds.IsEqual]() { return cell.value === filterValue },
-			[FilterIds.IsEmpty]() { return !cell.value },
+			[FilterIds.Contains]() { return cellValue.includes(filterValue) },
+			[FilterIds.BeginsWith]() { return cellValue.startsWith(filterValue) },
+			[FilterIds.EndsWith]() { return cellValue.endsWith(filterValue) },
+			[FilterIds.IsEqual]() { return cellValue === filterValue },
+			[FilterIds.IsEmpty]() { return !cellValue },
 		}[filter.operator.id]
 
 		return super.isFilterFound(filterMethod, cell)

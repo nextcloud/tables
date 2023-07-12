@@ -33,6 +33,7 @@ export default class NumberStarsColumn extends AbstractNumberColumn {
 			[FilterIds.IsGreaterThanOrEqual]() { return parseInt(cell.value) >= parseInt(filterValue) },
 			[FilterIds.IsLowerThan]() { return parseInt(cell.value) < parseInt(filterValue) },
 			[FilterIds.IsLowerThanOrEqual]() { return parseInt(cell.value) <= parseInt(filterValue) },
+			[FilterIds.IsEmpty]() { return !cell.value },
 		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)
 	}
