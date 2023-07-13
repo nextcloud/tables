@@ -172,7 +172,7 @@ export default {
 				await this.$store.dispatch('resetViewSetting')
 
 				await this.$store.dispatch('loadColumnsFromBE', { view: this.activeView })
-				if (this.canReadElement(this.activeView)) {
+				if (this.canReadData(this.activeView)) {
 					await this.$store.dispatch('loadRowsFromBE', { viewId: this.activeView.id })
 				}
 				this.lastActiveViewId = this.activeView.id

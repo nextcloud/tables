@@ -51,9 +51,9 @@ class ColumnService extends SuperService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function findAllByTable(int $tableId, ?string $userId = null): array {
+	public function findAllByTable(int $viewId, int $tableId, ?string $userId = null): array {
 		try {
-			if ($this->permissionsService->canReadColumnsByTableId($tableId, $userId)) {
+			if ($this->permissionsService->canReadTableColumnsByViewId($viewId, $userId)) {
 				return $this->mapper->findAllByTable($tableId);
 			} else {
 				throw new PermissionError('no read access to table id = '.$tableId);
@@ -75,26 +75,22 @@ class ColumnService extends SuperService {
 	public function findAllByView(int $viewId, ?string $userId = null): array {
 		try {
 			// No need to check for columns outside the view since they cannot be addressed
-			if ($this->permissionsService->canReadColumnsByViewId($viewId, $userId)) {
-				$view = $this->viewService->find($viewId);
-				$viewColumnIds = $view->getColumnsArray();
-				$viewColumns = [];
-				foreach ($viewColumnIds as $viewColumnId) {
-					if ($viewColumnId < 0) continue;
-					try {
-						$viewColumns[] = $this->mapper->find($viewColumnId);
-					} catch (DoesNotExistException $e) {
-							$this->logger->warning($e->getMessage());
-							throw new NotFoundError($e->getMessage());
-					} catch (MultipleObjectsReturnedException $e) {
-						$this->logger->error($e->getMessage());
-						throw new InternalError($e->getMessage());
-					}
+			$view = $this->viewService->find($viewId, true);
+			$viewColumnIds = $view->getColumnsArray();
+			$viewColumns = [];
+			foreach ($viewColumnIds as $viewColumnId) {
+				if ($viewColumnId < 0) continue;
+				try {
+					$viewColumns[] = $this->mapper->find($viewColumnId);
+				} catch (DoesNotExistException $e) {
+						$this->logger->warning($e->getMessage());
+						throw new NotFoundError($e->getMessage());
+				} catch (MultipleObjectsReturnedException $e) {
+					$this->logger->error($e->getMessage());
+					throw new InternalError($e->getMessage());
 				}
-				return $viewColumns;
-			} else {
-				throw new PermissionError('no read access to view id = '.$viewId);
 			}
+			return $viewColumns;
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());

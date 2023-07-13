@@ -21,14 +21,28 @@
 				</NcAppNavigationCaption>
 				<NavigationBaseViewItem v-for="view in getOwnBaseViews"
 					:key="view.id"
+					:filter-string="filterString"
+					:base-view="view" />
+
+				<NcAppNavigationCaption v-if="getSharedTables.length > 0"
+					:title="t('tables', 'Shared tables')" />
+
+				<NavigationBaseViewItem v-for="view in getSharedTables"
+					:key="view.id"
+					:filter-string="filterString"
 					:base-view="view" />
 
 				<NcAppNavigationCaption v-if="getSharedViews.length > 0"
 					:title="t('tables', 'Shared views')" />
 
-				<NavigationViewItem v-for="view in getSharedViews"
-					:key="'view'+view.id"
-					:view="view" />
+				<template v-for="view in getSharedViews">
+					<NavigationViewItem v-if="!view.isBaseView"
+						:key="'view'+view.id"
+						:view="view" />
+					<NavigationBaseViewItem v-else
+						:key="'baseView'+view.id"
+						:base-view="view" />
+				</template>
 			</ul>
 
 			<div v-if="filterString !== ''" class="search-info">
@@ -95,13 +109,20 @@ export default {
 	computed: {
 		...mapState(['tables', 'views', 'tablesLoading']),
 		getSharedViews() {
-			return this.views.filter((item) => { return item.isShared === true && item.ownership !== getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title)).filter(view => { return view.title.toLowerCase().includes(this.filterString.toLowerCase()) })
+			const sharedTableIds = this.getFilteredBaseViews.map(view => view.tableId)
+			const sharedBaseViewTableIds = this.views.filter(item => item.isShared === true && item.isBaseView).map(view => view.tableId)
+			return this.views.filter(item => item.isShared === true && item.ownership !== getCurrentUser().uid && !sharedTableIds.includes(item.tableId)).filter(view => view.isBaseView || !sharedBaseViewTableIds.includes(view.tableId)).filter(view => view.title.toLowerCase().includes(this.filterString.toLowerCase())).sort((a, b) => a.tableId === b.tableId ? a.id - b.id : a.tableId - b.tableId)
+		},
+		getSharedTables() {
+			return this.getFilteredBaseViews.filter((item) => { return item.isShared === true }).sort((a, b) => a.title.localeCompare(b.title))
 		},
 		getOwnBaseViews() {
 			return this.getFilteredBaseViews.filter((item) => { return item.isShared === false || item.ownership === getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
 		},
 		getFilteredBaseViews() {
-			return this.tables.map(table => this.views.find(view => view.id === table.baseView.id)).filter(view => { return view.title.toLowerCase().includes(this.filterString.toLowerCase()) })
+			return this.tables.filter(table => (!this.filterString
+				? true
+				: (table.baseView.title.toLowerCase().includes(this.filterString.toLowerCase()) || table.views.some(view => view.title.toLowerCase().includes(this.filterString.toLowerCase()))))).map(table => this.views.find(view => view.id === table.baseView.id))
 		},
 	},
 	mounted() {

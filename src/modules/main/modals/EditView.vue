@@ -50,8 +50,6 @@
 import { NcAppSettingsDialog, NcAppSettingsSection, NcEmojiPicker, NcButton } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
-import { mapGetters } from 'vuex'
-import tablePermissions from '../mixins/tablePermissions.js'
 import FilterForm from '../partials/editViewPartials/filter/FilterForm.vue'
 import SortForm from '../partials/editViewPartials/sort/SortForm.vue'
 import SelectedViewColumns from '../partials/editViewPartials/SelectedViewColumns.vue'
@@ -68,7 +66,6 @@ export default {
 		SelectedViewColumns,
 		SortForm,
 	},
-	mixins: [tablePermissions],
 	props: {
 		showModal: {
 			type: Boolean,
@@ -129,7 +126,7 @@ export default {
 			this.open = false
 		},
 		async loadTableColumnsFromBE() {
-			this.columns = await this.$store.dispatch('getColumnsFromBE', { tableId: this.view.tableId })
+			this.columns = await this.$store.dispatch('getColumnsFromBE', { tableId: this.view.tableId, viewId: this.view.id })
 			// Show columns of view first
 			this.allColumns = this.columns.concat(this.getMetaColumns)
 			this.allColumns = this.view.columns.map(id => this.allColumns.find(col => col.id === id)).concat(this.allColumns.filter(col => !this.view.columns.includes(col.id)))

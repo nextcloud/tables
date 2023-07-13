@@ -123,7 +123,7 @@
 import { NcModal, NcButton, NcCheckboxRadioSwitch, NcEmptyContent, NcLoadingIcon } from '@nextcloud/vue'
 import { FilePicker, FilePickerType, showError, showWarning } from '@nextcloud/dialogs'
 import RowFormWrapper from '../../../shared/components/ncTable/partials/rowTypePartials/RowFormWrapper.vue'
-import permissionMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
+import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import IconFolder from 'vue-material-design-icons/Folder.vue'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
@@ -143,7 +143,7 @@ export default {
 		NcEmptyContent,
 	},
 
-	mixins: [permissionMixin],
+	mixins: [permissionsMixin],
 
 	props: {
 		showModal: {

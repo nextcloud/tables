@@ -156,18 +156,18 @@ class ShareService extends SuperService {
 	}
 
 	public function findViewShareIfSharedWithMe(int $viewId, ?string $userId = null): Share {
-		return $this->findShareIfSharedWithMe('view', $viewId, $userId);
+		return $this->findShareIfSharedWithMe($viewId, 'view', $userId);
 	}
 
 	public function findTableShareIfSharedWithMe(int $tableId, ?string $userId = null): Share {
-		return $this->findShareIfSharedWithMe('table', $tableId, $userId);
+		return $this->findShareIfSharedWithMe($tableId, 'table', $userId);
 	}
 
 	/**
 	 * @throws NotFoundError
 	 * @throws InternalError
 	 */
-	private function findShareIfSharedWithMe(?string $elementType = 'table', int $elementId, ?string $userId = null): Share {
+	private function findShareIfSharedWithMe(int $elementId, ?string $elementType = 'table', ?string $userId = null): Share {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		// try to find a share with my userId

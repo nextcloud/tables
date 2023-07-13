@@ -18,32 +18,32 @@
 					<NcActions :force-menu="true">
 						<NcActionCaption :title="t('tables', 'Permissions')" />
 						<NcActionCheckbox :checked.sync="share.permissionRead"
-							:disabled="share.permissionManage"
-							@check="updatePermission(share.id, 'read', true)"
-							@uncheck="updatePermission(share.id, 'read', false)">
+							:disabled="share.permissionManage || share.permissionUpdate || share.permissionDelete"
+							@check="updatePermission(share, 'read', true)"
+							@uncheck="updatePermission(share, 'read', false)">
 							{{ t('tables', 'Read data') }}
 						</NcActionCheckbox>
 						<NcActionCheckbox :checked.sync="share.permissionCreate"
 							:disabled="share.permissionManage"
-							@check="updatePermission(share.id, 'create', true)"
-							@uncheck="updatePermission(share.id, 'create', false)">
+							@check="updatePermission(share, 'create', true)"
+							@uncheck="updatePermission(share, 'create', false)">
 							{{ t('tables', 'Create data') }}
 						</NcActionCheckbox>
 						<NcActionCheckbox :checked.sync="share.permissionUpdate"
 							:disabled="share.permissionManage"
-							@check="updatePermission(share.id, 'update', true)"
-							@uncheck="updatePermission(share.id, 'update', false)">
+							@check="updatePermission(share, 'update', true)"
+							@uncheck="updatePermission(share, 'update', false)">
 							{{ t('tables', 'Update data') }}
 						</NcActionCheckbox>
 						<NcActionCheckbox :checked.sync="share.permissionDelete"
 							:disabled="share.permissionManage"
-							@check="updatePermission(share.id, 'delete', true)"
-							@uncheck="updatePermission(share.id, 'delete', false)">
+							@check="updatePermission(share, 'delete', true)"
+							@uncheck="updatePermission(share, 'delete', false)">
 							{{ t('tables', 'Delete data') }}
 						</NcActionCheckbox>
 						<NcActionCheckbox :checked.sync="share.permissionManage"
-							@check="updatePermission(share.id, 'manage', true)"
-							@uncheck="updatePermission(share.id, 'manage', false)">
+							@check="updatePermission(share, 'manage', true)"
+							@uncheck="updatePermission(share, 'manage', false)">
 							{{ t('tables', 'Manage view') }}
 						</NcActionCheckbox>
 						<NcActionButton v-if="activeView.isBaseView && !personHasTablePermission(share.receiver)"
@@ -61,7 +61,7 @@
 							{{ t('tables', 'To manage table manage rights, open the base table') }}
 						</NcActionButton>
 						<NcActionSeparator />
-						<NcActionButton :close-after-click="true" icon="icon-delete" @click="actionDelete(share.id)">
+						<NcActionButton :close-after-click="true" icon="icon-delete" @click="actionDelete(share)">
 							{{ t('tables', 'Delete') }}
 						</NcActionButton>
 					</NcActions>
@@ -72,7 +72,8 @@
 			{{ t('tables', 'No shares') }}
 		</div>
 		<h3 v-if="tableShares && tableShares.length > 0">
-			{{ t('tables', 'Table managers') }}</h3>
+			{{ t('tables', 'Table managers') }}
+		</h3>
 		<ul v-if="tableShares && tableShares.length > 0" class="sharedWithList">
 			<div v-for="share in tableShares"
 				:key="share.id"
@@ -86,8 +87,8 @@
 				<div class="fix-col-2" style="justify-content: end;">
 					<ShareInfoPopover :share="share" />
 
-					<NcActions>
-						<NcActionButton :close-after-click="true" icon="icon-delete" @click="actionDelete(share.id)">
+					<NcActions v-if="activeView.isBaseView">
+						<NcActionButton :close-after-click="true" icon="icon-delete" @click="actionDelete(share)">
 							{{ t('tables', 'Delete') }}
 						</NcActionButton>
 					</NcActions>
@@ -142,7 +143,7 @@ export default {
 				.sort(this.sortByDisplayName)
 		},
 		viewShares() {
-			return this.shares.filter(share => share.nodeType === 'view')
+			return this.shares.filter(share => share.nodeType === 'view').filter(share => this.tableShares.find(tableShare => tableShare.nodeId === this.activeView.tableId && share.receiver === tableShare.receiver) === undefined)
 		},
 		tableShares() {
 			return this.shares.filter(share => share.nodeType === 'table')
@@ -158,11 +159,11 @@ export default {
 			if (a.displayName.toLowerCase() > b.displayName.toLowerCase()) return 1
 			return 0
 		},
-		actionDelete(shareId) {
-			this.$emit('remove', shareId)
+		actionDelete(share) {
+			this.$emit('remove', share)
 		},
-		updatePermission(id, permission, value) {
-			this.$emit('update', { id, permission, value })
+		updatePermission(share, permission, value) {
+			this.$emit('update', { id: share.id, permission, value })
 		},
 		addTablePermission(share) {
 			this.$emit('add-table-share', share)

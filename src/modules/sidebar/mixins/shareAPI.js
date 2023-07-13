@@ -30,16 +30,14 @@ export default {
 				permissionDelete: false,
 				permissionManage: true,
 			}
-			let viewId = null
 			try {
 				const res = await axios.post(generateUrl('/apps/tables/share'), data)
-				viewId = res.data.nodeId
 				showSuccess(t('tables', 'Saved new share with "{userName}".', { userName: res.data.receiverDisplayName }))
 			} catch (e) {
 				displayError(e, t('tables', 'Could not create share.'))
 				return false
 			}
-			await this.$store.dispatch('setViewHasShares', { viewId, hasShares: true })
+			await this.$store.dispatch('setViewHasShares', { viewId: this.activeView.id, hasShares: true })
 			return true
 		},
 		async sendNewShareToBE(share) {
@@ -73,6 +71,7 @@ export default {
 			} catch (e) {
 				displayError(e, t('tables', 'Could not remove share.'))
 			}
+
 		},
 		async updateShareToBE(shareId, data) {
 			try {

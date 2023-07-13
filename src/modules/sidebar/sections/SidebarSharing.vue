@@ -59,10 +59,12 @@ export default {
 			this.shares = await this.getSharedWithFromBE()
 			this.loading = false
 		},
-		async removeShare(shareId) {
-			console.debug('remove share triggered', shareId)
-			await this.removeShareFromBE(shareId)
+		async removeShare(share) {
+			await this.removeShareFromBE(share.id)
 			await this.loadSharesFromBE()
+			if (this.shares.find(share => (share.nodeType === 'view' && share.nodeId === this.activeView.id) || (share.nodeType === 'table' && share.nodeId === this.activeView.tableId)) === undefined) {
+				await this.$store.dispatch('setViewHasShares', { viewId: this.activeView.id, hasShares: false })
+			}
 		},
 		async addShare(share) {
 			console.debug('add share triggered', share)

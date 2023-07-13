@@ -86,7 +86,7 @@ class ViewController extends Controller {
 	 */
 	public function update(int $id, array $data): DataResponse {
 		return $this->handleError(function () use ($id, $data) {
-			return $this->service->update($id, $data, $this->getTableFromViewId($id), $this->userId);
+			return $this->service->update($id, $data, false, $this->userId);
 		});
 	}
 
@@ -95,7 +95,7 @@ class ViewController extends Controller {
 	 */
 	public function destroy(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
-			return $this->service->delete($id, $this->getTableFromViewId($id));
+			return $this->service->delete($id);
 		});
 	}
 
@@ -120,22 +120,5 @@ class ViewController extends Controller {
 			$this->logger->warning($e->getMessage(), ['exception' => $e]);
 			throw new PermissionError($e->getMessage());
 		}
-	}
-
-	/**
-	 * @param int $id
-	 * @return Table
-	 * @throws InternalError
-	 * @throws NotFoundError
-	 * @throws PermissionError
-	 */
-	private function getTableFromViewId(int $id): Table {
-		try {
-			$view = $this->mapper->find($id);
-		} catch (\OCP\DB\Exception $e) {
-			$this->logger->error($e->getMessage());
-			throw new InternalError($e->getMessage());
-		}
-		return $this->getTable($view->getTableId());
 	}
 }

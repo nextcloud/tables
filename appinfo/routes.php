@@ -67,7 +67,7 @@ return [
 		['name' => 'view#destroy', 'url' => '/view/{id}', 'verb' => 'DELETE'],
 
 		// columns
-		['name' => 'column#index', 'url' => '/column/{tableId}', 'verb' => 'GET'],
+		['name' => 'column#index', 'url' => '/view/{viewId}/column/{tableId}', 'verb' => 'GET'],
 		['name' => 'column#show', 'url' => '/column/{id}', 'verb' => 'GET'],
 		['name' => 'column#indexView', 'url' => '/column/view/{viewId}', 'verb' => 'GET'],
 		['name' => 'column#create', 'url' => '/column', 'verb' => 'POST'],

@@ -8,7 +8,7 @@
 				:value="getCellValue(col)" />
 		</td>
 		<td>
-			<NcButton type="primary" :aria-label="t('tables', 'Edit row')" @click="$emit('edit-row', row.id)">
+			<NcButton v-if="canUpdateData(activeView) || canDeleteData(activeView)" type="primary" :aria-label="t('tables', 'Edit row')" @click="$emit('edit-row', row.id)">
 				<template #icon>
 					<Pencil :size="20" />
 				</template>
@@ -32,6 +32,8 @@ import TableCellSelection from './TableCellSelection.vue'
 import TableCellMultiSelection from './TableCellMultiSelection.vue'
 import TableCellTextRich from './TableCellEditor.vue'
 import { ColumnTypes } from './../mixins/columnHandler.js'
+import permissionsMixin from '../../../../shared/components/ncTable/mixins/permissionsMixin.js'
+import { mapGetters } from 'vuex'
 
 export default {
 	name: 'TableRow',
@@ -51,6 +53,8 @@ export default {
 		TableCellMultiSelection,
 		TableCellTextRich,
 	},
+
+	mixins: [permissionsMixin],
 	props: {
 		row: {
 			type: Object,
@@ -70,6 +74,7 @@ export default {
 		},
 	},
 	computed: {
+		...mapGetters(['activeView']),
 		getSelection: {
 			get: () => { return this.selected },
 			set: () => { alert('updating selection') },
