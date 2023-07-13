@@ -11,20 +11,20 @@
 			{{ t('tables', 'Your permissions') }}
 		</h4>
 		<ul>
-			<li :class="{'notPermitted': !canReadDataActiveTable}">
-				{{ canReadDataActiveTable ? '✓' : '' }} {{ t('tables', 'Read') }}
+			<li :class="{'notPermitted': !canReadData(activeView)}">
+				{{ canReadData(activeView) ? '✓' : '' }} {{ t('tables', 'Read') }}
 			</li>
-			<li :class="{'notPermitted': !canCreateDataActiveTable}">
-				{{ canCreateDataActiveTable ? '✓' : '' }} {{ t('tables', 'Create') }}
+			<li :class="{'notPermitted': !canCreateRowInElement(activeView)}">
+				{{ canCreateRowInElement(activeView) ? '✓' : '' }} {{ t('tables', 'Create') }}
 			</li>
-			<li :class="{'notPermitted': !canUpdateDataActiveTable}">
-				{{ canUpdateDataActiveTable ? '✓' : '' }} {{ t('tables', 'Update') }}
+			<li :class="{'notPermitted': !canUpdateData(activeView)}">
+				{{ canUpdateData(activeView) ? '✓' : '' }} {{ t('tables', 'Update') }}
 			</li>
-			<li :class="{'notPermitted': !canDeleteDataActiveTable}">
-				{{ canDeleteDataActiveTable ? '✓' : '' }} {{ t('tables', 'Delete') }}
+			<li :class="{'notPermitted': !canDeleteData(activeView)}">
+				{{ canDeleteData(activeView) ? '✓' : '' }} {{ t('tables', 'Delete') }}
 			</li>
-			<li :class="{'notPermitted': !canManageActiveTable}">
-				{{ canManageActiveTable ? '✓' : '' }} {{ t('tables', 'Manage') }}
+			<li :class="{'notPermitted': !canManageElement(activeView)}">
+				{{ canManageElement(activeView) ? '✓' : '' }} {{ t('tables', 'Manage') }}
 			</li>
 		</ul>
 	</div>
@@ -33,11 +33,11 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import { generateUrl } from '@nextcloud/router'
-import tablePermissions from '../../main/mixins/tablePermissions.js'
+import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 
 export default {
 
-	mixins: [tablePermissions],
+	mixins: [permissionsMixin],
 
 	data() {
 		return {

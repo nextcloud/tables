@@ -27,7 +27,7 @@
 							{{ t('tables', 'I really want to delete this row!') }}
 						</NcButton>
 					</div>
-					<NcButton v-if="canUpdateDataActiveTable && !localLoading" :aria-label="t('tables', 'Save')" type="primary" @click="actionConfirm">
+					<NcButton v-if="canUpdateData(activeView) && !localLoading" :aria-label="t('tables', 'Save')" type="primary" @click="actionConfirm">
 						{{ t('tables', 'Save') }}
 					</NcButton>
 					<div v-if="localLoading" class="icon-loading" style="margin-left: 20px;" />
@@ -42,7 +42,7 @@ import { NcModal, NcButton } from '@nextcloud/vue'
 import { showError, showWarning } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import ColumnFormComponent from '../partials/ColumnFormComponent.vue'
-import tablePermissions from '../mixins/tablePermissions.js'
+import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -52,7 +52,7 @@ export default {
 		NcButton,
 		ColumnFormComponent,
 	},
-	mixins: [tablePermissions],
+	mixins: [permissionsMixin],
 	props: {
 		showModal: {
 			type: Boolean,
@@ -77,7 +77,7 @@ export default {
 	computed: {
 		...mapGetters(['activeView']),
 		showDeleteButton() {
-			return this.canDeleteDataActiveTable && !this.localLoading
+			return this.canDeleteData(this.activeView) && !this.localLoading
 		},
 		nonMetaColumns() {
 			return this.columns.filter(col => col.id >= 0)

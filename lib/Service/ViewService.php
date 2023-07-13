@@ -113,7 +113,7 @@ class ViewService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws InternalError
 	 */
-	public function find(int $id, ?string $userId = null): View {
+	public function find(int $id, bool $skipEnhancement = false, ?string $userId = null): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
 
@@ -125,11 +125,11 @@ class ViewService extends SuperService {
 		}
 
 		// security
-		if (!$this->permissionsService->canReadElement($view, 'view', $userId)) {
+
+		if (!$this->permissionsService->canAccessView($view, $userId)) {
 			throw new PermissionError('PermissionError: can not read view with id '.$id);
 		}
-
-		$this->enhanceView($view, $userId);
+		if(!$skipEnhancement) $this->enhanceView($view, $userId);
 
 		return $view;
 	}
@@ -202,8 +202,8 @@ class ViewService extends SuperService {
 	 * @return View
 	 * @throws InternalError
 	 */
-	public function updateSingle(int $id, string $key, ?string $value, Table $table, ?string $userId = null): View {
-		return $this->update($id, [$key => $value], $table, $userId);
+	public function updateSingle(int $id, string $key, ?string $value, ?string $userId = null): View {
+		return $this->update($id, [$key => $value], $userId);
 	}
 
 	/**
@@ -213,14 +213,14 @@ class ViewService extends SuperService {
 	 * @return View
 	 * @throws InternalError
 	 */
-	public function update(int $id, array $data, Table $table, bool $skipTableEnhancement = false, ?string $userId = null): View {
+	public function update(int $id, array $data, bool $skipTableEnhancement = false, ?string $userId = null): View {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
-			$view = $this->mapper->find($id);
+			$view = $this->mapper->find($id, true);
 
 			// security
-			if (!$this->permissionsService->canUpdateElement($table, 'table', $userId)) {
+			if (!$this->permissionsService->canManageElement($view, 'view', $userId)) {
 				throw new PermissionError('PermissionError: can not update view with id '.$id);
 			}
 
@@ -231,7 +231,6 @@ class ViewService extends SuperService {
 			$time = new DateTime();
 			$view->setLastEditBy($userId);
 			$view->setLastEditAt($time->format('Y-m-d H:i:s'));
-
 			$view = $this->mapper->update($view);
 			if(!$skipTableEnhancement) $this->enhanceView($view, $userId);
 			return $view;
@@ -247,23 +246,23 @@ class ViewService extends SuperService {
 	 * @return View
 	 * @throws InternalError
 	 */
-	public function delete(int $id, Table $table, ?string $userId = null): View {
+	public function delete(int $id, ?string $userId = null): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId is set or ''
 
 		try {
 			$view = $this->mapper->find($id);
+			if ($view->getIsBaseView()) {
+				throw new InternalError('To delete the base view, delete the table instead');
+			}
 
 			// security
-			if (!$this->permissionsService->canUpdateElement($table, 'table', $userId)) {
+			if (!$this->permissionsService->canManageElement($view, 'view', $userId)) {
 				throw new PermissionError('PermissionError: can not delete view with id '.$id);
 			}
-			if ($view->getIsBaseView()) {
-				$this->deleteAllByTable($table, $userId);
-			} else {
-				return $this->deleteByObject($view, $table, $userId);
-			}
+			$this->shareService->deleteAllForView($view);
 
+			return $this->mapper->delete($view);
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
@@ -278,16 +277,15 @@ class ViewService extends SuperService {
 	 * @return View
 	 * @throws InternalError
 	 */
-	public function deleteByObject(View $view, Table $table, ?string $userId = null): View {
+	public function deleteByObject(View $view, ?string $userId = null): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId is set or ''
 
 		try {
 			// security
-			if (!$this->permissionsService->canUpdateElement($table, 'table', $userId)) {
+			if (!$this->permissionsService->canManageElement($view, 'view', $userId)) {
 				throw new PermissionError('PermissionError: can not delete view with id '.$view->getId());
 			}
-
 			// delete all shares for that table
 			$this->shareService->deleteAllForView($view);
 
@@ -310,12 +308,43 @@ class ViewService extends SuperService {
 		// add owner display name for UI
 		$view->setOwnerDisplayName($this->userHelper->getUserDisplayName($view->getOwnership()));
 
+		// set if this is a shared table with you (somebody else shared it with you)
+		// (senseless if we have no user in context)
+		if ($userId !== '') {
+			try {
+				$share = $this->shareService->findViewShareIfSharedWithMe($view->getId());
+				/** @noinspection PhpUndefinedMethodInspection */
+				$view->setIsShared(true);
+				$canManageTable = false;
+				try {
+					$manageTableShare = $this->shareService->findTableShareIfSharedWithMe($view->getTableId());
+					$canManageTable = $manageTableShare->getPermissionManage();
+				} catch (\Exception $e) {
+				}
+				/** @noinspection PhpUndefinedMethodInspection */
+				$view->setOnSharePermissions([
+					'read' => $share->getPermissionRead(),
+					'create' => $share->getPermissionCreate(),
+					'update' => $share->getPermissionUpdate(),
+					'delete' => $share->getPermissionDelete(),
+					'manage' => $share->getPermissionManage(),
+					'manageTable' => $canManageTable,
+				]);
+			} catch (\Exception $e) {
+			}
+		}
+
+		if (!$this->permissionsService->canReadElement($view, 'view', $userId)) return;
+
 		// set hasShares if this table is shared by you (you share it with somebody else)
 		// (senseless if we have no user in context)
 		if ($userId !== '') {
 			try {
-				$shares = $this->shareService->findAll('view', $view->getId());
-				$view->setHasShares(count($shares) !== 0);
+				$allShares = $this->shareService->findAll('view', $view->getId());
+				if ($view->getIsBaseView()) {
+					$allShares = array_merge($allShares, $this->shareService->findAll('table', $view->getTableId()));
+				}
+				$view->setHasShares(count($allShares) !== 0);
 			} catch (InternalError $e) {
 			}
 		}
@@ -324,25 +353,6 @@ class ViewService extends SuperService {
 		try {
 			$view->setRowsCount($this->rowService->getViewRowsCount($view, $userId));
 		} catch (InternalError|PermissionError $e) {
-		}
-
-		// set if this is a shared table with you (somebody else shared it with you)
-		// (senseless if we have no user in context)
-		if ($userId !== '') {
-			try {
-				$share = $this->shareService->findViewShareIfSharedWithMe($view->getId());
-				/** @noinspection PhpUndefinedMethodInspection */
-				$view->setIsShared(true);
-				/** @noinspection PhpUndefinedMethodInspection */
-				$view->setOnSharePermissions([
-					'read' => $share->getPermissionRead(),
-					'create' => $share->getPermissionCreate(),
-					'update' => $share->getPermissionUpdate(),
-					'delete' => $share->getPermissionDelete(),
-					'manage' => $share->getPermissionManage(),
-				]);
-			} catch (\Exception $e) {
-			}
 		}
 	}
 
@@ -363,10 +373,10 @@ class ViewService extends SuperService {
 			if($view->getIsBaseView()) {
 				$baseView = $view;
 			} else {
-				$this->deleteByObject($view, $table, $userId);
+				$this->deleteByObject($view, $userId);
 			}
 		}
-		return $this->deleteByObject($baseView, $table, $userId);
+		return $this->deleteByObject($baseView, $userId);
 	}
 
 	public function deleteColumnDataFromViews(int $columnId, Table $table) {

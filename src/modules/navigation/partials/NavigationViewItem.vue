@@ -14,11 +14,11 @@
 		</template>
 		<template #extra />
 		<template #counter>
-			<NcCounterBubble>
+			<NcCounterBubble v-if="canReadData(view)">
 				{{ n('tables', '%n row', '%n rows', view.rowsCount, {}) }}
 			</NcCounterBubble>
 			<NcActionButton v-if="view.hasShares" icon="icon-share" :class="{'margin-right': !(activeView && view.id === activeView.id)}" @click="actionShowShare" />
-			<div v-if="view.isShared && view.ownership !== userId" class="margin-left">
+			<div v-if="view.isShared && view.ownership !== userId && !canManageTable(view)" class="margin-left">
 				<NcAvatar :user="view.ownership" />
 			</div>
 		</template>
@@ -51,7 +51,7 @@
 					<Creation :size="20" />
 				</template>
 			</NcActionButton>
-			<NcActionButton
+			<NcActionButton v-if="canManageTable(view)"
 				:close-after-click="true"
 				@click="cloneView">
 				<template #icon>
@@ -59,7 +59,7 @@
 				</template>
 				{{ t('tables', 'Clone view') }}
 			</NcActionButton>
-			<NcActionButton v-if="canDeleteElement(view)"
+			<NcActionButton v-if="canManageElement(view)"
 				icon="icon-delete"
 				:close-after-click="true"
 				@click="showDeletionConfirmation = true">
@@ -198,32 +198,3 @@ export default {
 
 }
 </script>
-<style lang="scss">
-
-// .app-navigation-entry__counter-wrapper {
-// 	button.action-button {
-// 		padding-right: 0;
-// 	}
-// 	margin-right: 0 !important;
-// }
-
-// .app-navigation-entry {
-// 	.margin-right {
-// 		margin-right: 44px;
-// 	}
-// 	.margin-left {
-// 		margin-left: calc(var(--default-grid-baseline) * 2);
-// 	}
-// }
-
-// .app-navigation-entry:hover {
-// 	.margin-right {
-// 		margin-right: 0;
-// 	}
-
-// 	.app-navigation-entry__counter-wrapper {
-// 		display: inline-flex;
-// 	}
-// }
-
-</style>

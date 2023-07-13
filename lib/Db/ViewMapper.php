@@ -2,6 +2,8 @@
 
 namespace OCA\Tables\Db;
 
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -18,16 +20,21 @@ class ViewMapper extends QBMapper {
 		$this->tableMapper = $tableMapper;
 	}
 
+
 	/**
+	 * @param int $id
+	 * @return View
 	 * @throws Exception
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
 	 */
-	public function find(int $id): View {
+	public function find(int $id, bool $skipEnhancement = false): View {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
 			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
 		$view = $this->findEntity($qb);
-		$this->enhanceByOwnership($view);
+		if(!$skipEnhancement) $this->enhanceByOwnership($view);
 		return $view;
 	}
 

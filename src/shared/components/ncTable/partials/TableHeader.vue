@@ -33,7 +33,7 @@
 		</th>
 		<th data-cy="customTableAction">
 			<NcActions :force-menu="true" :type="isViewSettingSet ? 'secondary' : 'tertiary'">
-				<NcActionCaption :title="t('tables', 'Manage view')" />
+				<NcActionCaption v-if="canManageElement(table)" :title="t('tables', 'Manage view')" />
 				<NcActionButton v-if="isViewSettingSet"
 					:close-after-click="true"
 					class="view-changed"
@@ -64,7 +64,7 @@
 
 				<NcActionSeparator v-if="isViewSettingSet" />
 
-				<NcActionButton v-if="canManageElement(table)" :close-after-click="true" @click="$emit('create-column')">
+				<NcActionButton v-if="canManageTable(table)" :close-after-click="true" @click="$emit('create-column')">
 					<template #icon>
 						<TableColumnPlusAfter :size="20" decorative title="" />
 					</template>
@@ -76,7 +76,7 @@
 					@click="$emit('edit-view')">
 					{{ t('tables', 'Edit view') }}
 				</NcActionButton>
-				<NcActionButton v-if="canManageElement(table)"
+				<NcActionButton v-if="canManageTable(table)"
 					:close-after-click="true"
 					@click="createView()">
 					<template #icon>
@@ -94,12 +94,12 @@
 					</template>
 					{{ t('tables', 'Import') }}
 				</NcActionButton>
-				<NcActionButton v-if="canReadElement(table)" :close-after-click="true"
+				<NcActionButton v-if="canReadData(table)" :close-after-click="true"
 					icon="icon-download"
 					@click="downloadCSV">
 					{{ t('tables', 'Export as CSV') }}
 				</NcActionButton>
-				<NcActionButton v-if="canManageElement(table)"
+				<NcActionButton v-if="canShareElement(table)"
 					:close-after-click="true"
 					icon="icon-share"
 					@click="toggleShare">

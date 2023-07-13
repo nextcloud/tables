@@ -26,15 +26,14 @@ class ColumnController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function index(int $tableId): DataResponse {
-		return $this->handleError(function () use ($tableId) {
-			return $this->service->findAllByTable($tableId);
+	public function index(int $viewId, int $tableId): DataResponse {
+		return $this->handleError(function () use ($viewId, $tableId) {
+			return $this->service->findAllByTable($viewId, $tableId);
 		});
 	}
 
 	/**
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 */
 	public function indexView(int $viewId): DataResponse {
 		return $this->handleError(function () use ($viewId) {

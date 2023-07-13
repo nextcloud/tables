@@ -17,7 +17,7 @@
 		</template>
 		<template #extra />
 		<template #counter>
-			<NcCounterBubble>
+			<NcCounterBubble v-if="canReadData(baseView)">
 				{{ n('tables', '%n row', '%n rows', baseView.rowsCount, {}) }}
 			</NcCounterBubble>
 			<NcActionButton v-if="baseView.hasShares" icon="icon-share" :class="{'margin-right': !(activeView && baseView.id === activeView.id)}" @click="actionShowShare" />
@@ -27,7 +27,7 @@
 		</template>
 
 		<template #actions>
-			<NcActionButton v-if="canManageElement(baseView)"
+			<NcActionButton v-if="canManageTable(baseView)"
 				icon="icon-add"
 				:close-after-click="true"
 				@click="createView">
@@ -61,7 +61,7 @@
 					<Creation :size="20" />
 				</template>
 			</NcActionButton>
-			<NcActionButton v-if="canDeleteElement(baseView)"
+			<NcActionButton v-if="canManageTable(baseView)"
 				icon="icon-delete"
 				:close-after-click="true"
 				@click="showDeletionConfirmation = true">
@@ -128,6 +128,10 @@ export default {
 			type: Object,
 			default: null,
 		},
+		filterString: {
+			type: String,
+			default: '',
+		},
 	},
 
 	data() {
@@ -147,7 +151,6 @@ export default {
 			return getCurrentUser().uid
 		},
 		getViews() {
-			// TODO: this.table.views exists, but the views are also stored in store views. When changed there the change does not appear in the views attribute of this.table. Use it like done here instead? -> this.table.views unnecessary?:
 			return this.views.filter(v => !v.isBaseView && v.tableId === this.baseView.tableId)
 		},
 		hasViews() {
@@ -160,13 +163,18 @@ export default {
 				this.isParentOfActiveView = true
 			}
 		},
+		filterString() {
+			if (!this.isParentOfActiveView && this.filterString && !this.baseView.title.toLowerCase().includes(this.filterString.toLowerCase())) {
+				this.isParentOfActiveView = true
+			}
+		},
 	},
 	methods: {
 		createView() {
 			emit('create-view', this.baseView.tableId)
 		},
 		editView() {
-			emit('edit-view', this.baseView) //TODO
+			emit('edit-view', this.baseView) // TODO
 		},
 		async actionShowShare() {
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })

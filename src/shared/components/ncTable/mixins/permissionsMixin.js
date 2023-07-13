@@ -1,10 +1,20 @@
 import { getCurrentUser } from '@nextcloud/auth'
 
 export default {
-
 	methods: {
 
+		canManageTable(element) {
+			if (!element.isShared) {
+				return true
+			}
+			if ((element.isShared && element?.onSharePermissions?.manageTable) || element?.ownership === getCurrentUser().uid) {
+				return true
+			}
+			return false
+		},
+
 		canManageElement(element) {
+			if (this.canManageTable(element)) return true
 			if (!element.isShared) {
 				return true
 			}
@@ -14,7 +24,8 @@ export default {
 			return false
 		},
 
-		canReadElement(element) {
+		canReadData(element) {
+			if (this.canManageTable(element) || this.canDeleteData(element) || this.canUpdateData(element) || this.canManageElement(element)) return true
 			if (!element.isShared) {
 				return true
 			}
@@ -26,6 +37,7 @@ export default {
 		},
 
 		canCreateRowInElement(element) {
+			if (this.canManageTable(element) || this.canManageElement(element)) return true
 			if (!element.isShared) {
 				return true
 			}
@@ -44,15 +56,15 @@ export default {
 			return false
 		},
 
-		canDeleteElement(element) {
-			return this.canManageElement(element)
-		},
-
 		canDeleteData(element) {
+			if (this.canManageTable(element) || this.canManageElement(element)) return true
 			return element.isShared === false
-				|| (element.isShared === true && element.onSharePermissions.delete === true)
-				|| (element.isShared === true && element.onSharePermissions.manage === true)
-				|| (element.isShared === true && element.ownership === getCurrentUser().uid)
+				|| (element.isShared === true && (element.onSharePermissions.delete === true || element.ownership === getCurrentUser().uid))
+		},
+		canUpdateData(element) {
+			if (this.canManageTable(element) || this.canManageElement(element)) return true
+			return element.isShared === false
+				|| (element.isShared === true && (element.onSharePermissions.update === true || element.ownership === getCurrentUser().uid))
 		},
 
 	},

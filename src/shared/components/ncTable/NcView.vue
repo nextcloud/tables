@@ -54,7 +54,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				@delete-selected-rows="rowIds => $emit('delete-selected-rows', rowIds)" />
 		</div>
 		<div class="custom-table row">
-			<CustomTable v-if="canReadElement(view)"
+			<CustomTable v-if="canReadData(view)"
 				:columns="columns"
 				:rows="rows"
 				:table="view"
@@ -70,7 +70,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				@update-selected-rows="rowIds => selectedRows = rowIds"
 				@download-csv="data => downloadCsv(data, columns, view)"
 				@delete-filter="id => $emit('delete-filter', id)" />
-			<NcEmptyContent v-else
+			<NcEmptyContent v-else-if="canCreateRowInElement(view)"
 				:title="t('tables', 'Create rows')"
 				:description="t('tables', 'You are not allowed to read this view, but you can still create rows.')">
 				<template #icon>
@@ -85,6 +85,13 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 					</NcButton>
 				</template>
 			</NcEmptyContent>
+			<NcEmptyContent v-else
+				:title="t('tables', 'No permissions')"
+				:description="t('tables', 'You have no permissions for this view.')">
+				<template #icon>
+					<Cancel :size="25" />
+				</template>
+			</NcEmptyContent>
 		</div>
 	</div>
 </template>
@@ -97,11 +104,12 @@ import exportTableMixin from './mixins/exportTableMixin.js'
 import permissionsMixin from './mixins/permissionsMixin.js'
 import { NcEmptyContent, NcButton } from '@nextcloud/vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
+import Cancel from 'vue-material-design-icons/Cancel.vue'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 export default {
 	name: 'NcView',
 
-	components: { CustomTable, Options, NcButton, NcEmptyContent, Plus },
+	components: { CustomTable, Options, NcButton, NcEmptyContent, Plus, Cancel },
 
 	mixins: [exportTableMixin, permissionsMixin],
 

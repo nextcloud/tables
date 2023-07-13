@@ -6,7 +6,7 @@
 			:subtitle="elementSubtitle"
 			@update:active="tab => activeSidebarTab = tab"
 			@close="showSidebar = false">
-			<NcAppSidebarTab v-if="canShareActiveTable"
+			<NcAppSidebarTab v-if="activeView && canShareElement(activeView)"
 				id="sharing"
 				icon="icon-share"
 				:name="t('tables', 'Sharing')">
@@ -31,7 +31,7 @@ import SidebarIntegration from './SidebarIntegration.vue'
 import { NcAppSidebar, NcAppSidebarTab } from '@nextcloud/vue'
 import { mapGetters, mapState } from 'vuex'
 import Creation from 'vue-material-design-icons/Creation.vue'
-import tablePermissions from '../../main/mixins/tablePermissions.js'
+import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 
 export default {
 	name: 'Sidebar',
@@ -43,7 +43,7 @@ export default {
 		Creation,
 	},
 
-	mixins: [tablePermissions],
+	mixins: [permissionsMixin],
 
 	data() {
 		return {

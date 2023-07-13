@@ -117,7 +117,7 @@ export default {
 
 			try {
 				if (tableId) {
-					res = await axios.get(generateUrl('/apps/tables/column/' + tableId))
+					res = await axios.get(generateUrl('/apps/tables/view/' + viewId + '/column/' + tableId))
 				  } else {
 					res = await axios.get(generateUrl('/apps/tables/column/view/' + viewId))
 				  }
