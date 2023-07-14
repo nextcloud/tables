@@ -4,7 +4,7 @@
 			{{ t('tables', 'Set now as default') }}
 		</div>
 		<div class="fix-col-4 space-L-small">
-			<NcCheckboxRadioSwitch type="switch" :checked.sync="mutableColumn.datetimeDefault" />
+			<NcCheckboxRadioSwitch type="switch" :checked.sync="nowAsDefault" />
 		</div>
 	</div>
 </template>
@@ -26,11 +26,22 @@ export default {
 	data() {
 		return {
 			mutableColumn: this.column,
+			nowAsDefault: this.column.datetimeDefault === 'now',
 		}
 	},
 	watch: {
 		column() {
 			this.mutableColumn = this.column
+			if (this.column.datetimeDefault === 'now') {
+				this.nowAsDefault = true
+			}
+		},
+		nowAsDefault() {
+			if (this.nowAsDefault) {
+				this.mutableColumn.datetimeDefault = 'now'
+			} else {
+				this.mutableColumn.datetimeDefault = ''
+			}
 		},
 	},
 }

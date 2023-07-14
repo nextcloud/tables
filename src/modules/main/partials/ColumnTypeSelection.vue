@@ -126,6 +126,11 @@ export default {
 			},
 		},
 	},
+	watch: {
+		columnId() {
+			this.combinedType = this.columnId
+		},
+	},
 }
 </script>
 <style lang="scss" scoped>

@@ -217,14 +217,14 @@ class ColumnService extends SuperService {
 			$entity = $this->mapper->insert($item);
 			// Add columns to view(s)
 			$baseView = $this->viewService->findBaseView($table, true);
-			$this->viewService->update($baseView->getId(), ['columns' => json_encode(array_merge($baseView->getColumnsArray(), [$entity->getId()]))], $table, true, $userId);
+			$this->viewService->update($baseView->getId(), ['columns' => json_encode(array_merge($baseView->getColumnsArray(), [$entity->getId()]))], $userId, true);
 			if($viewId != $baseView->getId()) {
 				$view = $this->viewService->find($viewId);
-				$this->viewService->update($viewId, ['columns' => json_encode(array_merge($view->getColumnsArray(), [$entity->getId()]))], $table, true, $userId);
+				$this->viewService->update($viewId, ['columns' => json_encode(array_merge($view->getColumnsArray(), [$entity->getId()]))], $userId, true);
 			}
 			foreach ($selectedViewIds as $viewId) {
 				$view = $this->viewService->find($viewId);
-				$this->viewService->update($viewId, ['columns' => json_encode(array_merge($view->getColumnsArray(), [$entity->getId()]))], $table, true, $userId);
+				$this->viewService->update($viewId, ['columns' => json_encode(array_merge($view->getColumnsArray(), [$entity->getId()]))], $userId, true);
 			}
 
 			return $entity;

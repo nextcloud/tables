@@ -102,6 +102,7 @@ import SelectionMultiForm from '../../../shared/components/ncTable/partials/colu
 import DatetimeForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeForm.vue'
 import DatetimeDateForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeTimeForm.vue'
+import { ColumnTypes } from '../../../shared/components/ncTable/mixins/columnHandler.js'
 
 export default {
 	name: 'EditColumn',
@@ -195,6 +196,7 @@ export default {
 		},
 		async updateColumn() {
 			const data = { ...this.editColumn }
+			if ((this.column.type === ColumnTypes.SelectionMulti || this.column.type === ColumnTypes.SelectionCheck) && data.selectionDefault !== null) data.selectionDefault = JSON.stringify(data.selectionDefault)
 			delete data.type
 			delete data.id
 			delete data.tableId
@@ -202,6 +204,7 @@ export default {
 			delete data.createdBy
 			delete data.lastEditAt
 			delete data.lastEditBy
+			console.debug("Update column: ", data)
 			const res = await this.$store.dispatch('updateColumn', { id: this.editColumn.id, data })
 			if (res) {
 				showSuccess(t('tables', 'The column "{column}" was updated.', { column: this.editColumn.title }))

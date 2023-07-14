@@ -213,11 +213,11 @@ class ViewService extends SuperService {
 	 * @return View
 	 * @throws InternalError
 	 */
-	public function update(int $id, array $data, bool $skipTableEnhancement = false, ?string $userId = null): View {
+	public function update(int $id, array $data, ?string $userId = null, bool $skipTableEnhancement = false): View {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
-			$view = $this->mapper->find($id, true);
+			$view = $this->mapper->find($id);
 
 			// security
 			if (!$this->permissionsService->canManageElement($view, 'view', $userId)) {
@@ -397,9 +397,7 @@ class ViewService extends SuperService {
 				'filter' => json_encode($filteredFilters),
 			];
 
-			$this->update($view->getId(), $data, $table);
-
-			//TODODODOTODOTODOTODOTODOTOD
+			$this->update($view->getId(), $data);
 		}
 	}
 

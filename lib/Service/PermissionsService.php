@@ -330,7 +330,7 @@ class PermissionsService {
 		try {
 			$share = $this->getShareForElement($elementId, $nodeType, $userId);
 			/** @noinspection PhpUndefinedMethodInspection */
-			return !!$share->getPermissionRead();
+			return !!$share->getPermissionCreate() || !!$share->getPermissionDelete() || !!$share->getPermissionRead();
 		} catch (InternalError|NotFoundError $e) {
 		}
 		return false;

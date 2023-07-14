@@ -200,6 +200,27 @@ class RowMapper extends QBMapper {
 	}
 
 
+	public function getRowIdsOfView(View $view, $userId): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('id')
+			->from($this->table)
+			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), $qb::PARAM_INT)));
+
+		$neededColumnIds = $this->getAllColumnIdsFromView($view);
+		$neededColumns = $this->columnMapper->getColumnTypes($neededColumnIds);
+
+		// Filter
+
+		$this->addFilterToQuery($qb, $view, $neededColumns, $userId);
+
+		try {
+			return $this->findOneQuery($qb);
+		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+			return [];
+		}
+	}
+
+
 	private function addFilterToQuery(IQueryBuilder &$qb, View $view, array $neededColumns, string $userId): void {
 		$enrichedFilters = $view->getFilterArray();
 		if (count($enrichedFilters) > 0) {

@@ -28,48 +28,18 @@ export default {
 		localValues: {
 			get() {
 				if (this.value !== null) {
-					return this.getValueObjects
+					return this.column.getObjects(this.value)
 				} else {
-					this.$emit('update:value', this.getDefaultIds)
-					return this.getDefaultObjects
+					this.$emit('update:value', this.column.default())
+					return this.column.getDefaultObjects()
 				}
 			},
 			set(v) {
 				this.$emit('update:value', this.getIdArrayFromObjects(v))
 			},
 		},
-		getDefaultIds() {
-			const ids = []
-			if (this.column?.selectionDefault === null || this.column?.selectionDefault === '') {
-				return ids
-			}
-			JSON.parse(this.column?.selectionDefault).forEach(def => {
-				ids.push(parseInt(def))
-			})
-			return ids
-		},
-		getDefaultObjects() {
-			const defaultObjects = []
-			this.getDefaultIds.forEach(id => {
-				const o = this.getOptionObject(id)
-				if (o) {
-					defaultObjects.push(o)
-				}
-			})
-			return defaultObjects
-		},
-		getValueObjects() {
-			const objects = []
-			this.value?.forEach(id => {
-				const o = this.getOptionObject(id)
-				if (o) {
-					objects.push(o)
-				}
-			})
-			return objects
-		},
 		getOptions() {
-			return this.column.selectionOptions.map(item => Object.assign({}, item)) || null
+			return this.column.selectionOptions || null
 		},
 		getAllNonDeletedOrSelectedOptions() {
 			const options = this.getOptions?.filter(item => {
@@ -87,16 +57,7 @@ export default {
 	methods: {
 		optionIdIsSelected(id) {
 			// check if the given id is selected (in the value array)
-			const result = this.getValueObjects.findIndex(item => item.id === id)
-			return result !== -1
-		},
-		getOptionObject(id) {
-			const i = this.getOptions?.findIndex(obj => {
-				return obj.id === id
-			})
-			if (i !== -1) {
-				return this.getOptions[i]
-			}
+			return this.values.includes(id)
 		},
 		getIdArrayFromObjects(objects) {
 			const ids = []

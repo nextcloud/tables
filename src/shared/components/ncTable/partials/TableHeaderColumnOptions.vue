@@ -78,12 +78,12 @@
 							<EyeOff :size="25" />
 						</template>
 					</NcButton>
-					<NcButton v-if="column.id >= 0" :aria-label="t('tables', 'Edit Column')" type="secondary" class="column-button" @click="editColumn()">
+					<NcButton v-if="column.id >= 0 && canManageTable(activeView)" :aria-label="t('tables', 'Edit Column')" type="secondary" class="column-button" @click="editColumn()">
 						<template #icon>
 							<Pencil :size="25" />
 						</template>
 					</NcButton>
-					<NcButton type="error" :aria-label="t('tables', 'Delete Column')" class="column-button" @click="deleteColumn()">
+					<NcButton v-if="column.id >= 0 && canManageTable(activeView)" type="error" :aria-label="t('tables', 'Delete Column')" class="column-button" @click="deleteColumn()">
 						<template #icon>
 							<Delete :size="25" />
 						</template>
@@ -102,8 +102,9 @@ import Delete from 'vue-material-design-icons/Delete.vue'
 import Pencil from 'vue-material-design-icons/Pencil.vue'
 import EyeOff from 'vue-material-design-icons/EyeOff.vue'
 import DotsHorizontal from 'vue-material-design-icons/DotsHorizontal.vue'
+import permissionsMixin from '../mixins/permissionsMixin.js'
 import { NcPopover, NcCheckboxRadioSwitch, NcButton, NcSelect } from '@nextcloud/vue'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import { AbstractColumn } from '../mixins/columnClass.js'
 import { ColumnTypes } from '../mixins/columnHandler.js'
 import { FilterIds } from '../mixins/filter.js'
@@ -124,7 +125,7 @@ export default {
 		NcButton,
 	},
 
-	mixins: [generalHelper],
+	mixins: [generalHelper, permissionsMixin],
 
 	props: {
 		column: {
@@ -157,6 +158,7 @@ export default {
 		...mapState({
 			viewSetting: state => state.data.viewSetting,
 		}),
+		...mapGetters(['activeView']),
 		getOperators() {
 			const possibleOperators = this.column.getPossibleOperators()
 			// preselect first operator, even if it's not displayed
