@@ -43,7 +43,7 @@ export default {
 			providers: [
 				{
 					id: 'url',
-					label: t('tables', 'Url'),
+					label: t('tables', 'URL'),
 					active: true,
 				},
 			],
