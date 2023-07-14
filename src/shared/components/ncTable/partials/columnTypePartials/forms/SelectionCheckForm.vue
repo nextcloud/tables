@@ -37,6 +37,10 @@ export default {
 		},
 	},
 	created() {
+		if (this.mutableColumn.selectionDefault === 'true') {
+			this.mutableColumn.selectionDefault = true
+			return
+		}
 		if (typeof this.mutableColumn.selectionDefault !== 'boolean') {
 			this.mutableColumn.selectionDefault = false
 		}

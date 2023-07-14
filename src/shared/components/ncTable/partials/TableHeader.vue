@@ -43,7 +43,7 @@
 					</template>
 					{{ t('tables', 'Reset view config') }}
 				</NcActionButton>
-				<NcActionButton v-if="isViewSettingSet && !activeView.isBaseView"
+				<NcActionButton v-if="isViewSettingSet && !activeView.isBaseView && canManageElement(table)"
 					:close-after-click="true"
 					class="view-changed"
 					@click="applyViewConfig">
@@ -52,7 +52,7 @@
 					</template>
 					{{ t('tables', 'Apply view config') }}
 				</NcActionButton>
-				<NcActionButton v-if="isViewSettingSet"
+				<NcActionButton v-if="isViewSettingSet && canManageElement(table)"
 					:close-after-click="true"
 					class="view-changed"
 					@click="createWithViewConfig">

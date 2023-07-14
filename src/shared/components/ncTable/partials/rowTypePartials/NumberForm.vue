@@ -34,12 +34,6 @@ export default {
 		},
 	},
 
-	data() {
-		return {
-			localValue: null,
-		}
-	},
-
 	computed: {
 		getStep() {
 			if (this.column?.numberDecimals === 0) {
@@ -49,6 +43,21 @@ export default {
 			} else {
 				return 'any'
 			}
+		},
+		localValue: {
+			get() {
+				if (this.value !== null) {
+					return this.value
+				} else {
+					if (this.column.numberDefault !== undefined) {
+						this.$emit('update:value', this.column.numberDefault)
+						return this.column.numberDefault
+					} else {
+						return null
+					}
+				}
+			},
+			set(v) { this.$emit('update:value', this.parseValue(v)) },
 		},
 	},
 

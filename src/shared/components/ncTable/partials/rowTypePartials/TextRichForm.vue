@@ -61,11 +61,10 @@ export default {
 	computed: {
 		localValue: {
 			get() {
-				return (this.value !== null)
-					? this.value
-					: ((this.column.textDefault !== undefined)
-						? this.column.textDefault
-						: '')
+				if (this.value !== null) return this.value
+				const newValue = this.column?.textDefault ? this.column.textDefault : ''
+				this.$emit('update:value', newValue)
+				return newValue
 			},
 			set(v) {
 				this.$emit('update:value', v)

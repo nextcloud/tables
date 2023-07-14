@@ -73,6 +73,7 @@ export default {
 		text(value) {
 			if (value.trim() !== this.localValue.trim()) {
 				this.editor.setContent(value, false)
+				this.localValue = value
 			}
 		},
 	},

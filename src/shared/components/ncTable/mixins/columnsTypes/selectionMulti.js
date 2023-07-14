@@ -10,6 +10,13 @@ export default class SelectionMutliColumn extends AbstractSelectionColumn {
 		this.selectionOptions = data.selectionOptions
 	}
 
+	default() {
+		if (!this.selectionDefault) {
+			return []
+		}
+		return JSON.parse(this.selectionDefault)
+	}
+
 	getValueString(valueObject) {
 		valueObject = valueObject || this.value || null
 
@@ -23,6 +30,10 @@ export default class SelectionMutliColumn extends AbstractSelectionColumn {
 			}
 		})
 		return ret
+	}
+
+	getDefaultObjects() {
+		return this.getObjects(this.default())
 	}
 
 	getObjects(values) {
@@ -41,18 +52,6 @@ export default class SelectionMutliColumn extends AbstractSelectionColumn {
 		if (i !== undefined) {
 			return this.selectionOptions[i] || null
 		}
-	}
-
-	getDefaultObjects() {
-		if (!this.selectionDefault) {
-			return []
-		}
-
-		const defaultObjects = []
-		JSON.parse(this.selectionDefault)?.forEach(id => {
-			defaultObjects.push(this.getOptionObjectForSelectionMulti(parseInt(id), this))
-		})
-		return defaultObjects
 	}
 
 	isSearchStringFound(cell, searchString) {

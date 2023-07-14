@@ -64,6 +64,9 @@ export default {
 		value_data(val) {
 			this.$emit('update:value', this.value_data)
 		},
+		value() {
+			this.value_data = this.value
+		},
 	},
 	methods: {
 		snakeToCamel(str) {

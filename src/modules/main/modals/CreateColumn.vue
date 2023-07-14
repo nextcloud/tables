@@ -229,8 +229,9 @@ export default {
 				this.typeMissingError = true
 			} else {
 				await this.sendNewColumnToBE()
-				this.reset(true, false)
-				if (!this.addNewAfterSave) {
+				if (this.addNewAfterSave) {
+					this.reset(true, true, false)
+				} else {
 					this.reset()
 					this.$emit('close')
 				}
@@ -260,7 +261,7 @@ export default {
 				} else if (this.combinedType === ColumnTypes.TextLink) {
 					data.textAllowedPattern = this.column.textAllowedPattern
 				} else if (this.column.type === 'selection') {
-					data.selectionDefault = JSON.stringify(this.column.selectionDefault)
+					data.selectionDefault = typeof this.column.selectionDefault !== 'string' ? JSON.stringify(this.column.selectionDefault) : this.column.selectionDefault
 					if (this.column.subtype !== 'check') {
 						data.selectionOptions = JSON.stringify(this.column.selectionOptions)
 					}
@@ -289,7 +290,7 @@ export default {
 				showError(t('tables', 'Could not create new column.'))
 			}
 		},
-		reset(mainForm = true, type = true) {
+		reset(mainForm = true, type = true, selectedViews = true) {
 			this.column = {
 				type: this.column.type,
 				subtype: this.column.subtype,
@@ -319,6 +320,8 @@ export default {
 			if (type) {
 				this.column.type = 'text'
 				this.column.subtype = 'line'
+			}
+			if (selectedViews) {
 				this.column.selectedViews = []
 			}
 			this.titleMissingError = false

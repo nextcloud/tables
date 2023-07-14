@@ -86,7 +86,7 @@ class ViewController extends Controller {
 	 */
 	public function update(int $id, array $data): DataResponse {
 		return $this->handleError(function () use ($id, $data) {
-			return $this->service->update($id, $data, false, $this->userId);
+			return $this->service->update($id, $data, $this->userId);
 		});
 	}
 

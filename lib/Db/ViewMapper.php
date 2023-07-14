@@ -142,5 +142,6 @@ class ViewMapper extends QBMapper {
 
 	private function enhanceByOwnership(View &$view): void {
 		$view->setOwnership($this->tableMapper->findOwnership($view->getTableId()));
+		$view->resetUpdatedFields();
 	}
 }

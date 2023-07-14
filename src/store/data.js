@@ -3,6 +3,7 @@ import { generateUrl } from '@nextcloud/router'
 import displayError from '../shared/utils/displayError.js'
 import { parseCol } from '../shared/components/ncTable/mixins/columnParser.js'
 import { MetaColumns } from '../shared/components/ncTable/mixins/metaColumns.js'
+import { showError } from '@nextcloud/dialogs'
 
 export default {
 	state: {
@@ -177,6 +178,7 @@ export default {
 			const columns = state.columns
 			const index = columns.findIndex(c => c.id === col.id)
 			columns[index] = parseCol(col)
+			console.debug("Update columns", columns)
 			commit('setColumns', [...columns])
 
 			return true
@@ -220,7 +222,13 @@ export default {
 			try {
 				res = await axios.put(generateUrl('/apps/tables/row/' + id), { viewId, data })
 			} catch (e) {
-				displayError(e, t('tables', 'Could not update row.'))
+				console.debug(e?.response)
+				if (e?.response?.data?.message?.startsWith('User should not be able to access row')) {
+					showError(t('tables', 'Outdated data. View is reloaded'))
+					dispatch('loadRowsFromBE', { viewId })
+				} else {
+					displayError(e, t('tables', 'Could not update row.'))
+				}
 				return false
 			}
 
@@ -251,7 +259,12 @@ export default {
 			try {
 				await axios.delete(generateUrl('/apps/tables/view/' + viewId + '/row/' + rowId))
 			} catch (e) {
-				displayError(e, t('tables', 'Could not remove row.'))
+				if (e?.response?.data?.message?.startsWith('User should not be able to access row')) {
+					showError(t('tables', 'Outdated data. View is reloaded'))
+					dispatch('loadRowsFromBE', { viewId })
+				} else {
+					displayError(e, t('tables', 'Could not remove row.'))
+				}
 				return false
 			}
 

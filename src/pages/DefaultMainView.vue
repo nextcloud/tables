@@ -41,7 +41,7 @@
 			@reload-view="reload(true)" />
 		<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false" />
 		<EditColumn v-if="columnToEdit" :column="columnToEdit" @close="columnToEdit = false" />
-		<DeleteRows v-if="rowsToDelete" :rows-to-delete="rowsToDelete" @cancel="rowsToDelete = null" />
+		<DeleteRows v-if="rowsToDelete" :rows-to-delete="rowsToDelete" :active-view="activeView" @cancel="rowsToDelete = null" />
 		<DeleteColumn v-if="columnToDelete" :column-to-delete="columnToDelete" @cancel="columnToDelete = null" />
 	</div>
 </template>

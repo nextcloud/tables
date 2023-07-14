@@ -157,13 +157,19 @@ class RowService extends SuperService {
 		int $id,
 		int $viewId,
 		int $columnId,
-		string $data
+		string $data,
+		string $userId
 	):Row {
 		try {
 			$item = $this->find($id);
 
 			// security
 			if (!$this->permissionsService->canUpdateRowsByViewId($viewId)) {
+				throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
+			}
+			$view = $this->viewMapper->find($viewId);
+			$rowIds = $this->mapper->getRowIdsOfView($view, $userId);
+			if(!in_array( $id, $rowIds)) {
 				throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
 			}
 
@@ -206,7 +212,8 @@ class RowService extends SuperService {
 	public function updateSet(
 		int $id,
 		int $viewId,
-		array $data
+		array $data,
+		string $userId
 	):Row {
 		try {
 			$item = $this->mapper->find($id);
@@ -214,6 +221,11 @@ class RowService extends SuperService {
 			// security
 			if (!$this->permissionsService->canUpdateRowsByViewId($viewId)) {
 				throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
+			}
+			$view = $this->viewMapper->find($viewId);
+			$rowIds = $this->mapper->getRowIdsOfView($view, $userId);
+			if(!in_array( $id, $rowIds)) {
+				throw new PermissionError('User should not be able to access row with id = '.$item->getId());
 			}
 
 			$time = new DateTime();
@@ -260,7 +272,7 @@ class RowService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function delete(int $id, int $viewId): Row {
+	public function delete(int $id, int $viewId, string $userId): Row {
 		try {
 			$item = $this->mapper->find($id);
 
@@ -268,6 +280,11 @@ class RowService extends SuperService {
 			/** @noinspection PhpUndefinedMethodInspection */
 			if (!$this->permissionsService->canDeleteRowsByViewId($viewId)) {
 				throw new PermissionError('delete row id = '.$item->getId().' is not allowed.');
+			}
+			$view = $this->viewMapper->find($viewId);
+			$rowIds = $this->mapper->getRowIdsOfView($view, $userId);
+			if(!in_array( $id, $rowIds)) {
+				throw new PermissionError('User should not be able to access row with id = '.$item->getId());
 			}
 
 			$this->mapper->delete($item);

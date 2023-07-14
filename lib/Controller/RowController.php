@@ -10,10 +10,10 @@ use OCP\IRequest;
 
 class RowController extends Controller {
 	/** @var RowService */
-	private $service;
+	private RowService $service;
 
 	/** @var string */
-	private $userId;
+	private string $userId;
 
 	use Errors;
 
@@ -98,7 +98,8 @@ class RowController extends Controller {
 				$id,
 				$viewId,
 				$columnId,
-				$data);
+				$data,
+				$this->userId);
 		});
 	}
 
@@ -109,6 +110,7 @@ class RowController extends Controller {
 		int $id,
 		int $viewId,
 		array $data
+
 	): DataResponse {
 		return $this->handleError(function () use (
 			$id,
@@ -118,7 +120,8 @@ class RowController extends Controller {
 			return $this->service->updateSet(
 				$id,
 				$viewId,
-				$data);
+				$data,
+				$this->userId);
 		});
 	}
 
@@ -127,7 +130,7 @@ class RowController extends Controller {
 	 */
 	public function destroy(int $id, int $viewId): DataResponse {
 		return $this->handleError(function () use ($id, $viewId) {
-			return $this->service->delete($id, $viewId);
+			return $this->service->delete($id, $viewId,	$this->userId);
 		});
 	}
 }

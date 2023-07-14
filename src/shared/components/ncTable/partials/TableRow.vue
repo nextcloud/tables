@@ -137,11 +137,9 @@ export default {
 
 			if (cell) {
 				value = cell.value
-			} else if (![ColumnTypes.NumberProgress, ColumnTypes.SelectionMulti, ColumnTypes.TextRich].includes(column.type)) {
+			} else {
 				// if no value is given, try to get the default value from the column definition
 				value = column.default()
-			} else {
-				return null
 			}
 
 			if ([ColumnTypes.NumberProgress, ColumnTypes.Selection].includes(column.type)) {
