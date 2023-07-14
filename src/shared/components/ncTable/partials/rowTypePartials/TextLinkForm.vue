@@ -63,7 +63,7 @@ export default {
 				if (!this.hasJsonStructure(this.value) && this.value !== '' && this.value !== null && this.value !== '""') {
 					return {
 						title: this.value,
-						subline: t('tables', 'Url'),
+						subline: t('tables', 'URL'),
 						providerId: 'url',
 						value: this.value,
 					}
