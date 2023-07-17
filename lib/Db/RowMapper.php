@@ -212,11 +212,15 @@ class RowMapper extends QBMapper {
 		// Filter
 
 		$this->addFilterToQuery($qb, $view, $neededColumns, $userId);
-
+		$result = $qb->executeQuery();
 		try {
-			return $this->findOneQuery($qb);
-		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
-			return [];
+			$ids = [];
+			while ($row = $result->fetch()) {
+				$ids[] = $row['id'];
+			}
+			return $ids;
+		} finally {
+			$result->closeCursor();
 		}
 	}
 
