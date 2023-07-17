@@ -54,12 +54,6 @@
 							</template>
 							{{ t('tables', 'Add Manage table') }}
 						</NcActionButton>
-						<NcActionButton v-if="!activeView.isBaseView" @click="openBaseView()">
-							<template #icon>
-								<OpenInNew :size="20" />
-							</template>
-							{{ t('tables', 'To manage table manage rights, open the base table') }}
-						</NcActionButton>
 						<NcActionSeparator />
 						<NcActionButton :close-after-click="true" icon="icon-delete" @click="actionDelete(share)">
 							{{ t('tables', 'Delete') }}
@@ -71,7 +65,7 @@
 		<div v-else>
 			{{ t('tables', 'No shares') }}
 		</div>
-		<h3 v-if="tableShares && tableShares.length > 0">
+		<h3 v-if="!activeView.isBaseView ||(tableShares && tableShares.length > 0)">
 			{{ t('tables', 'Table managers') }}
 		</h3>
 		<ul v-if="tableShares && tableShares.length > 0" class="sharedWithList">
@@ -95,13 +89,23 @@
 				</div>
 			</div>
 		</ul>
+		<div class="manage-button">
+			<NcButton v-if="!activeView.isBaseView"
+				type="tertiary"
+				@click="openBaseView()">
+				<template #icon>
+					<OpenInNew :size="20" />
+				</template>
+				{{ t('tables', 'To manage table manage rights, open the base table') }}
+			</NcButton>
+		</div>
 	</div>
 </template>
 
 <script>
 import { mapGetters, mapState } from 'vuex'
 import formatting from '../../../shared/mixins/formatting.js'
-import { NcActions, NcActionButton, NcAvatar, NcActionCheckbox, NcActionCaption, NcActionSeparator } from '@nextcloud/vue'
+import { NcActions, NcButton, NcActionButton, NcAvatar, NcActionCheckbox, NcActionCaption, NcActionSeparator } from '@nextcloud/vue'
 import ShareInfoPopover from './ShareInfoPopover.vue'
 import OpenInNew from 'vue-material-design-icons/OpenInNew.vue'
 import AccountTie from 'vue-material-design-icons/AccountTie.vue'
@@ -118,6 +122,7 @@ export default {
 		NcActionSeparator,
 		OpenInNew,
 		AccountTie,
+		NcButton,
 	},
 
 	mixins: [formatting],
@@ -187,6 +192,10 @@ export default {
 		padding-left: 5px;
 		font-size: 100%;
 		line-height: 35px;
+	}
+	.manage-button {
+		display: flex;
+		justify-content: center;
 	}
 
 </style>
