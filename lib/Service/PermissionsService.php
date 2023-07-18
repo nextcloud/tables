@@ -242,17 +242,17 @@ class PermissionsService {
 		try {
 			$view = $this->viewMapper->find($viewId);
 			// if you can read the table, you also can read its columns
-			return $this->canManageElement($view, 'view', $userId);
+			return $this->canReadRowsByElementId($view->getId(), 'view', $userId);
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
 		}
 		return false;
 	}
 
-	public function canReadColumnsByViewId(int $viewId, ?string $userId = null): bool {
+	public function canReadTableColumnsByTableId(int $tableId, ?string $userId = null): bool {
 		try {
-			$view = $this->viewMapper->find($viewId);
+			$table = $this->tableMapper->find($tableId);
 			// if you can read the table, you also can read its columns
-			return $this->canReadElement($view, 'view', $userId);
+			return $this->canReadRowsByElementId($table->getId(), 'table', $userId);
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
 		}
 		return false;
