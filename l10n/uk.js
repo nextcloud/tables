@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Nextcloud tables" : "Таблиці Nextcloud",
     "Select columns" : "Виберіть стовпці",
     "e.g. 1,2,4 or leave empty" : "напр. 1,2,4 або залиште порожнім",
     "ToDo list" : "Список завдань",
