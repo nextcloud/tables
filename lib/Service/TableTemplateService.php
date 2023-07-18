@@ -74,17 +74,17 @@ class TableTemplateService {
 		$createColumn = function ($params) use ($table, $baseViewId) {return $this->createColumn($table->getId(), $params, $baseViewId);};
 		$createRow = function ($data) use ($table, $baseViewId) {$this->createRow($table, $baseViewId, $data);};
 		if ($template === 'todo') {
-			$this->makeTodo($table, $createColumn, $createRow);
+			$this->makeTodo($createColumn, $createRow);
 		} elseif ($template === 'members') {
-			$this->makeMembers($table, $createColumn, $createRow);
+			$this->makeMembers($createColumn, $createRow);
 		} elseif ($template === 'weight') {
-			$this->makeWeight($table, $createColumn, $createRow);
+			$this->makeWeight($createColumn, $createRow);
 		} elseif ($template === 'vacation-requests') {
-			$this->makeVacationRequests($table, $createColumn, $createRow);
+			$this->makeVacationRequests($createColumn, $createRow);
 		} elseif ($template === 'customers') {
-			$this->makeCustomers($table, $createColumn, $createRow);
+			$this->makeCustomers($createColumn, $createRow);
 		} elseif ($template === 'tutorial') {
-			$this->makeStartupTable($table, $createColumn, $createRow);
+			$this->makeStartupTable($createColumn, $createRow);
 		}
 		return $table;
 	}

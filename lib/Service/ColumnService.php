@@ -51,9 +51,9 @@ class ColumnService extends SuperService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function findAllByTable(int $viewId, int $tableId, ?string $userId = null): array {
+	public function findAllByTable(int $tableId, ?int $viewId = null, ?string $userId = null): array {
 		try {
-			if ($this->permissionsService->canReadTableColumnsByViewId($viewId, $userId)) {
+			if ($this->permissionsService->canReadTableColumnsByTableId($tableId, $userId) || ($viewId != null && $this->permissionsService->canReadTableColumnsByViewId($viewId, $userId))) {
 				return $this->mapper->findAllByTable($tableId);
 			} else {
 				throw new PermissionError('no read access to table id = '.$tableId);
@@ -407,7 +407,7 @@ class ColumnService extends SuperService {
 		if($userId === null) {
 			$userId = $this->userId;
 		}
-		$allColumns = $this->findAllByTable($tableId, $userId);
+		$allColumns = $this->findAllByTable($tableId, $viewId, $userId);
 		$i = -1;
 		foreach ($titles as $title) {
 			$i++;

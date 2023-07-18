@@ -339,7 +339,7 @@ class TableService extends SuperService {
 			$this->rowService->deleteAllByTable($id, $userId);
 
 			// delete all columns for that table
-			$columns = $this->columnService->findAllByTable($id, $userId);
+			$columns = $this->columnService->findAllByTable($id, null, $userId);
 			foreach ($columns as $column) {
 				$this->columnService->delete($column->id, true, $userId);
 			}

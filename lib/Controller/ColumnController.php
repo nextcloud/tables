@@ -28,7 +28,7 @@ class ColumnController extends Controller {
 	 */
 	public function index(int $viewId, int $tableId): DataResponse {
 		return $this->handleError(function () use ($viewId, $tableId) {
-			return $this->service->findAllByTable($viewId, $tableId);
+			return $this->service->findAllByTable($tableId, $viewId);
 		});
 	}
 
