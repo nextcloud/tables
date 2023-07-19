@@ -42,6 +42,7 @@ OC.L10N.register(
     "No elements found." : "Нема пронајдено елементи.",
     "Shares" : "Споделувања",
     "group" : "група",
+    "Permissions" : "Дозволи",
     "No shares" : "Нема споделувања",
     "Sharing" : "Споделување",
     "Read" : "Прочитана",
