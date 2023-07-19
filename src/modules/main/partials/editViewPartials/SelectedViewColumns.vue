@@ -5,20 +5,44 @@
 		<div v-for="(column, index) in columns" :key="column.id" :draggable="true"
 			class="column-entry" @dragstart="dragStart(index)"
 			@dragover="dragOver(index)" @dragend="dragEnd(index)">
-			<NcButton aria-label="Move" type="tertiary-no-background"
-				class="move-button">
-				<template #icon>
-					<MenuIcon :size="20" />
-				</template>
-			</NcButton>
-			<NcCheckboxRadioSwitch
-				:disabled="isBaseView && column.id >= 0"
-				:checked="selectedColumns.includes(column.id)"
-				class="display-checkbox"
-				@update:checked="onToggle(column.id)" />
-			{{ column.title }}
-			<div v-if="column.id < 0" class="meta-info">
-				({{ t('tables', 'Meta Data') }})
+			<div class="row-elements">
+				<NcButton
+					aria-label="Move"
+					type="tertiary-no-background"
+					class="move-button">
+					<template #icon>
+						<DragHorizontalVariant :size="20" />
+					</template>
+				</NcButton>
+				<NcCheckboxRadioSwitch
+					:disabled="isBaseView && column.id >= 0"
+					:checked="selectedColumns.includes(column.id)"
+					class="display-checkbox"
+					@update:checked="onToggle(column.id)" />
+				{{ column.title }}
+				<div v-if="column.id < 0" class="meta-info">
+					({{ t('tables', 'Metadata') }})
+				</div>
+			</div>
+			<div class="row-elements">
+				<NcButton
+					:disabled="index === 0"
+					aria-label="Move"
+					type="tertiary-no-background"
+					@click="moveColumn(index, -1)">
+					<template #icon>
+						<ArrowUp :size="20" />
+					</template>
+				</NcButton>
+				<NcButton
+					:disabled="index >= columns.length - 1"
+					aria-label="Move"
+					type="tertiary-no-background"
+					@click="moveColumn(index, 1)">
+					<template #icon>
+						<ArrowDown :size="20" />
+					</template>
+				</NcButton>
 			</div>
 		</div>
 	</div>
@@ -26,14 +50,18 @@
 
 <script>
 import { NcButton, NcCheckboxRadioSwitch } from '@nextcloud/vue'
-import MenuIcon from 'vue-material-design-icons/Menu.vue'
+import DragHorizontalVariant from 'vue-material-design-icons/DragHorizontalVariant.vue'
+import ArrowUp from 'vue-material-design-icons/ArrowUp.vue'
+import ArrowDown from 'vue-material-design-icons/ArrowDown.vue'
 
 export default {
 	name: 'SelectedViewColumns',
 	components: {
 		NcButton,
-		MenuIcon,
+		DragHorizontalVariant,
 		NcCheckboxRadioSwitch,
+		ArrowUp,
+		ArrowDown,
 	},
 	props: {
 		columns: {
@@ -80,6 +108,11 @@ export default {
 				this.mutableColumns.splice(index, 0, this.draggedItem)
 			}
 		},
+		moveColumn(index, direction) {
+			const item = this.mutableColumns[index]
+			this.mutableColumns.splice(index, 1)
+			this.mutableColumns.splice(index + direction, 0, item)
+		},
 		async dragEnd(goalIndex) {
 			if (this.draggedItem === null) return
 			const goal = goalIndex !== undefined ? goalIndex : this.list.indexOf(this.draggedItem)
@@ -95,6 +128,7 @@ export default {
 
 .column-entry {
 	display: flex;
+	justify-content: space-between;
 	align-items: center;
 	padding: calc(var(--default-grid-baseline) * 1) 0;
 }
@@ -108,7 +142,7 @@ export default {
 }
 
 :deep(.button-vue) {
-	cursor: move;
+	cursor: move !important;
     min-height: auto !important;
     min-width: auto !important;
 }
@@ -143,6 +177,10 @@ export default {
 	font-style: italic;
 	padding-left:  calc(var(--default-grid-baseline) * 1);
 	color: var(--color-info);
+}
+
+.row-elements {
+	display: flex;
 }
 
 </style>

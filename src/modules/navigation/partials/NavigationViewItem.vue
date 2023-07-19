@@ -166,8 +166,9 @@ export default {
 				this.showDeletionConfirmation = false
 			}
 		},
-		editView() {
-			emit('edit-view', this.view)
+		async editView() {
+			await this.$router.push('/view/' + parseInt(this.view.id)).catch(err => err)
+			emit('tables:view:edit', this.view)
 		},
 		async cloneView() {
 			let data = {

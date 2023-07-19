@@ -14,7 +14,6 @@
 					@add-filter="addFilter"
 					@set-search-string="setSearchString"
 					@edit-row="rowId => editRowId = rowId"
-					@edit-view="editView = activeView"
 					@import="openImportModal"
 					@create-column="showCreateColumn = true"
 					@create-row="showCreateRow = true"
@@ -23,7 +22,7 @@
 			</div>
 
 			<EmptyTable v-if="columns.length === 0 && activeView.isBaseView" @create-column="showCreateColumn = true" />
-			<EmptyView v-if="columns.length === 0 && !activeView.isBaseView" @open-edit-view=" editView = activeView" />
+			<EmptyView v-if="columns.length === 0 && !activeView.isBaseView" />
 		</div>
 
 		<CreateRow :columns="columns"
@@ -34,7 +33,7 @@
 			:show-modal="editRowId !== null"
 			:out-transition="true"
 			@close="editRowId = null" />
-		<EditView
+		<ViewSettings
 			:show-modal="editView !== null"
 			:view="editView"
 			@close="editView = null"
@@ -52,7 +51,7 @@ import { mapState, mapGetters } from 'vuex'
 import NcView from '../shared/components/ncTable/NcView.vue'
 import CreateRow from '../modules/main/modals/CreateRow.vue'
 import EditRow from '../modules/main/modals/EditRow.vue'
-import EditView from '../modules/main/modals/EditView.vue'
+import ViewSettings from '../modules/main/modals/ViewSettings.vue'
 import CreateColumn from '../modules/main/modals/CreateColumn.vue'
 import EditColumn from '../modules/main/modals/EditColumn.vue'
 import DeleteRows from '../modules/main/modals/DeleteRows.vue'
@@ -68,7 +67,7 @@ export default {
 	components: {
 		EmptyTable,
 		EmptyView,
-		EditView,
+		ViewSettings,
 		DeleteRows,
 		DeleteColumn,
 		ElementDescription,
@@ -104,7 +103,7 @@ export default {
 		...mapState(['activeRowId']),
 		...mapGetters(['activeView']),
 		isLoading() {
-			return this.loading || this.localLoading
+			return (this.loading || this.localLoading) && (!this.editView)
 		},
 		getEditRow() {
 			if (this.editRowId !== null) {
@@ -142,11 +141,13 @@ export default {
 	},
 	mounted() {
 		this.reload()
+		subscribe('tables:view:edit', view => { this.editView = view })
 		subscribe('tables:column:edit', column => { this.columnToEdit = column })
 		subscribe('tables:column:delete', column => { this.columnToDelete = column })
 		subscribe('tables:view:reload', () => { this.reload(true) })
 	},
 	unmounted() {
+		unsubscribe('tables:view:edit', view => { this.editView = view })
 		unsubscribe('tables:column:edit', column => { this.columnToEdit = column })
 		unsubscribe('tables:column:delete', column => { this.columnToDelete = column })
 		unsubscribe('tables:view:reload', () => { this.reload(true) })

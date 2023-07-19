@@ -1,6 +1,6 @@
 <template>
 	<div class="filter-section">
-		<div v-for="(sortingRule, i) in sort" :key="i">
+		<div v-for="(sortingRule, i) in mutableSort" :key="i">
 			<SortEntry :sort-entry="sortingRule" :columns="columns"
 				@delete-sorting-rule="deleteSortingRule(i)" />
 		</div>

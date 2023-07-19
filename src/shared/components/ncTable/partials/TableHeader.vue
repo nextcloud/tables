@@ -33,7 +33,7 @@
 		</th>
 		<th data-cy="customTableAction">
 			<NcActions :force-menu="true" :type="isViewSettingSet ? 'secondary' : 'tertiary'">
-				<NcActionCaption v-if="canManageElement(table)" :title="t('tables', 'Manage view')" />
+				<NcActionCaption v-if="canManageElement(view)" :title="t('tables', 'Manage view')" />
 				<NcActionButton v-if="isViewSettingSet"
 					:close-after-click="true"
 					class="view-changed"
@@ -43,7 +43,7 @@
 					</template>
 					{{ t('tables', 'Reset view config') }}
 				</NcActionButton>
-				<NcActionButton v-if="isViewSettingSet && !activeView.isBaseView && canManageElement(table)"
+				<NcActionButton v-if="isViewSettingSet && !activeView.isBaseView && canManageElement(view)"
 					:close-after-click="true"
 					class="view-changed"
 					@click="applyViewConfig">
@@ -52,7 +52,7 @@
 					</template>
 					{{ t('tables', 'Apply view config') }}
 				</NcActionButton>
-				<NcActionButton v-if="isViewSettingSet && canManageElement(table)"
+				<NcActionButton v-if="isViewSettingSet && canManageElement(view)"
 					:close-after-click="true"
 					class="view-changed"
 					@click="createWithViewConfig">
@@ -64,19 +64,19 @@
 
 				<NcActionSeparator v-if="isViewSettingSet" />
 
-				<NcActionButton v-if="canManageTable(table)" :close-after-click="true" @click="$emit('create-column')">
+				<NcActionButton v-if="canManageTable(view)" :close-after-click="true" @click="$emit('create-column')">
 					<template #icon>
 						<TableColumnPlusAfter :size="20" decorative title="" />
 					</template>
 					{{ t('tables', 'Create column') }}
 				</NcActionButton>
-				<NcActionButton v-if="canManageElement(table)"
+				<NcActionButton v-if="canManageElement(view)"
 					:close-after-click="true"
 					icon="icon-rename"
-					@click="$emit('edit-view')">
+					@click="editView()">
 					{{ t('tables', 'Edit view') }}
 				</NcActionButton>
-				<NcActionButton v-if="canManageTable(table)"
+				<NcActionButton v-if="canManageTable(view)"
 					:close-after-click="true"
 					@click="createView()">
 					<template #icon>
@@ -86,20 +86,20 @@
 				</NcActionButton>
 
 				<NcActionCaption :title="t('tables', 'Integration')" />
-				<NcActionButton v-if="canCreateRowInElement(table)"
+				<NcActionButton v-if="canCreateRowInElement(view)"
 					:close-after-click="true"
-					@click="$emit('import', table)">
+					@click="$emit('import', view)">
 					<template #icon>
 						<IconImport :size="20" decorative title="Import" />
 					</template>
 					{{ t('tables', 'Import') }}
 				</NcActionButton>
-				<NcActionButton v-if="canReadData(table)" :close-after-click="true"
+				<NcActionButton v-if="canReadData(view)" :close-after-click="true"
 					icon="icon-download"
 					@click="downloadCSV">
 					{{ t('tables', 'Export as CSV') }}
 				</NcActionButton>
-				<NcActionButton v-if="canShareElement(table)"
+				<NcActionButton v-if="canShareElement(view)"
 					:close-after-click="true"
 					icon="icon-share"
 					@click="toggleShare">
@@ -166,7 +166,7 @@ export default {
 			type: Array,
 			default: () => [],
 		},
-		table: {
+		view: {
 			type: Object,
 			default: () => {},
 		},
@@ -200,6 +200,9 @@ export default {
 	},
 
 	methods: {
+		editView() {
+			emit('tables:view:edit', this.view)
+		},
 		updateOpenState(columnId) {
 			this.openedColumnHeaderMenus[columnId] = !this.openedColumnHeaderMenus[columnId]
 			this.openedColumnHeaderMenus = Object.assign({}, this.openedColumnHeaderMenus)
