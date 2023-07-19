@@ -173,8 +173,9 @@ export default {
 		createView() {
 			emit('create-view', this.baseView.tableId)
 		},
-		editView() {
-			emit('edit-view', this.baseView) // TODO
+		async editView() {
+			await this.$router.push('/view/' + parseInt(this.baseView.id)).catch(err => err)
+			emit('tables:view:edit', this.baseView)
 		},
 		async actionShowShare() {
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })

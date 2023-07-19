@@ -5,7 +5,7 @@
 			{{ activeView.emoji }}
 		</template>
 		<template #action>
-			<NcButton :aria-label="t('table', 'Edit view')" type="primary" @click="$emit('open-edit-view')">
+			<NcButton :aria-label="t('table', 'Edit view')" type="primary" @click="editView()">
 				{{ t('tables', 'Edit view') }}
 			</NcButton>
 		</template>
@@ -14,6 +14,7 @@
 <script>
 import { NcEmptyContent, NcButton } from '@nextcloud/vue'
 import { mapGetters } from 'vuex'
+import { emit } from '@nextcloud/event-bus'
 
 export default {
 	name: 'EmptyView',
@@ -23,6 +24,11 @@ export default {
 	},
 	computed: {
 		...mapGetters(['activeView']),
+	},
+	methods: {
+		editView() {
+			emit('tables:view:edit', this.activeView)
+		},
 	},
 }
 </script>

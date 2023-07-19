@@ -3,18 +3,19 @@
 		<h1>
 			{{ activeView.emoji }}&nbsp;{{ activeView.title }}
 		</h1>
-		<div class="light">
-			<NcActions>
-				<NcActionButton v-if="!activeView.isShared || (activeView.isShared && activeView.onSharePermissions.manage)"
-					icon="icon-rename"
-					:close-after-click="true"
-					@click="editElement">
-					{{ activeView.isBaseView ? t('tables', 'Edit table') : t('tables', 'Edit view') }}
-				</NcActionButton>
-			</NcActions>
+		<div v-if="!activeView.isShared || (activeView.isShared && activeView.onSharePermissions.manage)" class="light">
+			<NcButton
+				:aria-label="activeView.isBaseView ? t('tables', 'Edit table') : t('tables', 'Edit view')"
+				type="tertiary"
+				@click="editElement">
+				<template #icon>
+					<Pencil :size="20" />
+				</template>
+				{{ activeView.isBaseView ? t('tables', 'Edit table') : t('tables', 'Edit view') }}
+			</NcButton>
 		</div>
-		<div class="user-bubble">
-			<NcUserBubble v-if="activeView.isShared"
+		<div v-if="activeView.isShared" class="user-bubble">
+			<NcUserBubble
 				:display-name="activeView.ownerDisplayName"
 				:show-user-status="true"
 				:user="activeView.ownership" />
@@ -26,13 +27,14 @@
 
 import { mapGetters } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
-import { NcActions, NcActionButton, NcUserBubble } from '@nextcloud/vue'
+import { NcButton, NcUserBubble } from '@nextcloud/vue'
+import Pencil from 'vue-material-design-icons/Pencil.vue'
 export default {
 	name: 'ElementDescription',
 	components: {
-		NcActions,
-		NcActionButton,
+		NcButton,
 		NcUserBubble,
+		Pencil,
 	},
 	computed: {
 		...mapGetters(['activeView']),
@@ -40,7 +42,7 @@ export default {
 
 	methods: {
 		editElement() {
-			emit('edit-view', this.activeView)
+			emit('tables:view:edit', this.activeView)
 		},
 	},
 }

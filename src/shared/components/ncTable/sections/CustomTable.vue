@@ -5,10 +5,9 @@
 				<TableHeader :columns="columns"
 					:selected-rows="selectedRows"
 					:rows="getSearchedAndFilteredAndSortedRows"
-					:table="table"
+					:view="view"
 					:view-setting="viewSetting"
 					@create-row="$emit('create-row')"
-					@edit-view="$emit('edit-view')"
 					@import="table => $emit('import', table)"
 					@create-column="$emit('create-column')"
 					@edit-columns="$emit('edit-columns')"
@@ -55,7 +54,7 @@ export default {
 			type: Array,
 			default: () => [],
 		},
-		table: {
+		view: {
 			type: Object,
 			default: () => {},
 		},

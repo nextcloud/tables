@@ -3,7 +3,7 @@
 		<div class="filter-text">
 			{{ t('tables', 'Filtering rows') }}
 		</div>
-		<div v-for="(filterGroup, i) in filters" :key="i">
+		<div v-for="(filterGroup, i) in mutableFilters" :key="i">
 			<!-- {{ t('tables', 'Group') }} {{ i + 1 }} -->
 			<FilterGroup
 				:filter-group="filterGroup"

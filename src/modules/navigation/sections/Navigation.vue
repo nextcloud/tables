@@ -59,9 +59,8 @@
 			</div>
 
 			<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
-			<EditViewTitle :show-modal="editView !== null" :view="editView" @close="editView = null " />
 			<Import :show-modal="importToView !== null" :view="importToView" @close="importToView = null" />
-			<CreateView :show-modal="createViewTableId !== null" :table-id="createViewTableId" @close="createViewTableId = null" />
+			<ViewSettings :view="{tableId: createViewTableId, isBaseView: false, sort: [], filter: []}" :create-view="true" :show-modal="createViewTableId !== null" @close="createViewTableId = null" />
 		</template>
 	</NcAppNavigation>
 </template>
@@ -69,8 +68,7 @@
 <script>
 import { NcAppNavigation, NcAppNavigationCaption, NcActionButton, NcTextField, NcButton, NcEmptyContent } from '@nextcloud/vue'
 import CreateTable from '../modals/CreateTable.vue'
-import EditViewTitle from '../modals/EditViewTitle.vue'
-import CreateView from '../modals/CreateView.vue'
+import ViewSettings from '../../main/modals/ViewSettings.vue'
 import NavigationViewItem from '../partials/NavigationViewItem.vue'
 import NavigationBaseViewItem from '../partials/NavigationBaseViewItem.vue'
 import { mapState, mapGetters } from 'vuex'
@@ -87,21 +85,19 @@ export default {
 		NavigationViewItem,
 		NcAppNavigation,
 		CreateTable,
-		EditViewTitle,
 		NcAppNavigationCaption,
 		NcActionButton,
 		NcTextField,
 		Magnify,
 		NcButton,
 		NcEmptyContent,
-		CreateView,
+		ViewSettings,
 	},
 	data() {
 		return {
 			loading: true,
 			showModalCreateTable: false,
 			importToView: null,
-			editView: null, // if null, no modal open
 			createViewTableId: null, // if null, no modal open
 			filterString: '',
 		}
@@ -128,13 +124,11 @@ export default {
 	mounted() {
 		subscribe('create-view', tableId => { this.createViewTableId = tableId })
 		subscribe('create-table', this.createTable)
-		subscribe('edit-view', view => { this.editView = view })
 		subscribe('tables:modal:import', table => { this.importToView = table })
 	},
 	beforeDestroy() {
 		unsubscribe('create-view', tableId => { this.createViewTableId = tableId })
 		unsubscribe('create-table', this.createTable)
-		unsubscribe('edit-view', view => { this.editView = view })
 		unsubscribe('tables:modal:import', table => { this.importToView = table })
 	},
 	methods: {
