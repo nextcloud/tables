@@ -75,7 +75,7 @@ class PermissionsService {
 		}
 
 		try {
-			$this->getShareForElement($view->getId(), 'view',  $userId);
+			$this->getSharedPermissionsIfSharedWithMe($view->getId(), 'view',  $userId);
 			return true;
 		} catch (InternalError|NotFoundError $e) {
 		}
@@ -89,20 +89,17 @@ class PermissionsService {
 	 * @return bool
 	 */
 	public function canReadElement($element, string $nodeType, ?string $userId = null): bool {
-		try {
-			if($this->basisCheck($element, $nodeType, $userId)) return true;
-		} catch (InternalError $e) {
-			return false;
-		}
-
-		try {
-			$share = $this->getShareForElement($element->getId(), $nodeType,  $userId);
-			return !!$share->getPermissionManage() || !!$share->getPermissionRead();
-		} catch (InternalError|NotFoundError $e) {
-		}
-
-		return false;
+        return $this->checkPermission($element, $nodeType, 'read', $userId);
 	}
+
+    /**
+     * @param Table|View $element
+     * @param string|null $userId
+     * @return bool
+     */
+    public function canCreateElement($element, string $nodeType, ?string $userId = null): bool {
+        return $this->checkPermission($element, $nodeType, 'create', $userId);
+    }
 
 	/**
 	 * @param Table|View $element
@@ -110,20 +107,7 @@ class PermissionsService {
 	 * @return bool
 	 */
 	public function canUpdateElement($element, string $nodeType, ?string $userId = null): bool {
-		try {
-			if($this->basisCheck($element, $nodeType, $userId)) return true;
-		} catch (InternalError $e) {
-			return false;
-		}
-
-		try {
-			$share = $this->getShareForElement($element->getId(), $nodeType, $userId);
-			/** @noinspection PhpUndefinedMethodInspection */
-			return !!$share->getPermissionManage() || !!$share->getPermissionUpdate();
-		} catch (InternalError|NotFoundError $e) {
-		}
-
-		return false;
+        return $this->checkPermission($element, $nodeType, 'update', $userId);
 	}
 
 	/**
@@ -132,20 +116,7 @@ class PermissionsService {
 	 * @return bool
 	 */
 	public function canDeleteElement($element, string $nodeType, ?string $userId = null): bool {
-		try {
-			if($this->basisCheck($element, $nodeType, $userId)) return true;
-		} catch (InternalError $e) {
-			return false;
-		}
-
-		try {
-			$share = $this->getShareForElement($element->getId(), $nodeType, $userId);
-			/** @noinspection PhpUndefinedMethodInspection */
-			return !!$share->getPermissionManage() || !!$share->getPermissionDelete();
-		} catch (InternalError|NotFoundError $e) {
-		}
-
-		return false;
+        return $this->checkPermission($element, $nodeType, 'delete', $userId);
 	}
 
 
@@ -155,84 +126,7 @@ class PermissionsService {
 	 * @return bool
 	 */
 	public function canManageElement($element, string $nodeType, ?string $userId = null): bool {
-		try {
-			if($this->basisCheck($element, $nodeType, $userId)) return true;
-		} catch (InternalError $e) {
-			return false;
-		}
-
-		try {
-			$share = $this->getShareForElement($element->getId(), $nodeType, $userId);
-			/** @noinspection PhpUndefinedMethodInspection */
-			return !!$share->getPermissionManage();
-		} catch (InternalError|NotFoundError $e) {
-		}
-
-		return false;
-	}
-
-	/**
-	 * @param $element
-	 * @param string $nodeType
-	 * @param string|null $userId
-	 * @return bool
-	 * @throws InternalError
-	 */
-	public function basisCheck($element, string $nodeType, ?string &$userId) {
-		$userId = $this->preCheckUserId($userId);
-
-		if ($userId === '') {
-			return true;
-		}
-
-		if ($this->userIsElementOwner($userId, $element)) {
-			return true;
-		}
-		try {
-			$share = $this->getShareForElement($nodeType === 'view' ? $element->getTableId() : $element->getId(), 'table', $userId);
-			if(!!$share->getPermissionManage()) {
-				return true;
-			}
-		} catch (InternalError | NotFoundError $e) {
-		}
-		return false;
-	}
-
-	/**
-	 * @param int $elementId
-	 * @param string $nodeType
-	 * @param string|null $userId
-	 * @return bool
-	 * @throws DoesNotExistException
-	 * @throws Exception
-	 * @throws InternalError
-	 * @throws MultipleObjectsReturnedException
-	 * @throws NotFoundError
-	 */
-	public function basisCheckById(int $elementId, string $nodeType, ?string &$userId) {
-		$userId = $this->preCheckUserId($userId);
-
-		if ($userId === '') {
-			return true;
-		}
-
-		try {
-			$element = $nodeType === 'table' ? $this->tableMapper->find($elementId) : $this->viewMapper->find($elementId);
-
-			if ($this->userIsElementOwner($userId, $element)) {
-				return true;
-			}
-
-			try {
-				$share = $this->getShareForElement($nodeType === 'view' ? $element->getTableId() : $element->getId(), 'table', $userId);
-				if(!!$share->getPermissionManage()) {
-					return true;
-				}
-			} catch (InternalError|NotFoundError $e) {
-			}
-		} catch (DoesNotExistException|MultipleObjectsReturnedException|\Exception $e) {
-		}
-		return false;
+        return $this->checkPermission($element, $nodeType, 'manage', $userId);
 	}
 
 
@@ -322,18 +216,7 @@ class PermissionsService {
 	 * @return bool
 	 */
 	public function canReadRowsByElementId(int $elementId, string $nodeType, ?string $userId = null): bool {
-		try {
-			if($this->basisCheckById($elementId, $nodeType, $userId)) return true;
-		} catch (InternalError|DoesNotExistException|MultipleObjectsReturnedException|\Exception $e) {
-			return false;
-		}
-		try {
-			$share = $this->getShareForElement($elementId, $nodeType, $userId);
-			/** @noinspection PhpUndefinedMethodInspection */
-			return !!$share->getPermissionCreate() || !!$share->getPermissionDelete() || !!$share->getPermissionRead();
-		} catch (InternalError|NotFoundError $e) {
-		}
-		return false;
+        return $this->checkPermissionById($elementId, $nodeType, 'read', $userId);
 	}
 
 	/**
@@ -342,20 +225,7 @@ class PermissionsService {
 	 * @return bool
 	 */
 	public function canCreateRowsByViewId(int $viewId, ?string $userId = null): bool {
-		try {
-			if($this->basisCheckById($viewId, 'view', $userId)) return true;
-		} catch (InternalError|DoesNotExistException|MultipleObjectsReturnedException|\Exception $e) {
-			return false;
-		}
-
-		try {
-			$share = $this->getShareForElement($viewId, 'view', $userId);
-			/** @noinspection PhpUndefinedMethodInspection */
-			return !!$share->getPermissionCreate();
-		} catch (InternalError|NotFoundError $e) {
-		}
-
-		return false;
+        return $this->checkPermissionById($viewId, 'view', 'create', $userId);
 	}
 
 	/**
@@ -364,20 +234,7 @@ class PermissionsService {
 	 * @return bool
 	 */
 	public function canUpdateRowsByViewId(int $viewId, ?string $userId = null): bool {
-		try {
-			if($this->basisCheckById($viewId, 'view', $userId)) return true;
-		} catch (InternalError|DoesNotExistException|MultipleObjectsReturnedException|\Exception $e) {
-			return false;
-		}
-
-		try {
-			$share = $this->getShareForElement($viewId, 'view', $userId);
-			/** @noinspection PhpUndefinedMethodInspection */
-			return !!$share->getPermissionUpdate();
-		} catch (InternalError|NotFoundError $e) {
-		}
-
-		return false;
+        return $this->checkPermissionById($viewId, 'view', 'update', $userId);
 	}
 
 	/**
@@ -386,20 +243,7 @@ class PermissionsService {
 	 * @return bool
 	 */
 	public function canDeleteRowsByViewId(int $viewId, ?string $userId = null): bool {
-		try {
-			if($this->basisCheckById($viewId, 'view', $userId)) return true;
-		} catch (InternalError|DoesNotExistException|MultipleObjectsReturnedException|\Exception $e) {
-			return false;
-		}
-
-		try {
-			$share = $this->getShareForElement($viewId, 'view', $userId);
-			/** @noinspection PhpUndefinedMethodInspection */
-			return !!$share->getPermissionDelete() || !!$share->getPermissionManage();
-		} catch (InternalError|NotFoundError $e) {
-		}
-
-		return false;
+        return $this->checkPermissionById($viewId, 'view', 'delete', $userId);
 	}
 
 
@@ -471,41 +315,124 @@ class PermissionsService {
 		return $item->getSender() === $userId;
 	}
 
+    public function getSharedPermissionsIfSharedWithMe(int $elementId, ?string $elementType = 'table', string $userId = null): array {
+        $shares = $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userId, 'user');
+        $userGroups = $this->userHelper->getGroupsForUser($userId);
+        foreach ($userGroups as $userGroup) {
+            $shares = array_merge($shares, $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userGroup->getGid(), 'group'));
+        }
+        if (count($shares) > 0) {
+            $read = array_reduce($shares, function ($carry, $share) {
+                return $carry || ($share->getPermissionRead());
+            }, false);
+            $create = array_reduce($shares, function ($carry, $share) {
+                return $carry || ($share->getPermissionCreate());
+            }, false);
+            $update = array_reduce($shares, function ($carry, $share) {
+                return $carry || ($share->getPermissionUpdate());
+            }, false);
+            $delete = array_reduce($shares, function ($carry, $share) {
+                return $carry || ($share->getPermissionDelete());
+            }, false);
+            $manage = array_reduce($shares, function ($carry, $share) {
+                return $carry || ($share->getPermissionManage());
+            }, false);
 
-	//  private methods ==========================================================================
+            return [
+                'read' => $read || $update || $delete || $manage,
+                'create' => $create || $manage,
+                'update' => $update || $manage,
+                'delete' => $delete || $manage,
+                'manage' => $manage,
+            ];
+        }
+        throw new NotFoundError('No share for '.$elementType.' and given user ID found.');
+    }
 
-	/**
-	 * @param int $elementId
-	 * @param string $userId
-	 * @param string $nodeType
-	 * @return Share
-	 * @throws InternalError
-	 * @throws NotFoundError
-	 */
-	private function getShareForElement(int $elementId, string $nodeType, string $userId): Share {
-		// if shared by user
-		try {
-			return $this->shareMapper->findShareForNode($elementId, $nodeType, $userId, 'user');
-		} catch (Exception $e) {
-		}
+    //  private methods ==========================================================================
 
-		// if shared by group
-		try {
-			$userGroups = $this->userHelper->getGroupsForUser($userId);
-		} catch (InternalError $e) {
-			$this->logger->error('could not fetch user data for permission check');
-			throw new InternalError('could not fetch user data for permission check');
-		}
-		foreach ($userGroups as $userGroup) {
-			try {
-				return $this->shareMapper->findShareForNode($elementId, $nodeType, $userGroup->getGID(), 'group');
-			} catch (Exception $e) {
-			}
-		}
-		throw new NotFoundError('no share found');
-	}
+    private function checkPermission($element, string $nodeType, string $permission, ?string $userId = null): bool {
+        try {
+            if($this->basisCheck($element, $nodeType, $userId)) return true;
+        } catch (InternalError $e) {
+            return false;
+        }
 
-	/** @noinspection PhpUndefinedMethodInspection */
+        try {
+            return $this->getSharedPermissionsIfSharedWithMe($element->getId(), $nodeType, $userId)[$permission];
+        } catch (InternalError|NotFoundError $e) {
+        }
+        return false;
+    }
+
+    private function checkPermissionById(int $elementId, string $nodeType, string $permission, ?string $userId = null): bool {
+        try {
+            if($this->basisCheckById($elementId, $nodeType, $userId)) return true;
+        } catch (InternalError $e) {
+            return false;
+        }
+
+        try {
+            return $this->getSharedPermissionsIfSharedWithMe($elementId, $nodeType, $userId)[$permission];
+        } catch (InternalError|NotFoundError $e) {
+        }
+        return false;
+    }
+
+    /**
+     * @param $element
+     * @param string $nodeType
+     * @param string|null $userId
+     * @return bool
+     * @throws InternalError
+     */
+    private function basisCheck($element, string $nodeType, ?string &$userId) {
+        $userId = $this->preCheckUserId($userId);
+
+        if ($userId === '') {
+            return true;
+        }
+
+        if ($this->userIsElementOwner($userId, $element)) {
+            return true;
+        }
+        try {
+            $permissions = $this->getSharedPermissionsIfSharedWithMe($nodeType === 'view' ? $element->getTableId() : $element->getId(), 'table', $userId);
+            if($permissions['manage']) {
+                return true;
+            }
+        } catch (InternalError | NotFoundError $e) {
+        }
+        return false;
+    }
+
+    /**
+     * @param int $elementId
+     * @param string $nodeType
+     * @param string|null $userId
+     * @return bool
+     * @throws DoesNotExistException
+     * @throws Exception
+     * @throws InternalError
+     * @throws MultipleObjectsReturnedException
+     * @throws NotFoundError
+     */
+    private function basisCheckById(int $elementId, string $nodeType, ?string &$userId) {
+        $userId = $this->preCheckUserId($userId);
+
+        if ($userId === '') {
+            return true;
+        }
+
+        try {
+            $element = $nodeType === 'table' ? $this->tableMapper->find($elementId) : $this->viewMapper->find($elementId);
+            return $this->basisCheck($element, $nodeType, $userId);
+        } catch (DoesNotExistException|MultipleObjectsReturnedException|\Exception $e) {
+        }
+        return false;
+    }
+
+    /** @noinspection PhpUndefinedMethodInspection */
 	private function userIsElementOwner(string $userId, $element): bool {
 		return $element->getOwnership() === $userId;
 	}
