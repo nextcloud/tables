@@ -1,6 +1,6 @@
 <template>
 	<div class="options">
-		<div v-if="showOptions && canReadData(table)" class="fix-col-4" style="justify-content: space-between;">
+		<div v-if="showOptions && (canReadData(table) || (canCreateRowInElement(table) && rows.length > 0))" class="fix-col-4" style="justify-content: space-between;">
 			<div :class="{'add-padding-left': isSmallMobile }"
 				class="actionButtonsLeft">
 				<NcButton v-if="!isSmallMobile && canCreateRowInElement(table)"

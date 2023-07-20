@@ -16,12 +16,15 @@ class TableTemplateService {
 
 	private RowService $rowService;
 
+	private ViewService $viewService;
+
 	private ?string $userId;
 
-	public function __construct(IL10N $l, ColumnService $columnService, ?string $userId, RowService $rowService) {
+	public function __construct(IL10N $l, ColumnService $columnService, ?string $userId, RowService $rowService, ViewService $viewService) {
 		$this->l = $l;
 		$this->columnService = $columnService;
 		$this->rowService = $rowService;
+		$this->viewService = $viewService;
 		$this->userId = $userId;
 	}
 
@@ -73,6 +76,7 @@ class TableTemplateService {
 	public function makeTemplate(Table $table, string $template, int $baseViewId): Table {
 		$createColumn = function ($params) use ($table, $baseViewId) {return $this->createColumn($table->getId(), $params, $baseViewId);};
 		$createRow = function ($data) use ($table, $baseViewId) {$this->createRow($table, $baseViewId, $data);};
+		$createView = function ($data) use ($table) {$this->createView($table,$data);};
 		if ($template === 'todo') {
 			$this->makeTodo($createColumn, $createRow);
 		} elseif ($template === 'members') {
@@ -80,7 +84,7 @@ class TableTemplateService {
 		} elseif ($template === 'weight') {
 			$this->makeWeight($createColumn, $createRow);
 		} elseif ($template === 'vacation-requests') {
-			$this->makeVacationRequests($createColumn, $createRow);
+			$this->makeVacationRequests($createColumn, $createRow, $createView);
 		} elseif ($template === 'customers') {
 			$this->makeCustomers($createColumn, $createRow);
 		} elseif ($template === 'tutorial') {
@@ -318,7 +322,7 @@ class TableTemplateService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	private function makeVacationRequests($createColumn, $createRow):void {
+	private function makeVacationRequests($createColumn, $createRow, $createView):void {
 		$columns = [];
 
 		$params = [
@@ -335,6 +339,7 @@ class TableTemplateService {
 			'description' => $this->l->t('When is your vacation starting?'),
 			'type' => 'datetime',
 			'subtype' => 'date',
+			'mandatory' => true,
 			'orderWeight' => 41,
 		];
 		$columns['from'] = $createColumn($params);
@@ -344,6 +349,7 @@ class TableTemplateService {
 			'description' => $this->l->t('When is your vacation ending?'),
 			'type' => 'datetime',
 			'subtype' => 'date',
+			'mandatory' => true,
 			'orderWeight' => 40,
 		];
 		$columns['to'] = $createColumn($params);
@@ -354,6 +360,7 @@ class TableTemplateService {
 			'type' => 'number',
 			'numberMin' => 0,
 			'numberMax' => 100,
+			'mandatory' => true,
 			'orderWeight' => 30,
 		];
 		$columns['workingDays'] = $createColumn($params);
@@ -362,6 +369,8 @@ class TableTemplateService {
 			'title' => $this->l->t('Request date'),
 			'type' => 'datetime',
 			'subtype' => 'date',
+			'mandatory' => true,
+			'datetimeDefault' => 'today',
 			'orderWeight' => 20,
 		];
 		$columns['dateRequest'] = $createColumn($params);
@@ -437,6 +446,58 @@ class TableTemplateService {
 			// TRANSLATORS This is an example comment
 			$columns['comment']->getId() => $this->l->t('We have to talk about that.'),
 		]);
+		$createRow([
+			$columns['employee']->getId() => 'Pete',
+			$columns['from']->getId() => '2023-12-18',
+			$columns['to']->getId() => '2023-12-28',
+			$columns['workingDays']->getId() => 8,
+			$columns['dateRequest']->getId() => '2023-01-30',
+		]);
+
+
+		// let's add views
+		$createView(
+			[
+				'title' => $this->l->t('Create Vacation Request'),
+				'emoji' => '️➕',
+				'columns' => json_encode([$columns['employee']->getId(), $columns['from']->getId(), $columns['to']->getId(), $columns['workingDays']->getId(), $columns['dateRequest']->getId()]),
+				'sort' => json_encode([["columnId" => -5, "mode" => "ASC"]]),
+				'filter' => json_encode([[["columnId" => -2, "operator" => "is-equal", "value" => "@my-name"], ["columnId" => $columns['approved']->getId(), "operator" => "is-empty", "value" => ""]]]),
+			]
+		);
+		$createView(
+			[
+				'title' => $this->l->t('Open Request'),
+				'emoji' => '️📝',
+				'columns' => json_encode(array_values(array_map(function ($col) {
+					return $col->getId();
+				}, $columns))),
+				'sort' => json_encode([["columnId" => $columns['from']->getId(), "mode" => "ASC"]]),
+				'filter' => json_encode([[["columnId" => $columns['approved']->getId(), "operator" => "is-empty", "value" => ""]]]),
+			]
+		);
+		$createView(
+			[
+				'title' => $this->l->t('Request Status'),
+				'emoji' => '️❓',
+				'columns' => json_encode(array_values(array_map(function ($col) {
+					return $col->getId();
+				}, $columns))),
+				'sort' => json_encode([["columnId" => -3, "mode" => "ASC"]]),
+				'filter' => json_encode([[["columnId" => -2, "operator" => "is-equal", "value" => "@my-name"]]]),
+			]
+		);
+		$createView(
+			[
+				'title' => $this->l->t('Closed requests'),
+				'emoji' => '️✅',
+				'columns' => json_encode(array_values(array_map(function ($col) {
+					return $col->getId();
+				}, $columns))),
+				'sort' => json_encode([["columnId" => -3, "mode" => "ASC"]]),
+				'filter' => json_encode([[["columnId" => $columns['approved']->getId(), "operator" => "is-equal", "value" => "@checked"]], [["columnId" => $columns['approved']->getId(), "operator" => "is-equal", "value" => "@unchecked"]]]),
+			]
+		);
 	}
 
 	/**
@@ -790,6 +851,14 @@ class TableTemplateService {
 		}
 		try {
 			$this->rowService->createComplete($viewId, $table->getId(), $data);
+		} catch (PermissionError|Exception $e) {
+		}
+	}
+
+	private function createView(Table $table, array $data): void {
+		try {
+			$view = $this->viewService->create($data['title'], $data['emoji'], $table);
+			$this->viewService->update($view->getId(), $data);
 		} catch (PermissionError|Exception $e) {
 		}
 	}

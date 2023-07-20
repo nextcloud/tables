@@ -175,6 +175,8 @@ export default {
 				await this.$store.dispatch('loadColumnsFromBE', { view: this.activeView })
 				if (this.canReadData(this.activeView)) {
 					await this.$store.dispatch('loadRowsFromBE', { viewId: this.activeView.id })
+				} else {
+					await this.$store.dispatch('removeRows')
 				}
 				this.lastActiveViewId = this.activeView.id
 				this.localLoading = false

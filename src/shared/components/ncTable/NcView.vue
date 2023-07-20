@@ -54,7 +54,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				@delete-selected-rows="rowIds => $emit('delete-selected-rows', rowIds)" />
 		</div>
 		<div class="custom-table row">
-			<CustomTable v-if="canReadData(view)"
+			<CustomTable v-if="canReadData(view) || (canCreateRowInElement(view) && rows.length > 0)"
 				:columns="columns"
 				:rows="rows"
 				:view="view"
@@ -69,7 +69,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				@update-selected-rows="rowIds => selectedRows = rowIds"
 				@download-csv="data => downloadCsv(data, columns, view)"
 				@delete-filter="id => $emit('delete-filter', id)" />
-			<NcEmptyContent v-else-if="canCreateRowInElement(view)"
+			<NcEmptyContent v-else-if="canCreateRowInElement(view) && rows.length === 0"
 				:title="t('tables', 'Create rows')"
 				:description="t('tables', 'You are not allowed to read this view, but you can still create rows.')">
 				<template #icon>
