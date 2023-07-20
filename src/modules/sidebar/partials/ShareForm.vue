@@ -24,7 +24,7 @@
 
 <template>
 	<div class="row space-B">
-		<h3>{{ t('tables', 'Add a new share') }}</h3>
+		<h3>{{ t('tables', 'Share with accounts or groups') }}</h3>
 		<NcSelect id="ajax"
 			style="width: 100%;"
 			:clear-on-select="true"
@@ -62,6 +62,7 @@ import formatting from '../../../shared/mixins/formatting.js'
 import ShareTypes from '../mixins/shareTypesMixin.js'
 
 export default {
+	name: 'ShareForm',
 	components: {
 		NcSelect,
 	},
