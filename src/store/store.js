@@ -68,7 +68,7 @@ export default new Vuex.Store({
 		},
 	},
 	actions: {
-		async insertNewTable({ commit, state }, { data }) {
+		async insertNewTable({ commit, state, dispatch }, { data }) {
 			let res = null
 
 			try {
@@ -77,11 +77,15 @@ export default new Vuex.Store({
 				displayError(e, t('tables', 'Could not insert table.'))
 				return false
 			}
-
-			const tables = state.tables
-			tables.push(res.data)
-			state.views.push(res.data.baseView)
-			commit('setTables', tables)
+			if (data.template !== 'custom') {
+				await dispatch('loadTablesFromBE')
+				await dispatch('loadViewsSharedWithMeFromBE')
+			} else {
+				const tables = state.tables
+				tables.push(res.data)
+				state.views.push(res.data.baseView)
+				commit('setTables', tables)
+			}
 			return res.data.baseView.id
 		},
 		async loadTablesFromBE({ commit, state }) {

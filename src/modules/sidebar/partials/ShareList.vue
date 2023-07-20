@@ -115,8 +115,7 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import formatting from '../../../shared/mixins/formatting.js'
-import { NcActions, NcButton, NcActionButton, NcAvatar, NcActionCheckbox, NcActionCaption, NcActionSeparator, NcActionText } from '@nextcloud/vue'
-import ShareInfo from './ShareInfo.vue'
+import { NcActions, NcActionButton, NcAvatar, NcActionCheckbox, NcActionCaption, NcActionSeparator, NcActionText } from '@nextcloud/vue'
 import ShareInfoPopover from './ShareInfoPopover.vue'
 import OpenInNew from 'vue-material-design-icons/OpenInNew.vue'
 import Crown from 'vue-material-design-icons/Crown.vue'
@@ -130,7 +129,6 @@ export default {
 		NcAvatar,
 		NcActionButton,
 		NcActions,
-		ShareInfo,
 		Information,
 		Account,
 		NcActionText,
@@ -140,7 +138,6 @@ export default {
 		NcActionSeparator,
 		OpenInNew,
 		Crown,
-		NcButton,
 	},
 
 	mixins: [formatting],

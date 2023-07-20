@@ -57,7 +57,7 @@
 				<template #icon>
 					<TableMultiple :size="20" decorative />
 				</template>
-				{{ t('tables', 'Clone view') }}
+				{{ t('tables', 'Duplicate view') }}
 			</NcActionButton>
 			<NcActionButton v-if="canManageElement(view)"
 				icon="icon-delete"

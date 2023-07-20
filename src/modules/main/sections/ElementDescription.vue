@@ -14,6 +14,12 @@
 				{{ activeView.isBaseView ? t('tables', 'Edit table') : t('tables', 'Edit view') }}
 			</NcButton>
 		</div>
+		<div v-if="isFiltered" style="padding: 0 8px">
+			<InformationOutline :size="20" />
+		</div>
+		<div v-if="isFiltered">
+			{{ t('tables', 'Filtered view') }}
+		</div>
 		<div v-if="activeView.isShared" class="user-bubble">
 			<NcUserBubble
 				:display-name="activeView.ownerDisplayName"
@@ -29,15 +35,21 @@ import { mapGetters } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
 import { NcButton, NcUserBubble } from '@nextcloud/vue'
 import Pencil from 'vue-material-design-icons/Pencil.vue'
+import InformationOutline from 'vue-material-design-icons/InformationOutline.vue'
+
 export default {
 	name: 'ElementDescription',
 	components: {
 		NcButton,
 		NcUserBubble,
 		Pencil,
+		InformationOutline,
 	},
 	computed: {
 		...mapGetters(['activeView']),
+		isFiltered() {
+			return this.activeView.filter && this.activeView.filter[0]?.length > 0
+		},
 	},
 
 	methods: {

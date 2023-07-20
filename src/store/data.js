@@ -216,6 +216,9 @@ export default {
 			commit('setLoading', false)
 			return true
 		},
+		removeRows({ commit }) {
+			commit('setRows', [])
+		},
 		async updateRow({ state, commit, dispatch }, { id, viewId, data }) {
 			let res = null
 
