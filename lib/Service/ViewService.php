@@ -312,22 +312,22 @@ class ViewService extends SuperService {
 		// (senseless if we have no user in context)
 		if ($userId !== '') {
 			try {
-				$share = $this->shareService->findViewShareIfSharedWithMe($view->getId());
+				$permissions = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getId(),'view', $userId);
 				/** @noinspection PhpUndefinedMethodInspection */
 				$view->setIsShared(true);
 				$canManageTable = false;
 				try {
-					$manageTableShare = $this->shareService->findTableShareIfSharedWithMe($view->getTableId());
-					$canManageTable = $manageTableShare->getPermissionManage();
+					$manageTableShare = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getTableId(), 'table', $userId);
+					$canManageTable = $manageTableShare['manage'];
 				} catch (\Exception $e) {
 				}
 				/** @noinspection PhpUndefinedMethodInspection */
 				$view->setOnSharePermissions([
-					'read' => $share->getPermissionRead(),
-					'create' => $share->getPermissionCreate(),
-					'update' => $share->getPermissionUpdate(),
-					'delete' => $share->getPermissionDelete(),
-					'manage' => $share->getPermissionManage(),
+					'read' => $permissions['read'],
+					'create' => $permissions['create'],
+					'update' => $permissions['update'],
+					'delete' => $permissions['delete'],
+					'manage' => $permissions['manage'],
 					'manageTable' => $canManageTable,
 				]);
 			} catch (\Exception $e) {

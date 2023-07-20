@@ -153,17 +153,11 @@ class TableService extends SuperService {
 		// (senseless if we have no user in context)
 		if ($userId !== '') {
 			try {
-				$share = $this->shareService->findTableShareIfSharedWithMe($table->getId());
+				$permissions = $this->shareService->getSharedPermissionsIfSharedWithMe($table->getId(), 'table', $userId);
 				/** @noinspection PhpUndefinedMethodInspection */
 				$table->setIsShared(true);
 				/** @noinspection PhpUndefinedMethodInspection */
-				$table->setOnSharePermissions([
-					'read' => $share->getPermissionRead(),
-					'create' => $share->getPermissionCreate(),
-					'update' => $share->getPermissionUpdate(),
-					'delete' => $share->getPermissionDelete(),
-					'manage' => $share->getPermissionManage(),
-				]);
+				$table->setOnSharePermissions($permissions);
 			} catch (\Exception $e) {
 			}
 		}
@@ -174,7 +168,7 @@ class TableService extends SuperService {
 		} catch (NotFoundError $e) {
 			//TODO: Create new base view if none exists
 		}
-		$table->setViews($this->viewService->findAll($table));
+		$table->setViews($this->viewService->findAllNotBaseViews($table));
 	}
 
 

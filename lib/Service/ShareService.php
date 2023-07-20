@@ -137,60 +137,30 @@ class ShareService extends SuperService {
 				} else {
 					throw new InternalError('Cannot find element of type '.$elementType);
 				}
-				/** @noinspection PhpUndefinedMethodInspection */
-				$element->setIsShared(true);
-				/** @noinspection PhpUndefinedMethodInspection */
-				$element->setOnSharePermissions([
-					'read' => $share->getPermissionRead(),
-					'create' => $share->getPermissionCreate(),
-					'update' => $share->getPermissionUpdate(),
-					'delete' => $share->getPermissionDelete(),
-					'manage' => $share->getPermissionManage(),
-				]);
+				// Check if en element with this id is already in the result array
+				$index = array_search($element->getId(), array_column($returnArray, 'id'));
+				if (!$index) {
+					$returnArray[] = $element;
+				}
 			} catch (DoesNotExistException|\OCP\DB\Exception|MultipleObjectsReturnedException $e) {
 				throw new InternalError($e->getMessage());
 			}
-			$returnArray[] = $element;
 		}
 		return $returnArray;
 	}
 
-	public function findViewShareIfSharedWithMe(int $viewId, ?string $userId = null): Share {
-		return $this->findShareIfSharedWithMe($viewId, 'view', $userId);
-	}
-
-	public function findTableShareIfSharedWithMe(int $tableId, ?string $userId = null): Share {
-		return $this->findShareIfSharedWithMe($tableId, 'table', $userId);
-	}
 
 	/**
-	 * @throws NotFoundError
+	 * @param int $elementId
+	 * @param string|null $elementType
+	 * @param string|null $userId
+	 * @return array
 	 * @throws InternalError
+	 * @throws NotFoundError
 	 */
-	private function findShareIfSharedWithMe(int $elementId, ?string $elementType = 'table', ?string $userId = null): Share {
+	public function getSharedPermissionsIfSharedWithMe(int $elementId, ?string $elementType = 'table', ?string $userId = null): array {
 		$userId = $this->permissionsService->preCheckUserId($userId);
-
-		// try to find a share with my userId
-		try {
-			/** @var string $userId */
-			return $this->mapper->findShareForNode($elementId, $elementType, $userId, 'user');
-		} catch (Exception $e) {
-		}
-
-		// try to find a share with one of my groups
-		try {
-			/** @var string $userId */
-			$userGroups = $this->userHelper->getGroupsForUser($userId);
-			foreach ($userGroups as $userGroup) {
-				return $this->mapper->findShareForNode($elementId, $elementType, $userGroup->getGid(), 'group');
-				// $shares = $this->mapper->findAllSharesFor('table', $userGroup->getGid(), 'group');
-				// $tablesSharedWithMe = array_merge($tablesSharedWithMe, $shares);
-			}
-		} catch (Exception $e) {
-		}
-
-		// else throw error
-		throw new NotFoundError('No share for '.$elementType.' and given user ID found.');
+		return $this->permissionsService->getSharedPermissionsIfSharedWithMe($elementId, $elementType, $userId);
 	}
 
 
