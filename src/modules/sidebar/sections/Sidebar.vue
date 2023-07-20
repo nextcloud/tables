@@ -6,20 +6,19 @@
 			:subtitle="elementSubtitle"
 			@update:active="tab => activeSidebarTab = tab"
 			@close="showSidebar = false">
-			<NcAppSidebarTab v-if="activeView && canShareElement(activeView)"
-				id="sharing"
-				icon="icon-share"
-				:name="t('tables', 'Sharing')">
-				<SidebarSharing />
-			</NcAppSidebarTab>
 			<NcAppSidebarTab
 				id="integration"
-				icon="icon-share"
 				:name="t('tables', 'Integration')">
 				<SidebarIntegration />
 				<template #icon>
 					<Creation :size="20" />
 				</template>
+			</NcAppSidebarTab>
+			<NcAppSidebarTab v-if="activeView && canShareElement(activeView)"
+				id="sharing"
+				icon="icon-share"
+				:name="t('tables', 'Sharing')">
+				<SidebarSharing />
 			</NcAppSidebarTab>
 		</NcAppSidebar>
 	</div>

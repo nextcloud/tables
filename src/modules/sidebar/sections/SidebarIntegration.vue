@@ -4,9 +4,19 @@
 		<p>
 			{{ t('tables', 'This is your API endpoint for this view') }}
 		</p>
-		<p class="url">
-			{{ apiEndpointUrl }}
-		</p>
+		<NcInputField id="urlTextField"
+			:value="apiEndpointUrl"
+			:show-trailing-button="true"
+			:trailing-button-label="t('files', 'Copy to clipboard')"
+			readonly="readonly"
+			:success="copied"
+			type="url"
+			@focus="$event.target.select()"
+			@trailing-button-click="copyUrl">
+			<template #trailing-button-icon>
+				<ContentCopy :size="20" />
+			</template>
+		</NcInputField>
 		<h4>
 			{{ t('tables', 'Your permissions') }}
 		</h4>
@@ -34,14 +44,22 @@
 import { mapGetters, mapState } from 'vuex'
 import { generateUrl } from '@nextcloud/router'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
+import NcInputField from '@nextcloud/vue/dist/Components/NcInputField.js'
+import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
+import { showError, showSuccess } from '@nextcloud/dialogs'
 
 export default {
+	components: {
+		NcInputField,
+		ContentCopy,
+	},
 
 	mixins: [permissionsMixin],
 
 	data() {
 		return {
 			loading: false,
+			copied: false,
 		}
 	},
 
@@ -56,6 +74,27 @@ export default {
 			return window.location.protocol + '//' + window.location.host + generateUrl(url, params)
 		},
 	},
+	 methods: {
+		async copyUrl() {
+			document.querySelector('input#urlTextField').select()
+
+			if (!navigator.clipboard) {
+				try {
+					document.execCommand('copy')
+				} catch (e) {
+					showError(t('files', 'Clipboard is not available'))
+					return
+				}
+			} else {
+				await navigator.clipboard.writeText(this.webdavUrl)
+			}
+			this.copied = true
+			showSuccess(t('files', 'Integration URL copied to clipboard'))
+			setTimeout(() => {
+				this.copied = false
+			}, 5000)
+		},
+	 },
 }
 </script>
 <style lang="scss" scoped>
