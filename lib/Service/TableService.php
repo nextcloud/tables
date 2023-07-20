@@ -165,8 +165,11 @@ class TableService extends SuperService {
 		// add the corresponding views
 		try {
 			$table->setBaseView($this->viewService->findBaseView($table));
-		} catch (NotFoundError $e) {
-			//TODO: Create new base view if none exists
+		} catch (DoesNotExistException $e) {
+			// Create new base view if none exists
+			$view = $this->viewService->create($table->getTitle(), $table->getEmoji(), $table, true);
+			$view = $this->viewService->update($view->getId(), ["columns" => json_encode(array_column($this->columnService->findAllByTable($table->getId()),'id'))]);
+			$table->setBaseView($view);
 		}
 		$table->setViews($this->viewService->findAllNotBaseViews($table));
 	}
