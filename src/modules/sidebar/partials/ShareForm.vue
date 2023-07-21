@@ -110,14 +110,15 @@ export default {
 		 * @return {Array}
 		 */
 		options() {
+			const shareTypes = { 0: 'user', 1: 'group' }
 			// const shares = [...this.userShares, ...this.groupShares]
 			const shares = this.shares
 			if (this.isValidQuery) {
 				// Filter out existing shares
-				return this.suggestions.filter(item => !shares.find(share => share.shareWith === item.shareWith && share.shareType === item.shareType))
+				return this.suggestions.filter(item => !shares.find(share => share.receiver === item.shareWith && share.receiverType === shareTypes[item.shareType]))
 			}
 			// Filter out existing shares
-			return this.recommendations.filter(item => !shares.find(share => share.shareWith === item.shareWith && share.shareType === item.shareType))
+			return this.recommendations.filter(item => !shares.find(share => share.receiver === item.shareWith && share.receiverType === shareTypes[item.shareType]))
 		},
 
 		noResultText() {
