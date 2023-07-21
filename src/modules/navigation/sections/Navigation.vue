@@ -110,7 +110,7 @@ export default {
 			return this.views.filter(item => item.isShared === true && item.ownership !== getCurrentUser().uid && !sharedTableIds.includes(item.tableId)).filter(view => view.isBaseView || !sharedBaseViewTableIds.includes(view.tableId)).filter(view => view.title.toLowerCase().includes(this.filterString.toLowerCase())).sort((a, b) => a.tableId === b.tableId ? a.id - b.id : a.tableId - b.tableId)
 		},
 		getSharedTables() {
-			return this.getFilteredBaseViews.filter((item) => { return item.isShared === true }).sort((a, b) => a.title.localeCompare(b.title))
+			return this.getFilteredBaseViews.filter((item) => { return item.isShared === true && item.ownership !== getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
 		},
 		getOwnBaseViews() {
 			return this.getFilteredBaseViews.filter((item) => { return item.isShared === false || item.ownership === getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
