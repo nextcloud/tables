@@ -53,7 +53,7 @@ class ColumnService extends SuperService {
 	 */
 	public function findAllByTable(int $tableId, ?int $viewId = null, ?string $userId = null): array {
 		try {
-			if ($this->permissionsService->canReadTableColumnsByTableId($tableId, $userId) || ($viewId != null && $this->permissionsService->canReadTableColumnsByViewId($viewId, $userId))) {
+			if ($this->permissionsService->canReadColumnsByTableId($tableId, $userId) || ($viewId != null && $this->permissionsService->canReadColumnsByViewId($viewId, $userId))) {
 				return $this->mapper->findAllByTable($tableId);
 			} else {
 				throw new PermissionError('no read access to table id = '.$tableId);

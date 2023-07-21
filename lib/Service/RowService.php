@@ -304,10 +304,10 @@ class RowService extends SuperService {
 	 * @throws \OCP\DB\Exception
 	 */
 	public function deleteAllByTable(int $tableId, ?string $userId = null): int {
-		/*// security
+		// security
 		if (!$this->permissionsService->canDeleteRowsByTableId($tableId, $userId)) {
 			throw new PermissionError('delete all rows for table id = '.$tableId.' is not allowed.');
-		}TODO: If you can delete a table you should be allowed to delete the rows?! */
+		}
 
 		return $this->mapper->deleteAllByTable($tableId);
 	}
@@ -321,11 +321,11 @@ class RowService extends SuperService {
 		$rows = $this->mapper->findAllWithColumn($columnId);
 
 		// security
-		/*if (count($rows) > 0) {
+		if (count($rows) > 0) {
 			if (!$this->permissionsService->canUpdateRowsByTableId($rows[0]->getTableId())) {
 				throw new PermissionError('update row id = '.$rows[0]->getId().' within '.__FUNCTION__.' is not allowed.');
 			}
-		} TODO: Is this necessary? You only do that if you are allowed to delete columns. Then you should also be allowed to delete rows*/
+		}
 
 		foreach ($rows as $row) {
 			/* @var $row Row */
