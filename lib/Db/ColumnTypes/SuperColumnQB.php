@@ -22,17 +22,17 @@ class SuperColumnQB implements IColumnTypeQB {
 	public function formatCellValue(string $unformattedValue): string {
 		return 'JSON_UNQUOTE(LOWER('.$unformattedValue.'))';
 	}
-	public function passSearchValue(IQueryBuilder &$qb, string $unformattedSearchValue, string $operator, string $searchValuePlaceHolder): void	{
+	public function passSearchValue(IQueryBuilder &$qb, string $unformattedSearchValue, string $operator, string $searchValuePlaceHolder): void {
 		$lowerCaseSearchValue = strtolower($unformattedSearchValue);
 		switch ($operator) {
 			case 'begins-with':
 				$lowerCaseSearchValue = $lowerCaseSearchValue . '%';
 				break;
 			case 'ends-with':
-				$lowerCaseSearchValue =  '%' . $lowerCaseSearchValue;
+				$lowerCaseSearchValue = '%' . $lowerCaseSearchValue;
 				break;
 			case 'contains':
-				$lowerCaseSearchValue =  '%' . $lowerCaseSearchValue . '%';
+				$lowerCaseSearchValue = '%' . $lowerCaseSearchValue . '%';
 				break;
 			default:
 				break;
@@ -45,7 +45,7 @@ class SuperColumnQB implements IColumnTypeQB {
 	 * @return string
 	 * @throws InternalError
 	 */
-	private function buildSQLString(string $operator, string $formattedCellValue, string $searchValuePlaceHolder) : string{
+	private function buildSQLString(string $operator, string $formattedCellValue, string $searchValuePlaceHolder) : string {
 		if ($this->platform === self::DB_PLATFORM_PGSQL) {
 			return '';
 		} elseif ($this->platform === self::DB_PLATFORM_SQLITE) {

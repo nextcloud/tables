@@ -49,7 +49,6 @@ export default {
 				this.$store.commit('setActiveViewId', parseInt(to.params.viewId))
 				this.$store.commit('setActiveRowId', parseInt(to.params.rowId))
 			}
-			// console.debug("Setting table ID to value",to.params.tableId, to)
 		},
 	},
 	async created() {

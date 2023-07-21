@@ -270,6 +270,6 @@ export default {
 
 .sticky {
 	position: sticky;
-    bottom: 0;
+	bottom: 0;
 }
 </style>

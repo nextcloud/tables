@@ -325,6 +325,7 @@ export default {
 	display: flex;
 	justify-content: space-between;
 }
+
 .cell-options-wrapper {
 	display: flex;
 	flex-direction: column;

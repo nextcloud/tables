@@ -130,7 +130,7 @@ class RowController extends Controller {
 	 */
 	public function destroy(int $id, int $viewId): DataResponse {
 		return $this->handleError(function () use ($id, $viewId) {
-			return $this->service->delete($id, $viewId,	$this->userId);
+			return $this->service->delete($id, $viewId, $this->userId);
 		});
 	}
 }

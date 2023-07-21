@@ -60,12 +60,10 @@ export default {
 			this.mutableFilterGroup.push({ columnId: null, operator: null, value: '' })
 		},
 		deleteFilter(index) {
-			console.debug('Delete filter at index ', index)
 			this.mutableFilterGroup.splice(index, 1)
 			if (this.mutableFilterGroup.length === 0) {
 				this.$emit('delete-filter-group')
 			}
-			console.debug(this.mutableFilterGroup[index])
 		},
 	},
 }
@@ -76,6 +74,7 @@ export default {
 .group-text {
 	padding-left: calc(var(--default-grid-baseline) * 2);
 }
+
 .filter-group {
 	border-left: 6px solid var(--color-primary) !important;
 	padding-left: calc(var(--default-grid-baseline) * 2);

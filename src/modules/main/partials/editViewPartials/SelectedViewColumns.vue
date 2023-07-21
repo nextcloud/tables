@@ -143,15 +143,15 @@ export default {
 
 :deep(.button-vue) {
 	cursor: move !important;
-    min-height: auto !important;
-    min-width: auto !important;
+	min-height: auto !important;
+	min-width: auto !important;
 }
 
 :deep(.button-vue__icon) {
 	height: auto !important;
-    width: auto !important;
-    min-height: auto !important;
-    min-width: auto !important;
+	width: auto !important;
+	min-height: auto !important;
+	min-width: auto !important;
 }
 
 :deep(.checkbox-radio-switch__label) {
@@ -163,6 +163,7 @@ export default {
 	margin-right: 0 !important;
 	margin-left: 0 !important;
 }
+
 .selected-columns-wrapper {
 	display: flex;
 	flex-direction: column;

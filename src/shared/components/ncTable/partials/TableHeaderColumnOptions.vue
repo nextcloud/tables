@@ -333,10 +333,12 @@ export default {
 .menu {
 	padding-left: calc(var(--default-grid-baseline) * 1);
 }
+
 .selected {
 	background-color: var(--color-primary-element-light) !important;
 	border-radius: 6px;
 }
+
 .selected-option {
 	width: 100%;
 }

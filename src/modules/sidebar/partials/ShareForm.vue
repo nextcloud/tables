@@ -57,7 +57,7 @@ import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 import { NcSelect } from '@nextcloud/vue'
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import formatting from '../../../shared/mixins/formatting.js'
 import ShareTypes from '../mixins/shareTypesMixin.js'
 

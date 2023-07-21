@@ -125,15 +125,18 @@ export default {
 	width: 50%;
 	height: 100%;
 }
+
 .mode-icon {
 	padding-right: calc(var(--default-grid-baseline) * 2);
 }
+
 :deep(.checkbox-radio-switch--button-variant .checkbox-radio-switch__label) {
 	padding: 0px calc(var(--default-grid-baseline) * 2);
 	display: flex;
 	justify-content: center;
 	min-height: auto;
 }
+
 :deep(.checkbox-radio-switch--button-variant.checkbox-radio-switch--checked) {
 	border: 2px solid var(--color-border-dark);
 }

@@ -158,6 +158,7 @@ export default {
 	flex: 1;
 	display: flex;
 }
+
 .delete-button {
 	margin-left: auto;
 }

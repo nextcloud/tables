@@ -21,20 +21,14 @@
 				<div class="col-2 space-LR space-T">
 					<component :is="getColumnForm" :column="editColumn" />
 				</div>
-				<!-- <div class="col-3 space-B space-T">
-					<button class="secondary" @click="editColumn = null">
-						{{ t('tables', 'Cancel') }}
-					</button>
-					<button class="primary" @click="saveColumn">
-						{{ t('tables', 'Save') }}
-					</button>
-				</div> -->
-				<!-- <div class="col-1 align-right">
-					<ColumnInfoPopover :column="column" />
-				</div> -->
 			</div>
 			<div class="buttons">
-				<ColumnInfoPopover :column="column" />
+				<ColumnInfoPopover v-if="debug" :column="column" />
+				<div class="last-edit-info">
+					{{ t('tables', 'Last edit') + ': ' }}
+					{{ updateTime }}
+					<NcUserBubble :user="column.lastEditBy" :display-name="column.lastEditBy" />
+				</div>
 				<div style="display: flex">
 					<div class="button-padding-right">
 						<NcButton type="secondary" :aria-label="t('tables', 'Cancel')" @click="actionCancel">
@@ -46,47 +40,14 @@
 					</NcButton>
 				</div>
 			</div>
-
-				<!-- no edit mode -->
-				<!-- <div v-else class="row">
-					<div class="col-2">
-						<div class="row space-T">
-							<div class="col-1" style="display: inline-flex;">
-								<NcActions v-if="!otherActionPerformed" type="secondary">
-									<NcActionButton icon="icon-rename" :close-after-click="true" @click="editColumn = column">
-										{{ t('tables', 'Edit') }}
-									</NcActionButton>
-									<NcActionButton :close-after-click="true" icon="icon-delete" @click="deleteId = column.id">
-										{{ t('tables', 'Delete') }}
-									</NcActionButton>
-								</NcActions>
-							</div>
-						</div>
-					</div>
-					<div v-if="column.id === deleteId" class="row space-L">
-						<div class="col-4 space-T">
-							<h4>{{ t('tables', 'Do you really want to delete the column "{column}"?', { column: column.title }) }}</h4>
-						</div>
-						<div class="col-4 space-T space-B">
-							<button class="secondary" @click="deleteId = null">
-								{{ t('tables', 'Cancel') }}
-							</button>
-							<button class="error" @click="deleteColumn">
-								{{ t('tables', 'Delete') }}
-							</button>
-						</div>
-					</div>
-				</div> -->
-			</div>
 		</div>
 	</NcModal>
 </template>
 
 <script>
-import { NcModal, NcActions, NcActionButton, NcButton } from '@nextcloud/vue'
-import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
+import { NcModal, NcActions, NcActionButton, NcButton, NcUserBubble } from '@nextcloud/vue'
+import { showError, showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
-import { mapGetters, mapState } from 'vuex'
 import ColumnInfoPopover from '../partials/ColumnInfoPopover.vue'
 import NumberForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/NumberForm.vue'
 import NumberStarsForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/NumberStarsForm.vue'
@@ -103,6 +64,7 @@ import DatetimeForm from '../../../shared/components/ncTable/partials/columnType
 import DatetimeDateForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeTimeForm.vue'
 import { ColumnTypes } from '../../../shared/components/ncTable/mixins/columnHandler.js'
+import moment from '@nextcloud/moment'
 
 export default {
 	name: 'EditColumn',
@@ -126,6 +88,7 @@ export default {
 		NcActionButton,
 		ColumnInfoPopover,
 		NcButton,
+		NcUserBubble,
 	},
 	filters: {
 		truncate(text, length, suffix) {
@@ -147,6 +110,8 @@ export default {
 			editColumn: structuredClone(this.column),
 			deleteId: null,
 			editErrorTitle: false,
+			// To enable the column info popup
+			debug: false,
 		}
 	},
 	computed: {
@@ -161,9 +126,15 @@ export default {
 				throw Error('Form ' + form + ' does no exist')
 			}
 		},
+		updateTime() {
+			return (this.column && this.column.lastEditAt) ? this.relativeDateTime(this.column.lastEditAt) : ''
+		},
 	},
 
 	methods: {
+		relativeDateTime(v) {
+			return moment(v).format('L') === moment().format('L') ? t('tables', 'Today') + ' ' + moment(v).format('LT') : moment(v).format('LLLL')
+		},
 		snakeToCamel(str) {
 			str = str.toLowerCase().replace(/([-_][a-z])/g, group =>
 				group
@@ -204,7 +175,6 @@ export default {
 			delete data.createdBy
 			delete data.lastEditAt
 			delete data.lastEditBy
-			console.debug("Update column: ", data)
 			const res = await this.$store.dispatch('updateColumn', { id: this.editColumn.id, data })
 			if (res) {
 				showSuccess(t('tables', 'The column "{column}" was updated.', { column: this.editColumn.title }))
@@ -219,13 +189,20 @@ export default {
 	width: 100%;
 	max-width: 200px;
 }
+
 .buttons {
 	display: flex;
 	justify-content: space-between;
-    padding:  calc(var(--default-grid-baseline) * 5);
+	padding:  calc(var(--default-grid-baseline) * 5);
 }
+
 .button-padding-right {
 	padding-right: calc(var(--default-grid-baseline) * 2)
+}
+
+.last-edit-info {
+	display: flex;
+	align-items: center;
 }
 
 </style>

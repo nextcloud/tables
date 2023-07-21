@@ -18,7 +18,6 @@ export default {
 		},
 
 		async sendNewTableShareToBE(share) {
-			console.debug(share)
 			const data = {
 				nodeType: 'table',
 				nodeId: this.activeView.tableId,

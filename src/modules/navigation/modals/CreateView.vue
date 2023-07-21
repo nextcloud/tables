@@ -92,7 +92,6 @@ export default {
 		actionCancel() {
 			this.reset()
 			this.$emit('close')
-			console.debug('Closed')
 		},
 		async actionConfirm() {
 			if (this.title === '') {

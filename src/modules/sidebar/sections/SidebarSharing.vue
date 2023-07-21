@@ -67,12 +67,10 @@ export default {
 			}
 		},
 		async addShare(share) {
-			console.debug('add share triggered', share)
 			await this.sendNewShareToBE(share)
 			await this.loadSharesFromBE()
 		},
 		async updateShare(data) {
-			console.debug('update share triggered', data)
 			const shareId = data.id
 			delete data.id
 			await this.updateShareToBE(shareId, data)

@@ -34,7 +34,9 @@ class ViewMapper extends QBMapper {
 			->from($this->table)
 			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
 		$view = $this->findEntity($qb);
-		if(!$skipEnhancement) $this->enhanceByOwnership($view);
+		if(!$skipEnhancement) {
+			$this->enhanceByOwnership($view);
+		}
 		return $view;
 	}
 
@@ -112,7 +114,7 @@ class ViewMapper extends QBMapper {
 
 		$qb->select('v.*')
 			->from($this->table, 'v')
-			->leftJoin('v','tables_tables', 't','t.id = v.table_id');
+			->leftJoin('v', 'tables_tables', 't', 't.id = v.table_id');
 
 		if ($userId !== null && $userId !== '') {
 			$qb->andWhere($qb->expr()->eq('ownership', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)))

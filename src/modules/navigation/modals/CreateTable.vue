@@ -149,7 +149,6 @@ export default {
 			} else {
 				const newBaseViewId = await this.sendNewTableToBE(this.templateChoice)
 				if (newBaseViewId) {
-					// showSuccess(t('tables', 'The table "{emoji} {table}" is ready to use.', { emoji: this.icon, table: this.title }))
 					await this.$router.push('/view/' + newBaseViewId)
 					this.actionCancel()
 				}

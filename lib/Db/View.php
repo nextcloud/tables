@@ -88,7 +88,7 @@ class View extends Entity implements JsonSerializable {
 			'lastEditAt' => $this->lastEditAt,
 			'columns' => $this->getColumnsArray(),
 			'sort' => $this->getSortArray(),
-			'isBaseView'=> $this->isBaseView,
+			'isBaseView' => $this->isBaseView,
 			'isShared' => !!$this->isShared,
 			'onSharePermissions' => $this->onSharePermissions,
 			'hasShares' => $this->hasShares,

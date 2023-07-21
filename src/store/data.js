@@ -178,7 +178,6 @@ export default {
 			const columns = state.columns
 			const index = columns.findIndex(c => c.id === col.id)
 			columns[index] = parseCol(col)
-			console.debug("Update columns", columns)
 			commit('setColumns', [...columns])
 
 			return true

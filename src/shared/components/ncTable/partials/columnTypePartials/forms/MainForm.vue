@@ -115,7 +115,6 @@ export default {
 		localSelectedViews: {
 			get() { return this.selectedViews },
 			set(selectedViews) {
-				console.debug(selectedViews)
 				this.$emit('update:selectedViews', selectedViews)
 			},
 		},

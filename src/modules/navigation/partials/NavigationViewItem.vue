@@ -78,7 +78,6 @@ import Table from 'vue-material-design-icons/Table.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import DialogConfirmation from '../../../shared/modals/DialogConfirmation.vue'
 import Creation from 'vue-material-design-icons/Creation.vue'
-import Import from 'vue-material-design-icons/Import.vue'
 import TableMultiple from 'vue-material-design-icons/TableMultiple.vue'
 import { emit } from '@nextcloud/event-bus'
 
@@ -94,7 +93,6 @@ export default {
 		NcActionButton,
 		Creation,
 		NcAvatar,
-		Import,
 		TableMultiple,
 	},
 
@@ -137,9 +135,6 @@ export default {
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
 			await this.$router.push('/view/' + parseInt(this.view.id)).catch(err => err)
 		},
-		// async actionShowImport(table) {
-		// 	emit('tables:modal:import', table)
-		// },
 		async actionShowIntegration() {
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
 			await this.$router.push('/view/' + parseInt(this.view.id)).catch(err => err)
