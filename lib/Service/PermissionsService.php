@@ -88,68 +88,28 @@ class PermissionsService {
 	 * @param string|null $userId
 	 * @return bool
 	 */
-	public function canReadElement($element, string $nodeType, ?string $userId = null): bool {
-        return $this->checkPermission($element, $nodeType, 'read', $userId);
+	public function canManageView(View $view, ?string $userId = null): bool {
+        return $this->checkPermission($view, 'view', 'manage', $userId);
 	}
 
-    /**
-     * @param Table|View $element
-     * @param string|null $userId
-     * @return bool
-     */
-    public function canCreateElement($element, string $nodeType, ?string $userId = null): bool {
-        return $this->checkPermission($element, $nodeType, 'create', $userId);
-    }
-
-	/**
-	 * @param Table|View $element
-	 * @param string|null $userId
-	 * @return bool
-	 */
-	public function canUpdateElement($element, string $nodeType, ?string $userId = null): bool {
-        return $this->checkPermission($element, $nodeType, 'update', $userId);
+	public function canManageTable(Table $table, ?string $userId = null): bool {
+		return $this->checkPermission($table, 'table', 'manage', $userId);
 	}
 
-	/**
-	 * @param Table|View $element
-	 * @param string|null $userId
-	 * @return bool
-	 */
-	public function canDeleteElement($element, string $nodeType, ?string $userId = null): bool {
-        return $this->checkPermission($element, $nodeType, 'delete', $userId);
-	}
-
-
-	/**
-	 * @param Table|View $element
-	 * @param string|null $userId
-	 * @return bool
-	 */
-	public function canManageElement($element, string $nodeType, ?string $userId = null): bool {
-        return $this->checkPermission($element, $nodeType, 'manage', $userId);
+	public function canManageTableById(int $tableId, ?string $userId = null): bool {
+		$table = $this->tableMapper->find($tableId);
+		return $this->canManageTable($table, $userId);
 	}
 
 
 	// ***** COLUMNS permissions *****
 
-	public function canReadTableColumnsByViewId(int $viewId, ?string $userId = null): bool {
-		try {
-			$view = $this->viewMapper->find($viewId);
-			// if you can read the table, you also can read its columns
-			return $this->canReadRowsByElementId($view->getId(), 'view', $userId);
-		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
-		}
-		return false;
+	public function canReadColumnsByViewId(int $viewId, ?string $userId = null): bool {
+		return $this->canReadRowsByElementId($viewId, 'view', $userId);
 	}
 
-	public function canReadTableColumnsByTableId(int $tableId, ?string $userId = null): bool {
-		try {
-			$table = $this->tableMapper->find($tableId);
-			// if you can read the table, you also can read its columns
-			return $this->canReadRowsByElementId($table->getId(), 'table', $userId);
-		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
-		}
-		return false;
+	public function canReadColumnsByTableId(int $tableId, ?string $userId = null): bool {
+		return $this->canReadRowsByElementId($tableId, 'table', $userId);
 	}
 
 	/**
@@ -158,22 +118,7 @@ class PermissionsService {
 	 * @return bool
 	 */
 	public function canCreateColumns(Table $table, ?string $userId = null): bool {
-		// this is the same permission as to update a table
-		return $this->canManageElement($table, 'table', $userId);
-	}
-
-	/**
-	 * @param int $tableId
-	 * @param string|null $userId
-	 * @return bool
-	 */
-	public function canCreateColumnsByTableId(int $tableId, ?string $userId = null): bool {
-		try {
-			$table = $this->tableMapper->find($tableId);
-			return $this->canCreateColumns($table, $userId);
-		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
-		}
-		return false;
+		return $this->canManageTable($table, $userId);
 	}
 
 	/**
@@ -182,13 +127,7 @@ class PermissionsService {
 	 * @return bool
 	 */
 	public function canUpdateColumnsByTableId(int $tableId, ?string $userId = null): bool {
-		try {
-			$table = $this->tableMapper->find($tableId);
-			// this is the same permission as to update a table
-			return $this->canManageElement($table, 'table', $userId);
-		} catch (\Exception $e) {
-		}
-		return false;
+		return $this->canManageTableById($tableId, $userId);
 	}
 
 	/**
@@ -197,13 +136,7 @@ class PermissionsService {
 	 * @return bool
 	 */
 	public function canDeleteColumnsByTableId(int $tableId, ?string $userId = null): bool {
-		try {
-			$table = $this->tableMapper->find($tableId);
-			// this is the same permission as to update a table
-			return $this->canManageElement($table, 'table', $userId);
-		} catch (\Exception $e) {
-		}
-		return false;
+		return $this->canManageTableById($tableId, $userId);
 	}
 
 
@@ -217,6 +150,10 @@ class PermissionsService {
 	 */
 	public function canReadRowsByElementId(int $elementId, string $nodeType, ?string $userId = null): bool {
         return $this->checkPermissionById($elementId, $nodeType, 'read', $userId);
+	}
+
+	public function canReadRowsByElement($element, string $nodeType, ?string $userId = null): bool {
+		return $this->checkPermission($element, $nodeType, 'read', $userId);
 	}
 
 	/**
@@ -360,7 +297,7 @@ class PermissionsService {
 
         try {
             return $this->getSharedPermissionsIfSharedWithMe($element->getId(), $nodeType, $userId)[$permission];
-        } catch (InternalError|NotFoundError $e) {
+        } catch (NotFoundError $e) {
         }
         return false;
     }
@@ -374,7 +311,7 @@ class PermissionsService {
 
         try {
             return $this->getSharedPermissionsIfSharedWithMe($elementId, $nodeType, $userId)[$permission];
-        } catch (InternalError|NotFoundError $e) {
+        } catch (NotFoundError $e) {
         }
         return false;
     }

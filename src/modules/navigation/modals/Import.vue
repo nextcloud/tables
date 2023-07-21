@@ -170,10 +170,10 @@ export default {
 	computed: {
 		...mapGetters(['activeView']),
 		canCreateMissingColumns() {
-			return this.canManageElement(this.view)
+			return this.canManageTable(this.view)
 		},
 		getCreateMissingColumns() {
-			return this.canManageElement(this.view) && this.createMissingColumns
+			return this.canManageTable(this.view) && this.createMissingColumns
 		},
 	},
 
@@ -183,7 +183,7 @@ export default {
 			if (this.activeView.tableId === this.view.tableId) {
 				this.waitForReload = true
 				await this.$store.dispatch('loadTablesFromBE')
-				await this.$store.dispatch('loadViewsSharedWithMeFromBE') //TODO: Test if importing in shared Table 
+				await this.$store.dispatch('loadViewsSharedWithMeFromBE')
 				await this.$store.dispatch('loadColumnsFromBE', { view: this.view })
 				await this.$store.dispatch('loadRowsFromBE', { viewId: this.view.id })
 				this.waitForReload = false

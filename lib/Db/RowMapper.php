@@ -149,7 +149,6 @@ class RowMapper extends QBMapper {
 			$orderString = 'JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'$[*].columnId\'), \'one\', :'.$sortColumnPlaceholder.')), \'.value\'))';
 			if (str_starts_with($sortRule['columnType'],'number')) {
 				$orderString = 'CAST('.$orderString.' as int)';
-				//TODO: Better solution?
 			}
 			$qb->addOrderBy($qb->createFunction($orderString),$sortMode);
 			$qb->setParameter($sortColumnPlaceholder,$sortRule['columnId'], $qb::PARAM_INT);
@@ -294,7 +293,6 @@ class RowMapper extends QBMapper {
 		foreach ($sorts as $sortRule) {
 			$neededColumnIds[] = $sortRule['columnId'];
 		}
-		// TODO add sorting ids
 		return array_unique($neededColumnIds);
 	}
 

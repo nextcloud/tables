@@ -66,7 +66,7 @@ class ViewService extends SuperService {
 
 		try {
 			// security
-			if (!$this->permissionsService->canReadElement($table, 'table', $userId)) {
+			if (!$this->permissionsService->canManageTable($table, $userId)) {
 				throw new PermissionError('PermissionError: can not read views for tableId '.$table->getId());
 			}
 
@@ -89,11 +89,11 @@ class ViewService extends SuperService {
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
 
 		try {
-			$baseView = $this->mapper->findBaseView($table->getId());
 			// security
-			if (!$this->permissionsService->canReadElement($baseView, 'view', $userId)) {
+			if (!$this->permissionsService->canManageTable($table, $userId)) {
 				throw new PermissionError('PermissionError: can not read views for tableId '.$table->getId());
 			}
+			$baseView = $this->mapper->findBaseView($table->getId());
 			if(!$skipTableEnhancement) $this->enhanceView($baseView, $userId);
 			return $baseView;
 		} catch (\OCP\DB\Exception $e) {
@@ -166,7 +166,7 @@ class ViewService extends SuperService {
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
 
 		// security
-		if (!$this->permissionsService->canUpdateElement($table, 'table', $userId)) {
+		if (!$this->permissionsService->canManageTable($table, $userId)) {
 			throw new PermissionError('PermissionError: can not create view');
 		}
 
@@ -220,7 +220,7 @@ class ViewService extends SuperService {
 			$view = $this->mapper->find($id);
 
 			// security
-			if (!$this->permissionsService->canManageElement($view, 'view', $userId)) {
+			if (!$this->permissionsService->canManageView($view, $userId)) {
 				throw new PermissionError('PermissionError: can not update view with id '.$id);
 			}
 
@@ -257,7 +257,7 @@ class ViewService extends SuperService {
 			}
 
 			// security
-			if (!$this->permissionsService->canManageElement($view, 'view', $userId)) {
+			if (!$this->permissionsService->canManageView($view, $userId)) {
 				throw new PermissionError('PermissionError: can not delete view with id '.$id);
 			}
 			$this->shareService->deleteAllForView($view);
@@ -283,7 +283,7 @@ class ViewService extends SuperService {
 
 		try {
 			// security
-			if (!$this->permissionsService->canManageElement($view, 'view', $userId)) {
+			if (!$this->permissionsService->canManageView($view, $userId)) {
 				throw new PermissionError('PermissionError: can not delete view with id '.$view->getId());
 			}
 			// delete all shares for that table
@@ -334,7 +334,14 @@ class ViewService extends SuperService {
 			}
 		}
 
-		if (!$this->permissionsService->canReadElement($view, 'view', $userId)) return;
+		if (!$this->permissionsService->canReadRowsByElement($view, 'view', $userId)) return;
+		// add the rows count
+		try {
+			$view->setRowsCount($this->rowService->getViewRowsCount($view, $userId));
+		} catch (InternalError|PermissionError $e) {
+		}
+
+		if (!$this->permissionsService->canManageTableById($view->getTableId(), $userId)) return;
 
 		// set hasShares if this table is shared by you (you share it with somebody else)
 		// (senseless if we have no user in context)
@@ -348,12 +355,6 @@ class ViewService extends SuperService {
 			} catch (InternalError $e) {
 			}
 		}
-
-		// add the rows count
-		try {
-			$view->setRowsCount($this->rowService->getViewRowsCount($view, $userId));
-		} catch (InternalError|PermissionError $e) {
-		}
 	}
 
 	/**
@@ -365,9 +366,9 @@ class ViewService extends SuperService {
 	 */
 	public function deleteAllByTable(Table $table, ?string $userId = null): View {
 		// security
-		/*if (!$this->permissionsService->canDeleteRowsByTableId($tableId, $userId)) {
-			throw new PermissionError('delete all rows for table id = '.$tableId.' is not allowed.');
-		} TODO: If you can delete a table you should be allowed to delete the views?!*/
+		if (!$this->permissionsService->canManageTable($table, $userId)) {
+			throw new PermissionError('delete all rows for table id = '.$table->getId().' is not allowed.');
+		}
 		$views = $this->findAll($table,$userId);
 		foreach ($views as $view) {
 			if($view->getIsBaseView()) {

@@ -231,7 +231,6 @@ export default {
 			}
 			const res = await this.$store.dispatch('updateView', { id, data })
 			if (res) {
-				// TODO: Only reload if something changed
 				this.$emit('reload-view')
 				return res
 			} else {

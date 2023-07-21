@@ -55,7 +55,9 @@ class ImportService extends SuperService {
 	 * @throws NotFoundError
 	 */
 	public function import(int $tableId, int $viewId, string $path, bool $createMissingColumns = true): array {
-		//TODO: Permission add to this view
+		if (!$this->permissionsService->canCreateRowsByViewId($viewId)) {
+			throw new PermissionError('create row at the view id = '.$viewId.' is not allowed.');
+		}
 		if ($this->userManager->get($this->userId) === null) {
 			$error = 'No user in context, can not import data. Cancel.';
 			$this->logger->debug($error);

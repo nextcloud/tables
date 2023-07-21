@@ -35,14 +35,6 @@
 				@click="actionShowShare">
 				{{ t('tables', 'Share') }}
 			</NcActionButton>
-			<!--TODO: <NcActionButton v-if="true"
-				:close-after-click="true"
-				@click="actionShowImport(table)">
-				{{ t('tables', 'Import') }}
-				<template #icon>
-					<Import :size="20" />
-				</template>
-			</NcActionButton> -->
 			<NcActionButton
 				:close-after-click="true"
 				@click="actionShowIntegration">
