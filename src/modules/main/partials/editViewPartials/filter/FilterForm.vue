@@ -4,7 +4,6 @@
 			{{ t('tables', 'Filtering rows') }}
 		</div>
 		<div v-for="(filterGroup, i) in mutableFilters" :key="i">
-			<!-- {{ t('tables', 'Group') }} {{ i + 1 }} -->
 			<FilterGroup
 				:filter-group="filterGroup"
 				:columns="columns"
@@ -60,7 +59,6 @@ export default {
 	},
 	methods: {
 		deleteFilterGroup(index) {
-			console.debug('Delete filter group at index ', index)
 			this.mutableFilters.splice(index, 1)
 		},
 		addFilterGroup() {
@@ -75,6 +73,7 @@ export default {
 	display: flex;
 	flex-direction: column;
 }
+
 .filter-text {
 	padding-top: 8px;
 	padding-bottom: 8px;

@@ -112,7 +112,6 @@ export default new Vuex.Store({
 
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/view'))
-				console.debug(res.data)
 				res.data.forEach(view => {
 					if (state.views.filter(v => v.id === view.id).length === 0) {
 						state.views = state.views.concat(view)
@@ -227,7 +226,6 @@ export default new Vuex.Store({
 		},
 
 		setViewHasShares({ state, commit, getters }, { viewId, hasShares }) {
-			console.debug(viewId, hasShares, getters.getView(viewId))
 			const view = getters.getView(viewId)
 			view.hasShares = !!hasShares
 			commit('setView', view)

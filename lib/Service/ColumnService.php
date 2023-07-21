@@ -7,7 +7,6 @@ use Exception;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\TableMapper;
-use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -79,12 +78,14 @@ class ColumnService extends SuperService {
 			$viewColumnIds = $view->getColumnsArray();
 			$viewColumns = [];
 			foreach ($viewColumnIds as $viewColumnId) {
-				if ($viewColumnId < 0) continue;
+				if ($viewColumnId < 0) {
+					continue;
+				}
 				try {
 					$viewColumns[] = $this->mapper->find($viewColumnId);
 				} catch (DoesNotExistException $e) {
-						$this->logger->warning($e->getMessage());
-						throw new NotFoundError($e->getMessage());
+					$this->logger->warning($e->getMessage());
+					throw new NotFoundError($e->getMessage());
 				} catch (MultipleObjectsReturnedException $e) {
 					$this->logger->error($e->getMessage());
 					throw new InternalError($e->getMessage());

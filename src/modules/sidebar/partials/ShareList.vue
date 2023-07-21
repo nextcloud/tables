@@ -125,7 +125,6 @@ import moment from '@nextcloud/moment'
 
 export default {
 	components: {
-		// UserBubble,
 		NcAvatar,
 		NcActionButton,
 		NcActions,
@@ -224,6 +223,7 @@ export default {
 	.high-line-height {
 		line-height: 35px;
 	}
+
 	.manage-button {
 		display: flex;
 		justify-content: center;

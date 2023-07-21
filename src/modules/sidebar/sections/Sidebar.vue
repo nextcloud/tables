@@ -79,7 +79,6 @@ export default {
 	},
 	methods: {
 		handleToggleSidebar(data) {
-			console.debug('toggle sidebar in nav', data)
 			this.showSidebar = data.open ? data.open : false
 			this.activeSidebarTab = data.tab ? data.tab : ''
 		},

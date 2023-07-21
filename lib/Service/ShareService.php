@@ -132,7 +132,7 @@ class ShareService extends SuperService {
 			try {
 				if ($elementType === 'table') {
 					$element = $this->tableMapper->find($share->getNodeId());
-				} else if ($elementType === 'view') {
+				} elseif ($elementType === 'view') {
 					$element = $this->viewMapper->find($share->getNodeId());
 				} else {
 					throw new InternalError('Cannot find element of type '.$elementType);

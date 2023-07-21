@@ -168,7 +168,7 @@ class TableService extends SuperService {
 		} catch (DoesNotExistException $e) {
 			// Create new base view if none exists
 			$view = $this->viewService->create($table->getTitle(), $table->getEmoji(), $table, true);
-			$view = $this->viewService->update($view->getId(), ["columns" => json_encode(array_column($this->columnService->findAllByTable($table->getId()),'id'))]);
+			$view = $this->viewService->update($view->getId(), ["columns" => json_encode(array_column($this->columnService->findAllByTable($table->getId()), 'id'))]);
 			$table->setBaseView($view);
 		}
 		$table->setViews($this->viewService->findAllNotBaseViews($table));
@@ -342,7 +342,7 @@ class TableService extends SuperService {
 			}
 
 			// delete all views for that table
-			$this->viewService->deleteAllByTable($item,$userId);
+			$this->viewService->deleteAllByTable($item, $userId);
 
 			// delete all shares for that table
 			$this->shareService->deleteAllForTable($item);

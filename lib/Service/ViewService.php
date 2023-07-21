@@ -94,7 +94,9 @@ class ViewService extends SuperService {
 				throw new PermissionError('PermissionError: can not read views for tableId '.$table->getId());
 			}
 			$baseView = $this->mapper->findBaseView($table->getId());
-			if(!$skipTableEnhancement) $this->enhanceView($baseView, $userId);
+			if(!$skipTableEnhancement) {
+				$this->enhanceView($baseView, $userId);
+			}
 			return $baseView;
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
@@ -129,7 +131,9 @@ class ViewService extends SuperService {
 		if (!$this->permissionsService->canAccessView($view, $userId)) {
 			throw new PermissionError('PermissionError: can not read view with id '.$id);
 		}
-		if(!$skipEnhancement) $this->enhanceView($view, $userId);
+		if(!$skipEnhancement) {
+			$this->enhanceView($view, $userId);
+		}
 
 		return $view;
 	}
@@ -232,7 +236,9 @@ class ViewService extends SuperService {
 			$view->setLastEditBy($userId);
 			$view->setLastEditAt($time->format('Y-m-d H:i:s'));
 			$view = $this->mapper->update($view);
-			if(!$skipTableEnhancement) $this->enhanceView($view, $userId);
+			if(!$skipTableEnhancement) {
+				$this->enhanceView($view, $userId);
+			}
 			return $view;
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
@@ -312,7 +318,7 @@ class ViewService extends SuperService {
 		// (senseless if we have no user in context)
 		if ($userId !== '') {
 			try {
-				$permissions = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getId(),'view', $userId);
+				$permissions = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getId(), 'view', $userId);
 				/** @noinspection PhpUndefinedMethodInspection */
 				$view->setIsShared(true);
 				$canManageTable = false;
@@ -334,14 +340,18 @@ class ViewService extends SuperService {
 			}
 		}
 
-		if (!$this->permissionsService->canReadRowsByElement($view, 'view', $userId)) return;
+		if (!$this->permissionsService->canReadRowsByElement($view, 'view', $userId)) {
+			return;
+		}
 		// add the rows count
 		try {
 			$view->setRowsCount($this->rowService->getViewRowsCount($view, $userId));
 		} catch (InternalError|PermissionError $e) {
 		}
 
-		if (!$this->permissionsService->canManageTableById($view->getTableId(), $userId)) return;
+		if (!$this->permissionsService->canManageTableById($view->getTableId(), $userId)) {
+			return;
+		}
 
 		// set hasShares if this table is shared by you (you share it with somebody else)
 		// (senseless if we have no user in context)
@@ -369,7 +379,7 @@ class ViewService extends SuperService {
 		if (!$this->permissionsService->canManageTable($table, $userId)) {
 			throw new PermissionError('delete all rows for table id = '.$table->getId().' is not allowed.');
 		}
-		$views = $this->findAll($table,$userId);
+		$views = $this->findAll($table, $userId);
 		foreach ($views as $view) {
 			if($view->getIsBaseView()) {
 				$baseView = $view;
@@ -383,12 +393,12 @@ class ViewService extends SuperService {
 	public function deleteColumnDataFromViews(int $columnId, Table $table) {
 		$views = $this->mapper->findAll($table->getId());
 		foreach ($views as $view) {
-			$filteredSortingRules = array_filter($view->getSortArray(), function($sort) use ($columnId){
+			$filteredSortingRules = array_filter($view->getSortArray(), function ($sort) use ($columnId) {
 				return $sort['columnId'] !== $columnId;
 			});
 			$filteredSortingRules = array_values($filteredSortingRules);
-			$filteredFilters = array_filter($view->getFilterArray(), function($filterGroup) use ($columnId){
-				array_filter($filterGroup, function($filter) use ($columnId){
+			$filteredFilters = array_filter($view->getFilterArray(), function ($filterGroup) use ($columnId) {
+				array_filter($filterGroup, function ($filter) use ($columnId) {
 					return $filter['columnId'] !== $columnId;
 				});
 			});

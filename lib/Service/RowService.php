@@ -169,7 +169,7 @@ class RowService extends SuperService {
 			}
 			$view = $this->viewMapper->find($viewId);
 			$rowIds = $this->mapper->getRowIdsOfView($view, $userId);
-			if(!in_array( $id, $rowIds)) {
+			if(!in_array($id, $rowIds)) {
 				throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
 			}
 
@@ -224,7 +224,7 @@ class RowService extends SuperService {
 			}
 			$view = $this->viewMapper->find($viewId);
 			$rowIds = $this->mapper->getRowIdsOfView($view, $userId);
-			if(!in_array( $id, $rowIds)) {
+			if(!in_array($id, $rowIds)) {
 				throw new PermissionError('User should not be able to access row with id = '.$item->getId());
 			}
 
@@ -283,7 +283,7 @@ class RowService extends SuperService {
 			}
 			$view = $this->viewMapper->find($viewId);
 			$rowIds = $this->mapper->getRowIdsOfView($view, $userId);
-			if(!in_array( $id, $rowIds)) {
+			if(!in_array($id, $rowIds)) {
 				throw new PermissionError('User should not be able to access row with id = '.$item->getId());
 			}
 

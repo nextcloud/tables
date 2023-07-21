@@ -9,7 +9,6 @@ use OCA\Tables\Db\ColumnTypes\SelectionColumnQB;
 use OCA\Tables\Db\ColumnTypes\SuperColumnQB;
 use OCA\Tables\Db\ColumnTypes\TextColumnQB;
 use OCA\Tables\Helper\UserHelper;
-use OCA\Tables\Service\ColumnTypes\TextLineBusiness;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
@@ -39,7 +38,7 @@ class RowMapper extends QBMapper {
 		$this->textColumnQB = $textColumnQB;
 		$this->numberColumnQB = $numberColumnQB;
 		$this->selectionColumnQB = $selectionColumnQB;
-		$this->datetimeColumnQB= $datetimeColumnQB;
+		$this->datetimeColumnQB = $datetimeColumnQB;
 		$this->genericColumnQB = $columnQB;
 		$this->columnMapper = $columnMapper;
 		$this->userHelper = $userHelper;
@@ -101,15 +100,15 @@ class RowMapper extends QBMapper {
 
 	private function getInnerFilterExpressions(&$qb, $filterGroup, int $groupIndex): array {
 		$innerFilterExpressions = [];
-		foreach ($filterGroup as $index=>$filter) {
-			$innerFilterExpressions[] =  $this->buildFilterByColumnType($qb, $filter, $groupIndex.$index);
+		foreach ($filterGroup as $index => $filter) {
+			$innerFilterExpressions[] = $this->buildFilterByColumnType($qb, $filter, $groupIndex.$index);
 		}
 		return $innerFilterExpressions;
 	}
 
 	private function getFilterGroups(&$qb, $filters): array {
 		$filterGroups = [];
-		foreach ($filters as $groupIndex=>$filterGroup) {
+		foreach ($filters as $groupIndex => $filterGroup) {
 			$filterGroups[] = $qb->expr()->andX(...$this->getInnerFilterExpressions($qb, $filterGroup, $groupIndex));
 		}
 		return $filterGroups;
@@ -140,18 +139,18 @@ class RowMapper extends QBMapper {
 	}
 
 	private function addOrderByRules(IQueryBuilder &$qb, $sortArray) {
-		foreach ($sortArray as $index=>$sortRule) {
+		foreach ($sortArray as $index => $sortRule) {
 			$sortMode = $sortRule['mode'];
 			if (!in_array($sortMode, ['ASC', 'DESC'])) {
 				continue;
 			}
 			$sortColumnPlaceholder = 'sortColumn'.$index;
 			$orderString = 'JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'$[*].columnId\'), \'one\', :'.$sortColumnPlaceholder.')), \'.value\'))';
-			if (str_starts_with($sortRule['columnType'],'number')) {
+			if (str_starts_with($sortRule['columnType'], 'number')) {
 				$orderString = 'CAST('.$orderString.' as int)';
 			}
-			$qb->addOrderBy($qb->createFunction($orderString),$sortMode);
-			$qb->setParameter($sortColumnPlaceholder,$sortRule['columnId'], $qb::PARAM_INT);
+			$qb->addOrderBy($qb->createFunction($orderString), $sortMode);
+			$qb->setParameter($sortColumnPlaceholder, $sortRule['columnId'], $qb::PARAM_INT);
 		}
 	}
 

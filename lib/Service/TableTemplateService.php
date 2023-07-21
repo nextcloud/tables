@@ -76,7 +76,7 @@ class TableTemplateService {
 	public function makeTemplate(Table $table, string $template, int $baseViewId): Table {
 		$createColumn = function ($params) use ($table, $baseViewId) {return $this->createColumn($table->getId(), $params, $baseViewId);};
 		$createRow = function ($data) use ($table, $baseViewId) {$this->createRow($table, $baseViewId, $data);};
-		$createView = function ($data) use ($table) {$this->createView($table,$data);};
+		$createView = function ($data) use ($table) {$this->createView($table, $data);};
 		if ($template === 'todo') {
 			$this->makeTodo($createColumn, $createRow);
 		} elseif ($template === 'members') {
