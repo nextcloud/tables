@@ -117,6 +117,7 @@
     "Options" : "Valg",
     "Allowed pattern (regex)" : "Tillatt mønster (regex)",
     "Maximum text length" : "Maksimum tekstlengde",
+    "URL" : "URL",
     "Today as default" : "Idag som standard",
     "Yes" : "Ja",
     "No" : "Nei",

@@ -47,6 +47,7 @@ OC.L10N.register(
     "Prefix" : "Priedēklis",
     "Suffix" : "Piedēklis",
     "Default" : "Noklusējuma",
+    "URL" : "URL",
     "Yes" : "Jā",
     "No" : "Nē",
     "Max" : "Maksimāli",

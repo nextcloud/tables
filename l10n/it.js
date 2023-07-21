@@ -138,6 +138,7 @@ OC.L10N.register(
     "Add option" : "Aggiungi opzione",
     "Allowed pattern (regex)" : "Schema consentito (regex)",
     "Maximum text length" : "Lunghezza massima testo",
+    "URL" : "URL",
     "Today as default" : "Oggi come predefinito",
     "Yes" : "Si",
     "No" : "No",

@@ -111,6 +111,7 @@ OC.L10N.register(
     "Add option" : "Voeg een optie toe",
     "Allowed pattern (regex)" : "Toegestaan patroon (regex)",
     "Maximum text length" : "Maximum tekstlengte",
+    "URL" : "URL",
     "Today as default" : "Vandaag als standaard",
     "Yes" : "Ja",
     "No" : "Nee",

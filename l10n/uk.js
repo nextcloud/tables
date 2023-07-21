@@ -75,6 +75,7 @@ OC.L10N.register(
     "Default" : "За замовчуванням",
     "Options" : "Параметри",
     "Add option" : "Додати варіант",
+    "URL" : "URL",
     "Today as default" : "Типово сьогодні",
     "Yes" : "Так",
     "No" : "Ні",

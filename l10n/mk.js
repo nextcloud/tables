@@ -62,6 +62,7 @@ OC.L10N.register(
     "Suffix" : "Суфикс",
     "Default" : "Стандардно",
     "Options" : "Опции",
+    "URL" : "Адреса",
     "Yes" : "Да",
     "No" : "Не",
     "Defaults" : "Стандарди",

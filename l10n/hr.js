@@ -72,10 +72,11 @@ OC.L10N.register(
     "Options" : "Mogućnosti",
     "Delete option" : "Izbriši mogućnost",
     "Add option" : "Dodaj mogućnost",
-    "Url" : "Url",
+    "URL" : "URL",
     "Yes" : "Da",
     "No" : "Ne",
     "Max" : "Maks.",
+    "Url" : "Url",
     "Confirm" : "Potvrdi",
     "Unchecked" : "Neprovjereno"
 },

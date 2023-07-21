@@ -29,6 +29,7 @@ OC.L10N.register(
     "Italic" : "Italig",
     "Prefix" : "Rhagddodiad",
     "Suffix" : "Ôl-ddodiad",
+    "URL" : "URL",
     "Yes" : "Iawn",
     "No" : "No",
     "Close editor" : "Cau'r golygydd",

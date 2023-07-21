@@ -122,11 +122,12 @@
     "Options" : "选项",
     "Delete option" : "删除选项",
     "Add option" : "添加选项",
-    "Url" : "Url",
+    "URL" : "URL",
     "Yes" : "是",
     "No" : "否",
     "Max" : "最大值",
     "Defaults" : "默认",
+    "Url" : "Url",
     "Close editor" : "关闭编辑器",
     "Confirm" : "确认",
     "Unchecked" : "未选中"

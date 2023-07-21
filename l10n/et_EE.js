@@ -41,6 +41,7 @@ OC.L10N.register(
     "Prefix" : "Eesliide",
     "Suffix" : "Järelliide",
     "Default" : "Vaikeväärtus",
+    "URL" : "URL",
     "Yes" : "Jah",
     "No" : "Ei",
     "Confirm" : "Kinnita"

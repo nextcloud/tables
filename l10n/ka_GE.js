@@ -43,6 +43,7 @@ OC.L10N.register(
     "Prefix" : "პრეფიქსი",
     "Suffix" : "სუფიქსი",
     "Default" : "საწყისი",
+    "URL" : "URL",
     "Yes" : "კი",
     "No" : "არა",
     "Confirm" : "დადასტურება",

@@ -20,6 +20,7 @@ OC.L10N.register(
     "Error" : "﻿ತಪ್ಪಾಗಿದೆ",
     "Search" : "Search",
     "Default" : "ಆರಂಭದ ಪ್ರತಿ",
+    "URL" : "ಜಾಲದ ಕೊಂಡಿ",
     "Yes" : "Yes",
     "No" : "No"
 },

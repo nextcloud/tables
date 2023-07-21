@@ -56,6 +56,7 @@ OC.L10N.register(
     "Code" : "Còdi",
     "Default" : "Defaut",
     "Options" : "Opcions",
+    "URL" : "URL",
     "Yes" : "Òc",
     "No" : "Non",
     "Max" : "Max",

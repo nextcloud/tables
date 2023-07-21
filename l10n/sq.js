@@ -48,6 +48,7 @@ OC.L10N.register(
     "Prefix" : "Parashtesë",
     "Suffix" : "Prapashtesë",
     "Default" : "E paracaktuar",
+    "URL" : "URL",
     "Yes" : "Yes",
     "No" : "Jo",
     "Confirm" : "Konfirmo"

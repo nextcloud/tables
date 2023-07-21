@@ -28,6 +28,7 @@ OC.L10N.register(
     "Error" : "Fehler",
     "Search" : "Search",
     "Default" : "Standard",
+    "URL" : "URL",
     "Yes" : "Yes",
     "No" : "No"
 },

@@ -71,6 +71,7 @@ OC.L10N.register(
     "Options" : "Optziones",
     "Delete option" : "Cantzella sèberu",
     "Add option" : "Agiunghe sèberu",
+    "URL" : "URL",
     "Yes" : "Si",
     "No" : "No",
     "Max" : "Màssimu",

@@ -292,6 +292,7 @@ OC.L10N.register(
     "You can set default values by marking the checkboxes next to the label fields." : "Beállíthatja az alapértelmezett értékeket úgy, hogy bejelöli a címkemezők melletti választógombokat.",
     "Allowed pattern (regex)" : "Engedélyezett minta (regex)",
     "Maximum text length" : "Maximális szöveghossz",
+    "URL" : "URL",
     "Today as default" : "Ma nap alapértelmezettként",
     "Yes" : "Igen",
     "No" : "Nem",

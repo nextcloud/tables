@@ -173,6 +173,7 @@ OC.L10N.register(
     "Add option" : "Lisää valinta",
     "Allowed pattern (regex)" : "Sallittu kaava (regex)",
     "Maximum text length" : "Tekstin enimmäispituus",
+    "URL" : "URL-osoite",
     "Today as default" : "Tänään oletuksena",
     "Yes" : "Kyllä",
     "No" : "Ei",

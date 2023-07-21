@@ -56,6 +56,7 @@ OC.L10N.register(
     "Prefix" : "Tiền tố",
     "Suffix" : "Hậu tố",
     "Default" : "Mặc định",
+    "URL" : "URL",
     "Yes" : "Có",
     "No" : "Không",
     "Max" : "Tối đa",

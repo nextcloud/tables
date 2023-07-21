@@ -23,6 +23,7 @@ OC.L10N.register(
     "Error" : "خاتالىق",
     "Search" : "Search",
     "Default" : "كۆڭۈلدىكى",
+    "URL" : "URL",
     "Yes" : "Yes",
     "No" : "No"
 },

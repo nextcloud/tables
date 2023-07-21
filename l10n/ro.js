@@ -44,6 +44,7 @@ OC.L10N.register(
     "Suffix" : "Sufix",
     "Default" : "Implicit",
     "Options" : "Opțiuni",
+    "URL" : "URL",
     "Yes" : "a",
     "No" : "Nu",
     "Confirm" : "Confirmă"

@@ -60,6 +60,7 @@ OC.L10N.register(
     "Suffix" : "Sufijo",
     "Default" : "Predeterminado",
     "Options" : "Opciones",
+    "URL" : "URL",
     "Yes" : "Sí",
     "No" : "No",
     "Confirm" : "Confirmar",

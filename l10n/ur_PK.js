@@ -17,6 +17,7 @@ OC.L10N.register(
     "group" : "مجموعہ",
     "Error" : "ایرر",
     "Search" : "Search",
+    "URL" : "یو ار ایل",
     "Yes" : "Yes",
     "No" : "No"
 },

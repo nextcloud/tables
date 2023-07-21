@@ -63,10 +63,11 @@ OC.L10N.register(
     "Options" : "Valkostir",
     "Delete option" : "Eyða valkosti",
     "Add option" : "Bæta við valkosti",
-    "Url" : "Slóð (URL)",
+    "URL" : "Slóð",
     "Yes" : "Já",
     "No" : "Nei",
     "Defaults" : "Sjálfgefin gildi",
+    "Url" : "Slóð (URL)",
     "Close editor" : "Loka ritli",
     "Confirm" : "Staðfesta",
     "Unchecked" : "Ekki skoðað"

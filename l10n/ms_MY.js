@@ -23,6 +23,7 @@ OC.L10N.register(
     "Update" : "Kemaskini",
     "Error" : "Ralat",
     "Search" : "Search",
+    "URL" : "URL",
     "Yes" : "Yes",
     "No" : "No"
 },

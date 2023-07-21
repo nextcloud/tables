@@ -34,6 +34,7 @@ OC.L10N.register(
     "Undo" : "Disfacer",
     "Prefix" : "Prefixo",
     "Suffix" : "Suffixo",
+    "URL" : "URL",
     "Yes" : "Si",
     "No" : "No",
     "Confirm" : "Confirmar"

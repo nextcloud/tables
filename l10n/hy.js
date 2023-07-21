@@ -25,6 +25,7 @@ OC.L10N.register(
     "Error" : "Սխալ",
     "Search" : "Search",
     "Default" : "Լռելյայն",
+    "URL" : "URL",
     "Yes" : "Yes",
     "No" : "No"
 },

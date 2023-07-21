@@ -54,6 +54,7 @@ OC.L10N.register(
     "Suffix" : "Sufikso",
     "Default" : "Defaŭlta",
     "Add option" : "Aldoni opcion",
+    "URL" : "Retadreso",
     "Yes" : "Yes",
     "No" : "No",
     "Confirm" : "Konfirmi"

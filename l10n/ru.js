@@ -90,6 +90,7 @@ OC.L10N.register(
     "Options" : "Варианты",
     "Delete option" : "Удалить вариант",
     "Add option" : "Добавить вариант",
+    "URL" : "URL",
     "Yes" : "Да",
     "No" : "Нет",
     "Max" : "Макс",

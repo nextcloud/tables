@@ -40,6 +40,7 @@ OC.L10N.register(
     "Prefix" : "คำนำหน้า",
     "Suffix" : "คำต่อท้าย",
     "Default" : "ค่าเริ่มต้น",
+    "URL" : "URL",
     "Yes" : "ใช่",
     "No" : "ไม่",
     "Confirm" : "ยืนยัน"

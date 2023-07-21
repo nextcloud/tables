@@ -106,9 +106,10 @@ OC.L10N.register(
     "Options" : "Parinktys",
     "Delete option" : "Ištrinti variantą",
     "Add option" : "Pridėti variantą",
-    "Url" : "Url",
+    "URL" : "URL",
     "Yes" : "Taip",
     "No" : "Ne",
+    "Url" : "Url",
     "Close editor" : "Užverti redaktorių",
     "Confirm" : "Patvirtinti",
     "Share was deleted" : "Viešinys buvo ištrintas"

@@ -30,6 +30,7 @@ OC.L10N.register(
     "Error" : "Алдаа",
     "Search" : "Хайх",
     "Undo" : "буцах",
+    "URL" : "URL",
     "Yes" : "Тийм",
     "No" : "Үгүй",
     "Confirm" : "Батлах"

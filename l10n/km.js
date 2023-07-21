@@ -32,6 +32,7 @@ OC.L10N.register(
     "Search" : "ស្វែងរក",
     "Default" : "លំនាំ​ដើម",
     "Options" : "ជម្រើស",
+    "URL" : "URL",
     "Yes" : "Yes",
     "No" : "No"
 },

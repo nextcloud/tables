@@ -40,6 +40,7 @@ OC.L10N.register(
     "Suffix" : "Suffix",
     "Default" : "Bawaan",
     "Options" : "Pilihan",
+    "URL" : "URL",
     "Yes" : "Ya",
     "No" : "Tidak",
     "Max" : "Maksimum",

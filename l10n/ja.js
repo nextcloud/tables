@@ -81,10 +81,11 @@ OC.L10N.register(
     "Options" : "オプション",
     "Delete option" : "選択肢を削除",
     "Add option" : "オプションを追加",
-    "Url" : "URL",
+    "URL" : "URL",
     "Yes" : "はい",
     "No" : "いいえ",
     "Max" : "最大",
+    "Url" : "URL",
     "Close editor" : "エディタを閉じる",
     "Confirm" : "承認",
     "Unchecked" : "未チェック"

@@ -31,6 +31,7 @@ OC.L10N.register(
     "Error" : "Feil",
     "Search" : "Søk",
     "Default" : "Standard",
+    "URL" : "URL",
     "Yes" : "Ja",
     "No" : "Nei"
 },
