@@ -6,15 +6,14 @@ use OC\Collaboration\Reference\ReferenceManager;
 use OCP\Collaboration\Reference\IReference;
 use OCP\Collaboration\Reference\IReferenceProvider;
 
-class TableReferenceProvider implements IReferenceProvider {
-	private TableReferenceHelper $referenceHelper;
+class TableContentReferenceProvider implements IReferenceProvider {
+	private TableContentReferenceHelper $referenceHelper;
 	private ReferenceManager $referenceManager;
 
-	public function __construct(TableReferenceHelper $referenceHelper, ReferenceManager $referenceManager) {
+	public function __construct(TableContentReferenceHelper $referenceHelper, ReferenceManager $referenceManager) {
 		$this->referenceHelper = $referenceHelper;
 		$this->referenceManager = $referenceManager;
 	}
-	//TODO: Test the old TableReferenceProvider (old version)!!!!
 
 	/**
 	 * @inheritDoc

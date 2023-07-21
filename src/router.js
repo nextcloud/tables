@@ -20,6 +20,11 @@ export default new Router({
 			name: 'view',
 		},
 		{
+			path: '/view/:viewId/content',
+			component: DefaultMainView,
+			name: 'view',
+		},
+		{
 			path: '/view/:viewId/row/:rowId',
 			component: DefaultMainView,
 			name: 'row',

@@ -8,7 +8,10 @@ use OCA\Tables\Capabilities;
 use OCA\Tables\Listener\AnalyticsDatasourceListener;
 use OCA\Tables\Listener\TablesReferenceListener;
 use OCA\Tables\Listener\UserDeletedListener;
+use OCA\Tables\Reference\RowReferenceProvider;
 use OCA\Tables\Reference\SearchableTableReferenceProvider;
+use OCA\Tables\Reference\AdvancedTableReferenceProvider;
+use OCA\Tables\Reference\TableContentReferenceProvider;
 use OCA\Tables\Reference\TableReferenceProvider;
 use OCA\Tables\Search\SearchTablesProvider;
 use OCP\AppFramework\App;
@@ -49,7 +52,9 @@ class Application extends App implements IBootstrap {
 			if (version_compare($config->getSystemValueString('version', '0.0.0'), '26.0.0', '<')) {
 				$context->registerReferenceProvider(TableReferenceProvider::class);
 			} else {
-				$context->registerReferenceProvider(SearchableTableReferenceProvider::class);
+				$context->registerReferenceProvider(AdvancedTableReferenceProvider::class);
+				$context->registerReferenceProvider(TableContentReferenceProvider::class);
+				$context->registerReferenceProvider(RowReferenceProvider::class);
 			}
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 		}

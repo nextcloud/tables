@@ -7,6 +7,7 @@ use OC\Collaboration\Reference\LinkReferenceProvider;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\ViewService;
 use OCP\Collaboration\Reference\IReference;
@@ -16,18 +17,18 @@ use OCP\IURLGenerator;
 use Throwable;
 
 class ReferenceHelper {
-	private const RICH_OBJECT_TYPE = Application::APP_ID . '_table';
+	protected ?string $userId;
+	protected IURLGenerator $urlGenerator;
+	protected LinkReferenceProvider $linkReferenceProvider;
+	protected ViewService $viewService;
+	protected ColumnService $columnService;
+	protected RowService $rowService;
 
-	private ?string $userId;
-	private IURLGenerator $urlGenerator;
-	private LinkReferenceProvider $linkReferenceProvider;
-	private ViewService $viewService;
-	private RowService $rowService;
-
-	private IConfig $config;
+	protected IConfig $config;
 
 	public function __construct(IURLGenerator $urlGenerator,
 		ViewService $viewService,
+		ColumnService $columnService,
 		RowService $rowService,
 		LinkReferenceProvider $linkReferenceProvider,
 		?string $userId,
@@ -37,82 +38,18 @@ class ReferenceHelper {
 		$this->linkReferenceProvider = $linkReferenceProvider;
 		$this->viewService = $viewService;
 		$this->rowService = $rowService;
+		$this->columnService = $columnService;
 		$this->config = $config;
 	}
 
 	public function matchReference(string $referenceText): bool {
-		if ($this->userId === null) {
-			return false;
-		}
-		$start = $this->urlGenerator->getAbsoluteURL('/apps/' . Application::APP_ID);
-		$startIndex = $this->urlGenerator->getAbsoluteURL('/index.php/apps/' . Application::APP_ID);
-
-		// link example:
-		// https://nextcloud.local/apps/tables/#/table/3
-		$noIndexMatch = preg_match('/^' . preg_quote($start, '/') . '\/#\/view\/\d+$/i', $referenceText) === 1;
-		$indexMatch = preg_match('/^' . preg_quote($startIndex, '/') . '\/#\/view\/\d+$/i', $referenceText) === 1;
-
-		return $noIndexMatch || $indexMatch;
+		return false;
 	}
 
 	/** @noinspection PhpUndefinedMethodInspection */
 	/** @psalm-suppress InvalidReturnType */
 	public function resolveReference(string $referenceText): ?IReference {
-		if ($this->matchReference($referenceText)) {
-			$viewId = $this->getTableIdFromLink($referenceText);
-			if ($viewId === null || $this->userId === null) {
-				// fallback to opengraph if it matches, but somehow we can't resolve
-				/** @psalm-suppress InvalidReturnStatement */
-				return $this->linkReferenceProvider->resolveReference($referenceText);
-			}
-			try {
-				$view = $this->viewService->find($viewId, $this->userId);
-			} catch (Exception | Throwable $e) {
-				/** @psalm-suppress InvalidReturnStatement */
-				return $this->linkReferenceProvider->resolveReference($referenceText);
-			}
-
-			$reference = new Reference($referenceText);
-			$viewReferenceInfo = [];
-
-			if ($view->getEmoji()) {
-				$reference->setDescription($view->getEmoji() . ' ' . $view->getTitle());
-				$viewReferenceInfo['title'] = $view->getTitle();
-				$viewReferenceInfo['emoji'] = $view->getEmoji();
-			} else {
-				$reference->setTitle($view->getTitle());
-				$viewReferenceInfo['title'] = $view->getTitle();
-			}
-
-			$reference->setDescription($view->getOwnerDisplayName() ?? $view->getOwnership());
-
-			$viewReferenceInfo['ownership'] = $view->getOwnership();
-			$viewReferenceInfo['ownerDisplayName'] = $view->getOwnerDisplayName();
-			$viewReferenceInfo['rowsCount'] = $view->getRowsCount();
-
-			$imageUrl = $this->urlGenerator->getAbsoluteURL(
-				$this->urlGenerator->imagePath(Application::APP_ID, 'app-dark.svg')
-			);
-			$reference->setImageUrl($imageUrl);
-
-			$viewReferenceInfo['link'] = $referenceText;
-			$reference->setUrl($referenceText);
-
-			// add rows data
-			try {
-				$viewReferenceInfo['rows'] = $this->rowService->findAllByView($viewId, 10, 0);
-			} catch (InternalError $e) {
-			} catch (PermissionError $e) {
-			}
-
-			$reference->setRichObject(
-				$this::RICH_OBJECT_TYPE,
-				$viewReferenceInfo,
-			);
-			return $reference;
-		}
-
-		return null;
+		return $this->linkReferenceProvider->resolveReference($referenceText);
 	}
 
 	/**
@@ -123,9 +60,9 @@ class ReferenceHelper {
 		$start = $this->urlGenerator->getAbsoluteURL('/apps/' . Application::APP_ID);
 		$startIndex = $this->urlGenerator->getAbsoluteURL('/index.php/apps/' . Application::APP_ID);
 
-		preg_match('/^' . preg_quote($start, '/') . '\/#\/view\/(\d+)$/i', $url, $matches);
+		preg_match('/^' . preg_quote($start, '/') . '\/#\/view\/(\d+)(?:\/[^\/]+)*$/i', $url, $matches);
 		if (!$matches || count($matches) < 2) {
-			preg_match('/^' . preg_quote($startIndex, '/') . '\/#\/view\/(\d+)$/i', $url, $matches);
+			preg_match('/^' . preg_quote($startIndex, '/') . '\/#\/view\/(\d+)(?:\/[^\/]+)*$/i', $url, $matches);
 		}
 		if ($matches && count($matches) > 1) {
 			return (int) $matches[1];

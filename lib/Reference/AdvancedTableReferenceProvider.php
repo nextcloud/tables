@@ -3,18 +3,67 @@
 namespace OCA\Tables\Reference;
 
 use OC\Collaboration\Reference\ReferenceManager;
+use OCA\Tables\AppInfo\Application;
+use OCP\Collaboration\Reference\ADiscoverableReferenceProvider;
 use OCP\Collaboration\Reference\IReference;
-use OCP\Collaboration\Reference\IReferenceProvider;
+use OCP\IL10N;
+use OCP\IURLGenerator;
 
-class TableReferenceProvider implements IReferenceProvider {
+class AdvancedTableReferenceProvider extends ADiscoverableReferenceProvider {
 	private TableReferenceHelper $referenceHelper;
+	private IL10N $l10n;
+	private IURLGenerator $urlGenerator;
+
 	private ReferenceManager $referenceManager;
 
-	public function __construct(TableReferenceHelper $referenceHelper, ReferenceManager $referenceManager) {
+	public function __construct(
+		IL10N $l10n,
+		IURLGenerator $urlGenerator,
+		TableReferenceHelper $referenceHelper,
+		ReferenceManager $referenceManager
+	) {
 		$this->referenceHelper = $referenceHelper;
+		$this->l10n = $l10n;
+		$this->urlGenerator = $urlGenerator;
 		$this->referenceManager = $referenceManager;
 	}
-	//TODO: Test the old TableReferenceProvider (old version)!!!!
+
+	/**
+	 * @inheritDoc
+	 */
+	public function getId(): string {
+		return Application::APP_ID . '-ref-tables';
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function getTitle(): string {
+		return $this->l10n->t('Nextcloud tables');
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function getOrder(): int {
+		return 10;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function getIconUrl(): string {
+		return $this->urlGenerator->getAbsoluteURL(
+			$this->urlGenerator->imagePath(Application::APP_ID, 'app-dark.svg')
+		);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function getSupportedSearchProviderIds(): array {
+		return ['tables-search-tables'];
+	}
 
 	/**
 	 * @inheritDoc

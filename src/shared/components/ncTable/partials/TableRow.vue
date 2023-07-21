@@ -1,14 +1,16 @@
 <template>
 	<tr v-if="row" :class="{ selected }">
-		<td><NcCheckboxRadioSwitch :checked="selected" @update:checked="v => $emit('update-row-selection', { rowId: row.id, value: v })" /></td>
+		<td v-if="!readOnly" class="firstColumn">
+			<NcCheckboxRadioSwitch :checked="selected" @update:checked="v => $emit('update-row-selection', { rowId: row.id, value: v })" />
+		</td>
 		<td v-for="col in visibleColums" :key="col.id" :class="{ 'search-result': getCell(col.id)?.searchStringFound, 'filter-result': getCell(col.id)?.filterFound }">
 			<component :is="getTableCell(col)"
 				:column="col"
 				:row-id="row.id"
 				:value="getCellValue(col)" />
 		</td>
-		<td>
-			<NcButton v-if="canUpdateData(activeView) || canDeleteData(activeView)" type="primary" :aria-label="t('tables', 'Edit row')" @click="$emit('edit-row', row.id)">
+		<td v-if="!readOnly" class="lastColumn">
+			<NcButton v-if="canUpdateData(view) || canDeleteData(view)" type="primary" :aria-label="t('tables', 'Edit row')" @click="$emit('edit-row', row.id)">
 				<template #icon>
 					<Pencil :size="20" />
 				</template>
@@ -33,7 +35,6 @@ import TableCellMultiSelection from './TableCellMultiSelection.vue'
 import TableCellTextRich from './TableCellEditor.vue'
 import { ColumnTypes } from './../mixins/columnHandler.js'
 import permissionsMixin from '../../../../shared/components/ncTable/mixins/permissionsMixin.js'
-import { mapGetters } from 'vuex'
 
 export default {
 	name: 'TableRow',
@@ -56,6 +57,10 @@ export default {
 
 	mixins: [permissionsMixin],
 	props: {
+		view: {
+			type: Object,
+			default: () => {},
+		},
 		row: {
 			type: Object,
 			default: () => {},
@@ -72,9 +77,12 @@ export default {
 			type: Object,
 			default: null,
 		},
+		readOnly: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	computed: {
-		...mapGetters(['activeView']),
 		getSelection: {
 			get: () => { return this.selected },
 			set: () => { alert('updating selection') },
@@ -172,6 +180,29 @@ tr.selected {
 
 :deep(.checkbox-radio-switch__icon) {
 	margin: 0;
+}
+
+.firstColumn {
+		position: sticky;
+		left: 0;
+		padding-left: calc(var(--default-grid-baseline) * 4);
+		padding-right: calc(var(--default-grid-baseline) * 4);
+		width: 60px;
+		background-color: inherit;
+		z-index: 5;
+	}
+
+.lastColumn {
+	position: sticky;
+	right: 0;
+	width: 55px;
+	background-color: inherit;
+	padding-right: 16px;
+	opacity: 0;
+}
+.lastColumn:hover {
+	// visibility: visible;
+	opacity: 1;
 }
 
 </style>

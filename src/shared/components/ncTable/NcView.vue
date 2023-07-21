@@ -45,7 +45,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				:columns="columns"
 				:selected-rows="selectedRows"
 				:show-options="columns.length !== 0"
-				:table="view"
+				:view="view"
 				:view-setting="viewSetting"
 				@create-row="$emit('create-row')"
 				@download-csv="data => downloadCsv(data, columns, view)"
@@ -59,7 +59,6 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				:rows="rows"
 				:view="view"
 				:view-setting="viewSetting"
-				:is-view="true"
 				@create-row="$emit('create-row')"
 				@import="table => $emit('import', view)"
 				@edit-row="rowId => $emit('edit-row', rowId)"
@@ -126,9 +125,9 @@ export default {
 			default: () => {},
 		},
 		viewSetting: {
-		      type: Object,
-		      default: null,
-		    },
+			type: Object,
+			default: null,
+		},
 	},
 	data() {
 		return {

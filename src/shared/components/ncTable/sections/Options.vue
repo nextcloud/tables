@@ -1,9 +1,9 @@
 <template>
 	<div class="options">
-		<div v-if="showOptions && (canReadData(table) || (canCreateRowInElement(table) && rows.length > 0))" class="fix-col-4" style="justify-content: space-between;">
+		<div v-if="showOptions && (canReadData(view) || (canCreateRowInElement(view) && rows.length > 0))" class="fix-col-4" style="justify-content: space-between;">
 			<div :class="{'add-padding-left': isSmallMobile }"
 				class="actionButtonsLeft">
-				<NcButton v-if="!isSmallMobile && canCreateRowInElement(table)"
+				<NcButton v-if="!isSmallMobile && canCreateRowInElement(view)"
 					:aria-label="t('tables', 'Create row')"
 					:close-after-click="true"
 					type="tertiary"
@@ -13,7 +13,7 @@
 						<Plus :size="25" />
 					</template>
 				</NcButton>
-				<NcButton v-if="isSmallMobile && canCreateRowInElement(table)"
+				<NcButton v-if="isSmallMobile && canCreateRowInElement(view)"
 					:close-after-click="true"
 					:aria-label="t('tables', 'Create Row')"
 					type="tertiary"
@@ -43,7 +43,7 @@
 						</template>
 						{{ t('tables', 'Export CSV') }}
 					</NcActionButton>
-					<NcActionButton v-if="canDeleteData(table)"
+					<NcActionButton v-if="canDeleteData(view)"
 						@click="deleteSelectedRows">
 						<template #icon>
 							<Delete :size="20" />
@@ -102,7 +102,7 @@ export default {
 			type: Boolean,
 			default: true,
 		},
-		table: {
+		view: {
 			type: Object,
 			default: () => {},
 		},

@@ -1,6 +1,6 @@
 <template>
 	<tr>
-		<th>
+		<th v-if="!readOnly" class="firstColumn">
 			<div class="cell-wrapper">
 				<NcCheckboxRadioSwitch :checked="allRowsAreSelected" @update:checked="value => $emit('select-all-rows', value)" />
 				<div v-if="hasRightHiddenNeighbor(-1)" class="hidden-indicator-first" @click="unhide(-1)" />
@@ -9,7 +9,7 @@
 		<th v-for="col in visibleColums" :key="col.id">
 			<div class="cell-wrapper">
 				<div class="cell-options-wrapper">
-					<div class="cell">
+					<div v-if="!readOnly" class="cell">
 						<div class="clickable" @click="updateOpenState(col.id)">
 							{{ col.title }}
 						</div>
@@ -18,6 +18,9 @@
 							:open-state.sync="openedColumnHeaderMenus[col.id]"
 							:can-hide="visibleColums.length > 1"
 							@add-filter="filter => $emit('add-filter', filter)" />
+					</div>
+					<div v-else>
+						{{ col.title }}
 					</div>
 					<div v-if="getFilterForColumn(col)" class="filter-wrapper">
 						<FilterLabel v-for="filter in getFilterForColumn(col)"
@@ -31,7 +34,7 @@
 				<div v-if="hasRightHiddenNeighbor(col.id)" class="hidden-indicator" @click="unhide(col.id)" />
 			</div>
 		</th>
-		<th data-cy="customTableAction">
+		<th v-if="!readOnly" data-cy="customTableAction" class="lastColumn">
 			<NcActions :force-menu="true" :type="isViewSettingSet ? 'secondary' : 'tertiary'">
 				<NcActionCaption v-if="canManageElement(view)" :title="t('tables', 'Manage view')" />
 				<NcActionButton v-if="isViewSettingSet"
@@ -173,6 +176,10 @@ export default {
 		viewSetting: {
 			type: Object,
 			default: null,
+		},
+		readOnly: {
+			type: Boolean,
+			default: false,
 		},
 	},
 
@@ -329,6 +336,24 @@ export default {
 	display: flex;
 	flex-direction: column;
 	width: 100%;
+}
+
+.firstColumn {
+		position: sticky;
+		left: 0;
+		padding-left: calc(var(--default-grid-baseline) * 4);
+		padding-right: calc(var(--default-grid-baseline) * 4);
+		width: 60px;
+		background-color: inherit;
+		z-index: 5;
+	}
+
+.lastColumn {
+	position: sticky;
+	right: 0;
+	width: 55px;
+	background-color: inherit;
+	padding-right: 16px;
 }
 
 </style>

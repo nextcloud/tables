@@ -7,6 +7,7 @@
 					:rows="getSearchedAndFilteredAndSortedRows"
 					:view="view"
 					:view-setting="viewSetting"
+					:read-only="readOnly"
 					@create-row="$emit('create-row')"
 					@import="table => $emit('import', table)"
 					@create-column="$emit('create-column')"
@@ -19,10 +20,12 @@
 			<tbody>
 				<TableRow v-for="(row, index) in getSearchedAndFilteredAndSortedRows"
 					:key="index"
+					:view="view"
 					:row="row"
 					:columns="columns"
 					:selected="isRowSelected(row.id)"
 					:view-setting="viewSetting"
+					:read-only="readOnly"
 					@update-row-selection="updateRowSelection"
 					@edit-row="rowId => $emit('edit-row', rowId)" />
 			</tbody>
@@ -62,7 +65,7 @@ export default {
 			type: Object,
 			default: null,
 		},
-		isView: {
+		readOnly: {
 			type: Boolean,
 			default: false,
 		},
@@ -340,35 +343,6 @@ export default {
 			opacity: 1;
 		}
 	}
-
-	tr>th:first-child,tr>td:first-child {
-		position: sticky;
-		left: 0;
-		padding-left: calc(var(--default-grid-baseline) * 4);
-		padding-right: calc(var(--default-grid-baseline) * 4);
-		width: 60px;
-		background-color: inherit;
-		z-index: 5;
-	}
-
-	tr>th:last-child,tr>td:last-child {
-		position: sticky;
-		right: 0;
-		width: 55px;
-		background-color: inherit;
-		padding-right: 16px;
-	}
-
-	tr>td:last-child {
-		// visibility: hidden;
-		opacity: 0;
-	}
-
-	tr:hover>td:last-child {
-		// visibility: visible;
-		opacity: 1;
-	}
-
 }
 
 </style>
