@@ -29,6 +29,7 @@ OC.L10N.register(
     "Error" : "Səhv",
     "Search" : "Axtarış",
     "Default" : "Susmaya görə",
+    "URL" : "URL",
     "Yes" : "Yes",
     "No" : "No"
 },

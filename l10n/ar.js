@@ -294,6 +294,7 @@ OC.L10N.register(
     "Maximum text length" : "أقصى طول للنص",
     "Allowed types" : "الأنواع المتاحة",
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "تعتمد الأنواع المتاحة على إعدادات النظام الخاص بك. يمكنك استخدام نفس المزودين مثل البحث عن النص الكامل.",
+    "URL" : "رابط URL",
     "Could not load link providers." : "تعذر تحميل مزود الارتباط..",
     "Today as default" : "اليوم كافتراضي",
     "Yes" : "نعم",

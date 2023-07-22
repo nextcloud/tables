@@ -257,6 +257,7 @@ OC.L10N.register(
     "You can set default values by marking the checkboxes next to the label fields." : "Можете да зададете стойности по подразбиране, като маркирате квадратчетата за отметка до полетата с етикети.",
     "Allowed pattern (regex)" : "Разрешен шаблон (регламентен израз)",
     "Maximum text length" : "Максимална дължина на текста",
+    "URL" : "URL адрес",
     "Today as default" : "Днес по подразбиране",
     "Yes" : "Да",
     "No" : "Не",

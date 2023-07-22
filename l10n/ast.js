@@ -27,6 +27,7 @@ OC.L10N.register(
     "Search" : "Guetar",
     "This option is outdated." : "Esta opción ta anticuada.",
     "Options" : "Opciones",
+    "URL" : "URL",
     "Yes" : "Sí",
     "No" : "Non",
     "_{nb} row_::_{nb} rows_" : ["{nb} filera","{nb} fileres"],
