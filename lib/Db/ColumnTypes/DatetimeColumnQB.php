@@ -9,8 +9,8 @@ class DatetimeColumnQB extends SuperColumnQB implements IColumnTypeQB {
 	protected LoggerInterface $logger;
 	protected int $platform;
 
-	public function passSearchValue(IQueryBuilder &$qb, string $unformattedSearchValue, string $operator, string $searchValuePlaceHolder): void {
-		$qb->setParameter($searchValuePlaceHolder, $unformattedSearchValue, $qb::PARAM_STR);
+	public function passSearchValue(IQueryBuilder $qb, string $unformattedSearchValue, string $operator, string $searchValuePlaceHolder): void {
+		$qb->setParameter($searchValuePlaceHolder, $unformattedSearchValue, IQueryBuilder::PARAM_STR);
 
 
 	}

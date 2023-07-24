@@ -13,7 +13,7 @@
 <script>
 import { NcContent, NcAppContent } from '@nextcloud/vue'
 import Navigation from './modules/navigation/sections/Navigation.vue'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import Sidebar from './modules/sidebar/sections/Sidebar.vue'
 
 export default {
@@ -37,30 +37,37 @@ export default {
 	},
 	computed: {
 		...mapState(['tablesLoading']),
+		...mapGetters(['getBaseView']),
 		somethingIsLoading() {
 			return this.tablesLoading || this.loading
 		},
 	},
 	watch: {
 		'$route'(to, from) {
-			if (to.name === 'view') {
-				this.$store.commit('setActiveViewId', parseInt(to.params.viewId))
-			} else if (to.name === 'row') {
-				this.$store.commit('setActiveViewId', parseInt(to.params.viewId))
-				this.$store.commit('setActiveRowId', parseInt(to.params.rowId))
-			}
+			this.routing(to)
 		},
 	},
 	async created() {
 		await this.$store.dispatch('loadTablesFromBE')
 		await this.$store.dispatch('loadViewsSharedWithMeFromBE')
-		const $currentRoute = this.$router.currentRoute
-		if ($currentRoute.name === 'view') {
-			this.$store.commit('setActiveViewId', parseInt($currentRoute.params.viewId))
-		} else if ($currentRoute.name === 'row') {
-			this.$store.commit('setActiveViewId', parseInt($currentRoute.params.viewId))
-			this.$store.commit('setActiveRowId', parseInt($currentRoute.params.rowId))
-		}
+		this.routing(this.$router.currentRoute)
+	},
+	methods: {
+		routing(currentRoute) {
+			if (currentRoute.name === 'view') {
+				this.$store.commit('setActiveViewId', parseInt(currentRoute.params.viewId))
+			} else if (currentRoute.name === 'row') {
+				this.$store.commit('setActiveViewId', parseInt(currentRoute.params.viewId))
+				this.$store.commit('setActiveRowId', parseInt(currentRoute.params.rowId))
+			} else if (currentRoute.name === 'table') {
+				const baseView = this.getBaseView(parseInt(currentRoute.params.tableId))
+				if (baseView) {
+					this.$router.push('/view/' + baseView.id)
+				} else {
+					this.$router.push('/')
+				}
+			}
+		},
 	},
 }
 </script>

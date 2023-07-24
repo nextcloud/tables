@@ -27,7 +27,6 @@ class ImportController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 */
 	public function import(int $tableId, int $viewId, String $path, bool $createMissingColumns = true): DataResponse {
 		return $this->handleError(function () use ($tableId, $viewId, $path, $createMissingColumns) {

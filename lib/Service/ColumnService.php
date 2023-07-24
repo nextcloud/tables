@@ -156,7 +156,8 @@ class ColumnService extends SuperService {
 	 */
 	public function create(
 		?string $userId,
-		int $tableId,
+        int $tableId,
+        int $viewId,
 		string $type,
 		?string $subtype,
 		string $title,
@@ -179,8 +180,6 @@ class ColumnService extends SuperService {
 		?string $selectionDefault,
 
 		?string $datetimeDefault,
-
-		int $viewId,
 		?array $selectedViewIds
 	):Column {
 		// security
@@ -426,7 +425,7 @@ class ColumnService extends SuperService {
 			// if column was not found
 			if($result[$i] === '' && $createUnknownColumns) {
 				$description = $this->l->t('This column was automatically created by the import service.');
-				$result[$i] = $this->create($userId, $tableId, 'text', 'line', $title, false, $description, null, null, null, null, null, null, null, null, null, null, null, null, null, $viewId, []);
+				$result[$i] = $this->create($userId, $tableId, $viewId, 'text', 'line', $title, false, $description, null, null, null, null, null, null, null, null, null, null, null, null, null, []);
 				$countCreatedColumns++;
 			}
 		}

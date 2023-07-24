@@ -14,7 +14,7 @@ use OCP\DB\Types;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
-class Version000603Date20230703000000 extends SimpleMigrationStep {
+class Version000600Date20230703000000 extends SimpleMigrationStep {
 	/**
 	 * @param IOutput $output
 	 * @param Closure $schemaClosure The `\Closure` returns a `ISchemaWrapper`
@@ -54,14 +54,14 @@ class Version000603Date20230703000000 extends SimpleMigrationStep {
 			]);
 			$table->addColumn('created_by', Types::STRING, [
 				'notnull' => true,
-				'length' => 200,
+				'length' => 64,
 			]);
 			$table->addColumn('created_at', Types::DATETIME, [
 				'notnull' => true,
 			]);
 			$table->addColumn('last_edit_by', Types::STRING, [
 				'notnull' => true,
-				'length' => 200,
+				'length' => 64,
 			]);
 			$table->addColumn('last_edit_at', Types::DATETIME, [
 				'notnull' => true,
