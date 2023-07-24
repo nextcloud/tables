@@ -83,7 +83,7 @@ class RowMapper extends QBMapper {
 		return $this->findEntity($qb);
 	}
 
-	private function buildFilterByColumnType(&$qb, array $filter, string $filterId): string {
+	private function buildFilterByColumnType($qb, array $filter, string $filterId): string {
 		try {
 			$qbClassName = 'OCA\Tables\Db\ColumnTypes\\';
 			$type = explode("-", $filter['columnType'])[0];
@@ -98,7 +98,7 @@ class RowMapper extends QBMapper {
 		return '';
 	}
 
-	private function getInnerFilterExpressions(&$qb, $filterGroup, int $groupIndex): array {
+	private function getInnerFilterExpressions($qb, $filterGroup, int $groupIndex): array {
 		$innerFilterExpressions = [];
 		foreach ($filterGroup as $index => $filter) {
 			$innerFilterExpressions[] = $this->buildFilterByColumnType($qb, $filter, $groupIndex.$index);
@@ -106,7 +106,7 @@ class RowMapper extends QBMapper {
 		return $innerFilterExpressions;
 	}
 
-	private function getFilterGroups(&$qb, $filters): array {
+	private function getFilterGroups($qb, $filters): array {
 		$filterGroups = [];
 		foreach ($filters as $groupIndex => $filterGroup) {
 			$filterGroups[] = $qb->expr()->andX(...$this->getInnerFilterExpressions($qb, $filterGroup, $groupIndex));
@@ -138,7 +138,7 @@ class RowMapper extends QBMapper {
 		}
 	}
 
-	private function addOrderByRules(IQueryBuilder &$qb, $sortArray) {
+	private function addOrderByRules(IQueryBuilder $qb, $sortArray) {
 		foreach ($sortArray as $index => $sortRule) {
 			$sortMode = $sortRule['mode'];
 			if (!in_array($sortMode, ['ASC', 'DESC'])) {
@@ -150,7 +150,7 @@ class RowMapper extends QBMapper {
 				$orderString = 'CAST('.$orderString.' as int)';
 			}
 			$qb->addOrderBy($qb->createFunction($orderString), $sortMode);
-			$qb->setParameter($sortColumnPlaceholder, $sortRule['columnId'], $qb::PARAM_INT);
+			$qb->setParameter($sortColumnPlaceholder, $sortRule['columnId'], IQueryBuilder::PARAM_INT);
 		}
 	}
 
@@ -180,7 +180,7 @@ class RowMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select($qb->func()->count('*', 'counter'))
 			->from($this->table)
-			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), $qb::PARAM_INT)));
+			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), IQueryBuilder::PARAM_INT)));
 
 		$neededColumnIds = $this->getAllColumnIdsFromView($view);
 		$neededColumns = $this->columnMapper->getColumnTypes($neededColumnIds);
@@ -202,7 +202,7 @@ class RowMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('id')
 			->from($this->table)
-			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), $qb::PARAM_INT)));
+			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), IQueryBuilder::PARAM_INT)));
 
 		$neededColumnIds = $this->getAllColumnIdsFromView($view);
 		$neededColumns = $this->columnMapper->getColumnTypes($neededColumnIds);
@@ -223,7 +223,7 @@ class RowMapper extends QBMapper {
 	}
 
 
-	private function addFilterToQuery(IQueryBuilder &$qb, View $view, array $neededColumns, string $userId): void {
+	private function addFilterToQuery(IQueryBuilder $qb, View $view, array $neededColumns, string $userId): void {
 		$enrichedFilters = $view->getFilterArray();
 		if (count($enrichedFilters) > 0) {
 			foreach ($enrichedFilters as &$filterGroup) {
@@ -253,7 +253,7 @@ class RowMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
-			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), $qb::PARAM_INT)));
+			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), IQueryBuilder::PARAM_INT)));
 
 
 		$neededColumnIds = $this->getAllColumnIdsFromView($view);

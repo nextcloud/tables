@@ -50,6 +50,7 @@ class ColumnMapper extends QBMapper {
 	 * @return array<string> Array with key = columnId and value = [column-type]-[column-subtype]
 	 * @throws Exception
 	 */
+
 	public function getColumnTypes(array $neededColumnIds): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('id', 'type', 'subtype')
@@ -57,6 +58,7 @@ class ColumnMapper extends QBMapper {
 			->where('id IN (:columnIds)')
 			->setParameter('columnIds', $neededColumnIds, IQueryBuilder::PARAM_INT_ARRAY);
 
+		// Initialise return array with column types of the meta columns: id, created_by, created_at, last_edit_by, last_edit_at
 		$out = [
 			-1 => 'number',
 			-2 => 'text-line',

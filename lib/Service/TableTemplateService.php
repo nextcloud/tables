@@ -779,6 +779,9 @@ class TableTemplateService {
 			// tableId
 			$tableId,
 
+			// baseViewId
+			$baseViewId,
+
 			// column type
 			(isset($parameters['type'])) ? $parameters['type'] : 'text',
 
@@ -832,9 +835,6 @@ class TableTemplateService {
 
 			// datetimeDefault
 			(isset($parameters['datetimeDefault'])) ? $parameters['datetimeDefault'] : '',
-
-			// baseViewId
-			$baseViewId,
 
 			// additional view ids
 			[]

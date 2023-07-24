@@ -45,7 +45,6 @@ class RowController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 */
 	public function create(
 		int $tableId,
@@ -64,7 +63,6 @@ class RowController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 */
 	public function createComplete(
 		int $tableId,

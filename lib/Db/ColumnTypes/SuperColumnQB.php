@@ -22,7 +22,7 @@ class SuperColumnQB implements IColumnTypeQB {
 	public function formatCellValue(string $unformattedValue): string {
 		return 'JSON_UNQUOTE(LOWER('.$unformattedValue.'))';
 	}
-	public function passSearchValue(IQueryBuilder &$qb, string $unformattedSearchValue, string $operator, string $searchValuePlaceHolder): void {
+	public function passSearchValue(IQueryBuilder $qb, string $unformattedSearchValue, string $operator, string $searchValuePlaceHolder): void {
 		$lowerCaseSearchValue = strtolower($unformattedSearchValue);
 		switch ($operator) {
 			case 'begins-with':
@@ -37,7 +37,7 @@ class SuperColumnQB implements IColumnTypeQB {
 			default:
 				break;
 		}
-		$qb->setParameter($searchValuePlaceHolder, $lowerCaseSearchValue, $qb::PARAM_STR);
+		$qb->setParameter($searchValuePlaceHolder, $lowerCaseSearchValue, IQueryBuilder::PARAM_STR);
 	}
 
 	/**
@@ -88,11 +88,11 @@ class SuperColumnQB implements IColumnTypeQB {
 		}
 	}
 
-	public function addWhereFilterExpression(IQueryBuilder &$qb, array $filter, string $filterId): IQueryFunction {
+	public function addWhereFilterExpression(IQueryBuilder $qb, array $filter, string $filterId): IQueryFunction {
 		$searchValuePlaceHolder = 'searchValue'.$filterId;
 		$columnPlaceHolder = 'column'.$filterId;
 		if($filter['columnId'] >= 0) {
-			$qb->setParameter($columnPlaceHolder, $filter['columnId'], $qb::PARAM_INT);
+			$qb->setParameter($columnPlaceHolder, $filter['columnId'], IQueryBuilder::PARAM_INT);
 			$formattedCellValue = $this->getFormattedDataCellValue($columnPlaceHolder);
 		} else {
 			$formattedCellValue = $this->getFormattedMetaDataCellValue($filter['columnId']);
@@ -103,7 +103,7 @@ class SuperColumnQB implements IColumnTypeQB {
 
 	}
 
-	public function addWhereForFindAllWithColumn(IQueryBuilder &$qb, int $columnId): void {
+	public function addWhereForFindAllWithColumn(IQueryBuilder $qb, int $columnId): void {
 		if ($this->platform === self::DB_PLATFORM_PGSQL) {
 			// due to errors using doctrine with json, I paste the columnId inline.
 			// columnId is a number, ensured by the parameter definition

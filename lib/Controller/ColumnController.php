@@ -26,8 +26,8 @@ class ColumnController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function index(int $viewId, int $tableId): DataResponse {
-		return $this->handleError(function () use ($viewId, $tableId) {
+	public function index(int $tableId, int $viewId): DataResponse {
+		return $this->handleError(function () use ($tableId, $viewId) {
 			return $this->service->findAllByTable($tableId, $viewId);
 		});
 	}
@@ -55,13 +55,13 @@ class ColumnController extends Controller {
 	 */
 	public function create(
 		int $tableId,
+		int $viewId,
 		string $type,
 		?string $subtype,
 		string $title,
 		bool $mandatory,
 		?string $description,
 		?int $orderWeight,
-
 
 		?string $textDefault,
 		?string $textAllowedPattern,
@@ -78,12 +78,11 @@ class ColumnController extends Controller {
 		?string $selectionDefault,
 
 		?string $datetimeDefault,
-
-		int $viewId,
 		?array $selectedViewIds
 	): DataResponse {
 		return $this->handleError(function () use (
 			$tableId,
+			$viewId,
 			$type,
 			$subtype,
 			$title,
@@ -106,12 +105,11 @@ class ColumnController extends Controller {
 			$selectionDefault,
 
 			$datetimeDefault,
-
-			$viewId,
 			$selectedViewIds) {
 			return $this->service->create(
 				$this->userId,
 				$tableId,
+				$viewId,
 				$type,
 				$subtype,
 				$title,
@@ -134,8 +132,6 @@ class ColumnController extends Controller {
 				$selectionDefault,
 
 				$datetimeDefault,
-
-				$viewId,
 				$selectedViewIds);
 		});
 	}

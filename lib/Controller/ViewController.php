@@ -73,9 +73,8 @@ class ViewController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 */
-	public function create(int $tableId, string $title, string $emoji): DataResponse {
+	public function create(int $tableId, string $title, ?string $emoji): DataResponse {
 		return $this->handleError(function () use ($tableId, $title, $emoji) {
 			return $this->service->create($title, $emoji, $this->getTable($tableId, true));
 		});

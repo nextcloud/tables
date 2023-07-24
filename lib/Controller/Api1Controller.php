@@ -286,6 +286,7 @@ class Api1Controller extends ApiController {
 	 */
 	public function createTableColumn(
 		int $tableId,
+		int $viewId,
 		string $title,
 		string $type,
 		?string $subtype,
@@ -311,6 +312,7 @@ class Api1Controller extends ApiController {
 	): DataResponse {
 		return $this->handleError(function () use (
 			$tableId,
+			$viewId,
 			$type,
 			$subtype,
 			$title,
@@ -337,6 +339,7 @@ class Api1Controller extends ApiController {
 			return $this->columnService->create(
 				$this->userId,
 				$tableId,
+				$viewId,
 				$type,
 				$subtype,
 				$title,
