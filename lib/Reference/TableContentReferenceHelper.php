@@ -78,6 +78,7 @@ class TableContentReferenceHelper extends ReferenceHelper {
 			$viewReferenceInfo['ownership'] = $view->getOwnership();
 			$viewReferenceInfo['ownerDisplayName'] = $view->getOwnerDisplayName();
 			$viewReferenceInfo['rowsCount'] = $view->getRowsCount();
+			$viewReferenceInfo['columnIds'] = $view->getColumnsArray();
 
 			$imageUrl = $this->urlGenerator->getAbsoluteURL(
 				$this->urlGenerator->imagePath(Application::APP_ID, 'app-dark.svg')

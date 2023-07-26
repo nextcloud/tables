@@ -1,8 +1,11 @@
 <template>
 	<div class="picker-content">
-		<h2>
+		<h2 class="picker-title">
 			{{ getTitle }}
 		</h2>
+		<h3>
+			{{ t('tables', '1. Choose view') }}
+		</h3>
 		<div class="smart-picker-search" :class="{ 'with-empty-content': true }">
 			<NcSearch :selection.sync="selectedResult" :provider="provider" :search-placeholder="t('tables', 'Search table or view')" />
 			<NcEmptyContent v-if="selectedResult === null"
@@ -18,6 +21,9 @@
 			<div v-else class="search-content">
 				<div v-if="!viewObject" class="icon-loading" />
 				<div v-else style="width:100%">
+					<h3>
+						{{ t('tables', '2. Choose preview type') }}
+					</h3>
 					<div class="reference-style">
 						<NcCheckboxRadioSwitch :checked.sync="referenceType" value="link" type="radio" class="reference-option">
 							{{ t('tables', 'Link to table') }}
@@ -29,19 +35,32 @@
 							{{ t('tables', 'Row from table') }}
 						</NcCheckboxRadioSwitch>
 					</div>
-					<CustomTable
-						v-if="referenceType != 'link'"
-						:columns="viewObject.columns"
-						:rows="viewObject.rows"
-						:view="null"
-						:view-setting="{}"
-						:read-only="true" />
+					<div v-if="referenceType === 'row'" class="row-picker">
+						<h3>
+							{{ t('tables', '3. Choose table row') }}
+						</h3>
+						<RowPickerTable
+							:columns="viewObject.columns"
+							:rows="viewObject.rows"
+							:view="viewObject.view"
+							:selected-row-id="selectedRowId"
+							@update-selected-row-id="id => selectedRowId = id" />
+					</div>
+					<h3>
+						{{ t('tables', 'Preview') }}
+					</h3>
+					<TableReferenceWidget v-if="referenceType === 'link'" :rich-object="viewObject.view" />
+					<TableContentReferenceWidget v-else-if="referenceType === 'content'" :rich-object="enrichedView" />
+					<RowReferenceWidget v-if="referenceType === 'row' && selectedRowId" :rich-object="enrichedView" />
 				</div>
 			</div>
 		</div>
 		<div class="select-button">
-			<NcButton type="primary" :disabled="viewObject === null" :aria-label="t('tables', 'Select')" @click="selectReference">
-				{{ t('tables', 'Select') }}
+			<NcButton type="primary" :disabled="viewObject === null || (referenceType === 'row' && !selectedRowId)" :aria-label="t('tables', 'Select')" @click="selectReference">
+				<template #icon>
+					<Check :size="20" />
+				</template>
+				{{ t('tables', 'Confirm selection') }}
 			</NcButton>
 		</div>
 	</div>
@@ -49,6 +68,7 @@
 
 <script>
 
+import Check from 'vue-material-design-icons/Check.vue'
 import { NcEmptyContent, NcCheckboxRadioSwitch, NcButton } from '@nextcloud/vue'
 
 import { translate as t } from '@nextcloud/l10n'
@@ -57,20 +77,29 @@ import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 
 import LinkVariantIcon from 'vue-material-design-icons/LinkVariant.vue'
-import CustomTable from '../shared/components/ncTable/sections/CustomTable.vue'
 import { MetaColumns } from '../shared/components/ncTable/mixins/metaColumns.js'
 import { parseCol } from '../shared/components/ncTable/mixins/columnParser.js'
 import NcSearch from './NcSearch.vue'
+
+import TableReferenceWidget from './TableReferenceWidget.vue'
+import TableContentReferenceWidget from './TableContentReferenceWidget.vue'
+import RowReferenceWidget from './RowReferenceWidget.vue'
+import RowPickerTable from './RowPickerTable.vue'
 
 export default {
 	name: 'TableReferencePickerElement',
 	components: {
 		LinkVariantIcon,
 		NcEmptyContent,
-		CustomTable,
 		NcCheckboxRadioSwitch,
 		NcButton,
 		NcSearch,
+		TableReferenceWidget,
+		TableContentReferenceWidget,
+		RowReferenceWidget,
+		RowPickerTable,
+		Check
+
 	},
 	props: {
 		providerId: {
@@ -111,6 +140,19 @@ export default {
 		getTitle() {
 			return t('tables', 'Table picker')
 		},
+		enrichedView() {
+			let view = this.viewObject.view
+			view.columns = this.viewObject.columns
+			if (this.referenceType === 'content') {
+				view.rows = this.viewObject.rows
+			} else if (this.referenceType === 'row') {
+				view = {
+					...view,
+					rows: [this.viewObject.rows.find(row => row.id === this.selectedRowId)],
+				}
+			}
+			return view
+		},
 	},
 	watch: {
 		selectedResult() {
@@ -123,12 +165,11 @@ export default {
 	},
 	methods: {
 		selectReference() {
-			console.debug("Select", this.selectedResult, this.referenceType)
 			let linkUrl = this.selectedResult.resourceUrl
 			if (this.referenceType === 'content') {
 				linkUrl += '/content'
 			} else if (this.referenceType === 'row') {
-				linkUrl += '/row/' + this.viewObject.rows[0].id
+				linkUrl += '/row/' + this.selectedRowId
 			}
 			this.$emit('submit', linkUrl)
 		},
@@ -152,12 +193,8 @@ export default {
 <style scoped lang="scss">
 .picker-content {
 	width: 100%;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: space-between;
 	padding: 16px;
-	overflow-y: auto;
+	overflow-y: scroll;
 	max-height: 800px;
 
 	h2 {
@@ -195,17 +232,31 @@ export default {
 	justify-content: space-between;
 }
 .search-content {
-	padding: 16px;
+	padding: 16px 0;
 }
 .reference-option {
 	padding: 4px 12px;
 
 }
 .select-button {
-	padding-top: 16px;
+	bottom: 0;
 	width: 100%;
 	display: flex;
 	align-items: end;
 	flex-direction: column;
+	position:sticky;
 }
+
+.row-picker {
+	width: 100%;
+}
+.picker-title {
+	display: flex;
+    justify-content: center;
+}
+h3 {
+	font-weight: bold;
+	color: var(--color-text-lighter);
+}
+
 </style>

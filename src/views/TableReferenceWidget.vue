@@ -48,6 +48,7 @@
 <script>
 import TablesIcon from '../icons/TablesIcon.vue'
 import { NcUserBubble, NcCounterBubble } from '@nextcloud/vue'
+import { translatePlural as n } from '@nextcloud/l10n'
 
 export default {
 	name: 'TableReferenceWidget',
@@ -77,6 +78,10 @@ export default {
 		emoji() {
 			return this.richObject.emoji
 		},
+	},
+
+	methods: {
+		n,
 	},
 }
 </script>

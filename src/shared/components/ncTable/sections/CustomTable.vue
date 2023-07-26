@@ -1,6 +1,6 @@
 <template>
 	<div class="container">
-		<table>
+		<table class="custom-table">
 			<thead>
 				<TableHeader :columns="columns"
 					:selected-rows="selectedRows"
@@ -18,7 +18,9 @@
 					@delete-filter="id => $emit('delete-filter', id)" />
 			</thead>
 			<tbody>
-				<TableRow v-for="(row, index) in getSearchedAndFilteredAndSortedRows"
+				<TableRow
+					v-for="(row, index) in getSearchedAndFilteredAndSortedRows"
+					:id="'row'+row.id"
 					:key="index"
 					:view="view"
 					:row="row"
@@ -37,7 +39,7 @@
 import TableHeader from '../partials/TableHeader.vue'
 import TableRow from '../partials/TableRow.vue'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { MagicFields } from '../mixins/magicFields.js'
 
 export default {
@@ -81,6 +83,7 @@ export default {
 	computed: {
 
 		...mapGetters(['getColumnById']),
+		...mapState(['activeRowId']),
 
 		getSearchedAndFilteredAndSortedRows() {
 			// if we have to sort
@@ -208,6 +211,12 @@ export default {
 
 	mounted() {
 		subscribe('tables:selected-rows:deselect', this.deselectAllRows)
+		if (!this.readOnly && this.activeRowId) {
+			this.selectedRows.push(this.activeRowId)
+			document.getElementById('row' + this.activeRowId).scrollIntoView({ behavior: 'smooth' })
+			this.$store.commit('setActiveRowId', null)
+		}
+
 	},
 	beforeDestroy() {
 		unsubscribe('tables:selected-rows:deselect', this.deselectAllRows)
@@ -271,12 +280,12 @@ export default {
 	overflow-x: auto;
 }
 
-:deep(table) {
+:deep(table.custom-table) {
 	position: relative;
 	border-collapse: collapse;
 	border-spacing: 0;
 	table-layout: auto;
-	width: 100%;
+	width: 100% !important;
 	border: none;
 
 	* {
@@ -286,6 +295,7 @@ export default {
 
 	td, th {
 		padding-right: 8px;
+		border: none !important;
 	}
 
 	td .showOnHover, th .showOnHover {

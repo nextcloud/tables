@@ -3,6 +3,9 @@
 		<td v-if="!readOnly" class="firstColumn">
 			<NcCheckboxRadioSwitch :checked="selected" @update:checked="v => $emit('update-row-selection', { rowId: row.id, value: v })" />
 		</td>
+		<td v-if="selectRow" class="firstColumn">
+			<NcCheckboxRadioSwitch :checked="selected" type="radio" @update:checked="v => $emit('update-row-selection', { rowId: row.id })" />
+		</td>
 		<td v-for="col in visibleColums" :key="col.id" :class="{ 'search-result': getCell(col.id)?.searchStringFound, 'filter-result': getCell(col.id)?.filterFound }">
 			<component :is="getTableCell(col)"
 				:column="col"
@@ -78,6 +81,10 @@ export default {
 			default: null,
 		},
 		readOnly: {
+			type: Boolean,
+			default: false,
+		},
+		selectRow: {
 			type: Boolean,
 			default: false,
 		},
@@ -188,7 +195,7 @@ tr.selected {
 		padding-left: calc(var(--default-grid-baseline) * 4);
 		padding-right: calc(var(--default-grid-baseline) * 4);
 		width: 60px;
-		background-color: inherit;
+		background-color: var(--color-main-background);
 		z-index: 5;
 	}
 

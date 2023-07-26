@@ -20,11 +20,11 @@
   -->
 
 <template>
-	<div v-if="richObject" class="tables-table">
+	<div v-if="richObject">
 		<h2>{{ richObject.emoji }}&nbsp;{{ richObject.title }}</h2>
 		<CustomTable
 			:columns="columns"
-			:rows="richObject.rows"
+			:rows="rows"
 			:view="null"
 			:view-setting="{}"
 			:read-only="true" />
@@ -32,21 +32,17 @@
 </template>
 
 <script>
-import TablesIcon from '../icons/TablesIcon.vue'
-import { NcUserBubble, NcCounterBubble } from '@nextcloud/vue'
+import { AbstractColumn } from '../shared/components/ncTable/mixins/columnClass.js'
 import CustomTable from '../shared/components/ncTable/sections/CustomTable.vue'
 import { parseCol } from '../shared/components/ncTable/mixins/columnParser.js'
+import { MetaColumns } from '../shared/components/ncTable/mixins/metaColumns.js'
 
 export default {
 	name: 'RowReferenceWidget',
 
 	components: {
-		TablesIcon,
-		NcUserBubble,
-		NcCounterBubble,
 		CustomTable,
 	},
-
 	props: {
 		richObjectType: {
 			type: String,
@@ -61,63 +57,26 @@ export default {
 			default: true,
 		},
 	},
-
 	computed: {
 		emoji() {
 			return this.richObject.emoji
 		},
 		columns() {
-			console.debug(this.richObjectType, this.richObject)
-			return this.richObject.columns.map(col => parseCol(col))
+			const columns = this.richObject.columns
+			const columnIds = this.richObject.columnIds
+
+			if (columns.length >= 0 && !(columns[0] instanceof AbstractColumn)) {
+				let allColumns = columns.map(col => parseCol(col)).concat(MetaColumns.filter(col => columnIds.includes(col.id)))
+				allColumns = allColumns.sort(function(a, b) {
+					return columnIds.indexOf(a.id) - columnIds.indexOf(b.id)
+				})
+				return allColumns
+			}
+			return columns
+		},
+		rows() {
+			return this.richObject.rows
 		},
 	},
 }
 </script>
-
-<style scoped lang="scss">
-.tables-table {
-	width: 100%;
-	white-space: normal;
-	padding: 12px;
-	display: flex;
-    flex-direction: column;
-
-	a {
-		padding: 0 !important;
-		&:not(:hover) {
-			text-decoration: unset !important;
-		}
-
-	}
-
-	.line {
-		font-size: 1.3em;
-		padding-bottom: calc(var(--default-grid-baseline) * 2);
-	}
-
-	&--image {
-		margin-right: 12px;
-		display: flex;
-		align-items: center;
-		.table-emoji {
-			display: flex;
-			align-items: center;
-			height: 50px;
-			font-size: 50px;
-		}
-	}
-
-	.spacer {
-		flex-grow: 1;
-	}
-
-	.details {
-		display: inline-flex;
-		align-items: self-start;
-	}
-}
-
-:deep(.counter-bubble__counter) {
-	max-width: fit-content !important;
-}
-</style>

@@ -6,6 +6,7 @@
 				<div v-if="hasRightHiddenNeighbor(-1)" class="hidden-indicator-first" @click="unhide(-1)" />
 			</div>
 		</th>
+		<th v-if="selectRow" />
 		<th v-for="col in visibleColums" :key="col.id">
 			<div class="cell-wrapper">
 				<div class="cell-options-wrapper">
@@ -178,6 +179,10 @@ export default {
 			default: null,
 		},
 		readOnly: {
+			type: Boolean,
+			default: false,
+		},
+		selectRow: {
 			type: Boolean,
 			default: false,
 		},

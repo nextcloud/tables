@@ -100,7 +100,6 @@ export default {
 			rows: state => state.data.rows,
 			viewSetting: state => state.data.viewSetting,
 		}),
-		...mapState(['activeRowId']),
 		...mapGetters(['activeView']),
 		isLoading() {
 			return (this.loading || this.localLoading) && (!this.editView)
@@ -118,25 +117,6 @@ export default {
 	watch: {
 		activeView() {
 			this.reload()
-			if (this.activeRowId) {
-				this.addFilter({
-					columnId: -1,
-					operator: Filters.IsEqual,
-					value: this.activeRowId.toString(),
-				})
-				this.$store.commit('setActiveRowId', null)
-			}
-		},
-		activeRowId() {
-			if (this.activeRowId) {
-				this.viewSetting.filter = null
-				this.addFilter({
-					columnId: -1,
-					operator: Filters.IsEqual,
-					value: this.activeRowId.toString(),
-				})
-				this.$store.commit('setActiveRowId', null)
-			}
 		},
 	},
 	mounted() {
