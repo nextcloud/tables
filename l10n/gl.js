@@ -96,7 +96,7 @@ OC.L10N.register(
     "Add your first row" : "Engadir a súa primeira fila",
     "Edit a row" : "Editar unha fila",
     "Add a new column" : "Engadir unha nova columna",
-    "Read the docs" : "Ler os documentos",
+    "Read the docs" : "Lea os documentos",
     "No title given" : "Non se indicou ningún título",
     "Tables" : "Táboas",
     "Manage data the way you need it." : "Xestione os datos da forma que necesite.",
