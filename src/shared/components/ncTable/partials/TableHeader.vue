@@ -236,15 +236,23 @@ export default {
 				data.data.columns = JSON.stringify(this.columns.map(col => col.id))
 			}
 			if (this.viewSetting.sorting) {
-				data.data.sort = JSON.stringify([this.viewSetting.sorting[0]])
+				data.data.sort = JSON.stringify([...this.view.sort, this.viewSetting.sorting[0]])
 			}
 			if (this.viewSetting.filter && this.viewSetting.filter.length !== 0) {
-				const filteringRules = [this.viewSetting.filter.map(fil => ({
+				const filteringRules = this.viewSetting.filter.map(fil => ({
 					columnId: fil.columnId,
 					operator: fil.operator.id,
 					value: fil.value,
-				}))]
-				data.data.filter = JSON.stringify(filteringRules)
+				}))
+				const newFilter = []
+				if (this.view.filter && this.view.filter.length !== 0) {
+					this.view.filter.forEach(filterGroup => {
+						newFilter.push([...filterGroup, ...filteringRules])
+					})
+				} else {
+					newFilter[0] = filteringRules
+				}
+				data.data.filter = JSON.stringify(newFilter)
 			}
 			return data
 		},

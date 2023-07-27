@@ -180,7 +180,26 @@ class PermissionsService {
 	 * @param string|null $userId
 	 * @return bool
 	 */
+	public function canUpdateRowsByTableId(int $tableId, ?string $userId = null): bool {
+		return $this->checkPermissionById($tableId, 'table', 'manage', $userId);
+	}
+
+
+	/**
+	 * @param int $tableId
+	 * @param string|null $userId
+	 * @return bool
+	 */
 	public function canDeleteRowsByViewId(int $viewId, ?string $userId = null): bool {
+		return $this->checkPermissionById($tableId, 'table', 'manage', $userId);
+	}
+
+	/**
+	 * @param int $tableId
+	 * @param string|null $userId
+	 * @return bool
+	 */
+	public function canDeleteRowsByTableId(int $viewId, ?string $userId = null): bool {
 		return $this->checkPermissionById($viewId, 'view', 'delete', $userId);
 	}
 
