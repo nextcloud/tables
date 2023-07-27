@@ -851,7 +851,10 @@ class TableTemplateService {
 		}
 		try {
 			$this->rowService->createComplete($viewId, $table->getId(), $data);
-		} catch (PermissionError|Exception $e) {
+		} catch (PermissionError $e) {
+			$this->logger->warning('Cannot create row, permission denied: '.$e->getMessage());
+		} catch (Exception $e) {
+			$this->logger->warning('Exception occured while creating a row: '.$e->getMessage());
 		}
 	}
 
@@ -859,7 +862,10 @@ class TableTemplateService {
 		try {
 			$view = $this->viewService->create($data['title'], $data['emoji'], $table);
 			$this->viewService->update($view->getId(), $data);
-		} catch (PermissionError|Exception $e) {
+		} catch (PermissionError $e) {
+			$this->logger->warning('Cannot create view, permission denied: '.$e->getMessage());
+		} catch (Exception $e) {
+			$this->logger->warning('Exception occured while creating a row: '.$e->getMessage());
 		}
 	}
 }

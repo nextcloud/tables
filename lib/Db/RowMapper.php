@@ -169,6 +169,7 @@ class RowMapper extends QBMapper {
 			$result = $this->findOneQuery($qb);
 			return (int)$result['counter'];
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+			$this->logger->warning('Exception occured: '.$e->getMessage().' Returning 0.');
 			return 0;
 		}
 	}
@@ -193,6 +194,7 @@ class RowMapper extends QBMapper {
 			$result = $this->findOneQuery($qb);
 			return (int)$result['counter'];
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+			$this->logger->warning('Exception occured: '.$e->getMessage().' Returning 0.');
 			return 0;
 		}
 	}
@@ -352,6 +354,7 @@ class RowMapper extends QBMapper {
 			$result = $this->findOneQuery($qb);
 			return (int)$result['counter'];
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+			$this->logger->warning('Exception occured: '.$e->getMessage().' Returning 0.');
 			return 0;
 		}
 	}

@@ -325,7 +325,9 @@ class ViewService extends SuperService {
 				try {
 					$manageTableShare = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getTableId(), 'table', $userId);
 					$canManageTable = $manageTableShare['manage'];
+				} catch (NotFoundError $e) {
 				} catch (\Exception $e) {
+					throw new InternalError($e);
 				}
 				/** @noinspection PhpUndefinedMethodInspection */
 				$view->setOnSharePermissions([
@@ -336,7 +338,10 @@ class ViewService extends SuperService {
 					'manage' => $permissions['manage'],
 					'manageTable' => $canManageTable,
 				]);
+			} catch (NotFoundError $e) {
+
 			} catch (\Exception $e) {
+				throw new InternalError($e);
 			}
 		}
 

@@ -68,18 +68,17 @@ class PermissionsService {
 	// ***** TABLES permissions *****
 
 	public function canAccessView($view, ?string $userId = null): bool {
-		try {
-			if($this->basisCheck($view, 'view', $userId)) {
-				return true;
-			}
-		} catch (InternalError $e) {
-			return false;
+		if($this->basisCheck($view, 'view', $userId)) {
+			return true;
 		}
 
 		try {
 			$this->getSharedPermissionsIfSharedWithMe($view->getId(), 'view', $userId);
 			return true;
-		} catch (InternalError|NotFoundError $e) {
+		} catch (NotFoundError $e) {
+		} catch (InternalError $e) {
+			$this->logger->warning('Cannot get permissions');
+			return false;
 		}
 
 		return false;
@@ -193,6 +192,7 @@ class PermissionsService {
 		try {
 			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
+			$this->logger->warning('Cannot pre check the user id, permission denied');
 			return false;
 		}
 
@@ -217,6 +217,7 @@ class PermissionsService {
 					}
 				}
 			} catch (InternalError $e) {
+				$this->logger->warning('Cannot get user groups, permission denied');
 				return false;
 			}
 		}
@@ -228,6 +229,7 @@ class PermissionsService {
 		try {
 			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
+			$this->logger->warning('Cannot pre check the user id, permission denied');
 			return false;
 		}
 
@@ -243,6 +245,7 @@ class PermissionsService {
 		try {
 			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
+			$this->logger->warning('Cannot pre check the user id, permission denied');
 			return false;
 		}
 
@@ -255,10 +258,21 @@ class PermissionsService {
 	}
 
 	public function getSharedPermissionsIfSharedWithMe(int $elementId, ?string $elementType = 'table', string $userId = null): array {
-		$shares = $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userId, 'user');
+		try {
+			$shares = $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userId, 'user');
+		} catch (Exception $e) {
+			$this->logger->warning('Exception occured: '.$e->getMessage().' Permission denied.');
+			return [];
+		}
+
 		$userGroups = $this->userHelper->getGroupsForUser($userId);
 		foreach ($userGroups as $userGroup) {
-			$shares = array_merge($shares, $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userGroup->getGid(), 'group'));
+			try {
+				$shares = array_merge($shares, $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userGroup->getGid(), 'group'));
+			} catch (Exception $e) {
+				$this->logger->warning('Exception occured: '.$e->getMessage().' Permission denied.');
+				return [];
+			}
 		}
 		if (count($shares) > 0) {
 			$read = array_reduce($shares, function ($carry, $share) {
@@ -291,12 +305,8 @@ class PermissionsService {
 	//  private methods ==========================================================================
 
 	private function checkPermission($element, string $nodeType, string $permission, ?string $userId = null): bool {
-		try {
-			if($this->basisCheck($element, $nodeType, $userId)) {
-				return true;
-			}
-		} catch (InternalError $e) {
-			return false;
+		if($this->basisCheck($element, $nodeType, $userId)) {
+			return true;
 		}
 
 		try {
@@ -307,12 +317,8 @@ class PermissionsService {
 	}
 
 	private function checkPermissionById(int $elementId, string $nodeType, string $permission, ?string $userId = null): bool {
-		try {
-			if($this->basisCheckById($elementId, $nodeType, $userId)) {
-				return true;
-			}
-		} catch (InternalError $e) {
-			return false;
+		if($this->basisCheckById($elementId, $nodeType, $userId)) {
+			return true;
 		}
 
 		try {
@@ -327,10 +333,13 @@ class PermissionsService {
 	 * @param string $nodeType
 	 * @param string|null $userId
 	 * @return bool
-	 * @throws InternalError
 	 */
 	private function basisCheck($element, string $nodeType, ?string &$userId) {
-		$userId = $this->preCheckUserId($userId);
+		try {
+			$userId = $this->preCheckUserId($userId);
+		} catch (InternalError $e) {
+			$this->logger->warning('Cannot pre check the user id');
+		}
 
 		if ($userId === '') {
 			return true;
@@ -344,7 +353,9 @@ class PermissionsService {
 			if($permissions['manage']) {
 				return true;
 			}
-		} catch (InternalError | NotFoundError $e) {
+		} catch (NotFoundError $e) {
+		} catch (InternalError $e) {
+			$this->logger->warning('Cannot get permissions');
 		}
 		return false;
 	}
@@ -356,12 +367,15 @@ class PermissionsService {
 	 * @return bool
 	 * @throws DoesNotExistException
 	 * @throws Exception
-	 * @throws InternalError
 	 * @throws MultipleObjectsReturnedException
 	 * @throws NotFoundError
 	 */
 	private function basisCheckById(int $elementId, string $nodeType, ?string &$userId) {
-		$userId = $this->preCheckUserId($userId);
+		try {
+			$userId = $this->preCheckUserId($userId);
+		} catch (InternalError $e) {
+			$this->logger->warning('Cannot pre check the user id');
+		}
 
 		if ($userId === '') {
 			return true;
@@ -371,6 +385,7 @@ class PermissionsService {
 			$element = $nodeType === 'table' ? $this->tableMapper->find($elementId) : $this->viewMapper->find($elementId);
 			return $this->basisCheck($element, $nodeType, $userId);
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|\Exception $e) {
+			$this->logger->warning('Exception occured: '.$e->getMessage());
 		}
 		return false;
 	}

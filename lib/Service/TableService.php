@@ -158,7 +158,7 @@ class TableService extends SuperService {
 				$table->setIsShared(true);
 				/** @noinspection PhpUndefinedMethodInspection */
 				$table->setOnSharePermissions($permissions);
-			} catch (\Exception $e) {
+			} catch (NotFoundError $e) {
 			}
 		}
 

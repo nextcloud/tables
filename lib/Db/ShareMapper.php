@@ -63,6 +63,7 @@ class ShareMapper extends QBMapper {
 				return $items[0];
 			}
 		} catch (Exception $e) {
+			$this->logger->warning('Exception occured while executing SQL statement: '.$e->getMessage());
 		}
 
 		throw new Exception('no shares found as expected');
