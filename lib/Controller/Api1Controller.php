@@ -19,6 +19,7 @@ use OCP\AppFramework\ApiController;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\DB\Exception;
 use OCP\IRequest;
+use Psr\Log\LoggerInterface;
 
 class Api1Controller extends ApiController {
 	private TableService $tableService;
@@ -33,6 +34,8 @@ class Api1Controller extends ApiController {
 
 	private string $userId;
 
+	protected LoggerInterface $logger;
+
 	use Errors;
 
 
@@ -46,6 +49,7 @@ class Api1Controller extends ApiController {
 		ViewService $viewService,
 		ViewMapper $viewMapper,
 		V1Api $v1Api,
+		LoggerInterface $logger,
 		string $userId
 	) {
 		parent::__construct(Application::APP_ID, $request);
@@ -58,7 +62,10 @@ class Api1Controller extends ApiController {
 		$this->viewMapper = $viewMapper;
 		$this->userId = $userId;
 		$this->v1Api = $v1Api;
+		$this->logger = $logger;
 	}
+
+	// Tables
 
 	/**
 	 * @NoAdminRequired
@@ -76,31 +83,9 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function createImport(int $tableId, string $path, bool $createMissingColumns = true): DataResponse {
-		return $this->handleError(function () use ($tableId, $path, $createMissingColumns) {
-			return $this->importService->import($tableId, $path, $createMissingColumns);
-		});
-	}
-
-	/**
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 */
 	public function createTable(string $title, ?string $emoji, string $template = 'custom'): DataResponse {
 		return $this->handleError(function () use ($title, $emoji, $template) {
 			return $this->tableService->create($title, $template, $emoji);
-		});
-	}
-
-	/**
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 */
-	public function updateTable(int $tableId, ?string $title, ?string $emoji): DataResponse {
-		return $this->handleError(function () use ($tableId, $title, $emoji) {
-			return $this->tableService->update($tableId, $title, $emoji);
 		});
 	}
 
@@ -126,60 +111,7 @@ class Api1Controller extends ApiController {
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 */
-	public function getShare(int $shareId): DataResponse {
-		return $this->handleError(function () use ($shareId) {
-			return $this->shareService->find($shareId);
-		});
-	}
-
-	/**
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 */
-	public function indexTableShares(int $tableId): DataResponse {
-		return $this->handleError(function () use ($tableId) {
-			return $this->shareService->findAll('table', $tableId);
-		});
-	}
-
-	/**
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 */
-	public function createTableShare(int $tableId, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage): DataResponse {
-		return $this->handleError(function () use ($tableId, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage) {
-			return $this->shareService->create($tableId, 'table', $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage);
-		});
-	}
-
-	/**
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 */
-	public function deleteShare(int $shareId): DataResponse {
-		return $this->handleError(function () use ($shareId) {
-			return $this->shareService->delete($shareId);
-		});
-	}
-
-	/**
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 */
-	public function updateSharePermissions(int $shareId, string $permissionType, bool $permissionValue): DataResponse {
-		return $this->handleError(function () use ($shareId, $permissionType, $permissionValue) {
-			return $this->shareService->updatePermission($shareId, $permissionType, $permissionValue);
-		});
-	}
+	// Views
 
 	/**
 	 * @NoAdminRequired
@@ -211,27 +143,13 @@ class Api1Controller extends ApiController {
 	}
 
 	/**
-	 * @param int $id
-	 * @return Table
-	 * @throws Exception
-	 * @throws InternalError
-	 * @throws NotFoundError
-	 * @throws PermissionError
-	 */
-	private function getTableFromViewId(int $id): Table {
-		$view = $this->viewMapper->find($id);
-		return $this->tableService->find($view->getTableId());
-
-	}
-
-	/**
 	 * @NoAdminRequired
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
 	public function getView(int $viewId): DataResponse {
 		return $this->handleError(function () use ($viewId) {
-			return $this->viewService->find($viewId, $this->getTableFromViewId($viewId));
+			return $this->viewService->find($viewId);
 		});
 	}
 
@@ -242,7 +160,7 @@ class Api1Controller extends ApiController {
 	 */
 	public function updateView(int $viewId, array $data): DataResponse {
 		return $this->handleError(function () use ($viewId, $data) {
-			return $this->viewService->update($viewId, $data, $this->getTableFromViewId($viewId));
+			return $this->viewService->update($viewId, $data);
 		});
 	}
 
@@ -253,9 +171,79 @@ class Api1Controller extends ApiController {
 	 */
 	public function deleteView(int $viewId): DataResponse {
 		return $this->handleError(function () use ($viewId) {
-			return $this->viewService->delete($viewId, $this->getTableFromViewId($viewId));
+			return $this->viewService->delete($viewId);
 		});
 	}
+
+	// Shares
+	
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function getShare(int $shareId): DataResponse {
+		return $this->handleError(function () use ($shareId) {
+			return $this->shareService->find($shareId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function indexViewShares(int $viewId): DataResponse {
+		return $this->handleError(function () use ($viewId) {
+			return $this->shareService->findAll('view', $viewId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function indexTableManageShares(int $tableId): DataResponse {
+		return $this->handleError(function () use ($tableId) {
+			return $this->shareService->findAll('table', $tableId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function createShare(int $nodeId, string $nodeType, string $receiver, string $receiverType, bool $permissionRead = false, bool $permissionCreate = false, bool $permissionUpdate = false, bool $permissionDelete = false, bool $permissionManage = false): DataResponse {
+		return $this->handleError(function () use ($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage) {
+			return $this->shareService->create($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function deleteShare(int $shareId): DataResponse {
+		return $this->handleError(function () use ($shareId) {
+			return $this->shareService->delete($shareId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function updateSharePermissions(int $shareId, string $permissionType, bool $permissionValue): DataResponse {
+		return $this->handleError(function () use ($shareId, $permissionType, $permissionValue) {
+			return $this->shareService->updatePermission($shareId, $permissionType, $permissionValue);
+		});
+	}
+
+	// Columns
 
 	/**
 	 * @NoAdminRequired
@@ -284,8 +272,7 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function createTableColumn(
-		int $tableId,
+	public function createColumn(
 		int $viewId,
 		string $title,
 		string $type,
@@ -308,10 +295,10 @@ class Api1Controller extends ApiController {
 		?string $selectionOptions = '',
 		?string $selectionDefault = '',
 
-		?string $datetimeDefault = ''
+		?string $datetimeDefault = '',
+		?array $selectedViewIds = []
 	): DataResponse {
 		return $this->handleError(function () use (
-			$tableId,
 			$viewId,
 			$type,
 			$subtype,
@@ -334,11 +321,11 @@ class Api1Controller extends ApiController {
 			$selectionOptions,
 			$selectionDefault,
 
-			$datetimeDefault
+			$datetimeDefault,
+			$selectedViewIds
 		) {
 			return $this->columnService->create(
 				$this->userId,
-				$tableId,
 				$viewId,
 				$type,
 				$subtype,
@@ -361,7 +348,8 @@ class Api1Controller extends ApiController {
 				$selectionOptions,
 				$selectionDefault,
 
-				$datetimeDefault
+				$datetimeDefault,
+				$selectedViewIds
 			);
 		});
 	}
@@ -470,15 +458,6 @@ class Api1Controller extends ApiController {
 		});
 	}
 
-
-
-
-
-
-
-
-
-
 	/**
 	 * @NoAdminRequired
 	 * @CORS
@@ -486,7 +465,7 @@ class Api1Controller extends ApiController {
 	 */
 	public function indexTableRowsSimple(int $tableId, ?int $limit, ?int $offset): DataResponse {
 		return $this->handleError(function () use ($tableId, $limit, $offset) {
-			return $this->v1Api->getData($tableId, $limit, $offset);
+			return $this->v1Api->getData($tableId, $limit, $offset, $this->userId,);
 		});
 	}
 
@@ -501,6 +480,24 @@ class Api1Controller extends ApiController {
 		});
 	}
 
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function createRow(int $viewId, array $data): DataResponse {
+		$dataNew = [];
+		foreach ($data as $key => $value) {
+			$dataNew[] = [
+				'columnId' => (int) $key,
+				'value' => $value
+			];
+		}
+
+		return $this->handleError(function () use ($dataNew, $viewId) {
+			return $this->rowService->create($viewId, $dataNew);
+		});
+	}
 
 	/**
 	 * @NoAdminRequired
@@ -518,38 +515,16 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function createRow(int $tableId, int $viewId, string $data): DataResponse {
+	public function updateRow(int $rowId, int $viewId, array $data): DataResponse {
 		$dataNew = [];
-		$array = json_decode($data, true);
-		foreach ($array as $key => $value) {
+		foreach ($data as $key => $value) {
 			$dataNew[] = [
 				'columnId' => (int) $key,
 				'value' => $value
 			];
 		}
-
-		return $this->handleError(function () use ($dataNew, $viewId, $tableId) {
-			return $this->rowService->createComplete($viewId, $tableId, $dataNew);
-		});
-	}
-
-	/**
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 */
-	public function updateRow(int $rowId, int $viewId, string $data): DataResponse {
-		$dataNew = [];
-		$array = json_decode($data, true);
-		foreach ($array as $key => $value) {
-			$dataNew[] = [
-				'columnId' => (int) $key,
-				'value' => $value
-			];
-		}
-
 		return $this->handleError(function () use ($rowId, $viewId, $dataNew) {
-			return $this->rowService->updateSet($rowId, $viewId, $dataNew);
+			return $this->rowService->updateSet($rowId, $viewId, $dataNew, $this->userId);
 		});
 	}
 
@@ -558,9 +533,34 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function deleteRow(int $rowId): DataResponse {
-		return $this->handleError(function () use ($rowId) {
-			return $this->rowService->delete($rowId);
+	public function deleteRow(int $rowId, int $viewId): DataResponse {
+		return $this->handleError(function () use ($rowId, $viewId) {
+			return $this->rowService->delete($rowId, $viewId, $this->userId);
 		});
 	}
+	
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function createImport(int $viewId, string $path, bool $createMissingColumns = true): DataResponse {
+		return $this->handleError(function () use ($viewId, $path, $createMissingColumns) {
+			return $this->importService->import($viewId, $path, $createMissingColumns);
+		});
+	}
+
+	// Api Function for backward compatibility
+	
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function updateTable(int $tableId, ?string $title, ?string $emoji): DataResponse {
+		return $this->handleError(function () use ($tableId, $title, $emoji) {
+			return $this->tableService->update($tableId, $title, $emoji);
+		});
+	}
+
 }

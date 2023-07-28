@@ -129,7 +129,7 @@ class ColumnService extends SuperService {
 	 * @noinspection DuplicatedCode
 	 *
 	 * @param string|null $userId
-	 * @param int $tableId
+	 * @param int $viewId
 	 * @param string $type
 	 * @param string|null $subtype
 	 * @param string $title
@@ -156,7 +156,6 @@ class ColumnService extends SuperService {
 	 */
 	public function create(
 		?string $userId,
-        int $tableId,
         int $viewId,
 		string $type,
 		?string $subtype,
@@ -183,15 +182,16 @@ class ColumnService extends SuperService {
 		?array $selectedViewIds
 	):Column {
 		// security
-		$table = $this->tableMapper->find($tableId);
+		$view = $this->viewService->find($viewId);
+		$table = $this->tableMapper->find($view->getTableId());
 		if (!$this->permissionsService->canCreateColumns($table)) {
-			throw new PermissionError('create column at the table id = '.$tableId.' is not allowed.');
+			throw new PermissionError('create column at the table id = '.$table->getId().' is not allowed.');
 		}
 
 		$time = new DateTime();
 		$item = new Column();
 		$item->setTitle($title);
-		$item->setTableId($tableId);
+		$item->setTableId($table->getId());
 		$item->setType($type);
 		$item->setSubtype($subtype !== null ? $subtype: '');
 		$item->setMandatory($mandatory);
@@ -216,17 +216,15 @@ class ColumnService extends SuperService {
 		try {
 			$entity = $this->mapper->insert($item);
 			// Add columns to view(s)
-			$baseView = $this->viewService->findBaseView($table, true);
-			$this->viewService->update($baseView->getId(), ['columns' => json_encode(array_merge($baseView->getColumnsArray(), [$entity->getId()]))], $userId, true);
-			if($viewId != $baseView->getId()) {
-				$view = $this->viewService->find($viewId);
-				$this->viewService->update($viewId, ['columns' => json_encode(array_merge($view->getColumnsArray(), [$entity->getId()]))], $userId, true);
+			$this->viewService->update($view->getId(), ['columns' => json_encode(array_merge($view->getColumnsArray(), [$entity->getId()]))], $userId, true);
+			if (!$view->getIsBaseView()){
+				$baseView = $this->viewService->findBaseView($table, true);
+				$this->viewService->update($baseView->getId(), ['columns' => json_encode(array_merge($baseView->getColumnsArray(), [$entity->getId()]))], $userId, true);
 			}
 			foreach ($selectedViewIds as $viewId) {
 				$view = $this->viewService->find($viewId);
 				$this->viewService->update($viewId, ['columns' => json_encode(array_merge($view->getColumnsArray(), [$entity->getId()]))], $userId, true);
 			}
-
 			return $entity;
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage());
@@ -425,7 +423,7 @@ class ColumnService extends SuperService {
 			// if column was not found
 			if($result[$i] === '' && $createUnknownColumns) {
 				$description = $this->l->t('This column was automatically created by the import service.');
-				$result[$i] = $this->create($userId, $tableId, $viewId, 'text', 'line', $title, false, $description, null, null, null, null, null, null, null, null, null, null, null, null, null, []);
+				$result[$i] = $this->create($userId, $viewId, 'text', 'line', $title, false, $description, null, null, null, null, null, null, null, null, null, null, null, null, null, []);
 				$countCreatedColumns++;
 			}
 		}

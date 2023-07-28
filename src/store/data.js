@@ -241,11 +241,11 @@ export default {
 			commit('setRows', [...rows])
 			return true
 		},
-		async insertNewRow({ state, commit, dispatch }, { tableId, viewId, data }) {
+		async insertNewRow({ state, commit, dispatch }, { viewId, data }) {
 			let res = null
 
 			try {
-				res = await axios.post(generateUrl('/apps/tables/row'), { tableId, viewId, data })
+				res = await axios.post(generateUrl('/apps/tables/row'), { viewId, data })
 			} catch (e) {
 				displayError(e, t('tables', 'Could not insert row.'))
 				return false

@@ -83,7 +83,7 @@
 								<template #icon>
 									<Account :size="20" />
 								</template>
-								{{ t('tables', 'Demote to table manager') }}
+								{{ t('tables', 'Demote table manager') }}
 							</NcActionButton>
 							<NcActionText>
 								<template #icon>

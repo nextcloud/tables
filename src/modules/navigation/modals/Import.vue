@@ -203,7 +203,7 @@ export default {
 		async import() {
 			this.loading = true
 			try {
-				const res = await axios.post(generateUrl('/apps/tables/import/table/' + this.view.tableId), { viewId: this.view.id, path: this.path, createMissingColumns: this.getCreateMissingColumns })
+				const res = await axios.post(generateUrl('/apps/tables/import/view/' + this.view.id), { path: this.path, createMissingColumns: this.getCreateMissingColumns })
 				if (res.status === 200) {
 					this.result = res.data
 					this.loading = false

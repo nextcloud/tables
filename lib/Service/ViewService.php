@@ -228,7 +228,12 @@ class ViewService extends SuperService {
 				throw new PermissionError('PermissionError: can not update view with id '.$id);
 			}
 
+			$updatebleColumns = array('title', 'emoji', 'description', 'columns', 'sort', 'filter');
+
 			foreach ($data as $key => $value) {
+				if (!in_array($key, $updatebleColumns)) {
+					throw new InternalError('Column '.$key.' can not be updated.');
+				}
 				$setterMethod = 'set'.ucfirst($key);
 				$view->$setterMethod($value);
 			}

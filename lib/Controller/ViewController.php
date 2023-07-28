@@ -13,6 +13,7 @@ use OCA\Tables\Service\ViewService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
+use Psr\Log\LoggerInterface;
 
 class ViewController extends Controller {
 	private ViewService $service;
@@ -23,15 +24,20 @@ class ViewController extends Controller {
 
 	private string $userId;
 
+	protected LoggerInterface $logger;
+
 	use Errors;
 
 
-	public function __construct(IRequest     $request,
+	public function __construct(
+		IRequest $request,
+		LoggerInterface $logger,
 		ViewService $service,
 		ViewMapper $mapper,
 		TableService $tableService,
 		string $userId) {
 		parent::__construct(Application::APP_ID, $request);
+		$this->logger = $logger;
 		$this->service = $service;
 		$this->mapper = $mapper;
 		$this->tableService = $tableService;

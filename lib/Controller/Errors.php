@@ -8,15 +8,8 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
-use Psr\Log\LoggerInterface;
 
 trait Errors {
-
-	private LoggerInterface $logger;
-
-	public function __construct(LoggerInterface $logger) {
-		$this->logger = $logger;
-	}
 
 	protected function handleError(Closure $callback): DataResponse {
 		try {

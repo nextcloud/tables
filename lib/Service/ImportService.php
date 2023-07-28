@@ -27,6 +27,7 @@ class ImportService extends SuperService {
 	private IRootFolder $rootFolder;
 	private ColumnService $columnService;
 	private RowService $rowService;
+	private ViewService $viewService;
 	private IUserManager $userManager;
 
 	private int $tableId = -1;
@@ -38,11 +39,12 @@ class ImportService extends SuperService {
 	private int $countErrors = 0;
 
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-		IRootFolder $rootFolder, ColumnService $columnService, RowService $rowService, IUserManager $userManager) {
+		IRootFolder $rootFolder, ColumnService $columnService, RowService $rowService, ViewService $viewService, IUserManager $userManager) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->rootFolder = $rootFolder;
 		$this->columnService = $columnService;
 		$this->rowService = $rowService;
+		$this->viewService = $viewService;
 		$this->userManager = $userManager;
 	}
 
@@ -54,8 +56,9 @@ class ImportService extends SuperService {
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 */
-	public function import(int $tableId, int $viewId, string $path, bool $createMissingColumns = true): array {
-		if (!$this->permissionsService->canCreateRowsByViewId($viewId)) {
+	public function import(int $viewId, string $path, bool $createMissingColumns = true): array {
+		$view = $this->viewService->find($viewId);
+		if (!$this->permissionsService->canCreateRows($view)) {
 			throw new PermissionError('create row at the view id = '.$viewId.' is not allowed.');
 		}
 		if ($this->userManager->get($this->userId) === null) {
@@ -64,7 +67,7 @@ class ImportService extends SuperService {
 			throw new InternalError($error);
 		}
 
-		$this->tableId = $tableId;
+		$this->tableId = $view->getTableId();
 		$this->viewId = $viewId;
 		$this->createUnknownColumns = $createMissingColumns;
 
@@ -162,7 +165,7 @@ class ImportService extends SuperService {
 			];
 		}
 		try {
-			$this->rowService->createComplete($this->viewId, $this->tableId, $data);
+			$this->rowService->create($this->viewId, $data);
 			$this->countInsertedRows++;
 		} catch (PermissionError $e) {
 			$this->logger->error('Could not create row while importing, no permission.', ['exception' => $e]);

@@ -7,18 +7,24 @@ use OCA\Tables\Service\ColumnService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
+use Psr\Log\LoggerInterface;
 
 class ColumnController extends Controller {
 	private ColumnService $service;
 
 	private string $userId;
+	
+	protected LoggerInterface $logger;
 
 	use Errors;
 
-	public function __construct(IRequest     $request,
+	public function __construct(
+		IRequest $request,
+		LoggerInterface $logger,
 		ColumnService $service,
 		string $userId) {
 		parent::__construct(Application::APP_ID, $request);
+		$this->logger = $logger;
 		$this->service = $service;
 		$this->userId = $userId;
 	}
@@ -54,7 +60,6 @@ class ColumnController extends Controller {
 	 * @NoAdminRequired
 	 */
 	public function create(
-		int $tableId,
 		int $viewId,
 		string $type,
 		?string $subtype,
@@ -81,7 +86,6 @@ class ColumnController extends Controller {
 		?array $selectedViewIds
 	): DataResponse {
 		return $this->handleError(function () use (
-			$tableId,
 			$viewId,
 			$type,
 			$subtype,
@@ -108,7 +112,6 @@ class ColumnController extends Controller {
 			$selectedViewIds) {
 			return $this->service->create(
 				$this->userId,
-				$tableId,
 				$viewId,
 				$type,
 				$subtype,

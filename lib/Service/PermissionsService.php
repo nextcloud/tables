@@ -162,8 +162,8 @@ class PermissionsService {
 	 * @param string|null $userId
 	 * @return bool
 	 */
-	public function canCreateRowsByViewId(int $viewId, ?string $userId = null): bool {
-		return $this->checkPermissionById($viewId, 'view', 'create', $userId);
+	public function canCreateRows($view, ?string $userId = null): bool {
+		return $this->checkPermission($view, 'view', 'create', $userId);
 	}
 
 	/**
@@ -191,7 +191,7 @@ class PermissionsService {
 	 * @return bool
 	 */
 	public function canDeleteRowsByViewId(int $viewId, ?string $userId = null): bool {
-		return $this->checkPermissionById($tableId, 'table', 'manage', $userId);
+		return $this->checkPermissionById($viewId, 'view', 'delete', $userId);
 	}
 
 	/**
@@ -199,8 +199,9 @@ class PermissionsService {
 	 * @param string|null $userId
 	 * @return bool
 	 */
-	public function canDeleteRowsByTableId(int $viewId, ?string $userId = null): bool {
-		return $this->checkPermissionById($viewId, 'view', 'delete', $userId);
+	public function canDeleteRowsByTableId(int $tableId, ?string $userId = null): bool {
+		return $this->checkPermissionById($tableId, 'table', 'manage', $userId);
+		
 	}
 
 
