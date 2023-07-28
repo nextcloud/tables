@@ -250,7 +250,6 @@ export default {
 					description: this.column.description,
 					selectedViewIds: this.column.selectedViews.map(view => view.id),
 					mandatory: this.column.mandatory,
-					tableId: this.activeView.tableId,
 					viewId: this.activeView.id,
 				}
 				if (this.combinedType === ColumnTypes.TextLine || this.combinedType === ColumnTypes.TextLong) {

@@ -48,12 +48,12 @@ class ShareService extends SuperService {
 	 *
 	 * @psalm-param 'table' $nodeType
 	 */
-	public function findAll(string $nodeType, int $tableId, ?string $userId = null): array {
+	public function findAll(string $nodeType, int $nodeId, ?string $userId = null): array {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
 			/** @var string $userId */
-			$shares = $this->mapper->findAllSharesForNode($nodeType, $tableId, $userId);
+			$shares = $this->mapper->findAllSharesForNode($nodeType, $nodeId, $userId);
 			return $this->addReceiverDisplayNames($shares);
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage());

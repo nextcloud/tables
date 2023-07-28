@@ -77,43 +77,6 @@ class RowService extends SuperService {
 
 	/**
 	 * @param int $tableId
-	 * @param int $columnId
-	 * @param string $data
-	 * @return Row
-	 * @throws PermissionError
-	 * @throws \OCP\DB\Exception
-	 * @noinspection PhpUndefinedMethodInspection
-	 * @noinspection DuplicatedCode
-	 */
-	public function create(
-		int $tableId,
-		int $viewId,
-		int $columnId,
-		string $data
-	):Row {
-		// security
-		if (!$this->permissionsService->canCreateRowsByViewId($viewId)) {
-			throw new PermissionError('create row at the view id = '.$viewId.' is not allowed.');
-		}
-
-		$time = new DateTime();
-		$item = new Row();
-		$d = [];
-		$d[] = [
-			"columnId" => $columnId,
-			"value" => $data
-		];
-		$item->setDataArray($d);
-		$item->setTableId($tableId);
-		$item->setCreatedBy($this->userId);
-		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
-		$item->setLastEditBy($this->userId);
-		$item->setLastEditAt($time->format('Y-m-d H:i:s'));
-		return $this->mapper->insert($item);
-	}
-
-	/**
-	 * @param int $tableId
 	 * @param array $data
 	 * @return Row
 	 * @throws PermissionError
@@ -121,20 +84,29 @@ class RowService extends SuperService {
 	 * @noinspection PhpUndefinedMethodInspection
 	 * @noinspection DuplicatedCode
 	 */
-	public function createComplete(
+	public function create(
 		int $viewId,
-		int $tableId,
 		array $data
 	):Row {
+		
+		$view = $this->viewMapper->find($viewId);
 		// security
-		if (!$this->permissionsService->canCreateRowsByViewId($viewId)) {
+		if (!$this->permissionsService->canCreateRows($view)) {
 			throw new PermissionError('create row at the view id = '.$viewId.' is not allowed.');
 		}
+
+		$viewColumns = $view->getColumnsArray();
+
+		foreach ($data as $entry) {
+			if (!in_array($entry['columnId'], $viewColumns)) {
+				throw new InternalError('Column with id '.$entry['columnId'].' is not part of view with id '.$view->getId());
+			}
+		}		
 
 		$time = new DateTime();
 		$item = new Row();
 		$item->setDataArray($data);
-		$item->setTableId($tableId);
+		$item->setTableId($view->getTableId());
 		$item->setCreatedBy($this->userId);
 		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
 		$item->setLastEditBy($this->userId);
@@ -233,7 +205,6 @@ class RowService extends SuperService {
 			foreach ($data as $dataObject) {
 				$d = $this->replaceOrAddData($d, $dataObject);
 			}
-
 			$item->setDataArray($d);
 			$item->setLastEditBy($this->userId);
 			$item->setLastEditAt($time->format('Y-m-d H:i:s'));

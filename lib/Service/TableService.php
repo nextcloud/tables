@@ -251,45 +251,6 @@ class TableService extends SuperService {
 	}
 
 	/**
-	 * @noinspection PhpUndefinedMethodInspection
-	 *
-	 * @param int $id $userId
-	 * @param string|null $title
-	 * @param string|null $emoji
-	 * @param string|null $userId
-	 * @return Table
-	 * @throws InternalError
-	 */
-	public function update(int $id, ?string $title, ?string $emoji, ?string $userId = null): Table {
-		$userId = $this->permissionsService->preCheckUserId($userId);
-
-		try {
-			$table = $this->mapper->find($id);
-
-			// security
-			if (!$this->permissionsService->canManageTable($table, $userId)) {
-				throw new PermissionError('PermissionError: can not update table with id '.$id);
-			}
-
-			$time = new DateTime();
-			if ($title !== null) {
-				$table->setTitle($title);
-			}
-			if ($emoji !== null) {
-				$table->setEmoji($emoji);
-			}
-			$table->setLastEditBy($userId);
-			$table->setLastEditAt($time->format('Y-m-d H:i:s'));
-			$table = $this->mapper->update($table);
-			$this->enhanceTable($table, $userId);
-			return $table;
-		} catch (Exception $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError($e->getMessage());
-		}
-	}
-
-	/**
 	 * @throws InternalError
 	 */
 	public function setOwner(int $id, string $newOwnerUserId, ?string $userId = null): Table {

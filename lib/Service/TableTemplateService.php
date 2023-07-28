@@ -850,7 +850,7 @@ class TableTemplateService {
 			];
 		}
 		try {
-			$this->rowService->createComplete($viewId, $table->getId(), $data);
+			$this->rowService->create($viewId, $data);
 		} catch (PermissionError $e) {
 			$this->logger->warning('Cannot create row, permission denied: '.$e->getMessage());
 		} catch (Exception $e) {

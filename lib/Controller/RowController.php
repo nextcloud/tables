@@ -7,6 +7,7 @@ use OCA\Tables\Service\RowService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
+use Psr\Log\LoggerInterface;
 
 class RowController extends Controller {
 	/** @var RowService */
@@ -15,12 +16,17 @@ class RowController extends Controller {
 	/** @var string */
 	private string $userId;
 
+	protected LoggerInterface $logger;
+
 	use Errors;
 
-	public function __construct(IRequest     $request,
+	public function __construct(
+		IRequest $request,
+		LoggerInterface $logger,
 		RowService $service,
 		string $userId) {
 		parent::__construct(Application::APP_ID, $request);
+		$this->logger = $logger;
 		$this->service = $service;
 		$this->userId = $userId;
 	}
@@ -47,32 +53,12 @@ class RowController extends Controller {
 	 * @NoAdminRequired
 	 */
 	public function create(
-		int $tableId,
-		int $viewId,
-		int $columnId,
-		string $data
-	): DataResponse {
-		return $this->handleError(function () use ($tableId, $viewId, $columnId, $data) {
-			return $this->service->create(
-				$tableId,
-				$viewId,
-				$columnId,
-				$data);
-		});
-	}
-
-	/**
-	 * @NoAdminRequired
-	 */
-	public function createComplete(
-		int $tableId,
 		int $viewId,
 		array $data
 	): DataResponse {
-		return $this->handleError(function () use ($tableId, $viewId, $data) {
-			return $this->service->createComplete(
+		return $this->handleError(function () use ($viewId, $data) {
+			return $this->service->create(
 				$viewId,
-				$tableId,
 				$data);
 		});
 	}
