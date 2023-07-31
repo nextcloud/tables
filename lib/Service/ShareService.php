@@ -290,7 +290,7 @@ class ShareService extends SuperService {
 	 * @return Share
 	 * @noinspection PhpUndefinedMethodInspection
 	 */
-	private function addReceiverDisplayName(Share &$share):Share {
+	private function addReceiverDisplayName(Share $share):Share {
 		if ($share->getReceiverType() === 'user') {
 			$share->setReceiverDisplayName($this->userHelper->getUserDisplayName($share->getReceiver()));
 		} elseif ($share->getReceiverType() === 'group') {

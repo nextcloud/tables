@@ -315,7 +315,7 @@ class ViewService extends SuperService {
 	 *
 	 * @noinspection PhpUndefinedMethodInspection
 	 */
-	private function enhanceView(View &$view, string $userId): void {
+	private function enhanceView(View $view, string $userId): void {
 		// add owner display name for UI
 		$view->setOwnerDisplayName($this->userHelper->getUserDisplayName($view->getOwnership()));
 
