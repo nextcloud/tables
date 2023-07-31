@@ -288,7 +288,13 @@ class RowMapper extends QBMapper {
 		if ($offset !== null) {
 			$qb->setFirstResult($offset);
 		}
-		return $this->findEntities($qb);
+		$rows = $this->findEntities($qb);
+		foreach ($rows as &$row) {
+			$row->setDataArray(array_filter($row->getDataArray(), function($item) use ($view) {
+				return in_array($item['columnId'], $view->getColumnsArray());
+			}));
+		}
+		return $rows;
 	}
 
 	private function getAllColumnIdsFromView(View $view): array {
