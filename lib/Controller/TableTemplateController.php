@@ -10,8 +10,7 @@ use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
 class TableTemplateController extends Controller {
-	/** @var TableTemplateService */
-	private $service;
+	private TableTemplateService $service;
 
 	protected LoggerInterface $logger;
 

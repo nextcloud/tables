@@ -76,10 +76,6 @@ export default {
 			type: Boolean,
 			default: null,
 		},
-		orderWeight: {
-			type: Number,
-			default: null,
-		},
 		selectedViews: {
 			type: Array,
 			default: null,
@@ -107,10 +103,6 @@ export default {
 		localMandatory: {
 			get() { return this.mandatory },
 			set(mandatory) { this.$emit('update:mandatory', mandatory) },
-		},
-		localOrderWeight: {
-			get() { return this.orderWeight },
-			set(orderWeight) { this.$emit('update:orderWeight', parseInt(orderWeight)) },
 		},
 		localSelectedViews: {
 			get() { return this.selectedViews },

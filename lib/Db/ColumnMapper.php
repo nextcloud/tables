@@ -20,9 +20,10 @@ class ColumnMapper extends QBMapper {
 	/**
 	 * @param int $id
 	 *
-	 * @throws MultipleObjectsReturnedException
-	 * @throws Exception
+	 * @return Column
 	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @throws MultipleObjectsReturnedException
 	 */
 	public function find(int $id): Column {
 		$qb = $this->db->getQueryBuilder();

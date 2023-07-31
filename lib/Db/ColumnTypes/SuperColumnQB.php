@@ -42,6 +42,8 @@ class SuperColumnQB implements IColumnTypeQB {
 
 	/**
 	 * @param string $operator
+	 * @param string $formattedCellValue
+	 * @param string $searchValuePlaceHolder
 	 * @return string
 	 * @throws InternalError
 	 */
@@ -74,20 +76,36 @@ class SuperColumnQB implements IColumnTypeQB {
 		}
 	}
 
-	private function getFormattedDataCellValue(string $columnPlaceHolder) {
+	private function getFormattedDataCellValue(string $columnPlaceHolder): string
+	{
 		$cellValue = 'JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'$[*].columnId\'), \'one\', :'.$columnPlaceHolder.')), \'.value\'))';
 		return $this->formatCellValue($cellValue);
 	}
-	private function getFormattedMetaDataCellValue(int $metaId) {
+
+	/**
+	 * @param int $metaId
+	 * @return string
+	 * @throws InternalError
+	 */
+	private function getFormattedMetaDataCellValue(int $metaId): string
+	{
 		switch($metaId) {
 			case -1: return 'id';
 			case -2: return 'created_by';
 			case -3: return 'last_edit_by';
 			case -4: return 'created_at';
 			case -5: return 'last_edit_at';
+			default: throw new InternalError('No meta data column exists with id '.$metaId);
 		}
 	}
 
+	/**
+	 * @param IQueryBuilder $qb
+	 * @param array $filter
+	 * @param string $filterId
+	 * @return IQueryFunction
+	 * @throws InternalError
+	 */
 	public function addWhereFilterExpression(IQueryBuilder $qb, array $filter, string $filterId): IQueryFunction {
 		$searchValuePlaceHolder = 'searchValue'.$filterId;
 		$columnPlaceHolder = 'column'.$filterId;

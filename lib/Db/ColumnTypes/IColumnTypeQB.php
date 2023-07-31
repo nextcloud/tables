@@ -28,6 +28,7 @@ interface IColumnTypeQB {
 	 * @param IQueryBuilder $qb
 	 * @param string $unformattedSearchValue
 	 * @param string $operator
+	 * @param string $searchValuePlaceHolder
 	 * @return void
 	 */
 	public function passSearchValue(IQueryBuilder $qb, string $unformattedSearchValue, string $operator, string $searchValuePlaceHolder): void;
@@ -35,6 +36,7 @@ interface IColumnTypeQB {
 	/**
 	 * @param IQueryBuilder $qb
 	 * @param array $filter
+	 * @param string $filterId
 	 * @return IQueryFunction
 	 */
 	public function addWhereFilterExpression(IQueryBuilder $qb, array $filter, string $filterId): IQueryFunction;

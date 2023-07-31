@@ -85,7 +85,7 @@ class PermissionsService {
 	}
 
 	/**
-	 * @param Table|View $element
+	 * @param View $view
 	 * @param string|null $userId
 	 * @return bool
 	 */
@@ -98,7 +98,18 @@ class PermissionsService {
 	}
 
 	public function canManageTableById(int $tableId, ?string $userId = null): bool {
-		$table = $this->tableMapper->find($tableId);
+		try {
+			$table = $this->tableMapper->find($tableId);
+		} catch (MultipleObjectsReturnedException $e) {
+			$this->logger->warning('Multiple tables were found for this id');
+			return false;
+		} catch (DoesNotExistException $e) {
+			$this->logger->warning('No table was found for this id');
+			return false;
+		} catch (Exception $e) {
+			$this->logger->warning('Error occurred: '.$e->getMessage());
+			return false;
+		}
 		return $this->canManageTable($table, $userId);
 	}
 
@@ -146,6 +157,7 @@ class PermissionsService {
 
 	/**
 	 * @param int $elementId
+	 * @param string $nodeType
 	 * @param string|null $userId
 	 * @return bool
 	 */
@@ -153,21 +165,27 @@ class PermissionsService {
 		return $this->checkPermissionById($elementId, $nodeType, 'read', $userId);
 	}
 
+	/**
+	 * @param $element
+	 * @param string $nodeType
+	 * @param string|null $userId
+	 * @return bool
+	 */
 	public function canReadRowsByElement($element, string $nodeType, ?string $userId = null): bool {
 		return $this->checkPermission($element, $nodeType, 'read', $userId);
 	}
 
 	/**
-	 * @param int $tableId
+	 * @param View $view
 	 * @param string|null $userId
 	 * @return bool
 	 */
-	public function canCreateRows($view, ?string $userId = null): bool {
+	public function canCreateRows(View $view, ?string $userId = null): bool {
 		return $this->checkPermission($view, 'view', 'create', $userId);
 	}
 
 	/**
-	 * @param int $tableId
+	 * @param int $viewId
 	 * @param string|null $userId
 	 * @return bool
 	 */
@@ -186,7 +204,7 @@ class PermissionsService {
 
 
 	/**
-	 * @param int $tableId
+	 * @param int $viewId
 	 * @param string|null $userId
 	 * @return bool
 	 */
@@ -207,7 +225,6 @@ class PermissionsService {
 
 	// ***** SHARE permissions *****
 
-	/** @noinspection PhpUndefinedMethodInspection */
 	public function canReadShare(Share $share, ?string $userId = null): bool {
 		try {
 			$userId = $this->preCheckUserId($userId);
@@ -257,7 +274,6 @@ class PermissionsService {
 			return true;
 		}
 
-		/** @noinspection PhpUndefinedMethodInspection */
 		return $item->getSender() === $userId;
 	}
 
@@ -273,24 +289,35 @@ class PermissionsService {
 			return true;
 		}
 
-		/** @noinspection PhpUndefinedMethodInspection */
 		return $item->getSender() === $userId;
 	}
 
+	/**
+	 * @param int $elementId
+	 * @param string|null $elementType
+	 * @param string|null $userId
+	 * @return array
+	 * @throws NotFoundError
+	 */
 	public function getSharedPermissionsIfSharedWithMe(int $elementId, ?string $elementType = 'table', string $userId = null): array {
 		try {
 			$shares = $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userId);
 		} catch (Exception $e) {
-			$this->logger->warning('Exception occured: '.$e->getMessage().' Permission denied.');
+			$this->logger->warning('Exception occurred: '.$e->getMessage().' Permission denied.');
 			return [];
 		}
 
-		$userGroups = $this->userHelper->getGroupsForUser($userId);
+		try {
+			$userGroups = $this->userHelper->getGroupsForUser($userId);
+		} catch (InternalError $e) {
+			$this->logger->warning('Exception occurred: '.$e->getMessage().' Permission denied.');
+			return [];
+		}
 		foreach ($userGroups as $userGroup) {
 			try {
 				$shares = array_merge($shares, $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userGroup->getGid(), 'group'));
 			} catch (Exception $e) {
-				$this->logger->warning('Exception occured: '.$e->getMessage().' Permission denied.');
+				$this->logger->warning('Exception occurred: '.$e->getMessage().' Permission denied.');
 				return [];
 			}
 		}
@@ -332,20 +359,26 @@ class PermissionsService {
 		try {
 			return $this->getSharedPermissionsIfSharedWithMe($element->getId(), $nodeType, $userId)[$permission];
 		} catch (NotFoundError $e) {
+			return false;
 		}
-		return false;
 	}
 
+	/**
+	 * @param int $elementId
+	 * @param string $nodeType
+	 * @param string $permission
+	 * @param string|null $userId
+	 * @return bool
+	 */
 	private function checkPermissionById(int $elementId, string $nodeType, string $permission, ?string $userId = null): bool {
 		if($this->basisCheckById($elementId, $nodeType, $userId)) {
 			return true;
 		}
-
 		try {
 			return $this->getSharedPermissionsIfSharedWithMe($elementId, $nodeType, $userId)[$permission];
 		} catch (NotFoundError $e) {
+			return false;
 		}
-		return false;
 	}
 
 	/**
@@ -354,7 +387,8 @@ class PermissionsService {
 	 * @param string|null $userId
 	 * @return bool
 	 */
-	private function basisCheck($element, string $nodeType, ?string &$userId) {
+	private function basisCheck($element, string $nodeType, ?string &$userId): bool
+	{
 		try {
 			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
@@ -374,6 +408,7 @@ class PermissionsService {
 				return true;
 			}
 		} catch (NotFoundError $e) {
+			return false;
 		} catch (InternalError $e) {
 			$this->logger->warning('Cannot get permissions');
 		}
@@ -385,12 +420,8 @@ class PermissionsService {
 	 * @param string $nodeType
 	 * @param string|null $userId
 	 * @return bool
-	 * @throws DoesNotExistException
-	 * @throws Exception
-	 * @throws MultipleObjectsReturnedException
-	 * @throws NotFoundError
 	 */
-	private function basisCheckById(int $elementId, string $nodeType, ?string &$userId) {
+	private function basisCheckById(int $elementId, string $nodeType, ?string &$userId): bool {
 		try {
 			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
@@ -405,17 +436,16 @@ class PermissionsService {
 			$element = $nodeType === 'table' ? $this->tableMapper->find($elementId) : $this->viewMapper->find($elementId);
 			return $this->basisCheck($element, $nodeType, $userId);
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|\Exception $e) {
-			$this->logger->warning('Exception occured: '.$e->getMessage());
+			$this->logger->warning('Exception occurred: '.$e->getMessage());
 		}
 		return false;
 	}
 
-	/** @noinspection PhpUndefinedMethodInspection */
 	private function userIsElementOwner(string $userId, $element): bool {
 		return $element->getOwnership() === $userId;
 	}
 
-	public function canChangeElementOwner($element, string $userId): bool {
+	public function canChangeElementOwner(string $userId): bool {
 		return $userId === '';
 	}
 }

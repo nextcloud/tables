@@ -28,10 +28,13 @@ class RowService extends SuperService {
 
 	/**
 	 * @param int $viewId
+	 * @param string $userId
 	 * @param int|null $limit
 	 * @param int|null $offset
 	 * @return array
+	 * @throws DoesNotExistException
 	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
 	 * @throws PermissionError
 	 */
 	public function findAllByView(int $viewId, string $userId, ?int $limit = null, ?int $offset = null): array {
@@ -60,7 +63,6 @@ class RowService extends SuperService {
 			$row = $this->mapper->find($id);
 
 			// security
-			/** @noinspection PhpUndefinedMethodInspection */
 			if (!$this->permissionsService->canReadRowsByElementId($row->getTableId(), 'table')) {
 				throw new PermissionError('PermissionError: can not read row with id '.$id);
 			}
@@ -76,19 +78,21 @@ class RowService extends SuperService {
 	}
 
 	/**
-	 * @param int $tableId
+	 * @param int $viewId
 	 * @param array $data
 	 * @return Row
+	 * @throws DoesNotExistException
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
 	 * @throws PermissionError
 	 * @throws \OCP\DB\Exception
-	 * @noinspection PhpUndefinedMethodInspection
 	 * @noinspection DuplicatedCode
 	 */
 	public function create(
 		int $viewId,
 		array $data
 	):Row {
-		
+
 		$view = $this->viewMapper->find($viewId);
 		// security
 		if (!$this->permissionsService->canCreateRows($view)) {
@@ -101,7 +105,7 @@ class RowService extends SuperService {
 			if (!in_array($entry['columnId'], $viewColumns)) {
 				throw new InternalError('Column with id '.$entry['columnId'].' is not part of view with id '.$view->getId());
 			}
-		}		
+		}
 
 		$time = new DateTime();
 		$item = new Row();
@@ -115,13 +119,16 @@ class RowService extends SuperService {
 	}
 
 	/**
-	 * @noinspection PhpUndefinedMethodInspection
 	 * @noinspection DuplicatedCode
 	 * @param int $id
+	 * @param int $viewId
 	 * @param int $columnId
 	 * @param string $data
+	 * @param string $userId
 	 * @return Row
+	 * @throws DoesNotExistException
 	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
@@ -174,10 +181,11 @@ class RowService extends SuperService {
 	}
 
 	/**
-	 * @noinspection PhpUndefinedMethodInspection
 	 * @noinspection DuplicatedCode
 	 * @param int $id
+	 * @param int $viewId
 	 * @param array $data
+	 * @param string $userId
 	 * @return Row
 	 * @throws InternalError
 	 */
@@ -238,6 +246,8 @@ class RowService extends SuperService {
 
 	/**
 	 * @param int $id
+	 * @param int $viewId
+	 * @param string $userId
 	 * @return Row
 	 * @throws InternalError
 	 * @throws NotFoundError
@@ -248,7 +258,6 @@ class RowService extends SuperService {
 			$item = $this->mapper->find($id);
 
 			// security
-			/** @noinspection PhpUndefinedMethodInspection */
 			if (!$this->permissionsService->canDeleteRowsByViewId($viewId)) {
 				throw new PermissionError('delete row id = '.$item->getId().' is not allowed.');
 			}
@@ -311,33 +320,35 @@ class RowService extends SuperService {
 		}
 	}
 
+	/**
+	 * @param int $tableId
+	 * @return int
+	 * @throws PermissionError
+	 */
 	public function getRowsCount(int $tableId): int {
-		try {
-			if ($this->permissionsService->canReadRowsByElementId($tableId, 'table')) {
-				return $this->mapper->countRows($tableId);
-			} else {
-				throw new PermissionError('no read access for counting to table id = '.$tableId);
-			}
-		} catch (\OCP\DB\Exception $e) {
-			$this->logger->error($e->getMessage());
-			throw new InternalError($e->getMessage());
+		if ($this->permissionsService->canReadRowsByElementId($tableId, 'table')) {
+			return $this->mapper->countRows($tableId);
+		} else {
+			throw new PermissionError('no read access for counting to table id = '.$tableId);
 		}
 	}
 
+	/**
+	 * @param View $view
+	 * @param string $userId
+	 * @return int
+	 * @throws InternalError
+	 * @throws PermissionError
+	 */
 	public function getViewRowsCount(View $view, string $userId): int {
-		try {
-			if ($this->permissionsService->canReadRowsByElementId($view->getId(), 'view')) {
-				if ($view->getIsBaseView()) {
-					return $this->mapper->countRowsForBaseView($view);
-				} else {
-					return $this->mapper->countRowsForNotBaseView($view, $userId);
-				}
+		if ($this->permissionsService->canReadRowsByElementId($view->getId(), 'view')) {
+			if ($view->getIsBaseView()) {
+				return $this->mapper->countRowsForBaseView($view);
 			} else {
-				throw new PermissionError('no read access for counting to view id = '.$view->getId());
+				return $this->mapper->countRowsForNotBaseView($view, $userId);
 			}
-		} catch (\OCP\DB\Exception $e) {
-			$this->logger->error($e->getMessage());
-			throw new InternalError($e->getMessage());
+		} else {
+			throw new PermissionError('no read access for counting to view id = '.$view->getId());
 		}
 	}
 }

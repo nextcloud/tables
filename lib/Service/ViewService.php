@@ -6,7 +6,6 @@ use DateTime;
 use Exception;
 
 use OCA\Tables\Db\Table;
-use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 
@@ -15,13 +14,13 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\UserHelper;
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
 class ViewService extends SuperService {
 	private ViewMapper $mapper;
-
-	private TableMapper $tableMapper;
 
 	private ShareService $shareService;
 
@@ -36,7 +35,6 @@ class ViewService extends SuperService {
 		LoggerInterface $logger,
 		?string $userId,
 		ViewMapper $mapper,
-		TableMapper $tableMapper,
 		ShareService $shareService,
 		RowService $rowService,
 		UserHelper $userHelper,
@@ -45,21 +43,42 @@ class ViewService extends SuperService {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->l = $l;
 		$this->mapper = $mapper;
-		$this->tableMapper = $tableMapper;
 		$this->shareService = $shareService;
 		$this->rowService = $rowService;
 		$this->userHelper = $userHelper;
 	}
 
 
+	/**
+	 * @param Table $table
+	 * @param string|null $userId
+	 * @return array
+	 * @throws InternalError
+	 * @throws PermissionError
+	 */
 	public function findAll(Table $table, ?string $userId = null): array {
 		return $this->findAllGeneralised($table, true, $userId);
 	}
 
+	/**
+	 * @param Table $table
+	 * @param string|null $userId
+	 * @return array
+	 * @throws InternalError
+	 * @throws PermissionError
+	 */
 	public function findAllNotBaseViews(Table $table, ?string $userId = null): array {
 		return $this->findAllGeneralised($table, false, $userId);
 	}
 
+	/**
+	 * @param Table $table
+	 * @param bool $includeBaseView
+	 * @param string|null $userId
+	 * @return array
+	 * @throws InternalError
+	 * @throws PermissionError
+	 */
 	private function findAllGeneralised(Table $table, bool $includeBaseView = true, ?string $userId = null): array {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
@@ -70,12 +89,12 @@ class ViewService extends SuperService {
 				throw new PermissionError('PermissionError: can not read views for tableId '.$table->getId());
 			}
 
-			$allViews = $includeBaseView ? $allViews = $this->mapper->findAll($table->getId()) : $this->mapper->findAllNotBaseViews($table->getId());
+			$allViews = $includeBaseView ? $this->mapper->findAll($table->getId()) : $this->mapper->findAllNotBaseViews($table->getId());
 			foreach ($allViews as $view) {
 				$this->enhanceView($view, $userId);
 			}
 			return $allViews;
-		} catch (\OCP\DB\Exception $e) {
+		} catch (\OCP\DB\Exception|InternalError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError($e->getMessage());
 		} catch (PermissionError $e) {
@@ -84,6 +103,16 @@ class ViewService extends SuperService {
 		}
 	}
 
+	/**
+	 * @param Table $table
+	 * @param bool $skipTableEnhancement
+	 * @param string|null $userId
+	 * @return View
+	 * @throws InternalError
+	 * @throws PermissionError
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 */
 	public function findBaseView(Table $table, bool $skipTableEnhancement = false, ?string $userId = null): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
@@ -109,11 +138,13 @@ class ViewService extends SuperService {
 
 	/**
 	 * @param int $id
+	 * @param bool $skipEnhancement
 	 * @param string|null $userId (null -> take from session, '' -> no user in context)
 	 * @return View
-	 * @throws PermissionError
-	 * @throws NotFoundError
+	 * @throws DoesNotExistException
 	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws PermissionError
 	 */
 	public function find(int $id, bool $skipEnhancement = false, ?string $userId = null): View {
 		/** @var string $userId */
@@ -156,13 +187,13 @@ class ViewService extends SuperService {
 
 
 	/**
-	 * @param int $tableId
 	 * @param string $title
 	 * @param string|null $emoji
+	 * @param Table $table
+	 * @param bool $isBaseView
 	 * @param string|null $userId
 	 * @return View
 	 * @throws InternalError
-	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
 	public function create(string $title, ?string $emoji, Table $table, bool $isBaseView = false, ?string $userId = null): View {
@@ -214,6 +245,7 @@ class ViewService extends SuperService {
 	 * @param int $id
 	 * @param array $data
 	 * @param string|null $userId
+	 * @param bool $skipTableEnhancement
 	 * @return View
 	 * @throws InternalError
 	 */
@@ -281,9 +313,8 @@ class ViewService extends SuperService {
 	}
 
 
-
 	/**
-	 * @param int $id
+	 * @param View $view
 	 * @param string|null $userId
 	 * @return View
 	 * @throws InternalError
@@ -312,8 +343,6 @@ class ViewService extends SuperService {
 	 * add some basic values related to this view in context
 	 *
 	 * $userId can be set or ''
-	 *
-	 * @noinspection PhpUndefinedMethodInspection
 	 */
 	private function enhanceView(View $view, string $userId): void {
 		// add owner display name for UI
@@ -324,29 +353,34 @@ class ViewService extends SuperService {
 		if ($userId !== '') {
 			try {
 				$permissions = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getId(), 'view', $userId);
-				/** @noinspection PhpUndefinedMethodInspection */
 				$view->setIsShared(true);
 				$canManageTable = false;
 				try {
 					$manageTableShare = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getTableId(), 'table', $userId);
-					$canManageTable = $manageTableShare['manage'];
+					$canManageTable = $manageTableShare['manage'] ?? false;
 				} catch (NotFoundError $e) {
 				} catch (\Exception $e) {
 					throw new InternalError($e);
 				}
-				/** @noinspection PhpUndefinedMethodInspection */
 				$view->setOnSharePermissions([
-					'read' => $permissions['read'],
-					'create' => $permissions['create'],
-					'update' => $permissions['update'],
-					'delete' => $permissions['delete'],
-					'manage' => $permissions['manage'],
-					'manageTable' => $canManageTable,
+					'read' => $permissions['read'] ?? false,
+					'create' => $permissions['create'] ?? false,
+					'update' => $permissions['update'] ?? false,
+					'delete' => $permissions['delete'] ?? false,
+					'manage' => $permissions['manage'] ?? false,
+					'manageTable' => $canManageTable
 				]);
 			} catch (NotFoundError $e) {
-
 			} catch (\Exception $e) {
-				throw new InternalError($e);
+				$this->logger->warning('Exception occurred while setting shared permissions: '.$e->getMessage().' No permissions granted.');
+				$view->setOnSharePermissions([
+					'read' => false,
+					'create' => false,
+					'update' => false,
+					'delete' => false,
+					'manage' => false,
+					'manageTable' => false
+				]);
 			}
 		}
 
@@ -378,11 +412,11 @@ class ViewService extends SuperService {
 	}
 
 	/**
-	 * @param Table $tableId
+	 * @param Table $table
 	 * @param null|string $userId
-	 * @return int
+	 * @return View
+	 * @throws InternalError
 	 * @throws PermissionError
-	 * @throws \OCP\DB\Exception
 	 */
 	public function deleteAllByTable(Table $table, ?string $userId = null): View {
 		// security
@@ -397,11 +431,24 @@ class ViewService extends SuperService {
 				$this->deleteByObject($view, $userId);
 			}
 		}
+		if (!isset($baseView)) {
+			throw new InternalError('No base view exists for this table');
+		}
 		return $this->deleteByObject($baseView, $userId);
 	}
 
+	/**
+	 * @param int $columnId
+	 * @param Table $table
+	 * @return void
+	 * @throws InternalError
+	 */
 	public function deleteColumnDataFromViews(int $columnId, Table $table) {
-		$views = $this->mapper->findAll($table->getId());
+		try {
+			$views = $this->mapper->findAll($table->getId());
+		} catch (\OCP\DB\Exception $e) {
+			throw new InternalError($e->getMessage());
+		}
 		foreach ($views as $view) {
 			$filteredSortingRules = array_filter($view->getSortArray(), function ($sort) use ($columnId) {
 				return $sort['columnId'] !== $columnId;
@@ -434,8 +481,7 @@ class ViewService extends SuperService {
 			/** @var string $userId */
 			$userId = $this->permissionsService->preCheckUserId($userId);
 			$views = $this->mapper->search($term, $userId, $limit, $offset);
-			foreach ($views as &$view) {
-				/** @var string $userId */
+			foreach ($views as $view) {
 				$this->enhanceView($view, $userId);
 			}
 			return $views;

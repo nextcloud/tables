@@ -8,13 +8,16 @@ use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
+use Psr\Log\LoggerInterface;
 
 /** @template-extends QBMapper<Share> */
 class ShareMapper extends QBMapper {
 	protected string $table = 'tables_shares';
+	protected LoggerInterface $logger;
 
-	public function __construct(IDBConnection $db) {
+	public function __construct( LoggerInterface $logger, IDBConnection $db) {
 		parent::__construct($db, $this->table, Share::class);
+		$this->logger = $logger;
 	}
 
 	/**
@@ -63,7 +66,7 @@ class ShareMapper extends QBMapper {
 				return $items[0];
 			}
 		} catch (Exception $e) {
-			$this->logger->warning('Exception occured while executing SQL statement: '.$e->getMessage());
+			$this->logger->warning('Exception occurred while executing SQL statement: '.$e->getMessage());
 		}
 
 		throw new Exception('no shares found as expected');
@@ -72,6 +75,7 @@ class ShareMapper extends QBMapper {
 	/**
 	 * @param string $nodeType
 	 * @param string $receiver
+	 * @param string $userId
 	 * @param string|null $receiverType
 	 *
 	 * @return array
@@ -93,11 +97,10 @@ class ShareMapper extends QBMapper {
 	 * @param string $nodeType
 	 * @param int $nodeId
 	 * @param string $sender
-	 * @param int|null $limit
 	 * @return array
 	 * @throws Exception
 	 */
-	public function findAllSharesForNode(string $nodeType, int $nodeId, string $sender, ?int $limit = null): array {
+	public function findAllSharesForNode(string $nodeType, int $nodeId, string $sender): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
@@ -107,6 +110,14 @@ class ShareMapper extends QBMapper {
 		return $this->findEntities($qb);
 	}
 
+	/**
+	 * @param string $nodeType
+	 * @param int $nodeId
+	 * @param string $receiver
+	 * @param string|null $receiverType
+	 * @return array
+	 * @throws Exception
+	 */
 	public function findAllSharesForNodeFor(string $nodeType, int $nodeId, string $receiver, ?string $receiverType = 'user'): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')

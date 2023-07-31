@@ -5,9 +5,13 @@ namespace OCA\Tables\Service;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
 use OCP\IL10N;
+use Psr\Log\LoggerInterface;
 
 class TableTemplateService {
 	private IL10N $l;
@@ -18,9 +22,12 @@ class TableTemplateService {
 
 	private ViewService $viewService;
 
+	protected LoggerInterface $logger;
+
 	private ?string $userId;
 
-	public function __construct(IL10N $l, ColumnService $columnService, ?string $userId, RowService $rowService, ViewService $viewService) {
+	public function __construct(LoggerInterface $logger, IL10N $l, ColumnService $columnService, ?string $userId, RowService $rowService, ViewService $viewService) {
+		$this->logger = $logger;
 		$this->l = $l;
 		$this->columnService = $columnService;
 		$this->rowService = $rowService;
@@ -69,13 +76,18 @@ class TableTemplateService {
 	/**
 	 * @param Table $table
 	 * @param string $template
+	 * @param int $baseViewId
 	 * @return Table
+	 * @throws DoesNotExistException
+	 * @throws Exception
 	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
 	public function makeTemplate(Table $table, string $template, int $baseViewId): Table {
-		$createColumn = function ($params) use ($table, $baseViewId) {return $this->createColumn($table->getId(), $params, $baseViewId);};
-		$createRow = function ($data) use ($table, $baseViewId) {$this->createRow($table, $baseViewId, $data);};
+		$createColumn = function ($params) use ($table, $baseViewId) {return $this->createColumn($params, $baseViewId);};
+		$createRow = function ($data) use ($table, $baseViewId) {$this->createRow($baseViewId, $data);};
 		$createView = function ($data) use ($table) {$this->createView($table, $data);};
 		if ($template === 'todo') {
 			$this->makeTodo($createColumn, $createRow);
@@ -95,9 +107,8 @@ class TableTemplateService {
 
 	/**
 	 * @psalm-suppress PossiblyNullReference
-	 * @param Table $table
-	 * @throws InternalError
-	 * @throws PermissionError
+	 * @param $createColumn
+	 * @param $createRow
 	 */
 	private function makeWeight($createColumn, $createRow):void {
 		$columns = [];
@@ -108,7 +119,6 @@ class TableTemplateService {
 			'subtype' => 'date',
 			'mandatory' => true,
 			'datetimeDefault' => 'today',
-			'orderWeight' => 50,
 		];
 		$columns['date'] = $createColumn($params);
 
@@ -118,7 +128,6 @@ class TableTemplateService {
 			'numberSuffix' => 'kg',
 			'numberMin' => 0,
 			'numberMax' => 200,
-			'orderWeight' => 40,
 		];
 		$columns['weight'] = $createColumn($params);
 
@@ -128,7 +137,6 @@ class TableTemplateService {
 			'numberMin' => 0,
 			'numberMax' => 100,
 			'numberSuffix' => '%',
-			'orderWeight' => 30,
 		];
 		$columns['bodyFat'] = $createColumn($params);
 
@@ -136,7 +144,6 @@ class TableTemplateService {
 			'title' => $this->l->t('Feeling over all'),
 			'type' => 'number',
 			'subtype' => 'stars',
-			'orderWeight' => 20,
 		];
 		$columns['feeling'] = $createColumn($params);
 
@@ -144,7 +151,6 @@ class TableTemplateService {
 			'title' => $this->l->t('Comments'),
 			'type' => 'text',
 			'subtype' => 'long',
-			'orderWeight' => 10,
 		];
 		$columns['comment'] = $createColumn($params);
 
@@ -181,9 +187,8 @@ class TableTemplateService {
 
 	/**
 	 * @psalm-suppress PossiblyNullReference
-	 * @param Table $table
-	 * @throws InternalError
-	 * @throws PermissionError
+	 * @param $createColumn
+	 * @param $createRow
 	 */
 	private function makeCustomers($createColumn, $createRow):void {
 		$columns = [];
@@ -192,7 +197,6 @@ class TableTemplateService {
 			'title' => $this->l->t('Name'),
 			'type' => 'text',
 			'subtype' => 'line',
-			'orderWeight' => 100,
 		];
 		$columns['name'] = $createColumn($params);
 
@@ -200,7 +204,6 @@ class TableTemplateService {
 			'title' => $this->l->t('Account manager'),
 			'type' => 'text',
 			'subtype' => 'line',
-			'orderWeight' => 90,
 		];
 		$columns['accountManager'] = $createColumn($params);
 
@@ -208,7 +211,6 @@ class TableTemplateService {
 			'title' => $this->l->t('Contract type'),
 			'type' => 'text',
 			'subtype' => 'line',
-			'orderWeight' => 80,
 		];
 		$columns['contractType'] = $createColumn($params);
 
@@ -217,7 +219,6 @@ class TableTemplateService {
 			'type' => 'datetime',
 			'subtype' => 'date',
 			'datetimeDefault' => 'today',
-			'orderWeight' => 70,
 		];
 		$columns['contractStart'] = $createColumn($params);
 
@@ -225,7 +226,6 @@ class TableTemplateService {
 			'title' => $this->l->t('Contract end'),
 			'type' => 'datetime',
 			'subtype' => 'date',
-			'orderWeight' => 60,
 		];
 		$columns['contractEnd'] = $createColumn($params);
 
@@ -233,7 +233,7 @@ class TableTemplateService {
 			'title' => $this->l->t('Description'),
 			'type' => 'text',
 			'subtype' => 'long',
-			'orderWeight' => 50,
+
 		];
 		$columns['description'] = $createColumn($params);
 
@@ -241,7 +241,7 @@ class TableTemplateService {
 			'title' => $this->l->t('Contact information'),
 			'type' => 'text',
 			'subtype' => 'long',
-			'orderWeight' => 40,
+
 		];
 		$columns['contactInformation'] = $createColumn($params);
 
@@ -249,7 +249,7 @@ class TableTemplateService {
 			'title' => $this->l->t('Quality of relationship'),
 			'type' => 'number',
 			'subtype' => 'progress',
-			'orderWeight' => 30,
+
 			'numberDefault' => 30,
 		];
 		$columns['qualityRelationship'] = $createColumn($params);
@@ -258,7 +258,7 @@ class TableTemplateService {
 			'title' => $this->l->t('Comment'),
 			'type' => 'text',
 			'subtype' => 'long',
-			'orderWeight' => 20,
+
 		];
 		$columns['comment'] = $createColumn($params);
 
@@ -318,9 +318,9 @@ class TableTemplateService {
 
 	/**
 	 * @psalm-suppress PossiblyNullReference
-	 * @param Table $table
-	 * @throws InternalError
-	 * @throws PermissionError
+	 * @param $createColumn
+	 * @param $createRow
+	 * @param $createView
 	 */
 	private function makeVacationRequests($createColumn, $createRow, $createView):void {
 		$columns = [];
@@ -330,7 +330,7 @@ class TableTemplateService {
 			'type' => 'text',
 			'subtype' => 'line',
 			'mandatory' => true,
-			'orderWeight' => 50,
+
 		];
 		$columns['employee'] = $createColumn($params);
 
@@ -340,7 +340,7 @@ class TableTemplateService {
 			'type' => 'datetime',
 			'subtype' => 'date',
 			'mandatory' => true,
-			'orderWeight' => 41,
+
 		];
 		$columns['from'] = $createColumn($params);
 
@@ -350,7 +350,7 @@ class TableTemplateService {
 			'type' => 'datetime',
 			'subtype' => 'date',
 			'mandatory' => true,
-			'orderWeight' => 40,
+
 		];
 		$columns['to'] = $createColumn($params);
 
@@ -361,7 +361,7 @@ class TableTemplateService {
 			'numberMin' => 0,
 			'numberMax' => 100,
 			'mandatory' => true,
-			'orderWeight' => 30,
+
 		];
 		$columns['workingDays'] = $createColumn($params);
 
@@ -371,7 +371,7 @@ class TableTemplateService {
 			'subtype' => 'date',
 			'mandatory' => true,
 			'datetimeDefault' => 'today',
-			'orderWeight' => 20,
+
 		];
 		$columns['dateRequest'] = $createColumn($params);
 
@@ -379,7 +379,7 @@ class TableTemplateService {
 			'title' => $this->l->t('Approved'),
 			'type' => 'selection',
 			'subtype' => 'check',
-			'orderWeight' => 25,
+
 		];
 		$columns['approved'] = $createColumn($params);
 
@@ -387,7 +387,7 @@ class TableTemplateService {
 			'title' => $this->l->t('Approve date'),
 			'type' => 'datetime',
 			'subtype' => 'date',
-			'orderWeight' => 24,
+
 		];
 		$columns['dateApprove'] = $createColumn($params);
 
@@ -395,7 +395,7 @@ class TableTemplateService {
 			'title' => $this->l->t('Approved by'),
 			'type' => 'text',
 			'subtype' => 'line',
-			'orderWeight' => 23,
+
 		];
 		$columns['approveBy'] = $createColumn($params);
 
@@ -404,7 +404,7 @@ class TableTemplateService {
 			'title' => $this->l->t('Comments'),
 			'type' => 'text',
 			'subtype' => 'long',
-			'orderWeight' => 10,
+
 		];
 		$columns['comment'] = $createColumn($params);
 
@@ -502,9 +502,8 @@ class TableTemplateService {
 
 	/**
 	 * @psalm-suppress PossiblyNullReference
-	 * @param Table $table
-	 * @throws InternalError
-	 * @throws PermissionError
+	 * @param $createColumn
+	 * @param $createRow
 	 */
 	private function makeMembers($createColumn, $createRow):void {
 		$columns = [];
@@ -514,7 +513,7 @@ class TableTemplateService {
 			'type' => 'text',
 			'subtype' => 'line',
 			'mandatory' => true,
-			'orderWeight' => 50,
+
 		];
 		$columns['name'] = $createColumn($params);
 
@@ -522,7 +521,7 @@ class TableTemplateService {
 			'title' => $this->l->t('Position'),
 			'type' => 'text',
 			'subtype' => 'line',
-			'orderWeight' => 40,
+
 		];
 		$columns['position'] = $createColumn($params);
 
@@ -530,7 +529,7 @@ class TableTemplateService {
 			'title' => $this->l->t('Skills'),
 			'type' => 'text',
 			'subtype' => 'long',
-			'orderWeight' => 30,
+
 		];
 		$columns['skills'] = $createColumn($params);
 
@@ -538,7 +537,7 @@ class TableTemplateService {
 			'title' => $this->l->t('Birthday'),
 			'type' => 'datetime',
 			'subtype' => 'date',
-			'orderWeight' => 20,
+
 		];
 		$columns['birthday'] = $createColumn($params);
 
@@ -546,7 +545,7 @@ class TableTemplateService {
 			'title' => $this->l->t('Comments'),
 			'type' => 'text',
 			'subtype' => 'long',
-			'orderWeight' => 10,
+
 		];
 		$columns['comment'] = $createColumn($params);
 
@@ -565,9 +564,8 @@ class TableTemplateService {
 
 	/**
 	 * @psalm-suppress PossiblyNullReference
-	 * @param Table $table
-	 * @throws InternalError
-	 * @throws PermissionError
+	 * @param $createColumn
+	 * @param $createRow
 	 */
 	private function makeTodo($createColumn, $createRow): void {
 		$columns = [];
@@ -577,7 +575,7 @@ class TableTemplateService {
 			'type' => 'text',
 			'subtype' => 'line',
 			'mandatory' => true,
-			'orderWeight' => 50,
+
 		];
 		$columns['task'] = $createColumn($params);
 
@@ -587,7 +585,7 @@ class TableTemplateService {
 			'subtype' => 'long',
 			'description' => $this->l->t('Title or short description'),
 			'textMultiline' => true,
-			'orderWeight' => 40,
+
 		];
 		$columns['description'] = $createColumn($params);
 
@@ -596,7 +594,7 @@ class TableTemplateService {
 			'type' => 'text',
 			'subtype' => 'long',
 			'description' => $this->l->t('Date, time or whatever'),
-			'orderWeight' => 30,
+
 		];
 		$columns['target'] = $createColumn($params);
 
@@ -604,7 +602,7 @@ class TableTemplateService {
 			'title' => $this->l->t('Progress'),
 			'type' => 'number',
 			'subtype' => 'progress',
-			'orderWeight' => 20,
+
 			'numberDefault' => 0,
 		];
 		$columns['progress'] = $createColumn($params);
@@ -613,7 +611,7 @@ class TableTemplateService {
 			'title' => $this->l->t('Comments'),
 			'type' => 'text',
 			'subtype' => 'long',
-			'orderWeight' => 10,
+
 		];
 		$columns['comments'] = $createColumn($params);
 
@@ -621,7 +619,7 @@ class TableTemplateService {
 			'title' => $this->l->t('Proofed'),
 			'type' => 'selection',
 			'subtype' => 'check',
-			'orderWeight' => 5,
+
 		];
 		$columns['proofed'] = $createColumn($params);
 
@@ -674,9 +672,8 @@ class TableTemplateService {
 
 	/**
 	 * @psalm-suppress PossiblyNullReference
-	 * @param Table $table
-	 * @throws InternalError
-	 * @throws PermissionError
+	 * @param $createColumn
+	 * @param $createRow
 	 */
 	private function makeStartupTable($createColumn, $createRow):void {
 		$columns = [];
@@ -686,7 +683,7 @@ class TableTemplateService {
 			'title' => $this->l->t('What'),
 			'type' => 'text',
 			'subtype' => 'line',
-			'orderWeight' => 10,
+
 		];
 		$columns['what'] = $createColumn($params);
 
@@ -694,7 +691,7 @@ class TableTemplateService {
 			'title' => $this->l->t('How to do'),
 			'type' => 'text',
 			'subtype' => 'long',
-			'orderWeight' => 10,
+
 		];
 		$columns['how'] = $createColumn($params);
 
@@ -702,7 +699,7 @@ class TableTemplateService {
 			'title' => $this->l->t('Ease of use'),
 			'type' => 'number',
 			'subtype' => 'stars',
-			'orderWeight' => 10,
+
 		];
 		$columns['ease'] = $createColumn($params);
 
@@ -711,7 +708,7 @@ class TableTemplateService {
 			'title' => $this->l->t('Done'),
 			'type' => 'selection',
 			'subtype' => 'check',
-			'orderWeight' => 10,
+
 		];
 		$columns['done'] = $createColumn($params);
 
@@ -760,13 +757,16 @@ class TableTemplateService {
 	}
 
 	/**
-	 * @param int $tableId
 	 * @param (mixed)[] $parameters
+	 * @param int $baseViewId
 	 * @return Column
+	 * @throws Exception
 	 * @throws InternalError
 	 * @throws PermissionError
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
 	 */
-	private function createColumn(int $tableId, array $parameters, int $baseViewId): ?Column {
+	private function createColumn(array $parameters, int $baseViewId): ?Column {
 		if ($this->userId === null) {
 			return null;
 		}
@@ -793,9 +793,6 @@ class TableTemplateService {
 
 			// description
 			(isset($parameters['description'])) ? $parameters['description'] : '',
-
-			// orderWeight
-			(isset($parameters['orderWeight'])) ? $parameters['orderWeight'] : 0,
 
 			// textDefault
 			(isset($parameters['textDefault'])) ? $parameters['textDefault'] : '',
@@ -838,7 +835,15 @@ class TableTemplateService {
 		);
 	}
 
-	private function createRow(Table $table, int $viewId, array $values): void {
+	/**
+	 * @param int $viewId
+	 * @param array $values
+	 * @return void
+	 * @throws DoesNotExistException
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 */
+	private function createRow(int $viewId, array $values): void {
 		$data = [];
 		foreach ($values as $columnId => $value) {
 			$data[] = [
@@ -851,18 +856,22 @@ class TableTemplateService {
 		} catch (PermissionError $e) {
 			$this->logger->warning('Cannot create row, permission denied: '.$e->getMessage());
 		} catch (Exception $e) {
-			$this->logger->warning('Exception occured while creating a row: '.$e->getMessage());
+			$this->logger->warning('Exception occurred while creating a row: '.$e->getMessage());
 		}
 	}
 
+	/**
+	 * @param Table $table
+	 * @param array $data
+	 * @return void
+	 * @throws InternalError
+	 */
 	private function createView(Table $table, array $data): void {
 		try {
 			$view = $this->viewService->create($data['title'], $data['emoji'], $table);
 			$this->viewService->update($view->getId(), $data);
 		} catch (PermissionError $e) {
 			$this->logger->warning('Cannot create view, permission denied: '.$e->getMessage());
-		} catch (Exception $e) {
-			$this->logger->warning('Exception occured while creating a row: '.$e->getMessage());
 		}
 	}
 }

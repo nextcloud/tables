@@ -8,6 +8,32 @@ use OCP\AppFramework\Db\Entity;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
+ * @method getSender(): string
+ * @method setSender(string $sender)
+ * @method getReceiver(): string
+ * @method setReceiver(string $receiver)
+ * @method getReceiverDisplayName(): string
+ * @method setReceiverDisplayName(string $receiverDisplayName)
+ * @method getReceiverType(): string
+ * @method setReceiverType(string $receiverType)
+ * @method getNodeId(): int
+ * @method setNodeId(int $nodeId)
+ * @method getNodeType(): string
+ * @method setNodeType(string $nodeType)
+ * @method getPermissionRead(): bool
+ * @method setPermissionRead(bool $permissionRead)
+ * @method getPermissionCreate(): bool
+ * @method setPermissionCreate(bool $permissionCreate)
+ * @method getPermissionUpdate(): bool
+ * @method setPermissionUpdate(bool $permissionUpdate)
+ * @method getPermissionDelete(): bool
+ * @method setPermissionDelete(bool $permissionDelete)
+ * @method getPermissionManage(): bool
+ * @method setPermissionManage(bool $permissionManage)
+ * @method getCreatedAt(): string
+ * @method setCreatedAt(string $createdAt)
+ * @method getLastEditAt(): string
+ * @method setLastEditAt(string $lastEditAt)
  */
 class Share extends Entity implements JsonSerializable {
 	protected ?string $sender = null; // is also owner
