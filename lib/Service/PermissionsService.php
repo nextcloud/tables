@@ -201,7 +201,7 @@ class PermissionsService {
 	 */
 	public function canDeleteRowsByTableId(int $tableId, ?string $userId = null): bool {
 		return $this->checkPermissionById($tableId, 'table', 'manage', $userId);
-		
+
 	}
 
 
@@ -279,7 +279,7 @@ class PermissionsService {
 
 	public function getSharedPermissionsIfSharedWithMe(int $elementId, ?string $elementType = 'table', string $userId = null): array {
 		try {
-			$shares = $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userId, 'user');
+			$shares = $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userId);
 		} catch (Exception $e) {
 			$this->logger->warning('Exception occured: '.$e->getMessage().' Permission denied.');
 			return [];

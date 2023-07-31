@@ -776,9 +776,6 @@ class TableTemplateService {
 			// userId
 			$this->userId,
 
-			// tableId
-			$tableId,
-
 			// baseViewId
 			$baseViewId,
 

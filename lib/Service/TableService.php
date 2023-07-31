@@ -128,7 +128,7 @@ class TableService extends SuperService {
 	 *
 	 * @noinspection PhpUndefinedMethodInspection
 	 */
-	private function enhanceTable(Table &$table, string $userId): void {
+	private function enhanceTable(Table $table, string $userId): void {
 		// add owner display name for UI
 		$this->addOwnerDisplayName($table);
 
