@@ -6,7 +6,7 @@
 				<div v-if="hasRightHiddenNeighbor(-1)" class="hidden-indicator-first" @click="unhide(-1)" />
 			</div>
 		</th>
-		<th v-for="col in visibleColums" :key="col.id">
+		<th v-for="col in visibleColumns" :key="col.id">
 			<div class="cell-wrapper">
 				<div class="cell-options-wrapper">
 					<div class="cell">
@@ -16,7 +16,7 @@
 						<TableHeaderColumnOptions
 							:column="col"
 							:open-state.sync="openedColumnHeaderMenus[col.id]"
-							:can-hide="visibleColums.length > 1"
+							:can-hide="visibleColumns.length > 1"
 							@add-filter="filter => $emit('add-filter', filter)" />
 					</div>
 					<div v-if="getFilterForColumn(col)" class="filter-wrapper">
@@ -34,55 +34,18 @@
 		<th data-cy="customTableAction">
 			<NcActions :force-menu="true" :type="isViewSettingSet ? 'secondary' : 'tertiary'">
 				<NcActionCaption v-if="canManageElement(view)" :title="t('tables', 'Manage view')" />
-				<NcActionButton v-if="isViewSettingSet"
+				<NcActionButton v-if="canManageElement(view)"
 					:close-after-click="true"
-					class="view-changed"
-					@click="resetView">
-					<template #icon>
-						<ArrowULeftTop :size="20" decorative />
-					</template>
-					{{ t('tables', 'Reset view config') }}
+					:type="isViewSettingSet ? 'secondary' : 'tertiary'"
+					icon="icon-rename"
+					@click="editView()">
+					{{ t('tables', 'Edit view') }}
 				</NcActionButton>
-				<NcActionButton v-if="isViewSettingSet && !activeView.isBaseView && canManageElement(view)"
-					:close-after-click="true"
-					class="view-changed"
-					@click="applyViewConfig">
-					<template #icon>
-						<TableCheck :size="20" decorative />
-					</template>
-					{{ t('tables', 'Apply view config') }}
-				</NcActionButton>
-				<NcActionButton v-if="isViewSettingSet && canManageElement(view)"
-					:close-after-click="true"
-					class="view-changed"
-					@click="createWithViewConfig">
-					<template #icon>
-						<TablePlus :size="20" decorative />
-					</template>
-					{{ t('tables', 'Create view with config') }}
-				</NcActionButton>
-
-				<NcActionSeparator v-if="isViewSettingSet" />
-
 				<NcActionButton v-if="canManageTable(view)" :close-after-click="true" @click="$emit('create-column')">
 					<template #icon>
 						<TableColumnPlusAfter :size="20" decorative title="" />
 					</template>
 					{{ t('tables', 'Create column') }}
-				</NcActionButton>
-				<NcActionButton v-if="canManageElement(view)"
-					:close-after-click="true"
-					icon="icon-rename"
-					@click="editView()">
-					{{ t('tables', 'Edit view') }}
-				</NcActionButton>
-				<NcActionButton v-if="canManageTable(view)"
-					:close-after-click="true"
-					@click="createView()">
-					<template #icon>
-						<TablePlus :size="20" decorative />
-					</template>
-					{{ t('tables', 'Create view') }}
 				</NcActionButton>
 
 				<NcActionCaption :title="t('tables', 'Integration')" />
@@ -119,14 +82,11 @@
 </template>
 
 <script>
-import { NcCheckboxRadioSwitch, NcActions, NcActionButton, NcActionSeparator, NcActionCaption } from '@nextcloud/vue'
+import { NcCheckboxRadioSwitch, NcActions, NcActionButton, NcActionCaption } from '@nextcloud/vue'
 import { emit } from '@nextcloud/event-bus'
 import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
 import IconImport from 'vue-material-design-icons/Import.vue'
 import Creation from 'vue-material-design-icons/Creation.vue'
-import ArrowULeftTop from 'vue-material-design-icons/TableRefresh.vue'
-import TableCheck from 'vue-material-design-icons/TableCheck.vue'
-import TablePlus from 'vue-material-design-icons/TablePlus.vue'
 import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
 import FilterLabel from './FilterLabel.vue'
 import permissionsMixin from '../mixins/permissionsMixin.js'
@@ -142,11 +102,7 @@ export default {
 		TableHeaderColumnOptions,
 		NcActions,
 		NcActionButton,
-		NcActionSeparator,
 		TableColumnPlusAfter,
-		ArrowULeftTop,
-		TableCheck,
-		TablePlus,
 		NcActionCaption,
 		Creation,
 	},
@@ -191,7 +147,7 @@ export default {
 				return false
 			}
 		},
-		visibleColums() {
+		visibleColumns() {
 			return this.columns.filter(col => !this.viewSetting?.hiddenColumns?.includes(col.id))
 		},
 		isViewSettingSet() {

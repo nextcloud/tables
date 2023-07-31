@@ -3,21 +3,8 @@
 		<h1>
 			{{ activeView.emoji }}&nbsp;{{ activeView.title }}
 		</h1>
-		<div v-if="!activeView.isShared || (activeView.isShared && activeView.onSharePermissions.manage)" class="light">
-			<NcButton
-				:aria-label="activeView.isBaseView ? t('tables', 'Edit table') : t('tables', 'Edit view')"
-				type="tertiary"
-				@click="editElement">
-				<template #icon>
-					<Pencil :size="20" />
-				</template>
-				{{ activeView.isBaseView ? t('tables', 'Edit table') : t('tables', 'Edit view') }}
-			</NcButton>
-		</div>
-		<div v-if="isFiltered" style="padding: 0 8px">
-			<InformationOutline :size="20" />
-		</div>
-		<div v-if="isFiltered">
+		<div v-if="isFiltered" class="info">
+			<FilterMultipleOutline :size="20" />
 			{{ t('tables', 'Filtered view') }}
 		</div>
 		<div v-if="activeView.isShared" class="user-bubble">
@@ -33,17 +20,14 @@
 
 import { mapGetters } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
-import { NcButton, NcUserBubble } from '@nextcloud/vue'
-import Pencil from 'vue-material-design-icons/Pencil.vue'
-import InformationOutline from 'vue-material-design-icons/InformationOutline.vue'
+import { NcUserBubble } from '@nextcloud/vue'
+import FilterMultipleOutline from 'vue-material-design-icons/FilterMultipleOutline.vue'
 
 export default {
 	name: 'ElementDescription',
 	components: {
-		NcButton,
 		NcUserBubble,
-		Pencil,
-		InformationOutline,
+		FilterMultipleOutline,
 	},
 	computed: {
 		...mapGetters(['activeView']),
@@ -81,6 +65,17 @@ export default {
 
 .user-bubble {
 	padding-left: calc(var(--default-grid-baseline) * 2);
+}
+
+.info {
+	display: inline-flex;
+	margin-left: calc(var(--default-grid-baseline) * 2);
+	align-items: center;
+	color: var(--color-text-maxcontrast);
+}
+
+.info span {
+	padding: calc(var(--default-grid-baseline) * 1);
 }
 
 </style>
