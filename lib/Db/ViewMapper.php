@@ -2,6 +2,7 @@
 
 namespace OCA\Tables\Db;
 
+use OCA\Tables\Errors\InternalError;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
@@ -23,9 +24,11 @@ class ViewMapper extends QBMapper {
 
 	/**
 	 * @param int $id
+	 * @param bool $skipEnhancement
 	 * @return View
-	 * @throws Exception
 	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @throws InternalError
 	 * @throws MultipleObjectsReturnedException
 	 */
 	public function find(int $id, bool $skipEnhancement = false): View {
@@ -41,7 +44,12 @@ class ViewMapper extends QBMapper {
 	}
 
 	/**
+	 * @param int|null $tableId
+	 * @return View
+	 * @throws DoesNotExistException
 	 * @throws Exception
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
 	 */
 	public function findBaseView(?int $tableId = null): View {
 		$qb = $this->db->getQueryBuilder();
@@ -57,7 +65,10 @@ class ViewMapper extends QBMapper {
 	}
 
 	/**
+	 * @param int|null $tableId
+	 * @return array
 	 * @throws Exception
+	 * @throws InternalError
 	 */
 	public function findAll(?int $tableId = null): array {
 		$qb = $this->db->getQueryBuilder();
@@ -74,7 +85,10 @@ class ViewMapper extends QBMapper {
 	}
 
 	/**
+	 * @param int|null $tableId
+	 * @return array
 	 * @throws Exception
+	 * @throws InternalError
 	 */
 	public function findAllNotBaseViews(?int $tableId = null): array {
 		$qb = $this->db->getQueryBuilder();
@@ -92,7 +106,13 @@ class ViewMapper extends QBMapper {
 	}
 
 	/**
+	 * @param string|null $term
+	 * @param string|null $userId
+	 * @param int|null $limit
+	 * @param int|null $offset
+	 * @return array
 	 * @throws Exception
+	 * @throws InternalError
 	 */
 	public function search(string $term = null, ?string $userId = null, ?int $limit = null, ?int $offset = null): array {
 		$qb = $this->db->getQueryBuilder();
@@ -139,8 +159,6 @@ class ViewMapper extends QBMapper {
 			$qb->setFirstResult($offset);
 		}
 
-		$sql = $qb->getSQL();
-
 		$views = $this->findEntities($qb);
 		foreach($views as $view) {
 			$this->enhanceByOwnership($view);
@@ -148,8 +166,17 @@ class ViewMapper extends QBMapper {
 		return $views;
 	}
 
+	/**
+	 * @param View $view
+	 * @return void
+	 * @throws InternalError
+	 */
 	private function enhanceByOwnership(View $view): void {
-		$view->setOwnership($this->tableMapper->findOwnership($view->getTableId()));
+		try {
+			$view->setOwnership($this->tableMapper->findOwnership($view->getTableId()));
+		} catch (Exception $e) {
+			throw new InternalError('Could not find ownership of table');
+		}
 		$view->resetUpdatedFields();
 	}
 }

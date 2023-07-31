@@ -9,6 +9,8 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\ColumnTypes\TextLineBusiness;
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
@@ -49,12 +51,15 @@ class ImportService extends SuperService {
 	}
 
 	/**
-	 * @param int $tableId
+	 * @param int $viewId
 	 * @param string $path
 	 * @param bool $createMissingColumns
 	 * @return array
+	 * @throws DoesNotExistException
 	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
 	 * @throws NotFoundError
+	 * @throws PermissionError
 	 */
 	public function import(int $viewId, string $path, bool $createMissingColumns = true): array {
 		$view = $this->viewService->find($viewId);
@@ -104,8 +109,12 @@ class ImportService extends SuperService {
 	}
 
 	/**
-	 * @throws PermissionError
+	 * @param Worksheet $worksheet
+	 * @throws DoesNotExistException
 	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws NotFoundError
+	 * @throws PermissionError
 	 */
 	private function loop(Worksheet $worksheet): void {
 		$firstRow = true;
@@ -126,7 +135,6 @@ class ImportService extends SuperService {
 	private function parseValueByColumnType(string $value, Column $column): string {
 		try {
 			$businessClassName = 'OCA\Tables\Service\ColumnTypes\\';
-			/** @noinspection PhpUndefinedMethodInspection */
 			$businessClassName .= ucfirst($column->getType()).ucfirst($column->getSubtype()).'Business';
 			/** @var TextLineBusiness $columnBusiness */
 			$columnBusiness = Server::get($businessClassName);
@@ -137,6 +145,13 @@ class ImportService extends SuperService {
 		return '';
 	}
 
+	/**
+	 * @param Row $row
+	 * @return void
+	 * @throws DoesNotExistException
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 */
 	private function createRow(Row $row): void {
 		$cellIterator = $row->getCellIterator();
 		$cellIterator->setIterateOnlyExistingCells(false);
@@ -178,8 +193,12 @@ class ImportService extends SuperService {
 	}
 
 	/**
-	 * @throws PermissionError
+	 * @param Row $row
 	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
 	 */
 	private function getColumns(Row $row): void {
 		$cellIterator = $row->getCellIterator();
@@ -192,7 +211,11 @@ class ImportService extends SuperService {
 				$this->countErrors++;
 			}
 		}
-		$this->columns = $this->columnService->findOrCreateColumnsByTitleForTableAsArray($this->tableId, $this->viewId, $titles, $this->userId, $this->createUnknownColumns, $this->countCreatedColumns);
+		try {
+			$this->columns = $this->columnService->findOrCreateColumnsByTitleForTableAsArray($this->tableId, $this->viewId, $titles, $this->userId, $this->createUnknownColumns, $this->countCreatedColumns);
+		} catch (Exception $e) {
+			throw new InternalError($e->getMessage());
+		}
 	}
 
 }

@@ -33,6 +33,11 @@ class TableMapper extends QBMapper {
 		return $this->findEntity($qb);
 	}
 
+	/**
+	 * @param int $id
+	 * @return string
+	 * @throws Exception
+	 */
 	public function findOwnership(int $id): string {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('ownership')

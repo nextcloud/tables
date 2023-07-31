@@ -13,7 +13,6 @@
 				<div class="col-2">
 					<MainForm :description.sync="editColumn.description"
 						:mandatory.sync="editColumn.mandatory"
-						:order-weight.sync="editColumn.orderWeight"
 						:title.sync="editColumn.title"
 						:edit-column="true"
 						:title-missing-error="editErrorTitle" />

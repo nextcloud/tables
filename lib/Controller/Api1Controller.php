@@ -4,11 +4,7 @@ namespace OCA\Tables\Controller;
 
 use OCA\Tables\Api\V1Api;
 use OCA\Tables\AppInfo\Application;
-use OCA\Tables\Db\Table;
 use OCA\Tables\Db\ViewMapper;
-use OCA\Tables\Errors\InternalError;
-use OCA\Tables\Errors\NotFoundError;
-use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ImportService;
 use OCA\Tables\Service\RowService;
@@ -17,7 +13,6 @@ use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
 use OCP\AppFramework\ApiController;
 use OCP\AppFramework\Http\DataResponse;
-use OCP\DB\Exception;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
@@ -279,7 +274,6 @@ class Api1Controller extends ApiController {
 		?string $subtype,
 		bool $mandatory,
 		?string $description,
-		?int $orderWeight,
 
 		?string $numberPrefix,
 		?string $numberSuffix,
@@ -305,7 +299,6 @@ class Api1Controller extends ApiController {
 			$title,
 			$mandatory,
 			$description,
-			$orderWeight,
 
 			$textDefault,
 			$textAllowedPattern,
@@ -332,7 +325,6 @@ class Api1Controller extends ApiController {
 				$title,
 				$mandatory,
 				$description,
-				$orderWeight,
 
 				$textDefault,
 				$textAllowedPattern,
@@ -365,7 +357,6 @@ class Api1Controller extends ApiController {
 		?string $subtype,
 		?bool $mandatory,
 		?string $description,
-		?int $orderWeight,
 
 		?string $numberPrefix,
 		?string $numberSuffix,
@@ -389,7 +380,6 @@ class Api1Controller extends ApiController {
 			$subtype,
 			$mandatory,
 			$description,
-			$orderWeight,
 
 			$textDefault,
 			$textAllowedPattern,
@@ -416,7 +406,6 @@ class Api1Controller extends ApiController {
 				$title,
 				$mandatory,
 				$description,
-				$orderWeight,
 
 				$textDefault,
 				$textAllowedPattern,

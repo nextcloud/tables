@@ -9,7 +9,6 @@
 				<div class="fix-col-2">
 					<MainForm :description.sync="column.description"
 						:mandatory.sync="column.mandatory"
-						:order-weight.sync="column.orderWeight"
 						:title.sync="column.title"
 						:selected-views.sync="column.selectedViews"
 						:title-missing-error="titleMissingError" />
@@ -146,7 +145,6 @@ export default {
 				description: '',
 				numberPrefix: '',
 				numberSuffix: '',
-				orderWeight: 0,
 				selectedViews: [],
 				mandatory: false,
 				numberDefault: null,
@@ -299,7 +297,6 @@ export default {
 				mandatory: this.column.mandatory,
 				numberPrefix: null,
 				numberSuffix: null,
-				orderWeight: 0,
 				numberDefault: null,
 				numberMin: 0,
 				numberMax: 100,

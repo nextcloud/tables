@@ -3,9 +3,12 @@
 namespace OCA\Tables\Api;
 
 use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\RowService;
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 
 class V1Api {
 	private RowService $rowService;
@@ -18,14 +21,18 @@ class V1Api {
 	}
 
 	/**
-	 * @param int $tableId
+	 * @param int $viewId
 	 * @param int|null $limit
 	 * @param int|null $offset
+	 * @param string $userId
 	 * @return array
 	 * @throws InternalError
 	 * @throws PermissionError
+	 * @throws NotFoundError
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
 	 */
-	public function getData(int $viewId, ?int $limit, ?int $offset, string $userId): 
+	public function getData(int $viewId, ?int $limit, ?int $offset, string $userId):
 	array {
 		$columns = $this->columnService->findAllByView($viewId);
 

@@ -13,7 +13,7 @@ class ColumnController extends Controller {
 	private ColumnService $service;
 
 	private string $userId;
-	
+
 	protected LoggerInterface $logger;
 
 	use Errors;
@@ -66,7 +66,6 @@ class ColumnController extends Controller {
 		string $title,
 		bool $mandatory,
 		?string $description,
-		?int $orderWeight,
 
 		?string $textDefault,
 		?string $textAllowedPattern,
@@ -92,7 +91,6 @@ class ColumnController extends Controller {
 			$title,
 			$mandatory,
 			$description,
-			$orderWeight,
 
 			$textDefault,
 			$textAllowedPattern,
@@ -118,7 +116,6 @@ class ColumnController extends Controller {
 				$title,
 				$mandatory,
 				$description,
-				$orderWeight,
 
 				$textDefault,
 				$textAllowedPattern,
@@ -150,7 +147,6 @@ class ColumnController extends Controller {
 		?string $title,
 		?bool $mandatory,
 		?string $description,
-		?int $orderWeight,
 
 		?string $textDefault,
 		?string $textAllowedPattern,
@@ -176,7 +172,6 @@ class ColumnController extends Controller {
 			$title,
 			$mandatory,
 			$description,
-			$orderWeight,
 
 			$textDefault,
 			$textAllowedPattern,
@@ -203,7 +198,6 @@ class ColumnController extends Controller {
 				$title,
 				$mandatory,
 				$description,
-				$orderWeight,
 
 				$textDefault,
 				$textAllowedPattern,

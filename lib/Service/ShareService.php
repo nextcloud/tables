@@ -52,7 +52,6 @@ class ShareService extends SuperService {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
-			/** @var string $userId */
 			$shares = $this->mapper->findAllSharesForNode($nodeType, $nodeId, $userId);
 			return $this->addReceiverDisplayNames($shares);
 		} catch (\OCP\DB\Exception $e) {
@@ -155,11 +154,15 @@ class ShareService extends SuperService {
 	 * @param string|null $elementType
 	 * @param string|null $userId
 	 * @return array
-	 * @throws InternalError
 	 * @throws NotFoundError
 	 */
 	public function getSharedPermissionsIfSharedWithMe(int $elementId, ?string $elementType = 'table', ?string $userId = null): array {
-		$userId = $this->permissionsService->preCheckUserId($userId);
+		try {
+			$userId = $this->permissionsService->preCheckUserId($userId);
+		} catch (InternalError $e) {
+			$this->logger->warning('Could not pre check user: '.$e->getMessage().' Permission denied.');
+			return [];
+		}
 		return $this->permissionsService->getSharedPermissionsIfSharedWithMe($elementId, $elementType, $userId);
 	}
 
@@ -175,8 +178,6 @@ class ShareService extends SuperService {
 
 
 	/**
-	 * @noinspection PhpUndefinedMethodInspection
-	 *
 	 * @param int $nodeId
 	 * @param string $nodeType
 	 * @param string $receiver
@@ -214,8 +215,6 @@ class ShareService extends SuperService {
 	}
 
 	/**
-	 * @noinspection PhpUndefinedMethodInspection
-	 *
 	 * @param int $id
 	 * @param string $permission
 	 * @param bool $value
@@ -288,7 +287,6 @@ class ShareService extends SuperService {
 	/**
 	 * @param Share $share
 	 * @return Share
-	 * @noinspection PhpUndefinedMethodInspection
 	 */
 	private function addReceiverDisplayName(Share $share):Share {
 		if ($share->getReceiverType() === 'user') {

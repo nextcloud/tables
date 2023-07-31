@@ -8,7 +8,18 @@ use OCP\AppFramework\Db\Entity;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
- * @method getTableId()
+ * @method getTableId(): int
+ * @method setTableId(int $tableId)
+ * @method getCreatedBy(): string
+ * @method setCreatedBy(string $createdBy)
+ * @method getCreatedAt(): string
+ * @method setCreatedAt(string $createdAt)
+ * @method getLastEditBy(): string
+ * @method setLastEditBy(string $lastEditBy)
+ * @method getLastEditAt(): string
+ * @method setLastEditAt(string $lastEditAt)
+ * @method getData(): string
+ * @method setData(string $data)
  */
 class Row extends Entity implements JsonSerializable {
 	protected ?int $tableId = null;
@@ -36,12 +47,10 @@ class Row extends Entity implements JsonSerializable {
 		];
 	}
 
-	/** @noinspection PhpUndefinedMethodInspection */
 	public function getDataArray():array {
 		return \json_decode($this->getData(), true);
 	}
 
-	/** @noinspection PhpUndefinedMethodInspection */
 	public function setDataArray(array $array):void {
 		$new = [];
 		foreach ($array as $a) {
