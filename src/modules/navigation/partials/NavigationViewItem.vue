@@ -91,6 +91,7 @@ import Creation from 'vue-material-design-icons/Creation.vue'
 import PlaylistPlay from 'vue-material-design-icons/PlaylistPlay.vue'
 import { emit } from '@nextcloud/event-bus'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
+import Import from 'vue-material-design-icons/Import.vue'
 
 export default {
 	name: 'NavigationViewItem',
@@ -106,6 +107,7 @@ export default {
 		Creation,
 		NcAvatar,
 		PlaylistPlay,
+		Import,
 	},
 
 	filters: {
