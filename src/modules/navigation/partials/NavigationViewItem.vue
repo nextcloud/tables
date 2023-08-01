@@ -37,7 +37,7 @@
 				<template #icon>
 					<PlaylistPlay :size="20" decorative />
 				</template>
-				{{ t('tables', 'Clone view') }}
+				{{ t('tables', 'Duplicate view') }}
 			</NcActionButton>
 			<NcActionButton v-if="canShareElement(view)"
 				icon="icon-share"
