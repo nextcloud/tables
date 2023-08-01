@@ -8,6 +8,50 @@ use OCP\AppFramework\Db\Entity;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
+ * @method getTitle(): string
+ * @method setTitle(string $title)
+ * @method getTableId(): int
+ * @method setTableId(int $tableId)
+ * @method getCreatedBy(): string
+ * @method setCreatedBy(string $createdBy)
+ * @method getCreatedAt(): string
+ * @method setCreatedAt(string $createdAt)
+ * @method getLastEditBy(): string
+ * @method setLastEditBy(string $lastEditBy)
+ * @method getLastEditAt(): string
+ * @method setLastEditAt(string $lastEditAt)
+ * @method getType(): string
+ * @method setType(string $type)
+ * @method getSubtype(): string
+ * @method setSubtype(string $subtype)
+ * @method getMandatory(): bool
+ * @method setMandatory(bool $mandatory)
+ * @method getDescription(): string
+ * @method setDescription(string $description)
+ * @method getNumberDefault(): float
+ * @method setNumberDefault(float $numberDefault)
+ * @method getNumberMin(): float
+ * @method setNumberMin(float $numberMin)
+ * @method getNumberMax(): float
+ * @method setNumberMax(float $numberMax)
+ * @method getNumberDecimals(): int
+ * @method setNumberDecimals(int $numberDecimals)
+ * @method getNumberPrefix(): string
+ * @method setNumberPrefix(string $numberPrefix)
+ * @method getNumberSuffix(): string
+ * @method setNumberSuffix(string $numberSuffix)
+ * @method getTextDefault(): string
+ * @method setTextDefault(string $textDefault)
+ * @method getTextAllowedPattern(): string
+ * @method setTextAllowedPattern(string $textAllowedPattern)
+ * @method getTextMaxLength(): int
+ * @method setTextMaxLength(int $textMaxLenght)
+ * @method getSelectionOptions(): string
+ * @method getSelectionDefault(): string
+ * @method setSelectionOptions(string $selectionOptionsArray)
+ * @method setSelectionDefault(string $selectionDefault)
+ * @method getDatetimeDefault(): string
+ * @method setDatetimeDefault(string $datetimeDefault)
  */
 class Column extends Entity implements JsonSerializable {
 	protected ?string $title = null;
@@ -20,7 +64,7 @@ class Column extends Entity implements JsonSerializable {
 	protected ?string $subtype = null;
 	protected ?bool $mandatory = null;
 	protected ?string $description = null;
-	protected ?int $orderWeight = null;
+	protected ?int $orderWeight = null; // Deprecated
 
 	// type number
 	protected ?float $numberDefault = null;
@@ -46,7 +90,6 @@ class Column extends Entity implements JsonSerializable {
 		$this->addType('id', 'integer');
 		$this->addType('tableId', 'integer');
 		$this->addType('mandatory', 'boolean');
-		$this->addType('orderWeight', 'integer');
 
 		// type number
 		$this->addType('numberDecimals', 'integer');
@@ -58,7 +101,6 @@ class Column extends Entity implements JsonSerializable {
 		$this->addType('textMaxLength', 'integer');
 	}
 
-	/** @noinspection PhpUndefinedMethodInspection */
 	public function getSelectionOptionsArray():array {
 		$options = $this->getSelectionOptions();
 		if ($options !== "" && $options !== null && $options !== 'null') {
@@ -68,7 +110,6 @@ class Column extends Entity implements JsonSerializable {
 		}
 	}
 
-	/** @noinspection PhpUndefinedMethodInspection */
 	public function setSelectionOptionsArray(array $array):void {
 		$json = \json_encode($array);
 		$this->setSelectionOptions($json);
@@ -87,7 +128,6 @@ class Column extends Entity implements JsonSerializable {
 			'subtype' => $this->subtype,
 			'mandatory' => $this->mandatory,
 			'description' => $this->description,
-			'orderWeight' => $this->orderWeight,
 
 			// type number
 			'numberDefault' => $this->numberDefault,

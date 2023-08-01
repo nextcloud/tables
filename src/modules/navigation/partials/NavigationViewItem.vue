@@ -45,6 +45,14 @@
 				@click="actionShowShare">
 				{{ t('tables', 'Share') }}
 			</NcActionButton>
+			<NcActionButton v-if="canCreateRowInElement(view)"
+				:close-after-click="true"
+				@click="actionShowImport(view)">
+				{{ t('tables', 'Import') }}
+				<template #icon>
+					<Import :size="20" />
+				</template>
+			</NcActionButton>
 			<NcActionButton
 				:close-after-click="true"
 				@click="actionShowIntegration">
@@ -160,6 +168,9 @@ export default {
 		async editView() {
 			await this.$router.push('/view/' + parseInt(this.view.id)).catch(err => err)
 			emit('tables:view:edit', this.view)
+		},
+		async actionShowImport(view) {
+			emit('tables:modal:import', view)
 		},
 		async cloneView() {
 			let data = {

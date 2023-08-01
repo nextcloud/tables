@@ -102,6 +102,7 @@ class ViewController extends Controller {
 
 	/**
 	 * @param int $tableId
+	 * @param bool $skipTableEnhancement
 	 * @return Table
 	 * @throws InternalError
 	 * @throws NotFoundError

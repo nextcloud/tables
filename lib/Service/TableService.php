@@ -67,8 +67,13 @@ class TableService extends SuperService {
 	 * @param string|null $userId (null -> take from session, '' -> no user in context)
 	 * @param bool $skipTableEnhancement
 	 * @param bool $skipSharedTables
+	 * @param bool $createTutorial
 	 * @return array<Table>
+	 * @throws DoesNotExistException
 	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws NotFoundError
+	 * @throws PermissionError
 	 */
 	public function findAll(?string $userId = null, bool $skipTableEnhancement = false, bool $skipSharedTables = false, bool $createTutorial = true): array {
 		/** @var string $userId */
@@ -125,8 +130,11 @@ class TableService extends SuperService {
 	 * add some basic values related to this table in context
 	 *
 	 * $userId can be set or ''
-	 *
-	 * @noinspection PhpUndefinedMethodInspection
+	 * @param Table $table
+	 * @param string $userId
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws PermissionError
 	 */
 	private function enhanceTable(Table $table, string $userId): void {
 		// add owner display name for UI
@@ -153,11 +161,9 @@ class TableService extends SuperService {
 		// (senseless if we have no user in context)
 		if ($userId !== '') {
 			try {
-				$permissions = $this->shareService->getSharedPermissionsIfSharedWithMe($table->getId(), 'table', $userId);
-				/** @noinspection PhpUndefinedMethodInspection */
-				$table->setIsShared(true);
-				/** @noinspection PhpUndefinedMethodInspection */
-				$table->setOnSharePermissions($permissions);
+			$permissions = $this->shareService->getSharedPermissionsIfSharedWithMe($table->getId(), 'table', $userId);
+			$table->setIsShared(true);
+			$table->setOnSharePermissions($permissions);
 			} catch (NotFoundError $e) {
 			}
 		}
@@ -166,7 +172,8 @@ class TableService extends SuperService {
 		try {
 			$table->setBaseView($this->viewService->findBaseView($table));
 		} catch (DoesNotExistException $e) {
-			// Create new base view if none exists
+			// Create new base view if none exists (backward compatibility)
+			/** @noinspection PhpUndefinedMethodInspection */
 			$view = $this->viewService->create($table->getTitle(), $table->getEmoji(), $table, true);
 			$view = $this->viewService->update($view->getId(), ["columns" => json_encode(array_column($this->columnService->findAllByTable($table->getId()), 'id'))]);
 			$table->setBaseView($view);
@@ -197,7 +204,6 @@ class TableService extends SuperService {
 			}
 
 			if (!$skipTableEnhancement) {
-				/** @var string $userId */
 				$this->enhanceTable($table, $userId);
 			}
 
@@ -212,10 +218,17 @@ class TableService extends SuperService {
 	}
 
 	/**
-	 * @noinspection PhpUndefinedMethodInspection
-	 *
+	 * @param string $title
+	 * @param string $template
+	 * @param string|null $emoji
+	 * @param string|null $userId
+	 * @return Table
+	 * @throws DoesNotExistException
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws NotFoundError
+	 * @throws PermissionError
 	 * @throws \OCP\DB\Exception
-	 * @throws InternalError|PermissionError
 	 */
 	public function create(string $title, string $template, ?string $emoji, ?string $userId = null): Table {
 		/** @var string $userId */
@@ -223,6 +236,8 @@ class TableService extends SuperService {
 
 		$time = new DateTime();
 		$item = new Table();
+		// Deprecated mandatory attribute
+		/** @noinspection PhpUndefinedMethodInspection */
 		$item->setTitle('TODO: DELETE');
 		$item->setOwnership($userId);
 		$item->setCreatedBy($userId);
@@ -242,10 +257,6 @@ class TableService extends SuperService {
 			$table = $this->addOwnerDisplayName($newTable);
 		}
 
-		//$tableColumns = $this->columnService->findAllByTable($table->getId(), $userId);
-		//$columnArray = array_column($tableColumns, 'id');
-		//$baseView = $this->viewService->update($baseView->getId(), ['columns' => json_encode($columnArray)], $table, $userId);
-
 		$this->enhanceTable($table, $userId);
 		return $table;
 	}
@@ -260,11 +271,10 @@ class TableService extends SuperService {
 			$table = $this->mapper->find($id);
 
 			// security
-			if (!$this->permissionsService->canChangeElementOwner($table, $userId)) {
+			if (!$this->permissionsService->canChangeElementOwner($userId)) {
 				throw new PermissionError('PermissionError: can not change table owner with table id '.$id);
 			}
 
-			/** @noinspection PhpUndefinedMethodInspection */
 			$table->setOwnership($newOwnerUserId);
 			$table = $this->mapper->update($table);
 			$this->enhanceTable($table, $userId);
@@ -321,22 +331,11 @@ class TableService extends SuperService {
 	// PRIVATE FUNCTIONS ---------------------------------------------------------------
 
 	/**
-	 * @noinspection PhpUndefinedMethodInspection
-	 *
 	 * @param Table $table
 	 * @return Table
 	 */
 	private function addOwnerDisplayName(Table $table): Table {
 		$table->setOwnerDisplayName($this->userHelper->getUserDisplayName($table->getOwnership()));
 		return $table;
-	}
-
-	private function addOwnersDisplayName(array $tables): array {
-		$return = [];
-		foreach ($tables as $table) {
-			$table->setOwnerDisplayName($this->userHelper->getUserDisplayName($table->getOwnership()));
-			$return[] = $table;
-		}
-		return $return;
 	}
 }

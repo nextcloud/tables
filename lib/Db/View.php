@@ -8,6 +8,36 @@ use OCP\AppFramework\Db\Entity;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
+ * @method getTitle(): string
+ * @method setTitle(string $title)
+ * @method getTableId(): int
+ * @method setTableId(int $tableId)
+ * @method getCreatedBy(): string
+ * @method setCreatedBy(string $createdBy)
+ * @method getCreatedAt(): string
+ * @method setCreatedAt(string $createdAt)
+ * @method getLastEditBy(): string
+ * @method setLastEditBy(string $lastEditBy)
+ * @method getLastEditAt(): string
+ * @method setLastEditAt(string $lastEditAt)
+ * @method getEmoji(): string
+ * @method setEmoji(string $emoji)
+ * @method getDescription(): string
+ * @method setDescription(string $description)
+ * @method getIsBaseView(): bool
+ * @method setIsBaseView(bool $isBaseView)
+ * @method getIsShared(): bool
+ * @method setIsShared(bool $isShared)
+ * @method getOnSharePermissions(): array
+ * @method setOnSharePermissions(array $onSharePermissions)
+ * @method getHasShares(): bool
+ * @method setHasShares(bool $hasShares)
+ * @method getRowsCount(): int
+ * @method setRowsCount(int $rowCount)
+ * @method getOwnership(): string
+ * @method setOwnership(string $ownership)
+ * @method getOwnerDisplayName(): string
+ * @method setOwnerDisplayName(string $ownerDisplayName)
  */
 class View extends Entity implements JsonSerializable {
 	protected ?string $title = null;
@@ -36,17 +66,14 @@ class View extends Entity implements JsonSerializable {
 		$this->addType('tableId', 'integer');
 	}
 
-	/** @noinspection PhpUndefinedMethodInspection */
 	public function getColumnsArray():array {
 		return $this->getArray($this->getColumns());
 	}
 
-	/** @noinspection PhpUndefinedMethodInspection */
 	public function getSortArray():array {
 		return $this->getArray($this->getSort());
 	}
 
-	/** @noinspection PhpUndefinedMethodInspection */
 	public function getFilterArray():array {
 		return $this->getArray($this->getFilter());
 	}
@@ -59,17 +86,14 @@ class View extends Entity implements JsonSerializable {
 		}
 	}
 
-	/** @noinspection PhpUndefinedMethodInspection */
 	public function setColumnsArray(array $array):void {
 		$this->setColumns(\json_encode($array));
 	}
 
-	/** @noinspection PhpUndefinedMethodInspection */
 	public function setSortArray(array $array):void {
 		$this->setSort(\json_encode($array));
 	}
 
-	/** @noinspection PhpUndefinedMethodInspection */
 	public function setFilterArray(array $array):void {
 		$this->setFilter(\json_encode($array));
 	}

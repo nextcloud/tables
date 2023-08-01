@@ -8,6 +8,7 @@ use OCA\Tables\Db\ColumnTypes\NumberColumnQB;
 use OCA\Tables\Db\ColumnTypes\SelectionColumnQB;
 use OCA\Tables\Db\ColumnTypes\SuperColumnQB;
 use OCA\Tables\Db\ColumnTypes\TextColumnQB;
+use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -169,13 +170,16 @@ class RowMapper extends QBMapper {
 			$result = $this->findOneQuery($qb);
 			return (int)$result['counter'];
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
-			$this->logger->warning('Exception occured: '.$e->getMessage().' Returning 0.');
+			$this->logger->warning('Exception occurred: '.$e->getMessage().' Returning 0.');
 			return 0;
 		}
 	}
 
 	/**
-	 *
+	 * @param View $view
+	 * @param $userId
+	 * @return int
+	 * @throws InternalError
 	 */
 	public function countRowsForNotBaseView(View $view, $userId): int {
 		$qb = $this->db->getQueryBuilder();
@@ -184,7 +188,11 @@ class RowMapper extends QBMapper {
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), IQueryBuilder::PARAM_INT)));
 
 		$neededColumnIds = $this->getAllColumnIdsFromView($view);
-		$neededColumns = $this->columnMapper->getColumnTypes($neededColumnIds);
+		try {
+			$neededColumns = $this->columnMapper->getColumnTypes($neededColumnIds);
+		} catch (Exception $e) {
+			throw new InternalError('Could not get column types to count rows');
+		}
 
 		// Filter
 
@@ -194,7 +202,7 @@ class RowMapper extends QBMapper {
 			$result = $this->findOneQuery($qb);
 			return (int)$result['counter'];
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
-			$this->logger->warning('Exception occured: '.$e->getMessage().' Returning 0.');
+			$this->logger->warning('Exception occurred: '.$e->getMessage().' Returning 0.');
 			return 0;
 		}
 	}
@@ -245,7 +253,8 @@ class RowMapper extends QBMapper {
 	}
 
 	/**
-	 * @param View $viewrows
+	 * @param View $view
+	 * @param string $userId
 	 * @param int|null $limit
 	 * @param int|null $offset
 	 * @return array
@@ -279,7 +288,13 @@ class RowMapper extends QBMapper {
 		if ($offset !== null) {
 			$qb->setFirstResult($offset);
 		}
-		return $this->findEntities($qb);
+		$rows = $this->findEntities($qb);
+		foreach ($rows as &$row) {
+			$row->setDataArray(array_filter($row->getDataArray(), function($item) use ($view) {
+				return in_array($item['columnId'], $view->getColumnsArray());
+			}));
+		}
+		return $rows;
 	}
 
 	private function getAllColumnIdsFromView(View $view): array {
@@ -340,7 +355,8 @@ class RowMapper extends QBMapper {
 	}
 
 	/**
-	 *
+	 * @param int $tableId
+	 * @return int
 	 */
 	public function countRows(int $tableId): int {
 		$qb = $this->db->getQueryBuilder();
@@ -354,7 +370,7 @@ class RowMapper extends QBMapper {
 			$result = $this->findOneQuery($qb);
 			return (int)$result['counter'];
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
-			$this->logger->warning('Exception occured: '.$e->getMessage().' Returning 0.');
+			$this->logger->warning('Exception occurred: '.$e->getMessage().' Returning 0.');
 			return 0;
 		}
 	}

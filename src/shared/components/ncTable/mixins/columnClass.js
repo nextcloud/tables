@@ -12,7 +12,6 @@ export class AbstractColumn {
 		this.lastEditAt = data.lastEditAt
 		this.lastEditBy = data.lastEditBy
 		this.mandatory = data.mandatory
-		this.orderWeight = data.orderWeight
 		this.tableId = data.tableId
 		this.title = data.title
 		this.description = data.description

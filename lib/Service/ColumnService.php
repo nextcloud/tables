@@ -65,13 +65,14 @@ class ColumnService extends SuperService {
 
 	/**
 	 * @param int $viewId
-	 * @param string|null $userId
 	 * @return array
+	 * @throws DoesNotExistException
 	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function findAllByView(int $viewId, ?string $userId = null): array {
+	public function findAllByView(int $viewId): array {
 		try {
 			// No need to check for columns outside the view since they cannot be addressed
 			$view = $this->viewService->find($viewId, true);
@@ -109,7 +110,6 @@ class ColumnService extends SuperService {
 			$column = $this->mapper->find($id);
 
 			// security
-			/** @noinspection PhpUndefinedMethodInspection */
 			if (!$this->permissionsService->canReadColumnsByTableId($column->getTableId(), $userId)) {
 				throw new PermissionError('PermissionError: can not read column with id '.$id);
 			}
@@ -125,7 +125,6 @@ class ColumnService extends SuperService {
 	}
 
 	/**
-	 * @noinspection PhpUndefinedMethodInspection
 	 * @noinspection DuplicatedCode
 	 *
 	 * @param string|null $userId
@@ -135,7 +134,6 @@ class ColumnService extends SuperService {
 	 * @param string $title
 	 * @param bool $mandatory
 	 * @param string|null $description
-	 * @param int|null $orderWeight
 	 * @param string|null $textDefault
 	 * @param string|null $textAllowedPattern
 	 * @param int|null $textMaxLength
@@ -148,11 +146,14 @@ class ColumnService extends SuperService {
 	 * @param string|null $selectionOptions
 	 * @param string|null $selectionDefault
 	 * @param string|null $datetimeDefault
-	 *
+	 * @param array|null $selectedViewIds
 	 * @return Column
 	 *
+	 * @throws DoesNotExistException
 	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
 	 * @throws PermissionError
+	 * @throws \OCP\DB\Exception
 	 */
 	public function create(
 		?string $userId,
@@ -162,7 +163,6 @@ class ColumnService extends SuperService {
 		string $title,
 		bool $mandatory,
 		?string $description,
-		?int $orderWeight,
 
 		?string $textDefault,
 		?string $textAllowedPattern,
@@ -211,7 +211,6 @@ class ColumnService extends SuperService {
 		$item->setLastEditAt($time->format('Y-m-d H:i:s'));
 		$item->setSelectionOptions($selectionOptions);
 		$item->setSelectionDefault($selectionDefault);
-		$item->setOrderWeight($orderWeight);
 		$item->setDatetimeDefault($datetimeDefault);
 		try {
 			$entity = $this->mapper->insert($item);
@@ -233,7 +232,6 @@ class ColumnService extends SuperService {
 	}
 
 	/**
-	 * @noinspection PhpUndefinedMethodInspection
 	 * @noinspection DuplicatedCode
 	 * @param int $columnId
 	 * @param int|null $tableId
@@ -243,7 +241,6 @@ class ColumnService extends SuperService {
 	 * @param string|null $title
 	 * @param bool $mandatory
 	 * @param string|null $description
-	 * @param int|null $orderWeight
 	 * @param string|null $textDefault
 	 * @param string|null $textAllowedPattern
 	 * @param int|null $textMaxLength
@@ -268,7 +265,6 @@ class ColumnService extends SuperService {
 		?string $title,
 		?bool $mandatory,
 		?string $description,
-		?int $orderWeight,
 
 		?string $textDefault,
 		?string $textAllowedPattern,
@@ -344,9 +340,6 @@ class ColumnService extends SuperService {
 			if ($selectionDefault !== null) {
 				$item->setSelectionDefault($selectionDefault);
 			}
-			if ($orderWeight !== null) {
-				$item->setOrderWeight($orderWeight);
-			}
 			if ($datetimeDefault !== null) {
 				$item->setDatetimeDefault($datetimeDefault);
 			}
@@ -373,7 +366,6 @@ class ColumnService extends SuperService {
 			$item = $this->mapper->find($id);
 
 			// security
-			/** @noinspection PhpUndefinedMethodInspection */
 			if (!$this->permissionsService->canDeleteColumnsByTableId($item->getTableId(), $userId)) {
 				throw new PermissionError('delete column id = '.$id.' is not allowed.');
 			}
@@ -393,25 +385,34 @@ class ColumnService extends SuperService {
 	}
 
 	/**
+	 * @param int $tableId
+	 * @param int $viewId
 	 * @param array $titles example ['Test column 1', 'And so on', '3rd column title']
-	 * @throws PermissionError
-	 * @throws InternalError
-	 *
+	 * @param string|null $userId
+	 * @param bool $createUnknownColumns
+	 * @param int $countCreatedColumns
 	 * @return array with column object or null for given columns
+	 * @throws DoesNotExistException
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 * @throws \OCP\DB\Exception
 	 */
-	public function findOrCreateColumnsByTitleForTableAsArray(int $tableId, int $viewId, array $titles, ?string $userId, bool $createUnknownColumns, int &$countCreatedColumns): array {
+	public function findOrCreateColumnsByTitleForTableAsArray(int $viewId, array $titles, ?string $userId, bool $createUnknownColumns, int &$countCreatedColumns, int &$countMatchingColumns): array {
 		$result = [];
 
 		if($userId === null) {
 			$userId = $this->userId;
 		}
-		$allColumns = $this->findAllByTable($tableId, $viewId, $userId);
+		$allColumns = $this->findAllByView($viewId);
 		$i = -1;
 		foreach ($titles as $title) {
 			$i++;
 			foreach ($allColumns as $column) {
 				if($column->getTitle() === $title) {
 					$result[$i] = $column;
+					$countMatchingColumns++;
 					continue 2;
 				}
 				$result[$i] = '';
@@ -423,7 +424,7 @@ class ColumnService extends SuperService {
 			// if column was not found
 			if($result[$i] === '' && $createUnknownColumns) {
 				$description = $this->l->t('This column was automatically created by the import service.');
-				$result[$i] = $this->create($userId, $viewId, 'text', 'line', $title, false, $description, null, null, null, null, null, null, null, null, null, null, null, null, null, []);
+				$result[$i] = $this->create($userId, $viewId, 'text', 'line', $title, false, $description, null, null, null, null, null, null, null, null, null, null, null, null, []);
 				$countCreatedColumns++;
 			}
 		}

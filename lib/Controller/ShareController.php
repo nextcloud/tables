@@ -10,11 +10,9 @@ use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
 class ShareController extends Controller {
-	/** @var ShareService */
-	private $service;
+	private ShareService $service;
 
-	/** @var string */
-	private $userId;
+	private string $userId;
 
 	protected LoggerInterface $logger;
 
