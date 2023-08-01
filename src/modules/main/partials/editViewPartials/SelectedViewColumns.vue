@@ -7,7 +7,7 @@
 			@dragover="dragOver(index)" @dragend="dragEnd(index)">
 			<div class="row-elements">
 				<NcButton
-					aria-label="Move"
+					aria-label="t('tables', 'Move')"
 					type="tertiary-no-background"
 					class="move-button">
 					<template #icon>
@@ -24,7 +24,7 @@
 					({{ t('tables', 'Metadata') }})
 				</div>
 			</div>
-			<div class="row-elements">
+			<div class="row-elements move">
 				<NcButton
 					:disabled="index === 0"
 					aria-label="Move"
@@ -126,62 +126,80 @@ export default {
 
 <style lang="scss" scoped>
 
-.column-entry {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: calc(var(--default-grid-baseline) * 1) 0;
-}
+	.column-entry {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: calc(var(--default-grid-baseline) * 1) 0;
+		border-radius: var(--border-radius-large);
+	}
 
-.display-checkbox {
-	padding-right: calc(var(--default-grid-baseline) * 4);
-}
+	.column-entry:hover {
+		background-color: var(--color-background-dark);
+	}
 
-:deep(.modal-container) {
-	min-width: 60% !important;
-}
+	.display-checkbox {
+		padding-right: calc(var(--default-grid-baseline) * 4);
+	}
 
-:deep(.button-vue) {
-	cursor: move !important;
-	min-height: auto !important;
-	min-width: auto !important;
-}
+	:deep(.modal-container) {
+		min-width: 60% !important;
+	}
 
-:deep(.button-vue__icon) {
-	height: auto !important;
-	width: auto !important;
-	min-height: auto !important;
-	min-width: auto !important;
-}
+	:deep(.button-vue) {
+		cursor: move !important;
+		min-height: auto !important;
+		min-width: auto !important;
+	}
 
-:deep(.checkbox-radio-switch__label) {
-	min-height: auto;
-	padding: 4px;
-}
+	:deep(.button-vue__icon) {
+		height: auto !important;
+		width: auto !important;
+		min-height: auto !important;
+		min-width: auto !important;
+	}
 
-:deep(.checkbox-radio-switch__icon) {
-	margin-right: 0 !important;
-	margin-left: 0 !important;
-}
+	:deep(.checkbox-radio-switch__label) {
+		min-height: auto;
+		padding: 4px;
+	}
 
-.selected-columns-wrapper {
-	display: flex;
-	flex-direction: column;
-}
+	:deep(.checkbox-radio-switch__icon) {
+		margin-right: 0 !important;
+		margin-left: 0 !important;
+	}
 
-.move-button {
-	padding-right: 10px !important;
-	cursor: move !important;
-}
+	.selected-columns-wrapper {
+		display: flex;
+		flex-direction: column;
+	}
 
-.meta-info {
-	font-style: italic;
-	padding-left:  calc(var(--default-grid-baseline) * 1);
-	color: var(--color-info);
-}
+	.move-button {
+		padding-right: 10px !important;
+		cursor: move !important;
+	}
 
-.row-elements {
-	display: flex;
-}
+	.move-button:hover {
+		cursor: move !important;
+	}
+
+	.meta-info {
+		font-style: italic;
+		padding-left:  calc(var(--default-grid-baseline) * 1);
+		color: var(--color-info);
+	}
+
+	.row-elements {
+		display: flex;
+		align-items: center;
+	}
+
+	.row-elements.move {
+		display: none;
+	}
+
+	.column-entry:hover .row-elements.move, .column-entry:focus-within .row-elements.move {
+		display: flex;
+	}
 
 </style>
