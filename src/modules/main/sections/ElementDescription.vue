@@ -3,22 +3,14 @@
 		<h1>
 			{{ activeView.emoji }}&nbsp;{{ activeView.title }}
 		</h1>
-		<div v-if="!activeView.isShared || (activeView.isShared && activeView.onSharePermissions.manage)" class="light">
-			<NcButton
-				:aria-label="activeView.isBaseView ? t('tables', 'Edit table') : t('tables', 'Edit view')"
-				type="tertiary"
-				@click="editElement">
-				<template #icon>
-					<Pencil :size="20" />
-				</template>
-				{{ activeView.isBaseView ? t('tables', 'Edit table') : t('tables', 'Edit view') }}
-			</NcButton>
-		</div>
-		<div v-if="isFiltered" style="padding: 0 8px">
-			<InformationOutline :size="20" />
-		</div>
-		<div v-if="isFiltered">
-			{{ t('tables', 'Filtered view') }}
+		<div class="info">
+			<div v-if="isFiltered">
+				<TextIcon :size="15" />
+				{{ t('tables', 'Filtered view') }}&nbsp;&nbsp;
+			</div>
+			<NcSmallButton v-if="isViewSettingSet" @click="resetLocalAdjustments">
+				🔙 {{ t('tables', 'Reset local adjustments') }}
+			</NcSmallButton>
 		</div>
 		<div v-if="activeView.isShared" class="user-bubble">
 			<NcUserBubble
@@ -33,28 +25,44 @@
 
 import { mapGetters } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
-import { NcButton, NcUserBubble } from '@nextcloud/vue'
-import Pencil from 'vue-material-design-icons/Pencil.vue'
-import InformationOutline from 'vue-material-design-icons/InformationOutline.vue'
+import { NcUserBubble } from '@nextcloud/vue'
+import TextIcon from 'vue-material-design-icons/Text.vue'
+import NcSmallButton from '../../../shared/components/ncSmallButton/NcSmallButton.vue'
 
 export default {
 	name: 'ElementDescription',
+
 	components: {
-		NcButton,
 		NcUserBubble,
-		Pencil,
-		InformationOutline,
+		TextIcon,
+		NcSmallButton,
 	},
+
+	props: {
+		viewSetting: {
+			type: Object,
+			default: null,
+		},
+	},
+
 	computed: {
 		...mapGetters(['activeView']),
 		isFiltered() {
 			return this.activeView.filter && this.activeView.filter[0]?.length > 0
+		},
+
+		isViewSettingSet() {
+			return !(!this.viewSetting || ((!this.viewSetting.hiddenColumns || this.viewSetting.hiddenColumns.length === 0) && (!this.viewSetting.sorting) && (!this.viewSetting.filter || this.viewSetting.filter.length === 0)))
 		},
 	},
 
 	methods: {
 		editElement() {
 			emit('tables:view:edit', this.activeView)
+		},
+
+		resetLocalAdjustments() {
+			this.$store.dispatch('resetViewSetting')
 		},
 	},
 }
@@ -81,6 +89,22 @@ export default {
 
 .user-bubble {
 	padding-left: calc(var(--default-grid-baseline) * 2);
+}
+
+.info {
+	display: inline-flex;
+	margin-left: calc(var(--default-grid-baseline) * 2);
+	align-items: center;
+	color: var(--color-text-maxcontrast);
+}
+
+.info > div {
+	display: inline-flex;
+	width: max-content;
+}
+
+.info span {
+	padding: calc(var(--default-grid-baseline) * 1);
 }
 
 </style>

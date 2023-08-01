@@ -28,16 +28,12 @@
 
 		<template #actions>
 			<NcActionButton v-if="canManageTable(baseView)"
-				icon="icon-add"
 				:close-after-click="true"
 				@click="createView">
+				<template #icon>
+					<PlaylistPlus :size="20" />
+				</template>
 				{{ t('tables', 'Create view') }}
-			</NcActionButton>
-			<NcActionButton v-if="canManageElement(baseView)"
-				icon="icon-rename"
-				:close-after-click="true"
-				@click="editView">
-				{{ t('tables', 'Edit table') }}
 			</NcActionButton>
 			<NcActionButton v-if="canShareElement(baseView)"
 				icon="icon-share"
@@ -94,6 +90,7 @@ import { getCurrentUser } from '@nextcloud/auth'
 import Creation from 'vue-material-design-icons/Creation.vue'
 import Import from 'vue-material-design-icons/Import.vue'
 import NavigationViewItem from './NavigationViewItem.vue'
+import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 
 export default {
 	name: 'NavigationBaseViewItem',
@@ -109,6 +106,7 @@ export default {
 		NcCounterBubble,
 		NcAvatar,
 		Creation,
+		PlaylistPlus,
 	},
 
 	filters: {
