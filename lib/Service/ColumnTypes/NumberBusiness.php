@@ -10,4 +10,8 @@ class NumberBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		return json_encode(floatval($value));
 	}
 
+	public function canBeParsed(string $value, ?Column $column = null): bool {
+		return !$value || is_numeric(floatval($value));
+	}
+
 }

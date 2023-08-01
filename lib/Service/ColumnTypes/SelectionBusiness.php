@@ -20,4 +20,17 @@ class SelectionBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		return '';
 	}
 
+	public function canBeParsed(string $value, ?Column $column = null): bool {
+		if(!$column) {
+			return false;
+		}
+
+		foreach ($column->getSelectionOptionsArray() as $option) {
+			if($option['label'] === $value) {
+				return true;
+			}
+		}
+		return !$value;
+	}
+
 }

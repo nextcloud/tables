@@ -10,4 +10,8 @@ class DatetimeDateBusiness extends SuperBusiness implements IColumnTypeBusiness 
 		return json_encode($this->isValidDate($value, 'Y-m-d') ? $value : '');
 	}
 
+	public function canBeParsed(string $value, ?Column $column = null): bool {
+		return $this->isValidDate($value, 'Y-m-d');
+	}
+
 }
