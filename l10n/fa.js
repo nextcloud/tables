@@ -20,6 +20,7 @@ OC.L10N.register(
     "Save" : "ذخیره",
     "Text" : "متن",
     "Link" : "پیوند",
+    "Selection" : "انتخاب",
     "Cancel" : "لغو",
     "Move down" : "حرکت به پایین",
     "Edit" : "ویرایش",
