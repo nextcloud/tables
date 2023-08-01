@@ -30,9 +30,6 @@
 					<p v-if="!canManageTable(view)" class="fix-col-2 span">
 						{{ t('tables', '⚠️ You don\'t have the permission to create columns.') }}
 					</p>
-					<p v-else-if="!view.isBaseView" class="fix-col-2 span">
-						{{ t('tables', '⚠️ You can only create columns in the basic view') }}
-					</p>
 				</RowFormWrapper>
 
 				<div class="information">
@@ -185,7 +182,7 @@ export default {
 	computed: {
 		...mapGetters(['activeView']),
 		canCreateMissingColumns() {
-			return this.canManageTable(this.view) && this.view.isBaseView
+			return this.canManageTable(this.view)
 		},
 		getCreateMissingColumns() {
 			return this.canManageTable(this.view) && this.createMissingColumns

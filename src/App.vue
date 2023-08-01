@@ -37,7 +37,6 @@ export default {
 	},
 	computed: {
 		...mapState(['tablesLoading']),
-		...mapGetters(['getBaseView']),
 		somethingIsLoading() {
 			return this.tablesLoading || this.loading
 		},
@@ -54,18 +53,13 @@ export default {
 	},
 	methods: {
 		routing(currentRoute) {
-			if (currentRoute.name === 'view') {
+			if (currentRoute.name === 'table') {
+				this.$store.commit('setActiveTableId', parseInt(currentRoute.params.tableId))
+			} else if (currentRoute.name === 'view') {
 				this.$store.commit('setActiveViewId', parseInt(currentRoute.params.viewId))
 			} else if (currentRoute.name === 'row') {
 				this.$store.commit('setActiveViewId', parseInt(currentRoute.params.viewId))
 				this.$store.commit('setActiveRowId', parseInt(currentRoute.params.rowId))
-			} else if (currentRoute.name === 'table') {
-				const baseView = this.getBaseView(parseInt(currentRoute.params.tableId))
-				if (baseView) {
-					this.$router.push('/view/' + baseView.id)
-				} else {
-					this.$router.push('/')
-				}
 			}
 		},
 	},

@@ -24,11 +24,10 @@
 		<NcAppSettingsSection v-if="columns != null" id="columns-and-order" :title="t('tables', 'Columns')">
 			<SelectedViewColumns
 				:columns="allColumns"
-				:selected-columns="selectedColumns"
-				:is-base-view="mutableView.isBaseView" />
+				:selected-columns="selectedColumns" />
 		</NcAppSettingsSection>
 		<!--filtering-->
-		<NcAppSettingsSection v-if="columns != null && !mutableView.isBaseView" id="filter" :title="t('tables', 'Filter')">
+		<NcAppSettingsSection v-if="columns != null" id="filter" :title="t('tables', 'Filter')">
 			<FilterForm :filters="mutableView.filter" :columns="allColumns" />
 		</NcAppSettingsSection>
 		<!--sorting-->
@@ -136,7 +135,6 @@ export default {
 		type() {
 			if (!this.showModal) return 'create-view'
 			if (this.createView) return 'create-view'
-			else if (this.mutableView.isBaseView) return 'edit-table'
 			else return 'edit-view'
 		},
 	},
@@ -225,10 +223,8 @@ export default {
 				},
 			}
 
-			if (!this.mutableView.isBaseView) {
-				const filteredFilteringRules = this.mutableView.filter.map(filterGroup => filterGroup.filter(fil => fil.columnId !== undefined && fil.operator !== undefined)).filter(filterGroup => filterGroup.length > 0)
-				data.data.filter = JSON.stringify(filteredFilteringRules)
-			}
+			const filteredFilteringRules = this.mutableView.filter.map(filterGroup => filterGroup.filter(fil => fil.columnId !== undefined && fil.operator !== undefined)).filter(filterGroup => filterGroup.length > 0)
+			data.data.filter = JSON.stringify(filteredFilteringRules)
 			const res = await this.$store.dispatch('updateView', { id, data })
 			if (res) {
 				this.$emit('reload-view')

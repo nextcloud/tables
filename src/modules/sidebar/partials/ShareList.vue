@@ -57,14 +57,14 @@
 								@uncheck="updatePermission(share, 'manage', false)">
 								{{ t('tables', 'Manage view') }}
 							</NcActionCheckbox>
-							<NcActionButton v-if="activeView.isBaseView && !personHasTablePermission(share.receiver)"
+							<!-- <NcActionButton v-if="activeView.isBaseView && !personHasTablePermission(share.receiver)"
 								:close-after-click="true"
 								@click="addTablePermission(share)">
 								<template #icon>
 									<Crown :size="20" />
 								</template>
 								{{ t('tables', 'Promote to table manager') }}
-							</NcActionButton>
+							</NcActionButton> -->
 							<NcActionSeparator />
 							<NcActionButton :close-after-click="true" icon="icon-delete" @click="actionDelete(share)">
 								{{ t('tables', 'Delete') }}
@@ -76,7 +76,7 @@
 								{{ t('tables', 'Last edit') + ': ' }}{{ updateTime(share) }}
 							</NcActionText>
 						</template>
-						<template v-else-if="activeView.isBaseView">
+						<!-- <template v-else-if="activeView.isBaseView">
 							<NcActionButton
 								:close-after-click="true"
 								@click="actionDelete(share)">
@@ -91,11 +91,11 @@
 								</template>
 								{{ t('tables', 'Last edit') + ': ' }}{{ updateTime(share) }}
 							</NcActionText>
-						</template>
+						</template> -->
 						<template v-else>
 							<NcActionButton
 								:close-after-click="true"
-								@click="openBaseView()">
+								@click="openDashboard()">
 								<template #icon>
 									<OpenInNew :size="20" />
 								</template>
@@ -158,7 +158,7 @@ export default {
 
 	computed: {
 		...mapState(['tables', 'tablesLoading', 'showSidebar']),
-		...mapGetters(['activeView', 'getBaseView']),
+		...mapGetters(['activeView']),
 		sortedShares() {
 			return [...this.userShares, ...this.groupShares].slice()
 				.sort(this.sortByDisplayName)
@@ -181,8 +181,8 @@ export default {
 		relativeDateTime(v) {
 			return moment(v).format('L') === moment().format('L') ? t('tables', 'Today') + ' ' + moment(v).format('LT') : moment(v).format('LLLL')
 		},
-		async openBaseView() {
-			await this.$router.push('/view/' + this.getBaseView(this.activeView.tableId).id)
+		async openDashboard() {
+			await this.$router.push('/table/' + this.activeView.tableId)
 		},
 		sortByDisplayName(a, b) {
 			if (a.displayName.toLowerCase() < b.displayName.toLowerCase()) return -1

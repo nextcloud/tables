@@ -20,6 +20,7 @@ export default new Vuex.Store({
 		tables: [],
 		views: [],
 		activeViewId: null,
+		activeTableId: null,
 		activeRowId: null,
 	},
 
@@ -30,12 +31,15 @@ export default new Vuex.Store({
 		getView: (state) => (id) => {
 			return state.views.filter(view => view.id === id)[0]
 		},
-		getBaseView: (state) => (tableId) => {
-			return state.views.filter(view => view.tableId === tableId).find(view => view.isBaseView)
-		},
 		activeView(state) {
-			if (state.views && state.views.filter(item => item.id === state.activeViewId).length > 0) {
-				return state.views.filter(item => item.id === state.activeViewId)[0]
+			if (state.views && state.activeViewId) {
+				return state.views.find(item => item.id === state.activeViewId)
+			}
+			return null
+		},
+		activeTable(state) {
+			if (state.tables && state.activeTableId) {
+				return state.tables.find(item => item.id === state.activeTableId)
 			}
 			return null
 		},
@@ -47,6 +51,11 @@ export default new Vuex.Store({
 		setActiveViewId(state, viewId) {
 			if (state.activeViewId !== viewId) {
 				state.activeViewId = viewId
+			}
+		},
+		setActiveTableId(state, tableId) {
+			if (state.activeTableId !== tableId) {
+				state.activeTableId = tableId
 			}
 		},
 		setTables(state, tables) {
@@ -83,10 +92,10 @@ export default new Vuex.Store({
 			} else {
 				const tables = state.tables
 				tables.push(res.data)
-				state.views.push(res.data.baseView)
+				state.views.push(res.data.views[0])
 				commit('setTables', tables)
 			}
-			return res.data.baseView.id
+			return res.data.views[0]
 		},
 		async loadTablesFromBE({ commit, state }) {
 			commit('setTablesLoading', true)
@@ -97,7 +106,7 @@ export default new Vuex.Store({
 				// Set Views
 				state.views = []
 				res.data.forEach(table => {
-					state.views = state.views.concat([table.baseView, ...table.views])
+					state.views = state.views.concat(table.views)
 				})
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load tables.'))

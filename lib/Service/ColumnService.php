@@ -216,10 +216,6 @@ class ColumnService extends SuperService {
 			$entity = $this->mapper->insert($item);
 			// Add columns to view(s)
 			$this->viewService->update($view->getId(), ['columns' => json_encode(array_merge($view->getColumnsArray(), [$entity->getId()]))], $userId, true);
-			if (!$view->getIsBaseView()){
-				$baseView = $this->viewService->findBaseView($table, true);
-				$this->viewService->update($baseView->getId(), ['columns' => json_encode(array_merge($baseView->getColumnsArray(), [$entity->getId()]))], $userId, true);
-			}
 			foreach ($selectedViewIds as $viewId) {
 				$view = $this->viewService->find($viewId);
 				$this->viewService->update($viewId, ['columns' => json_encode(array_merge($view->getColumnsArray(), [$entity->getId()]))], $userId, true);
@@ -429,5 +425,18 @@ class ColumnService extends SuperService {
 			}
 		}
 		return $result;
+	}
+
+	/**
+	 * @param int $tableId
+	 * @return int
+	 * @throws PermissionError
+	 */
+	public function getColumnsCount(int $tableId): int {
+		if ($this->permissionsService->canManageTableById($tableId)) {
+			return $this->mapper->countColumns($tableId);
+		} else {
+			throw new PermissionError('no read access for counting to table id = '.$tableId);
+		}
 	}
 }

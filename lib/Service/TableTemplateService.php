@@ -76,7 +76,7 @@ class TableTemplateService {
 	/**
 	 * @param Table $table
 	 * @param string $template
-	 * @param int $baseViewId
+	 * @param int $defaultViewId
 	 * @return Table
 	 * @throws DoesNotExistException
 	 * @throws Exception
@@ -85,9 +85,9 @@ class TableTemplateService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function makeTemplate(Table $table, string $template, int $baseViewId): Table {
-		$createColumn = function ($params) use ($table, $baseViewId) {return $this->createColumn($params, $baseViewId);};
-		$createRow = function ($data) use ($table, $baseViewId) {$this->createRow($baseViewId, $data);};
+	public function makeTemplate(Table $table, string $template, int $defaultViewId): Table {
+		$createColumn = function ($params) use ($table, $defaultViewId) {return $this->createColumn($params, $defaultViewId);};
+		$createRow = function ($data) use ($table, $defaultViewId) {$this->createRow($defaultViewId, $data);};
 		$createView = function ($data) use ($table) {$this->createView($table, $data);};
 		if ($template === 'todo') {
 			$this->makeTodo($createColumn, $createRow);
@@ -758,7 +758,7 @@ class TableTemplateService {
 
 	/**
 	 * @param (mixed)[] $parameters
-	 * @param int $baseViewId
+	 * @param int $defaultViewId
 	 * @return Column
 	 * @throws Exception
 	 * @throws InternalError
@@ -766,7 +766,7 @@ class TableTemplateService {
 	 * @throws DoesNotExistException
 	 * @throws MultipleObjectsReturnedException
 	 */
-	private function createColumn(array $parameters, int $baseViewId): ?Column {
+	private function createColumn(array $parameters, int $defaultViewId): ?Column {
 		if ($this->userId === null) {
 			return null;
 		}
@@ -776,8 +776,8 @@ class TableTemplateService {
 			// userId
 			$this->userId,
 
-			// baseViewId
-			$baseViewId,
+			// defaultViewId
+			$defaultViewId,
 
 			// column type
 			(isset($parameters['type'])) ? $parameters['type'] : 'text',

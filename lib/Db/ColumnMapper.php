@@ -77,4 +77,26 @@ class ColumnMapper extends QBMapper {
 		}
 		return $out;
 	}
+
+
+	/**
+	 * @param int $tableId
+	 * @return int
+	 */
+	public function countColumns(int $tableId): int {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select($qb->func()->count('*', 'counter'));
+		$qb->from($this->table);
+		$qb->where(
+			$qb->expr()->eq('table_id', $qb->createNamedParameter($tableId))
+		);
+
+		try {
+			$result = $this->findOneQuery($qb);
+			return (int)$result['counter'];
+		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+			$this->logger->warning('Exception occurred: '.$e->getMessage().' Returning 0.');
+			return 0;
+		}
+	}
 }

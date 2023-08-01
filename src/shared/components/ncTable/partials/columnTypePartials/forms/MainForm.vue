@@ -26,7 +26,7 @@
 
 		<!-- add to views -->
 		<div v-if="!editColumn" class="fix-col-4 title space-T">
-			{{ activeView.isBaseView? t('tables', 'Add column to views') : t('tables', 'Add column to other views') }}
+			{{ t('tables', 'Add column to other views') }}
 		</div>
 		<div v-if="!editColumn" class="fix-col-4">
 			<NcSelect
@@ -88,10 +88,14 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		view: {
+			type: Object,
+			default: null,
+		},
 	},
 	computed: {
-		...mapGetters(['activeView']),
 		...mapState(['views']),
+		...mapGetters(['activeTable', 'getTable']),
 		localTitle: {
 			get() { return this.title },
 			set(title) { this.$emit('update:title', title) },
@@ -111,13 +115,17 @@ export default {
 			},
 		},
 		viewsForTable() {
-			return this.views.filter(view => view.tableId === this.activeView.tableId && view !== this.activeView && !view.isBaseView).filter(view => !this.localSelectedViews.includes(view))
+			if (this.view) {
+				return this.getTable(this.view.tableId).views.filter(view => view !== this.view).filter(view => !this.localSelectedViews.includes(view))
+			}
+			return this.activeTable.views.filter(view => !this.localSelectedViews.includes(view))
 		},
 	},
 
 	mounted() {
+		console.debug("mounted", this.view)
 		if (this.editColumn) return
-		if (this.activeView.isBaseView) {
+		if (!this.view) {
 			this.localSelectedViews = this.viewsForTable
 		} else {
 			this.localSelectedViews = []
