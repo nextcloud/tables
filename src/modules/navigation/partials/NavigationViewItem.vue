@@ -24,10 +24,20 @@
 		</template>
 		<template #actions>
 			<NcActionButton v-if="canManageElement(view)"
-				icon="icon-rename"
 				:close-after-click="true"
 				@click="editView">
+				<template #icon>
+					<PlaylistEdit :size="20" />
+				</template>
 				{{ t('tables', 'Edit view') }}
+			</NcActionButton>
+			<NcActionButton v-if="canManageTable(view)"
+				:close-after-click="true"
+				@click="cloneView">
+				<template #icon>
+					<PlaylistPlay :size="20" decorative />
+				</template>
+				{{ t('tables', 'Clone view') }}
 			</NcActionButton>
 			<NcActionButton v-if="canShareElement(view)"
 				icon="icon-share"
@@ -42,14 +52,6 @@
 				<template #icon>
 					<Creation :size="20" />
 				</template>
-			</NcActionButton>
-			<NcActionButton v-if="canManageTable(view)"
-				:close-after-click="true"
-				@click="cloneView">
-				<template #icon>
-					<TableMultiple :size="20" decorative />
-				</template>
-				{{ t('tables', 'Duplicate view') }}
 			</NcActionButton>
 			<NcActionButton v-if="canManageElement(view)"
 				icon="icon-delete"
@@ -78,13 +80,15 @@ import Table from 'vue-material-design-icons/Table.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import DialogConfirmation from '../../../shared/modals/DialogConfirmation.vue'
 import Creation from 'vue-material-design-icons/Creation.vue'
-import TableMultiple from 'vue-material-design-icons/TableMultiple.vue'
+import PlaylistPlay from 'vue-material-design-icons/PlaylistPlay.vue'
 import { emit } from '@nextcloud/event-bus'
+import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
 
 export default {
 	name: 'NavigationViewItem',
 
 	components: {
+		PlaylistEdit,
 		// eslint-disable-next-line vue/no-reserved-component-names
 		Table,
 		NcAppNavigationItem,
@@ -93,7 +97,7 @@ export default {
 		NcActionButton,
 		Creation,
 		NcAvatar,
-		TableMultiple,
+		PlaylistPlay,
 	},
 
 	filters: {

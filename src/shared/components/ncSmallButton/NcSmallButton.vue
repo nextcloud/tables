@@ -1,5 +1,5 @@
 <template>
-	<NcButton :aria-label="ariaLabel" class="button-small">
+	<NcButton :aria-label="ariaLabel" class="button-small" @click="submit">
 		<slot />
 	</NcButton>
 </template>
@@ -17,6 +17,12 @@ export default {
 		      type: String,
 		      default: null,
 		    },
+	},
+
+	methods: {
+		submit() {
+			this.$emit('click')
+		},
 	},
 
 }

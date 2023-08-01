@@ -3,10 +3,12 @@
 		<h1>
 			{{ activeView.emoji }}&nbsp;{{ activeView.title }}
 		</h1>
-		<div v-if="isFiltered" class="info">
-			<TextIcon :size="15" />
-			{{ t('tables', 'Filtered view') }}&nbsp;&nbsp;
-			<NcSmallButton v-if="isViewSettingSet">
+		<div class="info">
+			<div v-if="isFiltered">
+				<TextIcon :size="15" />
+				{{ t('tables', 'Filtered view') }}&nbsp;&nbsp;
+			</div>
+			<NcSmallButton v-if="isViewSettingSet" @click="resetLocalAdjustments">
 				🔙 {{ t('tables', 'Reset local adjustments') }}
 			</NcSmallButton>
 		</div>
@@ -58,6 +60,10 @@ export default {
 		editElement() {
 			emit('tables:view:edit', this.activeView)
 		},
+
+		resetLocalAdjustments() {
+			this.$store.dispatch('resetViewSetting')
+		},
 	},
 }
 </script>
@@ -90,6 +96,11 @@ export default {
 	margin-left: calc(var(--default-grid-baseline) * 2);
 	align-items: center;
 	color: var(--color-text-maxcontrast);
+}
+
+.info > div {
+	display: inline-flex;
+	width: max-content;
 }
 
 .info span {

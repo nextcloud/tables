@@ -42,7 +42,7 @@
 					</template>
 					{{ t('tables', 'Edit view') }}
 				</NcActionButton>
-				<NcActionButton v-if="canManageElement(view)"
+				<NcActionButton v-if="canManageElement(view) && false"
 					:close-after-click="true"
 					class="view-changed"
 					@click="createWithViewConfig">
@@ -191,9 +191,6 @@ export default {
 		},
 		unhide(colId) {
 			this.$store.dispatch('unhideColumn', { columnId: this.columns[this.columns.indexOf(this.columns.find(col => col.id === colId)) + 1]?.id })
-		},
-		resetView() {
-			this.$store.dispatch('resetViewSetting')
 		},
 		createView() {
 			emit('create-view', this.activeView.tableId)
