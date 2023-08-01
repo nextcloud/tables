@@ -93,7 +93,7 @@ class TableService extends SuperService {
 						}
 					}
 					if (!$found) {
-						$newSharedTables[] = $sharedTable;
+						$ownTables[] = $sharedTable;
 					}
 				}
 			}
@@ -105,16 +105,14 @@ class TableService extends SuperService {
 		}
 
 		// enhance table objects with additional data
-		$allTables = array_merge($ownTables, $newSharedTables);
 		if (!$skipTableEnhancement) {
-			foreach ($allTables as $table) {
+			foreach ($ownTables as $table) {
 				/** @var string $userId */
 				$this->enhanceTable($table, $userId);
 			}
 		}
 
-
-		return $allTables;
+		return $ownTables;
 	}
 
 	/**
