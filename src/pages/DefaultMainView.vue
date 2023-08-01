@@ -3,7 +3,7 @@
 		<div v-if="isLoading" class="icon-loading" />
 
 		<div v-if="!isLoading && activeView">
-			<ElementDescription />
+			<ElementDescription :view-setting="viewSetting" />
 
 			<div class="table-wrapper">
 				<NcView v-if="columns.length > 0"

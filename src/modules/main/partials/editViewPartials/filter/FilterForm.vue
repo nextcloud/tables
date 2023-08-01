@@ -1,6 +1,6 @@
 <template>
 	<div class="filter-section">
-		<div class="filter-text">
+		<div v-if="hasFilter" class="filter-text">
 			{{ t('tables', 'Filtering rows') }}
 		</div>
 		<div v-for="(filterGroup, i) in mutableFilters" :key="i">
@@ -55,8 +55,13 @@ export default {
 			mutableFilters: this.filters,
 		}
 	},
+
 	computed: {
+		hasFilter() {
+			return (this.mutableFilters !== null && this.mutableFilters.length > 0)
+		},
 	},
+
 	methods: {
 		deleteFilterGroup(index) {
 			this.mutableFilters.splice(index, 1)
