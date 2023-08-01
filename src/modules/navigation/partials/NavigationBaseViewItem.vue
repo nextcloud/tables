@@ -35,12 +35,6 @@
 				</template>
 				{{ t('tables', 'Create view') }}
 			</NcActionButton>
-			<NcActionButton v-if="canManageElement(baseView) && false"
-				icon="icon-rename"
-				:close-after-click="true"
-				@click="editView">
-				{{ t('tables', 'Edit table') }}
-			</NcActionButton>
 			<NcActionButton v-if="canShareElement(baseView)"
 				icon="icon-share"
 				:close-after-click="true"

@@ -13,7 +13,7 @@ class ColumnController extends Controller {
 	private ColumnService $service;
 
 	private string $userId;
-	
+
 	protected LoggerInterface $logger;
 
 	use Errors;
@@ -40,7 +40,6 @@ class ColumnController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 */
 	public function indexView(int $viewId): DataResponse {
 		return $this->handleError(function () use ($viewId) {

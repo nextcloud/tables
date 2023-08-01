@@ -42,15 +42,6 @@
 					</template>
 					{{ t('tables', 'Edit view') }}
 				</NcActionButton>
-				<NcActionButton v-if="canManageElement(view) && false"
-					:close-after-click="true"
-					class="view-changed"
-					@click="createWithViewConfig">
-					<template #icon>
-						<PlaylistPlus :size="20" decorative />
-					</template>
-					{{ t('tables', 'Create view') }}
-				</NcActionButton>
 				<NcActionButton v-if="canManageTable(view)" :close-after-click="true" @click="$emit('create-column')">
 					<template #icon>
 						<TableColumnPlusAfter :size="20" decorative title="" />

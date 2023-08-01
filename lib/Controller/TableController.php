@@ -33,7 +33,6 @@ class TableController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 */
 	public function index(): DataResponse {
 		return $this->handleError(function () {
