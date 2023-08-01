@@ -36,10 +36,20 @@
 				<NcActionCaption v-if="canManageElement(view)" :title="t('tables', 'Manage view')" />
 				<NcActionButton v-if="canManageElement(view)"
 					:close-after-click="true"
-					:type="isViewSettingSet ? 'secondary' : 'tertiary'"
-					icon="icon-rename"
 					@click="editView()">
+					<template #icon>
+						<PlaylistEdit :size="20" decorative />
+					</template>
 					{{ t('tables', 'Edit view') }}
+				</NcActionButton>
+				<NcActionButton v-if="canManageElement(view)"
+					:close-after-click="true"
+					class="view-changed"
+					@click="createWithViewConfig">
+					<template #icon>
+						<PlaylistPlus :size="20" decorative />
+					</template>
+					{{ t('tables', 'Create view') }}
 				</NcActionButton>
 				<NcActionButton v-if="canManageTable(view)" :close-after-click="true" @click="$emit('create-column')">
 					<template #icon>
@@ -85,6 +95,8 @@
 import { NcCheckboxRadioSwitch, NcActions, NcActionButton, NcActionCaption } from '@nextcloud/vue'
 import { emit } from '@nextcloud/event-bus'
 import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
+import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
+import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 import IconImport from 'vue-material-design-icons/Import.vue'
 import Creation from 'vue-material-design-icons/Creation.vue'
 import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
@@ -96,6 +108,8 @@ import { showSuccess, showError } from '@nextcloud/dialogs'
 export default {
 
 	components: {
+		PlaylistEdit,
+		PlaylistPlus,
 		IconImport,
 		FilterLabel,
 		NcCheckboxRadioSwitch,

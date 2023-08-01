@@ -4,8 +4,11 @@
 			{{ activeView.emoji }}&nbsp;{{ activeView.title }}
 		</h1>
 		<div v-if="isFiltered" class="info">
-			<FilterMultipleOutline :size="20" />
-			{{ t('tables', 'Filtered view') }}
+			<TextIcon :size="15" />
+			{{ t('tables', 'Filtered view') }}&nbsp;&nbsp;
+			<NcSmallButton v-if="isViewSettingSet">
+				🔙 {{ t('tables', 'Reset local adjustments') }}
+			</NcSmallButton>
 		</div>
 		<div v-if="activeView.isShared" class="user-bubble">
 			<NcUserBubble
@@ -21,18 +24,33 @@
 import { mapGetters } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
 import { NcUserBubble } from '@nextcloud/vue'
-import FilterMultipleOutline from 'vue-material-design-icons/FilterMultipleOutline.vue'
+import TextIcon from 'vue-material-design-icons/Text.vue'
+import NcSmallButton from '../../../shared/components/ncSmallButton/NcSmallButton.vue'
 
 export default {
 	name: 'ElementDescription',
+
 	components: {
 		NcUserBubble,
-		FilterMultipleOutline,
+		TextIcon,
+		NcSmallButton,
 	},
+
+	props: {
+		viewSetting: {
+			type: Object,
+			default: null,
+		},
+	},
+
 	computed: {
 		...mapGetters(['activeView']),
 		isFiltered() {
 			return this.activeView.filter && this.activeView.filter[0]?.length > 0
+		},
+
+		isViewSettingSet() {
+			return !(!this.viewSetting || ((!this.viewSetting.hiddenColumns || this.viewSetting.hiddenColumns.length === 0) && (!this.viewSetting.sorting) && (!this.viewSetting.filter || this.viewSetting.filter.length === 0)))
 		},
 	},
 
