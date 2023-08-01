@@ -233,6 +233,29 @@ class RowMapper extends QBMapper {
 	}
 
 	/**
+	 * @param int $tableId
+	 * @param int|null $limit
+	 * @param int|null $offset
+	 * @return array
+	 * @throws Exception
+	 */
+	public function findAllByTable(int $tableId, ?int $limit = null, ?int $offset = null): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId)));
+
+		if ($limit !== null) {
+			$qb->setMaxResults($limit);
+		}
+		if ($offset !== null) {
+			$qb->setFirstResult($offset);
+		}
+
+		return $this->findEntities($qb);
+	}
+
+	/**
 	 * @param View $view
 	 * @param string $userId
 	 * @param int|null $limit

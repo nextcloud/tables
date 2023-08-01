@@ -87,6 +87,21 @@
 					</NcButton>
 				</div>
 			</div>
+			<div class="table-wrapper">
+				<NcView v-if="columns.length > 0"
+					:rows="rows"
+					:columns="columns"
+					:view="activeTable"
+					:view-setting="viewSetting"
+					@add-filter="addFilter"
+					@set-search-string="setSearchString"
+					@edit-row="rowId => editRowId = rowId"
+					@import="openImportModal"
+					@create-column="showCreateColumn = true"
+					@create-row="showCreateRow = true"
+					@delete-selected-rows="deleteRows"
+					@delete-filter="deleteFilter" />
+			</div>
 		</div>
 		<ViewSettings :view="{ tableId: activeTable?.id, sort: [], filter: [] }"
 			:create-view="true" :show-modal="openCreateViewModal"
@@ -116,6 +131,7 @@ import Delete from 'vue-material-design-icons/Delete.vue'
 import { showSuccess } from '@nextcloud/dialogs'
 import DialogConfirmation from '../shared/modals/DialogConfirmation.vue'
 import CreateColumn from '../modules/main/modals/CreateColumn.vue'
+import NcView from '../shared/components/ncTable/NcView.vue'
 
 export default {
 	name: 'Dashboard',
@@ -129,6 +145,7 @@ export default {
 		Delete,
 		DialogConfirmation,
 		CreateColumn,
+		NcView,
 	},
 
 	mixins: [permissionsMixin],
@@ -144,12 +161,12 @@ export default {
 	},
 	computed: {
 		...mapState({
+			columns: state => state.data.columns,
 			loading: state => state.data.loading,
+			rows: state => state.data.rows,
+			viewSetting: state => state.data.viewSetting,
 		}),
 		...mapGetters(['activeTable']),
-		columns() {
-			return 10 //TODO
-		},
 		getTranslatedDescription() {
 			return t('tables', 'Do you really want to delete the table "{table}"?', { table: this.activeTable?.title })
 		},
@@ -173,9 +190,23 @@ export default {
 
 			if (this.activeTable.id !== this.lastActiveTableId) {
 				this.localLoading = true
+				await this.$store.dispatch('resetViewSetting')
+
+				await this.$store.dispatch('loadColumnsFromBE', { table: this.activeTable })
+				if (this.canReadData(this.activeTable)) {
+					await this.$store.dispatch('loadRowsFromBE', { tableId: this.activeTable.id })
+				} else {
+					await this.$store.dispatch('removeRows')
+				}
 				this.lastActiveTableId = this.activeTable.id
 				this.localLoading = false
 			}
+		},
+		addFilter(filterObject) {
+			this.$store.dispatch('addFilter', filterObject)
+		},
+		setSearchString(str) {
+			this.$store.dispatch('setSearchString', { str })
 		},
 		async deleteMe() {
 			const table = this.activeTable

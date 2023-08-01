@@ -117,9 +117,11 @@ export default {
 			let res = null
 
 			try {
-				if (tableId) {
-					res = await axios.get(generateUrl('/apps/tables/view/' + viewId + '/column/' + tableId))
-				  } else {
+				if (tableId && viewId) {
+					res = await axios.get(generateUrl('/apps/tables/column/table/' + tableId + '/view/' + viewId))
+				  } else if (tableId && !viewId) {
+					res = await axios.get(generateUrl('/apps/tables/column/table/' + tableId))
+				  } else if (!tableId && viewId) {
 					res = await axios.get(generateUrl('/apps/tables/column/view/' + viewId))
 				  }
 				if (!Array.isArray(res.data)) {
@@ -135,13 +137,14 @@ export default {
 			commit('setLoading', false)
 			return columns
 		},
-		async loadColumnsFromBE({ commit, dispatch }, { view }) {
-			const columns = await dispatch('getColumnsFromBE', { viewId: view.id })
-			let allColumns = columns.concat(MetaColumns.filter(col => view.columns.includes(col.id)))
-			allColumns = allColumns.sort(function(a, b) {
-				return view.columns.indexOf(a.id) - view.columns.indexOf(b.id)
-			  })
-
+		async loadColumnsFromBE({ commit, dispatch }, { view, table }) {
+			let allColumns = await dispatch('getColumnsFromBE', { tableId: table?.id, viewId: view?.id })
+			if (view) {
+				allColumns = allColumns.concat(MetaColumns.filter(col => view.columns.includes(col.id)))
+				allColumns = allColumns.sort(function(a, b) {
+					return view.columns.indexOf(a.id) - view.columns.indexOf(b.id)
+				  })
+			}
 			commit('setColumns', allColumns)
 			return true
 		},
@@ -199,12 +202,16 @@ export default {
 		},
 
 		// ROWS
-		async loadRowsFromBE({ commit }, { viewId }) {
+		async loadRowsFromBE({ commit }, { tableId, viewId }) {
 			commit('setLoading', true)
 			let res = null
 
 			try {
-				res = await axios.get(generateUrl('/apps/tables/row/view/' + viewId))
+				if (viewId) {
+					res = await axios.get(generateUrl('/apps/tables/row/view/' + viewId))
+				} else {
+					res = await axios.get(generateUrl('/apps/tables/row/table/' + tableId))
+				}
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load rows.'))
 				return false

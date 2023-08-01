@@ -36,7 +36,7 @@ return [
 		['name' => 'api1#createColumn',	'url' => '/api/1/views/{viewId}/columns', 'verb' => 'POST'],
 		['name' => 'api1#updateColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'PUT'],
 		['name' => 'api1#getColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'GET'],
-		['name' => 'api1#deleteColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'DELETE'],		
+		['name' => 'api1#deleteColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'DELETE'],
 		// -> rows
 		['name' => 'api1#indexTableRowsSimple',	'url' => '/api/1/tables/{tableId}/rows/simple', 'verb' => 'GET'],
 		['name' => 'api1#indexViewRows',	'url' => '/api/1/views/{viewId}/rows', 'verb' => 'GET'],
@@ -63,7 +63,8 @@ return [
 		['name' => 'view#destroy', 'url' => '/view/{id}', 'verb' => 'DELETE'],
 
 		// columns
-		['name' => 'column#index', 'url' => '/view/{viewId}/column/{tableId}', 'verb' => 'GET'],
+		['name' => 'column#index', 'url' => '/column/table/{tableId}/view/{viewId}', 'verb' => 'GET'],
+		['name' => 'column#index', 'url' => '/column/table/{tableId}', 'verb' => 'GET'],
 		['name' => 'column#show', 'url' => '/column/{id}', 'verb' => 'GET'],
 		['name' => 'column#indexView', 'url' => '/column/view/{viewId}', 'verb' => 'GET'],
 		['name' => 'column#create', 'url' => '/column', 'verb' => 'POST'],
@@ -71,6 +72,7 @@ return [
 		['name' => 'column#destroy', 'url' => '/column/{id}', 'verb' => 'DELETE'],
 
 		// rows
+		['name' => 'row#index', 'url' => '/row/table/{tableId}', 'verb' => 'GET'],
 		['name' => 'row#show', 'url' => '/row/{id}', 'verb' => 'GET'],
 		['name' => 'row#indexView', 'url' => '/row/view/{viewId}', 'verb' => 'GET'],
 		['name' => 'row#create', 'url' => '/row', 'verb' => 'POST'],
