@@ -57,30 +57,6 @@ class ViewService extends SuperService {
 	 * @throws PermissionError
 	 */
 	public function findAll(Table $table, ?string $userId = null): array {
-		return $this->findAllGeneralised($table, true, $userId);
-	}
-
-	/**
-	 * @param Table $table
-	 * @param string|null $userId
-	 * @return array
-	 * @throws InternalError
-	 * @throws PermissionError
-	 */
-	public function findAllNotBaseViews(Table $table, ?string $userId = null): array {
-		return $this->findAllGeneralised($table, false, $userId);
-	}
-
-	/**
-	 * @param Table $table
-	 * @param bool $includeBaseView
-	 * @param string|null $userId
-	 * @return array
-	 * @throws InternalError
-	 * @throws PermissionError
-	 */
-	private function findAllGeneralised(Table $table, bool $includeBaseView = true, ?string $userId = null): array {
-		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
 
 		try {
@@ -89,45 +65,12 @@ class ViewService extends SuperService {
 				throw new PermissionError('PermissionError: can not read views for tableId '.$table->getId());
 			}
 
-			$allViews = $includeBaseView ? $this->mapper->findAll($table->getId()) : $this->mapper->findAllNotBaseViews($table->getId());
+			$allViews = $this->mapper->findAll($table->getId());
 			foreach ($allViews as $view) {
 				$this->enhanceView($view, $userId);
 			}
 			return $allViews;
 		} catch (\OCP\DB\Exception|InternalError $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError($e->getMessage());
-		} catch (PermissionError $e) {
-			$this->logger->debug('permission error during looking for views', ['exception' => $e]);
-			throw new PermissionError($e->getMessage());
-		}
-	}
-
-	/**
-	 * @param Table $table
-	 * @param bool $skipTableEnhancement
-	 * @param string|null $userId
-	 * @return View
-	 * @throws InternalError
-	 * @throws PermissionError
-	 * @throws DoesNotExistException
-	 * @throws MultipleObjectsReturnedException
-	 */
-	public function findBaseView(Table $table, bool $skipTableEnhancement = false, ?string $userId = null): View {
-		/** @var string $userId */
-		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
-
-		try {
-			// security
-			if (!$this->permissionsService->canManageTable($table, $userId)) {
-				throw new PermissionError('PermissionError: can not read views for tableId '.$table->getId());
-			}
-			$baseView = $this->mapper->findBaseView($table->getId());
-			if(!$skipTableEnhancement) {
-				$this->enhanceView($baseView, $userId);
-			}
-			return $baseView;
-		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError($e->getMessage());
 		} catch (PermissionError $e) {
@@ -190,13 +133,12 @@ class ViewService extends SuperService {
 	 * @param string $title
 	 * @param string|null $emoji
 	 * @param Table $table
-	 * @param bool $isBaseView
 	 * @param string|null $userId
 	 * @return View
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function create(string $title, ?string $emoji, Table $table, bool $isBaseView = false, ?string $userId = null): View {
+	public function create(string $title, ?string $emoji, Table $table, ?string $userId = null): View {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // $userId is set
 
@@ -212,7 +154,6 @@ class ViewService extends SuperService {
 			$item->setEmoji($emoji);
 		}
 		$item->setDescription('');
-		$item->setIsBaseView($isBaseView);
 		$item->setTableId($table->getId());
 		$item->setCreatedBy($userId);
 		$item->setLastEditBy($userId);
@@ -295,9 +236,6 @@ class ViewService extends SuperService {
 
 		try {
 			$view = $this->mapper->find($id);
-			if ($view->getIsBaseView()) {
-				throw new InternalError('To delete the base view, delete the table instead');
-			}
 
 			// security
 			if (!$this->permissionsService->canManageView($view, $userId)) {
@@ -402,9 +340,6 @@ class ViewService extends SuperService {
 		if ($userId !== '') {
 			try {
 				$allShares = $this->shareService->findAll('view', $view->getId());
-				if ($view->getIsBaseView()) {
-					$allShares = array_merge($allShares, $this->shareService->findAll('table', $view->getTableId()));
-				}
 				$view->setHasShares(count($allShares) !== 0);
 			} catch (InternalError $e) {
 			}
@@ -418,23 +353,15 @@ class ViewService extends SuperService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function deleteAllByTable(Table $table, ?string $userId = null): View {
+	public function deleteAllByTable(Table $table, ?string $userId = null): void {
 		// security
 		if (!$this->permissionsService->canManageTable($table, $userId)) {
 			throw new PermissionError('delete all rows for table id = '.$table->getId().' is not allowed.');
 		}
 		$views = $this->findAll($table, $userId);
 		foreach ($views as $view) {
-			if($view->getIsBaseView()) {
-				$baseView = $view;
-			} else {
-				$this->deleteByObject($view, $userId);
-			}
+			$this->deleteByObject($view, $userId);
 		}
-		if (!isset($baseView)) {
-			throw new InternalError('No base view exists for this table');
-		}
-		return $this->deleteByObject($baseView, $userId);
 	}
 
 	/**

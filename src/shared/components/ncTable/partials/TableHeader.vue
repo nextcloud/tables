@@ -87,7 +87,6 @@ import { NcCheckboxRadioSwitch, NcActions, NcActionButton, NcActionCaption } fro
 import { emit } from '@nextcloud/event-bus'
 import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
-import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 import IconImport from 'vue-material-design-icons/Import.vue'
 import Creation from 'vue-material-design-icons/Creation.vue'
 import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
@@ -100,7 +99,6 @@ export default {
 
 	components: {
 		PlaylistEdit,
-		PlaylistPlus,
 		IconImport,
 		FilterLabel,
 		NcCheckboxRadioSwitch,

@@ -93,7 +93,7 @@ import NavigationViewItem from './NavigationViewItem.vue'
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 
 export default {
-	name: 'NavigationBaseViewItem',
+	name: 'NavigationBaseViewItem_old',
 
 	components: {
 		// eslint-disable-next-line vue/no-reserved-component-names

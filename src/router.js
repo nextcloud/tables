@@ -4,6 +4,7 @@ import { generateUrl } from '@nextcloud/router'
 import DefaultMainView from './pages/DefaultMainView.vue'
 import Redirect from './pages/Redirect.vue'
 import Startpage from './pages/Startpage.vue'
+import Dashboard from './pages/Dashboard.vue'
 
 Vue.use(Router)
 
@@ -14,6 +15,11 @@ export default new Router({
 		{
 			path: '/',
 			component: Startpage,
+		},
+		{
+			path: '/table/:tableId',
+			component: Dashboard,
+			name: 'table',
 		},
 		{
 			path: '/view/:viewId',

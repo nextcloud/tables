@@ -3,7 +3,7 @@
 		<div v-if="isLoading" class="icon-loading" />
 
 		<div v-if="!isLoading && activeView">
-			<ElementDescription :view-setting="viewSetting" />
+			<ElementDescription :active-element="activeView" :is-table="false" :view-setting="viewSetting" />
 
 			<div class="table-wrapper">
 				<NcView v-if="columns.length > 0"
@@ -21,8 +21,8 @@
 					@delete-filter="deleteFilter" />
 			</div>
 
-			<EmptyTable v-if="columns.length === 0 && activeView.isBaseView" @create-column="showCreateColumn = true" />
-			<EmptyView v-if="columns.length === 0 && !activeView.isBaseView" />
+			<EmptyTable v-if="columns.length === 0" @create-column="showCreateColumn = true" />
+			<!-- <EmptyView v-if="columns.length === 0" /> -->
 		</div>
 
 		<CreateRow :columns="columns"
@@ -38,8 +38,8 @@
 			:view="editView"
 			@close="editView = null"
 			@reload-view="reload(true)" />
-		<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false" />
-		<EditColumn v-if="columnToEdit" :column="columnToEdit" @close="columnToEdit = false" />
+		<CreateColumn :show-modal="showCreateColumn" :view="activeView" @close="showCreateColumn = false" />
+		<EditColumn v-if="columnToEdit" :column="columnToEdit" :view="activeView" @close="columnToEdit = false" />
 		<DeleteRows v-if="rowsToDelete" :rows-to-delete="rowsToDelete" :active-view="activeView" @cancel="rowsToDelete = null" />
 		<DeleteColumn v-if="columnToDelete" :column-to-delete="columnToDelete" @cancel="columnToDelete = null" />
 	</div>

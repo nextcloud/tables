@@ -45,27 +45,6 @@ class ViewMapper extends QBMapper {
 
 	/**
 	 * @param int|null $tableId
-	 * @return View
-	 * @throws DoesNotExistException
-	 * @throws Exception
-	 * @throws InternalError
-	 * @throws MultipleObjectsReturnedException
-	 */
-	public function findBaseView(?int $tableId = null): View {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->table);
-		if ($tableId !== null) {
-			$qb->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)))
-			->andWhere($qb->expr()->eq('is_base_view', $qb->createNamedParameter(true, IQueryBuilder::PARAM_BOOL)));
-		}
-		$view = $this->findEntity($qb);
-		$this->enhanceByOwnership($view);
-		return $view;
-	}
-
-	/**
-	 * @param int|null $tableId
 	 * @return array
 	 * @throws Exception
 	 * @throws InternalError
@@ -76,27 +55,6 @@ class ViewMapper extends QBMapper {
 			->from($this->table);
 		if ($tableId !== null) {
 			$qb->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)));
-		}
-		$views = $this->findEntities($qb);
-		foreach($views as $view) {
-			$this->enhanceByOwnership($view);
-		}
-		return $views;
-	}
-
-	/**
-	 * @param int|null $tableId
-	 * @return array
-	 * @throws Exception
-	 * @throws InternalError
-	 */
-	public function findAllNotBaseViews(?int $tableId = null): array {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->table);
-		if ($tableId !== null) {
-			$qb->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)))
-				->andWhere($qb->expr()->eq('is_base_view', $qb->createNamedParameter(false, IQueryBuilder::PARAM_BOOL)));
 		}
 		$views = $this->findEntities($qb);
 		foreach($views as $view) {

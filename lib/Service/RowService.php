@@ -342,11 +342,7 @@ class RowService extends SuperService {
 	 */
 	public function getViewRowsCount(View $view, string $userId): int {
 		if ($this->permissionsService->canReadRowsByElementId($view->getId(), 'view')) {
-			if ($view->getIsBaseView()) {
-				return $this->mapper->countRowsForBaseView($view);
-			} else {
-				return $this->mapper->countRowsForNotBaseView($view, $userId);
-			}
+			return $this->mapper->countRowsForView($view, $userId);
 		} else {
 			throw new PermissionError('no read access for counting to view id = '.$view->getId());
 		}

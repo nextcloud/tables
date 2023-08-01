@@ -14,35 +14,31 @@
 			</div>
 
 			<ul v-if="!tablesLoading">
-				<NcAppNavigationCaption v-if="getOwnBaseViews.length > 0" :title="t('tables', 'My tables')">
+				<NcAppNavigationCaption v-if="getOwnTables.length > 0" :title="t('tables', 'My tables')">
 					<template #actions>
 						<NcActionButton :aria-label="t('tables', 'Create table')" icon="icon-add" @click.prevent="createTable" />
 					</template>
 				</NcAppNavigationCaption>
-				<NavigationBaseViewItem v-for="view in getOwnBaseViews"
-					:key="view.id"
+				<NavigationDashboardItem v-for="table in getOwnTables"
+					:key="table.id"
 					:filter-string="filterString"
-					:base-view="view" />
+					:table="table" />
 
 				<NcAppNavigationCaption v-if="getSharedTables.length > 0"
 					:title="t('tables', 'Shared tables')" />
 
-				<NavigationBaseViewItem v-for="view in getSharedTables"
-					:key="view.id"
+				<NavigationDashboardItem v-for="table in getSharedTables"
+					:key="table.id"
 					:filter-string="filterString"
-					:base-view="view" />
+					:table="table" />
 
-				<NcAppNavigationCaption v-if="getSharedViews.length > 0"
+				<!-- <NcAppNavigationCaption v-if="getSharedViews.length > 0"
 					:title="t('tables', 'Shared views')" />
 
-				<template v-for="view in getSharedViews">
-					<NavigationViewItem v-if="!view.isBaseView"
-						:key="'view'+view.id"
-						:view="view" />
-					<NavigationBaseViewItem v-else
-						:key="'baseView'+view.id"
-						:base-view="view" />
-				</template>
+				<NavigationViewItem
+					v-for="view in getSharedViews"
+					:key="'view'+view.id"
+					:view="view" /> -->
 			</ul>
 
 			<div v-if="filterString !== ''" class="search-info">
@@ -60,7 +56,7 @@
 
 			<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
 			<Import :show-modal="importToView !== null" :view="importToView" @close="importToView = null" />
-			<ViewSettings :view="{tableId: createViewTableId, isBaseView: false, sort: [], filter: []}" :create-view="true" :show-modal="createViewTableId !== null" @close="createViewTableId = null" />
+			<ViewSettings :view="{tableId: createViewTableId, sort: [], filter: []}" :create-view="true" :show-modal="createViewTableId !== null" @close="createViewTableId = null" />
 		</template>
 	</NcAppNavigation>
 </template>
@@ -70,7 +66,7 @@ import { NcAppNavigation, NcAppNavigationCaption, NcActionButton, NcTextField, N
 import CreateTable from '../modals/CreateTable.vue'
 import ViewSettings from '../../main/modals/ViewSettings.vue'
 import NavigationViewItem from '../partials/NavigationViewItem.vue'
-import NavigationBaseViewItem from '../partials/NavigationBaseViewItem.vue'
+import NavigationDashboardItem from '../partials/NavigationDashboardItem.vue'
 import { mapState } from 'vuex'
 import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
@@ -81,7 +77,7 @@ export default {
 	name: 'Navigation',
 	components: {
 		Import,
-		NavigationBaseViewItem,
+		NavigationDashboardItem,
 		NavigationViewItem,
 		NcAppNavigation,
 		CreateTable,
@@ -104,21 +100,21 @@ export default {
 	},
 	computed: {
 		...mapState(['tables', 'views', 'tablesLoading']),
-		getSharedViews() {
-			const sharedTableIds = this.getFilteredBaseViews.map(view => view.tableId)
-			const sharedBaseViewTableIds = this.views.filter(item => item.isShared === true && item.isBaseView).map(view => view.tableId)
-			return this.views.filter(item => item.isShared === true && item.ownership !== getCurrentUser().uid && !sharedTableIds.includes(item.tableId)).filter(view => view.isBaseView || !sharedBaseViewTableIds.includes(view.tableId)).filter(view => view.title.toLowerCase().includes(this.filterString.toLowerCase())).sort((a, b) => a.tableId === b.tableId ? a.id - b.id : a.tableId - b.tableId)
-		},
+		// getSharedViews() {
+		// 	const sharedTableIds = this.getFilteredTables.map(table => table.id)
+		// 	const sharedBaseViewTableIds = this.views.filter(item => item.isShared === true && item.isBaseView).map(view => view.tableId)
+		// 	return this.views.filter(item => item.isShared === true && item.ownership !== getCurrentUser().uid && !sharedTableIds.includes(item.tableId)).filter(view => view.isBaseView || !sharedBaseViewTableIds.includes(view.tableId)).filter(view => view.title.toLowerCase().includes(this.filterString.toLowerCase())).sort((a, b) => a.tableId === b.tableId ? a.id - b.id : a.tableId - b.tableId)
+		// },
 		getSharedTables() {
-			return this.getFilteredBaseViews.filter((item) => { return item.isShared === true && item.ownership !== getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
+			return this.getFilteredTables.filter((item) => { return item.isShared === true && item.ownership !== getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
 		},
-		getOwnBaseViews() {
-			return this.getFilteredBaseViews.filter((item) => { return item.isShared === false || item.ownership === getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
+		getOwnTables() {
+			return this.getFilteredTables.filter((item) => { return item.isShared === false || item.ownership === getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
 		},
-		getFilteredBaseViews() {
+		getFilteredTables() {
 			return this.tables.filter(table => (!this.filterString
 				? true
-				: (table.baseView.title.toLowerCase().includes(this.filterString.toLowerCase()) || table.views.some(view => view.title.toLowerCase().includes(this.filterString.toLowerCase()))))).map(table => this.views.find(view => view.id === table.baseView.id))
+				: (table.title.toLowerCase().includes(this.filterString.toLowerCase()) || table.views.some(view => view.title.toLowerCase().includes(this.filterString.toLowerCase())))))
 		},
 	},
 	mounted() {

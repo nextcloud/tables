@@ -157,6 +157,13 @@ class TableService extends SuperService {
 			$table->setRowsCount(0);
 		}
 
+		// add the column count
+		try {
+			$table->setColumnsCount($this->columnService->getColumnsCount($table->getId()));
+		} catch (InternalError|PermissionError $e) {
+			$table->setRowsCount(0);
+		}
+
 		// set if this is a shared table with you (somebody else shared it with you)
 		// (senseless if we have no user in context)
 		if ($userId !== '') {
@@ -167,18 +174,9 @@ class TableService extends SuperService {
 			} catch (NotFoundError $e) {
 			}
 		}
-
+		// TODO: Create new base view if none exists (backward compatibility)
 		// add the corresponding views
-		try {
-			$table->setBaseView($this->viewService->findBaseView($table));
-		} catch (DoesNotExistException $e) {
-			// Create new base view if none exists (backward compatibility)
-			/** @noinspection PhpUndefinedMethodInspection */
-			$view = $this->viewService->create($table->getTitle(), $table->getEmoji(), $table, true);
-			$view = $this->viewService->update($view->getId(), ["columns" => json_encode(array_column($this->columnService->findAllByTable($table->getId()), 'id'))]);
-			$table->setBaseView($view);
-		}
-		$table->setViews($this->viewService->findAllNotBaseViews($table));
+		$table->setViews($this->viewService->findAll($table));
 	}
 
 
@@ -236,9 +234,10 @@ class TableService extends SuperService {
 
 		$time = new DateTime();
 		$item = new Table();
-		// Deprecated mandatory attribute
-		/** @noinspection PhpUndefinedMethodInspection */
-		$item->setTitle('TODO: DELETE');
+		$item->setTitle($title);
+		if($emoji) {
+			$item->setEmoji($emoji);
+		}
 		$item->setOwnership($userId);
 		$item->setCreatedBy($userId);
 		$item->setLastEditBy($userId);
@@ -250,9 +249,9 @@ class TableService extends SuperService {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
 		}
-		$baseView = $this->viewService->create($title, $emoji, $newTable, true, $userId);
+		$defaultView = $this->viewService->create($this->l->t('Default View'), $emoji, $newTable, $userId);
 		if ($template !== 'custom') {
-			$table = $this->tableTemplateService->makeTemplate($newTable, $template, $baseView->getId());
+			$table = $this->tableTemplateService->makeTemplate($newTable, $template, $defaultView->getId());
 		} else {
 			$table = $this->addOwnerDisplayName($newTable);
 		}

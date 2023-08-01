@@ -67,7 +67,7 @@ class ImportService extends SuperService {
 		if (!$this->permissionsService->canCreateRows($view)) {
 			throw new PermissionError('create row at the view id = '.$viewId.' is not allowed.');
 		}
-		if ($createMissingColumns && (!$view->getIsBaseView() || !$this->permissionsService->canManageTableById($view->getTableId()))) {
+		if ($createMissingColumns && !$this->permissionsService->canManageTableById($view->getTableId())) {
 			throw new PermissionError('create columns at the view id = '.$viewId.' is not allowed.');
 		}
 		if ($this->userManager->get($this->userId) === null) {

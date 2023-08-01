@@ -15,7 +15,8 @@
 						:mandatory.sync="editColumn.mandatory"
 						:title.sync="editColumn.title"
 						:edit-column="true"
-						:title-missing-error="editErrorTitle" />
+						:title-missing-error="editErrorTitle"
+						:view="view" />
 				</div>
 				<div class="col-2 space-LR space-T">
 					<component :is="getColumnForm" :column="editColumn" />
@@ -99,6 +100,10 @@ export default {
 	},
 	props: {
 		column: {
+			type: Object,
+			default: null,
+		},
+		view: {
 			type: Object,
 			default: null,
 		},

@@ -11,7 +11,8 @@
 						:mandatory.sync="column.mandatory"
 						:title.sync="column.title"
 						:selected-views.sync="column.selectedViews"
-						:title-missing-error="titleMissingError" />
+						:title-missing-error="titleMissingError"
+						:view="view" />
 				</div>
 				<div class="fix-col-2" style="display: block">
 					<div class="row no-padding-on-mobile space-L">
@@ -134,6 +135,10 @@ export default {
 		showModal: {
 			type: Boolean,
 			default: false,
+		},
+		view: {
+			type: Object,
+			default: null,
 		},
 	},
 	data() {

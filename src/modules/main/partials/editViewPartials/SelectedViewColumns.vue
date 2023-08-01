@@ -15,7 +15,7 @@
 					</template>
 				</NcButton>
 				<NcCheckboxRadioSwitch
-					:disabled="isBaseView && column.id >= 0"
+					:disabled="column.id >= 0"
 					:checked="selectedColumns.includes(column.id)"
 					class="display-checkbox"
 					@update:checked="onToggle(column.id)" />
@@ -71,10 +71,6 @@ export default {
 		selectedColumns: {
 			type: Array,
 			default: null,
-		},
-		isBaseView: {
-			type: Boolean,
-			default: false,
 		},
 	},
 	data() {
