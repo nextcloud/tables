@@ -399,19 +399,20 @@ class ColumnService extends SuperService {
 	 * @throws PermissionError
 	 * @throws \OCP\DB\Exception
 	 */
-	public function findOrCreateColumnsByTitleForTableAsArray(int $tableId, int $viewId, array $titles, ?string $userId, bool $createUnknownColumns, int &$countCreatedColumns): array {
+	public function findOrCreateColumnsByTitleForTableAsArray(int $viewId, array $titles, ?string $userId, bool $createUnknownColumns, int &$countCreatedColumns, int &$countMatchingColumns): array {
 		$result = [];
 
 		if($userId === null) {
 			$userId = $this->userId;
 		}
-		$allColumns = $this->findAllByTable($tableId, $viewId, $userId);
+		$allColumns = $this->findAllByView($viewId);
 		$i = -1;
 		foreach ($titles as $title) {
 			$i++;
 			foreach ($allColumns as $column) {
 				if($column->getTitle() === $title) {
 					$result[$i] = $column;
+					$countMatchingColumns++;
 					continue 2;
 				}
 				$result[$i] = '';

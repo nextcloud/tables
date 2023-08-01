@@ -29,4 +29,13 @@ class DatetimeBusiness extends SuperBusiness implements IColumnTypeBusiness {
 
 		return json_encode($newDateTime !== '' ? $newDateTime : '');
 	}
+
+	public function canBeParsed(string $value, ?Column $column = null): bool {
+		try {
+			new DateTime($value);
+		} catch (Exception $e) {
+			return false;
+		}
+		return true;
+	}
 }

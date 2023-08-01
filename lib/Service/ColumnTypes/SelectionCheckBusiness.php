@@ -11,4 +11,10 @@ class SelectionCheckBusiness extends SuperBusiness implements IColumnTypeBusines
 		return json_encode(in_array($value, $hits) ? 'true' : 'false');
 	}
 
+	public function canBeParsed(string $value, ?Column $column = null): bool {
+		$positive = ['yes', '1', true, 1];
+		$negative = ['no', '0', false, 0];
+		return in_array($value, $positive) || in_array($value, $negative) ;
+	}
+
 }

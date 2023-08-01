@@ -27,8 +27,11 @@
 							{{ t('tables', 'Create missing columns') }}
 						</NcCheckboxRadioSwitch>
 					</div>
-					<p v-if="!canCreateMissingColumns" class="fix-col-2 span">
+					<p v-if="!canManageTable(view)" class="fix-col-2 span">
 						{{ t('tables', '⚠️ You don\'t have the permission to create columns.') }}
+					</p>
+					<p v-else-if="!view.isBaseView" class="fix-col-2 span">
+						{{ t('tables', '⚠️ You can only create columns in the basic view') }}
 					</p>
 				</RowFormWrapper>
 
@@ -71,6 +74,12 @@
 						{{ result['found_columns_count'] }}
 					</div>
 					<div class="fix-col-1">
+						{{ t('tables', 'Matching columns') }}
+					</div>
+					<div class="fix-col-3">
+						{{ result['matching_columns_count'] }}
+					</div>
+					<div class="fix-col-1">
 						{{ t('tables', 'Created columns') }}
 					</div>
 					<div class="fix-col-3">
@@ -83,7 +92,13 @@
 						{{ result['inserted_rows_count'] }}
 					</div>
 					<div class="fix-col-1">
-						{{ t('tables', 'Errors') }}
+						{{ t('tables', 'Value parsing errors') }}
+					</div>
+					<div class="fix-col-3">
+						{{ result['errors_parsing_count'] }}
+					</div>
+					<div class="fix-col-1">
+						{{ t('tables', 'Row creation errors') }}
 					</div>
 					<div class="fix-col-3">
 						{{ result['errors_count'] }}
@@ -170,10 +185,17 @@ export default {
 	computed: {
 		...mapGetters(['activeView']),
 		canCreateMissingColumns() {
-			return this.canManageTable(this.view)
+			return this.canManageTable(this.view) && this.view.isBaseView
 		},
 		getCreateMissingColumns() {
 			return this.canManageTable(this.view) && this.createMissingColumns
+		},
+	},
+	watch: {
+		view() {
+			if (this.view) {
+				this.createMissingColumns = this.canCreateMissingColumns
+			}
 		},
 	},
 

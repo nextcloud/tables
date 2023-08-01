@@ -10,4 +10,8 @@ class NumberStarsBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		return json_encode((int) $value);
 	}
 
+	public function canBeParsed(string $value, ?Column $column = null): bool {
+		return !$value || in_array((int) $value, array(0,1,2,3,4,5));
+	}
+
 }
