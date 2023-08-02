@@ -47,6 +47,24 @@ class ColumnMapper extends QBMapper {
 	}
 
 	/**
+	 * @param integer $tableID
+	 * @return array
+	 * @throws Exception
+	 */
+	public function findAllIdsByTable(int $tableID): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('id')
+			->from($this->table)
+			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableID)));
+		$result = $qb->executeQuery();
+		$ids = [];
+		while ($row = $result->fetch()) {
+			$ids[] = $row['id'];
+		}
+		return $ids;
+	}
+
+	/**
 	 * @param array $neededColumnIds
 	 * @return array<string> Array with key = columnId and value = [column-type]-[column-subtype]
 	 * @throws Exception

@@ -96,13 +96,13 @@
 					</template>
 					{{ t('tables', 'Hide column') }}
 				</NcActionButton>
-				<NcActionButton v-if="column.id >= 0 && canManageTable(activeView)" @click="editColumn()">
+				<NcActionButton v-if="column.id >= 0 && (isView ? canManageTable(element) : canManageElement(element))" @click="editColumn()">
 					<template #icon>
 						<Pencil :size="25" />
 					</template>
 					{{ t('tables', 'Edit column') }}
 				</NcActionButton>
-				<NcActionButton v-if="column.id >= 0 && canManageTable(activeView)" @click="deleteColumn()">
+				<NcActionButton v-if="column.id >= 0 && (isView ? canManageTable(element) : canManageElement(element))" @click="deleteColumn()">
 					<template #icon>
 						<Delete :size="25" />
 					</template>
@@ -124,7 +124,7 @@ import ChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
 import FilterCog from 'vue-material-design-icons/FilterCog.vue'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
 import { NcActions, NcActionButton, NcActionInput, NcActionButtonGroup, NcActionCaption, NcActionRadio } from '@nextcloud/vue'
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import { AbstractColumn } from '../mixins/columnClass.js'
 import { FilterIds } from '../mixins/filter.js'
 import permissionsMixin from '../mixins/permissionsMixin.js'
@@ -161,6 +161,14 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		element: {
+			type: Object,
+			default: () => {},
+		},
+		isView: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	data() {
 		return {
@@ -176,7 +184,6 @@ export default {
 		...mapState({
 			viewSetting: state => state.data.viewSetting,
 		}),
-		...mapGetters(['activeView']),
 		getOperators() {
 			const possibleOperators = this.column.getPossibleOperators()
 			return possibleOperators

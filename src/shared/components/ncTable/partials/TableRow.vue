@@ -8,7 +8,7 @@
 				:value="getCellValue(col)" />
 		</td>
 		<td>
-			<NcButton v-if="canUpdateData(activeView) || canDeleteData(activeView)" type="primary" :aria-label="t('tables', 'Edit row')" @click="$emit('edit-row', row.id)">
+			<NcButton v-if="canUpdateData(view) || canDeleteData(view)" type="primary" :aria-label="t('tables', 'Edit row')" @click="$emit('edit-row', row.id)">
 				<template #icon>
 					<Pencil :size="20" />
 				</template>
@@ -72,9 +72,12 @@ export default {
 			type: Object,
 			default: null,
 		},
+		view: {
+			type: Object,
+			default: () => {},
+		},
 	},
 	computed: {
-		...mapGetters(['activeView']),
 		getSelection: {
 			get: () => { return this.selected },
 			set: () => { alert('updating selection') },

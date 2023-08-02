@@ -16,38 +16,32 @@
 			</template>
 		</template>
 		<template #extra />
-		<!-- <template #counter>
-			<NcCounterBubble v-if="canReadData(baseView)">
-				{{ n('tables', '%n row', '%n rows', baseView.rowsCount, {}) }}
+		<template #counter>
+			<NcCounterBubble v-if="canReadData(table)">
+				{{ n('tables', '%n row', '%n rows', table.rowsCount, {}) }}
 			</NcCounterBubble>
-			<NcActionButton v-if="baseView.hasShares" icon="icon-share" :class="{'margin-right': !(activeView && baseView.id === activeView.id)}" @click="actionShowShare" />
-			<div v-if="baseView.isShared && baseView.ownership !== userId" class="margin-left">
-				<NcAvatar :user="baseView.ownership" />
+			<NcActionButton v-if="table.hasShares" icon="icon-share" :class="{'margin-right': !(activeTable && table.id === activeTable.id)}" @click="actionShowShare" />
+			<div v-if="table.isShared && table.ownership !== userId" class="margin-left">
+				<NcAvatar :user="table.ownership" />
 			</div>
-		</template> -->
+		</template>
 
-		<!-- <template #actions>
-			<NcActionButton v-if="canManageTable(baseView)"
+		<template #actions>
+			<NcActionButton v-if="canManageElement(table)"
 				icon="icon-add"
 				:close-after-click="true"
 				@click="createView">
 				{{ t('tables', 'Create view') }}
 			</NcActionButton>
-			<NcActionButton v-if="canManageElement(baseView)"
-				icon="icon-rename"
-				:close-after-click="true"
-				@click="editView">
-				{{ t('tables', 'Edit table') }}
-			</NcActionButton>
-			<NcActionButton v-if="canShareElement(baseView)"
+			<NcActionButton v-if="canShareElement(table)"
 				icon="icon-share"
 				:close-after-click="true"
 				@click="actionShowShare">
 				{{ t('tables', 'Share') }}
 			</NcActionButton>
-			<NcActionButton v-if="canCreateRowInElement(baseView)"
+			<NcActionButton v-if="canCreateRowInElement(table)"
 				:close-after-click="true"
-				@click="actionShowImport(baseView)">
+				@click="actionShowImport(table)">
 				{{ t('tables', 'Import') }}
 				<template #icon>
 					<Import :size="20" />
@@ -61,13 +55,13 @@
 					<Creation :size="20" />
 				</template>
 			</NcActionButton>
-			<NcActionButton v-if="canManageTable(baseView)"
+			<NcActionButton v-if="canManageElement(table)"
 				icon="icon-delete"
 				:close-after-click="true"
 				@click="showDeletionConfirmation = true">
 				{{ t('tables', 'Delete table') }}
 			</NcActionButton>
-		</template> -->
+		</template>
 		<NavigationViewItem v-for="view in getViews"
 			:key="'view'+view.id"
 			:view="view" />
@@ -101,14 +95,14 @@ export default {
 	components: {
 		// eslint-disable-next-line vue/no-reserved-component-names
 		Table,
-		// Import,
+		Import,
 		DialogConfirmation,
 		NavigationViewItem,
-		// NcActionButton,
+		NcActionButton,
 		NcAppNavigationItem,
-		// NcCounterBubble,
-		// NcAvatar,
-		// Creation,
+		NcCounterBubble,
+		NcAvatar,
+		Creation,
 	},
 
 	filters: {
@@ -143,6 +137,7 @@ export default {
 
 	computed: {
 		...mapGetters(['activeTable', 'activeView']),
+		...mapState(['views']),
 		getTranslatedDescription() {
 			return t('tables', 'Do you really want to delete the table "{table}"?', { table: this.table.title })
 		},
@@ -150,7 +145,7 @@ export default {
 			return getCurrentUser().uid
 		},
 		getViews() {
-			return this.table.views
+			return this.views.filter(v => v.tableId === this.table.id)
 		},
 		hasViews() {
 			return this.getViews.length > 0
@@ -169,24 +164,20 @@ export default {
 		},
 	},
 	methods: {
-		// createView() {
-		// 	emit('create-view', this.baseView.tableId)
-		// },
-		// async editView() {
-		// 	await this.$router.push('/view/' + parseInt(this.baseView.id)).catch(err => err)
-		// 	emit('tables:view:edit', this.baseView)
-		// },
-		// async actionShowShare() {
-		// 	emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
-		// 	await this.$router.push('/view/' + parseInt(this.baseView.id)).catch(err => err)
-		// },
-		// async actionShowImport(view) {
-		// 	emit('tables:modal:import', view)
-		// },
-		// async actionShowIntegration() {
-		// 	emit('tables:sidebar:integration', { open: true, tab: 'integration' })
-		// 	await this.$router.push('/view/' + parseInt(this.baseView.id)).catch(err => err)
-		// },
+		createView() {
+			emit('create-view', this.table.id)
+		},
+		async actionShowShare() {
+			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
+			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
+		},
+		async actionShowImport(table) {
+			emit('tables:modal:import', table)
+		},
+		async actionShowIntegration() {
+			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
+			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
+		},
 		closeNav(e) {
 			if (window.innerWidth < 960) {
 				emit('toggle-navigation', {

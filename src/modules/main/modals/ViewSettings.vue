@@ -127,8 +127,8 @@ export default {
 		saveText() {
 			switch (this.type) {
 			case 'edit-table': return t('tables', 'Save Table')
-			case 'edit-view':
-			case 'create-view': return t('tables', 'Save View')
+			case 'edit-view': return t('tables', 'Save View')
+			case 'create-view': return t('tables', 'Create View')
 			default: throw Error('The type ' + this.type + ' is not valid for this modal')
 			}
 		},
@@ -194,6 +194,7 @@ export default {
 				const success = await this.updateViewToBE(this.mutableView.id)
 				this.localLoading = false
 				if (success) {
+					await this.$router.push('/view/' + this.mutableView.id).catch(err => err)
 					this.actionCancel()
 				}
 			}

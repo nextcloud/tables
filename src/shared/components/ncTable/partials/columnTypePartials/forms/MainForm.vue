@@ -88,14 +88,10 @@ export default {
 			type: Boolean,
 			default: false,
 		},
-		view: {
-			type: Object,
-			default: null,
-		},
 	},
 	computed: {
 		...mapState(['views']),
-		...mapGetters(['activeTable', 'getTable']),
+		...mapGetters(['activeElement', 'isView']),
 		localTitle: {
 			get() { return this.title },
 			set(title) { this.$emit('update:title', title) },
@@ -115,17 +111,16 @@ export default {
 			},
 		},
 		viewsForTable() {
-			if (this.view) {
-				return this.getTable(this.view.tableId).views.filter(view => view !== this.view).filter(view => !this.localSelectedViews.includes(view))
+			if (this.isView) {
+				return this.views.filter(view => view.tableId === this.activeElement.tableId && view !== this.activeElement).filter(view => !this.localSelectedViews.includes(view))
 			}
-			return this.activeTable.views.filter(view => !this.localSelectedViews.includes(view))
+			return this.views.filter(view => view.tableId === this.activeElement.id).filter(view => !this.localSelectedViews.includes(view))
 		},
 	},
 
 	mounted() {
-		console.debug("mounted", this.view)
 		if (this.editColumn) return
-		if (!this.view) {
+		if (!this.isView) {
 			this.localSelectedViews = this.viewsForTable
 		} else {
 			this.localSelectedViews = []

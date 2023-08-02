@@ -62,11 +62,13 @@ class RowController extends Controller {
 	 * @NoAdminRequired
 	 */
 	public function create(
-		int $viewId,
+		?int $tableId,
+		?int $viewId,
 		array $data
 	): DataResponse {
-		return $this->handleError(function () use ($viewId, $data) {
+		return $this->handleError(function () use ($tableId, $viewId, $data) {
 			return $this->service->create(
+				$tableId,
 				$viewId,
 				$data);
 		});
@@ -78,17 +80,20 @@ class RowController extends Controller {
 	public function update(
 		int $id,
 		int $columnId,
-		int $viewId,
+		?int $tableId,
+		?int $viewId,
 		string $data
 	): DataResponse {
 		return $this->handleError(function () use (
 			$id,
+			$tableId,
 			$viewId,
 			$columnId,
 			$data
 		) {
 			return $this->service->update(
 				$id,
+				$tableId,
 				$viewId,
 				$columnId,
 				$data,
@@ -101,17 +106,20 @@ class RowController extends Controller {
 	 */
 	public function updateSet(
 		int $id,
-		int $viewId,
+		?int $tableId,
+		?int $viewId,
 		array $data
 
 	): DataResponse {
 		return $this->handleError(function () use (
 			$id,
+			$tableId,
 			$viewId,
 			$data
 		) {
 			return $this->service->updateSet(
 				$id,
+				$tableId,
 				$viewId,
 				$data,
 				$this->userId);
@@ -121,9 +129,17 @@ class RowController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function destroy(int $id, int $viewId): DataResponse {
+	public function destroy(int $id, int $tableId): DataResponse {
+		return $this->handleError(function () use ($id, $tableId) {
+			return $this->service->delete($id, $tableId, null, $this->userId);
+		});
+	}
+	/**
+	 * @NoAdminRequired
+	 */
+	public function destroyByView(int $id, int $viewId): DataResponse {
 		return $this->handleError(function () use ($id, $viewId) {
-			return $this->service->delete($id, $viewId, $this->userId);
+			return $this->service->delete($id, null, $viewId, $this->userId);
 		});
 	}
 }

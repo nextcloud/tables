@@ -22,14 +22,15 @@ export default new Vuex.Store({
 		activeViewId: null,
 		activeTableId: null,
 		activeRowId: null,
+		activeElementIsView: false,
 	},
 
 	getters: {
 		getTable: (state) => (id) => {
-			return state.tables.filter(table => table.id === id)[0]
+			return state.tables.find(table => table.id === id)
 		},
 		getView: (state) => (id) => {
-			return state.views.filter(view => view.id === id)[0]
+			return state.views.find(view => view.id === id)
 		},
 		activeView(state) {
 			if (state.views && state.activeViewId) {
@@ -43,6 +44,17 @@ export default new Vuex.Store({
 			}
 			return null
 		},
+		activeElement(state) {
+			if (state.activeTableId && state.tables) {
+				return state.tables.find(item => item.id === state.activeTableId)
+			} else if (state.views && state.activeViewId) {
+				return state.views.find(item => item.id === state.activeViewId)
+			}
+			return null
+		},
+		isView(state) {
+			return state.activeElementIsView
+		},
 	},
 	mutations: {
 		setTablesLoading(state, value) {
@@ -51,11 +63,15 @@ export default new Vuex.Store({
 		setActiveViewId(state, viewId) {
 			if (state.activeViewId !== viewId) {
 				state.activeViewId = viewId
+				state.activeTableId = null
+				state.activeElementIsView = true
 			}
 		},
 		setActiveTableId(state, tableId) {
 			if (state.activeTableId !== tableId) {
 				state.activeTableId = tableId
+				state.activeViewId = null
+				state.activeElementIsView = false
 			}
 		},
 		setTables(state, tables) {
@@ -92,10 +108,9 @@ export default new Vuex.Store({
 			} else {
 				const tables = state.tables
 				tables.push(res.data)
-				state.views.push(res.data.views[0])
 				commit('setTables', tables)
 			}
-			return res.data.views[0]
+			return res.data
 		},
 		async loadTablesFromBE({ commit, state }) {
 			commit('setTablesLoading', true)
@@ -106,7 +121,7 @@ export default new Vuex.Store({
 				// Set Views
 				state.views = []
 				res.data.forEach(table => {
-					state.views = state.views.concat(table.views)
+					if (table.views) state.views = state.views.concat(table.views)
 				})
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load tables.'))
@@ -228,8 +243,8 @@ export default new Vuex.Store({
 			commit('setTables', [...tables])
 			return true
 		},
-		setTableHasShares({ state, commit, getters }, { elementId, hasShares }) {
-			const table = getters.getTable(elementId)
+		setTableHasShares({ state, commit, getters }, { tableId, hasShares }) {
+			const table = getters.getTable(tableId)
 			table.hasShares = !!hasShares
 			commit('setTable', table)
 		},
