@@ -32,13 +32,13 @@
 					:filter-string="filterString"
 					:table="table" />
 
-				<!-- <NcAppNavigationCaption v-if="getSharedViews.length > 0"
+				<NcAppNavigationCaption v-if="getSharedViews.length > 0"
 					:title="t('tables', 'Shared views')" />
 
 				<NavigationViewItem
 					v-for="view in getSharedViews"
 					:key="'view'+view.id"
-					:view="view" /> -->
+					:view="view" />
 			</ul>
 
 			<div v-if="filterString !== ''" class="search-info">
@@ -100,11 +100,10 @@ export default {
 	},
 	computed: {
 		...mapState(['tables', 'views', 'tablesLoading']),
-		// getSharedViews() {
-		// 	const sharedTableIds = this.getFilteredTables.map(table => table.id)
-		// 	const sharedBaseViewTableIds = this.views.filter(item => item.isShared === true && item.isBaseView).map(view => view.tableId)
-		// 	return this.views.filter(item => item.isShared === true && item.ownership !== getCurrentUser().uid && !sharedTableIds.includes(item.tableId)).filter(view => view.isBaseView || !sharedBaseViewTableIds.includes(view.tableId)).filter(view => view.title.toLowerCase().includes(this.filterString.toLowerCase())).sort((a, b) => a.tableId === b.tableId ? a.id - b.id : a.tableId - b.tableId)
-		// },
+		getSharedViews() {
+			const sharedTableIds = this.getFilteredTables.map(table => table.id)
+			return this.views.filter(item => item.isShared === true && item.ownership !== getCurrentUser().uid && !sharedTableIds.includes(item.tableId)).filter(view => view.title.toLowerCase().includes(this.filterString.toLowerCase())).sort((a, b) => a.tableId === b.tableId ? a.id - b.id : a.tableId - b.tableId)
+		},
 		getSharedTables() {
 			return this.getFilteredTables.filter((item) => { return item.isShared === true && item.ownership !== getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
 		},

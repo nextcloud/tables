@@ -61,7 +61,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['activeView']),
+		...mapGetters(['activeElement', 'isView']),
 		nonMetaColumns() {
 			return this.columns.filter(col => col.id >= 0)
 		},
@@ -115,7 +115,11 @@ export default {
 						value,
 					})
 				}
-				await this.$store.dispatch('insertNewRow', { viewId: this.activeView.id, data })
+				await this.$store.dispatch('insertNewRow', {
+					viewId: this.isView ? this.activeElement.id : null,
+					tableId: !this.isView ? this.activeElement.id : null,
+					data,
+				})
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not create new row'))

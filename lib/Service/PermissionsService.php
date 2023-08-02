@@ -180,8 +180,9 @@ class PermissionsService {
 	 * @param string|null $userId
 	 * @return bool
 	 */
-	public function canCreateRows(View $view, ?string $userId = null): bool {
-		return $this->checkPermission($view, 'view', 'create', $userId);
+	public function canCreateRows($element, string $nodeType = 'view', ?string $userId = null): bool {
+		if ($nodeType === 'table') return $this->checkPermission($element, 'table', 'manage', $userId);
+		return $this->checkPermission($element, 'view', 'create', $userId);
 	}
 
 	/**

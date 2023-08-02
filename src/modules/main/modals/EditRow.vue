@@ -27,7 +27,7 @@
 							{{ t('tables', 'I really want to delete this row!') }}
 						</NcButton>
 					</div>
-					<NcButton v-if="canUpdateData(activeView) && !localLoading" :aria-label="t('tables', 'Save')" type="primary" @click="actionConfirm">
+					<NcButton v-if="canUpdateData(activeElement) && !localLoading" :aria-label="t('tables', 'Save')" type="primary" @click="actionConfirm">
 						{{ t('tables', 'Save') }}
 					</NcButton>
 					<div v-if="localLoading" class="icon-loading" style="margin-left: 20px;" />
@@ -75,9 +75,9 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['activeView']),
+		...mapGetters(['activeElement', 'isView']),
 		showDeleteButton() {
-			return this.canDeleteData(this.activeView) && !this.localLoading
+			return this.canDeleteData(this.activeElement) && !this.localLoading
 		},
 		nonMetaColumns() {
 			return this.columns.filter(col => col.id >= 0)
@@ -139,7 +139,12 @@ export default {
 					value,
 				})
 			}
-			const res = await this.$store.dispatch('updateRow', { id: this.row.id, viewId: this.activeView.id, data })
+			const res = await this.$store.dispatch('updateRow', {
+				id: this.row.id,
+				viewId: this.isView ? this.activeElement.id : null,
+				tableId: !this.isView ? this.activeElement.id : null,
+				data,
+			})
 			if (!res) {
 				showError(t('tables', 'Could not update row'))
 			}
@@ -154,7 +159,11 @@ export default {
 		},
 		async deleteRowAtBE(rowId) {
 			this.localLoading = true
-			const res = await this.$store.dispatch('removeRow', { rowId, viewId: this.activeView.id })
+			const res = await this.$store.dispatch('removeRow', {
+				rowId,
+				viewId: this.isView ? this.activeElement.id : null,
+				tableId: !this.isView ? this.activeElement.id : null,
+			})
 			if (!res) {
 				showError(t('tables', 'Could not delete row.'))
 			}

@@ -197,7 +197,7 @@ class ImportService extends SuperService {
 			];
 		}
 		try {
-			$this->rowService->create($this->viewId, $data);
+			$this->rowService->create(null, $this->viewId, $data);
 			$this->countInsertedRows++;
 		} catch (PermissionError $e) {
 			$this->logger->error('Could not create row while importing, no permission.', ['exception' => $e]);

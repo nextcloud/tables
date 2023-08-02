@@ -63,7 +63,7 @@ return [
 		['name' => 'view#destroy', 'url' => '/view/{id}', 'verb' => 'DELETE'],
 
 		// columns
-		['name' => 'column#index', 'url' => '/column/table/{tableId}/view/{viewId}', 'verb' => 'GET'],
+		['name' => 'column#indexTableByView', 'url' => '/column/table/{tableId}/view/{viewId}', 'verb' => 'GET'],
 		['name' => 'column#index', 'url' => '/column/table/{tableId}', 'verb' => 'GET'],
 		['name' => 'column#show', 'url' => '/column/{id}', 'verb' => 'GET'],
 		['name' => 'column#indexView', 'url' => '/column/view/{viewId}', 'verb' => 'GET'],
@@ -78,7 +78,8 @@ return [
 		['name' => 'row#create', 'url' => '/row', 'verb' => 'POST'],
 		['name' => 'row#update', 'url' => '/row/{id}/column/{columnId}', 'verb' => 'PUT'],
 		['name' => 'row#updateSet', 'url' => '/row/{id}', 'verb' => 'PUT'],
-		['name' => 'row#destroy', 'url' => '/view/{viewId}/row/{id}', 'verb' => 'DELETE'],
+		['name' => 'row#destroyByView', 'url' => '/view/{viewId}/row/{id}', 'verb' => 'DELETE'],
+		['name' => 'row#destroy', 'url' => '/table/{tableId}/row/{id}', 'verb' => 'DELETE'],
 
 		// shares
 		['name' => 'share#index', 'url' => '/share/table/{tableId}', 'verb' => 'GET'],

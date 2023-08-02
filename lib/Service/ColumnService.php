@@ -157,7 +157,8 @@ class ColumnService extends SuperService {
 	 */
 	public function create(
 		?string $userId,
-        int $viewId,
+		?int $tableId,
+		?int $viewId,
 		string $type,
 		?string $subtype,
 		string $title,
@@ -182,8 +183,15 @@ class ColumnService extends SuperService {
 		?array $selectedViewIds
 	):Column {
 		// security
-		$view = $this->viewService->find($viewId);
-		$table = $this->tableMapper->find($view->getTableId());
+		if ($viewId) {
+			$view = $this->viewService->find($viewId);
+			$table = $this->tableMapper->find($view->getTableId());
+		} else if ($tableId) {
+			$table = $this->tableMapper->find($tableId);
+		} else {
+			throw new InternalError('Cannot update row without table or view in context');
+		}
+
 		if (!$this->permissionsService->canCreateColumns($table)) {
 			throw new PermissionError('create column at the table id = '.$table->getId().' is not allowed.');
 		}
@@ -214,8 +222,10 @@ class ColumnService extends SuperService {
 		$item->setDatetimeDefault($datetimeDefault);
 		try {
 			$entity = $this->mapper->insert($item);
-			// Add columns to view(s)
-			$this->viewService->update($view->getId(), ['columns' => json_encode(array_merge($view->getColumnsArray(), [$entity->getId()]))], $userId, true);
+			if($viewId) {
+				// Add columns to view(s)
+				$this->viewService->update($view->getId(), ['columns' => json_encode(array_merge($view->getColumnsArray(), [$entity->getId()]))], $userId, true);
+			}
 			foreach ($selectedViewIds as $viewId) {
 				$view = $this->viewService->find($viewId);
 				$this->viewService->update($viewId, ['columns' => json_encode(array_merge($view->getColumnsArray(), [$entity->getId()]))], $userId, true);
@@ -420,7 +430,7 @@ class ColumnService extends SuperService {
 			// if column was not found
 			if($result[$i] === '' && $createUnknownColumns) {
 				$description = $this->l->t('This column was automatically created by the import service.');
-				$result[$i] = $this->create($userId, $viewId, 'text', 'line', $title, false, $description, null, null, null, null, null, null, null, null, null, null, null, null, []);
+				$result[$i] = $this->create($userId, null, $viewId, 'text', 'line', $title, false, $description, null, null, null, null, null, null, null, null, null, null, null, null, []);
 				$countCreatedColumns++;
 			}
 		}

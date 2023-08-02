@@ -5,8 +5,9 @@
 				<TableHeader :columns="columns"
 					:selected-rows="selectedRows"
 					:rows="getSearchedAndFilteredAndSortedRows"
-					:view="view"
+					:element="view"
 					:view-setting="viewSetting"
+					:is-view="isView"
 					@create-row="$emit('create-row')"
 					@import="table => $emit('import', table)"
 					@create-column="$emit('create-column')"
@@ -23,6 +24,7 @@
 					:columns="columns"
 					:selected="isRowSelected(row.id)"
 					:view-setting="viewSetting"
+					:view="view"
 					@update-row-selection="updateRowSelection"
 					@edit-row="rowId => $emit('edit-row', rowId)" />
 			</tbody>

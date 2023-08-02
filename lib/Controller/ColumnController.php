@@ -41,6 +41,15 @@ class ColumnController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	public function indexTableByView(int $tableId, ?int $viewId): DataResponse {
+		return $this->handleError(function () use ($tableId, $viewId) {
+			return $this->service->findAllByTable($tableId, $viewId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
 	public function indexView(int $viewId): DataResponse {
 		return $this->handleError(function () use ($viewId) {
 			return $this->service->findAllByView($viewId);
@@ -60,7 +69,8 @@ class ColumnController extends Controller {
 	 * @NoAdminRequired
 	 */
 	public function create(
-		int $viewId,
+		?int $tableId,
+		?int $viewId,
 		string $type,
 		?string $subtype,
 		string $title,
@@ -85,6 +95,7 @@ class ColumnController extends Controller {
 		?array $selectedViewIds
 	): DataResponse {
 		return $this->handleError(function () use (
+			$tableId,
 			$viewId,
 			$type,
 			$subtype,
@@ -110,6 +121,7 @@ class ColumnController extends Controller {
 			$selectedViewIds) {
 			return $this->service->create(
 				$this->userId,
+				$tableId,
 				$viewId,
 				$type,
 				$subtype,

@@ -11,8 +11,7 @@
 						:mandatory.sync="column.mandatory"
 						:title.sync="column.title"
 						:selected-views.sync="column.selectedViews"
-						:title-missing-error="titleMissingError"
-						:view="view" />
+						:title-missing-error="titleMissingError" />
 				</div>
 				<div class="fix-col-2" style="display: block">
 					<div class="row no-padding-on-mobile space-L">
@@ -136,10 +135,6 @@ export default {
 			type: Boolean,
 			default: false,
 		},
-		view: {
-			type: Object,
-			default: null,
-		},
 	},
 	data() {
 		return {
@@ -182,7 +177,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['activeView']),
+		...mapGetters(['activeElement', 'isView']),
 		combinedType: {
 			get() {
 				return this.column.type ? this.column.type + ((this.column.subtype) ? ('-' + this.column.subtype) : '') : null
@@ -253,7 +248,8 @@ export default {
 					description: this.column.description,
 					selectedViewIds: this.column.selectedViews.map(view => view.id),
 					mandatory: this.column.mandatory,
-					viewId: this.activeView.id,
+					viewId: this.isView ? this.activeElement.id : null,
+					tableId: !this.isView ? this.activeElement.id : null,
 				}
 				if (this.combinedType === ColumnTypes.TextLine || this.combinedType === ColumnTypes.TextLong) {
 					data.textDefault = this.column.textDefault
@@ -286,7 +282,7 @@ export default {
 					showWarning(t('tables', 'Sorry, something went wrong.'))
 					console.debug('axios error', res)
 				}
-				await this.$store.dispatch('reloadViewsOfTable', { tableId: this.activeView.tableId })
+				await this.$store.dispatch('reloadViewsOfTable', { tableId: this.isView ? this.activeElement.tableId : this.activeElement.id })
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not create new column.'))

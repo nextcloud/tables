@@ -1,12 +1,12 @@
 <template>
-	<div v-if="activeView" class="sharing">
-		<div v-if="!activeView.isShared || activeView.ownership === getCurrentUser().uid">
+	<div v-if="activeElement" class="sharing">
+		<div v-if="!activeElement.isShared || activeElement.ownership === getCurrentUser().uid">
 			<ShareForm :shares="shares" @add="addShare" @update="updateShare" />
-			<ShareList :shares="shares" @add-table-share="addTableShare" @remove="removeShare" @update="updateShare" />
+			<ShareList :shares="shares" @remove="removeShare" @update="updateShare" />
 		</div>
-		<div v-else style="margin-top: 12px;">
+		<!-- <div v-else style="margin-top: 12px;">
 			{{ activeView ? t('tables', 'This table is shared with you. Resharing is not possible.') : t('tables', 'This view is shared with you. Resharing is not possible.') }}
-		</div>
+		</div> -->
 	</div>
 </template>
 
@@ -35,19 +35,19 @@ export default {
 	},
 
 	computed: {
-		...mapGetters(['activeView']),
+		...mapGetters(['activeElement', 'isView']),
 	},
 
 	watch: {
-		activeView() {
-			if (this.activeView) {
+		activeElement() {
+			if (this.activeElement) {
 				this.loadSharesFromBE()
 			}
 		},
 	},
 
 	mounted() {
-		if (this.activeView) {
+		if (this.activeElement) {
 			this.loadSharesFromBE()
 		}
 	},
@@ -62,8 +62,15 @@ export default {
 		async removeShare(share) {
 			await this.removeShareFromBE(share.id)
 			await this.loadSharesFromBE()
-			if (this.shares.find(share => (share.nodeType === 'view' && share.nodeId === this.activeView.id) || (share.nodeType === 'table' && share.nodeId === this.activeView.tableId)) === undefined) {
-				await this.$store.dispatch('setViewHasShares', { viewId: this.activeView.id, hasShares: false })
+			// If no share is left, remove shared indication
+			if (this.isView) {
+				if (this.shares.find(share => ((share.nodeType === 'view' && share.nodeId === this.activeElement.id) || (share.nodeType === 'table' && share.nodeId === this.activeElement.tableId))) === undefined) {
+					await this.$store.dispatch('setViewHasShares', { viewId: this.activeElement.id, hasShares: false })
+				}
+			} else {
+				if (this.shares.find(share => (share.nodeType === 'table' && share.nodeId === this.activeElement.id)) === undefined) {
+					await this.$store.dispatch('setTableHasShares', { tableId: this.activeElement.id, hasShares: false })
+				}
 			}
 		},
 		async addShare(share) {
@@ -74,10 +81,6 @@ export default {
 			const shareId = data.id
 			delete data.id
 			await this.updateShareToBE(shareId, data)
-			await this.loadSharesFromBE()
-		},
-		async addTableShare(share) {
-			await this.sendNewTableShareToBE(share)
 			await this.loadSharesFromBE()
 		},
 	},

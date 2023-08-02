@@ -15,7 +15,6 @@
 					</template>
 				</NcButton>
 				<NcCheckboxRadioSwitch
-					:disabled="column.id >= 0"
 					:checked="selectedColumns.includes(column.id)"
 					class="display-checkbox"
 					@update:checked="onToggle(column.id)" />

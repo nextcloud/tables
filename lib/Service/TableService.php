@@ -174,9 +174,11 @@ class TableService extends SuperService {
 			} catch (NotFoundError $e) {
 			}
 		}
-		// TODO: Create new base view if none exists (backward compatibility)
-		// add the corresponding views
-		$table->setViews($this->viewService->findAll($table));
+		if ($userId === '' || $table->getOnSharePermissions()['manage']) {
+			// add the corresponding views if it is an own table, or you have table manage rights
+			$table->setViews($this->viewService->findAll($table));
+		}
+
 	}
 
 
@@ -249,9 +251,8 @@ class TableService extends SuperService {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
 		}
-		$defaultView = $this->viewService->create($this->l->t('Default View'), $emoji, $newTable, $userId);
 		if ($template !== 'custom') {
-			$table = $this->tableTemplateService->makeTemplate($newTable, $template, $defaultView->getId());
+			$table = $this->tableTemplateService->makeTemplate($newTable, $template);
 		} else {
 			$table = $this->addOwnerDisplayName($newTable);
 		}

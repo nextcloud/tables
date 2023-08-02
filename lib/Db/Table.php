@@ -27,7 +27,9 @@ use OCP\AppFramework\Db\Entity;
  * @method getColumnsCount(): int
  * @method setColumnsCount(int $rowsCount)
  * @method getViews(): array
- * @method setViews(array $setViews)
+ * @method setViews(array $views)
+ * @method getColumns(): array
+ * @method setColumns(array $columns)
  * @method getCreatedBy(): string
  * @method setCreatedBy(string $createdBy)
  * @method getCreatedAt(): string
@@ -53,6 +55,7 @@ class Table extends Entity implements JsonSerializable {
 	protected ?int $rowsCount = 0;
 	protected ?int $columnsCount = 0;
 	protected ?array $views = null;
+	protected ?array $columns = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');
