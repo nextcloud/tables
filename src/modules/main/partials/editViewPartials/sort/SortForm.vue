@@ -69,6 +69,7 @@ export default {
 	},
 	computed: {
 		removedSortingRules() {
+			if (!this.viewSort || !this.generatedSort) return []
 			return this.viewSort.filter(entry => !this.generatedSort.some(e => this.isSameEntry(e, entry)) && !this.sort.some(e => this.isSameEntry(e, entry)))
 		},
 	},
@@ -77,6 +78,7 @@ export default {
 			this.mutableSort.unshift(entry)
 		},
 		isLocallyAdded(entry) {
+			if (!this.viewSort || !this.generatedSort) return false
 			return this.generatedSort.some(e => this.isSameEntry(e, entry)) && !this.viewSort.some(e => this.isSameEntry(e, entry))
 		},
 		isSameEntry(object, searchObject) {

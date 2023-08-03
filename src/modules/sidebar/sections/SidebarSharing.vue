@@ -1,12 +1,9 @@
 <template>
 	<div v-if="activeElement" class="sharing">
-		<div v-if="!activeElement.isShared || activeElement.ownership === getCurrentUser().uid">
+		<div v-if="canShareElement(activeElement)">
 			<ShareForm :shares="shares" @add="addShare" @update="updateShare" />
 			<ShareList :shares="shares" @remove="removeShare" @update="updateShare" />
 		</div>
-		<!-- <div v-else style="margin-top: 12px;">
-			{{ activeView ? t('tables', 'This table is shared with you. Resharing is not possible.') : t('tables', 'This view is shared with you. Resharing is not possible.') }}
-		</div> -->
 	</div>
 </template>
 
@@ -16,6 +13,7 @@ import shareAPI from '../mixins/shareAPI.js'
 import ShareForm from '../partials/ShareForm.vue'
 import ShareList from '../partials/ShareList.vue'
 import { getCurrentUser } from '@nextcloud/auth'
+import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 
 export default {
 	components: {
@@ -23,7 +21,7 @@ export default {
 		ShareList,
 	},
 
-	mixins: [shareAPI],
+	mixins: [shareAPI, permissionsMixin],
 
 	data() {
 		return {

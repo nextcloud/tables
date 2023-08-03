@@ -49,8 +49,6 @@ class View extends Entity implements JsonSerializable {
 	protected ?string $columns = null; // json
 	protected ?string $sort = null; // json
 	protected ?string $filter = null; // json
-
-	protected ?bool $isBaseView = false; //TODO: Delete
 	protected ?bool $isShared = null;
 	protected ?array $onSharePermissions = null;
 	protected ?bool $hasShares = false;
