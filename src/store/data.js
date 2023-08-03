@@ -118,10 +118,13 @@ export default {
 
 			try {
 				if (tableId && viewId) {
+					// Get all table columns. Try to access from view (Test if you have read access for view to read table columns)
 					res = await axios.get(generateUrl('/apps/tables/column/table/' + tableId + '/view/' + viewId))
 				  } else if (tableId && !viewId) {
+					// Get all table columns without view. Table manage rights needed
 					res = await axios.get(generateUrl('/apps/tables/column/table/' + tableId))
 				  } else if (!tableId && viewId) {
+					// Get all view columns.
 					res = await axios.get(generateUrl('/apps/tables/column/view/' + viewId))
 				  }
 				if (!Array.isArray(res.data)) {

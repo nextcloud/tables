@@ -35,6 +35,7 @@
 		<ViewSettings
 			:show-modal="editView !== null"
 			:view="editView"
+			:view-setting="viewSetting"
 			@close="editView = null"
 			@reload-view="reload(true)" />
 		<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false" />

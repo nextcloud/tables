@@ -36,7 +36,7 @@
 		<th data-cy="customTableAction">
 			<NcActions :force-menu="true" :type="isViewSettingSet ? 'secondary' : 'tertiary'">
 				<NcActionCaption v-if="canManageElement(element)" :title="t('tables', 'Manage view')" />
-				<NcActionButton v-if="canManageElement(element)"
+				<NcActionButton v-if="canManageElement(element) && isView"
 					:close-after-click="true"
 					@click="editView()">
 					<template #icon>
@@ -95,7 +95,6 @@ import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
 import FilterLabel from './FilterLabel.vue'
 import permissionsMixin from '../mixins/permissionsMixin.js'
 import { mapGetters } from 'vuex'
-import { showSuccess, showError } from '@nextcloud/dialogs'
 
 export default {
 
@@ -189,58 +188,6 @@ export default {
 		},
 		createView() {
 			emit('create-view', this.activeView.tableId)
-		},
-		generateViewConfigData() {
-			const view = this.element
-			const data = { data: {} }
-			if (this.viewSetting.hiddenColumns && this.viewSetting.hiddenColumns.length !== 0) {
-				data.data.columns = JSON.stringify(this.columns.map(col => col.id).filter(id => !this.viewSetting.hiddenColumns.includes(id)))
-			} else {
-				data.data.columns = JSON.stringify(this.columns.map(col => col.id))
-			}
-			if (this.viewSetting.sorting) {
-				data.data.sort = JSON.stringify([...view.sort, this.viewSetting.sorting[0]])
-			}
-			if (this.viewSetting.filter && this.viewSetting.filter.length !== 0) {
-				const filteringRules = this.viewSetting.filter.map(fil => ({
-					columnId: fil.columnId,
-					operator: fil.operator.id,
-					value: fil.value,
-				}))
-				const newFilter = []
-				if (view.filter && view.filter.length !== 0) {
-					view.filter.forEach(filterGroup => {
-						newFilter.push([...filterGroup, ...filteringRules])
-					})
-				} else {
-					newFilter[0] = filteringRules
-				}
-				data.data.filter = JSON.stringify(newFilter)
-			}
-			return data
-		},
-		async applyViewConfig() {
-			await this.$store.dispatch('updateView', { id: this.element.id, data: this.generateViewConfigData() })
-			emit('tables:view:reload')
-			showSuccess(t('tables', 'The configuration of view "{view}" was updated.', { view: this.element.title }))
-		},
-		async createWithViewConfig() {
-			const data = {
-				tableId: this.element.tableId,
-				title: this.element.title + ' ' + t('tables', 'Copy'),
-				emoji: this.element.emoji,
-			}
-			const newViewId = await this.$store.dispatch('insertNewView', { data })
-			if (newViewId) {
-				const res = await this.$store.dispatch('updateView', { id: newViewId, data: this.generateViewConfigData() })
-				if (res) {
-					await this.$router.push('/view/' + newViewId)
-				} else {
-					showError(t('tables', 'Could not configure new view'))
-				}
-			} else {
-				showError(t('tables', 'Could not create new view'))
-			}
 		},
 		async actionShowIntegration() {
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })

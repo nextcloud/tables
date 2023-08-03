@@ -2,7 +2,7 @@
 	<div class="selected-columns-wrapper"
 		@dragenter.prevent
 		@dragover.prevent>
-		<div v-for="(column, index) in columns" :key="column.id" :draggable="true"
+		<div v-for="(column, index) in columns" :key="column.id" :draggable="true" :class="{'locallyRemoved': isLocallyRemoved(column.id)}"
 			class="column-entry" @dragstart="dragStart(index)"
 			@dragover="dragOver(index)" @dragend="dragEnd(index)">
 			<div class="row-elements">
@@ -15,6 +15,7 @@
 					</template>
 				</NcButton>
 				<NcCheckboxRadioSwitch
+					v-if="!disableHide"
 					:checked="selectedColumns.includes(column.id)"
 					class="display-checkbox"
 					@update:checked="onToggle(column.id)" />
@@ -71,6 +72,18 @@ export default {
 			type: Array,
 			default: null,
 		},
+		viewColumnIds: {
+			type: Array,
+			default: null,
+		},
+		generatedColumnIds: {
+			type: Array,
+			default: null,
+		},
+		disableHide: {
+			type: Boolean,
+			default: true,
+		},
 	},
 	data() {
 		return {
@@ -81,6 +94,9 @@ export default {
 		}
 	},
 	methods: {
+		isLocallyRemoved(columnId) {
+			return !this.selectedColumns.includes(columnId) && !this.generatedColumnIds.includes(columnId) && this.viewColumnIds.includes(columnId)
+		},
 		onToggle(columnId) {
 			if (this.mutableSelectedColumns.includes(columnId)) {
 				this.mutableSelectedColumns.splice(this.mutableSelectedColumns.indexOf(columnId), 1)
@@ -121,80 +137,83 @@ export default {
 
 <style lang="scss" scoped>
 
-	.column-entry {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: calc(var(--default-grid-baseline) * 1) 0;
-		border-radius: var(--border-radius-large);
-	}
+.column-entry {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: calc(var(--default-grid-baseline) * 1) 0;
+	border-radius: var(--border-radius-large);
+}
 
-	.column-entry:hover {
-		background-color: var(--color-background-dark);
-	}
+.column-entry:hover {
+	background-color: var(--color-background-dark);
+}
 
-	.display-checkbox {
-		padding-right: calc(var(--default-grid-baseline) * 4);
-	}
+.display-checkbox {
+	padding-right: calc(var(--default-grid-baseline) * 4);
+}
 
-	:deep(.modal-container) {
-		min-width: 60% !important;
-	}
+:deep(.modal-container) {
+	min-width: 60% !important;
+}
 
-	:deep(.button-vue) {
-		cursor: move !important;
-		min-height: auto !important;
-		min-width: auto !important;
-	}
+:deep(.button-vue) {
+	cursor: move !important;
+	min-height: auto !important;
+	min-width: auto !important;
+}
 
-	:deep(.button-vue__icon) {
-		height: auto !important;
-		width: auto !important;
-		min-height: auto !important;
-		min-width: auto !important;
-	}
+:deep(.button-vue__icon) {
+	height: auto !important;
+	width: auto !important;
+	min-height: auto !important;
+	min-width: auto !important;
+}
 
-	:deep(.checkbox-radio-switch__label) {
-		min-height: auto;
-		padding: 4px;
-	}
+:deep(.checkbox-radio-switch__label) {
+	min-height: auto;
+	padding: 4px;
+}
 
-	:deep(.checkbox-radio-switch__icon) {
-		margin-right: 0 !important;
-		margin-left: 0 !important;
-	}
+:deep(.checkbox-radio-switch__icon) {
+	margin-right: 0 !important;
+	margin-left: 0 !important;
+}
 
-	.selected-columns-wrapper {
-		display: flex;
-		flex-direction: column;
-	}
+.selected-columns-wrapper {
+	display: flex;
+	flex-direction: column;
+}
 
-	.move-button {
-		padding-right: 10px !important;
-		cursor: move !important;
-	}
+.move-button {
+	padding-right: 10px !important;
+	cursor: move !important;
+}
 
-	.move-button:hover {
-		cursor: move !important;
-	}
+.move-button:hover {
+	cursor: move !important;
+}
 
-	.meta-info {
-		font-style: italic;
-		padding-left:  calc(var(--default-grid-baseline) * 1);
-		color: var(--color-info);
-	}
+.meta-info {
+	font-style: italic;
+	padding-left:  calc(var(--default-grid-baseline) * 1);
+	color: var(--color-info);
+}
 
-	.row-elements {
-		display: flex;
-		align-items: center;
-	}
+.row-elements {
+	display: flex;
+	align-items: center;
+}
 
-	.row-elements.move {
-		display: none;
-	}
+.row-elements.move {
+	display: none;
+}
 
-	.column-entry:hover .row-elements.move, .column-entry:focus-within .row-elements.move {
-		display: flex;
-	}
+.column-entry:hover .row-elements.move, .column-entry:focus-within .row-elements.move {
+	display: flex;
+}
 
+.locallyRemoved {
+	background-color: var(--color-error-hover);
+}
 </style>
