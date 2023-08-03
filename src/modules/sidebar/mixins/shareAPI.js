@@ -44,7 +44,7 @@ export default {
 				return false
 			}
 			if (this.isView) await this.$store.dispatch('setViewHasShares', { viewId: this.activeElement.id, hasShares: true })
-			await this.$store.dispatch('setTableHasShares', { tableId: this.isView ? this.activeElement.tableId : this.activeElement.id, hasShares: true })
+			else await this.$store.dispatch('setTableHasShares', { tableId: this.isView ? this.activeElement.tableId : this.activeElement.id, hasShares: true })
 			return true
 		},
 		async removeShareFromBE(shareId) {

@@ -48,10 +48,6 @@ class Version000600Date20230703000000 extends SimpleMigrationStep {
 			$table->addColumn('description', Types::TEXT, [
 				'notnull' => true,
 			]);
-			$table->addColumn('is_base_view', Types::BOOLEAN, [
-				'notnull' => true,
-				'default' => false,
-			]);
 			$table->addColumn('created_by', Types::STRING, [
 				'notnull' => true,
 				'length' => 64,

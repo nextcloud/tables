@@ -6,8 +6,8 @@
 		<div v-for="(filterGroup, i) in mutableFilters" :key="i">
 			<FilterGroup
 				:filter-group="filterGroup"
-				:view-filter-group="viewFilters[i] ?? []"
-				:generated-filter-group="generatedFilters[i] ?? []"
+				:view-filter-group="viewFilters ? viewFilters[i] ?? [] : null"
+				:generated-filter-group="generatedFilters ? generatedFilters[i] ?? [] : null"
 				:columns="columns"
 				@delete-filter-group="deleteFilterGroup(i)" />
 			<div v-if="i < filters.length - 1" class="filter-text">

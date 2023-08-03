@@ -48,11 +48,10 @@ export default {
 		},
 
 		canShareElement(element) {
-			if (!element.isShared || element.ownership === getCurrentUser().uid) {
+			if (!element.isShared || element.ownership === getCurrentUser().uid || this.canManageElement(element)) {
 				return true
 			}
 
-			// resharing is not allowed
 			return false
 		},
 

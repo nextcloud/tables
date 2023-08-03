@@ -69,6 +69,7 @@ export default {
 			return Object.keys(searchObject).every((key) => object[key] === searchObject[key])
 		},
 		isLocallyAdded(filter) {
+			if (!this.viewFilterGroup || !this.generatedFilterGroup) return false
 			return this.generatedFilterGroup.some(e => this.isSameEntry(e, filter)) && !this.viewFilterGroup.some(e => this.isSameEntry(e, filter))
 		},
 		addFilter() {

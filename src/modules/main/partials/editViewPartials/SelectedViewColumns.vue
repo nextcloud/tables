@@ -95,6 +95,7 @@ export default {
 	},
 	methods: {
 		isLocallyRemoved(columnId) {
+			if (!this.viewColumnIds || !this.generatedColumnIds) return false
 			return !this.selectedColumns.includes(columnId) && !this.generatedColumnIds.includes(columnId) && this.viewColumnIds.includes(columnId)
 		},
 		onToggle(columnId) {
