@@ -2,11 +2,13 @@
 	<div class="sort-entry">
 		<div class="selection-fields">
 			<NcSelect v-model="selectedColumn" class="select-field"
+				:disabled="true"
 				:options="columns" :get-option-key="(option) => option.id"
 				:placeholder="t('tables', 'Column')" label="title" />
 			<div class="mode-switch">
 				<NcCheckboxRadioSwitch
 					:button-variant="true"
+					:disabled="true"
 					:checked.sync="sortMode"
 					value="ASC"
 					type="radio"
@@ -19,6 +21,7 @@
 				</NcCheckboxRadioSwitch>
 				<NcCheckboxRadioSwitch
 					:button-variant="true"
+					:disabled="true"
 					:checked.sync="sortMode"
 					value="DESC"
 					type="radio"
@@ -33,12 +36,12 @@
 		</div>
 		<NcButton
 			:close-after-click="true"
-			:aria-label="t('tables', 'Delete sorting rule')"
+			:aria-label="t('tables', 'Reactivate sorting rule')"
 			type="tertiary"
 			class="delete-button"
-			@click="$emit('delete-sorting-rule')">
+			@click="$emit('reactive-sorting-rule')">
 			<template #icon>
-				<Delete :size="25" />
+				<Undo :size="25" />
 			</template>
 		</NcButton>
 	</div>
@@ -46,16 +49,16 @@
 
 <script>
 import { NcButton, NcSelect, NcCheckboxRadioSwitch } from '@nextcloud/vue'
-import Delete from 'vue-material-design-icons/Delete.vue'
+import Undo from 'vue-material-design-icons/Undo.vue'
 import SortAsc from 'vue-material-design-icons/SortAscending.vue'
 import SortDesc from 'vue-material-design-icons/SortDescending.vue'
 
 export default {
-	name: 'SortEntry',
+	name: 'DeletedSortEntry',
 	components: {
 		NcSelect,
 		NcButton,
-		Delete,
+		Undo,
 		NcCheckboxRadioSwitch,
 		SortAsc,
 		SortDesc,
@@ -79,7 +82,6 @@ export default {
 	},
 	watch: {
 		sortEntry() {
-			console.debug("Resetting!!!!")
 			this.reset()
 		},
 		selectedColumn() {

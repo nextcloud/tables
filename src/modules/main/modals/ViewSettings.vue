@@ -23,21 +23,35 @@
 		<!--columns & order-->
 		<NcAppSettingsSection v-if="columns != null" id="columns-and-order" :title="t('tables', 'Columns')">
 			<SelectedViewColumns
-				:columns="allColumns"
-				:selected-columns="selectedColumns" />
+				:columns="canManageTable(view) ? allColumns : columns.map(id => allColumns.find(col => col.id === id))"
+				:selected-columns="selectedColumns"
+				:view-column-ids="view.columns"
+				:generated-column-ids="generatedView.columns"
+				:disable-hide="!canManageTable(view)" />
 		</NcAppSettingsSection>
 		<!--filtering-->
-		<NcAppSettingsSection v-if="columns != null" id="filter" :title="t('tables', 'Filter')">
-			<FilterForm :filters="mutableView.filter" :columns="allColumns" />
+		<NcAppSettingsSection v-if="columns != null && canManageTable(view)" id="filter" :title="t('tables', 'Filter')">
+			<FilterForm
+				:filters="mutableView.filter"
+				:view-filters="view.filter"
+				:generated-filters="generatedView.filter"
+				:columns="allColumns" />
 		</NcAppSettingsSection>
 		<!--sorting-->
 		<NcAppSettingsSection v-if="columns != null" id="sort" :title="t('tables', 'Sort')">
-			<SortForm :sort="mutableView.sort" :columns="allColumns" />
+			<SortForm
+				:sort="mutableView.sort"
+				:view-sort="view.sort"
+				:generated-sort="generatedView.sort"
+				:columns="allColumns" />
 		</NcAppSettingsSection>
 
 		<div class="row sticky">
 			<div class="fix-col-4 space-T end">
-				<button v-if="!localLoading" class="primary" :aria-label="saveText" @click="actionConfirm()">
+				<button v-if="!localLoading && type === 'edit-view'" class="primary" :aria-label="createNewViewText" @click="createNewView()">
+					{{ createNewViewText }}
+				</button>
+				<button v-if="!localLoading" class="primary" :aria-label="saveText" @click="saveView()">
 					{{ saveText }}
 				</button>
 			</div>
@@ -53,6 +67,7 @@ import FilterForm from '../partials/editViewPartials/filter/FilterForm.vue'
 import SortForm from '../partials/editViewPartials/sort/SortForm.vue'
 import SelectedViewColumns from '../partials/editViewPartials/SelectedViewColumns.vue'
 import { MetaColumns } from '../../../shared/components/ncTable/mixins/metaColumns.js'
+import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 
 export default {
 	name: 'ViewSettings',
@@ -65,6 +80,7 @@ export default {
 		SelectedViewColumns,
 		SortForm,
 	},
+	mixins: [permissionsMixin],
 	props: {
 		showModal: {
 			type: Boolean,
@@ -78,6 +94,11 @@ export default {
 		createView: {
 			type: Boolean,
 			default: false,
+		},
+		// Local/frontend view settings like filter, sorting, ...
+		viewSetting: {
+			type: Object,
+			default: null,
 		},
 	},
 	data() {
@@ -93,7 +114,8 @@ export default {
 			columns: null,
 			draggedItem: null,
 			startDragIndex: null,
-			mutableView: this.view,
+			mutableView: null,
+			generatedView: null,
 		}
 	},
 	computed: {
@@ -127,15 +149,53 @@ export default {
 		saveText() {
 			switch (this.type) {
 			case 'edit-table': return t('tables', 'Save Table')
-			case 'edit-view': return t('tables', 'Save View')
+			case 'edit-view':
+				if (this.viewSettings) return t('tables', 'Save modified View')
+				else return t('tables', 'Save View')
 			case 'create-view': return t('tables', 'Create View')
 			default: throw Error('The type ' + this.type + ' is not valid for this modal')
 			}
+		},
+		createNewViewText() {
+			return t('tables', 'Create new view')
 		},
 		type() {
 			if (!this.showModal) return 'create-view'
 			if (this.createView) return 'create-view'
 			else return 'edit-view'
+		},
+		generateViewConfigData() {
+			if (!this.viewSetting) return this.view
+			const mergedViewSettings = JSON.parse(JSON.stringify(this.view))
+			if (this.viewSetting.hiddenColumns && this.viewSetting.hiddenColumns.length !== 0) {
+				mergedViewSettings.columns = this.view.columns.filter(id => !this.viewSetting.hiddenColumns.includes(id))
+			} else {
+				mergedViewSettings.columns = this.view.columns
+			}
+			if (this.viewSetting.sorting) {
+				mergedViewSettings.sort = [this.viewSetting.sorting[0]]
+			} else {
+				mergedViewSettings.sort = this.view.sort
+			}
+			if (this.viewSetting.filter && this.viewSetting.filter.length !== 0) {
+				const filteringRules = this.viewSetting.filter.map(fil => ({
+					columnId: fil.columnId,
+					operator: fil.operator.id,
+					value: fil.value,
+				}))
+				const newFilter = []
+				if (this.view.filter && this.view.filter.length !== 0) {
+					this.view.filter.forEach(filterGroup => {
+						newFilter.push([...filterGroup, ...filteringRules])
+					})
+				} else {
+					newFilter[0] = filteringRules
+				}
+				mergedViewSettings.filter = newFilter
+			} else {
+				mergedViewSettings.filter = this.view.filter
+			}
+			return mergedViewSettings
 		},
 	},
 	watch: {
@@ -172,9 +232,9 @@ export default {
 			if (this.selectedColumns === null) this.selectedColumns = this.columns.map(col => col.id)
 			// Show columns of view first
 			this.allColumns = this.columns.concat(this.getMetaColumns)
-			this.allColumns = (this.mutableView.columns ?? this.selectedColumns).map(id => this.allColumns.find(col => col.id === id)).concat(this.allColumns.filter(col => !(this.mutableView.columns ?? this.selectedColumns).includes(col.id)))
+			this.allColumns = (this.view.columns ?? this.selectedColumns).map(id => this.allColumns.find(col => col.id === id)).concat(this.allColumns.filter(col => !(this.view.columns ?? this.selectedColumns).includes(col.id)))
 		},
-		async actionConfirm() {
+		async saveView() {
 			if (this.title === '') {
 				let titleErrorText
 				switch (this.type) {
@@ -191,6 +251,21 @@ export default {
 				if (this.type === 'create-view') {
 					this.mutableView.id = await this.sendNewViewToBE()
 				}
+				const success = await this.updateViewToBE(this.mutableView.id)
+				this.localLoading = false
+				if (success) {
+					await this.$router.push('/view/' + this.mutableView.id).catch(err => err)
+					this.actionCancel()
+				}
+			}
+		},
+		async createNewView() {
+			if (this.title === '') {
+				showError(t('tables', 'Cannot create view.') + ' ' + t('tables', 'Title is missing.'))
+				this.errorTitle = true
+			} else {
+				this.localLoading = true
+				this.mutableView.id = await this.sendNewViewToBE()
 				const success = await this.updateViewToBE(this.mutableView.id)
 				this.localLoading = false
 				if (success) {
@@ -235,7 +310,9 @@ export default {
 			}
 		},
 		reset() {
-			this.mutableView = this.view
+			// Deep copy of generated view config data
+			this.mutableView = JSON.parse(JSON.stringify(this.generateViewConfigData))
+			this.generatedView = JSON.parse(JSON.stringify(this.generateViewConfigData))
 			this.title = this.mutableView.title ?? ''
 			this.icon = this.mutableView.emoji ?? this.loadEmoji()
 			this.errorTitle = false
