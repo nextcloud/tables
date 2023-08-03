@@ -3,7 +3,7 @@
 		<div v-if="isLoading" class="icon-loading" />
 
 		<div v-if="!isLoading && activeView">
-			<ElementDescription :view-setting="viewSetting" />
+			<ElementDescription :active-element="activeView" :is-table="false" :view-setting="viewSetting" />
 
 			<div class="table-wrapper">
 				<NcView v-if="columns.length > 0"
@@ -21,8 +21,7 @@
 					@delete-filter="deleteFilter" />
 			</div>
 
-			<EmptyTable v-if="columns.length === 0 && activeView.isBaseView" @create-column="showCreateColumn = true" />
-			<EmptyView v-if="columns.length === 0 && !activeView.isBaseView" />
+			<EmptyView v-if="columns.length === 0" />
 		</div>
 
 		<CreateRow :columns="columns"
@@ -36,10 +35,11 @@
 		<ViewSettings
 			:show-modal="editView !== null"
 			:view="editView"
+			:view-setting="viewSetting"
 			@close="editView = null"
 			@reload-view="reload(true)" />
 		<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false" />
-		<EditColumn v-if="columnToEdit" :column="columnToEdit" @close="columnToEdit = false" />
+		<EditColumn v-if="columnToEdit" :column="columnToEdit" :view="activeView" @close="columnToEdit = false" />
 		<DeleteRows v-if="rowsToDelete" :rows-to-delete="rowsToDelete" :active-view="activeView" @cancel="rowsToDelete = null" />
 		<DeleteColumn v-if="columnToDelete" :column-to-delete="columnToDelete" @cancel="columnToDelete = null" />
 	</div>
@@ -56,7 +56,6 @@ import CreateColumn from '../modules/main/modals/CreateColumn.vue'
 import EditColumn from '../modules/main/modals/EditColumn.vue'
 import DeleteRows from '../modules/main/modals/DeleteRows.vue'
 import DeleteColumn from '../modules/main/modals/DeleteColumn.vue'
-import EmptyTable from '../modules/main/sections/EmptyTable.vue'
 import EmptyView from '../modules/main/sections/EmptyView.vue'
 import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
 import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
@@ -65,7 +64,6 @@ import { Filters } from '../shared/components/ncTable/mixins/filter.js'
 export default {
 	name: 'DefaultMainView',
 	components: {
-		EmptyTable,
 		EmptyView,
 		ViewSettings,
 		DeleteRows,

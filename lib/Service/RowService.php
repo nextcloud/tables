@@ -4,8 +4,10 @@ namespace OCA\Tables\Service;
 
 use DateTime;
 use Exception;
+use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row;
 use OCA\Tables\Db\RowMapper;
+use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
@@ -17,13 +19,38 @@ use Psr\Log\LoggerInterface;
 
 class RowService extends SuperService {
 	private RowMapper $mapper;
+	private ColumnMapper $columnMapper;
 	private ViewMapper $viewMapper;
+	private TableMapper $tableMapper;
 
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-		RowMapper $mapper, ViewMapper $viewMapper) {
+		RowMapper $mapper, ColumnMapper $columnMapper, ViewMapper $viewMapper, TableMapper $tableMapper) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
+		$this->columnMapper = $columnMapper;
 		$this->viewMapper = $viewMapper;
+		$this->tableMapper = $tableMapper;
+	}
+
+	/**
+	 * @param int $tableId
+	 * @param ?int $limit
+	 * @param ?int $offset
+	 * @return array
+	 * @throws InternalError
+	 * @throws PermissionError
+	 */
+	public function findAllByTable(int $tableId, ?int $limit = null, ?int $offset = null): array {
+		try {
+			if ($this->permissionsService->canReadRowsByElementId($tableId, 'table')) {
+				return $this->mapper->findAllByTable($tableId, $limit, $offset);
+			} else {
+				throw new PermissionError('no read access to table id = '.$tableId);
+			}
+		} catch (\OCP\DB\Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
+		}
 	}
 
 	/**
@@ -89,9 +116,11 @@ class RowService extends SuperService {
 	 * @noinspection DuplicatedCode
 	 */
 	public function create(
-		int $viewId,
+		?int $tableId,
+		?int $viewId,
 		array $data
 	):Row {
+		if ($viewId) {
 
 		$view = $this->viewMapper->find($viewId);
 		// security
@@ -99,18 +128,28 @@ class RowService extends SuperService {
 			throw new PermissionError('create row at the view id = '.$viewId.' is not allowed.');
 		}
 
-		$viewColumns = $view->getColumnsArray();
+		$columns = $view->getColumnsArray();
+		} else if ($tableId) {
+			$table = $this->tableMapper->find($tableId);
+			// security
+			if (!$this->permissionsService->canCreateRows($table, 'table')) {
+				throw new PermissionError('create row at the table id = '.$tableId.' is not allowed.');
+			}
+		$columns = $this->columnMapper->findAllIdsByTable($tableId);
+		} else {
+			throw new InternalError('Cannot create row without table or view in context');
+		}
 
 		foreach ($data as $entry) {
-			if (!in_array($entry['columnId'], $viewColumns)) {
-				throw new InternalError('Column with id '.$entry['columnId'].' is not part of view with id '.$view->getId());
+			if (!in_array($entry['columnId'], $columns)) {
+				throw new InternalError('Column with id '.$entry['columnId'].' is not part of view with id '.$viewId ?? $tableId);
 			}
 		}
 
 		$time = new DateTime();
 		$item = new Row();
 		$item->setDataArray($data);
-		$item->setTableId($view->getTableId());
+		$item->setTableId($viewId ? $view->getTableId() : $tableId);
 		$item->setCreatedBy($this->userId);
 		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
 		$item->setLastEditBy($this->userId);
@@ -134,7 +173,8 @@ class RowService extends SuperService {
 	 */
 	public function update(
 		int $id,
-		int $viewId,
+		?int $tableId,
+		?int $viewId,
 		int $columnId,
 		string $data,
 		string $userId
@@ -142,14 +182,23 @@ class RowService extends SuperService {
 		try {
 			$item = $this->find($id);
 
-			// security
-			if (!$this->permissionsService->canUpdateRowsByViewId($viewId)) {
-				throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
-			}
-			$view = $this->viewMapper->find($viewId);
-			$rowIds = $this->mapper->getRowIdsOfView($view, $userId);
-			if(!in_array($id, $rowIds)) {
-				throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
+			if ($viewId) {
+				// security
+				if (!$this->permissionsService->canUpdateRowsByViewId($viewId)) {
+					throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
+				}
+				$view = $this->viewMapper->find($viewId);
+				$rowIds = $this->mapper->getRowIdsOfView($view, $userId);
+				if(!in_array($id, $rowIds)) {
+					throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
+				}
+			} else if ($tableId) {
+				// security
+				if (!$this->permissionsService->canUpdateRowsByTableId($tableId)) {
+					throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
+				}
+			} else {
+				throw new InternalError('Cannot update row without table or view in context');
 			}
 
 			$time = new DateTime();
@@ -191,21 +240,31 @@ class RowService extends SuperService {
 	 */
 	public function updateSet(
 		int $id,
-		int $viewId,
+		?int $tableId,
+		?int $viewId,
 		array $data,
 		string $userId
 	):Row {
 		try {
 			$item = $this->mapper->find($id);
 
-			// security
-			if (!$this->permissionsService->canUpdateRowsByViewId($viewId)) {
-				throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
-			}
-			$view = $this->viewMapper->find($viewId);
-			$rowIds = $this->mapper->getRowIdsOfView($view, $userId);
-			if(!in_array($id, $rowIds)) {
-				throw new PermissionError('User should not be able to access row with id = '.$item->getId());
+			if ($viewId) {
+				// security
+				if (!$this->permissionsService->canUpdateRowsByViewId($viewId)) {
+					throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
+				}
+				$view = $this->viewMapper->find($viewId);
+				$rowIds = $this->mapper->getRowIdsOfView($view, $userId);
+				if(!in_array($id, $rowIds)) {
+					throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
+				}
+			} else if ($tableId) {
+				// security
+				if (!$this->permissionsService->canUpdateRowsByTableId($tableId)) {
+					throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
+				}
+			} else {
+				throw new InternalError('Cannot update row without table or view in context');
 			}
 
 			$time = new DateTime();
@@ -253,18 +312,27 @@ class RowService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function delete(int $id, int $viewId, string $userId): Row {
+	public function delete(int $id, ?int $tableId, ?int $viewId, string $userId): Row {
 		try {
 			$item = $this->mapper->find($id);
 
-			// security
-			if (!$this->permissionsService->canDeleteRowsByViewId($viewId)) {
-				throw new PermissionError('delete row id = '.$item->getId().' is not allowed.');
-			}
-			$view = $this->viewMapper->find($viewId);
-			$rowIds = $this->mapper->getRowIdsOfView($view, $userId);
-			if(!in_array($id, $rowIds)) {
-				throw new PermissionError('User should not be able to access row with id = '.$item->getId());
+			if ($viewId) {
+				// security
+				if (!$this->permissionsService->canDeleteRowsByViewId($viewId)) {
+					throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
+				}
+				$view = $this->viewMapper->find($viewId);
+				$rowIds = $this->mapper->getRowIdsOfView($view, $userId);
+				if(!in_array($id, $rowIds)) {
+					throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
+				}
+			} else if ($tableId) {
+				// security
+				if (!$this->permissionsService->canDeleteRowsByTableId($tableId)) {
+					throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
+				}
+			} else {
+				throw new InternalError('Cannot update row without table or view in context');
 			}
 
 			$this->mapper->delete($item);
@@ -342,11 +410,7 @@ class RowService extends SuperService {
 	 */
 	public function getViewRowsCount(View $view, string $userId): int {
 		if ($this->permissionsService->canReadRowsByElementId($view->getId(), 'view')) {
-			if ($view->getIsBaseView()) {
-				return $this->mapper->countRowsForBaseView($view);
-			} else {
-				return $this->mapper->countRowsForNotBaseView($view, $userId);
-			}
+			return $this->mapper->countRowsForView($view, $userId);
 		} else {
 			throw new PermissionError('no read access for counting to view id = '.$view->getId());
 		}

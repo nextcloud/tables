@@ -8,41 +8,26 @@ export default {
 	methods: {
 		async getSharedWithFromBE() {
 			try {
-				let res = await axios.get(generateUrl('/apps/tables/share/view/' + this.activeView.id))
-				const shares = res.data
-				res = await axios.get(generateUrl('/apps/tables/share/table/' + this.activeView.tableId))
-				return shares.concat(res.data)
+				let res
+				let shares = []
+				if (this.isView) {
+					res = await axios.get(generateUrl('/apps/tables/share/view/' + this.activeElement.id))
+					shares = shares.concat(res.data)
+					res = await axios.get(generateUrl('/apps/tables/share/table/' + this.activeElement.tableId))
+					return shares.concat(res.data)
+				} else {
+					res = await axios.get(generateUrl('/apps/tables/share/table/' + this.activeElement.id))
+					return shares.concat(res.data)
+				}
 			} catch (e) {
 				displayError(e, t('tables', 'Could not fetch shares.'))
 			}
 		},
 
-		async sendNewTableShareToBE(share) {
-			const data = {
-				nodeType: 'table',
-				nodeId: this.activeView.tableId,
-				receiver: share.receiver,
-				receiverType: share.receiverType,
-				permissionRead: false,
-				permissionCreate: false,
-				permissionUpdate: false,
-				permissionDelete: false,
-				permissionManage: true,
-			}
-			try {
-				const res = await axios.post(generateUrl('/apps/tables/share'), data)
-				showSuccess(t('tables', 'Saved new share with "{userName}".', { userName: res.data.receiverDisplayName }))
-			} catch (e) {
-				displayError(e, t('tables', 'Could not create share.'))
-				return false
-			}
-			await this.$store.dispatch('setViewHasShares', { viewId: this.activeView.id, hasShares: true })
-			return true
-		},
 		async sendNewShareToBE(share) {
 			const data = {
-				nodeType: 'view',
-				nodeId: this.activeView.id,
+				nodeType: this.isView ? 'view' : 'table',
+				nodeId: this.activeElement.id,
 				receiver: share.user,
 				receiverType: (share.isNoUser) ? 'group' : 'user',
 				permissionRead: true,
@@ -51,16 +36,15 @@ export default {
 				permissionDelete: false,
 				permissionManage: false,
 			}
-			let viewId = null
 			try {
 				const res = await axios.post(generateUrl('/apps/tables/share'), data)
-				viewId = res.data.nodeId
 				showSuccess(t('tables', 'Saved new share with "{userName}".', { userName: res.data.receiverDisplayName }))
 			} catch (e) {
 				displayError(e, t('tables', 'Could not create share.'))
 				return false
 			}
-			await this.$store.dispatch('setViewHasShares', { viewId, hasShares: true })
+			if (this.isView) await this.$store.dispatch('setViewHasShares', { viewId: this.activeElement.id, hasShares: true })
+			else await this.$store.dispatch('setTableHasShares', { tableId: this.isView ? this.activeElement.tableId : this.activeElement.id, hasShares: true })
 			return true
 		},
 		async removeShareFromBE(shareId) {

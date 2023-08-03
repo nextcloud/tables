@@ -85,6 +85,19 @@ class PermissionsService {
 	}
 
 	/**
+	 * @param int $elementId
+	 * @param string $nodeType
+	 * @param string|null $userId
+	 * @return bool
+	 * @throws InternalError
+	 */
+	public function canManageElementById(int $elementId, string $nodeType = 'table', ?string $userId = null): bool {
+		if ($nodeType === 'table') return $this->canManageTableById($elementId, $userId);
+		else if ($nodeType === 'view') return $this->canManageViewById($elementId, $userId);
+		else throw new InternalError('Cannot read permission for node type '.$nodeType);
+	}
+
+	/**
 	 * @param View $view
 	 * @param string|null $userId
 	 * @return bool
@@ -111,6 +124,22 @@ class PermissionsService {
 			return false;
 		}
 		return $this->canManageTable($table, $userId);
+	}
+
+	public function canManageViewById(int $viewId, ?string $userId = null): bool {
+		try {
+			$view = $this->viewMapper->find($viewId);
+		} catch (MultipleObjectsReturnedException $e) {
+			$this->logger->warning('Multiple tables were found for this id');
+			return false;
+		} catch (DoesNotExistException $e) {
+			$this->logger->warning('No table was found for this id');
+			return false;
+		} catch (InternalError | Exception $e) {
+			$this->logger->warning('Error occurred: '.$e->getMessage());
+			return false;
+		}
+		return $this->canManageView($view, $userId);
 	}
 
 
@@ -180,8 +209,9 @@ class PermissionsService {
 	 * @param string|null $userId
 	 * @return bool
 	 */
-	public function canCreateRows(View $view, ?string $userId = null): bool {
-		return $this->checkPermission($view, 'view', 'create', $userId);
+	public function canCreateRows($element, string $nodeType = 'view', ?string $userId = null): bool {
+		if ($nodeType === 'table') return $this->checkPermission($element, 'table', 'manage', $userId);
+		return $this->checkPermission($element, 'view', 'create', $userId);
 	}
 
 	/**
@@ -236,6 +266,15 @@ class PermissionsService {
 		if ($userId === '') {
 			return true;
 		}
+		try {
+			if ($this->canManageElementById($share->getNodeId(), $share->getNodeType())){
+				return true;
+			}
+		} catch (InternalError $e) {
+			$this->logger->warning('Cannot check manage permissions, permission denied');
+			return false;
+		}
+
 
 		if ($share->getSender() === $userId) {
 			return true;
@@ -260,36 +299,6 @@ class PermissionsService {
 		}
 
 		return false;
-	}
-
-	public function canUpdateShare(Share $item, ?string $userId = null): bool {
-		try {
-			$userId = $this->preCheckUserId($userId);
-		} catch (InternalError $e) {
-			$this->logger->warning('Cannot pre check the user id, permission denied');
-			return false;
-		}
-
-		if ($userId === '') {
-			return true;
-		}
-
-		return $item->getSender() === $userId;
-	}
-
-	public function canDeleteShare(Share $item, ?string $userId = null): bool {
-		try {
-			$userId = $this->preCheckUserId($userId);
-		} catch (InternalError $e) {
-			$this->logger->warning('Cannot pre check the user id, permission denied');
-			return false;
-		}
-
-		if ($userId === '') {
-			return true;
-		}
-
-		return $item->getSender() === $userId;
 	}
 
 	/**

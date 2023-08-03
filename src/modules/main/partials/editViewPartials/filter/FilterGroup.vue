@@ -8,6 +8,7 @@
 			<FilterEntry
 				:filter-entry="filter"
 				:columns="columns"
+				:class="{'locallyAdded': isLocallyAdded(filter)}"
 				@delete-filter="deleteFilter(index)" />
 		</div>
 		<NcButton
@@ -40,6 +41,14 @@ export default {
 			type: Array,
 			default: null,
 		},
+		viewFilterGroup: {
+			type: Array,
+			default: null,
+		},
+		generatedFilterGroup: {
+			type: Array,
+			default: null,
+		},
 		columns: {
 			type: Array,
 			default: null,
@@ -56,6 +65,13 @@ export default {
 		},
 	},
 	methods: {
+		isSameEntry(object, searchObject) {
+			return Object.keys(searchObject).every((key) => object[key] === searchObject[key])
+		},
+		isLocallyAdded(filter) {
+			if (!this.viewFilterGroup || !this.generatedFilterGroup) return false
+			return this.generatedFilterGroup.some(e => this.isSameEntry(e, filter)) && !this.viewFilterGroup.some(e => this.isSameEntry(e, filter))
+		},
 		addFilter() {
 			this.mutableFilterGroup.push({ columnId: null, operator: null, value: '' })
 		},
@@ -78,5 +94,9 @@ export default {
 .filter-group {
 	border-left: 6px solid var(--color-primary) !important;
 	padding-left: calc(var(--default-grid-baseline) * 2);
+}
+
+.locallyAdded {
+	background-color: var(--color-success-hover);
 }
 </style>

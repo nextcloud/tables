@@ -28,7 +28,7 @@ export default {
 		},
 	},
 	computed: {
-		...mapGetters(['activeView']),
+		...mapGetters(['activeElement', 'isView']),
 		deleteDescription() {
 			return t('tables', 'Are you sure you want to delete column "{column}"?', { column: this.columnToDelete.title })
 		},
@@ -39,7 +39,7 @@ export default {
 			if (!res) {
 				showError(t('tables', 'Error occurred while deleting column "{column}".', { column: this.column.title }))
 			}
-			await this.$store.dispatch('reloadViewsOfTable', { tableId: this.activeView.tableId })
+			await this.$store.dispatch('reloadViewsOfTable', { tableId: this.isView ? this.activeElement.tableId : this.activeElement.id })
 			this.$emit('cancel')
 		},
 	},

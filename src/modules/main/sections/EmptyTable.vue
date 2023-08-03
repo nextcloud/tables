@@ -2,7 +2,7 @@
 	<NcEmptyContent :title="t('tables', 'No columns')"
 		:description="t('tables', 'We need at least one column, please be so kind and create one.')">
 		<template #icon>
-			{{ activeView.emoji }}
+			{{ table.emoji }}
 		</template>
 		<template #action>
 			<NcButton :aria-label="t('table', 'Create column')" type="primary" @click="$emit('create-column')">
@@ -13,7 +13,6 @@
 </template>
 <script>
 import { NcEmptyContent, NcButton } from '@nextcloud/vue'
-import { mapGetters } from 'vuex'
 
 export default {
 	name: 'EmptyTable',
@@ -21,8 +20,11 @@ export default {
 		NcEmptyContent,
 		NcButton,
 	},
-	computed: {
-		...mapGetters(['activeView']),
+	props: {
+		table: {
+			type: Object,
+			default: null,
+		},
 	},
 
 }

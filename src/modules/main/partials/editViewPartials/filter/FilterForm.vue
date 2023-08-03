@@ -6,6 +6,8 @@
 		<div v-for="(filterGroup, i) in mutableFilters" :key="i">
 			<FilterGroup
 				:filter-group="filterGroup"
+				:view-filter-group="viewFilters ? viewFilters[i] ?? [] : null"
+				:generated-filter-group="generatedFilters ? generatedFilters[i] ?? [] : null"
 				:columns="columns"
 				@delete-filter-group="deleteFilterGroup(i)" />
 			<div v-if="i < filters.length - 1" class="filter-text">
@@ -42,6 +44,14 @@ export default {
 	},
 	props: {
 		filters: {
+			type: Array,
+			default: null,
+		},
+		viewFilters: {
+			type: Array,
+			default: null,
+		},
+		generatedFilters: {
 			type: Array,
 			default: null,
 		},

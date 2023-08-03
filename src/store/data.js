@@ -117,9 +117,14 @@ export default {
 			let res = null
 
 			try {
-				if (tableId) {
-					res = await axios.get(generateUrl('/apps/tables/view/' + viewId + '/column/' + tableId))
-				  } else {
+				if (tableId && viewId) {
+					// Get all table columns. Try to access from view (Test if you have read access for view to read table columns)
+					res = await axios.get(generateUrl('/apps/tables/column/table/' + tableId + '/view/' + viewId))
+				  } else if (tableId && !viewId) {
+					// Get all table columns without view. Table manage rights needed
+					res = await axios.get(generateUrl('/apps/tables/column/table/' + tableId))
+				  } else if (!tableId && viewId) {
+					// Get all view columns.
 					res = await axios.get(generateUrl('/apps/tables/column/view/' + viewId))
 				  }
 				if (!Array.isArray(res.data)) {
@@ -135,13 +140,14 @@ export default {
 			commit('setLoading', false)
 			return columns
 		},
-		async loadColumnsFromBE({ commit, dispatch }, { view }) {
-			const columns = await dispatch('getColumnsFromBE', { viewId: view.id })
-			let allColumns = columns.concat(MetaColumns.filter(col => view.columns.includes(col.id)))
-			allColumns = allColumns.sort(function(a, b) {
-				return view.columns.indexOf(a.id) - view.columns.indexOf(b.id)
-			  })
-
+		async loadColumnsFromBE({ commit, dispatch }, { view, table }) {
+			let allColumns = await dispatch('getColumnsFromBE', { tableId: table?.id, viewId: view?.id })
+			if (view) {
+				allColumns = allColumns.concat(MetaColumns.filter(col => view.columns.includes(col.id)))
+				allColumns = allColumns.sort(function(a, b) {
+					return view.columns.indexOf(a.id) - view.columns.indexOf(b.id)
+				  })
+			}
 			commit('setColumns', allColumns)
 			return true
 		},
@@ -199,12 +205,16 @@ export default {
 		},
 
 		// ROWS
-		async loadRowsFromBE({ commit }, { viewId }) {
+		async loadRowsFromBE({ commit }, { tableId, viewId }) {
 			commit('setLoading', true)
 			let res = null
 
 			try {
-				res = await axios.get(generateUrl('/apps/tables/row/view/' + viewId))
+				if (viewId) {
+					res = await axios.get(generateUrl('/apps/tables/row/view/' + viewId))
+				} else {
+					res = await axios.get(generateUrl('/apps/tables/row/table/' + tableId))
+				}
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load rows.'))
 				return false
@@ -218,11 +228,11 @@ export default {
 		removeRows({ commit }) {
 			commit('setRows', [])
 		},
-		async updateRow({ state, commit, dispatch }, { id, viewId, data }) {
+		async updateRow({ state, commit, dispatch }, { id, viewId, tableId, data }) {
 			let res = null
 
 			try {
-				res = await axios.put(generateUrl('/apps/tables/row/' + id), { viewId, data })
+				res = await axios.put(generateUrl('/apps/tables/row/' + id), { viewId, tableId, data })
 			} catch (e) {
 				console.debug(e?.response)
 				if (e?.response?.data?.message?.startsWith('User should not be able to access row')) {
@@ -241,11 +251,11 @@ export default {
 			commit('setRows', [...rows])
 			return true
 		},
-		async insertNewRow({ state, commit, dispatch }, { viewId, data }) {
+		async insertNewRow({ state, commit, dispatch }, { viewId, tableId, data }) {
 			let res = null
 
 			try {
-				res = await axios.post(generateUrl('/apps/tables/row'), { viewId, data })
+				res = await axios.post(generateUrl('/apps/tables/row'), { viewId, tableId, data })
 			} catch (e) {
 				displayError(e, t('tables', 'Could not insert row.'))
 				return false
@@ -257,9 +267,10 @@ export default {
 			commit('setRows', [...rows])
 			return true
 		},
-		async removeRow({ state, commit, dispatch }, { rowId, viewId }) {
+		async removeRow({ state, commit, dispatch }, { rowId, tableId, viewId }) {
 			try {
-				await axios.delete(generateUrl('/apps/tables/view/' + viewId + '/row/' + rowId))
+				if (viewId) await axios.delete(generateUrl('/apps/tables/view/' + viewId + '/row/' + rowId))
+				else await axios.delete(generateUrl('/apps/tables/table/' + tableId + '/row/' + rowId))
 			} catch (e) {
 				if (e?.response?.data?.message?.startsWith('User should not be able to access row')) {
 					showError(t('tables', 'Outdated data. View is reloaded'))

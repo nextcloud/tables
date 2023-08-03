@@ -59,7 +59,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				:rows="rows"
 				:view="view"
 				:view-setting="viewSetting"
-				:is-view="true"
+				:is-view="isView"
 				@create-row="$emit('create-row')"
 				@import="table => $emit('import', view)"
 				@edit-row="rowId => $emit('edit-row', rowId)"
@@ -126,9 +126,13 @@ export default {
 			default: () => {},
 		},
 		viewSetting: {
-		      type: Object,
-		      default: null,
-		    },
+			type: Object,
+			default: null,
+		},
+		isView: {
+			type: Boolean,
+			default: true,
+		},
 	},
 	data() {
 		return {

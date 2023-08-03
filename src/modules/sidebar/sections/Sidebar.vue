@@ -14,7 +14,7 @@
 					<Creation :size="20" />
 				</template>
 			</NcAppSidebarTab>
-			<NcAppSidebarTab v-if="activeView && canShareElement(activeView)"
+			<NcAppSidebarTab v-if="activeElement && canShareElement(activeElement)"
 				id="sharing"
 				icon="icon-share"
 				:name="t('tables', 'Sharing')">
@@ -52,17 +52,17 @@ export default {
 	},
 	computed: {
 		...mapState(['tables']),
-		...mapGetters(['activeView']),
+		...mapGetters(['activeElement', 'isView']),
 		elementTitle() {
-			if (this.activeView) {
-				return this.activeView.emoji + ' ' + this.activeView.title
+			if (this.activeElement) {
+				return this.activeElement.emoji + ' ' + this.activeElement.title
 			} else {
 				return t('tables', 'No view in context')
 			}
 		},
 		elementSubtitle() {
-			if (this.activeView) {
-				return t('tables', 'From {ownerName}', { ownerName: this.activeView.createdBy })
+			if (this.activeElement) {
+				return t('tables', 'From {ownerName}', { ownerName: this.activeElement.ownership })
 				// TODO: Created By?
 			} else {
 				return ''

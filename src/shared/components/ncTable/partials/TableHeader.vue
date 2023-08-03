@@ -17,6 +17,8 @@
 							:column="col"
 							:open-state.sync="openedColumnHeaderMenus[col.id]"
 							:can-hide="visibleColumns.length > 1"
+							:element="element"
+							:is-view="isView"
 							@add-filter="filter => $emit('add-filter', filter)" />
 					</div>
 					<div v-if="getFilterForColumn(col)" class="filter-wrapper">
@@ -33,8 +35,8 @@
 		</th>
 		<th data-cy="customTableAction">
 			<NcActions :force-menu="true" :type="isViewSettingSet ? 'secondary' : 'tertiary'">
-				<NcActionCaption v-if="canManageElement(view)" :title="t('tables', 'Manage view')" />
-				<NcActionButton v-if="canManageElement(view)"
+				<NcActionCaption v-if="canManageElement(element)" :title="t('tables', 'Manage view')" />
+				<NcActionButton v-if="canManageElement(element) && isView"
 					:close-after-click="true"
 					@click="editView()">
 					<template #icon>
@@ -42,7 +44,7 @@
 					</template>
 					{{ t('tables', 'Edit view') }}
 				</NcActionButton>
-				<NcActionButton v-if="canManageTable(view)" :close-after-click="true" @click="$emit('create-column')">
+				<NcActionButton v-if="isView ? canManageTable(element) : canManageElement(element)" :close-after-click="true" @click="$emit('create-column')">
 					<template #icon>
 						<TableColumnPlusAfter :size="20" decorative title="" />
 					</template>
@@ -50,20 +52,20 @@
 				</NcActionButton>
 
 				<NcActionCaption :title="t('tables', 'Integration')" />
-				<NcActionButton v-if="canCreateRowInElement(view)"
+				<NcActionButton v-if="canCreateRowInElement(element)"
 					:close-after-click="true"
-					@click="$emit('import', view)">
+					@click="$emit('import', element)">
 					<template #icon>
 						<IconImport :size="20" decorative title="Import" />
 					</template>
 					{{ t('tables', 'Import') }}
 				</NcActionButton>
-				<NcActionButton v-if="canReadData(view)" :close-after-click="true"
+				<NcActionButton v-if="canReadData(element)" :close-after-click="true"
 					icon="icon-download"
 					@click="downloadCSV">
 					{{ t('tables', 'Export as CSV') }}
 				</NcActionButton>
-				<NcActionButton v-if="canShareElement(view)"
+				<NcActionButton v-if="canShareElement(element)"
 					:close-after-click="true"
 					icon="icon-share"
 					@click="toggleShare">
@@ -87,20 +89,17 @@ import { NcCheckboxRadioSwitch, NcActions, NcActionButton, NcActionCaption } fro
 import { emit } from '@nextcloud/event-bus'
 import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
-import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 import IconImport from 'vue-material-design-icons/Import.vue'
 import Creation from 'vue-material-design-icons/Creation.vue'
 import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
 import FilterLabel from './FilterLabel.vue'
 import permissionsMixin from '../mixins/permissionsMixin.js'
 import { mapGetters } from 'vuex'
-import { showSuccess, showError } from '@nextcloud/dialogs'
 
 export default {
 
 	components: {
 		PlaylistEdit,
-		PlaylistPlus,
 		IconImport,
 		FilterLabel,
 		NcCheckboxRadioSwitch,
@@ -127,13 +126,17 @@ export default {
 			type: Array,
 			default: () => [],
 		},
-		view: {
+		element: {
 			type: Object,
 			default: () => {},
 		},
 		viewSetting: {
 			type: Object,
 			default: null,
+		},
+		isView: {
+			type: Boolean,
+			default: false,
 		},
 	},
 
@@ -162,7 +165,7 @@ export default {
 
 	methods: {
 		editView() {
-			emit('tables:view:edit', this.view)
+			emit('tables:view:edit', this.element)
 		},
 		updateOpenState(columnId) {
 			this.openedColumnHeaderMenus[columnId] = !this.openedColumnHeaderMenus[columnId]
@@ -185,57 +188,6 @@ export default {
 		},
 		createView() {
 			emit('create-view', this.activeView.tableId)
-		},
-		generateViewConfigData() {
-			const data = { data: {} }
-			if (this.viewSetting.hiddenColumns && this.viewSetting.hiddenColumns.length !== 0) {
-				data.data.columns = JSON.stringify(this.columns.map(col => col.id).filter(id => !this.viewSetting.hiddenColumns.includes(id)))
-			} else {
-				data.data.columns = JSON.stringify(this.columns.map(col => col.id))
-			}
-			if (this.viewSetting.sorting) {
-				data.data.sort = JSON.stringify([...this.view.sort, this.viewSetting.sorting[0]])
-			}
-			if (this.viewSetting.filter && this.viewSetting.filter.length !== 0) {
-				const filteringRules = this.viewSetting.filter.map(fil => ({
-					columnId: fil.columnId,
-					operator: fil.operator.id,
-					value: fil.value,
-				}))
-				const newFilter = []
-				if (this.view.filter && this.view.filter.length !== 0) {
-					this.view.filter.forEach(filterGroup => {
-						newFilter.push([...filterGroup, ...filteringRules])
-					})
-				} else {
-					newFilter[0] = filteringRules
-				}
-				data.data.filter = JSON.stringify(newFilter)
-			}
-			return data
-		},
-		async applyViewConfig() {
-			await this.$store.dispatch('updateView', { id: this.activeView.id, data: this.generateViewConfigData() })
-			emit('tables:view:reload')
-			showSuccess(t('tables', 'The configuration of view "{view}" was updated.', { view: this.activeView.title }))
-		},
-		async createWithViewConfig() {
-			const data = {
-				tableId: this.activeView.tableId,
-				title: this.activeView.title + ' ' + t('tables', 'Copy'),
-				emoji: this.activeView.emoji,
-			}
-			const newViewId = await this.$store.dispatch('insertNewView', { data })
-			if (newViewId) {
-				const res = await this.$store.dispatch('updateView', { id: newViewId, data: this.generateViewConfigData() })
-				if (res) {
-					await this.$router.push('/view/' + newViewId)
-				} else {
-					showError(t('tables', 'Could not configure new view'))
-				}
-			} else {
-				showError(t('tables', 'Could not create new view'))
-			}
 		},
 		async actionShowIntegration() {
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })

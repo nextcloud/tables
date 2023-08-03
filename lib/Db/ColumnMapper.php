@@ -47,6 +47,24 @@ class ColumnMapper extends QBMapper {
 	}
 
 	/**
+	 * @param integer $tableID
+	 * @return array
+	 * @throws Exception
+	 */
+	public function findAllIdsByTable(int $tableID): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('id')
+			->from($this->table)
+			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableID)));
+		$result = $qb->executeQuery();
+		$ids = [];
+		while ($row = $result->fetch()) {
+			$ids[] = $row['id'];
+		}
+		return $ids;
+	}
+
+	/**
 	 * @param array $neededColumnIds
 	 * @return array<string> Array with key = columnId and value = [column-type]-[column-subtype]
 	 * @throws Exception
@@ -76,5 +94,27 @@ class ColumnMapper extends QBMapper {
 			$result->closeCursor();
 		}
 		return $out;
+	}
+
+
+	/**
+	 * @param int $tableId
+	 * @return int
+	 */
+	public function countColumns(int $tableId): int {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select($qb->func()->count('*', 'counter'));
+		$qb->from($this->table);
+		$qb->where(
+			$qb->expr()->eq('table_id', $qb->createNamedParameter($tableId))
+		);
+
+		try {
+			$result = $this->findOneQuery($qb);
+			return (int)$result['counter'];
+		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+			$this->logger->warning('Exception occurred: '.$e->getMessage().' Returning 0.');
+			return 0;
+		}
 	}
 }

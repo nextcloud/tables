@@ -147,9 +147,9 @@ export default {
 				showError(t('tables', 'Cannot create new table. Title is missing.'))
 				this.errorTitle = true
 			} else {
-				const newBaseViewId = await this.sendNewTableToBE(this.templateChoice)
-				if (newBaseViewId) {
-					await this.$router.push('/view/' + newBaseViewId)
+				const newTableId = await this.sendNewTableToBE(this.templateChoice)
+				if (newTableId) {
+					await this.$router.push('/table/' + newTableId)
 					this.actionCancel()
 				}
 			}
@@ -162,7 +162,7 @@ export default {
 			}
 			const res = await this.$store.dispatch('insertNewTable', { data })
 			if (res) {
-				return res
+				return res.id
 			} else {
 				showError(t('tables', 'Could not create new table'))
 			}

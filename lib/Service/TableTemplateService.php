@@ -76,7 +76,7 @@ class TableTemplateService {
 	/**
 	 * @param Table $table
 	 * @param string $template
-	 * @param int $baseViewId
+	 * @param int $defaultViewId
 	 * @return Table
 	 * @throws DoesNotExistException
 	 * @throws Exception
@@ -85,9 +85,9 @@ class TableTemplateService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function makeTemplate(Table $table, string $template, int $baseViewId): Table {
-		$createColumn = function ($params) use ($table, $baseViewId) {return $this->createColumn($params, $baseViewId);};
-		$createRow = function ($data) use ($table, $baseViewId) {$this->createRow($baseViewId, $data);};
+	public function makeTemplate(Table $table, string $template): Table {
+		$createColumn = function ($params) use ($table) {return $this->createColumn($params, $table->getId());};
+		$createRow = function ($data) use ($table) {$this->createRow($table->getId(), $data);};
 		$createView = function ($data) use ($table) {$this->createView($table, $data);};
 		if ($template === 'todo') {
 			$this->makeTodo($createColumn, $createRow);
@@ -758,7 +758,7 @@ class TableTemplateService {
 
 	/**
 	 * @param (mixed)[] $parameters
-	 * @param int $baseViewId
+	 * @param int $defaultViewId
 	 * @return Column
 	 * @throws Exception
 	 * @throws InternalError
@@ -766,7 +766,7 @@ class TableTemplateService {
 	 * @throws DoesNotExistException
 	 * @throws MultipleObjectsReturnedException
 	 */
-	private function createColumn(array $parameters, int $baseViewId): ?Column {
+	private function createColumn(array $parameters, int $tableId): ?Column {
 		if ($this->userId === null) {
 			return null;
 		}
@@ -776,8 +776,11 @@ class TableTemplateService {
 			// userId
 			$this->userId,
 
-			// baseViewId
-			$baseViewId,
+			// tableId
+			$tableId,
+
+			// viewId
+			null,
 
 			// column type
 			(isset($parameters['type'])) ? $parameters['type'] : 'text',
@@ -843,7 +846,7 @@ class TableTemplateService {
 	 * @throws InternalError
 	 * @throws MultipleObjectsReturnedException
 	 */
-	private function createRow(int $viewId, array $values): void {
+	private function createRow(int $tableId, array $values): void {
 		$data = [];
 		foreach ($values as $columnId => $value) {
 			$data[] = [
@@ -852,7 +855,7 @@ class TableTemplateService {
 			];
 		}
 		try {
-			$this->rowService->create($viewId, $data);
+			$this->rowService->create($tableId, null, $data);
 		} catch (PermissionError $e) {
 			$this->logger->warning('Cannot create row, permission denied: '.$e->getMessage());
 		} catch (Exception $e) {

@@ -24,8 +24,6 @@ use OCP\AppFramework\Db\Entity;
  * @method setEmoji(string $emoji)
  * @method getDescription(): string
  * @method setDescription(string $description)
- * @method getIsBaseView(): bool
- * @method setIsBaseView(bool $isBaseView)
  * @method getIsShared(): bool
  * @method setIsShared(bool $isShared)
  * @method getOnSharePermissions(): array
@@ -51,8 +49,6 @@ class View extends Entity implements JsonSerializable {
 	protected ?string $columns = null; // json
 	protected ?string $sort = null; // json
 	protected ?string $filter = null; // json
-
-	protected ?bool $isBaseView = false;
 	protected ?bool $isShared = null;
 	protected ?array $onSharePermissions = null;
 	protected ?bool $hasShares = false;
@@ -112,16 +108,13 @@ class View extends Entity implements JsonSerializable {
 			'lastEditAt' => $this->lastEditAt,
 			'columns' => $this->getColumnsArray(),
 			'sort' => $this->getSortArray(),
-			'isBaseView' => $this->isBaseView,
 			'isShared' => !!$this->isShared,
 			'onSharePermissions' => $this->onSharePermissions,
 			'hasShares' => $this->hasShares,
 			'rowsCount' => $this->rowsCount,
 			'ownerDisplayName' => $this->ownerDisplayName,
 		];
-		if (!$this->isBaseView) {
-			$serialisedJson['filter'] = $this->getFilterArray();
-		}
+		$serialisedJson['filter'] = $this->getFilterArray();
 
 		return $serialisedJson;
 	}

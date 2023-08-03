@@ -1,15 +1,15 @@
 <template>
-	<NcAppNavigationItem v-if="baseView"
-		:name="baseView.title"
-		:class="{active: activeView && baseView.id === activeView.id}"
+	<NcAppNavigationItem v-if="table"
+		:name="table.title"
+		:class="{active: activeTable && table.id === activeTable.id}"
 		:allow-collapse="hasViews"
 		:force-menu="true"
 		:open="isParentOfActiveView"
-		:to="'/view/' + parseInt(baseView.id)"
+		:to="'/table/' + parseInt(table.id)"
 		@click="closeNav">
 		<template #icon>
-			<template v-if="baseView.emoji">
-				{{ baseView.emoji }}
+			<template v-if="table.emoji">
+				{{ table.emoji }}
 			</template>
 			<template v-else>
 				<Table :size="20" />
@@ -17,33 +17,31 @@
 		</template>
 		<template #extra />
 		<template #counter>
-			<NcCounterBubble v-if="canReadData(baseView)">
-				{{ n('tables', '%n row', '%n rows', baseView.rowsCount, {}) }}
+			<NcCounterBubble v-if="canReadData(table)">
+				{{ n('tables', '%n row', '%n rows', table.rowsCount, {}) }}
 			</NcCounterBubble>
-			<NcActionButton v-if="baseView.hasShares" icon="icon-share" :class="{'margin-right': !(activeView && baseView.id === activeView.id)}" @click="actionShowShare" />
-			<div v-if="baseView.isShared && baseView.ownership !== userId" class="margin-left">
-				<NcAvatar :user="baseView.ownership" />
+			<NcActionButton v-if="table.hasShares" icon="icon-share" :class="{'margin-right': !(activeTable && table.id === activeTable.id)}" @click="actionShowShare" />
+			<div v-if="table.isShared && table.ownership !== userId" class="margin-left">
+				<NcAvatar :user="table.ownership" />
 			</div>
 		</template>
 
 		<template #actions>
-			<NcActionButton v-if="canManageTable(baseView)"
+			<NcActionButton v-if="canManageElement(table)"
+				icon="icon-add"
 				:close-after-click="true"
 				@click="createView">
-				<template #icon>
-					<PlaylistPlus :size="20" />
-				</template>
 				{{ t('tables', 'Create view') }}
 			</NcActionButton>
-			<NcActionButton v-if="canShareElement(baseView)"
+			<NcActionButton v-if="canShareElement(table)"
 				icon="icon-share"
 				:close-after-click="true"
 				@click="actionShowShare">
 				{{ t('tables', 'Share') }}
 			</NcActionButton>
-			<NcActionButton v-if="canCreateRowInElement(baseView)"
+			<NcActionButton v-if="canCreateRowInElement(table)"
 				:close-after-click="true"
-				@click="actionShowImport(baseView)">
+				@click="actionShowImport(table)">
 				{{ t('tables', 'Import') }}
 				<template #icon>
 					<Import :size="20" />
@@ -57,7 +55,7 @@
 					<Creation :size="20" />
 				</template>
 			</NcActionButton>
-			<NcActionButton v-if="canManageTable(baseView)"
+			<NcActionButton v-if="canManageElement(table)"
 				icon="icon-delete"
 				:close-after-click="true"
 				@click="showDeletionConfirmation = true">
@@ -90,10 +88,9 @@ import { getCurrentUser } from '@nextcloud/auth'
 import Creation from 'vue-material-design-icons/Creation.vue'
 import Import from 'vue-material-design-icons/Import.vue'
 import NavigationViewItem from './NavigationViewItem.vue'
-import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 
 export default {
-	name: 'NavigationBaseViewItem',
+	name: 'NavigationDashboardItem',
 
 	components: {
 		// eslint-disable-next-line vue/no-reserved-component-names
@@ -106,7 +103,6 @@ export default {
 		NcCounterBubble,
 		NcAvatar,
 		Creation,
-		PlaylistPlus,
 	},
 
 	filters: {
@@ -122,7 +118,7 @@ export default {
 	mixins: [permissionsMixin],
 
 	props: {
-		baseView: {
+		table: {
 			type: Object,
 			default: null,
 		},
@@ -140,16 +136,16 @@ export default {
 	},
 
 	computed: {
-		...mapGetters(['activeView']),
+		...mapGetters(['activeTable', 'activeView']),
 		...mapState(['views']),
 		getTranslatedDescription() {
-			return t('tables', 'Do you really want to delete the table "{table}"?', { table: this.baseView.title })
+			return t('tables', 'Do you really want to delete the table "{table}"?', { table: this.table.title })
 		},
 		userId() {
 			return getCurrentUser().uid
 		},
 		getViews() {
-			return this.views.filter(v => !v.isBaseView && v.tableId === this.baseView.tableId)
+			return this.views.filter(v => v.tableId === this.table.id)
 		},
 		hasViews() {
 			return this.getViews.length > 0
@@ -157,34 +153,30 @@ export default {
 	},
 	watch: {
 		activeView() {
-			if (!this.isParentOfActiveView && this.activeView?.id !== this.baseView?.id && this.activeView?.tableId === this.baseView?.tableId) {
+			if (!this.isParentOfActiveView && this.activeView?.tableId === this.table?.id) {
 				this.isParentOfActiveView = true
 			}
 		},
 		filterString() {
-			if (!this.isParentOfActiveView && this.filterString && !this.baseView.title.toLowerCase().includes(this.filterString.toLowerCase())) {
+			if (!this.isParentOfActiveView && this.filterString && !this.table.title.toLowerCase().includes(this.filterString.toLowerCase())) {
 				this.isParentOfActiveView = true
 			}
 		},
 	},
 	methods: {
 		createView() {
-			emit('create-view', this.baseView.tableId)
-		},
-		async editView() {
-			await this.$router.push('/view/' + parseInt(this.baseView.id)).catch(err => err)
-			emit('tables:view:edit', this.baseView)
+			emit('create-view', this.table.id)
 		},
 		async actionShowShare() {
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
-			await this.$router.push('/view/' + parseInt(this.baseView.id)).catch(err => err)
+			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
 		},
-		async actionShowImport(view) {
-			emit('tables:modal:import', view)
+		async actionShowImport(table) {
+			emit('tables:modal:import', table)
 		},
 		async actionShowIntegration() {
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
-			await this.$router.push('/view/' + parseInt(this.baseView.id)).catch(err => err)
+			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
 		},
 		closeNav(e) {
 			if (window.innerWidth < 960) {
@@ -194,15 +186,12 @@ export default {
 			}
 		},
 		async deleteMe() {
-			const deleteId = this.baseView.id
-			const activeViewId = this.activeView?.id
-
-			const res = await this.$store.dispatch('removeTable', { tableId: this.baseView.tableId })
+			const res = await this.$store.dispatch('removeTable', { tableId: this.table.id })
 			if (res) {
-				showSuccess(t('tables', 'Table "{emoji}{table}" removed.', { emoji: this.baseView.emoji ? this.baseView.emoji + ' ' : '', table: this.baseView.title }))
+				showSuccess(t('tables', 'Table "{emoji}{table}" removed.', { emoji: this.table.emoji ? this.table.emoji + ' ' : '', table: this.table.title }))
 
 				// if the actual table was deleted, go to startpage
-				if (deleteId === activeViewId) {
+				if (this.table.id === this.activeTable?.id) {
 					await this.$router.push('/').catch(err => err)
 				}
 				this.showDeletionConfirmation = false

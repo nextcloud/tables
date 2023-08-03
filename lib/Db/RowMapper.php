@@ -156,32 +156,12 @@ class RowMapper extends QBMapper {
 	}
 
 	/**
-	 *
-	 */
-	public function countRowsForBaseView(View $view): int {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select($qb->func()->count('*', 'counter'));
-		$qb->from($this->table);
-		$qb->where(
-			$qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId()))
-		);
-
-		try {
-			$result = $this->findOneQuery($qb);
-			return (int)$result['counter'];
-		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
-			$this->logger->warning('Exception occurred: '.$e->getMessage().' Returning 0.');
-			return 0;
-		}
-	}
-
-	/**
 	 * @param View $view
 	 * @param $userId
 	 * @return int
 	 * @throws InternalError
 	 */
-	public function countRowsForNotBaseView(View $view, $userId): int {
+	public function countRowsForView(View $view, $userId): int {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select($qb->func()->count('*', 'counter'))
 			->from($this->table)
@@ -250,6 +230,29 @@ class RowMapper extends QBMapper {
 				)
 			);
 		}
+	}
+
+	/**
+	 * @param int $tableId
+	 * @param int|null $limit
+	 * @param int|null $offset
+	 * @return array
+	 * @throws Exception
+	 */
+	public function findAllByTable(int $tableId, ?int $limit = null, ?int $offset = null): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId)));
+
+		if ($limit !== null) {
+			$qb->setMaxResults($limit);
+		}
+		if ($offset !== null) {
+			$qb->setFirstResult($offset);
+		}
+
+		return $this->findEntities($qb);
 	}
 
 	/**

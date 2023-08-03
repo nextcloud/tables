@@ -8,6 +8,10 @@ use OCP\AppFramework\Db\Entity;
 /**
  * @psalm-suppress PropertyNotSetInConstructor
  *
+ * @method getTitle(): string
+ * @method setTitle(string $title)
+ * @method getEmoji(): string
+ * @method setEmoji(string $emoji)
  * @method getOwnership(): string
  * @method setOwnership(string $ownership)
  * @method getOwnerDisplayName(): string
@@ -20,10 +24,12 @@ use OCP\AppFramework\Db\Entity;
  * @method setHasShares(bool $hasShares)
  * @method getRowsCount(): int
  * @method setRowsCount(int $rowsCount)
- * @method getBaseView(): View
- * @method setBaseView(View $setBaseView)
+ * @method getColumnsCount(): int
+ * @method setColumnsCount(int $rowsCount)
  * @method getViews(): array
- * @method setViews(array $setViews)
+ * @method setViews(array $views)
+ * @method getColumns(): array
+ * @method setColumns(array $columns)
  * @method getCreatedBy(): string
  * @method setCreatedBy(string $createdBy)
  * @method getCreatedAt(): string
@@ -35,7 +41,6 @@ use OCP\AppFramework\Db\Entity;
  */
 class Table extends Entity implements JsonSerializable {
 	protected ?string $title = null;
-
 	protected ?string $emoji = null;
 	protected ?string $ownership = null;
 	protected ?string $ownerDisplayName = null;
@@ -48,8 +53,9 @@ class Table extends Entity implements JsonSerializable {
 
 	protected ?bool $hasShares = false;
 	protected ?int $rowsCount = 0;
-	protected ?View $baseView = null;
+	protected ?int $columnsCount = 0;
 	protected ?array $views = null;
+	protected ?array $columns = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');
@@ -58,6 +64,8 @@ class Table extends Entity implements JsonSerializable {
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->id,
+			'title' => $this->title,
+			'emoji' => $this->emoji,
 			'ownership' => $this->ownership,
 			'ownerDisplayName' => $this->ownerDisplayName,
 			'createdBy' => $this->createdBy,
@@ -68,7 +76,7 @@ class Table extends Entity implements JsonSerializable {
 			'onSharePermissions' => $this->onSharePermissions,
 			'hasShares' => $this->hasShares,
 			'rowsCount' => $this->rowsCount,
-			'baseView' => $this->baseView,
+			'columnsCount' => $this->columnsCount,
 			'views' => $this->views,
 		];
 	}

@@ -1,7 +1,7 @@
 <template>
 	<div class="row first-row">
 		<h1>
-			{{ activeView.emoji }}&nbsp;{{ activeView.title }}
+			{{ activeElement.emoji }}&nbsp;{{ activeElement.title }}
 		</h1>
 		<div class="info">
 			<div v-if="isFiltered">
@@ -12,18 +12,17 @@
 				🔙 {{ t('tables', 'Reset local adjustments') }}
 			</NcSmallButton>
 		</div>
-		<div v-if="activeView.isShared" class="user-bubble">
+		<div v-if="!isTable && activeElement.isShared" class="user-bubble">
 			<NcUserBubble
-				:display-name="activeView.ownerDisplayName"
+				:display-name="activeElement.ownerDisplayName"
 				:show-user-status="true"
-				:user="activeView.ownership" />
+				:user="activeElement.ownership" />
 		</div>
 	</div>
 </template>
 
 <script>
 
-import { mapGetters } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
 import { NcUserBubble } from '@nextcloud/vue'
 import TextIcon from 'vue-material-design-icons/Text.vue'
@@ -43,12 +42,18 @@ export default {
 			type: Object,
 			default: null,
 		},
+		activeElement: {
+			type: Object,
+			default: null,
+		},
+		isTable: {
+			type: Boolean,
+			default: false,
+		},
 	},
-
 	computed: {
-		...mapGetters(['activeView']),
 		isFiltered() {
-			return this.activeView.filter && this.activeView.filter[0]?.length > 0
+			return this.activeElement.filter && this.activeElement.filter[0]?.length > 0
 		},
 
 		isViewSettingSet() {
@@ -57,9 +62,6 @@ export default {
 	},
 
 	methods: {
-		editElement() {
-			emit('tables:view:edit', this.activeView)
-		},
 
 		resetLocalAdjustments() {
 			this.$store.dispatch('resetViewSetting')
