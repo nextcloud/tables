@@ -16,7 +16,7 @@ export default class NumberStarsColumn extends AbstractNumberColumn {
 			const valueA = parseInt(tmpA)
 			const tmpB = rowB.data.find(item => item.columnId === this.id)?.value
 			const valueB = parseInt(tmpB)
-			return ((valueA < valueB) ? 1 : (valueA > valueB) ? -1 : 0) * factor
+			return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor
 		}
 	}
 

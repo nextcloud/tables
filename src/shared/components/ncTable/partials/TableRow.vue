@@ -1,14 +1,14 @@
 <template>
 	<tr v-if="row" :class="{ selected }">
 		<td><NcCheckboxRadioSwitch :checked="selected" @update:checked="v => $emit('update-row-selection', { rowId: row.id, value: v })" /></td>
-		<td v-for="col in visibleColums" :key="col.id" :class="{ 'search-result': getCell(col.id)?.searchStringFound, 'filter-result': getCell(col.id)?.filterFound }">
+		<td v-for="col in visibleColumns" :key="col.id" :class="{ 'search-result': getCell(col.id)?.searchStringFound, 'filter-result': getCell(col.id)?.filterFound }">
 			<component :is="getTableCell(col)"
 				:column="col"
 				:row-id="row.id"
 				:value="getCellValue(col)" />
 		</td>
 		<td>
-			<NcButton v-if="canUpdateData(view) || canDeleteData(view)" type="primary" :aria-label="t('tables', 'Edit row')" @click="$emit('edit-row', row.id)">
+			<NcButton v-if="config.canEditRows || config.canDeleteRows" type="primary" :aria-label="t('tables', 'Edit row')" @click="$emit('edit-row', row.id)">
 				<template #icon>
 					<Pencil :size="20" />
 				</template>
@@ -32,8 +32,6 @@ import TableCellSelection from './TableCellSelection.vue'
 import TableCellMultiSelection from './TableCellMultiSelection.vue'
 import TableCellTextRich from './TableCellEditor.vue'
 import { ColumnTypes } from './../mixins/columnHandler.js'
-import permissionsMixin from '../../../../shared/components/ncTable/mixins/permissionsMixin.js'
-import { mapGetters } from 'vuex'
 
 export default {
 	name: 'TableRow',
@@ -54,7 +52,6 @@ export default {
 		TableCellTextRich,
 	},
 
-	mixins: [permissionsMixin],
 	props: {
 		row: {
 			type: Object,
@@ -76,13 +73,17 @@ export default {
 			type: Object,
 			default: () => {},
 		},
+		config: {
+			type: Object,
+			default: null,
+		},
 	},
 	computed: {
 		getSelection: {
 			get: () => { return this.selected },
 			set: () => { alert('updating selection') },
 		},
-		visibleColums() {
+		visibleColumns() {
 			return this.columns.filter(col => !this.viewSetting?.hiddenColumns?.includes(col.id))
 		},
 	},

@@ -5,9 +5,9 @@
 				<TableHeader :columns="columns"
 					:selected-rows="selectedRows"
 					:rows="getSearchedAndFilteredAndSortedRows"
-					:element="view"
+					:element="table"
 					:view-setting="viewSetting"
-					:is-view="isView"
+					:config="config"
 					@create-row="$emit('create-row')"
 					@import="table => $emit('import', table)"
 					@create-column="$emit('create-column')"
@@ -15,7 +15,11 @@
 					@add-filter="filter => $emit('add-filter', filter)"
 					@download-csv="data => $emit('download-csv', data)"
 					@select-all-rows="selectAllRows"
-					@delete-filter="id => $emit('delete-filter', id)" />
+					@delete-filter="id => $emit('delete-filter', id)">
+					<template #actions>
+						<slot name="actions" />
+					</template>
+				</TableHeader>
 			</thead>
 			<tbody>
 				<TableRow v-for="(row, index) in getSearchedAndFilteredAndSortedRows"
@@ -24,7 +28,8 @@
 					:columns="columns"
 					:selected="isRowSelected(row.id)"
 					:view-setting="viewSetting"
-					:view="view"
+					:view="table"
+					:config="config"
 					@update-row-selection="updateRowSelection"
 					@edit-row="rowId => $emit('edit-row', rowId)" />
 			</tbody>
@@ -56,7 +61,7 @@ export default {
 			type: Array,
 			default: () => [],
 		},
-		view: {
+		table: {
 			type: Object,
 			default: () => {},
 		},
@@ -64,9 +69,9 @@ export default {
 			type: Object,
 			default: null,
 		},
-		isView: {
-			type: Boolean,
-			default: false,
+		config: {
+			type: Object,
+			default: null,
 		},
 	},
 

@@ -23,7 +23,7 @@
 		<!--columns & order-->
 		<NcAppSettingsSection v-if="columns != null" id="columns-and-order" :title="t('tables', 'Columns')">
 			<SelectedViewColumns
-				:columns="canManageTable(view) ? allColumns : columns.map(id => allColumns.find(col => col.id === id))"
+				:columns="allColumns"
 				:selected-columns="selectedColumns"
 				:view-column-ids="viewSetting ? view.columns : null"
 				:generated-column-ids="viewSetting ? generatedView.columns : null"
@@ -120,7 +120,7 @@ export default {
 	},
 	computed: {
 		saveText() {
-			if (this.creatView) {
+			if (this.createView) {
 				return t('tables', 'Create View')
 			} else if (this.viewSettings) {
 				return t('tables', 'Save modified View')
@@ -195,10 +195,14 @@ export default {
 			this.open = false
 		},
 		async loadTableColumnsFromBE() {
-			this.columns = await this.$store.dispatch('getColumnsFromBE', { tableId: this.mutableView.tableId, viewId: this.mutableView.id })
+			this.columns = await this.$store.dispatch('getColumnsFromBE', {
+				tableId: this.canManageTable(this.view) ? this.mutableView.tableId : null,
+				viewId: this.mutableView.id,
+			})
 			if (this.selectedColumns === null) this.selectedColumns = this.columns.map(col => col.id)
 			// Show columns of view first
-			this.allColumns = this.columns.concat(MetaColumns)
+			if (this.canManageTable(this.view)) this.allColumns = this.columns.concat(MetaColumns)
+			else this.allColumns = this.columns
 			this.allColumns = (this.view.columns ?? this.selectedColumns).map(id => this.allColumns.find(col => col.id === id)).concat(this.allColumns.filter(col => !(this.view.columns ?? this.selectedColumns).includes(col.id)))
 		},
 		async saveView() {
@@ -215,6 +219,7 @@ export default {
 				const success = await this.updateViewToBE(this.mutableView.id)
 				this.localLoading = false
 				if (success) {
+					this.$emit('reload-view')
 					await this.$router.push('/view/' + this.mutableView.id).catch(err => err)
 					this.actionCancel()
 				}
@@ -264,7 +269,6 @@ export default {
 			data.data.filter = JSON.stringify(filteredFilteringRules)
 			const res = await this.$store.dispatch('updateView', { id, data })
 			if (res) {
-				this.$emit('reload-view')
 				return res
 			} else {
 				showError(t('tables', 'Could not update view'))

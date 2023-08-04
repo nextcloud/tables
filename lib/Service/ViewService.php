@@ -381,11 +381,11 @@ class ViewService extends SuperService {
 				return $sort['columnId'] !== $columnId;
 			});
 			$filteredSortingRules = array_values($filteredSortingRules);
-			$filteredFilters = array_filter($view->getFilterArray(), function ($filterGroup) use ($columnId) {
-				array_filter($filterGroup, function ($filter) use ($columnId) {
+			$filteredFilters = array_filter(array_map(function ($filterGroup) use ($columnId) {
+				return array_filter($filterGroup, function ($filter) use ($columnId) {
 					return $filter['columnId'] !== $columnId;
 				});
-			});
+			}, $view->getFilterArray()), fn($filterGroup) => !empty($filterGroup));
 			$data = [
 				'columns' => json_encode(array_values(array_diff($view->getColumnsArray(), [$columnId]))),
 				'sort' => json_encode($filteredSortingRules),

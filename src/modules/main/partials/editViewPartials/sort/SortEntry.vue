@@ -79,7 +79,6 @@ export default {
 	},
 	watch: {
 		sortEntry() {
-			console.debug("Resetting!!!!")
 			this.reset()
 		},
 		selectedColumn() {

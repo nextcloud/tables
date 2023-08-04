@@ -90,6 +90,7 @@ return [
 		['name' => 'share#destroy', 'url' => '/share/{id}', 'verb' => 'DELETE'],
 
 		// import
-		['name' => 'import#import', 'url' => '/import/view/{viewId}', 'verb' => 'POST'],
+		['name' => 'import#importInTable', 'url' => '/import/table/{tableId}', 'verb' => 'POST'],
+		['name' => 'import#importInView', 'url' => '/import/view/{viewId}', 'verb' => 'POST'],
 	]
 ];

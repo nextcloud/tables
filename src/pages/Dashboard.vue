@@ -2,8 +2,8 @@
 	<div>
 		<div v-if="isLoading" class="icon-loading" />
 
-		<div v-if="!isLoading && activeTable">
-			<ElementDescription :active-element="activeTable" />
+		<div v-if="!isLoading && table">
+			<ElementDescription :active-element="table" />
 			<div v-if="hasViews" class="dashboard-content">
 				<h3>
 					{{ t('tables', 'Views') }}
@@ -29,8 +29,8 @@
 							</tr>
 							<tr key="footer">
 								<td>{{ t('Tables', 'Total') }}</td>
-								<td>{{ activeTable.rowsCount }}</td>
-								<td>{{ activeTable.columnsCount }}</td>
+								<td>{{ table.rowsCount }}</td>
+								<td>{{ table.columnsCount }}</td>
 								<td>{{ false }}</td>
 								<td>{{ false }}</td>
 							</tr>
@@ -41,7 +41,7 @@
 					{{ t('tables', 'Actions') }}
 				</h3>
 				<div class="actions">
-					<NcButton v-if="canManageElement(activeTable)"
+					<NcButton v-if="canManageElement(table)"
 						type="secondary"
 						:close-after-click="true" @click="showCreateColumn = true">
 						<template #icon>
@@ -49,7 +49,7 @@
 						</template>
 						{{ t('tables', 'Create column') }}
 					</NcButton>
-					<NcButton v-if="canManageElement(activeTable)"
+					<NcButton v-if="canManageElement(table)"
 						type="secondary"
 						:close-after-click="true" @click="openCreateViewModal = true">
 						<template #icon>
@@ -57,15 +57,15 @@
 						</template>
 						{{ t('tables', 'Create view') }}
 					</NcButton>
-					<NcButton v-if="canManageElement(activeTable)"
+					<NcButton v-if="canManageElement(table)"
 						type="secondary"
-						:close-after-click="true" @click="openCreateViewModal = true">
+						:close-after-click="true" @click="$emit('import', table)">
 						<template #icon>
 							<Import :size="20" />
 						</template>
 						{{ t('tables', 'Import') }}
 					</NcButton>
-					<NcButton v-if="canManageElement(activeTable)" icon="icon-delete"
+					<NcButton v-if="canManageElement(table)" icon="icon-delete"
 						type="error"
 						:close-after-click="true" @click="showDeletionConfirmation = true">
 						<template #icon>
@@ -76,28 +76,77 @@
 				</div>
 			</div>
 			<div class="table-wrapper">
-				<NcView v-if="columns.length > 0"
+				<EmptyTable v-if="columns.length === 0" :table="table" @create-column="showCreateColumn = true" />
+				<TableView v-else
 					:rows="rows"
 					:columns="columns"
-					:view="activeTable"
+					:element="table"
 					:view-setting="viewSetting"
 					:is-view="false"
-					@add-filter="addFilter"
-					@set-search-string="setSearchString"
-					@edit-row="rowId => editRowId = rowId"
-					@import="openImportModal"
-					@create-column="showCreateColumn = true"
-					@create-row="showCreateRow = true"
-					@delete-selected-rows="deleteRows"
-					@delete-filter="deleteFilter" />
+					:selected-rows.sync="localSelectedRows"
+					:can-read-rows="canReadData(table)"
+					:can-create-rows="canCreateRowInElement(table)"
+					:can-edit-rows="canUpdateData(table)"
+					:can-delete-rows="canDeleteData(table)"
+					:can-create-columns="canManageTable(table)"
+					:can-edit-columns="canManageTable(table)"
+					:can-delete-columns="canManageTable(table)"
+					:can-delete-table="canManageTable(table)">
+					<template #actions>
+						<NcActions :force-menu="true" :type="isViewSettingSet ? 'secondary' : 'tertiary'">
+							<NcActionCaption v-if="canManageElement(table)" :title="t('tables', 'Manage table')" />
+							<NcActionButton v-if="canManageElement(table) "
+								:close-after-click="true"
+								@click="openCreateViewModal = true">
+								<template #icon>
+									<PlaylistPlus :size="20" decorative />
+								</template>
+								{{ t('tables', 'Create view') }}
+							</NcActionButton>
+							<NcActionButton v-if="canManageTable(table)" :close-after-click="true" @click="$emit('create-column')">
+								<template #icon>
+									<TableColumnPlusAfter :size="20" decorative title="" />
+								</template>
+								{{ t('tables', 'Create column') }}
+							</NcActionButton>
+
+							<NcActionCaption :title="t('tables', 'Integration')" />
+							<NcActionButton v-if="canCreateRowInElement(table)"
+								:close-after-click="true"
+								@click="$emit('import', table)">
+								<template #icon>
+									<Import :size="20" decorative title="Import" />
+								</template>
+								{{ t('tables', 'Import') }}
+							</NcActionButton>
+							<NcActionButton v-if="canReadData(table)" :close-after-click="true"
+								icon="icon-download"
+								@click="$emit('download-csv')">
+								{{ t('tables', 'Export as CSV') }}
+							</NcActionButton>
+							<NcActionButton v-if="canShareElement(table)"
+								:close-after-click="true"
+								icon="icon-share"
+								@click="$emit('toggle-share')">
+								{{ t('tables', 'Share') }}
+							</NcActionButton>
+							<NcActionButton
+								:close-after-click="true"
+								@click="$emit('show-integration')">
+								{{ t('tables', 'Integration') }}
+								<template #icon>
+									<Creation :size="20" />
+								</template>
+							</NcActionButton>
+						</NcActions>
+					</template>
+				</TableView>
 			</div>
-			<EmptyTable v-if="columns.length === 0" :table="activeTable" @create-column="showCreateColumn = true" />
 		</div>
-		<ViewSettings :view="{ tableId: activeTable?.id, sort: [], filter: [] }"
+		<ViewSettings :view="{ tableId: table?.id, sort: [], filter: [], columns: columns.map(col => col.id) }"
 			:create-view="true" :show-modal="openCreateViewModal"
+			:view-setting="viewSetting"
 			@close="openCreateViewModal = false" />
-		<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false" />
-		<DeleteRows v-if="rowsToDelete" :rows-to-delete="rowsToDelete" :active-view="activeTable" @cancel="rowsToDelete = null" />
 		<DialogConfirmation :description="getTranslatedDescription"
 			:title="t('tables', 'Confirm table deletion')"
 			:cancel-title="t('tables', 'Cancel')"
@@ -106,24 +155,13 @@
 			:show-modal="showDeletionConfirmation"
 			@confirm="deleteMe"
 			@cancel="showDeletionConfirmation = false" />
-		<CreateRow :columns="columns"
-			:show-modal="showCreateRow"
-			@close="showCreateRow = false" />
-		<EditRow :columns="columns"
-			:row="getEditRow"
-			:show-modal="editRowId !== null"
-			:out-transition="true"
-			@close="editRowId = null" />
-		<EditColumn v-if="columnToEdit" :column="columnToEdit" :view="activeTable" @close="columnToEdit = false" />
-		<DeleteColumn v-if="columnToDelete" :column-to-delete="columnToDelete" @cancel="columnToDelete = null" />
 	</div>
 </template>
 
 <script>
 import ElementDescription from '../modules/main/sections/ElementDescription.vue'
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
-import { NcButton } from '@nextcloud/vue'
 import ViewSettings from '../modules/main/modals/ViewSettings.vue'
 import Import from 'vue-material-design-icons/Import.vue'
 import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
@@ -131,15 +169,10 @@ import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 import Delete from 'vue-material-design-icons/Delete.vue'
 import { showSuccess } from '@nextcloud/dialogs'
 import DialogConfirmation from '../shared/modals/DialogConfirmation.vue'
-import CreateColumn from '../modules/main/modals/CreateColumn.vue'
-import NcView from '../shared/components/ncTable/NcView.vue'
-import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
-import DeleteRows from '../modules/main/modals/DeleteRows.vue'
-import CreateRow from '../modules/main/modals/CreateRow.vue'
-import EditRow from '../modules/main/modals/EditRow.vue'
-import EditColumn from '../modules/main/modals/EditColumn.vue'
-import DeleteColumn from '../modules/main/modals/DeleteColumn.vue'
+import TableView from './TableView.vue'
 import EmptyTable from '../modules/main/sections/EmptyTable.vue'
+import { NcActions, NcActionButton, NcActionCaption, NcButton } from '@nextcloud/vue'
+import Creation from 'vue-material-design-icons/Creation.vue'
 
 export default {
 	name: 'Dashboard',
@@ -152,17 +185,38 @@ export default {
 		PlaylistPlus,
 		Delete,
 		DialogConfirmation,
-		CreateColumn,
-		NcView,
-		DeleteRows,
-		CreateRow,
-		EditRow,
-		EditColumn,
-		DeleteColumn,
+		TableView,
 		EmptyTable,
+		NcActions,
+		NcActionButton,
+		NcActionCaption,
+		Creation,
 	},
 
 	mixins: [permissionsMixin],
+
+	props: {
+		table: {
+			type: Object,
+			default: null,
+		},
+		columns: {
+			type: Array,
+			default: null,
+		},
+		rows: {
+			type: Array,
+			default: null,
+		},
+		viewSetting: {
+			type: Object,
+			default: null,
+		},
+		selectedRows: {
+			type: Array,
+			default: null,
+		},
+	},
 
 	data() {
 		return {
@@ -176,22 +230,19 @@ export default {
 			editRowId: null,
 			columnToEdit: null,
 			columnToDelete: null,
+			localSelectedRows: this.selectedRows,
 		}
 	},
 	computed: {
-		...mapState({
-			columns: state => state.data.columns,
-			loading: state => state.data.loading,
-			rows: state => state.data.rows,
-			viewSetting: state => state.data.viewSetting,
-		}),
-		...mapGetters(['activeTable']),
 		...mapState(['views']),
+		isViewSettingSet() {
+			return !(!this.viewSetting || ((!this.viewSetting.hiddenColumns || this.viewSetting.hiddenColumns.length === 0) && (!this.viewSetting.sorting) && (!this.viewSetting.filter || this.viewSetting.filter.length === 0)))
+		},
 		getTranslatedDescription() {
-			return t('tables', 'Do you really want to delete the table "{table}"?', { table: this.activeTable?.title })
+			return t('tables', 'Do you really want to delete the table "{table}"?', { table: this.table?.title })
 		},
 		getViews() {
-			return this.views.filter(v => v.tableId === this.activeTable.id)
+			return this.views.filter(v => v.tableId === this.table.id)
 		},
 		hasViews() {
 			return this.getViews.length > 0
@@ -210,66 +261,22 @@ export default {
 		},
 	},
 	watch: {
-		activeTable() {
-			this.reload()
+		localSelectedRows() {
+			this.$emit('update:selectedRows', this.localSelectedRows)
 		},
-	},
-	mounted() {
-		this.reload()
-		subscribe('tables:view:edit', view => { this.editView = view })
-		subscribe('tables:column:edit', column => { this.columnToEdit = column })
-		subscribe('tables:column:delete', column => { this.columnToDelete = column })
-		subscribe('tables:view:reload', () => { this.reload() })
-	},
-	unmounted() {
-		unsubscribe('tables:view:edit', view => { this.editView = view })
-		unsubscribe('tables:column:edit', column => { this.columnToEdit = column })
-		unsubscribe('tables:column:delete', column => { this.columnToDelete = column })
-		unsubscribe('tables:view:reload', () => { this.reload() })
 	},
 	methods: {
-		openImportModal(view) {
-			emit('tables:modal:import', view)
-		},
-		deleteFilter(id) {
-			this.$store.dispatch('deleteFilter', { id })
-		},
-		deleteRows(rowIds) {
-			this.rowsToDelete = rowIds
-		},
-		async reload() {
-			if (!this.activeTable) {
-				return
-			}
-
-			if (this.activeTable.id !== this.lastActiveTableId) {
-				this.localLoading = true
-				await this.$store.dispatch('resetViewSetting')
-
-				await this.$store.dispatch('loadColumnsFromBE', { table: this.activeTable })
-				if (this.canReadData(this.activeTable)) {
-					await this.$store.dispatch('loadRowsFromBE', { tableId: this.activeTable.id })
-				} else {
-					await this.$store.dispatch('removeRows')
-				}
-				this.lastActiveTableId = this.activeTable.id
-				this.localLoading = false
-			}
-		},
-		addFilter(filterObject) {
-			this.$store.dispatch('addFilter', filterObject)
-		},
-		setSearchString(str) {
-			this.$store.dispatch('setSearchString', { str })
-		},
 		async deleteMe() {
-			const table = this.activeTable
+			const table = this.table
 			const res = await this.$store.dispatch('removeTable', { tableId: table.id })
 			if (res) {
 				this.showDeletionConfirmation = false
 				showSuccess(t('tables', 'Table "{emoji}{table}" removed.', { emoji: table.emoji ? table.emoji + ' ' : '', table: table.title }))
 				await this.$router.push('/').catch(err => err)
 			}
+		},
+		createView() {
+			this.openCreateViewModal = true
 		},
 	},
 

@@ -43,35 +43,40 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 		<div class="options row" style="padding-right: calc(var(--default-grid-baseline) * 2);">
 			<Options :rows="rows"
 				:columns="columns"
-				:selected-rows="selectedRows"
+				:selected-rows="localSelectedRows"
 				:show-options="columns.length !== 0"
-				:table="view"
+				:table="table"
 				:view-setting="viewSetting"
+				:config="config"
 				@create-row="$emit('create-row')"
-				@download-csv="data => downloadCsv(data, columns, view)"
+				@download-csv="data => downloadCsv(data, columns, table)"
 				@add-filter="filter => $emit('add-filter', filter)"
 				@set-search-string="str => $emit('set-search-string', str)"
 				@delete-selected-rows="rowIds => $emit('delete-selected-rows', rowIds)" />
 		</div>
 		<div class="custom-table row">
-			<CustomTable v-if="canReadData(view) || (canCreateRowInElement(view) && rows.length > 0)"
+			<CustomTable v-if="config.canReadRows || (config.canCreateRows && rows.length > 0)"
 				:columns="columns"
 				:rows="rows"
-				:view="view"
+				:table="table"
 				:view-setting="viewSetting"
-				:is-view="isView"
+				:config="config"
 				@create-row="$emit('create-row')"
-				@import="table => $emit('import', view)"
+				@import="table => $emit('import', table)"
 				@edit-row="rowId => $emit('edit-row', rowId)"
 				@create-column="$emit('create-column')"
 				@edit-columns="$emit('edit-columns')"
 				@add-filter="filter => $emit('add-filter', filter)"
-				@update-selected-rows="rowIds => selectedRows = rowIds"
-				@download-csv="data => downloadCsv(data, columns, view)"
-				@delete-filter="id => $emit('delete-filter', id)" />
-			<NcEmptyContent v-else-if="canCreateRowInElement(view) && rows.length === 0"
+				@update-selected-rows="rowIds => localSelectedRows = rowIds"
+				@download-csv="data => downloadCsv(data, columns, table)"
+				@delete-filter="id => $emit('delete-filter', id)">
+				<template #actions>
+					<slot name="actions" />
+				</template>
+			</CustomTable>
+			<NcEmptyContent v-else-if="config.canCreateRows && rows.length === 0"
 				:title="t('tables', 'Create rows')"
-				:description="t('tables', 'You are not allowed to read this view, but you can still create rows.')">
+				:description="t('tables', 'You are not allowed to read this table, but you can still create rows.')">
 				<template #icon>
 					<Plus :size="25" />
 				</template>
@@ -86,7 +91,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 			</NcEmptyContent>
 			<NcEmptyContent v-else
 				:title="t('tables', 'No permissions')"
-				:description="t('tables', 'You have no permissions for this view.')">
+				:description="t('tables', 'You have no permissions for this table.')">
 				<template #icon>
 					<Cancel :size="25" />
 				</template>
@@ -100,17 +105,16 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 import Options from './sections/Options.vue'
 import CustomTable from './sections/CustomTable.vue'
 import exportTableMixin from './mixins/exportTableMixin.js'
-import permissionsMixin from './mixins/permissionsMixin.js'
 import { NcEmptyContent, NcButton } from '@nextcloud/vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
 import Cancel from 'vue-material-design-icons/Cancel.vue'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 export default {
-	name: 'NcView',
+	name: 'NcTable',
 
 	components: { CustomTable, Options, NcButton, NcEmptyContent, Plus, Cancel },
 
-	mixins: [exportTableMixin, permissionsMixin],
+	mixins: [exportTableMixin],
 
 	props: {
 		rows: {
@@ -121,7 +125,7 @@ export default {
 			type: Array,
 			default: () => [],
 		},
-		view: {
+		table: {
 			type: Object,
 			default: () => {},
 		},
@@ -129,17 +133,67 @@ export default {
 			type: Object,
 			default: null,
 		},
-		isView: {
+		selectedRows: {
+			type: Array,
+			default: null,
+		},
+		canReadRows: {
+			type: Boolean,
+			default: true,
+		},
+		canCreateRows: {
+			type: Boolean,
+			default: true,
+		},
+		canEditRows: {
+			type: Boolean,
+			default: true,
+		},
+		canDeleteRows: {
+			type: Boolean,
+			default: true,
+		},
+		canCreateColumns: {
+			type: Boolean,
+			default: true,
+		},
+		canEditColumns: {
+			type: Boolean,
+			default: true,
+		},
+		canDeleteColumns: {
+			type: Boolean,
+			default: true,
+		},
+		canDeleteTable: {
 			type: Boolean,
 			default: true,
 		},
 	},
 	data() {
 		return {
-			selectedRows: [],
+			localSelectedRows: [],
 		}
 	},
-
+	computed: {
+		config() {
+			return {
+				canReadRows: this.canReadRows,
+				canCreateRows: this.canCreateRows,
+				canEditRows: this.canEditRows,
+				canDeleteRows: this.canDeleteRows,
+				canCreateColumns: this.canCreateColumns,
+				canEditColumns: this.canEditColumns,
+				canDeleteColumns: this.canDeleteColumns,
+				canDeleteTable: this.canDeleteTable,
+			}
+		},
+	},
+	watch: {
+		localSelectedRows() {
+			this.$emit('update:selectedRows', this.localSelectedRows)
+		},
+	},
 	mounted() {
 		subscribe('tables:selected-rows:deselect', this.deselectRows)
 	},
@@ -148,7 +202,7 @@ export default {
 	},
 	methods: {
 		deselectRows() {
-			this.selectedRows = []
+			this.localSelectedRows = []
 		},
 	},
 }

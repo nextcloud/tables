@@ -34,9 +34,18 @@ class ImportController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function import(int $viewId, String $path, bool $createMissingColumns = true): DataResponse {
+	public function importInTable(int $tableId, String $path, bool $createMissingColumns = true): DataResponse {
+		return $this->handleError(function () use ($tableId, $path, $createMissingColumns) {
+			return $this->service->import($tableId, null, $path, $createMissingColumns);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function importInView(int $viewId, String $path, bool $createMissingColumns = true): DataResponse {
 		return $this->handleError(function () use ($viewId, $path, $createMissingColumns) {
-			return $this->service->import($viewId, $path, $createMissingColumns);
+			return $this->service->import(null, $viewId, $path, $createMissingColumns);
 		});
 	}
 }

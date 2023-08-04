@@ -5,7 +5,7 @@
 			{{ table.emoji }}
 		</template>
 		<template #action>
-			<NcButton :aria-label="t('table', 'Create column')" type="primary" @click="$emit('create-column')">
+			<NcButton :aria-label="t('table', 'Create column')" type="primary" @click="createColumn()">
 				{{ t('tables', 'Create column') }}
 			</NcButton>
 		</template>
@@ -13,6 +13,7 @@
 </template>
 <script>
 import { NcEmptyContent, NcButton } from '@nextcloud/vue'
+import { emit } from '@nextcloud/event-bus'
 
 export default {
 	name: 'EmptyTable',
@@ -24,6 +25,11 @@ export default {
 		table: {
 			type: Object,
 			default: null,
+		},
+	},
+	methods: {
+		createColumn() {
+			emit('tables:column:create')
 		},
 	},
 

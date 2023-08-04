@@ -1,9 +1,9 @@
 <template>
 	<div class="options">
-		<div v-if="showOptions && (canReadData(table) || (canCreateRowInElement(table) && rows.length > 0))" class="fix-col-4" style="justify-content: space-between;">
+		<div v-if="showOptions && (config.canReadRows || (config.canCreateRows && rows.length > 0))" class="fix-col-4" style="justify-content: space-between;">
 			<div :class="{'add-padding-left': isSmallMobile }"
 				class="actionButtonsLeft">
-				<NcButton v-if="!isSmallMobile && canCreateRowInElement(table)"
+				<NcButton v-if="!isSmallMobile && config.canCreateRows"
 					:aria-label="t('tables', 'Create row')"
 					:close-after-click="true"
 					type="tertiary"
@@ -13,7 +13,7 @@
 						<Plus :size="25" />
 					</template>
 				</NcButton>
-				<NcButton v-if="isSmallMobile && canCreateRowInElement(table)"
+				<NcButton v-if="isSmallMobile && config.canCreateRows"
 					:close-after-click="true"
 					:aria-label="t('tables', 'Create Row')"
 					type="tertiary"
@@ -43,7 +43,7 @@
 						</template>
 						{{ t('tables', 'Export CSV') }}
 					</NcActionButton>
-					<NcActionButton v-if="canDeleteData(table)"
+					<NcActionButton v-if="config.canDeleteRows"
 						@click="deleteSelectedRows">
 						<template #icon>
 							<Delete :size="20" />
@@ -70,7 +70,6 @@ import Check from 'vue-material-design-icons/CheckboxBlankOutline.vue'
 import Delete from 'vue-material-design-icons/Delete.vue'
 import Export from 'vue-material-design-icons/Export.vue'
 import viewportHelper from '../../../mixins/viewportHelper.js'
-import permissionsMixin from '../mixins/permissionsMixin.js'
 import SearchForm from '../partials/SearchForm.vue'
 
 export default {
@@ -87,7 +86,7 @@ export default {
 		Export,
 	},
 
-	mixins: [viewportHelper, permissionsMixin],
+	mixins: [viewportHelper],
 
 	props: {
 		selectedRows: {
@@ -111,6 +110,10 @@ export default {
 			default: null,
 		},
 		viewSetting: {
+			type: Object,
+			default: null,
+		},
+		config: {
 			type: Object,
 			default: null,
 		},

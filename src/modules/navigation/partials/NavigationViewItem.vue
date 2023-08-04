@@ -172,7 +172,7 @@ export default {
 			emit('tables:view:edit', this.view)
 		},
 		async actionShowImport(view) {
-			emit('tables:modal:import', view)
+			emit('tables:modal:import', { element: view, isView: true })
 		},
 		async cloneView() {
 			let data = {

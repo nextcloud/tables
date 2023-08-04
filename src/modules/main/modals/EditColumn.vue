@@ -102,10 +102,6 @@ export default {
 			type: Object,
 			default: null,
 		},
-		view: {
-			type: Object,
-			default: null,
-		},
 	},
 	data() {
 		return {

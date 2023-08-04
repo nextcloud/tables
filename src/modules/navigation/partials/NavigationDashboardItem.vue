@@ -28,9 +28,11 @@
 
 		<template #actions>
 			<NcActionButton v-if="canManageElement(table)"
-				icon="icon-add"
 				:close-after-click="true"
 				@click="createView">
+				<template #icon>
+					<PlaylistPlus :size="20" />
+				</template>
 				{{ t('tables', 'Create view') }}
 			</NcActionButton>
 			<NcActionButton v-if="canShareElement(table)"
@@ -88,6 +90,7 @@ import { getCurrentUser } from '@nextcloud/auth'
 import Creation from 'vue-material-design-icons/Creation.vue'
 import Import from 'vue-material-design-icons/Import.vue'
 import NavigationViewItem from './NavigationViewItem.vue'
+import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 
 export default {
 	name: 'NavigationDashboardItem',
@@ -103,7 +106,8 @@ export default {
 		NcCounterBubble,
 		NcAvatar,
 		Creation,
-	},
+		PlaylistPlus,
+},
 
 	filters: {
 		truncate(string, num) {
@@ -172,7 +176,7 @@ export default {
 			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
 		},
 		async actionShowImport(table) {
-			emit('tables:modal:import', table)
+			emit('tables:modal:import', { element: table, isView: false })
 		},
 		async actionShowIntegration() {
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })

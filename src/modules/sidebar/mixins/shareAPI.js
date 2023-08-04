@@ -14,7 +14,7 @@ export default {
 					res = await axios.get(generateUrl('/apps/tables/share/view/' + this.activeElement.id))
 					shares = shares.concat(res.data)
 					res = await axios.get(generateUrl('/apps/tables/share/table/' + this.activeElement.tableId))
-					return shares.concat(res.data)
+					return shares.concat(res.data.filter(share => share.permissionManage))
 				} else {
 					res = await axios.get(generateUrl('/apps/tables/share/table/' + this.activeElement.id))
 					return shares.concat(res.data)
