@@ -41,8 +41,8 @@
 import { NcModal, NcButton } from '@nextcloud/vue'
 import { showError, showWarning } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
-import ColumnFormComponent from '../partials/ColumnFormComponent.vue'
-import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
+import ColumnFormComponent from '../main/partials/ColumnFormComponent.vue'
+import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import { mapGetters } from 'vuex'
 
 export default {

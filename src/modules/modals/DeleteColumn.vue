@@ -11,7 +11,7 @@
 
 <script>
 
-import DialogConfirmation from '../../../shared/modals/DialogConfirmation.vue'
+import DialogConfirmation from '../../shared/modals/DialogConfirmation.vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'

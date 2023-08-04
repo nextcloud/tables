@@ -38,9 +38,9 @@ import CreateColumn from './CreateColumn.vue'
 import EditRow from './EditRow.vue'
 import ViewSettings from './ViewSettings.vue'
 import DeleteRows from './DeleteRows.vue'
-import Import from '../../navigation/modals/Import.vue'
+import Import from './Import.vue'
 import DeleteTable from './DeleteTable.vue'
-import CreateTable from '../../navigation/modals/CreateTable.vue'
+import CreateTable from './CreateTable.vue'
 
 export default {
 	components: {

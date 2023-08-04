@@ -62,8 +62,8 @@ import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
-import NcTile from '../../../shared/components/NcTile/NcTile.vue'
-import displayError from '../../../shared/utils/displayError.js'
+import NcTile from '../../shared/components/NcTile/NcTile.vue'
+import displayError from '../../shared/utils/displayError.js'
 
 export default {
 	name: 'CreateTable',
