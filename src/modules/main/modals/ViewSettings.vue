@@ -48,12 +48,14 @@
 
 		<div class="row sticky">
 			<div class="fix-col-4 space-T end">
-				<button v-if="!localLoading && !createView" class="primary" :aria-label="createNewViewText" @click="createNewView()">
-					{{ createNewViewText }}
-				</button>
-				<button v-if="!localLoading" class="primary" :aria-label="saveText" @click="saveView()">
+				<div style="padding-right: var(--default-grid-baseline);">
+					<NcButton v-if="!localLoading && !createView" type="secondary" :aria-label="createNewViewText" @click="createNewView()">
+						{{ createNewViewText }}
+					</NcButton>
+				</div>
+				<NcButton v-if="!localLoading" type="primary" :aria-label="saveText" @click="saveView()">
 					{{ saveText }}
-				</button>
+				</NcButton>
 			</div>
 		</div>
 	</NcAppSettingsDialog>
@@ -129,7 +131,7 @@ export default {
 			}
 		},
 		createNewViewText() {
-			return t('tables', 'Create new view')
+			return t('tables', 'Save as new view')
 		},
 		generateViewConfigData() {
 			if (!this.viewSetting) return this.view
@@ -255,18 +257,24 @@ export default {
 		},
 		async updateViewToBE(id) {
 			const newSelectedColumnIds = this.allColumns.map(col => col.id).filter(id => this.selectedColumns.includes(id))
-			const filteredSortingRules = this.mutableView.sort.filter(sortRule => sortRule.columnId !== undefined)
 			const data = {
 				data: {
 					title: this.title,
 					emoji: this.icon,
 					columns: JSON.stringify(newSelectedColumnIds),
-					sort: JSON.stringify(filteredSortingRules),
 				},
 			}
+			// Update sorting rules if they don't contain hidden rules (= rules regarding rows the user can not see) that were not overwritten
+			if (!this.mutableView.sort.includes(null)) {
+				const filteredSortingRules = this.mutableView.sort.filter(sortRule => sortRule.columnId !== undefined)
+				data.data.sort = JSON.stringify(filteredSortingRules)
+			}
 
-			const filteredFilteringRules = this.mutableView.filter.map(filterGroup => filterGroup.filter(fil => fil.columnId !== undefined && fil.operator !== undefined)).filter(filterGroup => filterGroup.length > 0)
-			data.data.filter = JSON.stringify(filteredFilteringRules)
+			if (!this.mutableView.filter.some(filterGroup => filterGroup.includes(null))) {
+				const filteredFilteringRules = this.mutableView.filter.map(filterGroup => filterGroup.filter(fil => fil.columnId !== undefined && fil.operator !== undefined)).filter(filterGroup => filterGroup.length > 0)
+				data.data.filter = JSON.stringify(filteredFilteringRules)
+			}
+
 			const res = await this.$store.dispatch('updateView', { id, data })
 			if (res) {
 				return res

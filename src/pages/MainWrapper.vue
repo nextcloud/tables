@@ -38,6 +38,12 @@
 			:out-transition="true"
 			@close="editRowId = null" />
 		<DeleteRows v-if="rowsToDelete" :rows-to-delete="rowsToDelete" @cancel="rowsToDelete = null" />
+		<ViewSettings
+			:show-modal="viewToEdit !== null"
+			:view="viewToEdit"
+			:view-setting="viewSetting"
+			@close="viewToEdit = null"
+			@reload-view="reload(true)" />
 	</div>
 </template>
 
@@ -53,6 +59,7 @@ import EditRow from '../modules/main/modals/EditRow.vue'
 import DeleteRows from '../modules/main/modals/DeleteRows.vue'
 import DefaultMainView from './DefaultMainView.vue'
 import Dashboard from './Dashboard.vue'
+import ViewSettings from '../modules/main/modals/ViewSettings.vue'
 import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
 import exportTableMixin from '../shared/components/ncTable/mixins/exportTableMixin.js'
 
@@ -68,6 +75,7 @@ export default {
 		DeleteRows,
 		DefaultMainView,
 		Dashboard,
+		ViewSettings,
 	},
 
 	mixins: [permissionsMixin, exportTableMixin],
@@ -93,6 +101,7 @@ export default {
 			rowsToDelete: null,
 			localLoading: false,
 			lastActiveElement: null,
+			viewToEdit: null,
 			selectedRows: [],
 		}
 	},
@@ -120,6 +129,7 @@ export default {
 		subscribe('tables:row:create', () => { this.showCreateRow = true })
 		subscribe('tables:row:edit', rowId => { this.editRowId = rowId })
 		subscribe('tables:row:delete', rows => { this.rowsToDelete = rows })
+		subscribe('tables:view:edit', view => { this.viewToEdit = view })
 	},
 	unmounted() {
 		unsubscribe('tables:view:reload', () => { this.reload(true) })
@@ -129,6 +139,7 @@ export default {
 		unsubscribe('tables:row:create', () => { this.showCreateRow = true })
 		unsubscribe('tables:row:edit', rowId => { this.editRowId = rowId })
 		unsubscribe('tables:row:delete', rows => { this.rowsToDelete = rows })
+		unsubscribe('tables:view:edit', view => { this.viewToEdit = view })
 	},
 
 	methods: {
