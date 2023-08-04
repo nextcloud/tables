@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<DialogConfirmation :description="getTranslatedDescription"
-			:title="t('tables', 'Confirm table deletion')"
+			:title="t('tables', 'Confirm view deletion')"
 			:cancel-title="t('tables', 'Cancel')"
 			:confirm-title="t('tables', 'Delete')"
 			confirm-class="error"
@@ -23,7 +23,7 @@ export default {
 		DialogConfirmation,
 	},
 	props: {
-		table: {
+		view: {
 			type: Object,
 			default: null,
 		},
@@ -33,22 +33,21 @@ export default {
 		},
 	},
 	computed: {
-		...mapGetters(['activeElement', 'isView']),
+		...mapGetters(['activeView', 'isView']),
 		getTranslatedDescription() {
-			return t('tables', 'Do you really want to delete the table "{table}"? This will also delete all data, views and shares that are connected to this table.', { table: this.table?.title })
+			return t('tables', 'Do you really want to delete the view "{view}"?', { view: this.view?.title })
 		},
 	},
 	methods: {
 		async deleteMe() {
-			const tableId = this.table.id
-			let activeTableId
-			if (this.activeElement) activeTableId = this.isView ? this.activeElement.id : this.activeElement.tableId
-			const res = await this.$store.dispatch('removeTable', { tableId: this.table.id })
+			const viewId = this.view.id
+			const activeViewId = this.activeView?.id
+			const res = await this.$store.dispatch('removeView', { viewId: this.view.id })
 			if (res) {
-				showSuccess(t('tables', 'Table "{emoji}{table}" removed.', { emoji: this.table.emoji ? this.table.emoji + ' ' : '', table: this.table.title }))
+				showSuccess(t('tables', 'View "{emoji}{view}" removed.', { emoji: this.view.emoji ? this.view.emoji + ' ' : '', view: this.view.title }))
 
-				// if the actual table was deleted, go to startpage
-				if (tableId === activeTableId) {
+				// if the actual view was deleted, go to startpage
+				if (viewId === activeViewId) {
 					await this.$router.push('/').catch(err => err)
 				}
 				this.$emit('cancel')

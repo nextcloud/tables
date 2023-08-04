@@ -62,7 +62,7 @@ import { NcAppNavigation, NcAppNavigationCaption, NcActionButton, NcTextField, N
 import CreateTable from '../../modals/CreateTable.vue'
 import ViewSettings from '../../modals/ViewSettings.vue'
 import NavigationViewItem from '../partials/NavigationViewItem.vue'
-import NavigationDashboardItem from '../partials/NavigationDashboardItem.vue'
+import NavigationDashboardItem from '../partials/NavigationTableItem.vue'
 import { mapState } from 'vuex'
 import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import Magnify from 'vue-material-design-icons/Magnify.vue'

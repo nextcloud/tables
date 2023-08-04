@@ -64,18 +64,10 @@
 			<NcActionButton v-if="canManageElement(view)"
 				icon="icon-delete"
 				:close-after-click="true"
-				@click="showDeletionConfirmation = true">
+				@click="emit('tables:view:delete', view)">
 				{{ t('tables', 'Delete view') }}
 			</NcActionButton>
 		</template>
-		<DialogConfirmation :description="getTranslatedDescription"
-			:title="t('tables', 'Confirm view deletion')"
-			:cancel-title="t('tables', 'Cancel')"
-			:confirm-title="t('tables', 'Delete')"
-			confirm-class="error"
-			:show-modal="showDeletionConfirmation"
-			@confirm="deleteMe"
-			@cancel="showDeletionConfirmation = false" />
 	</NcAppNavigationItem>
 </template>
 <script>
@@ -83,10 +75,9 @@ import { NcAppNavigationItem, NcActionButton, NcCounterBubble, NcAvatar } from '
 import '@nextcloud/dialogs/dist/index.css'
 import { getCurrentUser } from '@nextcloud/auth'
 import { mapGetters } from 'vuex'
-import { showSuccess, showError } from '@nextcloud/dialogs'
+import { showError } from '@nextcloud/dialogs'
 import Table from 'vue-material-design-icons/Table.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
-import DialogConfirmation from '../../../shared/modals/DialogConfirmation.vue'
 import Creation from 'vue-material-design-icons/Creation.vue'
 import PlaylistPlay from 'vue-material-design-icons/PlaylistPlay.vue'
 import { emit } from '@nextcloud/event-bus'
@@ -101,7 +92,6 @@ export default {
 		// eslint-disable-next-line vue/no-reserved-component-names
 		Table,
 		NcAppNavigationItem,
-		DialogConfirmation,
 		NcCounterBubble,
 		NcActionButton,
 		Creation,
@@ -145,6 +135,7 @@ export default {
 		},
 	},
 	methods: {
+		emit,
 		async actionShowShare() {
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
 			await this.$router.push('/view/' + parseInt(this.view.id)).catch(err => err)
@@ -152,20 +143,6 @@ export default {
 		async actionShowIntegration() {
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
 			await this.$router.push('/view/' + parseInt(this.view.id)).catch(err => err)
-		},
-		async deleteMe() {
-			const viewId = this.view.id
-			const activeViewId = this.activeView?.id
-			const res = await this.$store.dispatch('removeView', { viewId: this.view.id })
-			if (res) {
-				showSuccess(t('tables', 'View "{emoji}{view}" removed.', { emoji: this.view.emoji ? this.view.emoji + ' ' : '', view: this.view.title }))
-
-				// if the actual view was deleted, go to startpage
-				if (viewId === activeViewId) {
-					await this.$router.push('/').catch(err => err)
-				}
-				this.showDeletionConfirmation = false
-			}
 		},
 		async editView() {
 			emit('tables:view:edit', { view: this.view, viewSetting: {} })

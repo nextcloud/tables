@@ -76,8 +76,7 @@ class SuperColumnQB implements IColumnTypeQB {
 		}
 	}
 
-	private function getFormattedDataCellValue(string $columnPlaceHolder): string
-	{
+	private function getFormattedDataCellValue(string $columnPlaceHolder): string {
 		$cellValue = 'JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'$[*].columnId\'), \'one\', :'.$columnPlaceHolder.')), \'.value\'))';
 		return $this->formatCellValue($cellValue);
 	}
@@ -87,8 +86,7 @@ class SuperColumnQB implements IColumnTypeQB {
 	 * @return string
 	 * @throws InternalError
 	 */
-	private function getFormattedMetaDataCellValue(int $metaId): string
-	{
+	private function getFormattedMetaDataCellValue(int $metaId): string {
 		switch($metaId) {
 			case -1: return 'id';
 			case -2: return 'created_by';

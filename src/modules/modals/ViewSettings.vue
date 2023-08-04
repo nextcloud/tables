@@ -221,7 +221,7 @@ export default {
 				const success = await this.updateViewToBE(this.mutableView.id)
 				this.localLoading = false
 				if (success) {
-					await this.$router.push('/view/' + this.mutableView.id).catch(err => err)
+					// await this.$router.push('/view/' + this.mutableView.id).catch(err => err)
 					this.actionCancel()
 				}
 			}

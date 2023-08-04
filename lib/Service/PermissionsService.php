@@ -67,6 +67,25 @@ class PermissionsService {
 
 	// ***** TABLES permissions *****
 
+	/**
+	 * @param Table $table
+	 * @param string|null $userId
+	 * @return bool
+	 */
+	public function canUpdateTable(Table $table, ?string $userId = null): bool {
+		try {
+			$userId = $this->preCheckUserId($userId);
+		} catch (InternalError $e) {
+			return false;
+		}
+
+		if ($userId === '') {
+			return true;
+		}
+
+		return $this->canManageTable($table, $userId);
+	}
+
 	public function canAccessView($view, ?string $userId = null): bool {
 		if($this->basisCheck($view, 'view', $userId)) {
 			return true;
