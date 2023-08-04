@@ -1,16 +1,21 @@
 <template>
-	<MainWrapper :element="activeView" :is-view="true" />
+	<div>
+		<MainWrapper :element="activeView" :is-view="true" />
+		<MainModals />
+	</div>
 </template>
 
 <script>
 
 import { mapGetters, mapState } from 'vuex'
-import MainWrapper from './MainWrapper.vue'
+import MainWrapper from '../modules/main/sections/MainWrapper.vue'
+import MainModals from '../modules/main/modals/Modals.vue'
 
 export default {
 	name: 'MainViewWrapper',
 	components: {
 		MainWrapper,
+		MainModals,
 	},
 
 	computed: {

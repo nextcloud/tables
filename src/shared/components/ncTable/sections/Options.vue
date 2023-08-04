@@ -101,10 +101,6 @@ export default {
 			type: Boolean,
 			default: true,
 		},
-		table: {
-			type: Object,
-			default: () => {},
-		},
 		columns: {
 			type: Array,
 			default: null,

@@ -111,7 +111,7 @@ export default {
 			return Object.keys(searchObject).every((key) => object[key] === searchObject[key])
 		},
 		unusedColumns(selectedId) {
-			if (this.hadHiddenSortingRules) return this.columns
+			if (this.hadHiddenSortingRules || !this.viewSort) return this.columns
 			return this.columns.filter(col => !this.viewSort.map(entry => entry.columnId).includes(col.id) || col.id === selectedId)
 		},
 		deleteSortingRule(index) {

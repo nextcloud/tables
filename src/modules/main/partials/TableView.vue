@@ -4,7 +4,6 @@
 		:columns="columns"
 		:table="element"
 		:view-setting="viewSetting"
-		:selected-rows.sync="localSelectedRows"
 		:can-read-rows="canReadRows"
 		:can-create-rows="canCreateRows"
 		:can-edit-rows="canEditRows"
@@ -31,9 +30,9 @@
 
 <script>
 
-import NcTable from '../shared/components/ncTable/NcTable.vue'
+import NcTable from '../../../shared/components/ncTable/NcTable.vue'
 import { emit } from '@nextcloud/event-bus'
-import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
+import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 
 export default {
 	name: 'TableView',
@@ -99,17 +98,6 @@ export default {
 		},
 	},
 
-	data() {
-		return {
-			localSelectedRows: this.selectedRows,
-		}
-	},
-
-	watch: {
-		localSelectedRows() {
-			this.$emit('update:selectedRows', this.localSelectedRows)
-		},
-	},
 	methods: {
 		createColumn() {
 			emit('tables:column:create')
@@ -121,10 +109,10 @@ export default {
 			emit('tables:column:delete', column)
 		},
 		createRow() {
-			emit('tables:row:create')
+			emit('tables:row:create', this.columns)
 		},
 		editRow(rowId) {
-			emit('tables:row:edit', rowId)
+			emit('tables:row:edit', { row: this.rows.find(r => r.id === rowId), columns: this.columns })
 		},
 		deleteSelectedRows(rows) {
 			emit('tables:row:delete', rows)

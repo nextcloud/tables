@@ -1,6 +1,6 @@
 <template>
 	<NcAppSettingsDialog :open.sync="open" :show-navigation="true" :title="createView ? t('tables', 'Create view') : t('tables', 'Edit view')">
-		<NcAppSettingsSection v-if="columns === null" id="loading" :title="t('tables', 'Loading')">
+		<NcAppSettingsSection v-if="columns === null" id="loading" title="">
 			<div class="icon-loading" />
 		</NcAppSettingsSection>
 		<!--title & emoji-->
@@ -221,7 +221,6 @@ export default {
 				const success = await this.updateViewToBE(this.mutableView.id)
 				this.localLoading = false
 				if (success) {
-					this.$emit('reload-view')
 					await this.$router.push('/view/' + this.mutableView.id).catch(err => err)
 					this.actionCancel()
 				}

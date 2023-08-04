@@ -60,21 +60,14 @@
 			<NcActionButton v-if="canManageElement(table)"
 				icon="icon-delete"
 				:close-after-click="true"
-				@click="showDeletionConfirmation = true">
+				@click="deleteTable()">
 				{{ t('tables', 'Delete table') }}
 			</NcActionButton>
 		</template>
 		<NavigationViewItem v-for="view in getViews"
 			:key="'view'+view.id"
 			:view="view" />
-		<DialogConfirmation :description="getTranslatedDescription"
-			:title="t('tables', 'Confirm table deletion')"
-			:cancel-title="t('tables', 'Cancel')"
-			:confirm-title="t('tables', 'Delete')"
-			confirm-class="error"
-			:show-modal="showDeletionConfirmation"
-			@confirm="deleteMe"
-			@cancel="showDeletionConfirmation = false" />
+
 	</NcAppNavigationItem>
 </template>
 <script>
@@ -134,7 +127,6 @@ export default {
 
 	data() {
 		return {
-			showDeletionConfirmation: false,
 			isParentOfActiveView: false,
 		}
 	},
@@ -168,8 +160,11 @@ export default {
 		},
 	},
 	methods: {
+		deleteTable() {
+			emit('tables:table:delete', this.table)
+		},
 		createView() {
-			emit('create-view', this.table.id)
+			emit('tables:view:create', this.table.id)
 		},
 		async actionShowShare() {
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
@@ -187,18 +182,6 @@ export default {
 				emit('toggle-navigation', {
 					open: false,
 				})
-			}
-		},
-		async deleteMe() {
-			const res = await this.$store.dispatch('removeTable', { tableId: this.table.id })
-			if (res) {
-				showSuccess(t('tables', 'Table "{emoji}{table}" removed.', { emoji: this.table.emoji ? this.table.emoji + ' ' : '', table: this.table.title }))
-
-				// if the actual table was deleted, go to startpage
-				if (this.table.id === this.activeTable?.id) {
-					await this.$router.push('/').catch(err => err)
-				}
-				this.showDeletionConfirmation = false
 			}
 		},
 	},

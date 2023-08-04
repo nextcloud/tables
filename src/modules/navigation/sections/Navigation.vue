@@ -53,14 +53,6 @@
 					</template>
 				</NcEmptyContent>
 			</div>
-
-			<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
-			<Import
-				:show-modal="importToElement !== null"
-				:element="importToElement?.element"
-				:is-element-view="importToElement?.isView"
-				@close="importToElement = null" />
-			<ViewSettings :view="{tableId: createViewTableId, sort: [], filter: []}" :create-view="true" :show-modal="createViewTableId !== null" @close="createViewTableId = null" />
 		</template>
 	</NcAppNavigation>
 </template>
@@ -96,9 +88,6 @@ export default {
 	data() {
 		return {
 			loading: true,
-			showModalCreateTable: false,
-			importToElement: null,
-			createViewTableId: null, // if null, no modal open
 			filterString: '',
 		}
 	},
@@ -120,19 +109,9 @@ export default {
 				: (table.title.toLowerCase().includes(this.filterString.toLowerCase()) || table.views.some(view => view.title.toLowerCase().includes(this.filterString.toLowerCase())))))
 		},
 	},
-	mounted() {
-		subscribe('create-view', tableId => { this.createViewTableId = tableId })
-		subscribe('create-table', this.createTable)
-		subscribe('tables:modal:import', element => { this.importToElement = element })
-	},
-	beforeDestroy() {
-		unsubscribe('create-view', tableId => { this.createViewTableId = tableId })
-		unsubscribe('create-table', this.createTable)
-		unsubscribe('tables:modal:import', element => { this.importToElement = element })
-	},
 	methods: {
 		createTable() {
-			this.showModalCreateTable = true
+			emit('tables:table:create')
 		},
 		closeNav() {
 			if (window.innerWidth < 960) {

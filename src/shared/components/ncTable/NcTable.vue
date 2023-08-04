@@ -45,7 +45,6 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				:columns="columns"
 				:selected-rows="localSelectedRows"
 				:show-options="columns.length !== 0"
-				:table="table"
 				:view-setting="viewSetting"
 				:config="config"
 				@create-row="$emit('create-row')"

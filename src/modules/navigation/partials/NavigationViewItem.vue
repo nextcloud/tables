@@ -168,7 +168,7 @@ export default {
 			}
 		},
 		async editView() {
-			emit('tables:view:edit', this.view)
+			emit('tables:view:edit', { view: this.view, viewSetting: {} })
 		},
 		async actionShowImport(view) {
 			emit('tables:modal:import', { element: view, isView: true })
