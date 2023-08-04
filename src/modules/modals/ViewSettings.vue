@@ -65,11 +65,11 @@
 import { NcAppSettingsDialog, NcAppSettingsSection, NcEmojiPicker, NcButton } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
-import FilterForm from '../partials/editViewPartials/filter/FilterForm.vue'
-import SortForm from '../partials/editViewPartials/sort/SortForm.vue'
-import SelectedViewColumns from '../partials/editViewPartials/SelectedViewColumns.vue'
-import { MetaColumns } from '../../../shared/components/ncTable/mixins/metaColumns.js'
-import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
+import FilterForm from '../main/partials/editViewPartials/filter/FilterForm.vue'
+import SortForm from '../main/partials/editViewPartials/sort/SortForm.vue'
+import SelectedViewColumns from '../main/partials/editViewPartials/SelectedViewColumns.vue'
+import { MetaColumns } from '../../shared/components/ncTable/mixins/metaColumns.js'
+import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 
 export default {
 	name: 'ViewSettings',

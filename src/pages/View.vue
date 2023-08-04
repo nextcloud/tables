@@ -9,7 +9,7 @@
 
 import { mapGetters, mapState } from 'vuex'
 import MainWrapper from '../modules/main/sections/MainWrapper.vue'
-import MainModals from '../modules/main/modals/Modals.vue'
+import MainModals from '../modules/modals/Modals.vue'
 
 export default {
 	name: 'MainViewWrapper',

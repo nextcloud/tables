@@ -59,15 +59,15 @@
 
 <script>
 import { NcAppNavigation, NcAppNavigationCaption, NcActionButton, NcTextField, NcButton, NcEmptyContent } from '@nextcloud/vue'
-import CreateTable from '../modals/CreateTable.vue'
-import ViewSettings from '../../main/modals/ViewSettings.vue'
+import CreateTable from '../../modals/CreateTable.vue'
+import ViewSettings from '../../modals/ViewSettings.vue'
 import NavigationViewItem from '../partials/NavigationViewItem.vue'
 import NavigationDashboardItem from '../partials/NavigationDashboardItem.vue'
 import { mapState } from 'vuex'
 import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
 import { getCurrentUser } from '@nextcloud/auth'
-import Import from '../modals/Import.vue'
+import Import from '../../modals/Import.vue'
 
 export default {
 	name: 'Navigation',

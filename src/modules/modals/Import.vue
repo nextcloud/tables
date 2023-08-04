@@ -134,13 +134,13 @@
 <script>
 import { NcModal, NcButton, NcCheckboxRadioSwitch, NcEmptyContent, NcLoadingIcon } from '@nextcloud/vue'
 import { FilePicker, FilePickerType, showError, showWarning } from '@nextcloud/dialogs'
-import RowFormWrapper from '../../../shared/components/ncTable/partials/rowTypePartials/RowFormWrapper.vue'
-import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
+import RowFormWrapper from '../../shared/components/ncTable/partials/rowTypePartials/RowFormWrapper.vue'
+import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import IconFolder from 'vue-material-design-icons/Folder.vue'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { mapGetters } from 'vuex'
-import NcIconTimerSand from '../../../shared/components/ncIconTimerSand/NcIconTimerSand.vue'
+import NcIconTimerSand from '../../shared/components/ncIconTimerSand/NcIconTimerSand.vue'
 
 export default {
 
