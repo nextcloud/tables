@@ -1,32 +1,47 @@
 <template>
 	<div class="filter-section">
-		<div v-for="(sortingRule, i) in removedSortingRules" :key="'deleted'+sortingRule.columnId+i">
-			<DeletedSortEntry
-				:sort-entry="sortingRule"
-				:columns="columns"
-				class="locallyRemoved"
-				@reactive-sorting-rule="reactiveSortingRule(sortingRule)" />
+		<div v-if="hasHiddenSortingRules">
+			ℹ {{ t('tables', 'Among the sorting rules are some on which you have no permissions. However, if you like, you can override the sorting.') }}
+			<NcButton
+				:close-after-click="true"
+				:aria-label="t('tables', 'Override sorting rules')"
+				type="tertiary"
+				@click="overrideRules">
+				{{ t('tables', 'Override sorting rules') }}
+				<template #icon>
+					<Plus :size="25" />
+				</template>
+			</NcButton>
 		</div>
-		<div v-for="(sortingRule, i) in mutableSort" :key="sortingRule.columnId ?? '' + i">
-			<SortEntry
-				:sort-entry="sortingRule"
-				:columns="unusedColumns(sortingRule.columnId)"
-				:class="{'locallyAdded': isLocallyAdded(sortingRule)}"
-				@delete-sorting-rule="deleteSortingRule(i)" />
+		<div v-else>
+			<div v-for="(sortingRule, i) in removedSortingRules" :key="'deleted'+sortingRule.columnId+i">
+				<DeletedSortEntry
+					:sort-entry="sortingRule"
+					:columns="columns"
+					class="locallyRemoved"
+					@reactive-sorting-rule="reactiveSortingRule(sortingRule)" />
+			</div>
+			<div v-for="(sortingRule, i) in mutableSort" :key="sortingRule.columnId ?? '' + i">
+				<SortEntry
+					:sort-entry="sortingRule"
+					:columns="unusedColumns(sortingRule.columnId)"
+					:class="{'locallyAdded': isLocallyAdded(sortingRule)}"
+					@delete-sorting-rule="deleteSortingRule(i)" />
+			</div>
+			<NcButton
+				:close-after-click="true"
+				:aria-label="t('tables', 'Add new sorting rule')"
+				type="tertiary"
+				@click="addSortingRule">
+				{{ t('tables', 'Add new sorting rule') }}
+				<template #icon>
+					<Plus :size="25" />
+				</template>
+			</NcButton>
+			<p class="span">
+				{{ t('tables', 'The sorting rules are applied sequentially, meaning that if there are rows with the same priority to the first rule, the second rule determines the order among those rows.') }}
+			</p>
 		</div>
-		<NcButton
-			:close-after-click="true"
-			:aria-label="t('tables', 'Add new sorting rule')"
-			type="tertiary"
-			@click="addSortingRule">
-			{{ t('tables', 'Add new sorting rule') }}
-			<template #icon>
-				<Plus :size="25" />
-			</template>
-		</NcButton>
-		<p class="span">
-			{{ t('tables', 'The sorting rules are applied sequentially, meaning that if there are rows with the same priority to the first rule, the second rule determines the order among those rows.') }}
-		</p>
 	</div>
 </template>
 
@@ -69,8 +84,19 @@ export default {
 	},
 	computed: {
 		removedSortingRules() {
-			if (!this.viewSort || !this.generatedSort) return []
+			if (this.hadHiddenSortingRules || !this.viewSort || !this.generatedSort) return []
 			return this.viewSort.filter(entry => !this.generatedSort.some(e => this.isSameEntry(e, entry)) && !this.sort.some(e => this.isSameEntry(e, entry)))
+		},
+		hasHiddenSortingRules() {
+			return this.mutableSort.includes(null)
+		},
+		hadHiddenSortingRules() {
+			return this.viewSort && this.viewSort.includes(null)
+		},
+	},
+	watch: {
+		mutableSort() {
+			this.$emit('update:sort', this.mutableSort)
 		},
 	},
 	methods: {
@@ -78,13 +104,14 @@ export default {
 			this.mutableSort.unshift(entry)
 		},
 		isLocallyAdded(entry) {
-			if (!this.viewSort || !this.generatedSort) return false
+			if (this.hadHiddenSortingRules || !this.viewSort || !this.generatedSort) return false
 			return this.generatedSort.some(e => this.isSameEntry(e, entry)) && !this.viewSort.some(e => this.isSameEntry(e, entry))
 		},
 		isSameEntry(object, searchObject) {
 			return Object.keys(searchObject).every((key) => object[key] === searchObject[key])
 		},
 		unusedColumns(selectedId) {
+			if (this.hadHiddenSortingRules) return this.columns
 			return this.columns.filter(col => !this.viewSort.map(entry => entry.columnId).includes(col.id) || col.id === selectedId)
 		},
 		deleteSortingRule(index) {
@@ -92,6 +119,10 @@ export default {
 		},
 		addSortingRule() {
 			this.mutableSort.push({ columnId: null, mode: 'ASC' })
+		},
+		overrideRules() {
+			this.mutableSort.splice(0, this.mutableSort.length)
+			this.addSortingRule()
 		},
 	},
 }

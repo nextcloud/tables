@@ -308,6 +308,26 @@ class ViewService extends SuperService {
 					'manage' => $permissions['manage'] ?? false,
 					'manageTable' => $canManageTable
 				]);
+				// Remove detailed view filtering and sorting information if necessary
+				if(!$canManageTable) {
+					$view->setFilterArray(
+						array_map(function ($filterGroup) {
+							return array_map(function (){
+								// Instead of filter just indicate that there is a filter, but hide details
+								return null;
+							},$filterGroup);
+						},
+						$view->getFilterArray()));
+					$view->setSortArray(
+						array_map(function ($sortRule) use ($view) {
+							if(in_array($sortRule["columnId"], $view->getColumnsArray())) {
+								return $sortRule;
+							}
+							// Instead of sort rule just indicate that there is a rule, but hide details
+							return null;
+						},
+							$view->getSortArray()));
+				}
 			} catch (NotFoundError $e) {
 			} catch (\Exception $e) {
 				$this->logger->warning('Exception occurred while setting shared permissions: '.$e->getMessage().' No permissions granted.');

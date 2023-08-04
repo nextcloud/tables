@@ -23,7 +23,7 @@
 						<NcActionCaption v-if="canManageElement(view)" :title="t('tables', 'Manage view')" />
 						<NcActionButton v-if="canManageElement(view) "
 							:close-after-click="true"
-							@click="viewToEdit = view">
+							@click="editView">
 							<template #icon>
 								<PlaylistEdit :size="20" decorative />
 							</template>
@@ -68,13 +68,6 @@
 				</template>
 			</TableView>
 		</div>
-
-		<ViewSettings
-			:show-modal="viewToEdit !== null"
-			:view="viewToEdit"
-			:view-setting="viewSetting"
-			@close="viewToEdit = null"
-			@reload-view="reload(true)" />
 	</div>
 </template>
 
@@ -82,11 +75,9 @@
 import { mapState } from 'vuex'
 import TableView from './TableView.vue'
 
-import ViewSettings from '../modules/main/modals/ViewSettings.vue'
 import EmptyView from '../modules/main/sections/EmptyView.vue'
 import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
-import { subscribe, unsubscribe } from '@nextcloud/event-bus'
-import { Filters } from '../shared/components/ncTable/mixins/filter.js'
+import { emit } from '@nextcloud/event-bus'
 import { NcActions, NcActionButton, NcActionCaption } from '@nextcloud/vue'
 import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
@@ -98,7 +89,6 @@ export default {
 	name: 'DefaultMainView',
 	components: {
 		EmptyView,
-		ViewSettings,
 		TableView,
 		PlaylistEdit,
 		IconImport,
@@ -140,7 +130,6 @@ export default {
 		return {
 			localLoading: false,
 			lastActiveViewId: null,
-			viewToEdit: null,
 			localSelectedRows: this.selectedRows,
 		}
 	},
@@ -149,20 +138,16 @@ export default {
 		isViewSettingSet() {
 			return !(!this.viewSetting || ((!this.viewSetting.hiddenColumns || this.viewSetting.hiddenColumns.length === 0) && (!this.viewSetting.sorting) && (!this.viewSetting.filter || this.viewSetting.filter.length === 0)))
 		},
-		isLoading() {
-			return (this.loading || this.localLoading) && (!this.viewToEdit)
-		},
 	},
 	watch: {
 		localSelectedRows() {
 			this.$emit('update:selectedRows', this.localSelectedRows)
 		},
 	},
-	mounted() {
-		subscribe('tables:view:edit', view => { this.viewToEdit = view })
-	},
-	unmounted() {
-		unsubscribe('tables:view:edit', view => { this.viewToEdit = view })
+	methods: {
+		editView() {
+			emit('tables:view:edit', this.view)
+		},
 	},
 }
 </script>

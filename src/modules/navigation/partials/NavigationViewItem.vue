@@ -168,7 +168,6 @@ export default {
 			}
 		},
 		async editView() {
-			await this.$router.push('/view/' + parseInt(this.view.id)).catch(err => err)
 			emit('tables:view:edit', this.view)
 		},
 		async actionShowImport(view) {
