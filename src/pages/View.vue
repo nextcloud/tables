@@ -12,7 +12,7 @@ import MainWrapper from '../modules/main/sections/MainWrapper.vue'
 import MainModals from '../modules/modals/Modals.vue'
 
 export default {
-	name: 'MainViewWrapper',
+
 	components: {
 		MainWrapper,
 		MainModals,
@@ -26,7 +26,7 @@ export default {
 	watch: {
 		activeViewId() {
 			if (this.activeViewId && !this.activeView) {
-				// view does not exists, go to startpage
+				// view does not exist, go to startpage
 				this.$router.push('/').catch(err => err)
 			}
 		},

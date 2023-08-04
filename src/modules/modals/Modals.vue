@@ -1,8 +1,12 @@
 <template>
 	<div>
+		<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
+		<DeleteTable :show-modal="tableToDelete !== null" :table="tableToDelete" @cancel="tableToDelete = null" />
+
 		<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false" />
 		<EditColumn v-if="columnToEdit" :column="columnToEdit" @close="columnToEdit = false" />
 		<DeleteColumn v-if="columnToDelete" :column-to-delete="columnToDelete" @cancel="columnToDelete = null" />
+
 		<CreateRow :columns="columnsForRow"
 			:show-modal="columnsForRow !== null"
 			@close="columnsForRow = null" />
@@ -12,14 +16,15 @@
 			:out-transition="true"
 			@close="editRow = null" />
 		<DeleteRows v-if="rowsToDelete" :rows-to-delete="rowsToDelete" @cancel="rowsToDelete = null" />
+
 		<ViewSettings
 			:show-modal="viewToEdit !== null"
 			:view="viewToEdit?.view"
 			:create-view="viewToEdit?.createView"
 			:view-setting="viewToEdit?.viewSetting"
 			@close="viewToEdit = null" />
-		<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
-		<DeleteTable :show-modal="tableToDelete !== null" :table="tableToDelete" @cancel="tableToDelete = null" />
+		<DeleteView :show-modal="viewToDelete !== null" :view="viewToDelete" @cancel="viewToDelete = null" />
+
 		<Import
 			:show-modal="importToElement !== null"
 			:element="importToElement?.element"
@@ -41,9 +46,11 @@ import DeleteRows from './DeleteRows.vue'
 import Import from './Import.vue'
 import DeleteTable from './DeleteTable.vue'
 import CreateTable from './CreateTable.vue'
+import DeleteView from './DeleteView.vue'
 
 export default {
 	components: {
+		DeleteView,
 		CreateTable,
 		Import,
 		DeleteRows,
@@ -69,17 +76,17 @@ export default {
 			importToElement: null,
 			createViewTableId: null, // if null, no modal open
 			tableToDelete: null,
+			viewToDelete: null,
 		}
 	},
 
 	mounted() {
+		// table
+		subscribe('tables:table:create', () => { this.showModalCreateTable = true })
+		subscribe('tables:table:delete', table => { this.tableToDelete = table })
+
+		// views
 		subscribe('tables:view:reload', () => { this.reload(true) })
-		subscribe('tables:column:create', () => { this.showCreateColumn = true })
-		subscribe('tables:column:edit', column => { this.columnToEdit = column })
-		subscribe('tables:column:delete', column => { this.columnToDelete = column })
-		subscribe('tables:row:create', columns => { this.columnsForRow = columns })
-		subscribe('tables:row:edit', row => { this.editRow = row })
-		subscribe('tables:row:delete', rows => { this.rowsToDelete = rows })
 		subscribe('tables:view:edit', view => { this.viewToEdit = { ...view, createView: false } })
 		subscribe('tables:view:create', tableId => {
 			this.viewToEdit = {
@@ -87,9 +94,20 @@ export default {
 				createView: true,
 			}
 		})
-		subscribe('tables:table:create', () => { this.showModalCreateTable = true })
+		subscribe('tables:view:delete', view => { this.viewToDelete = view })
+
+		// columns
+		subscribe('tables:column:create', () => { this.showCreateColumn = true })
+		subscribe('tables:column:edit', column => { this.columnToEdit = column })
+		subscribe('tables:column:delete', column => { this.columnToDelete = column })
+
+		// rows
+		subscribe('tables:row:create', columns => { this.columnsForRow = columns })
+		subscribe('tables:row:edit', row => { this.editRow = row })
+		subscribe('tables:row:delete', rows => { this.rowsToDelete = rows })
+
+		// misc
 		subscribe('tables:modal:import', element => { this.importToElement = element })
-		subscribe('tables:table:delete', table => { this.tableToDelete = table })
 	},
 	unmounted() {
 		unsubscribe('tables:view:reload', () => { this.reload(true) })

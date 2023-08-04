@@ -50,11 +50,37 @@
 					<tbody>
 						<tr>
 							<td>{{ t('tables', 'Title') }}</td>
-							<td>{{ table.title }}</td>
-						</tr>
-						<tr>
-							<td>{{ t('tables', 'Emoji') }}</td>
-							<td>{{ table.emoji }}</td>
+							<td>
+								<div v-if="tableTitle === null" class="inline">
+									<NcEmojiPicker :close-on-select="true" @select="emoji => updateTableEmoji(emoji)">
+										<NcButton type="tertiary"
+											:aria-label="t('tables', 'Select emoji for table')"
+											:title="t('tables', 'Select emoji')"
+											@click.prevent>
+											{{ table.emoji ? table.emoji : '...' }}
+										</NcButton>
+									</NcEmojiPicker>
+									{{ table.title }}&nbsp;&nbsp;
+									<NcButton type="tertiary" :aria-label="t('tables', 'Edit table title')" @click="startEditingTableTitle">
+										<template #icon>
+											<IconRename :size="20" />
+										</template>
+									</NcButton>
+								</div>
+								<div v-else class="inline">
+									<input ref="tableTitle" v-model="tableTitle" maxlength="200">&nbsp;&nbsp;
+									<NcButton type="primary" :aria-label="t('tables', 'Save')" @click="updateTableTitle">
+										<template #icon>
+											<IconCheck :size="20" />
+										</template>
+									</NcButton>&nbsp;&nbsp;
+									<NcButton icon="icon-close" type="tertiary" :aria-label="t('tables', 'Close')" @click="tableTitle = null">
+										<template #icon>
+											<IconClose :size="20" />
+										</template>
+									</NcButton>
+								</div>
+							</td>
 						</tr>
 						<tr>
 							<td>{{ t('tables', 'Created at') }}</td>
@@ -71,10 +97,6 @@
 						<tr>
 							<td>{{ t('tables', 'Table ID') }}</td>
 							<td>{{ table.id }}</td>
-						</tr>
-						<tr>
-							<td>{{ t('tables', 'Is shared with you') }}</td>
-							<td>{{ table.isShared }}</td>
 						</tr>
 						<tr>
 							<td>{{ t('tables', 'Shares') }}</td>
@@ -150,7 +172,8 @@
 								<NcButton v-if="canManageElement(table)"
 									type="secondary"
 									:aria-label="t('tables', 'Edit view')"
-									:close-after-click="true">
+									:close-after-click="true"
+									@click="emit('tables:view:edit', { view })">
 									<template #icon>
 										<PlaylistEditIcon :size="20" />
 									</template>
@@ -158,7 +181,8 @@
 								<NcButton v-if="canManageElement(table)"
 									type="error"
 									:aria-label="t('tables', 'Delete view')"
-									:close-after-click="true">
+									:close-after-click="true"
+									@click="emit('tables:view:delete', view)">
 									<template #icon>
 										<Delete :size="20" />
 									</template>
@@ -188,16 +212,23 @@ import Delete from 'vue-material-design-icons/Delete.vue'
 import Moment from '@nextcloud/moment'
 import IconImport from 'vue-material-design-icons/Import.vue'
 import Creation from 'vue-material-design-icons/Creation.vue'
+import IconRename from 'vue-material-design-icons/Rename.vue'
+import IconClose from 'vue-material-design-icons/Close.vue'
+import IconCheck from 'vue-material-design-icons/Check.vue'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import displayError from '../../../shared/utils/displayError.js'
-import { NcActionButton, NcActions, NcAvatar, NcButton, NcLoadingIcon } from '@nextcloud/vue'
+import { NcActionButton, NcActions, NcAvatar, NcButton, NcLoadingIcon, NcEmojiPicker } from '@nextcloud/vue'
 import PlaylistEditIcon from 'vue-material-design-icons/PlaylistEdit.vue'
 import LinkIcon from 'vue-material-design-icons/Link.vue'
 import { emit } from '@nextcloud/event-bus'
+import { showError, showSuccess } from '@nextcloud/dialogs'
 
 export default {
 	components: {
+		IconCheck,
+		IconClose,
+		IconRename,
 		NcLoadingIcon,
 		NcActionButton,
 		Creation,
@@ -210,6 +241,7 @@ export default {
 		PlaylistEditIcon,
 		LinkIcon,
 		Delete,
+		NcEmojiPicker,
 	},
 
 	filters: {
@@ -233,6 +265,8 @@ export default {
 			loadingViewShares: true,
 			viewShares: {},
 			tableShares: [],
+			tableTitle: null,
+			tableEmoji: null,
 		}
 	},
 	computed: {
@@ -255,8 +289,35 @@ export default {
 	},
 
 	methods: {
-		deleteTable() {
-			emit('tables:table:delete', this.table)
+		startEditingTableTitle() {
+			this.tableTitle = this.table.title
+
+			this.$nextTick(() => {
+				this.$refs.tableTitle.focus()
+			})
+		},
+
+		async updateTableEmoji(emoji) {
+			const res = await this.$store.dispatch('updateTable', { id: this.table.id, data: { title: this.table.title, emoji } })
+			if (res) {
+				showSuccess(t('tables', 'Updated table "{emoji}{table}".', { emoji: emoji ? emoji + ' ' : '', table: this.table.title }))
+			}
+		},
+
+		async updateTableTitle() {
+			if (this.tableTitle === '' || this.tableTitle === null) {
+				showError(t('tables', 'Cannot update table. Title is missing.'))
+			} else {
+				const res = await this.$store.dispatch('updateTable', { id: this.table.id, data: { title: this.tableTitle, emoji: this.table.emoji } })
+				if (res) {
+					showSuccess(t('tables', 'Updated table "{emoji}{table}".', { emoji: this.icon ? this.icon + ' ' : '', table: this.tableTitle }))
+					this.tableTitle = null
+				}
+			}
+		},
+
+		deleteTable(table) {
+			emit('tables:table:delete', table)
 		},
 		async getSharesForViewFromBE(viewId) {
 			try {
@@ -305,6 +366,7 @@ export default {
 
 .table td .inline {
 	display: inline-flex;
+	align-items: center;
 }
 
 .table th,
@@ -325,10 +387,6 @@ export default {
 .table th {
 	color: var(--color-text-maxcontrast);
 	box-shadow: inset 0 -1px 0 var(--color-border);
-}
-
-.table tr:hover, .table tr:hover td {
-	background-color: var(--color-background-dark) !important;
 }
 
 .dashboard-content {

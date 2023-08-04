@@ -52,6 +52,7 @@ return [
 		['name' => 'table#index', 'url' => '/table', 'verb' => 'GET'],
 		['name' => 'table#show', 'url' => '/table/{id}', 'verb' => 'GET'],
 		['name' => 'table#create', 'url' => '/table', 'verb' => 'POST'],
+		['name' => 'table#update', 'url' => '/table/{id}', 'verb' => 'PUT'],
 		['name' => 'table#destroy', 'url' => '/table/{id}', 'verb' => 'DELETE'],
 
 		// view
