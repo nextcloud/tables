@@ -45,6 +45,10 @@ export class AbstractColumn {
 		return false
 	}
 
+	getValueString(valueObject) {
+		return valueObject.value
+	}
+
 }
 
 export class AbstractNumberColumn extends AbstractColumn {

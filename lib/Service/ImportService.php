@@ -29,10 +29,12 @@ class ImportService extends SuperService {
 	private IRootFolder $rootFolder;
 	private ColumnService $columnService;
 	private RowService $rowService;
+	private TableService $tableService;
 	private ViewService $viewService;
 	private IUserManager $userManager;
 
-	private int $viewId = -1;
+	private ?int $tableId = null;
+	private ?int $viewId = null;
 	private array $columns = [];
 	private bool $createUnknownColumns = true;
 	private int $countMatchingColumns = 0;
@@ -42,11 +44,12 @@ class ImportService extends SuperService {
 	private int $countParsingErrors = 0;
 
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-		IRootFolder $rootFolder, ColumnService $columnService, RowService $rowService, ViewService $viewService, IUserManager $userManager) {
+		IRootFolder $rootFolder, ColumnService $columnService, RowService $rowService, TableService $tableService, ViewService $viewService, IUserManager $userManager) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->rootFolder = $rootFolder;
 		$this->columnService = $columnService;
 		$this->rowService = $rowService;
+		$this->tableService = $tableService;
 		$this->viewService = $viewService;
 		$this->userManager = $userManager;
 	}
@@ -62,21 +65,33 @@ class ImportService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function import(int $viewId, string $path, bool $createMissingColumns = true): array {
-		$view = $this->viewService->find($viewId);
-		if (!$this->permissionsService->canCreateRows($view)) {
-			throw new PermissionError('create row at the view id = '.$viewId.' is not allowed.');
+	public function import(?int $tableId, ?int $viewId, string $path, bool $createMissingColumns = true): array {
+		if ($viewId !== null) {
+			$view = $this->viewService->find($viewId);
+			if (!$this->permissionsService->canCreateRows($view)) {
+				throw new PermissionError('create row at the view id = '.$viewId.' is not allowed.');
+			}
+			if ($createMissingColumns && !$this->permissionsService->canManageTableById($view->getTableId())) {
+				throw new PermissionError('create columns at the view id = '.$viewId.' is not allowed.');
+			}
+			$this->viewId = $viewId;
+		} else {
+			$table = $this->tableService->find($tableId);
+			if (!$this->permissionsService->canCreateRows($table, 'table')) {
+				throw new PermissionError('create row at the view id = '.$viewId.' is not allowed.');
+			}
+			if ($createMissingColumns && !$this->permissionsService->canManageTable($table)) {
+				throw new PermissionError('create columns at the view id = '.$viewId.' is not allowed.');
+			}
+			$this->tableId = $tableId;
 		}
-		if ($createMissingColumns && !$this->permissionsService->canManageTableById($view->getTableId())) {
-			throw new PermissionError('create columns at the view id = '.$viewId.' is not allowed.');
-		}
+
 		if ($this->userManager->get($this->userId) === null) {
 			$error = 'No user in context, can not import data. Cancel.';
 			$this->logger->debug($error);
 			throw new InternalError($error);
 		}
 
-		$this->viewId = $viewId;
 		$this->createUnknownColumns = $createMissingColumns;
 
 		try {
@@ -197,7 +212,7 @@ class ImportService extends SuperService {
 			];
 		}
 		try {
-			$this->rowService->create(null, $this->viewId, $data);
+			$this->rowService->create($this->tableId, $this->viewId, $data);
 			$this->countInsertedRows++;
 		} catch (PermissionError $e) {
 			$this->logger->error('Could not create row while importing, no permission.', ['exception' => $e]);
@@ -229,7 +244,7 @@ class ImportService extends SuperService {
 			}
 		}
 		try {
-			$this->columns = $this->columnService->findOrCreateColumnsByTitleForTableAsArray($this->viewId, $titles, $this->userId, $this->createUnknownColumns, $this->countCreatedColumns, $this->countMatchingColumns);
+			$this->columns = $this->columnService->findOrCreateColumnsByTitleForTableAsArray($this->tableId, $this->viewId, $titles, $this->userId, $this->createUnknownColumns, $this->countCreatedColumns, $this->countMatchingColumns);
 		} catch (Exception $e) {
 			throw new InternalError($e->getMessage());
 		}

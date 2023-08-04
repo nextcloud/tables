@@ -405,13 +405,13 @@ class ColumnService extends SuperService {
 	 * @throws PermissionError
 	 * @throws \OCP\DB\Exception
 	 */
-	public function findOrCreateColumnsByTitleForTableAsArray(int $viewId, array $titles, ?string $userId, bool $createUnknownColumns, int &$countCreatedColumns, int &$countMatchingColumns): array {
+	public function findOrCreateColumnsByTitleForTableAsArray(?int $tableId, ?int $viewId, array $titles, ?string $userId, bool $createUnknownColumns, int &$countCreatedColumns, int &$countMatchingColumns): array {
 		$result = [];
 
 		if($userId === null) {
 			$userId = $this->userId;
 		}
-		$allColumns = $this->findAllByView($viewId);
+		$allColumns = $viewId !== null ? $this->findAllByView($viewId) : $this->findAllByTable($tableId);
 		$i = -1;
 		foreach ($titles as $title) {
 			$i++;
@@ -430,7 +430,7 @@ class ColumnService extends SuperService {
 			// if column was not found
 			if($result[$i] === '' && $createUnknownColumns) {
 				$description = $this->l->t('This column was automatically created by the import service.');
-				$result[$i] = $this->create($userId, null, $viewId, 'text', 'line', $title, false, $description, null, null, null, null, null, null, null, null, null, null, null, null, []);
+				$result[$i] = $this->create($userId, $tableId, $viewId, 'text', 'line', $title, false, $description, null, null, null, null, null, null, null, null, null, null, null, null, []);
 				$countCreatedColumns++;
 			}
 		}

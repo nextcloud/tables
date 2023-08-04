@@ -18,7 +18,7 @@
 							:open-state.sync="openedColumnHeaderMenus[col.id]"
 							:can-hide="visibleColumns.length > 1"
 							:element="element"
-							:is-view="isView"
+							:config="config"
 							@add-filter="filter => $emit('add-filter', filter)" />
 					</div>
 					<div v-if="getFilterForColumn(col)" class="filter-wrapper">
@@ -34,84 +34,24 @@
 			</div>
 		</th>
 		<th data-cy="customTableAction">
-			<NcActions :force-menu="true" :type="isViewSettingSet ? 'secondary' : 'tertiary'">
-				<NcActionCaption v-if="canManageElement(element)" :title="t('tables', 'Manage view')" />
-				<NcActionButton v-if="canManageElement(element) && isView"
-					:close-after-click="true"
-					@click="editView()">
-					<template #icon>
-						<PlaylistEdit :size="20" decorative />
-					</template>
-					{{ t('tables', 'Edit view') }}
-				</NcActionButton>
-				<NcActionButton v-if="isView ? canManageTable(element) : canManageElement(element)" :close-after-click="true" @click="$emit('create-column')">
-					<template #icon>
-						<TableColumnPlusAfter :size="20" decorative title="" />
-					</template>
-					{{ t('tables', 'Create column') }}
-				</NcActionButton>
-
-				<NcActionCaption :title="t('tables', 'Integration')" />
-				<NcActionButton v-if="canCreateRowInElement(element)"
-					:close-after-click="true"
-					@click="$emit('import', element)">
-					<template #icon>
-						<IconImport :size="20" decorative title="Import" />
-					</template>
-					{{ t('tables', 'Import') }}
-				</NcActionButton>
-				<NcActionButton v-if="canReadData(element)" :close-after-click="true"
-					icon="icon-download"
-					@click="downloadCSV">
-					{{ t('tables', 'Export as CSV') }}
-				</NcActionButton>
-				<NcActionButton v-if="canShareElement(element)"
-					:close-after-click="true"
-					icon="icon-share"
-					@click="toggleShare">
-					{{ t('tables', 'Share') }}
-				</NcActionButton>
-				<NcActionButton
-					:close-after-click="true"
-					@click="actionShowIntegration">
-					{{ t('tables', 'Integration') }}
-					<template #icon>
-						<Creation :size="20" />
-					</template>
-				</NcActionButton>
-			</NcActions>
+			<slot name="actions" />
 		</th>
 	</tr>
 </template>
 
 <script>
-import { NcCheckboxRadioSwitch, NcActions, NcActionButton, NcActionCaption } from '@nextcloud/vue'
-import { emit } from '@nextcloud/event-bus'
-import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
-import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
-import IconImport from 'vue-material-design-icons/Import.vue'
-import Creation from 'vue-material-design-icons/Creation.vue'
+import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
 import FilterLabel from './FilterLabel.vue'
-import permissionsMixin from '../mixins/permissionsMixin.js'
 import { mapGetters } from 'vuex'
 
 export default {
 
 	components: {
-		PlaylistEdit,
-		IconImport,
 		FilterLabel,
 		NcCheckboxRadioSwitch,
 		TableHeaderColumnOptions,
-		NcActions,
-		NcActionButton,
-		TableColumnPlusAfter,
-		NcActionCaption,
-		Creation,
 	},
-
-	mixins: [permissionsMixin],
 
 	props: {
 		columns: {
@@ -134,9 +74,9 @@ export default {
 			type: Object,
 			default: null,
 		},
-		isView: {
-			type: Boolean,
-			default: false,
+		config: {
+			type: Object,
+			default: null,
 		},
 	},
 
@@ -158,15 +98,9 @@ export default {
 		visibleColumns() {
 			return this.columns.filter(col => !this.viewSetting?.hiddenColumns?.includes(col.id))
 		},
-		isViewSettingSet() {
-			return !(!this.viewSetting || ((!this.viewSetting.hiddenColumns || this.viewSetting.hiddenColumns.length === 0) && (!this.viewSetting.sorting) && (!this.viewSetting.filter || this.viewSetting.filter.length === 0)))
-		},
 	},
 
 	methods: {
-		editView() {
-			emit('tables:view:edit', this.element)
-		},
 		updateOpenState(columnId) {
 			this.openedColumnHeaderMenus[columnId] = !this.openedColumnHeaderMenus[columnId]
 			this.openedColumnHeaderMenus = Object.assign({}, this.openedColumnHeaderMenus)
@@ -174,23 +108,11 @@ export default {
 		getFilterForColumn(column) {
 			return this.viewSetting?.filter?.filter(item => item.columnId === column.id)
 		},
-		downloadCSV() {
-			this.$emit('download-csv', this.rows)
-		},
-		toggleShare() {
-			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
-		},
 		hasRightHiddenNeighbor(colId) {
 			return this.viewSetting?.hiddenColumns?.includes(this.columns[this.columns.indexOf(this.columns.find(col => col.id === colId)) + 1]?.id)
 		},
 		unhide(colId) {
 			this.$store.dispatch('unhideColumn', { columnId: this.columns[this.columns.indexOf(this.columns.find(col => col.id === colId)) + 1]?.id })
-		},
-		createView() {
-			emit('create-view', this.activeView.tableId)
-		},
-		async actionShowIntegration() {
-			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
 		},
 	},
 }

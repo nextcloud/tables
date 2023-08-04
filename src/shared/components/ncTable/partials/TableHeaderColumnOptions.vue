@@ -96,13 +96,13 @@
 					</template>
 					{{ t('tables', 'Hide column') }}
 				</NcActionButton>
-				<NcActionButton v-if="column.id >= 0 && (isView ? canManageTable(element) : canManageElement(element))" @click="editColumn()">
+				<NcActionButton v-if="column.id >= 0 && config.canEditColumns" @click="editColumn()">
 					<template #icon>
 						<Pencil :size="25" />
 					</template>
 					{{ t('tables', 'Edit column') }}
 				</NcActionButton>
-				<NcActionButton v-if="column.id >= 0 && (isView ? canManageTable(element) : canManageElement(element))" @click="deleteColumn()">
+				<NcActionButton v-if="column.id >= 0 && config.canDeleteColumns" @click="deleteColumn()">
 					<template #icon>
 						<Delete :size="25" />
 					</template>
@@ -127,7 +127,6 @@ import { NcActions, NcActionButton, NcActionInput, NcActionButtonGroup, NcAction
 import { mapState } from 'vuex'
 import { AbstractColumn } from '../mixins/columnClass.js'
 import { FilterIds } from '../mixins/filter.js'
-import permissionsMixin from '../mixins/permissionsMixin.js'
 import { emit } from '@nextcloud/event-bus'
 
 export default {
@@ -147,7 +146,7 @@ export default {
 		SortDesc,
 		NcActionButtonGroup,
 	},
-	mixins: [generalHelper, permissionsMixin],
+	mixins: [generalHelper],
 	props: {
 		column: {
 		      type: AbstractColumn,
@@ -165,9 +164,9 @@ export default {
 			type: Object,
 			default: () => {},
 		},
-		isView: {
-			type: Boolean,
-			default: false,
+		config: {
+			type: Object,
+			default: null,
 		},
 	},
 	data() {

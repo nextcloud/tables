@@ -27,7 +27,7 @@
 							{{ t('tables', 'Create missing columns') }}
 						</NcCheckboxRadioSwitch>
 					</div>
-					<p v-if="!canManageTable(view)" class="fix-col-2 span">
+					<p v-if="(isElementView && !canManageTable(element)) || !canManageElement(element)" class="fix-col-2 span">
 						{{ t('tables', '⚠️ You don\'t have the permission to create columns.') }}
 					</p>
 				</RowFormWrapper>
@@ -162,10 +162,14 @@ export default {
 			type: Boolean,
 			default: false,
 		},
-		view: {
-		      type: Object,
-		      default: null,
-		    },
+		element: {
+			type: Object,
+			default: null,
+		},
+		isElementView: {
+			type: Boolean,
+			default: true,
+		},
 	},
 
 	data() {
@@ -180,17 +184,17 @@ export default {
 	},
 
 	computed: {
-		...mapGetters(['activeView']),
+		...mapGetters(['activeElement', 'isView']),
 		canCreateMissingColumns() {
-			return this.canManageTable(this.view)
+			return this.isElementView ? this.canManageTable(this.element) : this.canManageElement(this.element)
 		},
 		getCreateMissingColumns() {
-			return this.canManageTable(this.view) && this.createMissingColumns
+			return this.canCreateMissingColumns && this.createMissingColumns
 		},
 	},
 	watch: {
-		view() {
-			if (this.view) {
+		element() {
+			if (this.element) {
 				this.createMissingColumns = this.canCreateMissingColumns
 			}
 		},
@@ -198,13 +202,24 @@ export default {
 
 	methods: {
 		async actionCloseAndReload() {
-			// reload data if active view was affected
-			if (this.activeView.tableId === this.view.tableId) {
+			// reload data if active element was affected
+			if ((this.isView && this.isElementView && this.activeElement.tableId === this.element.tableId)
+			|| (this.isView && !this.isElementView && this.activeElement.tableId === this.element.id)
+			|| (!this.isView && this.isElementView && this.activeElement.id === this.element.tableId)
+			|| (!this.isView && !this.isElementView && this.activeElement.id === this.element.id)) {
 				this.waitForReload = true
 				await this.$store.dispatch('loadTablesFromBE')
 				await this.$store.dispatch('loadViewsSharedWithMeFromBE')
-				await this.$store.dispatch('loadColumnsFromBE', { view: this.view })
-				await this.$store.dispatch('loadRowsFromBE', { viewId: this.view.id })
+				await this.$store.dispatch('loadColumnsFromBE', {
+					view: this.isElementView ? this.element : null,
+					table: !this.isElementView ? this.element : null,
+				})
+				if (this.canReadData(this.element)) {
+					await this.$store.dispatch('loadRowsFromBE', {
+						viewId: this.isElementView ? this.element.id : null,
+						tableId: !this.isElementView ? this.element.id : null,
+					})
+				}
 				this.waitForReload = false
 			}
 
@@ -222,7 +237,7 @@ export default {
 		async import() {
 			this.loading = true
 			try {
-				const res = await axios.post(generateUrl('/apps/tables/import/view/' + this.view.id), { path: this.path, createMissingColumns: this.getCreateMissingColumns })
+				const res = await axios.post(generateUrl('/apps/tables/import/' + (this.isElementView ? 'view' : 'table') + '/' + this.element.id), { path: this.path, createMissingColumns: this.getCreateMissingColumns })
 				if (res.status === 200) {
 					this.result = res.data
 					this.loading = false

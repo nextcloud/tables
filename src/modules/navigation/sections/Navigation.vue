@@ -55,7 +55,11 @@
 			</div>
 
 			<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
-			<Import :show-modal="importToView !== null" :view="importToView" @close="importToView = null" />
+			<Import
+				:show-modal="importToElement !== null"
+				:element="importToElement?.element"
+				:is-element-view="importToElement?.isView"
+				@close="importToElement = null" />
 			<ViewSettings :view="{tableId: createViewTableId, sort: [], filter: []}" :create-view="true" :show-modal="createViewTableId !== null" @close="createViewTableId = null" />
 		</template>
 	</NcAppNavigation>
@@ -93,7 +97,7 @@ export default {
 		return {
 			loading: true,
 			showModalCreateTable: false,
-			importToView: null,
+			importToElement: null,
 			createViewTableId: null, // if null, no modal open
 			filterString: '',
 		}
@@ -119,12 +123,12 @@ export default {
 	mounted() {
 		subscribe('create-view', tableId => { this.createViewTableId = tableId })
 		subscribe('create-table', this.createTable)
-		subscribe('tables:modal:import', table => { this.importToView = table })
+		subscribe('tables:modal:import', element => { this.importToElement = element })
 	},
 	beforeDestroy() {
 		unsubscribe('create-view', tableId => { this.createViewTableId = tableId })
 		unsubscribe('create-table', this.createTable)
-		unsubscribe('tables:modal:import', table => { this.importToView = table })
+		unsubscribe('tables:modal:import', element => { this.importToElement = element })
 	},
 	methods: {
 		createTable() {
