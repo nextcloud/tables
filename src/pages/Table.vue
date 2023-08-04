@@ -1,16 +1,20 @@
 <template>
-	<MainWrapper :element="activeTable" :is-view="false" />
+	<div>
+		<MainWrapper :element="activeTable" :is-view="false" />
+		<MainModals />
+	</div>
 </template>
 
 <script>
 
 import { mapGetters, mapState } from 'vuex'
-import MainWrapper from './MainWrapper.vue'
+import MainWrapper from '../modules/main/sections/MainWrapper.vue'
+import MainModals from '../modules/main/modals/Modals.vue'
 
 export default {
-	name: 'MainDashboardWrapper',
 	components: {
 		MainWrapper,
+		MainModals,
 	},
 
 	computed: {
@@ -20,6 +24,12 @@ export default {
 
 	watch: {
 		activeTableId() {
+			if (this.activeTableId && !this.activeTable) {
+				// table does not exists, go to startpage
+				this.$router.push('/').catch(err => err)
+			}
+		},
+		activeTable() {
 			if (this.activeTableId && !this.activeTable) {
 				// table does not exists, go to startpage
 				this.$router.push('/').catch(err => err)

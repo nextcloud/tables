@@ -27,7 +27,7 @@ export default {
 	},
 	methods: {
 		editView() {
-			emit('tables:view:edit', this.activeView)
+			emit('tables:view:edit', { view: this.activeView, viewSetting: {} })
 		},
 	},
 }

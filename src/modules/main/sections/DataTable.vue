@@ -1,35 +1,37 @@
 <template>
 	<div>
-		<ElementDescription :active-element="view" :is-table="false" :view-setting="viewSetting" />
-		<div class="table-wrapper">
-			<EmptyView v-if="columns.length === 0" />
+		<div class="row space-T space-B">
+			<div class="col-4 space-L">
+				<h2>{{ t('tables', 'Data') }}</h2>
+			</div>
+			<EmptyTable v-if="columns.length === 0" :table="table" @create-column="showCreateColumn = true" />
 			<TableView v-else
 				:rows="rows"
 				:columns="columns"
-				:element="view"
+				:element="table"
 				:view-setting="viewSetting"
-				:is-view="true"
+				:is-view="false"
 				:selected-rows.sync="localSelectedRows"
-				:can-read-rows="canReadData(view)"
-				:can-create-rows="canCreateRowInElement(view)"
-				:can-edit-rows="canUpdateData(view)"
-				:can-delete-rows="canDeleteData(view)"
-				:can-create-columns="canManageTable(view)"
-				:can-edit-columns="canManageTable(view)"
-				:can-delete-columns="canManageTable(view)"
-				:can-delete-table="canManageTable(view)">
+				:can-read-rows="canReadData(table)"
+				:can-create-rows="canCreateRowInElement(table)"
+				:can-edit-rows="canUpdateData(table)"
+				:can-delete-rows="canDeleteData(table)"
+				:can-create-columns="canManageTable(table)"
+				:can-edit-columns="canManageTable(table)"
+				:can-delete-columns="canManageTable(table)"
+				:can-delete-table="canManageTable(table)">
 				<template #actions>
 					<NcActions :force-menu="true" :type="isViewSettingSet ? 'secondary' : 'tertiary'">
-						<NcActionCaption v-if="canManageElement(view)" :title="t('tables', 'Manage view')" />
-						<NcActionButton v-if="canManageElement(view) "
+						<NcActionCaption v-if="canManageElement(table)" :title="t('tables', 'Manage table')" />
+						<NcActionButton v-if="canManageElement(table) "
 							:close-after-click="true"
-							@click="editView">
+							@click="$emit('create-view')">
 							<template #icon>
-								<PlaylistEdit :size="20" decorative />
+								<PlaylistPlus :size="20" decorative />
 							</template>
-							{{ t('tables', 'Edit view') }}
+							{{ t('tables', 'Create view') }}
 						</NcActionButton>
-						<NcActionButton v-if="canManageTable(view)" :close-after-click="true" @click="$emit('create-column')">
+						<NcActionButton v-if="canManageTable(table)" :close-after-click="true" @click="$emit('create-column')">
 							<template #icon>
 								<TableColumnPlusAfter :size="20" decorative title="" />
 							</template>
@@ -37,20 +39,20 @@
 						</NcActionButton>
 
 						<NcActionCaption :title="t('tables', 'Integration')" />
-						<NcActionButton v-if="canCreateRowInElement(view)"
+						<NcActionButton v-if="canCreateRowInElement(table)"
 							:close-after-click="true"
-							@click="$emit('import', view)">
+							@click="$emit('import', table)">
 							<template #icon>
-								<IconImport :size="20" decorative title="Import" />
+								<Import :size="20" decorative title="Import" />
 							</template>
 							{{ t('tables', 'Import') }}
 						</NcActionButton>
-						<NcActionButton v-if="canReadData(view)" :close-after-click="true"
+						<NcActionButton v-if="canReadData(table)" :close-after-click="true"
 							icon="icon-download"
 							@click="$emit('download-csv')">
 							{{ t('tables', 'Export as CSV') }}
 						</NcActionButton>
-						<NcActionButton v-if="canShareElement(view)"
+						<NcActionButton v-if="canShareElement(table)"
 							:close-after-click="true"
 							icon="icon-share"
 							@click="$emit('toggle-share')">
@@ -72,38 +74,32 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-import TableView from './TableView.vue'
-
-import EmptyView from '../modules/main/sections/EmptyView.vue'
-import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
-import { emit } from '@nextcloud/event-bus'
-import { NcActions, NcActionButton, NcActionCaption } from '@nextcloud/vue'
+import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
-import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
-import IconImport from 'vue-material-design-icons/Import.vue'
+import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
+import TableView from '../partials/TableView.vue'
+import EmptyTable from './EmptyTable.vue'
 import Creation from 'vue-material-design-icons/Creation.vue'
-import ElementDescription from '../modules/main/sections/ElementDescription.vue'
+import Import from 'vue-material-design-icons/Import.vue'
+import { NcActionButton, NcActions, NcActionCaption } from '@nextcloud/vue'
 
 export default {
-	name: 'DefaultMainView',
 	components: {
-		EmptyView,
 		TableView,
-		PlaylistEdit,
-		IconImport,
-		NcActions,
 		NcActionButton,
-		TableColumnPlusAfter,
-		NcActionCaption,
 		Creation,
-		ElementDescription,
+		NcActionCaption,
+		NcActions,
+		TableColumnPlusAfter,
+		PlaylistPlus,
+		EmptyTable,
+		Import,
 	},
 
 	mixins: [permissionsMixin],
 
 	props: {
-		view: {
+		table: {
 			type: Object,
 			default: null,
 		},
@@ -123,18 +119,14 @@ export default {
 			type: Array,
 			default: null,
 		},
-
 	},
 
 	data() {
 		return {
-			localLoading: false,
-			lastActiveViewId: null,
 			localSelectedRows: this.selectedRows,
 		}
 	},
 	computed: {
-		...mapState(['activeRowId']),
 		isViewSettingSet() {
 			return !(!this.viewSetting || ((!this.viewSetting.hiddenColumns || this.viewSetting.hiddenColumns.length === 0) && (!this.viewSetting.sorting) && (!this.viewSetting.filter || this.viewSetting.filter.length === 0)))
 		},
@@ -142,11 +134,6 @@ export default {
 	watch: {
 		localSelectedRows() {
 			this.$emit('update:selectedRows', this.localSelectedRows)
-		},
-	},
-	methods: {
-		editView() {
-			emit('tables:view:edit', this.view)
 		},
 	},
 }
