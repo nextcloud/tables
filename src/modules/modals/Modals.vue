@@ -115,7 +115,7 @@ export default {
 		unsubscribe('tables:column:edit', column => { this.columnToEdit = column })
 		unsubscribe('tables:column:delete', column => { this.columnToDelete = column })
 		unsubscribe('tables:row:create', columns => { this.columnsForRow = columns })
-		subscribe('tables:row:edit', row => { this.editRow = row })
+		unsubscribe('tables:row:edit', row => { this.editRow = row })
 		unsubscribe('tables:row:delete', rows => { this.rowsToDelete = rows })
 		unsubscribe('tables:view:edit', view => { this.viewToEdit = { view, createView: false } })
 		unsubscribe('tables:view:create', tableId => {
