@@ -289,6 +289,7 @@ export default {
 	},
 
 	methods: {
+		emit,
 		startEditingTableTitle() {
 			this.tableTitle = this.table.title
 
