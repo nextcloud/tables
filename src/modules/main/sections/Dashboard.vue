@@ -317,8 +317,8 @@ export default {
 			}
 		},
 
-		deleteTable(table) {
-			emit('tables:table:delete', table)
+		deleteTable() {
+			emit('tables:table:delete', this.table)
 		},
 		async getSharesForViewFromBE(viewId) {
 			try {
