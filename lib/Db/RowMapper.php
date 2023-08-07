@@ -86,13 +86,14 @@ class RowMapper extends QBMapper {
 
 	private function buildFilterByColumnType($qb, array $filter, string $filterId): string {
 		try {
-			$qbClassName = 'OCA\Tables\Db\ColumnTypes\\';
+			$columnQbClassName = 'OCA\Tables\Db\ColumnTypes\\';
 			$type = explode("-", $filter['columnType'])[0];
 
-			$qbClassName .= ucfirst($type).'ColumnQB';
+			$columnQbClassName .= ucfirst($type).'ColumnQB';
 
-			$qbClass = Server::get($qbClassName);
-			return $qbClass->addWhereFilterExpression($qb, $filter, $filterId);
+			/** @var IColumnTypeQB $columnQb */
+			$columnQb = Server::get($columnQbClassName);
+			return $columnQb->addWhereFilterExpression($qb, $filter, $filterId);
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 			$this->logger->debug('Column type query builder class not found');
 		}
@@ -213,12 +214,13 @@ class RowMapper extends QBMapper {
 	}
 
 
-	private function addFilterToQuery(IQueryBuilder $qb, View $view, array $neededColumns, string $userId): void {
+	private function addFilterToQuery(IQueryBuilder $qb, View $view, array $neededColumnTypes, string $userId): void {
 		$enrichedFilters = $view->getFilterArray();
 		if (count($enrichedFilters) > 0) {
 			foreach ($enrichedFilters as &$filterGroup) {
 				foreach ($filterGroup as &$filter) {
-					$filter['columnType'] = $neededColumns[$filter['columnId']];
+					$filter['columnType'] = $neededColumnTypes[$filter['columnId']];
+					// TODO move resolution for magic fields to service layer
 					if(str_starts_with($filter['value'], '@')) {
 						$filter['value'] = $this->resolveSearchValue($filter['value'], $userId);
 					}
@@ -271,17 +273,17 @@ class RowMapper extends QBMapper {
 
 
 		$neededColumnIds = $this->getAllColumnIdsFromView($view);
-		$neededColumns = $this->columnMapper->getColumnTypes($neededColumnIds);
+		$neededColumnsTypes = $this->columnMapper->getColumnTypes($neededColumnIds);
 
 		// Filter
 
-		$this->addFilterToQuery($qb, $view, $neededColumns, $userId);
+		$this->addFilterToQuery($qb, $view, $neededColumnsTypes, $userId);
 
 		// Sorting
 
 		$enrichedSort = $view->getSortArray();
 		foreach ($enrichedSort as &$sort) {
-			$sort['columnType'] = $neededColumns[$sort['columnId']];
+			$sort['columnType'] = $neededColumnsTypes[$sort['columnId']];
 		}
 		$this->addOrderByRules($qb, $enrichedSort);
 
