@@ -161,7 +161,7 @@ class TableService extends SuperService {
 		try {
 			$table->setColumnsCount($this->columnService->getColumnsCount($table->getId()));
 		} catch (InternalError|PermissionError $e) {
-			$table->setRowsCount(0);
+			$table->setColumnsCount(0);
 		}
 
 		// set if this is a shared table with you (somebody else shared it with you)

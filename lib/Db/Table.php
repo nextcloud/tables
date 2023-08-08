@@ -25,7 +25,7 @@ use OCP\AppFramework\Db\Entity;
  * @method getRowsCount(): int
  * @method setRowsCount(int $rowsCount)
  * @method getColumnsCount(): int
- * @method setColumnsCount(int $rowsCount)
+ * @method setColumnsCount(int $columnsCount)
  * @method getViews(): array
  * @method setViews(array $views)
  * @method getColumns(): array

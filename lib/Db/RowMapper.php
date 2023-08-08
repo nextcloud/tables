@@ -33,6 +33,8 @@ class RowMapper extends QBMapper {
 	protected LoggerInterface $logger;
 	protected UserHelper $userHelper;
 
+	protected int $platform;
+
 	public function __construct(IDBConnection $db, LoggerInterface $logger, TextColumnQB $textColumnQB, SelectionColumnQB $selectionColumnQB, NumberColumnQB $numberColumnQB, DatetimeColumnQB $datetimeColumnQB, SuperColumnQB $columnQB, ColumnMapper $columnMapper, UserHelper $userHelper) {
 		parent::__construct($db, $this->table, Row::class);
 		$this->logger = $logger;
@@ -48,24 +50,17 @@ class RowMapper extends QBMapper {
 
 	private function setPlatform() {
 		if (str_contains(strtolower(get_class($this->db->getDatabasePlatform())), 'postgres')) {
-			$this->genericColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_PGSQL);
-			$this->textColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_PGSQL);
-			$this->numberColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_PGSQL);
-			$this->selectionColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_PGSQL);
-			$this->datetimeColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_PGSQL);
+			$this->platform = IColumnTypeQB::DB_PLATFORM_PGSQL;
 		} elseif (str_contains(strtolower(get_class($this->db->getDatabasePlatform())), 'sqlite')) {
-			$this->genericColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_SQLITE);
-			$this->textColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_SQLITE);
-			$this->numberColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_SQLITE);
-			$this->selectionColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_SQLITE);
-			$this->datetimeColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_SQLITE);
+			$this->platform = IColumnTypeQB::DB_PLATFORM_SQLITE;
 		} else {
-			$this->genericColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_MYSQL);
-			$this->textColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_MYSQL);
-			$this->numberColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_MYSQL);
-			$this->selectionColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_MYSQL);
-			$this->datetimeColumnQB->setPlatform(IColumnTypeQB::DB_PLATFORM_MYSQL);
+			$this->platform = IColumnTypeQB::DB_PLATFORM_MYSQL;
 		}
+		$this->genericColumnQB->setPlatform($this->platform);
+		$this->textColumnQB->setPlatform($this->platform);
+		$this->numberColumnQB->setPlatform($this->platform);
+		$this->selectionColumnQB->setPlatform($this->platform);
+		$this->datetimeColumnQB->setPlatform($this->platform);
 	}
 
 	/**
@@ -78,8 +73,8 @@ class RowMapper extends QBMapper {
 	 */
 	public function find(int $id): Row {
 		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->table)
+		$qb->select('t1.*')
+			->from($this->table, 't1')
 			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
 		return $this->findEntity($qb);
 	}
@@ -147,10 +142,22 @@ class RowMapper extends QBMapper {
 				continue;
 			}
 			$sortColumnPlaceholder = 'sortColumn'.$index;
-			$orderString = 'JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'$[*].columnId\'), \'one\', :'.$sortColumnPlaceholder.')), \'.value\'))';
-			if (str_starts_with($sortRule['columnType'], 'number')) {
-				$orderString = 'CAST('.$orderString.' as int)';
+			if ($sortRule['columnId'] < 0) {
+				$orderString = ':'.$sortColumnPlaceholder;
+			} else {
+				if ($this->platform === IColumnTypeQB::DB_PLATFORM_PGSQL) {
+					$orderString = 'c'.$sortRule['columnId'].'->>\'value\'';
+				} elseif ($this->platform === IColumnTypeQB::DB_PLATFORM_SQLITE) {
+					// TODO DB BE SQLITE
+					$orderString = '';
+				} else { // mariadb / mysql
+					$orderString = 'JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'$[*].columnId\'), \'one\', :'.$sortColumnPlaceholder.')), \'.value\'))';
+				}
+				if (str_starts_with($sortRule['columnType'], 'number')) {
+					$orderString = 'CAST('.$orderString.' as decimal)';
+				}
 			}
+
 			$qb->addOrderBy($qb->createFunction($orderString), $sortMode);
 			$qb->setParameter($sortColumnPlaceholder, $sortRule['columnId'], IQueryBuilder::PARAM_INT);
 		}
@@ -164,11 +171,11 @@ class RowMapper extends QBMapper {
 	 */
 	public function countRowsForView(View $view, $userId): int {
 		$qb = $this->db->getQueryBuilder();
-		$qb->select($qb->func()->count('*', 'counter'))
-			->from($this->table)
+		$qb->select($qb->func()->count('t1.*', 'counter'))
+			->from($this->table, 't1')
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), IQueryBuilder::PARAM_INT)));
 
-		$neededColumnIds = $this->getAllColumnIdsFromView($view);
+		$neededColumnIds = $this->getAllColumnIdsFromView($view, $qb);
 		try {
 			$neededColumns = $this->columnMapper->getColumnTypes($neededColumnIds);
 		} catch (Exception $e) {
@@ -191,11 +198,11 @@ class RowMapper extends QBMapper {
 
 	public function getRowIdsOfView(View $view, $userId): array {
 		$qb = $this->db->getQueryBuilder();
-		$qb->select('id')
-			->from($this->table)
+		$qb->select('t1.id')
+			->from($this->table,'t1')
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), IQueryBuilder::PARAM_INT)));
 
-		$neededColumnIds = $this->getAllColumnIdsFromView($view);
+		$neededColumnIds = $this->getAllColumnIdsFromView($view, $qb);
 		$neededColumns = $this->columnMapper->getColumnTypes($neededColumnIds);
 
 		// Filter
@@ -243,8 +250,8 @@ class RowMapper extends QBMapper {
 	 */
 	public function findAllByTable(int $tableId, ?int $limit = null, ?int $offset = null): array {
 		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->table)
+		$qb->select('t1.*')
+			->from($this->table, 't1')
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId)));
 
 		if ($limit !== null) {
@@ -267,12 +274,12 @@ class RowMapper extends QBMapper {
 	 */
 	public function findAllByView(View $view, string $userId, ?int $limit = null, ?int $offset = null): array {
 		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->table)
+		$qb->select('t1.*')
+			->from($this->table, 't1')
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), IQueryBuilder::PARAM_INT)));
 
 
-		$neededColumnIds = $this->getAllColumnIdsFromView($view);
+		$neededColumnIds = $this->getAllColumnIdsFromView($view, $qb);
 		$neededColumnsTypes = $this->columnMapper->getColumnTypes($neededColumnIds);
 
 		// Filter
@@ -302,7 +309,7 @@ class RowMapper extends QBMapper {
 		return $rows;
 	}
 
-	private function getAllColumnIdsFromView(View $view): array {
+	private function getAllColumnIdsFromView(View $view, IQueryBuilder $qb): array {
 		$neededColumnIds = [];
 		$filters = $view->getFilterArray();
 		$sorts = $view->getSortArray();
@@ -314,7 +321,16 @@ class RowMapper extends QBMapper {
 		foreach ($sorts as $sortRule) {
 			$neededColumnIds[] = $sortRule['columnId'];
 		}
-		return array_unique($neededColumnIds);
+		$neededColumnIds = array_unique($neededColumnIds);
+		if ($this->platform === IColumnTypeQB::DB_PLATFORM_PGSQL) {
+			foreach ($neededColumnIds as $columnId) {
+				if ($columnId >= 0) {
+					$qb->leftJoin("t1", $qb->createFunction('json_array_elements(t1.data)'), 'c' . intval($columnId),$qb->createFunction("CAST(c".intval($columnId).".value->>'columnId' AS int) = ".$columnId));
+					// TODO Security
+				}
+			}
+		}
+		return $neededColumnIds;
 	}
 
 	/**
@@ -324,8 +340,8 @@ class RowMapper extends QBMapper {
 	 */
 	public function findNext(int $offsetId = -1): Row {
 		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->table)
+		$qb->select('t1.*')
+			->from($this->table, 't1')
 			->where($qb->expr()->gt('id', $qb->createNamedParameter($offsetId)))
 			->setMaxResults(1)
 			->orderBy('id', 'ASC');
@@ -351,8 +367,8 @@ class RowMapper extends QBMapper {
 	 */
 	public function findAllWithColumn(int $columnId): array {
 		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->table);
+		$qb->select('t1.*')
+			->from($this->table, 't1');
 
 		$this->genericColumnQB->addWhereForFindAllWithColumn($qb, $columnId);
 
@@ -365,8 +381,8 @@ class RowMapper extends QBMapper {
 	 */
 	public function countRows(int $tableId): int {
 		$qb = $this->db->getQueryBuilder();
-		$qb->select($qb->func()->count('*', 'counter'));
-		$qb->from($this->table);
+		$qb->select($qb->func()->count('t1.*', 'counter'));
+		$qb->from($this->table, 't1');
 		$qb->where(
 			$qb->expr()->eq('table_id', $qb->createNamedParameter($tableId))
 		);
