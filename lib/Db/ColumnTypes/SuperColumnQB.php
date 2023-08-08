@@ -55,43 +55,32 @@ class SuperColumnQB implements IColumnTypeQB {
 	 * @return string
 	 * @throws InternalError
 	 */
-	private function buildSqlFilterString(string $operator, string $formattedCellValue, string $searchValuePlaceHolder, string $columnPlaceHolder = null) : string {
-		if ($this->platform === self::DB_PLATFORM_PGSQL) {
-			return "id IN (".
-						"SELECT id ".
-						"FROM oc_tables_rows, json_array_elements(data) as t1 ".
-						"WHERE CAST(t1->>'columnId' AS int) = :".$columnPlaceHolder." AND ".$formattedCellValue." LIKE :".$searchValuePlaceHolder.
-				")";
-		} elseif ($this->platform === self::DB_PLATFORM_SQLITE) {
-			// TODO DB BE SQLITE
-			return '';
-		} else { // mariadb / mysql
-			switch ($operator) {
-				case 'begins-with':
-				case 'ends-with':
-				case 'contains':
-					return $formattedCellValue.' LIKE :'.$searchValuePlaceHolder;
-				case 'is-equal':
-					return $formattedCellValue.' = :'.$searchValuePlaceHolder;
-				case 'is-greater-than':
-					return $formattedCellValue.' > :'.$searchValuePlaceHolder;
-				case 'is-greater-than-or-equal':
-					return $formattedCellValue.' >= :'.$searchValuePlaceHolder;
-				case 'is-lower-than':
-					return $formattedCellValue.' < :'.$searchValuePlaceHolder;
-				case 'is-lower-than-or-equal':
-					return $formattedCellValue.' <= :'.$searchValuePlaceHolder;
-				case 'is-empty':
-					return $formattedCellValue.' = \'\' OR '.$formattedCellValue.' IS NULL';
-				default:
-					throw new InternalError('Operator '.$operator.' is not supported.');
-			}
+	private function sqlFilterOperation(string $operator, string $formattedCellValue, string $searchValuePlaceHolder) : string {
+		switch ($operator) {
+			case 'begins-with':
+			case 'ends-with':
+			case 'contains':
+				return $formattedCellValue.' LIKE :'.$searchValuePlaceHolder;
+			case 'is-equal':
+				return $formattedCellValue.' = :'.$searchValuePlaceHolder;
+			case 'is-greater-than':
+				return $formattedCellValue.' > :'.$searchValuePlaceHolder;
+			case 'is-greater-than-or-equal':
+				return $formattedCellValue.' >= :'.$searchValuePlaceHolder;
+			case 'is-lower-than':
+				return $formattedCellValue.' < :'.$searchValuePlaceHolder;
+			case 'is-lower-than-or-equal':
+				return $formattedCellValue.' <= :'.$searchValuePlaceHolder;
+			case 'is-empty':
+				return $formattedCellValue.' = \'\' OR '.$formattedCellValue.' IS NULL';
+			default:
+				throw new InternalError('Operator '.$operator.' is not supported.');
 		}
 	}
 
-	private function getFormattedDataCellValue(string $columnPlaceHolder): string {
+	private function getFormattedDataCellValue(string $columnPlaceHolder, int $columnId): string {
 		if ($this->platform === self::DB_PLATFORM_PGSQL) {
-			$cellValue = 't1 ->> \'value\'';
+			$cellValue = 'c'.intval($columnId).' ->> \'value\'';
 		} elseif ($this->platform === self::DB_PLATFORM_SQLITE) {
 			// TODO DB BE SQLITE
 		} else {
@@ -106,14 +95,20 @@ class SuperColumnQB implements IColumnTypeQB {
 	 * @return string
 	 * @throws InternalError
 	 */
-	private function getFormattedMetaDataCellValue(int $metaId): string {
-		switch($metaId) {
-			case -1: return 'id';
-			case -2: return 'created_by';
-			case -3: return 'last_edit_by';
-			case -4: return 'created_at';
-			case -5: return 'last_edit_at';
-			default: throw new InternalError('No meta data column exists with id '.$metaId);
+	private function getMetaColumnName(int $metaId): string {
+		switch ($metaId) {
+			case -1:
+				return 'id';
+			case -2:
+				return 'created_by';
+			case -3:
+				return 'last_edit_by';
+			case -4:
+				return 'created_at';
+			case -5:
+				return 'last_edit_at';
+			default:
+				throw new InternalError('No meta data column exists with id ' . $metaId);
 		}
 	}
 
@@ -126,17 +121,25 @@ class SuperColumnQB implements IColumnTypeQB {
 	 */
 	public function addWhereFilterExpression(IQueryBuilder $qb, array $filter, string $filterId): IQueryFunction {
 		$searchValuePlaceHolder = 'searchValue'.$filterId; // qb parameter binding name
+		$this->passSearchValue($qb, $filter['value'], $filter['operator'], $searchValuePlaceHolder);
 		$columnPlaceHolder = 'column'.$filterId; // qb parameter binding name
-		if($filter['columnId'] >= 0) { // negative ids for meta data columns
-			$qb->setParameter($columnPlaceHolder, $filter['columnId'], IQueryBuilder::PARAM_INT);
-			$formattedCellValue = $this->getFormattedDataCellValue($columnPlaceHolder); // as sql string
-		} else {
-			$formattedCellValue = $this->getFormattedMetaDataCellValue($filter['columnId']); // as sql string
+		if($filter['columnId'] < 0) { // negative ids for meta data columns
+			return $qb->createFunction($this->sqlFilterOperation($filter['operator'], $this->getMetaColumnName($filter['columnId']), $searchValuePlaceHolder));
 		}
 
-		$this->passSearchValue($qb, $filter['value'], $filter['operator'], $searchValuePlaceHolder);
-		return $qb->createFunction($this->buildSqlFilterString($filter['operator'], $formattedCellValue, $searchValuePlaceHolder, $columnPlaceHolder));
+		$qb->setParameter($columnPlaceHolder, $filter['columnId'], IQueryBuilder::PARAM_INT);
+		$formattedCellValue = $this->getFormattedDataCellValue($columnPlaceHolder, $filter['columnId']); // as sql string
+		$filterOperation = $this->sqlFilterOperation($filter['operator'], $formattedCellValue, $searchValuePlaceHolder);
 
+		if ($this->platform === self::DB_PLATFORM_PGSQL) {
+			$sqlFilterString = $filterOperation;
+		} elseif ($this->platform === self::DB_PLATFORM_SQLITE) {
+			// TODO DB BE SQLITE
+			$sqlFilterString = '';
+		} else { // mariadb / mysql
+			$sqlFilterString = $filterOperation;
+		}
+		return $qb->createFunction($sqlFilterString);
 	}
 
 	public function addWhereForFindAllWithColumn(IQueryBuilder $qb, int $columnId): void {

@@ -443,7 +443,7 @@ class ColumnService extends SuperService {
 	 * @throws PermissionError
 	 */
 	public function getColumnsCount(int $tableId): int {
-		if ($this->permissionsService->canManageTableById($tableId)) {
+		if ($this->permissionsService->canReadColumnsByTableId($tableId)) {
 			return $this->mapper->countColumns($tableId);
 		} else {
 			throw new PermissionError('no read access for counting to table id = '.$tableId);
