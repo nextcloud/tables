@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="row space-T space-B">
-			<div class="col-4 space-L">
+			<div v-if="hasViews" class="col-4 space-L">
 				<h2>{{ t('tables', 'Data') }}</h2>
 			</div>
 			<EmptyTable v-if="columns.length === 0" :table="table" @create-column="showCreateColumn = true" />
@@ -82,6 +82,7 @@ import EmptyTable from './EmptyTable.vue'
 import Creation from 'vue-material-design-icons/Creation.vue'
 import Import from 'vue-material-design-icons/Import.vue'
 import { NcActionButton, NcActions, NcActionCaption } from '@nextcloud/vue'
+import { mapState } from 'vuex'
 
 export default {
 	components: {
@@ -127,6 +128,10 @@ export default {
 		}
 	},
 	computed: {
+		...mapState(['views']),
+		hasViews() {
+			return this.views.some(v => v.tableId === this.table.id)
+		},
 		isViewSettingSet() {
 			return !(!this.viewSetting || ((!this.viewSetting.hiddenColumns || this.viewSetting.hiddenColumns.length === 0) && (!this.viewSetting.sorting) && (!this.viewSetting.filter || this.viewSetting.filter.length === 0)))
 		},
