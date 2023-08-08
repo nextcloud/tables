@@ -364,6 +364,30 @@ class TableService extends SuperService {
 		}
 	}
 
+	/**
+	 * @param string $term
+	 * @param int $limit
+	 * @param int $offset
+	 * @param string|null $userId
+	 * @return array
+	 * @throws MultipleObjectsReturnedException
+	 * @throws PermissionError
+	 */
+	public function search(string $term, int $limit = 100, int $offset = 0, ?string $userId = null): array {
+		try {
+			/** @var string $userId */
+			$userId = $this->permissionsService->preCheckUserId($userId);
+			$tables = $this->mapper->search($term, $userId, $limit, $offset);
+			foreach ($tables as &$table) {
+				/** @var string $userId */
+				$this->enhanceTable($table, $userId);
+			}
+			return $tables;
+		} catch (InternalError | \OCP\DB\Exception $e) {
+			return [];
+		}
+	}
+
 	// PRIVATE FUNCTIONS ---------------------------------------------------------------
 
 	/**
