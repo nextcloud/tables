@@ -59,7 +59,7 @@ export default {
 	},
 	methods: {
 		createView() {
-			emit('tables:view:create', { tableId: this.table.id, viewSetting: this.viewSetting })
+			emit('tables:view:create', { tableId: this.table.id, viewSetting: this.viewSetting.length > 0 ? this.viewSetting : null })
 		},
 	},
 }
