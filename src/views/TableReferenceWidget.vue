@@ -45,6 +45,7 @@
 <script>
 import TablesIcon from '../icons/TablesIcon.vue'
 import { NcUserBubble, NcCounterBubble } from '@nextcloud/vue'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'TableReferenceWidget',
