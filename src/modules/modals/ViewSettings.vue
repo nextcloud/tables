@@ -25,8 +25,8 @@
 			<SelectedViewColumns
 				:columns="allColumns"
 				:selected-columns="selectedColumns"
-				:view-column-ids="viewSetting ? view.columns : null"
-				:generated-column-ids="viewSetting ? generatedView.columns : null"
+				:view-column-ids="viewSetting ? (view.columns ?? columns.map(col => col.id)) : null"
+				:generated-column-ids="viewSetting ? (generatedView.columns ?? [...selectedColumns]) : null"
 				:disable-hide="!canManageTable(view)" />
 		</NcAppSettingsSection>
 		<!--filtering-->
@@ -136,10 +136,12 @@ export default {
 		generateViewConfigData() {
 			if (!this.viewSetting) return this.view
 			const mergedViewSettings = JSON.parse(JSON.stringify(this.view))
-			if (this.viewSetting.hiddenColumns && this.viewSetting.hiddenColumns.length !== 0) {
-				mergedViewSettings.columns = this.view.columns.filter(id => !this.viewSetting.hiddenColumns.includes(id))
-			} else {
-				mergedViewSettings.columns = this.view.columns
+			if (this.view.columns) {
+				if (this.viewSetting.hiddenColumns && this.viewSetting.hiddenColumns.length !== 0) {
+					mergedViewSettings.columns = this.view.columns.filter(id => !this.viewSetting.hiddenColumns.includes(id))
+				} else {
+					mergedViewSettings.columns = this.view.columns
+				}
 			}
 			if (this.viewSetting.sorting) {
 				mergedViewSettings.sort = [this.viewSetting.sorting[0]]
@@ -201,11 +203,13 @@ export default {
 				tableId: this.canManageTable(this.view) ? this.mutableView.tableId : null,
 				viewId: this.mutableView.id,
 			})
-			if (this.selectedColumns === null) this.selectedColumns = this.columns.map(col => col.id)
+			if (this.selectedColumns === null) this.selectedColumns = this.columns.map(col => col.id).filter(colId => !this.viewSetting?.hiddenColumns?.includes(colId))
 			// Show columns of view first
 			if (this.canManageTable(this.view)) this.allColumns = this.columns.concat(MetaColumns)
 			else this.allColumns = this.columns
-			this.allColumns = (this.view.columns ?? this.selectedColumns).map(id => this.allColumns.find(col => col.id === id)).concat(this.allColumns.filter(col => !(this.view.columns ?? this.selectedColumns).includes(col.id)))
+			if (this.view.columns) {
+				this.allColumns = this.view.columns.map(id => this.allColumns.find(col => col.id === id)).concat(this.allColumns.filter(col => !this.view.columns.includes(col.id)))
+			}
 		},
 		async saveView() {
 			if (this.title === '') {

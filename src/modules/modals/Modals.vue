@@ -88,9 +88,10 @@ export default {
 		// views
 		subscribe('tables:view:reload', () => { this.reload(true) })
 		subscribe('tables:view:edit', view => { this.viewToEdit = { ...view, createView: false } })
-		subscribe('tables:view:create', tableId => {
+		subscribe('tables:view:create', tableInfos => {
 			this.viewToEdit = {
-				view: { tableId, sort: [], filter: [] },
+				view: { tableId: tableInfos.tableId, sort: [], filter: [] },
+				viewSetting: tableInfos.viewSetting,
 				createView: true,
 			}
 		})
@@ -118,9 +119,10 @@ export default {
 		unsubscribe('tables:row:edit', row => { this.editRow = row })
 		unsubscribe('tables:row:delete', rows => { this.rowsToDelete = rows })
 		unsubscribe('tables:view:edit', view => { this.viewToEdit = { view, createView: false } })
-		unsubscribe('tables:view:create', tableId => {
+		unsubscribe('tables:view:create', tableInfos => {
 			this.viewToEdit = {
-				view: { tableId, sort: [], filter: [] },
+				view: { tableId: tableInfos.tableId, sort: [], filter: [] },
+				viewSetting: tableInfos.viewSetting,
 				createView: true,
 			}
 		})

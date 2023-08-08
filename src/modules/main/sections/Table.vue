@@ -1,7 +1,8 @@
 <template>
 	<div>
-		<ElementDescription :active-element="table" />
-		<Dashboard :table="table"
+		<ElementDescription :active-element="table" :view-setting="viewSetting" />
+		<Dashboard v-if="hasViews"
+			:table="table"
 			@create-column="$emit('create-column')"
 			@import="$emit('import')"
 			@toggle-share="$emit('toggle-share')"
@@ -21,6 +22,7 @@
 import ElementDescription from './ElementDescription.vue'
 import Dashboard from './Dashboard.vue'
 import DataTable from './DataTable.vue'
+import { mapState } from 'vuex'
 
 import { emit } from '@nextcloud/event-bus'
 
@@ -49,9 +51,15 @@ export default {
 			default: null,
 		},
 	},
+	computed: {
+		...mapState(['views']),
+		hasViews() {
+			return this.views.some(v => v.tableId === this.table.id)
+		},
+	},
 	methods: {
 		createView() {
-			emit('tables:view:create', this.table.id)
+			emit('tables:view:create', { tableId: this.table.id, viewSetting: this.viewSetting })
 		},
 	},
 }

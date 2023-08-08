@@ -121,7 +121,7 @@ class ShareService extends SuperService {
 			// get all views or tables that are shared with me by group
 			$userGroups = $this->userHelper->getGroupsForUser($userId);
 			foreach ($userGroups as $userGroup) {
-				$shares = $this->mapper->findAllSharesFor($elementType, $userId, $userGroup->getGid(), 'group');
+				$shares = $this->mapper->findAllSharesFor($elementType, $userGroup->getGid(), $userId, 'group');
 				$elementsSharedWithMe = array_merge($elementsSharedWithMe, $shares);
 			}
 		} catch (\OCP\DB\Exception $e) {

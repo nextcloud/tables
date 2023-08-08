@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div v-if="hasViews" class="row space-B space-T">
+		<div class="row space-B space-T">
 			<div class="col-4 space-L">
 				<h2 style="display: inline-flex; align-items: center;">
 					{{ t('tables', 'Table') }}&nbsp;&nbsp;
@@ -117,7 +117,7 @@
 			</div>
 		</div>
 
-		<div v-if="hasViews" class="row space-T space-B">
+		<div class="row space-T space-B">
 			<div class="col-4 space-L">
 				<h2>
 					{{ t('tables', 'Views') }}&nbsp;&nbsp;
@@ -273,9 +273,6 @@ export default {
 		...mapState(['views']),
 		getViews() {
 			return this.views.filter(v => v.tableId === this.table.id)
-		},
-		hasViews() {
-			return this.getViews.length > 0
 		},
 	},
 	watch: {

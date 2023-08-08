@@ -4,7 +4,7 @@
 		:class="{active: activeTable && table.id === activeTable.id}"
 		:allow-collapse="hasViews"
 		:force-menu="true"
-		:open="isParentOfActiveView"
+		:open.sync="isParentOfActiveView"
 		:to="'/table/' + parseInt(table.id)"
 		@click="closeNav">
 		<template #icon>
@@ -67,14 +67,11 @@
 		<NavigationViewItem v-for="view in getViews"
 			:key="'view'+view.id"
 			:view="view" />
-
 	</NcAppNavigationItem>
 </template>
 <script>
 import { NcActionButton, NcAppNavigationItem, NcCounterBubble, NcAvatar } from '@nextcloud/vue'
-import { showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
-import DialogConfirmation from '../../../shared/modals/DialogConfirmation.vue'
 import { mapGetters, mapState } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
 import Table from 'vue-material-design-icons/Table.vue'
@@ -86,13 +83,11 @@ import NavigationViewItem from './NavigationViewItem.vue'
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 
 export default {
-	name: 'NavigationDashboardItem',
 
 	components: {
 		// eslint-disable-next-line vue/no-reserved-component-names
 		Table,
 		Import,
-		DialogConfirmation,
 		NavigationViewItem,
 		NcActionButton,
 		NcAppNavigationItem,
@@ -141,7 +136,7 @@ export default {
 			return getCurrentUser().uid
 		},
 		getViews() {
-			return this.views.filter(v => v.tableId === this.table.id)
+			return this.views.filter(v => v.tableId === this.table.id && v.title.toLowerCase().includes(this.filterString.toLowerCase()))
 		},
 		hasViews() {
 			return this.getViews.length > 0
@@ -164,7 +159,7 @@ export default {
 			emit('tables:table:delete', this.table)
 		},
 		createView() {
-			emit('tables:view:create', this.table.id)
+			emit('tables:view:create', { tableId: this.table.id })
 		},
 		async actionShowShare() {
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })

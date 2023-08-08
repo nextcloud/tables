@@ -78,15 +78,14 @@ class TableService extends SuperService {
 	public function findAll(?string $userId = null, bool $skipTableEnhancement = false, bool $skipSharedTables = false, bool $createTutorial = true): array {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
-		$ownTables = [];
-		$newSharedTables = [];
+		$allTables = [];
 
 		try {
-			$ownTables = $this->mapper->findAll($userId);
+			$allTables = $this->mapper->findAll($userId); // get own tables
 
 			// if there are no own tables found, create the tutorial table
-			if (count($ownTables) === 0 && $createTutorial) {
-				$ownTables = [$this->create($this->l->t('Tutorial'), 'tutorial', '🚀')];
+			if (count($allTables) === 0 && $createTutorial) {
+				$allTables = [$this->create($this->l->t('Tutorial'), 'tutorial', '🚀')];
 			}
 
 			if (!$skipSharedTables && $userId !== '') {
@@ -95,14 +94,14 @@ class TableService extends SuperService {
 				// clean duplicates
 				foreach ($sharedTables as $sharedTable) {
 					$found = false;
-					foreach ($ownTables as $ownTable) {
-						if ($sharedTable->getId() === $ownTable->getId()) {
+					foreach ($allTables as $table) {
+						if ($sharedTable->getId() === $table->getId()) {
 							$found = true;
 							break;
 						}
 					}
 					if (!$found) {
-						$newSharedTables[] = $sharedTable;
+						$allTables[] = $sharedTable;
 					}
 				}
 			}
@@ -114,7 +113,6 @@ class TableService extends SuperService {
 		}
 
 		// enhance table objects with additional data
-		$allTables = array_merge($ownTables, $newSharedTables);
 		if (!$skipTableEnhancement) {
 			foreach ($allTables as $table) {
 				/** @var string $userId */
@@ -166,7 +164,7 @@ class TableService extends SuperService {
 
 		// set if this is a shared table with you (somebody else shared it with you)
 		// (senseless if we have no user in context)
-		if ($userId !== '') {
+		if ($userId !== '' && $userId !== $table->getOwnership()) {
 			try {
 			$permissions = $this->shareService->getSharedPermissionsIfSharedWithMe($table->getId(), 'table', $userId);
 			$table->setIsShared(true);
