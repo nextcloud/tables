@@ -34,6 +34,7 @@ import TableCellSelection from './TableCellSelection.vue'
 import TableCellMultiSelection from './TableCellMultiSelection.vue'
 import TableCellTextRich from './TableCellEditor.vue'
 import { ColumnTypes } from './../mixins/columnHandler.js'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'TableRow',
@@ -90,6 +91,7 @@ export default {
 		},
 	},
 	methods: {
+		t,
 		getTableCell(column) {
 			switch (column.type) {
 			case ColumnTypes.TextLine: return 'TableCellTextLine'

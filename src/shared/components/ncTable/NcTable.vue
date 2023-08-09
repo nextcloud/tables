@@ -42,33 +42,31 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 	<div class="NcTable">
 		<div class="options row" style="padding-right: calc(var(--default-grid-baseline) * 2);">
 			<Options :rows="rows"
-				:columns="columns"
+				:columns="parsedColumns"
 				:selected-rows="localSelectedRows"
-				:show-options="columns.length !== 0"
-				:view-setting="viewSetting"
+				:show-options="parsedColumns.length !== 0"
+				:view-setting.sync="localViewSetting"
 				:config="config"
 				@create-row="$emit('create-row')"
-				@download-csv="data => downloadCsv(data, columns, table)"
-				@add-filter="filter => $emit('add-filter', filter)"
-				@set-search-string="str => $emit('set-search-string', str)"
+				@download-csv="data => downloadCsv(data, parsedColumns, table)"
+				@set-search-string="str => setSearchString(str)"
 				@delete-selected-rows="rowIds => $emit('delete-selected-rows', rowIds)" />
 		</div>
 		<div class="custom-table row">
 			<CustomTable v-if="config.canReadRows || (config.canCreateRows && rows.length > 0)"
-				:columns="columns"
+				:columns="parsedColumns"
 				:rows="rows"
 				:table="table"
-				:view-setting="viewSetting"
+				:view-setting.sync="localViewSetting"
 				:config="config"
 				@create-row="$emit('create-row')"
 				@import="table => $emit('import', table)"
 				@edit-row="rowId => $emit('edit-row', rowId)"
 				@create-column="$emit('create-column')"
-				@edit-columns="$emit('edit-columns')"
-				@add-filter="filter => $emit('add-filter', filter)"
+				@edit-column="col => $emit('edit-column', col)"
+				@delete-column="col => $emit('delete-column', col)"
 				@update-selected-rows="rowIds => localSelectedRows = rowIds"
-				@download-csv="data => downloadCsv(data, columns, table)"
-				@delete-filter="id => $emit('delete-filter', id)">
+				@download-csv="data => downloadCsv(data, parsedColumns, table)">
 				<template #actions>
 					<slot name="actions" />
 				</template>
@@ -108,6 +106,10 @@ import { NcEmptyContent, NcButton } from '@nextcloud/vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
 import Cancel from 'vue-material-design-icons/Cancel.vue'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
+import { parseCol } from './mixins/columnParser.js'
+import { AbstractColumn } from './mixins/columnClass.js'
+import { translate as t } from '@nextcloud/l10n'
+
 export default {
 	name: 'NcTable',
 
@@ -176,6 +178,7 @@ export default {
 	data() {
 		return {
 			localSelectedRows: [],
+			localViewSetting: this.viewSetting ?? {},
 		}
 	},
 	computed: {
@@ -192,10 +195,19 @@ export default {
 				canSelectRows: this.canSelectRows,
 			}
 		},
+		parsedColumns() {
+			if (this.columns.length && !(this.columns[0] instanceof AbstractColumn)) {
+				return this.columns.map(col => parseCol(col))
+			}
+			return this.columns
+		},
 	},
 	watch: {
 		localSelectedRows() {
 			this.$emit('update:selectedRows', this.localSelectedRows)
+		},
+		localViewSetting() {
+			this.$emit('update:viewSetting', this.localViewSetting)
 		},
 	},
 	mounted() {
@@ -205,8 +217,13 @@ export default {
 		unsubscribe('tables:selected-rows:deselect', this.deselectRows)
 	},
 	methods: {
+		t,
 		deselectRows() {
 			this.localSelectedRows = []
+		},
+		setSearchString(str) {
+			this.localViewSetting.searchString = str !== '' ? str : null
+			this.localViewSetting = JSON.parse(JSON.stringify(this.localViewSetting))
 		},
 	},
 }

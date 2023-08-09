@@ -1,6 +1,5 @@
 <template>
 	<div>
-		<TableSmartPicker />
 		<NcEmptyContent :title="t('tables', 'Tables')"
 			:description="t('tables', 'Manage data the way you need it.')">
 			<template #icon>
@@ -21,7 +20,6 @@ import { NcEmptyContent, NcButton } from '@nextcloud/vue'
 import IconTables from '../shared/assets/icons/IconTables.vue'
 import { emit } from '@nextcloud/event-bus'
 import MainModals from '../modules/modals/Modals.vue'
-import TableSmartPicker from '../views/SmartPicker.vue'
 
 export default {
 	components: {
@@ -29,7 +27,6 @@ export default {
 		NcButton,
 		IconTables,
 		MainModals,
-		TableSmartPicker,
 	},
 	methods: {
 		addTable() {

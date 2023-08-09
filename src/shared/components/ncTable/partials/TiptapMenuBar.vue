@@ -116,6 +116,7 @@ import FormatHeader2 from 'vue-material-design-icons/FormatHeader2.vue'
 import FormatHeader3 from 'vue-material-design-icons/FormatHeader3.vue'
 import CodeTags from 'vue-material-design-icons/CodeTags.vue'
 import CheckboxMultipleMarkedOutline from 'vue-material-design-icons/CheckboxMultipleMarkedOutline.vue'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	components: {
@@ -188,6 +189,10 @@ export default {
 
 	beforeUnmount() {
 		this.editor.destroy()
+	},
+
+	methods: {
+		t,
 	},
 }
 </script>

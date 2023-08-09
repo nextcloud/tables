@@ -23,7 +23,6 @@
 
 <script>
 
-import { emit } from '@nextcloud/event-bus'
 import { NcUserBubble } from '@nextcloud/vue'
 import TextIcon from 'vue-material-design-icons/Text.vue'
 import NcSmallButton from '../../../shared/components/ncSmallButton/NcSmallButton.vue'
@@ -62,9 +61,8 @@ export default {
 	},
 
 	methods: {
-
 		resetLocalAdjustments() {
-			this.$store.dispatch('resetViewSetting')
+			this.$emit('update:viewSetting', {})
 		},
 	},
 }

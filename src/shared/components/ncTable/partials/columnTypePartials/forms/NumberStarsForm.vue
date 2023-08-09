@@ -29,6 +29,8 @@ import { NcButton } from '@nextcloud/vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
 import Minus from 'vue-material-design-icons/Minus.vue'
 
+import { translate as t } from '@nextcloud/l10n'
+
 export default {
 	name: 'NumberStarsForm',
 
@@ -59,6 +61,7 @@ export default {
 		},
 	},
 	methods: {
+		t,
 		more() {
 			if (this.mutableColumn.numberDefault < 5) {
 				this.mutableColumn.numberDefault++

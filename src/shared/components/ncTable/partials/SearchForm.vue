@@ -16,6 +16,7 @@
 import { NcTextField } from '@nextcloud/vue'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
 import debounce from 'debounce'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 
@@ -42,6 +43,7 @@ export default {
 	},
 
 	methods: {
+		t,
 		debounceSubmit: debounce(function() {
 			this.submit()
 		}, 500),

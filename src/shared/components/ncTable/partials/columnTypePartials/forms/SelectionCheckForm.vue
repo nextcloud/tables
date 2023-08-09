@@ -14,6 +14,7 @@
 
 <script>
 import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'SelectionCheckForm',
@@ -44,6 +45,9 @@ export default {
 		if (typeof this.mutableColumn.selectionDefault !== 'boolean') {
 			this.mutableColumn.selectionDefault = false
 		}
+	},
+	methods: {
+		t,
 	},
 }
 </script>

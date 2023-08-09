@@ -23,6 +23,7 @@ import { NcButton } from '@nextcloud/vue'
 import RowFormWrapper from './RowFormWrapper.vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
 import Minus from 'vue-material-design-icons/Minus.vue'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	components: {
@@ -66,6 +67,7 @@ export default {
 		},
 	},
 	methods: {
+		t,
 		more() {
 			if (this.localValue < 5) {
 				this.localValue++

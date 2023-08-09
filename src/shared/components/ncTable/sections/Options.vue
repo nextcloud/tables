@@ -26,7 +26,6 @@
 					<SearchForm
 						:columns="columns"
 						:search-string="getSearchString"
-						@add-filter="filter => $emit('add-filter', filter)"
 						@set-search-string="str => $emit('set-search-string', str)" />
 				</div>
 			</div>
@@ -71,6 +70,7 @@ import Delete from 'vue-material-design-icons/Delete.vue'
 import Export from 'vue-material-design-icons/Export.vue'
 import viewportHelper from '../../../mixins/viewportHelper.js'
 import SearchForm from '../partials/SearchForm.vue'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'Options',
@@ -143,6 +143,7 @@ export default {
 	},
 
 	methods: {
+		t,
 		updateOptionsDivWidth() {
 			this.optionsDivWidth = document.getElementsByClassName('options row')[0]?.offsetWidth
 		},

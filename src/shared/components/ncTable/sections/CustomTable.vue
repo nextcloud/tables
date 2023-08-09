@@ -6,16 +6,15 @@
 					:selected-rows="selectedRows"
 					:rows="getSearchedAndFilteredAndSortedRows"
 					:element="table"
-					:view-setting="viewSetting"
+					:view-setting.sync="localViewSetting"
 					:config="config"
 					@create-row="$emit('create-row')"
 					@import="table => $emit('import', table)"
 					@create-column="$emit('create-column')"
-					@edit-columns="$emit('edit-columns')"
-					@add-filter="filter => $emit('add-filter', filter)"
+					@edit-column="col => $emit('edit-column', col)"
+					@delete-column="col => $emit('delete-column', col)"
 					@download-csv="data => $emit('download-csv', data)"
-					@select-all-rows="selectAllRows"
-					@delete-filter="id => $emit('delete-filter', id)">
+					@select-all-rows="selectAllRows">
 					<template #actions>
 						<slot name="actions" />
 					</template>
@@ -27,7 +26,7 @@
 					:row="row"
 					:columns="columns"
 					:selected="isRowSelected(row.id)"
-					:view-setting="viewSetting"
+					:view-setting.sync="localViewSetting"
 					:view="table"
 					:config="config"
 					@update-row-selection="updateRowSelection"
@@ -79,13 +78,16 @@ export default {
 		return {
 			selectedRows: [],
 			searchTerm: null,
+			localViewSetting: this.viewSetting,
 		}
 	},
 
 	computed: {
 
 		...mapGetters(['getColumnById']),
-
+		sorting() {
+			return this.viewSetting?.sorting
+		},
 		getSearchedAndFilteredAndSortedRows() {
 			// if we have to sort
 			if (this.viewSetting?.sorting) {
@@ -207,6 +209,12 @@ export default {
 			})
 
 			return data
+		},
+	},
+
+	watch: {
+		localViewSetting() {
+			this.$emit('update:viewSetting', this.localViewSetting)
 		},
 	},
 

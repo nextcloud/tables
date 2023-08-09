@@ -1,6 +1,7 @@
 import DatetimeColumn from './columnsTypes/datetime.js'
 import NumberColumn from './columnsTypes/number.js'
 import TextLineColumn from './columnsTypes/textLine.js'
+import { translate as t } from '@nextcloud/l10n'
 
 export const MetaColumns = [
 	new NumberColumn({ id: -1, title: t('tables', 'ID') }),
