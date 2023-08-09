@@ -56,6 +56,7 @@
 <script>
 import { NcCheckboxRadioSwitch, NcSelect } from '@nextcloud/vue'
 import { mapGetters, mapState } from 'vuex'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'MainForm',
@@ -125,6 +126,9 @@ export default {
 		} else {
 			this.localSelectedViews = []
 		}
+	},
+	methods: {
+		t,
 	},
 }
 </script>

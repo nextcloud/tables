@@ -124,10 +124,9 @@ import ChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
 import FilterCog from 'vue-material-design-icons/FilterCog.vue'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
 import { NcActions, NcActionButton, NcActionInput, NcActionButtonGroup, NcActionCaption, NcActionRadio } from '@nextcloud/vue'
-import { mapState } from 'vuex'
 import { AbstractColumn } from '../mixins/columnClass.js'
 import { FilterIds } from '../mixins/filter.js'
-import { emit } from '@nextcloud/event-bus'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	components: {
@@ -168,6 +167,10 @@ export default {
 			type: Object,
 			default: null,
 		},
+		viewSetting: {
+			type: Object,
+			default: null,
+		},
 	},
 	data() {
 		return {
@@ -177,12 +180,10 @@ export default {
 			term: '',
 			selectOperator: false,
 			selectValue: false,
+			localViewSetting: this.viewSetting,
 		}
 	},
 	computed: {
-		...mapState({
-			viewSetting: state => state.data.viewSetting,
-		}),
 		getOperators() {
 			const possibleOperators = this.column.getPossibleOperators()
 			return possibleOperators
@@ -223,7 +224,7 @@ export default {
 			return this.column.canSort()
 		},
 		getSortMode() {
-			const sortObject = this.viewSetting.sorting?.find(item => item.columnId === this.column?.id)
+			const sortObject = this.localViewSetting?.sorting?.find(item => item.columnId === this.column?.id)
 			if (sortObject) {
 				return sortObject.mode
 			}
@@ -254,11 +255,18 @@ export default {
 		localOpenState() {
 			this.reset()
 		},
+		localViewSetting() {
+			this.$emit('update:viewSetting', this.localViewSetting)
+		},
+		viewSetting() {
+			this.localViewSetting = this.viewSetting
+		},
 	},
 	created() {
 		this.reset()
 	},
 	methods: {
+		t,
 		isDisabled(op) {
 			return this.getDisabledOperators.map(o => o.id).includes(op)
 		},
@@ -292,7 +300,7 @@ export default {
 			this.localOpenState = false
 		},
 		getFilterForColumn(column) {
-			return this.viewSetting?.filter?.filter(item => item.columnId === column.id)
+			return this.localViewSetting?.filter?.filter(item => item.columnId === column.id)
 		},
 		createFilter() {
 			const filterObject = {
@@ -300,7 +308,11 @@ export default {
 				operator: this.selectedOperator,
 				value: this.searchValue,
 			}
-			this.$emit('add-filter', filterObject)
+			if (!this.localViewSetting.filter) {
+				this.localViewSetting.filter = []
+			}
+			this.localViewSetting.filter.push(filterObject)
+			this.localViewSetting = JSON.parse(JSON.stringify(this.localViewSetting))
 			this.close()
 		},
 		reset() {
@@ -313,24 +325,36 @@ export default {
 		sort(mode) {
 			if (mode === this.getSortMode) {
 				this.sortMode = null
-				this.$store.dispatch('removeSorting', { columnId: this.column.id })
+				this.localViewSetting.sorting = null
 			} else {
 				this.sortMode = mode
-				this.$store.dispatch('setSorting', { columnId: this.column.id, mode })
+				if (mode !== 'ASC' && mode !== 'DESC') {
+					return
+				}
+				this.localViewSetting.sorting = [{
+					columnId: this.column.id,
+					mode,
+				}]
 			}
+			this.localViewSetting = JSON.parse(JSON.stringify(this.localViewSetting))
 			this.close()
 		},
 		hideColumn() {
 			this.close()
-			this.$store.dispatch('hideColumn', { columnId: this.column.id })
+			if (!this.localViewSetting.hiddenColumns) {
+				this.localViewSetting.hiddenColumns = [this.column.id]
+			} else {
+				this.localViewSetting.hiddenColumns.push(this.column.id)
+			}
+			this.localViewSetting = JSON.parse(JSON.stringify(this.localViewSetting))
 		},
 		editColumn() {
 			this.close()
-			emit('tables:column:edit', this.column)
+			this.$emit('edit-column', this.column)
 		},
 		deleteColumn() {
 			this.close()
-			emit('tables:column:delete', this.column)
+			this.$emit('delete-column', this.column)
 		},
 	},
 }

@@ -14,7 +14,6 @@
 		:can-delete-table="canDeleteTable"
 		@add-filter="addFilter"
 		@delete-filter="deleteFilter"
-		@set-search-string="setSearchString"
 		@import="openImportModal"
 		@create-column="createColumn"
 		@edit-column="editColumn"
@@ -97,6 +96,16 @@ export default {
 			default: true,
 		},
 	},
+	data() {
+		return {
+			localViewSetting: this.viewSetting,
+		}
+	},
+	watch: {
+		localViewSetting() {
+			this.$emit('update:viewSetting', this.localViewSetting)
+		},
+	},
 
 	methods: {
 		createColumn() {
@@ -132,9 +141,6 @@ export default {
 		},
 		openImportModal(element) {
 			emit('tables:modal:import', { element, isView: this.isView })
-		},
-		setSearchString(str) {
-			this.$store.dispatch('setSearchString', { str })
 		},
 	},
 }

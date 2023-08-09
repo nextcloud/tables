@@ -10,7 +10,6 @@ export default {
 		loading: false,
 		rows: [],
 		columns: [],
-		viewSetting: {},
 	},
 
 	mutations: {
@@ -23,9 +22,6 @@ export default {
 		setLoading(state, value) {
 			state.loading = !!(value)
 		},
-		setViewSetting(state, viewSetting) {
-			state.viewSetting = Object.assign({}, viewSetting)
-		},
 	},
 
 	getters: {
@@ -35,82 +31,6 @@ export default {
 	},
 
 	actions: {
-
-		removeSorting({ commit, state }, { columnId }) {
-			const viewSetting = state.viewSetting
-			viewSetting.sorting = null
-			commit('setViewSetting', viewSetting)
-		},
-
-		setSorting({ commit, state }, { columnId, mode }) {
-			// mode can be 'ASC' or 'DESC'
-			if (mode !== 'ASC' && mode !== 'DESC') {
-				return
-			}
-
-			const viewSetting = state.viewSetting
-			viewSetting.sorting = [{
-				columnId,
-				mode,
-			}]
-
-			commit('setViewSetting', viewSetting)
-		},
-
-		addFilter({ commit, state }, { columnId, operator, value }) {
-			const viewSetting = state.viewSetting
-
-			if (!viewSetting.filter) {
-				viewSetting.filter = []
-			}
-
-			viewSetting.filter.push({
-				columnId,
-				operator,
-				value,
-			})
-
-			commit('setViewSetting', viewSetting)
-		},
-
-		deleteFilter({ commit, state }, { id }) {
-			const index = state.viewSetting?.filter?.findIndex(item => item.columnId + item.operator.id + item.value === id)
-			if (index !== -1) {
-				const localViewSetting = { ...state.viewSetting }
-				localViewSetting.filter.splice(index, 1)
-				commit('setViewSetting', localViewSetting)
-			}
-		},
-
-		unhideColumn({ commit, state }, { columnId }) {
-			const viewSetting = state.viewSetting
-			const index = viewSetting.hiddenColumns.indexOf(columnId)
-			if (index > -1) {
-				viewSetting.hiddenColumns.splice(index, 1)
-			}
-			commit('setViewSetting', viewSetting)
-		},
-
-		hideColumn({ commit, state }, { columnId }) {
-			const viewSetting = state.viewSetting
-			if (!viewSetting.hiddenColumns) {
-				viewSetting.hiddenColumns = [columnId]
-			} else {
-				viewSetting.hiddenColumns.push(columnId)
-			}
-			commit('setViewSetting', viewSetting)
-		},
-
-		setSearchString({ commit, state }, { str }) {
-			const viewSetting = state.viewSetting
-			viewSetting.searchString = str
-			commit('setViewSetting', viewSetting)
-		},
-
-		resetViewSetting({ commit }) {
-			commit('setViewSetting', {})
-		},
-
 		// COLUMNS
 		async getColumnsFromBE({ commit }, { tableId, viewId }) {
 			commit('setLoading', true)

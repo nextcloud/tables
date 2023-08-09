@@ -66,6 +66,8 @@
 
 <script>
 
+import { translate as t } from '@nextcloud/l10n'
+
 export default {
 	name: 'NumberForm',
 	props: {
@@ -83,6 +85,9 @@ export default {
 		column() {
 			this.mutableColumn = this.column
 		},
+	},
+	methods: {
+		t,
 	},
 }
 </script>

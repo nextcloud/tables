@@ -6,6 +6,8 @@
 
 <script>
 
+import { translate as t } from '@nextcloud/l10n'
+
 export default {
 	name: 'TableCellSelection',
 
@@ -26,6 +28,7 @@ export default {
 		},
 	},
 	methods: {
+		t,
 		isDeleted() {
 			this.column.isDeletedLabel(this.value)
 		},

@@ -19,7 +19,9 @@
 							:can-hide="visibleColumns.length > 1"
 							:element="element"
 							:config="config"
-							@add-filter="filter => $emit('add-filter', filter)" />
+							:view-setting.sync="localViewSetting"
+							@edit-column="col => $emit('edit-column', col)"
+							@delete-column="col => $emit('delete-column', col)" />
 					</div>
 					<div v-if="getFilterForColumn(col)" class="filter-wrapper">
 						<FilterLabel v-for="filter in getFilterForColumn(col)"
@@ -27,7 +29,7 @@
 							:key="filter.columnId + filter.operator.id+ filter.value"
 							:operator="filter.operator"
 							:value="filter.value"
-							@delete-filter="id => $emit('delete-filter', id)" />
+							@delete-filter="id => deleteFilter(id)" />
 					</div>
 				</div>
 				<div v-if="hasRightHiddenNeighbor(col.id)" class="hidden-indicator" @click="unhide(col.id)" />
@@ -43,7 +45,6 @@
 import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
 import FilterLabel from './FilterLabel.vue'
-import { mapGetters } from 'vuex'
 
 export default {
 
@@ -83,11 +84,11 @@ export default {
 	data() {
 		return {
 			openedColumnHeaderMenus: {},
+			localViewSetting: this.viewSetting,
 		}
 	},
 
 	computed: {
-		...mapGetters(['activeView']),
 		allRowsAreSelected() {
 			if (Array.isArray(this.rows) && Array.isArray(this.selectedRows) && this.rows.length !== 0) {
 				return this.rows.length === this.selectedRows.length
@@ -96,7 +97,12 @@ export default {
 			}
 		},
 		visibleColumns() {
-			return this.columns.filter(col => !this.viewSetting?.hiddenColumns?.includes(col.id))
+			return this.columns.filter(col => !this.localViewSetting?.hiddenColumns?.includes(col.id))
+		},
+	},
+	watch: {
+		localViewSetting() {
+			this.$emit('update:viewSetting', this.localViewSetting)
 		},
 	},
 
@@ -106,13 +112,22 @@ export default {
 			this.openedColumnHeaderMenus = Object.assign({}, this.openedColumnHeaderMenus)
 		},
 		getFilterForColumn(column) {
-			return this.viewSetting?.filter?.filter(item => item.columnId === column.id)
+			return this.localViewSetting?.filter?.filter(item => item.columnId === column.id)
 		},
 		hasRightHiddenNeighbor(colId) {
-			return this.viewSetting?.hiddenColumns?.includes(this.columns[this.columns.indexOf(this.columns.find(col => col.id === colId)) + 1]?.id)
+			return this.localViewSetting?.hiddenColumns?.includes(this.columns[this.columns.indexOf(this.columns.find(col => col.id === colId)) + 1]?.id)
 		},
 		unhide(colId) {
-			this.$store.dispatch('unhideColumn', { columnId: this.columns[this.columns.indexOf(this.columns.find(col => col.id === colId)) + 1]?.id })
+			const index = this.localViewSetting.hiddenColumns.indexOf(this.columns[this.columns.indexOf(this.columns.find(col => col.id === colId)) + 1]?.id)
+			if (index !== -1) {
+				this.localViewSetting.hiddenColumns.splice(index, 1)
+			}
+		},
+		deleteFilter(id) {
+			const index = this.localViewSetting?.filter?.findIndex(item => item.columnId + item.operator.id + item.value === id)
+			if (index !== -1) {
+				this.localViewSetting.filter.splice(index, 1)
+			}
 		},
 	},
 }

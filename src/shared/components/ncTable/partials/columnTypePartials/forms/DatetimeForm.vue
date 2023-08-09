@@ -11,6 +11,7 @@
 
 <script>
 import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'DatetimeForm',
@@ -43,6 +44,9 @@ export default {
 				this.mutableColumn.datetimeDefault = ''
 			}
 		},
+	},
+	methods: {
+		t,
 	},
 }
 </script>

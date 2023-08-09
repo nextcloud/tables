@@ -1,6 +1,7 @@
 import { getCurrentUser } from '@nextcloud/auth'
 import Moment from '@nextcloud/moment'
 import { ColumnTypes } from './columnHandler.js'
+import { translate as t } from '@nextcloud/l10n'
 
 class BaseMagicField {
 

@@ -32,6 +32,7 @@ import RowFormWrapper from './RowFormWrapper.vue'
 import NcEditor from '../../../ncEditor/NcEditor.vue'
 import { NcButton, NcModal } from '@nextcloud/vue'
 import Fullscreen from 'vue-material-design-icons/Fullscreen.vue'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	components: {
@@ -70,6 +71,9 @@ export default {
 				this.$emit('update:value', v)
 			},
 		},
+	},
+	methods: {
+		t,
 	},
 
 }

@@ -30,7 +30,7 @@
 <script>
 
 import { mapState } from 'vuex'
-import { emit} from '@nextcloud/event-bus'
+import { emit } from '@nextcloud/event-bus'
 import CustomView from './View.vue'
 import CustomTable from './Table.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
@@ -61,6 +61,7 @@ export default {
 		return {
 			localLoading: false,
 			lastActiveElement: null,
+			viewSetting: {},
 		}
 	},
 
@@ -69,7 +70,6 @@ export default {
 		...mapState({
 			columns: state => state.data.columns,
 			rows: state => state.data.rows,
-			viewSetting: state => state.data.viewSetting,
 		}),
 	},
 

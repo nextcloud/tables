@@ -25,6 +25,7 @@ import { NcSelect } from '@nextcloud/vue'
 import debounce from 'debounce'
 import generalHelper from '../../../../mixins/generalHelper.js'
 import LinkWidget from '../LinkWidget.vue'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 
@@ -107,6 +108,7 @@ export default {
 	},
 
 	methods: {
+		t,
 		setProviderLoading(providerId, status) {
 			this.providerLoading[providerId] = !!status
 			this.providerLoading = { ...this.providerLoading }

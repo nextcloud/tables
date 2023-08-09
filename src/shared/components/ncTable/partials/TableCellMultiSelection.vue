@@ -10,6 +10,8 @@
 
 <script>
 
+import { translate as t } from '@nextcloud/l10n'
+
 export default {
 	name: 'TableCellMultiSelection',
 
@@ -30,6 +32,7 @@ export default {
 		},
 	},
 	methods: {
+		t,
 		getObjects() {
 			return this.column.getObjects(this.value)
 		},

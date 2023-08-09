@@ -24,6 +24,7 @@ import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import axios from '@nextcloud/axios'
 import displayError from '../../../../../utils/displayError.js'
 import { generateOcsUrl } from '@nextcloud/router'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 
@@ -83,6 +84,7 @@ export default {
 	},
 
 	methods: {
+		t,
 		async loadProviders() {
 			let res = null
 			try {
