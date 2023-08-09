@@ -289,37 +289,48 @@ class ViewService extends SuperService {
 		// set if this is a shared table with you (somebody else shared it with you)
 		// (senseless if we have no user in context)
 		if ($userId !== '') {
-			try {
-				$permissions = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getId(), 'view', $userId);
-				$view->setIsShared(true);
-				$canManageTable = false;
+			if ($userId !== $view->getOwnership()) {
 				try {
-					$manageTableShare = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getTableId(), 'table', $userId);
-					$canManageTable = $manageTableShare['manage'] ?? false;
+					$permissions = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getId(), 'view', $userId);
+					$view->setIsShared(true);
+					$canManageTable = false;
+					try {
+						$manageTableShare = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getTableId(), 'table', $userId);
+						$canManageTable = $manageTableShare['manage'] ?? false;
+					} catch (NotFoundError $e) {
+					} catch (\Exception $e) {
+						throw new InternalError($e);
+					}
+					$view->setOnSharePermissions([
+						'read' => $permissions['read'] ?? false,
+						'create' => $permissions['create'] ?? false,
+						'update' => $permissions['update'] ?? false,
+						'delete' => $permissions['delete'] ?? false,
+						'manage' => $permissions['manage'] ?? false,
+						'manageTable' => $canManageTable
+					]);
 				} catch (NotFoundError $e) {
 				} catch (\Exception $e) {
-					throw new InternalError($e);
+					$this->logger->warning('Exception occurred while setting shared permissions: '.$e->getMessage().' No permissions granted.');
+					$view->setOnSharePermissions([
+						'read' => false,
+						'create' => false,
+						'update' => false,
+						'delete' => false,
+						'manage' => false,
+						'manageTable' => false
+					]);
 				}
-				$view->setOnSharePermissions([
-					'read' => $permissions['read'] ?? false,
-					'create' => $permissions['create'] ?? false,
-					'update' => $permissions['update'] ?? false,
-					'delete' => $permissions['delete'] ?? false,
-					'manage' => $permissions['manage'] ?? false,
-					'manageTable' => $canManageTable
-				]);
-			} catch (NotFoundError $e) {
-			} catch (\Exception $e) {
-				$this->logger->warning('Exception occurred while setting shared permissions: '.$e->getMessage().' No permissions granted.');
-				$view->setOnSharePermissions([
-					'read' => false,
-					'create' => false,
-					'update' => false,
-					'delete' => false,
-					'manage' => false,
-					'manageTable' => false
-				]);
+			} else {
+				// set hasShares if this table is shared by you (you share it with somebody else)
+				// (senseless if we have no user in context)
+				try {
+					$allShares = $this->shareService->findAll('view', $view->getId());
+					$view->setHasShares(count($allShares) !== 0);
+				} catch (InternalError $e) {
+				}
 			}
+
 		}
 
 		if (!$this->permissionsService->canReadRowsByElement($view, 'view', $userId)) {
@@ -331,19 +342,6 @@ class ViewService extends SuperService {
 		} catch (InternalError|PermissionError $e) {
 		}
 
-		if (!$this->permissionsService->canManageTableById($view->getTableId(), $userId)) {
-			return;
-		}
-
-		// set hasShares if this table is shared by you (you share it with somebody else)
-		// (senseless if we have no user in context)
-		if ($userId !== '') {
-			try {
-				$allShares = $this->shareService->findAll('view', $view->getId());
-				$view->setHasShares(count($allShares) !== 0);
-			} catch (InternalError $e) {
-			}
-		}
 		if($view->getIsShared()) {
 			// Remove detailed view filtering and sorting information if necessary
 			if(!$view->getOnSharePermissions()['manageTable']) {

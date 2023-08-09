@@ -13,7 +13,7 @@
 <script>
 import { NcContent, NcAppContent } from '@nextcloud/vue'
 import Navigation from './modules/navigation/sections/Navigation.vue'
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import Sidebar from './modules/sidebar/sections/Sidebar.vue'
 
 export default {
@@ -53,13 +53,15 @@ export default {
 	},
 	methods: {
 		routing(currentRoute) {
-			if (currentRoute.name === 'table') {
-				this.$store.commit('setActiveTableId', parseInt(currentRoute.params.tableId))
-			} else if (currentRoute.name === 'view') {
-				this.$store.commit('setActiveViewId', parseInt(currentRoute.params.viewId))
-			} else if (currentRoute.name === 'row') {
-				this.$store.commit('setActiveViewId', parseInt(currentRoute.params.viewId))
+			if (currentRoute.name === 'row') {
 				this.$store.commit('setActiveRowId', parseInt(currentRoute.params.rowId))
+			} else {
+				this.$store.commit('setActiveRowId', null)
+			}
+			if (currentRoute.path.startsWith('/table/')) {
+				this.$store.commit('setActiveTableId', parseInt(currentRoute.params.tableId))
+			} else if (currentRoute.path.startsWith('/view/')) {
+				this.$store.commit('setActiveViewId', parseInt(currentRoute.params.viewId))
 			}
 		},
 	},

@@ -65,6 +65,7 @@ export default {
 	},
 
 	computed: {
+		...mapState(['activeRowId']),
 		...mapState({
 			columns: state => state.data.columns,
 			rows: state => state.data.rows,
@@ -81,7 +82,6 @@ export default {
 	mounted() {
 		this.reload(true)
 	},
-
 
 	methods: {
 		createColumn() {
@@ -127,6 +127,9 @@ export default {
 				this.lastActiveViewId = {
 					id: this.element.id,
 					isView: this.isView,
+				}
+				if (this.activeRowId) {
+					emit('tables:row:edit', { row: this.rows.find(r => r.id === this.activeRowId), columns: this.columns })
 				}
 				this.localLoading = false
 			}

@@ -85,7 +85,14 @@ export default {
 	},
 	watch: {
 		row() {
-			this.loadValues()
+			if (this.row) {
+				if (this.$router.currentRoute.path.includes('/row/')) {
+					this.$router.replace(this.$router.currentRoute.path.split('/row/')[0])
+				}
+				this.$router.push(this.$router.currentRoute.path + '/row/' + this.row.id)
+				this.$store.commit('setActiveRowId', null)
+				this.loadValues()
+			}
 		},
 	},
 	methods: {
@@ -99,6 +106,7 @@ export default {
 			}
 		},
 		actionCancel() {
+			this.$router.back()
 			this.reset()
 			this.$emit('close')
 		},

@@ -71,7 +71,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import TableView from '../partials/TableView.vue'
 
 import EmptyView from './EmptyView.vue'
@@ -127,7 +126,6 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(['activeRowId']),
 		isViewSettingSet() {
 			return !(!this.viewSetting || ((!this.viewSetting.hiddenColumns || this.viewSetting.hiddenColumns.length === 0) && (!this.viewSetting.sorting) && (!this.viewSetting.filter || this.viewSetting.filter.length === 0)))
 		},
