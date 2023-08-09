@@ -168,6 +168,10 @@ export default {
 			type: Boolean,
 			default: true,
 		},
+		canSelectRows: {
+			type: Boolean,
+			default: true,
+		},
 	},
 	data() {
 		return {
@@ -185,6 +189,7 @@ export default {
 				canEditColumns: this.canEditColumns,
 				canDeleteColumns: this.canDeleteColumns,
 				canDeleteTable: this.canDeleteTable,
+				canSelectRows: this.canSelectRows,
 			}
 		},
 	},

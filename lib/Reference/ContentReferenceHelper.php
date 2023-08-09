@@ -6,6 +6,7 @@ use Exception;
 use OC\Collaboration\Reference\LinkReferenceProvider;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\RowService;
@@ -19,17 +20,8 @@ use OCP\IConfig;
 use OCP\IURLGenerator;
 use Throwable;
 
-class ReferenceHelper {
-	protected const RICH_OBJECT_TYPE = Application::APP_ID . '_link';
-
-	protected ?string $userId;
-	protected IURLGenerator $urlGenerator;
-	protected LinkReferenceProvider $linkReferenceProvider;
-	protected ViewService $viewService;
-	protected TableService $tableService;
-	protected ColumnService $columnService;
-	protected RowService $rowService;
-	protected IConfig $config;
+class ContentReferenceHelper extends ReferenceHelper {
+	protected const RICH_OBJECT_TYPE = Application::APP_ID . '_content';
 
 	public function __construct(IURLGenerator $urlGenerator,
 		ViewService $viewService,
@@ -39,14 +31,7 @@ class ReferenceHelper {
 		LinkReferenceProvider $linkReferenceProvider,
 		?string $userId,
 		IConfig $config) {
-		$this->userId = $userId;
-		$this->urlGenerator = $urlGenerator;
-		$this->linkReferenceProvider = $linkReferenceProvider;
-		$this->viewService = $viewService;
-		$this->tableService = $tableService;
-		$this->rowService = $rowService;
-		$this->columnService = $columnService;
-		$this->config = $config;
+		parent::__construct($urlGenerator, $viewService, $tableService, $columnService, $rowService, $linkReferenceProvider, $userId, $config);
 	}
 
 	public function matchReference(string $referenceText, ?string $type = null): bool {
@@ -60,16 +45,16 @@ class ReferenceHelper {
 		$indexMatchTable = false;
 		if ($type === null || $type === 'table') {
 			// link example: https://nextcloud.local/apps/tables/#/table/3
-			$noIndexMatchTable = preg_match('/^' . preg_quote($start, '/') . '\/#\/table\/\d+$/i', $referenceText) === 1;
-			$indexMatchTable = preg_match('/^' . preg_quote($startIndex, '/') . '\/#\/table\/\d+$/i', $referenceText) === 1;
+			$noIndexMatchTable = preg_match('/^' . preg_quote($start, '/') . '\/#\/table\/\d+\/content$/i', $referenceText) === 1;
+			$indexMatchTable = preg_match('/^' . preg_quote($startIndex, '/') . '\/#\/table\/\d+\/content$/i', $referenceText) === 1;
 		}
 
 		$noIndexMatchView = false;
 		$indexMatchView = false;
 		if ($type === null || $type === 'view') {
 			// link example: https://nextcloud.local/apps/tables/#/view/3
-			$noIndexMatchView = preg_match('/^' . preg_quote($start, '/') . '\/#\/view\/\d+$/i', $referenceText) === 1;
-			$indexMatchView = preg_match('/^' . preg_quote($startIndex, '/') . '\/#\/view\/\d+$/i', $referenceText) === 1;
+			$noIndexMatchView = preg_match('/^' . preg_quote($start, '/') . '\/#\/view\/\d+\/content$/i', $referenceText) === 1;
+			$indexMatchView = preg_match('/^' . preg_quote($startIndex, '/') . '\/#\/view\/\d+\/content$/i', $referenceText) === 1;
 		}
 
 		return $noIndexMatchTable || $indexMatchTable || $noIndexMatchView || $indexMatchView;
@@ -83,7 +68,6 @@ class ReferenceHelper {
 			} elseif ($this->matchReference($referenceText, 'view')) {
 				$elementId = $this->getViewIdFromLink($referenceText);
 			}
-
 			if ($elementId === null || $this->userId === null) {
 				// fallback to opengraph if it matches, but somehow we can't resolve
 				/** @psalm-suppress InvalidReturnStatement */
@@ -126,22 +110,24 @@ class ReferenceHelper {
 			$referenceInfo['link'] = $referenceText;
 			$reference->setUrl($referenceText);
 
+			// add Columns
+			try {
+				if($this->matchReference($referenceText, 'table')) {
+					$referenceInfo['columns'] = $this->columnService->findAllByTable($elementId);
+				} elseif ($this->matchReference($referenceText, 'view')) {
+					$referenceInfo['columns'] = $this->columnService->findAllByView($elementId);
+				}
+			} catch (InternalError|NotFoundError|PermissionError|DoesNotExistException|MultipleObjectsReturnedException $e) {
+			}
+
 			// add rows data
 			try {
 				if($this->matchReference($referenceText, 'table')) {
-					$referenceInfo['rows'] = $this->rowService->findAllByTable($elementId, 10, 0);
+					$referenceInfo['rows'] = $this->rowService->findAllByTable($elementId, 100, 0);
 				} elseif ($this->matchReference($referenceText, 'view')) {
-					$referenceInfo['rows'] = $this->rowService->findAllByView($elementId, $this->userId, 10, 0);
+					$referenceInfo['rows'] = $this->rowService->findAllByView($elementId, $this->userId, 100, 0);
 				}
 			} catch (InternalError|PermissionError|DoesNotExistException|MultipleObjectsReturnedException $e) {
-				// TODO add logging
-			}
-
-			// set referenceType to { table, view }
-			if($this->matchReference($referenceText, 'table')) {
-				$referenceInfo['type'] = 'table';
-			} elseif ($this->matchReference($referenceText, 'view')) {
-				$referenceInfo['type'] = 'view';
 			}
 
 			$reference->setRichObject(
@@ -152,64 +138,5 @@ class ReferenceHelper {
 		}
 
 		return null;
-	}
-
-	/**
-	 * @param string $url
-	 * @return int|null
-	 */
-	public function getTableIdFromLink(string $url): ?int {
-		$start = $this->urlGenerator->getAbsoluteURL('/apps/' . Application::APP_ID);
-		$startIndex = $this->urlGenerator->getAbsoluteURL('/index.php/apps/' . Application::APP_ID);
-
-		preg_match('/^' . preg_quote($start, '/') . '\/#\/table\/(\d+)(?:\/[^\/]+)*$/i', $url, $matches);
-		if (!$matches || count($matches) < 2) {
-			preg_match('/^' . preg_quote($startIndex, '/') . '\/#\/table\/(\d+)(?:\/[^\/]+)*$/i', $url, $matches);
-		}
-		if ($matches && count($matches) > 1) {
-			return (int) $matches[1];
-		}
-
-		return null;
-	}
-
-	/**
-	 * @param string $url
-	 * @return int|null
-	 */
-	public function getViewIdFromLink(string $url): ?int {
-		$start = $this->urlGenerator->getAbsoluteURL('/apps/' . Application::APP_ID);
-		$startIndex = $this->urlGenerator->getAbsoluteURL('/index.php/apps/' . Application::APP_ID);
-
-		preg_match('/^' . preg_quote($start, '/') . '\/#\/view\/(\d+)(?:\/[^\/]+)*$/i', $url, $matches);
-		if (!$matches || count($matches) < 2) {
-			preg_match('/^' . preg_quote($startIndex, '/') . '\/#\/view\/(\d+)(?:\/[^\/]+)*$/i', $url, $matches);
-		}
-		if ($matches && count($matches) > 1) {
-			return (int) $matches[1];
-		}
-
-		return null;
-	}
-
-	public function getCachePrefix(string $referenceId): string {
-		return $this->userId ?? '';
-	}
-
-	public function getCacheKey(string $referenceId): ?string {
-		if ($this->config->getSystemValue('debug')) {
-			return $this->randomString(10);
-		} else {
-			return $referenceId;
-		}
-	}
-
-	private function randomString(int $length): string {
-		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-		$randString = '';
-		for ($i = 0; $i < $length; $i++) {
-			$randString = $characters[rand(0, strlen($characters))];
-		}
-		return $randString;
 	}
 }

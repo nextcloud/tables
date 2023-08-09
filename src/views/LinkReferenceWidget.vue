@@ -22,7 +22,9 @@
 <template>
 	<div v-if="richObject" class="tables-table">
 		<div class="tables-table--image">
-			<TablesIcon
+			<IconTables v-if="getType === 'table'"
+				:size="50" />
+			<IconView v-if="getType === 'view'"
 				:size="50" />
 		</div>
 		<div class="tables-table--info">
@@ -38,20 +40,24 @@
 					:display-name="richObject.ownerDisplayName" />&nbsp;
 				<NcCounterBubble>{{ n('tables', '{nb} row', '{nb} rows', richObject.rowsCount, { nb: richObject.rowsCount}) }}</NcCounterBubble>
 			</div>
+			<!-- <div>
+				{{ richObject.rows }}
+			</div> -->
 		</div>
 	</div>
 </template>
 
 <script>
-import TablesIcon from '../icons/TablesIcon.vue'
+import IconTables from '../icons/TablesIcon.vue'
+import IconView from 'vue-material-design-icons/Text.vue'
 import { NcUserBubble, NcCounterBubble } from '@nextcloud/vue'
-import { translate as t } from '@nextcloud/l10n'
+import { translatePlural as n } from '@nextcloud/l10n'
 
 export default {
-	name: 'TableReferenceWidget',
 
 	components: {
-		TablesIcon,
+		IconTables,
+		IconView,
 		NcUserBubble,
 		NcCounterBubble,
 	},
@@ -75,6 +81,13 @@ export default {
 		emoji() {
 			return this.richObject.emoji
 		},
+		getType() {
+			return this.richObject?.type ?? null
+		},
+	},
+
+	methods: {
+		n,
 	},
 }
 </script>
