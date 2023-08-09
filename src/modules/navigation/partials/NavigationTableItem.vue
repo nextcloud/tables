@@ -6,7 +6,7 @@
 		:force-menu="true"
 		:open.sync="isParentOfActiveView"
 		:to="'/table/' + parseInt(table.id)"
-		@click="closeNav">
+		@click="openTable">
 		<template #icon>
 			<template v-if="table.emoji">
 				{{ table.emoji }}
@@ -172,7 +172,9 @@ export default {
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
 			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
 		},
-		closeNav(e) {
+		openTable() {
+			this.isParentOfActiveView = true
+			// Close navigation
 			if (window.innerWidth < 960) {
 				emit('toggle-navigation', {
 					open: false,

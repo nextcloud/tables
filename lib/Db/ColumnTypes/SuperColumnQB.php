@@ -95,7 +95,7 @@ class SuperColumnQB implements IColumnTypeQB {
 	 * @return string
 	 * @throws InternalError
 	 */
-	private function getMetaColumnName(int $metaId): string {
+	public static function getMetaColumnName(int $metaId): string {
 		switch ($metaId) {
 			case -1:
 				return 'id';

@@ -143,7 +143,11 @@ class RowMapper extends QBMapper {
 			}
 			$sortColumnPlaceholder = 'sortColumn'.$index;
 			if ($sortRule['columnId'] < 0) {
-				$orderString = ':'.$sortColumnPlaceholder;
+				try {
+					$orderString = SuperColumnQB::getMetaColumnName($sortRule['columnId']);
+				} catch (InternalError $e) {
+					return;
+				}
 			} else {
 				if ($this->platform === IColumnTypeQB::DB_PLATFORM_PGSQL) {
 					$orderString = 'c'.$sortRule['columnId'].'->>\'value\'';
@@ -171,7 +175,7 @@ class RowMapper extends QBMapper {
 	 */
 	public function countRowsForView(View $view, $userId): int {
 		$qb = $this->db->getQueryBuilder();
-		$qb->select($qb->func()->count('t1.*', 'counter'))
+		$qb->select($qb->func()->count('*', 'counter'))
 			->from($this->table, 't1')
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), IQueryBuilder::PARAM_INT)));
 
@@ -367,7 +371,7 @@ class RowMapper extends QBMapper {
 	 */
 	public function findAllWithColumn(int $columnId): array {
 		$qb = $this->db->getQueryBuilder();
-		$qb->select('t1.*')
+		$qb->select('*')
 			->from($this->table, 't1');
 
 		$this->genericColumnQB->addWhereForFindAllWithColumn($qb, $columnId);
@@ -381,7 +385,7 @@ class RowMapper extends QBMapper {
 	 */
 	public function countRows(int $tableId): int {
 		$qb = $this->db->getQueryBuilder();
-		$qb->select($qb->func()->count('t1.*', 'counter'));
+		$qb->select($qb->func()->count('*', 'counter'));
 		$qb->from($this->table, 't1');
 		$qb->where(
 			$qb->expr()->eq('table_id', $qb->createNamedParameter($tableId))
