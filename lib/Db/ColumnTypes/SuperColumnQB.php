@@ -15,7 +15,7 @@ class SuperColumnQB implements IColumnTypeQB {
 		$this->logger = $logger;
 	}
 
-	public function setPlatform(int $platform) {
+	public function setPlatform(int $platform): void {
 		$this->platform = $platform;
 	}
 

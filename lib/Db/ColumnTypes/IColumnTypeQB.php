@@ -1,6 +1,6 @@
 <?php
 
-namespace OCA\Tables\DB\ColumnTypes;
+namespace OCA\Tables\Db\ColumnTypes;
 
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\DB\QueryBuilder\IQueryFunction;

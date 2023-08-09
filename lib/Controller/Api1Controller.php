@@ -102,7 +102,7 @@ class Api1Controller extends ApiController {
 	 */
 	public function updateTable(int $id, string $title = null, string $emoji = null): DataResponse {
 		return $this->handleError(function () use ($id, $title, $emoji) {
-			return $this->service->update($id, $title, $emoji, $this->userId);
+			return $this->tableService->update($id, $title, $emoji, $this->userId);
 		});
 	}
 
@@ -468,7 +468,7 @@ class Api1Controller extends ApiController {
 	 */
 	public function indexTableRowsSimple(int $tableId, ?int $limit, ?int $offset): DataResponse {
 		return $this->handleError(function () use ($tableId, $limit, $offset) {
-			return $this->v1Api->getData($tableId, $limit, $offset, $this->userId);
+			return $this->v1Api->getData($tableId, $limit, $offset);
 		});
 	}
 

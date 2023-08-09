@@ -11,7 +11,7 @@ class NumberBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	}
 
 	public function canBeParsed(string $value, ?Column $column = null): bool {
-		return !$value || is_numeric(floatval($value));
+		return !$value || floatval($value);
 	}
 
 }

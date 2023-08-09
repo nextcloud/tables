@@ -15,6 +15,7 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
+use OCP\DB\QueryBuilder\IQueryFunction;
 use OCP\IDBConnection;
 use OCP\Server;
 use Psr\Container\ContainerExceptionInterface;
@@ -79,7 +80,7 @@ class RowMapper extends QBMapper {
 		return $this->findEntity($qb);
 	}
 
-	private function buildFilterByColumnType($qb, array $filter, string $filterId): string {
+	private function buildFilterByColumnType($qb, array $filter, string $filterId): ?IQueryFunction {
 		try {
 			$columnQbClassName = 'OCA\Tables\Db\ColumnTypes\\';
 			$type = explode("-", $filter['columnType'])[0];
@@ -92,7 +93,7 @@ class RowMapper extends QBMapper {
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 			$this->logger->debug('Column type query builder class not found');
 		}
-		return '';
+		return null;
 	}
 
 	private function getInnerFilterExpressions($qb, $filterGroup, int $groupIndex): array {
@@ -123,14 +124,15 @@ class RowMapper extends QBMapper {
 			case 'stars-3': return '3';
 			case 'stars-4': return '4';
 			case 'stars-5': return '5';
-			case 'datetime-date-today': return date('Y-m-d');
-			case 'datetime-date-start-of-year': return date('Y-01-01');
-			case 'datetime-date-start-of-month': return date('Y-m-01');
+			case 'datetime-date-today': return date('Y-m-d') ? date('Y-m-d') : '';
+			case 'datetime-date-start-of-year': return date('Y-01-01') ? date('Y-01-01') : '';
+			case 'datetime-date-start-of-month': return date('Y-m-01') ? date('Y-m-01') : '';
 			case 'datetime-date-start-of-week':
 				$day = date('w');
-				return date('m-d-Y', strtotime('-'.$day.' days'));
+				$result = date('m-d-Y', strtotime('-'.$day.' days'));
+				return  $result ?: '';
 			case 'datetime-time-now': return date('H:i');
-			case 'datetime-now': return date('Y-m-d H:i');
+			case 'datetime-now': return date('Y-m-d H:i') ? date('Y-m-d H:i') : '';
 			default: return $unresolvedSearchValue;
 		}
 	}
@@ -203,7 +205,7 @@ class RowMapper extends QBMapper {
 	public function getRowIdsOfView(View $view, $userId): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('t1.id')
-			->from($this->table,'t1')
+			->from($this->table, 't1')
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), IQueryBuilder::PARAM_INT)));
 
 		$neededColumnIds = $this->getAllColumnIdsFromView($view, $qb);
@@ -306,7 +308,7 @@ class RowMapper extends QBMapper {
 		}
 		$rows = $this->findEntities($qb);
 		foreach ($rows as &$row) {
-			$row->setDataArray(array_filter($row->getDataArray(), function($item) use ($view) {
+			$row->setDataArray(array_filter($row->getDataArray(), function ($item) use ($view) {
 				return in_array($item['columnId'], $view->getColumnsArray());
 			}));
 		}
@@ -329,7 +331,8 @@ class RowMapper extends QBMapper {
 		if ($this->platform === IColumnTypeQB::DB_PLATFORM_PGSQL) {
 			foreach ($neededColumnIds as $columnId) {
 				if ($columnId >= 0) {
-					$qb->leftJoin("t1", $qb->createFunction('json_array_elements(t1.data)'), 'c' . intval($columnId),$qb->createFunction("CAST(c".intval($columnId).".value->>'columnId' AS int) = ".$columnId));
+					/** @psalm-suppress ImplicitToStringCast */
+					$qb->leftJoin("t1", $qb->createFunction('json_array_elements(t1.data)'), 'c' . intval($columnId), $qb->createFunction("CAST(c".intval($columnId).".value->>'columnId' AS int) = ".$columnId));
 					// TODO Security
 				}
 			}

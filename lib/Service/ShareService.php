@@ -45,8 +45,6 @@ class ShareService extends SuperService {
 
 	/**
 	 * @throws InternalError
-	 *
-	 * @psalm-param 'table' $nodeType
 	 */
 	public function findAll(string $nodeType, int $nodeId, ?string $userId = null): array {
 		$userId = $this->permissionsService->preCheckUserId($userId);
