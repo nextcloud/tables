@@ -21,7 +21,7 @@ import { NcEmptyContent, NcButton } from '@nextcloud/vue'
 import IconTables from '../shared/assets/icons/IconTables.vue'
 import { emit } from '@nextcloud/event-bus'
 import MainModals from '../modules/modals/Modals.vue'
-import TableSmartPicker from '../views/TableSmartPicker.vue'
+import TableSmartPicker from '../views/SmartPicker.vue'
 
 export default {
 	components: {

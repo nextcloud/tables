@@ -1,6 +1,8 @@
 <template>
 	<tr v-if="row" :class="{ selected }">
-		<td><NcCheckboxRadioSwitch :checked="selected" @update:checked="v => $emit('update-row-selection', { rowId: row.id, value: v })" /></td>
+		<td v-if="config.canSelectRows" :class="{sticky: config.canSelectRows}">
+			<NcCheckboxRadioSwitch :checked="selected" @update:checked="v => $emit('update-row-selection', { rowId: row.id, value: v })" />
+		</td>
 		<td v-for="col in visibleColumns" :key="col.id" :class="{ 'search-result': getCell(col.id)?.searchStringFound, 'filter-result': getCell(col.id)?.filterFound }">
 			<component :is="getTableCell(col)"
 				:column="col"

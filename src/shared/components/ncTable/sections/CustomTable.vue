@@ -88,7 +88,7 @@ export default {
 
 		getSearchedAndFilteredAndSortedRows() {
 			// if we have to sort
-			if (this.viewSetting.sorting) {
+			if (this.viewSetting?.sorting) {
 				const sortColumn = this.columns.find(item => item.id === this.viewSetting.sorting[0].columnId)
 				return [...this.getSearchedAndFilteredRows].sort(sortColumn.sort(this.viewSetting.sorting[0].mode))
 			}
@@ -348,7 +348,7 @@ export default {
 		}
 	}
 
-	tr>th:first-child,tr>td:first-child {
+	tr>th.sticky:first-child,tr>td.sticky:first-child {
 		position: sticky;
 		left: 0;
 		padding-left: calc(var(--default-grid-baseline) * 4);

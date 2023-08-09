@@ -1,6 +1,6 @@
 <template>
 	<tr>
-		<th>
+		<th v-if="config.canSelectRows" :class="{sticky: config.canSelectRows}">
 			<div class="cell-wrapper">
 				<NcCheckboxRadioSwitch :checked="allRowsAreSelected" @update:checked="value => $emit('select-all-rows', value)" />
 				<div v-if="hasRightHiddenNeighbor(-1)" class="hidden-indicator-first" @click="unhide(-1)" />

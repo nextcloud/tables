@@ -53,7 +53,7 @@
 <script>
 import { NcSelect } from '@nextcloud/vue'
 import { translate as t } from '@nextcloud/l10n'
-import SearchAndSelectOption from './SearchAndSelectOption.vue'
+import SearchAndSelectOption from '../partials/SearchAndSelectOption.vue'
 import debounce from 'debounce'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'

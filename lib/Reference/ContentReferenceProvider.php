@@ -6,11 +6,11 @@ use OC\Collaboration\Reference\ReferenceManager;
 use OCP\Collaboration\Reference\IReference;
 use OCP\Collaboration\Reference\IReferenceProvider;
 
-class TableReferenceProvider implements IReferenceProvider {
-	private ReferenceHelper $referenceHelper;
+class ContentReferenceProvider implements IReferenceProvider {
+	private ContentReferenceHelper $referenceHelper;
 	private ReferenceManager $referenceManager;
 
-	public function __construct(ReferenceHelper $referenceHelper, ReferenceManager $referenceManager) {
+	public function __construct(ContentReferenceHelper $referenceHelper, ReferenceManager $referenceManager) {
 		$this->referenceHelper = $referenceHelper;
 		$this->referenceManager = $referenceManager;
 	}
@@ -27,14 +27,6 @@ class TableReferenceProvider implements IReferenceProvider {
 	 */
 	public function resolveReference(string $referenceText): ?IReference {
 		return $this->referenceHelper->resolveReference($referenceText);
-	}
-
-	/**
-	 * @param string $url
-	 * @return int|null
-	 */
-	public function getTableIdFromLink(string $url): ?int {
-		return $this->referenceHelper->getTableIdFromLink($url);
 	}
 
 	/**
