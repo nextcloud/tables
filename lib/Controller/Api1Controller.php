@@ -100,6 +100,17 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
+	public function updateTable(int $id, string $title = null, string $emoji = null): DataResponse {
+		return $this->handleError(function () use ($id, $title, $emoji) {
+			return $this->service->update($id, $title, $emoji, $this->userId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
 	public function deleteTable(int $tableId): DataResponse {
 		return $this->handleError(function () use ($tableId) {
 			return $this->tableService->delete($tableId);
@@ -199,7 +210,7 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function indexTableManageShares(int $tableId): DataResponse {
+	public function indexTableShares(int $tableId): DataResponse {
 		return $this->handleError(function () use ($tableId) {
 			return $this->shareService->findAll('table', $tableId);
 		});
@@ -245,9 +256,9 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function indexTableColumns(int $tableId): DataResponse {
-		return $this->handleError(function () use ($tableId) {
-			return $this->columnService->findAllByTable($tableId);
+	public function indexTableColumns(int $tableId, ?int $viewId): DataResponse {
+		return $this->handleError(function () use ($tableId, $viewId) {
+			return $this->columnService->findAllByTable($tableId, $viewId);
 		});
 	}
 
@@ -268,7 +279,8 @@ class Api1Controller extends ApiController {
 	 * @NoCSRFRequired
 	 */
 	public function createColumn(
-		int $viewId,
+		?int $tableId,
+		?int $viewId,
 		string $title,
 		string $type,
 		?string $subtype,
@@ -293,6 +305,7 @@ class Api1Controller extends ApiController {
 		?array $selectedViewIds = []
 	): DataResponse {
 		return $this->handleError(function () use (
+			$tableId,
 			$viewId,
 			$type,
 			$subtype,
@@ -319,6 +332,7 @@ class Api1Controller extends ApiController {
 		) {
 			return $this->columnService->create(
 				$this->userId,
+				$tableId,
 				$viewId,
 				$type,
 				$subtype,
@@ -463,6 +477,17 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
+	public function indexTableRows(int $tableId, ?int $limit, ?int $offset): DataResponse {
+		return $this->handleError(function () use ($tableId, $limit, $offset) {
+			return $this->rowService->findAllByTable($tableId, $limit, $offset);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
 	public function indexViewRows(int $viewId, ?int $limit, ?int $offset): DataResponse {
 		return $this->handleError(function () use ($viewId, $limit, $offset) {
 			return $this->rowService->findAllByView($viewId, $this->userId, $limit, $offset);
@@ -474,7 +499,9 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function createRow(int $viewId, array $data): DataResponse {
+	public function createRowInView(
+		int $viewId,
+		array $data): DataResponse {
 		$dataNew = [];
 		foreach ($data as $key => $value) {
 			$dataNew[] = [
@@ -483,8 +510,29 @@ class Api1Controller extends ApiController {
 			];
 		}
 
-		return $this->handleError(function () use ($dataNew, $viewId) {
-			return $this->rowService->create($viewId, $dataNew);
+		return $this->handleError(function () use ( $viewId, $dataNew) {
+			return $this->rowService->create(null, $viewId, $dataNew);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function createRowInTable(
+		int $tableId,
+		array $data): DataResponse {
+		$dataNew = [];
+		foreach ($data as $key => $value) {
+			$dataNew[] = [
+				'columnId' => (int) $key,
+				'value' => $value
+			];
+		}
+
+		return $this->handleError(function () use ($tableId, $dataNew) {
+			return $this->rowService->create($tableId, null, $dataNew);
 		});
 	}
 
@@ -504,7 +552,9 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function updateRow(int $rowId, int $viewId, array $data): DataResponse {
+	public function updateRow(int $rowId,
+							  ?int $viewId,
+							  array $data): DataResponse {
 		$dataNew = [];
 		foreach ($data as $key => $value) {
 			$dataNew[] = [
@@ -522,7 +572,18 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function deleteRow(int $rowId, int $viewId): DataResponse {
+	public function deleteRow(int $rowId): DataResponse {
+		return $this->handleError(function () use ($rowId) {
+			return $this->rowService->delete($rowId, null, $this->userId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function deleteRowByView(int $rowId, int $viewId): DataResponse {
 		return $this->handleError(function () use ($rowId, $viewId) {
 			return $this->rowService->delete($rowId, $viewId, $this->userId);
 		});
@@ -533,9 +594,20 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function createImport(int $viewId, string $path, bool $createMissingColumns = true): DataResponse {
+	public function importInTable(int $tableId, string $path, bool $createMissingColumns = true): DataResponse {
+		return $this->handleError(function () use ($tableId, $path, $createMissingColumns) {
+			return $this->importService->import($tableId, null, $path, $createMissingColumns);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function importInView(int $viewId, string $path, bool $createMissingColumns = true): DataResponse {
 		return $this->handleError(function () use ($viewId, $path, $createMissingColumns) {
-			return $this->importService->import($viewId, $path, $createMissingColumns);
+			return $this->importService->import(null, $viewId, $path, $createMissingColumns);
 		});
 	}
 
@@ -546,10 +618,94 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function updateTable(int $tableId, ?string $title, ?string $emoji): DataResponse {
-		return $this->handleError(function () use ($tableId, $title, $emoji) {
-			return $this->tableService->update($tableId, $title, $emoji);
+	public function createTableShare(int $tableId, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage): DataResponse {
+		return $this->handleError(function () use ($tableId, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage) {
+			return $this->shareService->create($tableId, 'table', $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage);
 		});
 	}
 
+	/**
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 */
+	public function createTableColumn(
+		int $tableId,
+		string $title,
+		string $type,
+		?string $subtype,
+		bool $mandatory,
+		?string $description,
+
+		?string $numberPrefix,
+		?string $numberSuffix,
+		?float $numberDefault,
+		?float $numberMin,
+		?float $numberMax,
+		?int $numberDecimals,
+
+		?string $textDefault,
+		?string $textAllowedPattern,
+		?int $textMaxLength,
+
+		?string $selectionOptions = '',
+		?string $selectionDefault = '',
+
+		?string $datetimeDefault = '',
+		?array $selectedViewIds = []
+	): DataResponse {
+		return $this->handleError(function () use (
+			$tableId,
+			$type,
+			$subtype,
+			$title,
+			$mandatory,
+			$description,
+
+			$textDefault,
+			$textAllowedPattern,
+			$textMaxLength,
+
+			$numberPrefix,
+			$numberSuffix,
+			$numberDefault,
+			$numberMin,
+			$numberMax,
+			$numberDecimals,
+
+			$selectionOptions,
+			$selectionDefault,
+
+			$datetimeDefault,
+			$selectedViewIds
+		) {
+			return $this->columnService->create(
+				$this->userId,
+				$tableId,
+				null,
+				$type,
+				$subtype,
+				$title,
+				$mandatory,
+				$description,
+
+				$textDefault,
+				$textAllowedPattern,
+				$textMaxLength,
+
+				$numberPrefix,
+				$numberSuffix,
+				$numberDefault,
+				$numberMin,
+				$numberMax,
+				$numberDecimals,
+
+				$selectionOptions,
+				$selectionDefault,
+
+				$datetimeDefault,
+				$selectedViewIds
+			);
+		});
+	}
 }

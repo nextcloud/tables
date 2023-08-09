@@ -21,22 +21,17 @@ class V1Api {
 	}
 
 	/**
-	 * @param int $viewId
+	 * @param int $tableId
 	 * @param int|null $limit
 	 * @param int|null $offset
-	 * @param string $userId
 	 * @return array
 	 * @throws InternalError
 	 * @throws PermissionError
-	 * @throws NotFoundError
-	 * @throws DoesNotExistException
-	 * @throws MultipleObjectsReturnedException
 	 */
-	public function getData(int $viewId, ?int $limit, ?int $offset, string $userId):
-	array {
-		$columns = $this->columnService->findAllByView($viewId);
+	public function getData(int $tableId, ?int $limit, ?int $offset): array {
+		$columns = $this->columnService->findAllByTable($tableId);
 
-		$rows = $this->rowService->findAllByView($viewId, $userId, $limit, $offset);
+		$rows = $this->rowService->findAllByTable($tableId, $limit, $offset);
 
 		$data = [];
 

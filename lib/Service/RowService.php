@@ -240,7 +240,6 @@ class RowService extends SuperService {
 	 */
 	public function updateSet(
 		int $id,
-		?int $tableId,
 		?int $viewId,
 		array $data,
 		string $userId
@@ -254,22 +253,24 @@ class RowService extends SuperService {
 					throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
 				}
 				$view = $this->viewMapper->find($viewId);
+				$columnIds = $view->getColumnsArray();
 				$rowIds = $this->mapper->getRowIdsOfView($view, $userId);
 				if(!in_array($id, $rowIds)) {
 					throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
 				}
-			} else if ($tableId) {
+			} else {
 				// security
-				if (!$this->permissionsService->canUpdateRowsByTableId($tableId)) {
+				if (!$this->permissionsService->canUpdateRowsByTableId($item->getTableId())) {
 					throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
 				}
-			} else {
-				throw new InternalError('Cannot update row without table or view in context');
+				$columnIds = $this->columnMapper->findAllIdsByTable($item->getTableId());
 			}
 
 			$time = new DateTime();
 			$d = $item->getDataArray();
 			foreach ($data as $dataObject) {
+				// Check whether the column of which the value should change is part of the table / view
+				if (!in_array($dataObject['columnId'],$columnIds)) continue;
 				$d = $this->replaceOrAddData($d, $dataObject);
 			}
 			$item->setDataArray($d);
@@ -312,7 +313,7 @@ class RowService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function delete(int $id, ?int $tableId, ?int $viewId, string $userId): Row {
+	public function delete(int $id, ?int $viewId, string $userId): Row {
 		try {
 			$item = $this->mapper->find($id);
 
@@ -326,13 +327,11 @@ class RowService extends SuperService {
 				if(!in_array($id, $rowIds)) {
 					throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
 				}
-			} else if ($tableId) {
+			} else {
 				// security
-				if (!$this->permissionsService->canDeleteRowsByTableId($tableId)) {
+				if (!$this->permissionsService->canDeleteRowsByTableId($item->getTableId())) {
 					throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
 				}
-			} else {
-				throw new InternalError('Cannot update row without table or view in context');
 			}
 
 			$this->mapper->delete($item);

@@ -15,6 +15,7 @@ return [
 		// -> tables
 		['name' => 'api1#index', 'url' => '/api/1/tables', 'verb' => 'GET'],
 		['name' => 'api1#createTable',	'url' => '/api/1/tables', 'verb' => 'POST'],
+		['name' => 'api1#updateTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'PUT'],
 		['name' => 'api1#getTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'GET'],
 		['name' => 'api1#deleteTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'DELETE'],
 		// -> views
@@ -26,26 +27,35 @@ return [
 		// -> share
 		['name' => 'api1#getShare',	'url' => '/api/1/shares/{shareId}', 'verb' => 'GET'],
 		['name' => 'api1#indexViewShares',	'url' => '/api/1/views/{viewId}/shares', 'verb' => 'GET'],
-		['name' => 'api1#indexTableManageShares', 'url' => '/api/1/tables/{tableId}/shares', 'verb' => 'GET'],
+		['name' => 'api1#indexTableShares', 'url' => '/api/1/tables/{tableId}/shares', 'verb' => 'GET'],
 		['name' => 'api1#createShare',	'url' => '/api/1/shares', 'verb' => 'POST'],
 		['name' => 'api1#deleteShare',	'url' => '/api/1/shares/{shareId}', 'verb' => 'DELETE'],
 		['name' => 'api1#updateSharePermissions',	'url' => '/api/1/shares/{shareId}', 'verb' => 'PUT'],
 		// -> columns
 		['name' => 'api1#indexTableColumns',	'url' => '/api/1/tables/{tableId}/columns', 'verb' => 'GET'],
 		['name' => 'api1#indexViewColumns', 'url' => '/api/1/views/{viewId}/columns', 'verb' => 'GET'],
-		['name' => 'api1#createColumn',	'url' => '/api/1/views/{viewId}/columns', 'verb' => 'POST'],
+		['name' => 'api1#createColumn',	'url' => '/api/1/columns', 'verb' => 'POST'],
 		['name' => 'api1#updateColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'PUT'],
 		['name' => 'api1#getColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'GET'],
 		['name' => 'api1#deleteColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'DELETE'],
 		// -> rows
 		['name' => 'api1#indexTableRowsSimple',	'url' => '/api/1/tables/{tableId}/rows/simple', 'verb' => 'GET'],
+		['name' => 'api1#indexTableRows',	'url' => '/api/1/tables/{tableId}/rows', 'verb' => 'GET'],
 		['name' => 'api1#indexViewRows',	'url' => '/api/1/views/{viewId}/rows', 'verb' => 'GET'],
-		['name' => 'api1#createRow',	'url' => '/api/1/views/{viewId}/rows', 'verb' => 'POST'],
+		['name' => 'api1#createRowInView',	'url' => '/api/1/views/{viewId}/rows', 'verb' => 'POST'],
+		['name' => 'row#createRowInTable', 'url' => '/api/1/tables/{tableId}/rows', 'verb' => 'POST'],
+
 		['name' => 'api1#getRow',	'url' => '/api/1/rows/{rowId}', 'verb' => 'GET'],
-		['name' => 'api1#updateRow',	'url' => '/api/1/views/{viewId}/rows/{rowId}', 'verb' => 'PUT'],
-		['name' => 'api1#deleteRow',	'url' => '/api/1/views/{viewId}/rows/{rowId}', 'verb' => 'DELETE'],
+		['name' => 'api1#deleteRowByView',	'url' => '/api/1/views/{viewId}/rows/{rowId}', 'verb' => 'DELETE'],
+		['name' => 'api1#updateRow',	'url' => '/api/1/rows/{rowId}', 'verb' => 'PUT'],
+		['name' => 'api1#deleteRow',	'url' => '/api/1/rows/{rowId}', 'verb' => 'DELETE'],
 		// -> import
-		['name' => 'api1#createImport', 'url' => '/api/1/import/views/{viewId}', 'verb' => 'POST'],
+		['name' => 'api1#importInTable', 'url' => '/api/1/import/table/{tablesId}', 'verb' => 'POST'],
+		['name' => 'api1#importInView', 'url' => '/api/1/import/views/{viewId}', 'verb' => 'POST'],
+
+		// Deprecated API calls
+		['name' => 'api1#createTableShare',	'url' => '/api/1/tables/{tableId}/shares', 'verb' => 'POST'], // use createShare instead
+		['name' => 'api1#createTableColumn',	'url' => '/api/1/tables/{tableId}/columns', 'verb' => 'POST'], // Use create column instead
 
 
 		// table
@@ -80,7 +90,7 @@ return [
 		['name' => 'row#update', 'url' => '/row/{id}/column/{columnId}', 'verb' => 'PUT'],
 		['name' => 'row#updateSet', 'url' => '/row/{id}', 'verb' => 'PUT'],
 		['name' => 'row#destroyByView', 'url' => '/view/{viewId}/row/{id}', 'verb' => 'DELETE'],
-		['name' => 'row#destroy', 'url' => '/table/{tableId}/row/{id}', 'verb' => 'DELETE'],
+		['name' => 'row#destroy', 'url' => '/row/{id}', 'verb' => 'DELETE'],
 
 		// shares
 		['name' => 'share#index', 'url' => '/share/table/{tableId}', 'verb' => 'GET'],

@@ -228,11 +228,11 @@ export default {
 		removeRows({ commit }) {
 			commit('setRows', [])
 		},
-		async updateRow({ state, commit, dispatch }, { id, viewId, tableId, data }) {
+		async updateRow({ state, commit, dispatch }, { id, viewId, data }) {
 			let res = null
 
 			try {
-				res = await axios.put(generateUrl('/apps/tables/row/' + id), { viewId, tableId, data })
+				res = await axios.put(generateUrl('/apps/tables/row/' + id), { viewId, data })
 			} catch (e) {
 				console.debug(e?.response)
 				if (e?.response?.data?.message?.startsWith('User should not be able to access row')) {
@@ -267,10 +267,10 @@ export default {
 			commit('setRows', [...rows])
 			return true
 		},
-		async removeRow({ state, commit, dispatch }, { rowId, tableId, viewId }) {
+		async removeRow({ state, commit, dispatch }, { rowId, viewId }) {
 			try {
 				if (viewId) await axios.delete(generateUrl('/apps/tables/view/' + viewId + '/row/' + rowId))
-				else await axios.delete(generateUrl('/apps/tables/table/' + tableId + '/row/' + rowId))
+				else await axios.delete(generateUrl('/apps/tables/row/' + rowId))
 			} catch (e) {
 				if (e?.response?.data?.message?.startsWith('User should not be able to access row')) {
 					showError(t('tables', 'Outdated data. View is reloaded'))
