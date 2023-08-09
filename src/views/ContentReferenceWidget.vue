@@ -68,6 +68,10 @@ export default {
 </script>
 <style lang="scss" scoped>
 
+	div {
+		width: 100%;
+	}
+
 	h2 {
 		padding-left: calc(var(--default-grid-baseline) * 3);
 		padding-top: calc(var(--default-grid-baseline) * 3);
