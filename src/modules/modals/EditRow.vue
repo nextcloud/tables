@@ -142,7 +142,6 @@ export default {
 			const res = await this.$store.dispatch('updateRow', {
 				id: this.row.id,
 				viewId: this.isView ? this.activeElement.id : null,
-				tableId: !this.isView ? this.activeElement.id : null,
 				data,
 			})
 			if (!res) {
@@ -162,7 +161,6 @@ export default {
 			const res = await this.$store.dispatch('removeRow', {
 				rowId,
 				viewId: this.isView ? this.activeElement.id : null,
-				tableId: !this.isView ? this.activeElement.id : null,
 			})
 			if (!res) {
 				showError(t('tables', 'Could not delete row.'))

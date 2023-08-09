@@ -106,20 +106,17 @@ class RowController extends Controller {
 	 */
 	public function updateSet(
 		int $id,
-		?int $tableId,
 		?int $viewId,
 		array $data
 
 	): DataResponse {
 		return $this->handleError(function () use (
 			$id,
-			$tableId,
 			$viewId,
 			$data
 		) {
 			return $this->service->updateSet(
 				$id,
-				$tableId,
 				$viewId,
 				$data,
 				$this->userId);
@@ -129,9 +126,9 @@ class RowController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function destroy(int $id, int $tableId): DataResponse {
-		return $this->handleError(function () use ($id, $tableId) {
-			return $this->service->delete($id, $tableId, null, $this->userId);
+	public function destroy(int $id): DataResponse {
+		return $this->handleError(function () use ($id) {
+			return $this->service->delete($id, null, $this->userId);
 		});
 	}
 	/**
@@ -139,7 +136,7 @@ class RowController extends Controller {
 	 */
 	public function destroyByView(int $id, int $viewId): DataResponse {
 		return $this->handleError(function () use ($id, $viewId) {
-			return $this->service->delete($id, null, $viewId, $this->userId);
+			return $this->service->delete($id, $viewId, $this->userId);
 		});
 	}
 }

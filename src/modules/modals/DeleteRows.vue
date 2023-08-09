@@ -38,7 +38,6 @@ export default {
 				const res = this.$store.dispatch('removeRow', {
 					rowId,
 					viewId: this.isView ? this.activeElement.id : null,
-					tableId: !this.isView ? this.activeElement.id : null,
 				})
 				if (!res) {
 					error = true
