@@ -299,7 +299,7 @@ class ViewService extends SuperService {
 						$canManageTable = $manageTableShare['manage'] ?? false;
 					} catch (NotFoundError $e) {
 					} catch (\Exception $e) {
-						throw new InternalError($e);
+						throw new InternalError($e->getMessage());
 					}
 					$view->setOnSharePermissions([
 						'read' => $permissions['read'] ?? false,
@@ -347,10 +347,8 @@ class ViewService extends SuperService {
 			if(!$view->getOnSharePermissions()['manageTable']) {
 				$view->setFilterArray(
 					array_map(function ($filterGroup) {
-						return array_map(function (){
-							// Instead of filter just indicate that there is a filter, but hide details
-							return null;
-						},$filterGroup);
+						// Instead of filter just indicate that there is a filter, but hide details
+						return array_map(null, $filterGroup);
 					},
 						$view->getFilterArray()));
 				$view->setSortArray(
@@ -369,7 +367,7 @@ class ViewService extends SuperService {
 	/**
 	 * @param Table $table
 	 * @param null|string $userId
-	 * @return View
+	 * @return void
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
@@ -405,7 +403,7 @@ class ViewService extends SuperService {
 				return array_filter($filterGroup, function ($filter) use ($columnId) {
 					return $filter['columnId'] !== $columnId;
 				});
-			}, $view->getFilterArray()), fn($filterGroup) => !empty($filterGroup));
+			}, $view->getFilterArray()), fn ($filterGroup) => !empty($filterGroup));
 			$data = [
 				'columns' => json_encode(array_values(array_diff($view->getColumnsArray(), [$columnId]))),
 				'sort' => json_encode($filteredSortingRules),

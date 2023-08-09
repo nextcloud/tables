@@ -66,7 +66,7 @@ class ReferenceHelper {
 				return $this->linkReferenceProvider->resolveReference($referenceText);
 			}
 			try {
-				$view = $this->viewService->find($viewId, $this->userId);
+				$view = $this->viewService->find($viewId, false, $this->userId);
 			} catch (Exception | Throwable $e) {
 				/** @psalm-suppress InvalidReturnStatement */
 				return $this->linkReferenceProvider->resolveReference($referenceText);
@@ -100,7 +100,7 @@ class ReferenceHelper {
 
 			// add rows data
 			try {
-				$viewReferenceInfo['rows'] = $this->rowService->findAllByView($viewId, 10, 0);
+				$viewReferenceInfo['rows'] = $this->rowService->findAllByView($viewId, $this->userId, 10, 0);
 			} catch (InternalError $e) {
 			} catch (PermissionError $e) {
 			}
