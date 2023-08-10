@@ -28,6 +28,7 @@ namespace OCA\Tables\Service;
 
 use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Helper\UserHelper;
 use Psr\Log\LoggerInterface;
@@ -39,8 +40,9 @@ class PermissionsServiceTest extends TestCase {
 		$userId = "TestUser";
 		$tableMapper = $this->createMock(TableMapper::class);
 		$shareMapper = $this->createMock(ShareMapper::class);
+		$viewMapper = $this->createMock(ViewMapper::class);
 		$userHelper = $this->createMock(UserHelper::class);
-		$permissionsService = new PermissionsService($logger, $userId, $tableMapper, $shareMapper, $userHelper, false);
+		$permissionsService = new PermissionsService($logger, $userId, $tableMapper, $viewMapper, $shareMapper, $userHelper, false);
 
 		self::assertEquals($userId, $permissionsService->preCheckUserId($userId));
 	}
@@ -49,9 +51,10 @@ class PermissionsServiceTest extends TestCase {
 		$logger = $this->createMock(LoggerInterface::class);
 		$userId = null;
 		$tableMapper = $this->createMock(TableMapper::class);
+		$viewMapper = $this->createMock(ViewMapper::class);
 		$shareMapper = $this->createMock(ShareMapper::class);
 		$userHelper = $this->createMock(UserHelper::class);
-		$permissionsService = new PermissionsService($logger, $userId, $tableMapper, $shareMapper, $userHelper, false);
+		$permissionsService = new PermissionsService($logger, $userId, $tableMapper, $viewMapper, $shareMapper, $userHelper, false);
 
 		self::expectException(InternalError::class);
 		$permissionsService->preCheckUserId($userId);
@@ -61,9 +64,10 @@ class PermissionsServiceTest extends TestCase {
 		$logger = $this->createMock(LoggerInterface::class);
 		$userId = 'john';
 		$tableMapper = $this->createMock(TableMapper::class);
+		$viewMapper = $this->createMock(ViewMapper::class);
 		$shareMapper = $this->createMock(ShareMapper::class);
 		$userHelper = $this->createMock(UserHelper::class);
-		$permissionsService = new PermissionsService($logger, $userId, $tableMapper, $shareMapper, $userHelper, false);
+		$permissionsService = new PermissionsService($logger, $userId, $tableMapper, $viewMapper, $shareMapper, $userHelper, false);
 
 		self::assertEquals($userId, $permissionsService->preCheckUserId(null));
 	}
@@ -72,9 +76,10 @@ class PermissionsServiceTest extends TestCase {
 		$logger = $this->createMock(LoggerInterface::class);
 		$userId = '';
 		$tableMapper = $this->createMock(TableMapper::class);
+		$viewMapper = $this->createMock(ViewMapper::class);
 		$shareMapper = $this->createMock(ShareMapper::class);
 		$userHelper = $this->createMock(UserHelper::class);
-		$permissionsService = new PermissionsService($logger, $userId, $tableMapper, $shareMapper, $userHelper, false);
+		$permissionsService = new PermissionsService($logger, $userId, $tableMapper, $viewMapper, $shareMapper, $userHelper, false);
 
 		self::expectException(InternalError::class);
 		$permissionsService->preCheckUserId($userId, false);
@@ -87,9 +92,10 @@ class PermissionsServiceTest extends TestCase {
 		$logger = $this->createMock(LoggerInterface::class);
 		$userId = '';
 		$tableMapper = $this->createMock(TableMapper::class);
+		$viewMapper = $this->createMock(ViewMapper::class);
 		$shareMapper = $this->createMock(ShareMapper::class);
 		$userHelper = $this->createMock(UserHelper::class);
-		$permissionsService = new PermissionsService($logger, $userId, $tableMapper, $shareMapper, $userHelper, true);
+		$permissionsService = new PermissionsService($logger, $userId, $tableMapper, $viewMapper, $shareMapper, $userHelper, true);
 
 		self::assertEquals($userId, $permissionsService->preCheckUserId($userId));
 	}
