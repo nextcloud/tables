@@ -81,4 +81,8 @@ export default {
 		margin-left: calc(var(--default-grid-baseline) * 2);
 	}
 
+	.nc-table :deep(.container) {
+		max-height: 50vh;
+	}
+
 </style>
