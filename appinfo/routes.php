@@ -31,10 +31,12 @@ return [
 		['name' => 'api1#createShare',	'url' => '/api/1/shares', 'verb' => 'POST'],
 		['name' => 'api1#deleteShare',	'url' => '/api/1/shares/{shareId}', 'verb' => 'DELETE'],
 		['name' => 'api1#updateSharePermissions',	'url' => '/api/1/shares/{shareId}', 'verb' => 'PUT'],
+		['name' => 'api1#createTableShare',	'url' => '/api/1/tables/{tableId}/shares', 'verb' => 'POST'],
 		// -> columns
 		['name' => 'api1#indexTableColumns',	'url' => '/api/1/tables/{tableId}/columns', 'verb' => 'GET'],
 		['name' => 'api1#indexViewColumns', 'url' => '/api/1/views/{viewId}/columns', 'verb' => 'GET'],
 		['name' => 'api1#createColumn',	'url' => '/api/1/columns', 'verb' => 'POST'],
+		['name' => 'api1#createTableColumn', 'url' => '/api/1/tables/{tableId}/columns', 'verb' => 'POST'],
 		['name' => 'api1#updateColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'PUT'],
 		['name' => 'api1#getColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'GET'],
 		['name' => 'api1#deleteColumn',	'url' => '/api/1/columns/{columnId}', 'verb' => 'DELETE'],
@@ -52,10 +54,6 @@ return [
 		// -> import
 		['name' => 'api1#importInTable', 'url' => '/api/1/import/table/{tableId}', 'verb' => 'POST'],
 		['name' => 'api1#importInView', 'url' => '/api/1/import/views/{viewId}', 'verb' => 'POST'],
-
-		// Deprecated API calls
-		['name' => 'api1#createTableShare',	'url' => '/api/1/tables/{tableId}/shares', 'verb' => 'POST'], // use createShare instead
-		['name' => 'api1#createTableColumn',	'url' => '/api/1/tables/{tableId}/columns', 'verb' => 'POST'], // Use create column instead
 
 
 		// table

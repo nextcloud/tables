@@ -499,9 +499,8 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function createRowInView(
-		int $viewId,
-		array $data): DataResponse {
+	public function createRowInView(int $viewId, string $data): DataResponse {
+		$data = json_decode($data);
 		$dataNew = [];
 		foreach ($data as $key => $value) {
 			$dataNew[] = [
@@ -520,9 +519,9 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function createRowInTable(
-		int $tableId,
-		array $data): DataResponse {
+	public function createRowInTable(int $tableId, string $data): DataResponse {
+		$data = json_decode($data, true);
+
 		$dataNew = [];
 		foreach ($data as $key => $value) {
 			$dataNew[] = [
@@ -552,9 +551,9 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function updateRow(int $rowId,
-		?int $viewId,
-		array $data): DataResponse {
+	public function updateRow(int $rowId, ?int $viewId, string $data): DataResponse {
+		$data = json_decode($data, true);
+
 		$dataNew = [];
 		foreach ($data as $key => $value) {
 			$dataNew[] = [
