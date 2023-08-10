@@ -27,6 +27,14 @@
 		</template>
 
 		<template #actions>
+			<NcActionButton v-if="canManageElement(table) "
+				:close-after-click="true"
+				@click="emit('tables:table:edit', table.id)">
+				<template #icon>
+					<IconRename :size="20" decorative />
+				</template>
+				{{ t('tables', 'Edit table') }}
+			</NcActionButton>
 			<NcActionButton v-if="canManageElement(table)"
 				:close-after-click="true"
 				@click="createView">
@@ -81,10 +89,12 @@ import Creation from 'vue-material-design-icons/Creation.vue'
 import Import from 'vue-material-design-icons/Import.vue'
 import NavigationViewItem from './NavigationViewItem.vue'
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
+import IconRename from 'vue-material-design-icons/Rename.vue'
 
 export default {
 
 	components: {
+		IconRename,
 		// eslint-disable-next-line vue/no-reserved-component-names
 		Table,
 		Import,
@@ -155,6 +165,7 @@ export default {
 		},
 	},
 	methods: {
+		emit,
 		deleteTable() {
 			emit('tables:table:delete', this.table)
 		},

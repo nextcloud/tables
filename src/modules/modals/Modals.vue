@@ -30,6 +30,8 @@
 			:element="importToElement?.element"
 			:is-element-view="importToElement?.isView"
 			@close="importToElement = null" />
+
+		<EditTable :table-id="editTable" :show-modal="editTable !== null" @close="editTable = null" />
 	</div>
 </template>
 
@@ -47,9 +49,11 @@ import Import from './Import.vue'
 import DeleteTable from './DeleteTable.vue'
 import CreateTable from './CreateTable.vue'
 import DeleteView from './DeleteView.vue'
+import EditTable from './EditTable.vue'
 
 export default {
 	components: {
+		EditTable,
 		DeleteView,
 		CreateTable,
 		Import,
@@ -77,6 +81,7 @@ export default {
 			createViewTableId: null, // if null, no modal open
 			tableToDelete: null,
 			viewToDelete: null,
+			editTable: null,
 		}
 	},
 
@@ -84,6 +89,7 @@ export default {
 		// table
 		subscribe('tables:table:create', () => { this.showModalCreateTable = true })
 		subscribe('tables:table:delete', table => { this.tableToDelete = table })
+		subscribe('tables:table:edit', tableId => { this.editTable = tableId })
 
 		// views
 		subscribe('tables:view:reload', () => { this.reload(true) })
@@ -129,6 +135,7 @@ export default {
 		unsubscribe('tables:table:create', () => { this.showModalCreateTable = true })
 		unsubscribe('tables:modal:import', element => { this.importToElement = element })
 		unsubscribe('tables:table:delete', table => { this.tableToDelete = table })
+		unsubscribe('tables:table:edit', tableId => { this.editTable = tableId })
 	},
 }
 </script>

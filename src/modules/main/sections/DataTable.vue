@@ -25,6 +25,14 @@
 						<NcActionCaption v-if="canManageElement(table)" :title="t('tables', 'Manage table')" />
 						<NcActionButton v-if="canManageElement(table) "
 							:close-after-click="true"
+							@click="emit('tables:table:edit', table.id)">
+							<template #icon>
+								<IconRename :size="20" decorative />
+							</template>
+							{{ t('tables', 'Edit table') }}
+						</NcActionButton>
+						<NcActionButton v-if="canManageElement(table) "
+							:close-after-click="true"
 							@click="$emit('create-view')">
 							<template #icon>
 								<PlaylistPlus :size="20" decorative />
@@ -77,12 +85,14 @@
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
+import IconRename from 'vue-material-design-icons/Rename.vue'
 import TableView from '../partials/TableView.vue'
 import EmptyTable from './EmptyTable.vue'
 import Creation from 'vue-material-design-icons/Creation.vue'
 import Import from 'vue-material-design-icons/Import.vue'
 import { NcActionButton, NcActions, NcActionCaption } from '@nextcloud/vue'
 import { mapState } from 'vuex'
+import { emit } from '@nextcloud/event-bus'
 
 export default {
 	components: {
@@ -95,6 +105,7 @@ export default {
 		PlaylistPlus,
 		EmptyTable,
 		Import,
+		IconRename,
 	},
 
 	mixins: [permissionsMixin],
@@ -127,6 +138,7 @@ export default {
 			localSelectedRows: this.selectedRows,
 		}
 	},
+
 	computed: {
 		...mapState(['views']),
 		hasViews() {
@@ -136,10 +148,15 @@ export default {
 			return !(!this.viewSetting || ((!this.viewSetting.hiddenColumns || this.viewSetting.hiddenColumns.length === 0) && (!this.viewSetting.sorting) && (!this.viewSetting.filter || this.viewSetting.filter.length === 0)))
 		},
 	},
+
 	watch: {
 		localSelectedRows() {
 			this.$emit('update:selectedRows', this.localSelectedRows)
 		},
+	},
+
+	methods: {
+		emit,
 	},
 }
 </script>
