@@ -43,14 +43,14 @@ return [
 		['name' => 'api1#indexTableRows',	'url' => '/api/1/tables/{tableId}/rows', 'verb' => 'GET'],
 		['name' => 'api1#indexViewRows',	'url' => '/api/1/views/{viewId}/rows', 'verb' => 'GET'],
 		['name' => 'api1#createRowInView',	'url' => '/api/1/views/{viewId}/rows', 'verb' => 'POST'],
-		['name' => 'row#createRowInTable', 'url' => '/api/1/tables/{tableId}/rows', 'verb' => 'POST'],
+		['name' => 'api1#createRowInTable', 'url' => '/api/1/tables/{tableId}/rows', 'verb' => 'POST'],
 
 		['name' => 'api1#getRow',	'url' => '/api/1/rows/{rowId}', 'verb' => 'GET'],
 		['name' => 'api1#deleteRowByView',	'url' => '/api/1/views/{viewId}/rows/{rowId}', 'verb' => 'DELETE'],
 		['name' => 'api1#updateRow',	'url' => '/api/1/rows/{rowId}', 'verb' => 'PUT'],
 		['name' => 'api1#deleteRow',	'url' => '/api/1/rows/{rowId}', 'verb' => 'DELETE'],
 		// -> import
-		['name' => 'api1#importInTable', 'url' => '/api/1/import/table/{tablesId}', 'verb' => 'POST'],
+		['name' => 'api1#importInTable', 'url' => '/api/1/import/table/{tableId}', 'verb' => 'POST'],
 		['name' => 'api1#importInView', 'url' => '/api/1/import/views/{viewId}', 'verb' => 'POST'],
 
 		// Deprecated API calls

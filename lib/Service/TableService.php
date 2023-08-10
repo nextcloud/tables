@@ -197,7 +197,7 @@ class TableService extends SuperService {
 			$table = $this->mapper->find($id);
 
 			// security
-			if (!$this->permissionsService->canManageTable($table, $userId)) {
+			if (!$this->permissionsService->canReadTable($table, $userId)) {
 				throw new PermissionError('PermissionError: can not read table with id '.$id);
 			}
 
@@ -224,7 +224,6 @@ class TableService extends SuperService {
 	 * @throws DoesNotExistException
 	 * @throws InternalError
 	 * @throws MultipleObjectsReturnedException
-	 * @throws NotFoundError
 	 * @throws PermissionError
 	 * @throws \OCP\DB\Exception
 	 */

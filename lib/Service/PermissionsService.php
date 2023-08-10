@@ -67,6 +67,10 @@ class PermissionsService {
 
 	// ***** TABLES permissions *****
 
+	public function canReadTable(Table $table, ?string $userId = null): bool {
+		return $this->canReadColumnsByTableId($table->getId(), $userId);
+	}
+
 	/**
 	 * @param Table $table
 	 * @param string|null $userId
@@ -173,7 +177,9 @@ class PermissionsService {
 	}
 
 	public function canReadColumnsByTableId(int $tableId, ?string $userId = null): bool {
-		return $this->canReadRowsByElementId($tableId, 'table', $userId);
+		$canReadRows = $this->checkPermissionById($tableId, 'table', 'read', $userId);
+		$canCreateRows = $this->checkPermissionById($tableId, 'table', 'create', $userId);
+		return $canCreateRows || $canReadRows;
 	}
 
 	/**

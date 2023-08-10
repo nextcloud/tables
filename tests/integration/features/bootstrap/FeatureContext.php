@@ -207,6 +207,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 		);
 
 		$data = $this->getDataFromResponse($this->response);
+
 		Assert::assertEquals(200, $this->response->getStatusCode());
 
 		// check if tables are empty
