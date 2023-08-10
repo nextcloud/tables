@@ -110,7 +110,7 @@ export default {
 			if (!this.lastActiveElement || this.element.id !== this.lastActiveElement.id || this.isView !== this.lastActiveElement.isView || force) {
 				this.localLoading = true
 
-				if (this.isView) await this.$store.dispatch('resetViewSetting')
+				if (this.isView) this.viewSetting = {}
 
 				await this.$store.dispatch('loadColumnsFromBE', {
 					view: this.isView ? this.element : null,

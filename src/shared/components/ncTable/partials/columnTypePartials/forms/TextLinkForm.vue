@@ -41,13 +41,7 @@ export default {
 		return {
 			mutableColumn: this.column,
 			loading: false,
-			providers: [
-				{
-					id: 'url',
-					label: t('tables', 'URL'),
-					active: true,
-				},
-			],
+			providers: [],
 			preActivatedProviders: [
 				'url',
 				'files',
@@ -93,6 +87,13 @@ export default {
 				displayError(e, t('tables', 'Could not load link providers.'))
 				return
 			}
+			this.providers = [
+				{
+					id: 'url',
+					label: t('tables', 'URL'),
+					active: this.isActive('url'),
+				},
+			]
 			res.data?.ocs?.data?.forEach(item => {
 				this.providers.push(
 					{

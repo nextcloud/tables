@@ -10,8 +10,6 @@ create-row              -> click on create (plus) button
 create-column
 edit-columns
 delete-selected-rows
-add-filter              -> @param filter { columnId, operator, value }
-delete-filter           -> @param id (columnId + operator + value)
 set-search-string       -> @param string
 import                  -> click on import button on tables menu
 
@@ -56,11 +54,9 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 			<CustomTable v-if="config.canReadRows || (config.canCreateRows && rows.length > 0)"
 				:columns="parsedColumns"
 				:rows="rows"
-				:table="table"
 				:view-setting.sync="localViewSetting"
 				:config="config"
 				@create-row="$emit('create-row')"
-				@import="table => $emit('import', table)"
 				@edit-row="rowId => $emit('edit-row', rowId)"
 				@create-column="$emit('create-column')"
 				@edit-column="col => $emit('edit-column', col)"
@@ -126,9 +122,9 @@ export default {
 			type: Array,
 			default: () => [],
 		},
-		table: {
-			type: Object,
-			default: () => {},
+		downloadTitle: {
+			type: String,
+			default: t('tables', 'Download'),
 		},
 		viewSetting: {
 			type: Object,

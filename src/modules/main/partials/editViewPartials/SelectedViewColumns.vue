@@ -172,8 +172,8 @@ export default {
 }
 
 :deep(.checkbox-radio-switch__label) {
-	min-height: auto;
-	padding: 4px;
+	min-height: auto !important;
+	padding: 4px !important;
 }
 
 :deep(.checkbox-radio-switch__icon) {

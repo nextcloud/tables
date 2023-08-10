@@ -2,7 +2,7 @@
 	<NcTable v-if="columns.length > 0"
 		:rows="rows"
 		:columns="columns"
-		:table="element"
+		:download-title="element.title"
 		:view-setting="viewSetting"
 		:can-read-rows="canReadRows"
 		:can-create-rows="canCreateRows"
@@ -12,8 +12,6 @@
 		:can-edit-columns="canEditColumns"
 		:can-delete-columns="canDeleteColumns"
 		:can-delete-table="canDeleteTable"
-		@add-filter="addFilter"
-		@delete-filter="deleteFilter"
 		@import="openImportModal"
 		@create-column="createColumn"
 		@edit-column="editColumn"
@@ -132,12 +130,6 @@ export default {
 		},
 		actionShowIntegration() {
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
-		},
-		addFilter(filterObject) {
-			this.$store.dispatch('addFilter', filterObject)
-		},
-		deleteFilter(id) {
-			this.$store.dispatch('deleteFilter', { id })
 		},
 		openImportModal(element) {
 			emit('tables:modal:import', { element, isView: this.isView })

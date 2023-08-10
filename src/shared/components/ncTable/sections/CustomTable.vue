@@ -5,11 +5,9 @@
 				<TableHeader :columns="columns"
 					:selected-rows="selectedRows"
 					:rows="getSearchedAndFilteredAndSortedRows"
-					:element="table"
 					:view-setting.sync="localViewSetting"
 					:config="config"
 					@create-row="$emit('create-row')"
-					@import="table => $emit('import', table)"
 					@create-column="$emit('create-column')"
 					@edit-column="col => $emit('edit-column', col)"
 					@delete-column="col => $emit('delete-column', col)"
@@ -27,7 +25,6 @@
 					:columns="columns"
 					:selected="isRowSelected(row.id)"
 					:view-setting.sync="localViewSetting"
-					:view="table"
 					:config="config"
 					@update-row-selection="updateRowSelection"
 					@edit-row="rowId => $emit('edit-row', rowId)" />
@@ -59,10 +56,6 @@ export default {
 		columns: {
 			type: Array,
 			default: () => [],
-		},
-		table: {
-			type: Object,
-			default: () => {},
 		},
 		viewSetting: {
 			type: Object,

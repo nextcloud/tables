@@ -72,10 +72,6 @@ export default {
 			type: Object,
 			default: null,
 		},
-		view: {
-			type: Object,
-			default: () => {},
-		},
 		config: {
 			type: Object,
 			default: null,

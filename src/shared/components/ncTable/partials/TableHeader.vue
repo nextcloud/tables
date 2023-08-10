@@ -17,7 +17,6 @@
 							:column="col"
 							:open-state.sync="openedColumnHeaderMenus[col.id]"
 							:can-hide="visibleColumns.length > 1"
-							:element="element"
 							:config="config"
 							:view-setting.sync="localViewSetting"
 							@edit-column="col => $emit('edit-column', col)"
@@ -27,7 +26,7 @@
 						<FilterLabel v-for="filter in getFilterForColumn(col)"
 							:id="filter.columnId + filter.operator.id+ filter.value"
 							:key="filter.columnId + filter.operator.id+ filter.value"
-							:operator="filter.operator"
+							:operator="castToFilter(filter.operator.id)"
 							:value="filter.value"
 							@delete-filter="id => deleteFilter(id)" />
 					</div>
@@ -45,6 +44,7 @@
 import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
 import FilterLabel from './FilterLabel.vue'
+import { getFilterWithId } from '../mixins/filter.js'
 
 export default {
 
@@ -66,10 +66,6 @@ export default {
 		selectedRows: {
 			type: Array,
 			default: () => [],
-		},
-		element: {
-			type: Object,
-			default: () => {},
 		},
 		viewSetting: {
 			type: Object,
@@ -107,6 +103,7 @@ export default {
 	},
 
 	methods: {
+		getFilterWithId,
 		updateOpenState(columnId) {
 			this.openedColumnHeaderMenus[columnId] = !this.openedColumnHeaderMenus[columnId]
 			this.openedColumnHeaderMenus = Object.assign({}, this.openedColumnHeaderMenus)
@@ -128,6 +125,9 @@ export default {
 			if (index !== -1) {
 				this.localViewSetting.filter.splice(index, 1)
 			}
+		},
+		castToFilter(operatorId) {
+			return this.getFilterWithId(operatorId)
 		},
 	},
 }

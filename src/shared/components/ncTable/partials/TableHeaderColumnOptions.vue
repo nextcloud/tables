@@ -159,10 +159,6 @@ export default {
 			type: Boolean,
 			default: false,
 		},
-		element: {
-			type: Object,
-			default: () => {},
-		},
 		config: {
 			type: Object,
 			default: null,
