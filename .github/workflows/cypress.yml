@@ -119,7 +119,6 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v4
         with:
-          record: false
           wait-on: '${{ env.CYPRESS_baseUrl }}'
           working-directory: 'apps/${{ env.APP_NAME }}'
           config: defaultCommandTimeout=10000,video=false
