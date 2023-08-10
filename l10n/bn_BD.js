@@ -30,6 +30,7 @@ OC.L10N.register(
     "Error" : "সমস্যা",
     "Search" : "Search",
     "Default" : "পূর্বনির্ধারিত",
+    "URL" : "URL",
     "Yes" : "Yes",
     "No" : "No"
 },

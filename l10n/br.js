@@ -30,6 +30,7 @@ OC.L10N.register(
     "Error" : "Fazi",
     "Search" : "Klask",
     "Default" : "Dre ziouer",
+    "URL" : "URL",
     "Yes" : "Ya",
     "No" : "Nann",
     "Confirm" : "Kadarnañ"

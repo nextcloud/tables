@@ -292,6 +292,7 @@
     "Maximum text length" : "Maximální délka textu",
     "Allowed types" : "Umožněné typy",
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "Které typy jsou poskytovány záleží na nastavení vámi využívaného systému. Je možné použít stejné poskytovatele jako u plnotextového vyhledávání.",
+    "URL" : "URL",
     "Could not load link providers." : "Nepodařilo se načíst poskytovatele odkazů.",
     "Today as default" : "Dnešek jako výchozí",
     "Yes" : "Ano",
