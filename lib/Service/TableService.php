@@ -166,9 +166,9 @@ class TableService extends SuperService {
 		// (senseless if we have no user in context)
 		if ($userId !== '' && $userId !== $table->getOwnership()) {
 			try {
-			$permissions = $this->shareService->getSharedPermissionsIfSharedWithMe($table->getId(), 'table', $userId);
-			$table->setIsShared(true);
-			$table->setOnSharePermissions($permissions);
+				$permissions = $this->shareService->getSharedPermissionsIfSharedWithMe($table->getId(), 'table', $userId);
+				$table->setIsShared(true);
+				$table->setOnSharePermissions($permissions);
 			} catch (NotFoundError $e) {
 			}
 		}

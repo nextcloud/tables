@@ -359,7 +359,7 @@ export default {
 
 <style lang="scss" scoped>
 .table {
-  border-collapse: collapse;
+	border-collapse: collapse;
 }
 
 .table td .inline {
@@ -379,7 +379,7 @@ export default {
 
 .table th:last-child,
 .table td:last-child {
-  border-right: none;
+	border-right: none;
 }
 
 .table th {
@@ -396,25 +396,25 @@ export default {
 	flex-direction: row;
 }
 
-	td.actions {
-		display: inline-flex;
-	}
+td.actions {
+	display: inline-flex;
+}
 
-	td.actions button {
-		margin-left: calc(var(--default-grid-baseline) * 1);
-	}
+td.actions button {
+	margin-left: calc(var(--default-grid-baseline) * 1);
+}
 
-	td a {
-		text-decoration: underline;
-	}
+td a {
+	text-decoration: underline;
+}
 
-	.footer td {
-		font-weight: bold;
-	}
+.footer td {
+	font-weight: bold;
+}
 
-	h2 {
-		display: inline-flex;
-		align-items: center;
-	}
+h2 {
+	display: inline-flex;
+	align-items: center;
+}
 
 </style>

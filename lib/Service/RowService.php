@@ -122,20 +122,20 @@ class RowService extends SuperService {
 	):Row {
 		if ($viewId) {
 
-		$view = $this->viewMapper->find($viewId);
-		// security
-		if (!$this->permissionsService->canCreateRows($view)) {
-			throw new PermissionError('create row at the view id = '.$viewId.' is not allowed.');
-		}
+			$view = $this->viewMapper->find($viewId);
+			// security
+			if (!$this->permissionsService->canCreateRows($view)) {
+				throw new PermissionError('create row at the view id = '.$viewId.' is not allowed.');
+			}
 
-		$columns = $view->getColumnsArray();
-		} else if ($tableId) {
+			$columns = $view->getColumnsArray();
+		} elseif ($tableId) {
 			$table = $this->tableMapper->find($tableId);
 			// security
 			if (!$this->permissionsService->canCreateRows($table, 'table')) {
 				throw new PermissionError('create row at the table id = '.$tableId.' is not allowed.');
 			}
-		$columns = $this->columnMapper->findAllIdsByTable($tableId);
+			$columns = $this->columnMapper->findAllIdsByTable($tableId);
 		} else {
 			throw new InternalError('Cannot create row without table or view in context');
 		}
@@ -192,7 +192,7 @@ class RowService extends SuperService {
 				if(!in_array($id, $rowIds)) {
 					throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
 				}
-			} else if ($tableId) {
+			} elseif ($tableId) {
 				// security
 				if (!$this->permissionsService->canUpdateRowsByTableId($tableId)) {
 					throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
@@ -270,7 +270,9 @@ class RowService extends SuperService {
 			$d = $item->getDataArray();
 			foreach ($data as $dataObject) {
 				// Check whether the column of which the value should change is part of the table / view
-				if (!in_array($dataObject['columnId'],$columnIds)) continue;
+				if (!in_array($dataObject['columnId'], $columnIds)) {
+					continue;
+				}
 				$d = $this->replaceOrAddData($d, $dataObject);
 			}
 			$item->setDataArray($d);

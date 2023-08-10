@@ -5,7 +5,6 @@ namespace OCA\Tables\Service;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Errors\InternalError;
-use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -76,41 +75,40 @@ class TableTemplateService {
 	/**
 	 * @param Table $table
 	 * @param string $template
-	 * @param int $defaultViewId
 	 * @return Table
 	 * @throws DoesNotExistException
 	 * @throws Exception
 	 * @throws InternalError
 	 * @throws MultipleObjectsReturnedException
-	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
 	public function makeTemplate(Table $table, string $template): Table {
-		$createColumn = function ($params) use ($table) {return $this->createColumn($params, $table->getId());};
-		$createRow = function ($data) use ($table) {$this->createRow($table->getId(), $data);};
-		$createView = function ($data) use ($table) {$this->createView($table, $data);};
 		if ($template === 'todo') {
-			$this->makeTodo($createColumn, $createRow);
+			$this->makeTodo($table);
 		} elseif ($template === 'members') {
-			$this->makeMembers($createColumn, $createRow);
+			$this->makeMembers($table);
 		} elseif ($template === 'weight') {
-			$this->makeWeight($createColumn, $createRow);
+			$this->makeWeight($table);
 		} elseif ($template === 'vacation-requests') {
-			$this->makeVacationRequests($createColumn, $createRow, $createView);
+			$this->makeVacationRequests($table);
 		} elseif ($template === 'customers') {
-			$this->makeCustomers($createColumn, $createRow);
+			$this->makeCustomers($table);
 		} elseif ($template === 'tutorial') {
-			$this->makeStartupTable($createColumn, $createRow);
+			$this->makeStartupTable($table);
 		}
 		return $table;
 	}
 
 	/**
 	 * @psalm-suppress PossiblyNullReference
-	 * @param $createColumn
-	 * @param $createRow
+	 * @param Table $table
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws PermissionError
 	 */
-	private function makeWeight($createColumn, $createRow):void {
+	private function makeWeight(Table $table):void {
 		$columns = [];
 
 		$params = [
@@ -120,7 +118,7 @@ class TableTemplateService {
 			'mandatory' => true,
 			'datetimeDefault' => 'today',
 		];
-		$columns['date'] = $createColumn($params);
+		$columns['date'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Weight'),
@@ -129,7 +127,7 @@ class TableTemplateService {
 			'numberMin' => 0,
 			'numberMax' => 200,
 		];
-		$columns['weight'] = $createColumn($params);
+		$columns['weight'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Body fat'),
@@ -138,45 +136,45 @@ class TableTemplateService {
 			'numberMax' => 100,
 			'numberSuffix' => '%',
 		];
-		$columns['bodyFat'] = $createColumn($params);
+		$columns['bodyFat'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Feeling over all'),
 			'type' => 'number',
 			'subtype' => 'stars',
 		];
-		$columns['feeling'] = $createColumn($params);
+		$columns['feeling'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Comments'),
 			'type' => 'text',
 			'subtype' => 'long',
 		];
-		$columns['comment'] = $createColumn($params);
+		$columns['comment'] = $this->createColumn($table->id, $params);
 
 		// let's add some example rows
-		$createRow([
+		$this->createRow($table, [
 			$columns['date']->getId() => '2022-03-01',
 			$columns['weight']->getId() => 92.5,
 			$columns['bodyFat']->getId() => 30,
 			$columns['feeling']->getId() => 4,
 			$columns['comment']->getId() => '',
 		]);
-		$createRow([
+		$this->createRow($table, [
 			$columns['date']->getId() => '2022-03-02',
 			$columns['weight']->getId() => 92.7,
 			$columns['bodyFat']->getId() => 30.3,
 			$columns['feeling']->getId() => 3,
 			$columns['comment']->getId() => $this->l->t('feel sick'),
 		]);
-		$createRow([
+		$this->createRow($table, [
 			$columns['date']->getId() => '2022-03-10',
 			$columns['weight']->getId() => 91,
 			$columns['bodyFat']->getId() => 33.1,
 			$columns['feeling']->getId() => 4,
 			$columns['comment']->getId() => '',
 		]);
-		$createRow([
+		$this->createRow($table, [
 			$columns['date']->getId() => '2022-03-19',
 			$columns['weight']->getId() => 92.5,
 			$columns['bodyFat']->getId() => 30.7,
@@ -187,10 +185,14 @@ class TableTemplateService {
 
 	/**
 	 * @psalm-suppress PossiblyNullReference
-	 * @param $createColumn
-	 * @param $createRow
+	 * @param Table $table
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws PermissionError
 	 */
-	private function makeCustomers($createColumn, $createRow):void {
+	private function makeCustomers(Table $table):void {
 		$columns = [];
 
 		$params = [
@@ -198,21 +200,21 @@ class TableTemplateService {
 			'type' => 'text',
 			'subtype' => 'line',
 		];
-		$columns['name'] = $createColumn($params);
+		$columns['name'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Account manager'),
 			'type' => 'text',
 			'subtype' => 'line',
 		];
-		$columns['accountManager'] = $createColumn($params);
+		$columns['accountManager'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Contract type'),
 			'type' => 'text',
 			'subtype' => 'line',
 		];
-		$columns['contractType'] = $createColumn($params);
+		$columns['contractType'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Contract start'),
@@ -220,14 +222,14 @@ class TableTemplateService {
 			'subtype' => 'date',
 			'datetimeDefault' => 'today',
 		];
-		$columns['contractStart'] = $createColumn($params);
+		$columns['contractStart'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Contract end'),
 			'type' => 'datetime',
 			'subtype' => 'date',
 		];
-		$columns['contractEnd'] = $createColumn($params);
+		$columns['contractEnd'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Description'),
@@ -235,7 +237,7 @@ class TableTemplateService {
 			'subtype' => 'long',
 
 		];
-		$columns['description'] = $createColumn($params);
+		$columns['description'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Contact information'),
@@ -243,7 +245,7 @@ class TableTemplateService {
 			'subtype' => 'long',
 
 		];
-		$columns['contactInformation'] = $createColumn($params);
+		$columns['contactInformation'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Quality of relationship'),
@@ -252,7 +254,7 @@ class TableTemplateService {
 
 			'numberDefault' => 30,
 		];
-		$columns['qualityRelationship'] = $createColumn($params);
+		$columns['qualityRelationship'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Comment'),
@@ -260,10 +262,10 @@ class TableTemplateService {
 			'subtype' => 'long',
 
 		];
-		$columns['comment'] = $createColumn($params);
+		$columns['comment'] = $this->createColumn($table->id, $params);
 
 		// let's add some example rows
-		$createRow([
+		$this->createRow($table, [
 			// TRANSLATORS This is an example name
 			$columns['name']->getId() => $this->l->t('Dog'),
 			// TRANSLATORS This is an example account manager
@@ -280,7 +282,7 @@ class TableTemplateService {
 			// TRANSLATORS This is an example comment
 			$columns['comment']->getId() => $this->l->t('Likes treats'),
 		]);
-		$createRow([
+		$this->createRow($table, [
 			// TRANSLATORS This is an example name
 			$columns['name']->getId() => $this->l->t('Cat'),
 			// TRANSLATORS This is an example account manager
@@ -297,7 +299,7 @@ class TableTemplateService {
 			// TRANSLATORS This is an example comment
 			$columns['comment']->getId() => $this->l->t('New customer, let\'s see if there is more.'),
 		]);
-		$createRow([
+		$this->createRow($table, [
 			// TRANSLATORS This is an example name
 			$columns['name']->getId() => $this->l->t('Horse'),
 			// TRANSLATORS This is an example account manager
@@ -318,11 +320,14 @@ class TableTemplateService {
 
 	/**
 	 * @psalm-suppress PossiblyNullReference
-	 * @param $createColumn
-	 * @param $createRow
-	 * @param $createView
+	 * @param Table $table
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws PermissionError
 	 */
-	private function makeVacationRequests($createColumn, $createRow, $createView):void {
+	private function makeVacationRequests(Table $table):void {
 		$columns = [];
 
 		$params = [
@@ -332,7 +337,7 @@ class TableTemplateService {
 			'mandatory' => true,
 
 		];
-		$columns['employee'] = $createColumn($params);
+		$columns['employee'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('from'),
@@ -342,7 +347,7 @@ class TableTemplateService {
 			'mandatory' => true,
 
 		];
-		$columns['from'] = $createColumn($params);
+		$columns['from'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('to'),
@@ -352,7 +357,7 @@ class TableTemplateService {
 			'mandatory' => true,
 
 		];
-		$columns['to'] = $createColumn($params);
+		$columns['to'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Number of working days'),
@@ -363,7 +368,7 @@ class TableTemplateService {
 			'mandatory' => true,
 
 		];
-		$columns['workingDays'] = $createColumn($params);
+		$columns['workingDays'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Request date'),
@@ -373,7 +378,7 @@ class TableTemplateService {
 			'datetimeDefault' => 'today',
 
 		];
-		$columns['dateRequest'] = $createColumn($params);
+		$columns['dateRequest'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Approved'),
@@ -381,7 +386,7 @@ class TableTemplateService {
 			'subtype' => 'check',
 
 		];
-		$columns['approved'] = $createColumn($params);
+		$columns['approved'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Approve date'),
@@ -389,7 +394,7 @@ class TableTemplateService {
 			'subtype' => 'date',
 
 		];
-		$columns['dateApprove'] = $createColumn($params);
+		$columns['dateApprove'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Approved by'),
@@ -397,7 +402,7 @@ class TableTemplateService {
 			'subtype' => 'line',
 
 		];
-		$columns['approveBy'] = $createColumn($params);
+		$columns['approveBy'] = $this->createColumn($table->id, $params);
 
 
 		$params = [
@@ -406,10 +411,10 @@ class TableTemplateService {
 			'subtype' => 'long',
 
 		];
-		$columns['comment'] = $createColumn($params);
+		$columns['comment'] = $this->createColumn($table->id, $params);
 
 		// let's add some example rows
-		$createRow([
+		$this->createRow($table, [
 			$columns['employee']->getId() => 'Alice',
 			$columns['from']->getId() => '2023-02-05',
 			$columns['to']->getId() => '2023-02-10',
@@ -422,7 +427,7 @@ class TableTemplateService {
 			// TRANSLATORS This is an example comment
 			$columns['comment']->getId() => $this->l->t('Bob will help for this time'),
 		]);
-		$createRow([
+		$this->createRow($table, [
 			$columns['employee']->getId() => 'Bob',
 			$columns['from']->getId() => '2023-04-05',
 			$columns['to']->getId() => '2023-04-12',
@@ -434,7 +439,7 @@ class TableTemplateService {
 			$columns['approveBy']->getId() => $this->l->t('The Boss'),
 			$columns['comment']->getId() => '',
 		]);
-		$createRow([
+		$this->createRow($table, [
 			$columns['employee']->getId() => 'Evil',
 			$columns['from']->getId() => '2023-03-05',
 			$columns['to']->getId() => '2023-04-10',
@@ -446,7 +451,7 @@ class TableTemplateService {
 			// TRANSLATORS This is an example comment
 			$columns['comment']->getId() => $this->l->t('We have to talk about that.'),
 		]);
-		$createRow([
+		$this->createRow($table, [
 			$columns['employee']->getId() => 'Pete',
 			$columns['from']->getId() => '2023-12-18',
 			$columns['to']->getId() => '2023-12-28',
@@ -456,7 +461,7 @@ class TableTemplateService {
 
 
 		// let's add views
-		$createView(
+		$this->createView($table,
 			[
 				'title' => $this->l->t('Create Vacation Request'),
 				'emoji' => '️➕',
@@ -465,7 +470,7 @@ class TableTemplateService {
 				'filter' => json_encode([[["columnId" => -2, "operator" => "is-equal", "value" => "@my-name"], ["columnId" => $columns['approved']->getId(), "operator" => "is-empty", "value" => ""]]]),
 			]
 		);
-		$createView(
+		$this->createView($table,
 			[
 				'title' => $this->l->t('Open Request'),
 				'emoji' => '️📝',
@@ -476,7 +481,7 @@ class TableTemplateService {
 				'filter' => json_encode([[["columnId" => $columns['approved']->getId(), "operator" => "is-empty", "value" => ""]]]),
 			]
 		);
-		$createView(
+		$this->createView($table,
 			[
 				'title' => $this->l->t('Request Status'),
 				'emoji' => '️❓',
@@ -487,7 +492,7 @@ class TableTemplateService {
 				'filter' => json_encode([[["columnId" => -2, "operator" => "is-equal", "value" => "@my-name"]]]),
 			]
 		);
-		$createView(
+		$this->createView($table,
 			[
 				'title' => $this->l->t('Closed requests'),
 				'emoji' => '️✅',
@@ -502,10 +507,14 @@ class TableTemplateService {
 
 	/**
 	 * @psalm-suppress PossiblyNullReference
-	 * @param $createColumn
-	 * @param $createRow
+	 * @param Table $table
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws PermissionError
 	 */
-	private function makeMembers($createColumn, $createRow):void {
+	private function makeMembers(Table $table):void {
 		$columns = [];
 
 		$params = [
@@ -515,7 +524,7 @@ class TableTemplateService {
 			'mandatory' => true,
 
 		];
-		$columns['name'] = $createColumn($params);
+		$columns['name'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Position'),
@@ -523,7 +532,7 @@ class TableTemplateService {
 			'subtype' => 'line',
 
 		];
-		$columns['position'] = $createColumn($params);
+		$columns['position'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Skills'),
@@ -531,7 +540,7 @@ class TableTemplateService {
 			'subtype' => 'long',
 
 		];
-		$columns['skills'] = $createColumn($params);
+		$columns['skills'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Birthday'),
@@ -539,7 +548,7 @@ class TableTemplateService {
 			'subtype' => 'date',
 
 		];
-		$columns['birthday'] = $createColumn($params);
+		$columns['birthday'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Comments'),
@@ -547,10 +556,10 @@ class TableTemplateService {
 			'subtype' => 'long',
 
 		];
-		$columns['comment'] = $createColumn($params);
+		$columns['comment'] = $this->createColumn($table->id, $params);
 
 		// let's add some example rows
-		$createRow([
+		$this->createRow($table, [
 			// TRANSLATORS This is an example name
 			$columns['name']->getId() => $this->l->t('Santa Claus'),
 			// TRANSLATORS This is an example for a "position" for a member
@@ -564,10 +573,14 @@ class TableTemplateService {
 
 	/**
 	 * @psalm-suppress PossiblyNullReference
-	 * @param $createColumn
-	 * @param $createRow
+	 * @param Table $table
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws PermissionError
 	 */
-	private function makeTodo($createColumn, $createRow): void {
+	private function makeTodo(Table $table): void {
 		$columns = [];
 
 		$params = [
@@ -577,7 +590,7 @@ class TableTemplateService {
 			'mandatory' => true,
 
 		];
-		$columns['task'] = $createColumn($params);
+		$columns['task'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Description'),
@@ -587,7 +600,7 @@ class TableTemplateService {
 			'textMultiline' => true,
 
 		];
-		$columns['description'] = $createColumn($params);
+		$columns['description'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Target'),
@@ -596,7 +609,7 @@ class TableTemplateService {
 			'description' => $this->l->t('Date, time or whatever'),
 
 		];
-		$columns['target'] = $createColumn($params);
+		$columns['target'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Progress'),
@@ -605,7 +618,7 @@ class TableTemplateService {
 
 			'numberDefault' => 0,
 		];
-		$columns['progress'] = $createColumn($params);
+		$columns['progress'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Comments'),
@@ -613,7 +626,7 @@ class TableTemplateService {
 			'subtype' => 'long',
 
 		];
-		$columns['comments'] = $createColumn($params);
+		$columns['comments'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Proofed'),
@@ -621,10 +634,10 @@ class TableTemplateService {
 			'subtype' => 'check',
 
 		];
-		$columns['proofed'] = $createColumn($params);
+		$columns['proofed'] = $this->createColumn($table->id, $params);
 
 		// let's add some example rows
-		$createRow([
+		$this->createRow($table, [
 			/** @psalm-suppress PossiblyNullArgument */
 			// TRANSLATORS This is an example for a task
 			$columns['task']->getId() => $this->l->t('Create initial milestones'),
@@ -637,7 +650,7 @@ class TableTemplateService {
 			$columns['progress']->getId() => 100,
 			$columns['proofed']->getId() => 'true',
 		]);
-		$createRow([
+		$this->createRow($table, [
 			// TRANSLATORS This is an example for a task
 			$columns['task']->getId() => $this->l->t('Kickoff meeting'),
 			// TRANSLATORS This is an example description
@@ -649,7 +662,7 @@ class TableTemplateService {
 			$columns['progress']->getId() => 80,
 			$columns['proofed']->getId() => 'true',
 		]);
-		$createRow([
+		$this->createRow($table, [
 			// TRANSLATORS This is an example for a task
 			$columns['task']->getId() => $this->l->t('Set up some documentation and collaboration tools'),
 			// TRANSLATORS This is an example description
@@ -661,7 +674,7 @@ class TableTemplateService {
 			$columns['progress']->getId() => 10,
 			$columns['proofed']->getId() => 'false',
 		]);
-		$createRow([
+		$this->createRow($table, [
 			// TRANSLATORS This is an example for a task
 			$columns['task']->getId() => $this->l->t('Add more actions'),
 			// TRANSLATORS This is an example description
@@ -672,10 +685,14 @@ class TableTemplateService {
 
 	/**
 	 * @psalm-suppress PossiblyNullReference
-	 * @param $createColumn
-	 * @param $createRow
+	 * @param Table $table
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws PermissionError
 	 */
-	private function makeStartupTable($createColumn, $createRow):void {
+	private function makeStartupTable(Table $table):void {
 		$columns = [];
 
 		$params = [
@@ -685,7 +702,7 @@ class TableTemplateService {
 			'subtype' => 'line',
 
 		];
-		$columns['what'] = $createColumn($params);
+		$columns['what'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('How to do'),
@@ -693,7 +710,7 @@ class TableTemplateService {
 			'subtype' => 'long',
 
 		];
-		$columns['how'] = $createColumn($params);
+		$columns['how'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			'title' => $this->l->t('Ease of use'),
@@ -701,7 +718,7 @@ class TableTemplateService {
 			'subtype' => 'stars',
 
 		];
-		$columns['ease'] = $createColumn($params);
+		$columns['ease'] = $this->createColumn($table->id, $params);
 
 		$params = [
 			// TRANSLATORS This is an example title for a column to show if an action was done
@@ -710,11 +727,11 @@ class TableTemplateService {
 			'subtype' => 'check',
 
 		];
-		$columns['done'] = $createColumn($params);
+		$columns['done'] = $this->createColumn($table->id, $params);
 
 
 		// let's add some example rows
-		$createRow([
+		$this->createRow($table, [
 			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Open the tables app'),
 			// TRANSLATORS This is an example account manager
@@ -722,7 +739,7 @@ class TableTemplateService {
 			$columns['ease']->getId() => 5,
 			$columns['done']->getId() => 'true',
 		]);
-		$createRow([
+		$this->createRow($table, [
 			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Add your first row'),
 			// TRANSLATORS This is an example account manager
@@ -730,7 +747,7 @@ class TableTemplateService {
 			$columns['ease']->getId() => 5,
 			$columns['done']->getId() => 'false',
 		]);
-		$createRow([
+		$this->createRow($table, [
 			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Edit a row'),
 			// TRANSLATORS This is an example account manager
@@ -738,7 +755,7 @@ class TableTemplateService {
 			$columns['ease']->getId() => 5,
 			$columns['done']->getId() => 'false',
 		]);
-		$createRow([
+		$this->createRow($table, [
 			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Add a new column'),
 			// TRANSLATORS This is an example account manager
@@ -746,7 +763,7 @@ class TableTemplateService {
 			$columns['ease']->getId() => 4,
 			$columns['done']->getId() => 'false',
 		]);
-		$createRow([
+		$this->createRow($table, [
 			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Read the docs'),
 			// TRANSLATORS This is an example account manager
@@ -757,16 +774,16 @@ class TableTemplateService {
 	}
 
 	/**
+	 * @param int $tableId
 	 * @param (mixed)[] $parameters
-	 * @param int $defaultViewId
 	 * @return Column
+	 * @throws DoesNotExistException
 	 * @throws Exception
 	 * @throws InternalError
-	 * @throws PermissionError
-	 * @throws DoesNotExistException
 	 * @throws MultipleObjectsReturnedException
+	 * @throws PermissionError
 	 */
-	private function createColumn(array $parameters, int $tableId): ?Column {
+	private function createColumn(int $tableId, array $parameters): ?Column {
 		if ($this->userId === null) {
 			return null;
 		}
@@ -838,15 +855,7 @@ class TableTemplateService {
 		);
 	}
 
-	/**
-	 * @param int $viewId
-	 * @param array $values
-	 * @return void
-	 * @throws DoesNotExistException
-	 * @throws InternalError
-	 * @throws MultipleObjectsReturnedException
-	 */
-	private function createRow(int $tableId, array $values): void {
+	private function createRow(Table $table, array $values): void {
 		$data = [];
 		foreach ($values as $columnId => $value) {
 			$data[] = [
@@ -855,10 +864,10 @@ class TableTemplateService {
 			];
 		}
 		try {
-			$this->rowService->create($tableId, null, $data);
+			$this->rowService->create($table->getId(), null, $data);
 		} catch (PermissionError $e) {
 			$this->logger->warning('Cannot create row, permission denied: '.$e->getMessage());
-		} catch (Exception $e) {
+		} catch (Exception|InternalError|DoesNotExistException|MultipleObjectsReturnedException $e) {
 			$this->logger->warning('Exception occurred while creating a row: '.$e->getMessage());
 		}
 	}

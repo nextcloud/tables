@@ -198,7 +198,7 @@ class ImportService extends SuperService {
 			// if cell is empty
 			if(!$cell || $cell->getValue() === null) {
 				$this->logger->info('Cell is empty while fetching rows data for importing.');
-				if($this->columns[$i]->getMandatory()){
+				if($this->columns[$i]->getMandatory()) {
 					$this->logger->warning('Mandatory column was not set');
 					$this->countErrors++;
 					return;

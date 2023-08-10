@@ -395,12 +395,12 @@ class ViewService extends SuperService {
 			throw new InternalError($e->getMessage());
 		}
 		foreach ($views as $view) {
-			$filteredSortingRules = array_filter($view->getSortArray(), function ($sort) use ($columnId) {
+			$filteredSortingRules = array_filter($view->getSortArray(), function (array $sort) use ($columnId) {
 				return $sort['columnId'] !== $columnId;
 			});
 			$filteredSortingRules = array_values($filteredSortingRules);
-			$filteredFilters = array_filter(array_map(function ($filterGroup) use ($columnId) {
-				return array_filter($filterGroup, function ($filter) use ($columnId) {
+			$filteredFilters = array_filter(array_map(function (array $filterGroup) use ($columnId) {
+				return array_filter($filterGroup, function (array $filter) use ($columnId) {
 					return $filter['columnId'] !== $columnId;
 				});
 			}, $view->getFilterArray()), fn ($filterGroup) => !empty($filterGroup));

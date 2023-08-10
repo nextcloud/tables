@@ -3,21 +3,18 @@
 namespace OCA\Tables\Reference;
 
 use OC\Collaboration\Reference\ReferenceManager;
-use OCA\Tables\AppInfo\Application;
-use OCP\Collaboration\Reference\ADiscoverableReferenceProvider;
 use OCP\Collaboration\Reference\IReference;
 use OCP\Collaboration\Reference\IReferenceProvider;
-use OCP\Collaboration\Reference\ISearchableReferenceProvider;
 use OCP\IL10N;
 use OCP\IURLGenerator;
 
 class LegacyReferenceProvider implements IReferenceProvider {
-	private TableReferenceHelper $referenceHelper;
+	private ReferenceHelper $referenceHelper;
 	private ReferenceManager $referenceManager;
 	private IURLGenerator $urlGenerator;
 	private IL10N $l10n;
 
-	public function __construct(IL10N $l10n, IURLGenerator $urlGenerator, TableReferenceHelper $referenceHelper, ReferenceManager $referenceManager) {
+	public function __construct(IL10N $l10n, IURLGenerator $urlGenerator, ReferenceHelper $referenceHelper, ReferenceManager $referenceManager) {
 		$this->referenceHelper = $referenceHelper;
 		$this->referenceManager = $referenceManager;
 		$this->urlGenerator = $urlGenerator;

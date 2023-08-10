@@ -173,7 +173,7 @@ export default {
 		},
 		viewShares() {
 			return this.shares.filter(share => share.nodeType === 'view')
-			//.filter(share => this.tableShares.find(tableShare => tableShare.nodeId === this.activeElement.tableId && share.receiver === tableShare.receiver && tableShare.permissionManage) === undefined)
+			// .filter(share => this.tableShares.find(tableShare => tableShare.nodeId === this.activeElement.tableId && share.receiver === tableShare.receiver && tableShare.permissionManage) === undefined)
 		},
 		tableShares() {
 			return this.shares.filter(share => share.nodeType === 'table')

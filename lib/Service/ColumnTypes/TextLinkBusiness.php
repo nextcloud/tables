@@ -17,7 +17,9 @@ class TextLinkBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		}
 
 		preg_match('/(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/', $value, $matches);
-		if (empty($matches)) return '';
+		if (empty($matches)) {
+			return '';
+		}
 		return json_encode(json_encode([
 			'title' => $matches[0],
 			'resourceUrl' => $matches[0]

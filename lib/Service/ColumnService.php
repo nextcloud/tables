@@ -186,7 +186,7 @@ class ColumnService extends SuperService {
 		if ($viewId) {
 			$view = $this->viewService->find($viewId);
 			$table = $this->tableMapper->find($view->getTableId());
-		} else if ($tableId) {
+		} elseif ($tableId) {
 			$table = $this->tableMapper->find($tableId);
 		} else {
 			throw new InternalError('Cannot update row without table or view in context');

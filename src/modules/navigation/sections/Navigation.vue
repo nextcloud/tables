@@ -59,31 +59,25 @@
 
 <script>
 import { NcAppNavigation, NcAppNavigationCaption, NcActionButton, NcTextField, NcButton, NcEmptyContent } from '@nextcloud/vue'
-import CreateTable from '../../modals/CreateTable.vue'
-import ViewSettings from '../../modals/ViewSettings.vue'
 import NavigationViewItem from '../partials/NavigationViewItem.vue'
 import NavigationDashboardItem from '../partials/NavigationTableItem.vue'
 import { mapState } from 'vuex'
-import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
+import { emit } from '@nextcloud/event-bus'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
 import { getCurrentUser } from '@nextcloud/auth'
-import Import from '../../modals/Import.vue'
 
 export default {
 	name: 'Navigation',
 	components: {
-		Import,
 		NavigationDashboardItem,
 		NavigationViewItem,
 		NcAppNavigation,
-		CreateTable,
 		NcAppNavigationCaption,
 		NcActionButton,
 		NcTextField,
 		Magnify,
 		NcButton,
 		NcEmptyContent,
-		ViewSettings,
 	},
 	data() {
 		return {

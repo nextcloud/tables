@@ -220,8 +220,8 @@ export default {
 	}
 
 	.space-T {
-		 margin-top: calc(var(--default-grid-baseline) * 2);
-	 }
+		margin-top: calc(var(--default-grid-baseline) * 2);
+	}
 
 	table {
 		width: 100%;

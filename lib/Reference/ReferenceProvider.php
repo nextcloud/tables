@@ -6,7 +6,6 @@ use OC\Collaboration\Reference\ReferenceManager;
 use OCA\Tables\AppInfo\Application;
 use OCP\Collaboration\Reference\ADiscoverableReferenceProvider;
 use OCP\Collaboration\Reference\IReference;
-use OCP\Collaboration\Reference\IReferenceProvider;
 use OCP\Collaboration\Reference\ISearchableReferenceProvider;
 use OCP\IL10N;
 use OCP\IURLGenerator;

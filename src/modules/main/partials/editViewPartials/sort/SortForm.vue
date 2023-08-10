@@ -132,6 +132,7 @@ export default {
 .locallyAdded {
 	background-color: var(--color-success-hover);
 }
+
 .locallyRemoved {
 	background-color: var(--color-error-hover);
 }

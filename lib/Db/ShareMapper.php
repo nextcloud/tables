@@ -15,7 +15,7 @@ class ShareMapper extends QBMapper {
 	protected string $table = 'tables_shares';
 	protected LoggerInterface $logger;
 
-	public function __construct( LoggerInterface $logger, IDBConnection $db) {
+	public function __construct(LoggerInterface $logger, IDBConnection $db) {
 		parent::__construct($db, $this->table, Share::class);
 		$this->logger = $logger;
 	}

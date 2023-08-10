@@ -510,7 +510,7 @@ class Api1Controller extends ApiController {
 			];
 		}
 
-		return $this->handleError(function () use ( $viewId, $dataNew) {
+		return $this->handleError(function () use ($viewId, $dataNew) {
 			return $this->rowService->create(null, $viewId, $dataNew);
 		});
 	}
@@ -553,8 +553,8 @@ class Api1Controller extends ApiController {
 	 * @NoCSRFRequired
 	 */
 	public function updateRow(int $rowId,
-							  ?int $viewId,
-							  array $data): DataResponse {
+		?int $viewId,
+		array $data): DataResponse {
 		$dataNew = [];
 		foreach ($data as $key => $value) {
 			$dataNew[] = [

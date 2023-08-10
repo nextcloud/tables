@@ -111,9 +111,13 @@ class PermissionsService {
 	 * @throws InternalError
 	 */
 	public function canManageElementById(int $elementId, string $nodeType = 'table', ?string $userId = null): bool {
-		if ($nodeType === 'table') return $this->canManageTableById($elementId, $userId);
-		else if ($nodeType === 'view') return $this->canManageViewById($elementId, $userId);
-		else throw new InternalError('Cannot read permission for node type '.$nodeType);
+		if ($nodeType === 'table') {
+			return $this->canManageTableById($elementId, $userId);
+		} elseif ($nodeType === 'view') {
+			return $this->canManageViewById($elementId, $userId);
+		} else {
+			throw new InternalError('Cannot read permission for node type '.$nodeType);
+		}
 	}
 
 	/**
@@ -229,7 +233,9 @@ class PermissionsService {
 	 * @return bool
 	 */
 	public function canCreateRows($element, string $nodeType = 'view', ?string $userId = null): bool {
-		if ($nodeType === 'table') return $this->checkPermission($element, 'table', 'manage', $userId);
+		if ($nodeType === 'table') {
+			return $this->checkPermission($element, 'table', 'manage', $userId);
+		}
 		return $this->checkPermission($element, 'view', 'create', $userId);
 	}
 
@@ -286,7 +292,7 @@ class PermissionsService {
 			return true;
 		}
 		try {
-			if ($this->canManageElementById($share->getNodeId(), $share->getNodeType())){
+			if ($this->canManageElementById($share->getNodeId(), $share->getNodeType())) {
 				return true;
 			}
 		} catch (InternalError $e) {
@@ -415,8 +421,7 @@ class PermissionsService {
 	 * @param string|null $userId
 	 * @return bool
 	 */
-	private function basisCheck($element, string $nodeType, ?string &$userId): bool
-	{
+	private function basisCheck($element, string $nodeType, ?string &$userId): bool {
 		try {
 			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {

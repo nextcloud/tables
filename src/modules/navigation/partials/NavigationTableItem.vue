@@ -95,7 +95,7 @@ export default {
 		NcAvatar,
 		Creation,
 		PlaylistPlus,
-},
+	},
 
 	filters: {
 		truncate(string, num) {

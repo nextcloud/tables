@@ -6,7 +6,6 @@ namespace OCA\Tables\Service;
 use OCA\Tables\Db\View;
 use OCA\Tables\Errors\PermissionError;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
-use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 use Psr\Log\LoggerInterface;
 
 class SearchService extends SuperService {

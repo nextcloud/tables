@@ -3,12 +3,9 @@
 namespace OCA\Tables\Api;
 
 use OCA\Tables\Errors\InternalError;
-use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\RowService;
-use OCP\AppFramework\Db\DoesNotExistException;
-use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 
 class V1Api {
 	private RowService $rowService;
