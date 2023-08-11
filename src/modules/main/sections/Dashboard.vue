@@ -112,40 +112,29 @@
 <script>
 import { mapState } from 'vuex'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
-import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 import Delete from 'vue-material-design-icons/Delete.vue'
 import Moment from '@nextcloud/moment'
-import IconImport from 'vue-material-design-icons/Import.vue'
 import Creation from 'vue-material-design-icons/Creation.vue'
-import IconRename from 'vue-material-design-icons/Rename.vue'
-import IconClose from 'vue-material-design-icons/Close.vue'
-import IconCheck from 'vue-material-design-icons/Check.vue'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import displayError from '../../../shared/utils/displayError.js'
-import { NcActionButton, NcActions, NcAvatar, NcButton, NcLoadingIcon, NcEmojiPicker } from '@nextcloud/vue'
+import { NcActionButton, NcActions, NcAvatar, NcButton, NcLoadingIcon } from '@nextcloud/vue'
 import PlaylistEditIcon from 'vue-material-design-icons/PlaylistEdit.vue'
 import { emit } from '@nextcloud/event-bus'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 
 export default {
 	components: {
-		IconCheck,
-		IconClose,
-		IconRename,
 		NcLoadingIcon,
 		NcActionButton,
 		Creation,
-		IconImport,
 		NcActions,
 		NcButton,
 		NcAvatar,
-		TableColumnPlusAfter,
 		PlaylistPlus,
 		PlaylistEditIcon,
 		Delete,
-		NcEmojiPicker,
 	},
 
 	filters: {
@@ -298,6 +287,7 @@ export default {
 .table td:last-child {
 	border-right: none;
 }
+
 .table td:first-child {
 	min-width: 150px;
 }
