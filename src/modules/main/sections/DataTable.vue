@@ -1,8 +1,67 @@
 <template>
 	<div>
-		<div class="row space-T">
-			<div v-if="hasViews" class="col-4 space-L">
-				<h2>{{ t('tables', 'Data') }}</h2>
+		<div v-if="hasViews" class="row space-T">
+			<div class="col-4 space-L">
+				<h2>
+					{{ t('tables', 'Data') }}&nbsp;&nbsp;
+					<NcActions :force-menu="true" type="secondary">
+						<template #icon>
+							<IconTool :size="20" />
+						</template>
+						<NcActionCaption v-if="canManageElement(table)" :title="t('tables', 'Manage table')" />
+						<NcActionButton v-if="canManageElement(table) "
+							:close-after-click="true"
+							@click="emit('tables:table:edit', table.id)">
+							<template #icon>
+								<IconRename :size="20" decorative />
+							</template>
+							{{ t('tables', 'Edit table') }}
+						</NcActionButton>
+						<NcActionButton v-if="canManageElement(table) "
+							:close-after-click="true"
+							@click="$emit('create-view')">
+							<template #icon>
+								<PlaylistPlus :size="20" decorative />
+							</template>
+							{{ t('tables', 'Create view') + (isViewSettingSet ? '*' : '') }}
+						</NcActionButton>
+						<NcActionButton v-if="canManageTable(table)" :close-after-click="true" @click="$emit('create-column')">
+							<template #icon>
+								<TableColumnPlusAfter :size="20" decorative title="" />
+							</template>
+							{{ t('tables', 'Create column') }}
+						</NcActionButton>
+
+						<NcActionCaption :title="t('tables', 'Integration')" />
+						<NcActionButton v-if="canCreateRowInElement(table)"
+							:close-after-click="true"
+							@click="$emit('import', table)">
+							<template #icon>
+								<Import :size="20" decorative title="Import" />
+							</template>
+							{{ t('tables', 'Import') }}
+						</NcActionButton>
+						<NcActionButton v-if="canReadData(table)" :close-after-click="true"
+							icon="icon-download"
+							@click="$emit('download-csv')">
+							{{ t('tables', 'Export as CSV') }}
+						</NcActionButton>
+						<NcActionButton v-if="canShareElement(table)"
+							:close-after-click="true"
+							icon="icon-share"
+							@click="$emit('toggle-share')">
+							{{ t('tables', 'Share') }}
+						</NcActionButton>
+						<NcActionButton
+							:close-after-click="true"
+							@click="$emit('show-integration')">
+							{{ t('tables', 'Integration') }}
+							<template #icon>
+								<Creation :size="20" />
+							</template>
+						</NcActionButton>
+					</NcActions>
+				</h2>
 			</div>
 		</div>
 		<div class="row">
@@ -23,7 +82,7 @@
 				:can-delete-columns="canManageTable(table)"
 				:can-delete-table="canManageTable(table)">
 				<template #actions>
-					<NcActions :force-menu="true" type="secondary">
+					<NcActions :force-menu="true" :type="isViewSettingSet ? 'secondary' : 'tertiary'">
 						<NcActionCaption v-if="canManageElement(table)" :title="t('tables', 'Manage table')" />
 						<NcActionButton v-if="canManageElement(table) "
 							:close-after-click="true"
@@ -88,6 +147,7 @@ import permissionsMixin from '../../../shared/components/ncTable/mixins/permissi
 import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 import IconRename from 'vue-material-design-icons/Rename.vue'
+import IconTool from 'vue-material-design-icons/TableCog.vue'
 import TableView from '../partials/TableView.vue'
 import EmptyTable from './EmptyTable.vue'
 import Creation from 'vue-material-design-icons/Creation.vue'
@@ -98,6 +158,7 @@ import { emit } from '@nextcloud/event-bus'
 
 export default {
 	components: {
+		IconTool,
 		TableView,
 		NcActionButton,
 		Creation,
@@ -169,3 +230,11 @@ export default {
 	},
 }
 </script>
+<style lang="scss" scoped>
+
+	h2 {
+		display: inline-flex;
+		align-items: center;
+	}
+
+</style>
