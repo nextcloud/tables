@@ -6,8 +6,8 @@
 					{{ title }}<span v-if="mandatory" :title="t('tables', 'This field is mandatory')">*</span>
 					<NcLoadingIcon v-if="loading" />
 				</div>
-				<p v-if="description" class="fix-col-4 span description">
-					{{ description }}
+				<p v-if="description" class="fix-col-4 span">
+					<pre>{{ description }}</pre>
 				</p>
 			</div>
 		</div>
@@ -84,11 +84,6 @@ export default {
 
 .material-design-icon.loading-icon {
 	margin-left: calc(var(--default-grid-baseline) * 1);
-}
-
-.description {
-	white-space: pre-line;
-	margin-top: -28px;
 }
 
 </style>
