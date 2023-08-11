@@ -1,9 +1,11 @@
 <template>
 	<div>
-		<div class="row space-T space-B">
+		<div class="row space-T">
 			<div v-if="hasViews" class="col-4 space-L">
 				<h2>{{ t('tables', 'Data') }}</h2>
 			</div>
+		</div>
+		<div class="row">
 			<EmptyTable v-if="columns.length === 0" :table="table" @create-column="showCreateColumn = true" />
 			<TableView v-else
 				:rows="rows"
