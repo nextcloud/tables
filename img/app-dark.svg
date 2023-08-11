@@ -1,3 +1,12 @@
-<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
-  <path d="M3 2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2m0 4v4h6V6H3m8 0v4h6V6h-6m-8 6v4h6v-4H3m8 0v4h6v-4z"/>
+<svg fill="#000" version="1.0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 415 415" style="enable-background:new 415 415 415 415;">
+	<rect x="150" y="115" width="120" height="60" />
+	<rect x="150" y="315" width="120" height="60" />
+	<rect x="300" y="115" width="120" height="60" />
+	<rect x="150" y="215" width="120" height="60" />
+	<rect x="0" y="215" width="120" height="60" />
+	<rect x="300" y="315" width="120" height="60" />
+	<rect x="300" y="215" width="120" height="60" />
+	<rect y="315" width="120" height="60" />
+	<rect x="0" y="115" width="120" height="60" />
+	<rect y="15" width="415" height="50" />
 </svg>
