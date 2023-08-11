@@ -6,7 +6,7 @@
 			@update:active="tab => activeSidebarTab = tab"
 			@close="showSidebar = false">
 			<template #description>
-				<table>
+				<table v-if="activeElement">
 					<tr>
 						<td>{{ t('tables', 'Created at') }}</td>
 						<td>{{ activeElement.createdAt | niceDateTime }}</td>
