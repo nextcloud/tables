@@ -3,9 +3,29 @@
 		<NcAppSidebar v-show="showSidebar"
 			:active="activeSidebarTab"
 			:title="elementTitle"
-			:subtitle="elementSubtitle"
 			@update:active="tab => activeSidebarTab = tab"
 			@close="showSidebar = false">
+			<template #description>
+				<table>
+					<tr>
+						<td>{{ t('tables', 'Created at') }}</td>
+						<td>{{ activeElement.createdAt | niceDateTime }}</td>
+					</tr>
+					<tr>
+						<td>{{ t('tables', 'Ownership') }}</td>
+						<td><NcUserBubble :user="activeElement.ownership" :display-name="activeElement.ownerDisplayName" /></td>
+					</tr>
+					<tr>
+						<td v-if="isView">
+							{{ t('tables', 'View ID') }}
+						</td>
+						<td v-else>
+							{{ t('tables', 'Table ID') }}
+						</td>
+						<td>{{ activeElement.id }}</td>
+					</tr>
+				</table>
+			</template>
 			<NcAppSidebarTab
 				id="integration"
 				:name="t('tables', 'Integration')">
@@ -27,19 +47,27 @@
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import SidebarSharing from './SidebarSharing.vue'
 import SidebarIntegration from './SidebarIntegration.vue'
-import { NcAppSidebar, NcAppSidebarTab } from '@nextcloud/vue'
+import { NcAppSidebar, NcAppSidebarTab, NcUserBubble } from '@nextcloud/vue'
 import { mapGetters, mapState } from 'vuex'
 import Creation from 'vue-material-design-icons/Creation.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
+import Moment from '@nextcloud/moment'
 
 export default {
 	name: 'Sidebar',
 	components: {
+		NcUserBubble,
 		SidebarSharing,
 		SidebarIntegration,
 		NcAppSidebar,
 		NcAppSidebarTab,
 		Creation,
+	},
+
+	filters: {
+		niceDateTime(value) {
+			return Moment(value, 'YYYY-MM-DD HH:mm:ss').format('lll')
+		},
 	},
 
 	mixins: [permissionsMixin],
@@ -85,3 +113,12 @@ export default {
 	},
 }
 </script>
+<style lang="scss" scoped>
+
+	table {
+		margin-bottom: calc(var(--default-grid-baseline) * 2);
+		width: 100%;
+		color: var(--color-text-maxcontrast);
+	}
+
+</style>

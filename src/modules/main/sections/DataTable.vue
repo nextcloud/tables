@@ -23,7 +23,7 @@
 				:can-delete-columns="canManageTable(table)"
 				:can-delete-table="canManageTable(table)">
 				<template #actions>
-					<NcActions :force-menu="true" :type="isViewSettingSet ? 'secondary' : 'tertiary'">
+					<NcActions :force-menu="true" type="secondary">
 						<NcActionCaption v-if="canManageElement(table)" :title="t('tables', 'Manage table')" />
 						<NcActionButton v-if="canManageElement(table) "
 							:close-after-click="true"
@@ -39,7 +39,7 @@
 							<template #icon>
 								<PlaylistPlus :size="20" decorative />
 							</template>
-							{{ t('tables', 'Create view') }}
+							{{ t('tables', 'Create view') + (isViewSettingSet ? '*' : '') }}
 						</NcActionButton>
 						<NcActionButton v-if="canManageTable(table)" :close-after-click="true" @click="$emit('create-column')">
 							<template #icon>
