@@ -88,26 +88,25 @@
 					{{ t('tables', 'Select value') }}
 				</NcActionButton>
 				<NcActionCaption :title="t('tables', 'Manage column')" />
-				<NcActionButton
-					:disabled="!canHide"
-					@click="hideColumn()">
-					<template #icon>
-						<EyeOff :size="25" />
-					</template>
-					{{ t('tables', 'Hide column') }}
-				</NcActionButton>
-				<NcActionButton v-if="column.id >= 0 && config.canEditColumns" @click="editColumn()">
-					<template #icon>
-						<Pencil :size="25" />
-					</template>
-					{{ t('tables', 'Edit column') }}
-				</NcActionButton>
-				<NcActionButton v-if="column.id >= 0 && config.canDeleteColumns" @click="deleteColumn()">
-					<template #icon>
-						<Delete :size="25" />
-					</template>
-					{{ t('tables', 'Delete column') }}
-				</NcActionButton>
+				<NcActionButtonGroup :name="t('tables', 'Column manage actions')">
+					<NcActionButton
+						:disabled="!canHide"
+						@click="hideColumn()">
+						<template #icon>
+							<EyeOff :size="25" />
+						</template>
+					</NcActionButton>
+					<NcActionButton v-if="column.id >= 0 && config.canEditColumns" @click="editColumn()">
+						<template #icon>
+							<Pencil :size="25" />
+						</template>
+					</NcActionButton>
+					<NcActionButton v-if="column.id >= 0 && config.canDeleteColumns" @click="deleteColumn()">
+						<template #icon>
+							<Delete :size="25" />
+						</template>
+					</NcActionButton>
+				</NcActionButtonGroup>
 			</template>
 		</NcActions>
 	</div>
