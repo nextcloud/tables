@@ -88,6 +88,7 @@ export default {
 
 .description {
 	white-space: pre-line;
+	margin-top: -28px;
 }
 
 </style>
