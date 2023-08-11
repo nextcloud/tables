@@ -170,6 +170,18 @@ export default {
 			type: Boolean,
 			default: true,
 		},
+		canHideColumns: {
+			type: Boolean,
+			default: true,
+		},
+		canFilter: {
+			type: Boolean,
+			default: true,
+		},
+		showActions: {
+			type: Boolean,
+			default: true,
+		},
 	},
 	data() {
 		return {
@@ -189,6 +201,9 @@ export default {
 				canDeleteColumns: this.canDeleteColumns,
 				canDeleteTable: this.canDeleteTable,
 				canSelectRows: this.canSelectRows,
+				canHideColumns: this.canHideColumns,
+				canFilter: this.canFilter,
+				showActions: this.showActions,
 			}
 		},
 		parsedColumns() {

@@ -34,7 +34,7 @@
 				<div v-if="hasRightHiddenNeighbor(col.id)" class="hidden-indicator" @click="unhide(col.id)" />
 			</div>
 		</th>
-		<th data-cy="customTableAction">
+		<th v-if="config.showActions" data-cy="customTableAction" :class="{sticky: config.showActions}">
 			<slot name="actions" />
 		</th>
 	</tr>

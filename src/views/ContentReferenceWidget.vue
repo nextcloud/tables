@@ -33,7 +33,10 @@
 				:can-edit-columns="false"
 				:can-delete-columns="false"
 				:can-delete-table="false"
-				:can-select-rows="false" />
+				:can-select-rows="false"
+				:can-hide-columns="false"
+				:can-filter="false"
+				:show-actions="false" />
 		</div>
 	</div>
 </template>

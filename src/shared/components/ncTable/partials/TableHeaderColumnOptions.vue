@@ -69,9 +69,9 @@
 						</template>
 					</NcActionButton>
 				</NcActionButtonGroup>
-				<NcActionCaption v-if="hasOperators" :title="t('tables', 'Filtering')" />
+				<NcActionCaption v-if="showFilter && hasOperators" :title="t('tables', 'Filtering')" />
 				<NcActionButton
-					v-if="hasOperators"
+					v-if="showFilter && hasOperators"
 					:title="selectedOperator.label"
 					@click="selectOperator = true">
 					<template #icon>
@@ -80,16 +80,17 @@
 					{{ t('tables', 'Select Operator') }}
 				</NcActionButton>
 				<NcActionButton
-					v-if="hasOperators"
+					v-if="showFilter && hasOperators"
 					@click="selectValue = true">
 					<template #icon>
 						<Magnify :size="25" />
 					</template>
 					{{ t('tables', 'Select value') }}
 				</NcActionButton>
-				<NcActionCaption :title="t('tables', 'Manage column')" />
-				<NcActionButtonGroup :name="t('tables', 'Column manage actions')">
+				<NcActionCaption v-if="hasManageColumnEntries" :title="t('tables', 'Manage column')" />
+				<NcActionButtonGroup v-if="hasManageColumnEntries" :name="t('tables', 'Column manage actions')">
 					<NcActionButton
+						v-if="showHideColumn"
 						:disabled="!canHide"
 						:aria-label="t('tables', 'Hide column')"
 						@click="hideColumn()">
@@ -97,14 +98,14 @@
 							<EyeOff :size="25" />
 						</template>
 					</NcActionButton>
-					<NcActionButton v-if="column.id >= 0 && config.canEditColumns"
+					<NcActionButton v-if="showEditColumn"
 						:aria-label="t('tables', 'Edit column')"
 						@click="editColumn()">
 						<template #icon>
 							<Pencil :size="25" />
 						</template>
 					</NcActionButton>
-					<NcActionButton v-if="column.id >= 0 && config.canDeleteColumns"
+					<NcActionButton v-if="showDeleteColumn"
 						:aria-label="t('tables', 'Delete column')"
 						@click="deleteColumn()">
 						<template #icon>
@@ -229,6 +230,21 @@ export default {
 				return sortObject.mode
 			}
 			return null
+		},
+		showFilter() {
+			return this.config.canFilter
+		},
+		hasManageColumnEntries() {
+			return this.showHideColumn || this.showEditColumn || this.showDeleteColumn
+		},
+		showHideColumn() {
+			return this.config.canHideColumns
+		},
+		showEditColumn() {
+			return this.column.id >= 0 && this.config.canEditColumns
+		},
+		showDeleteColumn() {
+			return this.column.id >= 0 && this.config.canDeleteColumns
 		},
 		selectedOperator: {
 			get() {

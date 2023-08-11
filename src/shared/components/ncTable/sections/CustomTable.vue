@@ -362,7 +362,7 @@ export default {
 		z-index: 5;
 	}
 
-	tr>th:last-child,tr>td:last-child {
+	tr>th.sticky:last-child,tr>td.sticky:last-child {
 		position: sticky;
 		right: 0;
 		width: 55px;
