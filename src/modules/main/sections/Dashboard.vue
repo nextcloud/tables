@@ -145,21 +145,22 @@
 					</thead>
 					<tbody>
 						<tr v-for="view in getViews" :key="view.id">
-							<td style="display: inline-flex">
+							<td style="display: inline-flex" class="link-to-view" @click="openView(view)">
 								{{ view.emoji + ' ' + view.title }}&nbsp;
-								<NcButton :to="'/view/'+view.id" type="tertiary">
-									<template #icon>
-										<LinkIcon :size="20" />
-									</template>
-								</NcButton>
 							</td>
-							<td>{{ view.rowsCount }}</td>
-							<td>{{ view.columns.length }}</td>
-							<td>{{ view.lastEditAt | niceDateTime }}</td>
+							<td class="link-to-view number-column" @click="openView(view)">
+								{{ view.rowsCount }}
+							</td>
+							<td class="link-to-view number-column" @click="openView(view)">
+								{{ view.columns.length }}
+							</td>
+							<td class="link-to-view" @click="openView(view)">
+								{{ view.lastEditAt | niceDateTime }}
+							</td>
 							<td v-if="view.hasShares">
 								<NcLoadingIcon v-if="loadingViewShares" />
 								<div v-else>
-									<div v-for="share in viewShares[view.id]" :key="share.id">
+									<div v-for="share in viewShares[view.id]" :key="share.id" class="inline">
 										<NcAvatar
 											:display-name="share.receiverDisplayName"
 											:user="share.receiver"
@@ -169,30 +170,52 @@
 							</td>
 							<td v-else />
 							<td class="actions">
-								<NcButton v-if="canManageElement(table)"
-									type="secondary"
-									:aria-label="t('tables', 'Edit view')"
-									:close-after-click="true"
-									@click="emit('tables:view:edit', { view })">
-									<template #icon>
-										<PlaylistEditIcon :size="20" />
-									</template>
-								</NcButton>
-								<NcButton v-if="canManageElement(table)"
-									type="error"
-									:aria-label="t('tables', 'Delete view')"
-									:close-after-click="true"
-									@click="emit('tables:view:delete', view)">
-									<template #icon>
-										<Delete :size="20" />
-									</template>
-								</NcButton>
+								<NcActions>
+									<NcActionButton v-if="canManageElement(table)"
+										type="secondary"
+										:aria-label="t('tables', 'Edit view')"
+										:close-after-click="true"
+										@click="emit('tables:view:edit', { view })">
+										<template #icon>
+											<PlaylistEditIcon :size="20" />
+										</template>
+										{{ t('tables', 'Edit view') }}
+									</NcActionButton>
+									<NcActionButton v-if="canShareElement(table)"
+										icon="icon-share"
+										:close-after-click="true"
+										@click="actionShowShare(view)">
+										{{ t('tables', 'Share') }}
+									</NcActionButton>
+									<NcActionButton
+										:close-after-click="true"
+										@click="actionShowIntegration(view)">
+										{{ t('tables', 'Integration') }}
+										<template #icon>
+											<Creation :size="20" />
+										</template>
+									</NcActionButton>
+									<NcActionButton v-if="canManageElement(table)"
+										type="error"
+										:aria-label="t('tables', 'Delete view')"
+										:close-after-click="true"
+										@click="emit('tables:view:delete', view)">
+										<template #icon>
+											<Delete :size="20" />
+										</template>
+										{{ t('tables', 'Delete view') }}
+									</NcActionButton>
+								</NcActions>
 							</td>
 						</tr>
 						<tr class="footer">
 							<td>{{ t('Tables', 'Total') }}</td>
-							<td>{{ table.rowsCount }}</td>
-							<td>{{ table.columnsCount }}</td>
+							<td class="number-column">
+								{{ table.rowsCount }}
+							</td>
+							<td class="number-column">
+								{{ table.columnsCount }}
+							</td>
 							<td />
 							<td />
 						</tr>
@@ -220,7 +243,6 @@ import { generateUrl } from '@nextcloud/router'
 import displayError from '../../../shared/utils/displayError.js'
 import { NcActionButton, NcActions, NcAvatar, NcButton, NcLoadingIcon, NcEmojiPicker } from '@nextcloud/vue'
 import PlaylistEditIcon from 'vue-material-design-icons/PlaylistEdit.vue'
-import LinkIcon from 'vue-material-design-icons/Link.vue'
 import { emit } from '@nextcloud/event-bus'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 
@@ -239,7 +261,6 @@ export default {
 		TableColumnPlusAfter,
 		PlaylistPlus,
 		PlaylistEditIcon,
-		LinkIcon,
 		Delete,
 		NcEmojiPicker,
 	},
@@ -287,12 +308,25 @@ export default {
 
 	methods: {
 		emit,
+		openView(view) {
+			this.$router.push('/view/' + parseInt(view.id)).catch(err => err)
+		},
 		startEditingTableTitle() {
 			this.tableTitle = this.table.title
 
 			this.$nextTick(() => {
 				this.$refs.tableTitle.focus()
 			})
+		},
+
+		actionShowShare(view) {
+			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
+			this.$router.push('/view/' + parseInt(view.id)).catch(err => err)
+		},
+
+		async actionShowIntegration(view) {
+			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
+			await this.$router.push('/view/' + parseInt(view.id)).catch(err => err)
 		},
 
 		async updateTableEmoji(emoji) {
@@ -360,6 +394,7 @@ export default {
 <style lang="scss" scoped>
 .table {
 	border-collapse: collapse;
+	width: 670px;
 }
 
 .table td .inline {
@@ -373,13 +408,15 @@ export default {
 	padding-top: calc(var(--default-grid-baseline) * 1);
 	padding-bottom: calc(var(--default-grid-baseline) * 1);
 	text-align: left;
-	background-color: var(--color-main-background-translucent);
 	align-items: center;
 }
 
 .table th:last-child,
 .table td:last-child {
 	border-right: none;
+}
+.table td:first-child {
+	min-width: 150px;
 }
 
 .table th {
@@ -404,8 +441,17 @@ td.actions button {
 	margin-left: calc(var(--default-grid-baseline) * 1);
 }
 
-td a {
-	text-decoration: underline;
+tr:hover{
+	cursor: pointer !important;
+}
+
+table{
+	td.link-to-view{
+		cursor: pointer !important;
+	}
+	td.number-column{
+		text-align: end;
+	}
 }
 
 .footer td {

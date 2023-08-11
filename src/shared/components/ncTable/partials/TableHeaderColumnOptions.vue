@@ -91,17 +91,22 @@
 				<NcActionButtonGroup :name="t('tables', 'Column manage actions')">
 					<NcActionButton
 						:disabled="!canHide"
+						:aria-label="t('tables', 'Hide column')"
 						@click="hideColumn()">
 						<template #icon>
 							<EyeOff :size="25" />
 						</template>
 					</NcActionButton>
-					<NcActionButton v-if="column.id >= 0 && config.canEditColumns" @click="editColumn()">
+					<NcActionButton v-if="column.id >= 0 && config.canEditColumns"
+						:aria-label="t('tables', 'Edit column')"
+						@click="editColumn()">
 						<template #icon>
 							<Pencil :size="25" />
 						</template>
 					</NcActionButton>
-					<NcActionButton v-if="column.id >= 0 && config.canDeleteColumns" @click="deleteColumn()">
+					<NcActionButton v-if="column.id >= 0 && config.canDeleteColumns"
+						:aria-label="t('tables', 'Delete column')"
+						@click="deleteColumn()">
 						<template #icon>
 							<Delete :size="25" />
 						</template>
