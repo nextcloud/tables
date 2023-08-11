@@ -28,6 +28,7 @@
 			</template>
 			<NcAppSidebarTab
 				id="integration"
+				order="1"
 				:name="t('tables', 'Integration')">
 				<SidebarIntegration />
 				<template #icon>
@@ -37,6 +38,7 @@
 			<NcAppSidebarTab v-if="activeElement && canShareElement(activeElement)"
 				id="sharing"
 				icon="icon-share"
+				order="0"
 				:name="t('tables', 'Sharing')">
 				<SidebarSharing />
 			</NcAppSidebarTab>
