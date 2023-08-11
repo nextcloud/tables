@@ -11,29 +11,26 @@
 				</NcButton>
 			</template>
 		</NcEmptyContent>
+		<MainModals />
 	</div>
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
 import { NcEmptyContent, NcButton } from '@nextcloud/vue'
 import IconTables from '../shared/assets/icons/IconTables.vue'
 import { emit } from '@nextcloud/event-bus'
+import MainModals from '../modules/modals/Modals.vue'
 
 export default {
-	name: 'Startpage',
 	components: {
 		NcEmptyContent,
 		NcButton,
 		IconTables,
-	},
-	computed: {
-		...mapState(['tables']),
-		...mapGetters(['activeTable']),
+		MainModals,
 	},
 	methods: {
 		addTable() {
-			emit('create-table', {})
+			emit('tables:table:create', {})
 		},
 	},
 }

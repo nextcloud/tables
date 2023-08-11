@@ -36,4 +36,20 @@ class SelectionMultiBusiness extends SuperBusiness implements IColumnTypeBusines
 		return null;
 	}
 
+	public function canBeParsed(string $value, ?Column $column = null): bool {
+		if(!$column) {
+			return false;
+		}
+
+		$this->options = $column->getSelectionOptionsArray();
+		$wantedValues = explode(',', $value);
+
+		foreach ($wantedValues as $wantedValue) {
+			if ($this->getOptionIdForValue($wantedValue) === null && trim($wantedValue) !== null) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 }

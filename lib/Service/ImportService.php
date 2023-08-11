@@ -9,6 +9,8 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\ColumnTypes\TextLineBusiness;
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
@@ -27,40 +29,69 @@ class ImportService extends SuperService {
 	private IRootFolder $rootFolder;
 	private ColumnService $columnService;
 	private RowService $rowService;
+	private TableService $tableService;
+	private ViewService $viewService;
 	private IUserManager $userManager;
 
-	private int $tableId = -1;
+	private ?int $tableId = null;
+	private ?int $viewId = null;
 	private array $columns = [];
 	private bool $createUnknownColumns = true;
+	private int $countMatchingColumns = 0;
 	private int $countCreatedColumns = 0;
 	private int $countInsertedRows = 0;
 	private int $countErrors = 0;
+	private int $countParsingErrors = 0;
 
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-		IRootFolder $rootFolder, ColumnService $columnService, RowService $rowService, IUserManager $userManager) {
+		IRootFolder $rootFolder, ColumnService $columnService, RowService $rowService, TableService $tableService, ViewService $viewService, IUserManager $userManager) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->rootFolder = $rootFolder;
 		$this->columnService = $columnService;
 		$this->rowService = $rowService;
+		$this->tableService = $tableService;
+		$this->viewService = $viewService;
 		$this->userManager = $userManager;
 	}
 
 	/**
-	 * @param int $tableId
+	 * @param int $viewId
 	 * @param string $path
 	 * @param bool $createMissingColumns
 	 * @return array
+	 * @throws DoesNotExistException
 	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
 	 * @throws NotFoundError
+	 * @throws PermissionError
 	 */
-	public function import(int $tableId, string $path, bool $createMissingColumns = true): array {
+	public function import(?int $tableId, ?int $viewId, string $path, bool $createMissingColumns = true): array {
+		if ($viewId !== null) {
+			$view = $this->viewService->find($viewId);
+			if (!$this->permissionsService->canCreateRows($view)) {
+				throw new PermissionError('create row at the view id = '.$viewId.' is not allowed.');
+			}
+			if ($createMissingColumns && !$this->permissionsService->canManageTableById($view->getTableId())) {
+				throw new PermissionError('create columns at the view id = '.$viewId.' is not allowed.');
+			}
+			$this->viewId = $viewId;
+		} else {
+			$table = $this->tableService->find($tableId);
+			if (!$this->permissionsService->canCreateRows($table, 'table')) {
+				throw new PermissionError('create row at the view id = '.$viewId.' is not allowed.');
+			}
+			if ($createMissingColumns && !$this->permissionsService->canManageTable($table)) {
+				throw new PermissionError('create columns at the view id = '.$viewId.' is not allowed.');
+			}
+			$this->tableId = $tableId;
+		}
+
 		if ($this->userManager->get($this->userId) === null) {
 			$error = 'No user in context, can not import data. Cancel.';
 			$this->logger->debug($error);
 			throw new InternalError($error);
 		}
 
-		$this->tableId = $tableId;
 		$this->createUnknownColumns = $createMissingColumns;
 
 		try {
@@ -89,21 +120,30 @@ class ImportService extends SuperService {
 
 		return [
 			'found_columns_count' => count($this->columns),
+			'matching_columns_count' => $this->countMatchingColumns,
 			'created_columns_count' => $this->countCreatedColumns,
 			'inserted_rows_count' => $this->countInsertedRows,
+			'errors_parsing_count' => $this->countParsingErrors,
 			'errors_count' => $this->countErrors,
 		];
 	}
 
 	/**
-	 * @throws PermissionError
+	 * @param Worksheet $worksheet
+	 * @throws DoesNotExistException
 	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws NotFoundError
+	 * @throws PermissionError
 	 */
 	private function loop(Worksheet $worksheet): void {
 		$firstRow = true;
 		foreach ($worksheet->getRowIterator() as $row) {
 			if ($firstRow) {
 				$this->getColumns($row);
+				if (empty(array_filter($this->columns))) {
+					return;
+				}
 				$firstRow = false;
 			} else {
 				// parse row data
@@ -118,10 +158,14 @@ class ImportService extends SuperService {
 	private function parseValueByColumnType(string $value, Column $column): string {
 		try {
 			$businessClassName = 'OCA\Tables\Service\ColumnTypes\\';
-			/** @noinspection PhpUndefinedMethodInspection */
 			$businessClassName .= ucfirst($column->getType()).ucfirst($column->getSubtype()).'Business';
 			/** @var TextLineBusiness $columnBusiness */
 			$columnBusiness = Server::get($businessClassName);
+			if(!$columnBusiness->canBeParsed($value, $column)) {
+				$this->logger->warning('Value '.$value.' could not be parsed for column '.$column->getTitle());
+				$this->countParsingErrors++;
+				return '';
+			}
 			return $columnBusiness->parseValue($value, $column);
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 			$this->logger->debug('Column type business class not found');
@@ -129,6 +173,13 @@ class ImportService extends SuperService {
 		return '';
 	}
 
+	/**
+	 * @param Row $row
+	 * @return void
+	 * @throws DoesNotExistException
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 */
 	private function createRow(Row $row): void {
 		$cellIterator = $row->getCellIterator();
 		$cellIterator->setIterateOnlyExistingCells(false);
@@ -141,13 +192,17 @@ class ImportService extends SuperService {
 			// only add the dataset if column is known
 			if($this->columns[$i] === '' || !isset($this->columns[$i])) {
 				$this->logger->debug('Column unknown while fetching rows data for importing.');
-				$this->countErrors++;
 				continue;
 			}
 
 			// if cell is empty
 			if(!$cell || $cell->getValue() === null) {
 				$this->logger->info('Cell is empty while fetching rows data for importing.');
+				if($this->columns[$i]->getMandatory()) {
+					$this->logger->warning('Mandatory column was not set');
+					$this->countErrors++;
+					return;
+				}
 				continue;
 			}
 
@@ -157,7 +212,7 @@ class ImportService extends SuperService {
 			];
 		}
 		try {
-			$this->rowService->createComplete($this->tableId, $data);
+			$this->rowService->create($this->tableId, $this->viewId, $data);
 			$this->countInsertedRows++;
 		} catch (PermissionError $e) {
 			$this->logger->error('Could not create row while importing, no permission.', ['exception' => $e]);
@@ -170,8 +225,12 @@ class ImportService extends SuperService {
 	}
 
 	/**
-	 * @throws PermissionError
+	 * @param Row $row
 	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
 	 */
 	private function getColumns(Row $row): void {
 		$cellIterator = $row->getCellIterator();
@@ -184,7 +243,11 @@ class ImportService extends SuperService {
 				$this->countErrors++;
 			}
 		}
-		$this->columns = $this->columnService->findOrCreateColumnsByTitleForTableAsArray($this->tableId, $titles, $this->userId, $this->createUnknownColumns, $this->countCreatedColumns);
+		try {
+			$this->columns = $this->columnService->findOrCreateColumnsByTitleForTableAsArray($this->tableId, $this->viewId, $titles, $this->userId, $this->createUnknownColumns, $this->countCreatedColumns, $this->countMatchingColumns);
+		} catch (Exception $e) {
+			throw new InternalError($e->getMessage());
+		}
 	}
 
 }

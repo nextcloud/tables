@@ -32,8 +32,8 @@ function statusMessage(status) {
  * @param {Error} e The error
  * @param {string} msg as message to toast out
  */
-function displaySimpleError(e, msg) {
-	console.error('Error occurred: ' + msg, e.message)
+function displaySimpleError(e = null, msg = '') {
+	console.error('Error occurred: ' + msg ?? '', e?.message)
 	showError(msg)
 }
 

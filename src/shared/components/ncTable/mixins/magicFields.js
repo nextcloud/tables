@@ -1,6 +1,7 @@
 import { getCurrentUser } from '@nextcloud/auth'
 import Moment from '@nextcloud/moment'
 import { ColumnTypes } from './columnHandler.js'
+import { translate as t } from '@nextcloud/l10n'
 
 class BaseMagicField {
 
@@ -24,19 +25,23 @@ class MagicField extends BaseMagicField {
 
 }
 
+export function getMagicFieldWithId(id) {
+	return Object.values(MagicFields).find(mf => mf.id === id)
+}
+
 export const MagicFields = {
 	Me: new MagicField({
 		id: 'me',
 		label: t('tables', 'Me (user ID)'),
 		icon: 'icon-user',
-		goodFor: [ColumnTypes.TextLine, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.TextRich],
+		goodFor: [ColumnTypes.TextLine, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.TextRich, ColumnTypes.TextLink],
 		replace: getCurrentUser().uid,
 	}),
 	MyName: new MagicField({
 		id: 'my-name',
 		label: t('tables', 'Me (name)'),
 		icon: 'icon-user',
-		goodFor: [ColumnTypes.TextLine, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.TextRich],
+		goodFor: [ColumnTypes.TextLine, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.TextRich, ColumnTypes.TextLink],
 		replace: getCurrentUser().displayName,
 	}),
 	Checked: new MagicField({

@@ -18,12 +18,17 @@ class SuperBusiness {
 		return json_encode($value);
 	}
 
+	public function canBeParsed(string $value, ?Column $column = null): bool {
+		return true;
+	}
+
 	protected function isValidDate(string $dateString, string $format): bool {
 		try {
 			$dateTime = new DateTime($dateString);
 			$newString = $dateTime->format($format);
 			return $newString === $dateString;
 		} catch (\Exception $e) {
+			$this->logger->warning('Could not validate date: '.$e->getMessage().' Returning false.');
 			return false;
 		}
 	}

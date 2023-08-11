@@ -2,59 +2,118 @@
 	<div class="menu" :class="{showOnHover: getSortMode === null}">
 		<NcActions :open.sync="localOpenState" :force-menu="true">
 			<template v-if="getSortMode !== null" #icon>
-				<SortDesc v-if="getSortMode === 'desc'" :size="20" />
-				<SortAsc v-else-if="getSortMode === 'asc'" :size="20" />
+				<SortDesc v-if="getSortMode === 'DESC'" :size="20" />
+				<SortAsc v-else-if="getSortMode === 'ASC'" :size="20" />
 			</template>
-			<NcActionButtonGroup v-if="canSort" :title="t('tables', 'Sorting')">
-				<NcActionButton :class="{ selected: getSortMode === 'asc' }" :aria-label="t('tables', 'Sort asc')" @click="sort('asc')">
+			<template v-if="selectOperator">
+				<NcActionButton @click="selectOperator = false">
 					<template #icon>
-						<SortAsc :size="20" />
+						<ChevronLeft :size="25" />
 					</template>
+					{{ t('tables', 'Back') }}
 				</NcActionButton>
-				<NcActionButton :class="{ selected: getSortMode === 'desc' }" :aria-label="t('tables', 'Sort desc')" @click="sort('desc')">
+				<NcActionCaption :title="t('tables', 'Select operator')" />
+				<NcActionRadio
+					v-for="(op, index) in getOperators"
+					:key="index"
+					:name="'filter-operators-column-' + column.id"
+					:value="op.id"
+					:checked="selectedOperator.id === op.id"
+					:disabled="isDisabled(op.id)"
+					@change="changeFilterOperator(op)">
+					{{ op.label }}
+				</NcActionRadio>
+			</template>
+			<template v-else-if="selectValue">
+				<NcActionButton @click="selectValue = false">
 					<template #icon>
-						<SortDesc :size="20" />
+						<ChevronLeft :size="25" />
 					</template>
+					{{ t('tables', 'Back') }}
 				</NcActionButton>
-			</NcActionButtonGroup>
-			<NcActionSeparator v-if="canSort && haveOperators" />
-			<NcActionCaption v-if="haveOperators" :title="t('tables', 'Filtering')" />
-			<NcActionRadio
-				v-for="(op, index) in visibleOperators"
-				:key="index"
-				:name="'filter-operators-column-' + column.id"
-				:value="op.id"
-				:checked="operator.id === op.id"
-				:disabled="isDisabled(op.id)"
-				@change="changeFilterOperator(op)">
-				{{ op.label }}
-			</NcActionRadio>
-			<NcActionInput
-				v-if="canFilterWithTextInput && haveOperators"
-				:label-visible="false"
-				:label="t('tables', 'Keyword and submit')"
-				:value.sync="filterValue"
-				:show-trailing-button="true"
-				@submit="submitFilterInput">
-				<template #icon>
-					<Pencil :size="20" />
-				</template>
-			</NcActionInput>
-			<NcActionCaption
-				v-if="column.getPossibleMagicFields().length > 0 && canFilterWithTextInput"
-				:title="t('tables', 'Or use magic values')" />
-			<NcActionCaption
-				v-if="column.getPossibleMagicFields().length > 0 && !canFilterWithTextInput"
-				:title="t('tables', 'Choose value')" />
-			<NcActionButton
-				v-for="(magicField, index) in getMagicFields"
-				:key="'magic-field-' + index"
-				:value="magicField.id"
-				:checked="index === 0"
-				:icon="magicField.icon"
-				@click="submitMagicField(magicField.id)">
-				{{ magicField.label }}
-			</NcActionButton>
+				<NcActionCaption :title="t('tables', 'Search for value')" />
+				<NcActionInput
+					:label-visible="false"
+					:label="t('tables', 'Keyword and submit')"
+					:value.sync="searchValue"
+					:show-trailing-button="true"
+					@submit="submitFilterInput">
+					<template #icon>
+						<Magnify :size="20" />
+					</template>
+				</NcActionInput>
+				<NcActionCaption
+					v-if="getMagicFields.length > 0"
+					:title="t('tables', 'Or use magic values')" />
+				<NcActionButton
+					v-for="(magicField, index) in getMagicFields"
+					:key="'magic-field-' + index"
+					:value="magicField.id"
+					:checked="index === 0"
+					:icon="magicField.icon"
+					@click="submitMagicField(magicField)">
+					{{ magicField.label }}
+				</NcActionButton>
+			</template>
+			<template v-else>
+				<NcActionCaption v-if="canSort" :title="t('tables', 'Sorting')" />
+				<NcActionButtonGroup v-if="canSort">
+					<NcActionButton :class="{ selected: getSortMode === 'ASC' }" :aria-label="t('tables', 'Sort asc')" @click="sort('ASC')">
+						<template #icon>
+							<SortAsc :size="20" />
+						</template>
+					</NcActionButton>
+					<NcActionButton :class="{ selected: getSortMode === 'DESC' }" :aria-label="t('tables', 'Sort desc')" @click="sort('DESC')">
+						<template #icon>
+							<SortDesc :size="20" />
+						</template>
+					</NcActionButton>
+				</NcActionButtonGroup>
+				<NcActionCaption v-if="showFilter && hasOperators" :title="t('tables', 'Filtering')" />
+				<NcActionButton
+					v-if="showFilter && hasOperators"
+					:title="selectedOperator.label"
+					@click="selectOperator = true">
+					<template #icon>
+						<FilterCog :size="25" />
+					</template>
+					{{ t('tables', 'Select Operator') }}
+				</NcActionButton>
+				<NcActionButton
+					v-if="showFilter && hasOperators"
+					@click="selectValue = true">
+					<template #icon>
+						<Magnify :size="25" />
+					</template>
+					{{ t('tables', 'Select value') }}
+				</NcActionButton>
+				<NcActionCaption v-if="hasManageColumnEntries" :title="t('tables', 'Manage column')" />
+				<NcActionButtonGroup v-if="hasManageColumnEntries" :name="t('tables', 'Column manage actions')">
+					<NcActionButton
+						v-if="showHideColumn"
+						:disabled="!canHide"
+						:aria-label="t('tables', 'Hide column')"
+						@click="hideColumn()">
+						<template #icon>
+							<EyeOff :size="25" />
+						</template>
+					</NcActionButton>
+					<NcActionButton v-if="showEditColumn"
+						:aria-label="t('tables', 'Edit column')"
+						@click="editColumn()">
+						<template #icon>
+							<Pencil :size="25" />
+						</template>
+					</NcActionButton>
+					<NcActionButton v-if="showDeleteColumn"
+						:aria-label="t('tables', 'Delete column')"
+						@click="deleteColumn()">
+						<template #icon>
+							<Delete :size="25" />
+						</template>
+					</NcActionButton>
+				</NcActionButtonGroup>
+			</template>
 		</NcActions>
 	</div>
 </template>
@@ -63,17 +122,25 @@
 import generalHelper from '../../../mixins/generalHelper.js'
 import SortAsc from 'vue-material-design-icons/SortAscending.vue'
 import SortDesc from 'vue-material-design-icons/SortDescending.vue'
+import Delete from 'vue-material-design-icons/Delete.vue'
 import Pencil from 'vue-material-design-icons/Pencil.vue'
-import { NcActions, NcActionButton, NcActionInput, NcActionButtonGroup, NcActionSeparator, NcActionCaption, NcActionRadio } from '@nextcloud/vue'
-import { mapState } from 'vuex'
+import EyeOff from 'vue-material-design-icons/EyeOff.vue'
+import ChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
+import FilterCog from 'vue-material-design-icons/FilterCog.vue'
+import Magnify from 'vue-material-design-icons/Magnify.vue'
+import { NcActions, NcActionButton, NcActionInput, NcActionButtonGroup, NcActionCaption, NcActionRadio } from '@nextcloud/vue'
 import { AbstractColumn } from '../mixins/columnClass.js'
-import { ColumnTypes } from '../mixins/columnHandler.js'
 import { FilterIds } from '../mixins/filter.js'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
-
 	components: {
+		EyeOff,
+		Delete,
 		Pencil,
+		ChevronLeft,
+		FilterCog,
+		Magnify,
 		NcActionInput,
 		NcActionRadio,
 		NcActionCaption,
@@ -82,11 +149,8 @@ export default {
 		SortAsc,
 		SortDesc,
 		NcActionButtonGroup,
-		NcActionSeparator,
 	},
-
 	mixins: [generalHelper],
-
 	props: {
 		column: {
 		      type: AbstractColumn,
@@ -95,46 +159,34 @@ export default {
 		openState: {
 		      type: Boolean,
 		      default: false,
-		    },
+		},
+		canHide: {
+			type: Boolean,
+			default: false,
+		},
+		config: {
+			type: Object,
+			default: null,
+		},
+		viewSetting: {
+			type: Object,
+			default: null,
+		},
 	},
-
 	data() {
 		return {
-			filterValue: '',
+			searchValue: '',
 			operator: null,
-			hideFilterInputForColumnTypes: [
-				ColumnTypes.SelectionCheck,
-				ColumnTypes.NumberStars,
-			],
+			sortMode: null,
+			term: '',
+			selectOperator: false,
+			selectValue: false,
+			localViewSetting: this.viewSetting,
 		}
 	},
-
 	computed: {
-		...mapState({
-			view: state => state.data.view,
-		}),
-		haveOperators() {
-			const columnOperators = this.getOperators
-			return columnOperators && columnOperators.length > this.getDisabledOperators.length
-		},
-		visibleOperators() {
-			if (this.haveOperators && this.getOperators.length >= 2) {
-				return this.getOperators
-			}
-			return []
-		},
 		getOperators() {
-			console.debug('getOperators requested')
 			const possibleOperators = this.column.getPossibleOperators()
-
-			if (possibleOperators.length === 0) {
-				return null
-			}
-			// preselect first operator, even if it's not displayed
-			if (this.operator === null) {
-				// eslint-disable-next-line vue/no-side-effects-in-computed-properties
-				this.operator = possibleOperators[0]
-			}
 			return possibleOperators
 		},
 		getDisabledOperators() {
@@ -150,6 +202,22 @@ export default {
 			}
 			return []
 		},
+		getEnabledOperators() {
+			// filter filters that cannot be combined
+			const filters = this.getFilterForColumn(this.column)
+			if (filters && filters.length > 0) {
+				const incompatibleFilters = new Set()
+				filters.forEach(fil => {
+
+					fil.operator.incompatibleWith.forEach(item => incompatibleFilters.add(item))
+				})
+				return this.getOperators.filter(op => !incompatibleFilters.has(op.id))
+			}
+			return this.getOperators
+		},
+		hasOperators() {
+			return this.getEnabledOperators.length > 0
+		},
 		getMagicFields() {
 			return this.column.getPossibleMagicFields()
 		},
@@ -157,11 +225,38 @@ export default {
 			return this.column.canSort()
 		},
 		getSortMode() {
-			const sortObject = this.view.sorting?.find(item => item.columnId === this.column?.id)
+			const sortObject = this.localViewSetting?.sorting?.find(item => item.columnId === this.column?.id)
 			if (sortObject) {
 				return sortObject.mode
 			}
 			return null
+		},
+		showFilter() {
+			return this.config.canFilter
+		},
+		hasManageColumnEntries() {
+			return this.showHideColumn || this.showEditColumn || this.showDeleteColumn
+		},
+		showHideColumn() {
+			return this.config.canHideColumns
+		},
+		showEditColumn() {
+			return this.column.id >= 0 && this.config.canEditColumns
+		},
+		showDeleteColumn() {
+			return this.column.id >= 0 && this.config.canDeleteColumns
+		},
+		selectedOperator: {
+			get() {
+				if (this.operator === null) {
+					return this.getEnabledOperators[0]
+				} else {
+					return this.operator
+				}
+			},
+			set(v) {
+				this.operator = v
+			},
 		},
 		localOpenState: {
 			get() {
@@ -171,70 +266,116 @@ export default {
 				this.$emit('update:open-state', !!v)
 			},
 		},
-		canFilterWithTextInput() {
-			return !this.hideFilterInputForColumnTypes.includes(this.column.type)
+	},
+	watch: {
+		localOpenState() {
+			this.reset()
+		},
+		localViewSetting() {
+			this.$emit('update:viewSetting', this.localViewSetting)
+		},
+		viewSetting() {
+			this.localViewSetting = this.viewSetting
 		},
 	},
-
+	created() {
+		this.reset()
+	},
 	methods: {
-		submitMagicField(magicFieldId) {
-			console.debug('submitted magic field', magicFieldId)
-			this.filterValue = '@' + magicFieldId
-			this.submitFilterInput()
+		t,
+		isDisabled(op) {
+			return this.getDisabledOperators.map(o => o.id).includes(op)
 		},
-		changeFilterOperator(operator) {
-			this.operator = operator
-			if (this.operator.id === FilterIds.IsEmpty) {
-				this.submitFilter()
+		submitMagicField(magicField) {
+			this.searchValue = '@' + magicField.id
+			this.createFilter()
+			this.localOpenState = false
+		},
+		close() {
+			this.localOpenState = false
+		},
+		changeFilterOperator(op) {
+			this.selectedOperator = op
+			this.selectOperator = false
+			if (op.id === FilterIds.IsEmpty) {
+				this.createFilter()
+			} else {
+				this.selectValue = true
 			}
 		},
 		submitFilterInput() {
-			console.debug('submit clicked', this.filterValue)
-
 			// Ignore contains filter with the same value es old contain filters
-			if (this.operator.id === FilterIds.Contains) {
+			if (this.selectedOperator.id === FilterIds.Contains) {
 				const columnFilters = this.getFilterForColumn(this.column)
-				if (columnFilters && columnFilters.filter(fil => fil.operator.id === FilterIds.Contains).map(fil => fil.value).includes(this.filterValue)) {
-					this.localOpenState = false
+				if (columnFilters && columnFilters.filter(fil => fil.operator.id === FilterIds.Contains).map(fil => fil.value).includes(this.searchValue)) {
 					this.reset()
 					return
 				}
 			}
-			this.submitFilter()
-		},
-		submitFilter() {
 			this.createFilter()
 			this.localOpenState = false
 		},
 		getFilterForColumn(column) {
-			return this.view?.filter?.filter(item => item.columnId === column.id)
+			return this.localViewSetting?.filter?.filter(item => item.columnId === column.id)
 		},
 		createFilter() {
 			const filterObject = {
 				columnId: this.column.id,
-				operator: this.operator,
-				value: this.filterValue,
+				operator: this.selectedOperator,
+				value: this.searchValue,
 			}
-			console.debug('emitting new filterObject', filterObject)
-			this.$emit('add-filter', filterObject)
-			this.reset()
+			if (!this.localViewSetting.filter) {
+				this.localViewSetting.filter = []
+			}
+			this.localViewSetting.filter.push(filterObject)
+			this.localViewSetting = JSON.parse(JSON.stringify(this.localViewSetting))
+			this.close()
 		},
 		reset() {
 			this.operator = null
-			this.filterValue = ''
+			this.searchValue = ''
+			this.sortMode = this.getSortMode
+			this.selectOperator = false
+			this.selectValue = false
 		},
 		sort(mode) {
-			this.$store.dispatch('addSorting', { columnId: this.column.id, mode })
+			if (mode === this.getSortMode) {
+				this.sortMode = null
+				this.localViewSetting.sorting = null
+			} else {
+				this.sortMode = mode
+				if (mode !== 'ASC' && mode !== 'DESC') {
+					return
+				}
+				this.localViewSetting.sorting = [{
+					columnId: this.column.id,
+					mode,
+				}]
+			}
+			this.localViewSetting = JSON.parse(JSON.stringify(this.localViewSetting))
+			this.close()
 		},
-		isDisabled(op) {
-			return this.getDisabledOperators.map(o => o.id).includes(op)
+		hideColumn() {
+			this.close()
+			if (!this.localViewSetting.hiddenColumns) {
+				this.localViewSetting.hiddenColumns = [this.column.id]
+			} else {
+				this.localViewSetting.hiddenColumns.push(this.column.id)
+			}
+			this.localViewSetting = JSON.parse(JSON.stringify(this.localViewSetting))
+		},
+		editColumn() {
+			this.close()
+			this.$emit('edit-column', this.column)
+		},
+		deleteColumn() {
+			this.close()
+			this.$emit('delete-column', this.column)
 		},
 	},
-
 }
 </script>
 <style lang="scss" scoped>
-
 .menu {
 	padding-left: calc(var(--default-grid-baseline) * 1);
 }
@@ -244,4 +385,7 @@ export default {
 	border-radius: 6px;
 }
 
+.selected-option {
+	width: 100%;
+}
 </style>

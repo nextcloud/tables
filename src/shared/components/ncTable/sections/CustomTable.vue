@@ -5,16 +5,18 @@
 				<TableHeader :columns="columns"
 					:selected-rows="selectedRows"
 					:rows="getSearchedAndFilteredAndSortedRows"
-					:table="table"
-					:view="view"
+					:view-setting.sync="localViewSetting"
+					:config="config"
 					@create-row="$emit('create-row')"
-					@import="table => $emit('import', table)"
 					@create-column="$emit('create-column')"
-					@edit-columns="$emit('edit-columns')"
-					@add-filter="filter => $emit('add-filter', filter)"
+					@edit-column="col => $emit('edit-column', col)"
+					@delete-column="col => $emit('delete-column', col)"
 					@download-csv="data => $emit('download-csv', data)"
-					@select-all-rows="selectAllRows"
-					@delete-filter="id => $emit('delete-filter', id)" />
+					@select-all-rows="selectAllRows">
+					<template #actions>
+						<slot name="actions" />
+					</template>
+				</TableHeader>
 			</thead>
 			<tbody>
 				<TableRow v-for="(row, index) in getSearchedAndFilteredAndSortedRows"
@@ -22,6 +24,8 @@
 					:row="row"
 					:columns="columns"
 					:selected="isRowSelected(row.id)"
+					:view-setting.sync="localViewSetting"
+					:config="config"
 					@update-row-selection="updateRowSelection"
 					@edit-row="rowId => $emit('edit-row', rowId)" />
 			</tbody>
@@ -53,39 +57,42 @@ export default {
 			type: Array,
 			default: () => [],
 		},
-		table: {
+		viewSetting: {
 			type: Object,
-			default: () => {},
+			default: null,
 		},
-		view: {
-		      type: Object,
-		      default: null,
-		    },
+		config: {
+			type: Object,
+			default: null,
+		},
 	},
 
 	data() {
 		return {
 			selectedRows: [],
 			searchTerm: null,
+			localViewSetting: this.viewSetting,
 		}
 	},
 
 	computed: {
 
 		...mapGetters(['getColumnById']),
-
+		sorting() {
+			return this.viewSetting?.sorting
+		},
 		getSearchedAndFilteredAndSortedRows() {
 			// if we have to sort
-			if (this.view.sorting) {
-				const sortColumn = this.columns.find(item => item.id === this.view.sorting[0].columnId)
-				return [...this.getSearchedAndFilteredRows].sort(sortColumn.sort(this.view.sorting[0].mode))
+			if (this.viewSetting?.sorting) {
+				const sortColumn = this.columns.find(item => item.id === this.viewSetting.sorting[0].columnId)
+				return [...this.getSearchedAndFilteredRows].sort(sortColumn.sort(this.viewSetting.sorting[0].mode))
 			}
 			return this.getSearchedAndFilteredRows
 		},
 		getSearchedAndFilteredRows() {
 			const debug = false
 			// if we don't have to search and/or filter
-			if (!this.view?.filter?.length > 0 && !this.view?.searchString) {
+			if (!this.viewSetting?.filter?.length > 0 && !this.viewSetting?.searchString) {
 				// cleanup markers
 				this.rows?.forEach(row => {
 					this.columns?.forEach(column => {
@@ -101,7 +108,7 @@ export default {
 			}
 
 			const data = [] // array of rows
-			const searchString = this.view?.searchString
+			const searchString = this.viewSetting?.searchString
 
 			// each row
 			this.rows?.forEach(row => {
@@ -119,32 +126,54 @@ export default {
 					let filterStatus = null
 					let searchStatus = true
 					const filters = this.getFiltersForColumn(column)
-					const cell = row.data.find(item => item.columnId === column.id)
+					let cell
+					if (column.id < 0) {
+						cell = { columnId: column.id }
+						switch (column.id) {
+						case -1:
+							cell.value = row.id
+							break
+						case -2:
+							cell.value = row.createdBy
+							break
+						case -3:
+							cell.value = row.editedBy
+							break
+						case -4:
+							cell.value = row.createdAt
+							break
+						case -5:
+							cell.value = row.editedAt
+							break
+						}
+					} else {
+						cell = row.data.find(item => item.columnId === column.id)
+					}
 
 					// if we don't have a value for this cell
 					if (cell === undefined) {
 						if (searchString) {
 							searchStatus = false
 						}
-					} else {
-						// cleanup possible old markers
-						delete cell.searchStringFound
-						delete cell.filterFound
+						cell = { columnId: column.id, value: null }
+					}
+					// cleanup possible old markers
+					delete cell.searchStringFound
+					delete cell.filterFound
 
-						// if we should filter
-						if (filters !== null) {
-							filters.forEach(fil => {
-								this.addMagicFieldsValues(fil)
-								if (filterStatus === null || filterStatus === true) {
-									filterStatus = column.isFilterFound(cell, fil)
-								}
-							})
-						}
-						// if we should search
-						if (searchString) {
-							console.debug('look for searchString', searchString)
-							searchStatus = column.isSearchStringFound(cell, searchString.toLowerCase())
-						}
+					// if we should filter
+					if (filters !== null) {
+						filters.forEach(fil => {
+							this.addMagicFieldsValues(fil)
+							if (filterStatus === null || filterStatus === true) {
+								filterStatus = column.isFilterFound(cell, fil)
+							}
+						})
+					}
+					// if we should search
+					if (searchString) {
+						console.debug('look for searchString', searchString)
+						searchStatus = column.isSearchStringFound(cell, searchString.toLowerCase())
 					}
 
 					if (debug) {
@@ -176,6 +205,15 @@ export default {
 		},
 	},
 
+	watch: {
+		localViewSetting() {
+			this.$emit('update:viewSetting', this.localViewSetting)
+		},
+		viewSetting() {
+			this.localViewSetting = this.viewSetting
+		},
+	},
+
 	mounted() {
 		subscribe('tables:selected-rows:deselect', this.deselectAllRows)
 	},
@@ -193,8 +231,8 @@ export default {
 			})
 		},
 		getFiltersForColumn(column) {
-			if (this.view?.filter?.length > 0) {
-				const columnFilter = this.view.filter.filter(item => item.columnId === column.id)
+			if (this.viewSetting?.filter?.length > 0) {
+				const columnFilter = this.viewSetting.filter.filter(item => item.columnId === column.id)
 				if (columnFilter.length > 0) {
 					return columnFilter
 				}
@@ -314,7 +352,7 @@ export default {
 		}
 	}
 
-	tr>th:first-child,tr>td:first-child {
+	tr>th.sticky:first-child,tr>td.sticky:first-child {
 		position: sticky;
 		left: 0;
 		padding-left: calc(var(--default-grid-baseline) * 4);
@@ -324,7 +362,7 @@ export default {
 		z-index: 5;
 	}
 
-	tr>th:last-child,tr>td:last-child {
+	tr>th.sticky:last-child,tr>td.sticky:last-child {
 		position: sticky;
 		right: 0;
 		width: 55px;

@@ -89,8 +89,11 @@ export default {
 					const types = newValue.split('-')
 					this.type = types[0]
 					this.subtype = types[1] || ''
-
-					this.$emit('update:columnId', newValue)
+					if (this.type === 'text' && !this.subtype) {
+						// default subtype for type text
+						this.subtype = 'line'
+					}
+					this.$emit('update:columnId', this.combinedType)
 				}
 			},
 		},
@@ -123,7 +126,10 @@ export default {
 			},
 		},
 	},
-	methods: {
+	watch: {
+		columnId() {
+			this.combinedType = this.columnId
+		},
 	},
 }
 </script>

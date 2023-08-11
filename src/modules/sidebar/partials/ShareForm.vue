@@ -24,7 +24,7 @@
 
 <template>
 	<div class="row space-B">
-		<h3>{{ t('tables', 'Add a new share') }}</h3>
+		<h3>{{ t('tables', 'Share with accounts or groups') }}</h3>
 		<NcSelect id="ajax"
 			style="width: 100%;"
 			:clear-on-select="true"
@@ -57,11 +57,12 @@ import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 import { NcSelect } from '@nextcloud/vue'
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import formatting from '../../../shared/mixins/formatting.js'
 import ShareTypes from '../mixins/shareTypesMixin.js'
 
 export default {
+	name: 'ShareForm',
 	components: {
 		NcSelect,
 	},
@@ -91,7 +92,6 @@ export default {
 
 	computed: {
 		...mapState(['tables', 'tablesLoading', 'showSidebar']),
-		...mapGetters(['activeTable']),
 
 		/**
 		 * Is the search valid ?
@@ -110,14 +110,15 @@ export default {
 		 * @return {Array}
 		 */
 		options() {
+			const shareTypes = { 0: 'user', 1: 'group' }
 			// const shares = [...this.userShares, ...this.groupShares]
 			const shares = this.shares
 			if (this.isValidQuery) {
 				// Filter out existing shares
-				return this.suggestions.filter(item => !shares.find(share => share.shareWith === item.shareWith && share.shareType === item.shareType))
+				return this.suggestions.filter(item => !shares.find(share => share.receiver === item.shareWith && share.receiverType === shareTypes[item.shareType]))
 			}
 			// Filter out existing shares
-			return this.recommendations.filter(item => !shares.find(share => share.shareWith === item.shareWith && share.shareType === item.shareType))
+			return this.recommendations.filter(item => !shares.find(share => share.receiver === item.shareWith && share.receiverType === shareTypes[item.shareType]))
 		},
 
 		noResultText() {

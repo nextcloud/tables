@@ -24,6 +24,7 @@ import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import axios from '@nextcloud/axios'
 import displayError from '../../../../../utils/displayError.js'
 import { generateOcsUrl } from '@nextcloud/router'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 
@@ -31,22 +32,16 @@ export default {
 		NcCheckboxRadioSwitch,
 	},
 	props: {
-		textAllowedPattern: {
-			type: String,
-			default: '',
+		column: {
+			type: Object,
+			default: null,
 		},
 	},
-
 	data() {
 		return {
+			mutableColumn: this.column,
 			loading: false,
-			providers: [
-				{
-					id: 'url',
-					label: t('tables', 'URL'),
-					active: true,
-				},
-			],
+			providers: [],
 			preActivatedProviders: [
 				'url',
 				'files',
@@ -54,7 +49,6 @@ export default {
 			],
 		}
 	},
-
 	computed: {
 		getProviders() {
 			return this.providers
@@ -70,7 +64,10 @@ export default {
 
 	watch: {
 		getSelectedProviderIds() {
-			this.$emit('update:textAllowedPattern', this.getSelectedProviderIds.join(','))
+			this.mutableColumn.textAllowedPattern = this.getSelectedProviderIds.join(',')
+		},
+		column() {
+			this.mutableColumn = this.column
 		},
 	},
 
@@ -81,6 +78,7 @@ export default {
 	},
 
 	methods: {
+		t,
 		async loadProviders() {
 			let res = null
 			try {
@@ -89,6 +87,13 @@ export default {
 				displayError(e, t('tables', 'Could not load link providers.'))
 				return
 			}
+			this.providers = [
+				{
+					id: 'url',
+					label: t('tables', 'URL'),
+					active: this.isActive('url'),
+				},
+			]
 			res.data?.ocs?.data?.forEach(item => {
 				this.providers.push(
 					{
@@ -103,8 +108,8 @@ export default {
 			})
 		},
 		isActive(providerId) {
-			if (this.textAllowedPattern) {
-				const selectedProviders = this.textAllowedPattern.split(',')
+			if (this.column.textAllowedPattern) {
+				const selectedProviders = this.column.textAllowedPattern.split(',')
 				return selectedProviders.indexOf(providerId) !== -1
 			} else {
 				return this.preActivatedProviders.indexOf(providerId) !== -1

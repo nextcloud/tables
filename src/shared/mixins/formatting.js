@@ -1,10 +1,6 @@
-import { mapGetters } from 'vuex'
 import Moment from '@nextcloud/moment'
 
 export default {
-	components: {
-		...mapGetters(['activeTable']),
-	},
 	filters: {
 		niceDateTime(value, format) {
 			if (!format) {

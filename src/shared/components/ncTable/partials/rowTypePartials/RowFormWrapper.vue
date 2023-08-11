@@ -7,7 +7,7 @@
 					<NcLoadingIcon v-if="loading" />
 				</div>
 				<p v-if="description" class="fix-col-4 span">
-					{{ description }}
+					<pre>{{ description }}</pre>
 				</p>
 			</div>
 		</div>
@@ -22,6 +22,7 @@
 
 <script>
 import { NcLoadingIcon } from '@nextcloud/vue'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 
@@ -64,6 +65,9 @@ export default {
 		hasHeadSlot() {
 			return !!this.$slots.head?.[0]
 		},
+	},
+	methods: {
+		t,
 	},
 }
 </script>

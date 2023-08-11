@@ -27,7 +27,9 @@ describe('Manage a table', () => {
 
 	it('Update title', () => {
 		cy.get('.app-navigation__list').contains('to do list').click({ force: true })
-		cy.get('.row.first-row button').click()
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('.action-button__text').contains('Edit table').click()
+
 		cy.get('.modal-container input').clear().type('ToDo list')
 		cy.get('.modal-container button').contains('Save').click()
 
@@ -37,7 +39,9 @@ describe('Manage a table', () => {
 
 	it('Delete', () => {
 		cy.get('.app-navigation__list').contains('ToDo list').click({ force: true })
-		cy.get('.row.first-row button').click()
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('.action-button__text').contains('Edit table').click()
+
 		cy.get('.modal-container button').contains('Delete').click()
 		cy.get('.modal-container button').contains('I really want to delete this table!').click()
 

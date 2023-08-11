@@ -6,7 +6,7 @@
 					{{ t('tables', 'Default value') }}
 				</div>
 				<div class="fix-col-4">
-					<input v-model="defaultNum" type="number">
+					<input v-model="mutableColumn.numberDefault" type="number">
 				</div>
 			</div>
 			<div class="col-2 space-R" style="display: block">
@@ -15,7 +15,7 @@
 					{{ t('tables', 'Decimals') }}
 				</div>
 				<div class="fix-col-4">
-					<input v-model="decimals" type="number">
+					<input v-model="mutableColumn.numberDecimals" type="number">
 				</div>
 			</div>
 		</div>
@@ -27,7 +27,7 @@
 					{{ t('tables', 'Minimum') }}
 				</div>
 				<div class="fix-col-4">
-					<input v-model="min" type="number">
+					<input v-model="mutableColumn.numberMin" type="number">
 				</div>
 			</div>
 			<div class="col-2 space-R" style="display: block">
@@ -36,7 +36,7 @@
 					{{ t('tables', 'Maximum') }}
 				</div>
 				<div class="fix-col-4">
-					<input v-model="max" type="number">
+					<input v-model="mutableColumn.numberMax" type="number">
 				</div>
 			</div>
 		</div>
@@ -48,7 +48,7 @@
 					{{ t('tables', 'Prefix') }}
 				</div>
 				<div class="fix-col-4 space-B">
-					<input v-model="localPrefix">
+					<input v-model="mutableColumn.numberPrefix">
 				</div>
 			</div>
 			<div class="col-2 space-R" style="display: block">
@@ -57,7 +57,7 @@
 					{{ t('tables', 'Suffix') }}
 				</div>
 				<div class="fix-col-4">
-					<input v-model="localSuffix">
+					<input v-model="mutableColumn.numberSuffix">
 				</div>
 			</div>
 		</div>
@@ -66,59 +66,28 @@
 
 <script>
 
+import { translate as t } from '@nextcloud/l10n'
+
 export default {
 	name: 'NumberForm',
 	props: {
-		numberDefault: {
-			type: Number,
-			default: null,
-		},
-		numberMin: {
-			type: Number,
-			default: null,
-		},
-		numberMax: {
-			type: Number,
-			default: null,
-		},
-		numberDecimals: {
-			type: Number,
-			default: null,
-		},
-		numberPrefix: {
-			type: String,
-			default: null,
-		},
-		numberSuffix: {
-			type: String,
+		column: {
+			type: Object,
 			default: null,
 		},
 	},
-	computed: {
-		defaultNum: {
-			get() { return this.numberDefault },
-			set(defaultNum) { this.$emit('update:numberDefault', parseFloat(defaultNum)) },
+	data() {
+		return {
+			mutableColumn: this.column,
+		}
+	},
+	watch: {
+		column() {
+			this.mutableColumn = this.column
 		},
-		min: {
-			get() { return this.numberMin },
-			set(min) { this.$emit('update:numberMin', parseFloat(min)) },
-		},
-		max: {
-			get() { return this.numberMax },
-			set(max) { this.$emit('update:numberMax', parseFloat(max)) },
-		},
-		decimals: {
-			get() { return this.numberDecimals },
-			set(decimals) { this.$emit('update:numberDecimals', parseFloat(decimals)) },
-		},
-		localPrefix: {
-			get() { return this.numberPrefix },
-			set(prefix) { this.$emit('update:numberPrefix', prefix) },
-		},
-		localSuffix: {
-			get() { return this.numberSuffix },
-			set(suffix) { this.$emit('update:numberSuffix', suffix) },
-		},
+	},
+	methods: {
+		t,
 	},
 }
 </script>

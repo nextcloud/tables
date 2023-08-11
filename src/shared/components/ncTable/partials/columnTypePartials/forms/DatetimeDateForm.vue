@@ -6,7 +6,7 @@
 				{{ t('tables', 'Set today as default') }}
 			</div>
 			<div class="fix-col-4 margin-bottom">
-				<NcCheckboxRadioSwitch type="switch" :checked.sync="localDefault" />
+				<NcCheckboxRadioSwitch type="switch" :checked.sync="todayAsDefault" />
 			</div>
 		</div>
 	</div>
@@ -14,6 +14,7 @@
 
 <script>
 import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'DatetimeDateForm',
@@ -21,16 +22,34 @@ export default {
 		NcCheckboxRadioSwitch,
 	},
 	props: {
-		datetimeDefault: {
-			type: String,
-			default: 'false',
+		column: {
+			type: Object,
+			default: null,
 		},
 	},
-	computed: {
-		localDefault: {
-			get() { return this.datetimeDefault === 'today' },
-			set(def) { this.$emit('update:datetimeDefault', def ? 'today' : '') },
+	data() {
+		return {
+			mutableColumn: this.column,
+			todayAsDefault: this.column.datetimeDefault === 'today',
+		}
+	},
+	watch: {
+		column() {
+			this.mutableColumn = this.column
+			if (this.column.datetimeDefault === 'today') {
+				this.todayAsDefault = true
+			}
 		},
+		todayAsDefault() {
+			if (this.todayAsDefault) {
+				this.mutableColumn.datetimeDefault = 'today'
+			} else {
+				this.mutableColumn.datetimeDefault = ''
+			}
+		},
+	},
+	methods: {
+		t,
 	},
 }
 </script>

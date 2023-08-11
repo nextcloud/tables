@@ -10,13 +10,13 @@ export default class NumberStarsColumn extends AbstractNumberColumn {
 	}
 
 	sort(mode) {
-		const factor = mode === 'desc' ? -1 : 1
+		const factor = mode === 'DESC' ? -1 : 1
 		return (rowA, rowB) => {
 			const tmpA = rowA.data.find(item => item.columnId === this.id)?.value
 			const valueA = parseInt(tmpA)
 			const tmpB = rowB.data.find(item => item.columnId === this.id)?.value
 			const valueB = parseInt(tmpB)
-			return ((valueA < valueB) ? 1 : (valueA > valueB) ? -1 : 0) * factor
+			return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor
 		}
 	}
 
@@ -33,6 +33,7 @@ export default class NumberStarsColumn extends AbstractNumberColumn {
 			[FilterIds.IsGreaterThanOrEqual]() { return parseInt(cell.value) >= parseInt(filterValue) },
 			[FilterIds.IsLowerThan]() { return parseInt(cell.value) < parseInt(filterValue) },
 			[FilterIds.IsLowerThanOrEqual]() { return parseInt(cell.value) <= parseInt(filterValue) },
+			[FilterIds.IsEmpty]() { return !cell.value },
 		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)
 	}

@@ -10,7 +10,7 @@ export default class SelectionCheckColumn extends AbstractSelectionColumn {
 	}
 
 	sort(mode) {
-		const factor = mode === 'desc' ? 1 : -1
+		const factor = mode === 'DESC' ? 1 : -1
 		return (rowA, rowB) => {
 			const tmpA = rowA.data.find(item => item.columnId === this.id)?.value || ''
 			const valueA = (tmpA === true || tmpA === 'true')
@@ -29,6 +29,7 @@ export default class SelectionCheckColumn extends AbstractSelectionColumn {
 
 		const filterMethod = {
 			[FilterIds.IsEqual]() { return (cell.value === 'true' && filterValue === 'yes') || (cell.value === 'false' && filterValue === 'no') },
+			[FilterIds.IsEmpty]() { return !cell.value },
 		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)
 	}

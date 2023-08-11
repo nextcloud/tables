@@ -6,7 +6,7 @@
 				{{ t('tables', 'Default') }}
 			</div>
 			<div class="fix-col-4 space-B">
-				<NcEditor :text.sync="defaultText" height="small" />
+				<NcEditor :text.sync="mutableColumn.textDefault" height="small" />
 			</div>
 		</div>
 	</div>
@@ -14,26 +14,31 @@
 
 <script>
 import NcEditor from '../../../../ncEditor/NcEditor.vue'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'TextRichForm',
-
 	components: {
 		NcEditor,
 	},
-
 	props: {
-		textDefault: {
-			type: String,
-			default: '',
+		column: {
+			type: Object,
+			default: null,
 		},
 	},
-
-	computed: {
-		defaultText: {
-			get() { return this.textDefault },
-			set(defaultText) { this.$emit('update:textDefault', defaultText) },
+	data() {
+		return {
+			mutableColumn: this.column,
+		}
+	},
+	watch: {
+		column() {
+			this.mutableColumn = this.column
 		},
+	},
+	methods: {
+		t,
 	},
 
 }

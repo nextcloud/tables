@@ -2,11 +2,11 @@
 	<NcAppNavigationItem v-if="table"
 		:name="table.title"
 		:class="{active: activeTable && table.id === activeTable.id}"
-		:allow-collapse="false"
-		:open="false"
+		:allow-collapse="hasViews"
 		:force-menu="true"
+		:open.sync="isParentOfActiveView"
 		:to="'/table/' + parseInt(table.id)"
-		@click="closeNav">
+		@click="openTable">
 		<template #icon>
 			<template v-if="table.emoji">
 				{{ table.emoji }}
@@ -17,7 +17,7 @@
 		</template>
 		<template #extra />
 		<template #counter>
-			<NcCounterBubble>
+			<NcCounterBubble v-if="canReadData(table)">
 				{{ n('tables', '%n row', '%n rows', table.rowsCount, {}) }}
 			</NcCounterBubble>
 			<NcActionButton v-if="table.hasShares" icon="icon-share" :class="{'margin-right': !(activeTable && table.id === activeTable.id)}" @click="actionShowShare" />
@@ -27,19 +27,29 @@
 		</template>
 
 		<template #actions>
-			<NcActionButton v-if="canManageTable(table)"
-				icon="icon-rename"
+			<NcActionButton v-if="canManageElement(table) "
 				:close-after-click="true"
-				@click="$emit('edit-table', table.id)">
+				@click="emit('tables:table:edit', table.id)">
+				<template #icon>
+					<IconRename :size="20" decorative />
+				</template>
 				{{ t('tables', 'Edit table') }}
 			</NcActionButton>
-			<NcActionButton v-if="canShareTable(table)"
+			<NcActionButton v-if="canManageElement(table)"
+				:close-after-click="true"
+				@click="createView">
+				<template #icon>
+					<PlaylistPlus :size="20" />
+				</template>
+				{{ t('tables', 'Create view') }}
+			</NcActionButton>
+			<NcActionButton v-if="canShareElement(table)"
 				icon="icon-share"
 				:close-after-click="true"
 				@click="actionShowShare">
 				{{ t('tables', 'Share') }}
 			</NcActionButton>
-			<NcActionButton v-if="canCreateRowInTable(table)"
+			<NcActionButton v-if="canCreateRowInElement(table)"
 				:close-after-click="true"
 				@click="actionShowImport(table)">
 				{{ t('tables', 'Import') }}
@@ -55,49 +65,46 @@
 					<Creation :size="20" />
 				</template>
 			</NcActionButton>
-			<NcActionButton v-if="canDeleteTable(table)"
+			<NcActionButton v-if="canManageElement(table)"
 				icon="icon-delete"
 				:close-after-click="true"
-				@click="showDeletionConfirmation = true">
+				@click="deleteTable()">
 				{{ t('tables', 'Delete table') }}
 			</NcActionButton>
 		</template>
-		<DialogConfirmation :description="getTranslatedDescription"
-			:title="t('tables', 'Confirm table deletion')"
-			:cancel-title="t('tables', 'Cancel')"
-			:confirm-title="t('tables', 'Delete')"
-			confirm-class="error"
-			:show-modal="showDeletionConfirmation"
-			@confirm="deleteMe"
-			@cancel="showDeletionConfirmation = false" />
+		<NavigationViewItem v-for="view in getViews"
+			:key="'view'+view.id"
+			:view="view" />
 	</NcAppNavigationItem>
 </template>
 <script>
 import { NcActionButton, NcAppNavigationItem, NcCounterBubble, NcAvatar } from '@nextcloud/vue'
-import { showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
-import DialogConfirmation from '../../../shared/modals/DialogConfirmation.vue'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
 import Table from 'vue-material-design-icons/Table.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import { getCurrentUser } from '@nextcloud/auth'
 import Creation from 'vue-material-design-icons/Creation.vue'
 import Import from 'vue-material-design-icons/Import.vue'
+import NavigationViewItem from './NavigationViewItem.vue'
+import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
+import IconRename from 'vue-material-design-icons/Rename.vue'
 
 export default {
-	name: 'NavigationTableItem',
 
 	components: {
+		IconRename,
 		// eslint-disable-next-line vue/no-reserved-component-names
 		Table,
 		Import,
-		DialogConfirmation,
+		NavigationViewItem,
 		NcActionButton,
 		NcAppNavigationItem,
 		NcCounterBubble,
 		NcAvatar,
 		Creation,
+		PlaylistPlus,
 	},
 
 	filters: {
@@ -117,56 +124,72 @@ export default {
 			type: Object,
 			default: null,
 		},
+		filterString: {
+			type: String,
+			default: '',
+		},
 	},
 
 	data() {
 		return {
-			showDeletionConfirmation: false,
+			isParentOfActiveView: false,
 		}
 	},
 
 	computed: {
-		...mapGetters(['activeTable']),
+		...mapGetters(['activeTable', 'activeView']),
+		...mapState(['views']),
 		getTranslatedDescription() {
 			return t('tables', 'Do you really want to delete the table "{table}"?', { table: this.table.title })
 		},
 		userId() {
 			return getCurrentUser().uid
 		},
+		getViews() {
+			return this.views.filter(v => v.tableId === this.table.id && v.title.toLowerCase().includes(this.filterString.toLowerCase()))
+		},
+		hasViews() {
+			return this.getViews.length > 0
+		},
 	},
-
+	watch: {
+		activeView() {
+			if (!this.isParentOfActiveView && this.activeView?.tableId === this.table?.id) {
+				this.isParentOfActiveView = true
+			}
+		},
+		filterString() {
+			if (!this.isParentOfActiveView && this.filterString && !this.table.title.toLowerCase().includes(this.filterString.toLowerCase())) {
+				this.isParentOfActiveView = true
+			}
+		},
+	},
 	methods: {
+		emit,
+		deleteTable() {
+			emit('tables:table:delete', this.table)
+		},
+		createView() {
+			emit('tables:view:create', { tableId: this.table.id })
+		},
 		async actionShowShare() {
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
 			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
 		},
 		async actionShowImport(table) {
-			emit('tables:modal:import', table)
+			emit('tables:modal:import', { element: table, isView: false })
 		},
 		async actionShowIntegration() {
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
 			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
 		},
-		closeNav(e) {
+		openTable() {
+			this.isParentOfActiveView = true
+			// Close navigation
 			if (window.innerWidth < 960) {
 				emit('toggle-navigation', {
 					open: false,
 				})
-			}
-		},
-		async deleteMe() {
-			const deleteId = this.table.id
-			const activeTableId = this.activeTable?.id
-
-			const res = await this.$store.dispatch('removeTable', { tableId: this.table.id })
-			if (res) {
-				showSuccess(t('tables', 'Table "{emoji}{table}" removed.', { emoji: this.table.emoji ? this.table.emoji + ' ' : '', table: this.table.title }))
-
-				// if the actual table was deleted, go to startpage
-				if (deleteId === activeTableId) {
-					await this.$router.push('/').catch(err => err)
-				}
-				this.showDeletionConfirmation = false
 			}
 		},
 	},

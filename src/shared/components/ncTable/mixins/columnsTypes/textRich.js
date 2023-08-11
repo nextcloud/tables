@@ -17,7 +17,7 @@ export default class TextRichColumn extends AbstractTextColumn {
 		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
 
 		const filterMethod = {
-			[FilterIds.Contains]() { return cell.value.includes(filterValue) },
+			[FilterIds.Contains]() { return cell.value && cell.value.includes(filterValue) },
 			[FilterIds.IsEmpty]() { return !cell.value },
 		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)

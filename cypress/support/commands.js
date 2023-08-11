@@ -55,12 +55,12 @@ Cypress.Commands.add('createTextLinkColumn', (title, ressourceProvider, firstCol
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
 	cy.get('.multiSelectOptionLabel').contains('Link').click({ force: true })
 	// deactivate unwanted provider
-	cy.get('.typeSelection span label').contains('Url').click()
+	cy.get('.typeSelection span label').contains('Url', { matchCase: false }).click()
 	cy.get('.typeSelection span label').contains('Files').click()
 	cy.get('.typeSelection span label').contains('Contacts').click()
 
 	ressourceProvider.forEach(provider =>
-		cy.get('.typeSelection span label').contains(provider).click()
+		cy.get('.typeSelection span label').contains(provider, { matchCase: false }).click()
 	)
 	cy.get('.modal-container button').contains('Save').click()
 

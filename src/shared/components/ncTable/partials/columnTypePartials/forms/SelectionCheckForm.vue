@@ -6,7 +6,7 @@
 				{{ t('tables', 'Default') }}
 			</div>
 			<div class="fix-col-4 space-L-small">
-				<NcCheckboxRadioSwitch type="switch" :checked.sync="localSelectionDefault" />
+				<NcCheckboxRadioSwitch type="switch" :checked.sync="mutableColumn.selectionDefault" />
 			</div>
 		</div>
 	</div>
@@ -14,6 +14,7 @@
 
 <script>
 import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'SelectionCheckForm',
@@ -21,16 +22,32 @@ export default {
 		NcCheckboxRadioSwitch,
 	},
 	props: {
-		selectionDefault: {
-			type: String,
-			default: '',
+		column: {
+			type: Object,
+			default: null,
 		},
 	},
-	computed: {
-		localSelectionDefault: {
-			get() { return (this.selectionDefault === 'true' || this.selectionDefault === true) },
-			set(defaultValue) { this.$emit('update:selectionDefault', '' + defaultValue) },
+	data() {
+		return {
+			mutableColumn: this.column,
+		}
+	},
+	watch: {
+		column() {
+			this.mutableColumn = this.column
 		},
+	},
+	created() {
+		if (this.mutableColumn.selectionDefault === 'true') {
+			this.mutableColumn.selectionDefault = true
+			return
+		}
+		if (typeof this.mutableColumn.selectionDefault !== 'boolean') {
+			this.mutableColumn.selectionDefault = false
+		}
+	},
+	methods: {
+		t,
 	},
 }
 </script>

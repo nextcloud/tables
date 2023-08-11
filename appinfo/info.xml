@@ -22,7 +22,7 @@ Share your tables with users and groups within your cloud.
 Have a good time and manage whatever you want.
 
 ]]></description>
-    <version>0.5.1</version>
+    <version>0.6.0-beta.1</version>
     <licence>agpl</licence>
     <author mail="florian.steffens@nextcloud.com" >Florian Steffens</author>
     <namespace>Tables</namespace>
@@ -33,16 +33,15 @@ Have a good time and manage whatever you want.
     <category>office</category>
     <website>https://github.com/nextcloud/tables</website>
     <bugs>https://github.com/nextcloud/tables/issues</bugs>
-	<screenshot small-thumbnail="https://dl.datenangebot.de/nc%20tables/screenshots/v0.5/sh-tables-1-small.png">https://dl.datenangebot.de/nc%20tables/screenshots/v0.5/sh-tables-1.png</screenshot>
-    <screenshot>https://dl.datenangebot.de/nc%20tables/screenshots/v0.5/sh-tables-2.png</screenshot>
-    <screenshot>https://dl.datenangebot.de/nc%20tables/screenshots/v0.5/sh-tables-3.png</screenshot>
-	<screenshot>https://dl.datenangebot.de/nc%20tables/screenshots/v0.5/sh-tables-4.png</screenshot>
-	<screenshot>https://dl.datenangebot.de/nc%20tables/screenshots/v0.5/sh-tables-5.png</screenshot>
-	<screenshot>https://dl.datenangebot.de/nc%20tables/screenshots/v0.5/sh-tables-6.png</screenshot>
+	<screenshot small-thumbnail="https://dl.datenangebot.de/nc%20tables/screenshots/v0.6/sh-tables-1-small.png">https://dl.datenangebot.de/nc%20tables/screenshots/v0.6/sh-tables-1.png</screenshot>
+    <screenshot>https://dl.datenangebot.de/nc%20tables/screenshots/v0.6/sh-tables-2.png</screenshot>
+    <screenshot>https://dl.datenangebot.de/nc%20tables/screenshots/v0.6/sh-tables-3.png</screenshot>
+	<screenshot>https://dl.datenangebot.de/nc%20tables/screenshots/v0.6/sh-tables-4.png</screenshot>
+	<screenshot>https://dl.datenangebot.de/nc%20tables/screenshots/v0.6/sh-tables-5.png</screenshot>
+	<screenshot>https://dl.datenangebot.de/nc%20tables/screenshots/v0.6/sh-tables-6.png</screenshot>
 	<dependencies>
 		<database>pgsql</database>
 		<database>mysql</database>
-		<database>sqlite</database>
         <nextcloud min-version="25" max-version="27"/>
     </dependencies>
     <commands>

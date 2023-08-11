@@ -1,14 +1,16 @@
 <template>
 	<tr v-if="row" :class="{ selected }">
-		<td><NcCheckboxRadioSwitch :checked="selected" @update:checked="v => $emit('update-row-selection', { rowId: row.id, value: v })" /></td>
-		<td v-for="col in columns" :key="col.id" :class="{ 'search-result': getCell(col.id)?.searchStringFound, 'filter-result': getCell(col.id)?.filterFound }">
+		<td v-if="config.canSelectRows" :class="{sticky: config.canSelectRows}">
+			<NcCheckboxRadioSwitch :checked="selected" @update:checked="v => $emit('update-row-selection', { rowId: row.id, value: v })" />
+		</td>
+		<td v-for="col in visibleColumns" :key="col.id" :class="{ 'search-result': getCell(col.id)?.searchStringFound, 'filter-result': getCell(col.id)?.filterFound }">
 			<component :is="getTableCell(col)"
 				:column="col"
 				:row-id="row.id"
 				:value="getCellValue(col)" />
 		</td>
-		<td>
-			<NcButton type="primary" :aria-label="t('tables', 'Edit row')" @click="$emit('edit-row', row.id)">
+		<td v-if="config.showActions" :class="{sticky: config.showActions}">
+			<NcButton v-if="config.canEditRows || config.canDeleteRows" type="primary" :aria-label="t('tables', 'Edit row')" @click="$emit('edit-row', row.id)">
 				<template #icon>
 					<Pencil :size="20" />
 				</template>
@@ -32,6 +34,7 @@ import TableCellSelection from './TableCellSelection.vue'
 import TableCellMultiSelection from './TableCellMultiSelection.vue'
 import TableCellTextRich from './TableCellEditor.vue'
 import { ColumnTypes } from './../mixins/columnHandler.js'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'TableRow',
@@ -51,6 +54,7 @@ export default {
 		TableCellMultiSelection,
 		TableCellTextRich,
 	},
+
 	props: {
 		row: {
 			type: Object,
@@ -64,14 +68,26 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		viewSetting: {
+			type: Object,
+			default: null,
+		},
+		config: {
+			type: Object,
+			default: null,
+		},
 	},
 	computed: {
 		getSelection: {
 			get: () => { return this.selected },
 			set: () => { alert('updating selection') },
 		},
+		visibleColumns() {
+			return this.columns.filter(col => !this.viewSetting?.hiddenColumns?.includes(col.id))
+		},
 	},
 	methods: {
+		t,
 		getTableCell(column) {
 			switch (column.type) {
 			case ColumnTypes.TextLine: return 'TableCellTextLine'
@@ -90,6 +106,28 @@ export default {
 			}
 		},
 		getCell(columnId) {
+			if (columnId < 0) {
+				// See metaColumns.js for mapping
+				let value
+				switch (columnId) {
+				case -1:
+					value = this.row.id
+					break
+				case -2:
+					value = this.row.createdBy
+					break
+				case -3:
+					value = this.row.lastEditBy
+					break
+				case -4:
+					value = this.row.createdAt
+					break
+				case -5:
+					value = this.row.lastEditAt
+					break
+				}
+				return { columnId, value }
+			}
 			return this.row.data.find(item => item.columnId === columnId) || null
 		},
 		getCellValue(column) {
@@ -103,17 +141,13 @@ export default {
 
 			if (cell) {
 				value = cell.value
-			} else if (![ColumnTypes.NumberProgress, ColumnTypes.SelectionMulti, ColumnTypes.TextRich].includes(column.type)) {
+			} else {
 				// if no value is given, try to get the default value from the column definition
 				value = column.default()
-			} else {
-				return null
 			}
 
 			if ([ColumnTypes.NumberProgress, ColumnTypes.Selection].includes(column.type)) {
 				return parseInt(value)
-			} else if (column.type === ColumnTypes.SelectionCheck) {
-				return value === 'true'
 			}
 			return value
 		},

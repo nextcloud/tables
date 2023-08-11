@@ -4,8 +4,8 @@
 			<div class="col-4 title">
 				{{ t('tables', 'Options') }}
 			</div>
-			<div v-for="opt in localSelectionOptions" :key="opt.id" class="col-4 inline">
-				<NcCheckboxRadioSwitch :value="'' + opt.id" type="radio" :checked.sync="localSelectionDefault" />
+			<div v-for="opt in mutableColumn.selectionOptions" :key="opt.id" class="col-4 inline">
+				<NcCheckboxRadioSwitch :value="'' + opt.id" type="radio" :checked.sync="mutableColumn.selectionDefault" />
 				<input :value="opt.label" @input="updateLabel(opt.id, $event)">
 				<NcButton type="tertiary" :aria-label="t('tables', 'Delete option')" @click="deleteOption(opt.id)">
 					<template #icon>
@@ -18,7 +18,7 @@
 			</NcButton>
 			<p class="span">
 				{{ t('tables', 'You can set a default value by clicking on one of the radio buttons next to the label fields.') }}
-				<a v-if="localSelectionDefault" @click="localSelectionDefault = ''">{{ t('tables', 'Click here to unset default selection.') }}</a>
+				<a v-if="mutableColumn.selectionDefault" @click="mutableColumn.selectionDefault = ''">{{ t('tables', 'Click here to unset default selection.') }}</a>
 			</p>
 		</div>
 	</div>
@@ -27,6 +27,7 @@
 <script>
 import { NcCheckboxRadioSwitch, NcButton } from '@nextcloud/vue'
 import DeleteOutline from 'vue-material-design-icons/DeleteOutline.vue'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'SelectionForm',
@@ -36,48 +37,28 @@ export default {
 		DeleteOutline,
 	},
 	props: {
-		selectionOptions: {
-			type: Array,
-			default: () => [],
-		},
-		selectionDefault: {
-			type: String,
+		column: {
+			type: Object,
 			default: null,
 		},
 	},
-	computed: {
-		localSelectionDefault: {
-			get() {
-				return this.selectionDefault
-			},
-			set(value) {
-				this.$emit('update:selectionDefault', '' + value)
-			},
-		},
-		localSelectionOptions() {
-			// if we have or had options
-			if (this.allOptions?.length > 0) {
-				return this.getAllNonDeletedOptions
-			}
-
-			// if running first time, load default options
-			return this.loadDefaultOptions()
-		},
-		allOptions: {
-			get() {
-				return this.selectionOptions
-			},
-			set(value) {
-				this.$emit('update:selectionOptions', [...value])
-			},
-		},
-		getAllNonDeletedOptions() {
-			return this.allOptions?.filter(item => {
-				return !item.deleted
-			})
+	data() {
+		return {
+			mutableColumn: this.column,
+		}
+	},
+	watch: {
+		column() {
+			this.mutableColumn = this.column
 		},
 	},
+	created() {
+		if (!this.mutableColumn.selectionOptions || this.mutableColumn.selectionOptions?.length === 0) {
+			this.mutableColumn.selectionOptions = this.loadDefaultOptions()
+		}
+	},
 	methods: {
+		t,
 		loadDefaultOptions() {
 			const options = [
 				{
@@ -89,36 +70,30 @@ export default {
 					label: t('tables', 'Second option'),
 				},
 			]
-			this.$emit('update:selectionOptions', options)
 			return options
 		},
 		updateLabel(id, e) {
-			const i = this.allOptions.findIndex((obj) => obj.id === id)
-			const tmp = this.allOptions
+			const i = this.mutableColumn.selectionOptions.findIndex((obj) => obj.id === id)
+			const tmp = this.mutableColumn.selectionOptions
 			tmp[i].label = e.target.value
-			this.allOptions = tmp
+			this.mutableColumn.selectionOptions = tmp
 		},
 		addOption() {
 			const nextId = this.getNextId()
-			const options = this.allOptions
-			options.push({
+			this.mutableColumn.selectionOptions.push({
 				id: nextId,
 				label: '',
 			})
-			this.allOptions = options
 		},
 		getNextId() {
-			return Math.max(...this.allOptions.map(item => item.id)) + 1
+			return Math.max(...this.mutableColumn.selectionOptions.map(item => item.id)) + 1
 		},
 		deleteOption(id) {
-			const i = this.allOptions.findIndex((obj) => obj.id === id)
-			const tmpOptions = this.allOptions
-			tmpOptions[i].deleted = true
-			this.allOptions = tmpOptions
+			this.mutableColumn.selectionOptions = this.mutableColumn.selectionOptions.filter(opt => opt.id !== id)
 
 			// if deleted option was marked as default
-			if (id === parseInt(this.localSelectionDefault)) {
-				this.localSelectionDefault = ''
+			if (id === parseInt(this.mutableColumn.selectionDefault)) {
+				this.mutableColumn.selectionDefault = ''
 			}
 		},
 	},

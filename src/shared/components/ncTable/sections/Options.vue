@@ -1,9 +1,10 @@
 <template>
 	<div class="options">
-		<div v-if="showOptions && canReadTable(table)" class="fix-col-4" style="justify-content: space-between;">
+		<div v-if="showOptions && (config.canReadRows || (config.canCreateRows && rows.length > 0))" class="fix-col-4" style="justify-content: space-between;">
 			<div :class="{'add-padding-left': isSmallMobile }"
 				class="actionButtonsLeft">
-				<NcButton v-if="!isSmallMobile && canCreateRowInTable(table)"
+				<NcButton v-if="!isSmallMobile && config.canCreateRows"
+					:aria-label="t('tables', 'Create row')"
 					:close-after-click="true"
 					type="tertiary"
 					@click="$emit('create-row')">
@@ -12,8 +13,9 @@
 						<Plus :size="25" />
 					</template>
 				</NcButton>
-				<NcButton v-if="isSmallMobile && canCreateRowInTable(table)"
+				<NcButton v-if="isSmallMobile && config.canCreateRows"
 					:close-after-click="true"
+					:aria-label="t('tables', 'Create Row')"
 					type="tertiary"
 					@click="$emit('create-row')">
 					<template #icon>
@@ -24,7 +26,6 @@
 					<SearchForm
 						:columns="columns"
 						:search-string="getSearchString"
-						@add-filter="filter => $emit('add-filter', filter)"
 						@set-search-string="str => $emit('set-search-string', str)" />
 				</div>
 			</div>
@@ -41,7 +42,7 @@
 						</template>
 						{{ t('tables', 'Export CSV') }}
 					</NcActionButton>
-					<NcActionButton v-if="canDeleteData(table)"
+					<NcActionButton v-if="config.canDeleteRows"
 						@click="deleteSelectedRows">
 						<template #icon>
 							<Delete :size="20" />
@@ -55,24 +56,6 @@
 						{{ t('tables', 'Uncheck all') }}
 					</NcActionButton>
 				</NcActions>
-				<!-- <NcButton v-if="!isSmallMobile"
-					icon="icon-download" :title="t('tables', 'Export as CSV')"
-					@click="exportCsv">
-					<template #icon>
-						<Export :size="20" />
-					</template>
-					{{ t('tables', 'Export CSV') }}
-				</NcButton>
-				&nbsp;&nbsp;
-				<NcButton v-if="!isSmallMobile && canDeleteData(table)"
-					icon="icon-delete"
-					:title="t('tables', 'Delete')"
-					@click="deleteSelectedRows">
-					{{ t('tables', 'Delete') }}
-					<template #icon>
-						<Delete :size="20" />
-					</template>
-				</NcButton> -->
 			</div>
 		</div>
 	</div>
@@ -86,8 +69,8 @@ import Check from 'vue-material-design-icons/CheckboxBlankOutline.vue'
 import Delete from 'vue-material-design-icons/Delete.vue'
 import Export from 'vue-material-design-icons/Export.vue'
 import viewportHelper from '../../../mixins/viewportHelper.js'
-import permissionsMixin from '../mixins/permissionsMixin.js'
 import SearchForm from '../partials/SearchForm.vue'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'Options',
@@ -103,7 +86,7 @@ export default {
 		Export,
 	},
 
-	mixins: [viewportHelper, permissionsMixin],
+	mixins: [viewportHelper],
 
 	props: {
 		selectedRows: {
@@ -118,15 +101,15 @@ export default {
 			type: Boolean,
 			default: true,
 		},
-		table: {
-			type: Object,
-			default: () => {},
-		},
 		columns: {
 			type: Array,
 			default: null,
 		},
-		view: {
+		viewSetting: {
+			type: Object,
+			default: null,
+		},
+		config: {
 			type: Object,
 			default: null,
 		},
@@ -147,7 +130,7 @@ export default {
 			return rows
 		},
 		getSearchString() {
-			return this.view?.searchString || ''
+			return this.viewSetting?.searchString || ''
 		},
 		showFullOptions() {
 			 return this.optionsDivWidth > 800
@@ -160,6 +143,7 @@ export default {
 	},
 
 	methods: {
+		t,
 		updateOptionsDivWidth() {
 			this.optionsDivWidth = document.getElementsByClassName('options row')[0]?.offsetWidth
 		},

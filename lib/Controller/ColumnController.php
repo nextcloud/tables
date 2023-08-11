@@ -7,18 +7,24 @@ use OCA\Tables\Service\ColumnService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
+use Psr\Log\LoggerInterface;
 
 class ColumnController extends Controller {
 	private ColumnService $service;
 
 	private string $userId;
 
+	protected LoggerInterface $logger;
+
 	use Errors;
 
-	public function __construct(IRequest     $request,
+	public function __construct(
+		IRequest $request,
+		LoggerInterface $logger,
 		ColumnService $service,
 		string $userId) {
 		parent::__construct(Application::APP_ID, $request);
+		$this->logger = $logger;
 		$this->service = $service;
 		$this->userId = $userId;
 	}
@@ -26,9 +32,27 @@ class ColumnController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function index(int $tableId): DataResponse {
-		return $this->handleError(function () use ($tableId) {
-			return $this->service->findAllByTable($tableId);
+	public function index(int $tableId, ?int $viewId): DataResponse {
+		return $this->handleError(function () use ($tableId, $viewId) {
+			return $this->service->findAllByTable($tableId, $viewId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function indexTableByView(int $tableId, ?int $viewId): DataResponse {
+		return $this->handleError(function () use ($tableId, $viewId) {
+			return $this->service->findAllByTable($tableId, $viewId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function indexView(int $viewId): DataResponse {
+		return $this->handleError(function () use ($viewId) {
+			return $this->service->findAllByView($viewId);
 		});
 	}
 
@@ -45,13 +69,13 @@ class ColumnController extends Controller {
 	 * @NoAdminRequired
 	 */
 	public function create(
-		int $tableId,
+		?int $tableId,
+		?int $viewId,
 		string $type,
 		?string $subtype,
 		string $title,
 		bool $mandatory,
 		?string $description,
-		?int $orderWeight,
 
 		?string $textDefault,
 		?string $textAllowedPattern,
@@ -67,16 +91,17 @@ class ColumnController extends Controller {
 		?string $selectionOptions,
 		?string $selectionDefault,
 
-		?string $datetimeDefault
+		?string $datetimeDefault,
+		?array $selectedViewIds
 	): DataResponse {
 		return $this->handleError(function () use (
 			$tableId,
+			$viewId,
 			$type,
 			$subtype,
 			$title,
 			$mandatory,
 			$description,
-			$orderWeight,
 
 			$textDefault,
 			$textAllowedPattern,
@@ -92,16 +117,17 @@ class ColumnController extends Controller {
 			$selectionOptions,
 			$selectionDefault,
 
-			$datetimeDefault) {
+			$datetimeDefault,
+			$selectedViewIds) {
 			return $this->service->create(
 				$this->userId,
 				$tableId,
+				$viewId,
 				$type,
 				$subtype,
 				$title,
 				$mandatory,
 				$description,
-				$orderWeight,
 
 				$textDefault,
 				$textAllowedPattern,
@@ -117,7 +143,8 @@ class ColumnController extends Controller {
 				$selectionOptions,
 				$selectionDefault,
 
-				$datetimeDefault);
+				$datetimeDefault,
+				$selectedViewIds);
 		});
 	}
 
@@ -132,7 +159,6 @@ class ColumnController extends Controller {
 		?string $title,
 		?bool $mandatory,
 		?string $description,
-		?int $orderWeight,
 
 		?string $textDefault,
 		?string $textAllowedPattern,
@@ -158,7 +184,6 @@ class ColumnController extends Controller {
 			$title,
 			$mandatory,
 			$description,
-			$orderWeight,
 
 			$textDefault,
 			$textAllowedPattern,
@@ -185,7 +210,6 @@ class ColumnController extends Controller {
 				$title,
 				$mandatory,
 				$description,
-				$orderWeight,
 
 				$textDefault,
 				$textAllowedPattern,

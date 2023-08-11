@@ -7,21 +7,25 @@ use OCA\Tables\Service\ShareService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
+use Psr\Log\LoggerInterface;
 
 class ShareController extends Controller {
-	/** @var ShareService */
-	private $service;
+	private ShareService $service;
 
-	/** @var string */
-	private $userId;
+	private string $userId;
+
+	protected LoggerInterface $logger;
 
 	use Errors;
 
 
-	public function __construct(IRequest     $request,
+	public function __construct(
+		IRequest $request,
+		LoggerInterface $logger,
 		ShareService $service,
 		string $userId) {
 		parent::__construct(Application::APP_ID, $request);
+		$this->logger = $logger;
 		$this->service = $service;
 		$this->userId = $userId;
 	}
@@ -33,6 +37,15 @@ class ShareController extends Controller {
 	public function index(int $tableId): DataResponse {
 		return $this->handleError(function () use ($tableId) {
 			return $this->service->findAll('table', $tableId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function indexView(int $viewId): DataResponse {
+		return $this->handleError(function () use ($viewId) {
+			return $this->service->findAll('view', $viewId);
 		});
 	}
 

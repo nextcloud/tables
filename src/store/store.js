@@ -18,37 +18,82 @@ export default new Vuex.Store({
 	state: {
 		tablesLoading: false,
 		tables: [],
+		views: [],
+		activeViewId: null,
 		activeTableId: null,
+		activeRowId: null,
+		activeElementIsView: false,
 	},
 
 	getters: {
-		activeTable(state) {
-			if (state.tables && state.tables.filter(item => item.id === state.activeTableId).length > 0) { return state.tables.filter(item => item.id === state.activeTableId)[0] }
+		getTable: (state) => (id) => {
+			return state.tables.find(table => table.id === id)
+		},
+		getView: (state) => (id) => {
+			return state.views.find(view => view.id === id)
+		},
+		activeView(state) {
+			if (state.views && state.activeViewId) {
+				return state.views.find(item => item.id === state.activeViewId)
+			}
 			return null
 		},
-		getTable: (state) => (id) => {
-			return state.tables.filter(table => table.id === id)[0]
+		activeTable(state) {
+			if (state.tables && state.activeTableId) {
+				return state.tables.find(item => item.id === state.activeTableId)
+			}
+			return null
+		},
+		activeElement(state) {
+			if (state.activeTableId && state.tables) {
+				return state.tables.find(item => item.id === state.activeTableId)
+			} else if (state.views && state.activeViewId) {
+				return state.views.find(item => item.id === state.activeViewId)
+			}
+			return null
+		},
+		isView(state) {
+			return state.activeElementIsView
 		},
 	},
 	mutations: {
 		setTablesLoading(state, value) {
 			state.tablesLoading = !!(value)
 		},
+		setActiveViewId(state, viewId) {
+			if (state.activeViewId !== viewId) {
+				state.activeViewId = viewId
+				state.activeTableId = null
+				state.activeElementIsView = true
+			}
+		},
 		setActiveTableId(state, tableId) {
 			if (state.activeTableId !== tableId) {
 				state.activeTableId = tableId
+				state.activeViewId = null
+				state.activeElementIsView = false
 			}
 		},
 		setTables(state, tables) {
 			state.tables = tables
 		},
+		setViews(state, views) {
+			state.views = views
+		},
 		setTable(state, table) {
 			const index = state.tables.findIndex(t => t.id === table.id)
 			state.tables[index] = table
 		},
+		setView(state, view) {
+			const index = state.views.findIndex(v => v.id === view.id)
+			state.views[index] = view
+		},
+		setActiveRowId(state, rowId) {
+			state.activeRowId = rowId
+		},
 	},
 	actions: {
-		async insertNewTable({ commit, state }, { data }) {
+		async insertNewTable({ commit, state, dispatch }, { data }) {
 			let res = null
 
 			try {
@@ -57,24 +102,114 @@ export default new Vuex.Store({
 				displayError(e, t('tables', 'Could not insert table.'))
 				return false
 			}
-
-			const tables = state.tables
-			tables.push(res.data)
-			commit('setTables', tables)
-			return res.data.id
+			if (data.template !== 'custom') {
+				await dispatch('loadTablesFromBE')
+				await dispatch('loadViewsSharedWithMeFromBE')
+			} else {
+				const tables = state.tables
+				tables.push(res.data)
+				commit('setTables', tables)
+			}
+			return res.data
 		},
-		async loadTablesFromBE({ commit }) {
+		async loadTablesFromBE({ commit, state }) {
 			commit('setTablesLoading', true)
 
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/table'))
 				commit('setTables', res.data)
+				// Set Views
+				state.views = []
+				res.data.forEach(table => {
+					if (table.views) state.views = state.views.concat(table.views)
+				})
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load tables.'))
 				showError(t('tables', 'Could not fetch tables'))
 			}
 
 			commit('setTablesLoading', false)
+			return true
+		},
+		async loadViewsSharedWithMeFromBE({ commit, state }) {
+			commit('setTablesLoading', true)
+
+			try {
+				const res = await axios.get(generateUrl('/apps/tables/view'))
+				res.data.forEach(view => {
+					if (state.views.filter(v => v.id === view.id).length === 0) {
+						state.views = state.views.concat(view)
+					}
+				})
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load shared views.'))
+				showError(t('tables', 'Could not load shared views'))
+			}
+
+			commit('setTablesLoading', false)
+			return true
+		},
+		async insertNewView({ commit, state }, { data }) {
+			let res = null
+
+			try {
+				res = await axios.post(generateUrl('/apps/tables/view'), data)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not insert view.'))
+				return false
+			}
+
+			const views = state.views
+			views.push(res.data)
+			commit('setViews', views)
+			return res.data.id
+		},
+		async updateView({ state, commit, dispatch }, { id, data }) {
+			let res = null
+
+			try {
+				res = await axios.put(generateUrl('/apps/tables/view/' + id), data)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not update view.'))
+				return false
+			}
+
+			const view = res.data
+			const views = state.views
+			const index = views.findIndex(v => v.id === view.id)
+			views[index] = view
+			commit('setViews', [...views])
+			return true
+		},
+		async removeView({ state, commit }, { viewId }) {
+			try {
+				await axios.delete(generateUrl('/apps/tables/view/' + viewId))
+			} catch (e) {
+				displayError(e, t('tables', 'Could not remove view.'))
+				return false
+			}
+
+			const views = state.views
+			const index = views.findIndex(v => v.id === viewId)
+			views.splice(index, 1)
+			commit('setViews', [...views])
+			return true
+		},
+		async reloadViewsOfTable({ state, commit }, { tableId }) {
+			let res = null
+			try {
+				res = await axios.get(generateUrl('/apps/tables/view/table/' + tableId))
+				// Set Views
+				const views = state.views
+				res.data.forEach(view => {
+					const index = views.findIndex(v => v.id === view.id)
+					views[index] = view
+				})
+				commit('setViews', [...views])
+			} catch (e) {
+				displayError(e, t('tables', 'Could not reload view.'))
+				return false
+			}
 			return true
 		},
 		async updateTable({ state, commit, dispatch }, { id, data }) {
@@ -108,28 +243,16 @@ export default new Vuex.Store({
 			commit('setTables', [...tables])
 			return true
 		},
-		increaseRowsCountForTable({ state, commit, getters }, { tableId }) {
+		setTableHasShares({ state, commit, getters }, { tableId, hasShares }) {
 			const table = getters.getTable(tableId)
-			if (table.rowsCount) {
-				table.rowsCount++
-			} else {
-				table.rowsCount = 1
-			}
+			table.hasShares = !!hasShares
 			commit('setTable', table)
 		},
-		decreaseRowsCountForTable({ state, commit, getters }, { tableId }) {
-			const table = getters.getTable(tableId)
-			if (table.rowsCount) {
-				table.rowsCount--
-			} else {
-				table.rowsCount = 0
-			}
-			commit('setTable', table)
-		},
-		setTableHasShares({ state, commit, getters }, { tableId, hasSHares }) {
-			const table = getters.getTable(tableId)
-			table.hasShares = !!hasSHares
-			commit('setTable', table)
+
+		setViewHasShares({ state, commit, getters }, { viewId, hasShares }) {
+			const view = getters.getView(viewId)
+			view.hasShares = !!hasShares
+			commit('setView', view)
 		},
 	},
 })

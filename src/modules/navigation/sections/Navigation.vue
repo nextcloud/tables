@@ -14,24 +14,31 @@
 			</div>
 
 			<ul v-if="!tablesLoading">
-				<NcAppNavigationCaption :title="t('tables', 'My tables')">
+				<NcAppNavigationCaption v-if="getOwnTables.length > 0" :title="t('tables', 'My tables')">
 					<template #actions>
 						<NcActionButton :aria-label="t('tables', 'Create table')" icon="icon-add" @click.prevent="createTable" />
 					</template>
 				</NcAppNavigationCaption>
-
-				<NavigationTableItem v-for="table in getOwnTables"
+				<NavigationDashboardItem v-for="table in getOwnTables"
 					:key="table.id"
-					:table="table"
-					@edit-table="id => editTableId = id" />
+					:filter-string="filterString"
+					:table="table" />
 
 				<NcAppNavigationCaption v-if="getSharedTables.length > 0"
 					:title="t('tables', 'Shared tables')" />
 
-				<NavigationTableItem v-for="table in getSharedTables"
+				<NavigationDashboardItem v-for="table in getSharedTables"
 					:key="table.id"
-					:table="table"
-					@edit-table="id => editTableId = id" />
+					:filter-string="filterString"
+					:table="table" />
+
+				<NcAppNavigationCaption v-if="getSharedViews.length > 0"
+					:title="t('tables', 'Shared views')" />
+
+				<NavigationViewItem
+					v-for="view in getSharedViews"
+					:key="'view'+view.id"
+					:view="view" />
 			</ul>
 
 			<div v-if="filterString !== ''" class="search-info">
@@ -40,39 +47,31 @@
 						<Magnify :size="10" />
 					</template>
 					<template #action>
-						<NcButton @click="filterString = ''">
+						<NcButton :aria-label="t('tables', 'Clear filter')" @click="filterString = ''">
 							{{ t('tables', 'Clear filter') }}
 						</NcButton>
 					</template>
 				</NcEmptyContent>
 			</div>
-
-			<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
-			<EditTable :show-modal="editTableId !== null" :table-id="editTableId" @close="editTableId = null " />
-			<Import :show-modal="importTable !== null" :table="importTable" @close="importTable = null" />
 		</template>
 	</NcAppNavigation>
 </template>
 
 <script>
 import { NcAppNavigation, NcAppNavigationCaption, NcActionButton, NcTextField, NcButton, NcEmptyContent } from '@nextcloud/vue'
-import CreateTable from '../modals/CreateTable.vue'
-import EditTable from '../modals/EditTable.vue'
-import NavigationTableItem from '../partials/NavigationTableItem.vue'
-import { mapState, mapGetters } from 'vuex'
-import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
+import NavigationViewItem from '../partials/NavigationViewItem.vue'
+import NavigationDashboardItem from '../partials/NavigationTableItem.vue'
+import { mapState } from 'vuex'
+import { emit } from '@nextcloud/event-bus'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
 import { getCurrentUser } from '@nextcloud/auth'
-import Import from '../modals/Import.vue'
 
 export default {
 	name: 'Navigation',
 	components: {
-		Import,
-		NavigationTableItem,
+		NavigationDashboardItem,
+		NavigationViewItem,
 		NcAppNavigation,
-		CreateTable,
-		EditTable,
 		NcAppNavigationCaption,
 		NcActionButton,
 		NcTextField,
@@ -83,15 +82,15 @@ export default {
 	data() {
 		return {
 			loading: true,
-			showModalCreateTable: false,
-			importTable: null,
-			editTableId: null, // if null, no modal open
 			filterString: '',
 		}
 	},
 	computed: {
-		...mapState(['tables', 'tablesLoading']),
-		...mapGetters(['activeTable']),
+		...mapState(['tables', 'views', 'tablesLoading']),
+		getSharedViews() {
+			const sharedTableIds = this.getFilteredTables.map(table => table.id)
+			return this.views.filter(item => item.isShared === true && item.ownership !== getCurrentUser().uid && !sharedTableIds.includes(item.tableId)).filter(view => view.title.toLowerCase().includes(this.filterString.toLowerCase())).sort((a, b) => a.tableId === b.tableId ? a.id - b.id : a.tableId - b.tableId)
+		},
 		getSharedTables() {
 			return this.getFilteredTables.filter((item) => { return item.isShared === true && item.ownership !== getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
 		},
@@ -99,22 +98,14 @@ export default {
 			return this.getFilteredTables.filter((item) => { return item.isShared === false || item.ownership === getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
 		},
 		getFilteredTables() {
-			return this.tables.filter(table => { return table.title.toLowerCase().includes(this.filterString.toLowerCase()) })
+			return this.tables.filter(table => (!this.filterString
+				? true
+				: (table.title.toLowerCase().includes(this.filterString.toLowerCase()) || table.views.some(view => view.title.toLowerCase().includes(this.filterString.toLowerCase())))))
 		},
-	},
-	mounted() {
-		subscribe('create-table', this.createTable)
-		subscribe('edit-table', tableId => { this.editTableId = tableId })
-		subscribe('tables:modal:import', table => { this.importTable = table })
-	},
-	beforeDestroy() {
-		unsubscribe('create-table', this.createTable)
-		unsubscribe('edit-table', tableId => { this.editTableId = tableId })
-		unsubscribe('tables:modal:import', table => { this.importTable = table })
 	},
 	methods: {
 		createTable() {
-			this.showModalCreateTable = true
+			emit('tables:table:create')
 		},
 		closeNav() {
 			if (window.innerWidth < 960) {

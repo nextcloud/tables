@@ -10,4 +10,8 @@ class NumberProgressBusiness extends SuperBusiness implements IColumnTypeBusines
 		return json_encode((int) $value);
 	}
 
+	public function canBeParsed(string $value, ?Column $column = null): bool {
+		return !$value || ((int) $value >= 0 && (int) $value <= 100);
+	}
+
 }

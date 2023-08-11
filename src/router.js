@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import { generateUrl } from '@nextcloud/router'
-import DefaultMainView from './pages/DefaultMainView.vue'
+import MainViewWrapper from './pages/View.vue'
+import MainDashboardWrapper from './pages/Table.vue'
 import Startpage from './pages/Startpage.vue'
 
 Vue.use(Router)
@@ -16,8 +17,23 @@ export default new Router({
 		},
 		{
 			path: '/table/:tableId',
-			component: DefaultMainView,
+			component: MainDashboardWrapper,
 			name: 'table',
+		},
+		{
+			path: '/table/:tableId/row/:rowId',
+			component: MainDashboardWrapper,
+			name: 'tableRow',
+		},
+		{
+			path: '/view/:viewId',
+			component: MainViewWrapper,
+			name: 'view',
+		},
+		{
+			path: '/view/:viewId/row/:rowId',
+			component: MainViewWrapper,
+			name: 'viewRow',
 		},
 	],
 })

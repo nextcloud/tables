@@ -7,19 +7,25 @@ use OCA\Tables\Service\TableService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
+use Psr\Log\LoggerInterface;
 
 class TableController extends Controller {
 	private TableService $service;
 
 	private string $userId;
 
+	protected LoggerInterface $logger;
+
 	use Errors;
 
 
-	public function __construct(IRequest     $request,
+	public function __construct(
+		IRequest $request,
+		LoggerInterface $logger,
 		TableService $service,
 		string $userId) {
 		parent::__construct(Application::APP_ID, $request);
+		$this->logger = $logger;
 		$this->service = $service;
 		$this->userId = $userId;
 	}
@@ -55,18 +61,18 @@ class TableController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function update(int $id, string $title = null, string $emoji = null): DataResponse {
-		return $this->handleError(function () use ($id, $title, $emoji) {
-			return $this->service->update($id, $title, $emoji, $this->userId);
+	public function destroy(int $id): DataResponse {
+		return $this->handleError(function () use ($id) {
+			return $this->service->delete($id);
 		});
 	}
 
 	/**
 	 * @NoAdminRequired
 	 */
-	public function destroy(int $id): DataResponse {
-		return $this->handleError(function () use ($id) {
-			return $this->service->delete($id);
+	public function update(int $id, string $title = null, string $emoji = null): DataResponse {
+		return $this->handleError(function () use ($id, $title, $emoji) {
+			return $this->service->update($id, $title, $emoji, $this->userId);
 		});
 	}
 }

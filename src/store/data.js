@@ -1,13 +1,15 @@
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import displayError from '../shared/utils/displayError.js'
+import { parseCol } from '../shared/components/ncTable/mixins/columnParser.js'
+import { MetaColumns } from '../shared/components/ncTable/mixins/metaColumns.js'
+import { showError } from '@nextcloud/dialogs'
 
 export default {
 	state: {
 		loading: false,
 		rows: [],
 		columns: [],
-		view: {},
 	},
 
 	mutations: {
@@ -20,84 +22,31 @@ export default {
 		setLoading(state, value) {
 			state.loading = !!(value)
 		},
-		setView(state, view) {
-			state.view = Object.assign({}, view)
-		},
 	},
 
 	getters: {
 		getColumnById: (state) => (id) => {
 			return state.columns.filter(column => column.id === id)[0]
 		},
-		getDefaultValueFromColumn: (state) => (id) => {
-			const column = this.getColumnById(id)
-			return column[column.type + 'Default']
-		},
 	},
 
 	actions: {
-
-		addSorting({ commit, state }, { columnId, mode }) {
-			// mode can be 'asc' or 'desc'
-			if (mode !== 'asc' && mode !== 'desc') {
-				return
-			}
-
-			const view = state.view
-
-			const sorting = []
-			sorting.push({
-				columnId,
-				mode,
-			})
-
-			view.sorting = sorting
-
-			commit('setView', view)
-		},
-
-		addFilter({ commit, state }, { columnId, operator, value }) {
-			const view = state.view
-
-			if (!view.filter) {
-				view.filter = []
-			}
-
-			view.filter.push({
-				columnId,
-				operator,
-				value,
-			})
-
-			commit('setView', view)
-		},
-
-		deleteFilter({ commit, state }, { id }) {
-			const index = state.view?.filter?.findIndex(item => item.columnId + item.operator + item.value === id)
-			if (index !== -1) {
-				const localView = { ...state.view }
-				localView.filter.splice(index, 1)
-				commit('setView', localView)
-			}
-		},
-
-		setSearchString({ commit, state }, { str }) {
-			const view = state.view
-			view.searchString = str
-			commit('setView', view)
-		},
-
-		resetView({ commit }) {
-			commit('setView', {})
-		},
-
 		// COLUMNS
-		async loadColumnsFromBE({ commit }, { tableId }) {
+		async getColumnsFromBE({ commit }, { tableId, viewId }) {
 			commit('setLoading', true)
 			let res = null
 
 			try {
-				res = await axios.get(generateUrl('/apps/tables/column/' + tableId))
+				if (tableId && viewId) {
+					// Get all table columns. Try to access from view (Test if you have read access for view to read table columns)
+					res = await axios.get(generateUrl('/apps/tables/column/table/' + tableId + '/view/' + viewId))
+				  } else if (tableId && !viewId) {
+					// Get all table columns without view. Table manage rights needed
+					res = await axios.get(generateUrl('/apps/tables/column/table/' + tableId))
+				  } else if (!tableId && viewId) {
+					// Get all view columns.
+					res = await axios.get(generateUrl('/apps/tables/column/view/' + viewId))
+				  }
 				if (!Array.isArray(res.data)) {
 					const e = new Error('Expected array, but is not')
 					displayError(e, 'Format for loaded columns not valid.')
@@ -107,15 +56,19 @@ export default {
 				displayError(e, t('tables', 'Could not load columns.'))
 				return false
 			}
-
-			const columns = res.data.sort((a, b) => {
-				if (a.orderWeight < b.orderWeight) { return 1 }
-				if (a.orderWeight > b.orderWeight) { return -1 }
-				return 0
-			})
-			commit('setColumns', columns)
-
+			const columns = res.data.map(col => parseCol(col))
 			commit('setLoading', false)
+			return columns
+		},
+		async loadColumnsFromBE({ commit, dispatch }, { view, table }) {
+			let allColumns = await dispatch('getColumnsFromBE', { tableId: table?.id, viewId: view?.id })
+			if (view) {
+				allColumns = allColumns.concat(MetaColumns.filter(col => view.columns.includes(col.id)))
+				allColumns = allColumns.sort(function(a, b) {
+					return view.columns.indexOf(a.id) - view.columns.indexOf(b.id)
+				  })
+			}
+			commit('setColumns', allColumns)
 			return true
 		},
 		async insertNewColumn({ commit, state }, { data }) {
@@ -130,7 +83,7 @@ export default {
 			}
 
 			const columns = state.columns
-			columns.push(res.data)
+			columns.push(parseCol(res.data))
 			commit('setColumns', columns)
 
 			commit('setLoading', false)
@@ -150,7 +103,7 @@ export default {
 			const col = res.data
 			const columns = state.columns
 			const index = columns.findIndex(c => c.id === col.id)
-			columns[index] = col
+			columns[index] = parseCol(col)
 			commit('setColumns', [...columns])
 
 			return true
@@ -172,12 +125,16 @@ export default {
 		},
 
 		// ROWS
-		async loadRowsFromBE({ commit }, { tableId }) {
+		async loadRowsFromBE({ commit }, { tableId, viewId }) {
 			commit('setLoading', true)
 			let res = null
 
 			try {
-				res = await axios.get(generateUrl('/apps/tables/row/' + tableId))
+				if (viewId) {
+					res = await axios.get(generateUrl('/apps/tables/row/view/' + viewId))
+				} else {
+					res = await axios.get(generateUrl('/apps/tables/row/table/' + tableId))
+				}
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load rows.'))
 				return false
@@ -188,13 +145,22 @@ export default {
 			commit('setLoading', false)
 			return true
 		},
-		async updateRow({ state, commit, dispatch }, { id, data }) {
+		removeRows({ commit }) {
+			commit('setRows', [])
+		},
+		async updateRow({ state, commit, dispatch }, { id, viewId, data }) {
 			let res = null
 
 			try {
-				res = await axios.put(generateUrl('/apps/tables/row/' + id), { data })
+				res = await axios.put(generateUrl('/apps/tables/row/' + id), { viewId, data })
 			} catch (e) {
-				displayError(e, t('tables', 'Could not update row.'))
+				console.debug(e?.response)
+				if (e?.response?.data?.message?.startsWith('User should not be able to access row')) {
+					showError(t('tables', 'Outdated data. View is reloaded'))
+					dispatch('loadRowsFromBE', { viewId })
+				} else {
+					displayError(e, t('tables', 'Could not update row.'))
+				}
 				return false
 			}
 
@@ -205,11 +171,11 @@ export default {
 			commit('setRows', [...rows])
 			return true
 		},
-		async insertNewRow({ state, commit, dispatch }, { tableId, data }) {
+		async insertNewRow({ state, commit, dispatch }, { viewId, tableId, data }) {
 			let res = null
 
 			try {
-				res = await axios.post(generateUrl('/apps/tables/row'), { tableId, data })
+				res = await axios.post(generateUrl('/apps/tables/row'), { viewId, tableId, data })
 			} catch (e) {
 				displayError(e, t('tables', 'Could not insert row.'))
 				return false
@@ -219,16 +185,19 @@ export default {
 			const rows = state.rows
 			rows.push(row)
 			commit('setRows', [...rows])
-			dispatch('increaseRowsCountForTable', { tableId })
 			return true
 		},
-		async removeRow({ state, commit, dispatch }, { rowId }) {
-			let res = null
-
+		async removeRow({ state, commit, dispatch }, { rowId, viewId }) {
 			try {
-				res = await axios.delete(generateUrl('/apps/tables/row/' + rowId))
+				if (viewId) await axios.delete(generateUrl('/apps/tables/view/' + viewId + '/row/' + rowId))
+				else await axios.delete(generateUrl('/apps/tables/row/' + rowId))
 			} catch (e) {
-				displayError(e, t('tables', 'Could not remove row.'))
+				if (e?.response?.data?.message?.startsWith('User should not be able to access row')) {
+					showError(t('tables', 'Outdated data. View is reloaded'))
+					dispatch('loadRowsFromBE', { viewId })
+				} else {
+					displayError(e, t('tables', 'Could not remove row.'))
+				}
 				return false
 			}
 
@@ -236,7 +205,6 @@ export default {
 			const index = rows.findIndex(r => r.id === rowId)
 			rows.splice(index, 1)
 			commit('setRows', [...rows])
-			dispatch('decreaseRowsCountForTable', { tableId: res.data.tableId })
 
 			return true
 		},

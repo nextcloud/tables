@@ -26,6 +26,8 @@ class TableService extends SuperService {
 
 	private RowService $rowService;
 
+	private ViewService $viewService;
+
 	private ShareService $shareService;
 
 	protected UserHelper $userHelper;
@@ -40,6 +42,7 @@ class TableService extends SuperService {
 		TableTemplateService $tableTemplateService,
 		ColumnService $columnService,
 		RowService $rowService,
+		ViewService $viewService,
 		ShareService $shareService,
 		UserHelper $userHelper,
 		IL10N $l
@@ -49,6 +52,7 @@ class TableService extends SuperService {
 		$this->tableTemplateService = $tableTemplateService;
 		$this->columnService = $columnService;
 		$this->rowService = $rowService;
+		$this->viewService = $viewService;
 		$this->shareService = $shareService;
 		$this->userHelper = $userHelper;
 		$this->l = $l;
@@ -63,21 +67,25 @@ class TableService extends SuperService {
 	 * @param string|null $userId (null -> take from session, '' -> no user in context)
 	 * @param bool $skipTableEnhancement
 	 * @param bool $skipSharedTables
+	 * @param bool $createTutorial
 	 * @return array<Table>
+	 * @throws DoesNotExistException
 	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws NotFoundError
+	 * @throws PermissionError
 	 */
 	public function findAll(?string $userId = null, bool $skipTableEnhancement = false, bool $skipSharedTables = false, bool $createTutorial = true): array {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
-		$ownTables = [];
-		$newSharedTables = [];
+		$allTables = [];
 
 		try {
-			$ownTables = $this->mapper->findAll($userId);
+			$allTables = $this->mapper->findAll($userId); // get own tables
 
 			// if there are no own tables found, create the tutorial table
-			if (count($ownTables) === 0 && $createTutorial) {
-				$ownTables = [$this->create($this->l->t('Tutorial'), 'tutorial', '🚀')];
+			if (count($allTables) === 0 && $createTutorial) {
+				$allTables = [$this->create($this->l->t('Tutorial'), 'tutorial', '🚀')];
 			}
 
 			if (!$skipSharedTables && $userId !== '') {
@@ -86,14 +94,14 @@ class TableService extends SuperService {
 				// clean duplicates
 				foreach ($sharedTables as $sharedTable) {
 					$found = false;
-					foreach ($ownTables as $ownTable) {
-						if ($sharedTable->getId() === $ownTable->getId()) {
+					foreach ($allTables as $table) {
+						if ($sharedTable->getId() === $table->getId()) {
 							$found = true;
 							break;
 						}
 					}
 					if (!$found) {
-						$newSharedTables[] = $sharedTable;
+						$allTables[] = $sharedTable;
 					}
 				}
 			}
@@ -105,7 +113,6 @@ class TableService extends SuperService {
 		}
 
 		// enhance table objects with additional data
-		$allTables = array_merge($ownTables, $newSharedTables);
 		if (!$skipTableEnhancement) {
 			foreach ($allTables as $table) {
 				/** @var string $userId */
@@ -121,10 +128,13 @@ class TableService extends SuperService {
 	 * add some basic values related to this table in context
 	 *
 	 * $userId can be set or ''
-	 *
-	 * @noinspection PhpUndefinedMethodInspection
+	 * @param Table $table
+	 * @param string $userId
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws PermissionError
 	 */
-	private function enhanceTable(Table &$table, string $userId): void {
+	private function enhanceTable(Table $table, string $userId): void {
 		// add owner display name for UI
 		$this->addOwnerDisplayName($table);
 
@@ -145,24 +155,28 @@ class TableService extends SuperService {
 			$table->setRowsCount(0);
 		}
 
+		// add the column count
+		try {
+			$table->setColumnsCount($this->columnService->getColumnsCount($table->getId()));
+		} catch (InternalError|PermissionError $e) {
+			$table->setColumnsCount(0);
+		}
+
 		// set if this is a shared table with you (somebody else shared it with you)
 		// (senseless if we have no user in context)
-		if ($userId !== '') {
+		if ($userId !== '' && $userId !== $table->getOwnership()) {
 			try {
-				$share = $this->shareService->findTableShareIfSharedWithMe($table->getId());
-				/** @noinspection PhpUndefinedMethodInspection */
+				$permissions = $this->shareService->getSharedPermissionsIfSharedWithMe($table->getId(), 'table', $userId);
 				$table->setIsShared(true);
-				/** @noinspection PhpUndefinedMethodInspection */
-				$table->setOnSharePermissions([
-					'read' => $share->getPermissionRead(),
-					'create' => $share->getPermissionCreate(),
-					'update' => $share->getPermissionUpdate(),
-					'delete' => $share->getPermissionDelete(),
-					'manage' => $share->getPermissionManage(),
-				]);
-			} catch (\Exception $e) {
+				$table->setOnSharePermissions($permissions);
+			} catch (NotFoundError $e) {
 			}
 		}
+		if (!$table->getIsShared() || $table->getOnSharePermissions()['manage']) {
+			// add the corresponding views if it is an own table, or you have table manage rights
+			$table->setViews($this->viewService->findAll($table));
+		}
+
 	}
 
 
@@ -175,7 +189,7 @@ class TableService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function find(int $id, ?string $userId = null, bool $skipTableEnhancement = false): Table {
+	public function find(int $id, bool $skipTableEnhancement = false, ?string $userId = null): Table {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
 
@@ -188,7 +202,6 @@ class TableService extends SuperService {
 			}
 
 			if (!$skipTableEnhancement) {
-				/** @var string $userId */
 				$this->enhanceTable($table, $userId);
 			}
 
@@ -203,32 +216,16 @@ class TableService extends SuperService {
 	}
 
 	/**
-	 * @param string $term
-	 * @param int $limit
-	 * @param int $offset
+	 * @param string $title
+	 * @param string $template
+	 * @param string|null $emoji
 	 * @param string|null $userId
-	 * @return array
-	 */
-	public function search(string $term, int $limit = 100, int $offset = 0, ?string $userId = null): array {
-		try {
-			/** @var string $userId */
-			$userId = $this->permissionsService->preCheckUserId($userId);
-			$tables = $this->mapper->search($term, $userId, $limit, $offset);
-			foreach ($tables as &$table) {
-				/** @var string $userId */
-				$this->enhanceTable($table, $userId);
-			}
-			return $tables;
-		} catch (InternalError | \OCP\DB\Exception $e) {
-			return [];
-		}
-	}
-
-	/**
-	 * @noinspection PhpUndefinedMethodInspection
-	 *
+	 * @return Table
+	 * @throws DoesNotExistException
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws PermissionError
 	 * @throws \OCP\DB\Exception
-	 * @throws InternalError|PermissionError
 	 */
 	public function create(string $title, string $template, ?string $emoji, ?string $userId = null): Table {
 		/** @var string $userId */
@@ -253,10 +250,78 @@ class TableService extends SuperService {
 		}
 		if ($template !== 'custom') {
 			$table = $this->tableTemplateService->makeTemplate($newTable, $template);
+		} else {
+			$table = $this->addOwnerDisplayName($newTable);
+		}
+
+		$this->enhanceTable($table, $userId);
+		return $table;
+	}
+
+	/**
+	 * @throws InternalError
+	 */
+	public function setOwner(int $id, string $newOwnerUserId, ?string $userId = null): Table {
+		$userId = $this->permissionsService->preCheckUserId($userId);
+
+		try {
+			$table = $this->mapper->find($id);
+
+			// security
+			if (!$this->permissionsService->canChangeElementOwner($userId)) {
+				throw new PermissionError('PermissionError: can not change table owner with table id '.$id);
+			}
+
+			$table->setOwnership($newOwnerUserId);
+			$table = $this->mapper->update($table);
 			$this->enhanceTable($table, $userId);
 			return $table;
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError($e->getMessage());
 		}
-		return $this->addOwnerDisplayName($newTable);
+	}
+
+	/**
+	 * @param int $id
+	 * @param null|string $userId
+	 * @return Table
+	 * @throws InternalError
+	 */
+	public function delete(int $id, ?string $userId = null): Table {
+		/** @var string $userId */
+		$userId = $this->permissionsService->preCheckUserId($userId); // $userId is set or ''
+
+		try {
+			$item = $this->mapper->find($id);
+
+			// security
+			if (!$this->permissionsService->canManageTable($item, $userId)) {
+				throw new PermissionError('PermissionError: can not delete table with id '.$id);
+			}
+
+			// delete all rows for that table
+			$this->rowService->deleteAllByTable($id, $userId);
+
+			// delete all columns for that table
+			$columns = $this->columnService->findAllByTable($id, null, $userId);
+			foreach ($columns as $column) {
+				$this->columnService->delete($column->id, true, $userId);
+			}
+
+			// delete all views for that table
+			$this->viewService->deleteAllByTable($item, $userId);
+
+			// delete all shares for that table
+			$this->shareService->deleteAllForTable($item);
+
+			// delete table
+			$this->mapper->delete($item);
+			return $item;
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
+		}
 	}
 
 	/**
@@ -299,89 +364,37 @@ class TableService extends SuperService {
 	}
 
 	/**
-	 * @throws InternalError
+	 * @param string $term
+	 * @param int $limit
+	 * @param int $offset
+	 * @param string|null $userId
+	 * @return array
+	 * @throws MultipleObjectsReturnedException
+	 * @throws PermissionError
 	 */
-	public function setOwner(int $id, string $newOwnerUserId, ?string $userId = null): Table {
-		$userId = $this->permissionsService->preCheckUserId($userId);
-
+	public function search(string $term, int $limit = 100, int $offset = 0, ?string $userId = null): array {
 		try {
-			$table = $this->mapper->find($id);
-
-			// security
-			if (!$this->permissionsService->canChangeTableOwner($table, $userId)) {
-				throw new PermissionError('PermissionError: can not change table owner with table id '.$id);
+			/** @var string $userId */
+			$userId = $this->permissionsService->preCheckUserId($userId);
+			$tables = $this->mapper->search($term, $userId, $limit, $offset);
+			foreach ($tables as &$table) {
+				/** @var string $userId */
+				$this->enhanceTable($table, $userId);
 			}
-
-			/** @noinspection PhpUndefinedMethodInspection */
-			$table->setOwnership($newOwnerUserId);
-			$table = $this->mapper->update($table);
-			$this->enhanceTable($table, $userId);
-			return $table;
-		} catch (Exception $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError($e->getMessage());
+			return $tables;
+		} catch (InternalError | \OCP\DB\Exception $e) {
+			return [];
 		}
 	}
-
-	/**
-	 * @param int $id
-	 * @param null|string $userId
-	 * @return Table
-	 * @throws InternalError
-	 */
-	public function delete(int $id, ?string $userId = null): Table {
-		/** @var string $userId */
-		$userId = $this->permissionsService->preCheckUserId($userId); // $userId is set or ''
-
-		try {
-			$item = $this->mapper->find($id);
-
-			// security
-			if (!$this->permissionsService->canDeleteTable($item, $userId)) {
-				throw new PermissionError('PermissionError: can not delete table with id '.$id);
-			}
-
-			// delete all rows for that table
-			$this->rowService->deleteAllByTable($id, $userId);
-
-			// delete all columns for that table
-			$columns = $this->columnService->findAllByTable($id, $userId);
-			foreach ($columns as $column) {
-				$this->columnService->delete($column->id, true, $userId);
-			}
-
-			// delete all shares for that table
-			$this->shareService->deleteAllForTable($item);
-
-			// delete table
-			$this->mapper->delete($item);
-			return $item;
-		} catch (Exception $e) {
-			$this->logger->error($e->getMessage());
-			throw new InternalError($e->getMessage());
-		}
-	}
-
 
 	// PRIVATE FUNCTIONS ---------------------------------------------------------------
 
 	/**
-	 * @noinspection PhpUndefinedMethodInspection
-	 *
 	 * @param Table $table
 	 * @return Table
 	 */
 	private function addOwnerDisplayName(Table $table): Table {
 		$table->setOwnerDisplayName($this->userHelper->getUserDisplayName($table->getOwnership()));
 		return $table;
-	}
-
-	private function addOwnersDisplayName(array $tables): array {
-		$return = [];
-		foreach ($tables as $table) {
-			$table->setOwnerDisplayName($this->userHelper->getUserDisplayName($table->getOwnership()));
-			$return[] = $table;
-		}
-		return $return;
 	}
 }

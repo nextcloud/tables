@@ -6,7 +6,7 @@
 				{{ t('tables', 'Default') }}
 			</div>
 			<div class="fix-col-4 space-B">
-				<textarea v-model="defaultText" />
+				<textarea v-model="mutableColumn.textDefault" />
 			</div>
 		</div>
 
@@ -16,7 +16,7 @@
 				{{ t('tables', 'Maximum text length') }}
 			</div>
 			<div class="fix-col-4">
-				<input v-model="maxLength"
+				<input v-model="mutableColumn.textMaxLength"
 					type="number"
 					step="1"
 					min="0">
@@ -27,27 +27,28 @@
 
 <script>
 
+import { translate as t } from '@nextcloud/l10n'
+
 export default {
 	name: 'TextLongForm',
 	props: {
-		textDefault: {
-			type: String,
-			default: '',
-		},
-		textMaxLength: {
-			type: Number,
+		column: {
+			type: Object,
 			default: null,
 		},
 	},
-	computed: {
-		defaultText: {
-			get() { return this.textDefault },
-			set(defaultText) { this.$emit('update:textDefault', defaultText) },
+	data() {
+		return {
+			mutableColumn: this.column,
+		}
+	},
+	watch: {
+		column() {
+			this.mutableColumn = this.column
 		},
-		maxLength: {
-			get() { return (this.textMaxLength && this.textMaxLength === -1) ? '' : this.textMaxLength },
-			set(maxLength) { this.$emit('update:textMaxLength', parseFloat(maxLength)) },
-		},
+	},
+	methods: {
+		t,
 	},
 }
 </script>

@@ -1,21 +1,19 @@
 <template>
-	<div v-if="activeTable" class="sharing">
-		<div v-if="!activeTable.isShared || activeTable.ownership === getCurrentUser().uid">
+	<div v-if="activeElement" class="sharing">
+		<div v-if="canShareElement(activeElement)">
 			<ShareForm :shares="shares" @add="addShare" @update="updateShare" />
 			<ShareList :shares="shares" @remove="removeShare" @update="updateShare" />
-		</div>
-		<div v-else style="margin-top: 12px;">
-			{{ t('tables', 'This table is shared with you. Resharing is not possible.') }}
 		</div>
 	</div>
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 import shareAPI from '../mixins/shareAPI.js'
 import ShareForm from '../partials/ShareForm.vue'
 import ShareList from '../partials/ShareList.vue'
 import { getCurrentUser } from '@nextcloud/auth'
+import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 
 export default {
 	components: {
@@ -23,7 +21,7 @@ export default {
 		ShareList,
 	},
 
-	mixins: [shareAPI],
+	mixins: [shareAPI, permissionsMixin],
 
 	data() {
 		return {
@@ -35,20 +33,19 @@ export default {
 	},
 
 	computed: {
-		...mapState(['tables', 'tablesLoading']),
-		...mapGetters(['activeTable']),
+		...mapGetters(['activeElement', 'isView']),
 	},
 
 	watch: {
-		activeTable() {
-			if (this.activeTable) {
+		activeElement() {
+			if (this.activeElement) {
 				this.loadSharesFromBE()
 			}
 		},
 	},
 
 	mounted() {
-		if (this.activeTable) {
+		if (this.activeElement) {
 			this.loadSharesFromBE()
 		}
 	},
@@ -60,18 +57,25 @@ export default {
 			this.shares = await this.getSharedWithFromBE()
 			this.loading = false
 		},
-		async removeShare(shareId) {
-			console.debug('remove share triggered', shareId)
-			await this.removeShareFromBE(shareId)
+		async removeShare(share) {
+			await this.removeShareFromBE(share.id)
 			await this.loadSharesFromBE()
+			// If no share is left, remove shared indication
+			if (this.isView) {
+				if (this.shares.find(share => ((share.nodeType === 'view' && share.nodeId === this.activeElement.id) || (share.nodeType === 'table' && share.nodeId === this.activeElement.tableId))) === undefined) {
+					await this.$store.dispatch('setViewHasShares', { viewId: this.activeElement.id, hasShares: false })
+				}
+			} else {
+				if (this.shares.find(share => (share.nodeType === 'table' && share.nodeId === this.activeElement.id)) === undefined) {
+					await this.$store.dispatch('setTableHasShares', { tableId: this.activeElement.id, hasShares: false })
+				}
+			}
 		},
 		async addShare(share) {
-			console.debug('add share triggered', share)
 			await this.sendNewShareToBE(share)
 			await this.loadSharesFromBE()
 		},
 		async updateShare(data) {
-			console.debug('update share triggered', data)
 			const shareId = data.id
 			delete data.id
 			await this.updateShareToBE(shareId, data)

@@ -207,6 +207,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 		);
 
 		$data = $this->getDataFromResponse($this->response);
+
 		Assert::assertEquals(200, $this->response->getStatusCode());
 
 		// check if tables are empty
@@ -657,6 +658,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 			$props[$columnId] = $row[1];
 		}
 
+		print_r($props);
 
 		$this->sendRequest(
 			'POST',
@@ -665,6 +667,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 		);
 
 		$newRow = $this->getDataFromResponse($this->response);
+		// var_dump($newRow);
 		$this->rowId = $newRow['id'];
 
 		Assert::assertEquals(200, $this->response->getStatusCode());

@@ -10,8 +10,6 @@ create-row              -> click on create (plus) button
 create-column
 edit-columns
 delete-selected-rows
-add-filter              -> @param filter { columnId, operator, value }
-delete-filter           -> @param id (columnId + operator + value)
 set-search-string       -> @param string
 import                  -> click on import button on tables menu
 
@@ -42,33 +40,34 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 	<div class="NcTable">
 		<div class="options row" style="padding-right: calc(var(--default-grid-baseline) * 2);">
 			<Options :rows="rows"
-				:columns="columns"
-				:selected-rows="selectedRows"
-				:show-options="columns.length !== 0"
-				:table="table"
-				:view="view"
+				:columns="parsedColumns"
+				:selected-rows="localSelectedRows"
+				:show-options="parsedColumns.length !== 0"
+				:view-setting.sync="localViewSetting"
+				:config="config"
 				@create-row="$emit('create-row')"
-				@download-csv="data => downloadCsv(data, columns, table)"
-				@add-filter="filter => $emit('add-filter', filter)"
-				@set-search-string="str => $emit('set-search-string', str)"
+				@download-csv="data => downloadCsv(data, parsedColumns, table)"
+				@set-search-string="str => setSearchString(str)"
 				@delete-selected-rows="rowIds => $emit('delete-selected-rows', rowIds)" />
 		</div>
 		<div class="custom-table row">
-			<CustomTable v-if="canReadTable(table)"
-				:columns="columns"
+			<CustomTable v-if="config.canReadRows || (config.canCreateRows && rows.length > 0)"
+				:columns="parsedColumns"
 				:rows="rows"
-				:table="table"
-				:view="view"
+				:view-setting.sync="localViewSetting"
+				:config="config"
 				@create-row="$emit('create-row')"
-				@import="table => $emit('import', table)"
 				@edit-row="rowId => $emit('edit-row', rowId)"
 				@create-column="$emit('create-column')"
-				@edit-columns="$emit('edit-columns')"
-				@add-filter="filter => $emit('add-filter', filter)"
-				@update-selected-rows="rowIds => selectedRows = rowIds"
-				@download-csv="data => downloadCsv(data, columns, table)"
-				@delete-filter="id => $emit('delete-filter', id)" />
-			<NcEmptyContent v-else
+				@edit-column="col => $emit('edit-column', col)"
+				@delete-column="col => $emit('delete-column', col)"
+				@update-selected-rows="rowIds => localSelectedRows = rowIds"
+				@download-csv="data => downloadCsv(data, parsedColumns, table)">
+				<template #actions>
+					<slot name="actions" />
+				</template>
+			</CustomTable>
+			<NcEmptyContent v-else-if="config.canCreateRows && rows.length === 0"
 				:title="t('tables', 'Create rows')"
 				:description="t('tables', 'You are not allowed to read this table, but you can still create rows.')">
 				<template #icon>
@@ -83,25 +82,36 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 					</NcButton>
 				</template>
 			</NcEmptyContent>
+			<NcEmptyContent v-else
+				:title="t('tables', 'No permissions')"
+				:description="t('tables', 'You have no permissions for this table.')">
+				<template #icon>
+					<Cancel :size="25" />
+				</template>
+			</NcEmptyContent>
 		</div>
 	</div>
 </template>
 
 <script>
+
 import Options from './sections/Options.vue'
 import CustomTable from './sections/CustomTable.vue'
 import exportTableMixin from './mixins/exportTableMixin.js'
-import permissionsMixin from './mixins/permissionsMixin.js'
 import { NcEmptyContent, NcButton } from '@nextcloud/vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
+import Cancel from 'vue-material-design-icons/Cancel.vue'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
+import { parseCol } from './mixins/columnParser.js'
+import { AbstractColumn } from './mixins/columnClass.js'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'NcTable',
 
-	components: { CustomTable, Options, NcButton, NcEmptyContent, Plus },
+	components: { CustomTable, Options, NcButton, NcEmptyContent, Plus, Cancel },
 
-	mixins: [exportTableMixin, permissionsMixin],
+	mixins: [exportTableMixin],
 
 	props: {
 		rows: {
@@ -112,22 +122,108 @@ export default {
 			type: Array,
 			default: () => [],
 		},
-		table: {
-			type: Object,
-			default: () => {},
+		downloadTitle: {
+			type: String,
+			default: t('tables', 'Download'),
 		},
-		view: {
-		      type: Object,
-		      default: null,
-		    },
+		viewSetting: {
+			type: Object,
+			default: null,
+		},
+		selectedRows: {
+			type: Array,
+			default: null,
+		},
+		canReadRows: {
+			type: Boolean,
+			default: true,
+		},
+		canCreateRows: {
+			type: Boolean,
+			default: true,
+		},
+		canEditRows: {
+			type: Boolean,
+			default: true,
+		},
+		canDeleteRows: {
+			type: Boolean,
+			default: true,
+		},
+		canCreateColumns: {
+			type: Boolean,
+			default: true,
+		},
+		canEditColumns: {
+			type: Boolean,
+			default: true,
+		},
+		canDeleteColumns: {
+			type: Boolean,
+			default: true,
+		},
+		canDeleteTable: {
+			type: Boolean,
+			default: true,
+		},
+		canSelectRows: {
+			type: Boolean,
+			default: true,
+		},
+		canHideColumns: {
+			type: Boolean,
+			default: true,
+		},
+		canFilter: {
+			type: Boolean,
+			default: true,
+		},
+		showActions: {
+			type: Boolean,
+			default: true,
+		},
 	},
-
 	data() {
 		return {
-			selectedRows: [],
+			localSelectedRows: [],
+			localViewSetting: this.viewSetting ?? {},
 		}
 	},
-
+	computed: {
+		config() {
+			return {
+				canReadRows: this.canReadRows,
+				canCreateRows: this.canCreateRows,
+				canEditRows: this.canEditRows,
+				canDeleteRows: this.canDeleteRows,
+				canCreateColumns: this.canCreateColumns,
+				canEditColumns: this.canEditColumns,
+				canDeleteColumns: this.canDeleteColumns,
+				canDeleteTable: this.canDeleteTable,
+				canSelectRows: this.canSelectRows,
+				canHideColumns: this.canHideColumns,
+				canFilter: this.canFilter,
+				showActions: this.showActions,
+			}
+		},
+		parsedColumns() {
+			if (this.columns.length && !(this.columns[0] instanceof AbstractColumn)) {
+				return this.columns.map(col => parseCol(col))
+			}
+			return this.columns
+		},
+	},
+	watch: {
+		localSelectedRows() {
+			this.$emit('update:selectedRows', this.localSelectedRows)
+		},
+		localViewSetting() {
+			this.$emit('update:viewSetting', this.localViewSetting)
+		},
+		viewSetting() {
+			this.localViewSetting = this.viewSetting
+		},
+	},
 	mounted() {
 		subscribe('tables:selected-rows:deselect', this.deselectRows)
 	},
@@ -135,8 +231,13 @@ export default {
 		unsubscribe('tables:selected-rows:deselect', this.deselectRows)
 	},
 	methods: {
+		t,
 		deselectRows() {
-			this.selectedRows = []
+			this.localSelectedRows = []
+		},
+		setSearchString(str) {
+			this.localViewSetting.searchString = str !== '' ? str : null
+			this.localViewSetting = JSON.parse(JSON.stringify(this.localViewSetting))
 		},
 	},
 }

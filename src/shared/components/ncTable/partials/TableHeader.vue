@@ -1,98 +1,58 @@
 <template>
 	<tr>
-		<th>
-			<NcCheckboxRadioSwitch :checked="allRowsAreSelected" @update:checked="value => $emit('select-all-rows', value)" />
+		<th v-if="config.canSelectRows" :class="{sticky: config.canSelectRows}">
+			<div class="cell-wrapper">
+				<NcCheckboxRadioSwitch :checked="allRowsAreSelected" @update:checked="value => $emit('select-all-rows', value)" />
+				<div v-if="hasRightHiddenNeighbor(-1)" class="hidden-indicator-first" @click="unhide(-1)" />
+			</div>
 		</th>
-		<th v-for="col in columns" :key="col.id">
-			<div class="cell">
-				<div class="clickable" @click="updateOpenState(col.id)">
-					{{ col.title }}
+		<th v-for="col in visibleColumns" :key="col.id">
+			<div class="cell-wrapper">
+				<div class="cell-options-wrapper">
+					<div class="cell">
+						<div class="clickable" @click="updateOpenState(col.id)">
+							{{ col.title }}
+						</div>
+						<TableHeaderColumnOptions
+							:column="col"
+							:open-state.sync="openedColumnHeaderMenus[col.id]"
+							:can-hide="visibleColumns.length > 1"
+							:config="config"
+							:view-setting.sync="localViewSetting"
+							@edit-column="col => $emit('edit-column', col)"
+							@delete-column="col => $emit('delete-column', col)" />
+					</div>
+					<div v-if="getFilterForColumn(col)" class="filter-wrapper">
+						<FilterLabel v-for="filter in getFilterForColumn(col)"
+							:id="filter.columnId + filter.operator.id+ filter.value"
+							:key="filter.columnId + filter.operator.id+ filter.value"
+							:operator="castToFilter(filter.operator.id)"
+							:value="filter.value"
+							@delete-filter="id => deleteFilter(id)" />
+					</div>
 				</div>
-				<TableHeaderColumnOptions
-					:column="col"
-					:open-state.sync="openedColumnHeaderMenus[col.id]"
-					@add-filter="filter => $emit('add-filter', filter)" />
-			</div>
-			<div v-if="getFilterForColumn(col)" class="filter-wrapper">
-				<FilterLabel v-for="filter in getFilterForColumn(col)"
-					:id="filter.columnId + filter.operator + filter.value"
-					:key="filter.columnId + filter.operator + filter.value"
-					:operator="filter.operator"
-					:value="filter.value"
-					@delete-filter="id => $emit('delete-filter', id)" />
+				<div v-if="hasRightHiddenNeighbor(col.id)" class="hidden-indicator" @click="unhide(col.id)" />
 			</div>
 		</th>
-		<th data-cy="customTableAction">
-			<NcActions :force-menu="true">
-				<NcActionButton v-if="canCreateRowInTable(table)"
-					:close-after-click="true"
-					icon="icon-add"
-					@click="$emit('create-row')">
-					{{ t('tables', 'Create row') }}
-				</NcActionButton>
-				<NcActionButton v-if="canCreateRowInTable(table)"
-					:close-after-click="true"
-					@click="$emit('import', table)">
-					<template #icon>
-						<IconImport :size="20" decorative title="Import" />
-					</template>
-					{{ t('tables', 'Import') }}
-				</NcActionButton>
-				<NcActionSeparator v-if="canCreateRowInTable(table)" />
-				<NcActionButton v-if="canManageTable(table)" :close-after-click="true" @click="$emit('create-column')">
-					<template #icon>
-						<TableColumnPlusAfter :size="20" decorative title="" />
-					</template>
-					{{ t('tables', 'Create column') }}
-				</NcActionButton>
-				<NcActionButton v-if="canManageTable(table)" :close-after-click="true" @click="$emit('edit-columns')">
-					<template #icon>
-						<TableEdit :size="20" decorative title="" />
-					</template>
-					{{ t('tables', 'Edit columns') }}
-				</NcActionButton>
-				<NcActionSeparator v-if="canManageTable(table)" />
-				<NcActionButton v-if="canManageTable(table)"
-					:close-after-click="true"
-					icon="icon-share"
-					@click="toggleShare">
-					{{ t('tables', 'Share') }}
-				</NcActionButton>
-				<NcActionButton v-if="canReadTable(table)" :close-after-click="true"
-					icon="icon-download"
-					@click="downloadCSV">
-					{{ t('tables', 'Export as CSV') }}
-				</NcActionButton>
-			</NcActions>
+		<th v-if="config.showActions" data-cy="customTableAction" :class="{sticky: config.showActions}">
+			<slot name="actions" />
 		</th>
 	</tr>
 </template>
 
 <script>
-import { NcCheckboxRadioSwitch, NcActions, NcActionButton, NcActionSeparator } from '@nextcloud/vue'
-import { emit } from '@nextcloud/event-bus'
-import TableEdit from 'vue-material-design-icons/TableEdit.vue'
-import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
-import IconImport from 'vue-material-design-icons/Import.vue'
+import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
 import FilterLabel from './FilterLabel.vue'
-import permissionsMixin from '../mixins/permissionsMixin.js'
+import { getFilterWithId } from '../mixins/filter.js'
 
 export default {
 
 	components: {
-		IconImport,
 		FilterLabel,
 		NcCheckboxRadioSwitch,
 		TableHeaderColumnOptions,
-		NcActions,
-		NcActionButton,
-		NcActionSeparator,
-		TableEdit,
-		TableColumnPlusAfter,
 	},
-
-	mixins: [permissionsMixin],
 
 	props: {
 		columns: {
@@ -107,19 +67,20 @@ export default {
 			type: Array,
 			default: () => [],
 		},
-		table: {
+		viewSetting: {
 			type: Object,
-			default: () => {},
+			default: null,
 		},
-		view: {
-		      type: Object,
-		      default: null,
-		    },
+		config: {
+			type: Object,
+			default: null,
+		},
 	},
 
 	data() {
 		return {
 			openedColumnHeaderMenus: {},
+			localViewSetting: this.viewSetting,
 		}
 	},
 
@@ -131,21 +92,45 @@ export default {
 				return false
 			}
 		},
+		visibleColumns() {
+			return this.columns.filter(col => !this.localViewSetting?.hiddenColumns?.includes(col.id))
+		},
+	},
+	watch: {
+		localViewSetting() {
+			this.$emit('update:viewSetting', this.localViewSetting)
+		},
+		viewSetting() {
+			this.localViewSetting = this.viewSetting
+		},
 	},
 
 	methods: {
+		getFilterWithId,
 		updateOpenState(columnId) {
 			this.openedColumnHeaderMenus[columnId] = !this.openedColumnHeaderMenus[columnId]
 			this.openedColumnHeaderMenus = Object.assign({}, this.openedColumnHeaderMenus)
 		},
 		getFilterForColumn(column) {
-			return this.view?.filter?.filter(item => item.columnId === column.id)
+			return this.localViewSetting?.filter?.filter(item => item.columnId === column.id)
 		},
-		downloadCSV() {
-			this.$emit('download-csv', this.rows)
+		hasRightHiddenNeighbor(colId) {
+			return this.localViewSetting?.hiddenColumns?.includes(this.columns[this.columns.indexOf(this.columns.find(col => col.id === colId)) + 1]?.id)
 		},
-		toggleShare() {
-			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
+		unhide(colId) {
+			const index = this.localViewSetting.hiddenColumns.indexOf(this.columns[this.columns.indexOf(this.columns.find(col => col.id === colId)) + 1]?.id)
+			if (index !== -1) {
+				this.localViewSetting.hiddenColumns.splice(index, 1)
+			}
+		},
+		deleteFilter(id) {
+			const index = this.localViewSetting?.filter?.findIndex(item => item.columnId + item.operator.id + item.value === id)
+			if (index !== -1) {
+				this.localViewSetting.filter.splice(index, 1)
+			}
+		},
+		castToFilter(operatorId) {
+			return this.getFilterWithId(operatorId)
 		},
 	},
 }
@@ -176,6 +161,33 @@ export default {
 
 .clickable {
 	cursor: pointer;
+}
+
+.hidden-indicator {
+	border-right: solid;
+	border-color: var(--color-primary);
+	border-width: 3px;
+	padding-left: calc(var(--default-grid-baseline) * 1);
+	cursor: pointer;
+}
+
+.hidden-indicator-first {
+	border-right: solid;
+	border-color: var(--color-primary);
+	border-width: 3px;
+	padding-left: calc(var(--default-grid-baseline) * 4);
+	cursor: pointer;
+}
+
+.cell-wrapper {
+	display: flex;
+	justify-content: space-between;
+}
+
+.cell-options-wrapper {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
 }
 
 </style>

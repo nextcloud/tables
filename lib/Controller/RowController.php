@@ -7,20 +7,26 @@ use OCA\Tables\Service\RowService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
+use Psr\Log\LoggerInterface;
 
 class RowController extends Controller {
 	/** @var RowService */
-	private $service;
+	private RowService $service;
 
 	/** @var string */
-	private $userId;
+	private string $userId;
+
+	protected LoggerInterface $logger;
 
 	use Errors;
 
-	public function __construct(IRequest     $request,
+	public function __construct(
+		IRequest $request,
+		LoggerInterface $logger,
 		RowService $service,
 		string $userId) {
 		parent::__construct(Application::APP_ID, $request);
+		$this->logger = $logger;
 		$this->service = $service;
 		$this->userId = $userId;
 	}
@@ -37,6 +43,15 @@ class RowController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	public function indexView(int $viewId): DataResponse {
+		return $this->handleError(function () use ($viewId) {
+			return $this->service->findAllByView($viewId, $this->userId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
 	public function show(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
 			return $this->service->find($id);
@@ -47,28 +62,14 @@ class RowController extends Controller {
 	 * @NoAdminRequired
 	 */
 	public function create(
-		int $tableId,
-		int $columnId,
-		string $data
-	): DataResponse {
-		return $this->handleError(function () use ($tableId, $columnId, $data) {
-			return $this->service->create(
-				$tableId,
-				$columnId,
-				$data);
-		});
-	}
-
-	/**
-	 * @NoAdminRequired
-	 */
-	public function createComplete(
-		int $tableId,
+		?int $tableId,
+		?int $viewId,
 		array $data
 	): DataResponse {
-		return $this->handleError(function () use ($tableId, $data) {
-			return $this->service->createComplete(
+		return $this->handleError(function () use ($tableId, $viewId, $data) {
+			return $this->service->create(
 				$tableId,
+				$viewId,
 				$data);
 		});
 	}
@@ -79,17 +80,24 @@ class RowController extends Controller {
 	public function update(
 		int $id,
 		int $columnId,
+		?int $tableId,
+		?int $viewId,
 		string $data
 	): DataResponse {
 		return $this->handleError(function () use (
 			$id,
+			$tableId,
+			$viewId,
 			$columnId,
 			$data
 		) {
 			return $this->service->update(
 				$id,
+				$tableId,
+				$viewId,
 				$columnId,
-				$data);
+				$data,
+				$this->userId);
 		});
 	}
 
@@ -98,15 +106,20 @@ class RowController extends Controller {
 	 */
 	public function updateSet(
 		int $id,
+		?int $viewId,
 		array $data
+
 	): DataResponse {
 		return $this->handleError(function () use (
 			$id,
+			$viewId,
 			$data
 		) {
 			return $this->service->updateSet(
 				$id,
-				$data);
+				$viewId,
+				$data,
+				$this->userId);
 		});
 	}
 
@@ -115,7 +128,15 @@ class RowController extends Controller {
 	 */
 	public function destroy(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
-			return $this->service->delete($id);
+			return $this->service->delete($id, null, $this->userId);
+		});
+	}
+	/**
+	 * @NoAdminRequired
+	 */
+	public function destroyByView(int $id, int $viewId): DataResponse {
+		return $this->handleError(function () use ($id, $viewId) {
+			return $this->service->delete($id, $viewId, $this->userId);
 		});
 	}
 }

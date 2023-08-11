@@ -9,6 +9,8 @@ use OCA\Tables\Db\Share;
 use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\View;
+use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -24,15 +26,18 @@ class ShareService extends SuperService {
 
 	protected TableMapper $tableMapper;
 
+	protected ViewMapper $viewMapper;
+
 	protected UserHelper $userHelper;
 
 	protected GroupHelper $groupHelper;
 
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-		ShareMapper $shareMapper, TableMapper $tableMapper, UserHelper $userHelper, GroupHelper $groupHelper) {
+		ShareMapper $shareMapper, TableMapper $tableMapper, ViewMapper $viewMapper, UserHelper $userHelper, GroupHelper $groupHelper) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $shareMapper;
 		$this->tableMapper = $tableMapper;
+		$this->viewMapper = $viewMapper;
 		$this->userHelper = $userHelper;
 		$this->groupHelper = $groupHelper;
 	}
@@ -40,15 +45,12 @@ class ShareService extends SuperService {
 
 	/**
 	 * @throws InternalError
-	 *
-	 * @psalm-param 'table' $nodeType
 	 */
-	public function findAll(string $nodeType, int $tableId, ?string $userId = null): array {
+	public function findAll(string $nodeType, int $nodeId, ?string $userId = null): array {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
-			/** @var string $userId */
-			$shares = $this->mapper->findAllSharesForNode($nodeType, $tableId, $userId);
+			$shares = $this->mapper->findAllSharesForNode($nodeType, $nodeId, $userId);
 			return $this->addReceiverDisplayNames($shares);
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage());
@@ -83,79 +85,83 @@ class ShareService extends SuperService {
 		}
 	}
 
+	/**
+	 * @param string|null $userId
+	 * @return array
+	 * @throws InternalError
+	 */
+	public function findViewsSharedWithMe(?string $userId = null): array {
+		return $this->findElementsSharedWithMe('view', $userId);
+	}
+
+	/**
+	 * @param string|null $userId
+	 * @return array
+	 * @throws InternalError
+	 */
+	public function findTablesSharedWithMe(?string $userId = null): array {
+		return $this->findElementsSharedWithMe('table', $userId);
+	}
 
 	/**
 	 * @throws InternalError
 	 */
-	public function findTablesSharedWithMe(?string $userId = null): array {
+	private function findElementsSharedWithMe(?string $elementType = 'table', ?string $userId = null): array {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		$returnArray = [];
 
 		try {
 			/** @var string $userId */
-			// get all tables that are shared with me as user
-			$tablesSharedWithMe = $this->mapper->findAllSharesFor('table', $userId);
+			// get all views or tables that are shared with me as user
+			$elementsSharedWithMe = $this->mapper->findAllSharesFor($elementType, $userId, $userId);
 
-			// get all tables that are shared with me by group
+			// get all views or tables that are shared with me by group
 			$userGroups = $this->userHelper->getGroupsForUser($userId);
 			foreach ($userGroups as $userGroup) {
-				$shares = $this->mapper->findAllSharesFor('table', $userGroup->getGid(), 'group');
-				$tablesSharedWithMe = array_merge($tablesSharedWithMe, $shares);
+				$shares = $this->mapper->findAllSharesFor($elementType, $userGroup->getGid(), $userId, 'group');
+				$elementsSharedWithMe = array_merge($elementsSharedWithMe, $shares);
 			}
 		} catch (\OCP\DB\Exception $e) {
 			throw new InternalError($e->getMessage());
 		}
-		foreach ($tablesSharedWithMe as $share) {
+		foreach ($elementsSharedWithMe as $share) {
 			try {
-				$table = $this->tableMapper->find($share->getNodeId());
-				/** @noinspection PhpUndefinedMethodInspection */
-				$table->setIsShared(true);
-				/** @noinspection PhpUndefinedMethodInspection */
-				$table->setOnSharePermissions([
-					'read' => $share->getPermissionRead(),
-					'create' => $share->getPermissionCreate(),
-					'update' => $share->getPermissionUpdate(),
-					'delete' => $share->getPermissionDelete(),
-					'manage' => $share->getPermissionManage(),
-				]);
+				if ($elementType === 'table') {
+					$element = $this->tableMapper->find($share->getNodeId());
+				} elseif ($elementType === 'view') {
+					$element = $this->viewMapper->find($share->getNodeId());
+				} else {
+					throw new InternalError('Cannot find element of type '.$elementType);
+				}
+				// Check if en element with this id is already in the result array
+				$index = array_search($element->getId(), array_column($returnArray, 'id'));
+				if (!$index) {
+					$returnArray[] = $element;
+				}
 			} catch (DoesNotExistException|\OCP\DB\Exception|MultipleObjectsReturnedException $e) {
 				throw new InternalError($e->getMessage());
 			}
-			$returnArray[] = $table;
 		}
 		return $returnArray;
 	}
 
 
 	/**
+	 * @param int $elementId
+	 * @param string|null $elementType
+	 * @param string|null $userId
+	 * @return array
 	 * @throws NotFoundError
-	 * @throws InternalError
 	 */
-	public function findTableShareIfSharedWithMe(int $tableId, ?string $userId = null): Share {
-		$userId = $this->permissionsService->preCheckUserId($userId);
-
-		// try to find a share with my userId
+	public function getSharedPermissionsIfSharedWithMe(int $elementId, ?string $elementType = 'table', ?string $userId = null): array {
 		try {
-			/** @var string $userId */
-			return $this->mapper->findShareForNode($tableId, 'table', $userId, 'user');
-		} catch (Exception $e) {
+			$userId = $this->permissionsService->preCheckUserId($userId);
+		} catch (InternalError $e) {
+			$this->logger->warning('Could not pre check user: '.$e->getMessage().' Permission denied.');
+			return [];
 		}
-
-		// try to find a share with one of my groups
-		try {
-			/** @var string $userId */
-			$userGroups = $this->userHelper->getGroupsForUser($userId);
-			foreach ($userGroups as $userGroup) {
-				return $this->mapper->findShareForNode($tableId, 'table', $userGroup->getGid(), 'group');
-				// $shares = $this->mapper->findAllSharesFor('table', $userGroup->getGid(), 'group');
-				// $tablesSharedWithMe = array_merge($tablesSharedWithMe, $shares);
-			}
-		} catch (Exception $e) {
-		}
-
-		// else throw error
-		throw new NotFoundError('No share for table and given user ID found.');
+		return $this->permissionsService->getSharedPermissionsIfSharedWithMe($elementId, $elementType, $userId);
 	}
 
 
@@ -170,8 +176,6 @@ class ShareService extends SuperService {
 
 
 	/**
-	 * @noinspection PhpUndefinedMethodInspection
-	 *
 	 * @param int $nodeId
 	 * @param string $nodeType
 	 * @param string $receiver
@@ -209,8 +213,6 @@ class ShareService extends SuperService {
 	}
 
 	/**
-	 * @noinspection PhpUndefinedMethodInspection
-	 *
 	 * @param int $id
 	 * @param string $permission
 	 * @param bool $value
@@ -222,7 +224,7 @@ class ShareService extends SuperService {
 			$item = $this->mapper->find($id);
 
 			// security
-			if (!$this->permissionsService->canUpdateShare($item)) {
+			if (!$this->permissionsService->canManageElementById($item->getNodeId(), $item->getNodeType())) {
 				throw new PermissionError('PermissionError: can not update share with id '.$id);
 			}
 
@@ -268,7 +270,7 @@ class ShareService extends SuperService {
 			$item = $this->mapper->find($id);
 
 			// security
-			if (!$this->permissionsService->canDeleteShare($item)) {
+			if (!$this->permissionsService->canManageElementById($item->getNodeId(), $item->getNodeType())) {
 				throw new PermissionError('PermissionError: can not delete share with id '.$id);
 			}
 
@@ -283,9 +285,8 @@ class ShareService extends SuperService {
 	/**
 	 * @param Share $share
 	 * @return Share
-	 * @noinspection PhpUndefinedMethodInspection
 	 */
-	private function addReceiverDisplayName(Share &$share):Share {
+	private function addReceiverDisplayName(Share $share):Share {
 		if ($share->getReceiverType() === 'user') {
 			$share->setReceiverDisplayName($this->userHelper->getUserDisplayName($share->getReceiver()));
 		} elseif ($share->getReceiverType() === 'group') {
@@ -309,6 +310,14 @@ class ShareService extends SuperService {
 			$this->mapper->deleteByNode($table->getId(), 'table');
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error('something went wrong while deleting shares for table: '.$table->getId());
+		}
+	}
+
+	public function deleteAllForView(View $view):void {
+		try {
+			$this->mapper->deleteByNode($view->getId(), 'view');
+		} catch (\OCP\DB\Exception $e) {
+			$this->logger->error('something went wrong while deleting shares for view: '.$view->getId());
 		}
 	}
 }

@@ -6,7 +6,7 @@
 			</div>
 		</div>
 		<template #head>
-			<NcButton type="tertiary" @click="showBigEditorModal = true">
+			<NcButton :aria-label="t('tables', 'Show fullscreen')" type="tertiary" @click="showBigEditorModal = true">
 				<template #icon>
 					<Fullscreen :size="20" />
 				</template>
@@ -18,7 +18,7 @@
 					</div>
 				</div>
 				<div class="closeModalButton">
-					<NcButton @click="showBigEditorModal = false">
+					<NcButton :aria-label="t('tables', 'Close editor')" @click="showBigEditorModal = false">
 						{{ t('tables', 'Close editor') }}
 					</NcButton>
 				</div>
@@ -32,6 +32,7 @@ import RowFormWrapper from './RowFormWrapper.vue'
 import NcEditor from '../../../ncEditor/NcEditor.vue'
 import { NcButton, NcModal } from '@nextcloud/vue'
 import Fullscreen from 'vue-material-design-icons/Fullscreen.vue'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	components: {
@@ -61,16 +62,18 @@ export default {
 	computed: {
 		localValue: {
 			get() {
-				return (this.value !== null)
-					? this.value
-					: ((this.column.textDefault !== undefined)
-						? this.column.textDefault
-						: '')
+				if (this.value !== null) return this.value
+				const newValue = this.column?.textDefault ? this.column.textDefault : ''
+				this.$emit('update:value', newValue)
+				return newValue
 			},
 			set(v) {
 				this.$emit('update:value', v)
 			},
 		},
+	},
+	methods: {
+		t,
 	},
 
 }

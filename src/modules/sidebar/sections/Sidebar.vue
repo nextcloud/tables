@@ -2,24 +2,43 @@
 	<div>
 		<NcAppSidebar v-show="showSidebar"
 			:active="activeSidebarTab"
-			:title="(activeTable) ? activeTable.emoji + ' ' + activeTable.title : t('tables', 'No table in context')"
-			:subtitle="(activeTable) ? t('tables', 'From {ownerName}', { ownerName: activeTable.ownership }) : ''"
+			:title="elementTitle"
 			@update:active="tab => activeSidebarTab = tab"
 			@close="showSidebar = false">
-			<NcAppSidebarTab v-if="canShareActiveTable"
-				id="sharing"
-				icon="icon-share"
-				:name="t('tables', 'Sharing')">
-				<SidebarSharing />
-			</NcAppSidebarTab>
+			<template #description>
+				<table v-if="activeElement">
+					<tr>
+						<td>{{ t('tables', 'Created at') }}</td>
+						<td>{{ activeElement.createdAt | niceDateTime }}</td>
+					</tr>
+					<tr>
+						<td>{{ t('tables', 'Ownership') }}</td>
+						<td><NcUserBubble :user="activeElement.ownership" :display-name="activeElement.ownerDisplayName" /></td>
+					</tr>
+					<tr>
+						<td v-if="isView">
+							{{ t('tables', 'View ID') }}
+						</td>
+						<td v-else>
+							{{ t('tables', 'Table ID') }}
+						</td>
+						<td>{{ activeElement.id }}</td>
+					</tr>
+				</table>
+			</template>
 			<NcAppSidebarTab
 				id="integration"
-				icon="icon-share"
 				:name="t('tables', 'Integration')">
 				<SidebarIntegration />
 				<template #icon>
 					<Creation :size="20" />
 				</template>
+			</NcAppSidebarTab>
+			<NcAppSidebarTab v-if="activeElement && canShareElement(activeElement)"
+				id="sharing"
+				icon="icon-share"
+				:name="t('tables', 'Sharing')">
+				<SidebarSharing />
 			</NcAppSidebarTab>
 		</NcAppSidebar>
 	</div>
@@ -28,14 +47,16 @@
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import SidebarSharing from './SidebarSharing.vue'
 import SidebarIntegration from './SidebarIntegration.vue'
-import { NcAppSidebar, NcAppSidebarTab } from '@nextcloud/vue'
+import { NcAppSidebar, NcAppSidebarTab, NcUserBubble } from '@nextcloud/vue'
 import { mapGetters, mapState } from 'vuex'
 import Creation from 'vue-material-design-icons/Creation.vue'
-import tablePermissions from '../../main/mixins/tablePermissions.js'
+import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
+import Moment from '@nextcloud/moment'
 
 export default {
 	name: 'Sidebar',
 	components: {
+		NcUserBubble,
 		SidebarSharing,
 		SidebarIntegration,
 		NcAppSidebar,
@@ -43,7 +64,13 @@ export default {
 		Creation,
 	},
 
-	mixins: [tablePermissions],
+	filters: {
+		niceDateTime(value) {
+			return Moment(value, 'YYYY-MM-DD HH:mm:ss').format('lll')
+		},
+	},
+
+	mixins: [permissionsMixin],
 
 	data() {
 		return {
@@ -53,7 +80,22 @@ export default {
 	},
 	computed: {
 		...mapState(['tables']),
-		...mapGetters(['activeTable']),
+		...mapGetters(['activeElement', 'isView']),
+		elementTitle() {
+			if (this.activeElement) {
+				return this.activeElement.emoji + ' ' + this.activeElement.title
+			} else {
+				return t('tables', 'No view in context')
+			}
+		},
+		elementSubtitle() {
+			if (this.activeElement) {
+				return t('tables', 'From {ownerName}', { ownerName: this.activeElement.ownership })
+				// TODO: Created By?
+			} else {
+				return ''
+			}
+		},
 	},
 	mounted() {
 		subscribe('tables:sidebar:sharing', data => this.handleToggleSidebar(data))
@@ -65,10 +107,18 @@ export default {
 	},
 	methods: {
 		handleToggleSidebar(data) {
-			console.debug('toggle sidebar in nav', data)
 			this.showSidebar = data.open ? data.open : false
 			this.activeSidebarTab = data.tab ? data.tab : ''
 		},
 	},
 }
 </script>
+<style lang="scss" scoped>
+
+	table {
+		margin-bottom: calc(var(--default-grid-baseline) * 2);
+		width: 100%;
+		color: var(--color-text-maxcontrast);
+	}
+
+</style>

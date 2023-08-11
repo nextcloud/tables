@@ -24,27 +24,45 @@
 			<NcCheckboxRadioSwitch type="switch" :checked.sync="localMandatory" />
 		</div>
 
-		<!-- order weight -->
-		<div class="fix-col-4 title space-T">
-			{{ t('tables', 'Order weight') }}
+		<!-- add to views -->
+		<div v-if="!editColumn" class="fix-col-4 title space-T">
+			{{ t('tables', 'Add column to other views') }}
 		</div>
-		<div class="fix-col-4">
-			<input v-model="localOrderWeight"
-				type="number"
-				max="100"
-				min="0"
-				step="1">
+		<div v-if="!editColumn" class="fix-col-4">
+			<NcSelect
+				v-model="localSelectedViews"
+				:multiple="true"
+				:options="viewsForTable"
+				:get-option-key="(option) => option.id"
+				:placeholder="t('tables', 'Column')"
+				label="title">
+				<template #option="props">
+					<div>
+						{{ props.emoji }}
+						{{ props.title }}
+					</div>
+				</template>
+				<template #selected-option="props">
+					<div>
+						{{ props.emoji }}
+						{{ props.title }}
+					</div>
+				</template>
+			</NcSelect>
 		</div>
 	</div>
 </template>
 
 <script>
-import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
+import { NcCheckboxRadioSwitch, NcSelect } from '@nextcloud/vue'
+import { mapGetters, mapState } from 'vuex'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'MainForm',
 	components: {
 		NcCheckboxRadioSwitch,
+		NcSelect,
 	},
 	props: {
 		title: {
@@ -59,16 +77,22 @@ export default {
 			type: Boolean,
 			default: null,
 		},
-		orderWeight: {
-			type: Number,
+		selectedViews: {
+			type: Array,
 			default: null,
 		},
 		titleMissingError: {
 			type: Boolean,
 			default: false,
 		},
+		editColumn: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	computed: {
+		...mapState(['views']),
+		...mapGetters(['activeElement', 'isView']),
 		localTitle: {
 			get() { return this.title },
 			set(title) { this.$emit('update:title', title) },
@@ -81,10 +105,30 @@ export default {
 			get() { return this.mandatory },
 			set(mandatory) { this.$emit('update:mandatory', mandatory) },
 		},
-		localOrderWeight: {
-			get() { return this.orderWeight },
-			set(orderWeight) { this.$emit('update:orderWeight', parseInt(orderWeight)) },
+		localSelectedViews: {
+			get() { return this.selectedViews },
+			set(selectedViews) {
+				this.$emit('update:selectedViews', selectedViews)
+			},
 		},
+		viewsForTable() {
+			if (this.isView) {
+				return this.views.filter(view => view.tableId === this.activeElement.tableId && view !== this.activeElement).filter(view => !this.localSelectedViews.includes(view))
+			}
+			return this.views.filter(view => view.tableId === this.activeElement.id).filter(view => !this.localSelectedViews.includes(view))
+		},
+	},
+
+	mounted() {
+		if (this.editColumn) return
+		if (!this.isView) {
+			this.localSelectedViews = this.viewsForTable
+		} else {
+			this.localSelectedViews = []
+		}
+	},
+	methods: {
+		t,
 	},
 }
 </script>

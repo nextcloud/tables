@@ -26,7 +26,7 @@ export default class SelectionColumn extends AbstractSelectionColumn {
 	}
 
 	sort(mode) {
-		const factor = mode === 'desc' ? -1 : 1
+		const factor = mode === 'DESC' ? -1 : 1
 		return (rowA, rowB) => {
 			const selectionIdA = rowA.data.find(item => item.columnId === this.id)?.value || null
 			const valueA = selectionIdA !== null ? this.selectionOptions.find(item => item.id === selectionIdA)?.label : ''
