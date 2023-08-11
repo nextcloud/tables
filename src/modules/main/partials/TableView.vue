@@ -3,7 +3,7 @@
 		:rows="rows"
 		:columns="columns"
 		:download-title="element.title"
-		:view-setting="viewSetting"
+		:view-setting.sync="localViewSetting"
 		:can-read-rows="canReadRows"
 		:can-create-rows="canCreateRows"
 		:can-edit-rows="canEditRows"
@@ -102,6 +102,9 @@ export default {
 	watch: {
 		localViewSetting() {
 			this.$emit('update:viewSetting', this.localViewSetting)
+		},
+		viewSetting() {
+			this.localViewSetting = this.viewSetting
 		},
 	},
 

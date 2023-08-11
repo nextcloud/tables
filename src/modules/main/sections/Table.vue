@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<ElementDescription :active-element="table" :view-setting="viewSetting" />
+		<ElementDescription :active-element="table" :view-setting.sync="localViewSetting" />
 		<Dashboard v-if="hasViews"
 			:table="table"
 			@create-column="$emit('create-column')"
@@ -8,7 +8,7 @@
 			@toggle-share="$emit('toggle-share')"
 			@show-integration="$emit('show-integration')"
 			@create-view="createView" />
-		<DataTable :table="table" :columns="columns" :rows="rows" :view-setting="viewSetting"
+		<DataTable :table="table" :columns="columns" :rows="rows" :view-setting.sync="localViewSetting"
 			@create-column="$emit('create-column')"
 			@import="$emit('import')"
 			@download-csv="$emit('download-csv')"
@@ -51,15 +51,29 @@ export default {
 			default: null,
 		},
 	},
+
+	data() {
+		return {
+			localViewSetting: this.viewSetting,
+		}
+	},
 	computed: {
 		...mapState(['views']),
 		hasViews() {
 			return this.views.some(v => v.tableId === this.table.id)
 		},
 	},
+	watch: {
+		localViewSetting() {
+			this.$emit('update:viewSetting', this.localViewSetting)
+		},
+		viewSetting() {
+			this.localViewSetting = this.viewSetting
+		},
+	},
 	methods: {
 		createView() {
-			emit('tables:view:create', { tableId: this.table.id, viewSetting: this.viewSetting.length > 0 ? this.viewSetting : null })
+			emit('tables:view:create', { tableId: this.table.id, viewSetting: this.viewSetting.length > 0 ? this.viewSetting : this.localViewSetting })
 		},
 	},
 }

@@ -1,13 +1,13 @@
 <template>
 	<div>
-		<ElementDescription :active-element="view" :is-table="false" :view-setting="viewSetting" />
+		<ElementDescription :active-element="view" :is-table="false" :view-setting.sync="localViewSetting" />
 		<div class="table-wrapper">
 			<EmptyView v-if="columns.length === 0" />
 			<TableView v-else
 				:rows="rows"
 				:columns="columns"
 				:element="view"
-				:view-setting="viewSetting"
+				:view-setting.sync="localViewSetting"
 				:is-view="true"
 				:can-read-rows="canReadData(view)"
 				:can-create-rows="canCreateRowInElement(view)"
@@ -123,16 +123,25 @@ export default {
 		return {
 			localLoading: false,
 			lastActiveViewId: null,
+			localViewSetting: this.viewSetting,
 		}
 	},
 	computed: {
 		isViewSettingSet() {
-			return !(!this.viewSetting || ((!this.viewSetting.hiddenColumns || this.viewSetting.hiddenColumns.length === 0) && (!this.viewSetting.sorting) && (!this.viewSetting.filter || this.viewSetting.filter.length === 0)))
+			return !(!this.localViewSetting || ((!this.localViewSetting.hiddenColumns || this.localViewSetting.hiddenColumns.length === 0) && (!this.localViewSetting.sorting) && (!this.localViewSetting.filter || this.localViewSetting.filter.length === 0)))
+		},
+	},
+	watch: {
+		localViewSetting() {
+			this.$emit('update:viewSetting', this.localViewSetting)
+		},
+		viewSetting() {
+			this.localViewSetting = this.viewSetting
 		},
 	},
 	methods: {
 		editView() {
-			emit('tables:view:edit', { view: this.view, viewSetting: this.viewSetting })
+			emit('tables:view:edit', { view: this.view, viewSetting: this.localViewSetting })
 		},
 	},
 }

@@ -23,7 +23,7 @@ export default new Router({
 		{
 			path: '/table/:tableId/row/:rowId',
 			component: MainDashboardWrapper,
-			name: 'row',
+			name: 'tableRow',
 		},
 		{
 			path: '/view/:viewId',
@@ -33,7 +33,7 @@ export default new Router({
 		{
 			path: '/view/:viewId/row/:rowId',
 			component: MainViewWrapper,
-			name: 'row',
+			name: 'viewRow',
 		},
 	],
 })

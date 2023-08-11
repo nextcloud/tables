@@ -209,6 +209,9 @@ export default {
 		localViewSetting() {
 			this.$emit('update:viewSetting', this.localViewSetting)
 		},
+		viewSetting() {
+			this.localViewSetting = this.viewSetting
+		},
 	},
 
 	mounted() {

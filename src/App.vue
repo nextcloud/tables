@@ -53,7 +53,7 @@ export default {
 	},
 	methods: {
 		routing(currentRoute) {
-			if (currentRoute.name === 'row') {
+			if (currentRoute.name === 'tableRow' || currentRoute.name === 'viewRow') {
 				this.$store.commit('setActiveRowId', parseInt(currentRoute.params.rowId))
 			} else {
 				this.$store.commit('setActiveRowId', null)

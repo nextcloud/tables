@@ -11,7 +11,7 @@
 				:rows="rows"
 				:columns="columns"
 				:element="table"
-				:view-setting="viewSetting"
+				:view-setting.sync="localViewSetting"
 				:is-view="false"
 				:selected-rows.sync="localSelectedRows"
 				:can-read-rows="canReadData(table)"
@@ -138,6 +138,7 @@ export default {
 	data() {
 		return {
 			localSelectedRows: this.selectedRows,
+			localViewSetting: this.viewSetting,
 		}
 	},
 
@@ -147,13 +148,19 @@ export default {
 			return this.views.some(v => v.tableId === this.table.id)
 		},
 		isViewSettingSet() {
-			return !(!this.viewSetting || ((!this.viewSetting.hiddenColumns || this.viewSetting.hiddenColumns.length === 0) && (!this.viewSetting.sorting) && (!this.viewSetting.filter || this.viewSetting.filter.length === 0)))
+			return !(!this.localViewSetting || ((!this.localViewSetting.hiddenColumns || this.localViewSetting.hiddenColumns.length === 0) && (!this.localViewSetting.sorting) && (!this.localViewSetting.filter || this.localViewSetting.filter.length === 0)))
 		},
 	},
 
 	watch: {
 		localSelectedRows() {
 			this.$emit('update:selectedRows', this.localSelectedRows)
+		},
+		localViewSetting() {
+			this.$emit('update:viewSetting', this.localViewSetting)
+		},
+		viewSetting() {
+			this.localViewSetting = this.viewSetting
 		},
 	},
 
