@@ -45,7 +45,7 @@ class Api1Controller extends ApiController {
 		ViewMapper $viewMapper,
 		V1Api $v1Api,
 		LoggerInterface $logger,
-		string $userId
+		?string $userId
 	) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->tableService = $service;
@@ -55,7 +55,7 @@ class Api1Controller extends ApiController {
 		$this->importService = $importService;
 		$this->viewService = $viewService;
 		$this->viewMapper = $viewMapper;
-		$this->userId = $userId;
+		$this->userId = $userId ?? '';
 		$this->v1Api = $v1Api;
 		$this->logger = $logger;
 	}
