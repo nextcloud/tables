@@ -3,20 +3,19 @@
     "Name" : "اسم",
     "Description" : "تصریح",
     "Birthday" : "سالگرہ",
+    "Today" : "آج",
+    "Link" : "Link",
+    "Move" : "Move",
+    "Share" : "تقسیم",
     "Type" : "Type",
     "Save" : "حفظ",
-    "Link" : "Link",
-    "Cancel" : "منسوخ کریں",
-    "Edit" : "تدوین کریں",
-    "Delete" : "حذف کریں",
-    "Today" : "آج",
     "Title" : "عنوان",
-    "Share" : "تقسیم",
+    "Cancel" : "منسوخ کریں",
+    "Delete" : "حذف کریں",
     "group" : "مجموعہ",
     "Error" : "ایرر",
+    "Download" : "ڈاؤن لوڈ",
     "Search" : "Search",
-    "URL" : "یو ار ایل",
-    "Yes" : "Yes",
-    "No" : "No"
+    "URL" : "یو ار ایل"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
