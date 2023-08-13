@@ -16,6 +16,7 @@
     "Move" : "ย้าย",
     "View" : "มุมมอง",
     "Shares" : "การแชร์",
+    "Actions" : "การกระทำ",
     "Share" : "แชร์",
     "Import" : "นำเข้า",
     "Type" : "ประเภท",
@@ -27,12 +28,15 @@
     "File" : "ไฟล์",
     "Please select a file." : "กรุณาเลือกไฟล์",
     "Filter" : "ตัวกรอง",
+    "Sort" : "จัดเรียง",
+    "Copy" : "คัดลอก",
     "User or group name …" : "ชื่อผู้ใช้หรือกลุ่ม …",
     "No recommendations. Start typing." : "ไม่มีคำแนะนำ เริ่มพิมพ์เลย",
     "Searching …" : "กำลังค้นหา …",
     "group" : "กลุ่ม",
     "Created at" : "สร้างเมื่อ",
     "Sharing" : "การแชร์",
+    "Copy to clipboard" : "คัดลอกไปยังคลิปบอร์ด",
     "Read" : "อ่าน",
     "Update" : "อัปเดต",
     "Clipboard is not available" : "คลิปบอร์ดไม่พร้อมใช้งาน",
@@ -46,6 +50,7 @@
     "URL" : "URL",
     "Confirm" : "ยืนยัน",
     "Preview" : "ตัวอย่าง",
+    "Select" : "เลือก",
     "ID" : "ID"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

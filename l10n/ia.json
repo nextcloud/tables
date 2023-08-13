@@ -16,6 +16,7 @@
     "Move" : "Mover",
     "View" : "Vider",
     "Shares" : "Compartimentos",
+    "Actions" : "Actiones",
     "Share" : "Compartir",
     "Total" : "Total",
     "Type" : "Typo",
@@ -25,16 +26,20 @@
     "Cancel" : "Cancellar",
     "Delete" : "Deler",
     "Please select a file." : "Per favor selectiona un file.",
+    "Sort" : "Ordinar",
     "group" : "gruppo",
     "Sharing" : "Compartente",
     "Update" : "Actualisation",
     "Manage" : "Administrar",
     "Error" : "Error",
+    "Download" : "Discargar",
     "Search" : "Cercar",
     "Undo" : "Disfacer",
     "Prefix" : "Prefixo",
     "Suffix" : "Suffixo",
     "URL" : "URL",
-    "Confirm" : "Confirmar"
+    "Confirm" : "Confirmar",
+    "Preview" : "Previsualisar",
+    "Select" : "Selectionar"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

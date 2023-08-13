@@ -11,6 +11,9 @@ OC.L10N.register(
     "Create" : "Creu",
     "Today" : "Heddiw",
     "Link" : "Dolen",
+    "Move" : "Symud",
+    "Views" : "Dangosiadau",
+    "Actions" : "Gweithredoedd",
     "Share" : "Rhannu",
     "Import" : "Mewnforio",
     "Type" : "Math",
@@ -19,9 +22,11 @@ OC.L10N.register(
     "Title" : "Teitl",
     "Cancel" : "Diddymu",
     "Delete" : "Dileu",
+    "Sort" : "Trefnu",
     "group" : "grŵp",
     "Update" : "Diweddaru",
     "Error" : "Gwall",
+    "Download" : "Llwytho i lawr",
     "Search" : "Chwilio",
     "Undo" : "Dadwneud",
     "Bold" : "Trwm",
@@ -30,6 +35,7 @@ OC.L10N.register(
     "Suffix" : "Ôl-ddodiad",
     "URL" : "URL",
     "Close editor" : "Cau'r golygydd",
-    "Confirm" : "Cadarnhau"
+    "Confirm" : "Cadarnhau",
+    "Preview" : "Rhagolwg"
 },
 "nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != 11) ? 2 : 3;");

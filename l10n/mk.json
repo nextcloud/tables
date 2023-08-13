@@ -20,8 +20,10 @@
     "Link" : "Линк",
     "Move" : "Премести",
     "Metadata" : "Метаподатоци",
+    "Views" : "Прегледи",
     "View" : "Погледни",
     "Shares" : "Споделувања",
+    "Actions" : "Акции",
     "Share" : "Сподели",
     "Integration" : "Интеграција",
     "Total" : "Вкупно",
@@ -35,6 +37,8 @@
     "Delete" : "Избриши",
     "File" : "Датотека",
     "Please select a file." : "Изберете датотека.",
+    "Filter" : "Филтер",
+    "Sort" : "Сортирај",
     "Clear filter" : "Исчисти филтри",
     "User or group name …" : "Корисник или име на група ...",
     "No recommendations. Start typing." : "Нема препораки. Започнете со пишување.",
@@ -45,6 +49,7 @@
     "No shares" : "Нема споделувања",
     "Created at" : "Создадена на",
     "Sharing" : "Споделување",
+    "Copy to clipboard" : "Копирај во клипборд",
     "Read" : "Прочитана",
     "Update" : "Ажурирај",
     "Clipboard is not available" : "Клипбордот не е достапен",
@@ -67,6 +72,7 @@
     "URL" : "Адреса",
     "Close editor" : "Затвори го уредникот",
     "Confirm" : "Потврди",
+    "Select" : "Избери",
     "ID" : "ID"
 },"pluralForm" :"nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;"
 }

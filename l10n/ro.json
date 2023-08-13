@@ -17,8 +17,10 @@
     "Text" : "Text",
     "Link" : "Legătură",
     "Move" : "Mută",
+    "Views" : "Mod de viziualizare",
     "View" : "Vizualizare",
     "Shares" : "Partajări",
+    "Actions" : "Acțiuni",
     "Share" : "Partajează",
     "Import" : "Importă",
     "Type" : "Tip",
@@ -30,10 +32,13 @@
     "Delete" : "Șterge",
     "File" : "Fișier",
     "Please select a file." : "Te rugăm să alegi un fișier.",
+    "Filter" : "Filtru",
+    "Sort" : "Sortează",
     "group" : "grup",
     "No shares" : "Nicio partajare",
     "Created at" : "Creat la",
     "Sharing" : "Partajare",
+    "Copy to clipboard" : "Copiază în clipboard",
     "Read" : "Citit",
     "Update" : "Actualizare",
     "Error" : "Eroare",
@@ -47,6 +52,8 @@
     "Options" : "Opțiuni",
     "URL" : "URL",
     "Confirm" : "Confirmă",
+    "Preview" : "Previzualizare",
+    "Select" : "Selectează",
     "ID" : "ID"
 },"pluralForm" :"nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));"
 }

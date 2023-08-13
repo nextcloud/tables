@@ -12,7 +12,9 @@ OC.L10N.register(
     "Create" : "তৈরী কর",
     "Today" : "আজ",
     "Link" : "Link",
+    "Move" : "Move",
     "Shares" : "ভাগাভাগি",
+    "Actions" : "পদক্ষেপসমূহ",
     "Share" : "ভাগাভাগি কর",
     "Import" : "আমদানি",
     "Type" : "ধরণ",
@@ -27,8 +29,10 @@ OC.L10N.register(
     "Read" : "পড়",
     "Update" : "পরিবর্ধন",
     "Error" : "সমস্যা",
+    "Download" : "ডাউনলোড",
     "Search" : "Search",
     "Default" : "পূর্বনির্ধারিত",
-    "URL" : "URL"
+    "URL" : "URL",
+    "Select" : "সিলেক্ট"
 },
 "nplurals=2; plural=(n != 1);");

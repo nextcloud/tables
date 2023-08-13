@@ -20,9 +20,11 @@ OC.L10N.register(
     "Text" : "Văn bản",
     "Link" : "Liên kết",
     "Move" : "Dịch chuyển",
+    "Column" : "Cột",
     "Views" : "Lượt xem",
     "View" : "Xem",
     "Shares" : "Chia sẻ",
+    "Actions" : "Hành động",
     "Share" : "Chia sẻ",
     "Integration" : "Tích hợp",
     "Total" : "Tổng cộng",
@@ -49,6 +51,7 @@ OC.L10N.register(
     "Error" : "Lỗi",
     "Download" : "Tải xuống",
     "Search" : "Tìm kiếm",
+    "Back" : "Trở lại",
     "Undo" : "Hoàn tác",
     "Redo" : "Làm lại",
     "Bold" : "Đậm",
@@ -65,6 +68,7 @@ OC.L10N.register(
     "Close editor" : "Đóng trình biên tập",
     "Confirm" : "Xác nhận",
     "Preview" : "Xem trước",
+    "Select" : "Chọn",
     "ID" : "ID"
 },
 "nplurals=1; plural=0;");

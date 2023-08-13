@@ -18,9 +18,11 @@
     "Text" : "Văn bản",
     "Link" : "Liên kết",
     "Move" : "Dịch chuyển",
+    "Column" : "Cột",
     "Views" : "Lượt xem",
     "View" : "Xem",
     "Shares" : "Chia sẻ",
+    "Actions" : "Hành động",
     "Share" : "Chia sẻ",
     "Integration" : "Tích hợp",
     "Total" : "Tổng cộng",
@@ -47,6 +49,7 @@
     "Error" : "Lỗi",
     "Download" : "Tải xuống",
     "Search" : "Tìm kiếm",
+    "Back" : "Trở lại",
     "Undo" : "Hoàn tác",
     "Redo" : "Làm lại",
     "Bold" : "Đậm",
@@ -63,6 +66,7 @@
     "Close editor" : "Đóng trình biên tập",
     "Confirm" : "Xác nhận",
     "Preview" : "Xem trước",
+    "Select" : "Chọn",
     "ID" : "ID"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

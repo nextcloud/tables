@@ -14,7 +14,9 @@
     "Today" : "Hoy",
     "Text" : "Texto",
     "Link" : "Enlace",
+    "Move" : "Mover",
     "Shares" : "Elementos compartidos",
+    "Actions" : "Acciones",
     "Share" : "Compartir",
     "Integration" : "Integración",
     "Total" : "Total",
@@ -29,9 +31,13 @@
     "File" : "Archivo",
     "Result" : "Resultado",
     "Please select a file." : "Por favor selecciona un archivo.",
+    "Filter" : "Filtrar",
+    "Sort" : "Ordenar",
     "group" : "grupo",
     "Permissions" : "Permisos",
+    "Created at" : "Creado en",
     "Sharing" : "Compartiendo",
+    "Copy to clipboard" : "Copiar al portapapeles",
     "Read" : "Leer",
     "Update" : "Actualizar",
     "Manage" : "Administrar",
@@ -41,6 +47,10 @@
     "Suffix" : "Sufijo",
     "Default" : "Predeterminado",
     "Confirm" : "Confirmar",
-    "Unchecked" : "Desmarcado"
+    "Content" : "Contenido",
+    "Preview" : "Previsualizar",
+    "Select" : "Seleccionar",
+    "Unchecked" : "Desmarcado",
+    "ID" : "ID"
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

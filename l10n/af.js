@@ -15,8 +15,12 @@ OC.L10N.register(
     "Today" : "Vandag",
     "Text" : "Teks",
     "Link" : "Skakel",
+    "Move" : "Skuif",
+    "View" : "Bekyk",
+    "Actions" : "Aksies",
     "Share" : "Deel",
     "Integration" : "Integrasie",
+    "Total" : "Totaal",
     "Import" : "Invoer",
     "Type" : "Tipe",
     "Time" : "Tyd",
@@ -26,8 +30,11 @@ OC.L10N.register(
     "Delete" : "Skrap",
     "File" : "Lêer",
     "Please select a file." : "Kies asb. ’n lêer.",
+    "Filter" : "Filter",
     "group" : "Groep",
+    "Created at" : "Geskep om",
     "Update" : "Werk by",
+    "Download" : "Laai af",
     "Search" : "Soek",
     "Bold" : "Vet",
     "Italic" : "Skuins",
@@ -38,6 +45,7 @@ OC.L10N.register(
     "Prefix" : "Voorvoegsel",
     "Suffix" : "Agtervoegsel",
     "Default" : "Verstek",
-    "Confirm" : "Bevestig"
+    "Confirm" : "Bevestig",
+    "ID" : "ID"
 },
 "nplurals=2; plural=(n != 1);");

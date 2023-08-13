@@ -13,6 +13,7 @@ OC.L10N.register(
     "Today" : "Haut",
     "Link" : "Link",
     "Move" : "Verschieben",
+    "Actions" : "Aktiounen",
     "Share" : "Deelen",
     "Import" : "Import",
     "Type" : "Typ",
@@ -22,12 +23,15 @@ OC.L10N.register(
     "Cancel" : "Ofbriechen",
     "Delete" : "Läschen",
     "Please select a file." : "Wiel eng Datei aus.",
+    "Sort" : "Zortéieren",
     "group" : "Grupp",
     "Sharing" : "Gedeelt",
     "Update" : "Update",
     "Error" : "Fehler",
+    "Download" : "Eroflueden",
     "Search" : "Search",
     "Default" : "Standard",
-    "URL" : "URL"
+    "URL" : "URL",
+    "Select" : "Auswielen"
 },
 "nplurals=2; plural=(n != 1);");

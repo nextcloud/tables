@@ -12,7 +12,9 @@ OC.L10N.register(
     "Create" : "Yarat",
     "Today" : "Bu gün",
     "Link" : "Link",
+    "Move" : "Move",
     "Shares" : "Yayımlanmalar",
+    "Actions" : "İşlər",
     "Share" : "Paylaş",
     "Import" : "Əlavə et",
     "Type" : "Type",
@@ -21,13 +23,17 @@ OC.L10N.register(
     "Title" : "Başlıq",
     "Cancel" : "Dayandır",
     "Delete" : "Sil",
+    "Sort" : "Çeşidləmək",
+    "Copy" : "Kopyala",
     "group" : "qrup",
     "Sharing" : "Paylaşılır",
     "Read" : "Oxu",
     "Update" : "Yenilənmə",
     "Error" : "Səhv",
+    "Download" : "Yüklə",
     "Search" : "Axtarış",
     "Default" : "Susmaya görə",
-    "URL" : "URL"
+    "URL" : "URL",
+    "Select" : "Seç"
 },
 "nplurals=2; plural=(n != 1);");

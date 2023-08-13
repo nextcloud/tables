@@ -17,7 +17,10 @@ OC.L10N.register(
     "Delete" : "ລຶບ",
     "File" : "ຟາຍ",
     "Please select a file." : "ກະລຸນາເລືອກຟາຍ",
+    "Sort" : "ລຽງດຳດັບ",
+    "Copy" : "ສຳເນົາ",
     "Sharing" : "ການແບ່ງປັນ",
+    "Download" : "ດາວໂຫລດ",
     "Search" : "ຄົ້ນຫາ",
     "Default" : "ເລີ່ມຕົ້ນ",
     "Confirm" : "ຢືນຢັນ"

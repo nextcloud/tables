@@ -12,10 +12,15 @@
     "Delete" : "Sguab às",
     "File" : "Faidhle",
     "Please select a file." : "Tagh faidhle.",
+    "Sort" : "Seòrsaich",
+    "Copy" : "Dèan lethbhreac",
     "Sharing" : "Co-roinneadh",
     "Error" : "Mearachd",
+    "Download" : "Luchdaich a-nuas",
     "Search" : "Lorg",
+    "Back" : "Air ais",
     "Undo" : "Neo-dhèan",
-    "Default" : "Bunaiteach"
+    "Default" : "Bunaiteach",
+    "Preview" : "Ro-sheall"
 },"pluralForm" :"nplurals=4; plural=(n==1 || n==11) ? 0 : (n==2 || n==12) ? 1 : (n > 2 && n < 20) ? 2 : 3;"
 }

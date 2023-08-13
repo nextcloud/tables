@@ -11,6 +11,7 @@ OC.L10N.register(
     "Today" : "இன்று",
     "Link" : "Link",
     "Move" : "Move",
+    "Actions" : "செயல்கள்",
     "Share" : "பகிர்வு",
     "Import" : "இறக்குமதி",
     "Type" : "வகை",
@@ -23,6 +24,8 @@ OC.L10N.register(
     "Update" : "இற்றைப்படுத்தல்",
     "Error" : "வழு",
     "Download" : "பதிவிறக்குக",
-    "Search" : "தேடுதல்"
+    "Search" : "தேடுதல்",
+    "Back" : "பின்னுக்கு",
+    "Select" : "Select"
 },
 "nplurals=2; plural=(n != 1);");

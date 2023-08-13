@@ -10,7 +10,9 @@
     "Create" : "Yarat",
     "Today" : "Bu gün",
     "Link" : "Link",
+    "Move" : "Move",
     "Shares" : "Yayımlanmalar",
+    "Actions" : "İşlər",
     "Share" : "Paylaş",
     "Import" : "Əlavə et",
     "Type" : "Type",
@@ -19,13 +21,17 @@
     "Title" : "Başlıq",
     "Cancel" : "Dayandır",
     "Delete" : "Sil",
+    "Sort" : "Çeşidləmək",
+    "Copy" : "Kopyala",
     "group" : "qrup",
     "Sharing" : "Paylaşılır",
     "Read" : "Oxu",
     "Update" : "Yenilənmə",
     "Error" : "Səhv",
+    "Download" : "Yüklə",
     "Search" : "Axtarış",
     "Default" : "Susmaya görə",
-    "URL" : "URL"
+    "URL" : "URL",
+    "Select" : "Seç"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

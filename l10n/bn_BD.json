@@ -10,7 +10,9 @@
     "Create" : "তৈরী কর",
     "Today" : "আজ",
     "Link" : "Link",
+    "Move" : "Move",
     "Shares" : "ভাগাভাগি",
+    "Actions" : "পদক্ষেপসমূহ",
     "Share" : "ভাগাভাগি কর",
     "Import" : "আমদানি",
     "Type" : "ধরণ",
@@ -25,8 +27,10 @@
     "Read" : "পড়",
     "Update" : "পরিবর্ধন",
     "Error" : "সমস্যা",
+    "Download" : "ডাউনলোড",
     "Search" : "Search",
     "Default" : "পূর্বনির্ধারিত",
-    "URL" : "URL"
+    "URL" : "URL",
+    "Select" : "সিলেক্ট"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

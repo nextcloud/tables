@@ -18,12 +18,20 @@ OC.L10N.register(
     "Delete" : "Kkes",
     "File" : "Afaylu",
     "Please select a file." : "Ttxil fren afaylu.",
+    "Filter" : "Sizdeg",
+    "Sort" : "Smizzwer",
+    "Copy" : "Nɣel",
     "Sharing" : "Beṭṭu",
+    "Copy to clipboard" : "Copier dans le presse-papiers",
     "Error" : "Erreur",
+    "Download" : "Sider",
     "Search" : "Nadi",
+    "Back" : "Retour",
     "Default" : "Prédéfini(e)",
     "Options" : "Iɣewwaṛen",
     "Add option" : "Rnu aɣewwaṛ",
-    "Confirm" : "Serggeg"
+    "Confirm" : "Serggeg",
+    "Content" : "Agbur",
+    "Select" : "Fren"
 },
 "nplurals=2; plural=(n != 1);");

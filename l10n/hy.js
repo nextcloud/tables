@@ -21,11 +21,15 @@ OC.L10N.register(
     "Cancel" : "ընդհատել",
     "Delete" : "հեռացնել",
     "Please select a file." : "Խնդրում ենք ընտրել նիշք:",
+    "Sort" : "Դասակարգել",
+    "Copy" : "Պատճենել",
     "group" : "խումբ",
     "Update" : "Թարմացնել",
     "Error" : "Սխալ",
+    "Download" : "Ներբեռնել",
     "Search" : "Search",
     "Default" : "Լռելյայն",
-    "URL" : "URL"
+    "URL" : "URL",
+    "Select" : "Նշել"
 },
 "nplurals=2; plural=(n != 1);");

@@ -24,8 +24,10 @@
     "Selection" : "Seleccion",
     "Move" : "Desplaçar",
     "Metadata" : "Metadonadas",
+    "Views" : "Vistas",
     "View" : "Veire",
     "Shares" : "Partatges",
+    "Actions" : "Accions",
     "Share" : "Partejar",
     "Import" : "Importar",
     "Type" : "Tipe",
@@ -37,11 +39,13 @@
     "File" : "Fichièr",
     "Information" : "Informacions",
     "Please select a file." : "Seleccionatz un fichièr.",
+    "Sort" : "Triar",
     "Searching …" : "Recèrca…",
     "group" : "grop",
     "Delete data" : "Suprimir donada",
     "Created at" : "Creat lo",
     "Sharing" : "Partiment",
+    "Copy to clipboard" : "Copiar dins lo quichapapièrs",
     "Read" : "Legit",
     "Update" : "Actualizar",
     "Error" : "Error",
@@ -60,6 +64,7 @@
     "Options" : "Opcions",
     "URL" : "URL",
     "Confirm" : "Confirmar",
+    "Preview" : "Apercebut",
     "ID" : "ID"
 },"pluralForm" :"nplurals=2; plural=(n > 1);"
 }

@@ -19,6 +19,7 @@ OC.L10N.register(
     "Title" : "Judul",
     "Cancel" : "Batal",
     "Delete" : "Padam",
+    "Sort" : "Susun",
     "group" : "kumpulan",
     "Update" : "Kemaskini",
     "Error" : "Ralat",

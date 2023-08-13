@@ -9,6 +9,7 @@
     "Today" : "இன்று",
     "Link" : "Link",
     "Move" : "Move",
+    "Actions" : "செயல்கள்",
     "Share" : "பகிர்வு",
     "Import" : "இறக்குமதி",
     "Type" : "வகை",
@@ -21,6 +22,8 @@
     "Update" : "இற்றைப்படுத்தல்",
     "Error" : "வழு",
     "Download" : "பதிவிறக்குக",
-    "Search" : "தேடுதல்"
+    "Search" : "தேடுதல்",
+    "Back" : "பின்னுக்கு",
+    "Select" : "Select"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

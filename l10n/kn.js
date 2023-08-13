@@ -15,11 +15,14 @@ OC.L10N.register(
     "Title" : "ಶೀರ್ಷಿಕೆ",
     "Cancel" : "﻿ರದ್ದು",
     "Delete" : "﻿ಅಳಿಸಿ",
+    "Copy" : "ನಕಲಿಸಿ",
     "group" : "﻿ಗುಂಪು",
     "Sharing" : "﻿ಹಂಚಿಕೆ",
     "Error" : "﻿ತಪ್ಪಾಗಿದೆ",
+    "Download" : "ಪ್ರತಿಯನ್ನು ಸ್ಥಳೀಯವಾಗಿ ಉಳಿಸಿಕೊಳ್ಳಿ",
     "Search" : "Search",
     "Default" : "ಆರಂಭದ ಪ್ರತಿ",
-    "URL" : "ಜಾಲದ ಕೊಂಡಿ"
+    "URL" : "ಜಾಲದ ಕೊಂಡಿ",
+    "Select" : "ಆಯ್ಕೆ ಮಾಡಿ"
 },
 "nplurals=2; plural=(n > 1);");

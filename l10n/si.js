@@ -12,17 +12,21 @@ OC.L10N.register(
     "Today" : "අද",
     "Link" : "සබැඳිය",
     "Shares" : "බෙදාගැනීම්",
+    "Actions" : "ක්‍රියාමාර්ග",
     "Share" : "බෙදාගන්න",
     "Time" : "වේලාව",
     "Save" : "සුරකින්න",
     "Cancel" : "අවලංගු කරන්න",
     "File" : "ගොනුව",
     "Please select a file." : "කරුණාකර ගොනුවක් තෝරන්න.",
+    "Filter" : "පෙරහන",
     "Read" : "කියවීම",
     "Update" : "යාවත්කාල",
     "Error" : "දෝෂය",
     "Download" : "බාගන්න",
     "Search" : "සොයන්න",
-    "Confirm" : "තහවුරු කරන්න"
+    "Back" : "ආපසු",
+    "Confirm" : "තහවුරු කරන්න",
+    "Preview" : "පෙරදසුන"
 },
 "nplurals=2; plural=(n != 1);");

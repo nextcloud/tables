@@ -20,6 +20,7 @@ OC.L10N.register(
     "Metadata" : "Metadati",
     "View" : "Skats",
     "Shares" : "Koplietots",
+    "Actions" : "Darbības",
     "Share" : "Koplietot",
     "Integration" : "Integrācija",
     "Total" : "Kopā",
@@ -32,6 +33,7 @@ OC.L10N.register(
     "Delete" : "Dzēst",
     "File" : "Datne",
     "Please select a file." : "Lūdzu izvēlies datni.",
+    "Sort" : "Kārtot",
     "Searching …" : "Meklē...",
     "No elements found." : "Elementi netika atrasti.",
     "group" : "grupa",
@@ -39,6 +41,7 @@ OC.L10N.register(
     "No shares" : "Nav koplietojumu",
     "Created at" : "Izveidots plkst.",
     "Sharing" : "Koplietošana",
+    "Copy to clipboard" : "Kopēt starpliktuvē",
     "Read" : "Lasīt",
     "Update" : "Atjaunināt",
     "Error" : "Kļūda",
@@ -54,6 +57,9 @@ OC.L10N.register(
     "Default" : "Noklusējuma",
     "URL" : "URL",
     "Confirm" : "Apstiprināt",
+    "Content" : "Saturs",
+    "Preview" : "Priekšskatīt",
+    "Select" : "Atzīmēt",
     "Unchecked" : "Neatzīmēts"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);");

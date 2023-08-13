@@ -14,6 +14,7 @@
     "Link" : "Холбоос",
     "Move" : "Зөөх",
     "Shares" : "Түгээлтүүд",
+    "Actions" : "Үйл ажиллагаа",
     "Share" : "Түгээх",
     "Total" : "Нийт",
     "Type" : "Төрөл",
@@ -23,6 +24,8 @@
     "Cancel" : "болиулах",
     "Delete" : "Устгах",
     "Please select a file." : "Файл сонгоно уу.",
+    "Filter" : "Шүүлтүүр",
+    "Copy" : "хуулах",
     "group" : "бүлэг",
     "Created at" : "үүсгэгдсэн",
     "Sharing" : "Түгээх",
@@ -30,9 +33,12 @@
     "Error" : "Алдаа",
     "Download" : "Татах",
     "Search" : "Хайх",
+    "Back" : "Буцах",
     "Undo" : "буцах",
     "URL" : "URL",
     "Confirm" : "Батлах",
+    "Preview" : "шалгах",
+    "Select" : "Сонгох",
     "ID" : "ID"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
