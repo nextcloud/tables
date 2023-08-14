@@ -240,7 +240,7 @@ class PermissionsService {
 	 */
 	public function canCreateRows($element, string $nodeType = 'view', ?string $userId = null): bool {
 		if ($nodeType === 'table') {
-			return $this->checkPermission($element, 'table', 'manage', $userId);
+			return $this->checkPermission($element, 'table', 'create', $userId);
 		}
 		return $this->checkPermission($element, 'view', 'create', $userId);
 	}
@@ -260,7 +260,7 @@ class PermissionsService {
 	 * @return bool
 	 */
 	public function canUpdateRowsByTableId(int $tableId, ?string $userId = null): bool {
-		return $this->checkPermissionById($tableId, 'table', 'manage', $userId);
+		return $this->checkPermissionById($tableId, 'table', 'update', $userId);
 	}
 
 
@@ -279,7 +279,7 @@ class PermissionsService {
 	 * @return bool
 	 */
 	public function canDeleteRowsByTableId(int $tableId, ?string $userId = null): bool {
-		return $this->checkPermissionById($tableId, 'table', 'manage', $userId);
+		return $this->checkPermissionById($tableId, 'table', 'delete', $userId);
 
 	}
 
