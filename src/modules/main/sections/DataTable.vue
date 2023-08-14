@@ -57,7 +57,7 @@
 							@click="$emit('show-integration')">
 							{{ t('tables', 'Integration') }}
 							<template #icon>
-								<Creation :size="20" />
+								<Connection :size="20" />
 							</template>
 						</NcActionButton>
 					</NcActions>
@@ -132,7 +132,7 @@
 							@click="$emit('show-integration')">
 							{{ t('tables', 'Integration') }}
 							<template #icon>
-								<Creation :size="20" />
+								<Connection :size="20" />
 							</template>
 						</NcActionButton>
 					</NcActions>
@@ -150,7 +150,7 @@ import IconRename from 'vue-material-design-icons/Rename.vue'
 import IconTool from 'vue-material-design-icons/TableCog.vue'
 import TableView from '../partials/TableView.vue'
 import EmptyTable from './EmptyTable.vue'
-import Creation from 'vue-material-design-icons/Creation.vue'
+import Connection from 'vue-material-design-icons/Connection.vue'
 import Import from 'vue-material-design-icons/Import.vue'
 import { NcActionButton, NcActions, NcActionCaption } from '@nextcloud/vue'
 import { mapState } from 'vuex'
@@ -161,7 +161,7 @@ export default {
 		IconTool,
 		TableView,
 		NcActionButton,
-		Creation,
+		Connection,
 		NcActionCaption,
 		NcActions,
 		TableColumnPlusAfter,

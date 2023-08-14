@@ -60,7 +60,7 @@
 							@click="$emit('show-integration')">
 							{{ t('tables', 'Integration') }}
 							<template #icon>
-								<Creation :size="20" />
+								<Connection :size="20" />
 							</template>
 						</NcActionButton>
 					</NcActions>
@@ -80,7 +80,7 @@ import { NcActions, NcActionButton, NcActionCaption } from '@nextcloud/vue'
 import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter.vue'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
 import IconImport from 'vue-material-design-icons/Import.vue'
-import Creation from 'vue-material-design-icons/Creation.vue'
+import Connection from 'vue-material-design-icons/Connection.vue'
 import ElementDescription from './ElementDescription.vue'
 
 export default {
@@ -93,7 +93,7 @@ export default {
 		NcActionButton,
 		TableColumnPlusAfter,
 		NcActionCaption,
-		Creation,
+		Connection,
 		ElementDescription,
 	},
 

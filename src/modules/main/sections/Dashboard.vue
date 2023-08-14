@@ -75,7 +75,7 @@
 										@click="actionShowIntegration(view)">
 										{{ t('tables', 'Integration') }}
 										<template #icon>
-											<Creation :size="20" />
+											<Connection :size="20" />
 										</template>
 									</NcActionButton>
 									<NcActionButton v-if="canManageElement(table)"
@@ -115,7 +115,7 @@ import permissionsMixin from '../../../shared/components/ncTable/mixins/permissi
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 import Delete from 'vue-material-design-icons/Delete.vue'
 import Moment from '@nextcloud/moment'
-import Creation from 'vue-material-design-icons/Creation.vue'
+import Connection from 'vue-material-design-icons/Connection.vue'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import displayError from '../../../shared/utils/displayError.js'
@@ -128,7 +128,7 @@ export default {
 	components: {
 		NcLoadingIcon,
 		NcActionButton,
-		Creation,
+		Connection,
 		NcActions,
 		NcButton,
 		NcAvatar,

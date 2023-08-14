@@ -32,7 +32,7 @@
 				:name="t('tables', 'Integration')">
 				<SidebarIntegration />
 				<template #icon>
-					<Creation :size="20" />
+					<Connection :size="20" />
 				</template>
 			</NcAppSidebarTab>
 			<NcAppSidebarTab v-if="activeElement && canShareElement(activeElement)"
@@ -51,7 +51,7 @@ import SidebarSharing from './SidebarSharing.vue'
 import SidebarIntegration from './SidebarIntegration.vue'
 import { NcAppSidebar, NcAppSidebarTab, NcUserBubble } from '@nextcloud/vue'
 import { mapGetters, mapState } from 'vuex'
-import Creation from 'vue-material-design-icons/Creation.vue'
+import Connection from 'vue-material-design-icons/Connection.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import Moment from '@nextcloud/moment'
 
@@ -63,7 +63,7 @@ export default {
 		SidebarIntegration,
 		NcAppSidebar,
 		NcAppSidebarTab,
-		Creation,
+		Connection,
 	},
 
 	filters: {
