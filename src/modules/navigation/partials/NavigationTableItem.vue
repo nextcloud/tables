@@ -62,7 +62,7 @@
 				@click="actionShowIntegration">
 				{{ t('tables', 'Integration') }}
 				<template #icon>
-					<Creation :size="20" />
+					<Connection :size="20" />
 				</template>
 			</NcActionButton>
 			<NcActionButton v-if="canManageElement(table)"
@@ -85,7 +85,7 @@ import { emit } from '@nextcloud/event-bus'
 import Table from 'vue-material-design-icons/Table.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import { getCurrentUser } from '@nextcloud/auth'
-import Creation from 'vue-material-design-icons/Creation.vue'
+import Connection from 'vue-material-design-icons/Connection.vue'
 import Import from 'vue-material-design-icons/Import.vue'
 import NavigationViewItem from './NavigationViewItem.vue'
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
@@ -103,7 +103,7 @@ export default {
 		NcAppNavigationItem,
 		NcCounterBubble,
 		NcAvatar,
-		Creation,
+		Connection,
 		PlaylistPlus,
 	},
 
