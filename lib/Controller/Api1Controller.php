@@ -27,7 +27,7 @@ class Api1Controller extends ApiController {
 
 	private V1Api $v1Api;
 
-	private string $userId;
+	private ?string $userId;
 
 	protected LoggerInterface $logger;
 
