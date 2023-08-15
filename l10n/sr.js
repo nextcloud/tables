@@ -248,6 +248,7 @@ OC.L10N.register(
     "Download" : "Преузми",
     "Search" : "Претрага",
     "This option is outdated." : "Ова опција је застарела.",
+    "Back" : "Назад",
     "Keyword and submit" : "Кључна реч и предајте",
     "Or use magic values" : "Или употребите магчине вредности",
     "Sorting" : "Сортирање",

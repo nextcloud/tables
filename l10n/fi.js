@@ -154,6 +154,7 @@ OC.L10N.register(
     "Create rows" : "Luo rivit",
     "Download" : "Lataa",
     "Search" : "Etsi",
+    "Back" : "Takaisin",
     "Sorting" : "Lajittelu",
     "Undo" : "Kumoa",
     "Redo" : "Tee uudelleen",
