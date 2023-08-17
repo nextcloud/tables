@@ -1,7 +1,7 @@
 <template>
 	<div class="filter-section">
 		<div v-if="hasHiddenSortingRules">
-			ℹ {{ t('tables', 'Among the sorting rules are some on which you have no permissions. However, if you like, you can override the sorting.') }}
+			ℹ {{ t('tables', 'Among the sorting rules are some to which you have no permissions. However, if you like, you can override the sorting.') }}
 			<NcButton
 				:close-after-click="true"
 				:aria-label="t('tables', 'Override sorting rules')"
