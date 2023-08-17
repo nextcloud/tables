@@ -141,7 +141,7 @@ OC.L10N.register(
     "The sorting rules are applied sequentially, meaning that if there are rows with the same priority to the first rule, the second rule determines the order among those rows." : "Die Sortierregeln werden nacheinander angewendet. Das heißt, wenn es Zeilen mit derselben Priorität wie die erste Regel gibt, bestimmt die zweite Regel die Reihenfolge zwischen diesen Zeilen.",
     "Views" : "Ansichten",
     "Create view" : "Ansicht erstellen",
-    "View" : "Ansehen",
+    "View" : "Ansicht",
     "Rows" : "Reihen",
     "Columns" : "Spalten",
     "Last edited" : "Zuletzt bearbeitet",
@@ -442,7 +442,7 @@ OC.L10N.register(
     "Could not load shared views" : "Geteilte Ansichten konnten nicht geladen werden",
     "Could not insert view." : "Ansicht konnte nicht eingefügt werden.",
     "Could not update view." : "Ansicht konnte nicht aktualisiert werden.",
-    "Could not remove view." : "Ansicht konnte nciht entfernt werden.",
+    "Could not remove view." : "Ansicht konnte nicht entfernt werden.",
     "Could not reload view." : "Ansicht konnte nicht erneut geladen werden.",
     "Could not update table." : "Tabellen konnten nicht aktualisiert werden.",
     "Could not remove table." : "Tabelle konnte nicht entfernt werden."

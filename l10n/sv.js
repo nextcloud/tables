@@ -211,6 +211,7 @@ OC.L10N.register(
     "Download" : "Ladda ner",
     "Search" : "Sök",
     "This option is outdated." : "Det här alternativet har gått ut.",
+    "Back" : "Tillbaka",
     "Keyword and submit" : "Sökord och skicka in",
     "Or use magic values" : "Eller använd magiska värden",
     "Sorting" : "Sortering",
