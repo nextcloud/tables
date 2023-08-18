@@ -133,7 +133,6 @@
     "Descending" : "Descending",
     "Reactivate sorting rule" : "Reactivate sorting rule",
     "Delete sorting rule" : "Delete sorting rule",
-    "Among the sorting rules are some on which you have no permissions. However, if you like, you can override the sorting." : "Among the sorting rules are some on which you have no permissions. However, if you like, you can override the sorting.",
     "Override sorting rules" : "Override sorting rules",
     "Add new sorting rule" : "Add new sorting rule",
     "The sorting rules are applied sequentially, meaning that if there are rows with the same priority to the first rule, the second rule determines the order among those rows." : "The sorting rules are applied sequentially, meaning that if there are rows with the same priority to the first rule, the second rule determines the order among those rows.",

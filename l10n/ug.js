@@ -9,6 +9,7 @@ OC.L10N.register(
     "Today" : "بۈگۈن",
     "Link" : "Link",
     "Move" : "Move",
+    "Actions" : "مەشغۇلاتلار",
     "Share" : "ھەمبەھىر",
     "Import" : "ئەكىر",
     "Type" : "Type",

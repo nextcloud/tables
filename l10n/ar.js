@@ -135,7 +135,6 @@ OC.L10N.register(
     "Descending" : "تَنازُلي",
     "Reactivate sorting rule" : "أعد تفعيل شرط الفرز",
     "Delete sorting rule" : "إحذِف شرط الفرز",
-    "Among the sorting rules are some on which you have no permissions. However, if you like, you can override the sorting." : "من بين شروط الفرز هنالك بعض الشروط التي ليس لديك أذونات بها. و مع ذلك، إذا كنت ترغب فيمكنك تجاوز الفرز.",
     "Override sorting rules" : "تجاوُز شروط الفرز",
     "Add new sorting rule" : "أضِف شرط فرزٍ جديد",
     "The sorting rules are applied sequentially, meaning that if there are rows with the same priority to the first rule, the second rule determines the order among those rows." : "يتم تطبيق شروط الفرز بالتسلسل؛ مما يعني أنه إذا كانت هناك صفوف لها نفس الأولوية للشرط الأول، فإن الشرط الثاني سيُحدد الترتيب بين تلك الصفوف.",

@@ -133,7 +133,6 @@
     "Descending" : "遞減",
     "Reactivate sorting rule" : "重新啟用排序規則",
     "Delete sorting rule" : "刪除排序規則",
-    "Among the sorting rules are some on which you have no permissions. However, if you like, you can override the sorting." : "排序規則中有一些您沒有權限。但是，若您願意，您可以覆寫排序。",
     "Override sorting rules" : "覆寫排序規則",
     "Add new sorting rule" : "新增排序規則",
     "The sorting rules are applied sequentially, meaning that if there are rows with the same priority to the first rule, the second rule determines the order among those rows." : "排序規則按順序套用，這代表了若存在與第一個規則有相同優先程度的列，則第二個規則會用來決定這些列之間的順序。",

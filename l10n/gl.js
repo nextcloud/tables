@@ -135,7 +135,6 @@ OC.L10N.register(
     "Descending" : "Descendente",
     "Reactivate sorting rule" : "Reactivar a regra de ordenación",
     "Delete sorting rule" : "Eliminar a regra de ordenación",
-    "Among the sorting rules are some on which you have no permissions. However, if you like, you can override the sorting." : "Entre as regras de ordenación hai algunhas sobre as que non ten permisos. Porén, se o desexa, pode anular a ordenación.",
     "Override sorting rules" : "Anular as regras de ordenación",
     "Add new sorting rule" : "Engadir unha nova regra de ordenación",
     "The sorting rules are applied sequentially, meaning that if there are rows with the same priority to the first rule, the second rule determines the order among those rows." : "As regras de ordenación aplícanse secuencialmente, o que significa que se hai filas coa mesma prioridade na primeira regra, a segunda regra determina a orde entre esas filas.",

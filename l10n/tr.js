@@ -135,7 +135,6 @@ OC.L10N.register(
     "Descending" : "Azalan",
     "Reactivate sorting rule" : "Sıralama kuralını yeniden uygula",
     "Delete sorting rule" : "Sıralama kuralını sil",
-    "Among the sorting rules are some on which you have no permissions. However, if you like, you can override the sorting." : "Sıralama kuralları arasında, üzerinde yetkiniz olmayan bazı kurallar vardır. Ancak, isterseniz sıralamayı değiştirebilirsiniz.",
     "Override sorting rules" : "Sıralama kurallarını değiştir",
     "Add new sorting rule" : "Yeni sıralama kuralı ekle",
     "The sorting rules are applied sequentially, meaning that if there are rows with the same priority to the first rule, the second rule determines the order among those rows." : "Sıralama kuralları sıralı olarak uygulanır. Yani birinci kurala göre önceliği aynı olan satırlar varsa, bu satırlar arasındaki sıralamayı ikinci kural belirler.",

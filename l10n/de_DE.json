@@ -133,7 +133,6 @@
     "Descending" : "Absteigend",
     "Reactivate sorting rule" : "Sortierregel wieder aktivieren",
     "Delete sorting rule" : "Sortierregel löschen",
-    "Among the sorting rules are some on which you have no permissions. However, if you like, you can override the sorting." : "Unter den Sortierregeln gibt es einige, für die Sie keine Berechtigung haben. Wenn Sie möchten, können Sie die Sortierung jedoch überschreiben.",
     "Override sorting rules" : "Sortierregeln überschreiben",
     "Add new sorting rule" : "Neie Sortierregel hinzufügen",
     "The sorting rules are applied sequentially, meaning that if there are rows with the same priority to the first rule, the second rule determines the order among those rows." : "Die Sortierregeln werden nacheinander angewendet. Das heißt, wenn es Zeilen mit derselben Priorität wie die erste Regel gibt, bestimmt die zweite Regel die Reihenfolge zwischen diesen Zeilen.",
