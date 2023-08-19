@@ -134,6 +134,7 @@ OC.L10N.register(
     "Descending" : "降序",
     "Reactivate sorting rule" : "重新激活排序規則",
     "Delete sorting rule" : "刪除排序規則",
+    "Among the sorting rules are some to which you have no permissions. However, if you like, you can override the sorting." : "排序規則中有一些您沒有權限。 但是，如果您願意，可以覆蓋排序。",
     "Override sorting rules" : "推翻排序規則",
     "Add new sorting rule" : "添加新排序規則",
     "The sorting rules are applied sequentially, meaning that if there are rows with the same priority to the first rule, the second rule determines the order among those rows." : "排序規則按順序應用，這意味著如果存在與第一個規則具有相同優先級的行，則第二個規則確定這些行之間的順序。",
