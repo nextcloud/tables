@@ -125,6 +125,7 @@
     "hh:mm" : "hh:mm",
     "Search Value" : "搜尋數值",
     "Filtering rows" : "過濾列",
+    "OR" : "OR",
     "Add new filter group" : "添加新過濾群組",
     "... that meet all of the following conditions" : "... 滿足以下所有條件",
     "Add new filter" : "添加新過濾",
