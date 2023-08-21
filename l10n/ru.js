@@ -87,6 +87,7 @@ OC.L10N.register(
     "Error" : "Ошибка",
     "Download" : "Скачать",
     "Search" : "Поиск",
+    "Back" : "Назад",
     "Sorting" : "Сортировка",
     "Bold" : "Жирный",
     "Italic" : "Курсив",
