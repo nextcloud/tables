@@ -33,7 +33,7 @@
     "@nextcloud/router": "^2.1.2",
     "@nextcloud/vue": "^7.12.1",
     "@tiptap/extension-character-count": "^2.1.6",
-    "@tiptap/extension-task-item": "^2.0.4",
+    "@tiptap/extension-task-item": "^2.1.6",
     "@tiptap/extension-task-list": "^2.1.6",
     "@tiptap/starter-kit": "^2.1.6",
     "@tiptap/vue-2": "^2.1.6",
