@@ -36,6 +36,7 @@ OC.L10N.register(
     "Please select a file." : "Te rugăm să alegi un fișier.",
     "Filter" : "Filtru",
     "Sort" : "Sortează",
+    "Copy" : "Copiază",
     "group" : "grup",
     "No shares" : "Nicio partajare",
     "Created at" : "Creat la",
