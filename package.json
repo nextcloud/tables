@@ -36,7 +36,7 @@
     "@tiptap/extension-task-item": "^2.1.6",
     "@tiptap/extension-task-list": "^2.1.6",
     "@tiptap/starter-kit": "^2.1.7",
-    "@tiptap/vue-2": "^2.1.6",
+    "@tiptap/vue-2": "^2.1.7",
     "debounce": "^1.2.1",
     "vue": "^2.7.14",
     "vue-material-design-icons": "^5.2.0",
