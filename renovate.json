@@ -42,11 +42,6 @@
 			]
 		},
 		{
-			"matchUpdateTypes": ["major"],
-			"matchBaseBranches": ["stable27", "stable26", "stable25"],
-			"enabled": false
-		},
-		{
 			"groupName": "tiptap",
 			"matchBaseBranches": ["stable25"],
 			"matchPackagePrefixes": [
