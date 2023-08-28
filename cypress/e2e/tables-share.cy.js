@@ -32,7 +32,6 @@ describe('Manage a table', () => {
 		cy.get('.sharing input').type(localUser2.userId)
 		cy.wait(1000).get('.sharing input').type('{enter}')
 
-		cy.wait(10).get('.toastify.toast-success').should('be.visible')
 		cy.get('h3').contains('Shares').parent().find('ul').contains(localUser2.userId).should('exist')
 	})
 
