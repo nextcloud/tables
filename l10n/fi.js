@@ -191,7 +191,6 @@ OC.L10N.register(
     "Content" : "Sisältö",
     "Preview" : "Esikatselu",
     "Select" : "Valitse",
-    "Share was deleted" : "Jako poistettiin",
     "Contains" : "Sisältää",
     "Unchecked" : "Ei tarkistettu",
     "Now" : "Nyt",
