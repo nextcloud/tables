@@ -32,6 +32,7 @@ OC.L10N.register(
     "Target" : "Obiettivo",
     "Date, time or whatever" : "Data, ora o altro",
     "Progress" : "Avanzamento",
+    "What" : "Cosa",
     "Done" : "Completato",
     "Add a new column" : "Aggiungi una nuova colonna",
     "No title given" : "Nessun titolo specificato",
