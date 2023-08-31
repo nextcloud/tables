@@ -21,12 +21,22 @@ export default new Router({
 			name: 'table',
 		},
 		{
+			path: '/table/:tableId/content',
+			component: MainDashboardWrapper,
+			name: 'table',
+		},
+		{
 			path: '/table/:tableId/row/:rowId',
 			component: MainDashboardWrapper,
 			name: 'tableRow',
 		},
 		{
 			path: '/view/:viewId',
+			component: MainViewWrapper,
+			name: 'view',
+		},
+		{
+			path: '/view/:viewId/content',
 			component: MainViewWrapper,
 			name: 'view',
 		},
