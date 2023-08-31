@@ -154,8 +154,8 @@ class RowMapper extends QBMapper {
 				if ($this->platform === IColumnTypeQB::DB_PLATFORM_PGSQL) {
 					$orderString = 'c'.$sortRule['columnId'].'->>\'value\'';
 				} elseif ($this->platform === IColumnTypeQB::DB_PLATFORM_SQLITE) {
-					// TODO DB BE SQLITE
-					$orderString = '';
+					// here is an error for (multiple) sorting, works only for the first column at the moment
+					$orderString = 'json_extract(t2.value, "$.value")';
 				} else { // mariadb / mysql
 					$orderString = 'JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'$[*].columnId\'), \'one\', :'.$sortColumnPlaceholder.')), \'.value\'))';
 				}

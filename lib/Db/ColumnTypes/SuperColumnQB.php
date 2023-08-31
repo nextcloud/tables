@@ -23,8 +23,7 @@ class SuperColumnQB implements IColumnTypeQB {
 		if ($this->platform === self::DB_PLATFORM_PGSQL) {
 			return 'LOWER('.$unformattedValue.')';
 		} elseif ($this->platform === self::DB_PLATFORM_SQLITE) {
-			// TODO DB BE SQLITE
-			return '';
+			return $unformattedValue;
 		} else { // mariadb / mysql
 			return 'JSON_UNQUOTE(LOWER(' . $unformattedValue . '))';
 		}
@@ -80,9 +79,9 @@ class SuperColumnQB implements IColumnTypeQB {
 
 	private function getFormattedDataCellValue(string $columnPlaceHolder, int $columnId): string {
 		if ($this->platform === self::DB_PLATFORM_PGSQL) {
-			$cellValue = 'c'.intval($columnId).' ->> \'value\'';
+			$cellValue = 'c'.$columnId.' ->> \'value\'';
 		} elseif ($this->platform === self::DB_PLATFORM_SQLITE) {
-			// TODO DB BE SQLITE
+			$cellValue = 'json_extract(t2.value, "$.columnId") = '.$columnId.' AND LOWER(json_extract(t2.value, "$.value"))';
 		} else {
 			$cellValue = 'JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'$[*].columnId\'), \'one\', :'.$columnPlaceHolder.')), \'.value\'))';
 		}
@@ -134,8 +133,8 @@ class SuperColumnQB implements IColumnTypeQB {
 		if ($this->platform === self::DB_PLATFORM_PGSQL) {
 			$sqlFilterString = $filterOperation;
 		} elseif ($this->platform === self::DB_PLATFORM_SQLITE) {
-			// TODO DB BE SQLITE
-			$sqlFilterString = '';
+			$qb->from($qb->createFunction('json_each(data) as t2'));
+			$sqlFilterString = $filterOperation;
 		} else { // mariadb / mysql
 			$sqlFilterString = $filterOperation;
 		}
