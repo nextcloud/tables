@@ -23,7 +23,7 @@ trait Errors {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (InternalError|\Exception $e) {
-			$this->logger->warning('An internal error or exception accured: '.$e->getMessage());
+			$this->logger->warning('An internal error or exception occurred: '.$e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}

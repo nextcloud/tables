@@ -8,7 +8,7 @@ use OCA\Tables\Db\Column;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
-use OCA\Tables\Service\ColumnTypes\TextLineBusiness;
+use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
@@ -55,7 +55,8 @@ class ImportService extends SuperService {
 	}
 
 	/**
-	 * @param int $viewId
+	 * @param int|null $tableId
+	 * @param int|null $viewId
 	 * @param string $path
 	 * @param bool $createMissingColumns
 	 * @return array
@@ -159,7 +160,7 @@ class ImportService extends SuperService {
 		try {
 			$businessClassName = 'OCA\Tables\Service\ColumnTypes\\';
 			$businessClassName .= ucfirst($column->getType()).ucfirst($column->getSubtype()).'Business';
-			/** @var TextLineBusiness $columnBusiness */
+			/** @var IColumnTypeBusiness $columnBusiness */
 			$columnBusiness = Server::get($businessClassName);
 			if(!$columnBusiness->canBeParsed($value, $column)) {
 				$this->logger->warning('Value '.$value.' could not be parsed for column '.$column->getTitle());
@@ -168,7 +169,7 @@ class ImportService extends SuperService {
 			}
 			return $columnBusiness->parseValue($value, $column);
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
-			$this->logger->debug('Column type business class not found');
+			$this->logger->debug('Column type business class not found', ['exception' => $e]);
 		}
 		return '';
 	}
