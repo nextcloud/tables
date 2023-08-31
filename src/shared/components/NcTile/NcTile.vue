@@ -1,5 +1,5 @@
 <template>
-	<div :tabindex="tabbable ? 0 : null" class="tile" :class="{active: localeActive}" @click="$emit('set-template')">
+	<div :tabindex="tabbable ? 0 : null" class="tile" :class="{active: localeActive}" @click="$emit('set-template')" @keyup.enter="$emit('set-template')">
 		<h3>{{ title }}</h3>
 		<p>{{ body }}</p>
 	</div>
