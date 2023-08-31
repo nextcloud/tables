@@ -245,6 +245,7 @@ OC.L10N.register(
     "Nextcloud Tables" : "Nextcloud Taulak",
     "Content" : "Edukia",
     "Preview" : "Aurrebista",
+    "Select" : "Hautatu",
     "Insert" : "Txertatu",
     "Unchecked" : "Egiaztatu gabea",
     "Now" : "Orain",
