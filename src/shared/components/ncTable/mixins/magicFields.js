@@ -35,14 +35,14 @@ export const MagicFields = {
 		label: t('tables', 'Me (user ID)'),
 		icon: 'icon-user',
 		goodFor: [ColumnTypes.TextLine, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.TextRich, ColumnTypes.TextLink],
-		replace: getCurrentUser().uid,
+		replace: getCurrentUser()?.uid,
 	}),
 	MyName: new MagicField({
 		id: 'my-name',
 		label: t('tables', 'Me (name)'),
 		icon: 'icon-user',
 		goodFor: [ColumnTypes.TextLine, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.TextRich, ColumnTypes.TextLink],
-		replace: getCurrentUser().displayName,
+		replace: getCurrentUser()?.displayName,
 	}),
 	Checked: new MagicField({
 		id: 'checked',
