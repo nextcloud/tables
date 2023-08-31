@@ -9,12 +9,13 @@ use OCA\Tables\Service\RowService;
 
 class V1Api {
 	private RowService $rowService;
-
 	private ColumnService $columnService;
+	private string $userId;
 
-	public function __construct(ColumnService $columnService, RowService $rowService) {
+	public function __construct(ColumnService $columnService, RowService $rowService, string $userId) {
 		$this->columnService = $columnService;
 		$this->rowService = $rowService;
+		$this->userId = $userId;
 	}
 
 	/**
@@ -28,7 +29,7 @@ class V1Api {
 	public function getData(int $tableId, ?int $limit, ?int $offset): array {
 		$columns = $this->columnService->findAllByTable($tableId);
 
-		$rows = $this->rowService->findAllByTable($tableId, $limit, $offset);
+		$rows = $this->rowService->findAllByTable($tableId, $this->userId, $limit, $offset);
 
 		$data = [];
 

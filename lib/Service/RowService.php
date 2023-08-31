@@ -34,15 +34,16 @@ class RowService extends SuperService {
 
 	/**
 	 * @param int $tableId
+	 * @param string $userId
 	 * @param ?int $limit
 	 * @param ?int $offset
 	 * @return array
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function findAllByTable(int $tableId, ?int $limit = null, ?int $offset = null): array {
+	public function findAllByTable(int $tableId, string $userId, ?int $limit = null, ?int $offset = null): array {
 		try {
-			if ($this->permissionsService->canReadRowsByElementId($tableId, 'table')) {
+			if ($this->permissionsService->canReadRowsByElementId($tableId, 'table', $userId)) {
 				return $this->mapper->findAllByTable($tableId, $limit, $offset);
 			} else {
 				throw new PermissionError('no read access to table id = '.$tableId);
@@ -66,7 +67,7 @@ class RowService extends SuperService {
 	 */
 	public function findAllByView(int $viewId, string $userId, ?int $limit = null, ?int $offset = null): array {
 		try {
-			if ($this->permissionsService->canReadRowsByElementId($viewId, 'view')) {
+			if ($this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)) {
 				return $this->mapper->findAllByView($this->viewMapper->find($viewId), $userId, $limit, $offset);
 			} else {
 				throw new PermissionError('no read access to view id = '.$viewId);

@@ -479,7 +479,7 @@ class Api1Controller extends ApiController {
 	 */
 	public function indexTableRows(int $tableId, ?int $limit, ?int $offset): DataResponse {
 		return $this->handleError(function () use ($tableId, $limit, $offset) {
-			return $this->rowService->findAllByTable($tableId, $limit, $offset);
+			return $this->rowService->findAllByTable($tableId, $this->userId, $limit, $offset);
 		});
 	}
 
