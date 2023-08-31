@@ -10,7 +10,7 @@ use OCA\Tables\Service\RowService;
 class V1Api {
 	private RowService $rowService;
 	private ColumnService $columnService;
-	private string $userId;
+	private ?string $userId;
 
 	public function __construct(ColumnService $columnService, RowService $rowService, string $userId) {
 		$this->columnService = $columnService;
