@@ -79,8 +79,8 @@ export default {
 	},
 
 	async mounted() {
-		await this.setupEditor()
 		this.localValue = this.text
+		await this.setupEditor()
 		this.editor.setContent(this.localValue, false)
 	},
 
