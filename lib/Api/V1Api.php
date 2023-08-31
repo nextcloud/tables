@@ -12,7 +12,7 @@ class V1Api {
 	private ColumnService $columnService;
 	private ?string $userId;
 
-	public function __construct(ColumnService $columnService, RowService $rowService, string $userId) {
+	public function __construct(ColumnService $columnService, RowService $rowService, ?string $userId) {
 		$this->columnService = $columnService;
 		$this->rowService = $rowService;
 		$this->userId = $userId;
