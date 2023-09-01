@@ -72,8 +72,16 @@ export default {
 	watch: {
 		text(value) {
 			if (value.trim() !== this.localValue.trim()) {
-				this.editor.setContent(value, false)
 				this.localValue = value
+
+				// reset editor if content is empty
+				// otherwise the (empty) content will not be updated
+				if (value === '') {
+					console.debug('setupEditor!')
+					this.setupEditor()
+				} else {
+					this.editor.setContent(value, true)
+				}
 			}
 		},
 	},
