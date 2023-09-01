@@ -4,6 +4,7 @@
     "Select columns" : "Hautatu zutabeak",
     "e.g. 1,2,4 or leave empty" : "adib. 1,2,4 edo hutsik",
     "_%n row_::_%n rows_" : ["Errenkada %n","%n errenkada"],
+    "This column was automatically created by the import service." : "Zutabea automatikoki sortu du inportazio zerbitzuak.",
     "Tutorial" : "Tutoriala",
     "ToDo list" : "Egitekoen zerrenda",
     "Setup a simple todo-list." : "Konfiguratu zeregin-zerrenda sinple bat.",
@@ -59,6 +60,10 @@
     "The Boss" : "Buruzagia",
     "Bob will help for this time" : "Bob-ek lagunduko du oraingoan",
     "We have to talk about that." : "Horretaz hitz egin behar dugu.",
+    "Create Vacation Request" : "Sortu opor eskaera",
+    "Open Request" : "Ireki eskaera",
+    "Request Status" : "Eskaeraren egoera",
+    "Closed requests" : "Itxitako eskaera",
     "Position" : "Kokalekua",
     "Skills" : "Gaitasunak",
     "Birthday" : "Jaioteguna",
@@ -248,6 +253,8 @@
     "Unchecked" : "Egiaztatu gabea",
     "Now" : "Orain",
     "ID" : "ID",
+    "Request is not authorized. Are you logged in?" : "Eskaerak egiteko baimenik ez. Saioa hasi al duzu?",
+    "Request not allowed." : "Ez da eskaera onartu.",
     "Could not update row." : "Ezin izan da orain eguneratu.",
     "Could not fetch tables" : "Ezin izan dira taulak eskuratu"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
