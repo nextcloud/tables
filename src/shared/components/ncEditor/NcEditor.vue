@@ -79,7 +79,7 @@ export default {
 				if (value === '') {
 					this.setupEditor()
 				} else {
-					this.editor.setContent(value, true)
+					this.editor.setContent(value)
 				}
 			}
 		},
