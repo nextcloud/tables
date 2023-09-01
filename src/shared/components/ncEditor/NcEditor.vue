@@ -77,7 +77,6 @@ export default {
 				// reset editor if content is empty
 				// otherwise the (empty) content will not be updated
 				if (value === '') {
-					console.debug('setupEditor!')
 					this.setupEditor()
 				} else {
 					this.editor.setContent(value, true)
