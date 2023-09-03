@@ -1,8 +1,11 @@
 OC.L10N.register(
     "tables",
     {
+    "Nextcloud tables" : "Nextcloud таблицы",
+    "Select table" : "Выбрать таблицу",
     "Select columns" : "Выбрать столбцы",
     "e.g. 1,2,4 or leave empty" : "например 1,2,4 или оставьте пустым",
+    "_%n row_::_%n rows_" : ["%n строка","%n строки","%n строк","%n строк"],
     "ToDo list" : "Список задач",
     "Members" : "Участники",
     "Customers" : "Клиенты",
