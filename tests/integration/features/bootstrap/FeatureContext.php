@@ -62,6 +62,14 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	private ?array $tableColumns = [];
 	private ?array $importResult = null;
 
+	// we need some ids to reuse it in some contexts,
+	// but we can not return them and reuse it in the scenarios,
+	// that's why we hold a kind of register here
+	// structure: $name -> item-id
+	// example for a table: 'test-table' -> 5
+	private array $tableIds = [];
+	private array $viewIds = [];
+
 	use CommandLineTrait;
 
 	/**
@@ -159,6 +167,18 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	}
 
 	/**
+	 * @Then print register
+	 *
+	 */
+	public function printRegister(): void {
+		echo "REGISTER ========================\n";
+		echo "Tables --------------------\n";
+		print_r($this->tableIds);
+		echo "Views --------------------\n";
+		print_r($this->viewIds);
+	}
+
+	/**
 	 * @Then table contains at least following rows
 	 *
 	 * @param TableNode $table
@@ -230,13 +250,88 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	}
 
 	/**
-	 * @Given table :table with emoji :emoji exists for user :user
+	 * @Then table :tableName has the following views for user :user
+	 *
+	 * @param string $tableName
+	 * @param string $user
+	 * @param TableNode|null $body
+	 */
+	public function tableViews(string $tableName, string $user, TableNode $body = null): void {
+		$this->setCurrentUser($user);
+
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/tables/'.$this->tableIds[$tableName].'/views'
+		);
+
+		$data = $this->getDataFromResponse($this->response);
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		// check if views are empty
+		if ($body === null) {
+			Assert::assertCount(0, $data);
+			return;
+		}
+
+		// check if given view exists
+		$titles = [];
+		foreach ($data as $d) {
+			$titles[] = $d['title'];
+		}
+		foreach ($body->getRows()[0] as $viewTitle) {
+			Assert::assertTrue(in_array($viewTitle, $titles, true));
+		}
+	}
+
+	/**
+	 * @Given user :user create view :title with emoji :emoji for :tableName as :viewName
 	 *
 	 * @param string $user
 	 * @param string $title
+	 * @param string $tableName
+	 * @param string $viewName
 	 * @param string|null $emoji
 	 */
-	public function createTable(string $user, string $title, string $emoji = null): void {
+	public function createView(string $user, string $title, string $tableName, string $viewName, string $emoji = null): void {
+		$this->setCurrentUser($user);
+		$this->sendRequest(
+			'POST',
+			'/apps/tables/api/1/tables/'.$this->tableIds[$tableName].'/views',
+			[
+				'title' => $title,
+				'emoji' => $emoji
+			]
+		);
+
+		$newItem = $this->getDataFromResponse($this->response);
+		$this->viewIds[$viewName] = $newItem['id'];
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($newItem['title'], $title);
+		Assert::assertEquals($newItem['emoji'], $emoji);
+
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/views/'.$newItem['id'],
+		);
+
+		$itemToVerify = $this->getDataFromResponse($this->response);
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($itemToVerify['title'], $title);
+		Assert::assertEquals($itemToVerify['emoji'], $emoji);
+	}
+
+	/**
+	 * @Given table :table with emoji :emoji exists for user :user as :tableName
+	 *
+	 * @param string $user
+	 * @param string $title
+	 * @param string $tableName
+	 * @param string|null $emoji
+	 */
+	public function createTable(string $user, string $title, string $tableName, string $emoji = null): void {
 		$this->setCurrentUser($user);
 		$this->sendRequest(
 			'POST',
@@ -249,6 +344,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 
 		$newTable = $this->getDataFromResponse($this->response);
 		$this->tableId = $newTable['id'];
+		$this->tableIds[$tableName] = $newTable['id'];
 
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($newTable['title'], $title);
@@ -326,6 +422,71 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 		Assert::assertEquals($tableToVerify['title'], $title);
 		Assert::assertEquals($tableToVerify['emoji'], $emoji);
 		Assert::assertEquals($tableToVerify['ownership'], $user);
+	}
+
+	/**
+	 * @When user :user update view :viewName with title :title and emoji :emoji
+	 *
+	 * @param string $user
+	 * @param string $viewName
+	 * @param string $title
+	 * @param string|null $emoji
+	 */
+	public function updateView(string $user, string $viewName, string $title, ?string $emoji): void {
+		$this->setCurrentUser($user);
+
+		$data = ['title' => $title];
+		if ($emoji !== null) {
+			$data['emoji'] = $emoji;
+		}
+
+		$this->sendRequest(
+			'PUT',
+			'/apps/tables/api/1/views/'.$this->viewIds[$viewName],
+			[ 'data' => json_encode($data) ]
+		);
+
+		$updatedItem = $this->getDataFromResponse($this->response);
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($updatedItem['title'], $title);
+		Assert::assertEquals($updatedItem['emoji'], $emoji);
+
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/views/'.$updatedItem['id'],
+		);
+
+		$itemToVerify = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($itemToVerify['title'], $title);
+		Assert::assertEquals($itemToVerify['emoji'], $emoji);
+	}
+
+	/**
+	 * @When user :user deletes view :viewName
+	 *
+	 * @param string $user
+	 * @param string $viewName
+	 */
+	public function deleteView(string $user, string $viewName): void {
+		$this->setCurrentUser($user);
+
+		$this->sendRequest(
+			'DELETE',
+			'/apps/tables/api/1/views/'.$this->viewIds[$viewName]
+		);
+		$deletedItem = $this->getDataFromResponse($this->response);
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/tables/'.$deletedItem['id'],
+		);
+		Assert::assertEquals(404, $this->response->getStatusCode());
+
+		unset($this->viewIds[$viewName]);
 	}
 
 	/**
@@ -658,8 +819,6 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 			$props[$columnId] = $row[1];
 		}
 
-		print_r($props);
-
 		$this->sendRequest(
 			'POST',
 			'/apps/tables/api/1/tables/'.$this->tableId.'/rows',
@@ -667,7 +826,6 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 		);
 
 		$newRow = $this->getDataFromResponse($this->response);
-		// var_dump($newRow);
 		$this->rowId = $newRow['id'];
 
 		Assert::assertEquals(200, $this->response->getStatusCode());
