@@ -124,17 +124,10 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function indexViews(int $tableId, string $keyword = null, int $limit = 100, int $offset = 0): DataResponse {
-		if ($keyword) {
-			return $this->handleError(function () use ($keyword, $limit, $offset) {
-				return $this->viewService->search($keyword, $limit, $offset);
-			});
-		} else {
-			return $this->handleError(function () use ($tableId) {
-				return $this->viewService->findAll($this->tableService->find($tableId));
-			});
-		}
-
+	public function indexViews(int $tableId): DataResponse {
+		return $this->handleError(function () use ($tableId) {
+			return $this->viewService->findAll($this->tableService->find($tableId));
+		});
 	}
 
 	/**
@@ -164,9 +157,11 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function updateView(int $viewId, array $data): DataResponse {
-		return $this->handleError(function () use ($viewId, $data) {
-			return $this->viewService->update($viewId, $data);
+	public function updateView(int $viewId, string $data): DataResponse {
+		$dataNew = json_decode($data, true);
+
+		return $this->handleError(function () use ($viewId, $dataNew) {
+			return $this->viewService->update($viewId, $dataNew);
 		});
 	}
 

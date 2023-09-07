@@ -38,7 +38,7 @@ class ViewMapper extends QBMapper {
 			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
 		$view = $this->findEntity($qb);
 		if(!$skipEnhancement) {
-			$this->enhanceByOwnership($view);
+			$this->enhanceOwnership($view);
 		}
 		return $view;
 	}
@@ -58,7 +58,7 @@ class ViewMapper extends QBMapper {
 		}
 		$views = $this->findEntities($qb);
 		foreach($views as $view) {
-			$this->enhanceByOwnership($view);
+			$this->enhanceOwnership($view);
 		}
 		return $views;
 	}
@@ -119,7 +119,7 @@ class ViewMapper extends QBMapper {
 
 		$views = $this->findEntities($qb);
 		foreach($views as $view) {
-			$this->enhanceByOwnership($view);
+			$this->enhanceOwnership($view);
 		}
 		return $views;
 	}
@@ -129,7 +129,7 @@ class ViewMapper extends QBMapper {
 	 * @return void
 	 * @throws InternalError
 	 */
-	private function enhanceByOwnership(View $view): void {
+	private function enhanceOwnership(View $view): void {
 		try {
 			$view->setOwnership($this->tableMapper->findOwnership($view->getTableId()));
 		} catch (Exception $e) {
