@@ -15,7 +15,7 @@ Feature: api/tablesapi
     Then user "participant1" has the following tables
       | my new awesome table |
     Then user "participant1" updates table with keyword "awesome" set title "renamed table" and optional emoji "🍓"
-    Then user "participant1" updates table with keyword "renamed table" set title "renamed table without emoji" and optional emoji ""∆
+    Then user "participant1" updates table with keyword "renamed table" set title "renamed table without emoji" and optional emoji ""
     Then user "participant1" deletes table with keyword "without emoji"
     Then user "participant1" has the following tables
       | Tutorial |
