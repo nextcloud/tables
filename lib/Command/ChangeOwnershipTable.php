@@ -68,14 +68,7 @@ class ChangeOwnershipTable extends Command {
 		$newOwnerUserId = $input->getArgument('user-id');
 
 		try {
-			$table = $this->tableService->setOwner($id, $newOwnerUserId, '');
-
-			$arr = $table->jsonSerialize();
-			unset($arr['hasShares']);
-			unset($arr['isShared']);
-			unset($arr['onSharePermissions']);
-			unset($arr['rowsCount']);
-			unset($arr['ownerDisplayName']);
+			$arr = $this->tableService->setOwner($id, $newOwnerUserId, '');
 			$output->writeln(json_encode($arr, JSON_PRETTY_PRINT));
 		} catch (InternalError $e) {
 			$output->writeln('Error occurred: '.$e->getMessage());

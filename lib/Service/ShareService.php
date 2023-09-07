@@ -46,12 +46,12 @@ class ShareService extends SuperService {
 	/**
 	 * @throws InternalError
 	 */
-	public function findAll(string $nodeType, int $nodeId, ?string $userId = null): array {
+	public function findAll(string $nodeType, int $nodeId, ?string $userId = null, bool $enhanceShares = true): array {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
 			$shares = $this->mapper->findAllSharesForNode($nodeType, $nodeId, $userId);
-			return $this->addReceiverDisplayNames($shares);
+			return $enhanceShares ? $this->addReceiverDisplayNames($shares) : $shares;
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
@@ -163,17 +163,6 @@ class ShareService extends SuperService {
 		}
 		return $this->permissionsService->getSharedPermissionsIfSharedWithMe($elementId, $elementType, $userId);
 	}
-
-
-
-
-
-
-
-
-
-
-
 
 	/**
 	 * @param int $nodeId
@@ -320,4 +309,26 @@ class ShareService extends SuperService {
 			$this->logger->error('something went wrong while deleting shares for view: '.$view->getId());
 		}
 	}
+
+	/**
+	 * @throws InternalError
+	 */
+	public function changeSenderForNode(string $nodeType, int $nodeId, string $newOwnerUserId, ?string $userId = null): array {
+		$sharesForTable = $this->findAll($nodeType, $nodeId, $userId, false);
+		$newShares = [];
+
+		foreach ($sharesForTable as $share) {
+			/* @var Share $share */
+			$share->setSender($newOwnerUserId);
+			try {
+				$this->mapper->update($share);
+			} catch (\OCP\DB\Exception $e) {
+				$this->logger->warning("Could not update share to change the sender: ".$e->getMessage(), ['exception' => $e]);
+				throw new InternalError("Could not update share to change the sender");
+			}
+			$newShares[] = $share;
+		}
+		return $newShares;
+	}
+
 }

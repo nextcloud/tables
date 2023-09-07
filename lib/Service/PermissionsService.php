@@ -51,8 +51,9 @@ class PermissionsService {
 		}
 
 		if ($userId === null) {
+			$e = new \Exception();
 			$error = 'PreCheck for userId failed, requested in '. get_class($this) .'.';
-			$this->logger->debug($error);
+			$this->logger->debug($error, $e->getTrace());
 			throw new InternalError($error);
 		}
 
@@ -438,7 +439,7 @@ class PermissionsService {
 			return true;
 		}
 
-		if ($this->userIsElementOwner($userId, $element)) {
+		if ($this->userIsElementOwner($element, $userId)) {
 			return true;
 		}
 		try {
@@ -480,7 +481,7 @@ class PermissionsService {
 		return false;
 	}
 
-	private function userIsElementOwner(string $userId, $element): bool {
+	private function userIsElementOwner($element, string $userId = null): bool {
 		return $element->getOwnership() === $userId;
 	}
 
