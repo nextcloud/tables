@@ -846,6 +846,44 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	}
 
 	/**
+	 * @Then row exists with following values via legacy interface
+	 *
+	 * @param TableNode|null $properties
+	 */
+	public function createRowLegacy(TableNode $properties = null): void {
+		$props = [];
+		foreach ($properties->getRows() as $row) {
+			$columnId = $this->tableColumns[$row[0]];
+			$props[$columnId] = $row[1];
+		}
+
+		$this->sendRequest(
+			'POST',
+			'/apps/tables/api/1/tables/'.$this->tableId.'/rows',
+			['data' => json_encode($props)]
+		);
+
+		$newRow = $this->getDataFromResponse($this->response);
+		$this->rowId = $newRow['id'];
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		foreach ($newRow['data'] as $cell) {
+			Assert::assertEquals($props[$cell['columnId']], $cell['value']);
+		}
+
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/rows/'.$newRow['id'],
+		);
+
+		$rowToVerify = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		foreach ($rowToVerify['data'] as $cell) {
+			Assert::assertEquals($props[$cell['columnId']], $cell['value']);
+		}
+	}
+
+	/**
 	 * @Then user deletes last created row
 	 */
 	public function deleteRow(): void {
@@ -902,12 +940,42 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 		}
 	}
 
+	/**
+	 * @Then set following values for last created row via legacy interface
+	 *
+	 * @param TableNode|null $properties
+	 */
+	public function updateRowLegacy(TableNode $properties = null): void {
+		$props = [];
+		foreach ($properties->getRows() as $row) {
+			$columnId = $this->tableColumns[$row[0]];
+			$props[$columnId] = $row[1];
+		}
 
+		$this->sendRequest(
+			'PUT',
+			'/apps/tables/api/1/rows/'.$this->rowId,
+			['data' => json_encode($props)]
+		);
 
+		$row = $this->getDataFromResponse($this->response);
 
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		foreach ($row['data'] as $cell) {
+			Assert::assertEquals($props[$cell['columnId']], $cell['value']);
+		}
 
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/rows/'.$row['id'],
+		);
 
-
+		$rowToVerify = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		foreach ($rowToVerify['data'] as $cell) {
+			Assert::assertEquals($props[$cell['columnId']], $cell['value']);
+		}
+	}
 
 	/*
 	 * User management

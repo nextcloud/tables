@@ -1,5 +1,7 @@
 <?php
 
+/** @noinspection DuplicatedCode */
+
 namespace OCA\Tables\Controller;
 
 use OCA\Tables\Api\V1Api;
@@ -12,7 +14,9 @@ use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
 use OCP\AppFramework\ApiController;
+use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
+use OCP\IL10N;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
@@ -24,6 +28,7 @@ class Api1Controller extends ApiController {
 	private ImportService $importService;
 	private ViewService $viewService;
 	private ViewMapper $viewMapper;
+	private IL10N $l10N;
 
 	private V1Api $v1Api;
 
@@ -45,6 +50,7 @@ class Api1Controller extends ApiController {
 		ViewMapper $viewMapper,
 		V1Api $v1Api,
 		LoggerInterface $logger,
+		IL10N $l10N,
 		?string $userId
 	) {
 		parent::__construct(Application::APP_ID, $request);
@@ -58,6 +64,7 @@ class Api1Controller extends ApiController {
 		$this->userId = $userId;
 		$this->v1Api = $v1Api;
 		$this->logger = $logger;
+		$this->l10N = $l10N;
 	}
 
 	// Tables
@@ -491,8 +498,19 @@ class Api1Controller extends ApiController {
 	 * @NoAdminRequired
 	 * @CORS
 	 * @NoCSRFRequired
+	 *
+	 * @param array|string $data
 	 */
-	public function createRowInView(int $viewId, array $data): DataResponse {
+	public function createRowInView(int $viewId, $data): DataResponse {
+		if(is_string($data)) {
+			$data = json_decode($data, true);
+		}
+		if(!is_array($data)) {
+			$this->logger->warning('createRowInView not possible, data array invalid.');
+			$message = ['message' => $this->l10N->t('Could not create row.')];
+			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
+
 		$dataNew = [];
 		foreach ($data as $key => $value) {
 			$dataNew[] = [
@@ -510,8 +528,19 @@ class Api1Controller extends ApiController {
 	 * @NoAdminRequired
 	 * @CORS
 	 * @NoCSRFRequired
+	 *
+	 * @param array|string $data
 	 */
-	public function createRowInTable(int $tableId, array $data): DataResponse {
+	public function createRowInTable(int $tableId, $data): DataResponse {
+		if(is_string($data)) {
+			$data = json_decode($data, true);
+		}
+		if(!is_array($data)) {
+			$this->logger->warning('createRowInTable not possible, data array invalid.');
+			$message = ['message' => $this->l10N->t('Could not create row.')];
+			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
+
 		$dataNew = [];
 		foreach ($data as $key => $value) {
 			$dataNew[] = [
@@ -540,8 +569,18 @@ class Api1Controller extends ApiController {
 	 * @NoAdminRequired
 	 * @CORS
 	 * @NoCSRFRequired
+	 *
+	 * @param array|string $data
 	 */
-	public function updateRow(int $rowId, ?int $viewId, array $data): DataResponse {
+	public function updateRow(int $rowId, ?int $viewId, $data): DataResponse {
+		if(is_string($data)) {
+			$data = json_decode($data, true);
+		}
+		if(!is_array($data)) {
+			$this->logger->warning('updateRow not possible, data array invalid.');
+			$message = ['message' => $this->l10N->t('Could not update row.')];
+			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
 		$dataNew = [];
 		foreach ($data as $key => $value) {
 			$dataNew[] = [
