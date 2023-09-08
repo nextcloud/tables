@@ -24,7 +24,7 @@ export default {
 	},
 	computed: {
 		getValue() {
-			return this.value
+			return this.value.toFixed(this.column?.numberDecimals)
 		},
 	},
 }
