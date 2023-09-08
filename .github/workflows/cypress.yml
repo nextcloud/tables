@@ -63,6 +63,18 @@ jobs:
           ref: ${{ matrix.server-versions }}
           path: apps/viewer
 
+      - name: Register text Git reference
+        run: |
+          text_app_ref="$(if [ "${{ matrix.server-versions }}" = "master" ]; then echo -n "main"; else echo -n "${{ matrix.server-versions }}"; fi)"
+          echo "text_app_ref=$text_app_ref" >> $GITHUB_ENV
+
+      - name: Checkout text app
+        uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+        with:
+          repository: nextcloud/text
+          path: apps/text
+          ref: ${{ env.text_app_ref }}
+
       - name: Checkout app
         uses: actions/checkout@v3
         with:
@@ -107,6 +119,7 @@ jobs:
           ./occ config:system:set memcache.distributed --value="\\OC\\Memcache\\APCu"
           cat config/config.php
           ./occ user:list
+          ./occ app:enable --force text
           ./occ app:enable --force ${{ env.APP_NAME }}
           ./occ config:system:set query_log_file --value '/home/runner/work/${{ env.APP_NAME }}/${{ env.APP_NAME }}/query.log'
           php -S 127.0.0.1:8081 > /tmp/requestlog 2>&1 &
