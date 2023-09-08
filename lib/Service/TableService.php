@@ -5,6 +5,7 @@ namespace OCA\Tables\Service;
 use DateTime;
 use Exception;
 
+use OCA\Tables\Db\Share;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Errors\InternalError;
@@ -261,7 +262,7 @@ class TableService extends SuperService {
 	/**
 	 * @throws InternalError
 	 */
-	public function setOwner(int $id, string $newOwnerUserId, ?string $userId = null): Table {
+	public function setOwner(int $id, string $newOwnerUserId, ?string $userId = null): array {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
@@ -274,8 +275,26 @@ class TableService extends SuperService {
 
 			$table->setOwnership($newOwnerUserId);
 			$table = $this->mapper->update($table);
-			$this->enhanceTable($table, $userId);
-			return $table;
+
+			// also change owners of related shares
+			$updatedShares = $this->shareService->changeSenderForNode('table', $id, $newOwnerUserId, $userId);
+			$updatesSharesOutput = [];
+			foreach ($updatedShares as $share) {
+				$updatesSharesOutput[] = [
+					'shareId' => $share->getId(),
+					'nodeType' => $share->getNodeType(),
+					'sender' => $share->getSender(),
+					'receiverType' => $share->getReceiverType(),
+					'receiver' => $share->getReceiver()
+				];
+			}
+
+			return [
+				'tableId' => $table->getId(),
+				'title' => $table->getTitle(),
+				'ownership' => $table->getOwnership(),
+				'updatedShares' => $updatesSharesOutput
+			];
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError($e->getMessage());
