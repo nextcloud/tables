@@ -312,6 +312,7 @@ class ShareService extends SuperService {
 
 	/**
 	 * @throws InternalError
+	 * @return Share[]
 	 */
 	public function changeSenderForNode(string $nodeType, int $nodeId, string $newOwnerUserId, ?string $userId = null): array {
 		$sharesForTable = $this->findAll($nodeType, $nodeId, $userId, false);

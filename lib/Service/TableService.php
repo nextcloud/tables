@@ -280,7 +280,6 @@ class TableService extends SuperService {
 			$updatedShares = $this->shareService->changeSenderForNode('table', $id, $newOwnerUserId, $userId);
 			$updatesSharesOutput = [];
 			foreach ($updatedShares as $share) {
-				/* @var Share $share */
 				$updatesSharesOutput[] = [
 					'shareId' => $share->getId(),
 					'nodeType' => $share->getNodeType(),
