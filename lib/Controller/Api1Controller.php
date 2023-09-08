@@ -157,11 +157,9 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function updateView(int $viewId, string $data): DataResponse {
-		$dataNew = json_decode($data, true);
-
-		return $this->handleError(function () use ($viewId, $dataNew) {
-			return $this->viewService->update($viewId, $dataNew);
+	public function updateView(int $viewId, array $data): DataResponse {
+		return $this->handleError(function () use ($viewId, $data) {
+			return $this->viewService->update($viewId, $data);
 		});
 	}
 
@@ -494,8 +492,7 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function createRowInView(int $viewId, string $data): DataResponse {
-		$data = json_decode($data);
+	public function createRowInView(int $viewId, array $data): DataResponse {
 		$dataNew = [];
 		foreach ($data as $key => $value) {
 			$dataNew[] = [
@@ -514,9 +511,7 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function createRowInTable(int $tableId, string $data): DataResponse {
-		$data = json_decode($data, true);
-
+	public function createRowInTable(int $tableId, array $data): DataResponse {
 		$dataNew = [];
 		foreach ($data as $key => $value) {
 			$dataNew[] = [
@@ -546,9 +541,7 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 */
-	public function updateRow(int $rowId, ?int $viewId, string $data): DataResponse {
-		$data = json_decode($data, true);
-
+	public function updateRow(int $rowId, ?int $viewId, array $data): DataResponse {
 		$dataNew = [];
 		foreach ($data as $key => $value) {
 			$dataNew[] = [

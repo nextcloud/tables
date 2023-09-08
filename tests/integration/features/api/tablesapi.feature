@@ -134,9 +134,6 @@ Feature: api/tablesapi
     Then user deletes last created row
     Then user "participant1" deletes table with keyword "Rows check"
 
-
-
-
   Scenario: Import csv table
     Given file "/import.csv" exists for user "participant1" with following data
       | Col1    | Col2   | Col3   | num   | emoji | special  |

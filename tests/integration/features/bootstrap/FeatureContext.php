@@ -443,7 +443,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 		$this->sendRequest(
 			'PUT',
 			'/apps/tables/api/1/views/'.$this->viewIds[$viewName],
-			[ 'data' => json_encode($data) ]
+			[ 'data' => $data ]
 		);
 
 		$updatedItem = $this->getDataFromResponse($this->response);
@@ -822,7 +822,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 		$this->sendRequest(
 			'POST',
 			'/apps/tables/api/1/tables/'.$this->tableId.'/rows',
-			['data' => json_encode($props)]
+			['data' => $props]
 		);
 
 		$newRow = $this->getDataFromResponse($this->response);
@@ -880,7 +880,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 		$this->sendRequest(
 			'PUT',
 			'/apps/tables/api/1/rows/'.$this->rowId,
-			['data' => json_encode($props)]
+			['data' => $props]
 		);
 
 		$row = $this->getDataFromResponse($this->response);
