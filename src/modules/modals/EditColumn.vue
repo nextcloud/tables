@@ -22,13 +22,15 @@
 				</div>
 			</div>
 			<div class="buttons">
-				<ColumnInfoPopover v-if="debug" :column="column" />
-				<div class="last-edit-info">
-					{{ t('tables', 'Last edit') + ': ' }}
-					{{ updateTime }}
-					<NcUserBubble :user="column.lastEditBy" :display-name="column.lastEditBy" />
+				<div class="flex">
+					<ColumnInfoPopover :column="column" />&nbsp;
+					<div class="last-edit-info">
+						{{ t('tables', 'Last edit') + ': ' }}
+						{{ updateTime }}&nbsp;
+						<NcUserBubble :user="column.lastEditBy" :display-name="column.lastEditBy" />
+					</div>
 				</div>
-				<div style="display: flex">
+				<div class="flex">
 					<div class="button-padding-right">
 						<NcButton type="secondary" :aria-label="t('tables', 'Cancel')" @click="actionCancel">
 							{{ t('tables', 'Cancel') }}
@@ -109,8 +111,6 @@ export default {
 			editColumn: structuredClone(this.column),
 			deleteId: null,
 			editErrorTitle: false,
-			// To enable the column info popup
-			debug: false,
 		}
 	},
 	computed: {
@@ -203,5 +203,11 @@ export default {
 	display: flex;
 	align-items: center;
 }
+
+.buttons :deep(.user-bubble__wrapper) {
+	padding-top: 5px;
+}
+
+.flex { display: flex }
 
 </style>
