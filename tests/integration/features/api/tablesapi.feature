@@ -11,7 +11,7 @@ Feature: api/tablesapi
       | Tutorial |
 
   Scenario: User creates, rename and delete a table
-    Given table "my new awesome table" with emoji "🤓" exists for user "participant1"
+    Given table "my new awesome table" with emoji "🤓" exists for user "participant1" as "base1"
     Then user "participant1" has the following tables
       | my new awesome table |
     Then user "participant1" updates table with keyword "awesome" set title "renamed table" and optional emoji "🍓"
@@ -21,7 +21,7 @@ Feature: api/tablesapi
       | Tutorial |
 
   Scenario: Table sharing with a user
-    Given table "Ready to share" with emoji "🥪" exists for user "participant1"
+    Given table "Ready to share" with emoji "🥪" exists for user "participant1" as "base1"
     Then user "participant1" shares table with user "participant2"
     Then user "participant2" has the following permissions
       | read    | 1 |
@@ -46,7 +46,7 @@ Feature: api/tablesapi
       | Tutorial |
 
   Scenario: Table sharing with a group
-    Given table "Ready to share" with emoji "🥪" exists for user "participant1"
+    Given table "Ready to share" with emoji "🥪" exists for user "participant1" as "base1"
     Then user "participant1" shares table with group "phoenix"
     Then user "participant2" has the following tables
       | Tutorial | Ready to share |
@@ -57,7 +57,7 @@ Feature: api/tablesapi
       | Tutorial |
 
   Scenario: Create and check columns
-    Given table "Column test" with emoji "🥶" exists for user "participant1"
+    Given table "Column test" with emoji "🥶" exists for user "participant1" as "base1"
     Then table has at least following columns
     Then column "First column" exists with following properties
       | type          | text                    |
@@ -100,7 +100,7 @@ Feature: api/tablesapi
     Then user "participant1" deletes table with keyword "Column test"
 
   Scenario: Create, modify and delete rows
-    Given table "Rows check" with emoji "👨🏻‍💻" exists for user "participant1"
+    Given table "Rows check" with emoji "👨🏻‍💻" exists for user "participant1" as "base1"
     Then column "one" exists with following properties
       | type          | text                    |
       | subtype       | line                    |
@@ -134,7 +134,40 @@ Feature: api/tablesapi
     Then user deletes last created row
     Then user "participant1" deletes table with keyword "Rows check"
 
-
+  Scenario: Create, modify and delete rows (legacy interface)
+    Given table "Rows check legacy" with emoji "👨🏻‍💻" exists for user "participant1" as "base1"
+    Then column "one" exists with following properties
+      | type          | text                    |
+      | subtype       | line                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    Then column "two" exists with following properties
+      | type          | number                  |
+      | mandatory     | 1                       |
+      | numberDefault | 10                      |
+      | description   | This is a description!  |
+    Then column "three" exists with following properties
+      | type          | selection               |
+      | subtype       | check                   |
+      | mandatory     | 1                       |
+      | description   | This is a description!  |
+    Then column "four" exists with following properties
+      | type          | datetime                |
+      | subtype       | date                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    Then row exists with following values via legacy interface
+      | one           | AHA                     |
+      | two           | 88                      |
+      | three         | 1                       |
+      | four          | 2023-12-24              |
+    Then set following values for last created row via legacy interface
+      | one           | AHA!                    |
+      | two           | 99                      |
+      | three         | 0                       |
+      | four          | 2020-02-04              |
+    Then user deletes last created row
+    Then user "participant1" deletes table with keyword "Rows check"
 
 
   Scenario: Import csv table
@@ -142,7 +175,7 @@ Feature: api/tablesapi
       | Col1    | Col2   | Col3   | num   | emoji | special  |
       | Val1    | Val2   | Val3   | 1     | 💙    | Ä        |
       | great   | news   | here   | 99    | ⚠️    | Ö        |
-    Given table "Import test" with emoji "👨🏻‍💻" exists for user "participant1"
+    Given table "Import test" with emoji "👨🏻‍💻" exists for user "participant1" as "base1"
     When user imports file "/import.csv" into last created table
     Then import results have the following data
       | found_columns_count     | 6 |
@@ -160,3 +193,18 @@ Feature: api/tablesapi
       | Col1    | Col2   | Col3   | num   | emoji | special  |
       | Val1    | Val2   | Val3   | 1     | 💙    | Ä        |
       | great   | news   | here   | 99    | ⚠️    | Ö        |
+
+  Scenario: Create, edit and delete views
+    Given table "View test" with emoji "👨🏻‍💻" exists for user "participant1" as "view-test"
+    # Then print register
+    Then table "view-test" has the following views for user "participant1"
+    # Then print register
+    When user "participant1" create view "first view" with emoji "⚡️" for "view-test" as "first-view"
+    Then table "view-test" has the following views for user "participant1"
+      | first view |
+    # Then print register
+    When user "participant1" update view "first-view" with title "updated first view" and emoji "💾"
+    Then table "view-test" has the following views for user "participant1"
+      | updated first view |
+    When user "participant1" deletes view "first-view"
+    Then table "view-test" has the following views for user "participant1"

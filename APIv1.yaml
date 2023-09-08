@@ -238,10 +238,10 @@ paths:
                     schema:
                         - $ref: "#/components/schemas/columnProperties"
                         - type:
-                            type: string
-                            required: true
+                              type: string
+                              required: true
                         - subtype:
-                            type: string
+                              type: string
 
             responses:
                 '200':
@@ -254,6 +254,167 @@ paths:
                     description: Not authorized
                 '403':
                     description: Not allowed
+
+    /tables/{tableId}/views:
+        get:
+            summary: Get a list of views for a given table
+            description: Shipped with v0.6.0.
+            tags:
+                - Views
+            operationId: listTableViews
+            security:
+                - basicAuth: []
+            parameters:
+                -   name: tableId
+                    in: path
+                    description: Table ID
+                    required: true
+                    schema:
+                        type: integer
+            responses:
+                '200':
+                    description: Json array with view objects
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Views"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
+        post:
+            summary: Create a view for given table
+            description: Shipped with v0.6.0.
+            tags:
+                - Views
+            operationId: createTableView
+            security:
+                - basicAuth: []
+            parameters:
+                -   name: tableId
+                    in: path
+                    description: Related table ID
+                    required: true
+                    example: 5
+                    schema:
+                        type: integer
+                -   name: title
+                    in: query
+                    description: Title for the view
+                    required: true
+                    schema:
+                        type: string
+                -   name: emoji
+                    in: query
+                    description: Emoji for the view
+                    required: false
+                    schema:
+                        type: string
+            responses:
+                '200':
+                    description: View object
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/View"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+
+    /views/{viewId}:
+        get:
+            summary: Get a view
+            description: Shipped with v0.6.0.
+            tags:
+                - Views
+            operationId: getView
+            security:
+                - basicAuth: []
+            parameters:
+                -   name: viewId
+                    in: path
+                    description: View ID
+                    required: true
+                    schema:
+                        type: integer
+            responses:
+                '200':
+                    description: Json view object
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/View"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
+        put:
+            summary: Update a view
+            description: Shipped with v0.6.0.
+            tags:
+                - Views
+            operationId: updateView
+            security:
+                - basicAuth: []
+            parameters:
+                -   name: viewId
+                    in: path
+                    description: ID for the view
+                    required: true
+                    schema:
+                        type: integer
+                -   name: values
+                    in: query
+                    description: object of key-value pairs as json-string
+                    required: true
+                    schema:
+                        $ref: "#/components/schemas/viewProperties"
+            responses:
+                '200':
+                    description: Updated view object
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/View"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
+        delete:
+            summary: Delete a view
+            description: Shipped with v0.6.0.
+            tags:
+                - Views
+            operationId: deleteView
+            security:
+                - basicAuth: []
+            parameters:
+                -   name: viewId
+                    in: path
+                    description: ID for the requested view
+                    required: true
+                    schema:
+                        type: integer
+            responses:
+                '200':
+                    description: Deleted view object
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/View"
+                '401':
+                    description: Not authorized
+                '403':
+                    description: Not allowed
+                '404':
+                    description: Not found
 
     /column/{columnId}:
         get:
@@ -966,6 +1127,99 @@ components:
                     type: integer
                 datetimeDefault:
                     type: string
+        Views:
+            type: array
+            maxItems: 1000
+            items:
+                $ref: "#/components/schemas/View"
+        View:
+            type: object
+            required:
+                - id
+                - title
+                - tableId
+                - ownership
+            properties:
+                id:
+                    type: integer
+                tableId:
+                    type: integer
+                createdBy:
+                    type: string
+                createdAt:
+                    type: string
+                lastEditBy:
+                    type: string
+                lastEditAt:
+                    type: string
+                description:
+                    type: string
+                emoji:
+                    type: string
+                columns:
+                    type: array
+                    items:
+                        type: integer
+                sort:
+                    $ref: "#/components/schemas/Sorting"
+                isShared:
+                    type: boolean
+                onSharePermissions:
+                    type: object
+                    properties:
+                        read:
+                            type: boolean
+                        create:
+                            type: boolean
+                        update:
+                            type: boolean
+                        delete:
+                            type: boolean
+                        manage:
+                            type: boolean
+                hasShares:
+                    type: boolean
+                rowsCount:
+                    type: integer
+                ownerDisplayName:
+                    type: string
+                filter:
+                    $ref: "#/components/schemas/Filters"
+        Filters:
+            type: array
+            maxItems: 1000
+            items:
+                $ref: "#/components/schemas/FilterGroups"
+        FilterGroups:
+            type: array
+            description: Definition of filter groups that are combined with logical OR.
+            maxItems: 1000
+            items:
+                $ref: "#/components/schemas/Filter"
+        Filter:
+            type: object
+            description: Definition of filter that are combined with logical AND.
+            required:
+                - columnId
+                - operator
+                - value
+            properties:
+                columnId:
+                    type: integer
+                operator:
+                    type: string
+                    enum:
+                        - contains
+                        - begins-with
+                        - ends-with
+                        - is-equal
+                        - is-greater-than
+                        - is-greater-than-or-equal
+                        - is-lower-than
+                        - is-lower-than-or-equal
+                        - is-empty
+                value:
+                    type: string
         RowsSimple:
             type: array
             maxItems: 1000
@@ -1042,3 +1296,38 @@ components:
                     type: integer
                 datetimeDefault:
                     type: string
+        viewProperties:
+            type: object
+            properties:
+                title:
+                    type: string
+                    required: true
+                emoji:
+                    type: boolean
+                    required: true
+                description:
+                    type: string
+                columns:
+                    type: array
+                    items:
+                        type: integer
+                sort:
+                    $ref: "#/components/schemas/Sorting"
+                filter:
+                    $ref: "#/components/schemas/Filters"
+        Sorting:
+            type: array
+            maxItems: 1000
+            items:
+                $ref: "#/components/schemas/Sort"
+        Sort:
+            type: object
+            description: Object with sorting definition
+            properties:
+                columnId:
+                    type: integer
+                mode:
+                    type: string
+                    enum:
+                        - ASC
+                        - DESC
