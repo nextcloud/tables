@@ -28,7 +28,7 @@
 				{{ t('tables', 'Maximum text length') }}
 			</div>
 			<div class="fix-col-4">
-				<input v-model="mutableColumn.textMaxLength"
+				<input v-model="getMaxLength"
 					type="number"
 					step="1"
 					min="0">
@@ -42,23 +42,32 @@
 import { translate as t } from '@nextcloud/l10n'
 
 export default {
-	name: 'TextLineForm',
+
 	props: {
 		column: {
 			type: Object,
 			default: null,
 		},
 	},
+
 	data() {
 		return {
 			mutableColumn: this.column,
 		}
 	},
+
+	computed: {
+		getMaxLength() {
+			return this.mutableColumn.textMaxLength > 0 ? this.mutableColumn.textMaxLength : null
+		},
+	},
+
 	watch: {
 		column() {
 			this.mutableColumn = this.column
 		},
 	},
+
 	methods: {
 		t,
 	},

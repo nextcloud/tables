@@ -5,36 +5,36 @@
 		</template>
 		<table>
 			<tr>
-				<td>
+				<td class="key">
 					{{ t('tables', 'Last edit') }}
 				</td>
-				<td>
-					{{ updateTime }}<br>
+				<td class="value">
+					{{ updateTime }}&nbsp;
 					<NcUserBubble :user="column.lastEditBy" :display-name="column.lastEditBy" />
 				</td>
 			</tr>
 			<tr>
-				<td>
+				<td class="key">
 					{{ t('tables', 'Create') }}
 				</td>
-				<td>
-					{{ createTime }}<br>
+				<td class="value">
+					{{ createTime }}&nbsp;
 					<NcUserBubble :user="column.createdBy" :display-name="column.createdBy" />
 				</td>
 			</tr>
 			<tr>
-				<td>
+				<td class="key">
 					{{ t('tables', 'Column ID') }}
 				</td>
-				<td>
+				<td class="value">
 					{{ column.id }}
 				</td>
 			</tr>
 			<tr>
-				<td>
+				<td class="key">
 					{{ t('tables', 'Table ID') }}
 				</td>
-				<td>
+				<td class="value">
 					{{ column.tableId }}
 				</td>
 			</tr>
@@ -78,6 +78,14 @@ export default {
 .popover__wrapper table, .popover__wrapper td {
 	padding: 8px;
 	vertical-align: text-top;
+}
+
+td {
+	vertical-align: top;
+}
+
+td.value {
+	text-align: end;
 }
 
 </style>
