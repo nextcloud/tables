@@ -58,7 +58,7 @@ export default {
 
 	computed: {
 		getMaxLength() {
-			return this.mutableColumn.textMaxLength >= 0 ? this.mutableColumn.textMaxLength : null
+			return this.mutableColumn.textMaxLength > 0 ? this.mutableColumn.textMaxLength : null
 		},
 	},
 
