@@ -53,7 +53,7 @@ class PermissionsService {
 		if ($userId === null) {
 			$e = new \Exception();
 			$error = 'PreCheck for userId failed, requested in '. get_class($this) .'.';
-			$this->logger->debug($error, $e->getTrace());
+			$this->logger->debug($error, ['exception' => new \Exception()]);
 			throw new InternalError($error);
 		}
 
