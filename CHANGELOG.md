@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.6.0-beta.2 - 2023-09-08
+### Added
+- ⚗️ Add views to tables
+- 🤝 Share views individually
+- 🛠️ Adjust views with filters, sorting and column selection and ordering
+- 🔗 Link to any Nextcloud resource like files, pictures, contacts, deck-cards, etc.
+- 📇 New smart picker integrations and link previews
+- 🤹 Insert dynamic tables directly into any Nextcloud text editor
+
+### Updated
+- 🏳️ Translations
+- 🐞 Bug fixing
+- ✨ Small design adjustments
+- 💾 Update software dependencies
+
 ## 0.6.0-beta.1 - 2023-08-11
 ### Added
 - ⚗️ Add views to tables
