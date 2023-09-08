@@ -148,7 +148,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('Comments'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => 'rich',
 		];
 		$columns['comment'] = $this->createColumn($table->id, $params);
 
@@ -234,7 +234,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('Description'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => 'rich',
 
 		];
 		$columns['description'] = $this->createColumn($table->id, $params);
@@ -242,7 +242,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('Contact information'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => 'rich',
 
 		];
 		$columns['contactInformation'] = $this->createColumn($table->id, $params);
@@ -259,7 +259,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('Comment'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => 'rich',
 
 		];
 		$columns['comment'] = $this->createColumn($table->id, $params);
@@ -408,7 +408,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('Comments'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => 'rich',
 
 		];
 		$columns['comment'] = $this->createColumn($table->id, $params);
@@ -537,7 +537,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('Skills'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => 'rich',
 
 		];
 		$columns['skills'] = $this->createColumn($table->id, $params);
@@ -553,7 +553,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('Comments'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => 'rich',
 
 		];
 		$columns['comment'] = $this->createColumn($table->id, $params);
@@ -595,7 +595,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('Description'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => 'rich',
 			'description' => $this->l->t('Title or short description'),
 			'textMultiline' => true,
 
@@ -605,7 +605,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('Target'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => 'rich',
 			'description' => $this->l->t('Date, time or whatever'),
 
 		];
@@ -623,7 +623,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('Comments'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => 'rich',
 
 		];
 		$columns['comments'] = $this->createColumn($table->id, $params);
@@ -707,7 +707,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('How to do'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => 'rich',
 
 		];
 		$columns['how'] = $this->createColumn($table->id, $params);
