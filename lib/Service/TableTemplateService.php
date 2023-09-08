@@ -9,6 +9,7 @@ use OCA\Tables\Errors\PermissionError;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
+use OCP\IConfig;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
@@ -25,13 +26,24 @@ class TableTemplateService {
 
 	private ?string $userId;
 
-	public function __construct(LoggerInterface $logger, IL10N $l, ColumnService $columnService, ?string $userId, RowService $rowService, ViewService $viewService) {
+	private IConfig $config;
+
+	private string $textRichColumnTypeName = 'rich';
+
+	public function __construct(LoggerInterface $logger, IL10N $l, ColumnService $columnService, ?string $userId, RowService $rowService, ViewService $viewService, IConfig $config) {
 		$this->logger = $logger;
 		$this->l = $l;
 		$this->columnService = $columnService;
 		$this->rowService = $rowService;
 		$this->viewService = $viewService;
 		$this->userId = $userId;
+		$this->config = $config;
+
+		// if we are on NC25, wie have to use the old text-long column type
+		// this is because NC25 does not serve the text editor globally
+		if (version_compare($this->config->getSystemValueString('version', '0.0.0'), '26.0.0', '<')) {
+			$this->textRichColumnTypeName = 'long';
+		}
 	}
 
 	/**
@@ -148,7 +160,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('Comments'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => $this->textRichColumnTypeName,
 		];
 		$columns['comment'] = $this->createColumn($table->id, $params);
 
@@ -234,7 +246,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('Description'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => $this->textRichColumnTypeName,
 
 		];
 		$columns['description'] = $this->createColumn($table->id, $params);
@@ -242,7 +254,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('Contact information'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => $this->textRichColumnTypeName,
 
 		];
 		$columns['contactInformation'] = $this->createColumn($table->id, $params);
@@ -259,7 +271,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('Comment'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => $this->textRichColumnTypeName,
 
 		];
 		$columns['comment'] = $this->createColumn($table->id, $params);
@@ -408,7 +420,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('Comments'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => $this->textRichColumnTypeName,
 
 		];
 		$columns['comment'] = $this->createColumn($table->id, $params);
@@ -537,7 +549,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('Skills'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => $this->textRichColumnTypeName,
 
 		];
 		$columns['skills'] = $this->createColumn($table->id, $params);
@@ -553,7 +565,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('Comments'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => $this->textRichColumnTypeName,
 
 		];
 		$columns['comment'] = $this->createColumn($table->id, $params);
@@ -595,7 +607,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('Description'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => $this->textRichColumnTypeName,
 			'description' => $this->l->t('Title or short description'),
 			'textMultiline' => true,
 
@@ -605,7 +617,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('Target'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => $this->textRichColumnTypeName,
 			'description' => $this->l->t('Date, time or whatever'),
 
 		];
@@ -623,7 +635,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('Comments'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => $this->textRichColumnTypeName,
 
 		];
 		$columns['comments'] = $this->createColumn($table->id, $params);
@@ -707,7 +719,7 @@ class TableTemplateService {
 		$params = [
 			'title' => $this->l->t('How to do'),
 			'type' => 'text',
-			'subtype' => 'long',
+			'subtype' => $this->textRichColumnTypeName,
 
 		];
 		$columns['how'] = $this->createColumn($table->id, $params);
