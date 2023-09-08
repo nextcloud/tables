@@ -276,7 +276,7 @@ class TableService extends SuperService {
 			$table->setOwnership($newOwnerUserId);
 			$table = $this->mapper->update($table);
 
-			# also change owners of related shares
+			// also change owners of related shares
 			$updatedShares = $this->shareService->changeSenderForNode('table', $id, $newOwnerUserId, $userId);
 			$updatesSharesOutput = [];
 			foreach ($updatedShares as $share) {
