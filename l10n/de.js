@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not update row." : "Die Zeile konnte nicht aktualisiert werden",
     "Nextcloud tables" : "Nextcloud Tabellen",
     "Select table" : "Tabelle wählen",
     "Select columns" : "Spalten wählen",
@@ -338,7 +339,6 @@ OC.L10N.register(
     "Could not update column." : "Spalte konnte nicht aktualisiert werden.",
     "Could not remove column." : "Spalte konnte nicht entfernt werden.",
     "Could not load rows." : "Zeilen konnten nicht geladen werden.",
-    "Could not update row." : "Die Zeile konnte nicht aktualisiert werden",
     "Could not insert row." : "Zeile konnte nicht eingefügt werden.",
     "Could not remove row." : "Zeile konnte nicht entfernt werden.",
     "Could not insert table." : "Tabelle konnte nicht eingefügt werden.",

@@ -1,4 +1,5 @@
 { "translations": {
+    "Could not update row." : "Riviä ei voitu päivittää.",
     "Nextcloud tables" : "Nextcloud-taulukot",
     "Select table" : "Valitse taulukko",
     "Select columns" : "Valitse sarakkeet",
@@ -193,7 +194,6 @@
     "Unchecked" : "Ei tarkistettu",
     "Now" : "Nyt",
     "ID" : "ID",
-    "Could not update row." : "Riviä ei voitu päivittää.",
     "Could not fetch tables" : "Taulukkoja ei voitu noutaa"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

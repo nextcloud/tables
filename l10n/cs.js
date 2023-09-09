@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not update row." : "Řádek se nedaří aktualizovat.",
     "Nextcloud tables" : "Nextcloud tabulky",
     "Select table" : "Vybrat tabulku",
     "Select columns" : "Vybrat sloupce",
@@ -429,7 +430,6 @@ OC.L10N.register(
     "Could not remove column." : "Nepodařilo se odebrat sloupec.",
     "Could not load rows." : "Nepodařilo se načíst řádky.",
     "Outdated data. View is reloaded" : "Zastaralá data. Zobrazení je znovunačteno",
-    "Could not update row." : "Řádek se nedaří aktualizovat.",
     "Could not insert row." : "Nepodařilo se vložit řádky.",
     "Could not remove row." : "Nepodařilo se odebrat řádek.",
     "Could not insert table." : "Nepodařilo se vložit tabulku.",

@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not update row." : "無法更新列。",
     "Nextcloud tables" : "Nextcloud 數據庫表",
     "Select table" : "選擇數據庫表",
     "Select columns" : "選擇縱列",
@@ -429,7 +430,6 @@ OC.L10N.register(
     "Could not remove column." : "無法移除縱列。",
     "Could not load rows." : "無法載入列。",
     "Outdated data. View is reloaded" : "過期資料。檢視已重新載入",
-    "Could not update row." : "無法更新列。",
     "Could not insert row." : "無法插入列。",
     "Could not remove row." : "無法移除列。",
     "Could not insert table." : "無法插入數據庫表。",

@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not update row." : "Nepodarilo sa upraviť riadok.",
     "Select columns" : "Vyberte stĺpce",
     "e.g. 1,2,4 or leave empty" : "napr. 1,2,4 alebo ponechajte prázdne",
     "ToDo list" : "Zoznam úloh",
@@ -167,7 +168,6 @@ OC.L10N.register(
     "Select" : "Vybrať",
     "Unchecked" : "Nekontrolované",
     "ID" : "ID",
-    "Could not update row." : "Nepodarilo sa upraviť riadok.",
     "Could not fetch tables" : "Nepodarilo sa získať tabuľky."
 },
 "nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);");

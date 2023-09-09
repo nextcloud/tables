@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not update row." : "Nem sikerült a sor frissítése.",
     "Nextcloud tables" : "Nextcloud táblázatok",
     "Select table" : "Táblázat kiválasztása",
     "Select columns" : "Válasszon oszlopokat",
@@ -335,7 +336,6 @@ OC.L10N.register(
     "Could not update column." : "Nem sikerült az oszlop frissítése.",
     "Could not remove column." : "Nem sikerült az oszlop eltávolítása.",
     "Could not load rows." : "Nem sikerült a sorok betöltése.",
-    "Could not update row." : "Nem sikerült a sor frissítése.",
     "Could not insert row." : "Nem sikerült a sor beszúrása.",
     "Could not remove row." : "Nem sikerült a sor eltávolítása.",
     "Could not insert table." : "Nem sikerült a táblázat beszúrása.",

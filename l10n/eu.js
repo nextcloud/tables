@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not update row." : "Ezin izan da orain eguneratu.",
     "Nextcloud tables" : "Nextcloud taulak",
     "Select table" : "Hautatu taula",
     "Select columns" : "Hautatu zutabeak",
@@ -257,7 +258,6 @@ OC.L10N.register(
     "ID" : "ID",
     "Request is not authorized. Are you logged in?" : "Eskaerak egiteko baimenik ez. Saioa hasi al duzu?",
     "Request not allowed." : "Ez da eskaera onartu.",
-    "Could not update row." : "Ezin izan da orain eguneratu.",
     "Could not fetch tables" : "Ezin izan dira taulak eskuratu"
 },
 "nplurals=2; plural=(n != 1);");

@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not update row." : "No se pudo actualizar la fila.",
     "Nextcloud tables" : "Tablas de Nextcloud",
     "Select table" : "Seleccionar tabla",
     "Select columns" : "Seleccionar columnas",
@@ -338,7 +339,6 @@ OC.L10N.register(
     "Could not update column." : "No se pudo actualizar la columna.",
     "Could not remove column." : "No se pudo eliminar la columna.",
     "Could not load rows." : "No se pudieron cargar las filas.",
-    "Could not update row." : "No se pudo actualizar la fila.",
     "Could not insert row." : "No se pudo insertar la fila.",
     "Could not remove row." : "No se pudo eliminar la fila.",
     "Could not insert table." : "No se pudo insertar la tabla.",

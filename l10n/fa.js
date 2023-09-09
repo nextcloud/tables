@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not update row." : "Could not update row.",
     "Nextcloud tables" : "Nextcloud tables",
     "Select table" : "Select table",
     "Select columns" : "Select columns",
@@ -428,7 +429,6 @@ OC.L10N.register(
     "Could not remove column." : "Could not remove column.",
     "Could not load rows." : "Could not load rows.",
     "Outdated data. View is reloaded" : "Outdated data. View is reloaded",
-    "Could not update row." : "Could not update row.",
     "Could not insert row." : "Could not insert row.",
     "Could not remove row." : "Could not remove row.",
     "Could not insert table." : "Could not insert table.",

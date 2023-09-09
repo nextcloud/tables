@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not update row." : "Rækken kunne ikke opdateres.",
     "Nextcloud tables" : "Nextcloud tabeller",
     "Select table" : "Vælg tabel",
     "Select columns" : "Vælg kolonner",
@@ -337,7 +338,6 @@ OC.L10N.register(
     "Could not update column." : "Kolonnen kunne ikke opdateres.",
     "Could not remove column." : "Kolonnen kunne ikke fjernes.",
     "Could not load rows." : "Kunne ikke indlæse rækker.",
-    "Could not update row." : "Rækken kunne ikke opdateres.",
     "Could not insert row." : "Rækken kunne ikke indsættes.",
     "Could not remove row." : "Rækken kunne ikke fjernes.",
     "Could not insert table." : "Tabellen kunne ikke indsættes.",

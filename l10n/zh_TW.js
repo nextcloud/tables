@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not update row." : "無法更新列。",
     "Nextcloud tables" : "Nextcloud 表格",
     "Select table" : "選取表格",
     "Select columns" : "選取欄",
@@ -429,7 +430,6 @@ OC.L10N.register(
     "Could not remove column." : "無法移除欄。",
     "Could not load rows." : "無法載入列。",
     "Outdated data. View is reloaded" : "過期資料。檢視已重新載入",
-    "Could not update row." : "無法更新列。",
     "Could not insert row." : "無法插入列。",
     "Could not remove row." : "無法移除列。",
     "Could not insert table." : "無法插入表格。",

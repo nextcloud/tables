@@ -10,6 +10,7 @@ OC.L10N.register(
     "Customers" : "Kunder",
     "Date" : "Dato",
     "Weight" : "Vekt",
+    "Body fat" : "Kroppsfett",
     "Comments" : "Kommentarer",
     "Name" : "Navn",
     "Description" : "Beskrivelse",

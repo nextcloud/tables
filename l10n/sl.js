@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not update row." : "Vrstice ni mogoče posodobiti.",
     "Nextcloud tables" : "Razpredelnice Nextcloud",
     "Select table" : "Izbor razpredelnice",
     "Select columns" : "Izbor stolpcev",
@@ -268,7 +269,6 @@ OC.L10N.register(
     "Insert" : "Vstavi",
     "Unchecked" : "Nepregledano",
     "ID" : "ID",
-    "Could not update row." : "Vrstice ni mogoče posodobiti.",
     "Could not fetch tables" : "Razpredelnic ni mogoče pridobiti."
 },
 "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);");

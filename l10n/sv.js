@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not update row." : "Kunde inte uppdatera rad.",
     "Nextcloud tables" : "Nextcloud tabeller",
     "Select table" : "Välj tabell",
     "Select columns" : "Välj kolumner",
@@ -300,7 +301,6 @@ OC.L10N.register(
     "Could not update column." : "Kunde inte uppdatera kolumn.",
     "Could not remove column." : "Kunde inte ta bort kolumn.",
     "Could not load rows." : "Kunde inte läsa in rader.",
-    "Could not update row." : "Kunde inte uppdatera rad.",
     "Could not insert row." : "Kunde inte infoga rad.",
     "Could not remove row." : "Kunde inte ta bort rad.",
     "Could not insert table." : "Kunde inte infoga tabell.",

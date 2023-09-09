@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not update row." : "Nie udało się zaktualizować wiersza.",
     "Select columns" : "Wybierz kolumny",
     "e.g. 1,2,4 or leave empty" : "np. 1,2,4 lub pozostaw puste",
     "ToDo list" : "Lista zadań",
@@ -170,7 +171,6 @@ OC.L10N.register(
     "Insert" : "wstaw",
     "Unchecked" : "Niesprawdzony",
     "ID" : "ID",
-    "Could not update row." : "Nie udało się zaktualizować wiersza.",
     "Could not fetch tables" : "Nie udało się pobrać tabel"
 },
 "nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);");

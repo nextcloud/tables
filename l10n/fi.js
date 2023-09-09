@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not update row." : "Riviä ei voitu päivittää.",
     "Nextcloud tables" : "Nextcloud-taulukot",
     "Select table" : "Valitse taulukko",
     "Select columns" : "Valitse sarakkeet",
@@ -195,7 +196,6 @@ OC.L10N.register(
     "Unchecked" : "Ei tarkistettu",
     "Now" : "Nyt",
     "ID" : "ID",
-    "Could not update row." : "Riviä ei voitu päivittää.",
     "Could not fetch tables" : "Taulukkoja ei voitu noutaa"
 },
 "nplurals=2; plural=(n != 1);");

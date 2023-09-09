@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not update row." : "No s'ha pogut actualitzar la fila.",
     "Nextcloud tables" : "Taules Nextcloud",
     "Select table" : "Seleccioneu una taula",
     "Select columns" : "Seleccioneu columnes",
@@ -244,7 +245,6 @@ OC.L10N.register(
     "Insert" : "Insereix",
     "Unchecked" : "Sense verificar",
     "ID" : "ID",
-    "Could not update row." : "No s'ha pogut actualitzar la fila.",
     "Could not fetch tables" : "No s'han pogut recuperar les taules"
 },
 "nplurals=2; plural=(n != 1);");

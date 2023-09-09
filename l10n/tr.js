@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not update row." : "Satır güncellenemedi.",
     "Nextcloud tables" : "Nextcloud tabloları",
     "Select table" : "Tabloyu seçin",
     "Select columns" : "Sütunları seçin",
@@ -429,7 +430,6 @@ OC.L10N.register(
     "Could not remove column." : "Sütun silinemedi.",
     "Could not load rows." : "Satırlar yüklenemedi.",
     "Outdated data. View is reloaded" : "Veriler eskimiş. Görünüm yeniden yüklendi",
-    "Could not update row." : "Satır güncellenemedi.",
     "Could not insert row." : "Satır eklenemedi.",
     "Could not remove row." : "Satır silinemedi.",
     "Could not insert table." : "Satır eklenemedi.",

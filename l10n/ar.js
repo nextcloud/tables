@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not update row." : "تعذر تحديث الصف.",
     "Nextcloud tables" : "\"جداول\" نكست كلاود Nextcloud tables",
     "Select table" : "إختَر جدولاً",
     "Select columns" : "حدد الأعمدة",
@@ -429,7 +430,6 @@ OC.L10N.register(
     "Could not remove column." : "تعذر حذف العمود.",
     "Could not load rows." : "تعذر تحميل الصفوف.",
     "Outdated data. View is reloaded" : "بيانات قديمة. تمّت إعادة تحميل المنظور",
-    "Could not update row." : "تعذر تحديث الصف.",
     "Could not insert row." : "تعذر إدراج صف.",
     "Could not remove row." : "تعذر حذف الصف.",
     "Could not insert table." : "تعذر إدراج الجدول.",

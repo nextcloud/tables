@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not update row." : "Редът не можа да се актуализира.",
     "Nextcloud tables" : "Таблици на Nextcloud",
     "Select table" : "Избор на таблица",
     "Select columns" : "Избор на колони",
@@ -285,7 +286,6 @@ OC.L10N.register(
     "Start of the week" : "Начало на седмицата",
     "Now" : "Сега",
     "ID" : "ID /Идентификатор/",
-    "Could not update row." : "Редът не можа да се актуализира.",
     "Could not fetch tables" : "Таблиците не можаха да бъдат извлечени"
 },
 "nplurals=2; plural=(n != 1);");

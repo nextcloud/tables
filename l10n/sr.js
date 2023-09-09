@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not update row." : "Не може да се ажурира ред.",
     "Nextcloud tables" : "Nextcloud табеле",
     "Select table" : "Изабери табелу",
     "Select columns" : "Изаберите колоне",
@@ -429,7 +430,6 @@ OC.L10N.register(
     "Could not remove column." : "Не може да се уклони колона.",
     "Could not load rows." : "Не могу да се учитају редови.",
     "Outdated data. View is reloaded" : "Застарели подаци. Поглед је поново учитан",
-    "Could not update row." : "Не може да се ажурира ред.",
     "Could not insert row." : "Не може да се уметне ред.",
     "Could not remove row." : "Не може да се уклони ред.",
     "Could not insert table." : "Не може да се уметне табела.",
