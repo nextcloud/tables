@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not create row." : "Non foi posíbel crear a fila",
     "Could not update row." : "Non foi posíbel actualizar a fila",
     "Nextcloud tables" : "Táboas de Nextcloud",
     "Select table" : "Seleccionar táboa",

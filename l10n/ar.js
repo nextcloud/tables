@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not create row." : "تعذّر إنشاء السطر.",
     "Could not update row." : "تعذر تحديث الصف.",
     "Nextcloud tables" : "\"جداول\" نكست كلاود Nextcloud tables",
     "Select table" : "إختَر جدولاً",

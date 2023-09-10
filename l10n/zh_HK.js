@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not create row." : "無法創建列。",
     "Could not update row." : "無法更新列。",
     "Nextcloud tables" : "Nextcloud 數據庫表",
     "Select table" : "選擇數據庫表",
