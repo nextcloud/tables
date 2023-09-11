@@ -128,12 +128,12 @@ export default {
 			}
 		},
 		magicFields() {
-			if (this.selectedColumn && this.selectedColumn.type !== 'selection') {
+			if (this.selectedColumn && this.selectedColumn.type.substr(0, 9) !== 'selection') {
 				if (this.term) {
 					return [this.term, ...this.selectedColumn.getPossibleMagicFields()]
 				}
 				return this.selectedColumn.getPossibleMagicFields()
-			} else if (this.selectedColumn && this.selectedColumn.type === 'selection') {
+			} else if (this.selectedColumn && this.selectedColumn.type.substr(0, 9) === 'selection') {
 				const options = []
 				this.selectedColumn.selectionOptions.forEach(item => {
 					options.push({
