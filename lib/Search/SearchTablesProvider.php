@@ -96,7 +96,6 @@ class SearchTablesProvider implements IProvider {
 		$offset = $query->getCursor();
 		$offset = $offset ? (int) $offset : 0;
 
-		// TODO how to read if dark mode is set to use light icons?
 		$appIconUrl = $this->urlGenerator->getAbsoluteURL(
 			$this->urlGenerator->imagePath(Application::APP_ID, 'app-dark.svg')
 		);

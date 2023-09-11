@@ -59,7 +59,7 @@ Cypress.Commands.add('unifiedSearch', (term) => {
 
 	cy.intercept({ method: 'GET', url: '**/ocs/v2.php/search/providers/settings/search*' }).as('searchResults')
 	cy.get('#unified-search__input').type(term)
-	cy.wait('@searchResults').wait(2000)
+	cy.wait('@searchResults')
 
 	cy.get('.unified-search__results').contains(term, { matchCase: false }).should('be.visible')
 })
