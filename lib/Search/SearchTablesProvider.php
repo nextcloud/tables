@@ -96,8 +96,12 @@ class SearchTablesProvider implements IProvider {
 		$offset = $query->getCursor();
 		$offset = $offset ? (int) $offset : 0;
 
+		// TODO how to read if dark mode is set to use light icons?
 		$appIconUrl = $this->urlGenerator->getAbsoluteURL(
 			$this->urlGenerator->imagePath(Application::APP_ID, 'app-dark.svg')
+		);
+		$viewIconUrl = $this->urlGenerator->getAbsoluteURL(
+			$this->urlGenerator->imagePath(Application::APP_ID, 'view-dark.svg')
 		);
 
 		// look for tables
@@ -106,7 +110,7 @@ class SearchTablesProvider implements IProvider {
 			return new SearchResultEntry(
 				$appIconUrl,
 				$table->getEmoji() .' '. $table->getTitle(),
-				($table->getOwnerDisplayName() ?? $table->getOwnership()) . ', ' . $this->l10n->n('%n row', '%n rows', $table->getRowsCount()),
+				($table->getOwnerDisplayName() ?? $table->getOwnership()) . ', ' . $this->l10n->n('%n row', '%n rows', $table->getRowsCount()).', '.$this->l10n->t('table'),
 				$this->getInternalLink('table', $table->getId()),
 				'',
 				false
@@ -115,11 +119,11 @@ class SearchTablesProvider implements IProvider {
 
 		// look for views
 		$views = $this->viewService->search($term, $limit, $offset);
-		$formattedViewResults = array_map(function (View $view) use ($appIconUrl): SearchResultEntry {
+		$formattedViewResults = array_map(function (View $view) use ($viewIconUrl): SearchResultEntry {
 			return new SearchResultEntry(
-				$appIconUrl,
+				$viewIconUrl,
 				$view->getEmoji() .' '. $view->getTitle(),
-				($view->getOwnerDisplayName() ?? $view->getOwnership()) . ', ' . $this->l10n->n('%n row', '%n rows', $view->getRowsCount()),
+				($view->getOwnerDisplayName() ?? $view->getOwnership()) . ', ' . $this->l10n->n('%n row', '%n rows', $view->getRowsCount()).', '.$this->l10n->t('table view'),
 				$this->getInternalLink('view', $view->getId()),
 				'',
 				false
