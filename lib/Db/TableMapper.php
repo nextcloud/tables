@@ -102,8 +102,6 @@ class TableMapper extends QBMapper {
 			$qb->setFirstResult($offset);
 		}
 
-		$sql = $qb->getSQL();
-
 		return $this->findEntities($qb);
 	}
 }
