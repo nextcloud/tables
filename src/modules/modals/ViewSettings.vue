@@ -32,7 +32,7 @@
 		<!--filtering-->
 		<NcAppSettingsSection v-if="columns != null && canManageTable(view)" id="filter" :title="t('tables', 'Filter')">
 			<FilterForm
-				:filters="mutableView.filter"
+				:filters.sync="mutableFilters"
 				:view-filters="viewSetting ? view.filter : null"
 				:generated-filters="viewSetting ? generatedView.filter : null"
 				:columns="allColumns" />
@@ -92,7 +92,7 @@ export default {
 			type: Object,
 			default: null,
 		},
-		// If a new view is created or an existing view is edit
+		// If a new view is created or an existing view is edited
 		createView: {
 			type: Boolean,
 			default: false,
@@ -121,6 +121,14 @@ export default {
 		}
 	},
 	computed: {
+		mutableFilters: {
+			get() {
+				return this.mutableView.filter
+			},
+			set(filters) {
+				this.mutableView.filter = filters
+			},
+		},
 		saveText() {
 			if (this.createView) {
 				return t('tables', 'Create View')

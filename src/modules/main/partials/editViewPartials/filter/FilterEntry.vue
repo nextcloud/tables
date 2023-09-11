@@ -5,23 +5,20 @@
 				v-model="selectedColumn"
 				class="select-field"
 				:options="columns"
-				:get-option-key="(option) => option.id"
-				:placeholder="t('tables', 'Column')"
-				label="title" />
+				label="title"
+				:placeholder="t('tables', 'Column')" />
 			<NcSelect
 				v-if="selectedColumn"
 				v-model="selectedOperator"
 				class="select-field"
-				:options="operatorArray"
-				:get-option-key="(option) => option.id"
-				:placeholder="t('tables', 'Operator')"
-				label="label" />
+				:options="operators"
+				:placeholder="t('tables', 'Operator')" />
 			<NcSelect
 				v-if="selectedOperator && !selectedOperator.noSearchValue"
 				v-model="searchValue"
 				class="select-field"
-				:options="magicFieldsArray"
-				:placeholder="valuePlaceHolder"
+				:options="magicFields"
+				:placeholder="getValuePlaceholder"
 				@search="v => term = v" />
 		</div>
 		<NcButton
@@ -39,18 +36,17 @@
 
 <script>
 import { NcButton, NcSelect } from '@nextcloud/vue'
-import { getFilterWithId } from '../../../../../shared/components/ncTable/mixins/filter.js'
-import { getMagicFieldWithId } from '../../../../../shared/components/ncTable/mixins/magicFields.js'
 import Delete from 'vue-material-design-icons/Delete.vue'
 import { ColumnTypes } from '../../../../../shared/components/ncTable/mixins/columnHandler.js'
 
 export default {
-	name: 'FilterEntry',
+
 	components: {
 		NcSelect,
 		NcButton,
 		Delete,
 	},
+
 	props: {
 		filterEntry: {
 			type: Object,
@@ -61,34 +57,96 @@ export default {
 			default: null,
 		},
 	},
+
 	data() {
 		return {
-			selectedColumn: null,
-			selectedOperator: null,
-			mutableFilterEntry: this.filterEntry,
-			searchValue: '',
 			term: '',
 		}
 	},
+
 	computed: {
-		operatorArray() {
+		mutableFilterEntry: {
+			get() {
+				return this.filterEntry
+			},
+			set(filterEntry) {
+				this.$emit('update:filter-entry', filterEntry)
+			},
+		},
+		searchValue: {
+			get() {
+				// if no value is set, just return ''
+				if (this.filterEntry?.value === null || this.filterEntry?.value === '') {
+					return ''
+				}
+
+				// if the value starts with @, we try to load the magic-value object
+				if (this.filterEntry?.value.substr(0, 1) === '@') {
+					return this.magicFields.find(item => item.id === this.filterEntry?.value || item.id === this.filterEntry?.value.substr(1))
+				}
+
+				return this.filterEntry.value
+			},
+			set(searchValue) {
+				if (typeof searchValue === 'object' && searchValue?.id) {
+					this.mutableFilterEntry.value = searchValue.id
+				} else if (typeof searchValue === 'string') {
+					this.mutableFilterEntry.value = searchValue
+				} else {
+					this.mutableFilterEntry.value = ''
+				}
+			},
+		},
+		selectedColumn: {
+			get() {
+				return this.columns.find(col => col.id === this.filterEntry.columnId)
+			},
+			set(column) {
+				if (this.operators.length >= 1) {
+					this.selectedOperator = this.operators[0]
+				} else {
+					this.selectedOperator = null
+				}
+
+				this.searchValue = null
+				this.mutableFilterEntry.columnId = column?.id ?? null
+			},
+		},
+		selectedOperator: {
+			get() {
+				return this.operators.find(item => this.filterEntry.operator === item.id)
+			},
+			set(operator) {
+				this.mutableFilterEntry.operator = operator?.id
+			},
+		},
+		operators() {
 			if (this.selectedColumn) {
 				return this.selectedColumn.getPossibleOperators()
 			} else {
 				return []
 			}
 		},
-		magicFieldsArray() {
-			if (this.selectedColumn) {
+		magicFields() {
+			if (this.selectedColumn && this.selectedColumn.type !== 'selection') {
 				if (this.term) {
 					return [this.term, ...this.selectedColumn.getPossibleMagicFields()]
 				}
 				return this.selectedColumn.getPossibleMagicFields()
+			} else if (this.selectedColumn && this.selectedColumn.type === 'selection') {
+				const options = []
+				this.selectedColumn.selectionOptions.forEach(item => {
+					options.push({
+						id: '@selection-id-' + item.id,
+						label: item.label,
+					})
+				})
+				return options
 			} else {
 				return []
 			}
 		},
-		valuePlaceHolder() {
+		getValuePlaceholder() {
 			if (this.selectedColumn.type === ColumnTypes.Datetime) {
 				return t('tables', 'JJJJ-MM-DD hh:mm')
 			} else if (this.selectedColumn.type === ColumnTypes.DatetimeDate) {
@@ -97,45 +155,6 @@ export default {
 				return t('tables', 'hh:mm')
 			}
 			return t('tables', 'Search Value')
-		},
-	},
-	watch: {
-		selectedColumn() {
-			if (!this.selectedOperator || (this.selectedOperator && !this.operatorArray.includes(this.selectedOperator))) {
-				if (this.operatorArray.length === 1) {
-					this.selectedOperator = this.operatorArray[0]
-				} else {
-					this.selectedOperator = null
-				}
-			}
-			if (this.searchValue && typeof this.searchValue === 'object' && !this.magicFieldsArray.includes(this.searchValue)) {
-				this.searchValue = null
-			}
-			this.mutableFilterEntry.columnId = this.selectedColumn?.id
-		},
-		selectedOperator() {
-			this.mutableFilterEntry.operator = this.selectedOperator?.id
-		},
-		searchValue() {
-			if (this.searchValue) {
-				this.mutableFilterEntry.value = typeof this.searchValue === 'object' ? '@' + this.searchValue.id : this.searchValue
-			} else {
-				this.mutableFilterEntry.value = ''
-			}
-		},
-	},
-	mounted() {
-		this.reset()
-	},
-	methods: {
-
-		clearValue() {
-			this.searchValue = ''
-		},
-		reset() {
-			this.selectedColumn = this.columns.find(col => col.id === this.filterEntry.columnId)
-			this.selectedOperator = getFilterWithId(this.filterEntry.operator)
-			this.searchValue = this.filterEntry.value && this.filterEntry.value.startsWith('@') ? getMagicFieldWithId(this.filterEntry.value.substring(1)) : this.filterEntry.value
 		},
 	},
 }
@@ -149,8 +168,7 @@ export default {
 
 .select-field {
 	width: 30%;
-	/* flex: 1; */
-	padding: 8px;
+	padding: calc(var(--default-grid-baseline) * 2);
 	min-width: auto !important;
 }
 
