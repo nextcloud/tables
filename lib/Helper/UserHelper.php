@@ -2,6 +2,7 @@
 
 namespace OCA\Tables\Helper;
 
+use OC\Group\Group;
 use OCA\Tables\Errors\InternalError;
 use OCP\IGroupManager;
 use OCP\IUser;
@@ -42,11 +43,29 @@ class UserHelper {
 
 	/**
 	 * @param string $userId
-	 * @return array
+	 * @return Group[]
 	 * @throws InternalError
 	 */
 	public function getGroupsForUser(string $userId): array {
 		$user = $this->getUser($userId);
 		return $this->groupManager->getUserGroups($user);
+	}
+
+	/**
+	 * @param string $userId
+	 * @return array|null
+	 */
+	public function getGroupIdsForUser(string $userId): ?array {
+		try {
+			$userGroups = $this->getGroupsForUser($userId);
+		} catch (InternalError $e) {
+			return null;
+		}
+
+		$groupArray = [];
+		foreach ($userGroups as $group) {
+			$groupArray[] = $group->getGID();
+		}
+		return $groupArray;
 	}
 }

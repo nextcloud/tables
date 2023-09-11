@@ -2,6 +2,7 @@
 
 namespace OCA\Tables\Db;
 
+use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
@@ -12,9 +13,11 @@ use OCP\IDBConnection;
 /** @template-extends QBMapper<Table> */
 class TableMapper extends QBMapper {
 	protected string $table = 'tables_tables';
+	private UserHelper $userHelper;
 
-	public function __construct(IDBConnection $db) {
+	public function __construct(IDBConnection $db, UserHelper $userHelper) {
 		parent::__construct($db, $this->table, Table::class);
+		$this->userHelper = $userHelper;
 	}
 
 	/**
@@ -66,15 +69,26 @@ class TableMapper extends QBMapper {
 	 */
 	public function search(string $term = null, ?string $userId = null, ?int $limit = null, ?int $offset = null): array {
 		$qb = $this->db->getQueryBuilder();
-		$shareQuery = $this->db->getQueryBuilder();
+		$shareQueryTablesSharedViaUser = $this->db->getQueryBuilder();
+		$shareQueryTablesSharedViaGroup = $this->db->getQueryBuilder();
+		$userGroups = $this->userHelper->getGroupIdsForUser($userId);
 
 		// get table ids, that are shared with the given user
 		// only makes sense if a user is given, otherwise will always get all shares doubled
 		if ($userId !== null && $userId !== '') {
-			$shareQuery->selectDistinct('node_id')
+			$shareQueryTablesSharedViaUser->selectDistinct('node_id')
 				->from('tables_shares')
 				->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter('table', IQueryBuilder::PARAM_STR)))
+				->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter('user', IQueryBuilder::PARAM_STR)))
 				->andWhere($qb->expr()->eq('receiver', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
+
+			if($userGroups) {
+				$shareQueryTablesSharedViaGroup->selectDistinct('node_id')
+					->from('tables_shares')
+					->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter('table', IQueryBuilder::PARAM_STR)))
+					->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter('group', IQueryBuilder::PARAM_STR)))
+					->andWhere($qb->expr()->in('receiver', $qb->createNamedParameter($userGroups, IQueryBuilder::PARAM_STR_ARRAY)));
+			}
 		}
 
 		$qb->select('*')
@@ -82,7 +96,10 @@ class TableMapper extends QBMapper {
 
 		if ($userId !== null && $userId !== '') {
 			$qb->andWhere($qb->expr()->eq('ownership', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
-			$qb->orWhere($shareQuery->expr()->in('id', $qb->createFunction($shareQuery->getSQL()), IQueryBuilder::PARAM_INT_ARRAY));
+			$qb->orWhere($shareQueryTablesSharedViaUser->expr()->in('id', $qb->createFunction($shareQueryTablesSharedViaUser->getSQL()), IQueryBuilder::PARAM_INT_ARRAY));
+			if($userGroups) {
+				$qb->orWhere($shareQueryTablesSharedViaGroup->expr()->in('id', $qb->createFunction($shareQueryTablesSharedViaGroup->getSQL()), IQueryBuilder::PARAM_INT_ARRAY));
+			}
 		}
 
 		if ($term) {
