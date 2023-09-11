@@ -39,8 +39,29 @@ Cypress.Commands.add('createTable', (title) => {
 	cy.contains('h1', 'Test text-link').should('be.visible')
 })
 
+Cypress.Commands.add('createView', (title) => {
+	cy.get('[data-cy="customTableAction"] button').click()
+	cy.get('.v-popper__popper li button span').contains('Create view').click({ force: true })
+
+	cy.get('.modal-container #settings-section_title input').type(title)
+
+	cy.contains('button', 'Create View').click()
+
+	cy.contains('.app-navigation-entry-link span', title).should('exist')
+})
+
 Cypress.Commands.add('loadTable', (name) => {
 	cy.get('.app-navigation-entry-link').contains(name).click({ force: true })
+})
+
+Cypress.Commands.add('unifiedSearch', (term) => {
+	cy.get('#unified-search').click()
+
+	cy.intercept({ method: 'GET', url: '**/ocs/v2.php/search/providers/settings/search*' }).as('searchResults')
+	cy.get('#unified-search__input').type(term)
+	cy.wait('@searchResults')
+
+	cy.get('.unified-search__results').contains(term, { matchCase: false }).should('be.visible')
 })
 
 Cypress.Commands.add('createTextLinkColumn', (title, ressourceProvider, firstColumn) => {
