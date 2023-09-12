@@ -36,11 +36,33 @@ Cypress.Commands.add('createTable', (title) => {
 	cy.get('.modal__content input[type="text"]').clear().type(title)
 	cy.contains('button', 'Create table').click()
 
-	cy.contains('h1', 'Test text-link').should('be.visible')
+	cy.contains('h1', title).should('be.visible')
+})
+
+Cypress.Commands.add('createView', (title) => {
+	cy.get('[data-cy="customTableAction"] button').click()
+	cy.get('.v-popper__popper li button span').contains('Create view').click({ force: true })
+
+	cy.get('.modal-container #settings-section_title input').type(title)
+
+	cy.contains('button', 'Create View').click()
+
+	cy.contains('.app-navigation-entry-link span', title).should('exist')
+})
+
+Cypress.Commands.add('clickOnTableThreeDotMenu', (optionName) => {
+	cy.get('[data-cy="customTableAction"] button').click()
+	cy.get('.v-popper__popper li button span').contains(optionName).click({ force: true })
 })
 
 Cypress.Commands.add('loadTable', (name) => {
 	cy.get('.app-navigation-entry-link').contains(name).click({ force: true })
+})
+
+Cypress.Commands.add('unifiedSearch', (term) => {
+	cy.get('#unified-search').click()
+	cy.get('#unified-search__input').type(term)
+	cy.get('.unified-search__results .unified-search__result-line-one span').contains(term, { matchCase: false }).should('exist')
 })
 
 Cypress.Commands.add('createTextLinkColumn', (title, ressourceProvider, firstColumn) => {
@@ -62,6 +84,21 @@ Cypress.Commands.add('createTextLinkColumn', (title, ressourceProvider, firstCol
 	ressourceProvider.forEach(provider =>
 		cy.get('.typeSelection span label').contains(provider, { matchCase: false }).click()
 	)
+	cy.get('.modal-container button').contains('Save').click()
+
+	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
+})
+
+Cypress.Commands.add('createTextLineColumn', (title, firstColumn) => {
+	if (firstColumn) {
+		cy.get('.button-vue__text').contains('Create column').click({ force: true })
+	} else {
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+	}
+
+	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
 	cy.get('.modal-container button').contains('Save').click()
 
 	cy.wait(10).get('.toastify.toast-success').should('be.visible')

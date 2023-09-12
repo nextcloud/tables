@@ -3,6 +3,7 @@
 namespace OCA\Tables\Db;
 
 use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
@@ -13,12 +14,13 @@ use OCP\IDBConnection;
 /** @template-extends QBMapper<View> */
 class ViewMapper extends QBMapper {
 	protected string $table = 'tables_views';
+	private UserHelper $userHelper;
+	private TableMapper $tableMapper;
 
-	protected TableMapper $tableMapper;
-
-	public function __construct(IDBConnection $db, TableMapper $tableMapper) {
+	public function __construct(IDBConnection $db, TableMapper $tableMapper, UserHelper $userHelper) {
 		parent::__construct($db, $this->table, View::class);
 		$this->tableMapper = $tableMapper;
+		$this->userHelper = $userHelper;
 	}
 
 
@@ -74,16 +76,28 @@ class ViewMapper extends QBMapper {
 	 */
 	public function search(string $term = null, ?string $userId = null, ?int $limit = null, ?int $offset = null): array {
 		$qb = $this->db->getQueryBuilder();
-		$shareViewQuery = $this->db->getQueryBuilder();
 		$shareTableQuery = $this->db->getQueryBuilder();
+		$shareQueryViewsSharedViaUser = $this->db->getQueryBuilder();
+		$shareQueryViewsSharedViaGroup = $this->db->getQueryBuilder();
+		$userGroups = $this->userHelper->getGroupIdsForUser($userId);
 
 		// get view ids, that are shared with the given user
 		// only makes sense if a user is given, otherwise will always get all shares doubled
-		if ($userId !== null && $userId !== '') {
-			$shareViewQuery->selectDistinct('node_id')
+		if ($userId) {
+			$shareQueryViewsSharedViaUser->selectDistinct('node_id')
 				->from('tables_shares')
 				->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter('view', IQueryBuilder::PARAM_STR)))
+				->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter('user', IQueryBuilder::PARAM_STR)))
 				->andWhere($qb->expr()->eq('receiver', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
+
+			if($userGroups) {
+				$shareQueryViewsSharedViaGroup->selectDistinct('node_id')
+					->from('tables_shares')
+					->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter('view', IQueryBuilder::PARAM_STR)))
+					->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter('group', IQueryBuilder::PARAM_STR)))
+					->andWhere($qb->expr()->in('receiver', $qb->createNamedParameter($userGroups, IQueryBuilder::PARAM_STR_ARRAY)));
+			}
+
 			$shareTableQuery->selectDistinct('node_id')
 				->from('tables_shares')
 				->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter('table', IQueryBuilder::PARAM_STR)))
@@ -94,10 +108,12 @@ class ViewMapper extends QBMapper {
 			->from($this->table, 'v')
 			->leftJoin('v', 'tables_tables', 't', 't.id = v.table_id');
 
-		if ($userId !== null && $userId !== '') {
-			$qb->andWhere($qb->expr()->eq('ownership', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)))
-			->orWhere($shareViewQuery->expr()->in('v.id', $qb->createFunction($shareViewQuery->getSQL()), IQueryBuilder::PARAM_INT_ARRAY))
-			->orWhere($shareTableQuery->expr()->in('v.table_id', $qb->createFunction($shareTableQuery->getSQL()), IQueryBuilder::PARAM_INT_ARRAY));
+		if ($userId) {
+			$qb->where($qb->expr()->eq('ownership', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)))
+			->orWhere($shareQueryViewsSharedViaUser->expr()->in('v.id', $qb->createFunction($shareQueryViewsSharedViaUser->getSQL()), IQueryBuilder::PARAM_INT_ARRAY));
+			if($userGroups) {
+				$qb->orWhere($shareQueryViewsSharedViaGroup->expr()->in('v.id', $qb->createFunction($shareQueryViewsSharedViaGroup->getSQL()), IQueryBuilder::PARAM_INT_ARRAY));
+			}
 		}
 
 		if ($term) {
