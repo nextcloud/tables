@@ -129,7 +129,7 @@ class ReferenceHelper {
 			// add rows data
 			try {
 				if($this->matchReference($referenceText, 'table')) {
-					$referenceInfo['rows'] = $this->rowService->findAllByTable($elementId, 10, 0);
+					$referenceInfo['rows'] = $this->rowService->findAllByTable($elementId, $this->userId, 10, 0);
 				} elseif ($this->matchReference($referenceText, 'view')) {
 					$referenceInfo['rows'] = $this->rowService->findAllByView($elementId, $this->userId, 10, 0);
 				}

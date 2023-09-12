@@ -36,7 +36,7 @@ class RowController extends Controller {
 	 */
 	public function index(int $tableId): DataResponse {
 		return $this->handleError(function () use ($tableId) {
-			return $this->service->findAllByTable($tableId);
+			return $this->service->findAllByTable($tableId, $this->userId);
 		});
 	}
 
