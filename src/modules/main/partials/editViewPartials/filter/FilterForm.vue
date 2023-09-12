@@ -5,7 +5,7 @@
 		</div>
 		<div v-for="(filterGroup, i) in mutableFilters" :key="i">
 			<FilterGroup
-				:filter-group="filterGroup"
+				:filter-group.sync="mutableFilters[i]"
 				:view-filter-group="viewFilters ? viewFilters[i] ?? [] : null"
 				:generated-filter-group="generatedFilters ? generatedFilters[i] ?? [] : null"
 				:columns="columns"
@@ -60,15 +60,18 @@ export default {
 			default: null,
 		},
 	},
-	data() {
-		return {
-			mutableFilters: this.filters,
-		}
-	},
 
 	computed: {
 		hasFilter() {
-			return (this.mutableFilters !== null && this.mutableFilters.length > 0)
+			return this.mutableFilters?.length > 0
+		},
+		mutableFilters: {
+			get() {
+				return this.filters
+			},
+			set(filters) {
+				this.$emit('update:filters', filters)
+			},
 		},
 	},
 

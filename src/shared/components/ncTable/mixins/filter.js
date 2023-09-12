@@ -68,7 +68,7 @@ export const Filters = {
 		id: FilterIds.IsEqual,
 		label: t('tables', 'Is equal'),
 		shortLabel: '=',
-		goodFor: [ColumnTypes.TextLine, ColumnTypes.Number, ColumnTypes.SelectionCheck, ColumnTypes.TextLink, ColumnTypes.NumberStars, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime],
+		goodFor: [ColumnTypes.TextLine, ColumnTypes.Number, ColumnTypes.SelectionCheck, ColumnTypes.TextLink, ColumnTypes.NumberStars, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime, ColumnTypes.Selection],
 		incompatibleWith: [FilterIds.IsEmpty, FilterIds.IsEqual, FilterIds.BeginsWith, FilterIds.EndsWith, FilterIds.Contains, FilterIds.IsGreaterThan, FilterIds.IsGreaterThanOrEqual, FilterIds.IsLowerThan, FilterIds.IsLowerThanOrEqual],
 	}),
 	IsGreaterThan: new Filter({

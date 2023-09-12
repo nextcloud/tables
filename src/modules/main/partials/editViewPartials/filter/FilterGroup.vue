@@ -3,10 +3,10 @@
 		<div class="group-text">
 			{{ t('tables', '... that meet all of the following conditions') }}
 		</div>
-		<div v-for="(filter, index) in filterGroup"
-			:key="filter.columnId + filter.operator?.id+ filter.value + index">
+		<div v-for="(filter, index) in mutableFilterGroup"
+			:key="index">
 			<FilterEntry
-				:filter-entry="filter"
+				:filter-entry.sync="mutableFilterGroup[index]"
 				:columns="columns"
 				:class="{'locallyAdded': isLocallyAdded(filter)}"
 				@delete-filter="deleteFilter(index)" />
@@ -54,14 +54,14 @@ export default {
 			default: null,
 		},
 	},
-	data() {
-		return {
-			mutableFilterGroup: this.filterGroup,
-		}
-	},
-	watch: {
-		filterGroup() {
-			this.mutableFilterGroup = this.filterGroup
+	computed: {
+		mutableFilterGroup: {
+			get() {
+				return this.filterGroup
+			},
+			set(filterGroup) {
+				this.$emit('update:filter-group', filterGroup)
+			},
 		},
 	},
 	methods: {
