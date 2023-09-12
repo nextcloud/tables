@@ -50,6 +50,11 @@ Cypress.Commands.add('createView', (title) => {
 	cy.contains('.app-navigation-entry-link span', title).should('exist')
 })
 
+Cypress.Commands.add('clickOnTableThreeDotMenu', (optionName) => {
+	cy.get('[data-cy="customTableAction"] button').click()
+	cy.get('.v-popper__popper li button span').contains(optionName).click({ force: true })
+})
+
 Cypress.Commands.add('loadTable', (name) => {
 	cy.get('.app-navigation-entry-link').contains(name).click({ force: true })
 })
@@ -57,7 +62,7 @@ Cypress.Commands.add('loadTable', (name) => {
 Cypress.Commands.add('unifiedSearch', (term) => {
 	cy.get('#unified-search').click()
 
-	cy.intercept({ method: 'GET', url: '**/ocs/v2.php/search/providers/settings/search*' }).as('searchResults')
+	cy.intercept({ method: 'GET', url: '**/ocs/v2.php/search/providers/tables-search-tables/search*' }).as('searchResults')
 	cy.get('#unified-search__input').type(term)
 	cy.wait('@searchResults')
 
