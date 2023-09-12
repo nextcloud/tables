@@ -370,7 +370,7 @@ export default {
 		padding-right: 16px;
 	}
 
-	tr>td:last-child {
+	tr>td.sticky:last-child {
 		// visibility: hidden;
 		opacity: 0;
 	}
