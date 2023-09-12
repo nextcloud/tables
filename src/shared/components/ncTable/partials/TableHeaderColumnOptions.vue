@@ -343,10 +343,10 @@ export default {
 				this.sortMode = null
 				this.localViewSetting.sorting = null
 			} else {
-				this.sortMode = mode
 				if (mode !== 'ASC' && mode !== 'DESC') {
 					return
 				}
+				this.sortMode = mode
 				this.localViewSetting.sorting = [{
 					columnId: this.column.id,
 					mode,
