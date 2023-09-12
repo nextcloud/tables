@@ -15,12 +15,11 @@
 				<Table :size="20" />
 			</template>
 		</template>
-		<template #extra />
 		<template #counter>
 			<NcCounterBubble v-if="canReadData(table)">
 				{{ n('tables', '%n row', '%n rows', table.rowsCount, {}) }}
 			</NcCounterBubble>
-			<NcActionButton v-if="table.hasShares" icon="icon-share" :class="{'margin-right': !(activeTable && table.id === activeTable.id)}" @click="actionShowShare" />
+			<NcActionButton v-if="!isSharedItem" icon="icon-share" :class="{'margin-right': !(activeTable && table.id === activeTable.id)}" @click="actionShowShare" />
 			<div v-if="table.isShared && table.ownership !== userId" class="margin-left">
 				<NcAvatar :user="table.ownership" />
 			</div>
@@ -74,7 +73,8 @@
 		</template>
 		<NavigationViewItem v-for="view in getViews"
 			:key="'view'+view.id"
-			:view="view" />
+			:view="view"
+			:is-shared-item="true" />
 	</NcAppNavigationItem>
 </template>
 <script>
@@ -128,6 +128,10 @@ export default {
 			type: String,
 			default: '',
 		},
+		isSharedItem: {
+		      type: Boolean,
+		      default: false,
+		    },
 	},
 
 	data() {

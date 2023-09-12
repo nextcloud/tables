@@ -12,12 +12,11 @@
 				<Table :size="20" />
 			</template>
 		</template>
-		<template #extra />
 		<template #counter>
 			<NcCounterBubble v-if="canReadData(view)">
 				{{ n('tables', '%n row', '%n rows', view.rowsCount, {}) }}
 			</NcCounterBubble>
-			<NcActionButton v-if="view.hasShares" icon="icon-share" :class="{'margin-right': !(activeView && view.id === activeView.id)}" @click="actionShowShare" />
+			<NcActionButton v-if="!isSharedItem" icon="icon-share" :class="{'margin-right': !(activeView && view.id === activeView.id)}" @click="actionShowShare" />
 			<div v-if="view.isShared && view.ownership !== userId && !canManageTable(view)" class="margin-left">
 				<NcAvatar :user="view.ownership" />
 			</div>
@@ -116,6 +115,10 @@ export default {
 		view: {
 			type: Object,
 			default: null,
+		},
+		isSharedItem: {
+			type: Boolean,
+			default: false,
 		},
 	},
 
