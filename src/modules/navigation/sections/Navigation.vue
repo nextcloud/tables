@@ -19,26 +19,23 @@
 						<NcActionButton :aria-label="t('tables', 'Create table')" icon="icon-add" @click.prevent="createTable" />
 					</template>
 				</NcAppNavigationCaption>
-				<NavigationDashboardItem v-for="table in getOwnTables"
+				<NavigationTableItem v-for="table in getOwnTables"
 					:key="table.id"
 					:filter-string="filterString"
 					:table="table" />
 
 				<NcAppNavigationCaption v-if="getSharedTables.length > 0"
-					:title="t('tables', 'Shared tables')" />
-
-				<NavigationDashboardItem v-for="table in getSharedTables"
+					:title="t('tables', 'Shared')" />
+				<NavigationTableItem v-for="table in getSharedTables"
 					:key="table.id"
 					:filter-string="filterString"
-					:table="table" />
-
-				<NcAppNavigationCaption v-if="getSharedViews.length > 0"
-					:title="t('tables', 'Shared views')" />
-
+					:table="table"
+					:is-shared-item="true" />
 				<NavigationViewItem
 					v-for="view in getSharedViews"
 					:key="'view'+view.id"
-					:view="view" />
+					:view="view"
+					:is-shared-item="true" />
 			</ul>
 
 			<div v-if="filterString !== ''" class="search-info">
@@ -60,7 +57,7 @@
 <script>
 import { NcAppNavigation, NcAppNavigationCaption, NcActionButton, NcTextField, NcButton, NcEmptyContent } from '@nextcloud/vue'
 import NavigationViewItem from '../partials/NavigationViewItem.vue'
-import NavigationDashboardItem from '../partials/NavigationTableItem.vue'
+import NavigationTableItem from '../partials/NavigationTableItem.vue'
 import { mapState } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
@@ -69,7 +66,7 @@ import { getCurrentUser } from '@nextcloud/auth'
 export default {
 	name: 'Navigation',
 	components: {
-		NavigationDashboardItem,
+		NavigationTableItem,
 		NavigationViewItem,
 		NcAppNavigation,
 		NcAppNavigationCaption,
