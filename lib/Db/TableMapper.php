@@ -75,7 +75,7 @@ class TableMapper extends QBMapper {
 
 		// get table ids, that are shared with the given user
 		// only makes sense if a user is given, otherwise will always get all shares doubled
-		if ($userId !== null && $userId !== '') {
+		if ($userId) {
 			$shareQueryTablesSharedViaUser->selectDistinct('node_id')
 				->from('tables_shares')
 				->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter('table', IQueryBuilder::PARAM_STR)))
@@ -94,7 +94,7 @@ class TableMapper extends QBMapper {
 		$qb->select('*')
 			->from($this->table);
 
-		if ($userId !== null && $userId !== '') {
+		if ($userId) {
 			$qb->andWhere($qb->expr()->eq('ownership', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
 			$qb->orWhere($shareQueryTablesSharedViaUser->expr()->in('id', $qb->createFunction($shareQueryTablesSharedViaUser->getSQL()), IQueryBuilder::PARAM_INT_ARRAY));
 			if($userGroups) {

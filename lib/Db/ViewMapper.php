@@ -83,7 +83,7 @@ class ViewMapper extends QBMapper {
 
 		// get view ids, that are shared with the given user
 		// only makes sense if a user is given, otherwise will always get all shares doubled
-		if ($userId !== null && $userId !== '') {
+		if ($userId) {
 			$shareQueryViewsSharedViaUser->selectDistinct('node_id')
 				->from('tables_shares')
 				->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter('view', IQueryBuilder::PARAM_STR)))
@@ -108,7 +108,7 @@ class ViewMapper extends QBMapper {
 			->from($this->table, 'v')
 			->leftJoin('v', 'tables_tables', 't', 't.id = v.table_id');
 
-		if ($userId !== null && $userId !== '') {
+		if ($userId) {
 			$qb->where($qb->expr()->eq('ownership', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)))
 			->orWhere($shareQueryViewsSharedViaUser->expr()->in('v.id', $qb->createFunction($shareQueryViewsSharedViaUser->getSQL()), IQueryBuilder::PARAM_INT_ARRAY));
 			if($userGroups) {

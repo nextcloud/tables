@@ -110,7 +110,7 @@ class SearchTablesProvider implements IProvider {
 				$appIconUrl,
 				$table->getEmoji() .' '. $table->getTitle(),
 				($table->getOwnerDisplayName() ?? $table->getOwnership()) . ', ' . $this->l10n->n('%n row', '%n rows', $table->getRowsCount()).', '.$this->l10n->t('table'),
-				$this->getInternalLink('table', $table->getId()),
+				$this->getInternalLink($table->getId(), 'table'),
 				'',
 				false
 			);
@@ -123,7 +123,7 @@ class SearchTablesProvider implements IProvider {
 				$viewIconUrl,
 				$view->getEmoji() .' '. $view->getTitle(),
 				($view->getOwnerDisplayName() ?? $view->getOwnership()) . ', ' . $this->l10n->n('%n row', '%n rows', $view->getRowsCount()).', '.$this->l10n->t('table view'),
-				$this->getInternalLink('view', $view->getId()),
+				$this->getInternalLink($view->getId(), 'view'),
 				'',
 				false
 			);
@@ -141,7 +141,7 @@ class SearchTablesProvider implements IProvider {
 	 * @param int $nodeId
 	 * @return string
 	 */
-	protected function getInternalLink(string $nodeType = 'table', int $nodeId): string {
+	protected function getInternalLink(int $nodeId, string $nodeType = 'table'): string {
 		$allowedNodeTypes = ['table', 'view'];
 		if(in_array($nodeType, $allowedNodeTypes)) {
 			return $this->urlGenerator->linkToRouteAbsolute(Application::APP_ID . '.page.index')
