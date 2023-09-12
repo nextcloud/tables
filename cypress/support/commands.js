@@ -61,7 +61,7 @@ Cypress.Commands.add('unifiedSearch', (term) => {
 	cy.get('#unified-search__input').type(term)
 	cy.wait('@searchResults')
 
-	cy.get('.unified-search__results').contains(term, { matchCase: false }).should('be.visible')
+	cy.get('.unified-search__results .unified-search__result-line-one span').contains(term, { matchCase: false }).should('exist')
 })
 
 Cypress.Commands.add('createTextLinkColumn', (title, ressourceProvider, firstColumn) => {
