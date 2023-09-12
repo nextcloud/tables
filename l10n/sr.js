@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not create row." : "Не може да се креира ред.",
     "Could not update row." : "Не може да се ажурира ред.",
     "Nextcloud tables" : "Nextcloud табеле",
     "Select table" : "Изабери табелу",
