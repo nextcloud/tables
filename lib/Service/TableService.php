@@ -132,6 +132,7 @@ class TableService extends SuperService {
 	 * @param Table $table
 	 * @param string $userId
 	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
 	 * @throws PermissionError
 	 */
 	private function enhanceTable(Table $table, string $userId): void {
@@ -387,6 +388,8 @@ class TableService extends SuperService {
 	 * @param int $offset
 	 * @param string|null $userId
 	 * @return array
+	 * @throws MultipleObjectsReturnedException
+	 * @throws PermissionError
 	 */
 	public function search(string $term, int $limit = 100, int $offset = 0, ?string $userId = null): array {
 		try {
@@ -394,10 +397,11 @@ class TableService extends SuperService {
 			$userId = $this->permissionsService->preCheckUserId($userId);
 			$tables = $this->mapper->search($term, $userId, $limit, $offset);
 			foreach ($tables as &$table) {
+				/** @var string $userId */
 				$this->enhanceTable($table, $userId);
 			}
 			return $tables;
-		} catch (InternalError | PermissionError | \OCP\DB\Exception $e) {
+		} catch (InternalError | \OCP\DB\Exception $e) {
 			return [];
 		}
 	}

@@ -43,7 +43,7 @@ Have a good time and manage whatever you want.
 		<database>pgsql</database>
 		<database>mysql</database>
 		<database>sqlite</database>
-        <nextcloud min-version="25" max-version="28"/>
+        <nextcloud min-version="25" max-version="27"/>
     </dependencies>
     <commands>
 		<command>OCA\Tables\Command\ListTables</command>

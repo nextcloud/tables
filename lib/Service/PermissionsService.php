@@ -392,13 +392,6 @@ class PermissionsService {
 
 	//  private methods ==========================================================================
 
-	/**
-	 * @param mixed $element
-	 * @param string $nodeType
-	 * @param string $permission
-	 * @param string|null $userId
-	 * @return bool
-	 */
 	private function checkPermission($element, string $nodeType, string $permission, ?string $userId = null): bool {
 		if($this->basisCheck($element, $nodeType, $userId)) {
 			return true;
