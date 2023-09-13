@@ -44,6 +44,10 @@ export default {
 			type: Object,
 			default: null,
 		},
+		canSave: {
+			type: Boolean,
+			default: true,
+		},
 	},
 	data() {
 		return {

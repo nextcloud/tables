@@ -1,18 +1,27 @@
 <template>
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :loading="isLoadingResults">
-		<NcSelect v-model="localValue"
-			:options="results"
-			:clearable="true"
-			label="title"
-			style="width: 100%"
-			@search="v => term = v">
-			<template #option="props">
-				<LinkWidget :thumbnail-url="props.thumbnailUrl" :icon-url="props.icon" :title="props.title" :subline="props.subline" :icon-size="40" />
-			</template>
-			<template #selected-option="props">
-				<LinkWidget :thumbnail-url="props.thumbnailUrl" :icon-url="props.icon" :title="props.title" :subline="props.subline" :icon-size="40" />
-			</template>
-		</NcSelect>
+		<div class="row">
+			<div v-if="providers.length === 0" class="col-4">
+				<NcNoteCard type="info">
+					{{ t('tables', 'You can not insert any links in this field. Please configure at least one link provider in the column configuration.') }}
+				</NcNoteCard>
+			</div>
+			<div class="col-4">
+				<NcSelect v-model="localValue"
+					:options="results"
+					:clearable="true"
+					label="title"
+					style="width: 100%"
+					@search="v => term = v">
+					<template #option="props">
+						<LinkWidget :thumbnail-url="props.thumbnailUrl" :icon-url="props.icon" :title="props.title" :subline="props.subline" :icon-size="40" />
+					</template>
+					<template #selected-option="props">
+						<LinkWidget :thumbnail-url="props.thumbnailUrl" :icon-url="props.icon" :title="props.title" :subline="props.subline" :icon-size="40" />
+					</template>
+				</NcSelect>
+			</div>
+		</div>
 	</RowFormWrapper>
 </template>
 
@@ -21,7 +30,7 @@ import RowFormWrapper from './RowFormWrapper.vue'
 import axios from '@nextcloud/axios'
 import { generateOcsUrl } from '@nextcloud/router'
 import displayError from '../../../../utils/displayError.js'
-import { NcSelect } from '@nextcloud/vue'
+import { NcNoteCard, NcSelect } from '@nextcloud/vue'
 import debounce from 'debounce'
 import generalHelper from '../../../../mixins/generalHelper.js'
 import LinkWidget from '../LinkWidget.vue'
@@ -30,6 +39,7 @@ import { translate as t } from '@nextcloud/l10n'
 export default {
 
 	components: {
+		NcNoteCard,
 		RowFormWrapper,
 		NcSelect,
 		LinkWidget,
@@ -104,7 +114,11 @@ export default {
 	},
 
 	mounted() {
-		this.providers = this.column?.textAllowedPattern?.split(',')
+		if (this.column?.textAllowedPattern) {
+			this.providers = this.column?.textAllowedPattern?.split(',')
+		} else {
+			this.providers = []
+		}
 	},
 
 	methods: {

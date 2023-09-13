@@ -7,6 +7,11 @@
 			<div class="fix-col-4">
 				{{ t('tables', 'Allowed types') }}
 			</div>
+			<div v-if="!canSave" class="fix-col-4">
+				<NcNoteCard type="warning">
+					{{ t('tables', 'Please select at least one provider.') }}
+				</NcNoteCard>
+			</div>
 			<div class="col-4 space-B typeSelection">
 				<NcCheckboxRadioSwitch v-for="provider in getProviders" :key="provider.id" :checked.sync="provider.active" type="switch">
 					{{ provider.label }}
@@ -20,7 +25,7 @@
 </template>
 
 <script>
-import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
+import { NcCheckboxRadioSwitch, NcNoteCard } from '@nextcloud/vue'
 import axios from '@nextcloud/axios'
 import displayError from '../../../../../utils/displayError.js'
 import { generateOcsUrl } from '@nextcloud/router'
@@ -30,11 +35,16 @@ export default {
 
 	components: {
 		NcCheckboxRadioSwitch,
+		NcNoteCard,
 	},
 	props: {
 		column: {
 			type: Object,
 			default: null,
+		},
+		canSave: {
+			type: Boolean,
+			default: true,
 		},
 	},
 	data() {
@@ -60,11 +70,24 @@ export default {
 			})
 			return activeProviderIds
 		},
+		error: {
+			get() {
+				return !this.canSave
+			},
+			set(v) {
+				this.$emit('update:can-save', !v)
+			},
+		},
 	},
 
 	watch: {
 		getSelectedProviderIds() {
 			this.mutableColumn.textAllowedPattern = this.getSelectedProviderIds.join(',')
+			if (this.getSelectedProviderIds.length === 0) {
+				this.error = true
+			} else {
+				this.error = false
+			}
 		},
 		column() {
 			this.mutableColumn = this.column
@@ -108,8 +131,8 @@ export default {
 			})
 		},
 		isActive(providerId) {
-			if (this.column.textAllowedPattern) {
-				const selectedProviders = this.column.textAllowedPattern.split(',')
+			if (this.column?.id) {
+				const selectedProviders = this.column.textAllowedPattern?.split(',')
 				return selectedProviders.indexOf(providerId) !== -1
 			} else {
 				return this.preActivatedProviders.indexOf(providerId) !== -1
