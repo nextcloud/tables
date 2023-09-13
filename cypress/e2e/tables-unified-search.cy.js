@@ -5,17 +5,16 @@ const groupId = (Math.random() + 1).toString(36).substring(7)
 describe('The Home Page', () => {
 
 	before(function() {
-		cy.createGroup(groupId).then(() => {
-			cy.createRandomUser().then(user => {
-				localUser = user
-			}).then(user => {
-				cy.addUserToGroup(user.userId, groupId)
-			})
-			cy.createRandomUser().then(user => {
-				localUser2 = user
-			}).then(user => {
-				cy.addUserToGroup(user.userId, groupId)
-			})
+		cy.createGroup(groupId)
+		cy.createRandomUser().then(user => {
+			localUser = user
+		}).then(user => {
+			cy.addUserToGroup(user.userId, groupId)
+		})
+		cy.createRandomUser().then(user => {
+			localUser2 = user
+		}).then(user => {
+			cy.addUserToGroup(user.userId, groupId)
 		})
 	})
 
