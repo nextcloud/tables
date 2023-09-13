@@ -128,9 +128,6 @@ jobs:
           export OC_PASS=1234561
           php occ user:add --password-from-env user1
           php occ user:add --password-from-env user2
-          ./occ group:add shareTestGroup
-          ./occ group:adduser shareTestGroup user1
-          ./occ group:adduser shareTestGroup user2
           curl -v http://127.0.0.1:8081/index.php/login
           cat data/nextcloud.log
 
