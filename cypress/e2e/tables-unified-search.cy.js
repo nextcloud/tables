@@ -1,5 +1,7 @@
 let localUser
 let localUser2
+const alice = { userId: 'alice', password: 'alice' }
+const bob = { userId: 'bob', password: 'bob' }
 
 describe('The Home Page', () => {
 
@@ -75,7 +77,7 @@ describe('The Home Page', () => {
 	})
 
 	it('Search for shared table via group share', () => {
-		cy.login({ userId: 'user1', password: '1234561' })
+		cy.login(alice)
 		cy.visit('apps/tables')
 
 		// create table to share
@@ -92,13 +94,13 @@ describe('The Home Page', () => {
 
 		cy.get('h3').contains('Shares').parent().find('ul').contains('shareTestGroup').should('exist')
 
-		cy.login({ userId: 'user2', password: '1234561' })
+		cy.login(bob)
 		cy.visit('apps/tables')
 		cy.unifiedSearch('Share for group')
 	})
 
 	it('Search for shared view via group share', () => {
-		cy.login({ userId: 'user1', password: '1234561' })
+		cy.login(alice)
 		cy.visit('apps/tables')
 
 		// create table to share
@@ -116,7 +118,7 @@ describe('The Home Page', () => {
 
 		cy.get('h3').contains('Shares').parent().find('ul').contains('shareTestGroup').should('exist')
 
-		cy.login({ userId: 'user2', password: '1234561' })
+		cy.login(bob)
 		cy.visit('apps/tables')
 		cy.unifiedSearch('ShareView2')
 	})
