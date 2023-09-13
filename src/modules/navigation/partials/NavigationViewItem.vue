@@ -16,8 +16,8 @@
 			<NcCounterBubble v-if="canReadData(view)">
 				{{ n('tables', '%n row', '%n rows', view.rowsCount, {}) }}
 			</NcCounterBubble>
-			<NcActionButton v-if="!isSharedItem" icon="icon-share" :class="{'margin-right': !(activeView && view.id === activeView.id)}" @click="actionShowShare" />
-			<div v-if="view.isShared && view.ownership !== userId && !canManageTable(view)" class="margin-left">
+			<NcActionButton v-if="view.hasShares" icon="icon-share" :class="{'margin-right': !(activeView && view.id === activeView.id)}" @click="actionShowShare" />
+			<div v-if="view.isShared && view.ownership !== userId && !canManageTable(view) && showShareSender" class="margin-left">
 				<NcAvatar :user="view.ownership" />
 			</div>
 		</template>
@@ -116,10 +116,11 @@ export default {
 			type: Object,
 			default: null,
 		},
-		isSharedItem: {
-			type: Boolean,
-			default: false,
-		},
+		// this is good if you show the share sender via the table and show this as children
+		showShareSender: {
+		      type: Boolean,
+		      default: true,
+		    },
 	},
 
 	data() {

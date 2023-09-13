@@ -5,7 +5,6 @@ namespace OCA\Tables\Service;
 use DateTime;
 use Exception;
 
-use OCA\Tables\Db\Share;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Errors\InternalError;
@@ -118,6 +117,11 @@ class TableService extends SuperService {
 			foreach ($allTables as $table) {
 				/** @var string $userId */
 				$this->enhanceTable($table, $userId);
+				// if the table is shared with me, there are no other shares
+				// will avoid showing the shared icon in the FE nav
+				if($table->getIsShared()) {
+					$table->setHasShares(false);
+				}
 			}
 		}
 
