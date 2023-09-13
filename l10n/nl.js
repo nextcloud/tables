@@ -81,7 +81,7 @@ OC.L10N.register(
     "Delete table" : "Verwijder tabel",
     "Copy" : "Kopiëren",
     "My tables" : "Mijn tabellen",
-    "Shared tables" : "Gedeelde tabellen",
+    "Shared" : "Gedeeld",
     "Clear filter" : "Filter leegmaken",
     "User or group name …" : "Gebruiker of groepsnaam …",
     "No recommendations. Start typing." : "Geen aanbevelingen. Begin te typen.",

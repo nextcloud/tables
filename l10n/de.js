@@ -213,7 +213,7 @@ OC.L10N.register(
     "Copy" : "Kopieren",
     "Filter tables" : "Tabellen filtern",
     "My tables" : "Meine Tabellen",
-    "Shared tables" : "Geteilte Tabellen",
+    "Shared" : "Geteilt",
     "Your results are filtered." : "Die Ergebnisse sind gefiltert.",
     "Clear filter" : "Filter zurücksetzen",
     "User or group name …" : "Benutzer oder Gruppenname …",

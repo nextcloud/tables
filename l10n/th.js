@@ -32,6 +32,7 @@ OC.L10N.register(
     "Filter" : "ตัวกรอง",
     "Sort" : "จัดเรียง",
     "Copy" : "คัดลอก",
+    "Shared" : "ถูกแชร์",
     "User or group name …" : "ชื่อผู้ใช้หรือกลุ่ม …",
     "No recommendations. Start typing." : "ไม่มีคำแนะนำ เริ่มพิมพ์เลย",
     "Searching …" : "กำลังค้นหา …",

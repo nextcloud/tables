@@ -35,6 +35,7 @@ OC.L10N.register(
     "Please select a file." : "Silakan pilih berkas",
     "Filter" : "Filter",
     "Sort" : "Urutkan",
+    "Shared" : "Dibagikan",
     "Clear filter" : "Bersihkan filter",
     "group" : "grup",
     "Delete data" : "Hapus data",

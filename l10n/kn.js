@@ -16,6 +16,7 @@ OC.L10N.register(
     "Cancel" : "﻿ರದ್ದು",
     "Delete" : "﻿ಅಳಿಸಿ",
     "Copy" : "ನಕಲಿಸಿ",
+    "Shared" : "﻿ಹಂಚಿಕೆಯ",
     "group" : "﻿ಗುಂಪು",
     "Sharing" : "﻿ಹಂಚಿಕೆ",
     "Error" : "﻿ತಪ್ಪಾಗಿದೆ",

@@ -147,7 +147,7 @@ OC.L10N.register(
     "Copy" : "Αντιγραφή",
     "Filter tables" : "Φιλτράρετε πίνακες",
     "My tables" : "Οι πίνακές μου",
-    "Shared tables" : "Κοινόχρηστοι πίνακες",
+    "Shared" : "Κοινόχρηστα",
     "Your results are filtered." : "Τα αποτελέσματά σας έχουν φιλτραριστεί.",
     "Clear filter" : "Εκκαθάριση φίλτρου",
     "User or group name …" : "Όνομα χρήστη ή ομάδας",

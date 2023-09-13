@@ -28,6 +28,7 @@ OC.L10N.register(
     "Please select a file." : "Файл сонгоно уу.",
     "Filter" : "Шүүлтүүр",
     "Copy" : "хуулах",
+    "Shared" : "Түгээсэн",
     "group" : "бүлэг",
     "Created at" : "үүсгэгдсэн",
     "Sharing" : "Түгээх",

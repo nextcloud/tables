@@ -29,6 +29,7 @@ OC.L10N.register(
     "Delete" : "Deler",
     "Please select a file." : "Per favor selectiona un file.",
     "Sort" : "Ordinar",
+    "Shared" : "Compartite",
     "group" : "gruppo",
     "Sharing" : "Compartente",
     "Update" : "Actualisation",

@@ -187,7 +187,7 @@ OC.L10N.register(
     "Do you really want to delete the table \"{table}\"?" : "Ali ste prepričani, da želite izbrisati razpredelnico »{table}«?",
     "Copy" : "Kopiraj",
     "My tables" : "Moje razpredelnice",
-    "Shared tables" : "Razpredelnice v souporabi",
+    "Shared" : "V souporabi",
     "Your results are filtered." : "Rezultati so filtrirani.",
     "Clear filter" : "Počisti filter",
     "User or group name …" : "Ime uporabnika oziroma skupine ...",

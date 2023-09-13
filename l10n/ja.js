@@ -58,7 +58,7 @@ OC.L10N.register(
     "Delete table" : "表を削除",
     "Copy" : "コピー",
     "My tables" : "マイテーブル",
-    "Shared tables" : "共有された表",
+    "Shared" : "共有中",
     "Clear filter" : "フィルターをクリア",
     "User or group name …" : "ユーザーかグループ名 ...",
     "No recommendations. Start typing." : "推奨事項はありません。 入力を開始します。",

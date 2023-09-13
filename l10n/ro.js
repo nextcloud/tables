@@ -37,6 +37,7 @@ OC.L10N.register(
     "Filter" : "Filtru",
     "Sort" : "Sortează",
     "Copy" : "Copiază",
+    "Shared" : "Partajat",
     "group" : "grup",
     "No shares" : "Nicio partajare",
     "Created at" : "Creat la",

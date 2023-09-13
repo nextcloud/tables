@@ -16,6 +16,7 @@ OC.L10N.register(
     "Please select a file." : "Tagh faidhle.",
     "Sort" : "Seòrsaich",
     "Copy" : "Dèan lethbhreac",
+    "Shared" : "Co-roinnte",
     "Sharing" : "Co-roinneadh",
     "Error" : "Mearachd",
     "Download" : "Luchdaich a-nuas",

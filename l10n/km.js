@@ -27,6 +27,7 @@ OC.L10N.register(
     "Delete" : "លុប",
     "File" : "ឯកសារ",
     "Sort" : "តម្រៀប",
+    "Shared" : "បាន​ចែក​រំលែក",
     "group" : "ក្រុម",
     "Delete data" : "លុបទិន្នន័យ",
     "Sharing" : "ការ​ចែក​រំលែក",

@@ -271,8 +271,6 @@ OC.L10N.register(
     "Could not configure new view" : "تتعذّر تهيئة المنظور الجديد",
     "Filter tables" : "تصفية/ فلترة الجداول",
     "My tables" : "جداولي",
-    "Shared tables" : "جداول مشتركة",
-    "Shared views" : "مناظير مشتركة",
     "Your results are filtered." : "نتائجك تمّت فلترتُها",
     "Clear filter" : "ازل التصفية",
     "Share with accounts or groups" : "شارك مع حسابات و مجموعات",

@@ -40,6 +40,7 @@ OC.L10N.register(
     "File" : "Tệp",
     "Please select a file." : "Hãy chọn một tệp.",
     "Filter" : "Lọc",
+    "Shared" : "Chia sẻ",
     "Searching …" : "Đang tìm kiếm ...",
     "group" : "nhóm",
     "Delete data" : "Xóa dữ liệu",

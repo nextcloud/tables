@@ -23,6 +23,7 @@ OC.L10N.register(
     "Cancel" : "Diddymu",
     "Delete" : "Dileu",
     "Sort" : "Trefnu",
+    "Shared" : "Rhannwyd",
     "group" : "grŵp",
     "Update" : "Diweddaru",
     "Error" : "Gwall",

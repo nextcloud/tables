@@ -35,6 +35,7 @@ OC.L10N.register(
     "Please select a file." : "გთხოვთ აირჩიოთ ფაილი.",
     "Filter" : "ფილტრი",
     "Sort" : "განლაგება",
+    "Shared" : "გაზიარებული",
     "group" : "ჯგუფი",
     "Permissions" : "უფლებები",
     "Created at" : "შეიქმნა",

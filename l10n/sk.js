@@ -106,7 +106,7 @@ OC.L10N.register(
     "Delete table" : "Vymazať tabuľku",
     "Do you really want to delete the table \"{table}\"?" : "Naozaj chcete odstrániť tabuľku \"{table}\"?",
     "My tables" : "Moje tabuľky",
-    "Shared tables" : "Zdieľané tabuľky",
+    "Shared" : "Sprístupnené",
     "Clear filter" : "Vyčistiť filter",
     "User or group name …" : "Meno používateľa alebo názov skupiny…",
     "No recommendations. Start typing." : "Žiadne odporúčania. Môžete začať písať.",

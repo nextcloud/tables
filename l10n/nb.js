@@ -86,6 +86,7 @@ OC.L10N.register(
     "Sort" : "Sorter",
     "Delete table" : "Slett tabell",
     "Copy" : "Kopi",
+    "Shared" : "Delt",
     "Clear filter" : "Tøm filter",
     "User or group name …" : "Bruker eller gruppenavn ...",
     "No recommendations. Start typing." : "Ingen anbefalinger. Start å skrive.",

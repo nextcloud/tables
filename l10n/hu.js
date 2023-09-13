@@ -214,7 +214,7 @@ OC.L10N.register(
     "Copy" : "Másolás",
     "Filter tables" : "Táblázatok szűrése",
     "My tables" : "Saját táblázatok",
-    "Shared tables" : "Megosztott táblázatok",
+    "Shared" : "Megosztva",
     "Your results are filtered." : "A találatok szűrtek.",
     "Clear filter" : "Szűrő törlése",
     "User or group name …" : "Felhasználó vagy csoport neve…",

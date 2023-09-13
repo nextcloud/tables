@@ -34,6 +34,7 @@ OC.L10N.register(
     "File" : "Datne",
     "Please select a file." : "Lūdzu izvēlies datni.",
     "Sort" : "Kārtot",
+    "Shared" : "Koplietots",
     "Searching …" : "Meklē...",
     "No elements found." : "Elementi netika atrasti.",
     "group" : "grupa",

@@ -31,6 +31,7 @@ OC.L10N.register(
     "Please select a file." : "Palun vali fail.",
     "Filter" : "Filter",
     "Sort" : "Sorteeri",
+    "Shared" : "Jagatud",
     "No recommendations. Start typing." : "Soovitusi pole. Alusta trükkimist.",
     "Searching …" : "Otsin ...",
     "group" : "grupp",

@@ -95,6 +95,7 @@ OC.L10N.register(
     "Filter" : "מסנן",
     "Sort" : "מיון",
     "Copy" : "העתקה",
+    "Shared" : "משותף",
     "Clear filter" : "מחיקת מסנן",
     "User or group name …" : "שם משתמש או קבוצה…",
     "No recommendations. Start typing." : "אין המלצות. נא להתחיל להקליד.",

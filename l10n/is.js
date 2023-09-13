@@ -43,6 +43,7 @@ OC.L10N.register(
     "Please select a file." : "Veldu skrá.",
     "Filter" : "Sía",
     "Sort" : "Flokka",
+    "Shared" : "Sameiginlegt",
     "User or group name …" : "Notandi eða heiti hóps …",
     "Searching …" : "Leita …",
     "group" : "hópur",

@@ -108,7 +108,7 @@ OC.L10N.register(
     "Do you really want to delete the table \"{table}\"?" : "Czy na pewno chcesz usunąć tabelę \"{table}\"?",
     "Copy" : "Skopiuj",
     "My tables" : "Moje tabele",
-    "Shared tables" : "Wspólne tabele",
+    "Shared" : "Udostępnione",
     "Clear filter" : "Wyczyść filtr",
     "User or group name …" : "Nazwa użytkownika lub grupy…",
     "No recommendations. Start typing." : "Brak rekomendacji. Możesz napisać.",

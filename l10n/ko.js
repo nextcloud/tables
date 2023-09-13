@@ -50,6 +50,7 @@ OC.L10N.register(
     "Please select a file." : "파일을 선택하십시오.",
     "Filter" : "필터",
     "Sort" : "정렬",
+    "Shared" : "공유됨",
     "No recommendations. Start typing." : "추천 없음. 타이핑을 시작하십시오",
     "Searching …" : "검색 ...",
     "No elements found." : "요소를 찾을 수 없습니다.",

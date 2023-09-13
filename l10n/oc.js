@@ -42,6 +42,7 @@ OC.L10N.register(
     "Information" : "Informacions",
     "Please select a file." : "Seleccionatz un fichièr.",
     "Sort" : "Triar",
+    "Shared" : "Partejat",
     "Searching …" : "Recèrca…",
     "group" : "grop",
     "Delete data" : "Suprimir donada",

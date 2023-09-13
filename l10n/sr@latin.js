@@ -20,6 +20,7 @@ OC.L10N.register(
     "Delete" : "Obriši",
     "File" : "Fajl",
     "Copy" : "Kopiraj",
+    "Shared" : "Deljeno",
     "group" : "grupa",
     "Sharing" : "Deljenje",
     "Read" : "Čitaj",

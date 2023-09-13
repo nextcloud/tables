@@ -39,6 +39,7 @@ OC.L10N.register(
     "Filter" : "Filtro",
     "Sort" : "Renditni",
     "Copy" : "Kopjoni",
+    "Shared" : "Ndarë",
     "group" : "grup",
     "Permissions" : "Lejet",
     "Created at" : "U krijua në",

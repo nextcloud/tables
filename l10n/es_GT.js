@@ -34,6 +34,7 @@ OC.L10N.register(
     "Result" : "Resultado",
     "Please select a file." : "Por favor selecciona un archivo.",
     "Filter" : "Filtrar",
+    "Shared" : "Compartido",
     "group" : "grupo",
     "Permissions" : "Permisos",
     "Created at" : "Creado en",

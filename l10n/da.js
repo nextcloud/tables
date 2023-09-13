@@ -213,7 +213,7 @@ OC.L10N.register(
     "Copy" : "Kopiér",
     "Filter tables" : "Filtrer tabeller",
     "My tables" : "Mine tabeller",
-    "Shared tables" : "Fælles tabeller",
+    "Shared" : "Delt",
     "Your results are filtered." : "Dine resultater er filtreret.",
     "Clear filter" : "Ryd filter",
     "User or group name …" : "Bruger- eller gruppenavn...",

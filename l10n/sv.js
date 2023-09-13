@@ -177,7 +177,7 @@ OC.L10N.register(
     "Copy" : "Kopiera",
     "Filter tables" : "Filtrera tabeller",
     "My tables" : "Mina tabeller",
-    "Shared tables" : "Delade tabeller",
+    "Shared" : "Delad",
     "Your results are filtered." : "Dina resultat filtreras.",
     "Clear filter" : "Rensa filter",
     "User or group name …" : "Användar- eller gruppnamn ...",

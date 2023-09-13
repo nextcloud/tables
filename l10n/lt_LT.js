@@ -76,7 +76,7 @@ OC.L10N.register(
     "Sort" : "Rikiuoti",
     "Copy" : "Kopija",
     "My tables" : "Mano lentelės",
-    "Shared tables" : "Bendrinamos lentelės",
+    "Shared" : "Bendrinama",
     "Clear filter" : "Išvalyti filtrą",
     "User or group name …" : "Naudotojo ar grupės vardas…",
     "No recommendations. Start typing." : "Rekomendacijų nėra. Pradėkite rašyti.",

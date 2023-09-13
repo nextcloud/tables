@@ -56,6 +56,7 @@ OC.L10N.register(
     "Please select a file." : "Будь ласка, виберіть файл.",
     "Filter" : "Фільтр",
     "Sort" : "Впорядкувати",
+    "Shared" : "Спільне",
     "Clear filter" : "Очистити фільтр",
     "No recommendations. Start typing." : "Немає рекомендацій. Почніть друкувати.",
     "Searching …" : "Пошук...",

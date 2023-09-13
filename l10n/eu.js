@@ -179,7 +179,7 @@ OC.L10N.register(
     "Do you really want to delete the table \"{table}\"?" : "Benetan ezabatu nahi al duzu \"{table}\" taula?",
     "Copy" : "Kopiatu",
     "My tables" : "Nire taulak",
-    "Shared tables" : "Partekatutako taulak",
+    "Shared" : "Partekatuta",
     "Clear filter" : "Garbitu iragazkia",
     "User or group name …" : "Erabiltzaile edo taldearen izena ...",
     "No recommendations. Start typing." : "Gomendiorik ez. Hasi idazten.",

@@ -19,6 +19,7 @@ OC.L10N.register(
     "Please select a file." : "ກະລຸນາເລືອກຟາຍ",
     "Sort" : "ລຽງດຳດັບ",
     "Copy" : "ສຳເນົາ",
+    "Shared" : "ແບ່ງປັນ",
     "Sharing" : "ການແບ່ງປັນ",
     "Download" : "ດາວໂຫລດ",
     "Search" : "ຄົ້ນຫາ",

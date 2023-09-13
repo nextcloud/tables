@@ -35,6 +35,7 @@ OC.L10N.register(
     "File" : "Dosiero",
     "Please select a file." : "Bonvolu elekti dosieron.",
     "Sort" : "Ordigi",
+    "Shared" : "Kunhavigita",
     "No recommendations. Start typing." : "Neniu propono. Ektajpu.",
     "No elements found." : "Nenio trovita.",
     "group" : "grupo",

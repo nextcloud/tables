@@ -214,7 +214,7 @@ OC.L10N.register(
     "Copy" : "Copiar",
     "Filter tables" : "Filtrar tablas",
     "My tables" : "Mis tablas",
-    "Shared tables" : "Tablas compartidas",
+    "Shared" : "Compartido",
     "Your results are filtered." : "Tus resultados están filtrados.",
     "Clear filter" : "Borrar filtro",
     "User or group name …" : "Nombre de usuario o grupo...",

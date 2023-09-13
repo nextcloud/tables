@@ -102,6 +102,7 @@ OC.L10N.register(
     "Sort" : "排序",
     "Delete table" : "删除表格",
     "Copy" : "复制",
+    "Shared" : "已共享",
     "Clear filter" : "清除筛选",
     "User or group name …" : "用户或群组名 ......",
     "No recommendations. Start typing." : "无建议。开始输入。",

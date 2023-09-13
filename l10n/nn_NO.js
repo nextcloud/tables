@@ -30,6 +30,7 @@ OC.L10N.register(
     "Filter" : "Filter",
     "Sort" : "Sorter",
     "Copy" : "Kopier",
+    "Shared" : "Delt",
     "group" : "gruppe",
     "Delete data" : "Slett data",
     "Created at" : "Skapt den",

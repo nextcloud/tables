@@ -70,7 +70,7 @@ OC.L10N.register(
     "Delete table" : "Удалить таблицу",
     "Copy" : "Копировать",
     "My tables" : "Мои таблицы",
-    "Shared tables" : "Общие таблицы",
+    "Shared" : "Опубликованное",
     "Clear filter" : "Сбросить фильтр",
     "User or group name …" : "Имя пользователя или группы…",
     "No recommendations. Start typing." : "Начните вводить имя...",

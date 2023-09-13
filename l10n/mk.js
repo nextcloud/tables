@@ -41,6 +41,7 @@ OC.L10N.register(
     "Please select a file." : "Изберете датотека.",
     "Filter" : "Филтер",
     "Sort" : "Сортирај",
+    "Shared" : "Споделено",
     "Clear filter" : "Исчисти филтри",
     "User or group name …" : "Корисник или име на група ...",
     "No recommendations. Start typing." : "Нема препораки. Започнете со пишување.",
