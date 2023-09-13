@@ -35,7 +35,7 @@ describe('The Home Page', () => {
 		cy.contains('Read the docs').should('exist')
 	})
 
-	it.only('Reset FE filter on table or view change', () => {
+	it('Reset FE filter on table or view change', () => {
 		// create a table and view, so we can change the active table and view later on
 		cy.createTable('first table')
 		cy.createTextLineColumn('colA', true)
