@@ -31,7 +31,7 @@ addCommands()
 
 Cypress.Commands.add('createTable', (title) => {
 	cy.contains('.app-menu-entry--label', 'Tables').click()
-	cy.contains('button', 'Create new table').click()
+	cy.get('button[aria-label="Create new table"]').click()
 	cy.get('.tile').contains('Custom table').click({ force: true })
 	cy.get('.modal__content input[type="text"]').clear().type(title)
 	cy.contains('button', 'Create table').click()
@@ -45,7 +45,11 @@ Cypress.Commands.add('createView', (title) => {
 
 	cy.get('.modal-container #settings-section_title input').type(title)
 
+	cy.intercept({ method: 'POST', url: '**/apps/tables/view' }).as('createView')
+	cy.intercept({ method: 'PUT', url: '**/apps/tables/view/*' }).as('updateView')
 	cy.contains('button', 'Create View').click()
+	cy.wait('@createView')
+	cy.wait('@updateView')
 
 	cy.contains('.app-navigation-entry-link span', title).should('exist')
 })
@@ -55,8 +59,21 @@ Cypress.Commands.add('clickOnTableThreeDotMenu', (optionName) => {
 	cy.get('.v-popper__popper li button span').contains(optionName).click({ force: true })
 })
 
+Cypress.Commands.add('sortTableColumn', (columnTitle, mode = 'ASC') => {
+	cy.get('th').contains(columnTitle).click()
+	if (mode === 'ASC') {
+		cy.get('ul li.action button[aria-label="Sort asc"]').click()
+	} else {
+		cy.get('ul li.action button[aria-label="Sort desc"]').click()
+	}
+})
+
 Cypress.Commands.add('loadTable', (name) => {
-	cy.get('.app-navigation-entry-link').contains(name).click({ force: true })
+	cy.get('.app-navigation-entry a[title="' + name + '"]').click({ force: true })
+})
+
+Cypress.Commands.add('loadView', (name) => {
+	cy.get('.app-navigation-entry a[title="' + name + '"]').click({ force: true })
 })
 
 Cypress.Commands.add('unifiedSearch', (term) => {
