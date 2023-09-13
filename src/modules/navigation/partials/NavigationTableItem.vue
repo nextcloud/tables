@@ -19,7 +19,7 @@
 			<NcCounterBubble v-if="canReadData(table)">
 				{{ n('tables', '%n row', '%n rows', table.rowsCount, {}) }}
 			</NcCounterBubble>
-			<NcActionButton v-if="!isSharedItem" icon="icon-share" :class="{'margin-right': !(activeTable && table.id === activeTable.id)}" @click="actionShowShare" />
+			<NcActionButton v-if="table.hasShares" icon="icon-share" :class="{'margin-right': !(activeTable && table.id === activeTable.id)}" @click="actionShowShare" />
 			<div v-if="table.isShared && table.ownership !== userId" class="margin-left">
 				<NcAvatar :user="table.ownership" />
 			</div>
@@ -74,7 +74,7 @@
 		<NavigationViewItem v-for="view in getViews"
 			:key="'view'+view.id"
 			:view="view"
-			:is-shared-item="true" />
+			:show-share-sender="false" />
 	</NcAppNavigationItem>
 </template>
 <script>
@@ -128,10 +128,6 @@ export default {
 			type: String,
 			default: '',
 		},
-		isSharedItem: {
-		      type: Boolean,
-		      default: false,
-		    },
 	},
 
 	data() {

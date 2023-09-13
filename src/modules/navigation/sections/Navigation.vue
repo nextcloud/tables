@@ -24,18 +24,15 @@
 					:filter-string="filterString"
 					:table="table" />
 
-				<NcAppNavigationCaption v-if="getSharedTables.length > 0"
+				<NcAppNavigationCaption v-if="getSharedTables.length > 0 || getSharedViews.length > 0"
 					:title="t('tables', 'Shared')" />
 				<NavigationTableItem v-for="table in getSharedTables"
 					:key="table.id"
 					:filter-string="filterString"
-					:table="table"
-					:is-shared-item="true" />
-				<NavigationViewItem
-					v-for="view in getSharedViews"
+					:table="table" />
+				<NavigationViewItem v-for="view in getSharedViews"
 					:key="'view'+view.id"
-					:view="view"
-					:is-shared-item="true" />
+					:view="view" />
 			</ul>
 
 			<div v-if="filterString !== ''" class="search-info">
