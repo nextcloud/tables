@@ -28,10 +28,10 @@ export default class SelectionColumn extends AbstractSelectionColumn {
 	sort(mode) {
 		const factor = mode === 'DESC' ? -1 : 1
 		return (rowA, rowB) => {
-			const selectionIdA = rowA.data.find(item => item.columnId === this.id)?.value ?? null
+			const selectionIdA = parseInt(rowA.data.find(item => item.columnId === this.id)?.value ?? null)
 			const vA = selectionIdA !== null ? this.selectionOptions.find(item => item.id === selectionIdA)?.label : ''
 			const valueA = this.removeEmoji(vA).trim()
-			const selectionIdB = rowB.data.find(item => item.columnId === this.id)?.value ?? null
+			const selectionIdB = parseInt(rowB.data.find(item => item.columnId === this.id)?.value ?? null)
 			const vB = selectionIdB !== null ? this.selectionOptions.find(item => item.id === selectionIdB)?.label : ''
 			const valueB = this.removeEmoji(vB).trim()
 			return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor
