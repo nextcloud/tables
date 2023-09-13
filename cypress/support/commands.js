@@ -26,6 +26,7 @@
 import { addCommands } from '@nextcloud/cypress'
 
 const url = Cypress.config('baseUrl').replace(/\/index.php\/?$/g, '')
+Cypress.env('baseUrl', url)
 
 addCommands()
 
@@ -155,4 +156,41 @@ Cypress.Commands.add('uploadFile', (fileName, mimeType, target) => {
 					return cy.wrap(fileId)
 				})
 		})
+})
+
+Cypress.Commands.add('ocsRequest', (user, options) => {
+	const auth = { user: user.userId, password: user.password }
+	return cy.request({
+		form: true,
+		auth,
+		headers: {
+			'OCS-ApiRequest': 'true',
+			'Content-Type': 'application/x-www-form-urlencoded',
+		},
+		...options,
+	})
+})
+Cypress.Commands.add('createGroup', (groupName) => {
+	cy.ocsRequest({ userId: 'admin', password: 'admin' }, {
+		method: 'POST',
+		url: `${url}/ocs/v2.php/cloud/groups`,
+		body: {
+			groupid: groupName,
+			displayname: groupName,
+		},
+	}).then(response => {
+		cy.log(`Group ${groupName} created.`, response.status)
+	})
+})
+
+Cypress.Commands.add('addUserToGroup', (userId, groupId) => {
+	cy.ocsRequest({ userId: 'admin', password: 'admin' }, {
+		method: 'POST',
+		url: `${url}/ocs/v2.php/cloud/users/${userId}/groups`,
+		body: {
+			groupid: groupId,
+		},
+	}).then(response => {
+		cy.log(`User ${userId} added to group ${groupId}.`, response.status)
+	})
 })

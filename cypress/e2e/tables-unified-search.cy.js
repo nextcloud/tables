@@ -1,16 +1,21 @@
 let localUser
 let localUser2
-const alice = { userId: 'alice', password: 'alice' }
-const bob = { userId: 'bob', password: 'bob' }
+const groupId = (Math.random() + 1).toString(36).substring(7)
 
 describe('The Home Page', () => {
 
 	before(function() {
-		cy.createRandomUser().then(user => {
-			localUser = user
-		})
-		cy.createRandomUser().then(user => {
-			localUser2 = user
+		cy.createGroup(groupId).then(() => {
+			cy.createRandomUser().then(user => {
+				localUser = user
+			}).then(user => {
+				cy.addUserToGroup(user.userId, groupId)
+			})
+			cy.createRandomUser().then(user => {
+				localUser2 = user
+			}).then(user => {
+				cy.addUserToGroup(user.userId, groupId)
+			})
 		})
 	})
 
@@ -77,7 +82,7 @@ describe('The Home Page', () => {
 	})
 
 	it('Search for shared table via group share', () => {
-		cy.login(alice)
+		cy.login(localUser)
 		cy.visit('apps/tables')
 
 		// create table to share
@@ -88,19 +93,19 @@ describe('The Home Page', () => {
 		cy.clickOnTableThreeDotMenu('Share')
 
 		cy.intercept({ method: 'GET', url: '**/ocs/v2.php/apps/files_sharing/api/v1/sharees*' }).as('searchShareUsers')
-		cy.get('.sharing input').type('shareTestGroup')
+		cy.get('.sharing input').type(groupId)
 		cy.wait('@searchShareUsers')
 		cy.get('.sharing input').type('{enter}')
 
-		cy.get('h3').contains('Shares').parent().find('ul').contains('shareTestGroup').should('exist')
+		cy.get('h3').contains('Shares').parent().find('ul').contains(groupId).should('exist')
 
-		cy.login(bob)
+		cy.login(localUser2)
 		cy.visit('apps/tables')
 		cy.unifiedSearch('Share for group')
 	})
 
 	it('Search for shared view via group share', () => {
-		cy.login(alice)
+		cy.login(localUser)
 		cy.visit('apps/tables')
 
 		// create table to share
@@ -112,13 +117,13 @@ describe('The Home Page', () => {
 		cy.clickOnTableThreeDotMenu('Share')
 
 		cy.intercept({ method: 'GET', url: '**/ocs/v2.php/apps/files_sharing/api/v1/sharees*' }).as('searchShareUsers')
-		cy.get('.sharing input').type('shareTestGroup')
+		cy.get('.sharing input').type(groupId)
 		cy.wait('@searchShareUsers')
 		cy.get('.sharing input').type('{enter}')
 
-		cy.get('h3').contains('Shares').parent().find('ul').contains('shareTestGroup').should('exist')
+		cy.get('h3').contains('Shares').parent().find('ul').contains(groupId).should('exist')
 
-		cy.login(bob)
+		cy.login(localUser2)
 		cy.visit('apps/tables')
 		cy.unifiedSearch('ShareView2')
 	})

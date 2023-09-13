@@ -125,16 +125,6 @@ jobs:
           ./occ app:enable --force ${{ env.APP_NAME }}
           ./occ config:system:set query_log_file --value '/home/runner/work/${{ env.APP_NAME }}/${{ env.APP_NAME }}/query.log'
           php -S 127.0.0.1:8081 > /tmp/requestlog 2>&1 &
-          export OC_PASS=1234561
-          php occ user:add --password-from-env user1
-          php occ user:add --password-from-env user2
-          export OC_PASS=alice
-          php occ user:add --password-from-env alice
-          export OC_PASS=bob
-          php occ user:add --password-from-env bob
-          ./occ group:add shareTestGroup
-          ./occ group:adduser shareTestGroup alice
-          ./occ group:adduser shareTestGroup bob
           curl -v http://127.0.0.1:8081/index.php/login
           cat data/nextcloud.log
 
