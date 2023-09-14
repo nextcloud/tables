@@ -135,12 +135,12 @@ export default {
 						const id = field.id
 						field.id = '@' + id
 					}
-					mf.push({ ...field })
+					fields.push({ ...field })
 				})
 				if (this.term) {
-					return [this.term, mf]
+					return [this.term, fields]
 				} else {
-					return mf
+					return fields
 				}
 			} else if (this.selectedColumn && this.selectedColumn.type.substr(0, 9) === 'selection') {
 				const options = []
