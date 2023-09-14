@@ -129,10 +129,19 @@ export default {
 		},
 		magicFields() {
 			if (this.selectedColumn && this.selectedColumn.type.substr(0, 9) !== 'selection') {
+				const fields = []
+				this.selectedColumn.getPossibleMagicFields().forEach(field => {
+					if (field.id.substr(0, 1) !== '@') {
+						const id = field.id
+						field.id = '@' + id
+					}
+					fields.push({ ...field })
+				})
 				if (this.term) {
-					return [this.term, ...this.selectedColumn.getPossibleMagicFields()]
+					return [this.term, fields]
+				} else {
+					return fields
 				}
-				return this.selectedColumn.getPossibleMagicFields()
 			} else if (this.selectedColumn && this.selectedColumn.type.substr(0, 9) === 'selection') {
 				const options = []
 				this.selectedColumn.selectionOptions.forEach(item => {

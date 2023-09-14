@@ -1,7 +1,7 @@
 <template>
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :loading="isLoadingResults">
 		<div class="row">
-			<div v-if="providers.length === 0" class="col-4">
+			<div v-if="providers?.length === 0" class="col-4">
 				<NcNoteCard type="info">
 					{{ t('tables', 'You can not insert any links in this field. Please configure at least one link provider in the column configuration.') }}
 				</NcNoteCard>

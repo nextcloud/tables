@@ -83,7 +83,7 @@ export default {
 	watch: {
 		getSelectedProviderIds() {
 			this.mutableColumn.textAllowedPattern = this.getSelectedProviderIds.join(',')
-			if (this.getSelectedProviderIds.length === 0) {
+			if (this.getSelectedProviderIds?.length === 0) {
 				this.error = true
 			} else {
 				this.error = false

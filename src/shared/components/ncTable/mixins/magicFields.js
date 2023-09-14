@@ -104,7 +104,7 @@ export const MagicFields = {
 		id: 'datetime-date-today',
 		label: t('tables', 'Today'),
 		icon: 'icon-calendar-dark',
-		goodFor: [ColumnTypes.DatetimeDate],
+		goodFor: [ColumnTypes.DatetimeDate, ColumnTypes.Datetime],
 		replace: new Moment().format('YYYY-MM-DD'),
 	}),
 	DatetimeDateStartOfYear: new MagicField({
