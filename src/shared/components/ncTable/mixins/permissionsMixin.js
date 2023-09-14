@@ -7,7 +7,7 @@ export default {
 			if (!element.isShared) {
 				return true
 			}
-			if ((element.isShared && element?.onSharePermissions?.manageTable) || element?.ownership === getCurrentUser().uid) {
+			if ((element.isShared && element?.onSharePermissions?.manage) || element?.ownership === getCurrentUser().uid) {
 				return true
 			}
 			return false
