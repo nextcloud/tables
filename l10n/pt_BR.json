@@ -1,10 +1,13 @@
 { "translations": {
+    "Could not create row." : "Não foi possível criar a linha.",
     "Could not update row." : "Não foi possível atualizar a linha.",
     "Nextcloud tables" : "Nextcloud tables",
     "Select table" : "Select table",
     "Select columns" : "Selecione as colunas",
     "e.g. 1,2,4 or leave empty" : "por exemplo. 1,2,4 ou deixe vazio",
     "_%n row_::_%n rows_" : ["%n row","%n rows","%n rows"],
+    "table" : "tabela",
+    "table view" : "ver tabela",
     "This column was automatically created by the import service." : "Esta coluna foi criada automaticamente pelo serviço de importação.",
     "Tutorial" : "Tutorial",
     "ToDo list" : "Lista de tarefas",

@@ -8,6 +8,8 @@ OC.L10N.register(
     "Select columns" : "選擇縱列",
     "e.g. 1,2,4 or leave empty" : "例如 1, 2, 4 或留空",
     "_%n row_::_%n rows_" : ["%n 列"],
+    "table" : "表",
+    "table view" : "表格檢視",
     "This column was automatically created by the import service." : "此縱列為自動從匯入服務建立。",
     "Tutorial" : "教學",
     "ToDo list" : "待辦清單",

@@ -6,6 +6,8 @@
     "Select columns" : "Select columns",
     "e.g. 1,2,4 or leave empty" : "e.g. 1,2,4 or leave empty",
     "_%n row_::_%n rows_" : ["%n row","%n rows"],
+    "table" : "table",
+    "table view" : "table view",
     "This column was automatically created by the import service." : "This column was automatically created by the import service.",
     "Tutorial" : "Tutorial",
     "ToDo list" : "ToDo list",

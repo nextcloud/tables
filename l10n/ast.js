@@ -21,6 +21,7 @@ OC.L10N.register(
     "Delete" : "Desaniciar",
     "Please select a file." : "Seleiciona un ficheru.",
     "Sort" : "Ordenar",
+    "Shared" : "Compartío",
     "Searching …" : "Buscando…",
     "Permissions" : "Permisos",
     "Sharing" : "Comparticiñon",

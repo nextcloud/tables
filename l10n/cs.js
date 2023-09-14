@@ -270,6 +270,7 @@ OC.L10N.register(
     "Could not configure new view" : "Nepodařilo se nastavit nový pohled",
     "Filter tables" : "Filtrovat tabulky",
     "My tables" : "Moje tabulky",
+    "Shared" : "Sdíleno",
     "Your results are filtered." : "Vaše výsledky jsou filtrovány.",
     "Clear filter" : "Vyčistit filtr",
     "Share with accounts or groups" : "Sdílet s účty nebo skupinami",

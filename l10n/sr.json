@@ -6,6 +6,8 @@
     "Select columns" : "Изаберите колоне",
     "e.g. 1,2,4 or leave empty" : "нпр. 1,2,4 или оставите празно",
     "_%n row_::_%n rows_" : ["%n ред","%n реда","%n редова"],
+    "table" : "табела",
+    "table view" : "поглед табеле",
     "This column was automatically created by the import service." : "Ову колону је аутоматски креирао сервис за увоз.",
     "Tutorial" : "Туторијал",
     "ToDo list" : "ToDo листа",

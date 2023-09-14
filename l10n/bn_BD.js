@@ -24,6 +24,7 @@ OC.L10N.register(
     "Cancel" : "বাতির",
     "Delete" : "মুছে",
     "Please select a file." : "একটি ফাইল নির্বাচন করুন",
+    "Shared" : "ভাগাভাগিকৃত",
     "group" : "দল",
     "Sharing" : "ভাগাভাগিরত",
     "Read" : "পড়",

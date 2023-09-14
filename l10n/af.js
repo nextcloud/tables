@@ -31,6 +31,7 @@ OC.L10N.register(
     "File" : "Lêer",
     "Please select a file." : "Kies asb. ’n lêer.",
     "Filter" : "Filter",
+    "Shared" : "Gedeel",
     "group" : "Groep",
     "Created at" : "Geskep om",
     "Update" : "Werk by",

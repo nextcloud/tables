@@ -22,6 +22,7 @@ OC.L10N.register(
     "Title" : "Naslov",
     "Cancel" : "Otkaži",
     "Delete" : "Obriši",
+    "Shared" : "Podijeljen",
     "group" : "grupa",
     "Sharing" : "Dijeljenje",
     "Update" : "Ažuriraj",

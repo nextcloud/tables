@@ -27,6 +27,7 @@ OC.L10N.register(
     "Please select a file." : "Choazit ur restr mar-plij.",
     "Filter" : "Filtre",
     "Sort" : "Renkañ",
+    "Shared" : "Rannet",
     "Searching …" : "O klask ...",
     "group" : "strollad",
     "Created at" : "Krouet da",
