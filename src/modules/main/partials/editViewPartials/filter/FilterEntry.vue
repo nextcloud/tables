@@ -128,7 +128,7 @@ export default {
 			}
 		},
 		magicFields() {
-			if (this.selectedColumn && this.selectedColumn.type.substr(0, 9) !== 'selection') {
+			if (this.selectedColumn && (this.selectedColumn.type.substr(0, 9) !== 'selection' || this.selectedColumn?.type === 'selection-check')) {
 				const fields = []
 				this.selectedColumn.getPossibleMagicFields().forEach(field => {
 					if (field.id.substr(0, 1) !== '@') {
@@ -144,7 +144,7 @@ export default {
 				}
 			} else if (this.selectedColumn && this.selectedColumn.type.substr(0, 9) === 'selection') {
 				const options = []
-				this.selectedColumn.selectionOptions.forEach(item => {
+				this.selectedColumn.selectionOptions?.forEach(item => {
 					options.push({
 						id: '@selection-id-' + item.id,
 						label: item.label,
