@@ -18,7 +18,7 @@
 						:title-missing-error="editErrorTitle" />
 				</div>
 				<div class="col-2 space-LR space-T">
-					<component :is="getColumnForm" :column="editColumn" />
+					<component :is="getColumnForm" :column="editColumn" :can-save.sync="canSave" />
 				</div>
 			</div>
 			<div class="buttons">
@@ -36,7 +36,7 @@
 							{{ t('tables', 'Cancel') }}
 						</NcButton>
 					</div>
-					<NcButton type="primary" :aria-label="t('tables', 'Save')" @click="saveColumn">
+					<NcButton type="primary" :aria-label="t('tables', 'Save')" :disabled="!canSave" @click="saveColumn">
 						{{ t('tables', 'Save') }}
 					</NcButton>
 				</div>
@@ -108,9 +108,10 @@ export default {
 	data() {
 		return {
 			loading: false,
-			editColumn: structuredClone(this.column),
+			editColumn: Object.assign({}, this.column),
 			deleteId: null,
 			editErrorTitle: false,
+			canSave: true, // avoid to save an incorrect config
 		}
 	},
 	computed: {
@@ -165,7 +166,7 @@ export default {
 			this.editErrorTitle = false
 		},
 		async updateColumn() {
-			const data = { ...this.editColumn }
+			const data = Object.assign({}, this.editColumn)
 			if ((this.column.type === ColumnTypes.SelectionMulti || this.column.type === ColumnTypes.SelectionCheck) && data.selectionDefault !== null) data.selectionDefault = JSON.stringify(data.selectionDefault)
 			delete data.type
 			delete data.id
