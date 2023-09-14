@@ -129,7 +129,7 @@ export default {
 		},
 		magicFields() {
 			if (this.selectedColumn && this.selectedColumn.type.substr(0, 9) !== 'selection') {
-				const mf = []
+				const fields = []
 				this.selectedColumn.getPossibleMagicFields().forEach(field => {
 					if (field.id.substr(0, 1) !== '@') {
 						const id = field.id
