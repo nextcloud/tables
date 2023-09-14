@@ -79,7 +79,7 @@ export default {
 				if (value === '') {
 					this.setupEditor()
 				} else {
-					this.editor.setContent(value)
+					this.editor?.setContent(value)
 				}
 			}
 		},
@@ -88,7 +88,7 @@ export default {
 	async mounted() {
 		this.localValue = this.text
 		await this.setupEditor()
-		this.editor.setContent(this.localValue, false)
+		this.editor?.setContent(this.localValue, false)
 	},
 
 	beforeDestroy() {
