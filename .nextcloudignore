@@ -36,3 +36,4 @@ psalm.xml
 stylelint.config.js
 webpack.js
 releaseNotes.md
+/.scripts
