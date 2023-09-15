@@ -1,6 +1,6 @@
 let localUser
 
-describe('The Home Page', () => {
+describe('FE sorting and filtering', () => {
 
 	before(function() {
 		cy.createRandomUser().then(user => {
@@ -63,5 +63,41 @@ describe('The Home Page', () => {
 		cy.get('.info').contains('Reset local adjustments').should('be.visible')
 		cy.loadView('view for second table')
 		cy.get('.info').contains('Reset local adjustments').should('not.exist')
+	})
+
+	it.only('Navigation filtering', () => {
+		cy.viewport('macbook-15')
+		cy.createTable('first table')
+		cy.createTable('second table')
+		cy.createTable('third table 🙇')
+		cy.createTextLineColumn('col1', true)
+		cy.createView('view for third tab')
+
+		// all tables and views should be visible
+		cy.get('.app-navigation-entry__title').contains('first table').should('be.visible')
+		cy.get('.app-navigation-entry__title').contains('second table').should('be.visible')
+		cy.get('.app-navigation-entry__title').contains('third table 🙇').should('be.visible')
+		cy.get('.app-navigation-entry__title').contains('view for third tab').should('be.visible')
+
+		// only tables should be visible
+		cy.get('.filter-box input').clear().type('table')
+		cy.get('.app-navigation-entry__title').contains('first table').should('be.visible')
+		cy.get('.app-navigation-entry__title').contains('second table').should('be.visible')
+		cy.get('.app-navigation-entry__title').contains('third table 🙇').should('be.visible')
+		cy.get('.app-navigation-entry__title').contains('view for third tab').should('not.exist')
+
+		// only the second table should be visible
+		cy.get('.filter-box input').clear().type('second')
+		cy.get('.app-navigation-entry__title').contains('first table').should('not.exist')
+		cy.get('.app-navigation-entry__title').contains('second table').should('be.visible')
+		cy.get('.app-navigation-entry__title').contains('third table 🙇').should('not.exist')
+		cy.get('.app-navigation-entry__title').contains('view for third tab').should('not.exist')
+
+		// only the third table and it's view should be visible
+		cy.get('.filter-box input').clear().type('view for third')
+		cy.get('.app-navigation-entry__title').contains('first table').should('not.exist')
+		cy.get('.app-navigation-entry__title').contains('second table').should('not.exist')
+		cy.get('.app-navigation-entry__title').contains('third table 🙇').should('be.visible')
+		cy.get('.app-navigation-entry__title').contains('view for third tab').should('be.visible')
 	})
 })

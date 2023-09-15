@@ -162,6 +162,11 @@ export default new Vuex.Store({
 			const views = state.views
 			views.push(res.data)
 			commit('setViews', views)
+
+			const tables = state.tables
+			const table = tables.find(t => t.id === res.data.tableId)
+			table.views.push(res.data)
+
 			return res.data.id
 		},
 		async updateView({ state, commit, dispatch }, { id, data }) {
