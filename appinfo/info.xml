@@ -22,7 +22,7 @@ Share your tables with users and groups within your cloud.
 Have a good time and manage whatever you want.
 
 ]]></description>
-    <version>0.6.0-beta.4</version>
+    <version>0.6.0</version>
     <licence>agpl</licence>
     <author mail="florian.steffens@nextcloud.com" >Florian Steffens</author>
     <namespace>Tables</namespace>
@@ -39,6 +39,7 @@ Have a good time and manage whatever you want.
 	<screenshot>https://dl.datenangebot.de/nc%20tables/screenshots/v0.6/sh-tables-4.png</screenshot>
 	<screenshot>https://dl.datenangebot.de/nc%20tables/screenshots/v0.6/sh-tables-5.png</screenshot>
 	<screenshot>https://dl.datenangebot.de/nc%20tables/screenshots/v0.6/sh-tables-6.png</screenshot>
+	<screenshot>https://dl.datenangebot.de/nc%20tables/screenshots/v0.6/sh-tables-7.png</screenshot>
 	<dependencies>
 		<database>pgsql</database>
 		<database>mysql</database>
