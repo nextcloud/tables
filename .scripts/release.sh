@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+cd ..
+
 echo
 echo "🚀 Lets make a new release!"
 echo "==========================="
