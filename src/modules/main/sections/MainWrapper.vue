@@ -88,7 +88,7 @@ export default {
 			emit('tables:column:create')
 		},
 		downloadCSV() {
-			this.downloadCsv(this.rows, this.columns, this.element)
+			this.downloadCsv(this.rows, this.columns, this.element.title)
 		},
 		toggleShare() {
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })

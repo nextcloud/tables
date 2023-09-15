@@ -46,7 +46,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				:view-setting.sync="localViewSetting"
 				:config="config"
 				@create-row="$emit('create-row')"
-				@download-csv="data => downloadCsv(data, parsedColumns, table)"
+				@download-csv="data => downloadCsv(data, parsedColumns, downloadTitle)"
 				@set-search-string="str => setSearchString(str)"
 				@delete-selected-rows="rowIds => $emit('delete-selected-rows', rowIds)" />
 		</div>
