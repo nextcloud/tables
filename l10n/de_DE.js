@@ -8,6 +8,8 @@ OC.L10N.register(
     "Select columns" : "Spalten wählen",
     "e.g. 1,2,4 or leave empty" : "z. B. 1,2,4 oder leer lassen",
     "_%n row_::_%n rows_" : ["%n Zeile","%n Zeilen"],
+    "table" : "Tabelle",
+    "table view" : "Tabellenansicht",
     "This column was automatically created by the import service." : "Diese Spalte wurde automatisch vom Importdienst erstellt.",
     "Tutorial" : "Tutorial",
     "ToDo list" : "ToDo-Liste",

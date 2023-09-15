@@ -6,6 +6,8 @@
     "Select columns" : "حدد الأعمدة",
     "e.g. 1,2,4 or leave empty" : "على سبيل المثال 1، 2، 4 أو اتركه فارغا",
     "_%n row_::_%n rows_" : ["%n صفوف","%n صف","%n صفوف","%n صفوف","%n صفوف","%n صفوف"],
+    "table" : "جدول table",
+    "table view" : "منظور الجدول table view",
     "This column was automatically created by the import service." : "تم إنشاء هذا العمود تلقائيًا بواسطة خدمة الاستيراد.",
     "Tutorial" : "درس تعليمي",
     "ToDo list" : "قائمة مهام",
