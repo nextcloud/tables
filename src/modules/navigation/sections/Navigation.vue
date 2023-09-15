@@ -92,9 +92,14 @@ export default {
 			return this.getFilteredTables.filter((item) => { return item.isShared === false || item.ownership === getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
 		},
 		getFilteredTables() {
-			return this.tables.filter(table => (!this.filterString
-				? true
-				: (table.title.toLowerCase().includes(this.filterString.toLowerCase()) || table.views.some(view => view.title.toLowerCase().includes(this.filterString.toLowerCase())))))
+			return this.tables.filter(table => {
+				if (this.filterString === '') {
+					return true
+				} else {
+					return table.title.toLowerCase().includes(this.filterString.toLowerCase())
+						|| table.views?.some(view => view.title.toLowerCase().includes(this.filterString.toLowerCase()))
+				}
+			})
 		},
 	},
 	methods: {
