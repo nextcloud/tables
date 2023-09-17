@@ -133,7 +133,7 @@ OC.L10N.register(
     "Filtering rows" : "Zeilen filtern",
     "OR" : "ODER",
     "Add new filter group" : "Neue Filtergruppe hinzufügen",
-    "... that meet all of the following conditions" : "...auf die alle folgenden Bedingungen zutreffen",
+    "... that meet all of the following conditions" : "... auf alle folgenden Bedingungen zutreffen",
     "Add new filter" : "Neuen Filer hinzufügen",
     "Ascending" : "Aufsteigend",
     "Descending" : "Absteigend",
