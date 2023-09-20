@@ -59,6 +59,7 @@ OC.L10N.register(
     "Error" : "Грешка",
     "Download" : "Преземи",
     "Search" : "Барај",
+    "Back" : "Назад",
     "Undo" : "Назад",
     "Redo" : "Напред",
     "Bold" : "Болд",
