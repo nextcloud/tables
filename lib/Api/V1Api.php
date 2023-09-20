@@ -27,7 +27,7 @@ class V1Api
      * @param int $tableId
      * @param int|null $limit
      * @param int|null $offset
-     * @param int|null $userId
+     * @param string|null $userId
      * @param string|null $nodeType
      * @return array
      * @throws DoesNotExistException
@@ -36,7 +36,7 @@ class V1Api
      * @throws NotFoundError
      * @throws PermissionError
      */
-    public function getData(int $tableId, ?int $limit, ?int $offset, ?int $userId, ?string $nodeType = null): array
+    public function getData(int $tableId, ?int $limit, ?int $offset, ?string $userId, ?string $nodeType = null): array
     {
         if ($userId) $this->userId = $userId;
         if ($nodeType === 'view') {
