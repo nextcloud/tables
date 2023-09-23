@@ -249,6 +249,7 @@ OC.L10N.register(
     "Download" : "Télécharger",
     "Search" : "Recherche",
     "This option is outdated." : "Cette option est obsolète.",
+    "Back" : "Retour",
     "Keyword and submit" : "Mots clés et soumission",
     "Or use magic values" : "Ou utiliser des valeurs magiques",
     "Sorting" : "Trier",
