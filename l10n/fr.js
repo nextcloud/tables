@@ -1,12 +1,14 @@
 OC.L10N.register(
     "tables",
     {
+    "Could not create row." : "Impossible de créer une ligne.",
     "Could not update row." : "Impossible de mettre à jour la ligne.",
     "Nextcloud tables" : "Tableaux Nextcloud",
     "Select table" : "Sélectionner un tableau",
     "Select columns" : "Sélectionner les colonnes",
     "e.g. 1,2,4 or leave empty" : "par ex. 1,2,4 ou laisser vide",
     "_%n row_::_%n rows_" : ["%n ligne","%n lignes","%n lignes"],
+    "table" : "tableau",
     "This column was automatically created by the import service." : "Cette colonne a été créée automatiquement par le service d'importation.",
     "Tutorial" : "Tutoriel ",
     "ToDo list" : "Liste de tâches",
@@ -291,6 +293,7 @@ OC.L10N.register(
     "You can set default values by marking the checkboxes next to the label fields." : "Vous pouvez définir des valeurs par défaut en cliquant sur les cases à cocher suivant·e·s le champs étiquette.",
     "Allowed pattern (regex)" : "Motif autorisé (regex)",
     "Maximum text length" : "Longueur maximum du texte",
+    "Please select at least one provider." : "Veuillez sélectionner au moins un fournisseur.",
     "URL" : "URL",
     "This field is mandatory" : "Ce champ est obligatoire",
     "Url" : "URL",
