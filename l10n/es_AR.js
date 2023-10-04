@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "Select columns" : "Seleccionar columnas",
+    "e.g. 1,2,4 or leave empty" : "ej: 1,2,4 o dejar vacío",
     "Members" : "Miembros",
     "Date" : "Fecha",
     "Comments" : "Comentarios",
@@ -18,7 +20,9 @@ OC.L10N.register(
     "Today" : "Hoy",
     "Text" : "Texto",
     "Link" : "Link",
+    "Selection" : "Selección",
     "Move" : "Mover",
+    "Column" : "Columna",
     "Operator" : "Operador",
     "View" : "Ver",
     "Shares" : "Shares",
@@ -46,6 +50,7 @@ OC.L10N.register(
     "No elements found." : "No se encontraron elementos",
     "group" : "grupo",
     "Permissions" : "Permisos",
+    "Delete data" : "Borrar datos",
     "Created at" : "Creado en",
     "Sharing" : "Compartiendo",
     "Copy to clipboard" : "Copiar al portapapeles",
