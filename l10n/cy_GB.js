@@ -4,6 +4,7 @@ OC.L10N.register(
     "Date" : "Date",
     "Name" : "Enw",
     "Description" : "Disgrifiad",
+    "Comment" : "Sylw",
     "Dog" : "Ci",
     "from" : "oddi wrth",
     "to" : "at",
@@ -13,8 +14,10 @@ OC.L10N.register(
     "Link" : "Dolen",
     "Move" : "Symud",
     "Views" : "Dangosiadau",
+    "View" : "Golwg",
     "Actions" : "Gweithredoedd",
     "Share" : "Rhannu",
+    "Integration" : "Integreiddio",
     "Import" : "Mewnforio",
     "Type" : "Math",
     "Time" : "Amser",
@@ -25,6 +28,7 @@ OC.L10N.register(
     "Sort" : "Trefnu",
     "Shared" : "Rhannwyd",
     "group" : "grŵp",
+    "Created at" : "Crëwyd ar",
     "Update" : "Diweddaru",
     "Error" : "Gwall",
     "Download" : "Llwytho i lawr",
@@ -37,6 +41,7 @@ OC.L10N.register(
     "URL" : "URL",
     "Close editor" : "Cau'r golygydd",
     "Confirm" : "Cadarnhau",
-    "Preview" : "Rhagolwg"
+    "Preview" : "Rhagolwg",
+    "ID" : "ID"
 },
 "nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != 11) ? 2 : 3;");

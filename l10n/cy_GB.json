@@ -2,6 +2,7 @@
     "Date" : "Date",
     "Name" : "Enw",
     "Description" : "Disgrifiad",
+    "Comment" : "Sylw",
     "Dog" : "Ci",
     "from" : "oddi wrth",
     "to" : "at",
@@ -11,8 +12,10 @@
     "Link" : "Dolen",
     "Move" : "Symud",
     "Views" : "Dangosiadau",
+    "View" : "Golwg",
     "Actions" : "Gweithredoedd",
     "Share" : "Rhannu",
+    "Integration" : "Integreiddio",
     "Import" : "Mewnforio",
     "Type" : "Math",
     "Time" : "Amser",
@@ -23,6 +26,7 @@
     "Sort" : "Trefnu",
     "Shared" : "Rhannwyd",
     "group" : "grŵp",
+    "Created at" : "Crëwyd ar",
     "Update" : "Diweddaru",
     "Error" : "Gwall",
     "Download" : "Llwytho i lawr",
@@ -35,6 +39,7 @@
     "URL" : "URL",
     "Close editor" : "Cau'r golygydd",
     "Confirm" : "Cadarnhau",
-    "Preview" : "Rhagolwg"
+    "Preview" : "Rhagolwg",
+    "ID" : "ID"
 },"pluralForm" :"nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != 11) ? 2 : 3;"
 }
