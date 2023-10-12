@@ -4,10 +4,14 @@ namespace OCA\Tables\Db;
 
 use JsonSerializable;
 
+use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\Entity;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
+ *
+ * @psalm-import-type TablesView from ResponseDefinitions
+ *
  * @method getTitle(): string
  * @method setTitle(string $title)
  * @method getTableId(): int
@@ -94,6 +98,9 @@ class View extends Entity implements JsonSerializable {
 		$this->setFilter(\json_encode($array));
 	}
 
+	/**
+	 * @psalm-return TablesView
+	 */
 	public function jsonSerialize(): array {
 		$serialisedJson = [
 			'id' => $this->id,

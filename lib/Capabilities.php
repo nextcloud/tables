@@ -45,6 +45,9 @@ class Capabilities implements ICapability {
 	}
 
 	/**
+	 *
+	 * @return array{tables: array{enabled: bool, version: string, apiVersions: string[], column_types: string[]}}
+	 *
 	 * @inheritDoc
 	 */
 	public function getCapabilities(): array {

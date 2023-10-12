@@ -1,4 +1,4 @@
-Feature: api/tablesapi
+Feature: APIv1
   Background:
     Given user "participant1" exists
      Given user "participant2" exists
@@ -6,10 +6,12 @@ Feature: api/tablesapi
      And user "participant1" is member of group "phoenix"
      And user "participant2" is member of group "phoenix"
 
+  @api1
   Scenario: User has initial table
     Then user "participant1" has the following tables
       | Tutorial |
 
+  @api1
   Scenario: User creates, rename and delete a table
     Given table "my new awesome table" with emoji "🤓" exists for user "participant1" as "base1"
     Then user "participant1" has the following tables
@@ -20,6 +22,7 @@ Feature: api/tablesapi
     Then user "participant1" has the following tables
       | Tutorial |
 
+  @api1
   Scenario: Table sharing with a user
     Given table "Ready to share" with emoji "🥪" exists for user "participant1" as "base1"
     Then user "participant1" shares table with user "participant2"
@@ -45,6 +48,7 @@ Feature: api/tablesapi
     Then user "participant2" has the following tables
       | Tutorial |
 
+  @api1
   Scenario: Table sharing with a group
     Given table "Ready to share" with emoji "🥪" exists for user "participant1" as "base1"
     Then user "participant1" shares table with group "phoenix"
@@ -56,6 +60,7 @@ Feature: api/tablesapi
     Then user "participant2" has the following tables
       | Tutorial |
 
+  @api1
   Scenario: Create and check columns
     Given table "Column test" with emoji "🥶" exists for user "participant1" as "base1"
     Then table has at least following columns
@@ -99,7 +104,7 @@ Feature: api/tablesapi
       | First column  |
     Then user "participant1" deletes table with keyword "Column test"
 
-  @rows
+  @api1 @rows
   Scenario: Create, modify and delete rows
     Given table "Rows check" with emoji "👨🏻‍💻" exists for user "participant1" as "base1"
     Then column "one" exists with following properties
@@ -135,7 +140,7 @@ Feature: api/tablesapi
     Then user deletes last created row
     Then user "participant1" deletes table with keyword "Rows check"
 
-  @rows
+  @api1 @rows
   Scenario: Create, modify and delete rows (legacy interface)
     Given table "Rows check legacy" with emoji "👨🏻‍💻" exists for user "participant1" as "base1"
     Then column "one" exists with following properties
@@ -172,6 +177,7 @@ Feature: api/tablesapi
     Then user "participant1" deletes table with keyword "Rows check"
 
 
+  @api1
   Scenario: Import csv table
     Given file "/import.csv" exists for user "participant1" with following data
       | Col1    | Col2   | Col3   | num   | emoji | special  |
@@ -196,6 +202,7 @@ Feature: api/tablesapi
       | Val1    | Val2   | Val3   | 1     | 💙    | Ä        |
       | great   | news   | here   | 99    | ⚠️    | Ö        |
 
+  @api1
   Scenario: Create, edit and delete views
     Given table "View test" with emoji "👨🏻‍💻" exists for user "participant1" as "view-test"
     # Then print register

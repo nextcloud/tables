@@ -4,10 +4,14 @@ namespace OCA\Tables\Db;
 
 use JsonSerializable;
 
+use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\Entity;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
+ *
+ * @psalm-import-type TablesColumn from ResponseDefinitions
+ *
  * @method getTitle(): string
  * @method setTitle(string $title)
  * @method getTableId(): int
@@ -115,6 +119,9 @@ class Column extends Entity implements JsonSerializable {
 		$this->setSelectionOptions($json);
 	}
 
+	/**
+	 * @psalm-return TablesColumn
+	 */
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->id,

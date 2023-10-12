@@ -1,9 +1,10 @@
 <?php
 
+/** @noinspection DuplicatedCode */
+
 namespace OCA\Tables\Service;
 
 use DateTime;
-use Exception;
 
 use OCA\Tables\Db\Share;
 use OCA\Tables\Db\ShareMapper;
@@ -17,10 +18,14 @@ use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
 
+use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @psalm-import-type TablesShare from ResponseDefinitions
+ */
 class ShareService extends SuperService {
 	protected ShareMapper $mapper;
 
@@ -58,6 +63,13 @@ class ShareService extends SuperService {
 		}
 	}
 
+	/**
+	 * @param Share[] $items
+	 * @return TablesShare[]
+	 */
+	public function formatShares(array $items): array {
+		return array_map(fn (Share $item) => $item->jsonSerialize(), $items);
+	}
 
 	/**
 	 * @param int $id
@@ -178,6 +190,9 @@ class ShareService extends SuperService {
 	 * @throws InternalError
 	 */
 	public function create(int $nodeId, string $nodeType, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage):Share {
+		// TODO Do we need to check if create is allowed for requested nodeId?!
+		// should also return not found if share_node could not be found
+		// should also return no permission if sender don't have permission to create a share for node
 		$time = new DateTime();
 		$item = new Share();
 		$item->setSender($this->userId);
@@ -207,68 +222,88 @@ class ShareService extends SuperService {
 	 * @param bool $value
 	 * @return Share
 	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
 	 */
 	public function updatePermission(int $id, string $permission, bool $value): Share {
 		try {
 			$item = $this->mapper->find($id);
-
-			// security
-			if (!$this->permissionsService->canManageElementById($item->getNodeId(), $item->getNodeType())) {
-				throw new PermissionError('PermissionError: can not update share with id '.$id);
-			}
-
-			$time = new DateTime();
-
-			if ($permission === "read") {
-				$item->setPermissionRead($value);
-			}
-
-			if ($permission === "create") {
-				$item->setPermissionCreate($value);
-			}
-
-			if ($permission === "update") {
-				$item->setPermissionUpdate($value);
-			}
-
-			if ($permission === "delete") {
-				$item->setPermissionDelete($value);
-			}
-
-			if ($permission === "manage") {
-				$item->setPermissionManage($value);
-			}
-
-			$item->setLastEditAt($time->format('Y-m-d H:i:s'));
-
-			$share = $this->mapper->update($item);
-			return $this->addReceiverDisplayName($share);
-		} catch (Exception $e) {
-			$this->logger->error($e->getMessage());
-			throw new InternalError($e->getMessage());
+		} catch (DoesNotExistException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		} catch (MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
+
+		// security
+		if (!$this->permissionsService->canManageElementById($item->getNodeId(), $item->getNodeType())) {
+			throw new PermissionError('PermissionError: can not update share with id '.$id);
+		}
+
+		$time = new DateTime();
+
+		if ($permission === "read") {
+			$item->setPermissionRead($value);
+		}
+
+		if ($permission === "create") {
+			$item->setPermissionCreate($value);
+		}
+
+		if ($permission === "update") {
+			$item->setPermissionUpdate($value);
+		}
+
+		if ($permission === "delete") {
+			$item->setPermissionDelete($value);
+		}
+
+		if ($permission === "manage") {
+			$item->setPermissionManage($value);
+		}
+
+		$item->setLastEditAt($time->format('Y-m-d H:i:s'));
+
+		try {
+			$share = $this->mapper->update($item);
+		} catch (\OCP\DB\Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+		return $this->addReceiverDisplayName($share);
 	}
 
 	/**
 	 * @param int $id
 	 * @return Share
 	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
 	 */
 	public function delete(int $id): Share {
 		try {
 			$item = $this->mapper->find($id);
+		} catch (DoesNotExistException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		} catch (MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
 
-			// security
+		// security
 			if (!$this->permissionsService->canManageElementById($item->getNodeId(), $item->getNodeType())) {
 				throw new PermissionError('PermissionError: can not delete share with id '.$id);
 			}
 
+		try {
 			$this->mapper->delete($item);
-			return $this->addReceiverDisplayName($item);
-		} catch (Exception $e) {
-			$this->logger->error($e->getMessage());
-			throw new InternalError($e->getMessage());
+		} catch (\OCP\DB\Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
+		return $this->addReceiverDisplayName($item);
 	}
 
 	/**

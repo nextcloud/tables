@@ -43,6 +43,10 @@ class PermissionsService {
 
 
 	/**
+	 * @param string|null $userId
+	 * @param bool $canBeEmpty
+	 * @return string
+	 *
 	 * @throws InternalError
 	 */
 	public function preCheckUserId(string $userId = null, bool $canBeEmpty = true): string {

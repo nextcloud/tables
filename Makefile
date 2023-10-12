@@ -151,3 +151,11 @@ clean:
 clean-dev:
 	rm -rf node_modules
 	rm -rf vendor
+
+###### API generation
+
+api:
+	composer exec generate-spec
+
+api-fast:
+	composer exec generate-spec -- --allow-missing-docs --continue-on-error
