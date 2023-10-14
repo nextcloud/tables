@@ -105,6 +105,7 @@ OC.L10N.register(
     "Column" : "Stĺpec",
     "Operator" : "Operátor",
     "Search Value" : "Hľadať hodnotu",
+    "Add new filter" : "Pridať nový filter",
     "Views" : "Zobrazenia",
     "Create view" : "Vytvoriť zobrazenie",
     "View" : "Zobrazenie",
