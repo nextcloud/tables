@@ -249,6 +249,7 @@ OC.L10N.register(
     "Download" : "Letöltés",
     "Search" : "Keresés",
     "This option is outdated." : "Ez a beállítás elavult.",
+    "Back" : "Vissza",
     "Keyword and submit" : "Kulcsszó és elküldés",
     "Or use magic values" : "Vagy mágikus értékek használata",
     "Sorting" : "Rendezés",
