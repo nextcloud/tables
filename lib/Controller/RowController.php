@@ -4,10 +4,12 @@ namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Service\RowService;
+use OCA\Tables\Service\SuperService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
+
 
 class RowController extends Controller {
 	/** @var RowService */
@@ -64,13 +66,19 @@ class RowController extends Controller {
 	public function create(
 		?int $tableId,
 		?int $viewId,
-		array $data
-	): DataResponse {
-		return $this->handleError(function () use ($tableId, $viewId, $data) {
-			return $this->service->create(
+		array $data,
+		SuperService $superService
+	): DataResponse { 
+		return $this->handleError(function () use ($tableId, $viewId, $data, $superService) { 
+
+			$create = $this->service->create(
 				$tableId,
 				$viewId,
-				$data);
+				$data);  
+			
+			$superService->AdminNotificationCall($tableId,$viewId);
+			
+			return $create; 
 		});
 	}
 
