@@ -15,6 +15,7 @@ OC.L10N.register(
     "Metadata" : "Metadatos",
     "Actions" : "Aiciones",
     "Integration" : "Integración",
+    "Data" : "Datos",
     "Single selection" : "Seleición única",
     "Multiple selection" : "Seleición múltiple",
     "Error occurred while deleting rows." : "Prodúxose un error mentanto se desaniciaben les fileres.",
