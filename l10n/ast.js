@@ -8,6 +8,7 @@ OC.L10N.register(
     "Weight" : "Pesu",
     "Name" : "Nome",
     "Description" : "Descripción",
+    "Dog" : "Perru",
     "Position" : "Posición",
     "Today" : "Güei",
     "Selection" : "Seleición",

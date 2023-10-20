@@ -294,6 +294,7 @@
     "No view in context" : "Nincs nézet a környezetben",
     "From {ownerName}" : "Tulajdonos: {ownerName}",
     "API" : "API",
+    "This is your API endpoint for this view" : "Ez a nézethez tartozó API végpontja",
     "Copy to clipboard" : "Másolás a vágólapra",
     "Your permissions" : "Az Ön jogosulságai",
     "Read" : "Olvasás",

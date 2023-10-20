@@ -326,6 +326,7 @@ OC.L10N.register(
     "Creator" : "Autor",
     "Last editor" : "Naposledy upravil(a)",
     "Last edited at" : "Naposledy upravené dňa",
+    "Unknown error." : "Neznáma chyba.",
     "Outdated data. View is reloaded" : "Neaktuálne údaje. Zobrazenie sa obnovuje",
     "Could not load tables." : "Nepodarilo sa načítať tabuľky.",
     "Could not fetch tables" : "Nepodarilo sa získať tabuľky.",
