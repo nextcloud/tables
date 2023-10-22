@@ -1250,21 +1250,31 @@ components:
         Row:
             type: object
             description: Object with row metadata. The values are inside of the property 'data'.
+            required:
+                - id
+                - tableId
             properties:
                 id:
                     type: integer
+                    nullable: false
                 tableId:
                     type: integer
+                    nullable: false
                 createdBy:
                     type: string
+                    nullable: false
                 createdAt:
                     type: string
+                    nullable: false
                 lastEditBy:
                     type: string
+                    nullable: false
                 lastEditAt:
                     type: string
+                    nullable: false
                 data:
                     type: array
+                    nullable: false
                     items:
                         type: object
                         properties:
