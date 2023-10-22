@@ -1083,26 +1083,40 @@ components:
             properties:
                 id:
                     type: integer
+                    nullable: false
+                title:
+                    type: string
+                    nullable: false
                 tableId:
                     type: integer
+                    nullable: false
                 createdBy:
                     type: string
                 createdAt:
                     type: string
+                    nullable: false
+                    pattern: "^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
                 lastEditBy:
                     type: string
                 lastEditAt:
                     type: string
+                    nullable: false
+                    pattern: "^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
                 type:
                     type: string
+                    nullable: false
                 subtype:
                     type: string
+                    nullable: false
+                    description: "subtype or an empty string"
                 mandatory:
                     type: boolean
+                    nullable: false
                 description:
                     type: string
                 orderWeight:
                     type: integer
+                    description: "Deprecated"
                 numberDefault:
                     type: number
                 numberMin:
@@ -1113,8 +1127,12 @@ components:
                     type: integer
                 numberPrefix:
                     type: string
+                    nullable: false
+                    description: "prefix or an empty string"
                 numberSuffix:
                     type: string
+                    nullable: false
+                    description: "suffix or an empty string"
                 textDefault:
                     type: string
                 textAllowedPattern:
@@ -1123,6 +1141,7 @@ components:
                     type: integer
                 selectionOptions:
                     type: string
+                    nullable: false
                 selectionDefault:
                     type: integer
                 datetimeDefault:
