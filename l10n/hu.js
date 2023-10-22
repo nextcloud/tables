@@ -67,6 +67,7 @@ OC.L10N.register(
     "The Boss" : "A főnök",
     "Bob will help for this time" : "Most Bob fog benne segíteni",
     "We have to talk about that." : "Erről beszélnünk kell.",
+    "Create Vacation Request" : "Szabadság kérelem létrehozása",
     "Open Request" : "Nyitott kérés",
     "Request Status" : "Kérés állapota",
     "Closed requests" : "Lezárt kérés",
