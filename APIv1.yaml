@@ -1006,13 +1006,13 @@ components:
                 createdAt:
                     type: string
                     nullable: false
-                    pattern: "^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
+                    pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
                 lastEditBy:
                     type: string
                 lastEditAt:
                     type: string
                     nullable: false
-                    pattern: "^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
+                    pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
                 isShared:
                     type: boolean
                     nullable: false
@@ -1092,11 +1092,11 @@ components:
                 createdAt:
                     type: string
                     nullable: false
-                    pattern: "^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
+                    pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
                 lastEditAt:
                     type: string
                     nullable: false
-                    pattern: "^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
+                    pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
         Columns:
             type: array
             maxItems: 1000
@@ -1125,13 +1125,13 @@ components:
                 createdAt:
                     type: string
                     nullable: false
-                    pattern: "^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
+                    pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
                 lastEditBy:
                     type: string
                 lastEditAt:
                     type: string
                     nullable: false
-                    pattern: "^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
+                    pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
                 type:
                     type: string
                     nullable: false
@@ -1204,14 +1204,14 @@ components:
                 createdAt:
                     type: string
                     nullable: false
-                    pattern: "^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
+                    pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
                 lastEditBy:
                     type: string
                     nullable: true
                 lastEditAt:
                     type: string
                     nullable: false
-                    pattern: "^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
+                    pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
                 description:
                     type: string
                     nullable: false
@@ -1317,14 +1317,14 @@ components:
                 createdAt:
                     type: string
                     nullable: false
-                    pattern: "^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
+                    pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
                 lastEditBy:
                     type: string
                     nullable: false
                 lastEditAt:
                     type: string
                     nullable: false
-                    pattern: "^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
+                    pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
                 data:
                     type: array
                     nullable: false
