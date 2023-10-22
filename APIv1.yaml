@@ -1016,6 +1016,11 @@ components:
                 isShared:
                     type: boolean
                     nullable: false
+                    description: "Whether the table is shared with the requesting user"
+                hasShares:
+                    type: boolean
+                    nullable: false
+                    description: "Whether the table is shared with ANY user"
                 onSharePermissions:
                     type: object
                     properties:
@@ -1031,6 +1036,12 @@ components:
                             type: boolean
                 rowsCount:
                     type: integer
+                    nullable: false
+                columnsCount:
+                    type: integer
+                    nullable: false
+                views:
+                    type: array
         Shares:
             type: array
             maxItems: 1000
