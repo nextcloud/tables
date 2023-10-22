@@ -1142,20 +1142,31 @@ components:
             properties:
                 id:
                     type: integer
+                    nullable: false
+                title:
+                    type: string
+                    nullable: false
                 tableId:
                     type: integer
+                    nullable: false
                 createdBy:
                     type: string
+                    nullable: true
                 createdAt:
                     type: string
+                    nullable: false
                 lastEditBy:
                     type: string
+                    nullable: true
                 lastEditAt:
                     type: string
+                    nullable: false
                 description:
                     type: string
+                    nullable: false
                 emoji:
                     type: string
+                    nullable: true
                 columns:
                     type: array
                     items:
@@ -1179,8 +1190,10 @@ components:
                             type: boolean
                 hasShares:
                     type: boolean
+                    nullable: false
                 rowsCount:
                     type: integer
+                    nullable: false
                 ownerDisplayName:
                     type: string
                 filter:
