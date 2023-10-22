@@ -993,8 +993,10 @@ components:
                     format: int64
                 title:
                     type: string
+                    nullable: false
                 emoji:
                     type: string
+                    nullable: true
                 ownership:
                     type: string
                 ownerDisplayName:
@@ -1003,12 +1005,17 @@ components:
                     type: string
                 createdAt:
                     type: string
+                    nullable: false
+                    pattern: "^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
                 lastEditBy:
                     type: string
                 lastEditAt:
                     type: string
+                    nullable: false
+                    pattern: "^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
                 isShared:
                     type: boolean
+                    nullable: false
                 onSharePermissions:
                     type: object
                     properties:
@@ -1038,35 +1045,47 @@ components:
             properties:
                 id:
                     type: integer
+                    nullable: false
                 nodeId:
                     type: integer
+                    nullable: false
                 nodeType:
                     type: string
+                    nullable: false
                 permissionRead:
                     type: boolean
+                    nullable: false
                 permissionCreate:
                     type: boolean
+                    nullable: false
                 permissionUpdate:
                     type: boolean
+                    nullable: false
                 permissionDelete:
                     type: boolean
+                    nullable: false
                 permissionManage:
                     type: boolean
+                    nullable: false
                 sender:
                     type: string
                 receiver:
                     type: string
+                    nullable: false
                 receiverDisplayName:
                     type: string
                 receiverType:
                     type: string
-                    items:
-                        - user
-                        - group
+                    nullable: false
+                    pattern: "^(user)|(group)$"
                 createdAt:
                     type: string
+                    nullable: false
+                    pattern: "^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
                 lastEditAt:
                     type: string
+                    nullable: false
+                    pattern: "^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
         Columns:
             type: array
             maxItems: 1000
@@ -1174,12 +1193,14 @@ components:
                 createdAt:
                     type: string
                     nullable: false
+                    pattern: "^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
                 lastEditBy:
                     type: string
                     nullable: true
                 lastEditAt:
                     type: string
                     nullable: false
+                    pattern: "^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
                 description:
                     type: string
                     nullable: false
@@ -1285,12 +1306,14 @@ components:
                 createdAt:
                     type: string
                     nullable: false
+                    pattern: "^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
                 lastEditBy:
                     type: string
                     nullable: false
                 lastEditAt:
                     type: string
                     nullable: false
+                    pattern: "^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
                 data:
                     type: array
                     nullable: false
