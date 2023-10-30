@@ -65,6 +65,7 @@ class ColumnService extends SuperService {
 
 	/**
 	 * @param int $viewId
+	 * @param string|null $userId
 	 * @return array
 	 * @throws DoesNotExistException
 	 * @throws InternalError
@@ -72,10 +73,10 @@ class ColumnService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function findAllByView(int $viewId): array {
+	public function findAllByView(int $viewId, ?string $userId = null): array {
 		try {
 			// No need to check for columns outside the view since they cannot be addressed
-			$view = $this->viewService->find($viewId, true);
+			$view = $this->viewService->find($viewId, true, $userId);
 			$viewColumnIds = $view->getColumnsArray();
 			$viewColumns = [];
 			foreach ($viewColumnIds as $viewColumnId) {
@@ -391,12 +392,13 @@ class ColumnService extends SuperService {
 	}
 
 	/**
-	 * @param int $tableId
-	 * @param int $viewId
+	 * @param int|null $tableId
+	 * @param int|null $viewId
 	 * @param array $titles example ['Test column 1', 'And so on', '3rd column title']
 	 * @param string|null $userId
 	 * @param bool $createUnknownColumns
 	 * @param int $countCreatedColumns
+	 * @param int $countMatchingColumns
 	 * @return array with column object or null for given columns
 	 * @throws DoesNotExistException
 	 * @throws InternalError
@@ -411,7 +413,7 @@ class ColumnService extends SuperService {
 		if($userId === null) {
 			$userId = $this->userId;
 		}
-		$allColumns = $viewId !== null ? $this->findAllByView($viewId) : $this->findAllByTable($tableId);
+		$allColumns = $viewId !== null ? $this->findAllByView($viewId, $userId) : $this->findAllByTable($tableId, null, $userId);
 		$i = -1;
 		foreach ($titles as $title) {
 			$i++;

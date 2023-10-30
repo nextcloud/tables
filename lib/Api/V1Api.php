@@ -22,7 +22,7 @@ class V1Api {
 	}
 
 	/**
-	 * @param int $tableId
+	 * @param int $nodeId
 	 * @param int|null $limit
 	 * @param int|null $offset
 	 * @param string|null $userId
@@ -34,17 +34,17 @@ class V1Api {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function getData(int $tableId, ?int $limit, ?int $offset, ?string $userId, ?string $nodeType = null): array {
+	public function getData(int $nodeId, ?int $limit, ?int $offset, ?string $userId, ?string $nodeType = null): array {
 		if ($userId) {
 			$this->userId = $userId;
 		}
 		if ($nodeType === 'view') {
-			$columns = $this->columnService->findAllByView($tableId, $this->userId);
-			$rows = $this->rowService->findAllByView($tableId, $this->userId, $limit, $offset);
+			$columns = $this->columnService->findAllByView($nodeId, $this->userId);
+			$rows = $this->rowService->findAllByView($nodeId, $this->userId, $limit, $offset);
 		} else {
 			// if no nodeType is provided, the old table selection is used to not break anything
-			$columns = $this->columnService->findAllByTable($tableId, null, $this->userId);
-			$rows = $this->rowService->findAllByTable($tableId, $this->userId, $limit, $offset);
+			$columns = $this->columnService->findAllByTable($nodeId, null, $this->userId);
+			$rows = $this->rowService->findAllByTable($nodeId, $this->userId, $limit, $offset);
 		}
 
 		$data = [];

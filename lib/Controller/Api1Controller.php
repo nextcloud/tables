@@ -468,7 +468,7 @@ class Api1Controller extends ApiController {
 	 */
 	public function indexTableRowsSimple(int $tableId, ?int $limit, ?int $offset): DataResponse {
 		return $this->handleError(function () use ($tableId, $limit, $offset) {
-			return $this->v1Api->getData($tableId, $limit, $offset);
+			return $this->v1Api->getData($tableId, $limit, $offset, $this->userId, 'table');
 		});
 	}
 

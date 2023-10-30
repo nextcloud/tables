@@ -140,11 +140,11 @@ class AnalyticsDatasource implements IDatasource {
 		$this->userId = $option['user_id'];
 
 		if (count($ids) === 1) {
-			// its a table
-			$data = $this->api->getData($ids[0], null, null, $this->userId);
+			// it's a table
+			$data = $this->api->getData((int) $ids[0], null, null, $this->userId);
 		} elseif (count($ids) === 2) {
-			// its a view
-			$data = $this->api->getData($ids[1], null, null, $this->userId, 'view');
+			// it's a view
+			$data = $this->api->getData((int) $ids[1], null, null, $this->userId, 'view');
 		}
 
 		// extract the header from the first row
