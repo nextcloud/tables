@@ -16,6 +16,8 @@ OC.L10N.register(
     "Today" : "Täna",
     "Link" : "Link",
     "Move" : "Liiguta",
+    "Metadata" : "Metaandmed",
+    "Views" : "Vaated",
     "Shares" : "Jagamisi",
     "Actions" : "Tegevused",
     "Share" : "Jaga",
