@@ -143,7 +143,7 @@ class RowService extends SuperService {
 
 		foreach ($data as $entry) {
 			if (!in_array($entry['columnId'], $columns)) {
-				throw new InternalError('Column with id '.$entry['columnId'].' is not part of view with id '.$viewId ?? $tableId);
+				throw new InternalError('Column with id '.$entry['columnId'].' is not part of view with id '.$viewId);
 			}
 		}
 
