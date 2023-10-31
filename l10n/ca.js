@@ -2,10 +2,11 @@ OC.L10N.register(
     "tables",
     {
     "Could not update row." : "No s'ha pogut actualitzar la fila.",
-    "Nextcloud tables" : "Taules Nextcloud",
     "Select table" : "Seleccioneu una taula",
     "Select columns" : "Seleccioneu columnes",
     "e.g. 1,2,4 or leave empty" : "per exemple. 1,2,4 o deixar buit",
+    "Timestamp of data load" : "Marca de temps de càrrega de dades",
+    "Nextcloud tables" : "Taules Nextcloud",
     "_%n row_::_%n rows_" : ["%n fila","%n files"],
     "ToDo list" : "Llista de tasques pendents",
     "Setup a simple todo-list." : "Configuració d'una llista de tasques senzilla.",

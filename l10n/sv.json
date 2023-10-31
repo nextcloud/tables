@@ -1,9 +1,12 @@
 { "translations": {
     "Could not update row." : "Kunde inte uppdatera rad.",
-    "Nextcloud tables" : "Nextcloud tabeller",
     "Select table" : "Välj tabell",
     "Select columns" : "Välj kolumner",
     "e.g. 1,2,4 or leave empty" : "t.ex. 1,2,4 eller lämna tomt",
+    "Timestamp of data load" : "Tidstämpel för datainläsning",
+    "No" : "Nej",
+    "Yes" : "Ja",
+    "Nextcloud tables" : "Nextcloud tabeller",
     "_%n row_::_%n rows_" : ["%n rad","%n rader"],
     "This column was automatically created by the import service." : "Denna kolumn skapades automatiskt av importtjänsten.",
     "Tutorial" : "Handledning",

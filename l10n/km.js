@@ -3,6 +3,8 @@ OC.L10N.register(
     {
     "Select columns" : "ជ្រើសរើសជួរឈរ",
     "e.g. 1,2,4 or leave empty" : "ឧទា. 1,2,4 ឬទុកចោល",
+    "No" : "ទេ",
+    "Yes" : "បាទ ឬចាស",
     "Date" : "Date",
     "Name" : "ឈ្មោះ",
     "Description" : "ការ​អធិប្បាយ",

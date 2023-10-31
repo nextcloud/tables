@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "Chan eil",
+    "Yes" : "Tha",
     "Name" : "Ainm",
     "Progress" : "Adhartas",
     "Create" : "Cruthaich",

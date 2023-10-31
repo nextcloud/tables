@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "Ne",
+    "Yes" : "Da",
     "ToDo list" : "Popis zadataka",
     "Members" : "Članovi",
     "Customers" : "Korisnici",

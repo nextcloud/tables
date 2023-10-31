@@ -1,4 +1,6 @@
 { "translations": {
+    "No" : "Ne",
+    "Yes" : "Da",
     "ToDo list" : "Popis zadataka",
     "Members" : "Članovi",
     "Customers" : "Korisnici",

@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "아니오",
+    "Yes" : "예",
     "ToDo list" : "할일 목록",
     "Members" : "구성원",
     "Date" : "날짜",

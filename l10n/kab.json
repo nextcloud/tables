@@ -1,4 +1,6 @@
 { "translations": {
+    "No" : "Uhu",
+    "Yes" : "Oui",
     "Comments" : "Commentaires",
     "Name" : "Nom",
     "Comment" : "Commentaire",

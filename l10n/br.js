@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "Nann",
     "Date" : "Deiz",
     "Comments" : "Displegadennoù",
     "Name" : "Anv",

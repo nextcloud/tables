@@ -1,6 +1,9 @@
 { "translations": {
     "Select columns" : "Seleziona colonne",
     "e.g. 1,2,4 or leave empty" : "es. 1,2,4 o lascia vuoto",
+    "Timestamp of data load" : "Timestamp del caricamento dati",
+    "No" : "No",
+    "Yes" : "Si",
     "ToDo list" : "Elenco Cose da fare",
     "Setup a simple todo-list." : "Imposta una semplice lista Da Fare",
     "Members" : "Partecipanti",

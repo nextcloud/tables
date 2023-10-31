@@ -3,6 +3,8 @@ OC.L10N.register(
     {
     "Select columns" : "Seleccionar columnas",
     "e.g. 1,2,4 or leave empty" : "ej: 1,2,4 o dejar vacío",
+    "Timestamp of data load" : "Marca de tiempo de carga de datos",
+    "Yes" : "Sí",
     "Members" : "Miembros",
     "Date" : "Fecha",
     "Comments" : "Comentarios",

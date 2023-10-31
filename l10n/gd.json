@@ -1,4 +1,6 @@
 { "translations": {
+    "No" : "Chan eil",
+    "Yes" : "Tha",
     "Name" : "Ainm",
     "Progress" : "Adhartas",
     "Create" : "Cruthaich",

@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "Uhu",
+    "Yes" : "Oui",
     "Comments" : "Commentaires",
     "Name" : "Nom",
     "Comment" : "Commentaire",

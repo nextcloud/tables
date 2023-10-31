@@ -1,4 +1,6 @@
 { "translations": {
+    "No" : "Nee",
+    "Yes" : "Jo",
     "Date" : "Date",
     "Comments" : "Kommentarer",
     "Name" : "Numm",

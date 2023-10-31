@@ -3,6 +3,9 @@ OC.L10N.register(
     {
     "Select columns" : "Selecteer kolommen",
     "e.g. 1,2,4 or leave empty" : "bijv. 1,2,4 of laat leeg",
+    "Timestamp of data load" : "Tijdstempel van de datalading",
+    "No" : "Nee",
+    "Yes" : "Ja",
     "ToDo list" : "ToDo overzicht",
     "Setup a simple todo-list." : "Maak een eenvoudige takenlijst.",
     "Members" : "Leden",

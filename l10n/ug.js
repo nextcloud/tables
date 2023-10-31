@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "ياق",
+    "Yes" : "ھەئە",
     "Date" : "Date",
     "Name" : "ئاتى",
     "Description" : "چۈشەندۈرۈش",

@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "﻿ಇಲ್ಲ",
+    "Yes" : "﻿ಹೌದು",
     "Date" : "Date",
     "Name" : "﻿ಹೆಸರು",
     "Create" : "ಸೃಷ್ಟಿಸಿ",

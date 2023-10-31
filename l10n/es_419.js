@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Yes" : "Si",
     "Members" : "Miembros",
     "Date" : "Fecha",
     "Comments" : "Comentarios",

@@ -1,9 +1,9 @@
 { "translations": {
     "Could not update row." : "Rækken kunne ikke opdateres.",
-    "Nextcloud tables" : "Nextcloud tabeller",
     "Select table" : "Vælg tabel",
     "Select columns" : "Vælg kolonner",
     "e.g. 1,2,4 or leave empty" : "f.eks. 1,2,4 eller lad være tom",
+    "Nextcloud tables" : "Nextcloud tabeller",
     "_%n row_::_%n rows_" : ["%n række","%n rækker"],
     "This column was automatically created by the import service." : "Denne kolonne blev automatisk oprettet af importtjenesten.",
     "Tutorial" : "Guide",

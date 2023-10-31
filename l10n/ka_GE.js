@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Yes" : "დიახ",
     "Members" : "წევრები",
     "Date" : "თარიღი",
     "Comments" : "კომენტარები",

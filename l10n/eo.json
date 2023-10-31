@@ -1,4 +1,6 @@
 { "translations": {
+    "No" : "Ne",
+    "Yes" : "Jes",
     "Members" : "Membroj",
     "Date" : "Date",
     "Comments" : "Komentoj",

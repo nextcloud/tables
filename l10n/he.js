@@ -1,10 +1,10 @@
 OC.L10N.register(
     "tables",
     {
-    "Nextcloud tables" : "טכלאות של Nextcloud",
     "Select table" : "בחירת טבלה",
     "Select columns" : "בחירת עמודות",
     "e.g. 1,2,4 or leave empty" : "למשל: 1,2,4 או להשאיר ריק",
+    "Nextcloud tables" : "טכלאות של Nextcloud",
     "_%n row_::_%n rows_" : ["שורה","%n שורות","%n שורות","%n שורות"],
     "This column was automatically created by the import service." : "העמודה הזאת נוצרה אוטומטית על ידי שירות הייבוא.",
     "Tutorial" : "מדריך",

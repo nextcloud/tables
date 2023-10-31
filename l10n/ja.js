@@ -1,6 +1,9 @@
 OC.L10N.register(
     "tables",
     {
+    "Nextcloud Tables" : "Nextcloud Tables",
+    "No" : "いいえ",
+    "Yes" : "はい",
     "ToDo list" : "ToDo リスト",
     "Members" : "メンバー",
     "Date" : "日付",
@@ -97,7 +100,6 @@ OC.L10N.register(
     "Url" : "URL",
     "Close editor" : "エディタを閉じる",
     "Confirm" : "承認",
-    "Nextcloud Tables" : "Nextcloud Tables",
     "Content" : "内容",
     "Preview" : "プレビュー",
     "Select" : "選択",

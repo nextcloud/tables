@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "Ne",
+    "Yes" : "Taip",
     "ToDo list" : "Užduočių sąrašas",
     "Members" : "Nariai",
     "Date" : "Data",

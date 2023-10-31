@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Yes" : "Po",
     "Members" : "Anëtar",
     "Date" : "Data",
     "Comments" : "Komentet",

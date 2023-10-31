@@ -1,4 +1,6 @@
 { "translations": {
+    "No" : "Ոչ",
+    "Yes" : "Այո",
     "Date" : "Date",
     "Comments" : "Կարծիքներ",
     "Name" : "Անուն",
