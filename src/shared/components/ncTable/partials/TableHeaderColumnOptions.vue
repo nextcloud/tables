@@ -91,7 +91,6 @@
 				<NcActionButtonGroup v-if="hasManageColumnEntries" :name="t('tables', 'Column manage actions')">
 					<NcActionButton
 						v-if="showHideColumn"
-						:disabled="!canHide"
 						:aria-label="t('tables', 'Hide column')"
 						@click="hideColumn()">
 						<template #icon>
@@ -128,7 +127,14 @@ import EyeOff from 'vue-material-design-icons/EyeOff.vue'
 import ChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
 import FilterCog from 'vue-material-design-icons/FilterCog.vue'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
-import { NcActions, NcActionButton, NcActionInput, NcActionButtonGroup, NcActionCaption, NcActionRadio } from '@nextcloud/vue'
+import {
+	NcActionButton,
+	NcActionButtonGroup,
+	NcActionCaption,
+	NcActionInput,
+	NcActionRadio,
+	NcActions,
+} from '@nextcloud/vue'
 import { AbstractColumn } from '../mixins/columnClass.js'
 import { FilterIds } from '../mixins/filter.js'
 import { translate as t } from '@nextcloud/l10n'
@@ -160,10 +166,6 @@ export default {
 		      type: Boolean,
 		      default: false,
 		},
-		canHide: {
-			type: Boolean,
-			default: false,
-		},
 		config: {
 			type: Object,
 			default: null,
@@ -186,8 +188,7 @@ export default {
 	},
 	computed: {
 		getOperators() {
-			const possibleOperators = this.column.getPossibleOperators()
-			return possibleOperators
+			return this.column.getPossibleOperators()
 		},
 		getDisabledOperators() {
 			// filter filters that cannot be combined
