@@ -16,7 +16,6 @@
 						<TableHeaderColumnOptions
 							:column="col"
 							:open-state.sync="openedColumnHeaderMenus[col.id]"
-							:can-hide="visibleColumns.length > 1"
 							:config="config"
 							:view-setting.sync="localViewSetting"
 							@edit-column="col => $emit('edit-column', col)"
