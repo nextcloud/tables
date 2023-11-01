@@ -1,4 +1,6 @@
 { "translations": {
+    "No" : "Xeyir",
+    "Yes" : "Bəli",
     "Date" : "Date",
     "Name" : "Ad",
     "Description" : "Açıqlanma",

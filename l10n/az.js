@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "Xeyir",
+    "Yes" : "Bəli",
     "Date" : "Date",
     "Name" : "Ad",
     "Description" : "Açıqlanma",
