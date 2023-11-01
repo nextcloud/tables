@@ -86,4 +86,8 @@ export default {
 	margin-left: calc(var(--default-grid-baseline) * 1);
 }
 
+pre {
+	white-space: normal;
+}
+
 </style>
