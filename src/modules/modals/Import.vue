@@ -67,37 +67,37 @@
 					<div class="fix-col-1">
 						{{ t('tables', 'Found columns') }}
 					</div>
-					<div class="fix-col-3">
+					<div class="fix-col-3" data-cy="importResultColumnsFound">
 						{{ result['found_columns_count'] }}
 					</div>
 					<div class="fix-col-1">
 						{{ t('tables', 'Matching columns') }}
 					</div>
-					<div class="fix-col-3">
+					<div class="fix-col-3" data-cy="importResultColumnsMatch">
 						{{ result['matching_columns_count'] }}
 					</div>
 					<div class="fix-col-1">
 						{{ t('tables', 'Created columns') }}
 					</div>
-					<div class="fix-col-3">
+					<div class="fix-col-3" data-cy="importResultColumnsCreated">
 						{{ result['created_columns_count'] }}
 					</div>
 					<div class="fix-col-1">
 						{{ t('tables', 'Inserted rows') }}
 					</div>
-					<div class="fix-col-3">
+					<div class="fix-col-3" data-cy="importResultRowsInserted">
 						{{ result['inserted_rows_count'] }}
 					</div>
 					<div class="fix-col-1">
 						{{ t('tables', 'Value parsing errors') }}
 					</div>
-					<div class="fix-col-3">
+					<div class="fix-col-3" data-cy="importResultParsingErrors">
 						{{ result['errors_parsing_count'] }}
 					</div>
 					<div class="fix-col-1">
 						{{ t('tables', 'Row creation errors') }}
 					</div>
-					<div class="fix-col-3">
+					<div class="fix-col-3" data-cy="importResultRowErrors">
 						{{ result['errors_count'] }}
 					</div>
 				</RowFormWrapper>
