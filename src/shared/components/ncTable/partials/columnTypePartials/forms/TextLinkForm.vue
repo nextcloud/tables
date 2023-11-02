@@ -123,7 +123,7 @@ export default {
 						id: item.id,
 						label: item.name,
 						active: this.isActive(item.id),
-					}
+					},
 				)
 			})
 			this.providers.sort((a, b) => {
