@@ -75,7 +75,7 @@ export default {
 				group
 					.toUpperCase()
 					.replace('_', '')
-					.replace('-', '')
+					.replace('-', ''),
 			)
 			return str.charAt(0).toUpperCase() + str.slice(1)
 		},

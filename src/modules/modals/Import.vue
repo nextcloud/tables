@@ -285,7 +285,7 @@ export default {
 				true, // modal
 				FilePickerType.Choose, // type
 				false, // directories
-				this.path // path
+				this.path, // path
 			)
 
 			filePicker.pick().then((file) => {
