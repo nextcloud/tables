@@ -1,18 +1,22 @@
 <template>
-	<div class="filter-entry">
-		<div class="selection-fields">
+	<div class="row">
+		<div class="fix-col-2">
 			<NcSelect
 				v-model="selectedColumn"
 				class="select-field"
 				:options="columns"
 				label="title"
 				:placeholder="t('tables', 'Column')" />
+		</div>
+		<div class="fix-col-2">
 			<NcSelect
 				v-if="selectedColumn"
 				v-model="selectedOperator"
 				class="select-field"
 				:options="operators"
 				:placeholder="t('tables', 'Operator')" />
+		</div>
+		<div class="fix-col-2">
 			<NcSelect
 				v-if="selectedOperator && !selectedOperator.noSearchValue"
 				v-model="searchValue"
@@ -21,16 +25,18 @@
 				:placeholder="getValuePlaceholder"
 				@search="v => term = v" />
 		</div>
-		<NcButton
-			:close-after-click="true"
-			type="tertiary"
-			class="delete-button"
-			:aria-label="t('tables', 'Delete filter')"
-			@click="$emit('delete-filter')">
-			<template #icon>
-				<Delete :size="25" />
-			</template>
-		</NcButton>
+		<div class="fix-col-2 actions">
+			<NcButton
+				:close-after-click="true"
+				type="tertiary"
+				class="delete-button"
+				:aria-label="t('tables', 'Delete filter')"
+				@click="$emit('delete-filter')">
+				<template #icon>
+					<Delete :size="25" />
+				</template>
+			</NcButton>
+		</div>
 	</div>
 </template>
 
@@ -169,25 +175,32 @@ export default {
 }
 </script>
 
-<style>
-.filter-entry {
-	display: flex;
-	justify-content: space-between;
-}
+<style lang="scss" scoped>
 
-.select-field {
-	width: 30%;
-	padding: calc(var(--default-grid-baseline) * 2);
-	min-width: auto !important;
-}
+	.row {
+		margin-bottom: calc(var(--default-grid-baseline) * 4);
+		margin-top: var(--default-grid-baseline);
+		background-color: var(--color-primary-element-light);
+		border-radius: var(--border-radius-large);
+	}
 
-.selection-fields {
-	flex: 1;
-	display: flex;
-}
+	.row .fix-col-2 > div {
+		width: 100%;
+		padding: calc(var(--default-grid-baseline) * 2);
+	}
 
-.delete-button {
-	margin-left: auto;
-}
+	.row .fix-col-2 {
+		height: 63.32px;
+	}
+
+	.row .fix-col-2.actions {
+		align-items: center;
+	}
+
+	.actions button {
+		margin-right: calc(var(--default-grid-baseline) * 2);
+		margin-left: auto;
+		height: 44px;
+	}
 
 </style>
