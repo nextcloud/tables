@@ -993,8 +993,10 @@ components:
                     format: int64
                 title:
                     type: string
+                    nullable: false
                 emoji:
                     type: string
+                    nullable: true
                 ownership:
                     type: string
                 ownerDisplayName:
@@ -1003,12 +1005,22 @@ components:
                     type: string
                 createdAt:
                     type: string
+                    nullable: false
+                    pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
                 lastEditBy:
                     type: string
                 lastEditAt:
                     type: string
+                    nullable: false
+                    pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
                 isShared:
                     type: boolean
+                    nullable: false
+                    description: "Whether the table is shared with the requesting user"
+                hasShares:
+                    type: boolean
+                    nullable: false
+                    description: "Whether the table is shared with ANY user"
                 onSharePermissions:
                     type: object
                     properties:
@@ -1024,6 +1036,12 @@ components:
                             type: boolean
                 rowsCount:
                     type: integer
+                    nullable: false
+                columnsCount:
+                    type: integer
+                    nullable: false
+                views:
+                    type: array
         Shares:
             type: array
             maxItems: 1000
@@ -1038,35 +1056,47 @@ components:
             properties:
                 id:
                     type: integer
+                    nullable: false
                 nodeId:
                     type: integer
+                    nullable: false
                 nodeType:
                     type: string
+                    nullable: false
                 permissionRead:
                     type: boolean
+                    nullable: false
                 permissionCreate:
                     type: boolean
+                    nullable: false
                 permissionUpdate:
                     type: boolean
+                    nullable: false
                 permissionDelete:
                     type: boolean
+                    nullable: false
                 permissionManage:
                     type: boolean
+                    nullable: false
                 sender:
                     type: string
                 receiver:
                     type: string
+                    nullable: false
                 receiverDisplayName:
                     type: string
                 receiverType:
                     type: string
-                    items:
-                        - user
-                        - group
+                    nullable: false
+                    pattern: "^(user)|(group)$"
                 createdAt:
                     type: string
+                    nullable: false
+                    pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
                 lastEditAt:
                     type: string
+                    nullable: false
+                    pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
         Columns:
             type: array
             maxItems: 1000
@@ -1083,26 +1113,40 @@ components:
             properties:
                 id:
                     type: integer
+                    nullable: false
+                title:
+                    type: string
+                    nullable: false
                 tableId:
                     type: integer
+                    nullable: false
                 createdBy:
                     type: string
                 createdAt:
                     type: string
+                    nullable: false
+                    pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
                 lastEditBy:
                     type: string
                 lastEditAt:
                     type: string
+                    nullable: false
+                    pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
                 type:
                     type: string
+                    nullable: false
                 subtype:
                     type: string
+                    nullable: false
+                    description: "subtype or an empty string"
                 mandatory:
                     type: boolean
+                    nullable: false
                 description:
                     type: string
                 orderWeight:
                     type: integer
+                    description: "Deprecated"
                 numberDefault:
                     type: number
                 numberMin:
@@ -1113,8 +1157,12 @@ components:
                     type: integer
                 numberPrefix:
                     type: string
+                    nullable: false
+                    description: "prefix or an empty string"
                 numberSuffix:
                     type: string
+                    nullable: false
+                    description: "suffix or an empty string"
                 textDefault:
                     type: string
                 textAllowedPattern:
@@ -1123,6 +1171,7 @@ components:
                     type: integer
                 selectionOptions:
                     type: string
+                    nullable: false
                 selectionDefault:
                     type: integer
                 datetimeDefault:
@@ -1142,20 +1191,33 @@ components:
             properties:
                 id:
                     type: integer
+                    nullable: false
+                title:
+                    type: string
+                    nullable: false
                 tableId:
                     type: integer
+                    nullable: false
                 createdBy:
                     type: string
+                    nullable: true
                 createdAt:
                     type: string
+                    nullable: false
+                    pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
                 lastEditBy:
                     type: string
+                    nullable: true
                 lastEditAt:
                     type: string
+                    nullable: false
+                    pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
                 description:
                     type: string
+                    nullable: false
                 emoji:
                     type: string
+                    nullable: true
                 columns:
                     type: array
                     items:
@@ -1179,8 +1241,10 @@ components:
                             type: boolean
                 hasShares:
                     type: boolean
+                    nullable: false
                 rowsCount:
                     type: integer
+                    nullable: false
                 ownerDisplayName:
                     type: string
                 filter:
@@ -1237,21 +1301,33 @@ components:
         Row:
             type: object
             description: Object with row metadata. The values are inside of the property 'data'.
+            required:
+                - id
+                - tableId
             properties:
                 id:
                     type: integer
+                    nullable: false
                 tableId:
                     type: integer
+                    nullable: false
                 createdBy:
                     type: string
+                    nullable: false
                 createdAt:
                     type: string
+                    nullable: false
+                    pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
                 lastEditBy:
                     type: string
+                    nullable: false
                 lastEditAt:
                     type: string
+                    nullable: false
+                    pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
                 data:
                     type: array
+                    nullable: false
                     items:
                         type: object
                         properties:
