@@ -9,6 +9,7 @@ OC.L10N.register(
     "e.g. 1,2,4 or leave empty" : "např. 1,2,4 nebo nevyplňujte",
     "Timestamp of data load" : "Časové razítko načtení dat",
     "No" : "Ne",
+    "Yes" : "Ano",
     "Nextcloud tables" : "Nextcloud tabulky",
     "_%n row_::_%n rows_" : ["%n řádek","%n řádky","%n řádků","%n řádky"],
     "table" : "tabulka",

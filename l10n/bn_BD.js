@@ -2,6 +2,7 @@ OC.L10N.register(
     "tables",
     {
     "No" : "না",
+    "Yes" : "হ্যাঁ",
     "Date" : "Date",
     "Name" : "নাম",
     "Description" : "বিবরণ",
