@@ -27,6 +27,7 @@ import store from './store/store.js'
 import router from './router.js'
 import VuePapaParse from 'vue-papa-parse'
 
+__webpack_nonce__ = btoa(OC.requestToken) // eslint-disable-line
 // eslint-disable-next-line
 __webpack_public_path__ = generateFilePath('tables', '', 'js/')
 
