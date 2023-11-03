@@ -113,7 +113,7 @@ class RowService extends SuperService {
 	/**
 	 * @param int|null $tableId
 	 * @param int|null $viewId
-	 * @param array{columnId: string|int, value: mixed} $data
+	 * @param list<array{columnId: int, value: mixed}> $data
 	 * @return Row
 	 *
 	 * @throws NotFoundError
@@ -174,18 +174,18 @@ class RowService extends SuperService {
 	}
 
 	/**
-	 * @param array{columnId: string|int, value: mixed} $data
+	 * @param list<array{columnId: string|int, value: mixed}> $data
 	 * @param Column[] $columns
 	 * @param int|null $tableId
 	 * @param int|null $viewId
-	 * @return array{columnId: int, value: mixed}
+	 * @return list<array{columnId: int, value: float|int|string}>|null
 	 *
 	 * @throws InternalError
 	 */
-	private function cleanupData(array $data, array $columns, ?int $tableId, ?int $viewId): array {
-		$out = [];
+	private function cleanupData(array $data, array $columns, ?int $tableId, ?int $viewId): ?array {
+		$out = null;
 		foreach ($data as $entry) {
-			$column = $this->getColumnFromColumnsArray($entry['columnId'], $columns);
+			$column = $this->getColumnFromColumnsArray((int) $entry['columnId'], $columns);
 
 			// check if it is allowed to insert a value for the requested column
 			if (!$column && $viewId) {
@@ -246,7 +246,7 @@ class RowService extends SuperService {
 	 *
 	 * @param int $id
 	 * @param int|null $viewId
-	 * @param array{columnId: string|int, value: mixed} $data
+	 * @param list<array{columnId: string|int, value: mixed}> $data
 	 * @param string $userId
 	 * @return Row
 	 *

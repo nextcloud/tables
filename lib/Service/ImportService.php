@@ -180,6 +180,7 @@ class ImportService extends SuperService {
 	 * @throws DoesNotExistException
 	 * @throws InternalError
 	 * @throws MultipleObjectsReturnedException
+	 * @throws NotFoundError
 	 */
 	private function createRow(Row $row): void {
 		$cellIterator = $row->getCellIterator();
@@ -207,8 +208,9 @@ class ImportService extends SuperService {
 				continue;
 			}
 
+			/** @noinspection PhpComposerExtensionStubsInspection */
 			$data[] = [
-				'columnId' => $this->columns[$i]->getId(),
+				'columnId' => (int) $this->columns[$i]->getId(),
 				'value' => json_decode($this->parseValueByColumnType($cell->getValue(), $this->columns[$i])),
 			];
 		}
@@ -218,9 +220,12 @@ class ImportService extends SuperService {
 		} catch (PermissionError $e) {
 			$this->logger->error('Could not create row while importing, no permission.', ['exception' => $e]);
 			$this->countErrors++;
-		} catch (Exception $e) {
+		} catch (InternalError $e) {
 			$this->logger->error('Error while creating  new row for import.', ['exception' => $e]);
 			$this->countErrors++;
+		} catch (NotFoundError $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 
 	}
