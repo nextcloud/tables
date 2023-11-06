@@ -149,6 +149,9 @@ export default {
 			if ([ColumnTypes.NumberProgress, ColumnTypes.Selection].includes(column.type)) {
 				return parseInt(value)
 			}
+			if ([ColumnTypes.Number].includes(column.type)) {
+				return parseFloat(value)
+			}
 			return value
 		},
 		truncate(text) {
