@@ -37,6 +37,20 @@ class ColumnMapper extends QBMapper {
 	}
 
 	/**
+	 * @param int[] $ids
+	 *
+	 * @return Column[]
+	 * @throws Exception
+	 */
+	public function findMultiple(array $ids): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->in('id', $qb->createNamedParameter($ids, IQueryBuilder::PARAM_INT_ARRAY)));
+		return $this->findEntities($qb);
+	}
+
+	/**
 	 * @param integer $tableID
 	 * @return array
 	 * @throws Exception
