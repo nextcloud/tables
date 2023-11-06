@@ -99,6 +99,7 @@ Feature: api/tablesapi
       | First column  |
     Then user "participant1" deletes table with keyword "Column test"
 
+  @rows
   Scenario: Create, modify and delete rows
     Given table "Rows check" with emoji "👨🏻‍💻" exists for user "participant1" as "base1"
     Then column "one" exists with following properties
@@ -124,16 +125,17 @@ Feature: api/tablesapi
     Then row exists with following values
       | one           | AHA                     |
       | two           | 88                      |
-      | three         | 1                       |
+      | three         | true                    |
       | four          | 2023-12-24              |
     Then set following values for last created row
       | one           | AHA!                    |
       | two           | 99                      |
-      | three         | 0                       |
+      | three         | false                   |
       | four          | 2020-02-04              |
     Then user deletes last created row
     Then user "participant1" deletes table with keyword "Rows check"
 
+  @rows
   Scenario: Create, modify and delete rows (legacy interface)
     Given table "Rows check legacy" with emoji "👨🏻‍💻" exists for user "participant1" as "base1"
     Then column "one" exists with following properties
@@ -159,12 +161,12 @@ Feature: api/tablesapi
     Then row exists with following values via legacy interface
       | one           | AHA                     |
       | two           | 88                      |
-      | three         | 1                       |
+      | three         | true                    |
       | four          | 2023-12-24              |
     Then set following values for last created row via legacy interface
       | one           | AHA!                    |
       | two           | 99                      |
-      | three         | 0                       |
+      | three         | true                    |
       | four          | 2020-02-04              |
     Then user deletes last created row
     Then user "participant1" deletes table with keyword "Rows check"
