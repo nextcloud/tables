@@ -91,13 +91,7 @@ class RowController extends Controller {
 			$columnId,
 			$data
 		) {
-			return $this->service->update(
-				$id,
-				$tableId,
-				$viewId,
-				$columnId,
-				$data,
-				$this->userId);
+			return $this->service->updateSet($id, $viewId, ['columnId' => $columnId, 'value' => $data], $this->userId);
 		});
 	}
 

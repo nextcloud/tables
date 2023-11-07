@@ -5,6 +5,7 @@ namespace OCA\Tables\Service;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -867,11 +868,15 @@ class TableTemplateService {
 		);
 	}
 
+	/**
+	 * @throws NotFoundError
+	 * @throws Exception
+	 */
 	private function createRow(Table $table, array $values): void {
 		$data = [];
 		foreach ($values as $columnId => $value) {
 			$data[] = [
-				'columnId' => $columnId,
+				'columnId' => (int) $columnId,
 				'value' => $value
 			];
 		}
@@ -879,8 +884,11 @@ class TableTemplateService {
 			$this->rowService->create($table->getId(), null, $data);
 		} catch (PermissionError $e) {
 			$this->logger->warning('Cannot create row, permission denied: '.$e->getMessage());
-		} catch (Exception|InternalError|DoesNotExistException|MultipleObjectsReturnedException $e) {
+		} catch (InternalError $e) {
 			$this->logger->warning('Exception occurred while creating a row: '.$e->getMessage());
+		} catch (NotFoundError $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 	}
 

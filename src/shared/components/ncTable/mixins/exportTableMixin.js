@@ -16,8 +16,30 @@ export default {
 			rows.forEach(row => {
 				const rowData = {}
 				columns.forEach(column => {
-					const set = row.data ? row.data.find(d => d.columnId === column.id) || '' : null
-					rowData[column.title] = set ? column.getValueString(set) : ''
+					// if a normal column
+					if (column.id >= 0) {
+						const set = row.data ? row.data.find(d => d.columnId === column.id) || '' : null
+						rowData[column.title] = set ? column.getValueString(set) : ''
+					} else {
+						// if is a meta data column (id < 0)
+						switch (column.id) {
+						case -1:
+							rowData[column.title] = row.id
+							break
+						case -2:
+							rowData[column.title] = row.createdBy
+							break
+						case -3:
+							rowData[column.title] = row.lastEditBy
+							break
+						case -4:
+							rowData[column.title] = row.createdAt
+							break
+						case -5:
+							rowData[column.title] = row.lastEditAt
+							break
+						}
+					}
 				})
 				data.push(rowData)
 			})
