@@ -24,6 +24,7 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 import { addCommands } from '@nextcloud/cypress'
+require('cypress-downloadfile/lib/downloadFileCommand')
 
 const url = Cypress.config('baseUrl').replace(/\/index.php\/?$/g, '')
 Cypress.env('baseUrl', url)
@@ -100,7 +101,7 @@ Cypress.Commands.add('createTextLinkColumn', (title, ressourceProvider, firstCol
 	cy.get('.typeSelection span label').contains('Contacts').click()
 
 	ressourceProvider.forEach(provider =>
-		cy.get('.typeSelection span label').contains(provider, { matchCase: false }).click()
+		cy.get('.typeSelection span label').contains(provider, { matchCase: false }).click(),
 	)
 	cy.get('.modal-container button').contains('Save').click()
 
