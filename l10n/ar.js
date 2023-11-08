@@ -112,7 +112,6 @@ OC.L10N.register(
     "No title given" : "لم يتم تقديم عنوان",
     "Tables" : "الجداول",
     "Manage data the way you need it." : "أدِر بياناتك كيفما ترغب.",
-    "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link\n- Number\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n\nShare your tables with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "أدِر و استخدم البيانات بالطريقة التي تحتاجها.\n\nباستخدام هذا التطبيق، يمكنك إنشاء الجداول الخاصة بك باستخدام أعمدة فردية. يمكنك البدء باستخدام قالب أوالبدء من الصفر وإضافة الأعمدة المطلوبة.\nيمكنك الاختيار من بين أنواع الأعمدة التالية:\n- سطر نصي أو نص منسق\n- رابط\n- رقم\n- شريط إنجاز\n- تقييم بالنجوم\n- مربعات اختيار نعم / لا \n- التاريخ و/أو الوقت\n- اختيارات (متعددة)\n\nشارك الجداول الخاصة بك مع المستخدمين والمجموعات داخل السحابة الخاصة بك.\n\nاحظ بوقت طيب وقم بإدارة ما تريد.",
     "Last edit" : "آخر تعديل",
     "Create" : "إنشاء",
     "Column ID" : "معرف العمود",

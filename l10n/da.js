@@ -101,7 +101,6 @@ OC.L10N.register(
     "No title given" : "Ingen titel givet",
     "Tables" : "Tabeller",
     "Manage data the way you need it." : "Administrer data efter dine ønsker og behov…",
-    "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link\n- Number\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n\nShare your tables with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Administrer data efter dine ønsker og behov.\n\nWith this app you are able to create your own tables with individual columns. Med denne app er du i stand til at oprette dine egne tabeller med individuelle kolonner. Du kan starte med en skabelon eller helt fra bunden og tilføje dine egne kolonner.\nDu kan vælge mellem følgende kolonnetyper:\n- Tekstlinje eller lang tekst\n- Link\n- Nummer\n- Fremskridtslinje\n- Stjernebedømmelse\n- Ja/Nej sæt kryds\n- Dato og/eller tid\n- (Multi) valg\n\nDel dine tabeller med brugere og grupper i din cloud.\n\nGod fornøjelse.",
     "Last edit" : "Sidste redigering",
     "Create" : "Opret",
     "Column ID" : "Kolonne ID",

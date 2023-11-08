@@ -108,7 +108,6 @@ OC.L10N.register(
     "No title given" : "Назва не вказана",
     "Tables" : "Таблиці",
     "Manage data the way you need it." : "Керуйте даними так, як вам потрібно.",
-    "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link\n- Number\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n\nShare your tables with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Зручне керування даними.\n\nЦей застосунок надає можливість створювати власні таблиці на основі шаблонів, додавати типізовані стовпці на вибір.\nПідтримуються такі типи стовпців:\n- Текстовий рядок або форматований текст\n- Посилання\n- Числовий рядок\n- Індикатор виконання\n- Рейтинґ із зірочками\n- Вибір так/ні\n- Дата та/або час\n- Одинарний або множинний вибір\n\nТаблиці можна надавати у спільний доступ з користувачами або групами вашої хмари.\n\nСподіваємося, що цей застосунок допоможе оптимізувати керування вашими даними.",
     "Last edit" : "Останні зміни",
     "Create" : "Створити",
     "Column ID" : "ID стовпчика",

@@ -112,7 +112,6 @@ OC.L10N.register(
     "No title given" : "Nincs cím megadva",
     "Tables" : "Táblázatok",
     "Manage data the way you need it." : "Kezelje az adatokat úgy, ahogy szüksége van rájuk.",
-    "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link\n- Number\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n\nShare your tables with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Kezelje az adatokat úgy, ahogy szüksége van rájuk.\n\nAz alkalmazással létrehozhatja a saját táblázatait az egyes oszlopok megadásával. Kezdheti sablonnal, vagy elölről és a kívánt oszlopok hozzáadásával.\nA következő oszloptípusok közül választhat:\n- Szöveges sor vagy formázott szöveg\n- Hivatkozás\n- Szám\n- Folyamatjelző\n- Csillagos értékelés\n- Igen/Nem pipa\n- Dátum és/vagy idő\n- (Többszörös) kiválasztás\n\nOssza meg a táblázatait felhasználókkal és csoportokkal a felhőben.\n\nÉrezze jól magát, és kezelje azt, amit csak szeretne.",
     "Last edit" : "Legutóbbi szerkesztés",
     "Create" : "Létrehozás",
     "Column ID" : "Oszlopazonosító",
