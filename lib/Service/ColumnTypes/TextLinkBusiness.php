@@ -16,10 +16,26 @@ class TextLinkBusiness extends SuperBusiness implements IColumnTypeBusiness {
 			]));
 		}
 
+		// if is json
+		/** @noinspection PhpComposerExtensionStubsInspection */
+		$data = json_decode($value, true);
+		if($data !== null) {
+			// at least title and resUrl have to be set
+			if(isset($data['title']) && isset($data['value'])) {
+				/** @noinspection PhpComposerExtensionStubsInspection */
+				return json_encode($value);
+			} else {
+				$this->logger->warning("Link cell value has incomplete json string.");
+				return '';
+			}
+		}
+
+		// if is just a url (old implementation)
 		preg_match('/(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/', $value, $matches);
 		if (empty($matches)) {
 			return '';
 		}
+		/** @noinspection PhpComposerExtensionStubsInspection */
 		return json_encode(json_encode([
 			'title' => $matches[0],
 			'resourceUrl' => $matches[0]
@@ -29,6 +45,13 @@ class TextLinkBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	public function canBeParsed(string $value, ?Column $column = null): bool {
 		preg_match('/(.*) \((http.*)\)/', $value, $matches);
 		if (!empty($matches) && $matches[0] && $matches[1]) {
+			return true;
+		}
+
+		// if is json
+		/** @noinspection PhpComposerExtensionStubsInspection */
+		$data = json_decode($value);
+		if($data != null) {
 			return true;
 		}
 
