@@ -112,6 +112,7 @@ OC.L10N.register(
     "No title given" : "Herhangi bir başlık belirtilmemiş",
     "Tables" : "Tablolar",
     "Manage data the way you need it." : "Verileri istediğiniz şekilde yönetin.",
+    "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link to urls or other nextcloud resources\n- Numbers\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n\nShare your tables and views with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Verileri gerek duyduğunuz şekilde yönetin.\n\nBu uygulama ile belirleyeceğiniz sütunlar ile kendi tablolarınızı oluşturabilirsiniz. Bir kalıp kullanabilir ya da sıfırdan başlayabilir ve istediğiniz sütunları ekleyebilirsiniz.\nŞu sütun türlerini seçebilirsiniz:\n- Metin satırı ya da zengin metin\n- Adres ya da diğer Nextcloud kaynaklarına bağlantı\n- Sayı\n- İlerleme çubuğu\n- Yıldız değerlendirmesi\n- Tarih ve/veya saat\n- (Çoklu) seçim\n\nTablolarınızı ve görünümlerinizi bulutunuzdaki kullanıcılar ve gruplar ile paylaşabilirsiniz.\n\nİyi eğlenceler, istediğiniz gibi yönetin.",
     "Last edit" : "Son düzenleme",
     "Create" : "Ekle",
     "Column ID" : "Sütun kodu",
