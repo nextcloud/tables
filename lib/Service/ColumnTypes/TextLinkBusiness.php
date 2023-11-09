@@ -17,12 +17,10 @@ class TextLinkBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		}
 
 		// if is json
-		/** @noinspection PhpComposerExtensionStubsInspection */
 		$data = json_decode($value, true);
 		if($data !== null) {
 			// at least title and resUrl have to be set
 			if(isset($data['title']) && isset($data['value'])) {
-				/** @noinspection PhpComposerExtensionStubsInspection */
 				return json_encode($value);
 			} else {
 				$this->logger->warning("Link cell value has incomplete json string.");
@@ -35,7 +33,6 @@ class TextLinkBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		if (empty($matches)) {
 			return '';
 		}
-		/** @noinspection PhpComposerExtensionStubsInspection */
 		return json_encode(json_encode([
 			'title' => $matches[0],
 			'resourceUrl' => $matches[0]
@@ -49,7 +46,6 @@ class TextLinkBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		}
 
 		// if is json
-		/** @noinspection PhpComposerExtensionStubsInspection */
 		$data = json_decode($value);
 		if($data != null) {
 			return true;
