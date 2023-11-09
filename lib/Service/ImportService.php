@@ -208,7 +208,6 @@ class ImportService extends SuperService {
 				continue;
 			}
 
-			/** @noinspection PhpComposerExtensionStubsInspection */
 			$data[] = [
 				'columnId' => (int) $this->columns[$i]->getId(),
 				'value' => json_decode($this->parseValueByColumnType($cell->getValue(), $this->columns[$i])),

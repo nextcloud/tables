@@ -38,6 +38,7 @@
         "psalm:fix:dry": "./vendor/bin/psalm --no-cache --alter --issues=InvalidReturnType,InvalidNullableReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingParamType,InvalidFalsableReturnType --dry-run"
     },
     "require": {
-        "phpoffice/phpspreadsheet": "^1.28"
-    }
+        "phpoffice/phpspreadsheet": "^1.28",
+		"ext-json": "*"
+	}
 }

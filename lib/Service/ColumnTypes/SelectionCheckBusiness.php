@@ -10,7 +10,6 @@ class SelectionCheckBusiness extends SuperBusiness implements IColumnTypeBusines
 
 	public function parseValue(string $value, ?Column $column = null): string {
 		$found = in_array($value, self::PATTERN_POSITIVE, true);
-		/** @noinspection PhpComposerExtensionStubsInspection */
 		return json_encode($found ? 'true' : 'false');
 	}
 
