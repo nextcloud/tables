@@ -219,7 +219,6 @@ class RowService extends SuperService {
 				$this->logger->warning('Value '.$value.' could not be parsed for column '.$column->getTitle());
 				return $value;
 			}
-			/** @noinspection PhpComposerExtensionStubsInspection */
 			return json_decode($columnBusiness->parseValue($value, $column));
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 			$this->logger->debug('Column type business class not found', ['exception' => $e]);
