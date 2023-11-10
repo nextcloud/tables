@@ -33,6 +33,7 @@ export default {
 	data() {
 		return {
 			loading: false,
+			defaultPageTitle: false,
 		}
 	},
 	computed: {
@@ -60,9 +61,28 @@ export default {
 			}
 			if (currentRoute.path.startsWith('/table/')) {
 				this.$store.commit('setActiveTableId', parseInt(currentRoute.params.tableId))
+				this.setPageTitle(this.$store.getters.activeTable.title)
 			} else if (currentRoute.path.startsWith('/view/')) {
 				this.$store.commit('setActiveViewId', parseInt(currentRoute.params.viewId))
+				this.setPageTitle(this.$store.getters.activeView.title)
 			}
+		},
+		setPageTitle(title) {
+			if (this.defaultPageTitle === false) {
+				const appTitle = t('tables', 'Tables')
+				this.defaultPageTitle = window.document.title
+				if (this.defaultPageTitle.indexOf(` - ${appTitle} - `) !== -1) {
+					this.defaultPageTitle = this.defaultPageTitle.substring(this.defaultPageTitle.indexOf(` - ${appTitle} - `) + 3)
+				}
+				if (this.defaultPageTitle.indexOf(`${appTitle} - `) !== 0) {
+					this.defaultPageTitle = `${appTitle} - ` + this.defaultPageTitle
+				}
+			}
+			let newTitle = this.defaultPageTitle
+			if (title !== '') {
+				newTitle = `${title} - ${newTitle}`
+			}
+			window.document.title = newTitle
 		},
 	},
 }
