@@ -14,11 +14,11 @@ class SuperBusiness {
 		$this->logger = $logger;
 	}
 
-	public function parseValue(string $value, ?Column $column = null): string {
+	public function parseValue(?string $value, ?Column $column = null): string {
 		return json_encode($value);
 	}
 
-	public function canBeParsed(string $value, ?Column $column = null): bool {
+	public function canBeParsed(?string $value, ?Column $column = null): bool {
 		return true;
 	}
 

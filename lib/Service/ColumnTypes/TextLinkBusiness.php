@@ -6,7 +6,7 @@ use OCA\Tables\Db\Column;
 
 class TextLinkBusiness extends SuperBusiness implements IColumnTypeBusiness {
 
-	public function parseValue(string $value, ?Column $column = null): string {
+	public function parseValue(?string $value, ?Column $column = null): string {
 		// if is import from export in format "[description] ([link])"
 		preg_match('/(.*) \((http.*)\)/', $value, $matches);
 		if (!empty($matches) && $matches[0] && $matches[1]) {
@@ -39,7 +39,7 @@ class TextLinkBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		]));
 	}
 
-	public function canBeParsed(string $value, ?Column $column = null): bool {
+	public function canBeParsed(?string $value, ?Column $column = null): bool {
 		preg_match('/(.*) \((http.*)\)/', $value, $matches);
 		if (!empty($matches) && $matches[0] && $matches[1]) {
 			return true;

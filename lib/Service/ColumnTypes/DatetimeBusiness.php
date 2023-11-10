@@ -11,7 +11,7 @@ class DatetimeBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	/**
 	 * @throws Exception
 	 */
-	public function parseValue(string $value, ?Column $column = null): string {
+	public function parseValue(?string $value, ?Column $column = null): string {
 		$allowedFormats = [\DateTimeInterface::ATOM, 'Y-m-d H:i'];
 		$newDateTime = '';
 
@@ -30,7 +30,7 @@ class DatetimeBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		return json_encode($newDateTime !== '' ? $newDateTime : '');
 	}
 
-	public function canBeParsed(string $value, ?Column $column = null): bool {
+	public function canBeParsed(?string $value, ?Column $column = null): bool {
 		try {
 			new DateTime($value);
 		} catch (Exception $e) {

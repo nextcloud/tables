@@ -11,12 +11,12 @@ interface IColumnTypeBusiness {
 	 *
 	 * @return value stringify
 	 */
-	public function parseValue(string $value, ?Column $column): string;
+	public function parseValue(?string $value, ?Column $column): string;
 
 	/*
 	 * tests if the given string can be parsed to a value of the column type
 	 *
 	 * @return value stringify
 	 */
-	public function canBeParsed(string $value, ?Column $column): bool;
+	public function canBeParsed(?string $value, ?Column $column): bool;
 }

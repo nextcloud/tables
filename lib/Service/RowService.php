@@ -195,7 +195,7 @@ class RowService extends SuperService {
 			}
 
 			// parse given value to respect the column type value format
-			$value = $this->parseValueByColumnType($entry['value'], $column);
+			$value = $this->parseValueByColumnType($column, $entry['value']);
 			$out[] = [
 				'columnId' => (int) $entry['columnId'],
 				'value' => $value
@@ -205,11 +205,11 @@ class RowService extends SuperService {
 	}
 
 	/**
-	 * @param string $value
 	 * @param Column $column
+	 * @param string|null $value
 	 * @return string|int|float
 	 */
-	private function parseValueByColumnType(string $value, Column $column) {
+	private function parseValueByColumnType(Column $column, ?string $value = null) {
 		try {
 			$businessClassName = 'OCA\Tables\Service\ColumnTypes\\';
 			$businessClassName .= ucfirst($column->getType()).ucfirst($column->getSubtype()).'Business';
@@ -217,13 +217,13 @@ class RowService extends SuperService {
 			$columnBusiness = Server::get($businessClassName);
 			if(!$columnBusiness->canBeParsed($value, $column)) {
 				$this->logger->warning('Value '.$value.' could not be parsed for column '.$column->getTitle());
-				return $value;
+				return "".$value;
 			}
 			return json_decode($columnBusiness->parseValue($value, $column));
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 			$this->logger->debug('Column type business class not found', ['exception' => $e]);
 		}
-		return $value;
+		return "".$value;
 	}
 
 	/**

@@ -8,7 +8,7 @@ class SelectionMultiBusiness extends SuperBusiness implements IColumnTypeBusines
 
 	private array $options = [];
 
-	public function parseValue(string $value, ?Column $column = null): string {
+	public function parseValue(?string $value, ?Column $column = null): string {
 		if(!$column) {
 			$this->logger->warning('No column given, but expected on parseValue for SelectionBusiness');
 			return '';
@@ -36,9 +36,13 @@ class SelectionMultiBusiness extends SuperBusiness implements IColumnTypeBusines
 		return null;
 	}
 
-	public function canBeParsed(string $value, ?Column $column = null): bool {
+	public function canBeParsed(?string $value, ?Column $column = null): bool {
 		if(!$column) {
 			return false;
+		}
+
+		if($value === null) {
+			return true;
 		}
 
 		$this->options = $column->getSelectionOptionsArray();
