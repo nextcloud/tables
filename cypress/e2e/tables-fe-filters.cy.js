@@ -38,10 +38,10 @@ describe('FE sorting and filtering', () => {
 	it('Reset FE filter on table or view change', () => {
 		// create a table and view, so we can change the active table and view later on
 		cy.createTable('first table')
-		cy.createTextLineColumn('colA', true)
+		cy.createTextLineColumn('colA', null, null, true)
 
 		cy.createTable('second table')
-		cy.createTextLineColumn('col1', true)
+		cy.createTextLineColumn('col1', null, null, true)
 
 		// change between tables
 		cy.loadTable('first table')
@@ -70,7 +70,7 @@ describe('FE sorting and filtering', () => {
 		cy.createTable('first table')
 		cy.createTable('second table')
 		cy.createTable('third table 🙇')
-		cy.createTextLineColumn('col1', true)
+		cy.createTextLineColumn('col1', null, null, true)
 		cy.createView('view for third tab')
 
 		// all tables and views should be visible

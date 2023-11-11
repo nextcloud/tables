@@ -66,7 +66,7 @@
 							</NcCheckboxRadioSwitch>
 						</div>
 					</div>
-					<div class="row no-padding-on-mobile space-L">
+					<div class="row no-padding-on-mobile space-L" :data-cy="getColumnForm">
 						<component :is="getColumnForm" :column="column" />
 					</div>
 				</div>

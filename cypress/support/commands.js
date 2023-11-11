@@ -169,17 +169,21 @@ Cypress.Commands.add('createSelectionMultiColumn', (title, options, defaultOptio
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
-Cypress.Commands.add('createTextLineColumn', (title, firstColumn) => {
+Cypress.Commands.add('createTextLineColumn', (title, defaultValue, maxLength, firstColumn) => {
 	if (firstColumn) {
 		cy.get('.button-vue__text').contains('Create column').click({ force: true })
 	} else {
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
 	}
-
 	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+	if (defaultValue) {
+		cy.get('[data-cy="TextLineForm"] input').first().type(defaultValue)
+	}
+	if (maxLength) {
+		cy.get('[data-cy="TextLineForm"] input').eq(1).type(maxLength)
+	}
 	cy.get('.modal-container button').contains('Save').click()
-
 	cy.wait(10).get('.toastify.toast-success').should('be.visible')
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
