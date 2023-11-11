@@ -138,6 +138,37 @@ Cypress.Commands.add('createSelectionColumn', (title, options, defaultOption, fi
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
+Cypress.Commands.add('createSelectionMultiColumn', (title, options, defaultOptions, firstColumn) => {
+	if (firstColumn) {
+		cy.get('.button-vue__text').contains('Create column').click({ force: true })
+	} else {
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+	}
+
+	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
+	cy.get('.multiSelectOptionLabel').contains('Selection').click({ force: true })
+	cy.get('.modal-container label').contains('Multiple selection').click()
+
+	// remove default option
+	cy.get('[data-cy="selection-option"] button').first().click()
+	cy.get('[data-cy="selection-option"] button').first().click()
+
+	// add wanted option
+	options.forEach(option => {
+		cy.get('button').contains('Add option').click()
+		cy.get('[data-cy="selection-option-label"]').last().type(option)
+		if (defaultOptions.includes(option)) {
+			cy.get('[data-cy="selection-option"] span label').last().click()
+		}
+	})
+	cy.get('.modal-container button').contains('Save').click()
+
+	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
+})
+
 Cypress.Commands.add('createTextLineColumn', (title, firstColumn) => {
 	if (firstColumn) {
 		cy.get('.button-vue__text').contains('Create column').click({ force: true })
