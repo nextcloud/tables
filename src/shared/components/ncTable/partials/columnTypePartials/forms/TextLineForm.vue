@@ -28,7 +28,7 @@
 				{{ t('tables', 'Maximum text length') }}
 			</div>
 			<div class="fix-col-4">
-				<input v-model="getMaxLength"
+				<input v-model="maxLength"
 					type="number"
 					step="1"
 					min="0">
@@ -61,8 +61,13 @@ export default {
 	},
 
 	computed: {
-		getMaxLength() {
-			return this.mutableColumn.textMaxLength > 0 ? this.mutableColumn.textMaxLength : null
+		maxLength: {
+			get() {
+				return this.mutableColumn.textMaxLength > 0 ? this.mutableColumn.textMaxLength : null
+			},
+			set(v) {
+				this.mutableColumn.textMaxLength = parseInt(v)
+			},
 		},
 	},
 
