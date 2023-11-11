@@ -206,10 +206,10 @@ class RowService extends SuperService {
 
 	/**
 	 * @param Column $column
-	 * @param string|null $value
+	 * @param string|array|int|float|bool|null $value
 	 * @return string|int|float
 	 */
-	private function parseValueByColumnType(Column $column, ?string $value = null) {
+	private function parseValueByColumnType(Column $column, $value = null) {
 		try {
 			$businessClassName = 'OCA\Tables\Service\ColumnTypes\\';
 			$businessClassName .= ucfirst($column->getType()).ucfirst($column->getSubtype()).'Business';

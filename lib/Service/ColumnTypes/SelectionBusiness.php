@@ -6,7 +6,12 @@ use OCA\Tables\Db\Column;
 
 class SelectionBusiness extends SuperBusiness implements IColumnTypeBusiness {
 
-	public function parseValue(?string $value = null, ?Column $column = null): string {
+	/**
+	 * @param mixed $value (array|string|null)
+	 * @param Column|null $column
+	 * @return string
+	 */
+	public function parseValue($value, ?Column $column = null): string {
 		if(!$column) {
 			$this->logger->warning('No column given, but expected on parseValue for SelectionBusiness');
 			return '';
@@ -31,7 +36,12 @@ class SelectionBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		return '';
 	}
 
-	public function canBeParsed(?string $value = null, ?Column $column = null): bool {
+	/**
+	 * @param mixed $value (array|string|null)
+	 * @param Column|null $column
+	 * @return bool
+	 */
+	public function canBeParsed($value, ?Column $column = null): bool {
 		if(!$column) {
 			return false;
 		}
