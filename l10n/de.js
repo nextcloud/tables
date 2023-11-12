@@ -86,7 +86,7 @@ OC.L10N.register(
     "Kickoff meeting" : "Kick-Off-Meeting",
     "We will have a kickoff meeting in person." : "Wir werden ein persönliches Kick-Off-Meeting haben.",
     "Project is kicked-off and we know the vision and our first tasks." : "Das Projekt ist gestartet und wir kennen die Vision und unsere ersten Aufgaben.",
-    "That was nice in person again. We collected some action points, had a look at the documentation..." : "Das war mal wieder toll, sich persönlich zu treffen. Wir haben einige Aktionspunkte gesammelt, uns die Dokumentation angesehen…",
+    "That was nice in person again. We collected some action points, had a look at the documentation..." : "Das war mal wieder toll, sich persönlich zu treffen. Wir haben einige Aktionspunkte gesammelt, uns die Dokumentation angesehen …",
     "Set up some documentation and collaboration tools" : "Dokumentations- und Kollaborationstools einrichten",
     "Where and in what way do we collaborate?" : "Wo und wie arbeiten wir zusammen?",
     "We know what we are doing." : "Wir wissen was wir tun.",
