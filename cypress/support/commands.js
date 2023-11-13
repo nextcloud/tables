@@ -109,7 +109,7 @@ Cypress.Commands.add('createTextLinkColumn', (title, ressourceProvider, firstCol
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
-Cypress.Commands.add('createTextLineColumn', (title, firstColumn) => {
+Cypress.Commands.add('createSelectionColumn', (title, options, defaultOption, firstColumn) => {
 	if (firstColumn) {
 		cy.get('.button-vue__text').contains('Create column').click({ force: true })
 	} else {
@@ -118,8 +118,166 @@ Cypress.Commands.add('createTextLineColumn', (title, firstColumn) => {
 	}
 
 	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
+	cy.get('.multiSelectOptionLabel').contains('Selection').click({ force: true })
+	// remove default option
+	cy.get('[data-cy="selection-option"] button').first().click()
+	cy.get('[data-cy="selection-option"] button').first().click()
+
+	// add wanted option
+	options.forEach(option => {
+		cy.get('button').contains('Add option').click()
+		cy.get('[data-cy="selection-option-label"]').last().type(option)
+		if (defaultOption === option) {
+			cy.get('[data-cy="selection-option"] span label').last().click()
+		}
+	})
 	cy.get('.modal-container button').contains('Save').click()
 
+	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
+})
+
+Cypress.Commands.add('createSelectionMultiColumn', (title, options, defaultOptions, firstColumn) => {
+	if (firstColumn) {
+		cy.get('.button-vue__text').contains('Create column').click({ force: true })
+	} else {
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+	}
+
+	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
+	cy.get('.multiSelectOptionLabel').contains('Selection').click({ force: true })
+	cy.get('.modal-container label').contains('Multiple selection').click()
+
+	// remove default option
+	cy.get('[data-cy="selection-option"] button').first().click()
+	cy.get('[data-cy="selection-option"] button').first().click()
+
+	// add wanted option
+	options.forEach(option => {
+		cy.get('button').contains('Add option').click()
+		cy.get('[data-cy="selection-option-label"]').last().type(option)
+		if (defaultOptions.includes(option)) {
+			cy.get('[data-cy="selection-option"] span label').last().click()
+		}
+	})
+	cy.get('.modal-container button').contains('Save').click()
+
+	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
+})
+
+Cypress.Commands.add('createTextLineColumn', (title, defaultValue, maxLength, firstColumn) => {
+	if (firstColumn) {
+		cy.get('.button-vue__text').contains('Create column').click({ force: true })
+	} else {
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+	}
+	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+	if (defaultValue) {
+		cy.get('[data-cy="TextLineForm"] input').first().type(defaultValue)
+	}
+	if (maxLength) {
+		cy.get('[data-cy="TextLineForm"] input').eq(1).type(maxLength)
+	}
+	cy.get('.modal-container button').contains('Save').click()
+	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
+})
+
+Cypress.Commands.add('createNumberColumn', (title, defaultValue, decimals, min, max, prefix, suffix, firstColumn) => {
+	if (firstColumn) {
+		cy.get('.button-vue__text').contains('Create column').click({ force: true })
+	} else {
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+	}
+	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
+	cy.get('.multiSelectOptionLabel').contains('Number').click({ force: true })
+
+	if (defaultValue) {
+		cy.get('[data-cy="NumberForm"] input').eq(0).clear().type(defaultValue)
+	}
+	if (decimals) {
+		cy.get('[data-cy="NumberForm"] input').eq(1).clear().type('' + decimals)
+	}
+	if (min) {
+		cy.get('[data-cy="NumberForm"] input').eq(2).clear().type('' + min)
+	}
+	if (max) {
+		cy.get('[data-cy="NumberForm"] input').eq(3).clear().type('' + max)
+	}
+	if (prefix) {
+		cy.get('[data-cy="NumberForm"] input').eq(4).clear().type(prefix)
+	}
+	if (suffix) {
+		cy.get('[data-cy="NumberForm"] input').eq(5).clear().type(suffix)
+	}
+	cy.get('.modal-container button').contains('Save').click()
+	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
+})
+
+Cypress.Commands.add('createNumberProgressColumn', (title, defaultValue, firstColumn) => {
+	if (firstColumn) {
+		cy.get('.button-vue__text').contains('Create column').click({ force: true })
+	} else {
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+	}
+	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
+	cy.get('.multiSelectOptionLabel').contains('Progress').click({ force: true })
+
+	if (defaultValue) {
+		cy.get('[data-cy="NumberProgressForm"] input').eq(0).clear().type(defaultValue)
+	}
+	cy.get('.modal-container button').contains('Save').click()
+	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
+})
+
+Cypress.Commands.add('createNumberStarsColumn', (title, defaultValue, firstColumn) => {
+	if (firstColumn) {
+		cy.get('.button-vue__text').contains('Create column').click({ force: true })
+	} else {
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+	}
+	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
+	cy.get('.multiSelectOptionLabel').contains('Stars rating').click({ force: true })
+
+	if (defaultValue) {
+		for (let n = 0; n < defaultValue; n++) {
+			cy.get('[data-cy="NumberStarsForm"] button').last().click()
+		}
+	}
+	cy.get('.modal-container button').contains('Save').click()
+	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
+})
+
+Cypress.Commands.add('createSelectionCheckColumn', (title, defaultValue, firstColumn) => {
+	if (firstColumn) {
+		cy.get('.button-vue__text').contains('Create column').click({ force: true })
+	} else {
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+	}
+	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
+	cy.get('.multiSelectOptionLabel').contains('Selection').click({ force: true })
+	cy.get('.modal-container label').contains('Yes/No').click()
+
+	if (defaultValue) {
+		cy.get('[data-cy="SelectionCheckForm"] label').last().click()
+	}
+	cy.get('.modal-container button').contains('Save').click()
 	cy.wait(10).get('.toastify.toast-success').should('be.visible')
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
@@ -194,4 +352,10 @@ Cypress.Commands.add('addUserToGroup', (userId, groupId) => {
 	}).then(response => {
 		cy.log(`User ${userId} added to group ${groupId}.`, response.status)
 	})
+})
+
+Cypress.Commands.add('removeColumn', (title) => {
+	cy.get('.custom-table table tr th .cell').contains(title).click()
+	cy.get('.v-popper__popper ul.nc-button-group-content').last().get('button').last().click()
+	cy.get('.modal__content button').contains('Confirm').click()
 })
