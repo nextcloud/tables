@@ -8,48 +8,96 @@ class SelectionMultiBusiness extends SuperBusiness implements IColumnTypeBusines
 
 	private array $options = [];
 
-	public function parseValue(string $value, ?Column $column = null): string {
+	/**
+	 * @param mixed $value (array|string|null)
+	 * @param Column|null $column
+	 * @return string
+	 */
+	public function parseValue($value, ?Column $column = null): string {
 		if(!$column) {
-			$this->logger->warning('No column given, but expected on parseValue for SelectionBusiness');
-			return '';
+			$this->logger->warning('No column given, but expected on '.__FUNCTION__.' within '.__CLASS__, ['exception' => new \Exception()]);
+			return json_encode([]);
+		}
+
+		if($value === null) {
+			return json_encode([]);
 		}
 
 		$this->options = $column->getSelectionOptionsArray();
-		$wantedValues = explode(',', $value);
-		$result = [];
 
-		foreach ($wantedValues as $wantedValue) {
-			$wantedValue = trim($wantedValue);
-			if(($id = $this->getOptionIdForValue($wantedValue)) !== null) {
-				$result[] = $id;
+		$wasString = false;
+		if (is_string($value)) {
+			$value = array_map('trim', explode(',', $value));
+			$wasString = true;
+		}
+
+		$result = [];
+		foreach ($value as $wantedValue) {
+			if(!$wasString) {
+				$wantedValue = (int) $wantedValue;
+			}
+			if ($this->getOptionIdForValue($wantedValue) !== null) {
+				$result[] = $this->getOptionIdForValue($wantedValue);
 			}
 		}
+		sort($result, SORT_NUMERIC);
 		return json_encode($result);
 	}
 
-	private function getOptionIdForValue(string $value): ?int {
+	/**
+	 * @param int|string|null $value int assume as option ID, string assumes a label
+	 * @return int|null return always the option ID or null
+	 */
+	private function getOptionIdForValue($value): ?int {
+		if($value === null) {
+			return null;
+		}
+
 		foreach ($this->options as $option) {
-			if($option['label'] === $value) {
-				return $option['id'];
+			if(is_int($value)) {
+				if($option['id'] === $value) {
+					return $option['id'];
+				}
+			} else {
+				if($option['label'] === $value) {
+					return $option['id'];
+				}
 			}
 		}
 		return null;
 	}
 
-	public function canBeParsed(string $value, ?Column $column = null): bool {
+	/**
+	 * @param mixed $value (int[]|string|null) Array of option IDs or string with comma seperated labels
+	 * @param Column|null $column
+	 * @return bool
+	 */
+	public function canBeParsed($value, ?Column $column = null): bool {
 		if(!$column) {
+			$this->logger->warning('No column given, but expected on '.__FUNCTION__.' within '.__CLASS__, ['exception' => new \Exception()]);
 			return false;
 		}
 
-		$this->options = $column->getSelectionOptionsArray();
-		$wantedValues = explode(',', $value);
+		if($value === null) {
+			return true;
+		}
 
-		foreach ($wantedValues as $wantedValue) {
-			if ($this->getOptionIdForValue($wantedValue) === null && trim($wantedValue) !== null) {
+		$this->options = $column->getSelectionOptionsArray();
+
+		$wasString = false;
+		if (is_string($value)) {
+			$value = array_map('trim', explode(',', $value));
+			$wasString = true;
+		}
+
+		foreach ($value as $wantedValue) {
+			if(!$wasString) {
+				$wantedValue = (int) $wantedValue;
+			}
+			if ($this->getOptionIdForValue((int) $wantedValue) === null) {
 				return false;
 			}
 		}
 		return true;
 	}
-
 }

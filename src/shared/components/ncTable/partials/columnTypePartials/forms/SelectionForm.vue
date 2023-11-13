@@ -4,9 +4,9 @@
 			<div class="col-4 title">
 				{{ t('tables', 'Options') }}
 			</div>
-			<div v-for="opt in mutableColumn.selectionOptions" :key="opt.id" class="col-4 inline">
+			<div v-for="opt in mutableColumn.selectionOptions" :key="opt.id" class="col-4 inline" data-cy="selection-option">
 				<NcCheckboxRadioSwitch :value="'' + opt.id" type="radio" :checked.sync="mutableColumn.selectionDefault" />
-				<input :value="opt.label" @input="updateLabel(opt.id, $event)">
+				<input :value="opt.label" data-cy="selection-option-label" @input="updateLabel(opt.id, $event)">
 				<NcButton type="tertiary" :aria-label="t('tables', 'Delete option')" @click="deleteOption(opt.id)">
 					<template #icon>
 						<DeleteOutline :size="20" />
@@ -90,7 +90,11 @@ export default {
 			})
 		},
 		getNextId() {
-			return Math.max(...this.mutableColumn.selectionOptions.map(item => item.id)) + 1
+			if (this.mutableColumn.selectionOptions.length > 0) {
+				return Math.max(...this.mutableColumn.selectionOptions.map(item => item.id)) + 1
+			} else {
+				return 0
+			}
 		},
 		deleteOption(id) {
 			this.mutableColumn.selectionOptions = this.mutableColumn.selectionOptions.filter(opt => opt.id !== id)

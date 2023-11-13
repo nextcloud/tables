@@ -6,11 +6,22 @@ use OCA\Tables\Db\Column;
 
 class NumberBusiness extends SuperBusiness implements IColumnTypeBusiness {
 
-	public function parseValue(string $value, ?Column $column = null): string {
+	/**
+	 * @param mixed $value (int|float|string|null)
+	 * @param Column|null $column
+	 * @return string
+	 */
+	public function parseValue($value, ?Column $column = null): string {
 		return json_encode(floatval($value));
 	}
 
-	public function canBeParsed(string $value, ?Column $column = null): bool {
+
+	/**
+	 * @param mixed $value (int|float|string|null)
+	 * @param Column|null $column
+	 * @return bool
+	 */
+	public function canBeParsed($value, ?Column $column = null): bool {
 		return !$value || floatval($value);
 	}
 
