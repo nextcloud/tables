@@ -262,6 +262,26 @@ Cypress.Commands.add('createNumberStarsColumn', (title, defaultValue, firstColum
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
+Cypress.Commands.add('createSelectionCheckColumn', (title, defaultValue, firstColumn) => {
+	if (firstColumn) {
+		cy.get('.button-vue__text').contains('Create column').click({ force: true })
+	} else {
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+	}
+	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
+	cy.get('.multiSelectOptionLabel').contains('Selection').click({ force: true })
+	cy.get('.modal-container label').contains('Yes/No').click()
+
+	if (defaultValue) {
+		cy.get('[data-cy="SelectionCheckForm"] label').last().click()
+	}
+	cy.get('.modal-container button').contains('Save').click()
+	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
+})
+
 Cypress.Commands.add('uploadFile', (fileName, mimeType, target) => {
 	return cy.fixture(fileName, 'binary')
 		.then(Cypress.Blob.binaryStringToBlob)
