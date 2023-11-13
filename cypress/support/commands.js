@@ -188,6 +188,40 @@ Cypress.Commands.add('createTextLineColumn', (title, defaultValue, maxLength, fi
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
+Cypress.Commands.add('createNumberColumn', (title, defaultValue, decimals, min, max, prefix, suffix, firstColumn) => {
+	if (firstColumn) {
+		cy.get('.button-vue__text').contains('Create column').click({ force: true })
+	} else {
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+	}
+	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
+	cy.get('.multiSelectOptionLabel').contains('Number').click({ force: true })
+
+	if (defaultValue) {
+		cy.get('[data-cy="NumberForm"] input').eq(0).clear().type(defaultValue)
+	}
+	if (decimals) {
+		cy.get('[data-cy="NumberForm"] input').eq(1).clear().type('' + decimals)
+	}
+	if (min) {
+		cy.get('[data-cy="NumberForm"] input').eq(2).clear().type('' + min)
+	}
+	if (max) {
+		cy.get('[data-cy="NumberForm"] input').eq(3).clear().type('' + max)
+	}
+	if (prefix) {
+		cy.get('[data-cy="NumberForm"] input').eq(4).clear().type(prefix)
+	}
+	if (suffix) {
+		cy.get('[data-cy="NumberForm"] input').eq(5).clear().type(suffix)
+	}
+	cy.get('.modal-container button').contains('Save').click()
+	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
+})
+
 Cypress.Commands.add('uploadFile', (fileName, mimeType, target) => {
 	return cy.fixture(fileName, 'binary')
 		.then(Cypress.Blob.binaryStringToBlob)
@@ -258,4 +292,10 @@ Cypress.Commands.add('addUserToGroup', (userId, groupId) => {
 	}).then(response => {
 		cy.log(`User ${userId} added to group ${groupId}.`, response.status)
 	})
+})
+
+Cypress.Commands.add('removeColumn', (title) => {
+	cy.get('.custom-table table tr th .cell').contains(title).click()
+	cy.get('.v-popper__popper ul.nc-button-group-content').last().get('button').last().click()
+	cy.get('.modal__content button').contains('Confirm').click()
 })
