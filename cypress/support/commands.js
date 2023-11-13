@@ -241,6 +241,27 @@ Cypress.Commands.add('createNumberProgressColumn', (title, defaultValue, firstCo
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
+Cypress.Commands.add('createNumberStarsColumn', (title, defaultValue, firstColumn) => {
+	if (firstColumn) {
+		cy.get('.button-vue__text').contains('Create column').click({ force: true })
+	} else {
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+	}
+	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
+	cy.get('.multiSelectOptionLabel').contains('Stars rating').click({ force: true })
+
+	if (defaultValue) {
+		for (let n = 0; n < defaultValue; n++) {
+			cy.get('[data-cy="NumberStarsForm"] button').last().click()
+		}
+	}
+	cy.get('.modal-container button').contains('Save').click()
+	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
+})
+
 Cypress.Commands.add('uploadFile', (fileName, mimeType, target) => {
 	return cy.fixture(fileName, 'binary')
 		.then(Cypress.Blob.binaryStringToBlob)
