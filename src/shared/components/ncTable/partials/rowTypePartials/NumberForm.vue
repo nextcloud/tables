@@ -78,9 +78,16 @@ export default {
 
 	methods: {
 		parseValue(inputValue) {
-			const parsedValue = parseFloat(inputValue)
+			const parsedValue = parseFloat(inputValue.replace(',', '.'))
 			const roundedValue = parsedValue.toFixed(this.column?.numberDecimals)
-			return parseFloat(roundedValue)
+			let value = parseFloat(roundedValue)
+			if (this.column?.numberMin && value < this.column?.numberMin) {
+				value = this.column.numberMin
+			}
+			if (this.column?.numberMax && value > this.column?.numberMax) {
+				value = this.column.numberMax
+			}
+			return value
 		},
 	},
 }

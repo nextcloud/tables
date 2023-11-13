@@ -40,7 +40,7 @@ describe('The Home Page', () => {
 		// create table to share
 		cy.contains('.app-menu-entry--label', 'Tables').click()
 		cy.createTable('Share for user')
-		cy.createTextLineColumn('any', true)
+		cy.createTextLineColumn('any', null, null, true)
 
 		cy.clickOnTableThreeDotMenu('Share')
 
@@ -63,7 +63,7 @@ describe('The Home Page', () => {
 		// create table to share
 		cy.contains('.app-menu-entry--label', 'Tables').click()
 		cy.createTable('Share for user')
-		cy.createTextLineColumn('any', true)
+		cy.createTextLineColumn('any', null, null, true)
 		cy.createView('ShareView1')
 
 		cy.clickOnTableThreeDotMenu('Share')
@@ -87,7 +87,7 @@ describe('The Home Page', () => {
 		// create table to share
 		cy.contains('.app-menu-entry--label', 'Tables').click()
 		cy.createTable('Share for group')
-		cy.createTextLineColumn('any', true)
+		cy.createTextLineColumn('any', null, null, true)
 
 		cy.clickOnTableThreeDotMenu('Share')
 
@@ -110,7 +110,7 @@ describe('The Home Page', () => {
 		// create table to share
 		cy.contains('.app-menu-entry--label', 'Tables').click()
 		cy.createTable('Share for group')
-		cy.createTextLineColumn('any', true)
+		cy.createTextLineColumn('any', null, null, true)
 		cy.createView('ShareView2')
 
 		cy.clickOnTableThreeDotMenu('Share')
