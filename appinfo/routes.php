@@ -3,15 +3,17 @@
 return [
 	'routes' => [
 
-		// enable CORS for api calls (API version 1)
+		// enable CORS for api calls
 		['name' => 'api1#preflighted_cors', 'url' => '/api/1/{path}',
+			'verb' => 'OPTIONS', 'requirements' => ['path' => '.+']],
+		['name' => 'api2#preflighted_cors', 'url' => '/api/2/{path}',
 			'verb' => 'OPTIONS', 'requirements' => ['path' => '.+']],
 
 		['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
 
 		['name' => 'tableTemplate#list', 'url' => '/table/templates', 'verb' => 'GET'],
 
-		// API
+		// API v1
 		// -> tables
 		['name' => 'api1#index', 'url' => '/api/1/tables', 'verb' => 'GET'],
 		['name' => 'api1#createTable',	'url' => '/api/1/tables', 'verb' => 'POST'],
@@ -54,7 +56,6 @@ return [
 		// -> import
 		['name' => 'api1#importInTable', 'url' => '/api/1/import/table/{tableId}', 'verb' => 'POST'],
 		['name' => 'api1#importInView', 'url' => '/api/1/import/views/{viewId}', 'verb' => 'POST'],
-
 
 		// table
 		['name' => 'table#index', 'url' => '/table', 'verb' => 'GET'],
@@ -104,5 +105,22 @@ return [
 
 		// search
 		['name' => 'search#all', 'url' => '/search/all', 'verb' => 'GET'],
+	],
+	'ocs' => [
+		// API v2
+		['name' => 'ApiGeneral#index', 'url' => '/api/2/init', 'verb' => 'GET'],
+		// -> tables
+		['name' => 'ApiTables#index', 'url' => '/api/2/tables', 'verb' => 'GET'],
+		['name' => 'ApiTables#show', 'url' => '/api/2/tables/{id}', 'verb' => 'GET'],
+		['name' => 'ApiTables#create', 'url' => '/api/2/tables', 'verb' => 'POST'],
+		['name' => 'ApiTables#update', 'url' => '/api/2/tables/{id}', 'verb' => 'PUT'],
+		['name' => 'ApiTables#destroy', 'url' => '/api/2/tables/{id}', 'verb' => 'DELETE'],
+
+		['name' => 'ApiColumns#index', 'url' => '/api/2/columns/{nodeType}/{nodeId}', 'verb' => 'GET'],
+		['name' => 'ApiColumns#show', 'url' => '/api/2/columns/{id}', 'verb' => 'GET'],
+		['name' => 'ApiColumns#createNumberColumn', 'url' => '/api/2/columns/number', 'verb' => 'POST'],
+		['name' => 'ApiColumns#createTextColumn', 'url' => '/api/2/columns/text', 'verb' => 'POST'],
+		['name' => 'ApiColumns#createSelectionColumn', 'url' => '/api/2/columns/selection', 'verb' => 'POST'],
+		['name' => 'ApiColumns#createDatetimeColumn', 'url' => '/api/2/columns/datetime', 'verb' => 'POST'],
 	]
 ];

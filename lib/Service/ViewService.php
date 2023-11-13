@@ -16,11 +16,15 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @psalm-import-type TablesView from ResponseDefinitions
+ */
 class ViewService extends SuperService {
 	private ViewMapper $mapper;
 
@@ -82,14 +86,21 @@ class ViewService extends SuperService {
 	}
 
 	/**
+	 * @param View[] $items
+	 * @return TablesView[]
+	 */
+	public function formatViews(array $items): array {
+		return array_map(fn (View $item) => $item->jsonSerialize(), $items);
+	}
+
+	/**
 	 * @param int $id
 	 * @param bool $skipEnhancement
 	 * @param string|null $userId (null -> take from session, '' -> no user in context)
 	 * @return View
-	 * @throws DoesNotExistException
 	 * @throws InternalError
-	 * @throws MultipleObjectsReturnedException
 	 * @throws PermissionError
+	 * @throws NotFoundError
 	 */
 	public function find(int $id, bool $skipEnhancement = false, ?string $userId = null): View {
 		/** @var string $userId */
@@ -97,9 +108,12 @@ class ViewService extends SuperService {
 
 		try {
 			$view = $this->mapper->find($id);
-		} catch (\OCP\DB\Exception $e) {
-			$this->logger->error($e->getMessage());
-			throw new InternalError($e->getMessage());
+		} catch (InternalError|\OCP\DB\Exception|MultipleObjectsReturnedException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		} catch (DoesNotExistException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 
 		// security
@@ -191,6 +205,7 @@ class ViewService extends SuperService {
 	 * @param bool $skipTableEnhancement
 	 * @return View
 	 * @throws InternalError
+	 * @throws PermissionError
 	 */
 	public function update(int $id, array $data, ?string $userId = null, bool $skipTableEnhancement = false): View {
 		$userId = $this->permissionsService->preCheckUserId($userId);
@@ -231,24 +246,33 @@ class ViewService extends SuperService {
 	 * @param string|null $userId
 	 * @return View
 	 * @throws InternalError
+	 * @throws PermissionError
+	 * @throws NotFoundError
 	 */
 	public function delete(int $id, ?string $userId = null): View {
-		/** @var string $userId */
-		$userId = $this->permissionsService->preCheckUserId($userId); // $userId is set or ''
+		$userId = $this->permissionsService->preCheckUserId($userId); // assume $userId is set or ''
 
 		try {
 			$view = $this->mapper->find($id);
+		} catch (InternalError|MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		} catch (DoesNotExistException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
 
-			// security
-			if (!$this->permissionsService->canManageView($view, $userId)) {
-				throw new PermissionError('PermissionError: can not delete view with id '.$id);
-			}
-			$this->shareService->deleteAllForView($view);
+		// security
+		if (!$this->permissionsService->canManageView($view, $userId)) {
+			throw new PermissionError('PermissionError: can not delete view with id '.$id);
+		}
+		$this->shareService->deleteAllForView($view);
 
+		try {
 			return $this->mapper->delete($view);
-		} catch (Exception $e) {
-			$this->logger->error($e->getMessage());
-			throw new InternalError($e->getMessage());
+		} catch (\OCP\DB\Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 	}
 

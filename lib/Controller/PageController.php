@@ -21,6 +21,7 @@ class PageController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 * @NoCSRFRequired
+	 * @IgnoreOpenAPI
 	 *
 	 * Render default template
 	 */

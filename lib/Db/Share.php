@@ -4,10 +4,14 @@ namespace OCA\Tables\Db;
 
 use JsonSerializable;
 
+use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\Entity;
 
 /**
+ * @psalm-import-type TablesShare from ResponseDefinitions
+ *
  * @psalm-suppress PropertyNotSetInConstructor
+ *
  * @method getSender(): string
  * @method setSender(string $sender)
  * @method getReceiver(): string
@@ -63,6 +67,9 @@ class Share extends Entity implements JsonSerializable {
 		$this->addType('permissionManage', 'boolean');
 	}
 
+	/**
+	 * @psalm-return TablesShare
+	 */
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->id,

@@ -9,19 +9,26 @@
 			"email": "florian@nextcloud.com"
 		}
 	],
-	"require-dev": {
+	"repositories": [
+		{
+			"type": "vcs",
+			"url": "https://github.com/nextcloud/openapi-extractor"
+		}
+	],
+    "require-dev": {
 		"nextcloud/coding-standard": "^v1.0.0",
 		"vimeo/psalm": "^5.6.0",
 		"nextcloud/ocp": "dev-master",
 		"phan/phan": "5.x",
 		"staabm/annotate-pull-request-from-checkstyle": "^1.8",
-		"phpunit/phpunit": "^9"
+		"phpunit/phpunit": "^9",
+		"nextcloud/openapi-extractor": "dev-main"
 	},
 	"config": {
 		"optimize-autoloader": true,
 		"classmap-authoritative": true,
 		"platform": {
-			"php": "7.4"
+			"php": "8.1"
 		}
 	},
 	"scripts": {

@@ -1,28 +1,27 @@
 <?php
 /**
- * @author Joas Schilling <coding@schilljs.com>
- * @author Thomas Müller <thomas.mueller@tmit.eu>
  *
- * @copyright Copyright (c) 2016, ownCloud, Inc.
- * @license AGPL-3.0
+ * @copyright Copyright (c) 2023, Florian Steffens (flost-dev@mailbox.org)
  *
- * This code is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License, version 3,
- * as published by the Free Software Foundation.
+ * @license GNU AGPL version 3 or any later version
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License, version 3,
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 require __DIR__ . '/../../vendor/autoload.php';
 
 use Behat\Behat\Context\Context;
-use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
@@ -34,7 +33,7 @@ use Psr\Http\Message\ResponseInterface;
 /**
  * Defines application features from the specific context.
  */
-class FeatureContext implements Context, SnippetAcceptingContext {
+class FeatureContext implements Context {
 	public const TEST_PASSWORD = '123456';
 
 	/** @var string */
@@ -69,8 +68,9 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	// example for a table: 'test-table' -> 5
 	private array $tableIds = [];
 	private array $viewIds = [];
+	private array $columnIds = [];
 
-	use CommandLineTrait;
+	// use CommandLineTrait;
 
 	/**
 	 * FeatureContext constructor.
@@ -99,6 +99,289 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 			$this->deleteGroup($group);
 		}
 	}
+
+
+	/**
+	 * @Given table :table with emoji :emoji exists for user :user as :tableName via v2
+	 *
+	 * @param string $user
+	 * @param string $title
+	 * @param string $tableName
+	 * @param string|null $emoji
+	 * @throws Exception
+	 */
+	public function createTableV2(string $user, string $title, string $tableName, string $emoji = null): void {
+		$this->setCurrentUser($user);
+		$this->sendOcsRequest('post', '/apps/tables/api/2/tables',
+			[
+				'title' => $title,
+				'emoji' => $emoji
+			]
+		);
+
+		$newTable = $this->getDataFromResponse($this->response)['ocs']['data'];
+		$this->tableIds[$tableName] = $newTable['id'];
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($newTable['title'], $title);
+		Assert::assertEquals($newTable['emoji'], $emoji);
+		Assert::assertEquals($newTable['ownership'], $user);
+
+		$this->sendOcsRequest(
+			'GET',
+			'/apps/tables/api/2/tables/'.$newTable['id'],
+		);
+
+		$tableToVerify = $this->getDataFromResponse($this->response)['ocs']['data'];
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($tableToVerify['title'], $title);
+		Assert::assertEquals($tableToVerify['emoji'], $emoji);
+		Assert::assertEquals($tableToVerify['ownership'], $user);
+	}
+
+	/**
+	 * @Then user :user has the following tables via v2
+	 *
+	 * @param string $user
+	 * @param TableNode|null $body
+	 * @throws Exception
+	 */
+	public function userTablesV2(string $user, TableNode $body = null): void {
+		$this->setCurrentUser($user);
+		$this->sendOcsRequest(
+			'GET',
+			'/apps/tables/api/2/tables'
+		);
+
+		$data = $this->getDataFromResponse($this->response)['ocs']['data'];
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		// check if tables are empty
+		if ($body === null) {
+			Assert::assertCount(0, $data);
+			return;
+		}
+
+		// check if given tables exists
+		$titles = [];
+		foreach ($data as $d) {
+			$titles[] = $d['title'];
+		}
+		foreach ($body->getRows()[0] as $tableTitle) {
+			Assert::assertTrue(in_array($tableTitle, $titles, true));
+		}
+	}
+
+	/**
+	 * @Then user :user has the following resources via v2
+	 *
+	 * first row contains tables, second views
+	 * | first table 		| second table 			|
+	 * | first shared view 	| second shared view 	|
+	 *
+	 * @param string $user
+	 * @param TableNode|null $body
+	 * @throws Exception
+	 */
+	public function initialResourcesV2(string $user, TableNode $body = null): void {
+		$this->setCurrentUser($user);
+		$this->sendOcsRequest(
+			'GET',
+			'/apps/tables/api/2/init'
+		);
+
+		$data = $this->getDataFromResponse($this->response)['ocs']['data'];
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		// check if table is empty
+		if ($body === null) {
+			Assert::assertCount(0, $data);
+			return;
+		}
+
+		// check if given tables exists
+		$tableTitles = [];
+		foreach ($data['tables'] as $d) {
+			$tableTitles[] = $d['title'];
+		}
+		$viewTitles = [];
+		foreach ($data['views'] as $d) {
+			$tableTitles[] = $d['title'];
+		}
+
+		if (@$body->getRows()[0]) {
+			foreach ($body->getRows()[0] as $tableTitle) {
+				Assert::assertTrue(in_array($tableTitle, $tableTitles, true));
+			}
+		}
+		if (@$body->getRows()[1]) {
+			foreach ($body->getRows()[1] as $viewTitle) {
+				Assert::assertTrue(in_array($viewTitle, $viewTitles, true));
+			}
+		}
+	}
+
+	/**
+	 * @Then user :user updates table :tableName set title :title and emoji :emoji via v2
+	 *
+	 * @param string $user
+	 * @param string $title
+	 * @param string|null $emoji
+	 * @param string $tableName
+	 * @throws Exception
+	 */
+	public function updateTableV2(string $user, string $title, ?string $emoji, string $tableName): void {
+		$this->setCurrentUser($user);
+
+		$data = ['title' => $title];
+		if ($emoji !== null) {
+			$data['emoji'] = $emoji;
+		}
+
+		$this->sendOcsRequest(
+			'PUT',
+			'/apps/tables/api/2/tables/'.$this->tableIds[$tableName],
+			$data
+		);
+
+		$updatedTable = $this->getDataFromResponse($this->response)['ocs']['data'];
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($updatedTable['title'], $title);
+		Assert::assertEquals($updatedTable['emoji'], $emoji);
+		Assert::assertEquals($updatedTable['ownership'], $user);
+
+		$this->sendOcsRequest(
+			'GET',
+			'/apps/tables/api/2/tables/'.$updatedTable['id'],
+		);
+
+		$tableToVerify = $this->getDataFromResponse($this->response)['ocs']['data'];
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($tableToVerify['title'], $title);
+		Assert::assertEquals($tableToVerify['emoji'], $emoji);
+		Assert::assertEquals($tableToVerify['ownership'], $user);
+	}
+
+	/**
+	 * @Then user :user deletes table :tableName via v2
+	 *
+	 * @param string $user
+	 * @param string $tableName
+	 * @throws Exception
+	 */
+	public function deleteTableV2(string $user, string $tableName): void {
+		$this->setCurrentUser($user);
+
+		$this->sendOcsRequest(
+			'DELETE',
+			'/apps/tables/api/2/tables/'.$this->tableIds[$tableName]
+		);
+
+		$deletedTable = $this->getDataFromResponse($this->response)['ocs']['data'];
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($deletedTable['id'], $this->tableIds[$tableName]);
+
+		$this->sendOcsRequest(
+			'GET',
+			'/apps/tables/api/2/tables/'.$deletedTable['id'],
+		);
+		Assert::assertEquals(404, $this->response->getStatusCode());
+
+		unset($this->tableIds[$tableName]);
+	}
+
+	/**
+	 * @Then column from main type :columnType for node type :nodeType and node name :nodeName exists with name :columnName and following properties via v2
+	 *
+	 * @param string $nodeType
+	 * @param string $nodeName
+	 * @param string $columnType
+	 * @param string $columnName
+	 * @param TableNode|null $properties
+	 */
+	public function createColumnV2(string $nodeType, string $nodeName, string $columnType, string $columnName, TableNode $properties = null): void {
+		$props = [
+			'baseNodeType' => $nodeType,
+		];
+		if($nodeType === 'table') {
+			$props['baseNodeId'] = $this->tableIds[$nodeName];
+		}
+		if($nodeType === 'view') {
+			$props['baseNodeId'] = $this->viewIds[$nodeName];
+		}
+		$title = null;
+		foreach ($properties->getRows() as $row) {
+			if($row[0] === 'title') {
+				$title = $row[1];
+			}
+			$props[$row[0]] = $row[1];
+		}
+
+		$this->sendOcsRequest(
+			'POST',
+			'/apps/tables/api/2/columns/'.$columnType,
+			$props
+		);
+
+		$newColumn = $this->getDataFromResponse($this->response)['ocs']['data'];
+		$this->columnIds[$columnName] = $newColumn['id'];
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		$this->sendOcsRequest(
+			'GET',
+			'/apps/tables/api/2/columns/'.$newColumn['id'],
+		);
+
+		$columnToVerify = $this->getDataFromResponse($this->response)['ocs']['data'];
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($columnToVerify['title'], $title);
+	}
+
+	/**
+	 * @Then node with node type :nodeType and node name :nodeName has the following columns via v2
+	 *
+	 * @param string $nodeType
+	 * @param string $nodeName
+	 * @param TableNode|null $body
+	 */
+	public function columnsForNodeV2(string $nodeType, string $nodeName, TableNode $body = null): void {
+		$nodeId = null;
+		if($nodeType === 'table') {
+			$nodeId = $this->tableIds[$nodeName];
+		}
+		if($nodeType === 'view') {
+			$nodeId = $this->viewIds[$nodeName];
+		}
+
+		$this->sendOcsRequest(
+			'GET',
+			'/apps/tables/api/2/columns/'.$nodeType.'/'.$nodeId
+		);
+
+		$data = $this->getDataFromResponse($this->response)['ocs']['data'];
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		// check if tables are empty
+		if ($body === null) {
+			Assert::assertCount(0, $data);
+			return;
+		}
+
+		// check if given tables exists
+		$titles = [];
+		foreach ($data as $d) {
+			$titles[] = $d['title'];
+		}
+		foreach ($body->getRows()[0] as $tableTitle) {
+			Assert::assertTrue(in_array($tableTitle, $titles, true));
+		}
+	}
+
+	// (((((((((((((((((((((((((((( END API v2 )))))))))))))))))))))))))))))))))))
+
+
 
 
 
@@ -176,6 +459,8 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 		print_r($this->tableIds);
 		echo "Views --------------------\n";
 		print_r($this->viewIds);
+		echo "Columns --------------------\n";
+		print_r($this->columnIds);
 	}
 
 	/**
@@ -482,7 +767,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/tables/'.$deletedItem['id'],
+			'/apps/tables/api/1/views/'.$deletedItem['id'],
 		);
 		Assert::assertEquals(404, $this->response->getStatusCode());
 
