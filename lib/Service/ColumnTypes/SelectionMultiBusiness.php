@@ -93,7 +93,8 @@ class SelectionMultiBusiness extends SuperBusiness implements IColumnTypeBusines
 		foreach ($value as $wantedValue) {
 			if(!$wasString) {
 				$wantedValue = (int) $wantedValue;
-			}			if ($this->getOptionIdForValue((int) $wantedValue) === null) {
+			}
+			if ($this->getOptionIdForValue((int) $wantedValue) === null) {
 				return false;
 			}
 		}
