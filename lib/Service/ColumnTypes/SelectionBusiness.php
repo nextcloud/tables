@@ -18,7 +18,7 @@ class SelectionBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		}
 
 		$intValue = (int) $value;
-		if ("".$intValue === $value) {
+		if ((string)$intValue === $value) {
 			// if it seems to be an option ID
 			foreach ($column->getSelectionOptionsArray() as $option) {
 				if($option['id'] === $intValue && $option['label'] !== $value) {
