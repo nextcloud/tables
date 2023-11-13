@@ -5,18 +5,18 @@ cd ..
 echo
 echo "🚀 Lets make a new release!"
 echo "==========================="
-
 echo
 echo "Preparation steps:"
-echo "   - krankerl is installed"
-echo "   - Sign keys are under '~/.nextcloud'"
+echo "   🚨 Run this from inside the folder .scripts"
+echo "   🧑‍💻 krankerl is installed"
+echo "   🔐 Sign keys are under '~/.nextcloud'"
 echo
-echo "   - All code changes are committed and merged"
-echo "   - CI is green"
+echo "   ✅ All code changes are committed and merged"
+echo "   🍀 CI is green"
 echo
-echo "   - Version number bumped"
-echo "   - File 'releaseNotes.md' is up to date"
-echo "   - Update screenshots if needed"
+echo "   💯 Version number bumped"
+echo "   💬 File 'releaseNotes.md' is up to date"
+echo "   📺 Update screenshots if needed"
 echo
 read -r -p "Are all the prepare steps done? [y/N] " CONFIRMATION
 

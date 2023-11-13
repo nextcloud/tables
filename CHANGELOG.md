@@ -1,4 +1,8 @@
 # Changelog
+## 0.6.2 - 2023-11-13
+### Updated
+- 🐞 Bug fixing
+
 ## 0.6.1 - 2023-11-07
 ### Updated
 - 🏳️ Translations
