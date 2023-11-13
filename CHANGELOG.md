@@ -1,4 +1,14 @@
 # Changelog
+## 0.6.2 - 2023-11-13
+### Updated
+- 🐞 Bug fixing
+
+## 0.6.1 - 2023-11-07
+### Updated
+- 🏳️ Translations
+- 🐞 Bug fixing
+- ✨ Small design adjustments
+- 💾 Update software dependencies
 
 ## 0.6.0 - 2023-09-15
 ### Added
