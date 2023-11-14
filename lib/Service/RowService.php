@@ -182,7 +182,7 @@ class RowService extends SuperService {
 	 *
 	 * @throws InternalError
 	 */
-	private function cleanupData(array $data, array $columns, ?int $tableId, ?int $viewId): ?array {
+	private function cleanupData(array $data, array $columns, ?int $tableId, ?int $viewId): array {
 		$out = [];
 		foreach ($data as $entry) {
 			$column = $this->getColumnFromColumnsArray((int) $entry['columnId'], $columns);
