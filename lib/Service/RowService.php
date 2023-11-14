@@ -217,7 +217,7 @@ class RowService extends SuperService {
 			$columnBusiness = Server::get($businessClassName);
 			if(!$columnBusiness->canBeParsed($value, $column)) {
 				$this->logger->warning('Value '.$value.' could not be parsed for column '.$column->getTitle());
-				return "".$value;
+				return (string)$value;
 			}
 			return json_decode($columnBusiness->parseValue($value, $column));
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
