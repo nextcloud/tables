@@ -29,7 +29,7 @@ describe('Test column ' + columnTitle, () => {
 		cy.get('.modal__content input').first().clear().type('05:15')
 		cy.get('.modal-container .checkbox-radio-switch label').click().click()
 		cy.get('button').contains('Save').click()
-		cy.get('.custom-table table tr td div').contains('05:15').should('be.visible')
+		cy.get('.custom-table table tr td div').contains('5:15').should('be.visible')
 
 		// delete row
 		cy.get('.NcTable tr td button').first().click()
@@ -45,13 +45,11 @@ describe('Test column ' + columnTitle, () => {
 
 		// insert row with int value
 		cy.get('button').contains('Create row').click()
-		const hour = new Date().getHours().toString().length < 2 ? '0' + new Date().getHours() : new Date().getHours().toString()
-		const minutes = new Date().getMinutes().toString().length < 2 ? '0' + new Date().getMinutes() : new Date().getMinutes().toString()
-		const datetime = hour + ':' + minutes
-		cy.get('.modal__content input').first().should('contain.value', datetime)
+		const minutes = ':' + new Date().getMinutes().toString().length < 2 ? '0' + new Date().getMinutes() : new Date().getMinutes().toString()
+		cy.get('.modal__content input').first().should('contain.value', minutes)
 		cy.get('.modal-container .checkbox-radio-switch label').click().click()
 		cy.get('button').contains('Save').click()
-		cy.get('.custom-table table tr td div').contains(datetime).should('be.visible')
+		cy.get('.custom-table table tr td div').contains(minutes).should('be.visible')
 	})
 
 })

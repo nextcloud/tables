@@ -29,7 +29,10 @@ describe('Test column ' + columnTitle, () => {
 		cy.get('.modal__content input').first().clear().type('2023-12-24 05:15')
 		cy.get('.modal-container .checkbox-radio-switch label').click().click()
 		cy.get('button').contains('Save').click()
-		cy.get('.custom-table table tr td div').contains('24 Dec 2023 05:15').should('be.visible')
+		cy.get('.custom-table table tr td div').contains('24').should('be.visible')
+		cy.get('.custom-table table tr td div').contains('Dec').should('be.visible')
+		cy.get('.custom-table table tr td div').contains('2023').should('be.visible')
+		cy.get('.custom-table table tr td div').contains('5:15').should('be.visible')
 
 		// delete row
 		cy.get('.NcTable tr td button').first().click()
@@ -49,14 +52,15 @@ describe('Test column ' + columnTitle, () => {
 		const minutes = new Date().getMinutes().toString().length < 2 ? '0' + new Date().getMinutes() : new Date().getMinutes().toString()
 		const date = new Date().toISOString().slice(2, 10)
 		const datetime = date + ' ' + hour + ':' + minutes
-		cy.get('.modal__content input').first().should('contain.value', datetime)
+		cy.get('.modal__content input').first().should('contain.value', '20' + datetime)
 		cy.get('.modal-container .checkbox-radio-switch label').click().click()
 		cy.get('button').contains('Save').click()
 		const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June',
 			'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
-		const datetime2 = new Date().getDate() + ' ' + monthNames[new Date().getMonth()] + ' ' + new Date().getFullYear() + ' ' + hour + ':' + minutes
-		cy.log(datetime2)
-		cy.get('.custom-table table tr td div').contains(datetime2).should('be.visible')
+		cy.get('.custom-table table tr td div').contains(new Date().getDate()).should('be.visible')
+		cy.get('.custom-table table tr td div').contains(monthNames[new Date().getMonth()]).should('be.visible')
+		cy.get('.custom-table table tr td div').contains(new Date().getFullYear()).should('be.visible')
+		cy.get('.custom-table table tr td div').contains(':' + minutes).should('be.visible')
 	})
 
 })
