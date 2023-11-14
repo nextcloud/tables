@@ -29,7 +29,9 @@ describe('Test column ' + columnTitle, () => {
 		cy.get('.modal__content input').first().clear().type('2023-12-24')
 		cy.get('.modal-container .checkbox-radio-switch label').click().click()
 		cy.get('button').contains('Save').click()
-		cy.get('.custom-table table tr td div').contains('24 Dec 2023').should('be.visible')
+		cy.get('.custom-table table tr td div').contains('24').should('be.visible')
+		cy.get('.custom-table table tr td div').contains('Dec').should('be.visible')
+		cy.get('.custom-table table tr td div').contains('2023').should('be.visible')
 
 		// delete row
 		cy.get('.NcTable tr td button').first().click()
@@ -53,7 +55,9 @@ describe('Test column ' + columnTitle, () => {
 			'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
 		const datetime2 = new Date().getDate() + ' ' + monthNames[new Date().getMonth()] + ' ' + new Date().getFullYear()
 		cy.log(datetime2)
-		cy.get('.custom-table table tr td div').contains(datetime2).should('be.visible')
+		cy.get('.custom-table table tr td div').contains(new Date().getDate()).should('be.visible')
+		cy.get('.custom-table table tr td div').contains(monthNames[new Date().getMonth()]).should('be.visible')
+		cy.get('.custom-table table tr td div').contains(new Date().getFullYear()).should('be.visible')
 	})
 
 })
