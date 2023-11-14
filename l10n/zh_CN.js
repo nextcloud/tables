@@ -162,6 +162,7 @@ OC.L10N.register(
     "Error" : "错误",
     "Download" : "下载",
     "Search" : "搜索",
+    "Back" : "返回",
     "Sorting" : "正在排序",
     "Undo" : "撤消",
     "Redo" : "重做",
