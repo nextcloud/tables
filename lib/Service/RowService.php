@@ -178,7 +178,7 @@ class RowService extends SuperService {
 	 * @param Column[] $columns
 	 * @param int|null $tableId
 	 * @param int|null $viewId
-	 * @return list<array{columnId: int, value: float|int|string}>|null
+	 * @return list<array{columnId: int, value: float|int|string}>
 	 *
 	 * @throws InternalError
 	 */
