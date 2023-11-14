@@ -183,7 +183,7 @@ class RowService extends SuperService {
 	 * @throws InternalError
 	 */
 	private function cleanupData(array $data, array $columns, ?int $tableId, ?int $viewId): ?array {
-		$out = null;
+		$out = [];
 		foreach ($data as $entry) {
 			$column = $this->getColumnFromColumnsArray((int) $entry['columnId'], $columns);
 
@@ -223,7 +223,7 @@ class RowService extends SuperService {
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 			$this->logger->debug('Column type business class not found', ['exception' => $e]);
 		}
-		return "".$value;
+		return (string) $value;
 	}
 
 	/**
