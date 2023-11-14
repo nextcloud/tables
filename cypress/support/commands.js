@@ -156,10 +156,10 @@ Cypress.Commands.add('createSelectionMultiColumn', (title, options, defaultOptio
 	cy.get('[data-cy="selection-option"] button').first().click()
 
 	// add wanted option
-	options.forEach(option => {
+	options?.forEach(option => {
 		cy.get('button').contains('Add option').click()
 		cy.get('[data-cy="selection-option-label"]').last().type(option)
-		if (defaultOptions.includes(option)) {
+		if (defaultOptions?.includes(option)) {
 			cy.get('[data-cy="selection-option"] span label').last().click()
 		}
 	})

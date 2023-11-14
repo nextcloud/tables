@@ -178,12 +178,12 @@ class RowService extends SuperService {
 	 * @param Column[] $columns
 	 * @param int|null $tableId
 	 * @param int|null $viewId
-	 * @return list<array{columnId: int, value: float|int|string}>|null
+	 * @return list<array{columnId: int, value: float|int|string}>
 	 *
 	 * @throws InternalError
 	 */
-	private function cleanupData(array $data, array $columns, ?int $tableId, ?int $viewId): ?array {
-		$out = null;
+	private function cleanupData(array $data, array $columns, ?int $tableId, ?int $viewId): array {
+		$out = [];
 		foreach ($data as $entry) {
 			$column = $this->getColumnFromColumnsArray((int) $entry['columnId'], $columns);
 
@@ -217,13 +217,13 @@ class RowService extends SuperService {
 			$columnBusiness = Server::get($businessClassName);
 			if(!$columnBusiness->canBeParsed($value, $column)) {
 				$this->logger->warning('Value '.$value.' could not be parsed for column '.$column->getTitle());
-				return "".$value;
+				return (string)$value;
 			}
 			return json_decode($columnBusiness->parseValue($value, $column));
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 			$this->logger->debug('Column type business class not found', ['exception' => $e]);
 		}
-		return "".$value;
+		return (string) $value;
 	}
 
 	/**
