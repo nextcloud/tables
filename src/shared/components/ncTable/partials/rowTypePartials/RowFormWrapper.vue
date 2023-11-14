@@ -87,7 +87,7 @@ export default {
 }
 
 pre {
-	white-space: normal;
+	white-space: pre;
 }
 
 </style>
