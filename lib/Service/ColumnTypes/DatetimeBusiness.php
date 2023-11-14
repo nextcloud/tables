@@ -14,6 +14,10 @@ class DatetimeBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	 * @return string
 	 */
 	public function parseValue($value, ?Column $column = null): string {
+		if ($value === '' || $value === null) {
+			return '';
+		}
+
 		$allowedFormats = [\DateTimeInterface::ATOM, 'Y-m-d H:i'];
 		$newDateTime = '';
 
@@ -38,6 +42,10 @@ class DatetimeBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	 * @return bool
 	 */
 	public function canBeParsed($value, ?Column $column = null): bool {
+		if ($value === '' || $value === null) {
+			return true;
+		}
+
 		try {
 			new DateTime($value);
 		} catch (Exception $e) {

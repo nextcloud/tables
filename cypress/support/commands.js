@@ -188,6 +188,68 @@ Cypress.Commands.add('createTextLineColumn', (title, defaultValue, maxLength, fi
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
+Cypress.Commands.add('createDatetimeColumn', (title, setNow, firstColumn) => {
+	if (firstColumn) {
+		cy.get('.button-vue__text').contains('Create column').click({ force: true })
+	} else {
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+	}
+	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
+	cy.get('.multiSelectOptionLabel').contains('Date and time').click({ force: true })
+
+	if (setNow) {
+		cy.get('[data-cy="DatetimeForm"] label').first().click()
+	}
+
+	cy.get('.modal-container button').contains('Save').click()
+	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
+})
+
+Cypress.Commands.add('createDatetimeDateColumn', (title, setNow, firstColumn) => {
+	if (firstColumn) {
+		cy.get('.button-vue__text').contains('Create column').click({ force: true })
+	} else {
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+	}
+	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
+	cy.get('.multiSelectOptionLabel').contains('Date and time').click({ force: true })
+	cy.get('.modal-container label').contains('Date').click()
+
+	if (setNow) {
+		cy.get('[data-cy="DatetimeDateForm"] label').first().click()
+	}
+
+	cy.get('.modal-container button').contains('Save').click()
+	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
+})
+
+Cypress.Commands.add('createDatetimeTimeColumn', (title, setNow, firstColumn) => {
+	if (firstColumn) {
+		cy.get('.button-vue__text').contains('Create column').click({ force: true })
+	} else {
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+	}
+	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
+	cy.get('.multiSelectOptionLabel').contains('Date and time').click({ force: true })
+	cy.get('.modal-container label').contains('Time').click()
+
+	if (setNow) {
+		cy.get('[data-cy="DatetimeTimeForm"] label').first().click()
+	}
+
+	cy.get('.modal-container button').contains('Save').click()
+	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
+})
+
 Cypress.Commands.add('createNumberColumn', (title, defaultValue, decimals, min, max, prefix, suffix, firstColumn) => {
 	if (firstColumn) {
 		cy.get('.button-vue__text').contains('Create column').click({ force: true })
