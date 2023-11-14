@@ -43,7 +43,7 @@ class DatetimeBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	 */
 	public function canBeParsed($value, ?Column $column = null): bool {
 		if ($value === '' || $value === null) {
-			return '';
+			return true;
 		}
 
 		try {
