@@ -1,6 +1,8 @@
 let localUser
+const columnTitle = 'single selection'
+const tableTitle = 'Test number column'
 
-describe('Test column selection', () => {
+describe('Test column ' + columnTitle, () => {
 
 	before(function() {
 		cy.createRandomUser().then(user => {
@@ -15,19 +17,17 @@ describe('Test column selection', () => {
 	})
 
 	it('Table and column setup', () => {
-		cy.createTable('Test selection columns')
-		cy.loadTable('Test selection columns')
-
-		cy.createSelectionColumn('single selection 1', ['first option', 'second option', '👋 third option', '🤷🏻 fifths'], 'second option', true)
+		cy.createTable(tableTitle)
 	})
 
 	it('Insert and test rows', () => {
-		cy.loadTable('Test selection columns')
+		cy.loadTable(tableTitle)
+		cy.createSelectionColumn(columnTitle, ['first option', 'second option', '👋 third option', '🤷🏻 fifths'], 'second option', true)
 
 		// check if default value is set on row creation
 		cy.get('button').contains('Create row').click()
 		cy.get('.modal__content h2').contains('Create row').should('be.visible')
-		cy.get('.modal__content .title').contains('single selection 1').should('be.visible')
+		cy.get('.modal__content .title').contains(columnTitle).should('be.visible')
 		cy.get('.modal__content .select span[title="second option"]').should('be.visible')
 		cy.get('button').contains('Save').click()
 		cy.get('.custom-table table tr td div').contains('second option').should('be.visible')
@@ -51,6 +51,25 @@ describe('Test column selection', () => {
 		cy.get('ul.vs__dropdown-menu li span[title="first option"]').click()
 		cy.get('button').contains('Save').click()
 		cy.get('.custom-table table tr td div').contains('first option').should('be.visible')
+
+		// delete first row
+		cy.get('.NcTable tr td button').first().click()
+		cy.get('button').contains('Delete').click()
+		cy.get('button').contains('I really').click()
+
+		cy.removeColumn(columnTitle)
+	})
+
+	it('Test empty selection', () => {
+		cy.loadTable(tableTitle)
+		cy.createSelectionColumn(columnTitle, ['first option', 'second option', '👋 third option', '🤷🏻 fifths'], null, true)
+
+		// check if default value is set on row creation
+		cy.get('button').contains('Create row').click()
+		cy.get('.modal__content h2').contains('Create row').should('be.visible')
+		cy.get('button').contains('Save').click()
+		cy.get('.custom-table table tr td div').should('exist')
+		cy.get('.NcTable tr td button').should('exist')
 	})
 
 })
