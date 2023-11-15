@@ -1,6 +1,9 @@
 OC.L10N.register(
     "tables",
     {
+    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administrator." : "حدث خطأ غير متوقع. يمكنك إيجاد تفاصيل أكثر عنه في سجل الحركات. من فضلك، تواصل مع مشرف النظام عندك.",
+    "An permission error occurred. More details can be found in the logs. Please reach out to your administrator." : "حدث خطأ في الأذونات. يمكنك إيجاد تفاصيل أكثر عنه في سجل الحركات. من فضلك، تواصل مع مشرف النظام عندك.",
+    "An not found error occurred. More details can be found in the logs. Please reach out to your administrator." : "حدث خطأ من النوع \"غير موجود\". يمكنك إيجاد تفاصيل أكثر عنه في سجل الحركات. من فضلك، تواصل مع مشرف النظام عندك.",
     "Could not create row." : "تعذّر إنشاء السطر.",
     "Could not update row." : "تعذر تحديث الصف.",
     "Nextcloud Tables" : "جداول نكست كلاود Tables",

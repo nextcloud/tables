@@ -1,6 +1,9 @@
 OC.L10N.register(
     "tables",
     {
+    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administrator." : "Beklenmeyen bir sorun çıktı. Ayrıntılı bilgi almak için günlük kayıtlarına bakabilirsiniz. Lütfen yöneticinizle görüşün.",
+    "An permission error occurred. More details can be found in the logs. Please reach out to your administrator." : "Bir izin sorunu çıktı. Ayrıntılı bilgi almak için günlük kayıtlarına bakabilirsiniz. Lütfen yöneticinizle görüşün.",
+    "An not found error occurred. More details can be found in the logs. Please reach out to your administrator." : "Bir bulunamama sorunu çıktı. Ayrıntılı bilgi almak için günlük kayıtlarına bakabilirsiniz. Lütfen yöneticinizle görüşün.",
     "Could not create row." : "Satır oluşturulamadı.",
     "Could not update row." : "Satır güncellenemedi.",
     "Nextcloud Tables" : "Nextcloud tabloları",

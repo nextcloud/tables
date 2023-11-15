@@ -1,4 +1,7 @@
 { "translations": {
+    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administrator." : "Дошло је до неочекиване грешке. Више детаља можете да пронађете у дневницима. Молимо вас да се обратите свом администратору.",
+    "An permission error occurred. More details can be found in the logs. Please reach out to your administrator." : "Дошло је до грешке у вези са дозволама. Више детаља можете да пронађете у дневницима. Молимо вас да се обратите свом администратору.",
+    "An not found error occurred. More details can be found in the logs. Please reach out to your administrator." : "Дошло је до грешке непостојања. Више детаља можете да пронађете у дневницима. Молимо вас да се обратите свом администратору.",
     "Could not create row." : "Не може да се креира ред.",
     "Could not update row." : "Не може да се ажурира ред.",
     "Nextcloud Tables" : "Nextcloud Табеле",
