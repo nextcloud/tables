@@ -416,7 +416,7 @@ paths:
                 '404':
                     description: Not found
 
-    /column/{columnId}:
+    /columns/{columnId}:
         get:
             summary: Get a column
             description: Shipped with v0.4.0.
