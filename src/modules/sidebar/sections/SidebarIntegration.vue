@@ -75,24 +75,23 @@ export default {
 		},
 	},
 	 methods: {
-		async copyUrl() {
-			document.querySelector('input#urlTextField').select()
-
-			if (!navigator.clipboard) {
+		copyUrl() {
+			if (navigator?.clipboard) {
+				navigator.clipboard.writeText(this.webdavUrl).then(function() {
+					showSuccess(t('files', 'Integration URL copied to clipboard'))
+				}, function(err) {
+					showError(t('files', 'Clipboard is not available'))
+					console.error('Async: Could not copy text: ', err)
+				})
+			} else {
 				try {
+					document.querySelector('input#urlTextField').select()
 					document.execCommand('copy')
+					showSuccess(t('files', 'Integration URL copied to clipboard'))
 				} catch (e) {
 					showError(t('files', 'Clipboard is not available'))
-					return
 				}
-			} else {
-				await navigator.clipboard.writeText(this.webdavUrl)
 			}
-			this.copied = true
-			showSuccess(t('files', 'Integration URL copied to clipboard'))
-			setTimeout(() => {
-				this.copied = false
-			}, 5000)
 		},
 	 },
 }
