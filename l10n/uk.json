@@ -221,7 +221,7 @@
     "View \"{emoji}{view}\" removed." : "Вид \"{emoji}{view}\" вилучено.",
     "Edit column" : "Редагувати стовпець",
     "Cannot update column. Title is missing." : "Неможливо оновити стовпець. Відсутній заголовок.",
-    "The column \"{column}\" was updated." : "Стовпець \"{columnn}\" оновлено.",
+    "The column \"{column}\" was updated." : "Стовпець \"{column}\" оновлено.",
     "Edit row" : "Редагувати рядок",
     "I really want to delete this row!" : "Я справді бажаю вилучити цей рядок!",
     "Could not update row" : "Не вдалося оновити рядок",
