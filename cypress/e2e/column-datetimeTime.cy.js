@@ -40,16 +40,17 @@ describe('Test column ' + columnTitle, () => {
 	})
 
 	it('Insert and test rows - default now', () => {
+		const now = new Date(2023, 11, 24, 7, 21)
+		cy.clock(now)
 		cy.loadTable(tableTitle)
 		cy.createDatetimeTimeColumn(columnTitle, true, true)
 
 		// insert row with int value
 		cy.get('button').contains('Create row').click()
-		const minutes = ':' + new Date().getMinutes().toString().length < 2 ? '0' + new Date().getMinutes() : new Date().getMinutes().toString()
-		cy.get('.modal__content input').first().should('contain.value', minutes)
+		cy.get('.modal__content input').first().should('contain.value', '07:21')
 		cy.get('.modal-container .checkbox-radio-switch label').click().click()
 		cy.get('button').contains('Save').click()
-		cy.get('.custom-table table tr td div').contains(minutes).should('be.visible')
+		cy.get('.custom-table table tr td div').contains('7:21').should('be.visible')
 	})
 
 })
