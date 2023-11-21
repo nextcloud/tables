@@ -43,24 +43,19 @@ describe('Test column ' + columnTitle, () => {
 	})
 
 	it('Insert and test rows - default now', () => {
+		const now = new Date(2023, 11, 24, 7, 21)
+		cy.clock(now)
 		cy.loadTable(tableTitle)
 		cy.createDatetimeColumn(columnTitle, true, true)
 
-		// insert row with int value
 		cy.get('button').contains('Create row').click()
-		const hour = new Date().getHours().toString().length < 2 ? '0' + new Date().getHours() : new Date().getHours().toString()
-		const minutes = new Date().getMinutes().toString().length < 2 ? '0' + new Date().getMinutes() : new Date().getMinutes().toString()
-		const date = new Date().toISOString().slice(2, 10)
-		const datetime = date + ' ' + hour + ':' + minutes
-		cy.get('.modal__content input').first().should('contain.value', '20' + datetime)
+		cy.get('.modal__content input').first().should('contain.value', '2023-12-24 07:21')
 		cy.get('.modal-container .checkbox-radio-switch label').click().click()
 		cy.get('button').contains('Save').click()
-		const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June',
-			'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
-		cy.get('.custom-table table tr td div').contains(new Date().getDate()).should('be.visible')
-		cy.get('.custom-table table tr td div').contains(monthNames[new Date().getMonth()]).should('be.visible')
-		cy.get('.custom-table table tr td div').contains(new Date().getFullYear()).should('be.visible')
-		cy.get('.custom-table table tr td div').contains(':' + minutes).should('be.visible')
+		cy.get('.custom-table table tr td div').contains('7:').should('be.visible')
+		cy.get('.custom-table table tr td div').contains('Dec').should('be.visible')
+		cy.get('.custom-table table tr td div').contains('2023').should('be.visible')
+		cy.get('.custom-table table tr td div').contains(':21').should('be.visible')
 	})
 
 })
