@@ -1712,7 +1712,7 @@
                     {
                         "name": "permissionValue",
                         "in": "query",
-                        "description": "New permission value",
+                        "description": "New permission value (use 0 for false or 1 for true as int values)",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -1951,7 +1951,7 @@
                     {
                         "name": "permissionRead",
                         "in": "query",
-                        "description": "Permission if receiver can read data",
+                        "description": "Permission if receiver can read data (use 0 for false or 1 for true as int values)",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -1960,7 +1960,7 @@
                     {
                         "name": "permissionCreate",
                         "in": "query",
-                        "description": "Permission if receiver can create data",
+                        "description": "Permission if receiver can create data (use 0 for false or 1 for true as int values)",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -1969,7 +1969,7 @@
                     {
                         "name": "permissionUpdate",
                         "in": "query",
-                        "description": "Permission if receiver can update data",
+                        "description": "Permission if receiver can update data (use 0 for false or 1 for true as int values)",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -1978,7 +1978,7 @@
                     {
                         "name": "permissionDelete",
                         "in": "query",
-                        "description": "Permission if receiver can delete data",
+                        "description": "Permission if receiver can delete data (use 0 for false or 1 for true as int values)",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -1987,7 +1987,7 @@
                     {
                         "name": "permissionManage",
                         "in": "query",
-                        "description": "Permission if receiver can manage table",
+                        "description": "Permission if receiver can manage table (use 0 for false or 1 for true as int values)",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -2133,7 +2133,7 @@
                     {
                         "name": "permissionRead",
                         "in": "query",
-                        "description": "Permission if receiver can read data",
+                        "description": "Permission if receiver can read data (use 0 for false or 1 for true as int values)",
                         "schema": {
                             "type": "integer",
                             "default": 0
@@ -2142,7 +2142,7 @@
                     {
                         "name": "permissionCreate",
                         "in": "query",
-                        "description": "Permission if receiver can create data",
+                        "description": "Permission if receiver can create data (use 0 for false or 1 for true as int values)",
                         "schema": {
                             "type": "integer",
                             "default": 0
@@ -2151,7 +2151,7 @@
                     {
                         "name": "permissionUpdate",
                         "in": "query",
-                        "description": "Permission if receiver can update data",
+                        "description": "Permission if receiver can update data (use 0 for false or 1 for true as int values)",
                         "schema": {
                             "type": "integer",
                             "default": 0
@@ -2160,7 +2160,7 @@
                     {
                         "name": "permissionDelete",
                         "in": "query",
-                        "description": "Permission if receiver can delete data",
+                        "description": "Permission if receiver can delete data (use 0 for false or 1 for true as int values)",
                         "schema": {
                             "type": "integer",
                             "default": 0
@@ -2169,7 +2169,7 @@
                     {
                         "name": "permissionManage",
                         "in": "query",
-                        "description": "Permission if receiver can manage node",
+                        "description": "Permission if receiver can manage node (use 0 for false or 1 for true as int values)",
                         "schema": {
                             "type": "integer",
                             "default": 0
@@ -2396,7 +2396,7 @@
                     {
                         "name": "mandatory",
                         "in": "query",
-                        "description": "Is the column mandatory",
+                        "description": "Is the column mandatory (use 0 for false or 1 for true as int values)",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -2784,7 +2784,7 @@
                     {
                         "name": "mandatory",
                         "in": "query",
-                        "description": "Is the column mandatory",
+                        "description": "Is the column mandatory (use 0 for false or 1 for true as int values)",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -3032,7 +3032,7 @@
                     {
                         "name": "mandatory",
                         "in": "query",
-                        "description": "Is the column mandatory",
+                        "description": "Is the column mandatory? (use 0 for false or 1 for true as int values)",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -4308,7 +4308,7 @@
                     {
                         "name": "createMissingColumns",
                         "in": "query",
-                        "description": "Create missing columns",
+                        "description": "Create missing columns (use 0 for false or 1 for true as int values)",
                         "schema": {
                             "type": "integer",
                             "default": 1
@@ -4418,7 +4418,7 @@
                     {
                         "name": "createMissingColumns",
                         "in": "query",
-                        "description": "Create missing columns",
+                        "description": "Create missing columns (use 0 for false or 1 for true as int values)",
                         "schema": {
                             "type": "integer",
                             "default": 1

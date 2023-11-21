@@ -477,11 +477,11 @@ class Api1Controller extends ApiController {
 	 * @param 'table'|'view' $nodeType Node type
 	 * @param string $receiver Receiver ID
 	 * @param 'user'|'group' $receiverType Receiver type
-	 * @param bool $permissionRead Permission if receiver can read data
-	 * @param bool $permissionCreate Permission if receiver can create data
-	 * @param bool $permissionUpdate Permission if receiver can update data
-	 * @param bool $permissionDelete Permission if receiver can delete data
-	 * @param bool $permissionManage Permission if receiver can manage node
+	 * @param bool $permissionRead Permission if receiver can read data (use 0 for false or 1 for true as int values)
+	 * @param bool $permissionCreate Permission if receiver can create data (use 0 for false or 1 for true as int values)
+	 * @param bool $permissionUpdate Permission if receiver can update data (use 0 for false or 1 for true as int values)
+	 * @param bool $permissionDelete Permission if receiver can delete data (use 0 for false or 1 for true as int values)
+	 * @param bool $permissionManage Permission if receiver can manage node (use 0 for false or 1 for true as int values)
 	 * @return DataResponse<Http::STATUS_OK, TablesShare, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Share returned
@@ -547,7 +547,7 @@ class Api1Controller extends ApiController {
 	 *
 	 * @param int $shareId Share ID
 	 * @param string $permissionType Permission type that should be changed
-	 * @param bool $permissionValue New permission value
+	 * @param bool $permissionValue New permission value (use 0 for false or 1 for true as int values)
 	 * @return DataResponse<Http::STATUS_OK, TablesShare, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: View deleted
@@ -649,7 +649,7 @@ class Api1Controller extends ApiController {
 	 * @param string $title Title
 	 * @param 'text'|'number'|'datetime'|'select' $type Column main type
 	 * @param string|null $subtype Column sub type
-	 * @param bool $mandatory Is the column mandatory
+	 * @param bool $mandatory Is the column mandatory (use 0 for false or 1 for true as int values)
 	 * @param string|null $description Description
 	 * @param string|null $numberPrefix Prefix if the column is a number field
 	 * @param string|null $numberSuffix Suffix if the column is a number field
@@ -749,7 +749,7 @@ class Api1Controller extends ApiController {
 	 * @param int $columnId Column ID that will be updated
 	 * @param string|null $title Title
 	 * @param string|null $subtype Column sub type
-	 * @param bool $mandatory Is the column mandatory
+	 * @param bool $mandatory Is the column mandatory? (use 0 for false or 1 for true as int values)
 	 * @param string|null $description Description
 	 * @param string|null $numberPrefix Prefix if the column is a number field
 	 * @param string|null $numberSuffix Suffix if the column is a number field
@@ -1219,7 +1219,7 @@ class Api1Controller extends ApiController {
 	 * @NoCSRFRequired
 	 * @param int $tableId Table ID
 	 * @param string $path Path to file
-	 * @param bool $createMissingColumns Create missing columns
+	 * @param bool $createMissingColumns Create missing columns (use 0 for false or 1 for true as int values)
 	 * @return DataResponse<Http::STATUS_OK, TablesImportState, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Import status returned
@@ -1252,7 +1252,7 @@ class Api1Controller extends ApiController {
 	 * @NoCSRFRequired
 	 * @param int $viewId View ID
 	 * @param string $path Path to file
-	 * @param bool $createMissingColumns Create missing columns
+	 * @param bool $createMissingColumns Create missing columns (use 0 for false or 1 for true as int values)
 	 * @return DataResponse<Http::STATUS_OK, TablesImportState, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Import status returned
@@ -1289,11 +1289,11 @@ class Api1Controller extends ApiController {
 	 * @param int $tableId Table ID
 	 * @param string $receiver Receiver ID
 	 * @param 'user'|'group' $receiverType Receiver type
-	 * @param bool $permissionRead Permission if receiver can read data
-	 * @param bool $permissionCreate Permission if receiver can create data
-	 * @param bool $permissionUpdate Permission if receiver can update data
-	 * @param bool $permissionDelete Permission if receiver can delete data
-	 * @param bool $permissionManage Permission if receiver can manage table
+	 * @param bool $permissionRead Permission if receiver can read data (use 0 for false or 1 for true as int values)
+	 * @param bool $permissionCreate Permission if receiver can create data (use 0 for false or 1 for true as int values)
+	 * @param bool $permissionUpdate Permission if receiver can update data (use 0 for false or 1 for true as int values)
+	 * @param bool $permissionDelete Permission if receiver can delete data (use 0 for false or 1 for true as int values)
+	 * @param bool $permissionManage Permission if receiver can manage table (use 0 for false or 1 for true as int values)
 	 * @return DataResponse<Http::STATUS_OK, TablesShare, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: View deleted
@@ -1329,7 +1329,7 @@ class Api1Controller extends ApiController {
 	 * @param string $title Title
 	 * @param 'text'|'number'|'datetime'|'select' $type Column main type
 	 * @param string|null $subtype Column sub type
-	 * @param bool $mandatory Is the column mandatory
+	 * @param bool $mandatory Is the column mandatory (use 0 for false or 1 for true as int values)
 	 * @param string|null $description Description
 	 * @param string|null $numberPrefix Prefix if the column is a number field
 	 * @param string|null $numberSuffix Suffix if the column is a number field
