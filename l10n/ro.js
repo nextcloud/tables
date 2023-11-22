@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "Nu",
     "Yes" : "Da",
     "Date" : "Date",
     "Comments" : "Comentarii",
@@ -40,7 +41,9 @@ OC.L10N.register(
     "Sort" : "Sortează",
     "Copy" : "Copiază",
     "Shared" : "Partajat",
+    "Clear filter" : "Șterge filtrul",
     "group" : "grup",
+    "Permissions" : "Permisiuni",
     "No shares" : "Nicio partajare",
     "Created at" : "Creat la",
     "Sharing" : "Partajare",

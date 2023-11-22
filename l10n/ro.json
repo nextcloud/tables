@@ -1,4 +1,5 @@
 { "translations": {
+    "No" : "Nu",
     "Yes" : "Da",
     "Date" : "Date",
     "Comments" : "Comentarii",
@@ -38,7 +39,9 @@
     "Sort" : "Sortează",
     "Copy" : "Copiază",
     "Shared" : "Partajat",
+    "Clear filter" : "Șterge filtrul",
     "group" : "grup",
+    "Permissions" : "Permisiuni",
     "No shares" : "Nicio partajare",
     "Created at" : "Creat la",
     "Sharing" : "Partajare",
