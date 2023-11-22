@@ -365,7 +365,7 @@ class ColumnService extends SuperService {
 			if ($numberPrefix !== null) {
 				$item->setNumberPrefix($numberPrefix);
 			}
-			if($numberSuffix !== null) {
+			if ($numberSuffix !== null) {
 				$item->setNumberSuffix($numberSuffix);
 			}
 			if ($mandatory !== null) {
