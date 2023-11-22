@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import IconTables from '../icons/TablesIcon.vue'
+import IconTables from '../shared/assets/icons/IconTables.vue'
 import IconView from 'vue-material-design-icons/Text.vue'
 import { NcUserBubble, NcCounterBubble } from '@nextcloud/vue'
 import { translatePlural as n } from '@nextcloud/l10n'
