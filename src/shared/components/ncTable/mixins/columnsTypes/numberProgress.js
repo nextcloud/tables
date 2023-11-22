@@ -38,4 +38,8 @@ export default class NumberProgressColumn extends AbstractNumberColumn {
 		return super.isFilterFound(filterMethod, cell)
 	}
 
+	parseValue(value) {
+		return parseInt(value)
+	}
+
 }

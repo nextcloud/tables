@@ -49,6 +49,16 @@ export class AbstractColumn {
 		return valueObject.value
 	}
 
+	/**
+	 * parse an input value
+	 *
+	 * @param value
+	 * @return {*}
+	 */
+	parseValue(value) {
+		return value
+	}
+
 }
 
 export class AbstractNumberColumn extends AbstractColumn {
