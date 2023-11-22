@@ -147,7 +147,7 @@ class ColumnService extends SuperService {
 	 * @param string|null $selectionOptions
 	 * @param string|null $selectionDefault
 	 * @param string|null $datetimeDefault
-	 * @param array|null $selectedViewIds
+	 * @param array $selectedViewIds
 	 * @return Column
 	 *
 	 * @throws DoesNotExistException
