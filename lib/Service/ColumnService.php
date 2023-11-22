@@ -198,7 +198,7 @@ class ColumnService extends SuperService {
 		?string $selectionDefault,
 
 		?string $datetimeDefault,
-		?array $selectedViewIds = []
+		array $selectedViewIds = []
 	):Column {
 		// security
 		if ($viewId) {
@@ -362,8 +362,12 @@ class ColumnService extends SuperService {
 			if ($subtype !== null) {
 				$item->setSubtype($subtype);
 			}
-			$item->setNumberPrefix($numberPrefix);
-			$item->setNumberSuffix($numberSuffix);
+			if($numberPrefix !== null) {
+				$item->setNumberPrefix($numberPrefix);
+			}
+			if($numberSuffix !== null) {
+				$item->setNumberSuffix($numberSuffix);
+			}
 			if ($mandatory !== null) {
 				$item->setMandatory($mandatory);
 			}
