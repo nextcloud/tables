@@ -78,7 +78,15 @@ export default {
 
 	methods: {
 		parseValue(inputValue) {
-			const parsedValue = parseFloat(inputValue.replace(',', '.'))
+			if (inputValue === null || inputValue === '') {
+				return null
+			}
+			let parsedValue
+			if (typeof inputValue === 'string' || inputValue instanceof String) {
+				parsedValue = parseFloat(inputValue.replace(',', '.'))
+			} else {
+				parsedValue = inputValue
+			}
 			const roundedValue = parsedValue.toFixed(this.column?.numberDecimals)
 			let value = parseFloat(roundedValue)
 			if (this.column?.numberMin && value < this.column?.numberMin) {
