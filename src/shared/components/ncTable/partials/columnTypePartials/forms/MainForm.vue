@@ -25,10 +25,10 @@
 		</div>
 
 		<!-- add to views -->
-		<div v-if="!editColumn" class="fix-col-4 title space-T">
+		<div v-if="!editColumn && views.length > 0" class="fix-col-4 title space-T">
 			{{ t('tables', 'Add column to other views') }}
 		</div>
-		<div v-if="!editColumn" class="fix-col-4">
+		<div v-if="!editColumn && views.length > 0" class="fix-col-4">
 			<NcSelect
 				v-model="localSelectedViews"
 				:multiple="true"
