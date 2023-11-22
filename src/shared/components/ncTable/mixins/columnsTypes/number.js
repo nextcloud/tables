@@ -50,4 +50,8 @@ export default class NumberColumn extends AbstractNumberColumn {
 		return super.isFilterFound(filterMethod, cell)
 	}
 
+	parseValue(value) {
+		return value === null ? null : parseFloat(value)
+	}
+
 }
