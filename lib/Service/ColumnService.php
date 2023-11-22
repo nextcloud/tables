@@ -544,10 +544,9 @@ class ColumnService extends SuperService {
 			return [];
 		}
 
-		$out = [];
 		foreach ($columns as $column) {
-			$out[] = $this->enhanceColumn($column);
+			$this->enhanceColumn($column);
 		}
-		return $out;
+		return $columns;
 	}
 }
