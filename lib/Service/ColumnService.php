@@ -10,6 +10,7 @@ use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\IL10N;
@@ -26,6 +27,7 @@ class ColumnService extends SuperService {
 
 	private IL10N $l;
 
+	private UserHelper $userHelper;
 
 	public function __construct(
 		PermissionsService $permissionsService,
@@ -35,7 +37,8 @@ class ColumnService extends SuperService {
 		TableMapper $tableMapper,
 		ViewService $viewService,
 		RowService $rowService,
-		IL10N $l
+		IL10N $l,
+		UserHelper $userHelper
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
@@ -43,6 +46,7 @@ class ColumnService extends SuperService {
 		$this->viewService = $viewService;
 		$this->rowService = $rowService;
 		$this->l = $l;
+		$this->userHelper = $userHelper;
 	}
 
 
@@ -53,7 +57,7 @@ class ColumnService extends SuperService {
 	public function findAllByTable(int $tableId, ?int $viewId = null, ?string $userId = null): array {
 		try {
 			if ($this->permissionsService->canReadColumnsByTableId($tableId, $userId) || ($viewId != null && $this->permissionsService->canReadColumnsByViewId($viewId, $userId))) {
-				return $this->mapper->findAllByTable($tableId);
+				return $this->enhanceColumns($this->mapper->findAllByTable($tableId));
 			} else {
 				throw new PermissionError('no read access to table id = '.$tableId);
 			}
@@ -93,7 +97,7 @@ class ColumnService extends SuperService {
 					throw new InternalError($e->getMessage());
 				}
 			}
-			return $viewColumns;
+			return $this->enhanceColumns($viewColumns);
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
@@ -115,7 +119,7 @@ class ColumnService extends SuperService {
 				throw new PermissionError('PermissionError: can not read column with id '.$id);
 			}
 
-			return $column;
+			return $this->enhanceColumn($column);
 		} catch (DoesNotExistException $e) {
 			$this->logger->warning($e->getMessage());
 			throw new NotFoundError($e->getMessage());
@@ -231,7 +235,7 @@ class ColumnService extends SuperService {
 				$view = $this->viewService->find($viewId);
 				$this->viewService->update($viewId, ['columns' => json_encode(array_merge($view->getColumnsArray(), [$entity->getId()]))], $userId, true);
 			}
-			return $entity;
+			return $this->enhanceColumn($entity);
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
@@ -354,7 +358,7 @@ class ColumnService extends SuperService {
 			$time = new DateTime();
 			$item->setLastEditAt($time->format('Y-m-d H:i:s'));
 			$item->setLastEditBy($userId);
-			return $this->mapper->update($item);
+			return $this->enhanceColumn($this->mapper->update($item));
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
@@ -384,7 +388,7 @@ class ColumnService extends SuperService {
 			}
 
 			$this->mapper->delete($item);
-			return $item;
+			return $this->enhanceColumn($item);
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
@@ -436,7 +440,7 @@ class ColumnService extends SuperService {
 				$countCreatedColumns++;
 			}
 		}
-		return $result;
+		return $this->enhanceColumns($result);
 	}
 
 	/**
@@ -450,5 +454,31 @@ class ColumnService extends SuperService {
 		} else {
 			throw new PermissionError('no read access for counting to table id = '.$tableId);
 		}
+	}
+
+	/**
+	 * add some basic values related to this column in context
+	 *
+	 * $userId can be set or ''
+	 * @param Column $column
+	 *
+	 * @return Column
+	 */
+	private function enhanceColumn(Column $column): Column {
+		// add created by display name for UI usage
+		$column->setCreatedByDisplayName($this->userHelper->getUserDisplayName($column->getCreatedBy()));
+		$column->setLastEditByDisplayName($this->userHelper->getUserDisplayName($column->getLastEditBy()));
+		return $column;
+	}
+
+	private function enhanceColumns(?array $columns): array {
+		if ($columns === null) {
+			return [];
+		}
+
+		foreach ($columns as $column) {
+			$this->enhanceColumn($column);
+		}
+		return $columns;
 	}
 }

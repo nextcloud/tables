@@ -27,7 +27,7 @@
 					<div class="last-edit-info">
 						{{ t('tables', 'Last edit') + ': ' }}
 						{{ updateTime }}&nbsp;
-						<NcUserBubble :user="column.lastEditBy" :display-name="column.lastEditBy" />
+						<NcUserBubble :user="column.lastEditBy" :display-name="column.lastEditByDisplayName ? column.lastEditByDisplayName : column.lastEditBy" />
 					</div>
 				</div>
 				<div class="flex">
