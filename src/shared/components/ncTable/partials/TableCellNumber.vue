@@ -24,6 +24,9 @@ export default {
 	},
 	computed: {
 		getValue() {
+			if (this.value === null) {
+				return null
+			}
 			return this.value.toFixed(this.column?.numberDecimals)
 		},
 	},

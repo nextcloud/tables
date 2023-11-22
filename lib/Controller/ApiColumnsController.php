@@ -116,7 +116,7 @@ class ApiColumnsController extends AOCSController {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function createNumberColumn(int $baseNodeId, string $title, ?float $numberDefault, ?int $numberDecimals, ?string $numberPrefix, ?string $numberSuffix, ?float $numberMin, ?float $numberMax, string $subtype = null, string $description = null, ?array $selectedViewIds = null, bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
+	public function createNumberColumn(int $baseNodeId, string $title, ?float $numberDefault, ?int $numberDecimals, ?string $numberPrefix, ?string $numberSuffix, ?float $numberMin, ?float $numberMax, string $subtype = null, string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		$column = $this->service->create(
@@ -171,7 +171,7 @@ class ApiColumnsController extends AOCSController {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function createTextColumn(int $baseNodeId, string $title, ?string $textDefault, ?string $textAllowedPattern, ?int $textMaxLength, string $subtype = null, string $description = null, ?array $selectedViewIds = null, bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
+	public function createTextColumn(int $baseNodeId, string $title, ?string $textDefault, ?string $textAllowedPattern, ?int $textMaxLength, string $subtype = null, string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		$column = $this->service->create(
@@ -278,7 +278,7 @@ class ApiColumnsController extends AOCSController {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function createDatetimeColumn(int $baseNodeId, string $title, ?string $datetimeDefault, string $subtype = null, string $description = null, ?array $selectedViewIds = null, bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
+	public function createDatetimeColumn(int $baseNodeId, string $title, ?string $datetimeDefault, string $subtype = null, string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		$column = $this->service->create(
