@@ -362,7 +362,7 @@ class ColumnService extends SuperService {
 			if ($subtype !== null) {
 				$item->setSubtype($subtype);
 			}
-			if($numberPrefix !== null) {
+			if ($numberPrefix !== null) {
 				$item->setNumberPrefix($numberPrefix);
 			}
 			if($numberSuffix !== null) {
