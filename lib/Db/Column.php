@@ -18,10 +18,14 @@ use OCP\AppFramework\Db\Entity;
  * @method setTableId(int $tableId)
  * @method getCreatedBy(): string
  * @method setCreatedBy(string $createdBy)
+ * @method getCreatedByDisplayName(): string
+ * @method setCreatedByDisplayName(string $displayName)
  * @method getCreatedAt(): string
  * @method setCreatedAt(string $createdAt)
  * @method getLastEditBy(): string
  * @method setLastEditBy(string $lastEditBy)
+ * @method getLastEditByDisplayName(): string
+ * @method setLastEditByDisplayName(string $displayName)
  * @method getLastEditAt(): string
  * @method setLastEditAt(string $lastEditAt)
  * @method getType(): string
@@ -49,7 +53,7 @@ use OCP\AppFramework\Db\Entity;
  * @method getTextAllowedPattern(): string
  * @method setTextAllowedPattern(string $textAllowedPattern)
  * @method getTextMaxLength(): int
- * @method setTextMaxLength(int $textMaxLenght)
+ * @method setTextMaxLength(int $textMaxLength)
  * @method getSelectionOptions(): string
  * @method getSelectionDefault(): string
  * @method setSelectionOptions(string $selectionOptionsArray)
@@ -61,8 +65,10 @@ class Column extends Entity implements JsonSerializable {
 	protected ?string $title = null;
 	protected ?int $tableId = null;
 	protected ?string $createdBy = null;
+	protected ?string $createdByDisplayName = null;
 	protected ?string $createdAt = null;
 	protected ?string $lastEditBy = null;
+	protected ?string $lastEditByDisplayName = null;
 	protected ?string $lastEditAt = null;
 	protected ?string $type = null;
 	protected ?string $subtype = null;
@@ -128,8 +134,10 @@ class Column extends Entity implements JsonSerializable {
 			'tableId' => $this->tableId,
 			'title' => $this->title,
 			'createdBy' => $this->createdBy,
+			'createdByDisplayName' => $this->createdByDisplayName,
 			'createdAt' => $this->createdAt,
 			'lastEditBy' => $this->lastEditBy,
+			'lastEditByDisplayName' => $this->lastEditByDisplayName,
 			'lastEditAt' => $this->lastEditAt,
 			'type' => $this->type,
 			'subtype' => $this->subtype,
