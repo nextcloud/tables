@@ -15,6 +15,8 @@ export class AbstractColumn {
 		this.tableId = data.tableId
 		this.title = data.title
 		this.description = data.description
+		this.createdByDisplayName = data.createdByDisplayName
+		this.lastEditByDisplayName = data.lastEditByDisplayName
 	}
 
 	canSort() {
