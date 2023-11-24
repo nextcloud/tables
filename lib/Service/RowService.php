@@ -13,6 +13,7 @@ use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -22,6 +23,9 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @psalm-import-type TablesRow from ResponseDefinitions
+ */
 class RowService extends SuperService {
 	private RowMapper $mapper;
 	private ColumnMapper $columnMapper;
@@ -35,6 +39,14 @@ class RowService extends SuperService {
 		$this->columnMapper = $columnMapper;
 		$this->viewMapper = $viewMapper;
 		$this->tableMapper = $tableMapper;
+	}
+
+	/**
+	 * @param Row[] $items
+	 * @return TablesRow[]
+	 */
+	public function formatRows(array $items): array {
+		return array_map(fn (Column $item) => $item->jsonSerialize(), $items);
 	}
 
 	/**
@@ -65,10 +77,7 @@ class RowService extends SuperService {
 	 * @param int|null $limit
 	 * @param int|null $offset
 	 * @return array
-	 * @throws DoesNotExistException
-	 * @throws InternalError
-	 * @throws MultipleObjectsReturnedException
-	 * @throws PermissionError
+	 * @throws InternalError|PermissionError|NotFoundError
 	 */
 	public function findAllByView(int $viewId, string $userId, ?int $limit = null, ?int $offset = null): array {
 		try {
@@ -80,6 +89,12 @@ class RowService extends SuperService {
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
+		} catch (DoesNotExistException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		} catch (MultipleObjectsReturnedException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 	}
 

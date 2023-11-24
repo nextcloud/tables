@@ -72,6 +72,83 @@ namespace OCA\Tables;
  *  data: ?array{columnId: int, value: mixed},
  * }
  *
+ * @psalm-type TablesCellNumber = array{
+ *     columnId: int,
+ *     columnType: 'number',
+ *     format: 'float|int',
+ *     value: int|float,
+ * }
+ * @psalm-type TablesCellNumberProgress = array{
+ *     columnId: int,
+ *     columnType: 'number-progress',
+ *     format: 'int<0, 100>',
+ *     value: int,
+ * }
+ * @psalm-type TablesCellNumberStars = array{
+ *     columnId: int,
+ *     columnType: 'number-stars',
+ *     format: 'int<0, 5>',
+ *     value: int,
+ * }
+ * @psalm-type TablesCellText = array{
+ *     columnId: int,
+ *     columnType: 'text-line'|'text-rich',
+ *     format: 'string',
+ *     value: string,
+ * }
+ * @psalm-type TablesCellTextLink = array{
+ *     columnId: int,
+ *     columnType: 'text-link',
+ *     format: 'json array{title: string, subline: string, providerId: string, value: string}',
+ *     value: array{title: string, subline: string, providerId: string, value: string},
+ * }
+ * @psalm-type TablesCellSelection = array{
+ *     columnId: int,
+ *     columnType: 'selection',
+ *     format: 'json ?array{optionId: int, optionLabel: string}',
+ *     value: ?array{optionId: int, optionLabel: string},
+ * }
+ * @psalm-type TablesCellSelectionMulti = array{
+ *     columnId: int,
+ *     columnType: 'selection-multi',
+ *     format: 'json ?array<array{optionId: int, optionLabel: string}>',
+ *     value: ?array<array{optionId: int, optionLabel: string}>,
+ * }
+ * @psalm-type TablesCellSelectionCheck = array{
+ *     columnId: int,
+ *     columnType: 'selection-check',
+ *     format: 'bool',
+ *     value: bool,
+ * }
+ * @psalm-type TablesCellDatetime = array{
+ *     columnId: int,
+ *     columnType: 'datetime',
+ *     format: 'string "Y-m-d H:i"',
+ *     value: string,
+ * }
+ * @psalm-type TablesCellDatetimeDate = array{
+ *     columnId: int,
+ *     columnType: 'datetime-date',
+ *     format: 'string "Y-m-d"',
+ *     value: string,
+ * }
+ * @psalm-type TablesCellDatetimeTime = array{
+ *     columnId: int,
+ *     columnType: 'datetime-time',
+ *     format: 'string "H:i"',
+ *     value: string,
+ * }
+ *
+ * @psalm-type TablesApiRow = array{
+ * 	id: int,
+ * 	tableId: int,
+ * 	createdBy: string,
+ * 	createdAt: string,
+ * 	lastEditBy: string,
+ * 	lastEditAt: string,
+ *  data: ?array<TablesCellNumber|TablesCellNumberProgress|TablesCellNumberStars|TablesCellText|TablesCellTextLink|TablesCellSelection|TablesCellSelectionMulti|TablesCellSelectionCheck|TablesCellDatetime|TablesCellDatetimeDate|TablesCellDatetimeTime>,
+ * }
+ *
  * @psalm-type TablesShare = array{
  * 	id: int,
  * 	sender: string,
