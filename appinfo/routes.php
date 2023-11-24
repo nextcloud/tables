@@ -115,12 +115,15 @@ return [
 		['name' => 'ApiTables#create', 'url' => '/api/2/tables', 'verb' => 'POST'],
 		['name' => 'ApiTables#update', 'url' => '/api/2/tables/{id}', 'verb' => 'PUT'],
 		['name' => 'ApiTables#destroy', 'url' => '/api/2/tables/{id}', 'verb' => 'DELETE'],
-
+		// -> columns
 		['name' => 'ApiColumns#index', 'url' => '/api/2/columns/{nodeType}/{nodeId}', 'verb' => 'GET'],
 		['name' => 'ApiColumns#show', 'url' => '/api/2/columns/{id}', 'verb' => 'GET'],
 		['name' => 'ApiColumns#createNumberColumn', 'url' => '/api/2/columns/number', 'verb' => 'POST'],
 		['name' => 'ApiColumns#createTextColumn', 'url' => '/api/2/columns/text', 'verb' => 'POST'],
 		['name' => 'ApiColumns#createSelectionColumn', 'url' => '/api/2/columns/selection', 'verb' => 'POST'],
 		['name' => 'ApiColumns#createDatetimeColumn', 'url' => '/api/2/columns/datetime', 'verb' => 'POST'],
+		// -> rows
+		['name' => 'ApiRows#show', 'url' => '/api/2/rows/{id}', 'verb' => 'GET'],
+		['name' => 'ApiRows#index', 'url' => '/api/2/rows/{nodeType}/{nodeId}', 'verb' => 'GET'],
 	]
 ];

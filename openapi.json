@@ -20,6 +20,81 @@
             }
         },
         "schemas": {
+            "ApiRow": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "tableId",
+                    "createdBy",
+                    "createdAt",
+                    "lastEditBy",
+                    "lastEditAt",
+                    "data"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "tableId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "createdBy": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string"
+                    },
+                    "lastEditBy": {
+                        "type": "string"
+                    },
+                    "lastEditAt": {
+                        "type": "string"
+                    },
+                    "data": {
+                        "type": "array",
+                        "nullable": true,
+                        "items": {
+                            "oneOf": [
+                                {
+                                    "$ref": "#/components/schemas/CellNumber"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/CellNumberProgress"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/CellNumberStars"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/CellText"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/CellTextLink"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/CellSelection"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/CellSelectionMulti"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/CellSelectionCheck"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/CellDatetime"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/CellDatetimeDate"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/CellDatetimeTime"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
             "Capabilities": {
                 "type": "object",
                 "required": [
@@ -52,6 +127,399 @@
                                 "items": {
                                     "type": "string"
                                 }
+                            }
+                        }
+                    }
+                }
+            },
+            "CellDatetime": {
+                "type": "object",
+                "required": [
+                    "columnId",
+                    "columnType",
+                    "format",
+                    "value"
+                ],
+                "properties": {
+                    "columnId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "columnType": {
+                        "type": "string",
+                        "enum": [
+                            "datetime"
+                        ]
+                    },
+                    "format": {
+                        "type": "string",
+                        "enum": [
+                            "string \"Y-m-d H:i\""
+                        ]
+                    },
+                    "value": {
+                        "type": "string"
+                    }
+                }
+            },
+            "CellDatetimeDate": {
+                "type": "object",
+                "required": [
+                    "columnId",
+                    "columnType",
+                    "format",
+                    "value"
+                ],
+                "properties": {
+                    "columnId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "columnType": {
+                        "type": "string",
+                        "enum": [
+                            "datetime-date"
+                        ]
+                    },
+                    "format": {
+                        "type": "string",
+                        "enum": [
+                            "string \"Y-m-d\""
+                        ]
+                    },
+                    "value": {
+                        "type": "string"
+                    }
+                }
+            },
+            "CellDatetimeTime": {
+                "type": "object",
+                "required": [
+                    "columnId",
+                    "columnType",
+                    "format",
+                    "value"
+                ],
+                "properties": {
+                    "columnId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "columnType": {
+                        "type": "string",
+                        "enum": [
+                            "datetime-time"
+                        ]
+                    },
+                    "format": {
+                        "type": "string",
+                        "enum": [
+                            "string \"H:i\""
+                        ]
+                    },
+                    "value": {
+                        "type": "string"
+                    }
+                }
+            },
+            "CellNumber": {
+                "type": "object",
+                "required": [
+                    "columnId",
+                    "columnType",
+                    "format",
+                    "value"
+                ],
+                "properties": {
+                    "columnId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "columnType": {
+                        "type": "string",
+                        "enum": [
+                            "number"
+                        ]
+                    },
+                    "format": {
+                        "type": "string",
+                        "enum": [
+                            "float|int"
+                        ]
+                    },
+                    "value": {
+                        "oneOf": [
+                            {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            {
+                                "type": "number",
+                                "format": "float"
+                            }
+                        ]
+                    }
+                }
+            },
+            "CellNumberProgress": {
+                "type": "object",
+                "required": [
+                    "columnId",
+                    "columnType",
+                    "format",
+                    "value"
+                ],
+                "properties": {
+                    "columnId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "columnType": {
+                        "type": "string",
+                        "enum": [
+                            "number-progress"
+                        ]
+                    },
+                    "format": {
+                        "type": "string",
+                        "enum": [
+                            "int<0, 100>"
+                        ]
+                    },
+                    "value": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                }
+            },
+            "CellNumberStars": {
+                "type": "object",
+                "required": [
+                    "columnId",
+                    "columnType",
+                    "format",
+                    "value"
+                ],
+                "properties": {
+                    "columnId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "columnType": {
+                        "type": "string",
+                        "enum": [
+                            "number-stars"
+                        ]
+                    },
+                    "format": {
+                        "type": "string",
+                        "enum": [
+                            "int<0, 5>"
+                        ]
+                    },
+                    "value": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                }
+            },
+            "CellSelection": {
+                "type": "object",
+                "required": [
+                    "columnId",
+                    "columnType",
+                    "format",
+                    "value"
+                ],
+                "properties": {
+                    "columnId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "columnType": {
+                        "type": "string",
+                        "enum": [
+                            "selection"
+                        ]
+                    },
+                    "format": {
+                        "type": "string",
+                        "enum": [
+                            "json ?array{optionId: int, optionLabel: string}"
+                        ]
+                    },
+                    "value": {
+                        "type": "object",
+                        "nullable": true,
+                        "required": [
+                            "optionId",
+                            "optionLabel"
+                        ],
+                        "properties": {
+                            "optionId": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "optionLabel": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "CellSelectionCheck": {
+                "type": "object",
+                "required": [
+                    "columnId",
+                    "columnType",
+                    "format",
+                    "value"
+                ],
+                "properties": {
+                    "columnId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "columnType": {
+                        "type": "string",
+                        "enum": [
+                            "selection-check"
+                        ]
+                    },
+                    "format": {
+                        "type": "string",
+                        "enum": [
+                            "bool"
+                        ]
+                    },
+                    "value": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "CellSelectionMulti": {
+                "type": "object",
+                "required": [
+                    "columnId",
+                    "columnType",
+                    "format",
+                    "value"
+                ],
+                "properties": {
+                    "columnId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "columnType": {
+                        "type": "string",
+                        "enum": [
+                            "selection-multi"
+                        ]
+                    },
+                    "format": {
+                        "type": "string",
+                        "enum": [
+                            "json ?array<array{optionId: int, optionLabel: string}>"
+                        ]
+                    },
+                    "value": {
+                        "type": "array",
+                        "nullable": true,
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "optionId",
+                                "optionLabel"
+                            ],
+                            "properties": {
+                                "optionId": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "optionLabel": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "CellText": {
+                "type": "object",
+                "required": [
+                    "columnId",
+                    "columnType",
+                    "format",
+                    "value"
+                ],
+                "properties": {
+                    "columnId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "columnType": {
+                        "type": "string",
+                        "enum": [
+                            "text-line",
+                            "text-rich"
+                        ]
+                    },
+                    "format": {
+                        "type": "string",
+                        "enum": [
+                            "string"
+                        ]
+                    },
+                    "value": {
+                        "type": "string"
+                    }
+                }
+            },
+            "CellTextLink": {
+                "type": "object",
+                "required": [
+                    "columnId",
+                    "columnType",
+                    "format",
+                    "value"
+                ],
+                "properties": {
+                    "columnId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "columnType": {
+                        "type": "string",
+                        "enum": [
+                            "text-link"
+                        ]
+                    },
+                    "format": {
+                        "type": "string",
+                        "enum": [
+                            "json array{title: string, subline: string, providerId: string, value: string}"
+                        ]
+                    },
+                    "value": {
+                        "type": "object",
+                        "required": [
+                            "title",
+                            "subline",
+                            "providerId",
+                            "value"
+                        ],
+                        "properties": {
+                            "title": {
+                                "type": "string"
+                            },
+                            "subline": {
+                                "type": "string"
+                            },
+                            "providerId": {
+                                "type": "string"
+                            },
+                            "value": {
+                                "type": "string"
                             }
                         }
                     }
@@ -5451,7 +5919,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "View deleted",
+                        "description": "Columns returned",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -5904,6 +6372,7 @@
                         "schema": {
                             "type": "array",
                             "nullable": true,
+                            "default": [],
                             "items": {
                                 "type": "integer",
                                 "format": "int64"
@@ -6185,6 +6654,7 @@
                         "schema": {
                             "type": "array",
                             "nullable": true,
+                            "default": [],
                             "items": {
                                 "type": "integer",
                                 "format": "int64"
@@ -6719,6 +7189,7 @@
                         "schema": {
                             "type": "array",
                             "nullable": true,
+                            "default": [],
                             "items": {
                                 "type": "integer",
                                 "format": "int64"
@@ -6866,6 +7337,393 @@
                             "text/plain": {
                                 "schema": {
                                     "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ocs/v2.php/apps/tables/api/2/rows/{id}": {
+            "get": {
+                "operationId": "api_rows-show",
+                "summary": "[api v2] Get a row object",
+                "tags": [
+                    "api_rows"
+                ],
+                "security": [
+                    {
+                        "bearer_auth": []
+                    },
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "row ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "OCS-APIRequest",
+                        "in": "header",
+                        "description": "Required to be true for the API request to pass",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Row returned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "$ref": "#/components/schemas/ApiRow"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ocs/v2.php/apps/tables/api/2/rows/{nodeType}/{nodeId}": {
+            "get": {
+                "operationId": "api_rows-list",
+                "summary": "[api v2] Get all rows for a table or a view",
+                "description": "Returns an empty array if no rows were found",
+                "tags": [
+                    "api_rows"
+                ],
+                "security": [
+                    {
+                        "bearer_auth": []
+                    },
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "nodeType",
+                        "in": "path",
+                        "description": "Node type",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "table",
+                                "view"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "nodeId",
+                        "in": "path",
+                        "description": "Node ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "OCS-APIRequest",
+                        "in": "header",
+                        "description": "Required to be true for the API request to pass",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rows returned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ApiRow"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
