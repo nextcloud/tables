@@ -363,6 +363,8 @@ OC.L10N.register(
     "Maximum" : "Maximum",
     "Prefix" : "Předpona",
     "Suffix" : "Přípona",
+    "The default value is lower than the minimum allowed value." : "Výchozí hodnota je nižší než minimální povolená.",
+    "The default value is greater than the maximum allowed value." : "Výchozí hodnota je vyšší než maximálně povolená.",
     "Default" : "Výchozí",
     "Reduce stars" : "Snížit počet hvězdiček",
     "Increase stars" : "Zvýšit počet hvězdiček",

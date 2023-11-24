@@ -364,6 +364,8 @@ OC.L10N.register(
     "Maximum" : "最大值",
     "Prefix" : "前綴",
     "Suffix" : "後綴",
+    "The default value is lower than the minimum allowed value." : "預設值低於最小允許值。",
+    "The default value is greater than the maximum allowed value." : "預設值大於最大允許值。",
     "Default" : "預設",
     "Reduce stars" : "減少星星",
     "Increase stars" : "增加星星",

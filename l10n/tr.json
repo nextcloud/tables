@@ -362,6 +362,8 @@
     "Maximum" : "En fazla",
     "Prefix" : "Ön ek",
     "Suffix" : "Son ek",
+    "The default value is lower than the minimum allowed value." : "Varsayılan değer kullanılabilecek en az değerden küçük",
+    "The default value is greater than the maximum allowed value." : "Varsayılan değer kullanılabilecek en fazla değerden büyük",
     "Default" : "Varsayılan",
     "Reduce stars" : "Yıldızları azalt",
     "Increase stars" : "Yıldızları artır",

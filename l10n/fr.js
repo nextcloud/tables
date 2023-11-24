@@ -1,6 +1,9 @@
 OC.L10N.register(
     "tables",
     {
+    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administrator." : "Une erreur inattendue s'est produite. Davantage de détails peuvent être trouvés dans les journaux. Veuillez contacter votre administrateur. ",
+    "An permission error occurred. More details can be found in the logs. Please reach out to your administrator." : "Une erreur de permissions s'est produite. Davantage de détails peuvent être trouvés dans les journaux. Veuillez contacter votre administrateur.",
+    "An not found error occurred. More details can be found in the logs. Please reach out to your administrator." : "Une erreur « Non trouvé » s'est produite. Davantage de détails peuvent être trouvés dans les journaux. Veuillez contacter votre administrateur.",
     "Could not create row." : "Impossible de créer une ligne.",
     "Could not update row." : "Impossible de mettre à jour la ligne.",
     "Nextcloud Tables" : "Nextcloud Tables",
@@ -137,6 +140,8 @@ OC.L10N.register(
     "Add new filter" : "Ajouter un nouveau filtre",
     "Ascending" : "Ascendant",
     "Descending" : "Descendant",
+    "Reactivate sorting rule" : "Réactiver la règle de tri",
+    "Delete sorting rule" : "Supprimer la règle de tri",
     "Add new sorting rule" : "Ajouter une nouvelle règle de tri",
     "The sorting rules are applied sequentially, meaning that if there are rows with the same priority to the first rule, the second rule determines the order among those rows." : "Les règles de tri sont appliquées successivement, ce qui signifie que s'il y a des lignes avec la même priorité que la première règle, la seconde règle détermine l'ordre parmi ces lignes. ",
     "Views" : "Vues",
@@ -200,6 +205,7 @@ OC.L10N.register(
     "Could not load templates." : "Impossible de charger les modèles.",
     "Delete column" : "Supprimer la colonne",
     "Are you sure you want to delete column \"{column}\"?" : "Voulez-vous vraiment supprimer la colonne « {column} » ?",
+    "Error occurred while deleting column \"{column}\"." : "Une erreur s'est produite lors de la suppression de la colonne « {column} ».",
     "Error occurred while deleting rows." : "Une erreur est survenue lors de la suppression de la ligne.",
     "_Delete row_::_Delete rows_" : ["Supprimer la ligne","Supprimer les lignes","Supprimer les lignes"],
     "_Are you sure you want to delete the selected row?_::_Are you sure you want to delete the %n selected rows?_" : ["Êtes-vous sûr de vouloir supprimer la ligne sélectionné ?","Êtes-vous sûr de vouloir supprimer les %n lignes sélectionnées ?","Êtes-vous sûr de vouloir supprimer les %n lignes sélectionnées ?"],

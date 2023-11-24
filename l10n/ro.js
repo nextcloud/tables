@@ -57,6 +57,7 @@ OC.L10N.register(
     "Error" : "Eroare",
     "Download" : "Descărcare",
     "Search" : "Căutare",
+    "Back" : "Înapoi",
     "Undo" : "Anulează ultima acțiune",
     "Code" : "Cod",
     "Prefix" : "Prefix",

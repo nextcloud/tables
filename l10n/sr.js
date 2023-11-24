@@ -364,6 +364,8 @@ OC.L10N.register(
     "Maximum" : "Максимум",
     "Prefix" : "Префикс",
     "Suffix" : "Суфикс",
+    "The default value is lower than the minimum allowed value." : "Подразумевана вредност је нижа од минималне дозвољене вредности.",
+    "The default value is greater than the maximum allowed value." : "Подразумевана вредност је већа од максималне дозвољене вредности.",
     "Default" : "Подразумевано",
     "Reduce stars" : "Умањи звездице",
     "Increase stars" : "Увећај звездице",
