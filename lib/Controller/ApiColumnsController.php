@@ -40,7 +40,7 @@ class ApiColumnsController extends AOCSController {
 	 * @param 'table'|'view' $nodeType Node type
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn[], array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
-	 * 200: View deleted
+	 * 200: Columns returned
 	 * 403: No permissions
 	 * 404: Not found
 	 */
