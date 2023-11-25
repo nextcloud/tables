@@ -45,6 +45,7 @@ OC.L10N.register(
     "Sort" : "Flokka",
     "Shared" : "Sameiginlegt",
     "User or group name …" : "Notandi eða heiti hóps …",
+    "No recommendations. Start typing." : "Engar tillögur. Byrjaðu að skrifa.",
     "Searching …" : "Leita …",
     "group" : "hópur",
     "Permissions" : "Heimildir",
