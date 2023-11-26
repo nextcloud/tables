@@ -60,6 +60,7 @@ OC.L10N.register(
     "Search" : "Căutare",
     "Back" : "Înapoi",
     "Undo" : "Anulează ultima acțiune",
+    "Redo" : "Repetă",
     "Code" : "Cod",
     "Prefix" : "Prefix",
     "Suffix" : "Sufix",

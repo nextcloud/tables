@@ -56,6 +56,7 @@ OC.L10N.register(
     "Read" : "Lesa",
     "Update" : "Uppfæra",
     "Manage" : "Skipuleggja",
+    "Clipboard is not available" : "Klippispjald er ekki tiltækt",
     "Error" : "Villa",
     "Download" : "Sækja",
     "Search" : "Search",
@@ -81,6 +82,7 @@ OC.L10N.register(
     "Content" : "Efni",
     "Preview" : "Forskoðun",
     "Select" : "Velja",
+    "Insert" : "Setja inn",
     "Unchecked" : "Ekki skoðað",
     "ID" : "ID"
 },

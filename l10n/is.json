@@ -54,6 +54,7 @@
     "Read" : "Lesa",
     "Update" : "Uppfæra",
     "Manage" : "Skipuleggja",
+    "Clipboard is not available" : "Klippispjald er ekki tiltækt",
     "Error" : "Villa",
     "Download" : "Sækja",
     "Search" : "Search",
@@ -79,6 +80,7 @@
     "Content" : "Efni",
     "Preview" : "Forskoðun",
     "Select" : "Velja",
+    "Insert" : "Setja inn",
     "Unchecked" : "Ekki skoðað",
     "ID" : "ID"
 },"pluralForm" :"nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);"

@@ -103,6 +103,7 @@ OC.L10N.register(
     "Content" : "内容",
     "Preview" : "プレビュー",
     "Select" : "選択",
+    "Insert" : "挿入する",
     "Unchecked" : "未チェック",
     "ID" : "ID"
 },
