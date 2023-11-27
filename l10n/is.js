@@ -47,6 +47,7 @@ OC.L10N.register(
     "User or group name …" : "Notandi eða heiti hóps …",
     "No recommendations. Start typing." : "Engar tillögur. Byrjaðu að skrifa.",
     "Searching …" : "Leita …",
+    "No elements found." : "Engin stök fundust.",
     "group" : "hópur",
     "Permissions" : "Heimildir",
     "No shares" : "Engar sameignir",
