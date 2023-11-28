@@ -250,7 +250,7 @@ OC.L10N.register(
     "Value parsing errors" : "Producíronse erros na análise dos valores",
     "Row creation errors" : "Producíronse erros na creación de filas",
     "Error during importing. Please read the logs for more information." : "Produciuse un erro durante a importación. Lea os rexistros para obter máis información.",
-    "Importing..." : "Importando…",
+    "Importing..." : "Importando...",
     "Please wait while we try our best to import your data. This might take some time, depending on the server configuration." : "Agarde mentres facemos todo o posíbel para importar os seus datos. Isto pode levar o seu tempo, dependendo da configuración do servidor.",
     "Loading table data" : "Cargando os datos da táboa",
     "Please select a file." : "Seleccione un ficheiro.",
