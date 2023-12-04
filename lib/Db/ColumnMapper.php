@@ -21,19 +21,25 @@ class ColumnMapper extends QBMapper {
 	}
 
 	/**
-	 * @param int $id
+	 * @param int|array<int> $id
 	 *
-	 * @return Column
+	 * @return Column|Column[]
 	 * @throws DoesNotExistException
 	 * @throws Exception
 	 * @throws MultipleObjectsReturnedException
 	 */
-	public function find(int $id): Column {
+	public function find($id) {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
-			->from($this->table)
-			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
-		return $this->findEntity($qb);
+			->from($this->table);
+
+		if(is_array($id)) {
+			$qb->where($qb->expr()->in('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT_ARRAY)));
+			return $this->findEntities($qb);
+		} else {
+			$qb->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
+			return $this->findEntity($qb);
+		}
 	}
 
 	/**

@@ -51,7 +51,7 @@ class TableMapper extends QBMapper {
 
 	/**
 	 * @param string|null $userId
-	 * @return array
+	 * @return Table[]
 	 * @throws Exception
 	 */
 	public function findAll(?string $userId = null): array {
