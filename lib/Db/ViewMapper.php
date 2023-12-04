@@ -47,7 +47,7 @@ class ViewMapper extends QBMapper {
 
 	/**
 	 * @param int|null $tableId
-	 * @return array
+	 * @return View[]
 	 * @throws Exception
 	 * @throws InternalError
 	 */
