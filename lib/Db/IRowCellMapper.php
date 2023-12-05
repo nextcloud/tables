@@ -18,7 +18,7 @@ interface IRowCellMapper {
 	 * @throws DoesNotExistException
 	 * @throws Exception
 	 */
-	public function findByRowAndColumn(int $rowId, int $columnId): IRowCell;
+	public function findByRowAndColumn(int $rowId, int $columnId): RowCellSuper;
 
 	public function getTableName(): string;
 
@@ -30,7 +30,7 @@ interface IRowCellMapper {
 
 	public function update(Entity $entity): Entity;
 
-	public function find(int $id): IRowCell;
+	public function find(int $id): RowCellSuper;
 
-	public function updateWrapper(IRowCell $cell): IRowCell;
+	public function updateWrapper(RowCellSuper $cell): RowCellSuper;
 }

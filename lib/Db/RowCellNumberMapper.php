@@ -5,7 +5,7 @@ namespace OCA\Tables\Db;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\IDBConnection;
 
-/** @template-extends QBMapper<Column> */
+/** @template-extends RowCellMapperSuper<RowCellNumber> */
 class RowCellNumberMapper extends RowCellMapperSuper implements IRowCellMapper {
 	protected string $table = 'tables_row_cells_number';
 
