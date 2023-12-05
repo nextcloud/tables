@@ -16,7 +16,7 @@ class Row2 implements JsonSerializable {
 
 	private bool $loaded = false; // set to true if model is loaded, after that changed column ids will be collected
 
-	public function getId(): int {
+	public function getId(): ?int {
 		return $this->id;
 	}
 	public function setId(int $id): void {

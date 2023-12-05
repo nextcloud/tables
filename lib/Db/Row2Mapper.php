@@ -96,7 +96,7 @@ class Row2Mapper {
 	 * @throws MultipleObjectsReturnedException
 	 * @throws Exception
 	 */
-	public function getTableIdForRow(int $rowId): int {
+	public function getTableIdForRow(int $rowId): ?int {
 		$rowSleeve = $this->rowSleeveMapper->find($rowId);
 		return $rowSleeve->getTableId();
 	}
@@ -330,7 +330,15 @@ class Row2Mapper {
 
 		$rows = [];
 		foreach ($data as $rowData) {
-			$this->parseModel($rowData, $rows[$rowData['row_id']]);
+			if (!isset($rowData['row_id'])) {
+				break;
+			}
+			$rowId = $rowData['row_id'];
+			if (!isset($rows[$rowId])) {
+				$rows[$rowId] = new Row2();
+			}
+			/* @var array $rowData */
+			$this->parseModel($rowData, $rows[$rowId]);
 		}
 
 		// format an array without keys
@@ -369,13 +377,13 @@ class Row2Mapper {
 
 	/**
 	 * @param Row2 $row
-	 * @param column[] $columns
+	 * @param Column[] $columns
 	 * @return Row2
 	 * @throws InternalError
 	 * @throws Exception
 	 */
 	public function insert(Row2 $row, array $columns): Row2 {
-		if(!$columns || count($columns) === 0) {
+		if(!$columns) {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': columns are missing');
 		}
 		$this->setColumns($columns);
@@ -396,7 +404,7 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	public function update(Row2 $row, array $columns): Row2 {
-		if(!$columns || count($columns) === 0) {
+		if(!$columns) {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': columns are missing');
 		}
 		$this->setColumns($columns);

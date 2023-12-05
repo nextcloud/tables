@@ -9,7 +9,10 @@ use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
-/** @template-extends QBMapper<Column> */
+/**
+ * @template-extends QBMapper<T>
+ * @template T of RowCellSuper
+ */
 class RowCellMapperSuper extends QBMapper implements IRowCellMapper {
 
 	public function __construct(IDBConnection $db, string $table, string $class) {
@@ -37,7 +40,7 @@ class RowCellMapperSuper extends QBMapper implements IRowCellMapper {
 	 * @throws DoesNotExistException
 	 * @throws Exception
 	 */
-	public function findByRowAndColumn(int $rowId, int $columnId): IRowCell {
+	public function findByRowAndColumn(int $rowId, int $columnId): RowCellSuper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->tableName)
@@ -52,7 +55,7 @@ class RowCellMapperSuper extends QBMapper implements IRowCellMapper {
 	 * @throws DoesNotExistException
 	 * @throws Exception
 	 */
-	public function find(int $id): IRowCell {
+	public function find(int $id): RowCellSuper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->tableName)
@@ -61,11 +64,11 @@ class RowCellMapperSuper extends QBMapper implements IRowCellMapper {
 	}
 
 	/**
+	 * @psalm-param T $cell
 	 * @throws Exception
 	 */
-	public function updateWrapper(IRowCell $cell): IRowCell	{
+	public function updateWrapper(RowCellSuper $cell): RowCellSuper	{
 		// TODO is this possible?
-		/** @var IRowCell $cell */
 		$cell = $this->update($cell);
 		return $cell;
 	}

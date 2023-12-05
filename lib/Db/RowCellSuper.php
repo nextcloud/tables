@@ -23,7 +23,7 @@ use OCP\AppFramework\Db\Entity;
  * @method getLastEditAt(): string
  * @method setLastEditAt(string $lastEditAt)
  */
-class RowCellSuper extends Entity implements JsonSerializable, IRowCell {
+abstract class RowCellSuper extends Entity implements JsonSerializable {
 	protected ?int $columnId = null;
 	protected ?int $rowId = null;
 	protected ?string $lastEditBy = null;
@@ -56,9 +56,5 @@ class RowCellSuper extends Entity implements JsonSerializable, IRowCell {
 
 	public function setValueWrapper($value) {
 		$this->setValue($value);
-	}
-
-	public function jsonSerialize() {
-		// has to be overwritten
 	}
 }

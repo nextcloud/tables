@@ -8,7 +8,7 @@ use OCP\AppFramework\Db\Entity;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
- * @method getTableId(): string
+ * @method getTableId(): ?int
  * @method setTableId(int $columnId)
  * @method getCreatedBy(): string
  * @method setCreatedBy(string $createdBy)
