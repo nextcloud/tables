@@ -98,7 +98,8 @@ Cypress.Commands.add('createTextLinkColumn', (title, ressourceProvider, firstCol
 	// deactivate unwanted provider
 	cy.get('.typeSelection span label').contains('Url', { matchCase: false }).click()
 	cy.get('.typeSelection span label').contains('Files').click()
-	cy.get('.typeSelection span label').contains('Contacts').click()
+	// TODO is the contacts search provider deactivated by default beginning with nc28
+	// cy.get('.typeSelection span label').contains('Contacts').click()
 
 	ressourceProvider.forEach(provider =>
 		cy.get('.typeSelection span label').contains(provider, { matchCase: false }).click(),
