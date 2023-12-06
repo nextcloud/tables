@@ -77,7 +77,7 @@ export default {
 	 methods: {
 		copyUrl() {
 			if (navigator?.clipboard) {
-				navigator.clipboard.writeText(this.webdavUrl).then(function() {
+				navigator.clipboard.writeText(this.apiEndpointUrl).then(function() {
 					showSuccess(t('files', 'Integration URL copied to clipboard'))
 				}, function(err) {
 					showError(t('files', 'Clipboard is not available'))
