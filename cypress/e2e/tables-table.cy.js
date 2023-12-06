@@ -30,7 +30,7 @@ describe('Manage a table', () => {
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('.action-button__text').contains('Edit table').click()
 
-		cy.get('.modal-container input').clear().type('ToDo list')
+		cy.get('.modal-container input').last().clear().type('ToDo list')
 		cy.get('.modal-container button').contains('Save').click()
 
 		cy.wait(10).get('.toastify.toast-success').should('be.visible')
