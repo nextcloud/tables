@@ -250,6 +250,7 @@ OC.L10N.register(
     "Delete table" : "Vymazať tabuľku",
     "Do you really want to delete the table \"{table}\"?" : "Naozaj chcete odstrániť tabuľku \"{table}\"?",
     "Duplicate view" : "Kopírovať zobrazenie",
+    "Copy" : "Kopírovať",
     "Could not configure new view" : "Nepodarilo sa nastaviť nové zobrazenie",
     "Filter tables" : "Filtrovať tabuľky",
     "My tables" : "Moje tabuľky",
