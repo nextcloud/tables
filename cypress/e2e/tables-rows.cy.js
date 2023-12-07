@@ -23,7 +23,7 @@ describe('Rows for a table', () => {
 		cy.get('.modal__content [aria-label="Increase stars"]').click().click()
 		cy.get('.modal-container button').contains('Save').click()
 
-		cy.get('.modal-container').should('not.be.visible')
+		cy.get('.modal-container:visible').should('not.exist')
 		cy.get('.custom-table table').contains('My first task').should('exist')
 	})
 
@@ -34,7 +34,7 @@ describe('Rows for a table', () => {
 		cy.get('.modal__content [aria-label="Increase stars"]').click().click()
 		cy.get('.modal-container button').contains('Save').click()
 
-		cy.get('.modal-container').should('not.be.visible')
+		cy.get('.modal-container:visible').should('not.exist')
 		cy.get('.custom-table table').contains('Changed column value').should('exist')
 	})
 
@@ -44,7 +44,7 @@ describe('Rows for a table', () => {
 		cy.get('.modal-container button').contains('Delete').click()
 		cy.get('.modal-container button').contains('I really want to delete this row!').click()
 
-		cy.get('.modal-container').should('not.be.visible')
+		cy.get('.modal-container:visible').should('not.exist')
 		cy.get('.custom-table table').contains('Changed column value').should('not.exist')
 	})
 })
