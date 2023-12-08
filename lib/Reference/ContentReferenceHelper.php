@@ -18,6 +18,7 @@ use OCP\Collaboration\Reference\IReference;
 use OCP\Collaboration\Reference\Reference;
 use OCP\IConfig;
 use OCP\IURLGenerator;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
 class ContentReferenceHelper extends ReferenceHelper {
@@ -30,8 +31,9 @@ class ContentReferenceHelper extends ReferenceHelper {
 		RowService $rowService,
 		LinkReferenceProvider $linkReferenceProvider,
 		?string $userId,
-		IConfig $config) {
-		parent::__construct($urlGenerator, $viewService, $tableService, $columnService, $rowService, $linkReferenceProvider, $userId, $config);
+		IConfig $config,
+		LoggerInterface $logger) {
+		parent::__construct($urlGenerator, $viewService, $tableService, $columnService, $rowService, $linkReferenceProvider, $userId, $config, $logger);
 	}
 
 	public function matchReference(string $referenceText, ?string $type = null): bool {

@@ -127,6 +127,7 @@ class ColumnService extends SuperService {
 	 */
 	public function find(int $id, string $userId = null): Column {
 		try {
+			/** @var Column $column */
 			$column = $this->mapper->find($id);
 
 			// security
@@ -247,7 +248,7 @@ class ColumnService extends SuperService {
 		$item->setType($type);
 		$item->setSubtype($subtype !== null ? $subtype: '');
 		$item->setMandatory($mandatory);
-		$item->setDescription($description);
+		$item->setDescription($description ?? '');
 		$item->setTextDefault($textDefault);
 		$item->setTextAllowedPattern($textAllowedPattern);
 		$item->setTextMaxLength($textMaxLength);
@@ -257,10 +258,7 @@ class ColumnService extends SuperService {
 		$item->setNumberDecimals($numberDecimals);
 		$item->setNumberPrefix($numberPrefix !== null ? $numberPrefix: '');
 		$item->setNumberSuffix($numberSuffix !== null ? $numberSuffix: '');
-		$item->setCreatedBy($userId);
-		$item->setLastEditBy($userId);
-		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
-		$item->setLastEditAt($time->format('Y-m-d H:i:s'));
+		$this->updateMetadata($item, $userId, true);
 		$item->setSelectionOptions($selectionOptions);
 		$item->setSelectionDefault($selectionDefault);
 		$item->setDatetimeDefault($datetimeDefault);
@@ -271,7 +269,7 @@ class ColumnService extends SuperService {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
-		if($viewId) {
+		if(isset($view) && $view) {
 			// Add columns to view(s)
 			$this->viewService->update($view->getId(), ['columns' => json_encode(array_merge($view->getColumnsArray(), [$entity->getId()]))], $userId, true);
 		}
@@ -343,6 +341,7 @@ class ColumnService extends SuperService {
 		?string $datetimeDefault
 	):Column {
 		try {
+			/** @var Column $item */
 			$item = $this->mapper->find($columnId);
 
 			// security
@@ -387,13 +386,40 @@ class ColumnService extends SuperService {
 			}
 			$item->setDatetimeDefault($datetimeDefault);
 
-			$time = new DateTime();
-			$item->setLastEditAt($time->format('Y-m-d H:i:s'));
-			$item->setLastEditBy($userId);
+			$this->updateMetadata($item, $userId);
 			return $this->enhanceColumn($this->mapper->update($item));
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
+		}
+	}
+
+	private function updateMetadata(Column $column, ?string $userId, bool $setCreateData = false): void	{
+		if ($userId) {
+			$column->setLastEditBy($userId);
+		} else {
+			if ($this->userId) {
+				$column->setLastEditBy($this->userId);
+			} else {
+				$e = new Exception('Could not update LastEditBy, no user id given.');
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+			}
+		}
+		$time = new DateTime();
+		$column->setLastEditAt($time->format('Y-m-d H:i:s'));
+
+		if ($setCreateData) {
+			$column->setCreatedAt($time->format('Y-m-d H:i:s'));
+			if ($userId) {
+				$column->setCreatedBy($userId);
+			} else {
+				if ($this->userId) {
+					$column->setCreatedBy($this->userId);
+				} else {
+					$e = new Exception('Could not update CreatedBy, no user id given.');
+					$this->logger->error($e->getMessage(), ['exception' => $e]);
+				}
+			}
 		}
 	}
 
@@ -408,6 +434,7 @@ class ColumnService extends SuperService {
 	 */
 	public function delete(int $id, bool $skipRowCleanup = false, ?string $userId = null): Column {
 		try {
+			/** @var Column $item */
 			$item = $this->mapper->find($id);
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
@@ -467,7 +494,16 @@ class ColumnService extends SuperService {
 		if($userId === null) {
 			$userId = $this->userId;
 		}
-		$allColumns = $viewId !== null ? $this->findAllByView($viewId, $userId) : $this->findAllByTable($tableId, null, $userId);
+		if ($viewId) {
+			$allColumns = $this->findAllByView($viewId, $userId);
+		} elseif ($tableId) {
+			$allColumns = $this->findAllByTable($tableId, null, $userId);
+		} else {
+			$e = new Exception('Either tableId nor viewId is given.');
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+
 		$i = -1;
 		foreach ($titles as $title) {
 			$i++;

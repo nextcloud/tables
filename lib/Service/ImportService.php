@@ -76,18 +76,22 @@ class ImportService extends SuperService {
 				throw new PermissionError('create columns at the view id = '.$viewId.' is not allowed.');
 			}
 			$this->viewId = $viewId;
-		} else {
+		} elseif ($tableId) {
 			$table = $this->tableService->find($tableId);
 			if (!$this->permissionsService->canCreateRows($table, 'table')) {
-				throw new PermissionError('create row at the view id = '.$viewId.' is not allowed.');
+				throw new PermissionError('create row at the view id = '. (string) $viewId .' is not allowed.');
 			}
 			if ($createMissingColumns && !$this->permissionsService->canManageTable($table)) {
-				throw new PermissionError('create columns at the view id = '.$viewId.' is not allowed.');
+				throw new PermissionError('create columns at the view id = '. (string) $viewId .' is not allowed.');
 			}
 			$this->tableId = $tableId;
+		} else {
+			$e = new \Exception('Neither tableId nor viewId is given.');
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 
-		if ($this->userManager->get($this->userId) === null) {
+		if ($this->userId === null || $this->userManager->get($this->userId) === null) {
 			$error = 'No user in context, can not import data. Cancel.';
 			$this->logger->debug($error);
 			throw new InternalError($error);

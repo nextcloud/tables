@@ -445,7 +445,7 @@ class ViewService extends SuperService {
 	 * @param int $limit
 	 * @param int $offset
 	 * @param string|null $userId
-	 * @return array
+	 * @return View[]
 	 */
 	public function search(string $term, int $limit = 100, int $offset = 0, ?string $userId = null): array {
 		try {

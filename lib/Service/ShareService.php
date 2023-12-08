@@ -21,6 +21,7 @@ use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
+use OCP\DB\Exception;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -50,6 +51,7 @@ class ShareService extends SuperService {
 
 	/**
 	 * @throws InternalError
+	 * @return Share[]
 	 */
 	public function findAll(string $nodeType, int $nodeId, ?string $userId = null, bool $enhanceShares = true): array {
 		$userId = $this->permissionsService->preCheckUserId($userId);
@@ -57,7 +59,7 @@ class ShareService extends SuperService {
 		try {
 			$shares = $this->mapper->findAllSharesForNode($nodeType, $nodeId, $userId);
 			return $enhanceShares ? $this->addReceiverDisplayNames($shares) : $shares;
-		} catch (\OCP\DB\Exception $e) {
+		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
 		}
@@ -91,7 +93,7 @@ class ShareService extends SuperService {
 		} catch (DoesNotExistException $e) {
 			$this->logger->warning($e->getMessage());
 			throw new NotFoundError($e->getMessage());
-		} catch (MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
+		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
 		}
@@ -118,13 +120,12 @@ class ShareService extends SuperService {
 	/**
 	 * @throws InternalError
 	 */
-	private function findElementsSharedWithMe(?string $elementType = 'table', ?string $userId = null): array {
+	private function findElementsSharedWithMe(string $elementType = 'table', ?string $userId = null): array {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		$returnArray = [];
 
 		try {
-			/** @var string $userId */
 			// get all views or tables that are shared with me as user
 			$elementsSharedWithMe = $this->mapper->findAllSharesFor($elementType, $userId, $userId);
 
@@ -134,7 +135,7 @@ class ShareService extends SuperService {
 				$shares = $this->mapper->findAllSharesFor($elementType, $userGroup->getGid(), $userId, 'group');
 				$elementsSharedWithMe = array_merge($elementsSharedWithMe, $shares);
 			}
-		} catch (\OCP\DB\Exception $e) {
+		} catch (Exception $e) {
 			throw new InternalError($e->getMessage());
 		}
 		foreach ($elementsSharedWithMe as $share) {
@@ -151,7 +152,7 @@ class ShareService extends SuperService {
 				if (!$index) {
 					$returnArray[] = $element;
 				}
-			} catch (DoesNotExistException|\OCP\DB\Exception|MultipleObjectsReturnedException $e) {
+			} catch (DoesNotExistException|Exception|MultipleObjectsReturnedException $e) {
 				throw new InternalError($e->getMessage());
 			}
 		}
@@ -161,12 +162,12 @@ class ShareService extends SuperService {
 
 	/**
 	 * @param int $elementId
-	 * @param string|null $elementType
+	 * @param 'table'|'view' $elementType
 	 * @param string|null $userId
 	 * @return array
 	 * @throws NotFoundError
 	 */
-	public function getSharedPermissionsIfSharedWithMe(int $elementId, ?string $elementType = 'table', ?string $userId = null): array {
+	public function getSharedPermissionsIfSharedWithMe(int $elementId, string $elementType = 'table', ?string $userId = null): array {
 		try {
 			$userId = $this->permissionsService->preCheckUserId($userId);
 		} catch (InternalError $e) {
@@ -190,6 +191,11 @@ class ShareService extends SuperService {
 	 * @throws InternalError
 	 */
 	public function create(int $nodeId, string $nodeType, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage):Share {
+		if (!$this->userId) {
+			$e = new \Exception('No user given.');
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
 		// TODO Do we need to check if create is allowed for requested nodeId?!
 		// should also return not found if share_node could not be found
 		// should also return no permission if sender don't have permission to create a share for node
@@ -209,7 +215,7 @@ class ShareService extends SuperService {
 		$item->setLastEditAt($time->format('Y-m-d H:i:s'));
 		try {
 			$newShare = $this->mapper->insert($item);
-		} catch (\OCP\DB\Exception $e) {
+		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
 		}
@@ -231,7 +237,7 @@ class ShareService extends SuperService {
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
-		} catch (MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
+		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
@@ -267,7 +273,7 @@ class ShareService extends SuperService {
 
 		try {
 			$share = $this->mapper->update($item);
-		} catch (\OCP\DB\Exception $e) {
+		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
@@ -287,7 +293,7 @@ class ShareService extends SuperService {
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
-		} catch (MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
+		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
@@ -299,7 +305,7 @@ class ShareService extends SuperService {
 
 		try {
 			$this->mapper->delete($item);
-		} catch (\OCP\DB\Exception $e) {
+		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
@@ -332,7 +338,7 @@ class ShareService extends SuperService {
 	public function deleteAllForTable(Table $table):void {
 		try {
 			$this->mapper->deleteByNode($table->getId(), 'table');
-		} catch (\OCP\DB\Exception $e) {
+		} catch (Exception $e) {
 			$this->logger->error('something went wrong while deleting shares for table: '.$table->getId());
 		}
 	}
@@ -340,7 +346,7 @@ class ShareService extends SuperService {
 	public function deleteAllForView(View $view):void {
 		try {
 			$this->mapper->deleteByNode($view->getId(), 'view');
-		} catch (\OCP\DB\Exception $e) {
+		} catch (Exception $e) {
 			$this->logger->error('something went wrong while deleting shares for view: '.$view->getId());
 		}
 	}
@@ -358,7 +364,7 @@ class ShareService extends SuperService {
 			$share->setSender($newOwnerUserId);
 			try {
 				$this->mapper->update($share);
-			} catch (\OCP\DB\Exception $e) {
+			} catch (Exception $e) {
 				$this->logger->warning("Could not update share to change the sender: ".$e->getMessage(), ['exception' => $e]);
 				throw new InternalError("Could not update share to change the sender");
 			}
