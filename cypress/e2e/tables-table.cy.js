@@ -17,6 +17,7 @@ describe('Manage a table', () => {
 		cy.contains('.app-menu-entry--label', 'Tables').click()
 		cy.contains('button', 'Create new table').click()
 		cy.get('.tile').contains('ToDo').click({ force: true })
+		cy.get('.modal__content').should('be.visible')
 		cy.get('.modal__content input[type="text"]').clear().type('to do list')
 		cy.contains('button', 'Create table').click()
 
@@ -30,7 +31,8 @@ describe('Manage a table', () => {
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('.action-button__text').contains('Edit table').click()
 
-		cy.get('.modal-container input').clear().type('ToDo list')
+		cy.get('.modal__content').should('be.visible')
+		cy.get('.modal-container input').last().clear().type('ToDo list')
 		cy.get('.modal-container button').contains('Save').click()
 
 		cy.wait(10).get('.toastify.toast-success').should('be.visible')
@@ -42,6 +44,7 @@ describe('Manage a table', () => {
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('.action-button__text').contains('Edit table').click()
 
+		cy.get('.modal__content').should('be.visible')
 		cy.get('.modal-container button').contains('Delete').click()
 		cy.get('.modal-container button').contains('I really want to delete this table!').click()
 
