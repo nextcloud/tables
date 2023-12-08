@@ -13,6 +13,11 @@ class RowCellNumberMapper extends RowCellMapperSuper implements IRowCellMapper {
 		parent::__construct($db, $this->table, RowCellNumber::class);
 	}
 
+	/**
+	 * @param Column $column
+	 * @param $value
+	 * @return float|int|null
+	 */
 	public function parseValueOutgoing(Column $column, $value) {
 		if($value === '') {
 			return null;

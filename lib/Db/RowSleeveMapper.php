@@ -9,7 +9,7 @@ use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
-/** @template-extends QBMapper<Column> */
+/** @template-extends QBMapper<RowSleeve> */
 class RowSleeveMapper extends QBMapper {
 	protected string $table = 'tables_row_sleeves';
 
