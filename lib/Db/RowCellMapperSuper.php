@@ -8,6 +8,7 @@ use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
+use phpDocumentor\Reflection\Types\ClassString;
 
 /**
  * @template-extends QBMapper<T>
@@ -15,10 +16,15 @@ use OCP\IDBConnection;
  */
 class RowCellMapperSuper extends QBMapper implements IRowCellMapper {
 
-	public function __construct(IDBConnection $db, string $table, string $class) {
+	public function __construct(IDBConnection $db, string $table, ClassString $class) {
 		parent::__construct($db, $table, $class);
 	}
 
+	/**
+	 * @param Column $column
+	 * @param mixed $value
+	 * @return mixed
+	 */
 	public function parseValueOutgoing(Column $column, $value) {
 		return $value;
 	}
@@ -26,7 +32,7 @@ class RowCellMapperSuper extends QBMapper implements IRowCellMapper {
 	/**
 	 * @throws Exception
 	 */
-	public function deleteAllForRow(int $rowId) {
+	public function deleteAllForRow(int $rowId): void {
 		$qb = $this->db->getQueryBuilder();
 		$qb->delete($this->tableName)
 			->where(
@@ -64,7 +70,7 @@ class RowCellMapperSuper extends QBMapper implements IRowCellMapper {
 	}
 
 	/**
-	 * @psalm-param T $cell
+	 * @psalm-param RowCellSuper $cell
 	 * @throws Exception
 	 */
 	public function updateWrapper(RowCellSuper $cell): RowCellSuper	{

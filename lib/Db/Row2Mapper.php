@@ -446,7 +446,7 @@ class Row2Mapper {
 	 * Updates the last_edit_by and last_edit_at data
 	 * optional adds the created_by and created_at data
 	 *
-	 * @param RowSleeve|IRowCell $entity
+	 * @param RowSleeve|RowCellSuper $entity
 	 * @param bool $setCreate
 	 * @return void
 	 */
@@ -467,7 +467,7 @@ class Row2Mapper {
 	 */
 	private function insertCell(int $rowId, int $columnId, string $value): void {
 		$cellClassName = 'OCA\Tables\Db\RowCell'.ucfirst($this->columns[$columnId]->getType());
-		/** @var IRowCell $cell */
+		/** @var RowCellSuper $cell */
 		$cell = new $cellClassName();
 
 		$cell->setRowIdWrapper($rowId);
@@ -493,11 +493,11 @@ class Row2Mapper {
 	}
 
 	/**
-	 * @param IRowCell $cell
+	 * @param RowCellSuper $cell
 	 * @param IRowCellMapper $mapper
 	 * @param mixed $value the value should be parsed to the correct format within the row service
 	 */
-	private function updateCell(IRowCell $cell, IRowCellMapper $mapper, $value): void {
+	private function updateCell(RowCellSuper $cell, IRowCellMapper $mapper, $value): void {
 		$cell->setValueWrapper($value);
 		$this->updateMetaData($cell);
 		$mapper->updateWrapper($cell);
@@ -537,6 +537,7 @@ class Row2Mapper {
 
 	/**
 	 * @throws InternalError
+	 * @return mixed
 	 */
 	private function formatValue(Column $column, string $value) {
 		$cellMapperClassName = 'OCA\Tables\Db\RowCell'.ucfirst($column->getType()).'Mapper';
