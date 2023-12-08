@@ -8,7 +8,6 @@ use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
-use phpDocumentor\Reflection\Types\ClassString;
 
 /**
  * @template-extends QBMapper<T>
@@ -16,7 +15,7 @@ use phpDocumentor\Reflection\Types\ClassString;
  */
 class RowCellMapperSuper extends QBMapper implements IRowCellMapper {
 
-	public function __construct(IDBConnection $db, string $table, ClassString $class) {
+	public function __construct(IDBConnection $db, string $table, string $class) {
 		parent::__construct($db, $table, $class);
 	}
 

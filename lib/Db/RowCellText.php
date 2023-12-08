@@ -2,6 +2,7 @@
 
 namespace OCA\Tables\Db;
 
+/** @template-extends RowCellSuper<RowCellText> */
 class RowCellText extends RowCellSuper {
 	protected ?string $value = null;
 
