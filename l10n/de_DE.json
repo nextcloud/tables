@@ -1,5 +1,5 @@
 { "translations": {
-    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administrator." : "Ein unerwarteter Fehler ist aufgetreten. Weitere Details finden Sie in den Protokollen. Bitte wenden Sie sich an Ihre Administration.",
+    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administrator." : "Es ist ein unerwarteter Fehler aufgetreten. Weitere Details finden Sie in den Protokollen. Bitte wenden Sie sich an Ihre Administration.",
     "An permission error occurred. More details can be found in the logs. Please reach out to your administrator." : "Es ist ein Berechtigungsfehler aufgetreten. Weitere Details finden Sie in den Protokollen. Bitte wenden Sie sich an Ihre Administration.",
     "An not found error occurred. More details can be found in the logs. Please reach out to your administrator." : "Es ist ein „Nicht gefunden“-Fehler aufgetreten. Weitere Details finden Sie in den Protokollen. Bitte wenden Sie sich an Ihre Administration.",
     "Could not create row." : "Zeile konnte nicht erstellt werden.",
