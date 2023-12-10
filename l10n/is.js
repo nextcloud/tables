@@ -63,6 +63,7 @@ OC.L10N.register(
     "Error" : "Villa",
     "Download" : "Sækja",
     "Search" : "Search",
+    "Back" : "Til baka",
     "Sorting" : "Röðun",
     "Undo" : "Afturkalla",
     "Redo" : "Endurtaka",
