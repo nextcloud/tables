@@ -44,6 +44,7 @@ OC.L10N.register(
     "Please select a file." : "Veldu skrá.",
     "Filter" : "Sía",
     "Sort" : "Flokka",
+    "Copy" : "Afrita",
     "Shared" : "Sameiginlegt",
     "Clear filter" : "Hreinsa síu",
     "User or group name …" : "Notandi eða heiti hóps …",
