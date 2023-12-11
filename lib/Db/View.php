@@ -112,9 +112,9 @@ class View extends Entity implements JsonSerializable {
 
 	/**
 	 * @psalm-suppress MismatchingDocblockReturnType
-	 * @return array{create: bool,delete: bool,manage: bool,read: bool,update: bool}|null
+	 * @return array{create: bool, delete: bool, manage: bool, read: bool, update: bool}|null
 	 */
-	private function getSharePermissions(): array {
+	private function getSharePermissions(): ?array {
 		return $this->getOnSharePermissions();
 	}
 
