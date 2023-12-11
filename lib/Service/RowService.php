@@ -122,6 +122,12 @@ class RowService extends SuperService {
 	 * @throws InternalError
 	 */
 	public function create(?int $tableId, ?int $viewId, array $data):Row {
+		if ($this->userId === null || $this->userId === '') {
+			$e = new \Exception('No user id in context, but needed.');
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+
 		if ($viewId) {
 			try {
 				$view = $this->viewMapper->find($viewId);
@@ -165,7 +171,11 @@ class RowService extends SuperService {
 		$time = new DateTime();
 		$item = new Row();
 		$item->setDataArray($data);
-		$item->setTableId($viewId ? $view->getTableId() : $tableId);
+		if ($tableId) {
+			$item->setTableId($tableId);
+		} elseif (isset($view) && $view) {
+			$item->setTableId($view->getTableId());
+		}
 		$item->setCreatedBy($this->userId);
 		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
 		$item->setLastEditBy($this->userId);
@@ -178,7 +188,7 @@ class RowService extends SuperService {
 	 * @param Column[] $columns
 	 * @param int|null $tableId
 	 * @param int|null $viewId
-	 * @return list<array{columnId: int, value: float|int|string}>
+	 * @return list<array{columnId: int, value: float|int|string|null}>
 	 *
 	 * @throws InternalError
 	 */
@@ -194,11 +204,16 @@ class RowService extends SuperService {
 				throw new InternalError('Column with id '.$entry['columnId'].' is not part of table with id '.$tableId);
 			}
 
+			if (!$column) {
+				$e = new \Exception('No column found, can not parse value.');
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			}
+
 			// parse given value to respect the column type value format
-			$value = $this->parseValueByColumnType($column, $entry['value']);
 			$out[] = [
 				'columnId' => (int) $entry['columnId'],
-				'value' => $value
+				'value' => $this->parseValueByColumnType($column, $entry['value'])
 			];
 		}
 		return $out;
@@ -207,7 +222,7 @@ class RowService extends SuperService {
 	/**
 	 * @param Column $column
 	 * @param string|array|int|float|bool|null $value
-	 * @return string|int|float
+	 * @return string|int|float|null
 	 */
 	private function parseValueByColumnType(Column $column, $value = null) {
 		try {
@@ -215,15 +230,14 @@ class RowService extends SuperService {
 			$businessClassName .= ucfirst($column->getType()).ucfirst($column->getSubtype()).'Business';
 			/** @var IColumnTypeBusiness $columnBusiness */
 			$columnBusiness = Server::get($businessClassName);
-			if(!$columnBusiness->canBeParsed($value, $column)) {
-				$this->logger->warning('Value '.$value.' could not be parsed for column '.$column->getTitle());
-				return (string)$value;
+			if($columnBusiness->canBeParsed($value, $column)) {
+				return json_decode($columnBusiness->parseValue($value, $column));
 			}
-			return json_decode($columnBusiness->parseValue($value, $column));
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 			$this->logger->debug('Column type business class not found', ['exception' => $e]);
 		}
-		return (string) $value;
+		$this->logger->warning('Value could not be parsed for column '.$column->getTitle(), [$value]);
+		return null;
 	}
 
 	/**
@@ -328,7 +342,7 @@ class RowService extends SuperService {
 		}
 
 		$item->setDataArray($oldData);
-		$item->setLastEditBy($this->userId);
+		$item->setLastEditBy($userId);
 		$item->setLastEditAt($time->format('Y-m-d H:i:s'));
 		try {
 			return $this->mapper->update($item);

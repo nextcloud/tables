@@ -62,7 +62,9 @@ class ContentReferenceHelper extends ReferenceHelper {
 		return $noIndexMatchTable || $indexMatchTable || $noIndexMatchView || $indexMatchView;
 	}
 
-	/** @psalm-suppress InvalidReturnType */
+	/** @psalm-suppress InvalidReturnType
+	 * @noinspection DuplicatedCode
+	 */
 	public function resolveReference(string $referenceText): ?IReference {
 		if ($this->matchReference($referenceText)) {
 			if($this->matchReference($referenceText, 'table')) {
@@ -70,7 +72,7 @@ class ContentReferenceHelper extends ReferenceHelper {
 			} elseif ($this->matchReference($referenceText, 'view')) {
 				$elementId = $this->getViewIdFromLink($referenceText);
 			}
-			if ($elementId === null || $this->userId === null) {
+			if (!isset($elementId) || $this->userId === null) {
 				// fallback to opengraph if it matches, but somehow we can't resolve
 				/** @psalm-suppress InvalidReturnStatement */
 				return $this->linkReferenceProvider->resolveReference($referenceText);
@@ -80,6 +82,10 @@ class ContentReferenceHelper extends ReferenceHelper {
 					$element = $this->tableService->find($elementId, false, $this->userId);
 				} elseif ($this->matchReference($referenceText, 'view')) {
 					$element = $this->viewService->find($elementId, false, $this->userId);
+				} else {
+					$e = new Exception('Could not map '.$referenceText.' to any known type.');
+					$this->logger->error($e->getMessage(), ['exception' => $e]);
+					throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 				}
 			} catch (Exception | Throwable $e) {
 				/** @psalm-suppress InvalidReturnStatement */
@@ -98,7 +104,7 @@ class ContentReferenceHelper extends ReferenceHelper {
 				$referenceInfo['title'] = $element->getTitle();
 			}
 
-			$reference->setDescription($element->getOwnerDisplayName() ?? $element->getOwnership());
+			$reference->setDescription($element->getOwnerDisplayName() ? $element->getOwnerDisplayName() : $element->getOwnership());
 
 			$referenceInfo['ownership'] = $element->getOwnership();
 			$referenceInfo['ownerDisplayName'] = $element->getOwnerDisplayName();

@@ -394,7 +394,7 @@ class ColumnService extends SuperService {
 		}
 	}
 
-	private function updateMetadata(Column $column, ?string $userId, bool $setCreateData = false): void	{
+	private function updateMetadata(Column $column, ?string $userId, bool $setCreateData = false): void {
 		if ($userId) {
 			$column->setLastEditBy($userId);
 		} else {

@@ -79,7 +79,7 @@ class ViewMapper extends QBMapper {
 		$shareTableQuery = $this->db->getQueryBuilder();
 		$shareQueryViewsSharedViaUser = $this->db->getQueryBuilder();
 		$shareQueryViewsSharedViaGroup = $this->db->getQueryBuilder();
-		$userGroups = $this->userHelper->getGroupIdsForUser($userId);
+		$userGroups = $userId ? $this->userHelper->getGroupIdsForUser($userId) : null;
 
 		// get view ids, that are shared with the given user
 		// only makes sense if a user is given, otherwise will always get all shares doubled

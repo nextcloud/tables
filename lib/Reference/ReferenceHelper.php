@@ -88,7 +88,7 @@ class ReferenceHelper {
 				$elementId = $this->getViewIdFromLink($referenceText);
 			}
 
-			if ($elementId === null || $this->userId === null) {
+			if (!isset($elementId) || $this->userId === null) {
 				// fallback to opengraph if it matches, but somehow we can't resolve
 				/** @psalm-suppress InvalidReturnStatement */
 				return $this->linkReferenceProvider->resolveReference($referenceText);
