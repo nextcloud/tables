@@ -84,13 +84,13 @@ class View extends Entity implements JsonSerializable {
 
 	/**
 	 * @psalm-suppress MismatchingDocblockReturnType
-	 * @return array{array-key, array{columnId: int, operator: 'begins-with'|'contains'|'ends-with'|'is-empty'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal', value: float|int|string}}|null
+	 * @return array<array-key,array{columnId: int, operator: 'begins-with'|'contains'|'ends-with'|'is-empty'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal', value: float|int|string}>|null
 	 */
 	public function getFilterArray():array {
 		return $this->getArray($this->getFilter());
 	}
 
-	private function getArray(?string $json) {
+	private function getArray(?string $json): array {
 		if ($json !== "" && $json !== null && $json !== 'null') {
 			return \json_decode($json, true);
 		} else {

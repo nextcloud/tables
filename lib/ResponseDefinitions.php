@@ -37,7 +37,7 @@ namespace OCA\Tables;
  * @psalm-type TablesTable = array{
  * 	id: int,
  * 	title: string,
- * 	emoji: string,
+ * 	emoji: string|null,
  * 	ownership: string,
  * 	ownerDisplayName: string,
  * 	createdBy: string,
@@ -55,6 +55,7 @@ namespace OCA\Tables;
  *  hasShares: bool,
  *  rowsCount: int,
  *  views: TablesView[],
+ *  columnsCount: int,
  * }
  *
  * @psalm-type TablesIndex = array{

@@ -71,7 +71,7 @@ class TableMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$shareQueryTablesSharedViaUser = $this->db->getQueryBuilder();
 		$shareQueryTablesSharedViaGroup = $this->db->getQueryBuilder();
-		$userGroups = $this->userHelper->getGroupIdsForUser($userId);
+		$userGroups = $userId ? $this->userHelper->getGroupIdsForUser($userId) : null;
 
 		// get table ids, that are shared with the given user
 		// only makes sense if a user is given, otherwise will always get all shares doubled
