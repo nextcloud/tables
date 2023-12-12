@@ -92,7 +92,7 @@ class Table extends Entity implements JsonSerializable {
 	 * @psalm-suppress MismatchingDocblockReturnType
 	 * @return array{read: bool, create: bool, update: bool, delete: bool, manage: bool}|null
 	 */
-	private function getSharePermissions(): array {
+	private function getSharePermissions(): ?array {
 		return $this->onSharePermissions;
 	}
 
@@ -101,6 +101,6 @@ class Table extends Entity implements JsonSerializable {
 	 * @return TablesView[]
 	 */
 	private function getViewsArray(): array {
-		return $this->getViews();
+		return $this->getViews() ?: [];
 	}
 }
