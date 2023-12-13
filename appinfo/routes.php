@@ -18,6 +18,7 @@ return [
 		['name' => 'api1#index', 'url' => '/api/1/tables', 'verb' => 'GET'],
 		['name' => 'api1#createTable',	'url' => '/api/1/tables', 'verb' => 'POST'],
 		['name' => 'api1#updateTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'PUT'],
+		['name' => 'api1#transferTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'PUT'],
 		['name' => 'api1#getTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'GET'],
 		['name' => 'api1#deleteTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'DELETE'],
 		// -> views

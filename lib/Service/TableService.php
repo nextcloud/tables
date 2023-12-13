@@ -336,6 +336,43 @@ class TableService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
+	public function transfer(int $id, string $newOwnerUserId, string $userId): Table {
+		$userId = $this->permissionsService->preCheckUserId($userId);
+
+		try {
+			$table = $this->mapper->find($id);
+		} catch (DoesNotExistException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		} catch (MultipleObjectsReturnedException|OcpDbException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+
+		try {
+			$this->setOwner($id, $newOwnerUserId, $userId);
+		}
+		catch(PermissionError|InternalError $e){
+			throw new PermissionError('PermissionError: can not transfer table with id '.$id);
+		} 
+		catch (DoesNotExistException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		} catch (MultipleObjectsReturnedException|OcpDbException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+		return $table;
+	}
+
+	/**
+	 * @param int $id
+	 * @param null|string $userId
+	 * @return Table
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
 	public function delete(int $id, ?string $userId = null): Table {
 		$userId = $this->permissionsService->preCheckUserId($userId); // assume that $userId is set or ''
 
