@@ -2,6 +2,9 @@ import { getCurrentUser } from '@nextcloud/auth'
 
 export default {
 	methods: {
+		ownsTable(element) {
+			return element?.ownership === getCurrentUser().uid
+		},
 		// views have the flag manageTable set if the user has manage rights for the corresponding table
 		canManageTable(element) {
 			if (!element.isShared) {
