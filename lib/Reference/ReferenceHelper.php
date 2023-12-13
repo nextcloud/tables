@@ -99,7 +99,7 @@ class ReferenceHelper {
 				} elseif ($this->matchReference($referenceText, 'view')) {
 					$element = $this->viewService->find($elementId, false, $this->userId);
 				} else {
-					$e = new Exception('Either table nor view is given.');
+					$e = new Exception('Neither table nor view is given.');
 					$this->logger->error($e->getMessage(), ['exception' => $e]);
 					throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 				}
