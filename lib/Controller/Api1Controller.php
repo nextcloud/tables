@@ -197,33 +197,6 @@ class Api1Controller extends ApiController {
 	}
 
 	/**
-	 * Transfer table from one user to another
-	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
-	 * @param int $tableId Table ID
-	 * @param string $newOwnerUserId New user ID 
-	 * @param string $userId Current user ID 
-	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
-	 *
-	 */
-	public function transferTable(int $tableId, int $newOwnerUserId, int $userId): DataResponse {
-		try {
-			return new DataResponse($this->tableService->transfer($tableId, $newOwnerUserId, $userId)->jsonSerialize());
-		} catch (PermissionError $e) {
-			$this->logger->warning('A permission error occurred: ' . $e->getMessage());
-			$message = ['message' => $e->getMessage()];
-			return new DataResponse($message, Http::STATUS_FORBIDDEN);
-		} catch (InternalError|Exception $e) {
-			$this->logger->warning('An internal error or exception occurred: '.$e->getMessage());
-			$message = ['message' => $e->getMessage()];
-			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
-		}
-	}
-
-	/**
 	 * Delete a table
 	 *
 	 * @NoAdminRequired
