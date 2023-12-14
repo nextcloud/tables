@@ -508,7 +508,12 @@ class PermissionsService {
 		return $element->getOwnership() === $userId;
 	}
 
-	public function canChangeElementOwner(string $userId): bool {
-		return $userId === '';
+	/**
+	 * @param View|Table $element
+	 * @param string $userId
+	 * @return bool
+	 */
+	public function canChangeElementOwner($element, string $userId): bool {
+		return $userId === '' || $this->userIsElementOwner($element, $userId);
 	}
 }

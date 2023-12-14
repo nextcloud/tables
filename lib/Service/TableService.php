@@ -5,7 +5,6 @@
 namespace OCA\Tables\Service;
 
 use DateTime;
-use Exception;
 
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
@@ -287,56 +286,19 @@ class TableService extends SuperService {
 	}
 
 	/**
-	 * @throws InternalError
-	 */
-	public function setOwner(int $id, string $newOwnerUserId, ?string $userId = null): array {
-		$userId = $this->permissionsService->preCheckUserId($userId);
-
-		try {
-			$table = $this->mapper->find($id);
-
-			// security
-			if (!$this->permissionsService->canChangeElementOwner($userId)) {
-				throw new PermissionError('PermissionError: can not change table owner with table id '.$id);
-			}
-
-			$table->setOwnership($newOwnerUserId);
-			$table = $this->mapper->update($table);
-
-			// also change owners of related shares
-			$updatedShares = $this->shareService->changeSenderForNode('table', $id, $newOwnerUserId, $userId);
-			$updatesSharesOutput = [];
-			foreach ($updatedShares as $share) {
-				$updatesSharesOutput[] = [
-					'shareId' => $share->getId(),
-					'nodeType' => $share->getNodeType(),
-					'sender' => $share->getSender(),
-					'receiverType' => $share->getReceiverType(),
-					'receiver' => $share->getReceiver()
-				];
-			}
-
-			return [
-				'tableId' => $table->getId(),
-				'title' => $table->getTitle(),
-				'ownership' => $table->getOwnership(),
-				'updatedShares' => $updatesSharesOutput
-			];
-		} catch (Exception $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError($e->getMessage());
-		}
-	}
-
-	/**
+	 * Set a new owner for a table and adjust all related ressources
+	 *
 	 * @param int $id
-	 * @param null|string $userId
+	 * @param string $newOwnerUserId
+	 * @param string|null $userId
+	 *
 	 * @return Table
+	 *
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function transfer(int $id, string $newOwnerUserId, string $userId): Table {
+	public function setOwner(int $id, string $newOwnerUserId, ?string $userId = null): Table {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
@@ -349,19 +311,28 @@ class TableService extends SuperService {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 
-		try {
-			$this->setOwner($id, $newOwnerUserId, $userId);
+		// security
+		if (!$this->permissionsService->canChangeElementOwner($table, $userId)) {
+			throw new PermissionError('PermissionError: can not change table owner with table id '.$id);
 		}
-		catch(PermissionError|InternalError $e){
-			throw new PermissionError('PermissionError: can not transfer table with id '.$id);
-		} 
-		catch (DoesNotExistException $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
-		} catch (MultipleObjectsReturnedException|OcpDbException $e) {
+
+		$table->setOwnership($newOwnerUserId);
+		try {
+			$table = $this->mapper->update($table);
+		} catch (OcpDbException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
+
+		// change owners of related shares
+		try {
+			$this->shareService->changeSenderForNode('table', $id, $newOwnerUserId, $userId);
+		} catch (InternalError $e) {
+			$this->logger->error('Could not update related shares for a table transfer!');
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+
 		return $table;
 	}
 
