@@ -371,21 +371,28 @@ class ViewService extends SuperService {
 		if($view->getIsShared()) {
 			// Remove detailed view filtering and sorting information if necessary
 			if(!$view->getOnSharePermissions()['manageTable']) {
-				$view->setFilterArray(
-					array_map(function ($filterGroup) {
-						// Instead of filter just indicate that there is a filter, but hide details
-						return array_map(null, $filterGroup);
-					},
-						$view->getFilterArray()));
-				$view->setSortArray(
-					array_map(function ($sortRule) use ($view) {
-						if(in_array($sortRule["columnId"], $view->getColumnsArray())) {
-							return $sortRule;
-						}
-						// Instead of sort rule just indicate that there is a rule, but hide details
-						return null;
-					},
-						$view->getSortArray()));
+				$rawFilterArray = $view->getFilterArray();
+				if($rawFilterArray) {
+					$view->setFilterArray(
+						array_map(function ($filterGroup) {
+							// Instead of filter just indicate that there is a filter, but hide details
+							return array_map(null, $filterGroup);
+						},
+							$rawFilterArray));
+				}
+				$rawSortArray = $view->getSortArray();
+				if($rawSortArray) {
+					$view->setSortArray(
+						array_map(function ($sortRule) use ($view) {
+							$columnsArray = $view->getColumnsArray();
+							if(isset($sortRule['columnId']) && $columnsArray && in_array($sortRule['columnId'], $columnsArray)) {
+								return $sortRule;
+							}
+							// Instead of sort rule just indicate that there is a rule, but hide details
+							return null;
+						},
+							$rawSortArray));
+				}
 			}
 		}
 	}
@@ -445,7 +452,7 @@ class ViewService extends SuperService {
 	 * @param int $limit
 	 * @param int $offset
 	 * @param string|null $userId
-	 * @return array
+	 * @return View[]
 	 */
 	public function search(string $term, int $limit = 100, int $offset = 0, ?string $userId = null): array {
 		try {

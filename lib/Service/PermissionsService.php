@@ -95,18 +95,18 @@ class PermissionsService {
 		return $this->canManageTable($table, $userId);
 	}
 
-	public function canAccessView($view, ?string $userId = null): bool {
+	public function canAccessView(View $view, ?string $userId = null): bool {
 		if($this->basisCheck($view, 'view', $userId)) {
 			return true;
 		}
 
-		try {
-			$this->getSharedPermissionsIfSharedWithMe($view->getId(), 'view', $userId);
-			return true;
-		} catch (NotFoundError $e) {
-		} catch (InternalError $e) {
-			$this->logger->warning('Cannot get permissions');
-			return false;
+		if ($userId) {
+			try {
+				$this->getSharedPermissionsIfSharedWithMe($view->getId(), 'view', $userId);
+				return true;
+			} catch (NotFoundError $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+			}
 		}
 
 		return false;
@@ -220,7 +220,7 @@ class PermissionsService {
 
 	/**
 	 * @param int $elementId
-	 * @param string $nodeType
+	 * @param 'table'|'view' $nodeType
 	 * @param string|null $userId
 	 * @return bool
 	 */
@@ -229,8 +229,8 @@ class PermissionsService {
 	}
 
 	/**
-	 * @param $element
-	 * @param string $nodeType
+	 * @param Table|View $element
+	 * @param 'table'|'view' $nodeType
 	 * @param string|null $userId
 	 * @return bool
 	 */
@@ -239,7 +239,8 @@ class PermissionsService {
 	}
 
 	/**
-	 * @param View $view
+	 * @param Table|View $element
+	 * @param 'table'|'view' $nodeType
 	 * @param string|null $userId
 	 * @return bool
 	 */
@@ -339,12 +340,12 @@ class PermissionsService {
 
 	/**
 	 * @param int $elementId
-	 * @param string|null $elementType
-	 * @param string|null $userId
+	 * @param 'table'|'view' $elementType
+	 * @param string $userId
 	 * @return array
 	 * @throws NotFoundError
 	 */
-	public function getSharedPermissionsIfSharedWithMe(int $elementId, ?string $elementType = 'table', string $userId = null): array {
+	public function getSharedPermissionsIfSharedWithMe(int $elementId, string $elementType, string $userId): array {
 		try {
 			$shares = $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userId);
 		} catch (Exception $e) {
@@ -398,7 +399,7 @@ class PermissionsService {
 
 	/**
 	 * @param mixed $element
-	 * @param string $nodeType
+	 * @param 'table'|'view' $nodeType
 	 * @param string $permission
 	 * @param string|null $userId
 	 * @return bool
@@ -408,16 +409,19 @@ class PermissionsService {
 			return true;
 		}
 
-		try {
-			return $this->getSharedPermissionsIfSharedWithMe($element->getId(), $nodeType, $userId)[$permission];
-		} catch (NotFoundError $e) {
-			return false;
+		if ($userId) {
+			try {
+				return $this->getSharedPermissionsIfSharedWithMe($element->getId(), $nodeType, $userId)[$permission];
+			} catch (NotFoundError $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+			}
 		}
+		return false;
 	}
 
 	/**
 	 * @param int $elementId
-	 * @param string $nodeType
+	 * @param 'table'|'view' $nodeType
 	 * @param string $permission
 	 * @param string|null $userId
 	 * @return bool
@@ -426,15 +430,18 @@ class PermissionsService {
 		if($this->basisCheckById($elementId, $nodeType, $userId)) {
 			return true;
 		}
-		try {
-			return $this->getSharedPermissionsIfSharedWithMe($elementId, $nodeType, $userId)[$permission];
-		} catch (NotFoundError $e) {
-			return false;
+		if ($userId) {
+			try {
+				return $this->getSharedPermissionsIfSharedWithMe($elementId, $nodeType, $userId)[$permission];
+			} catch (NotFoundError $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+			}
 		}
+		return false;
 	}
 
 	/**
-	 * @param $element
+	 * @param Table|View $element
 	 * @param string $nodeType
 	 * @param string|null $userId
 	 * @return bool
@@ -443,7 +450,9 @@ class PermissionsService {
 		try {
 			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
-			$this->logger->warning('Cannot pre check the user id');
+			$e = new \Exception('Cannot pre check the user id');
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			return false;
 		}
 
 		if ($userId === '') {
@@ -460,8 +469,6 @@ class PermissionsService {
 			}
 		} catch (NotFoundError $e) {
 			return false;
-		} catch (InternalError $e) {
-			$this->logger->warning('Cannot get permissions');
 		}
 		return false;
 	}
@@ -492,6 +499,11 @@ class PermissionsService {
 		return false;
 	}
 
+	/**
+	 * @param View|Table $element
+	 * @param string|null $userId
+	 * @return bool
+	 */
 	private function userIsElementOwner($element, string $userId = null): bool {
 		return $element->getOwnership() === $userId;
 	}

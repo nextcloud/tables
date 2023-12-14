@@ -17,6 +17,7 @@ use OCP\Collaboration\Reference\IReference;
 use OCP\Collaboration\Reference\Reference;
 use OCP\IConfig;
 use OCP\IURLGenerator;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
 class ReferenceHelper {
@@ -30,6 +31,7 @@ class ReferenceHelper {
 	protected ColumnService $columnService;
 	protected RowService $rowService;
 	protected IConfig $config;
+	protected LoggerInterface $logger;
 
 	public function __construct(IURLGenerator $urlGenerator,
 		ViewService $viewService,
@@ -38,7 +40,8 @@ class ReferenceHelper {
 		RowService $rowService,
 		LinkReferenceProvider $linkReferenceProvider,
 		?string $userId,
-		IConfig $config) {
+		IConfig $config,
+		LoggerInterface $logger) {
 		$this->userId = $userId;
 		$this->urlGenerator = $urlGenerator;
 		$this->linkReferenceProvider = $linkReferenceProvider;
@@ -47,6 +50,7 @@ class ReferenceHelper {
 		$this->rowService = $rowService;
 		$this->columnService = $columnService;
 		$this->config = $config;
+		$this->logger = $logger;
 	}
 
 	public function matchReference(string $referenceText, ?string $type = null): bool {
@@ -84,7 +88,7 @@ class ReferenceHelper {
 				$elementId = $this->getViewIdFromLink($referenceText);
 			}
 
-			if ($elementId === null || $this->userId === null) {
+			if (!isset($elementId) || $this->userId === null) {
 				// fallback to opengraph if it matches, but somehow we can't resolve
 				/** @psalm-suppress InvalidReturnStatement */
 				return $this->linkReferenceProvider->resolveReference($referenceText);
@@ -94,6 +98,10 @@ class ReferenceHelper {
 					$element = $this->tableService->find($elementId, false, $this->userId);
 				} elseif ($this->matchReference($referenceText, 'view')) {
 					$element = $this->viewService->find($elementId, false, $this->userId);
+				} else {
+					$e = new Exception('Neither table nor view is given.');
+					$this->logger->error($e->getMessage(), ['exception' => $e]);
+					throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 				}
 			} catch (Exception | Throwable $e) {
 				/** @psalm-suppress InvalidReturnStatement */
@@ -112,7 +120,7 @@ class ReferenceHelper {
 				$referenceInfo['title'] = $element->getTitle();
 			}
 
-			$reference->setDescription($element->getOwnerDisplayName() ?? $element->getOwnership());
+			$reference->setDescription($element->getOwnerDisplayName() ? $element->getOwnerDisplayName() : $element->getOwnership());
 
 			$referenceInfo['ownership'] = $element->getOwnership();
 			$referenceInfo['ownerDisplayName'] = $element->getOwnerDisplayName();

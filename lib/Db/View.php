@@ -30,7 +30,7 @@ use OCP\AppFramework\Db\Entity;
  * @method setDescription(string $description)
  * @method getIsShared(): bool
  * @method setIsShared(bool $isShared)
- * @method getOnSharePermissions(): array
+ * @method getOnSharePermissions(): array{create: bool,delete: bool,manage: bool,read: bool,update: bool}|null
  * @method setOnSharePermissions(array $onSharePermissions)
  * @method getHasShares(): bool
  * @method setHasShares(bool $hasShares)
@@ -66,19 +66,31 @@ class View extends Entity implements JsonSerializable {
 		$this->addType('tableId', 'integer');
 	}
 
-	public function getColumnsArray():array {
+	/**
+	 * @psalm-suppress MismatchingDocblockReturnType
+	 * @return int[]
+	 */
+	public function getColumnsArray(): array {
 		return $this->getArray($this->getColumns());
 	}
 
-	public function getSortArray():array {
+	/**
+	 * @psalm-suppress MismatchingDocblockReturnType
+	 * @return array{array-key, array{columnId: int, mode: 'ASC'|'DESC'}}|null
+	 */
+	public function getSortArray(): array {
 		return $this->getArray($this->getSort());
 	}
 
+	/**
+	 * @psalm-suppress MismatchingDocblockReturnType
+	 * @return array<array-key,array{columnId: int, operator: 'begins-with'|'contains'|'ends-with'|'is-empty'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal', value: float|int|string}>|null
+	 */
 	public function getFilterArray():array {
 		return $this->getArray($this->getFilter());
 	}
 
-	private function getArray(?string $json) {
+	private function getArray(?string $json): array {
 		if ($json !== "" && $json !== null && $json !== 'null') {
 			return \json_decode($json, true);
 		} else {
@@ -99,26 +111,34 @@ class View extends Entity implements JsonSerializable {
 	}
 
 	/**
+	 * @psalm-suppress MismatchingDocblockReturnType
+	 * @return array{create: bool, delete: bool, manage: bool, read: bool, update: bool}|null
+	 */
+	private function getSharePermissions(): ?array {
+		return $this->getOnSharePermissions();
+	}
+
+	/**
 	 * @psalm-return TablesView
 	 */
 	public function jsonSerialize(): array {
 		$serialisedJson = [
 			'id' => $this->id,
-			'tableId' => $this->tableId,
-			'title' => $this->title,
+			'tableId' => ($this->tableId || $this->tableId === 0) ? $this->tableId : -1,
+			'title' => $this->title ?: '',
 			'description' => $this->description,
 			'emoji' => $this->emoji,
-			'ownership' => $this->ownership,
-			'createdBy' => $this->createdBy,
-			'createdAt' => $this->createdAt,
-			'lastEditBy' => $this->lastEditBy,
-			'lastEditAt' => $this->lastEditAt,
+			'ownership' => $this->ownership ?: '',
+			'createdBy' => $this->createdBy ?: '',
+			'createdAt' => $this->createdAt ?: '',
+			'lastEditBy' => $this->lastEditBy ?: '',
+			'lastEditAt' => $this->lastEditAt ?: '',
 			'columns' => $this->getColumnsArray(),
 			'sort' => $this->getSortArray(),
 			'isShared' => !!$this->isShared,
-			'onSharePermissions' => $this->onSharePermissions,
-			'hasShares' => $this->hasShares,
-			'rowsCount' => $this->rowsCount,
+			'onSharePermissions' => $this->getSharePermissions(),
+			'hasShares' => !!$this->hasShares,
+			'rowsCount' => $this->rowsCount ?: 0,
 			'ownerDisplayName' => $this->ownerDisplayName,
 		];
 		$serialisedJson['filter'] = $this->getFilterArray();

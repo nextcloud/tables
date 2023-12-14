@@ -33,33 +33,33 @@ use OCP\AppFramework\Db\Entity;
  * @method getSubtype(): string
  * @method setSubtype(string $subtype)
  * @method getMandatory(): bool
- * @method setMandatory(bool $mandatory)
+ * @method setMandatory(?bool $mandatory)
  * @method getDescription(): string
- * @method setDescription(string $description)
+ * @method setDescription(?string $description)
  * @method getNumberDefault(): float
- * @method setNumberDefault(float $numberDefault)
+ * @method setNumberDefault(?float $numberDefault)
  * @method getNumberMin(): float
- * @method setNumberMin(float $numberMin)
+ * @method setNumberMin(?float $numberMin)
  * @method getNumberMax(): float
- * @method setNumberMax(float $numberMax)
+ * @method setNumberMax(?float $numberMax)
  * @method getNumberDecimals(): int
- * @method setNumberDecimals(int $numberDecimals)
+ * @method setNumberDecimals(?int $numberDecimals)
  * @method getNumberPrefix(): string
- * @method setNumberPrefix(string $numberPrefix)
+ * @method setNumberPrefix(?string $numberPrefix)
  * @method getNumberSuffix(): string
- * @method setNumberSuffix(string $numberSuffix)
+ * @method setNumberSuffix(?string $numberSuffix)
  * @method getTextDefault(): string
- * @method setTextDefault(string $textDefault)
+ * @method setTextDefault(?string $textDefault)
  * @method getTextAllowedPattern(): string
- * @method setTextAllowedPattern(string $textAllowedPattern)
+ * @method setTextAllowedPattern(?string $textAllowedPattern)
  * @method getTextMaxLength(): int
- * @method setTextMaxLength(int $textMaxLength)
+ * @method setTextMaxLength(?int $textMaxLength)
  * @method getSelectionOptions(): string
  * @method getSelectionDefault(): string
- * @method setSelectionOptions(string $selectionOptionsArray)
- * @method setSelectionDefault(string $selectionDefault)
+ * @method setSelectionOptions(?string $selectionOptionsArray)
+ * @method setSelectionDefault(?string $selectionDefault)
  * @method getDatetimeDefault(): string
- * @method setDatetimeDefault(string $datetimeDefault)
+ * @method setDatetimeDefault(?string $datetimeDefault)
  */
 class Column extends Entity implements JsonSerializable {
 	protected ?string $title = null;

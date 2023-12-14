@@ -10,6 +10,7 @@ use OCP\AppFramework\Db\Entity;
  * @psalm-suppress PropertyNotSetInConstructor
  *
  * @psalm-import-type TablesTable from ResponseDefinitions
+ * @psalm-import-type TablesView from ResponseDefinitions
  *
  * @method getTitle(): string
  * @method setTitle(string $title)
@@ -70,20 +71,36 @@ class Table extends Entity implements JsonSerializable {
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->id,
-			'title' => $this->title,
+			'title' => $this->title ?: '',
 			'emoji' => $this->emoji,
-			'ownership' => $this->ownership,
-			'ownerDisplayName' => $this->ownerDisplayName,
-			'createdBy' => $this->createdBy,
-			'createdAt' => $this->createdAt,
-			'lastEditBy' => $this->lastEditBy,
-			'lastEditAt' => $this->lastEditAt,
+			'ownership' => $this->ownership ?: '',
+			'ownerDisplayName' => $this->ownerDisplayName ?: '',
+			'createdBy' => $this->createdBy ?: '',
+			'createdAt' => $this->createdAt ?: '',
+			'lastEditBy' => $this->lastEditBy ?: '',
+			'lastEditAt' => $this->lastEditAt ?: '',
 			'isShared' => !!$this->isShared,
-			'onSharePermissions' => $this->onSharePermissions,
-			'hasShares' => $this->hasShares,
-			'rowsCount' => $this->rowsCount,
-			'columnsCount' => $this->columnsCount,
-			'views' => $this->views,
+			'onSharePermissions' => $this->getSharePermissions(),
+			'hasShares' => !!$this->hasShares,
+			'rowsCount' => $this->rowsCount ?: 0,
+			'columnsCount' => $this->columnsCount ?: 0,
+			'views' => $this->getViewsArray(),
 		];
+	}
+
+	/**
+	 * @psalm-suppress MismatchingDocblockReturnType
+	 * @return array{read: bool, create: bool, update: bool, delete: bool, manage: bool}|null
+	 */
+	private function getSharePermissions(): ?array {
+		return $this->onSharePermissions;
+	}
+
+	/**
+	 * @psalm-suppress MismatchingDocblockReturnType
+	 * @return TablesView[]
+	 */
+	private function getViewsArray(): array {
+		return $this->getViews() ?: [];
 	}
 }

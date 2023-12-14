@@ -109,7 +109,7 @@ class SearchTablesProvider implements IProvider {
 			return new SearchResultEntry(
 				$appIconUrl,
 				$table->getEmoji() .' '. $table->getTitle(),
-				($table->getOwnerDisplayName() ?? $table->getOwnership()) . ', ' . $this->l10n->n('%n row', '%n rows', $table->getRowsCount()).', '.$this->l10n->t('table'),
+				($table->getOwnerDisplayName() ? $table->getOwnerDisplayName() : $table->getOwnership()) . ', ' . $this->l10n->n('%n row', '%n rows', $table->getRowsCount()).', '.$this->l10n->t('table'),
 				$this->getInternalLink($table->getId(), 'table'),
 				'',
 				false
@@ -122,7 +122,7 @@ class SearchTablesProvider implements IProvider {
 			return new SearchResultEntry(
 				$viewIconUrl,
 				$view->getEmoji() .' '. $view->getTitle(),
-				($view->getOwnerDisplayName() ?? $view->getOwnership()) . ', ' . $this->l10n->n('%n row', '%n rows', $view->getRowsCount()).', '.$this->l10n->t('table view'),
+				($view->getOwnerDisplayName() ? $view->getOwnerDisplayName(): $view->getOwnership()) . ', ' . $this->l10n->n('%n row', '%n rows', $view->getRowsCount()).', '.$this->l10n->t('table view'),
 				$this->getInternalLink($view->getId(), 'view'),
 				'',
 				false
