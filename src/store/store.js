@@ -234,7 +234,8 @@ export default new Vuex.Store({
 			commit('setTables', [...tables])
 			return true
 		},
-		async transferTable({ state, commit, dispatch }, { tableId, newOwnerUserId, userId}) {
+		async transferTable({ state, commit, dispatch }, { tableId, newOwnerUserId, userId }) {
+			// TODO add business
 		},
 		async removeTable({ state, commit }, { tableId }) {
 			try {

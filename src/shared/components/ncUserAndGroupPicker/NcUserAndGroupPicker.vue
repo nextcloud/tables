@@ -21,21 +21,28 @@ import debounce from 'debounce'
 import { NcSelect } from '@nextcloud/vue'
 import { mapState } from 'vuex'
 import formatting from '../../../shared/mixins/formatting.js'
-import ShareTypes from '../mixins/shareTypesMixin.js'
 
 export default {
-	name: 'TransferForm',
+
 	components: {
 		NcSelect,
 	},
 
-	mixins: [ShareTypes, formatting],
+	mixins: [formatting],
 
 	props: {
-		newOwnerUserId: {
+		value: {
 			type: String,
-			default: '',
+			default: null,
 		},
+		userSelect: {
+		      type: Boolean,
+		      default: true,
+		    },
+		groups: {
+		      type: Boolean,
+		      default: false,
+		    },
 	},
 
 	data() {
@@ -51,6 +58,16 @@ export default {
 
 	computed: {
 		...mapState(['tables', 'tablesLoading']),
+
+		localValue: {
+			get() {
+				return this.value
+			},
+			set(v) {
+				console.debug('set new value to', v)
+				this.$emit('update:value', v)
+			},
+		},
 
 		isValidQuery() {
 			return this.query && this.query.trim() !== '' && this.query.length > this.minSearchStringLength
@@ -122,7 +139,7 @@ export default {
 			console.info('suggestions', this.suggestions)
 		},
 
-		debounceGetSuggestions: debounce(function (...args) {
+		debounceGetSuggestions: debounce(function(...args) {
 			this.getSuggestions(...args)
 		}, 300),
 
@@ -147,7 +164,6 @@ export default {
 			this.loading = false
 			console.info('recommendations', this.recommendations)
 		},
-
 
 		filterOutCurrentUser(shares) {
 			return shares.reduce((arr, share) => {

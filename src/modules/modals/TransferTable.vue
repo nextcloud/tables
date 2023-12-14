@@ -5,11 +5,14 @@
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
-					<h2>{{ t('tables', 'Transfer table') }}</h2>
+					<h2>{{ t('tables', 'Transfer tables ownership') }}</h2>
 				</div>
 			</div>
 			<div class="row">
-				<TransferForm :newOwnerUserId="newOwnerUserId" @add="addTransfer"/>
+				// TODO: add actual owner
+			</div>
+			<div class="row">
+				<NcUserAndGroupPicker :users="true" :groups="false" :value.sync="newOwnerUserId" />
 			</div>
 			<div class="row">
 				<div class="fix-col-4 space-T justify-between">
@@ -30,22 +33,20 @@
 
 <script>
 import { NcModal, NcButton } from '@nextcloud/vue'
-import TransferForm from '../sidebar/partials/TransferForm.vue'
-import shareAPI from '../sidebar/mixins/shareAPI.js'
 import { showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
-import { mapGetters } from 'vuex'
 import { getCurrentUser } from '@nextcloud/auth'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
+import NcUserAndGroupPicker from '../../shared/components/ncUserAndGroupPicker/NcUserAndGroupPicker.vue'
 
 export default {
 	name: 'TransferTable',
 	components: {
 		NcModal,
 		NcButton,
-		TransferForm,
+		NcUserAndGroupPicker,
 	},
-	mixins: [shareAPI, permissionsMixin],
+	mixins: [permissionsMixin],
 	props: {
 		showModal: {
 			type: Boolean,
@@ -64,7 +65,6 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['activeElement', 'isView']),
 		getTranslatedDescription() {
 			return t('tables', 'Do you really want to transfer the table "{table}"?', { table: this.table?.title })
 		},
@@ -82,11 +82,11 @@ export default {
 			console.info(getCurrentUser().uid)
 			const transferId = this.table.id
 			let activeTableId
-			if (this.activeElement){
+			if (this.activeElement) {
 				activeTableId = this.isView ? this.activeElement.id : this.activeElement.tableId
 				this.prepareTransferTable = false
-			} 
-			const res = await this.$store.dispatch('transferTable', { tableId: this.table.id, newOwnerUserId: 'test',  userId: getCurrentUser().uid})
+			}
+			const res = await this.$store.dispatch('transferTable', { tableId: this.table.id, newOwnerUserId: 'test', userId: getCurrentUser().uid })
 			if (res) {
 				showSuccess(t('tables', 'Table "{emoji}{table}" transfered', { emoji: this.table?.icon ? this.table?.icon + ' ' : '', table: this.table?.title }))
 
@@ -98,9 +98,6 @@ export default {
 				this.actionCancel()
 			}
 
-		},
-		async addTransfer(id) {
-			this.newOwnerUserId = id
 		},
 	},
 }
