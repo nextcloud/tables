@@ -335,6 +335,7 @@ class Row2Mapper {
 			$rowId = $rowData['row_id'];
 			if (!isset($rows[$rowId])) {
 				$rows[$rowId] = new Row2();
+				$rows[$rowId]->setId($rowId);
 			}
 			/* @var array $rowData */
 			$this->parseModel($rowData, $rows[$rowId]);
@@ -425,7 +426,7 @@ class Row2Mapper {
 
 		// write all changed cells to its db-table
 		foreach ($row->getChangedCells() as $cell) {
-		 	$this->insertOrUpdateCell($sleeve->getId(), $cell['columnId'], $cell['value']);
+			$this->insertOrUpdateCell($sleeve->getId(), $cell['columnId'], $cell['value']);
 		}
 
 		return $row;
@@ -559,13 +560,13 @@ class Row2Mapper {
 	private function parseModel(array $data, ?Row2 &$row = null): Row2 {
 		if (!$row) {
 			$row = new Row2();
-			$row->setId($data['row_id']);
-			$row->setTableId($data['table_id']);
-			$row->setCreatedBy($data['created_by']);
-			$row->setCreatedAt($data['created_at']);
-			$row->setLastEditBy($data['last_edit_by']);
-			$row->setLastEditAt($data['last_edit_at']);
 		}
+		$row->setId($data['row_id']);
+		$row->setTableId($data['table_id']);
+		$row->setCreatedBy($data['created_by']);
+		$row->setCreatedAt($data['created_at']);
+		$row->setLastEditBy($data['last_edit_by']);
+		$row->setLastEditAt($data['last_edit_at']);
 		$row->addCell($data['column_id'], $this->formatValue($this->columns[$data['column_id']], $data['value']));
 		return $row;
 	}
