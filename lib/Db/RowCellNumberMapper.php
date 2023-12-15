@@ -2,7 +2,6 @@
 
 namespace OCA\Tables\Db;
 
-use OCP\AppFramework\Db\QBMapper;
 use OCP\IDBConnection;
 
 /** @template-extends RowCellMapperSuper<RowCellNumber> */

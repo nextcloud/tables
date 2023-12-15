@@ -2,8 +2,6 @@
 
 namespace OCA\Tables\Db;
 
-use OCP\AppFramework\Db\Entity;
-
 interface IRowCell {
 
 	public function setRowIdWrapper(int $rowId);

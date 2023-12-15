@@ -72,7 +72,7 @@ class RowCellMapperSuper extends QBMapper implements IRowCellMapper {
 	 * @psalm-param RowCellSuper $cell
 	 * @throws Exception
 	 */
-	public function updateWrapper(RowCellSuper $cell): RowCellSuper	{
+	public function updateWrapper(RowCellSuper $cell): RowCellSuper {
 		// TODO is this possible?
 		$cell = $this->update($cell);
 		return $cell;
