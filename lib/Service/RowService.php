@@ -55,7 +55,7 @@ class RowService extends SuperService {
 			if ($this->permissionsService->canReadRowsByElementId($tableId, 'table', $userId)) {
 				return $this->row2Mapper->findAll($this->columnMapper->findAllByTable($tableId), $limit, $offset, null, null, $userId);
 
-				// return $this->mapper->findAllByTable($tableId, $limit, $offset);
+			// return $this->mapper->findAllByTable($tableId, $limit, $offset);
 			} else {
 				throw new PermissionError('no read access to table id = '.$tableId);
 			}
@@ -84,7 +84,7 @@ class RowService extends SuperService {
 				$columns = $this->columnMapper->find($columnsArray);
 				return $this->row2Mapper->findAll($columns, $limit, $offset, $view->getFilterArray(), $view->getSortArray(), $userId);
 
-				// return $this->mapper->findAllByView($this->viewMapper->find($viewId), $userId, $limit, $offset);
+			// return $this->mapper->findAllByView($this->viewMapper->find($viewId), $userId, $limit, $offset);
 			} else {
 				throw new PermissionError('no read access to view id = '.$viewId);
 			}
@@ -132,7 +132,7 @@ class RowService extends SuperService {
 	 * @throws Exception
 	 * @throws InternalError
 	 */
-	public function create(?int $tableId, ?int $viewId, array $data):Row {
+	public function create(?int $tableId, ?int $viewId, array $data): Row2 {
 		if ($this->userId === null || $this->userId === '') {
 			$e = new \Exception('No user id in context, but needed.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);

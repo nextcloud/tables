@@ -5,7 +5,6 @@ namespace OCA\Tables\Db;
 use JsonSerializable;
 
 use OCP\AppFramework\Db\Entity;
-use OCP\AppFramework\Db\QBMapper;
 
 /**
  * @template T of Entity
