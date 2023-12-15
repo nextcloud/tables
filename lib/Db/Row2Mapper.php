@@ -184,7 +184,14 @@ class Row2Mapper {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), );
 		}
 
-		return $this->parseEntities($result);
+		try {
+			$sleeves = $this->rowSleeveMapper->findMultiple($rowIds);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+
+		return $this->parseEntities($result, $sleeves);
 	}
 
 	/**
@@ -321,24 +328,31 @@ class Row2Mapper {
 
 	/**
 	 * @param IResult $result
+	 * @param RowSleeve[] $sleeves
 	 * @return Row2[]
 	 * @throws InternalError
 	 */
-	private function parseEntities(IResult $result): array {
+	private function parseEntities(IResult $result, array $sleeves): array {
 		$data = $result->fetchAll();
 
 		$rows = [];
+		foreach ($sleeves as $sleeve) {
+			$rows[$sleeve->getId()] = new Row2();
+			$rows[$sleeve->getId()]->setId($sleeve->getId());
+			$rows[$sleeve->getId()]->setCreatedBy($sleeve->getCreatedBy());
+			$rows[$sleeve->getId()]->setCreatedAt($sleeve->getCreatedAt());
+			$rows[$sleeve->getId()]->setLastEditBy($sleeve->getLastEditBy());
+			$rows[$sleeve->getId()]->setLastEditAt($sleeve->getLastEditAt());
+			$rows[$sleeve->getId()]->setTableId($sleeve->getTableId());
+		}
+
 		foreach ($data as $rowData) {
-			if (!isset($rowData['row_id'])) {
+			if (!isset($rowData['row_id']) || !isset($rows[$rowData['row_id']])) {
 				break;
 			}
-			$rowId = $rowData['row_id'];
-			if (!isset($rows[$rowId])) {
-				$rows[$rowId] = new Row2();
-				$rows[$rowId]->setId($rowId);
-			}
+
 			/* @var array $rowData */
-			$this->parseModel($rowData, $rows[$rowId]);
+			$rows[$rowData['row_id']]->addCell($rowData['column_id'], $this->formatValue($this->columns[$rowData['column_id']], $rowData['value']));
 		}
 
 		// format an array without keys
@@ -355,25 +369,6 @@ class Row2Mapper {
 	public function isRowInViewPresent(int $rowId, View $view, string $userId): bool {
 		return in_array($rowId, $this->getWantedRowIds($userId, $view->getFilterArray()));
 	}
-
-	/**
-	 * @param IResult $result
-	 * @return Row2
-	 * @throws InternalError
-	 */
-	private function parseEntity(IResult $result): Row2 {
-		$data = $result->fetchAll();
-
-		if(count($data) === 0) {
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': result was empty, expected one row');
-		}
-		if(count($data) > 1) {
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': found more than one expected result');
-		}
-
-		return $this->parseModel($data[0]);
-	}
-
 
 	/**
 	 * @param Row2 $row
@@ -552,23 +547,23 @@ class Row2Mapper {
 	}
 
 	/**
-	 * @param array $data
-	 * @param Row2|null $row
-	 * @return Row2
 	 * @throws InternalError
 	 */
-	private function parseModel(array $data, ?Row2 &$row = null): Row2 {
-		if (!$row) {
-			$row = new Row2();
+	public function deleteDataForColumn(Column $column): void {
+		$cellMapperClassName = 'OCA\Tables\Db\RowCell' . ucfirst($column->getType()) . 'Mapper';
+		/** @var RowCellMapperSuper $cellMapper */
+		try {
+			$cellMapper = Server::get($cellMapperClassName);
+		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
-		$row->setId($data['row_id']);
-		$row->setTableId($data['table_id']);
-		$row->setCreatedBy($data['created_by']);
-		$row->setCreatedAt($data['created_at']);
-		$row->setLastEditBy($data['last_edit_by']);
-		$row->setLastEditAt($data['last_edit_at']);
-		$row->addCell($data['column_id'], $this->formatValue($this->columns[$data['column_id']], $data['value']));
-		return $row;
+		try {
+			$cellMapper->deleteAllForColumn($column->getId());
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
 	}
 
 }
