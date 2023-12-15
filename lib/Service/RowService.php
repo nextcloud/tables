@@ -449,32 +449,17 @@ class RowService extends SuperService {
 	}
 
 	/**
-	 * @param int $columnId
+	 * This deletes all data for a column, eg if the columns gets removed
 	 *
-	 * @throws PermissionError
-	 * @throws Exception
+	 * >>> SECURITY <<<
+	 * We do not check if you are allowed to remove this data. That has to be done before!
+	 * Why? Mostly this check will have be run before and we can pass this here due to performance reasons.
+	 *
+	 * @param Column $column
+	 * @throws InternalError
 	 */
-	public function deleteColumnDataFromRows(int $columnId):void {
-		$rows = $this->mapper->findAllWithColumn($columnId);
-
-		// security
-		if (count($rows) > 0) {
-			if (!$this->permissionsService->canUpdateRowsByTableId($rows[0]->getTableId())) {
-				throw new PermissionError('update row id = '.$rows[0]->getId().' within '.__FUNCTION__.' is not allowed.');
-			}
-		}
-
-		foreach ($rows as $row) {
-			/* @var $row Row */
-			$data = $row->getDataArray();
-			foreach ($data as $key => $col) {
-				if ($col['columnId'] == $columnId) {
-					unset($data[$key]);
-				}
-			}
-			$row->setDataArray($data);
-			$this->mapper->update($row);
-		}
+	public function deleteColumnDataFromRows(Column $column):void {
+		$this->row2Mapper->deleteDataForColumn($column);
 	}
 
 	/**

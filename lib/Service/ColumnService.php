@@ -451,8 +451,8 @@ class ColumnService extends SuperService {
 
 		if (!$skipRowCleanup) {
 			try {
-				$this->rowService->deleteColumnDataFromRows($id);
-			} catch (PermissionError|\OCP\DB\Exception $e) {
+				$this->rowService->deleteColumnDataFromRows($item);
+			} catch (InternalError $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 			}

@@ -41,6 +41,18 @@ class RowCellMapperSuper extends QBMapper implements IRowCellMapper {
 	}
 
 	/**
+	 * @throws Exception
+	 */
+	public function deleteAllForColumn(int $columnId): void {
+		$qb = $this->db->getQueryBuilder();
+		$qb->delete($this->tableName)
+			->where(
+				$qb->expr()->eq('column_id', $qb->createNamedParameter($columnId, IQueryBuilder::PARAM_INT))
+			);
+		$qb->executeStatement();
+	}
+
+	/**
 	 * @throws MultipleObjectsReturnedException
 	 * @throws DoesNotExistException
 	 * @throws Exception
