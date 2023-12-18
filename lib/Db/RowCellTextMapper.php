@@ -5,7 +5,7 @@ namespace OCA\Tables\Db;
 use OCP\IDBConnection;
 
 /** @template-extends RowCellMapperSuper<RowCellText> */
-class RowCellTextMapper extends RowCellMapperSuper implements IRowCellMapper {
+class RowCellTextMapper extends RowCellMapperSuper {
 	protected string $table = 'tables_row_cells_text';
 
 	public function __construct(IDBConnection $db) {
