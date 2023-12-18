@@ -489,10 +489,11 @@ class Row2Mapper {
 
 	/**
 	 * @param RowCellSuper $cell
-	 * @param IRowCellMapper $mapper
+	 * @param RowCellMapperSuper $mapper
 	 * @param mixed $value the value should be parsed to the correct format within the row service
+	 * @throws Exception
 	 */
-	private function updateCell(RowCellSuper $cell, IRowCellMapper $mapper, $value): void {
+	private function updateCell(RowCellSuper $cell, RowCellMapperSuper $mapper, $value): void {
 		$cell->setValueWrapper($value);
 		$this->updateMetaData($cell);
 		$mapper->updateWrapper($cell);
@@ -503,7 +504,7 @@ class Row2Mapper {
 	 */
 	private function insertOrUpdateCell(int $rowId, int $columnId, string $value): void {
 		$cellMapperClassName = 'OCA\Tables\Db\RowCell'.ucfirst($this->columns[$columnId]->getType()).'Mapper';
-		/** @var IRowCellMapper $cellMapper */
+		/** @var RowCellMapperSuper $cellMapper */
 		try {
 			$cellMapper = Server::get($cellMapperClassName);
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {

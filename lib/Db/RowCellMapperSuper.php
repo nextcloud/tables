@@ -13,7 +13,7 @@ use OCP\IDBConnection;
  * @template-extends QBMapper<T>
  * @template T of RowCellSuper
  */
-class RowCellMapperSuper extends QBMapper implements IRowCellMapper {
+class RowCellMapperSuper extends QBMapper {
 
 	public function __construct(IDBConnection $db, string $table, string $class) {
 		parent::__construct($db, $table, $class);
@@ -81,7 +81,8 @@ class RowCellMapperSuper extends QBMapper implements IRowCellMapper {
 	}
 
 	/**
-	 * @psalm-param RowCellSuper $cell
+	 * @psalm-param T $cell
+	 * @psalm-return T
 	 * @throws Exception
 	 */
 	public function updateWrapper(RowCellSuper $cell): RowCellSuper {
