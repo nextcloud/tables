@@ -402,4 +402,26 @@ class RowMapper extends QBMapper {
 			return 0;
 		}
 	}
+
+	/**
+	 * @param int $id
+	 * @param View $view
+	 * @return Row
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @throws MultipleObjectsReturnedException
+	 */
+	public function findByView(int $id, View $view): Row {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('t1.*')
+			->from($this->table, 't1')
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
+		$row = $this->findEntity($qb);
+
+		$row->setDataArray(array_filter($row->getDataArray(), function ($item) use ($view) {
+			return in_array($item['columnId'], $view->getColumnsArray());
+		}));
+
+		return $row;
+	}
 }

@@ -345,11 +345,22 @@ class RowService extends SuperService {
 		$item->setLastEditBy($userId);
 		$item->setLastEditAt($time->format('Y-m-d H:i:s'));
 		try {
-			return $this->mapper->update($item);
+			$row = $this->mapper->update($item);
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
+
+		if ($viewId) {
+			try {
+				$row = $this->mapper->findByView($row->getId(), $view);
+			} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			}
+		}
+
+		return $row;
 	}
 
 	private function replaceOrAddData(array $dataArray, array $newDataObject): array {
