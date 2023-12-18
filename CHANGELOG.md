@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.5 - 2023-12-18
+### Upgraded
+- 🏳️ Translations
+- 🐞 Bug fixing
+  - https://github.com/nextcloud/tables/pull/744
+  - https://github.com/nextcloud/tables/pull/735
+
 ## 0.6.4 - 2023-11-24
 ### Updated
 - 🐞 Bug fixing
