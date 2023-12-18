@@ -4,6 +4,8 @@
 ### Upgraded
 - 🏳️ Translations
 - 🐞 Bug fixing
+  - https://github.com/nextcloud/tables/pull/744
+  - https://github.com/nextcloud/tables/pull/735
 
 ## 0.6.4 - 2023-11-24
 ### Updated
