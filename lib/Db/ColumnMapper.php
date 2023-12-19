@@ -57,15 +57,15 @@ class ColumnMapper extends QBMapper {
 	}
 
 	/**
-	 * @param integer $tableID
+	 * @param integer $tableId
 	 * @return array
 	 * @throws Exception
 	 */
-	public function findAllByTable(int $tableID): array {
+	public function findAllByTable(int $tableId): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
-			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableID)));
+			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId)));
 		return $this->findEntities($qb);
 	}
 

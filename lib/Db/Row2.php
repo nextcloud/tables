@@ -3,7 +3,11 @@
 namespace OCA\Tables\Db;
 
 use JsonSerializable;
+use OCA\Tables\ResponseDefinitions;
 
+/**
+ * @psalm-import-type TablesRow from ResponseDefinitions
+ */
 class Row2 implements JsonSerializable {
 	private ?int $id = null;
 	private ?int $tableId = null;
@@ -107,6 +111,9 @@ class Row2 implements JsonSerializable {
 		// TODO
 	}
 
+	/**
+	 * @psalm-return TablesRow
+	 */
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->id,

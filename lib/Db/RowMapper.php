@@ -234,8 +234,8 @@ class RowMapper extends QBMapper {
 				foreach ($filterGroup as &$filter) {
 					$filter['columnType'] = $neededColumnTypes[$filter['columnId']];
 					// TODO move resolution for magic fields to service layer
-					if(str_starts_with($filter['value'], '@')) {
-						$filter['value'] = $this->resolveSearchValue($filter['value'], $userId);
+					if(str_starts_with((string) $filter['value'], '@')) {
+						$filter['value'] = $this->resolveSearchValue((string) $filter['value'], $userId);
 					}
 				}
 			}

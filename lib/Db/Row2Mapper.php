@@ -213,7 +213,7 @@ class Row2Mapper {
 	private function replaceMagicValues(array &$filters, string $userId): void {
 		foreach ($filters as &$filterGroup) {
 			foreach ($filterGroup as &$filter) {
-				if(str_starts_with($filter['value'], '@')) {
+				if(substr($filter['value'], 0, 1) === '@') {
 					$filter['value'] = $this->resolveSearchValue($filter['value'], $userId);
 				}
 			}
@@ -566,5 +566,49 @@ class Row2Mapper {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 	}
+
+	/**
+	 * @param int $tableId
+	 * @param Column[] $columns
+	 * @return void
+	 */
+	public function deleteAllForTable(int $tableId, array $columns): void {
+		foreach ($columns as $column) {
+			try {
+				$this->deleteDataForColumn($column);
+			} catch (InternalError $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+			}
+		}
+		try {
+			$this->rowSleeveMapper->deleteAllForTable($tableId);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+		}
+	}
+
+	public function countRowsForTable(int $tableId): int {
+		return $this->rowSleeveMapper->countRows($tableId);
+	}
+
+	/**
+	 * @param View $view
+	 * @param string $userId
+	 * @param Column[] $columns
+	 * @return int
+	 */
+	public function countRowsForView(View $view, string $userId, array $columns): int {
+		$this->setColumns($columns);
+
+		$filter = $view->getFilterArray();
+		try {
+			$rowIds = $this->getWantedRowIds($userId, $filter);
+		} catch (InternalError $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			$rowIds = [];
+		}
+		return count($rowIds);
+	}
+
 
 }
