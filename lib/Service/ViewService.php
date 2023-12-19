@@ -432,11 +432,25 @@ class ViewService extends SuperService {
 				return $sort['columnId'] !== $columnId;
 			});
 			$filteredSortingRules = array_values($filteredSortingRules);
-			$filteredFilters = array_filter(array_map(function (array $filterGroup) use ($columnId) {
-				return array_filter($filterGroup, function (array $filter) use ($columnId) {
-					return $filter['columnId'] !== $columnId;
-				});
-			}, $view->getFilterArray()), fn ($filterGroup) => !empty($filterGroup));
+
+			$filteredFilters = array_filter(
+
+				array_map(
+					function (array $filterGroup) use ($columnId) {
+						return array_filter(
+							$filterGroup,
+							function (array $filter) use ($columnId) {
+								return $filter['columnId'] !== $columnId;
+							}
+						);
+					},
+					$view->getFilterArray()
+				),
+
+				fn ($filterGroup) => !empty($filterGroup)
+
+			);
+
 			$data = [
 				'columns' => json_encode(array_values(array_diff($view->getColumnsArray(), [$columnId]))),
 				'sort' => json_encode($filteredSortingRules),

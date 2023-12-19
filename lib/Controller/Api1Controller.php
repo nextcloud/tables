@@ -937,7 +937,7 @@ class Api1Controller extends ApiController {
 	 */
 	public function indexTableRows(int $tableId, ?int $limit, ?int $offset): DataResponse {
 		try {
-			return new DataResponse($this->rowService->findAllByTable($tableId, $this->userId, $limit, $offset));
+			return new DataResponse($this->rowService->formatRows($this->rowService->findAllByTable($tableId, $this->userId, $limit, $offset)));
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
@@ -967,7 +967,7 @@ class Api1Controller extends ApiController {
 	 */
 	public function indexViewRows(int $viewId, ?int $limit, ?int $offset): DataResponse {
 		try {
-			return new DataResponse($this->rowService->findAllByView($viewId, $this->userId, $limit, $offset));
+			return new DataResponse($this->rowService->formatRows($this->rowService->findAllByView($viewId, $this->userId, $limit, $offset)));
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];

@@ -280,11 +280,14 @@ class PermissionsService {
 	}
 
 	/**
-	 * @param int $tableId
+	 * @param int|null $tableId
 	 * @param string|null $userId
 	 * @return bool
 	 */
-	public function canDeleteRowsByTableId(int $tableId, ?string $userId = null): bool {
+	public function canDeleteRowsByTableId(int $tableId = null, ?string $userId = null): bool {
+		if ($tableId === null) {
+			return false;
+		}
 		return $this->checkPermissionById($tableId, 'table', 'delete', $userId);
 
 	}

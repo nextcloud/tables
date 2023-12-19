@@ -63,8 +63,7 @@ class RowCellMapperSuper extends QBMapper {
 			->from($this->tableName)
 			->where($qb->expr()->eq('row_id', $qb->createNamedParameter($rowId, IQueryBuilder::PARAM_INT)))
 			->andWhere($qb->expr()->eq('column_id', $qb->createNamedParameter($columnId, IQueryBuilder::PARAM_INT)));
-		$item = $this->findEntity($qb);
-		return $item;
+		return $this->findEntity($qb);
 	}
 
 	/**
@@ -86,9 +85,7 @@ class RowCellMapperSuper extends QBMapper {
 	 * @throws Exception
 	 */
 	public function updateWrapper(RowCellSuper $cell): RowCellSuper {
-		// TODO is this possible?
-		$cell = $this->update($cell);
-		return $cell;
+		return $this->update($cell);
 	}
 
 }
