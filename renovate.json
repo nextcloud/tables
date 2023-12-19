@@ -7,7 +7,7 @@
 	"schedule": [
 		"every weekend"
 	],
-	"reviewers": ["team:office"],
+	"reviewers": ["datenangebot", "enjeck"],
 	"labels": ["dependencies"],
 	"rangeStrategy": "bump",
 	"rebaseWhen": "conflicted",
