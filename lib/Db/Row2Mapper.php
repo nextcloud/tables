@@ -179,9 +179,9 @@ class Row2Mapper {
 				->andWhere($qb->expr()->in('row_id', $qb->createNamedParameter($rowIds, IQueryBuilder::PARAM_INT_ARRAY, ':rowsIds')));
 
 			if ($qbSqlForColumnTypes) {
-				$qbSqlForColumnTypes .= ' UNION ALL (' . $qbTmp->getSQL() . ') ';
+				$qbSqlForColumnTypes .= ' UNION ALL ' . $qbTmp->getSQL() . ' ';
 			} else {
-				$qbSqlForColumnTypes = '((' . $qbTmp->getSQL() . ')';
+				$qbSqlForColumnTypes = '(' . $qbTmp->getSQL();
 			}
 		}
 		$qbSqlForColumnTypes .= ')';
