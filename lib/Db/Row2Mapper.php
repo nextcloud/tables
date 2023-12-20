@@ -465,14 +465,13 @@ class Row2Mapper {
 	 *
 	 * @throws InternalError
 	 */
-	private function insertCell(int $rowId, int $columnId, string $value): void {
+	private function insertCell(int $rowId, int $columnId, $value): void {
 		$cellClassName = 'OCA\Tables\Db\RowCell'.ucfirst($this->columns[$columnId]->getType());
 		/** @var RowCellSuper $cell */
 		$cell = new $cellClassName();
 
 		$cell->setRowIdWrapper($rowId);
 		$cell->setColumnIdWrapper($columnId);
-		$cell->setValueWrapper($value);
 		$this->updateMetaData($cell);
 
 		// insert new cell
@@ -484,6 +483,10 @@ class Row2Mapper {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
+
+		$v = $this->formatValue($this->columns[$columnId], $value, 'in');
+		$cell->setValueWrapper($v);
+
 		try {
 			$cellMapper->insert($cell);
 		} catch (Exception $e) {
@@ -496,10 +499,12 @@ class Row2Mapper {
 	 * @param RowCellSuper $cell
 	 * @param RowCellMapperSuper $mapper
 	 * @param mixed $value the value should be parsed to the correct format within the row service
-	 * @throws Exception
+	 * @param Column $column
+	 * @throws InternalError
 	 */
-	private function updateCell(RowCellSuper $cell, RowCellMapperSuper $mapper, $value): void {
-		$cell->setValueWrapper($value);
+	private function updateCell(RowCellSuper $cell, RowCellMapperSuper $mapper, $value, Column $column): void {
+		$v = $this->formatValue($column, $value, 'in');
+		$cell->setValueWrapper($v);
 		$this->updateMetaData($cell);
 		$mapper->updateWrapper($cell);
 	}
@@ -507,7 +512,7 @@ class Row2Mapper {
 	/**
 	 * @throws InternalError
 	 */
-	private function insertOrUpdateCell(int $rowId, int $columnId, string $value): void {
+	private function insertOrUpdateCell(int $rowId, int $columnId, $value): void {
 		$cellMapperClassName = 'OCA\Tables\Db\RowCell'.ucfirst($this->columns[$columnId]->getType()).'Mapper';
 		/** @var RowCellMapperSuper $cellMapper */
 		try {
@@ -518,7 +523,7 @@ class Row2Mapper {
 		}
 		try {
 			$cell = $cellMapper->findByRowAndColumn($rowId, $columnId);
-			$this->updateCell($cell, $cellMapper, $value);
+			$this->updateCell($cell, $cellMapper, $value, $this->columns[$columnId]);
 		} catch (DoesNotExistException $e) {
 			$this->insertCell($rowId, $columnId, $value);
 		} catch (MultipleObjectsReturnedException|Exception $e) {
@@ -538,12 +543,12 @@ class Row2Mapper {
 
 	/**
 	 * @param Column $column
-	 * @param string $value
+	 * @param mixed $value
 	 * @param 'out'|'in' $mode Parse the value for incoming requests that get send to the db or outgoing, from the db to the services
 	 * @return mixed
 	 * @throws InternalError
 	 */
-	private function formatValue(Column $column, string $value, string $mode = 'out') {
+	private function formatValue(Column $column, $value, string $mode = 'out') {
 		$cellMapperClassName = 'OCA\Tables\Db\RowCell'.ucfirst($column->getType()).'Mapper';
 		/** @var RowCellMapperSuper $cellMapper */
 		try {
