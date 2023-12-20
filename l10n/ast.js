@@ -29,6 +29,7 @@ OC.L10N.register(
     "Please select a file." : "Seleiciona un ficheru.",
     "Sort" : "Ordenar",
     "Shared" : "Compartío",
+    "No recommendations. Start typing." : "Nun hai nenguna recomendación. Comienza a escribir",
     "Searching …" : "Buscando…",
     "Permissions" : "Permisos",
     "Sharing" : "Comparticiñon",
