@@ -18,6 +18,14 @@ class ColumnsHelper {
 				'name' => 'number',
 				'db_type' => Types::FLOAT,
 			],
+			[
+				'name' => 'datetime',
+				'db_type' => Types::TEXT,
+			],
+			[
+				'name' => 'selection',
+				'db_type' => Types::TEXT,
+			],
 		];
 	}
 
