@@ -2,6 +2,7 @@
 
 namespace OCA\Tables\Db;
 
+use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
 /** @template-extends RowCellMapperSuper<RowCellNumber> */
@@ -13,9 +14,9 @@ class RowCellNumberMapper extends RowCellMapperSuper {
 	}
 
 	/**
-	 * @param Column $column
-	 * @param $value
-	 * @return float|int|null
+	 * @inheritDoc
+	 *
+	 * @extends RowCellSuper<int|float>
 	 */
 	public function parseValueOutgoing(Column $column, $value) {
 		if($value === '') {
@@ -23,9 +24,26 @@ class RowCellNumberMapper extends RowCellMapperSuper {
 		}
 		$decimals = $column->getNumberDecimals() ?? 0;
 		if ($decimals === 0) {
-			return intval($value);
+			return (int) $value;
 		} else {
 			return round(floatval($value), $decimals);
 		}
+	}
+
+	/**
+	 * @inheritDoc
+	 *
+	 * @extends RowCellSuper<int|float>
+	 */
+	public function parseValueIncoming(Column $column, $value): ?float {
+		if($value === '') {
+			return null;
+		}
+		return (float) $value;
+	}
+
+	public function getDbParamType() {
+		// seems to be a string for float/double values
+		return IQueryBuilder::PARAM_STR;
 	}
 }

@@ -20,12 +20,32 @@ class RowCellMapperSuper extends QBMapper {
 	}
 
 	/**
+	 * Parse value for db results (after send request)
+	 * eg for filtering
+	 *
 	 * @param Column $column
-	 * @param mixed $value
-	 * @return mixed
+	 * @param T $value
+	 * @return T
+	 * @template T
 	 */
 	public function parseValueOutgoing(Column $column, $value) {
 		return $value;
+	}
+
+	/**
+	 * Parse value for db requests (before send request)
+	 *
+	 * @param Column $column
+	 * @param T $value
+	 * @return T
+	 * @template T
+	 */
+	public function parseValueIncoming(Column $column, $value) {
+		return $value;
+	}
+
+	public function getDbParamType() {
+		return IQueryBuilder::PARAM_STR;
 	}
 
 	/**

@@ -66,9 +66,9 @@ class RowService extends SuperService {
 	public function findAllByTable(int $tableId, string $userId, ?int $limit = null, ?int $offset = null): array {
 		try {
 			if ($this->permissionsService->canReadRowsByElementId($tableId, 'table', $userId)) {
-				return $this->row2Mapper->findAll($this->columnMapper->findAllByTable($tableId), $limit, $offset, null, null, $userId);
+				return $this->row2Mapper->findAll($this->columnMapper->findAllByTable($tableId), $tableId, $limit, $offset, null, null, $userId);
 
-			// return $this->mapper->findAllByTable($tableId, $limit, $offset);
+				// return $this->mapper->findAllByTable($tableId, $limit, $offset);
 			} else {
 				throw new PermissionError('no read access to table id = '.$tableId);
 			}
@@ -95,9 +95,9 @@ class RowService extends SuperService {
 				$view = $this->viewMapper->find($viewId);
 				$columnsArray = $view->getColumnsArray();
 				$columns = $this->columnMapper->find($columnsArray);
-				return $this->row2Mapper->findAll($columns, $limit, $offset, $view->getFilterArray(), $view->getSortArray(), $userId);
+				return $this->row2Mapper->findAll($columns, $view->getTableId(), $limit, $offset, $view->getFilterArray(), $view->getSortArray(), $userId);
 
-			// return $this->mapper->findAllByView($this->viewMapper->find($viewId), $userId, $limit, $offset);
+				// return $this->mapper->findAllByView($this->viewMapper->find($viewId), $userId, $limit, $offset);
 			} else {
 				throw new PermissionError('no read access to view id = '.$viewId);
 			}
@@ -522,7 +522,12 @@ class RowService extends SuperService {
 	 */
 	public function getViewRowsCount(View $view, string $userId): int {
 		if ($this->permissionsService->canReadRowsByElementId($view->getId(), 'view', $userId)) {
-			return $this->row2Mapper->countRowsForView($view, $userId, $this->columnMapper->findMultiple($view->getColumnsArray()));
+			try {
+				return $this->row2Mapper->countRowsForView($view, $userId, $this->columnMapper->findMultiple($view->getColumnsArray()));
+			} catch (Exception $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				return 0;
+			}
 		} else {
 			throw new PermissionError('no read access for counting to view id = '.$view->getId());
 		}

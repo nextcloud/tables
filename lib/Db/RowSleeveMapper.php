@@ -38,7 +38,7 @@ class RowSleeveMapper extends QBMapper {
 	 * @return RowSleeve[]
 	 * @throws Exception
 	 */
-	public function findMultiple(array $ids): array	{
+	public function findMultiple(array $ids): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
