@@ -5,7 +5,7 @@ namespace OCA\Tables\Db;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
-/** @template-extends RowCellMapperSuper<RowCellNumber> */
+/** @template-extends RowCellMapperSuper<RowCellNumber, int|float|null, int|float|null> */
 class RowCellNumberMapper extends RowCellMapperSuper {
 	protected string $table = 'tables_row_cells_number';
 
@@ -15,8 +15,6 @@ class RowCellNumberMapper extends RowCellMapperSuper {
 
 	/**
 	 * @inheritDoc
-	 *
-	 * @extends RowCellSuper<int|float>
 	 */
 	public function parseValueOutgoing(Column $column, $value) {
 		if($value === '') {
@@ -32,8 +30,6 @@ class RowCellNumberMapper extends RowCellMapperSuper {
 
 	/**
 	 * @inheritDoc
-	 *
-	 * @extends RowCellSuper<int|float>
 	 */
 	public function parseValueIncoming(Column $column, $value): ?float {
 		if($value === '') {
