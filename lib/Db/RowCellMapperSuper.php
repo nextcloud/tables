@@ -12,6 +12,8 @@ use OCP\IDBConnection;
 /**
  * @template-extends QBMapper<T>
  * @template T of RowCellSuper
+ * @template TIncoming
+ * @template TOutgoing
  */
 class RowCellMapperSuper extends QBMapper {
 
@@ -24,9 +26,8 @@ class RowCellMapperSuper extends QBMapper {
 	 * eg for filtering
 	 *
 	 * @param Column $column
-	 * @param T $value
-	 * @return T
-	 * @template T
+	 * @param TOutgoing $value
+	 * @return TOutgoing
 	 */
 	public function parseValueOutgoing(Column $column, $value) {
 		return $value;
@@ -36,9 +37,8 @@ class RowCellMapperSuper extends QBMapper {
 	 * Parse value for db requests (before send request)
 	 *
 	 * @param Column $column
-	 * @param T $value
-	 * @return T
-	 * @template T
+	 * @param TIncoming $value
+	 * @return TIncoming
 	 */
 	public function parseValueIncoming(Column $column, $value) {
 		return $value;
