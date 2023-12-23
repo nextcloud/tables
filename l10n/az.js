@@ -4,6 +4,7 @@ OC.L10N.register(
     "No" : "Xeyir",
     "Yes" : "Bəli",
     "Date" : "Date",
+    "Comments" : "Şərhlər",
     "Name" : "Ad",
     "Description" : "Açıqlanma",
     "Comment" : "Komentariya",
@@ -25,6 +26,7 @@ OC.L10N.register(
     "Title" : "Başlıq",
     "Cancel" : "Dayandır",
     "Delete" : "Sil",
+    "Please select a file." : "Lütfən, fayl seçin.",
     "Sort" : "Çeşidləmək",
     "Copy" : "Kopyala",
     "group" : "qrup",
@@ -34,8 +36,10 @@ OC.L10N.register(
     "Error" : "Səhv",
     "Download" : "Yüklə",
     "Search" : "Axtarış",
+    "Back" : "Geri",
     "Default" : "Susmaya görə",
     "URL" : "URL",
+    "Confirm" : "Təsdiq edin",
     "Select" : "Seç"
 },
 "nplurals=2; plural=(n != 1);");

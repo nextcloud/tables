@@ -36,6 +36,7 @@ OC.L10N.register(
     "Please select a file." : "Silakan pilih berkas",
     "Filter" : "Filter",
     "Sort" : "Urutkan",
+    "Copy" : "Salin",
     "Shared" : "Dibagikan",
     "Clear filter" : "Bersihkan filter",
     "No recommendations. Start typing." : "Tidak ada saran. Mulai mengetik.",

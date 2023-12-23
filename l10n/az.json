@@ -2,6 +2,7 @@
     "No" : "Xeyir",
     "Yes" : "Bəli",
     "Date" : "Date",
+    "Comments" : "Şərhlər",
     "Name" : "Ad",
     "Description" : "Açıqlanma",
     "Comment" : "Komentariya",
@@ -23,6 +24,7 @@
     "Title" : "Başlıq",
     "Cancel" : "Dayandır",
     "Delete" : "Sil",
+    "Please select a file." : "Lütfən, fayl seçin.",
     "Sort" : "Çeşidləmək",
     "Copy" : "Kopyala",
     "group" : "qrup",
@@ -32,8 +34,10 @@
     "Error" : "Səhv",
     "Download" : "Yüklə",
     "Search" : "Axtarış",
+    "Back" : "Geri",
     "Default" : "Susmaya görə",
     "URL" : "URL",
+    "Confirm" : "Təsdiq edin",
     "Select" : "Seç"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
