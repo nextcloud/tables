@@ -1,11 +1,10 @@
 <template>
 	<div class="row space-B">
-		<h3>{{ t('tables', 'Share with accounts') }}</h3>
-		<NcSelect id="transfer-ownership-select" style="width: 100%;" :loading="loading" :options="options"
-			:placeholder="t('tables', 'User…')" :searchable="true" label="displayName" @search="asyncFind">
-			<template #no-options>
-				{{ t('tables', 'No recommendations. Start typing.') }}
-			</template>
+		<h3>{{ t('tables', 'Transfer this table to another user') }}</h3>
+		<NcSelect id="transfer-ownership-select" v-model="value" style="width: 100%;" :loading="loading" :options="options" :placeholder="t('tables', 'User…')"
+			:searchable="true" :get-option-key="(option) => option.key"
+			label="displayName" :user-select="true"
+			@search="asyncFind" @input="addTransfer">
 			<template #noResult>
 				{{ noResultText }}
 			</template>
@@ -19,8 +18,8 @@ import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 import { NcSelect } from '@nextcloud/vue'
-import { mapState } from 'vuex'
 import formatting from '../../../shared/mixins/formatting.js'
+import ShareTypes from '../../mixins/shareTypesMixin.js'
 
 export default {
 
@@ -28,44 +27,42 @@ export default {
 		NcSelect,
 	},
 
-	mixins: [formatting],
+	mixins: [ShareTypes, formatting],
 
 	props: {
-		value: {
+		newOwnerUserId: {
 			type: String,
-			default: null,
+			default: '',
 		},
-		userSelect: {
-		      type: Boolean,
-		      default: true,
-		    },
-		groups: {
-		      type: Boolean,
-		      default: false,
-		    },
+		selectUsers: {
+			type: Boolean,
+			default: true,
+		},
+		selectGroups: {
+			type: Boolean,
+			default: false,
+		},
 	},
 
 	data() {
 		return {
 			query: '',
+			value: '',
 			loading: false,
 			minSearchStringLength: 1,
 			maxAutocompleteResults: 20,
-			recommendations: [],
 			suggestions: [],
 		}
 	},
 
 	computed: {
-		...mapState(['tables', 'tablesLoading']),
-
 		localValue: {
 			get() {
-				return this.value
+				return this.newOwnerUserId
 			},
 			set(v) {
-				console.debug('set new value to', v)
-				this.$emit('update:value', v)
+				console.info('newOwnerUserId set to ', v)
+				this.$emit('update:newOwnerUserId', v)
 			},
 		},
 
@@ -77,7 +74,7 @@ export default {
 			if (this.isValidQuery) {
 				return this.suggestions
 			}
-			return this.recommendations
+			return []
 		},
 
 		noResultText() {
@@ -86,16 +83,40 @@ export default {
 			}
 			return t('tables', 'No elements found.')
 		},
-	},
 
-	mounted() {
-		this.getRecommendations()
+		userId() {
+			return getCurrentUser().uid
+		},
 	},
 
 	methods: {
-		addShare(id) {
-			this.newOwnerUserId = id
+		addTransfer(selectedItem) {
+			if (selectedItem) {
+				this.localValue = selectedItem.user
+			} else {
+				this.localValue = ''
+			}
 		},
+
+		getShareTypes() {
+			if (this.selectUsers && this.selectGroups) {
+				return [
+					this.SHARE_TYPES.SHARE_TYPE_USER,
+					this.SHARE_TYPES.SHARE_TYPE_GROUP,
+				]
+			} else if (this.selectUsers) {
+				return [
+					this.SHARE_TYPES.SHARE_TYPE_USER,
+				]
+			} else if (this.selectGroups) {
+				return [
+					this.SHARE_TYPES.SHARE_TYPE_GROUP,
+				]
+			} else {
+				return []
+			}
+		},
+
 		async asyncFind(query) {
 			this.query = query.trim()
 			if (this.isValidQuery) {
@@ -106,89 +127,51 @@ export default {
 
 		async getSuggestions(search) {
 			this.loading = true
-
-			const shareType = [
-				this.SHARE_TYPES.SHARE_TYPE_USER,
-			]
-
-			const request = await axios.get(generateOcsUrl('apps/files_sharing/api/v1/sharees'), {
-				params: {
-					format: 'json',
-					itemType: 'file',
-					search,
-					perPage: this.maxAutocompleteResults,
-					shareType,
-				},
+			const shareTypes = this.getShareTypes()
+			let shareTypeQueryString = ''
+			shareTypes.forEach(shareType => {
+				shareTypeQueryString += `&shareTypes[]=${shareType}`
 			})
+			const url = generateOcsUrl('core/autocomplete/get?search={searchQuery}&itemType=%20&itemId=%20{shareTypeQueryString}&limit={limit}', { searchQuery: search, shareTypeQueryString, limit: this.maxAutocompleteResults })
+			await axios.get(url).then(res => {
+				const rawSuggestions = res.data.ocs.data.map(autocompleteResult => {
+					return {
+						user: autocompleteResult.id,
+						displayName: autocompleteResult.label,
+						icon: autocompleteResult.icon,
+						isUser: autocompleteResult.source.startsWith('users'),
+						key: autocompleteResult.source + '-' + autocompleteResult.id,
+					}
+				})
 
-			const data = request.data.ocs.data
-			const exact = data.exact
-			data.exact = []
+				this.suggestions = this.filterOutCurrentUser(rawSuggestions)
 
-			const rawExactSuggestions = Object.values(exact).reduce((arr, elem) => arr.concat(elem), [])
-			const rawSuggestions = Object.values(data).reduce((arr, elem) => arr.concat(elem), [])
+				this.loading = false
 
-			const exactSuggestions = this.filterOutCurrentUser(rawExactSuggestions)
-				.map(share => this.formatForSelect(share))
-			const suggestions = this.filterOutCurrentUser(rawSuggestions)
-				.map(share => this.formatForSelect(share))
-
-			this.suggestions = exactSuggestions.concat(suggestions)
-
-			this.loading = false
-			console.info('suggestions', this.suggestions)
+			}).catch(err => {
+				console.debug(err)
+			})
 		},
 
 		debounceGetSuggestions: debounce(function(...args) {
 			this.getSuggestions(...args)
 		}, 300),
 
-		async getRecommendations() {
-			this.loading = true
-
-			const request = await axios.get(generateOcsUrl('apps/files_sharing/api/v1/sharees_recommended'), {
-				params: {
-					format: 'json',
-					itemType: 'file',
-				},
-			})
-
-			const exact = request.data.ocs.data.exact
-
-			// flatten array of arrays
-			const rawRecommendations = Object.values(exact).reduce((arr, elem) => arr.concat(elem), [])
-
-			this.recommendations = this.filterOutCurrentUser(rawRecommendations)
-				.map(share => this.formatForSelect(share))
-
-			this.loading = false
-			console.info('recommendations', this.recommendations)
-		},
-
-		filterOutCurrentUser(shares) {
-			return shares.reduce((arr, share) => {
-				if (typeof share !== 'object') {
+		filterOutCurrentUser(list) {
+			return list.reduce((arr, item) => {
+				if (typeof item !== 'object') {
 					return arr
 				}
 				try {
-					if (share.value.shareWith === getCurrentUser().uid) {
+					if (item.isUser && item.user === getCurrentUser().uid) {
 						return arr
 					}
-					arr.push(share)
+					arr.push(item)
 				} catch {
 					return arr
 				}
 				return arr
 			}, [])
-		},
-
-		formatForSelect(result) {
-			return {
-				user: result.uuid || result.value.shareWith,
-				displayName: result.name || result.label,
-				icon: 'icon-user',
-				key: result.uuid || result.label,
-			}
 		},
 
 	},

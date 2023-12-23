@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from '@nextcloud/axios'
-import { generateUrl } from '@nextcloud/router'
+import { generateUrl, generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import data from './data.js'
@@ -234,8 +234,19 @@ export default new Vuex.Store({
 			commit('setTables', [...tables])
 			return true
 		},
-		async transferTable({ state, commit, dispatch }, { tableId, newOwnerUserId, userId }) {
-			// TODO add business
+		async transferTable({ state, commit, dispatch }, { id, data }) {
+			try {
+				await axios.put(generateOcsUrl('/apps/tables/api/2/tables/' + id + '/transfer'), data)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not transfer table.'))
+				return false
+			}
+
+			const tables = state.tables
+			const index = tables.findIndex(t => t.id === id)
+			tables.splice(index, 1)
+			commit('setTables', [...tables])
+			return true
 		},
 		async removeTable({ state, commit }, { tableId }) {
 			try {

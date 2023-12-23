@@ -34,14 +34,6 @@
 				</template>
 				{{ t('tables', 'Edit table') }}
 			</NcActionButton>
-			<NcActionButton v-if="ownsTable(table)"
-				:close-after-click="true"
-				@click="emit('tables:table:transfer', table.id)">
-				<template #icon>
-					<IconRename :size="20" decorative />
-				</template>
-				{{ t('tables', 'Transfer table') }}
-			</NcActionButton>
 			<NcActionButton v-if="canManageElement(table)"
 				:close-after-click="true"
 				@click="createView">
