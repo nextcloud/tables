@@ -47,6 +47,7 @@ OC.L10N.register(
     "Shared" : "Partejat",
     "Searching …" : "Recèrca…",
     "group" : "grop",
+    "Permissions" : "Autorizacions",
     "Delete data" : "Suprimir donada",
     "Created at" : "Creat lo",
     "Sharing" : "Partiment",

@@ -22,6 +22,7 @@ OC.L10N.register(
     "Shares" : "การแชร์",
     "Actions" : "การกระทำ",
     "Share" : "แชร์",
+    "Data" : "ข้อมูล",
     "Import" : "นำเข้า",
     "Type" : "ประเภท",
     "Time" : "เวลา",

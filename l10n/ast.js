@@ -44,6 +44,7 @@ OC.L10N.register(
     "Redo" : "Refacer",
     "Options" : "Opciones",
     "URL" : "URL",
+    "Confirm" : "Confirmar",
     "_{nb} row_::_{nb} rows_" : ["{nb} filera","{nb} fileres"],
     "Content" : "Conteníu",
     "Contains" : "Contién",
