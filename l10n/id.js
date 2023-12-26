@@ -28,6 +28,7 @@ OC.L10N.register(
     "Data" : "Data",
     "Import" : "Impor",
     "Type" : "tipe",
+    "Simple text" : "Teks sederhana",
     "Time" : "Waktu",
     "Save" : "Simpan",
     "Title" : "Judul",
