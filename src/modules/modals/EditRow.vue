@@ -12,6 +12,10 @@
 				<ColumnFormComponent
 					:column="column"
 					:value.sync="localRow[column.id]" />
+				<NcNoteCard v-if="column.mandatory && !isValueValidForColumn(localRow[column.id], column)"
+					type="error">
+					{{ t('tables', `"${column.title}" should not be empty`) }}
+				</NcNoteCard>
 			</div>
 			<div class="row">
 				<div class="fix-col-4 space-T" :class="{'justify-between': showDeleteButton, 'end': !showDeleteButton}">
@@ -27,7 +31,9 @@
 							{{ t('tables', 'I really want to delete this row!') }}
 						</NcButton>
 					</div>
-					<NcButton v-if="canUpdateData(activeElement) && !localLoading" :aria-label="t('tables', 'Save')" type="primary" @click="actionConfirm">
+					<NcButton v-if="canUpdateData(activeElement) && !localLoading" :aria-label="t('tables', 'Save')" type="primary"
+						:disabled="hasEmptyMandatoryRows"
+						@click="actionConfirm">
 						{{ t('tables', 'Save') }}
 					</NcButton>
 					<div v-if="localLoading" class="icon-loading" style="margin-left: 20px;" />
@@ -38,8 +44,8 @@
 </template>
 
 <script>
-import { NcModal, NcButton } from '@nextcloud/vue'
-import { showError, showWarning } from '@nextcloud/dialogs'
+import { NcModal, NcButton, NcNoteCard } from '@nextcloud/vue'
+import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import ColumnFormComponent from '../main/partials/ColumnFormComponent.vue'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
@@ -51,6 +57,7 @@ export default {
 		NcModal,
 		NcButton,
 		ColumnFormComponent,
+		NcNoteCard,
 	},
 	mixins: [permissionsMixin],
 	props: {
@@ -81,6 +88,16 @@ export default {
 		},
 		nonMetaColumns() {
 			return this.columns.filter(col => col.id >= 0)
+		},
+		hasEmptyMandatoryRows() {
+			let mandatoryFieldsEmpty = false
+			this.columns.forEach(col => {
+				if (col.mandatory) {
+					const validValue = this.isValueValidForColumn(this.localRow[col.id], col)
+					mandatoryFieldsEmpty = mandatoryFieldsEmpty || !validValue
+				}
+			})
+			return mandatoryFieldsEmpty
 		},
 	},
 	watch: {
@@ -123,21 +140,10 @@ export default {
 			return !!value || value === 0
 		},
 		async actionConfirm() {
-			let mandatoryFieldsEmpty = false
-			this.columns.forEach(col => {
-				if (col.mandatory) {
-					const validValue = this.isValueValidForColumn(this.localRow[col.id], col)
-					mandatoryFieldsEmpty = mandatoryFieldsEmpty || !validValue
-				}
-			})
-			if (!mandatoryFieldsEmpty) {
-				this.localLoading = true
-				await this.sendRowToBE()
-				this.localLoading = false
-				this.actionCancel()
-			} else {
-				showWarning(t('tables', 'Please fill in the mandatory fields.'))
-			}
+			this.localLoading = true
+			await this.sendRowToBE()
+			this.localLoading = false
+			this.actionCancel()
 		},
 		async sendRowToBE() {
 			const data = []
