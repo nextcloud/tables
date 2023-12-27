@@ -27,7 +27,7 @@
 			</div>
 			<div class="row">
 				<div class="fix-col-4 space-T justify-between">
-					<NcButton type="warning" :disabled="newOwnerUserId === ''" @click="transferMe">
+					<NcButton type="warning" :disabled="newOwnerUserId === ''" data-cy="transferTableButton" @click="transferMe">
 						{{ t('tables', 'Transfer') }}
 					</NcButton>
 				</div>

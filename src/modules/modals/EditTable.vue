@@ -2,7 +2,7 @@
 	<NcModal v-if="showModal"
 		size="normal"
 		@close="actionCancel">
-		<div class="modal__content">
+		<div class="modal__content" data-cy="editTableModal">
 			<div class="row">
 				<div class="col-4">
 					<h2>{{ t('tables', 'Edit table') }}</h2>
