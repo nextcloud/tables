@@ -17,12 +17,11 @@
 	],
     "require-dev": {
 		"nextcloud/coding-standard": "^v1.0.0",
-		"vimeo/psalm": "^5.6.0",
 		"nextcloud/ocp": "dev-master",
-		"phan/phan": "5.x",
 		"staabm/annotate-pull-request-from-checkstyle": "^1.8",
 		"phpunit/phpunit": "^9",
-		"nextcloud/openapi-extractor": "dev-main"
+		"nextcloud/openapi-extractor": "dev-main",
+		"psalm/phar": "^5.18"
 	},
 	"config": {
 		"optimize-autoloader": true,
@@ -39,10 +38,10 @@
 		"lint": "find . -name \\*.php -not -path './vendor/*' -not -path './build/*' -print0 | xargs -0 -n1 php -l",
 		"cs:check": "php-cs-fixer fix --dry-run --diff",
 		"cs:fix": "php-cs-fixer fix",
-		"psalm": "./vendor/bin/psalm --show-info=true --no-cache",
-		"psalm:update-baseline": "./vendor/bin/psalm --update-baseline",
-		"psalm:fix": "./vendor/bin/psalm --no-cache --alter --issues=InvalidReturnType,InvalidNullableReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingParamType,InvalidFalsableReturnType",
-		"psalm:fix:dry": "./vendor/bin/psalm --no-cache --alter --issues=InvalidReturnType,InvalidNullableReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingParamType,InvalidFalsableReturnType --dry-run"
+		"psalm": "./vendor/bin/psalm.phar --show-info=true --no-cache",
+		"psalm:update-baseline": "./vendor/bin/psalm.phar --update-baseline",
+		"psalm:fix": "./vendor/bin/psalm.phar --no-cache --alter --issues=InvalidReturnType,InvalidNullableReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingParamType,InvalidFalsableReturnType",
+		"psalm:fix:dry": "./vendor/bin/psalm.phar --no-cache --alter --issues=InvalidReturnType,InvalidNullableReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingParamType,InvalidFalsableReturnType --dry-run"
 	},
 	"require": {
 		"phpoffice/phpspreadsheet": "^1.28",
