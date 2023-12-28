@@ -13,6 +13,7 @@ OC.L10N.register(
     "Dog" : "Perru",
     "Position" : "Posición",
     "Today" : "Güei",
+    "Text" : "Testu",
     "Selection" : "Seleición",
     "Move" : "Mover",
     "Metadata" : "Metadatos",
