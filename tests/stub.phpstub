@@ -57,3 +57,44 @@ namespace OC\User {
 	class NoUserException extends \Exception {
 	}
 }
+
+
+namespace Symfony\Component\Console\Input {
+	class InputInterface {
+		public function getOption(string $key) {}
+		public function setOption(string $key, $value) {}
+		public function getArgument(string $key) {}
+	}
+	class InputArgument {
+		const REQUIRED = 0;
+		const OPTIONAL = 1;
+		const IS_ARRAY = 1;
+	}
+	class InputOption {
+		const VALUE_NONE = 1;
+		const VALUE_REQUIRED = 1;
+		const VALUE_OPTIONAL = 1;
+	}
+}
+
+namespace Symfony\Component\Console\Question {
+	class ConfirmationQuestion {
+		public function __construct(string $text, bool $default) {}
+	}
+}
+
+namespace Symfony\Component\Console\Output {
+	class OutputInterface {
+		public const VERBOSITY_VERBOSE = 1;
+		public function writeln($text, int $flat = 0) {}
+		public function isVerbose(): bool {}
+		public function isVeryVerbose(): bool {}
+	}
+}
+
+namespace Symfony\Component\Console\Command {
+    abstract class Command {
+        public function __construct();
+        public function setName(string $name);
+    }
+}
