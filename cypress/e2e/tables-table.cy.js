@@ -1,5 +1,5 @@
 let localUser
-let user1
+let targetUserTransfer
 
 describe('Manage a table', () => {
 
@@ -8,7 +8,7 @@ describe('Manage a table', () => {
 			localUser = user
 		})
 		cy.createRandomUser().then(user => {
-			user1 = user
+			targetUserTransfer = user
 		})
 	})
 
@@ -72,10 +72,13 @@ describe('Manage a table', () => {
 		cy.get('[data-cy="editTableModal"] button').contains('Change owner').click()
 		cy.get('[data-cy="editTableModal"]').should('not.exist')
 		cy.get('[data-cy="transferTableModal"]').should('be.visible')
-		cy.get('[data-cy="transferTableModal"] input[type="search"]').clear().type(user1.userId)
-		cy.get(`.vs__dropdown-menu [user="${user1.userId}"]`).click()
+		cy.get('[data-cy="transferTableModal"] input[type="search"]').clear().type(targetUserTransfer.userId)
+		cy.get(`.vs__dropdown-menu [user="${targetUserTransfer.userId}"]`).click()
 		cy.get('[data-cy="transferTableButton"]').should('be.enabled').click()
-		cy.wait(10).get('.toastify.toast-success').should('be.visible')
+		cy.get('.toastify.toast-success').should('be.visible')
 		cy.get('.app-navigation__list').contains('test table').should('not.exist')
+		cy.login(targetUserTransfer)
+		cy.visit('apps/tables')
+		cy.get('.app-navigation__list').contains('test table')
 	})
 })

@@ -1,7 +1,6 @@
 <template>
 	<div class="row space-B">
-		<h3>{{ t('tables', 'Transfer this table to another user') }}</h3>
-		<NcSelect id="transfer-ownership-select" v-model="value" style="width: 100%;" :loading="loading" :options="options" :placeholder="t('tables', 'User…')"
+		<NcSelect id="transfer-ownership-select" v-model="value" style="width: 100%;" :loading="loading" :options="options" :placeholder="t('tables', `${getShareTypeString()}...`)"
 			:searchable="true" :get-option-key="(option) => option.key"
 			label="displayName" :user-select="true"
 			@search="asyncFind" @input="addTransfer">
@@ -20,6 +19,8 @@ import debounce from 'debounce'
 import { NcSelect } from '@nextcloud/vue'
 import formatting from '../../../shared/mixins/formatting.js'
 import ShareTypes from '../../mixins/shareTypesMixin.js'
+import { showError } from '@nextcloud/dialogs'
+import '@nextcloud/dialogs/style.css'
 
 export default {
 
@@ -67,7 +68,7 @@ export default {
 		},
 
 		isValidQuery() {
-			return this.query && this.query.trim() !== '' && this.query.length > this.minSearchStringLength
+			return this.query?.trim() && this.query.length >= this.minSearchStringLength
 		},
 
 		options() {
@@ -99,21 +100,25 @@ export default {
 		},
 
 		getShareTypes() {
-			if (this.selectUsers && this.selectGroups) {
-				return [
-					this.SHARE_TYPES.SHARE_TYPE_USER,
-					this.SHARE_TYPES.SHARE_TYPE_GROUP,
-				]
-			} else if (this.selectUsers) {
-				return [
-					this.SHARE_TYPES.SHARE_TYPE_USER,
-				]
-			} else if (this.selectGroups) {
-				return [
-					this.SHARE_TYPES.SHARE_TYPE_GROUP,
-				]
-			} else {
-				return []
+			const types = []
+			if (this.selectUsers) {
+				types.push(this.SHARE_TYPES.SHARE_TYPE_USER)
+			}
+			if (this.selectGroups) {
+				types.push(this.SHARE_TYPES.SHARE_TYPE_GROUP)
+			}
+			return types
+		},
+
+		getShareTypeString(){
+			if (this.selectUsers && !this.selectGroups) {
+				return 'User'
+			}
+			else if (!this.selectUsers && this.selectGroups) {
+				return 'Group'
+			}
+			else {
+				return 'User or group'
 			}
 		},
 
@@ -133,7 +138,9 @@ export default {
 				shareTypeQueryString += `&shareTypes[]=${shareType}`
 			})
 			const url = generateOcsUrl('core/autocomplete/get?search={searchQuery}&itemType=%20&itemId=%20{shareTypeQueryString}&limit={limit}', { searchQuery: search, shareTypeQueryString, limit: this.maxAutocompleteResults })
-			await axios.get(url).then(res => {
+
+			try {
+				const res = await axios.get(url)
 				const rawSuggestions = res.data.ocs.data.map(autocompleteResult => {
 					return {
 						user: autocompleteResult.id,
@@ -145,12 +152,11 @@ export default {
 				})
 
 				this.suggestions = this.filterOutCurrentUser(rawSuggestions)
-
 				this.loading = false
-
-			}).catch(err => {
-				console.debug(err)
-			})
+			} catch (err) {
+				console.debug(err)		
+				showError(t('tables', `Failed to fetch ${this.getShareTypeString().toLowerCase()}`))
+			}
 		},
 
 		debounceGetSuggestions: debounce(function(...args) {
@@ -158,20 +164,7 @@ export default {
 		}, 300),
 
 		filterOutCurrentUser(list) {
-			return list.reduce((arr, item) => {
-				if (typeof item !== 'object') {
-					return arr
-				}
-				try {
-					if (item.isUser && item.user === getCurrentUser().uid) {
-						return arr
-					}
-					arr.push(item)
-				} catch {
-					return arr
-				}
-				return arr
-			}, [])
+			return list.filter((item) => !(item.isUser && item.user === getCurrentUser().uid))
 		},
 
 	},

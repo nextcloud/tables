@@ -9,24 +9,11 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-4 mandatory space-T">
-					{{ t('tables', 'Owner') }}
-				</div>
-
-				<!-- We don't need to show this, since the current user will only see this if they're the owner? -->
-				<div v-if="localTable !== undefined" class="col-3 inline space-T-small">
-					<NcUserBubble
-						:margin="4"
-						:size="30"
-						:display-name="localTable.ownerDisplayName"
-						:user="localTable.owner" />
-				</div>
-			</div>
-			<div class="row">
+				<h3>{{ t('tables', 'Transfer this table to another user') }}</h3>
 				<NcUserAndGroupPicker :select-users="true" :select-groups="false" :new-owner-user-id.sync="newOwnerUserId" />
 			</div>
 			<div class="row">
-				<div class="fix-col-4 space-T justify-between">
+				<div class="fix-col-4 space-T end">
 					<NcButton type="warning" :disabled="newOwnerUserId === ''" data-cy="transferTableButton" @click="transferMe">
 						{{ t('tables', 'Transfer') }}
 					</NcButton>
@@ -90,10 +77,7 @@ export default {
 	},
 	methods: {
 		actionCancel() {
-			this.reset()
 			this.$emit('close')
-		},
-		reset() {
 		},
 		async transferMe() {
 			const transferId = this.table.id
