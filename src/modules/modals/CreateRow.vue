@@ -14,7 +14,7 @@
 					:value.sync="row[column.id]" />
 				<NcNoteCard v-if="column.mandatory && !isValueValidForColumn(row[column.id], column)"
 					type="error">
-					{{ t('tables', `"${column.title}" should not be empty`) }}
+					{{ t('tables', '"{columnTitle}" should not be empty', { columnTitle: column.title }) }}
 				</NcNoteCard>
 			</div>
 			<div class="row">
