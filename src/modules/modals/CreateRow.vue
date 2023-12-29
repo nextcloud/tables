@@ -24,9 +24,9 @@
 							{{ t('tables', 'Add more') }}
 						</NcCheckboxRadioSwitch>
 					</div>
-					<button v-if="!localLoading" class="primary" :aria-label="t('tables', 'Save row')" :disabled="hasEmptyMandatoryRows" @click="actionConfirm()">
+					<NcButton v-if="!localLoading" class="primary" :aria-label="t('tables', 'Save row')" :disabled="hasEmptyMandatoryRows" @click="actionConfirm()">
 						{{ t('tables', 'Save') }}
-					</button>
+					</NcButton>
 				</div>
 			</div>
 		</div>
@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { NcModal, NcCheckboxRadioSwitch, NcNoteCard } from '@nextcloud/vue'
+import { NcModal, NcCheckboxRadioSwitch, NcNoteCard, NcButton } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
@@ -47,6 +47,7 @@ export default {
 		ColumnFormComponent,
 		NcCheckboxRadioSwitch,
 		NcNoteCard,
+		NcButton,
 	},
 	props: {
 		showModal: {
