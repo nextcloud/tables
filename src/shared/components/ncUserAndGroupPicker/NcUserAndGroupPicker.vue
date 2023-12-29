@@ -110,14 +110,12 @@ export default {
 			return types
 		},
 
-		getShareTypeString(){
+		getShareTypeString() {
 			if (this.selectUsers && !this.selectGroups) {
 				return 'User'
-			}
-			else if (!this.selectUsers && this.selectGroups) {
+			} else if (!this.selectUsers && this.selectGroups) {
 				return 'Group'
-			}
-			else {
+			} else {
 				return 'User or group'
 			}
 		},
@@ -154,7 +152,7 @@ export default {
 				this.suggestions = this.filterOutCurrentUser(rawSuggestions)
 				this.loading = false
 			} catch (err) {
-				console.debug(err)		
+				console.debug(err)
 				showError(t('tables', `Failed to fetch ${this.getShareTypeString().toLowerCase()}`))
 			}
 		},

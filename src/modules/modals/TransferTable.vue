@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { NcModal, NcButton, NcUserBubble } from '@nextcloud/vue'
+import { NcModal, NcButton } from '@nextcloud/vue'
 import { showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
@@ -38,7 +38,6 @@ export default {
 		NcModal,
 		NcButton,
 		NcUserAndGroupPicker,
-		NcUserBubble,
 	},
 	mixins: [permissionsMixin],
 	props: {
