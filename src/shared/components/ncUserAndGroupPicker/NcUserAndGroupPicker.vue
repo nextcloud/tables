@@ -1,6 +1,7 @@
 <template>
 	<div class="row space-B">
-		<NcSelect id="transfer-ownership-select" v-model="value" style="width: 100%;" :loading="loading" :options="options" :placeholder="t('tables', `${getShareTypeString()}...`)"
+		<NcSelect id="transfer-ownership-select" v-model="value" style="width: 100%;" :loading="loading" :options="options"
+		:placeholder="getPlaceholder()"
 			:searchable="true" :get-option-key="(option) => option.key"
 			label="displayName" :user-select="true"
 			@search="asyncFind" @input="addTransfer">
@@ -120,6 +121,10 @@ export default {
 			}
 		},
 
+		getPlaceholder() {
+			return t('tables', '{shareTypeString}...', { shareTypeString: this.getShareTypeString() })
+		},
+
 		async asyncFind(query) {
 			this.query = query.trim()
 			if (this.isValidQuery) {
@@ -153,7 +158,7 @@ export default {
 				this.loading = false
 			} catch (err) {
 				console.debug(err)
-				showError(t('tables', `Failed to fetch ${this.getShareTypeString().toLowerCase()}`))
+				showError(t('tables', 'Failed to fetch {shareTypeString}', { shareTypeString: this.getShareTypeString().toLowerCase() }))
 			}
 		},
 
