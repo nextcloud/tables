@@ -281,6 +281,9 @@ OC.L10N.register(
     "Search" : "Poišči",
     "This option is outdated." : "Ta možnost je zastarela.",
     "Sorting" : "Razvrščanje",
+    "Sort asc" : "Razvrsti naraščajoče",
+    "Sort desc" : "Razvrsti padajoče",
+    "Filtering" : "Filtriranje",
     "Select value" : "Izbor vrednosti",
     "Hide column" : "Skrij stolpec",
     "Undo" : "Razveljavi",
@@ -338,6 +341,7 @@ OC.L10N.register(
     "Is lower than or equal" : "Je enako ali manjše kot",
     "Unchecked" : "Nepregledano",
     "ID" : "ID",
+    "Unknown error." : "Neznana napaka.",
     "Could not fetch tables" : "Razpredelnic ni mogoče pridobiti."
 },
 "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);");
