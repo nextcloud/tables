@@ -15,6 +15,7 @@ OC.L10N.register(
     "Done" : "Selesai",
     "Create" : "Buat",
     "Today" : "Hari ini",
+    "Text" : "Teks",
     "Link" : "Tautan",
     "Move" : "Pindah",
     "Operator" : "Operator",
