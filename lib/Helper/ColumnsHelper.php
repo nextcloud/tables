@@ -7,23 +7,23 @@ use OCP\DB\Types;
 class ColumnsHelper {
 
 	private array $columns = [
-			[
-				'name' => 'text',
-				'db_type' => Types::TEXT,
-			],
-			[
-				'name' => 'number',
-				'db_type' => Types::FLOAT,
-			],
-			[
-				'name' => 'datetime',
-				'db_type' => Types::TEXT,
-			],
-			[
-				'name' => 'selection',
-				'db_type' => Types::TEXT,
-			],
-		];
+		[
+			'name' => 'text',
+			'db_type' => Types::TEXT,
+		],
+		[
+			'name' => 'number',
+			'db_type' => Types::FLOAT,
+		],
+		[
+			'name' => 'datetime',
+			'db_type' => Types::TEXT,
+		],
+		[
+			'name' => 'selection',
+			'db_type' => Types::TEXT,
+		],
+	];
 
 	/**
 	 * @param string[] $keys Keys that should be returned
