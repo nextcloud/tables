@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal" @close="actionCancel">
+	<NcModal v-if="showModal" @close="actionCancel" data-cy="editRowModal">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
@@ -32,6 +32,7 @@
 						</NcButton>
 					</div>
 					<NcButton v-if="canUpdateData(activeElement) && !localLoading" :aria-label="t('tables', 'Save')" type="primary"
+					data-cy="editRowSaveButton"
 						:disabled="hasEmptyMandatoryRows"
 						@click="actionConfirm">
 						{{ t('tables', 'Save') }}

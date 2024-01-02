@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal" @close="actionCancel">
+	<NcModal v-if="showModal" @close="actionCancel" data-cy="createRowModal">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
@@ -24,7 +24,7 @@
 							{{ t('tables', 'Add more') }}
 						</NcCheckboxRadioSwitch>
 					</div>
-					<NcButton v-if="!localLoading" class="primary" :aria-label="t('tables', 'Save row')" :disabled="hasEmptyMandatoryRows" @click="actionConfirm()">
+					<NcButton v-if="!localLoading" class="primary" :aria-label="t('tables', 'Save row')" :disabled="hasEmptyMandatoryRows" @click="actionConfirm()" data-cy="createRowSaveButton">
 						{{ t('tables', 'Save') }}
 					</NcButton>
 				</div>
