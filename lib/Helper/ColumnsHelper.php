@@ -6,10 +6,7 @@ use OCP\DB\Types;
 
 class ColumnsHelper {
 
-	private array $columns;
-
-	public function __construct() {
-		$this->columns = [
+	private array $columns = [
 			[
 				'name' => 'text',
 				'db_type' => Types::TEXT,
@@ -27,7 +24,6 @@ class ColumnsHelper {
 				'db_type' => Types::TEXT,
 			],
 		];
-	}
 
 	/**
 	 * @param string[] $keys Keys that should be returned
