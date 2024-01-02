@@ -19,6 +19,7 @@ OC.L10N.register(
     "Text" : "Teks",
     "Link" : "Tautan",
     "Move" : "Pindah",
+    "Column" : "Kolom",
     "Operator" : "Operator",
     "Views" : "Tampilan",
     "View" : "Tampilan",
