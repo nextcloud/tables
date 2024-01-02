@@ -60,6 +60,7 @@ class Version000700Date20230916000000 extends SimpleMigrationStep {
 			// we will write this data to use it one day to extract versions of rows based on the timestamp
 			$table->addColumn('last_edit_at', Types::DATETIME, ['notnull' => true]);
 			$table->addColumn('last_edit_by', Types::STRING, ['notnull' => true, 'length' => 64]);
+			$table->addIndex(['column_id', 'row_id']);
 			$table->setPrimaryKey(['id']);
 		}
 	}
@@ -76,6 +77,7 @@ class Version000700Date20230916000000 extends SimpleMigrationStep {
 			$table->addColumn('created_at', Types::DATETIME, ['notnull' => true]);
 			$table->addColumn('last_edit_by', Types::STRING, ['notnull' => true, 'length' => 64]);
 			$table->addColumn('last_edit_at', Types::DATETIME, ['notnull' => true]);
+
 			$table->setPrimaryKey(['id']);
 		}
 	}
