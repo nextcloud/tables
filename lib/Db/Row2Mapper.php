@@ -283,9 +283,9 @@ class Row2Mapper {
 
 		switch ($operator) {
 			case 'begins-with':
-				return $qb2->andWhere($qb->expr()->like('value', $qb->createNamedParameter('%'.$value, $paramType)));
+				return $qb2->andWhere($qb->expr()->like('value', $qb->createNamedParameter('%'.$this->db->escapeLikeParameter($value), $paramType)));
 			case 'ends-with':
-				return $qb2->andWhere($qb->expr()->like('value', $qb->createNamedParameter($value.'%', $paramType)));
+				return $qb2->andWhere($qb->expr()->like('value', $qb->createNamedParameter($this->db->escapeLikeParameter($value).'%', $paramType)));
 			case 'contains':
 				return $qb2->andWhere($qb->expr()->like('value', $qb->createNamedParameter('%'.$this->db->escapeLikeParameter($value).'%', $paramType)));
 			case 'is-equal':
