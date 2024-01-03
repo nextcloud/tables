@@ -139,8 +139,14 @@ export default {
 	:deep(.v-select.select) {
 		width: 100%;
 	}
+
 	:deep(#smartpicker-select input[type=search]) {
-		height: 46px;
+		height: 41px;
+	}
+
+	:deep(#smartpicker-select .details) {
+		display: inline-flex;
+		align-items: self-start;
 	}
 
 </style>
