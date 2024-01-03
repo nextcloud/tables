@@ -2,118 +2,312 @@
 
 namespace OCA\Tables\Db;
 
-use OCA\Tables\Db\ColumnTypes\DatetimeColumnQB;
-use OCA\Tables\Db\ColumnTypes\IColumnTypeQB;
-use OCA\Tables\Db\ColumnTypes\NumberColumnQB;
-use OCA\Tables\Db\ColumnTypes\SelectionColumnQB;
-use OCA\Tables\Db\ColumnTypes\SuperColumnQB;
-use OCA\Tables\Db\ColumnTypes\TextColumnQB;
+use DateTime;
 use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
+use OCP\DB\IResult;
 use OCP\DB\QueryBuilder\IQueryBuilder;
-use OCP\DB\QueryBuilder\IQueryFunction;
 use OCP\IDBConnection;
 use OCP\Server;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 
-/** @template-extends QBMapper<Row> */
-class RowMapper extends QBMapper {
-	protected string $table = 'tables_rows';
-	protected TextColumnQB $textColumnQB;
-	protected SelectionColumnQB $selectionColumnQB;
-	protected NumberColumnQB $numberColumnQB;
-	protected DatetimeColumnQB $datetimeColumnQB;
-	protected SuperColumnQB $genericColumnQB;
-	protected ColumnMapper $columnMapper;
-	protected LoggerInterface $logger;
+class RowMapper {
+	private RowSleeveMapper $rowSleeveMapper;
+	private ?string $userId = null;
+	private IDBConnection $db;
+	private LoggerInterface $logger;
 	protected UserHelper $userHelper;
 
-	protected int $platform;
+	/* @var Column[] $columns */
+	private array $columns = [];
 
-	public function __construct(IDBConnection $db, LoggerInterface $logger, TextColumnQB $textColumnQB, SelectionColumnQB $selectionColumnQB, NumberColumnQB $numberColumnQB, DatetimeColumnQB $datetimeColumnQB, SuperColumnQB $columnQB, ColumnMapper $columnMapper, UserHelper $userHelper) {
-		parent::__construct($db, $this->table, Row::class);
+	private ColumnsHelper $columnsHelper;
+
+	public function __construct(?string $userId, IDBConnection $db, LoggerInterface $logger, UserHelper $userHelper, RowSleeveMapper $rowSleeveMapper, ColumnsHelper  $columnsHelper) {
+		$this->rowSleeveMapper = $rowSleeveMapper;
+		$this->userId = $userId;
+		$this->db = $db;
 		$this->logger = $logger;
-		$this->textColumnQB = $textColumnQB;
-		$this->numberColumnQB = $numberColumnQB;
-		$this->selectionColumnQB = $selectionColumnQB;
-		$this->datetimeColumnQB = $datetimeColumnQB;
-		$this->genericColumnQB = $columnQB;
-		$this->columnMapper = $columnMapper;
 		$this->userHelper = $userHelper;
-		$this->setPlatform();
+		$this->columnsHelper = $columnsHelper;
 	}
 
-	private function setPlatform() {
-		if (str_contains(strtolower(get_class($this->db->getDatabasePlatform())), 'postgres')) {
-			$this->platform = IColumnTypeQB::DB_PLATFORM_PGSQL;
-		} elseif (str_contains(strtolower(get_class($this->db->getDatabasePlatform())), 'sqlite')) {
-			$this->platform = IColumnTypeQB::DB_PLATFORM_SQLITE;
-		} else {
-			$this->platform = IColumnTypeQB::DB_PLATFORM_MYSQL;
+	/**
+	 * @throws InternalError
+	 */
+	public function delete(Row $row): Row {
+		foreach ($this->columnsHelper->get(['name']) as $columnType) {
+			$cellMapperClassName = 'OCA\Tables\Db\RowCell' . ucfirst($columnType) . 'Mapper';
+			/** @var RowCellMapperSuper $cellMapper */
+			try {
+				$cellMapper = Server::get($cellMapperClassName);
+			} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			}
+			try {
+				$cellMapper->deleteAllForRow($row->getId());
+			} catch (Exception $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			}
 		}
-		$this->genericColumnQB->setPlatform($this->platform);
-		$this->textColumnQB->setPlatform($this->platform);
-		$this->numberColumnQB->setPlatform($this->platform);
-		$this->selectionColumnQB->setPlatform($this->platform);
-		$this->datetimeColumnQB->setPlatform($this->platform);
+		try {
+			$this->rowSleeveMapper->deleteById($row->getId());
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+
+		return $row;
 	}
 
 	/**
 	 * @param int $id
-	 *
+	 * @param Column[] $columns
 	 * @return Row
-	 * @throws DoesNotExistException
-	 * @throws Exception
-	 * @throws MultipleObjectsReturnedException
+	 * @throws InternalError
+	 * @throws NotFoundError
 	 */
-	public function find(int $id): Row {
+	public function find(int $id, array $columns): Row {
+		$this->setColumns($columns);
+		$columnIdsArray = array_map(fn (Column $column) => $column->getId(), $columns);
+		$rows = $this->getRows([$id], $columnIdsArray);
+		if (count($rows) === 1) {
+			return $rows[0];
+		} elseif (count($rows) === 0) {
+			$e = new Exception('Wanted row not found.');
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		} else {
+			$e = new Exception('Too many results for one wanted row.');
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+	}
+
+	/**
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 * @throws Exception
+	 */
+	public function getTableIdForRow(int $rowId): ?int {
+		$rowSleeve = $this->rowSleeveMapper->find($rowId);
+		return $rowSleeve->getTableId();
+	}
+
+	/**
+	 * @param string $userId
+	 * @param int $tableId
+	 * @param array|null $filter
+	 * @param int|null $limit
+	 * @param int|null $offset
+	 * @return int[]
+	 * @throws InternalError
+	 */
+	private function getWantedRowIds(string $userId, int $tableId, ?array $filter = null, ?int $limit = null, ?int $offset = null): array {
 		$qb = $this->db->getQueryBuilder();
-		$qb->select('t1.*')
-			->from($this->table, 't1')
-			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
-		return $this->findEntity($qb);
-	}
 
-	private function buildFilterByColumnType($qb, array $filter, string $filterId): ?IQueryFunction {
+		$qb->select('id')
+			->from('tables_row_sleeves', 'sleeves')
+			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)));
+		if($filter) {
+			$this->addFilterToQuery($qb, $filter, $userId);
+		}
+		if ($limit !== null) {
+			$qb->setMaxResults($limit);
+		}
+		if ($offset !== null) {
+			$qb->setFirstResult($offset);
+		}
+
 		try {
-			$columnQbClassName = 'OCA\Tables\Db\ColumnTypes\\';
-			$type = explode("-", $filter['columnType'])[0];
-
-			$columnQbClassName .= ucfirst($type).'ColumnQB';
-
-			/** @var IColumnTypeQB $columnQb */
-			$columnQb = Server::get($columnQbClassName);
-			return $columnQb->addWhereFilterExpression($qb, $filter, $filterId);
-		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
-			$this->logger->debug('Column type query builder class not found');
+			$result = $this->db->executeQuery($qb->getSQL(), $qb->getParameters(), $qb->getParameterTypes());
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), );
 		}
-		return null;
+
+		return array_map(fn (array $item) => $item['id'], $result->fetchAll());
 	}
 
-	private function getInnerFilterExpressions($qb, $filterGroup, int $groupIndex): array {
-		$innerFilterExpressions = [];
-		foreach ($filterGroup as $index => $filter) {
-			$innerFilterExpressions[] = $this->buildFilterByColumnType($qb, $filter, $groupIndex.$index);
-		}
-		return $innerFilterExpressions;
+	/**
+	 * @param Column[] $columns
+	 * @param int $tableId
+	 * @param int|null $limit
+	 * @param int|null $offset
+	 * @param array|null $filter
+	 * @param array|null $sort
+	 * @param string|null $userId
+	 * @return Row[]
+	 * @throws InternalError
+	 */
+	public function findAll(array $columns, int $tableId, int $limit = null, int $offset = null, array $filter = null, array $sort = null, string $userId = null): array {
+		$this->setColumns($columns);
+		$columnIdsArray = array_map(fn (Column $column) => $column->getId(), $columns);
+
+		$wantedRowIdsArray = $this->getWantedRowIds($userId, $tableId, $filter, $limit, $offset);
+
+		// TODO add sorting
+
+		return $this->getRows($wantedRowIdsArray, $columnIdsArray);
 	}
 
-	private function getFilterGroups($qb, $filters): array {
+	/**
+	 * @param array $rowIds
+	 * @param array $columnIds
+	 * @return Row[]
+	 * @throws InternalError
+	 */
+	private function getRows(array $rowIds, array $columnIds): array {
+		$qb = $this->db->getQueryBuilder();
+
+		$qbSqlForColumnTypes = null;
+		foreach ($this->columnsHelper->get(['name']) as $columnType) {
+			$qbTmp = $this->db->getQueryBuilder();
+			$qbTmp->select('*')
+				->from('tables_row_cells_'.$columnType)
+				->where($qb->expr()->in('column_id', $qb->createNamedParameter($columnIds, IQueryBuilder::PARAM_INT_ARRAY, ':columnIds')))
+				->andWhere($qb->expr()->in('row_id', $qb->createNamedParameter($rowIds, IQueryBuilder::PARAM_INT_ARRAY, ':rowsIds')));
+
+			if ($qbSqlForColumnTypes) {
+				$qbSqlForColumnTypes .= ' UNION ALL ' . $qbTmp->getSQL() . ' ';
+			} else {
+				$qbSqlForColumnTypes = '(' . $qbTmp->getSQL();
+			}
+		}
+		$qbSqlForColumnTypes .= ')';
+
+		$qb->select('row_id', 'column_id', 'created_by', 'created_at', 't1.last_edit_by', 't1.last_edit_at', 'value', 'table_id')
+			->from($qb->createFunction($qbSqlForColumnTypes), 't1')
+			->innerJoin('t1', 'tables_row_sleeves', 'rowSleeve', 'rowSleeve.id = t1.row_id');
+
+		try {
+			$result = $this->db->executeQuery($qb->getSQL(), $qb->getParameters(), $qb->getParameterTypes());
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), );
+		}
+
+		try {
+			$sleeves = $this->rowSleeveMapper->findMultiple($rowIds);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+
+		return $this->parseEntities($result, $sleeves);
+	}
+
+	/**
+	 * @throws InternalError
+	 */
+	private function addFilterToQuery(IQueryBuilder &$qb, array $filters, string $userId): void {
+		// TODO move this into service
+		$this->replaceMagicValues($filters, $userId);
+
+		if (count($filters) > 0) {
+			$qb->andWhere(
+				$qb->expr()->orX(
+					...$this->getFilterGroups($qb, $filters)
+				)
+			);
+		}
+	}
+
+	private function replaceMagicValues(array &$filters, string $userId): void {
+		foreach ($filters as &$filterGroup) {
+			foreach ($filterGroup as &$filter) {
+				if(substr($filter['value'], 0, 1) === '@') {
+					$filter['value'] = $this->resolveSearchValue($filter['value'], $userId);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @throws InternalError
+	 */
+	private function getFilterGroups(IQueryBuilder &$qb, array $filters): array {
 		$filterGroups = [];
-		foreach ($filters as $groupIndex => $filterGroup) {
-			$filterGroups[] = $qb->expr()->andX(...$this->getInnerFilterExpressions($qb, $filterGroup, $groupIndex));
+		foreach ($filters as $filterGroup) {
+			$tmp = $this->getFilter($qb, $filterGroup);
+			$filterGroups[] = $qb->expr()->andX(...$tmp);
 		}
 		return $filterGroups;
 	}
 
-	private function resolveSearchValue(string $unresolvedSearchValue, string $userId): string {
-		switch (ltrim($unresolvedSearchValue, '@')) {
+	/**
+	 * @throws InternalError
+	 */
+	private function getFilter(IQueryBuilder &$qb, array $filterGroup): array {
+		$filterExpressions = [];
+		foreach ($filterGroup as $filter) {
+			$sql = $qb->expr()->in(
+				'id',
+				$qb->createFunction($this->getFilterExpression($qb, $this->columns[$filter['columnId']], $filter['operator'], $filter['value'])->getSQL())
+			);
+			$filterExpressions[] = $sql;
+		}
+		return $filterExpressions;
+	}
+
+	/**
+	 * @throws InternalError
+	 */
+	private function getFilterExpression(IQueryBuilder $qb, Column $column, string $operator, string $value): IQueryBuilder {
+		/*if($column->getType() === 'number' && $column->getNumberDecimals() === 0) {
+			$paramType = IQueryBuilder::PARAM_INT;
+			$value = (int)$value;
+		} elseif ($column->getType() === 'datetime') {
+			$paramType = IQueryBuilder::PARAM_DATE;
+		} else {
+			$paramType = IQueryBuilder::PARAM_STR;
+		}*/
+
+		$paramType = $this->getColumnDbParamType($column);
+		$value = $this->formatValue($column, $value, 'in');
+
+		$qb2 = $this->db->getQueryBuilder();
+		$qb2->select('row_id');
+		$qb2->where($qb->expr()->eq('column_id', $qb->createNamedParameter($column->getId()), IQueryBuilder::PARAM_INT));
+		$qb2->from('tables_row_cells_' . $column->getType());
+
+		switch ($operator) {
+			case 'begins-with':
+				return $qb2->andWhere($qb->expr()->like('value', $qb->createNamedParameter('%'.$this->db->escapeLikeParameter($value), $paramType)));
+			case 'ends-with':
+				return $qb2->andWhere($qb->expr()->like('value', $qb->createNamedParameter($this->db->escapeLikeParameter($value).'%', $paramType)));
+			case 'contains':
+				return $qb2->andWhere($qb->expr()->like('value', $qb->createNamedParameter('%'.$this->db->escapeLikeParameter($value).'%', $paramType)));
+			case 'is-equal':
+				return $qb2->andWhere($qb->expr()->eq('value', $qb->createNamedParameter($value, $paramType)));
+			case 'is-greater-than':
+				return $qb2->andWhere($qb->expr()->gt('value', $qb->createNamedParameter($value, $paramType)));
+			case 'is-greater-than-or-equal':
+				return $qb2->andWhere($qb->expr()->gte('value', $qb->createNamedParameter($value, $paramType)));
+			case 'is-lower-than':
+				return $qb2->andWhere($qb->expr()->lt('value', $qb->createNamedParameter($value, $paramType)));
+			case 'is-lower-than-or-equal':
+				return $qb2->andWhere($qb->expr()->lte('value', $qb->createNamedParameter($value, $paramType)));
+			case 'is-empty':
+				return $qb2->andWhere($qb->expr()->isNull('value'));
+			default:
+				throw new InternalError('Operator '.$operator.' is not supported.');
+		}
+	}
+
+	/** @noinspection DuplicatedCode */
+	private function resolveSearchValue(string $magicValue, string $userId): string {
+		switch (ltrim($magicValue, '@')) {
 			case 'me': return $userId;
 			case 'my-name': return $this->userHelper->getUserDisplayName($userId);
 			case 'checked': return 'true';
@@ -133,295 +327,319 @@ class RowMapper extends QBMapper {
 				return  $result ?: '';
 			case 'datetime-time-now': return date('H:i');
 			case 'datetime-now': return date('Y-m-d H:i') ? date('Y-m-d H:i') : '';
-			default: return $unresolvedSearchValue;
-		}
-	}
-
-	private function addOrderByRules(IQueryBuilder $qb, $sortArray) {
-		foreach ($sortArray as $index => $sortRule) {
-			$sortMode = $sortRule['mode'];
-			if (!in_array($sortMode, ['ASC', 'DESC'])) {
-				continue;
-			}
-			$sortColumnPlaceholder = 'sortColumn'.$index;
-			if ($sortRule['columnId'] < 0) {
-				try {
-					$orderString = SuperColumnQB::getMetaColumnName($sortRule['columnId']);
-				} catch (InternalError $e) {
-					return;
-				}
-			} else {
-				if ($this->platform === IColumnTypeQB::DB_PLATFORM_PGSQL) {
-					$orderString = 'c'.$sortRule['columnId'].'->>\'value\'';
-				} elseif ($this->platform === IColumnTypeQB::DB_PLATFORM_SQLITE) {
-					// here is an error for (multiple) sorting, works only for the first column at the moment
-					$orderString = 'json_extract(t2.value, "$.value")';
-				} else { // mariadb / mysql
-					$orderString = 'JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'$[*].columnId\'), \'one\', :'.$sortColumnPlaceholder.')), \'.value\'))';
-				}
-				if (str_starts_with($sortRule['columnType'], 'number')) {
-					$orderString = 'CAST('.$orderString.' as decimal)';
-				}
-			}
-
-			$qb->addOrderBy($qb->createFunction($orderString), $sortMode);
-			$qb->setParameter($sortColumnPlaceholder, $sortRule['columnId'], IQueryBuilder::PARAM_INT);
+			default: return $magicValue;
 		}
 	}
 
 	/**
-	 * @param View $view
-	 * @param $userId
-	 * @return int
+	 * @param IResult $result
+	 * @param RowSleeve[] $sleeves
+	 * @return Row[]
 	 * @throws InternalError
 	 */
-	public function countRowsForView(View $view, $userId): int {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select($qb->func()->count('*', 'counter'))
-			->from($this->table, 't1')
-			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), IQueryBuilder::PARAM_INT)));
+	private function parseEntities(IResult $result, array $sleeves): array {
+		$data = $result->fetchAll();
 
-		$neededColumnIds = $this->getAllColumnIdsFromView($view, $qb);
-		try {
-			$neededColumns = $this->columnMapper->getColumnTypes($neededColumnIds);
-		} catch (Exception $e) {
-			throw new InternalError('Could not get column types to count rows');
+		$rows = [];
+		foreach ($sleeves as $sleeve) {
+			$rows[$sleeve->getId()] = new Row();
+			$rows[$sleeve->getId()]->setId($sleeve->getId());
+			$rows[$sleeve->getId()]->setCreatedBy($sleeve->getCreatedBy());
+			$rows[$sleeve->getId()]->setCreatedAt($sleeve->getCreatedAt());
+			$rows[$sleeve->getId()]->setLastEditBy($sleeve->getLastEditBy());
+			$rows[$sleeve->getId()]->setLastEditAt($sleeve->getLastEditAt());
+			$rows[$sleeve->getId()]->setTableId($sleeve->getTableId());
 		}
 
-		// Filter
+		foreach ($data as $rowData) {
+			if (!isset($rowData['row_id']) || !isset($rows[$rowData['row_id']])) {
+				break;
+			}
 
-		$this->addFilterToQuery($qb, $view, $neededColumns, $userId);
+			/* @var array $rowData */
+			$rows[$rowData['row_id']]->addCell($rowData['column_id'], $this->formatValue($this->columns[$rowData['column_id']], $rowData['value']));
+		}
 
+		// format an array without keys
+		$return = [];
+		foreach ($rows as $row) {
+			$return[] = $row;
+		}
+		return $return;
+	}
+
+	/**
+	 * @throws InternalError
+	 */
+	public function isRowInViewPresent(int $rowId, View $view, string $userId): bool {
+		return in_array($rowId, $this->getWantedRowIds($userId, $view->getTableId(), $view->getFilterArray()));
+	}
+
+	/**
+	 * @param Row $row
+	 * @param Column[] $columns
+	 * @return Row
+	 * @throws InternalError
+	 * @throws Exception
+	 */
+	public function insert(Row $row, array $columns): Row {
+		if(!$columns) {
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': columns are missing');
+		}
+		$this->setColumns($columns);
+
+		// create a new row sleeve to get a new rowId
+		$rowSleeve = $this->createNewRowSleeve($row->getTableId());
+		$row->setId($rowSleeve->getId());
+
+		// write all cells to its db-table
+		foreach ($row->getData() as $cell) {
+			$this->insertCell($rowSleeve->getId(), $cell['columnId'], $cell['value']);
+		}
+
+		return $row;
+	}
+
+	/**
+	 * @throws InternalError
+	 */
+	public function update(Row $row, array $columns): Row {
+		if(!$columns) {
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': columns are missing');
+		}
+		$this->setColumns($columns);
+
+		// if nothing has changed
+		if (count($row->getChangedCells()) === 0) {
+			return $row;
+		}
+
+		// update meta data for sleeve
 		try {
-			$result = $this->findOneQuery($qb);
-			return (int)$result['counter'];
+			$sleeve = $this->rowSleeveMapper->find($row->getId());
+			$this->updateMetaData($sleeve);
+			$this->rowSleeveMapper->update($sleeve);
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
-			$this->logger->warning('Exception occurred: '.$e->getMessage().' Returning 0.');
-			return 0;
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
+
+		// write all changed cells to its db-table
+		foreach ($row->getChangedCells() as $cell) {
+			$this->insertOrUpdateCell($sleeve->getId(), $cell['columnId'], $cell['value']);
+		}
+
+		return $row;
 	}
 
+	/**
+	 * @throws Exception
+	 */
+	private function createNewRowSleeve(int $tableId): RowSleeve {
+		$rowSleeve = new RowSleeve();
+		$rowSleeve->setTableId($tableId);
+		$this->updateMetaData($rowSleeve, true);
+		return $this->rowSleeveMapper->insert($rowSleeve);
+	}
 
-	public function getRowIdsOfView(View $view, $userId): array {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('t1.id')
-			->from($this->table, 't1')
-			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), IQueryBuilder::PARAM_INT)));
+	/**
+	 * Updates the last_edit_by and last_edit_at data
+	 * optional adds the created_by and created_at data
+	 *
+	 * @param RowSleeve|RowCellSuper $entity
+	 * @param bool $setCreate
+	 * @return void
+	 */
+	private function updateMetaData($entity, bool $setCreate = false): void {
+		$time = new DateTime();
+		if ($setCreate) {
+			$entity->setCreatedBy($this->userId);
+			$entity->setCreatedAt($time->format('Y-m-d H:i:s'));
+		}
+		$entity->setLastEditBy($this->userId);
+		$entity->setLastEditAt($time->format('Y-m-d H:i:s'));
+	}
 
-		$neededColumnIds = $this->getAllColumnIdsFromView($view, $qb);
-		$neededColumns = $this->columnMapper->getColumnTypes($neededColumnIds);
+	/**
+	 * Insert a cell to its specific db-table
+	 *
+	 * @throws InternalError
+	 */
+	private function insertCell(int $rowId, int $columnId, $value): void {
+		$cellClassName = 'OCA\Tables\Db\RowCell'.ucfirst($this->columns[$columnId]->getType());
+		/** @var RowCellSuper $cell */
+		$cell = new $cellClassName();
 
-		// Filter
+		$cell->setRowIdWrapper($rowId);
+		$cell->setColumnIdWrapper($columnId);
+		$this->updateMetaData($cell);
 
-		$this->addFilterToQuery($qb, $view, $neededColumns, $userId);
-		$result = $qb->executeQuery();
+		// insert new cell
+		$cellMapperClassName = 'OCA\Tables\Db\RowCell'.ucfirst($this->columns[$columnId]->getType()).'Mapper';
+		/** @var QBMapper $cellMapper */
 		try {
-			$ids = [];
-			while ($row = $result->fetch()) {
-				$ids[] = $row['id'];
-			}
-			return $ids;
-		} finally {
-			$result->closeCursor();
+			$cellMapper = Server::get($cellMapperClassName);
+		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+
+		$v = $this->formatValue($this->columns[$columnId], $value, 'in');
+		$cell->setValueWrapper($v);
+
+		try {
+			$cellMapper->insert($cell);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 	}
 
+	/**
+	 * @param RowCellSuper $cell
+	 * @param RowCellMapperSuper $mapper
+	 * @param mixed $value the value should be parsed to the correct format within the row service
+	 * @param Column $column
+	 * @throws InternalError
+	 */
+	private function updateCell(RowCellSuper $cell, RowCellMapperSuper $mapper, $value, Column $column): void {
+		$v = $this->formatValue($column, $value, 'in');
+		$cell->setValueWrapper($v);
+		$this->updateMetaData($cell);
+		$mapper->updateWrapper($cell);
+	}
 
-	private function addFilterToQuery(IQueryBuilder $qb, View $view, array $neededColumnTypes, string $userId): void {
-		$enrichedFilters = $view->getFilterArray();
-		if (count($enrichedFilters) > 0) {
-			foreach ($enrichedFilters as &$filterGroup) {
-				foreach ($filterGroup as &$filter) {
-					$filter['columnType'] = $neededColumnTypes[$filter['columnId']];
-					// TODO move resolution for magic fields to service layer
-					if(str_starts_with((string) $filter['value'], '@')) {
-						$filter['value'] = $this->resolveSearchValue((string) $filter['value'], $userId);
-					}
-				}
-			}
-			$qb->andWhere(
-				$qb->expr()->orX(
-					...$this->getFilterGroups($qb, $enrichedFilters)
-				)
-			);
+	/**
+	 * @throws InternalError
+	 */
+	private function insertOrUpdateCell(int $rowId, int $columnId, $value): void {
+		$cellMapperClassName = 'OCA\Tables\Db\RowCell'.ucfirst($this->columns[$columnId]->getType()).'Mapper';
+		/** @var RowCellMapperSuper $cellMapper */
+		try {
+			$cellMapper = Server::get($cellMapperClassName);
+		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+		try {
+			$cell = $cellMapper->findByRowAndColumn($rowId, $columnId);
+			$this->updateCell($cell, $cellMapper, $value, $this->columns[$columnId]);
+		} catch (DoesNotExistException $e) {
+			$this->insertCell($rowId, $columnId, $value);
+		} catch (MultipleObjectsReturnedException|Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+	}
+
+	/**
+	 * @param Column[] $columns
+	 */
+	private function setColumns(array $columns): void {
+		foreach ($columns as $column) {
+			$this->columns[$column->getId()] = $column;
+		}
+	}
+
+	/**
+	 * @param Column $column
+	 * @param mixed $value
+	 * @param 'out'|'in' $mode Parse the value for incoming requests that get send to the db or outgoing, from the db to the services
+	 * @return mixed
+	 * @throws InternalError
+	 */
+	private function formatValue(Column $column, $value, string $mode = 'out') {
+		$cellMapperClassName = 'OCA\Tables\Db\RowCell'.ucfirst($column->getType()).'Mapper';
+		/** @var RowCellMapperSuper $cellMapper */
+		try {
+			$cellMapper = Server::get($cellMapperClassName);
+		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+		if ($mode === 'out') {
+			return $cellMapper->parseValueOutgoing($column, $value);
+		} else {
+			return $cellMapper->parseValueIncoming($column, $value);
+		}
+	}
+
+	/**
+	 * @throws InternalError
+	 */
+	private function getColumnDbParamType(Column $column) {
+		$cellMapperClassName = 'OCA\Tables\Db\RowCell'.ucfirst($column->getType()).'Mapper';
+		/** @var RowCellMapperSuper $cellMapper */
+		try {
+			$cellMapper = Server::get($cellMapperClassName);
+		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+		return $cellMapper->getDbParamType();
+	}
+
+	/**
+	 * @throws InternalError
+	 */
+	public function deleteDataForColumn(Column $column): void {
+		$cellMapperClassName = 'OCA\Tables\Db\RowCell' . ucfirst($column->getType()) . 'Mapper';
+		/** @var RowCellMapperSuper $cellMapper */
+		try {
+			$cellMapper = Server::get($cellMapperClassName);
+		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+		try {
+			$cellMapper->deleteAllForColumn($column->getId());
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 	}
 
 	/**
 	 * @param int $tableId
-	 * @param int|null $limit
-	 * @param int|null $offset
-	 * @return array
-	 * @throws Exception
+	 * @param Column[] $columns
+	 * @return void
 	 */
-	public function findAllByTable(int $tableId, ?int $limit = null, ?int $offset = null): array {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('t1.*')
-			->from($this->table, 't1')
-			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId)));
-
-		if ($limit !== null) {
-			$qb->setMaxResults($limit);
+	public function deleteAllForTable(int $tableId, array $columns): void {
+		foreach ($columns as $column) {
+			try {
+				$this->deleteDataForColumn($column);
+			} catch (InternalError $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+			}
 		}
-		if ($offset !== null) {
-			$qb->setFirstResult($offset);
+		try {
+			$this->rowSleeveMapper->deleteAllForTable($tableId);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
 		}
+	}
 
-		return $this->findEntities($qb);
+	public function countRowsForTable(int $tableId): int {
+		return $this->rowSleeveMapper->countRows($tableId);
 	}
 
 	/**
 	 * @param View $view
 	 * @param string $userId
-	 * @param int|null $limit
-	 * @param int|null $offset
-	 * @return array
-	 * @throws Exception
-	 */
-	public function findAllByView(View $view, string $userId, ?int $limit = null, ?int $offset = null): array {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('t1.*')
-			->from($this->table, 't1')
-			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($view->getTableId(), IQueryBuilder::PARAM_INT)));
-
-
-		$neededColumnIds = $this->getAllColumnIdsFromView($view, $qb);
-		$neededColumnsTypes = $this->columnMapper->getColumnTypes($neededColumnIds);
-
-		// Filter
-
-		$this->addFilterToQuery($qb, $view, $neededColumnsTypes, $userId);
-
-		// Sorting
-
-		$enrichedSort = $view->getSortArray();
-		foreach ($enrichedSort as &$sort) {
-			$sort['columnType'] = $neededColumnsTypes[$sort['columnId']];
-		}
-		$this->addOrderByRules($qb, $enrichedSort);
-
-		if ($limit !== null) {
-			$qb->setMaxResults($limit);
-		}
-		if ($offset !== null) {
-			$qb->setFirstResult($offset);
-		}
-		$rows = $this->findEntities($qb);
-		foreach ($rows as &$row) {
-			$row->setDataArray(array_filter($row->getDataArray(), function ($item) use ($view) {
-				return in_array($item['columnId'], $view->getColumnsArray());
-			}));
-		}
-		return $rows;
-	}
-
-	private function getAllColumnIdsFromView(View $view, IQueryBuilder $qb): array {
-		$neededColumnIds = [];
-		$filters = $view->getFilterArray();
-		$sorts = $view->getSortArray();
-		foreach ($filters as $filterGroup) {
-			foreach ($filterGroup as $filter) {
-				$neededColumnIds[] = $filter['columnId'];
-			}
-		}
-		foreach ($sorts as $sortRule) {
-			$neededColumnIds[] = $sortRule['columnId'];
-		}
-		$neededColumnIds = array_unique($neededColumnIds);
-		if ($this->platform === IColumnTypeQB::DB_PLATFORM_PGSQL) {
-			foreach ($neededColumnIds as $columnId) {
-				if ($columnId >= 0) {
-					/** @psalm-suppress ImplicitToStringCast */
-					$qb->leftJoin("t1", $qb->createFunction('json_array_elements(t1.data)'), 'c' . intval($columnId), $qb->createFunction("CAST(c".intval($columnId).".value->>'columnId' AS int) = ".$columnId));
-					// TODO Security
-				}
-			}
-		}
-		return $neededColumnIds;
-	}
-
-	/**
-	 * @throws MultipleObjectsReturnedException
-	 * @throws DoesNotExistException
-	 * @throws Exception
-	 */
-	public function findNext(int $offsetId = -1): Row {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('t1.*')
-			->from($this->table, 't1')
-			->where($qb->expr()->gt('id', $qb->createNamedParameter($offsetId)))
-			->setMaxResults(1)
-			->orderBy('id', 'ASC');
-
-		return $this->findEntity($qb);
-	}
-
-	/**
-	 * @return int affected rows
-	 * @throws Exception
-	 */
-	public function deleteAllByTable(int $tableId): int {
-		$qb = $this->db->getQueryBuilder();
-		$qb->delete($this->tableName)
-			->where(
-				$qb->expr()->eq('table_id', $qb->createNamedParameter($tableId))
-			);
-		return $qb->executeStatement();
-	}
-
-	/**
-	 * @throws Exception
-	 */
-	public function findAllWithColumn(int $columnId): array {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->table, 't1');
-
-		$this->genericColumnQB->addWhereForFindAllWithColumn($qb, $columnId);
-
-		return $this->findEntities($qb);
-	}
-
-	/**
-	 * @param int $tableId
+	 * @param Column[] $columns
 	 * @return int
 	 */
-	public function countRows(int $tableId): int {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select($qb->func()->count('*', 'counter'));
-		$qb->from($this->table, 't1');
-		$qb->where(
-			$qb->expr()->eq('table_id', $qb->createNamedParameter($tableId))
-		);
+	public function countRowsForView(View $view, string $userId, array $columns): int {
+		$this->setColumns($columns);
 
+		$filter = $view->getFilterArray();
 		try {
-			$result = $this->findOneQuery($qb);
-			return (int)$result['counter'];
-		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
-			$this->logger->warning('Exception occurred: '.$e->getMessage().' Returning 0.');
-			return 0;
+			$rowIds = $this->getWantedRowIds($userId, $view->getTableId(), $filter);
+		} catch (InternalError $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			$rowIds = [];
 		}
+		return count($rowIds);
 	}
 
-	/**
-	 * @param int $id
-	 * @param View $view
-	 * @return Row
-	 * @throws DoesNotExistException
-	 * @throws Exception
-	 * @throws MultipleObjectsReturnedException
-	 */
-	public function findByView(int $id, View $view): Row {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('t1.*')
-			->from($this->table, 't1')
-			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
-		$row = $this->findEntity($qb);
-
-		$row->setDataArray(array_filter($row->getDataArray(), function ($item) use ($view) {
-			return in_array($item['columnId'], $view->getColumnsArray());
-		}));
-
-		return $row;
-	}
 }
