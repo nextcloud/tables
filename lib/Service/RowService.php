@@ -4,10 +4,9 @@ namespace OCA\Tables\Service;
 
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
-use OCA\Tables\Db\LegacyRow;
+use OCA\Tables\Db\LegacyRowMapper;
 use OCA\Tables\Db\Row;
 use OCA\Tables\Db\RowMapper;
-use OCA\Tables\Db\LegacyRowMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
@@ -37,7 +36,7 @@ class RowService extends SuperService {
 	private array $tmpRows = []; // holds already loaded rows as a small cache
 
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-								LegacyRowMapper    $mapper, ColumnMapper $columnMapper, ViewMapper $viewMapper, TableMapper $tableMapper, RowMapper $row2Mapper) {
+		LegacyRowMapper    $mapper, ColumnMapper $columnMapper, ViewMapper $viewMapper, TableMapper $tableMapper, RowMapper $row2Mapper) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
 		$this->columnMapper = $columnMapper;
