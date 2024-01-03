@@ -23,8 +23,8 @@
 
 namespace OCA\Tables\Command;
 
-use OCA\Tables\Db\Row;
-use OCA\Tables\Db\RowMapper;
+use OCA\Tables\Db\LegacyRow;
+use OCA\Tables\Db\LegacyRowMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -50,17 +50,17 @@ class Clean extends Command {
 	protected RowService $rowService;
 	protected TableService $tableService;
 	protected LoggerInterface $logger;
-	protected RowMapper $rowMapper;
+	protected LegacyRowMapper $rowMapper;
 
 	private bool $dry = false;
 	private int $truncateLength = 20;
 
-	private ?Row $row = null;
+	private ?LegacyRow $row = null;
 	private int $offset = -1;
 
 	private OutputInterface $output;
 
-	public function __construct(LoggerInterface $logger, ColumnService $columnService, RowService $rowService, TableService $tableService, RowMapper $rowMapper) {
+	public function __construct(LoggerInterface $logger, ColumnService $columnService, RowService $rowService, TableService $tableService, LegacyRowMapper $rowMapper) {
 		parent::__construct();
 		$this->logger = $logger;
 		$this->columnService = $columnService;
