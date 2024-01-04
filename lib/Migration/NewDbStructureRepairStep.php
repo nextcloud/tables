@@ -59,7 +59,7 @@ class NewDbStructureRepairStep implements IRepairStep {
 	 */
 	private function transferDataForTables(array $tables, IOutput $output) {
 		foreach ($tables as $table) {
-			$output->info("-- Start transfer for table " . $table->getId()) . " (" . $table->getTitle() . ")";
+			$output->info("-- Start transfer for table " . $table->getId() . " (" . $table->getTitle() . ")");
 			try {
 				$this->transferTable($table, $output);
 			} catch (InternalError|PermissionError|Exception $e) {
