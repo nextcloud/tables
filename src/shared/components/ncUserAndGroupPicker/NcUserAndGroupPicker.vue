@@ -140,7 +140,7 @@ export default {
 			shareTypes.forEach(shareType => {
 				shareTypeQueryString += `&shareTypes[]=${shareType}`
 			})
-			const url = generateOcsUrl('core/autocomplete/get?search={searchQuery}&itemType=%20&itemId=%20{shareTypeQueryString}&limit={limit}', { searchQuery: search, shareTypeQueryString, limit: this.maxAutocompleteResults })
+			const url = generateOcsUrl(`core/autocomplete/get?search=${search}${shareTypeQueryString}&limit=${this.maxAutocompleteResults}`)
 
 			try {
 				const res = await axios.get(url)
