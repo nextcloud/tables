@@ -251,7 +251,7 @@ class LegacyRowMapper extends QBMapper {
 	 * @param int $tableId
 	 * @param int|null $limit
 	 * @param int|null $offset
-	 * @return array
+	 * @return LegacyRow[]
 	 * @throws Exception
 	 */
 	public function findAllByTable(int $tableId, ?int $limit = null, ?int $offset = null): array {

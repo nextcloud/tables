@@ -388,13 +388,18 @@ class RowMapper {
 		}
 		$this->setColumns($columns);
 
-		// create a new row sleeve to get a new rowId
-		$rowSleeve = $this->createNewRowSleeve($row->getTableId());
-		$row->setId($rowSleeve->getId());
+		if($row->getId()) {
+			// if row has an id from migration or import etc.
+			$rowSleeve = $this->createRowSleeveFromExistingData($row->getId(), $row->getTableId(), $row->getCreatedAt(), $row->getCreatedBy(), $row->getLastEditBy(), $row->getLastEditAt());
+		} else {
+			// create a new row sleeve to get a new rowId
+			$rowSleeve = $this->createNewRowSleeve($row->getTableId());
+			$row->setId($rowSleeve->getId());
+		}
 
 		// write all cells to its db-table
 		foreach ($row->getData() as $cell) {
-			$this->insertCell($rowSleeve->getId(), $cell['columnId'], $cell['value']);
+			$this->insertCell($rowSleeve->getId(), $cell['columnId'], $cell['value'], $rowSleeve->getLastEditAt(), $rowSleeve->getLastEditBy());
 		}
 
 		return $row;
@@ -443,21 +448,37 @@ class RowMapper {
 	}
 
 	/**
+	 * @throws Exception
+	 */
+	private function createRowSleeveFromExistingData(int $id, int $tableId, string $createdAt, string $createdBy, string $lastEditBy, string $lastEditAt): RowSleeve {
+		$rowSleeve = new RowSleeve();
+		$rowSleeve->setId($id);
+		$rowSleeve->setTableId($tableId);
+		$rowSleeve->setCreatedBy($createdBy);
+		$rowSleeve->setCreatedAt($createdAt);
+		$rowSleeve->setLastEditBy($lastEditBy);
+		$rowSleeve->setLastEditAt($lastEditAt);
+		return $this->rowSleeveMapper->insert($rowSleeve);
+	}
+
+	/**
 	 * Updates the last_edit_by and last_edit_at data
 	 * optional adds the created_by and created_at data
 	 *
 	 * @param RowSleeve|RowCellSuper $entity
 	 * @param bool $setCreate
+	 * @param string|null $lastEditAt
+	 * @param string|null $lastEditBy
 	 * @return void
 	 */
-	private function updateMetaData($entity, bool $setCreate = false): void {
+	private function updateMetaData($entity, bool $setCreate = false, ?string $lastEditAt = null, ?string $lastEditBy = null): void {
 		$time = new DateTime();
 		if ($setCreate) {
 			$entity->setCreatedBy($this->userId);
 			$entity->setCreatedAt($time->format('Y-m-d H:i:s'));
 		}
-		$entity->setLastEditBy($this->userId);
-		$entity->setLastEditAt($time->format('Y-m-d H:i:s'));
+		$entity->setLastEditBy($lastEditBy ?: $this->userId);
+		$entity->setLastEditAt($lastEditAt ?: $time->format('Y-m-d H:i:s'));
 	}
 
 	/**
@@ -465,14 +486,14 @@ class RowMapper {
 	 *
 	 * @throws InternalError
 	 */
-	private function insertCell(int $rowId, int $columnId, $value): void {
+	private function insertCell(int $rowId, int $columnId, $value, ?string $lastEditAt = null, ?string $lastEditBy = null): void {
 		$cellClassName = 'OCA\Tables\Db\RowCell'.ucfirst($this->columns[$columnId]->getType());
 		/** @var RowCellSuper $cell */
 		$cell = new $cellClassName();
 
 		$cell->setRowIdWrapper($rowId);
 		$cell->setColumnIdWrapper($columnId);
-		$this->updateMetaData($cell);
+		$this->updateMetaData($cell, false, $lastEditAt, $lastEditBy);
 
 		// insert new cell
 		$cellMapperClassName = 'OCA\Tables\Db\RowCell'.ucfirst($this->columns[$columnId]->getType()).'Mapper';
