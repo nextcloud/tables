@@ -7,17 +7,38 @@ declare(strict_types=1);
 namespace OCA\Tables\Migration;
 
 use Closure;
-use OCA\Tables\Helper\ColumnsHelper;
 use OCP\DB\Exception;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\Types;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
-use OCP\Server;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 class Version000700Date20230916000000 extends SimpleMigrationStep {
+
+	/**
+	 * this is a copy from the definition set in OCA\Tables\Helper\ColumnsHelper
+	 * this has to be in sync! but the definition can not be used directly
+	 * because it might cause problems on auto web updates
+	 * (class might not be loaded if it gets replaced during the runtime)
+	 */
+	private array $columns = [
+		[
+			'name' => 'text',
+			'db_type' => Types::TEXT,
+		],
+		[
+			'name' => 'number',
+			'db_type' => Types::FLOAT,
+		],
+		[
+			'name' => 'datetime',
+			'db_type' => Types::TEXT,
+		],
+		[
+			'name' => 'selection',
+			'db_type' => Types::TEXT,
+		],
+	];
 
 	/**
 	 * @param IOutput $output
@@ -32,13 +53,7 @@ class Version000700Date20230916000000 extends SimpleMigrationStep {
 
 		$this->createRowSleevesTable($schema);
 
-		try {
-			$columnsHelper = Server::get(ColumnsHelper::class);
-		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
-			throw new Exception('Could not fetch columns helper which is needed to setup all the tables.');
-		}
-
-		$rowTypeSchema = $columnsHelper->get(['name', 'db_type']);
+		$rowTypeSchema = $this->columns;
 
 		foreach ($rowTypeSchema as $colType) {
 			$this->createRowValueTable($schema, $colType['name'], $colType['db_type']);
