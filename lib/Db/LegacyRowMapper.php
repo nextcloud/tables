@@ -33,10 +33,11 @@ class LegacyRowMapper extends QBMapper {
 	protected ColumnMapper $columnMapper;
 	protected LoggerInterface $logger;
 	protected UserHelper $userHelper;
+	protected RowMapper $rowMapper;
 
 	protected int $platform;
 
-	public function __construct(IDBConnection $db, LoggerInterface $logger, TextColumnQB $textColumnQB, SelectionColumnQB $selectionColumnQB, NumberColumnQB $numberColumnQB, DatetimeColumnQB $datetimeColumnQB, SuperColumnQB $columnQB, ColumnMapper $columnMapper, UserHelper $userHelper) {
+	public function __construct(IDBConnection $db, LoggerInterface $logger, TextColumnQB $textColumnQB, SelectionColumnQB $selectionColumnQB, NumberColumnQB $numberColumnQB, DatetimeColumnQB $datetimeColumnQB, SuperColumnQB $columnQB, ColumnMapper $columnMapper, UserHelper $userHelper, RowMapper $rowMapper) {
 		parent::__construct($db, $this->table, LegacyRow::class);
 		$this->logger = $logger;
 		$this->textColumnQB = $textColumnQB;
@@ -46,6 +47,7 @@ class LegacyRowMapper extends QBMapper {
 		$this->genericColumnQB = $columnQB;
 		$this->columnMapper = $columnMapper;
 		$this->userHelper = $userHelper;
+		$this->rowMapper = $rowMapper;
 		$this->setPlatform();
 	}
 
@@ -423,5 +425,24 @@ class LegacyRowMapper extends QBMapper {
 		}));
 
 		return $row;
+	}
+
+	/**
+	 * @param Column[] $columns
+	 * @param LegacyRow $legacyRow
+	 *
+	 * @throws Exception
+	 * @throws InternalError
+	 */
+	public function transferLegacyRow(LegacyRow $legacyRow, array $columns) {
+		$row = new Row();
+		$row->setId($legacyRow->getId());
+		$row->setTableId($legacyRow->getTableId());
+		$row->setCreatedBy($legacyRow->getCreatedBy());
+		$row->setCreatedAt($legacyRow->getCreatedAt());
+		$row->setLastEditBy($legacyRow->getLastEditBy());
+		$row->setLastEditAt($legacyRow->getLastEditAt());
+		$row->setData($legacyRow->getDataArray());
+		$this->rowMapper->insert($row, $columns);
 	}
 }
