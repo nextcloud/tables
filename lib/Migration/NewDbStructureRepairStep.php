@@ -3,7 +3,6 @@
 namespace OCA\Tables\Migration;
 
 use OCA\Tables\Db\LegacyRowMapper;
-use OCA\Tables\Db\Row;
 use OCA\Tables\Db\RowMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Errors\InternalError;
@@ -11,6 +10,7 @@ use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\TableService;
 use OCP\DB\Exception;
+use OCP\IConfig;
 use OCP\Migration\IOutput;
 use OCP\Migration\IRepairStep;
 use Psr\Log\LoggerInterface;
@@ -22,13 +22,15 @@ class NewDbStructureRepairStep implements IRepairStep {
 	protected LegacyRowMapper $legacyRowMapper;
 	protected RowMapper $rowMapper;
 	protected ColumnService $columnService;
+	protected IConfig $config;
 
-	public function __construct(LoggerInterface $logger, TableService $tableService, ColumnService $columnService, LegacyRowMapper $legacyRowMapper, RowMapper $rowMapper) {
+	public function __construct(LoggerInterface $logger, TableService $tableService, ColumnService $columnService, LegacyRowMapper $legacyRowMapper, RowMapper $rowMapper, IConfig $config) {
 		$this->logger = $logger;
 		$this->tableService = $tableService;
 		$this->columnService = $columnService;
 		$this->legacyRowMapper = $legacyRowMapper;
 		$this->rowMapper = $rowMapper;
+		$this->config = $config;
 	}
 
 	/**
@@ -42,6 +44,12 @@ class NewDbStructureRepairStep implements IRepairStep {
 	 * @param IOutput $output
 	 */
 	public function run(IOutput $output) {
+		$appVersion = $this->config->getAppValue('tables', 'installed_version');
+
+		if (!$appVersion || version_compare($appVersion, '0.7.0', '<')) {
+			return;
+		}
+
 		$output->info("Look for tables");
 		try {
 			$tables = $this->tableService->findAll('', true, true, false);
@@ -58,14 +66,16 @@ class NewDbStructureRepairStep implements IRepairStep {
 	 * @return void
 	 */
 	private function transferDataForTables(array $tables, IOutput $output) {
+		$i = 1;
 		foreach ($tables as $table) {
-			$output->info("-- Start transfer for table " . $table->getId() . " (" . $table->getTitle() . ")");
+			$output->info("-- Start transfer for table " . $table->getId() . " (" . $table->getTitle() . ") [" . $i . "/" . count($tables) . "]");
 			try {
 				$this->transferTable($table, $output);
 			} catch (InternalError|PermissionError|Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				$output->warning("Could not transfer data. Continue with next table. The logs will have more information about the error.");
 			}
+			$i++;
 		}
 	}
 
@@ -83,16 +93,7 @@ class NewDbStructureRepairStep implements IRepairStep {
 
 		$output->startProgress(count($legacyRows));
 		foreach ($legacyRows as $legacyRow) {
-			$row = new Row();
-			$row->setId($legacyRow->getId());
-			$row->setTableId($legacyRow->getTableId());
-			$row->setCreatedBy($legacyRow->getCreatedBy());
-			$row->setCreatedAt($legacyRow->getCreatedAt());
-			$row->setLastEditBy($legacyRow->getLastEditBy());
-			$row->setLastEditAt($legacyRow->getLastEditAt());
-			$row->setData($legacyRow->getDataArray());
-			$this->rowMapper->insert($row, $columns);
-
+			$this->legacyRowMapper->transferLegacyRow($legacyRow, $columns);
 			$output->advance(1);
 		}
 		$output->finishProgress();

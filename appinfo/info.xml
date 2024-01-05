@@ -58,6 +58,7 @@ Have a good time and manage whatever you want.
 		<command>OCA\Tables\Command\RenameTable</command>
 		<command>OCA\Tables\Command\ChangeOwnershipTable</command>
 		<command>OCA\Tables\Command\Clean</command>
+		<command>OCA\Tables\Command\TransferLegacyRows</command>
 	</commands>
 	<navigations>
 		<navigation>
