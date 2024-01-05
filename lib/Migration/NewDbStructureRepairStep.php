@@ -44,9 +44,9 @@ class NewDbStructureRepairStep implements IRepairStep {
 	 * @param IOutput $output
 	 */
 	public function run(IOutput $output) {
-		$appVersion = $this->config->getAppValue('tables', 'installed_version');
+		$legacyRowTransferRunComplete = $this->config->getAppValue('tables', 'legacyRowTransferRunComplete', "false");
 
-		if (!$appVersion || version_compare($appVersion, '0.7.0', '<')) {
+		if ($legacyRowTransferRunComplete === "true") {
 			return;
 		}
 
@@ -59,6 +59,7 @@ class NewDbStructureRepairStep implements IRepairStep {
 			return;
 		}
 		$this->transferDataForTables($tables, $output);
+		$this->config->setAppValue('tables', 'legacyRowTransferRunComplete', "true");
 	}
 
 	/**
