@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a02c84c3d91c647e9aea00547c4f751f",
+    "content-hash": "583101c4e273135ddfc7ece0a8b5c78c",
     "packages": [
         {
             "name": "ezyang/htmlpurifier",
@@ -634,101 +634,88 @@
     ],
     "packages-dev": [
         {
-            "name": "adhocore/cli",
-            "version": "v1.6.1",
+            "name": "bamarni/composer-bin-plugin",
+            "version": "1.8.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/adhocore/php-cli.git",
-                "reference": "25b5a93e5eebcdb70e20ee33313a011ea3a4f770"
+                "url": "https://github.com/bamarni/composer-bin-plugin.git",
+                "reference": "92fd7b1e6e9cdae19b0d57369d8ad31a37b6a880"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/adhocore/php-cli/zipball/25b5a93e5eebcdb70e20ee33313a011ea3a4f770",
-                "reference": "25b5a93e5eebcdb70e20ee33313a011ea3a4f770",
+                "url": "https://api.github.com/repos/bamarni/composer-bin-plugin/zipball/92fd7b1e6e9cdae19b0d57369d8ad31a37b6a880",
+                "reference": "92fd7b1e6e9cdae19b0d57369d8ad31a37b6a880",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.0"
+                "composer-plugin-api": "^2.0",
+                "php": "^7.2.5 || ^8.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^9.0"
+                "composer/composer": "^2.0",
+                "ext-json": "*",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan": "^1.8",
+                "phpstan/phpstan-phpunit": "^1.1",
+                "phpunit/phpunit": "^8.5 || ^9.5",
+                "symfony/console": "^2.8.52 || ^3.4.35 || ^4.4 || ^5.0 || ^6.0",
+                "symfony/finder": "^2.8.52 || ^3.4.35 || ^4.4 || ^5.0 || ^6.0",
+                "symfony/process": "^2.8.52 || ^3.4.35 || ^4.4 || ^5.0 || ^6.0"
             },
-            "type": "library",
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Bamarni\\Composer\\Bin\\BamarniBinPlugin"
+            },
             "autoload": {
                 "psr-4": {
-                    "Ahc\\Cli\\": "src/"
+                    "Bamarni\\Composer\\Bin\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
-            "authors": [
-                {
-                    "name": "Jitendra Adhikari",
-                    "email": "jiten.adhikary@gmail.com"
-                }
-            ],
-            "description": "Command line interface library for PHP",
+            "description": "No conflicts for your bin dependencies",
             "keywords": [
-                "argument-parser",
-                "argv-parser",
-                "cli",
-                "cli-action",
-                "cli-app",
-                "cli-color",
-                "cli-option",
-                "cli-writer",
-                "command",
-                "console",
-                "console-app",
-                "php-cli",
-                "php8",
-                "stream-input",
-                "stream-output"
+                "composer",
+                "conflict",
+                "dependency",
+                "executable",
+                "isolation",
+                "tool"
             ],
             "support": {
-                "issues": "https://github.com/adhocore/php-cli/issues",
-                "source": "https://github.com/adhocore/php-cli/tree/v1.6.1"
+                "issues": "https://github.com/bamarni/composer-bin-plugin/issues",
+                "source": "https://github.com/bamarni/composer-bin-plugin/tree/1.8.2"
             },
-            "funding": [
-                {
-                    "url": "https://paypal.me/ji10",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/adhocore",
-                    "type": "github"
-                }
-            ],
-            "time": "2023-06-26T09:55:29+00:00"
+            "time": "2022-10-31T08:38:03+00:00"
         },
         {
             "name": "doctrine/instantiator",
-            "version": "2.0.0",
+            "version": "1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/instantiator.git",
-                "reference": "c6222283fa3f4ac679f8b9ced9a4e23f163e80d0"
+                "reference": "0a0fa9780f5d4e507415a065172d26a98d02047b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/instantiator/zipball/c6222283fa3f4ac679f8b9ced9a4e23f163e80d0",
-                "reference": "c6222283fa3f4ac679f8b9ced9a4e23f163e80d0",
+                "url": "https://api.github.com/repos/doctrine/instantiator/zipball/0a0fa9780f5d4e507415a065172d26a98d02047b",
+                "reference": "0a0fa9780f5d4e507415a065172d26a98d02047b",
                 "shasum": ""
             },
             "require": {
-                "php": "^8.1"
+                "php": "^7.1 || ^8.0"
             },
             "require-dev": {
-                "doctrine/coding-standard": "^11",
+                "doctrine/coding-standard": "^9 || ^11",
                 "ext-pdo": "*",
                 "ext-phar": "*",
-                "phpbench/phpbench": "^1.2",
-                "phpstan/phpstan": "^1.9.4",
-                "phpstan/phpstan-phpunit": "^1.3",
-                "phpunit/phpunit": "^9.5.27",
-                "vimeo/psalm": "^5.4"
+                "phpbench/phpbench": "^0.16 || ^1",
+                "phpstan/phpstan": "^1.4",
+                "phpstan/phpstan-phpunit": "^1",
+                "phpunit/phpunit": "^7.5 || ^8.5 || ^9.5",
+                "vimeo/psalm": "^4.30 || ^5.4"
             },
             "type": "library",
             "autoload": {
@@ -755,7 +742,7 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/instantiator/issues",
-                "source": "https://github.com/doctrine/instantiator/tree/2.0.0"
+                "source": "https://github.com/doctrine/instantiator/tree/1.5.0"
             },
             "funding": [
                 {
@@ -771,7 +758,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-12-30T00:23:10+00:00"
+            "time": "2022-12-30T00:15:36+00:00"
         },
         {
             "name": "myclabs/deep-copy",
@@ -917,55 +904,6 @@
                 "source": "https://github.com/nextcloud-deps/ocp/tree/master"
             },
             "time": "2023-12-23T00:31:42+00:00"
-        },
-        {
-            "name": "nextcloud/openapi-extractor",
-            "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/nextcloud/openapi-extractor.git",
-                "reference": "25ea3662212e6202a1bf3b0f1210dd7b71a9d7cd"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/nextcloud/openapi-extractor/zipball/25ea3662212e6202a1bf3b0f1210dd7b71a9d7cd",
-                "reference": "25ea3662212e6202a1bf3b0f1210dd7b71a9d7cd",
-                "shasum": ""
-            },
-            "require": {
-                "adhocore/cli": "^v1.6",
-                "ext-simplexml": "*",
-                "nikic/php-parser": "^4.16",
-                "php": "^8.1",
-                "phpstan/phpdoc-parser": "^1.23"
-            },
-            "require-dev": {
-                "nextcloud/coding-standard": "^1.1"
-            },
-            "default-branch": true,
-            "bin": [
-                "generate-spec",
-                "merge-specs"
-            ],
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "OpenAPIExtractor\\": "src"
-                }
-            },
-            "scripts": {
-                "cs:check": [
-                    "php-cs-fixer fix --dry-run --diff"
-                ],
-                "cs:fix": [
-                    "php-cs-fixer fix"
-                ]
-            },
-            "support": {
-                "source": "https://github.com/nextcloud/openapi-extractor/tree/main",
-                "issues": "https://github.com/nextcloud/openapi-extractor/issues"
-            },
-            "time": "2023-12-21T16:01:34+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -1185,53 +1123,6 @@
                 "source": "https://github.com/PHP-CS-Fixer/shim/tree/v3.46.0"
             },
             "time": "2024-01-03T21:39:12+00:00"
-        },
-        {
-            "name": "phpstan/phpdoc-parser",
-            "version": "1.25.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "bd84b629c8de41aa2ae82c067c955e06f1b00240"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/bd84b629c8de41aa2ae82c067c955e06f1b00240",
-                "reference": "bd84b629c8de41aa2ae82c067c955e06f1b00240",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.2 || ^8.0"
-            },
-            "require-dev": {
-                "doctrine/annotations": "^2.0",
-                "nikic/php-parser": "^4.15",
-                "php-parallel-lint/php-parallel-lint": "^1.2",
-                "phpstan/extension-installer": "^1.0",
-                "phpstan/phpstan": "^1.5",
-                "phpstan/phpstan-phpunit": "^1.1",
-                "phpstan/phpstan-strict-rules": "^1.0",
-                "phpunit/phpunit": "^9.5",
-                "symfony/process": "^5.2"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "PHPStan\\PhpDocParser\\": [
-                        "src/"
-                    ]
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "PHPDoc parser with support for nullable, intersection and generic types",
-            "support": {
-                "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.25.0"
-            },
-            "time": "2024-01-04T17:06:16+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -2961,8 +2852,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "nextcloud/ocp": 20,
-        "nextcloud/openapi-extractor": 20
+        "nextcloud/ocp": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

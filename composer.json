@@ -9,25 +9,22 @@
 			"email": "florian@nextcloud.com"
 		}
 	],
-	"repositories": [
-		{
-			"type": "vcs",
-			"url": "https://github.com/nextcloud/openapi-extractor"
-		}
-	],
     "require-dev": {
 		"nextcloud/coding-standard": "^v1.0.0",
 		"nextcloud/ocp": "dev-master",
 		"staabm/annotate-pull-request-from-checkstyle": "^1.8",
 		"phpunit/phpunit": "^9",
-		"nextcloud/openapi-extractor": "dev-main",
-		"psalm/phar": "^5.18"
+		"psalm/phar": "^5.18",
+		"bamarni/composer-bin-plugin": "^1.8"
 	},
 	"config": {
 		"optimize-autoloader": true,
 		"classmap-authoritative": true,
 		"platform": {
 			"php": "8.0"
+		},
+		"allow-plugins": {
+			"bamarni/composer-bin-plugin": true
 		}
 	},
 	"scripts": {
@@ -41,7 +38,14 @@
 		"psalm": "./vendor/bin/psalm.phar --show-info=true --no-cache",
 		"psalm:update-baseline": "./vendor/bin/psalm.phar --update-baseline",
 		"psalm:fix": "./vendor/bin/psalm.phar --no-cache --alter --issues=InvalidReturnType,InvalidNullableReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingParamType,InvalidFalsableReturnType",
-		"psalm:fix:dry": "./vendor/bin/psalm.phar --no-cache --alter --issues=InvalidReturnType,InvalidNullableReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingParamType,InvalidFalsableReturnType --dry-run"
+		"psalm:fix:dry": "./vendor/bin/psalm.phar --no-cache --alter --issues=InvalidReturnType,InvalidNullableReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingParamType,InvalidFalsableReturnType --dry-run",
+		"openapi": "./vendor-bin/openapi-extractor/vendor/nextcloud/openapi-extractor/generate-spec",
+		"post-install-cmd": [
+			"[ $COMPOSER_DEV_MODE -eq 0 ] || composer bin all install --ansi"
+		],
+		"post-update-cmd": [
+			"[ $COMPOSER_DEV_MODE -eq 0 ] || composer bin all update --ansi"
+		]
 	},
 	"require": {
 		"phpoffice/phpspreadsheet": "^1.28",

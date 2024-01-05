@@ -155,7 +155,7 @@ clean-dev:
 ###### API generation
 
 api:
-	composer exec generate-spec
+	composer run openapi
 
 api-fast:
-	composer exec generate-spec -- --allow-missing-docs --continue-on-error
+	composer run openapi -- --allow-missing-docs --continue-on-error
