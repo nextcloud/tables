@@ -42,6 +42,7 @@ OC.L10N.register(
     "Please select a file." : "Hãy chọn một tệp.",
     "Filter" : "Lọc",
     "Shared" : "Chia sẻ",
+    "Clear filter" : "Xóa bộ lọc",
     "No recommendations. Start typing." : "Không có khuyến nghị. Bắt đầu gõ.",
     "Searching …" : "Đang tìm kiếm ...",
     "No elements found." : "Không tìm thấy phần tử nào.",
