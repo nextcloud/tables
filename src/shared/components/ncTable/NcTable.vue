@@ -101,7 +101,7 @@ import exportTableMixin from './mixins/exportTableMixin.js'
 import { NcEmptyContent, NcButton } from '@nextcloud/vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
 import Cancel from 'vue-material-design-icons/Cancel.vue'
-import { subscribe, unsubscribe } from '@nextcloud/event-bus'
+import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { parseCol } from './mixins/columnParser.js'
 import { AbstractColumn } from './mixins/columnClass.js'
 import { translate as t } from '@nextcloud/l10n'
@@ -216,6 +216,7 @@ export default {
 	watch: {
 		localSelectedRows() {
 			this.$emit('update:selectedRows', this.localSelectedRows)
+			emit()
 		},
 		localViewSetting() {
 			this.$emit('update:viewSetting', this.localViewSetting)
