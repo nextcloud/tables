@@ -149,4 +149,13 @@ export default {
 		align-items: self-start;
 	}
 
+	:deep(#smartpicker-select .vs__selected-options) {
+		padding-top: calc(var(--default-grid-baseline) * 3);
+		padding-bottom: calc(var(--default-grid-baseline) * 3);
+	}
+
+	:deep(#smartpicker-select .vs__selected) {
+		margin-left: 0;
+	}
+
 </style>
