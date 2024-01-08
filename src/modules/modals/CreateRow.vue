@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal" @close="actionCancel">
+	<NcModal v-if="showModal" data-cy="createRowModal" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
@@ -12,6 +12,10 @@
 				<ColumnFormComponent
 					:column="column"
 					:value.sync="row[column.id]" />
+				<NcNoteCard v-if="column.mandatory && !isValueValidForColumn(row[column.id], column)"
+					type="error">
+					{{ t('tables', '"{columnTitle}" should not be empty', { columnTitle: column.title }) }}
+				</NcNoteCard>
 			</div>
 			<div class="row">
 				<div class="fix-col-4 space-T end">
@@ -20,9 +24,9 @@
 							{{ t('tables', 'Add more') }}
 						</NcCheckboxRadioSwitch>
 					</div>
-					<button v-if="!localLoading" class="primary" :aria-label="t('tables', 'Save row')" @click="actionConfirm()">
+					<NcButton v-if="!localLoading" class="primary" :aria-label="t('tables', 'Save row')" :disabled="hasEmptyMandatoryRows" data-cy="createRowSaveButton" @click="actionConfirm()">
 						{{ t('tables', 'Save') }}
-					</button>
+					</NcButton>
 				</div>
 			</div>
 		</div>
@@ -30,8 +34,8 @@
 </template>
 
 <script>
-import { NcModal, NcCheckboxRadioSwitch } from '@nextcloud/vue'
-import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
+import { NcModal, NcCheckboxRadioSwitch, NcNoteCard, NcButton } from '@nextcloud/vue'
+import { showError, showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
 import ColumnFormComponent from '../main/partials/ColumnFormComponent.vue'
@@ -42,6 +46,8 @@ export default {
 		NcModal,
 		ColumnFormComponent,
 		NcCheckboxRadioSwitch,
+		NcNoteCard,
+		NcButton,
 	},
 	props: {
 		showModal: {
@@ -65,6 +71,16 @@ export default {
 		nonMetaColumns() {
 			return this.columns.filter(col => col.id >= 0)
 		},
+		hasEmptyMandatoryRows() {
+			let mandatoryFieldsEmpty = false
+			this.columns.forEach(col => {
+				if (col.mandatory) {
+					const validValue = this.isValueValidForColumn(this.row[col.id], col)
+					mandatoryFieldsEmpty = mandatoryFieldsEmpty || !validValue
+				}
+			})
+			return mandatoryFieldsEmpty
+		},
 	},
 	methods: {
 		actionCancel() {
@@ -85,25 +101,14 @@ export default {
 			return !!value || value === 0
 		},
 		async actionConfirm() {
-			let mandatoryFieldsEmpty = false
-			this.columns.forEach(col => {
-				if (col.mandatory) {
-					const validValue = this.isValueValidForColumn(this.row[col.id], col)
-					mandatoryFieldsEmpty = mandatoryFieldsEmpty || !validValue
-				}
-			})
-			if (!mandatoryFieldsEmpty) {
-				this.localLoading = true
-				await this.sendNewRowToBE()
-				this.localLoading = false
-				if (!this.addNewAfterSave) {
-					this.actionCancel()
-				} else {
-					showSuccess(t('tables', 'Row successfully created.'))
-					this.reset()
-				}
+			this.localLoading = true
+			await this.sendNewRowToBE()
+			this.localLoading = false
+			if (!this.addNewAfterSave) {
+				this.actionCancel()
 			} else {
-				showWarning(t('tables', 'Please fill in the mandatory fields.'))
+				showSuccess(t('tables', 'Row successfully created.'))
+				this.reset()
 			}
 		},
 		async sendNewRowToBE() {
