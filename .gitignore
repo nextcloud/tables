@@ -16,3 +16,4 @@ tests/unit/.phpunit.result.cache
 /gen/
 .DS_Store
 /cypress/videos
+/vendor-bin/*/vendor

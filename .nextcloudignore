@@ -37,3 +37,4 @@ stylelint.config.js
 webpack.js
 releaseNotes.md
 /.scripts
+/vendor-bin
