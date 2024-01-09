@@ -38,7 +38,7 @@ abstract class AOCSController extends OCSController {
 	 */
 	protected function handleError($e): DataResponse {
 		$this->logger->warning('An internal error or exception occurred: ['. $e->getCode() . ']' . $e->getMessage());
-		return new DataResponse(['message' => $this->n->t('An unexpected error occurred. More details can be found in the logs. Please reach out to your administrator.')], Http::STATUS_INTERNAL_SERVER_ERROR);
+		return new DataResponse(['message' => $this->n->t('An unexpected error occurred. More details can be found in the logs. Please reach out to your administration.')], Http::STATUS_INTERNAL_SERVER_ERROR);
 	}
 
 	/**
@@ -47,7 +47,7 @@ abstract class AOCSController extends OCSController {
 	 */
 	protected function handlePermissionError(PermissionError $e): DataResponse {
 		$this->logger->warning('A permission error occurred: ['. $e->getCode() . ']' . $e->getMessage());
-		return new DataResponse(['message' => $this->n->t('An permission error occurred. More details can be found in the logs. Please reach out to your administrator.')], Http::STATUS_FORBIDDEN);
+		return new DataResponse(['message' => $this->n->t('A permission error occurred. More details can be found in the logs. Please reach out to your administration.')], Http::STATUS_FORBIDDEN);
 	}
 
 	/**
@@ -56,7 +56,7 @@ abstract class AOCSController extends OCSController {
 	 */
 	protected function handleNotFoundError(NotFoundError $e): DataResponse {
 		$this->logger->warning('A not found error occurred: ['. $e->getCode() . ']' . $e->getMessage());
-		return new DataResponse(['message' => $this->n->t('An not found error occurred. More details can be found in the logs. Please reach out to your administrator.')], Http::STATUS_NOT_FOUND);
+		return new DataResponse(['message' => $this->n->t('A not found error occurred. More details can be found in the logs. Please reach out to your administration.')], Http::STATUS_NOT_FOUND);
 	}
 
 }
