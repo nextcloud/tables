@@ -197,7 +197,6 @@ OC.L10N.register(
     "Create row" : "Satır ekle",
     "Save row" : "Satırı kaydet",
     "Row successfully created." : "Satır eklendi.",
-    "Please fill in the mandatory fields." : "Lütfen zorunlu alanları doldurun.",
     "Could not create new row" : "Yeni satır eklenemedi",
     "Create table" : "Tablo oluştur",
     "Title" : "Başlık",

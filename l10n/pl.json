@@ -79,7 +79,6 @@
     "The column \"{column}\" was created." : "Kolumna \"{column}\" została utworzona.",
     "Sorry, something went wrong." : "Przepraszam, coś poszło nie tak.",
     "Create row" : "Utwórz wiersz",
-    "Please fill in the mandatory fields." : "Wypełnij obowiązkowe pola.",
     "Could not create new row" : "Nie można utworzyć nowego wiersza",
     "Create table" : "Utwórz tabelę",
     "Title" : "Tytuł",

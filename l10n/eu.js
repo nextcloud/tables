@@ -148,7 +148,6 @@ OC.L10N.register(
     "Create row" : "Sortu errenkada",
     "Save row" : "Gorde errenkada",
     "Row successfully created." : "Errenkada ondo sortu da.",
-    "Please fill in the mandatory fields." : "Bete nahitaezko eremuak.",
     "Could not create new row" : "Ezin izan da errenkada sortu",
     "Create table" : "Sortu taula",
     "Title" : "Izenburua",

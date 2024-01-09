@@ -197,7 +197,6 @@ OC.L10N.register(
     "Create row" : "إنشاء صف",
     "Save row" : "حفظ الصف",
     "Row successfully created." : "تمّ بنجاحٍ إنشاء السطر",
-    "Please fill in the mandatory fields." : "يرجى ملئ الحقول الإلزامية",
     "Could not create new row" : "تعذر إنشاء صف جديد",
     "Create table" : "إنشاء جدول",
     "Title" : "العنوان",

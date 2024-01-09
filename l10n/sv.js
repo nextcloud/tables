@@ -160,7 +160,6 @@ OC.L10N.register(
     "Create row" : "Skapa rad",
     "Save row" : "Spara rad",
     "Row successfully created." : "Raden har skapats.",
-    "Please fill in the mandatory fields." : "Fyll i de obligatoriska fälten.",
     "Could not create new row" : "Det gick inte att skapa en ny rad.",
     "Create table" : "Skapa tabell",
     "Title" : "Titel",

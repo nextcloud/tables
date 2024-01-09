@@ -163,7 +163,6 @@ OC.L10N.register(
     "Create row" : "Δημιουργία γραμμής",
     "Save row" : "Αποθήκευση γραμμής",
     "Row successfully created." : "Η γραμμή δημιουργήθηκε επιτυχώς.",
-    "Please fill in the mandatory fields." : "Παρακαλούμε συμπληρώστε τα υποχρεωτικά πεδία.",
     "Could not create new row" : "Δεν ήταν δυνατή η δημιουργία νέας γραμμής",
     "Create table" : "Δημιουργία πίνακα",
     "Title" : "Τίτλος",

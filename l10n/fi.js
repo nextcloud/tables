@@ -95,7 +95,6 @@ OC.L10N.register(
     "Create row" : "Luo rivi",
     "Save row" : "Tallenna rivi",
     "Row successfully created." : "Rivi luotu onnistuneesti.",
-    "Please fill in the mandatory fields." : "Täytä pakolliset kentät.",
     "Could not create new row" : "Uutta riviä ei voitu luoda",
     "Create table" : "Luo taulukko",
     "Title" : "Nimeke",

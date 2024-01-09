@@ -189,7 +189,6 @@ OC.L10N.register(
     "Create row" : "Sor létrehozása",
     "Save row" : "Sor mentése",
     "Row successfully created." : "Sor sikeresen létrehozva.",
-    "Please fill in the mandatory fields." : "Töltse ki a kötelező mezőket.",
     "Could not create new row" : "Nem hozható létre új sor",
     "Create table" : "Táblázat létrehozása",
     "Title" : "Cím",

@@ -197,7 +197,6 @@ OC.L10N.register(
     "Create row" : "Crear unha fila",
     "Save row" : "Gardar a fila",
     "Row successfully created." : "Creouse a fila correctamente.",
-    "Please fill in the mandatory fields." : "Encha os campos obrigatorios.",
     "Could not create new row" : "Non foi posíbel crear a nova fila.",
     "Create table" : "Crear unha táboa",
     "Title" : "Título",

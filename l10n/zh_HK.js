@@ -197,7 +197,6 @@ OC.L10N.register(
     "Create row" : "創建列",
     "Save row" : "保存列",
     "Row successfully created." : "成功建立一列。",
-    "Please fill in the mandatory fields." : "請填寫必填字段。",
     "Could not create new row" : "無法創建新列",
     "Create table" : "創建表",
     "Title" : "標題",

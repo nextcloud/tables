@@ -197,7 +197,6 @@ OC.L10N.register(
     "Create row" : "Criar linha",
     "Save row" : "Salvar linha",
     "Row successfully created." : "Row successfully created.",
-    "Please fill in the mandatory fields." : "Por favor, preencha os campos obrigatórios.",
     "Could not create new row" : "Não foi possível criar uma nova linha",
     "Create table" : "Criar a tabela",
     "Title" : "Título",

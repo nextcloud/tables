@@ -143,7 +143,6 @@ OC.L10N.register(
     "Could not create new column." : "No s'ha pogut crear una columna nova.",
     "Create row" : "Crea fila",
     "Row successfully created." : "La fila s'ha creat correctament.",
-    "Please fill in the mandatory fields." : "Ompliu els camps obligatoris.",
     "Could not create new row" : "No s'ha pogut crear una fila nova",
     "Create table" : "Crea una taula",
     "Title" : "Títol",

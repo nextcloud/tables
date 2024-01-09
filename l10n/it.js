@@ -78,7 +78,6 @@ OC.L10N.register(
     "The column \"{column}\" was created." : "La colonna \"{column}\" è stata creata.",
     "Sorry, something went wrong." : "Spiacenti, qualcosa non ha funzionato!",
     "Create row" : "Crea riga",
-    "Please fill in the mandatory fields." : "Compilare i campi obbligatori.",
     "Could not create new row" : "Impossibile creare una nuova riga",
     "Create table" : "Crea tabella",
     "Title" : "Titolo",

@@ -196,7 +196,6 @@ OC.L10N.register(
     "Create row" : "Vytvořit řádek",
     "Save row" : "Uložit řádek",
     "Row successfully created." : "Řádek úspěšně vytvořen.",
-    "Please fill in the mandatory fields." : "Vyplňte nezbytné kolonky.",
     "Could not create new row" : "Nedaří se vytvořit nový řádek",
     "Create table" : "Vytvořit tabulku",
     "Title" : "Nadpis",

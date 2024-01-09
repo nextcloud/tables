@@ -66,7 +66,6 @@ OC.L10N.register(
     "You need to select a type for the new column." : "Du må velge en type for den nye kolonnen",
     "Sorry, something went wrong." : "Noe gikk galt.",
     "Create row" : "Opprett rad",
-    "Please fill in the mandatory fields." : "Fyll inn de obligatoriske feltene.",
     "Create table" : "Opprett tabell",
     "Title" : "Titte",
     "Title of the new table" : "Tittel på den nye tabellen",

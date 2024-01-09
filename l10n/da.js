@@ -152,7 +152,6 @@ OC.L10N.register(
     "Create row" : "Opret række",
     "Save row" : "Gem række",
     "Row successfully created." : "Rækken blev oprettet.",
-    "Please fill in the mandatory fields." : "Udfyld venligst de obligatoriske felter.",
     "Could not create new row" : "Kunne ikke oprette ny række",
     "Create table" : "Opret tabel",
     "Title" : "Titel",

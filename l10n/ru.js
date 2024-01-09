@@ -152,7 +152,6 @@ OC.L10N.register(
     "Create row" : "Создать строку",
     "Save row" : "Сохранить строку",
     "Row successfully created." : "Строка создана.",
-    "Please fill in the mandatory fields." : "Заполните все обязательные поля.",
     "Could not create new row" : "Ошибка при создании новой строки",
     "Create table" : "Создать таблицу",
     "Title" : "Название",

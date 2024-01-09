@@ -194,7 +194,6 @@ OC.L10N.register(
     "Create row" : "Додати рядок",
     "Save row" : "Зберегти рядок",
     "Row successfully created." : "Рядок успішно додано.",
-    "Please fill in the mandatory fields." : "Потрібно заповнити обов'язкові поля.",
     "Could not create new row" : "Не вдалося додати рядок",
     "Create table" : "Створити таблицю",
     "Title" : "Назва",

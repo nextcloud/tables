@@ -172,7 +172,6 @@ OC.L10N.register(
     "Create row" : "Vytvoriť riadok",
     "Save row" : "Uložiť riadok",
     "Row successfully created." : "Riadok bol úspešne vytvorený.",
-    "Please fill in the mandatory fields." : "Prosím, vyplňte povinné polia",
     "Could not create new row" : "Nepodarilo sa vytvoriť nový riadok",
     "Create table" : "Vytvoriť tabuľku",
     "Title" : "Názov",

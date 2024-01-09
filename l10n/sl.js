@@ -181,7 +181,6 @@ OC.L10N.register(
     "Create row" : "Dodaj vrstico",
     "Save row" : "Shrani vrstico",
     "Row successfully created." : "Vrstica je uspešno dodana.",
-    "Please fill in the mandatory fields." : "Vpisati je treba vsa obvezna polja.",
     "Could not create new row" : "Nove vrstice ni mogoče dodati.",
     "Create table" : "Ustvari razpredelnico",
     "Title" : "Naslov",
