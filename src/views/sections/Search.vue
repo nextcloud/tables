@@ -21,6 +21,7 @@
 <template>
 	<div>
 		<NcSelect
+			id="smartpicker-select"
 			v-model="localValue"
 			:loading="loading"
 			:placeholder="t('tables', 'Search for table and views...')"
@@ -137,6 +138,24 @@ export default {
 
 	:deep(.v-select.select) {
 		width: 100%;
+	}
+
+	:deep(#smartpicker-select input[type=search]) {
+		height: 41px;
+	}
+
+	:deep(#smartpicker-select .details) {
+		display: inline-flex;
+		align-items: self-start;
+	}
+
+	:deep(#smartpicker-select .vs__selected-options) {
+		padding-top: calc(var(--default-grid-baseline) * 3);
+		padding-bottom: calc(var(--default-grid-baseline) * 3);
+	}
+
+	:deep(#smartpicker-select .vs__selected) {
+		margin-left: 0;
 	}
 
 </style>

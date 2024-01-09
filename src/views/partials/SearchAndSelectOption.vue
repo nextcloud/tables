@@ -110,12 +110,19 @@ export default {
 		display: block;
 	}
 
+	.content .labels {
+		font-size: 1.3em;
+		font-weight: bold;
+		margin-bottom: 8px;
+	}
+
 	.content .details {
 		display: inline-flex;
 	}
 
 	:deep(.counter-bubble__counter) {
 		max-width: fit-content !important;
+		height: 100%;
 	}
 
 </style>
