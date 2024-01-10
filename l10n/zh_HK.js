@@ -195,6 +195,7 @@ OC.L10N.register(
     "Sorry, something went wrong." : "發生錯誤了。",
     "Could not create new column." : "無法創建新縱列。",
     "Create row" : "創建列",
+    "\"{columnTitle}\" should not be empty" : "\"{columnTitle}\" 不應為空",
     "Save row" : "保存列",
     "Row successfully created." : "成功建立一列。",
     "Could not create new row" : "無法創建新列",

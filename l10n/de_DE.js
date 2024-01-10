@@ -195,6 +195,7 @@ OC.L10N.register(
     "Sorry, something went wrong." : "Leider ist etwas schiefgelaufen!",
     "Could not create new column." : "Neue Spalte konnte nicht erstellt werden.",
     "Create row" : "Zeile erstellen",
+    "\"{columnTitle}\" should not be empty" : "\"{columnTitle}\" sollte nicht leer sein",
     "Save row" : "Zeile speichern",
     "Row successfully created." : "Zeile erfolgreich erstellt.",
     "Could not create new row" : "Neue Zeile konnte nicht erstellt werden",

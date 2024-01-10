@@ -195,6 +195,7 @@ OC.L10N.register(
     "Sorry, something went wrong." : "عذرا، هناك خطأ ما.",
     "Could not create new column." : "تعذّر إنشاء عمود جديد",
     "Create row" : "إنشاء صف",
+    "\"{columnTitle}\" should not be empty" : "\"{columnTitle}\" يجب ألّا تكون فارغةً",
     "Save row" : "حفظ الصف",
     "Row successfully created." : "تمّ بنجاحٍ إنشاء السطر",
     "Could not create new row" : "تعذر إنشاء صف جديد",

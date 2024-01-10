@@ -193,6 +193,7 @@
     "Sorry, something went wrong." : "Sorry, something went wrong.",
     "Could not create new column." : "Could not create new column.",
     "Create row" : "Create row",
+    "\"{columnTitle}\" should not be empty" : "\"{columnTitle}\" should not be empty",
     "Save row" : "Save row",
     "Row successfully created." : "Row successfully created.",
     "Could not create new row" : "Could not create new row",
