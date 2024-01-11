@@ -93,7 +93,7 @@ class RowService extends SuperService {
 			if ($this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)) {
 				$view = $this->viewMapper->find($viewId);
 				$columnsArray = $view->getColumnsArray();
-				$columns = $this->columnMapper->find($columnsArray);
+				$columns = $this->columnMapper->findAll($columnsArray);
 				return $this->row2Mapper->findAll($columns, $view->getTableId(), $limit, $offset, $view->getFilterArray(), $view->getSortArray(), $userId);
 
 				// return $this->mapper->findAllByView($this->viewMapper->find($viewId), $userId, $limit, $offset);
