@@ -125,7 +125,7 @@ class TransferLegacyRows extends Command {
 	 * @param Table[] $tables
 	 * @return void
 	 */
-	private function transferDataForTables(array $tables, OutputInterface $output) {
+	private function transferDataForTables(array $tables, OutputInterface $output): void {
 		$i = 1;
 		foreach ($tables as $table) {
 			$output->writeln("-- Start transfer for table " . $table->getId() . " (" . $table->getTitle() . ") [" . $i . "/" . count($tables) . "]");
