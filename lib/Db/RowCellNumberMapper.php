@@ -32,7 +32,7 @@ class RowCellNumberMapper extends RowCellMapperSuper {
 	 * @inheritDoc
 	 */
 	public function parseValueIncoming(Column $column, $value): ?float {
-		if($value === '') {
+		if(!is_numeric($value)) {
 			return null;
 		}
 		return (float) $value;
