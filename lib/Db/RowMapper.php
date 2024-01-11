@@ -18,6 +18,7 @@ use OCP\Server;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 class RowMapper {
 	private RowSleeveMapper $rowSleeveMapper;
@@ -41,28 +42,48 @@ class RowMapper {
 	}
 
 	/**
+	 * @param Row $row
+	 * @return Row
 	 * @throws InternalError
 	 */
 	public function delete(Row $row): Row {
-		foreach ($this->columnsHelper->get(['name']) as $columnType) {
-			$cellMapperClassName = 'OCA\Tables\Db\RowCell' . ucfirst($columnType) . 'Mapper';
-			/** @var RowCellMapperSuper $cellMapper */
-			try {
-				$cellMapper = Server::get($cellMapperClassName);
-			} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		try {
+			$this->db->beginTransaction();
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+		try {
+			foreach ($this->columnsHelper->get(['name']) as $columnType) {
+				$cellMapperClassName = 'OCA\Tables\Db\RowCell' . ucfirst($columnType) . 'Mapper';
+				/** @var RowCellMapperSuper $cellMapper */
+				try {
+					$cellMapper = Server::get($cellMapperClassName);
+				} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+					$this->logger->error($e->getMessage(), ['exception' => $e]);
+					throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				}
+				try {
+					$cellMapper->deleteAllForRow($row->getId());
+				} catch (Exception $e) {
+					$this->logger->error($e->getMessage(), ['exception' => $e]);
+					throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+				}
 			}
 			try {
-				$cellMapper->deleteAllForRow($row->getId());
+				$this->rowSleeveMapper->deleteById($row->getId());
 			} catch (Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 			}
-		}
-		try {
-			$this->rowSleeveMapper->deleteById($row->getId());
-		} catch (Exception $e) {
+			$this->db->commit();
+		} catch (Throwable $e) {
+			try {
+				$this->db->rollBack();
+			} catch (Exception $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			}
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
