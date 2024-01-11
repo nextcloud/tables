@@ -463,7 +463,12 @@ class RowService extends SuperService {
 			}
 		}
 
-		return $this->row2Mapper->delete($item);
+		try {
+			return $this->row2Mapper->delete($item);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
 	}
 
 	/**

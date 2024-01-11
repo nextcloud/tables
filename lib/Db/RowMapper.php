@@ -44,15 +44,10 @@ class RowMapper {
 	/**
 	 * @param Row $row
 	 * @return Row
-	 * @throws InternalError
+	 * @throws Exception
 	 */
 	public function delete(Row $row): Row {
-		try {
-			$this->db->beginTransaction();
-		} catch (Exception $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
-		}
+		$this->db->beginTransaction();
 		try {
 			foreach ($this->columnsHelper->get(['name']) as $columnType) {
 				$cellMapperClassName = 'OCA\Tables\Db\RowCell' . ucfirst($columnType) . 'Mapper';
@@ -61,31 +56,16 @@ class RowMapper {
 					$cellMapper = Server::get($cellMapperClassName);
 				} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 					$this->logger->error($e->getMessage(), ['exception' => $e]);
-					throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+					throw new Exception(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 				}
-				try {
-					$cellMapper->deleteAllForRow($row->getId());
-				} catch (Exception $e) {
-					$this->logger->error($e->getMessage(), ['exception' => $e]);
-					throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
-				}
+				$cellMapper->deleteAllForRow($row->getId());
 			}
-			try {
-				$this->rowSleeveMapper->deleteById($row->getId());
-			} catch (Exception $e) {
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
-			}
+			$this->rowSleeveMapper->deleteById($row->getId());
 			$this->db->commit();
 		} catch (Throwable $e) {
-			try {
-				$this->db->rollBack();
-			} catch (Exception $e) {
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
-			}
+			$this->db->rollBack();
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new Exception(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 
 		return $row;
