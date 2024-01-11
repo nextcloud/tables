@@ -32,6 +32,7 @@
 			@close="importToElement = null" />
 
 		<EditTable :table-id="editTable" :show-modal="editTable !== null" @close="editTable = null" />
+		<TransferTable :table="tableToTransfer" :show-modal="tableToTransfer !== null" @close="tableToTransfer = null" />
 	</div>
 </template>
 
@@ -50,6 +51,7 @@ import DeleteTable from './DeleteTable.vue'
 import CreateTable from './CreateTable.vue'
 import DeleteView from './DeleteView.vue'
 import EditTable from './EditTable.vue'
+import TransferTable from './TransferTable.vue'
 
 export default {
 	components: {
@@ -65,6 +67,7 @@ export default {
 		DeleteColumn,
 		CreateRow,
 		DeleteTable,
+		TransferTable,
 	},
 
 	data() {
@@ -82,6 +85,7 @@ export default {
 			tableToDelete: null,
 			viewToDelete: null,
 			editTable: null,
+			tableToTransfer: null,
 		}
 	},
 
@@ -90,6 +94,7 @@ export default {
 		subscribe('tables:table:create', () => { this.showModalCreateTable = true })
 		subscribe('tables:table:delete', table => { this.tableToDelete = table })
 		subscribe('tables:table:edit', tableId => { this.editTable = tableId })
+		subscribe('tables:table:transfer', table => { this.tableToTransfer = table })
 
 		// views
 		subscribe('tables:view:reload', () => { this.reload(true) })
@@ -136,6 +141,7 @@ export default {
 		unsubscribe('tables:modal:import', element => { this.importToElement = element })
 		unsubscribe('tables:table:delete', table => { this.tableToDelete = table })
 		unsubscribe('tables:table:edit', tableId => { this.editTable = tableId })
+		unsubscribe('tables:table:transfer', table => { this.tableToTransfer = table })
 	},
 }
 </script>

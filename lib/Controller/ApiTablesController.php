@@ -141,4 +141,32 @@ class ApiTablesController extends AOCSController {
 			return $this->handleNotFoundError($e);
 		}
 	}
+
+	/**
+	 * [api v2] Transfer table
+	 *
+	 * Transfer table from one user to another
+	 *
+	 * @NoAdminRequired
+	 *
+	 * @param int $id Table ID
+	 * @param string $newOwnerUserId New user ID
+	 *
+	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 *
+	 * 200: Ownership changed
+	 * 403: No permissions
+	 * 404: Not found
+	 */
+	public function transfer(int $id, string $newOwnerUserId): DataResponse {
+		try {
+			return new DataResponse($this->service->setOwner($id, $newOwnerUserId)->jsonSerialize());
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
+		} catch (InternalError $e) {
+			return $this->handleError($e);
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		}
+	}
 }

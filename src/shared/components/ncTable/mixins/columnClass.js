@@ -54,7 +54,7 @@ export class AbstractColumn {
 	/**
 	 * parse an input value
 	 *
-	 * @param value
+	 * @param {*} value Value to parse
 	 * @return {*}
 	 */
 	parseValue(value) {

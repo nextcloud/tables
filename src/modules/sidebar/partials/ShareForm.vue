@@ -59,7 +59,7 @@ import debounce from 'debounce'
 import { NcSelect } from '@nextcloud/vue'
 import { mapState } from 'vuex'
 import formatting from '../../../shared/mixins/formatting.js'
-import ShareTypes from '../mixins/shareTypesMixin.js'
+import ShareTypes from '../../../shared/mixins/shareTypesMixin.js'
 
 export default {
 	name: 'ShareForm',

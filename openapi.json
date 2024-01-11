@@ -382,7 +382,8 @@
                     "onSharePermissions",
                     "hasShares",
                     "rowsCount",
-                    "views"
+                    "views",
+                    "columnsCount"
                 ],
                 "properties": {
                     "id": {
@@ -393,7 +394,8 @@
                         "type": "string"
                     },
                     "emoji": {
-                        "type": "string"
+                        "type": "string",
+                        "nullable": true
                     },
                     "ownership": {
                         "type": "string"
@@ -456,6 +458,10 @@
                         "items": {
                             "$ref": "#/components/schemas/View"
                         }
+                    },
+                    "columnsCount": {
+                        "type": "integer",
+                        "format": "int64"
                     }
                 }
             },
@@ -490,7 +496,8 @@
                         "type": "string"
                     },
                     "emoji": {
-                        "type": "string"
+                        "type": "string",
+                        "nullable": true
                     },
                     "tableId": {
                         "type": "integer",
@@ -500,7 +507,8 @@
                         "type": "string"
                     },
                     "ownerDisplayName": {
-                        "type": "string"
+                        "type": "string",
+                        "nullable": true
                     },
                     "createdBy": {
                         "type": "string"
@@ -515,11 +523,11 @@
                         "type": "string"
                     },
                     "description": {
-                        "type": "string"
+                        "type": "string",
+                        "nullable": true
                     },
                     "columns": {
                         "type": "array",
-                        "nullable": true,
                         "items": {
                             "type": "integer",
                             "format": "int64"
@@ -528,65 +536,71 @@
                     "sort": {
                         "type": "object",
                         "nullable": true,
-                        "required": [
-                            "columnId",
-                            "mode"
-                        ],
-                        "properties": {
-                            "columnId": {
-                                "type": "integer",
-                                "format": "int64"
-                            },
-                            "mode": {
-                                "type": "string",
-                                "enum": [
-                                    "ASC",
-                                    "DESC"
-                                ]
+                        "additionalProperties": {
+                            "type": "object",
+                            "required": [
+                                "columnId",
+                                "mode"
+                            ],
+                            "properties": {
+                                "columnId": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "mode": {
+                                    "type": "string",
+                                    "enum": [
+                                        "ASC",
+                                        "DESC"
+                                    ]
+                                }
                             }
                         }
                     },
                     "filter": {
                         "type": "object",
                         "nullable": true,
-                        "required": [
-                            "columnId",
-                            "operator",
-                            "value"
-                        ],
-                        "properties": {
-                            "columnId": {
-                                "type": "integer",
-                                "format": "int64"
-                            },
-                            "operator": {
-                                "type": "string",
-                                "enum": [
-                                    "begins-with",
-                                    "ends-with",
-                                    "contains",
-                                    "is-equal",
-                                    "is-greater-than",
-                                    "is-greater-than-or-equal",
-                                    "is-lower-than",
-                                    "is-lower-than-or-equal",
-                                    "is-empty"
-                                ]
-                            },
-                            "value": {
-                                "oneOf": [
-                                    {
-                                        "type": "string"
-                                    },
-                                    {
-                                        "type": "integer",
-                                        "format": "int64"
-                                    },
-                                    {
-                                        "type": "number",
-                                        "format": "float"
-                                    }
-                                ]
+                        "additionalProperties": {
+                            "type": "object",
+                            "required": [
+                                "columnId",
+                                "operator",
+                                "value"
+                            ],
+                            "properties": {
+                                "columnId": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "operator": {
+                                    "type": "string",
+                                    "enum": [
+                                        "begins-with",
+                                        "ends-with",
+                                        "contains",
+                                        "is-equal",
+                                        "is-greater-than",
+                                        "is-greater-than-or-equal",
+                                        "is-lower-than",
+                                        "is-lower-than-or-equal",
+                                        "is-empty"
+                                    ]
+                                },
+                                "value": {
+                                    "oneOf": [
+                                        {
+                                            "type": "string"
+                                        },
+                                        {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        },
+                                        {
+                                            "type": "number",
+                                            "format": "float"
+                                        }
+                                    ]
+                                }
                             }
                         }
                     },
@@ -1353,7 +1367,143 @@
                         "description": "key-value pairs",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "oneOf": [
+                                {
+                                    "type": "object",
+                                    "required": [
+                                        "key",
+                                        "value"
+                                    ],
+                                    "properties": {
+                                        "key": {
+                                            "type": "string",
+                                            "enum": [
+                                                "title",
+                                                "emoji",
+                                                "description"
+                                            ]
+                                        },
+                                        "value": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                {
+                                    "type": "object",
+                                    "required": [
+                                        "key",
+                                        "value"
+                                    ],
+                                    "properties": {
+                                        "key": {
+                                            "type": "string",
+                                            "enum": [
+                                                "columns"
+                                            ]
+                                        },
+                                        "value": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "integer",
+                                                "format": "int64"
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    "type": "object",
+                                    "required": [
+                                        "key",
+                                        "value"
+                                    ],
+                                    "properties": {
+                                        "key": {
+                                            "type": "string",
+                                            "enum": [
+                                                "sort"
+                                            ]
+                                        },
+                                        "value": {
+                                            "type": "object",
+                                            "required": [
+                                                "columnId",
+                                                "mode"
+                                            ],
+                                            "properties": {
+                                                "columnId": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "mode": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "ASC",
+                                                        "DESC"
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    "type": "object",
+                                    "required": [
+                                        "key",
+                                        "value"
+                                    ],
+                                    "properties": {
+                                        "key": {
+                                            "type": "string",
+                                            "enum": [
+                                                "filter"
+                                            ]
+                                        },
+                                        "value": {
+                                            "type": "object",
+                                            "required": [
+                                                "columnId",
+                                                "operator",
+                                                "value"
+                                            ],
+                                            "properties": {
+                                                "columnId": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "operator": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "begins-with",
+                                                        "ends-with",
+                                                        "contains",
+                                                        "is-equal",
+                                                        "is-greater-than",
+                                                        "is-greater-than-or-equal",
+                                                        "is-lower-than",
+                                                        "is-lower-than-or-equal",
+                                                        "is-empty"
+                                                    ]
+                                                },
+                                                "value": {
+                                                    "oneOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "integer",
+                                                            "format": "int64"
+                                                        },
+                                                        {
+                                                            "type": "number",
+                                                            "format": "float"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     {
@@ -3630,7 +3780,27 @@
                         "description": "Data as key - value store",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "oneOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "object",
+                                    "required": [
+                                        "columnId",
+                                        "value"
+                                    ],
+                                    "properties": {
+                                        "columnId": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        },
+                                        "value": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     {
@@ -3826,7 +3996,27 @@
                         "description": "Data as key - value store",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "oneOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "object",
+                                    "required": [
+                                        "columnId",
+                                        "value"
+                                    ],
+                                    "properties": {
+                                        "columnId": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        },
+                                        "value": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     {
@@ -4009,7 +4199,27 @@
                         "description": "Data as key - value store",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "oneOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "object",
+                                    "required": [
+                                        "columnId",
+                                        "value"
+                                    ],
+                                    "properties": {
+                                        "columnId": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        },
+                                        "value": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     {
@@ -5398,6 +5608,201 @@
                 }
             }
         },
+        "/ocs/v2.php/apps/tables/api/2/tables/{id}/transfer": {
+            "put": {
+                "operationId": "api_tables-transfer",
+                "summary": "[api v2] Transfer table",
+                "description": "Transfer table from one user to another",
+                "tags": [
+                    "api_tables"
+                ],
+                "security": [
+                    {
+                        "bearer_auth": []
+                    },
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "newOwnerUserId",
+                        "in": "query",
+                        "description": "New user ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Table ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "OCS-APIRequest",
+                        "in": "header",
+                        "description": "Required to be true for the API request to pass",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ownership changed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "$ref": "#/components/schemas/Table"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/ocs/v2.php/apps/tables/api/2/columns/{nodeType}/{nodeId}": {
             "get": {
                 "operationId": "api_columns-list",
@@ -5885,7 +6290,11 @@
                         "description": "Subtype for the new column",
                         "schema": {
                             "type": "string",
-                            "nullable": true
+                            "nullable": true,
+                            "enum": [
+                                "progress",
+                                "stars"
+                            ]
                         }
                     },
                     {
@@ -5904,6 +6313,7 @@
                         "schema": {
                             "type": "array",
                             "nullable": true,
+                            "default": [],
                             "items": {
                                 "type": "integer",
                                 "format": "int64"
@@ -6166,7 +6576,11 @@
                         "description": "Subtype for the new column",
                         "schema": {
                             "type": "string",
-                            "nullable": true
+                            "nullable": true,
+                            "enum": [
+                                "progress",
+                                "stars"
+                            ]
                         }
                     },
                     {
@@ -6185,6 +6599,7 @@
                         "schema": {
                             "type": "array",
                             "nullable": true,
+                            "default": [],
                             "items": {
                                 "type": "integer",
                                 "format": "int64"
@@ -6437,7 +6852,11 @@
                         "description": "Subtype for the new column",
                         "schema": {
                             "type": "string",
-                            "nullable": true
+                            "nullable": true,
+                            "enum": [
+                                "progress",
+                                "stars"
+                            ]
                         }
                     },
                     {
@@ -6691,7 +7110,11 @@
                         "description": "For a subtype 'date' you can set 'today'. For a main type or subtype 'time' you can set to 'now'.",
                         "schema": {
                             "type": "string",
-                            "nullable": true
+                            "nullable": true,
+                            "enum": [
+                                "today",
+                                "now"
+                            ]
                         }
                     },
                     {
@@ -6700,7 +7123,11 @@
                         "description": "Subtype for the new column",
                         "schema": {
                             "type": "string",
-                            "nullable": true
+                            "nullable": true,
+                            "enum": [
+                                "progress",
+                                "stars"
+                            ]
                         }
                     },
                     {
@@ -6719,6 +7146,7 @@
                         "schema": {
                             "type": "array",
                             "nullable": true,
+                            "default": [],
                             "items": {
                                 "type": "integer",
                                 "format": "int64"

@@ -24,6 +24,8 @@
 namespace OCA\Tables\Command;
 
 use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\TableService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -68,10 +70,18 @@ class ChangeOwnershipTable extends Command {
 		$newOwnerUserId = $input->getArgument('user-id');
 
 		try {
-			$arr = $this->tableService->setOwner($id, $newOwnerUserId, '');
-			$output->writeln(json_encode($arr, JSON_PRETTY_PRINT));
+			$table = $this->tableService->setOwner($id, $newOwnerUserId, '');
+			$output->writeln(json_encode($table->jsonSerialize(), JSON_PRETTY_PRINT));
 		} catch (InternalError $e) {
 			$output->writeln('Error occurred: '.$e->getMessage());
+			$this->logger->warning('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
+			return 1;
+		} catch (NotFoundError $e) {
+			$output->writeln('Not found error occurred: '.$e->getMessage());
+			$this->logger->warning('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
+			return 1;
+		} catch (PermissionError $e) {
+			$output->writeln('Permission error occurred: '.$e->getMessage());
 			$this->logger->warning('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
 			return 1;
 		}

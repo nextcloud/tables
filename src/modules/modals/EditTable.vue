@@ -2,7 +2,7 @@
 	<NcModal v-if="showModal"
 		size="normal"
 		@close="actionCancel">
-		<div class="modal__content">
+		<div class="modal__content" data-cy="editTableModal">
 			<div class="row">
 				<div class="col-4">
 					<h2>{{ t('tables', 'Edit table') }}</h2>
@@ -28,19 +28,36 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="fix-col-4 space-T justify-between">
-					<NcButton v-if="!prepareDeleteTable" type="error" @click="prepareDeleteTable = true">
-						{{ t('tables', 'Delete') }}
-					</NcButton>
-					<NcButton v-if="prepareDeleteTable"
-						:wide="true"
-						type="error"
-						@click="actionDeleteTable">
-						{{ t('tables', 'I really want to delete this table!') }}
-					</NcButton>
-					<NcButton type="primary" @click="submit">
-						{{ t('tables', 'Save') }}
-					</NcButton>
+				<div class="col-4 mandatory space-T">
+					{{ t('tables', 'Owner') }}
+				</div>
+				<div class="col-3 inline space-T-small">
+					<NcUserBubble
+						:margin="4"
+						:size="30"
+						:display-name="localTable.ownerDisplayName"
+						:user="localTable.owner" />
+				</div>
+				<div class="row">
+					<div class="fix-col-4 space-T justify-between">
+						<NcButton v-if="!prepareDeleteTable" type="error" @click="prepareDeleteTable = true">
+							{{ t('tables', 'Delete') }}
+						</NcButton>
+						<NcButton v-if="prepareDeleteTable"
+							:wide="true"
+							type="error"
+							@click="actionDeleteTable">
+							{{ t('tables', 'I really want to delete this table!') }}
+						</NcButton>
+						<div class="right-additional-button">
+							<NcButton v-if="ownsTable(localTable)" @click="actionTransfer">
+								{{ t('tables', 'Change owner') }}
+							</NcButton>
+							<NcButton type="primary" @click="submit">
+								{{ t('tables', 'Save') }}
+							</NcButton>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -48,10 +65,12 @@
 </template>
 
 <script>
-import { NcModal, NcEmojiPicker, NcButton } from '@nextcloud/vue'
+import { NcModal, NcEmojiPicker, NcButton, NcUserBubble } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
+import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
+import { emit } from '@nextcloud/event-bus'
 
 export default {
 	name: 'EditTable',
@@ -59,7 +78,9 @@ export default {
 		NcModal,
 		NcEmojiPicker,
 		NcButton,
+		NcUserBubble,
 	},
+	mixins: [permissionsMixin],
 	props: {
 		showModal: {
 			type: Boolean,
@@ -80,6 +101,9 @@ export default {
 	},
 	computed: {
 		...mapGetters(['getTable', 'activeTable']),
+		localTable() {
+			return this.getTable(this.tableId)
+		},
 	},
 	watch: {
 		title() {
@@ -137,6 +161,21 @@ export default {
 			}
 
 		},
+		actionTransfer() {
+			emit('tables:table:edit', null)
+			emit('tables:table:transfer', this.localTable)
+		},
 	},
 }
 </script>
+<style lang="scss" scoped>
+
+.right-additional-button {
+	display: inline-flex;
+}
+
+.right-additional-button > button {
+	margin-left: calc(var(--default-grid-baseline) * 3);
+}
+
+</style>

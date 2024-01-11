@@ -264,6 +264,51 @@ class FeatureContext implements Context {
 	}
 
 	/**
+	 * @Then change owner for table :tableName from user :user to user :newUser
+	 *
+	 * @param string $user
+	 * @param string $newUser
+	 * @param string $tableName
+	 */
+	public function transferTableV2(string $user, string $newUser, string $tableName): void {
+		$this->setCurrentUser($user);
+
+		$data = ['newOwnerUserId' => $newUser];
+
+		$this->sendOcsRequest(
+			'PUT',
+			'/apps/tables/api/2/tables/'.$this->tableIds[$tableName].'/transfer',
+			$data
+		);
+
+		$updatedTable = $this->getDataFromResponse($this->response)['ocs']['data'];
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($updatedTable['ownership'], $newUser);
+	}
+
+	/**
+	 * @Then table :tableName is owned by :user
+	 *
+	 * @param string $user
+	 * @param string $tableName
+	 * @throws Exception
+	 */
+	public function checkTableOwnershipV2(string $user, string $tableName): void {
+		$this->setCurrentUser($user);
+
+		$this->sendOcsRequest(
+			'GET',
+			'/apps/tables/api/2/tables/'.$this->tableIds[$tableName]
+		);
+
+		$table = $this->getDataFromResponse($this->response)['ocs']['data'];
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($table['ownership'], $user);
+	}
+
+	/**
 	 * @Then user :user deletes table :tableName via v2
 	 *
 	 * @param string $user
