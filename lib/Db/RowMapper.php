@@ -213,7 +213,7 @@ class RowMapper {
 	 */
 	private function addFilterToQuery(IQueryBuilder &$qb, array $filters, string $userId): void {
 		// TODO move this into service
-		$this->replaceMagicValues($filters, $userId);
+		$this->replacePlaceholderValues($filters, $userId);
 
 		if (count($filters) > 0) {
 			$qb->andWhere(
@@ -224,7 +224,7 @@ class RowMapper {
 		}
 	}
 
-	private function replaceMagicValues(array &$filters, string $userId): void {
+	private function replacePlaceholderValues(array &$filters, string $userId): void {
 		foreach ($filters as &$filterGroup) {
 			foreach ($filterGroup as &$filter) {
 				if(substr($filter['value'], 0, 1) === '@') {
@@ -307,8 +307,8 @@ class RowMapper {
 	}
 
 	/** @noinspection DuplicatedCode */
-	private function resolveSearchValue(string $magicValue, string $userId): string {
-		switch (ltrim($magicValue, '@')) {
+	private function resolveSearchValue(string $placeholder, string $userId): string {
+		switch (ltrim($placeholder, '@')) {
 			case 'me': return $userId;
 			case 'my-name': return $this->userHelper->getUserDisplayName($userId);
 			case 'checked': return 'true';
@@ -328,7 +328,7 @@ class RowMapper {
 				return  $result ?: '';
 			case 'datetime-time-now': return date('H:i');
 			case 'datetime-now': return date('Y-m-d H:i') ? date('Y-m-d H:i') : '';
-			default: return $magicValue;
+			default: return $placeholder;
 		}
 	}
 
