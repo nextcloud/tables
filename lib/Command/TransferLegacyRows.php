@@ -144,7 +144,7 @@ class TransferLegacyRows extends Command {
 	 * @throws InternalError
 	 * @throws Exception
 	 */
-	private function transferTable(Table $table, OutputInterface $output) {
+	private function transferTable(Table $table, OutputInterface $output): void {
 		$columns = $this->columnService->findAllByTable($table->getId(), null, '');
 		$output->writeln("---- Found " . count($columns) . " columns");
 
