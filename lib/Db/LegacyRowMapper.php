@@ -33,11 +33,11 @@ class LegacyRowMapper extends QBMapper {
 	protected ColumnMapper $columnMapper;
 	protected LoggerInterface $logger;
 	protected UserHelper $userHelper;
-	protected RowMapper $rowMapper;
+	protected Row2Mapper $rowMapper;
 
 	protected int $platform;
 
-	public function __construct(IDBConnection $db, LoggerInterface $logger, TextColumnQB $textColumnQB, SelectionColumnQB $selectionColumnQB, NumberColumnQB $numberColumnQB, DatetimeColumnQB $datetimeColumnQB, SuperColumnQB $columnQB, ColumnMapper $columnMapper, UserHelper $userHelper, RowMapper $rowMapper) {
+	public function __construct(IDBConnection $db, LoggerInterface $logger, TextColumnQB $textColumnQB, SelectionColumnQB $selectionColumnQB, NumberColumnQB $numberColumnQB, DatetimeColumnQB $datetimeColumnQB, SuperColumnQB $columnQB, ColumnMapper $columnMapper, UserHelper $userHelper, Row2Mapper $rowMapper) {
 		parent::__construct($db, $this->table, LegacyRow::class);
 		$this->logger = $logger;
 		$this->textColumnQB = $textColumnQB;
@@ -435,7 +435,7 @@ class LegacyRowMapper extends QBMapper {
 	 * @throws InternalError
 	 */
 	public function transferLegacyRow(LegacyRow $legacyRow, array $columns) {
-		$row = new Row();
+		$row = new Row2();
 		$row->setId($legacyRow->getId());
 		$row->setTableId($legacyRow->getTableId());
 		$row->setCreatedBy($legacyRow->getCreatedBy());

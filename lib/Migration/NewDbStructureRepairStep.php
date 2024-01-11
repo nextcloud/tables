@@ -3,7 +3,7 @@
 namespace OCA\Tables\Migration;
 
 use OCA\Tables\Db\LegacyRowMapper;
-use OCA\Tables\Db\RowMapper;
+use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\PermissionError;
@@ -20,11 +20,11 @@ class NewDbStructureRepairStep implements IRepairStep {
 	protected LoggerInterface $logger;
 	protected TableService $tableService;
 	protected LegacyRowMapper $legacyRowMapper;
-	protected RowMapper $rowMapper;
+	protected Row2Mapper $rowMapper;
 	protected ColumnService $columnService;
 	protected IConfig $config;
 
-	public function __construct(LoggerInterface $logger, TableService $tableService, ColumnService $columnService, LegacyRowMapper $legacyRowMapper, RowMapper $rowMapper, IConfig $config) {
+	public function __construct(LoggerInterface $logger, TableService $tableService, ColumnService $columnService, LegacyRowMapper $legacyRowMapper, Row2Mapper $rowMapper, IConfig $config) {
 		$this->logger = $logger;
 		$this->tableService = $tableService;
 		$this->columnService = $columnService;

@@ -8,7 +8,7 @@ use OCA\Tables\ResponseDefinitions;
 /**
  * @psalm-import-type TablesRow from ResponseDefinitions
  */
-class Row implements JsonSerializable {
+class Row2 implements JsonSerializable {
 	private ?int $id = null;
 	private ?int $tableId = null;
 	private ?string $createdBy = null;
