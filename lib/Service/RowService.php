@@ -36,7 +36,7 @@ class RowService extends SuperService {
 	private array $tmpRows = []; // holds already loaded rows as a small cache
 
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-								LegacyRowMapper    $mapper, ColumnMapper $columnMapper, ViewMapper $viewMapper, TableMapper $tableMapper, Row2Mapper $row2Mapper) {
+		LegacyRowMapper    $mapper, ColumnMapper $columnMapper, ViewMapper $viewMapper, TableMapper $tableMapper, Row2Mapper $row2Mapper) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
 		$this->columnMapper = $columnMapper;
