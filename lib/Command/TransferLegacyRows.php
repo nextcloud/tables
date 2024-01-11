@@ -111,7 +111,7 @@ class TransferLegacyRows extends Command {
 			}
 		} else {
 			$output->writeln("🤷🏻‍ Add at least one table id or add the option --all to transfer all tables.");
-			return 1;
+			return 2;
 		}
 		if (!$optionNoDelete) {
 			$this->deleteDataForTables($tables, $output);
