@@ -20,7 +20,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
-class RowMapper {
+class Row2Mapper {
 	private RowSleeveMapper $rowSleeveMapper;
 	private ?string $userId = null;
 	private IDBConnection $db;
@@ -42,11 +42,11 @@ class RowMapper {
 	}
 
 	/**
-	 * @param Row $row
-	 * @return Row
+	 * @param Row2 $row
+	 * @return Row2
 	 * @throws Exception
 	 */
-	public function delete(Row $row): Row {
+	public function delete(Row2 $row): Row2 {
 		$this->db->beginTransaction();
 		try {
 			foreach ($this->columnsHelper->get(['name']) as $columnType) {
@@ -74,11 +74,11 @@ class RowMapper {
 	/**
 	 * @param int $id
 	 * @param Column[] $columns
-	 * @return Row
+	 * @return Row2
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 */
-	public function find(int $id, array $columns): Row {
+	public function find(int $id, array $columns): Row2 {
 		$this->setColumns($columns);
 		$columnIdsArray = array_map(fn (Column $column) => $column->getId(), $columns);
 		$rows = $this->getRows([$id], $columnIdsArray);
@@ -148,7 +148,7 @@ class RowMapper {
 	 * @param array|null $filter
 	 * @param array|null $sort
 	 * @param string|null $userId
-	 * @return Row[]
+	 * @return Row2[]
 	 * @throws InternalError
 	 */
 	public function findAll(array $columns, int $tableId, int $limit = null, int $offset = null, array $filter = null, array $sort = null, string $userId = null): array {
@@ -165,7 +165,7 @@ class RowMapper {
 	/**
 	 * @param array $rowIds
 	 * @param array $columnIds
-	 * @return Row[]
+	 * @return Row2[]
 	 * @throws InternalError
 	 */
 	private function getRows(array $rowIds, array $columnIds): array {
@@ -335,7 +335,7 @@ class RowMapper {
 	/**
 	 * @param IResult $result
 	 * @param RowSleeve[] $sleeves
-	 * @return Row[]
+	 * @return Row2[]
 	 * @throws InternalError
 	 */
 	private function parseEntities(IResult $result, array $sleeves): array {
@@ -343,7 +343,7 @@ class RowMapper {
 
 		$rows = [];
 		foreach ($sleeves as $sleeve) {
-			$rows[$sleeve->getId()] = new Row();
+			$rows[$sleeve->getId()] = new Row2();
 			$rows[$sleeve->getId()]->setId($sleeve->getId());
 			$rows[$sleeve->getId()]->setCreatedBy($sleeve->getCreatedBy());
 			$rows[$sleeve->getId()]->setCreatedAt($sleeve->getCreatedAt());
@@ -377,13 +377,13 @@ class RowMapper {
 	}
 
 	/**
-	 * @param Row $row
+	 * @param Row2 $row
 	 * @param Column[] $columns
-	 * @return Row
+	 * @return Row2
 	 * @throws InternalError
 	 * @throws Exception
 	 */
-	public function insert(Row $row, array $columns): Row {
+	public function insert(Row2 $row, array $columns): Row2 {
 		if(!$columns) {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': columns are missing');
 		}
@@ -409,7 +409,7 @@ class RowMapper {
 	/**
 	 * @throws InternalError
 	 */
-	public function update(Row $row, array $columns): Row {
+	public function update(Row2 $row, array $columns): Row2 {
 		if(!$columns) {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': columns are missing');
 		}

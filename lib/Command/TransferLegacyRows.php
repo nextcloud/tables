@@ -24,7 +24,7 @@
 namespace OCA\Tables\Command;
 
 use OCA\Tables\Db\LegacyRowMapper;
-use OCA\Tables\Db\RowMapper;
+use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
@@ -43,10 +43,10 @@ class TransferLegacyRows extends Command {
 	protected TableService $tableService;
 	protected LoggerInterface $logger;
 	protected LegacyRowMapper $legacyRowMapper;
-	protected RowMapper $rowMapper;
+	protected Row2Mapper $rowMapper;
 	protected ColumnService $columnService;
 
-	public function __construct(TableService $tableService, LoggerInterface $logger, LegacyRowMapper $legacyRowMapper, RowMapper $rowMapper, ColumnService $columnService) {
+	public function __construct(TableService $tableService, LoggerInterface $logger, LegacyRowMapper $legacyRowMapper, Row2Mapper $rowMapper, ColumnService $columnService) {
 		parent::__construct();
 		$this->tableService = $tableService;
 		$this->logger = $logger;

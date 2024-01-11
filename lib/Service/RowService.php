@@ -5,8 +5,8 @@ namespace OCA\Tables\Service;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\LegacyRowMapper;
-use OCA\Tables\Db\Row;
-use OCA\Tables\Db\RowMapper;
+use OCA\Tables\Db\Row2;
+use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
@@ -32,11 +32,11 @@ class RowService extends SuperService {
 	private ColumnMapper $columnMapper;
 	private ViewMapper $viewMapper;
 	private TableMapper $tableMapper;
-	private RowMapper $row2Mapper;
+	private Row2Mapper $row2Mapper;
 	private array $tmpRows = []; // holds already loaded rows as a small cache
 
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-		LegacyRowMapper    $mapper, ColumnMapper $columnMapper, ViewMapper $viewMapper, TableMapper $tableMapper, RowMapper $row2Mapper) {
+								LegacyRowMapper    $mapper, ColumnMapper $columnMapper, ViewMapper $viewMapper, TableMapper $tableMapper, Row2Mapper $row2Mapper) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
 		$this->columnMapper = $columnMapper;
@@ -46,11 +46,11 @@ class RowService extends SuperService {
 	}
 
 	/**
-	 * @param Row[] $rows
+	 * @param Row2[] $rows
 	 * @psalm-return TablesRow[]
 	 */
 	public function formatRows(array $rows): array {
-		return array_map(fn (Row $row) => $row->jsonSerialize(), $rows);
+		return array_map(fn (Row2 $row) => $row->jsonSerialize(), $rows);
 	}
 
 	/**
@@ -58,7 +58,7 @@ class RowService extends SuperService {
 	 * @param string $userId
 	 * @param ?int $limit
 	 * @param ?int $offset
-	 * @return Row[]
+	 * @return Row2[]
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
@@ -82,7 +82,7 @@ class RowService extends SuperService {
 	 * @param string $userId
 	 * @param int|null $limit
 	 * @param int|null $offset
-	 * @return Row[]
+	 * @return Row2[]
 	 * @throws DoesNotExistException
 	 * @throws InternalError
 	 * @throws MultipleObjectsReturnedException
@@ -109,12 +109,12 @@ class RowService extends SuperService {
 
 	/**
 	 * @param int $id
-	 * @return Row
+	 * @return Row2
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function find(int $id): Row {
+	public function find(int $id): Row2 {
 		try {
 			$columns = $this->columnMapper->findAllByTable($id);
 		} catch (Exception $e) {
@@ -144,14 +144,14 @@ class RowService extends SuperService {
 	 * @param int|null $tableId
 	 * @param int|null $viewId
 	 * @param list<array{columnId: int, value: mixed}> $data
-	 * @return Row
+	 * @return Row2
 	 *
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 * @throws Exception
 	 * @throws InternalError
 	 */
-	public function create(?int $tableId, ?int $viewId, array $data): Row {
+	public function create(?int $tableId, ?int $viewId, array $data): Row2 {
 		if ($this->userId === null || $this->userId === '') {
 			$e = new \Exception('No user id in context, but needed.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
@@ -199,7 +199,7 @@ class RowService extends SuperService {
 		$data = $this->cleanupData($data, $columns, $tableId, $viewId);
 
 		// perf
-		$row2 = new Row();
+		$row2 = new Row2();
 		$row2->setTableId($tableId);
 		$row2->setData($data);
 		try {
@@ -295,7 +295,7 @@ class RowService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws InternalError
 	 */
-	private function getRowById(int $rowId): Row {
+	private function getRowById(int $rowId): Row2 {
 		if (isset($this->tmpRows[$rowId])) {
 			return $this->tmpRows[$rowId];
 		}
@@ -326,7 +326,7 @@ class RowService extends SuperService {
 	 * @param int|null $viewId
 	 * @param list<array{columnId: string|int, value: mixed}> $data
 	 * @param string $userId
-	 * @return Row
+	 * @return Row2
 	 *
 	 * @throws InternalError
 	 * @throws NotFoundError
@@ -337,7 +337,7 @@ class RowService extends SuperService {
 		?int $viewId,
 		array $data,
 		string $userId
-	): Row {
+	): Row2 {
 		try {
 			$item = $this->getRowById($id);
 		} catch (InternalError $e) {
@@ -417,14 +417,14 @@ class RowService extends SuperService {
 	 * @param int $id
 	 * @param int|null $viewId
 	 * @param string $userId
-	 * @return Row
+	 * @return Row2
 	 *
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 * @noinspection DuplicatedCode
 	 */
-	public function delete(int $id, ?int $viewId, string $userId): Row {
+	public function delete(int $id, ?int $viewId, string $userId): Row2 {
 		try {
 			$item = $this->getRowById($id);
 		} catch (InternalError $e) {
