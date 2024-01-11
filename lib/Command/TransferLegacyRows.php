@@ -162,7 +162,7 @@ class TransferLegacyRows extends Command {
 	 * @param OutputInterface $output
 	 * @return void
 	 */
-	private function deleteDataForTables(array $tables, OutputInterface $output) {
+	private function deleteDataForTables(array $tables, OutputInterface $output): void {
 		$output->writeln("Start deleting data for tables that should be transferred.");
 		foreach ($tables as $table) {
 			try {
