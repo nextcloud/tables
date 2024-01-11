@@ -472,7 +472,7 @@ class RowMapper {
 	 * @param string|null $lastEditBy
 	 * @return void
 	 */
-	private function updateMetaData(Entity $entity, bool $setCreate = false, ?string $lastEditAt = null, ?string $lastEditBy = null): void {
+	private function updateMetaData($entity, bool $setCreate = false, ?string $lastEditAt = null, ?string $lastEditBy = null): void {
 		$time = new DateTime();
 		if ($setCreate) {
 			$entity->setCreatedBy($this->userId);
