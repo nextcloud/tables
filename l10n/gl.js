@@ -1,9 +1,6 @@
 OC.L10N.register(
     "tables",
     {
-    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administrator." : "Produciuse un erro non agardado. Pódense atopar máis detalles nos rexistros. Póñase en contacto coa administración da instancia.",
-    "An permission error occurred. More details can be found in the logs. Please reach out to your administrator." : "Produciuse un erro de permisos. Pódense atopar máis detalles nos rexistros. Póñase en contacto coa administración da instancia.",
-    "An not found error occurred. More details can be found in the logs. Please reach out to your administrator." : "Produciuse un erro non atopado. Pódense atopar máis detalles nos rexistros. Póñase en contacto coa administración da instancia.",
     "Could not create row." : "Non foi posíbel crear a fila",
     "Could not update row." : "Non foi posíbel actualizar a fila",
     "Nextcloud Tables" : "Táboas de Nextcloud",

@@ -1,5 +1,4 @@
 { "translations": {
-    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administrator." : "Возникла непредвиденная ошибка. Детали могут быть найдены в логах. Пожалуйста, свяжитесь с администратором.",
     "Could not create row." : "Не удалось создать строку",
     "Could not update row." : "Не удалось обновить строку.",
     "Nextcloud Tables" : "Nextcloud Tables",

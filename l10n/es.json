@@ -1,7 +1,4 @@
 { "translations": {
-    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administrator." : "Ocurrió un error inesperado. Podrá encontrar más detalles en los registros. Por favor, comuníquese con su administrador.",
-    "An permission error occurred. More details can be found in the logs. Please reach out to your administrator." : "Ocurrió un error de permisos. Podrá encontrar más detalles en los registros. Por favor, comuníquese con su administrador.",
-    "An not found error occurred. More details can be found in the logs. Please reach out to your administrator." : "Ocurrió un error de \"no encontrado\". Podrá encontrar más detalles en los registros. Por favor, comuníquese con su administrador.",
     "Could not create row." : "No se pudo crear fila.",
     "Could not update row." : "No se ha podido actualizar la fila.",
     "Nextcloud Tables" : "Tablas de Nextcloud",

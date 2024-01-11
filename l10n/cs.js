@@ -1,9 +1,6 @@
 OC.L10N.register(
     "tables",
     {
-    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administrator." : "Došlo k neočekávané chybě. Podrobnosti jsou k dispozici v záznamem událostí. Obraťte se na svého správce.",
-    "An permission error occurred. More details can be found in the logs. Please reach out to your administrator." : "Došlo k chybě ohledně oprávnění. Podrobnosti jsou k dispozici v záznamem událostí. Obraťte se na svého správce.",
-    "An not found error occurred. More details can be found in the logs. Please reach out to your administrator." : "Došlo k chybě typu nenalezeno. Podrobnosti jsou k dispozici v záznamem událostí. Obraťte se na svého správce.",
     "Could not create row." : "Nepodařilo se vytvořit řádek.",
     "Could not update row." : "Řádek se nedaří aktualizovat.",
     "Nextcloud Tables" : "Nextcloud tabulky",

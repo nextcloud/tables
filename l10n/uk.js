@@ -1,9 +1,6 @@
 OC.L10N.register(
     "tables",
     {
-    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administrator." : "Неочікувана помилка. Докдадну інформацію можна знайти у журналі. Будь ласка, сконтактуйте з адміністратором.",
-    "An permission error occurred. More details can be found in the logs. Please reach out to your administrator." : "Помилка з доступом. Докладну інформацію можна знайти у журналі. Будь ласка, сконтактуйте з адміністратором.",
-    "An not found error occurred. More details can be found in the logs. Please reach out to your administrator." : "Помилка з відсутністю результатів. Докладну інформацію можна знайти у журналі. Будь ласка, сконтактуйте з адміністратором.",
     "Could not create row." : "Не вдалося створити рядок.",
     "Could not update row." : "Не вдалося оновити рядок.",
     "Nextcloud Tables" : "Таблиці",

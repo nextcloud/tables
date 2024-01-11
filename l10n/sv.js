@@ -1,9 +1,6 @@
 OC.L10N.register(
     "tables",
     {
-    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administrator." : "Ett oväntat fel inträffade. Mer information finns i loggarna. Kontakta din administratör.",
-    "An permission error occurred. More details can be found in the logs. Please reach out to your administrator." : "En behörighetsfel uppstod. Mer information finns i loggarna. Kontakta din administratör.",
-    "An not found error occurred. More details can be found in the logs. Please reach out to your administrator." : "Ett fel som inte hittades uppstod. Mer information finns i loggarna. Kontakta din administratör.",
     "Could not create row." : "Det gick inte att skapa raden.",
     "Could not update row." : "Kunde inte uppdatera rad.",
     "Nextcloud Tables" : "Nextcloud Tabeller",

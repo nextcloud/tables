@@ -1,7 +1,4 @@
 { "translations": {
-    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administrator." : "Παρουσιάστηκε ένα απρόσμενο σφάλμα. Περισσότερες λεπτομέρειες μπορούν να βρεθούν στα αρχεία καταγραφής. Παρακαλώ επικοινωνήστε με τον διαχειριστή σας.",
-    "An permission error occurred. More details can be found in the logs. Please reach out to your administrator." : "Παρουσιάστηκε ένα σφάλμα άδειας. Περισσότερες λεπτομέρειες μπορούν να βρεθούν στα αρχεία καταγραφής. Παρακαλώ επικοινωνήστε με τον διαχειριστή σας.",
-    "An not found error occurred. More details can be found in the logs. Please reach out to your administrator." : "Παρουσιάστηκε ένα σφάλμα \"Δε βρέθηκε\". Περισσότερες λεπτομέρειες μπορούν να βρεθούν στα αρχεία καταγραφής. Παρακαλώ επικοινωνήστε με τον διαχειριστή σας.",
     "Could not create row." : "Δεν ήταν δυνατή η δημιουργία της γραμμής.",
     "Could not update row." : "Δεν ήταν δυνατή η ενημέρωση της γραμμής.",
     "Select table" : "Επιλογή πίνακα",
