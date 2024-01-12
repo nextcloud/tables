@@ -118,11 +118,11 @@ class Row2 implements JsonSerializable {
 		return [
 			'id' => $this->id,
 			'tableId' => $this->tableId,
-			'data' => $this->data,
 			'createdBy' => $this->createdBy,
 			'createdAt' => $this->createdAt,
 			'lastEditBy' => $this->lastEditBy,
 			'lastEditAt' => $this->lastEditAt,
+			'data' => $this->data,
 		];
 	}
 

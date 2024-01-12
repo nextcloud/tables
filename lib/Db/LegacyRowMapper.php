@@ -37,7 +37,17 @@ class LegacyRowMapper extends QBMapper {
 
 	protected int $platform;
 
-	public function __construct(IDBConnection $db, LoggerInterface $logger, TextColumnQB $textColumnQB, SelectionColumnQB $selectionColumnQB, NumberColumnQB $numberColumnQB, DatetimeColumnQB $datetimeColumnQB, SuperColumnQB $columnQB, ColumnMapper $columnMapper, UserHelper $userHelper, Row2Mapper $rowMapper) {
+	public function __construct(
+		IDBConnection $db,
+		LoggerInterface $logger,
+		TextColumnQB $textColumnQB,
+		SelectionColumnQB $selectionColumnQB,
+		NumberColumnQB $numberColumnQB,
+		DatetimeColumnQB $datetimeColumnQB,
+		SuperColumnQB $columnQB,
+		ColumnMapper $columnMapper,
+		UserHelper $userHelper,
+		Row2Mapper $rowMapper) {
 		parent::__construct($db, $this->table, LegacyRow::class);
 		$this->logger = $logger;
 		$this->textColumnQB = $textColumnQB;
@@ -435,6 +445,14 @@ class LegacyRowMapper extends QBMapper {
 	 * @throws InternalError
 	 */
 	public function transferLegacyRow(LegacyRow $legacyRow, array $columns) {
+		$this->rowMapper->insert($this->migrateLegacyRow($legacyRow), $columns);
+	}
+
+	/**
+	 * @param LegacyRow $legacyRow
+	 * @return Row2
+	 */
+	public function migrateLegacyRow(LegacyRow $legacyRow): Row2 {
 		$row = new Row2();
 		$row->setId($legacyRow->getId());
 		$row->setTableId($legacyRow->getTableId());
@@ -443,6 +461,6 @@ class LegacyRowMapper extends QBMapper {
 		$row->setLastEditBy($legacyRow->getLastEditBy());
 		$row->setLastEditAt($legacyRow->getLastEditAt());
 		$row->setData($legacyRow->getDataArray());
-		$this->rowMapper->insert($row, $columns);
+		return $row;
 	}
 }
