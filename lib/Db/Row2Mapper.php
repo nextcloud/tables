@@ -96,6 +96,21 @@ class Row2Mapper {
 	}
 
 	/**
+	 * @throws InternalError
+	 */
+	public function findNextId(int $offsetId = -1): ?int {
+		try {
+			$rowSleeve = $this->rowSleeveMapper->findNext($offsetId);
+		} catch (MultipleObjectsReturnedException|Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		} catch (DoesNotExistException $e) {
+			return null;
+		}
+		return $rowSleeve->getId();
+	}
+
+	/**
 	 * @throws DoesNotExistException
 	 * @throws MultipleObjectsReturnedException
 	 * @throws Exception
