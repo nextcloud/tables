@@ -126,7 +126,7 @@ class RowService extends SuperService {
 			$row = $this->row2Mapper->find($id, $columns);
 		} catch (InternalError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage(), $e->getCode(), $e);
 		} catch (NotFoundError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
