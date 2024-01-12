@@ -23,8 +23,8 @@
 
 namespace OCA\Tables\Command;
 
-use OCA\Tables\Db\LegacyRow;
-use OCA\Tables\Db\LegacyRowMapper;
+use Exception;
+use OCA\Tables\Db\Row2;
 use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
@@ -32,9 +32,6 @@ use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\TableService;
-use OCP\AppFramework\Db\DoesNotExistException;
-use OCP\AppFramework\Db\MultipleObjectsReturnedException;
-use OCP\DB\Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -56,7 +53,7 @@ class Clean extends Command {
 	private bool $dry = false;
 	private int $truncateLength = 20;
 
-	private ?LegacyRow $row = null;
+	private ?Row2 $row = null;
 	private int $offset = -1;
 
 	private OutputInterface $output;
@@ -107,16 +104,21 @@ class Clean extends Command {
 
 	private function getNextRow():void {
 		try {
-			$this->row = $this->rowMapper->findNext($this->offset);
+			$nextRowId = $this->rowMapper->findNextId($this->offset);
+			if ($nextRowId === null) {
+				$this->print("");
+				$this->print("No more rows found.", self::PRINT_LEVEL_INFO);
+				$this->print("");
+				$this->row = null;
+				return;
+			}
+			$tableId = $this->rowMapper->getTableIdForRow($nextRowId);
+			$columns = $this->columnService->findAllByTable($tableId, null, '');
+			$this->row = $this->rowMapper->find($nextRowId, $columns);
 			$this->offset = $this->row->getId();
-		} catch (MultipleObjectsReturnedException|Exception $e) {
+		} catch (Exception $e) {
 			$this->print('Error while fetching row', self::PRINT_LEVEL_ERROR);
 			$this->logger->error('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
-		} catch (DoesNotExistException $e) {
-			$this->print("");
-			$this->print("No more rows found.", self::PRINT_LEVEL_INFO);
-			$this->print("");
-			$this->row = null;
 		}
 	}
 
@@ -142,14 +144,14 @@ class Clean extends Command {
 	}
 
 	private function checkColumns(): void {
-		$data = json_decode($this->row->getData());
-		foreach ($data as $date) {
-			$suffix = strlen($date->value) > $this->truncateLength ? "...": "";
+		foreach ($this->row->getData() as $date) {
+			$valueAsString = is_string($date['value']) ? $date['value'] : json_encode($date['value']);
+			$suffix = strlen($valueAsString) > $this->truncateLength ? "...": "";
 			$this->print("");
-			$this->print("columnId: " . $date->columnId . " -> " . substr($date->value, 0, $this->truncateLength) . $suffix, self::PRINT_LEVEL_INFO);
+			$this->print("columnId: " . $date['columnId'] . " -> " . substr($valueAsString, 0, $this->truncateLength) . $suffix, self::PRINT_LEVEL_INFO);
 
 			try {
-				$this->columnService->find($date->columnId, '');
+				$this->columnService->find($date['columnId'], '');
 				if($this->output->isVerbose()) {
 					$this->print("column found", self::PRINT_LEVEL_SUCCESS);
 				}
@@ -160,10 +162,10 @@ class Clean extends Command {
 				if($this->output->isVerbose()) {
 					$this->print("corresponding column not found.", self::PRINT_LEVEL_ERROR);
 				} else {
-					$this->print("columnId: " . $date->columnId . " not found, but needed by row ".$this->row->getId(), self::PRINT_LEVEL_WARNING);
+					$this->print("columnId: " . $date['columnId'] . " not found, but needed by row ".$this->row->getId(), self::PRINT_LEVEL_WARNING);
 				}
 				// if the corresponding column is not found, lets delete the data from the row.
-				$this->deleteDataFromRow($date->columnId);
+				$this->deleteDataFromRow($date['columnId']);
 			} catch (PermissionError $e) {
 				$this->print("😱️ permission error while looking for column", self::PRINT_LEVEL_ERROR);
 				$this->logger->error('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
@@ -183,17 +185,18 @@ class Clean extends Command {
 		}
 
 		$this->print("DANGER, start deleting", self::PRINT_LEVEL_WARNING);
-		$data = json_decode($this->row->getData(), true);
+		$data = $this->row->getData();
 
-		// $this->print("Data before: \t".json_encode(array_values($data), 0), self::PRINT_LEVEL_INFO);
+		$this->print("Data before: \t".json_encode(array_values($data)), self::PRINT_LEVEL_INFO);
 		$key = array_search($columnId, array_column($data, 'columnId'));
 		unset($data[$key]);
-		// $this->print("Data after: \t".json_encode(array_values($data), 0), self::PRINT_LEVEL_INFO);
-		$this->row->setDataArray(array_values($data));
+		$this->print("Data after: \t".json_encode(array_values($data)), self::PRINT_LEVEL_INFO);
+		$this->row->setData(array_values($data));
+
 		try {
-			$this->rowMapper->update($this->row);
+			$this->rowMapper->update($this->row, $this->columnService->findAllByTable($this->row->getTableId()));
 			$this->print("Row successfully updated", self::PRINT_LEVEL_SUCCESS);
-		} catch (Exception $e) {
+		} catch (InternalError|PermissionError $e) {
 			$this->print("Error while updating row to db.", self::PRINT_LEVEL_ERROR);
 			$this->logger->error('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
 		}
