@@ -58,7 +58,7 @@ class TableMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table);
-		if ($userId != null) {
+		if ($userId !== null && $userId !== '') {
 			$qb->where($qb->expr()->eq('ownership', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
 		}
 		return $this->findEntities($qb);
