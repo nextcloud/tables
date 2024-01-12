@@ -253,6 +253,7 @@
     "Could not import, needed resources were not found." : "Non foi posíbel importar, non se atoparon os recursos necesarios.",
     "Could not import data due to unknown errors." : "Non foi posíbel importar os datos por mor de erros descoñecidos.",
     "Select file for the import" : "Seleccionar o ficheiro para importar",
+    "Transfer" : "Transferencia",
     "Select emoji for view" : "Seleccione o «emoji» para a vista",
     "Title of the new view" : "Título da nova vista",
     "New title of the view" : "Novo título da nova vista",

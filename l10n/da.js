@@ -204,6 +204,7 @@ OC.L10N.register(
     "Could not import, needed resources were not found." : "Kunne ikke importere, de nødvendige ressourcer blev ikke fundet.",
     "Could not import data due to unknown errors." : "Kunne ikke importere data på grund af ukendte fejl.",
     "Select file for the import" : "Vælg fil til importen",
+    "Transfer" : "Overførsel",
     "Filter" : "Filter",
     "Sort" : "Sortér",
     "Delete table" : "Slet tabel",

@@ -1,6 +1,9 @@
 OC.L10N.register(
     "tables",
     {
+    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Es ist ein unerwarteter Fehler aufgetreten. Weitere Details finden Sie in den Protokollen. Bitte wenden Sie sich an Ihre Administration.",
+    "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "Es ist ein Berechtigungsfehler aufgetreten. Weitere Details finden Sie in den Protokollen. Bitte wenden Sie sich an Ihre Administration.",
+    "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "Es ist ein „Nicht gefunden“-Fehler aufgetreten. Weitere Details finden Sie in den Protokollen. Bitte wenden Sie sich an Ihre Administration.",
     "Could not create row." : "Zeile konnte nicht erstellt werden.",
     "Could not update row." : "Zeile konnte nicht aktualisiert werden.",
     "Nextcloud Tables" : "Nextcloud Tabellen",
@@ -256,6 +259,7 @@ OC.L10N.register(
     "Could not import, needed resources were not found." : "Import nicht möglich, benötigte Ressourcen wurden nicht gefunden.",
     "Could not import data due to unknown errors." : "Daten konnten aufgrund unbekannter Fehler nicht importiert werden.",
     "Select file for the import" : "Datei für Import auswählen",
+    "Transfer" : "Übertragen",
     "Select emoji for view" : "Emoji für Ansicht auswählen",
     "Title of the new view" : "Titel der neuen Ansicht",
     "New title of the view" : "Neuer Titel der Ansicht",

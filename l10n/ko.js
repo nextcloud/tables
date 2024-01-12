@@ -52,6 +52,7 @@ OC.L10N.register(
     "File" : "파일",
     "Result" : "결과",
     "Please select a file." : "파일을 선택하십시오.",
+    "Transfer" : "전송",
     "Filter" : "필터",
     "Sort" : "정렬",
     "Copy" : "복사",

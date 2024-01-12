@@ -218,6 +218,7 @@ OC.L10N.register(
     "Could not import, needed resources were not found." : "Kunde inte importera, nödvändiga resurser hittades inte.",
     "Could not import data due to unknown errors." : "Kunde inte importera data på grund av okända fel.",
     "Select file for the import" : "Välj fil för importen",
+    "Transfer" : "Överför",
     "Select emoji for view" : "Välj emoji för vy",
     "Title of the new view" : "Titeln på den nya vyn",
     "New title of the view" : "Ny titel på vyn",

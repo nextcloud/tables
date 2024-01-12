@@ -226,6 +226,7 @@ OC.L10N.register(
     "Inserted rows" : "Vstavljeni stolpci",
     "Importing..." : "Poteka uvažanje ...",
     "Please select a file." : "Izberite datoteko.",
+    "Transfer" : "Prenos",
     "New title of the view" : "Nov naziv pogleda",
     "Filter" : "Filter",
     "Sort" : "Razvrsti",

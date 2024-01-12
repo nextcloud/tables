@@ -192,6 +192,7 @@ OC.L10N.register(
     "Importing..." : "Выполняется импорт…",
     "Loading table data" : "Загрузка данных таблицы…",
     "Please select a file." : "Выберите файл.",
+    "Transfer" : "Передача",
     "Filter" : "Фильтр",
     "Sort" : "Сортировка",
     "Create View" : "Создать представление",

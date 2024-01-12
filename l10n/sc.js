@@ -50,6 +50,7 @@ OC.L10N.register(
     "File" : "Archìviu",
     "Result" : "Resurtadu",
     "Please select a file." : "Seletziona un'archìviu.",
+    "Transfer" : "Tràmuda",
     "Filter" : "Filtru",
     "Sort" : "Assenta",
     "Copy" : "Còpia",

@@ -18,6 +18,7 @@ OC.L10N.register(
     "Delete column" : "Obriši kolonu",
     "Cancel" : "Otkaži",
     "Delete" : "Obriši",
+    "Owner" : "Vlasnik",
     "File" : "Fajl",
     "Copy" : "Kopiraj",
     "Shared" : "Deljeno",

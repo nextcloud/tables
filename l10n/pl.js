@@ -105,6 +105,7 @@ OC.L10N.register(
     "Information" : "Informacje",
     "Result" : "Wynik",
     "Please select a file." : "Wybierz plik.",
+    "Transfer" : "Przenieś",
     "Filter" : "Filtruj",
     "Sort" : "Sortuj",
     "Delete table" : "Usuń tabelę",

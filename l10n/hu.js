@@ -250,6 +250,7 @@ OC.L10N.register(
     "Could not import, needed resources were not found." : "Nem sikerült importálni, nem találhatók a szükséges erőforrások.",
     "Could not import data due to unknown errors." : "Az adatok importálása ismeretlen hibák miatt nem sikerült.",
     "Select file for the import" : "Válassza ki az importálandó fájlt",
+    "Transfer" : "Átvitel",
     "Select emoji for view" : "Válasszon emodzsit a megtekintéshez",
     "Title of the new view" : "Az új nézet címe",
     "New title of the view" : "Új cím a nézetnek",

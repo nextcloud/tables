@@ -255,6 +255,7 @@ OC.L10N.register(
     "Could not import, needed resources were not found." : "Veriler içe aktarılamadı. Gerekli kaynaklar bulunamadı.",
     "Could not import data due to unknown errors." : "Veriler bilinmeyen sorunlar nedeniyle içe aktarılamadı.",
     "Select file for the import" : "İçe aktarılacak dosyayı seçin",
+    "Transfer" : "Aktar",
     "Select emoji for view" : "Görünüm için bir emoji seçin",
     "Title of the new view" : "Yeni görünümün başlığı",
     "New title of the view" : "Görünümün yeni başlığı",

@@ -29,6 +29,7 @@ OC.L10N.register(
     "Title" : "Pealkiri",
     "Cancel" : "Loobu",
     "Delete" : "Kustuta",
+    "Owner" : "Omanik",
     "File" : "Fail",
     "Please select a file." : "Palun vali fail.",
     "Filter" : "Filter",

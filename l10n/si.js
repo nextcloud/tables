@@ -18,6 +18,7 @@ OC.L10N.register(
     "Time" : "වේලාව",
     "Save" : "සුරකින්න",
     "Cancel" : "අවලංගු කරන්න",
+    "Owner" : "හිමිකරු",
     "File" : "ගොනුව",
     "Please select a file." : "කරුණාකර ගොනුවක් තෝරන්න.",
     "Filter" : "පෙරහන",

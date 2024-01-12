@@ -25,6 +25,7 @@ OC.L10N.register(
     "Title" : "Цол/Албан тушаал",
     "Cancel" : "болиулах",
     "Delete" : "Устгах",
+    "Owner" : "Эзэмшигч",
     "Please select a file." : "Файл сонгоно уу.",
     "Filter" : "Шүүлтүүр",
     "Copy" : "хуулах",

@@ -43,6 +43,7 @@ OC.L10N.register(
     "File" : "Archivo",
     "Result" : "Resultado",
     "Please select a file." : "Favor de seleccionar un archivo.",
+    "Transfer" : "Transferir",
     "Filter" : "Filtrar",
     "Sort" : "Ordenar",
     "Shared" : "Compartido",

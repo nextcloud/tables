@@ -35,6 +35,7 @@ OC.L10N.register(
     "Title" : "Titolo",
     "Cancel" : "Nuligi",
     "Delete" : "Forigi",
+    "Owner" : "Posedanto",
     "File" : "Dosiero",
     "Please select a file." : "Bonvolu elekti dosieron.",
     "Sort" : "Ordigi",

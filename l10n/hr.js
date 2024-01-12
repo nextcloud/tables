@@ -50,6 +50,7 @@ OC.L10N.register(
     "File" : "Datoteka",
     "Result" : "Rezultat",
     "Please select a file." : "Odaberite datoteku.",
+    "Transfer" : "Prijenos",
     "Filter" : "Filtar",
     "Sort" : "Razvrstaj",
     "Copy" : "Kopirajte",

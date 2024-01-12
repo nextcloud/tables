@@ -39,6 +39,7 @@ OC.L10N.register(
     "Delete" : "Избриши",
     "File" : "Датотека",
     "Please select a file." : "Изберете датотека.",
+    "Transfer" : "Пренос",
     "Filter" : "Филтер",
     "Sort" : "Сортирај",
     "Shared" : "Споделено",

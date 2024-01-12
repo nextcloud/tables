@@ -1,6 +1,9 @@
 OC.L10N.register(
     "tables",
     {
+    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Дошло је до неочекиване грешке. Више детаља можете да пронађете у дневницима. Молимо вас да се обратите администрацији.",
+    "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "Дошло је до грешке у вези са дозволама. Више детаља можете да пронађете у дневницима. Молимо вас да се обратите администрацији.",
+    "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "Дошло је до грешке непостојања. Више детаља можете да пронађете у дневницима. Молимо вас да се обратите администрацији.",
     "Could not create row." : "Не може да се креира ред.",
     "Could not update row." : "Не може да се ажурира ред.",
     "Nextcloud Tables" : "Nextcloud Табеле",
@@ -192,6 +195,7 @@ OC.L10N.register(
     "Sorry, something went wrong." : "Жао нам је, нешто је пошло наопако.",
     "Could not create new column." : "Није могла да се креира нова колона.",
     "Create row" : "Креирај ред",
+    "\"{columnTitle}\" should not be empty" : "„{columnTitle}” не би требало да буде празно",
     "Save row" : "Сачувај ред",
     "Row successfully created." : "Ред је успешно креиран.",
     "Could not create new row" : "Није могао да се креира нови ред",
@@ -227,6 +231,7 @@ OC.L10N.register(
     "I really want to delete this row!" : "Заиста желим да обришем овај ред!",
     "Could not update row" : "Није успело ажурирање реда",
     "Could not delete row." : "Ред не може да се обрише.",
+    "Owner" : "Власник",
     "I really want to delete this table!" : "Заиста желим да обришем ову табелу!",
     "File" : "Фајл",
     "Supported formats are xlsx, xls, html, xml and csv." : "Подржани формати су xlsx, xls, html, xml и csv.",
@@ -255,6 +260,7 @@ OC.L10N.register(
     "Could not import, needed resources were not found." : "Не може да се увезе, нису пронађени потребни ресурси.",
     "Could not import data due to unknown errors." : "Не могу да се увезу подаци услед непознатих грешака.",
     "Select file for the import" : "Изаберите фајл за увоз",
+    "Transfer" : "Пренеси",
     "Select emoji for view" : "Изаберите емођи за поглед",
     "Title of the new view" : "Назив новог погледа",
     "New title of the view" : "Нови наслов погледа",

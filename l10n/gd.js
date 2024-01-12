@@ -16,6 +16,7 @@ OC.L10N.register(
     "Delete" : "Sguab às",
     "File" : "Faidhle",
     "Please select a file." : "Tagh faidhle.",
+    "Transfer" : "Tar-chuir",
     "Sort" : "Seòrsaich",
     "Copy" : "Dèan lethbhreac",
     "Shared" : "Co-roinnte",

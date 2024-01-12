@@ -176,6 +176,7 @@ OC.L10N.register(
     "Information" : "Informazioa",
     "Result" : "Emaitza",
     "Please select a file." : "Aukeratu fitxategi bat.",
+    "Transfer" : "Transferitu",
     "Filter" : "Iragazi",
     "Sort" : "Ordenatu",
     "Delete table" : "Ezabatu taula",

@@ -82,6 +82,7 @@ OC.L10N.register(
     "Information" : "Informasjo",
     "Result" : "Resultat",
     "Please select a file." : "Velg en fil.",
+    "Transfer" : "Overfør",
     "Filter" : "Filter",
     "Sort" : "Sorter",
     "Delete table" : "Slett tabell",

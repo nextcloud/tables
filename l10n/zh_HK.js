@@ -1,6 +1,9 @@
 OC.L10N.register(
     "tables",
     {
+    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "發生了意料之外的錯誤。可在紀錄檔中找到更多詳細資訊。請聯絡您的管理員。",
+    "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "發生了權限錯誤。可在紀錄檔中找到更多詳細資訊。請聯絡您的管理員。",
+    "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "發生了找不到的錯誤。可在紀錄檔中找到更多詳細資訊。請聯絡您的管理員。",
     "Could not create row." : "無法創建列。",
     "Could not update row." : "無法更新列。",
     "Nextcloud Tables" : "Nextcloud 表格",
@@ -228,6 +231,7 @@ OC.L10N.register(
     "I really want to delete this row!" : "我真的很想刪除這一行！",
     "Could not update row" : "無法更新列",
     "Could not delete row." : "無法刪除列。",
+    "Owner" : "擁有者",
     "I really want to delete this table!" : "我真的很想刪除此數據庫表！",
     "File" : "檔案",
     "Supported formats are xlsx, xls, html, xml and csv." : "支援的格式有 xlsx、xls、html、xml 與 csv。",
@@ -256,6 +260,7 @@ OC.L10N.register(
     "Could not import, needed resources were not found." : "無法匯入，找不到需要的資源。",
     "Could not import data due to unknown errors." : "因為未知的錯誤，因此無法匯入資料。",
     "Select file for the import" : "選取要匯入的檔案",
+    "Transfer" : "轉移",
     "Select emoji for view" : "為檢視選擇表情符號",
     "Title of the new view" : "新檢視標題",
     "New title of the view" : "檢視新標題",

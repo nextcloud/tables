@@ -230,6 +230,7 @@
     "Could not import, needed resources were not found." : "Import sa nepodaril, potrebné zdroje neboli nájdené.",
     "Could not import data due to unknown errors." : "Nepodarilo sa importovať údaje kvôli neznámym chybám.",
     "Select file for the import" : "Vyberte súbor pre import",
+    "Transfer" : "Prenos",
     "Select emoji for view" : "Vyberte emotikonu pre zobrazenie",
     "Title of the new view" : "Názov nového zobrazenia",
     "New title of the view" : "Nový názov zobrazenia",

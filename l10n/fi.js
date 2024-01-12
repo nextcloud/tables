@@ -128,6 +128,7 @@ OC.L10N.register(
     "Loading table data" : "Ladataan taulukon tietoja",
     "Please select a file." : "Valitse tiedosto.",
     "Select file for the import" : "Valitse tuotava tiedosto",
+    "Transfer" : "Siirrä",
     "Filter" : "Suodatin",
     "Sort" : "Lajittele",
     "Delete table" : "Poista taulukko",

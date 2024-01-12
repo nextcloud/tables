@@ -38,6 +38,7 @@ OC.L10N.register(
     "Cancel" : "Membatalkan",
     "Delete" : "Hapus",
     "Please select a file." : "Silakan pilih berkas",
+    "Transfer" : "Transfer",
     "Filter" : "Filter",
     "Sort" : "Urutkan",
     "Copy" : "Salin",

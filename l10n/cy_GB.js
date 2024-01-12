@@ -27,6 +27,7 @@ OC.L10N.register(
     "Title" : "Teitl",
     "Cancel" : "Diddymu",
     "Delete" : "Dileu",
+    "Owner" : "Perchennog",
     "Sort" : "Trefnu",
     "Shared" : "Rhannwyd",
     "group" : "grŵp",

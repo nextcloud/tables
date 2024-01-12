@@ -30,6 +30,7 @@ OC.L10N.register(
     "Title" : "Título",
     "Cancel" : "Cancelar",
     "Delete" : "Borrar",
+    "Owner" : "Dueño",
     "File" : "Archivo",
     "Result" : "Resultado",
     "Please select a file." : "Por favor selecciona un archivo.",

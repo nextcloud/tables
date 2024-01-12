@@ -79,6 +79,7 @@ OC.L10N.register(
     "File" : "Bestand",
     "Result" : "Resultaat",
     "Please select a file." : "Selecteer een bestand.",
+    "Transfer" : "Overdragen",
     "Filter" : "Filter",
     "Sort" : "Sorteren",
     "Delete table" : "Verwijder tabel",

@@ -255,6 +255,7 @@ OC.L10N.register(
     "Could not import, needed resources were not found." : "Não foi possível importar, os recursos necessários não foram encontrados.",
     "Could not import data due to unknown errors." : "Não foi possível importar dados devido a erros desconhecidos.",
     "Select file for the import" : "Selecione o arquivo para a importação",
+    "Transfer" : "Transferir",
     "Select emoji for view" : "Seleciona emoji para exibição",
     "Title of the new view" : "Título da nova exibição",
     "New title of the view" : "Novo título da exibição",

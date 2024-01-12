@@ -1,6 +1,9 @@
 OC.L10N.register(
     "tables",
     {
+    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration.",
+    "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "A permission error occurred. More details can be found in the logs. Please reach out to your administration.",
+    "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "A not found error occurred. More details can be found in the logs. Please reach out to your administration.",
     "Could not create row." : "Could not create row.",
     "Could not update row." : "Could not update row.",
     "Nextcloud Tables" : "Nextcloud Tables",
@@ -256,6 +259,7 @@ OC.L10N.register(
     "Could not import, needed resources were not found." : "Could not import, needed resources were not found.",
     "Could not import data due to unknown errors." : "Could not import data due to unknown errors.",
     "Select file for the import" : "Select file for the import",
+    "Transfer" : "Transfer",
     "Select emoji for view" : "Select emoji for view",
     "Title of the new view" : "Title of the new view",
     "New title of the view" : "New title of the view",

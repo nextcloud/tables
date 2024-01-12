@@ -18,6 +18,7 @@ OC.L10N.register(
     "Title" : "Azwel",
     "Cancel" : "Sefsex",
     "Delete" : "Kkes",
+    "Owner" : "Bab",
     "File" : "Afaylu",
     "Please select a file." : "Ttxil fren afaylu.",
     "Filter" : "Sizdeg",
