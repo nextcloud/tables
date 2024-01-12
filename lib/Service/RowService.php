@@ -66,8 +66,6 @@ class RowService extends SuperService {
 		try {
 			if ($this->permissionsService->canReadRowsByElementId($tableId, 'table', $userId)) {
 				return $this->row2Mapper->findAll($this->columnMapper->findAllByTable($tableId), $tableId, $limit, $offset, null, null, $userId);
-
-				// return $this->mapper->findAllByTable($tableId, $limit, $offset);
 			} else {
 				throw new PermissionError('no read access to table id = '.$tableId);
 			}
@@ -95,8 +93,6 @@ class RowService extends SuperService {
 				$columnsArray = $view->getColumnsArray();
 				$columns = $this->columnMapper->findAll($columnsArray);
 				return $this->row2Mapper->findAll($columns, $view->getTableId(), $limit, $offset, $view->getFilterArray(), $view->getSortArray(), $userId);
-
-				// return $this->mapper->findAllByView($this->viewMapper->find($viewId), $userId, $limit, $offset);
 			} else {
 				throw new PermissionError('no read access to view id = '.$viewId);
 			}
@@ -208,16 +204,6 @@ class RowService extends SuperService {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
-
-		/*$time = new DateTime();
-		$item = new Row();
-		$item->setDataArray($data);
-		$item->setTableId($viewId ? $view->getTableId() : $tableId);
-		$item->setCreatedBy($this->userId);
-		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
-		$item->setLastEditBy($this->userId);
-		$item->setLastEditAt($time->format('Y-m-d H:i:s'));
-		return $this->mapper->insert($item);*/
 	}
 
 	/**
