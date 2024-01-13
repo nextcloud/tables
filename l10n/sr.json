@@ -231,6 +231,7 @@
     "Could not delete row." : "Ред не може да се обрише.",
     "Owner" : "Власник",
     "I really want to delete this table!" : "Заиста желим да обришем ову табелу!",
+    "Change owner" : "Промени власника",
     "File" : "Фајл",
     "Supported formats are xlsx, xls, html, xml and csv." : "Подржани формати су xlsx, xls, html, xml и csv.",
     "Select a file" : "Изаберите фајл",
@@ -258,7 +259,10 @@
     "Could not import, needed resources were not found." : "Не може да се увезе, нису пронађени потребни ресурси.",
     "Could not import data due to unknown errors." : "Не могу да се увезу подаци услед непознатих грешака.",
     "Select file for the import" : "Изаберите фајл за увоз",
+    "Transfer table" : "Пренеси табелу",
+    "Transfer this table to another user" : "Пренеси ову табелу другом кориснику",
     "Transfer" : "Пренеси",
+    "Table \"{emoji}{table}\" transfered to {user}" : "Табела „{emoji} {table}” је пренесена кориснику {user}",
     "Select emoji for view" : "Изаберите емођи за поглед",
     "Title of the new view" : "Назив новог погледа",
     "New title of the view" : "Нови наслов погледа",
@@ -394,6 +398,8 @@
     "Export CSV" : "Извези CSV",
     "Uncheck all" : "Одштиклирај све",
     "_%n selected row_::_%n selected rows_" : ["%n изабрани ред","%n изабрана реда","%n изабраних редова"],
+    "{shareTypeString}..." : "{shareTypeString}...",
+    "Failed to fetch {shareTypeString}" : "Није успело добављање {shareTypeString}",
     "Confirmation" : "Потврда",
     "Confirm" : "Потврди",
     "_{nb} row_::_{nb} rows_" : ["{nb} ред","{nb} реда","{nb} редова"],
@@ -454,6 +460,7 @@
     "Could not remove view." : "Не може да се уклони поглед.",
     "Could not reload view." : "Поглед није могао да се учита поново.",
     "Could not update table." : "Не може да се ажурира табела.",
+    "Could not transfer table." : "Табела није могла да се пренесе.",
     "Could not remove table." : "Не може да се уклони табела."
 },"pluralForm" :"nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);"
 }

@@ -26,6 +26,7 @@ OC.L10N.register(
     "Delete" : "Lemel",
     "File" : "Restr",
     "Please select a file." : "Choazit ur restr mar-plij.",
+    "Transfer" : "Treuzkas",
     "Filter" : "Filtre",
     "Sort" : "Renkañ",
     "Shared" : "Rannet",

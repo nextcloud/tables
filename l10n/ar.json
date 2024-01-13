@@ -229,7 +229,9 @@
     "I really want to delete this row!" : "أنا حقا أريد حذف هذا الصف!",
     "Could not update row" : "تعذّر تحديث السطر",
     "Could not delete row." : "تعذر حذف الصف.",
+    "Owner" : "مالك",
     "I really want to delete this table!" : "أنا أرغب فعلاً في حذف هذا الجدول!",
+    "Change owner" : "تغيير المالك",
     "File" : "ملف",
     "Supported formats are xlsx, xls, html, xml and csv." : "التنسيقات المدعومة هي xlsx و xls و html و xml و csv.",
     "Select a file" : "إختَر ملفّاً",
@@ -257,6 +259,10 @@
     "Could not import, needed resources were not found." : "تعذّر الاستيراد، لم يتم العثور على الموارد المطلوبة.",
     "Could not import data due to unknown errors." : "تعذّر استيراد البيانات بسبب أخطاء غير معروفة.",
     "Select file for the import" : "اختَر ملفاً للاستيراد",
+    "Transfer table" : "نقل الجدول",
+    "Transfer this table to another user" : "نقل هذا الجدول لمستخدِم آخر",
+    "Transfer" : "نقل",
+    "Table \"{emoji}{table}\" transfered to {user}" : "تمّ نقل الجدول \"{emoji}{table}\" للمستخدِم {user}",
     "Select emoji for view" : "إختَؤ إيموجي emoji للمنظور",
     "Title of the new view" : "عنوان المنظور الجديد",
     "New title of the view" : "عنوان جديد للمنظور",
@@ -392,6 +398,8 @@
     "Export CSV" : "صدِّر CSV",
     "Uncheck all" : "إلغاء تحديد الكل",
     "_%n selected row_::_%n selected rows_" : ["%n أعمدة محددة","%n عمود محدد","%n أعمدة محددة","%n أعمدة محددة","%n أعمدة محددة","%n أعمدة محددة"],
+    "{shareTypeString}..." : "{shareTypeString}...",
+    "Failed to fetch {shareTypeString}" : "تعذّر جلب {shareTypeString}",
     "Confirmation" : "تأكيد",
     "Confirm" : "تأكيد",
     "_{nb} row_::_{nb} rows_" : ["{nb} صفوف","{nb} صف","{nb} صفوف","{nb} صفوف","{nb} صفوف","{nb} صفوف"],
@@ -452,6 +460,7 @@
     "Could not remove view." : "تعذّر حذف المنظور",
     "Could not reload view." : "تعذّرت إعادة تحميل المنظور",
     "Could not update table." : "تعذر تحديث الجدول.",
+    "Could not transfer table." : "تعذّر نقل الجدول.",
     "Could not remove table." : "تعذر إزالة/نقل الجدول."
 },"pluralForm" :"nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;"
 }

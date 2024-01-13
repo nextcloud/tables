@@ -254,6 +254,7 @@ OC.L10N.register(
     "Could not import, needed resources were not found." : "Nedaří se naimportovat – potřebné prostředky nebyly nalezeny.",
     "Could not import data due to unknown errors." : "Data se kvůli neznámým chybám nepodařilo naimportovat.",
     "Select file for the import" : "Vyberte soubor pro import",
+    "Transfer" : "Přenos",
     "Select emoji for view" : "Vyberte emotikonu pro pohled",
     "Title of the new view" : "Nadpis nového pohledu",
     "New title of the view" : "Nový nadpis pohledu",

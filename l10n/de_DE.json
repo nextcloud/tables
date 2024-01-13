@@ -229,7 +229,9 @@
     "I really want to delete this row!" : "Ich möchte diese Zeile wirklich löschen!",
     "Could not update row" : "Zeile konnte nicht aktualisiert werden",
     "Could not delete row." : "Zeile konnte nicht gelöscht werden.",
+    "Owner" : "Besitzer",
     "I really want to delete this table!" : "Die Tabelle soll gelöscht werden.",
+    "Change owner" : "Besitzer ändern",
     "File" : "Datei",
     "Supported formats are xlsx, xls, html, xml and csv." : "Unterstützte Formate sind xlsx, xls, html, xml und csv.",
     "Select a file" : "Datei auswählen",
@@ -257,7 +259,10 @@
     "Could not import, needed resources were not found." : "Import nicht möglich, benötigte Ressourcen wurden nicht gefunden.",
     "Could not import data due to unknown errors." : "Daten konnten aufgrund unbekannter Fehler nicht importiert werden.",
     "Select file for the import" : "Datei für Import auswählen",
+    "Transfer table" : "Tabelle übertragen",
+    "Transfer this table to another user" : "Diese Tabelle auf einen anderen Benutzer übertragen",
     "Transfer" : "Übertragen",
+    "Table \"{emoji}{table}\" transfered to {user}" : "Tabelle \"{emoji}{table}\" an {user} übertragen",
     "Select emoji for view" : "Emoji für Ansicht auswählen",
     "Title of the new view" : "Titel der neuen Ansicht",
     "New title of the view" : "Neuer Titel der Ansicht",
@@ -393,6 +398,8 @@
     "Export CSV" : "CSV esportieren",
     "Uncheck all" : "Auswahl aufheben",
     "_%n selected row_::_%n selected rows_" : ["%n gewählte Zeile","%n gewählte Zeilen"],
+    "{shareTypeString}..." : "{shareTypeString}...",
+    "Failed to fetch {shareTypeString}" : "Konnte {shareTypeString} nicht abrufen",
     "Confirmation" : "Bestätigung",
     "Confirm" : "Bestätigen",
     "_{nb} row_::_{nb} rows_" : ["{nb} Zeile","{nb} Zeilen"],
@@ -453,6 +460,7 @@
     "Could not remove view." : "Ansicht konnte nicht entfernt werden.",
     "Could not reload view." : "Ansicht konnte nicht erneut geladen werden.",
     "Could not update table." : "Tabellen konnten nicht aktualisiert werden.",
+    "Could not transfer table." : "Tabelle konnte nicht übertragen werden.",
     "Could not remove table." : "Tabelle konnte nicht entfernt werden."
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

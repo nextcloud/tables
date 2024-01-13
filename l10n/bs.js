@@ -24,6 +24,7 @@ OC.L10N.register(
     "Title" : "Naslov",
     "Cancel" : "Otkaži",
     "Delete" : "Obriši",
+    "Owner" : "Vlasnik",
     "Shared" : "Podijeljen",
     "group" : "grupa",
     "Sharing" : "Dijeljenje",
