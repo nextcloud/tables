@@ -229,7 +229,9 @@
     "I really want to delete this row!" : "I really want to delete this row!",
     "Could not update row" : "Could not update row",
     "Could not delete row." : "Could not delete row.",
+    "Owner" : "Owner",
     "I really want to delete this table!" : "I really want to delete this table!",
+    "Change owner" : "Change owner",
     "File" : "File",
     "Supported formats are xlsx, xls, html, xml and csv." : "Supported formats are xlsx, xls, html, xml and csv.",
     "Select a file" : "Select a file",
@@ -257,7 +259,10 @@
     "Could not import, needed resources were not found." : "Could not import, needed resources were not found.",
     "Could not import data due to unknown errors." : "Could not import data due to unknown errors.",
     "Select file for the import" : "Select file for the import",
+    "Transfer table" : "Transfer table",
+    "Transfer this table to another user" : "Transfer this table to another user",
     "Transfer" : "Transfer",
+    "Table \"{emoji}{table}\" transfered to {user}" : "Table \"{emoji}{table}\" transfered to {user}",
     "Select emoji for view" : "Select emoji for view",
     "Title of the new view" : "Title of the new view",
     "New title of the view" : "New title of the view",
@@ -393,6 +398,8 @@
     "Export CSV" : "Export CSV",
     "Uncheck all" : "Uncheck all",
     "_%n selected row_::_%n selected rows_" : ["%n selected row","%n selected rows"],
+    "{shareTypeString}..." : "{shareTypeString}...",
+    "Failed to fetch {shareTypeString}" : "Failed to fetch {shareTypeString}",
     "Confirmation" : "Confirmation",
     "Confirm" : "Confirm",
     "_{nb} row_::_{nb} rows_" : ["{nb} row","{nb} rows"],
@@ -453,6 +460,7 @@
     "Could not remove view." : "Could not remove view.",
     "Could not reload view." : "Could not reload view.",
     "Could not update table." : "Could not update table.",
+    "Could not transfer table." : "Could not transfer table.",
     "Could not remove table." : "Could not remove table."
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
