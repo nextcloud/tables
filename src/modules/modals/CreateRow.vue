@@ -120,7 +120,7 @@ export default {
 						value,
 					})
 				}
-				await this.$store.dispatch('insertNewRow', {
+				await this.$store.dispatch((this.activeElement.id).toString()+'/insertNewRow', {
 					viewId: this.isView ? this.activeElement.id : null,
 					tableId: !this.isView ? this.activeElement.id : null,
 					data,

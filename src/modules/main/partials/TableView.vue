@@ -2,6 +2,7 @@
 	<NcTable v-if="columns.length > 0"
 		:rows="rows"
 		:columns="columns"
+		:table-id="element.id"
 		:download-title="element.title"
 		:view-setting.sync="localViewSetting"
 		:can-read-rows="canReadRows"

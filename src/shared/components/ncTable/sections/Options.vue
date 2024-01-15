@@ -113,6 +113,10 @@ export default {
 			type: Object,
 			default: null,
 		},
+		tableId: {
+			type: Number,
+			default: null,
+		},
 	},
 
 	data() {
@@ -158,7 +162,7 @@ export default {
 			this.$emit('delete-selected-rows', this.selectedRows)
 		},
 		deselectAllRows() {
-			emit('tables:selected-rows:deselect', {})
+			emit('tables:selected-rows:deselect', this.tableId)
 		},
 	},
 }
