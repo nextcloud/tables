@@ -6,9 +6,11 @@ import TablesSmartPicker from './views/SmartPicker.vue'
 __webpack_nonce__ = btoa(OC.requestToken) // eslint-disable-line
 __webpack_public_path__ = OC.linkTo('tables', 'js/') // eslint-disable-line
 
-registerWidget('tables_link', async (el, { richObjectType, richObject, accessible }) => {
+const renderWidget = async (el, { richObjectType, richObject, accessible, interactive }) => {
 	const { default: Vue } = await import(/* webpackChunkName: "reference-table-lazy" */'vue')
-	const { default: TableReferenceWidget } = await import(/* webpackChunkName: "reference-table-lazy" */'./views/LinkReferenceWidget.vue')
+	const { default: TableReferenceWidget } = interactive
+		? await import(/* webpackChunkName: "reference-table-lazy" */'./views/ContentReferenceWidget.vue')
+		: await import(/* webpackChunkName: "reference-table-lazy" */'./views/LinkReferenceWidget.vue')
 	Vue.mixin({ methods: { t, n } })
 	const Widget = Vue.extend(TableReferenceWidget)
 	new Widget({
@@ -18,21 +20,11 @@ registerWidget('tables_link', async (el, { richObjectType, richObject, accessibl
 			accessible,
 		},
 	}).$mount(el)
-})
+}
 
-registerWidget('tables_content', async (el, { richObjectType, richObject, accessible }) => {
-	const { default: Vue } = await import(/* webpackChunkName: "reference-table-lazy" */'vue')
-	const { default: TableReferenceWidget } = await import(/* webpackChunkName: "reference-table-lazy" */'./views/ContentReferenceWidget.vue')
-	Vue.mixin({ methods: { t, n } })
-	const Widget = Vue.extend(TableReferenceWidget)
-	new Widget({
-		propsData: {
-			richObjectType,
-			richObject,
-			accessible,
-		},
-	}).$mount(el)
-})
+registerWidget('tables_link', renderWidget)
+
+registerWidget('tables_content', renderWidget)
 
 registerCustomPickerElement('tables-ref-tables', (el, { providerId, accessible }) => {
 	const Element = Vue.extend(TablesSmartPicker)
