@@ -353,7 +353,7 @@ class RowService extends SuperService {
 			}
 
 			// is row in view?
-			if($this->row2Mapper->isRowInViewPresent($id, $view, $userId)) {
+			if(!$this->row2Mapper->isRowInViewPresent($id, $view, $userId)) {
 				$e = new \Exception('Update row is not allowed.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
