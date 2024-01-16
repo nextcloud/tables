@@ -107,10 +107,6 @@ class Row2 implements JsonSerializable {
 		return 'inserted';
 	}
 
-	public function removeCell(int $columnId): void {
-		// TODO
-	}
-
 	/**
 	 * @psalm-return TablesRow
 	 */
