@@ -7,6 +7,7 @@ OC.L10N.register(
     "Name" : "Vārds",
     "Description" : "Apraksts",
     "Comment" : "Komentārs",
+    "Dog" : "Suns",
     "from" : "no",
     "to" : "kam",
     "Approved" : "Apstiprināts",
