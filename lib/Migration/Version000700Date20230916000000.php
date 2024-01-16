@@ -16,8 +16,8 @@ use OCP\Migration\SimpleMigrationStep;
 class Version000700Date20230916000000 extends SimpleMigrationStep {
 
 	/**
-	 * this is a copy from the definition set in OCA\Tables\Helper\ColumnsHelper
-	 * this has to be in sync! but the definition can not be used directly
+	 * this is a copy from the definition set in OCA\Tables\Helper\ColumnsHelper with added types
+	 * the names have to be in sync! but the definition can not be used directly
 	 * because it might cause problems on auto web updates
 	 * (class might not be loaded if it gets replaced during the runtime)
 	 */

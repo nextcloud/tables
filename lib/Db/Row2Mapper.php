@@ -49,7 +49,7 @@ class Row2Mapper {
 	public function delete(Row2 $row): Row2 {
 		$this->db->beginTransaction();
 		try {
-			foreach ($this->columnsHelper->get(['name']) as $columnType) {
+			foreach ($this->columnsHelper->columns as $columnType) {
 				$cellMapperClassName = 'OCA\Tables\Db\RowCell' . ucfirst($columnType) . 'Mapper';
 				/** @var RowCellMapperSuper $cellMapper */
 				try {
@@ -187,7 +187,7 @@ class Row2Mapper {
 		$qb = $this->db->getQueryBuilder();
 
 		$qbSqlForColumnTypes = null;
-		foreach ($this->columnsHelper->get(['name']) as $columnType) {
+		foreach ($this->columnsHelper->columns as $columnType) {
 			$qbTmp = $this->db->getQueryBuilder();
 			$qbTmp->select('*')
 				->from('tables_row_cells_'.$columnType)
