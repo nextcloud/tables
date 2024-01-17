@@ -1,6 +1,9 @@
 OC.L10N.register(
     "tables",
     {
+    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Ocurrió un error inesperado. Podrá encontrar más detalles en los registros. Por favor, comuníquese con su administrador.",
+    "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "Ocurrió un error de permisos. Podrá encontrar más detalles en los registros. Por favor, comuníquese con su administrador.",
+    "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "Ocurrió un error de \"no encontrado\". Podrá encontrar más detalles en los registros. Por favor, comuníquese con su administrador.",
     "Could not create row." : "No se pudo crear fila.",
     "Could not update row." : "No se ha podido actualizar la fila.",
     "Nextcloud Tables" : "Tablas de Nextcloud",
@@ -230,6 +233,7 @@ OC.L10N.register(
     "Could not delete row." : "No se ha podido eliminar la fila.",
     "Owner" : "Dueño",
     "I really want to delete this table!" : "¡De verdad quiero eliminar esta tabla!",
+    "Change owner" : "Cambiar propietario",
     "File" : "Archivo",
     "Supported formats are xlsx, xls, html, xml and csv." : "Los formatos compatibles son: xlsx, xls, html, xml y csv.",
     "Select a file" : "Selecciona un archivo",
@@ -257,7 +261,10 @@ OC.L10N.register(
     "Could not import, needed resources were not found." : "No se pudo importar, los recursos necesarios no fueron encontrados.",
     "Could not import data due to unknown errors." : "No se pudo importar los datos debido a errores desconocidos.",
     "Select file for the import" : "Selecciona el archivo para la importación",
+    "Transfer table" : "Transferir tabla",
+    "Transfer this table to another user" : "Transferir esta tabla a otro usuario",
     "Transfer" : "Transferir",
+    "Table \"{emoji}{table}\" transfered to {user}" : "Tabla \"{emoji}{table}\" transferida a {user}",
     "Select emoji for view" : "Seleccione Emoji para la vista",
     "Title of the new view" : "Título de la vista nueva",
     "New title of the view" : "Título nuevo para la vista",
@@ -393,6 +400,8 @@ OC.L10N.register(
     "Export CSV" : "Exportar CSV",
     "Uncheck all" : "Desmarcar todo",
     "_%n selected row_::_%n selected rows_" : ["%n fila seleccionada","%n filas seleccionadas","%n filas seleccionadas"],
+    "{shareTypeString}..." : "{shareTypeString}...",
+    "Failed to fetch {shareTypeString}" : "Fallo al recuperar {shareTypeString}",
     "Confirmation" : "Confirmación",
     "Confirm" : "Confirmar",
     "_{nb} row_::_{nb} rows_" : ["{nb} fila","{nb} filas","{nb} filas"],
@@ -453,6 +462,7 @@ OC.L10N.register(
     "Could not remove view." : "No se pudo eliminar la vista.",
     "Could not reload view." : "No se pudo recargar la vista.",
     "Could not update table." : "No se pudo actualizar la tabla.",
+    "Could not transfer table." : "No se pudo transferir la tabla.",
     "Could not remove table." : "No se pudo eliminar la tabla."
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

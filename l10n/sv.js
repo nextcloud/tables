@@ -1,6 +1,9 @@
 OC.L10N.register(
     "tables",
     {
+    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Ett oväntat fel inträffade. Mer information finns i loggarna. Kontakta din administratör.",
+    "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "En behörighetsfel uppstod. Mer information finns i loggarna. Kontakta din administratör.",
+    "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "Ett inte hitta-fel uppstod. Mer information finns i loggarna. Kontakta din administratör.",
     "Could not create row." : "Det gick inte att skapa raden.",
     "Could not update row." : "Kunde inte uppdatera rad.",
     "Nextcloud Tables" : "Nextcloud Tabeller",
@@ -155,6 +158,7 @@ OC.L10N.register(
     "Sorry, something went wrong." : "Något gick fel.",
     "Could not create new column." : "Det gick inte att skapa en ny kolumn.",
     "Create row" : "Skapa rad",
+    "\"{columnTitle}\" should not be empty" : "\"{columnTitle}\" ska inte vara tom",
     "Save row" : "Spara rad",
     "Row successfully created." : "Raden har skapats.",
     "Could not create new row" : "Det gick inte att skapa en ny rad.",
@@ -304,6 +308,7 @@ OC.L10N.register(
     "Select Operator" : "Välj operator",
     "Select value" : "Välj värde",
     "Manage column" : "Hantera kolumn",
+    "Column manage actions" : "Hantera kolumnåtgärder",
     "Hide column" : "Dölj kolumn",
     "Undo" : "Ångra",
     "Redo" : "Gör om",
@@ -355,6 +360,7 @@ OC.L10N.register(
     "Export CSV" : "Exportera CSV",
     "Uncheck all" : "Avmarkera alla",
     "_%n selected row_::_%n selected rows_" : ["%n vald rad","%n valda rader"],
+    "Failed to fetch {shareTypeString}" : "Misslyckades att hämta {shareTypeString}",
     "Confirmation" : "Bekräftelse",
     "Confirm" : "Bekräfta",
     "_{nb} row_::_{nb} rows_" : ["{nb} rad","{nb} rader"],
@@ -391,6 +397,7 @@ OC.L10N.register(
     "Now" : "Nu",
     "ID" : "ID",
     "Creator" : "Skapare",
+    "Last editor" : "Senaste redigerare",
     "Last edited at" : "Senast redigerad ",
     "Request is not authorized. Are you logged in?" : "Begäran är inte godkänd. Är du inloggad?",
     "Request not allowed." : "Begäran är inte tillåten.",
@@ -414,6 +421,7 @@ OC.L10N.register(
     "Could not remove view." : "Det gick inte att ta bort vyn.",
     "Could not reload view." : "Det gick inte att ladda om vyn.",
     "Could not update table." : "Kunde inte uppdatera tabell.",
+    "Could not transfer table." : "Kunde inte överföra tabell.",
     "Could not remove table." : "Kunde inte ta bort tabell."
 },
 "nplurals=2; plural=(n != 1);");
