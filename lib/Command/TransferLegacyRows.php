@@ -123,16 +123,21 @@ class TransferLegacyRows extends Command {
 
 	/**
 	 * @param Table[] $tables
+	 * @param OutputInterface $output
 	 * @return void
 	 */
 	private function transferDataForTables(array $tables, OutputInterface $output): void {
 		$i = 1;
 		foreach ($tables as $table) {
+			$output->writeln('');
 			$output->writeln("-- Start transfer for table " . $table->getId() . " (" . $table->getTitle() . ") [" . $i . "/" . count($tables) . "]");
 			try {
 				$this->transferTable($table, $output);
 			} catch (InternalError|PermissionError|Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				if ($output->isVerbose()) {
+					$output->writeln("❌ Error: " . $e->getMessage());
+				}
 				$output->writeln("⚠️  Could not transfer data. Continue with next table. The logs will have more information about the error.");
 			}
 			$i++;

@@ -36,7 +36,7 @@ class NewDbStructureRepairStep implements IRepairStep {
 	/**
 	 * Returns the step's name
 	 */
-	public function getName() {
+	public function getName(): string {
 		return 'Copy the data into the new db structure';
 	}
 
