@@ -266,10 +266,28 @@ class Row2Mapper {
 	private function getFilter(IQueryBuilder &$qb, array $filterGroup): array {
 		$filterExpressions = [];
 		foreach ($filterGroup as $filter) {
-			$sql = $qb->expr()->in(
-				'id',
-				$qb->createFunction($this->getFilterExpression($qb, $this->columns[$filter['columnId']], $filter['operator'], $filter['value'])->getSQL())
-			);
+			$columnId = $filter['columnId'];
+
+			// if is normal column
+			if ($columnId >= 0) {
+				$sql = $qb->expr()->in(
+					'id',
+					$qb->createFunction($this->getFilterExpression($qb, $this->columns[$filter['columnId']], $filter['operator'], $filter['value'])->getSQL())
+				);
+
+				// if is meta data column
+			} elseif ($columnId < 0) {
+				$sql = $qb->expr()->in(
+					'id',
+					$qb->createFunction($this->getMetaFilterExpression($qb, $columnId, $filter['operator'], $filter['value'])->getSQL())
+				);
+
+				// if column id is unknown
+			} else {
+				$e = new Exception("Needed column (" . $filter['columnId'] . ") not found.");
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			}
 			$filterExpressions[] = $sql;
 		}
 		return $filterExpressions;
@@ -306,6 +324,74 @@ class Row2Mapper {
 				return $qb2->andWhere($qb->expr()->lte('value', $qb->createNamedParameter($value, $paramType)));
 			case 'is-empty':
 				return $qb2->andWhere($qb->expr()->isNull('value'));
+			default:
+				throw new InternalError('Operator '.$operator.' is not supported.');
+		}
+	}
+
+	/**
+	 *
+	 * -1 => 'number', ID
+	 * -2 => 'text-line', Created
+	 * -3 => 'datetime', At
+	 * -4 => 'text-line', LastEdit
+	 * -5 => 'datetime', At
+	 * @throws InternalError
+	 */
+	private function getMetaFilterExpression(IQueryBuilder $qb, int $columnId, string $operator, string $value): IQueryBuilder {
+		$qb2 = $this->db->getQueryBuilder();
+		$qb2->select('id');
+		$qb2->from('tables_row_sleeves');
+
+		switch ($columnId) {
+			case -1: // row ID
+				$qb2->where($this->getSqlOperator($operator, $qb, 'id', $value, IQueryBuilder::PARAM_INT));
+				break;
+			case -2: // created by
+				$qb2->where($this->getSqlOperator($operator, $qb, 'created_by', $value, IQueryBuilder::PARAM_STR));
+				break;
+			case -3: // created at
+				$qb2->where($this->getSqlOperator($operator, $qb, 'created_at', $value, IQueryBuilder::PARAM_DATE));
+				break;
+			case -4: // last edit by
+				$qb2->where($this->getSqlOperator($operator, $qb, 'last_edit_by', $value, IQueryBuilder::PARAM_STR));
+				break;
+			case -5: // last edit at
+				$qb2->where($this->getSqlOperator($operator, $qb, 'last_edit_at', $value, IQueryBuilder::PARAM_DATE));
+				break;
+		}
+		return $qb2;
+	}
+
+	/**
+	 * @param string $operator
+	 * @param IQueryBuilder $qb
+	 * @param string $column
+	 * @param mixed $value
+	 * @param mixed $paramType
+	 * @return string
+	 * @throws InternalError
+	 */
+	private function getSqlOperator(string $operator, IQueryBuilder $qb, string $columnName, $value, $paramType): string {
+		switch ($operator) {
+			case 'begins-with':
+				return $qb->expr()->like($columnName, $qb->createNamedParameter('%'.$this->db->escapeLikeParameter($value), $paramType));
+			case 'ends-with':
+				return $qb->expr()->like($columnName, $qb->createNamedParameter($this->db->escapeLikeParameter($value).'%', $paramType));
+			case 'contains':
+				return $qb->expr()->like($columnName, $qb->createNamedParameter('%'.$this->db->escapeLikeParameter($value).'%', $paramType));
+			case 'is-equal':
+				return $qb->expr()->eq($columnName, $qb->createNamedParameter($value, $paramType));
+			case 'is-greater-than':
+				return $qb->expr()->gt($columnName, $qb->createNamedParameter($value, $paramType));
+			case 'is-greater-than-or-equal':
+				return $qb->expr()->gte($columnName, $qb->createNamedParameter($value, $paramType));
+			case 'is-lower-than':
+				return $qb->expr()->lt($columnName, $qb->createNamedParameter($value, $paramType));
+			case 'is-lower-than-or-equal':
+				return $qb->expr()->lte($columnName, $qb->createNamedParameter($value, $paramType));
+			case 'is-empty':
+				return $qb->expr()->isNull($columnName);
 			default:
 				throw new InternalError('Operator '.$operator.' is not supported.');
 		}
@@ -493,6 +579,12 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	private function insertCell(int $rowId, int $columnId, $value, ?string $lastEditAt = null, ?string $lastEditBy = null): void {
+		if (!isset($this->columns[$columnId])) {
+			$e = new Exception("Can not insert cell, because the given column-id is not known");
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+
 		$cellClassName = 'OCA\Tables\Db\RowCell'.ucfirst($this->columns[$columnId]->getType());
 		/** @var RowCellSuper $cell */
 		$cell = new $cellClassName();
