@@ -12,18 +12,30 @@ class TextLinkBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	 * @return string
 	 */
 	public function parseValue($value, ?Column $column = null): string {
+		if ($value === null) {
+			return '';
+		}
+
 		// if is import from export in format "[description] ([link])"
 		preg_match('/(.*) \((http.*)\)/', $value, $matches);
 		if (!empty($matches) && $matches[0] && $matches[1]) {
 			return json_encode(json_encode([
 				'title' => $matches[1],
-				'resourceUrl' => $matches[2]
+				'value' => $matches[2],
+				'providerId' => 'url',
 			]));
 		}
 
-		// if is json
+		// if is json (this is the default case, other formats are backward compatibility
 		$data = json_decode($value, true);
 		if($data !== null) {
+			if (isset($data['resourceUrl'])) {
+				return json_encode(json_encode([
+					'title' => $data['title'] ?? $data['resourceUrl'],
+					'value' => $data['resourceUrl'],
+					'providerId' => 'url',
+				]));
+			}
 			// at least title and resUrl have to be set
 			if(isset($data['title']) && isset($data['value'])) {
 				return json_encode($value);
@@ -40,7 +52,8 @@ class TextLinkBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		}
 		return json_encode(json_encode([
 			'title' => $matches[0],
-			'resourceUrl' => $matches[0]
+			'value' => $matches[0],
+			'providerId' => 'url',
 		]));
 	}
 
@@ -50,14 +63,28 @@ class TextLinkBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	 * @return bool
 	 */
 	public function canBeParsed($value, ?Column $column = null): bool {
+		if (!$value) {
+			return true;
+		}
 		preg_match('/(.*) \((http.*)\)/', $value, $matches);
 		if (!empty($matches) && $matches[0] && $matches[1]) {
 			return true;
 		}
 
-		// if is json
-		$data = json_decode($value);
-		if($data != null) {
+		$data = json_decode($value, true);
+		if($data !== null) {
+			if (!isset($data['resourceUrl']) && !isset($data['value'])) {
+				$this->logger->error('Value ' . $value . ' cannot be parsed as the column ' . $column->getId(). ' as it contains incomplete data');
+				return false;
+			}
+
+			// Validate url providers
+			$allowedProviders = explode(',', $column->getTextAllowedPattern() ?? '') ?: [];
+			if (isset($data['providerId']) && !in_array($data['providerId'], $allowedProviders)) {
+				$this->logger->error('Value ' . $value . ' cannot be parsed as the column ' . $column->getId(). ' does not allow the provider: ' . $data['providerId']);
+				return false;
+			}
+
 			return true;
 		}
 
