@@ -255,8 +255,7 @@ class Row2Mapper {
 	private function getFilterGroups(IQueryBuilder &$qb, array $filters): array {
 		$filterGroups = [];
 		foreach ($filters as $filterGroup) {
-			$tmp = $this->getFilter($qb, $filterGroup);
-			$filterGroups[] = $qb->expr()->andX(...$tmp);
+			$filterGroups[] = $qb->expr()->andX(...$this->getFilter($qb, $filterGroup));
 		}
 		return $filterGroups;
 	}
@@ -280,15 +279,6 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	private function getFilterExpression(IQueryBuilder $qb, Column $column, string $operator, string $value): IQueryBuilder {
-		/*if($column->getType() === 'number' && $column->getNumberDecimals() === 0) {
-			$paramType = IQueryBuilder::PARAM_INT;
-			$value = (int)$value;
-		} elseif ($column->getType() === 'datetime') {
-			$paramType = IQueryBuilder::PARAM_DATE;
-		} else {
-			$paramType = IQueryBuilder::PARAM_STR;
-		}*/
-
 		$paramType = $this->getColumnDbParamType($column);
 		$value = $this->formatValue($column, $value, 'in');
 
