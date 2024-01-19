@@ -245,7 +245,7 @@ export default {
 		selectAllRows(value) {
 			this.selectedRows = []
 			if (value) {
-				this.rows.forEach(item => { this.selectedRows.push(item.id) })
+				this.getSearchedAndFilteredRows.forEach(item => { this.selectedRows.push(item.id) })
 			}
 			this.$emit('update-selected-rows', this.selectedRows)
 		},
