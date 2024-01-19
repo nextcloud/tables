@@ -10,8 +10,9 @@
 					{{ t('tables', 'You can not insert any links in this field. Please configure at least one link provider in the column configuration.') }}
 				</NcNoteCard>
 			</div>
-			<div class="col-4">
-				<NcSelect v-model="localValue"
+			<div class="link-input">
+				<NcTextField v-if="isPlainUrl" :value.sync="plainLink" :placeholder="t('tables', 'URL')" />
+				<NcSelect v-else v-model="localValue"
 					:options="results"
 					:clearable="true"
 					label="title"
@@ -25,32 +26,55 @@
 						<LinkWidget :thumbnail-url="props.thumbnailUrl" :icon-url="props.icon" :title="props.title" :subline="props.subline" :icon-size="40" />
 					</template>
 				</NcSelect>
+				<NcButton type="tertiary" :disabled="!localValue" :title="t('tables', 'Copy link')" @click="copyLink">
+					<template #icon>
+						<ContentCopy v-if="!copied" :size="20" />
+						<ClipboardCheckMultipleOutline v-else :size="20" />
+					</template>
+				</NcButton>
+				<NcButton type="tertiary" :disabled="!localValue" :title="t('tables', 'Open link')" @click="openLink">
+					<template #icon>
+						<OpenInNew :size="20" />
+					</template>
+				</NcButton>
 			</div>
+			<NcReferenceList :text="localValue?.value" :limit="1" :interactive="false" />
 		</div>
 	</RowFormWrapper>
 </template>
 
 <script>
+import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
+import ClipboardCheckMultipleOutline from 'vue-material-design-icons/ClipboardCheckMultipleOutline.vue'
+import OpenInNew from 'vue-material-design-icons/OpenInNew.vue'
+import { NcReferenceList } from '@nextcloud/vue/dist/Components/NcRichText.js'
 import RowFormWrapper from './RowFormWrapper.vue'
 import axios from '@nextcloud/axios'
 import { generateOcsUrl } from '@nextcloud/router'
 import displayError from '../../../../utils/displayError.js'
-import { NcNoteCard, NcSelect } from '@nextcloud/vue'
+import { NcButton, NcTextField, NcNoteCard, NcSelect } from '@nextcloud/vue'
 import debounce from 'debounce'
 import generalHelper from '../../../../mixins/generalHelper.js'
+import copyToClipboard from '../../../../mixins/copyToClipboard.js'
 import LinkWidget from '../LinkWidget.vue'
 import { translate as t } from '@nextcloud/l10n'
 
 export default {
 
 	components: {
+		ContentCopy,
+		ClipboardCheckMultipleOutline,
+		OpenInNew,
+		NcButton,
 		NcNoteCard,
-		RowFormWrapper,
 		NcSelect,
+		NcReferenceList,
+		NcTextField,
+		RowFormWrapper,
 		LinkWidget,
 	},
 
-	mixins: [generalHelper],
+	mixins: [generalHelper, copyToClipboard],
 
 	props: {
 		column: {
@@ -69,10 +93,24 @@ export default {
 			results: [],
 			term: '',
 			providerLoading: {},
+			copied: false,
 		}
 	},
 
 	computed: {
+		plainLink: {
+			get() {
+				return this.localValue?.value ?? ''
+			},
+			set(v) {
+				this.$emit('update:value', JSON.stringify({
+					title: v,
+					subline: t('tables', 'URL'),
+					providerId: 'url',
+					value: v,
+				}))
+			},
+		},
 		localValue: {
 			get() {
 				// if we got an old value (string not object as json)
@@ -94,6 +132,9 @@ export default {
 				}
 				this.$emit('update:value', value)
 			},
+		},
+		isPlainUrl() {
+			return this.providers?.length === 1 && this.providers[0] === 'url'
 		},
 		isLoadingResults() {
 			for (const [key, value] of Object.entries(this.providerLoading)) {
@@ -198,6 +239,33 @@ export default {
 		removeResultsByProviderId(providerId) {
 			this.results = this.results.filter(item => item.providerId !== providerId)
 		},
+
+		copyLink() {
+			if (this.localValue) {
+				if (this.copied !== false) {
+					clearTimeout(this.copied)
+				}
+
+				this.copied = this.copyToClipboard(this.localValue.value)
+					? setTimeout(() => {
+						this.copied = false
+					}, 3000)
+					: false
+			}
+		},
+
+		openLink() {
+			if (this.localValue) {
+				window.open(this.localValue.value, '_blank')
+			}
+		},
 	},
 }
 </script>
+<style scoped>
+.link-input {
+	display: flex;
+	align-items: center;
+	margin-bottom: var(--default-grid-baseline)
+}
+</style>

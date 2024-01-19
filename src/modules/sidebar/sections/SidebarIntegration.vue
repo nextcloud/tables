@@ -48,9 +48,10 @@
 import { mapGetters, mapState } from 'vuex'
 import { generateUrl } from '@nextcloud/router'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
+import copyToClipboard from '../../../shared/mixins/copyToClipboard.js'
+
 import NcInputField from '@nextcloud/vue/dist/Components/NcInputField.js'
 import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
-import { showError, showSuccess } from '@nextcloud/dialogs'
 
 export default {
 	components: {
@@ -58,7 +59,7 @@ export default {
 		ContentCopy,
 	},
 
-	mixins: [permissionsMixin],
+	mixins: [permissionsMixin, copyToClipboard],
 
 	data() {
 		return {
@@ -80,22 +81,7 @@ export default {
 	},
 	 methods: {
 		copyUrl() {
-			if (navigator?.clipboard) {
-				navigator.clipboard.writeText(this.apiEndpointUrl).then(function() {
-					showSuccess(t('files', 'Integration URL copied to clipboard'))
-				}, function(err) {
-					showError(t('files', 'Clipboard is not available'))
-					console.error('Async: Could not copy text: ', err)
-				})
-			} else {
-				try {
-					document.querySelector('input#urlTextField').select()
-					document.execCommand('copy')
-					showSuccess(t('files', 'Integration URL copied to clipboard'))
-				} catch (e) {
-					showError(t('files', 'Clipboard is not available'))
-				}
-			}
+			this.copyToClipboard(this.apiEndpointUrl, false)
 		},
 	 },
 }
