@@ -10,7 +10,7 @@
 				</td>
 				<td class="value">
 					{{ updateTime }}&nbsp;
-					<NcUserBubble :user="column.lastEditBy" :display-name="column.lastEditBy" />
+					<NcUserBubble :user="column.lastEditBy" :display-name="column.lastEditByDisplayName ? column.lastEditByDisplayName : column.lastEditBy" />
 				</td>
 			</tr>
 			<tr>
@@ -19,7 +19,7 @@
 				</td>
 				<td class="value">
 					{{ createTime }}&nbsp;
-					<NcUserBubble :user="column.createdBy" :display-name="column.createdBy" />
+					<NcUserBubble :user="column.createdBy" :display-name="column.createdByDisplayName ? column.createdByDisplayName : column.createdBy" />
 				</td>
 			</tr>
 			<tr>
