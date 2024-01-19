@@ -59,4 +59,8 @@ export default class SelectionColumn extends AbstractSelectionColumn {
 		return super.isFilterFound(filterMethod, cell)
 	}
 
+	parseValue(value) {
+		return parseInt(value)
+	}
+
 }

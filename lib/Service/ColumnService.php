@@ -151,7 +151,7 @@ class ColumnService extends SuperService {
 	 * @param string|null $selectionOptions
 	 * @param string|null $selectionDefault
 	 * @param string|null $datetimeDefault
-	 * @param array|null $selectedViewIds
+	 * @param array $selectedViewIds
 	 * @return Column
 	 *
 	 * @throws DoesNotExistException
@@ -185,7 +185,7 @@ class ColumnService extends SuperService {
 		?string $selectionDefault,
 
 		?string $datetimeDefault,
-		?array $selectedViewIds
+		array $selectedViewIds = []
 	):Column {
 		// security
 		if ($viewId) {
@@ -321,39 +321,21 @@ class ColumnService extends SuperService {
 			if ($mandatory !== null) {
 				$item->setMandatory($mandatory);
 			}
-			if ($description !== null) {
-				$item->setDescription($description);
-			}
-			if ($textDefault !== null) {
-				$item->setTextDefault($textDefault);
-			}
-			if ($textAllowedPattern !== null) {
-				$item->setTextAllowedPattern($textAllowedPattern);
-			}
-			if ($textMaxLength !== null) {
-				$item->setTextMaxLength($textMaxLength);
-			}
-			if ($numberDefault !== null) {
-				$item->setNumberDefault($numberDefault);
-			}
-			if ($numberMin !== null) {
-				$item->setNumberMin($numberMin);
-			}
-			if ($numberMax !== null) {
-				$item->setNumberMax($numberMax);
-			}
-			if ($numberDecimals !== null) {
-				$item->setNumberDecimals($numberDecimals);
-			}
+			$item->setDescription($description);
+			$item->setTextDefault($textDefault);
+			$item->setTextAllowedPattern($textAllowedPattern);
+			$item->setTextMaxLength($textMaxLength);
+			$item->setNumberDefault($numberDefault);
+			$item->setNumberMin($numberMin);
+			$item->setNumberMax($numberMax);
+			$item->setNumberDecimals($numberDecimals);
 			if ($selectionOptions !== null) {
 				$item->setSelectionOptions($selectionOptions);
 			}
 			if ($selectionDefault !== null) {
 				$item->setSelectionDefault($selectionDefault);
 			}
-			if ($datetimeDefault !== null) {
-				$item->setDatetimeDefault($datetimeDefault);
-			}
+			$item->setDatetimeDefault($datetimeDefault);
 
 			$time = new DateTime();
 			$item->setLastEditAt($time->format('Y-m-d H:i:s'));

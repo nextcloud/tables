@@ -12,6 +12,9 @@ class NumberBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	 * @return string
 	 */
 	public function parseValue($value, ?Column $column = null): string {
+		if ($value === null) {
+			return '';
+		}
 		return json_encode(floatval($value));
 	}
 
