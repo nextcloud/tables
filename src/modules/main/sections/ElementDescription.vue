@@ -79,6 +79,7 @@ export default {
 }
 
 .row.first-row {
+	width: var(--app-content-width, auto);
 	position: sticky;
 	left: 0;
 	top: 0;

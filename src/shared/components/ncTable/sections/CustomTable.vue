@@ -284,12 +284,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
-.container {
-	//margin: auto;
-	overflow-x: auto;
-}
-
 :deep(table) {
 	position: relative;
 	border-collapse: collapse;
@@ -325,25 +319,20 @@ export default {
 		background-color: var(--color-main-background);
 	}
 
-	thead tr {
-		// text-align: left;
+	thead {
+		position: sticky;
+		top: 118px;
+		z-index: 6;
 
-		th {
-			vertical-align: middle;
-			color: var(--color-text-maxcontrast);
-
-			// sticky head
-			// position: -webkit-sticky;
-			// position: sticky;
-			// top: 80px;
-			box-shadow: inset 0 -1px 0 var(--color-border); // use box-shadow instead of border to be compatible with sticky heads
-			background-color: var(--color-main-background-translucent);
-			z-index: 5;
-
-			// always fit to title
-			// min-width: max-content;
+		tr {
+			th {
+				vertical-align: middle;
+				color: var(--color-text-maxcontrast);
+				box-shadow: inset 0 -1px 0 var(--color-border); // use box-shadow instead of border to be compatible with sticky heads
+				background-color: var(--color-main-background-translucent);
+				z-index: 5;
+			}
 		}
-
 	}
 
 	tbody {

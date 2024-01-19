@@ -20,7 +20,7 @@
   -->
 
 <template>
-	<div v-if="richObject">
+	<div v-if="richObject" class="tables-content-widget">
 		<h2>{{ richObject.emoji }}&nbsp;{{ richObject.title }}</h2>
 		<div class="nc-table">
 			<NcTable
@@ -43,6 +43,7 @@
 
 <script>
 import NcTable from '../shared/components/ncTable/NcTable.vue'
+import { useResizeObserver } from '@vueuse/core'
 
 export default {
 
@@ -65,27 +66,43 @@ export default {
 		},
 	},
 
-	computed: {
+	mounted() {
+		useResizeObserver(this.$el, (entries) => {
+			const entry = entries[0]
+			const { width } = entry.contentRect
+			this.$el.style.setProperty('--widget-content-width', `${width}px`)
+		})
 	},
 }
 </script>
 <style lang="scss" scoped>
 
-	div {
-		width: 100%;
-	}
+	.tables-content-widget {
+		min-height: max(50vh, 200px);
+		height: 50vh;
+		overflow: scroll;
 
-	h2 {
-		padding-left: calc(var(--default-grid-baseline) * 3);
-		padding-top: calc(var(--default-grid-baseline) * 3);
-	}
+		h2 {
+			position: sticky;
+			top: 0;
+			left: 0;
+			width: calc(var(--widget-content-width, 100%) - 24px);
+			height: 36px;
+			z-index: 1;
+			background-color: var(--color-main-background);
+			margin: 0 !important;
+			padding: calc(var(--default-grid-baseline) * 3);
+		}
 
-	.nc-table {
-		margin-left: calc(var(--default-grid-baseline) * 2);
-	}
+		.nc-table {
+			margin-left: calc(var(--default-grid-baseline) * 2);
+			width: max-content;
+			margin-top: -1px;
+		}
 
-	.nc-table :deep(.container) {
-		max-height: 50vh;
+		& :deep(.options.row) {
+			width: calc(var(--widget-content-width, 100%) - 12px);
+		}
 	}
 
 </style>

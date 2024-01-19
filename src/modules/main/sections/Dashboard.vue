@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="table-dashboard">
 		<div class="row space-T space-B">
 			<div class="col-4 space-L">
 				<h2>
@@ -264,6 +264,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+.table-dashboard {
+	display: sticky;
+	left: 0;
+}
+
 .table {
 	border-collapse: collapse;
 	width: 670px;

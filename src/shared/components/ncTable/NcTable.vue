@@ -249,8 +249,9 @@ export default {
 
 <style scoped lang="scss">
 .options.row {
+	width: var(--app-content-width, auto);
 	position: sticky;
-	top: 52px;
+	top: 60px;
 	left: 0;
 	z-index: 15;
 	background-color: var(--color-main-background-translucent);

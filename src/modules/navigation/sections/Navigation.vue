@@ -1,8 +1,6 @@
 <template>
 	<NcAppNavigation>
 		<template #list>
-			<div v-if="tablesLoading" class="icon-loading" />
-
 			<div class="filter-box">
 				<NcTextField :value.sync="filterString"
 					:label="t('tables', 'Filter tables')"
@@ -12,6 +10,8 @@
 					<Magnify :size="16" />
 				</NcTextField>
 			</div>
+
+			<div v-if="tablesLoading" class="icon-loading" />
 
 			<ul v-if="!tablesLoading">
 				<NcAppNavigationCaption :name="t('tables', 'My tables')">
