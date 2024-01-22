@@ -74,7 +74,7 @@ class NewDbStructureRepairStep implements IRepairStep {
 				$this->transferTable($table, $output);
 			} catch (InternalError|PermissionError|Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				$output->warning("Could not transfer data. Continue with next table. The logs will have more information about the error.");
+				$output->warning("Could not transfer data. Continue with next table. The logs will have more information about the error: " . $e->getMessage());
 			}
 			$i++;
 		}
