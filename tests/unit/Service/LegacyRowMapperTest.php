@@ -24,58 +24,88 @@ class LegacyRowMapperTest extends TestCase {
 	 * @throws NotFoundExceptionInterface
 	 */
 	public function testMigrateLegacyRow() {
-		$data = [
-			// assume column is a text column
-			[
-				'columnId' => 1,
-				'value' => 'one'
-			],
-			// assume column is a number column
-			[
-				'columnId' => 2,
-				'value' => 22.2
-			],
-			// assume column is a selection column
-			[
-				'columnId' => 3,
-				'value' => 1
-			],
-			// assume columns are selection-check columns
-			[
-				'columnId' => 4,
-				'value' => '"true"'
-			],
-			[
-				'columnId' => 5,
-				'value' => '"false"'
-			],
-			// assume columns are selection-multi columns
-			[
-				'columnId' => 6,
-				'value' => '[1]'
-			],
-			[
-				'columnId' => 7,
-				'value' => '[2,3]'
-			],
-			[
-				'columnId' => 8,
-				'value' => 'null'
-			],
-			// assume columns are datetime columns
-			[
-				'columnId' => 9,
-				'value' => '2023-12-24 10:00'
-			],
-			[
-				'columnId' => 10,
-				'value' => '2023-12-25'
-			],
-			[
-				'columnId' => 11,
-				'value' => '11:11'
-			],
-		];
+		$data = [];
+		$columns = [];
+
+		$data[] = ['columnId' => 1,	'value' => 'one'];
+		$col = new Column();
+		$col->setId(1);
+		$col->setType('text');
+		$col->setSubtype('line');
+		$columns[] = $col;
+
+		$data[] = ['columnId' => 2,	'value' => 22.2];
+		$col = new Column();
+		$col->setId(2);
+		$col->setType('number');
+		$columns[] = $col;
+
+		$data[] = ['columnId' => 3,	'value' => 1];
+		$col = new Column();
+		$col->setId(3);
+		$col->setType('selection');
+		$columns[] = $col;
+
+		$data[] = ['columnId' => 12,	'value' => '2'];
+		$col = new Column();
+		$col->setId(12);
+		$col->setType('selection');
+		$columns[] = $col;
+
+		$data[] = ['columnId' => 4,	'value' => '"true"'];
+		$col = new Column();
+		$col->setId(4);
+		$col->setType('selection');
+		$col->setSubtype('check');
+		$columns[] = $col;
+
+		$data[] = ['columnId' => 5, 'value' => '"false"'];
+		$col = new Column();
+		$col->setId(5);
+		$col->setType('selection');
+		$col->setSubtype('check');
+		$columns[] = $col;
+
+		$data[] = ['columnId' => 6,	'value' => '[1]'];
+		$col = new Column();
+		$col->setId(6);
+		$col->setType('selection');
+		$col->setSubtype('multi');
+		$columns[] = $col;
+
+		$data[] = ['columnId' => 7,	'value' => '[2,3]'];
+		$col = new Column();
+		$col->setId(7);
+		$col->setType('selection');
+		$col->setSubtype('multi');
+		$columns[] = $col;
+
+		$data[] = ['columnId' => 8,	'value' => 'null'];
+		$col = new Column();
+		$col->setId(8);
+		$col->setType('selection');
+		$col->setSubtype('multi');
+		$columns[] = $col;
+
+		$data[] = ['columnId' => 9,	'value' => '2023-12-24 10:00'];
+		$col = new Column();
+		$col->setId(9);
+		$col->setType('datetime');
+		$columns[] = $col;
+
+		$data[] = ['columnId' => 10, 'value' => '2023-12-25'];
+		$col = new Column();
+		$col->setId(10);
+		$col->setType('datetime');
+		$col->setSubtype('date');
+		$columns[] = $col;
+
+		$data[] = ['columnId' => 11, 'value' => '11:11'];
+		$col = new Column();
+		$col->setId(11);
+		$col->setType('datetime');
+		$col->setSubtype('time');
+		$columns[] = $col;
 
 		$dbConnection = Server::get(IDBConnection::class);
 		$textColumnQb = $this->createMock(TextColumnQB::class);
@@ -98,7 +128,7 @@ class LegacyRowMapperTest extends TestCase {
 		$legacyRow->setLastEditBy('user1');
 		$legacyRow->setDataArray($data);
 
-		$row2 = $legacyRowMapper->migrateLegacyRow($legacyRow);
+		$row2 = $legacyRowMapper->migrateLegacyRow($legacyRow, $columns);
 		$data2 = $row2->getData();
 
 		self::assertTrue($data === $data2);
