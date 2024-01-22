@@ -475,9 +475,6 @@ class Row2Mapper {
 	 * @throws Exception
 	 */
 	public function insert(Row2 $row, array $columns): Row2 {
-		if(!$columns) {
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': columns are missing');
-		}
 		$this->setColumns($columns);
 
 		if($row->getId()) {
@@ -489,9 +486,12 @@ class Row2Mapper {
 			$row->setId($rowSleeve->getId());
 		}
 
-		// write all cells to its db-table
-		foreach ($row->getData() as $cell) {
-			$this->insertCell($rowSleeve->getId(), $cell['columnId'], $cell['value'], $rowSleeve->getLastEditAt(), $rowSleeve->getLastEditBy());
+		// if the table/view has columns
+		if (count($columns) > 0) {
+			// write all cells to its db-table
+			foreach ($row->getData() as $cell) {
+				$this->insertCell($rowSleeve->getId(), $cell['columnId'], $cell['value'], $rowSleeve->getLastEditAt(), $rowSleeve->getLastEditBy());
+			}
 		}
 
 		return $row;

@@ -445,14 +445,15 @@ class LegacyRowMapper extends QBMapper {
 	 * @throws InternalError
 	 */
 	public function transferLegacyRow(LegacyRow $legacyRow, array $columns) {
-		$this->rowMapper->insert($this->migrateLegacyRow($legacyRow), $columns);
+		$this->rowMapper->insert($this->migrateLegacyRow($legacyRow, $columns), $columns);
 	}
 
 	/**
 	 * @param LegacyRow $legacyRow
+	 * @param Column[] $columns
 	 * @return Row2
 	 */
-	public function migrateLegacyRow(LegacyRow $legacyRow): Row2 {
+	public function migrateLegacyRow(LegacyRow $legacyRow, array $columns): Row2 {
 		$row = new Row2();
 		$row->setId($legacyRow->getId());
 		$row->setTableId($legacyRow->getTableId());
@@ -460,7 +461,33 @@ class LegacyRowMapper extends QBMapper {
 		$row->setCreatedAt($legacyRow->getCreatedAt());
 		$row->setLastEditBy($legacyRow->getLastEditBy());
 		$row->setLastEditAt($legacyRow->getLastEditAt());
-		$row->setData($legacyRow->getDataArray());
+
+		$legacyData = $legacyRow->getDataArray();
+		$data = [];
+		foreach ($legacyData as $legacyDatum) {
+			$columnId = $legacyDatum['columnId'];
+			if ($this->getColumnFromColumnsArray($columnId, $columns)) {
+				$data[] = $legacyDatum;
+			} else {
+				$this->logger->warning("The row with id " . $row->getId() . " has a value for the column with id " . $columnId . ". But this column does not exist or is not part of the table " . $row->getTableId() . ". Will ignore this value abd continue.");
+			}
+		}
+		$row->setData($data);
+
 		return $row;
+	}
+
+	/**
+	 * @param int $columnId
+	 * @param Column[] $columns
+	 * @return Column|null
+	 */
+	private function getColumnFromColumnsArray(int $columnId, array $columns): ?Column {
+		foreach ($columns as $column) {
+			if($column->getId() === $columnId) {
+				return $column;
+			}
+		}
+		return null;
 	}
 }
