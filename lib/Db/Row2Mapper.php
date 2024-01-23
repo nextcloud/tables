@@ -399,6 +399,9 @@ class Row2Mapper {
 
 	/** @noinspection DuplicatedCode */
 	private function resolveSearchValue(string $placeholder, string $userId): string {
+		if (substr($placeholder, 0, 14) === '@selection-id-') {
+			return substr($placeholder, 14);
+		}
 		switch (ltrim($placeholder, '@')) {
 			case 'me': return $userId;
 			case 'my-name': return $this->userHelper->getUserDisplayName($userId);

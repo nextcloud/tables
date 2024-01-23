@@ -18,6 +18,14 @@ class RowCellSelectionMapper extends RowCellMapperSuper {
 	 * @inheritDoc
 	 */
 	public function parseValueIncoming(Column $column, $value): string {
+		if ($column->getSubtype() === 'check') {
+			return json_encode(ltrim($value, '"'));
+		}
+
+		if ($column->getSubtype() === '' || $column->getSubtype() === null) {
+			return $value ?? '';
+		}
+
 		return json_encode($value);
 	}
 
