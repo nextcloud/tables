@@ -71,10 +71,10 @@ class TransferLegacyRows extends Command {
 				'Transfer all table data.'
 			)
 			->addOption(
-				'no-delete',
+				'delete',
 				null,
 				InputOption::VALUE_OPTIONAL,
-				'Set to not delete data from new db structure if any.'
+				'Set to delete data from new db structure if any before transferring data.'
 			)
 		;
 	}
@@ -87,7 +87,7 @@ class TransferLegacyRows extends Command {
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$tableIds = $input->getArgument('table-ids');
 		$optionAll = !!$input->getOption('all');
-		$optionNoDelete = $input->getOption('no-delete') ?: null;
+		$optionDelete = $input->getOption('delete') ?: null;
 
 		if ($optionAll) {
 			$output->writeln("Look for tables");
@@ -113,7 +113,7 @@ class TransferLegacyRows extends Command {
 			$output->writeln("🤷🏻‍ Add at least one table id or add the option --all to transfer all tables.");
 			return 2;
 		}
-		if (!$optionNoDelete) {
+		if ($optionDelete) {
 			$this->deleteDataForTables($tables, $output);
 		}
 		$this->transferDataForTables($tables, $output);
