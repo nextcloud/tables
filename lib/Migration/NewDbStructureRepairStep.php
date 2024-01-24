@@ -14,6 +14,7 @@ use OCP\IConfig;
 use OCP\Migration\IOutput;
 use OCP\Migration\IRepairStep;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 class NewDbStructureRepairStep implements IRepairStep {
 
@@ -72,7 +73,7 @@ class NewDbStructureRepairStep implements IRepairStep {
 			$output->info("-- Start transfer for table " . $table->getId() . " (" . $table->getTitle() . ") [" . $i . "/" . count($tables) . "]");
 			try {
 				$this->transferTable($table, $output);
-			} catch (InternalError|PermissionError|Exception $e) {
+			} catch (InternalError|PermissionError|Exception|Throwable $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				$output->warning("Could not transfer data. Continue with next table. The logs will have more information about the error: " . $e->getMessage());
 			}

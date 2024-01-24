@@ -138,7 +138,7 @@ class TransferLegacyRows extends Command {
 				if ($output->isVerbose()) {
 					$output->writeln("❌ Error: " . $e->getMessage());
 				}
-				$output->writeln("⚠️  Could not transfer data. Continue with next table. The logs will have more information about the error.");
+				$output->writeln("⚠️  Could not transfer data. Continue with next table. The logs will have more information about the error: " . $e->getMessage());
 			}
 			$i++;
 		}
