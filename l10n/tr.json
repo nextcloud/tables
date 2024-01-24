@@ -1,4 +1,7 @@
 { "translations": {
+    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Beklenmeyen bir sorun çıktı. Ayrıntılı bilgi almak için günlük kayıtlarına bakabilirsiniz. Lütfen yöneticinizle görüşün.",
+    "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "Bir izin sorunu çıktı. Ayrıntılı bilgi almak için günlük kayıtlarına bakabilirsiniz. Lütfen yöneticinizle görüşün.",
+    "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "Bir bulunamama sorunu çıktı. Ayrıntılı bilgi almak için günlük kayıtlarına bakabilirsiniz. Lütfen yöneticinizle görüşün.",
     "Could not create row." : "Satır oluşturulamadı.",
     "Could not update row." : "Satır güncellenemedi.",
     "Nextcloud Tables" : "Nextcloud tabloları",
@@ -190,6 +193,7 @@
     "Sorry, something went wrong." : "Ne yazık ki bir sorun çıktı.",
     "Could not create new column." : "Yeni sütun eklenemedi.",
     "Create row" : "Satır ekle",
+    "\"{columnTitle}\" should not be empty" : "\"{columnTitle}\" boş olamaz",
     "Save row" : "Satırı kaydet",
     "Row successfully created." : "Satır eklendi.",
     "Could not create new row" : "Yeni satır eklenemedi",
@@ -225,7 +229,9 @@
     "I really want to delete this row!" : "Bu satırı silmek istediğime eminim!",
     "Could not update row" : "Satır güncellenemedi",
     "Could not delete row." : "Satır silinemedi.",
+    "Owner" : "Sahibi",
     "I really want to delete this table!" : "Bu tabloyu silmek istediğime eminim!",
+    "Change owner" : "Sahibi değiştir",
     "File" : "Dosya",
     "Supported formats are xlsx, xls, html, xml and csv." : "Desteklenen biçimler xlsx, xls, html, xml ve csv.",
     "Select a file" : "Bir dosya seçin",
@@ -253,7 +259,10 @@
     "Could not import, needed resources were not found." : "Veriler içe aktarılamadı. Gerekli kaynaklar bulunamadı.",
     "Could not import data due to unknown errors." : "Veriler bilinmeyen sorunlar nedeniyle içe aktarılamadı.",
     "Select file for the import" : "İçe aktarılacak dosyayı seçin",
+    "Transfer table" : "Tabloyu aktar",
+    "Transfer this table to another user" : "Bu tabloyu başka bir kullanıcıya aktar",
     "Transfer" : "Aktar",
+    "Table \"{emoji}{table}\" transfered to {user}" : "\"{emoji}{table}\" tablosu {user} kullanıcısına aktarıldı",
     "Select emoji for view" : "Görünüm için bir emoji seçin",
     "Title of the new view" : "Yeni görünümün başlığı",
     "New title of the view" : "Görünümün yeni başlığı",
@@ -389,6 +398,8 @@
     "Export CSV" : "CSV olarak dışa aktar",
     "Uncheck all" : "Tümünü bırak",
     "_%n selected row_::_%n selected rows_" : ["%n satır seçilmiş","%n satır seçilmiş"],
+    "{shareTypeString}..." : "{shareTypeString}...",
+    "Failed to fetch {shareTypeString}" : "{shareTypeString} alınamadı",
     "Confirmation" : "Onaylama",
     "Confirm" : "Onayla",
     "_{nb} row_::_{nb} rows_" : ["{nb} satır","{nb} satır"],
@@ -449,6 +460,7 @@
     "Could not remove view." : "Görünüm silinemedi.",
     "Could not reload view." : "Görünüm yeniden yüklenemedi.",
     "Could not update table." : "Tablo güncellenemedi.",
+    "Could not transfer table." : "Tablo aktarılamadı.",
     "Could not remove table." : "Tablo silinemedi."
 },"pluralForm" :"nplurals=2; plural=(n > 1);"
 }
