@@ -23,7 +23,7 @@ class RowCellSelectionMapper extends RowCellMapperSuper {
 		}
 
 		if ($column->getSubtype() === '' || $column->getSubtype() === null) {
-			return $value;
+			return $value ?? '';
 		}
 
 		return json_encode($value);
