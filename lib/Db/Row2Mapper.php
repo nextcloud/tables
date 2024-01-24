@@ -311,8 +311,21 @@ class Row2Mapper {
 			case 'ends-with':
 				return $qb2->andWhere($qb->expr()->like('value', $qb->createNamedParameter($this->db->escapeLikeParameter($value).'%', $paramType)));
 			case 'contains':
+				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
+					$value = str_replace(['"', '\''], '', $value);
+					return $qb2->andWhere($qb2->expr()->orX(
+						$qb->expr()->like('value', $qb->createNamedParameter('['.$this->db->escapeLikeParameter($value).']')),
+						$qb->expr()->like('value', $qb->createNamedParameter('['.$this->db->escapeLikeParameter($value).',%')),
+						$qb->expr()->like('value', $qb->createNamedParameter('%,'.$this->db->escapeLikeParameter($value).']%')),
+						$qb->expr()->like('value', $qb->createNamedParameter('%,'.$this->db->escapeLikeParameter($value).',%'))
+					));
+				}
 				return $qb2->andWhere($qb->expr()->like('value', $qb->createNamedParameter('%'.$this->db->escapeLikeParameter($value).'%', $paramType)));
 			case 'is-equal':
+				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
+					$value = str_replace(['"', '\''], '', $value);
+					return $qb2->andWhere($qb->expr()->eq('value', $qb->createNamedParameter('['.$this->db->escapeLikeParameter($value).']', $paramType)));
+				}
 				return $qb2->andWhere($qb->expr()->eq('value', $qb->createNamedParameter($value, $paramType)));
 			case 'is-greater-than':
 				return $qb2->andWhere($qb->expr()->gt('value', $qb->createNamedParameter($value, $paramType)));
@@ -366,7 +379,7 @@ class Row2Mapper {
 	/**
 	 * @param string $operator
 	 * @param IQueryBuilder $qb
-	 * @param string $column
+	 * @param string $columnName
 	 * @param mixed $value
 	 * @param mixed $paramType
 	 * @return string
