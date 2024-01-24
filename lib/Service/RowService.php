@@ -513,7 +513,7 @@ class RowService extends SuperService {
 	public function getViewRowsCount(View $view, string $userId): int {
 		if ($this->permissionsService->canReadRowsByElementId($view->getId(), 'view', $userId)) {
 			try {
-				return $this->row2Mapper->countRowsForView($view, $userId, $this->columnMapper->findMultiple($view->getColumnsArray()));
+				return $this->row2Mapper->countRowsForView($view, $userId, $this->columnMapper->findAllByTable($view->getTableId()));
 			} catch (Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				return 0;
