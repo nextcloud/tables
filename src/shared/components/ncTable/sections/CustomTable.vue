@@ -65,6 +65,10 @@ export default {
 			type: Object,
 			default: null,
 		},
+		table: {
+			type: Object,
+			default: null,
+		},
 	},
 
 	data() {
@@ -215,10 +219,10 @@ export default {
 	},
 
 	mounted() {
-		subscribe('tables:selected-rows:deselect', this.deselectAllRows)
+		subscribe('tables:selected-rows:deselect', tableId => { this.deselectAllRows(tableId) })
 	},
 	beforeDestroy() {
-		unsubscribe('tables:selected-rows:deselect', this.deselectAllRows)
+		unsubscribe('tables:selected-rows:deselect', tableId => { this.deselectAllRows(tableId) })
 	},
 
 	methods: {
@@ -245,7 +249,7 @@ export default {
 		selectAllRows(value) {
 			this.selectedRows = []
 			if (value) {
-				this.rows.forEach(item => { this.selectedRows.push(item.id) })
+				this.getSearchedAndFilteredRows.forEach(item => { this.selectedRows.push(item.id) })
 			}
 			this.$emit('update-selected-rows', this.selectedRows)
 		},

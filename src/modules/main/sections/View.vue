@@ -141,6 +141,7 @@ export default {
 	},
 	methods: {
 		editView() {
+			this.$store.commit('setActiveViewId', parseInt(this.view.id))
 			emit('tables:view:edit', { view: this.view, viewSetting: this.localViewSetting })
 		},
 	},

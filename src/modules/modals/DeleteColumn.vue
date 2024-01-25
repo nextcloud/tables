@@ -35,7 +35,7 @@ export default {
 	},
 	methods: {
 		async deleteColumn() {
-			const res = await this.$store.dispatch('removeColumn', { id: this.columnToDelete.id })
+			const res = await this.$store.dispatch('removeColumn', { tableId: this.isView ? this.activeElement.tableId : this.activeElement.id, id: this.columnToDelete.id })
 			if (!res) {
 				showError(t('tables', 'Error occurred while deleting column "{column}".', { column: this.column.title }))
 			}

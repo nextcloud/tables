@@ -202,7 +202,6 @@ export default {
 			localViewSetting: this.viewSetting,
 		}
 	},
-
 	computed: {
 		...mapState(['views']),
 		hasViews() {

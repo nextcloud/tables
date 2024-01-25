@@ -22,6 +22,17 @@ export default {
 		...mapGetters(['activeTable']),
 	},
 
+	created() {
+		this.$store.commit('setColumns', {tableId: this.activeTableId, columns: []})
+		this.$store.commit('setRows', {tableId: this.activeTableId, rows: []})
+	},
+	
+	unmounted() {
+		this.$store.commit('removeColumns', this.activeTableId)
+		this.$store.commit('removeRows', this.activeTableId)
+		this.$store.commit('removeLoading', this.activeTableId)
+	},
+
 	watch: {
 		activeTableId() {
 			if (this.activeTableId && !this.activeTable) {

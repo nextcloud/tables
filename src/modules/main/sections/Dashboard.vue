@@ -179,6 +179,9 @@ export default {
 	},
 
 	methods: {
+		setActiveElement() {
+			this.$store.commit('setActiveTableId', parseInt(this.table.id))
+		},
 		emit,
 		openView(view) {
 			this.$router.push('/view/' + parseInt(view.id)).catch(err => err)
@@ -192,11 +195,13 @@ export default {
 		},
 
 		actionShowShare(view) {
+			this.setActiveElement()
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
 			this.$router.push('/view/' + parseInt(view.id)).catch(err => err)
 		},
 
 		async actionShowIntegration(view) {
+			this.setActiveElement()
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
 			await this.$router.push('/view/' + parseInt(view.id)).catch(err => err)
 		},
@@ -221,6 +226,7 @@ export default {
 		},
 
 		deleteTable() {
+			this.setActiveElement()
 			emit('tables:table:delete', this.table)
 		},
 		async getSharesForViewFromBE(viewId) {

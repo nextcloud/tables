@@ -9,32 +9,26 @@
 				</div>
 			</div>
 			<div v-for="column in nonMetaColumns" :key="column.id">
-				<ColumnFormComponent
-					:column="column"
-					:value.sync="localRow[column.id]" />
-				<NcNoteCard v-if="column.mandatory && !isValueValidForColumn(localRow[column.id], column)"
-					type="error">
+				<ColumnFormComponent :column="column" :value.sync="localRow[column.id]" />
+				<NcNoteCard v-if="column.mandatory && !isValueValidForColumn(localRow[column.id], column)" type="error">
 					{{ t('tables', '"{columnTitle}" should not be empty', { columnTitle: column.title }) }}
 				</NcNoteCard>
 			</div>
 			<div class="row">
-				<div class="fix-col-4 space-T" :class="{'justify-between': showDeleteButton, 'end': !showDeleteButton}">
+				<div class="fix-col-4 space-T" :class="{ 'justify-between': showDeleteButton, 'end': !showDeleteButton }">
 					<div v-if="showDeleteButton">
-						<NcButton v-if="!prepareDeleteRow" :aria-label="t('tables', 'Delete')" type="error" @click="prepareDeleteRow = true">
+						<NcButton v-if="!prepareDeleteRow" :aria-label="t('tables', 'Delete')" type="error"
+							@click="prepareDeleteRow = true">
 							{{ t('tables', 'Delete') }}
 						</NcButton>
-						<NcButton v-if="prepareDeleteRow"
-							:wide="true"
-							:aria-label="t('tables', 'I really want to delete this row!')"
-							type="error"
+						<NcButton v-if="prepareDeleteRow" :wide="true"
+							:aria-label="t('tables', 'I really want to delete this row!')" type="error"
 							@click="actionDeleteRow">
 							{{ t('tables', 'I really want to delete this row!') }}
 						</NcButton>
 					</div>
-					<NcButton v-if="canUpdateData(activeElement) && !localLoading" :aria-label="t('tables', 'Save')" type="primary"
-						data-cy="editRowSaveButton"
-						:disabled="hasEmptyMandatoryRows"
-						@click="actionConfirm">
+					<NcButton v-if="canUpdateData(activeElement) && !localLoading" :aria-label="t('tables', 'Save')"
+						type="primary" data-cy="editRowSaveButton" :disabled="hasEmptyMandatoryRows" @click="actionConfirm">
 						{{ t('tables', 'Save') }}
 					</NcButton>
 					<div v-if="localLoading" class="icon-loading" style="margin-left: 20px;" />
@@ -156,6 +150,7 @@ export default {
 			}
 			const res = await this.$store.dispatch('updateRow', {
 				id: this.row.id,
+				tableId: this.activeElement.id,
 				viewId: this.isView ? this.activeElement.id : null,
 				data,
 			})
@@ -176,6 +171,7 @@ export default {
 			const res = await this.$store.dispatch('removeRow', {
 				rowId,
 				viewId: this.isView ? this.activeElement.id : null,
+				tableId: this.activeElement.id,
 			})
 			if (!res) {
 				showError(t('tables', 'Could not delete row.'))

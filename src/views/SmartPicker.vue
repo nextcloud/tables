@@ -164,6 +164,7 @@ export default {
 			this.richObject.rowsCount = this.value.rowsCount
 			this.richObject.title = this.value.label
 			this.richObject.type = this.value.type
+			this.richObject.id = this.value.value
 		},
 		async loadColumnsForContentPreview() {
 			if (this.value === null) {

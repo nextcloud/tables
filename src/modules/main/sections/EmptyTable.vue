@@ -29,6 +29,7 @@ export default {
 	},
 	methods: {
 		createColumn() {
+			this.$store.commit('setActiveTableId', parseInt(this.table.id))
 			emit('tables:column:create')
 		},
 	},

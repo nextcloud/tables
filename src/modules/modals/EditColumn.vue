@@ -172,6 +172,7 @@ export default {
 			data.numberDecimals = data.numberDecimals === '' ? null : data.numberDecimals
 			data.numberMin = data.numberMin === '' ? null : data.numberMin
 			data.numberMax = data.numberMax === '' ? null : data.numberMax
+			const tableId = data.tableId
 			delete data.type
 			delete data.id
 			delete data.tableId
@@ -180,7 +181,7 @@ export default {
 			delete data.lastEditAt
 			delete data.lastEditBy
 			console.debug('this column data will be send', data)
-			const res = await this.$store.dispatch('updateColumn', { id: this.editColumn.id, data })
+			const res = await this.$store.dispatch('updateColumn', { id: this.editColumn.id, tableId, data })
 			if (res) {
 				showSuccess(t('tables', 'The column "{column}" was updated.', { column: this.editColumn.title }))
 			}

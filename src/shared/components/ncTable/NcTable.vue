@@ -52,6 +52,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 		</div>
 		<div class="custom-table row">
 			<CustomTable v-if="config.canReadRows || (config.canCreateRows && rows.length > 0)"
+				:table="table"
 				:columns="parsedColumns"
 				:rows="rows"
 				:view-setting.sync="localViewSetting"
@@ -121,6 +122,10 @@ export default {
 		columns: {
 			type: Array,
 			default: () => [],
+		},
+		table: {
+			type: Object,
+			default: null,
 		},
 		downloadTitle: {
 			type: String,
@@ -225,10 +230,10 @@ export default {
 		},
 	},
 	mounted() {
-		subscribe('tables:selected-rows:deselect', this.deselectRows)
+		subscribe('tables:selected-rows:deselect', tableId => { this.deselectRows(tableId) })
 	},
 	beforeDestroy() {
-		unsubscribe('tables:selected-rows:deselect', this.deselectRows)
+		unsubscribe('tables:selected-rows:deselect', tableId => { this.deselectRows(tableId) })
 	},
 	methods: {
 		t,
