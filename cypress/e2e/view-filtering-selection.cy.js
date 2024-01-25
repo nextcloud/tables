@@ -94,8 +94,8 @@ describe('Filtering in a view by selection columns', () => {
 		cy.get('ul.vs__dropdown-menu li span[title="sel2"]').click()
 
 		// ## save view
-		cy.intercept({ method: 'POST', url: '**!/apps/tables/view' }).as('createView')
-		cy.intercept({ method: 'PUT', url: '**!/apps/tables/view/!*' }).as('updateView')
+		cy.intercept({ method: 'POST', url: '**/apps/tables/view' }).as('createView')
+		cy.intercept({ method: 'PUT', url: '**/apps/tables/view/*' }).as('updateView')
 		cy.contains('button', 'Create View').click()
 		cy.wait('@createView')
 		cy.wait('@updateView')
@@ -122,7 +122,7 @@ describe('Filtering in a view by selection columns', () => {
 		cy.get('ul.vs__dropdown-menu li span[title="sel1"]').click()
 
 		// ## update view
-		cy.intercept({ method: 'PUT', url: '**!/apps/tables/view/!*' }).as('updateView')
+		cy.intercept({ method: 'PUT', url: '**/apps/tables/view/*' }).as('updateView')
 		cy.contains('button', 'Save View').click()
 		cy.wait('@updateView')
 
@@ -160,8 +160,8 @@ describe('Filtering in a view by selection columns', () => {
 		cy.get('ul.vs__dropdown-menu li span[title="A"]').click()
 
 		// ## save view
-		cy.intercept({ method: 'POST', url: '**!/apps/tables/view' }).as('createView')
-		cy.intercept({ method: 'PUT', url: '**!/apps/tables/view/!*' }).as('updateView')
+		cy.intercept({ method: 'POST', url: '**/apps/tables/view' }).as('createView')
+		cy.intercept({ method: 'PUT', url: '**/apps/tables/view/*' }).as('updateView')
 		cy.contains('button', 'Create View').click()
 		cy.wait('@createView')
 		cy.wait('@updateView')
@@ -201,8 +201,8 @@ describe('Filtering in a view by selection columns', () => {
 		cy.get('ul.vs__dropdown-menu li span[title="A"]').click()
 
 		// ## save view
-		cy.intercept({ method: 'POST', url: '**!/apps/tables/view' }).as('createView')
-		cy.intercept({ method: 'PUT', url: '**!/apps/tables/view/!*' }).as('updateView')
+		cy.intercept({ method: 'POST', url: '**/apps/tables/view' }).as('createView')
+		cy.intercept({ method: 'PUT', url: '**/apps/tables/view/*' }).as('updateView')
 		cy.contains('button', 'Create View').click()
 		cy.wait('@createView')
 		cy.wait('@updateView')
@@ -250,8 +250,8 @@ describe('Filtering in a view by selection columns', () => {
 		cy.get('ul.vs__dropdown-menu li span[title="B"]').click()
 
 		// ## save view
-		cy.intercept({ method: 'POST', url: '**!/apps/tables/view' }).as('createView')
-		cy.intercept({ method: 'PUT', url: '**!/apps/tables/view/!*' }).as('updateView')
+		cy.intercept({ method: 'POST', url: '**/apps/tables/view' }).as('createView')
+		cy.intercept({ method: 'PUT', url: '**/apps/tables/view/*' }).as('updateView')
 		cy.contains('button', 'Create View').click()
 		cy.wait('@createView')
 		cy.wait('@updateView')
@@ -307,8 +307,8 @@ describe('Filtering in a view by selection columns', () => {
 		cy.get('ul.vs__dropdown-menu li span[title="D"]').click()
 
 		// ## save view
-		cy.intercept({ method: 'POST', url: '**!/apps/tables/view' }).as('createView')
-		cy.intercept({ method: 'PUT', url: '**!/apps/tables/view/!*' }).as('updateView')
+		cy.intercept({ method: 'POST', url: '**/apps/tables/view' }).as('createView')
+		cy.intercept({ method: 'PUT', url: '**/apps/tables/view/*' }).as('updateView')
 		cy.contains('button', 'Create View').click()
 		cy.wait('@createView')
 		cy.wait('@updateView')
