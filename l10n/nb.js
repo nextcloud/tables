@@ -135,6 +135,8 @@ OC.L10N.register(
     "Suffix" : "Suffiks",
     "Default" : "Standard",
     "Options" : "Valg",
+    "Delete option" : "Slett alternativ",
+    "Add option" : "Legg til alternativ",
     "Allowed pattern (regex)" : "Tillatt mønster (regex)",
     "Maximum text length" : "Maksimum tekstlengde",
     "URL" : "URL",
