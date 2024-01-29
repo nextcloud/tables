@@ -49,7 +49,7 @@ export const Filters = {
 	Contains: new Filter({
 		id: FilterIds.Contains,
 		label: t('tables', 'Contains'),
-		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextLong, ColumnTypes.TextLink, ColumnTypes.TextRich],
+		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextLong, ColumnTypes.TextLink, ColumnTypes.TextRich, ColumnTypes.SelectionMulti],
 		incompatibleWith: [FilterIds.IsEmpty, FilterIds.IsEqual],
 	}),
 	BeginsWith: new Filter({
@@ -68,7 +68,7 @@ export const Filters = {
 		id: FilterIds.IsEqual,
 		label: t('tables', 'Is equal'),
 		shortLabel: '=',
-		goodFor: [ColumnTypes.TextLine, ColumnTypes.Number, ColumnTypes.SelectionCheck, ColumnTypes.TextLink, ColumnTypes.NumberStars, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime, ColumnTypes.Selection],
+		goodFor: [ColumnTypes.TextLine, ColumnTypes.Number, ColumnTypes.SelectionCheck, ColumnTypes.TextLink, ColumnTypes.NumberStars, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime, ColumnTypes.Selection, ColumnTypes.SelectionMulti],
 		incompatibleWith: [FilterIds.IsEmpty, FilterIds.IsEqual, FilterIds.BeginsWith, FilterIds.EndsWith, FilterIds.Contains, FilterIds.IsGreaterThan, FilterIds.IsGreaterThanOrEqual, FilterIds.IsLowerThan, FilterIds.IsLowerThanOrEqual],
 	}),
 	IsGreaterThan: new Filter({

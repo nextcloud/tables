@@ -3,7 +3,6 @@
 namespace OCA\Tables\Db;
 
 use JsonSerializable;
-
 use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\Entity;
 
@@ -12,6 +11,8 @@ use OCP\AppFramework\Db\Entity;
  *
  * @psalm-import-type TablesView from ResponseDefinitions
  *
+ * @method getId(): int
+ * @method setId(int $id)
  * @method getTitle(): string
  * @method setTitle(string $title)
  * @method getTableId(): int
@@ -76,7 +77,7 @@ class View extends Entity implements JsonSerializable {
 
 	/**
 	 * @psalm-suppress MismatchingDocblockReturnType
-	 * @return array{array-key, array{columnId: int, mode: 'ASC'|'DESC'}}|null
+	 * @return list<array{columnId: int, mode: 'ASC'|'DESC'}>
 	 */
 	public function getSortArray(): array {
 		return $this->getArray($this->getSort());
@@ -84,7 +85,7 @@ class View extends Entity implements JsonSerializable {
 
 	/**
 	 * @psalm-suppress MismatchingDocblockReturnType
-	 * @return array<array-key,array{columnId: int, operator: 'begins-with'|'contains'|'ends-with'|'is-empty'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal', value: float|int|string}>|null
+	 * @return list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>
 	 */
 	public function getFilterArray():array {
 		return $this->getArray($this->getFilter());

@@ -422,3 +422,21 @@ Cypress.Commands.add('removeColumn', (title) => {
 	cy.get('.v-popper__popper ul.nc-button-group-content').last().get('button').last().click()
 	cy.get('.modal__content button').contains('Confirm').click()
 })
+
+// fill in a value in the 'create row' or 'edit row' model
+Cypress.Commands.add('fillInValueTextLine', (columnTitle, value) => {
+	cy.get('.modal__content [data-cy="' + columnTitle + '"] .slot input').type(value)
+})
+Cypress.Commands.add('fillInValueSelection', (columnTitle, optionLabel) => {
+	cy.get('.modal__content [data-cy="' + columnTitle + '"] .slot input').click()
+	cy.get('ul.vs__dropdown-menu li span[title="' + optionLabel + '"]').click()
+})
+Cypress.Commands.add('fillInValueSelectionMulti', (columnTitle, optionLabels) => {
+	optionLabels.forEach(item => {
+		cy.get('.modal__content [data-cy="' + columnTitle + '"] .slot input').click()
+		cy.get('ul.vs__dropdown-menu li span[title="' + item + '"]').click()
+	})
+})
+Cypress.Commands.add('fillInValueSelectionCheck', (columnTitle) => {
+	cy.get('.modal__content [data-cy="' + columnTitle + '"] .checkbox-radio-switch__label').click()
+})

@@ -21,7 +21,7 @@ class ColumnMapper extends QBMapper {
 	}
 
 	/**
-	 * @param int $id
+	 * @param int $id Column ID
 	 *
 	 * @return Column
 	 * @throws DoesNotExistException
@@ -34,6 +34,20 @@ class ColumnMapper extends QBMapper {
 			->from($this->table)
 			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
 		return $this->findEntity($qb);
+	}
+
+	/**
+	 * @param array<int> $id Column IDs
+	 *
+	 * @return Column[]
+	 * @throws Exception
+	 */
+	public function findAll(array $id): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->in('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT_ARRAY)));
+		return $this->findEntities($qb);
 	}
 
 	/**
@@ -51,15 +65,15 @@ class ColumnMapper extends QBMapper {
 	}
 
 	/**
-	 * @param integer $tableID
+	 * @param integer $tableId
 	 * @return array
 	 * @throws Exception
 	 */
-	public function findAllByTable(int $tableID): array {
+	public function findAllByTable(int $tableId): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
-			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableID)));
+			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId)));
 		return $this->findEntities($qb);
 	}
 

@@ -21,7 +21,7 @@ use OCP\AppFramework\Db\Entity;
  * @method getData(): string
  * @method setData(string $data)
  */
-class Row extends Entity implements JsonSerializable {
+class LegacyRow extends Entity implements JsonSerializable {
 	protected ?int $tableId = null;
 	protected ?string $createdBy = null;
 	protected ?string $createdAt = null;

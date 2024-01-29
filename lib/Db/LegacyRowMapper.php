@@ -22,8 +22,8 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 
-/** @template-extends QBMapper<Row> */
-class RowMapper extends QBMapper {
+/** @template-extends QBMapper<LegacyRow> */
+class LegacyRowMapper extends QBMapper {
 	protected string $table = 'tables_rows';
 	protected TextColumnQB $textColumnQB;
 	protected SelectionColumnQB $selectionColumnQB;
@@ -33,11 +33,22 @@ class RowMapper extends QBMapper {
 	protected ColumnMapper $columnMapper;
 	protected LoggerInterface $logger;
 	protected UserHelper $userHelper;
+	protected Row2Mapper $rowMapper;
 
 	protected int $platform;
 
-	public function __construct(IDBConnection $db, LoggerInterface $logger, TextColumnQB $textColumnQB, SelectionColumnQB $selectionColumnQB, NumberColumnQB $numberColumnQB, DatetimeColumnQB $datetimeColumnQB, SuperColumnQB $columnQB, ColumnMapper $columnMapper, UserHelper $userHelper) {
-		parent::__construct($db, $this->table, Row::class);
+	public function __construct(
+		IDBConnection $db,
+		LoggerInterface $logger,
+		TextColumnQB $textColumnQB,
+		SelectionColumnQB $selectionColumnQB,
+		NumberColumnQB $numberColumnQB,
+		DatetimeColumnQB $datetimeColumnQB,
+		SuperColumnQB $columnQB,
+		ColumnMapper $columnMapper,
+		UserHelper $userHelper,
+		Row2Mapper $rowMapper) {
+		parent::__construct($db, $this->table, LegacyRow::class);
 		$this->logger = $logger;
 		$this->textColumnQB = $textColumnQB;
 		$this->numberColumnQB = $numberColumnQB;
@@ -46,6 +57,7 @@ class RowMapper extends QBMapper {
 		$this->genericColumnQB = $columnQB;
 		$this->columnMapper = $columnMapper;
 		$this->userHelper = $userHelper;
+		$this->rowMapper = $rowMapper;
 		$this->setPlatform();
 	}
 
@@ -67,12 +79,12 @@ class RowMapper extends QBMapper {
 	/**
 	 * @param int $id
 	 *
-	 * @return Row
+	 * @return LegacyRow
 	 * @throws DoesNotExistException
 	 * @throws Exception
 	 * @throws MultipleObjectsReturnedException
 	 */
-	public function find(int $id): Row {
+	public function find(int $id): LegacyRow {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('t1.*')
 			->from($this->table, 't1')
@@ -234,8 +246,8 @@ class RowMapper extends QBMapper {
 				foreach ($filterGroup as &$filter) {
 					$filter['columnType'] = $neededColumnTypes[$filter['columnId']];
 					// TODO move resolution for magic fields to service layer
-					if(str_starts_with($filter['value'], '@')) {
-						$filter['value'] = $this->resolveSearchValue($filter['value'], $userId);
+					if(str_starts_with((string) $filter['value'], '@')) {
+						$filter['value'] = $this->resolveSearchValue((string) $filter['value'], $userId);
 					}
 				}
 			}
@@ -251,7 +263,7 @@ class RowMapper extends QBMapper {
 	 * @param int $tableId
 	 * @param int|null $limit
 	 * @param int|null $offset
-	 * @return array
+	 * @return LegacyRow[]
 	 * @throws Exception
 	 */
 	public function findAllByTable(int $tableId, ?int $limit = null, ?int $offset = null): array {
@@ -345,7 +357,7 @@ class RowMapper extends QBMapper {
 	 * @throws DoesNotExistException
 	 * @throws Exception
 	 */
-	public function findNext(int $offsetId = -1): Row {
+	public function findNext(int $offsetId = -1): LegacyRow {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('t1.*')
 			->from($this->table, 't1')
@@ -406,12 +418,12 @@ class RowMapper extends QBMapper {
 	/**
 	 * @param int $id
 	 * @param View $view
-	 * @return Row
+	 * @return LegacyRow
 	 * @throws DoesNotExistException
 	 * @throws Exception
 	 * @throws MultipleObjectsReturnedException
 	 */
-	public function findByView(int $id, View $view): Row {
+	public function findByView(int $id, View $view): LegacyRow {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('t1.*')
 			->from($this->table, 't1')
@@ -423,5 +435,59 @@ class RowMapper extends QBMapper {
 		}));
 
 		return $row;
+	}
+
+	/**
+	 * @param Column[] $columns
+	 * @param LegacyRow $legacyRow
+	 *
+	 * @throws Exception
+	 * @throws InternalError
+	 */
+	public function transferLegacyRow(LegacyRow $legacyRow, array $columns) {
+		$this->rowMapper->insert($this->migrateLegacyRow($legacyRow, $columns), $columns);
+	}
+
+	/**
+	 * @param LegacyRow $legacyRow
+	 * @param Column[] $columns
+	 * @return Row2
+	 */
+	public function migrateLegacyRow(LegacyRow $legacyRow, array $columns): Row2 {
+		$row = new Row2();
+		$row->setId($legacyRow->getId());
+		$row->setTableId($legacyRow->getTableId());
+		$row->setCreatedBy($legacyRow->getCreatedBy());
+		$row->setCreatedAt($legacyRow->getCreatedAt());
+		$row->setLastEditBy($legacyRow->getLastEditBy());
+		$row->setLastEditAt($legacyRow->getLastEditAt());
+
+		$legacyData = $legacyRow->getDataArray();
+		$data = [];
+		foreach ($legacyData as $legacyDatum) {
+			$columnId = $legacyDatum['columnId'];
+			if ($this->getColumnFromColumnsArray($columnId, $columns)) {
+				$data[] = $legacyDatum;
+			} else {
+				$this->logger->warning("The row with id " . $row->getId() . " has a value for the column with id " . $columnId . ". But this column does not exist or is not part of the table " . $row->getTableId() . ". Will ignore this value abd continue.");
+			}
+		}
+		$row->setData($data);
+
+		return $row;
+	}
+
+	/**
+	 * @param int $columnId
+	 * @param Column[] $columns
+	 * @return Column|null
+	 */
+	private function getColumnFromColumnsArray(int $columnId, array $columns): ?Column {
+		foreach ($columns as $column) {
+			if($column->getId() === $columnId) {
+				return $column;
+			}
+		}
+		return null;
 	}
 }

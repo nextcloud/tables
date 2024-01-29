@@ -103,6 +103,9 @@ lint: lint-php lint-js lint-css lint-xml
 
 lint-php: lint-php-lint lint-php-cs-fixer lint-php-psalm
 
+lint-fast:
+	composer run psalm -- --show-info=false
+
 lint-php-lint:
 	# Check PHP syntax errors
 	@! find $(php_dirs) -name "*.php" | xargs -I{} php -l '{}' | grep -v "No syntax errors detected"

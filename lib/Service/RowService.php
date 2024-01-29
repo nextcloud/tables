@@ -2,17 +2,19 @@
 
 namespace OCA\Tables\Service;
 
-use DateTime;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
-use OCA\Tables\Db\Row;
-use OCA\Tables\Db\RowMapper;
+use OCA\Tables\Db\LegacyRowMapper;
+use OCA\Tables\Db\Row2;
+use OCA\Tables\Db\Row2Mapper;
+use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -22,19 +24,33 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @psalm-import-type TablesRow from ResponseDefinitions
+ */
 class RowService extends SuperService {
-	private RowMapper $mapper;
+	private LegacyRowMapper $mapper;
 	private ColumnMapper $columnMapper;
 	private ViewMapper $viewMapper;
 	private TableMapper $tableMapper;
+	private Row2Mapper $row2Mapper;
+	private array $tmpRows = []; // holds already loaded rows as a small cache
 
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-		RowMapper $mapper, ColumnMapper $columnMapper, ViewMapper $viewMapper, TableMapper $tableMapper) {
+		LegacyRowMapper    $mapper, ColumnMapper $columnMapper, ViewMapper $viewMapper, TableMapper $tableMapper, Row2Mapper $row2Mapper) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
 		$this->columnMapper = $columnMapper;
 		$this->viewMapper = $viewMapper;
 		$this->tableMapper = $tableMapper;
+		$this->row2Mapper = $row2Mapper;
+	}
+
+	/**
+	 * @param Row2[] $rows
+	 * @psalm-return TablesRow[]
+	 */
+	public function formatRows(array $rows): array {
+		return array_map(fn (Row2 $row) => $row->jsonSerialize(), $rows);
 	}
 
 	/**
@@ -42,14 +58,14 @@ class RowService extends SuperService {
 	 * @param string $userId
 	 * @param ?int $limit
 	 * @param ?int $offset
-	 * @return array
+	 * @return Row2[]
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
 	public function findAllByTable(int $tableId, string $userId, ?int $limit = null, ?int $offset = null): array {
 		try {
 			if ($this->permissionsService->canReadRowsByElementId($tableId, 'table', $userId)) {
-				return $this->mapper->findAllByTable($tableId, $limit, $offset);
+				return $this->row2Mapper->findAll($this->columnMapper->findAllByTable($tableId), $tableId, $limit, $offset, null, null, $userId);
 			} else {
 				throw new PermissionError('no read access to table id = '.$tableId);
 			}
@@ -64,7 +80,7 @@ class RowService extends SuperService {
 	 * @param string $userId
 	 * @param int|null $limit
 	 * @param int|null $offset
-	 * @return array
+	 * @return Row2[]
 	 * @throws DoesNotExistException
 	 * @throws InternalError
 	 * @throws MultipleObjectsReturnedException
@@ -73,7 +89,10 @@ class RowService extends SuperService {
 	public function findAllByView(int $viewId, string $userId, ?int $limit = null, ?int $offset = null): array {
 		try {
 			if ($this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)) {
-				return $this->mapper->findAllByView($this->viewMapper->find($viewId), $userId, $limit, $offset);
+				$view = $this->viewMapper->find($viewId);
+				$columnsArray = $view->getColumnsArray();
+				$columns = $this->columnMapper->findAll($columnsArray);
+				return $this->row2Mapper->findAll($columns, $view->getTableId(), $limit, $offset, $view->getFilterArray(), $view->getSortArray(), $userId);
 			} else {
 				throw new PermissionError('no read access to view id = '.$viewId);
 			}
@@ -86,42 +105,49 @@ class RowService extends SuperService {
 
 	/**
 	 * @param int $id
-	 * @return Row
+	 * @return Row2
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function find(int $id): Row {
+	public function find(int $id): Row2 {
 		try {
-			$row = $this->mapper->find($id);
-
-			// security
-			if (!$this->permissionsService->canReadRowsByElementId($row->getTableId(), 'table')) {
-				throw new PermissionError('PermissionError: can not read row with id '.$id);
-			}
-
-			return $row;
-		} catch (DoesNotExistException $e) {
-			$this->logger->warning($e->getMessage());
-			throw new NotFoundError($e->getMessage());
-		} catch (MultipleObjectsReturnedException|Exception $e) {
-			$this->logger->error($e->getMessage());
-			throw new InternalError($e->getMessage());
+			$columns = $this->columnMapper->findAllByTable($id);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
+
+		try {
+			$row = $this->row2Mapper->find($id, $columns);
+		} catch (InternalError $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage(), $e->getCode(), $e);
+		} catch (NotFoundError $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+
+		// security
+		if (!$this->permissionsService->canReadRowsByElementId($row->getTableId(), 'table')) {
+			throw new PermissionError('PermissionError: can not read row with id '.$id);
+		}
+
+		return $row;
 	}
 
 	/**
 	 * @param int|null $tableId
 	 * @param int|null $viewId
 	 * @param list<array{columnId: int, value: mixed}> $data
-	 * @return Row
+	 * @return Row2
 	 *
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 * @throws Exception
 	 * @throws InternalError
 	 */
-	public function create(?int $tableId, ?int $viewId, array $data):Row {
+	public function create(?int $tableId, ?int $viewId, array $data): Row2 {
 		if ($this->userId === null || $this->userId === '') {
 			$e = new \Exception('No user id in context, but needed.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
@@ -168,19 +194,16 @@ class RowService extends SuperService {
 
 		$data = $this->cleanupData($data, $columns, $tableId, $viewId);
 
-		$time = new DateTime();
-		$item = new Row();
-		$item->setDataArray($data);
-		if ($tableId) {
-			$item->setTableId($tableId);
-		} elseif (isset($view) && $view) {
-			$item->setTableId($view->getTableId());
+		// perf
+		$row2 = new Row2();
+		$row2->setTableId($tableId);
+		$row2->setData($data);
+		try {
+			return $this->row2Mapper->insert($row2, $this->columnMapper->findAllByTable($tableId));
+		} catch (InternalError|Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
-		$item->setCreatedBy($this->userId);
-		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
-		$item->setLastEditBy($this->userId);
-		$item->setLastEditAt($time->format('Y-m-d H:i:s'));
-		return $this->mapper->insert($item);
 	}
 
 	/**
@@ -255,16 +278,43 @@ class RowService extends SuperService {
 	}
 
 	/**
+	 * @throws NotFoundError
+	 * @throws InternalError
+	 */
+	private function getRowById(int $rowId): Row2 {
+		if (isset($this->tmpRows[$rowId])) {
+			return $this->tmpRows[$rowId];
+		}
+
+		try {
+			if ($this->row2Mapper->getTableIdForRow($rowId) === null) {
+				$e = new \Exception('No table id in row, but needed.');
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			}
+			$row = $this->row2Mapper->find($rowId, $this->columnMapper->findAllByTable($this->row2Mapper->getTableIdForRow($rowId)));
+			$row->markAsLoaded();
+		} catch (InternalError|DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		} catch (NotFoundError $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+		$this->tmpRows[$rowId] = $row;
+		return $row;
+	}
+
+	/**
 	 * Update multiple cells in a row
 	 *
 	 * @param int $id
 	 * @param int|null $viewId
 	 * @param list<array{columnId: string|int, value: mixed}> $data
 	 * @param string $userId
-	 * @return Row
+	 * @return Row2
 	 *
 	 * @throws InternalError
-	 * @throws PermissionError
 	 * @throws NotFoundError
 	 * @noinspection DuplicatedCode
 	 */
@@ -273,13 +323,13 @@ class RowService extends SuperService {
 		?int $viewId,
 		array $data,
 		string $userId
-	):Row {
+	): Row2 {
 		try {
-			$item = $this->mapper->find($id);
-		} catch (MultipleObjectsReturnedException|Exception $e) {
+			$item = $this->getRowById($id);
+		} catch (InternalError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
-		} catch (DoesNotExistException $e) {
+		} catch (NotFoundError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
@@ -287,7 +337,9 @@ class RowService extends SuperService {
 		if ($viewId) {
 			// security
 			if (!$this->permissionsService->canUpdateRowsByViewId($viewId)) {
-				throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
+				$e = new \Exception('Update row is not allowed.');
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 			}
 
 			try {
@@ -300,11 +352,14 @@ class RowService extends SuperService {
 				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 			}
 
-			$rowIds = $this->mapper->getRowIdsOfView($view, $userId);
-			if(!in_array($id, $rowIds)) {
-				throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
+			// is row in view?
+			if(!$this->row2Mapper->isRowInViewPresent($id, $view, $userId)) {
+				$e = new \Exception('Update row is not allowed.');
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 			}
 
+			// fetch all needed columns
 			try {
 				$columns = $this->columnMapper->findMultiple($view->getColumnsArray());
 			} catch (Exception $e) {
@@ -317,7 +372,9 @@ class RowService extends SuperService {
 
 			// security
 			if (!$this->permissionsService->canUpdateRowsByTableId($tableId)) {
-				throw new PermissionError('update row id = '.$tableId.' is not allowed.');
+				$e = new \Exception('Update row is not allowed.');
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 			}
 			try {
 				$columns = $this->columnMapper->findAllByTable($tableId);
@@ -329,146 +386,107 @@ class RowService extends SuperService {
 
 		$data = $this->cleanupData($data, $columns, $item->getTableId(), $viewId);
 
-		$time = new DateTime();
-		$oldData = $item->getDataArray();
 		foreach ($data as $entry) {
 			// Check whether the column of which the value should change is part of the table / view
 			$column = $this->getColumnFromColumnsArray($entry['columnId'], $columns);
 			if ($column) {
-				$oldData = $this->replaceOrAddData($oldData, $entry);
+				$item->insertOrUpdateCell($entry);
 			} else {
 				$this->logger->warning("Column to update row not found, will continue and ignore this.");
 			}
 		}
 
-		$item->setDataArray($oldData);
-		$item->setLastEditBy($userId);
-		$item->setLastEditAt($time->format('Y-m-d H:i:s'));
-		try {
-			$row = $this->mapper->update($item);
-		} catch (Exception $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
-		}
-
-		if ($viewId) {
-			try {
-				$row = $this->mapper->findByView($row->getId(), $view);
-			} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
-			}
-		}
-
-		return $row;
-	}
-
-	private function replaceOrAddData(array $dataArray, array $newDataObject): array {
-		$columnId = (int) $newDataObject['columnId'];
-		$value = $newDataObject['value'];
-
-		$columnFound = false;
-		foreach ($dataArray as $key => $c) {
-			if ($c['columnId'] == $columnId) {
-				$dataArray[$key]['value'] = $value;
-				$columnFound = true;
-				break;
-			}
-		}
-		// if the value was not set, add it
-		if (!$columnFound) {
-			$dataArray[] = [
-				"columnId" => $columnId,
-				"value" => $value
-			];
-		}
-		return $dataArray;
+		return $this->row2Mapper->update($item, $columns);
 	}
 
 	/**
 	 * @param int $id
 	 * @param int|null $viewId
 	 * @param string $userId
-	 * @return Row
+	 * @return Row2
 	 *
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
+	 * @noinspection DuplicatedCode
 	 */
-	public function delete(int $id, ?int $viewId, string $userId): Row {
+	public function delete(int $id, ?int $viewId, string $userId): Row2 {
 		try {
-			$item = $this->mapper->find($id);
+			$item = $this->getRowById($id);
+		} catch (InternalError $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		} catch (NotFoundError $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
 
-			if ($viewId) {
-				// security
-				if (!$this->permissionsService->canDeleteRowsByViewId($viewId)) {
-					throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
-				}
-				$view = $this->viewMapper->find($viewId);
-				$rowIds = $this->mapper->getRowIdsOfView($view, $userId);
-				if(!in_array($id, $rowIds)) {
-					throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
-				}
-			} else {
-				// security
-				if (!$this->permissionsService->canDeleteRowsByTableId($item->getTableId())) {
-					throw new PermissionError('update row id = '.$item->getId().' is not allowed.');
-				}
+		if ($viewId) {
+			// security
+			if (!$this->permissionsService->canDeleteRowsByViewId($viewId)) {
+				$e = new \Exception('Update row is not allowed.');
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 			}
+			try {
+				$view = $this->viewMapper->find($viewId);
+			} catch (InternalError|DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			}
+			$rowIds = $this->mapper->getRowIdsOfView($view, $userId);
+			if(!in_array($id, $rowIds)) {
+				$e = new \Exception('Update row is not allowed.');
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			}
+		} else {
+			// security
+			if (!$this->permissionsService->canDeleteRowsByTableId($item->getTableId())) {
+				$e = new \Exception('Update row is not allowed.');
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new PermissionError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			}
+		}
 
-			$this->mapper->delete($item);
-			return $item;
-		} catch (DoesNotExistException $e) {
-			throw new NotFoundError($e->getMessage());
-		} catch (MultipleObjectsReturnedException|Exception $e) {
-			throw new InternalError($e->getMessage());
+		try {
+			return $this->row2Mapper->delete($item);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 	}
 
 	/**
 	 * @param int $tableId
 	 * @param null|string $userId
-	 * @return int
 	 *
 	 * @throws PermissionError
 	 * @throws Exception
 	 */
-	public function deleteAllByTable(int $tableId, ?string $userId = null): int {
+	public function deleteAllByTable(int $tableId, ?string $userId = null): void {
 		// security
 		if (!$this->permissionsService->canDeleteRowsByTableId($tableId, $userId)) {
 			throw new PermissionError('delete all rows for table id = '.$tableId.' is not allowed.');
 		}
 
-		return $this->mapper->deleteAllByTable($tableId);
+		$columns = $this->columnMapper->findAllByTable($tableId);
+
+		$this->row2Mapper->deleteAllForTable($tableId, $columns);
 	}
 
 	/**
-	 * @param int $columnId
+	 * This deletes all data for a column, eg if the columns gets removed
 	 *
-	 * @throws PermissionError
-	 * @throws Exception
+	 * >>> SECURITY <<<
+	 * We do not check if you are allowed to remove this data. That has to be done before!
+	 * Why? Mostly this check will have be run before and we can pass this here due to performance reasons.
+	 *
+	 * @param Column $column
+	 * @throws InternalError
 	 */
-	public function deleteColumnDataFromRows(int $columnId):void {
-		$rows = $this->mapper->findAllWithColumn($columnId);
-
-		// security
-		if (count($rows) > 0) {
-			if (!$this->permissionsService->canUpdateRowsByTableId($rows[0]->getTableId())) {
-				throw new PermissionError('update row id = '.$rows[0]->getId().' within '.__FUNCTION__.' is not allowed.');
-			}
-		}
-
-		foreach ($rows as $row) {
-			/* @var $row Row */
-			$data = $row->getDataArray();
-			foreach ($data as $key => $col) {
-				if ($col['columnId'] == $columnId) {
-					unset($data[$key]);
-				}
-			}
-			$row->setDataArray($data);
-			$this->mapper->update($row);
-		}
+	public function deleteColumnDataFromRows(Column $column):void {
+		$this->row2Mapper->deleteDataForColumn($column);
 	}
 
 	/**
@@ -479,7 +497,7 @@ class RowService extends SuperService {
 	 */
 	public function getRowsCount(int $tableId): int {
 		if ($this->permissionsService->canReadRowsByElementId($tableId, 'table')) {
-			return $this->mapper->countRows($tableId);
+			return $this->row2Mapper->countRowsForTable($tableId);
 		} else {
 			throw new PermissionError('no read access for counting to table id = '.$tableId);
 		}
@@ -490,12 +508,16 @@ class RowService extends SuperService {
 	 * @param string $userId
 	 * @return int
 	 *
-	 * @throws InternalError
 	 * @throws PermissionError
 	 */
 	public function getViewRowsCount(View $view, string $userId): int {
 		if ($this->permissionsService->canReadRowsByElementId($view->getId(), 'view', $userId)) {
-			return $this->mapper->countRowsForView($view, $userId);
+			try {
+				return $this->row2Mapper->countRowsForView($view, $userId, $this->columnMapper->findAllByTable($view->getTableId()));
+			} catch (Exception $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				return 0;
+			}
 		} else {
 			throw new PermissionError('no read access for counting to view id = '.$view->getId());
 		}
