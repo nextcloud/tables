@@ -165,21 +165,29 @@ export default {
 		},
 	},
 	methods: {
+		setActiveElement() {
+			this.$store.commit('setActiveTableId', parseInt(this.table.id))
+		},
 		emit,
 		deleteTable() {
+			this.setActiveElement()
 			emit('tables:table:delete', this.table)
 		},
 		createView() {
+			this.setActiveElement()
 			emit('tables:view:create', { tableId: this.table.id })
 		},
 		async actionShowShare() {
+			this.setActiveElement()
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
 			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
 		},
 		async actionShowImport(table) {
+			this.setActiveElement()
 			emit('tables:modal:import', { element: table, isView: false })
 		},
 		async actionShowIntegration() {
+			this.setActiveElement()
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
 			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
 		},

@@ -38,6 +38,7 @@ export default {
 				const res = this.$store.dispatch('removeRow', {
 					rowId,
 					viewId: this.isView ? this.activeElement.id : null,
+					stateId: this.isView ? 'view-' + this.activeElement.id : this.activeElement.id,
 				})
 				if (!res) {
 					error = true
@@ -46,7 +47,7 @@ export default {
 			if (error) {
 				showError(t('tables', 'Error occurred while deleting rows.'))
 			}
-			emit('tables:selected-rows:deselect', {})
+			emit('tables:selected-rows:deselect', this.activeElement.id)
 			this.$emit('cancel')
 		},
 	},

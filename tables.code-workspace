@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"name": "tables",
+			"path": "."
+		}
+	],
+	"settings": {
+		"git.enableCommitSigning": true
+	}
+}

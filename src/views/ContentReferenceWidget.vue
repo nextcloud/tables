@@ -26,6 +26,7 @@
 			<NcTable
 				:rows="richObject.rows"
 				:columns="richObject.columns"
+				:table-id="richObject.id"
 				:can-create-rows="false"
 				:can-edit-rows="false"
 				:can-delete-rows="false"

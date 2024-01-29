@@ -162,6 +162,7 @@ export default {
 
 		},
 		actionTransfer() {
+			this.$store.commit('setActiveTableId', parseInt(this.tableId))
 			emit('tables:table:edit', null)
 			emit('tables:table:transfer', this.localTable)
 		},

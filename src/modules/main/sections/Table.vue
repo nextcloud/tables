@@ -73,6 +73,7 @@ export default {
 	},
 	methods: {
 		createView() {
+			this.$store.commit('setActiveTableId', parseInt(this.table.id))
 			emit('tables:view:create', { tableId: this.table.id, viewSetting: this.viewSetting.length > 0 ? this.viewSetting : this.localViewSetting })
 		},
 	},

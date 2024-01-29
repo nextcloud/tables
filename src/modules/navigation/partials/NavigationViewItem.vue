@@ -139,19 +139,26 @@ export default {
 		},
 	},
 	methods: {
+		setActiveElement() {
+			this.$store.commit('setActiveViewId', parseInt(this.view.id))
+		},
 		emit,
 		async actionShowShare() {
+			this.setActiveElement()
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
 			await this.$router.push('/view/' + parseInt(this.view.id)).catch(err => err)
 		},
 		async actionShowIntegration() {
+			this.setActiveElement()
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
 			await this.$router.push('/view/' + parseInt(this.view.id)).catch(err => err)
 		},
 		async editView() {
+			this.setActiveElement()
 			emit('tables:view:edit', { view: this.view, viewSetting: {} })
 		},
 		async actionShowImport(view) {
+			this.setActiveElement()
 			emit('tables:modal:import', { element: view, isView: true })
 		},
 		async cloneView() {

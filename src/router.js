@@ -4,6 +4,7 @@ import { generateUrl } from '@nextcloud/router'
 import MainViewWrapper from './pages/View.vue'
 import MainDashboardWrapper from './pages/Table.vue'
 import Startpage from './pages/Startpage.vue'
+import Context from './pages/Context.vue'
 
 Vue.use(Router)
 
@@ -14,6 +15,16 @@ export default new Router({
 		{
 			path: '/',
 			component: Startpage,
+		},
+		{
+			path: '/context/:contextId',
+			component: Context,
+			name: 'context',
+		},
+		{
+			path: '/context/:contextId/row/:rowId',
+			component: Context,
+			name: 'contextRow',
 		},
 		{
 			path: '/table/:tableId',

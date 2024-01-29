@@ -4,36 +4,60 @@ import displayError from '../shared/utils/displayError.js'
 import { parseCol } from '../shared/components/ncTable/mixins/columnParser.js'
 import { MetaColumns } from '../shared/components/ncTable/mixins/metaColumns.js'
 import { showError } from '@nextcloud/dialogs'
+import { set } from 'vue'
 
 export default {
 	state: {
-		loading: false,
-		rows: [],
-		columns: [],
+		loading: {},
+		rows: {},
+		columns: {},
 	},
 
 	mutations: {
-		setColumns(state, columns) {
-			state.columns = columns
+		setColumns(state, { stateId, columns }) {
+			set(state.columns, stateId, columns)
 		},
-		setRows(state, rows) {
-			state.rows = rows
+		setRows(state, { stateId, rows }) {
+			set(state.rows, stateId, rows)
 		},
-		setLoading(state, value) {
-			state.loading = !!(value)
+		setLoading(state, { stateId, value }) {
+			set(state.loading, stateId, !!(value))
 		},
+		removeColumns(state, { stateId }) {
+			delete state.columns[stateId]
+		},
+		removeRows(state, { stateId }) {
+			delete state.rows[stateId]
+		},
+		removeLoading(state, { stateId }) {
+			delete state.loading[stateId]
+		},
+
 	},
 
 	getters: {
-		getColumnById: (state) => (id) => {
-			return state.columns.filter(column => column.id === id)[0]
+		getColumnById: (state) => (tableId, columnId) => {
+			return state.columns[tableId].filter(column => column.id === columnId)[0]
 		},
 	},
 
 	actions: {
+		initState({ commit }, { stateId }) {
+			commit('setLoading', { stateId, value: null })
+			commit('setColumns', { stateId, columns: [] })
+			commit('setRows', { stateId, rows: [] })
+		},
+		removeDataFromState({ commit }, { stateId }) {
+			commit('removeLoading', { stateId })
+			commit('removeColumns', { stateId })
+			commit('removeRows', { stateId })
+		},
 		// COLUMNS
 		async getColumnsFromBE({ commit }, { tableId, viewId }) {
-			commit('setLoading', true)
+			const stateId = viewId ? 'view-' + viewId : tableId
+			if (stateId) {
+				commit('setLoading', { stateId, value: true })
+			}
 			let res = null
 
 			try {
@@ -57,22 +81,27 @@ export default {
 				return false
 			}
 			const columns = res.data.map(col => parseCol(col))
-			commit('setLoading', false)
+			if (stateId) {
+				commit('setLoading', { stateId, value: false })
+			}
 			return columns
 		},
-		async loadColumnsFromBE({ commit, dispatch }, { view, table }) {
-			let allColumns = await dispatch('getColumnsFromBE', { tableId: table?.id, viewId: view?.id })
+		async loadColumnsFromBE({ commit, dispatch }, { view, tableId }) {
+			let allColumns = await dispatch('getColumnsFromBE', { tableId: tableId, viewId: view?.id })
 			if (view) {
 				allColumns = allColumns.concat(MetaColumns.filter(col => view.columns.includes(col.id)))
 				allColumns = allColumns.sort(function(a, b) {
 					return view.columns.indexOf(a.id) - view.columns.indexOf(b.id)
 				  })
 			}
-			commit('setColumns', allColumns)
+			const stateId = view?.id ? 'view-' + view.id : tableId
+			if (stateId) {
+				commit('setColumns', { stateId, columns: allColumns })
+			}
 			return true
 		},
-		async insertNewColumn({ commit, state }, { data }) {
-			commit('setLoading', true)
+		async insertNewColumn({ commit, state }, { stateId, data }) {
+			commit('setLoading', { stateId, value: true })
 			let res = null
 
 			try {
@@ -81,15 +110,17 @@ export default {
 				displayError(e, t('tables', 'Could not insert column.'))
 				return false
 			}
+			if (stateId) {
+				const columns = state.columns[stateId]
+				columns.push(parseCol(res.data))
 
-			const columns = state.columns
-			columns.push(parseCol(res.data))
-			commit('setColumns', columns)
+				commit('setColumns', { stateId, columns })
 
-			commit('setLoading', false)
+				commit('setLoading', { stateId, value: false })
+			}
 			return true
 		},
-		async updateColumn({ state, commit }, { id, data }) {
+		async updateColumn({ state, commit }, { id, stateId, data }) {
 			data.selectionOptions = JSON.stringify(data.selectionOptions)
 			let res = null
 
@@ -100,15 +131,17 @@ export default {
 				return false
 			}
 
-			const col = res.data
-			const columns = state.columns
-			const index = columns.findIndex(c => c.id === col.id)
-			columns[index] = parseCol(col)
-			commit('setColumns', [...columns])
+			if (stateId) {
+				const col = res.data
+				const columns = state.columns[stateId]
+				const index = columns.findIndex(c => c.id === col.id)
+				columns[index] = parseCol(col)
+				commit('setColumns', { stateId, columns: [...columns] })
+			}
 
 			return true
 		},
-		async removeColumn({ state, commit }, { id }) {
+		async removeColumn({ state, commit }, { id, stateId }) {
 			try {
 				await axios.delete(generateUrl('/apps/tables/column/' + id))
 			} catch (e) {
@@ -116,17 +149,22 @@ export default {
 				return false
 			}
 
-			const columns = state.columns
-			const index = columns.findIndex(c => c.id === id)
-			columns.splice(index, 1)
-			commit('setColumns', [...columns])
+			if (stateId) {
+				const columns = state.columns[stateId]
+				const index = columns.findIndex(c => c.id === id)
+				columns.splice(index, 1)
+				commit('setColumns', { stateId, columns: [...columns] })
+			}
 
 			return true
 		},
 
 		// ROWS
 		async loadRowsFromBE({ commit }, { tableId, viewId }) {
-			commit('setLoading', true)
+			const stateId = viewId ? 'view-' + viewId : tableId
+			if (stateId) {
+				commit('setLoading', { stateId, value: true })
+			}
 			let res = null
 
 			try {
@@ -140,15 +178,18 @@ export default {
 				return false
 			}
 
-			commit('setRows', res.data)
-
-			commit('setLoading', false)
+			if (stateId) {
+				commit('setRows', { stateId, rows: res.data })
+				commit('setLoading', { stateId, value: false })
+			}
 			return true
 		},
-		removeRows({ commit }) {
-			commit('setRows', [])
+		removeRows({ commit }, { stateId }) {
+			if (stateId) {
+				commit('setRows', { stateId, rows: [] })
+			}
 		},
-		async updateRow({ state, commit, dispatch }, { id, viewId, data }) {
+		async updateRow({ state, commit, dispatch }, { id, viewId, stateId, data }) {
 			let res = null
 
 			try {
@@ -164,14 +205,17 @@ export default {
 				return false
 			}
 
-			const row = res.data
-			const rows = state.rows
-			const index = rows.findIndex(r => r.id === row.id)
-			rows[index] = row
-			commit('setRows', [...rows])
+			if (stateId) {
+				const row = res.data
+				const rows = state.rows[stateId]
+				const index = rows.findIndex(r => r.id === row.id)
+				rows[index] = row
+				commit('setRows', { stateId, rows: [...rows] })
+			}
 			return true
 		},
 		async insertNewRow({ state, commit, dispatch }, { viewId, tableId, data }) {
+			const stateId = viewId ? 'view-' + viewId : tableId
 			let res = null
 
 			try {
@@ -181,13 +225,15 @@ export default {
 				return false
 			}
 
-			const row = res.data
-			const rows = state.rows
-			rows.push(row)
-			commit('setRows', [...rows])
+			if (stateId) {
+				const row = res.data
+				const rows = state.rows[stateId]
+				rows.push(row)
+				commit('setRows', { stateId, rows: [...rows] })
+			}
 			return true
 		},
-		async removeRow({ state, commit, dispatch }, { rowId, viewId }) {
+		async removeRow({ state, commit, dispatch }, { rowId, viewId, stateId }) {
 			try {
 				if (viewId) await axios.delete(generateUrl('/apps/tables/view/' + viewId + '/row/' + rowId))
 				else await axios.delete(generateUrl('/apps/tables/row/' + rowId))
@@ -201,11 +247,12 @@ export default {
 				return false
 			}
 
-			const rows = state.rows
-			const index = rows.findIndex(r => r.id === rowId)
-			rows.splice(index, 1)
-			commit('setRows', [...rows])
-
+			if (stateId) {
+				const rows = state.rows[stateId]
+				const index = rows.findIndex(r => r.id === rowId)
+				rows.splice(index, 1)
+				commit('setRows', { stateId, rows: [...rows] })
+			}
 			return true
 		},
 	},

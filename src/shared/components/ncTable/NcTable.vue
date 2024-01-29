@@ -41,26 +41,28 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 		<div class="options row" style="padding-right: calc(var(--default-grid-baseline) * 2);">
 			<Options :rows="rows"
 				:columns="parsedColumns"
+				:table-id="tableId"
 				:selected-rows="localSelectedRows"
 				:show-options="parsedColumns.length !== 0"
 				:view-setting.sync="localViewSetting"
 				:config="config"
-				@create-row="$emit('create-row')"
+				@create-row="$emit('create-row', tableId)"
 				@download-csv="data => downloadCsv(data, parsedColumns, downloadTitle)"
 				@set-search-string="str => setSearchString(str)"
-				@delete-selected-rows="rowIds => $emit('delete-selected-rows', rowIds)" />
+				@delete-selected-rows="rowIds => $emit('delete-selected-rows', rowIds, tableId)" />
 		</div>
 		<div class="custom-table row">
 			<CustomTable v-if="config.canReadRows || (config.canCreateRows && rows.length > 0)"
+				:table-id="tableId"
 				:columns="parsedColumns"
 				:rows="rows"
 				:view-setting.sync="localViewSetting"
 				:config="config"
-				@create-row="$emit('create-row')"
-				@edit-row="rowId => $emit('edit-row', rowId)"
-				@create-column="$emit('create-column')"
-				@edit-column="col => $emit('edit-column', col)"
-				@delete-column="col => $emit('delete-column', col)"
+				@create-row="$emit('create-row', tableId)"
+				@edit-row="rowId => $emit('edit-row', rowId, tableId)"
+				@create-column="$emit('create-column', tableId)"
+				@edit-column="col => $emit('edit-column', col, tableId)"
+				@delete-column="col => $emit('delete-column', col, tableId)"
 				@update-selected-rows="rowIds => localSelectedRows = rowIds"
 				@download-csv="data => downloadCsv(data, parsedColumns, table)">
 				<template #actions>
@@ -121,6 +123,10 @@ export default {
 		columns: {
 			type: Array,
 			default: () => [],
+		},
+		tableId: {
+			type: Number,
+			default: null,
 		},
 		downloadTitle: {
 			type: String,
@@ -225,15 +231,17 @@ export default {
 		},
 	},
 	mounted() {
-		subscribe('tables:selected-rows:deselect', this.deselectRows)
+		subscribe('tables:selected-rows:deselect', tableId => { this.deselectRows(tableId) })
 	},
 	beforeDestroy() {
-		unsubscribe('tables:selected-rows:deselect', this.deselectRows)
+		unsubscribe('tables:selected-rows:deselect', tableId => { this.deselectRows(tableId) })
 	},
 	methods: {
 		t,
-		deselectRows() {
-			this.localSelectedRows = []
+		deselectRows(tableId) {
+			if (tableId === this.tableId) {
+				this.localSelectedRows = []
+			}
 		},
 		setSearchString(str) {
 			this.localViewSetting.searchString = str !== '' ? str : null

@@ -66,6 +66,7 @@ import DatetimeDateForm from '../../shared/components/ncTable/partials/columnTyp
 import DatetimeTimeForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeTimeForm.vue'
 import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandler.js'
 import moment from '@nextcloud/moment'
+import { mapGetters } from 'vuex'
 
 export default {
 	name: 'EditColumn',
@@ -115,6 +116,7 @@ export default {
 		}
 	},
 	computed: {
+		...mapGetters(['activeElement', 'isView']),
 		otherActionPerformed() {
 			return !!(this.editColumn !== null || this.deleteId !== null)
 		},
@@ -180,7 +182,7 @@ export default {
 			delete data.lastEditAt
 			delete data.lastEditBy
 			console.debug('this column data will be send', data)
-			const res = await this.$store.dispatch('updateColumn', { id: this.editColumn.id, data })
+			const res = await this.$store.dispatch('updateColumn', { id: this.editColumn.id, stateId: this.isView ? 'view-' + this.activeElement.id : this.activeElement.id, data })
 			if (res) {
 				showSuccess(t('tables', 'The column "{column}" was updated.', { column: this.editColumn.title }))
 			}

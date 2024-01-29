@@ -68,8 +68,8 @@ export default {
 	computed: {
 		...mapState(['activeRowId']),
 		...mapState({
-			columns: state => state.data.columns,
-			rows: state => state.data.rows,
+			columns(state) { return state.data.columns[this.isView ? 'view-' + this.element.id : this.element.id] },
+			rows(state) { return state.data.rows[this.isView ? 'view-' + this.element.id : this.element.id] },
 		}),
 	},
 
@@ -79,24 +79,35 @@ export default {
 		},
 	},
 
-	mounted() {
+	beforeMount() {
 		this.reload(true)
 	},
 
 	methods: {
+		setActiveElement() {
+			if (this.isView) {
+				this.$store.commit('setActiveViewId', parseInt(this.element.id))
+			} else {
+				this.$store.commit('setActiveTableId', parseInt(this.element.id))
+			}
+		},
 		createColumn() {
+			this.setActiveElement()
 			emit('tables:column:create')
 		},
 		downloadCSV() {
 			this.downloadCsv(this.rows, this.columns, this.element.title)
 		},
 		toggleShare() {
+			this.setActiveElement()
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
 		},
 		showIntegration() {
+			this.setActiveElement()
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
 		},
 		openImportModal() {
+			this.setActiveElement()
 			emit('tables:modal:import', { element: this.element, isView: this.isView })
 		},
 		deleteRows(rowIds) {
@@ -106,15 +117,22 @@ export default {
 			if (!this.element) {
 				return
 			}
+			const stateId = this.isView ? 'view-' + this.element.id : this.element.id
+			// if (stateId && !(stateId in this.$store.state.data.rows)) {
+			// 	this.$store.dispatch('initState', { stateId })
+			// }
 
 			if (!this.lastActiveElement || this.element.id !== this.lastActiveElement.id || this.isView !== this.lastActiveElement.isView || force) {
+				if (this.lastActiveElement) {
+					this.$store.dispatch('removeDataFromState', { stateId: this.lastActiveElement.id })
+				}
 				this.localLoading = true
 
 				this.viewSetting = {}
 
 				await this.$store.dispatch('loadColumnsFromBE', {
 					view: this.isView ? this.element : null,
-					table: !this.isView ? this.element : null,
+					tableId: !this.isView ? this.element.id : null,
 				})
 				if (this.canReadData(this.element)) {
 					await this.$store.dispatch('loadRowsFromBE', {
@@ -122,13 +140,14 @@ export default {
 						tableId: !this.isView ? this.element.id : null,
 					})
 				} else {
-					await this.$store.dispatch('removeRows')
+					await this.$store.dispatch('removeRows', { stateId })
 				}
-				this.lastActiveViewId = {
+				this.lastActiveElement = {
 					id: this.element.id,
 					isView: this.isView,
 				}
 				if (this.activeRowId) {
+					this.setActiveElement()
 					emit('tables:row:edit', { row: this.rows.find(r => r.id === this.activeRowId), columns: this.columns })
 				}
 				this.localLoading = false
