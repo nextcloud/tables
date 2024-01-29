@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.0-beta.1 - 2024-01-29
+### Added
+- New database structure: https://github.com/nextcloud/tables/pull/749
+- Filtering in views for multi selection: https://github.com/nextcloud/tables/pull/798
+
+### Updated
+- Update software dependencies
+
 ## 0.6.5 - 2023-12-18
 ### Upgraded
 - 🏳️ Translations
