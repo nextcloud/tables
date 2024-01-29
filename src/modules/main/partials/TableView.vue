@@ -2,6 +2,7 @@
 	<NcTable v-if="columns.length > 0"
 		:rows="rows"
 		:columns="columns"
+		:table-id="element.id"
 		:download-title="element.title"
 		:view-setting.sync="localViewSetting"
 		:can-read-rows="canReadRows"
@@ -109,29 +110,44 @@ export default {
 	},
 
 	methods: {
+		setActiveElement() {
+			if (this.isView) {
+				this.$store.commit('setActiveViewId', parseInt(this.element.id))
+			} else {
+				this.$store.commit('setActiveTableId', parseInt(this.element.id))
+			}
+		},
 		createColumn() {
+			this.setActiveElement()
 			emit('tables:column:create')
 		},
 		editColumn(column) {
+			this.setActiveElement()
 			emit('tables:column:edit', column)
 		},
 		deleteColumn(column) {
+			this.setActiveElement()
 			emit('tables:column:delete', column)
 		},
 		createRow() {
+			this.setActiveElement()
 			emit('tables:row:create', this.columns)
 		},
 		editRow(rowId) {
+			this.setActiveElement()
 			emit('tables:row:edit', { row: this.rows.find(r => r.id === rowId), columns: this.columns })
 		},
 		deleteSelectedRows(rows) {
+			this.setActiveElement()
 			emit('tables:row:delete', rows)
 		},
 
 		toggleShare() {
+			this.setActiveElement()
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
 		},
 		actionShowIntegration() {
+			this.setActiveElement()
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
 		},
 		openImportModal(element) {

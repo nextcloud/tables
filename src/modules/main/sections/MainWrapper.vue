@@ -14,6 +14,7 @@
 				@toggle-share="toggleShare"
 				@show-integration="showIntegration" />
 			<CustomTable v-else
+				:table-id="element.id"
 				:table="element"
 				:columns="columns"
 				:rows="rows"
@@ -84,16 +85,26 @@ export default {
 	},
 
 	methods: {
+		setActiveElement() {
+			if (this.isView) {
+				this.$store.commit('setActiveViewId', parseInt(this.element.id))
+			} else {
+				this.$store.commit('setActiveTableId', parseInt(this.element.id))
+			}
+		},
 		createColumn() {
+			this.setActiveElement()
 			emit('tables:column:create')
 		},
 		downloadCSV() {
 			this.downloadCsv(this.rows, this.columns, this.element.title)
 		},
 		toggleShare() {
+			this.setActiveElement()
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
 		},
 		showIntegration() {
+			this.setActiveElement()
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
 		},
 		openImportModal() {
@@ -129,6 +140,7 @@ export default {
 					isView: this.isView,
 				}
 				if (this.activeRowId) {
+					this.setActiveElement()
 					emit('tables:row:edit', { row: this.rows.find(r => r.id === this.activeRowId), columns: this.columns })
 				}
 				this.localLoading = false

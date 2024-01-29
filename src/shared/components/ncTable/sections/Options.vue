@@ -99,6 +99,10 @@ export default {
 			type: Array,
 			default: () => [],
 		},
+		tableId: {
+			type: Number,
+			default: null,
+		},
 		showOptions: {
 			type: Boolean,
 			default: true,
@@ -160,7 +164,7 @@ export default {
 			this.$emit('delete-selected-rows', this.selectedRows)
 		},
 		deselectAllRows() {
-			emit('tables:selected-rows:deselect', {})
+			emit('tables:selected-rows:deselect', this.tableId)
 		},
 	},
 }
