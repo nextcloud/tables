@@ -61,6 +61,6 @@
     "cypress": "^13.6.3",
     "cypress-downloadfile": "^1.2.3",
     "sass": "^1.70.0",
-    "sass-loader": "^13.3.3"
+    "sass-loader": "^14.1.0"
   }
 }
