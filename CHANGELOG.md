@@ -4,9 +4,19 @@
 ### Added
 - New database structure: https://github.com/nextcloud/tables/pull/749
 - Filtering in views for multi selection: https://github.com/nextcloud/tables/pull/798
+- API v2 and docs in API viewer
+- icon replaced
+- occ commands for manual data transfer and cleanup
 
 ### Updated
 - Update software dependencies
+
+## 0.6.6
+### Updated
+- Fix number column issues [#784](https://github.com/nextcloud/tables/pull/784)
+- fix: add display names to all column meta data printouts [#785](https://github.com/nextcloud/tables/pull/785)
+- Avoid failures with link column database values from previous versions [#780](https://github.com/nextcloud/tables/pull/780)
+- fix(sorting): handle NaN results if the values are empty [#757](https://github.com/nextcloud/tables/pull/757)
 
 ## 0.6.5 - 2023-12-18
 ### Upgraded
