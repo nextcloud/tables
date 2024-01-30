@@ -195,6 +195,7 @@ class RowService extends SuperService {
 		$data = $this->cleanupData($data, $columns, $tableId, $viewId);
 
 		// perf
+		$tableId = $tableId ?? $view->getTableId();
 		$row2 = new Row2();
 		$row2->setTableId($tableId);
 		$row2->setData($data);
