@@ -1,6 +1,6 @@
 <template>
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description">
-		<NcSelect v-model="localValue" :options="getAllNonDeletedOptions" />
+		<NcSelect v-model="localValue" :options="getAllNonDeletedOptions" :aria-label-combobox="t('tables', 'Options')" />
 	</RowFormWrapper>
 </template>
 
