@@ -1,5 +1,5 @@
 <template>
-	<NcEmptyContent :title="t('tables', 'No columns selected')"
+	<NcEmptyContent :name="t('tables', 'No columns selected')"
 		:description="t('tables', 'The view is empty. Edit which columns should be displayed.')">
 		<template #icon>
 			{{ activeView.emoji }}

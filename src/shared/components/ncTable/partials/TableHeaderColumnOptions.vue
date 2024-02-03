@@ -12,7 +12,7 @@
 					</template>
 					{{ t('tables', 'Back') }}
 				</NcActionButton>
-				<NcActionCaption :title="t('tables', 'Select operator')" />
+				<NcActionCaption :name="t('tables', 'Select operator')" />
 				<NcActionRadio
 					v-for="(op, index) in getOperators"
 					:key="index"
@@ -31,7 +31,7 @@
 					</template>
 					{{ t('tables', 'Back') }}
 				</NcActionButton>
-				<NcActionCaption :title="t('tables', 'Search for value')" />
+				<NcActionCaption :name="t('tables', 'Search for value')" />
 				<NcActionInput
 					:label-visible="false"
 					:label="t('tables', 'Keyword and submit')"
@@ -44,7 +44,7 @@
 				</NcActionInput>
 				<NcActionCaption
 					v-if="getMagicFields.length > 0"
-					:title="t('tables', 'Or use magic values')" />
+					:name="t('tables', 'Or use magic values')" />
 				<NcActionButton
 					v-for="(magicField, index) in getMagicFields"
 					:key="'magic-field-' + index"
@@ -56,7 +56,7 @@
 				</NcActionButton>
 			</template>
 			<template v-else>
-				<NcActionCaption v-if="canSort" :title="t('tables', 'Sorting')" />
+				<NcActionCaption v-if="canSort" :name="t('tables', 'Sorting')" />
 				<NcActionButtonGroup v-if="canSort">
 					<NcActionButton :class="{ selected: getSortMode === 'ASC' }" :aria-label="t('tables', 'Sort asc')" @click="sort('ASC')">
 						<template #icon>
@@ -69,7 +69,7 @@
 						</template>
 					</NcActionButton>
 				</NcActionButtonGroup>
-				<NcActionCaption v-if="showFilter && hasOperators" :title="t('tables', 'Filtering')" />
+				<NcActionCaption v-if="showFilter && hasOperators" :name="t('tables', 'Filtering')" />
 				<NcActionButton
 					v-if="showFilter && hasOperators"
 					:title="selectedOperator.label"
@@ -87,7 +87,7 @@
 					</template>
 					{{ t('tables', 'Select value') }}
 				</NcActionButton>
-				<NcActionCaption v-if="hasManageColumnEntries" :title="t('tables', 'Manage column')" />
+				<NcActionCaption v-if="hasManageColumnEntries" :name="t('tables', 'Manage column')" />
 				<NcActionButtonGroup v-if="hasManageColumnEntries" :name="t('tables', 'Column manage actions')">
 					<NcActionButton
 						v-if="showHideColumn"

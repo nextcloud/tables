@@ -117,7 +117,7 @@
 
 			<!-- show loading -->
 			<div v-if="loading && !waitForReload">
-				<NcEmptyContent :title="t('tables', 'Importing...')" :description="t('tables', 'Please wait while we try our best to import your data. This might take some time, depending on the server configuration.')">
+				<NcEmptyContent :name="t('tables', 'Importing...')" :description="t('tables', 'Please wait while we try our best to import your data. This might take some time, depending on the server configuration.')">
 					<template #icon>
 						<NcIconTimerSand />
 					</template>
@@ -125,7 +125,7 @@
 			</div>
 
 			<div v-if="waitForReload">
-				<NcLoadingIcon :title="t('tables', 'Loading table data')" :size="64" />
+				<NcLoadingIcon :name="t('tables', 'Loading table data')" :size="64" />
 			</div>
 		</div>
 	</NcModal>

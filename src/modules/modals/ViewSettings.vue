@@ -21,7 +21,7 @@
 			</div>
 		</NcAppSettingsSection>
 		<!--columns & order-->
-		<NcAppSettingsSection v-if="columns != null" id="columns-and-order" :title="t('tables', 'Columns')">
+		<NcAppSettingsSection v-if="columns != null" id="columns-and-order" :name="t('tables', 'Columns')">
 			<SelectedViewColumns
 				:columns="allColumns"
 				:selected-columns="selectedColumns"
@@ -30,7 +30,7 @@
 				:disable-hide="!canManageTable(view)" />
 		</NcAppSettingsSection>
 		<!--filtering-->
-		<NcAppSettingsSection v-if="columns != null && canManageTable(view)" id="filter" :title="t('tables', 'Filter')">
+		<NcAppSettingsSection v-if="columns != null && canManageTable(view)" id="filter" :name="t('tables', 'Filter')">
 			<FilterForm
 				:filters.sync="mutableFilters"
 				:view-filters="viewSetting ? view.filter : null"
@@ -38,7 +38,7 @@
 				:columns="allColumns" />
 		</NcAppSettingsSection>
 		<!--sorting-->
-		<NcAppSettingsSection v-if="columns != null" id="sort" :title="t('tables', 'Sort')">
+		<NcAppSettingsSection v-if="columns != null" id="sort" :name="t('tables', 'Sort')">
 			<SortForm
 				:sort="mutableView.sort"
 				:view-sort="viewSetting ? view.sort : null"

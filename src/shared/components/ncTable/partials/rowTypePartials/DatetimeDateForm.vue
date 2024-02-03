@@ -1,6 +1,6 @@
 <template>
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :width="2">
-		<NcDatetimePicker v-model="localValue"
+		<NcDateTimePicker v-model="localValue"
 			type="date"
 			format="YYYY-MM-DD"
 			:clearable="false"
@@ -10,13 +10,13 @@
 </template>
 
 <script>
-import { NcDatetimePicker } from '@nextcloud/vue'
+import { NcDateTimePicker } from '@nextcloud/vue'
 import Moment from '@nextcloud/moment'
 import RowFormWrapper from './RowFormWrapper.vue'
 
 export default {
 	components: {
-		NcDatetimePicker,
+		NcDateTimePicker,
 		RowFormWrapper,
 	},
 	props: {

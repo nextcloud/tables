@@ -2,7 +2,7 @@
 	<div>
 		<NcAppSidebar v-show="showSidebar"
 			:active="activeSidebarTab"
-			:title="elementTitle"
+			:name="elementTitle"
 			@update:active="tab => activeSidebarTab = tab"
 			@close="showSidebar = false">
 			<template #description>

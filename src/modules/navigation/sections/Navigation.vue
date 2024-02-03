@@ -14,7 +14,7 @@
 			</div>
 
 			<ul v-if="!tablesLoading">
-				<NcAppNavigationCaption :title="t('tables', 'My tables')">
+				<NcAppNavigationCaption :name="t('tables', 'My tables')">
 					<template #actions>
 						<NcActionButton :aria-label="t('tables', 'Create table')" icon="icon-add" @click.prevent="createTable" />
 					</template>
@@ -25,7 +25,7 @@
 					:table="table" />
 
 				<NcAppNavigationCaption v-if="getSharedTables.length > 0 || getSharedViews.length > 0"
-					:title="t('tables', 'Shared')" />
+					:name="t('tables', 'Shared')" />
 				<NavigationTableItem v-for="table in getSharedTables"
 					:key="table.id"
 					:filter-string="filterString"
