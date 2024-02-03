@@ -135,6 +135,14 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		isView: {
+			type: Boolean,
+			default: false,
+		},
+		element: {
+			type: Object,
+			default: null,
+		},
 	},
 	data() {
 		return {
@@ -177,7 +185,6 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['activeElement', 'isView']),
 		combinedType: {
 			get() {
 				return this.column.type ? this.column.type + ((this.column.subtype) ? ('-' + this.column.subtype) : '') : null
@@ -248,8 +255,8 @@ export default {
 					description: this.column.description,
 					selectedViewIds: this.column.selectedViews.map(view => view.id),
 					mandatory: this.column.mandatory,
-					viewId: this.isView ? this.activeElement.id : null,
-					tableId: !this.isView ? this.activeElement.id : null,
+					viewId: this.isView ? this.element.id : null,
+					tableId: !this.isView ? this.element.id : null,
 				}
 				if (this.combinedType === ColumnTypes.TextLine || this.combinedType === ColumnTypes.TextLong) {
 					data.textDefault = this.column.textDefault
@@ -282,7 +289,7 @@ export default {
 					showWarning(t('tables', 'Sorry, something went wrong.'))
 					console.debug('axios error', res)
 				}
-				await this.$store.dispatch('reloadViewsOfTable', { tableId: this.isView ? this.activeElement.tableId : this.activeElement.id })
+				await this.$store.dispatch('reloadViewsOfTable', { tableId: this.isView ? this.element.tableId : this.element.id })
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not create new column.'))

@@ -81,8 +81,8 @@ export default {
 		async transferMe() {
 			const transferId = this.table.id
 			let activeTableId
-			if (this.activeElement) {
-				activeTableId = this.isView ? this.activeElement.id : this.activeElement.tableId
+			if (this.activeTable) {
+				activeTableId = !this.isView ? this.activeTable.id : null
 			}
 			const res = await this.$store.dispatch('transferTable', { id: this.table.id, data: { newOwnerUserId: this.newOwnerUserId } })
 			if (res) {

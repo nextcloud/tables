@@ -32,7 +32,7 @@
 							{{ t('tables', 'I really want to delete this row!') }}
 						</NcButton>
 					</div>
-					<NcButton v-if="canUpdateData(activeElement) && !localLoading" :aria-label="t('tables', 'Save')" type="primary"
+					<NcButton v-if="canUpdateData(element) && !localLoading" :aria-label="t('tables', 'Save')" type="primary"
 						data-cy="editRowSaveButton"
 						:disabled="hasEmptyMandatoryRows"
 						@click="actionConfirm">
@@ -51,7 +51,6 @@ import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import ColumnFormComponent from '../main/partials/ColumnFormComponent.vue'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
-import { mapGetters } from 'vuex'
 
 export default {
 	name: 'EditRow',
@@ -75,6 +74,14 @@ export default {
 			type: Object,
 			default: null,
 		},
+		isView: {
+			type: Boolean,
+			default: false,
+		},
+		element: {
+			type: Number,
+			default: null,
+		},
 	},
 	data() {
 		return {
@@ -84,9 +91,8 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['activeElement', 'isView']),
 		showDeleteButton() {
-			return this.canDeleteData(this.activeElement) && !this.localLoading
+			return this.canDeleteData(this.element.id) && !this.localLoading
 		},
 		nonMetaColumns() {
 			return this.columns.filter(col => col.id >= 0)
@@ -157,7 +163,7 @@ export default {
 			}
 			const res = await this.$store.dispatch('updateRow', {
 				id: this.row.id,
-				viewId: this.isView ? this.activeElement.id : null,
+				viewId: this.isView ? this.element.id : null,
 				data,
 			})
 			if (!res) {
@@ -176,7 +182,7 @@ export default {
 			this.localLoading = true
 			const res = await this.$store.dispatch('removeRow', {
 				rowId,
-				viewId: this.isView ? this.activeElement.id : null,
+				viewId: this.isView ? this.element.id : null,
 			})
 			if (!res) {
 				showError(t('tables', 'Could not delete row.'))

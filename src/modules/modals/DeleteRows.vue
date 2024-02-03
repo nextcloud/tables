@@ -15,7 +15,6 @@ import DialogConfirmation from '../../shared/modals/DialogConfirmation.vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import { emit } from '@nextcloud/event-bus'
-import { mapGetters } from 'vuex'
 
 export default {
 	name: 'DeleteRows',
@@ -28,16 +27,13 @@ export default {
 			default: null,
 		},
 	},
-	computed: {
-		...mapGetters(['activeElement', 'isView']),
-	},
 	methods: {
 		deleteRows() {
 			let error = false
-			this.rowsToDelete.forEach(rowId => {
+			this.rowsToDelete.rows.forEach(rowId => {
 				const res = this.$store.dispatch('removeRow', {
 					rowId,
-					viewId: this.isView ? this.activeElement.id : null,
+					viewId: this.rowsToDelete.isView ? this.rowsToDelete.elementId : null,
 				})
 				if (!res) {
 					error = true
@@ -46,7 +42,7 @@ export default {
 			if (error) {
 				showError(t('tables', 'Error occurred while deleting rows.'))
 			}
-			emit('tables:selected-rows:deselect', this.activeElement.id)
+			emit('tables:selected-rows:deselect', this.rowsToDelete.elementId)
 			this.$emit('cancel')
 		},
 	},

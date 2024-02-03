@@ -104,6 +104,14 @@ export default {
 			type: Object,
 			default: null,
 		},
+		isView: {
+			type: Boolean,
+			default: false,
+		},
+		elementId: {
+			type: Number,
+			default: null,
+		},
 	},
 	data() {
 		return {

@@ -85,26 +85,16 @@ export default {
 	},
 
 	methods: {
-		setActiveElement() {
-			if (this.isView) {
-				this.$store.commit('setActiveViewId', parseInt(this.element.id))
-			} else {
-				this.$store.commit('setActiveTableId', parseInt(this.element.id))
-			}
-		},
 		createColumn() {
-			this.setActiveElement()
-			emit('tables:column:create')
+			emit('tables:column:create', { isView: this.isView, element: this.element })
 		},
 		downloadCSV() {
 			this.downloadCsv(this.rows, this.columns, this.element.title)
 		},
 		toggleShare() {
-			this.setActiveElement()
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
 		},
 		showIntegration() {
-			this.setActiveElement()
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
 		},
 		openImportModal() {
@@ -140,8 +130,7 @@ export default {
 					isView: this.isView,
 				}
 				if (this.activeRowId) {
-					this.setActiveElement()
-					emit('tables:row:edit', { row: this.rows.find(r => r.id === this.activeRowId), columns: this.columns })
+					emit('tables:row:edit', { row: this.rows.find(r => r.id === this.activeRowId), columns: this.columns, isView: this.isView, elementId: this.element.id })
 				}
 				this.localLoading = false
 			}

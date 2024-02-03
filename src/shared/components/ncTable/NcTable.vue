@@ -231,10 +231,10 @@ export default {
 		},
 	},
 	mounted() {
-		subscribe('tables:selected-rows:deselect', tableId => { this.deselectRows(tableId) })
+		subscribe('tables:selected-rows:deselect', tableId => this.deselectRows(tableId))
 	},
 	beforeDestroy() {
-		unsubscribe('tables:selected-rows:deselect', tableId => { this.deselectRows(tableId) })
+		unsubscribe('tables:selected-rows:deselect', tableId => this.deselectRows(tableId))
 	},
 	methods: {
 		t,

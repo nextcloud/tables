@@ -220,10 +220,10 @@ export default {
 	},
 
 	mounted() {
-		subscribe('tables:selected-rows:deselect', tableId => { this.deselectAllRows(tableId) })
+		subscribe('tables:selected-rows:deselect', tableId => this.deselectAllRows(tableId))
 	},
 	beforeDestroy() {
-		unsubscribe('tables:selected-rows:deselect', tableId => { this.deselectAllRows(tableId) })
+		unsubscribe('tables:selected-rows:deselect', tableId => this.deselectAllRows(tableId) )
 	},
 
 	methods: {

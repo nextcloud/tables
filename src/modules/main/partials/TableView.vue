@@ -110,44 +110,29 @@ export default {
 	},
 
 	methods: {
-		setActiveElement() {
-			if (this.isView) {
-				this.$store.commit('setActiveViewId', parseInt(this.element.id))
-			} else {
-				this.$store.commit('setActiveTableId', parseInt(this.element.id))
-			}
-		},
 		createColumn() {
-			this.setActiveElement()
-			emit('tables:column:create')
+			emit('tables:column:create', { isView: this.isView, element: this.element })
 		},
 		editColumn(column) {
-			this.setActiveElement()
-			emit('tables:column:edit', column)
+			emit('tables:column:edit', { column, isView: this.isView, elementId: this.element.id })
 		},
 		deleteColumn(column) {
-			this.setActiveElement()
-			emit('tables:column:delete', column)
+			emit('tables:column:delete', {column, isView: this.isView, elementId: this.element.id})
 		},
 		createRow() {
-			this.setActiveElement()
-			emit('tables:row:create', this.columns)
+			emit('tables:row:create', { column: this.columns, isView: this.isView, elementId: this.element.id })
 		},
 		editRow(rowId) {
-			this.setActiveElement()
-			emit('tables:row:edit', { row: this.rows.find(r => r.id === rowId), columns: this.columns })
+			emit('tables:row:edit', { row: this.rows.find(r => r.id === rowId), columns: this.columns, isView: this.isView, element: this.element })
 		},
 		deleteSelectedRows(rows) {
-			this.setActiveElement()
-			emit('tables:row:delete', rows)
+			emit('tables:row:delete', { rows, isView: this.isView, elementId: this.element.id })
 		},
 
 		toggleShare() {
-			this.setActiveElement()
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
 		},
 		actionShowIntegration() {
-			this.setActiveElement()
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
 		},
 		openImportModal(element) {
