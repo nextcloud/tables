@@ -40,4 +40,8 @@ export default {
 	opacity: 1;
 }
 
+.empty-content {
+	margin-top: 20vh;
+}
+
 </style>

@@ -35,3 +35,11 @@ export default {
 	},
 }
 </script>
+
+<style scoped>
+
+:deep(.empty-content) {
+	margin-top: 20vh;
+}
+
+</style>
