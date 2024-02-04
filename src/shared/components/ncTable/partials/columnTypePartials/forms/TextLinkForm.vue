@@ -13,7 +13,7 @@
 				</NcNoteCard>
 			</div>
 			<div class="col-4 space-B typeSelection">
-				<NcCheckboxRadioSwitch v-for="provider in getProviders" :key="provider.id" :checked.sync="provider.active" type="switch">
+				<NcCheckboxRadioSwitch v-for="provider in getProviders" :key="provider.id" :checked.sync="provider.active" type="switch" data-cy="selectionOptionLabel">
 					{{ provider.label }}
 				</NcCheckboxRadioSwitch>
 			</div>

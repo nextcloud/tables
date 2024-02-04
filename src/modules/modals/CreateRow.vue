@@ -20,7 +20,7 @@
 			<div class="row">
 				<div class="fix-col-4 space-T end">
 					<div class="padding-right">
-						<NcCheckboxRadioSwitch :checked.sync="addNewAfterSave" type="switch">
+						<NcCheckboxRadioSwitch :checked.sync="addNewAfterSave" type="switch" data-cy="createRowAddMoreSwitch">
 							{{ t('tables', 'Add more') }}
 						</NcCheckboxRadioSwitch>
 					</div>

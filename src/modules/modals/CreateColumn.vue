@@ -44,10 +44,10 @@
 							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="selection" name="selectionTypeSelection" type="radio">
 								{{ t('tables', 'Single selection') }}
 							</NcCheckboxRadioSwitch>
-							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="selection-multi" name="selectionTypeSelection" type="radio">
+							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="selection-multi" name="selectionTypeSelection" type="radio" data-cy="createColumnMultipleSelectionSwitch">
 								{{ t('tables', 'Multiple selection') }}
 							</NcCheckboxRadioSwitch>
-							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="selection-check" name="selectionTypeSelection" type="radio">
+							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="selection-check" name="selectionTypeSelection" type="radio" data-cy="createColumnYesNoSwitch">
 								{{ t('tables', 'Yes/No') }}
 							</NcCheckboxRadioSwitch>
 						</div>
@@ -55,13 +55,13 @@
 
 					<div v-if="column.type === 'datetime'" class="row no-padding-on-mobile space-L">
 						<div class="col-4 typeSelections space-B space-T space-L">
-							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="datetime-date" name="datetimeTypeSelection" type="radio">
+							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="datetime-date" name="datetimeTypeSelection" type="radio" data-cy="createColumnDateSwitch">
 								{{ t('tables', 'Date') }}
 							</NcCheckboxRadioSwitch>
-							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="datetime-time" name="datetimeTypeSelection" type="radio">
+							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="datetime-time" name="datetimeTypeSelection" type="radio" data-cy="createColumnTimeSwitch">
 								{{ t('tables', 'Time') }}
 							</NcCheckboxRadioSwitch>
-							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="datetime" name="datetimeTypeSelection" type="radio">
+							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="datetime" name="datetimeTypeSelection" type="radio" data-cy="createColumnDateAndTimeSwitch">
 								{{ t('tables', 'Date and time') }}
 							</NcCheckboxRadioSwitch>
 						</div>

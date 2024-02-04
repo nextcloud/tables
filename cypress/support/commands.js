@@ -43,7 +43,7 @@ Cypress.Commands.add('createTable', (title) => {
 
 Cypress.Commands.add('createView', (title) => {
 	cy.get('[data-cy="customTableAction"] button').click()
-	cy.get('.v-popper__popper li button span').contains('Create view').click({ force: true })
+	cy.get('[data-cy="dataTableCreateViewBtn"]').contains('Create view').click({ force: true })
 
 	cy.get('.modal-container #settings-section_title input').type(title)
 
@@ -58,7 +58,7 @@ Cypress.Commands.add('createView', (title) => {
 
 Cypress.Commands.add('clickOnTableThreeDotMenu', (optionName) => {
 	cy.get('[data-cy="customTableAction"] button').click()
-	cy.get('.v-popper__popper li button span').contains(optionName).click({ force: true })
+	cy.get('[data-cy="dataTableBtn"]').contains(optionName).click({ force: true })
 })
 
 Cypress.Commands.add('sortTableColumn', (columnTitle, mode = 'ASC') => {
@@ -89,20 +89,20 @@ Cypress.Commands.add('createTextLinkColumn', (title, ressourceProvider, firstCol
 		cy.get('.button-vue__text').contains('Create column').click({ force: true })
 	} else {
 		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
 	}
 
 	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
 	cy.get('.multiSelectOptionLabel').contains('Link').click({ force: true })
 	// deactivate unwanted provider
-	cy.get('.typeSelection span label').contains('Url', { matchCase: false }).click()
-	cy.get('.typeSelection span label').contains('Files').click()
+	cy.get('.typeSelection span').contains('Url', { matchCase: false }).click()
+	cy.get('.typeSelection span').contains('Files').click()
 	// TODO is the contacts search provider deactivated by default beginning with nc28
 	// cy.get('.typeSelection span label').contains('Contacts').click()
 
 	ressourceProvider.forEach(provider =>
-		cy.get('.typeSelection span label').contains(provider, { matchCase: false }).click(),
+		cy.get('.typeSelection span').contains(provider, { matchCase: false }).click(),
 	)
 	cy.get('.modal-container button').contains('Save').click()
 
@@ -115,22 +115,22 @@ Cypress.Commands.add('createSelectionColumn', (title, options, defaultOption, fi
 		cy.get('.button-vue__text').contains('Create column').click({ force: true })
 	} else {
 		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
 	}
 
 	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
 	cy.get('.multiSelectOptionLabel').contains('Selection').click({ force: true })
 	// remove default option
-	cy.get('[data-cy="selection-option"] button').first().click()
-	cy.get('[data-cy="selection-option"] button').first().click()
+	cy.get('[data-cy="selectionOption"] button').first().click()
+	cy.get('[data-cy="selectionOption"] button').first().click()
 
 	// add wanted option
 	options.forEach(option => {
 		cy.get('button').contains('Add option').click()
-		cy.get('[data-cy="selection-option-label"]').last().type(option)
+		cy.get('[data-cy="selectionOptionLabel"]').last().type(option)
 		if (defaultOption === option) {
-			cy.get('[data-cy="selection-option"] span label').last().click()
+			cy.get('[data-cy="selectionOption"] .checkbox-radio-switch__input').last().click({force: true})
 		}
 	})
 	cy.get('.modal-container button').contains('Save').click()
@@ -144,24 +144,24 @@ Cypress.Commands.add('createSelectionMultiColumn', (title, options, defaultOptio
 		cy.get('.button-vue__text').contains('Create column').click({ force: true })
 	} else {
 		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
 	}
 
 	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
 	cy.get('.multiSelectOptionLabel').contains('Selection').click({ force: true })
-	cy.get('.modal-container label').contains('Multiple selection').click()
+	cy.get('[data-cy="createColumnMultipleSelectionSwitch"]').contains('Multiple selection').click()
 
 	// remove default option
-	cy.get('[data-cy="selection-option"] button').first().click()
-	cy.get('[data-cy="selection-option"] button').first().click()
+	cy.get('[data-cy="selectionOption"] button').first().click()
+	cy.get('[data-cy="selectionOption"] button').first().click()
 
 	// add wanted option
 	options?.forEach(option => {
 		cy.get('button').contains('Add option').click()
-		cy.get('[data-cy="selection-option-label"]').last().type(option)
+		cy.get('[data-cy="selectionOptionLabel"]').last().type(option)
 		if (defaultOptions?.includes(option)) {
-			cy.get('[data-cy="selection-option"] span label').last().click()
+			cy.get('[data-cy="selectionOptionLabel"]').last().click()
 		}
 	})
 	cy.get('.modal-container button').contains('Save').click()
@@ -175,7 +175,7 @@ Cypress.Commands.add('createTextLineColumn', (title, defaultValue, maxLength, fi
 		cy.get('.button-vue__text').contains('Create column').click({ force: true })
 	} else {
 		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
 	}
 	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
 	if (defaultValue) {
@@ -194,14 +194,14 @@ Cypress.Commands.add('createDatetimeColumn', (title, setNow, firstColumn) => {
 		cy.get('.button-vue__text').contains('Create column').click({ force: true })
 	} else {
 		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
 	}
 	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
 	cy.get('.multiSelectOptionLabel').contains('Date and time').click({ force: true })
 
 	if (setNow) {
-		cy.get('[data-cy="DatetimeForm"] label').first().click()
+		cy.get('[data-cy="datetimeFormNowSwitch"]').click()
 	}
 
 	cy.get('.modal-container button').contains('Save').click()
@@ -214,15 +214,15 @@ Cypress.Commands.add('createDatetimeDateColumn', (title, setNow, firstColumn) =>
 		cy.get('.button-vue__text').contains('Create column').click({ force: true })
 	} else {
 		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
 	}
 	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
 	cy.get('.multiSelectOptionLabel').contains('Date and time').click({ force: true })
-	cy.get('.modal-container label').contains('Date').click()
+	cy.get('[data-cy="createColumnDateSwitch"]').contains('Date').click()
 
 	if (setNow) {
-		cy.get('[data-cy="DatetimeDateForm"] label').first().click()
+		cy.get('[data-cy="datetimeDateFormTodaySwitch"]').click()
 	}
 
 	cy.get('.modal-container button').contains('Save').click()
@@ -235,15 +235,15 @@ Cypress.Commands.add('createDatetimeTimeColumn', (title, setNow, firstColumn) =>
 		cy.get('.button-vue__text').contains('Create column').click({ force: true })
 	} else {
 		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
 	}
 	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
 	cy.get('.multiSelectOptionLabel').contains('Date and time').click({ force: true })
-	cy.get('.modal-container label').contains('Time').click()
+	cy.get('[data-cy="createColumnTimeSwitch"]').contains('Time').click()
 
 	if (setNow) {
-		cy.get('[data-cy="DatetimeTimeForm"] label').first().click()
+		cy.get('[data-cy="datetimeTimeFormNowSwitch"]').click()
 	}
 
 	cy.get('.modal-container button').contains('Save').click()
@@ -256,7 +256,7 @@ Cypress.Commands.add('createNumberColumn', (title, defaultValue, decimals, min, 
 		cy.get('.button-vue__text').contains('Create column').click({ force: true })
 	} else {
 		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
 	}
 	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
@@ -290,7 +290,7 @@ Cypress.Commands.add('createNumberProgressColumn', (title, defaultValue, firstCo
 		cy.get('.button-vue__text').contains('Create column').click({ force: true })
 	} else {
 		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
 	}
 	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
@@ -309,7 +309,7 @@ Cypress.Commands.add('createNumberStarsColumn', (title, defaultValue, firstColum
 		cy.get('.button-vue__text').contains('Create column').click({ force: true })
 	} else {
 		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
 	}
 	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
@@ -330,15 +330,15 @@ Cypress.Commands.add('createSelectionCheckColumn', (title, defaultValue, firstCo
 		cy.get('.button-vue__text').contains('Create column').click({ force: true })
 	} else {
 		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('.v-popper__popper li button span').contains('Create column').click({ force: true })
+		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
 	}
 	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
 	cy.get('.multiSelectOptionLabel').contains('Selection').click({ force: true })
-	cy.get('.modal-container label').contains('Yes/No').click()
+	cy.get('[data-cy="createColumnYesNoSwitch"').contains('Yes/No').click()
 
 	if (defaultValue) {
-		cy.get('[data-cy="SelectionCheckForm"] label').last().click()
+		cy.get('[data-cy="selectionCheckFormDefaultSwitch"]').click()
 	}
 	cy.get('.modal-container button').contains('Save').click()
 	cy.wait(10).get('.toastify.toast-success').should('be.visible')
@@ -438,5 +438,5 @@ Cypress.Commands.add('fillInValueSelectionMulti', (columnTitle, optionLabels) =>
 	})
 })
 Cypress.Commands.add('fillInValueSelectionCheck', (columnTitle) => {
-	cy.get('.modal__content [data-cy="' + columnTitle + '"] .checkbox-radio-switch__label').click()
+	cy.get('.modal__content [data-cy="' + columnTitle + '"] [data-cy="selectionCheckFormSwitch"]').click()
 })

@@ -4,7 +4,7 @@
 			{{ t('tables', 'Set now as default') }}
 		</div>
 		<div class="fix-col-4 space-L-small">
-			<NcCheckboxRadioSwitch type="switch" :checked.sync="nowAsDefault" />
+			<NcCheckboxRadioSwitch type="switch" :checked.sync="nowAsDefault" data-cy="datetimeFormNowSwitch" />
 		</div>
 	</div>
 </template>

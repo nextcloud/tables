@@ -17,9 +17,8 @@
 							</template>
 							{{ t('tables', 'Edit table') }}
 						</NcActionButton>
-						<NcActionButton v-if="canManageElement(table) "
-							:close-after-click="true"
-							@click="$emit('create-view')">
+						<NcActionButton v-if="canManageElement(table)"
+							:close-after-click="true" @click="$emit('create-view')">
 							<template #icon>
 								<PlaylistPlus :size="20" decorative />
 							</template>

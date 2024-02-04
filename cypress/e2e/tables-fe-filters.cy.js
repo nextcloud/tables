@@ -74,30 +74,30 @@ describe('FE sorting and filtering', () => {
 		cy.createView('view for third tab')
 
 		// all tables and views should be visible
-		cy.get('.app-navigation-entry__title').contains('first table').should('be.visible')
-		cy.get('.app-navigation-entry__title').contains('second table').should('be.visible')
-		cy.get('.app-navigation-entry__title').contains('third table 🙇').should('be.visible')
-		cy.get('.app-navigation-entry__title').contains('view for third tab').should('be.visible')
+		cy.get('[data-cy="navigationTableItem"]').contains('first table').should('be.visible')
+		cy.get('[data-cy="navigationTableItem"]').contains('second table').should('be.visible')
+		cy.get('[data-cy="navigationTableItem"]').contains('third table 🙇').should('be.visible')
+		cy.get('[data-cy="navigationTableItem"]').contains('view for third tab').should('be.visible')
 
 		// only tables should be visible
 		cy.get('.filter-box input').clear().type('table')
-		cy.get('.app-navigation-entry__title').contains('first table').should('be.visible')
-		cy.get('.app-navigation-entry__title').contains('second table').should('be.visible')
-		cy.get('.app-navigation-entry__title').contains('third table 🙇').should('be.visible')
-		cy.get('.app-navigation-entry__title').contains('view for third tab').should('not.exist')
+		cy.get('[data-cy="navigationTableItem"]').contains('first table').should('be.visible')
+		cy.get('[data-cy="navigationTableItem"]').contains('second table').should('be.visible')
+		cy.get('[data-cy="navigationTableItem"]').contains('third table 🙇').should('be.visible')
+		cy.get('[data-cy="navigationTableItem"]').contains('view for third tab').should('not.exist')
 
 		// only the second table should be visible
 		cy.get('.filter-box input').clear().type('second')
-		cy.get('.app-navigation-entry__title').contains('first table').should('not.exist')
-		cy.get('.app-navigation-entry__title').contains('second table').should('be.visible')
-		cy.get('.app-navigation-entry__title').contains('third table 🙇').should('not.exist')
-		cy.get('.app-navigation-entry__title').contains('view for third tab').should('not.exist')
+		cy.get('[data-cy="navigationTableItem"]').contains('first table').should('not.exist')
+		cy.get('[data-cy="navigationTableItem"]').contains('second table').should('be.visible')
+		cy.get('[data-cy="navigationTableItem"]').contains('third table 🙇').should('not.exist')
+		cy.get('[data-cy="navigationTableItem"]').contains('view for third tab').should('not.exist')
 
 		// only the third table and it's view should be visible
 		cy.get('.filter-box input').clear().type('view for third')
-		cy.get('.app-navigation-entry__title').contains('first table').should('not.exist')
-		cy.get('.app-navigation-entry__title').contains('second table').should('not.exist')
-		cy.get('.app-navigation-entry__title').contains('third table 🙇').should('be.visible')
-		cy.get('.app-navigation-entry__title').contains('view for third tab').should('be.visible')
+		cy.get('[data-cy="navigationTableItem"]').contains('first table').should('not.exist')
+		cy.get('[data-cy="navigationTableItem"]').contains('second table').should('not.exist')
+		cy.get('[data-cy="navigationTableItem"]').contains('third table 🙇').should('be.visible')
+		cy.get('[data-cy="navigationTableItem"]').contains('view for third tab').should('be.visible')
 	})
 })
