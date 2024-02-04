@@ -130,7 +130,7 @@ Cypress.Commands.add('createSelectionColumn', (title, options, defaultOption, fi
 		cy.get('button').contains('Add option').click()
 		cy.get('[data-cy="selectionOptionLabel"]').last().type(option)
 		if (defaultOption === option) {
-			cy.get('[data-cy="selectionOption"] .checkbox-radio-switch__input').last().click({force: true})
+			cy.get('[data-cy="selectionOption"] .checkbox-content').last().click()
 		}
 	})
 	cy.get('.modal-container button').contains('Save').click()
@@ -161,7 +161,7 @@ Cypress.Commands.add('createSelectionMultiColumn', (title, options, defaultOptio
 		cy.get('button').contains('Add option').click()
 		cy.get('[data-cy="selectionOptionLabel"]').last().type(option)
 		if (defaultOptions?.includes(option)) {
-			cy.get('[data-cy="selectionOptionLabel"]').last().click()
+			cy.get('[data-cy="selectionOption"] .checkbox-content').last().click()
 		}
 	})
 	cy.get('.modal-container button').contains('Save').click()
