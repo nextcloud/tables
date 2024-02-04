@@ -120,8 +120,9 @@ export default {
 		// rows
 		subscribe('tables:row:create', columnsInfo => { this.columnsForRow = columnsInfo })
 		subscribe('tables:row:edit', rowInfo => { this.editRow = rowInfo })
-		subscribe('tables:row:delete', tableInfo => { 
-			this.rowsToDelete = tableInfo })
+		subscribe('tables:row:delete', tableInfo => {
+			this.rowsToDelete = tableInfo
+		})
 
 		// misc
 		subscribe('tables:modal:import', element => { this.importToElement = element })
@@ -133,8 +134,9 @@ export default {
 		unsubscribe('tables:column:delete', columnInfo => { this.columnToDelete = columnInfo })
 		unsubscribe('tables:row:create', columnsInfo => { this.columnsForRow = columnsInfo })
 		unsubscribe('tables:row:edit', rowInfo => { this.editRow = rowInfo })
-		unsubscribe('tables:row:delete', tableInfo => { 
-			this.rowsToDelete = tableInfo })
+		unsubscribe('tables:row:delete', tableInfo => {
+			this.rowsToDelete = tableInfo
+		})
 		unsubscribe('tables:view:edit', view => { this.viewToEdit = { view, createView: false } })
 		unsubscribe('tables:view:create', tableInfos => {
 			this.viewToEdit = {

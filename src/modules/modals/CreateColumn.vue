@@ -104,7 +104,6 @@ import SelectionForm from '../../shared/components/ncTable/partials/columnTypePa
 import SelectionMultiForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionMultiForm.vue'
 import { showError, showInfo, showSuccess, showWarning } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
-import { mapGetters } from 'vuex'
 import ColumnTypeSelection from '../main/partials/ColumnTypeSelection.vue'
 import TextRichForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextRichForm.vue'
 import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandler.js'

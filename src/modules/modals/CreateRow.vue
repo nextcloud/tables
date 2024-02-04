@@ -37,7 +37,6 @@
 import { NcModal, NcCheckboxRadioSwitch, NcNoteCard, NcButton } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
-import { mapGetters } from 'vuex'
 import ColumnFormComponent from '../main/partials/ColumnFormComponent.vue'
 
 export default {
