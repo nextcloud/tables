@@ -142,4 +142,8 @@ export default {
 	padding-right: calc(var(--default-grid-baseline) * 3);
 }
 
+:deep(.modal-container) {
+	overflow: visible !important;
+}
+
 </style>

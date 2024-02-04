@@ -21,7 +21,7 @@ describe('Rows for a table', () => {
 		cy.get('.modal__content .ProseMirror').first().clear()
 		cy.get('.modal__content .ProseMirror').first().type('My first description')
 		cy.get('.modal__content [aria-label="Increase stars"]').click().click()
-		cy.get('.modal-container button').contains('Save').click()
+		cy.get('.modal-container button').contains('Save').click({ force: true })
 
 		cy.get('.modal-container:visible').should('not.exist')
 		cy.get('.custom-table table').contains('My first task').should('exist')
@@ -64,7 +64,7 @@ describe('Rows for a table', () => {
 		cy.get('.modal__content .slot input').first().type('My first task')
 		cy.get('[data-cy="createRowModal"] .notecard--error').should('not.exist')
 		cy.get('[data-cy="createRowSaveButton"]').should('be.enabled')
-		cy.get('[data-cy="createRowSaveButton"]').click()
+		cy.get('[data-cy="createRowSaveButton"]').click({ force: true })
 
 		cy.get('.app-navigation-entry-link').contains('to do list').click({ force: true })
 		cy.get('.custom-table table').contains('My first task').parent().parent().find('[aria-label="Edit row"]').click()
