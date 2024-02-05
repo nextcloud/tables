@@ -375,7 +375,7 @@ OC.L10N.register(
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "Les types fournis dépendent de la configuration de votre système. Vous pouvez utiliser les même fournisseurs que la recherche de texte.",
     "URL" : "URL",
     "This field is mandatory" : "Ce champ est obligatoire",
-    "You can not insert any links in this field. Please configure at least one link provider in the column configuration." : "Vous ne pouvez pas insérer de liens dans ce champs. Configurez au moins un fournisseur de lien dans la configuration de la colonne.",
+    "You can not insert any links in this field. Please configure at least one link provider in the column configuration." : "Vous ne pouvez pas insérer de liens dans ce champ. Configurez au moins un fournisseur de lien dans la configuration de la colonne.",
     "Could not load link provider results." : "Impossible de charger les résultats du fournisseur de lien.",
     "Url" : "URL",
     "Show fullscreen" : "Afficher en plein écran",
