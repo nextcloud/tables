@@ -1,7 +1,7 @@
 <template>
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :width="2">
 		<NcDateTimePickerNative id="datetime-time-picker" v-model="localValue" :label="t('tables', 'Please select a new time')"
-			type="time"/>
+			type="time" />
 		<div v-if="canBeCleared" class="icon-close make-empty" @click="emptyValue" />
 	</RowFormWrapper>
 </template>
@@ -36,7 +36,6 @@ export default {
 		},
 		localValue: {
 			get() {
-				console.log(this.value)
 				if (this.value !== null && this.value !== 'none') {
 					return Moment(this.value, 'HH:mm').toDate()
 				} else if (this.value === null && this.column.datetimeDefault === 'now') {

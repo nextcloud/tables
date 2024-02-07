@@ -1,7 +1,7 @@
 <template>
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :width="2">
 		<NcDateTimePickerNative id="datetime-picker" v-model="localValue"
-			type="datetime-local"/>
+			type="datetime-local" />
 		<div v-if="canBeCleared" class="icon-close make-empty" @click="emptyValue" />
 	</RowFormWrapper>
 </template>
