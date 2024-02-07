@@ -19,7 +19,7 @@
 			:show-modal="editRow !== null"
 			:out-transition="true"
 			@close="editRow = null" />
-		<DeleteRows v-if="rowsToDelete" :rows-to-delete="rowsToDelete" @cancel="rowsToDelete = null" />
+		<DeleteRows v-if="rowsToDelete" :rows-to-delete="rowsToDelete?.rows" :is-view="rowsToDelete?.isView" :element-id="rowsToDelete?.elementId" @cancel="rowsToDelete = null" />
 
 		<ViewSettings
 			:show-modal="viewToEdit !== null"

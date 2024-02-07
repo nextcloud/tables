@@ -26,14 +26,22 @@ export default {
 			type: Array,
 			default: null,
 		},
+		elementId: {
+			type: Number,
+			default: null,
+		},
+		isView: {
+			type: Boolean,
+			default: true,
+		},
 	},
 	methods: {
 		deleteRows() {
 			let error = false
-			this.rowsToDelete.rows.forEach(rowId => {
+			this.rowsToDelete.forEach(rowId => {
 				const res = this.$store.dispatch('removeRow', {
 					rowId,
-					viewId: this.rowsToDelete.isView ? this.rowsToDelete.elementId : null,
+					viewId: this.isView ? this.elementId : null,
 				})
 				if (!res) {
 					error = true
@@ -42,7 +50,7 @@ export default {
 			if (error) {
 				showError(t('tables', 'Error occurred while deleting rows.'))
 			}
-			emit('tables:selected-rows:deselect', { elementId: this.rowsToDelete.elementId, isView: this.rowsToDelete.isView })
+			emit('tables:selected-rows:deselect', { elementId: this.elementId, isView: this.isView })
 			this.$emit('cancel')
 		},
 	},
