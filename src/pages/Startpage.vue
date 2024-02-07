@@ -38,7 +38,7 @@ export default {
 
 <style scoped>
 
-:deep(.empty-content) {
+.empty-content {
 	margin-top: 20vh;
 }
 

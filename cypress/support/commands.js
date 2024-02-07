@@ -58,7 +58,7 @@ Cypress.Commands.add('createView', (title) => {
 
 Cypress.Commands.add('clickOnTableThreeDotMenu', (optionName) => {
 	cy.get('[data-cy="customTableAction"] button').click()
-	cy.get('[data-cy="dataTableBtn"]').contains(optionName).click({ force: true })
+	cy.get('[data-cy="dataTableExportBtn"]').contains(optionName).click({ force: true })
 })
 
 Cypress.Commands.add('sortTableColumn', (columnTitle, mode = 'ASC') => {
