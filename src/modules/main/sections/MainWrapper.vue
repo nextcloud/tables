@@ -14,7 +14,6 @@
 				@toggle-share="toggleShare"
 				@show-integration="showIntegration" />
 			<CustomTable v-else
-				:table-id="element.id"
 				:table="element"
 				:columns="columns"
 				:rows="rows"

@@ -79,7 +79,7 @@ export default {
 			default: false,
 		},
 		element: {
-			type: Number,
+			type: Object,
 			default: null,
 		},
 	},
@@ -92,7 +92,7 @@ export default {
 	},
 	computed: {
 		showDeleteButton() {
-			return this.canDeleteData(this.element.id) && !this.localLoading
+			return this.canDeleteData(this.element) && !this.localLoading
 		},
 		nonMetaColumns() {
 			return this.columns.filter(col => col.id >= 0)

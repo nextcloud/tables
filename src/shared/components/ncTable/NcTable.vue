@@ -39,30 +39,21 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 <template>
 	<div class="NcTable">
 		<div class="options row" style="padding-right: calc(var(--default-grid-baseline) * 2);">
-			<Options :rows="rows"
-				:columns="parsedColumns"
-				:table-id="tableId"
-				:selected-rows="localSelectedRows"
-				:show-options="parsedColumns.length !== 0"
-				:view-setting.sync="localViewSetting"
-				:config="config"
-				@create-row="$emit('create-row', tableId)"
+			<Options :rows="rows" :columns="parsedColumns" :element-id="elementId" :is-view="isView"
+				:selected-rows="localSelectedRows" :show-options="parsedColumns.length !== 0"
+				:view-setting.sync="localViewSetting" :config="config" @create-row="$emit('create-row', elementId, isView)"
 				@download-csv="data => downloadCsv(data, parsedColumns, downloadTitle)"
 				@set-search-string="str => setSearchString(str)"
-				@delete-selected-rows="rowIds => $emit('delete-selected-rows', rowIds, tableId)" />
+				@delete-selected-rows="rowIds => $emit('delete-selected-rows', rowIds, elementId, isView)" />
 		</div>
 		<div class="custom-table row">
-			<CustomTable v-if="config.canReadRows || (config.canCreateRows && rows.length > 0)"
-				:columns="parsedColumns"
-				:rows="rows"
-				:table-id="tableId"
-				:view-setting.sync="localViewSetting"
-				:config="config"
-				@create-row="$emit('create-row', tableId)"
-				@edit-row="rowId => $emit('edit-row', rowId, tableId)"
-				@create-column="$emit('create-column', tableId)"
-				@edit-column="col => $emit('edit-column', col, tableId)"
-				@delete-column="col => $emit('delete-column', col, tableId)"
+			<CustomTable v-if="config.canReadRows || (config.canCreateRows && rows.length > 0)" :columns="parsedColumns"
+				:rows="rows" :is-view="isView" :element-id="elementId" :view-setting.sync="localViewSetting"
+				:config="config" @create-row="$emit('create-row', elementId, isView)"
+				@edit-row="rowId => $emit('edit-row', rowId, elementId, isView)"
+				@create-column="$emit('create-column', elementId, isView)"
+				@edit-column="col => $emit('edit-column', col, elementId, isView)"
+				@delete-column="col => $emit('delete-column', col, elementId, isView)"
 				@update-selected-rows="rowIds => localSelectedRows = rowIds"
 				@download-csv="data => downloadCsv(data, parsedColumns, table)">
 				<template #actions>
@@ -76,7 +67,8 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 					<Plus :size="25" />
 				</template>
 				<template #action>
-					<NcButton :aria-label="t('tables', 'Create row')" type="primary" @click="$emit('create-row', tableId)">
+					<NcButton :aria-label="t('tables', 'Create row')" type="primary"
+						@click="$emit('create-row', elementId, isView)">
 						<template #icon>
 							<Plus :size="25" />
 						</template>
@@ -124,9 +116,13 @@ export default {
 			type: Array,
 			default: () => [],
 		},
-		tableId: {
+		elementId: {
 			type: Number,
 			default: null,
+		},
+		isView: {
+			type: Boolean,
+			default: true,
 		},
 		downloadTitle: {
 			type: String,
@@ -231,15 +227,15 @@ export default {
 		},
 	},
 	mounted() {
-		subscribe('tables:selected-rows:deselect', tableId => this.deselectRows(tableId))
+		subscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectRows(elementId, isView))
 	},
 	beforeDestroy() {
-		unsubscribe('tables:selected-rows:deselect', tableId => this.deselectRows(tableId))
+		unsubscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectRows(elementId, isView))
 	},
 	methods: {
 		t,
-		deselectRows(tableId) {
-			if (parseInt(tableId) === parseInt(this.tableId)) {
+		deselectRows(elementId, isView) {
+			if (parseInt(elementId) === parseInt(this.elementId) && isView === this.isView) {
 				this.localSelectedRows = []
 			}
 		},
@@ -252,7 +248,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-
 .options.row {
 	position: sticky;
 	top: 52px;

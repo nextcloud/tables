@@ -99,9 +99,13 @@ export default {
 			type: Array,
 			default: () => [],
 		},
-		tableId: {
+		elementId: {
 			type: Number,
 			default: null,
+		},
+		isView: {
+			type: Boolean,
+			default: true,
 		},
 		showOptions: {
 			type: Boolean,
@@ -164,7 +168,7 @@ export default {
 			this.$emit('delete-selected-rows', this.selectedRows)
 		},
 		deselectAllRows() {
-			emit('tables:selected-rows:deselect', this.tableId)
+			emit('tables:selected-rows:deselect', { elementId: this.elementId, isView: this.isView })
 		},
 	},
 }
