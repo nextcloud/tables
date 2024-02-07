@@ -20,10 +20,11 @@
 			<div class="row">
 				<div class="fix-col-4 space-T" :class="{'justify-between': showDeleteButton, 'end': !showDeleteButton}">
 					<div v-if="showDeleteButton">
-						<NcButton v-if="!prepareDeleteRow" :aria-label="t('tables', 'Delete')" type="error" @click="prepareDeleteRow = true">
+						<NcButton v-if="!prepareDeleteRow" :aria-label="t('tables', 'Delete')" type="error" data-cy="editRowDeleteButton" @click="prepareDeleteRow = true">
 							{{ t('tables', 'Delete') }}
 						</NcButton>
 						<NcButton v-if="prepareDeleteRow"
+							data-cy="editRowEditConfirmButton"
 							:wide="true"
 							:aria-label="t('tables', 'I really want to delete this row!')"
 							type="error"

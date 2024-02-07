@@ -21,6 +21,7 @@
 			:close-after-click="true"
 			:aria-label="t('tables', 'Add new filter group')"
 			type="tertiary"
+			data-cy="filterFormFilterGroupBtn"
 			@click="addFilterGroup">
 			{{ t('tables', 'Add new filter group') }}
 			<template #icon>
