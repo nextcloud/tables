@@ -1,22 +1,19 @@
 <template>
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :width="2">
-		<NcDateTimePicker v-model="localValue"
-			type="date"
-			format="YYYY-MM-DD"
-			:clearable="false"
-			:show-week-number="true" />
+		<NcDateTimePickerNative id="datetime-date-picker" v-model="localValue"
+			type="date" />
 		<div v-if="canBeCleared" class="icon-close make-empty" @click="emptyValue" />
 	</RowFormWrapper>
 </template>
 
 <script>
-import { NcDateTimePicker } from '@nextcloud/vue'
+import { NcDateTimePickerNative } from '@nextcloud/vue'
 import Moment from '@nextcloud/moment'
 import RowFormWrapper from './RowFormWrapper.vue'
 
 export default {
 	components: {
-		NcDateTimePicker,
+		NcDateTimePickerNative,
 		RowFormWrapper,
 	},
 	props: {

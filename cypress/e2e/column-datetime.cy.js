@@ -26,7 +26,7 @@ describe('Test column ' + columnTitle, () => {
 
 		// insert row with int value
 		cy.get('button').contains('Create row').click()
-		cy.get('.modal__content input').first().clear().type('2023-12-24 05:15')
+		cy.get('.modal__content input').first().clear().type('2023-12-24T05:15')
 		cy.get('[data-cy="createRowAddMoreSwitch"]').click().click()
 		cy.get('button').contains('Save').click()
 		cy.get('.custom-table table tr td div').contains('24').should('be.visible')
@@ -49,7 +49,7 @@ describe('Test column ' + columnTitle, () => {
 		cy.createDatetimeColumn(columnTitle, true, true)
 
 		cy.get('button').contains('Create row').click()
-		cy.get('.modal__content input').first().should('contain.value', '2023-12-24 07:21')
+		cy.get('.modal__content input').first().should('contain.value', '2023-12-24T07:21')
 		cy.get('[data-cy="createRowAddMoreSwitch"]').click().click()
 		cy.get('button').contains('Save').click()
 		cy.get('.custom-table table tr td div').contains('7:').should('be.visible')
