@@ -6,7 +6,7 @@ import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import data from './data.js'
 import displayError from '../shared/utils/displayError.js'
-import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../shared/constants.js'
+import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../shared/constants.ts'
 
 Vue.use(Vuex)
 
