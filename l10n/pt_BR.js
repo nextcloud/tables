@@ -227,6 +227,7 @@ OC.L10N.register(
     "I really want to delete this row!" : "Eu realmente quero excluir esta linha!",
     "Could not update row" : "Could not update row",
     "Could not delete row." : "Não foi possível excluir a linha.",
+    "Owner" : "Proprietário",
     "I really want to delete this table!" : "I really want to delete this table!",
     "File" : "Arquivo",
     "Supported formats are xlsx, xls, html, xml and csv." : "Os formatos suportados são xlsx, xls, html, xml e csv.",
