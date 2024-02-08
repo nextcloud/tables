@@ -10,10 +10,6 @@ import router from './router.js'
 import VuePapaParse from 'vue-papa-parse'
 import { translate as t, translatePlural as n } from '@nextcloud/l10n'
 
-__webpack_nonce__ = btoa(OC.requestToken) // eslint-disable-line
-// eslint-disable-next-line
-__webpack_public_path__ = generateFilePath('tables', '', 'js/')
-
 Vue.mixin({ methods: { t, n } })
 Vue.use(PiniaVuePlugin)
 const pinia = createPinia()

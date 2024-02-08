@@ -42,7 +42,7 @@ import { ColumnTypes } from './../mixins/columnHandler.js'
 import { translate as t } from '@nextcloud/l10n'
 import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
-} from '../../../../shared/constants.js'
+} from '../../../../shared/constants.ts'
 
 export default {
 	name: 'TableRow',
