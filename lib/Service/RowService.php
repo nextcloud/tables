@@ -65,7 +65,8 @@ class RowService extends SuperService {
 	public function findAllByTable(int $tableId, string $userId, ?int $limit = null, ?int $offset = null): array {
 		try {
 			if ($this->permissionsService->canReadRowsByElementId($tableId, 'table', $userId)) {
-				return $this->row2Mapper->findAll($this->columnMapper->findAllByTable($tableId), $tableId, $limit, $offset, null, null, $userId);
+				$tableColumns = $this->columnMapper->findAllByTable($tableId);
+				return $this->row2Mapper->findAll($tableColumns, $tableColumns, $tableId, $limit, $offset, null, null, $userId);
 			} else {
 				throw new PermissionError('no read access to table id = '.$tableId);
 			}
@@ -91,8 +92,10 @@ class RowService extends SuperService {
 			if ($this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)) {
 				$view = $this->viewMapper->find($viewId);
 				$columnsArray = $view->getColumnsArray();
-				$columns = $this->columnMapper->findAll($columnsArray);
-				return $this->row2Mapper->findAll($columns, $view->getTableId(), $limit, $offset, $view->getFilterArray(), $view->getSortArray(), $userId);
+				$filterColumns = $this->columnMapper->findAll($columnsArray);
+				$tableColumns = $this->columnMapper->findAllByTable($view->getTableId());
+
+				return $this->row2Mapper->findAll($tableColumns, $filterColumns, $view->getTableId(), $limit, $offset, $view->getFilterArray(), $view->getSortArray(), $userId);
 			} else {
 				throw new PermissionError('no read access to view id = '.$viewId);
 			}

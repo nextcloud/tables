@@ -26,19 +26,23 @@ class Row2Mapper {
 	private IDBConnection $db;
 	private LoggerInterface $logger;
 	protected UserHelper $userHelper;
+	protected ColumnMapper $columnMapper;
 
 	/* @var Column[] $columns */
 	private array $columns = [];
+	/* @var Column[] $columns */
+	private array $allColumns = [];
 
 	private ColumnsHelper $columnsHelper;
 
-	public function __construct(?string $userId, IDBConnection $db, LoggerInterface $logger, UserHelper $userHelper, RowSleeveMapper $rowSleeveMapper, ColumnsHelper  $columnsHelper) {
+	public function __construct(?string $userId, IDBConnection $db, LoggerInterface $logger, UserHelper $userHelper, RowSleeveMapper $rowSleeveMapper, ColumnsHelper $columnsHelper, ColumnMapper $columnMapper) {
 		$this->rowSleeveMapper = $rowSleeveMapper;
 		$this->userId = $userId;
 		$this->db = $db;
 		$this->logger = $logger;
 		$this->userHelper = $userHelper;
 		$this->columnsHelper = $columnsHelper;
+		$this->columnMapper = $columnMapper;
 	}
 
 	/**
@@ -166,8 +170,8 @@ class Row2Mapper {
 	 * @return Row2[]
 	 * @throws InternalError
 	 */
-	public function findAll(array $columns, int $tableId, int $limit = null, int $offset = null, array $filter = null, array $sort = null, string $userId = null): array {
-		$this->setColumns($columns);
+	public function findAll(array $tableColumns, array $columns, int $tableId, int $limit = null, int $offset = null, array $filter = null, array $sort = null, string $userId = null): array {
+		$this->setColumns($columns, $tableColumns);
 		$columnIdsArray = array_map(fn (Column $column) => $column->getId(), $columns);
 
 		$wantedRowIdsArray = $this->getWantedRowIds($userId, $tableId, $filter, $limit, $offset);
@@ -267,12 +271,13 @@ class Row2Mapper {
 		$filterExpressions = [];
 		foreach ($filterGroup as $filter) {
 			$columnId = $filter['columnId'];
+			$column = $this->columns[$columnId] ?? $this->allColumns[$columnId];
 
 			// if is normal column
 			if ($columnId >= 0) {
 				$sql = $qb->expr()->in(
 					'id',
-					$qb->createFunction($this->getFilterExpression($qb, $this->columns[$filter['columnId']], $filter['operator'], $filter['value'])->getSQL())
+					$qb->createFunction($this->getFilterExpression($qb, $column, $filter['operator'], $filter['value'])->getSQL())
 				);
 
 				// if is meta data column
@@ -284,7 +289,7 @@ class Row2Mapper {
 
 				// if column id is unknown
 			} else {
-				$e = new Exception("Needed column (" . $filter['columnId'] . ") not found.");
+				$e = new Exception("Needed column (" . $columnId . ") not found.");
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 			}
@@ -670,10 +675,16 @@ class Row2Mapper {
 	/**
 	 * @param Column[] $columns
 	 */
-	private function setColumns(array $columns): void {
+	private function setColumns(array $columns, array $tableColumns = []): void {
 		foreach ($columns as $column) {
 			$this->columns[$column->getId()] = $column;
 		}
+
+		// We hold a list of all table columns to be used in filter expression building for those not visible in the view
+		foreach ($tableColumns as $column) {
+			$this->allColumns[$column->getId()] = $column;
+		}
+
 	}
 
 	/**
