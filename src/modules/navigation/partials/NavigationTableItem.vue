@@ -136,12 +136,12 @@
 				{{ t('tables', 'Delete table') }}
 			</NcActionButton>
 		</template>
-		<div>
+		<ul>
 			<NavigationViewItem v-for="view in getViews"
 				:key="'view'+view.id"
 				:view="view"
 				:show-share-sender="false" />
-		</div>
+		</ul>
 	</NcAppNavigationItem>
 </template>
 

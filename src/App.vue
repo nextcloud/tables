@@ -48,7 +48,7 @@ export default {
 		...mapState(useTablesStore, ['isLoadingSomething', 'activeView', 'activeTable', 'activeContext']),
 	},
 	watch: {
-		'$route'(to, from) {
+		'$route'(to) {
 			this.routing(to)
 		},
 	},

@@ -5,7 +5,7 @@
 import { AbstractNumberColumn } from '../columnClass.js'
 import { ColumnTypes } from '../columnHandler.js'
 import { FilterIds } from '../filter.js'
-import { TYPE_META_ID } from '../../../../constants.js'
+import { TYPE_META_ID } from '../../../../constants.ts'
 
 export default class NumberColumn extends AbstractNumberColumn {
 

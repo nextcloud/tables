@@ -9,7 +9,7 @@ import { FilterIds } from '../filter.js'
 import {
 	TYPE_META_CREATED_AT,
 	TYPE_META_UPDATED_AT,
-} from '../../../../constants.js'
+} from '../../../../constants.ts'
 
 export default class DatetimeColumn extends AbstractDatetimeColumn {
 
