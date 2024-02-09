@@ -6,7 +6,8 @@
 				class="select-field"
 				:options="columns"
 				label="title"
-				:placeholder="t('tables', 'Column')" />
+				:placeholder="t('tables', 'Column')"
+				data-cy="filterEntryColumn" />
 		</div>
 		<div class="fix-col-2">
 			<NcSelect
@@ -14,7 +15,8 @@
 				v-model="selectedOperator"
 				class="select-field"
 				:options="operators"
-				:placeholder="t('tables', 'Operator')" />
+				:placeholder="t('tables', 'Operator')"
+				data-cy="filterEntryOperator" />
 		</div>
 		<div class="fix-col-2">
 			<NcSelect
@@ -23,6 +25,7 @@
 				class="select-field"
 				:options="magicFields"
 				:placeholder="getValuePlaceholder"
+				data-cy="filterEntrySeachValue"
 				@search="v => term = v" />
 		</div>
 		<div class="fix-col-2 actions">

@@ -1,5 +1,5 @@
 <template>
-	<div class="filter-group">
+	<div class="filter-group" data-cy="filterGroupSection">
 		<div class="group-text">
 			{{ t('tables', '... that meet all of the following conditions') }}
 		</div>

@@ -21,6 +21,7 @@
 			<tbody>
 				<TableRow v-for="(row, index) in getSearchedAndFilteredAndSortedRows"
 					:key="index"
+					data-cy="customTableRow"
 					:row="row"
 					:columns="columns"
 					:selected="isRowSelected(row.id)"

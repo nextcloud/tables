@@ -94,13 +94,13 @@
 						</NcActionButton>
 						<NcActionButton v-if="canManageElement(table) "
 							:close-after-click="true"
-							@click="$emit('create-view')">
+							data-cy="dataTableCreateViewBtn" @click="$emit('create-view')">
 							<template #icon>
 								<PlaylistPlus :size="20" decorative />
 							</template>
 							{{ t('tables', 'Create view') + (isViewSettingSet ? '*' : '') }}
 						</NcActionButton>
-						<NcActionButton v-if="canManageTable(table)" :close-after-click="true" @click="$emit('create-column')">
+						<NcActionButton v-if="canManageTable(table)" :close-after-click="true" data-cy="dataTableCreateColumnBtn" @click="$emit('create-column')">
 							<template #icon>
 								<TableColumnPlusAfter :size="20" decorative title="" />
 							</template>
@@ -110,7 +110,7 @@
 						<NcActionCaption :title="t('tables', 'Integration')" />
 						<NcActionButton v-if="canCreateRowInElement(table)"
 							:close-after-click="true"
-							@click="$emit('import', table)">
+							data-cy="dataTableExportBtn" @click="$emit('import', table)">
 							<template #icon>
 								<Import :size="20" decorative title="Import" />
 							</template>
@@ -118,7 +118,7 @@
 						</NcActionButton>
 						<NcActionButton v-if="canReadData(table)" :close-after-click="true"
 							icon="icon-download"
-							@click="$emit('download-csv')">
+							data-cy="dataTableExportBtn" @click="$emit('download-csv')">
 							{{ t('tables', 'Export as CSV') }}
 						</NcActionButton>
 						<NcActionButton v-if="canShareElement(table)"

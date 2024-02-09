@@ -7,6 +7,7 @@
 					:aria-label="t('tables', 'Create row')"
 					:close-after-click="true"
 					type="tertiary"
+					data-cy="createRowBtn"
 					@click="$emit('create-row')">
 					{{ t('tables', 'Create row') }}
 					<template #icon>
@@ -17,6 +18,7 @@
 					:close-after-click="true"
 					:aria-label="t('tables', 'Create Row')"
 					type="tertiary"
+					data-cy="createRowBtn"
 					@click="$emit('create-row')">
 					<template #icon>
 						<Plus :size="25" />

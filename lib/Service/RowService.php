@@ -4,7 +4,6 @@ namespace OCA\Tables\Service;
 
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
-use OCA\Tables\Db\LegacyRowMapper;
 use OCA\Tables\Db\Row2;
 use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\Table;
@@ -28,7 +27,6 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type TablesRow from ResponseDefinitions
  */
 class RowService extends SuperService {
-	private LegacyRowMapper $mapper;
 	private ColumnMapper $columnMapper;
 	private ViewMapper $viewMapper;
 	private TableMapper $tableMapper;
@@ -36,9 +34,8 @@ class RowService extends SuperService {
 	private array $tmpRows = []; // holds already loaded rows as a small cache
 
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-		LegacyRowMapper    $mapper, ColumnMapper $columnMapper, ViewMapper $viewMapper, TableMapper $tableMapper, Row2Mapper $row2Mapper) {
+		ColumnMapper $columnMapper, ViewMapper $viewMapper, TableMapper $tableMapper, Row2Mapper $row2Mapper) {
 		parent::__construct($logger, $userId, $permissionsService);
-		$this->mapper = $mapper;
 		$this->columnMapper = $columnMapper;
 		$this->viewMapper = $viewMapper;
 		$this->tableMapper = $tableMapper;
@@ -438,8 +435,7 @@ class RowService extends SuperService {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 			}
-			$rowIds = $this->mapper->getRowIdsOfView($view, $userId);
-			if(!in_array($id, $rowIds)) {
+			if(!$this->row2Mapper->isRowInViewPresent($id, $view, $userId)) {
 				$e = new \Exception('Update row is not allowed.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());

@@ -10,7 +10,7 @@
 				:value="getCellValue(col)" />
 		</td>
 		<td v-if="config.showActions" :class="{sticky: config.showActions}">
-			<NcButton v-if="config.canEditRows || config.canDeleteRows" type="primary" :aria-label="t('tables', 'Edit row')" @click="$emit('edit-row', row.id)">
+			<NcButton v-if="config.canEditRows || config.canDeleteRows" type="primary" :aria-label="t('tables', 'Edit row')" data-cy="editRowBtn" @click="$emit('edit-row', row.id)">
 				<template #icon>
 					<Pencil :size="20" />
 				</template>

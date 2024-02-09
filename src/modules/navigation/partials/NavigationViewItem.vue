@@ -1,5 +1,6 @@
 <template>
 	<NcAppNavigationItem v-if="view"
+		data-cy="navigationViewItem"
 		:name="view.title"
 		:class="{active: activeView && view.id === activeView.id}"
 		:force-menu="true"
