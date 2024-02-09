@@ -4,7 +4,6 @@ namespace OCA\Tables\Service;
 
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
-use OCA\Tables\Db\LegacyRowMapper;
 use OCA\Tables\Db\Row2;
 use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\Table;
