@@ -7,7 +7,7 @@
 		<EditColumn v-if="columnToEdit" :column="columnToEdit?.column" :is-view="columnToEdit.isView" :element-id="columnToEdit?.elementId" @close="columnToEdit = false" />
 		<DeleteColumn v-if="columnToDelete" :is-view="columnToDelete?.isView" :element-id="columnToDelete?.elementId" :column-to-delete="columnToDelete?.column" @cancel="columnToDelete = null" />
 
-		<CreateRow :columns="columnsForRow?.column"
+		<CreateRow :columns="columnsForRow?.columns"
 			:is-view="columnsForRow?.isView"
 			:element-id="columnsForRow?.elementId"
 			:show-modal="columnsForRow !== null"

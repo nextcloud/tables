@@ -121,7 +121,7 @@ export default {
 			emit('tables:column:delete', { column, isView: this.isView, elementId: this.element.id })
 		},
 		createRow() {
-			emit('tables:row:create', { column: this.columns, isView: this.isView, elementId: this.element.id })
+			emit('tables:row:create', { columns: this.columns, isView: this.isView, elementId: this.element.id })
 		},
 		editRow(rowId) {
 			emit('tables:row:edit', { row: this.rows.find(r => r.id === rowId), columns: this.columns, isView: this.isView, element: this.element })
