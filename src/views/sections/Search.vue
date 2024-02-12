@@ -25,6 +25,7 @@
 			v-model="localValue"
 			:loading="loading"
 			:placeholder="t('tables', 'Search for table and views...')"
+			:aria-label-combobox="t('tables', 'Search for table and views...')"
 			:options="getOptions"
 			@search="v => term = v">
 			<template #option="props">

@@ -8,7 +8,7 @@
 						<template #icon>
 							<IconTool :size="20" />
 						</template>
-						<NcActionCaption v-if="canManageElement(table)" :title="t('tables', 'Manage table')" />
+						<NcActionCaption v-if="canManageElement(table)" :name="t('tables', 'Manage table')" />
 						<NcActionButton v-if="canManageElement(table) "
 							:close-after-click="true"
 							@click="emit('tables:table:edit', table.id)">
@@ -17,9 +17,8 @@
 							</template>
 							{{ t('tables', 'Edit table') }}
 						</NcActionButton>
-						<NcActionButton v-if="canManageElement(table) "
-							:close-after-click="true"
-							@click="$emit('create-view')">
+						<NcActionButton v-if="canManageElement(table)"
+							:close-after-click="true" @click="$emit('create-view')">
 							<template #icon>
 								<PlaylistPlus :size="20" decorative />
 							</template>
@@ -32,7 +31,7 @@
 							{{ t('tables', 'Create column') }}
 						</NcActionButton>
 
-						<NcActionCaption :title="t('tables', 'Integration')" />
+						<NcActionCaption :name="t('tables', 'Integration')" />
 						<NcActionButton v-if="canCreateRowInElement(table)"
 							:close-after-click="true"
 							@click="$emit('import', table)">
@@ -83,7 +82,7 @@
 				:can-delete-table="canManageTable(table)">
 				<template #actions>
 					<NcActions :force-menu="true" :type="isViewSettingSet ? 'secondary' : 'tertiary'">
-						<NcActionCaption v-if="canManageElement(table)" :title="t('tables', 'Manage table')" />
+						<NcActionCaption v-if="canManageElement(table)" :name="t('tables', 'Manage table')" />
 						<NcActionButton v-if="canManageElement(table) "
 							:close-after-click="true"
 							@click="emit('tables:table:edit', table.id)">
@@ -107,7 +106,7 @@
 							{{ t('tables', 'Create column') }}
 						</NcActionButton>
 
-						<NcActionCaption :title="t('tables', 'Integration')" />
+						<NcActionCaption :name="t('tables', 'Integration')" />
 						<NcActionButton v-if="canCreateRowInElement(table)"
 							:close-after-click="true"
 							data-cy="dataTableExportBtn" @click="$emit('import', table)">

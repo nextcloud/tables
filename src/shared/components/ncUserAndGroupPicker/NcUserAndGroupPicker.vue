@@ -3,7 +3,8 @@
 		<NcSelect id="transfer-ownership-select" v-model="value" style="width: 100%;" :loading="loading" :options="options"
 			:placeholder="getPlaceholder()"
 			:searchable="true" :get-option-key="(option) => option.key"
-			label="displayName" :user-select="true"
+			label="displayName"
+			:aria-label-combobox="getPlaceholder()" :user-select="true"
 			@search="asyncFind" @input="addTransfer">
 			<template #noResult>
 				{{ noResultText }}

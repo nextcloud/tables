@@ -38,6 +38,7 @@
 			:searchable="true"
 			:user-select="true"
 			:get-option-key="(option) => option.key"
+			:aria-label-combobox="t('tables', 'User or group name …')"
 			label="displayName"
 			@search="asyncFind"
 			@input="addShare">

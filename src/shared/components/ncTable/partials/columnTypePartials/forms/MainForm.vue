@@ -35,7 +35,8 @@
 				:options="viewsForTable"
 				:get-option-key="(option) => option.id"
 				:placeholder="t('tables', 'Column')"
-				label="title">
+				label="title"
+				:aria-label-combobox="t('tables', 'Column')">
 				<template #option="props">
 					<div>
 						{{ props.emoji }}

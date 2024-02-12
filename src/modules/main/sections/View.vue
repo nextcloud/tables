@@ -19,7 +19,7 @@
 				:can-delete-table="canManageTable(view)">
 				<template #actions>
 					<NcActions :force-menu="true" :type="isViewSettingSet ? 'secondary' : 'tertiary'">
-						<NcActionCaption v-if="canManageElement(view)" :title="t('tables', 'Manage view')" />
+						<NcActionCaption v-if="canManageElement(view)" :name="t('tables', 'Manage view')" />
 						<NcActionButton v-if="canManageElement(view) "
 							:close-after-click="true"
 							@click="editView">
@@ -35,7 +35,7 @@
 							{{ t('tables', 'Create column') }}
 						</NcActionButton>
 
-						<NcActionCaption :title="t('tables', 'Integration')" />
+						<NcActionCaption :name="t('tables', 'Integration')" />
 						<NcActionButton v-if="canCreateRowInElement(view)"
 							:close-after-click="true"
 							@click="$emit('import', view)">

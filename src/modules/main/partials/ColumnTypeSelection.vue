@@ -3,6 +3,7 @@
 		class="columnTypeSelection"
 		:options="typeOptions"
 		:clearable="false"
+		:aria-label-combobox="t('tables', 'Column type')"
 		style="width: 100%">
 		<template #option="props">
 			<div class="icon-label-container">

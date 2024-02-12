@@ -1,5 +1,5 @@
 <template>
-	<NcEmptyContent :title="t('tables', 'No columns')"
+	<NcEmptyContent :name="t('tables', 'No columns')"
 		:description="t('tables', 'We need at least one column, please be so kind and create one.')">
 		<template #icon>
 			{{ table.emoji }}
@@ -41,6 +41,10 @@ export default {
 :deep(.empty-content__icon) {
 	font-size: xxx-large;
 	opacity: 1;
+}
+
+.empty-content {
+	margin-top: 20vh;
 }
 
 </style>

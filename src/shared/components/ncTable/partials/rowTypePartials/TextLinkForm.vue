@@ -11,6 +11,7 @@
 					:options="results"
 					:clearable="true"
 					label="title"
+					:aria-label-combobox="t('tables', 'Link providers')"
 					style="width: 100%"
 					@search="v => term = v">
 					<template #option="props">

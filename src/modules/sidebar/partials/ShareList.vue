@@ -27,7 +27,7 @@
 							<Crown :size="20" />
 						</template>
 						<template v-if="!personHasTableManagePermission(share.receiver)">
-							<NcActionCaption :title="t('tables', 'Permissions')" />
+							<NcActionCaption :name="t('tables', 'Permissions')" />
 							<NcActionCheckbox :checked.sync="share.permissionRead"
 								:disabled="share.permissionManage || share.permissionUpdate || share.permissionDelete"
 								@check="updatePermission(share, 'read', true)"

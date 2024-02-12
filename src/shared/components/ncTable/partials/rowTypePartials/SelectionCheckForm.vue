@@ -1,6 +1,6 @@
 <template>
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description">
-		<NcCheckboxRadioSwitch type="switch" :checked.sync="localValue" />
+		<NcCheckboxRadioSwitch type="switch" :checked.sync="localValue" data-cy="selectionCheckFormSwitch" />
 	</RowFormWrapper>
 </template>
 

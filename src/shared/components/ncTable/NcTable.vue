@@ -68,7 +68,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				</template>
 			</CustomTable>
 			<NcEmptyContent v-else-if="config.canCreateRows && rows.length === 0"
-				:title="t('tables', 'Create rows')"
+				:name="t('tables', 'Create rows')"
 				:description="t('tables', 'You are not allowed to read this table, but you can still create rows.')">
 				<template #icon>
 					<Plus :size="25" />
@@ -83,7 +83,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				</template>
 			</NcEmptyContent>
 			<NcEmptyContent v-else
-				:title="t('tables', 'No permissions')"
+				:name="t('tables', 'No permissions')"
 				:description="t('tables', 'You have no permissions for this table.')">
 				<template #icon>
 					<Cancel :size="25" />

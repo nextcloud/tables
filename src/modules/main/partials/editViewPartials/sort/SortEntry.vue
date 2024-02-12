@@ -3,6 +3,7 @@
 		<div class="selection-fields">
 			<NcSelect v-model="selectedColumn" class="select-field"
 				:options="columns" :get-option-key="(option) => option.id"
+				:aria-label-combobox="t('tables', 'Column')"
 				:placeholder="t('tables', 'Column')" label="title" />
 			<div class="mode-switch">
 				<NcCheckboxRadioSwitch

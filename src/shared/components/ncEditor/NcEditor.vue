@@ -5,7 +5,7 @@
 		</div>
 		<div v-else>
 			<NcEmptyContent
-				:title="t('tables', 'Error')"
+				:name="t('tables', 'Error')"
 				:description="t('tables', 'Could not load editor, text not available.')">
 				<template #icon>
 					<Alert :size="20" />

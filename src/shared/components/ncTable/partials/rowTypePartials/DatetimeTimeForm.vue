@@ -1,22 +1,19 @@
 <template>
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :width="2">
-		<NcDatetimePicker v-model="localValue"
-			type="time"
-			format="HH:mm"
-			:clearable="false"
-			:show-week-number="true" />
+		<NcDateTimePickerNative id="datetime-time-picker" v-model="localValue" :label="t('tables', 'Please select a new time')"
+			type="time" />
 		<div v-if="canBeCleared" class="icon-close make-empty" @click="emptyValue" />
 	</RowFormWrapper>
 </template>
 
 <script>
-import { NcDatetimePicker } from '@nextcloud/vue'
+import { NcDateTimePickerNative } from '@nextcloud/vue'
 import Moment from '@nextcloud/moment'
 import RowFormWrapper from './RowFormWrapper.vue'
 
 export default {
 	components: {
-		NcDatetimePicker,
+		NcDateTimePickerNative,
 		RowFormWrapper,
 	},
 	props: {
@@ -46,7 +43,7 @@ export default {
 					this.$emit('update:value', dt.format('HH:mm'))
 					return dt.toDate()
 				} else {
-					return null
+					return new Date()
 				}
 			},
 			set(v) {

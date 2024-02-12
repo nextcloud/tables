@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<NcEmptyContent :title="t('tables', 'Tables')"
+		<NcEmptyContent :name="t('tables', 'Tables')"
 			:description="t('tables', 'Manage data the way you need it.')">
 			<template #icon>
 				<IconTables />
@@ -35,3 +35,11 @@ export default {
 	},
 }
 </script>
+
+<style scoped>
+
+.empty-content {
+	margin-top: 20vh;
+}
+
+</style>

@@ -6,6 +6,7 @@
 				class="select-field"
 				:options="columns"
 				label="title"
+				:aria-label-combobox="t('tables', 'Column')"
 				:placeholder="t('tables', 'Column')"
 				data-cy="filterEntryColumn" />
 		</div>
@@ -15,6 +16,7 @@
 				v-model="selectedOperator"
 				class="select-field"
 				:options="operators"
+				:aria-label-combobox="t('tables', 'Operator')"
 				:placeholder="t('tables', 'Operator')"
 				data-cy="filterEntryOperator" />
 		</div>
@@ -24,6 +26,7 @@
 				v-model="searchValue"
 				class="select-field"
 				:options="magicFields"
+				:aria-label-combobox="getValuePlaceholder"
 				:placeholder="getValuePlaceholder"
 				data-cy="filterEntrySeachValue"
 				@search="v => term = v" />
