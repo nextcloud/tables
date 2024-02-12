@@ -80,6 +80,7 @@ OC.L10N.register(
     "Heading 2" : "Intestatzione 2",
     "Heading 3" : "Intestatzione 3",
     "Code" : "Còdighe",
+    "Mandatory" : "Obligatòriu",
     "Prefix" : "Prefissu",
     "Suffix" : "Sufissu",
     "Default" : "Predefinidu",
