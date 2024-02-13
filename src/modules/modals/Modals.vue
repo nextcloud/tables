@@ -3,19 +3,23 @@
 		<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
 		<DeleteTable :show-modal="tableToDelete !== null" :table="tableToDelete" @cancel="tableToDelete = null" />
 
-		<CreateColumn :show-modal="showCreateColumn" @close="showCreateColumn = false" />
-		<EditColumn v-if="columnToEdit" :column="columnToEdit" @close="columnToEdit = false" />
-		<DeleteColumn v-if="columnToDelete" :column-to-delete="columnToDelete" @cancel="columnToDelete = null" />
+		<CreateColumn :show-modal="createColumnInfo !== null" :is-view="createColumnInfo?.isView" :element="createColumnInfo?.element" @close="createColumnInfo = null" />
+		<EditColumn v-if="columnToEdit" :column="columnToEdit?.column" :is-view="columnToEdit.isView" :element-id="columnToEdit?.elementId" @close="columnToEdit = false" />
+		<DeleteColumn v-if="columnToDelete" :is-view="columnToDelete?.isView" :element-id="columnToDelete?.elementId" :column-to-delete="columnToDelete?.column" @cancel="columnToDelete = null" />
 
-		<CreateRow :columns="columnsForRow"
+		<CreateRow :columns="columnsForRow?.columns"
+			:is-view="columnsForRow?.isView"
+			:element-id="columnsForRow?.elementId"
 			:show-modal="columnsForRow !== null"
 			@close="columnsForRow = null" />
 		<EditRow :columns="editRow?.columns"
 			:row="editRow?.row"
+			:is-view="editRow?.isView"
+			:element="editRow?.element"
 			:show-modal="editRow !== null"
 			:out-transition="true"
 			@close="editRow = null" />
-		<DeleteRows v-if="rowsToDelete" :rows-to-delete="rowsToDelete" @cancel="rowsToDelete = null" />
+		<DeleteRows v-if="rowsToDelete" :rows-to-delete="rowsToDelete?.rows" :is-view="rowsToDelete?.isView" :element-id="rowsToDelete?.elementId" @cancel="rowsToDelete = null" />
 
 		<ViewSettings
 			:show-modal="viewToEdit !== null"
@@ -72,7 +76,7 @@ export default {
 
 	data() {
 		return {
-			showCreateColumn: false,
+			createColumnInfo: null,
 			columnToEdit: null,
 			columnToDelete: null,
 			columnsForRow: null,
@@ -109,26 +113,30 @@ export default {
 		subscribe('tables:view:delete', view => { this.viewToDelete = view })
 
 		// columns
-		subscribe('tables:column:create', () => { this.showCreateColumn = true })
-		subscribe('tables:column:edit', column => { this.columnToEdit = column })
-		subscribe('tables:column:delete', column => { this.columnToDelete = column })
+		subscribe('tables:column:create', columnInfo => { this.createColumnInfo = columnInfo })
+		subscribe('tables:column:edit', columnInfo => { this.columnToEdit = columnInfo })
+		subscribe('tables:column:delete', columnInfo => { this.columnToDelete = columnInfo })
 
 		// rows
-		subscribe('tables:row:create', columns => { this.columnsForRow = columns })
-		subscribe('tables:row:edit', row => { this.editRow = row })
-		subscribe('tables:row:delete', rows => { this.rowsToDelete = rows })
+		subscribe('tables:row:create', columnsInfo => { this.columnsForRow = columnsInfo })
+		subscribe('tables:row:edit', rowInfo => { this.editRow = rowInfo })
+		subscribe('tables:row:delete', tableInfo => {
+			this.rowsToDelete = tableInfo
+		})
 
 		// misc
 		subscribe('tables:modal:import', element => { this.importToElement = element })
 	},
 	unmounted() {
 		unsubscribe('tables:view:reload', () => { this.reload(true) })
-		unsubscribe('tables:column:create', () => { this.showCreateColumn = true })
-		unsubscribe('tables:column:edit', column => { this.columnToEdit = column })
-		unsubscribe('tables:column:delete', column => { this.columnToDelete = column })
-		unsubscribe('tables:row:create', columns => { this.columnsForRow = columns })
-		unsubscribe('tables:row:edit', row => { this.editRow = row })
-		unsubscribe('tables:row:delete', rows => { this.rowsToDelete = rows })
+		unsubscribe('tables:column:create', columnInfo => { this.createColumnInfo = columnInfo })
+		unsubscribe('tables:column:edit', columnInfo => { this.columnToEdit = columnInfo })
+		unsubscribe('tables:column:delete', columnInfo => { this.columnToDelete = columnInfo })
+		unsubscribe('tables:row:create', columnsInfo => { this.columnsForRow = columnsInfo })
+		unsubscribe('tables:row:edit', rowInfo => { this.editRow = rowInfo })
+		unsubscribe('tables:row:delete', tableInfo => {
+			this.rowsToDelete = tableInfo
+		})
 		unsubscribe('tables:view:edit', view => { this.viewToEdit = { view, createView: false } })
 		unsubscribe('tables:view:create', tableInfos => {
 			this.viewToEdit = {

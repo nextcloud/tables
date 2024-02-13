@@ -37,7 +37,6 @@
 import { NcModal, NcCheckboxRadioSwitch, NcNoteCard, NcButton } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
-import { mapGetters } from 'vuex'
 import ColumnFormComponent from '../main/partials/ColumnFormComponent.vue'
 
 export default {
@@ -58,6 +57,14 @@ export default {
 			type: Array,
 			default: null,
 		},
+		isView: {
+			type: Boolean,
+			default: false,
+		},
+		elementId: {
+			type: Number,
+			default: null,
+		},
 	},
 	data() {
 		return {
@@ -67,7 +74,6 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['activeElement', 'isView']),
 		nonMetaColumns() {
 			return this.columns.filter(col => col.id >= 0)
 		},
@@ -121,8 +127,8 @@ export default {
 					})
 				}
 				await this.$store.dispatch('insertNewRow', {
-					viewId: this.isView ? this.activeElement.id : null,
-					tableId: !this.isView ? this.activeElement.id : null,
+					viewId: this.isView ? this.elementId : null,
+					tableId: !this.isView ? this.elementId : null,
 					data,
 				})
 			} catch (e) {

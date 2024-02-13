@@ -85,7 +85,7 @@ export default {
 
 	methods: {
 		createColumn() {
-			emit('tables:column:create')
+			emit('tables:column:create', { isView: this.isView, element: this.element })
 		},
 		downloadCSV() {
 			this.downloadCsv(this.rows, this.columns, this.element.title)
@@ -129,7 +129,7 @@ export default {
 					isView: this.isView,
 				}
 				if (this.activeRowId) {
-					emit('tables:row:edit', { row: this.rows.find(r => r.id === this.activeRowId), columns: this.columns })
+					emit('tables:row:edit', { row: this.rows.find(r => r.id === this.activeRowId), columns: this.columns, isView: this.isView, elementId: this.element.id })
 				}
 				this.localLoading = false
 			}

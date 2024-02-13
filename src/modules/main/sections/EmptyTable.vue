@@ -29,7 +29,7 @@ export default {
 	},
 	methods: {
 		createColumn() {
-			emit('tables:column:create')
+			emit('tables:column:create', { isView: false, element: this.table })
 		},
 	},
 

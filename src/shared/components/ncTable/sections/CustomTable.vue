@@ -58,6 +58,14 @@ export default {
 			type: Array,
 			default: () => [],
 		},
+		elementId: {
+			type: Number,
+			default: null,
+		},
+		isView: {
+			type: Boolean,
+			default: true,
+		},
 		viewSetting: {
 			type: Object,
 			default: null,
@@ -216,10 +224,10 @@ export default {
 	},
 
 	mounted() {
-		subscribe('tables:selected-rows:deselect', this.deselectAllRows)
+		subscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectAllRows(elementId, isView))
 	},
 	beforeDestroy() {
-		unsubscribe('tables:selected-rows:deselect', this.deselectAllRows)
+		unsubscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectAllRows(elementId, isView))
 	},
 
 	methods: {
@@ -240,8 +248,10 @@ export default {
 			}
 			return null
 		},
-		deselectAllRows() {
-			this.selectedRows = []
+		deselectAllRows(elementId, isView) {
+			if (parseInt(elementId) === parseInt(this.elementId) && isView === this.isView) {
+				this.selectedRows = []
+			}
 		},
 		selectAllRows(value) {
 			this.selectedRows = []

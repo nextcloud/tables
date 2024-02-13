@@ -2,6 +2,8 @@
 	<NcTable v-if="columns.length > 0"
 		:rows="rows"
 		:columns="columns"
+		:element-id="element.id"
+		:is-view="isView"
 		:download-title="element.title"
 		:view-setting.sync="localViewSetting"
 		:can-read-rows="canReadRows"
@@ -110,22 +112,22 @@ export default {
 
 	methods: {
 		createColumn() {
-			emit('tables:column:create')
+			emit('tables:column:create', { isView: this.isView, element: this.element })
 		},
 		editColumn(column) {
-			emit('tables:column:edit', column)
+			emit('tables:column:edit', { column, isView: this.isView, elementId: this.element.id })
 		},
 		deleteColumn(column) {
-			emit('tables:column:delete', column)
+			emit('tables:column:delete', { column, isView: this.isView, elementId: this.element.id })
 		},
 		createRow() {
-			emit('tables:row:create', this.columns)
+			emit('tables:row:create', { columns: this.columns, isView: this.isView, elementId: this.element.id })
 		},
 		editRow(rowId) {
-			emit('tables:row:edit', { row: this.rows.find(r => r.id === rowId), columns: this.columns })
+			emit('tables:row:edit', { row: this.rows.find(r => r.id === rowId), columns: this.columns, isView: this.isView, element: this.element })
 		},
 		deleteSelectedRows(rows) {
-			emit('tables:row:delete', rows)
+			emit('tables:row:delete', { rows, isView: this.isView, elementId: this.element.id })
 		},
 
 		toggleShare() {
