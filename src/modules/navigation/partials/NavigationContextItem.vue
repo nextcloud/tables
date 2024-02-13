@@ -34,7 +34,7 @@
 </template>
 <script>
 import { NcAppNavigationItem, NcActionButton, NcIconSvgWrapper } from '@nextcloud/vue'
-import '@nextcloud/dialogs/dist/index.css'
+import '@nextcloud/dialogs/style.css'
 import { mapGetters } from 'vuex'
 import TableIcon from 'vue-material-design-icons/Table.vue'
 import { emit } from '@nextcloud/event-bus'
