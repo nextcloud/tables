@@ -3,6 +3,8 @@ import { spawnDialog } from '@nextcloud/dialogs'
 // eslint-disable-next-line import/no-unresolved
 import tablesIcon from '@mdi/svg/svg/table-large.svg?raw'
 
+import '@nextcloud/dialogs/style.css'
+
 __webpack_nonce__ = btoa(OC.requestToken) // eslint-disable-line
 __webpack_public_path__ = OC.linkTo('tables', 'js/') // eslint-disable-line
 

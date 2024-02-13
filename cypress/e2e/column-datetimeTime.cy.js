@@ -8,16 +8,14 @@ describe('Test column ' + columnTitle, () => {
 		cy.createRandomUser().then(user => {
 			localUser = user
 			cy.login(localUser)
+			cy.visit('apps/tables')
+			cy.createTable(tableTitle)
 		})
 	})
 
 	beforeEach(function() {
 		cy.login(localUser)
 		cy.visit('apps/tables')
-	})
-
-	it('Table and column setup', () => {
-		cy.createTable(tableTitle)
 	})
 
 	it('Insert and test rows', () => {
@@ -27,7 +25,6 @@ describe('Test column ' + columnTitle, () => {
 		// insert row with int value
 		cy.get('button').contains('Create row').click()
 		cy.get('.modal__content input').first().clear().type('05:15')
-		cy.get('[data-cy="createRowAddMoreSwitch"]').click().click()
 		cy.get('button').contains('Save').click()
 		cy.get('.custom-table table tr td div').contains('5:15').should('be.visible')
 
@@ -48,7 +45,6 @@ describe('Test column ' + columnTitle, () => {
 		// insert row with int value
 		cy.get('button').contains('Create row').click()
 		cy.get('.modal__content input').first().should('contain.value', '07:21')
-		cy.get('[data-cy="createRowAddMoreSwitch"]').click().click()
 		cy.get('button').contains('Save').click()
 		cy.get('.custom-table table tr td div').contains('7:21').should('be.visible')
 	})

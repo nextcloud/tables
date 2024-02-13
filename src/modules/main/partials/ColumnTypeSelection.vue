@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import '@nextcloud/dialogs/dist/index.css'
+import '@nextcloud/dialogs/style.css'
 import TextLongIcon from 'vue-material-design-icons/TextLong.vue'
 import LinkIcon from 'vue-material-design-icons/Link.vue'
 import CounterIcon from 'vue-material-design-icons/Counter.vue'

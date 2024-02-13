@@ -15,7 +15,7 @@
 
 import DialogConfirmation from '../../shared/modals/DialogConfirmation.vue'
 import { showSuccess } from '@nextcloud/dialogs'
-import '@nextcloud/dialogs/dist/index.css'
+import '@nextcloud/dialogs/style.css'
 import { mapGetters } from 'vuex'
 
 export default {

@@ -8,16 +8,14 @@ describe('Test column ' + columnTitle, () => {
 		cy.createRandomUser().then(user => {
 			localUser = user
 			cy.login(localUser)
+			cy.visit('apps/tables')
+			cy.createTable(tableTitle)
 		})
 	})
 
 	beforeEach(function() {
 		cy.login(localUser)
 		cy.visit('apps/tables')
-	})
-
-	it('Table and column setup', () => {
-		cy.createTable(tableTitle)
 	})
 
 	it('Insert and test rows - default value unchecked', () => {
@@ -31,7 +29,7 @@ describe('Test column ' + columnTitle, () => {
 
 		// insert row
 		cy.get('button').contains('Create row').click()
-		cy.get('[data-cy="selectionCheckFormSwitch"]').first().click()
+		cy.get('[data-cy="selectionCheckFormSwitch"]').first().click({ force: true })
 		cy.get('button').contains('Save').click()
 		cy.get('.custom-table table tr td div .material-design-icon.check-circle-outline-icon').should('be.visible')
 
@@ -49,7 +47,7 @@ describe('Test column ' + columnTitle, () => {
 
 		// insert row
 		cy.get('button').contains('Create row').click()
-		cy.get('[data-cy="selectionCheckFormSwitch"]').first().click()
+		cy.get('[data-cy="selectionCheckFormSwitch"]').first().click({ force: true })
 		cy.get('button').contains('Save').click()
 		cy.get('.custom-table table tr td div .material-design-icon.radiobox-blank-icon').should('be.visible')
 
