@@ -210,7 +210,7 @@ export default {
 				await this.$store.dispatch('loadViewsSharedWithMeFromBE')
 				await this.$store.dispatch('loadColumnsFromBE', {
 					view: this.isElementView ? this.element : null,
-					table: !this.isElementView ? this.element : null,
+					tableId: !this.isElementView ? this.element.id : null,
 				})
 				if (this.canReadData(this.element)) {
 					await this.$store.dispatch('loadRowsFromBE', {
