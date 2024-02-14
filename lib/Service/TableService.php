@@ -370,6 +370,16 @@ class TableService extends SuperService {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 
+		// delete all views for that table
+		// we must delete views before columns because we need columns
+		// while deleting views (in case we're deleting a table that has views)
+		try {
+			$this->viewService->deleteAllByTable($item, $userId);
+		} catch (InternalError|PermissionError $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+
 		// delete all columns for that table
 		try {
 			$columns = $this->columnService->findAllByTable($id, null, $userId);
@@ -386,13 +396,6 @@ class TableService extends SuperService {
 			}
 		}
 
-		// delete all views for that table
-		try {
-			$this->viewService->deleteAllByTable($item, $userId);
-		} catch (InternalError|PermissionError $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
-		}
 
 		// delete all shares for that table
 		$this->shareService->deleteAllForTable($item);
