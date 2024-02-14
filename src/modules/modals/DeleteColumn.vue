@@ -41,11 +41,13 @@ export default {
 	},
 	methods: {
 		async deleteColumn() {
-			const res = await this.$store.dispatch('removeColumn', { id: this.columnToDelete.id })
+			const res = await this.$store.dispatch('removeColumn', { id: this.columnToDelete.id, isView: this.isView, elementId: this.elementId })
 			if (!res) {
 				showError(t('tables', 'Error occurred while deleting column "{column}".', { column: this.columnToDelete.title }))
 			}
-			await this.$store.dispatch('reloadViewsOfTable', { tableId: this.elementId })
+			if (!this.isView) {
+				await this.$store.dispatch('reloadViewsOfTable', { tableId: this.elementId })
+			}
 			this.$emit('cancel')
 		},
 	},

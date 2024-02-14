@@ -188,7 +188,7 @@ export default {
 			delete data.lastEditAt
 			delete data.lastEditBy
 			console.debug('this column data will be send', data)
-			const res = await this.$store.dispatch('updateColumn', { id: this.editColumn.id, data })
+			const res = await this.$store.dispatch('updateColumn', { id: this.editColumn.id, isView: this.isView, elementId: this.elementId, data })
 			if (res) {
 				showSuccess(t('tables', 'The column "{column}" was updated.', { column: this.editColumn.title }))
 			}
