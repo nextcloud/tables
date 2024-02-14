@@ -281,7 +281,7 @@ export default {
 						data.numberSuffix = this.column.numberSuffix
 					}
 				}
-				const res = await this.$store.dispatch('insertNewColumn', { data })
+				const res = await this.$store.dispatch('insertNewColumn', { isView: this.isView, elementId: this.element.id, data })
 				if (res) {
 					showSuccess(t('tables', 'The column "{column}" was created.', { column: this.column.title }))
 				} else {
