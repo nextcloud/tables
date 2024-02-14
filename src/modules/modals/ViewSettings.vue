@@ -1,10 +1,10 @@
 <template>
 	<NcAppSettingsDialog :open.sync="open" :show-navigation="true" data-cy="viewSettingsDialog" :title="createView ? t('tables', 'Create view') : t('tables', 'Edit view')">
-		<NcAppSettingsSection v-if="columns === null" id="loading" title="">
+		<NcAppSettingsSection v-if="columns === null" id="loading" name="">
 			<div class="icon-loading" />
 		</NcAppSettingsSection>
 		<!--title & emoji-->
-		<NcAppSettingsSection v-if="columns != null" id="title" :title="t('tables', 'Title')" data-cy="viewSettingsDialogSection">
+		<NcAppSettingsSection v-if="columns != null" id="title" :name="t('tables', 'Title')" data-cy="viewSettingsDialogSection">
 			<div class="col-4" style="display: inline-flex;">
 				<NcEmojiPicker :close-on-select="true" @select="setIcon">
 					<NcButton type="tertiary"
