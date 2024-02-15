@@ -271,6 +271,9 @@ class Row2Mapper {
 		$filterExpressions = [];
 		foreach ($filterGroup as $filter) {
 			$columnId = $filter['columnId'];
+			if (!isset($this->columns[$columnId]) && !isset($this->allColumns[$columnId])) {
+				throw new InternalError('No column found to build filter with for id ' . $columnId);
+			}
 			$column = $this->columns[$columnId] ?? $this->allColumns[$columnId];
 
 			// if is normal column

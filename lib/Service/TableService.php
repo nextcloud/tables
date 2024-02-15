@@ -124,7 +124,6 @@ class TableService extends SuperService {
 					$this->enhanceTable($table, $userId);
 				} catch (InternalError|PermissionError $e) {
 					$this->logger->error($e->getMessage(), ['exception' => $e]);
-					throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 				}
 				// if the table is shared with me, there are no other shares
 				// will avoid showing the shared icon in the FE nav
