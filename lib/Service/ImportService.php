@@ -111,6 +111,10 @@ class ImportService extends SuperService {
 				} else {
 					$error = true;
 				}
+			}
+			elseif (file_exists($path)) {
+				$spreadsheet = IOFactory::load($path);
+				$this->loop($spreadsheet->getActiveSheet());
 			} else {
 				$error = true;
 			}

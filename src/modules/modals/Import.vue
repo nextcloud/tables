@@ -17,7 +17,23 @@
 							</template>
 							{{ t('tables', 'Select a file') }}
 						</NcButton>
-						<input v-model="path" :class="{ missing: pathError }">
+						<input v-model="path" :class="{ missing: pathError }" :disabled="!!selectedUploadFile">
+					</div>
+
+					<div class="fix-col-4 space-T-small middle">
+						<NcButton :aria-label="t('tables', 'Upload a file')" @click="selectUploadFile">
+							<template #icon>
+								<IconUpload :size="20" />
+							</template>
+							{{ t('tables', 'Upload a file') }}
+						</NcButton>
+						<input ref="uploadFileInput"
+							type="file"
+							aria-hidden="true"
+							class="hidden-visually"
+							:accept="mimeTypes.join(',')"
+							@change="onUploadFileInputChange">
+						<input :value="selectedUploadFile ? selectedUploadFile.name : ''" disabled>
 					</div>
 				</RowFormWrapper>
 
@@ -137,6 +153,7 @@ import { FilePicker, FilePickerType, showError, showWarning } from '@nextcloud/d
 import RowFormWrapper from '../../shared/components/ncTable/partials/rowTypePartials/RowFormWrapper.vue'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import IconFolder from 'vue-material-design-icons/Folder.vue'
+import IconUpload from 'vue-material-design-icons/Upload.vue'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { mapGetters } from 'vuex'
@@ -148,6 +165,7 @@ export default {
 		NcIconTimerSand,
 		NcLoadingIcon,
 		IconFolder,
+		IconUpload,
 		NcModal,
 		NcButton,
 		NcCheckboxRadioSwitch,
@@ -180,6 +198,15 @@ export default {
 			loading: false,
 			result: null,
 			waitForReload: false,
+			mimeTypes: [
+				'text/csv',
+				'application/vnd.ms-excel',
+				'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+				'application/xml',
+				'text/html',
+				'application/vnd.oasis.opendocument.spreadsheet',
+			],
+			selectedUploadFile: null,
 		}
 	},
 
@@ -196,6 +223,16 @@ export default {
 		element() {
 			if (this.element) {
 				this.createMissingColumns = this.canCreateMissingColumns
+			}
+		},
+		path(val) {
+			if (val !== '') {
+				this.clearSelectedUploadFile()
+			}
+		},
+		selectedUploadFile(val) {
+			if (val !== null) {
+				this.path = ''
 			}
 		},
 	},
@@ -226,6 +263,16 @@ export default {
 			this.actionCancel()
 		},
 		actionSubmit() {
+			if (this.selectedUploadFile && this.selectedUploadFile.type !== '' && !this.mimeTypes.includes(this.selectedUploadFile.type)) {
+				showWarning(t('tables', 'The selected file is not supported.'))
+				return null
+			}
+
+			if (this.selectedUploadFile) {
+				this.uploadFile()
+				return
+			}
+
 			if (this.path === '') {
 				showWarning(t('tables', 'Please select a file.'))
 				this.pathError = true
@@ -238,6 +285,41 @@ export default {
 			this.loading = true
 			try {
 				const res = await axios.post(generateUrl('/apps/tables/import/' + (this.isElementView ? 'view' : 'table') + '/' + this.element.id), { path: this.path, createMissingColumns: this.getCreateMissingColumns })
+				if (res.status === 200) {
+					this.result = res.data
+					this.loading = false
+				} else if (res.status === 401) {
+					console.debug('error while importing', res)
+					showError(t('tables', 'Could not import, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					console.debug('error while importing', res)
+					showError(t('tables', 'Could not import, missing needed permission.'))
+				} else if (res.status === 404) {
+					console.debug('error while importing', res)
+					showError(t('tables', 'Could not import, needed resources were not found.'))
+				} else {
+					showError(t('tables', 'Could not import data due to unknown errors.'))
+					console.debug('error while importing', res)
+				}
+			} catch (e) {
+				console.error(e)
+				return false
+			}
+		},
+		async uploadFile() {
+			this.loading = true
+			try {
+				const url = generateUrl('/apps/tables/importupload/' + (this.isElementView ? 'view' : 'table') + '/' + this.element.id)
+				const formData = new FormData()
+				formData.append('uploadfile', this.selectedUploadFile)
+				formData.append('createMissingColumns', this.getCreateMissingColumns)
+
+				const res = await axios.post(url, formData, {
+					headers: {
+						'Content-Type': 'multipart/form-data',
+					},
+				})
+
 				if (res.status === 200) {
 					this.result = res.data
 					this.loading = false
@@ -274,14 +356,7 @@ export default {
 			const filePicker = new FilePicker(
 				t('text', 'Select file for the import'),
 				false, // multiselect
-				[
-					'text/csv',
-					'application/vnd.ms-excel',
-					'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-					'application/xml',
-					'text/html',
-					'application/vnd.oasis.opendocument.spreadsheet',
-				], // mime filter
+				this.mimeTypes, // mime filter
 				true, // modal
 				FilePickerType.Choose, // type
 				false, // directories
@@ -294,6 +369,16 @@ export default {
 					this.path = fileInfo.path === '/' ? `/${fileInfo.name}` : `${fileInfo.path}/${fileInfo.name}`
 				})
 			})
+		},
+		selectUploadFile() {
+			this.$refs.uploadFileInput.click()
+		},
+		clearSelectedUploadFile() {
+			this.selectedUploadFile = null
+			this.$refs.uploadFileInput.value = ''
+		},
+		onUploadFileInputChange(event) {
+			this.selectedUploadFile = event.target.files[0]
 		},
 	},
 

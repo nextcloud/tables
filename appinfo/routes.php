@@ -102,6 +102,8 @@ return [
 		// import
 		['name' => 'import#importInTable', 'url' => '/import/table/{tableId}', 'verb' => 'POST'],
 		['name' => 'import#importInView', 'url' => '/import/view/{viewId}', 'verb' => 'POST'],
+		['name' => 'import#importUploadInTable', 'url' => '/importupload/table/{tableId}', 'verb' => 'POST'],
+		['name' => 'import#importUploadInView', 'url' => '/importupload/view/{viewId}', 'verb' => 'POST'],
 
 		// search
 		['name' => 'search#all', 'url' => '/search/all', 'verb' => 'GET'],
