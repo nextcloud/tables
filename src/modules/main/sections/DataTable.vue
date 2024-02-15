@@ -231,6 +231,10 @@ export default {
 </script>
 <style lang="scss" scoped>
 
+	.row {
+		width: auto;
+	}
+
 	h2 {
 		display: inline-flex;
 		align-items: center;

@@ -15,6 +15,7 @@ import { NcContent, NcAppContent } from '@nextcloud/vue'
 import Navigation from './modules/navigation/sections/Navigation.vue'
 import { mapState } from 'vuex'
 import Sidebar from './modules/sidebar/sections/Sidebar.vue'
+import { useResizeObserver } from '@vueuse/core'
 
 export default {
 	name: 'App',
@@ -51,6 +52,7 @@ export default {
 		await this.$store.dispatch('loadTablesFromBE')
 		await this.$store.dispatch('loadViewsSharedWithMeFromBE')
 		this.routing(this.$router.currentRoute)
+		this.observeAppContent()
 	},
 	methods: {
 		routing(currentRoute) {
@@ -83,6 +85,13 @@ export default {
 				newTitle = `${title} - ${newTitle}`
 			}
 			window.document.title = newTitle
+		},
+		observeAppContent() {
+			useResizeObserver(document.getElementById('app-content-vue'), (entries) => {
+				const entry = entries[0]
+				const { width } = entry.contentRect
+				document.documentElement.style.setProperty('--app-content-width', `${width}px`)
+			})
 		},
 	},
 }

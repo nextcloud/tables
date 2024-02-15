@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="main-table-view">
 		<MainWrapper :element="activeTable" :is-view="false" />
 		<MainModals />
 	</div>
@@ -38,3 +38,9 @@ export default {
 	},
 }
 </script>
+<style lang="scss">
+.main-table-view {
+	width: max-content;
+	min-width: var(--app-content-width, 100%);
+}
+</style>
