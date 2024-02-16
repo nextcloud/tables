@@ -15,7 +15,7 @@
 		<div v-if="!isTable && activeElement.isShared" class="user-bubble">
 			<NcUserBubble
 				:display-name="activeElement.ownerDisplayName"
-				:show-user-status="true"
+				:show-user-status="false"
 				:user="activeElement.ownership" />
 		</div>
 	</div>
