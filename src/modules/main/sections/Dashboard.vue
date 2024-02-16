@@ -47,7 +47,8 @@
 										<NcAvatar
 											:display-name="share.receiverDisplayName"
 											:user="share.receiver"
-											:is-no-user="share.receiverType !== 'user'" />
+											:is-no-user="share.receiverType !== 'user'"
+											:show-user-status="false" />
 									</div>
 								</div>
 							</td>
