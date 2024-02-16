@@ -17,7 +17,10 @@ use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
 use OCP\IUserManager;
 use OCP\Server;
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Psr\Container\ContainerExceptionInterface;
@@ -145,18 +148,17 @@ class ImportService extends SuperService {
 	 * @throws PermissionError
 	 */
 	private function loop(Worksheet $worksheet): void {
-		$firstRow = true;
-		foreach ($worksheet->getRowIterator() as $row) {
-			if ($firstRow) {
-				$this->getColumns($row);
-				if (empty(array_filter($this->columns))) {
-					return;
-				}
-				$firstRow = false;
-			} else {
-				// parse row data
-				$this->createRow($row);
-			}
+		$firstRow = $worksheet->getRowIterator()->current();
+		$secondRow = $worksheet->getRowIterator()->seek(2)->current();
+		$this->getColumns($firstRow, $secondRow);
+
+		if (empty(array_filter($this->columns))) {
+			return;
+		}
+
+		foreach ($worksheet->getRowIterator(2) as $row) {
+			// parse row data
+			$this->createRow($row);
 		}
 	}
 
@@ -204,10 +206,13 @@ class ImportService extends SuperService {
 				continue;
 			}
 
+			/** @var Column $column */
+			$column = $this->columns[$i];
+
 			// if cell is empty
 			if(!$cell || $cell->getValue() === null) {
 				$this->logger->info('Cell is empty while fetching rows data for importing.');
-				if($this->columns[$i]->getMandatory()) {
+				if($column->getMandatory()) {
 					$this->logger->warning('Mandatory column was not set');
 					$this->countErrors++;
 					return;
@@ -215,9 +220,18 @@ class ImportService extends SuperService {
 				continue;
 			}
 
+			$value = $cell->getValue();
+			if ($column->getType() === 'datetime') {
+				$value = Date::excelToDateTimeObject($value)->format('Y-m-d H:i');
+			} elseif ($column->getType() === 'number' && $column->getNumberSuffix() === '%') {
+				$value = $value * 100;
+			} elseif ($column->getType() === 'selection' && $column->getSubtype() === 'check') {
+				$value = $cell->getFormattedValue() === 'TRUE' ? 'true' : 'false';
+			}
+
 			$data[] = [
 				'columnId' => (int) $this->columns[$i]->getId(),
-				'value' => json_decode($this->parseValueByColumnType($cell->getValue(), $this->columns[$i])),
+				'value' => json_decode($this->parseValueByColumnType($value, $this->columns[$i])),
 			];
 		}
 		try {
@@ -237,29 +251,101 @@ class ImportService extends SuperService {
 	}
 
 	/**
-	 * @param Row $row
+	 * @param Row $firstRow
+	 * @param Row $secondRow
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 * @throws DoesNotExistException
 	 * @throws MultipleObjectsReturnedException
 	 */
-	private function getColumns(Row $row): void {
-		$cellIterator = $row->getCellIterator();
+	private function getColumns(Row $firstRow, Row $secondRow): void {
+		$cellIterator = $firstRow->getCellIterator();
+		$secondRowCellIterator = $secondRow->getCellIterator();
 		$titles = [];
+		$dataTypes = [];
 		foreach ($cellIterator as $cell) {
 			if ($cell && $cell->getValue() !== null && $cell->getValue() !== '') {
 				$titles[] = $cell->getValue();
+
+				// Convert data type to our data type
+				$dataTypes[] = $this->parseColumnDataType($secondRowCellIterator->current());
 			} else {
 				$this->logger->debug('No cell given or cellValue is empty while loading columns for importing');
 				$this->countErrors++;
 			}
+			$secondRowCellIterator->next();
 		}
 		try {
-			$this->columns = $this->columnService->findOrCreateColumnsByTitleForTableAsArray($this->tableId, $this->viewId, $titles, $this->userId, $this->createUnknownColumns, $this->countCreatedColumns, $this->countMatchingColumns);
+			$this->columns = $this->columnService->findOrCreateColumnsByTitleForTableAsArray($this->tableId, $this->viewId, $titles, $dataTypes, $this->userId, $this->createUnknownColumns, $this->countCreatedColumns, $this->countMatchingColumns);
 		} catch (Exception $e) {
 			throw new InternalError($e->getMessage());
 		}
 	}
 
+	private function parseColumnDataType(Cell $cell): array {
+		$originDataType = $cell->getDataType();
+		$value = $cell->getValue();
+		$formattedValue = $cell->getFormattedValue();
+		$dataType = [
+			'type' => 'text',
+			'subtype' => 'line',
+		];
+
+		if (Date::isDateTime($cell) || $originDataType === DataType::TYPE_ISO_DATE) {
+			$dataType = [
+				'type' => 'datetime',
+			];
+		} elseif ($originDataType === DataType::TYPE_NUMERIC) {
+			if (str_contains($formattedValue, '%')) {
+				$dataType = [
+					'type' => 'number',
+					'number_decimals' => 2,
+					'number_suffix' => '%',
+				];
+			} elseif (str_contains($formattedValue, '€')) {
+				$dataType = [
+					'type' => 'number',
+					'number_decimals' => 2,
+					'number_suffix' => '€',
+				];
+			} elseif (str_contains($formattedValue, 'EUR')) {
+				$dataType = [
+					'type' => 'number',
+					'number_decimals' => 2,
+					'number_suffix' => 'EUR',
+				];
+			} elseif (str_contains($formattedValue, '$')) {
+				$dataType = [
+					'type' => 'number',
+					'number_decimals' => 2,
+					'number_prefix' => '$',
+				];
+			} elseif (str_contains($formattedValue, 'USD')) {
+				$dataType = [
+					'type' => 'number',
+					'number_decimals' => 2,
+					'number_suffix' => 'USD',
+				];
+			} elseif (is_float($value)) {
+				$decimals = strlen(substr(strrchr((string)$value, "."), 1));
+				$dataType = [
+					'type' => 'number',
+					'number_decimals' => $decimals,
+				];
+			} else {
+				$dataType = [
+					'type' => 'number',
+				];
+			}
+		} elseif ($originDataType === DataType::TYPE_BOOL) {
+			$dataType = [
+				'type' => 'selection',
+				'subtype' => 'check',
+				'selection_default' => 'false',
+			];
+		}
+
+		return $dataType;
+	}
 }
