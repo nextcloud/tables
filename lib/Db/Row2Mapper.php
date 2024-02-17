@@ -193,7 +193,8 @@ class Row2Mapper {
 		$qbSqlForColumnTypes = null;
 		foreach ($this->columnsHelper->columns as $columnType) {
 			$qbTmp = $this->db->getQueryBuilder();
-			$qbTmp->select('*')
+			$qbTmp->select('row_id', 'column_id', 'last_edit_at', 'last_edit_by')
+				->selectAlias($qb->expr()->castColumn('value', IQueryBuilder::PARAM_STR), 'value')
 				->from('tables_row_cells_'.$columnType)
 				->where($qb->expr()->in('column_id', $qb->createNamedParameter($columnIds, IQueryBuilder::PARAM_INT_ARRAY, ':columnIds')))
 				->andWhere($qb->expr()->in('row_id', $qb->createNamedParameter($rowIds, IQueryBuilder::PARAM_INT_ARRAY, ':rowsIds')));
@@ -208,7 +209,7 @@ class Row2Mapper {
 
 		$qb->select('row_id', 'column_id', 'created_by', 'created_at', 't1.last_edit_by', 't1.last_edit_at', 'value', 'table_id')
 			->from($qb->createFunction($qbSqlForColumnTypes), 't1')
-			->innerJoin('t1', 'tables_row_sleeves', 'rowSleeve', 'rowSleeve.id = t1.row_id');
+			->innerJoin('t1', 'tables_row_sleeves', 'rs', 'rs.id = t1.row_id');
 
 		try {
 			$result = $this->db->executeQuery($qb->getSQL(), $qb->getParameters(), $qb->getParameterTypes());
