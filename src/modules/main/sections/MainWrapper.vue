@@ -109,8 +109,12 @@ export default {
 
 			// Used to reload View from backend, in case there are Filter updates
 			const isLastElementSameAndView = this.element.id === this.lastActiveElement?.id && this.isView === this.lastActiveElement?.isView
+
 			if (!this.lastActiveElement || this.element.id !== this.lastActiveElement.id || isLastElementSameAndView || this.isView !== this.lastActiveElement.isView || force) {
 				this.localLoading = true
+
+				// Since we show one page at a time, no need keep other tables in the store
+				await this.$store.dispatch('clearState')
 
 				this.viewSetting = {}
 
