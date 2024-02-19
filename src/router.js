@@ -17,12 +17,12 @@ export default new Router({
 			component: Startpage,
 		},
 		{
-			path: '/context/:contextId',
+			path: '/context/',
 			component: Context,
 			name: 'context',
 		},
 		{
-			path: '/context/:contextId/row/:rowId',
+			path: '/context/row/:rowId',
 			component: Context,
 			name: 'contextRow',
 		},
