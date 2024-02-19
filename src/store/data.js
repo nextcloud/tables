@@ -40,12 +40,6 @@ export default {
 
 	},
 
-	getters: {
-		getColumnById: (state) => (id) => {
-			return state.columns.filter(column => column.id === id)[0]
-		},
-	},
-
 	actions: {
 		clearState({ commit }) {
 			commit('clearLoading')

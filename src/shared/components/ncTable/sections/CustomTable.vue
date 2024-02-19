@@ -38,7 +38,6 @@
 import TableHeader from '../partials/TableHeader.vue'
 import TableRow from '../partials/TableRow.vue'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
-import { mapGetters } from 'vuex'
 import { MagicFields } from '../mixins/magicFields.js'
 
 export default {
@@ -85,8 +84,6 @@ export default {
 	},
 
 	computed: {
-
-		...mapGetters(['getColumnById']),
 		sorting() {
 			return this.viewSetting?.sorting
 		},
