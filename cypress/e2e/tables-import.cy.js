@@ -17,7 +17,7 @@ describe('Import csv', () => {
 		cy.uploadFile('test-import.csv', 'text/csv')
 		cy.loadTable('Tutorial')
 		cy.clickOnTableThreeDotMenu('Import')
-		cy.get('.modal__content button').contains('Select a file').click()
+		cy.get('.modal__content button').contains('Select from Files').click()
 		cy.get('.file-picker__files').contains('test-import').click()
 		cy.get('.file-picker button span').contains('Choose test-import.csv').click()
 		cy.get('.modal__content button').contains('Import').click()
@@ -32,7 +32,7 @@ describe('Import csv', () => {
 	it('Import csv with upload file button', () => {
 		cy.loadTable('Tutorial')
 		cy.clickOnTableThreeDotMenu('Import')
-		cy.get('.modal__content button').contains('Upload a file').click()
+		cy.get('.modal__content button').contains('Upload from device').click()
 		cy.get('input[type="file"]').selectFile('cypress/fixtures/test-import.csv', { force: true })
 		cy.get('.modal__content button').contains('Import').click()
 		cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')
