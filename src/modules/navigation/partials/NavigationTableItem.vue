@@ -22,7 +22,7 @@
 			</NcCounterBubble>
 			<NcActionButton v-if="table.hasShares" icon="icon-share" :class="{'margin-right': !(activeTable && table.id === activeTable.id)}" @click="actionShowShare" />
 			<div v-if="table.isShared && table.ownership !== userId" class="margin-left">
-				<NcAvatar :user="table.ownership" />
+				<NcAvatar :user="table.ownership" :show-user-status="false" />
 			</div>
 		</template>
 
