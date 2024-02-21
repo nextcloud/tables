@@ -129,5 +129,6 @@ return [
 		['name' => 'ApiFavorite#create', 'url' => '/api/2/favorites/{nodeType}/{nodeId}', 'verb' => 'POST', 'requirements' => ['nodeType' => '(\d+)', 'nodeId' => '(\d+)']],
 		['name' => 'ApiFavorite#destroy', 'url' => '/api/2/favorites/{nodeType}/{nodeId}', 'verb' => 'DELETE', 'requirements' => ['nodeType' => '(\d+)', 'nodeId' => '(\d+)']],
 		['name' => 'Context#index', 'url' => '/api/2/contexts', 'verb' => 'GET'],
+		['name' => 'Context#show', 'url' => '/api/2/contexts/{contextId}', 'verb' => 'GET'],
 	]
 ];
