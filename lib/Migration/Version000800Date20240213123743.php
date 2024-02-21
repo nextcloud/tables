@@ -97,7 +97,7 @@ class Version000800Date20240213123743 extends SimpleMigrationStep {
 	protected function havePageTable(ISchemaWrapper $schema): void {
 		if ($table = $this->shouldAddTable(self::PREFIX . 'page', $schema)) {
 			$table->addColumn('id', Types::INTEGER, ['notnull' => true]);
-			$table->addColumn('context_id', Types::STRING, ['notnull' => true]);
+			$table->addColumn('context_id', Types::INTEGER, ['notnull' => true]);
 			$table->addColumn('page_type', Types::STRING, ['notnull' => true, 'length' => 32]);
 
 			$table->setPrimaryKey(['id']);
