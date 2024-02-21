@@ -168,6 +168,39 @@
                     }
                 }
             },
+            "Context": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "name",
+                    "iconName",
+                    "description",
+                    "owner",
+                    "ownerType"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "iconName": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "owner": {
+                        "type": "string"
+                    },
+                    "ownerType": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                }
+            },
             "ImportState": {
                 "type": "object",
                 "required": [
@@ -534,9 +567,8 @@
                         }
                     },
                     "sort": {
-                        "type": "object",
-                        "nullable": true,
-                        "additionalProperties": {
+                        "type": "array",
+                        "items": {
                             "type": "object",
                             "required": [
                                 "columnId",
@@ -558,48 +590,50 @@
                         }
                     },
                     "filter": {
-                        "type": "object",
-                        "nullable": true,
-                        "additionalProperties": {
-                            "type": "object",
-                            "required": [
-                                "columnId",
-                                "operator",
-                                "value"
-                            ],
-                            "properties": {
-                                "columnId": {
-                                    "type": "integer",
-                                    "format": "int64"
-                                },
-                                "operator": {
-                                    "type": "string",
-                                    "enum": [
-                                        "begins-with",
-                                        "ends-with",
-                                        "contains",
-                                        "is-equal",
-                                        "is-greater-than",
-                                        "is-greater-than-or-equal",
-                                        "is-lower-than",
-                                        "is-lower-than-or-equal",
-                                        "is-empty"
-                                    ]
-                                },
-                                "value": {
-                                    "oneOf": [
-                                        {
-                                            "type": "string"
-                                        },
-                                        {
-                                            "type": "integer",
-                                            "format": "int64"
-                                        },
-                                        {
-                                            "type": "number",
-                                            "format": "float"
-                                        }
-                                    ]
+                        "type": "array",
+                        "items": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "required": [
+                                    "columnId",
+                                    "operator",
+                                    "value"
+                                ],
+                                "properties": {
+                                    "columnId": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "operator": {
+                                        "type": "string",
+                                        "enum": [
+                                            "begins-with",
+                                            "ends-with",
+                                            "contains",
+                                            "is-equal",
+                                            "is-greater-than",
+                                            "is-greater-than-or-equal",
+                                            "is-lower-than",
+                                            "is-lower-than-or-equal",
+                                            "is-empty"
+                                        ]
+                                    },
+                                    "value": {
+                                        "oneOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "integer",
+                                                "format": "int64"
+                                            },
+                                            {
+                                                "type": "number",
+                                                "format": "float"
+                                            }
+                                        ]
+                                    }
                                 }
                             }
                         }
@@ -1865,7 +1899,11 @@
                         "description": "New permission value",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2104,7 +2142,11 @@
                         "description": "Permission if receiver can read data",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2113,7 +2155,11 @@
                         "description": "Permission if receiver can create data",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2122,7 +2168,11 @@
                         "description": "Permission if receiver can update data",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2131,7 +2181,11 @@
                         "description": "Permission if receiver can delete data",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2140,7 +2194,11 @@
                         "description": "Permission if receiver can manage table",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2286,7 +2344,11 @@
                         "description": "Permission if receiver can read data",
                         "schema": {
                             "type": "integer",
-                            "default": 0
+                            "default": 0,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2295,7 +2357,11 @@
                         "description": "Permission if receiver can create data",
                         "schema": {
                             "type": "integer",
-                            "default": 0
+                            "default": 0,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2304,7 +2370,11 @@
                         "description": "Permission if receiver can update data",
                         "schema": {
                             "type": "integer",
-                            "default": 0
+                            "default": 0,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2313,7 +2383,11 @@
                         "description": "Permission if receiver can delete data",
                         "schema": {
                             "type": "integer",
-                            "default": 0
+                            "default": 0,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2322,7 +2396,11 @@
                         "description": "Permission if receiver can manage node",
                         "schema": {
                             "type": "integer",
-                            "default": 0
+                            "default": 0,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     }
                 ],
@@ -2549,7 +2627,11 @@
                         "description": "Is the column mandatory",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2937,7 +3019,11 @@
                         "description": "Is the column mandatory",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -3185,7 +3271,11 @@
                         "description": "Is the column mandatory",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -4521,7 +4611,11 @@
                         "description": "Create missing columns",
                         "schema": {
                             "type": "integer",
-                            "default": 1
+                            "default": 1,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -4631,7 +4725,11 @@
                         "description": "Create missing columns",
                         "schema": {
                             "type": "integer",
-                            "default": 1
+                            "default": 1,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -6326,7 +6424,11 @@
                         "description": "Is mandatory",
                         "schema": {
                             "type": "integer",
-                            "default": 0
+                            "default": 0,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -6612,7 +6714,11 @@
                         "description": "Is mandatory",
                         "schema": {
                             "type": "integer",
-                            "default": 0
+                            "default": 0,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -6888,7 +6994,11 @@
                         "description": "Is mandatory",
                         "schema": {
                             "type": "integer",
-                            "default": 0
+                            "default": 0,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -7159,7 +7269,11 @@
                         "description": "Is mandatory",
                         "schema": {
                             "type": "integer",
-                            "default": 0
+                            "default": 0,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -7300,6 +7414,109 @@
                     },
                     "404": {
                         "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ocs/v2.php/apps/tables/api/3/contexts": {
+            "get": {
+                "operationId": "contexts-list",
+                "summary": "[api v3] Get all contexts available to the requesting person",
+                "description": "Return an empty array if no contexts were found",
+                "tags": [
+                    "contexts"
+                ],
+                "security": [
+                    {
+                        "bearer_auth": []
+                    },
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "OCS-APIRequest",
+                        "in": "header",
+                        "description": "Required to be true for the API request to pass",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "reporting in available contexts",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Context"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {

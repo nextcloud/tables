@@ -123,5 +123,7 @@ return [
 		['name' => 'ApiColumns#createTextColumn', 'url' => '/api/2/columns/text', 'verb' => 'POST'],
 		['name' => 'ApiColumns#createSelectionColumn', 'url' => '/api/2/columns/selection', 'verb' => 'POST'],
 		['name' => 'ApiColumns#createDatetimeColumn', 'url' => '/api/2/columns/datetime', 'verb' => 'POST'],
+
+		['name' => 'Context#index', 'url' => '/api/2/contexts', 'verb' => 'GET'],
 	]
 ];
