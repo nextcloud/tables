@@ -55,6 +55,25 @@ class ContextController extends AOCSController {
 	}
 
 	/**
+	 * [api v3] Get information about the requests context
+	 *
+	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 *
+	 * 200: returning the full context information
+	 * 404: context not found or not available anymore
+	 *
+	 * @NoAdminRequired
+	 */
+	public function show(int $contextId): DataResponse {
+		try {
+			$context = $this->contextService->findById($contextId, $this->userId);
+			return new DataResponse($context->jsonSerialize());
+		} catch (InternalError|Exception $e) {
+			return $this->handleError($e);
+		}
+	}
+
+	/**
 	 * @param Context[] $contexts
 	 * @return array
 	 */

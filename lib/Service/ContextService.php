@@ -42,4 +42,21 @@ class ContextService {
 		}
 		return $this->mapper->findAll($userId);
 	}
+
+	/**
+	 * @return Context
+	 * @throws InternalError
+	 */
+	public function findById(int $id, ?string $userId): Context {
+		if ($userId !== null && trim($userId) === '') {
+			$userId = null;
+		}
+		if ($userId === null && !$this->isCLI) {
+			$error = 'Try to set no user in context, but request is not allowed.';
+			$this->logger->warning($error);
+			throw new InternalError($error);
+		}
+
+		return $this->mapper->findById($id, $userId);
+	}
 }
