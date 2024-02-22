@@ -19,10 +19,12 @@ export default new Vuex.Store({
 		tablesLoading: false,
 		tables: [],
 		views: [],
+		contexts: [],
 		activeViewId: null,
 		activeTableId: null,
 		activeRowId: null,
 		activeElementIsView: false,
+		activeContextId: null,
 	},
 
 	getters: {
@@ -74,11 +76,19 @@ export default new Vuex.Store({
 				state.activeElementIsView = false
 			}
 		},
+		setActiveContextId(state, contextId) {
+			if (state.activeContextId !== contextId) {
+				state.activeContextId = contextId
+			}
+		},
 		setTables(state, tables) {
 			state.tables = tables
 		},
 		setViews(state, views) {
 			state.views = views
+		},
+		setContexts(state, contexts) {
+			state.contexts = contexts
 		},
 		setTable(state, table) {
 			const index = state.tables.findIndex(t => t.id === table.id)
@@ -87,6 +97,10 @@ export default new Vuex.Store({
 		setView(state, view) {
 			const index = state.views.findIndex(v => v.id === view.id)
 			state.views[index] = view
+		},
+		setContext(state, context) {
+			const index = state.contexts.findIndex(c => c.id === context.id)
+			state.contexts[index] = context
 		},
 		setActiveRowId(state, rowId) {
 			state.activeRowId = rowId
@@ -248,6 +262,29 @@ export default new Vuex.Store({
 			commit('setTables', [...tables])
 			return true
 		},
+
+		async getAllContexts({ commit, state }) {
+			try {
+				const res = await axios.get(generateOcsUrl('/apps/tables/api/3/contexts'))
+				commit('setContexts', res.data.ocs.data)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load contexts.'))
+				showError(t('tables', 'Could not fetch contexts'))
+			}
+			return true
+		},
+
+		async getContext({ state, commit, dispatch }, { id }) {
+			try {
+				const res = await axios.get(generateOcsUrl('/apps/tables/api/3/contexts/' + id))
+				commit('setContext', res.data.ocs.data)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load contexts.'))
+				showError(t('tables', 'Could not fetch contexts'))
+			}
+			return true
+		},
+
 		async removeTable({ state, commit }, { tableId }) {
 			try {
 				await axios.delete(generateUrl('/apps/tables/table/' + tableId))
