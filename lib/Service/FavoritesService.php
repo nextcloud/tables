@@ -24,24 +24,39 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Service;
 
+use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Errors\PermissionError;
 use OCP\Cache\CappedMemoryCache;
+use OCP\DB\Exception;
 use OCP\IDBConnection;
 
 class FavoritesService {
 
+	private IDBConnection $connection;
+	private PermissionsService $permissionsService;
+	private ?string $userId;
 	private CappedMemoryCache $cache;
 
-	public function __construct(private IDBConnection $connection, private ?string $userId) {
+	public function __construct(
+		IDBConnection $connection,
+		PermissionsService $permissionsService,
+		?string $userId
+	) {
+		$this->connection = $connection;
+		$this->permissionsService = $permissionsService;
+		$this->userId = $userId;
 		$this->cache = new CappedMemoryCache();
 	}
 
 	public function isFavorite(int $nodeType, int $id): bool {
-		if ($cached = $this->cache->get($this->userId . '_' . $nodeType . '_' . $id)) {
+		$cacheKey = $this->userId . '_' . $nodeType . '_' . $id;
+		if ($cached = $this->cache->get($cacheKey)) {
 			return $cached;
 		}
 
-		// We still might run this multiple times
-
+		$this->cache->clear();
 		$qb = $this->connection->getQueryBuilder();
 		$qb->select('*')
 			->from('tables_favorites')
@@ -52,10 +67,24 @@ class FavoritesService {
 			$this->cache->set($this->userId . '_' . $row['node_type'] . '_' . $row['node_id'], true);
 		}
 
-		return $this->cache->get($this->userId . '_' . $nodeType . '_' . $id) ?? false;
+		// Set the cache for not found matches still to avoid further queries
+		if (!$this->cache->get($cacheKey)) {
+			$this->cache->set($cacheKey, false);
+		}
+
+		return $this->cache->get($cacheKey);
 	}
 
+	/**
+	 * @throws Exception
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
 	public function addFavorite(int $nodeType, int $id): void {
+		$this->checkValidNodeType($nodeType);
+		$this->checkAccessToNode($nodeType, $id);
+
 		$qb = $this->connection->getQueryBuilder();
 		$qb->insert('tables_favorites')
 			->values([
@@ -67,7 +96,16 @@ class FavoritesService {
 		$this->cache->set($this->userId . '_' . $nodeType . '_' . $id, true);
 	}
 
+	/**
+	 * @throws Exception
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
 	public function removeFavorite(int $nodeType, int $id): void {
+		$this->checkValidNodeType($nodeType);
+		$this->checkAccessToNode($nodeType, $id);
+
 		$qb = $this->connection->getQueryBuilder();
 		$qb->delete('tables_favorites')
 			->where($qb->expr()->eq('user_id', $qb->createNamedParameter($this->userId)))
@@ -75,6 +113,26 @@ class FavoritesService {
 			->andWhere($qb->expr()->eq('node_id', $qb->createNamedParameter($id)));
 		$qb->executeStatement();
 		$this->cache->set($this->userId . '_' . $nodeType . '_' . $id, false);
+	}
+
+	/**
+	 * @throws InternalError
+	 */
+	private function checkValidNodeType(int $nodeType): void {
+		if (!in_array($nodeType, [Application::NODE_TYPE_TABLE, Application::NODE_TYPE_VIEW])) {
+			throw new InternalError('Invalid node type');
+		}
+	}
+
+	/**
+	 * @throws PermissionError
+	 */
+	private function checkAccessToNode(int $nodeType, int $nodeId): void {
+		if ($this->permissionsService->canAccessNodeById($nodeType, $nodeId)) {
+			return;
+		}
+
+		throw new PermissionError('Invalid node type and id');
 	}
 
 }

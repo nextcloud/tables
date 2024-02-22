@@ -10,6 +10,7 @@ use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\FavoritesService;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
+use OCP\DB\Exception as DBException;
 use OCP\IL10N;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
@@ -31,35 +32,38 @@ class ApiFavoriteController extends AOCSController {
 	}
 
 	/**
-	 * [api v2] Create a new table and return it
+	 * [api v2] Add a node (table or view) to user favorites
 	 *
 	 * @NoAdminRequired
 	 *
-	 * @param string $title Title of the table
-	 * @param string|null $emoji Emoji for the table
-	 * @param string $template Template to use if wanted
-	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @param int $nodeType
+	 * @param int $nodeId
+	 * @return DataResponse<Http::STATUS_OK, array{}, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
 	 */
 	public function create(int $nodeType, int $nodeId): DataResponse {
 		try {
 			$this->service->addFavorite($nodeType, $nodeId);
-			return new DataResponse(['ok']);
-		} catch (InternalError|Exception $e) {
+			return new DataResponse();
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
+		} catch (InternalError|DBException|Exception $e) {
 			return $this->handleError($e);
 		}
 	}
 
 
 	/**
-	 * [api v2] Delete a table
+	 * [api v2] Remove a node (table or view) to from favorites
 	 *
 	 * @NoAdminRequired
 	 *
-	 * @param int $id Table ID
-	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @param int $nodeType
+	 * @param int $nodeId
+	 * @return DataResponse<Http::STATUS_OK, array{}, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Deleted table returned
 	 * 403: No permissions
@@ -68,13 +72,13 @@ class ApiFavoriteController extends AOCSController {
 	public function destroy(int $nodeType, int $nodeId): DataResponse {
 		try {
 			$this->service->removeFavorite($nodeType, $nodeId);
-			return new DataResponse(['ok']);
-		} catch (PermissionError $e) {
-			return $this->handlePermissionError($e);
-		} catch (InternalError $e) {
-			return $this->handleError($e);
+			return new DataResponse();
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
+		} catch (InternalError|DBException|Exception $e) {
+			return $this->handleError($e);
 		}
 	}
 }

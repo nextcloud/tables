@@ -45,7 +45,7 @@ class RenameTable extends Command {
 	protected function configure(): void {
 		$this
 			->setName('tables:update')
-			->setAliases('tables:rename')
+			->setAliases(['tables:rename'])
 			->setDescription('Rename a table.')
 			->addArgument(
 				'ID',
