@@ -44,6 +44,8 @@ namespace OCA\Tables;
  * 	createdAt: string,
  * 	lastEditBy: string,
  * 	lastEditAt: string,
+ *	archived: bool,
+ *	favorite: bool,
  * 	isShared: bool,
  * 	onSharePermissions: ?array{
  * 		read: bool,

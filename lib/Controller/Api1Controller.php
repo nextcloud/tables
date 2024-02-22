@@ -178,9 +178,9 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
-	public function updateTable(int $tableId, string $title = null, string $emoji = null): DataResponse {
+	public function updateTable(int $tableId, string $title = null, string $emoji = null, ?bool $archived = false): DataResponse {
 		try {
-			return new DataResponse($this->tableService->update($tableId, $title, $emoji, $this->userId)->jsonSerialize());
+			return new DataResponse($this->tableService->update($tableId, $title, $emoji, $archived, $this->userId)->jsonSerialize());
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];

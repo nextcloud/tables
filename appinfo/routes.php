@@ -17,7 +17,7 @@ return [
 		// -> tables
 		['name' => 'api1#index', 'url' => '/api/1/tables', 'verb' => 'GET'],
 		['name' => 'api1#createTable',	'url' => '/api/1/tables', 'verb' => 'POST'],
-		['name' => 'api1#updateTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'PUT'], // needs archived
+		['name' => 'api1#updateTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'PUT'],
 		['name' => 'api1#getTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'GET'],
 		['name' => 'api1#deleteTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'DELETE'],
 		// -> views
@@ -61,7 +61,7 @@ return [
 		['name' => 'table#index', 'url' => '/table', 'verb' => 'GET'],
 		['name' => 'table#show', 'url' => '/table/{id}', 'verb' => 'GET'],
 		['name' => 'table#create', 'url' => '/table', 'verb' => 'POST'],
-		['name' => 'table#update', 'url' => '/table/{id}', 'verb' => 'PUT'],  // needs archived
+		['name' => 'table#update', 'url' => '/table/{id}', 'verb' => 'PUT'],
 		['name' => 'table#destroy', 'url' => '/table/{id}', 'verb' => 'DELETE'],
 
 		// view
@@ -115,7 +115,7 @@ return [
 		['name' => 'ApiTables#index', 'url' => '/api/2/tables', 'verb' => 'GET'],
 		['name' => 'ApiTables#show', 'url' => '/api/2/tables/{id}', 'verb' => 'GET'],
 		['name' => 'ApiTables#create', 'url' => '/api/2/tables', 'verb' => 'POST'],
-		['name' => 'ApiTables#update', 'url' => '/api/2/tables/{id}', 'verb' => 'PUT'],  // needs archived
+		['name' => 'ApiTables#update', 'url' => '/api/2/tables/{id}', 'verb' => 'PUT'],
 		['name' => 'ApiTables#destroy', 'url' => '/api/2/tables/{id}', 'verb' => 'DELETE'],
 		['name' => 'ApiTables#transfer', 'url' => '/api/2/tables/{id}/transfer', 'verb' => 'PUT'],
 
