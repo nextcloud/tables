@@ -50,6 +50,7 @@ export default {
 	},
 	async created() {
 		await this.$store.dispatch('loadTablesFromBE')
+		await this.$store.dispatch('getAllContexts')
 		await this.$store.dispatch('loadViewsSharedWithMeFromBE')
 		this.routing(this.$router.currentRoute)
 		this.observeAppContent()
@@ -67,6 +68,8 @@ export default {
 			} else if (currentRoute.path.startsWith('/view/')) {
 				this.$store.commit('setActiveViewId', parseInt(currentRoute.params.viewId))
 				this.setPageTitle(this.$store.getters.activeView.title)
+			} else if (currentRoute.path.startsWith('/context/')) {
+				this.$store.commit('setActiveContextId', currentRoute.params.contextId)
 			}
 		},
 		setPageTitle(title) {
