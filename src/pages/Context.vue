@@ -7,9 +7,8 @@
 
 			<h1> Context Tables</h1>
 			<div v-for="table in contextTables">
-				<TableWrapper :table="table" :columns="tableData['columns' + table.id]"
-					:rows="tableData['rows' + table.id]" :view-setting="viewSetting"
-					@create-column="createColumn(false, table)"
+				<TableWrapper :table="table" :columns="tableData['columns' + table.id]" :rows="tableData['rows' + table.id]"
+					:view-setting="viewSetting" @create-column="createColumn(false, table)"
 					@import="openImportModal(table, false)" @download-csv="downloadCSV(table, false)" />
 			</div>
 
@@ -49,12 +48,14 @@ export default {
 		...mapState(['tables', 'contexts', 'activeContextId']),
 		tableData() {
 			const data = {}
-			for (const [key, node] of Object.entries(this.context.nodes)) {
-				if (node.node_type) {
-					const rowId = 'rows' + node.node_id
-					const colId = 'columns' + node.node_id
-					data[colId] = this.$store.state.data.columns[(node.node_id).toString()]
-					data[rowId] = this.$store.state.data.rows[(node.node_id).toString()]
+			if (this.context && this.context.nodes) {
+				for (const [key, node] of Object.entries(this.context.nodes)) {
+					if (node.node_type) {
+						const rowId = 'rows' + node.node_id
+						const colId = 'columns' + node.node_id
+						data[colId] = this.$store.state.data.columns[(node.node_id).toString()]
+						data[rowId] = this.$store.state.data.rows[(node.node_id).toString()]
+					}
 				}
 			}
 			return data
@@ -67,7 +68,7 @@ export default {
 		},
 	},
 
-	async  mounted() {
+	async mounted() {
 		await this.reload()
 	},
 
@@ -77,18 +78,22 @@ export default {
 			const index = this.contexts.findIndex(c => parseInt(c.id) === parseInt(this.activeContextId))
 			this.context = this.contexts[index]
 
-			for (const [key, node] of Object.entries(this.context.nodes)) {
-				if (node.node_type === 'table') {
-					const table = this.tables.find(table => table.id === node.node_id)
-					this.contextTables.push(table)
-					await this.$store.dispatch('loadColumnsFromBE', {
-						view: null,
-						tableId: node.node_id,
-					})
-					await this.$store.dispatch('loadRowsFromBE', {
-						viewId: null,
-						tableId: node.node_id,
-					})
+			console.log(this.contexts, this.activeContextId)
+			console.log(this.context)
+			if (this.context && this.context.nodes) {
+				for (const [key, node] of Object.entries(this.context.nodes)) {
+					if (node.node_type === 'table') {
+						const table = this.tables.find(table => table.id === node.node_id)
+						this.contextTables.push(table)
+						await this.$store.dispatch('loadColumnsFromBE', {
+							view: null,
+							tableId: node.node_id,
+						})
+						await this.$store.dispatch('loadRowsFromBE', {
+							viewId: null,
+							tableId: node.node_id,
+						})
+					}
 				}
 			}
 		},
