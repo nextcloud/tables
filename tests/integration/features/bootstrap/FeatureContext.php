@@ -70,6 +70,10 @@ class FeatureContext implements Context {
 	private array $viewIds = [];
 	private array $columnIds = [];
 
+	// Store data from last request to perform assertions, id is used as a key
+	private array $tableData = [];
+	private array $viewData = [];
+
 	// use CommandLineTrait;
 
 	/**
@@ -127,16 +131,30 @@ class FeatureContext implements Context {
 		Assert::assertEquals($newTable['emoji'], $emoji);
 		Assert::assertEquals($newTable['ownership'], $user);
 
-		$this->sendOcsRequest(
-			'GET',
-			'/apps/tables/api/2/tables/'.$newTable['id'],
-		);
-
-		$tableToVerify = $this->getDataFromResponse($this->response)['ocs']['data'];
+		$tableToVerify = $this->userFetchesTableInfo($user, $tableName);
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($tableToVerify['title'], $title);
 		Assert::assertEquals($tableToVerify['emoji'], $emoji);
 		Assert::assertEquals($tableToVerify['ownership'], $user);
+	}
+
+	/**
+	 * @Given user :user fetches table info for table :tableName
+	 */
+	public function userFetchesTableInfo($user, $tableName) {
+		$this->setCurrentUser($user);
+		$tableId = $this->tableIds[$tableName];
+
+		$this->sendOcsRequest(
+			'GET',
+			'/apps/tables/api/2/tables/'.$tableId,
+		);
+
+		$tableToVerify = $this->getDataFromResponse($this->response)['ocs']['data'];
+		$this->tableData[$tableName] = $tableToVerify;
+		$this->tableId = $tableToVerify['id'];
+
+		return $tableToVerify;
 	}
 
 	/**
@@ -223,6 +241,7 @@ class FeatureContext implements Context {
 
 	/**
 	 * @Then user :user updates table :tableName set title :title and emoji :emoji via v2
+	 * @Then user :user updates table :tableName set archived :archived via v2
 	 *
 	 * @param string $user
 	 * @param string $title
@@ -230,12 +249,25 @@ class FeatureContext implements Context {
 	 * @param string $tableName
 	 * @throws Exception
 	 */
-	public function updateTableV2(string $user, string $title, ?string $emoji, string $tableName): void {
+	public function updateTableV2(string $user, string $tableName, string $title = null, ?string $emoji = null, ?bool $archived = null): void {
 		$this->setCurrentUser($user);
 
-		$data = ['title' => $title];
+		$this->sendOcsRequest(
+			'GET',
+			'/apps/tables/api/2/tables/'.$this->tableIds[$tableName],
+		);
+
+		$previousData = $this->getDataFromResponse($this->response)['ocs']['data'];
+
+		$data = [];
+		if ($title !== null) {
+			$data['title'] = $title;
+		}
 		if ($emoji !== null) {
 			$data['emoji'] = $emoji;
+		}
+		if ($archived !== null) {
+			$data['archived'] = $archived;
 		}
 
 		$this->sendOcsRequest(
@@ -247,9 +279,10 @@ class FeatureContext implements Context {
 		$updatedTable = $this->getDataFromResponse($this->response)['ocs']['data'];
 
 		Assert::assertEquals(200, $this->response->getStatusCode());
-		Assert::assertEquals($updatedTable['title'], $title);
-		Assert::assertEquals($updatedTable['emoji'], $emoji);
-		Assert::assertEquals($updatedTable['ownership'], $user);
+		Assert::assertEquals($updatedTable['title'], $title ?? $previousData['title']);
+		Assert::assertEquals($updatedTable['emoji'], $emoji ?? $previousData['emoji']);
+		Assert::assertEquals($updatedTable['ownership'], $user ?? $previousData['ownership']);
+		Assert::assertEquals($updatedTable['archived'], $archived ?? $previousData['archived']);
 
 		$this->sendOcsRequest(
 			'GET',
@@ -258,9 +291,12 @@ class FeatureContext implements Context {
 
 		$tableToVerify = $this->getDataFromResponse($this->response)['ocs']['data'];
 		Assert::assertEquals(200, $this->response->getStatusCode());
-		Assert::assertEquals($tableToVerify['title'], $title);
-		Assert::assertEquals($tableToVerify['emoji'], $emoji);
-		Assert::assertEquals($tableToVerify['ownership'], $user);
+		Assert::assertEquals($tableToVerify['title'], $title ?? $previousData['title']);
+		Assert::assertEquals($tableToVerify['emoji'], $emoji ?? $previousData['emoji']);
+		Assert::assertEquals($tableToVerify['ownership'], $user ?? $previousData['ownership']);
+		Assert::assertEquals($tableToVerify['archived'], $archived ?? $previousData['archived']);
+
+		$this->tableData[$tableName] = $tableToVerify;
 	}
 
 	/**
@@ -1633,5 +1669,60 @@ class FeatureContext implements Context {
 		} else {
 			Assert::assertEquals($statusCode, $response->getStatusCode(), $message);
 		}
+	}
+
+	/**
+	 * @Given user :user sees the following table attributes on table :tableName
+	 */
+	public function userSeesTheFollowingTableAttributesOnTable($user, $tableName, TableNode $table) {
+		foreach ($table->getRows() as $row) {
+			$attribute = $row[0];
+			$value = $row[1];
+			if (in_array($attribute, ['archived', 'favorite'])) {
+				$value = (bool)$value;
+			}
+			Assert::assertEquals($value, $this->tableData[$tableName][$attribute]);
+		}
+	}
+
+	/**
+	 * @Given user :user adds the table :tableName to favorites
+	 */
+	public function userAddsTheTableToFavorites($user, $tableName) {
+		$this->setCurrentUser($user);
+		$nodeType = 0;
+		$tableId = $this->tableIds[$tableName];
+
+		$this->sendOcsRequest(
+			'POST',
+			'/apps/tables/api/2/favorites/' . $nodeType. '/' . $tableId,
+		);
+		if ($this->response->getStatusCode() === 200) {
+			$this->userFetchesTableInfo($user, $tableName);
+		}
+	}
+
+	/**
+	 * @Given user :user removes the table :tableName from favorites
+	 */
+	public function userRemovesTheTableFromFavorites($user, $tableName) {
+		$this->setCurrentUser($user);
+		$nodeType = 0;
+		$tableId = $this->tableIds[$tableName];
+
+		$this->sendOcsRequest(
+			'DELETE',
+			'/apps/tables/api/2/favorites/' . $nodeType. '/' . $tableId,
+		);
+		if ($this->response->getStatusCode() === 200) {
+			$this->userFetchesTableInfo($user, $tableName);
+		}
+	}
+
+	/**
+	 * @Then /^the last response should have a "([^"]*)" status code$/
+	 */
+	public function theLastResponseShouldHaveAStatusCode(int $statusCode) {
+		Assert::assertEquals($statusCode, $this->response->getStatusCode());
 	}
 }

@@ -2,6 +2,7 @@ Feature: APIv2
   Background:
     Given user "participant1-v2" exists
     Given user "participant2-v2" exists
+    Given user "participant3-v2" exists
 
   @api2
   Scenario: Test initial setup
@@ -15,10 +16,36 @@ Feature: APIv2
     Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
     Then user "participant1-v2" has the following tables via v2
       | Table 1 via api v2 |
+    And user "participant1-v2" sees the following table attributes on table "t1"
+      | archived | 0 |
     Then user "participant1-v2" updates table "t1" set title "updated title" and emoji "⛵︎" via v2
     Then user "participant1-v2" has the following tables via v2
       | updated title |
+    Then user "participant1-v2" updates table "t1" set archived 1 via v2
+    And user "participant1-v2" sees the following table attributes on table "t1"
+      | archived | 1 |
+    Then user "participant1-v2" updates table "t1" set archived 0 via v2
+    And user "participant1-v2" sees the following table attributes on table "t1"
+      | archived | 0 |
     Then user "participant1-v2" deletes table "t1" via v2
+
+  @api2
+  Scenario: Favorite tables
+    Given table "Own table" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And user "participant1-v2" shares table with user "participant2-v2"
+    And user "participant1-v2" adds the table "t1" to favorites
+    And user "participant1-v2" sees the following table attributes on table "t1"
+      | favorite | 1 |
+    And user "participant2-v2" fetches table info for table "t1"
+    And user "participant2-v2" sees the following table attributes on table "t1"
+      | favorite | 0 |
+    When user "participant1-v2" removes the table "t1" from favorites
+    And user "participant1-v2" sees the following table attributes on table "t1"
+      | favorite | 0 |
+    When user "participant3-v2" adds the table "t1" to favorites
+    Then the last response should have a "403" status code
+
+
 
   @api2
   Scenario: Basic column actions
