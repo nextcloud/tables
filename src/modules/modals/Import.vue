@@ -40,7 +40,7 @@
 						<p class="span">
 							{{ t('tables', 'Supported formats: xlsx, xls, csv, html, xml') }}
 							<br>
-							{{ t('tables', 'The first row if the file must contain column headings.') }}
+							{{ t('tables', 'First row of the file must contain column headings.') }}
 						</p>
 					</div>
 				</RowFormWrapper>
@@ -224,7 +224,14 @@ export default {
 			return this.canCreateMissingColumns && this.createMissingColumns
 		},
 		importFileName() {
-			return this.selectedUploadFile ? this.selectedUploadFile.name : this.path
+			const fileName = this.selectedUploadFile ? this.selectedUploadFile.name : this.path
+
+			if (fileName.length > 30) {
+				const extension = fileName.split('.').pop()
+				return fileName.substring(0, 30 - extension.length - 3) + '...' + extension
+			}
+
+			return fileName
 		},
 	},
 	watch: {
