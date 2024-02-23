@@ -65,7 +65,7 @@ class Version000800Date20240213123743 extends SimpleMigrationStep {
 	 */
 	protected function haveContextTable(ISchemaWrapper $schema): void {
 		if ($table = $this->shouldAddTable(self::PREFIX . 'context', $schema)) {
-			$table->addColumn('id', Types::INTEGER, ['notnull' => true]);
+			$table->addColumn('id', Types::INTEGER, ['autoincrement' => true, 'notnull' => true]);
 			$table->addColumn('name', Types::STRING, ['notnull' => true, 'length' => 200]);
 			$table->addColumn('icon', Types::STRING, ['notnull' => true, 'length' => 64]);
 			$table->addColumn('description', Types::TEXT);
@@ -81,7 +81,7 @@ class Version000800Date20240213123743 extends SimpleMigrationStep {
 	 */
 	protected function haveContextNodeRelationTable(ISchemaWrapper $schema): void {
 		if ($table = $this->shouldAddTable(self::PREFIX . 'rel_context_node', $schema)) {
-			$table->addColumn('id', Types::INTEGER, ['notnull' => true]);
+			$table->addColumn('id', Types::INTEGER, ['autoincrement' => true, 'notnull' => true]);
 			$table->addColumn('context_id', Types::INTEGER, ['notnull' => true]);
 			$table->addColumn('node_id', Types::INTEGER, ['notnull' => true]);
 			$table->addColumn('node_type', Types::STRING, ['notnull' => true, 'length' => 50]);
@@ -96,7 +96,7 @@ class Version000800Date20240213123743 extends SimpleMigrationStep {
 	 */
 	protected function havePageTable(ISchemaWrapper $schema): void {
 		if ($table = $this->shouldAddTable(self::PREFIX . 'page', $schema)) {
-			$table->addColumn('id', Types::INTEGER, ['notnull' => true]);
+			$table->addColumn('id', Types::INTEGER, ['autoincrement' => true, 'notnull' => true]);
 			$table->addColumn('context_id', Types::INTEGER, ['notnull' => true]);
 			$table->addColumn('page_type', Types::STRING, ['notnull' => true, 'length' => 32]);
 
@@ -109,7 +109,7 @@ class Version000800Date20240213123743 extends SimpleMigrationStep {
 	 */
 	protected function havePageContentTable(ISchemaWrapper $schema): void {
 		if ($table = $this->shouldAddTable(self::PREFIX . 'page_content', $schema)) {
-			$table->addColumn('id', Types::INTEGER, ['notnull' => true]);
+			$table->addColumn('id', Types::INTEGER, ['autoincrement' => true, 'notnull' => true]);
 			$table->addColumn('page_id', Types::INTEGER, ['notnull' => true]);
 			$table->addColumn('node_rel_id', Types::INTEGER, ['notnull' => true]);
 			$table->addColumn('order', Types::INTEGER, ['notnull' => true]);
