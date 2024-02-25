@@ -41,6 +41,7 @@ OC.L10N.register(
     "Sort" : "Ordigi",
     "Shared" : "Kunhavigita",
     "No recommendations. Start typing." : "Neniu propono. Ektajpu.",
+    "Searching …" : "Serĉado ...",
     "No elements found." : "Nenio trovita.",
     "group" : "grupo",
     "No shares" : "Neniu kunhavo",
