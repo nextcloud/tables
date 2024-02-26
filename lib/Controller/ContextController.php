@@ -74,6 +74,28 @@ class ContextController extends AOCSController {
 	}
 
 	/**
+	 * [api v2] Create a new context and return it
+	 *
+	 * @NoAdminRequired
+	 *
+	 * @param string $name Name of the context
+	 * @param string $iconName Material design icon name of the context
+	 * @param string $description Descriptive text of the context
+	 * @param array $nodes optional nodes to be connected to this context
+	 *
+	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 *
+	 * 200: Tables returned
+	 */
+	public function create(string $name, string $iconName, string $description = '', array $nodes = []): DataResponse {
+		try {
+			return new DataResponse($this->contextService->create($name, $iconName, $description, $nodes, $this->userId, 0)->jsonSerialize());
+		} catch (Exception $e) {
+			return $this->handleError($e);
+		}
+	}
+
+	/**
 	 * @param Context[] $contexts
 	 * @return array
 	 */
