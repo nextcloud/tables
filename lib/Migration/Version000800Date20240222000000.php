@@ -51,6 +51,7 @@ class Version000800Date20240222000000 extends SimpleMigrationStep {
 				'length' => 64,
 			]);
 			$table->setPrimaryKey(['id']);
+			$table->addIndex(['user_id'], 'idx_tables_fav_uid');
 		}
 
 		return $schema;
