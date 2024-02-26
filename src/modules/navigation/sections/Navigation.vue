@@ -35,6 +35,16 @@
 					:view="view" />
 			</ul>
 
+			<NcAppNavigationItem :name="t('tables', 'Archived tables')" :allow-collapse="true" :open="false">
+				<template #icon>
+					<Archive :size="24" />
+				</template>
+
+				<template #counter>
+					0
+				</template>
+			</NcAppNavigationItem>
+
 			<div v-if="filterString !== ''" class="search-info">
 				<NcEmptyContent :description="t('tables', 'Your results are filtered.')">
 					<template #icon>
@@ -52,12 +62,13 @@
 </template>
 
 <script>
-import { NcAppNavigation, NcAppNavigationCaption, NcActionButton, NcTextField, NcButton, NcEmptyContent } from '@nextcloud/vue'
+import { NcAppNavigation, NcAppNavigationItem, NcAppNavigationCaption, NcActionButton, NcTextField, NcButton, NcEmptyContent } from '@nextcloud/vue'
 import NavigationViewItem from '../partials/NavigationViewItem.vue'
 import NavigationTableItem from '../partials/NavigationTableItem.vue'
 import { mapState } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
+import Archive from 'vue-material-design-icons/Archive.vue'
 import { getCurrentUser } from '@nextcloud/auth'
 
 export default {
@@ -66,10 +77,12 @@ export default {
 		NavigationTableItem,
 		NavigationViewItem,
 		NcAppNavigation,
+		NcAppNavigationItem,
 		NcAppNavigationCaption,
 		NcActionButton,
 		NcTextField,
 		Magnify,
+		Archive,
 		NcButton,
 		NcEmptyContent,
 	},
