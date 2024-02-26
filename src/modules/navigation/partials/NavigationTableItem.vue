@@ -66,6 +66,14 @@
 				</template>
 			</NcActionButton>
 			<NcActionButton v-if="canManageElement(table)"
+				:close-after-click="true"
+				@click="archiveTable">
+				{{ t('tables', 'Archive table') }}
+				<template #icon>
+					<ArchiveArrowDown :size="20" />
+				</template>
+			</NcActionButton>
+			<NcActionButton v-if="canManageElement(table)"
 				icon="icon-delete"
 				:close-after-click="true"
 				@click="deleteTable()">
@@ -78,12 +86,14 @@
 			:show-share-sender="false" />
 	</NcAppNavigationItem>
 </template>
+
 <script>
 import { NcActionButton, NcAppNavigationItem, NcCounterBubble, NcAvatar } from '@nextcloud/vue'
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters, mapState } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
 import Table from 'vue-material-design-icons/Table.vue'
+import ArchiveArrowDown from 'vue-material-design-icons/ArchiveArrowDown.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import { getCurrentUser } from '@nextcloud/auth'
 import Connection from 'vue-material-design-icons/Connection.vue'
@@ -98,6 +108,7 @@ export default {
 		IconRename,
 		// eslint-disable-next-line vue/no-reserved-component-names
 		Table,
+		ArchiveArrowDown,
 		Import,
 		NavigationViewItem,
 		NcActionButton,
@@ -192,6 +203,10 @@ export default {
 					open: false,
 				})
 			}
+		},
+		archiveTable() {
+			// eslint-disable-next-line no-console
+			console.log(this.table)
 		},
 	},
 
