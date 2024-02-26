@@ -47,11 +47,12 @@ class FavoritesService {
 		$this->connection = $connection;
 		$this->permissionsService = $permissionsService;
 		$this->userId = $userId;
+		// The cache usage is currently not unique to the user id as only a memory cache is used
 		$this->cache = new CappedMemoryCache();
 	}
 
 	public function isFavorite(int $nodeType, int $id): bool {
-		$cacheKey = $this->userId . '_' . $nodeType . '_' . $id;
+		$cacheKey = $nodeType . '_' . $id;
 		if ($cached = $this->cache->get($cacheKey)) {
 			return $cached;
 		}
@@ -64,7 +65,7 @@ class FavoritesService {
 
 		$result = $qb->executeQuery();
 		while ($row = $result->fetch()) {
-			$this->cache->set($this->userId . '_' . $row['node_type'] . '_' . $row['node_id'], true);
+			$this->cache->set($row['node_type'] . '_' . $row['node_id'], true);
 		}
 
 		// Set the cache for not found matches still to avoid further queries
@@ -93,7 +94,7 @@ class FavoritesService {
 				'node_id' => $qb->createNamedParameter($id),
 			]);
 		$qb->executeStatement();
-		$this->cache->set($this->userId . '_' . $nodeType . '_' . $id, true);
+		$this->cache->set($nodeType . '_' . $id, true);
 	}
 
 	/**
@@ -112,7 +113,7 @@ class FavoritesService {
 			->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType)))
 			->andWhere($qb->expr()->eq('node_id', $qb->createNamedParameter($id)));
 		$qb->executeStatement();
-		$this->cache->set($this->userId . '_' . $nodeType . '_' . $id, false);
+		$this->cache->set($nodeType . '_' . $id, false);
 	}
 
 	/**
