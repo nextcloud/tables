@@ -25,6 +25,8 @@ class Application extends App implements IBootstrap {
 	public const NODE_TYPE_TABLE = 0;
 	public const NODE_TYPE_VIEW = 1;
 
+	public const OWNER_TYPE_USER = 0;
+
 	public function __construct() {
 		parent::__construct(self::APP_ID);
 	}
