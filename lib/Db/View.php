@@ -35,6 +35,8 @@ use OCP\AppFramework\Db\Entity;
  * @method setOnSharePermissions(array $onSharePermissions)
  * @method getHasShares(): bool
  * @method setHasShares(bool $hasShares)
+ * @method getFavorite(): bool
+ * @method setFavorite(bool $favorite)
  * @method getRowsCount(): int
  * @method setRowsCount(int $rowCount)
  * @method getOwnership(): string
@@ -57,6 +59,7 @@ class View extends Entity implements JsonSerializable {
 	protected ?bool $isShared = null;
 	protected ?array $onSharePermissions = null;
 	protected ?bool $hasShares = false;
+	protected bool $favorite = false;
 	protected ?int $rowsCount = 0;
 	protected ?string $ownership = null;
 	protected ?string $ownerDisplayName = null;
@@ -137,6 +140,7 @@ class View extends Entity implements JsonSerializable {
 			'columns' => $this->getColumnsArray(),
 			'sort' => $this->getSortArray(),
 			'isShared' => !!$this->isShared,
+			'favorite' => $this->favorite,
 			'onSharePermissions' => $this->getSharePermissions(),
 			'hasShares' => !!$this->hasShares,
 			'rowsCount' => $this->rowsCount ?: 0,

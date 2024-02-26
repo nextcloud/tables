@@ -7,6 +7,7 @@ namespace OCA\Tables\Service;
 use DateTime;
 use Exception;
 
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
@@ -34,6 +35,8 @@ class ViewService extends SuperService {
 
 	protected UserHelper $userHelper;
 
+	protected FavoritesService $favoritesService;
+
 	protected IL10N $l;
 
 	public function __construct(
@@ -44,6 +47,7 @@ class ViewService extends SuperService {
 		ShareService $shareService,
 		RowService $rowService,
 		UserHelper $userHelper,
+		FavoritesService $favoritesService,
 		IL10N $l
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
@@ -52,6 +56,7 @@ class ViewService extends SuperService {
 		$this->shareService = $shareService;
 		$this->rowService = $rowService;
 		$this->userHelper = $userHelper;
+		$this->favoritesService = $favoritesService;
 	}
 
 
@@ -394,6 +399,10 @@ class ViewService extends SuperService {
 							$rawSortArray));
 				}
 			}
+		}
+
+		if ($this->favoritesService->isFavorite(Application::NODE_TYPE_VIEW, $view->getId())) {
+			$view->setFavorite(true);
 		}
 	}
 
