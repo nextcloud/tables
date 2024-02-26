@@ -19,10 +19,13 @@
 						<NcActionButton :aria-label="t('tables', 'Create table')" icon="icon-add" @click.prevent="createTable" />
 					</template>
 				</NcAppNavigationCaption>
-				<NavigationTableItem v-for="table in getOwnTables"
-					:key="table.id"
-					:filter-string="filterString"
-					:table="table" />
+
+				<template v-for="table in getOwnTables">
+					<NavigationTableItem v-if="!table.archived"
+						:key="table.id"
+						:filter-string="filterString"
+						:table="table" />
+				</template>
 
 				<NcAppNavigationCaption v-if="getSharedTables.length > 0 || getSharedViews.length > 0"
 					:name="t('tables', 'Shared')" />
@@ -41,7 +44,9 @@
 				</template>
 
 				<template #counter>
-					{{ getArchivedTables.length }}
+					<NcCounterBubble>
+						{{ getArchivedTables.length }}
+					</NcCounterBubble>
 				</template>
 
 				<NavigationTableItem v-for="table in getArchivedTables"
@@ -66,7 +71,17 @@
 </template>
 
 <script>
-import { NcAppNavigation, NcAppNavigationItem, NcAppNavigationCaption, NcActionButton, NcTextField, NcButton, NcEmptyContent } from '@nextcloud/vue'
+import {
+	NcAppNavigation,
+	NcAppNavigationItem,
+	NcAppNavigationCaption,
+	NcActionButton,
+	NcTextField,
+	NcButton,
+	NcEmptyContent,
+	NcCounterBubble,
+} from '@nextcloud/vue'
+
 import NavigationViewItem from '../partials/NavigationViewItem.vue'
 import NavigationTableItem from '../partials/NavigationTableItem.vue'
 import { mapState } from 'vuex'
@@ -88,6 +103,7 @@ export default {
 		Magnify,
 		Archive,
 		NcButton,
+		NcCounterBubble,
 		NcEmptyContent,
 	},
 	data() {
@@ -103,10 +119,19 @@ export default {
 			return this.views.filter(item => item.isShared === true && item.ownership !== getCurrentUser().uid && !sharedTableIds.includes(item.tableId)).filter(view => view.title.toLowerCase().includes(this.filterString.toLowerCase())).sort((a, b) => a.tableId === b.tableId ? a.id - b.id : a.tableId - b.tableId)
 		},
 		getSharedTables() {
-			return this.getFilteredTables.filter((item) => { return item.isShared === true && item.ownership !== getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
+			return this.getFilteredTables.filter((item) => {
+				return item.isShared === true && item.ownership !== getCurrentUser().uid
+			}).sort((a, b) => a.title.localeCompare(b.title))
 		},
 		getOwnTables() {
-			return this.getFilteredTables.filter((item) => { return item.isShared === false || item.ownership === getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
+			return this.getFilteredTables.filter((item) => {
+				return item.isShared === false || item.ownership === getCurrentUser().uid
+			}).sort((a, b) => a.title.localeCompare(b.title))
+		},
+		getArchivedTables() {
+			return this.getFilteredTables.filter(item => {
+				return item.archived
+			}).sort((a, b) => a.title.localeCompare(b.title))
 		},
 		getFilteredTables() {
 			return this.tables.filter(table => {
@@ -116,11 +141,6 @@ export default {
 					return table.title.toLowerCase().includes(this.filterString.toLowerCase())
 						|| table.views?.some(view => view.title.toLowerCase().includes(this.filterString.toLowerCase()))
 				}
-			})
-		},
-		getArchivedTables() {
-			return this.tables.filter(item => {
-				return item.archived
 			})
 		},
 	},
