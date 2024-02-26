@@ -37,12 +37,16 @@
 
 			<NcAppNavigationItem :name="t('tables', 'Archived tables')" :allow-collapse="true" :open="false">
 				<template #icon>
-					<Archive :size="24" />
+					<Archive :size="20" />
 				</template>
 
 				<template #counter>
-					0
+					{{ getArchivedTables.length }}
 				</template>
+
+				<NavigationTableItem v-for="table in getArchivedTables"
+					:key="table.id"
+					:table="table" />
 			</NcAppNavigationItem>
 
 			<div v-if="filterString !== ''" class="search-info">
@@ -112,6 +116,11 @@ export default {
 					return table.title.toLowerCase().includes(this.filterString.toLowerCase())
 						|| table.views?.some(view => view.title.toLowerCase().includes(this.filterString.toLowerCase()))
 				}
+			})
+		},
+		getArchivedTables() {
+			return this.tables.filter(item => {
+				return item.archived
 			})
 		},
 	},
