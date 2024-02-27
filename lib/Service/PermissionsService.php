@@ -3,6 +3,7 @@
 namespace OCA\Tables\Service;
 
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\Table;
@@ -31,8 +32,18 @@ class PermissionsService {
 	protected ?string $userId = null;
 
 	protected bool $isCli = false;
+	private ContextMapper $contextMapper;
 
-	public function __construct(LoggerInterface $logger, ?string $userId, TableMapper $tableMapper, ViewMapper $viewMapper, ShareMapper $shareMapper, UserHelper $userHelper, bool $isCLI) {
+	public function __construct(
+		LoggerInterface $logger,
+		?string         $userId,
+		TableMapper     $tableMapper,
+		ViewMapper      $viewMapper,
+		ShareMapper     $shareMapper,
+		ContextMapper   $contextMapper,
+		UserHelper      $userHelper,
+		bool            $isCLI
+	) {
 		$this->tableMapper = $tableMapper;
 		$this->viewMapper = $viewMapper;
 		$this->shareMapper = $shareMapper;
@@ -40,6 +51,7 @@ class PermissionsService {
 		$this->logger = $logger;
 		$this->userId = $userId;
 		$this->isCli = $isCLI;
+		$this->contextMapper = $contextMapper;
 	}
 
 
@@ -116,6 +128,28 @@ class PermissionsService {
 		}
 
 		return false;
+	}
+
+	public function canManageContextById(int $contextId, ?string $userId = null): bool {
+		try {
+			$context = $this->contextMapper->findById($contextId, $userId);
+		} catch (DoesNotExistException $e) {
+			$this->logger->warning('Context does not exist');
+			return false;
+		} catch (MultipleObjectsReturnedException $e) {
+			$this->logger->warning('Multiple contexts found for this ID');
+			return false;
+		} catch (Exception $e) {
+			$this->logger->warning($e->getMessage());
+			return false;
+		}
+
+		if ($context->getOwnerType() !== Application::OWNER_TYPE_USER) {
+			$this->logger->warning('Unsupported owner type');
+			return false;
+		}
+
+		return $context->getOwnerId() === $userId;
 	}
 
 	public function canAccessView(View $view, ?string $userId = null): bool {

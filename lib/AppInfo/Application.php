@@ -8,6 +8,7 @@ use OCA\Tables\Capabilities;
 use OCA\Tables\Listener\AnalyticsDatasourceListener;
 use OCA\Tables\Listener\TablesReferenceListener;
 use OCA\Tables\Listener\UserDeletedListener;
+use OCA\Tables\Middleware\PermissionMiddleware;
 use OCA\Tables\Reference\ContentReferenceProvider;
 use OCA\Tables\Reference\LegacyReferenceProvider;
 use OCA\Tables\Reference\ReferenceProvider;
@@ -62,6 +63,8 @@ class Application extends App implements IBootstrap {
 		}
 
 		$context->registerCapability(Capabilities::class);
+
+		$context->registerMiddleware(PermissionMiddleware::class);
 	}
 
 	public function boot(IBootContext $context): void {

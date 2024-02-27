@@ -127,6 +127,8 @@ return [
 		['name' => 'Context#index', 'url' => '/api/2/contexts', 'verb' => 'GET'],
 		['name' => 'Context#show', 'url' => '/api/2/contexts/{contextId}', 'verb' => 'GET'],
 		['name' => 'Context#create', 'url' => '/api/2/contexts', 'verb' => 'POST'],
+		['name' => 'Context#addNode', 'url' => '/api/2/contexts/{contextId}/nodes', 'verb' => 'POST'],
+		['name' => 'Context#removeNode', 'url' => '/api/2/contexts/{contextId}/nodes/{nodeRelId}', 'verb' => 'DELETE'],
 
 	]
 ];
