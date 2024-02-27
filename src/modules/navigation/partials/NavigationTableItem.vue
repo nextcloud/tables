@@ -78,7 +78,7 @@
 			<!-- FAVORITE -->
 			<NcActionButton v-if="canManageElement(table) && !table.favorite"
 				:close-after-click="true"
-				@click="() => {}">
+				@click="toggleFavoriteTable(true)">
 				{{ t('tables', 'Add to favorites') }}
 				<template #icon>
 					<Star :size="20" />
@@ -88,7 +88,7 @@
 			<!-- UNFAVORITE -->
 			<NcActionButton v-if="canManageElement(table) && table.favorite"
 				:close-after-click="true"
-				@click="() => {}">
+				@click="toggleFavoriteTable(false)">
 				{{ t('tables', 'Remove from favorites') }}
 				<template #icon>
 					<StarOutline :size="20" />
@@ -258,6 +258,17 @@ export default {
 				id: this.table.id,
 				data: { archived },
 			})
+		},
+		async toggleFavoriteTable(favorite) {
+			if (favorite) {
+				await this.$store.dispatch('favoriteTable', {
+					id: this.table.id,
+				})
+			} else {
+				await this.$store.dispatch('removeFavoriteTable', {
+					id: this.table.id,
+				})
+			}
 		},
 	},
 }
