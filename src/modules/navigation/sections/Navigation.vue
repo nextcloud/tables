@@ -38,7 +38,10 @@
 					:view="view" />
 			</ul>
 
-			<NcAppNavigationItem :name="t('tables', 'Archived tables')" :allow-collapse="true" :open="false">
+			<NcAppNavigationItem v-if="getArchivedTables.length > 0"
+				:name="t('tables', 'Archived tables')"
+				:allow-collapse="true"
+				:open="false">
 				<template #icon>
 					<Archive :size="20" />
 				</template>
