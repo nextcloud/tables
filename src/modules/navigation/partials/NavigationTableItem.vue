@@ -220,16 +220,10 @@ export default {
 			}
 		},
 		async toggleArchiveTable(archived) {
-			const res = await this.$store.dispatch('updateTable', {
+			await this.$store.dispatch('updateTable', {
 				id: this.table.id,
 				data: { archived },
 			})
-
-			// eslint-disable-next-line no-console
-			if (!res) { console.log('failed to archive/unarchive table') }
-
-			// eslint-disable-next-line no-console
-			console.log('archived/unarchived table')
 		},
 	},
 
