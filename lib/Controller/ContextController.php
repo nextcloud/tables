@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace OCA\Tables\Controller;
 
 use OCA\Tables\Db\Context;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ContextService;
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\DB\Exception;
@@ -93,6 +97,48 @@ class ContextController extends AOCSController {
 		} catch (Exception $e) {
 			return $this->handleError($e);
 		}
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CanManageNode
+	 */
+	public function addNode(int $contextId, int $nodeId, int $nodeType, int $permissions, ?int $order = null): DataResponse {
+		try {
+			$rel = $this->contextService->addNodeToContextById($contextId, $nodeId, $nodeType, $permissions, $this->userId);
+			$this->contextService->addNodeRelToPage($rel, $order);
+			$context = $this->contextService->findById($rel->getContextId(), $this->userId);
+			return new DataResponse($context->jsonSerialize());
+		} catch (DoesNotExistException $e) {
+			return $this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
+		} catch (MultipleObjectsReturnedException|Exception|InternalError $e) {
+			return $this->handleError($e);
+		}
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @CanManageContext
+	 */
+	public function removeNode(int $contextId, int $nodeRelId): DataResponse {
+		// we could do without the contextId, however it is used by the Permission Middleware
+		// and also results in a more consistent endpoint url
+		try {
+			$context = $this->contextService->findById($contextId, $this->userId);
+			if (!isset($context->getNodes()[$nodeRelId])) {
+				return $this->handleBadRequestError(new BadRequestError('Node Relation ID not found in given Context'));
+			}
+			$nodeRelation = $this->contextService->removeNodeFromContextById($nodeRelId);
+			$this->contextService->removeNodeRelFromAllPages($nodeRelation);
+			$context = $this->contextService->findById($contextId, $this->userId);
+			return new DataResponse($context->jsonSerialize());
+		} catch (DoesNotExistException $e) {
+			$this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
+		} catch (MultipleObjectsReturnedException|Exception $e) {
+			$this->handleError($e);
+		}
+
+		return new DataResponse();
 	}
 
 	/**

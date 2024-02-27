@@ -15,6 +15,8 @@ use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\PermissionError;
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
 use Psr\Log\LoggerInterface;
 
@@ -102,6 +104,87 @@ class ContextService {
 		return $context;
 	}
 
+	/**
+	 * @throws MultipleObjectsReturnedException
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 */
+	public function addNodeToContextById(int $contextId, int $nodeId, int $nodeType, int $permissions, ?string $userId): ContextNodeRelation {
+		$context = $this->contextMapper->findById($contextId, $userId);
+		return $this->addNodeToContext($context, $nodeId, $nodeType, $permissions);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function removeNodeFromContext(ContextNodeRelation $nodeRelation): ContextNodeRelation {
+		return $this->contextNodeRelMapper->delete($nodeRelation);
+	}
+
+	/**
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 * @throws Exception
+	 */
+	public function removeNodeFromContextById(int $nodeRelationId): ContextNodeRelation {
+		$nodeRelation = $this->contextNodeRelMapper->findById($nodeRelationId);
+		return $this->contextNodeRelMapper->delete($nodeRelation);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function addNodeToContext(Context $context, int $nodeId, int $nodeType, int $permissions): ContextNodeRelation {
+		$contextNodeRel = new ContextNodeRelation();
+		$contextNodeRel->setContextId($context->getId());
+		$contextNodeRel->setNodeId($nodeId);
+		$contextNodeRel->setNodeType($nodeType);
+		$contextNodeRel->setPermissions($permissions);
+
+		return $this->contextNodeRelMapper->insert($contextNodeRel);
+	}
+
+	public function addNodeRelToPage(ContextNodeRelation $nodeRel, int $order = null, ?int $pageId = null): PageContent {
+		if ($pageId === null) {
+			// when no page is given, find the startpage to add it to
+			$context = $this->contextMapper->findById($nodeRel->getContextId());
+			$pages = $context->getPages();
+			foreach ($pages as $page) {
+				if ($page['page_type'] === 'startpage') {
+					$pageId = $page['id'];
+					break;
+				}
+			}
+		}
+
+		$pageContent = $this->pageContentMapper->findByPageAndNodeRelation($pageId, $nodeRel->getId());
+
+		if ($pageContent === null) {
+			$pageContent = new PageContent();
+			$pageContent->setPageId($pageId);
+			$pageContent->setNodeRelId($nodeRel->getId());
+			$pageContent->setOrder($order ?? 100); //FIXME: demand or calc order
+
+			$pageContent = $this->pageContentMapper->insert($pageContent);
+		}
+		return $pageContent;
+	}
+
+	public function removeNodeRelFromAllPages(ContextNodeRelation $nodeRelation): array {
+		$contents = $this->pageContentMapper->findByNodeRelation($nodeRelation->getId());
+		/** @var PageContent $content */
+		foreach ($contents as $content) {
+			try {
+				$this->pageContentMapper->delete($content);
+			} catch (Exception $e) {
+				$this->logger->warning('Failed to delete Contexts page content with ID {pcId}', [
+					'pcId' => $content->getId(),
+					'exception' => $e,
+				]);
+			}
+		}
+		return $contents;
+	}
 
 	protected function insertPage(Context $context): void {
 		$page = new Page();
@@ -133,18 +216,11 @@ class ContextService {
 
 		$userId = $context->getOwnerType() === Application::OWNER_TYPE_USER ? $context->getOwnerId() : null;
 		foreach ($nodes as $node) {
-			$contextNodeRel = new ContextNodeRelation();
-			$contextNodeRel->setContextId($context->getId());
-			$contextNodeRel->setNodeId($node['id']);
-			$contextNodeRel->setNodeType($node['type']);
-			$contextNodeRel->setPermissions($node['permissions'] ?? 660);
-
 			try {
 				if (!$this->permissionsService->canManageNodeById($node['type'], $node['id'], $userId)) {
 					throw new PermissionError(sprintf('Owner cannot manage node %d (type %d)', $node['id'], $node['type']));
 				}
-
-				$this->contextNodeRelMapper->insert($contextNodeRel);
+				$contextNodeRel = $this->addNodeToContext($context, $node['id'], $node['type'], $node['permissions'] ?? 660);
 				$addedNodes[] = $contextNodeRel->jsonSerialize();
 			} catch (Exception $e) {
 				$this->logger->warning('Could not add node {ntype}/{nid} to context {cid}, skipping.', [
