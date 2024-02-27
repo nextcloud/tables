@@ -2,6 +2,7 @@
 
 namespace OCA\Tables\Service;
 
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\Table;
@@ -93,6 +94,17 @@ class PermissionsService {
 		}
 
 		return $this->canManageTable($table, $userId);
+	}
+
+	public function canAccessNodeById(int $nodeType, int $nodeId, ?string $userId = null): bool {
+		if ($nodeType === Application::NODE_TYPE_TABLE) {
+			return $this->canReadColumnsByTableId($nodeId, $this->userId);
+		}
+		if ($nodeType === Application::NODE_TYPE_VIEW) {
+			return $this->canReadColumnsByViewId($nodeId, $this->userId);
+		}
+
+		return false;
 	}
 
 	public function canAccessView(View $view, ?string $userId = null): bool {
