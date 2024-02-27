@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace OCA\Tables\Listener;
 
 use OCA\Analytics\Datasource\DatasourceEvent;
-use OCA\Tables\Datasource\AnalyticsDatasource;
+use OCA\Tables\Analytics\AnalyticsDatasource;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 
