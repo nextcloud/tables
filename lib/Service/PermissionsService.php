@@ -107,6 +107,17 @@ class PermissionsService {
 		return false;
 	}
 
+	public function canManageNodeById(int $nodeType, int $nodeId, ?string $userId = null): bool {
+		if ($nodeType === Application::NODE_TYPE_TABLE) {
+			return $this->canManageTableById($nodeId, $this->userId);
+		}
+		if ($nodeType === Application::NODE_TYPE_VIEW) {
+			return $this->canManageViewById($nodeId, $this->userId);
+		}
+
+		return false;
+	}
+
 	public function canAccessView(View $view, ?string $userId = null): bool {
 		if($this->basisCheck($view, 'view', $userId)) {
 			return true;
@@ -130,6 +141,7 @@ class PermissionsService {
 	 * @param string|null $userId
 	 * @return bool
 	 * @throws InternalError
+	 * @note prefer canManageNodeById()
 	 */
 	public function canManageElementById(int $elementId, string $nodeType = 'table', ?string $userId = null): bool {
 		if ($nodeType === 'table') {
