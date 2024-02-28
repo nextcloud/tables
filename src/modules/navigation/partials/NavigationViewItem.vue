@@ -74,7 +74,7 @@
 			<!-- FAVORITE -->
 			<NcActionButton v-if="!view.favorite"
 				:close-after-click="true"
-				@click="() => {}">
+				@click="toggleFavoriteView(true)">
 				{{ t('tables', 'Add to favorites') }}
 				<template #icon>
 					<Star :size="20" />
@@ -84,7 +84,7 @@
 			<!-- UNFAVORITE -->
 			<NcActionButton v-if="view.favorite"
 				:close-after-click="true"
-				@click="() => {}">
+				@click="toggleFavoriteView(false)">
 				{{ t('tables', 'Remove from favorites') }}
 				<template #icon>
 					<StarOutline :size="20" />

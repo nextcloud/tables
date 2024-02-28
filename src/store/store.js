@@ -234,6 +234,36 @@ export default new Vuex.Store({
 			commit('setTables', [...tables])
 			return true
 		},
+		async favoriteView({ state, commit, dispatch }, { id }) {
+			try {
+				await axios.post(generateOcsUrl('/apps/tables/api/2/favorites/views/' + id))
+			} catch (e) {
+				displayError(e, t('tables', 'Could not favorite view'))
+				return false
+			}
+
+			const index = state.views.findIndex(v => v.id === id)
+			const view = state.views[index]
+			view.favorite = true
+			commit('setView', view)
+
+			return true
+		},
+		async removeFavoriteView({ state, commit, dispatch }, { id }) {
+			try {
+				await axios.delete(generateOcsUrl('/apps/tables/api/2/favorites/views/' + id))
+			} catch (e) {
+				displayError(e, t('tables', 'Could not remove view from favorites'))
+				return false
+			}
+
+			const index = state.views.findIndex(v => v.id === id)
+			const view = state.views[index]
+			view.favorite = false
+			commit('setView', view)
+
+			return true
+		},
 		async favoriteTable({ state, commit, dispatch }, { id }) {
 			try {
 				await axios.post(generateOcsUrl('/apps/tables/api/2/favorites/tables/' + id))
