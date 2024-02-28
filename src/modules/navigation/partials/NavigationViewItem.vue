@@ -19,10 +19,11 @@
 			</NcCounterBubble>
 			<NcActionButton v-if="view.hasShares" icon="icon-share" :class="{'margin-right': !(activeView && view.id === activeView.id)}" @click="actionShowShare" />
 			<div v-if="view.isShared && view.ownership !== userId && !canManageTable(view) && showShareSender" class="margin-left">
-				<NcAvatar :user="view.ownership" />
+				<NcAvatar :user="view.ownership" :show-user-status="false" />
 			</div>
 		</template>
 		<template #actions>
+			<!-- EDIT -->
 			<NcActionButton v-if="canManageElement(view)"
 				:close-after-click="true"
 				@click="editView">
@@ -31,6 +32,8 @@
 				</template>
 				{{ t('tables', 'Edit view') }}
 			</NcActionButton>
+
+			<!-- DUPLICATE -->
 			<NcActionButton v-if="canManageTable(view)"
 				:close-after-click="true"
 				@click="cloneView">
@@ -39,12 +42,16 @@
 				</template>
 				{{ t('tables', 'Duplicate view') }}
 			</NcActionButton>
+
+			<!-- SHARE -->
 			<NcActionButton v-if="canShareElement(view)"
 				icon="icon-share"
 				:close-after-click="true"
 				@click="actionShowShare">
 				{{ t('tables', 'Share') }}
 			</NcActionButton>
+
+			<!-- IMPORT -->
 			<NcActionButton v-if="canCreateRowInElement(view)"
 				:close-after-click="true"
 				@click="actionShowImport(view)">
@@ -53,6 +60,8 @@
 					<Import :size="20" />
 				</template>
 			</NcActionButton>
+
+			<!-- INTEGRATION -->
 			<NcActionButton
 				:close-after-click="true"
 				@click="actionShowIntegration">
@@ -61,6 +70,28 @@
 					<Connection :size="20" />
 				</template>
 			</NcActionButton>
+
+			<!-- FAVORITE -->
+			<NcActionButton v-if="!view.favorite"
+				:close-after-click="true"
+				@click="() => {}">
+				{{ t('tables', 'Add to favorites') }}
+				<template #icon>
+					<Star :size="20" />
+				</template>
+			</NcActionButton>
+
+			<!-- UNFAVORITE -->
+			<NcActionButton v-if="view.favorite"
+				:close-after-click="true"
+				@click="() => {}">
+				{{ t('tables', 'Remove from favorites') }}
+				<template #icon>
+					<StarOutline :size="20" />
+				</template>
+			</NcActionButton>
+
+			<!-- DELETE -->
 			<NcActionButton v-if="canManageElement(view)"
 				icon="icon-delete"
 				:close-after-click="true"
@@ -77,6 +108,8 @@ import { getCurrentUser } from '@nextcloud/auth'
 import { mapGetters } from 'vuex'
 import { showError } from '@nextcloud/dialogs'
 import Table from 'vue-material-design-icons/Table.vue'
+import Star from 'vue-material-design-icons/Star.vue'
+import StarOutline from 'vue-material-design-icons/StarOutline.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import Connection from 'vue-material-design-icons/Connection.vue'
 import PlaylistPlay from 'vue-material-design-icons/PlaylistPlay.vue'
@@ -91,6 +124,8 @@ export default {
 		PlaylistEdit,
 		// eslint-disable-next-line vue/no-reserved-component-names
 		Table,
+		Star,
+		StarOutline,
 		NcAppNavigationItem,
 		NcCounterBubble,
 		NcActionButton,
@@ -178,6 +213,17 @@ export default {
 				}
 			} else {
 				showError(t('tables', 'Could not create new view'))
+			}
+		},
+		async toggleFavoriteView(favorite) {
+			if (favorite) {
+				await this.$store.dispatch('favoriteView', {
+					id: this.view.id,
+				})
+			} else {
+				await this.$store.dispatch('removeFavoriteView', {
+					id: this.view.id,
+				})
 			}
 		},
 	},

@@ -12,10 +12,12 @@
 			<template v-if="table.emoji">
 				{{ table.emoji }}
 			</template>
+
 			<template v-else>
 				<Table :size="20" />
 			</template>
 		</template>
+
 		<template #counter>
 			<NcCounterBubble v-if="canReadData(table)">
 				{{ n('tables', '%n row', '%n rows', table.rowsCount, {}) }}
@@ -76,7 +78,7 @@
 			</NcActionButton>
 
 			<!-- FAVORITE -->
-			<NcActionButton v-if="canManageElement(table) && !table.favorite"
+			<NcActionButton v-if="!table.favorite && !table.archived"
 				:close-after-click="true"
 				@click="toggleFavoriteTable(true)">
 				{{ t('tables', 'Add to favorites') }}
@@ -86,7 +88,7 @@
 			</NcActionButton>
 
 			<!-- UNFAVORITE -->
-			<NcActionButton v-if="canManageElement(table) && table.favorite"
+			<NcActionButton v-if="table.favorite"
 				:close-after-click="true"
 				@click="toggleFavoriteTable(false)">
 				{{ t('tables', 'Remove from favorites') }}
@@ -96,7 +98,7 @@
 			</NcActionButton>
 
 			<!-- ARCHIVE -->
-			<NcActionButton v-if="canManageElement(table) && !table.archived"
+			<NcActionButton v-if="canManageElement(table) && !table.archived && !table.favorite"
 				:close-after-click="true"
 				@click="toggleArchiveTable(true)">
 				{{ t('tables', 'Archive table') }}
