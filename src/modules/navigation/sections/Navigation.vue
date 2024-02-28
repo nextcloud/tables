@@ -42,7 +42,7 @@
 						:filter-string="filterString"
 						:table="node" />
 
-					<NavigationViewItem v-else-if="node.tableId && !node.favorite"
+					<NavigationViewItem v-else-if="node.tableId && !node.favorite && !viewAlreadyListed(node)"
 						:key="'view' + node.id"
 						:view="node" />
 				</template>
@@ -130,7 +130,14 @@ export default {
 	computed: {
 		...mapState(['tables', 'views', 'tablesLoading']),
 		getAllNodes() {
-			return [...this.getFilteredTables, ...this.getSharedViews]
+			return [...this.getFilteredTables, ...this.getOwnViews, ...this.getSharedViews]
+		},
+		getOwnViews() {
+			const sharedTableIds = this.getFilteredTables.map(table => table.id)
+
+			return this.views.filter(view => {
+				return !view.isShared && view.ownership === getCurrentUser().uid && sharedTableIds.includes(view.tableId)
+			}).filter(view => view.title.toLowerCase().includes(this.filterString.toLowerCase()))
 		},
 		getSharedViews() {
 			const sharedTableIds = this.getFilteredTables.map(table => table.id)
@@ -166,6 +173,9 @@ export default {
 					open: false,
 				})
 			}
+		},
+		viewAlreadyListed(view) {
+			return this.getFilteredTables.map(t => t.id).includes(view.tableId)
 		},
 	},
 }
