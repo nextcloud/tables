@@ -265,7 +265,7 @@ export default new Vuex.Store({
 
 		async getAllContexts({ commit, state }) {
 			try {
-				const res = await axios.get(generateOcsUrl('/apps/tables/api/3/contexts'))
+				const res = await axios.get(generateOcsUrl('/apps/tables/api/2/contexts'))
 				commit('setContexts', res.data.ocs.data)
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load contexts.'))
