@@ -2,6 +2,7 @@
 
 namespace OCA\Tables\Service;
 
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\Table;
@@ -95,6 +96,28 @@ class PermissionsService {
 		return $this->canManageTable($table, $userId);
 	}
 
+	public function canAccessNodeById(int $nodeType, int $nodeId, ?string $userId = null): bool {
+		if ($nodeType === Application::NODE_TYPE_TABLE) {
+			return $this->canReadColumnsByTableId($nodeId, $this->userId);
+		}
+		if ($nodeType === Application::NODE_TYPE_VIEW) {
+			return $this->canReadColumnsByViewId($nodeId, $this->userId);
+		}
+
+		return false;
+	}
+
+	public function canManageNodeById(int $nodeType, int $nodeId, ?string $userId = null): bool {
+		if ($nodeType === Application::NODE_TYPE_TABLE) {
+			return $this->canManageTableById($nodeId, $this->userId);
+		}
+		if ($nodeType === Application::NODE_TYPE_VIEW) {
+			return $this->canManageViewById($nodeId, $this->userId);
+		}
+
+		return false;
+	}
+
 	public function canAccessView(View $view, ?string $userId = null): bool {
 		if($this->basisCheck($view, 'view', $userId)) {
 			return true;
@@ -118,6 +141,7 @@ class PermissionsService {
 	 * @param string|null $userId
 	 * @return bool
 	 * @throws InternalError
+	 * @note prefer canManageNodeById()
 	 */
 	public function canManageElementById(int $elementId, string $nodeType = 'table', ?string $userId = null): bool {
 		if ($nodeType === 'table') {
