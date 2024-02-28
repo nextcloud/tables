@@ -1,7 +1,7 @@
 <template>
 	<div class="container">
 		<h1> Contexts </h1>
-		<div v-for="context in contexts" class="context">
+		<div v-for="context in contexts" :key="context.id" class="context">
 			<div>
 				<NcActionRouter :to="'/context/' + parseInt(context.id)"
 					:name="context.name" />
@@ -10,13 +10,13 @@
 		</div>
 		<h1> All Tables and Views</h1>
 		<div v-if="dataReady">
-			<div v-for="table in tables">
+			<div v-for="table in tables" :key="table.id">
 				<TableWrapper :table="table" :columns="tableData['columns' + table.id]"
 					:rows="tableData['rows' + table.id]" :view-setting="viewSetting"
 					@create-column="createColumn(false, table)"
 					@import="openImportModal(table, false)" @download-csv="downloadCSV(table, false)" />
 			</div>
-			<div v-for="view in views">
+			<div v-for="view in views" :key="view.id">
 				<CustomView :view="view"
 					:columns="tableData['view-columns' + view.id]" :rows="tableData['view-rows' + view.id]" :view-setting="viewSetting"
 					@create-column="createColumn(true, view)"
@@ -118,8 +118,8 @@ export default {
 
 <style scoped lang="scss">
 li{
-    margin: 0;
-    padding: 0;
+	margin: 0;
+	padding: 0;
 	list-style: none;
 }
 
@@ -127,15 +127,19 @@ li{
 	padding: 20px;
 	border: 1px;
 }
+
 .container {
 	padding: 80px;
 }
+
 h1 {
 	color: red;
 }
+
 :deep(a strong) {
 	text-decoration: underline;
 }
+
 :deep(li span) {
 	padding: 0 !important;
 	color: blue;
