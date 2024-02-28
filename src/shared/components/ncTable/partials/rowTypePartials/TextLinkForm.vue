@@ -112,6 +112,10 @@ export default {
 		if (this.localValue === null) {
 			this.localValue = this.column.textDefault
 		}
+
+		this.debounceSubmit = debounce(function() {
+			this.loadResults()
+		}, 500)
 	},
 
 	mounted() {
@@ -128,10 +132,6 @@ export default {
 			this.providerLoading[providerId] = !!status
 			this.providerLoading = { ...this.providerLoading }
 		},
-
-		debounceSubmit: debounce(function() {
-			this.loadResults()
-		}, 500),
 
 		loadResults() {
 			if (this.term.length >= 3 || this.term === '') {
