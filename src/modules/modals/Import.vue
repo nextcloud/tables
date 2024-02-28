@@ -3,25 +3,49 @@
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
-					<h2>{{ t('tables', 'Import') }}</h2>
+					<h2>{{ t('tables', 'Import table') }}</h2>
 				</div>
 			</div>
 
 			<!-- Starting -->
 			<div v-if="!loading && result === null && !waitForReload">
-				<RowFormWrapper :title="t('tables', 'File')" :description="t('tables', 'Supported formats are xlsx, xls, html, xml and csv.')">
-					<div class="fix-col-4 space-T-small middle">
-						<NcButton :aria-label="t('tables', 'Select a file')" @click="pickFile">
+				<div class="row space-T">
+					{{ t('tables', 'Add data to the table from a file') }}
+				</div>
+				<RowFormWrapper>
+					<div v-if="importFileName.length" class="import-filename">
+						<IconFile :size="20" />{{ importFileName }}
+					</div>
+					<div class="fix-col-4 middle">
+						<NcButton :aria-label="t('tables', 'Select from Files')" @click="pickFile">
 							<template #icon>
 								<IconFolder :size="20" />
 							</template>
-							{{ t('tables', 'Select a file') }}
+							{{ t('tables', 'Select from Files') }}
 						</NcButton>
-						<input v-model="path" :class="{ missing: pathError }">
+						<NcButton :aria-label="t('tables', 'Upload from device')" @click="selectUploadFile">
+							<template #icon>
+								<IconUpload :size="20" />
+							</template>
+							{{ t('tables', 'Upload from device') }}
+						</NcButton>
+						<input ref="uploadFileInput"
+							type="file"
+							aria-hidden="true"
+							class="hidden-visually"
+							:accept="mimeTypes.join(',')"
+							@change="onUploadFileInputChange">
+					</div>
+					<div class="fix-col-4">
+						<p class="span">
+							{{ t('tables', 'Supported formats: xlsx, xls, csv, html, xml') }}
+							<br>
+							{{ t('tables', 'First row of the file must contain column headings.') }}
+						</p>
 					</div>
 				</RowFormWrapper>
 
-				<RowFormWrapper :title="t('tables', 'Create missing columns')" :description="t('tables', 'Columns are identified by the titles. If there is no match, a new text-line column will be created.')">
+				<div class="row">
 					<div class="fix-col-2">
 						<NcCheckboxRadioSwitch :checked.sync="createMissingColumns" type="switch" :disabled="!canCreateMissingColumns">
 							{{ t('tables', 'Create missing columns') }}
@@ -30,26 +54,6 @@
 					<p v-if="(isElementView && !canManageTable(element)) || !canManageElement(element)" class="fix-col-2 span">
 						{{ t('tables', '⚠️ You don\'t have the permission to create columns.') }}
 					</p>
-				</RowFormWrapper>
-
-				<div class="information">
-					<RowFormWrapper :title="t('tables', 'Information')">
-						<div class="fix-col-4">
-							<p class="span">
-								{{ t('tables', 'The first row has to contain the column titles.') }}
-							</p>
-						</div>
-						<div class="fix-col-4">
-							<p class="span">
-								{{ t('tables', 'Note that imported data will be added to the table. Updating of existing rows is not possible at the moment.') }}
-							</p>
-						</div>
-						<div class="fix-col-4">
-							<p class="span">
-								{{ t('tables', 'The possible importing size depends on the system configuration and is only limited by execution time and memory.') }}
-							</p>
-						</div>
-					</RowFormWrapper>
 				</div>
 
 				<div class="row">
@@ -63,7 +67,14 @@
 
 			<!-- show results -->
 			<div v-if="!loading && result !== null && !waitForReload">
-				<RowFormWrapper v-if="result !== ''" :title="t('tables', 'Result')">
+				<RowFormWrapper v-if="result !== ''">
+					<div>
+						<h3 class="result-headline">
+							<IconCheck v-if="!result['errors_parsing_count'] && !result['errors_count']" :size="15" />
+							<IconAlert v-else :size="15" />
+							{{ t('tables', 'Imported from ') + importFileName }}
+						</h3>
+					</div>
 					<div class="fix-col-1">
 						{{ t('tables', 'Found columns') }}
 					</div>
@@ -88,18 +99,22 @@
 					<div class="fix-col-3" data-cy="importResultRowsInserted">
 						{{ result['inserted_rows_count'] }}
 					</div>
-					<div class="fix-col-1">
-						{{ t('tables', 'Value parsing errors') }}
-					</div>
-					<div class="fix-col-3" data-cy="importResultParsingErrors">
-						{{ result['errors_parsing_count'] }}
-					</div>
-					<div class="fix-col-1">
-						{{ t('tables', 'Row creation errors') }}
-					</div>
-					<div class="fix-col-3" data-cy="importResultRowErrors">
-						{{ result['errors_count'] }}
-					</div>
+					<template v-if="result['errors_parsing_count'] || result['errors_count']">
+						<div class="fix-col-1">
+							{{ t('tables', 'Value parsing errors') }}
+						</div>
+						<div class="fix-col-3 errors-count" data-cy="importResultParsingErrors">
+							{{ result['errors_parsing_count'] }}
+							<IconAlert :size="15" />
+						</div>
+						<div class="fix-col-1">
+							{{ t('tables', 'Row creation errors') }}
+						</div>
+						<div class="fix-col-3 errors-count" data-cy="importResultRowErrors">
+							{{ result['errors_count'] }}
+							<IconAlert :size="15" />
+						</div>
+					</template>
 				</RowFormWrapper>
 
 				<RowFormWrapper v-else :title="t('tables', 'Result')">
@@ -117,7 +132,7 @@
 
 			<!-- show loading -->
 			<div v-if="loading && !waitForReload">
-				<NcEmptyContent :name="t('tables', 'Importing...')" :description="t('tables', 'Please wait while we try our best to import your data. This might take some time, depending on the server configuration.')">
+				<NcEmptyContent :name="t('tables', 'Importing data from ') + importFileName" :description="t('tables', 'This might take a while...')">
 					<template #icon>
 						<NcIconTimerSand />
 					</template>
@@ -137,6 +152,10 @@ import { FilePicker, FilePickerType, showError, showWarning } from '@nextcloud/d
 import RowFormWrapper from '../../shared/components/ncTable/partials/rowTypePartials/RowFormWrapper.vue'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import IconFolder from 'vue-material-design-icons/Folder.vue'
+import IconUpload from 'vue-material-design-icons/Upload.vue'
+import IconFile from 'vue-material-design-icons/File.vue'
+import IconCheck from 'vue-material-design-icons/Check.vue'
+import IconAlert from 'vue-material-design-icons/Alert.vue'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { mapGetters } from 'vuex'
@@ -148,6 +167,10 @@ export default {
 		NcIconTimerSand,
 		NcLoadingIcon,
 		IconFolder,
+		IconUpload,
+		IconFile,
+		IconCheck,
+		IconAlert,
 		NcModal,
 		NcButton,
 		NcCheckboxRadioSwitch,
@@ -180,6 +203,15 @@ export default {
 			loading: false,
 			result: null,
 			waitForReload: false,
+			mimeTypes: [
+				'text/csv',
+				'application/vnd.ms-excel',
+				'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+				'application/xml',
+				'text/html',
+				'application/vnd.oasis.opendocument.spreadsheet',
+			],
+			selectedUploadFile: null,
 		}
 	},
 
@@ -191,11 +223,31 @@ export default {
 		getCreateMissingColumns() {
 			return this.canCreateMissingColumns && this.createMissingColumns
 		},
+		importFileName() {
+			const fileName = this.selectedUploadFile ? this.selectedUploadFile.name : this.path
+
+			if (fileName.length > 30) {
+				const extension = fileName.split('.').pop()
+				return fileName.substring(0, 30 - extension.length - 3) + '...' + extension
+			}
+
+			return fileName
+		},
 	},
 	watch: {
 		element() {
 			if (this.element) {
 				this.createMissingColumns = this.canCreateMissingColumns
+			}
+		},
+		path(val) {
+			if (val !== '') {
+				this.clearSelectedUploadFile()
+			}
+		},
+		selectedUploadFile(val) {
+			if (val !== null) {
+				this.path = ''
 			}
 		},
 	},
@@ -226,6 +278,16 @@ export default {
 			this.actionCancel()
 		},
 		actionSubmit() {
+			if (this.selectedUploadFile && this.selectedUploadFile.type !== '' && !this.mimeTypes.includes(this.selectedUploadFile.type)) {
+				showWarning(t('tables', 'The selected file is not supported.'))
+				return null
+			}
+
+			if (this.selectedUploadFile) {
+				this.uploadFile()
+				return
+			}
+
 			if (this.path === '') {
 				showWarning(t('tables', 'Please select a file.'))
 				this.pathError = true
@@ -238,6 +300,41 @@ export default {
 			this.loading = true
 			try {
 				const res = await axios.post(generateUrl('/apps/tables/import/' + (this.isElementView ? 'view' : 'table') + '/' + this.element.id), { path: this.path, createMissingColumns: this.getCreateMissingColumns })
+				if (res.status === 200) {
+					this.result = res.data
+					this.loading = false
+				} else if (res.status === 401) {
+					console.debug('error while importing', res)
+					showError(t('tables', 'Could not import, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					console.debug('error while importing', res)
+					showError(t('tables', 'Could not import, missing needed permission.'))
+				} else if (res.status === 404) {
+					console.debug('error while importing', res)
+					showError(t('tables', 'Could not import, needed resources were not found.'))
+				} else {
+					showError(t('tables', 'Could not import data due to unknown errors.'))
+					console.debug('error while importing', res)
+				}
+			} catch (e) {
+				console.error(e)
+				return false
+			}
+		},
+		async uploadFile() {
+			this.loading = true
+			try {
+				const url = generateUrl('/apps/tables/importupload/' + (this.isElementView ? 'view' : 'table') + '/' + this.element.id)
+				const formData = new FormData()
+				formData.append('uploadfile', this.selectedUploadFile)
+				formData.append('createMissingColumns', this.getCreateMissingColumns)
+
+				const res = await axios.post(url, formData, {
+					headers: {
+						'Content-Type': 'multipart/form-data',
+					},
+				})
+
 				if (res.status === 200) {
 					this.result = res.data
 					this.loading = false
@@ -274,14 +371,7 @@ export default {
 			const filePicker = new FilePicker(
 				t('text', 'Select file for the import'),
 				false, // multiselect
-				[
-					'text/csv',
-					'application/vnd.ms-excel',
-					'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-					'application/xml',
-					'text/html',
-					'application/vnd.oasis.opendocument.spreadsheet',
-				], // mime filter
+				this.mimeTypes, // mime filter
 				true, // modal
 				FilePickerType.Choose, // type
 				false, // directories
@@ -294,6 +384,16 @@ export default {
 					this.path = fileInfo.path === '/' ? `/${fileInfo.name}` : `${fileInfo.path}/${fileInfo.name}`
 				})
 			})
+		},
+		selectUploadFile() {
+			this.$refs.uploadFileInput.click()
+		},
+		clearSelectedUploadFile() {
+			this.selectedUploadFile = null
+			this.$refs.uploadFileInput.value = ''
+		},
+		onUploadFileInputChange(event) {
+			this.selectedUploadFile = event.target.files[0]
 		},
 	},
 
@@ -324,6 +424,28 @@ export default {
 
 	.information :deep(.row.space-T) {
 		padding-top: calc(var(--default-grid-baseline) * 2);
+	}
+
+	.import-filename {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 12px;
+		padding-left: 12px;
+		padding-bottom: 16px;
+	}
+
+	.result-headline {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		font-size: medium;
+	}
+
+	.errors-count {
+		display: flex;
+		gap: 4px;
 	}
 
 </style>
