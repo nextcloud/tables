@@ -2,6 +2,8 @@
 
 namespace OCA\Tables\Db;
 
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\IDBConnection;
@@ -12,6 +14,20 @@ class PageContentMapper extends QBMapper {
 
 	public function __construct(IDBConnection $db) {
 		parent::__construct($db, $this->table, PageContent::class);
+	}
+
+	/**
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 * @throws Exception
+	 */
+	public function findById(int $pageContentId): PageContent {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->tableName)
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($pageContentId)));
+
+		return $this->mapRowToEntity($this->findOneQuery($qb));
 	}
 
 	/**

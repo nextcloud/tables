@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Service;
 
+use InvalidArgumentException;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
@@ -205,6 +206,36 @@ class ContextService {
 			}
 		}
 		return $contents;
+	}
+
+	public function updateContentOrder(int $pageId, array $contents): array {
+		$updated = [];
+		foreach ($contents as $content) {
+			try {
+				$updated[] = $this->updatePageContent($pageId, $content['id'], $content['order']);
+			} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception|InvalidArgumentException $e) {
+				$this->logger->info('Could not updated order of content with ID {cID}', [
+					'cID' => $content['id'],
+					'exception' => $e,
+				]);
+			}
+		}
+		return $updated;
+	}
+
+	/**
+	 * @throws MultipleObjectsReturnedException
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @throws InvalidArgumentException
+	 */
+	protected function updatePageContent(int $pageId, int $contentId, int $order): PageContent {
+		$pageContent = $this->pageContentMapper->findById($contentId);
+		if ($pageContent->getPageId() !== $pageId) {
+			throw new InvalidArgumentException('Content does not belong to given page');
+		}
+		$pageContent->setOrder($order);
+		return $this->pageContentMapper->update($pageContent);
 	}
 
 	protected function insertPage(Context $context): void {
