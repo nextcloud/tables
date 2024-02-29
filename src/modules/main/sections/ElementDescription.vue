@@ -8,8 +8,13 @@
 				<TextIcon :size="15" />
 				{{ t('tables', 'Filtered view') }}&nbsp;&nbsp;
 			</div>
-			<NcSmallButton v-if="isViewSettingSet" @click="resetLocalAdjustments">
-				🔙 {{ t('tables', 'Reset local adjustments') }}
+			<NcSmallButton
+				v-if="isViewSettingSet"
+				@click="resetLocalAdjustments">
+				<template #icon>
+					<FilterRemove :size="15" />
+				</template>
+				{{ t('tables', 'Reset local adjustments') }}
 			</NcSmallButton>
 		</div>
 		<div v-if="!isTable && activeElement.isShared" class="user-bubble">
@@ -25,6 +30,7 @@
 
 import { NcUserBubble } from '@nextcloud/vue'
 import TextIcon from 'vue-material-design-icons/Text.vue'
+import FilterRemove from 'vue-material-design-icons/FilterRemove.vue'
 import NcSmallButton from '../../../shared/components/ncSmallButton/NcSmallButton.vue'
 
 export default {
@@ -33,6 +39,7 @@ export default {
 	components: {
 		NcUserBubble,
 		TextIcon,
+		FilterRemove,
 		NcSmallButton,
 	},
 
