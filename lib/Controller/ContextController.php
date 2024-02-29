@@ -156,6 +156,19 @@ class ContextController extends AOCSController {
 	}
 
 	/**
+	 * @NoAdminRequired
+	 * @CanManageContext
+	 */
+	public function updateContentOrder(int $contextId, int $pageId, array $content): DataResponse {
+		$context = $this->contextService->findById($contextId, $this->userId);
+		if (!isset($context->getPages()[$pageId])) {
+			return $this->handleBadRequestError(new BadRequestError('Page not found in given Context'));
+		}
+
+		return new DataResponse($this->contextService->updateContentOrder($pageId, $content));
+	}
+
+	/**
 	 * @param Context[] $contexts
 	 * @return array
 	 */
