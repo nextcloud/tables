@@ -1,6 +1,10 @@
 OC.L10N.register(
     "tables",
     {
+    "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "ატვირთული ფაილი აჭარბებს php.ini-ში დაყენებულ upload_max_filesize დირექტივას",
+    "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "ატვირთული ფაილი აჭარბებს HTML ფორამაში მითითებულ MAX_FILE_SIZE დირექტივას",
+    "No file was uploaded" : "ფაილი არ აიტვირთა",
+    "Missing a temporary folder" : "დროებითი დირექტორია არ არსებობს",
     "Yes" : "დიახ",
     "Members" : "წევრები",
     "Date" : "თარიღი",
@@ -31,7 +35,7 @@ OC.L10N.register(
     "Title" : "სათაური",
     "Cancel" : "უარყოფა",
     "Delete" : "წაშლა",
-    "File" : "ფაილი",
+    "Select from Files" : "აირჩიეთ ფაილებიდან",
     "Result" : "შედეგი",
     "Please select a file." : "გთხოვთ აირჩიოთ ფაილი.",
     "Filter" : "ფილტრი",

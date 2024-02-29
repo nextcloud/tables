@@ -1,6 +1,11 @@
 OC.L10N.register(
     "tables",
     {
+    "The file was uploaded" : "El archivo fue cargado",
+    "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "El archivo cargado excede el valor establecido en la directiva upload_max_filesize en el archivo php.ini",
+    "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "El archivo cargado excede el valor especificado de la directiva MAX_FILE_SIZE en la forma de HTML",
+    "The file was only partially uploaded" : "El archivo sólo fue cargado parcialmente",
+    "A PHP extension stopped the file upload" : "Una extensión de PHP detuvo la carga del archivo",
     "ToDo list" : "Lista de penditentes",
     "Members" : "Miembros",
     "Date" : "Fecha",
@@ -39,7 +44,7 @@ OC.L10N.register(
     "Cancel" : "Cancelar",
     "Delete" : "Eliminar",
     "Owner" : "Propietario",
-    "File" : "Archivo",
+    "Select from Files" : "Seleccionar desde Archivos",
     "Result" : "Resultado",
     "Please select a file." : "Por favor selecciona un archivo.",
     "Transfer" : "Transferir",

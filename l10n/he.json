@@ -1,4 +1,13 @@
 { "translations": {
+    "The file was uploaded" : "הקובץ הועלה",
+    "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "הקובץ שהועלה חורג מההנחיה upload_max_filesize ב־php.ini",
+    "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "הקובץ שהועלה חורג מההנחיה MAX_FILE_SIZE שצוינה בטופס ה־HTML",
+    "The file was only partially uploaded" : "הקובץ הועלה באופן חלקי בלבד",
+    "No file was uploaded" : "לא הועלה קובץ",
+    "Missing a temporary folder" : "חסרה תיקייה זמנית",
+    "Could not write file to disk" : "לא ניתן לכתוב לכונן",
+    "A PHP extension stopped the file upload" : "הרחבת PHP עצרה את העלאת הקובץ",
+    "No file uploaded or file size exceeds maximum of %s" : "לא הועלה אף קובץ או שגודל הקובץ חרג מהסף המרבי של %s",
     "Select table" : "בחירת טבלה",
     "Select columns" : "בחירת עמודות",
     "e.g. 1,2,4 or leave empty" : "למשל: 1,2,4 או להשאיר ריק",
@@ -88,7 +97,7 @@
     "Cancel" : "ביטול",
     "Delete" : "מחיקה",
     "Owner" : "בעלות",
-    "File" : "קובץ",
+    "Select from Files" : "בחירה מתוך קבצים",
     "Result" : "תוצאה",
     "Please select a file." : "יש לבחור קובץ.",
     "Transfer" : "העברה",
@@ -138,5 +147,5 @@
     "Select" : "בחר",
     "Unchecked" : "לא נבדק",
     "ID" : "מזהה"
-},"pluralForm" :"nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;"
+},"pluralForm" :"nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: 2;"
 }

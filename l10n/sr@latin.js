@@ -19,7 +19,6 @@ OC.L10N.register(
     "Cancel" : "Otkaži",
     "Delete" : "Obriši",
     "Owner" : "Vlasnik",
-    "File" : "Fajl",
     "Copy" : "Kopiraj",
     "Shared" : "Deljeno",
     "group" : "grupa",

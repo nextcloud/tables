@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "No file was uploaded" : "කිසිදු ගොනුවක් උඩුගත කර නොමැත",
+    "Missing a temporary folder" : "තාවකාලික බහාලුමක් අස්ථානගත වී ඇත",
     "No" : "නැහැ",
     "Date" : "දිනය",
     "Comments" : "අදහස්",
@@ -19,7 +21,6 @@ OC.L10N.register(
     "Save" : "සුරකින්න",
     "Cancel" : "අවලංගු කරන්න",
     "Owner" : "හිමිකරු",
-    "File" : "ගොනුව",
     "Please select a file." : "කරුණාකර ගොනුවක් තෝරන්න.",
     "Filter" : "පෙරහන",
     "Read" : "කියවීම",

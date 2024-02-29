@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "No file was uploaded" : "ವರ್ಗಾವಣೆಗೆ ﻿ಯಾವುದೇ ಕಡತಗಳು ಕಂಡುಬಂದಿಲ್ಲ",
+    "Missing a temporary folder" : "ತಾತ್ಕಾಲಿಕ ಕಡತಕೋಶ ದೊರೆಕುತ್ತಿಲ್ಲ",
     "No" : "﻿ಇಲ್ಲ",
     "Yes" : "﻿ಹೌದು",
     "Date" : "Date",

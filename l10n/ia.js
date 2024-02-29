@@ -1,6 +1,9 @@
 OC.L10N.register(
     "tables",
     {
+    "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Le file incargate excede le directiva MAX_FILE_SIZE que esseva specificate in le formulario HTML",
+    "No file was uploaded" : "Nulle file esseva incargate",
+    "Missing a temporary folder" : "Il manca un dossier temporari",
     "Members" : "Membros",
     "Date" : "Date",
     "Comments" : "Commentarios",
@@ -27,6 +30,7 @@ OC.L10N.register(
     "Title" : "Titulo",
     "Cancel" : "Cancellar",
     "Delete" : "Deler",
+    "Select from Files" : "Selectionar de Files",
     "Please select a file." : "Per favor selectiona un file.",
     "Sort" : "Ordinar",
     "Shared" : "Compartite",

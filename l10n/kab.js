@@ -1,6 +1,10 @@
 OC.L10N.register(
     "tables",
     {
+    "The file was uploaded" : "Ulac afaylu yettwaznen",
+    "The file was only partially uploaded" : "Afaylu, cwiṭ kan i yettwaznen segs",
+    "No file was uploaded" : "Ulac afaylu i d-yettwasulin",
+    "Missing a temporary folder" : "Ixuṣ ukaram akudan",
     "No" : "Uhu",
     "Yes" : "Oui",
     "Comments" : "Commentaires",
@@ -19,7 +23,6 @@ OC.L10N.register(
     "Cancel" : "Sefsex",
     "Delete" : "Kkes",
     "Owner" : "Bab",
-    "File" : "Afaylu",
     "Please select a file." : "Ttxil fren afaylu.",
     "Filter" : "Sizdeg",
     "Sort" : "Smizzwer",

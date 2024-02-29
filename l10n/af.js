@@ -28,7 +28,6 @@ OC.L10N.register(
     "Title" : "Titel",
     "Cancel" : "Kanselleer",
     "Delete" : "Skrap",
-    "File" : "Lêer",
     "Please select a file." : "Kies asb. ’n lêer.",
     "Filter" : "Filter",
     "Shared" : "Gedeel",

@@ -1,6 +1,14 @@
 OC.L10N.register(
     "tables",
     {
+    "The file was uploaded" : "Fail laaditi üles",
+    "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Üleslaaditud fail on suurem kui php.ini failis määratud upload_max_filesize direktiiv",
+    "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Üleslaaditud fail on suurem kui HTML vormil määratud MAX_FILE_SIZE direktiiv",
+    "The file was only partially uploaded" : "Fail laaditi üles ainult osaliselt",
+    "No file was uploaded" : "Ühtegi faili ei laaditud üles",
+    "Missing a temporary folder" : "Ajutine kaust on puudu",
+    "A PHP extension stopped the file upload" : "PHP laiendus peatas faili üleslaadimise",
+    "No file uploaded or file size exceeds maximum of %s" : "Faili ei laaditud üles või selle suurus ületab maksimaalse %s",
     "Date" : "Kuupäev",
     "Comments" : "Kommentaarid",
     "Name" : "Nimi",
@@ -30,7 +38,7 @@ OC.L10N.register(
     "Cancel" : "Loobu",
     "Delete" : "Kustuta",
     "Owner" : "Omanik",
-    "File" : "Fail",
+    "Select from Files" : "Vali failidest",
     "Please select a file." : "Palun vali fail.",
     "Filter" : "Filter",
     "Sort" : "Sorteeri",

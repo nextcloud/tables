@@ -1,6 +1,9 @@
 OC.L10N.register(
     "tables",
     {
+    "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Augšupielādētā datne pārsniedz MAX_FILE_SIZE norādi, kas ir norādīta HTML formā",
+    "No file was uploaded" : "Neviena datne netika augšupielādēta",
+    "Missing a temporary folder" : "Trūkst pagaidu mapes",
     "Members" : "Biedri",
     "Date" : "Datums",
     "Comments" : "Komentāri",
@@ -33,7 +36,8 @@ OC.L10N.register(
     "Title" : "Amats",
     "Cancel" : "Atcelt",
     "Delete" : "Dzēst",
-    "File" : "Datne",
+    "Select from Files" : "Izvēlēties no Datnes",
+    "Upload from device" : "Augšupielādēt no ierīces",
     "Please select a file." : "Lūdzu izvēlies datni.",
     "Sort" : "Kārtot",
     "Shared" : "Koplietots",

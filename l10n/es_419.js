@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "El archivo cargado excede el valor especificado de la directiva MAX_FILE_SIZE en la forma de HTML",
     "Yes" : "Si",
     "Members" : "Miembros",
     "Date" : "Fecha",
@@ -33,7 +34,6 @@ OC.L10N.register(
     "Cancel" : "Cancelar",
     "Delete" : "Borrar",
     "Owner" : "Dueño",
-    "File" : "Archivo",
     "Result" : "Resultado",
     "Please select a file." : "Por favor selecciona un archivo.",
     "Filter" : "Filtrar",

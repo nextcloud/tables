@@ -27,7 +27,6 @@ OC.L10N.register(
     "Title" : "ចំណងជើង",
     "Cancel" : "បោះបង់",
     "Delete" : "លុប",
-    "File" : "ឯកសារ",
     "Sort" : "តម្រៀប",
     "Shared" : "បាន​ចែក​រំលែក",
     "group" : "ក្រុម",

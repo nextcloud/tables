@@ -1,6 +1,9 @@
 OC.L10N.register(
     "tables",
     {
+    "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "La dosiero alŝutita superas la regulon MAX_FILE_SIZE, kiu estas difinita en la HTML-formularo",
+    "The file was only partially uploaded" : "La dosiero alŝutiĝis nur parte",
+    "No file uploaded or file size exceeds maximum of %s" : "Neniu dosiero alŝutita, aŭ dosiergrando transpasas la maksimumon %s",
     "No" : "Ne",
     "Yes" : "Jes",
     "Members" : "Membroj",
@@ -36,7 +39,6 @@ OC.L10N.register(
     "Cancel" : "Nuligi",
     "Delete" : "Forigi",
     "Owner" : "Posedanto",
-    "File" : "Dosiero",
     "Please select a file." : "Bonvolu elekti dosieron.",
     "Sort" : "Ordigi",
     "Shared" : "Kunhavigita",

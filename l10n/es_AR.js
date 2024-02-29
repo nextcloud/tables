@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "El archivo subido sobrepasa el valor MAX_FILE_SIZE especificada en el formulario HTML",
     "Select columns" : "Seleccionar columnas",
     "e.g. 1,2,4 or leave empty" : "ej: 1,2,4 o dejar vacío",
     "Timestamp of data load" : "Marca de tiempo de carga de datos",
@@ -40,7 +41,6 @@ OC.L10N.register(
     "Title" : "Título",
     "Cancel" : "Cancelar",
     "Delete" : "Eliminar",
-    "File" : "Archivo",
     "Result" : "Resultado",
     "Please select a file." : "Favor de seleccionar un archivo.",
     "Transfer" : "Transferir",

@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "No file was uploaded" : "ھېچقانداق ھۆججەت يۈكلەنمىدى",
+    "Missing a temporary folder" : "ۋاقىتلىق قىسقۇچ كەم.",
     "No" : "ياق",
     "Yes" : "ھەئە",
     "Date" : "Date",

@@ -180,8 +180,6 @@ OC.L10N.register(
     "Could not delete row." : "Редът не можа да се изтрие.",
     "Owner" : "Създател",
     "I really want to delete this table!" : "Наистина искам да изтрия тази таблица!",
-    "File" : "Файл",
-    "Select a file" : "Избор на файл",
     "Result" : "Резултат",
     "Please select a file." : "Моля изберете файл.",
     "Transfer" : "Прехвърляне",

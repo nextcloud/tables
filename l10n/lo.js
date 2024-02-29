@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "The file was uploaded" : "ຟາຍຖຶກອັບໂຫລດສຳເລັດ",
+    "No file was uploaded" : "ບໍ່ມີການອັບໂຫລດຟາຍ",
     "No" : "ບໍ່",
     "Date" : "ວັນທີ",
     "Comments" : "ຄໍາເຫັນ",
@@ -16,7 +18,6 @@ OC.L10N.register(
     "Save" : "ບັນທຶກ",
     "Cancel" : "ຍົກເລີກ",
     "Delete" : "ລຶບ",
-    "File" : "ຟາຍ",
     "Please select a file." : "ກະລຸນາເລືອກຟາຍ",
     "Sort" : "ລຽງດຳດັບ",
     "Copy" : "ສຳເນົາ",

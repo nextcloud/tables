@@ -1,6 +1,14 @@
 OC.L10N.register(
     "tables",
     {
+    "The file was uploaded" : "ไฟล์อัปโหลดแล้ว",
+    "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "ขนาดไฟล์ที่อัปโหลดมีขนาดเกินค่า upload_max_filesize ที่ระบุไว้ใน php.ini",
+    "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "ไฟล์ที่อัปโหลดมีขนาดใหญ่เกินค่า MAX_FILE_SIZE ที่ระบุไว้ในรูปแบบของ HTML",
+    "The file was only partially uploaded" : "ไฟล์ถูกอัปโหลดเพียงบางส่วน",
+    "No file was uploaded" : "ไม่มีไฟล์ที่ถูกอัปโหลด",
+    "Missing a temporary folder" : "โฟลเดอร์ชั่วคราวขาดหาย",
+    "Could not write file to disk" : "ไม่สามารถเขียนไฟล์ลงดิสก์",
+    "A PHP extension stopped the file upload" : "ส่วนขยาย PHP ได้หยุดการอัปโหลดไฟล์",
     "No" : "ไม่ตกลง",
     "Yes" : "ใช่",
     "Date" : "วันที่",
@@ -31,7 +39,7 @@ OC.L10N.register(
     "Cancel" : "ยกเลิก",
     "Delete" : "ลบ",
     "Owner" : "เจ้าของ",
-    "File" : "ไฟล์",
+    "Select from Files" : "เลือกจากไฟล์",
     "Please select a file." : "กรุณาเลือกไฟล์",
     "Transfer" : "โอนย้าย",
     "Filter" : "ตัวกรอง",

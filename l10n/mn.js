@@ -26,6 +26,7 @@ OC.L10N.register(
     "Cancel" : "болиулах",
     "Delete" : "Устгах",
     "Owner" : "Эзэмшигч",
+    "Select from Files" : "Файлуудаас сонгох",
     "Please select a file." : "Файл сонгоно уу.",
     "Filter" : "Шүүлтүүр",
     "Copy" : "хуулах",
