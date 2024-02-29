@@ -105,6 +105,27 @@ class ContextService {
 	}
 
 	/**
+	 * @throws Exception
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 */
+	public function update(int $contextId, ?string $name, ?string $iconName, ?string $description): Context {
+		$context = $this->contextMapper->findById($contextId);
+
+		if ($name !== null) {
+			$context->setName(trim($name));
+		}
+		if ($iconName !== null) {
+			$context->setIcon(trim($iconName));
+		}
+		if ($description !== null) {
+			$context->setDescription(trim($description));
+		}
+
+		return $this->contextMapper->update($context);
+	}
+
+	/**
 	 * @throws MultipleObjectsReturnedException
 	 * @throws DoesNotExistException
 	 * @throws Exception
