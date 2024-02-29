@@ -33,9 +33,10 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 
 div {
+	max-width: 670px;
 	max-height: calc(var(--default-line-height) * 6);
 	overflow-y: scroll;
 	min-width: 100px;
@@ -44,10 +45,20 @@ div {
 }
 
 :deep(.text-editor__wrapper div.ProseMirror) {
-	padding: 0px 0px 0px 0px
+	padding: 0px 0px 0px 0px;
+
+}
+
+:deep(div[contenteditable='false']) {
+	background: transparent;
+	color: var(--color-main-text);
+	width: auto;
+	min-height: auto;
+	opacity: 1;
+	font-size: var(--default-font-size);
 }
 
 :deep(.editor__content) {
-	max-width: 100% !important
+	max-width: 100% !important;
 }
 </style>
