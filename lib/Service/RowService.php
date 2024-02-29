@@ -397,7 +397,7 @@ class RowService extends SuperService {
 			}
 		}
 
-		return $this->row2Mapper->update($item, $columns);
+		return $this->filterRowResult($view ?? null, $this->row2Mapper->update($item, $columns));
 	}
 
 	/**
@@ -450,7 +450,7 @@ class RowService extends SuperService {
 		}
 
 		try {
-			return $this->row2Mapper->delete($item);
+			return $this->filterRowResult($view ?? null, $this->row2Mapper->delete($item));
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
@@ -521,5 +521,15 @@ class RowService extends SuperService {
 		} else {
 			throw new PermissionError('no read access for counting to view id = '.$view->getId());
 		}
+	}
+
+	private function filterRowResult(?View $view, Row2 $row): Row2 {
+		if ($view === null) {
+			return $row;
+		}
+
+		$row->filterDataByColumns($view->getColumnsArray());
+
+		return $row;
 	}
 }
