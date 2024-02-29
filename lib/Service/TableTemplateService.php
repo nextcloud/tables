@@ -10,7 +10,6 @@ use OCA\Tables\Errors\PermissionError;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
-use OCP\IConfig;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
@@ -27,24 +26,15 @@ class TableTemplateService {
 
 	private ?string $userId;
 
-	private IConfig $config;
-
 	private string $textRichColumnTypeName = 'rich';
 
-	public function __construct(LoggerInterface $logger, IL10N $l, ColumnService $columnService, ?string $userId, RowService $rowService, ViewService $viewService, IConfig $config) {
+	public function __construct(LoggerInterface $logger, IL10N $l, ColumnService $columnService, ?string $userId, RowService $rowService, ViewService $viewService) {
 		$this->logger = $logger;
 		$this->l = $l;
 		$this->columnService = $columnService;
 		$this->rowService = $rowService;
 		$this->viewService = $viewService;
 		$this->userId = $userId;
-		$this->config = $config;
-
-		// if we are on NC25, wie have to use the old text-long column type
-		// this is because NC25 does not serve the text editor globally
-		if (version_compare($this->config->getSystemValueString('version', '0.0.0'), '26.0.0', '<')) {
-			$this->textRichColumnTypeName = 'long';
-		}
 	}
 
 	/**
