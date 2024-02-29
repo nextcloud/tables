@@ -202,10 +202,12 @@ export default {
 .actionButtonsLeft {
 	display: inline-flex;
 	align-items: center;
+	padding-left: calc(var(--default-grid-baseline) * 1);
 }
 
 :deep(.actionButtonsLeft button) {
 	min-width: fit-content;
+	margin-top: 5px;
 }
 
 .searchAndFilter {
