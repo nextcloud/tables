@@ -98,10 +98,10 @@ class PermissionsService {
 
 	public function canAccessNodeById(int $nodeType, int $nodeId, ?string $userId = null): bool {
 		if ($nodeType === Application::NODE_TYPE_TABLE) {
-			return $this->canReadColumnsByTableId($nodeId, $this->userId);
+			return $this->canReadColumnsByTableId($nodeId, $userId);
 		}
 		if ($nodeType === Application::NODE_TYPE_VIEW) {
-			return $this->canReadColumnsByViewId($nodeId, $this->userId);
+			return $this->canReadColumnsByViewId($nodeId, $userId);
 		}
 
 		return false;
@@ -109,10 +109,10 @@ class PermissionsService {
 
 	public function canManageNodeById(int $nodeType, int $nodeId, ?string $userId = null): bool {
 		if ($nodeType === Application::NODE_TYPE_TABLE) {
-			return $this->canManageTableById($nodeId, $this->userId);
+			return $this->canManageTableById($nodeId, $userId);
 		}
 		if ($nodeType === Application::NODE_TYPE_VIEW) {
-			return $this->canManageViewById($nodeId, $this->userId);
+			return $this->canManageViewById($nodeId, $userId);
 		}
 
 		return false;
