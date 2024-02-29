@@ -195,48 +195,55 @@ class ImportService extends SuperService {
 		$cellIterator = $row->getCellIterator();
 		$cellIterator->setIterateOnlyExistingCells(false);
 
-		$i = -1;
-		$data = [];
-		foreach ($cellIterator as $cell) {
-			$i++;
-
-			// only add the dataset if column is known
-			if($this->columns[$i] === '' || !isset($this->columns[$i])) {
-				$this->logger->debug('Column unknown while fetching rows data for importing.');
-				continue;
-			}
-
-			/** @var Column $column */
-			$column = $this->columns[$i];
-
-			// if cell is empty
-			if(!$cell || $cell->getValue() === null) {
-				$this->logger->info('Cell is empty while fetching rows data for importing.');
-				if($column->getMandatory()) {
-					$this->logger->warning('Mandatory column was not set');
-					$this->countErrors++;
-					return;
-				}
-				continue;
-			}
-
-			$value = $cell->getValue();
-			if ($column->getType() === 'datetime') {
-				$value = Date::excelToDateTimeObject($value)->format('Y-m-d H:i');
-			} elseif ($column->getType() === 'number' && $column->getNumberSuffix() === '%') {
-				$value = $value * 100;
-			} elseif ($column->getType() === 'selection' && $column->getSubtype() === 'check') {
-				$value = $cell->getFormattedValue() === 'TRUE' ? 'true' : 'false';
-			}
-
-			$data[] = [
-				'columnId' => (int) $this->columns[$i]->getId(),
-				'value' => json_decode($this->parseValueByColumnType($value, $this->columns[$i])),
-			];
-		}
 		try {
-			$this->rowService->create($this->tableId, $this->viewId, $data);
-			$this->countInsertedRows++;
+			$i = -1;
+			$data = [];
+			$hasData = false;
+			foreach ($cellIterator as $cell) {
+				$i++;
+
+				// only add the dataset if column is known
+				if(!isset($this->columns[$i]) || $this->columns[$i] === '') {
+					$this->logger->debug('Column unknown while fetching rows data for importing.');
+					continue;
+				}
+
+				/** @var Column $column */
+				$column = $this->columns[$i];
+
+				// if cell is empty
+				if(!$cell || $cell->getValue() === null) {
+					$this->logger->info('Cell is empty while fetching rows data for importing.');
+					if($column->getMandatory()) {
+						$this->logger->warning('Mandatory column was not set');
+						$this->countErrors++;
+						return;
+					}
+					continue;
+				}
+
+				$value = $cell->getValue();
+				$hasData = $hasData || !empty($value);
+				if ($column->getType() === 'datetime') {
+					$value = Date::excelToDateTimeObject($value)->format('Y-m-d H:i');
+				} elseif ($column->getType() === 'number' && $column->getNumberSuffix() === '%') {
+					$value = $value * 100;
+				} elseif ($column->getType() === 'selection' && $column->getSubtype() === 'check') {
+					$value = $cell->getFormattedValue() === 'TRUE' ? 'true' : 'false';
+				}
+
+				$data[] = [
+					'columnId' => $column->getId(),
+					'value' => json_decode($this->parseValueByColumnType($value, $column)),
+				];
+			}
+
+			if ($hasData) {
+				$this->rowService->create($this->tableId, $this->viewId, $data);
+				$this->countInsertedRows++;
+			} else {
+				$this->logger->debug('Skipped empty row ' . $row->getRowIndex() . ' during import');
+			}
 		} catch (PermissionError $e) {
 			$this->logger->error('Could not create row while importing, no permission.', ['exception' => $e]);
 			$this->countErrors++;
@@ -246,6 +253,9 @@ class ImportService extends SuperService {
 		} catch (NotFoundError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		} catch (\Throwable $e) {
+			$this->countErrors++;
+			$this->logger->error('Error while creating new row for import.', ['exception' => $e]);
 		}
 
 	}
