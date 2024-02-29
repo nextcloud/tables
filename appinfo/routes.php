@@ -134,6 +134,6 @@ return [
 		['name' => 'Context#update', 'url' => '/api/2/contexts/{contextId}', 'verb' => 'PUT'],
 		['name' => 'Context#addNode', 'url' => '/api/2/contexts/{contextId}/nodes', 'verb' => 'POST'],
 		['name' => 'Context#removeNode', 'url' => '/api/2/contexts/{contextId}/nodes/{nodeRelId}', 'verb' => 'DELETE'],
-
+		['name' => 'Context#updateContentOrder', 'url' => '/api/2/contexts/{contextId}/pages/{pageId}', 'verb' => 'PUT'],
 	]
 ];
