@@ -1,8 +1,14 @@
 OC.L10N.register(
     "tables",
     {
+    "The file was uploaded" : "La dosiero alŝutiĝis",
+    "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "La dosiero alŝutita superas la regulon „upload_max_filesize“ el „php.ini“",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "La dosiero alŝutita superas la regulon MAX_FILE_SIZE, kiu estas difinita en la HTML-formularo",
     "The file was only partially uploaded" : "La dosiero alŝutiĝis nur parte",
+    "No file was uploaded" : "Neniu dosiero alŝutiĝis",
+    "Missing a temporary folder" : "Mankas provizora dosierujo",
+    "Could not write file to disk" : "Ne eblis skribi dosieron sur diskon",
+    "A PHP extension stopped the file upload" : "PHP-modulo haltigis la dosieralŝuton",
     "No file uploaded or file size exceeds maximum of %s" : "Neniu dosiero alŝutita, aŭ dosiergrando transpasas la maksimumon %s",
     "No" : "Ne",
     "Yes" : "Jes",
@@ -39,6 +45,7 @@ OC.L10N.register(
     "Cancel" : "Nuligi",
     "Delete" : "Forigi",
     "Owner" : "Posedanto",
+    "Select from Files" : "Elekti el dosieroj",
     "Please select a file." : "Bonvolu elekti dosieron.",
     "Sort" : "Ordigi",
     "Shared" : "Kunhavigita",

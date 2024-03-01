@@ -24,6 +24,7 @@ OC.L10N.register(
     "Title" : "Titl",
     "Cancel" : "Arrest",
     "Delete" : "Lemel",
+    "Select from Files" : "Choaz diouz ar restr",
     "Please select a file." : "Choazit ur restr mar-plij.",
     "Transfer" : "Treuzkas",
     "Filter" : "Filtre",
