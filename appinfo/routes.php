@@ -126,7 +126,7 @@ return [
 		['name' => 'ApiColumns#createSelectionColumn', 'url' => '/api/2/columns/selection', 'verb' => 'POST'],
 		['name' => 'ApiColumns#createDatetimeColumn', 'url' => '/api/2/columns/datetime', 'verb' => 'POST'],
 
-		['name' => 'ApiFavorite#create', 'url' => '/api/2/favorites/{nodeType}/{nodeId}', 'verb' => 'POST'],
-		['name' => 'ApiFavorite#destroy', 'url' => '/api/2/favorites/{nodeType}/{nodeId}', 'verb' => 'DELETE'],
+		['name' => 'ApiFavorite#create', 'url' => '/api/2/favorites/{nodeType}/{nodeId}', 'verb' => 'POST', 'requirements' => ['nodeType' => '(\d+)', 'nodeId' => '(\d+)']],
+		['name' => 'ApiFavorite#destroy', 'url' => '/api/2/favorites/{nodeType}/{nodeId}', 'verb' => 'DELETE', 'requirements' => ['nodeType' => '(\d+)', 'nodeId' => '(\d+)']],
 	]
 ];

@@ -6,6 +6,7 @@ import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import data from './data.js'
 import displayError from '../shared/utils/displayError.js'
+import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../shared/constants.js'
 
 Vue.use(Vuex)
 
@@ -236,7 +237,7 @@ export default new Vuex.Store({
 		},
 		async favoriteView({ state, commit, dispatch }, { id }) {
 			try {
-				await axios.post(generateOcsUrl('/apps/tables/api/2/favorites/views/' + id))
+				await axios.post(generateOcsUrl(`/apps/tables/api/2/favorites/${NODE_TYPE_VIEW}/${id}`))
 			} catch (e) {
 				displayError(e, t('tables', 'Could not favorite view'))
 				return false
@@ -251,7 +252,7 @@ export default new Vuex.Store({
 		},
 		async removeFavoriteView({ state, commit, dispatch }, { id }) {
 			try {
-				await axios.delete(generateOcsUrl('/apps/tables/api/2/favorites/views/' + id))
+				await axios.delete(generateOcsUrl(`/apps/tables/api/2/favorites/${NODE_TYPE_VIEW}/${id}`))
 			} catch (e) {
 				displayError(e, t('tables', 'Could not remove view from favorites'))
 				return false
@@ -266,7 +267,7 @@ export default new Vuex.Store({
 		},
 		async favoriteTable({ state, commit, dispatch }, { id }) {
 			try {
-				await axios.post(generateOcsUrl('/apps/tables/api/2/favorites/tables/' + id))
+				await axios.post(generateOcsUrl(`/apps/tables/api/2/favorites/${NODE_TYPE_TABLE}/${id}`))
 			} catch (e) {
 				displayError(e, t('tables', 'Could not favorite table'))
 				return false
@@ -281,7 +282,7 @@ export default new Vuex.Store({
 		},
 		async removeFavoriteTable({ state, commit, dispatch }, { id }) {
 			try {
-				await axios.delete(generateOcsUrl('/apps/tables/api/2/favorites/tables/' + id))
+				await axios.delete(generateOcsUrl(`/apps/tables/api/2/favorites/${NODE_TYPE_TABLE}/${id}`))
 			} catch (e) {
 				displayError(e, t('tables', 'Could not remove table from favorites'))
 				return false
