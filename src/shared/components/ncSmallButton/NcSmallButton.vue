@@ -1,6 +1,9 @@
 <template>
 	<NcButton :aria-label="ariaLabel" class="button-small" @click="submit">
-		<slot />
+		<div class="button-small__label">
+			<slot name="icon" />
+			<slot />
+		</div>
 	</NcButton>
 </template>
 <script>
@@ -33,6 +36,12 @@ export default {
 		min-height: auto !important;
 		padding: 1px 2px !important;
 		margin: 0 0 0 4px !important;
+	}
+
+	.button-small__label {
+		display: flex;
+		flex-flow: row nowrap;
+		align-items: center;
 	}
 
 </style>
