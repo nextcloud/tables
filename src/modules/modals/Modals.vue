@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
+		<CreateContext :show-modal="showModalCreateContext" @close="showModalCreateContext = false" />
 		<DeleteTable :show-modal="tableToDelete !== null" :table="tableToDelete" @cancel="tableToDelete = null" />
 
 		<CreateColumn :show-modal="createColumnInfo !== null" :is-view="createColumnInfo?.isView" :element="createColumnInfo?.element" @close="createColumnInfo = null" />
@@ -56,6 +57,7 @@ import CreateTable from './CreateTable.vue'
 import DeleteView from './DeleteView.vue'
 import EditTable from './EditTable.vue'
 import TransferTable from './TransferTable.vue'
+import CreateContext from './CreateContext.vue'
 
 export default {
 	components: {
@@ -72,6 +74,7 @@ export default {
 		CreateRow,
 		DeleteTable,
 		TransferTable,
+		CreateContext,
 	},
 
 	data() {
@@ -84,6 +87,7 @@ export default {
 			rowsToDelete: null,
 			viewToEdit: null,
 			showModalCreateTable: false,
+			showModalCreateContext: false,
 			importToElement: null,
 			createViewTableId: null, // if null, no modal open
 			tableToDelete: null,
@@ -126,6 +130,10 @@ export default {
 
 		// misc
 		subscribe('tables:modal:import', element => { this.importToElement = element })
+
+		// context
+		subscribe('tables:context:create', () => { this.showModalCreateContext = true })
+
 	},
 	unmounted() {
 		unsubscribe('tables:view:reload', () => { this.reload(true) })
@@ -150,6 +158,7 @@ export default {
 		unsubscribe('tables:table:delete', table => { this.tableToDelete = table })
 		unsubscribe('tables:table:edit', tableId => { this.editTable = tableId })
 		unsubscribe('tables:table:transfer', table => { this.tableToTransfer = table })
+		unsubscribe('tables:context:create', () => { this.showModalCreateContext = true })
 	},
 }
 </script>

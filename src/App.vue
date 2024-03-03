@@ -70,6 +70,8 @@ export default {
 				this.setPageTitle(this.$store.getters.activeView.title)
 			} else if (currentRoute.path.startsWith('/context/')) {
 				this.$store.commit('setActiveContextId', currentRoute.params.contextId)
+				console.log('actibecontexts', this.$store.getters.activeContext)
+				this.setPageTitle(this.$store.getters.activeContext.name)
 			}
 		},
 		setPageTitle(title) {
