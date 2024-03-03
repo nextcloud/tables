@@ -2,10 +2,8 @@
 	<NcAppNavigation>
 		<template #list>
 			<div class="filter-box">
-				<NcTextField :value.sync="filterString"
-					:label="t('tables', 'Filter tables')"
-					trailing-button-icon="close"
-					:show-trailing-button="filterString !== ''"
+				<NcTextField :value.sync="filterString" :label="t('tables', 'Filter items')"
+					trailing-button-icon="close" :show-trailing-button="filterString !== ''"
 					@trailing-button-click="filterString = ''">
 					<Magnify :size="16" />
 				</NcTextField>
@@ -14,45 +12,36 @@
 			<div v-if="tablesLoading" class="icon-loading" />
 
 			<ul v-if="!tablesLoading">
-				<NcAppNavigationCaption v-if="getFavoriteNodes.length > 0"
-					:name="t('tables', 'Favorites')" />
+				<NcAppNavigationCaption v-if="getFavoriteNodes.length > 0" :name="t('tables', 'Favorites')" />
 
 				<!-- FAVORITES -->
 				<template v-for="node in getFavoriteNodes">
-					<NavigationTableItem v-if="!node.tableId"
-						:key="node.id"
-						:filter-string="filterString"
+					<NavigationTableItem v-if="!node.tableId" :key="node.id" :filter-string="filterString"
 						:table="node" />
 
-					<NavigationViewItem v-else
-						:key="'view' + node.id"
-						:view="node" />
+					<NavigationViewItem v-else :key="'view' + node.id" :view="node" />
 				</template>
 
 				<NcAppNavigationCaption :name="t('tables', 'Tables')">
 					<template #actions>
-						<NcActionButton :aria-label="t('tables', 'Create table')" icon="icon-add" @click.prevent="createTable" />
+						<NcActionButton :aria-label="t('tables', 'Create table')" icon="icon-add"
+							@click.prevent="createTable" />
 					</template>
 				</NcAppNavigationCaption>
 
 				<!-- ALL NON-FAVORITES -->
+
 				<template v-for="node in getAllNodes">
-					<NavigationTableItem v-if="!node.tableId && !node.archived && !node.favorite"
-						:key="node.id"
-						:filter-string="filterString"
-						:table="node" />
+					<NavigationTableItem v-if="!node.tableId && !node.archived && !node.favorite" :key="node.id"
+						:filter-string="filterString" :table="node" />
 
 					<NavigationViewItem v-else-if="node.tableId && !node.favorite && !viewAlreadyListed(node)"
-						:key="'view' + node.id"
-						:view="node" />
+						:key="'view' + node.id" :view="node" />
 				</template>
 
 				<!-- ARCHIVED -->
-				<NcAppNavigationItem v-if="getArchivedTables.length > 0"
-					class="archived-items"
-					:name="t('tables', 'Archived tables')"
-					:allow-collapse="true"
-					:open="false">
+				<NcAppNavigationItem v-if="getArchivedTables.length > 0" :name="t('tables', 'Archived tables')"
+					:allow-collapse="true" :open="false">
 					<template #icon>
 						<Archive :size="20" />
 					</template>
@@ -63,11 +52,22 @@
 						</NcCounterBubble>
 					</template>
 
-					<NavigationTableItem v-for="table in getArchivedTables"
-						:key="table.id"
-						:filter-string="filterString"
-						:table="table" />
+					<NavigationTableItem v-for="table in getArchivedTables" :key="table.id"
+						:filter-string="filterString" :table="table" />
 				</NcAppNavigationItem>
+			</ul>
+			<div v-if="contextsLoading" class="icon-loading" />
+			<ul v-if="!contextsLoading">
+				<NcAppNavigationCaption :name="t('tables', 'Applications')">
+					<template #actions>
+						<NcActionButton :aria-label="t('tables', 'Create application')" icon="icon-add"
+							@click.prevent="createContext" />
+					</template>
+				</NcAppNavigationCaption>
+
+				<template v-for="node in getAllContexts">
+					<NavigationContextItem :key="node.id" :context="node" />
+				</template>
 			</ul>
 		</template>
 
@@ -76,6 +76,7 @@
 				<template #icon>
 					<Magnify :size="10" />
 				</template>
+
 				<template #action>
 					<NcButton :aria-label="t('tables', 'Clear filter')" @click="filterString = ''">
 						{{ t('tables', 'Clear filter') }}
@@ -100,6 +101,7 @@ import {
 
 import NavigationViewItem from '../partials/NavigationViewItem.vue'
 import NavigationTableItem from '../partials/NavigationTableItem.vue'
+import NavigationContextItem from '../partials/NavigationContextItem.vue'
 import { mapState } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
@@ -111,6 +113,7 @@ export default {
 	components: {
 		NavigationTableItem,
 		NavigationViewItem,
+		NavigationContextItem,
 		NcAppNavigation,
 		NcAppNavigationItem,
 		NcAppNavigationCaption,
@@ -129,7 +132,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(['tables', 'views', 'tablesLoading']),
+		...mapState(['tables', 'views', 'tablesLoading', 'contexts', 'contextsLoading']),
 		getAllNodes() {
 			return [...this.getFilteredTables, ...this.getOwnViews, ...this.getSharedViews]
 		},
@@ -163,10 +166,16 @@ export default {
 				}
 			})
 		},
+		getAllContexts() {
+			return this.contexts.filter(context => context.name.toLowerCase().includes(this.filterString.toLowerCase()))
+		},
 	},
 	methods: {
 		createTable() {
 			emit('tables:table:create')
+		},
+		createContext() {
+			emit('tables:context:create')
 		},
 		closeNav() {
 			if (window.innerWidth < 960) {
@@ -199,16 +208,6 @@ export default {
 
 	.empty-content {
 		margin-top: 3vh;
-	}
-}
-</style>
-
-<style>
-.archived-items .app-navigation-entry__children {
-	& .app-navigation-entry-wrapper .app-navigation-entry__children {
-		& .app-navigation-entry {
-			padding-left: 32px;
-		}
 	}
 }
 </style>
