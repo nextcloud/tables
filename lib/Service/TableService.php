@@ -6,6 +6,7 @@ namespace OCA\Tables\Service;
 
 use DateTime;
 
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Errors\InternalError;
@@ -38,6 +39,9 @@ class TableService extends SuperService {
 
 	protected UserHelper $userHelper;
 
+	protected FavoritesService $favoritesService;
+
+
 	protected IL10N $l;
 
 	public function __construct(
@@ -51,6 +55,7 @@ class TableService extends SuperService {
 		ViewService $viewService,
 		ShareService $shareService,
 		UserHelper $userHelper,
+		FavoritesService $favoritesService,
 		IL10N $l
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
@@ -61,6 +66,7 @@ class TableService extends SuperService {
 		$this->viewService = $viewService;
 		$this->shareService = $shareService;
 		$this->userHelper = $userHelper;
+		$this->favoritesService = $favoritesService;
 		$this->l = $l;
 	}
 
@@ -196,6 +202,11 @@ class TableService extends SuperService {
 			// add the corresponding views if it is an own table, or you have table manage rights
 			$table->setViews($this->viewService->findAll($table));
 		}
+
+		if ($this->favoritesService->isFavorite(Application::NODE_TYPE_TABLE, $table->getId())) {
+			$table->setFavorite(true);
+		}
+
 
 	}
 
@@ -420,7 +431,7 @@ class TableService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function update(int $id, ?string $title, ?string $emoji, ?string $userId = null): Table {
+	public function update(int $id, ?string $title, ?string $emoji, ?bool $archived = null, ?string $userId = null): Table {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
@@ -444,6 +455,9 @@ class TableService extends SuperService {
 		}
 		if ($emoji !== null) {
 			$table->setEmoji($emoji);
+		}
+		if ($archived !== null) {
+			$table->setArchived($archived);
 		}
 		$table->setLastEditBy($userId);
 		$table->setLastEditAt($time->format('Y-m-d H:i:s'));

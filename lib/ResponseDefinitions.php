@@ -23,6 +23,7 @@ namespace OCA\Tables;
  *  sort: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
  *  filter: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>,
  * 	isShared: bool,
+ *	favorite: bool,
  * 	onSharePermissions: ?array{
  * 		read: bool,
  * 		create: bool,
@@ -44,6 +45,8 @@ namespace OCA\Tables;
  * 	createdAt: string,
  * 	lastEditBy: string,
  * 	lastEditAt: string,
+ *	archived: bool,
+ *	favorite: bool,
  * 	isShared: bool,
  * 	onSharePermissions: ?array{
  * 		read: bool,

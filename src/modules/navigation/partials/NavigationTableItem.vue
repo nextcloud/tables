@@ -12,10 +12,12 @@
 			<template v-if="table.emoji">
 				{{ table.emoji }}
 			</template>
+
 			<template v-else>
 				<Table :size="20" />
 			</template>
 		</template>
+
 		<template #counter>
 			<NcCounterBubble v-if="canReadData(table)">
 				{{ n('tables', '%n row', '%n rows', table.rowsCount, {}) }}
@@ -27,6 +29,7 @@
 		</template>
 
 		<template #actions>
+			<!-- EDIT -->
 			<NcActionButton v-if="canManageElement(table) "
 				:close-after-click="true"
 				@click="emit('tables:table:edit', table.id)">
@@ -35,6 +38,8 @@
 				</template>
 				{{ t('tables', 'Edit table') }}
 			</NcActionButton>
+
+			<!-- CREATE VIEW -->
 			<NcActionButton v-if="canManageElement(table)"
 				:close-after-click="true"
 				@click="createView">
@@ -43,12 +48,16 @@
 				</template>
 				{{ t('tables', 'Create view') }}
 			</NcActionButton>
+
+			<!-- SHARE -->
 			<NcActionButton v-if="canShareElement(table)"
 				icon="icon-share"
 				:close-after-click="true"
 				@click="actionShowShare">
 				{{ t('tables', 'Share') }}
 			</NcActionButton>
+
+			<!-- IMPORT -->
 			<NcActionButton v-if="canCreateRowInElement(table)"
 				:close-after-click="true"
 				@click="actionShowImport(table)">
@@ -57,6 +66,8 @@
 					<Import :size="20" />
 				</template>
 			</NcActionButton>
+
+			<!-- INTEGRATION -->
 			<NcActionButton
 				:close-after-click="true"
 				@click="actionShowIntegration">
@@ -65,6 +76,48 @@
 					<Connection :size="20" />
 				</template>
 			</NcActionButton>
+
+			<!-- FAVORITE -->
+			<NcActionButton v-if="!table.favorite && !table.archived"
+				:close-after-click="true"
+				@click="toggleFavoriteTable(true)">
+				{{ t('tables', 'Add to favorites') }}
+				<template #icon>
+					<Star :size="20" />
+				</template>
+			</NcActionButton>
+
+			<!-- UNFAVORITE -->
+			<NcActionButton v-if="table.favorite"
+				:close-after-click="true"
+				@click="toggleFavoriteTable(false)">
+				{{ t('tables', 'Remove from favorites') }}
+				<template #icon>
+					<StarOutline :size="20" />
+				</template>
+			</NcActionButton>
+
+			<!-- ARCHIVE -->
+			<NcActionButton v-if="canManageElement(table) && !table.archived && !table.favorite"
+				:close-after-click="true"
+				@click="toggleArchiveTable(true)">
+				{{ t('tables', 'Archive table') }}
+				<template #icon>
+					<ArchiveArrowDown :size="20" />
+				</template>
+			</NcActionButton>
+
+			<!-- UNARCHIVE -->
+			<NcActionButton v-if="canManageElement(table) && table.archived"
+				:close-after-click="true"
+				@click="toggleArchiveTable(false)">
+				{{ t('tables', 'Unarchive table') }}
+				<template #icon>
+					<ArchiveArrowUpOutline :size="20" />
+				</template>
+			</NcActionButton>
+
+			<!-- DELETE -->
 			<NcActionButton v-if="canManageElement(table)"
 				icon="icon-delete"
 				:close-after-click="true"
@@ -78,12 +131,17 @@
 			:show-share-sender="false" />
 	</NcAppNavigationItem>
 </template>
+
 <script>
 import { NcActionButton, NcAppNavigationItem, NcCounterBubble, NcAvatar } from '@nextcloud/vue'
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters, mapState } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
 import Table from 'vue-material-design-icons/Table.vue'
+import Star from 'vue-material-design-icons/Star.vue'
+import StarOutline from 'vue-material-design-icons/StarOutline.vue'
+import ArchiveArrowDown from 'vue-material-design-icons/ArchiveArrowDown.vue'
+import ArchiveArrowUpOutline from 'vue-material-design-icons/ArchiveArrowUpOutline.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import { getCurrentUser } from '@nextcloud/auth'
 import Connection from 'vue-material-design-icons/Connection.vue'
@@ -98,6 +156,10 @@ export default {
 		IconRename,
 		// eslint-disable-next-line vue/no-reserved-component-names
 		Table,
+		Star,
+		StarOutline,
+		ArchiveArrowDown,
+		ArchiveArrowUpOutline,
 		Import,
 		NavigationViewItem,
 		NcActionButton,
@@ -193,8 +255,24 @@ export default {
 				})
 			}
 		},
+		async toggleArchiveTable(archived) {
+			await this.$store.dispatch('updateTable', {
+				id: this.table.id,
+				data: { archived },
+			})
+		},
+		async toggleFavoriteTable(favorite) {
+			if (favorite) {
+				await this.$store.dispatch('favoriteTable', {
+					id: this.table.id,
+				})
+			} else {
+				await this.$store.dispatch('removeFavoriteTable', {
+					id: this.table.id,
+				})
+			}
+		},
 	},
-
 }
 </script>
 <style lang="scss">

@@ -14,50 +14,95 @@
 			<div v-if="tablesLoading" class="icon-loading" />
 
 			<ul v-if="!tablesLoading">
-				<NcAppNavigationCaption :name="t('tables', 'My tables')">
+				<NcAppNavigationCaption v-if="getFavoriteNodes.length > 0"
+					:name="t('tables', 'Favorites')" />
+
+				<!-- FAVORITES -->
+				<template v-for="node in getFavoriteNodes">
+					<NavigationTableItem v-if="!node.tableId"
+						:key="node.id"
+						:filter-string="filterString"
+						:table="node" />
+
+					<NavigationViewItem v-else
+						:key="'view' + node.id"
+						:view="node" />
+				</template>
+
+				<NcAppNavigationCaption :name="t('tables', 'Tables')">
 					<template #actions>
 						<NcActionButton :aria-label="t('tables', 'Create table')" icon="icon-add" @click.prevent="createTable" />
 					</template>
 				</NcAppNavigationCaption>
-				<NavigationTableItem v-for="table in getOwnTables"
-					:key="table.id"
-					:filter-string="filterString"
-					:table="table" />
 
-				<NcAppNavigationCaption v-if="getSharedTables.length > 0 || getSharedViews.length > 0"
-					:name="t('tables', 'Shared')" />
-				<NavigationTableItem v-for="table in getSharedTables"
-					:key="table.id"
-					:filter-string="filterString"
-					:table="table" />
-				<NavigationViewItem v-for="view in getSharedViews"
-					:key="'view'+view.id"
-					:view="view" />
-			</ul>
+				<!-- ALL NON-FAVORITES -->
+				<template v-for="node in getAllNodes">
+					<NavigationTableItem v-if="!node.tableId && !node.archived && !node.favorite"
+						:key="node.id"
+						:filter-string="filterString"
+						:table="node" />
 
-			<div v-if="filterString !== ''" class="search-info">
-				<NcEmptyContent :description="t('tables', 'Your results are filtered.')">
+					<NavigationViewItem v-else-if="node.tableId && !node.favorite && !viewAlreadyListed(node)"
+						:key="'view' + node.id"
+						:view="node" />
+				</template>
+
+				<!-- ARCHIVED -->
+				<NcAppNavigationItem v-if="getArchivedTables.length > 0"
+					:name="t('tables', 'Archived tables')"
+					:allow-collapse="true"
+					:open="false">
 					<template #icon>
-						<Magnify :size="10" />
+						<Archive :size="20" />
 					</template>
-					<template #action>
-						<NcButton :aria-label="t('tables', 'Clear filter')" @click="filterString = ''">
-							{{ t('tables', 'Clear filter') }}
-						</NcButton>
+
+					<template #counter>
+						<NcCounterBubble>
+							{{ getArchivedTables.length }}
+						</NcCounterBubble>
 					</template>
-				</NcEmptyContent>
-			</div>
+
+					<NavigationTableItem v-for="table in getArchivedTables"
+						:key="table.id"
+						:filter-string="filterString"
+						:table="table" />
+				</NcAppNavigationItem>
+			</ul>
 		</template>
+
+		<div v-if="filterString !== ''" class="search-info">
+			<NcEmptyContent :description="t('tables', 'Your results are filtered.')">
+				<template #icon>
+					<Magnify :size="10" />
+				</template>
+				<template #action>
+					<NcButton :aria-label="t('tables', 'Clear filter')" @click="filterString = ''">
+						{{ t('tables', 'Clear filter') }}
+					</NcButton>
+				</template>
+			</NcEmptyContent>
+		</div>
 	</NcAppNavigation>
 </template>
 
 <script>
-import { NcAppNavigation, NcAppNavigationCaption, NcActionButton, NcTextField, NcButton, NcEmptyContent } from '@nextcloud/vue'
+import {
+	NcAppNavigation,
+	NcAppNavigationItem,
+	NcAppNavigationCaption,
+	NcActionButton,
+	NcTextField,
+	NcButton,
+	NcEmptyContent,
+	NcCounterBubble,
+} from '@nextcloud/vue'
+
 import NavigationViewItem from '../partials/NavigationViewItem.vue'
 import NavigationTableItem from '../partials/NavigationTableItem.vue'
 import { mapState } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
+import Archive from 'vue-material-design-icons/Archive.vue'
 import { getCurrentUser } from '@nextcloud/auth'
 
 export default {
@@ -66,11 +111,14 @@ export default {
 		NavigationTableItem,
 		NavigationViewItem,
 		NcAppNavigation,
+		NcAppNavigationItem,
 		NcAppNavigationCaption,
 		NcActionButton,
 		NcTextField,
 		Magnify,
+		Archive,
 		NcButton,
+		NcCounterBubble,
 		NcEmptyContent,
 	},
 	data() {
@@ -81,15 +129,28 @@ export default {
 	},
 	computed: {
 		...mapState(['tables', 'views', 'tablesLoading']),
+		getAllNodes() {
+			return [...this.getFilteredTables, ...this.getOwnViews, ...this.getSharedViews]
+		},
+		getOwnViews() {
+			const sharedTableIds = this.getFilteredTables.map(table => table.id)
+
+			return this.views.filter(view => {
+				return !view.isShared && view.ownership === getCurrentUser().uid && sharedTableIds.includes(view.tableId)
+			}).filter(view => view.title.toLowerCase().includes(this.filterString.toLowerCase()))
+		},
 		getSharedViews() {
 			const sharedTableIds = this.getFilteredTables.map(table => table.id)
-			return this.views.filter(item => item.isShared === true && item.ownership !== getCurrentUser().uid && !sharedTableIds.includes(item.tableId)).filter(view => view.title.toLowerCase().includes(this.filterString.toLowerCase())).sort((a, b) => a.tableId === b.tableId ? a.id - b.id : a.tableId - b.tableId)
+
+			return this.views.filter(view => {
+				return view.isShared && view.ownership !== getCurrentUser().uid && !sharedTableIds.includes(view.tableId)
+			}).filter(view => view.title.toLowerCase().includes(this.filterString.toLowerCase()))
 		},
-		getSharedTables() {
-			return this.getFilteredTables.filter((item) => { return item.isShared === true && item.ownership !== getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
+		getFavoriteNodes() {
+			return this.getAllNodes.filter(node => node.favorite)
 		},
-		getOwnTables() {
-			return this.getFilteredTables.filter((item) => { return item.isShared === false || item.ownership === getCurrentUser().uid }).sort((a, b) => a.title.localeCompare(b.title))
+		getArchivedTables() {
+			return this.getFilteredTables.filter(node => node.archived)
 		},
 		getFilteredTables() {
 			return this.tables.filter(table => {
@@ -112,6 +173,9 @@ export default {
 					open: false,
 				})
 			}
+		},
+		viewAlreadyListed(view) {
+			return this.getFilteredTables.map(t => t.id).includes(view.tableId)
 		},
 	},
 }

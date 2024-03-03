@@ -44,7 +44,8 @@ class RenameTable extends Command {
 
 	protected function configure(): void {
 		$this
-			->setName('tables:rename')
+			->setName('tables:update')
+			->setAliases(['tables:rename'])
 			->setDescription('Rename a table.')
 			->addArgument(
 				'ID',
@@ -62,6 +63,12 @@ class RenameTable extends Command {
 				InputOption::VALUE_OPTIONAL,
 				'New emoji.'
 			)
+			->addOption(
+				'archived',
+				'a',
+				InputOption::VALUE_NONE,
+				'Archived'
+			)
 		;
 	}
 
@@ -74,9 +81,10 @@ class RenameTable extends Command {
 		$id = $input->getArgument('ID');
 		$title = $input->getArgument('title');
 		$emoji = $input->getOption('emoji');
+		$archived = $input->getOption('archived');
 
 		try {
-			$table = $this->tableService->update($id, $title, $emoji, '');
+			$table = $this->tableService->update($id, $title, $emoji, $archived, '');
 
 			$arr = $table->jsonSerialize();
 			unset($arr['hasShares']);

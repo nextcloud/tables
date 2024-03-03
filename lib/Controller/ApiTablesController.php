@@ -106,9 +106,9 @@ class ApiTablesController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
-	public function update(int $id, string $title = null, string $emoji = null): DataResponse {
+	public function update(int $id, ?string $title = null, ?string $emoji = null, ?bool $archived = null): DataResponse {
 		try {
-			return new DataResponse($this->service->update($id, $title, $emoji, $this->userId)->jsonSerialize());
+			return new DataResponse($this->service->update($id, $title, $emoji, $archived, $this->userId)->jsonSerialize());
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
 		} catch (InternalError $e) {

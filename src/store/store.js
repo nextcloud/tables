@@ -6,6 +6,7 @@ import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import data from './data.js'
 import displayError from '../shared/utils/displayError.js'
+import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../shared/constants.js'
 
 Vue.use(Vuex)
 
@@ -232,6 +233,66 @@ export default new Vuex.Store({
 			const index = tables.findIndex(t => t.id === table.id)
 			tables[index] = table
 			commit('setTables', [...tables])
+			return true
+		},
+		async favoriteView({ state, commit, dispatch }, { id }) {
+			try {
+				await axios.post(generateOcsUrl(`/apps/tables/api/2/favorites/${NODE_TYPE_VIEW}/${id}`))
+			} catch (e) {
+				displayError(e, t('tables', 'Could not favorite view'))
+				return false
+			}
+
+			const index = state.views.findIndex(v => v.id === id)
+			const view = state.views[index]
+			view.favorite = true
+			commit('setView', view)
+
+			return true
+		},
+		async removeFavoriteView({ state, commit, dispatch }, { id }) {
+			try {
+				await axios.delete(generateOcsUrl(`/apps/tables/api/2/favorites/${NODE_TYPE_VIEW}/${id}`))
+			} catch (e) {
+				displayError(e, t('tables', 'Could not remove view from favorites'))
+				return false
+			}
+
+			const index = state.views.findIndex(v => v.id === id)
+			const view = state.views[index]
+			view.favorite = false
+			commit('setView', view)
+
+			return true
+		},
+		async favoriteTable({ state, commit, dispatch }, { id }) {
+			try {
+				await axios.post(generateOcsUrl(`/apps/tables/api/2/favorites/${NODE_TYPE_TABLE}/${id}`))
+			} catch (e) {
+				displayError(e, t('tables', 'Could not favorite table'))
+				return false
+			}
+
+			const index = state.tables.findIndex(t => t.id === id)
+			const table = state.tables[index]
+			table.favorite = true
+			commit('setTable', table)
+
+			return true
+		},
+		async removeFavoriteTable({ state, commit, dispatch }, { id }) {
+			try {
+				await axios.delete(generateOcsUrl(`/apps/tables/api/2/favorites/${NODE_TYPE_TABLE}/${id}`))
+			} catch (e) {
+				displayError(e, t('tables', 'Could not remove table from favorites'))
+				return false
+			}
+
+			const index = state.tables.findIndex(t => t.id === id)
+			const table = state.tables[index]
+			table.favorite = false
+			commit('setTable', table)
+
 			return true
 		},
 		async transferTable({ state, commit, dispatch }, { id, data }) {
