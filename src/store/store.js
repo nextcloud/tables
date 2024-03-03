@@ -20,6 +20,7 @@ export default new Vuex.Store({
 		tables: [],
 		views: [],
 		contexts: [],
+		contextsLoading: false,
 		activeViewId: null,
 		activeTableId: null,
 		activeRowId: null,
@@ -54,6 +55,14 @@ export default new Vuex.Store({
 			}
 			return null
 		},
+		activeContext(state) {
+			if (state.contexts && state.activeContextId) {
+				console.log(state.contexts, state.activeContextId)
+				console.log('context', state.contexts.find(item => item.id === state.activeContextId))
+				return state.contexts.find(item => item.id === state.activeContextId)
+			}
+			return null
+		},
 		isView(state) {
 			return state.activeElementIsView
 		},
@@ -61,6 +70,9 @@ export default new Vuex.Store({
 	mutations: {
 		setTablesLoading(state, value) {
 			state.tablesLoading = !!(value)
+		},
+		setContextsLoading(state, value) {
+			state.contextsLoading = !!(value)
 		},
 		setActiveViewId(state, viewId) {
 			if (state.activeViewId !== viewId) {
@@ -78,7 +90,7 @@ export default new Vuex.Store({
 		},
 		setActiveContextId(state, contextId) {
 			if (state.activeContextId !== contextId) {
-				state.activeContextId = contextId
+				state.activeContextId = parseInt(contextId)
 			}
 		},
 		setTables(state, tables) {
@@ -264,23 +276,26 @@ export default new Vuex.Store({
 		},
 
 		async getAllContexts({ commit, state }) {
+			commit('setContextsLoading', true)
 			try {
 				const res = await axios.get(generateOcsUrl('/apps/tables/api/2/contexts'))
+				console.log('all con', res.data.ocs.data)
 				commit('setContexts', res.data.ocs.data)
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load contexts.'))
 				showError(t('tables', 'Could not fetch contexts'))
 			}
+			commit('setContextsLoading', false)
 			return true
 		},
 
 		async getContext({ state, commit, dispatch }, { id }) {
 			try {
-				const res = await axios.get(generateOcsUrl('/apps/tables/api/3/contexts/' + id))
+				const res = await axios.get(generateOcsUrl('/apps/tables/api/2/contexts/' + id))
 				commit('setContext', res.data.ocs.data)
 			} catch (e) {
-				displayError(e, t('tables', 'Could not load contexts.'))
-				showError(t('tables', 'Could not fetch contexts'))
+				displayError(e, t('tables', 'Could not load context.'))
+				showError(t('tables', 'Could not fetch context'))
 			}
 			return true
 		},

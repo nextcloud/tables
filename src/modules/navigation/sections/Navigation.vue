@@ -35,6 +35,21 @@
 					:view="view" />
 			</ul>
 
+			<div v-if="contextsLoading" class="icon-loading" />
+			<ul v-if="!contextsLoading">
+				<NcAppNavigationCaption :name="t('tables', 'Contexts')">
+					<template #actions>
+						<NcActionButton :aria-label="t('tables', 'Create context')" icon="icon-add" @click.prevent="createContext" />
+					</template>
+				</NcAppNavigationCaption>
+
+				<template v-for="node in getAllContexts">
+					<NavigationContextItem
+						:filter-string="filterString"
+						:context="node" />
+				</template>
+			</ul>
+
 			<div v-if="filterString !== ''" class="search-info">
 				<NcEmptyContent :description="t('tables', 'Your results are filtered.')">
 					<template #icon>
@@ -55,6 +70,7 @@
 import { NcAppNavigation, NcAppNavigationCaption, NcActionButton, NcTextField, NcButton, NcEmptyContent } from '@nextcloud/vue'
 import NavigationViewItem from '../partials/NavigationViewItem.vue'
 import NavigationTableItem from '../partials/NavigationTableItem.vue'
+import NavigationContextItem from '../partials/NavigationContextItem.vue'
 import { mapState } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
@@ -65,6 +81,7 @@ export default {
 	components: {
 		NavigationTableItem,
 		NavigationViewItem,
+		NavigationContextItem,
 		NcAppNavigation,
 		NcAppNavigationCaption,
 		NcActionButton,
@@ -80,7 +97,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(['tables', 'views', 'tablesLoading']),
+		...mapState(['tables', 'views', 'tablesLoading', 'contexts', 'contextsLoading']),
 		getSharedViews() {
 			const sharedTableIds = this.getFilteredTables.map(table => table.id)
 			return this.views.filter(item => item.isShared === true && item.ownership !== getCurrentUser().uid && !sharedTableIds.includes(item.tableId)).filter(view => view.title.toLowerCase().includes(this.filterString.toLowerCase())).sort((a, b) => a.tableId === b.tableId ? a.id - b.id : a.tableId - b.tableId)
@@ -101,10 +118,16 @@ export default {
 				}
 			})
 		},
+		getAllContexts() {
+			return this.contexts
+		},
 	},
 	methods: {
 		createTable() {
 			emit('tables:table:create')
+		},
+		createContext() {
+			emit('tables:context:create')
 		},
 		closeNav() {
 			if (window.innerWidth < 960) {
