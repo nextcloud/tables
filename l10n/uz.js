@@ -16,7 +16,7 @@ OC.L10N.register(
     "Delete" : "Delete",
     "Owner" : "Owner",
     "Please select a file." : "Iltimos, faylni tanlang.",
-    "Shared" : "Shared",
+    "Favorites" : "Favorites",
     "group" : "group",
     "Sharing" : "Ulashish",
     "Update" : "Update",

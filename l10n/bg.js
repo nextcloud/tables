@@ -199,8 +199,6 @@ OC.L10N.register(
     "Delete table" : "Изтриване на таблица",
     "Do you really want to delete the table \"{table}\"?" : "Наистина ли искате да изтриете таблицата \"{table}\"?",
     "Copy" : "Копие",
-    "My tables" : "Моите таблици",
-    "Shared" : "Споделен",
     "Your results are filtered." : "Вашите резултати са филтрирани.",
     "Clear filter" : "Изчстиване на филтър",
     "User or group name …" : "Име на потребител или на група … ",

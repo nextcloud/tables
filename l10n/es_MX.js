@@ -53,7 +53,7 @@ OC.L10N.register(
     "Transfer" : "Transferir",
     "Filter" : "Filtrar",
     "Sort" : "Ordenar",
-    "Shared" : "Compartido",
+    "Favorites" : "Favoritos",
     "No recommendations. Start typing." : "Sin recomendaciones. Empiece a escribir.",
     "Searching …" : "Buscando  …",
     "No elements found." : "No se encontraron elementos",

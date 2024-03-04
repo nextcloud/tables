@@ -28,7 +28,7 @@ OC.L10N.register(
     "Cancel" : "បោះបង់",
     "Delete" : "លុប",
     "Sort" : "តម្រៀប",
-    "Shared" : "បាន​ចែក​រំលែក",
+    "Favorites" : "Favorites",
     "group" : "ក្រុម",
     "Delete data" : "លុបទិន្នន័យ",
     "Sharing" : "ការ​ចែក​រំលែក",

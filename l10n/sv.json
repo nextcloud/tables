@@ -250,14 +250,15 @@
     "Title is missing." : "Titel saknas.",
     "Could not create new view" : "Det gick inte att skapa ny vy",
     "Could not update view" : "Det gick inte att uppdatera vyn",
+    "Add to favorites" : "Lägg till i favoriter",
+    "Remove from favorites" : "Ta bort från favoriter",
     "Delete table" : "Ta bort tabell",
     "Do you really want to delete the table \"{table}\"?" : "Vill du verkligen ta bort tabellen \"{table}\"?",
     "Duplicate view" : "Duplicera vy",
     "Copy" : "Kopiera",
     "Could not configure new view" : "Det gick inte att konfigurera ny vy",
     "Filter tables" : "Filtrera tabeller",
-    "My tables" : "Mina tabeller",
-    "Shared" : "Delad",
+    "Favorites" : "Favoriter",
     "Your results are filtered." : "Dina resultat filtreras.",
     "Clear filter" : "Rensa filter",
     "Share with accounts or groups" : "Dela med konton eller grupper",
@@ -435,7 +436,6 @@
     "Could not remove view." : "Det gick inte att ta bort vyn.",
     "Could not reload view." : "Det gick inte att ladda om vyn.",
     "Could not update table." : "Kunde inte uppdatera tabell.",
-    "Could not transfer table." : "Kunde inte överföra tabell.",
     "Could not remove table." : "Kunde inte ta bort tabell."
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

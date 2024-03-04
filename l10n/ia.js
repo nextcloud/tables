@@ -33,7 +33,7 @@ OC.L10N.register(
     "Select from Files" : "Selectionar de Files",
     "Please select a file." : "Per favor selectiona un file.",
     "Sort" : "Ordinar",
-    "Shared" : "Compartite",
+    "Favorites" : "Favoritos",
     "group" : "gruppo",
     "Sharing" : "Compartente",
     "Update" : "Actualisation",

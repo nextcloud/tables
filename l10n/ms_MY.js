@@ -25,6 +25,7 @@ OC.L10N.register(
     "Cancel" : "Batal",
     "Delete" : "Padam",
     "Sort" : "Susun",
+    "Favorites" : "Favorites",
     "group" : "kumpulan",
     "Update" : "Kemaskini",
     "Error" : "Ralat",

@@ -295,8 +295,6 @@ OC.L10N.register(
     "Copy" : "إنسَخ",
     "Could not configure new view" : "تتعذّر تهيئة المنظور الجديد",
     "Filter tables" : "تصفية/ فلترة الجداول",
-    "My tables" : "جداولي",
-    "Shared" : "مُشارَكة",
     "Your results are filtered." : "نتائجك تمّت فلترتُها",
     "Clear filter" : "ازل التصفية",
     "Share with accounts or groups" : "شارك مع حسابات و مجموعات",
@@ -474,7 +472,6 @@ OC.L10N.register(
     "Could not remove view." : "تعذّر حذف المنظور",
     "Could not reload view." : "تعذّرت إعادة تحميل المنظور",
     "Could not update table." : "تعذر تحديث الجدول.",
-    "Could not transfer table." : "تعذّر نقل الجدول.",
     "Could not remove table." : "تعذر إزالة/نقل الجدول."
 },
 "nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;");

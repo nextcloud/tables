@@ -29,7 +29,7 @@ OC.L10N.register(
     "Delete" : "Läschen",
     "Please select a file." : "Wiel eng Datei aus.",
     "Sort" : "Zortéieren",
-    "Shared" : "Gedeelt",
+    "Favorites" : "Favoriten",
     "group" : "Grupp",
     "Sharing" : "Gedeelt",
     "Update" : "Update",

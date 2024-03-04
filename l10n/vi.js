@@ -52,7 +52,7 @@ OC.L10N.register(
     "Please select a file." : "Hãy chọn một tệp.",
     "Transfer" : "Truyền",
     "Filter" : "Lọc",
-    "Shared" : "Chia sẻ",
+    "Favorites" : "Ưa thích",
     "Clear filter" : "Xóa bộ lọc",
     "No recommendations. Start typing." : "Không có khuyến nghị. Bắt đầu gõ.",
     "Searching …" : "Đang tìm kiếm ...",

@@ -63,7 +63,7 @@ OC.L10N.register(
     "Filter" : "Filtar",
     "Sort" : "Razvrstaj",
     "Copy" : "Kopirajte",
-    "Shared" : "Dijeljeno",
+    "Favorites" : "Favoriti",
     "Clear filter" : "Ukloni filtar",
     "User or group name …" : "Ime korisnika ili grupe…",
     "No recommendations. Start typing." : "Nema preporuka. Započnite unos.",

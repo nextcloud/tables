@@ -189,8 +189,6 @@ OC.L10N.register(
     "Delete table" : "Suprimeix la taula",
     "Do you really want to delete the table \"{table}\"?" : "Realment voleu suprimir la taula \"{table}\"?",
     "Copy" : "Còpia",
-    "My tables" : "Les meves taules",
-    "Shared" : "S'ha compartit",
     "Your results are filtered." : "Els teus resultats es filtren.",
     "Clear filter" : "Esborra el filtre",
     "User or group name …" : "Nom de l'usuari o del grup …",

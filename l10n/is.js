@@ -58,7 +58,7 @@ OC.L10N.register(
     "Filter" : "Sía",
     "Sort" : "Flokka",
     "Copy" : "Afrita",
-    "Shared" : "Sameiginlegt",
+    "Favorites" : "Eftirlæti",
     "Clear filter" : "Hreinsa síu",
     "User or group name …" : "Notandi eða heiti hóps …",
     "No recommendations. Start typing." : "Engar tillögur. Byrjaðu að skrifa.",

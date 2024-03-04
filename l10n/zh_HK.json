@@ -287,14 +287,15 @@
     "Title is missing." : "找不到標題。",
     "Could not create new view" : "無法創建新檢視",
     "Could not update view" : "無法更新檢視",
+    "Add to favorites" : "新增收藏",
+    "Remove from favorites" : "從最愛中移除",
     "Delete table" : "刪除數據庫表",
     "Do you really want to delete the table \"{table}\"?" : "您確定要刪除 \"{table}\" 數據庫表嗎？",
     "Duplicate view" : "重複檢視",
     "Copy" : "複製",
     "Could not configure new view" : "無法配置新檢視",
     "Filter tables" : "過濾表格",
-    "My tables" : "我的數據庫表",
-    "Shared" : "已分享",
+    "Favorites" : "最愛",
     "Your results are filtered." : "您的結果已被過濾。",
     "Clear filter" : "清空過濾器",
     "Share with accounts or groups" : "與賬戶或群組分享",
@@ -472,7 +473,6 @@
     "Could not remove view." : "無法移除檢視。",
     "Could not reload view." : "無法重新加載檢視。",
     "Could not update table." : "無法更新數據庫表。",
-    "Could not transfer table." : "無法轉移數據庫表。",
     "Could not remove table." : "無法移除數據庫表。"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

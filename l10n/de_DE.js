@@ -289,14 +289,13 @@ OC.L10N.register(
     "Title is missing." : "Titel fehlt.",
     "Could not create new view" : "Neue Ansicht konnte nicht erstellt werden",
     "Could not update view" : "Ansicht konnte nicht aktualisiert werden",
+    "Remove from favorites" : "Von Favoriten entfernen",
     "Delete table" : "Tabelle löschen",
     "Do you really want to delete the table \"{table}\"?" : "Möchten Sie wirklich die Tabelle \"{table}\" löschen?",
     "Duplicate view" : "Ansicht duplizieren",
     "Copy" : "Kopieren",
     "Could not configure new view" : "Neue Ansicht konnte nicht konfiguriert werden",
     "Filter tables" : "Tabellen filtern",
-    "My tables" : "Meine Tabellen",
-    "Shared" : "Geteilt",
     "Your results are filtered." : "Die Ergebnisse sind gefiltert.",
     "Clear filter" : "Filter zurücksetzen",
     "Share with accounts or groups" : "Mit Konten oder Gruppen teilen",
@@ -474,7 +473,6 @@ OC.L10N.register(
     "Could not remove view." : "Ansicht konnte nicht entfernt werden.",
     "Could not reload view." : "Ansicht konnte nicht erneut geladen werden.",
     "Could not update table." : "Tabellen konnten nicht aktualisiert werden.",
-    "Could not transfer table." : "Tabelle konnte nicht übertragen werden.",
     "Could not remove table." : "Tabelle konnte nicht entfernt werden."
 },
 "nplurals=2; plural=(n != 1);");

@@ -23,6 +23,7 @@ OC.L10N.register(
     "Owner" : "හිමිකරු",
     "Please select a file." : "කරුණාකර ගොනුවක් තෝරන්න.",
     "Filter" : "පෙරහන",
+    "Favorites" : "ප්‍රියතම",
     "Read" : "කියවීම",
     "Update" : "යාවත්කාල",
     "Error" : "දෝෂය",

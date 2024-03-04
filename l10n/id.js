@@ -52,7 +52,7 @@ OC.L10N.register(
     "Filter" : "Filter",
     "Sort" : "Urutkan",
     "Copy" : "Salin",
-    "Shared" : "Dibagikan",
+    "Favorites" : "Disukai",
     "Clear filter" : "Bersihkan filter",
     "No recommendations. Start typing." : "Tidak ada saran. Mulai mengetik.",
     "group" : "grup",

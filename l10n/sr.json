@@ -287,14 +287,15 @@
     "Title is missing." : "Недостаје наслов.",
     "Could not create new view" : "Није могао да се креира нови поглед",
     "Could not update view" : "Није могао да се ажурира поглед",
+    "Add to favorites" : "Додаје у омиљене",
+    "Remove from favorites" : "Избаци из омиљених",
     "Delete table" : "Обриши таблу",
     "Do you really want to delete the table \"{table}\"?" : "Да ли заиста желите да обришете табелу „{table}”?",
     "Duplicate view" : "Дуплирани поглед",
     "Copy" : "Копирај",
     "Could not configure new view" : "Није могао да се конфигурише нови поглед",
     "Filter tables" : "Филтрирај табеле",
-    "My tables" : "Моје табеле",
-    "Shared" : "Подељено",
+    "Favorites" : "Омиљене",
     "Your results are filtered." : "Ваши резултати су филтрирани.",
     "Clear filter" : "Очисти филтер",
     "Share with accounts or groups" : "Дели са налозима или групама",
@@ -472,7 +473,6 @@
     "Could not remove view." : "Не може да се уклони поглед.",
     "Could not reload view." : "Поглед није могао да се учита поново.",
     "Could not update table." : "Не може да се ажурира табела.",
-    "Could not transfer table." : "Табела није могла да се пренесе.",
     "Could not remove table." : "Не може да се уклони табела."
 },"pluralForm" :"nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);"
 }

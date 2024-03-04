@@ -32,7 +32,6 @@ OC.L10N.register(
     "Delete" : "Dileu",
     "Owner" : "Perchennog",
     "Sort" : "Trefnu",
-    "Shared" : "Rhannwyd",
     "group" : "grŵp",
     "Created at" : "Crëwyd ar",
     "Update" : "Diweddaru",

@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "The file was uploaded" : "Kaset eo bet ar restr",
+    "No file was uploaded" : "N'eus restr ebet a zo bet kaset",
     "No" : "Nann",
     "Date" : "Deiz",
     "Comments" : "Displegadennoù",
@@ -29,7 +31,6 @@ OC.L10N.register(
     "Transfer" : "Treuzkas",
     "Filter" : "Filtre",
     "Sort" : "Renkañ",
-    "Shared" : "Rannet",
     "Searching …" : "O klask ...",
     "group" : "strollad",
     "Created at" : "Krouet da",

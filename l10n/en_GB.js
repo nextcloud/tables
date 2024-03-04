@@ -295,8 +295,7 @@ OC.L10N.register(
     "Copy" : "Copy",
     "Could not configure new view" : "Could not configure new view",
     "Filter tables" : "Filter tables",
-    "My tables" : "My tables",
-    "Shared" : "Shared",
+    "Favorites" : "Favourites",
     "Your results are filtered." : "Your results are filtered.",
     "Clear filter" : "Clear filter",
     "Share with accounts or groups" : "Share with accounts or groups",
@@ -474,7 +473,6 @@ OC.L10N.register(
     "Could not remove view." : "Could not remove view.",
     "Could not reload view." : "Could not reload view.",
     "Could not update table." : "Could not update table.",
-    "Could not transfer table." : "Could not transfer table.",
     "Could not remove table." : "Could not remove table."
 },
 "nplurals=2; plural=(n != 1);");

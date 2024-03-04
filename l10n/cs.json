@@ -277,14 +277,13 @@
     "Title is missing." : "Chybí nadpis.",
     "Could not create new view" : "Nepodařilo se vytvořit nový pohled",
     "Could not update view" : "Nepodařil ose zaktualizovat pohled",
+    "Remove from favorites" : "Odebrat z oblíbených",
     "Delete table" : "Smazat tabulku",
     "Do you really want to delete the table \"{table}\"?" : "Opravdu chcete tabulku „{table}“ smazat?",
     "Duplicate view" : "Zduplikovat pohled",
     "Copy" : "Zkopírovat",
     "Could not configure new view" : "Nepodařilo se nastavit nový pohled",
     "Filter tables" : "Filtrovat tabulky",
-    "My tables" : "Moje tabulky",
-    "Shared" : "Sdíleno",
     "Your results are filtered." : "Vaše výsledky jsou filtrovány.",
     "Clear filter" : "Vyčistit filtr",
     "Share with accounts or groups" : "Sdílet s účty nebo skupinami",
@@ -460,7 +459,6 @@
     "Could not remove view." : "Pohled se nepodařilo odebrat.",
     "Could not reload view." : "Pohled se nepodařilo znovu načíst.",
     "Could not update table." : "Nepodařilo se zaktualizovat tabulku.",
-    "Could not transfer table." : "Nepodařilo se přenést tabulku.",
     "Could not remove table." : "Nepodařilo se odebrat tabulku."
 },"pluralForm" :"nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;"
 }

@@ -20,7 +20,7 @@ OC.L10N.register(
     "Delete" : "Obriši",
     "Owner" : "Vlasnik",
     "Copy" : "Kopiraj",
-    "Shared" : "Deljeno",
+    "Favorites" : "Omiljene",
     "group" : "grupa",
     "Sharing" : "Deljenje",
     "Read" : "Čitaj",
