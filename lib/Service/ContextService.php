@@ -14,11 +14,15 @@ use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\PermissionError;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
+use OCP\EventDispatcher\IEventDispatcher;
+use OCP\IUserManager;
+use OCP\Log\Audit\CriticalActionPerformedEvent;
 use Psr\Log\LoggerInterface;
 
 class ContextService {
@@ -30,6 +34,8 @@ class ContextService {
 	private PageMapper $pageMapper;
 	private PageContentMapper $pageContentMapper;
 	private PermissionsService $permissionsService;
+	private IUserManager $userManager;
+	private IEventDispatcher $eventDispatcher;
 
 	public function __construct(
 		ContextMapper             $contextMapper,
@@ -38,6 +44,8 @@ class ContextService {
 		PageContentMapper         $pageContentMapper,
 		LoggerInterface           $logger,
 		PermissionsService        $permissionsService,
+		IUserManager              $userManager,
+		IEventDispatcher          $eventDispatcher,
 		bool                      $isCLI,
 	) {
 		$this->contextMapper = $contextMapper;
@@ -47,6 +55,8 @@ class ContextService {
 		$this->pageMapper = $pageMapper;
 		$this->pageContentMapper = $pageContentMapper;
 		$this->permissionsService = $permissionsService;
+		$this->userManager = $userManager;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	/**
@@ -124,6 +134,41 @@ class ContextService {
 		}
 
 		return $this->contextMapper->update($context);
+	}
+
+	/**
+	 * @throws MultipleObjectsReturnedException
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @throws BadRequestError
+	 */
+	public function transfer(int $contextId, string $newOwnerId, int $newOwnerType): Context {
+		$context = $this->contextMapper->findById($contextId);
+
+		// the owner type check can be dropped as soon as NC 29 is the lowest supported version,
+		// as the int range as defined in the Controller will be enforced by the Http/Dispatcher.
+		if ($newOwnerType !== Application::OWNER_TYPE_USER) {
+			throw new BadRequestError('Unsupported owner type');
+		}
+
+		if (!$this->userManager->userExists($newOwnerId)) {
+			throw new BadRequestError('User does not exist');
+		}
+
+		$context->setOwnerId($newOwnerId);
+		$context->setOwnerType($newOwnerType);
+
+		$context = $this->contextMapper->update($context);
+
+		$auditEvent = new CriticalActionPerformedEvent(
+			sprintf('Tables application with ID %d was transferred to user %s',
+				$contextId, $newOwnerId,
+			)
+		);
+
+		$this->eventDispatcher->dispatchTyped($auditEvent);
+
+		return $context;
 	}
 
 	/**
