@@ -41,6 +41,20 @@ describe('Interact with views', () => {
 		cy.get('[data-cy="viewSettingsDialogSection"] input').type(title)
 	})
 
+	// cleanup
+	afterEach(function() {
+		// delete table (with view)
+		cy.get('[data-cy="navigationTableItem"]').contains('View test table').click({ force: true })
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('[data-cy="dataTableEditTableBtn"]').contains('Edit table').click()
+		cy.get('[data-cy="editTableModal"]').should('be.visible')
+		cy.get('[data-cy="editTableModal"] button').contains('Delete').click()
+		cy.get('[data-cy="editTableModal"] button').contains('I really want to delete this table!').click()
+		cy.wait(10).get('.toastify.toast-success').should('be.visible')
+		cy.get('[data-cy="navigationTableItem"]').contains('View test table').should('not.exist')
+		cy.get('[data-cy="navigationTableItem"]').contains(title).should('not.exist')
+	})
+
 	it('Create view and insert rows in the view', () => {
 		// ## add filter
 		cy.get('[data-cy="filterFormFilterGroupBtn"]').contains('Add new filter group').click()
