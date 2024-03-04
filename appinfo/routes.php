@@ -132,6 +132,7 @@ return [
 		['name' => 'Context#show', 'url' => '/api/2/contexts/{contextId}', 'verb' => 'GET'],
 		['name' => 'Context#create', 'url' => '/api/2/contexts', 'verb' => 'POST'],
 		['name' => 'Context#update', 'url' => '/api/2/contexts/{contextId}', 'verb' => 'PUT'],
+		['name' => 'Context#transfer', 'url' => '/api/2/contexts/{contextId}/transfer', 'verb' => 'PUT'],
 		['name' => 'Context#addNode', 'url' => '/api/2/contexts/{contextId}/nodes', 'verb' => 'POST'],
 		['name' => 'Context#removeNode', 'url' => '/api/2/contexts/{contextId}/nodes/{nodeRelId}', 'verb' => 'DELETE'],
 		['name' => 'Context#updateContentOrder', 'url' => '/api/2/contexts/{contextId}/pages/{pageId}', 'verb' => 'PUT'],

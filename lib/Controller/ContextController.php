@@ -115,6 +115,25 @@ class ContextController extends AOCSController {
 
 	/**
 	 * @NoAdminRequired
+	 * @CanManageContext
+	 *
+	 * @psalm-param int<0, max> $contextId
+	 * @psalm-param int<0, 0> $newOwnerType
+	 */
+	public function transfer(int $contextId, string $newOwnerId, int $newOwnerType = 0): DataResponse {
+		try {
+			return new DataResponse($this->contextService->transfer($contextId, $newOwnerId, $newOwnerType)->jsonSerialize());
+		} catch (Exception|MultipleObjectsReturnedException $e) {
+			return $this->handleError($e);
+		} catch (DoesNotExistException $e) {
+			return $this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
+		} catch (BadRequestError $e) {
+			return $this->handleBadRequestError($e);
+		}
+	}
+
+	/**
+	 * @NoAdminRequired
 	 * @CanManageNode
 	 */
 	public function addNode(int $contextId, int $nodeId, int $nodeType, int $permissions, ?int $order = null): DataResponse {
