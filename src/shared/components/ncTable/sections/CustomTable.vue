@@ -299,6 +299,7 @@ export default {
 
 	td, th {
 		padding-right: 8px;
+		max-width: 500px;
 	}
 
 	td .showOnHover, th .showOnHover {
