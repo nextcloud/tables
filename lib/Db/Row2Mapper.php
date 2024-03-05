@@ -309,46 +309,86 @@ class Row2Mapper {
 		$paramType = $this->getColumnDbParamType($column);
 		$value = $this->formatValue($column, $value, 'in');
 
+		// We try to match the requested value against the default before building the query
+		// so we know if we shall include rows that have no entry in the column_TYPE tables upfront
+		$includeDefault = false;
+		$defaultValue = $this->getFormattedDefaultValue($column);
+
 		$qb2 = $this->db->getQueryBuilder();
-		$qb2->select('row_id');
-		$qb2->where($qb->expr()->eq('column_id', $qb->createNamedParameter($column->getId()), IQueryBuilder::PARAM_INT));
-		$qb2->from('tables_row_cells_' . $column->getType());
+		$qb2->selectAlias('sl.id', 'row_id')
+			->from('tables_row_sleeves', 'sl')
+			->leftJoin('sl', 'tables_row_cells_' . $column->getType(), 'v', $qb->expr()->andX(
+				$qb->expr()->eq('sl.id', 'v.row_id'),
+				$qb->expr()->eq('v.column_id', $qb->createNamedParameter($column->getId(), IQueryBuilder::PARAM_INT)),
+			));
+		$qb2->where(
+			$qb->expr()->eq('sl.table_id', $qb->createNamedParameter($column->getTableId(), IQueryBuilder::PARAM_INT))
+		);
 
 		switch ($operator) {
 			case 'begins-with':
-				return $qb2->andWhere($qb->expr()->like('value', $qb->createNamedParameter('%'.$this->db->escapeLikeParameter($value), $paramType)));
+				$includeDefault = str_starts_with($defaultValue, $value);
+				$filterExpression = $qb->expr()->like('value', $qb->createNamedParameter($this->db->escapeLikeParameter($value) . '%', $paramType));
+				break;
 			case 'ends-with':
-				return $qb2->andWhere($qb->expr()->like('value', $qb->createNamedParameter($this->db->escapeLikeParameter($value).'%', $paramType)));
+				$includeDefault = str_ends_with($defaultValue, $value);
+				$filterExpression = $qb->expr()->like('value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value), $paramType));
+				break;
 			case 'contains':
+				$includeDefault = str_contains($defaultValue, $value);
 				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
 					$value = str_replace(['"', '\''], '', $value);
-					return $qb2->andWhere($qb2->expr()->orX(
+					$filterExpression = $qb2->expr()->orX(
 						$qb->expr()->like('value', $qb->createNamedParameter('['.$this->db->escapeLikeParameter($value).']')),
 						$qb->expr()->like('value', $qb->createNamedParameter('['.$this->db->escapeLikeParameter($value).',%')),
 						$qb->expr()->like('value', $qb->createNamedParameter('%,'.$this->db->escapeLikeParameter($value).']%')),
 						$qb->expr()->like('value', $qb->createNamedParameter('%,'.$this->db->escapeLikeParameter($value).',%'))
-					));
+					);
+					break;
 				}
-				return $qb2->andWhere($qb->expr()->like('value', $qb->createNamedParameter('%'.$this->db->escapeLikeParameter($value).'%', $paramType)));
+				$filterExpression = $qb->expr()->like('value', $qb->createNamedParameter('%'.$this->db->escapeLikeParameter($value).'%', $paramType));
+				break;
 			case 'is-equal':
+				$includeDefault = $defaultValue === $value;
 				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
 					$value = str_replace(['"', '\''], '', $value);
-					return $qb2->andWhere($qb->expr()->eq('value', $qb->createNamedParameter('['.$this->db->escapeLikeParameter($value).']', $paramType)));
+					$filterExpression = $qb->expr()->eq('value', $qb->createNamedParameter('['.$this->db->escapeLikeParameter($value).']', $paramType));
+					break;
 				}
-				return $qb2->andWhere($qb->expr()->eq('value', $qb->createNamedParameter($value, $paramType)));
+				$filterExpression = $qb->expr()->eq('value', $qb->createNamedParameter($value, $paramType));
+				break;
 			case 'is-greater-than':
-				return $qb2->andWhere($qb->expr()->gt('value', $qb->createNamedParameter($value, $paramType)));
+				$includeDefault = $column->getNumberDefault() > (float)$value;
+				$filterExpression = $qb->expr()->gt('value', $qb->createNamedParameter($value, $paramType));
+				break;
 			case 'is-greater-than-or-equal':
-				return $qb2->andWhere($qb->expr()->gte('value', $qb->createNamedParameter($value, $paramType)));
+				$includeDefault = $column->getNumberDefault() >= (float)$value;
+				$filterExpression = $qb->expr()->gte('value', $qb->createNamedParameter($value, $paramType));
+				break;
 			case 'is-lower-than':
-				return $qb2->andWhere($qb->expr()->lt('value', $qb->createNamedParameter($value, $paramType)));
+				$includeDefault = $column->getNumberDefault() < (float)$value;
+				$filterExpression = $qb->expr()->lt('value', $qb->createNamedParameter($value, $paramType));
+				break;
 			case 'is-lower-than-or-equal':
-				return $qb2->andWhere($qb->expr()->lte('value', $qb->createNamedParameter($value, $paramType)));
+				$includeDefault = $column->getNumberDefault() <= (float)$value;
+				$filterExpression = $qb->expr()->lte('value', $qb->createNamedParameter($value, $paramType));
+				break;
 			case 'is-empty':
-				return $qb2->andWhere($qb->expr()->isNull('value'));
+				$includeDefault = empty($defaultValue);
+				$filterExpression = $qb->expr()->isNull('value');
+				break;
 			default:
 				throw new InternalError('Operator '.$operator.' is not supported.');
 		}
+
+		return $qb2->andWhere(
+			$qb->expr()->orX(
+				...array_values(array_filter([
+					$filterExpression,
+					$includeDefault ? $qb->expr()->isNull('value') : null
+				])),
+			),
+		);
 	}
 
 	/**
@@ -790,6 +830,25 @@ class Row2Mapper {
 			$rowIds = [];
 		}
 		return count($rowIds);
+	}
+
+	private function getFormattedDefaultValue(Column $column) {
+		$defaultValue = null;
+		switch ($column->getType()) {
+			case Column::TYPE_SELECTION:
+				$defaultValue = $this->formatValue($column, $column->getSelectionDefault(), 'in');
+				break;
+			case Column::TYPE_DATETIME:
+				$defaultValue = $this->formatValue($column, $column->getDatetimeDefault(), 'in');
+				break;
+			case Column::TYPE_NUMBER:
+				$defaultValue = $this->formatValue($column, $column->getNumberDefault(), 'in');
+				break;
+			case Column::TYPE_TEXT:
+				$defaultValue = $this->formatValue($column, $column->getTextDefault(), 'in');
+				break;
+		}
+		return $defaultValue;
 	}
 
 }
