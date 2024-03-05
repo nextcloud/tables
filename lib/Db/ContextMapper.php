@@ -21,27 +21,8 @@ class ContextMapper extends QBMapper {
 		$this->userHelper = $userHelper;
 		parent::__construct($db, $this->table, Context::class);
 	}
-	/**
-	 * @return Context[]
-	 * @throws Exception
-	 */
-	public function findAll(?string $userId = null): array {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('c.*')
-			->from($this->table, 'c');
-		if ($userId !== null) {
-			$this->applyOwnedOrSharedQuery($qb, $userId);
-		}
 
-		return $this->findEntities($qb);
-	}
-
-	/**
-	 * @throws DoesNotExistException
-	 * @throws MultipleObjectsReturnedException
-	 * @throws Exception
-	 */
-	public function findById(int $contextId, ?string $userId = null): Context {
+	protected function getFindContextBaseQuery(?string $userId): IQueryBuilder {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select(
@@ -52,8 +33,7 @@ class ContextMapper extends QBMapper {
 			'n.display_mode as display_mode_default',
 			's.id as share_id', 's.receiver', 's.receiver_type'
 		)
-			->from($this->table, 'c')
-			->where($qb->expr()->eq('c.id', $qb->createNamedParameter($contextId, IQueryBuilder::PARAM_INT)));
+			->from($this->table, 'c');
 
 		if ($userId !== null) {
 			$this->applyOwnedOrSharedQuery($qb, $userId);
@@ -84,19 +64,20 @@ class ContextMapper extends QBMapper {
 
 		$qb->orderBy('pc.order', 'ASC');
 
-		$result = $qb->executeQuery();
-		$r = $result->fetchAll();
+		return $qb;
+	}
 
+	protected function formatResultRows(array $rows, ?string $userId) {
 		$formatted = [
-			'id' => $r[0]['id'],
-			'name' => $r[0]['name'],
-			'icon' => $r[0]['icon'],
-			'description' => $r[0]['description'],
-			'owner_id' => $r[0]['owner_id'],
-			'owner_type' => $r[0]['owner_type'],
+			'id' => $rows[0]['id'],
+			'name' => $rows[0]['name'],
+			'icon' => $rows[0]['icon'],
+			'description' => $rows[0]['description'],
+			'owner_id' => $rows[0]['owner_id'],
+			'owner_type' => $rows[0]['owner_type'],
 		];
 
-		$formatted['sharing'] = array_reduce($r, function (array $carry, array $item) use ($userId) {
+		$formatted['sharing'] = array_reduce($rows, function (array $carry, array $item) use ($userId) {
 			if ($item['share_id'] === null) {
 				// empty Context
 				return $carry;
@@ -113,7 +94,7 @@ class ContextMapper extends QBMapper {
 			return $carry;
 		}, []);
 
-		$formatted['nodes'] = array_reduce($r, function (array $carry, array $item) {
+		$formatted['nodes'] = array_reduce($rows, function (array $carry, array $item) {
 			if ($item['node_rel_id'] === null) {
 				// empty Context
 				return $carry;
@@ -127,7 +108,7 @@ class ContextMapper extends QBMapper {
 			return $carry;
 		}, []);
 
-		$formatted['pages'] = array_reduce($r, function (array $carry, array $item) {
+		$formatted['pages'] = array_reduce($rows, function (array $carry, array $item) {
 			if ($item['page_id'] === null) {
 				// empty Context
 				return $carry;
@@ -146,6 +127,52 @@ class ContextMapper extends QBMapper {
 		}, []);
 
 		return $this->mapRowToEntity($formatted);
+	}
+
+	/**
+	 * @return Context[]
+	 * @throws Exception
+	 */
+	public function findAll(?string $userId = null): array {
+		$qb = $this->getFindContextBaseQuery($userId);
+
+		$result = $qb->executeQuery();
+		$r = $result->fetchAll();
+
+		$contextIds = [];
+		foreach ($r as $row) {
+			$contextIds[$row['id']] = 1;
+		}
+		$contextIds = array_keys($contextIds);
+		unset($row);
+
+		$resultEntities = [];
+		foreach ($contextIds as $contextId) {
+			$workArray = [];
+			foreach ($r as $row) {
+				if ($row['id'] === $contextId) {
+					$workArray[] = $row;
+				}
+			}
+			$resultEntities[] = $this->formatResultRows($workArray, $userId);
+		}
+
+		return $resultEntities;
+	}
+
+	/**
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 * @throws Exception
+	 */
+	public function findById(int $contextId, ?string $userId = null): Context {
+		$qb = $this->getFindContextBaseQuery($userId);
+		$qb->andWhere($qb->expr()->eq('c.id', $qb->createNamedParameter($contextId, IQueryBuilder::PARAM_INT)));
+
+		$result = $qb->executeQuery();
+		$r = $result->fetchAll();
+
+		return $this->formatResultRows($r, $userId);
 	}
 
 	protected function applyOwnedOrSharedQuery(IQueryBuilder $qb, string $userId): void {
