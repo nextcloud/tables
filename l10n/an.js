@@ -20,6 +20,7 @@ OC.L10N.register(
     "Cancel" : "Canzelar",
     "Delete" : "Borrar",
     "Please select a file." : "Per favor, estríe un fichero.",
+    "Favorites" : "Favoritos",
     "Read" : "Leyer",
     "Error" : "Error",
     "Download" : "Escargar",

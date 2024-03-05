@@ -37,6 +37,7 @@ OC.L10N.register(
     "Please select a file." : "Lütfən, fayl seçin.",
     "Sort" : "Çeşidləmək",
     "Copy" : "Kopyala",
+    "Favorites" : "Sevimlilər",
     "group" : "qrup",
     "Sharing" : "Paylaşılır",
     "Read" : "Oxu",

@@ -38,6 +38,7 @@ OC.L10N.register(
     "Select from Files" : "Kies uit Lêers",
     "Please select a file." : "Kies asb. ’n lêer.",
     "Filter" : "Filter",
+    "Favorites" : "Gunstelinge",
     "group" : "Groep",
     "Created at" : "Geskep om",
     "Update" : "Werk by",
