@@ -7,7 +7,8 @@
 				</NcNoteCard>
 			</div>
 			<div class="col-4">
-				<NcSelect v-model="localValue"
+				<NcTextField v-if="isPlainUrl" :value.sync="plainLink" :placeholder="t('tables', 'URL')" />
+				<NcSelect v-else v-model="localValue"
 					:options="results"
 					:clearable="true"
 					label="title"
@@ -31,7 +32,7 @@ import RowFormWrapper from './RowFormWrapper.vue'
 import axios from '@nextcloud/axios'
 import { generateOcsUrl } from '@nextcloud/router'
 import displayError from '../../../../utils/displayError.js'
-import { NcNoteCard, NcSelect } from '@nextcloud/vue'
+import { NcTextField, NcNoteCard, NcSelect } from '@nextcloud/vue'
 import debounce from 'debounce'
 import generalHelper from '../../../../mixins/generalHelper.js'
 import LinkWidget from '../LinkWidget.vue'
@@ -40,6 +41,7 @@ import { translate as t } from '@nextcloud/l10n'
 export default {
 
 	components: {
+		NcTextField,
 		NcNoteCard,
 		RowFormWrapper,
 		NcSelect,
@@ -69,6 +71,19 @@ export default {
 	},
 
 	computed: {
+		plainLink: {
+			get() {
+				return this.localValue?.value ?? ''
+			},
+			set(v) {
+				this.$emit('update:value', JSON.stringify({
+					title: v,
+					subline: t('tables', 'URL'),
+					providerId: 'url',
+					value: v,
+				}))
+			},
+		},
 		localValue: {
 			get() {
 				// if we got an old value (string not object as json)
@@ -90,6 +105,9 @@ export default {
 				}
 				this.$emit('update:value', value)
 			},
+		},
+		isPlainUrl() {
+			return this.providers?.length === 1 && this.providers[0] === 'url'
 		},
 		isLoadingResults() {
 			for (const [key, value] of Object.entries(this.providerLoading)) {
