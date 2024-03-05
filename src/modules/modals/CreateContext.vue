@@ -1,6 +1,5 @@
 <template>
-	<NcModal v-if="showModal" size="normal"
-		@close="actionCancel">
+	<NcModal v-if="showModal" size="normal" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
@@ -13,23 +12,25 @@
 				</div>
 				<div class="col-4" style="display: inline-flex;">
 					<NcEmojiPicker :close-on-select="true" @select="setIcon">
-						<NcButton type="tertiary"
-							:aria-label="t('tables', 'Select emoji for the context')"
-							:title="t('tables', 'Select emoji')"
-							@click.prevent>
+						<NcButton type="tertiary" :aria-label="t('tables', 'Select emoji for the context')"
+							:title="t('tables', 'Select emoji')" @click.prevent>
 							{{ icon }}
 						</NcButton>
 					</NcEmojiPicker>
-					<input v-model="title"
-						:class="{missing: errorTitle}"
-						type="text"
-						:placeholder="t('tables', 'Title of the new context')"
-						@input="titleChangedManually">
+					<input v-model="title" :class="{ missing: errorTitle }" type="text"
+						:placeholder="t('tables', 'Title of the new context')" @input="titleChangedManually">
+					<div class="row space-T">
+						<div class="col-4 mandatory">
+							{{ t('tables', 'Description') }}
+						</div>
+						<input v-model="description" type="text"
+							:placeholder="t('tables', 'Description of the new context')">
+					</div>
 				</div>
 				<div>
-				{{ t('tables', 'Resources') }}
+					{{ t('tables', 'Resources') }}
 				</div>
-				<NcSelect v-model="localValues" :tag-width="80" :options="getAllResources" :multiple="true" :aria-label-combobox="t('tables', 'Resources')" />
+				<NcContextResource :resources.sync="resources" />
 			</div>
 			<div class="row space-R">
 				<div class="fix-col-4 end">
@@ -50,14 +51,15 @@ import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import NcTile from '../../shared/components/ncTile/NcTile.vue'
 import displayError from '../../shared/utils/displayError.js'
+import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
 
 export default {
-	name: 'CreateTable',
+	name: 'CreateContext',
 	components: {
 		NcModal,
 		NcEmojiPicker,
 		NcButton,
-		NcTile,
+		NcContextResource,
 	},
 	props: {
 		showModal: {
@@ -65,23 +67,13 @@ export default {
 			default: false,
 		},
 	},
-	computed: {
-		localValues: {
-			get() {
-			},
-			set(v) {
-			},
-		},
-	},
 	data() {
 		return {
 			title: '',
 			icon: '',
 			errorTitle: false,
-			templates: null,
-			templateChoice: 'custom',
-			customIconChosen: false,
-			customTitleChosen: false,
+			description: '',
+			resources: [],
 		}
 	},
 	watch: {
@@ -107,27 +99,6 @@ export default {
 			this.icon = icon
 			this.customIconChosen = true
 		},
-		setTemplate(name) {
-			this.templateChoice = name
-
-			if (!this.customIconChosen) {
-				if (name === 'custom') {
-					this.icon = '🔧'
-				} else {
-					const templateObject = this.templates?.find(item => item.name === name) || ''
-					this.icon = templateObject?.icon
-				}
-			}
-
-			if (!this.customTitleChosen) {
-				if (name === 'custom') {
-					this.title = ''
-				} else {
-					const templateObject = this.templates?.find(item => item.name === name) || ''
-					this.title = templateObject?.title || ''
-				}
-			}
-		},
 		loadEmoji() {
 			const emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '🫠', '😉', '😊', '😇']
 			this.icon = emojis[~~(Math.random() * emojis.length)]
@@ -137,22 +108,35 @@ export default {
 			this.$emit('close')
 		},
 		async submit() {
+			const dataResources = this.resources.map(resource => {
+				return {
+					id: resource.id,
+					type: resource.nodeType,
+					permissions: 660,
+				}
+			})
+			const data = {
+				name: this.title,
+				iconName: this.icon,
+				description: this.description,
+				nodes: dataResources,
+			}
+			console.log(data)
 			if (this.title === '') {
-				showError(t('tables', 'Cannot create new table. Title is missing.'))
+				showError(t('tables', 'Cannot create new context. Title is missing.'))
 				this.errorTitle = true
 			} else {
-				const newTableId = await this.sendNewTableToBE(this.templateChoice)
-				if (newTableId) {
-					await this.$router.push('/table/' + newTableId)
-					this.actionCancel()
-				}
+				// const newContextId = await this.sendNewContextToBE()
+				// if (newTableId) {
+				// 	await this.$router.push('/table/' + newTableId)
+				// 	this.actionCancel()
+				// }
 			}
 		},
-		async sendNewTableToBE(template) {
+		async sendNewContextToBE(e) {
 			const data = {
 				title: this.title,
 				emoji: this.icon,
-				template,
 			}
 			const res = await this.$store.dispatch('insertNewTable', { data })
 			if (res) {
@@ -180,10 +164,9 @@ export default {
 	},
 }
 </script>
-<style lang="scss" scoped>
 
+<style lang="scss" scoped>
 .modal__content {
 	padding-right: 0 !important;
 }
-
 </style>
