@@ -89,7 +89,7 @@ export default {
 	computed: {
 		...mapGetters(['activeContext']),
 		getTranslatedDescription() {
-			return t('tables', 'Do you really want to delete the context "{context}"?', { context: this.context.name})
+			return t('tables', 'Do you really want to delete the context "{context}"?', { context: this.context.name })
 		},
 		userId() {
 			return getCurrentUser().uid
