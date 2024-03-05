@@ -17,7 +17,7 @@
 import './commands'
 
 Cypress.on('uncaught:exception', (err) => {
-	return !err.message.includes('ResizeObserver loop limit exceeded')
+	return !err.message.includes('ResizeObserver loop')
 })
 
 // Alternatively you can use CommonJS syntax:
