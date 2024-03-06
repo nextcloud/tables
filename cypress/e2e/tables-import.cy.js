@@ -49,55 +49,59 @@ describe('Import csv', () => {
 
 })
 
-describe('Import csv from Files file action', () => {
+// only run the following tests if not testing on v26 or v27
+// the files api in use is only supported on v28+
+if (!['stable26', 'stable27'].includes(Cypress.env('ncVersion'))) {
+	describe('Import csv from Files file action', () => {
 
-	before(function() {
-		cy.createRandomUser().then(user => {
-			localUser = user
-			cy.login(localUser)
-			cy.uploadFile('test-import.csv', 'text/csv')
+		before(function() {
+			cy.createRandomUser().then(user => {
+				localUser = user
+				cy.login(localUser)
+				cy.uploadFile('test-import.csv', 'text/csv')
+			})
 		})
-	})
 
-	beforeEach(function() {
-		cy.login(localUser)
-		cy.visit('apps/files/files')
-	})
+		beforeEach(function() {
+			cy.login(localUser)
+			cy.visit('apps/files/files')
+		})
 
-	it('Import to new table', () => {
-		cy.get('[data-cy-files-list-row-name="test-import.csv"] [data-cy-files-list-row-actions] .action-item button').click()
-		cy.get('[data-cy-files-list-row-action="import-to-tables"]').click()
+		it('Import to new table', () => {
+			cy.get('[data-cy-files-list-row-name="test-import.csv"] [data-cy-files-list-row-actions] .action-item button').click()
+			cy.get('[data-cy-files-list-row-action="import-to-tables"]').click()
 
-		cy.intercept({ method: 'POST', url: '**/apps/tables/import/table/*'}).as('importNewTableReq')
-		cy.get('[data-cy="fileActionImportButton"]').click()
-		cy.wait('@importNewTableReq').its('response.statusCode').should('equal', 200)
+			cy.intercept({ method: 'POST', url: '**/apps/tables/import/table/*'}).as('importNewTableReq')
+			cy.get('[data-cy="fileActionImportButton"]').click()
+			cy.wait('@importNewTableReq').its('response.statusCode').should('equal', 200)
 
-		cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')
-		cy.get('[data-cy="importResultColumnsMatch"]').should('contain.text', '0')
-		cy.get('[data-cy="importResultColumnsCreated"]').should('contain.text', '4')
-		cy.get('[data-cy="importResultRowsInserted"]').should('contain.text', '3')
-		cy.get('[data-cy="importResultParsingErrors"]').should('contain.text', '0')
-		cy.get('[data-cy="importResultRowErrors"]').should('contain.text', '0')
-	})
+			cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')
+			cy.get('[data-cy="importResultColumnsMatch"]').should('contain.text', '0')
+			cy.get('[data-cy="importResultColumnsCreated"]').should('contain.text', '4')
+			cy.get('[data-cy="importResultRowsInserted"]').should('contain.text', '3')
+			cy.get('[data-cy="importResultParsingErrors"]').should('contain.text', '0')
+			cy.get('[data-cy="importResultRowErrors"]').should('contain.text', '0')
+		})
 
-	it('Import to existing table', () => {
-		cy.get('[data-cy-files-list-row-name="test-import.csv"] [data-cy-files-list-row-actions] .action-item button').click()
-		cy.get('[data-cy-files-list-row-action="import-to-tables"]').click()
+		it('Import to existing table', () => {
+			cy.get('[data-cy-files-list-row-name="test-import.csv"] [data-cy-files-list-row-actions] .action-item button').click()
+			cy.get('[data-cy-files-list-row-action="import-to-tables"]').click()
 
-		cy.get('[data-cy="importAsNewTableSwitch"]').click()
-		cy.get('[data-cy="selectExistingTableDropdown"]').type('tutorial')
-		cy.get('.name-parts').click()
+			cy.get('[data-cy="importAsNewTableSwitch"]').click()
+			cy.get('[data-cy="selectExistingTableDropdown"]').type('tutorial')
+			cy.get('.name-parts').click()
 
-		cy.intercept({ method: 'POST', url: '**/apps/tables/import/table/*'}).as('importExistingTableReq')
-		cy.get('[data-cy="fileActionImportButton"]').click()
-		cy.wait('@importExistingTableReq').its('response.statusCode').should('equal', 200)
+			cy.intercept({ method: 'POST', url: '**/apps/tables/import/table/*'}).as('importExistingTableReq')
+			cy.get('[data-cy="fileActionImportButton"]').click()
+			cy.wait('@importExistingTableReq').its('response.statusCode').should('equal', 200)
 
-		cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')
-		cy.get('[data-cy="importResultColumnsMatch"]').should('contain.text', '4')
-		cy.get('[data-cy="importResultColumnsCreated"]').should('contain.text', '0')
-		cy.get('[data-cy="importResultRowsInserted"]').should('contain.text', '3')
-		cy.get('[data-cy="importResultParsingErrors"]').should('contain.text', '0')
-		cy.get('[data-cy="importResultRowErrors"]').should('contain.text', '0')
-	})
+			cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')
+			cy.get('[data-cy="importResultColumnsMatch"]').should('contain.text', '4')
+			cy.get('[data-cy="importResultColumnsCreated"]').should('contain.text', '0')
+			cy.get('[data-cy="importResultRowsInserted"]').should('contain.text', '3')
+			cy.get('[data-cy="importResultParsingErrors"]').should('contain.text', '0')
+			cy.get('[data-cy="importResultRowErrors"]').should('contain.text', '0')
+		})
 	
-})
+	})
+}
