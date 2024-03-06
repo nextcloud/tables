@@ -49,6 +49,7 @@
 
 				<!-- ARCHIVED -->
 				<NcAppNavigationItem v-if="getArchivedTables.length > 0"
+					class="archived-items"
 					:name="t('tables', 'Archived tables')"
 					:allow-collapse="true"
 					:open="false">
@@ -182,7 +183,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 :deep(.filter-box) {
 	.input-field {
 		padding: 8px;
@@ -201,5 +201,14 @@ export default {
 		margin-top: 3vh;
 	}
 }
+</style>
 
+<style>
+.archived-items .app-navigation-entry__children {
+	& .app-navigation-entry-wrapper .app-navigation-entry__children {
+		& .app-navigation-entry {
+			padding-left: calc(16px * 2);
+		}
+	}
+}
 </style>
