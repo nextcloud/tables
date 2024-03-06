@@ -24,18 +24,11 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
-import { NcActions, NcActionButton, NcAvatar, NcActionCheckbox, NcActionCaption, NcActionSeparator, NcActionText } from '@nextcloud/vue'
+import { NcActionButton } from '@nextcloud/vue'
 
 export default {
 	components: {
-		NcAvatar,
 		NcActionButton,
-		NcActions,
-		NcActionText,
-		NcActionCheckbox,
-		NcActionCaption,
-		NcActionSeparator,
 	},
 
 	props: {
@@ -52,7 +45,6 @@ export default {
 	},
 
 	computed: {
-		...mapState(['tables', 'tablesLoading']),
 		sortedResources() {
 			return [...this.tableResources, ...this.viewResources].slice()
 		},
@@ -60,10 +52,10 @@ export default {
 			return [...this.viewResources, ...this.tableResources]
 		},
 		viewResources() {
-			return this.resources.filter(resource => resource.nodeType === 'view')
+			return this.resources.filter(resource => resource.nodeType === 1)
 		},
 		tableResources() {
-			return this.resources.filter(resource => resource.nodeType === 'table')
+			return this.resources.filter(resource => resource.nodeType === 0)
 		},
 	},
 
