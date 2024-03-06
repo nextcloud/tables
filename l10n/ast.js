@@ -42,6 +42,7 @@ OC.L10N.register(
     "Type" : "Tipu",
     "Single selection" : "Seleición única",
     "Multiple selection" : "Seleición múltiple",
+    "Time" : "Data",
     "Save" : "Guardar",
     "Title" : "Tñitulu",
     "Error occurred while deleting rows." : "Prodúxose un error mentanto se desaniciaben les fileres.",
