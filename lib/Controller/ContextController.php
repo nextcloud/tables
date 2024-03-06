@@ -72,6 +72,8 @@ class ContextController extends AOCSController {
 		try {
 			$context = $this->contextService->findById($contextId, $this->userId);
 			return new DataResponse($context->jsonSerialize());
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
 		} catch (InternalError|Exception $e) {
 			return $this->handleError($e);
 		}

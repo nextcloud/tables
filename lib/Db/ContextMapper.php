@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Db;
 
+use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -171,6 +172,10 @@ class ContextMapper extends QBMapper {
 
 		$result = $qb->executeQuery();
 		$r = $result->fetchAll();
+
+		if (empty($r)) {
+			throw new NotFoundError('Context does not exist');
+		}
 
 		return $this->formatResultRows($r, $userId);
 	}
