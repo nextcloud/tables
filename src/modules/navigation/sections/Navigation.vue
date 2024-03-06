@@ -207,7 +207,7 @@ export default {
 .archived-items .app-navigation-entry__children {
 	& .app-navigation-entry-wrapper .app-navigation-entry__children {
 		& .app-navigation-entry {
-			padding-left: calc(16px * 2);
+			padding-left: 32px;
 		}
 	}
 }
