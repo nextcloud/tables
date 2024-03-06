@@ -57,8 +57,6 @@ export default new Vuex.Store({
 		},
 		activeContext(state) {
 			if (state.contexts && state.activeContextId) {
-				console.log(state.contexts, state.activeContextId)
-				console.log('context', state.contexts.find(item => item.id === state.activeContextId))
 				return state.contexts.find(item => item.id === state.activeContextId)
 			}
 			return null
@@ -119,6 +117,22 @@ export default new Vuex.Store({
 		},
 	},
 	actions: {
+		async insertNewContext({ commit, state, dispatch }, { data }) {
+			let res = null
+
+			try {
+				res = await axios.post(generateOcsUrl('/apps/tables/api/2/contexts'), data)
+				console.log(res.data.ocs.data)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not insert context.'))
+				return false
+			}
+			const contexts = state.contexts
+			contexts.push(res.data.ocs.data)
+			commit('setContexts', contexts)
+
+			return res.data.ocs.data
+		},
 		async insertNewTable({ commit, state, dispatch }, { data }) {
 			let res = null
 
@@ -260,6 +274,23 @@ export default new Vuex.Store({
 			commit('setTables', [...tables])
 			return true
 		},
+		async updateContext({ state, commit, dispatch }, { id, data }) {
+			let res = null
+
+			try {
+				res = await axios.put(generateOcsUrl('/apps/tables/api/2/contexts/' + id), data)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not update context.'))
+				return false
+			}
+
+			const context = res.data.ocs.data
+			const contexts = state.contexts
+			const index = contexts.findIndex(c => c.id === context.id)
+			contexts[index] = context
+			commit('setContexts', [...contexts])
+			return true
+		},
 		async transferTable({ state, commit, dispatch }, { id, data }) {
 			try {
 				await axios.put(generateOcsUrl('/apps/tables/api/2/tables/' + id + '/transfer'), data)
@@ -293,6 +324,7 @@ export default new Vuex.Store({
 			try {
 				const res = await axios.get(generateOcsUrl('/apps/tables/api/2/contexts/' + id))
 				commit('setContext', res.data.ocs.data)
+				console.log(res.data.ocs.data)
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load context.'))
 				showError(t('tables', 'Could not fetch context'))

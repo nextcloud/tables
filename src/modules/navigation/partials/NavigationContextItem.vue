@@ -98,7 +98,7 @@ export default {
 	methods: {
 		emit,
 		async editContext() {
-			emit('tables:context:edit', { context: this.context })
+			emit('tables:context:edit', this.context)
 		},
 	},
 
