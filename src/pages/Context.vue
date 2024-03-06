@@ -1,15 +1,29 @@
 <template>
-	<div class="container">
-		<div v-if="dataReady && context">
-			<h1> Context info</h1>
-			<h2> {{ context.name }}</h2>
-			<p> {{ context.description }}</p>
+	<div class="row">
+		<div v-if="loading" class="icon-loading" />
+		<div v-if="!loading && context">
+			<div class="content first-row">
+				<div class="row">
+					<h1> {{ context.iconName }}&nbsp; {{ context.name }}</h1>
+				</div>
+				<div class="row">
+					<h3> {{ context.description }}</h3>
+				</div>
+			</div>
 
-			<h1> Context Tables</h1>
-			<div v-for="table in contextTables" :key="table.id">
-				<TableWrapper :table="table" :columns="tableData['columns' + table.id]" :rows="tableData['rows' + table.id]"
-					:view-setting="viewSetting" @create-column="createColumn(false, table)"
-					@import="openImportModal(table, false)" @download-csv="downloadCSV(table, false)" />
+			<div class="resources">
+				<div v-for="resource in contextResources" :key="resource.key">
+					<div v-if="!resource.isView">
+						<TableWrapper :table="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
+							:view-setting="viewSetting" @create-column="createColumn(false, resource)"
+							@import="openImportModal(resource, false)" @download-csv="downloadCSV(resource, false)" />
+					</div>
+					<div v-else-if="resource.isView">
+						<CustomView :view="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
+							:view-setting="viewSetting" @create-column="createColumn(true, resource)"
+							@import="openImportModal(resource, true)" @download-csv="downloadCSV(resource, true)" />
+					</div>
+				</div>
 			</div>
 
 			<MainModals />
@@ -22,6 +36,7 @@ import MainModals from '../modules/modals/Modals.vue'
 import Vuex, { mapState } from 'vuex'
 import Vue from 'vue'
 import TableWrapper from '../modules/main/sections/TableWrapper.vue'
+import CustomView from '../modules/main/sections/View.vue'
 import { emit } from '@nextcloud/event-bus'
 
 Vue.use(Vuex)
@@ -30,33 +45,55 @@ export default {
 	components: {
 		MainModals,
 		TableWrapper,
+		CustomView,
 	},
 
 	data() {
 		return {
-			dataReady: false,
+			loading: true,
 			viewSetting: {},
 			context: null,
-			contextTables: [],
+			contextResources: [],
 		}
 	},
 
 	computed: {
-		...mapState(['tables', 'contexts', 'activeContextId']),
-		tableData() {
-			const data = {}
+		...mapState(['tables', 'contexts', 'activeContextId', 'views']),
+		rows() {
+			const rows = {}
 			if (this.context && this.context.nodes) {
 				for (const [, node] of Object.entries(this.context.nodes)) {
-					if (node.node_type) {
-						const rowId = 'rows' + node.node_id
-						const colId = 'columns' + node.node_id
-						data[colId] = this.$store.state.data.columns[(node.node_id).toString()]
-						data[rowId] = this.$store.state.data.rows[(node.node_id).toString()]
+					if (node.node_type === '0') {
+						const rowId = (node.node_id).toString()
+						rows[rowId] = this.$store.state.data.rows[rowId]
+
+					} else if (node.node_type === '1') {
+						const rowId = 'view-' + (node.node_id).toString()
+						rows[rowId] = this.$store.state.data.rows[rowId]
 					}
 				}
 			}
-			return data
+			return rows
+
 		},
+
+		columns() {
+			const columns = {}
+			if (this.context && this.context.nodes) {
+				for (const [, node] of Object.entries(this.context.nodes)) {
+					if (node.node_type === '0') {
+						const columnId = (node.node_id).toString()
+						columns[columnId] = this.$store.state.data.columns[columnId]
+					} else if (node.node_type === '1') {
+						const columnId = 'view-' + (node.node_id).toString()
+						columns[columnId] = this.$store.state.data.columns[columnId]
+
+					}
+
+				}
+			}
+			return columns
+		}
 	},
 
 	watch: {
@@ -70,26 +107,52 @@ export default {
 	},
 
 	methods: {
+		async reload() {
+			this.loading = true
+			if (this.activeContextId) {
+				await this.loadContext()
+			}
+			this.loading = false
+		},
 		async loadContext() {
-			await this.$store.dispatch('getContext', this.activeContextId)
+			console.log('id', this.activeContextId)
+			this.contextResources = []
+			await this.$store.dispatch('getContext', { id: this.activeContextId })
 			const index = this.contexts.findIndex(c => parseInt(c.id) === parseInt(this.activeContextId))
 			this.context = this.contexts[index]
 
-			console.debug(this.contexts, this.activeContextId)
-			console.debug(this.context)
+			console.log('loaded context', this.context)
+
 			if (this.context && this.context.nodes) {
 				for (const [, node] of Object.entries(this.context.nodes)) {
-					if (node.node_type === 'table') {
+					// table
+					if (node.node_type === '0') {
 						const table = this.tables.find(table => table.id === node.node_id)
-						this.contextTables.push(table)
 						await this.$store.dispatch('loadColumnsFromBE', {
 							view: null,
-							tableId: node.node_id,
+							tableId: table.id,
 						})
 						await this.$store.dispatch('loadRowsFromBE', {
 							viewId: null,
-							tableId: node.node_id,
+							tableId: table.id,
 						})
+						table['key'] = (table.id).toString()
+						table['isView'] = false
+						this.contextResources.push(table)
+					}
+					else if (node.node_type === '1') {
+						const view = this.views.find(view => view.id === node.node_id)
+						await this.$store.dispatch('loadColumnsFromBE', {
+							view: view,
+							tableId: view.tableId,
+						})
+						await this.$store.dispatch('loadRowsFromBE', {
+							viewId: view.id,
+							tableId: view.tableId,
+						})
+						view['key'] = 'view-' + (view.id).toString()
+						view['isView'] = true
+						this.contextResources.push(view)
 					}
 				}
 			}
@@ -105,20 +168,16 @@ export default {
 		openImportModal(element, isView) {
 			emit('tables:modal:import', { element, isView })
 		},
-
-		async reload() {
-			if (this.activeContextId) {
-				await this.loadContext()
-				this.dataReady = true
-			}
-		},
 	},
 }
 
 </script>
 
 <style scoped lang="scss">
-.container {
-	padding: 80px;
+.content {
+	margin: 50px;
+}
+.resource, content {
+	padding: 30px 0;
 }
 </style>

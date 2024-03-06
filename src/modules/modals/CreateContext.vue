@@ -3,14 +3,14 @@
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
-					<h2>{{ t('tables', 'Create an context') }}</h2>
+					<h2>{{ t('tables', 'Create a context') }}</h2>
 				</div>
 			</div>
-			<div class="row space-T">
+			<div>
 				<div class="col-4 mandatory">
 					{{ t('tables', 'Title') }}
 				</div>
-				<div class="col-4" style="display: inline-flex;">
+				<div class="row" style="display: inline-flex;">
 					<NcEmojiPicker :close-on-select="true" @select="setIcon">
 						<NcButton type="tertiary" :aria-label="t('tables', 'Select emoji for the context')"
 							:title="t('tables', 'Select emoji')" @click.prevent>
@@ -19,16 +19,18 @@
 					</NcEmojiPicker>
 					<input v-model="title" :class="{ missing: errorTitle }" type="text"
 						:placeholder="t('tables', 'Title of the new context')" @input="titleChangedManually">
-					<div class="row space-T">
+				</div>
+				<div class="row">
 						<div class="col-4 mandatory">
 							{{ t('tables', 'Description') }}
 						</div>
 						<input v-model="description" type="text"
 							:placeholder="t('tables', 'Description of the new context')">
 					</div>
-				</div>
-				<div>
-					{{ t('tables', 'Resources') }}
+				<div class="row">
+					<div>
+						{{ t('tables', 'Resources') }}
+					</div>
 				</div>
 				<NcContextResource :resources.sync="resources" />
 			</div>
@@ -71,6 +73,8 @@ export default {
 		return {
 			title: '',
 			icon: '',
+			customIconChosen: false,
+			customTitleChosen: false,
 			errorTitle: false,
 			description: '',
 			resources: [],
@@ -87,9 +91,6 @@ export default {
 			// every time when the modal opens chose a new emoji
 			this.loadEmoji()
 		},
-	},
-	beforeMount() {
-		this.loadTemplatesFromBE()
 	},
 	methods: {
 		titleChangedManually() {
@@ -108,10 +109,23 @@ export default {
 			this.$emit('close')
 		},
 		async submit() {
+			if (this.title === '') {
+				showError(t('tables', 'Cannot create new context. Title is missing.'))
+				this.errorTitle = true
+			} else {
+				const newContextId = await this.sendNewContextToBE()
+				console.log('new context id', newContextId)
+				if (newContextId) {
+					await this.$router.push('/context/' + newContextId)
+					this.actionCancel()
+				}
+			}
+		},
+		async sendNewContextToBE(e) {
 			const dataResources = this.resources.map(resource => {
 				return {
-					id: resource.id,
-					type: resource.nodeType,
+					id: parseInt(resource.id),
+					type: parseInt(resource.nodeType),
 					permissions: 660,
 				}
 			})
@@ -121,24 +135,8 @@ export default {
 				description: this.description,
 				nodes: dataResources,
 			}
-			console.log(data)
-			if (this.title === '') {
-				showError(t('tables', 'Cannot create new context. Title is missing.'))
-				this.errorTitle = true
-			} else {
-				// const newContextId = await this.sendNewContextToBE()
-				// if (newTableId) {
-				// 	await this.$router.push('/table/' + newTableId)
-				// 	this.actionCancel()
-				// }
-			}
-		},
-		async sendNewContextToBE(e) {
-			const data = {
-				title: this.title,
-				emoji: this.icon,
-			}
-			const res = await this.$store.dispatch('insertNewTable', { data })
+			console.log('data to send', data)
+			const res = await this.$store.dispatch('insertNewContext', { data })
 			if (res) {
 				return res.id
 			} else {
@@ -148,18 +146,9 @@ export default {
 		reset() {
 			this.title = ''
 			this.errorTitle = false
-			this.templateChoice = 'custom'
 			this.icon = ''
 			this.customIconChosen = false
 			this.customTitleChosen = false
-		},
-		async loadTemplatesFromBE() {
-			try {
-				const res = await axios.get(generateUrl('/apps/tables/table/templates'))
-				this.templates = res.data
-			} catch (e) {
-				displayError(e, t('tables', 'Could not load templates.'))
-			}
 		},
 	},
 }

@@ -80,14 +80,6 @@ export default {
 	},
 
 	methods: {
-		addItem(selectedItem) {
-			if (selectedItem) {
-				this.localValue = selectedItem.user
-			} else {
-				this.localValue = ''
-			}
-		},
-
 		addResource(resource) {
 			this.$emit('add', resource)
 		},
@@ -109,7 +101,7 @@ export default {
 					title: table.title,
 					emoji: table.emoji,
 					key: 'table-' + table.id,
-					nodeType: 'table',
+					nodeType: 0,
 					id: (table.id).toString(),
 				}
 			})
@@ -119,7 +111,7 @@ export default {
 					title: view.title,
 					emoji: view.emoji,
 					key: 'view-' + view.id,
-					nodeType: 'view',
+					nodeType: 1,
 					id: (view.id).toString(),
 				}
 			})
@@ -136,10 +128,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
-.multiselect {
-	width: 100% !important;
-	max-width: 100% !important;
-}
 
 </style>
