@@ -38,9 +38,9 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(['tablesLoading']),
+		...mapState(['tablesLoading', 'contextsLoading']),
 		somethingIsLoading() {
-			return this.tablesLoading || this.loading
+			return this.tablesLoading || this.contextsLoading || this.loading
 		},
 	},
 	watch: {
