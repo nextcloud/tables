@@ -21,22 +21,20 @@
 					<input v-model="title" :class="{ missing: errorTitle }" type="text"
 						:placeholder="t('tables', 'Title of the context')">
 				</div>
-				<div>
-					<div class="row">
-						<div class="col-4 mandatory">
-							{{ t('tables', 'Description') }}
-						</div>
-						<input v-model="description" type="text"
-							:placeholder="t('tables', 'Description of the context')">
-					</div>
-				</div>
-				<div class="row">
-					<div>
-						{{ t('tables', 'Resources') }}
-					</div>
-					<NcContextResource :resources.sync="resources" />
-				</div>
 			</div>
+			<div class="row">
+				<div class="col-4 mandatory">
+					{{ t('tables', 'Description') }}
+				</div>
+				<input v-model="description" type="text" :placeholder="t('tables', 'Description of the context')">
+			</div>
+			<div class="row">
+				<div>
+					{{ t('tables', 'Resources') }}
+				</div>
+				<NcContextResource :resources.sync="resources" />
+			</div>
+
 			<div class="row">
 				<div class="right-additional-button">
 					<NcButton type="primary" @click="submit">
