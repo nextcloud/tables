@@ -105,9 +105,16 @@ class ContextController extends AOCSController {
 	 * @NoAdminRequired
 	 * @CanManageContext
 	 */
-	public function update(int $contextId, ?string $name, ?string $iconName, ?string $description): DataResponse {
+	public function update(int $contextId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): DataResponse {
 		try {
-			return new DataResponse($this->contextService->update($contextId, $name, $iconName, $description)->jsonSerialize());
+			return new DataResponse($this->contextService->update(
+				$contextId,
+				$this->userId,
+				$name,
+				$iconName,
+				$description,
+				$nodes,
+			)->jsonSerialize());
 		} catch (Exception|MultipleObjectsReturnedException $e) {
 			return $this->handleError($e);
 		} catch (DoesNotExistException $e) {
