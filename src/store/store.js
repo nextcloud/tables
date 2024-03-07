@@ -123,7 +123,6 @@ export default new Vuex.Store({
 
 			try {
 				res = await axios.post(generateOcsUrl('/apps/tables/api/2/contexts'), data)
-				console.log(res.data.ocs.data)
 			} catch (e) {
 				displayError(e, t('tables', 'Could not insert context.'))
 				return false
@@ -348,7 +347,7 @@ export default new Vuex.Store({
 			const index = contexts.findIndex(c => c.id === context.id)
 			contexts[index] = context
 			commit('setContexts', [...contexts])
-			return true
+			return context
 		},
 		async transferTable({ state, commit, dispatch }, { id, data }) {
 			try {
@@ -369,7 +368,6 @@ export default new Vuex.Store({
 			commit('setContextsLoading', true)
 			try {
 				const res = await axios.get(generateOcsUrl('/apps/tables/api/2/contexts'))
-				console.log('all con', res.data.ocs.data)
 				commit('setContexts', res.data.ocs.data)
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load contexts.'))
@@ -383,7 +381,6 @@ export default new Vuex.Store({
 			try {
 				const res = await axios.get(generateOcsUrl('/apps/tables/api/2/contexts/' + id))
 				commit('setContext', res.data.ocs.data)
-				console.log(res.data.ocs.data)
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load context.'))
 				showError(t('tables', 'Could not fetch context'))
