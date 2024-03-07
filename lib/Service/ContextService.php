@@ -120,8 +120,8 @@ class ContextService {
 	 * @throws DoesNotExistException
 	 * @throws MultipleObjectsReturnedException
 	 */
-	public function update(int $contextId, ?string $name, ?string $iconName, ?string $description): Context {
-		$context = $this->contextMapper->findById($contextId);
+	public function update(int $contextId, string $userId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): Context {
+		$context = $this->contextMapper->findById($contextId, $userId);
 
 		if ($name !== null) {
 			$context->setName(trim($name));
@@ -133,7 +133,75 @@ class ContextService {
 			$context->setDescription(trim($description));
 		}
 
-		return $this->contextMapper->update($context);
+		$hasUpdatedNodeInformation = false;
+		if ($nodes !== null) {
+			$currentNodes = $context->getNodes();
+			$currentPages = $context->getPages();
+
+			$nodesBeingRemoved = [];
+			$nodesBeingAdded = [];
+			$nodesBeingKept = [];
+
+			// new node relationships do not have an ID. We can recognize them
+			// through their nodeType and nodeIds. For this we need to transform
+			// the known relationships` keys to a compatible format.
+			$oldNodeResolvableIdMapper = [];
+			foreach ($currentNodes as $i => $oldNode) {
+				$key = sprintf('t%di%d', $oldNode['node_type'], $oldNode['node_id']);
+				$oldNodeResolvableIdMapper[$key] = $i;
+			}
+
+			foreach ($nodes as $node) {
+				$key = sprintf('t%di%d', $node['type'], $node['id']);
+				if (isset($oldNodeResolvableIdMapper[$key])) {
+					unset($oldNodeResolvableIdMapper[$key]);
+					$nodesBeingKept[$key] = $node;
+					continue;
+				}
+				$nodesBeingAdded[$key] = $node;
+			}
+
+			foreach (array_diff_key($oldNodeResolvableIdMapper, $nodesBeingAdded, $nodesBeingKept) as $toRemoveId) {
+				$nodesBeingRemoved[$toRemoveId] = $currentNodes[$toRemoveId];
+			}
+			unset($nodesBeingKept);
+
+			$hasUpdatedNodeInformation = !empty($nodesBeingAdded) || !empty($nodesBeingRemoved);
+
+			foreach ($nodesBeingRemoved as $node) {
+				/** @var ContextNodeRelation $removedNode */
+				/** @var PageContent[] $removedContents */
+				[$removedNode, $removedContents] = $this->removeNodeFromContextAndPages($node['id']);
+				foreach ($removedContents as $removedContent) {
+					unset($currentPages[$removedContent->getPageId()]['content'][$removedContent->getId()]);
+				}
+				unset($currentNodes[$removedNode->getId()]);
+			}
+			unset($nodesBeingRemoved);
+
+			foreach ($nodesBeingAdded as $node) {
+				/** @var ContextNodeRelation $addedNode */
+				/** @var PageContent $updatedContent */
+				[$addedNode, $updatedContent] = $this->addNodeToContextAndStartpage(
+					$contextId,
+					$node['id'],
+					$node['type'],
+					$node['permissions'],
+					$node['order'] ?? 100,
+					$userId
+				);
+				$currentNodes[$addedNode->getId()] = $addedNode->jsonSerialize();
+				$currentPages[$updatedContent->getPageId()]['content'][$updatedContent->getId()] = $updatedContent->jsonSerialize();
+			}
+			unset($nodesBeingAdded);
+		}
+
+		$context = $this->contextMapper->update($context);
+		if ($hasUpdatedNodeInformation && isset($currentNodes) && isset($currentPages)) {
+			$context->setNodes($currentNodes);
+			$context->setPages($currentPages);
+		}
+		return $context;
 	}
 
 	/**
@@ -196,6 +264,28 @@ class ContextService {
 	public function removeNodeFromContextById(int $nodeRelationId): ContextNodeRelation {
 		$nodeRelation = $this->contextNodeRelMapper->findById($nodeRelationId);
 		return $this->contextNodeRelMapper->delete($nodeRelation);
+	}
+
+	/**
+	 * @throws MultipleObjectsReturnedException
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 */
+	public function addNodeToContextAndStartpage(int $contextId, int $nodeId, int $nodeType, int $permissions, int $order, string $userId): array {
+		$relation = $this->addNodeToContextById($contextId, $nodeId, $nodeType, $permissions, $userId);
+		$pageContent = $this->addNodeRelToPage($relation, $order);
+		return [$relation, $pageContent];
+	}
+
+	/**
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 * @throws Exception
+	 */
+	public function removeNodeFromContextAndPages(int $nodeRelationId): array {
+		$nodeRelation = $this->removeNodeFromContextById($nodeRelationId);
+		$contents = $this->removeNodeRelFromAllPages($nodeRelation);
+		return [$nodeRelation, $contents];
 	}
 
 	/**
