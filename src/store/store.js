@@ -119,6 +119,7 @@ export default new Vuex.Store({
 	},
 	actions: {
 		async insertNewContext({ commit, state, dispatch }, { data }) {
+			commit('setContextsLoading', true)
 			let res = null
 
 			try {
@@ -131,6 +132,7 @@ export default new Vuex.Store({
 			contexts.push(res.data.ocs.data)
 			commit('setContexts', contexts)
 
+			commit('setContextsLoading', false)
 			return res.data.ocs.data
 		},
 		async insertNewTable({ commit, state, dispatch }, { data }) {
@@ -331,6 +333,8 @@ export default new Vuex.Store({
 			const table = state.tables[index]
 			table.favorite = false
 			commit('setTable', table)
+			
+			return true
 		},
 		async updateContext({ state, commit, dispatch }, { id, data }) {
 			let res = null
@@ -347,6 +351,7 @@ export default new Vuex.Store({
 			const index = contexts.findIndex(c => c.id === context.id)
 			contexts[index] = context
 			commit('setContexts', [...contexts])
+
 			return context
 		},
 		async transferTable({ state, commit, dispatch }, { id, data }) {
