@@ -1,4 +1,5 @@
 <template>
+	<!-- TODO fix alignment and styling -->
 	<NcModal v-if="showModal" size="normal" @close="actionCancel">
 		<div class="modal__content" data-cy="editContextModal">
 			<div class="row">
@@ -12,13 +13,15 @@
 				</div>
 				<div class="col-4">
 					<NcEmojiPicker :close-on-select="true" @select="emoji => icon = emoji">
-						<NcButton type="tertiary" :aria-label="t('tables', 'Select emoji for table')"
-							:title="t('tables', 'Select emoji')" @click.prevent>
+						<NcButton type="tertiary" :aria-label="t('tables', 'Select icon for context')"
+							:title="t('tables', 'Select icon')" @click.prevent>
 							{{ icon ? icon : '...' }}
 						</NcButton>
 					</NcEmojiPicker>
 					<input v-model="title" :class="{ missing: errorTitle }" type="text"
 						:placeholder="t('tables', 'Title of the context')">
+				</div>
+				<div>
 					<div class="row">
 						<div class="col-4 mandatory">
 							{{ t('tables', 'Description') }}
@@ -35,12 +38,10 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="row">
-					<div class="right-additional-button">
-						<NcButton type="primary" @click="submit">
-							{{ t('tables', 'Save') }}
-						</NcButton>
-					</div>
+				<div class="right-additional-button">
+					<NcButton type="primary" @click="submit">
+						{{ t('tables', 'Save') }}
+					</NcButton>
 				</div>
 			</div>
 		</div>
@@ -48,11 +49,10 @@
 </template>
 
 <script>
-import { NcModal, NcEmojiPicker, NcButton, NcUserBubble } from '@nextcloud/vue'
+import { NcModal, NcEmojiPicker, NcButton } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
-import { mapGetters } from 'vuex'
-import { emit } from '@nextcloud/event-bus'
+import { mapState } from 'vuex'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
 
 export default {
@@ -61,7 +61,6 @@ export default {
 		NcModal,
 		NcEmojiPicker,
 		NcButton,
-		NcUserBubble,
 		NcContextResource,
 	},
 	props: {
@@ -85,7 +84,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['activeContext']),
+		...mapState(['activeContextId']),
 
 	},
 	watch: {
@@ -100,7 +99,8 @@ export default {
 				this.title = this.context.name
 				this.icon = this.context.iconName
 				this.description = this.context.description
-				// this.resources
+				// TODO replace with context.nodes when API provides it
+				this.resources = []
 				this.contextId = this.context.id
 			}
 		},
@@ -110,16 +110,16 @@ export default {
 			this.reset()
 			this.$emit('close')
 		},
+		// TODO show edited changes if we're currently viewing on active context
 		async submit() {
-			console.log('edit values', this.context, this.title)
 			if (this.title === '') {
 				showError(t('tables', 'Cannot update context. Title is missing.'))
 				this.errorTitle = true
 			} else {
-				// TODO add nodes/resources during update
+				// TODO send nodes/resources during update
 				const res = await this.$store.dispatch('updateContext', { id: this.context.id, data: { name: this.title, iconName: this.icon, description: this.description } })
 				if (res) {
-					showSuccess(t('tables', 'Updated context "{emoji}{contextTitle}".', { emoji: this.icon ? this.icon + ' ' : '', contextTitle: this.title }))
+					showSuccess(t('tables', 'Updated context "{icon}{contextTitle}".', { icon: this.icon ? this.icon + ' ' : '', contextTitle: this.title }))
 					this.actionCancel()
 				}
 			}
@@ -128,6 +128,8 @@ export default {
 			this.title = ''
 			this.errorTitle = false
 			this.icon = ''
+			this.resources = []
+			this.description = ''
 		},
 	},
 }

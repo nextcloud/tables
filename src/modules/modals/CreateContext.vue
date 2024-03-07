@@ -1,4 +1,5 @@
 <template>
+	<!-- TODO fix alignment and styling -->
 	<NcModal v-if="showModal" size="normal" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
@@ -6,27 +7,29 @@
 					<h2>{{ t('tables', 'Create a context') }}</h2>
 				</div>
 			</div>
-			<div>
-				<div class="col-4 mandatory">
+			<div class="row space-T">
+				<div class="col-4">
 					{{ t('tables', 'Title') }}
 				</div>
 				<div class="row" style="display: inline-flex;">
+					<!-- TODO replace with Context's icon picker -->
 					<NcEmojiPicker :close-on-select="true" @select="setIcon">
-						<NcButton type="tertiary" :aria-label="t('tables', 'Select emoji for the context')"
-							:title="t('tables', 'Select emoji')" @click.prevent>
+						<NcButton type="tertiary" :aria-label="t('tables', 'Select icon for the context')"
+							:title="t('tables', 'Select icon')" @click.prevent>
 							{{ icon }}
 						</NcButton>
 					</NcEmojiPicker>
 					<input v-model="title" :class="{ missing: errorTitle }" type="text"
 						:placeholder="t('tables', 'Title of the new context')" @input="titleChangedManually">
 				</div>
-				<div class="row">
-						<div class="col-4 mandatory">
-							{{ t('tables', 'Description') }}
-						</div>
-						<input v-model="description" type="text"
-							:placeholder="t('tables', 'Description of the new context')">
-					</div>
+			</div>
+			<div class="row space-T">
+				<div class="col-4 mandatory">
+					{{ t('tables', 'Description') }}
+				</div>
+				<input v-model="description" type="text" :placeholder="t('tables', 'Description of the new context')">
+			</div>
+			<div class="row space-T">
 				<div class="row">
 					<div>
 						{{ t('tables', 'Resources') }}
@@ -49,10 +52,6 @@
 import { NcModal, NcEmojiPicker, NcButton } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
-import axios from '@nextcloud/axios'
-import { generateUrl } from '@nextcloud/router'
-import NcTile from '../../shared/components/ncTile/NcTile.vue'
-import displayError from '../../shared/utils/displayError.js'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
 
 export default {
@@ -72,7 +71,7 @@ export default {
 	data() {
 		return {
 			title: '',
-			icon: '',
+			icon: '😀',
 			customIconChosen: false,
 			customTitleChosen: false,
 			errorTitle: false,
@@ -87,10 +86,6 @@ export default {
 				this.title = this.title.slice(0, 199)
 			}
 		},
-		showModal() {
-			// every time when the modal opens chose a new emoji
-			this.loadEmoji()
-		},
 	},
 	methods: {
 		titleChangedManually() {
@@ -99,10 +94,6 @@ export default {
 		setIcon(icon) {
 			this.icon = icon
 			this.customIconChosen = true
-		},
-		loadEmoji() {
-			const emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '🫠', '😉', '😊', '😇']
-			this.icon = emojis[~~(Math.random() * emojis.length)]
 		},
 		actionCancel() {
 			this.reset()
@@ -114,14 +105,13 @@ export default {
 				this.errorTitle = true
 			} else {
 				const newContextId = await this.sendNewContextToBE()
-				console.log('new context id', newContextId)
 				if (newContextId) {
 					await this.$router.push('/context/' + newContextId)
 					this.actionCancel()
 				}
 			}
 		},
-		async sendNewContextToBE(e) {
+		async sendNewContextToBE() {
 			const dataResources = this.resources.map(resource => {
 				return {
 					id: parseInt(resource.id),
@@ -135,7 +125,6 @@ export default {
 				description: this.description,
 				nodes: dataResources,
 			}
-			console.log('data to send', data)
 			const res = await this.$store.dispatch('insertNewContext', { data })
 			if (res) {
 				return res.id
@@ -146,7 +135,7 @@ export default {
 		reset() {
 			this.title = ''
 			this.errorTitle = false
-			this.icon = ''
+			this.icon = '😀'
 			this.customIconChosen = false
 			this.customTitleChosen = false
 		},

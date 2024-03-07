@@ -197,7 +197,7 @@ export default {
 		showOptions: {
 			type: Boolean,
 			default: true,
-		}
+		},
 	},
 
 	data() {

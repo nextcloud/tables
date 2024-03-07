@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<ElementDescription :active-element="table" :view-setting.sync="localViewSetting" />
-		<DataTable :showOptions="false" :table="table" :columns="columns" :rows="rows" :view-setting.sync="localViewSetting"
+		<DataTable :show-options="false" :table="table" :columns="columns" :rows="rows" :view-setting.sync="localViewSetting"
 			@create-column="$emit('create-column')"
 			@import="$emit('import')"
 			@download-csv="$emit('download-csv')"

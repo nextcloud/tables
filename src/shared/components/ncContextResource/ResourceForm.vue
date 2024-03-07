@@ -22,9 +22,6 @@
 </template>
 
 <script>
-import { generateOcsUrl } from '@nextcloud/router'
-import { getCurrentUser } from '@nextcloud/auth'
-import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 import { NcSelect } from '@nextcloud/vue'
 import { mapState } from 'vuex'
@@ -54,7 +51,7 @@ export default {
 	},
 
 	computed: {
-		...mapState(['tables', 'views', 'tablesLoading']),
+		...mapState(['tables', 'views']),
 
 		isValidQuery() {
 			return this.query?.trim() && this.query.length >= this.minSearchStringLength
@@ -72,10 +69,6 @@ export default {
 				return t('tables', 'Searching …')
 			}
 			return t('tables', 'No elements found.')
-		},
-
-		userId() {
-			return getCurrentUser().uid
 		},
 	},
 

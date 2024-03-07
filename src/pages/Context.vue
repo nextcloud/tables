@@ -1,3 +1,4 @@
+<!-- TODO test that Tables and Views events work properly -->
 <template>
 	<div class="row">
 		<div v-if="loading" class="icon-loading" />
@@ -38,6 +39,8 @@ import Vue from 'vue'
 import TableWrapper from '../modules/main/sections/TableWrapper.vue'
 import CustomView from '../modules/main/sections/View.vue'
 import { emit } from '@nextcloud/event-bus'
+import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../shared/constants.js'
+import exportTableMixin from '../shared/components/ncTable/mixins/exportTableMixin.js'
 
 Vue.use(Vuex)
 
@@ -47,6 +50,8 @@ export default {
 		TableWrapper,
 		CustomView,
 	},
+
+	mixins: [exportTableMixin],
 
 	data() {
 		return {
@@ -63,11 +68,11 @@ export default {
 			const rows = {}
 			if (this.context && this.context.nodes) {
 				for (const [, node] of Object.entries(this.context.nodes)) {
-					if (node.node_type === '0') {
+					if (parseInt(node.node_type) === NODE_TYPE_TABLE) {
 						const rowId = (node.node_id).toString()
 						rows[rowId] = this.$store.state.data.rows[rowId]
 
-					} else if (node.node_type === '1') {
+					} else if (parseInt(node.node_type) === NODE_TYPE_VIEW) {
 						const rowId = 'view-' + (node.node_id).toString()
 						rows[rowId] = this.$store.state.data.rows[rowId]
 					}
@@ -81,10 +86,10 @@ export default {
 			const columns = {}
 			if (this.context && this.context.nodes) {
 				for (const [, node] of Object.entries(this.context.nodes)) {
-					if (node.node_type === '0') {
+					if (parseInt(node.node_type) === NODE_TYPE_TABLE) {
 						const columnId = (node.node_id).toString()
 						columns[columnId] = this.$store.state.data.columns[columnId]
-					} else if (node.node_type === '1') {
+					} else if (parseInt(node.node_type) === NODE_TYPE_VIEW) {
 						const columnId = 'view-' + (node.node_id).toString()
 						columns[columnId] = this.$store.state.data.columns[columnId]
 
@@ -93,7 +98,7 @@ export default {
 				}
 			}
 			return columns
-		}
+		},
 	},
 
 	watch: {
@@ -115,18 +120,14 @@ export default {
 			this.loading = false
 		},
 		async loadContext() {
-			console.log('id', this.activeContextId)
 			this.contextResources = []
 			await this.$store.dispatch('getContext', { id: this.activeContextId })
 			const index = this.contexts.findIndex(c => parseInt(c.id) === parseInt(this.activeContextId))
 			this.context = this.contexts[index]
 
-			console.log('loaded context', this.context)
-
 			if (this.context && this.context.nodes) {
 				for (const [, node] of Object.entries(this.context.nodes)) {
-					// table
-					if (node.node_type === '0') {
+					if (parseInt(node.node_type) === NODE_TYPE_TABLE) {
 						const table = this.tables.find(table => table.id === node.node_id)
 						await this.$store.dispatch('loadColumnsFromBE', {
 							view: null,
@@ -136,22 +137,21 @@ export default {
 							viewId: null,
 							tableId: table.id,
 						})
-						table['key'] = (table.id).toString()
-						table['isView'] = false
+						table.key = (table.id).toString()
+						table.isView = false
 						this.contextResources.push(table)
-					}
-					else if (node.node_type === '1') {
+					} else if (parseInt(node.node_type) === NODE_TYPE_VIEW) {
 						const view = this.views.find(view => view.id === node.node_id)
 						await this.$store.dispatch('loadColumnsFromBE', {
-							view: view,
+							view,
 							tableId: view.tableId,
 						})
 						await this.$store.dispatch('loadRowsFromBE', {
 							viewId: view.id,
 							tableId: view.tableId,
 						})
-						view['key'] = 'view-' + (view.id).toString()
-						view['isView'] = true
+						view.key = 'view-' + (view.id).toString()
+						view.isView = true
 						this.contextResources.push(view)
 					}
 				}
@@ -161,9 +161,9 @@ export default {
 			emit('tables:column:create', { isView, element })
 		},
 		downloadCSV(element, isView) {
-			const rowId = !isView ? 'rows' + element.id : 'view-rows' + element.id
-			const colId = !isView ? 'columns' + element.id : 'view-columns' + element.id
-			this.downloadCsv(this.tableData[rowId], this.tableData[colId], element.title)
+			const rowId = !isView ? element.key : 'view-' + element.key
+			const colId = !isView ? element.key : 'view-' + element.key
+			this.downloadCsv(this.rows[rowId], this.columns[colId], element.title)
 		},
 		openImportModal(element, isView) {
 			emit('tables:modal:import', { element, isView })
