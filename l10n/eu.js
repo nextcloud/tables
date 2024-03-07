@@ -127,6 +127,8 @@ OC.L10N.register(
     "Operator" : "Eragilea",
     "Views" : "Ikuspegiak",
     "View" : "Ikusi",
+    "Rows" : "Errenkadak",
+    "Columns" : "Zutabeak",
     "Shares" : "Partekatzeak",
     "Actions" : "Ekintzak",
     "Share" : "Partekatu",
