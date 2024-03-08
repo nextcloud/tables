@@ -25,6 +25,7 @@
 import debounce from 'debounce'
 import { NcSelect } from '@nextcloud/vue'
 import { mapState } from 'vuex'
+import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../../../shared/constants.js'
 
 export default {
 	name: 'ResourceForm',
@@ -88,13 +89,14 @@ export default {
 		async getSuggestions(search) {
 			this.loading = true
 			// TODO improve search, should be case-insensitive
+			// TODO check if item already in the list before showing as suggestion
 			let tables = this.tables.filter((table) => table.title.includes(search))
 			tables = tables.map(table => {
 				return {
 					title: table.title,
 					emoji: table.emoji,
 					key: 'table-' + table.id,
-					nodeType: 0,
+					nodeType: NODE_TYPE_TABLE,
 					id: (table.id).toString(),
 				}
 			})
@@ -104,7 +106,7 @@ export default {
 					title: view.title,
 					emoji: view.emoji,
 					key: 'view-' + view.id,
-					nodeType: 1,
+					nodeType: NODE_TYPE_VIEW,
 					id: (view.id).toString(),
 				}
 			})

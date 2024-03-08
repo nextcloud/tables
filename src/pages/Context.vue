@@ -127,7 +127,8 @@ export default {
 
 			if (this.context && this.context.nodes) {
 				for (const [, node] of Object.entries(this.context.nodes)) {
-					if (parseInt(node.node_type) === NODE_TYPE_TABLE) {
+					const nodeType = parseInt(node.node_type)
+					if (nodeType === NODE_TYPE_TABLE) {
 						const table = this.tables.find(table => table.id === node.node_id)
 						await this.$store.dispatch('loadColumnsFromBE', {
 							view: null,
@@ -140,7 +141,7 @@ export default {
 						table.key = (table.id).toString()
 						table.isView = false
 						this.contextResources.push(table)
-					} else if (parseInt(node.node_type) === NODE_TYPE_VIEW) {
+					} else if (nodeType === NODE_TYPE_VIEW) {
 						const view = this.views.find(view => view.id === node.node_id)
 						await this.$store.dispatch('loadColumnsFromBE', {
 							view,
