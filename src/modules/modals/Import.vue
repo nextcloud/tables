@@ -67,59 +67,7 @@
 
 			<!-- show results -->
 			<div v-if="!loading && result !== null && !waitForReload">
-				<RowFormWrapper v-if="result !== ''">
-					<div>
-						<h3 class="result-headline">
-							<IconCheck v-if="!result['errors_parsing_count'] && !result['errors_count']" :size="15" />
-							<IconAlert v-else :size="15" />
-							{{ t('tables', 'Imported from ') + importFileName }}
-						</h3>
-					</div>
-					<div class="fix-col-1">
-						{{ t('tables', 'Found columns') }}
-					</div>
-					<div class="fix-col-3" data-cy="importResultColumnsFound">
-						{{ result['found_columns_count'] }}
-					</div>
-					<div class="fix-col-1">
-						{{ t('tables', 'Matching columns') }}
-					</div>
-					<div class="fix-col-3" data-cy="importResultColumnsMatch">
-						{{ result['matching_columns_count'] }}
-					</div>
-					<div class="fix-col-1">
-						{{ t('tables', 'Created columns') }}
-					</div>
-					<div class="fix-col-3" data-cy="importResultColumnsCreated">
-						{{ result['created_columns_count'] }}
-					</div>
-					<div class="fix-col-1">
-						{{ t('tables', 'Inserted rows') }}
-					</div>
-					<div class="fix-col-3" data-cy="importResultRowsInserted">
-						{{ result['inserted_rows_count'] }}
-					</div>
-					<template v-if="result['errors_parsing_count'] || result['errors_count']">
-						<div class="fix-col-1">
-							{{ t('tables', 'Value parsing errors') }}
-						</div>
-						<div class="fix-col-3 errors-count" data-cy="importResultParsingErrors">
-							{{ result['errors_parsing_count'] }}
-							<IconAlert :size="15" />
-						</div>
-						<div class="fix-col-1">
-							{{ t('tables', 'Row creation errors') }}
-						</div>
-						<div class="fix-col-3 errors-count" data-cy="importResultRowErrors">
-							{{ result['errors_count'] }}
-							<IconAlert :size="15" />
-						</div>
-					</template>
-				</RowFormWrapper>
-
-				<RowFormWrapper v-else :title="t('tables', 'Result')">
-					{{ t('tables', 'Error during importing. Please read the logs for more information.') }}
-				</RowFormWrapper>
+				<ImportResults :results="result" />
 
 				<div class="row">
 					<div class="fix-col-4 space-T end">
@@ -154,12 +102,11 @@ import permissionsMixin from '../../shared/components/ncTable/mixins/permissions
 import IconFolder from 'vue-material-design-icons/Folder.vue'
 import IconUpload from 'vue-material-design-icons/Upload.vue'
 import IconFile from 'vue-material-design-icons/File.vue'
-import IconCheck from 'vue-material-design-icons/Check.vue'
-import IconAlert from 'vue-material-design-icons/Alert.vue'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { mapGetters } from 'vuex'
 import NcIconTimerSand from '../../shared/components/ncIconTimerSand/NcIconTimerSand.vue'
+import ImportResults from './ImportResults.vue'
 
 export default {
 
@@ -169,10 +116,9 @@ export default {
 		IconFolder,
 		IconUpload,
 		IconFile,
-		IconCheck,
-		IconAlert,
 		NcModal,
 		NcButton,
+		ImportResults,
 		NcCheckboxRadioSwitch,
 		RowFormWrapper,
 		NcEmptyContent,
