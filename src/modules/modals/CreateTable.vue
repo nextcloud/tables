@@ -45,6 +45,14 @@
 						:tabbable="true"
 						@set-template="setTemplate('custom')" />
 				</div>
+				<div class="col-2 block space-R space-B">
+					<NcTile
+						:title="t('tables', '📄 Import table')"
+						:body="t('tables', 'Import table from file.')"
+						:active="templateChoice === 'import'"
+						:tabbable="true"
+						@set-template="setTemplate('import')" />
+				</div>
 				<div v-for="template in templates" :key="template.name" class="col-2 block space-R space-B">
 					<NcTile
 						:title="template.icon + ' ' + template.title"
@@ -74,6 +82,7 @@ import { generateUrl } from '@nextcloud/router'
 import NcTile from '../../shared/components/ncTile/NcTile.vue'
 import displayError from '../../shared/utils/displayError.js'
 import TableDescription from '../../modules/main/sections/TableDescription.vue'
+import { emit } from '@nextcloud/event-bus'
 
 export default {
 	name: 'CreateTable',
@@ -132,6 +141,8 @@ export default {
 			if (!this.customIconChosen) {
 				if (name === 'custom') {
 					this.icon = '🔧'
+				} else if (name === 'import') {
+					this.icon = '📄'
 				} else {
 					const templateObject = this.templates?.find(item => item.name === name) || ''
 					this.icon = templateObject?.icon
@@ -139,7 +150,7 @@ export default {
 			}
 
 			if (!this.customTitleChosen) {
-				if (name === 'custom') {
+				if (name === 'custom' || name === 'import') {
 					this.title = ''
 				} else {
 					const templateObject = this.templates?.find(item => item.name === name) || ''
@@ -163,6 +174,9 @@ export default {
 				const newTableId = await this.sendNewTableToBE(this.templateChoice)
 				if (newTableId) {
 					await this.$router.push('/table/' + newTableId)
+					if (this.templateChoice === 'import') {
+						emit('tables:modal:import', { element: { tableId: newTableId, id: newTableId }, isView: false })
+					}
 					this.actionCancel()
 				}
 			}
