@@ -77,7 +77,7 @@ export default {
 			icon: this.context?.iconName,
 			description: this.context?.description,
 			errorTitle: false,
-			resources: [],
+			resources: this.context?.resources ? [...this.context?.resources] : [],
 			contextId: this.context?.id,
 		}
 	},
@@ -97,8 +97,7 @@ export default {
 				this.title = this.context.name
 				this.icon = this.context.iconName
 				this.description = this.context.description
-				// TODO replace with context.nodes when API provides it
-				this.resources = []
+				this.resources = [...this.context.resources]
 				this.contextId = this.context.id
 			}
 		},
@@ -114,8 +113,21 @@ export default {
 				showError(t('tables', 'Cannot update context. Title is missing.'))
 				this.errorTitle = true
 			} else {
-				// TODO send nodes/resources during update
-				const res = await this.$store.dispatch('updateContext', { id: this.context.id, data: { name: this.title, iconName: this.icon, description: this.description } })
+				const dataResources = this.resources.map(resource => {
+					return {
+						id: parseInt(resource.id),
+						type: parseInt(resource.nodeType),
+						// TODO get right permissions for the node
+						permissions: 660,
+					}
+				})
+				const data = {
+					name: this.title,
+					iconName: this.icon,
+					description: this.description,
+					nodes: dataResources,
+				}
+				const res = await this.$store.dispatch('updateContext', { id: this.context.id, data })
 				if (res) {
 					showSuccess(t('tables', 'Updated context "{icon}{contextTitle}".', { icon: this.icon ? this.icon + ' ' : '', contextTitle: this.title }))
 					this.actionCancel()
