@@ -15,6 +15,6 @@ class LoadAdditionalListener implements IEventListener {
 			return;
 		}
 
-		Util::addScript(Application::APP_ID, 'tables-files', 'files');
+		Util::addInitScript(Application::APP_ID, 'tables-files');
 	}
 }
