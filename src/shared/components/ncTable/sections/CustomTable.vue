@@ -93,8 +93,8 @@ export default {
 		getSearchedAndFilteredAndSortedRows() {
 			// if we have to sort
 			if (this.viewSetting?.sorting) {
-				const sortColumn = this.columns.find(item => item.id === this.viewSetting.sorting[0].columnId)
-				return [...this.getSearchedAndFilteredRows].sort(sortColumn.sort(this.viewSetting.sorting[0].mode))
+				const sortColumn = this.columns.find(item => item.id === this.viewSetting.sorting?.[0].columnId)
+				return [...this.getSearchedAndFilteredRows].sort(sortColumn?.sort?.(this.viewSetting.sorting[0].mode))
 			}
 			return this.getSearchedAndFilteredRows
 		},

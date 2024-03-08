@@ -111,6 +111,9 @@ export default {
 				this.localLoading = true
 
 				this.viewSetting = {}
+				if (this.isView && this.element?.sort?.length) {
+					this.viewSetting.sorting = [...this.element.sort]
+				}
 
 				await this.$store.dispatch('loadColumnsFromBE', {
 					view: this.isView ? this.element : null,
