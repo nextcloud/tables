@@ -1,5 +1,57 @@
 # Changelog
 
+## 0.7.0-beta.2
+
+### Added
+
+- enh: Use table id for events @enjeck [#808](https://github.com/nextcloud/tables/pull/808)
+- node type constants and convenience methods to check access and manage permissions @blizzz [#878](https://github.com/nextcloud/tables/pull/878)
+- feat: implement direct file upload @luka-nextcloud [#845](https://github.com/nextcloud/tables/pull/845)
+- feat: autodetect data type during import @luka-nextcloud [#854](https://github.com/nextcloud/tables/pull/854)
+- changed view filter reset icon (issue #884) @elzody [#889](https://github.com/nextcloud/tables/pull/889)
+- feat: Add backend for table archive and favorite flag @juliushaertl [#865](https://github.com/nextcloud/tables/pull/865)
+- Feat: File action to import from Files to Tables @elzody [#890](https://github.com/nextcloud/tables/pull/890)
+
+### Fixed
+
+- fix: properly delete rows in views @enjeck [#826](https://github.com/nextcloud/tables/pull/826)
+- fix: Pass all table columns along as we need them for filtering the rows @juliushaertl [#828](https://github.com/nextcloud/tables/pull/828)
+- enh: use required name prop for NcAppSettingsSection @enjeck [#840](https://github.com/nextcloud/tables/pull/840)
+- fix: Only skip failing table data loading instead of full failure @juliushaertl [#846](https://github.com/nextcloud/tables/pull/846)
+- fix: Make table header sticky @juliushaertl [#786](https://github.com/nextcloud/tables/pull/786)
+- fix: Apply fill to path for svg app icon @juliushaertl [#851](https://github.com/nextcloud/tables/pull/851)
+- Fix hide user status from owner avatar (issue #829) @elzody [#853](https://github.com/nextcloud/tables/pull/853)
+- fix: Avoid sql error on postgres @juliushaertl [#859](https://github.com/nextcloud/tables/pull/859)
+- fix: Filter returned entity result by view columns @juliushaertl [#881](https://github.com/nextcloud/tables/pull/881)
+- fix: Catch any error that may occur during row import @juliushaertl [#882](https://github.com/nextcloud/tables/pull/882)
+- fix(Permissions): check against user provided in args @blizzz [#885](https://github.com/nextcloud/tables/pull/885)
+- Polish table header and text column rendering @juliushaertl [#883](https://github.com/nextcloud/tables/pull/883)
+- Match default values when querying views @juliushaertl [#900](https://github.com/nextcloud/tables/pull/900)
+- fix: properly indent child views of archived tables @elzody [#909](https://github.com/nextcloud/tables/pull/909)
+
+### Dependencies
+
+- fix(deps): update dependency @nextcloud/dialogs to ^4.2.5 @renovate[bot] [#834](https://github.com/nextcloud/tables/pull/834)
+- fix(deps): update tiptap to ^2.2.2 @renovate[bot] [#835](https://github.com/nextcloud/tables/pull/835)
+- fix(deps): update tiptap to ^2.2.3 @renovate[bot] [#856](https://github.com/nextcloud/tables/pull/856)
+- fix(deps): update dependency @nextcloud/vue to ^8.6.2 @renovate[bot] [#855](https://github.com/nextcloud/tables/pull/855)
+- fix(deps): update dependency @nextcloud/vue to ^8.7.0 @renovate[bot] [#860](https://github.com/nextcloud/tables/pull/860)
+- fix(deps): update dependency @nextcloud/vue to ^8.7.1 @renovate[bot] [#874](https://github.com/nextcloud/tables/pull/874)
+- fix(deps): update dependency @nextcloud/dialogs to ^4.2.6 @renovate[bot] [#873](https://github.com/nextcloud/tables/pull/873)
+- fix(deps): update tiptap to ^2.2.4 @renovate[bot] [#875](https://github.com/nextcloud/tables/pull/875)
+- fix(deps): update dependency @vueuse/core to ^10.9.0 @renovate[bot] [#876](https://github.com/nextcloud/tables/pull/876)
+- fix(deps): update dependency debounce to v2 @renovate[bot] [#700](https://github.com/nextcloud/tables/pull/700)
+- fix(deps): update dependency @nextcloud/vue to ^8.8.1 @renovate[bot] [#891](https://github.com/nextcloud/tables/pull/891)
+
+### Other
+
+- fix: properly delete tables with filtered view @enjeck [#842](https://github.com/nextcloud/tables/pull/842)
+- Update PHP options in issue template @blizzz [#850](https://github.com/nextcloud/tables/pull/850)
+- perf: Optimize lazy imports for reference widgets @juliushaertl [#825](https://github.com/nextcloud/tables/pull/825)
+- fix(meta): drop 25 support @blizzz [#886](https://github.com/nextcloud/tables/pull/886)
+- Cypress test: delete table with view @enjeck [#899](https://github.com/nextcloud/tables/pull/899)
+- cypress testing for archive/favorite @elzody [#901](https://github.com/nextcloud/tables/pull/901)
+
 ## 0.7.0-beta.1 - 2024-01-29
 ### Added
 - New database structure: https://github.com/nextcloud/tables/pull/749

@@ -1,6 +1,5 @@
-<?xml version="1.0"?>
-<info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
-	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+<?xml version="1.0" encoding="utf-8"?>
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
 	<id>tables</id>
 	<name>Tables</name>
 	<summary>Manage data the way you need it.</summary>
@@ -22,9 +21,9 @@ Share your tables and views with users and groups within your cloud.
 Have a good time and manage whatever you want.
 
 ]]></description>
-	<version>0.7.0-beta.1</version>
+	<version>0.7.0-beta.2</version>
 	<licence>agpl</licence>
-	<author mail="florian.steffens@nextcloud.com" >Florian Steffens</author>
+	<author mail="florian.steffens@nextcloud.com">Florian Steffens</author>
 	<namespace>Tables</namespace>
 	<documentation>
 		<user>https://github.com/nextcloud/tables/wiki</user>
