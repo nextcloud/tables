@@ -77,7 +77,7 @@ export default {
 			icon: this.context?.iconName,
 			description: this.context?.description,
 			errorTitle: false,
-			resources: this.context?.resources ? [...this.context?.resources] : [],
+			resources: this.context?.resources ? [...this.context.resources] : [],
 			contextId: this.context?.id,
 		}
 	},

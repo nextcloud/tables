@@ -71,7 +71,6 @@
 			</ul>
 		</template>
 
-		<!-- TODO make filter work for Contexts -->
 		<div v-if="filterString !== ''" class="search-info">
 			<NcEmptyContent :description="t('tables', 'Your results are filtered.')">
 				<template #icon>
