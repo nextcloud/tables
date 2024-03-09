@@ -1,16 +1,11 @@
 <template>
 	<div class="row space-B">
 		<h3>{{ t('tables', 'Select a table or view') }}</h3>
-		<NcSelect style="width: 100%;" :loading="loading" :options="options"
-			:clear-on-select="true"
-			:hide-selected="true"
-			:placeholder="t('tables', 'Select a table or view')"
-			:searchable="true" :get-option-key="(option) => option.key"
-			label="title"
-			:aria-label-combobox="t('tables', 'Select a table or view')" :user-select="true"
-			:preselect-first="true"
-			:preserve-search="true"
-			@search="asyncFind" @input="addResource">
+		<NcSelect style="width: 100%;" :loading="loading" :options="options" :clear-on-select="true"
+			:hide-selected="true" :placeholder="t('tables', 'Select a table or view')" :searchable="true"
+			:get-option-key="(option) => option.key" label="title"
+			:aria-label-combobox="t('tables', 'Select a table or view')" :user-select="true" :preselect-first="true"
+			:preserve-search="true" @search="asyncFind" @input="addResource">
 			<template #no-options>
 				{{ t('tables', 'No recommendations. Start typing.') }}
 			</template>
@@ -86,12 +81,12 @@ export default {
 			}
 		},
 
-		async getSuggestions(search) {
+		async getSuggestions(searchTerm) {
 			this.loading = true
-			// TODO improve search, should be case-insensitive
-			// TODO check if item already in the list before showing as suggestion
-			let tables = this.tables.filter((table) => table.title.includes(search))
-			tables = tables.map(table => {
+			// Check search word and if item already in the resource list before showing as suggestion
+			let filteredTables = this.tables.filter((table) => table.title.toLowerCase().includes(searchTerm.toLowerCase())
+			&& !this.resources.find(t => t.nodeType === NODE_TYPE_TABLE && parseInt(t.id) === parseInt(table.id)))
+			filteredTables = filteredTables.map(table => {
 				return {
 					title: table.title,
 					emoji: table.emoji,
@@ -100,8 +95,9 @@ export default {
 					id: (table.id).toString(),
 				}
 			})
-			let views = this.views.filter((view) => view.title.includes(search))
-			views = views.map(view => {
+			let filteredViews = this.views.filter((view) => view.title.toLowerCase().includes(searchTerm.toLowerCase())
+			&& !this.resources.find(v => v.nodeType === NODE_TYPE_VIEW && parseInt(v.id) === parseInt(view.id)))
+			filteredViews = filteredViews.map(view => {
 				return {
 					title: view.title,
 					emoji: view.emoji,
@@ -111,7 +107,12 @@ export default {
 				}
 			})
 			this.loading = false
-			this.suggestions = [...tables, ...views]
+			this.suggestions = [...filteredTables, ...filteredViews].sort(this.sortByTitle)
+		},
+		sortByTitle(a, b) {
+			if (a.title.toLowerCase() < b.title.toLowerCase()) return -1
+			if (a.title.toLowerCase() > b.title.toLowerCase()) return 1
+			return 0
 		},
 
 		debounceGetSuggestions: debounce(function(...args) {
@@ -122,6 +123,4 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

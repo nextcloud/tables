@@ -50,7 +50,7 @@ export default {
 
 	computed: {
 		...mapGetters(['activeContext']),
-		...mapState(['tables', 'views'])
+		...mapState(['tables', 'views']),
 	},
 	methods: {
 		emit,
@@ -60,7 +60,7 @@ export default {
 				// Format resources for selection dropdown
 				const nodes = Object.values(this.context.nodes)
 				const resources = []
-				for (let node of nodes) {
+				for (const node of nodes) {
 					if (parseInt(node.node_type) === NODE_TYPE_TABLE || parseInt(node.node_type) === NODE_TYPE_VIEW) {
 						const element = parseInt(node.node_type) === NODE_TYPE_TABLE ? this.tables.find(t => t.id === node.id) : this.views.find(v => v.id === node.id)
 						if (element) {
