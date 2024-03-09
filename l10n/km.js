@@ -27,6 +27,7 @@ OC.L10N.register(
     "Title" : "ចំណងជើង",
     "Cancel" : "បោះបង់",
     "Delete" : "លុប",
+    "Close" : "បិទ",
     "Sort" : "តម្រៀប",
     "Favorites" : "Favorites",
     "group" : "ក្រុម",

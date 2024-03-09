@@ -27,6 +27,7 @@ OC.L10N.register(
     "Title" : "Titel",
     "Cancel" : "Ofbriechen",
     "Delete" : "Läschen",
+    "Close" : "Zoumaachen",
     "Please select a file." : "Wiel eng Datei aus.",
     "Sort" : "Zortéieren",
     "Favorites" : "Favoriten",

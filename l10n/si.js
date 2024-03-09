@@ -21,6 +21,7 @@ OC.L10N.register(
     "Save" : "සුරකින්න",
     "Cancel" : "අවලංගු කරන්න",
     "Owner" : "හිමිකරු",
+    "Close" : "වසන්න",
     "Please select a file." : "කරුණාකර ගොනුවක් තෝරන්න.",
     "Filter" : "පෙරහන",
     "Favorites" : "ප්‍රියතම",

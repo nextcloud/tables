@@ -39,6 +39,7 @@ OC.L10N.register(
     "Cancel" : "Loobu",
     "Delete" : "Kustuta",
     "Owner" : "Omanik",
+    "Close" : "Sulge",
     "Select from Files" : "Vali failidest",
     "Upload from device" : "Laadi üles seadmest",
     "Please select a file." : "Palun vali fail.",

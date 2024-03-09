@@ -30,6 +30,7 @@ OC.L10N.register(
     "Title" : "Titulo",
     "Cancel" : "Cancellar",
     "Delete" : "Deler",
+    "Close" : "Clauder",
     "Select from Files" : "Selectionar de Files",
     "Please select a file." : "Per favor selectiona un file.",
     "Sort" : "Ordinar",

@@ -36,6 +36,7 @@ OC.L10N.register(
     "Title" : "Amats",
     "Cancel" : "Atcelt",
     "Delete" : "Dzēst",
+    "Close" : "Aizvērt",
     "Select from Files" : "Izvēlēties no Datnes",
     "Upload from device" : "Augšupielādēt no ierīces",
     "Please select a file." : "Lūdzu izvēlies datni.",

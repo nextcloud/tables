@@ -30,6 +30,7 @@ OC.L10N.register(
     "Title" : "Վերնագիր",
     "Cancel" : "ընդհատել",
     "Delete" : "հեռացնել",
+    "Close" : "Փակել",
     "Please select a file." : "Խնդրում ենք ընտրել նիշք:",
     "Sort" : "Դասակարգել",
     "Copy" : "Պատճենել",

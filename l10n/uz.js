@@ -15,6 +15,7 @@ OC.L10N.register(
     "Cancel" : "Cancel",
     "Delete" : "Delete",
     "Owner" : "Owner",
+    "Close" : "Close",
     "Please select a file." : "Iltimos, faylni tanlang.",
     "Favorites" : "Favorites",
     "group" : "group",

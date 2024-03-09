@@ -39,6 +39,7 @@ OC.L10N.register(
     "Cancel" : "ยกเลิก",
     "Delete" : "ลบ",
     "Owner" : "เจ้าของ",
+    "Close" : "ปิด",
     "Select from Files" : "เลือกจากไฟล์",
     "Please select a file." : "กรุณาเลือกไฟล์",
     "Transfer" : "โอนย้าย",

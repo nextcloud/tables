@@ -48,6 +48,7 @@ OC.L10N.register(
     "Cancel" : "Hủy",
     "Delete" : "Xóa",
     "Owner" : "Chủ",
+    "Close" : "Đóng",
     "Select from Files" : "Chọn từ tập tin",
     "Please select a file." : "Hãy chọn một tệp.",
     "Transfer" : "Truyền",

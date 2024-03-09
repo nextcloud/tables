@@ -22,6 +22,7 @@ OC.L10N.register(
     "Title" : "ماۋزۇ",
     "Cancel" : "ۋاز كەچ",
     "Delete" : "ئۆچۈر",
+    "Close" : "ياپ",
     "Favorites" : "يىغقۇچ",
     "group" : "گۇرۇپپا",
     "Sharing" : "ھەمبەھىر",

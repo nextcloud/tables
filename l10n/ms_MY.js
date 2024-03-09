@@ -24,6 +24,7 @@ OC.L10N.register(
     "Title" : "Judul",
     "Cancel" : "Batal",
     "Delete" : "Padam",
+    "Close" : "Tutup",
     "Sort" : "Susun",
     "Favorites" : "Favorites",
     "group" : "kumpulan",

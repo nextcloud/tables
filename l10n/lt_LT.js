@@ -82,6 +82,8 @@ OC.L10N.register(
     "Could not update row" : "Nepavyko atnaujinti eilutės",
     "Could not delete row." : "Nepavyko ištrinti eilutės.",
     "Owner" : "Savivinkas",
+    "Import successful" : "Importavimas pavyko",
+    "Close" : "Užverti",
     "Select from Files" : "Pasirinkti iš failų",
     "Please select a file." : "Pasirinkite failą.",
     "Transfer" : "Persiųsti",

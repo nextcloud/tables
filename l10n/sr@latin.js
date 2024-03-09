@@ -19,6 +19,7 @@ OC.L10N.register(
     "Cancel" : "Otkaži",
     "Delete" : "Obriši",
     "Owner" : "Vlasnik",
+    "Close" : "Zatvori",
     "Copy" : "Kopiraj",
     "Favorites" : "Omiljene",
     "group" : "grupa",

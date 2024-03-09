@@ -23,6 +23,7 @@ OC.L10N.register(
     "Cancel" : "Sefsex",
     "Delete" : "Kkes",
     "Owner" : "Bab",
+    "Close" : "Mdel",
     "Please select a file." : "Ttxil fren afaylu.",
     "Filter" : "Sizdeg",
     "Sort" : "Smizzwer",

@@ -48,6 +48,7 @@ OC.L10N.register(
     "Cancel" : "Anulare",
     "Delete" : "Șterge",
     "Owner" : "Proprietar",
+    "Close" : "Închide",
     "Select from Files" : "Selectează din fișiere",
     "Upload from device" : "Încarcă din dispozitiv",
     "Please select a file." : "Te rugăm să alegi un fișier.",

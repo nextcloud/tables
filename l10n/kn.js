@@ -19,6 +19,7 @@ OC.L10N.register(
     "Title" : "ಶೀರ್ಷಿಕೆ",
     "Cancel" : "﻿ರದ್ದು",
     "Delete" : "﻿ಅಳಿಸಿ",
+    "Close" : "ಮುಚ್ಚು",
     "Copy" : "ನಕಲಿಸಿ",
     "Favorites" : "ಅಚ್ಚುಮೆಚ್ಚಿನ",
     "group" : "﻿ಗುಂಪು",

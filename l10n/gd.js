@@ -22,6 +22,7 @@ OC.L10N.register(
     "Save" : "Sàbhail",
     "Cancel" : "Sguir dheth",
     "Delete" : "Sguab às",
+    "Close" : "Dùin",
     "Please select a file." : "Tagh faidhle.",
     "Transfer" : "Tar-chuir",
     "Sort" : "Seòrsaich",

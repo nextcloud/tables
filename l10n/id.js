@@ -46,6 +46,7 @@ OC.L10N.register(
     "Title" : "Judul",
     "Cancel" : "Membatalkan",
     "Delete" : "Hapus",
+    "Close" : "Tutup",
     "Select from Files" : "Pilih dari berkas",
     "Please select a file." : "Silakan pilih berkas",
     "Transfer" : "Transfer",

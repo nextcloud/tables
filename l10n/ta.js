@@ -25,6 +25,7 @@ OC.L10N.register(
     "Cancel" : "இரத்து செய்க",
     "Delete" : "நீக்குக",
     "Owner" : "Owner",
+    "Close" : "மூடுக",
     "Remove from favorites" : "Remove from favorites",
     "Favorites" : "விருப்பங்கள்",
     "group" : "குழு",

@@ -51,6 +51,7 @@ OC.L10N.register(
     "Cancel" : "Cancelar",
     "Delete" : "Apagar",
     "Owner" : "Proprietário",
+    "Close" : "Fechar",
     "Select from Files" : "Seleccione dos Ficheiros",
     "Please select a file." : "Por favor, selecione um ficheiro.",
     "Transfer" : "Transfere",

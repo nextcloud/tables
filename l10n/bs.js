@@ -28,6 +28,7 @@ OC.L10N.register(
     "Cancel" : "Otkaži",
     "Delete" : "Obriši",
     "Owner" : "Vlasnik",
+    "Favorites" : "Favoriti",
     "group" : "grupa",
     "Sharing" : "Dijeljenje",
     "Update" : "Ažuriraj",

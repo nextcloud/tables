@@ -18,6 +18,7 @@ OC.L10N.register(
     "Save" : "ບັນທຶກ",
     "Cancel" : "ຍົກເລີກ",
     "Delete" : "ລຶບ",
+    "Close" : "ປິດ",
     "Please select a file." : "ກະລຸນາເລືອກຟາຍ",
     "Sort" : "ລຽງດຳດັບ",
     "Add to favorites" : "ເພີ່ມລາຍການທີ່ມັກ",

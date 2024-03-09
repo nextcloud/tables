@@ -31,6 +31,7 @@ OC.L10N.register(
     "Transfer" : "Treuzkas",
     "Filter" : "Filtre",
     "Sort" : "Renkañ",
+    "Favorites" : "Pennrolloù",
     "Searching …" : "O klask ...",
     "group" : "strollad",
     "Created at" : "Krouet da",

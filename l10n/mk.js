@@ -46,6 +46,7 @@ OC.L10N.register(
     "Title" : "Наслов",
     "Cancel" : "Откажи",
     "Delete" : "Избриши",
+    "Close" : "Затвори",
     "Select from Files" : "Избри од датотеките",
     "Upload from device" : "Прикачи од уред",
     "Please select a file." : "Изберете датотека.",

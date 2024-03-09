@@ -28,6 +28,7 @@ OC.L10N.register(
     "Title" : "Tittel",
     "Cancel" : "Avbryt",
     "Delete" : "Slett",
+    "Close" : "Lat att",
     "Select from Files" : "Vel frå filer",
     "Please select a file." : "Ver venleg og vel ei fil.",
     "Filter" : "Filter",

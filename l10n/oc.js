@@ -48,6 +48,7 @@ OC.L10N.register(
     "Title" : "Títol",
     "Cancel" : "Anullar",
     "Delete" : "Suprimir",
+    "Close" : "Plegar",
     "Select from Files" : "Seleccionar dels fichièrs",
     "Please select a file." : "Seleccionatz un fichièr.",
     "Sort" : "Triar",
