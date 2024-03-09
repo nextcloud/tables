@@ -333,7 +333,7 @@ export default new Vuex.Store({
 			const table = state.tables[index]
 			table.favorite = false
 			commit('setTable', table)
-			
+
 			return true
 		},
 		async updateContext({ state, commit, dispatch }, { id, data }) {
