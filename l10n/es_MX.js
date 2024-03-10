@@ -54,6 +54,7 @@ OC.L10N.register(
     "Transfer" : "Transferir",
     "Filter" : "Filtrar",
     "Sort" : "Ordenar",
+    "Copy" : "Copiar",
     "Favorites" : "Favoritos",
     "No recommendations. Start typing." : "Sin recomendaciones. Empiece a escribir.",
     "Searching …" : "Buscando  …",

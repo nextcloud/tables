@@ -190,6 +190,7 @@ OC.L10N.register(
     "Could not delete row." : "Rækken kunne ikke slettes.",
     "I really want to delete this table!" : "Jeg ønsker virkelig at slette denne tabel!",
     "Create missing columns" : "Opret manglende kolonner",
+    "Close" : "Luk",
     "Select from Files" : "Vælg fra filer",
     "Upload from device" : "Upload fra enhed",
     "⚠️ You don't have the permission to create columns." : "⚠️ du har ikke tilladelse til at oprette kolonner.",

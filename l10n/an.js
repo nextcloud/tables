@@ -19,6 +19,7 @@ OC.L10N.register(
     "Share" : "Compartir",
     "Cancel" : "Canzelar",
     "Delete" : "Borrar",
+    "Close" : "Zarrar",
     "Please select a file." : "Per favor, estríe un fichero.",
     "Favorites" : "Favoritos",
     "Read" : "Leyer",

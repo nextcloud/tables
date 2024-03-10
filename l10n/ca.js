@@ -179,6 +179,7 @@ OC.L10N.register(
     "Could not delete row." : "No s'ha pogut suprimir la fila.",
     "Owner" : "Propietat",
     "I really want to delete this table!" : "Tinc moltes ganes d'esborrar aquesta taula!",
+    "Close" : "Tanca",
     "Select from Files" : "Selecciona dels Fitxers",
     "Upload from device" : "Pujada des del dispositiu",
     "Please select a file." : "Seleccioneu un fitxer.",

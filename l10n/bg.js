@@ -189,6 +189,7 @@ OC.L10N.register(
     "Could not delete row." : "Редът не можа да се изтрие.",
     "Owner" : "Създател",
     "I really want to delete this table!" : "Наистина искам да изтрия тази таблица!",
+    "Close" : "Затваряне",
     "Select from Files" : "Избери от файловете",
     "Upload from device" : "Качване от устройство",
     "Please select a file." : "Моля изберете файл.",

@@ -28,6 +28,7 @@ OC.L10N.register(
     "Title" : "শিরোনাম",
     "Cancel" : "বাতির",
     "Delete" : "মুছে",
+    "Close" : "বন্ধ",
     "Please select a file." : "একটি ফাইল নির্বাচন করুন",
     "Favorites" : "প্রিয়জন",
     "group" : "দল",

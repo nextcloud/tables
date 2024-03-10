@@ -31,6 +31,7 @@ OC.L10N.register(
     "Cancel" : "Diddymu",
     "Delete" : "Dileu",
     "Owner" : "Perchennog",
+    "Close" : "Cau",
     "Sort" : "Trefnu",
     "Favorites" : "Ffefrynnau",
     "group" : "grŵp",

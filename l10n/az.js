@@ -34,6 +34,7 @@ OC.L10N.register(
     "Title" : "Başlıq",
     "Cancel" : "Dayandır",
     "Delete" : "Sil",
+    "Close" : "Bağla",
     "Please select a file." : "Lütfən, fayl seçin.",
     "Sort" : "Çeşidləmək",
     "Copy" : "Kopyala",

@@ -49,6 +49,7 @@ OC.L10N.register(
     "Cancel" : "Encaboxar",
     "Delete" : "Desaniciar",
     "Owner" : "Propietariu",
+    "Close" : "Zarrar",
     "Please select a file." : "Seleiciona un ficheru.",
     "Result" : "Resultáu",
     "Transfer" : "Tresferir",
