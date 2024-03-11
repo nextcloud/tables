@@ -104,7 +104,7 @@ export default {
 			} else {
 				const newContextId = await this.sendNewContextToBE()
 				if (newContextId) {
-					await this.$router.push('/context/' + newContextId)
+					await this.$router.push('/application/' + newContextId)
 					this.actionCancel()
 				}
 			}

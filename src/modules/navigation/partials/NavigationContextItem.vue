@@ -23,7 +23,7 @@
 <script>
 import { NcAppNavigationItem, NcActionButton } from '@nextcloud/vue'
 import '@nextcloud/dialogs/dist/index.css'
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 import Table from 'vue-material-design-icons/Table.vue'
 import { emit } from '@nextcloud/event-bus'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
@@ -51,7 +51,6 @@ export default {
 
 	computed: {
 		...mapGetters(['activeContext']),
-		...mapState(['tables', 'views']),
 	},
 	methods: {
 		emit,
