@@ -164,9 +164,8 @@ class ContextMapper extends QBMapper {
 	}
 
 	/**
-	 * @throws DoesNotExistException
-	 * @throws MultipleObjectsReturnedException
 	 * @throws Exception
+	 * @throws NotFoundError
 	 */
 	public function findById(int $contextId, ?string $userId = null): Context {
 		$qb = $this->getFindContextBaseQuery($userId);
