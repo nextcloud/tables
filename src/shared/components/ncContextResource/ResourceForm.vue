@@ -1,6 +1,8 @@
 <template>
 	<div class="row space-B">
-		<h3>{{ t('tables', 'Select a table or view') }}</h3>
+		<div class="resource-label">
+			{{ t('tables', 'Select a table or view') }}
+		</div>
 		<NcSelect style="width: 100%;" :loading="loading" :options="options" :clear-on-select="true"
 			:hide-selected="true" :placeholder="t('tables', 'Select a table or view')" :searchable="true"
 			:get-option-key="(option) => option.key" label="title"
@@ -83,9 +85,8 @@ export default {
 
 		async getSuggestions(searchTerm) {
 			this.loading = true
-			// Check search word and if item already in the resource list before showing as suggestion
 			let filteredTables = this.tables.filter((table) => table.title.toLowerCase().includes(searchTerm.toLowerCase())
-			&& !this.resources.find(t => t.nodeType === NODE_TYPE_TABLE && parseInt(t.id) === parseInt(table.id)))
+				&& !this.resources.find(t => t.nodeType === NODE_TYPE_TABLE && parseInt(t.id) === parseInt(table.id)))
 			filteredTables = filteredTables.map(table => {
 				return {
 					title: table.title,
@@ -96,7 +97,7 @@ export default {
 				}
 			})
 			let filteredViews = this.views.filter((view) => view.title.toLowerCase().includes(searchTerm.toLowerCase())
-			&& !this.resources.find(v => v.nodeType === NODE_TYPE_VIEW && parseInt(v.id) === parseInt(view.id)))
+				&& !this.resources.find(v => v.nodeType === NODE_TYPE_VIEW && parseInt(v.id) === parseInt(view.id)))
 			filteredViews = filteredViews.map(view => {
 				return {
 					title: view.title,
@@ -123,4 +124,8 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.resource-label {
+	font-style: italic;
+}
+</style>

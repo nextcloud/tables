@@ -1,8 +1,10 @@
 <template>
 	<div>
-		<h3>{{ t('tables', 'Resources') }}</h3>
+		<div class="resource-label">
+			{{ t('tables', 'Selected Resources') }}
+		</div>
 		<div v-if="loading" class="icon-loading" />
-		<ul v-if="getResources && getResources.length > 0" class="resourceList">
+		<ul v-if="getResources && getResources.length > 0" class="resource-list">
 			<div v-for="resource in getResources" :key="resource.key" class="row">
 				<div class="fix-col-2">
 					<div style="display:flex; align-items: center;">
@@ -18,7 +20,7 @@
 			</div>
 		</ul>
 		<div v-else>
-			{{ t('tables', 'No resources') }}
+			{{ t('tables', 'No selected resources') }}
 		</div>
 	</div>
 </template>
@@ -68,9 +70,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.resourceList li {
+.resource-list li {
     display: flex;
     justify-content: space-between;
     line-height: 44px;
+}
+
+.resource-label {
+	font-style: italic;
 }
 </style>
