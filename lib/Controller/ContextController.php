@@ -59,8 +59,9 @@ class ContextController extends AOCSController {
 	}
 
 	/**
-	 * [api v3] Get information about the requests context
+	 * [api v2] Get information about the requests context
 	 *
+	 * @param int $contextId ID of the context
 	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: returning the full context information
@@ -87,11 +88,11 @@ class ContextController extends AOCSController {
 	 * @param string $name Name of the context
 	 * @param string $iconName Material design icon name of the context
 	 * @param string $description Descriptive text of the context
-	 * @param array $nodes optional nodes to be connected to this context
+	 * @param array{id: int, type: int, permissions: int} $nodes optional nodes to be connected to this context
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
-	 * 200: Tables returned
+	 * 200: returning the full context information
 	 */
 	public function create(string $name, string $iconName, string $description = '', array $nodes = []): DataResponse {
 		try {
@@ -102,6 +103,20 @@ class ContextController extends AOCSController {
 	}
 
 	/**
+	 * [api v2] Update an existing context and return it
+	 *
+	 * @param int $contextId ID of the context
+	 * @param ?string $name provide this parameter to set a new name
+	 * @param ?string $iconName provide this parameter to set a new icon
+	 * @param ?string $description provide this parameter to set a new description
+	 * @param ?array{id: int, type: int, permissions: int, order: int} $nodes provide this parameter to set a new list of nodes.
+	 *
+	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 *
+	 * 200: returning the full context information
+	 * 403: No permissions
+	 * 404: Not found
+	 *
 	 * @NoAdminRequired
 	 * @CanManageContext
 	 */
@@ -123,6 +138,19 @@ class ContextController extends AOCSController {
 	}
 
 	/**
+	 * [api v2] Transfer the ownership of a context and return it
+	 *
+	 * @param int $contextId ID of the context
+	 * @param string $newOwnerId ID of the new owner
+	 * @param int $newOwnerType any Application::OWNER_TYPE_* constant
+	 *
+	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 *
+	 * 200: Ownership transferred
+	 * 400: Invalid request
+	 * 403: No permissions
+	 * 404: Not found
+	 *
 	 * @NoAdminRequired
 	 * @CanManageContext
 	 *
@@ -142,6 +170,20 @@ class ContextController extends AOCSController {
 	}
 
 	/**
+	 * [api v2] Add a node to a Context
+	 *
+	 * @param int $contextId ID of the context
+	 * @param int $nodeId ID of the node
+	 * @param int $nodeType any Application::NODE_TYPE_* constant
+	 * @param int $permissions bitmask of the permissions for context recipients
+	 * @param ?int $order in which order the node should appear within the context
+	 *
+	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 *
+	 * 200: Node added successfully
+	 * 403: No permissions
+	 * 404: Not found
+	 *
 	 * @NoAdminRequired
 	 * @CanManageNode
 	 */
@@ -151,6 +193,8 @@ class ContextController extends AOCSController {
 			$this->contextService->addNodeRelToPage($rel, $order);
 			$context = $this->contextService->findById($rel->getContextId(), $this->userId);
 			return new DataResponse($context->jsonSerialize());
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
 		} catch (DoesNotExistException $e) {
 			return $this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
 		} catch (MultipleObjectsReturnedException|Exception|InternalError $e) {
@@ -159,6 +203,18 @@ class ContextController extends AOCSController {
 	}
 
 	/**
+	 * [api v2] Remove a node from a Context
+	 *
+	 * @param int $contextId ID of the context
+	 * @param int $nodeRelId ID of the node-in-context relation
+	 *
+	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 *
+	 * 200: Node removed successfully
+	 * 400: Invalid request
+	 * 403: No permissions
+	 * 404: Not found
+	 *
 	 * @NoAdminRequired
 	 * @CanManageContext
 	 */
@@ -174,21 +230,40 @@ class ContextController extends AOCSController {
 			$this->contextService->removeNodeRelFromAllPages($nodeRelation);
 			$context = $this->contextService->findById($contextId, $this->userId);
 			return new DataResponse($context->jsonSerialize());
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
 		} catch (DoesNotExistException $e) {
-			$this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
-		} catch (MultipleObjectsReturnedException|Exception $e) {
-			$this->handleError($e);
+			return $this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
+		} catch (MultipleObjectsReturnedException|Exception|InternalError $e) {
+			return $this->handleError($e);
 		}
-
-		return new DataResponse();
 	}
 
 	/**
+	 * [api v2] Update the order on a page of a context
+	 *
+	 * @param int $contextId ID of the context
+	 * @param int $pageId ID of the page
+	 * @param array{id: int, order: int} $content content items with it and order values
+	 *
+	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 *
 	 * @NoAdminRequired
 	 * @CanManageContext
+	 *
+	 * 200: content updated successfully
+	 * 400: Invalid request
+	 * 403: No permissions
+	 * 404: Not found
 	 */
 	public function updateContentOrder(int $contextId, int $pageId, array $content): DataResponse {
-		$context = $this->contextService->findById($contextId, $this->userId);
+		try {
+			$context = $this->contextService->findById($contextId, $this->userId);
+		} catch (Exception|InternalError $e) {
+			return $this->handleError($e);
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		}
 		if (!isset($context->getPages()[$pageId])) {
 			return $this->handleBadRequestError(new BadRequestError('Page not found in given Context'));
 		}

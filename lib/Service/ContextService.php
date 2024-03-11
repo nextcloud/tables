@@ -16,6 +16,7 @@ use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -77,8 +78,9 @@ class ContextService {
 	}
 
 	/**
-	 * @return Context
+	 * @throws Exception
 	 * @throws InternalError
+	 * @throws NotFoundError
 	 */
 	public function findById(int $id, ?string $userId): Context {
 		if ($userId !== null && trim($userId) === '') {
