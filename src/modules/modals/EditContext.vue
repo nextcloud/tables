@@ -11,13 +11,17 @@
 					{{ t('tables', 'Title') }}
 				</div>
 				<div class="col-4" style="display: inline-flex;">
-					<!-- TODO replace with Context's icon picker -->
-					<NcEmojiPicker :close-on-select="true" @select="emoji => icon = emoji">
-						<NcButton type="tertiary" :aria-label="t('tables', 'Select icon for application')"
-							:title="t('tables', 'Select icon')" @click.prevent>
-							{{ icon ? icon : '...' }}
+					<NcIconPicker :close-on-select="true" @select="setIcon">
+						<NcButton
+							type="tertiary"
+							:aria-label="t('tables', 'Select an icon for application')"
+							:title="t('tables', 'Select icon')"
+							@click.prevent>
+							<template #icon>
+								<NcIconSvgWrapper :svg="icon.svg" />
+							</template>
 						</NcButton>
-					</NcEmojiPicker>
+					</NcIconPicker>
 					<input v-model="title" :class="{ missing: errorTitle }" type="text"
 						:placeholder="t('tables', 'Title of the application')">
 				</div>
@@ -47,21 +51,25 @@
 </template>
 
 <script>
-import { NcModal, NcEmojiPicker, NcButton } from '@nextcloud/vue'
+import { NcModal, NcButton, NcIconSvgWrapper } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters, mapState } from 'vuex'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
+import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../../shared/constants.js'
+import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'
 
 export default {
 	name: 'EditContext',
 	components: {
 		NcModal,
-		NcEmojiPicker,
 		NcButton,
+		NcIconPicker,
+		NcIconSvgWrapper,
 		NcContextResource,
 	},
+	mixins: [svgHelper],
 	props: {
 		showModal: {
 			type: Boolean,
@@ -75,7 +83,10 @@ export default {
 	data() {
 		return {
 			title: '',
-			icon: '',
+			icon: {
+				name: 'equalizer',
+				svg: null,
+			},
 			description: '',
 			errorTitle: false,
 			resources: [],
@@ -99,13 +110,17 @@ export default {
 			if (this.contextId) {
 				const context = this.getContext(this.contextId)
 				this.title = context.name
-				this.icon = context.iconName
+				this.setIcon(this.localContext.iconName)
 				this.description = context.description
 				this.resources = context ? [...this.getContextResources(context)] : []
 			}
 		},
 	},
 	methods: {
+		async setIcon(iconName) {
+			this.icon.name = iconName
+			this.icon.svg = await this.getContextIcon(iconName)
+		},
 		actionCancel() {
 			this.reset()
 			this.$emit('close')
@@ -126,13 +141,13 @@ export default {
 				})
 				const data = {
 					name: this.title,
-					iconName: this.icon,
+					iconName: this.icon.name,
 					description: this.description,
 					nodes: dataResources,
 				}
 				const res = await this.$store.dispatch('updateContext', { id: this.contextId, data })
 				if (res) {
-					showSuccess(t('tables', 'Updated context "{icon}{contextTitle}".', { icon: this.icon ? this.icon + ' ' : '', contextTitle: this.title }))
+					showSuccess(t('tables', 'Updated context "{contextTitle}".', { contextTitle: this.title }))
 					this.actionCancel()
 				}
 			}
@@ -141,7 +156,7 @@ export default {
 			const context = this.getContext(this.contextId)
 			this.title = ''
 			this.errorTitle = false
-			this.icon = ''
+			this.icon.name = 'equalizer'
 			this.description = ''
 			this.resources = context ? [...this.getContextResources(context)] : []
 		},
