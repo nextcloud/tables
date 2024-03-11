@@ -68,7 +68,7 @@ export default {
 			} else if (currentRoute.path.startsWith('/view/')) {
 				this.$store.commit('setActiveViewId', parseInt(currentRoute.params.viewId))
 				this.setPageTitle(this.$store.getters.activeView.title)
-			} else if (currentRoute.path.startsWith('/context/')) {
+			} else if (currentRoute.path.startsWith('/application/')) {
 				this.$store.commit('setActiveContextId', parseInt(currentRoute.params.contextId))
 				this.setPageTitle(this.$store.getters.activeContext.name)
 			}

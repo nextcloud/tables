@@ -1,7 +1,7 @@
 <template>
 	<NcAppNavigationItem v-if="context" data-cy="navigationContextItem" :name="context.name"
 		:class="{ active: activeContext && context.id === activeContext.id }" :force-menu="true"
-		:to="'/context/' + parseInt(context.id)">
+		:to="'/application/' + parseInt(context.id)">
 		<template #icon>
 			<template v-if="context.iconName">
 				{{ context.iconName }}
@@ -16,7 +16,7 @@
 				<template #icon>
 					<PlaylistEdit :size="20" />
 				</template>
-				{{ t('tables', 'Edit context') }}
+				{{ t('tables', 'Edit application') }}
 			</NcActionButton>
 		</template>
 	</NcAppNavigationItem>

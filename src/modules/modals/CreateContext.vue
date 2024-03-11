@@ -3,7 +3,7 @@
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
-					<h2>{{ t('tables', 'Create an Application') }}</h2>
+					<h2>{{ t('tables', 'Create an application') }}</h2>
 				</div>
 			</div>
 			<div class="row space-T">
@@ -13,13 +13,13 @@
 				<div class="col-4" style="display: inline-flex;">
 					<!-- TODO replace with Context's icon picker -->
 					<NcEmojiPicker :close-on-select="true" @select="setIcon">
-						<NcButton type="tertiary" :aria-label="t('tables', 'Select icon for the Application')"
+						<NcButton type="tertiary" :aria-label="t('tables', 'Select icon for the application')"
 							:title="t('tables', 'Select icon')" @click.prevent>
 							{{ icon }}
 						</NcButton>
 					</NcEmojiPicker>
 					<input v-model="title" :class="{ missing: errorTitle }" type="text"
-						:placeholder="t('tables', 'Title of the new context')" @input="titleChangedManually">
+						:placeholder="t('tables', 'Title of the new application')" @input="titleChangedManually">
 				</div>
 			</div>
 			<div class="col-4 row space-T">
@@ -27,7 +27,7 @@
 					{{ t('tables', 'Description') }}
 				</div>
 				<input v-model="description" type="text"
-					:placeholder="t('tables', 'Description of the new Application')">
+					:placeholder="t('tables', 'Description of the new application')">
 			</div>
 			<div class="col-4 row space-T">
 				<div class="col-4">
@@ -37,8 +37,8 @@
 			</div>
 			<div class="row space-R">
 				<div class="fix-col-4 end">
-					<NcButton type="primary" :aria-label="t('tables', 'Create Application')" @click="submit">
-						{{ t('tables', 'Create Application') }}
+					<NcButton type="primary" :aria-label="t('tables', 'Create application')" @click="submit">
+						{{ t('tables', 'Create application') }}
 					</NcButton>
 				</div>
 			</div>
