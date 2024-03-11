@@ -385,7 +385,7 @@ export default new Vuex.Store({
 			return true
 		},
 
-		async getContext({ state, commit, dispatch }, { id }) {
+		async loadContext({ state, commit, dispatch }, { id }) {
 			try {
 				const res = await axios.get(generateOcsUrl('/apps/tables/api/2/contexts/' + id))
 				commit('setContext', res.data.ocs.data)

@@ -50,7 +50,7 @@
 import { NcModal, NcEmojiPicker, NcButton } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../../shared/constants.js'
 
@@ -83,6 +83,7 @@ export default {
 	},
 	computed: {
 		...mapGetters(['getContext']),
+		...mapState(['tables', 'views']),
 		localContext() {
 			return this.getContext(this.contextId)
 		},
@@ -146,10 +147,10 @@ export default {
 		},
 		getContextResources(context) {
 			const resources = []
-			const nodes = Object.values(context)
+			const nodes = Object.values(context.nodes)
 			for (const node of nodes) {
 				if (parseInt(node.node_type) === NODE_TYPE_TABLE || parseInt(node.node_type) === NODE_TYPE_VIEW) {
-					const element = parseInt(node.node_type) === NODE_TYPE_TABLE ? this.tables.find(t => t.id === node.id) : this.views.find(v => v.id === node.id)
+					const element = parseInt(node.node_type) === NODE_TYPE_TABLE ? this.tables.find(t => t.id === node.node_id) : this.views.find(v => v.id === node.node_id)
 					if (element) {
 						const elementKey = parseInt(node.node_type) === NODE_TYPE_TABLE ? 'table-' : 'view-'
 						const resource = {
