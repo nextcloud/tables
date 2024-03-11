@@ -4,10 +4,10 @@
 		<div v-if="!loading && context">
 			<div class="content first-row">
 				<div class="row">
-					<h1> {{ context.iconName }}&nbsp; {{ context.name }}</h1>
+					<h1> {{ activeContext.iconName }}&nbsp; {{ activeContext.name }}</h1>
 				</div>
 				<div class="row">
-					<h3> {{ context.description }}</h3>
+					<h3> {{ activeContext.description }}</h3>
 				</div>
 			</div>
 
@@ -126,7 +126,7 @@ export default {
 		},
 		async loadContext() {
 			this.contextResources = []
-			await this.$store.dispatch('getContext', { id: this.activeContextId })
+			await this.$store.dispatch('loadContext', { id: this.activeContextId })
 			const index = this.contexts.findIndex(c => parseInt(c.id) === parseInt(this.activeContextId))
 			this.context = this.contexts[index]
 
