@@ -4,7 +4,7 @@
 		:to="'/application/' + parseInt(context.id)">
 		<template #icon>
 			<template v-if="context.iconName">
-				{{ context.iconName }}
+				<NcIconSvgWrapper :svg="icon" />
 			</template>
 			<template v-else>
 				<TableIcon :size="20" />
@@ -21,13 +21,14 @@
 	</NcAppNavigationItem>
 </template>
 <script>
-import { NcAppNavigationItem, NcActionButton } from '@nextcloud/vue'
+import { NcAppNavigationItem, NcActionButton, NcIconSvgWrapper } from '@nextcloud/vue'
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
 import TableIcon from 'vue-material-design-icons/Table.vue'
 import { emit } from '@nextcloud/event-bus'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
+import svgHelper from '../../../shared/components/ncIconPicker/mixins/svgHelper.js'
 
 export default {
 	name: 'NavigationContextItem',
@@ -35,11 +36,12 @@ export default {
 	components: {
 		PlaylistEdit,
 		TableIcon,
+		NcIconSvgWrapper,
 		NcAppNavigationItem,
 		NcActionButton,
 	},
 
-	mixins: [permissionsMixin],
+	mixins: [permissionsMixin, svgHelper],
 
 	props: {
 		context: {
@@ -48,9 +50,24 @@ export default {
 		},
 	},
 
+	data() {
+		return {
+			icon: null,
+		}
+	},
 	computed: {
 		...mapGetters(['activeContext']),
 	},
+
+	watch: {
+		'context.iconName': {
+			async handler() {
+				this.icon = await this.getContextIcon(this.context.iconName)
+			},
+			immediate: true,
+		},
+	},
+
 	methods: {
 		emit,
 		async editContext() {

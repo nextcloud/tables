@@ -2,12 +2,14 @@
 	<div class="row">
 		<div v-if="loading" class="icon-loading" />
 		<div v-if="!loading && context">
-			<div class="content first-row">
-				<div class="row">
-					<h1> {{ activeContext.iconName }}&nbsp; {{ activeContext.name }}</h1>
+			<div class="content context">
+				<div class="row first-row">
+					<h1 class="context__title">
+						<NcIconSvgWrapper :svg="icon" :size="32" style="display: inline-block;" />&nbsp; {{ activeContext.name }}
+					</h1>
 				</div>
-				<div class="row">
-					<h3> {{ activeContext.description }}</h3>
+				<div class="row space-L context__description">
+					{{ activeContext.description }}
 				</div>
 			</div>
 
@@ -35,26 +37,30 @@
 import MainModals from '../modules/modals/Modals.vue'
 import Vuex, { mapState, mapGetters } from 'vuex'
 import Vue from 'vue'
+import { NcIconSvgWrapper } from '@nextcloud/vue'
 import TableWrapper from '../modules/main/sections/TableWrapper.vue'
 import CustomView from '../modules/main/sections/View.vue'
 import { emit } from '@nextcloud/event-bus'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../shared/constants.js'
 import exportTableMixin from '../shared/components/ncTable/mixins/exportTableMixin.js'
+import svgHelper from '../shared/components/ncIconPicker/mixins/svgHelper.js'
 
 Vue.use(Vuex)
 
 export default {
 	components: {
 		MainModals,
+		NcIconSvgWrapper,
 		TableWrapper,
 		CustomView,
 	},
 
-	mixins: [exportTableMixin],
+	mixins: [exportTableMixin, svgHelper],
 
 	data() {
 		return {
 			loading: true,
+			icon: null,
 			viewSetting: {},
 			context: null,
 			contextResources: [],
@@ -110,6 +116,12 @@ export default {
 				await this.reload()
 			}
 		},
+		'context.iconName': {
+			async handler(value) {
+				this.icon = value ? await this.getContextIcon(value) : ''
+			},
+			immediate: true,
+		},
 	},
 
 	async mounted() {
@@ -125,6 +137,7 @@ export default {
 			this.loading = false
 		},
 		async loadContext() {
+			this.icon = await this.getContextIcon(this.activeContext.iconName)
 			this.contextResources = []
 			await this.$store.dispatch('loadContext', { id: this.activeContextId })
 			const index = this.contexts.findIndex(c => parseInt(c.id) === parseInt(this.activeContextId))
@@ -180,11 +193,29 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.content {
-	margin: 50px 50px 0;
+.context {
+	&__title {
+		display: inline-flex;
+	}
+
+	&__description {
+		margin: calc(3 * var(--default-grid-baseline, 4px));
+		max-width: 790px;
+		margin-left: 32px;
+	}
+
+	&:deep(.icon-vue) {
+		min-width: 32px;
+		min-height: 32px;
+	}
 }
 
 .resource {
 	margin: 40px 0;
+
+	&:deep(.row.first-row) {
+		margin-left: 20px;
+		padding-left: 0px;
+	}
 }
 </style>
