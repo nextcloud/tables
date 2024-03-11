@@ -33,6 +33,9 @@ export default new Vuex.Store({
 		getTable: (state) => (id) => {
 			return state.tables.find(table => table.id === id)
 		},
+		getContext: (state) => (id) => {
+			return state.contexts.find(context => context.id === id)
+		},
 		getView: (state) => (id) => {
 			return state.views.find(view => view.id === id)
 		},
@@ -352,7 +355,7 @@ export default new Vuex.Store({
 			contexts[index] = context
 			commit('setContexts', [...contexts])
 
-			return context
+			return true
 		},
 		async transferTable({ state, commit, dispatch }, { id, data }) {
 			try {
