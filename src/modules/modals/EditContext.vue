@@ -1,42 +1,42 @@
 <template>
-	<!-- TODO fix alignment and styling -->
 	<NcModal v-if="showModal" size="normal" @close="actionCancel">
 		<div class="modal__content" data-cy="editContextModal">
 			<div class="row">
 				<div class="col-4">
-					<h2>{{ t('tables', 'Edit context') }}</h2>
+					<h2>{{ t('tables', 'Edit Application') }}</h2>
 				</div>
 			</div>
-			<div class="row">
-				<div class="row">
+			<div class="row space-T">
+				<div class="col-4 mandatory">
 					{{ t('tables', 'Title') }}
 				</div>
-				<div class="col-4">
+				<div class="col-4" style="display: inline-flex;">
+					<!-- TODO replace with Context's icon picker -->
 					<NcEmojiPicker :close-on-select="true" @select="emoji => icon = emoji">
-						<NcButton type="tertiary" :aria-label="t('tables', 'Select icon for context')"
+						<NcButton type="tertiary" :aria-label="t('tables', 'Select icon for Application')"
 							:title="t('tables', 'Select icon')" @click.prevent>
 							{{ icon ? icon : '...' }}
 						</NcButton>
 					</NcEmojiPicker>
 					<input v-model="title" :class="{ missing: errorTitle }" type="text"
-						:placeholder="t('tables', 'Title of the context')">
+						:placeholder="t('tables', 'Title of the Application')">
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-4 mandatory">
+			<div class="col-4 row space-T">
+				<div class="col-4">
 					{{ t('tables', 'Description') }}
 				</div>
-				<input v-model="description" type="text" :placeholder="t('tables', 'Description of the context')">
+				<input v-model="description" type="text" :placeholder="t('tables', 'Description of the Application')">
 			</div>
-			<div class="row">
-				<div>
+			<div class="col-4 row space-T">
+				<div class="col-4">
 					{{ t('tables', 'Resources') }}
 				</div>
 				<NcContextResource :resources.sync="resources" />
 			</div>
 
-			<div class="row">
-				<div class="right-additional-button">
+			<div class="row space-R">
+				<div class="fix-col-4 end">
 					<NcButton type="primary" @click="submit">
 						{{ t('tables', 'Save') }}
 					</NcButton>
@@ -70,6 +70,10 @@ export default {
 			type: Object,
 			default: null,
 		},
+		contextResources: {
+			type: Array,
+			default: () => [],
+		},
 	},
 	data() {
 		return {
@@ -77,7 +81,7 @@ export default {
 			icon: this.context?.iconName,
 			description: this.context?.description,
 			errorTitle: false,
-			resources: this.context?.resources ? [...this.context.resources] : [],
+			resources: [...this.contextResources],
 			contextId: this.context?.id,
 		}
 	},
@@ -97,7 +101,7 @@ export default {
 				this.title = this.context.name
 				this.icon = this.context.iconName
 				this.description = this.context.description
-				this.resources = [...this.context.resources]
+				this.resources = [...this.contextResources]
 				this.contextId = this.context.id
 			}
 		},
@@ -107,7 +111,7 @@ export default {
 			this.reset()
 			this.$emit('close')
 		},
-		// TODO show edited changes if we're currently viewing on active context
+		// TODO show edited changes if we're currently viewing the active context
 		async submit() {
 			if (this.title === '') {
 				showError(t('tables', 'Cannot update context. Title is missing.'))
@@ -138,19 +142,9 @@ export default {
 			this.title = ''
 			this.errorTitle = false
 			this.icon = ''
-			this.resources = []
+			this.resources = [...this.contextResources]
 			this.description = ''
 		},
 	},
 }
 </script>
-
-<style lang="scss" scoped>
-.right-additional-button {
-	display: inline-flex;
-}
-
-.right-additional-button>button {
-	margin-left: calc(var(--default-grid-baseline) * 3);
-}
-</style>

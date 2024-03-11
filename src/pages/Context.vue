@@ -1,4 +1,3 @@
-<!-- TODO test that Tables and Views events work properly -->
 <template>
 	<div class="row">
 		<div v-if="loading" class="icon-loading" />

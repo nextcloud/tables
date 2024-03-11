@@ -1,20 +1,19 @@
 <template>
-	<!-- TODO fix alignment and styling -->
 	<NcModal v-if="showModal" size="normal" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
-					<h2>{{ t('tables', 'Create a context') }}</h2>
+					<h2>{{ t('tables', 'Create an Application') }}</h2>
 				</div>
 			</div>
 			<div class="row space-T">
-				<div class="col-4">
+				<div class="col-4 mandatory">
 					{{ t('tables', 'Title') }}
 				</div>
-				<div class="row" style="display: inline-flex;">
+				<div class="col-4" style="display: inline-flex;">
 					<!-- TODO replace with Context's icon picker -->
 					<NcEmojiPicker :close-on-select="true" @select="setIcon">
-						<NcButton type="tertiary" :aria-label="t('tables', 'Select icon for the context')"
+						<NcButton type="tertiary" :aria-label="t('tables', 'Select icon for the Application')"
 							:title="t('tables', 'Select icon')" @click.prevent>
 							{{ icon }}
 						</NcButton>
@@ -23,24 +22,23 @@
 						:placeholder="t('tables', 'Title of the new context')" @input="titleChangedManually">
 				</div>
 			</div>
-			<div class="row space-T">
-				<div class="col-4 mandatory">
+			<div class="col-4 row space-T">
+				<div class="col-4">
 					{{ t('tables', 'Description') }}
 				</div>
-				<input v-model="description" type="text" :placeholder="t('tables', 'Description of the new context')">
+				<input v-model="description" type="text"
+					:placeholder="t('tables', 'Description of the new Application')">
 			</div>
-			<div class="row space-T">
-				<div class="row">
-					<div>
-						{{ t('tables', 'Resources') }}
-					</div>
+			<div class="col-4 row space-T">
+				<div class="col-4">
+					{{ t('tables', 'Resources') }}
 				</div>
 				<NcContextResource :resources.sync="resources" />
 			</div>
 			<div class="row space-R">
 				<div class="fix-col-4 end">
-					<NcButton type="primary" :aria-label="t('tables', 'Create context')" @click="submit">
-						{{ t('tables', 'Create context') }}
+					<NcButton type="primary" :aria-label="t('tables', 'Create Application')" @click="submit">
+						{{ t('tables', 'Create Application') }}
 					</NcButton>
 				</div>
 			</div>

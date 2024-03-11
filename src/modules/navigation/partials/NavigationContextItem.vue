@@ -55,11 +55,10 @@ export default {
 	methods: {
 		emit,
 		async editContext() {
-			// TODO make more elegant
+			const resources = []
 			if (this.context) {
 				// Format resources for selection dropdown
 				const nodes = Object.values(this.context.nodes)
-				const resources = []
 				for (const node of nodes) {
 					if (parseInt(node.node_type) === NODE_TYPE_TABLE || parseInt(node.node_type) === NODE_TYPE_VIEW) {
 						const element = parseInt(node.node_type) === NODE_TYPE_TABLE ? this.tables.find(t => t.id === node.id) : this.views.find(v => v.id === node.id)
@@ -77,11 +76,8 @@ export default {
 
 					}
 				}
-				if (resources) {
-					this.context.resources = [...resources]
-				}
 			}
-			emit('tables:context:edit', this.context)
+			emit('tables:context:edit', { context: this.context, resources })
 		},
 	},
 
