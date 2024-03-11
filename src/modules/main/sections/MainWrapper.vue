@@ -112,7 +112,7 @@ export default {
 
 				this.viewSetting = {}
 				if (this.isView && this.element?.sort?.length) {
-					this.viewSetting.sorting = [...this.element.sort]
+					this.viewSetting.presetSorting = [...this.element.sort]
 				}
 
 				await this.$store.dispatch('loadColumnsFromBE', {

@@ -92,9 +92,13 @@ export default {
 		},
 		getSearchedAndFilteredAndSortedRows() {
 			// if we have to sort
+			if (this.viewSetting?.presetSorting) {
+				const sortColumn = this.columns.find(item => item.id === this.viewSetting.presetSorting?.[0].columnId)
+				return [...this.getSearchedAndFilteredRows].sort(sortColumn?.sort?.(this.viewSetting.presetSorting[0].mode))
+			}
 			if (this.viewSetting?.sorting) {
-				const sortColumn = this.columns.find(item => item.id === this.viewSetting.sorting?.[0].columnId)
-				return [...this.getSearchedAndFilteredRows].sort(sortColumn?.sort?.(this.viewSetting.sorting[0].mode))
+				const sortColumn = this.columns.find(item => item.id === this.viewSetting.sorting[0].columnId)
+				return [...this.getSearchedAndFilteredRows].sort(sortColumn.sort(this.viewSetting.sorting[0].mode))
 			}
 			return this.getSearchedAndFilteredRows
 		},
