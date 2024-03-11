@@ -11,8 +11,7 @@
 			</template>
 		</template>
 		<template #actions>
-			<!-- TODO check if current user has right permissions before showing options -->
-			<NcActionButton :close-after-click="true" @click="editContext">
+			<NcActionButton v-if="canManageContext(context)" :close-after-click="true" @click="editContext">
 				<template #icon>
 					<PlaylistEdit :size="20" />
 				</template>
@@ -29,6 +28,7 @@ import Table from 'vue-material-design-icons/Table.vue'
 import { emit } from '@nextcloud/event-bus'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../../../shared/constants.js'
+import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 
 export default {
 	name: 'NavigationContextItem',
@@ -40,6 +40,8 @@ export default {
 		NcAppNavigationItem,
 		NcActionButton,
 	},
+
+	mixins: [permissionsMixin],
 
 	props: {
 		context: {
