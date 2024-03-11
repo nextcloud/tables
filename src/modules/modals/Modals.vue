@@ -38,7 +38,7 @@
 
 		<EditTable :table-id="editTable" :show-modal="editTable !== null" @close="editTable = null" />
 		<TransferTable :table="tableToTransfer" :show-modal="tableToTransfer !== null" @close="tableToTransfer = null" />
-		<EditContext :context="editContext?.context" :context-resources="editContext?.resources" :show-modal="editContext !== null" @close="editContext = null" />
+		<EditContext :context-id="editContext" :show-modal="editContext !== null" @close="editContext = null" />
 	</div>
 </template>
 
@@ -137,7 +137,7 @@ export default {
 
 		// context
 		subscribe('tables:context:create', () => { this.showModalCreateContext = true })
-		subscribe('tables:context:edit', contextInfo => { this.editContext = contextInfo })
+		subscribe('tables:context:edit', contextId => { this.editContext = contextId })
 
 	},
 	unmounted() {
@@ -164,7 +164,7 @@ export default {
 		unsubscribe('tables:table:edit', tableId => { this.editTable = tableId })
 		unsubscribe('tables:table:transfer', table => { this.tableToTransfer = table })
 		unsubscribe('tables:context:create', () => { this.showModalCreateContext = true })
-		unsubscribe('tables:context:edit', contextInfo => { this.editContext = contextInfo })
+		unsubscribe('tables:context:edit', contextId => { this.editContext = contextId })
 	},
 }
 </script>

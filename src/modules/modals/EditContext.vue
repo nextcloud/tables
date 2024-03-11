@@ -50,8 +50,9 @@
 import { NcModal, NcEmojiPicker, NcButton } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
-import { mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
+import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../../shared/constants.js'
 
 export default {
 	name: 'EditContext',
@@ -66,28 +67,25 @@ export default {
 			type: Boolean,
 			default: false,
 		},
-		context: {
-			type: Object,
+		contextId: {
+			type: Number,
 			default: null,
-		},
-		contextResources: {
-			type: Array,
-			default: () => [],
 		},
 	},
 	data() {
 		return {
-			title: this.context?.name,
-			icon: this.context?.iconName,
-			description: this.context?.description,
+			title: '',
+			icon: '',
+			description: '',
 			errorTitle: false,
-			resources: [...this.contextResources],
-			contextId: this.context?.id,
+			resources: [],
 		}
 	},
 	computed: {
-		...mapState(['activeContextId']),
-
+		...mapGetters(['getContext']),
+		localContext() {
+			return this.getContext(this.contextId)
+		},
 	},
 	watch: {
 		title() {
@@ -96,13 +94,13 @@ export default {
 				this.title = this.title.slice(0, 199)
 			}
 		},
-		context() {
-			if (this.context) {
-				this.title = this.context.name
-				this.icon = this.context.iconName
-				this.description = this.context.description
-				this.resources = [...this.contextResources]
-				this.contextId = this.context.id
+		contextId() {
+			if (this.contextId) {
+				const context = this.getContext(this.contextId)
+				this.title = context.name
+				this.icon = context.iconName
+				this.description = context.description
+				this.resources = context ? [...this.getContextResources(context)] : []
 			}
 		},
 	},
@@ -131,7 +129,7 @@ export default {
 					description: this.description,
 					nodes: dataResources,
 				}
-				const res = await this.$store.dispatch('updateContext', { id: this.context.id, data })
+				const res = await this.$store.dispatch('updateContext', { id: this.contextId, data })
 				if (res) {
 					showSuccess(t('tables', 'Updated context "{icon}{contextTitle}".', { icon: this.icon ? this.icon + ' ' : '', contextTitle: this.title }))
 					this.actionCancel()
@@ -139,11 +137,33 @@ export default {
 			}
 		},
 		reset() {
+			const context = this.getContext(this.contextId)
 			this.title = ''
 			this.errorTitle = false
 			this.icon = ''
-			this.resources = [...this.contextResources]
 			this.description = ''
+			this.resources = context ? [...this.getContextResources(context)] : []
+		},
+		getContextResources(context) {
+			const resources = []
+			const nodes = Object.values(context)
+			for (const node of nodes) {
+				if (parseInt(node.node_type) === NODE_TYPE_TABLE || parseInt(node.node_type) === NODE_TYPE_VIEW) {
+					const element = parseInt(node.node_type) === NODE_TYPE_TABLE ? this.tables.find(t => t.id === node.id) : this.views.find(v => v.id === node.id)
+					if (element) {
+						const elementKey = parseInt(node.node_type) === NODE_TYPE_TABLE ? 'table-' : 'view-'
+						const resource = {
+							title: element.title,
+							emoji: element.emoji,
+							key: `${elementKey}` + element.id,
+							nodeType: parseInt(node.node_type) === NODE_TYPE_TABLE ? NODE_TYPE_TABLE : NODE_TYPE_VIEW,
+							id: (element.id).toString(),
+						}
+						resources.push(resource)
+					}
+				}
+			}
+			return resources
 		},
 	},
 }

@@ -27,7 +27,6 @@ import { mapGetters, mapState } from 'vuex'
 import Table from 'vue-material-design-icons/Table.vue'
 import { emit } from '@nextcloud/event-bus'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
-import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../../../shared/constants.js'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 
 export default {
@@ -57,29 +56,7 @@ export default {
 	methods: {
 		emit,
 		async editContext() {
-			const resources = []
-			if (this.context) {
-				// Format resources for selection dropdown
-				const nodes = Object.values(this.context.nodes)
-				for (const node of nodes) {
-					if (parseInt(node.node_type) === NODE_TYPE_TABLE || parseInt(node.node_type) === NODE_TYPE_VIEW) {
-						const element = parseInt(node.node_type) === NODE_TYPE_TABLE ? this.tables.find(t => t.id === node.id) : this.views.find(v => v.id === node.id)
-						if (element) {
-							const elementKey = parseInt(node.node_type) === NODE_TYPE_TABLE ? 'table-' : 'view-'
-							const resource = {
-								title: element.title,
-								emoji: element.emoji,
-								key: `${elementKey}` + element.id,
-								nodeType: parseInt(node.node_type) === NODE_TYPE_TABLE ? NODE_TYPE_TABLE : NODE_TYPE_VIEW,
-								id: (element.id).toString(),
-							}
-							resources.push(resource)
-						}
-
-					}
-				}
-			}
-			emit('tables:context:edit', { context: this.context, resources })
+			emit('tables:context:edit', this.context.id)
 		},
 	},
 
