@@ -38,11 +38,13 @@ class ApiFavoriteController extends AOCSController {
 	 *
 	 * @NoAdminRequired
 	 *
-	 * @param int $nodeType
-	 * @param int $nodeId
+	 * @param int $nodeType any Application::NODE_TYPE_* constant
+	 * @param int $nodeId identifier of the node
 	 * @return DataResponse<Http::STATUS_OK, array{}, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
+	 * 403: No permissions
+	 * 404: Not found
 	 */
 	public function create(int $nodeType, int $nodeId): DataResponse {
 		try {
@@ -63,8 +65,8 @@ class ApiFavoriteController extends AOCSController {
 	 *
 	 * @NoAdminRequired
 	 *
-	 * @param int $nodeType
-	 * @param int $nodeId
+	 * @param int $nodeType any Application::NODE_TYPE_* constant
+	 * @param int $nodeId identifier of the node
 	 * @return DataResponse<Http::STATUS_OK, array{}, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Deleted table returned

@@ -32,6 +32,7 @@
                             "enabled",
                             "version",
                             "apiVersions",
+                            "features",
                             "column_types"
                         ],
                         "properties": {
@@ -42,6 +43,12 @@
                                 "type": "string"
                             },
                             "apiVersions": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "features": {
                                 "type": "array",
                                 "items": {
                                     "type": "string"
@@ -378,6 +385,8 @@
                     "createdAt",
                     "lastEditBy",
                     "lastEditAt",
+                    "archived",
+                    "favorite",
                     "isShared",
                     "onSharePermissions",
                     "hasShares",
@@ -414,6 +423,12 @@
                     },
                     "lastEditAt": {
                         "type": "string"
+                    },
+                    "archived": {
+                        "type": "boolean"
+                    },
+                    "favorite": {
+                        "type": "boolean"
                     },
                     "isShared": {
                         "type": "boolean"
@@ -483,6 +498,7 @@
                     "sort",
                     "filter",
                     "isShared",
+                    "favorite",
                     "onSharePermissions",
                     "hasShares",
                     "rowsCount"
@@ -534,9 +550,8 @@
                         }
                     },
                     "sort": {
-                        "type": "object",
-                        "nullable": true,
-                        "additionalProperties": {
+                        "type": "array",
+                        "items": {
                             "type": "object",
                             "required": [
                                 "columnId",
@@ -558,53 +573,58 @@
                         }
                     },
                     "filter": {
-                        "type": "object",
-                        "nullable": true,
-                        "additionalProperties": {
-                            "type": "object",
-                            "required": [
-                                "columnId",
-                                "operator",
-                                "value"
-                            ],
-                            "properties": {
-                                "columnId": {
-                                    "type": "integer",
-                                    "format": "int64"
-                                },
-                                "operator": {
-                                    "type": "string",
-                                    "enum": [
-                                        "begins-with",
-                                        "ends-with",
-                                        "contains",
-                                        "is-equal",
-                                        "is-greater-than",
-                                        "is-greater-than-or-equal",
-                                        "is-lower-than",
-                                        "is-lower-than-or-equal",
-                                        "is-empty"
-                                    ]
-                                },
-                                "value": {
-                                    "oneOf": [
-                                        {
-                                            "type": "string"
-                                        },
-                                        {
-                                            "type": "integer",
-                                            "format": "int64"
-                                        },
-                                        {
-                                            "type": "number",
-                                            "format": "float"
-                                        }
-                                    ]
+                        "type": "array",
+                        "items": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "required": [
+                                    "columnId",
+                                    "operator",
+                                    "value"
+                                ],
+                                "properties": {
+                                    "columnId": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "operator": {
+                                        "type": "string",
+                                        "enum": [
+                                            "begins-with",
+                                            "ends-with",
+                                            "contains",
+                                            "is-equal",
+                                            "is-greater-than",
+                                            "is-greater-than-or-equal",
+                                            "is-lower-than",
+                                            "is-lower-than-or-equal",
+                                            "is-empty"
+                                        ]
+                                    },
+                                    "value": {
+                                        "oneOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "integer",
+                                                "format": "int64"
+                                            },
+                                            {
+                                                "type": "number",
+                                                "format": "float"
+                                            }
+                                        ]
+                                    }
                                 }
                             }
                         }
                     },
                     "isShared": {
+                        "type": "boolean"
+                    },
+                    "favorite": {
                         "type": "boolean"
                     },
                     "onSharePermissions": {
@@ -794,6 +814,19 @@
                         "schema": {
                             "type": "string",
                             "nullable": true
+                        }
+                    },
+                    {
+                        "name": "archived",
+                        "in": "query",
+                        "description": "Whether the table is archived",
+                        "schema": {
+                            "type": "integer",
+                            "default": 0,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -1865,7 +1898,11 @@
                         "description": "New permission value",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2104,7 +2141,11 @@
                         "description": "Permission if receiver can read data",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2113,7 +2154,11 @@
                         "description": "Permission if receiver can create data",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2122,7 +2167,11 @@
                         "description": "Permission if receiver can update data",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2131,7 +2180,11 @@
                         "description": "Permission if receiver can delete data",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2140,7 +2193,11 @@
                         "description": "Permission if receiver can manage table",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2286,7 +2343,11 @@
                         "description": "Permission if receiver can read data",
                         "schema": {
                             "type": "integer",
-                            "default": 0
+                            "default": 0,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2295,7 +2356,11 @@
                         "description": "Permission if receiver can create data",
                         "schema": {
                             "type": "integer",
-                            "default": 0
+                            "default": 0,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2304,7 +2369,11 @@
                         "description": "Permission if receiver can update data",
                         "schema": {
                             "type": "integer",
-                            "default": 0
+                            "default": 0,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2313,7 +2382,11 @@
                         "description": "Permission if receiver can delete data",
                         "schema": {
                             "type": "integer",
-                            "default": 0
+                            "default": 0,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2322,7 +2395,11 @@
                         "description": "Permission if receiver can manage node",
                         "schema": {
                             "type": "integer",
-                            "default": 0
+                            "default": 0,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     }
                 ],
@@ -2549,7 +2626,11 @@
                         "description": "Is the column mandatory",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -2937,7 +3018,11 @@
                         "description": "Is the column mandatory",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -3185,7 +3270,11 @@
                         "description": "Is the column mandatory",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -4521,7 +4610,11 @@
                         "description": "Create missing columns",
                         "schema": {
                             "type": "integer",
-                            "default": 1
+                            "default": 1,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -4631,7 +4724,11 @@
                         "description": "Create missing columns",
                         "schema": {
                             "type": "integer",
-                            "default": 1
+                            "default": 1,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -5254,6 +5351,19 @@
                         "schema": {
                             "type": "string",
                             "nullable": true
+                        }
+                    },
+                    {
+                        "name": "archived",
+                        "in": "query",
+                        "description": "whether the table is archived",
+                        "schema": {
+                            "type": "integer",
+                            "default": 0,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -6326,7 +6436,11 @@
                         "description": "Is mandatory",
                         "schema": {
                             "type": "integer",
-                            "default": 0
+                            "default": 0,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -6612,7 +6726,11 @@
                         "description": "Is mandatory",
                         "schema": {
                             "type": "integer",
-                            "default": 0
+                            "default": 0,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -6888,7 +7006,11 @@
                         "description": "Is mandatory",
                         "schema": {
                             "type": "integer",
-                            "default": 0
+                            "default": 0,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -7159,7 +7281,11 @@
                         "description": "Is mandatory",
                         "schema": {
                             "type": "integer",
-                            "default": 0
+                            "default": 0,
+                            "enum": [
+                                0,
+                                1
+                            ]
                         }
                     },
                     {
@@ -7294,6 +7420,394 @@
                             "text/plain": {
                                 "schema": {
                                     "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ocs/v2.php/apps/tables/api/2/favorites/{nodeType}/{nodeId}": {
+            "post": {
+                "operationId": "api_favorite-create",
+                "summary": "[api v2] Add a node (table or view) to user favorites",
+                "tags": [
+                    "api_favorite"
+                ],
+                "security": [
+                    {
+                        "bearer_auth": []
+                    },
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "nodeType",
+                        "in": "path",
+                        "description": "any Application::NODE_TYPE_* constant",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "nodeId",
+                        "in": "path",
+                        "description": "identifier of the node",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "OCS-APIRequest",
+                        "in": "header",
+                        "description": "Required to be true for the API request to pass",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tables returned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "api_favorite-destroy",
+                "summary": "[api v2] Remove a node (table or view) to from favorites",
+                "tags": [
+                    "api_favorite"
+                ],
+                "security": [
+                    {
+                        "bearer_auth": []
+                    },
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "nodeType",
+                        "in": "path",
+                        "description": "any Application::NODE_TYPE_* constant",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "nodeId",
+                        "in": "path",
+                        "description": "identifier of the node",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "OCS-APIRequest",
+                        "in": "header",
+                        "description": "Required to be true for the API request to pass",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted table returned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
