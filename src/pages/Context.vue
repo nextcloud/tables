@@ -33,7 +33,7 @@
 
 <script>
 import MainModals from '../modules/modals/Modals.vue'
-import Vuex, { mapState } from 'vuex'
+import Vuex, { mapState, mapGetters } from 'vuex'
 import Vue from 'vue'
 import TableWrapper from '../modules/main/sections/TableWrapper.vue'
 import CustomView from '../modules/main/sections/View.vue'
@@ -63,6 +63,7 @@ export default {
 
 	computed: {
 		...mapState(['tables', 'contexts', 'activeContextId', 'views']),
+		...mapGetters(['activeContext']),
 		rows() {
 			const rows = {}
 			if (this.context && this.context.nodes) {
@@ -102,7 +103,12 @@ export default {
 
 	watch: {
 		async activeContextId() {
-			await this.reload()
+			if (this.activeContextId && !this.activeContext) {
+				// context does not exists, go to startpage
+				this.$router.push('/').catch(err => err)
+			} else {
+				await this.reload()
+			}
 		},
 	},
 
