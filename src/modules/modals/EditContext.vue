@@ -3,7 +3,7 @@
 		<div class="modal__content" data-cy="editContextModal">
 			<div class="row">
 				<div class="col-4">
-					<h2>{{ t('tables', 'Edit Application') }}</h2>
+					<h2>{{ t('tables', 'Edit application') }}</h2>
 				</div>
 			</div>
 			<div class="row space-T">
@@ -13,20 +13,20 @@
 				<div class="col-4" style="display: inline-flex;">
 					<!-- TODO replace with Context's icon picker -->
 					<NcEmojiPicker :close-on-select="true" @select="emoji => icon = emoji">
-						<NcButton type="tertiary" :aria-label="t('tables', 'Select icon for Application')"
+						<NcButton type="tertiary" :aria-label="t('tables', 'Select icon for application')"
 							:title="t('tables', 'Select icon')" @click.prevent>
 							{{ icon ? icon : '...' }}
 						</NcButton>
 					</NcEmojiPicker>
 					<input v-model="title" :class="{ missing: errorTitle }" type="text"
-						:placeholder="t('tables', 'Title of the Application')">
+						:placeholder="t('tables', 'Title of the application')">
 				</div>
 			</div>
 			<div class="col-4 row space-T">
 				<div class="col-4">
 					{{ t('tables', 'Description') }}
 				</div>
-				<input v-model="description" type="text" :placeholder="t('tables', 'Description of the Application')">
+				<input v-model="description" type="text" :placeholder="t('tables', 'Description of the application')">
 			</div>
 			<div class="col-4 row space-T">
 				<div class="col-4">
