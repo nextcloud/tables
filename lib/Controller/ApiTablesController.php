@@ -6,9 +6,11 @@ use Exception;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Middleware\Attribute\RequireTable;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\TableService;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IL10N;
 use OCP\IRequest;
@@ -17,7 +19,7 @@ use Psr\Log\LoggerInterface;
 /**
  * @psalm-import-type TablesTable from ResponseDefinitions
  */
-class ApiTablesController extends AOCSController {
+class ApiTablesController extends AEnvironmentAwareOCSController {
 	private TableService $service;
 
 	public function __construct(
@@ -33,12 +35,11 @@ class ApiTablesController extends AOCSController {
 	/**
 	 * [api v2] Returns all Tables
 	 *
-	 * @NoAdminRequired
-	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesTable[], array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
 	 */
+	#[NoAdminRequired]
 	public function index(): DataResponse {
 		try {
 			return new DataResponse($this->service->formatTables($this->service->findAll($this->userId)));
@@ -50,31 +51,20 @@ class ApiTablesController extends AOCSController {
 	/**
 	 * [api v2] Get a table object
 	 *
-	 * @NoAdminRequired
-	 *
-	 * @param int $id Table ID
 	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Table returned
 	 * 403: No permissions
 	 * 404: Not found
 	 */
-	public function show(int $id): DataResponse {
-		try {
-			return new DataResponse($this->service->find($id)->jsonSerialize());
-		} catch (PermissionError $e) {
-			return $this->handlePermissionError($e);
-		} catch (InternalError $e) {
-			return $this->handleError($e);
-		} catch (NotFoundError $e) {
-			return $this->handleNotFoundError($e);
-		}
+	#[NoAdminRequired]
+	#[RequireTable(enhance: true)]
+	public function show(): DataResponse {
+		return new DataResponse($this->getTable()->jsonSerialize());
 	}
 
 	/**
 	 * [api v2] Create a new table and return it
-	 *
-	 * @NoAdminRequired
 	 *
 	 * @param string $title Title of the table
 	 * @param string|null $emoji Emoji for the table
@@ -84,6 +74,7 @@ class ApiTablesController extends AOCSController {
 	 *
 	 * 200: Tables returned
 	 */
+	#[NoAdminRequired]
 	public function create(string $title, ?string $emoji, string $template = 'custom'): DataResponse {
 		try {
 			return new DataResponse($this->service->create($title, $template, $emoji)->jsonSerialize());
@@ -95,9 +86,6 @@ class ApiTablesController extends AOCSController {
 	/**
 	 * [api v2] Update tables properties
 	 *
-	 * @NoAdminRequired
-	 *
-	 * @param int $id Table ID
 	 * @param string|null $title New table title
 	 * @param string|null $emoji New table emoji
 	 * @param bool $archived whether the table is archived
@@ -106,41 +94,36 @@ class ApiTablesController extends AOCSController {
 	 * 200: Tables returned
 	 * 403: No permissions
 	 * 404: Not found
+	 *
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
 	 */
-	public function update(int $id, ?string $title = null, ?string $emoji = null, ?bool $archived = null): DataResponse {
-		try {
-			return new DataResponse($this->service->update($id, $title, $emoji, $archived, $this->userId)->jsonSerialize());
-		} catch (PermissionError $e) {
-			return $this->handlePermissionError($e);
-		} catch (InternalError $e) {
-			return $this->handleError($e);
-		} catch (NotFoundError $e) {
-			return $this->handleNotFoundError($e);
-		}
+	#[NoAdminRequired]
+	#[RequireTable(enhance: true)]
+	public function update(?string $title = null, ?string $emoji = null, ?bool $archived = null): DataResponse {
+		// TODO: service class to accept Table instead of ID
+		return new DataResponse($this->service->update($this->getTable()->getId(), $title, $emoji, $archived, $this->userId)->jsonSerialize());
 	}
 
 	/**
 	 * [api v2] Delete a table
 	 *
-	 * @NoAdminRequired
-	 *
-	 * @param int $id Table ID
 	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Deleted table returned
 	 * 403: No permissions
 	 * 404: Not found
+	 *
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
 	 */
-	public function destroy(int $id): DataResponse {
-		try {
-			return new DataResponse($this->service->delete($id)->jsonSerialize());
-		} catch (PermissionError $e) {
-			return $this->handlePermissionError($e);
-		} catch (InternalError $e) {
-			return $this->handleError($e);
-		} catch (NotFoundError $e) {
-			return $this->handleNotFoundError($e);
-		}
+	#[NoAdminRequired]
+	#[RequireTable(enhance: true)]
+	public function destroy(): DataResponse {
+		// TODO: service class to accept Table instead of ID
+		return new DataResponse($this->service->delete($this->getTable()->getId())->jsonSerialize());
 	}
 
 	/**
@@ -150,7 +133,6 @@ class ApiTablesController extends AOCSController {
 	 *
 	 * @NoAdminRequired
 	 *
-	 * @param int $id Table ID
 	 * @param string $newOwnerUserId New user ID
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
@@ -158,16 +140,15 @@ class ApiTablesController extends AOCSController {
 	 * 200: Ownership changed
 	 * 403: No permissions
 	 * 404: Not found
+	 *
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
 	 */
-	public function transfer(int $id, string $newOwnerUserId): DataResponse {
-		try {
-			return new DataResponse($this->service->setOwner($id, $newOwnerUserId)->jsonSerialize());
-		} catch (PermissionError $e) {
-			return $this->handlePermissionError($e);
-		} catch (InternalError $e) {
-			return $this->handleError($e);
-		} catch (NotFoundError $e) {
-			return $this->handleNotFoundError($e);
-		}
+	#[NoAdminRequired]
+	#[RequireTable(enhance: true)]
+	public function transfer(string $newOwnerUserId): DataResponse {
+		// TODO: service class to accept Table instead of ID
+		return new DataResponse($this->service->setOwner($this->getTable()->getId(), $newOwnerUserId)->jsonSerialize());
 	}
 }
