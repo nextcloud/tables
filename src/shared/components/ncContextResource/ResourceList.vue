@@ -8,7 +8,8 @@
 			<div v-for="resource in getResources" :key="resource.key" class="row">
 				<div class="fix-col-2">
 					<div style="display:flex; align-items: center;">
-						{{ resource.emoji }} &nbsp; {{ resource.title }} </div>
+						{{ resource.emoji }} &nbsp; {{ resource.title }}
+					</div>
 				</div>
 				<div class="fix-col-2" style="justify-content: end;">
 					<NcActionButton :close-after-click="true" icon="icon-delete" @click="actionDelete(resource)">

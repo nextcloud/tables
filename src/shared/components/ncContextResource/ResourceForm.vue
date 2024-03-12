@@ -116,7 +116,7 @@ export default {
 				title: element.title,
 				emoji: element.emoji,
 				key: keyPrefix + element.id,
-				nodeType: nodeType,
+				nodeType,
 				id: (element.id).toString(),
 				ownerDisplayName: element.ownerDisplayName,
 				owner: element.ownership,
