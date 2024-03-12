@@ -6,7 +6,7 @@
 		<NcSelect style="width: 100%;" :loading="loading" :options="options" :clear-on-select="true"
 			:hide-selected="true" :placeholder="t('tables', 'Select a table or view')" :searchable="true"
 			:get-option-key="(option) => option.key" label="title"
-			:aria-label-combobox="t('tables', 'Select a table or view')" :user-select="true" :preselect-first="true"
+			:aria-label-combobox="t('tables', 'Select a table or view')" :preselect-first="true"
 			:preserve-search="true" @search="asyncFind" @input="addResource">
 			<template #no-options>
 				{{ t('tables', 'No recommendations. Start typing.') }}

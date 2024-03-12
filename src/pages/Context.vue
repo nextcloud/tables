@@ -13,12 +13,12 @@
 
 			<div class="resources">
 				<div v-for="resource in contextResources" :key="resource.key">
-					<div v-if="!resource.isView">
+					<div v-if="!resource.isView" class="resource">
 						<TableWrapper :table="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
 							:view-setting="viewSetting" @create-column="createColumn(false, resource)"
 							@import="openImportModal(resource, false)" @download-csv="downloadCSV(resource, false)" />
 					</div>
-					<div v-else-if="resource.isView">
+					<div v-else-if="resource.isView" class="resource">
 						<CustomView :view="resource" :columns="columns[resource.key]" :rows="rows[resource.key]"
 							:view-setting="viewSetting" @create-column="createColumn(true, resource)"
 							@import="openImportModal(resource, true)" @download-csv="downloadCSV(resource, true)" />
@@ -181,9 +181,9 @@ export default {
 
 <style scoped lang="scss">
 .content {
-	margin: 50px;
+	margin: 50px 50px 0;
 }
-.resource, content {
-	padding: 30px 0;
+.resource {
+	margin: 40px 0;
 }
 </style>
