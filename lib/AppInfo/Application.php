@@ -9,8 +9,6 @@ use OCA\Tables\Listener\AnalyticsDatasourceListener;
 use OCA\Tables\Listener\LoadAdditionalListener;
 use OCA\Tables\Listener\TablesReferenceListener;
 use OCA\Tables\Listener\UserDeletedListener;
-use OCA\Tables\Reference\ContentReferenceProvider;
-use OCA\Tables\Reference\LegacyReferenceProvider;
 use OCA\Tables\Reference\ReferenceProvider;
 use OCA\Tables\Search\SearchTablesProvider;
 use OCP\AppFramework\App;
@@ -19,12 +17,7 @@ use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\Collaboration\Reference\RenderReferenceEvent;
 use OCP\Collaboration\Resources\LoadAdditionalScriptsEvent;
-use OCP\IConfig;
-use OCP\Server;
 use OCP\User\Events\BeforeUserDeletedEvent;
-use Psr\Container\ContainerExceptionInterface;
-
-use Psr\Container\NotFoundExceptionInterface;
 
 class Application extends App implements IBootstrap {
 	public const APP_ID = 'tables';
@@ -52,17 +45,7 @@ class Application extends App implements IBootstrap {
 
 		$context->registerSearchProvider(SearchTablesProvider::class);
 
-		try {
-			/** @var IConfig $config */
-			$config = Server::get(IConfig::class);
-			if (version_compare($config->getSystemValueString('version', '0.0.0'), '26.0.0', '<')) {
-				$context->registerReferenceProvider(LegacyReferenceProvider::class);
-			} else {
-				$context->registerReferenceProvider(ReferenceProvider::class);
-			}
-			$context->registerReferenceProvider(ContentReferenceProvider::class);
-		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
-		}
+		$context->registerReferenceProvider(ReferenceProvider::class);
 
 		$context->registerCapability(Capabilities::class);
 	}
