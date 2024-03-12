@@ -128,7 +128,7 @@ export default new Vuex.Store({
 			try {
 				res = await axios.post(generateOcsUrl('/apps/tables/api/2/contexts'), data)
 			} catch (e) {
-				displayError(e, t('tables', 'Could not insert context.'))
+				displayError(e, t('tables', 'Could not insert application.'))
 				return false
 			}
 			const contexts = state.contexts
@@ -345,7 +345,7 @@ export default new Vuex.Store({
 			try {
 				res = await axios.put(generateOcsUrl('/apps/tables/api/2/contexts/' + id), data)
 			} catch (e) {
-				displayError(e, t('tables', 'Could not update context.'))
+				displayError(e, t('tables', 'Could not update application.'))
 				return false
 			}
 
@@ -378,8 +378,8 @@ export default new Vuex.Store({
 				const res = await axios.get(generateOcsUrl('/apps/tables/api/2/contexts'))
 				commit('setContexts', res.data.ocs.data)
 			} catch (e) {
-				displayError(e, t('tables', 'Could not load contexts.'))
-				showError(t('tables', 'Could not fetch contexts'))
+				displayError(e, t('tables', 'Could not load applications.'))
+				showError(t('tables', 'Could not fetch applications'))
 			}
 			commit('setContextsLoading', false)
 			return true
@@ -390,8 +390,8 @@ export default new Vuex.Store({
 				const res = await axios.get(generateOcsUrl('/apps/tables/api/2/contexts/' + id))
 				commit('setContext', res.data.ocs.data)
 			} catch (e) {
-				displayError(e, t('tables', 'Could not load context.'))
-				showError(t('tables', 'Could not fetch context'))
+				displayError(e, t('tables', 'Could not load application.'))
+				showError(t('tables', 'Could not fetch application'))
 			}
 			return true
 		},
