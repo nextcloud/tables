@@ -5,7 +5,6 @@ namespace OCA\Tables\Middleware;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\PermissionsService;
-use OCP\AppFramework\Controller;
 use OCP\AppFramework\Middleware;
 use OCP\AppFramework\Utility\IControllerMethodReflector;
 use OCP\IRequest;
@@ -33,7 +32,9 @@ class PermissionMiddleware extends Middleware {
 	 * @throws PermissionError
 	 * @throws InternalError
 	 */
-	public function beforeController(Controller $controller, string $methodName): void {
+	public function beforeController($controller, $methodName): void {
+		// we can have type hinting in the signature only after dropping NC26 – calling parent to enforce on newer releases
+		parent::beforeController($controller, $methodName);
 		$this->assertCanManageNode();
 		$this->assertCanManageContext();
 	}
