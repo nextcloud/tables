@@ -36,7 +36,7 @@ jobs:
           files: "src/types/openapi/openapi*.ts"
 
       - name: Read package.json node and npm engines version
-        if: steps.check_composer.outputs.files_exists == 'true'
+        if: steps.check_typescript_openapi.outputs.files_exists == 'true'
         uses: skjnldsv/read-package-engines-version-actions@8205673bab74a63eb9b8093402fd9e0e018663a1 # v2.2
         id: versions
         # Continue if no package.json
