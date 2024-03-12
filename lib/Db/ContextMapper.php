@@ -6,8 +6,6 @@ namespace OCA\Tables\Db;
 
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Helper\UserHelper;
-use OCP\AppFramework\Db\DoesNotExistException;
-use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
