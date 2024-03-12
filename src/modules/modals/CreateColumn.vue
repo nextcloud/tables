@@ -212,6 +212,11 @@ export default {
 		combinedType() {
 			this.reset(false, false)
 		},
+		showModal() {
+			this.$nextTick(() => {
+				this.$el.querySelector('input')?.focus()
+			})
+		},
 	},
 	methods: {
 		snakeToCamel(str) {
