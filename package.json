@@ -18,6 +18,8 @@
     "dev": "NODE_ENV=development webpack --progress --config webpack.js",
     "watch": "NODE_ENV=development webpack --progress --watch --config webpack.js",
     "serve": "NODE_ENV=development webpack serve --progress --config webpack.js",
+    "typescript:check": "tsc --noEmit",
+    "typescript:generate": "npx openapi-typescript \"./openapi*.json\" --immutable -t -o src/types/openapi/",
     "lint": "eslint --ext .js,.vue src",
     "lint:fix": "eslint --ext .js,.vue src --fix",
     "stylelint": "stylelint 'css/*.css' 'css/*.scss' 'src/**/*.scss' 'src/**/*.vue'",
@@ -62,6 +64,7 @@
     "@nextcloud/stylelint-config": "^2.4.0",
     "@nextcloud/webpack-vue-config": "^6.0.1",
     "cypress": "^13.6.4",
-    "cypress-downloadfile": "^1.2.3"
+    "cypress-downloadfile": "^1.2.3",
+    "openapi-typescript": "^6.7.4"
   }
 }
