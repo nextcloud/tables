@@ -11,6 +11,16 @@
 			<template #no-options>
 				{{ t('tables', 'No recommendations. Start typing.') }}
 			</template>
+			<template #option="props">
+				<SearchAndSelectOption
+					:label="props.label"
+					:emoji="props.emoji"
+					:owner="props.owner"
+					:owner-display-name="props.ownerDisplayName"
+					:rows-count="props.rowsCount"
+					:type="props.type"
+					:subline="props.subline" />
+			</template>
 			<template #noResult>
 				{{ noResultText }}
 			</template>
@@ -23,11 +33,13 @@ import debounce from 'debounce'
 import { NcSelect } from '@nextcloud/vue'
 import { mapState } from 'vuex'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../../../shared/constants.js'
+import SearchAndSelectOption from '../../../views/partials/SearchAndSelectOption.vue'
 
 export default {
 	name: 'ResourceForm',
 	components: {
 		NcSelect,
+		SearchAndSelectOption,
 	},
 
 	props: {
@@ -40,7 +52,7 @@ export default {
 	data() {
 		return {
 			query: '',
-			value: '',
+			value: null,
 			loading: false,
 			minSearchStringLength: 1,
 			maxAutocompleteResults: 20,
@@ -88,28 +100,33 @@ export default {
 			let filteredTables = this.tables.filter((table) => table.title.toLowerCase().includes(searchTerm.toLowerCase())
 				&& !this.resources.find(t => t.nodeType === NODE_TYPE_TABLE && parseInt(t.id) === parseInt(table.id)))
 			filteredTables = filteredTables.map(table => {
-				return {
-					title: table.title,
-					emoji: table.emoji,
-					key: 'table-' + table.id,
-					nodeType: NODE_TYPE_TABLE,
-					id: (table.id).toString(),
-				}
+				return this.formatElementData(table, NODE_TYPE_TABLE, 'table-')
 			})
 			let filteredViews = this.views.filter((view) => view.title.toLowerCase().includes(searchTerm.toLowerCase())
 				&& !this.resources.find(v => v.nodeType === NODE_TYPE_VIEW && parseInt(v.id) === parseInt(view.id)))
 			filteredViews = filteredViews.map(view => {
-				return {
-					title: view.title,
-					emoji: view.emoji,
-					key: 'view-' + view.id,
-					nodeType: NODE_TYPE_VIEW,
-					id: (view.id).toString(),
-				}
+				return this.formatElementData(view, NODE_TYPE_VIEW, 'view-')
 			})
 			this.loading = false
 			this.suggestions = [...filteredTables, ...filteredViews].sort(this.sortByTitle)
 		},
+
+		formatElementData(element, nodeType, keyPrefix) {
+			return {
+				title: element.title,
+				emoji: element.emoji,
+				key: keyPrefix + element.id,
+				nodeType: nodeType,
+				id: (element.id).toString(),
+				ownerDisplayName: element.ownerDisplayName,
+				owner: element.ownership,
+				rowsCount: element.rowsCount,
+				type: element.type,
+				label: element.title,
+				subline: '',
+			}
+		},
+
 		sortByTitle(a, b) {
 			if (a.title.toLowerCase() < b.title.toLowerCase()) return -1
 			if (a.title.toLowerCase() > b.title.toLowerCase()) return 1
