@@ -172,6 +172,7 @@ class Api1Controller extends ApiController {
 	 * @param int $tableId Table ID
 	 * @param string|null $title New table title
 	 * @param string|null $emoji New table emoji
+	 * @param bool $archived Whether the table is archived
 	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
