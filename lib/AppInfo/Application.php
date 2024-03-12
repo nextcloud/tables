@@ -9,6 +9,7 @@ use OCA\Tables\Listener\AnalyticsDatasourceListener;
 use OCA\Tables\Listener\LoadAdditionalListener;
 use OCA\Tables\Listener\TablesReferenceListener;
 use OCA\Tables\Listener\UserDeletedListener;
+use OCA\Tables\Middleware\PermissionMiddleware;
 use OCA\Tables\Reference\ContentReferenceProvider;
 use OCA\Tables\Reference\LegacyReferenceProvider;
 use OCA\Tables\Reference\ReferenceProvider;
@@ -31,6 +32,8 @@ class Application extends App implements IBootstrap {
 
 	public const NODE_TYPE_TABLE = 0;
 	public const NODE_TYPE_VIEW = 1;
+
+	public const OWNER_TYPE_USER = 0;
 
 	public function __construct() {
 		parent::__construct(self::APP_ID);
@@ -65,6 +68,8 @@ class Application extends App implements IBootstrap {
 		}
 
 		$context->registerCapability(Capabilities::class);
+
+		$context->registerMiddleware(PermissionMiddleware::class);
 	}
 
 	public function boot(IBootContext $context): void {

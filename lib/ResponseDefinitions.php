@@ -128,6 +128,15 @@ namespace OCA\Tables;
  *  errors_parsing_count: int,
  *  errors_count: int,
  * }
+ *
+ * @psalm-type TablesContext = array{
+ *   id: int,
+ *   name: string,
+ *   iconName: string,
+ *   description: string,
+ *   owner: string,
+ *   ownerType: int,
+ * }
  */
 class ResponseDefinitions {
 }

@@ -36,6 +36,7 @@
 				<referencedClass name="Doctrine\DBAL\Platforms\PostgreSQL94Platform" />
 				<referencedClass name="Doctrine\DBAL\Schema\Table" />
 				<referencedClass name="Doctrine\DBAL\Types\Types" />
+				<referencedClass name="OC\Core\Command\Base" />
 			</errorLevel>
 		</UndefinedClass>
 		<UndefinedDocblockClass>
