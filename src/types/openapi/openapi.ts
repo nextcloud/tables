@@ -205,6 +205,8 @@ export type paths = {
     get: operations["context-show"];
     /** [api v2] Update an existing context and return it */
     put: operations["context-update"];
+    /** [api v2] Delete an existing context and return it */
+    delete: operations["context-destroy"];
   };
   "/ocs/v2.php/apps/tables/api/2/contexts/{contextId}/transfer": {
     /** [api v2] Transfer the ownership of a context and return it */
@@ -3116,6 +3118,57 @@ export type operations = {
         /** @description provide this parameter to set a new list of nodes. */
         nodes?: string | null;
       };
+      header: {
+        /** @description Required to be true for the API request to pass */
+        "OCS-APIRequest": boolean;
+      };
+      path: {
+        /** @description ID of the context */
+        contextId: number;
+      };
+    };
+    responses: {
+      /** @description returning the full context information */
+      200: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: components["schemas"]["Context"];
+            };
+          };
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+      500: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+  /** [api v2] Delete an existing context and return it */
+  "context-destroy": {
+    parameters: {
       header: {
         /** @description Required to be true for the API request to pass */
         "OCS-APIRequest": boolean;
