@@ -207,6 +207,15 @@ class ContextService {
 	}
 
 	/**
+	 * @throws NotFoundError
+	 * @throws Exception
+	 */
+	public function delete(int $contextId, string $userId): Context {
+		$context = $this->contextMapper->findById($contextId, $userId);
+		return $this->contextMapper->delete($context);
+	}
+
+	/**
 	 * @throws MultipleObjectsReturnedException
 	 * @throws DoesNotExistException
 	 * @throws Exception
