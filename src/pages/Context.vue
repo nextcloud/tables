@@ -183,6 +183,7 @@ export default {
 .content {
 	margin: 50px 50px 0;
 }
+
 .resource {
 	margin: 40px 0;
 }
