@@ -245,6 +245,7 @@ OC.L10N.register(
     "Change owner" : "Cambiar propietario",
     "Create missing columns" : "Crear las columnas que faltan",
     "Import successful" : "Importación exitosa",
+    "Close" : "Cerrar",
     "Select from Files" : "Seleccionar desde Archivos",
     "Upload from device" : "Subir desde dispositivo",
     "⚠️ You don't have the permission to create columns." : "⚠️ No tienes permiso para crear columnas.",

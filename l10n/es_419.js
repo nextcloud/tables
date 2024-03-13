@@ -37,6 +37,7 @@ OC.L10N.register(
     "Cancel" : "Cancelar",
     "Delete" : "Borrar",
     "Owner" : "Dueño",
+    "Close" : "Cerrar",
     "Select from Files" : "Seleccionar desde Archivos",
     "Please select a file." : "Por favor selecciona un archivo.",
     "Result" : "Resultado",

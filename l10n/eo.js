@@ -45,6 +45,7 @@ OC.L10N.register(
     "Cancel" : "Nuligi",
     "Delete" : "Forigi",
     "Owner" : "Posedanto",
+    "Close" : "Malfermi",
     "Select from Files" : "Elekti el dosieroj",
     "Please select a file." : "Bonvolu elekti dosieron.",
     "Sort" : "Ordigi",
