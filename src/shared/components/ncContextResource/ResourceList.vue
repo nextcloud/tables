@@ -70,9 +70,9 @@ export default {
 
 <style lang="scss" scoped>
 .resource-list li {
-    display: flex;
-    justify-content: space-between;
-    line-height: 44px;
+	display: flex;
+	justify-content: space-between;
+	line-height: 44px;
 }
 
 .resource-label {
