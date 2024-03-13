@@ -138,6 +138,29 @@ class ContextController extends AOCSController {
 	}
 
 	/**
+	 * [api v2] Delete an existing context and return it
+	 *
+	 * @param int $contextId ID of the context
+	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 *
+	 * 200: returning the full context information
+	 * 403: No permissions
+	 * 404: Not found
+	 *
+	 * @NoAdminRequired
+	 * @CanManageContext
+	 */
+	public function destroy(int $contextId): DataResponse {
+		try {
+			return new DataResponse($this->contextService->delete($contextId, $this->userId)->jsonSerialize());
+		} catch (Exception $e) {
+			return $this->handleError($e);
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		}
+	}
+
+	/**
 	 * [api v2] Transfer the ownership of a context and return it
 	 *
 	 * @param int $contextId ID of the context
