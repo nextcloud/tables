@@ -56,22 +56,30 @@ class V1Api {
 		}
 		$data[] = $header;
 
-		// now add the rows
-		foreach ($rows as $row) {
-			$rowData = $row->getData();
-			$line = [];
-			foreach ($columns as $column) {
-				$value = '';
-				foreach ($rowData as $datum) {
-					if ($datum['columnId'] === $column->getId()) {
-						$value = $datum['value'];
-					}
-				}
-				$line[] = $value;
-			}
-			$data[] = $line;
-		}
-
-		return $data;
+	        // now add the rows
+	        foreach ($rows as $row) {
+	            $rowData = $row->getDataArray();
+	            $line = [];
+	            foreach ($columns as $column) {
+	                $value = '';
+	                foreach ($rowData as $datum) {
+	                    if ($datum['columnId'] === $column->getId()) {
+	                        // if column type selection, the corresponding labels need to be fetched
+	                        if ($column->getType() === 'selection') {
+	                            foreach ($column->getSelectionOptionsArray() as $option) {
+	                                if ($option['id'] === $datum['value']) {
+	                                    $value = $option['label'];
+	                                }
+	                            }
+	                        } else {
+	                            $value = $datum['value'];
+	                        }
+	                    }
+	                }
+	                $line[] = $value;
+	            }
+	            $data[] = $line;
+	        }
+	        return $data;
 	}
 }
