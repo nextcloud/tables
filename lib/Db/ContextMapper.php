@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Db;
 
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\QBMapper;
@@ -136,6 +137,42 @@ class ContextMapper extends QBMapper {
 	 */
 	public function findAll(?string $userId = null): array {
 		$qb = $this->getFindContextBaseQuery($userId);
+
+		$result = $qb->executeQuery();
+		$r = $result->fetchAll();
+
+		$contextIds = [];
+		foreach ($r as $row) {
+			$contextIds[$row['id']] = 1;
+		}
+		$contextIds = array_keys($contextIds);
+		unset($row);
+
+		$resultEntities = [];
+		foreach ($contextIds as $contextId) {
+			$workArray = [];
+			foreach ($r as $row) {
+				if ($row['id'] === $contextId) {
+					$workArray[] = $row;
+				}
+			}
+			$resultEntities[] = $this->formatResultRows($workArray, $userId);
+		}
+
+		return $resultEntities;
+	}
+
+	public function findForNavBar(string $userId): array {
+		$qb = $this->getFindContextBaseQuery($userId);
+		$qb->andWhere($qb->expr()->andX(
+			// default
+			$qb->expr()->gt('n.display_mode', $qb->createNamedParameter(Application::NAV_ENTRY_MODE_HIDDEN, IQueryBuilder::PARAM_INT)),
+			// user override
+			$qb->expr()->orX(
+				$qb->expr()->gt('n2.display_mode', $qb->createNamedParameter(Application::NAV_ENTRY_MODE_HIDDEN, IQueryBuilder::PARAM_INT)),
+				$qb->expr()->isNull('n2.display_mode'),
+			)
+		));
 
 		$result = $qb->executeQuery();
 		$r = $result->fetchAll();

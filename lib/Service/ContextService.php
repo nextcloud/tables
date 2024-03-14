@@ -77,6 +77,10 @@ class ContextService {
 		return $this->contextMapper->findAll($userId);
 	}
 
+	public function findForNavigation(string $userId): array {
+		return $this->contextMapper->findForNavBar($userId);
+	}
+
 	/**
 	 * @throws Exception
 	 * @throws InternalError

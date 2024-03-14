@@ -6,6 +6,7 @@ use Exception;
 use OCA\Analytics\Datasource\DatasourceEvent;
 use OCA\Tables\Capabilities;
 use OCA\Tables\Listener\AnalyticsDatasourceListener;
+use OCA\Tables\Listener\BeforeTemplateRenderedListener;
 use OCA\Tables\Listener\LoadAdditionalListener;
 use OCA\Tables\Listener\TablesReferenceListener;
 use OCA\Tables\Listener\UserDeletedListener;
@@ -16,6 +17,7 @@ use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
+use OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent;
 use OCP\Collaboration\Reference\RenderReferenceEvent;
 use OCP\Collaboration\Resources\LoadAdditionalScriptsEvent;
 use OCP\User\Events\BeforeUserDeletedEvent;
@@ -27,6 +29,10 @@ class Application extends App implements IBootstrap {
 	public const NODE_TYPE_VIEW = 1;
 
 	public const OWNER_TYPE_USER = 0;
+
+	public const NAV_ENTRY_MODE_HIDDEN = 0;
+	public const NAV_ENTRY_MODE_RECIPIENTS = 1;
+	public const NAV_ENTRY_MODE_ALL = 2;
 
 	public function __construct() {
 		parent::__construct(self::APP_ID);
@@ -43,7 +49,7 @@ class Application extends App implements IBootstrap {
 		$context->registerEventListener(BeforeUserDeletedEvent::class, UserDeletedListener::class);
 		$context->registerEventListener(DatasourceEvent::class, AnalyticsDatasourceListener::class);
 		$context->registerEventListener(RenderReferenceEvent::class, TablesReferenceListener::class);
-
+		$context->registerEventListener(BeforeTemplateRenderedEvent::class, BeforeTemplateRenderedListener::class);
 		$context->registerEventListener(LoadAdditionalScriptsEvent::class, LoadAdditionalListener::class);
 
 		$context->registerSearchProvider(SearchTablesProvider::class);
