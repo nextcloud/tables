@@ -100,13 +100,24 @@ export default {
 	}
 
 	#app-content-vue table {
-		table-layout: fixed;
+		table-layout: auto !important;
 	}
 
 	#app-content-vue table td, #app-content-vue table th {
 		white-space: normal !important;
 		word-break: normal !important;
 		word-wrap: break-word !important;
+  		width: auto !important;
+	}
+
+	#app-content-vue table th .menu {
+		display: none !important;
+	}
+
+	#app-content-vue table td .tiptap-reader-cell {
+		max-height: fit-content;
+		min-width: 200px;
+		max-width: fit-content;
 	}
 
 	#app-content-vue table tr > th.sticky:first-child,
