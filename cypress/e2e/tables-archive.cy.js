@@ -11,6 +11,7 @@ describe('Archive tables/views', () => {
   beforeEach(function() {
     cy.login(localUser)
     cy.visit('apps/tables')
+    cy.wait(1000)
   })
 
   it('can archive tables', () => {
