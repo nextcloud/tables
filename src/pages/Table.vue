@@ -82,6 +82,10 @@ export default {
 		height: auto;
 	}
 
+	#content-vue .row.first-row {
+		padding-left: 0px;
+	}
+
 	.main-table-view, .main-view-view {
 		width: auto;
 		min-width: 0;
@@ -100,7 +104,7 @@ export default {
 	}
 
 	#app-content-vue table {
-		table-layout: auto !important;
+		table-layout: fixed;
 	}
 
 	#app-content-vue table td, #app-content-vue table th {
@@ -110,13 +114,16 @@ export default {
   		width: auto !important;
 	}
 
+	#app-content-vue table th .clickable {
+		overflow-wrap: anywhere;
+	}
+	
 	#app-content-vue table th .menu {
 		display: none !important;
 	}
 
 	#app-content-vue table td .tiptap-reader-cell {
 		max-height: fit-content;
-		min-width: 200px;
 		max-width: fit-content;
 	}
 
