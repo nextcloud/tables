@@ -109,6 +109,8 @@ export default {
 		word-wrap: break-word !important;
 	}
 
+	#app-content-vue table tr > th.sticky:first-child,
+	#app-content-vue table tr > td.sticky:first-child,
 	#app-content-vue table tr > th.sticky:last-child,
 	#app-content-vue table tr > td.sticky:last-child {
 		display: none !important;
