@@ -111,13 +111,13 @@ export default {
 		white-space: normal !important;
 		word-break: normal !important;
 		word-wrap: break-word !important;
-  		width: auto !important;
+		width: auto !important;
 	}
 
 	#app-content-vue table th .clickable {
 		overflow-wrap: anywhere;
 	}
-	
+
 	#app-content-vue table th .menu {
 		display: none !important;
 	}
