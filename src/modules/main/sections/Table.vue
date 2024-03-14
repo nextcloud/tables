@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<ElementDescription :active-element="table" :view-setting.sync="localViewSetting" />
+		<div id="description-editor" ref="textDiv" />
 		<Dashboard v-if="hasViews"
 			:table="table"
 			@create-column="$emit('create-column')"
@@ -55,6 +56,7 @@ export default {
 	data() {
 		return {
 			localViewSetting: this.viewSetting,
+			description: '',
 		}
 	},
 	computed: {
@@ -71,9 +73,50 @@ export default {
 			this.localViewSetting = this.viewSetting
 		},
 	},
+	mounted() {
+		this.setupEditor()
+	},
+	async beforeDestroy() {
+		await this.destroyEditor()
+	},
 	methods: {
 		createView() {
 			emit('tables:view:create', { tableId: this.table.id, viewSetting: this.viewSetting.length > 0 ? this.viewSetting : this.localViewSetting })
+		},
+		async setupEditor() {
+			await this.destroyEditor()
+			this.descriptionLastEdited = 0
+			this.description = this.table.description
+			this.editor = await window.OCA.Text.createEditor({
+				el: this.$refs.textDiv,
+				content: this.table.description,
+				onUpdate: ({ markdown }) => {
+					if (this.description === markdown) {
+						this.descriptionLastEdit = 0
+						return
+					}
+					this.description = markdown
+					this.updateDescription()
+				},
+			})
+		},
+		async saveDescription() {
+			if (this.descriptionLastEdited !== 0) return
+			this.descriptionSaving = true
+			await this.$store.dispatch('updateTable', { id: this.table.id, data: { description: this.description } })
+			this.descriptionLastEdit = 0
+			this.descriptionSaving = false
+		},
+		updateDescription() {
+			this.descriptionLastEdit = Date.now()
+			clearTimeout(this.descriptionSaveTimeout)
+			this.descriptionSaveTimeout = setTimeout(async () => {
+				await this.saveDescription()
+			}, 2500)
+		},
+		async destroyEditor() {
+			await this.saveDescription()
+			this?.editor?.destroy()
 		},
 	},
 }

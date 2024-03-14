@@ -266,7 +266,7 @@ export default new Vuex.Store({
 			let res = null
 
 			try {
-				res = await axios.put(generateUrl('/apps/tables/table/' + id), data)
+				res = (await axios.put(generateOcsUrl('/apps/tables/api/2/tables/' + id), data)).data.ocs
 			} catch (e) {
 				displayError(e, t('tables', 'Could not update table.'))
 				return false
@@ -276,7 +276,7 @@ export default new Vuex.Store({
 			const tables = state.tables
 			const index = tables.findIndex(t => t.id === table.id)
 			tables[index] = table
-			commit('setTables', [...tables])
+			commit('setTable', table)
 			return true
 		},
 		async favoriteView({ state, commit, dispatch }, { id }) {
