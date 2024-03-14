@@ -11,13 +11,17 @@
 					{{ t('tables', 'Title') }}
 				</div>
 				<div class="col-4" style="display: inline-flex;">
-					<!-- TODO replace with Context's icon picker -->
-					<NcEmojiPicker :close-on-select="true" @select="setIcon">
-						<NcButton type="tertiary" :aria-label="t('tables', 'Select icon for the application')"
-							:title="t('tables', 'Select icon')" @click.prevent>
-							{{ icon }}
+					<NcIconPicker :close-on-select="true" @select="setIcon">
+						<NcButton
+							type="tertiary"
+							:aria-label="t('tables', 'Select icon for the application')"
+							:title="t('tables', 'Select icon')"
+							@click.prevent>
+							<template #icon>
+								<NcIconSvgWrapper :svg="icon.svg" />
+							</template>
 						</NcButton>
-					</NcEmojiPicker>
+					</NcIconPicker>
 					<input v-model="title" :class="{ missing: errorTitle }" type="text"
 						:placeholder="t('tables', 'Title of the new application')" @input="titleChangedManually">
 				</div>
@@ -47,19 +51,23 @@
 </template>
 
 <script>
-import { NcModal, NcEmojiPicker, NcButton } from '@nextcloud/vue'
+import { NcModal, NcButton, NcIconSvgWrapper } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
+import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'
+import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'
 
 export default {
 	name: 'CreateContext',
 	components: {
 		NcModal,
-		NcEmojiPicker,
+		NcIconPicker,
 		NcButton,
+		NcIconSvgWrapper,
 		NcContextResource,
 	},
+	mixins: [svgHelper],
 	props: {
 		showModal: {
 			type: Boolean,
@@ -69,7 +77,10 @@ export default {
 	data() {
 		return {
 			title: '',
-			icon: '😀',
+			icon: {
+				name: 'equalizer',
+				svg: null,
+			},
 			customIconChosen: false,
 			customTitleChosen: false,
 			errorTitle: false,
@@ -85,12 +96,17 @@ export default {
 			}
 		},
 	},
+	async mounted() {
+		await this.setIcon('equalizer')
+	},
 	methods: {
 		titleChangedManually() {
 			this.customTitleChosen = true
 		},
-		setIcon(icon) {
-			this.icon = icon
+		async setIcon(iconName) {
+			this.icon.name = iconName
+			this.icon.svg = await this.getContextIcon(iconName)
+
 			this.customIconChosen = true
 		},
 		actionCancel() {
@@ -119,7 +135,7 @@ export default {
 			})
 			const data = {
 				name: this.title,
-				iconName: this.icon,
+				iconName: this.icon.name,
 				description: this.description,
 				nodes: dataResources,
 			}
@@ -133,7 +149,7 @@ export default {
 		reset() {
 			this.title = ''
 			this.errorTitle = false
-			this.icon = '😀'
+			this.icon.name = 'equalizer'
 			this.customIconChosen = false
 			this.customTitleChosen = false
 		},

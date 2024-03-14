@@ -1,13 +1,10 @@
 <template>
 	<div>
-		<div class="resource-label">
-			{{ t('tables', 'Selected Resources') }}
-		</div>
 		<div v-if="loading" class="icon-loading" />
 		<ul v-if="getResources && getResources.length > 0" class="resource-list">
 			<div v-for="resource in getResources" :key="resource.key" class="row">
 				<div class="fix-col-2">
-					<div style="display:flex; align-items: center;">
+					<div style="display:flex; align-items: center; padding: 10px;">
 						{{ resource.emoji }} &nbsp; {{ resource.title }}
 					</div>
 				</div>
