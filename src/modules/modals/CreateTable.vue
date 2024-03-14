@@ -20,7 +20,8 @@
 							{{ icon }}
 						</NcButton>
 					</NcEmojiPicker>
-					<input v-model="title"
+					<input ref="titleInput"
+						v-model="title"
 						:class="{missing: errorTitle}"
 						type="text"
 						:placeholder="t('tables', 'Title of the new table')"
@@ -100,6 +101,7 @@ export default {
 		showModal() {
 			// every time when the modal opens chose a new emoji
 			this.loadEmoji()
+			this.$nextTick(() => this.$refs.titleInput.focus())
 		},
 	},
 	beforeMount() {

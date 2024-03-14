@@ -189,6 +189,7 @@ export default {
 				this.reset()
 				await this.loadTableColumnsFromBE()
 				this.open = true
+				this.$nextTick(() => this.$el.querySelector('input')?.focus())
 			}
 		},
 		open(value) {

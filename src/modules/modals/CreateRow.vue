@@ -88,6 +88,13 @@ export default {
 			return mandatoryFieldsEmpty
 		},
 	},
+	watch: {
+		showModal() {
+			this.$nextTick(() => {
+				this.$el.querySelector('input')?.focus()
+			})
+		},
+	},
 	methods: {
 		actionCancel() {
 			this.reset()
