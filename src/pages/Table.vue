@@ -43,4 +43,58 @@ export default {
 	width: max-content;
 	min-width: var(--app-content-width, 100%);
 }
+
+@page {
+	size: auto;
+	margin: 5mm;
+}
+
+@media print {
+	html, body {
+		background: var(--color-main-background, white) !important;
+	}
+
+	html {
+		overflow-y: scroll;
+	}
+
+	body {
+		position: absolute;
+	}
+
+	/* hide toast notifications for printing */
+	.toastify.dialogs {
+		display: none;
+	}
+
+	.app-navigation {
+		display: none !important;
+	}
+
+	#header {
+		display: none !important;
+	}
+
+	#content-vue {
+		display: block !important;
+		position: static;
+		overflow: auto;
+		height: auto;
+	}
+
+	.main-table-view {
+		width: auto;
+		min-width: 0;
+	}
+
+	.main-table-view table {
+		table-layout: fixed;
+	}
+
+	.main-table-view table td, table th{
+		white-space: normal !important;
+		word-break: normal !important;
+		word-wrap: break-word !important;
+	}
+}
 </style>
