@@ -43,4 +43,77 @@ export default {
 	width: max-content;
 	min-width: var(--app-content-width, 100%);
 }
+
+@page {
+	size: auto;
+	margin: 5mm;
+}
+
+@media print {
+	html, body {
+		background: var(--color-main-background, white) !important;
+	}
+
+	html {
+		overflow-y: scroll;
+	}
+
+	body {
+		position: absolute;
+	}
+
+	/* hide toast notifications for printing */
+	.toastify.dialogs {
+		display: none;
+	}
+
+	.app-navigation {
+		display: none !important;
+	}
+
+	#header {
+		display: none !important;
+	}
+
+	#content-vue {
+		display: block !important;
+		position: static;
+		overflow: auto;
+		height: auto;
+	}
+
+	.main-table-view, .main-view-view {
+		width: auto;
+		min-width: 0;
+	}
+
+	.table-dashboard {
+		display: none !important;
+	}
+
+	.row.space-T {
+		display: none !important;
+	}
+
+	#app-content-vue .options.row {
+		display: none !important;
+	}
+
+	#app-content-vue table {
+		table-layout: fixed;
+	}
+
+	#app-content-vue table td, #app-content-vue table th {
+		white-space: normal !important;
+		word-break: normal !important;
+		word-wrap: break-word !important;
+	}
+
+	#app-content-vue table tr > th.sticky:first-child,
+	#app-content-vue table tr > td.sticky:first-child,
+	#app-content-vue table tr > th.sticky:last-child,
+	#app-content-vue table tr > td.sticky:last-child {
+		display: none !important;
+	}
+}
 </style>
