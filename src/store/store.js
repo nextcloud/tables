@@ -106,7 +106,7 @@ export default new Vuex.Store({
 		},
 		setTable(state, table) {
 			const index = state.tables.findIndex(t => t.id === table.id)
-			state.tables[index] = table
+			state.tables.splice(index, 1, table)
 		},
 		setView(state, view) {
 			const index = state.views.findIndex(v => v.id === view.id)
@@ -262,11 +262,27 @@ export default new Vuex.Store({
 			}
 			return true
 		},
+		async updateTableProperty({ state, commit, dispatch }, { id, data, property }) {
+			let res = null
+
+			try {
+				res = (await axios.put(generateOcsUrl('/apps/tables/api/2/tables/' + id), data)).data.ocs
+			} catch (e) {
+				displayError(e, t('tables', 'Could not update table.'))
+				return false
+			}
+
+			const table = res.data
+			const tables = state.tables
+			const index = tables.findIndex(t => t.id === table.id)
+			Vue.set(state.tables[index], property, data[property])
+			return true
+		},
 		async updateTable({ state, commit, dispatch }, { id, data }) {
 			let res = null
 
 			try {
-				res = await axios.put(generateUrl('/apps/tables/table/' + id), data)
+				res = (await axios.put(generateOcsUrl('/apps/tables/api/2/tables/' + id), data)).data.ocs
 			} catch (e) {
 				displayError(e, t('tables', 'Could not update table.'))
 				return false
