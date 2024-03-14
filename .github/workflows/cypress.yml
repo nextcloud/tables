@@ -25,7 +25,7 @@ jobs:
       matrix:
         node-version: [ 16 ]
         databases: [ 'mysql' ]
-        server-versions: [ 'stable26', 'stable27', 'master' ]
+        server-versions: [ 'stable27', 'stable28', 'master' ]
         include:
           - php-versions: 8.1
 

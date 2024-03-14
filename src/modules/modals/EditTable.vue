@@ -67,7 +67,7 @@
 <script>
 import { NcModal, NcEmojiPicker, NcButton, NcUserBubble } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
-import '@nextcloud/dialogs/dist/index.css'
+import '@nextcloud/dialogs/style.css'
 import { mapGetters } from 'vuex'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import { emit } from '@nextcloud/event-bus'

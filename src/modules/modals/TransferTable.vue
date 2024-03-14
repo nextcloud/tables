@@ -26,7 +26,7 @@
 <script>
 import { NcModal, NcButton } from '@nextcloud/vue'
 import { showSuccess } from '@nextcloud/dialogs'
-import '@nextcloud/dialogs/dist/index.css'
+import '@nextcloud/dialogs/style.css'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import NcUserAndGroupPicker from '../../shared/components/ncUserAndGroupPicker/NcUserAndGroupPicker.vue'
 import { mapGetters } from 'vuex'

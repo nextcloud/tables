@@ -1,9 +1,9 @@
-/**
- * @copyright Copyright (c) 2018 John Molakvoæ <skjnldsv@protonmail.com>
+/*
+ * @copyright Copyright (c) 2024 Julius Härtl <jus@bitgrid.net>
  *
- * @author John Molakvoæ <skjnldsv@protonmail.com>
+ * @author Julius Härtl <jus@bitgrid.net>
  *
- * @license AGPL-3.0-or-later
+ * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -12,27 +12,18 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
  */
-import Vue from 'vue'
-import App from './App.vue'
-import Vuex from 'vuex'
-import store from './store/store.js'
-import router from './router.js'
-import VuePapaParse from 'vue-papa-parse'
 
-Vue.mixin({ methods: { t, n } })
-Vue.use(Vuex)
-Vue.use(VuePapaParse)
+import axios from '@nextcloud/axios'
+import { generateUrl } from '@nextcloud/router'
 
-export default new Vue({
-	el: '#content',
-	router,
-	store,
-	render: h => h(App),
-})
+import type { getTablesResponse } from '../types/index.ts'
+
+export const listTables = async (): Promise<getTablesResponse> => {
+	return axios.get(generateUrl('/apps/tables/table'))
+}

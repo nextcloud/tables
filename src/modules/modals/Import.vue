@@ -96,7 +96,7 @@
 
 <script>
 import { NcModal, NcButton, NcCheckboxRadioSwitch, NcEmptyContent, NcLoadingIcon } from '@nextcloud/vue'
-import { FilePicker, FilePickerType, showError, showWarning } from '@nextcloud/dialogs'
+import { getFilePickerBuilder, FilePickerType, showError, showWarning } from '@nextcloud/dialogs'
 import RowFormWrapper from '../../shared/components/ncTable/partials/rowTypePartials/RowFormWrapper.vue'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import IconFolder from 'vue-material-design-icons/Folder.vue'
@@ -200,6 +200,10 @@ export default {
 
 	methods: {
 		async actionCloseAndReload() {
+			if (!this?.activeElement) {
+				return
+			}
+
 			// reload data if active element was affected
 			if ((this.isView && this.isElementView && this.activeElement.tableId === this.element.tableId)
 			|| (this.isView && !this.isElementView && this.activeElement.tableId === this.element.id)
@@ -314,15 +318,12 @@ export default {
 			this.loading = false
 		},
 		pickFile() {
-			const filePicker = new FilePicker(
-				t('text', 'Select file for the import'),
-				false, // multiselect
-				this.mimeTypes, // mime filter
-				true, // modal
-				FilePickerType.Choose, // type
-				false, // directories
-				this.path, // path
-			)
+			const filePicker = getFilePickerBuilder(t('text', 'Select file for the import'))
+				.setMultiSelect(false)
+				.setMimeTypeFilter(this.mimeTypes)
+				.setType(FilePickerType.Choose)
+				.startAt(this.path)
+				.build()
 
 			filePicker.pick().then((file) => {
 				const client = OC.Files.getClient()
