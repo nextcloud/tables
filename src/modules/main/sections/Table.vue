@@ -1,7 +1,9 @@
 <template>
 	<div>
 		<ElementDescription :active-element="table" :view-setting.sync="localViewSetting" />
-		<div id="description-editor" ref="textDiv" />
+		<div class="description__editor">
+			<div id="description-editor" ref="textEditor" />
+		</div>
 		<Dashboard v-if="hasViews"
 			:table="table"
 			@create-column="$emit('create-column')"
@@ -21,6 +23,7 @@
 
 <script>
 import ElementDescription from './ElementDescription.vue'
+import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import Dashboard from './Dashboard.vue'
 import DataTable from './DataTable.vue'
 import { mapState } from 'vuex'
@@ -33,6 +36,7 @@ export default {
 		Dashboard,
 		DataTable,
 	},
+	mixins: [permissionsMixin],
 
 	props: {
 		table: {
@@ -88,8 +92,9 @@ export default {
 			this.descriptionLastEdited = 0
 			this.description = this.table.description
 			this.editor = await window.OCA.Text.createEditor({
-				el: this.$refs.textDiv,
+				el: this.$refs.textEditor,
 				content: this.table.description,
+				readOnly: !this.canManageElement(this.table),
 				onUpdate: ({ markdown }) => {
 					if (this.description === markdown) {
 						this.descriptionLastEdit = 0
@@ -121,3 +126,8 @@ export default {
 	},
 }
 </script>
+<style lang="scss" scoped>
+.description__editor :deep(.ProseMirror) {
+	padding-bottom: 0;
+}
+</style>
