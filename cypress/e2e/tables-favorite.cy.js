@@ -67,5 +67,23 @@ describe('Favorite tables/views', () => {
 
     cy.get('@testView').parent().parent().should('contain.text', 'Tutorial')
   })
-  
+
+  it('can (un)favorite views with favorited parent tables', () => {
+    cy.get('[data-cy="navigationViewItem"]').first().as('testView')
+    cy.get('[data-cy="navigationTableItem"]').first().as('tutorialTable')
+
+    cy.get('@testView').parent().parent().should('contain.text', 'Tutorial')
+    cy.get('@testView').find('[aria-haspopup="menu"]').click({ force: true })
+    cy.contains('Add to favorites').click({ force: true })
+
+    cy.get('@testView').parent().should('contain.text', 'Favorites')
+
+    cy.get('@tutorialTable').should('contain.text', 'Tutorial')
+    cy.get('@tutorialTable').find('[aria-haspopup="menu"]').first().click({ force: true })
+    cy.contains('Add to favorites').click({ force: true })
+
+    cy.get('@tutorialTable').parent().should('contain.text', 'Tables')
+    cy.get('@testView').parent().should('not.contain.text', 'Favorites')
+  })
+
 })

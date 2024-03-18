@@ -141,14 +141,22 @@ export default {
 			}).filter(view => view.title.toLowerCase().includes(this.filterString.toLowerCase()))
 		},
 		getSharedViews() {
-			const sharedTableIds = this.getFilteredTables.map(table => table.id)
-
 			return this.views.filter(view => {
-				return view.isShared && view.ownership !== getCurrentUser().uid && !sharedTableIds.includes(view.tableId)
+				return view.isShared && view.ownership !== getCurrentUser().uid
 			}).filter(view => view.title.toLowerCase().includes(this.filterString.toLowerCase()))
 		},
+		getFavoriteTables() {
+			return this.getAllNodes.filter(node => !node.tableId && node.favorite)
+		},
+		getFavoriteViews() {
+			return this.getAllNodes.filter(node => node.tableId && node.favorite)
+		},
 		getFavoriteNodes() {
-			return this.getAllNodes.filter(node => node.favorite)
+			const favoriteViews = this.getFavoriteViews.filter(view => {
+				return !this.getFavoriteTables.map(t => t.id).includes(view.tableId)
+			})
+
+			return [...this.getFavoriteTables, ...favoriteViews]
 		},
 		getArchivedTables() {
 			return this.getFilteredTables.filter(node => node.archived)
