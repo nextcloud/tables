@@ -91,6 +91,9 @@ export default {
 			await this.destroyEditor()
 			this.descriptionLastEdited = 0
 			this.description = this.table.description
+			if (this.$refs.textEditor === undefined) {
+				return
+			}
 			this.editor = await window.OCA.Text.createEditor({
 				el: this.$refs.textEditor,
 				content: this.table.description,
