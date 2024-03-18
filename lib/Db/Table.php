@@ -67,7 +67,7 @@ class Table extends Entity implements JsonSerializable {
 	protected ?int $columnsCount = 0;
 	protected ?array $views = null;
 	protected ?array $columns = null;
-	protected ?string $description = null;	
+	protected ?string $description = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');
