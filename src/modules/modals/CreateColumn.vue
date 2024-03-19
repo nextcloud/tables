@@ -1,6 +1,6 @@
 <template>
 	<NcModal v-if="showModal" size="large" @close="actionCancel">
-		<div class="modal__content">
+		<div class="modal__content create-column">
 			<div class="row">
 				<div class="col-4">
 					<h2>{{ t('tables', 'Create column') }}</h2>
@@ -142,6 +142,14 @@ export default {
 			type: Object,
 			default: null,
 		},
+		isCustomSave: {
+			type: Boolean,
+			default: false,
+		},
+		preset: {
+			type: Object,
+			default: null,
+		},
 	},
 	data() {
 		return {
@@ -211,6 +219,33 @@ export default {
 	watch: {
 		combinedType() {
 			this.reset(false, false)
+			if (this.preset) {
+				for (const key in this.preset) {
+					if (['type', 'subtype'].includes(key)) {
+						continue
+					}
+					if (Object.hasOwn(this.column, key)) {
+						this.column[key] = this.preset[key]
+					}
+				}
+			}
+		},
+		preset: {
+			handler() {
+				if (this.preset) {
+					const combinedType = this.preset.type + (this.preset.subtype ? `-${this.preset.subtype}` : '')
+					if (combinedType !== this.combinedType) {
+						this.combinedType = combinedType
+					} else {
+						for (const key in this.preset) {
+							if (Object.hasOwn(this.column, key)) {
+								this.column[key] = this.preset[key]
+							}
+						}
+					}
+				}
+			},
+			deep: true,
 		},
 		showModal() {
 			this.$nextTick(() => {
@@ -237,6 +272,12 @@ export default {
 				showInfo(t('tables', 'You need to select a type for the new column.'))
 				this.typeMissingError = true
 			} else {
+				this.$emit('save', this.prepareSubmitData())
+				if (this.isCustomSave) {
+					this.reset()
+					this.$emit('close')
+					return
+				}
 				await this.sendNewColumnToBE()
 				if (this.addNewAfterSave) {
 					this.reset(true, true, false)
@@ -250,42 +291,46 @@ export default {
 			this.reset()
 			this.$emit('close')
 		},
+		prepareSubmitData() {
+			const data = {
+				type: this.column.type,
+				subtype: this.column.subtype,
+				title: this.column.title,
+				description: this.column.description,
+				selectedViewIds: this.column.selectedViews.map(view => view.id),
+				mandatory: this.column.mandatory,
+				viewId: this.isView ? this.element.id : null,
+				tableId: !this.isView ? this.element.id : null,
+			}
+			if (this.combinedType === ColumnTypes.TextLine || this.combinedType === ColumnTypes.TextLong) {
+				data.textDefault = this.column.textDefault
+				data.textMaxLength = this.column.textMaxLength
+			} else if (this.combinedType === ColumnTypes.TextRich) {
+				data.textDefault = this.column.textDefault
+			} else if (this.combinedType === ColumnTypes.TextLink) {
+				data.textAllowedPattern = this.column.textAllowedPattern
+			} else if (this.column.type === 'selection') {
+				data.selectionDefault = typeof this.column.selectionDefault !== 'string' ? JSON.stringify(this.column.selectionDefault) : this.column.selectionDefault
+				if (this.column.subtype !== 'check') {
+					data.selectionOptions = JSON.stringify(this.column.selectionOptions)
+				}
+			} else if (this.column.type === 'datetime') {
+				data.datetimeDefault = this.column.datetimeDefault ? this.column.subtype === 'date' ? 'today' : 'now' : ''
+			} else if (this.column.type === 'number') {
+				data.numberDefault = this.column.numberDefault
+				if (this.column.subtype === '') {
+					data.numberDecimals = this.column.numberDecimals
+					data.numberMin = this.column.numberMin
+					data.numberMax = this.column.numberMax
+					data.numberPrefix = this.column.numberPrefix
+					data.numberSuffix = this.column.numberSuffix
+				}
+			}
+			return data
+		},
 		async sendNewColumnToBE() {
 			try {
-				const data = {
-					type: this.column.type,
-					subtype: this.column.subtype,
-					title: this.column.title,
-					description: this.column.description,
-					selectedViewIds: this.column.selectedViews.map(view => view.id),
-					mandatory: this.column.mandatory,
-					viewId: this.isView ? this.element.id : null,
-					tableId: !this.isView ? this.element.id : null,
-				}
-				if (this.combinedType === ColumnTypes.TextLine || this.combinedType === ColumnTypes.TextLong) {
-					data.textDefault = this.column.textDefault
-					data.textMaxLength = this.column.textMaxLength
-				} else if (this.combinedType === ColumnTypes.TextRich) {
-					data.textDefault = this.column.textDefault
-				} else if (this.combinedType === ColumnTypes.TextLink) {
-					data.textAllowedPattern = this.column.textAllowedPattern
-				} else if (this.column.type === 'selection') {
-					data.selectionDefault = typeof this.column.selectionDefault !== 'string' ? JSON.stringify(this.column.selectionDefault) : this.column.selectionDefault
-					if (this.column.subtype !== 'check') {
-						data.selectionOptions = JSON.stringify(this.column.selectionOptions)
-					}
-				} else if (this.column.type === 'datetime') {
-					data.datetimeDefault = this.column.datetimeDefault ? this.column.subtype === 'date' ? 'today' : 'now' : ''
-				} else if (this.column.type === 'number') {
-					data.numberDefault = this.column.numberDefault
-					if (this.column.subtype === '') {
-						data.numberDecimals = this.column.numberDecimals
-						data.numberMin = this.column.numberMin
-						data.numberMax = this.column.numberMax
-						data.numberPrefix = this.column.numberPrefix
-						data.numberSuffix = this.column.numberSuffix
-					}
-				}
+				const data = this.prepareSubmitData()
 				const res = await this.$store.dispatch('insertNewColumn', { isView: this.isView, elementId: this.element.id, data })
 				if (res) {
 					showSuccess(t('tables', 'The column "{column}" was created.', { column: this.column.title }))
