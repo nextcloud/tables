@@ -47,33 +47,50 @@ class ImportController extends Controller {
 		$this->l10n = $l10n;
 	}
 
-
 	/**
 	 * @NoAdminRequired
 	 */
-	public function importInTable(int $tableId, String $path, bool $createMissingColumns = true): DataResponse {
-		return $this->handleError(function () use ($tableId, $path, $createMissingColumns) {
-			return $this->service->import($tableId, null, $path, $createMissingColumns);
+	public function previewImportTable(int $tableId, String $path): DataResponse {
+		return $this->handleError(function () use ($tableId, $path) {
+			return $this->service->previewImport($tableId, null, $path);
 		});
 	}
 
 	/**
 	 * @NoAdminRequired
 	 */
-	public function importInView(int $viewId, String $path, bool $createMissingColumns = true): DataResponse {
-		return $this->handleError(function () use ($viewId, $path, $createMissingColumns) {
-			return $this->service->import(null, $viewId, $path, $createMissingColumns);
+	public function importInTable(int $tableId, String $path, bool $createMissingColumns = true, array $columnsConfig = []): DataResponse {
+		return $this->handleError(function () use ($tableId, $path, $createMissingColumns, $columnsConfig) {
+			return $this->service->import($tableId, null, $path, $createMissingColumns, $columnsConfig);
 		});
 	}
 
 	/**
 	 * @NoAdminRequired
 	 */
-	public function importUploadInTable(int $tableId, bool $createMissingColumns = true): DataResponse {
+	public function previewImportView(int $viewId, String $path): DataResponse {
+		return $this->handleError(function () use ($viewId, $path) {
+			return $this->service->previewImport(null, $viewId, $path);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function importInView(int $viewId, String $path, bool $createMissingColumns = true, array $columnsConfig = []): DataResponse {
+		return $this->handleError(function () use ($viewId, $path, $createMissingColumns, $columnsConfig) {
+			return $this->service->import(null, $viewId, $path, $createMissingColumns, $columnsConfig);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function previewUploadImportTable(int $tableId): DataResponse {
 		try {
 			$file = $this->getUploadedFile('uploadfile');
-			return $this->handleError(function () use ($tableId, $file, $createMissingColumns) {
-				return $this->service->import($tableId, null, $file['tmp_name'], $createMissingColumns);
+			return $this->handleError(function () use ($tableId, $file) {
+				return $this->service->previewImport($tableId, null, $file['tmp_name']);
 			});
 		} catch (UploadException | NotPermittedException $e) {
 			$this->logger->error('Upload error', ['exception' => $e]);
@@ -84,11 +101,43 @@ class ImportController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function importUploadInView(int $viewId, bool $createMissingColumns = true): DataResponse {
+	public function importUploadInTable(int $tableId, bool $createMissingColumns = true, string $columnsConfig = ''): DataResponse {
+		try {
+			$columnsConfigArray = json_decode($columnsConfig, true);
+			$file = $this->getUploadedFile('uploadfile');
+			return $this->handleError(function () use ($tableId, $file, $createMissingColumns, $columnsConfigArray) {
+				return $this->service->import($tableId, null, $file['tmp_name'], $createMissingColumns, $columnsConfigArray);
+			});
+		} catch (UploadException | NotPermittedException $e) {
+			$this->logger->error('Upload error', ['exception' => $e]);
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function previewUploadImportView(int $viewId): DataResponse {
 		try {
 			$file = $this->getUploadedFile('uploadfile');
-			return $this->handleError(function () use ($viewId, $file, $createMissingColumns) {
-				return $this->service->import(null, $viewId, $file['tmp_name'], $createMissingColumns);
+			return $this->handleError(function () use ($viewId, $file) {
+				return $this->service->previewImport(null, $viewId, $file['tmp_name']);
+			});
+		} catch (UploadException | NotPermittedException $e) {
+			$this->logger->error('Upload error', ['exception' => $e]);
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function importUploadInView(int $viewId, bool $createMissingColumns = true, string $columnsConfig = ''): DataResponse {
+		try {
+			$columnsConfigArray = json_decode($columnsConfig, true);
+			$file = $this->getUploadedFile('uploadfile');
+			return $this->handleError(function () use ($viewId, $file, $createMissingColumns, $columnsConfigArray) {
+				return $this->service->import(null, $viewId, $file['tmp_name'], $createMissingColumns, $columnsConfigArray);
 			});
 		} catch (UploadException | NotPermittedException $e) {
 			$this->logger->error('Upload error', ['exception' => $e]);

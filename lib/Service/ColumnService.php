@@ -586,7 +586,9 @@ class ColumnService extends SuperService {
 		}
 
 		foreach ($columns as $column) {
-			$this->enhanceColumn($column);
+			if ($column instanceof Column) {
+				$this->enhanceColumn($column);
+			}
 		}
 		return $columns;
 	}
