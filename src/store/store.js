@@ -396,6 +396,21 @@ export default new Vuex.Store({
 			return true
 		},
 
+		async transferContext({ state, commit, dispatch }, { id, data }) {
+			try {
+				await axios.put(generateOcsUrl('/apps/tables/api/2/contexts/' + id + '/transfer'), data)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not transfer application.'))
+				return false
+			}
+
+			const contexts = state.contexts
+			const index = contexts.findIndex(t => t.id === id)
+			contexts.splice(index, 1)
+			commit('setContexts', [...contexts])
+			return true
+		},
+
 		async removeTable({ state, commit }, { tableId }) {
 			try {
 				await axios.delete(generateUrl('/apps/tables/table/' + tableId))
