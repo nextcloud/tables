@@ -9,6 +9,7 @@ use OCA\Tables\Listener\AnalyticsDatasourceListener;
 use OCA\Tables\Listener\LoadAdditionalListener;
 use OCA\Tables\Listener\TablesReferenceListener;
 use OCA\Tables\Listener\UserDeletedListener;
+use OCA\Tables\Reference\ContentReferenceProvider;
 use OCA\Tables\Reference\ReferenceProvider;
 use OCA\Tables\Search\SearchTablesProvider;
 use OCP\AppFramework\App;
@@ -46,6 +47,7 @@ class Application extends App implements IBootstrap {
 		$context->registerSearchProvider(SearchTablesProvider::class);
 
 		$context->registerReferenceProvider(ReferenceProvider::class);
+		$context->registerReferenceProvider(ContentReferenceProvider::class);
 
 		$context->registerCapability(Capabilities::class);
 	}
