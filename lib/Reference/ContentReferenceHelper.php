@@ -108,6 +108,8 @@ class ContentReferenceHelper extends ReferenceHelper {
 
 			$referenceInfo['ownership'] = $element->getOwnership();
 			$referenceInfo['ownerDisplayName'] = $element->getOwnerDisplayName();
+			$referenceInfo['isShared'] = $element->getIsShared();
+			$referenceInfo['onSharePermissions'] = $element->getOnSharePermissions();
 			$referenceInfo['rowsCount'] = $element->getRowsCount();
 
 			$imageUrl = $this->urlGenerator->getAbsoluteURL(

@@ -125,6 +125,11 @@ export default {
 			}
 		},
 		async sendNewRowToBE() {
+			if (!this.$store) {
+				const { default: store } = await import(/* webpackChunkName: 'store' */ '../../store/store.js')
+				this.$store = store
+			}
+
 			try {
 				const data = []
 				for (const [key, value] of Object.entries(this.row)) {
@@ -150,6 +155,38 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+
+.modal__content {
+	padding: 20px;
+
+	:where(.row .space-T, .row.space-T) {
+		padding-top: 20px;
+	}
+
+	:where([class*='fix-col-']) {
+		display: flex;
+	}
+
+	:where(.slot) {
+		align-items: baseline;
+	}
+
+	:where(.end) {
+		justify-content: end;
+	}
+
+	:where(.slot.fix-col-2) {
+		min-width: 50%;
+	}
+
+	:where(.fix-col-3) {
+		min-width: 75%;
+	}
+
+	:where(.slot.fix-col-4 input, .slot.fix-col-4 .row) {
+		min-width: 100% !important;
+	}
+}
 
 .padding-right {
 	padding-right: calc(var(--default-grid-baseline) * 3);

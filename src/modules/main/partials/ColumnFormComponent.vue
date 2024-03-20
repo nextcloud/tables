@@ -17,7 +17,6 @@ import DatetimeForm from '../../../shared/components/ncTable/partials/rowTypePar
 import DatetimeDateForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeTimeForm.vue'
 import TextRichForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextRichForm.vue'
-import { AbstractColumn } from '../../../shared/components/ncTable/mixins/columnClass.js'
 
 export default {
 	name: 'ColumnFormComponent',
@@ -38,7 +37,7 @@ export default {
 	},
 	props: {
 		column: {
-			type: AbstractColumn,
+			type: Object,
 			default: null,
 		},
 		value: {
@@ -53,11 +52,14 @@ export default {
 	},
 	computed: {
 		getFormComponent() {
-			const form = this.snakeToCamel(this.column.type) + 'Form'
+			const columnType = this.column.type
+			const columnSubType = this.column.subtype ?? ''
+			const form = this.snakeToCamel(columnType) + this.snakeToCamel(columnSubType) + 'Form'
+
 			if (this.$options.components && this.$options.components[form]) {
 				return form
 			} else {
-				throw Error('Form ' + form + ' does no exist')
+				throw Error('Form ' + form + ' does not exist')
 			}
 		},
 	},

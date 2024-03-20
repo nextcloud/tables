@@ -85,7 +85,7 @@ export default {
 	},
 	data() {
 		return {
-			localRow: {},
+			localRow: null,
 			prepareDeleteRow: false,
 			localLoading: false,
 		}
@@ -120,6 +120,9 @@ export default {
 			}
 		},
 	},
+	mounted() {
+		this.loadValues()
+	},
 	methods: {
 		loadValues() {
 			if (this.row) {
@@ -131,7 +134,7 @@ export default {
 			}
 		},
 		actionCancel() {
-			this.$router.back()
+			this.$router?.back()
 			this.reset()
 			this.$emit('close')
 		},
@@ -154,11 +157,15 @@ export default {
 			this.actionCancel()
 		},
 		async sendRowToBE() {
+			if (!this.$store) {
+				await this.loadStore()
+			}
+
 			const data = []
 			for (const [key, value] of Object.entries(this.localRow)) {
 				data.push({
 					columnId: key,
-					value,
+					value: value ?? '',
 				})
 			}
 			const res = await this.$store.dispatch('updateRow', {
@@ -179,6 +186,10 @@ export default {
 			this.deleteRowAtBE(this.row.id)
 		},
 		async deleteRowAtBE(rowId) {
+			if (!this.$store) {
+				await this.loadStore()
+			}
+
 			this.localLoading = true
 			const res = await this.$store.dispatch('removeRow', {
 				rowId,
@@ -190,6 +201,44 @@ export default {
 			this.localLoading = false
 			this.actionCancel()
 		},
+		async loadStore() {
+			const { default: store } = await import(/* webpackChunkName: 'store' */ '../../store/store.js')
+			this.$store = store
+		},
 	},
 }
 </script>
+
+<style lang="scss" scoped>
+.modal__content {
+	padding: 20px;
+
+	:where(.row .space-T, .row.space-T) {
+		padding-top: 20px;
+	}
+
+	:where([class*='fix-col-']) {
+		display: flex;
+	}
+
+	:where(.slot) {
+		align-items: baseline;
+	}
+
+	:where(.end) {
+		justify-content: end;
+	}
+
+	:where(.slot.fix-col-2) {
+		min-width: 50%;
+	}
+
+	:where(.fix-col-3) {
+		min-width: 75%;
+	}
+
+	:where(.slot.fix-col-4 input, .slot.fix-col-4 .row) {
+		min-width: 100% !important;
+	}
+}
+</style>
