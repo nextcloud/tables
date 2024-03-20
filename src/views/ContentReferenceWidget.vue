@@ -22,34 +22,36 @@
 <template>
 	<div v-if="richObject" class="tables-content-widget">
 		<h2>{{ richObject.emoji }}&nbsp;{{ richObject.title }}</h2>
+		<Options
+			:config="tablePermissions"
+			:show-options="true"
+			@create-row="createRow"
+			@set-search-string="search" />
 		<div class="nc-table">
 			<NcTable
-				:rows="richObject.rows"
+				:rows="filteredRows"
 				:columns="richObject.columns"
-				:can-create-rows="false"
-				:can-edit-rows="false"
-				:can-delete-rows="false"
-				:can-create-columns="false"
-				:can-edit-columns="false"
-				:can-delete-columns="false"
-				:can-delete-table="false"
-				:can-select-rows="false"
-				:can-hide-columns="false"
-				:can-filter="false"
-				:show-actions="false" />
+				v-bind="tablePermissions"
+				@edit-row="editRow" />
 		</div>
 	</div>
 </template>
 
 <script>
 import NcTable from '../shared/components/ncTable/NcTable.vue'
+import Options from '../shared/components/ncTable/sections/Options.vue'
+import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
 import { useResizeObserver } from '@vueuse/core'
+import { spawnDialog } from '@nextcloud/dialogs'
 
 export default {
 
 	components: {
 		NcTable,
+		Options,
 	},
+
+	mixins: [permissionsMixin],
 
 	props: {
 		richObjectType: {
@@ -66,12 +68,97 @@ export default {
 		},
 	},
 
-	mounted() {
+	data() {
+		return {
+			searchExp: null,
+			rows: this.richObject.rows,
+		}
+	},
+
+	computed: {
+		tablePermissions() {
+			return {
+				canCreateRows: this.canCreateRowInElement(this.richObject),
+				canReadRows: true,
+				canEditRows: this.canUpdateData(this.richObject),
+				canDeleteRows: this.canDeleteData(this.richObject),
+				canCreateColumns: false,
+				canEditColumns: false,
+				canDeleteColumns: false,
+				canDeleteTable: false,
+				canSelectRows: false,
+				canHideColumns: false,
+				canFilter: false,
+				showActions: this.canManageElement(this.richObject),
+			}
+		},
+		filteredRows() {
+			if (this.searchExp) {
+				return this.rows.filter(row => {
+					return row.data.some(column => {
+						const col = String(column.value)
+						return col.search(this.searchExp) >= 0
+					})
+				})
+			} else {
+				return this.rows
+			}
+		},
+	},
+
+	async mounted() {
 		useResizeObserver(this.$el, (entries) => {
 			const entry = entries[0]
 			const { width } = entry.contentRect
 			this.$el.style.setProperty('--widget-content-width', `${width}px`)
 		})
+
+		await this.loadRows()
+	},
+
+	methods: {
+		search(searchString) {
+			this.searchExp = (searchString !== '')
+				? new RegExp(searchString.trim(), 'ig')
+				: null
+		},
+		async createRow() {
+			const { default: CreateRow } = await import('../modules/modals/CreateRow.vue')
+			spawnDialog(CreateRow, {
+				showModal: true,
+				columns: this.richObject.columns,
+				isView: Boolean(this.richObject.type),
+				elementId: this.richObject.id,
+			}, () => {
+				const storeRows = Object.values(this.$store.data.state.rows).at(0)
+
+				if (storeRows.length > this.rows.length) {
+					const createdRow = storeRows.at(-1)
+					this.rows.push(createdRow)
+				}
+			})
+		},
+		async editRow(rowId) {
+			const { default: EditRow } = await import('../modules/modals/EditRow.vue')
+			spawnDialog(EditRow, {
+				showModal: true,
+				columns: this.richObject.columns,
+				row: this.getRow(rowId),
+				isView: Boolean(this.richObject.type),
+				element: this.richObject,
+			}, () => {
+				const storeRows = Object.values(this.$store.data.state.rows).at(0)
+				const localRowIndex = this.rows.findIndex(row => row.id === rowId)
+				const updatedRow = storeRows.find(row => row.id === rowId)
+				this.rows.splice(localRowIndex, 1, updatedRow)
+			})
+		},
+		getRow(rowId) {
+			return this.rows.find(row => row.id === rowId)
+		},
+		async loadRows() {
+			await this.$store.dispatch('loadRowsFromBE', { tableId: this.richObject.id })
+		},
 	},
 }
 </script>
@@ -82,22 +169,49 @@ export default {
 		height: 50vh;
 		overflow: scroll;
 
+		:where(.options) {
+			position: sticky;
+			top: 57px;
+			z-index: 1;
+			padding-bottom: 10px;
+			background-color: var(--color-main-background);
+		}
+
 		h2 {
 			position: sticky;
 			top: 0;
-			left: 0;
-			width: calc(var(--widget-content-width, 100%) - 24px);
-			height: 36px;
+			min-width: var(--widget-content-width);
 			z-index: 1;
 			background-color: var(--color-main-background);
 			margin: 0 !important;
-			padding: calc(var(--default-grid-baseline) * 3);
+			padding: calc(var(--default-grid-baseline) * 4);
 		}
 
 		.nc-table {
 			margin-left: calc(var(--default-grid-baseline) * 2);
-			width: max-content;
-			margin-top: -1px;
+			min-width: var(--widget-content-width);
+
+			:where(.options.row) {
+				display: none;
+			}
+
+			:where(thead) {
+				position: sticky;
+				top: 117px;
+
+				:where(.cell-wrapper) {
+					min-width: 150px;
+					max-width: 200px;
+				}
+
+				:where(.sticky) {
+					background: transparent !important;
+				}
+			}
+
+			:where(.sticky) {
+				border: none;
+			}
 		}
 
 		& :deep(.options.row) {

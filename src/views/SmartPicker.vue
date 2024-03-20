@@ -139,14 +139,26 @@ export default {
 		},
 	},
 
+	async mounted() {
+		if (!this.$store) {
+			const { default: store } = await import(
+				/* webpackChunkName: 'store' */
+				'../store/store.js')
+
+			this.$store = store
+		}
+	},
+
 	methods: {
 		t,
 		n,
 		async updateContent() {
 			if (this.renderMode === 'content') {
 				this.previewLoading = true
+
 				await this.loadColumnsForContentPreview()
 				await this.loadRowsForContentPreview()
+
 				this.previewLoading = false
 			} else {
 				delete this.richObject.rows
