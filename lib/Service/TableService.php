@@ -196,6 +196,12 @@ class TableService extends SuperService {
 				$table->setIsShared(true);
 				$table->setOnSharePermissions($permissions);
 			} catch (NotFoundError $e) {
+				try {
+					$table->setOnSharePermissions($this->permissionsService->getPermissionArrayForNodeFromContexts($table->getId(), 'table', $userId));
+					$table->setIsShared(true);
+				} catch (NotFoundError $e) {
+				}
+
 			}
 		}
 		if (!$table->getIsShared() || $table->getOnSharePermissions()['manage']) {
