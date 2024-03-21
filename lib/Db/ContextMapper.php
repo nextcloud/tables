@@ -216,6 +216,40 @@ class ContextMapper extends QBMapper {
 		return $this->formatResultRows($r, $userId);
 	}
 
+	/**
+	 * @return Context[]
+	 * @throws Exception
+	 */
+	public function findAllContainingNode(int $nodeType, int $nodeId, string $userId): array {
+		$qb = $this->getFindContextBaseQuery($userId);
+
+		$qb->andWhere($qb->expr()->eq('r.node_id', $qb->createNamedParameter($nodeId)))
+			->andWhere($qb->expr()->eq('r.node_type', $qb->createNamedParameter($nodeType)));
+
+		$result = $qb->executeQuery();
+		$r = $result->fetchAll();
+
+		$contextIds = [];
+		foreach ($r as $row) {
+			$contextIds[$row['id']] = 1;
+		}
+		$contextIds = array_keys($contextIds);
+		unset($row);
+
+		$resultEntities = [];
+		foreach ($contextIds as $contextId) {
+			$workArray = [];
+			foreach ($r as $row) {
+				if ($row['id'] === $contextId) {
+					$workArray[] = $row;
+				}
+			}
+			$resultEntities[] = $this->formatResultRows($workArray, $userId);
+		}
+
+		return $resultEntities;
+	}
+
 	protected function applyOwnedOrSharedQuery(IQueryBuilder $qb, string $userId): void {
 		$sharedToConditions = $qb->expr()->orX();
 

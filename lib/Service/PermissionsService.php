@@ -153,20 +153,7 @@ class PermissionsService {
 	}
 
 	public function canAccessView(View $view, ?string $userId = null): bool {
-		if($this->basisCheck($view, 'view', $userId)) {
-			return true;
-		}
-
-		if ($userId) {
-			try {
-				$this->getSharedPermissionsIfSharedWithMe($view->getId(), 'view', $userId);
-				return true;
-			} catch (NotFoundError $e) {
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-			}
-		}
-
-		return false;
+		return $this->canAccessNodeById(Application::NODE_TYPE_VIEW, $view->getId(), $userId);
 	}
 
 	/**
@@ -459,6 +446,64 @@ class PermissionsService {
 	//  private methods ==========================================================================
 
 	/**
+	 * @throws NotFoundError
+	 */
+	public function getPermissionIfAvailableThroughContext(int $nodeId, string $nodeType, string $userId): int {
+		$permissions = 0;
+		$found = false;
+		$iNodeType = match ($nodeType) {
+			'table' => Application::NODE_TYPE_TABLE,
+			'view' => Application::NODE_TYPE_VIEW,
+		};
+		$contexts = $this->contextMapper->findAllContainingNode($iNodeType, $nodeId, $userId);
+		foreach ($contexts as $context) {
+			$found = true;
+			if ($context->getOwnerType() === Application::OWNER_TYPE_USER
+				&& $context->getOwnerId() === $userId) {
+				// Making someone owner of a context, makes this person also having manage permissions on the node.
+				// This is sort of an intended "privilege escalation".
+				return Application::PERMISSION_ALL;
+			}
+			foreach ($context->getNodes() as $nodeRelation) {
+				$permissions |= $nodeRelation['permissions'];
+			}
+		}
+		if (!$found) {
+			throw new NotFoundError('Node not found in any context');
+		}
+		return $permissions;
+	}
+
+	/**
+	 * @throws NotFoundError
+	 */
+	public function getPermissionArrayForNodeFromContexts(int $nodeId, string $nodeType, string $userId) {
+		$permissions = $this->getPermissionIfAvailableThroughContext($nodeId, $nodeType, $userId);
+		return [
+			'read' => (bool)($permissions & Application::PERMISSION_READ),
+			'create' => (bool)($permissions & Application::PERMISSION_CREATE),
+			'update' => (bool)($permissions & Application::PERMISSION_UPDATE),
+			'delete' => (bool)($permissions & Application::PERMISSION_DELETE),
+			'manage' => (bool)($permissions & Application::PERMISSION_MANAGE),
+		];
+	}
+
+	private function hasPermission(int $existingPermissions, string $permissionName): bool {
+		$constantName = 'PERMISSION_' . strtoupper($permissionName);
+		try {
+			$permissionBit = constant(Application::class . "::$constantName");
+		} catch (\Throwable $t) {
+			$this->logger->error('Unexpected permission string {permission}', [
+				'app' => Application::APP_ID,
+				'permission' => $permissionName,
+				'exception' => $t,
+			]);
+			return false;
+		}
+		return (bool)($existingPermissions & $permissionBit);
+	}
+
+	/**
 	 * @param mixed $element
 	 * @param 'table'|'view' $nodeType
 	 * @param string $permission
@@ -470,13 +515,22 @@ class PermissionsService {
 			return true;
 		}
 
-		if ($userId) {
-			try {
-				return $this->getSharedPermissionsIfSharedWithMe($element->getId(), $nodeType, $userId)[$permission];
-			} catch (NotFoundError $e) {
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-			}
+		if (!$userId) {
+			return false;
 		}
+
+		try {
+			return $this->getSharedPermissionsIfSharedWithMe($element->getId(), $nodeType, $userId)[$permission];
+		} catch (NotFoundError $e) {
+			try {
+				if ($this->hasPermission($this->getPermissionIfAvailableThroughContext($element->getId(), $nodeType, $userId), $permission)) {
+					return true;
+				}
+			} catch (NotFoundError $e) {
+			}
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+		}
+
 		return false;
 	}
 
@@ -495,6 +549,12 @@ class PermissionsService {
 			try {
 				return $this->getSharedPermissionsIfSharedWithMe($elementId, $nodeType, $userId)[$permission];
 			} catch (NotFoundError $e) {
+				try {
+					if ($this->hasPermission($this->getPermissionIfAvailableThroughContext($elementId, $nodeType, $userId), $permission)) {
+						return true;
+					}
+				} catch (NotFoundError $e) {
+				}
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 			}
 		}
