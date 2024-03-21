@@ -84,7 +84,7 @@ class Version000800Date20240213123743 extends SimpleMigrationStep {
 			$table->addColumn('id', Types::INTEGER, ['autoincrement' => true, 'notnull' => true]);
 			$table->addColumn('context_id', Types::INTEGER, ['notnull' => true]);
 			$table->addColumn('node_id', Types::INTEGER, ['notnull' => true]);
-			$table->addColumn('node_type', Types::STRING, ['notnull' => true, 'length' => 50]);
+			$table->addColumn('node_type', Types::INTEGER, ['notnull' => true]);
 			$table->addColumn('permissions', Types::INTEGER, ['notnull' => true]);
 
 			$table->setPrimaryKey(['id']);
