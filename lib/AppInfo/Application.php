@@ -34,6 +34,13 @@ class Application extends App implements IBootstrap {
 	public const NAV_ENTRY_MODE_RECIPIENTS = 1;
 	public const NAV_ENTRY_MODE_ALL = 2;
 
+	public const PERMISSION_READ = 1;
+	public const PERMISSION_CREATE = 2;
+	public const PERMISSION_UPDATE = 4;
+	public const PERMISSION_DELETE = 8;
+	public const PERMISSION_MANAGE = 16;
+	public const PERMISSION_ALL = 31;
+
 	public function __construct() {
 		parent::__construct(self::APP_ID);
 	}
