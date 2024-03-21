@@ -1,9 +1,6 @@
 <template>
 	<div>
-		<ElementDescription :active-element="table" :view-setting.sync="localViewSetting" />
-		<div class="description__editor">
-			<div id="description-editor" ref="textEditor" />
-		</div>
+		<ElementDescription :active-element="table" :view-setting.sync="localViewSetting" :table="table" />
 		<Dashboard v-if="hasViews"
 			:table="table"
 			@create-column="$emit('create-column')"
@@ -23,7 +20,6 @@
 
 <script>
 import ElementDescription from './ElementDescription.vue'
-import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import Dashboard from './Dashboard.vue'
 import DataTable from './DataTable.vue'
 import { mapState } from 'vuex'
@@ -36,7 +32,6 @@ export default {
 		Dashboard,
 		DataTable,
 	},
-	mixins: [permissionsMixin],
 
 	props: {
 		table: {
@@ -60,7 +55,6 @@ export default {
 	data() {
 		return {
 			localViewSetting: this.viewSetting,
-			description: '',
 		}
 	},
 	computed: {
@@ -77,54 +71,10 @@ export default {
 			this.localViewSetting = this.viewSetting
 		},
 	},
-	mounted() {
-		this.setupEditor()
-	},
-	async beforeDestroy() {
-		await this.destroyEditor()
-	},
+
 	methods: {
 		createView() {
 			emit('tables:view:create', { tableId: this.table.id, viewSetting: this.viewSetting.length > 0 ? this.viewSetting : this.localViewSetting })
-		},
-		async setupEditor() {
-			await this.destroyEditor()
-			this.descriptionLastEdited = 0
-			this.description = this.table.description
-			if (this.$refs.textEditor === undefined) {
-				return
-			}
-			this.editor = await window.OCA.Text.createEditor({
-				el: this.$refs.textEditor,
-				content: this.table.description,
-				readOnly: !this.canManageElement(this.table),
-				onUpdate: ({ markdown }) => {
-					if (this.description === markdown) {
-						this.descriptionLastEdit = 0
-						return
-					}
-					this.description = markdown
-					this.updateDescription()
-				},
-			})
-		},
-		async saveDescription() {
-			if (this.descriptionLastEdited !== 0) return
-			this.descriptionSaving = true
-			await this.$store.dispatch('updateTableProperty', { id: this.table.id, data: { description: this.description }, property: 'description' })
-			this.descriptionLastEdit = 0
-			this.descriptionSaving = false
-		},
-		updateDescription() {
-			this.descriptionLastEdit = Date.now()
-			clearTimeout(this.descriptionSaveTimeout)
-			this.descriptionSaveTimeout = setTimeout(async () => {
-				await this.saveDescription()
-			}, 2500)
-		},
-		async destroyEditor() {
-			await this.saveDescription()
-			this?.editor?.destroy()
 		},
 	},
 }
