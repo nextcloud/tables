@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<ElementTitle :active-element="table" :view-setting.sync="localViewSetting" />
-		<TableDescription :active-element="table" @updatedesc="saveDescription" />
+		<TableDescription :active-element="table" />
 		<Dashboard v-if="hasViews"
 			:table="table"
 			@create-column="$emit('create-column')"
@@ -78,9 +78,6 @@ export default {
 	methods: {
 		createView() {
 			emit('tables:view:create', { tableId: this.table.id, viewSetting: this.viewSetting.length > 0 ? this.viewSetting : this.localViewSetting })
-		},
-		async saveDescription(description) {
-			await this.$store.dispatch('updateTableProperty', { id: this.table.id, data: { description }, property: 'description' })
 		},
 	},
 }

@@ -101,8 +101,7 @@ export default {
 		async saveDescription() {
 			if (this.descriptionLastEdited !== 0 || this.description === this.activeElement.description) return
 			this.descriptionSaving = true
-			// await this.$store.dispatch('updateTableProperty', { id: this.activeElement.id, data: { description: this.description }, property: 'description' })
-			this.$emit('updatedesc', this.description)
+			await this.$store.dispatch('updateTableProperty', { id: this.table.id, data: { description }, property: 'description' })
 			this.descriptionLastEdit = 0
 			this.descriptionSaving = false
 		},
