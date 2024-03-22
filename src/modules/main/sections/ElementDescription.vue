@@ -5,11 +5,12 @@
 				{{ activeElement.emoji }}&nbsp;{{ activeElement.title }}
 			</h1>
 			<div class="info">
-				<div>
+				<div v-if="isFiltered">
 					<TextIcon :size="15" />
 					{{ t('tables', 'Filtered view') }}&nbsp;&nbsp;
 				</div>
 				<NcSmallButton
+					v-if="isViewSettingSet"
 					@click="resetLocalAdjustments">
 					<template #icon>
 						<FilterRemove :size="15" />
@@ -17,7 +18,7 @@
 					{{ t('tables', 'Reset local adjustments') }}
 				</NcSmallButton>
 			</div>
-			<div class="user-bubble">
+			<div v-if="!isTable && activeElement.isShared" class="user-bubble">
 				<NcUserBubble
 					:display-name="activeElement.ownerDisplayName"
 					:show-user-status="false"
@@ -117,7 +118,6 @@ export default {
 	},
 
 	mounted() {
-		alert(this.table.id)
 		this.setupEditor()
 	},
 	async beforeDestroy() {
@@ -178,10 +178,12 @@ export default {
 .text-readonly-bar {
 	background-color: red;
 }
+
 .description{
 	width: var(--text-editor-max-width);
 	margin-inline: auto;
 }
+
 .mode-switch{
 	width: 100%;
 	display: flex;
