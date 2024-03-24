@@ -69,6 +69,7 @@ OC.L10N.register(
     "Manage" : "Administrar",
     "Clipboard is not available" : "El portapapeles no está disponible",
     "Error" : "Error",
+    "Could not load editor, text not available." : "No se pudo cargar el editor, el texto no está disponible.",
     "Download" : "Descargar",
     "Search" : "Buscar",
     "Back" : "Atrás",
