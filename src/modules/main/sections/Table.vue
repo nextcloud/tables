@@ -82,8 +82,3 @@ export default {
 	},
 }
 </script>
-<style lang="scss" scoped>
-.description__editor :deep(.ProseMirror) {
-	padding-bottom: 0;
-}
-</style>
