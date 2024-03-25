@@ -99,7 +99,7 @@ export default {
 			this.editor.setReadOnly(true)
 		},
 		async saveDescription() {
-			if (this.descriptionLastEdited !== 0 || this.description === this.activeElement.description) return
+			if (this.descriptionLastEdited !== 0 || this.description === this.activeElement.description || !this.canManageElement(this.activeElement)) return
 			this.descriptionSaving = true
 			await this.$store.dispatch('updateTableProperty', { id: this.activeElement.id, data: { description: this.description }, property: 'description' })
 			this.descriptionLastEdit = 0
