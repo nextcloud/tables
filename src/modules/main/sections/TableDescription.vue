@@ -2,28 +2,20 @@
 	<div class="element-description">
 		<div class="mode-switch">
 			<div class="buttons-wrap">
-				<NcButton v-if="canManageElement(activeElement)" :type="mode === 'edit' ? 'secondary' : 'tertiary'" @click="() => mode='edit'">
+				<NcButton v-if="mode !== 'edit' && canManageElement(activeElement)" @click="() => mode='edit'">
 					<template #icon>
-						<IconPencil :size="20" />
+						<IconPencil :size="15" />
 					</template>
 					<template #default>
 						{{ t('tables','Edit') }}
 					</template>
 				</NcButton>
-				<NcButton :type="mode === 'view' ? 'secondary':'tertiary'" @click="() => mode='view'">
+				<NcButton v-if="mode !== 'view'" :size="15" @click="() => mode='view'">
 					<template #icon>
-						<IconEye :size="20" />
+						<IconCheck :size="15" />
 					</template>
 					<template #default>
-						{{ t('tables','View') }}
-					</template>
-				</NcButton>
-				<NcButton :type="mode === 'hidden' ? 'secondary':'tertiary'" @click="() => mode='hidden'">
-					<template #icon>
-						<IconEye :size="20" />
-					</template>
-					<template #default>
-						{{ t('tables','Hide') }}
+						{{ t('tables','Done') }}
 					</template>
 				</NcButton>
 			</div>
@@ -39,7 +31,7 @@
 import { NcButton } from '@nextcloud/vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import IconPencil from 'vue-material-design-icons/Pencil.vue'
-import IconEye from 'vue-material-design-icons/Eye.vue'
+import IconCheck from 'vue-material-design-icons/Check.vue'
 
 export default {
 	name: 'TableDescription',
@@ -47,7 +39,7 @@ export default {
 	components: {
 		NcButton,
 		IconPencil,
-		IconEye,
+		IconCheck,
 	},
 	mixins: [permissionsMixin],
 	props: {
@@ -127,6 +119,7 @@ export default {
 }
 
 .mode-switch{
+	margin-left: 14px;
 	width: 100%;
 	display: flex;
 	align-items: center;
@@ -135,11 +128,18 @@ export default {
 		background: var(--color-main-background);
 		border: 2px solid var(--color-border);
 		border-radius: var(--border-radius-pill);
+		z-index: 10022;
+		:deep(.button-vue){
+			max-height: 30px !important;
+			min-height: unset !important;
+		}
 	}
 }
 
 .element-description {
+	max-width: 100vw;
 	width: var(--text-editor-max-width);
+	padding-inline: min(60px,5vw)
 }
 
 </style>
