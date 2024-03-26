@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal" size="normal" @close="actionCancel">
+	<NcModal v-if="showModal" :size="preview !== null && result === null ? 'large' : 'normal'" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
@@ -8,7 +8,7 @@
 			</div>
 
 			<!-- Starting -->
-			<div v-if="!loading && result === null && !waitForReload">
+			<div v-if="!loading && result === null && preview === null && !waitForReload">
 				<div class="row space-T">
 					{{ t('tables', 'Add data to the table from a file') }}
 				</div>
@@ -58,7 +58,20 @@
 
 				<div class="row">
 					<div class="fix-col-4 end">
-						<NcButton :aria-label="t('tables', 'Import')" type="primary" @click="actionSubmit">
+						<NcButton :aria-label="t('tables', 'Preview')" type="primary" @click="actionPreview">
+							{{ t('tables', 'Preview') }}
+						</NcButton>
+					</div>
+				</div>
+			</div>
+
+			<!-- show preview -->
+			<div v-if="!loading && preview !== null && !result && !waitForReload">
+				<ImportPreview :preview-data="preview" :element="element" :create-missing-columns="createMissingColumns" @update:columns="onUpdateColumnsConfig" />
+
+				<div class="row">
+					<div class="fix-col-4 space-T end">
+						<NcButton :aria-label="t('tables', 'Import')" type="primary" @click="actionImport">
 							{{ t('tables', 'Import') }}
 						</NcButton>
 					</div>
@@ -107,6 +120,7 @@ import { generateUrl } from '@nextcloud/router'
 import { mapGetters } from 'vuex'
 import NcIconTimerSand from '../../shared/components/ncIconTimerSand/NcIconTimerSand.vue'
 import ImportResults from './ImportResults.vue'
+import ImportPreview from './ImportPreview.vue'
 
 export default {
 
@@ -119,6 +133,7 @@ export default {
 		NcModal,
 		NcButton,
 		ImportResults,
+		ImportPreview,
 		NcCheckboxRadioSwitch,
 		RowFormWrapper,
 		NcEmptyContent,
@@ -148,6 +163,8 @@ export default {
 			pathError: false,
 			loading: false,
 			result: null,
+			preview: null,
+			columnsConfig: [],
 			waitForReload: false,
 			mimeTypes: [
 				'text/csv',
@@ -223,14 +240,14 @@ export default {
 
 			this.actionCancel()
 		},
-		actionSubmit() {
+		actionPreview() {
 			if (this.selectedUploadFile && this.selectedUploadFile.type !== '' && !this.mimeTypes.includes(this.selectedUploadFile.type)) {
 				showWarning(t('tables', 'The selected file is not supported.'))
 				return null
 			}
 
 			if (this.selectedUploadFile) {
-				this.uploadFile()
+				this.previewImportFromUploadFile()
 				return
 			}
 
@@ -240,12 +257,119 @@ export default {
 				return null
 			}
 			this.pathError = false
-			this.import()
+			this.previewImportFromPath()
 		},
-		async import() {
+		async previewImportFromPath() {
 			this.loading = true
 			try {
-				const res = await axios.post(generateUrl('/apps/tables/import/' + (this.isElementView ? 'view' : 'table') + '/' + this.element.id), { path: this.path, createMissingColumns: this.getCreateMissingColumns })
+				const res = await axios.post(generateUrl('/apps/tables/import-preview/' + (this.isElementView ? 'view' : 'table') + '/' + this.element.id), { path: this.path })
+				if (res.status === 200) {
+					this.preview = res.data
+					this.loading = false
+				} else if (res.status === 401) {
+					console.debug('error while importing', res)
+					showError(t('tables', 'Could not import, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					console.debug('error while importing', res)
+					showError(t('tables', 'Could not import, missing needed permission.'))
+				} else if (res.status === 404) {
+					console.debug('error while importing', res)
+					showError(t('tables', 'Could not import, needed resources were not found.'))
+				} else {
+					showError(t('tables', 'Could not import data due to unknown errors.'))
+					console.debug('error while importing', res)
+				}
+			} catch (e) {
+				console.error(e)
+				return false
+			}
+		},
+		async previewImportFromUploadFile() {
+			this.loading = true
+			try {
+				const url = generateUrl('/apps/tables/importupload-preview/' + (this.isElementView ? 'view' : 'table') + '/' + this.element.id)
+				const formData = new FormData()
+				formData.append('uploadfile', this.selectedUploadFile)
+
+				const res = await axios.post(url, formData, {
+					headers: {
+						'Content-Type': 'multipart/form-data',
+					},
+				})
+
+				if (res.status === 200) {
+					this.preview = res.data
+					this.loading = false
+				} else if (res.status === 401) {
+					console.debug('error while importing', res)
+					showError(t('tables', 'Could not import, not authorized. Are you logged in?'))
+				} else if (res.status === 403) {
+					console.debug('error while importing', res)
+					showError(t('tables', 'Could not import, missing needed permission.'))
+				} else if (res.status === 404) {
+					console.debug('error while importing', res)
+					showError(t('tables', 'Could not import, needed resources were not found.'))
+				} else {
+					showError(t('tables', 'Could not import data due to unknown errors.'))
+					console.debug('error while importing', res)
+				}
+			} catch (e) {
+				console.error(e)
+				return false
+			}
+		},
+		actionImport() {
+			if (this.selectedUploadFile && this.selectedUploadFile.type !== '' && !this.mimeTypes.includes(this.selectedUploadFile.type)) {
+				showWarning(t('tables', 'The selected file is not supported.'))
+				return null
+			}
+
+			if (!this.validateColumnsConfig()) {
+				return null
+			}
+
+			if (this.selectedUploadFile) {
+				this.importFromUploadFile()
+				return null
+			}
+
+			if (this.path === '') {
+				showWarning(t('tables', 'Please select a file.'))
+				this.pathError = true
+				return null
+			}
+			this.pathError = false
+			this.importFromPath()
+		},
+		validateColumnsConfig() {
+			const existColumnCount = {}
+			for (const column of this.columnsConfig) {
+				if (column.action === 'exist') {
+					if (!column.existColumn) {
+						showWarning(t('tables', 'Please select column for mapping.'))
+						return false
+					}
+					if (existColumnCount[column.existColumn.id] === undefined) {
+						existColumnCount[column.existColumn.id] = 1
+					} else {
+						existColumnCount[column.existColumn.id]++
+					}
+				}
+			}
+			if (Object.values(existColumnCount).some(count => count > 1)) {
+				showWarning(t('tables', 'Cannot map same exist column for multiple columns.'))
+				return false
+			}
+
+			return true
+		},
+		async importFromPath() {
+			this.loading = true
+			try {
+				const res = await axios.post(
+					generateUrl('/apps/tables/import/' + (this.isElementView ? 'view' : 'table') + '/' + this.element.id),
+					{ path: this.path, createMissingColumns: this.getCreateMissingColumns, columnsConfig: this.columnsConfig },
+				)
 				if (res.status === 200) {
 					this.result = res.data
 					this.loading = false
@@ -267,13 +391,14 @@ export default {
 				return false
 			}
 		},
-		async uploadFile() {
+		async importFromUploadFile() {
 			this.loading = true
 			try {
 				const url = generateUrl('/apps/tables/importupload/' + (this.isElementView ? 'view' : 'table') + '/' + this.element.id)
 				const formData = new FormData()
 				formData.append('uploadfile', this.selectedUploadFile)
 				formData.append('createMissingColumns', this.getCreateMissingColumns)
+				formData.append('columnsConfig', JSON.stringify(this.columnsConfig))
 
 				const res = await axios.post(url, formData, {
 					headers: {
@@ -311,6 +436,7 @@ export default {
 			this.pathError = false
 			this.createMissingColumns = true
 			this.result = null
+			this.preview = null
 			this.loading = false
 		},
 		pickFile() {
@@ -340,6 +466,9 @@ export default {
 		},
 		onUploadFileInputChange(event) {
 			this.selectedUploadFile = event.target.files[0]
+		},
+		onUpdateColumnsConfig(event) {
+			this.columnsConfig = event
 		},
 	},
 
