@@ -130,13 +130,10 @@ export default {
 
 	methods: {
 		async reload() {
-			this.loading = true
-			if (this.activeContextId) {
-				await this.loadContext()
+			if (!this.activeContextId) {
+				return
 			}
-			this.loading = false
-		},
-		async loadContext() {
+			this.loading = true
 			this.icon = await this.getContextIcon(this.activeContext.iconName)
 			this.contextResources = []
 			await this.$store.dispatch('loadContext', { id: this.activeContextId })
@@ -175,6 +172,7 @@ export default {
 					}
 				}
 			}
+			this.loading = false
 		},
 		createColumn(isView, element) {
 			emit('tables:column:create', { isView, element })
