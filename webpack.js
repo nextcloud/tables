@@ -17,4 +17,8 @@ webpackConfig.module = {
 	]
 }
 
+webpackConfig.resolve.alias = {
+  MaterialIcons: path.resolve(__dirname, 'img/material'),
+}
+
 module.exports = webpackConfig

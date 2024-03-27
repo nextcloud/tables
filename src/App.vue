@@ -38,9 +38,9 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(['tablesLoading']),
+		...mapState(['tablesLoading', 'contextsLoading']),
 		somethingIsLoading() {
-			return this.tablesLoading || this.loading
+			return this.tablesLoading || this.contextsLoading || this.loading
 		},
 	},
 	watch: {
@@ -50,6 +50,7 @@ export default {
 	},
 	async created() {
 		await this.$store.dispatch('loadTablesFromBE')
+		await this.$store.dispatch('getAllContexts')
 		await this.$store.dispatch('loadViewsSharedWithMeFromBE')
 		this.routing(this.$router.currentRoute)
 		this.observeAppContent()
@@ -67,6 +68,9 @@ export default {
 			} else if (currentRoute.path.startsWith('/view/')) {
 				this.$store.commit('setActiveViewId', parseInt(currentRoute.params.viewId))
 				this.setPageTitle(this.$store.getters.activeView.title)
+			} else if (currentRoute.path.startsWith('/application/')) {
+				this.$store.commit('setActiveContextId', parseInt(currentRoute.params.contextId))
+				this.setPageTitle(this.$store.getters.activeContext.name)
 			}
 		},
 		setPageTitle(title) {

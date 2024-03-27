@@ -191,6 +191,39 @@ export type paths = {
     /** [api v2] Remove a node (table or view) to from favorites */
     delete: operations["api_favorite-destroy"];
   };
+  "/ocs/v2.php/apps/tables/api/2/contexts": {
+    /**
+     * [api v3] Get all contexts available to the requesting person
+     * @description Return an empty array if no contexts were found
+     */
+    get: operations["context-list"];
+    /** [api v2] Create a new context and return it */
+    post: operations["context-create"];
+  };
+  "/ocs/v2.php/apps/tables/api/2/contexts/{contextId}": {
+    /** [api v2] Get information about the requests context */
+    get: operations["context-show"];
+    /** [api v2] Update an existing context and return it */
+    put: operations["context-update"];
+    /** [api v2] Delete an existing context and return it */
+    delete: operations["context-destroy"];
+  };
+  "/ocs/v2.php/apps/tables/api/2/contexts/{contextId}/transfer": {
+    /** [api v2] Transfer the ownership of a context and return it */
+    put: operations["context-transfer"];
+  };
+  "/ocs/v2.php/apps/tables/api/2/contexts/{contextId}/nodes": {
+    /** [api v2] Add a node to a Context */
+    post: operations["context-add-node"];
+  };
+  "/ocs/v2.php/apps/tables/api/2/contexts/{contextId}/nodes/{nodeRelId}": {
+    /** [api v2] Remove a node from a Context */
+    delete: operations["context-remove-node"];
+  };
+  "/ocs/v2.php/apps/tables/api/2/contexts/{contextId}/pages/{pageId}": {
+    /** [api v2] Update the order on a page of a context */
+    put: operations["context-update-content-order"];
+  };
 };
 
 export type webhooks = Record<string, never>;
@@ -239,6 +272,16 @@ export type components = {
       selectionOptions: string;
       selectionDefault: string;
       datetimeDefault: string;
+    };
+    Context: {
+      /** Format: int64 */
+      id: number;
+      name: string;
+      iconName: string;
+      description: string;
+      owner: string;
+      /** Format: int64 */
+      ownerType: number;
     };
     ImportState: {
       /** Format: int64 */
@@ -2885,6 +2928,524 @@ export type operations = {
       };
       /** @description No permissions */
       403: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+      500: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+  /**
+   * [api v3] Get all contexts available to the requesting person
+   * @description Return an empty array if no contexts were found
+   */
+  "context-list": {
+    parameters: {
+      header: {
+        /** @description Required to be true for the API request to pass */
+        "OCS-APIRequest": boolean;
+      };
+    };
+    responses: {
+      /** @description reporting in available contexts */
+      200: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: components["schemas"]["Context"][];
+            };
+          };
+        };
+      };
+      500: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+  /** [api v2] Create a new context and return it */
+  "context-create": {
+    parameters: {
+      query: {
+        /** @description Name of the context */
+        name: string;
+        /** @description Material design icon name of the context */
+        iconName: string;
+        /** @description Descriptive text of the context */
+        description?: string;
+        /** @description optional nodes to be connected to this context */
+        nodes?: OneOf<[{
+          /** Format: int64 */
+          id: number;
+          /** Format: int64 */
+          type: number;
+          /** Format: int64 */
+          permissions: number;
+        }, unknown[]]>;
+      };
+      header: {
+        /** @description Required to be true for the API request to pass */
+        "OCS-APIRequest": boolean;
+      };
+    };
+    responses: {
+      /** @description returning the full context information */
+      200: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: components["schemas"]["Context"];
+            };
+          };
+        };
+      };
+      500: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+  /** [api v2] Get information about the requests context */
+  "context-show": {
+    parameters: {
+      header: {
+        /** @description Required to be true for the API request to pass */
+        "OCS-APIRequest": boolean;
+      };
+      path: {
+        /** @description ID of the context */
+        contextId: number;
+      };
+    };
+    responses: {
+      /** @description returning the full context information */
+      200: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: components["schemas"]["Context"];
+            };
+          };
+        };
+      };
+      /** @description context not found or not available anymore */
+      404: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+      500: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+  /** [api v2] Update an existing context and return it */
+  "context-update": {
+    parameters: {
+      query?: {
+        /** @description provide this parameter to set a new name */
+        name?: string | null;
+        /** @description provide this parameter to set a new icon */
+        iconName?: string | null;
+        /** @description provide this parameter to set a new description */
+        description?: string | null;
+        /** @description provide this parameter to set a new list of nodes. */
+        nodes?: string | null;
+      };
+      header: {
+        /** @description Required to be true for the API request to pass */
+        "OCS-APIRequest": boolean;
+      };
+      path: {
+        /** @description ID of the context */
+        contextId: number;
+      };
+    };
+    responses: {
+      /** @description returning the full context information */
+      200: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: components["schemas"]["Context"];
+            };
+          };
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+      500: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+  /** [api v2] Delete an existing context and return it */
+  "context-destroy": {
+    parameters: {
+      header: {
+        /** @description Required to be true for the API request to pass */
+        "OCS-APIRequest": boolean;
+      };
+      path: {
+        /** @description ID of the context */
+        contextId: number;
+      };
+    };
+    responses: {
+      /** @description returning the full context information */
+      200: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: components["schemas"]["Context"];
+            };
+          };
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+      500: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+  /** [api v2] Transfer the ownership of a context and return it */
+  "context-transfer": {
+    parameters: {
+      query: {
+        /** @description ID of the new owner */
+        newOwnerId: string;
+        /** @description any Application::OWNER_TYPE_* constant */
+        newOwnerType?: number;
+      };
+      header: {
+        /** @description Required to be true for the API request to pass */
+        "OCS-APIRequest": boolean;
+      };
+      path: {
+        /** @description ID of the context */
+        contextId: number;
+      };
+    };
+    responses: {
+      /** @description Ownership transferred */
+      200: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: components["schemas"]["Context"];
+            };
+          };
+        };
+      };
+      /** @description Invalid request */
+      400: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+      500: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+  /** [api v2] Add a node to a Context */
+  "context-add-node": {
+    parameters: {
+      query: {
+        /** @description ID of the node */
+        nodeId: number;
+        /** @description any Application::NODE_TYPE_* constant */
+        nodeType: number;
+        /** @description bitmask of the permissions for context recipients */
+        permissions: number;
+        /** @description in which order the node should appear within the context */
+        order?: number | null;
+      };
+      header: {
+        /** @description Required to be true for the API request to pass */
+        "OCS-APIRequest": boolean;
+      };
+      path: {
+        /** @description ID of the context */
+        contextId: number;
+      };
+    };
+    responses: {
+      /** @description Node added successfully */
+      200: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: components["schemas"]["Context"];
+            };
+          };
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+      500: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+  /** [api v2] Remove a node from a Context */
+  "context-remove-node": {
+    parameters: {
+      header: {
+        /** @description Required to be true for the API request to pass */
+        "OCS-APIRequest": boolean;
+      };
+      path: {
+        /** @description ID of the context */
+        contextId: number;
+        /** @description ID of the node-in-context relation */
+        nodeRelId: number;
+      };
+    };
+    responses: {
+      /** @description Node removed successfully */
+      200: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: components["schemas"]["Context"];
+            };
+          };
+        };
+      };
+      /** @description Invalid request */
+      400: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+      500: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+  /** [api v2] Update the order on a page of a context */
+  "context-update-content-order": {
+    parameters: {
+      query: {
+        /** @description content items with it and order values */
+        content: string;
+      };
+      header: {
+        /** @description Required to be true for the API request to pass */
+        "OCS-APIRequest": boolean;
+      };
+      path: {
+        /** @description ID of the context */
+        contextId: number;
+        /** @description ID of the page */
+        pageId: number;
+      };
+    };
+    responses: {
+      /** @description content updated successfully */
+      200: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: components["schemas"]["Context"];
+            };
+          };
+        };
+      };
+      /** @description Invalid request */
+      400: {
         content: {
           "application/json": {
             ocs: {

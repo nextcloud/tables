@@ -20,15 +20,21 @@ export default new Vuex.Store({
 		tablesLoading: false,
 		tables: [],
 		views: [],
+		contexts: [],
+		contextsLoading: false,
 		activeViewId: null,
 		activeTableId: null,
 		activeRowId: null,
 		activeElementIsView: false,
+		activeContextId: null,
 	},
 
 	getters: {
 		getTable: (state) => (id) => {
 			return state.tables.find(table => table.id === id)
+		},
+		getContext: (state) => (id) => {
+			return state.contexts.find(context => context.id === id)
 		},
 		getView: (state) => (id) => {
 			return state.views.find(view => view.id === id)
@@ -53,6 +59,12 @@ export default new Vuex.Store({
 			}
 			return null
 		},
+		activeContext(state) {
+			if (state.contexts && state.activeContextId) {
+				return state.contexts.find(item => item.id === state.activeContextId)
+			}
+			return null
+		},
 		isView(state) {
 			return state.activeElementIsView
 		},
@@ -60,6 +72,9 @@ export default new Vuex.Store({
 	mutations: {
 		setTablesLoading(state, value) {
 			state.tablesLoading = !!(value)
+		},
+		setContextsLoading(state, value) {
+			state.contextsLoading = !!(value)
 		},
 		setActiveViewId(state, viewId) {
 			if (state.activeViewId !== viewId) {
@@ -75,11 +90,19 @@ export default new Vuex.Store({
 				state.activeElementIsView = false
 			}
 		},
+		setActiveContextId(state, contextId) {
+			if (state.activeContextId !== contextId) {
+				state.activeContextId = parseInt(contextId)
+			}
+		},
 		setTables(state, tables) {
 			state.tables = tables
 		},
 		setViews(state, views) {
 			state.views = views
+		},
+		setContexts(state, contexts) {
+			state.contexts = contexts
 		},
 		setTable(state, table) {
 			const index = state.tables.findIndex(t => t.id === table.id)
@@ -89,11 +112,32 @@ export default new Vuex.Store({
 			const index = state.views.findIndex(v => v.id === view.id)
 			state.views[index] = view
 		},
+		setContext(state, context) {
+			const index = state.contexts.findIndex(c => c.id === context.id)
+			state.contexts[index] = context
+		},
 		setActiveRowId(state, rowId) {
 			state.activeRowId = rowId
 		},
 	},
 	actions: {
+		async insertNewContext({ commit, state, dispatch }, { data }) {
+			commit('setContextsLoading', true)
+			let res = null
+
+			try {
+				res = await axios.post(generateOcsUrl('/apps/tables/api/2/contexts'), data)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not insert application.'))
+				return false
+			}
+			const contexts = state.contexts
+			contexts.push(res.data.ocs.data)
+			commit('setContexts', contexts)
+
+			commit('setContextsLoading', false)
+			return res.data.ocs.data
+		},
 		async insertNewTable({ commit, state, dispatch }, { data }) {
 			let res = null
 
@@ -295,6 +339,24 @@ export default new Vuex.Store({
 
 			return true
 		},
+		async updateContext({ state, commit, dispatch }, { id, data }) {
+			let res = null
+
+			try {
+				res = await axios.put(generateOcsUrl('/apps/tables/api/2/contexts/' + id), data)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not update application.'))
+				return false
+			}
+
+			const context = res.data.ocs.data
+			const contexts = state.contexts
+			const index = contexts.findIndex(c => c.id === context.id)
+			contexts[index] = context
+			commit('setContexts', [...contexts])
+
+			return true
+		},
 		async transferTable({ state, commit, dispatch }, { id, data }) {
 			try {
 				await axios.put(generateOcsUrl('/apps/tables/api/2/tables/' + id + '/transfer'), data)
@@ -309,6 +371,31 @@ export default new Vuex.Store({
 			commit('setTables', [...tables])
 			return true
 		},
+
+		async getAllContexts({ commit, state }) {
+			commit('setContextsLoading', true)
+			try {
+				const res = await axios.get(generateOcsUrl('/apps/tables/api/2/contexts'))
+				commit('setContexts', res.data.ocs.data)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load applications.'))
+				showError(t('tables', 'Could not fetch applications'))
+			}
+			commit('setContextsLoading', false)
+			return true
+		},
+
+		async loadContext({ state, commit, dispatch }, { id }) {
+			try {
+				const res = await axios.get(generateOcsUrl('/apps/tables/api/2/contexts/' + id))
+				commit('setContext', res.data.ocs.data)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load application.'))
+				showError(t('tables', 'Could not fetch application'))
+			}
+			return true
+		},
+
 		async removeTable({ state, commit }, { tableId }) {
 			try {
 				await axios.delete(generateUrl('/apps/tables/table/' + tableId))

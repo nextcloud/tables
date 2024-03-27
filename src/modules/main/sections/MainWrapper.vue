@@ -68,8 +68,8 @@ export default {
 	computed: {
 		...mapState(['activeRowId']),
 		...mapState({
-			columns: state => state.data.columns,
-			rows: state => state.data.rows,
+			columns(state) { return state.data.columns[this.isView ? 'view-' + (this.element.id).toString() : (this.element.id).toString()] },
+			rows(state) { return state.data.rows[this.isView ? 'view-' + (this.element.id).toString() : (this.element.id).toString()] },
 		}),
 	},
 
@@ -79,7 +79,7 @@ export default {
 		},
 	},
 
-	mounted() {
+	beforeMount() {
 		this.reload(true)
 	},
 
@@ -107,8 +107,14 @@ export default {
 				return
 			}
 
-			if (!this.lastActiveElement || this.element.id !== this.lastActiveElement.id || this.isView !== this.lastActiveElement.isView || force) {
+			// Used to reload View from backend, in case there are Filter updates
+			const isLastElementSameAndView = this.element.id === this.lastActiveElement?.id && this.isView === this.lastActiveElement?.isView
+
+			if (!this.lastActiveElement || this.element.id !== this.lastActiveElement.id || isLastElementSameAndView || this.isView !== this.lastActiveElement.isView || force) {
 				this.localLoading = true
+
+				// Since we show one page at a time, no need keep other tables in the store
+				await this.$store.dispatch('clearState')
 
 				this.viewSetting = {}
 				if (this.isView && this.element?.sort?.length) {
@@ -117,7 +123,7 @@ export default {
 
 				await this.$store.dispatch('loadColumnsFromBE', {
 					view: this.isView ? this.element : null,
-					table: !this.isView ? this.element : null,
+					tableId: !this.isView ? this.element.id : null,
 				})
 				if (this.canReadData(this.element)) {
 					await this.$store.dispatch('loadRowsFromBE', {
@@ -125,9 +131,12 @@ export default {
 						tableId: !this.isView ? this.element.id : null,
 					})
 				} else {
-					await this.$store.dispatch('removeRows')
+					await this.$store.dispatch('removeRows', {
+						isView: this.isView,
+						elementId: this.element.id,
+					})
 				}
-				this.lastActiveViewId = {
+				this.lastActiveElement = {
 					id: this.element.id,
 					isView: this.isView,
 				}
