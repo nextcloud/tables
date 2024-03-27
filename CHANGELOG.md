@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.7.0-beta.3 - 2024-03-27
+
+### Added
+
+- feat: add print styles @FahrJo [#931](https://github.com/nextcloud/tables/pull/931)
+- feat: Contexts (Applications) @blizzz @enjeck @elzody [#848](https://github.com/nextcloud/tables/pull/848)
+
+### Updated
+
+- fix: shared views can be favorited @elzody [#921](https://github.com/nextcloud/tables/pull/921)
+- fix: views respect sorting @enjeck [#912](https://github.com/nextcloud/tables/pull/912)
+- fix: reintroduce content reference provider @elzody [#943](https://github.com/nextcloud/tables/pull/943)
+- fix: Focus first input when creating a new table/row/column/view @juliushaertl [#925](https://github.com/nextcloud/tables/pull/925)
+
+
 ## 0.7.0-beta.2
 
 ### Added
