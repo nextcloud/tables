@@ -152,7 +152,7 @@ class ContextMapper extends QBMapper {
 		foreach ($contextIds as $contextId) {
 			$workArray = [];
 			foreach ($r as $row) {
-				if ($row['id'] === $contextId) {
+				if ((int) $row['id'] === $contextId) {
 					$workArray[] = $row;
 				}
 			}
@@ -188,7 +188,7 @@ class ContextMapper extends QBMapper {
 		foreach ($contextIds as $contextId) {
 			$workArray = [];
 			foreach ($r as $row) {
-				if ($row['id'] === $contextId) {
+				if ((int) $row['id'] === $contextId) {
 					$workArray[] = $row;
 				}
 			}
