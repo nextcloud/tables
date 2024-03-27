@@ -142,4 +142,8 @@ export default {
 	padding-inline: min(60px,5vw)
 }
 
+:deep(.text-readonly-bar){
+	display:none !important;
+}
+
 </style>
