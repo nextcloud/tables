@@ -85,7 +85,7 @@ class RenameTable extends Command {
 		$description = $input->getOption('description');
 
 		try {
-			$table = $this->tableService->update($id, $title, $emoji, null, $archived, '');
+			$table = $this->tableService->update($id, $title, $emoji, $description, $archived, '');
 
 			$arr = $table->jsonSerialize();
 			unset($arr['hasShares']);

@@ -91,7 +91,9 @@ export default {
 			this.editor.setReadOnly(true)
 		},
 		async saveDescription() {
-			if (this.descriptionLastEdited !== 0 || this.description === this.activeElement.description || !this.canManageElement(this.activeElement)) return
+			if (this.descriptionLastEdited !== 0 || this.description === this.activeElement.description || !this.canManageElement(this.activeElement)) {
+				return
+			}
 			this.descriptionSaving = true
 			await this.$store.dispatch('updateTableProperty', { id: this.activeElement.id, data: { description: this.description }, property: 'description' })
 			this.descriptionLastEdit = 0
@@ -100,9 +102,7 @@ export default {
 		updateDescription() {
 			this.descriptionLastEdit = Date.now()
 			clearTimeout(this.descriptionSaveTimeout)
-			this.descriptionSaveTimeout = setTimeout(async () => {
-				await this.saveDescription()
-			}, 1000)
+			this.descriptionSaveTimeout = setTimeout(this.saveDescription, 1000)
 		},
 		async destroyEditor() {
 			await this.saveDescription()
