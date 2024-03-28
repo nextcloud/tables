@@ -186,6 +186,7 @@ OC.L10N.register(
     "Time" : "時間",
     "Save" : "保存",
     "Title" : "タイトル",
+    "Resources" : "リソース",
     "Select emoji" : "絵文字の選択",
     "Delete column" : "列の削除",
     "Cancel" : "キャンセル",

@@ -36,6 +36,7 @@ OC.L10N.register(
     "Time" : "Aeg",
     "Save" : "Salvesta",
     "Title" : "Pealkiri",
+    "Resources" : "Ressursid",
     "Cancel" : "Loobu",
     "Delete" : "Kustuta",
     "Owner" : "Omanik",

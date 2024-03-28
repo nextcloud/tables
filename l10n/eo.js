@@ -42,6 +42,7 @@ OC.L10N.register(
     "Time" : "Dato",
     "Save" : "Konservi",
     "Title" : "Titolo",
+    "Resources" : "Rimedoj",
     "Cancel" : "Nuligi",
     "Delete" : "Forigi",
     "Owner" : "Posedanto",

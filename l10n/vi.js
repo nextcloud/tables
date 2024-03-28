@@ -45,6 +45,7 @@ OC.L10N.register(
     "Time" : "Thời gian",
     "Save" : "Lưu",
     "Title" : "Tiêu đề",
+    "Resources" : "Các nguồn lực",
     "Cancel" : "Hủy",
     "Delete" : "Xóa",
     "Owner" : "Chủ",

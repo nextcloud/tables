@@ -46,6 +46,7 @@ OC.L10N.register(
     "Time" : "Tími",
     "Save" : "Vista",
     "Title" : "Titill",
+    "Resources" : "Tilföng",
     "Delete column" : "Eyða dálki",
     "Cancel" : "Hætta við",
     "Delete" : "Eyða",

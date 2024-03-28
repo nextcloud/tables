@@ -45,6 +45,7 @@ OC.L10N.register(
     "Rich text" : "Rich text",
     "Time" : "Time",
     "Save" : "Save",
+    "Resources" : "Resources",
     "Cancel" : "Cancel",
     "Delete" : "Delete",
     "Owner" : "Owner",

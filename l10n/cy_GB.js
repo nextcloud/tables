@@ -28,6 +28,7 @@ OC.L10N.register(
     "Time" : "Amser",
     "Save" : "Cadw",
     "Title" : "Teitl",
+    "Resources" : "Adnoddau",
     "Cancel" : "Diddymu",
     "Delete" : "Dileu",
     "Owner" : "Perchennog",

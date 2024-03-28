@@ -35,6 +35,7 @@ OC.L10N.register(
     "Time" : "Kohë",
     "Save" : "Ruaj",
     "Title" : "Titulli",
+    "Resources" : "Burimet",
     "Delete column" : "Fshi kolonë",
     "Cancel" : "Anullo",
     "Delete" : "Fshij",

@@ -96,6 +96,7 @@ OC.L10N.register(
     "Time" : "זמן",
     "Save" : "שמירה",
     "Title" : "תפקיד",
+    "Resources" : "משאבים",
     "Cancel" : "ביטול",
     "Delete" : "מחיקה",
     "Owner" : "בעלות",

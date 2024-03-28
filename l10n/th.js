@@ -36,6 +36,7 @@ OC.L10N.register(
     "Time" : "เวลา",
     "Save" : "บันทึก",
     "Title" : "ชื่อเรื่อง",
+    "Resources" : "ทรัพยากร",
     "Cancel" : "ยกเลิก",
     "Delete" : "ลบ",
     "Owner" : "เจ้าของ",

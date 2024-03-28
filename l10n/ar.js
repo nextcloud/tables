@@ -204,21 +204,21 @@ OC.L10N.register(
     "The column \"{column}\" was created." : "تم إنشاء العمود \"{column}\".",
     "Sorry, something went wrong." : "عذرا، هناك خطأ ما.",
     "Could not create new column." : "تعذّر إنشاء عمود جديد",
+    "Title" : "العنوان",
+    "The title limit is reached with 200 characters. Please use a shorter title." : "تم الوصول إلى الحد القصي لعدد حلاوف العنوان وهو 200 حرف. الرجاء استخدام عنوان أقصر.",
+    "Could not create new table" : "تعذر إنشاء جدول جديد",
     "Create row" : "إنشاء صف",
     "\"{columnTitle}\" should not be empty" : "\"{columnTitle}\" يجب ألّا تكون فارغةً",
     "Save row" : "حفظ الصف",
     "Row successfully created." : "تمّ بنجاحٍ إنشاء السطر",
     "Could not create new row" : "تعذر إنشاء صف جديد",
     "Create table" : "إنشاء جدول",
-    "Title" : "العنوان",
     "Select emoji for table" : "إختَر إيموجي emoji للجدول",
     "Select emoji" : "إختر رمزاً تعبيريّاً emji",
     "Title of the new table" : "عنوان الجدول الجديد",
     "🔧 Custom table" : "🔧 جدولٌ مُخصَّصٌ",
     "Custom table from scratch." : "جدول مخصص من البداية.",
-    "The title limit is reached with 200 characters. Please use a shorter title." : "تم الوصول إلى الحد القصي لعدد حلاوف العنوان وهو 200 حرف. الرجاء استخدام عنوان أقصر.",
     "Cannot create new table. Title is missing." : "لا يمكن إنشاء جدول جديد. العنوان مفقود.",
-    "Could not create new table" : "تعذر إنشاء جدول جديد",
     "Could not load templates." : "تعذر تحميل القوالب.",
     "Delete column" : "حذف عمود",
     "Are you sure you want to delete column \"{column}\"?" : "هل أنت متأكد أنك تريد حذف العمود \"{column}\"؟",
@@ -308,7 +308,6 @@ OC.L10N.register(
     "Duplicate view" : "استنساخ المنظور",
     "Copy" : "إنسَخ",
     "Could not configure new view" : "تتعذّر تهيئة المنظور الجديد",
-    "Filter tables" : "تصفية/ فلترة الجداول",
     "Favorites" : "المُفضّلة",
     "Archived tables" : "جداول مؤرشفة",
     "Your results are filtered." : "نتائجك تمّت فلترتُها",

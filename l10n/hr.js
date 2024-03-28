@@ -53,6 +53,7 @@ OC.L10N.register(
     "Time" : "Vrijeme",
     "Save" : "Spremi",
     "Title" : "Naslov",
+    "Resources" : "Resursi",
     "Delete column" : "Izbriši stupac",
     "Cancel" : "Odustani",
     "Delete" : "Izbriši",

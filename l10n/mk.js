@@ -44,6 +44,7 @@ OC.L10N.register(
     "Time" : "Време",
     "Save" : "Зачувај",
     "Title" : "Наслов",
+    "Resources" : "Ресурси",
     "Cancel" : "Откажи",
     "Delete" : "Избриши",
     "Close" : "Затвори",

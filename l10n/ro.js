@@ -45,6 +45,7 @@ OC.L10N.register(
     "Time" : "Timp",
     "Save" : "Salvează",
     "Title" : "Titlu",
+    "Resources" : "Resurse",
     "Cancel" : "Anulare",
     "Delete" : "Șterge",
     "Owner" : "Proprietar",

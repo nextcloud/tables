@@ -54,6 +54,7 @@ OC.L10N.register(
     "Time" : "Ora",
     "Save" : "Sarva",
     "Title" : "Tìtulu",
+    "Resources" : "Risorsas",
     "Cancel" : "Annulla",
     "Delete" : "Cantzella",
     "Close" : "Serra",

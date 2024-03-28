@@ -34,6 +34,7 @@ OC.L10N.register(
     "Time" : "Laiks",
     "Save" : "Saglabāt",
     "Title" : "Amats",
+    "Resources" : "Resursi",
     "Cancel" : "Atcelt",
     "Delete" : "Dzēst",
     "Close" : "Aizvērt",

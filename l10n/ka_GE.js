@@ -33,6 +33,7 @@ OC.L10N.register(
     "Time" : "დრო",
     "Save" : "შენახვა",
     "Title" : "სათაური",
+    "Resources" : "რესურსები",
     "Cancel" : "უარყოფა",
     "Delete" : "წაშლა",
     "Close" : "დახურვა",

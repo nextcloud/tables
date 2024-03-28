@@ -44,6 +44,7 @@ OC.L10N.register(
     "Time" : "Waktu",
     "Save" : "Simpan",
     "Title" : "Judul",
+    "Resources" : "Sumber daya",
     "Cancel" : "Membatalkan",
     "Delete" : "Hapus",
     "Close" : "Tutup",

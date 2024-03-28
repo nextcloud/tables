@@ -41,6 +41,7 @@ OC.L10N.register(
     "Time" : "Hora",
     "Save" : "Guardar",
     "Title" : "Título",
+    "Resources" : "Recursos",
     "Cancel" : "Cancelar",
     "Delete" : "Eliminar",
     "Close" : "Cerrar",
