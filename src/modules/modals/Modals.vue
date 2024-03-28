@@ -39,6 +39,7 @@
 		<EditTable :table-id="editTable" :show-modal="editTable !== null" @close="editTable = null" />
 		<TransferTable :table="tableToTransfer" :show-modal="tableToTransfer !== null" @close="tableToTransfer = null" />
 		<EditContext :context-id="editContext" :show-modal="editContext !== null" @close="editContext = null" />
+		<TransferContext :context="contextToTransfer" :show-modal="contextToTransfer !== null" @close="contextToTransfer = null" />
 	</div>
 </template>
 
@@ -60,6 +61,7 @@ import EditTable from './EditTable.vue'
 import EditContext from './EditContext.vue'
 import TransferTable from './TransferTable.vue'
 import CreateContext from './CreateContext.vue'
+import TransferContext from './TransferContext.vue'
 
 export default {
 	components: {
@@ -78,6 +80,7 @@ export default {
 		TransferTable,
 		CreateContext,
 		EditContext,
+		TransferContext,
 	},
 
 	data() {
@@ -98,6 +101,7 @@ export default {
 			editTable: null,
 			editContext: null,
 			tableToTransfer: null,
+			contextToTransfer: null,
 		}
 	},
 
@@ -138,6 +142,7 @@ export default {
 		// context
 		subscribe('tables:context:create', () => { this.showModalCreateContext = true })
 		subscribe('tables:context:edit', contextId => { this.editContext = contextId })
+		subscribe('tables:context:transfer', context => { this.contextToTransfer = context })
 
 	},
 	unmounted() {
@@ -165,6 +170,7 @@ export default {
 		unsubscribe('tables:table:transfer', table => { this.tableToTransfer = table })
 		unsubscribe('tables:context:create', () => { this.showModalCreateContext = true })
 		unsubscribe('tables:context:edit', contextId => { this.editContext = contextId })
+		unsubscribe('tables:context:transfer', context => { this.contextToTransfer = context })
 	},
 }
 </script>

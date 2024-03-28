@@ -377,6 +377,7 @@ export default new Vuex.Store({
 			try {
 				const res = await axios.get(generateOcsUrl('/apps/tables/api/2/contexts'))
 				commit('setContexts', res.data.ocs.data)
+				await this.dispatch('getContextsTablesAndViews')
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load applications.'))
 				showError(t('tables', 'Could not fetch applications'))
@@ -393,6 +394,69 @@ export default new Vuex.Store({
 				displayError(e, t('tables', 'Could not load application.'))
 				showError(t('tables', 'Could not fetch application'))
 			}
+			return true
+		},
+		async getContextsTablesAndViews({ state }) {
+			for (const context of state.contexts) {
+				for (const node of Object.values(context?.nodes)) {
+					if (parseInt(node.node_type) === NODE_TYPE_TABLE) {
+						await this.dispatch('loadContextTable', { id: node.node_id })
+					} else if (parseInt(node.node_type) === NODE_TYPE_VIEW) {
+						await this.dispatch('loadContextView', { id: node.node_id })
+					}
+				}
+
+			}
+		},
+
+		async loadContextTable({ commit, state, getters }, { id }) {
+			const table = getters.getTable(id)
+			if (table) {
+				return true
+			}
+			let res
+			try {
+				res = await axios.get(generateOcsUrl('/apps/tables/api/2/tables/' + id))
+				const tables = state.tables
+				tables.push(res.data.ocs.data)
+				commit('setTables', tables)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load table.'))
+				showError(t('tables', 'Could not fetch table'))
+			}
+			return res?.data.ocs.data
+		},
+
+		async loadContextView({ commit, state, getters }, { id }) {
+			const view = getters.getView(id)
+			if (view) {
+				return true
+			}
+			let res
+			try {
+				res = await axios.get(generateUrl('/apps/tables/view/' + id))
+				const views = state.views
+				views.push(res.data)
+				commit('setViews', views)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load view'))
+				showError(t('tables', 'Could not fetch view'))
+			}
+			return res?.data
+		},
+
+		async transferContext({ state, commit, dispatch }, { id, data }) {
+			try {
+				await axios.put(generateOcsUrl('/apps/tables/api/2/contexts/' + id + '/transfer'), data)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not transfer application.'))
+				return false
+			}
+
+			const contexts = state.contexts
+			const index = contexts.findIndex(t => t.id === id)
+			contexts.splice(index, 1)
+			commit('setContexts', [...contexts])
 			return true
 		},
 
