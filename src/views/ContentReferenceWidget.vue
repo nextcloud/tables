@@ -21,35 +21,36 @@
 
 <template>
 	<div v-if="richObject" class="tables-content-widget">
-		<h2>{{ richObject.emoji }}&nbsp;{{ richObject.title }}</h2>
+		<h2>{{ element.emoji }}&nbsp;{{ element.title }}</h2>
+		<Options
+			:config="tablePermissions"
+			:show-options="true"
+			@create-row="createRow" />
 		<div class="nc-table">
 			<NcTable
-				:rows="richObject.rows"
-				:columns="richObject.columns"
-				:can-create-rows="false"
-				:can-edit-rows="false"
-				:can-delete-rows="false"
-				:can-create-columns="false"
-				:can-edit-columns="false"
-				:can-delete-columns="false"
-				:can-delete-table="false"
-				:can-select-rows="false"
-				:can-hide-columns="false"
-				:can-filter="false"
-				:show-actions="false" />
+				:rows="element.rows"
+				:columns="element.columns"
+				v-bind="tablePermissions"
+				@edit-row="editRow" />
 		</div>
 	</div>
 </template>
 
 <script>
 import NcTable from '../shared/components/ncTable/NcTable.vue'
+import Options from '../shared/components/ncTable/sections/Options.vue'
+import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
 import { useResizeObserver } from '@vueuse/core'
+import { spawnDialog } from '@nextcloud/dialogs'
 
 export default {
 
 	components: {
 		NcTable,
+		Options,
 	},
+
+	mixins: [permissionsMixin],
 
 	props: {
 		richObjectType: {
@@ -66,12 +67,90 @@ export default {
 		},
 	},
 
+	data() {
+		return {
+			element: {
+				...this.richObject,
+			},
+		}
+	},
+
+	computed: {
+		tablePermissions() {
+			return {
+				canCreateRows: this.canCreateRowInElement(this.element),
+				canReadRows: true,
+				canEditRows: this.canUpdateData(this.element),
+				canDeleteRows: this.canDeleteData(this.element),
+				canCreateColumns: false,
+				canEditColumns: false,
+				canDeleteColumns: false,
+				canDeleteTable: false,
+				canSelectRows: false,
+				canHideColumns: false,
+				canFilter: false,
+				showActions: this.canManageElement(this.element),
+			}
+		},
+	},
+
 	mounted() {
 		useResizeObserver(this.$el, (entries) => {
 			const entry = entries[0]
 			const { width } = entry.contentRect
 			this.$el.style.setProperty('--widget-content-width', `${width}px`)
 		})
+	},
+
+	methods: {
+		async createRow() {
+			await this.loadStore()
+
+			const { default: CreateRow } = await import('../modules/modals/CreateRow.vue')
+			spawnDialog(CreateRow, {
+				showModal: true,
+				columns: this.element.columns,
+				isView: this.element.type,
+				elementId: this.element.id,
+			}, async () => {
+				const storeRows = this.$store.data.state.rows
+
+				if (storeRows.length > this.element.rows.length) {
+					const createdRow = this.$store.data.state.rows.at(-1)
+					this.element.rows.push(createdRow)
+				}
+			})
+		},
+		async editRow(rowId) {
+			await this.loadStore()
+
+			const { default: EditRow } = await import('../modules/modals/EditRow.vue')
+			spawnDialog(EditRow, {
+				showModal: true,
+				columns: this.element.columns,
+				row: this.getRow(rowId),
+				isView: this.element.type,
+				element: this.element,
+			}, async () => {
+				const localRowIndex = this.element.rows.findIndex(row => row.id === rowId)
+				const updatedRow = this.$store.data.state.rows.find(row => row.id === rowId)
+				this.element.rows.splice(localRowIndex, 1, updatedRow)
+			})
+		},
+		getRow(rowId) {
+			return this.element.rows.find(row => row.id === rowId)
+		},
+		async loadStore() {
+			if (this.$store) { return }
+
+			const { default: store } = await import(/* webpackChunkName: 'store' */ '../store/store.js')
+			const { default: data } = await import(/* webpackChunkName: 'store' */ '../store/data.js')
+
+			this.$store = store
+			this.$store.data = data
+
+			await this.$store.dispatch('loadRowsFromBE', { tableId: this.tableId })
+		},
 	},
 }
 </script>
@@ -82,12 +161,18 @@ export default {
 		height: 50vh;
 		overflow: scroll;
 
+		:where(.options) {
+			position: sticky;
+			top: 57px;
+			z-index: 1;
+			padding-bottom: 10px;
+			background-color: var(--color-main-background);
+		}
+
 		h2 {
 			position: sticky;
 			top: 0;
-			left: 0;
 			width: calc(var(--widget-content-width, 100%) - 24px);
-			height: 36px;
 			z-index: 1;
 			background-color: var(--color-main-background);
 			margin: 0 !important;
@@ -96,8 +181,20 @@ export default {
 
 		.nc-table {
 			margin-left: calc(var(--default-grid-baseline) * 2);
-			width: max-content;
-			margin-top: -1px;
+			min-width: var(--widget-content-width);
+
+			:where(.options.row) {
+				display: none;
+			}
+
+			:where(thead) {
+				position: sticky;
+				top: 117px;
+			}
+
+			:where(.sticky) {
+				border-width: 0;
+			}
 		}
 
 		& :deep(.options.row) {
