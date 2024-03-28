@@ -71,7 +71,6 @@ export default {
 		return {
 			element: {
 				...this.richObject,
-				isView: this.richObject.link.includes('view'),
 			},
 		}
 	},
