@@ -77,10 +77,6 @@ export default {
 	},
 
 	computed: {
-		tableId() {
-			const id = this.richObject.link.split('/').at(-2)
-			return parseInt(id)
-		},
 		tablePermissions() {
 			return {
 				canCreateRows: this.canCreateRowInElement(this.element),
@@ -109,14 +105,14 @@ export default {
 
 	methods: {
 		async createRow() {
-      await this.loadStore()
+			await this.loadStore()
 
 			const { default: CreateRow } = await import('../modules/modals/CreateRow.vue')
 			spawnDialog(CreateRow, {
 				showModal: true,
 				columns: this.element.columns,
-				isView: this.element.isView,
-				elementId: this.tableId,
+				isView: this.element.type,
+				elementId: this.element.id,
 			}, async () => {
 				const storeRows = this.$store.data.state.rows
 
@@ -127,14 +123,14 @@ export default {
 			})
 		},
 		async editRow(rowId) {
-      await this.loadStore()
+			await this.loadStore()
 
 			const { default: EditRow } = await import('../modules/modals/EditRow.vue')
 			spawnDialog(EditRow, {
 				showModal: true,
 				columns: this.element.columns,
 				row: this.getRow(rowId),
-				isView: this.element.isView,
+				isView: this.element.type,
 				element: this.element,
 			}, async () => {
 				const localRowIndex = this.element.rows.findIndex(row => row.id === rowId)
@@ -148,7 +144,7 @@ export default {
 		async loadStore() {
 			if (this.$store) { return }
 
-      const { default: store } = await import(/* webpackChunkName: 'store' */ '../store/store.js')
+			const { default: store } = await import(/* webpackChunkName: 'store' */ '../store/store.js')
 			const { default: data } = await import(/* webpackChunkName: 'store' */ '../store/data.js')
 
 			this.$store = store

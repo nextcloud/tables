@@ -5,6 +5,7 @@ namespace OCA\Tables\Reference;
 use Exception;
 use OC\Collaboration\Reference\LinkReferenceProvider;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Db\Table;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -94,6 +95,9 @@ class ContentReferenceHelper extends ReferenceHelper {
 
 			$reference = new Reference($referenceText);
 			$referenceInfo = [];
+
+			$referenceInfo['id'] = $elementId;
+			$referenceInfo['type'] = ($element instanceof Table) ? Application::NODE_TYPE_TABLE : Application::NODE_TYPE_VIEW;
 
 			if ($element->getEmoji()) {
 				$reference->setDescription($element->getEmoji() . ' ' . $element->getTitle());
