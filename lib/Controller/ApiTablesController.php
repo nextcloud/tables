@@ -101,15 +101,16 @@ class ApiTablesController extends AOCSController {
 	 * @param string|null $title New table title
 	 * @param string|null $emoji New table emoji
 	 * @param bool $archived whether the table is archived
+	 * @param string $description the tables description
 	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
 	 * 403: No permissions
 	 * 404: Not found
 	 */
-	public function update(int $id, ?string $title = null, ?string $emoji = null, ?bool $archived = null): DataResponse {
+	public function update(int $id, ?string $title = null, ?string $emoji = null, ?string $description = null, ?bool $archived = null): DataResponse {
 		try {
-			return new DataResponse($this->service->update($id, $title, $emoji, $archived, $this->userId)->jsonSerialize());
+			return new DataResponse($this->service->update($id, $title, $emoji, $description, $archived, $this->userId)->jsonSerialize());
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
 		} catch (InternalError $e) {

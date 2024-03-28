@@ -1,6 +1,7 @@
 <template>
 	<div>
-		<ElementDescription :active-element="table" :view-setting.sync="localViewSetting" />
+		<ElementTitle :active-element="table" :view-setting.sync="localViewSetting" />
+		<TableDescription :active-element="table" />
 		<Dashboard v-if="hasViews"
 			:table="table"
 			@create-column="$emit('create-column')"
@@ -19,7 +20,8 @@
 </template>
 
 <script>
-import ElementDescription from './ElementDescription.vue'
+import TableDescription from './TableDescription.vue'
+import ElementTitle from './ElementTitle.vue'
 import Dashboard from './Dashboard.vue'
 import DataTable from './DataTable.vue'
 import { mapState } from 'vuex'
@@ -28,7 +30,8 @@ import { emit } from '@nextcloud/event-bus'
 
 export default {
 	components: {
-		ElementDescription,
+		TableDescription,
+		ElementTitle,
 		Dashboard,
 		DataTable,
 	},
@@ -71,6 +74,7 @@ export default {
 			this.localViewSetting = this.viewSetting
 		},
 	},
+
 	methods: {
 		createView() {
 			emit('tables:view:create', { tableId: this.table.id, viewSetting: this.viewSetting.length > 0 ? this.viewSetting : this.localViewSetting })

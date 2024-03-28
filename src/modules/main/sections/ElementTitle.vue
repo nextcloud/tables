@@ -34,7 +34,7 @@ import FilterRemove from 'vue-material-design-icons/FilterRemove.vue'
 import NcSmallButton from '../../../shared/components/ncSmallButton/NcSmallButton.vue'
 
 export default {
-	name: 'ElementDescription',
+	name: 'ElementTitle',
 
 	components: {
 		NcUserBubble,

@@ -431,7 +431,7 @@ class TableService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function update(int $id, ?string $title, ?string $emoji, ?bool $archived = null, ?string $userId = null): Table {
+	public function update(int $id, ?string $title, ?string $emoji, ?string $description, ?bool $archived = null, ?string $userId = null): Table {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
@@ -458,6 +458,9 @@ class TableService extends SuperService {
 		}
 		if ($archived !== null) {
 			$table->setArchived($archived);
+		}
+		if ($description !== null) {
+			$table->setDescription($description);
 		}
 		$table->setLastEditBy($userId);
 		$table->setLastEditAt($time->format('Y-m-d H:i:s'));

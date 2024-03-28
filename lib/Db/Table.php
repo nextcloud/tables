@@ -18,6 +18,7 @@ use OCP\AppFramework\Db\Entity;
  * @method setEmoji(string $emoji)
  * @method getArchived(): bool
  * @method setArchived(bool $archived)
+ * @method setDescription(string $description)
  * @method getOwnership(): string
  * @method setOwnership(string $ownership)
  * @method getOwnerDisplayName(): string
@@ -66,6 +67,7 @@ class Table extends Entity implements JsonSerializable {
 	protected ?int $columnsCount = 0;
 	protected ?array $views = null;
 	protected ?array $columns = null;
+	protected ?string $description = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');
@@ -94,6 +96,7 @@ class Table extends Entity implements JsonSerializable {
 			'rowsCount' => $this->rowsCount ?: 0,
 			'columnsCount' => $this->columnsCount ?: 0,
 			'views' => $this->getViewsArray(),
+			'description' => $this->description ?:'',
 		];
 	}
 

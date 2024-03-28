@@ -5387,6 +5387,14 @@
                         }
                     },
                     {
+                        "name": "description",
+                        "in": "query",
+                        "description": "the tables description",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
                         "name": "archived",
                         "in": "query",
                         "description": "whether the table is archived",
