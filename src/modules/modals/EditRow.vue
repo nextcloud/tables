@@ -157,9 +157,7 @@ export default {
 			this.actionCancel()
 		},
 		async sendRowToBE() {
-			if (!this.$store) {
-				await this.loadStore()
-			}
+      await this.loadStore()
 
 			const data = []
 			for (const [key, value] of Object.entries(this.localRow)) {
@@ -186,9 +184,7 @@ export default {
 			this.deleteRowAtBE(this.row.id)
 		},
 		async deleteRowAtBE(rowId) {
-			if (!this.$store) {
-				await this.loadStore()
-			}
+      await this.loadStore()
 
 			this.localLoading = true
 			const res = await this.$store.dispatch('removeRow', {
@@ -202,6 +198,8 @@ export default {
 			this.actionCancel()
 		},
 		async loadStore() {
+      if (this.$store) { return }
+
 			const { default: store } = await import(/* webpackChunkName: 'store' */ '../../store/store.js')
 			this.$store = store
 		},
