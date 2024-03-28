@@ -159,9 +159,10 @@ export default {
 .modal__content {
 	padding: 20px;
 
-	:where(.row .space-T, .row.space-T) {
-		padding-top: 20px;
-	}
+  .row .space-T,
+  .row.space-T {
+    padding-top: 20px;
+  }
 
 	:where([class*='fix-col-']) {
 		display: flex;
