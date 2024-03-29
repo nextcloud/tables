@@ -464,6 +464,7 @@ OC.L10N.register(
     "Could not remove view." : "Pohled se nepodařilo odebrat.",
     "Could not reload view." : "Pohled se nepodařilo znovu načíst.",
     "Could not update table." : "Nepodařilo se zaktualizovat tabulku.",
+    "Could not transfer table." : "Nepodařilo se přenést tabulku.",
     "Could not remove table." : "Nepodařilo se odebrat tabulku."
 },
 "nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;");

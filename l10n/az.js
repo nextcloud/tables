@@ -32,6 +32,7 @@ OC.L10N.register(
     "Time" : "Vaxt",
     "Save" : "Saxla",
     "Title" : "Başlıq",
+    "Resources" : "Resurslar",
     "Cancel" : "Dayandır",
     "Delete" : "Sil",
     "Close" : "Bağla",

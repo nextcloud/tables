@@ -33,6 +33,7 @@ OC.L10N.register(
     "Time" : "Tyd",
     "Save" : "Bewaar",
     "Title" : "Titel",
+    "Resources" : "Hulpbronne",
     "Cancel" : "Kanselleer",
     "Delete" : "Skrap",
     "Select from Files" : "Kies uit Lêers",

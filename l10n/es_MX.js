@@ -74,6 +74,7 @@ OC.L10N.register(
     "Download" : "Descargar",
     "Search" : "Buscar",
     "Back" : "Atrás",
+    "Sorting" : "Ordenando",
     "Undo" : "Deshacer",
     "Redo" : "Rehacer",
     "Bold" : "Negritas",

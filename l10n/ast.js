@@ -45,6 +45,7 @@ OC.L10N.register(
     "Time" : "Data",
     "Save" : "Guardar",
     "Title" : "Tñitulu",
+    "Resources" : "Recursos",
     "Error occurred while deleting rows." : "Prodúxose un error mentanto se desaniciaben les fileres.",
     "Cancel" : "Encaboxar",
     "Delete" : "Desaniciar",

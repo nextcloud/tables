@@ -489,6 +489,7 @@ OC.L10N.register(
     "Could not remove view." : "Ansicht konnte nicht entfernt werden.",
     "Could not reload view." : "Ansicht konnte nicht erneut geladen werden.",
     "Could not update table." : "Tabellen konnten nicht aktualisiert werden.",
+    "Could not transfer table." : "Tabelle konnte nicht übertragen werden.",
     "Could not remove table." : "Tabelle konnte nicht entfernt werden."
 },
 "nplurals=2; plural=(n != 1);");

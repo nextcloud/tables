@@ -489,6 +489,7 @@ OC.L10N.register(
     "Could not remove view." : "Could not remove view.",
     "Could not reload view." : "Could not reload view.",
     "Could not update table." : "Could not update table.",
+    "Could not transfer table." : "Could not transfer table.",
     "Could not remove table." : "Could not remove table."
 },
 "nplurals=2; plural=(n != 1);");
