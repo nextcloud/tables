@@ -59,6 +59,8 @@ OC.L10N.register(
     "Operator" : "Operator",
     "Views" : "Bekeken",
     "View" : "Bekijken",
+    "Rows" : "Regels",
+    "Columns" : "Kolommen",
     "Shares" : "Shares",
     "Actions" : "Acties",
     "Share" : "Delen",
