@@ -5,19 +5,20 @@
 namespace OCA\Tables\Service;
 
 use DateTime;
-
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Event\TableDeletedEvent;
+use OCA\Tables\Event\TableOwnershipTransferredEvent;
 use OCA\Tables\Helper\UserHelper;
-
 use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception as OcpDbException;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
@@ -44,6 +45,8 @@ class TableService extends SuperService {
 
 	protected IL10N $l;
 
+    protected IEventDispatcher $eventDispatcher;
+
 	public function __construct(
 		PermissionsService $permissionsService,
 		LoggerInterface $logger,
@@ -56,7 +59,8 @@ class TableService extends SuperService {
 		ShareService $shareService,
 		UserHelper $userHelper,
 		FavoritesService $favoritesService,
-		IL10N $l
+		IL10N $l,
+        IEventDispatcher $eventDispatcher
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
@@ -68,6 +72,7 @@ class TableService extends SuperService {
 		$this->userHelper = $userHelper;
 		$this->favoritesService = $favoritesService;
 		$this->l = $l;
+        $this->eventDispatcher = $eventDispatcher;
 	}
 
 	/**
@@ -343,6 +348,14 @@ class TableService extends SuperService {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 
+        $event = new TableOwnershipTransferredEvent(
+            table: $table,
+            toUserId: $newOwnerUserId,
+            fromUserId: $userId
+        );
+
+        $this->eventDispatcher->dispatchTyped($event);
+
 		return $table;
 	}
 
@@ -417,6 +430,18 @@ class TableService extends SuperService {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
+
+        /*
+         * Decouple the side logic from the core business logic
+         * (logging, mail sending, etc.), called handling side effects and most of them can be done asynchronously via queue.
+         */
+        $event = new TableDeletedEvent(
+            table: $item,
+            userId: $userId
+        );
+
+        $this->eventDispatcher->dispatchTyped($event);
+
 		return $item;
 	}
 

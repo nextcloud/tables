@@ -5,15 +5,25 @@ namespace OCA\Tables\AppInfo;
 use Exception;
 use OCA\Analytics\Datasource\DatasourceEvent;
 use OCA\Tables\Capabilities;
+use OCA\Tables\Event\RowDeletedEvent;
+use OCA\Tables\Event\TableDeletedEvent;
+use OCA\Tables\Event\TableOwnershipTransferredEvent;
+use OCA\Tables\Event\ViewDeletedEvent;
 use OCA\Tables\Listener\AnalyticsDatasourceListener;
 use OCA\Tables\Listener\BeforeTemplateRenderedListener;
 use OCA\Tables\Listener\LoadAdditionalListener;
 use OCA\Tables\Listener\TablesReferenceListener;
 use OCA\Tables\Listener\UserDeletedListener;
+use OCA\Tables\Listener\WhenRowDeletedAuditLogListener;
+use OCA\Tables\Listener\WhenTableDeletedAuditLogListener;
+use OCA\Tables\Listener\WhenTableTransferredAuditLogListener;
+use OCA\Tables\Listener\WhenViewDeletedAuditLogListener;
 use OCA\Tables\Middleware\PermissionMiddleware;
 use OCA\Tables\Reference\ContentReferenceProvider;
 use OCA\Tables\Reference\ReferenceProvider;
 use OCA\Tables\Search\SearchTablesProvider;
+use OCA\Tables\Service\Support\AuditLogServiceInterface;
+use OCA\Tables\Service\Support\DefaultAuditLogService;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -47,11 +57,17 @@ class Application extends App implements IBootstrap {
 			throw new Exception('Cannot include autoload. Did you run install dependencies using composer?');
 		}
 
+        $context->registerService(AuditLogServiceInterface::class, fn($c) => $c->query(DefaultAuditLogService::class));
+
 		$context->registerEventListener(BeforeUserDeletedEvent::class, UserDeletedListener::class);
 		$context->registerEventListener(DatasourceEvent::class, AnalyticsDatasourceListener::class);
 		$context->registerEventListener(RenderReferenceEvent::class, TablesReferenceListener::class);
 		$context->registerEventListener(BeforeTemplateRenderedEvent::class, BeforeTemplateRenderedListener::class);
 		$context->registerEventListener(LoadAdditionalScriptsEvent::class, LoadAdditionalListener::class);
+        $context->registerEventListener(TableDeletedEvent::class, WhenTableDeletedAuditLogListener::class);
+        $context->registerEventListener(ViewDeletedEvent::class, WhenViewDeletedAuditLogListener::class);
+        $context->registerEventListener(RowDeletedEvent::class, WhenRowDeletedAuditLogListener::class);
+        $context->registerEventListener(TableOwnershipTransferredEvent::class, WhenTableTransferredAuditLogListener::class);
 
 		$context->registerSearchProvider(SearchTablesProvider::class);
 
