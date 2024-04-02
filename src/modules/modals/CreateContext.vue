@@ -22,7 +22,7 @@
 							</template>
 						</NcButton>
 					</NcIconPicker>
-					<input v-model="title" :class="{ missing: errorTitle }" type="text"
+					<input ref="titleInput" v-model="title" :class="{ missing: errorTitle }" type="text"
 						:placeholder="t('tables', 'Title of the new application')" @input="titleChangedManually">
 				</div>
 			</div>
@@ -78,7 +78,7 @@ export default {
 		return {
 			title: '',
 			icon: {
-				name: 'equalizer',
+				name: this.randomIcon(),
 				svg: null,
 			},
 			customIconChosen: false,
@@ -95,9 +95,14 @@ export default {
 				this.title = this.title.slice(0, 199)
 			}
 		},
+		showModal() {
+			// every time when the modal opens chose a new icon
+			this.icon.name = this.setIcon(this.randomIcon())
+			// this.$nextTick(() => this.$refs.titleInput?.focus())
+		},
 	},
 	async mounted() {
-		await this.setIcon('equalizer')
+		await this.setIcon(this.randomIcon())
 	},
 	methods: {
 		titleChangedManually() {
@@ -125,6 +130,10 @@ export default {
 				}
 			}
 		},
+		randomIcon() {
+			const iconNames = ['alarm', 'apps', 'bank', 'bell', 'book', 'briefcase', 'camera', 'cellphone', 'earth', 'equalizer', 'file', 'football', 'heart', 'home', 'laptop', 'lightbulb', 'lock', 'movie', 'newspaper', 'rocket', 'star']
+			return iconNames[~~(Math.random() * iconNames.length)]
+		},
 		async sendNewContextToBE() {
 			const dataResources = this.resources.map(resource => {
 				return {
@@ -149,7 +158,7 @@ export default {
 		reset() {
 			this.title = ''
 			this.errorTitle = false
-			this.icon.name = 'equalizer'
+			this.icon.name = this.randomIcon()
 			this.customIconChosen = false
 			this.customTitleChosen = false
 		},
