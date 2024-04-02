@@ -120,7 +120,7 @@ export default {
 		},
 		async submit() {
 			if (this.title === '') {
-				showError(t('tables', 'Cannot create new context. Title is missing.'))
+				showError(t('tables', 'Cannot create new application. Title is missing.'))
 				this.errorTitle = true
 			} else {
 				const newContextId = await this.sendNewContextToBE()

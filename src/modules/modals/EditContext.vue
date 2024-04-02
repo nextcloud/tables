@@ -128,7 +128,7 @@ export default {
 		// TODO show edited changes if we're currently viewing the active context
 		async submit() {
 			if (this.title === '') {
-				showError(t('tables', 'Cannot update context. Title is missing.'))
+				showError(t('tables', 'Cannot update application. Title is missing.'))
 				this.errorTitle = true
 			} else {
 				const dataResources = this.resources.map(resource => {
