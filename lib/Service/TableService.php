@@ -45,7 +45,7 @@ class TableService extends SuperService {
 
 	protected IL10N $l;
 
-    protected IEventDispatcher $eventDispatcher;
+	protected IEventDispatcher $eventDispatcher;
 
 	public function __construct(
 		PermissionsService $permissionsService,
@@ -60,7 +60,7 @@ class TableService extends SuperService {
 		UserHelper $userHelper,
 		FavoritesService $favoritesService,
 		IL10N $l,
-        IEventDispatcher $eventDispatcher
+		IEventDispatcher $eventDispatcher
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
@@ -72,7 +72,7 @@ class TableService extends SuperService {
 		$this->userHelper = $userHelper;
 		$this->favoritesService = $favoritesService;
 		$this->l = $l;
-        $this->eventDispatcher = $eventDispatcher;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	/**
@@ -348,13 +348,13 @@ class TableService extends SuperService {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 
-        $event = new TableOwnershipTransferredEvent(
-            table: $table,
-            toUserId: $newOwnerUserId,
-            fromUserId: $userId
-        );
+		$event = new TableOwnershipTransferredEvent(
+			table: $table,
+			toUserId: $newOwnerUserId,
+			fromUserId: $userId
+		);
 
-        $this->eventDispatcher->dispatchTyped($event);
+		$this->eventDispatcher->dispatchTyped($event);
 
 		return $table;
 	}
@@ -431,16 +431,16 @@ class TableService extends SuperService {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 
-        /*
-         * Decouple the side logic from the core business logic
-         * (logging, mail sending, etc.), called handling side effects and most of them can be done asynchronously via queue.
-         */
-        $event = new TableDeletedEvent(
-            table: $item,
-            userId: $userId
-        );
+		/*
+		 * Decouple the side logic from the core business logic
+		 * (logging, mail sending, etc.), called handling side effects and most of them can be done asynchronously via queue.
+		 */
+		$event = new TableDeletedEvent(
+			table: $item,
+			userId: $userId
+		);
 
-        $this->eventDispatcher->dispatchTyped($event);
+		$this->eventDispatcher->dispatchTyped($event);
 
 		return $item;
 	}

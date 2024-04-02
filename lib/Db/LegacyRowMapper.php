@@ -116,7 +116,12 @@ class LegacyRowMapper extends QBMapper {
 		return $innerFilterExpressions;
 	}
 
-	private function getFilterGroups($qb, $filters): array {
+	/**
+	 * @param (float|int|string)[][][] $filters
+	 *
+	 * @psalm-param non-empty-list<list<array{columnId: int, operator: 'begins-with'|'contains'|'ends-with'|'is-empty'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal', value: float|int|string}>> $filters
+	 */
+	private function getFilterGroups(IQueryBuilder $qb, array $filters): array {
 		$filterGroups = [];
 		foreach ($filters as $groupIndex => $filterGroup) {
 			$filterGroups[] = $qb->expr()->andX(...$this->getInnerFilterExpressions($qb, $filterGroup, $groupIndex));
@@ -149,7 +154,12 @@ class LegacyRowMapper extends QBMapper {
 		}
 	}
 
-	private function addOrderByRules(IQueryBuilder $qb, $sortArray) {
+	/**
+	 * @param (int|string)[][] $sortArray
+	 *
+	 * @psalm-param list<array{columnId: int, mode: 'ASC'|'DESC'}> $sortArray
+	 */
+	private function addOrderByRules(IQueryBuilder $qb, array $sortArray) {
 		foreach ($sortArray as $index => $sortRule) {
 			$sortMode = $sortRule['mode'];
 			if (!in_array($sortMode, ['ASC', 'DESC'])) {

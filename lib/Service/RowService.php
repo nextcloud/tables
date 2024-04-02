@@ -35,25 +35,24 @@ class RowService extends SuperService {
 	private Row2Mapper $row2Mapper;
 	private array $tmpRows = []; // holds already loaded rows as a small cache
 
-    protected IEventDispatcher $eventDispatcher;
+	protected IEventDispatcher $eventDispatcher;
 
 	public function __construct(
-        PermissionsService $permissionsService,
-        LoggerInterface $logger,
-        ?string $userId,
+		PermissionsService $permissionsService,
+		LoggerInterface $logger,
+		?string $userId,
 		ColumnMapper $columnMapper,
-        ViewMapper $viewMapper,
-        TableMapper $tableMapper,
-        Row2Mapper $row2Mapper,
-        IEventDispatcher $eventDispatcher
-    )
-    {
+		ViewMapper $viewMapper,
+		TableMapper $tableMapper,
+		Row2Mapper $row2Mapper,
+		IEventDispatcher $eventDispatcher
+	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->columnMapper = $columnMapper;
 		$this->viewMapper = $viewMapper;
 		$this->tableMapper = $tableMapper;
 		$this->row2Mapper = $row2Mapper;
-        $this->eventDispatcher = $eventDispatcher;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	/**
@@ -464,14 +463,14 @@ class RowService extends SuperService {
 		}
 
 		try {
-            $deletedRow = $this->row2Mapper->delete($item);
+			$deletedRow = $this->row2Mapper->delete($item);
 
-            $event = new RowDeletedEvent(
-                row: $item,
-                userId: $userId
-            );
+			$event = new RowDeletedEvent(
+				row: $item,
+				userId: $userId
+			);
 
-            $this->eventDispatcher->dispatchTyped($event);
+			$this->eventDispatcher->dispatchTyped($event);
 
 			return $this->filterRowResult($view ?? null, $deletedRow);
 		} catch (Exception $e) {

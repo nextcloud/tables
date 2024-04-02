@@ -41,7 +41,7 @@ class ViewService extends SuperService {
 
 	protected IL10N $l;
 
-    protected IEventDispatcher $eventDispatcher;
+	protected IEventDispatcher $eventDispatcher;
 
 	public function __construct(
 		PermissionsService $permissionsService,
@@ -53,7 +53,7 @@ class ViewService extends SuperService {
 		UserHelper $userHelper,
 		FavoritesService $favoritesService,
 		IL10N $l,
-        IEventDispatcher $eventDispatcher
+		IEventDispatcher $eventDispatcher
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->l = $l;
@@ -62,7 +62,7 @@ class ViewService extends SuperService {
 		$this->rowService = $rowService;
 		$this->userHelper = $userHelper;
 		$this->favoritesService = $favoritesService;
-        $this->eventDispatcher = $eventDispatcher;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 
@@ -282,14 +282,14 @@ class ViewService extends SuperService {
 		try {
 			$deletedView = $this->mapper->delete($view);
 
-            $event = new ViewDeletedEvent(
-                view: $view,
-                userId: $userId
-            );
+			$event = new ViewDeletedEvent(
+				view: $view,
+				userId: $userId
+			);
 
-            $this->eventDispatcher->dispatchTyped($event);
+			$this->eventDispatcher->dispatchTyped($event);
 
-            return $deletedView;
+			return $deletedView;
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
@@ -317,14 +317,14 @@ class ViewService extends SuperService {
 
 			$this->mapper->delete($view);
 
-            $event = new ViewDeletedEvent(
-                view: $view,
-                userId: $userId
-            );
+			$event = new ViewDeletedEvent(
+				view: $view,
+				userId: $userId
+			);
 
-            $this->eventDispatcher->dispatchTyped($event);
+			$this->eventDispatcher->dispatchTyped($event);
 
-            return $view;
+			return $view;
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
