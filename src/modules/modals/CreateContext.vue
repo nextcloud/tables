@@ -40,7 +40,7 @@
 				<NcContextResource :resources.sync="resources" />
 			</div>
 			<div class="row space-R">
-				<div class="fix-col-4 end">
+				<div class="fix-col-4 end space-T">
 					<NcButton type="primary" :aria-label="t('tables', 'Create application')" @click="submit">
 						{{ t('tables', 'Create application') }}
 					</NcButton>

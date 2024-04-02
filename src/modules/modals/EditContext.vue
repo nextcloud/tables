@@ -40,7 +40,7 @@
 			</div>
 
 			<div class="row space-R">
-				<div class="fix-col-4 end">
+				<div class="fix-col-4 end space-T">
 					<NcButton type="primary" @click="submit">
 						{{ t('tables', 'Save') }}
 					</NcButton>
