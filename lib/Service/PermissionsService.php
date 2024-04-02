@@ -164,6 +164,14 @@ class PermissionsService {
 		}
 	}
 
+		try {
+			$this->contextMapper->findById($contextId, $userId ?? $this->userId);
+			return true;
+		} catch (NotFoundError $e) {
+			return false;
+		}
+	}
+
 	public function canAccessView(View $view, ?string $userId = null): bool {
 		return $this->canAccessNodeById(Application::NODE_TYPE_VIEW, $view->getId(), $userId);
 	}
