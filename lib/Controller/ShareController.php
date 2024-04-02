@@ -61,9 +61,20 @@ class ShareController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function create(int $nodeId, string $nodeType, string $receiver, string $receiverType, bool $permissionRead = false, bool $permissionCreate = false, bool $permissionUpdate = false, bool $permissionDelete = false, bool $permissionManage = false): DataResponse {
-		return $this->handleError(function () use ($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage) {
-			return $this->service->create($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage);
+	public function create(
+		int $nodeId,
+		string $nodeType,
+		string $receiver,
+		string $receiverType,
+		bool $permissionRead = false,
+		bool $permissionCreate = false,
+		bool $permissionUpdate = false,
+		bool $permissionDelete = false,
+		bool $permissionManage = false,
+		int $displayMode = 0,
+	): DataResponse {
+		return $this->handleError(function () use ($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage, $displayMode) {
+			return $this->service->create($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage, $displayMode);
 		});
 	}
 
@@ -73,6 +84,25 @@ class ShareController extends Controller {
 	public function updatePermission(int $id, string $permission, bool $value): DataResponse {
 		return $this->handleError(function () use ($id, $permission, $value) {
 			return $this->service->updatePermission($id, $permission, $value);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @psalm-param int<0, 2> $displayMode
+	 * @psalm-param ("default"|"self") $target
+	 */
+	public function updateDisplayMode(int $id, int $displayMode, string $target = 'default') {
+		return $this->handleError(function () use ($id, $displayMode, $target) {
+			if ($target === 'default') {
+				$userId = '';
+			} elseif ($target === 'self') {
+				$userId = $this->userId;
+			} else {
+				throw new \InvalidArgumentException('target parameter must be either "default" or "self"');
+			}
+
+			return $this->service->updateDisplayMode($id, $displayMode, $userId);
 		});
 	}
 

@@ -152,6 +152,18 @@ class PermissionsService {
 		return $context->getOwnerId() === $userId;
 	}
 
+	/**
+	 * @throws Exception
+	 */
+	public function canAccessContextById(int $contextId, ?string $userId = null): bool {
+		try {
+			$this->contextMapper->findById($contextId, $userId ?? $this->userId);
+			return true;
+		} catch (NotFoundError $e) {
+			return false;
+		}
+	}
+
 	public function canAccessView(View $view, ?string $userId = null): bool {
 		return $this->canAccessNodeById(Application::NODE_TYPE_VIEW, $view->getId(), $userId);
 	}

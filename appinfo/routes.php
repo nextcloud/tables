@@ -33,6 +33,7 @@ return [
 		['name' => 'api1#createShare',	'url' => '/api/1/shares', 'verb' => 'POST'],
 		['name' => 'api1#deleteShare',	'url' => '/api/1/shares/{shareId}', 'verb' => 'DELETE'],
 		['name' => 'api1#updateSharePermissions',	'url' => '/api/1/shares/{shareId}', 'verb' => 'PUT'],
+		['name' => 'api1#updateShareDisplayMode',	'url' => '/api/1/shares/{shareId}/display-mode', 'verb' => 'PUT'],
 		['name' => 'api1#createTableShare',	'url' => '/api/1/tables/{tableId}/shares', 'verb' => 'POST'],
 		// -> columns
 		['name' => 'api1#indexTableColumns',	'url' => '/api/1/tables/{tableId}/columns', 'verb' => 'GET'],
@@ -97,6 +98,7 @@ return [
 		['name' => 'share#show', 'url' => '/share/{id}', 'verb' => 'GET'],
 		['name' => 'share#create', 'url' => '/share', 'verb' => 'POST'],
 		['name' => 'share#updatePermission', 'url' => '/share/{id}/permission', 'verb' => 'PUT'],
+		['name' => 'share#updateDisplayMode', 'url' => '/share/{id}/display-mode', 'verb' => 'PUT'],
 		['name' => 'share#destroy', 'url' => '/share/{id}', 'verb' => 'DELETE'],
 
 		// import
