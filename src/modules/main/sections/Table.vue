@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<ElementTitle :active-element="table" :view-setting.sync="localViewSetting" />
-		<TableDescription :active-element="table" />
+		<TableDescription :description="table.description" :read-only="true" />
 		<Dashboard v-if="hasViews"
 			:table="table"
 			@create-column="$emit('create-column')"

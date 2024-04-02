@@ -2052,6 +2052,8 @@ export type operations = {
         title: string;
         /** @description Emoji for the table */
         emoji?: string | null;
+        /** @description Description for the table */
+        description?: string | null;
         /** @description Template to use if wanted */
         template?: string;
       };

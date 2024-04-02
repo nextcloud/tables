@@ -54,6 +54,10 @@ class Version000000Date20210921000000 extends SimpleMigrationStep {
 			$table->addColumn('last_edit_at', Types::DATETIME, [
 				'notnull' => true,
 			]);
+			$table->addColumn('description', Types::TEXT, [
+				'default' => '',
+				'notnull' => false,
+			]);
 			$table->setPrimaryKey(['id']);
 		}
 

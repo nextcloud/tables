@@ -28,6 +28,14 @@
 				</div>
 			</div>
 			<div class="row">
+				<div class="col-4 mandatory">
+					{{ t('tables', 'Description') }}
+				</div>
+				<div class="col-4">
+					<TableDescription :description.sync="localTable.description" />
+				</div>
+			</div>
+			<div class="row">
 				<div class="col-4 mandatory space-T">
 					{{ t('tables', 'Owner') }}
 				</div>
@@ -71,6 +79,7 @@ import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import { emit } from '@nextcloud/event-bus'
+import TableDescription from '../main/sections/TableDescription.vue'
 
 export default {
 	name: 'EditTable',
@@ -79,6 +88,7 @@ export default {
 		NcEmojiPicker,
 		NcButton,
 		NcUserBubble,
+		TableDescription,
 	},
 	mixins: [permissionsMixin],
 	props: {
@@ -130,7 +140,7 @@ export default {
 				showError(t('tables', 'Cannot update table. Title is missing.'))
 				this.errorTitle = true
 			} else {
-				const res = await this.$store.dispatch('updateTable', { id: this.tableId, data: { title: this.title, emoji: this.icon } })
+				const res = await this.$store.dispatch('updateTable', { id: this.tableId, data: { title: this.title, emoji: this.icon, description: this.localTable.description } })
 				if (res) {
 					showSuccess(t('tables', 'Updated table "{emoji}{table}".', { emoji: this.icon ? this.icon + ' ' : '', table: this.title }))
 					this.actionCancel()
@@ -176,6 +186,11 @@ export default {
 
 .right-additional-button > button {
 	margin-left: calc(var(--default-grid-baseline) * 3);
+}
+
+:deep(.element-description) {
+	padding-inline: 0 !important;
+	max-width: 100%;
 }
 
 </style>

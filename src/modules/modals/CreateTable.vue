@@ -28,6 +28,14 @@
 						@input="titleChangedManually">
 				</div>
 			</div>
+			<div class="row">
+				<div class="col-4 mandatory">
+					{{ t('tables', 'Description') }}
+				</div>
+				<div class="col-4">
+					<TableDescription :description.sync="description" :read-only="false" />
+				</div>
+			</div>
 			<div class="row space-T">
 				<div class="col-2 block space-R space-B">
 					<NcTile
@@ -65,6 +73,7 @@ import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import NcTile from '../../shared/components/ncTile/NcTile.vue'
 import displayError from '../../shared/utils/displayError.js'
+import TableDescription from '../../modules/main/sections/TableDescription.vue'
 
 export default {
 	name: 'CreateTable',
@@ -73,6 +82,7 @@ export default {
 		NcEmojiPicker,
 		NcButton,
 		NcTile,
+		TableDescription,
 	},
 	props: {
 		showModal: {
@@ -84,6 +94,7 @@ export default {
 		return {
 			title: '',
 			icon: '',
+			description: '',
 			errorTitle: false,
 			templates: null,
 			templateChoice: 'custom',
@@ -159,6 +170,7 @@ export default {
 		async sendNewTableToBE(template) {
 			const data = {
 				title: this.title,
+				description: this.description,
 				emoji: this.icon,
 				template,
 			}
@@ -189,6 +201,11 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+
+:deep(.element-description) {
+	padding-inline: 0 !important;
+	max-width: 100%;
+}
 
 .modal__content {
 	padding-right: 0 !important;

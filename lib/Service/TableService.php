@@ -255,12 +255,13 @@ class TableService extends SuperService {
 	 * @throws InternalError
 	 * @noinspection DuplicatedCode
 	 */
-	public function create(string $title, string $template, ?string $emoji, ?string $userId = null): Table {
+	public function create(string $title, string $template, ?string $emoji, ?string $description = '', ?string $userId = null): Table {
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // we can assume that the $userId is set
 
 		$time = new DateTime();
 		$item = new Table();
 		$item->setTitle($title);
+		$item->setDescription($description);
 		if($emoji) {
 			$item->setEmoji($emoji);
 		}

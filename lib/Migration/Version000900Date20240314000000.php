@@ -27,13 +27,14 @@ class Version000900Date20240314000000 extends SimpleMigrationStep {
 
 		if ($schema->hasTable('tables_tables')) {
 			$table = $schema->getTable('tables_tables');
-			$table->addColumn('description', Types::TEXT, [
-				'default' => '',
-				'notnull' => false,
-			]);
+			if (!$table->hasColumn('description')) {
+				$table->addColumn('description', Types::TEXT, [
+					'default' => '',
+					'notnull' => false,
+				]);
+			}
 			return $schema;
 		}
 		return null;
 	}
-
 }

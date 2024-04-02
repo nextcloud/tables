@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<ElementTitle :active-element="table" :view-setting.sync="localViewSetting" />
+		<TableDescription :description="table.description" :read-only="true" />
 		<DataTable :show-options="false" :table="table" :columns="columns" :rows="rows" :view-setting.sync="localViewSetting"
 			@create-column="$emit('create-column')"
 			@import="$emit('import')"
@@ -12,6 +13,7 @@
 </template>
 
 <script>
+import TableDescription from './TableDescription.vue'
 import ElementTitle from './ElementTitle.vue'
 import DataTable from './DataTable.vue'
 import { mapState } from 'vuex'
@@ -22,6 +24,7 @@ export default {
 	components: {
 		ElementTitle,
 		DataTable,
+		TableDescription,
 	},
 
 	props: {

@@ -78,15 +78,16 @@ class ApiTablesController extends AOCSController {
 	 *
 	 * @param string $title Title of the table
 	 * @param string|null $emoji Emoji for the table
+	 * @param string|null $description Description for the table
 	 * @param string $template Template to use if wanted
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
 	 */
-	public function create(string $title, ?string $emoji, string $template = 'custom'): DataResponse {
+	public function create(string $title, ?string $emoji, ?string $description, string $template = 'custom'): DataResponse {
 		try {
-			return new DataResponse($this->service->create($title, $template, $emoji)->jsonSerialize());
+			return new DataResponse($this->service->create($title, $template, $emoji, $description)->jsonSerialize());
 		} catch (InternalError|Exception $e) {
 			return $this->handleError($e);
 		}

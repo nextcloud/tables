@@ -142,7 +142,7 @@ export default new Vuex.Store({
 			let res = null
 
 			try {
-				res = await axios.post(generateUrl('/apps/tables/table'), data)
+				res = (await axios.post(generateOcsUrl('/apps/tables/api/2/tables'), data)).data.ocs
 			} catch (e) {
 				displayError(e, t('tables', 'Could not insert table.'))
 				return false
@@ -260,22 +260,6 @@ export default new Vuex.Store({
 				displayError(e, t('tables', 'Could not reload view.'))
 				return false
 			}
-			return true
-		},
-		async updateTableProperty({ state, commit, dispatch }, { id, data, property }) {
-			let res = null
-
-			try {
-				res = (await axios.put(generateOcsUrl('/apps/tables/api/2/tables/' + id), data)).data.ocs
-			} catch (e) {
-				displayError(e, t('tables', 'Could not update table.'))
-				return false
-			}
-
-			const table = res.data
-			const tables = state.tables
-			const index = tables.findIndex(t => t.id === table.id)
-			Vue.set(state.tables[index], property, data[property])
 			return true
 		},
 		async updateTable({ state, commit, dispatch }, { id, data }) {
