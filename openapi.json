@@ -208,6 +208,32 @@
                     }
                 }
             },
+            "ContextNavigation": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "shareId",
+                    "displayMode",
+                    "userId"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "shareId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "displayMode": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "userId": {
+                        "type": "string"
+                    }
+                }
+            },
             "ImportState": {
                 "type": "object",
                 "required": [
@@ -2434,6 +2460,16 @@
                                 1
                             ]
                         }
+                    },
+                    {
+                        "name": "displayMode",
+                        "in": "query",
+                        "description": "context shares only, whether it should appear in nav bar. 0: no, 1: recipients, 2: all",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64",
+                            "default": 0
+                        }
                     }
                 ],
                 "responses": {
@@ -2485,6 +2521,141 @@
                     },
                     "404": {
                         "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/index.php/apps/tables/api/1/shares/{shareId}/display-mode": {
+            "put": {
+                "operationId": "api1-update-share-display-mode",
+                "summary": "Updates the display mode of a context share",
+                "tags": [
+                    "api1"
+                ],
+                "security": [
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "displayMode",
+                        "in": "query",
+                        "description": "The new value for the display mode of the nav bar icon. 0: hidden, 1: visible for recipients, 2: visible for all",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64",
+                            "minimum": 0,
+                            "maximum": 2
+                        }
+                    },
+                    {
+                        "name": "target",
+                        "in": "query",
+                        "description": "\"default\" to set the default, \"self\" to set an override for the authenticated user",
+                        "schema": {
+                            "type": "string",
+                            "default": "default",
+                            "enum": [
+                                "default",
+                                "self"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "shareId",
+                        "in": "path",
+                        "description": "Share ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Display mode updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ContextNavigation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameter",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Share not found",
                         "content": {
                             "application/json": {
                                 "schema": {

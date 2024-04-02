@@ -137,6 +137,13 @@ namespace OCA\Tables;
  *   owner: string,
  *   ownerType: int,
  * }
+ *
+ * @psalm-type TablesContextNavigation = array{
+ *     id: int,
+ *     shareId: int,
+ *     displayMode: int,
+ *     userId: string,
+ * }
  */
 class ResponseDefinitions {
 }

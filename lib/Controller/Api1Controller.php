@@ -34,6 +34,7 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type TablesColumn from ResponseDefinitions
  * @psalm-import-type TablesRow from ResponseDefinitions
  * @psalm-import-type TablesImportState from ResponseDefinitions
+ * @psalm-import-type TablesContextNavigation from ResponseDefinitions
  */
 class Api1Controller extends ApiController {
 	private TableService $tableService;
@@ -483,15 +484,27 @@ class Api1Controller extends ApiController {
 	 * @param bool $permissionUpdate Permission if receiver can update data
 	 * @param bool $permissionDelete Permission if receiver can delete data
 	 * @param bool $permissionManage Permission if receiver can manage node
+	 * @param int $displayMode context shares only, whether it should appear in nav bar. 0: no, 1: recipients, 2: all
 	 * @return DataResponse<Http::STATUS_OK, TablesShare, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Share returned
 	 * 403: No permissions
 	 * 404: Not found
 	 */
-	public function createShare(int $nodeId, string $nodeType, string $receiver, string $receiverType, bool $permissionRead = false, bool $permissionCreate = false, bool $permissionUpdate = false, bool $permissionDelete = false, bool $permissionManage = false): DataResponse {
+	public function createShare(
+		int $nodeId,
+		string $nodeType,
+		string $receiver,
+		string $receiverType,
+		bool $permissionRead = false,
+		bool $permissionCreate = false,
+		bool $permissionUpdate = false,
+		bool $permissionDelete = false,
+		bool $permissionManage = false,
+		int $displayMode = 0,
+	): DataResponse {
 		try {
-			return new DataResponse($this->shareService->create($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage)->jsonSerialize());
+			return new DataResponse($this->shareService->create($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage, $displayMode)->jsonSerialize());
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: '.$e->getMessage());
 			$message = ['message' => $e->getMessage()];
@@ -570,6 +583,55 @@ class Api1Controller extends ApiController {
 			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
+		}
+	}
+
+	/**
+	 * Updates the display mode of a context share
+	 *
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 *
+	 * @param int $shareId Share ID
+	 * @param int $displayMode The new value for the display mode of the nav bar icon. 0: hidden, 1: visible for recipients, 2: visible for all
+	 * @param string $target "default" to set the default, "self" to set an override for the authenticated user
+	 * @return DataResponse<Http::STATUS_OK, TablesContextNavigation, array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 *
+	 * 200: Display mode updated
+	 * 400: Invalid parameter
+	 * 403: No permissions
+	 * 404: Share not found
+	 *
+	 * @psalm-param int<0, 2> $displayMode
+	 * @psalm-param ("default"|"self") $target
+	 */
+	public function updateShareDisplayMode(int $shareId, int $displayMode, string $target = 'default'): DataResponse {
+		if ($target === 'default') {
+			$userId = '';
+		} elseif ($target === 'self') {
+			$userId = $this->userId;
+		} else {
+			$error = 'target parameter must be either "default" or "self"';
+			$this->logger->warning(sprintf('An internal error or exception occurred: %s', $error));
+			$message = ['message' => $error];
+			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
+		}
+
+		try {
+			return new DataResponse($this->shareService->updateDisplayMode($shareId, $displayMode, $userId)->jsonSerialize());
+		} catch (InternalError $e) {
+			$this->logger->warning('An internal error or exception occurred: '.$e->getMessage());
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
+		} catch (NotFoundError $e) {
+			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_NOT_FOUND);
+		} catch (PermissionError $e) {
+			$this->logger->warning('A permission error occurred: '.$e->getMessage());
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		}
 	}
 
@@ -1303,7 +1365,7 @@ class Api1Controller extends ApiController {
 	 */
 	public function createTableShare(int $tableId, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage): DataResponse {
 		try {
-			return new DataResponse($this->shareService->create($tableId, 'table', $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage)->jsonSerialize());
+			return new DataResponse($this->shareService->create($tableId, 'table', $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage, 0)->jsonSerialize());
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: '.$e->getMessage());
 			$message = ['message' => $e->getMessage()];
