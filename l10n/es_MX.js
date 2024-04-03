@@ -62,6 +62,7 @@ OC.L10N.register(
     "No elements found." : "No se encontraron elementos",
     "group" : "grupo",
     "Permissions" : "Permisos",
+    "No shares" : "No hay recursos compartidos",
     "Created at" : "Creado en",
     "Sharing" : "Compartiendo",
     "Copy to clipboard" : "Copiar al portapapeles",
