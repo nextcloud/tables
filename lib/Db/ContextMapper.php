@@ -83,13 +83,13 @@ class ContextMapper extends QBMapper {
 				return $carry;
 			}
 			$carry[$item['share_id']] = [
-				'share_id' => $item['share_id'],
+				'share_id' => (int)$item['share_id'],
 				'receiver' => $item['receiver'],
 				'receiver_type' => $item['receiver_type'],
-				'display_mode_default' => $item['display_mode_default'],
+				'display_mode_default' => (int)$item['display_mode_default'],
 			];
 			if ($userId !== null) {
-				$carry[$item['share_id']]['display_mode'] = $item['display_mode'];
+				$carry[$item['share_id']]['display_mode'] = (int)$item['display_mode'];
 			}
 			return $carry;
 		}, []);
@@ -100,10 +100,10 @@ class ContextMapper extends QBMapper {
 				return $carry;
 			}
 			$carry[$item['node_rel_id']] = [
-				'id' => $item['node_rel_id'],
-				'node_id' => $item['node_id'],
-				'node_type' => $item['node_type'],
-				'permissions' => $item['permissions'],
+				'id' => (int)$item['node_rel_id'],
+				'node_id' => (int)$item['node_id'],
+				'node_type' => (int)$item['node_type'],
+				'permissions' => (int)$item['permissions'],
 			];
 			return $carry;
 		}, []);
@@ -116,12 +116,12 @@ class ContextMapper extends QBMapper {
 			if (!isset($carry[$item['page_id']])) {
 				$carry[$item['page_id']] = ['content' => []];
 			}
-			$carry[$item['page_id']]['id'] = $item['page_id'];
+			$carry[$item['page_id']]['id'] = (int)$item['page_id'];
 			$carry[$item['page_id']]['page_type'] = $item['page_type'];
 			if ($item['node_rel_id'] !== null) {
 				$carry[$item['page_id']]['content'][$item['content_id']] = [
-					'order' => $item['order'],
-					'node_rel_id' => $item['node_rel_id']
+					'order' => (int)$item['order'],
+					'node_rel_id' => (int)$item['node_rel_id']
 				];
 			}
 
