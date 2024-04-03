@@ -17,6 +17,12 @@
 				</template>
 				{{ t('tables', 'Edit application') }}
 			</NcActionButton>
+			<NcActionButton v-if="canManageContext(context)" :close-after-click="true" @click="transferContext">
+				<template #icon>
+					<FileSwap :size="20" />
+				</template>
+				{{ t('tables', 'Transfer application') }}
+			</NcActionButton>
 		</template>
 	</NcAppNavigationItem>
 </template>
@@ -27,6 +33,7 @@ import { mapGetters } from 'vuex'
 import TableIcon from 'vue-material-design-icons/Table.vue'
 import { emit } from '@nextcloud/event-bus'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
+import FileSwap from 'vue-material-design-icons/FileSwap.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import svgHelper from '../../../shared/components/ncIconPicker/mixins/svgHelper.js'
 
@@ -35,6 +42,7 @@ export default {
 
 	components: {
 		PlaylistEdit,
+		FileSwap,
 		TableIcon,
 		NcIconSvgWrapper,
 		NcAppNavigationItem,
@@ -72,6 +80,9 @@ export default {
 		emit,
 		async editContext() {
 			emit('tables:context:edit', this.context.id)
+		},
+		async transferContext() {
+			emit('tables:context:transfer', this.context)
 		},
 	},
 
