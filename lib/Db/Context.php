@@ -38,6 +38,7 @@ class Context extends Entity implements JsonSerializable {
 
 	public function __construct() {
 		$this->addType('id', 'integer');
+		$this->addType('owner_type', 'integer');
 	}
 
 	public function jsonSerialize(): array {
