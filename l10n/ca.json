@@ -149,6 +149,7 @@
     "Sorry, something went wrong." : "Ho sentim, alguna cosa ha anat malament.",
     "Could not create new column." : "No s'ha pogut crear una columna nova.",
     "Title" : "Títol",
+    "Resources" : "Recursos",
     "The title limit is reached with 200 characters. Please use a shorter title." : "S'arriba al límit del títol amb 200 caràcters. Si us plau, utilitzeu un títol més curt.",
     "Could not create new table" : "No s'ha pogut crear una taula nova",
     "Create row" : "Crea fila",

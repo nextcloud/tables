@@ -161,6 +161,7 @@ OC.L10N.register(
     "Sorry, something went wrong." : "Съжалявам нещо се обърка.",
     "Could not create new column." : "Не можа да се създаде нова колона.",
     "Title" : "Заглавие",
+    "Resources" : "Ресурси",
     "The title limit is reached with 200 characters. Please use a shorter title." : "Достигнато е ограничението за заглавие от 200 знака. Моля, използвайте по-кратко заглавие.",
     "Could not create new table" : "Не можа да се създаде нова таблица",
     "Create row" : "Създаване на ред",
