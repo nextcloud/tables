@@ -291,7 +291,10 @@
     "Created columns" : "Colonnes créées",
     "Inserted rows" : "Lignes insérées",
     "Row creation errors" : "Erreurs de création de ligne",
+    "Transfer application" : "Transférer l’application",
+    "Transfer this application to another user" : "Transférer cette application à un autre utilisateur",
     "Transfer" : "Transférer",
+    "Context \"{name}\" transfered to {user}" : "Contexte « {name} » transféré à {user}",
     "Transfer table" : "Transférer le tableau",
     "Transfer this table to another user" : "Transférer ce tableau à un autre utilisateur",
     "Table \"{emoji}{table}\" transfered to {user}" : "Tableau « {emoji}{table} » transféré à {user}",
@@ -498,6 +501,12 @@
     "Could not reload view." : "Impossible d'actualiser la vue.",
     "Could not update table." : "Impossible de mettre à jour le tableau.",
     "Could not update application." : "Impossible de mettre à jour l’application",
+    "Could not transfer table." : "Impossible de transférer le tableau.",
+    "Could not load table." : "Impossible de charger le tableau.",
+    "Could not fetch table" : "Impossible de récupérer le tableau",
+    "Could not load view" : "Impossible de charger la vue",
+    "Could not fetch view" : "Impossible de récupérer la vue",
+    "Could not transfer application." : "Impossible de transférer l’application.",
     "Could not remove table." : "Impossible de supprimer le tableau."
 },"pluralForm" :"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

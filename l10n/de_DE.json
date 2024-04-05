@@ -295,7 +295,10 @@
     "Inserted rows" : "Eingefügte Reihen",
     "Value parsing errors" : "Fehler beim Einlesen von Werten",
     "Row creation errors" : "Fehler bei der Zeilenerstellung",
+    "Transfer application" : "Anwendung übertragen",
+    "Transfer this application to another user" : "Diese Anwendung auf einen anderern Benutzer übertragen",
     "Transfer" : "Übertragen",
+    "Context \"{name}\" transfered to {user}" : "Kontext „{name}“ wurde auf {user} übertragen",
     "Transfer table" : "Tabelle übertragen",
     "Transfer this table to another user" : "Diese Tabelle auf einen anderen Benutzer übertragen",
     "Table \"{emoji}{table}\" transfered to {user}" : "Tabelle \"{emoji}{table}\" an {user} übertragen",
@@ -511,9 +514,14 @@
     "Could not update application." : "Anwendung konnte nicht aktualisiert werden.",
     "Could not transfer table." : "Tabelle konnte nicht übertragen werden.",
     "Could not load applications." : "Anwendungen konnten nicht geladen werden.",
-    "Could not fetch applications" : "Anwendungen konnten nicht abgerufen werden.",
+    "Could not fetch applications" : "Anwendungen konnten nicht abgerufen werden",
     "Could not load application." : "Anwendung konnte nicht geladen werden.",
-    "Could not fetch application" : "Anwendung konnte nicht abgerufen  werden.",
+    "Could not fetch application" : "Anwendung konnte nicht abgerufen werden",
+    "Could not load table." : "Tabelle konnte nicht geladen werden.",
+    "Could not fetch table" : "Tabelle konnte nicht abgerufen werden",
+    "Could not load view" : "Ansicht konnte nicht geladen werden",
+    "Could not fetch view" : "Ansicht konnte nicht abgerufen werden",
+    "Could not transfer application." : "Anwendung konnte nicht übertragen werden.",
     "Could not remove table." : "Tabelle konnte nicht entfernt werden."
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

@@ -297,7 +297,10 @@ OC.L10N.register(
     "Inserted rows" : "Satt inn rader",
     "Value parsing errors" : "Feil ved verdianalyse",
     "Row creation errors" : "Feil ved opprettelse av rad",
+    "Transfer application" : "Overfør applikasjon",
+    "Transfer this application to another user" : "Overfør denne applikasjonen til en annen bruker",
     "Transfer" : "Overfør",
+    "Context \"{name}\" transfered to {user}" : "Kontekst \"{name}\" overført til {user}",
     "Transfer table" : "Overfør tabell",
     "Transfer this table to another user" : "Overfør denne tabellen til en annen bruker",
     "Table \"{emoji}{table}\" transfered to {user}" : "Tabell \"{emoji}{table}\" overført til {user}",
@@ -516,6 +519,11 @@ OC.L10N.register(
     "Could not fetch applications" : "Kunne ikke hente applikasjoner.",
     "Could not load application." : "Kunne ikke laste applikasjonen.",
     "Could not fetch application" : "Kunne ikke hente applikasjonen.",
+    "Could not load table." : "Kunne ikke laste tabellen.",
+    "Could not fetch table" : "Kunne ikke hente tabellen",
+    "Could not load view" : "Kunne ikke laste visning",
+    "Could not fetch view" : "Kunne ikke hente visning",
+    "Could not transfer application." : "Kunne ikke overføre applikasjon.",
     "Could not remove table." : "Kunne ikke fjerne tabell."
 },
 "nplurals=2; plural=(n != 1);");
