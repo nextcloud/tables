@@ -3,6 +3,8 @@
 		<div>
 			<ResourceForm :resources="localResource" @add="addResource" />
 			<ResourceList :resources="localResource" @remove="removeResource" />
+			<ResourceSharees :select-users="true" :select-groups="false" :sharees.sync="sharees" />
+			<ResourceSharePermissions :resources="localResource" />
 		</div>
 	</div>
 </template>
@@ -11,11 +13,15 @@
 import { mapGetters } from 'vuex'
 import ResourceForm from './ResourceForm.vue'
 import ResourceList from './ResourceList.vue'
+import ResourceSharePermissions from './ResourceSharePermissions.vue'
+import ResourceSharees from './ResourceSharees.vue'
 
 export default {
 	components: {
 		ResourceForm,
 		ResourceList,
+		ResourceSharePermissions,
+		ResourceSharees,
 	},
 
 	props: {
@@ -26,6 +32,10 @@ export default {
 		},
 		// table or view
 		resources: {
+			type: Array,
+			default: () => ([]),
+		},
+		sharees: {
 			type: Array,
 			default: () => ([]),
 		},
