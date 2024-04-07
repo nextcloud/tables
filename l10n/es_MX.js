@@ -9,6 +9,7 @@ OC.L10N.register(
     "Missing a temporary folder" : "Falta una carpeta temporal",
     "Could not write file to disk" : "No fue posible escribir a disco",
     "A PHP extension stopped the file upload" : "Una extensión de PHP detuvo la carga del archivo",
+    "No file uploaded or file size exceeds maximum of %s" : "No se ha cargado ningún archivo o el tamaño del archivo excede el máximo de %s",
     "ToDo list" : "Lista de penditentes",
     "Members" : "Miembros",
     "Date" : "Fecha",
@@ -94,6 +95,7 @@ OC.L10N.register(
     "Content" : "Contenido",
     "Preview" : "Previsualizar",
     "Select" : "Seleccionar",
+    "Insert" : "Insertar",
     "Unchecked" : "Desmarcado",
     "ID" : "ID"
 },

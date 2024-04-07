@@ -297,7 +297,10 @@ OC.L10N.register(
     "Inserted rows" : "الصفوف المدرجة",
     "Value parsing errors" : "خطأ في تحليل القيمة",
     "Row creation errors" : "خطأ في إنشاء السطر",
+    "Transfer application" : "نقل التطبيق",
+    "Transfer this application to another user" : "نقل هذا التطبيق إلى مستخدِم آخر",
     "Transfer" : "نقل",
+    "Context \"{name}\" transfered to {user}" : "السياق \"{name}\" تمّ نقله إلى {user}",
     "Transfer table" : "نقل الجدول",
     "Transfer this table to another user" : "نقل هذا الجدول لمستخدِم آخر",
     "Table \"{emoji}{table}\" transfered to {user}" : "تمّ نقل الجدول \"{emoji}{table}\" للمستخدِم {user}",
@@ -516,6 +519,11 @@ OC.L10N.register(
     "Could not fetch applications" : "تعذّرجلب التطبيقات",
     "Could not load application." : "تعذّر تحميل التطبيق.",
     "Could not fetch application" : "تعذّر جلب التطبيق",
+    "Could not load table." : "تعذّر تحميل الجدول.",
+    "Could not fetch table" : "تعذّر جلب الجدول",
+    "Could not load view" : "تعذّر تحميل المنظور view",
+    "Could not fetch view" : "تعذّر جلب المنظور view",
+    "Could not transfer application." : "تعذّر نقل التطبيق.",
     "Could not remove table." : "تعذر إزالة/نقل الجدول."
 },
 "nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;");

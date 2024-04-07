@@ -465,6 +465,10 @@ OC.L10N.register(
     "Could not reload view." : "Det gick inte att ladda om vyn.",
     "Could not update table." : "Kunde inte uppdatera tabell.",
     "Could not transfer table." : "Kunde inte överföra tabell.",
+    "Could not load table." : "Kunde inte läsa in tabell.",
+    "Could not fetch table" : "Kunde inte hämta tabell",
+    "Could not load view" : "Kunde inte ladda vyn",
+    "Could not fetch view" : "Kunde inte hämta vyn",
     "Could not remove table." : "Kunde inte ta bort tabell."
 },
 "nplurals=2; plural=(n != 1);");
