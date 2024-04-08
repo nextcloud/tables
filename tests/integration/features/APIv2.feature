@@ -99,3 +99,42 @@ Feature: APIv2
     Then table "t4" is owned by "participant1-v2"
     Then change owner for table "t4" from user "participant1-v2" to user "participant2-v2"
     Then table "t4" is owned by "participant2-v2"
+
+  @api2 @contexts
+  Scenario: Create a simple context containing one table and one view
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "👋" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
+    When user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+      | v1    | view  | read                |
+    Then user "participant1-v2" has access to Context "c1"
+    And the fetched Context "c1" has following data:
+      | field | value                        |
+      | name  | Enchanting Guitar            |
+      | icon  | tennis                       |
+      | node  | table:t1:read,create,update  |
+      | node  | view:v1:read                 |
+      | page  | startpage:2                  |
+
+  @api2 @contexts
+  Scenario: Fetch the overview over existing Contexts as owner
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And table "Table X via api v2" with emoji "📋" exists for user "participant2-v2" as "t3" via v2
+    And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
+    And user "participant1-v2" create view "v2" with emoji "🦉" for "t2" as "v2"
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,created,update |
+      | v1    | view  | read                |
+    And user "participant1-v2" creates the Context "c2" with name "Placid Ring" with icon "headphones" and description "Lacus suspendisse faucibus etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t2    | table | read,create,update  |
+      | v2    | view  | read                |
+    And user "participant2-v2" creates the Context "c3" with name "Chilly Lumber" with icon "monitor" and description "Sed blandit libero etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t3    | table | all                 |
+    When user "participant1-v2" fetches all Contexts
+    Then they will find Contexts "c1, c2" and no other
