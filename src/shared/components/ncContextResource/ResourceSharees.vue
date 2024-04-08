@@ -1,8 +1,7 @@
 <template>
 	<div class="row space-B">
 		<h3>{{ t('tables', 'Share with accounts or groups') }}</h3>
-		<NcSelect v-model="value" style="width: 100%;" :loading="loading" :options="options"
-			:value="sharees"
+		<NcSelect v-model="preExistingSharees" style="width: 100%;" :loading="loading" :options="options"
 			:placeholder="getPlaceholder()"
 			:searchable="true" :get-option-key="(option) => option.key"
 			label="displayName"
@@ -59,17 +58,19 @@ export default {
 			minSearchStringLength: 1,
 			maxAutocompleteResults: 20,
 			suggestions: [],
+			preExistingSharees: [...this.sharees],
+			localSharees: this.sharees.map(userObject => userObject.user),
 		}
 	},
 
 	computed: {
 		localValue: {
 			get() {
-				return this.newOwnerUserId
+				return this.localSharees
 			},
 			set(v) {
-				console.info('newOwnerUserId set to ', v)
-				this.$emit('update:newOwnerUserId', v)
+				this.localSharees = v.map(userObject => userObject.user)
+				this.$emit('update:sharees', v)
 			},
 		},
 
@@ -99,9 +100,9 @@ export default {
 	methods: {
 		addShare(selectedItem) {
 			if (selectedItem) {
-				this.localValue = selectedItem.user
+				this.localValue = selectedItem
 			} else {
-				this.localValue = ''
+				this.localValue = []
 			}
 		},
 
@@ -160,6 +161,7 @@ export default {
 				})
 
 				this.suggestions = this.filterOutCurrentUser(rawSuggestions)
+				this.suggestions = this.filterOutSelectedUsers(this.suggestions)
 				this.loading = false
 			} catch (err) {
 				console.debug(err)
@@ -173,6 +175,9 @@ export default {
 
 		filterOutCurrentUser(list) {
 			return list.filter((item) => !(item.isUser && item.user === getCurrentUser().uid))
+		},
+		filterOutSelectedUsers(list) {
+			return list.filter((item) => !(item.isUser && this.localSharees.includes(item.user)))
 		},
 
 	},
