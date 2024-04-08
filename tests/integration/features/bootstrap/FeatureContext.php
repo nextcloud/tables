@@ -69,10 +69,13 @@ class FeatureContext implements Context {
 	private array $tableIds = [];
 	private array $viewIds = [];
 	private array $columnIds = [];
+	private array $contextIds = [];
 
 	// Store data from last request to perform assertions, id is used as a key
 	private array $tableData = [];
 	private array $viewData = [];
+	private array $contextData = [];
+	private array $createdContexts = [];
 
 	// use CommandLineTrait;
 
@@ -102,6 +105,10 @@ class FeatureContext implements Context {
 		foreach ($this->createdGroups as $group) {
 			$this->deleteGroup($group);
 		}
+		foreach ($this->createdContexts as $contextId => $contextOwner) {
+			$this->deleteContext($contextId, $contextOwner);
+		}
+		$this->contextIds = [];
 	}
 
 
@@ -1725,5 +1732,195 @@ class FeatureContext implements Context {
 	 */
 	public function theLastResponseShouldHaveAStatusCode(int $statusCode) {
 		Assert::assertEquals($statusCode, $this->response->getStatusCode());
+	}
+
+	protected function humanReadablePermissionToInt(string $humanReadablePermissionString): int {
+		$humanReadablePermissions = explode(',', $humanReadablePermissionString);
+
+		$permissions = 0;
+		foreach ($humanReadablePermissions as $humanReadablePermission) {
+			switch (trim($humanReadablePermission)) {
+				case 'read':
+					$permissions += 1;
+					break;
+				case 'create':
+					$permissions += 2;
+					break;
+				case 'update':
+					$permissions += 4;
+					break;
+				case 'delete':
+					$permissions += 8;
+					break;
+				case 'manage':
+					$permissions += 16;
+					break;
+				case 'all':
+					$permissions = 31;
+					break 2;
+			}
+		}
+		return $permissions;
+	}
+
+	/**
+	 * @When user :user creates the Context :alias with name :name with icon :icon and description :description and nodes:
+	 */
+	public function createContext(string $user, string $alias, string $name, string $icon, string $description, TableNode $table) {
+		$this->setCurrentUser($user);
+
+		$nodes = [];
+		foreach ($table as $row) {
+			$permissions = $this->humanReadablePermissionToInt($row['permissions']);
+
+			$nodes[] = [
+				'id' => $row['type'] === 'table' ? $this->tableIds[$row['alias']] : $this->viewIds[$row['alias']],
+				'type' => $row['type'] === 'table' ? 0 : 1,
+				'permissions' => $permissions,
+			];
+		}
+
+		$this->sendOcsRequest(
+			'POST',
+			'/apps/tables/api/2/contexts',
+			[
+				'name' => $name,
+				'iconName' => $icon,
+				'description' => $description,
+				'nodes' => $nodes,
+			]
+		);
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		$newContext = $this->getDataFromResponse($this->response)['ocs']['data'];
+		$this->createdContexts[$newContext['id']] = $user;
+		$this->contextIds[$alias] = $newContext['id'];
+
+		Assert::assertEquals($newContext['name'], $name);
+		Assert::assertEquals($newContext['iconName'], $icon);
+		Assert::assertEquals($newContext['owner'], $user);
+		Assert::assertCount(count($nodes), $newContext['nodes'], 'Node count does not match');
+		Assert::assertCount(1, $newContext['pages'], 'Page count does not match');
+		Assert::assertCount(count($nodes), $newContext['pages'][array_key_first($newContext['pages'])]['content'], 'Page content count does not match');
+
+		foreach ($newContext['nodes'] as $i => $newNode) {
+			Assert::assertSame($newNode['nodeId'], $nodes[$i]['id']);
+			Assert::assertSame($newNode['nodeType'], $nodes[$i]['type']);
+			Assert::assertSame($newNode['permissions'], $nodes[$i]['permissions']);
+		}
+	}
+
+	/**
+	 * @Then user :user has access to Context :contextAlias
+	 */
+	public function userHasAccessToContext(string $user, string $contextAlias) {
+		$this->setCurrentUser($user);
+
+		$contextId = $this->contextIds[$contextAlias] ?? -1;
+		Assert::assertNotEquals(-1, $contextId);
+
+		$this->sendOcsRequest(
+			'GET',
+			'/apps/tables/api/2/contexts/' . $contextId
+		);
+
+		$context = $this->getDataFromResponse($this->response)['ocs']['data'];
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		Assert::assertEquals($context['id'], $contextId);
+		$this->contextData[$contextAlias] = $context;
+	}
+
+	/**
+	 * @Given the fetched Context :contextAlias has following data:
+	 */
+	public function theFetchedContextHasFollowingData(string $contextAlias, TableNode $expectedData) {
+		$actualData = $this->contextData[$contextAlias] ?? [];
+		Assert::assertNotEmpty($actualData);
+
+		foreach ($expectedData as $field => $value) {
+			switch ($field) {
+				case "name":
+					Assert::assertEquals($value, $actualData['name']);
+					break;
+				case "icon":
+					Assert::assertEquals($value, $actualData['iconName']);
+					break;
+				case "node":
+					[$strType, $alias, $strPermission] = explode(':', $value);
+					$nodeType = $strType === 'table' ? 0 : 1;
+					$nodeId = $nodeType === 0 ? $this->tableIds[$alias] : $this->viewIds[$alias];
+					$permissions = $this->humanReadablePermissionToInt($strPermission);
+					$found = false;
+					foreach ($actualData['nodes'] as $actualNodeData) {
+						$found |= ($actualNodeData['node_id'] === $nodeId
+							&& $actualNodeData['node_type'] === $nodeType
+							&& $actualNodeData['permissions'] === $permissions);
+					}
+					Assert::assertTrue($found);
+					break;
+				case "page":
+					[$pageType, $contentNodesCount] = explode(':', $value);
+					$found = false;
+					foreach ($actualData['pages'] as $actualPageData) {
+						$found |= ($actualPageData['type'] === $pageType
+							&& count($actualPageData['content']) === (int)$contentNodesCount);
+					}
+					Assert::assertTrue($found);
+					break;
+			}
+		}
+	}
+
+	/**
+	 * @When user :user fetches all Contexts
+	 */
+	public function userFetchAllsContexts(string $user): void {
+		$this->setCurrentUser($user);
+
+		$this->sendOcsRequest(
+			'GET',
+			'/apps/tables/api/2/contexts'
+		);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+	}
+
+	/**
+	 * @Then they will find Contexts :contextAliasList and no other
+	 */
+	public function theyWillFindContextsAndNoOther(string $contextAliasList) {
+		$receivedContexts = $this->getDataFromResponse($this->response)['ocs']['data'];
+
+		$aliases = explode(',', $contextAliasList);
+		$expectedContextIds = array_map(function (string $alias) {
+			return $this->contextIds[trim($alias)];
+		}, $aliases);
+		sort($expectedContextIds);
+
+		$actualContextIds = [];
+		foreach ($receivedContexts as $receivedContext) {
+			$actualContextIds[] = $receivedContext['id'];
+		}
+		sort($actualContextIds);
+
+		Assert::assertSame($expectedContextIds, $actualContextIds, json_encode($receivedContexts));
+	}
+
+	public function deleteContext(int $contextId, string $owner): void {
+		$this->setCurrentUser($owner);
+
+		$this->sendOcsRequest(
+			'DELETE',
+			sprintf('/apps/tables/api/2/contexts/%d', $contextId),
+		);
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		$deletedContext = $this->getDataFromResponse($this->response)['ocs']['data'];
+
+		$this->sendOcsRequest(
+			'GET',
+			sprintf('/apps/tables/api/2/contexts/%d', $deletedContext['id']),
+		);
+		Assert::assertEquals(404, $this->response->getStatusCode());
 	}
 }
