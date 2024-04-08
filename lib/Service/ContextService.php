@@ -418,7 +418,7 @@ class ContextService {
 			unset($addedPage['content'][$pageContent->getId()]['pageId']);
 		}
 
-		$context->setPages($addedPage);
+		$context->setPages([$addedPage['id'] => $addedPage]);
 	}
 
 	protected function insertNodesFromArray(Context $context, array $nodes): void {
