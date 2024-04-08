@@ -125,7 +125,7 @@ export default {
 			this.reset()
 			this.$emit('close')
 		},
-		// TODO show edited changes if we're currently viewing the active context
+		// TODO show edited changes without having to reload
 		async submit() {
 			if (this.title === '') {
 				showError(t('tables', 'Cannot update context. Title is missing.'))

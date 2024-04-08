@@ -3,7 +3,7 @@
 		<div>
 			<ResourceForm :resources="localResource" @add="addResource" />
 			<ResourceList :resources="localResource" @remove="removeResource" />
-			<ResourceSharees :select-users="true" :select-groups="false" :sharees.sync="sharees" />
+			<ResourceSharees :select-users="true" :select-groups="false" :sharees.sync="currentSharees" />
 			<ResourceSharePermissions :resources="localResource" />
 		</div>
 	</div>
@@ -45,6 +45,23 @@ export default {
 		return {
 			loading: false,
 			contextResource: this.resources,
+			// currentSharees: [...this.sharees],
+			currentSharees: [
+				{
+					user: 'user2',
+					displayName: 'user2',
+					icon: 'icon-user',
+					isUser: true,
+					key: 'users-user2',
+				},
+				{
+					user: 'user1',
+					displayName: 'user1',
+					icon: 'icon-user',
+					isUser: true,
+					key: 'users-user1',
+				},
+			],
 		}
 	},
 
