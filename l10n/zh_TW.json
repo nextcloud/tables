@@ -295,7 +295,10 @@
     "Inserted rows" : "已插入列",
     "Value parsing errors" : "值解析錯誤",
     "Row creation errors" : "列建立錯誤",
+    "Transfer application" : "轉移應用程式",
+    "Transfer this application to another user" : "將此應用程式轉移至其他使用者",
     "Transfer" : "轉移",
+    "Context \"{name}\" transfered to {user}" : "情境「{name}」已傳送至 {user}",
     "Transfer table" : "轉移表格",
     "Transfer this table to another user" : "轉移此表格給其他使用者",
     "Table \"{emoji}{table}\" transfered to {user}" : "表格「{emoji}{table}」已轉移給 {user}",
@@ -514,6 +517,11 @@
     "Could not fetch applications" : "無法擷取應用程式",
     "Could not load application." : "無法載入應用程式。",
     "Could not fetch application" : "無法擷取應用程式",
+    "Could not load table." : "無法載入表格。",
+    "Could not fetch table" : "無法擷取表格",
+    "Could not load view" : "無法載入檢視",
+    "Could not fetch view" : "無法擷取檢視",
+    "Could not transfer application." : "無法轉移應用程式。",
     "Could not remove table." : "無法移除表格。"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

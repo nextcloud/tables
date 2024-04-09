@@ -297,7 +297,10 @@ OC.L10N.register(
     "Inserted rows" : "Linhas inseridas",
     "Value parsing errors" : "Erros de análise de valor",
     "Row creation errors" : "Erros de criação de linhas",
+    "Transfer application" : "Aplicativo de transferência",
+    "Transfer this application to another user" : "Transferir este aplicativo para outro usuário",
     "Transfer" : "Transferir",
+    "Context \"{name}\" transfered to {user}" : "Contexto \"{name}\" transferido para {user}",
     "Transfer table" : "Tabela de transferência",
     "Transfer this table to another user" : "Transferir esta tabela para outro usuário",
     "Table \"{emoji}{table}\" transfered to {user}" : "Tabela \"{emoji}{table}\" transferida para {user}",
@@ -516,6 +519,11 @@ OC.L10N.register(
     "Could not fetch applications" : "Não foi possível buscar aplicativos",
     "Could not load application." : "Não foi possível carregar o aplicativo.",
     "Could not fetch application" : "Não foi possível buscar o aplicativo",
+    "Could not load table." : "Não foi possível carregar a tabela.",
+    "Could not fetch table" : "Não foi possível buscar a tabela",
+    "Could not load view" : "Não foi possível carregar a visualização",
+    "Could not fetch view" : "Não foi possível buscar a visualização",
+    "Could not transfer application." : "Não foi possível transferir o aplicativo.",
     "Could not remove table." : "Não foi possível remover tabela."
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");
