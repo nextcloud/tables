@@ -145,13 +145,7 @@ export default {
 					nodes: dataResources,
 				}
 
-				const share = {
-					nodeType: 'context',
-					nodeId: this.contextId,
-					receiverType: 'user',
-					displayMode: 2,
-				}
-				const res = await this.$store.dispatch('updateContext', { id: this.contextId, data, share, receivers: this.receivers })
+				const res = await this.$store.dispatch('updateContext', { id: this.contextId, data, receivers: this.receivers })
 				if (res) {
 					showSuccess(t('tables', 'Updated context "{contextTitle}".', { contextTitle: this.title }))
 					this.actionCancel()

@@ -339,8 +339,13 @@ export default new Vuex.Store({
 
 			return true
 		},
-		async updateContext({ state, commit, dispatch }, { id, data, share, receivers }) {
+		async updateContext({ state, commit, dispatch }, { id, data, receivers }) {
 			let res = null
+			let share = {
+				nodeType: 'context',
+				nodeId: id,
+				displayMode: 2,
+			}
 
 			try {
 				res = await axios.put(generateOcsUrl('/apps/tables/api/2/contexts/' + id), data)
