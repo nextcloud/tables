@@ -44,6 +44,7 @@ OC.L10N.register(
     "Cat" : "Gatu",
     "Horse" : "Caballu",
     "from" : "de",
+    "to" : "pa",
     "How many working days are included?" : "¿Cuántos díes llaborables s'inclúin?",
     "Request date" : "Data de solicitú",
     "Approved" : "Aprobóse",
