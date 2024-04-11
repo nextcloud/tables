@@ -3,7 +3,7 @@
 		<div>
 			<ResourceForm :resources="localResource" @add="addResource" />
 			<ResourceList :resources="localResource" @remove="removeResource" />
-			<ResourceSharees :select-users="true" :select-groups="false" :sharees.sync="currentSharees" />
+			<ResourceSharees :select-users="true" :select-groups="false" :receivers="localReceivers" @update="updateReceivers" />
 			<ResourceSharePermissions :resources="localResource" />
 		</div>
 	</div>
@@ -35,7 +35,7 @@ export default {
 			type: Array,
 			default: () => ([]),
 		},
-		sharees: {
+		receivers: {
 			type: Array,
 			default: () => ([]),
 		},
@@ -45,22 +45,14 @@ export default {
 		return {
 			loading: false,
 			contextResource: this.resources,
-			// currentSharees: [...this.sharees],
-			currentSharees: [
-				{
-					user: 'user2',
-					displayName: 'user2',
-					icon: 'icon-user',
-					isUser: true,
-					key: 'users-user2',
-				},
-				{
-					user: 'user1',
-					displayName: 'user1',
-					icon: 'icon-user',
-					isUser: true,
-					key: 'users-user1',
-				},
+			contextReceivers: [
+				// {
+				// 	user: 'user2',
+				// 	displayName: 'user2',
+				// 	icon: 'icon-user',
+				// 	isUser: true,
+				// 	key: 'users-user2',
+				// },
 			],
 		}
 	},
@@ -75,6 +67,14 @@ export default {
 				this.$emit('update:resources', v)
 			},
 		},
+		localReceivers: {
+			get() {
+				return this.contextReceivers
+			},
+			set(v) {
+				this.$emit('update:receivers', v)
+			},
+		},
 	},
 
 	methods: {
@@ -85,7 +85,9 @@ export default {
 		addResource(resource) {
 			this.contextResource.push(resource)
 			this.localResource = this.contextResource
-
+		},
+		updateReceivers(receivers) {
+			this.localReceivers = receivers
 		},
 
 	},
