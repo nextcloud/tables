@@ -12,11 +12,8 @@
 				</div>
 				<div class="col-4" style="display: inline-flex;">
 					<NcIconPicker :close-on-select="true" @select="setIcon">
-						<NcButton
-							type="tertiary"
-							:aria-label="t('tables', 'Select an icon for application')"
-							:title="t('tables', 'Select icon')"
-							@click.prevent>
+						<NcButton type="tertiary" :aria-label="t('tables', 'Select an icon for application')"
+							:title="t('tables', 'Select icon')" @click.prevent>
 							<template #icon>
 								<NcIconSvgWrapper :svg="icon.svg" />
 							</template>
@@ -36,7 +33,7 @@
 				<div class="col-4">
 					{{ t('tables', 'Resources') }}
 				</div>
-				<NcContextResource :resources.sync="resources" />
+				<NcContextResource :resources.sync="resources" :receivers.sync="receivers" />
 			</div>
 
 			<div class="row space-R">
@@ -90,6 +87,7 @@ export default {
 			description: '',
 			errorTitle: false,
 			resources: [],
+			receivers: [],
 		}
 	},
 	computed: {
@@ -113,6 +111,7 @@ export default {
 				this.setIcon(this.localContext.iconName)
 				this.description = context.description
 				this.resources = context ? [...this.getContextResources(context)] : []
+				this.receivers = context && context?.sharing ? [...context.sharing] : []
 			}
 		},
 	},
@@ -145,7 +144,14 @@ export default {
 					description: this.description,
 					nodes: dataResources,
 				}
-				const res = await this.$store.dispatch('updateContext', { id: this.contextId, data })
+
+				const share = {
+					nodeType: 'context',
+					nodeId: this.contextId,
+					receiverType: 'user',
+					displayMode: 2,
+				}
+				const res = await this.$store.dispatch('updateContext', { id: this.contextId, data, share, receivers: this.receivers })
 				if (res) {
 					showSuccess(t('tables', 'Updated context "{contextTitle}".', { contextTitle: this.title }))
 					this.actionCancel()
@@ -159,6 +165,7 @@ export default {
 			this.icon.name = 'equalizer'
 			this.description = ''
 			this.resources = context ? [...this.getContextResources(context)] : []
+			this.receivers = context && context?.sharing ? [...context.sharing] : []
 		},
 		getContextResources(context) {
 			const resources = []

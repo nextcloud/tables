@@ -339,11 +339,16 @@ export default new Vuex.Store({
 
 			return true
 		},
-		async updateContext({ state, commit, dispatch }, { id, data }) {
+		async updateContext({ state, commit, dispatch }, { id, data, share, receivers }) {
 			let res = null
 
 			try {
 				res = await axios.put(generateOcsUrl('/apps/tables/api/2/contexts/' + id), data)
+				for (const receiver of receivers) {
+					share.receiverType = receiver.isUser ? 'user' : 'group'
+					share.receiver = receiver.user
+					await axios.post(generateUrl('/apps/tables/share'), share)
+				}
 			} catch (e) {
 				displayError(e, t('tables', 'Could not update application.'))
 				return false

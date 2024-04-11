@@ -36,7 +36,7 @@ export default {
 	mixins: [ShareTypes, formatting],
 
 	props: {
-		sharees: {
+		receivers: {
 			type: Array,
 			default: () => ([]),
 		},
@@ -58,8 +58,8 @@ export default {
 			minSearchStringLength: 1,
 			maxAutocompleteResults: 20,
 			suggestions: [],
-			preExistingSharees: [...this.sharees],
-			localSharees: this.sharees.map(userObject => userObject.user),
+			preExistingSharees: [...this.receivers],
+			localSharees: this.receivers.map(userObject => userObject.user),
 		}
 	},
 
@@ -70,7 +70,7 @@ export default {
 			},
 			set(v) {
 				this.localSharees = v.map(userObject => userObject.user)
-				this.$emit('update:sharees', v)
+				this.$emit('update', v)
 			},
 		},
 
