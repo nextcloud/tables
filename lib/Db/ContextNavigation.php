@@ -15,9 +15,9 @@ use OCP\AppFramework\Db\Entity;
  * @method setDisplayMode(int $value): void
  */
 class ContextNavigation extends Entity implements \JsonSerializable {
-	protected ?int $shareId;
-	protected ?string $userId;
-	protected ?int $displayMode;
+	protected ?int $shareId = null;
+	protected ?string $userId = null;
+	protected ?int $displayMode = null;
 
 	public function __construct() {
 		$this->addType('shareId', 'integer');
