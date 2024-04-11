@@ -157,7 +157,7 @@ class LegacyRowMapper extends QBMapper {
 	/**
 	 * @param (int|string)[][] $sortArray
 	 *
-	 * @psalm-param list<array{columnId: int, mode: 'ASC'|'DESC'}> $sortArray
+	 * @psalm-param list<array{columnId?: int, columnType?: string, mode?: 'ASC'|'DESC'}> $sortArray
 	 */
 	private function addOrderByRules(IQueryBuilder $qb, array $sortArray) {
 		foreach ($sortArray as $index => $sortRule) {

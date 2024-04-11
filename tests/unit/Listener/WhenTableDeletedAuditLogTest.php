@@ -22,18 +22,16 @@ final class WhenTableDeletedAuditLogTest extends TestCase {
 	public function testHandle(): void {
 		$table = new Table();
 		$table->id = 1;
-		$userId = 'user1';
 
-		$event = new TableDeletedEvent($table, $userId);
+		$event = new TableDeletedEvent($table);
 
 		$this->auditLogService
 			->expects($this->once())
 			->method('log')
 			->with(
-				$this->equalTo("Table with ID: {$table->id} was deleted by user with ID: $userId"),
+				$this->equalTo("Table with ID: {$table->id} was deleted"),
 				$this->equalTo([
 					'table' => $table->jsonSerialize(),
-					'userId' => $userId,
 				])
 			);
 

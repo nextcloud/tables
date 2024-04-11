@@ -282,10 +282,7 @@ class ViewService extends SuperService {
 		try {
 			$deletedView = $this->mapper->delete($view);
 
-			$event = new ViewDeletedEvent(
-				view: $view,
-				userId: $userId
-			);
+			$event = new ViewDeletedEvent(view: $view);
 
 			$this->eventDispatcher->dispatchTyped($event);
 
@@ -317,10 +314,7 @@ class ViewService extends SuperService {
 
 			$this->mapper->delete($view);
 
-			$event = new ViewDeletedEvent(
-				view: $view,
-				userId: $userId
-			);
+			$event = new ViewDeletedEvent(view: $view);
 
 			$this->eventDispatcher->dispatchTyped($event);
 

@@ -8,15 +8,11 @@ use OCA\Tables\Db\Row2;
 use OCP\EventDispatcher\Event;
 
 final class RowDeletedEvent extends Event {
-	public function __construct(protected Row2 $row, protected string $userId) {
+	public function __construct(protected Row2 $row) {
 		parent::__construct();
 	}
 
 	public function getRow(): Row2 {
 		return $this->row;
-	}
-
-	public function getUserId(): string {
-		return $this->userId;
 	}
 }

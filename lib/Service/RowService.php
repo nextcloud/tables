@@ -465,10 +465,7 @@ class RowService extends SuperService {
 		try {
 			$deletedRow = $this->row2Mapper->delete($item);
 
-			$event = new RowDeletedEvent(
-				row: $item,
-				userId: $userId
-			);
+			$event = new RowDeletedEvent(row: $item);
 
 			$this->eventDispatcher->dispatchTyped($event);
 

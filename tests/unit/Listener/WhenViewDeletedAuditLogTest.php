@@ -22,18 +22,16 @@ final class WhenViewDeletedAuditLogTest extends TestCase {
 	public function testHandle(): void {
 		$view = new View();
 		$view->id = 1;
-		$userId = 'user1';
 
-		$event = new ViewDeletedEvent($view, $userId);
+		$event = new ViewDeletedEvent(view: $view);
 
 		$this->auditLogService
 			->expects($this->once())
 			->method('log')
 			->with(
-				$this->equalTo("View with ID: {$view->id} was deleted by user with ID: $userId"),
+				$this->equalTo("View with ID: {$view->id} was deleted"),
 				$this->equalTo([
 					'view' => $view->jsonSerialize(),
-					'userId' => $userId,
 				])
 			);
 

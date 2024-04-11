@@ -431,14 +431,7 @@ class TableService extends SuperService {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 
-		/*
-		 * Decouple the side logic from the core business logic
-		 * (logging, mail sending, etc.), called handling side effects and most of them can be done asynchronously via queue.
-		 */
-		$event = new TableDeletedEvent(
-			table: $item,
-			userId: $userId
-		);
+		$event = new TableDeletedEvent(table: $item);
 
 		$this->eventDispatcher->dispatchTyped($event);
 

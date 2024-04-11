@@ -8,15 +8,11 @@ use OCA\Tables\Db\View;
 use OCP\EventDispatcher\Event;
 
 final class ViewDeletedEvent extends Event {
-	public function __construct(protected View $view, protected string $userId) {
+	public function __construct(protected View $view) {
 		parent::__construct();
 	}
 
 	public function getView(): View {
 		return $this->view;
-	}
-
-	public function getUserId(): string {
-		return $this->userId;
 	}
 }

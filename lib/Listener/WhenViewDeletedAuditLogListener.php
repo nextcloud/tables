@@ -22,11 +22,9 @@ final class WhenViewDeletedAuditLogListener implements IEventListener {
 		}
 
 		$view = $event->getView();
-		$userId = $event->getUserId();
 
-		$this->auditLogService->log("View with ID: $view->id was deleted by user with ID: $userId", [
+		$this->auditLogService->log("View with ID: $view->id was deleted", [
 			'view' => $view->jsonSerialize(),
-			'userId' => $userId,
 		]);
 	}
 }

@@ -22,11 +22,9 @@ final class WhenTableDeletedAuditLogListener implements IEventListener {
 		}
 
 		$table = $event->getTable();
-		$userId = $event->getUserId();
 
-		$this->auditLogService->log("Table with ID: $table->id was deleted by user with ID: $userId", [
+		$this->auditLogService->log("Table with ID: $table->id was deleted", [
 			'table' => $table->jsonSerialize(),
-			'userId' => $userId,
 		]);
 	}
 }
