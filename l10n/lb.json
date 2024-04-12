@@ -28,6 +28,7 @@
     "Close" : "Zoumaachen",
     "Please select a file." : "Wiel eng Datei aus.",
     "Sort" : "Zortéieren",
+    "Copy" : "Kopie",
     "Favorites" : "Favoriten",
     "group" : "Grupp",
     "Sharing" : "Gedeelt",
@@ -37,6 +38,7 @@
     "Search" : "Search",
     "Default" : "Standard",
     "URL" : "URL",
+    "Confirm" : "Konfirméieren",
     "Select" : "Auswielen"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

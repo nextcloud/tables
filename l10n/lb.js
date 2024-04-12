@@ -30,6 +30,7 @@ OC.L10N.register(
     "Close" : "Zoumaachen",
     "Please select a file." : "Wiel eng Datei aus.",
     "Sort" : "Zortéieren",
+    "Copy" : "Kopie",
     "Favorites" : "Favoriten",
     "group" : "Grupp",
     "Sharing" : "Gedeelt",
@@ -39,6 +40,7 @@ OC.L10N.register(
     "Search" : "Search",
     "Default" : "Standard",
     "URL" : "URL",
+    "Confirm" : "Konfirméieren",
     "Select" : "Auswielen"
 },
 "nplurals=2; plural=(n != 1);");
