@@ -297,7 +297,10 @@ OC.L10N.register(
     "Inserted rows" : "已插入列",
     "Value parsing errors" : "數值解析錯誤",
     "Row creation errors" : "列創建錯誤",
+    "Transfer application" : "轉移應用程式",
+    "Transfer this application to another user" : "將此應用程式轉移至其他使用者",
     "Transfer" : "轉移",
+    "Context \"{name}\" transfered to {user}" : "上下文「{name}」已轉移至 {user}",
     "Transfer table" : "轉移數據庫表",
     "Transfer this table to another user" : "將此數據庫表轉移給另一個用戶",
     "Table \"{emoji}{table}\" transfered to {user}" : "數據庫表「{emoji}{table}」已轉移給 {user}",
@@ -516,6 +519,11 @@ OC.L10N.register(
     "Could not fetch applications" : "無法擷取應用程式",
     "Could not load application." : "無法載入應用程式。",
     "Could not fetch application" : "無法擷取應用程式",
+    "Could not load table." : "無法載入數據庫表。",
+    "Could not fetch table" : "無法擷取數據庫表",
+    "Could not load view" : "無法加載檢視",
+    "Could not fetch view" : "無法擷取檢視",
+    "Could not transfer application." : "無法轉移應用程式。",
     "Could not remove table." : "無法移除數據庫表。"
 },
 "nplurals=1; plural=0;");
