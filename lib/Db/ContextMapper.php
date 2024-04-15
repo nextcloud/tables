@@ -253,6 +253,10 @@ class ContextMapper extends QBMapper {
 	protected function applyOwnedOrSharedQuery(IQueryBuilder $qb, string $userId): void {
 		$sharedToConditions = $qb->expr()->orX();
 
+		// shared by user clause
+		$userInitiatedShare = $qb->expr()->eq('s.sender', $qb->createNamedParameter($userId));
+		$sharedToConditions->add($userInitiatedShare);
+
 		// shared to user clause
 		$userShare = $qb->expr()->andX(
 			$qb->expr()->eq('s.receiver_type', $qb->createNamedParameter('user')),
