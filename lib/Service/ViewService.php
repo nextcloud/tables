@@ -16,10 +16,12 @@ use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Event\ViewDeletedEvent;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
@@ -39,6 +41,8 @@ class ViewService extends SuperService {
 
 	protected IL10N $l;
 
+	protected IEventDispatcher $eventDispatcher;
+
 	public function __construct(
 		PermissionsService $permissionsService,
 		LoggerInterface $logger,
@@ -48,7 +52,8 @@ class ViewService extends SuperService {
 		RowService $rowService,
 		UserHelper $userHelper,
 		FavoritesService $favoritesService,
-		IL10N $l
+		IL10N $l,
+		IEventDispatcher $eventDispatcher
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->l = $l;
@@ -57,6 +62,7 @@ class ViewService extends SuperService {
 		$this->rowService = $rowService;
 		$this->userHelper = $userHelper;
 		$this->favoritesService = $favoritesService;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 
@@ -274,7 +280,13 @@ class ViewService extends SuperService {
 		$this->shareService->deleteAllForView($view);
 
 		try {
-			return $this->mapper->delete($view);
+			$deletedView = $this->mapper->delete($view);
+
+			$event = new ViewDeletedEvent(view: $view);
+
+			$this->eventDispatcher->dispatchTyped($event);
+
+			return $deletedView;
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
@@ -301,6 +313,11 @@ class ViewService extends SuperService {
 			$this->shareService->deleteAllForView($view);
 
 			$this->mapper->delete($view);
+
+			$event = new ViewDeletedEvent(view: $view);
+
+			$this->eventDispatcher->dispatchTyped($event);
+
 			return $view;
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());

@@ -13,11 +13,13 @@ use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Event\RowDeletedEvent;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Server;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -33,13 +35,24 @@ class RowService extends SuperService {
 	private Row2Mapper $row2Mapper;
 	private array $tmpRows = []; // holds already loaded rows as a small cache
 
-	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-		ColumnMapper $columnMapper, ViewMapper $viewMapper, TableMapper $tableMapper, Row2Mapper $row2Mapper) {
+	protected IEventDispatcher $eventDispatcher;
+
+	public function __construct(
+		PermissionsService $permissionsService,
+		LoggerInterface $logger,
+		?string $userId,
+		ColumnMapper $columnMapper,
+		ViewMapper $viewMapper,
+		TableMapper $tableMapper,
+		Row2Mapper $row2Mapper,
+		IEventDispatcher $eventDispatcher
+	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->columnMapper = $columnMapper;
 		$this->viewMapper = $viewMapper;
 		$this->tableMapper = $tableMapper;
 		$this->row2Mapper = $row2Mapper;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	/**
@@ -450,7 +463,13 @@ class RowService extends SuperService {
 		}
 
 		try {
-			return $this->filterRowResult($view ?? null, $this->row2Mapper->delete($item));
+			$deletedRow = $this->row2Mapper->delete($item);
+
+			$event = new RowDeletedEvent(row: $item);
+
+			$this->eventDispatcher->dispatchTyped($event);
+
+			return $this->filterRowResult($view ?? null, $deletedRow);
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
