@@ -37,7 +37,7 @@
 				<div class="col-4">
 					{{ t('tables', 'Resources') }}
 				</div>
-				<NcContextResource :resources.sync="resources" />
+				<NcContextResource :resources.sync="resources" :receivers.sync="receivers" />
 			</div>
 			<div class="row space-R">
 				<div class="fix-col-4 end space-T">
@@ -86,6 +86,7 @@ export default {
 			errorTitle: false,
 			description: '',
 			resources: [],
+			receivers: [],
 		}
 	},
 	watch: {
@@ -139,6 +140,7 @@ export default {
 				return {
 					id: parseInt(resource.id),
 					type: parseInt(resource.nodeType),
+					// TODO get right permissions for the node
 					permissions: 660,
 				}
 			})
@@ -148,7 +150,7 @@ export default {
 				description: this.description,
 				nodes: dataResources,
 			}
-			const res = await this.$store.dispatch('insertNewContext', { data })
+			const res = await this.$store.dispatch('insertNewContext', { data, previousReceivers: [], receivers: this.receivers })
 			if (res) {
 				return res.id
 			} else {

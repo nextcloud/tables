@@ -110,8 +110,8 @@ export default {
 				this.title = context.name
 				this.setIcon(this.localContext.iconName)
 				this.description = context.description
-				this.resources = context ? [...this.getContextResources(context)] : []
-				this.receivers = context && context?.sharing ? [...context.sharing] : []
+				this.resources = context ? this.getContextResources(context) : []
+				this.receivers = context ? this.getContextReceivers(context) : []
 			}
 		},
 	},
@@ -144,8 +144,9 @@ export default {
 					description: this.description,
 					nodes: dataResources,
 				}
+				const context = this.getContext(this.contextId)
 
-				const res = await this.$store.dispatch('updateContext', { id: this.contextId, data, receivers: this.receivers })
+				const res = await this.$store.dispatch('updateContext', { id: this.contextId, data, previousReceivers: Object.values(context.sharing), receivers: this.receivers })
 				if (res) {
 					showSuccess(t('tables', 'Updated context "{contextTitle}".', { contextTitle: this.title }))
 					this.actionCancel()
@@ -158,8 +159,21 @@ export default {
 			this.errorTitle = false
 			this.icon.name = 'equalizer'
 			this.description = ''
-			this.resources = context ? [...this.getContextResources(context)] : []
-			this.receivers = context && context?.sharing ? [...context.sharing] : []
+			this.resources = context ? this.getContextResources(context) : []
+			this.receivers = context ? this.getContextReceivers(context) : []
+		},
+		getContextReceivers(context) {
+			const sharing = Object.values(context.sharing)
+			const receivers = sharing.map((share) => {
+				return {
+					user: share.receiver,
+					displayName: share.receiver,
+					icon: 'icon-user',
+					isUser: share.receiver_type === 'user',
+					key: share.receiver_type + '-' + share.receiver,
+				}
+			})
+			return receivers
 		},
 		getContextResources(context) {
 			const resources = []
