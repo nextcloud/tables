@@ -124,6 +124,10 @@ export default {
 				type: element.type,
 				label: element.title,
 				subline: '',
+				permissionRead: true,
+				permissionCreate: true,
+				permissionUpdate: true,
+				permissionDelete: false,
 			}
 		},
 

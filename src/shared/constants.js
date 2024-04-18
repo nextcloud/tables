@@ -21,3 +21,11 @@
 
 export const NODE_TYPE_TABLE = 0
 export const NODE_TYPE_VIEW = 1
+
+// from Application.php
+export const PERMISSION_READ = 1
+export const PERMISSION_CREATE = 2
+export const PERMISSION_UPDATE = 4
+export const PERMISSION_DELETE = 8
+export const PERMISSION_MANAGE = 16
+export const PERMISSION_ALL = 31

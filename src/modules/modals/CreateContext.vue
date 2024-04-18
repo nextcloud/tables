@@ -57,6 +57,7 @@ import '@nextcloud/dialogs/dist/index.css'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
 import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'
 import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'
+import { PERMISSION_READ, PERMISSION_CREATE, PERMISSION_UPDATE, PERMISSION_DELETE } from '../../shared/constants.js'
 
 export default {
 	name: 'CreateContext',
@@ -87,6 +88,10 @@ export default {
 			description: '',
 			resources: [],
 			receivers: [],
+			PERMISSION_READ,
+			PERMISSION_CREATE,
+			PERMISSION_UPDATE,
+			PERMISSION_DELETE,
 		}
 	},
 	watch: {
@@ -126,13 +131,20 @@ export default {
 				}
 			}
 		},
+		getPermissionBitmaskFromBools(permissionRead, permissionCreate, permissionUpdate, permissionDelete) {
+			const read = permissionRead ? PERMISSION_READ : 0
+			const create = permissionCreate ? PERMISSION_CREATE : 0
+			const update = permissionUpdate ? PERMISSION_UPDATE : 0
+			const del = permissionDelete ? PERMISSION_DELETE : 0
+			return read | create | update | del
+		},
 		async sendNewContextToBE() {
 			const dataResources = this.resources.map(resource => {
 				return {
 					id: parseInt(resource.id),
 					type: parseInt(resource.nodeType),
 					// TODO get right permissions for the node
-					permissions: 660,
+					permissions: this.getPermissionBitmaskFromBools(true /* ensure permission is always true */, resource.permissionCreate, resource.permissionUpdate, resource.permissionDelete),
 				}
 			})
 			const data = {
