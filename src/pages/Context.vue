@@ -108,7 +108,8 @@ export default {
 	},
 
 	watch: {
-		async activeContextId() {
+		// Watch for changes to active context to make page reactive
+		async activeContext() {
 			if (this.activeContextId && !this.activeContext) {
 				// context does not exists, go to startpage
 				this.$router.push('/').catch(err => err)

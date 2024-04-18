@@ -45,15 +45,7 @@ export default {
 		return {
 			loading: false,
 			contextResource: this.resources,
-			contextReceivers: [
-				// {
-				// 	user: 'user2',
-				// 	displayName: 'user2',
-				// 	icon: 'icon-user',
-				// 	isUser: true,
-				// 	key: 'users-user2',
-				// },
-			],
+			contextReceivers: this.receivers,
 		}
 	},
 
