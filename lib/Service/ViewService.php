@@ -40,6 +40,7 @@ class ViewService extends SuperService {
 	protected FavoritesService $favoritesService;
 
 	protected IL10N $l;
+	private ContextService $contextService;
 
 	protected IEventDispatcher $eventDispatcher;
 
@@ -52,8 +53,9 @@ class ViewService extends SuperService {
 		RowService $rowService,
 		UserHelper $userHelper,
 		FavoritesService $favoritesService,
-		IL10N $l,
-		IEventDispatcher $eventDispatcher
+		IEventDispatcher $eventDispatcher,
+		ContextService $contextService,
+		IL10N $l
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->l = $l;
@@ -63,6 +65,7 @@ class ViewService extends SuperService {
 		$this->userHelper = $userHelper;
 		$this->favoritesService = $favoritesService;
 		$this->eventDispatcher = $eventDispatcher;
+		$this->contextService = $contextService;
 	}
 
 
@@ -148,11 +151,31 @@ class ViewService extends SuperService {
 		if ($userId === '') {
 			return [];
 		}
+
+		$allViews = [];
+
 		$sharedViews = $this->shareService->findViewsSharedWithMe($userId);
-		foreach ($sharedViews as $view) {
+		foreach ($sharedViews as $sharedView) {
+			$allViews[$sharedView->getId()] = $sharedView;
+		}
+
+		$contexts = $this->contextService->findAll($userId);
+		foreach ($contexts as $context) {
+			$nodes = $context->getNodes();
+			foreach ($nodes as $node) {
+				if ($node['node_type'] !== Application::NODE_TYPE_VIEW
+					|| isset($allViews[$node['node_id']])
+				) {
+					continue;
+				}
+				$allViews[$node['node_id']] = $this->find($node['node_id'], false, $userId);
+			}
+		}
+
+		foreach ($allViews as $view) {
 			$this->enhanceView($view, $userId);
 		}
-		return $sharedViews;
+		return array_values($allViews);
 	}
 
 

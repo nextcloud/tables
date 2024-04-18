@@ -422,7 +422,7 @@ class ContextService {
 				if (!$this->permissionsService->canManageNodeById($node['type'], $node['id'], $userId)) {
 					throw new PermissionError(sprintf('Owner cannot manage node %d (type %d)', $node['id'], $node['type']));
 				}
-				$contextNodeRel = $this->addNodeToContext($context, $node['id'], $node['type'], $node['permissions'] ?? 660);
+				$contextNodeRel = $this->addNodeToContext($context, $node['id'], $node['type'], $node['permissions'] ?? 0);
 				$addedNodes[] = $contextNodeRel->jsonSerialize();
 			} catch (Exception $e) {
 				$this->logger->warning('Could not add node {ntype}/{nid} to context {cid}, skipping.', [
