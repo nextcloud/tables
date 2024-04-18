@@ -3,6 +3,7 @@
 namespace OCA\Tables\Service;
 
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Db\ShareMapper;
@@ -149,7 +150,8 @@ class PermissionsService {
 			return false;
 		}
 
-		return $context->getOwnerId() === $userId;
+		return $context->getOwnerId() === $userId || $this->canManageContext($context, $userId);
+		;
 	}
 
 	/**
@@ -189,6 +191,8 @@ class PermissionsService {
 			return $this->canManageTableById($elementId, $userId);
 		} elseif ($nodeType === 'view') {
 			return $this->canManageViewById($elementId, $userId);
+		} elseif ($nodeType === 'context') {
+			return $this->canManageContextById($elementId, $userId);
 		} else {
 			throw new InternalError('Cannot read permission for node type '.$nodeType);
 		}
@@ -205,6 +209,10 @@ class PermissionsService {
 
 	public function canManageTable(Table $table, ?string $userId = null): bool {
 		return $this->checkPermission($table, 'table', 'manage', $userId);
+	}
+
+	public function canManageContext(Context $context, ?string $userId = null): bool {
+		return $this->checkPermission($context, 'context', 'manage', $userId);
 	}
 
 	public function canManageTableById(int $tableId, ?string $userId = null): bool {
@@ -582,7 +590,7 @@ class PermissionsService {
 	}
 
 	/**
-	 * @param Table|View $element
+	 * @param Table|View|Context $element
 	 * @param string $nodeType
 	 * @param string|null $userId
 	 * @return bool
@@ -600,7 +608,7 @@ class PermissionsService {
 			return true;
 		}
 
-		if ($this->userIsElementOwner($element, $userId)) {
+		if ($this->userIsElementOwner($element, $userId, $nodeType)) {
 			return true;
 		}
 		try {
@@ -641,11 +649,14 @@ class PermissionsService {
 	}
 
 	/**
-	 * @param View|Table $element
+	 * @param View|Table|Context $element
 	 * @param string|null $userId
 	 * @return bool
 	 */
-	private function userIsElementOwner($element, string $userId = null): bool {
+	private function userIsElementOwner($element, string $userId = null, ?string $nodeType = null): bool {
+		if ($nodeType === 'context') {
+			return $element->getOwnerId() === $userId;
+		}
 		return $element->getOwnership() === $userId;
 	}
 
