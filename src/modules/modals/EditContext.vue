@@ -54,7 +54,7 @@ import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters, mapState } from 'vuex'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
 import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'
-import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../../shared/constants.js'
+import { NODE_TYPE_TABLE, NODE_TYPE_VIEW, PERMISSION_READ, PERMISSION_CREATE, PERMISSION_UPDATE, PERMISSION_DELETE } from '../../shared/constants.js'
 import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'
 
 export default {
@@ -88,6 +88,10 @@ export default {
 			errorTitle: false,
 			resources: [],
 			receivers: [],
+			PERMISSION_READ,
+			PERMISSION_CREATE,
+			PERMISSION_UPDATE,
+			PERMISSION_DELETE,
 		}
 	},
 	computed: {
@@ -135,7 +139,7 @@ export default {
 						id: parseInt(resource.id),
 						type: parseInt(resource.nodeType),
 						// TODO get right permissions for the node
-						permissions: 660,
+						permissions: this.getPermissionBitmaskFromBools(true /* ensure permission is always true */, resource.permissionCreate, resource.permissionUpdate, resource.permissionDelete),
 					}
 				})
 				const data = {
@@ -175,6 +179,17 @@ export default {
 			})
 			return receivers
 		},
+		// TODO use mixin or similar for reusability
+		getPermissionBitmaskFromBools(permissionRead, permissionCreate, permissionUpdate, permissionDelete) {
+			const read = permissionRead ? PERMISSION_READ : 0
+			const create = permissionCreate ? PERMISSION_CREATE : 0
+			const update = permissionUpdate ? PERMISSION_UPDATE : 0
+			const del = permissionDelete ? PERMISSION_DELETE : 0
+			return read | create | update | del
+		},
+		getPermissionFromBitmask(bitmask, permission) {
+			return !!(bitmask & permission)
+		},
 		getContextResources(context) {
 			const resources = []
 			const nodes = Object.values(context.nodes)
@@ -189,6 +204,10 @@ export default {
 							key: `${elementKey}` + element.id,
 							nodeType: parseInt(node.node_type) === NODE_TYPE_TABLE ? NODE_TYPE_TABLE : NODE_TYPE_VIEW,
 							id: (element.id).toString(),
+							permissionRead: this.getPermissionFromBitmask(node.permissions, PERMISSION_READ),
+							permissionCreate: this.getPermissionFromBitmask(node.permissions, PERMISSION_CREATE),
+							permissionUpdate: this.getPermissionFromBitmask(node.permissions, PERMISSION_UPDATE),
+							permissionDelete: this.getPermissionFromBitmask(node.permissions, PERMISSION_DELETE),
 						}
 						resources.push(resource)
 					}

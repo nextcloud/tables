@@ -1,10 +1,10 @@
 <template>
 	<div>
 		<div>
-			<ResourceForm :resources="localResource" @add="addResource" />
-			<ResourceList :resources="localResource" @remove="removeResource" />
+			<ResourceForm :resources="localResources" @add="addResource" />
+			<ResourceList :resources="localResources" @remove="removeResource" />
 			<ResourceSharees :select-users="true" :select-groups="false" :receivers="localReceivers" @update="updateReceivers" />
-			<ResourceSharePermissions :resources="localResource" />
+			<ResourceSharePermissions :resources="localResources" @update="updateResourcePermissions" />
 		</div>
 	</div>
 </template>
@@ -44,16 +44,16 @@ export default {
 	data() {
 		return {
 			loading: false,
-			contextResource: this.resources,
+			contextResources: this.resources,
 			contextReceivers: this.receivers,
 		}
 	},
 
 	computed: {
 		...mapGetters(['activeContext']),
-		localResource: {
+		localResources: {
 			get() {
-				return this.contextResource
+				return this.contextResources
 			},
 			set(v) {
 				this.$emit('update:resources', v)
@@ -71,15 +71,21 @@ export default {
 
 	methods: {
 		removeResource(resource) {
-			this.contextResource = this.contextResource.filter(r => r.key !== resource.key)
-			this.localResource = this.contextResource
+			this.contextResources = this.contextResources.filter(r => r.key !== resource.key)
+			this.localResources = this.contextResources
 		},
 		addResource(resource) {
-			this.contextResource.push(resource)
-			this.localResource = this.contextResource
+			this.contextResources.push(resource)
+			this.localResources = this.contextResources
 		},
 		updateReceivers(receivers) {
 			this.localReceivers = receivers
+		},
+		updateResourcePermissions({ resourceId, permission, value }) {
+			const resourceIndex = this.localResources.findIndex((resource) => resource.id === resourceId)
+			if (resourceIndex !== -1) {
+				this.localResources[resourceIndex][permission] = value
+			}
 		},
 
 	},
