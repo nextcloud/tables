@@ -110,7 +110,7 @@ class TableService extends SuperService {
 		if (count($allTables) === 0 && $createTutorial) {
 			try {
 				$tutorialTable = $this->create($this->l->t('Tutorial'), 'tutorial', '🚀');
-				$allTables = [$tutorialTable->getId() => $tutorialTable];
+				$allTables[$tutorialTable->getId()] = $tutorialTable;
 			} catch (InternalError|PermissionError|DoesNotExistException|MultipleObjectsReturnedException|OcpDbException $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
