@@ -339,7 +339,7 @@ export default new Vuex.Store({
 					}
 				}
 			} catch (e) {
-				displayError(e, t('tables', 'Could not add context share.'))
+				displayError(e, t('tables', 'Could not add application share.'))
 			}
 			try {
 				// If there's a previous share that wasn't maintained, delete it
@@ -353,7 +353,7 @@ export default new Vuex.Store({
 					}
 				}
 			} catch (e) {
-				displayError(e, t('tables', 'Could not remove context share.'))
+				displayError(e, t('tables', 'Could not remove application share.'))
 			}
 		},
 		async insertNewContext({ commit, state, dispatch }, { data, receivers }) {
