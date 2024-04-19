@@ -523,13 +523,13 @@ class PermissionsService {
 	}
 
 	/**
-	 * @param mixed $element
-	 * @param 'table'|'view' $nodeType
+	 * @param Table|View|Context $element
+	 * @param 'table'|'view'|'context' $nodeType
 	 * @param string $permission
 	 * @param string|null $userId
 	 * @return bool
 	 */
-	private function checkPermission($element, string $nodeType, string $permission, ?string $userId = null): bool {
+	private function checkPermission(Table|View|Context $element, string $nodeType, string $permission, ?string $userId = null): bool {
 		if($this->basisCheck($element, $nodeType, $userId)) {
 			return true;
 		}
@@ -542,7 +542,9 @@ class PermissionsService {
 			return $this->getSharedPermissionsIfSharedWithMe($element->getId(), $nodeType, $userId)[$permission];
 		} catch (NotFoundError $e) {
 			try {
-				if ($this->hasPermission($this->getPermissionIfAvailableThroughContext($element->getId(), $nodeType, $userId), $permission)) {
+				if ($nodeType !== 'context'
+					&& $this->hasPermission($this->getPermissionIfAvailableThroughContext($element->getId(), $nodeType, $userId), $permission)
+				) {
 					return true;
 				}
 			} catch (NotFoundError $e) {
@@ -580,13 +582,7 @@ class PermissionsService {
 		return false;
 	}
 
-	/**
-	 * @param Table|View|Context $element
-	 * @param string $nodeType
-	 * @param string|null $userId
-	 * @return bool
-	 */
-	private function basisCheck($element, string $nodeType, ?string &$userId): bool {
+	private function basisCheck(Table|View|Context $element, string $nodeType, ?string &$userId): bool {
 		try {
 			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
