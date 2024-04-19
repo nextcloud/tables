@@ -1,6 +1,8 @@
 <template>
 	<div>
-		<h3>{{ t('tables', 'Shared resources permissions') }}</h3>
+		<div class="col-4">
+			{{ t('tables', 'Shared resources permissions') }}
+		</div>
 		<ul v-if="resources && resources.length > 0" class="shares-list">
 			<div v-for="resource in resources" :key="resource.key" class="row">
 				<div class="fix-col-2">
@@ -17,18 +19,18 @@
 							{{ t('tables', 'Read resource') }}
 						</NcActionCheckbox>
 						<NcActionCheckbox :checked.sync="resource.permissionCreate"
-							@check="updatePermission(resource, 'create', true)"
-							@uncheck="updatePermission(resource, 'create', false)">
+							@check="updatePermission(resource, 'permissionCreate', true)"
+							@uncheck="updatePermission(resource, 'permissionCreate', false)">
 							{{ t('tables', 'Create resource') }}
 						</NcActionCheckbox>
 						<NcActionCheckbox :checked.sync="resource.permissionUpdate"
-							@check="updatePermission(resource, 'update', true)"
-							@uncheck="updatePermission(resource, 'update', false)">
+							@check="updatePermission(resource, 'permissionUpdate', true)"
+							@uncheck="updatePermission(resource, 'permissionUpdate', false)">
 							{{ t('tables', 'Update resource') }}
 						</NcActionCheckbox>
 						<NcActionCheckbox :checked.sync="resource.permissionDelete"
-							@check="updatePermission(resource, 'delete', true)"
-							@uncheck="updatePermission(resource, 'delete', false)">
+							@check="updatePermission(resource, 'permissionDelete', true)"
+							@uncheck="updatePermission(resource, 'permissionDelete', false)">
 							{{ t('tables', 'Delete resource') }}
 						</NcActionCheckbox>
 					</NcActions>

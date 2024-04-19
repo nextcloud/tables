@@ -328,26 +328,32 @@ export default new Vuex.Store({
 				nodeId: id,
 				displayMode: 2,
 			}
-			// TODO use try catch
-			for (const receiver of receivers) {
-				share.receiverType = receiver.isUser ? 'user' : 'group'
-				share.receiver = receiver.user
-				// Avoid duplicate shares by checking if share exists first
-				const existingShare = previousReceivers.find((p) => p.receiver === share.receiver && p.receiver_type === share.receiverType)
-				if (!existingShare) {
-					await axios.post(generateUrl('/apps/tables/share'), share)
+			try {
+				for (const receiver of receivers) {
+					share.receiverType = receiver.isUser ? 'user' : 'group'
+					share.receiver = receiver.user
+					// Avoid duplicate shares by checking if share exists first
+					const existingShare = previousReceivers.find((p) => p.receiver === share.receiver && p.receiver_type === share.receiverType)
+					if (!existingShare) {
+						await axios.post(generateUrl('/apps/tables/share'), share)
+					}
 				}
+			} catch (e) {
+				displayError(e, t('tables', 'Could not add context share.'))
 			}
-
-			// If there's a previous share that wasn't maintained, delete it
-			for (const previousReceiver of previousReceivers) {
-				const currentShare = receivers.find((r) => {
-					const receiverType = r.isUser ? 'user' : 'group'
-					return r.user === previousReceiver.receiver && receiverType === previousReceiver.receiver_type
-				})
-				if (!currentShare) {
-					await axios.delete(generateUrl('/apps/tables/share/' + previousReceiver.share_id))
+			try {
+				// If there's a previous share that wasn't maintained, delete it
+				for (const previousReceiver of previousReceivers) {
+					const currentShare = receivers.find((r) => {
+						const receiverType = r.isUser ? 'user' : 'group'
+						return r.user === previousReceiver.receiver && receiverType === previousReceiver.receiver_type
+					})
+					if (!currentShare) {
+						await axios.delete(generateUrl('/apps/tables/share/' + previousReceiver.share_id))
+					}
 				}
+			} catch (e) {
+				displayError(e, t('tables', 'Could not remove context share.'))
 			}
 		},
 		async insertNewContext({ commit, state, dispatch }, { data, receivers }) {
@@ -491,10 +497,6 @@ export default new Vuex.Store({
 			contexts.splice(index, 1)
 			commit('setContexts', [...contexts])
 			return true
-		},
-
-		// TODO, maybe. For shared contexts, need to fetch and store associated context resources
-		async loadContextResources({ state, commit, dispatch }, { id }) {
 		},
 
 		async removeTable({ state, commit }, { tableId }) {

@@ -151,7 +151,6 @@ class PermissionsService {
 		}
 
 		return $context->getOwnerId() === $userId || $this->canManageContext($context, $userId);
-		;
 	}
 
 	/**
