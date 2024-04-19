@@ -122,6 +122,8 @@ OC.L10N.register(
     "Metadata" : "元数据",
     "Column" : "列",
     "Operator" : "运算符号",
+    "Ascending" : "升序",
+    "Descending" : "降序",
     "Views" : "视图",
     "View" : "查看",
     "Rows" : "列",
