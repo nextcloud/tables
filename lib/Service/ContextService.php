@@ -160,8 +160,15 @@ class ContextService {
 			foreach ($nodes as $node) {
 				$key = sprintf('t%di%d', $node['type'], $node['id']);
 				if (isset($oldNodeResolvableIdMapper[$key])) {
-					unset($oldNodeResolvableIdMapper[$key]);
 					$nodesBeingKept[$key] = $node;
+					if ($node['permissions'] !== $currentNodes[$oldNodeResolvableIdMapper[$key]]['permissions']) {
+						$nodeRel = $this->contextNodeRelMapper->findById($currentNodes[$oldNodeResolvableIdMapper[$key]]['id']);
+						$nodeRel->setPermissions($node['permissions']);
+						$this->contextNodeRelMapper->update($nodeRel);
+						$currentNodes[$oldNodeResolvableIdMapper[$key]]['permissions'] = $nodeRel->getPermissions();
+						$hasUpdatedNodeInformation = true;
+					}
+					unset($oldNodeResolvableIdMapper[$key]);
 					continue;
 				}
 				$nodesBeingAdded[$key] = $node;
@@ -172,7 +179,7 @@ class ContextService {
 			}
 			unset($nodesBeingKept);
 
-			$hasUpdatedNodeInformation = !empty($nodesBeingAdded) || !empty($nodesBeingRemoved);
+			$hasUpdatedNodeInformation = $hasUpdatedNodeInformation || !empty($nodesBeingAdded) || !empty($nodesBeingRemoved);
 
 			foreach ($nodesBeingRemoved as $node) {
 				/** @var ContextNodeRelation $removedNode */
@@ -203,10 +210,11 @@ class ContextService {
 		}
 
 		$context = $this->contextMapper->update($context);
-		if ($hasUpdatedNodeInformation && isset($currentNodes) && isset($currentPages)) {
+		if (isset($currentNodes, $currentPages) && $hasUpdatedNodeInformation) {
 			$context->setNodes($currentNodes);
 			$context->setPages($currentPages);
 		}
+
 		return $context;
 	}
 
