@@ -1,6 +1,8 @@
 <template>
 	<div class="row space-B">
-		<h3>{{ t('tables', 'Share with accounts or groups') }}</h3>
+		<div class="col-4">
+			{{ t('tables', 'Share with accounts') }}
+		</div>
 		<NcSelect v-model="preExistingSharees" style="width: 100%;" :loading="loading" :options="options"
 			:placeholder="getPlaceholder()"
 			:searchable="true" :get-option-key="(option) => option.key"

@@ -36,7 +36,7 @@
 				<NcContextResource :resources.sync="resources" :receivers.sync="receivers" />
 			</div>
 
-			<div class="row space-R">
+			<div class="row space-R row space-T">
 				<div class="fix-col-4 end">
 					<NcButton type="primary" @click="submit">
 						{{ t('tables', 'Save') }}
@@ -50,12 +50,14 @@
 <script>
 import { NcModal, NcButton, NcIconSvgWrapper } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
+import { getCurrentUser } from '@nextcloud/auth'
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters, mapState } from 'vuex'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
 import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW, PERMISSION_READ, PERMISSION_CREATE, PERMISSION_UPDATE, PERMISSION_DELETE } from '../../shared/constants.js'
 import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'
+import permissionBitmask from '../../shared/components/ncContextResource/mixins/permissionBitmask.js'
 
 export default {
 	name: 'EditContext',
@@ -66,7 +68,7 @@ export default {
 		NcIconSvgWrapper,
 		NcContextResource,
 	},
-	mixins: [svgHelper],
+	mixins: [svgHelper, permissionBitmask],
 	props: {
 		showModal: {
 			type: Boolean,
@@ -92,6 +94,7 @@ export default {
 			PERMISSION_CREATE,
 			PERMISSION_UPDATE,
 			PERMISSION_DELETE,
+
 		}
 	},
 	computed: {
@@ -128,7 +131,6 @@ export default {
 			this.reset()
 			this.$emit('close')
 		},
-		// TODO show edited changes without having to reload
 		async submit() {
 			if (this.title === '') {
 				showError(t('tables', 'Cannot update context. Title is missing.'))
@@ -138,8 +140,7 @@ export default {
 					return {
 						id: parseInt(resource.id),
 						type: parseInt(resource.nodeType),
-						// TODO get right permissions for the node
-						permissions: this.getPermissionBitmaskFromBools(true /* ensure permission is always true */, resource.permissionCreate, resource.permissionUpdate, resource.permissionDelete),
+						permissions: this.getPermissionBitmaskFromBools(true /* ensure read permission is always true */, resource.permissionCreate, resource.permissionUpdate, resource.permissionDelete),
 					}
 				})
 				const data = {
@@ -167,25 +168,18 @@ export default {
 			this.receivers = context ? this.getContextReceivers(context) : []
 		},
 		getContextReceivers(context) {
-			const sharing = Object.values(context.sharing)
+			let sharing = Object.values(context.sharing)
+			sharing = sharing.filter((share) => getCurrentUser().uid !== share.receiver)
 			const receivers = sharing.map((share) => {
 				return {
 					user: share.receiver,
 					displayName: share.receiver,
-					icon: 'icon-user',
+					icon: share.receiver_type === 'user' ? 'icon-user' : 'icon-group',
 					isUser: share.receiver_type === 'user',
 					key: share.receiver_type + '-' + share.receiver,
 				}
 			})
 			return receivers
-		},
-		// TODO use mixin or similar for reusability
-		getPermissionBitmaskFromBools(permissionRead, permissionCreate, permissionUpdate, permissionDelete) {
-			const read = permissionRead ? PERMISSION_READ : 0
-			const create = permissionCreate ? PERMISSION_CREATE : 0
-			const update = permissionUpdate ? PERMISSION_UPDATE : 0
-			const del = permissionDelete ? PERMISSION_DELETE : 0
-			return read | create | update | del
 		},
 		getPermissionFromBitmask(bitmask, permission) {
 			return !!(bitmask & permission)
