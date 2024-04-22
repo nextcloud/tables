@@ -6,6 +6,7 @@ namespace OCA\Tables\Db;
 
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
@@ -15,10 +16,8 @@ use OCP\IDBConnection;
 /** @template-extends QBMapper<Context> */
 class ContextMapper extends QBMapper {
 	protected string $table = 'tables_contexts_context';
-	private UserHelper $userHelper;
 
-	public function __construct(IDBConnection $db, UserHelper $userHelper) {
-		$this->userHelper = $userHelper;
+	public function __construct(IDBConnection $db, protected UserHelper $userHelper, protected GroupHelper $groupHelper) {
 		parent::__construct($db, $this->table, Context::class);
 	}
 
@@ -86,6 +85,11 @@ class ContextMapper extends QBMapper {
 				'share_id' => (int)$item['share_id'],
 				'receiver' => $item['receiver'],
 				'receiver_type' => $item['receiver_type'],
+				'receiver_display_name' => match ($item['receiver_type']) {
+					'user' => $this->userHelper->getUserDisplayName($item['receiver']),
+					'group' => $this->groupHelper->getGroupDisplayName($item['receiver']),
+					default => $item['receiver'],
+				},
 				'display_mode_default' => (int)$item['display_mode_default'],
 			];
 			if ($userId !== null) {
