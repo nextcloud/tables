@@ -125,6 +125,9 @@ export default {
 	},
 
 	async mounted() {
+		emit('toggle-navigation', {
+			open: false,
+		})
 		await this.reload()
 	},
 
