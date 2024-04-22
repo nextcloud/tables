@@ -173,7 +173,7 @@ export default {
 			const receivers = sharing.map((share) => {
 				return {
 					user: share.receiver,
-					displayName: share.receiver,
+					displayName: share.receiver_display_name,
 					icon: share.receiver_type === 'user' ? 'icon-user' : 'icon-group',
 					isUser: share.receiver_type === 'user',
 					key: share.receiver_type + '-' + share.receiver,
