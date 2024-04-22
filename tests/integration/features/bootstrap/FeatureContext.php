@@ -69,13 +69,10 @@ class FeatureContext implements Context {
 	private array $tableIds = [];
 	private array $viewIds = [];
 	private array $columnIds = [];
-	private array $contextIds = [];
 
 	// Store data from last request to perform assertions, id is used as a key
 	private array $tableData = [];
 	private array $viewData = [];
-	private array $contextData = [];
-	private array $createdContexts = [];
 
 	// use CommandLineTrait;
 
@@ -85,6 +82,7 @@ class FeatureContext implements Context {
 	public function __construct() {
 		$this->cookieJars = [];
 		$this->baseUrl = getenv('TEST_SERVER_URL');
+		$this->collectionManager = new CollectionManager();
 	}
 
 	/**
@@ -99,16 +97,13 @@ class FeatureContext implements Context {
 	 * @AfterScenario
 	 */
 	public function cleanupUsers() {
+		$this->collectionManager->cleanUp();
 		foreach ($this->createdUsers as $user) {
 			$this->deleteUser($user);
 		}
 		foreach ($this->createdGroups as $group) {
 			$this->deleteGroup($group);
 		}
-		foreach ($this->createdContexts as $contextId => $contextOwner) {
-			$this->deleteContext($contextId, $contextOwner);
-		}
-		$this->contextIds = [];
 	}
 
 
@@ -1794,8 +1789,10 @@ class FeatureContext implements Context {
 		Assert::assertEquals(200, $this->response->getStatusCode());
 
 		$newContext = $this->getDataFromResponse($this->response)['ocs']['data'];
-		$this->createdContexts[$newContext['id']] = $user;
-		$this->contextIds[$alias] = $newContext['id'];
+
+		$this->collectionManager->register($newContext, 'context', $newContext['id'], $alias, function () use ($newContext) {
+			$this->deleteContext($newContext['id'], $newContext['owner']);
+		});
 
 		Assert::assertEquals($newContext['name'], $name);
 		Assert::assertEquals($newContext['iconName'], $icon);
@@ -1817,7 +1814,8 @@ class FeatureContext implements Context {
 	public function userHasAccessToContext(string $user, string $contextAlias) {
 		$this->setCurrentUser($user);
 
-		$contextId = $this->contextIds[$contextAlias] ?? -1;
+		$context = $this->collectionManager->getByAlias('context', $contextAlias);
+		$contextId = $context['id'] ?? -1;
 		Assert::assertNotEquals(-1, $contextId);
 
 		$this->sendOcsRequest(
@@ -1828,14 +1826,14 @@ class FeatureContext implements Context {
 		$context = $this->getDataFromResponse($this->response)['ocs']['data'];
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($context['id'], $contextId);
-		$this->contextData[$contextAlias] = $context;
+		$this->collectionManager->update($context, 'context', $context['id']);
 	}
 
 	/**
 	 * @Given the fetched Context :contextAlias has following data:
 	 */
 	public function theFetchedContextHasFollowingData(string $contextAlias, TableNode $expectedData) {
-		$actualData = $this->contextData[$contextAlias] ?? [];
+		$actualData = $this->collectionManager->getByAlias('context', $contextAlias);
 		Assert::assertNotEmpty($actualData);
 
 		foreach ($expectedData as $field => $value) {
@@ -1893,7 +1891,7 @@ class FeatureContext implements Context {
 
 		$aliases = explode(',', $contextAliasList);
 		$expectedContextIds = array_map(function (string $alias) {
-			return $this->contextIds[trim($alias)];
+			return $this->collectionManager->getByAlias('context', trim($alias))['id'];
 		}, $aliases);
 		sort($expectedContextIds);
 
