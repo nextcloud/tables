@@ -469,8 +469,8 @@ class TableTemplateService {
 				'title' => $this->l->t('Create Vacation Request'),
 				'emoji' => '️➕',
 				'columns' => json_encode([$columns['employee']->getId(), $columns['from']->getId(), $columns['to']->getId(), $columns['workingDays']->getId(), $columns['dateRequest']->getId()]),
-				'sort' => json_encode([["columnId" => -5, "mode" => "ASC"]]),
-				'filter' => json_encode([[["columnId" => -2, "operator" => "is-equal", "value" => "@my-name"], ["columnId" => $columns['approved']->getId(), "operator" => "is-empty", "value" => ""]]]),
+				'sort' => json_encode([["columnId" => $columns['from']->getId(), "mode" => "ASC"]]),
+				'filter' => json_encode([[["columnId" => $columns['employee']->getId(), "operator" => "is-equal", "value" => "@my-name"], ["columnId" => $columns['approved']->getId(), "operator" => "is-empty", "value" => ""]]]),
 			]
 		);
 		$this->createView($table,
@@ -491,8 +491,8 @@ class TableTemplateService {
 				'columns' => json_encode(array_values(array_map(function ($col) {
 					return $col->getId();
 				}, $columns))),
-				'sort' => json_encode([["columnId" => -3, "mode" => "ASC"]]),
-				'filter' => json_encode([[["columnId" => -2, "operator" => "is-equal", "value" => "@my-name"]]]),
+				'sort' => json_encode([["columnId" => $columns['dateRequest']->getId(), "mode" => "ASC"]]),
+				'filter' => json_encode([[["columnId" => $columns['employee']->getId(), "operator" => "is-equal", "value" => "@my-name"]]]),
 			]
 		);
 		$this->createView($table,
@@ -502,7 +502,7 @@ class TableTemplateService {
 				'columns' => json_encode(array_values(array_map(function ($col) {
 					return $col->getId();
 				}, $columns))),
-				'sort' => json_encode([["columnId" => -3, "mode" => "ASC"]]),
+				'sort' => json_encode([["columnId" => $columns['dateRequest']->getId(), "mode" => "ASC"]]),
 				'filter' => json_encode([[["columnId" => $columns['approved']->getId(), "operator" => "is-equal", "value" => "@checked"]], [["columnId" => $columns['approved']->getId(), "operator" => "is-equal", "value" => "@unchecked"]]]),
 			]
 		);
