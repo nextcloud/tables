@@ -1,4 +1,6 @@
 { "translations": {
+    "No" : "Ne",
+    "Yes" : "Da",
     "Date" : "Date",
     "Name" : "Ime",
     "Description" : "Opis",
