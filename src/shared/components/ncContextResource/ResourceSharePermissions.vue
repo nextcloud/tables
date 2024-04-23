@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="col-4">
+		<div>
 			{{ t('tables', 'Shared resources permissions') }}
 		</div>
 		<ul v-if="resources && resources.length > 0" class="shares-list">
