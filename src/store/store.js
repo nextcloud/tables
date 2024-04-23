@@ -106,7 +106,7 @@ export default new Vuex.Store({
 		},
 		setTable(state, table) {
 			const index = state.tables.findIndex(t => t.id === table.id)
-			state.tables[index] = table
+			state.tables.splice(index, 1, table)
 		},
 		setView(state, view) {
 			const index = state.views.findIndex(v => v.id === view.id)
@@ -142,7 +142,7 @@ export default new Vuex.Store({
 			let res = null
 
 			try {
-				res = await axios.post(generateUrl('/apps/tables/table'), data)
+				res = (await axios.post(generateOcsUrl('/apps/tables/api/2/tables'), data)).data.ocs
 			} catch (e) {
 				displayError(e, t('tables', 'Could not insert table.'))
 				return false
@@ -266,7 +266,7 @@ export default new Vuex.Store({
 			let res = null
 
 			try {
-				res = await axios.put(generateUrl('/apps/tables/table/' + id), data)
+				res = (await axios.put(generateOcsUrl('/apps/tables/api/2/tables/' + id), data)).data.ocs
 			} catch (e) {
 				displayError(e, t('tables', 'Could not update table.'))
 				return false

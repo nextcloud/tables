@@ -2052,6 +2052,8 @@ export type operations = {
         title: string;
         /** @description Emoji for the table */
         emoji?: string | null;
+        /** @description Description for the table */
+        description?: string | null;
         /** @description Template to use if wanted */
         template?: string;
       };
@@ -2158,6 +2160,8 @@ export type operations = {
         title?: string | null;
         /** @description New table emoji */
         emoji?: string | null;
+        /** @description the tables description */
+        description?: string;
         /** @description whether the table is archived */
         archived?: 0 | 1;
       };

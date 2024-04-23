@@ -1,6 +1,7 @@
 <template>
 	<div>
-		<ElementDescription :active-element="table" :view-setting.sync="localViewSetting" />
+		<ElementTitle :active-element="table" :view-setting.sync="localViewSetting" />
+		<TableDescription :description="table.description" :read-only="true" />
 		<DataTable :show-options="false" :table="table" :columns="columns" :rows="rows" :view-setting.sync="localViewSetting"
 			@create-column="$emit('create-column')"
 			@import="$emit('import')"
@@ -12,7 +13,8 @@
 </template>
 
 <script>
-import ElementDescription from './ElementDescription.vue'
+import TableDescription from './TableDescription.vue'
+import ElementTitle from './ElementTitle.vue'
 import DataTable from './DataTable.vue'
 import { mapState } from 'vuex'
 
@@ -20,8 +22,9 @@ import { emit } from '@nextcloud/event-bus'
 
 export default {
 	components: {
-		ElementDescription,
+		ElementTitle,
 		DataTable,
+		TableDescription,
 	},
 
 	props: {

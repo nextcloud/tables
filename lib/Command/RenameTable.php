@@ -82,9 +82,10 @@ class RenameTable extends Command {
 		$title = $input->getArgument('title');
 		$emoji = $input->getOption('emoji');
 		$archived = $input->getOption('archived');
+		$description = $input->getOption('description');
 
 		try {
-			$table = $this->tableService->update($id, $title, $emoji, $archived, '');
+			$table = $this->tableService->update($id, $title, $emoji, $description, $archived, '');
 
 			$arr = $table->jsonSerialize();
 			unset($arr['hasShares']);

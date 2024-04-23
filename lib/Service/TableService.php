@@ -266,12 +266,13 @@ class TableService extends SuperService {
 	 * @throws InternalError
 	 * @noinspection DuplicatedCode
 	 */
-	public function create(string $title, string $template, ?string $emoji, ?string $userId = null): Table {
+	public function create(string $title, string $template, ?string $emoji, ?string $description = '', ?string $userId = null): Table {
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // we can assume that the $userId is set
 
 		$time = new DateTime();
 		$item = new Table();
 		$item->setTitle($title);
+		$item->setDescription($description);
 		if($emoji) {
 			$item->setEmoji($emoji);
 		}
@@ -455,7 +456,7 @@ class TableService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function update(int $id, ?string $title, ?string $emoji, ?bool $archived = null, ?string $userId = null): Table {
+	public function update(int $id, ?string $title, ?string $emoji, ?string $description, ?bool $archived = null, ?string $userId = null): Table {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
@@ -482,6 +483,9 @@ class TableService extends SuperService {
 		}
 		if ($archived !== null) {
 			$table->setArchived($archived);
+		}
+		if ($description !== null) {
+			$table->setDescription($description);
 		}
 		$table->setLastEditBy($userId);
 		$table->setLastEditAt($time->format('Y-m-d H:i:s'));

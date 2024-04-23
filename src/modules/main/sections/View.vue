@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<ElementDescription :active-element="view" :is-table="false" :view-setting.sync="localViewSetting" />
+		<ElementTitle :active-element="view" :is-table="false" :view-setting.sync="localViewSetting" />
 		<div class="table-wrapper">
 			<EmptyView v-if="columns.length === 0" />
 			<TableView v-else
@@ -81,7 +81,7 @@ import TableColumnPlusAfter from 'vue-material-design-icons/TableColumnPlusAfter
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
 import IconImport from 'vue-material-design-icons/Import.vue'
 import Connection from 'vue-material-design-icons/Connection.vue'
-import ElementDescription from './ElementDescription.vue'
+import ElementTitle from './ElementTitle.vue'
 
 export default {
 	components: {
@@ -94,7 +94,7 @@ export default {
 		TableColumnPlusAfter,
 		NcActionCaption,
 		Connection,
-		ElementDescription,
+		ElementTitle,
 	},
 
 	mixins: [permissionsMixin],

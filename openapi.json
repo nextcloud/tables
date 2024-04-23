@@ -5078,6 +5078,15 @@
                         }
                     },
                     {
+                        "name": "description",
+                        "in": "query",
+                        "description": "Description for the table",
+                        "schema": {
+                            "type": "string",
+                            "nullable": true
+                        }
+                    },
+                    {
                         "name": "template",
                         "in": "query",
                         "description": "Template to use if wanted",
@@ -5384,6 +5393,14 @@
                         "schema": {
                             "type": "string",
                             "nullable": true
+                        }
+                    },
+                    {
+                        "name": "description",
+                        "in": "query",
+                        "description": "the tables description",
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     {
