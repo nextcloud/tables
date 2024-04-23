@@ -74,7 +74,7 @@ export default {
 			const transferId = this.context.id
 			const res = await this.$store.dispatch('transferContext', { id: this.context.id, data: { newOwnerId: this.newOwnerId } })
 			if (res) {
-				showSuccess(t('tables', 'Context "{name}" transfered to {user}', { name: this.context?.name, user: this.newOwnerId }))
+				showSuccess(t('tables', 'Context "{name}" transferred to {user}', { name: this.context?.name, user: this.newOwnerId }))
 
 				if (transferId === this.activeContextId) {
 					await this.$router.push('/').catch(err => err)
