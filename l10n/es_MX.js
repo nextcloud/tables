@@ -26,6 +26,7 @@ OC.L10N.register(
     "Birthday" : "Fecha de nacimiento",
     "Target" : "Objetivo",
     "Progress" : "Avance",
+    "What" : "Qué",
     "Done" : "Terminado",
     "Create" : "Crear",
     "Today" : "Hoy",

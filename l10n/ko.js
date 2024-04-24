@@ -250,7 +250,6 @@ OC.L10N.register(
     "Transfer" : "전송",
     "Transfer table" : "표 전송",
     "Transfer this table to another user" : "다른 사용자에게 이 표 전송",
-    "Table \"{emoji}{table}\" transfered to {user}" : "표 \"{emoji}{table}\"이(가) {user}에게 전송됨",
     "Select emoji for view" : "보기에 이모지 지정",
     "Title of the new view" : "새 보기의 제목",
     "New title of the view" : "보기의 새 제목",

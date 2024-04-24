@@ -262,7 +262,6 @@ OC.L10N.register(
     "Transfer" : "Μεταφορά",
     "Transfer table" : "Μεταφορά πίνακα",
     "Transfer this table to another user" : "Μεταφορά αυτού του πίνακα σε άλλον χρήστη",
-    "Table \"{emoji}{table}\" transfered to {user}" : "Ο πίνακας \"{emoji}{table}\" μεταφέρθηκε στον/στην {user}",
     "Select emoji for view" : "Επιλέξτε emoji για την προβολή",
     "Title of the new view" : "Τίτλος της νέας προβολής",
     "New title of the view" : "Νέος τίτλος της προβολής",

@@ -256,7 +256,6 @@ OC.L10N.register(
     "Transfer" : "Överför",
     "Transfer table" : "Överför tabell",
     "Transfer this table to another user" : "Överför denna tabell till en annan användare",
-    "Table \"{emoji}{table}\" transfered to {user}" : "Tabellen \"{emoji}{table}\" överfördes till {user}",
     "Select emoji for view" : "Välj emoji för vy",
     "Title of the new view" : "Titeln på den nya vyn",
     "New title of the view" : "Ny titel på vyn",

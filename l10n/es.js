@@ -267,7 +267,6 @@ OC.L10N.register(
     "Transfer" : "Transferir",
     "Transfer table" : "Transferir tabla",
     "Transfer this table to another user" : "Transferir esta tabla a otro usuario",
-    "Table \"{emoji}{table}\" transfered to {user}" : "Tabla \"{emoji}{table}\" transferida a {user}",
     "Select emoji for view" : "Seleccione Emoji para la vista",
     "Title of the new view" : "Título de la vista nueva",
     "New title of the view" : "Título nuevo para la vista",
