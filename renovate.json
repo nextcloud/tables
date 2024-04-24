@@ -13,7 +13,8 @@
 	"rebaseWhen": "conflicted",
 	"ignoreUnstable": false,
 	"baseBranches": [
-		"main"
+		"main",
+		"stable0.7"
 	],
 	"enabledManagers": [
 		"npm"
@@ -23,6 +24,11 @@
 		"npm"
 	],
 	"packageRules": [
+		{
+			"matchUpdateTypes": ["major", "minor"],
+			"matchBaseBranches": ["stable0.7"],
+			"enabled": false
+		},
 		{
 			"groupName": "cypress",
 			"matchPackageNames": [
