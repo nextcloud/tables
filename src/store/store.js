@@ -121,23 +121,6 @@ export default new Vuex.Store({
 		},
 	},
 	actions: {
-		async insertNewContext({ commit, state, dispatch }, { data }) {
-			commit('setContextsLoading', true)
-			let res = null
-
-			try {
-				res = await axios.post(generateOcsUrl('/apps/tables/api/2/contexts'), data)
-			} catch (e) {
-				displayError(e, t('tables', 'Could not insert application.'))
-				return false
-			}
-			const contexts = state.contexts
-			contexts.push(res.data.ocs.data)
-			commit('setContexts', contexts)
-
-			commit('setContextsLoading', false)
-			return res.data.ocs.data
-		},
 		async insertNewTable({ commit, state, dispatch }, { data }) {
 			let res = null
 
@@ -339,11 +322,67 @@ export default new Vuex.Store({
 
 			return true
 		},
-		async updateContext({ state, commit, dispatch }, { id, data }) {
+		async shareContext({ dispatch }, { id, previousReceivers, receivers }) {
+			const share = {
+				nodeType: 'context',
+				nodeId: id,
+				displayMode: 2,
+			}
+			try {
+				for (const receiver of receivers) {
+					share.receiverType = receiver.isUser ? 'user' : 'group'
+					share.receiver = receiver.user
+					// Avoid duplicate shares by checking if share exists first
+					const existingShare = previousReceivers.find((p) => p.receiver === share.receiver && p.receiver_type === share.receiverType)
+					if (!existingShare) {
+						await axios.post(generateUrl('/apps/tables/share'), share)
+					}
+				}
+			} catch (e) {
+				displayError(e, t('tables', 'Could not add application share.'))
+			}
+			try {
+				// If there's a previous share that wasn't maintained, delete it
+				for (const previousReceiver of previousReceivers) {
+					const currentShare = receivers.find((r) => {
+						const receiverType = r.isUser ? 'user' : 'group'
+						return r.user === previousReceiver.receiver && receiverType === previousReceiver.receiver_type
+					})
+					if (!currentShare) {
+						await axios.delete(generateUrl('/apps/tables/share/' + previousReceiver.share_id))
+					}
+				}
+			} catch (e) {
+				displayError(e, t('tables', 'Could not remove application share.'))
+			}
+		},
+		async insertNewContext({ commit, state, dispatch }, { data, receivers }) {
+			commit('setContextsLoading', true)
 			let res = null
 
 			try {
+				res = await axios.post(generateOcsUrl('/apps/tables/api/2/contexts'), data)
+				const id = res?.data?.ocs?.data?.id
+				if (id) {
+					await dispatch('shareContext', { id, previousReceivers: [], receivers })
+				}
+			} catch (e) {
+				displayError(e, t('tables', 'Could not insert application.'))
+				return false
+			}
+			const contexts = state.contexts
+			contexts.push(res.data.ocs.data)
+			commit('setContexts', contexts)
+
+			commit('setContextsLoading', false)
+			return res.data.ocs.data
+		},
+		async updateContext({ state, commit, dispatch }, { id, data, previousReceivers, receivers }) {
+			let res = null
+			try {
 				res = await axios.put(generateOcsUrl('/apps/tables/api/2/contexts/' + id), data)
+				await dispatch('shareContext', { id, previousReceivers, receivers })
+
 			} catch (e) {
 				displayError(e, t('tables', 'Could not update application.'))
 				return false

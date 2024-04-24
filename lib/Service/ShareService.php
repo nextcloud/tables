@@ -6,6 +6,9 @@ namespace OCA\Tables\Service;
 
 use DateTime;
 
+use InvalidArgumentException;
+use OCA\Tables\Db\ContextNavigation;
+use OCA\Tables\Db\ContextNavigationMapper;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\Table;
@@ -37,15 +40,26 @@ class ShareService extends SuperService {
 	protected UserHelper $userHelper;
 
 	protected GroupHelper $groupHelper;
+	private ContextNavigationMapper $contextNavigationMapper;
 
-	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-		ShareMapper $shareMapper, TableMapper $tableMapper, ViewMapper $viewMapper, UserHelper $userHelper, GroupHelper $groupHelper) {
+	public function __construct(
+		PermissionsService $permissionsService,
+		LoggerInterface $logger,
+		?string $userId,
+		ShareMapper $shareMapper,
+		TableMapper $tableMapper,
+		ViewMapper $viewMapper,
+		UserHelper $userHelper,
+		GroupHelper $groupHelper,
+		ContextNavigationMapper $contextNavigationMapper,
+	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $shareMapper;
 		$this->tableMapper = $tableMapper;
 		$this->viewMapper = $viewMapper;
 		$this->userHelper = $userHelper;
 		$this->groupHelper = $groupHelper;
+		$this->contextNavigationMapper = $contextNavigationMapper;
 	}
 
 
@@ -190,7 +204,7 @@ class ShareService extends SuperService {
 	 * @return Share
 	 * @throws InternalError
 	 */
-	public function create(int $nodeId, string $nodeType, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage):Share {
+	public function create(int $nodeId, string $nodeType, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage, int $displayMode):Share {
 		if (!$this->userId) {
 			$e = new \Exception('No user given.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
@@ -219,6 +233,22 @@ class ShareService extends SuperService {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
 		}
+
+		if ($nodeType === 'context') {
+			// set the default visibility of the nav bar item for Application shares
+			$navigationItem = new ContextNavigation();
+			$navigationItem->setShareId($item->getId());
+			$navigationItem->setUserId('');
+			$navigationItem->setDisplayMode($displayMode);
+
+			try {
+				$this->contextNavigationMapper->insert($navigationItem);
+			} catch (Exception $e) {
+				$this->logger->error($e->getMessage());
+				throw new InternalError($e->getMessage());
+			}
+		}
+
 		return $this->addReceiverDisplayName($newShare);
 	}
 
@@ -281,6 +311,40 @@ class ShareService extends SuperService {
 	}
 
 	/**
+	 * @throws InternalError|PermissionError|NotFoundError
+	 */
+	public function updateDisplayMode(int $shareId, int $displayMode, string $userId): ContextNavigation {
+		try {
+			$item = $this->mapper->find($shareId);
+
+			if ($item->getNodeType() !== 'context') {
+				// Contexts-only property
+				throw new InvalidArgumentException(get_class($this) . ' - ' . __FUNCTION__ . ': nav bar display mode can be set for shared contexts only');
+			}
+
+			if ($userId === '') {
+				// setting default display mode requires manage permissions
+				if (!$this->permissionsService->canManageContextById($item->getNodeId())) {
+					throw new PermissionError(sprintf('PermissionError: can not update share with id %d', $shareId));
+				}
+			} else {
+				// setting user display mode override only requires access
+				if (!$this->permissionsService->canAccessContextById($item->getId())) {
+					throw new PermissionError(sprintf('PermissionError: can not update share with id %d', $shareId));
+				}
+			}
+
+			return $this->contextNavigationMapper->setDisplayModeByShareId($shareId, $displayMode, '');
+		} catch (DoesNotExistException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		} catch (Exception|MultipleObjectsReturnedException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+	}
+
+	/**
 	 * @param int $id
 	 * @return Share
 	 * @throws InternalError
@@ -305,6 +369,9 @@ class ShareService extends SuperService {
 
 		try {
 			$this->mapper->delete($item);
+			if ($item->getNodeType() === 'context') {
+				$this->contextNavigationMapper->deleteByShareId($item->getId());
+			}
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());

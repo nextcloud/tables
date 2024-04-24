@@ -60,6 +60,10 @@ export type paths = {
     /** Create a new share */
     post: operations["api1-create-share"];
   };
+  "/index.php/apps/tables/api/1/shares/{shareId}/display-mode": {
+    /** Updates the display mode of a context share */
+    put: operations["api1-update-share-display-mode"];
+  };
   "/index.php/apps/tables/api/1/tables/{tableId}/columns": {
     /** Get all columns for a table or a underlying view Return an empty array if no columns were found */
     get: operations["api1-list-table-columns"];
@@ -282,6 +286,15 @@ export type components = {
       owner: string;
       /** Format: int64 */
       ownerType: number;
+    };
+    ContextNavigation: {
+      /** Format: int64 */
+      id: number;
+      /** Format: int64 */
+      shareId: number;
+      /** Format: int64 */
+      displayMode: number;
+      userId: string;
     };
     ImportState: {
       /** Format: int64 */
@@ -1079,6 +1092,8 @@ export type operations = {
         permissionDelete?: 0 | 1;
         /** @description Permission if receiver can manage node */
         permissionManage?: 0 | 1;
+        /** @description context shares only, whether it should appear in nav bar. 0: no, 1: recipients, 2: all */
+        displayMode?: number;
       };
     };
     responses: {
@@ -1097,6 +1112,60 @@ export type operations = {
         };
       };
       /** @description Not found */
+      404: {
+        content: {
+          "application/json": {
+            message: string;
+          };
+        };
+      };
+      500: {
+        content: {
+          "application/json": {
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  /** Updates the display mode of a context share */
+  "api1-update-share-display-mode": {
+    parameters: {
+      query: {
+        /** @description The new value for the display mode of the nav bar icon. 0: hidden, 1: visible for recipients, 2: visible for all */
+        displayMode: number;
+        /** @description "default" to set the default, "self" to set an override for the authenticated user */
+        target?: "default" | "self";
+      };
+      path: {
+        /** @description Share ID */
+        shareId: number;
+      };
+    };
+    responses: {
+      /** @description Display mode updated */
+      200: {
+        content: {
+          "application/json": components["schemas"]["ContextNavigation"];
+        };
+      };
+      /** @description Invalid parameter */
+      400: {
+        content: {
+          "application/json": {
+            message: string;
+          };
+        };
+      };
+      /** @description No permissions */
+      403: {
+        content: {
+          "application/json": {
+            message: string;
+          };
+        };
+      };
+      /** @description Share not found */
       404: {
         content: {
           "application/json": {

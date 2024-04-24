@@ -611,7 +611,8 @@ class FeatureContext implements Context {
 			$titles[] = $d['title'];
 		}
 		foreach ($body->getRows()[0] as $tableTitle) {
-			Assert::assertTrue(in_array($tableTitle, $titles, true));
+			$message = sprintf('"%s" not in the list: %s', $tableTitle, implode(', ', $titles));
+			Assert::assertTrue(in_array($tableTitle, $titles, true), $message);
 		}
 	}
 

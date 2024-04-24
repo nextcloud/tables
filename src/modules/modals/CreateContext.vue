@@ -37,10 +37,10 @@
 				<div class="col-4">
 					{{ t('tables', 'Resources') }}
 				</div>
-				<NcContextResource :resources.sync="resources" />
+				<NcContextResource :resources.sync="resources" :receivers.sync="receivers" />
 			</div>
-			<div class="row space-R">
-				<div class="fix-col-4 end space-T">
+			<div class="row space-R row space-T">
+				<div class="fix-col-4 end">
 					<NcButton type="primary" :aria-label="t('tables', 'Create application')" @click="submit">
 						{{ t('tables', 'Create application') }}
 					</NcButton>
@@ -57,6 +57,7 @@ import '@nextcloud/dialogs/dist/index.css'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
 import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'
 import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'
+import permissionBitmask from '../../shared/components/ncContextResource/mixins/permissionBitmask.js'
 
 export default {
 	name: 'CreateContext',
@@ -67,7 +68,7 @@ export default {
 		NcIconSvgWrapper,
 		NcContextResource,
 	},
-	mixins: [svgHelper],
+	mixins: [svgHelper, permissionBitmask],
 	props: {
 		showModal: {
 			type: Boolean,
@@ -86,6 +87,7 @@ export default {
 			errorTitle: false,
 			description: '',
 			resources: [],
+			receivers: [],
 		}
 	},
 	watch: {
@@ -139,7 +141,7 @@ export default {
 				return {
 					id: parseInt(resource.id),
 					type: parseInt(resource.nodeType),
-					permissions: 660,
+					permissions: this.getPermissionBitmaskFromBools(true /* ensure read permission is always true */, resource.permissionCreate, resource.permissionUpdate, resource.permissionDelete),
 				}
 			})
 			const data = {
@@ -148,7 +150,7 @@ export default {
 				description: this.description,
 				nodes: dataResources,
 			}
-			const res = await this.$store.dispatch('insertNewContext', { data })
+			const res = await this.$store.dispatch('insertNewContext', { data, previousReceivers: [], receivers: this.receivers })
 			if (res) {
 				return res.id
 			} else {

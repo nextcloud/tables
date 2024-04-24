@@ -12,11 +12,8 @@
 				</div>
 				<div class="col-4" style="display: inline-flex;">
 					<NcIconPicker :close-on-select="true" @select="setIcon">
-						<NcButton
-							type="tertiary"
-							:aria-label="t('tables', 'Select an icon for application')"
-							:title="t('tables', 'Select icon')"
-							@click.prevent>
+						<NcButton type="tertiary" :aria-label="t('tables', 'Select an icon for application')"
+							:title="t('tables', 'Select icon')" @click.prevent>
 							<template #icon>
 								<NcIconSvgWrapper :svg="icon.svg" />
 							</template>
@@ -36,11 +33,11 @@
 				<div class="col-4">
 					{{ t('tables', 'Resources') }}
 				</div>
-				<NcContextResource :resources.sync="resources" />
+				<NcContextResource :resources.sync="resources" :receivers.sync="receivers" />
 			</div>
 
-			<div class="row space-R">
-				<div class="fix-col-4 end space-T">
+			<div class="row space-R row space-T">
+				<div class="fix-col-4 end">
 					<NcButton type="primary" @click="submit">
 						{{ t('tables', 'Save') }}
 					</NcButton>
@@ -53,12 +50,14 @@
 <script>
 import { NcModal, NcButton, NcIconSvgWrapper } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
+import { getCurrentUser } from '@nextcloud/auth'
 import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters, mapState } from 'vuex'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
 import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'
-import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../../shared/constants.js'
+import { NODE_TYPE_TABLE, NODE_TYPE_VIEW, PERMISSION_READ, PERMISSION_CREATE, PERMISSION_UPDATE, PERMISSION_DELETE } from '../../shared/constants.js'
 import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'
+import permissionBitmask from '../../shared/components/ncContextResource/mixins/permissionBitmask.js'
 
 export default {
 	name: 'EditContext',
@@ -69,7 +68,7 @@ export default {
 		NcIconSvgWrapper,
 		NcContextResource,
 	},
-	mixins: [svgHelper],
+	mixins: [svgHelper, permissionBitmask],
 	props: {
 		showModal: {
 			type: Boolean,
@@ -90,6 +89,12 @@ export default {
 			description: '',
 			errorTitle: false,
 			resources: [],
+			receivers: [],
+			PERMISSION_READ,
+			PERMISSION_CREATE,
+			PERMISSION_UPDATE,
+			PERMISSION_DELETE,
+
 		}
 	},
 	computed: {
@@ -112,7 +117,8 @@ export default {
 				this.title = context.name
 				this.setIcon(this.localContext.iconName)
 				this.description = context.description
-				this.resources = context ? [...this.getContextResources(context)] : []
+				this.resources = context ? this.getContextResources(context) : []
+				this.receivers = context ? this.getContextReceivers(context) : []
 			}
 		},
 	},
@@ -125,7 +131,6 @@ export default {
 			this.reset()
 			this.$emit('close')
 		},
-		// TODO show edited changes if we're currently viewing the active context
 		async submit() {
 			if (this.title === '') {
 				showError(t('tables', 'Cannot update application. Title is missing.'))
@@ -135,8 +140,7 @@ export default {
 					return {
 						id: parseInt(resource.id),
 						type: parseInt(resource.nodeType),
-						// TODO get right permissions for the node
-						permissions: 660,
+						permissions: this.getPermissionBitmaskFromBools(true /* ensure read permission is always true */, resource.permissionCreate, resource.permissionUpdate, resource.permissionDelete),
 					}
 				})
 				const data = {
@@ -145,7 +149,9 @@ export default {
 					description: this.description,
 					nodes: dataResources,
 				}
-				const res = await this.$store.dispatch('updateContext', { id: this.contextId, data })
+				const context = this.getContext(this.contextId)
+
+				const res = await this.$store.dispatch('updateContext', { id: this.contextId, data, previousReceivers: Object.values(context.sharing), receivers: this.receivers })
 				if (res) {
 					showSuccess(t('tables', 'Updated context "{contextTitle}".', { contextTitle: this.title }))
 					this.actionCancel()
@@ -158,7 +164,25 @@ export default {
 			this.errorTitle = false
 			this.icon.name = 'equalizer'
 			this.description = ''
-			this.resources = context ? [...this.getContextResources(context)] : []
+			this.resources = context ? this.getContextResources(context) : []
+			this.receivers = context ? this.getContextReceivers(context) : []
+		},
+		getContextReceivers(context) {
+			let sharing = Object.values(context.sharing)
+			sharing = sharing.filter((share) => getCurrentUser().uid !== share.receiver)
+			const receivers = sharing.map((share) => {
+				return {
+					user: share.receiver,
+					displayName: share.receiver_display_name,
+					icon: share.receiver_type === 'user' ? 'icon-user' : 'icon-group',
+					isUser: share.receiver_type === 'user',
+					key: share.receiver_type + '-' + share.receiver,
+				}
+			})
+			return receivers
+		},
+		getPermissionFromBitmask(bitmask, permission) {
+			return !!(bitmask & permission)
 		},
 		getContextResources(context) {
 			const resources = []
@@ -174,6 +198,10 @@ export default {
 							key: `${elementKey}` + element.id,
 							nodeType: parseInt(node.node_type) === NODE_TYPE_TABLE ? NODE_TYPE_TABLE : NODE_TYPE_VIEW,
 							id: (element.id).toString(),
+							permissionRead: this.getPermissionFromBitmask(node.permissions, PERMISSION_READ),
+							permissionCreate: this.getPermissionFromBitmask(node.permissions, PERMISSION_CREATE),
+							permissionUpdate: this.getPermissionFromBitmask(node.permissions, PERMISSION_UPDATE),
+							permissionDelete: this.getPermissionFromBitmask(node.permissions, PERMISSION_DELETE),
 						}
 						resources.push(resource)
 					}

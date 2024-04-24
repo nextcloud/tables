@@ -44,6 +44,7 @@ class TableService extends SuperService {
 
 
 	protected IL10N $l;
+	private ContextService $contextService;
 
 	protected IEventDispatcher $eventDispatcher;
 
@@ -59,8 +60,9 @@ class TableService extends SuperService {
 		ShareService $shareService,
 		UserHelper $userHelper,
 		FavoritesService $favoritesService,
+		IEventDispatcher $eventDispatcher,
+		ContextService $contextService,
 		IL10N $l,
-		IEventDispatcher $eventDispatcher
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
@@ -73,6 +75,7 @@ class TableService extends SuperService {
 		$this->favoritesService = $favoritesService;
 		$this->l = $l;
 		$this->eventDispatcher = $eventDispatcher;
+		$this->contextService = $contextService;
 	}
 
 	/**
@@ -91,9 +94,13 @@ class TableService extends SuperService {
 	public function findAll(?string $userId = null, bool $skipTableEnhancement = false, bool $skipSharedTables = false, bool $createTutorial = true): array {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
+		$allTables = [];
 
 		try {
-			$allTables = $this->mapper->findAll($userId); // get own tables
+			$ownedTables = $this->mapper->findAll($userId); // get own tables
+			foreach ($ownedTables as $ownedTable) {
+				$allTables[$ownedTable->getId()] = $ownedTable;
+			}
 		} catch (OcpDbException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError($e->getMessage());
@@ -102,7 +109,8 @@ class TableService extends SuperService {
 		// if there are no own tables found, create the tutorial table
 		if (count($allTables) === 0 && $createTutorial) {
 			try {
-				$allTables = [$this->create($this->l->t('Tutorial'), 'tutorial', '🚀')];
+				$tutorialTable = $this->create($this->l->t('Tutorial'), 'tutorial', '🚀');
+				$allTables[$tutorialTable->getId()] = $tutorialTable;
 			} catch (InternalError|PermissionError|DoesNotExistException|MultipleObjectsReturnedException|OcpDbException $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
@@ -114,16 +122,22 @@ class TableService extends SuperService {
 
 			// clean duplicates
 			foreach ($sharedTables as $sharedTable) {
-				$found = false;
-				foreach ($allTables as $table) {
-					if ($sharedTable->getId() === $table->getId()) {
-						$found = true;
-						break;
-					}
+				if (!isset($allTables[$sharedTable->getId()])) {
+					$allTables[$sharedTable->getId()] = $sharedTable;
 				}
-				if (!$found) {
-					$allTables[] = $sharedTable;
+			}
+		}
+
+		$contexts = $this->contextService->findAll($userId);
+		foreach ($contexts as $context) {
+			$nodes = $context->getNodes();
+			foreach ($nodes as $node) {
+				if ($node['node_type'] !== Application::NODE_TYPE_TABLE
+					|| isset($allTables[$node['node_id']])
+				) {
+					continue;
 				}
+				$allTables[$node['node_id']] = $this->find($node['node_id'], $skipTableEnhancement, $userId);
 			}
 		}
 
@@ -144,8 +158,7 @@ class TableService extends SuperService {
 			}
 		}
 
-
-		return $allTables;
+		return array_values($allTables);
 	}
 
 	/**
