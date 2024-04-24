@@ -1,5 +1,53 @@
 # Changelog
 
+## 0.7.0
+
+### Feature highlights
+
+- Support for Nextcloud 29
+- Applications: Build custom Tables apps
+- Navigation improvements: Favorite and archive tables
+- Add description to tables
+- File action to import to tables
+- Import files by upload and improved column detection
+- Write critical operations to the audit log
+- Add print stylesheets
+
+### Added
+
+- feat(Context): add share logic for contexts @blizzz [#962](https://github.com/nextcloud/tables/pull/962)
+- Contexts @blizzz [#848](https://github.com/nextcloud/tables/pull/848)
+- feat: Transfer context ownership @enjeck [#945](https://github.com/nextcloud/tables/pull/945)
+- changed view filter reset icon (issue #884) @elzody [#889](https://github.com/nextcloud/tables/pull/889)
+- feat: Add backend for table archive and favorite flag @juliushaertl [#865](https://github.com/nextcloud/tables/pull/865)
+- Import: File action to import from Files to Tables @elzody [#890](https://github.com/nextcloud/tables/pull/890)
+- Add text description to tables @grnd-alt [#932](https://github.com/nextcloud/tables/pull/932)
+- Add print styles @FahrJo [#931](https://github.com/nextcloud/tables/pull/931)
+- Write critical operations to the audit log @hweihwang [#959](https://github.com/nextcloud/tables/pull/959)
+- enh: some design review tasks @enjeck [#961](https://github.com/nextcloud/tables/pull/961)
+- feat: add vertical column lines to Tables @enjeck [#960](https://github.com/nextcloud/tables/pull/960)
+
+### Fixed
+
+- fix(Permissions): check against user provided in args @blizzz [#885](https://github.com/nextcloud/tables/pull/885)
+- Polish table header and text column rendering @juliushaertl [#883](https://github.com/nextcloud/tables/pull/883)
+- Match default values when querying views @juliushaertl [#900](https://github.com/nextcloud/tables/pull/900)
+- fix: properly indent child views of archived tables @elzody [#909](https://github.com/nextcloud/tables/pull/909)
+- fix: views respect sorting @enjeck [#912](https://github.com/nextcloud/tables/pull/912)
+- fix: Focus first input when creating  a new table/row/column/view @juliushaertl [#925](https://github.com/nextcloud/tables/pull/925)
+- fix: reintroduce content reference provider @elzody [#943](https://github.com/nextcloud/tables/pull/943)
+- fix(api): ContextMapper now coerces the row ID to an int for proper comparison @elzody [#954](https://github.com/nextcloud/tables/pull/954)
+- fix(Contexts): explicitely state non-int types @blizzz [#964](https://github.com/nextcloud/tables/pull/964)
+- fix(OpenApi): resolve errors and generate openapi file @blizzz [#919](https://github.com/nextcloud/tables/pull/919)
+- fix: limit min and max numbers @enjeck [#963](https://github.com/nextcloud/tables/pull/963)
+- fix(i18n): Fixed grammar @rakekniven [#990](https://github.com/nextcloud/tables/pull/990)
+- fix: Vacation Request template @enjeck [#979](https://github.com/nextcloud/tables/pull/979)
+
+### Other
+
+- Dependency updates
+- chore: Remove legacy reference provider @juliushaertl [#924](https://github.com/nextcloud/tables/pull/924)
+
 ## 0.7.0-beta.3 - 2024-03-27
 
 ### Added
