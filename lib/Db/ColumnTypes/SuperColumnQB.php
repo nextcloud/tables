@@ -2,6 +2,7 @@
 
 namespace OCA\Tables\Db\ColumnTypes;
 
+use OCA\Tables\Db\Column;
 use OCA\Tables\Errors\InternalError;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\DB\QueryBuilder\IQueryFunction;
@@ -96,15 +97,15 @@ class SuperColumnQB implements IColumnTypeQB {
 	 */
 	public static function getMetaColumnName(int $metaId): string {
 		switch ($metaId) {
-			case -1:
+			case Column::TYPE_META_ID:
 				return 'id';
-			case -2:
+			case Column::TYPE_META_CREATED_BY:
 				return 'created_by';
-			case -3:
+			case Column::TYPE_META_UPDATED_BY:
 				return 'last_edit_by';
-			case -4:
+			case Column::TYPE_META_CREATED_AT:
 				return 'created_at';
-			case -5:
+			case Column::TYPE_META_UPDATED_AT:
 				return 'last_edit_at';
 			default:
 				throw new InternalError('No meta data column exists with id ' . $metaId);
