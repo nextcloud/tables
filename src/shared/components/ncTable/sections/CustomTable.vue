@@ -19,7 +19,7 @@
 				</TableHeader>
 			</thead>
 			<tbody>
-				<TableRow v-for="(row, index) in getSearchedAndFilteredAndSortedRows"
+				<TableRow v-for="(row, index) in currentPageRows"
 					:key="index"
 					data-cy="customTableRow"
 					:row="row"
@@ -29,16 +29,56 @@
 					:config="config"
 					@update-row-selection="updateRowSelection"
 					@edit-row="rowId => $emit('edit-row', rowId)" />
+				<tr />
 			</tbody>
 		</table>
+		<div class="pagination-footer" :class="{'large-width': !appNavCollapsed || isMobile}">
+			<div class="pagination-items">
+				<NcButton type="tertiary" :disabled="totalPages === 1 || pageNumber <= 1" @click="pageNumber = 1">
+					<template #icon>
+						<PageFirstIcon :size="20" />
+					</template>
+				</NcButton>
+				<NcButton type="tertiary" :disabled="totalPages === 1 || pageNumber <= 1" @click="pageNumber--">
+					<template #icon>
+						<ChevronLeftIcon :size="20" />
+					</template>
+				</NcButton>
+				<div class="page-number">
+					<NcSelect v-model="pageNumber" :options="allPageNumbersArray">
+						<template #selected-option-container="{ option }">
+							<span class="selected-page">
+								{{ option.label }} of {{ totalPages }}
+							</span>
+						</template>
+					</NcSelect>
+				</div>
+				<NcButton type="tertiary" :disabled="totalPages === 1 || pageNumber >= totalPages" @click="pageNumber++">
+					<template #icon>
+						<ChevronRightIcon :size="20" />
+					</template>
+				</NcButton>
+				<NcButton type="tertiary" :disabled="totalPages === 1 || pageNumber >= totalPages" @click="pageNumber = totalPages">
+					<template #icon>
+						<PageLastIcon :size="20" />
+					</template>
+				</NcButton>
+			</div>
+		</div>
 	</div>
 </template>
 
 <script>
 import TableHeader from '../partials/TableHeader.vue'
+import PageLastIcon from 'vue-material-design-icons/PageLast.vue'
+import PageFirstIcon from 'vue-material-design-icons/PageFirst.vue'
+import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
+import ChevronLeftIcon from 'vue-material-design-icons/ChevronLeft.vue'
 import TableRow from '../partials/TableRow.vue'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { MagicFields } from '../mixins/magicFields.js'
+import { NcButton, useIsMobile, NcSelect } from '@nextcloud/vue'
+import { mapState } from 'vuex'
 import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
 } from '../../../../shared/constants.js'
@@ -49,6 +89,12 @@ export default {
 	components: {
 		TableRow,
 		TableHeader,
+		NcButton,
+		PageLastIcon,
+		PageFirstIcon,
+		ChevronLeftIcon,
+		ChevronRightIcon,
+		NcSelect,
 	},
 
 	props: {
@@ -78,29 +124,38 @@ export default {
 		},
 	},
 
+	setup() {
+		return {
+			isMobile: useIsMobile(),
+		}
+	},
+
 	data() {
 		return {
 			selectedRows: [],
 			searchTerm: null,
 			localViewSetting: this.viewSetting,
+			pageNumber: 1,
+			rowsPerPage: 100,
 		}
 	},
 
 	computed: {
+		...mapState(['appNavCollapsed']),
+		allPageNumbersArray() {
+			return Array.from(
+				{ length: this.totalPages },
+				(value, index) => 1 + index,
+			)
+		},
+		currentPageRows() {
+			return this.getSearchedAndFilteredAndSortedRows.slice((this.pageNumber - 1) * this.rowsPerPage, ((this.pageNumber - 1) * this.rowsPerPage) + this.rowsPerPage)
+		},
+		totalPages() {
+			return Math.ceil(this.getSearchedAndFilteredAndSortedRows.length / this.rowsPerPage)
+		},
 		sorting() {
 			return this.viewSetting?.sorting
-		},
-		getSearchedAndFilteredAndSortedRows() {
-			// if we have to sort
-			if (this.viewSetting?.presetSorting) {
-				const sortColumn = this.columns.find(item => item.id === this.viewSetting.presetSorting?.[0].columnId)
-				return [...this.getSearchedAndFilteredRows].sort(sortColumn?.sort?.(this.viewSetting.presetSorting[0].mode))
-			}
-			if (this.viewSetting?.sorting) {
-				const sortColumn = this.columns.find(item => item.id === this.viewSetting.sorting[0].columnId)
-				return [...this.getSearchedAndFilteredRows].sort(sortColumn.sort(this.viewSetting.sorting[0].mode))
-			}
-			return this.getSearchedAndFilteredRows
 		},
 		getSearchedAndFilteredRows() {
 			const debug = false
@@ -122,9 +177,8 @@ export default {
 
 			const data = [] // array of rows
 			const searchString = this.viewSetting?.searchString
-
 			// each row
-			this.rows?.forEach(row => {
+			for (const row of this.rows) {
 				if (debug) {
 					console.debug('new row ===============================================', row)
 				}
@@ -212,9 +266,20 @@ export default {
 				if ((filterStatusRow || filterStatusRow === null) && searchStatusRow) {
 					data.push({ ...row })
 				}
-			})
-
+			}
 			return data
+		},
+		getSearchedAndFilteredAndSortedRows() {
+			// if we have to sort
+			if (this.viewSetting?.presetSorting) {
+				const sortColumn = this.columns.find(item => item.id === this.viewSetting.presetSorting?.[0].columnId)
+				return [...this.getSearchedAndFilteredRows].sort(sortColumn?.sort?.(this.viewSetting.presetSorting[0].mode))
+			}
+			if (this.viewSetting?.sorting) {
+				const sortColumn = this.columns.find(item => item.id === this.viewSetting.sorting[0].columnId)
+				return [...this.getSearchedAndFilteredRows].sort(sortColumn.sort(this.viewSetting.sorting[0].mode))
+			}
+			return this.getSearchedAndFilteredRows
 		},
 	},
 
@@ -225,6 +290,12 @@ export default {
 		viewSetting() {
 			this.localViewSetting = this.viewSetting
 		},
+	},
+
+	updated() {
+		if (this.pageNumber > this.totalPages || this.totalPages === 1) {
+			this.pageNumber = this.totalPages
+		}
 	},
 
 	mounted() {
@@ -287,7 +358,64 @@ export default {
 }
 </script>
 
+<style>
+.vs__dropdown-menu {
+	min-width: 95px !important;
+}
+</style>
+
 <style lang="scss" scoped>
+
+:deep(.vs__clear) {
+	display: none;
+}
+
+:deep(.v-select) {
+	min-width: 95px !important;
+	.vs__dropdown-toggle {
+		background: none;
+	}
+}
+
+.selected-page{
+	padding-left: 5px;
+
+	display:inline-flex;
+	align-items: center;
+}
+
+.page-number{
+	padding-inline: 5px;
+}
+
+.large-width{
+	width: 100vw !important;
+	left: 0 !important;
+}
+
+.pagination-items{
+	background-color: var(--color-main-background);
+	border-radius: var(--border-radius-large);
+	pointer-events: all;
+
+	display: flex;
+	align-items: center;
+}
+
+.pagination-footer{
+	position: sticky;
+	box-shadow: var(--box-shadow);
+	filter: drop-shadow(0 1px 10px var(--color-box-shadow));
+	bottom: 20px;
+	left: 300px;
+	width: calc(100vw - 316px);
+	pointer-events: none;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
 :deep(table) {
 	position: relative;
 	border-collapse: collapse;
