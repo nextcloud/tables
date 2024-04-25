@@ -24,6 +24,7 @@ class CollectionManager {
 
 	public function update(mixed $item, string $type, int $id, ?callable $cleanUpFunc = null): void {
 		$idMapKey = $this->makeKey($type, $id);
+		$this->itemsById[$idMapKey] = $item;
 		$aliasMapKey = array_search($idMapKey, $this->mapByAlias, true) ?: null;
 
 		if ($cleanUpFunc) {
