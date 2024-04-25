@@ -138,3 +138,28 @@ Feature: APIv2
       | t3    | table | all                 |
     When user "participant1-v2" fetches all Contexts
     Then they will find Contexts "c1, c2" and no other
+
+  @api2 @contexts
+  Scenario: Fetch the a specific Context as owner
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And table "Table X via api v2" with emoji "📋" exists for user "participant2-v2" as "t3" via v2
+    And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
+    And user "participant1-v2" create view "v2" with emoji "🦉" for "t2" as "v2"
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,created,update |
+      | v1    | view  | read                |
+    And user "participant1-v2" creates the Context "c2" with name "Placid Ring" with icon "headphones" and description "Lacus suspendisse faucibus etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t2    | table | read,create,update  |
+      | v2    | view  | read                |
+    And user "participant2-v2" creates the Context "c3" with name "Chilly Lumber" with icon "monitor" and description "Sed blandit libero etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t3    | table | all                 |
+    When user "participant1-v2" fetches Context "c2"
+    Then known Context "c2" has "name" set to "Placid Ring"
+    And known Context "c2" has "icon" set to "headphones"
+    And known Context "c2" has "description" set to "Lacus suspendisse faucibus etc pp"
+    And known Context "c2" contains "table" "t2" with permissions "read,create,update"
+    And known Context "c2" contains "view" "v2" with permissions "read"

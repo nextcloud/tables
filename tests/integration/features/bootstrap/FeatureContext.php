@@ -1871,6 +1871,25 @@ class FeatureContext implements Context {
 	}
 
 	/**
+	 * @When user :user fetches Context :contextAlias
+	 */
+	public function userFetchesContext(string $user, string $contextAlias): void {
+		$this->setCurrentUser($user);
+
+		$context = $this->collectionManager->getByAlias('context', $contextAlias);
+
+		$this->sendOcsRequest(
+			'GET',
+			sprintf('/apps/tables/api/2/contexts/%d', $context['id'])
+		);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		$updatedContext = $this->getDataFromResponse($this->response)['ocs']['data'];
+		Assert::assertSame($context['id'], $updatedContext['id']);
+		$this->collectionManager->update($updatedContext, 'context', $updatedContext['id']);
+	}
+
+	/**
 	 * @When user :user fetches all Contexts
 	 */
 	public function userFetchAllsContexts(string $user): void {
@@ -1886,7 +1905,7 @@ class FeatureContext implements Context {
 	/**
 	 * @Then they will find Contexts :contextAliasList and no other
 	 */
-	public function theyWillFindContextsAndNoOther(string $contextAliasList) {
+	public function theyWillFindContextsAndNoOther(string $contextAliasList): void {
 		$receivedContexts = $this->getDataFromResponse($this->response)['ocs']['data'];
 
 		$aliases = explode(',', $contextAliasList);
@@ -1920,5 +1939,49 @@ class FeatureContext implements Context {
 			sprintf('/apps/tables/api/2/contexts/%d', $deletedContext['id']),
 		);
 		Assert::assertEquals(404, $this->response->getStatusCode());
+	}
+
+	/**
+	 * @Then known Context :contextAlias has :attributeName set to :attributeValue
+	 */
+	public function knownContextHasAttributeSetTo(string $contextAlias, string $attributeName, string $attributeValue): void {
+		$context = $this->collectionManager->getByAlias('context', $contextAlias);
+		$officialAttribute = match($attributeName) {
+			'name' => 'name',
+			'icon' => 'iconName',
+			'description' => 'description',
+		};
+		Assert::assertSame($attributeValue, $context[$officialAttribute]);
+	}
+
+	/**
+	 * @Then known Context :contextAlias contains :nodeType :nodeAlias with permissions :permissionList
+	 */
+	public function knownContextContainsNodeWithPermissions(string $contextAlias, string $nodeType, string $nodeAlias, string $permissionList): void {
+		$context = $this->collectionManager->getByAlias('context', $contextAlias);
+
+		$numericNodeType = $nodeType === 'table' ? 0 : 1;
+
+		if ($numericNodeType === 0) {
+			$nodeId = $this->tableIds[$nodeAlias];
+		} else {
+			$nodeId = $this->viewIds[$nodeAlias];
+		}
+
+		$found = false;
+		$actualPermissions = -1;
+		foreach ($context['nodes'] as $actualNode) {
+			$found = $actualNode['node_type'] === $numericNodeType
+				&& $actualNode['node_id'] === $nodeId;
+			if ($found) {
+				$actualPermissions = $actualNode['permissions'];
+				break;
+			}
+		}
+
+		Assert::assertTrue($found);
+
+		$expectedPermissions = $this->humanReadablePermissionToInt($permissionList);
+		Assert::assertSame($expectedPermissions, $actualPermissions);
 	}
 }
