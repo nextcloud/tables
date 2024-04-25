@@ -24,12 +24,34 @@ describe('Manage a table', () => {
 		cy.get('.modal__content').should('be.visible')
 		cy.get('.modal__content input[type="text"]').clear().type('to do list')
 		cy.get('.modal__content #description-editor .tiptap.ProseMirror').type('to Do List description')
-		cy.contains('button', 'Create table').click()
+		cy.contains('button', 'Create table').scrollIntoView().click()
 
 		cy.contains('button', 'Create row').should('be.visible')
 		cy.contains('h1', 'to do list').should('be.visible')
 		cy.contains('table th', 'Task').should('exist')
 		cy.contains('.paragraph-content', 'to Do List description').should('be.visible')
+	})
+
+	it('Create with import', () => {
+		cy.uploadFile('test-import.csv', 'text/csv')
+		cy.contains('.app-menu-entry--label', 'Tables').click()
+		cy.contains('button', 'Create new table').click()
+		cy.get('.tile').contains('Import').click({ force: true })
+		cy.get('.modal__content').should('be.visible')
+		cy.get('.modal__content input[type="text"]').clear().type('import list')
+		cy.contains('button', 'Create table').scrollIntoView().click()
+		cy.contains('h2', 'Import').should('be.visible')
+
+		cy.get('.modal__content button').contains('Select from Files').click()
+		cy.get('.file-picker__files').contains('test-import').click()
+		cy.get('.file-picker button span').contains('Choose test-import.csv').click()
+		cy.get('.modal__content button').contains('Import').click()
+		cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')
+		cy.get('[data-cy="importResultColumnsMatch"]').should('contain.text', '0')
+		cy.get('[data-cy="importResultColumnsCreated"]').should('contain.text', '4')
+		cy.get('[data-cy="importResultRowsInserted"]').should('contain.text', '3')
+		cy.get('[data-cy="importResultParsingErrors"]').should('contain.text', '0')
+		cy.get('[data-cy="importResultRowErrors"]').should('contain.text', '0')
 	})
 
 	it('Update title And Description', () => {
