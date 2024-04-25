@@ -82,7 +82,6 @@ export default {
 				name: this.randomIcon(),
 				svg: null,
 			},
-			customIconChosen: false,
 			customTitleChosen: false,
 			errorTitle: false,
 			description: '',
@@ -99,7 +98,7 @@ export default {
 		},
 		showModal() {
 			// every time when the modal opens chose a new icon
-			this.icon.name = this.setIcon(this.randomIcon())
+			this.setIcon(this.randomIcon())
 			// this.$nextTick(() => this.$refs.titleInput?.focus())
 		},
 	},
@@ -113,8 +112,6 @@ export default {
 		async setIcon(iconName) {
 			this.icon.name = iconName
 			this.icon.svg = await this.getContextIcon(iconName)
-
-			this.customIconChosen = true
 		},
 		actionCancel() {
 			this.reset()
@@ -160,8 +157,7 @@ export default {
 		reset() {
 			this.title = ''
 			this.errorTitle = false
-			this.icon.name = this.randomIcon()
-			this.customIconChosen = false
+			this.setIcon(this.randomIcon())
 			this.customTitleChosen = false
 		},
 	},
