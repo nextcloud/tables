@@ -407,20 +407,20 @@ class Row2Mapper {
 		$qb2->from('tables_row_sleeves');
 
 		switch ($columnId) {
-			case -1: // row ID
+			case Column::TYPE_META_ID:
 				$qb2->where($this->getSqlOperator($operator, $qb, 'id', (int)$value, IQueryBuilder::PARAM_INT));
 				break;
-			case -2: // created by
+			case Column::TYPE_META_CREATED:
 				$qb2->where($this->getSqlOperator($operator, $qb, 'created_by', $value, IQueryBuilder::PARAM_STR));
 				break;
-			case -3: // created at
+			case Column::TYPE_META_CREATED_AT:
 				$value = new \DateTimeImmutable($value);
 				$qb2->where($this->getSqlOperator($operator, $qb, 'created_at', $value, IQueryBuilder::PARAM_DATE));
 				break;
-			case -4: // last edit by
+			case Column::TYPE_META_UPDATED:
 				$qb2->where($this->getSqlOperator($operator, $qb, 'last_edit_by', $value, IQueryBuilder::PARAM_STR));
 				break;
-			case -5: // last edit at
+			case Column::TYPE_META_UPDATED_AT:
 				$value = new \DateTimeImmutable($value);
 				$qb2->where($this->getSqlOperator($operator, $qb, 'last_edit_at', $value, IQueryBuilder::PARAM_DATE));
 				break;
