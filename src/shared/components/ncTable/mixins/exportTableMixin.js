@@ -1,5 +1,8 @@
 import moment from '@nextcloud/moment'
 import generalHelper from '../../../mixins/generalHelper.js'
+import {
+	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
+} from '../../../../shared/constants.js'
 
 export default {
 
@@ -23,19 +26,19 @@ export default {
 					} else {
 						// if is a meta data column (id < 0)
 						switch (column.id) {
-						case -1:
+						case TYPE_META_ID:
 							rowData[column.title] = row.id
 							break
-						case -2:
+						case TYPE_META_CREATED_BY:
 							rowData[column.title] = row.createdBy
 							break
-						case -3:
+						case TYPE_META_UPDATED_BY:
 							rowData[column.title] = row.lastEditBy
 							break
-						case -4:
+						case TYPE_META_CREATED_AT:
 							rowData[column.title] = row.createdAt
 							break
-						case -5:
+						case TYPE_META_UPDATED_AT:
 							rowData[column.title] = row.lastEditAt
 							break
 						}
