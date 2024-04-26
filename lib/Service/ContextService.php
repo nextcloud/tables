@@ -20,8 +20,10 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
+use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
 use OCP\EventDispatcher\IEventDispatcher;
+use OCP\IDBConnection;
 use OCP\IUserManager;
 use OCP\Log\Audit\CriticalActionPerformedEvent;
 use Psr\Log\LoggerInterface;
@@ -37,6 +39,7 @@ class ContextService {
 	private PermissionsService $permissionsService;
 	private IUserManager $userManager;
 	private IEventDispatcher $eventDispatcher;
+	private IDBConnection $dbc;
 
 	public function __construct(
 		ContextMapper             $contextMapper,
@@ -47,6 +50,7 @@ class ContextService {
 		PermissionsService        $permissionsService,
 		IUserManager              $userManager,
 		IEventDispatcher          $eventDispatcher,
+		IDBConnection             $dbc,
 		bool                      $isCLI,
 	) {
 		$this->contextMapper = $contextMapper;
@@ -58,7 +62,9 @@ class ContextService {
 		$this->permissionsService = $permissionsService;
 		$this->userManager = $userManager;
 		$this->eventDispatcher = $eventDispatcher;
+		$this->dbc = $dbc;
 	}
+	use TTransactional;
 
 	/**
 	 * @return Context[]
@@ -100,7 +106,7 @@ class ContextService {
 	}
 
 	/**
-	 * @throws Exception
+	 * @throws Exception|PermissionError|InvalidArgumentException
 	 */
 	public function create(string $name, string $iconName, string $description, array $nodes, string $ownerId, int $ownerType): Context {
 		$context = new Context();
@@ -110,13 +116,16 @@ class ContextService {
 		$context->setOwnerId($ownerId);
 		$context->setOwnerType($ownerType);
 
-		$this->contextMapper->insert($context);
 
-		if (!empty($nodes)) {
-			$context->resetUpdatedFields();
-			$this->insertNodesFromArray($context, $nodes);
-			$this->insertPage($context);
-		}
+		$this->atomic(function () use ($context, $nodes) {
+			$this->contextMapper->insert($context);
+
+			if (!empty($nodes)) {
+				$context->resetUpdatedFields();
+				$this->insertNodesFromArray($context, $nodes);
+				$this->insertPage($context);
+			}
+		}, $this->dbc);
 
 		return $context;
 	}
@@ -421,6 +430,9 @@ class ContextService {
 		$context->setPages([$addedPage['id'] => $addedPage]);
 	}
 
+	/**
+	 * @throws PermissionError|InvalidArgumentException
+	 */
 	protected function insertNodesFromArray(Context $context, array $nodes): void {
 		$addedNodes = [];
 
