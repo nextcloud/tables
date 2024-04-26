@@ -36,6 +36,8 @@ use Psr\Http\Message\ResponseInterface;
  */
 class FeatureContext implements Context {
 	public const TEST_PASSWORD = '123456';
+	public const NON_EXISTING_CONTEXT_ALIAS = 'NON-EXISTENT';
+	public const NON_EXISTING_CONTEXT_ID = 99404;
 
 	/** @var string */
 	protected $currentUser;
@@ -1887,12 +1889,30 @@ class FeatureContext implements Context {
 	}
 
 	/**
+	 * @When user :user attempts to fetch Context :contextAlias
+	 */
+	public function userAttemptsToFetchContext(string $user, string $contextAlias): void {
+		$caughtException = false;
+		try {
+			$this->userFetchesContext($user, $contextAlias);
+		} catch (ExpectationFailedException $e) {
+			$caughtException = true;
+		}
+
+		Assert::assertTrue($caughtException);
+	}
+
+	/**
 	 * @When user :user fetches Context :contextAlias
 	 */
 	public function userFetchesContext(string $user, string $contextAlias): void {
 		$this->setCurrentUser($user);
 
-		$context = $this->collectionManager->getByAlias('context', $contextAlias);
+		if ($contextAlias === self::NON_EXISTING_CONTEXT_ALIAS) {
+			$context = ['id' => self::NON_EXISTING_CONTEXT_ID];
+		} else {
+			$context = $this->collectionManager->getByAlias('context', $contextAlias);
+		}
 
 		$this->sendOcsRequest(
 			'GET',

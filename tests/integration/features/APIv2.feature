@@ -186,3 +186,23 @@ Feature: APIv2
     And known Context "c2" has "description" set to "Lacus suspendisse faucibus etc pp"
     And known Context "c2" contains "table" "t2" with permissions "read,create,update"
     And known Context "c2" contains "view" "v2" with permissions "read"
+
+  @api2 @contexts
+  Scenario: Fetch a specific, but inaccessible Context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,created,update |
+    When user "participant2-v2" attempts to fetch Context "c1"
+    Then the reported status is "404"
+
+  @api2 @contexts
+  Scenario: Fetch a specific, but non-existing Context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,created,update |
+    When user "participant1-v2" attempts to fetch Context "NON-EXISTENT"
+    Then the reported status is "404"
