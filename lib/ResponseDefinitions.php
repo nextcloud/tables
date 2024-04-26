@@ -118,6 +118,7 @@ namespace OCA\Tables;
  *  	selectionOptions: string,
  *  	selectionDefault: string,
  *  	datetimeDefault: string,
+ *      usergroupDefault: string,
  * }
  *
  * @psalm-type TablesImportState = array{
