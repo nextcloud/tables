@@ -130,6 +130,18 @@ Feature: APIv2
     Then they will find Contexts "" and no other
 
   @api2 @contexts
+  Scenario: Attempt to create a context containing an inaccessible view
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "👋" exists for user "participant2-v2" as "t2" via v2
+    And user "participant2-v2" create view "v2" with emoji "⚡️" for "t2" as "v2"
+    When user "participant1-v2" attempts to create the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | v2    | view | read,create,update  |
+    Then the reported status is "403"
+    And user "participant1-v2" fetches all Contexts
+    Then they will find Contexts "" and no other
+
+  @api2 @contexts
   Scenario: Fetch the overview over existing Contexts as owner
     Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
     And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
