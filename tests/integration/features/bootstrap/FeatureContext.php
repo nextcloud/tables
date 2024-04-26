@@ -28,6 +28,7 @@ use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\ExpectationFailedException;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -1759,6 +1760,21 @@ class FeatureContext implements Context {
 	}
 
 	/**
+	 * @When user :user attempts to create the Context :alias with name :name with icon :icon and description :description and nodes:
+	 */
+	public function attemptCreateContext(string $user, string $alias, string $name, string $icon, string $description, TableNode $table) {
+		$exceptionCaught = false;
+		try {
+			$this->createContext($user, $alias, $name, $icon, $description, $table);
+		} catch (ExpectationFailedException $e) {
+			$exceptionCaught = true;
+
+		}
+
+		Assert::assertTrue($exceptionCaught);
+	}
+
+	/**
 	 * @When user :user creates the Context :alias with name :name with icon :icon and description :description and nodes:
 	 */
 	public function createContext(string $user, string $alias, string $name, string $icon, string $description, TableNode $table) {
@@ -1908,7 +1924,7 @@ class FeatureContext implements Context {
 	public function theyWillFindContextsAndNoOther(string $contextAliasList): void {
 		$receivedContexts = $this->getDataFromResponse($this->response)['ocs']['data'];
 
-		$aliases = explode(',', $contextAliasList);
+		$aliases = $contextAliasList === '' ? [] : explode(',', $contextAliasList);
 		$expectedContextIds = array_map(function (string $alias) {
 			return $this->collectionManager->getByAlias('context', trim($alias))['id'];
 		}, $aliases);
@@ -1984,4 +2000,12 @@ class FeatureContext implements Context {
 		$expectedPermissions = $this->humanReadablePermissionToInt($permissionList);
 		Assert::assertSame($expectedPermissions, $actualPermissions);
 	}
+
+	/**
+	 * @Then the reported status is :statusCode
+	 */
+	public function theReportedStatusIs(int $statusCode): void {
+		Assert::assertEquals($statusCode, $this->response->getStatusCode());
+	}
+
 }

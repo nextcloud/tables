@@ -8,6 +8,7 @@ use OCA\Tables\Db\Context;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ContextService;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -90,15 +91,21 @@ class ContextController extends AOCSController {
 	 * @param string $description Descriptive text of the context
 	 * @param array{id: int, type: int, permissions: int}|array<empty> $nodes optional nodes to be connected to this context
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN, array{message: string}, array{}>
 	 *
 	 * 200: returning the full context information
+	 * 400: invalid parameters were supplied
+	 * 403: lacking permissions on a resource
 	 */
 	public function create(string $name, string $iconName, string $description = '', array $nodes = []): DataResponse {
 		try {
 			return new DataResponse($this->contextService->create($name, $iconName, $description, $nodes, $this->userId, 0)->jsonSerialize());
 		} catch (Exception $e) {
 			return $this->handleError($e);
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
+		} catch (\InvalidArgumentException $e) {
+			return $this->handleBadRequestError(new BadRequestError($e->getMessage(), $e->getCode(), $e));
 		}
 	}
 

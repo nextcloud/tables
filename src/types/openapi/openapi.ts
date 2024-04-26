@@ -3113,6 +3113,32 @@ export type operations = {
           };
         };
       };
+      /** @description invalid parameters were supplied */
+      400: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+      /** @description lacking permissions on a resource */
+      403: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
       500: {
         content: {
           "application/json": {
