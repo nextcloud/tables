@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@mdi/svg": "^7.4.47",
-    "@nextcloud/auth": "^2.2.1",
+    "@nextcloud/auth": "^2.3.0",
     "@nextcloud/axios": "^2.4.0",
     "@nextcloud/dialogs": "^4.2.7",
     "@nextcloud/event-bus": "^3.2.0",
