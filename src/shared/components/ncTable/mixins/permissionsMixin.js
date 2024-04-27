@@ -68,7 +68,7 @@ export default {
 			return element.isShared === false
 				|| (element.isShared === true && (element.onSharePermissions.update === true || element.ownership === getCurrentUser().uid))
 		},
-		canManageContext(context) {
+		ownsContext(context) {
 			return context.owner === getCurrentUser().uid
 		},
 

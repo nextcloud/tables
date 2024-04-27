@@ -11,17 +11,23 @@
 			</template>
 		</template>
 		<template #actions>
-			<NcActionButton v-if="canManageContext(context)" :close-after-click="true" @click="editContext">
+			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" @click="editContext">
 				<template #icon>
 					<PlaylistEdit :size="20" />
 				</template>
 				{{ t('tables', 'Edit application') }}
 			</NcActionButton>
-			<NcActionButton v-if="canManageContext(context)" :close-after-click="true" @click="transferContext">
+			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" @click="transferContext">
 				<template #icon>
 					<FileSwap :size="20" />
 				</template>
 				{{ t('tables', 'Transfer application') }}
+			</NcActionButton>
+			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" @click="deleteContext">
+				<template #icon>
+					<Delete :size="20" />
+				</template>
+				{{ t('tables', 'Delete application') }}
 			</NcActionButton>
 		</template>
 	</NcAppNavigationItem>
@@ -34,6 +40,7 @@ import TableIcon from 'vue-material-design-icons/Table.vue'
 import { emit } from '@nextcloud/event-bus'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
 import FileSwap from 'vue-material-design-icons/FileSwap.vue'
+import Delete from 'vue-material-design-icons/Delete.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import svgHelper from '../../../shared/components/ncIconPicker/mixins/svgHelper.js'
 
@@ -44,6 +51,7 @@ export default {
 		PlaylistEdit,
 		FileSwap,
 		TableIcon,
+		Delete,
 		NcIconSvgWrapper,
 		NcAppNavigationItem,
 		NcActionButton,
@@ -83,6 +91,9 @@ export default {
 		},
 		async transferContext() {
 			emit('tables:context:transfer', this.context)
+		},
+		deleteContext() {
+			emit('tables:context:delete', this.context)
 		},
 	},
 

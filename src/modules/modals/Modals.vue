@@ -1,8 +1,9 @@
 <template>
 	<div>
 		<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
-		<CreateContext :show-modal="showModalCreateContext" @close="showModalCreateContext = false" />
 		<DeleteTable :show-modal="tableToDelete !== null" :table="tableToDelete" @cancel="tableToDelete = null" />
+		<EditTable :table-id="editTable" :show-modal="editTable !== null" @close="editTable = null" />
+		<TransferTable :table="tableToTransfer" :show-modal="tableToTransfer !== null" @close="tableToTransfer = null" />
 
 		<CreateColumn :show-modal="createColumnInfo !== null" :is-view="createColumnInfo?.isView" :element="createColumnInfo?.element" @close="createColumnInfo = null" />
 		<EditColumn v-if="columnToEdit" :column="columnToEdit?.column" :is-view="columnToEdit.isView" :element-id="columnToEdit?.elementId" @close="columnToEdit = false" />
@@ -36,10 +37,10 @@
 			:is-element-view="importToElement?.isView"
 			@close="importToElement = null" />
 
-		<EditTable :table-id="editTable" :show-modal="editTable !== null" @close="editTable = null" />
-		<TransferTable :table="tableToTransfer" :show-modal="tableToTransfer !== null" @close="tableToTransfer = null" />
+		<CreateContext :show-modal="showModalCreateContext" @close="showModalCreateContext = false" />
 		<EditContext :context-id="editContext" :show-modal="editContext !== null" @close="editContext = null" />
 		<TransferContext :context="contextToTransfer" :show-modal="contextToTransfer !== null" @close="contextToTransfer = null" />
+		<DeleteContext :show-modal="contextToDelete !== null" :context="contextToDelete" @cancel="contextToDelete = null" />
 	</div>
 </template>
 
@@ -62,6 +63,7 @@ import EditContext from './EditContext.vue'
 import TransferTable from './TransferTable.vue'
 import CreateContext from './CreateContext.vue'
 import TransferContext from './TransferContext.vue'
+import DeleteContext from './DeleteContext.vue'
 
 export default {
 	components: {
@@ -81,6 +83,7 @@ export default {
 		CreateContext,
 		EditContext,
 		TransferContext,
+		DeleteContext,
 	},
 
 	data() {
@@ -102,6 +105,7 @@ export default {
 			editContext: null,
 			tableToTransfer: null,
 			contextToTransfer: null,
+			contextToDelete: null,
 		}
 	},
 
@@ -143,6 +147,7 @@ export default {
 		subscribe('tables:context:create', () => { this.showModalCreateContext = true })
 		subscribe('tables:context:edit', contextId => { this.editContext = contextId })
 		subscribe('tables:context:transfer', context => { this.contextToTransfer = context })
+		subscribe('tables:context:delete', context => { this.contextToDelete = context })
 
 	},
 	unmounted() {
@@ -171,6 +176,7 @@ export default {
 		unsubscribe('tables:context:create', () => { this.showModalCreateContext = true })
 		unsubscribe('tables:context:edit', contextId => { this.editContext = contextId })
 		unsubscribe('tables:context:transfer', context => { this.contextToTransfer = context })
+		unsubscribe('tables:context:delete', context => { this.contextToDelete = context })
 	},
 }
 </script>
