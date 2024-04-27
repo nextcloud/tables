@@ -227,6 +227,8 @@ OC.L10N.register(
     "Title of the new table" : "عنوان الجدول الجديد",
     "🔧 Custom table" : "🔧 جدولٌ مُخصَّصٌ",
     "Custom table from scratch." : "جدول مخصص من البداية.",
+    "📄 Import table" : "إستيراد جدول",
+    "Import table from file." : "إستيراد جدول من ملف",
     "Cannot create new table. Title is missing." : "لا يمكن إنشاء جدول جديد. العنوان مفقود.",
     "Could not load templates." : "تعذر تحميل القوالب.",
     "Delete column" : "حذف عمود",

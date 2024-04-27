@@ -225,6 +225,8 @@
     "Title of the new table" : "Title of the new table",
     "🔧 Custom table" : "🔧 Custom table",
     "Custom table from scratch." : "Custom table from scratch.",
+    "📄 Import table" : "📄 Import table",
+    "Import table from file." : "Import table from file.",
     "Cannot create new table. Title is missing." : "Cannot create new table. Title is missing.",
     "Could not load templates." : "Could not load templates.",
     "Delete column" : "Delete column",

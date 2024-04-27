@@ -225,6 +225,8 @@
     "Title of the new table" : "Titel der neuen Tabelle",
     "🔧 Custom table" : "🔧 Benutzerdefinierte Tabelle",
     "Custom table from scratch." : "Benutzerdefinierte Spalte von Grund auf neu.",
+    "📄 Import table" : "📄 Tabelle importieren",
+    "Import table from file." : "Tabelle von Datei importieren",
     "Cannot create new table. Title is missing." : "Neue Tabelle kann nicht erstellt werden. Titel fehlt.",
     "Could not load templates." : "Vorlagen konnten nicht geladen werden.",
     "Delete column" : "Spalte löschen",

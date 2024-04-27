@@ -225,6 +225,8 @@
     "Title of the new table" : "新表標題",
     "🔧 Custom table" : "🔧 自訂數據庫表",
     "Custom table from scratch." : "從頭開始定製表。",
+    "📄 Import table" : "📄 導入數據庫表",
+    "Import table from file." : "從檔案匯入表格。",
     "Cannot create new table. Title is missing." : "無法創建表。缺少標題。",
     "Could not load templates." : "無法載入模板。",
     "Delete column" : "刪除縱列",

@@ -225,6 +225,8 @@
     "Title of the new table" : "新表格標題",
     "🔧 Custom table" : "🔧 自訂表格",
     "Custom table from scratch." : "從頭開始自訂表格。",
+    "📄 Import table" : "📄 匯入表格",
+    "Import table from file." : "從檔案匯入表格。",
     "Cannot create new table. Title is missing." : "無法建立新表格。缺少標題。",
     "Could not load templates." : "無法載入範本。",
     "Delete column" : "刪除欄位",
