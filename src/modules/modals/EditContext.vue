@@ -36,11 +36,22 @@
 				<NcContextResource :resources.sync="resources" :receivers.sync="receivers" />
 			</div>
 
-			<div class="row space-R row space-T">
-				<div class="fix-col-4 end">
-					<NcButton type="primary" @click="submit">
-						{{ t('tables', 'Save') }}
+			<div class="row space-T">
+				<div class="fix-col-4 space-T justify-between">
+					<NcButton v-if="!prepareDeleteContext" type="error" @click="prepareDeleteContext = true">
+						{{ t('tables', 'Delete') }}
 					</NcButton>
+					<NcButton v-if="prepareDeleteContext" :wide="true" type="error" @click="actionDeleteContext">
+						{{ t('tables', 'I really want to delete this application!') }}
+					</NcButton>
+					<div class="right-additional-button">
+						<NcButton v-if="ownsContext(localContext)" @click="actionTransfer">
+							{{ t('tables', 'Transfer application') }}
+						</NcButton>
+						<NcButton type="primary" @click="submit">
+							{{ t('tables', 'Save') }}
+						</NcButton>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -58,6 +69,8 @@ import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW, PERMISSION_READ, PERMISSION_CREATE, PERMISSION_UPDATE, PERMISSION_DELETE } from '../../shared/constants.js'
 import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'
 import permissionBitmask from '../../shared/components/ncContextResource/mixins/permissionBitmask.js'
+import { emit } from '@nextcloud/event-bus'
+import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 
 export default {
 	name: 'EditContext',
@@ -68,7 +81,7 @@ export default {
 		NcIconSvgWrapper,
 		NcContextResource,
 	},
-	mixins: [svgHelper, permissionBitmask],
+	mixins: [svgHelper, permissionBitmask, permissionsMixin],
 	props: {
 		showModal: {
 			type: Boolean,
@@ -94,12 +107,12 @@ export default {
 			PERMISSION_CREATE,
 			PERMISSION_UPDATE,
 			PERMISSION_DELETE,
-
+			prepareDeleteContext: false,
 		}
 	},
 	computed: {
 		...mapGetters(['getContext']),
-		...mapState(['tables', 'views']),
+		...mapState(['tables', 'views', 'activeContextId']),
 		localContext() {
 			return this.getContext(this.contextId)
 		},
@@ -153,7 +166,7 @@ export default {
 
 				const res = await this.$store.dispatch('updateContext', { id: this.contextId, data, previousReceivers: Object.values(context.sharing), receivers: this.receivers })
 				if (res) {
-					showSuccess(t('tables', 'Updated context "{contextTitle}".', { contextTitle: this.title }))
+					showSuccess(t('tables', 'Updated application "{contextTitle}".', { contextTitle: this.title }))
 					this.actionCancel()
 				}
 			}
@@ -166,6 +179,7 @@ export default {
 			this.description = ''
 			this.resources = context ? this.getContextResources(context) : []
 			this.receivers = context ? this.getContextReceivers(context) : []
+			this.prepareDeleteContext = false
 		},
 		getContextReceivers(context) {
 			let sharing = Object.values(context.sharing)
@@ -209,6 +223,37 @@ export default {
 			}
 			return resources
 		},
+		async actionDeleteContext() {
+			this.prepareDeleteContext = false
+			const res = await this.$store.dispatch('removeContext', { context: this.context, receivers: this.context.sharing })
+			if (res) {
+				showSuccess(t('tables', 'Application "{context}" removed.', { context: this.title }))
+				// if the active context was deleted, go to startpage
+				if (this.contextId === this.activeContextId) {
+					await this.$router.push('/').catch(err => err)
+				}
+				this.actionCancel()
+			}
+
+		},
+		actionTransfer() {
+			emit('tables:context:edit', null)
+			emit('tables:context:transfer', this.localContext)
+		},
 	},
 }
 </script>
+<style lang="scss" scoped>
+.right-additional-button {
+	display: inline-flex;
+}
+
+.right-additional-button>button {
+	margin-left: calc(var(--default-grid-baseline) * 3);
+}
+
+:deep(.element-description) {
+	padding-inline: 0 !important;
+	max-width: 100%;
+}
+</style>
