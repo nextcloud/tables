@@ -35,6 +35,9 @@ import TableCellMultiSelection from './TableCellMultiSelection.vue'
 import TableCellTextRich from './TableCellEditor.vue'
 import { ColumnTypes } from './../mixins/columnHandler.js'
 import { translate as t } from '@nextcloud/l10n'
+import {
+	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
+} from '../../../../shared/constants.js'
 
 export default {
 	name: 'TableRow',
@@ -110,19 +113,19 @@ export default {
 				// See metaColumns.js for mapping
 				let value
 				switch (columnId) {
-				case -1:
+				case TYPE_META_ID:
 					value = this.row.id
 					break
-				case -2:
+				case TYPE_META_CREATED_BY:
 					value = this.row.createdBy
 					break
-				case -3:
+				case TYPE_META_UPDATED_BY:
 					value = this.row.lastEditBy
 					break
-				case -4:
+				case TYPE_META_CREATED_AT:
 					value = this.row.createdAt
 					break
-				case -5:
+				case TYPE_META_UPDATED_AT:
 					value = this.row.lastEditAt
 					break
 				}

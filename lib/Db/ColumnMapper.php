@@ -110,11 +110,11 @@ class ColumnMapper extends QBMapper {
 
 		// Initialise return array with column types of the meta columns: id, created_by, created_at, last_edit_by, last_edit_at
 		$out = [
-			-1 => 'number',
-			-2 => 'text-line',
-			-3 => 'datetime',
-			-4 => 'text-line',
-			-5 => 'datetime',
+			Column::TYPE_META_ID => 'number',
+			Column::TYPE_META_CREATED_BY => 'text-line',
+			Column::TYPE_META_CREATED_AT => 'datetime',
+			Column::TYPE_META_UPDATED_BY => 'text-line',
+			Column::TYPE_META_UPDATED_AT => 'datetime',
 		];
 		$result = $qb->executeQuery();
 		try {
