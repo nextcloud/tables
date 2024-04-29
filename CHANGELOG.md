@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.7.1
+
+### Fixed
+
+- Fix filters for meta columns @backportbot[bot] [#1028](https://github.com/nextcloud/tables/pull/1028)
+- fix(filter): pass datetime object for PARAM_DATE @backportbot[bot] [#1024](https://github.com/nextcloud/tables/pull/1024)
+
+### Other
+
+- test(Integration): add contexts related tests @backportbot[bot] [#1030](https://github.com/nextcloud/tables/pull/1030)
+
 ## 0.7.0
 
 ### Feature highlights
