@@ -407,18 +407,20 @@ class Row2Mapper {
 
 		switch ($columnId) {
 			case -1: // row ID
-				$qb2->where($this->getSqlOperator($operator, $qb, 'id', $value, IQueryBuilder::PARAM_INT));
+				$qb2->where($this->getSqlOperator($operator, $qb, 'id', (int)$value, IQueryBuilder::PARAM_INT));
 				break;
 			case -2: // created by
 				$qb2->where($this->getSqlOperator($operator, $qb, 'created_by', $value, IQueryBuilder::PARAM_STR));
 				break;
 			case -3: // created at
+				$value = new \DateTimeImmutable($value);
 				$qb2->where($this->getSqlOperator($operator, $qb, 'created_at', $value, IQueryBuilder::PARAM_DATE));
 				break;
 			case -4: // last edit by
 				$qb2->where($this->getSqlOperator($operator, $qb, 'last_edit_by', $value, IQueryBuilder::PARAM_STR));
 				break;
 			case -5: // last edit at
+				$value = new \DateTimeImmutable($value);
 				$qb2->where($this->getSqlOperator($operator, $qb, 'last_edit_at', $value, IQueryBuilder::PARAM_DATE));
 				break;
 		}
