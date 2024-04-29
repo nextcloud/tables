@@ -6,6 +6,7 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
+use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
 /** @template-extends QBMapper<PageContent> */
@@ -56,5 +57,14 @@ class PageContentMapper extends QBMapper {
 			));
 
 		return $this->findEntities($qb);
+	}
+
+	public function deleteByPageId(int $pageId): int {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->delete($this->table)
+			->where($qb->expr()->eq('page_id', $qb->createNamedParameter($pageId, IQueryBuilder::PARAM_INT)));
+
+		return $qb->executeStatement();
 	}
 }

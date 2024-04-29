@@ -14,6 +14,7 @@ use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
+use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
@@ -40,6 +41,7 @@ class ContextService {
 	private IUserManager $userManager;
 	private IEventDispatcher $eventDispatcher;
 	private IDBConnection $dbc;
+	private ShareService $shareService;
 
 	public function __construct(
 		ContextMapper             $contextMapper,
@@ -51,6 +53,7 @@ class ContextService {
 		IUserManager              $userManager,
 		IEventDispatcher          $eventDispatcher,
 		IDBConnection             $dbc,
+		ShareService              $shareService,
 		bool                      $isCLI,
 	) {
 		$this->contextMapper = $contextMapper;
@@ -63,6 +66,7 @@ class ContextService {
 		$this->userManager = $userManager;
 		$this->eventDispatcher = $eventDispatcher;
 		$this->dbc = $dbc;
+		$this->shareService = $shareService;
 	}
 	use TTransactional;
 
@@ -233,7 +237,18 @@ class ContextService {
 	 */
 	public function delete(int $contextId, string $userId): Context {
 		$context = $this->contextMapper->findById($contextId, $userId);
-		return $this->contextMapper->delete($context);
+
+		$this->atomic(function () use ($context): void {
+			$this->shareService->deleteAllForContext($context);
+			$this->contextNodeRelMapper->deleteAllByContextId($context->getId());
+			$pageIds = $this->pageMapper->getPageIdsForContext($context->getId());
+			foreach ($pageIds as $pageId) {
+				$this->pageContentMapper->deleteByPageId($pageId);
+				$this->pageMapper->deleteByPageId($pageId);
+			}
+			$this->contextMapper->delete($context);
+		}, $this->dbc);
+		return $context;
 	}
 
 	/**
