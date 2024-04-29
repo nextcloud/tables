@@ -272,13 +272,15 @@ class Row2Mapper {
 		$filterExpressions = [];
 		foreach ($filterGroup as $filter) {
 			$columnId = $filter['columnId'];
-			if (!isset($this->columns[$columnId]) && !isset($this->allColumns[$columnId])) {
+			// Fail if the filter is for a column that is not in the list and no meta column
+			if (!isset($this->columns[$columnId]) && !isset($this->allColumns[$columnId]) && $columnId > 0) {
 				throw new InternalError('No column found to build filter with for id ' . $columnId);
 			}
-			$column = $this->columns[$columnId] ?? $this->allColumns[$columnId];
 
 			// if is normal column
 			if ($columnId >= 0) {
+				$column = $this->columns[$columnId] ?? $this->allColumns[$columnId];
+
 				$sql = $qb->expr()->in(
 					'id',
 					$qb->createFunction($this->getFilterExpression($qb, $column, $filter['operator'], $filter['value'])->getSQL())
@@ -392,12 +394,6 @@ class Row2Mapper {
 	}
 
 	/**
-	 *
-	 * -1 => 'number', ID
-	 * -2 => 'text-line', Created
-	 * -3 => 'datetime', At
-	 * -4 => 'text-line', LastEdit
-	 * -5 => 'datetime', At
 	 * @throws InternalError
 	 */
 	private function getMetaFilterExpression(IQueryBuilder $qb, int $columnId, string $operator, string $value): IQueryBuilder {
@@ -406,20 +402,20 @@ class Row2Mapper {
 		$qb2->from('tables_row_sleeves');
 
 		switch ($columnId) {
-			case -1: // row ID
+			case Column::TYPE_META_ID:
 				$qb2->where($this->getSqlOperator($operator, $qb, 'id', (int)$value, IQueryBuilder::PARAM_INT));
 				break;
-			case -2: // created by
+			case Column::TYPE_META_CREATED_BY:
 				$qb2->where($this->getSqlOperator($operator, $qb, 'created_by', $value, IQueryBuilder::PARAM_STR));
 				break;
-			case -3: // created at
+			case Column::TYPE_META_CREATED_AT:
 				$value = new \DateTimeImmutable($value);
 				$qb2->where($this->getSqlOperator($operator, $qb, 'created_at', $value, IQueryBuilder::PARAM_DATE));
 				break;
-			case -4: // last edit by
+			case Column::TYPE_META_UPDATED_BY:
 				$qb2->where($this->getSqlOperator($operator, $qb, 'last_edit_by', $value, IQueryBuilder::PARAM_STR));
 				break;
-			case -5: // last edit at
+			case Column::TYPE_META_UPDATED_AT:
 				$value = new \DateTimeImmutable($value);
 				$qb2->where($this->getSqlOperator($operator, $qb, 'last_edit_at', $value, IQueryBuilder::PARAM_DATE));
 				break;

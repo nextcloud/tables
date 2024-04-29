@@ -39,6 +39,9 @@ import TableHeader from '../partials/TableHeader.vue'
 import TableRow from '../partials/TableRow.vue'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { MagicFields } from '../mixins/magicFields.js'
+import {
+	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
+} from '../../../../shared/constants.js'
 
 export default {
 	name: 'CustomTable',
@@ -140,19 +143,19 @@ export default {
 					if (column.id < 0) {
 						cell = { columnId: column.id }
 						switch (column.id) {
-						case -1:
+						case TYPE_META_ID:
 							cell.value = row.id
 							break
-						case -2:
+						case TYPE_META_CREATED_BY:
 							cell.value = row.createdBy
 							break
-						case -3:
+						case TYPE_META_UPDATED_BY:
 							cell.value = row.editedBy
 							break
-						case -4:
+						case TYPE_META_CREATED_AT:
 							cell.value = row.createdAt
 							break
-						case -5:
+						case TYPE_META_UPDATED_AT:
 							cell.value = row.editedAt
 							break
 						}

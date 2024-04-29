@@ -62,6 +62,13 @@ use OCP\AppFramework\Db\Entity;
  * @method setDatetimeDefault(?string $datetimeDefault)
  */
 class Column extends Entity implements JsonSerializable {
+	// Meta column types
+	public const TYPE_META_ID = -1;
+	public const TYPE_META_CREATED_BY = -2;
+	public const TYPE_META_UPDATED_BY = -3;
+	public const TYPE_META_CREATED_AT = -4;
+	public const TYPE_META_UPDATED_AT = -5;
+
 	public const TYPE_SELECTION = 'selection';
 	public const TYPE_TEXT = 'text';
 	public const TYPE_NUMBER = 'number';
