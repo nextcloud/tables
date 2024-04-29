@@ -20,8 +20,10 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
+use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
 use OCP\EventDispatcher\IEventDispatcher;
+use OCP\IDBConnection;
 use OCP\IUserManager;
 use OCP\Log\Audit\CriticalActionPerformedEvent;
 use Psr\Log\LoggerInterface;
@@ -37,6 +39,7 @@ class ContextService {
 	private PermissionsService $permissionsService;
 	private IUserManager $userManager;
 	private IEventDispatcher $eventDispatcher;
+	private IDBConnection $dbc;
 
 	public function __construct(
 		ContextMapper             $contextMapper,
@@ -47,6 +50,7 @@ class ContextService {
 		PermissionsService        $permissionsService,
 		IUserManager              $userManager,
 		IEventDispatcher          $eventDispatcher,
+		IDBConnection             $dbc,
 		bool                      $isCLI,
 	) {
 		$this->contextMapper = $contextMapper;
@@ -58,7 +62,9 @@ class ContextService {
 		$this->permissionsService = $permissionsService;
 		$this->userManager = $userManager;
 		$this->eventDispatcher = $eventDispatcher;
+		$this->dbc = $dbc;
 	}
+	use TTransactional;
 
 	/**
 	 * @return Context[]
@@ -100,7 +106,7 @@ class ContextService {
 	}
 
 	/**
-	 * @throws Exception
+	 * @throws Exception|PermissionError|InvalidArgumentException
 	 */
 	public function create(string $name, string $iconName, string $description, array $nodes, string $ownerId, int $ownerType): Context {
 		$context = new Context();
@@ -110,13 +116,16 @@ class ContextService {
 		$context->setOwnerId($ownerId);
 		$context->setOwnerType($ownerType);
 
-		$this->contextMapper->insert($context);
 
-		if (!empty($nodes)) {
-			$context->resetUpdatedFields();
-			$this->insertNodesFromArray($context, $nodes);
-			$this->insertPage($context);
-		}
+		$this->atomic(function () use ($context, $nodes) {
+			$this->contextMapper->insert($context);
+
+			if (!empty($nodes)) {
+				$context->resetUpdatedFields();
+				$this->insertNodesFromArray($context, $nodes);
+				$this->insertPage($context);
+			}
+		}, $this->dbc);
 
 		return $context;
 	}
@@ -418,25 +427,37 @@ class ContextService {
 			unset($addedPage['content'][$pageContent->getId()]['pageId']);
 		}
 
-		$context->setPages($addedPage);
+		$context->setPages([$addedPage['id'] => $addedPage]);
 	}
 
+	/**
+	 * @throws PermissionError|InvalidArgumentException
+	 */
 	protected function insertNodesFromArray(Context $context, array $nodes): void {
 		$addedNodes = [];
 
 		$userId = $context->getOwnerType() === Application::OWNER_TYPE_USER ? $context->getOwnerId() : null;
 		foreach ($nodes as $node) {
 			try {
-				if (!$this->permissionsService->canManageNodeById($node['type'], $node['id'], $userId)) {
-					throw new PermissionError(sprintf('Owner cannot manage node %d (type %d)', $node['id'], $node['type']));
+				if (!is_numeric($node['type'])) {
+					throw new InvalidArgumentException('Unexpected node type');
 				}
-				$contextNodeRel = $this->addNodeToContext($context, $node['id'], $node['type'], $node['permissions'] ?? 0);
+				$nodeType = (int)($node['type']);
+				if (!is_numeric($node['id'])) {
+					throw new InvalidArgumentException('Unexpected node id');
+				}
+				$nodeId = (int)($node['id']);
+				if (!$this->permissionsService->canManageNodeById($nodeType, $nodeId, $userId)) {
+					throw new PermissionError(sprintf('Owner cannot manage node %d (type %d)', $nodeId, $nodeType));
+				}
+				$contextNodeRel = $this->addNodeToContext($context, $nodeId, $nodeType, (int)($node['permissions'] ?? Application::PERMISSION_READ));
 				$addedNodes[] = $contextNodeRel->jsonSerialize();
 			} catch (Exception $e) {
 				$this->logger->warning('Could not add node {ntype}/{nid} to context {cid}, skipping.', [
 					'app' => Application::APP_ID,
 					'ntype' => $node['type'],
 					'nid' => $node['id'],
+					'permissions' => $node['permissions'],
 					'cid' => $context['id'],
 					'exception' => $e,
 				]);
