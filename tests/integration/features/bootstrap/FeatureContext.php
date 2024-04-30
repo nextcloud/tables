@@ -1809,7 +1809,7 @@ class FeatureContext implements Context {
 		$newContext = $this->getDataFromResponse($this->response)['ocs']['data'];
 
 		$this->collectionManager->register($newContext, 'context', $newContext['id'], $alias, function () use ($newContext) {
-			$this->deleteContext($newContext['id'], $newContext['owner']);
+			$this->deleteContextWithFetchCheck($newContext['id'], $newContext['owner']);
 		});
 
 		Assert::assertEquals($newContext['name'], $name);
@@ -1968,11 +1968,15 @@ class FeatureContext implements Context {
 		);
 
 		Assert::assertEquals(200, $this->response->getStatusCode());
-		$deletedContext = $this->getDataFromResponse($this->response)['ocs']['data'];
+	}
 
+	public function deleteContextWithFetchCheck(int $contextId, string $owner): void {
+		$this->deleteContext($contextId, $owner);
+
+		$this->setCurrentUser($owner);
 		$this->sendOcsRequest(
 			'GET',
-			sprintf('/apps/tables/api/2/contexts/%d', $deletedContext['id']),
+			sprintf('/apps/tables/api/2/contexts/%d', $contextId),
 		);
 		Assert::assertEquals(404, $this->response->getStatusCode());
 	}
@@ -2026,6 +2030,36 @@ class FeatureContext implements Context {
 	 */
 	public function theReportedStatusIs(int $statusCode): void {
 		Assert::assertEquals($statusCode, $this->response->getStatusCode());
+	}
+
+	/**
+	 * @When user :user deletes Context :contextAlias
+	 */
+	public function userDeletesContext(string $user, string $contextAlias): void {
+		$context = $this->collectionManager->getByAlias('context', $contextAlias);
+		$this->deleteContext($context['id'], $user);
+		// keep the alias and id mapping, but reset the cleanup method
+		$this->collectionManager->update($context, 'context', $context['id'], fn () => null);
+	}
+
+	/**
+	 * @When user :user attempts to delete Context :contextAlias
+	 */
+	public function userAttemptsToDeleteContext(string $user, string $contextAlias): void {
+		if ($contextAlias === self::NON_EXISTING_CONTEXT_ALIAS) {
+			$context = ['id' => self::NON_EXISTING_CONTEXT_ID];
+		} else {
+			$context = $this->collectionManager->getByAlias('context', $contextAlias);
+		}
+
+		$exceptionCaught = false;
+		try {
+			$this->deleteContext($context['id'], $user);
+		} catch (ExpectationFailedException $e) {
+			$exceptionCaught = true;
+		}
+
+		Assert::assertTrue($exceptionCaught);
 	}
 
 }
