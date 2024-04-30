@@ -71,6 +71,15 @@ export default {
 			} else if (currentRoute.path.startsWith('/application/')) {
 				this.$store.commit('setActiveContextId', parseInt(currentRoute.params.contextId))
 				this.setPageTitle(this.$store.getters.activeContext.name)
+
+				// move the focus away from nav bar (import for app-internal switch)
+				const appContent = document.getElementById('app-content-vue')
+				const oldTabIndex = appContent.tabIndex
+				if (oldTabIndex === -1) {
+					appContent.tabIndex = 0
+				}
+				appContent.focus()
+				appContent.tabIndex = oldTabIndex
 			}
 		},
 		setPageTitle(title) {
