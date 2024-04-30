@@ -188,6 +188,8 @@
     "Title of the new table" : "Titeln på den nya tabellen",
     "🔧 Custom table" : "🔧 Anpassad tabell",
     "Custom table from scratch." : "Anpassad tabell från grunden.",
+    "📄 Import table" : "📄 Importera tabell",
+    "Import table from file." : "Importera tabell från fil.",
     "Cannot create new table. Title is missing." : "Det går inte att skapa en ny tabell. Titel saknas.",
     "Could not load templates." : "Kunde inte läsa in mallar.",
     "Delete column" : "Radera kolumn",
