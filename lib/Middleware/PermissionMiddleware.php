@@ -3,8 +3,10 @@
 namespace OCA\Tables\Middleware;
 
 use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\PermissionsService;
+use OCP\AppFramework\Http;
 use OCP\AppFramework\Middleware;
 use OCP\AppFramework\Utility\IControllerMethodReflector;
 use OCP\IRequest;
@@ -86,5 +88,15 @@ class PermissionMiddleware extends Middleware {
 				));
 			}
 		}
+	}
+
+	public function afterException($controller, $methodName, \Exception $exception) {
+		if ($exception instanceof PermissionError) {
+			return new Http\DataResponse(['message' => $exception->getMessage()], Http::STATUS_FORBIDDEN);
+		}
+		if ($exception instanceof NotFoundError) {
+			return new Http\DataResponse(['message' => $exception->getMessage()], Http::STATUS_NOT_FOUND);
+		}
+		throw $exception;
 	}
 }
