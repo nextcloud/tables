@@ -54,7 +54,7 @@ class RenameTable extends Command {
 			)
 			->addArgument(
 				'title',
-				InputArgument::REQUIRED,
+				InputArgument::OPTIONAL,
 				'New title for the table.'
 			)
 			->addOption(
