@@ -67,6 +67,7 @@ OC.L10N.register(
     "Operator" : "Operatore",
     "Views" : "Viste",
     "View" : "Visualizza",
+    "Columns" : "Colonne",
     "Shares" : "Condivisioni",
     "Actions" : "Azioni",
     "Share" : "Condividi",

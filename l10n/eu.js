@@ -275,6 +275,7 @@ OC.L10N.register(
     "Create Row" : "Sortu errenkada",
     "Export CSV" : "Esportatu CSVa",
     "Uncheck all" : "Desautatu dena",
+    "_%n selected row_::_%n selected rows_" : ["Hautatutako errenkada %n","%n hautatutako errenkada"],
     "Confirmation" : "Berrespena",
     "Confirm" : "Berretsi",
     "Content" : "Edukia",
