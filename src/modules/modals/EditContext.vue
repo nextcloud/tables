@@ -225,7 +225,8 @@ export default {
 		},
 		async actionDeleteContext() {
 			this.prepareDeleteContext = false
-			const res = await this.$store.dispatch('removeContext', { context: this.context, receivers: this.context.sharing })
+			const context = this.getContext(this.contextId)
+			const res = await this.$store.dispatch('removeContext', { context, receivers: context.sharing })
 			if (res) {
 				showSuccess(t('tables', 'Application "{context}" removed.', { context: this.title }))
 				// if the active context was deleted, go to startpage

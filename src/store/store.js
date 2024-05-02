@@ -364,7 +364,7 @@ export default new Vuex.Store({
 				res = await axios.post(generateOcsUrl('/apps/tables/api/2/contexts'), data)
 				const id = res?.data?.ocs?.data?.id
 				if (id) {
-					// TODO: Delete shares when a context is deleted after creation without reloading page 
+					// TODO: Delete shares when a context is deleted after creation without reloading page
 					await dispatch('shareContext', { id, previousReceivers: [], receivers })
 				}
 			} catch (e) {
@@ -499,12 +499,9 @@ export default new Vuex.Store({
 			commit('setContexts', [...contexts])
 			return true
 		},
-		async removeContext({ dispatch, state, commit }, { context }) {
+		async removeContext({ state, commit }, { context }) {
 			try {
-				await dispatch('unShareContext', { receivers: context.sharing })
-				if (context.sharing) {
-					await axios.delete(generateOcsUrl('/apps/tables/api/2/contexts/' + context.id))
-				}
+				await axios.delete(generateOcsUrl('/apps/tables/api/2/contexts/' + context.id))
 			} catch (e) {
 				displayError(e, t('tables', 'Could not remove application.'))
 				return false
@@ -514,15 +511,6 @@ export default new Vuex.Store({
 			contexts.splice(index, 1)
 			commit('setContexts', [...contexts])
 			return true
-		},
-		async unShareContext({ dispatch }, { receivers }) {
-			try {
-				for (const receiver of Object.values(receivers)) {
-					await axios.delete(generateUrl('/apps/tables/share/' + receiver.share_id))
-				}
-			} catch (e) {
-				displayError(e, t('tables', 'Could not remove application share.'))
-			}
 		},
 
 		async removeTable({ state, commit }, { tableId }) {
