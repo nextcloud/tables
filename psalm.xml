@@ -34,6 +34,7 @@
 				<referencedClass name="Doctrine\DBAL\Exception\TableNotFoundException" />
 				<referencedClass name="Doctrine\DBAL\Exception\UniqueConstraintViolationException" />
 				<referencedClass name="Doctrine\DBAL\Platforms\PostgreSQL94Platform" />
+				<referencedClass name="Doctrine\DBAL\Schema\Schema" />
 				<referencedClass name="Doctrine\DBAL\Schema\Table" />
 				<referencedClass name="Doctrine\DBAL\Types\Types" />
 				<referencedClass name="OC\Core\Command\Base" />
@@ -47,6 +48,7 @@
 				<referencedClass name="Doctrine\DBAL\Platforms\AbstractPlatform" />
 				<referencedClass name="Doctrine\DBAL\Schema\Schema" />
 				<referencedClass name="Doctrine\DBAL\Schema\SchemaException" />
+				<referencedClass name="Doctrine\DBAL\Schema\Sequence" />
 				<referencedClass name="Doctrine\DBAL\Schema\Table" />
 			</errorLevel>
 		</UndefinedDocblockClass>
