@@ -39,8 +39,6 @@ use OCP\AppFramework\Db\Entity;
  * @method setFavorite(bool $favorite)
  * @method getRowsCount(): int
  * @method setRowsCount(int $rowCount)
- * @method getOwnership(): string
- * @method setOwnership(string $ownership)
  * @method getOwnerDisplayName(): string
  * @method setOwnerDisplayName(string $ownerDisplayName)
  */
@@ -120,6 +118,14 @@ class View extends Entity implements JsonSerializable {
 	 */
 	private function getSharePermissions(): ?array {
 		return $this->getOnSharePermissions();
+	}
+
+	public function getOwnership(): ?string {
+		return $this->ownership;
+	}
+
+	public function setOwnership(string $ownership): void {
+		$this->ownership = $ownership;
 	}
 
 	/**
