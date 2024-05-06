@@ -364,7 +364,6 @@ export default new Vuex.Store({
 				res = await axios.post(generateOcsUrl('/apps/tables/api/2/contexts'), data)
 				const id = res?.data?.ocs?.data?.id
 				if (id) {
-					// TODO: Delete shares when a context is deleted after creation without reloading page
 					await dispatch('shareContext', { id, previousReceivers: [], receivers })
 				}
 			} catch (e) {
