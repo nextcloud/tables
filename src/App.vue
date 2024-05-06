@@ -65,12 +65,15 @@ export default {
 			if (currentRoute.path.startsWith('/table/')) {
 				this.$store.commit('setActiveTableId', parseInt(currentRoute.params.tableId))
 				this.setPageTitle(this.$store.getters.activeTable.title)
+				this.switchActiveMenuEntry(document.querySelector('header .header-left .app-menu li[data-app-id="tables"]'))
 			} else if (currentRoute.path.startsWith('/view/')) {
 				this.$store.commit('setActiveViewId', parseInt(currentRoute.params.viewId))
 				this.setPageTitle(this.$store.getters.activeView.title)
+				this.switchActiveMenuEntry(document.querySelector('header .header-left .app-menu li[data-app-id="tables"]'))
 			} else if (currentRoute.path.startsWith('/application/')) {
 				this.$store.commit('setActiveContextId', parseInt(currentRoute.params.contextId))
 				this.setPageTitle(this.$store.getters.activeContext.name)
+				this.switchActiveMenuEntry(document.querySelector('header .header-left .app-menu li[data-app-id="tables_application_' + currentRoute.params.contextId + '"]'))
 
 				// move the focus away from nav bar (import for app-internal switch)
 				const appContent = document.getElementById('app-content-vue')
@@ -81,6 +84,11 @@ export default {
 				appContent.focus()
 				appContent.tabIndex = oldTabIndex
 			}
+		},
+		switchActiveMenuEntry(targetElement) {
+			const currentlyActive = document.querySelector('header .header-left .app-menu li.app-menu-entry__active')
+			currentlyActive.classList.remove('app-menu-entry__active')
+			targetElement.classList.add('app-menu-entry__active')
 		},
 		setPageTitle(title) {
 			if (this.defaultPageTitle === false) {
