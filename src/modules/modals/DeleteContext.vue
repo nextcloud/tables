@@ -35,7 +35,6 @@ export default {
 	computed: {
 		...mapState(['activeContextId']),
 		getTranslatedDescription() {
-			// TODO confirm that we actually do delete all the shares
 			return t('tables', 'Do you really want to delete the application "{context}"? This will also delete the shares and unshare the resources that are connected to this application.', { context: this.context?.name })
 		},
 	},
