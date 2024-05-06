@@ -2,7 +2,6 @@
 
 namespace OCA\Tables\Db;
 
-use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -14,65 +13,44 @@ use OCP\IDBConnection;
 /** @template-extends QBMapper<View> */
 class ViewMapper extends QBMapper {
 	protected string $table = 'tables_views';
-	private UserHelper $userHelper;
-	private TableMapper $tableMapper;
 
-	public function __construct(IDBConnection $db, TableMapper $tableMapper, UserHelper $userHelper) {
+	public function __construct(IDBConnection $db, private UserHelper $userHelper) {
 		parent::__construct($db, $this->table, View::class);
-		$this->tableMapper = $tableMapper;
-		$this->userHelper = $userHelper;
 	}
 
-
 	/**
-	 * @param int $id
-	 * @param bool $skipEnhancement
-	 * @return View
 	 * @throws DoesNotExistException
 	 * @throws Exception
-	 * @throws InternalError
 	 * @throws MultipleObjectsReturnedException
 	 */
-	public function find(int $id, bool $skipEnhancement = false): View {
+	public function find(int $id): View {
 		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->table)
-			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
-		$view = $this->findEntity($qb);
-		if(!$skipEnhancement) {
-			$this->enhanceOwnership($view);
-		}
-		return $view;
+		$qb->select('v.*', 't.ownership')
+			->from($this->table, 'v')
+			->innerJoin('v', 'tables_tables', 't', 't.id = v.table_id')
+			->where($qb->expr()->eq('v.id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
+		return $this->findEntity($qb);
 	}
 
 	/**
-	 * @param int|null $tableId
 	 * @return View[]
 	 * @throws Exception
-	 * @throws InternalError
 	 */
 	public function findAll(?int $tableId = null): array {
 		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->table);
+		$qb->select('v.*', 't.ownership')
+			->from($this->table, 'v')
+			->innerJoin('v', 'tables_tables', 't', 't.id = v.table_id');
+
 		if ($tableId !== null) {
-			$qb->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)));
+			$qb->where($qb->expr()->eq('v.table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)));
 		}
-		$views = $this->findEntities($qb);
-		foreach($views as $view) {
-			$this->enhanceOwnership($view);
-		}
-		return $views;
+		return $this->findEntities($qb);
 	}
 
 	/**
-	 * @param string|null $term
-	 * @param string|null $userId
-	 * @param int|null $limit
-	 * @param int|null $offset
-	 * @return array
+	 * @return View[]
 	 * @throws Exception
-	 * @throws InternalError
 	 */
 	public function search(string $term = null, ?string $userId = null, ?int $limit = null, ?int $offset = null): array {
 		$qb = $this->db->getQueryBuilder();
@@ -104,7 +82,7 @@ class ViewMapper extends QBMapper {
 				->andWhere($qb->expr()->eq('receiver', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
 		}
 
-		$qb->select('v.*')
+		$qb->select('v.*', 't.ownership')
 			->from($this->table, 'v')
 			->leftJoin('v', 'tables_tables', 't', 't.id = v.table_id');
 
@@ -133,24 +111,6 @@ class ViewMapper extends QBMapper {
 			$qb->setFirstResult($offset);
 		}
 
-		$views = $this->findEntities($qb);
-		foreach($views as $view) {
-			$this->enhanceOwnership($view);
-		}
-		return $views;
-	}
-
-	/**
-	 * @param View $view
-	 * @return void
-	 * @throws InternalError
-	 */
-	private function enhanceOwnership(View $view): void {
-		try {
-			$view->setOwnership($this->tableMapper->findOwnership($view->getTableId()));
-		} catch (Exception $e) {
-			throw new InternalError('Could not find ownership of table');
-		}
-		$view->resetUpdatedFields();
+		return $this->findEntities($qb);
 	}
 }
