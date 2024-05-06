@@ -37,6 +37,7 @@ class FavoritesService {
 	private IDBConnection $connection;
 	private PermissionsService $permissionsService;
 	private ?string $userId;
+	private bool $cached = false;
 	private CappedMemoryCache $cache;
 
 	public function __construct(
@@ -53,27 +54,22 @@ class FavoritesService {
 
 	public function isFavorite(int $nodeType, int $id): bool {
 		$cacheKey = $nodeType . '_' . $id;
-		if ($cached = $this->cache->get($cacheKey)) {
-			return $cached;
+
+		if (!$this->cached) {
+			$this->cached = true;
+			$this->cache->clear();
+			$qb = $this->connection->getQueryBuilder();
+			$qb->select('*')
+				->from('tables_favorites')
+				->where($qb->expr()->eq('user_id', $qb->createNamedParameter($this->userId)));
+
+			$result = $qb->executeQuery();
+			while ($row = $result->fetch()) {
+				$this->cache->set($cacheKey, true);
+			}
 		}
 
-		$this->cache->clear();
-		$qb = $this->connection->getQueryBuilder();
-		$qb->select('*')
-			->from('tables_favorites')
-			->where($qb->expr()->eq('user_id', $qb->createNamedParameter($this->userId)));
-
-		$result = $qb->executeQuery();
-		while ($row = $result->fetch()) {
-			$this->cache->set($row['node_type'] . '_' . $row['node_id'], true);
-		}
-
-		// Set the cache for not found matches still to avoid further queries
-		if (!$this->cache->get($cacheKey)) {
-			$this->cache->set($cacheKey, false);
-		}
-
-		return $this->cache->get($cacheKey);
+		return (bool)$this->cache->get($cacheKey);
 	}
 
 	/**
