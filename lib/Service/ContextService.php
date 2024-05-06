@@ -14,7 +14,6 @@ use OCA\Tables\Db\Page;
 use OCA\Tables\Db\PageContent;
 use OCA\Tables\Db\PageContentMapper;
 use OCA\Tables\Db\PageMapper;
-use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
