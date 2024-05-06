@@ -244,3 +244,94 @@ Feature: APIv2
     Then the reported status is "404"
     When user "participant1-v2" attempts to fetch Context "NON-EXISTENT"
     Then the reported status is "404"
+
+  @api2 @contexts @contexts-update
+  Scenario: Update an owned context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,created,update |
+    When user "participant1-v2" updates Context "c1" by setting
+      | property    | value                 |
+      | name        | Psychedelic Drawer    |
+      | iconName    | thermostat            |
+      | description | Roll With the Punches |
+    Then the reported status is "200"
+    When user "participant1-v2" fetches Context "c1"
+    Then known Context "c1" has "name" set to "Psychedelic Drawer"
+    And known Context "c1" has "icon" set to "thermostat"
+    And known Context "c1" has "description" set to "Roll With the Punches"
+
+  @api2 @contexts @contexts-update
+  Scenario: Update an inaccessible context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,created,update |
+    When user "participant2-v2" updates Context "c1" by setting
+      | property    | value                 |
+      | name        | Psychedelic Drawer    |
+      | iconName    | thermostat            |
+      | description | Roll With the Punches |
+    Then the reported status is "404"
+    When user "participant1-v2" fetches Context "c1"
+    Then known Context "c1" has "name" set to "Enchanting Guitar"
+    And known Context "c1" has "icon" set to "tennis"
+    And known Context "c1" has "description" set to "Lorem ipsum dolor etc pp"
+
+  @api2 @contexts @contexts-update
+  Scenario: Add a table to an owned context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+    When user "participant1-v2" updates the nodes of the Context "c1" to
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+      | t2    | table | read                |
+    Then the reported status is "200"
+    When user "participant1-v2" fetches Context "c1"
+    Then the fetched Context "c1" has following data:
+      | field | value                        |
+      | node  | table:t1:read,create,update  |
+      | node  | table:t2:read                |
+
+  @api2 @contexts @contexts-update
+  Scenario: Add a table to an inaccessible context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant2-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+    When user "participant2-v2" updates the nodes of the Context "c1" to
+      | alias | type  | permissions         |
+      | t1    | table | read,create         |
+      | t2    | table | read                |
+    Then the reported status is "404"
+    When user "participant1-v2" fetches Context "c1"
+    Then the fetched Context "c1" has following data:
+      | field | value                        |
+      | node  | table:t1:read,create,update  |
+
+  @api2 @contexts @contexts-update
+  Scenario: Add an inaccessible table to an owned context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant2-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,created,update |
+    When user "participant1-v2" updates the nodes of the Context "c1" to
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+      | t2    | table | read                |
+    Then the reported status is "200"
+    When user "participant1-v2" fetches Context "c1"
+    Then the fetched Context "c1" has following data:
+      | field | value                        |
+      | node  | table:t1:read,create,update  |
+    And the fetched Context "c1" does not contain following data:
+      | field | value                        |
+      | node  | table:t2:read                |
