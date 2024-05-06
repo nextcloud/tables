@@ -493,7 +493,20 @@ export default new Vuex.Store({
 			}
 
 			const contexts = state.contexts
-			const index = contexts.findIndex(t => t.id === id)
+			const index = contexts.findIndex(c => c.id === id)
+			contexts.splice(index, 1)
+			commit('setContexts', [...contexts])
+			return true
+		},
+		async removeContext({ state, commit }, { context }) {
+			try {
+				await axios.delete(generateOcsUrl('/apps/tables/api/2/contexts/' + context.id))
+			} catch (e) {
+				displayError(e, t('tables', 'Could not remove application.'))
+				return false
+			}
+			const contexts = state.contexts
+			const index = contexts.findIndex(c => c.id === context.id)
 			contexts.splice(index, 1)
 			commit('setContexts', [...contexts])
 			return true

@@ -8,6 +8,7 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
+use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
 /** @template-extends QBMapper<ContextNodeRelation> */
@@ -16,6 +17,15 @@ class ContextNodeRelationMapper extends QBMapper {
 
 	public function __construct(IDBConnection $db) {
 		parent::__construct($db, $this->table, ContextNodeRelation::class);
+	}
+
+	public function deleteAllByContextId(int $contextId): void {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->delete($this->tableName)
+			->where($qb->expr()->eq('context_id', $qb->createNamedParameter($contextId, IQueryBuilder::PARAM_INT)));
+
+		$qb->executeStatement();
 	}
 
 	/**

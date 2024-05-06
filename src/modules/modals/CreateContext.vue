@@ -151,7 +151,7 @@ export default {
 			if (res) {
 				return res.id
 			} else {
-				showError(t('tables', 'Could not create new table'))
+				showError(t('tables', 'Could not create new application'))
 			}
 		},
 		reset() {
