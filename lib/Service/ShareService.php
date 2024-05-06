@@ -7,6 +7,7 @@ namespace OCA\Tables\Service;
 use DateTime;
 
 use InvalidArgumentException;
+use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextNavigation;
 use OCA\Tables\Db\ContextNavigationMapper;
 use OCA\Tables\Db\Share;
@@ -24,13 +25,17 @@ use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
+use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
+use OCP\IDBConnection;
 use Psr\Log\LoggerInterface;
 
 /**
  * @psalm-import-type TablesShare from ResponseDefinitions
  */
 class ShareService extends SuperService {
+	use TTransactional;
+
 	protected ShareMapper $mapper;
 
 	protected TableMapper $tableMapper;
@@ -41,6 +46,7 @@ class ShareService extends SuperService {
 
 	protected GroupHelper $groupHelper;
 	private ContextNavigationMapper $contextNavigationMapper;
+	private IDBConnection $dbc;
 
 	public function __construct(
 		PermissionsService $permissionsService,
@@ -52,6 +58,7 @@ class ShareService extends SuperService {
 		UserHelper $userHelper,
 		GroupHelper $groupHelper,
 		ContextNavigationMapper $contextNavigationMapper,
+		IDBConnection $dbc,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $shareMapper;
@@ -60,6 +67,7 @@ class ShareService extends SuperService {
 		$this->userHelper = $userHelper;
 		$this->groupHelper = $groupHelper;
 		$this->contextNavigationMapper = $contextNavigationMapper;
+		$this->dbc = $dbc;
 	}
 
 
@@ -415,6 +423,21 @@ class ShareService extends SuperService {
 			$this->mapper->deleteByNode($view->getId(), 'view');
 		} catch (Exception $e) {
 			$this->logger->error('something went wrong while deleting shares for view: '.$view->getId());
+		}
+	}
+
+	public function deleteAllForContext(Context $context): void {
+		try {
+			$this->atomic(function () use ($context) {
+				$shares = $this->mapper->findAllSharesForNode('context', $context->getId(), $this->userId);
+				foreach ($shares as $share) {
+					/** @var Share $share */
+					$this->contextNavigationMapper->deleteByShareId($share->getId());
+				}
+				$this->mapper->deleteByNode($context->getId(), 'context');
+			}, $this->dbc);
+		} catch (Exception $e) {
+			$this->logger->error('something went wrong while deleting shares for context: '.$context->getId());
 		}
 	}
 
