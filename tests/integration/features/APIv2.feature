@@ -206,3 +206,41 @@ Feature: APIv2
       | t1    | table | read,created,update |
     When user "participant1-v2" attempts to fetch Context "NON-EXISTENT"
     Then the reported status is "404"
+
+  @api2 @contexts
+  Scenario: Delete an owned context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,created,update |
+    When user "participant1-v2" deletes Context "c1"
+    Then the reported status is "200"
+    When user "participant1-v2" attempts to fetch Context "c1"
+    Then the reported status is "404"
+
+  @api2 @contexts
+  Scenario: Delete an inaccessible context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,created,update |
+    When user "participant2-v2" attempts to delete Context "c1"
+    Then the reported status is "404"
+    When user "participant2-v2" attempts to fetch Context "c1"
+    Then the reported status is "404"
+    When user "participant1-v2" fetches Context "c1"
+    Then the reported status is "200"
+
+  @api2 @contexts
+  Scenario: Delete an non-existing context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,created,update |
+    When user "participant1-v2" attempts to delete Context "NON-EXISTENT"
+    Then the reported status is "404"
+    When user "participant1-v2" attempts to fetch Context "NON-EXISTENT"
+    Then the reported status is "404"
