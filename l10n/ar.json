@@ -213,7 +213,6 @@
     "Create application" : "إنشاء تطبيق",
     "The title limit is reached with 200 characters. Please use a shorter title." : "تم الوصول إلى الحد القصي لعدد حلاوف العنوان وهو 200 حرف. الرجاء استخدام عنوان أقصر.",
     "Cannot create new application. Title is missing." : "يتعذّر إنشاء تطبيق جديد. العنوان مفقود.",
-    "Could not create new table" : "تعذر إنشاء جدول جديد",
     "Create row" : "إنشاء صف",
     "\"{columnTitle}\" should not be empty" : "\"{columnTitle}\" يجب ألّا تكون فارغةً",
     "Save row" : "حفظ الصف",
@@ -228,16 +227,17 @@
     "📄 Import table" : "إستيراد جدول",
     "Import table from file." : "إستيراد جدول من ملف",
     "Cannot create new table. Title is missing." : "لا يمكن إنشاء جدول جديد. العنوان مفقود.",
+    "Could not create new table" : "تعذر إنشاء جدول جديد",
     "Could not load templates." : "تعذر تحميل القوالب.",
     "Delete column" : "حذف عمود",
     "Are you sure you want to delete column \"{column}\"?" : "هل أنت متأكد أنك تريد حذف العمود \"{column}\"؟",
     "Error occurred while deleting column \"{column}\"." : "حدث خطأ أثناء حذف العمود  \"{column}\".",
+    "Cancel" : "إلغاء",
+    "Delete" : "إزالة",
     "Error occurred while deleting rows." : "حدث خطأٌ أثناء حذف السطور",
     "_Delete row_::_Delete rows_" : ["حذف الصفوف","حذف الصف","حذف الصفوف","حذف الصفوف","حذف الصفوف","حذف الصفوف"],
     "_Are you sure you want to delete the selected row?_::_Are you sure you want to delete the %n selected rows?_" : ["هل أنت متأكد من أنك تريد حذف %n صفوف المختارة؟","هل أنت متأكد من أنك تريد حذف الصف المختار؟","هل أنت متأكد من أنك تريد حذف %nصفوف المختارة؟","هل أنت متأكد من أنك تريد حذف %nصفوف المختارة؟","هل أنت متأكد من أنك تريد حذف %n صفوف المختارة؟","هل أنت متأكد من أنك تريد حذف %n صفوف المختارة؟"],
     "Confirm table deletion" : "تأكيد حذف الجدول",
-    "Cancel" : "إلغاء",
-    "Delete" : "إزالة",
     "Do you really want to delete the table \"{table}\"? This will also delete all data, views and shares that are connected to this table." : "هل أنت متأكد أنك تريد حذف الجدول \"{table}\"؟ هذا سيؤدي لحذف كل البيانات data و المناظير views و المشاركات shares المتصلة بهذا الجدول.",
     "Table \"{emoji}{table}\" removed." : "تمّ حذف الجدول \"{emoji}{table}\".",
     "Confirm view deletion" : "أكّد رغبتك في حذف المنظور",
@@ -250,9 +250,9 @@
     "Select an icon for application" : "إختَر أيقونة للتطبيق",
     "Title of the application" : "اسم التطبيق",
     "Description of the application" : "وصف التطبيق",
+    "Transfer application" : "نقل التطبيق",
     "The title limit is reached with 200 characters." : "وصلت الحد الأقصى لطول الاسم هو 200 حرفٍ.",
     "Cannot update application. Title is missing." : "يتعذّر تحديث التطبيق. العنوان مفقود.",
-    "Updated context \"{contextTitle}\"." : "السياق المُحدَّث \"{contextTitle}\".",
     "Edit row" : "تعديل صف",
     "I really want to delete this row!" : "أنا حقا أريد حذف هذا الصف!",
     "Could not update row" : "تعذّر تحديث السطر",
@@ -297,7 +297,6 @@
     "Inserted rows" : "الصفوف المدرجة",
     "Value parsing errors" : "خطأ في تحليل القيمة",
     "Row creation errors" : "خطأ في إنشاء السطر",
-    "Transfer application" : "نقل التطبيق",
     "Transfer this application to another user" : "نقل هذا التطبيق إلى مستخدِم آخر",
     "Transfer" : "نقل",
     "Context \"{name}\" transferred to {user}" : "تمّ نقل السياق \"{name}\" إلى المستخدِم {user}",
