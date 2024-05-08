@@ -9,6 +9,7 @@ use OCA\Tables\Event\RowDeletedEvent;
 use OCA\Tables\Event\TableDeletedEvent;
 use OCA\Tables\Event\TableOwnershipTransferredEvent;
 use OCA\Tables\Event\ViewDeletedEvent;
+use OCA\Tables\Listener\AddMissingIndicesListener;
 use OCA\Tables\Listener\AnalyticsDatasourceListener;
 use OCA\Tables\Listener\BeforeTemplateRenderedListener;
 use OCA\Tables\Listener\LoadAdditionalListener;
@@ -32,6 +33,7 @@ use OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent;
 use OCP\AppFramework\IAppContainer;
 use OCP\Collaboration\Reference\RenderReferenceEvent;
 use OCP\Collaboration\Resources\LoadAdditionalScriptsEvent;
+use OCP\DB\Events\AddMissingIndicesEvent;
 use OCP\User\Events\BeforeUserDeletedEvent;
 
 class Application extends App implements IBootstrap {
@@ -76,6 +78,7 @@ class Application extends App implements IBootstrap {
 		$context->registerEventListener(ViewDeletedEvent::class, WhenViewDeletedAuditLogListener::class);
 		$context->registerEventListener(RowDeletedEvent::class, WhenRowDeletedAuditLogListener::class);
 		$context->registerEventListener(TableOwnershipTransferredEvent::class, WhenTableTransferredAuditLogListener::class);
+		$context->registerEventListener(AddMissingIndicesEvent::class, AddMissingIndicesListener::class);
 
 		$context->registerSearchProvider(SearchTablesProvider::class);
 
