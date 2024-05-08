@@ -10,6 +10,7 @@ return [
 			'verb' => 'OPTIONS', 'requirements' => ['path' => '.+']],
 
 		['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
+		['name' => 'page#context', 'url' => '/app/{contextId}', 'verb' => 'GET'],
 
 		['name' => 'tableTemplate#list', 'url' => '/table/templates', 'verb' => 'GET'],
 
