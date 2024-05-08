@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.7.2
+
+### Added
+
+* [enh(Contexts): set active navigation entry (tables#1069)](https://github.com/nextcloud/tables/pull/1069)
+* [enh: Delete Application and its shares (tables#1071)](https://github.com/nextcloud/tables/pull/1071)
+
+### Fixed
+
+* [fix: Properly set random icon on load (tables#1041)](https://github.com/nextcloud/tables/pull/1041)
+* [fix(App): unstuck navbar focus on internal entries (tables#1043)](https://github.com/nextcloud/tables/pull/1043)
+* [fix(occ): Fix occ tables:update by defining the `description` option and making `title` optional (tables#1047)](https://github.com/nextcloud/tables/pull/1047)
+* [fix(DB): update tables_row_sleeves' sequence after migration (tables#1070)](https://github.com/nextcloud/tables/pull/1070)
+
+### Other
+
+* [perf: Make cache usable for unfavorited entries (tables#1065)](https://github.com/nextcloud/tables/pull/1065)
+* [perf: Avoid extra queries to get the view ownership (tables#1066)](https://github.com/nextcloud/tables/pull/1066)
+* [ci(integration): tests against context deletion (tables#1073)](https://github.com/nextcloud/tables/pull/1073)
+* [Fix(deps): update dependency @nextcloud/router to ^3.0.1 (stable0.7) (tables#1022)](https://github.com/nextcloud/tables/pull/1022)
+
 ## 0.7.1
 
 ### Fixed
