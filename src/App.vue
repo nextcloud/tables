@@ -16,6 +16,7 @@ import Navigation from './modules/navigation/sections/Navigation.vue'
 import { mapState } from 'vuex'
 import Sidebar from './modules/sidebar/sections/Sidebar.vue'
 import { useResizeObserver } from '@vueuse/core'
+import { loadState } from '@nextcloud/initial-state'
 
 export default {
 	name: 'App',
@@ -57,6 +58,19 @@ export default {
 	},
 	methods: {
 		routing(currentRoute) {
+			try {
+				if (loadState('tables', 'contextId', undefined)) {
+					// prepare route, when Context is opened from navigation bar
+					const contextId = loadState('tables', 'contextId', undefined)
+					const originalUrl = window.location.href
+					this.$router.replace('/application/' + contextId).catch(() => {})
+					// reverts turning /apps/tables/app/28 into /apps/tables/app/28#/application/28
+					history.replaceState({}, undefined, originalUrl)
+				}
+			} catch (e) {
+				// contextId is not always set, it is fine.
+			}
+
 			if (currentRoute.name === 'tableRow' || currentRoute.name === 'viewRow') {
 				this.$store.commit('setActiveRowId', parseInt(currentRoute.params.rowId))
 			} else {
@@ -71,9 +85,10 @@ export default {
 				this.setPageTitle(this.$store.getters.activeView.title)
 				this.switchActiveMenuEntry(document.querySelector('header .header-left .app-menu li[data-app-id="tables"]'))
 			} else if (currentRoute.path.startsWith('/application/')) {
-				this.$store.commit('setActiveContextId', parseInt(currentRoute.params.contextId))
+				const contextId = parseInt(currentRoute.params.contextId)
+				this.$store.commit('setActiveContextId', contextId)
 				this.setPageTitle(this.$store.getters.activeContext.name)
-				this.switchActiveMenuEntry(document.querySelector('header .header-left .app-menu li[data-app-id="tables_application_' + currentRoute.params.contextId + '"]'))
+				this.switchActiveMenuEntry(document.querySelector('header .header-left .app-menu li[data-app-id="tables_application_' + contextId + '"]'))
 
 				// move the focus away from nav bar (import for app-internal switch)
 				const appContent = document.getElementById('app-content-vue')

@@ -74,8 +74,7 @@ class BeforeTemplateRenderedListener implements IEventListener {
 					$iconUrl = $this->urlGenerator->imagePath('core', 'places/default-app-icon.svg');
 				}
 
-				$contextUrl = $this->urlGenerator->linkToRoute('tables.page.index');
-				$contextUrl .= sprintf('#/application/%d', $context->getId());
+				$contextUrl = $this->urlGenerator->linkToRoute('tables.page.context', ['contextId' => $context->getId()]);
 
 				return [
 					'id' => Application::APP_ID . '_application_' . $context->getId(),
