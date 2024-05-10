@@ -1,5 +1,5 @@
 <template>
-	<NcAppNavigation>
+	<NcAppNavigation v-if="!isStandaloneContext">
 		<template #list>
 			<div class="filter-box">
 				<NcTextField :value.sync="filterString" :label="t('tables', 'Filter items')"
@@ -107,6 +107,7 @@ import { emit } from '@nextcloud/event-bus'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
 import Archive from 'vue-material-design-icons/Archive.vue'
 import { getCurrentUser } from '@nextcloud/auth'
+import { loadState } from '@nextcloud/initial-state'
 
 export default {
 	name: 'Navigation',
@@ -176,6 +177,15 @@ export default {
 		},
 		getAllContexts() {
 			return this.contexts.filter(context => context.name.toLowerCase().includes(this.filterString.toLowerCase()))
+		},
+		isStandaloneContext() {
+			try {
+				// this state is only set by the PageController.context route
+				loadState('tables', 'contextId', undefined)
+				return true
+			} catch (e) {
+				return false
+			}
 		},
 	},
 	methods: {
