@@ -120,6 +120,7 @@ OC.L10N.register(
     "Select from Files" : "Wybierz z Plików",
     "Upload from device" : "Wyślij z urządzenia",
     "Please select a file." : "Wybierz plik.",
+    "Could not import, not authorized. Are you logged in?" : "Nie można zaimportować, brak autoryzacji. Czy jesteś zalogowany?",
     "Result" : "Wynik",
     "Transfer" : "Przenieś",
     "Filter" : "Filtruj",
@@ -192,6 +193,7 @@ OC.L10N.register(
     "Insert" : "wstaw",
     "Unchecked" : "Niesprawdzony",
     "ID" : "ID",
+    "Request is not authorized. Are you logged in?" : "Żądanie nie jest autoryzowane. Czy jesteś zalogowany?",
     "Could not fetch tables" : "Nie udało się pobrać tabel"
 },
 "nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);");
