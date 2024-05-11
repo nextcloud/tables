@@ -60,6 +60,16 @@ use OCP\AppFramework\Db\Entity;
  * @method setSelectionDefault(?string $selectionDefault)
  * @method getDatetimeDefault(): string
  * @method setDatetimeDefault(?string $datetimeDefault)
+ * @method getUsergroupDefault(): string
+ * @method setUsergroupDefault(?string $usergroupDefaultArray)
+ * @method getUsergroupMultipleItems(): bool
+ * @method setUsergroupMultipleItems(?bool $usergroupMultipleItems)
+ * @method getUsergroupSelectUsers(): bool
+ * @method setUsergroupSelectUsers(?bool $usergroupSelectUsers)
+ * @method getUsergroupSelectGroups(): bool
+ * @method setUsergroupSelectGroups(?bool $usergroupSelectGroups)
+ * @method getShowUserStatus(): bool
+ * @method setShowUserStatus(?bool $showUserStatus)
  */
 class Column extends Entity implements JsonSerializable {
 	// Meta column types
@@ -73,6 +83,7 @@ class Column extends Entity implements JsonSerializable {
 	public const TYPE_TEXT = 'text';
 	public const TYPE_NUMBER = 'number';
 	public const TYPE_DATETIME = 'datetime';
+	public const TYPE_USERGROUP = 'usergroup';
 
 	protected ?string $title = null;
 	protected ?int $tableId = null;
@@ -108,6 +119,13 @@ class Column extends Entity implements JsonSerializable {
 	// type datetime
 	protected ?string $datetimeDefault = null;
 
+	// type usergroup
+	protected ?string $usergroupDefault = null;
+	protected ?bool $usergroupMultipleItems = null;
+	protected ?bool $usergroupSelectUsers = null;
+	protected ?bool $usergroupSelectGroups = null;
+	protected ?bool $showUserStatus = null;
+
 	public function __construct() {
 		$this->addType('id', 'integer');
 		$this->addType('tableId', 'integer');
@@ -121,6 +139,26 @@ class Column extends Entity implements JsonSerializable {
 
 		// type text
 		$this->addType('textMaxLength', 'integer');
+
+		// // type usergroup
+		$this->addType('usergroupMultipleItems', 'boolean');
+		$this->addType('usergroupSelectUsers', 'boolean');
+		$this->addType('usergroupSelectGroups', 'boolean');
+		$this->addType('showUserStatus', 'boolean');
+	}
+
+	public function getUsergroupDefaultArray():array {
+		$default = $this->getUsergroupDefault();
+		if ($default !== "" && $default !== null && $default !== 'null') {
+			return \json_decode($default, true);
+		} else {
+			return [];
+		}
+	}
+
+	public function setUsergroupDefaultArray(array $array):void {
+		$json = \json_encode($array);
+		$this->setUsergroup($json);
 	}
 
 	public function getSelectionOptionsArray():array {
@@ -175,6 +213,13 @@ class Column extends Entity implements JsonSerializable {
 
 			// type datetime
 			'datetimeDefault' => $this->datetimeDefault,
+
+			// type usergroup
+			'usergroupDefault' => $this->getUsergroupDefaultArray(),
+			'usergroupMultipleItems' => $this->usergroupMultipleItems,
+			'usergroupSelectUsers' => $this->usergroupSelectUsers,
+			'usergroupSelectGroups' => $this->usergroupSelectGroups,
+			'showUserStatus' => $this->showUserStatus,
 		];
 	}
 }

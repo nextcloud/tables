@@ -113,7 +113,6 @@ class TableTemplateService {
 	 */
 	private function makeWeight(Table $table):void {
 		$columns = [];
-
 		$params = [
 			'title' => $this->l->t('Date'),
 			'type' => 'datetime',
@@ -418,6 +417,7 @@ class TableTemplateService {
 
 		// let's add some example rows
 		$this->createRow($table, [
+			// TODO maybe change to usergroup type?
 			$columns['employee']->getId() => 'Alice',
 			$columns['from']->getId() => '2023-02-05',
 			$columns['to']->getId() => '2023-02-10',
@@ -425,6 +425,7 @@ class TableTemplateService {
 			$columns['dateRequest']->getId() => '2023-01-08',
 			$columns['approved']->getId() => 'true',
 			$columns['dateApprove']->getId() => '2023-02-02',
+			// TODO maybe change to usergroup type?
 			// TRANSLATORS This is an example for a name or role
 			$columns['approveBy']->getId() => $this->l->t('The Boss'),
 			// TRANSLATORS This is an example comment
@@ -852,6 +853,21 @@ class TableTemplateService {
 
 			// datetimeDefault
 			(isset($parameters['datetimeDefault'])) ? $parameters['datetimeDefault'] : '',
+
+			// usergroupDefault
+			(isset($parameters['usergroupDefault'])) ? $parameters['usergroupDefault'] : '',
+
+			// usergroupMultipleItems
+			(isset($parameters['usergroupMultipleItems'])) ? $parameters['usergroupMultipleItems'] : null,
+
+			// usergroupSelectUsers
+			(isset($parameters['usergroupSelectUsers'])) ? $parameters['usergroupSelectUsers'] : null,
+
+			// usergroupSelectGroups
+			(isset($parameters['usergroupSelectGroups'])) ? $parameters['usergroupSelectGroups'] : null,
+
+			// showUserStatus
+			(isset($parameters['showUserStatus'])) ? $parameters['showUserStatus'] : null,
 
 			// additional view ids
 			[]

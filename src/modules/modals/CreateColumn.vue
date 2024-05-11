@@ -66,6 +66,19 @@
 							</NcCheckboxRadioSwitch>
 						</div>
 					</div>
+					<!-- <div v-if="column.type === 'usergroup'" class="row no-padding-on-mobile space-L">
+						<div class="col-4 typeSelections space-B space-T space-L">
+							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="usergroup-user" name="usergroupTypeSelection" type="radio" data-cy="createColumnUserSwitch">
+								{{ t('tables', 'Users') }}
+							</NcCheckboxRadioSwitch>
+							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="usergroup-group" name="usergroupTypeSelection" type="radio" data-cy="createColumnGroupSwitch">
+								{{ t('tables', 'Groups') }}
+							</NcCheckboxRadioSwitch>
+							<NcCheckboxRadioSwitch :checked.sync="combinedType" value="usergroup" name="usergroupTypeSelection" type="radio" data-cy="createColumnUserAndGroupSwitch">
+								{{ t('tables', 'Users and groups') }}
+							</NcCheckboxRadioSwitch>
+						</div>
+					</div> -->
 					<div class="row no-padding-on-mobile space-L" :data-cy="getColumnForm">
 						<component :is="getColumnForm" :column="column" />
 					</div>
@@ -107,6 +120,7 @@ import '@nextcloud/dialogs/dist/index.css'
 import ColumnTypeSelection from '../main/partials/ColumnTypeSelection.vue'
 import TextRichForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextRichForm.vue'
 import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandler.js'
+import UsergroupForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/UsergroupForm.vue'
 
 export default {
 	name: 'CreateColumn',
@@ -128,6 +142,7 @@ export default {
 		NcCheckboxRadioSwitch,
 		SelectionForm,
 		SelectionMultiForm,
+		UsergroupForm,
 	},
 	props: {
 		showModal: {
@@ -164,6 +179,11 @@ export default {
 				selectionOptions: null,
 				selectionDefault: null,
 				datetimeDefault: '',
+				usergroupDefault: null,
+				usergroupMultipleItems: false,
+				usergroupSelectUsers: true,
+				usergroupSelectGroups: false,
+				showUserStatus: false,
 			},
 			textAppAvailable: !!window.OCA?.Text?.createEditor,
 			addNewAfterSave: false,
@@ -180,6 +200,7 @@ export default {
 				{ id: 'selection', label: t('tables', 'Selection') },
 
 				{ id: 'datetime', label: t('tables', 'Date and time') },
+				{ id: 'usergroup', label: t('tables', 'Users and groups') },
 			],
 		}
 	},
@@ -276,6 +297,12 @@ export default {
 					}
 				} else if (this.column.type === 'datetime') {
 					data.datetimeDefault = this.column.datetimeDefault ? this.column.subtype === 'date' ? 'today' : 'now' : ''
+				} else if (this.column.type === 'usergroup') {
+					data.usergroupDefault = JSON.stringify(this.column.usergroupDefault)
+					data.usergroupMultipleItems = this.column.usergroupMultipleItems
+					data.usergroupSelectUsers = this.column.usergroupSelectUsers
+					data.usergroupSelectGroups = this.column.usergroupSelectGroups
+					data.showUserStatus = this.column.showUserStatus
 				} else if (this.column.type === 'number') {
 					data.numberDefault = this.column.numberDefault
 					if (this.column.subtype === '') {
@@ -319,6 +346,11 @@ export default {
 				selectionOptions: null,
 				selectionDefault: null,
 				datetimeDefault: '',
+				usergroupDefault: null,
+				usergroupMultipleItems: false,
+				usergroupSelectUsers: true,
+				usergroupSelectGroups: false,
+				showUserStatus: false,
 			}
 			if (mainForm) {
 				this.column.title = ''

@@ -17,6 +17,7 @@ import DatetimeForm from '../../../shared/components/ncTable/partials/rowTypePar
 import DatetimeDateForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeTimeForm.vue'
 import TextRichForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextRichForm.vue'
+import UsergroupForm from '../../../shared/components/ncTable/partials/rowTypePartials/UsergroupForm.vue'
 import { AbstractColumn } from '../../../shared/components/ncTable/mixins/columnClass.js'
 
 export default {
@@ -35,6 +36,7 @@ export default {
 		DatetimeForm,
 		DatetimeDateForm,
 		DatetimeTimeForm,
+		UsergroupForm,
 	},
 	props: {
 		column: {

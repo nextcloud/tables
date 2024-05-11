@@ -40,18 +40,18 @@ export default {
 	methods: {
 		getShareTypes() {
 			const types = []
-			if (this.selectUsers) {
+			if (this.usergroupSelectUsers) {
 				types.push(this.SHARE_TYPES.SHARE_TYPE_USER)
 			}
-			if (this.selectGroups) {
+			if (this.usergroupSelectGroups) {
 				types.push(this.SHARE_TYPES.SHARE_TYPE_GROUP)
 			}
 			return types
 		},
 		getShareTypeString() {
-			if (this.selectUsers && !this.selectGroups) {
+			if (this.usergroupSelectUsers && !this.usergroupSelectGroups) {
 				return 'User'
-			} else if (!this.selectUsers && this.selectGroups) {
+			} else if (!this.usergroupSelectUsers && this.usergroupSelectGroups) {
 				return 'Group'
 			} else {
 				return 'User or group'

@@ -31,11 +31,11 @@ export default {
 			type: String,
 			default: '',
 		},
-		selectUsers: {
+		usergroupSelectUsers: {
 			type: Boolean,
 			default: true,
 		},
-		selectGroups: {
+		usergroupSelectGroups: {
 			type: Boolean,
 			default: false,
 		},
