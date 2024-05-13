@@ -38,6 +38,10 @@ class Version000700Date20230916000000 extends SimpleMigrationStep {
 			'name' => 'selection',
 			'db_type' => Types::TEXT,
 		],
+		[
+			'name' => 'usergroup',
+			'db_type' => Types::TEXT,
+		],
 	];
 
 	/**

@@ -90,7 +90,12 @@
                     "textMaxLength",
                     "selectionOptions",
                     "selectionDefault",
-                    "datetimeDefault"
+                    "datetimeDefault",
+                    "usergroupDefault",
+                    "usergroupMultipleItems",
+                    "usergroupSelectUsers",
+                    "usergroupSelectGroups",
+                    "showUserStatus"
                 ],
                 "properties": {
                     "id": {
@@ -172,6 +177,21 @@
                     },
                     "datetimeDefault": {
                         "type": "string"
+                    },
+                    "usergroupDefault": {
+                        "type": "string"
+                    },
+                    "usergroupMultipleItems": {
+                        "type": "boolean"
+                    },
+                    "usergroupSelectUsers": {
+                        "type": "boolean"
+                    },
+                    "usergroupSelectGroups": {
+                        "type": "boolean"
+                    },
+                    "showUserStatus": {
+                        "type": "boolean"
                     }
                 }
             },
@@ -2858,7 +2878,8 @@
                                             "text",
                                             "number",
                                             "datetime",
-                                            "select"
+                                            "select",
+                                            "usergroup"
                                         ],
                                         "description": "Column main type"
                                     },
@@ -2943,6 +2964,32 @@
                                         "nullable": true,
                                         "default": "",
                                         "description": "Default value, if column is datetime"
+                                    },
+                                    "usergroupDefault": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": "",
+                                        "description": "Default value, if column is usergroup"
+                                    },
+                                    "usergroupMultipleItems": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "description": "Can select multiple users or/and groups, if column is usergroup"
+                                    },
+                                    "usergroupSelectUsers": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "description": "Can select users, if column type is usergroup"
+                                    },
+                                    "usergroupSelectGroups": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "description": "Can select groups, if column type is usergroup"
+                                    },
+                                    "showUserStatus": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "description": "Whether to show the user's status, if column type is usergroup"
                                     },
                                     "selectedViewIds": {
                                         "type": "array",
@@ -3180,7 +3227,8 @@
                                             "text",
                                             "number",
                                             "datetime",
-                                            "select"
+                                            "select",
+                                            "usergroup"
                                         ],
                                         "description": "Column main type"
                                     },
@@ -3265,6 +3313,32 @@
                                         "nullable": true,
                                         "default": "",
                                         "description": "Default value, if column is datetime"
+                                    },
+                                    "usergroupDefault": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": "",
+                                        "description": "Default value, if column is usergroup (json array{id: string, icon: string, isUser: bool, displayName: string})"
+                                    },
+                                    "usergroupMultipleItems": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "description": "Can select multiple users or/and groups, if column is usergroup"
+                                    },
+                                    "usergroupSelectUsers": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "description": "Can select users, if column type is usergroup"
+                                    },
+                                    "usergroupSelectGroups": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "description": "Can select groups, if column type is usergroup"
+                                    },
+                                    "showUserStatus": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "description": "Whether to show the user's status, if column type is usergroup"
                                     },
                                     "selectedViewIds": {
                                         "type": "array",
@@ -3454,6 +3528,31 @@
                                         "type": "string",
                                         "nullable": true,
                                         "description": "Default value, if column is datetime"
+                                    },
+                                    "usergroupDefault": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Default value, if column is usergroup"
+                                    },
+                                    "usergroupMultipleItems": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "description": "Can select multiple users or/and groups, if column is usergroup"
+                                    },
+                                    "usergroupSelectUsers": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "description": "Can select users, if column type is usergroup"
+                                    },
+                                    "usergroupSelectGroups": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "description": "Can select groups, if column type is usergroup"
+                                    },
+                                    "showUserStatus": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "description": "Whether to show the user's status, if column type is usergroup"
                                     }
                                 }
                             }
@@ -7564,6 +7663,261 @@
                                             "stars"
                                         ],
                                         "description": "Subtype for the new column"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Description"
+                                    },
+                                    "selectedViewIds": {
+                                        "type": "array",
+                                        "nullable": true,
+                                        "default": [],
+                                        "description": "View IDs where this columns should be added",
+                                        "items": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        }
+                                    },
+                                    "mandatory": {
+                                        "type": "boolean",
+                                        "default": false,
+                                        "description": "Is mandatory"
+                                    },
+                                    "baseNodeType": {
+                                        "type": "string",
+                                        "default": "table",
+                                        "enum": [
+                                            "table",
+                                            "view"
+                                        ],
+                                        "description": "Context type of the column creation"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "OCS-APIRequest",
+                        "in": "header",
+                        "description": "Required to be true for the API request to pass",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Column created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "$ref": "#/components/schemas/Column"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No permission",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ocs/v2.php/apps/tables/api/2/columns/usergroup": {
+            "post": {
+                "operationId": "api_columns-create-usergroup-column",
+                "summary": "[api v2] Create new usergroup column",
+                "tags": [
+                    "api_columns"
+                ],
+                "security": [
+                    {
+                        "bearer_auth": []
+                    },
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "baseNodeId",
+                                    "title"
+                                ],
+                                "properties": {
+                                    "baseNodeId": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "description": "Context of the column creation"
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "description": "Title"
+                                    },
+                                    "usergroupDefault": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Json array{id: string, isUser: bool, displayName: string}, eg [{\"id\": \"admin\", \"isUser\": true, \"displayName\": \"admin\"}, {\"id\": \"user1\", \"isUser\": true, \"displayName\": \"user1\"}]"
+                                    },
+                                    "usergroupMultipleItems": {
+                                        "type": "boolean",
+                                        "description": "Whether you can select multiple users or/and groups"
+                                    },
+                                    "usergroupSelectUsers": {
+                                        "type": "boolean",
+                                        "description": "Whether you can select users"
+                                    },
+                                    "usergroupSelectGroups": {
+                                        "type": "boolean",
+                                        "description": "Whether you can select groups"
+                                    },
+                                    "showUserStatus": {
+                                        "type": "boolean",
+                                        "description": "Whether to show the user's status"
                                     },
                                     "description": {
                                         "type": "string",

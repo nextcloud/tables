@@ -140,6 +140,11 @@ class ApiColumnsController extends AOCSController {
 			null,
 			null,
 			null,
+			null,
+			null,
+			null,
+			null,
+			null,
 			$selectedViewIds
 		);
 		return new DataResponse($column->jsonSerialize());
@@ -186,6 +191,11 @@ class ApiColumnsController extends AOCSController {
 			$textDefault,
 			$textAllowedPattern,
 			$textMaxLength,
+			null,
+			null,
+			null,
+			null,
+			null,
 			null,
 			null,
 			null,
@@ -249,6 +259,11 @@ class ApiColumnsController extends AOCSController {
 			$selectionOptions,
 			$selectionDefault,
 			null,
+			null,
+			null,
+			null,
+			null,
+			null,
 			$selectedViewIds
 		);
 		return new DataResponse($column->jsonSerialize());
@@ -302,6 +317,70 @@ class ApiColumnsController extends AOCSController {
 			null,
 			null,
 			$datetimeDefault,
+			null,
+			null,
+			null,
+			null,
+			null,
+			$selectedViewIds
+		);
+		return new DataResponse($column->jsonSerialize());
+	}
+
+	/**
+	 * [api v2] Create new usergroup column
+	 *
+	 * @NoAdminRequired
+	 *
+	 * @param int $baseNodeId Context of the column creation
+	 * @param string $title Title
+	 * @param string|null $usergroupDefault Json array{id: string, isUser: bool, displayName: string}, eg [{"id": "admin", "isUser": true, "displayName": "admin"}, {"id": "user1", "isUser": true, "displayName": "user1"}]
+	 * @param boolean $usergroupMultipleItems Whether you can select multiple users or/and groups
+	 * @param boolean $usergroupSelectUsers Whether you can select users
+	 * @param boolean $usergroupSelectGroups Whether you can select groups
+	 * @param boolean $showUserStatus Whether to show the user's status
+	 * @param string|null $description Description
+	 * @param int[]|null $selectedViewIds View IDs where this columns should be added
+	 * @param boolean $mandatory Is mandatory
+	 * @param 'table'|'view' $baseNodeType Context type of the column creation
+	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 *
+	 * 200: Column created
+	 * 403: No permission
+	 * 404: Not found
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
+	public function createUsergroupColumn(int $baseNodeId, string $title, ?string $usergroupDefault, bool $usergroupMultipleItems = null, bool $usergroupSelectUsers = null, bool $usergroupSelectGroups = null, bool $showUserStatus = null, string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
+		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
+		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
+		$column = $this->service->create(
+			$this->userId,
+			$tableId,
+			$viewId,
+			'usergroup',
+			null,
+			$title,
+			$mandatory,
+			$description,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			$usergroupDefault,
+			$usergroupMultipleItems,
+			$usergroupSelectUsers,
+			$usergroupSelectGroups,
+			$showUserStatus,
 			$selectedViewIds
 		);
 		return new DataResponse($column->jsonSerialize());

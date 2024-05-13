@@ -81,6 +81,7 @@ class Capabilities implements ICapability {
 					'datetime',
 					'datetime-date',
 					'datetime-time',
+					'usergroup',
 				]
 			],
 		];

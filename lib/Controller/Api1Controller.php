@@ -745,7 +745,7 @@ class Api1Controller extends ApiController {
 	 * @param int|null $tableId Table ID
 	 * @param int|null $viewId View ID
 	 * @param string $title Title
-	 * @param 'text'|'number'|'datetime'|'select' $type Column main type
+	 * @param 'text'|'number'|'datetime'|'select'|'usergroup' $type Column main type
 	 * @param string|null $subtype Column sub type
 	 * @param bool $mandatory Is the column mandatory
 	 * @param string|null $description Description
@@ -761,6 +761,11 @@ class Api1Controller extends ApiController {
 	 * @param string|null $selectionOptions Options for a selection (json array{id: int, label: string})
 	 * @param string|null $selectionDefault Default option IDs for a selection (json int[])
 	 * @param string|null $datetimeDefault Default value, if column is datetime
+	 * @param string|null $usergroupDefault Default value, if column is usergroup (json array{id: string, icon: string, isUser: bool, displayName: string})
+	 * @param bool|null $usergroupMultipleItems Can select multiple users or/and groups, if column is usergroup
+	 * @param bool|null $usergroupSelectUsers Can select users, if column type is usergroup
+	 * @param bool|null $usergroupSelectGroups Can select groups, if column type is usergroup
+	 * @param bool|null $showUserStatus Whether to show the user's status, if column type is usergroup
 	 * @param int[]|null $selectedViewIds View IDs where this column should be added to be presented
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
@@ -792,6 +797,13 @@ class Api1Controller extends ApiController {
 		?string $selectionDefault = '',
 
 		?string $datetimeDefault = '',
+
+		?string $usergroupDefault = '',
+		?bool $usergroupMultipleItems,
+		?bool $usergroupSelectUsers,
+		?bool $usergroupSelectGroups,
+		?bool $showUserStatus,
+
 		?array $selectedViewIds = []
 	): DataResponse {
 		try {
@@ -820,6 +832,13 @@ class Api1Controller extends ApiController {
 				$selectionDefault,
 
 				$datetimeDefault,
+
+				$usergroupDefault,
+				$usergroupMultipleItems,
+				$usergroupSelectUsers,
+				$usergroupSelectGroups,
+				$showUserStatus,
+
 				$selectedViewIds
 			)->jsonSerialize());
 		} catch (PermissionError $e) {
@@ -861,6 +880,11 @@ class Api1Controller extends ApiController {
 	 * @param string|null $selectionOptions Options for a selection (json array{id: int, label: string})
 	 * @param string|null $selectionDefault Default option IDs for a selection (json int[])
 	 * @param string|null $datetimeDefault Default value, if column is datetime
+	 * @param string|null $usergroupDefault Default value, if column is usergroup
+	 * @param bool|null $usergroupMultipleItems Can select multiple users or/and groups, if column is usergroup
+	 * @param bool|null $usergroupSelectUsers Can select users, if column type is usergroup
+	 * @param bool|null $usergroupSelectGroups Can select groups, if column type is usergroup
+	 * @param bool|null $showUserStatus Whether to show the user's status, if column type is usergroup
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
@@ -887,7 +911,14 @@ class Api1Controller extends ApiController {
 		?string $selectionOptions,
 		?string $selectionDefault,
 
-		?string $datetimeDefault
+		?string $datetimeDefault,
+
+		?string $usergroupDefault,
+		?bool $usergroupMultipleItems,
+		?bool $usergroupSelectUsers,
+		?bool $usergroupSelectGroups,
+		?bool $showUserStatus,
+
 	): DataResponse {
 		try {
 			$item = $this->columnService->update(
@@ -913,7 +944,13 @@ class Api1Controller extends ApiController {
 
 				$selectionOptions,
 				$selectionDefault,
-				$datetimeDefault
+				$datetimeDefault,
+
+				$usergroupDefault,
+				$usergroupMultipleItems,
+				$usergroupSelectUsers,
+				$usergroupSelectGroups,
+				$showUserStatus,
 			);
 			return new DataResponse($item->jsonSerialize());
 		} catch (InternalError $e) {
@@ -1426,7 +1463,7 @@ class Api1Controller extends ApiController {
 	 *
 	 * @param int $tableId Table ID
 	 * @param string $title Title
-	 * @param 'text'|'number'|'datetime'|'select' $type Column main type
+	 * @param 'text'|'number'|'datetime'|'select'|'usergroup' $type Column main type
 	 * @param string|null $subtype Column sub type
 	 * @param bool $mandatory Is the column mandatory
 	 * @param string|null $description Description
@@ -1442,6 +1479,11 @@ class Api1Controller extends ApiController {
 	 * @param string|null $selectionOptions Options for a selection (json array{id: int, label: string})
 	 * @param string|null $selectionDefault Default option IDs for a selection (json int[])
 	 * @param string|null $datetimeDefault Default value, if column is datetime
+	 * @param string|null $usergroupDefault Default value, if column is usergroup
+	 * @param bool|null $usergroupMultipleItems Can select multiple users or/and groups, if column is usergroup
+	 * @param bool|null $usergroupSelectUsers Can select users, if column type is usergroup
+	 * @param bool|null $usergroupSelectGroups Can select groups, if column type is usergroup
+	 * @param bool|null $showUserStatus Whether to show the user's status, if column type is usergroup
 	 * @param int[]|null $selectedViewIds View IDs where this column should be added to be presented
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
@@ -1473,6 +1515,13 @@ class Api1Controller extends ApiController {
 		?string $selectionDefault = '',
 
 		?string $datetimeDefault = '',
+
+		?string $usergroupDefault = '',
+		?bool $usergroupMultipleItems,
+		?bool $usergroupSelectUsers,
+		?bool $usergroupSelectGroups,
+		?bool $showUserStatus,
+
 		?array $selectedViewIds = []
 	): DataResponse {
 		try {
@@ -1501,6 +1550,13 @@ class Api1Controller extends ApiController {
 				$selectionDefault,
 
 				$datetimeDefault,
+
+				$usergroupDefault,
+				$usergroupMultipleItems,
+				$usergroupSelectUsers,
+				$usergroupSelectGroups,
+				$showUserStatus,
+
 				$selectedViewIds
 			);
 			return new DataResponse($item->jsonSerialize());

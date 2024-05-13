@@ -8,6 +8,7 @@ class ColumnsHelper {
 		'text',
 		'number',
 		'datetime',
-		'selection'
+		'selection',
+		'usergroup'
 	];
 }
