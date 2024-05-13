@@ -9,6 +9,7 @@ use OCA\Tables\Db\ColumnTypes\NumberColumnQB;
 use OCA\Tables\Db\ColumnTypes\SelectionColumnQB;
 use OCA\Tables\Db\ColumnTypes\SuperColumnQB;
 use OCA\Tables\Db\ColumnTypes\TextColumnQB;
+use OCA\Tables\Db\ColumnTypes\UsergroupColumnQB;
 use OCA\Tables\Helper\UserHelper;
 use OCP\IDBConnection;
 use OCP\Server;
@@ -112,12 +113,13 @@ class LegacyRowMapperTest extends TestCase {
 		$selectionColumnQb = $this->createMock(SelectionColumnQB::class);
 		$numberColumnQb = $this->createMock(NumberColumnQB::class);
 		$datetimeColumnQb = $this->createMock(DatetimeColumnQB::class);
+		$usergroupColumnQb = $this->createMock(UsergroupColumnQB::class);
 		$superColumnQb = $this->createMock(SuperColumnQB::class);
 		$columnMapper = $this->createMock(ColumnMapper::class);
 		$row2Mapper = $this->createMock(Row2Mapper::class);
 		$logger = $this->createMock(LoggerInterface::class);
 		$userHelper = $this->createMock(UserHelper::class);
-		$legacyRowMapper = new LegacyRowMapper($dbConnection, $logger, $textColumnQb, $selectionColumnQb, $numberColumnQb, $datetimeColumnQb, $superColumnQb, $columnMapper, $userHelper, $row2Mapper);
+		$legacyRowMapper = new LegacyRowMapper($dbConnection, $logger, $textColumnQb, $selectionColumnQb, $numberColumnQb, $datetimeColumnQb, $usergroupColumnQb, $superColumnQb, $columnMapper, $userHelper, $row2Mapper);
 
 		$legacyRow = new LegacyRow();
 		$legacyRow->setId(5);
