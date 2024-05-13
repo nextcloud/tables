@@ -120,7 +120,7 @@ export default {
 	watch: {
 		title() {
 			if (this.title && this.title.length >= 200) {
-				showError(t('tables', 'The title limit is reached with 200 characters.'))
+				showError(t('tables', 'The title character limit is 200 characters. Please use a shorter title.'))
 				this.title = this.title.slice(0, 199)
 			}
 		},
