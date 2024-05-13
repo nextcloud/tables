@@ -14,6 +14,9 @@ class PageMapper extends QBMapper {
 		parent::__construct($db, $this->table, Page::class);
 	}
 
+	/**
+	 * @return int[]
+	 */
 	public function getPageIdsForContext(int $contextId): array {
 		$qb = $this->db->getQueryBuilder();
 
@@ -25,7 +28,7 @@ class PageMapper extends QBMapper {
 		$pageIds = [];
 		while ($row = $result->fetch()
 		) {
-			$pageIds[] = $row['id'];
+			$pageIds[] = (int)$row['id'];
 		}
 		return $pageIds;
 	}
