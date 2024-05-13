@@ -8,6 +8,7 @@ use OCA\Tables\Db\ColumnTypes\NumberColumnQB;
 use OCA\Tables\Db\ColumnTypes\SelectionColumnQB;
 use OCA\Tables\Db\ColumnTypes\SuperColumnQB;
 use OCA\Tables\Db\ColumnTypes\TextColumnQB;
+use OCA\Tables\Db\ColumnTypes\UsergroupColumnQB;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -29,6 +30,7 @@ class LegacyRowMapper extends QBMapper {
 	protected SelectionColumnQB $selectionColumnQB;
 	protected NumberColumnQB $numberColumnQB;
 	protected DatetimeColumnQB $datetimeColumnQB;
+	protected UsergroupColumnQB $usergroupColumnQB;
 	protected SuperColumnQB $genericColumnQB;
 	protected ColumnMapper $columnMapper;
 	protected LoggerInterface $logger;
@@ -44,6 +46,7 @@ class LegacyRowMapper extends QBMapper {
 		SelectionColumnQB $selectionColumnQB,
 		NumberColumnQB $numberColumnQB,
 		DatetimeColumnQB $datetimeColumnQB,
+		UsergroupColumnQB $usergroupColumnQB,
 		SuperColumnQB $columnQB,
 		ColumnMapper $columnMapper,
 		UserHelper $userHelper,
@@ -54,6 +57,7 @@ class LegacyRowMapper extends QBMapper {
 		$this->numberColumnQB = $numberColumnQB;
 		$this->selectionColumnQB = $selectionColumnQB;
 		$this->datetimeColumnQB = $datetimeColumnQB;
+		$this->usergroupColumnQB = $usergroupColumnQB;
 		$this->genericColumnQB = $columnQB;
 		$this->columnMapper = $columnMapper;
 		$this->userHelper = $userHelper;
@@ -74,6 +78,7 @@ class LegacyRowMapper extends QBMapper {
 		$this->numberColumnQB->setPlatform($this->platform);
 		$this->selectionColumnQB->setPlatform($this->platform);
 		$this->datetimeColumnQB->setPlatform($this->platform);
+		$this->usergroupColumnQB->setPlatform($this->platform);
 	}
 
 	/**

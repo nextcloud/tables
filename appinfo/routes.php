@@ -128,6 +128,7 @@ return [
 		['name' => 'ApiColumns#createTextColumn', 'url' => '/api/2/columns/text', 'verb' => 'POST'],
 		['name' => 'ApiColumns#createSelectionColumn', 'url' => '/api/2/columns/selection', 'verb' => 'POST'],
 		['name' => 'ApiColumns#createDatetimeColumn', 'url' => '/api/2/columns/datetime', 'verb' => 'POST'],
+		['name' => 'ApiColumns#createUsergroupColumn', 'url' => '/api/2/columns/usergroup', 'verb' => 'POST'],
 
 		['name' => 'ApiFavorite#create', 'url' => '/api/2/favorites/{nodeType}/{nodeId}', 'verb' => 'POST', 'requirements' => ['nodeType' => '(\d+)', 'nodeId' => '(\d+)']],
 		['name' => 'ApiFavorite#destroy', 'url' => '/api/2/favorites/{nodeType}/{nodeId}', 'verb' => 'DELETE', 'requirements' => ['nodeType' => '(\d+)', 'nodeId' => '(\d+)']],

@@ -189,6 +189,10 @@ export type paths = {
      */
     post: operations["api_columns-create-datetime-column"];
   };
+  "/ocs/v2.php/apps/tables/api/2/columns/usergroup": {
+    /** [api v2] Create new usergroup column */
+    post: operations["api_columns-create-usergroup-column"];
+  };
   "/ocs/v2.php/apps/tables/api/2/favorites/{nodeType}/{nodeId}": {
     /** [api v2] Add a node (table or view) to user favorites */
     post: operations["api_favorite-create"];
@@ -276,6 +280,11 @@ export type components = {
       selectionOptions: string;
       selectionDefault: string;
       datetimeDefault: string;
+      usergroupDefault: string;
+      usergroupMultipleItems: boolean;
+      usergroupSelectUsers: boolean;
+      usergroupSelectGroups: boolean;
+      showUserStatus: boolean;
     };
     Context: {
       /** Format: int64 */
@@ -1233,7 +1242,7 @@ export type operations = {
         /** @description Title */
         title: string;
         /** @description Column main type */
-        type: "text" | "number" | "datetime" | "select";
+        type: "text" | "number" | "datetime" | "select" | "usergroup";
         /** @description Column sub type */
         subtype?: string | null;
         /** @description Is the column mandatory */
@@ -1264,6 +1273,16 @@ export type operations = {
         selectionDefault?: string | null;
         /** @description Default value, if column is datetime */
         datetimeDefault?: string | null;
+        /** @description Default value, if column is usergroup */
+        usergroupDefault?: string | null;
+        /** @description Can select multiple users or/and groups, if column is usergroup */
+        usergroupMultipleItems?: 0 | 1 | null;
+        /** @description Can select users, if column type is usergroup */
+        usergroupSelectUsers?: 0 | 1 | null;
+        /** @description Can select groups, if column type is usergroup */
+        usergroupSelectGroups?: 0 | 1 | null;
+        /** @description Whether to show the user's status, if column type is usergroup */
+        showUserStatus?: 0 | 1 | null;
         /** @description View IDs where this column should be added to be presented */
         "selectedViewIds[]"?: number[] | null;
       };
@@ -1355,7 +1374,7 @@ export type operations = {
         /** @description Title */
         title: string;
         /** @description Column main type */
-        type: "text" | "number" | "datetime" | "select";
+        type: "text" | "number" | "datetime" | "select" | "usergroup";
         /** @description Column sub type */
         subtype?: string | null;
         /** @description Is the column mandatory */
@@ -1386,6 +1405,16 @@ export type operations = {
         selectionDefault?: string | null;
         /** @description Default value, if column is datetime */
         datetimeDefault?: string | null;
+        /** @description Default value, if column is usergroup (json array{id: string, icon: string, isUser: bool, displayName: string}) */
+        usergroupDefault?: string | null;
+        /** @description Can select multiple users or/and groups, if column is usergroup */
+        usergroupMultipleItems?: 0 | 1 | null;
+        /** @description Can select users, if column type is usergroup */
+        usergroupSelectUsers?: 0 | 1 | null;
+        /** @description Can select groups, if column type is usergroup */
+        usergroupSelectGroups?: 0 | 1 | null;
+        /** @description Whether to show the user's status, if column type is usergroup */
+        showUserStatus?: 0 | 1 | null;
         /** @description View IDs where this column should be added to be presented */
         "selectedViewIds[]"?: number[] | null;
       };
@@ -1498,6 +1527,16 @@ export type operations = {
         selectionDefault?: string | null;
         /** @description Default value, if column is datetime */
         datetimeDefault?: string | null;
+        /** @description Default value, if column is usergroup */
+        usergroupDefault?: string | null;
+        /** @description Can select multiple users or/and groups, if column is usergroup */
+        usergroupMultipleItems?: 0 | 1 | null;
+        /** @description Can select users, if column type is usergroup */
+        usergroupSelectUsers?: 0 | 1 | null;
+        /** @description Can select groups, if column type is usergroup */
+        usergroupSelectGroups?: 0 | 1 | null;
+        /** @description Whether to show the user's status, if column type is usergroup */
+        showUserStatus?: 0 | 1 | null;
       };
       path: {
         /** @description Column ID that will be updated */
@@ -2840,6 +2879,91 @@ export type operations = {
         datetimeDefault?: "today" | "now" | null;
         /** @description Subtype for the new column */
         subtype?: "progress" | "stars" | null;
+        /** @description Description */
+        description?: string | null;
+        /** @description View IDs where this columns should be added */
+        "selectedViewIds[]"?: number[] | null;
+        /** @description Is mandatory */
+        mandatory?: 0 | 1;
+        /** @description Context type of the column creation */
+        baseNodeType?: "table" | "view";
+      };
+      header: {
+        /** @description Required to be true for the API request to pass */
+        "OCS-APIRequest": boolean;
+      };
+    };
+    responses: {
+      /** @description Column created */
+      200: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: components["schemas"]["Column"];
+            };
+          };
+        };
+      };
+      /** @description No permission */
+      403: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+      500: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+          "text/plain": string;
+        };
+      };
+    };
+  };
+  /** [api v2] Create new usergroup column */
+  "api_columns-create-usergroup-column": {
+    parameters: {
+      query: {
+        /** @description Context of the column creation */
+        baseNodeId: number;
+        /** @description Title */
+        title: string;
+        /** @description Json array{id: string, isUser: bool, displayName: string}, eg [{"id": "admin", "isUser": true, "displayName": "admin"}, {"id": "user1", "isUser": true, "displayName": "user1"}] */
+        usergroupDefault?: string | null;
+        /** @description Whether you can select multiple users or/and groups */
+        usergroupMultipleItems?: 0 | 1;
+        /** @description Whether you can select users */
+        usergroupSelectUsers?: 0 | 1;
+        /** @description Whether you can select groups */
+        usergroupSelectGroups?: 0 | 1;
+        /** @description Whether to show the user's status */
+        showUserStatus?: 0 | 1;
         /** @description Description */
         description?: string | null;
         /** @description View IDs where this columns should be added */
