@@ -4,6 +4,7 @@ import { getCurrentUser } from '@nextcloud/auth'
 import debounce from 'debounce'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
+import { SHARE_TYPES } from '../constants.js'
 
 export default {
 	data() {
@@ -41,10 +42,10 @@ export default {
 		getShareTypes() {
 			const types = []
 			if (this.selectUsers) {
-				types.push(this.SHARE_TYPES.SHARE_TYPE_USER)
+				types.push(SHARE_TYPES.SHARE_TYPE_USER)
 			}
 			if (this.selectGroups) {
-				types.push(this.SHARE_TYPES.SHARE_TYPE_GROUP)
+				types.push(SHARE_TYPES.SHARE_TYPE_GROUP)
 			}
 			return types
 		},
@@ -80,7 +81,7 @@ export default {
 				const res = await axios.get(url)
 				const rawSuggestions = res.data.ocs.data.map(autocompleteResult => {
 					return {
-						user: autocompleteResult.id,
+						id: autocompleteResult.id,
 						displayName: autocompleteResult.label,
 						icon: autocompleteResult.icon,
 						isUser: autocompleteResult.source.startsWith('users'),
@@ -99,7 +100,7 @@ export default {
 		}, 300),
 
 		filterOutCurrentUser(list) {
-			return list.filter((item) => !(item.isUser && item.user === getCurrentUser().uid))
+			return list.filter((item) => !(item.isUser && item.id === getCurrentUser().uid))
 		},
 	},
 }

@@ -348,7 +348,7 @@ export default new Vuex.Store({
 			try {
 				for (const receiver of receivers) {
 					share.receiverType = receiver.isUser ? 'user' : 'group'
-					share.receiver = receiver.user
+					share.receiver = receiver.id
 					// Avoid duplicate shares by checking if share exists first
 					const existingShare = previousReceivers.find((p) => p.receiver === share.receiver && p.receiver_type === share.receiverType)
 					if (!existingShare) {
@@ -363,7 +363,7 @@ export default new Vuex.Store({
 				for (const previousReceiver of previousReceivers) {
 					const currentShare = receivers.find((r) => {
 						const receiverType = r.isUser ? 'user' : 'group'
-						return r.user === previousReceiver.receiver && receiverType === previousReceiver.receiver_type
+						return r.id === previousReceiver.receiver && receiverType === previousReceiver.receiver_type
 					})
 					if (!currentShare) {
 						await axios.delete(generateUrl('/apps/tables/share/' + previousReceiver.share_id))

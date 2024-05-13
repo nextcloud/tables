@@ -14,7 +14,6 @@
 <script>
 import { NcSelect } from '@nextcloud/vue'
 import formatting from '../../../shared/mixins/formatting.js'
-import ShareTypes from '../../mixins/shareTypesMixin.js'
 import '@nextcloud/dialogs/style.css'
 import searchUserGroup from '../../../shared/mixins/searchUserGroup.js'
 
@@ -24,7 +23,7 @@ export default {
 		NcSelect,
 	},
 
-	mixins: [ShareTypes, formatting, searchUserGroup],
+	mixins: [formatting, searchUserGroup],
 
 	props: {
 		newOwnerUserId: {
@@ -53,18 +52,14 @@ export default {
 				return this.newOwnerUserId
 			},
 			set(v) {
-				this.$emit('update:newOwnerUserId', v)
+				this.$emit('update:newOwnerUserId', v?.id)
 			},
 		},
 	},
 
 	methods: {
 		addTransfer(selectedItem) {
-			if (selectedItem) {
-				this.localValue = selectedItem.user
-			} else {
-				this.localValue = ''
-			}
+			this.localValue = selectedItem
 		},
 		filterOutUnwantedItems(list) {
 			return this.filterOutCurrentUser(list)

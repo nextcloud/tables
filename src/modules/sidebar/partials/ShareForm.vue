@@ -60,7 +60,7 @@ import debounce from 'debounce'
 import { NcSelect } from '@nextcloud/vue'
 import { mapState } from 'vuex'
 import formatting from '../../../shared/mixins/formatting.js'
-import ShareTypes from '../../../shared/mixins/shareTypesMixin.js'
+import { SHARE_TYPES } from '../../../shared/constants.js'
 
 export default {
 	name: 'ShareForm',
@@ -68,7 +68,7 @@ export default {
 		NcSelect,
 	},
 
-	mixins: [ShareTypes, formatting],
+	mixins: [formatting],
 
 	props: {
 		shares: {
@@ -160,8 +160,8 @@ export default {
 			this.loading = true
 
 			const shareType = [
-				this.SHARE_TYPES.SHARE_TYPE_USER,
-				this.SHARE_TYPES.SHARE_TYPE_GROUP,
+				SHARE_TYPES.SHARE_TYPE_USER,
+				SHARE_TYPES.SHARE_TYPE_GROUP,
 			]
 
 			const request = await axios.get(generateOcsUrl('apps/files_sharing/api/v1/sharees'), {
@@ -248,7 +248,7 @@ export default {
 
 				try {
 					// filter out current user
-					if (share.value.shareType === this.SHARE_TYPES.SHARE_TYPE_USER
+					if (share.value.shareType === SHARE_TYPES.SHARE_TYPE_USER
 							&& share.value.shareWith === getCurrentUser().uid) {
 						return arr
 					}
@@ -274,7 +274,7 @@ export default {
 				shareWith: result.value.shareWith,
 				shareType: result.value.shareType,
 				user: result.uuid || result.value.shareWith,
-				isNoUser: result.value.shareType !== this.SHARE_TYPES.SHARE_TYPE_USER,
+				isNoUser: result.value.shareType !== SHARE_TYPES.SHARE_TYPE_USER,
 				displayName: result.name || result.label,
 				icon: this.shareTypeToIcon(result.value.shareType),
 				// Vue unique binding to render within Multiselect's AvatarSelectOption
@@ -290,20 +290,20 @@ export default {
 		 */
 		shareTypeToIcon(type) {
 			switch (type) {
-			case this.SHARE_TYPES.SHARE_TYPE_GUEST:
+			case SHARE_TYPES.SHARE_TYPE_GUEST:
 				// default is a user, other icons are here to differenciate
 				// themselves from it, so let's not display the user icon
-				// case this.SHARE_TYPES.SHARE_TYPE_REMOTE:
-				// case this.SHARE_TYPES.SHARE_TYPE_USER:
+				// case SHARE_TYPES.SHARE_TYPE_REMOTE:
+				// case SHARE_TYPES.SHARE_TYPE_USER:
 				return 'icon-user'
-			case this.SHARE_TYPES.SHARE_TYPE_REMOTE_GROUP:
-			case this.SHARE_TYPES.SHARE_TYPE_GROUP:
+			case SHARE_TYPES.SHARE_TYPE_REMOTE_GROUP:
+			case SHARE_TYPES.SHARE_TYPE_GROUP:
 				return 'icon-group'
-			case this.SHARE_TYPES.SHARE_TYPE_EMAIL:
+			case SHARE_TYPES.SHARE_TYPE_EMAIL:
 				return 'icon-mail'
-			case this.SHARE_TYPES.SHARE_TYPE_CIRCLE:
+			case SHARE_TYPES.SHARE_TYPE_CIRCLE:
 				return 'icon-circle'
-			case this.SHARE_TYPES.SHARE_TYPE_ROOM:
+			case SHARE_TYPES.SHARE_TYPE_ROOM:
 				return 'icon-room'
 
 			default:

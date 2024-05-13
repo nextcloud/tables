@@ -186,7 +186,7 @@ export default {
 			sharing = sharing.filter((share) => getCurrentUser().uid !== share.receiver)
 			const receivers = sharing.map((share) => {
 				return {
-					user: share.receiver,
+					id: share.receiver,
 					displayName: share.receiver_display_name,
 					icon: share.receiver_type === 'user' ? 'icon-user' : 'icon-group',
 					isUser: share.receiver_type === 'user',
