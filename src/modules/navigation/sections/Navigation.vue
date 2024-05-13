@@ -103,7 +103,7 @@ import NavigationViewItem from '../partials/NavigationViewItem.vue'
 import NavigationTableItem from '../partials/NavigationTableItem.vue'
 import NavigationContextItem from '../partials/NavigationContextItem.vue'
 import { mapState } from 'vuex'
-import { emit } from '@nextcloud/event-bus'
+import { emit, subscribe } from '@nextcloud/event-bus'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
 import Archive from 'vue-material-design-icons/Archive.vue'
 import { getCurrentUser } from '@nextcloud/auth'
@@ -130,10 +130,11 @@ export default {
 		return {
 			loading: true,
 			filterString: '',
+			isNavBarVisible: true,
 		}
 	},
 	computed: {
-		...mapState(['tables', 'views', 'tablesLoading', 'contexts', 'contextsLoading']),
+		...mapState(['appNavCollapsed', 'tables', 'views', 'tablesLoading', 'contexts', 'contextsLoading']),
 		getAllNodes() {
 			return [...this.getFilteredTables, ...this.getOwnViews, ...this.getSharedViews]
 		},
@@ -188,6 +189,9 @@ export default {
 			}
 		},
 	},
+	created() {
+		subscribe('navigation-toggled', this.toggleNavigationByEventBus)
+	},
 	methods: {
 		createTable() {
 			emit('tables:table:create')
@@ -204,6 +208,9 @@ export default {
 		},
 		viewAlreadyListed(view) {
 			return this.getFilteredTables.map(t => t.id).includes(view.tableId)
+		},
+		toggleNavigationByEventBus({ open }) {
+			this.$store.commit('setAppNavCollapsed', open)
 		},
 	},
 }

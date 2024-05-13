@@ -27,6 +27,7 @@ export default new Vuex.Store({
 		activeRowId: null,
 		activeElementIsView: false,
 		activeContextId: null,
+		appNavCollapsed: false,
 	},
 
 	getters: {
@@ -70,6 +71,9 @@ export default new Vuex.Store({
 		},
 	},
 	mutations: {
+		setAppNavCollapsed(state, value) {
+			state.appNavCollapsed = !!(value)
+		},
 		setTablesLoading(state, value) {
 			state.tablesLoading = !!(value)
 		},
