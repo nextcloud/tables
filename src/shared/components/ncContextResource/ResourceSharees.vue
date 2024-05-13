@@ -22,7 +22,6 @@
 import { NcSelect } from '@nextcloud/vue'
 import formatting from '../../../shared/mixins/formatting.js'
 import searchUserGroup from '../../../shared/mixins/searchUserGroup.js'
-import ShareTypes from '../../mixins/shareTypesMixin.js'
 import '@nextcloud/dialogs/style.css'
 
 export default {
@@ -31,7 +30,7 @@ export default {
 		NcSelect,
 	},
 
-	mixins: [ShareTypes, formatting, searchUserGroup],
+	mixins: [formatting, searchUserGroup],
 
 	props: {
 		receivers: {
@@ -50,9 +49,8 @@ export default {
 
 	data() {
 		return {
-			value: '',
 			preExistingSharees: [...this.receivers],
-			localSharees: this.receivers.map(userObject => userObject.user),
+			localSharees: this.receivers.map(userObject => userObject.id),
 		}
 	},
 
@@ -62,7 +60,7 @@ export default {
 				return this.localSharees
 			},
 			set(v) {
-				this.localSharees = v.map(userObject => userObject.user)
+				this.localSharees = v.map(userObject => userObject.id)
 				this.$emit('update', v)
 			},
 		},
@@ -70,11 +68,7 @@ export default {
 
 	methods: {
 		addShare(selectedItem) {
-			if (selectedItem) {
-				this.localValue = selectedItem
-			} else {
-				this.localValue = []
-			}
+			this.localValue = selectedItem
 		},
 
 		filterOutUnwantedItems(list) {
@@ -83,7 +77,7 @@ export default {
 		},
 
 		filterOutSelectedUsers(list) {
-			return list.filter((item) => !(item.isUser && this.localSharees.includes(item.user)))
+			return list.filter((item) => !(item.isUser && this.localSharees.includes(item.id)))
 		},
 
 	},
