@@ -42,10 +42,10 @@ export default {
 		getShareTypes() {
 			const types = []
 			if (this.selectUsers) {
-				types.push(this.SHARE_TYPES.SHARE_TYPE_USER)
+				types.push(SHARE_TYPES.SHARE_TYPE_USER)
 			}
 			if (this.selectGroups) {
-				types.push(this.SHARE_TYPES.SHARE_TYPE_GROUP)
+				types.push(SHARE_TYPES.SHARE_TYPE_GROUP)
 			}
 			return types
 		},
