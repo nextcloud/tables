@@ -93,8 +93,18 @@ Feature: APIv2
       | sel single  | sel multi |
     Then print register
 
+  @api2usergroup
+  Scenario: Create usergroup columns
+    Given table "Table 5" with emoji "👋" exists for user "participant1-v2" as "t5" via v2
+    Then column from main type "usergroup" for node type "table" and node name "t5" exists with name "ug-c1" and following properties via v2
+      | title             | ug column                                                 |
+      | usergroupDefault  | [{"id": "admin", "displayName": "admin", "isUser": true}] |
+    Then node with node type "table" and node name "t5" has the following columns via v2
+      | ug column  |
+    Then print register
+
   @api2transfer
-  Scenario: Create selection columns
+  Scenario: Transfer table
     Given table "Table 4" with emoji "👋" exists for user "participant1-v2" as "t4" via v2
     Then table "t4" is owned by "participant1-v2"
     Then change owner for table "t4" from user "participant1-v2" to user "participant2-v2"
