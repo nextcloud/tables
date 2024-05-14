@@ -248,24 +248,26 @@ export default {
 				const res = await axios.post(generateUrl('/apps/tables/import/' + (this.isElementView ? 'view' : 'table') + '/' + this.element.id), { path: this.path, createMissingColumns: this.getCreateMissingColumns })
 				if (res.status === 200) {
 					this.result = res.data
-					this.loading = false
-				} else if (res.status === 401) {
-					console.debug('error while importing', res)
-					showError(t('tables', 'Could not import, not authorized. Are you logged in?'))
-				} else if (res.status === 403) {
-					console.debug('error while importing', res)
-					showError(t('tables', 'Could not import, missing needed permission.'))
-				} else if (res.status === 404) {
-					console.debug('error while importing', res)
-					showError(t('tables', 'Could not import, needed resources were not found.'))
 				} else {
-					showError(t('tables', 'Could not import data due to unknown errors.'))
 					console.debug('error while importing', res)
+					showError(t('tables', res.data?.message || 'Could not import data due to unknown errors.'))
 				}
 			} catch (e) {
-				console.error(e)
-				return false
+				if (e.response?.status === 401) {
+					console.debug('error while importing', e)
+					showError(t('tables', 'Could not import, not authorized. Are you logged in?'))
+				} else if (e.response?.status === 403) {
+					console.debug('error while importing', e)
+					showError(t('tables', 'Could not import, missing needed permission.'))
+				} else if (e.response?.status === 404) {
+					console.debug('error while importing', e)
+					showError(t('tables', 'Could not import, needed resources were not found.'))
+				} else {
+					console.debug('error while importing', e)
+					showError(t('tables', e.response.data?.message || 'Could not import data due to unknown errors.'))
+				}
 			}
+			this.loading = false
 		},
 		async uploadFile() {
 			this.loading = true
@@ -283,24 +285,26 @@ export default {
 
 				if (res.status === 200) {
 					this.result = res.data
-					this.loading = false
-				} else if (res.status === 401) {
-					console.debug('error while importing', res)
-					showError(t('tables', 'Could not import, not authorized. Are you logged in?'))
-				} else if (res.status === 403) {
-					console.debug('error while importing', res)
-					showError(t('tables', 'Could not import, missing needed permission.'))
-				} else if (res.status === 404) {
-					console.debug('error while importing', res)
-					showError(t('tables', 'Could not import, needed resources were not found.'))
 				} else {
-					showError(t('tables', 'Could not import data due to unknown errors.'))
 					console.debug('error while importing', res)
+					showError(t('tables', res.data?.message || 'Could not import data due to unknown errors.'))
 				}
 			} catch (e) {
-				console.error(e)
-				return false
+				if (e.response?.status === 401) {
+					console.debug('error while importing', e)
+					showError(t('tables', 'Could not import, not authorized. Are you logged in?'))
+				} else if (e.response?.status === 403) {
+					console.debug('error while importing', e)
+					showError(t('tables', 'Could not import, missing needed permission.'))
+				} else if (e.response?.status === 404) {
+					console.debug('error while importing', e)
+					showError(t('tables', 'Could not import, needed resources were not found.'))
+				} else {
+					console.debug('error while importing', e)
+					showError(t('tables', e.response?.data?.message || 'Could not import data due to unknown errors.'))
+				}
 			}
+			this.loading = false
 		},
 		actionCancel() {
 			this.reset()

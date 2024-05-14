@@ -17,6 +17,7 @@ use Psr\Log\LoggerInterface;
 class ImportController extends Controller {
 	public const MIME_TYPES = [
 		'text/csv',
+		'text/plain',
 		'application/vnd.ms-excel',
 		'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 		'application/xml',
