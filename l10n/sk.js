@@ -180,7 +180,6 @@ OC.L10N.register(
     "Could not create new column." : "Nepodarilo sa vytvoriť nový stĺpec.",
     "Title" : "Názov",
     "Resources" : "Zdroje",
-    "The title limit is reached with 200 characters. Please use a shorter title." : "Limit názvu je dosiahnutý s 200 znakmi. Použite kratší názov.",
     "Create row" : "Vytvoriť riadok",
     "Save row" : "Uložiť riadok",
     "Row successfully created." : "Riadok bol úspešne vytvorený.",

@@ -204,7 +204,6 @@ OC.L10N.register(
     "Could not create new column." : "Nedaří se vytvořit nový sloupec.",
     "Title" : "Nadpis",
     "Resources" : "Prostředky",
-    "The title limit is reached with 200 characters. Please use a shorter title." : "Překročeno omezení délky nadpisu (200 znaků). Použijte kratší.",
     "Create row" : "Vytvořit řádek",
     "\"{columnTitle}\" should not be empty" : "„{columnTitle}“ je třeba vyplnit",
     "Save row" : "Uložit řádek",

@@ -189,7 +189,6 @@ OC.L10N.register(
     "Could not create new column." : "Stolpca ni mogoče dodati.",
     "Title" : "Naslov",
     "Resources" : "Viri",
-    "The title limit is reached with 200 characters. Please use a shorter title." : "Dosežena je omejitev števila 200 znakov. Izbrati je treba krajše ime.",
     "Create row" : "Dodaj vrstico",
     "Save row" : "Shrani vrstico",
     "Row successfully created." : "Vrstica je uspešno dodana.",

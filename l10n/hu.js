@@ -198,7 +198,6 @@ OC.L10N.register(
     "Could not create new column." : "Nem sikerült az új oszlop létrehozása.",
     "Title" : "Cím",
     "Resources" : "Erőforrások",
-    "The title limit is reached with 200 characters. Please use a shorter title." : "A cím hosszának 200 karakteres korlátja elérve. Használjon rövidebb címet.",
     "Create row" : "Sor létrehozása",
     "Save row" : "Sor mentése",
     "Row successfully created." : "Sor sikeresen létrehozva.",

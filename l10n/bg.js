@@ -162,7 +162,6 @@ OC.L10N.register(
     "Could not create new column." : "Не можа да се създаде нова колона.",
     "Title" : "Заглавие",
     "Resources" : "Ресурси",
-    "The title limit is reached with 200 characters. Please use a shorter title." : "Достигнато е ограничението за заглавие от 200 знака. Моля, използвайте по-кратко заглавие.",
     "Create row" : "Създаване на ред",
     "Save row" : "Записване на ред",
     "Row successfully created." : "Редът е създаден успешно.",

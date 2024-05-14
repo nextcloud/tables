@@ -189,7 +189,6 @@ OC.L10N.register(
     "Could not create new column." : "새 행을 만들 수 없음",
     "Title" : "제목",
     "Resources" : "자원",
-    "The title limit is reached with 200 characters. Please use a shorter title." : "제목은 최대 200자까지 작성할 수 있습니다. 더 짧은 제목을 사용하십시오.",
     "Create row" : "행 만들기",
     "\"{columnTitle}\" should not be empty" : "\"{columnTitle}\"을(를) 비울 수 없습니다",
     "Save row" : "행 저장",

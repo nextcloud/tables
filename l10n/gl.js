@@ -202,7 +202,6 @@ OC.L10N.register(
     "Could not create new column." : "Non foi posíbel crear a nova columna.",
     "Title" : "Título",
     "Resources" : "Recursos",
-    "The title limit is reached with 200 characters. Please use a shorter title." : "O límite do título acadase con 200 caracteres. Use un título máis curto.",
     "Create row" : "Crear unha fila",
     "Save row" : "Gardar a fila",
     "Row successfully created." : "Creouse a fila correctamente.",

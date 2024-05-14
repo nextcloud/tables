@@ -161,7 +161,6 @@
     "Could not create new column." : "No se pudo crear la nueva columna.",
     "Title" : "Título",
     "Resources" : "Recursos",
-    "The title limit is reached with 200 characters. Please use a shorter title." : "Se alcanzó el límite de 200 caracteres para el título. Por favor, utiliza un título más corto.",
     "Create row" : "Crear fila",
     "Save row" : "Guardar fila",
     "Row successfully created." : "Fila creada correctamente.",

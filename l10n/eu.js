@@ -160,7 +160,6 @@ OC.L10N.register(
     "Could not create new column." : "Ezin izan da zutabe berria sortu.",
     "Title" : "Izenburua",
     "Resources" : "Baliabideak",
-    "The title limit is reached with 200 characters. Please use a shorter title." : "Izenburuaren muga 200 karakterekoa da. Erabili izenburu laburragoa.",
     "Create row" : "Sortu errenkada",
     "Save row" : "Gorde errenkada",
     "Row successfully created." : "Errenkada ondo sortu da.",

@@ -195,7 +195,6 @@ OC.L10N.register(
     "Could not create new column." : "Could not create new column.",
     "Title" : "عنوان",
     "Resources" : "منابع",
-    "The title limit is reached with 200 characters. Please use a shorter title." : "The title limit is reached with 200 characters. Please use a shorter title.",
     "Create row" : "Create row",
     "Save row" : "Save row",
     "Row successfully created." : "Row successfully created.",

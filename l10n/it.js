@@ -92,7 +92,6 @@ OC.L10N.register(
     "Sorry, something went wrong." : "Spiacenti, qualcosa non ha funzionato!",
     "Title" : "Titolo",
     "Resources" : "Risorse",
-    "The title limit is reached with 200 characters. Please use a shorter title." : "Il limite di 200 caratteri per il titolo è stato raggiunto. Inserisci un titolo più breve.",
     "Create row" : "Crea riga",
     "Could not create new row" : "Impossibile creare una nuova riga",
     "Create table" : "Crea tabella",

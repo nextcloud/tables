@@ -200,7 +200,6 @@
     "Could not create new column." : "Neue Spalte konnte nicht erstellt werden.",
     "Title" : "Titel",
     "Resources" : "Ressourcen",
-    "The title limit is reached with 200 characters. Please use a shorter title." : "Bei 200 Zeichen ist die Titelgrenze erreicht. Bitte verwende einen kürzeren Titel.",
     "Create row" : "Zeile erstellen",
     "Save row" : "Zeile speichern",
     "Row successfully created." : "Zeile erfolgreich erstellt.",

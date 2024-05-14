@@ -181,7 +181,6 @@ OC.L10N.register(
     "Save" : "保存",
     "Title" : "标题",
     "Resources" : "资源",
-    "The title limit is reached with 200 characters. Please use a shorter title." : "标题已达到 200 个字符的限制。 请使用较短的标题。",
     "Cannot create new application. Title is missing." : "无法创建新应用程序。 标题缺失。",
     "Row successfully created." : "行已成功创建。",
     "Select emoji" : "选择表情符号",
