@@ -246,7 +246,6 @@
     "Could not import, not authorized. Are you logged in?" : "Non foi posíbel importar, non está autorizado. Está Vde. autenticado?",
     "Could not import, missing needed permission." : "Non foi posíbel, falta o permiso necesario.",
     "Could not import, needed resources were not found." : "Non foi posíbel importar, non se atoparon os recursos necesarios.",
-    "Could not import data due to unknown errors." : "Non foi posíbel importar os datos por mor de erros descoñecidos.",
     "Select file for the import" : "Seleccionar o ficheiro para importar",
     "Result" : "Resultado",
     "Found columns" : "Columnas atopadas",

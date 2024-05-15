@@ -292,7 +292,6 @@ OC.L10N.register(
     "Could not import, not authorized. Are you logged in?" : "Не вдалося імпортувати, оскільки вас не авторизовано. Чи ви увійшли до системи?",
     "Could not import, missing needed permission." : "Не вдалося імпортувати, оскільки у вас відсутні відповідні дозвол.",
     "Could not import, needed resources were not found." : "Не вдалося імпортувати, оскільки потрібні ресурсу не знайдено.",
-    "Could not import data due to unknown errors." : "Не вдалося імпортувати через невідомі помилки.",
     "Select file for the import" : "Виберіть файл для імпорту",
     "Result" : "Результат",
     "Found columns" : "Знайдено стовпці",

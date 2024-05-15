@@ -237,7 +237,6 @@ OC.L10N.register(
     "Could not import, not authorized. Are you logged in?" : "인증되지 않은 가져오기를 진행할 수 없습니다. 로그인되어 있습니까?",
     "Could not import, missing needed permission." : "필요한 권한이 없어 가져오기를 진행할 수 없습니다.",
     "Could not import, needed resources were not found." : "필요한 자원을 찾을 수 없어 가져오기를 진행할 수 없습니다.",
-    "Could not import data due to unknown errors." : "알 수 없는 오류로 인해 가져오기를 진행할 수 없습니다.",
     "Select file for the import" : "가져올 파일 선택",
     "Result" : "결과",
     "Found columns" : "개의 열",

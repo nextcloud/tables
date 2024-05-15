@@ -288,7 +288,6 @@ OC.L10N.register(
     "Could not import, not authorized. Are you logged in?" : "Veriler içe aktarılamadı. Yetkiniz yok. Oturum açtınız mı?",
     "Could not import, missing needed permission." : "Veriler içe aktarılamadı. Gerekli izinler eksik.",
     "Could not import, needed resources were not found." : "Veriler içe aktarılamadı. Gerekli kaynaklar bulunamadı.",
-    "Could not import data due to unknown errors." : "Veriler bilinmeyen sorunlar nedeniyle içe aktarılamadı.",
     "Select file for the import" : "İçe aktarılacak dosyayı seçin",
     "Result" : "Sonuç",
     "Found columns" : "Bulunan sütunlar",

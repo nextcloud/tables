@@ -253,7 +253,6 @@ OC.L10N.register(
     "Could not import, not authorized. Are you logged in?" : "Nedaří se naimportovat – chybí pověření. Jste přihlášení?",
     "Could not import, missing needed permission." : "Nedaří se naimportovat – chybí potřebná oprávnění.",
     "Could not import, needed resources were not found." : "Nedaří se naimportovat – potřebné prostředky nebyly nalezeny.",
-    "Could not import data due to unknown errors." : "Data se kvůli neznámým chybám nepodařilo naimportovat.",
     "Select file for the import" : "Vyberte soubor pro import",
     "Result" : "Výsledek",
     "Found columns" : "Nalezené sloupce",

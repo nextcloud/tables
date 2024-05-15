@@ -226,7 +226,6 @@ OC.L10N.register(
     "Could not import, not authorized. Are you logged in?" : "Import sa nepodaril, chýba autorizácia. Prihlásili ste sa?",
     "Could not import, missing needed permission." : "Import sa nepodaril, chýbajú potrebné oprávnenia.",
     "Could not import, needed resources were not found." : "Import sa nepodaril, potrebné zdroje neboli nájdené.",
-    "Could not import data due to unknown errors." : "Nepodarilo sa importovať údaje kvôli neznámym chybám.",
     "Select file for the import" : "Vyberte súbor pre import",
     "Result" : "Výsledok",
     "Found columns" : "Nájdené stĺpce",

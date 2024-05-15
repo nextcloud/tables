@@ -241,7 +241,6 @@ OC.L10N.register(
     "Could not import, not authorized. Are you logged in?" : "Could not import, not authorized. Are you logged in?",
     "Could not import, missing needed permission." : "Could not import, missing needed permission.",
     "Could not import, needed resources were not found." : "Could not import, needed resources were not found.",
-    "Could not import data due to unknown errors." : "Could not import data due to unknown errors.",
     "Select file for the import" : "Select file for the import",
     "Result" : "شروع به اسکنیک",
     "Found columns" : "Found columns",

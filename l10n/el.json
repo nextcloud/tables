@@ -247,7 +247,6 @@
     "Could not import, not authorized. Are you logged in?" : "Δεν ήταν δυνατή η εισαγωγή, δεν υπάρχει εξουσιοδότηση. Έχετε συνδεθεί;",
     "Could not import, missing needed permission." : "Δεν ήταν δυνατή η εισαγωγή, λείπει το απαραίτητο δικαίωμα.",
     "Could not import, needed resources were not found." : "Δεν ήταν δυνατή η εισαγωγή, δεν βρέθηκαν οι απαιτούμενοι πόροι.",
-    "Could not import data due to unknown errors." : "Δεν ήταν δυνατή η εισαγωγή δεδομένων λόγω άγνωστων σφαλμάτων.",
     "Select file for the import" : "Επιλογή αρχείου για την εισαγωγή",
     "Result" : "Αποτέλεσμα",
     "Found columns" : "Βρέθηκαν στήλες",

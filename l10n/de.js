@@ -249,7 +249,6 @@ OC.L10N.register(
     "Could not import, not authorized. Are you logged in?" : "Fehler beim Import, fehlende Autorisierung. Bist du angemeldet?",
     "Could not import, missing needed permission." : "Import nicht möglich, erforderliche Berechtigung fehlt.",
     "Could not import, needed resources were not found." : "Import nicht möglich, benötigte Ressourcen wurden nicht gefunden.",
-    "Could not import data due to unknown errors." : "Daten konnten aufgrund unbekannter Fehler nicht importiert werden.",
     "Select file for the import" : "Datei für Import auswählen",
     "Result" : "Ergebnis",
     "Found columns" : "Gefundene Spalten",

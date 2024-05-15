@@ -241,7 +241,6 @@
     "Could not import, not authorized. Are you logged in?" : "Nem sikerült importálni, nincs jogosultsága. Bejelentkezett?",
     "Could not import, missing needed permission." : "Nem sikerült importálni, hiányzik a szükséges engedély.",
     "Could not import, needed resources were not found." : "Nem sikerült importálni, nem találhatók a szükséges erőforrások.",
-    "Could not import data due to unknown errors." : "Az adatok importálása ismeretlen hibák miatt nem sikerült.",
     "Select file for the import" : "Válassza ki az importálandó fájlt",
     "Result" : "Eredmény",
     "Found columns" : "Megtalált oszlopok",
