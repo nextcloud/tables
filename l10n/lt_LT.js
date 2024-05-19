@@ -61,6 +61,8 @@ OC.L10N.register(
     "Type" : "Tipas",
     "Simple text" : "Paprastas tekstas",
     "Rich text" : "Raiškusis tekstas",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Yes/No" : "Taip/Ne",
     "Time" : "Laikas",
     "Add more" : "Pridėti daugiau",

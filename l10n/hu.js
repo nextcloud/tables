@@ -185,6 +185,8 @@ OC.L10N.register(
     "Text line" : "Szöveges sor",
     "Simple text" : "Egyszerű szöveg",
     "Rich text" : "Formázott szöveg",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Single selection" : "Egyszerű kiválasztás",
     "Multiple selection" : "Többszörös kiválasztás",
     "Yes/No" : "Igen/nem",

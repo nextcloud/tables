@@ -161,6 +161,8 @@ OC.L10N.register(
     "Text line" : "Γραμμή κειμένου",
     "Simple text" : "Απλό κείμενο",
     "Rich text" : "Εμπλουτισμένο κείμενο",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Single selection" : "Μοναδική επιλογή",
     "Multiple selection" : "Πολλαπλές επιλογές",
     "Yes/No" : "Ναι/Όχι",

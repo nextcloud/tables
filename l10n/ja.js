@@ -183,6 +183,8 @@ OC.L10N.register(
     "Type" : "タイプ",
     "Simple text" : "単純なテキスト",
     "Rich text" : "リッチテキスト",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Time" : "時間",
     "Save" : "保存",
     "Title" : "タイトル",

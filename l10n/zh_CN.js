@@ -176,6 +176,8 @@ OC.L10N.register(
     "Type" : "类型",
     "Simple text" : "简述文本",
     "Rich text" : "富文本",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Yes/No" : "是 / 否",
     "Time" : "时间",
     "Save" : "保存",

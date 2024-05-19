@@ -142,6 +142,8 @@ OC.L10N.register(
     "Text line" : "Línia de text",
     "Simple text" : "Text simple",
     "Rich text" : "Text enriquit",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Yes/No" : "Sí/No",
     "Time" : "Hora",
     "Save" : "Desar",

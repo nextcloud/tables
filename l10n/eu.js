@@ -147,6 +147,8 @@ OC.L10N.register(
     "Text line" : "Testu-lerroa",
     "Simple text" : "Testu sinplea",
     "Rich text" : "Testu aberastua",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Single selection" : "Hautapen bakarra",
     "Multiple selection" : "Hautapen anitza",
     "Yes/No" : "Bai/Ez",

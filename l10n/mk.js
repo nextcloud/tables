@@ -41,6 +41,8 @@ OC.L10N.register(
     "Import" : "Увези",
     "Type" : "Вид",
     "Rich text" : "Богат текст",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Time" : "Време",
     "Save" : "Зачувај",
     "Title" : "Наслов",

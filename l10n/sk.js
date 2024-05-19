@@ -169,6 +169,8 @@ OC.L10N.register(
     "Text line" : "Textový riadok",
     "Simple text" : "Jednoduchý text",
     "Rich text" : "Formátovaný text",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Yes/No" : "Áno/Nie",
     "Time" : "Čas",
     "Add more" : "Pridať viac",

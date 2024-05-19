@@ -42,6 +42,8 @@ OC.L10N.register(
     "Type" : "Tip",
     "Simple text" : "Text simplu",
     "Rich text" : "Text formatat",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Time" : "Timp",
     "Save" : "Salvează",
     "Title" : "Titlu",

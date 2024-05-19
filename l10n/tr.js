@@ -194,6 +194,8 @@ OC.L10N.register(
     "Text line" : "Metin satırı",
     "Simple text" : "Basit metin",
     "Rich text" : "Zengin metin",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Single selection" : "Tek seçim",
     "Multiple selection" : "Çoklu seçim",
     "Yes/No" : "Evet/hayır",

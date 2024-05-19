@@ -73,6 +73,8 @@ OC.L10N.register(
     "Type" : "Type",
     "Simple text" : "Verkorte tekst",
     "Rich text" : "Rijke tekst",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Yes/No" : "Ja/Nee",
     "Time" : "Tijd",
     "Save" : "Opslaan",

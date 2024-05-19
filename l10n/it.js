@@ -83,6 +83,8 @@ OC.L10N.register(
     "Text line" : "Linea di testo",
     "Simple text" : "Testo semplice",
     "Rich text" : "Testo formattato",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Yes/No" : "Sì/No",
     "Time" : "Ora",
     "Save" : "Salva",

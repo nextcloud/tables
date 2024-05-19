@@ -157,6 +157,8 @@ OC.L10N.register(
     "Text line" : "Textrad",
     "Simple text" : "Enkel text",
     "Rich text" : "Formaterad text",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Single selection" : "Enstaka val",
     "Multiple selection" : "Flerval",
     "Yes/No" : "Ja/Nej",

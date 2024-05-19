@@ -149,6 +149,8 @@ OC.L10N.register(
     "Text line" : "Tekstlinje",
     "Simple text" : "Simpel tekst",
     "Rich text" : "Formateret tekst",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Single selection" : "Enkelt valg",
     "Multiple selection" : "Flere valg",
     "Yes/No" : "Ja Nej",

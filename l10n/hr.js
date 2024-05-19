@@ -50,6 +50,8 @@ OC.L10N.register(
     "Type" : "Vrsta",
     "Simple text" : "Jednostavan tekst",
     "Rich text" : "Bogat tekst",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Time" : "Vrijeme",
     "Save" : "Spremi",
     "Title" : "Naslov",
