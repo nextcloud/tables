@@ -36,6 +36,12 @@
 							<NcCheckboxRadioSwitch v-if="textAppAvailable" :checked.sync="column.subtype" value="rich" name="textTypeSelection" type="radio">
 								{{ t('tables', 'Rich text') }}
 							</NcCheckboxRadioSwitch>
+							<NcCheckboxRadioSwitch :checked.sync="column.subtype" value="ipv4" name="textTypeSelection" type="radio">
+								{{ t('tables', 'IPv4 address') }}
+							</NcCheckboxRadioSwitch>
+							<NcCheckboxRadioSwitch :checked.sync="column.subtype" value="ipv6" name="textTypeSelection" type="radio">
+								{{ t('tables', 'IPv6 address') }}
+							</NcCheckboxRadioSwitch>
 						</div>
 					</div>
 
@@ -170,7 +176,7 @@ export default {
 			typeMissingError: false,
 			titleMissingError: false,
 			typeOptions: [
-				{ id: 'text', label: t('tables', 'Text') },
+				{ id: 'text', label: t('tables*.php', 'Text') },
 				{ id: 'text-link', label: t('tables', 'Link') },
 
 				{ id: 'number', label: t('tables', 'Number') },
