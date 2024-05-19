@@ -9,6 +9,7 @@ export const ColumnTypes = {
 	SelectionCheck: 'selection-check',
 	SelectionMulti: 'selection-multi',
 	TextIPv4Address: 'text-ip-v4-address',
+	TextIPv6Address: 'text-ip-v6-address',
 	TextLine: 'text-line',
 	TextLink: 'text-link',
 	TextLong: 'text-long',
