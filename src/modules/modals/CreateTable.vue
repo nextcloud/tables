@@ -83,6 +83,7 @@ import NcTile from '../../shared/components/ncTile/NcTile.vue'
 import displayError from '../../shared/utils/displayError.js'
 import TableDescription from '../../modules/main/sections/TableDescription.vue'
 import { emit } from '@nextcloud/event-bus'
+import { mapState } from 'vuex'
 
 export default {
 	name: 'CreateTable',
@@ -105,11 +106,13 @@ export default {
 			icon: '',
 			description: '',
 			errorTitle: false,
-			templates: null,
 			templateChoice: 'custom',
 			customIconChosen: false,
 			customTitleChosen: false,
 		}
+	},
+	computed: {
+		...mapState(['templates']),
 	},
 	watch: {
 		title() {
@@ -123,9 +126,6 @@ export default {
 			this.loadEmoji()
 			this.$nextTick(() => this.$refs.titleInput.focus())
 		},
-	},
-	beforeMount() {
-		this.loadTemplatesFromBE()
 	},
 	methods: {
 		titleChangedManually() {

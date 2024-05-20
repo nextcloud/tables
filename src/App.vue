@@ -53,6 +53,7 @@ export default {
 		await this.$store.dispatch('loadTablesFromBE')
 		await this.$store.dispatch('getAllContexts')
 		await this.$store.dispatch('loadViewsSharedWithMeFromBE')
+		await this.$store.dispatch('loadTemplatesFromBE')
 		this.routing(this.$router.currentRoute)
 		this.observeAppContent()
 	},
