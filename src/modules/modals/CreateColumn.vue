@@ -180,7 +180,7 @@ export default {
 			typeMissingError: false,
 			titleMissingError: false,
 			typeOptions: [
-				{ id: 'text', label: t('tables*.php', 'Text') },
+				{ id: 'text', label: t('tables', 'Text') },
 				{ id: 'text-link', label: t('tables', 'Link') },
 
 				{ id: 'number', label: t('tables', 'Number') },
