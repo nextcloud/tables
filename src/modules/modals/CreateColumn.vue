@@ -137,7 +137,7 @@ export default {
 		TextLongForm,
 		TextRichForm,
 		TextIPv4AddressForm,
-		TextIPv6AddressForm
+		TextIPv6AddressForm,
 	},
 	props: {
 		showModal: {
