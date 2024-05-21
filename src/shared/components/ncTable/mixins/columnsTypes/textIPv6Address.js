@@ -2,7 +2,7 @@ import { AbstractTextColumn } from '../columnClass.js'
 import { ColumnTypes } from '../columnHandler.js'
 import { FilterIds } from '../filter.js'
 
-export default class TextIPv6Address extends AbstractTextColumn {
+export default class TextIPv6AddressColumn extends AbstractTextColumn {
 
 	constructor(data) {
 		super(data)
