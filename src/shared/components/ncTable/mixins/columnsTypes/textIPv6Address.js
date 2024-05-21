@@ -19,6 +19,11 @@ export default class TextIPv6Address extends AbstractTextColumn {
 							.join('')
 	}
 
+	compareAlphaNumStr(referenceStr, compareStr) {
+		// This is a wrapper for https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare#numeric_sorting
+		return referenceStr.localeCompare(compareStr, undefined, { numeric: true })
+	}
+
 	sort(mode) {
 		const factor = mode === 'DESC' ? -1 : 1
 		return (rowA, rowB) => {
@@ -26,7 +31,7 @@ export default class TextIPv6Address extends AbstractTextColumn {
 			const valueB = rowB.data.find(item => item.columnId === this.id)?.value?.toLowerCase() || ''
 			const valueAForNaturalSort = this.toNaturalSortReadyString(valueA)
 			const valueBForNaturalSort = this.toNaturalSortReadyString(valueB)
-			return ((valueAForNaturalSort < valueBForNaturalSort) ? -1 : (valueAForNaturalSort > valueBForNaturalSort) ? 1 : 0) * factor
+			return this.compareAlphaNumStr(valueAForNaturalSort, valueBForNaturalSort) * factor
 		}
 	}
 
@@ -49,10 +54,10 @@ export default class TextIPv6Address extends AbstractTextColumn {
 			[FilterIds.BeginsWith]() { return cellValue.startsWith(filterValue) },
 			[FilterIds.EndsWith]() { return cellValue.endsWith(filterValue) },
 			[FilterIds.IsEqual]() { return cellValue === filterValue },
-			[FilterIds.IsGreaterThan]() { return parseInt(cellValueForNaturalSort) > parseInt(filterValueForNaturalSort) },
-			[FilterIds.IsGreaterThanOrEqual]() { return parseInt(cellValueForNaturalSort) >= parseInt(filterValueForNaturalSort) },
-			[FilterIds.IsLowerThan]() { return parseInt(cellValueForNaturalSort) < parseInt(filterValueForNaturalSort) },
-			[FilterIds.IsLowerThanOrEqual]() { return parseInt(cellValueForNaturalSort) <= parseInt(filterValueForNaturalSort) },
+			[FilterIds.IsGreaterThan]() { return this.compareAlphaNumStr(cellValueForNaturalSort, filterValueForNaturalSort) > 0 },
+			[FilterIds.IsGreaterThanOrEqual]() { return this.compareAlphaNumStr(cellValueForNaturalSort, filterValueForNaturalSort) >= 0 },
+			[FilterIds.IsLowerThan]() { return this.compareAlphaNumStr(cellValueForNaturalSort, filterValueForNaturalSort) < 0 },
+			[FilterIds.IsLowerThanOrEqual]() { return this.compareAlphaNumStr(cellValueForNaturalSort, filterValueForNaturalSort) <= 0 },
 			[FilterIds.IsEmpty]() { return !cellValue },
 		}[filter.operator.id]
 
