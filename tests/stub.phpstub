@@ -1,0 +1,100 @@
+<?php
+
+// reference for: use OCA\Analytics\Datasource\DatasourceEvent;
+namespace OCA\Analytics\Datasource {
+    class DatasourceEvent extends \OCP\EventDispatcher\Event {
+         abstract public function registerDatasource(string $datasource): void {}
+         abstract public function getDataSources(): array {}
+    }
+
+    interface IDatasource {
+        public function getName(): string;
+        public function getId(): int;
+        public function getTemplate(): array;
+        public function readData($option): array;
+    }
+}
+
+namespace OC\Collaboration\Reference {
+    class LinkReferenceProvider implements IReferenceProvider {
+        abstract public function matchReference(string $referenceText): bool {}
+        abstract public function getCachePrefix(string $referenceId): string {}
+        abstract public function getCacheKey(string $referenceId): ?string {}
+        abstract public function resolveReference(string $referenceText): ?IReference {}
+    }
+    interface IReferenceProvider {
+        public function matchReference(string $referenceText): bool;
+        public function resolveReference(string $referenceText): ?IReference;
+        public function getCachePrefix(string $referenceId): string;
+        public function getCacheKey(string $referenceId): ?string;
+    }
+    interface ReferenceManager {
+        public function extractReferences(string $text): array;
+        public function resolveReference(string $referenceId): ?IReference;
+        public function getReferenceByCacheKey(string $cacheKey): ?IReference;
+        public function getReferenceFromCache(string $referenceId): ?IReference;
+        public function invalidateCache(string $cachePrefix, ?string $cacheKey = null): void;
+        public function getDiscoverableProviders(): array;
+        public function touchProvider(string $userId, string $providerId, ?int $timestamp = null): bool;
+        public function getUserProviderTimestamps(): array;
+    }
+}
+
+namespace Doctrine\DBAL\Types {
+	class Type {
+		public static function getType($name): Type;
+	}
+}
+
+namespace OC\Hooks {
+	interface Emitter {
+		public function listen($scope, $method, callable $callback);
+		public function removeListener($scope = null, $method = null, callable $callback = null);
+	}
+}
+
+namespace OC\User {
+	class NoUserException extends \Exception {
+	}
+}
+
+
+namespace Symfony\Component\Console\Input {
+	class InputInterface {
+		public function getOption(string $key) {}
+		public function setOption(string $key, $value) {}
+		public function getArgument(string $key) {}
+	}
+	class InputArgument {
+		const REQUIRED = 0;
+		const OPTIONAL = 1;
+		const IS_ARRAY = 1;
+	}
+	class InputOption {
+		const VALUE_NONE = 1;
+		const VALUE_REQUIRED = 1;
+		const VALUE_OPTIONAL = 1;
+	}
+}
+
+namespace Symfony\Component\Console\Question {
+	class ConfirmationQuestion {
+		public function __construct(string $text, bool $default) {}
+	}
+}
+
+namespace Symfony\Component\Console\Output {
+	class OutputInterface {
+		public const VERBOSITY_VERBOSE = 1;
+		public function writeln($text, int $flat = 0) {}
+		public function isVerbose(): bool {}
+		public function isVeryVerbose(): bool {}
+	}
+}
+
+namespace Symfony\Component\Console\Command {
+    abstract class Command {
+        public function __construct();
+        public function setName(string $name);
+    }
+}

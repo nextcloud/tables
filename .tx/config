@@ -1,0 +1,10 @@
+[main]
+host     = https://www.transifex.com
+lang_map = sk_SK: sk, th_TH: th, ja_JP: ja, bg_BG: bg, cs_CZ: cs, fi_FI: fi, hu_HU: hu, nb_NO: nb
+
+[o:nextcloud:p:nextcloud:r:tables]
+file_filter = translationfiles/<lang>/tables.po
+source_file = translationfiles/templates/tables.pot
+source_lang = en
+type        = PO
+

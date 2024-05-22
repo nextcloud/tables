@@ -1,0 +1,255 @@
+/* ===== ROWS ================================ */
+.row {
+	width: 100%;
+}
+
+.row.first-row {
+	padding-top: calc(var(--default-grid-baseline) * 4);
+	padding-left: 60px;
+	/*width: calc(100% - 45px);*/
+	width: 100%;
+	padding-bottom: 20px;
+	align-items: center;
+	display: inline-flex;
+}
+
+.row::after {
+	content: '';
+	clear: both;
+	display: table;
+}
+
+/* ===== SHOW DETAILS ON HOVER =================== */
+.row:hover .hideIfNoHover {
+	visibility: visible;
+}
+
+.showIfHover:hover .hideIfNoHover {
+	visibility: visible;
+}
+
+.hideIfNoHover {
+	visibility: hidden;
+}
+
+/* ===== COLS ================================== */
+/* normal cols */
+.col-1 { width: calc(25% - 20px); }
+
+.col-2 { width: calc(50% - 20px); }
+
+.col-3 { width: calc(75% - 20px); }
+
+.col-4 { width: calc(100% - 20px); }
+
+.row [class^='col-'], .row [class^='fix-col-'] {
+	float: left;
+	position: relative;
+	/*
+    padding-right: 20px;
+    */
+	/*display: block;*/
+}
+
+.floatReverse [class*='col-'] {
+	float: right;
+}
+
+/* ===================== SPACES for rows OR columns =================00 */
+.row .space-L {
+	margin-left: 20px;
+}
+
+.row.space-L {
+	margin-left: 20px;
+	width: calc(100% - 20px);
+}
+
+.row .space-L-small {
+	margin-left: 8px;
+}
+
+.row.space-L-small {
+	margin-left: 8px;
+	width: calc(100% - 8px);
+}
+
+.row .space-R {
+	margin-right: 20px;
+}
+
+.row.space-R {
+	margin-right: 20px;
+	width: calc(100% - 20px);
+}
+
+.row .space-R-small {
+	margin-right: 8px;
+}
+
+.row.space-R-small {
+	margin-right: 8px;
+	width: calc(100% - 8px);
+}
+
+.row .space-LR {
+	margin-left: 20px;
+	margin-right: 20px;
+}
+
+.row.space-LR {
+	margin-left: 20px;
+	margin-right: 20px;
+	width: calc(100% - 40px);
+}
+
+.row .space-LR-small {
+	margin-left: 8px;
+	margin-right: 8px;
+}
+
+.row.space-LR-small {
+	margin-left: 8px;
+	margin-right: 8px;
+	width: calc(100% - 16px);
+}
+
+.row .space-T, .row.space-T {
+	padding-top: 20px;
+}
+
+.row .space-T-small, .row.space-T-small {
+	padding-top: 8px;
+}
+
+.row .space-B, .row.space-B {
+	padding-bottom: 20px;
+}
+
+.row .space-B-small, .row.space-B-small {
+	padding-bottom: 12px;
+}
+
+@media only screen and (max-width: 641px) {
+	.row .no-padding-on-mobile, .row.no-padding-on-mobile {
+		padding: 0 0 0 0;
+		margin: 0 0 0 0;
+		width: 100%;
+	}
+}
+
+/* put two or more elements (buttons) to the left and right */
+.col-stretch-elements {
+	justify-content: space-between;
+	padding-right: 0;
+	width: 100%;
+}
+
+/* cols with fix relative width */
+.fix-col-1 { width: 25%; }
+
+.fix-col-2 { width: 50%; }
+
+.fix-col-3 { width: 75%; }
+
+.fix-col-4 { width: 100%; }
+
+[class*='fix-col-'] {
+	float: left;
+	position: relative;
+	padding: 0;
+	display: flex;
+}
+
+.floatReverse [class*='fix-col-'] {
+	float: right;
+}
+
+/* ===== BOXES ========================== */
+/* boxes, fixed width */
+.box-1 { width: 150px; }
+
+.box-2 { width: 200px; }
+
+.box-3 { width: 250px; }
+
+.box-4 { width: 300px; }
+
+.box-1 h4, .box-2 h4, .box-3 h4, .box-4 h4 {
+	line-break: anywhere;
+}
+
+[class^='box-'] {
+	margin-right: 20px;
+	margin-bottom: 20px;
+	background-color: var(--color-background-darker);
+	padding: 15px;
+	float: left;
+	position: relative;
+}
+
+/* ===== RESIZE OR HIDE COMPONENTS ON SMALL SCREENS ============== */
+@media only screen and (max-width: 1025px) {
+	.hide-m {
+		display: none;
+	}
+}
+
+@media only screen and (max-width: 641px) {
+	.hide-s {
+		display: none;
+	}
+	.col-1 { width: calc(50% - 20px); }
+	.col-2 { width: calc(100% - 20px); }
+	.fix-col-1 { width: 50%; }
+	.fix-col-2 { width: 100%; }
+
+	.col-3 { width: calc(100% - 20px); }
+	.fix-col-3 { width: 100%; }
+
+	[class^='box-'] {
+		margin-bottom: 15px;
+		padding: 10px;
+	}
+}
+
+@media only screen and (max-width: 460px) {
+	.hide-xs {
+		display: none;
+	}
+	.col-1, .fix-col-1 { width: 100%; padding-left: 0; padding-right: 0; }
+	.col-3, .fix-col-3 { width: 100%; padding-left: 0; padding-right: 0; }
+}
+
+input, textarea {
+	width: 100%;
+}
+
+textarea {
+	min-height: 100px;
+}
+
+input.missing {
+	border: 1px solid var(--color-error);
+}
+
+.row .linebreak {
+	line-break: anywhere;
+}
+
+
+.block {
+	display: block;
+}
+
+.end {
+	justify-content: end;
+}
+
+.justify-between {
+	justify-content: space-between;
+}
+
+.inline {
+	display: inline-flex;
+}

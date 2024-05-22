@@ -1,0 +1,126 @@
+<template>
+	<div>
+		<NcAppSidebar v-show="showSidebar"
+			:active="activeSidebarTab"
+			:name="elementTitle"
+			@update:active="tab => activeSidebarTab = tab"
+			@close="showSidebar = false">
+			<template #description>
+				<table v-if="activeElement">
+					<tr>
+						<td>{{ t('tables', 'Created at') }}</td>
+						<td>{{ activeElement.createdAt | niceDateTime }}</td>
+					</tr>
+					<tr>
+						<td>{{ t('tables', 'Ownership') }}</td>
+						<td><NcUserBubble :user="activeElement.ownership" :display-name="activeElement.ownerDisplayName" /></td>
+					</tr>
+					<tr>
+						<td v-if="isView">
+							{{ t('tables', 'View ID') }}
+						</td>
+						<td v-else>
+							{{ t('tables', 'Table ID') }}
+						</td>
+						<td>{{ activeElement.id }}</td>
+					</tr>
+				</table>
+			</template>
+			<NcAppSidebarTab
+				id="integration"
+				:order="1"
+				:name="t('tables', 'Integration')">
+				<SidebarIntegration />
+				<template #icon>
+					<Connection :size="20" />
+				</template>
+			</NcAppSidebarTab>
+			<NcAppSidebarTab v-if="activeElement && canShareElement(activeElement)"
+				id="sharing"
+				icon="icon-share"
+				:order="0"
+				:name="t('tables', 'Sharing')">
+				<SidebarSharing />
+			</NcAppSidebarTab>
+		</NcAppSidebar>
+	</div>
+</template>
+<script>
+import { subscribe, unsubscribe } from '@nextcloud/event-bus'
+import SidebarSharing from './SidebarSharing.vue'
+import SidebarIntegration from './SidebarIntegration.vue'
+import { NcAppSidebar, NcAppSidebarTab, NcUserBubble } from '@nextcloud/vue'
+import { mapGetters, mapState } from 'vuex'
+import Connection from 'vue-material-design-icons/Connection.vue'
+import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
+import Moment from '@nextcloud/moment'
+
+export default {
+	name: 'Sidebar',
+	components: {
+		NcUserBubble,
+		SidebarSharing,
+		SidebarIntegration,
+		NcAppSidebar,
+		NcAppSidebarTab,
+		Connection,
+	},
+
+	filters: {
+		niceDateTime(value) {
+			return Moment(value, 'YYYY-MM-DD HH:mm:ss').format('lll')
+		},
+	},
+
+	mixins: [permissionsMixin],
+
+	data() {
+		return {
+			showSidebar: false,
+			activeSidebarTab: '',
+		}
+	},
+	computed: {
+		...mapState(['tables']),
+		...mapGetters(['activeElement', 'isView']),
+		elementTitle() {
+			if (this.activeElement) {
+				return this.activeElement.emoji + ' ' + this.activeElement.title
+			} else {
+				return t('tables', 'No view in context')
+			}
+		},
+		elementSubtitle() {
+			if (this.activeElement) {
+				return t('tables', 'From {ownerName}', { ownerName: this.activeElement.ownership })
+				// TODO: Created By?
+			} else {
+				return ''
+			}
+		},
+	},
+	mounted() {
+		subscribe('tables:sidebar:sharing', data => this.handleToggleSidebar(data))
+		subscribe('tables:sidebar:integration', data => this.handleToggleSidebar(data))
+	},
+	beforeDestroy() {
+		unsubscribe('tables:sidebar:sharing', data => this.handleToggleSidebar(data))
+		unsubscribe('tables:sidebar:integration', data => this.handleToggleSidebar(data))
+	},
+	methods: {
+		handleToggleSidebar(data) {
+			this.showSidebar = data.open ? data.open : false
+			this.activeSidebarTab = data.tab ? data.tab : ''
+		},
+	},
+}
+</script>
+<style lang="scss" scoped>
+
+	table {
+		margin-bottom: calc(var(--default-grid-baseline) * 2);
+		width: 100%;
+		color: var(--color-text-maxcontrast);
+	}
+
+</style>

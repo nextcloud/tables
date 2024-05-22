@@ -1,0 +1,54 @@
+{
+	"name": "nextcloud/tables",
+	"description": "This app is for managing data in tables.",
+	"type": "project",
+	"license": "AGPL",
+	"authors": [
+		{
+			"name": "Florian Steffens",
+			"email": "florian@nextcloud.com"
+		}
+	],
+    "require-dev": {
+		"nextcloud/coding-standard": "^v1.0.0",
+		"nextcloud/ocp": "dev-master",
+		"staabm/annotate-pull-request-from-checkstyle": "^1.8",
+		"phpunit/phpunit": "^9",
+		"psalm/phar": "^5.18",
+		"bamarni/composer-bin-plugin": "^1.8"
+	},
+	"config": {
+		"optimize-autoloader": true,
+		"classmap-authoritative": true,
+		"platform": {
+			"php": "8.0"
+		},
+		"allow-plugins": {
+			"bamarni/composer-bin-plugin": true
+		}
+	},
+	"scripts": {
+		"test": [
+			"@test:unit"
+		],
+		"test:unit": "./vendor/bin/phpunit -c tests/unit/phpunit.xml",
+		"lint": "find . -name \\*.php -not -path './vendor/*' -not -path './build/*' -print0 | xargs -0 -n1 php -l",
+		"cs:check": "php-cs-fixer fix --dry-run --diff",
+		"cs:fix": "php-cs-fixer fix",
+		"psalm": "./vendor/bin/psalm.phar --show-info=false --no-cache",
+		"psalm:update-baseline": "./vendor/bin/psalm.phar --update-baseline",
+		"psalm:fix": "./vendor/bin/psalm.phar --no-cache --alter --issues=InvalidReturnType,InvalidNullableReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingParamType,InvalidFalsableReturnType",
+		"psalm:fix:dry": "./vendor/bin/psalm.phar --no-cache --alter --issues=InvalidReturnType,InvalidNullableReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingParamType,InvalidFalsableReturnType --dry-run",
+		"openapi": "generate-spec --verbose && (npm run typescript:generate || echo 'Please manually regenerate the typescript OpenAPI models')",
+		"post-install-cmd": [
+			"[ $COMPOSER_DEV_MODE -eq 0 ] || composer bin all install --ansi"
+		],
+		"post-update-cmd": [
+			"[ $COMPOSER_DEV_MODE -eq 0 ] || composer bin all update --ansi"
+		]
+	},
+	"require": {
+		"phpoffice/phpspreadsheet": "^1.28",
+		"ext-json": "*"
+	}
+}

@@ -1,0 +1,64 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": [
+		"config:base"
+	],
+	"timezone": "Europe/Berlin",
+	"schedule": [
+		"every weekend"
+	],
+	"reviewers": ["datenangebot", "enjeck"],
+	"labels": ["dependencies"],
+	"rangeStrategy": "bump",
+	"rebaseWhen": "conflicted",
+	"ignoreUnstable": false,
+	"baseBranches": [
+		"main",
+		"stable0.7"
+	],
+	"enabledManagers": [
+		"npm"
+	],
+	"ignoreDeps": [
+		"node",
+		"npm"
+	],
+	"packageRules": [
+		{
+			"matchUpdateTypes": ["major", "minor"],
+			"matchBaseBranches": ["stable0.7"],
+			"enabled": false
+		},
+		{
+			"groupName": "cypress",
+			"matchPackageNames": [
+				"cypress",
+				"@nextcloud/cypress",
+				"@cypress/"
+			]
+		},
+		{
+			"groupName": "tiptap",
+			"matchPackagePrefixes": [
+				"@tiptap/",
+				"prosemirror-"
+			]
+		},
+		{
+			"matchPackageNames": ["vue"],
+			"allowedVersions": "<3"
+		},
+		{
+			"matchPackageNames": ["vuex"],
+			"allowedVersions": "<4"
+		},
+		{
+			"matchPackageNames": ["vue-router"],
+			"allowedVersions": "<4"
+		},
+		{
+			"matchPackageNames": ["@vue/test-utils"],
+			"allowedVersions": "<2"
+		}
+	]
+}

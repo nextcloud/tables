@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+	<id>tables</id>
+	<name>Tables</name>
+	<summary>Manage data the way you need it.</summary>
+	<description><![CDATA[Manage data the way you need it.
+
+With this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.
+You can choose from the following column types:
+- Text line or rich text
+- Link to urls or other nextcloud resources
+- Numbers
+- Progress bar
+- Stars rating
+- Yes/No tick
+- Date and/or time
+- (Multi) selection
+
+Share your tables and views with users and groups within your cloud.
+
+Have a good time and manage whatever you want.
+
+]]></description>
+	<version>0.8.0-dev.0</version>
+	<licence>agpl</licence>
+	<author mail="florian.steffens@nextcloud.com">Florian Steffens</author>
+	<namespace>Tables</namespace>
+	<documentation>
+		<user>https://github.com/nextcloud/tables/wiki</user>
+		<admin>https://github.com/nextcloud/tables/wiki/Administration</admin>
+	</documentation>
+	<category>office</category>
+	<website>https://github.com/nextcloud/tables</website>
+	<bugs>https://github.com/nextcloud/tables/issues</bugs>
+	<screenshot small-thumbnail="https://raw.githubusercontent.com/nextcloud/tables/main/screenshots/sh-tables-1-small.png">https://raw.githubusercontent.com/nextcloud/tables/main/screenshots/sh-tables-1.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/nextcloud/tables/main/screenshots/sh-tables-2.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/nextcloud/tables/main/screenshots/sh-tables-3.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/nextcloud/tables/main/screenshots/sh-tables-4.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/nextcloud/tables/main/screenshots/sh-tables-5.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/nextcloud/tables/main/screenshots/sh-tables-6.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/nextcloud/tables/main/screenshots/sh-tables-7.png</screenshot>
+	<dependencies>
+		<database>pgsql</database>
+		<database>mysql</database>
+		<database>sqlite</database>
+		<nextcloud min-version="26" max-version="30"/>
+	</dependencies>
+	<repair-steps>
+		<post-migration>
+			<step>OCA\Tables\Migration\NewDbStructureRepairStep</step>
+			<step>OCA\Tables\Migration\DbRowSleeveSequence</step>
+		</post-migration>
+	</repair-steps>
+	<commands>
+		<command>OCA\Tables\Command\ListTables</command>
+		<command>OCA\Tables\Command\AddTable</command>
+		<command>OCA\Tables\Command\RemoveTable</command>
+		<command>OCA\Tables\Command\RenameTable</command>
+		<command>OCA\Tables\Command\ChangeOwnershipTable</command>
+		<command>OCA\Tables\Command\ListContexts</command>
+		<command>OCA\Tables\Command\ShowContext</command>
+		<command>OCA\Tables\Command\Clean</command>
+		<command>OCA\Tables\Command\CleanLegacy</command>
+		<command>OCA\Tables\Command\TransferLegacyRows</command>
+	</commands>
+	<navigations>
+		<navigation>
+			<name>Tables</name>
+			<route>tables.page.index</route>
+		</navigation>
+	</navigations>
+</info>
