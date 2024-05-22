@@ -8,8 +8,8 @@ import TextLineForm from '../../../shared/components/ncTable/partials/rowTypePar
 import TextLongForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextLongForm.vue'
 import TextLinkForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextLinkForm.vue'
 import TextRichForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextRichForm.vue'
-import TextIPv4AddressForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextIPv4AddressForm.vue'
-import TextIPv6AddressForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextIPv6AddressForm.vue'
+import TextIpv4AddressForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextIpv4AddressForm.vue'
+import TextIpv6AddressForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextIpv6AddressForm.vue'
 import NumberForm from '../../../shared/components/ncTable/partials/rowTypePartials/NumberForm.vue'
 import NumberStarsForm from '../../../shared/components/ncTable/partials/rowTypePartials/NumberStarsForm.vue'
 import NumberProgressForm from '../../../shared/components/ncTable/partials/rowTypePartials/NumberProgressForm.vue'
@@ -31,8 +31,8 @@ export default {
 		TextLongForm,
 		TextLinkForm,
 		TextRichForm,
-		TextIPv4AddressForm,
-		TextIPv6AddressForm,
+		TextIpv4AddressForm,
+		TextIpv6AddressForm,
 		NumberForm,
 		NumberStarsForm,
 		NumberProgressForm,

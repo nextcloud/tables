@@ -36,10 +36,10 @@
 							<NcCheckboxRadioSwitch v-if="textAppAvailable" :checked.sync="column.subtype" value="rich" name="textTypeSelection" type="radio">
 								{{ t('tables', 'Rich text') }}
 							</NcCheckboxRadioSwitch>
-							<NcCheckboxRadioSwitch :checked.sync="column.subtype" value="ipv4address" name="textTypeSelection" type="radio">
+							<NcCheckboxRadioSwitch :checked.sync="column.subtype" value="ipv4_address" name="textTypeSelection" type="radio">
 								{{ t('tables', 'IPv4 address') }}
 							</NcCheckboxRadioSwitch>
-							<NcCheckboxRadioSwitch :checked.sync="column.subtype" value="ipv6address" name="textTypeSelection" type="radio">
+							<NcCheckboxRadioSwitch :checked.sync="column.subtype" value="ipv6_address" name="textTypeSelection" type="radio">
 								{{ t('tables', 'IPv6 address') }}
 							</NcCheckboxRadioSwitch>
 						</div>
@@ -113,8 +113,8 @@ import TextLineForm from '../../shared/components/ncTable/partials/columnTypePar
 import TextLinkForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextLinkForm.vue'
 import TextLongForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextLongForm.vue'
 import TextRichForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextRichForm.vue'
-import TextIPv4AddressForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextIPv4AddressForm.vue'
-import TextIPv6AddressForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextIPv6AddressForm.vue'
+import TextIpv4AddressForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextIpv4AddressForm.vue'
+import TextIpv6AddressForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextIpv6AddressForm.vue'
 
 export default {
 	name: 'CreateColumn',
@@ -136,8 +136,8 @@ export default {
 		TextLinkForm,
 		TextLongForm,
 		TextRichForm,
-		TextIPv4AddressForm,
-		TextIPv6AddressForm,
+		TextIpv4AddressForm,
+		TextIpv6AddressForm,
 	},
 	props: {
 		showModal: {

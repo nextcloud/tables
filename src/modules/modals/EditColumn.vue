@@ -66,8 +66,8 @@ import TextLineForm from '../../shared/components/ncTable/partials/columnTypePar
 import TextLinkForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextLinkForm.vue'
 import TextLongForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextLongForm.vue'
 import TextRichForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextRichForm.vue'
-import TextIPv4AddressForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextIPv4AddressForm.vue'
-import TextIPv6AddressForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextIPv6AddressForm.vue'
+import TextIpv4AddressForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextIpv4AddressForm.vue'
+import TextIpv6AddressForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextIpv6AddressForm.vue'
 
 export default {
 	name: 'EditColumn',
@@ -92,8 +92,8 @@ export default {
 		TextLinkForm,
 		TextLongForm,
 		TextRichForm,
-		TextIPv4AddressForm,
-		TextIPv6AddressForm,
+		TextIpv4AddressForm,
+		TextIpv6AddressForm,
 	},
 	filters: {
 		truncate(text, length, suffix) {
