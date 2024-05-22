@@ -33,6 +33,7 @@ OC.L10N.register(
     "Remove from favorites" : "Bain ó cheanáin",
     "Copy" : "Cóipeáil",
     "Searching …" : "Ag cuardach…",
+    "Sharing" : "Roinnt",
     "Read" : "Léigh",
     "Error" : "Earráid",
     "Download" : "Íoslódáil",
