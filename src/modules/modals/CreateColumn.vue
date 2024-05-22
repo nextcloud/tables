@@ -36,10 +36,10 @@
 							<NcCheckboxRadioSwitch v-if="textAppAvailable" :checked.sync="column.subtype" value="rich" name="textTypeSelection" type="radio">
 								{{ t('tables', 'Rich text') }}
 							</NcCheckboxRadioSwitch>
-							<NcCheckboxRadioSwitch :checked.sync="column.subtype" value="ipv4" name="textTypeSelection" type="radio">
+							<NcCheckboxRadioSwitch :checked.sync="column.subtype" value="ipv4address" name="textTypeSelection" type="radio">
 								{{ t('tables', 'IPv4 address') }}
 							</NcCheckboxRadioSwitch>
-							<NcCheckboxRadioSwitch :checked.sync="column.subtype" value="ipv6" name="textTypeSelection" type="radio">
+							<NcCheckboxRadioSwitch :checked.sync="column.subtype" value="ipv6address" name="textTypeSelection" type="radio">
 								{{ t('tables', 'IPv6 address') }}
 							</NcCheckboxRadioSwitch>
 						</div>
