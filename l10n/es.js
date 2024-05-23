@@ -213,6 +213,7 @@ OC.L10N.register(
     "Description of the new application" : "Descripción de la aplicación nueva",
     "Resources" : "Recursos",
     "Create application" : "Crear aplicación",
+    "The title character limit is 200 characters. Please use a shorter title." : "El límite de caracteres en el título es de 200 caracteres. Por favor, utilice un título más corto.",
     "Cannot create new application. Title is missing." : "No se puede crear la aplicación nueva. Falta el título.",
     "Could not create new application" : "No se pudo crear la aplicación nueva",
     "Create row" : "Crear fila",
