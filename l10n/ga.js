@@ -17,6 +17,7 @@ OC.L10N.register(
     "Description" : "Cur síos",
     "Comment" : "Trácht",
     "Progress" : "Dul chun cinn",
+    "Done" : "Déanta",
     "Create" : "Cruthaigh",
     "Today" : "Inniu",
     "Move" : "Bog",
@@ -43,6 +44,7 @@ OC.L10N.register(
     "Download" : "Íoslódáil",
     "Search" : "Cuardach",
     "Back" : "Ar ais",
+    "Sorting" : "Sórtáil",
     "Default" : "Réamhshocrú",
     "Confirm" : "Deimhnigh"
 },

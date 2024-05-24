@@ -15,6 +15,7 @@
     "Description" : "Cur síos",
     "Comment" : "Trácht",
     "Progress" : "Dul chun cinn",
+    "Done" : "Déanta",
     "Create" : "Cruthaigh",
     "Today" : "Inniu",
     "Move" : "Bog",
@@ -41,6 +42,7 @@
     "Download" : "Íoslódáil",
     "Search" : "Cuardach",
     "Back" : "Ar ais",
+    "Sorting" : "Sórtáil",
     "Default" : "Réamhshocrú",
     "Confirm" : "Deimhnigh"
 },"pluralForm" :"nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : 4);"
