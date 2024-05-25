@@ -35,7 +35,7 @@ OC.L10N.register(
     "Integration" : "Integrācija",
     "Total" : "Kopā",
     "Import" : "Importēt",
-    "Type" : "Tips",
+    "Type" : "Veids",
     "Time" : "Laiks",
     "Save" : "Saglabāt",
     "Title" : "Amats",
