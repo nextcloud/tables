@@ -43,7 +43,7 @@
     "@tiptap/starter-kit": "^2.4.0",
     "@tiptap/vue-2": "^2.4.0",
     "@vueuse/core": "^10.9.0",
-    "debounce": "^2.0.0",
+    "debounce": "^2.1.0",
     "vue": "^2.7.16",
     "vue-material-design-icons": "^5.3.0",
     "vue-papa-parse": "^3.1.0",
