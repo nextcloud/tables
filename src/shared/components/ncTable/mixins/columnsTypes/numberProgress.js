@@ -9,14 +9,14 @@ export default class NumberProgressColumn extends AbstractNumberColumn {
 		this.type = ColumnTypes.NumberProgress
 	}
 
-	sort(mode) {
+	sort(mode, nextSorts) {
 		const factor = mode === 'DESC' ? -1 : 1
 		return (rowA, rowB) => {
 			const tmpA = rowA.data.find(item => item.columnId === this.id)?.value || null
 			const valueA = parseInt(tmpA)
 			const tmpB = rowB.data.find(item => item.columnId === this.id)?.value || null
 			const valueB = parseInt(tmpB)
-			return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor
+			return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
 		}
 	}
 

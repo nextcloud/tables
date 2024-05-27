@@ -14,7 +14,7 @@ export default class DatetimeTimeColumn extends AbstractDatetimeColumn {
 		return Moment(value, 'HH:mm:ss').format('LT')
 	}
 
-	sort(mode) {
+	sort(mode, nextSorts) {
 		const factor = mode === 'DESC' ? -1 : 1
 		return (rowA, rowB) => {
 			const tmpA = rowA.data.find(item => item.columnId === this.id)?.value || ''
@@ -28,9 +28,9 @@ export default class DatetimeTimeColumn extends AbstractDatetimeColumn {
 				return 1 * factor
 			}
 			if (!tmpA && !tmpB) {
-				return 0
+				return super.getNextSortsResult(nextSorts, rowA, rowB)
 			}
-			return (valueA.diff(valueB)) * factor
+			return (valueA.diff(valueB)) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
 		}
 	}
 
