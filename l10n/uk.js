@@ -211,6 +211,7 @@ OC.L10N.register(
     "Description of the new application" : "Опис нового застосунку",
     "Resources" : "Ресурси",
     "Create application" : "Створити застосунок",
+    "The title character limit is 200 characters. Please use a shorter title." : "Назва не може містити понад 200 символів. Зробіть назву коротшою.",
     "Cannot create new application. Title is missing." : "Неможливо створити новий застосунок. Відсутній заголовок.",
     "Could not create new application" : "Не вдалося створити новий застосунок",
     "Create row" : "Додати рядок",
