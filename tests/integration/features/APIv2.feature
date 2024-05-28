@@ -335,3 +335,61 @@ Feature: APIv2
     And the fetched Context "c1" does not contain following data:
       | field | value                        |
       | node  | table:t2:read                |
+
+  @api2 @contexts @contexts-update
+  Scenario: Add an inaccessible table to an inaccessible context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant2-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,created,update |
+    When user "participant2-v2" updates the nodes of the Context "c1" to
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+      | t2    | table | read                |
+    Then the reported status is "404"
+    When user "participant1-v2" fetches Context "c1"
+    Then the fetched Context "c1" has following data:
+      | field | value                        |
+      | node  | table:t1:read,create,update  |
+    And the fetched Context "c1" does not contain following data:
+      | field | value                        |
+      | node  | table:t2:read                |
+
+  @api2 @contexts @contexts-update
+  Scenario: Remove a table from an owned context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+      | t2    | table | read                |
+    When user "participant1-v2" updates the nodes of the Context "c1" to
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+    Then the reported status is "200"
+    When user "participant1-v2" fetches Context "c1"
+    Then the fetched Context "c1" has following data:
+      | field | value                        |
+      | node  | table:t1:read,create,update  |
+    And the fetched Context "c1" does not contain following data:
+      | field | value                        |
+      | node  | table:t2:read                |
+
+  @api2 @contexts @contexts-update
+  Scenario: Remove a non-existing table from an inaccessible context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+      | t2    | table | read                |
+    When user "participant2-v2" updates the nodes of the Context "c1" to
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+    Then the reported status is "404"
+    When user "participant1-v2" fetches Context "c1"
+    Then the fetched Context "c1" has following data:
+      | field | value                        |
+      | node  | table:t1:read,create,update  |
+      | node  | table:t2:read                |

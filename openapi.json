@@ -8219,39 +8219,33 @@
                         }
                     },
                     {
-                        "name": "nodes",
+                        "name": "nodes[]",
                         "in": "query",
                         "description": "optional nodes to be connected to this context",
                         "schema": {
+                            "type": "array",
                             "default": [],
-                            "oneOf": [
-                                {
-                                    "type": "object",
-                                    "required": [
-                                        "id",
-                                        "type",
-                                        "permissions"
-                                    ],
-                                    "properties": {
-                                        "id": {
-                                            "type": "integer",
-                                            "format": "int64"
-                                        },
-                                        "type": {
-                                            "type": "integer",
-                                            "format": "int64"
-                                        },
-                                        "permissions": {
-                                            "type": "integer",
-                                            "format": "int64"
-                                        }
+                            "items": {
+                                "type": "object",
+                                "required": [
+                                    "id",
+                                    "type"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "type": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "permissions": {
+                                        "type": "integer",
+                                        "format": "int64"
                                     }
-                                },
-                                {
-                                    "type": "array",
-                                    "maxLength": 0
                                 }
-                            ]
+                            }
                         }
                     },
                     {
