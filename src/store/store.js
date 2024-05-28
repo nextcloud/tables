@@ -20,6 +20,7 @@ export default new Vuex.Store({
 		tablesLoading: false,
 		tables: [],
 		views: [],
+		templates: [],
 		contexts: [],
 		contextsLoading: false,
 		activeViewId: null,
@@ -105,6 +106,9 @@ export default new Vuex.Store({
 		setViews(state, views) {
 			state.views = views
 		},
+		setTemplates(state, templates) {
+			state.templates = templates
+		},
 		setContexts(state, contexts) {
 			state.contexts = contexts
 		},
@@ -180,6 +184,15 @@ export default new Vuex.Store({
 
 			commit('setTablesLoading', false)
 			return true
+		},
+		async loadTemplatesFromBE({ commit }) {
+			try {
+				const res = await axios.get(generateUrl('/apps/tables/table/templates'))
+				commit('setTemplates', res.data)
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load templates.'))
+				showError(t('tables', 'Could not fetch templates'))
+			}
 		},
 		async insertNewView({ commit, state }, { data }) {
 			let res = null
