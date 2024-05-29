@@ -164,7 +164,6 @@ export default {
 						const view = this.views.find(view => view.id === node.node_id)
 						await this.$store.dispatch('loadColumnsFromBE', {
 							view,
-							tableId: view.tableId,
 						})
 						await this.$store.dispatch('loadRowsFromBE', {
 							viewId: view.id,
