@@ -243,6 +243,7 @@ OC.L10N.register(
     "URL" : "URL",
     "Url" : "URL",
     "Close editor" : "エディタを閉じる",
+    "Confirmation" : "確認",
     "Confirm" : "承認",
     "Content" : "内容",
     "Preview" : "プレビュー",

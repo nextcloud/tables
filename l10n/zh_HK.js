@@ -520,6 +520,7 @@ OC.L10N.register(
     "Could not fetch tables" : "無法擷取數據庫表",
     "Could not load shared views." : "無法載入已分享的檢視。",
     "Could not load shared views" : "無法載入已分享的檢視",
+    "Could not fetch templates" : "無法擷取模板",
     "Could not insert view." : "無法插入檢視。",
     "Could not update view." : "無法更新檢視。",
     "Could not remove view." : "無法移除檢視。",

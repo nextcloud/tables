@@ -518,6 +518,7 @@
     "Could not fetch tables" : "無法擷取表格",
     "Could not load shared views." : "無法載入已分享的檢視。",
     "Could not load shared views" : "無法載入已分享的檢視",
+    "Could not fetch templates" : "無法擷取範本",
     "Could not insert view." : "無法插入檢視",
     "Could not update view." : "無法更新檢視。",
     "Could not remove view." : "無法移除檢視。",

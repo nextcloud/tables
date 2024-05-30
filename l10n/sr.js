@@ -520,6 +520,7 @@ OC.L10N.register(
     "Could not fetch tables" : "Табеле нису могле да се добаве",
     "Could not load shared views." : "Нису могли да се учитају дељени погледи.",
     "Could not load shared views" : "Нису могли да се учитају дељени погледи",
+    "Could not fetch templates" : "Није успело преузимање шаблона",
     "Could not insert view." : "Не може да се уметне поглед.",
     "Could not update view." : "Није могао да се ажурира поглед.",
     "Could not remove view." : "Не може да се уклони поглед.",

@@ -520,6 +520,7 @@ OC.L10N.register(
     "Could not fetch tables" : "Could not fetch tables",
     "Could not load shared views." : "Could not load shared views.",
     "Could not load shared views" : "Could not load shared views",
+    "Could not fetch templates" : "Could not fetch templates",
     "Could not insert view." : "Could not insert view.",
     "Could not update view." : "Could not update view.",
     "Could not remove view." : "Could not remove view.",

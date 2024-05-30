@@ -520,6 +520,7 @@ OC.L10N.register(
     "Could not fetch tables" : "تعذر استدعاء الجداول",
     "Could not load shared views." : "يتعذّر تحميل المناظير المشتركة",
     "Could not load shared views" : "يتعذّر تحميل المناظير المشتركة",
+    "Could not fetch templates" : "تعذّر جلب القوالب",
     "Could not insert view." : "تعذّر إدخال المنظور",
     "Could not update view." : "تعذّر تحديث المنظور",
     "Could not remove view." : "تعذّر حذف المنظور",

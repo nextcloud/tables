@@ -520,6 +520,7 @@ OC.L10N.register(
     "Could not fetch tables" : "No se ha podido obtener las tablas.",
     "Could not load shared views." : "No se pudieron cargar las vistas compartidas.",
     "Could not load shared views" : "No se pudieron cargar las vistas compartidas",
+    "Could not fetch templates" : "No se pudieron obtener las plantillas",
     "Could not insert view." : "No se pudo insertar la vista.",
     "Could not update view." : "No se pudo actualizar la vista.",
     "Could not remove view." : "No se pudo eliminar la vista.",

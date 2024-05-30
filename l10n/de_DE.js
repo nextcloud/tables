@@ -520,6 +520,7 @@ OC.L10N.register(
     "Could not fetch tables" : "Tabellen konnten nicht geladen werden",
     "Could not load shared views." : "Geteilte Ansichten konnten nicht geladen werden.",
     "Could not load shared views" : "Geteilte Ansichten konnten nicht geladen werden",
+    "Could not fetch templates" : "Vorlagen konnten nicht abgerufen werden",
     "Could not insert view." : "Ansicht konnte nicht eingefügt werden.",
     "Could not update view." : "Ansicht konnte nicht aktualisiert werden.",
     "Could not remove view." : "Ansicht konnte nicht entfernt werden.",
