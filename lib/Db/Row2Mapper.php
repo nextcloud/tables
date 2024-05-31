@@ -725,7 +725,7 @@ class Row2Mapper {
 		if ($columnType == 'usergroup') {
 			try {
 				// TODO Maybe these should be a transaction?
-				$cellMapper->deleteAllForRow($row->getId());
+				$cellMapper->deleteAllForRow($rowId);
 				$this->insertCell($rowId, $columnId, $value);
 			} catch (Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
