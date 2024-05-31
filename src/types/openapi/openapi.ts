@@ -1405,7 +1405,7 @@ export type operations = {
         selectionDefault?: string | null;
         /** @description Default value, if column is datetime */
         datetimeDefault?: string | null;
-        /** @description Default value, if column is usergroup (json array{id: string, icon: string, isUser: bool, displayName: string}) */
+        /** @description Default value, if column is usergroup (json array{id: string, type: int}) */
         usergroupDefault?: string | null;
         /** @description Can select multiple users or/and groups, if column is usergroup */
         usergroupMultipleItems?: 0 | 1 | null;
@@ -2954,7 +2954,7 @@ export type operations = {
         baseNodeId: number;
         /** @description Title */
         title: string;
-        /** @description Json array{id: string, isUser: bool, displayName: string}, eg [{"id": "admin", "isUser": true, "displayName": "admin"}, {"id": "user1", "isUser": true, "displayName": "user1"}] */
+        /** @description Json array{id: string, type: int}, eg [{"id": "admin", "type": 0}, {"id": "user1", "type": 0}] */
         usergroupDefault?: string | null;
         /** @description Whether you can select multiple users or/and groups */
         usergroupMultipleItems?: 0 | 1;

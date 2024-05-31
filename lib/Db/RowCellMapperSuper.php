@@ -86,6 +86,21 @@ class RowCellMapperSuper extends QBMapper {
 		return $this->findEntity($qb);
 	}
 
+	// 	/**
+	//  * @throws MultipleObjectsReturnedException
+	//  * @throws DoesNotExistException
+	//  * @throws Exception
+	//  */
+	// public function findMultByRowAndColumn(int $rowId, int $columnId): array{
+	// 	$qb = $this->db->getQueryBuilder();
+	// 	$qb->select('*')
+	// 		->from($this->tableName)
+	// 		->where($qb->expr()->eq('row_id', $qb->createNamedParameter($rowId, IQueryBuilder::PARAM_INT)))
+	// 		->andWhere($qb->expr()->eq('column_id', $qb->createNamedParameter($columnId, IQueryBuilder::PARAM_INT)));
+	// 	return $this->findEntities($qb);
+	// }
+
+
 	/**
 	 * @throws MultipleObjectsReturnedException
 	 * @throws DoesNotExistException

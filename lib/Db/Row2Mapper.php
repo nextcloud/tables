@@ -58,7 +58,7 @@ class Row2Mapper {
 				/** @var RowCellMapperSuper $cellMapper */
 				try {
 					$cellMapper = Server::get($cellMapperClassName);
-				} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+				} catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
 					$this->logger->error($e->getMessage(), ['exception' => $e]);
 					throw new Exception(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 				}
@@ -69,7 +69,7 @@ class Row2Mapper {
 		} catch (Throwable $e) {
 			$this->db->rollBack();
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new Exception(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new Exception(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		return $row;
@@ -91,11 +91,11 @@ class Row2Mapper {
 		} elseif (count($rows) === 0) {
 			$e = new Exception('Wanted row not found.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} else {
 			$e = new Exception('Too many results for one wanted row.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
 
@@ -105,9 +105,9 @@ class Row2Mapper {
 	public function findNextId(int $offsetId = -1): ?int {
 		try {
 			$rowSleeve = $this->rowSleeveMapper->findNext($offsetId);
-		} catch (MultipleObjectsReturnedException|Exception $e) {
+		} catch (MultipleObjectsReturnedException | Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (DoesNotExistException $e) {
 			return null;
 		}
@@ -139,7 +139,7 @@ class Row2Mapper {
 		$qb->select('id')
 			->from('tables_row_sleeves', 'sleeves')
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)));
-		if($filter) {
+		if ($filter) {
 			$this->addFilterToQuery($qb, $filter, $userId);
 		}
 		if ($limit !== null) {
@@ -195,7 +195,7 @@ class Row2Mapper {
 			$qbTmp = $this->db->getQueryBuilder();
 			$qbTmp->select('row_id', 'column_id', 'last_edit_at', 'last_edit_by')
 				->selectAlias($qb->expr()->castColumn('value', IQueryBuilder::PARAM_STR), 'value')
-				->from('tables_row_cells_'.$columnType)
+				->from('tables_row_cells_' . $columnType)
 				->where($qb->expr()->in('column_id', $qb->createNamedParameter($columnIds, IQueryBuilder::PARAM_INT_ARRAY, ':columnIds')))
 				->andWhere($qb->expr()->in('row_id', $qb->createNamedParameter($rowIds, IQueryBuilder::PARAM_INT_ARRAY, ':rowsIds')));
 
@@ -222,7 +222,7 @@ class Row2Mapper {
 			$sleeves = $this->rowSleeveMapper->findMultiple($rowIds);
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		return $this->parseEntities($result, $sleeves);
@@ -247,7 +247,7 @@ class Row2Mapper {
 	private function replacePlaceholderValues(array &$filters, string $userId): void {
 		foreach ($filters as &$filterGroup) {
 			foreach ($filterGroup as &$filter) {
-				if(substr($filter['value'], 0, 1) === '@') {
+				if (substr($filter['value'], 0, 1) === '@') {
 					$filter['value'] = $this->resolveSearchValue($filter['value'], $userId);
 				}
 			}
@@ -297,7 +297,7 @@ class Row2Mapper {
 			} else {
 				$e = new Exception("Needed column (" . $columnId . ") not found.");
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 			$filterExpressions[] = $sql;
 		}
@@ -341,20 +341,20 @@ class Row2Mapper {
 				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
 					$value = str_replace(['"', '\''], '', $value);
 					$filterExpression = $qb2->expr()->orX(
-						$qb->expr()->like('value', $qb->createNamedParameter('['.$this->db->escapeLikeParameter($value).']')),
-						$qb->expr()->like('value', $qb->createNamedParameter('['.$this->db->escapeLikeParameter($value).',%')),
-						$qb->expr()->like('value', $qb->createNamedParameter('%,'.$this->db->escapeLikeParameter($value).']%')),
-						$qb->expr()->like('value', $qb->createNamedParameter('%,'.$this->db->escapeLikeParameter($value).',%'))
+						$qb->expr()->like('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ']')),
+						$qb->expr()->like('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ',%')),
+						$qb->expr()->like('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($value) . ']%')),
+						$qb->expr()->like('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($value) . ',%'))
 					);
 					break;
 				}
-				$filterExpression = $qb->expr()->like('value', $qb->createNamedParameter('%'.$this->db->escapeLikeParameter($value).'%', $paramType));
+				$filterExpression = $qb->expr()->like('value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
 				break;
 			case 'is-equal':
 				$includeDefault = $defaultValue === $value;
 				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
 					$value = str_replace(['"', '\''], '', $value);
-					$filterExpression = $qb->expr()->eq('value', $qb->createNamedParameter('['.$this->db->escapeLikeParameter($value).']', $paramType));
+					$filterExpression = $qb->expr()->eq('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ']', $paramType));
 					break;
 				}
 				$filterExpression = $qb->expr()->eq('value', $qb->createNamedParameter($value, $paramType));
@@ -380,7 +380,7 @@ class Row2Mapper {
 				$filterExpression = $qb->expr()->isNull('value');
 				break;
 			default:
-				throw new InternalError('Operator '.$operator.' is not supported.');
+				throw new InternalError('Operator ' . $operator . ' is not supported.');
 		}
 
 		return $qb2->andWhere(
@@ -435,11 +435,11 @@ class Row2Mapper {
 	private function getSqlOperator(string $operator, IQueryBuilder $qb, string $columnName, $value, $paramType): string {
 		switch ($operator) {
 			case 'begins-with':
-				return $qb->expr()->like($columnName, $qb->createNamedParameter('%'.$this->db->escapeLikeParameter($value), $paramType));
+				return $qb->expr()->like($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value), $paramType));
 			case 'ends-with':
-				return $qb->expr()->like($columnName, $qb->createNamedParameter($this->db->escapeLikeParameter($value).'%', $paramType));
+				return $qb->expr()->like($columnName, $qb->createNamedParameter($this->db->escapeLikeParameter($value) . '%', $paramType));
 			case 'contains':
-				return $qb->expr()->like($columnName, $qb->createNamedParameter('%'.$this->db->escapeLikeParameter($value).'%', $paramType));
+				return $qb->expr()->like($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
 			case 'is-equal':
 				return $qb->expr()->eq($columnName, $qb->createNamedParameter($value, $paramType));
 			case 'is-greater-than':
@@ -453,7 +453,7 @@ class Row2Mapper {
 			case 'is-empty':
 				return $qb->expr()->isNull($columnName);
 			default:
-				throw new InternalError('Operator '.$operator.' is not supported.');
+				throw new InternalError('Operator ' . $operator . ' is not supported.');
 		}
 	}
 
@@ -540,7 +540,7 @@ class Row2Mapper {
 	public function insert(Row2 $row, array $columns): Row2 {
 		$this->setColumns($columns);
 
-		if($row->getId()) {
+		if ($row->getId()) {
 			// if row has an id from migration or import etc.
 			$rowSleeve = $this->createRowSleeveFromExistingData($row->getId(), $row->getTableId(), $row->getCreatedAt(), $row->getCreatedBy(), $row->getLastEditBy(), $row->getLastEditAt());
 		} else {
@@ -564,7 +564,7 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	public function update(Row2 $row, array $columns): Row2 {
-		if(!$columns) {
+		if (!$columns) {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': columns are missing');
 		}
 		$this->setColumns($columns);
@@ -579,9 +579,9 @@ class Row2Mapper {
 			$sleeve = $this->rowSleeveMapper->find($row->getId());
 			$this->updateMetaData($sleeve);
 			$this->rowSleeveMapper->update($sleeve);
-		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
+		} catch (DoesNotExistException | MultipleObjectsReturnedException | Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// write all changed cells to its db-table
@@ -648,32 +648,50 @@ class Row2Mapper {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 
-		$cellClassName = 'OCA\Tables\Db\RowCell'.ucfirst($this->columns[$columnId]->getType());
-		/** @var RowCellSuper $cell */
-		$cell = new $cellClassName();
-
-		$cell->setRowIdWrapper($rowId);
-		$cell->setColumnIdWrapper($columnId);
-		$this->updateMetaData($cell, false, $lastEditAt, $lastEditBy);
+		$cellClassName = 'OCA\Tables\Db\RowCell' . ucfirst($this->columns[$columnId]->getType());
 
 		// insert new cell
-		$cellMapperClassName = 'OCA\Tables\Db\RowCell'.ucfirst($this->columns[$columnId]->getType()).'Mapper';
+		$cellMapperClassName = 'OCA\Tables\Db\RowCell' . ucfirst($this->columns[$columnId]->getType()) . 'Mapper';
 		/** @var QBMapper $cellMapper */
 		try {
 			$cellMapper = Server::get($cellMapperClassName);
-		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+		} catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		$v = $this->formatValue($this->columns[$columnId], $value, 'in');
-		$cell->setValueWrapper($v);
 
-		try {
-			$cellMapper->insert($cell);
-		} catch (Exception $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		if ($this->columns[$columnId]->getType() == 'usergroup') {
+			foreach ($v as $val) {
+				/** @var RowCellSuper $cell */
+				$cell = new $cellClassName();
+				$cell->setRowIdWrapper($rowId);
+				$cell->setColumnIdWrapper($columnId);
+				$this->updateMetaData($cell, false, $lastEditAt, $lastEditBy);
+				$cell->setValueWrapper((string)$val['id']);
+				$cell->setValueTypeWrapper((int)$val['type']);
+				try {
+					$cellMapper->insert($cell);
+				} catch (Exception $e) {
+					$this->logger->error($e->getMessage(), ['exception' => $e]);
+					throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				}
+			}
+		} else {
+			/** @var RowCellSuper $cell */
+			$cell = new $cellClassName();
+			$cell->setRowIdWrapper($rowId);
+			$cell->setColumnIdWrapper($columnId);
+			$this->updateMetaData($cell, false, $lastEditAt, $lastEditBy);
+			$cell->setValueWrapper($v);
+
+			try {
+				$cellMapper->insert($cell);
+			} catch (Exception $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			}
 		}
 	}
 
@@ -695,7 +713,8 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	private function insertOrUpdateCell(int $rowId, int $columnId, $value): void {
-		$cellMapperClassName = 'OCA\Tables\Db\RowCell'.ucfirst($this->columns[$columnId]->getType()).'Mapper';
+		$columnType = $this->columns[$columnId]->getType();
+		$cellMapperClassName = 'OCA\Tables\Db\RowCell'.ucfirst($columnType).'Mapper';
 		/** @var RowCellMapperSuper $cellMapper */
 		try {
 			$cellMapper = Server::get($cellMapperClassName);
@@ -703,14 +722,25 @@ class Row2Mapper {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
-		try {
-			$cell = $cellMapper->findByRowAndColumn($rowId, $columnId);
-			$this->updateCell($cell, $cellMapper, $value, $this->columns[$columnId]);
-		} catch (DoesNotExistException $e) {
-			$this->insertCell($rowId, $columnId, $value);
-		} catch (MultipleObjectsReturnedException|Exception $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		if ($columnType == 'usergroup') {
+			try {
+				// TODO Maybe these should be a transaction?
+				$cellMapper->deleteAllForRow($row->getId());
+				$this->insertCell($rowId, $columnId, $value);
+			} catch (Exception $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			}
+		} else {
+			try {
+				$cell = $cellMapper->findByRowAndColumn($rowId, $columnId);
+				$this->updateCell($cell, $cellMapper, $value, $this->columns[$columnId]);
+			} catch (DoesNotExistException $e) {
+				$this->insertCell($rowId, $columnId, $value);
+			} catch (MultipleObjectsReturnedException|Exception $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			}
 		}
 	}
 
@@ -783,7 +813,7 @@ class Row2Mapper {
 			$cellMapper->deleteAllForColumn($column->getId());
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
 
@@ -845,8 +875,10 @@ class Row2Mapper {
 			case Column::TYPE_TEXT:
 				$defaultValue = $this->formatValue($column, $column->getTextDefault(), 'in');
 				break;
+			case Column::TYPE_USERGROUP:
+				$defaultValue = $this->formatValue($column, $column->getUsergroupDefault(), 'in');
+				break;
 		}
 		return $defaultValue;
 	}
-
 }
