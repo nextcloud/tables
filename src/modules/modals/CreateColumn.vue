@@ -107,6 +107,7 @@ import '@nextcloud/dialogs/dist/index.css'
 import ColumnTypeSelection from '../main/partials/ColumnTypeSelection.vue'
 import TextRichForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextRichForm.vue'
 import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandler.js'
+import UsergroupForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/UsergroupForm.vue'
 
 export default {
 	name: 'CreateColumn',
@@ -128,6 +129,7 @@ export default {
 		NcCheckboxRadioSwitch,
 		SelectionForm,
 		SelectionMultiForm,
+		UsergroupForm,
 	},
 	props: {
 		showModal: {
@@ -172,6 +174,11 @@ export default {
 				selectionOptions: null,
 				selectionDefault: null,
 				datetimeDefault: '',
+				usergroupDefault: null,
+				usergroupMultipleItems: false,
+				usergroupSelectUsers: true,
+				usergroupSelectGroups: false,
+				showUserStatus: false,
 			},
 			textAppAvailable: !!window.OCA?.Text?.createEditor,
 			addNewAfterSave: false,
@@ -188,6 +195,7 @@ export default {
 				{ id: 'selection', label: t('tables', 'Selection') },
 
 				{ id: 'datetime', label: t('tables', 'Date and time') },
+				{ id: 'usergroup', label: t('tables', 'Users and groups') },
 			],
 		}
 	},
@@ -209,7 +217,7 @@ export default {
 			if (this.$options.components && this.$options.components[form]) {
 				return form
 			} else {
-				throw Error('Form ' + form + ' does not exist')
+				throw Error('Form ' + form + ' does no exist')
 			}
 		},
 		type() {
@@ -316,6 +324,12 @@ export default {
 				}
 			} else if (this.column.type === 'datetime') {
 				data.datetimeDefault = this.column.datetimeDefault ? this.column.subtype === 'date' ? 'today' : 'now' : ''
+			} else if (this.column.type === 'usergroup') {
+				data.usergroupDefault = JSON.stringify(this.column.usergroupDefault)
+				data.usergroupMultipleItems = this.column.usergroupMultipleItems
+				data.usergroupSelectUsers = this.column.usergroupSelectUsers
+				data.usergroupSelectGroups = this.column.usergroupSelectGroups
+				data.showUserStatus = this.column.showUserStatus
 			} else if (this.column.type === 'number') {
 				data.numberDefault = this.column.numberDefault
 				if (this.column.subtype === '') {
@@ -364,6 +378,11 @@ export default {
 				selectionOptions: null,
 				selectionDefault: null,
 				datetimeDefault: '',
+				usergroupDefault: null,
+				usergroupMultipleItems: false,
+				usergroupSelectUsers: true,
+				usergroupSelectGroups: false,
+				showUserStatus: false,
 			}
 			if (mainForm) {
 				this.column.title = ''

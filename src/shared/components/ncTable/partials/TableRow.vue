@@ -33,6 +33,7 @@ import TableCellTextLine from './TableCellTextLine.vue'
 import TableCellSelection from './TableCellSelection.vue'
 import TableCellMultiSelection from './TableCellMultiSelection.vue'
 import TableCellTextRich from './TableCellEditor.vue'
+import TableCellUsergroup from './TableCellUsergroup.vue'
 import { ColumnTypes } from './../mixins/columnHandler.js'
 import { translate as t } from '@nextcloud/l10n'
 import {
@@ -56,6 +57,7 @@ export default {
 		TableCellSelection,
 		TableCellMultiSelection,
 		TableCellTextRich,
+		TableCellUsergroup,
 	},
 
 	props: {
@@ -105,6 +107,7 @@ export default {
 			case ColumnTypes.Datetime: return 'TableCellDateTime'
 			case ColumnTypes.DatetimeDate: return 'TableCellDateTime'
 			case ColumnTypes.DatetimeTime: return 'TableCellDateTime'
+			case ColumnTypes.Usergroup: return 'TableCellUsergroup'
 			default: return 'TableCellHtml'
 			}
 		},

@@ -73,6 +73,19 @@ export class AbstractColumn {
 
 }
 
+export class AbstractUsergroupColumn extends AbstractColumn {
+
+	constructor(data) {
+		super(data)
+		this.usergroupDefault = data.usergroupDefault
+	}
+
+	default() {
+		return this.usergroupDefault
+	}
+
+}
+
 export class AbstractNumberColumn extends AbstractColumn {
 
 	constructor(data) {

@@ -64,6 +64,7 @@ import SelectionMultiForm from '../../shared/components/ncTable/partials/columnT
 import DatetimeForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeForm.vue'
 import DatetimeDateForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeTimeForm.vue'
+import UsergroupForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/UsergroupForm.vue'
 import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandler.js'
 import moment from '@nextcloud/moment'
 
@@ -90,6 +91,7 @@ export default {
 		ColumnInfoPopover,
 		NcButton,
 		NcUserBubble,
+		UsergroupForm,
 	},
 	filters: {
 		truncate(text, length, suffix) {
@@ -119,7 +121,7 @@ export default {
 			editColumn: Object.assign({}, this.column),
 			deleteId: null,
 			editErrorTitle: false,
-			canSave: true, // avoid to save an incorrect config
+			canSave: true, // used to avoid saving an incorrect config
 		}
 	},
 	computed: {
@@ -131,7 +133,7 @@ export default {
 			if (this.$options.components && this.$options.components[form]) {
 				return form
 			} else {
-				throw Error('Form ' + form + ' does not exist')
+				throw Error('Form ' + form + ' does no exist')
 			}
 		},
 		updateTime() {

@@ -12,4 +12,5 @@ export const ColumnTypes = {
 	DatetimeDate: 'datetime-date',
 	DatetimeTime: 'datetime-time',
 	Datetime: 'datetime',
+	Usergroup: 'usergroup',
 }
