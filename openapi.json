@@ -3441,7 +3441,7 @@
                     {
                         "name": "usergroupDefault",
                         "in": "query",
-                        "description": "Default value, if column is usergroup (json array{id: string, icon: string, isUser: bool, displayName: string})",
+                        "description": "Default value, if column is usergroup (json array{id: string, type: int})",
                         "schema": {
                             "type": "string",
                             "nullable": true,
@@ -7931,7 +7931,7 @@
                     {
                         "name": "usergroupDefault",
                         "in": "query",
-                        "description": "Json array{id: string, isUser: bool, displayName: string}, eg [{\"id\": \"admin\", \"isUser\": true, \"displayName\": \"admin\"}, {\"id\": \"user1\", \"isUser\": true, \"displayName\": \"user1\"}]",
+                        "description": "Json array{id: string, type: int}, eg [{\"id\": \"admin\", \"type\": 0}, {\"id\": \"user1\", \"type\": 0}]",
                         "schema": {
                             "type": "string",
                             "nullable": true
