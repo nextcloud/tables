@@ -1,6 +1,6 @@
 <template>
 	<NcModal v-if="showModal" data-cy="editRowModal" @close="actionCancel">
-		<div class="modal__content">
+		<div class="modal__content" @keydown="onKeydown">
 			<div class="row">
 				<div class="col-4">
 					<h2 tabindex="0">
@@ -191,6 +191,11 @@ export default {
 			}
 			this.localLoading = false
 			this.actionCancel()
+		},
+		onKeydown(event) {
+			if (event.key === 'Enter' && event.ctrlKey) {
+				this.actionConfirm()
+			}
 		},
 	},
 }
