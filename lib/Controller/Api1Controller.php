@@ -761,7 +761,7 @@ class Api1Controller extends ApiController {
 	 * @param string|null $selectionOptions Options for a selection (json array{id: int, label: string})
 	 * @param string|null $selectionDefault Default option IDs for a selection (json int[])
 	 * @param string|null $datetimeDefault Default value, if column is datetime
-	 * @param string|null $usergroupDefault Default value, if column is usergroup (json array{id: string, icon: string, isUser: bool, displayName: string})
+	 * @param string|null $usergroupDefault Default value, if column is usergroup (json array{id: string, type: int})
 	 * @param bool|null $usergroupMultipleItems Can select multiple users or/and groups, if column is usergroup
 	 * @param bool|null $usergroupSelectUsers Can select users, if column type is usergroup
 	 * @param bool|null $usergroupSelectGroups Can select groups, if column type is usergroup

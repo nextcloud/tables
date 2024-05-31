@@ -39,6 +39,9 @@ class Version000400Date20230406000000 extends SimpleMigrationStep {
 			$column->setLength(65535);
 			$column->setType(Type::getType('text'));
 
+			$column = $table->getColumn('usergroup_default');
+			$column->setLength(65535);
+
 			$column = $table->getColumn('text_default');
 			$column->setLength(65535);
 			$column->setType(Type::getType('text'));

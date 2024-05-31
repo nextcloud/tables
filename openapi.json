@@ -3318,7 +3318,7 @@
                                         "type": "string",
                                         "nullable": true,
                                         "default": "",
-                                        "description": "Default value, if column is usergroup (json array{id: string, icon: string, isUser: bool, displayName: string})"
+                                        "description": "Default value, if column is usergroup (json array{id: string, type: int})"
                                     },
                                     "usergroupMultipleItems": {
                                         "type": "boolean",
@@ -7901,7 +7901,7 @@
                                     "usergroupDefault": {
                                         "type": "string",
                                         "nullable": true,
-                                        "description": "Json array{id: string, isUser: bool, displayName: string}, eg [{\"id\": \"admin\", \"isUser\": true, \"displayName\": \"admin\"}, {\"id\": \"user1\", \"isUser\": true, \"displayName\": \"user1\"}]"
+                                        "description": "Json array{id: string, type: int}, eg [{\"id\": \"admin\", \"type\": 0}, {\"id\": \"user1\", \"type\": 0}]"
                                     },
                                     "usergroupMultipleItems": {
                                         "type": "boolean",

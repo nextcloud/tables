@@ -98,7 +98,7 @@ Feature: APIv2
     Given table "Table 5" with emoji "👋" exists for user "participant1-v2" as "t5" via v2
     Then column from main type "usergroup" for node type "table" and node name "t5" exists with name "ug-c1" and following properties via v2
       | title             | ug column                                                 |
-      | usergroupDefault  | [{"id": "admin", "displayName": "admin", "isUser": true}] |
+      | usergroupDefault  | [{"id": "admin", "type": 0}] |
     Then node with node type "table" and node name "t5" has the following columns via v2
       | ug column  |
     Then print register

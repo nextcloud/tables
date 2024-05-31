@@ -2399,7 +2399,7 @@ export interface operations {
                      */
                     readonly datetimeDefault?: string | null;
                     /**
-                     * @description Default value, if column is usergroup (json array{id: string, icon: string, isUser: bool, displayName: string})
+                     * @description Default value, if column is usergroup (json array{id: string, type: int})
                      * @default
                      */
                     readonly usergroupDefault?: string | null;
@@ -4631,7 +4631,7 @@ export interface operations {
                     readonly baseNodeId: number;
                     /** @description Title */
                     readonly title: string;
-                    /** @description Json array{id: string, isUser: bool, displayName: string}, eg [{"id": "admin", "isUser": true, "displayName": "admin"}, {"id": "user1", "isUser": true, "displayName": "user1"}] */
+                    /** @description Json array{id: string, type: int}, eg [{"id": "admin", "type": 0}, {"id": "user1", "type": 0}] */
                     readonly usergroupDefault?: string | null;
                     /** @description Whether you can select multiple users or/and groups */
                     readonly usergroupMultipleItems?: boolean;

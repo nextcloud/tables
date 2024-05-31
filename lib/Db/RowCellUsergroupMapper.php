@@ -15,10 +15,9 @@ class RowCellUsergroupMapper extends RowCellMapperSuper {
 	/**
 	 * @inheritDoc
 	 */
-	public function parseValueIncoming(Column $column, $value): string {
-		// need to convert from array to string before saving
-		// TODO figure out whether to handle these conversions in the BE or FE; confusing to have both
-		return json_encode($value);
+	public function parseValueIncoming(Column $column, $value): array {
+		return json_decode(json_encode($value), true);
+		//return json_encode($value);
 	}
 
 	/**

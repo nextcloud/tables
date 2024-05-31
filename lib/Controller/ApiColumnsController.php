@@ -334,7 +334,7 @@ class ApiColumnsController extends AOCSController {
 	 *
 	 * @param int $baseNodeId Context of the column creation
 	 * @param string $title Title
-	 * @param string|null $usergroupDefault Json array{id: string, isUser: bool, displayName: string}, eg [{"id": "admin", "isUser": true, "displayName": "admin"}, {"id": "user1", "isUser": true, "displayName": "user1"}]
+	 * @param string|null $usergroupDefault Json array{id: string, type: int}, eg [{"id": "admin", "type": 0}, {"id": "user1", "type": 0}]
 	 * @param boolean $usergroupMultipleItems Whether you can select multiple users or/and groups
 	 * @param boolean $usergroupSelectUsers Whether you can select users
 	 * @param boolean $usergroupSelectGroups Whether you can select groups

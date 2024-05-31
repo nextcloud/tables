@@ -6,10 +6,7 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 
 class UsergroupColumnQB extends SuperColumnQB implements IColumnTypeQB {
 	public function passSearchValue(IQueryBuilder $qb, string $unformattedSearchValue, string $operator, string $searchValuePlaceHolder): void {
-		if(substr($unformattedSearchValue, 0, 1) === '@') {
-			// TODO
-		} else {
-			$qb->setParameter($searchValuePlaceHolder, $unformattedSearchValue, IQueryBuilder::PARAM_STR);
-		}
+		// TODO how to handle searching for multiple users/groups?
+		$qb->setParameter($searchValuePlaceHolder, $unformattedSearchValue, IQueryBuilder::PARAM_STR);
 	}
 }

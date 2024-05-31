@@ -25,7 +25,7 @@ class UsergroupBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	}
 
 	/**
-	 * @param mixed $value array{id: string, isUser: bool, displayName: string}
+	 * @param mixed $value array{id: string, type: int}
 	 * @param Column|null $column
 	 * @return bool
 	 */
@@ -41,7 +41,7 @@ class UsergroupBusiness extends SuperBusiness implements IColumnTypeBusiness {
 
 		foreach ($value as $v) {
 			// TODO: maybe check if key exists first
-			if(!is_string($v['id']) && !is_string($v['displayName']) && !is_bool($v['isUser'])) {
+			if((array_key_exists('id', $v) && !is_string($v['id'])) && (array_key_exists('type', $v) && !is_int($v['type']))) {
 				return false;
 			}
 		}

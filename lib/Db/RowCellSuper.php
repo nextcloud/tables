@@ -15,6 +15,8 @@ use OCP\AppFramework\Db\Entity;
  * @method setRowId(int $rowId)
  * @method getValue(): string
  * @method setValue(string $value)
+ * @method getValueType(): int
+ * @method setValueType(int $valueType)
  * @method getCreatedBy(): string
  * @method setCreatedBy(string $createdBy)
  * @method getCreatedAt(): string
@@ -38,15 +40,17 @@ abstract class RowCellSuper extends Entity implements JsonSerializable {
 
 	/**
 	 * @param float|null|string $value
+	 * @param int $value_type
 	 */
-	public function jsonSerializePreparation(string|float|null $value): array {
+	public function jsonSerializePreparation(string|float|null $value, int $valueType): array {
 		return [
 			'id' => $this->id,
 			'columnId' => $this->columnId,
 			'rowId' => $this->rowId,
 			'lastEditBy' => $this->lastEditBy,
 			'lastEditAt' => $this->lastEditAt,
-			'value' => $value
+			'value' => $value,
+			'valueType' => $valueType
 		];
 	}
 
@@ -60,5 +64,9 @@ abstract class RowCellSuper extends Entity implements JsonSerializable {
 
 	public function setValueWrapper($value) {
 		$this->setValue($value);
+	}
+
+	public function setValueTypeWrapper($valueType) {
+		$this->setValueType($valueType);
 	}
 }
