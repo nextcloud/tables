@@ -481,6 +481,7 @@
     "Could not fetch tables" : "Det gick inte att hämta tabeller",
     "Could not load shared views." : "Det gick inte att läsa in delade vyer.",
     "Could not load shared views" : "Det gick inte att läsa in delade vyer",
+    "Could not fetch templates" : "Det gick inte att hämta mallar",
     "Could not insert view." : "Det gick inte att infoga vyn.",
     "Could not update view." : "Det gick inte att uppdatera vyn.",
     "Could not remove view." : "Det gick inte att ta bort vyn.",
