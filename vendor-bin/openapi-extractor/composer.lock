@@ -9,16 +9,16 @@
     "packages-dev": [
         {
             "name": "adhocore/cli",
-            "version": "v1.6.1",
+            "version": "v1.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/adhocore/php-cli.git",
-                "reference": "25b5a93e5eebcdb70e20ee33313a011ea3a4f770"
+                "reference": "3fde60a838912e71c82ed0f48048685dc32dbc77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/adhocore/php-cli/zipball/25b5a93e5eebcdb70e20ee33313a011ea3a4f770",
-                "reference": "25b5a93e5eebcdb70e20ee33313a011ea3a4f770",
+                "url": "https://api.github.com/repos/adhocore/php-cli/zipball/3fde60a838912e71c82ed0f48048685dc32dbc77",
+                "reference": "3fde60a838912e71c82ed0f48048685dc32dbc77",
                 "shasum": ""
             },
             "require": {
@@ -63,7 +63,7 @@
             ],
             "support": {
                 "issues": "https://github.com/adhocore/php-cli/issues",
-                "source": "https://github.com/adhocore/php-cli/tree/v1.6.1"
+                "source": "https://github.com/adhocore/php-cli/tree/v1.7.1"
             },
             "funding": [
                 {
@@ -75,7 +75,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-06-26T09:55:29+00:00"
+            "time": "2024-03-28T08:30:12+00:00"
         },
         {
             "name": "nextcloud/openapi-extractor",
@@ -83,23 +83,23 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/nextcloud/openapi-extractor.git",
-                "reference": "25ea3662212e6202a1bf3b0f1210dd7b71a9d7cd"
+                "reference": "5f5f339c43457919fbe46e91e4256bde5fb07807"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nextcloud/openapi-extractor/zipball/25ea3662212e6202a1bf3b0f1210dd7b71a9d7cd",
-                "reference": "25ea3662212e6202a1bf3b0f1210dd7b71a9d7cd",
+                "url": "https://api.github.com/repos/nextcloud/openapi-extractor/zipball/5f5f339c43457919fbe46e91e4256bde5fb07807",
+                "reference": "5f5f339c43457919fbe46e91e4256bde5fb07807",
                 "shasum": ""
             },
             "require": {
-                "adhocore/cli": "^v1.6",
+                "adhocore/cli": "^1.7",
                 "ext-simplexml": "*",
-                "nikic/php-parser": "^4.16",
+                "nikic/php-parser": "^5.0",
                 "php": "^8.1",
-                "phpstan/phpdoc-parser": "^1.23"
+                "phpstan/phpdoc-parser": "^1.28"
             },
             "require-dev": {
-                "nextcloud/coding-standard": "^1.1"
+                "nextcloud/coding-standard": "^1.2"
             },
             "default-branch": true,
             "bin": [
@@ -113,48 +113,57 @@
                 }
             },
             "scripts": {
+                "lint": [
+                    "find . -name \\*.php -not -path './tests/*' -not -path './vendor/*' -not -path './build/*' -print0 | xargs -0 -n1 php -l && php -l generate-spec && php -l merge-specs"
+                ],
                 "cs:check": [
                     "php-cs-fixer fix --dry-run --diff"
                 ],
                 "cs:fix": [
                     "php-cs-fixer fix"
+                ],
+                "test:unit": [
+                    "cd tests && ../generate-spec"
                 ]
             },
             "support": {
                 "source": "https://github.com/nextcloud/openapi-extractor/tree/main",
                 "issues": "https://github.com/nextcloud/openapi-extractor/issues"
             },
-            "time": "2023-12-21T16:01:34+00:00"
+            "time": "2024-06-06T10:43:00+00:00"
         },
         {
             "name": "nikic/php-parser",
-            "version": "4.x-dev",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "1bcbb2179f97633e98bbbc87044ee2611c7d7999"
+                "reference": "daaadc3bae458908aa477b90a8932e7da9253f22"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/1bcbb2179f97633e98bbbc87044ee2611c7d7999",
-                "reference": "1bcbb2179f97633e98bbbc87044ee2611c7d7999",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/daaadc3bae458908aa477b90a8932e7da9253f22",
+                "reference": "daaadc3bae458908aa477b90a8932e7da9253f22",
                 "shasum": ""
             },
             "require": {
+                "ext-ctype": "*",
+                "ext-json": "*",
                 "ext-tokenizer": "*",
-                "php": ">=7.0"
+                "php": ">=7.4"
             },
             "require-dev": {
                 "ircmaxell/php-yacc": "^0.0.7",
-                "phpunit/phpunit": "^6.5 || ^7.0 || ^8.0 || ^9.0"
+                "phpunit/phpunit": "^9.0"
             },
+            "default-branch": true,
             "bin": [
                 "bin/php-parse"
             ],
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "4.9-dev"
+                    "dev-master": "5.0-dev"
                 }
             },
             "autoload": {
@@ -178,22 +187,22 @@
             ],
             "support": {
                 "issues": "https://github.com/nikic/PHP-Parser/issues",
-                "source": "https://github.com/nikic/PHP-Parser/tree/4.x"
+                "source": "https://github.com/nikic/PHP-Parser/tree/master"
             },
-            "time": "2023-12-10T21:03:43+00:00"
+            "time": "2024-06-03T06:24:19+00:00"
         },
         {
             "name": "phpstan/phpdoc-parser",
-            "version": "1.25.0",
+            "version": "1.29.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "bd84b629c8de41aa2ae82c067c955e06f1b00240"
+                "reference": "fcaefacf2d5c417e928405b71b400d4ce10daaf4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/bd84b629c8de41aa2ae82c067c955e06f1b00240",
-                "reference": "bd84b629c8de41aa2ae82c067c955e06f1b00240",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/fcaefacf2d5c417e928405b71b400d4ce10daaf4",
+                "reference": "fcaefacf2d5c417e928405b71b400d4ce10daaf4",
                 "shasum": ""
             },
             "require": {
@@ -225,9 +234,9 @@
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
             "support": {
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.25.0"
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.29.1"
             },
-            "time": "2024-01-04T17:06:16+00:00"
+            "time": "2024-05-31T08:52:43+00:00"
         }
     ],
     "aliases": [],
