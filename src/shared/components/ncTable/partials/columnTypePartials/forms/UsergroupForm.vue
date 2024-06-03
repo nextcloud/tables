@@ -24,7 +24,7 @@
 					<!-- TODO: Add prop for single or multiple -->
 					<NcSelect v-model="value" style="width: 100%;" :loading="loading" :options="options"
 						:placeholder="getPlaceholder()" :searchable="true" :get-option-key="(option) => option.key"
-						label="displayName" :aria-label-combobox="getPlaceholder()"
+						label="id" :aria-label-combobox="getPlaceholder()"
 						:user-select="mutableColumn.usergroupSelectUsers"
 						:group-select="mutableColumn.usergroupSelectGroups" :close-on-select="false"
 						:multiple="mutableColumn.usergroupMultipleItems" @search="asyncFind" @input="addItem">
@@ -83,7 +83,7 @@ export default {
 	data() {
 		return {
 			mutableColumn: this.column,
-			value: [],
+			value: this.column.usergroupDefault,
 		}
 	},
 	computed: {
@@ -95,10 +95,10 @@ export default {
 				// TODO update to get groups too
 				if (Array.isArray(v)) {
 					this.column.usergroupDefault = v.map(o => {
-						return {type: o.isUser ? 0 : 1, id: o.user }
+						return o
 					})
 				} else {
-					this.column.usergroupDefault = [{ type: v.isUser ? 0 : 1, id: v.user }]
+					this.column.usergroupDefault = [v]
 				}
 
 			},

@@ -13,6 +13,10 @@ export default class UsergroupColumn extends AbstractUsergroupColumn {
 		this.usergroupSelectGroups = data.usergroupSelectGroups
 	}
 
+	// TODO consider if we want to sort, and how
+	// sort(mode) {
+	// }
+	
 	getValueString(valueObject) {
 		valueObject = valueObject || this.value || null
 
@@ -22,7 +26,7 @@ export default class UsergroupColumn extends AbstractUsergroupColumn {
 			if (ret === '') {
 				ret = obj.id
 			} else {
-				ret += ', ' + obj.display
+				ret += ', ' + obj.id
 			}
 		})
 		return ret

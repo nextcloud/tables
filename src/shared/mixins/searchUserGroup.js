@@ -80,11 +80,9 @@ export default {
 				const res = await axios.get(url)
 				const rawSuggestions = res.data.ocs.data.map(autocompleteResult => {
 					return {
-						user: autocompleteResult.id,
-						displayName: autocompleteResult.label,
-						icon: autocompleteResult.icon,
-						isUser: autocompleteResult.source.startsWith('users'),
-						key: autocompleteResult.source + '-' + autocompleteResult.id,
+						id: autocompleteResult.id,
+						type: autocompleteResult.source.startsWith('users') ? 0 : 1,
+						key: autocompleteResult.id,
 					}
 				})
 				this.suggestions = this.filterOutUnwantedItems(rawSuggestions)
