@@ -23,7 +23,7 @@ class RowCellUsergroupMapper extends RowCellMapperSuper {
 	/**
 	 * @inheritDoc
 	 */
-	public function parseValueOutgoing(Column $column, $value) {
-		return json_decode($value);
+	public function parseValueOutgoing(Column $column, $value, ?int $value_type = null): array {
+		return ['id' => $value, 'type' => $value_type];
 	}
 }
