@@ -2,7 +2,7 @@
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :width="2">
 		<NcSelect v-model="localValue" style="width: 100%;" :loading="loading" :options="options"
 			:placeholder="getPlaceholder()" :searchable="true" :get-option-key="(option) => option.key"
-			label="displayName" :aria-label-combobox="getPlaceholder()"
+			label="id" :aria-label-combobox="getPlaceholder()"
 			:user-select="column.usergroupSelectUsers" :group-select="column.usergroupSelectGroups"
 			:close-on-select="false" :multiple="column.usergroupMultipleItems" @search="asyncFind"
 			@input="addItem">
@@ -48,13 +48,14 @@ export default {
 			},
 			set(v) {
 				// TODO update to get groups too
-				let formattedValue = []
+				console.log('v', v)
+				let formattedValue = null
 				if (Array.isArray(v)) {
 					formattedValue = v.map(o => {
-						return {displayName: o.displayName, type: o.isUser ? 0 : 1, id: o.user }
+						return o
 					})
 				} else {
-					formattedValue = [{ displayName: v.displayName, type: v.isUser ? 0 : 1, id: v.user }]
+					formattedValue = [v]
 				}
 				console.log(formattedValue)
 				this.$emit('update:value', formattedValue)

@@ -8,6 +8,7 @@
 				{{ item.id }}
 			</span> -->
 			<NcUserBubble :display-name="item.id" :show-user-status="column.showUserStatus" :user="item.type === 0 ? item.id: ''">
+				<h3> User </h3>
 				@{{ item.id }}
 			</NcUserBubble>
 		</div>
@@ -37,7 +38,7 @@ export default {
 		},
 	},
 	mounted() {
-		console.log(value)
+		console.log(this.value)
 	}
 }
 </script>
