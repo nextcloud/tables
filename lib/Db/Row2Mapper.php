@@ -193,7 +193,7 @@ class Row2Mapper {
 		$qbSqlForColumnTypes = null;
 		foreach ($this->columnsHelper->columns as $columnType) {
 			$qbTmp = $this->db->getQueryBuilder();
-			$qbTmp->select('row_id', 'column_id', 'last_edit_at', 'last_edit_by')
+			$qbTmp->select('row_id', 'column_id', 'value_type', 'last_edit_at', 'last_edit_by')
 				->selectAlias($qb->expr()->castColumn('value', IQueryBuilder::PARAM_STR), 'value')
 				->from('tables_row_cells_' . $columnType)
 				->where($qb->expr()->in('column_id', $qb->createNamedParameter($columnIds, IQueryBuilder::PARAM_INT_ARRAY, ':columnIds')))
@@ -207,7 +207,7 @@ class Row2Mapper {
 		}
 		$qbSqlForColumnTypes .= ')';
 
-		$qb->select('row_id', 'column_id', 'created_by', 'created_at', 't1.last_edit_by', 't1.last_edit_at', 'value', 'table_id')
+		$qb->select('row_id', 'column_id', 'created_by', 'created_at', 't1.last_edit_by', 't1.last_edit_at', 'value', 'value_type', 'table_id')
 			->from($qb->createFunction($qbSqlForColumnTypes), 't1')
 			->innerJoin('t1', 'tables_row_sleeves', 'rs', 'rs.id = t1.row_id');
 
@@ -225,7 +225,14 @@ class Row2Mapper {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
-		return $this->parseEntities($result, $sleeves);
+		try {
+			$columnTypes = $this->columnMapper->getColumnTypes($columnIds);
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+
+		return $this->parseEntities($result, $sleeves, $columnTypes);
 	}
 
 	/**
@@ -492,7 +499,7 @@ class Row2Mapper {
 	 * @return Row2[]
 	 * @throws InternalError
 	 */
-	private function parseEntities(IResult $result, array $sleeves): array {
+	private function parseEntities(IResult $result, array $sleeves, array $columnTypes): array {
 		$data = $result->fetchAll();
 
 		$rows = [];
@@ -506,13 +513,32 @@ class Row2Mapper {
 			$rows[$sleeve->getId()]->setTableId($sleeve->getTableId());
 		}
 
+		$rowValues = [];
+		$keyToColumnId = [];
+		$keyToRowId = [];
+
 		foreach ($data as $rowData) {
 			if (!isset($rowData['row_id']) || !isset($rows[$rowData['row_id']])) {
 				break;
 			}
+			$value = $this->formatValue($this->columns[$rowData['column_id']], $rowData['value'], 'out', $rowData['value_type']);
+			$compositeKey = (string)$rowData['row_id'] . ',' . (string)$rowData['column_id'];
 
-			/* @var array $rowData */
-			$rows[$rowData['row_id']]->addCell($rowData['column_id'], $this->formatValue($this->columns[$rowData['column_id']], $rowData['value']));
+			if ($columnTypes[$rowData['column_id']] == 'usergroup') {
+				if (array_key_exists($compositeKey, $rowValues)) {
+					$rowValues[$compositeKey][] = $value;
+				} else {
+					$rowValues[$compositeKey] = [$value];
+				}
+			} else {
+				$rowValues[$compositeKey] = $value;
+			}
+			$keyToColumnId[$compositeKey] = $rowData['column_id'];
+			$keyToRowId[$compositeKey] = $rowData['row_id'];
+		}
+
+		foreach ($rowValues as $compositeKey => $value) {
+			$rows[$keyToRowId[$compositeKey]]->addCell($keyToColumnId[$compositeKey], $value);
 		}
 
 		// format an array without keys
@@ -766,7 +792,7 @@ class Row2Mapper {
 	 * @return mixed
 	 * @throws InternalError
 	 */
-	private function formatValue(Column $column, $value, string $mode = 'out') {
+	private function formatValue(Column $column, $value, string $mode = 'out', ?int $value_type = null) {
 		$cellMapperClassName = 'OCA\Tables\Db\RowCell'.ucfirst($column->getType()).'Mapper';
 		/** @var RowCellMapperSuper $cellMapper */
 		try {
@@ -776,7 +802,7 @@ class Row2Mapper {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 		if ($mode === 'out') {
-			return $cellMapper->parseValueOutgoing($column, $value);
+			return $cellMapper->parseValueOutgoing($column, $value, $value_type);
 		} else {
 			return $cellMapper->parseValueIncoming($column, $value);
 		}
