@@ -12,6 +12,7 @@ import TextLineColumn from './columnsTypes/textLine.js'
 import TextLinkColumn from './columnsTypes/textLink.js'
 import TextLongColumn from './columnsTypes/textLong.js'
 import TextRichColumn from './columnsTypes/textRich.js'
+import UsergroupColumn from './columnsTypes/usergroup.js'
 
 export function parseCol(col) {
 	const columnType = col.type + (col.subtype === '' ? '' : '-' + col.subtype)
@@ -29,6 +30,7 @@ export function parseCol(col) {
 	case ColumnTypes.Datetime: return new DatetimeColumn(col)
 	case ColumnTypes.DatetimeDate: return new DatetimeDateColumn(col)
 	case ColumnTypes.DatetimeTime: return new DatetimeTimeColumn(col)
+	case ColumnTypes.Usergroup: return new UsergroupColumn(col)
 	default: throw Error(columnType + ' is not a valid column type!')
 	}
 }
