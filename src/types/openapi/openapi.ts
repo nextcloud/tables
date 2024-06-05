@@ -3087,14 +3087,14 @@ export type operations = {
         /** @description Descriptive text of the context */
         description?: string;
         /** @description optional nodes to be connected to this context */
-        nodes?: OneOf<[{
-          /** Format: int64 */
-          id: number;
-          /** Format: int64 */
-          type: number;
-          /** Format: int64 */
-          permissions: number;
-        }, unknown[]]>;
+        "nodes[]"?: {
+            /** Format: int64 */
+            id: number;
+            /** Format: int64 */
+            type: number;
+            /** Format: int64 */
+            permissions?: number;
+          }[];
       };
       header: {
         /** @description Required to be true for the API request to pass */

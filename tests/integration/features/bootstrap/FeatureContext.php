@@ -1869,7 +1869,7 @@ class FeatureContext implements Context {
 					$permissions = $this->humanReadablePermissionToInt($strPermission);
 					$found = false;
 					foreach ($actualData['nodes'] as $actualNodeData) {
-						$found |= ($actualNodeData['node_id'] === $nodeId
+						$found = $found || ($actualNodeData['node_id'] === $nodeId
 							&& $actualNodeData['node_type'] === $nodeType
 							&& $actualNodeData['permissions'] === $permissions);
 					}
@@ -1879,10 +1879,50 @@ class FeatureContext implements Context {
 					[$pageType, $contentNodesCount] = explode(':', $value);
 					$found = false;
 					foreach ($actualData['pages'] as $actualPageData) {
-						$found |= ($actualPageData['type'] === $pageType
+						$found = $found || ($actualPageData['type'] === $pageType
 							&& count($actualPageData['content']) === (int)$contentNodesCount);
 					}
 					Assert::assertTrue($found);
+					break;
+			}
+		}
+	}
+
+	/**
+	 * @Given the fetched Context :contextAlias does not contain following data:
+	 */
+	public function theFetchedContextDoesNotContainFollowingData(string $contextAlias, TableNode $expectedData) {
+		$actualData = $this->collectionManager->getByAlias('context', $contextAlias);
+
+		foreach ($expectedData as $field => $value) {
+			switch ($field) {
+				case "name":
+					Assert::assertNotEquals($value, $actualData['name']);
+					break;
+				case "icon":
+					Assert::assertNotEquals($value, $actualData['iconName']);
+					break;
+				case "node":
+					[$strType, $alias, $strPermission] = explode(':', $value);
+					$nodeType = $strType === 'table' ? 0 : 1;
+					$nodeId = $nodeType === 0 ? $this->tableIds[$alias] : $this->viewIds[$alias];
+					$permissions = $this->humanReadablePermissionToInt($strPermission);
+					$found = false;
+					foreach ($actualData['nodes'] as $actualNodeData) {
+						$found = $found || ($actualNodeData['node_id'] === $nodeId
+								&& $actualNodeData['node_type'] === $nodeType
+								&& $actualNodeData['permissions'] === $permissions);
+					}
+					Assert::assertFalse($found);
+					break;
+				case "page":
+					[$pageType, $contentNodesCount] = explode(':', $value);
+					$found = false;
+					foreach ($actualData['pages'] as $actualPageData) {
+						$found = $found || ($actualPageData['type'] === $pageType
+								&& count($actualPageData['content']) === (int)$contentNodesCount);
+					}
+					Assert::assertFalse($found);
 					break;
 			}
 		}
@@ -2060,6 +2100,44 @@ class FeatureContext implements Context {
 		}
 
 		Assert::assertTrue($exceptionCaught);
+	}
+
+	/**
+	 * @When user :user updates Context :contextAlias by setting
+	 */
+	public function userUpdatesContextBySetting(string $user, string $contextAlias, TableNode $updatedProperties) {
+		$this->setCurrentUser($user);
+		$context = $this->collectionManager->getByAlias('context', $contextAlias);
+
+		$this->sendOcsRequest(
+			'PUT',
+			sprintf('/apps/tables/api/2/contexts/%d', $context['id']),
+			$updatedProperties
+		);
+	}
+
+	/**
+	 * @When user :user updates the nodes of the Context :contextAlias to
+	 */
+	public function userUpdatesNodesOfContext(string $user, string $contextAlias, TableNode $updatedNodes) {
+		$this->setCurrentUser($user);
+		$context = $this->collectionManager->getByAlias('context', $contextAlias);
+		$nodes = [];
+
+		foreach ($updatedNodes as $row) {
+			$permissions = $this->humanReadablePermissionToInt($row['permissions']);
+			$nodes[] = [
+				'id' => $row['type'] === 'table' ? $this->tableIds[$row['alias']] : $this->viewIds[$row['alias']],
+				'type' => $row['type'] === 'table' ? 0 : 1,
+				'permissions' => $permissions,
+			];
+		}
+
+		$this->sendOcsRequest(
+			'PUT',
+			sprintf('/apps/tables/api/2/contexts/%d', $context['id']),
+			['nodes' => $nodes]
+		);
 	}
 
 }
