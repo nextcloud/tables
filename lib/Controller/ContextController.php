@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OCA\Tables\Controller;
 
+use InvalidArgumentException;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
@@ -89,7 +90,7 @@ class ContextController extends AOCSController {
 	 * @param string $name Name of the context
 	 * @param string $iconName Material design icon name of the context
 	 * @param string $description Descriptive text of the context
-	 * @param array{id: int, type: int, permissions: int}|array<empty> $nodes optional nodes to be connected to this context
+	 * @psalm-param list<array{id: int, type: int, permissions?: int}> $nodes optional nodes to be connected to this context
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN, array{message: string}, array{}>
 	 *
@@ -99,12 +100,19 @@ class ContextController extends AOCSController {
 	 */
 	public function create(string $name, string $iconName, string $description = '', array $nodes = []): DataResponse {
 		try {
-			return new DataResponse($this->contextService->create($name, $iconName, $description, $nodes, $this->userId, 0)->jsonSerialize());
+			return new DataResponse($this->contextService->create(
+				$name,
+				$iconName,
+				$description,
+				$this->sanitizeInputNodes($nodes),
+				$this->userId,
+				0,
+			)->jsonSerialize());
 		} catch (Exception $e) {
 			return $this->handleError($e);
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
-		} catch (\InvalidArgumentException $e) {
+		} catch (InvalidArgumentException $e) {
 			return $this->handleBadRequestError(new BadRequestError($e->getMessage(), $e->getCode(), $e));
 		}
 	}
@@ -129,6 +137,7 @@ class ContextController extends AOCSController {
 	 */
 	public function update(int $contextId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): DataResponse {
 		try {
+			$nodes = $nodes ? $this->sanitizeInputNodes($nodes) : null;
 			return new DataResponse($this->contextService->update(
 				$contextId,
 				$this->userId,
@@ -142,6 +151,33 @@ class ContextController extends AOCSController {
 		} catch (DoesNotExistException $e) {
 			return $this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
 		}
+	}
+
+	/**
+	 * @psalm-param list<array{id: mixed, type: mixed, permissions?: mixed, order?: mixed}> $nodes
+	 * @psalm-return list<array{id: int, type: int, permissions?: int, order?: int}>
+	 */
+	protected function sanitizeInputNodes(array $nodes): array {
+		foreach ($nodes as &$node) {
+			if (!is_numeric($node['type'])) {
+				throw new InvalidArgumentException('Unexpected node type');
+			}
+			$node['type'] = (int)$node['type'];
+
+			if (!is_numeric($node['id'])) {
+				throw new InvalidArgumentException('Unexpected node id');
+			}
+			$node['id'] = (int)$node['id'];
+
+			if (isset($node['permissions'])) {
+				$node['permissions'] = (int)$node['permissions'];
+			}
+
+			if (isset($node['order'])) {
+				$node['order'] = (int)$node['order'];
+			}
+		}
+		return $nodes;
 	}
 
 	/**

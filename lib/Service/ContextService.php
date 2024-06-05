@@ -109,6 +109,7 @@ class ContextService {
 	}
 
 	/**
+	 * @psalm-param list<array{id: int, type: int, permissions?: int, order?: int}> $nodes
 	 * @throws Exception|PermissionError|InvalidArgumentException
 	 */
 	public function create(string $name, string $iconName, string $description, array $nodes, string $ownerId, int $ownerType): Context {
@@ -134,6 +135,7 @@ class ContextService {
 	}
 
 	/**
+	 * @psalm-param list<array{id: int, type: int, permissions?: int, order?: int}> $nodes
 	 * @throws Exception
 	 * @throws DoesNotExistException
 	 * @throws MultipleObjectsReturnedException
@@ -445,6 +447,7 @@ class ContextService {
 	}
 
 	/**
+	 * @psalm-param list<array{id: int, type: int, permissions?: int, order?: int}> $nodes
 	 * @throws PermissionError|InvalidArgumentException
 	 */
 	protected function insertNodesFromArray(Context $context, array $nodes): void {
@@ -453,25 +456,20 @@ class ContextService {
 		$userId = $context->getOwnerType() === Application::OWNER_TYPE_USER ? $context->getOwnerId() : null;
 		foreach ($nodes as $node) {
 			try {
-				if (!is_numeric($node['type'])) {
-					throw new InvalidArgumentException('Unexpected node type');
-				}
 				$nodeType = (int)($node['type']);
-				if (!is_numeric($node['id'])) {
-					throw new InvalidArgumentException('Unexpected node id');
-				}
 				$nodeId = (int)($node['id']);
+
 				if (!$this->permissionsService->canManageNodeById($nodeType, $nodeId, $userId)) {
 					throw new PermissionError(sprintf('Owner cannot manage node %d (type %d)', $nodeId, $nodeType));
 				}
-				$contextNodeRel = $this->addNodeToContext($context, $nodeId, $nodeType, (int)($node['permissions'] ?? Application::PERMISSION_READ));
+				$contextNodeRel = $this->addNodeToContext($context, $nodeId, $nodeType, $node['permissions'] ?? Application::PERMISSION_READ);
 				$addedNodes[] = $contextNodeRel->jsonSerialize();
 			} catch (Exception $e) {
 				$this->logger->warning('Could not add node {ntype}/{nid} to context {cid}, skipping.', [
 					'app' => Application::APP_ID,
 					'ntype' => $node['type'],
 					'nid' => $node['id'],
-					'permissions' => $node['permissions'],
+					'permissions' => $node['permissions'] ?? '',
 					'cid' => $context['id'],
 					'exception' => $e,
 				]);
