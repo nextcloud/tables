@@ -209,6 +209,11 @@ export default {
 				}
 			}
 
+			:where(.pagination-footer) {
+				width: unset !important;
+				left: unset !important;
+			}
+
 			:where(.sticky) {
 				border: none;
 			}
