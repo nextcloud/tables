@@ -213,10 +213,6 @@ export default {
 				width: unset !important;
 				left: unset !important;
 			}
-
-			:where(.sticky) {
-				border: none;
-			}
 		}
 
 		& :deep(.options.row) {
