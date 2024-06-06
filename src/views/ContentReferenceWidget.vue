@@ -21,12 +21,14 @@
 
 <template>
 	<div v-if="richObject" class="tables-content-widget">
-		<h2>{{ richObject.emoji }}&nbsp;{{ richObject.title }}</h2>
-		<Options
-			:config="tablePermissions"
-			:show-options="true"
-			@create-row="createRow"
-			@set-search-string="search" />
+		<div class="header">
+			<h2>{{ richObject.emoji }}&nbsp;{{ richObject.title }}</h2>
+			<Options
+				:config="tablePermissions"
+				:show-options="true"
+				@create-row="createRow"
+				@set-search-string="search" />
+		</div>
 		<div class="nc-table">
 			<NcTable
 				:rows="filteredRows"
@@ -169,26 +171,32 @@ export default {
 		height: 50vh;
 		overflow: scroll;
 
-		:where(.options) {
-			position: sticky;
-			top: 57px;
-			z-index: 1;
-			padding-bottom: 10px;
-			background-color: var(--color-main-background);
-		}
-
-		h2 {
+		& .header {
 			position: sticky;
 			top: 0;
-			min-width: var(--widget-content-width);
+			left: 0;
 			z-index: 1;
-			background-color: var(--color-main-background);
-			margin: 0 !important;
-			padding: calc(var(--default-grid-baseline) * 4);
+
+			:where(.options) {
+				position: sticky;
+				top: 57px;
+				z-index: 1;
+				padding-bottom: 10px;
+				background-color: var(--color-main-background);
+			}
+
+			h2 {
+				position: sticky;
+				top: 0;
+				min-width: var(--widget-content-width);
+				z-index: 1;
+				background-color: var(--color-main-background);
+				margin: 0 !important;
+				padding: calc(var(--default-grid-baseline) * 4);
+			}
 		}
 
 		.nc-table {
-			margin-left: calc(var(--default-grid-baseline) * 2);
 			min-width: var(--widget-content-width);
 
 			:where(.options.row) {
