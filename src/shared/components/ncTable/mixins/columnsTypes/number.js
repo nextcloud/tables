@@ -1,6 +1,7 @@
 import { AbstractNumberColumn } from '../columnClass.js'
 import { ColumnTypes } from '../columnHandler.js'
 import { FilterIds } from '../filter.js'
+import { TYPE_META_ID } from '../../../../constants.js'
 
 export default class NumberColumn extends AbstractNumberColumn {
 
@@ -14,11 +15,15 @@ export default class NumberColumn extends AbstractNumberColumn {
 		this.numberSuffix = data.numberSuffix
 	}
 
-	sort(mode) {
+	sort(mode, nextSorts) {
 		const factor = mode === 'DESC' ? -1 : 1
 		return (rowA, rowB) => {
-			const valueA = rowA.data.find(item => item.columnId === this.id)?.value || null
-			const valueB = rowB.data.find(item => item.columnId === this.id)?.value || null
+			let valueA = rowA.data.find(item => item.columnId === this.id)?.value || null
+			let valueB = rowB.data.find(item => item.columnId === this.id)?.value || null
+			if (this.id === TYPE_META_ID) {
+				valueA = rowA.id
+				valueB = rowB.id
+			}
 			if (!valueA && valueB) {
 				return -1 * factor
 			}
@@ -26,9 +31,9 @@ export default class NumberColumn extends AbstractNumberColumn {
 				return 1 * factor
 			}
 			if (!valueA && !valueB) {
-				return 0
+				return super.getNextSortsResult(nextSorts, rowA, rowB)
 			}
-			return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor
+			return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
 		}
 	}
 

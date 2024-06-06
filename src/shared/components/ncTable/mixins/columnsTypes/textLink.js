@@ -10,14 +10,14 @@ export default class TextLinkColumn extends AbstractTextColumn {
 		this.textAllowedPattern = data.textAllowedPattern
 	}
 
-	sort(mode) {
+	sort(mode, nextSorts) {
 		const factor = mode === 'DESC' ? -1 : 1
 		return (rowA, rowB) => {
 			const tmpA = rowA.data.find(item => item.columnId === this.id)?.value?.toLowerCase() || ''
 			const valueA = this.getValueFromCellValue(tmpA)
 			const tmpB = rowB.data.find(item => item.columnId === this.id)?.value?.toLowerCase() || ''
 			const valueB = this.getValueFromCellValue(tmpB)
-			return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor
+			return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
 		}
 	}
 

@@ -9,14 +9,14 @@ export default class SelectionCheckColumn extends AbstractSelectionColumn {
 		this.type = ColumnTypes.SelectionCheck
 	}
 
-	sort(mode) {
+	sort(mode, nextSorts) {
 		const factor = mode === 'DESC' ? 1 : -1
 		return (rowA, rowB) => {
 			const tmpA = rowA.data.find(item => item.columnId === this.id)?.value || ''
 			const valueA = (tmpA === true || tmpA === 'true')
 			const tmpB = rowB.data.find(item => item.columnId === this.id)?.value || ''
 			const valueB = (tmpB === true || tmpB === 'true')
-			return (valueA - valueB) * factor
+			return (valueA - valueB) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
 		}
 	}
 

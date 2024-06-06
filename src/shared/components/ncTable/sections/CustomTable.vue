@@ -82,6 +82,7 @@ import { mapState } from 'vuex'
 import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
 } from '../../../../shared/constants.js'
+import { MetaColumns } from '../mixins/metaColumns.js'
 
 export default {
 	name: 'CustomTable',
@@ -270,14 +271,23 @@ export default {
 			return data
 		},
 		getSearchedAndFilteredAndSortedRows() {
+			const allColumns = this.columns.concat(MetaColumns)
+			const sort = (sortCols) => {
+				const sortColumn = allColumns.find(item => item.id === sortCols?.[0].columnId)
+				const nextSorts = []
+				for (let i = 1; i < sortCols.length; i++) {
+					const sortColumn = allColumns.find(item => item.id === sortCols[i].columnId)
+					nextSorts.push(sortColumn?.sort?.(sortCols[i].mode))
+				}
+				return [...this.getSearchedAndFilteredRows].sort(sortColumn?.sort?.(sortCols[0].mode, nextSorts))
+			}
+
 			// if we have to sort
 			if (this.viewSetting?.presetSorting) {
-				const sortColumn = this.columns.find(item => item.id === this.viewSetting.presetSorting?.[0].columnId)
-				return [...this.getSearchedAndFilteredRows].sort(sortColumn?.sort?.(this.viewSetting.presetSorting[0].mode))
+				return sort(this.viewSetting.presetSorting)
 			}
 			if (this.viewSetting?.sorting) {
-				const sortColumn = this.columns.find(item => item.id === this.viewSetting.sorting[0].columnId)
-				return [...this.getSearchedAndFilteredRows].sort(sortColumn.sort(this.viewSetting.sorting[0].mode))
+				return sort(this.viewSetting.sorting)
 			}
 			return this.getSearchedAndFilteredRows
 		},
