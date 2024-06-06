@@ -393,3 +393,41 @@ Feature: APIv2
       | field | value                        |
       | node  | table:t1:read,create,update  |
       | node  | table:t2:read                |
+
+  @api2 @contexts @contexts-ownership
+  Scenario: Transfer an owned context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+      | t2    | table | read                |
+    When user "participant1-v2" transfers the Context "c1" to "participant2-v2"
+    Then the reported status is "200"
+    When user "participant1-v2" attempts to fetch Context "c1"
+    Then the reported status is "404"
+    When user "participant2-v2" fetches Context "c1"
+    Then the fetched Context "c1" has following data:
+      | field | value                        |
+      | node  | table:t1:read,create,update  |
+      | node  | table:t2:read                |
+
+  @api2 @contexts @contexts-ownership
+  Scenario: Transfer an inaccessible context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+      | t2    | table | read                |
+    When user "participant2-v2" transfers the Context "c1" to "participant3-v2"
+    Then the reported status is "404"
+    When user "participant1-v2" fetches Context "c1"
+    Then the fetched Context "c1" has following data:
+      | field | value                        |
+      | node  | table:t1:read,create,update  |
+      | node  | table:t2:read                |
+    When user "participant2-v2" attempts to fetch Context "c1"
+    Then the reported status is "404"
+    When user "participant3-v2" attempts to fetch Context "c1"
+    Then the reported status is "404"
