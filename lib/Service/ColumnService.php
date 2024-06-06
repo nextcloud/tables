@@ -94,21 +94,7 @@ class ColumnService extends SuperService {
 			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 		$viewColumnIds = $view->getColumnsArray();
-		$viewColumns = [];
-		foreach ($viewColumnIds as $viewColumnId) {
-			if ($viewColumnId < 0) {
-				continue;
-			}
-			try {
-				$viewColumns[] = $this->mapper->find($viewColumnId);
-			} catch (DoesNotExistException $e) {
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
-			} catch (MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
-			}
-		}
+		$viewColumns = $this->mapper->findAll($viewColumnIds);
 		return $this->enhanceColumns($viewColumns);
 	}
 
