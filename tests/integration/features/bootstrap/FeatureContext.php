@@ -2140,4 +2140,27 @@ class FeatureContext implements Context {
 		);
 	}
 
+	/**
+	 * @When user :user transfers the Context :contextAlias to :recipientUser
+	 */
+	public function userTransfersTheTheContextTo(string $user, string $contextAlias, string $recipientUser): void {
+		$this->setCurrentUser($user);
+		$context = $this->collectionManager->getByAlias('context', $contextAlias);
+		$this->sendOcsRequest(
+			'PUT',
+			sprintf('/apps/tables/api/2/contexts/%d/transfer', $context['id']),
+			[
+				'newOwnerId' => $recipientUser,
+				'newOwnerType' => 0,
+			]
+		);
+		if ($this->response->getStatusCode() === 200) {
+			$context['owner'] = $recipientUser;
+			$this->collectionManager->update($context, 'context', $context['id'], function () use ($context, $recipientUser) {
+				$this->deleteContextWithFetchCheck($context['id'], $recipientUser);
+			});
+
+		}
+	}
+
 }
