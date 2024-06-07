@@ -1077,7 +1077,7 @@ export type operations = {
         /** @description Node ID */
         nodeId: number;
         /** @description Node type */
-        nodeType: "table" | "view";
+        nodeType: "table" | "view" | "context";
         /** @description Receiver ID */
         receiver: string;
         /** @description Receiver type */

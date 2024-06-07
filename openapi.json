@@ -2370,7 +2370,8 @@
                             "type": "string",
                             "enum": [
                                 "table",
-                                "view"
+                                "view",
+                                "context"
                             ]
                         }
                     },
