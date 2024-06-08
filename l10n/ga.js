@@ -41,6 +41,7 @@ OC.L10N.register(
     "Import" : "Iompórtáil",
     "Type" : "Cineál",
     "Simple text" : "Téacs simplí",
+    "Rich text" : "Téacs saibhir",
     "Time" : "Am",
     "Save" : "Sábháil",
     "Title" : "Teideal",
