@@ -33,8 +33,7 @@ describe('Test column text-link', () => {
 
 		cy.loadTable('Test text-link')
 		cy.get('.NcTable').contains('Create row').click({ force: true })
-		cy.get('.modal__content .slot input').first().type('https://nextcloud.com').tick(500)
-		cy.get('.icon-label-container .labels').contains('https://nextcloud.com').click()
+		cy.get('.modal__content .slot input').first().type('https://nextcloud.com')
 
 		cy.intercept({ method: 'GET', url: '**/search/providers/files/*' }).as('filesResults')
 		cy.get('.modal__content .slot input').eq(1).type('pdf').tick(500)
@@ -54,8 +53,7 @@ describe('Test column text-link', () => {
 		cy.loadTable('Test text-link')
 		cy.get('.NcTable tr td button').click({ force: true })
 
-		cy.get('.modal__content .slot input').first().clear().type('https://github.com').tick(500)
-		cy.get('[data-cy*="github"]').click()
+		cy.get('.modal__content .slot input').first().clear().type('https://github.com')
 
 		cy.get('.modal__content .slot input').eq(1).type('photo-test').tick(500)
 		cy.get('[data-cy*="photo-test"]').first().click()
