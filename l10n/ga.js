@@ -68,6 +68,7 @@ OC.L10N.register(
     "Searching …" : "Ag cuardach…",
     "No elements found." : "Níor aimsíodh aon eilimintí.",
     "group" : "grúpa",
+    "Permissions" : "Permissions",
     "No shares" : "Uimh scaireanna",
     "Created at" : "Cruthaithe ag",
     "Sharing" : "Roinnt",
