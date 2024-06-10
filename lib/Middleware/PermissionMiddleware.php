@@ -2,9 +2,11 @@
 
 namespace OCA\Tables\Middleware;
 
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Service\PermissionsService;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Middleware;
@@ -37,8 +39,80 @@ class PermissionMiddleware extends Middleware {
 	public function beforeController($controller, $methodName): void {
 		// we can have type hinting in the signature only after dropping NC26 – calling parent to enforce on newer releases
 		parent::beforeController($controller, $methodName);
+		$this->assertPermission($controller, $methodName);
 		$this->assertCanManageNode();
 		$this->assertCanManageContext();
+	}
+
+	protected function assertPermission($controller, $methodName): void {
+		$reflectionMethod = new \ReflectionMethod($controller, $methodName);
+		$permissionReqs = $reflectionMethod->getAttributes(RequirePermission::class);
+		if ($permissionReqs) {
+			foreach ($permissionReqs as $permissionReqAttribute) {
+				/** @var RequirePermission $attribute */
+				$attribute = $permissionReqAttribute->newInstance();
+				$this->checkPermission($attribute);
+			}
+		}
+	}
+
+	/**
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
+	protected function checkPermission(RequirePermission $attribute): void {
+		$nodeId = $this->request->getParam($attribute->getIdParam());
+		if (!is_numeric($nodeId)) {
+			throw new InternalError('Invalid node ID');
+		}
+		$nodeId = (int)$nodeId;
+
+		$nodeType = $attribute->getType() ?? $this->request->getParam($attribute->getTypeParam());
+		$isContext = false;
+		if (!is_numeric($nodeType)) {
+			if ($nodeType === 'context') {
+				// contexts are not considered nodes, but we deal with them as well
+				// currently they are only passed as string as well
+				$isContext = true;
+			} else {
+				$nodeType = match ($nodeType) {
+					'table' => Application::NODE_TYPE_TABLE,
+					'view' => Application::NODE_TYPE_VIEW,
+					default => throw new InternalError('Invalid node type'),
+				};
+			}
+		} elseif (!in_array((int)$nodeType, [Application::NODE_TYPE_TABLE, Application::NODE_TYPE_VIEW], true)) {
+			throw new InternalError('Invalid node type');
+		}
+		$nodeType = (int)$nodeType;
+
+		// pre-test: if the node is not accessible in first place, we do not have to reveal it
+		if ($isContext) {
+			if (!$this->permissionsService->canAccessContextById($nodeId, $this->userId)) {
+				throw new NotFoundError();
+			}
+		} else {
+			if (!$this->permissionsService->canAccessNodeById($nodeType, $nodeId, $this->userId)) {
+				throw new NotFoundError();
+			}
+		}
+
+		if ($attribute->getPermission() === Application::PERMISSION_MANAGE) {
+			if (!$isContext) {
+				if (!$this->permissionsService->canManageNodeById($nodeType, $nodeId, $this->userId)) {
+					throw new PermissionError(sprintf('User %s cannot manage node %d (type %d)',
+						$this->userId, $nodeId, $nodeType
+					));
+				}
+			} else {
+				if (!$this->permissionsService->canManageContextById($nodeId, $this->userId)) {
+					throw new PermissionError(sprintf('User %s cannot manage context %d',
+						$this->userId, $nodeId
+					));
+				}
+			}
+		}
 	}
 
 	/**

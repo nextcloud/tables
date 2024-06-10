@@ -154,7 +154,7 @@ class PermissionsService {
 	}
 
 	/**
-	 * @throws Exception
+	 * @throws NotFoundError
 	 */
 	public function canAccessContextById(int $contextId, ?string $userId = null): bool {
 		try {

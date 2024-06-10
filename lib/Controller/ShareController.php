@@ -3,6 +3,7 @@
 namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Service\ShareService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
@@ -61,6 +62,7 @@ class ShareController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE)]
 	public function create(
 		int $nodeId,
 		string $nodeType,

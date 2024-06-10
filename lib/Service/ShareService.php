@@ -218,9 +218,6 @@ class ShareService extends SuperService {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
-		// TODO Do we need to check if create is allowed for requested nodeId?!
-		// should also return not found if share_node could not be found
-		// should also return no permission if sender don't have permission to create a share for node
 		$time = new DateTime();
 		$item = new Share();
 		$item->setSender($this->userId);
