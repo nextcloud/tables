@@ -893,6 +893,29 @@ class FeatureContext implements Context {
 	}
 
 	/**
+	 * @When user :user attempts to share the table with user :receiver
+	 */
+	public function userAttemptsToShareTheTableWithUser(string $user, string $receiver): void {
+		$this->setCurrentUser($user);
+
+		$permissions = [
+			'permissionRead' => true,
+			'permissionCreate' => true,
+			'permissionUpdate' => true,
+			'permissionDelete' => false,
+			'permissionManage' => false
+		];
+		$this->sendRequest(
+			'POST',
+			sprintf('/apps/tables/api/1/tables/%d/shares', $this->tableId),
+			array_merge($permissions, [
+				'receiverType' => 'user',
+				'receiver' => $receiver
+			])
+		);
+	}
+
+	/**
 	 * @Then user :user shares table with user :receiver
 	 *
 	 * @param string $user
@@ -2138,6 +2161,35 @@ class FeatureContext implements Context {
 			sprintf('/apps/tables/api/2/contexts/%d', $context['id']),
 			['nodes' => $nodes]
 		);
+	}
+
+	/**
+	 * @When user :sharer shares the Context :contextAlias to :shareeType :sharee
+	 */
+	public function userSharesTheContextTo(string $sharer, string $contextAlias, string $shareeType, string $sharee): void {
+		$this->setCurrentUser($sharer);
+		$context = $this->collectionManager->getByAlias('context', $contextAlias);
+
+		$this->sendRequest(
+			'POST',
+			'/apps/tables/api/1/shares',
+			[
+				'nodeId' => $context['id'],
+				'nodeType' => 'context',
+				'receiver' => $sharee,
+				'receiverType' => $shareeType,
+				'displayMode' => 2,
+			]
+		);
+		if ($this->response->getStatusCode() === 200) {
+			$share = $this->getDataFromResponse($this->response);
+			$this->shareId = $share['id'];
+
+			Assert::assertEquals($share['nodeType'], 'context');
+			Assert::assertEquals($share['nodeId'], $context['id']);
+			Assert::assertEquals($share['receiverType'], $shareeType);
+			Assert::assertEquals($share['receiver'], $sharee);
+		}
 	}
 
 }

@@ -11,6 +11,7 @@ use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ImportService;
@@ -476,7 +477,7 @@ class Api1Controller extends ApiController {
 	 * @NoCSRFRequired
 	 *
 	 * @param int $nodeId Node ID
-	 * @param 'table'|'view' $nodeType Node type
+	 * @param 'table'|'view'|'context' $nodeType Node type
 	 * @param string $receiver Receiver ID
 	 * @param 'user'|'group' $receiverType Receiver type
 	 * @param bool $permissionRead Permission if receiver can read data
@@ -491,6 +492,7 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE)]
 	public function createShare(
 		int $nodeId,
 		string $nodeType,
@@ -1363,6 +1365,7 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function createTableShare(int $tableId, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage): DataResponse {
 		try {
 			return new DataResponse($this->shareService->create($tableId, 'table', $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage, 0)->jsonSerialize());
