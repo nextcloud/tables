@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.7.3
+
+### Added
+
+* [[stable0.7] enh(App): navigation tweaks for Contexts (tables#1082)](https://github.com/nextcloud/tables/pull/1082)
+
+### Fixed
+
+* [[stable0.7] fix(DB): fetch pageId as int (tables#1089)](https://github.com/nextcloud/tables/pull/1089)
+* [[stable0.7] fix(Context): do not show hidden columns (tables#1111)](https://github.com/nextcloud/tables/pull/1111)
+
+### Other
+
+* [Chore(deps): update dependency @nextcloud/browserslist-config to ^3.0.1 (stable0.7) (tables#1020)](https://github.com/nextcloud/tables/pull/1020)
+* [Fix(deps): update tiptap to ^2.3.2 (stable0.7) (tables#1056)](https://github.com/nextcloud/tables/pull/1056)
+* [Chore(deps): update dependency openapi-typescript to ^6.7.6 (stable0.7) (tables#1107)](https://github.com/nextcloud/tables/pull/1107)
+* [[stable0.7] test(cypress): fix month names (tables#1120)](https://github.com/nextcloud/tables/pull/1120)
+* [[stable0.7] ci(integration): tests against context updates (tables#1121)](https://github.com/nextcloud/tables/pull/1121)
+* [[stable0.7] ci(integration): test against context sharing (tables#1132)](https://github.com/nextcloud/tables/pull/1132)
+* [[stable0.7] fix(Controller): remove unneeded endpoints (tables#1133)](https://github.com/nextcloud/tables/pull/1133)
+
 ## 0.7.2
 
 ### Added
