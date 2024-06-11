@@ -368,7 +368,6 @@ class ViewService extends SuperService {
 						$permissions = $this->permissionsService->getPermissionArrayForNodeFromContexts($view->getId(), 'view', $userId);
 					}
 					$view->setIsShared(true);
-					$canManageTable = false;
 					try {
 						try {
 							$manageTableShare = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getTableId(), 'table', $userId);
@@ -384,7 +383,7 @@ class ViewService extends SuperService {
 					$view->setOnSharePermissions($permissions);
 				} catch (NotFoundError $e) {
 				} catch (\Exception $e) {
-					$this->logger->warning('Exception occurred while setting shared permissions: '.$e->getMessage().' No permissions granted.');
+					$this->logger->warning('Exception occurred while setting shared permissions: ' . $e->getMessage() . ' No permissions granted.');
 					$view->setOnSharePermissions([
 						'read' => false,
 						'create' => false,
@@ -415,24 +414,24 @@ class ViewService extends SuperService {
 		} catch (InternalError|PermissionError $e) {
 		}
 
-		if($view->getIsShared()) {
+		if ($view->getIsShared()) {
 			// Remove detailed view filtering and sorting information if necessary
-			if(!$view->getOnSharePermissions()['manageTable']) {
+			if (!$view->getOnSharePermissions()['manageTable']) {
 				$rawFilterArray = $view->getFilterArray();
-				if($rawFilterArray) {
+				if ($rawFilterArray) {
 					$view->setFilterArray(
-						array_map(function ($filterGroup) {
+						array_map(static function ($filterGroup) {
 							// Instead of filter just indicate that there is a filter, but hide details
 							return array_map(null, $filterGroup);
 						},
 							$rawFilterArray));
 				}
 				$rawSortArray = $view->getSortArray();
-				if($rawSortArray) {
+				if ($rawSortArray) {
 					$view->setSortArray(
-						array_map(function ($sortRule) use ($view) {
+						array_map(static function ($sortRule) use ($view) {
 							$columnsArray = $view->getColumnsArray();
-							if(isset($sortRule['columnId']) && $columnsArray && in_array($sortRule['columnId'], $columnsArray)) {
+							if (isset($sortRule['columnId']) && $columnsArray && in_array($sortRule['columnId'], $columnsArray, true)) {
 								return $sortRule;
 							}
 							// Instead of sort rule just indicate that there is a rule, but hide details

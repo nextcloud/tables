@@ -17,10 +17,14 @@ use OCP\AppFramework\Db\Entity;
  * @method setTitle(string $title)
  * @method getTableId(): int
  * @method setTableId(int $tableId)
+ * @method getColumns(): string
+ * @method setColumns(string $columns)
  * @method getCreatedBy(): string
  * @method setCreatedBy(string $createdBy)
  * @method getCreatedAt(): string
  * @method setCreatedAt(string $createdAt)
+ * @method getFilter(): string
+ * @method setFilter(string $filter)
  * @method getLastEditBy(): string
  * @method setLastEditBy(string $lastEditBy)
  * @method getLastEditAt(): string
@@ -39,6 +43,8 @@ use OCP\AppFramework\Db\Entity;
  * @method setFavorite(bool $favorite)
  * @method getRowsCount(): int
  * @method setRowsCount(int $rowCount)
+ * @method getSort(): string
+ * @method setSort(string $sort)
  * @method getOwnerDisplayName(): string
  * @method setOwnerDisplayName(string $ownerDisplayName)
  */
@@ -61,7 +67,6 @@ class View extends Entity implements JsonSerializable {
 	protected ?int $rowsCount = 0;
 	protected ?string $ownership = null;
 	protected ?string $ownerDisplayName = null;
-
 
 	public function __construct() {
 		$this->addType('id', 'integer');
