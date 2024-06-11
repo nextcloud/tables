@@ -92,6 +92,8 @@ OC.L10N.register(
     "Code" : "Cód",
     "Mandatory" : "Éigeantach",
     "Default" : "Réamhshocrú",
+    "Options" : "Roghanna",
+    "Add option" : "Cuir rogha leis",
     "URL" : "URL",
     "Close editor" : "Dún eagarthóir",
     "Confirmation" : "Daingniú",
