@@ -119,6 +119,27 @@ Feature: APIv2
       | page  | startpage:2                  |
 
   @api2 @contexts
+  Scenario: Create a simple shared context containing one table and one view
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "👋" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
+    When user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+      | v1    | view  | read                |
+    Then user "participant1-v2" has access to Context "c1"
+    When user "participant1-v2" shares the Context "c1" to "user" "participant2-v2"
+    Then user "participant2-v2" has access to Context "c1"
+    And user "participant2-v2" fetches Context "c1"
+    And the fetched Context "c1" has following data:
+      | field | value                        |
+      | name  | Enchanting Guitar            |
+      | icon  | tennis                       |
+      | node  | table:t1:read,create,update  |
+      | node  | view:v1:read                 |
+      | page  | startpage:2                  |
+
+  @api2 @contexts
   Scenario: Attempt to create a context containing an inaccessible table
     Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
     And table "Table 2 via api v2" with emoji "👋" exists for user "participant2-v2" as "t2" via v2
@@ -220,6 +241,19 @@ Feature: APIv2
     Then the reported status is "404"
 
   @api2 @contexts
+  Scenario: Delete a shared context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,created,update |
+    And user "participant1-v2" shares the Context "c1" to "user" "participant2-v2"
+    When user "participant2-v2" attempts to delete Context "c1"
+    Then the reported status is "403"
+    When user "participant1-v2" fetches Context "c1"
+    Then the reported status is "200"
+
+  @api2 @contexts
   Scenario: Delete an inaccessible context
     Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
     And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
@@ -264,6 +298,25 @@ Feature: APIv2
     And known Context "c1" has "description" set to "Roll With the Punches"
 
   @api2 @contexts @contexts-update
+  Scenario: Update a shared context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,created,update |
+    And user "participant1-v2" shares the Context "c1" to "user" "participant2-v2"
+    When user "participant2-v2" updates Context "c1" by setting
+      | property    | value                 |
+      | name        | Psychedelic Drawer    |
+      | iconName    | thermostat            |
+      | description | Roll With the Punches |
+    Then the reported status is "403"
+    When user "participant1-v2" fetches Context "c1"
+    Then known Context "c1" has "name" set to "Enchanting Guitar"
+    And known Context "c1" has "icon" set to "tennis"
+    And known Context "c1" has "description" set to "Lorem ipsum dolor etc pp"
+
+  @api2 @contexts @contexts-update
   Scenario: Update an inaccessible context
     Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
     And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
@@ -298,6 +351,24 @@ Feature: APIv2
       | field | value                        |
       | node  | table:t1:read,create,update  |
       | node  | table:t2:read                |
+
+  @api2 @contexts @contexts-update
+  Scenario: Add a table to a shared context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant2-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+    And user "participant1-v2" shares the Context "c1" to "user" "participant2-v2"
+    When user "participant2-v2" updates the nodes of the Context "c1" to
+      | alias | type  | permissions         |
+      | t1    | table | read,create         |
+      | t2    | table | read                |
+    Then the reported status is "403"
+    When user "participant1-v2" fetches Context "c1"
+    Then the fetched Context "c1" has following data:
+      | field | value                        |
+      | node  | table:t1:read,create,update  |
 
   @api2 @contexts @contexts-update
   Scenario: Add a table to an inaccessible context
@@ -377,6 +448,25 @@ Feature: APIv2
       | node  | table:t2:read                |
 
   @api2 @contexts @contexts-update
+  Scenario: Remove a table from a shared context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+      | t2    | table | read                |
+    And user "participant1-v2" shares the Context "c1" to "user" "participant2-v2"
+    When user "participant2-v2" updates the nodes of the Context "c1" to
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+    Then the reported status is "403"
+    When user "participant1-v2" fetches Context "c1"
+    Then the fetched Context "c1" has following data:
+      | field | value                        |
+      | node  | table:t1:read,create,update  |
+      | node  | table:t2:read                |
+
+  @api2 @contexts @contexts-update
   Scenario: Remove a non-existing table from an inaccessible context
     Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
     And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
@@ -411,6 +501,27 @@ Feature: APIv2
       | field | value                        |
       | node  | table:t1:read,create,update  |
       | node  | table:t2:read                |
+
+  @api2 @contexts @contexts-ownership
+  Scenario: Transfer a shared context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1-v2" as "t2" via v2
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+      | t2    | table | read                |
+    And user "participant1-v2" shares the Context "c1" to "user" "participant2-v2"
+    When user "participant2-v2" transfers the Context "c1" to "participant3-v2"
+    Then the reported status is "403"
+    When user "participant1-v2" fetches Context "c1"
+    Then the fetched Context "c1" has following data:
+      | field | value                        |
+      | node  | table:t1:read,create,update  |
+      | node  | table:t2:read                |
+    When user "participant2-v2" fetches Context "c1"
+    Then the reported status is "200"
+    When user "participant3-v2" attempts to fetch Context "c1"
+    Then the reported status is "404"
 
   @api2 @contexts @contexts-ownership
   Scenario: Transfer an inaccessible context
