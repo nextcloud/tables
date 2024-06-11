@@ -374,8 +374,9 @@ class ViewService extends SuperService {
 							$manageTableShare = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getTableId(), 'table', $userId);
 						} catch (NotFoundError) {
 							$manageTableShare = $this->permissionsService->getPermissionArrayForNodeFromContexts($view->getTableId(), 'table', $userId);
+						} finally {
+							$permissions['manageTable'] = $manageTableShare['manage'] ?? false;
 						}
-						$permissions['manageTable'] = $manageTableShare['manage'] ?? false;
 					} catch (NotFoundError $e) {
 					} catch (\Exception $e) {
 						throw new InternalError($e->getMessage());
