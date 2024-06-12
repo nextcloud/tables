@@ -1,6 +1,9 @@
 OC.L10N.register(
     "tables",
     {
+    "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Déi ropgelueden Datei ass méi grouss wei d'MAX_FILE_SIZE Eegenschaft déi an der HTML form uginn ass",
+    "No file was uploaded" : "Et ass kee Fichier ropgeluede ginn",
+    "Missing a temporary folder" : "Et feelt en temporären Dossier",
     "No" : "Nee",
     "Yes" : "Jo",
     "Date" : "Date",
@@ -24,9 +27,11 @@ OC.L10N.register(
     "Title" : "Titel",
     "Cancel" : "Ofbriechen",
     "Delete" : "Läschen",
+    "Close" : "Zoumaachen",
     "Please select a file." : "Wiel eng Datei aus.",
     "Sort" : "Zortéieren",
-    "Shared" : "Gedeelt",
+    "Copy" : "Kopie",
+    "Favorites" : "Favoriten",
     "group" : "Grupp",
     "Sharing" : "Gedeelt",
     "Update" : "Update",
@@ -35,6 +40,7 @@ OC.L10N.register(
     "Search" : "Search",
     "Default" : "Standard",
     "URL" : "URL",
+    "Confirm" : "Konfirméieren",
     "Select" : "Auswielen"
 },
 "nplurals=2; plural=(n != 1);");

@@ -201,7 +201,7 @@ export default {
 			if (this.$options.components && this.$options.components[form]) {
 				return form
 			} else {
-				throw Error('Form ' + form + ' does no exist')
+				throw Error('Form ' + form + ' does not exist')
 			}
 		},
 		type() {
@@ -211,6 +211,11 @@ export default {
 	watch: {
 		combinedType() {
 			this.reset(false, false)
+		},
+		showModal() {
+			this.$nextTick(() => {
+				this.$el.querySelector('input')?.focus()
+			})
 		},
 	},
 	methods: {
@@ -281,7 +286,7 @@ export default {
 						data.numberSuffix = this.column.numberSuffix
 					}
 				}
-				const res = await this.$store.dispatch('insertNewColumn', { data })
+				const res = await this.$store.dispatch('insertNewColumn', { isView: this.isView, elementId: this.element.id, data })
 				if (res) {
 					showSuccess(t('tables', 'The column "{column}" was created.', { column: this.column.title }))
 				} else {

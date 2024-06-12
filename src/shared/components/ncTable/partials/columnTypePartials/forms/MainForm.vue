@@ -116,7 +116,7 @@ export default {
 			if (this.isView) {
 				return this.views.filter(view => view.tableId === this.activeElement.tableId && view !== this.activeElement).filter(view => !this.localSelectedViews.includes(view))
 			}
-			return this.views.filter(view => view.tableId === this.activeElement.id).filter(view => !this.localSelectedViews.includes(view))
+			return this.views.filter(view => view.tableId === this.activeElement?.id).filter(view => !this.localSelectedViews.includes(view))
 		},
 	},
 

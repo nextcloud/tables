@@ -93,6 +93,7 @@ class Version000700Date20230916000000 extends SimpleMigrationStep {
 			$table->addColumn('last_edit_by', Types::STRING, ['notnull' => true, 'length' => 64]);
 			$table->addColumn('last_edit_at', Types::DATETIME, ['notnull' => true]);
 			$table->addIndex(['id']);
+			$table->addIndex(['table_id'], 'tables_tables_row_sleeves_t_id');
 			$table->setPrimaryKey(['id']);
 		}
 	}

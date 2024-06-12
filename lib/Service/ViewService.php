@@ -7,6 +7,7 @@ namespace OCA\Tables\Service;
 use DateTime;
 use Exception;
 
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
@@ -15,10 +16,12 @@ use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Event\ViewDeletedEvent;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
@@ -34,7 +37,12 @@ class ViewService extends SuperService {
 
 	protected UserHelper $userHelper;
 
+	protected FavoritesService $favoritesService;
+
 	protected IL10N $l;
+	private ContextService $contextService;
+
+	protected IEventDispatcher $eventDispatcher;
 
 	public function __construct(
 		PermissionsService $permissionsService,
@@ -44,6 +52,9 @@ class ViewService extends SuperService {
 		ShareService $shareService,
 		RowService $rowService,
 		UserHelper $userHelper,
+		FavoritesService $favoritesService,
+		IEventDispatcher $eventDispatcher,
+		ContextService $contextService,
 		IL10N $l
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
@@ -52,6 +63,9 @@ class ViewService extends SuperService {
 		$this->shareService = $shareService;
 		$this->rowService = $rowService;
 		$this->userHelper = $userHelper;
+		$this->favoritesService = $favoritesService;
+		$this->eventDispatcher = $eventDispatcher;
+		$this->contextService = $contextService;
 	}
 
 
@@ -137,11 +151,31 @@ class ViewService extends SuperService {
 		if ($userId === '') {
 			return [];
 		}
+
+		$allViews = [];
+
 		$sharedViews = $this->shareService->findViewsSharedWithMe($userId);
-		foreach ($sharedViews as $view) {
+		foreach ($sharedViews as $sharedView) {
+			$allViews[$sharedView->getId()] = $sharedView;
+		}
+
+		$contexts = $this->contextService->findAll($userId);
+		foreach ($contexts as $context) {
+			$nodes = $context->getNodes();
+			foreach ($nodes as $node) {
+				if ($node['node_type'] !== Application::NODE_TYPE_VIEW
+					|| isset($allViews[$node['node_id']])
+				) {
+					continue;
+				}
+				$allViews[$node['node_id']] = $this->find($node['node_id'], false, $userId);
+			}
+		}
+
+		foreach ($allViews as $view) {
 			$this->enhanceView($view, $userId);
 		}
-		return $sharedViews;
+		return array_values($allViews);
 	}
 
 
@@ -269,7 +303,13 @@ class ViewService extends SuperService {
 		$this->shareService->deleteAllForView($view);
 
 		try {
-			return $this->mapper->delete($view);
+			$deletedView = $this->mapper->delete($view);
+
+			$event = new ViewDeletedEvent(view: $view);
+
+			$this->eventDispatcher->dispatchTyped($event);
+
+			return $deletedView;
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
@@ -296,6 +336,11 @@ class ViewService extends SuperService {
 			$this->shareService->deleteAllForView($view);
 
 			$this->mapper->delete($view);
+
+			$event = new ViewDeletedEvent(view: $view);
+
+			$this->eventDispatcher->dispatchTyped($event);
+
 			return $view;
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());
@@ -317,27 +362,28 @@ class ViewService extends SuperService {
 		if ($userId !== '') {
 			if ($userId !== $view->getOwnership()) {
 				try {
-					$permissions = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getId(), 'view', $userId);
-					$view->setIsShared(true);
-					$canManageTable = false;
 					try {
-						$manageTableShare = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getTableId(), 'table', $userId);
-						$canManageTable = $manageTableShare['manage'] ?? false;
+						$permissions = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getId(), 'view', $userId);
+					} catch (NotFoundError) {
+						$permissions = $this->permissionsService->getPermissionArrayForNodeFromContexts($view->getId(), 'view', $userId);
+					}
+					$view->setIsShared(true);
+					try {
+						try {
+							$manageTableShare = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getTableId(), 'table', $userId);
+						} catch (NotFoundError) {
+							$manageTableShare = $this->permissionsService->getPermissionArrayForNodeFromContexts($view->getTableId(), 'table', $userId);
+						} finally {
+							$permissions['manageTable'] = $manageTableShare['manage'] ?? false;
+						}
 					} catch (NotFoundError $e) {
 					} catch (\Exception $e) {
 						throw new InternalError($e->getMessage());
 					}
-					$view->setOnSharePermissions([
-						'read' => $permissions['read'] ?? false,
-						'create' => $permissions['create'] ?? false,
-						'update' => $permissions['update'] ?? false,
-						'delete' => $permissions['delete'] ?? false,
-						'manage' => $permissions['manage'] ?? false,
-						'manageTable' => $canManageTable
-					]);
+					$view->setOnSharePermissions($permissions);
 				} catch (NotFoundError $e) {
 				} catch (\Exception $e) {
-					$this->logger->warning('Exception occurred while setting shared permissions: '.$e->getMessage().' No permissions granted.');
+					$this->logger->warning('Exception occurred while setting shared permissions: ' . $e->getMessage() . ' No permissions granted.');
 					$view->setOnSharePermissions([
 						'read' => false,
 						'create' => false,
@@ -368,24 +414,24 @@ class ViewService extends SuperService {
 		} catch (InternalError|PermissionError $e) {
 		}
 
-		if($view->getIsShared()) {
+		if ($view->getIsShared()) {
 			// Remove detailed view filtering and sorting information if necessary
-			if(!$view->getOnSharePermissions()['manageTable']) {
+			if (!$view->getOnSharePermissions()['manageTable']) {
 				$rawFilterArray = $view->getFilterArray();
-				if($rawFilterArray) {
+				if ($rawFilterArray) {
 					$view->setFilterArray(
-						array_map(function ($filterGroup) {
+						array_map(static function ($filterGroup) {
 							// Instead of filter just indicate that there is a filter, but hide details
 							return array_map(null, $filterGroup);
 						},
 							$rawFilterArray));
 				}
 				$rawSortArray = $view->getSortArray();
-				if($rawSortArray) {
+				if ($rawSortArray) {
 					$view->setSortArray(
-						array_map(function ($sortRule) use ($view) {
+						array_map(static function ($sortRule) use ($view) {
 							$columnsArray = $view->getColumnsArray();
-							if(isset($sortRule['columnId']) && $columnsArray && in_array($sortRule['columnId'], $columnsArray)) {
+							if (isset($sortRule['columnId']) && $columnsArray && in_array($sortRule['columnId'], $columnsArray, true)) {
 								return $sortRule;
 							}
 							// Instead of sort rule just indicate that there is a rule, but hide details
@@ -394,6 +440,10 @@ class ViewService extends SuperService {
 							$rawSortArray));
 				}
 			}
+		}
+
+		if ($this->favoritesService->isFavorite(Application::NODE_TYPE_VIEW, $view->getId())) {
+			$view->setFavorite(true);
 		}
 	}
 

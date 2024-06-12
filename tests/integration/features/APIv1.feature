@@ -48,6 +48,15 @@ Feature: APIv1
     Then user "participant2" has the following tables
       | Tutorial |
 
+  @api1 @table-sharing
+  Scenario: Inaccessible table sharing with a user
+    Given table "Ready to share" with emoji "🥪" exists for user "participant1" as "base1"
+    And user "participant3" exists
+    When user "participant2" attempts to share the table with user "participant3"
+    Then the reported status is "404"
+    And user "participant3" has the following tables
+      | Tutorial |
+
   @api1
   Scenario: Table sharing with a group
     Given table "Ready to share" with emoji "🥪" exists for user "participant1" as "base1"
@@ -217,3 +226,35 @@ Feature: APIv1
       | updated first view |
     When user "participant1" deletes view "first-view"
     Then table "view-test" has the following views for user "participant1"
+
+  @api1 @contexts @contexts-sharing
+  Scenario: Share an owned context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1" as "t2" via v2
+    And user "participant1" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+      | t2    | table | read                |
+    When user "participant2" attempts to fetch Context "c1"
+    Then the reported status is "404"
+    When user "participant1" shares the Context "c1" to "user" "participant2"
+    Then the reported status is "200"
+    When user "participant2" fetches Context "c1"
+    Then the fetched Context "c1" has following data:
+      | field | value                        |
+      | node  | table:t1:read,create,update  |
+      | node  | table:t2:read                |
+
+  @api1 @contexts @contexts-sharing
+  Scenario: Share an inaccessible context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1" as "t1" via v2
+    And table "Table 2 via api v2" with emoji "📸" exists for user "participant1" as "t2" via v2
+    And user "participant1" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+      | t2    | table | read                |
+    And user "participant3" exists
+    When user "participant2" shares the Context "c1" to "user" "participant3"
+    Then the reported status is "404"
+    When user "participant3" attempts to fetch Context "c1"
+    Then the reported status is "404"

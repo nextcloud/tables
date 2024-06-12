@@ -1,0 +1,5207 @@
+[
+  {
+    "id": "E76EC23F-AB71-49B3-9173-841544527A20",
+    "baseIconId": "E76EC23F-AB71-49B3-9173-841544527A20",
+    "name": "account",
+    "codepoint": "F0004",
+    "aliases": [
+      "person",
+      "user"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Account / User",
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "3334E19F-962D-45B4-BE11-F009E1192165",
+    "baseIconId": "3334E19F-962D-45B4-BE11-F009E1192165",
+    "name": "adjust",
+    "codepoint": "F001A",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "9A1AAF33-6F36-4987-9E8C-798E34D919A9",
+    "baseIconId": "9A1AAF33-6F36-4987-9E8C-798E34D919A9",
+    "name": "alarm",
+    "codepoint": "F0020",
+    "aliases": [
+      "access-alarms",
+      "alarm-clock"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Date / Time"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "8529D611-F581-4808-95BE-271FB1A6C2FD",
+    "baseIconId": "8529D611-F581-4808-95BE-271FB1A6C2FD",
+    "name": "album",
+    "codepoint": "F0025",
+    "aliases": [
+      "vinyl",
+      "record"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Audio",
+      "Music"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "9FF7DF3F-D575-433B-9C9A-69C58363C186",
+    "baseIconId": "9FF7DF3F-D575-433B-9C9A-69C58363C186",
+    "name": "alert",
+    "codepoint": "F0026",
+    "aliases": [
+      "warning",
+      "report-problem"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Alert / Error"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "8A3C8CCE-D798-446B-A283-90129AD847C9",
+    "baseIconId": "8A3C8CCE-D798-446B-A283-90129AD847C9",
+    "name": "anchor",
+    "codepoint": "F0031",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Transportation + Water"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "4633B767-FF29-411D-8C04-69057C6B65B2",
+    "baseIconId": "4633B767-FF29-411D-8C04-69057C6B65B2",
+    "name": "android",
+    "codepoint": "F0032",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": true,
+    "tags": [
+      "Brand / Logo"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "4FE8F135-8FF9-427B-8857-122FBB0A300A",
+    "baseIconId": "4FE8F135-8FF9-427B-8857-122FBB0A300A",
+    "name": "animation",
+    "codepoint": "F05D8",
+    "aliases": [
+      "auto-awesome-motion"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "B6F97155-147F-4D03-9C71-7668E5EA2712",
+    "baseIconId": "B6F97155-147F-4D03-9C71-7668E5EA2712",
+    "name": "antenna",
+    "codepoint": "F1119",
+    "aliases": [],
+    "styles": [],
+    "version": "4.3.95",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "ABE80259-E64D-4BF4-BC6E-1D8FFA16636F",
+    "baseIconId": "ABE80259-E64D-4BF4-BC6E-1D8FFA16636F",
+    "name": "api",
+    "codepoint": "F109B",
+    "aliases": [],
+    "styles": [],
+    "version": "4.2.95",
+    "deprecated": false,
+    "tags": [
+      "Developer / Languages"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "7F5B9650-26E7-4A88-A6D1-2C338778651D",
+    "baseIconId": "7F5B9650-26E7-4A88-A6D1-2C338778651D",
+    "name": "apps",
+    "codepoint": "F003B",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "View"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "0C612FE5-D7CC-44F3-945A-4BD15A7E39BA",
+    "baseIconId": "0C612FE5-D7CC-44F3-945A-4BD15A7E39BA",
+    "name": "assistant",
+    "codepoint": "F0064",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "9FC24609-9C8B-4DBA-A473-F5EFAFCC90DF",
+    "baseIconId": "9FC24609-9C8B-4DBA-A473-F5EFAFCC90DF",
+    "name": "at",
+    "codepoint": "F0065",
+    "aliases": [
+      "alternate-email"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "A35ABE08-C956-4177-935C-1E1FB835772D",
+    "baseIconId": "A35ABE08-C956-4177-935C-1E1FB835772D",
+    "name": "atm",
+    "codepoint": "F0D47",
+    "aliases": [],
+    "styles": [],
+    "version": "3.4.93",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "E3C20B38-A6D3-4EF0-817D-863B25E555BA",
+    "baseIconId": "E3C20B38-A6D3-4EF0-817D-863B25E555BA",
+    "name": "attachment",
+    "codepoint": "F0066",
+    "aliases": [
+      "paperclip-horizontal"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "0086E21E-2ABC-4983-8BA7-C9C31B55D6B9",
+    "baseIconId": "0086E21E-2ABC-4983-8BA7-C9C31B55D6B9",
+    "name": "atv",
+    "codepoint": "F1B70",
+    "aliases": [
+      "quad",
+      "trike",
+      "two-wheeler",
+      "all-terrain-vehicle"
+    ],
+    "styles": [],
+    "version": "7.0.96",
+    "deprecated": false,
+    "tags": [
+      "Transportation + Other",
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "00598C19-1255-479D-914A-1AADFDBC4868",
+    "baseIconId": "00598C19-1255-479D-914A-1AADFDBC4868",
+    "name": "autorenew",
+    "codepoint": "F006A",
+    "aliases": [
+      "clockwise-arrows",
+      "circular-arrows",
+      "circle-arrows",
+      "sync"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Arrow"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "2CD51EFC-51B6-4323-B1EA-429EB58BFF7F",
+    "baseIconId": "2CD51EFC-51B6-4323-B1EA-429EB58BFF7F",
+    "name": "baby",
+    "codepoint": "F006C",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "People / Family"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "2AAC06E6-8ABD-418B-B9A4-8554B62D7C04",
+    "baseIconId": "2AAC06E6-8ABD-418B-B9A4-8554B62D7C04",
+    "name": "backspace",
+    "codepoint": "F006E",
+    "aliases": [
+      "erase",
+      "clear"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "005E0382-9004-4606-AA2A-07E27AF1E77E",
+    "baseIconId": "005E0382-9004-4606-AA2A-07E27AF1E77E",
+    "name": "balcony",
+    "codepoint": "F1817",
+    "aliases": [
+      "terrace",
+      "patio",
+      "veranda"
+    ],
+    "styles": [],
+    "version": "6.1.95",
+    "deprecated": false,
+    "tags": [
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "27AB71F3-1EFD-484F-8E63-C1E4C694E392",
+    "baseIconId": "27AB71F3-1EFD-484F-8E63-C1E4C694E392",
+    "name": "ballot",
+    "codepoint": "F09C9",
+    "aliases": [
+      "vote"
+    ],
+    "styles": [],
+    "version": "2.5.94",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "6CDF527A-26C1-4175-A56B-5D65FD5E46E2",
+    "baseIconId": "6CDF527A-26C1-4175-A56B-5D65FD5E46E2",
+    "name": "bandage",
+    "codepoint": "F0DAF",
+    "aliases": [
+      "band-aid",
+      "plaster"
+    ],
+    "styles": [],
+    "version": "3.5.94",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "FE08919F-CFFC-4A25-994C-CEDEB299908B",
+    "baseIconId": "FE08919F-CFFC-4A25-994C-CEDEB299908B",
+    "name": "bank",
+    "codepoint": "F0070",
+    "aliases": [
+      "account-balance",
+      "museum"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Banking",
+      "Places"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "CD3098D2-892F-49F5-9FA7-1A5FDC53A15C",
+    "baseIconId": "CD3098D2-892F-49F5-9FA7-1A5FDC53A15C",
+    "name": "barrel",
+    "codepoint": "F0074",
+    "aliases": [
+      "oil-barrel",
+      "energy",
+      "fossil-fuel"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "4E334FE9-DF93-469A-B7D7-AC88BBF25D84",
+    "baseIconId": "4E334FE9-DF93-469A-B7D7-AC88BBF25D84",
+    "name": "basket",
+    "codepoint": "F0076",
+    "aliases": [
+      "shopping-basket",
+      "skip"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Shopping"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "FD797202-9EF1-407E-A290-97C014B8F37E",
+    "baseIconId": "FD797202-9EF1-407E-A290-97C014B8F37E",
+    "name": "basketball",
+    "codepoint": "F0806",
+    "aliases": [
+      "youtube-sports"
+    ],
+    "styles": [],
+    "version": "2.1.19",
+    "deprecated": false,
+    "tags": [
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "4DB5FCB7-2D9E-4612-8087-4F78B0053305",
+    "baseIconId": "4DB5FCB7-2D9E-4612-8087-4F78B0053305",
+    "name": "bathtub",
+    "codepoint": "F1818",
+    "aliases": [],
+    "styles": [],
+    "version": "6.1.95",
+    "deprecated": false,
+    "tags": [
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "C12D919F-7D0D-4355-8109-912BA37154B5",
+    "baseIconId": "C12D919F-7D0D-4355-8109-912BA37154B5",
+    "name": "battery",
+    "codepoint": "F0079",
+    "aliases": [
+      "battery-full",
+      "battery-std",
+      "battery-100"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Battery",
+      "Home Automation",
+      "Automotive"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "EA62EF73-ACC7-4E54-87EF-D5E1683BE58F",
+    "baseIconId": "EA62EF73-ACC7-4E54-87EF-D5E1683BE58F",
+    "name": "bed",
+    "codepoint": "F02E3",
+    "aliases": [
+      "hotel",
+      "guest-room"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Home Automation",
+      "Holiday"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "8B580447-CD93-41E8-BDB0-F37DAE420D3A",
+    "baseIconId": "8B580447-CD93-41E8-BDB0-F37DAE420D3A",
+    "name": "bee",
+    "codepoint": "F0FA1",
+    "aliases": [
+      "fly",
+      "insect"
+    ],
+    "styles": [],
+    "version": "4.0.96",
+    "deprecated": false,
+    "tags": [
+      "Nature",
+      "Agriculture",
+      "Animal"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "45fea174-07db-11e4-bf19-842b2b6cfe1b",
+    "baseIconId": "45fea174-07db-11e4-bf19-842b2b6cfe1b",
+    "name": "bell",
+    "codepoint": "F009A",
+    "aliases": [
+      "notifications"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Notification",
+      "Home Automation",
+      "Music"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "7E88D677-5560-4DF1-A3D0-FC2814BF6612",
+    "baseIconId": "7E88D677-5560-4DF1-A3D0-FC2814BF6612",
+    "name": "biathlon",
+    "codepoint": "F0E14",
+    "aliases": [
+      "human-biathlon"
+    ],
+    "styles": [],
+    "version": "3.6.95",
+    "deprecated": false,
+    "tags": [
+      "Sport",
+      "People / Family"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "627C7FF1-BCAD-4741-966E-7CED73B35DC2",
+    "baseIconId": "627C7FF1-BCAD-4741-966E-7CED73B35DC2",
+    "name": "bike",
+    "codepoint": "F00A3",
+    "aliases": [
+      "bicycle",
+      "cycling",
+      "directions-bike"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Transportation + Other",
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "AC980D29-7F19-4356-970E-A147CFEB64E3",
+    "baseIconId": "AC980D29-7F19-4356-970E-A147CFEB64E3",
+    "name": "blender",
+    "codepoint": "F0CEB",
+    "aliases": [
+      "food-processor"
+    ],
+    "styles": [],
+    "version": "3.3.92",
+    "deprecated": false,
+    "tags": [
+      "Food / Drink",
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "FAFCB184-2AAD-4E83-924F-1C37F1EDF956",
+    "baseIconId": "FAFCB184-2AAD-4E83-924F-1C37F1EDF956",
+    "name": "blur",
+    "codepoint": "F00B5",
+    "aliases": [
+      "blur-on"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "FFF82791-D12F-4643-8128-71CF5FE38C9B",
+    "baseIconId": "FFF82791-D12F-4643-8128-71CF5FE38C9B",
+    "name": "book",
+    "codepoint": "F00BA",
+    "aliases": [
+      "git-repository"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "690787DD-F7B0-4D32-A668-32657D3A3AE8",
+    "baseIconId": "690787DD-F7B0-4D32-A668-32657D3A3AE8",
+    "name": "bookmark",
+    "codepoint": "F00C0",
+    "aliases": [
+      "turned-in"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "DAA06443-AE25-4881-BC62-8033C4420B8E",
+    "baseIconId": "DAA06443-AE25-4881-BC62-8033C4420B8E",
+    "name": "boombox",
+    "codepoint": "F05DC",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "15A9F4A5-3EB6-443C-8283-547A077CB0C4",
+    "baseIconId": "15A9F4A5-3EB6-443C-8283-547A077CB0C4",
+    "name": "briefcase",
+    "codepoint": "F00D6",
+    "aliases": [
+      "work"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "F5E24182-366C-4D23-BA0E-8D2E25B88230",
+    "baseIconId": "F5E24182-366C-4D23-BA0E-8D2E25B88230",
+    "name": "broadcast",
+    "codepoint": "F1720",
+    "aliases": [
+      "signal"
+    ],
+    "styles": [],
+    "version": "5.9.55",
+    "deprecated": false,
+    "tags": [
+      "Weather"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "B5C72984-BCCF-4729-A7D3-2A07D5794014",
+    "baseIconId": "B5C72984-BCCF-4729-A7D3-2A07D5794014",
+    "name": "brush",
+    "codepoint": "F00E3",
+    "aliases": [
+      "paintbrush"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Drawing / Art"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "09A131FB-EE06-49B8-80C3-49B294BCA612",
+    "baseIconId": "09A131FB-EE06-49B8-80C3-49B294BCA612",
+    "name": "bug",
+    "codepoint": "F00E4",
+    "aliases": [
+      "bug-report"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Nature",
+      "Animal"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "A5D2E199-03A1-4C23-9C63-954D63DEBEB4",
+    "baseIconId": "A5D2E199-03A1-4C23-9C63-954D63DEBEB4",
+    "name": "bullhorn",
+    "codepoint": "F00E6",
+    "aliases": [
+      "announcement",
+      "megaphone",
+      "loudspeaker"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "F6516F38-B29E-4CC9-A7E2-706817121D45",
+    "baseIconId": "F6516F38-B29E-4CC9-A7E2-706817121D45",
+    "name": "bus",
+    "codepoint": "F00E7",
+    "aliases": [
+      "directions-bus"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Navigation",
+      "Transportation + Road"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "7DFE345F-A336-43BC-89BE-18FE3C902BFC",
+    "baseIconId": "7DFE345F-A336-43BC-89BE-18FE3C902BFC",
+    "name": "cached",
+    "codepoint": "F00E8",
+    "aliases": [
+      "counterclockwise-arrows",
+      "circular-arrows",
+      "circle-arrows",
+      "sync"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Arrow"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "E5BFDCE4-1033-4062-9677-94B95E028B6E",
+    "baseIconId": "E5BFDCE4-1033-4062-9677-94B95E028B6E",
+    "name": "cake",
+    "codepoint": "F00E9",
+    "aliases": [
+      "birthday-cake"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Holiday",
+      "Food / Drink"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "23C8742A-612C-4C55-B184-2A0ABB387746",
+    "baseIconId": "23C8742A-612C-4C55-B184-2A0ABB387746",
+    "name": "calendar",
+    "codepoint": "F00ED",
+    "aliases": [
+      "event",
+      "insert-invitation"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Date / Time"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "236D9E8E-E38C-4EA9-9539-0E8B1447003A",
+    "baseIconId": "236D9E8E-E38C-4EA9-9539-0E8B1447003A",
+    "name": "camera",
+    "codepoint": "F0100",
+    "aliases": [
+      "photography",
+      "camera-alt",
+      "local-see",
+      "photo-camera"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Photography",
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "02F70DD2-E16E-43FD-9C2A-267C965E3919",
+    "baseIconId": "02F70DD2-E16E-43FD-9C2A-267C965E3919",
+    "name": "cancel",
+    "codepoint": "F073A",
+    "aliases": [
+      "prohibited",
+      "ban",
+      "do-not-disturb-alt",
+      "denied",
+      "block",
+      "forbid",
+      "no",
+      "clear"
+    ],
+    "styles": [],
+    "version": "1.9.32",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "4FB0AA38-406A-4877-8B0C-15C7ED95F22C",
+    "baseIconId": "4FB0AA38-406A-4877-8B0C-15C7ED95F22C",
+    "name": "candle",
+    "codepoint": "F05E2",
+    "aliases": [
+      "candle-flame",
+      "candle-fire"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Holiday",
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "FCF4FF57-4547-4C11-A20A-3D26252780EC",
+    "baseIconId": "FCF4FF57-4547-4C11-A20A-3D26252780EC",
+    "name": "car",
+    "codepoint": "F010B",
+    "aliases": [
+      "directions-car",
+      "drive-eta",
+      "time-to-leave"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Transportation + Road",
+      "Navigation",
+      "Automotive"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "077EABE1-1DBC-4AC9-AA0E-B45386391968",
+    "baseIconId": "077EABE1-1DBC-4AC9-AA0E-B45386391968",
+    "name": "carabiner",
+    "codepoint": "F14C0",
+    "aliases": [
+      "karabiner",
+      "rock-climbing"
+    ],
+    "styles": [],
+    "version": "5.3.45",
+    "deprecated": false,
+    "tags": [
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "97563623-CF1C-43AE-87D8-DF54802D442B",
+    "baseIconId": "97563623-CF1C-43AE-87D8-DF54802D442B",
+    "name": "cart",
+    "codepoint": "F0110",
+    "aliases": [
+      "trolley",
+      "local-grocery-store",
+      "shopping-cart"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Shopping"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "996A1644-29FB-4221-9225-FD5CF8AAD5CE",
+    "baseIconId": "996A1644-29FB-4221-9225-FD5CF8AAD5CE",
+    "name": "cast",
+    "codepoint": "F0118",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "8898488F-1BE6-40A0-84B7-1C0832AA4754",
+    "baseIconId": "8898488F-1BE6-40A0-84B7-1C0832AA4754",
+    "name": "cellphone",
+    "codepoint": "F011C",
+    "aliases": [
+      "mobile-phone",
+      "smartphone",
+      "stay-current-portrait",
+      "stay-primary-portrait"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Cellphone / Phone",
+      "Device / Tech"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "B5589411-20E7-4552-BEC5-A394068B23A7",
+    "baseIconId": "B5589411-20E7-4552-BEC5-A394068B23A7",
+    "name": "charity",
+    "codepoint": "F0C4F",
+    "aliases": [
+      "super-chat-for-good"
+    ],
+    "styles": [],
+    "version": "3.2.89",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "F789CE44-7EA3-4E97-88FB-BEC22EB2030C",
+    "baseIconId": "F789CE44-7EA3-4E97-88FB-BEC22EB2030C",
+    "name": "check",
+    "codepoint": "F012C",
+    "aliases": [
+      "tick",
+      "done",
+      "success"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Form"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "F35E17AA-A0E8-4AEE-9504-6DC07F3ACEAD",
+    "baseIconId": "F35E17AA-A0E8-4AEE-9504-6DC07F3ACEAD",
+    "name": "checkbook",
+    "codepoint": "F0A9D",
+    "aliases": [
+      "chequebook",
+      "cheque-book"
+    ],
+    "styles": [],
+    "version": "2.7.94",
+    "deprecated": false,
+    "tags": [
+      "Banking"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "82E4FDFE-C9C8-4087-ABCC-DF51F760379A",
+    "baseIconId": "82E4FDFE-C9C8-4087-ABCC-DF51F760379A",
+    "name": "church",
+    "codepoint": "F0144",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Religion",
+      "Places"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "5A5AC571-1818-45D0-8259-A9177DBED615",
+    "baseIconId": "5A5AC571-1818-45D0-8259-A9177DBED615",
+    "name": "city",
+    "codepoint": "F0146",
+    "aliases": [
+      "location-city"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Places"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "90E7BBD9-12C3-4339-94DE-99A049C8D4B1",
+    "baseIconId": "90E7BBD9-12C3-4339-94DE-99A049C8D4B1",
+    "name": "clock",
+    "codepoint": "F0954",
+    "aliases": [
+      "watch-later"
+    ],
+    "styles": [],
+    "version": "2.4.85",
+    "deprecated": false,
+    "tags": [
+      "Date / Time"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "FEA26660-7D6A-4C2A-9F13-7AE125FBA543",
+    "baseIconId": "FEA26660-7D6A-4C2A-9F13-7AE125FBA543",
+    "name": "close",
+    "codepoint": "F0156",
+    "aliases": [
+      "clear",
+      "multiply",
+      "remove",
+      "cancel",
+      "times"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Math",
+      "Form"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "CF07C502-388E-4A65-BD89-FACCFD00C245",
+    "baseIconId": "CF07C502-388E-4A65-BD89-FACCFD00C245",
+    "name": "cloud",
+    "codepoint": "F015F",
+    "aliases": [
+      "wb-cloudy"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Cloud",
+      "Weather"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "C95D04C5-F5EE-411A-88F7-A9872B2B4021",
+    "baseIconId": "C95D04C5-F5EE-411A-88F7-A9872B2B4021",
+    "name": "coffee",
+    "codepoint": "F0176",
+    "aliases": [
+      "tea",
+      "cup",
+      "free-breakfast",
+      "local-cafe",
+      "drink"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Food / Drink"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "E4A14909-3821-4DB1-A739-4DA464ABEEB7",
+    "baseIconId": "E4A14909-3821-4DB1-A739-4DA464ABEEB7",
+    "name": "cog",
+    "codepoint": "F0493",
+    "aliases": [
+      "settings",
+      "gear"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Settings"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "2EF56130-ECE9-4432-B59E-36F646DE1C86",
+    "baseIconId": "E4A14909-3821-4DB1-A739-4DA464ABEEB7",
+    "name": "cogs",
+    "codepoint": "F08D6",
+    "aliases": [
+      "settings",
+      "manufacturing"
+    ],
+    "styles": [
+      "multiple"
+    ],
+    "version": "2.3.50",
+    "deprecated": false,
+    "tags": [
+      "Settings"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "8FD44CCD-5073-4C73-98BE-139F777F6E94",
+    "baseIconId": "8FD44CCD-5073-4C73-98BE-139F777F6E94",
+    "name": "collage",
+    "codepoint": "F0640",
+    "aliases": [
+      "auto-awesome-mosaic"
+    ],
+    "styles": [],
+    "version": "1.6.50",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "A9786B48-6664-4170-B56C-6F2868D5000D",
+    "baseIconId": "A9786B48-6664-4170-B56C-6F2868D5000D",
+    "name": "compare",
+    "codepoint": "F018A",
+    "aliases": [
+      "theme-light-dark"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "8FE64B61-0FD6-4056-9A4F-E62408CE70FE",
+    "baseIconId": "8FE64B61-0FD6-4056-9A4F-E62408CE70FE",
+    "name": "compass",
+    "codepoint": "F018B",
+    "aliases": [
+      "explore"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Navigation",
+      "Geographic Information System"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "75C5A894-CC25-4326-A270-6F70BE0D8AAB",
+    "baseIconId": "75C5A894-CC25-4326-A270-6F70BE0D8AAB",
+    "name": "compost",
+    "codepoint": "F1A38",
+    "aliases": [
+      "regeneration",
+      "regenerative-agriculture"
+    ],
+    "styles": [],
+    "version": "6.7.96",
+    "deprecated": false,
+    "tags": [
+      "Agriculture",
+      "Nature"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "5A68EA78-9792-4223-808D-17E5205765E6",
+    "baseIconId": "5A68EA78-9792-4223-808D-17E5205765E6",
+    "name": "contacts",
+    "codepoint": "F06CB",
+    "aliases": [],
+    "styles": [],
+    "version": "1.8.36",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "605CAD46-2EA0-47AE-8A41-953C1F27F9CD",
+    "baseIconId": "605CAD46-2EA0-47AE-8A41-953C1F27F9CD",
+    "name": "controller",
+    "codepoint": "F02B4",
+    "aliases": [
+      "gamepad"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Gaming / RPG"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "8E3FB537-B293-41A6-B6C5-B2BE927091F5",
+    "baseIconId": "8E3FB537-B293-41A6-B6C5-B2BE927091F5",
+    "name": "cookie",
+    "codepoint": "F0198",
+    "aliases": [
+      "biscuit"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Food / Drink"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "34B43A77-9873-4723-AA65-45D42992748E",
+    "baseIconId": "34B43A77-9873-4723-AA65-45D42992748E",
+    "name": "copyright",
+    "codepoint": "F05E6",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "795A2085-78E1-4721-BF6F-007B20CF92AF",
+    "baseIconId": "795A2085-78E1-4721-BF6F-007B20CF92AF",
+    "name": "countertop",
+    "codepoint": "F181C",
+    "aliases": [
+      "kitchen-counter",
+      "sink"
+    ],
+    "styles": [],
+    "version": "6.1.95",
+    "deprecated": false,
+    "tags": [
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "74B57630-EBF9-48DB-886C-36FA79D4350B",
+    "baseIconId": "74B57630-EBF9-48DB-886C-36FA79D4350B",
+    "name": "cradle",
+    "codepoint": "F198B",
+    "aliases": [
+      "crib",
+      "bassinet",
+      "baby",
+      "nursery",
+      "baby-room"
+    ],
+    "styles": [],
+    "version": "6.5.95",
+    "deprecated": false,
+    "tags": [
+      "People / Family",
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "598B7931-3DF8-4CFA-A6E6-80550CA31372",
+    "baseIconId": "598B7931-3DF8-4CFA-A6E6-80550CA31372",
+    "name": "creation",
+    "codepoint": "F0674",
+    "aliases": [
+      "auto-awesome",
+      "sparkles",
+      "stars",
+      "shimmer"
+    ],
+    "styles": [],
+    "version": "1.7.12",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "9C7DBA7B-099C-460D-BD51-2B2F70EBE39A",
+    "baseIconId": "9C7DBA7B-099C-460D-BD51-2B2F70EBE39A",
+    "name": "cricket",
+    "codepoint": "F0D6D",
+    "aliases": [
+      "cricket-bat"
+    ],
+    "styles": [],
+    "version": "3.4.93",
+    "deprecated": false,
+    "tags": [
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "FA68ACCA-389F-453E-B886-FF3DAFE10530",
+    "baseIconId": "FA68ACCA-389F-453E-B886-FF3DAFE10530",
+    "name": "crop",
+    "codepoint": "F019E",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "33845FDE-0003-4780-8DC9-07FC29D46599",
+    "baseIconId": "33845FDE-0003-4780-8DC9-07FC29D46599",
+    "name": "crosshairs",
+    "codepoint": "F01A3",
+    "aliases": [
+      "gps-not-fixed",
+      "location-searching"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Geographic Information System"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "FEE6305B-081C-429E-9584-5A5C6D8FD38F",
+    "baseIconId": "FEE6305B-081C-429E-9584-5A5C6D8FD38F",
+    "name": "crowd",
+    "codepoint": "F1975",
+    "aliases": [
+      "family",
+      "crowd-source",
+      "crowdsource"
+    ],
+    "styles": [],
+    "version": "6.5.95",
+    "deprecated": false,
+    "tags": [
+      "Account / User",
+      "People / Family"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "71CD492D-A1E8-4A7A-961A-51DA30952BAD",
+    "baseIconId": "71CD492D-A1E8-4A7A-961A-51DA30952BAD",
+    "name": "delete",
+    "codepoint": "F01B4",
+    "aliases": [
+      "trash",
+      "bin",
+      "rubbish",
+      "garbage",
+      "rubbish-bin",
+      "trash-can",
+      "garbage-can"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "D4B29470-8EE3-4ED8-BB01-6C942CE7E748",
+    "baseIconId": "D4B29470-8EE3-4ED8-BB01-6C942CE7E748",
+    "name": "delta",
+    "codepoint": "F01C2",
+    "aliases": [
+      "change-history"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Math",
+      "Alpha / Numeric"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "21A2819F-3B97-49D0-A588-30CF7B8915F5",
+    "baseIconId": "21A2819F-3B97-49D0-A588-30CF7B8915F5",
+    "name": "details",
+    "codepoint": "F01C6",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "D8990892-9C02-46AC-9A91-3D4D9A2EFF19",
+    "baseIconId": "D8990892-9C02-46AC-9A91-3D4D9A2EFF19",
+    "name": "devices",
+    "codepoint": "F0FB0",
+    "aliases": [
+      "monitor",
+      "watch",
+      "smartwatch",
+      "smartphone",
+      "cellphone",
+      "television"
+    ],
+    "styles": [],
+    "version": "4.0.96",
+    "deprecated": false,
+    "tags": [
+      "Device / Tech",
+      "Home Automation",
+      "Cellphone / Phone"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "B732FAD7-93A7-478E-810F-835069DE6EDB",
+    "baseIconId": "B732FAD7-93A7-478E-810F-835069DE6EDB",
+    "name": "dialpad",
+    "codepoint": "F061C",
+    "aliases": [
+      "keypad"
+    ],
+    "styles": [],
+    "version": "1.6.50",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "4C84603B-BEB6-4282-B6CE-D9AD3C098627",
+    "baseIconId": "4C84603B-BEB6-4282-B6CE-D9AD3C098627",
+    "name": "directions",
+    "codepoint": "F01D0",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "41CB517E-41F5-47D4-A8A2-E9512CB065DD",
+    "baseIconId": "41CB517E-41F5-47D4-A8A2-E9512CB065DD",
+    "name": "dishwasher",
+    "codepoint": "F0AAC",
+    "aliases": [],
+    "styles": [],
+    "version": "2.7.94",
+    "deprecated": false,
+    "tags": [
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "813D489B-3127-4F32-9D6E-4BB8A6F51605",
+    "baseIconId": "813D489B-3127-4F32-9D6E-4BB8A6F51605",
+    "name": "diving",
+    "codepoint": "F1977",
+    "aliases": [
+      "swim-dive",
+      "human-diving"
+    ],
+    "styles": [],
+    "version": "6.5.95",
+    "deprecated": false,
+    "tags": [
+      "Sport",
+      "People / Family"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "D4A20191-F5B8-4323-A0A8-F4C15A86A83B",
+    "baseIconId": "D4A20191-F5B8-4323-A0A8-F4C15A86A83B",
+    "name": "dns",
+    "codepoint": "F01D6",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "CA264BA4-62A9-4823-A172-22DD413A6CF5",
+    "baseIconId": "CA264BA4-62A9-4823-A172-22DD413A6CF5",
+    "name": "domain",
+    "codepoint": "F01D7",
+    "aliases": [
+      "building",
+      "company",
+      "business"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Places"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "704F7397-0E85-4213-8D76-FE156DF1795F",
+    "baseIconId": "704F7397-0E85-4213-8D76-FE156DF1795F",
+    "name": "download",
+    "codepoint": "F01DA",
+    "aliases": [
+      "file-download",
+      "get-app"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "E792948B-8E66-49B5-83E7-8CDF1ECE6C5D",
+    "baseIconId": "E792948B-8E66-49B5-83E7-8CDF1ECE6C5D",
+    "name": "dumbbell",
+    "codepoint": "F01E6",
+    "aliases": [
+      "weights",
+      "fitness-center",
+      "gym",
+      "barbell"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "0D1618BF-A3AD-4B4A-92EA-5DBF93BF7625",
+    "baseIconId": "0D1618BF-A3AD-4B4A-92EA-5DBF93BF7625",
+    "name": "earth",
+    "codepoint": "F01E7",
+    "aliases": [
+      "globe",
+      "public",
+      "planet",
+      "world"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Geographic Information System",
+      "Navigation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "4B57E9DF-354F-460D-9551-65C0DB55D788",
+    "baseIconId": "4B57E9DF-354F-460D-9551-65C0DB55D788",
+    "name": "eject",
+    "codepoint": "F01EA",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "14AAE073-8399-4D67-9F7E-8E9424328681",
+    "baseIconId": "14AAE073-8399-4D67-9F7E-8E9424328681",
+    "name": "email",
+    "codepoint": "F01EE",
+    "aliases": [
+      "local-post-office",
+      "mail",
+      "markunread",
+      "envelope"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "E8F2B8BE-F4EC-4B9C-BB15-001752B29FFD",
+    "baseIconId": "E8F2B8BE-F4EC-4B9C-BB15-001752B29FFD",
+    "name": "emoticon",
+    "codepoint": "F0C68",
+    "aliases": [
+      "smiley",
+      "face",
+      "emoji"
+    ],
+    "styles": [],
+    "version": "3.2.89",
+    "deprecated": false,
+    "tags": [
+      "Emoji"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "4F6A532E-58ED-4CB5-9BBB-9E77C128D536",
+    "baseIconId": "4F6A532E-58ED-4CB5-9BBB-9E77C128D536",
+    "name": "equalizer",
+    "codepoint": "F0EA2",
+    "aliases": [],
+    "styles": [],
+    "version": "3.7.94",
+    "deprecated": false,
+    "tags": [
+      "Audio"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "3C2B7DF3-97FE-4EC4-B6A9-69A75FB26B67",
+    "baseIconId": "3C2B7DF3-97FE-4EC4-B6A9-69A75FB26B67",
+    "name": "eye",
+    "codepoint": "F0208",
+    "aliases": [
+      "show",
+      "visibility",
+      "remove-red-eye"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "2C398569-5DBF-4405-AF73-6F5CA629AEE1",
+    "baseIconId": "2C398569-5DBF-4405-AF73-6F5CA629AEE1",
+    "name": "fax",
+    "codepoint": "F0212",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Printer",
+      "Cellphone / Phone"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "325210DA-E889-4CBD-B0A7-8A32D706322B",
+    "baseIconId": "325210DA-E889-4CBD-B0A7-8A32D706322B",
+    "name": "fencing",
+    "codepoint": "F14C1",
+    "aliases": [
+      "sword-fight"
+    ],
+    "styles": [],
+    "version": "5.3.45",
+    "deprecated": false,
+    "tags": [
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "F138AC6A-406B-4EB0-BB85-0FDB5415B6F8",
+    "baseIconId": "F138AC6A-406B-4EB0-BB85-0FDB5415B6F8",
+    "name": "ferry",
+    "codepoint": "F0213",
+    "aliases": [
+      "cargo-ship",
+      "boat",
+      "ship",
+      "directions-boat",
+      "directions-ferry"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Transportation + Water",
+      "Navigation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "BFF59001-B52D-47E6-A217-C9095F81C3B8",
+    "baseIconId": "BFF59001-B52D-47E6-A217-C9095F81C3B8",
+    "name": "file",
+    "codepoint": "F0214",
+    "aliases": [
+      "insert-drive-file",
+      "draft",
+      "paper"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Files / Folders"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "2EFEE436-9663-4C09-AD65-6727A0ED2AFD",
+    "baseIconId": "2EFEE436-9663-4C09-AD65-6727A0ED2AFD",
+    "name": "film",
+    "codepoint": "F022F",
+    "aliases": [
+      "camera-roll"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Photography",
+      "Video / Movie"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "10A06B6D-A551-425C-B084-DA3F2239DFA1",
+    "baseIconId": "10A06B6D-A551-425C-B084-DA3F2239DFA1",
+    "name": "filmstrip",
+    "codepoint": "F0230",
+    "aliases": [
+      "local-movies",
+      "theaters"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Video / Movie"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "C39421CD-2A2D-4D92-B59B-69D70A328DF4",
+    "baseIconId": "C39421CD-2A2D-4D92-B59B-69D70A328DF4",
+    "name": "finance",
+    "codepoint": "F081F",
+    "aliases": [
+      "chart-finance",
+      "report-finance",
+      "graph-bar"
+    ],
+    "styles": [],
+    "version": "2.1.19",
+    "deprecated": false,
+    "tags": [
+      "Banking",
+      "Math"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "F71C897D-9858-40AE-8DB4-253CE675D823",
+    "baseIconId": "F71C897D-9858-40AE-8DB4-253CE675D823",
+    "name": "fingerprint",
+    "codepoint": "F0237",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "5259DBA5-B2FB-4112-B1F2-5DC17002205C",
+    "baseIconId": "5259DBA5-B2FB-4112-B1F2-5DC17002205C",
+    "name": "fire",
+    "codepoint": "F0238",
+    "aliases": [
+      "whatshot",
+      "flame",
+      "gas",
+      "natural-gas",
+      "hot"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "3A3D9EFD-ABA4-444F-9CB5-A2D8C1322B2C",
+    "baseIconId": "3A3D9EFD-ABA4-444F-9CB5-A2D8C1322B2C",
+    "name": "firebase",
+    "codepoint": "F0967",
+    "aliases": [],
+    "styles": [],
+    "version": "2.4.85",
+    "deprecated": true,
+    "tags": [
+      "Brand / Logo"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "55271063-77EF-43FA-917C-657E57135A24",
+    "baseIconId": "55271063-77EF-43FA-917C-657E57135A24",
+    "name": "flag",
+    "codepoint": "F023B",
+    "aliases": [
+      "assistant-photo"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "8F4F8B2A-9E7D-432F-978E-F3F108DA701B",
+    "baseIconId": "8F4F8B2A-9E7D-432F-978E-F3F108DA701B",
+    "name": "flare",
+    "codepoint": "F0D72",
+    "aliases": [
+      "star"
+    ],
+    "styles": [],
+    "version": "3.4.93",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "EF3D6923-793B-410C-B349-90A6A338F06C",
+    "baseIconId": "EF3D6923-793B-410C-B349-90A6A338F06C",
+    "name": "flash",
+    "codepoint": "F0241",
+    "aliases": [
+      "lightning-bolt",
+      "flash-on",
+      "electricity"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Weather"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "D73BB486-A112-48C1-A4EE-993825164C43",
+    "baseIconId": "D73BB486-A112-48C1-A4EE-993825164C43",
+    "name": "flower",
+    "codepoint": "F024A",
+    "aliases": [
+      "local-florist",
+      "plant"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Nature",
+      "Agriculture"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "9D8C1CEE-19BE-4B0B-85CC-DEB829F9F045",
+    "baseIconId": "9D8C1CEE-19BE-4B0B-85CC-DEB829F9F045",
+    "name": "folder",
+    "codepoint": "F024B",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Files / Folders"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "140954DE-20F5-4A8B-BFC3-DB8E49922AF3",
+    "baseIconId": "140954DE-20F5-4A8B-BFC3-DB8E49922AF3",
+    "name": "food",
+    "codepoint": "F025A",
+    "aliases": [
+      "fast-food",
+      "burger",
+      "cup",
+      "drink",
+      "hamburger"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Food / Drink"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "3C0488C6-E807-401D-9689-7770550EC2E7",
+    "baseIconId": "3C0488C6-E807-401D-9689-7770550EC2E7",
+    "name": "football",
+    "codepoint": "F025D",
+    "aliases": [
+      "football-american"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "70EFA358-6CE3-4CC1-9F46-6283D491F2E2",
+    "baseIconId": "70EFA358-6CE3-4CC1-9F46-6283D491F2E2",
+    "name": "forest",
+    "codepoint": "F1897",
+    "aliases": [
+      "forestry",
+      "pine-tree-multiple"
+    ],
+    "styles": [],
+    "version": "6.2.95",
+    "deprecated": false,
+    "tags": [
+      "Nature",
+      "Agriculture",
+      "Places"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "3AC84477-2308-4445-868C-9666AE25B054",
+    "baseIconId": "3AC84477-2308-4445-868C-9666AE25B054",
+    "name": "forum",
+    "codepoint": "F028C",
+    "aliases": [
+      "message-group",
+      "question-answer",
+      "chat",
+      "dialogue",
+      "conversation",
+      "discussion"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "EAE07425-A6D5-4B33-A9C5-6D7E9E9E1908",
+    "baseIconId": "EAE07425-A6D5-4B33-A9C5-6D7E9E9E1908",
+    "name": "forward",
+    "codepoint": "F028D",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Arrow"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "A4F7E2E4-704C-4A71-99D5-4BD19AD8E755",
+    "baseIconId": "A4F7E2E4-704C-4A71-99D5-4BD19AD8E755",
+    "name": "fullscreen",
+    "codepoint": "F0293",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "5C29EFA9-0FF3-4101-BC87-C9C15ACBA7AB",
+    "baseIconId": "5C29EFA9-0FF3-4101-BC87-C9C15ACBA7AB",
+    "name": "gamepad",
+    "codepoint": "F0296",
+    "aliases": [
+      "games",
+      "controller"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Home Automation",
+      "Gaming / RPG"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "EC7B7499-25F1-43D4-9A09-9742F5B6D3F2",
+    "baseIconId": "EC7B7499-25F1-43D4-9A09-9742F5B6D3F2",
+    "name": "gauge",
+    "codepoint": "F029A",
+    "aliases": [
+      "swap-driving-apps-wheel",
+      "barometer"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Home Automation",
+      "Automotive"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "FFC2833D-65AB-47BB-AC7C-8CFA41DF9250",
+    "baseIconId": "FFC2833D-65AB-47BB-AC7C-8CFA41DF9250",
+    "name": "gesture",
+    "codepoint": "F07CB",
+    "aliases": [
+      "freehand-line"
+    ],
+    "styles": [],
+    "version": "2.0.46",
+    "deprecated": false,
+    "tags": [
+      "Drawing / Art"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "259F5EC9-395F-40C8-9389-6B6A82D9997C",
+    "baseIconId": "259F5EC9-395F-40C8-9389-6B6A82D9997C",
+    "name": "gmail",
+    "codepoint": "F02AB",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": true,
+    "tags": [
+      "Brand / Logo"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "80A4F47A-3512-4C76-AA10-C0232C57E624",
+    "baseIconId": "80A4F47A-3512-4C76-AA10-C0232C57E624",
+    "name": "golf",
+    "codepoint": "F0823",
+    "aliases": [
+      "golf-course"
+    ],
+    "styles": [],
+    "version": "2.1.19",
+    "deprecated": false,
+    "tags": [
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "F787FBCA-3C54-43CC-AE16-E23436AD0720",
+    "baseIconId": "F787FBCA-3C54-43CC-AE16-E23436AD0720",
+    "name": "google",
+    "codepoint": "F02AD",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": true,
+    "tags": [
+      "Brand / Logo"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "D1784DB9-E2F2-44AA-AF8D-E562D8E3CBBC",
+    "baseIconId": "D1784DB9-E2F2-44AA-AF8D-E562D8E3CBBC",
+    "name": "grain",
+    "codepoint": "F0D7C",
+    "aliases": [],
+    "styles": [],
+    "version": "3.4.93",
+    "deprecated": false,
+    "tags": [
+      "Photography",
+      "Video / Movie",
+      "Agriculture"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "8688646A-F06F-421F-83B1-8AA8FABF7BD8",
+    "baseIconId": "8688646A-F06F-421F-83B1-8AA8FABF7BD8",
+    "name": "grass",
+    "codepoint": "F1510",
+    "aliases": [
+      "lawn"
+    ],
+    "styles": [],
+    "version": "5.4.55",
+    "deprecated": false,
+    "tags": [
+      "Nature",
+      "Agriculture"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "8D4C203D-A1F0-42DA-997A-AB7BAC63D97B",
+    "baseIconId": "8D4C203D-A1F0-42DA-997A-AB7BAC63D97B",
+    "name": "grid",
+    "codepoint": "F02C1",
+    "aliases": [
+      "grid-on"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "22C8B00E-9BA8-4C66-994B-A2F0B4D369DD",
+    "baseIconId": "22C8B00E-9BA8-4C66-994B-A2F0B4D369DD",
+    "name": "grill",
+    "codepoint": "F0E45",
+    "aliases": [
+      "bbq",
+      "barbecue",
+      "charcoal"
+    ],
+    "styles": [],
+    "version": "3.6.95",
+    "deprecated": false,
+    "tags": [
+      "Food / Drink"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "450F9873-EC55-4361-99EB-BBFF202647C6",
+    "baseIconId": "450F9873-EC55-4361-99EB-BBFF202647C6",
+    "name": "gymnastics",
+    "codepoint": "F1A41",
+    "aliases": [],
+    "styles": [],
+    "version": "6.7.96",
+    "deprecated": false,
+    "tags": [
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "B4AC04DD-9F29-4F55-ABB6-A4AE4F272EC4",
+    "baseIconId": "B4AC04DD-9F29-4F55-ABB6-A4AE4F272EC4",
+    "name": "hail",
+    "codepoint": "F0AC1",
+    "aliases": [
+      "hail-taxi",
+      "hail-cab"
+    ],
+    "styles": [],
+    "version": "2.7.94",
+    "deprecated": false,
+    "tags": [
+      "Transportation + Road",
+      "Navigation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "A3F55E77-82C2-48F6-B1B1-92C9259C9C26",
+    "baseIconId": "A3F55E77-82C2-48F6-B1B1-92C9259C9C26",
+    "name": "hammer",
+    "codepoint": "F08EA",
+    "aliases": [],
+    "styles": [],
+    "version": "2.3.50",
+    "deprecated": false,
+    "tags": [
+      "Hardware / Tools"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "845C7000-7198-490F-8043-EC1F61CE4F53",
+    "baseIconId": "845C7000-7198-490F-8043-EC1F61CE4F53",
+    "name": "handball",
+    "codepoint": "F0F53",
+    "aliases": [
+      "volleyball",
+      "human-handball"
+    ],
+    "styles": [],
+    "version": "3.9.97",
+    "deprecated": false,
+    "tags": [
+      "Sport",
+      "People / Family"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "81182C14-380B-4F56-AFF9-EF636EC7BF7E",
+    "baseIconId": "81182C14-380B-4F56-AFF9-EF636EC7BF7E",
+    "name": "hdr",
+    "codepoint": "F0D7D",
+    "aliases": [],
+    "styles": [],
+    "version": "3.4.93",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "51F72F83-1559-4037-8BF9-2D8AE3BCB1A8",
+    "baseIconId": "51F72F83-1559-4037-8BF9-2D8AE3BCB1A8",
+    "name": "headphones",
+    "codepoint": "F02CB",
+    "aliases": [
+      "headset"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Audio",
+      "Device / Tech",
+      "Music"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "AFF98802-E02B-4EC8-8AFF-F0F5373D86C5",
+    "baseIconId": "51F72F83-1559-4037-8BF9-2D8AE3BCB1A8",
+    "name": "headset",
+    "codepoint": "F02CE",
+    "aliases": [
+      "headset-mic"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Audio",
+      "Device / Tech"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "32B56DB2-B6BF-4B54-AD0C-9444106B1C1D",
+    "baseIconId": "32B56DB2-B6BF-4B54-AD0C-9444106B1C1D",
+    "name": "heart",
+    "codepoint": "F02D1",
+    "aliases": [
+      "favorite",
+      "favourite"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Shape",
+      "Gaming / RPG",
+      "Medical / Hospital"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "DA3D64F2-C874-420A-917A-0F66C9854D84",
+    "baseIconId": "DA3D64F2-C874-420A-917A-0F66C9854D84",
+    "name": "hiking",
+    "codepoint": "F0D7F",
+    "aliases": [
+      "human-hiking"
+    ],
+    "styles": [],
+    "version": "3.4.93",
+    "deprecated": false,
+    "tags": [
+      "Sport",
+      "People / Family"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "55AF2D53-7FAD-4A1D-8440-10301C95D3B8",
+    "baseIconId": "55AF2D53-7FAD-4A1D-8440-10301C95D3B8",
+    "name": "history",
+    "codepoint": "F02DA",
+    "aliases": [
+      "recent",
+      "latest",
+      "clock-arrow",
+      "counterclockwise",
+      "restore-clock"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Date / Time"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "5D085274-15B9-42EC-8CCE-2F94C5EC039C",
+    "baseIconId": "5D085274-15B9-42EC-8CCE-2F94C5EC039C",
+    "name": "home",
+    "codepoint": "F02DC",
+    "aliases": [
+      "house"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Home Automation",
+      "Places"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "0BEA7CE4-5642-406D-A995-E2502E85D184",
+    "baseIconId": "0BEA7CE4-5642-406D-A995-E2502E85D184",
+    "name": "hub",
+    "codepoint": "F1C95",
+    "aliases": [],
+    "styles": [],
+    "version": "7.3.67",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "B05E458D-886A-491D-9969-156562C52105",
+    "baseIconId": "10E7CAB4-7B15-4F73-82B1-E42562B9103C",
+    "name": "human",
+    "codepoint": "F02E6",
+    "aliases": [
+      "accessibility"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "People / Family"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "EE07113F-BD81-424C-B228-7EC802F7CFB2",
+    "baseIconId": "EE07113F-BD81-424C-B228-7EC802F7CFB2",
+    "name": "hvac",
+    "codepoint": "F1352",
+    "aliases": [
+      "heating",
+      "ventilation",
+      "air-conditioning"
+    ],
+    "styles": [],
+    "version": "4.9.95",
+    "deprecated": false,
+    "tags": [
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "3238BA72-FEE8-4C90-A440-AD701359A7BC",
+    "baseIconId": "3238BA72-FEE8-4C90-A440-AD701359A7BC",
+    "name": "image",
+    "codepoint": "F02E9",
+    "aliases": [
+      "insert-photo"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "4DDB79C2-C3AE-41DC-B560-AFBF3F689E86",
+    "baseIconId": "4DDB79C2-C3AE-41DC-B560-AFBF3F689E86",
+    "name": "inbox",
+    "codepoint": "F0687",
+    "aliases": [],
+    "styles": [],
+    "version": "1.7.12",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "2BC4A4B6-119B-4637-BF3D-1FB9394E1F38",
+    "baseIconId": "2BC4A4B6-119B-4637-BF3D-1FB9394E1F38",
+    "name": "information",
+    "codepoint": "F02FC",
+    "aliases": [
+      "about",
+      "information-circle",
+      "info-circle",
+      "about-circle",
+      "info"
+    ],
+    "styles": [
+      "circle"
+    ],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Settings"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "43DA7407-CFBA-44CE-9857-D75DF5581CE2",
+    "baseIconId": "43DA7407-CFBA-44CE-9857-D75DF5581CE2",
+    "name": "iron",
+    "codepoint": "F1824",
+    "aliases": [
+      "flatiron",
+      "smoothing-iron"
+    ],
+    "styles": [],
+    "version": "6.1.95",
+    "deprecated": false,
+    "tags": [
+      "Home Automation",
+      "Clothing"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "24CB8442-6875-4A22-A265-0C625118C7E7",
+    "baseIconId": "24CB8442-6875-4A22-A265-0C625118C7E7",
+    "name": "kabaddi",
+    "codepoint": "F0D87",
+    "aliases": [
+      "wrestling",
+      "human-kabaddi"
+    ],
+    "styles": [],
+    "version": "3.4.93",
+    "deprecated": false,
+    "tags": [
+      "Sport",
+      "People / Family"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "85144563-B019-4B8A-AB76-3DE0797D517E",
+    "baseIconId": "85144563-B019-4B8A-AB76-3DE0797D517E",
+    "name": "karate",
+    "codepoint": "F082C",
+    "aliases": [
+      "martial-arts",
+      "kickboxing",
+      "human-karate"
+    ],
+    "styles": [],
+    "version": "2.1.19",
+    "deprecated": false,
+    "tags": [
+      "Sport",
+      "People / Family"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "21C7383B-5839-4F3E-A4EC-81A9980F531B",
+    "baseIconId": "21C7383B-5839-4F3E-A4EC-81A9980F531B",
+    "name": "kayaking",
+    "codepoint": "F08AF",
+    "aliases": [
+      "human-kayaking"
+    ],
+    "styles": [],
+    "version": "2.2.43",
+    "deprecated": false,
+    "tags": [
+      "Sport",
+      "People / Family"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "D6208581-CF7F-438A-8578-B6ADEE462212",
+    "baseIconId": "D6208581-CF7F-438A-8578-B6ADEE462212",
+    "name": "key",
+    "codepoint": "F0306",
+    "aliases": [
+      "vpn-key"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Automotive"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "520C8488-DD34-43E1-AEA0-A188B2DE6B01",
+    "baseIconId": "520C8488-DD34-43E1-AEA0-A188B2DE6B01",
+    "name": "keyboard",
+    "codepoint": "F030C",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "8B89609E-5F12-4A3B-99AE-F6698FEA48E4",
+    "baseIconId": "8B89609E-5F12-4A3B-99AE-F6698FEA48E4",
+    "name": "kite",
+    "codepoint": "F1985",
+    "aliases": [],
+    "styles": [],
+    "version": "6.5.95",
+    "deprecated": false,
+    "tags": [
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "2B23BD24-9796-4D72-85CC-76BE23854F0F",
+    "baseIconId": "2B23BD24-9796-4D72-85CC-76BE23854F0F",
+    "name": "kitesurfing",
+    "codepoint": "F1744",
+    "aliases": [],
+    "styles": [],
+    "version": "6.1.95",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "C749E06B-E75E-4D9B-97A6-47E9399D01FC",
+    "baseIconId": "C749E06B-E75E-4D9B-97A6-47E9399D01FC",
+    "name": "label",
+    "codepoint": "F0315",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "97AFF594-E421-4757-BE72-1D6C428E27AE",
+    "baseIconId": "97AFF594-E421-4757-BE72-1D6C428E27AE",
+    "name": "ladybug",
+    "codepoint": "F082D",
+    "aliases": [
+      "bugfood",
+      "ladybird"
+    ],
+    "styles": [],
+    "version": "2.1.19",
+    "deprecated": false,
+    "tags": [
+      "Nature"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "AD048AA5-6C71-49DF-B5B2-427F634C3538",
+    "baseIconId": "AD048AA5-6C71-49DF-B5B2-427F634C3538",
+    "name": "landslide",
+    "codepoint": "F1A48",
+    "aliases": [
+      "avalanche",
+      "mudslide"
+    ],
+    "styles": [],
+    "version": "6.7.96",
+    "deprecated": false,
+    "tags": [
+      "Nature"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "A8B6481F-EE91-4F90-81AC-DEB8A096F45A",
+    "baseIconId": "A8B6481F-EE91-4F90-81AC-DEB8A096F45A",
+    "name": "laptop",
+    "codepoint": "F0322",
+    "aliases": [
+      "computer"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Device / Tech",
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "ED8AF9CE-E555-49C9-8E7E-F9B85CD94CDF",
+    "baseIconId": "ED8AF9CE-E555-49C9-8E7E-F9B85CD94CDF",
+    "name": "launch",
+    "codepoint": "F0327",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "36A9B462-C487-458E-BFB6-2415739BC968",
+    "baseIconId": "36A9B462-C487-458E-BFB6-2415739BC968",
+    "name": "layers",
+    "codepoint": "F0328",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Geographic Information System"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "D648ECFA-B185-4041-8B54-6D1C125CD08E",
+    "baseIconId": "D648ECFA-B185-4041-8B54-6D1C125CD08E",
+    "name": "leak",
+    "codepoint": "F0DD7",
+    "aliases": [
+      "proximity-sensor"
+    ],
+    "styles": [],
+    "version": "3.5.94",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "45FA5A9C-DFF1-4D7E-B683-DB7DE2BAEFC7",
+    "baseIconId": "45FA5A9C-DFF1-4D7E-B683-DB7DE2BAEFC7",
+    "name": "library",
+    "codepoint": "F0331",
+    "aliases": [
+      "local-library"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Places"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "8398466C-F905-444F-81E6-B5B2103BD873",
+    "baseIconId": "8398466C-F905-444F-81E6-B5B2103BD873",
+    "name": "license",
+    "codepoint": "F0FC3",
+    "aliases": [
+      "ribbon",
+      "prize",
+      "award",
+      "seal"
+    ],
+    "styles": [],
+    "version": "4.0.96",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "ECC94305-DFA6-4D9B-85C8-CC79F3F05FB5",
+    "baseIconId": "ECC94305-DFA6-4D9B-85C8-CC79F3F05FB5",
+    "name": "lightbulb",
+    "codepoint": "F0335",
+    "aliases": [
+      "idea",
+      "bulb"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "462769C2-0A30-4B31-B66C-55168B10D705",
+    "baseIconId": "462769C2-0A30-4B31-B66C-55168B10D705",
+    "name": "link",
+    "codepoint": "F0337",
+    "aliases": [
+      "insert-link"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "48C6596F-07B5-495C-82E2-683B09DD7040",
+    "baseIconId": "48C6596F-07B5-495C-82E2-683B09DD7040",
+    "name": "liquor",
+    "codepoint": "F191E",
+    "aliases": [
+      "booze",
+      "alcohol",
+      "beverages",
+      "whiskey",
+      "rum",
+      "wine",
+      "tequila",
+      "beer",
+      "spirits"
+    ],
+    "styles": [],
+    "version": "6.4.95",
+    "deprecated": false,
+    "tags": [
+      "Food / Drink"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "D711AFDE-2B8D-4932-82AC-A04E7B2810AE",
+    "baseIconId": "D711AFDE-2B8D-4932-82AC-A04E7B2810AE",
+    "name": "lock",
+    "codepoint": "F033E",
+    "aliases": [
+      "https",
+      "password",
+      "secure",
+      "protected",
+      "encryption"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Lock",
+      "Home Automation",
+      "Automotive"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "63D8BFA5-7AE4-4002-A4C2-C464638C38FC",
+    "baseIconId": "63D8BFA5-7AE4-4002-A4C2-C464638C38FC",
+    "name": "login",
+    "codepoint": "F0342",
+    "aliases": [
+      "log-in",
+      "sign-in"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "47DF41F2-49C7-4081-8419-F49C7894E7F1",
+    "baseIconId": "47DF41F2-49C7-4081-8419-F49C7894E7F1",
+    "name": "logout",
+    "codepoint": "F0343",
+    "aliases": [
+      "log-out",
+      "sign-out"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "3633613A-B8A7-49D0-8C1B-5415EC76F426",
+    "baseIconId": "3633613A-B8A7-49D0-8C1B-5415EC76F426",
+    "name": "looks",
+    "codepoint": "F0344",
+    "aliases": [
+      "rainbow"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Weather",
+      "Color"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "DB75FD27-01F6-4232-AA23-86C115751A0C",
+    "baseIconId": "DB75FD27-01F6-4232-AA23-86C115751A0C",
+    "name": "loupe",
+    "codepoint": "F0345",
+    "aliases": [
+      "zoom-plus",
+      "circle-plus-outline",
+      "magnify"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "C2889545-7F08-4AE1-9142-ECF9B79957E1",
+    "baseIconId": "C2889545-7F08-4AE1-9142-ECF9B79957E1",
+    "name": "magnify",
+    "codepoint": "F0349",
+    "aliases": [
+      "search"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Geographic Information System"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "99738FF8-01AE-420D-8481-8B9E1402255B",
+    "baseIconId": "99738FF8-01AE-420D-8481-8B9E1402255B",
+    "name": "map",
+    "codepoint": "F034D",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Navigation",
+      "Geographic Information System"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "71E6D8F0-A3D2-43CB-8940-16AA4E1D9825",
+    "baseIconId": "71E6D8F0-A3D2-43CB-8940-16AA4E1D9825",
+    "name": "marker",
+    "codepoint": "F0652",
+    "aliases": [
+      "highlighter"
+    ],
+    "styles": [],
+    "version": "1.6.50",
+    "deprecated": false,
+    "tags": [
+      "Text / Content / Format"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "57211BE3-0055-4D43-B05C-3CD0FE10322C",
+    "baseIconId": "57211BE3-0055-4D43-B05C-3CD0FE10322C",
+    "name": "medication",
+    "codepoint": "F1B14",
+    "aliases": [
+      "pill-bottle",
+      "medicine-bottle",
+      "bottle-plus"
+    ],
+    "styles": [],
+    "version": "6.9.96",
+    "deprecated": false,
+    "tags": [
+      "Health / Beauty",
+      "Medical / Hospital"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "B68AA118-B8B5-4A2A-BCA2-A12C8C119319",
+    "baseIconId": "B68AA118-B8B5-4A2A-BCA2-A12C8C119319",
+    "name": "meditation",
+    "codepoint": "F117B",
+    "aliases": [
+      "human-meditation"
+    ],
+    "styles": [],
+    "version": "4.4.95",
+    "deprecated": false,
+    "tags": [
+      "Sport",
+      "People / Family"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "E404434E-17DB-4E90-9D97-5355258E1FCF",
+    "baseIconId": "E404434E-17DB-4E90-9D97-5355258E1FCF",
+    "name": "memory",
+    "codepoint": "F035B",
+    "aliases": [
+      "chip"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "0BD2CD08-CCFB-4EC3-B96D-08B0B8230A91",
+    "baseIconId": "0BD2CD08-CCFB-4EC3-B96D-08B0B8230A91",
+    "name": "menu",
+    "codepoint": "F035C",
+    "aliases": [
+      "hamburger-menu"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "0D0E7E15-9615-4A66-8933-8BC98675AE3D",
+    "baseIconId": "0D0E7E15-9615-4A66-8933-8BC98675AE3D",
+    "name": "merge",
+    "codepoint": "F0F5C",
+    "aliases": [],
+    "styles": [],
+    "version": "3.9.97",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "99DA4752-8C79-44D8-8286-6EBD696F0B45",
+    "baseIconId": "99DA4752-8C79-44D8-8286-6EBD696F0B45",
+    "name": "message",
+    "codepoint": "F0361",
+    "aliases": [
+      "chat-bubble"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "18C99959-2A0E-4095-BAEA-F5B266377648",
+    "baseIconId": "18C99959-2A0E-4095-BAEA-F5B266377648",
+    "name": "microphone",
+    "codepoint": "F036C",
+    "aliases": [
+      "keyboard-voice"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Music"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "2CEA6B7B-E7C9-4D52-9D9D-286E50001B70",
+    "baseIconId": "2CEA6B7B-E7C9-4D52-9D9D-286E50001B70",
+    "name": "minus",
+    "codepoint": "F0374",
+    "aliases": [
+      "remove",
+      "horizontal-line",
+      "minimize"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Math"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "35091AEB-2AF7-4F92-A249-2955F01404A3",
+    "baseIconId": "35091AEB-2AF7-4F92-A249-2955F01404A3",
+    "name": "monitor",
+    "codepoint": "F0379",
+    "aliases": [
+      "desktop-windows"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Device / Tech"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "DC294862-E625-444E-83A4-7D5F2255EE0C",
+    "baseIconId": "DC294862-E625-444E-83A4-7D5F2255EE0C",
+    "name": "moped",
+    "codepoint": "F1086",
+    "aliases": [
+      "scooter",
+      "vespa",
+      "delivery-dining"
+    ],
+    "styles": [],
+    "version": "4.2.95",
+    "deprecated": false,
+    "tags": [
+      "Transportation + Road",
+      "Transportation + Other"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "6284690E-A12C-4209-A779-18284E241DE3",
+    "baseIconId": "6284690E-A12C-4209-A779-18284E241DE3",
+    "name": "more",
+    "codepoint": "F037B",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "55847C89-2AE5-4F91-85AA-761FD8CE57F0",
+    "baseIconId": "55847C89-2AE5-4F91-85AA-761FD8CE57F0",
+    "name": "mosque",
+    "codepoint": "F0D45",
+    "aliases": [
+      "islam",
+      "muslim"
+    ],
+    "styles": [],
+    "version": "3.4.93",
+    "deprecated": false,
+    "tags": [
+      "Religion"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "D5136ED4-FC45-44D8-9DE4-C266844D5131",
+    "baseIconId": "D5136ED4-FC45-44D8-9DE4-C266844D5131",
+    "name": "motion",
+    "codepoint": "F15B2",
+    "aliases": [],
+    "styles": [],
+    "version": "5.5.55",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "D6AADAF8-D44E-44C0-8647-E578B277441D",
+    "baseIconId": "D6AADAF8-D44E-44C0-8647-E578B277441D",
+    "name": "motorbike",
+    "codepoint": "F037C",
+    "aliases": [
+      "motorcycle"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Transportation + Road",
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "965CDBD7-9E52-4169-B363-E0428C75C19D",
+    "baseIconId": "965CDBD7-9E52-4169-B363-E0428C75C19D",
+    "name": "mouse",
+    "codepoint": "F037D",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "122C53AA-C8BC-41B3-89B2-B9A9F8BB56DC",
+    "baseIconId": "122C53AA-C8BC-41B3-89B2-B9A9F8BB56DC",
+    "name": "movie",
+    "codepoint": "F0381",
+    "aliases": [
+      "slate",
+      "clapperboard",
+      "film",
+      "movie-creation"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Video / Movie"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "766E10EA-23CD-42BD-9DB8-633FBF8C584A",
+    "baseIconId": "766E10EA-23CD-42BD-9DB8-633FBF8C584A",
+    "name": "mustache",
+    "codepoint": "F15DE",
+    "aliases": [],
+    "styles": [],
+    "version": "5.6.55",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "C5FCAD4F-C7E6-4BDB-9F2F-A665CB68B7FD",
+    "baseIconId": "C5FCAD4F-C7E6-4BDB-9F2F-A665CB68B7FD",
+    "name": "nature",
+    "codepoint": "F038E",
+    "aliases": [
+      "plant"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Nature",
+      "Agriculture"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "DAAF6988-6EE9-4595-A758-294C83C7304B",
+    "baseIconId": "DAAF6988-6EE9-4595-A758-294C83C7304B",
+    "name": "navigation",
+    "codepoint": "F0390",
+    "aliases": [
+      "arrow-compass"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Navigation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "EE440B14-2E25-4C8E-99A7-A3C98CBC9151",
+    "baseIconId": "EE440B14-2E25-4C8E-99A7-A3C98CBC9151",
+    "name": "newspaper",
+    "codepoint": "F0395",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "1655675D-A197-44BD-83E9-76E2BAD31740",
+    "baseIconId": "1655675D-A197-44BD-83E9-76E2BAD31740",
+    "name": "noodles",
+    "codepoint": "F117E",
+    "aliases": [
+      "food-ramen",
+      "asian-noodles"
+    ],
+    "styles": [],
+    "version": "4.4.95",
+    "deprecated": false,
+    "tags": [
+      "Food / Drink"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "27C36043-E269-4223-ADCE-568B1EFB4623",
+    "baseIconId": "27C36043-E269-4223-ADCE-568B1EFB4623",
+    "name": "opacity",
+    "codepoint": "F05CC",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "059B5D2A-9B8B-412D-BAF1-F3F9B7E14A44",
+    "baseIconId": "059B5D2A-9B8B-412D-BAF1-F3F9B7E14A44",
+    "name": "overscan",
+    "codepoint": "F1005",
+    "aliases": [
+      "fullscreen"
+    ],
+    "styles": [],
+    "version": "4.0.96",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "954CCE2B-7FEE-4F9C-9923-4E1D567607C3",
+    "baseIconId": "954CCE2B-7FEE-4F9C-9923-4E1D567607C3",
+    "name": "palette",
+    "codepoint": "F03D8",
+    "aliases": [
+      "color-lens",
+      "colour-lens",
+      "paint",
+      "art",
+      "color"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Color",
+      "Drawing / Art"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "4054A322-F348-49BA-B85F-B978EFC1BDAD",
+    "baseIconId": "4054A322-F348-49BA-B85F-B978EFC1BDAD",
+    "name": "panorama",
+    "codepoint": "F03DC",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Photography"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "27BCEC7F-ABF8-4506-B339-EE2425E1BAF9",
+    "baseIconId": "27BCEC7F-ABF8-4506-B339-EE2425E1BAF9",
+    "name": "paperclip",
+    "codepoint": "F03E2",
+    "aliases": [
+      "attachment-vertical",
+      "attach-file"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "24CD918E-9458-4D8D-A00C-746F8AB5D17E",
+    "baseIconId": "24CD918E-9458-4D8D-A00C-746F8AB5D17E",
+    "name": "paragliding",
+    "codepoint": "F1745",
+    "aliases": [
+      "parasail",
+      "paraglide"
+    ],
+    "styles": [],
+    "version": "6.1.95",
+    "deprecated": false,
+    "tags": [
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "07C8266A-A135-443C-B2DD-4148CD718C51",
+    "baseIconId": "07C8266A-A135-443C-B2DD-4148CD718C51",
+    "name": "parking",
+    "codepoint": "F03E3",
+    "aliases": [
+      "car-park",
+      "local-parking"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Places"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "8288CA76-67E5-4EEA-82CD-DE0E0842F34D",
+    "baseIconId": "8288CA76-67E5-4EEA-82CD-DE0E0842F34D",
+    "name": "pasta",
+    "codepoint": "F1160",
+    "aliases": [
+      "food-italian",
+      "spaghetti"
+    ],
+    "styles": [],
+    "version": "4.4.95",
+    "deprecated": false,
+    "tags": [
+      "Food / Drink"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "2A1F0831-13CA-4419-BBD7-1F1FAF62A32B",
+    "baseIconId": "2A1F0831-13CA-4419-BBD7-1F1FAF62A32B",
+    "name": "pause",
+    "codepoint": "F03E4",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "BB27CE6C-769A-4C0C-A53C-F1B10B9C4423",
+    "baseIconId": "BB27CE6C-769A-4C0C-A53C-F1B10B9C4423",
+    "name": "pencil",
+    "codepoint": "F03EB",
+    "aliases": [
+      "edit",
+      "create",
+      "mode-edit"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Drawing / Art",
+      "Edit / Modify"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "B5BA809F-FCE8-476C-8388-6A9CFFF73015",
+    "baseIconId": "B5BA809F-FCE8-476C-8388-6A9CFFF73015",
+    "name": "phone",
+    "codepoint": "F03F2",
+    "aliases": [
+      "call",
+      "local-phone",
+      "telephone"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Cellphone / Phone"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "E7651219-1BF9-4D06-9B4A-7599A2E0A407",
+    "baseIconId": "E7651219-1BF9-4D06-9B4A-7599A2E0A407",
+    "name": "piano",
+    "codepoint": "F067D",
+    "aliases": [],
+    "styles": [],
+    "version": "1.7.12",
+    "deprecated": false,
+    "tags": [
+      "Music"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "B1337135-0E57-465F-8C0C-E658C9981A19",
+    "baseIconId": "B1337135-0E57-465F-8C0C-E658C9981A19",
+    "name": "pin",
+    "codepoint": "F0403",
+    "aliases": [
+      "keep"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "BB298846-B608-4289-987C-A8F2A904409F",
+    "baseIconId": "BB298846-B608-4289-987C-A8F2A904409F",
+    "name": "pinwheel",
+    "codepoint": "F0AD5",
+    "aliases": [
+      "toys"
+    ],
+    "styles": [],
+    "version": "2.7.94",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "E617E8BD-2C63-4E59-B1F4-EB3F9F3916D3",
+    "baseIconId": "E617E8BD-2C63-4E59-B1F4-EB3F9F3916D3",
+    "name": "pizza",
+    "codepoint": "F0409",
+    "aliases": [
+      "pizzeria",
+      "local-pizza"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Food / Drink",
+      "Places"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "90AD6D2A-7986-49D0-8DA5-DC92F9F92A15",
+    "baseIconId": "90AD6D2A-7986-49D0-8DA5-DC92F9F92A15",
+    "name": "play",
+    "codepoint": "F040A",
+    "aliases": [
+      "play-arrow"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "2DE4F8E6-F25C-4FCA-8405-109FA8918B78",
+    "baseIconId": "2DE4F8E6-F25C-4FCA-8405-109FA8918B78",
+    "name": "plus",
+    "codepoint": "F0415",
+    "aliases": [
+      "add"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Math"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "56B37BA8-E973-4B53-812A-7F47BCFF217A",
+    "baseIconId": "56B37BA8-E973-4B53-812A-7F47BCFF217A",
+    "name": "podcast",
+    "codepoint": "F0994",
+    "aliases": [],
+    "styles": [],
+    "version": "2.4.85",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "5ACE4E72-9576-405A-A17F-314A1FF864C8",
+    "baseIconId": "5ACE4E72-9576-405A-A17F-314A1FF864C8",
+    "name": "polo",
+    "codepoint": "F14C3",
+    "aliases": [],
+    "styles": [],
+    "version": "5.3.45",
+    "deprecated": false,
+    "tags": [
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "9B1DF082-5266-408A-A057-92E9AEB81BFA",
+    "baseIconId": "9B1DF082-5266-408A-A057-92E9AEB81BFA",
+    "name": "post",
+    "codepoint": "F1008",
+    "aliases": [
+      "blog"
+    ],
+    "styles": [],
+    "version": "4.0.96",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "C945D203-9737-4C25-87CA-29D97B862DD2",
+    "baseIconId": "C945D203-9737-4C25-87CA-29D97B862DD2",
+    "name": "power",
+    "codepoint": "F0425",
+    "aliases": [
+      "power-settings-new",
+      "shutdown"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "7365D689-4C10-4EBA-AD9A-09189B8091EE",
+    "baseIconId": "7365D689-4C10-4EBA-AD9A-09189B8091EE",
+    "name": "printer",
+    "codepoint": "F042A",
+    "aliases": [
+      "local-printshop",
+      "local-print-shop"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Printer",
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "7E1AC29D-46E3-4C7C-9A00-D8803E502795",
+    "baseIconId": "7E1AC29D-46E3-4C7C-9A00-D8803E502795",
+    "name": "publish",
+    "codepoint": "F06A7",
+    "aliases": [],
+    "styles": [],
+    "version": "1.7.12",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "0773D18C-C6A2-41B5-9685-F3E0507E1770",
+    "baseIconId": "0773D18C-C6A2-41B5-9685-F3E0507E1770",
+    "name": "puzzle",
+    "codepoint": "F0431",
+    "aliases": [
+      "extension",
+      "jigsaw"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Gaming / RPG"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "0E46DC98-E185-4B26-A4E9-FC1CEC750172",
+    "baseIconId": "0E46DC98-E185-4B26-A4E9-FC1CEC750172",
+    "name": "racquetball",
+    "codepoint": "F0D94",
+    "aliases": [
+      "lacrosse",
+      "squash"
+    ],
+    "styles": [],
+    "version": "3.4.93",
+    "deprecated": false,
+    "tags": [
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "73BD6C2A-0D5B-4DF6-9FA3-EC489AFBF947",
+    "baseIconId": "73BD6C2A-0D5B-4DF6-9FA3-EC489AFBF947",
+    "name": "radar",
+    "codepoint": "F0437",
+    "aliases": [
+      "track-changes"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "2FA21C1E-99C3-4C9B-AF46-8DF6B9F2A8FC",
+    "baseIconId": "2FA21C1E-99C3-4C9B-AF46-8DF6B9F2A8FC",
+    "name": "radio",
+    "codepoint": "F0439",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Audio",
+      "Device / Tech"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "0B304D53-8218-4F49-9330-1AB9CCB11C01",
+    "baseIconId": "0B304D53-8218-4F49-9330-1AB9CCB11C01",
+    "name": "raw",
+    "codepoint": "F1A0F",
+    "aliases": [],
+    "styles": [],
+    "version": "6.6.96",
+    "deprecated": false,
+    "tags": [
+      "Photography"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "7061BAB7-4413-4666-A919-9DD8C4F405F9",
+    "baseIconId": "7061BAB7-4413-4666-A919-9DD8C4F405F9",
+    "name": "redo",
+    "codepoint": "F044E",
+    "aliases": [
+      "arrow"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "AD3C7A2B-0B64-4183-9452-C96EAAF3E08E",
+    "baseIconId": "AD3C7A2B-0B64-4183-9452-C96EAAF3E08E",
+    "name": "refresh",
+    "codepoint": "F0450",
+    "aliases": [
+      "loop"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Arrow"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "1BD93F0A-87D1-4B55-A0EF-D9F05A8B3826",
+    "baseIconId": "1BD93F0A-87D1-4B55-A0EF-D9F05A8B3826",
+    "name": "reminder",
+    "codepoint": "F088C",
+    "aliases": [],
+    "styles": [],
+    "version": "2.1.99",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "49C7BBC2-6C7F-442E-A6EE-B58AB758A8D4",
+    "baseIconId": "49C7BBC2-6C7F-442E-A6EE-B58AB758A8D4",
+    "name": "remote",
+    "codepoint": "F0454",
+    "aliases": [
+      "settings-remote"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "43D55245-34B8-4F1B-953A-CCE75AF35866",
+    "baseIconId": "43D55245-34B8-4F1B-953A-CCE75AF35866",
+    "name": "rename",
+    "codepoint": "F1C18",
+    "aliases": [],
+    "styles": [],
+    "version": "7.1.96",
+    "deprecated": false,
+    "tags": [
+      "Edit / Modify"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "9AEE0CB7-46B9-414F-A8A8-AFB127CB7057",
+    "baseIconId": "9AEE0CB7-46B9-414F-A8A8-AFB127CB7057",
+    "name": "repeat",
+    "codepoint": "F0456",
+    "aliases": [
+      "repost"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Arrow"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "A15D2CB0-E938-4894-8BF3-BC6C628E6433",
+    "baseIconId": "A15D2CB0-E938-4894-8BF3-BC6C628E6433",
+    "name": "replay",
+    "codepoint": "F0459",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "CC3BEE2C-0FEA-46D2-BC53-F7D248AAF47C",
+    "baseIconId": "CC3BEE2C-0FEA-46D2-BC53-F7D248AAF47C",
+    "name": "reply",
+    "codepoint": "F045A",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Arrow"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "15954B5D-3ADA-4B6B-BE15-F95B6A5D4659",
+    "baseIconId": "15954B5D-3ADA-4B6B-BE15-F95B6A5D4659",
+    "name": "restart",
+    "codepoint": "F0709",
+    "aliases": [],
+    "styles": [],
+    "version": "1.8.36",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "FF1CAAB4-2192-442F-88F1-08DEB67E21F0",
+    "baseIconId": "FF1CAAB4-2192-442F-88F1-08DEB67E21F0",
+    "name": "restore",
+    "codepoint": "F099B",
+    "aliases": [
+      "loop",
+      "rotate-counter-clockwise"
+    ],
+    "styles": [],
+    "version": "2.4.85",
+    "deprecated": false,
+    "tags": [
+      "Arrow"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "28BCDF41-AA93-4C25-B87A-95A3F5DD8805",
+    "baseIconId": "28BCDF41-AA93-4C25-B87A-95A3F5DD8805",
+    "name": "rewind",
+    "codepoint": "F045F",
+    "aliases": [
+      "fast-rewind"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "1C09CB9B-162B-486B-966C-1FCB18C0F633",
+    "baseIconId": "1C09CB9B-162B-486B-966C-1FCB18C0F633",
+    "name": "ribbon",
+    "codepoint": "F0460",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "96BE0E43-42AB-4F93-8045-0C7B61BF69CC",
+    "baseIconId": "96BE0E43-42AB-4F93-8045-0C7B61BF69CC",
+    "name": "rocket",
+    "codepoint": "F0463",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Transportation + Flying",
+      "Science"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "AA8B7EA9-2DB2-4591-94E0-A457373E64C1",
+    "baseIconId": "AA8B7EA9-2DB2-4591-94E0-A457373E64C1",
+    "name": "rodent",
+    "codepoint": "F1327",
+    "aliases": [
+      "mouse",
+      "rat"
+    ],
+    "styles": [],
+    "version": "4.9.95",
+    "deprecated": false,
+    "tags": [
+      "Animal"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "72F11BA0-1557-4500-8235-2E3F2346FE69",
+    "baseIconId": "72F11BA0-1557-4500-8235-2E3F2346FE69",
+    "name": "rowing",
+    "codepoint": "F0608",
+    "aliases": [
+      "human-rowing"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Sport",
+      "Transportation + Water",
+      "People / Family"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "9E877D76-9BC5-496D-99E4-1E6029DE1B4D",
+    "baseIconId": "9E877D76-9BC5-496D-99E4-1E6029DE1B4D",
+    "name": "rss",
+    "codepoint": "F046B",
+    "aliases": [
+      "rss-feed"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "19489FCE-DD25-4670-BC6F-4FC3AF1E66D3",
+    "baseIconId": "19489FCE-DD25-4670-BC6F-4FC3AF1E66D3",
+    "name": "rugby",
+    "codepoint": "F0D99",
+    "aliases": [
+      "rugby-ball"
+    ],
+    "styles": [],
+    "version": "3.4.93",
+    "deprecated": false,
+    "tags": [
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "2A869029-60EB-4965-9BE4-9B3DB964C707",
+    "baseIconId": "2A869029-60EB-4965-9BE4-9B3DB964C707",
+    "name": "run",
+    "codepoint": "F070E",
+    "aliases": [
+      "directions-run",
+      "human-run"
+    ],
+    "styles": [],
+    "version": "1.8.36",
+    "deprecated": false,
+    "tags": [
+      "Sport",
+      "People / Family"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "D77BED79-19CC-45A9-9940-5EB621E95C11",
+    "baseIconId": "D77BED79-19CC-45A9-9940-5EB621E95C11",
+    "name": "satellite",
+    "codepoint": "F0470",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "64F494E1-5B39-488D-B46E-0FC1B9567478",
+    "baseIconId": "64F494E1-5B39-488D-B46E-0FC1B9567478",
+    "name": "saxophone",
+    "codepoint": "F0609",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Music"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "BE9A1BD3-1DF7-407F-98B7-24070994D472",
+    "baseIconId": "BE9A1BD3-1DF7-407F-98B7-24070994D472",
+    "name": "scanner",
+    "codepoint": "F06AB",
+    "aliases": [],
+    "styles": [],
+    "version": "1.7.12",
+    "deprecated": false,
+    "tags": [
+      "Device / Tech"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "A671C11E-0A75-4F41-AA32-EAA99955DEDE",
+    "baseIconId": "A671C11E-0A75-4F41-AA32-EAA99955DEDE",
+    "name": "school",
+    "codepoint": "F0474",
+    "aliases": [
+      "graduation-cap",
+      "university",
+      "college",
+      "academic-cap",
+      "education",
+      "learn"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "0299DD49-341B-4979-91A9-FB3BF6AEFB87",
+    "baseIconId": "0299DD49-341B-4979-91A9-FB3BF6AEFB87",
+    "name": "scooter",
+    "codepoint": "F15BD",
+    "aliases": [],
+    "styles": [],
+    "version": "5.6.55",
+    "deprecated": false,
+    "tags": [
+      "Transportation + Other"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "68B68EDB-6CDA-4488-A213-5E6DF4146EA6",
+    "baseIconId": "68B68EDB-6CDA-4488-A213-5E6DF4146EA6",
+    "name": "sd",
+    "codepoint": "F0479",
+    "aliases": [
+      "sd-card",
+      "sd-storage"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "C9A796D6-1A7D-47AD-A036-B3B9035FBDA3",
+    "baseIconId": "C9A796D6-1A7D-47AD-A036-B3B9035FBDA3",
+    "name": "seat",
+    "codepoint": "F0CC3",
+    "aliases": [
+      "event-seat",
+      "chair",
+      "chair-accent",
+      "home-theater",
+      "home-theatre"
+    ],
+    "styles": [],
+    "version": "3.2.89",
+    "deprecated": false,
+    "tags": [
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "0C2F3617-9710-4265-AFB5-29C52AD2FBE0",
+    "baseIconId": "0C2F3617-9710-4265-AFB5-29C52AD2FBE0",
+    "name": "security",
+    "codepoint": "F0483",
+    "aliases": [
+      "shield",
+      "uac",
+      "user-access-control",
+      "administrator"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "5AFE282B-CAE1-4D7F-A2BF-37E8655537DD",
+    "baseIconId": "E56EAB24-6D70-49E0-BEC8-D9164A93CB63",
+    "name": "segment",
+    "codepoint": "F0ECB",
+    "aliases": [],
+    "styles": [],
+    "version": "3.7.94",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "6791A1E4-DBF8-471C-AA27-0D4540A23678",
+    "baseIconId": "6791A1E4-DBF8-471C-AA27-0D4540A23678",
+    "name": "send",
+    "codepoint": "F048A",
+    "aliases": [
+      "paper-airplane",
+      "paper-plane"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "B29246C8-6014-4019-8CCC-F803DBC0FA95",
+    "baseIconId": "B29246C8-6014-4019-8CCC-F803DBC0FA95",
+    "name": "shape",
+    "codepoint": "F0831",
+    "aliases": [
+      "category",
+      "theme"
+    ],
+    "styles": [],
+    "version": "2.1.19",
+    "deprecated": false,
+    "tags": [
+      "Shape"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "F0053E35-64B2-45D5-92D6-EE9F8A8839A1",
+    "baseIconId": "F0053E35-64B2-45D5-92D6-EE9F8A8839A1",
+    "name": "share",
+    "codepoint": "F0496",
+    "aliases": [
+      "forward"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Arrow"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "7A5ED547-B142-4921-8050-647B2B9F4DC0",
+    "baseIconId": "7A5ED547-B142-4921-8050-647B2B9F4DC0",
+    "name": "shopping",
+    "codepoint": "F049A",
+    "aliases": [
+      "local-mall",
+      "marketplace"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Shopping"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "99537665-2115-40D6-9725-0F4B4730C99A",
+    "baseIconId": "99537665-2115-40D6-9725-0F4B4730C99A",
+    "name": "shuffle",
+    "codepoint": "F049D",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Arrow"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "59A98F47-9067-492A-8454-42BEFA2391C1",
+    "baseIconId": "59A98F47-9067-492A-8454-42BEFA2391C1",
+    "name": "sigma",
+    "codepoint": "F04A0",
+    "aliases": [
+      "summation"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Math"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "F7C26535-863F-4295-9E48-9847B740FEE7",
+    "baseIconId": "F7C26535-863F-4295-9E48-9847B740FEE7",
+    "name": "silverware",
+    "codepoint": "F04A3",
+    "aliases": [
+      "local-dining",
+      "restaurant-menu",
+      "local-restaurant",
+      "cutlery",
+      "utensils"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Food / Drink"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "93020F21-A0FE-427D-8685-B74EE39B9921",
+    "baseIconId": "93020F21-A0FE-427D-8685-B74EE39B9921",
+    "name": "sim",
+    "codepoint": "F04A7",
+    "aliases": [
+      "sim-card",
+      "subscriber-identity-module",
+      "subscriber-identification-module"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Cellphone / Phone"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "CB0C6DC2-0A4E-41C8-9E6A-9A8531F754CF",
+    "baseIconId": "CB0C6DC2-0A4E-41C8-9E6A-9A8531F754CF",
+    "name": "skate",
+    "codepoint": "F0D35",
+    "aliases": [
+      "ice-skate"
+    ],
+    "styles": [],
+    "version": "3.3.92",
+    "deprecated": false,
+    "tags": [
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "56BF6222-BEC1-44B6-845C-AD6F84552D90",
+    "baseIconId": "56BF6222-BEC1-44B6-845C-AD6F84552D90",
+    "name": "skateboard",
+    "codepoint": "F14C2",
+    "aliases": [],
+    "styles": [],
+    "version": "5.3.45",
+    "deprecated": false,
+    "tags": [
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "47F1C290-ED78-4459-B33C-6E2ACC867CC6",
+    "baseIconId": "47F1C290-ED78-4459-B33C-6E2ACC867CC6",
+    "name": "skateboarding",
+    "codepoint": "F0501",
+    "aliases": [
+      "human-skateboarding"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Sport",
+      "People / Family"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "197B0D1A-34DB-4FD7-825B-FFE5C28297BB",
+    "baseIconId": "197B0D1A-34DB-4FD7-825B-FFE5C28297BB",
+    "name": "ski",
+    "codepoint": "F1304",
+    "aliases": [
+      "human-ski"
+    ],
+    "styles": [],
+    "version": "4.8.95",
+    "deprecated": false,
+    "tags": [
+      "Sport",
+      "People / Family"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "E67044BA-8025-4D61-916C-56DF4D6FFE6D",
+    "baseIconId": "E67044BA-8025-4D61-916C-56DF4D6FFE6D",
+    "name": "sledding",
+    "codepoint": "F041B",
+    "aliases": [
+      "human-sledding"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Sport",
+      "People / Family"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "C9CF20D8-55F4-4997-8019-F8056ED86702",
+    "baseIconId": "C9CF20D8-55F4-4997-8019-F8056ED86702",
+    "name": "sleep",
+    "codepoint": "F04B2",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "20A9F2BB-C53E-410E-A433-4CEE2305AD49",
+    "baseIconId": "20A9F2BB-C53E-410E-A433-4CEE2305AD49",
+    "name": "smoking",
+    "codepoint": "F04B4",
+    "aliases": [
+      "cigarette",
+      "smoking-area",
+      "smoking-rooms"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Automotive"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "C2A03E16-166E-4FAA-A5DB-462CE38C44FE",
+    "baseIconId": "C2A03E16-166E-4FAA-A5DB-462CE38C44FE",
+    "name": "snowboard",
+    "codepoint": "F1307",
+    "aliases": [
+      "human-snowboard"
+    ],
+    "styles": [],
+    "version": "4.8.95",
+    "deprecated": false,
+    "tags": [
+      "Sport",
+      "People / Family"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "5675A747-D467-473E-9A1D-1C61E1B5C619",
+    "baseIconId": "5675A747-D467-473E-9A1D-1C61E1B5C619",
+    "name": "snowflake",
+    "codepoint": "F0717",
+    "aliases": [
+      "power-hibernate"
+    ],
+    "styles": [],
+    "version": "1.8.36",
+    "deprecated": false,
+    "tags": [
+      "Weather",
+      "Holiday",
+      "Automotive"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "A4C7D4DF-2B1F-424B-9502-6618F88C9A65",
+    "baseIconId": "A4C7D4DF-2B1F-424B-9502-6618F88C9A65",
+    "name": "snowmobile",
+    "codepoint": "F06DD",
+    "aliases": [],
+    "styles": [],
+    "version": "1.8.36",
+    "deprecated": false,
+    "tags": [
+      "Transportation + Other",
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "D9F59FE2-7B27-4B54-8935-AC2A83CE084B",
+    "baseIconId": "D9F59FE2-7B27-4B54-8935-AC2A83CE084B",
+    "name": "snowshoeing",
+    "codepoint": "F1A72",
+    "aliases": [],
+    "styles": [],
+    "version": "6.7.96",
+    "deprecated": false,
+    "tags": [
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "B4AFB6A4-C315-4B06-AE4D-AC633F3ED0A7",
+    "baseIconId": "B4AFB6A4-C315-4B06-AE4D-AC633F3ED0A7",
+    "name": "soccer",
+    "codepoint": "F04B8",
+    "aliases": [
+      "football"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "84F00C86-0380-4554-B142-286C3B80BA3A",
+    "baseIconId": "84F00C86-0380-4554-B142-286C3B80BA3A",
+    "name": "spa",
+    "codepoint": "F0CD1",
+    "aliases": [
+      "flower-lotus",
+      "plant"
+    ],
+    "styles": [],
+    "version": "3.2.89",
+    "deprecated": false,
+    "tags": [
+      "Nature"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "43C37FC5-E271-40FA-BB50-C139DDD5B15B",
+    "baseIconId": "43C37FC5-E271-40FA-BB50-C139DDD5B15B",
+    "name": "speaker",
+    "codepoint": "F04C3",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Audio",
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "72253002-9545-40A4-95A4-49401269B553",
+    "baseIconId": "72253002-9545-40A4-95A4-49401269B553",
+    "name": "spellcheck",
+    "codepoint": "F04C6",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "5FDB24B6-FF16-4575-A794-E5CCEB95CC81",
+    "baseIconId": "5FDB24B6-FF16-4575-A794-E5CCEB95CC81",
+    "name": "stadium",
+    "codepoint": "F0FF9",
+    "aliases": [
+      "arena"
+    ],
+    "styles": [],
+    "version": "4.0.96",
+    "deprecated": false,
+    "tags": [
+      "Sport",
+      "Places"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "53D81A11-D8FF-46F4-A0CB-B7F668BA720D",
+    "baseIconId": "53D81A11-D8FF-46F4-A0CB-B7F668BA720D",
+    "name": "star",
+    "codepoint": "F04CE",
+    "aliases": [
+      "grade",
+      "star-rate",
+      "favorite"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Shape"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "A2FE9DC5-BC17-4265-9D2C-4CA20135C4BB",
+    "baseIconId": "A2FE9DC5-BC17-4265-9D2C-4CA20135C4BB",
+    "name": "steering",
+    "codepoint": "F04D4",
+    "aliases": [
+      "search-hands-free"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Automotive"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "F1057179-EA45-4D87-A14D-D05442C06503",
+    "baseIconId": "F1057179-EA45-4D87-A14D-D05442C06503",
+    "name": "stop",
+    "codepoint": "F04DB",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "3C3AEDE0-B6DA-4CB9-A686-869634678D5D",
+    "baseIconId": "3C3AEDE0-B6DA-4CB9-A686-869634678D5D",
+    "name": "store",
+    "codepoint": "F04DC",
+    "aliases": [
+      "shop",
+      "store-mall-directory"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Places",
+      "Shopping"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "9808EEC5-35FB-45B1-AFCB-065E9CF469E4",
+    "baseIconId": "9808EEC5-35FB-45B1-AFCB-065E9CF469E4",
+    "name": "subtitles",
+    "codepoint": "F0A16",
+    "aliases": [],
+    "styles": [],
+    "version": "2.5.94",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "769FB684-BA81-4E2A-B623-4C8B6F3DCD2C",
+    "baseIconId": "769FB684-BA81-4E2A-B623-4C8B6F3DCD2C",
+    "name": "subway",
+    "codepoint": "F06AC",
+    "aliases": [
+      "metro",
+      "tube",
+      "underground"
+    ],
+    "styles": [],
+    "version": "1.7.12",
+    "deprecated": false,
+    "tags": [
+      "Transportation + Other"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "13371A33-E911-4D02-B921-CECC9D1BDB50",
+    "baseIconId": "13371A33-E911-4D02-B921-CECC9D1BDB50",
+    "name": "surfing",
+    "codepoint": "F1746",
+    "aliases": [],
+    "styles": [],
+    "version": "6.1.95",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "9013848A-21D4-4AF4-BA8A-6CF76128FE17",
+    "baseIconId": "9013848A-21D4-4AF4-BA8A-6CF76128FE17",
+    "name": "synagogue",
+    "codepoint": "F1B04",
+    "aliases": [
+      "shul",
+      "temple",
+      "jewish"
+    ],
+    "styles": [],
+    "version": "6.9.96",
+    "deprecated": false,
+    "tags": [
+      "Places",
+      "Religion"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "E8CE455E-8C08-48F4-B989-8D91E185E8AE",
+    "baseIconId": "E8CE455E-8C08-48F4-B989-8D91E185E8AE",
+    "name": "sync",
+    "codepoint": "F04E6",
+    "aliases": [
+      "loop",
+      "counterclockwise-arrows",
+      "circular-arrows",
+      "circle-arrows"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "76D6AAA9-7D7F-4C7A-818E-D9947744A23C",
+    "baseIconId": "76D6AAA9-7D7F-4C7A-818E-D9947744A23C",
+    "name": "tab",
+    "codepoint": "F04E9",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "703B639C-E17D-40F1-8025-2B2950B1961D",
+    "baseIconId": "703B639C-E17D-40F1-8025-2B2950B1961D",
+    "name": "tablet",
+    "codepoint": "F04F6",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Device / Tech"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "0BE85AB2-0D51-411C-B119-789E9E317216",
+    "baseIconId": "0BE85AB2-0D51-411C-B119-789E9E317216",
+    "name": "tag",
+    "codepoint": "F04F9",
+    "aliases": [
+      "local-offer"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "32F3835A-EBD0-4927-9497-6F67F7075EAF",
+    "baseIconId": "32F3835A-EBD0-4927-9497-6F67F7075EAF",
+    "name": "taxi",
+    "codepoint": "F04FF",
+    "aliases": [
+      "local-taxi",
+      "cab"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Transportation + Road",
+      "Navigation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "D1759BBF-821F-4902-AAF5-8323A179912F",
+    "baseIconId": "C95D04C5-F5EE-411A-88F7-A9872B2B4021",
+    "name": "tea",
+    "codepoint": "F0D9E",
+    "aliases": [],
+    "styles": [
+      "variant"
+    ],
+    "version": "3.4.93",
+    "deprecated": false,
+    "tags": [
+      "Food / Drink"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "1B699A99-578E-450C-9523-934F4D281F72",
+    "baseIconId": "1B699A99-578E-450C-9523-934F4D281F72",
+    "name": "television",
+    "codepoint": "F0502",
+    "aliases": [
+      "tv"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Device / Tech",
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "CE166270-170C-4292-8D6F-FE787AF6B021",
+    "baseIconId": "CE166270-170C-4292-8D6F-FE787AF6B021",
+    "name": "tennis",
+    "codepoint": "F0DA0",
+    "aliases": [
+      "tennis-racquet",
+      "tennis-racket"
+    ],
+    "styles": [],
+    "version": "3.4.93",
+    "deprecated": false,
+    "tags": [
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "1F98A781-6023-4368-AC06-5A421D166FCC",
+    "baseIconId": "1F98A781-6023-4368-AC06-5A421D166FCC",
+    "name": "terrain",
+    "codepoint": "F0509",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Nature"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "E56EAB24-6D70-49E0-BEC8-D9164A93CB63",
+    "baseIconId": "E56EAB24-6D70-49E0-BEC8-D9164A93CB63",
+    "name": "text",
+    "codepoint": "F09A8",
+    "aliases": [
+      "notes"
+    ],
+    "styles": [],
+    "version": "2.4.85",
+    "deprecated": false,
+    "tags": [
+      "Text / Content / Format"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "E3A06403-51B5-4D00-9349-53517553A324",
+    "baseIconId": "E3A06403-51B5-4D00-9349-53517553A324",
+    "name": "texture",
+    "codepoint": "F050C",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "628D16E2-7E57-43CA-8451-012B8AB852DA",
+    "baseIconId": "628D16E2-7E57-43CA-8451-012B8AB852DA",
+    "name": "thermostat",
+    "codepoint": "F0393",
+    "aliases": [
+      "nest"
+    ],
+    "styles": [
+      "circle"
+    ],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Device / Tech",
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "18F55984-07FD-4630-BB11-8285F83AA838",
+    "baseIconId": "18F55984-07FD-4630-BB11-8285F83AA838",
+    "name": "ticket",
+    "codepoint": "F0516",
+    "aliases": [
+      "local-activity",
+      "local-play",
+      "local-attraction"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "348DB89A-B4E2-4CB9-A7A4-B86973243ADE",
+    "baseIconId": "348DB89A-B4E2-4CB9-A7A4-B86973243ADE",
+    "name": "timelapse",
+    "codepoint": "F051A",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Date / Time"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "79D1B3B8-FC3E-4978-AA8E-C78A1360B880",
+    "baseIconId": "79D1B3B8-FC3E-4978-AA8E-C78A1360B880",
+    "name": "toolbox",
+    "codepoint": "F09AC",
+    "aliases": [],
+    "styles": [],
+    "version": "2.4.85",
+    "deprecated": false,
+    "tags": [
+      "Hardware / Tools"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "B6E1232A-3A43-4200-BE34-1BC436B34BF1",
+    "baseIconId": "B6E1232A-3A43-4200-BE34-1BC436B34BF1",
+    "name": "train",
+    "codepoint": "F052C",
+    "aliases": [
+      "directions-railway",
+      "locomotive",
+      "railroad"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Navigation",
+      "Transportation + Other"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "13AE3C37-5323-4FE6-86F7-3B30B635969F",
+    "baseIconId": "13AE3C37-5323-4FE6-86F7-3B30B635969F",
+    "name": "tram",
+    "codepoint": "F052D",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Navigation",
+      "Transportation + Other"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "2650CA0F-8423-4DE2-A821-9D7D1E5547C0",
+    "baseIconId": "2650CA0F-8423-4DE2-A821-9D7D1E5547C0",
+    "name": "transition",
+    "codepoint": "F0915",
+    "aliases": [
+      "animation",
+      "motion",
+      "translate"
+    ],
+    "styles": [],
+    "version": "2.3.50",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "4486DD26-4110-457E-BBD7-B5D19DF72E4E",
+    "baseIconId": "4486DD26-4110-457E-BBD7-B5D19DF72E4E",
+    "name": "translate",
+    "codepoint": "F05CA",
+    "aliases": [
+      "language"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "A0B91DEA-DB9A-4737-B2F4-26B805B88648",
+    "baseIconId": "A0B91DEA-DB9A-4737-B2F4-26B805B88648",
+    "name": "truck",
+    "codepoint": "F053D",
+    "aliases": [
+      "lorry",
+      "local-shipping",
+      "courier"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Transportation + Road"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "23DCD596-6B2A-4556-AF71-A37AE9FE4D99",
+    "baseIconId": "23DCD596-6B2A-4556-AF71-A37AE9FE4D99",
+    "name": "tsunami",
+    "codepoint": "F1A81",
+    "aliases": [],
+    "styles": [],
+    "version": "6.7.96",
+    "deprecated": false,
+    "tags": [
+      "Nature",
+      "Weather"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "B1F7C2ED-4017-4162-A4C7-31D8761D8DC3",
+    "baseIconId": "B1F7C2ED-4017-4162-A4C7-31D8761D8DC3",
+    "name": "tune",
+    "codepoint": "F062E",
+    "aliases": [
+      "mixer-settings",
+      "equaliser",
+      "settings"
+    ],
+    "styles": [],
+    "version": "1.6.50",
+    "deprecated": false,
+    "tags": [
+      "Settings",
+      "Audio"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "C9D6F6DE-E9F7-4AC9-B9F1-41160A4C2B0E",
+    "baseIconId": "C9D6F6DE-E9F7-4AC9-B9F1-41160A4C2B0E",
+    "name": "undo",
+    "codepoint": "F054C",
+    "aliases": [
+      "arrow"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "1B274396-AAE7-4CD8-8D57-27E31D915F68",
+    "baseIconId": "1B274396-AAE7-4CD8-8D57-27E31D915F68",
+    "name": "update",
+    "codepoint": "F06B0",
+    "aliases": [
+      "clockwise",
+      "clock-arrow"
+    ],
+    "styles": [],
+    "version": "1.7.12",
+    "deprecated": false,
+    "tags": [
+      "Date / Time"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "08F8FCE9-67A0-4696-9B83-0B1F11EA959E",
+    "baseIconId": "08F8FCE9-67A0-4696-9B83-0B1F11EA959E",
+    "name": "upload",
+    "codepoint": "F0552",
+    "aliases": [
+      "file-upload"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "25033E0B-3AD4-414D-9972-559F2690FC1D",
+    "baseIconId": "25033E0B-3AD4-414D-9972-559F2690FC1D",
+    "name": "usb",
+    "codepoint": "F0553",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "280D39D7-C3B6-4C48-827F-D944B4773B0C",
+    "baseIconId": "280D39D7-C3B6-4C48-827F-D944B4773B0C",
+    "name": "vacuum",
+    "codepoint": "F19A1",
+    "aliases": [
+      "vacuum-cleaner"
+    ],
+    "styles": [],
+    "version": "6.5.95",
+    "deprecated": false,
+    "tags": [
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "68E64FD4-A020-4DEF-B2CB-5EA5BAA80E42",
+    "baseIconId": "68E64FD4-A020-4DEF-B2CB-5EA5BAA80E42",
+    "name": "vibrate",
+    "codepoint": "F0566",
+    "aliases": [
+      "vibration"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "B1337ECC-EF1F-481B-9E75-6A8DB7A01BB9",
+    "baseIconId": "B1337ECC-EF1F-481B-9E75-6A8DB7A01BB9",
+    "name": "video",
+    "codepoint": "F0567",
+    "aliases": [
+      "videocam"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Video / Movie",
+      "Home Automation"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "D6702650-990F-416E-BF27-F6F2B86BFB8D",
+    "baseIconId": "D6702650-990F-416E-BF27-F6F2B86BFB8D",
+    "name": "violin",
+    "codepoint": "F060F",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Music"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "04CEF7C6-E77F-4A66-89F3-2F5B544C482B",
+    "baseIconId": "04CEF7C6-E77F-4A66-89F3-2F5B544C482B",
+    "name": "voicemail",
+    "codepoint": "F057D",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "F319008C-CAC3-4D75-8DED-8164D252A015",
+    "baseIconId": "F319008C-CAC3-4D75-8DED-8164D252A015",
+    "name": "volcano",
+    "codepoint": "F1A83",
+    "aliases": [
+      "eruption"
+    ],
+    "styles": [],
+    "version": "6.7.96",
+    "deprecated": false,
+    "tags": [
+      "Nature"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "3978DABC-FC98-4D3E-A971-88716AD5D600",
+    "baseIconId": "3978DABC-FC98-4D3E-A971-88716AD5D600",
+    "name": "volleyball",
+    "codepoint": "F09B4",
+    "aliases": [],
+    "styles": [],
+    "version": "2.4.85",
+    "deprecated": false,
+    "tags": [
+      "Sport"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "61CDB722-3238-4F21-9A3F-77DC47A51755",
+    "baseIconId": "61CDB722-3238-4F21-9A3F-77DC47A51755",
+    "name": "vote",
+    "codepoint": "F0A1F",
+    "aliases": [
+      "how-to-vote"
+    ],
+    "styles": [],
+    "version": "2.5.94",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "DA42DA16-21E0-4A08-89E4-F634EBBCF85A",
+    "baseIconId": "DA42DA16-21E0-4A08-89E4-F634EBBCF85A",
+    "name": "walk",
+    "codepoint": "F0583",
+    "aliases": [
+      "directions-walk",
+      "walker",
+      "walking",
+      "human-walk"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Sport",
+      "Transportation + Other",
+      "People / Family"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "C5ABA786-D897-4770-AA78-CE4CB2A9230E",
+    "baseIconId": "C5ABA786-D897-4770-AA78-CE4CB2A9230E",
+    "name": "wallet",
+    "codepoint": "F0584",
+    "aliases": [
+      "account-balance-wallet"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Currency",
+      "Banking"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "350FE9C5-BFF1-462D-9318-BA2DDC55E11E",
+    "baseIconId": "350FE9C5-BFF1-462D-9318-BA2DDC55E11E",
+    "name": "wallpaper",
+    "codepoint": "F0E09",
+    "aliases": [],
+    "styles": [],
+    "version": "3.5.94",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "3389F6CD-3E46-47DE-B26A-341C1B65D6BF",
+    "baseIconId": "3389F6CD-3E46-47DE-B26A-341C1B65D6BF",
+    "name": "watch",
+    "codepoint": "F0589",
+    "aliases": [],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Device / Tech"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "17EEE663-92E4-4AB1-87FE-94F2CD296C4B",
+    "baseIconId": "17EEE663-92E4-4AB1-87FE-94F2CD296C4B",
+    "name": "water",
+    "codepoint": "F058C",
+    "aliases": [
+      "drop",
+      "blood",
+      "water-drop",
+      "trans-fat",
+      "ink"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Home Automation",
+      "Health / Beauty",
+      "Food / Drink",
+      "Weather",
+      "Agriculture"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "20907A4A-11CA-447E-A4F5-D0F0901D197E",
+    "baseIconId": "20907A4A-11CA-447E-A4F5-D0F0901D197E",
+    "name": "watermark",
+    "codepoint": "F0612",
+    "aliases": [
+      "branding-watermark"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "DA9C32CA-8C31-4462-B123-479169C31587",
+    "baseIconId": "DA9C32CA-8C31-4462-B123-479169C31587",
+    "name": "web",
+    "codepoint": "F059F",
+    "aliases": [
+      "language",
+      "globe",
+      "internet",
+      "world-wide-web"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Geographic Information System"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "419C0A49-C751-4204-8C82-7E43B0896BD9",
+    "baseIconId": "419C0A49-C751-4204-8C82-7E43B0896BD9",
+    "name": "widgets",
+    "codepoint": "F072C",
+    "aliases": [],
+    "styles": [],
+    "version": "1.8.36",
+    "deprecated": false,
+    "tags": [],
+    "author": "Google"
+  },
+  {
+    "id": "CACAAE64-D38D-423E-8C84-68EFF0EA0F8A",
+    "baseIconId": "CACAAE64-D38D-423E-8C84-68EFF0EA0F8A",
+    "name": "wrench",
+    "codepoint": "F05B7",
+    "aliases": [
+      "build",
+      "spanner"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": false,
+    "tags": [
+      "Hardware / Tools"
+    ],
+    "author": "Google"
+  },
+  {
+    "id": "0A078909-90AF-41F5-8E76-CAB565D49AAA",
+    "baseIconId": "0A078909-90AF-41F5-8E76-CAB565D49AAA",
+    "name": "youtube",
+    "codepoint": "F05C3",
+    "aliases": [
+      "video-youtube",
+      "youtube-play"
+    ],
+    "styles": [],
+    "version": "1.5.54",
+    "deprecated": true,
+    "tags": [
+      "Brand / Logo",
+      "Social Media"
+    ],
+    "author": "Google"
+  }
+]

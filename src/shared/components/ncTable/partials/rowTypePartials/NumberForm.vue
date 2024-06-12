@@ -89,10 +89,10 @@ export default {
 			}
 			const roundedValue = parsedValue.toFixed(this.column?.numberDecimals)
 			let value = parseFloat(roundedValue)
-			if (this.column?.numberMin && value < this.column?.numberMin) {
+			if ((this.column?.numberMin !== null && this.column?.numberMin !== undefined) && value < this.column?.numberMin) {
 				value = this.column.numberMin
 			}
-			if (this.column?.numberMax && value > this.column?.numberMax) {
+			if ((this.column?.numberMax !== null && this.column?.numberMax !== undefined) && value > this.column?.numberMax) {
 				value = this.column.numberMax
 			}
 			return value

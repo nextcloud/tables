@@ -16,6 +16,9 @@ use OCP\AppFramework\Db\Entity;
  * @method setTitle(string $title)
  * @method getEmoji(): string
  * @method setEmoji(string $emoji)
+ * @method getArchived(): bool
+ * @method setArchived(bool $archived)
+ * @method setDescription(string $description)
  * @method getOwnership(): string
  * @method setOwnership(string $ownership)
  * @method getOwnerDisplayName(): string
@@ -26,6 +29,8 @@ use OCP\AppFramework\Db\Entity;
  * @method setOnSharePermissions(array $onSharePermissions)
  * @method getHasShares(): bool
  * @method setHasShares(bool $hasShares)
+ * @method getFavorite(): bool
+ * @method setFavorite(bool $favorite)
  * @method getRowsCount(): int
  * @method setRowsCount(int $rowsCount)
  * @method getColumnsCount(): int
@@ -52,17 +57,21 @@ class Table extends Entity implements JsonSerializable {
 	protected ?string $createdAt = null;
 	protected ?string $lastEditBy = null;
 	protected ?string $lastEditAt = null;
+	protected bool $archived = false;
 	protected ?bool $isShared = null;
 	protected ?array $onSharePermissions = null;
 
 	protected ?bool $hasShares = false;
+	protected ?bool $favorite = false;
 	protected ?int $rowsCount = 0;
 	protected ?int $columnsCount = 0;
 	protected ?array $views = null;
 	protected ?array $columns = null;
+	protected ?string $description = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');
+		$this->addType('archived', 'boolean');
 	}
 
 	/**
@@ -79,12 +88,15 @@ class Table extends Entity implements JsonSerializable {
 			'createdAt' => $this->createdAt ?: '',
 			'lastEditBy' => $this->lastEditBy ?: '',
 			'lastEditAt' => $this->lastEditAt ?: '',
+			'archived' => $this->archived,
 			'isShared' => !!$this->isShared,
+			'favorite' => $this->favorite,
 			'onSharePermissions' => $this->getSharePermissions(),
 			'hasShares' => !!$this->hasShares,
 			'rowsCount' => $this->rowsCount ?: 0,
 			'columnsCount' => $this->columnsCount ?: 0,
 			'views' => $this->getViewsArray(),
+			'description' => $this->description ?:'',
 		];
 	}
 

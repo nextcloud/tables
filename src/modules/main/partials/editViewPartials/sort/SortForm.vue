@@ -24,7 +24,7 @@
 			<div v-for="(sortingRule, i) in mutableSort" :key="sortingRule.columnId ?? '' + i">
 				<SortEntry
 					:sort-entry="sortingRule"
-					:columns="unusedColumns(sortingRule.columnId)"
+					:columns="eligibleColumns(sortingRule.columnId)"
 					:class="{'locallyAdded': isLocallyAdded(sortingRule)}"
 					@delete-sorting-rule="deleteSortingRule(i)" />
 			</div>
@@ -110,9 +110,9 @@ export default {
 		isSameEntry(object, searchObject) {
 			return Object.keys(searchObject).every((key) => object[key] === searchObject[key])
 		},
-		unusedColumns(selectedId) {
-			if (this.hadHiddenSortingRules || !this.viewSort) return this.columns
-			return this.columns.filter(col => !this.viewSort.map(entry => entry.columnId).includes(col.id) || col.id === selectedId)
+		eligibleColumns(selectedId) { // filter sortable and unused columns
+			if (this.hadHiddenSortingRules || !this.viewSort) return this.columns?.filter(col => col.canSort())
+			return this.columns.filter(col => col.canSort() && (!this.viewSort.map(entry => entry.columnId).includes(col.id) || col.id === selectedId))
 		},
 		deleteSortingRule(index) {
 			this.mutableSort.splice(index, 1)

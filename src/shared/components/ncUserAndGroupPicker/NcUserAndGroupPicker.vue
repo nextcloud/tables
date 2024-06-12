@@ -64,7 +64,6 @@ export default {
 				return this.newOwnerUserId
 			},
 			set(v) {
-				console.info('newOwnerUserId set to ', v)
 				this.$emit('update:newOwnerUserId', v)
 			},
 		},

@@ -2,6 +2,9 @@
 
 namespace OCA\Tables\Service;
 
+use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Db\Context;
+use OCA\Tables\Db\ContextMapper;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\Table;
@@ -30,8 +33,18 @@ class PermissionsService {
 	protected ?string $userId = null;
 
 	protected bool $isCli = false;
+	private ContextMapper $contextMapper;
 
-	public function __construct(LoggerInterface $logger, ?string $userId, TableMapper $tableMapper, ViewMapper $viewMapper, ShareMapper $shareMapper, UserHelper $userHelper, bool $isCLI) {
+	public function __construct(
+		LoggerInterface $logger,
+		?string         $userId,
+		TableMapper     $tableMapper,
+		ViewMapper      $viewMapper,
+		ShareMapper     $shareMapper,
+		ContextMapper   $contextMapper,
+		UserHelper      $userHelper,
+		bool            $isCLI
+	) {
 		$this->tableMapper = $tableMapper;
 		$this->viewMapper = $viewMapper;
 		$this->shareMapper = $shareMapper;
@@ -39,6 +52,7 @@ class PermissionsService {
 		$this->logger = $logger;
 		$this->userId = $userId;
 		$this->isCli = $isCLI;
+		$this->contextMapper = $contextMapper;
 	}
 
 
@@ -95,21 +109,64 @@ class PermissionsService {
 		return $this->canManageTable($table, $userId);
 	}
 
-	public function canAccessView(View $view, ?string $userId = null): bool {
-		if($this->basisCheck($view, 'view', $userId)) {
-			return true;
+	public function canAccessNodeById(int $nodeType, int $nodeId, ?string $userId = null): bool {
+		if ($nodeType === Application::NODE_TYPE_TABLE) {
+			return $this->canReadColumnsByTableId($nodeId, $userId);
 		}
-
-		if ($userId) {
-			try {
-				$this->getSharedPermissionsIfSharedWithMe($view->getId(), 'view', $userId);
-				return true;
-			} catch (NotFoundError $e) {
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-			}
+		if ($nodeType === Application::NODE_TYPE_VIEW) {
+			return $this->canReadColumnsByViewId($nodeId, $userId);
 		}
 
 		return false;
+	}
+
+	public function canManageNodeById(int $nodeType, int $nodeId, ?string $userId = null): bool {
+		if ($nodeType === Application::NODE_TYPE_TABLE) {
+			return $this->canManageTableById($nodeId, $userId);
+		}
+		if ($nodeType === Application::NODE_TYPE_VIEW) {
+			return $this->canManageViewById($nodeId, $userId);
+		}
+
+		return false;
+	}
+
+	public function canManageContextById(int $contextId, ?string $userId = null): bool {
+		try {
+			$context = $this->contextMapper->findById($contextId, $userId);
+		} catch (DoesNotExistException $e) {
+			$this->logger->warning('Context does not exist');
+			return false;
+		} catch (MultipleObjectsReturnedException $e) {
+			$this->logger->warning('Multiple contexts found for this ID');
+			return false;
+		} catch (Exception $e) {
+			$this->logger->warning($e->getMessage());
+			return false;
+		}
+
+		if ($context->getOwnerType() !== Application::OWNER_TYPE_USER) {
+			$this->logger->warning('Unsupported owner type');
+			return false;
+		}
+
+		return $context->getOwnerId() === $userId || $this->canManageContext($context, $userId);
+	}
+
+	/**
+	 * @throws NotFoundError
+	 */
+	public function canAccessContextById(int $contextId, ?string $userId = null): bool {
+		try {
+			$this->contextMapper->findById($contextId, $userId ?? $this->userId);
+			return true;
+		} catch (NotFoundError $e) {
+			return false;
+		}
+	}
+
+	public function canAccessView(View $view, ?string $userId = null): bool {
+		return $this->canAccessNodeById(Application::NODE_TYPE_VIEW, $view->getId(), $userId);
 	}
 
 	/**
@@ -118,12 +175,15 @@ class PermissionsService {
 	 * @param string|null $userId
 	 * @return bool
 	 * @throws InternalError
+	 * @note prefer canManageNodeById()
 	 */
 	public function canManageElementById(int $elementId, string $nodeType = 'table', ?string $userId = null): bool {
 		if ($nodeType === 'table') {
 			return $this->canManageTableById($elementId, $userId);
 		} elseif ($nodeType === 'view') {
 			return $this->canManageViewById($elementId, $userId);
+		} elseif ($nodeType === 'context') {
+			return $this->canManageContextById($elementId, $userId);
 		} else {
 			throw new InternalError('Cannot read permission for node type '.$nodeType);
 		}
@@ -140,6 +200,10 @@ class PermissionsService {
 
 	public function canManageTable(Table $table, ?string $userId = null): bool {
 		return $this->checkPermission($table, 'table', 'manage', $userId);
+	}
+
+	public function canManageContext(Context $context, ?string $userId = null): bool {
+		return $this->checkPermission($context, 'context', 'manage', $userId);
 	}
 
 	public function canManageTableById(int $tableId, ?string $userId = null): bool {
@@ -401,24 +465,93 @@ class PermissionsService {
 	//  private methods ==========================================================================
 
 	/**
-	 * @param mixed $element
-	 * @param 'table'|'view' $nodeType
+	 * @throws NotFoundError
+	 */
+	public function getPermissionIfAvailableThroughContext(int $nodeId, string $nodeType, string $userId): int {
+		$permissions = 0;
+		$found = false;
+		$iNodeType = match ($nodeType) {
+			'table' => Application::NODE_TYPE_TABLE,
+			'view' => Application::NODE_TYPE_VIEW,
+		};
+		$contexts = $this->contextMapper->findAllContainingNode($iNodeType, $nodeId, $userId);
+		foreach ($contexts as $context) {
+			$found = true;
+			if ($context->getOwnerType() === Application::OWNER_TYPE_USER
+				&& $context->getOwnerId() === $userId) {
+				// Making someone owner of a context, makes this person also having manage permissions on the node.
+				// This is sort of an intended "privilege escalation".
+				return Application::PERMISSION_ALL;
+			}
+			foreach ($context->getNodes() as $nodeRelation) {
+				$permissions |= $nodeRelation['permissions'];
+			}
+		}
+		if (!$found) {
+			throw new NotFoundError('Node not found in any context');
+		}
+		return $permissions;
+	}
+
+	/**
+	 * @throws NotFoundError
+	 */
+	public function getPermissionArrayForNodeFromContexts(int $nodeId, string $nodeType, string $userId) {
+		$permissions = $this->getPermissionIfAvailableThroughContext($nodeId, $nodeType, $userId);
+		return [
+			'read' => (bool)($permissions & Application::PERMISSION_READ),
+			'create' => (bool)($permissions & Application::PERMISSION_CREATE),
+			'update' => (bool)($permissions & Application::PERMISSION_UPDATE),
+			'delete' => (bool)($permissions & Application::PERMISSION_DELETE),
+			'manage' => (bool)($permissions & Application::PERMISSION_MANAGE),
+		];
+	}
+
+	private function hasPermission(int $existingPermissions, string $permissionName): bool {
+		$constantName = 'PERMISSION_' . strtoupper($permissionName);
+		try {
+			$permissionBit = constant(Application::class . "::$constantName");
+		} catch (\Throwable $t) {
+			$this->logger->error('Unexpected permission string {permission}', [
+				'app' => Application::APP_ID,
+				'permission' => $permissionName,
+				'exception' => $t,
+			]);
+			return false;
+		}
+		return (bool)($existingPermissions & $permissionBit);
+	}
+
+	/**
+	 * @param Table|View|Context $element
+	 * @param 'table'|'view'|'context' $nodeType
 	 * @param string $permission
 	 * @param string|null $userId
 	 * @return bool
 	 */
-	private function checkPermission($element, string $nodeType, string $permission, ?string $userId = null): bool {
+	private function checkPermission(Table|View|Context $element, string $nodeType, string $permission, ?string $userId = null): bool {
 		if($this->basisCheck($element, $nodeType, $userId)) {
 			return true;
 		}
 
-		if ($userId) {
-			try {
-				return $this->getSharedPermissionsIfSharedWithMe($element->getId(), $nodeType, $userId)[$permission];
-			} catch (NotFoundError $e) {
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-			}
+		if (!$userId) {
+			return false;
 		}
+
+		try {
+			return $this->getSharedPermissionsIfSharedWithMe($element->getId(), $nodeType, $userId)[$permission];
+		} catch (NotFoundError $e) {
+			try {
+				if ($nodeType !== 'context'
+					&& $this->hasPermission($this->getPermissionIfAvailableThroughContext($element->getId(), $nodeType, $userId), $permission)
+				) {
+					return true;
+				}
+			} catch (NotFoundError $e) {
+			}
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+		}
+
 		return false;
 	}
 
@@ -437,19 +570,19 @@ class PermissionsService {
 			try {
 				return $this->getSharedPermissionsIfSharedWithMe($elementId, $nodeType, $userId)[$permission];
 			} catch (NotFoundError $e) {
+				try {
+					if ($this->hasPermission($this->getPermissionIfAvailableThroughContext($elementId, $nodeType, $userId), $permission)) {
+						return true;
+					}
+				} catch (NotFoundError $e) {
+				}
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 			}
 		}
 		return false;
 	}
 
-	/**
-	 * @param Table|View $element
-	 * @param string $nodeType
-	 * @param string|null $userId
-	 * @return bool
-	 */
-	private function basisCheck($element, string $nodeType, ?string &$userId): bool {
+	private function basisCheck(Table|View|Context $element, string $nodeType, ?string &$userId): bool {
 		try {
 			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
@@ -462,7 +595,7 @@ class PermissionsService {
 			return true;
 		}
 
-		if ($this->userIsElementOwner($element, $userId)) {
+		if ($this->userIsElementOwner($element, $userId, $nodeType)) {
 			return true;
 		}
 		try {
@@ -503,11 +636,14 @@ class PermissionsService {
 	}
 
 	/**
-	 * @param View|Table $element
+	 * @param View|Table|Context $element
 	 * @param string|null $userId
 	 * @return bool
 	 */
-	private function userIsElementOwner($element, string $userId = null): bool {
+	private function userIsElementOwner($element, string $userId = null, ?string $nodeType = null): bool {
+		if ($nodeType === 'context') {
+			return $element->getOwnerId() === $userId;
+		}
 		return $element->getOwnership() === $userId;
 	}
 

@@ -25,7 +25,7 @@ export default class SelectionColumn extends AbstractSelectionColumn {
 		return !!this.selectionOptions[i]?.deleted
 	}
 
-	sort(mode) {
+	sort(mode, nextSorts) {
 		const factor = mode === 'DESC' ? -1 : 1
 		return (rowA, rowB) => {
 			const selectionIdA = parseInt(rowA.data.find(item => item.columnId === this.id)?.value)
@@ -34,7 +34,7 @@ export default class SelectionColumn extends AbstractSelectionColumn {
 			const selectionIdB = parseInt(rowB.data.find(item => item.columnId === this.id)?.value ?? null)
 			const vB = Number.isNaN(selectionIdB) ? '' : this.selectionOptions.find(item => item.id === selectionIdB)?.label
 			const valueB = this.removeEmoji(vB).trim()
-			return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor
+			return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
 		}
 	}
 

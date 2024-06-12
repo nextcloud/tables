@@ -2,6 +2,8 @@
 	<div>
 		<CreateTable :show-modal="showModalCreateTable" @close="showModalCreateTable = false" />
 		<DeleteTable :show-modal="tableToDelete !== null" :table="tableToDelete" @cancel="tableToDelete = null" />
+		<EditTable :table-id="editTable" :show-modal="editTable !== null" @close="editTable = null" />
+		<TransferTable :table="tableToTransfer" :show-modal="tableToTransfer !== null" @close="tableToTransfer = null" />
 
 		<CreateColumn :show-modal="createColumnInfo !== null" :is-view="createColumnInfo?.isView" :element="createColumnInfo?.element" @close="createColumnInfo = null" />
 		<EditColumn v-if="columnToEdit" :column="columnToEdit?.column" :is-view="columnToEdit.isView" :element-id="columnToEdit?.elementId" @close="columnToEdit = false" />
@@ -35,8 +37,10 @@
 			:is-element-view="importToElement?.isView"
 			@close="importToElement = null" />
 
-		<EditTable :table-id="editTable" :show-modal="editTable !== null" @close="editTable = null" />
-		<TransferTable :table="tableToTransfer" :show-modal="tableToTransfer !== null" @close="tableToTransfer = null" />
+		<CreateContext :show-modal="showModalCreateContext" @close="showModalCreateContext = false" />
+		<EditContext :context-id="editContext" :show-modal="editContext !== null" @close="editContext = null" />
+		<TransferContext :context="contextToTransfer" :show-modal="contextToTransfer !== null" @close="contextToTransfer = null" />
+		<DeleteContext :show-modal="contextToDelete !== null" :context="contextToDelete" @cancel="contextToDelete = null" />
 	</div>
 </template>
 
@@ -55,7 +59,11 @@ import DeleteTable from './DeleteTable.vue'
 import CreateTable from './CreateTable.vue'
 import DeleteView from './DeleteView.vue'
 import EditTable from './EditTable.vue'
+import EditContext from './EditContext.vue'
 import TransferTable from './TransferTable.vue'
+import CreateContext from './CreateContext.vue'
+import TransferContext from './TransferContext.vue'
+import DeleteContext from './DeleteContext.vue'
 
 export default {
 	components: {
@@ -72,6 +80,10 @@ export default {
 		CreateRow,
 		DeleteTable,
 		TransferTable,
+		CreateContext,
+		EditContext,
+		TransferContext,
+		DeleteContext,
 	},
 
 	data() {
@@ -84,12 +96,16 @@ export default {
 			rowsToDelete: null,
 			viewToEdit: null,
 			showModalCreateTable: false,
+			showModalCreateContext: false,
 			importToElement: null,
 			createViewTableId: null, // if null, no modal open
 			tableToDelete: null,
 			viewToDelete: null,
 			editTable: null,
+			editContext: null,
 			tableToTransfer: null,
+			contextToTransfer: null,
+			contextToDelete: null,
 		}
 	},
 
@@ -126,6 +142,13 @@ export default {
 
 		// misc
 		subscribe('tables:modal:import', element => { this.importToElement = element })
+
+		// context
+		subscribe('tables:context:create', () => { this.showModalCreateContext = true })
+		subscribe('tables:context:edit', contextId => { this.editContext = contextId })
+		subscribe('tables:context:transfer', context => { this.contextToTransfer = context })
+		subscribe('tables:context:delete', context => { this.contextToDelete = context })
+
 	},
 	unmounted() {
 		unsubscribe('tables:view:reload', () => { this.reload(true) })
@@ -150,6 +173,10 @@ export default {
 		unsubscribe('tables:table:delete', table => { this.tableToDelete = table })
 		unsubscribe('tables:table:edit', tableId => { this.editTable = tableId })
 		unsubscribe('tables:table:transfer', table => { this.tableToTransfer = table })
+		unsubscribe('tables:context:create', () => { this.showModalCreateContext = true })
+		unsubscribe('tables:context:edit', contextId => { this.editContext = contextId })
+		unsubscribe('tables:context:transfer', context => { this.contextToTransfer = context })
+		unsubscribe('tables:context:delete', context => { this.contextToDelete = context })
 	},
 }
 </script>

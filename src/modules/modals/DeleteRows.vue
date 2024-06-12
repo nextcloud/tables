@@ -41,7 +41,8 @@ export default {
 			this.rowsToDelete.forEach(rowId => {
 				const res = this.$store.dispatch('removeRow', {
 					rowId,
-					viewId: this.isView ? this.elementId : null,
+					isView: this.isView,
+					elementId: this.elementId,
 				})
 				if (!res) {
 					error = true

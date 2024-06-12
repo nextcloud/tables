@@ -20,11 +20,20 @@
 							{{ icon }}
 						</NcButton>
 					</NcEmojiPicker>
-					<input v-model="title"
+					<input ref="titleInput"
+						v-model="title"
 						:class="{missing: errorTitle}"
 						type="text"
 						:placeholder="t('tables', 'Title of the new table')"
 						@input="titleChangedManually">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-4 mandatory">
+					{{ t('tables', 'Description') }}
+				</div>
+				<div class="col-4">
+					<TableDescription :description.sync="description" :read-only="false" />
 				</div>
 			</div>
 			<div class="row space-T">
@@ -35,6 +44,14 @@
 						:active="templateChoice === 'custom'"
 						:tabbable="true"
 						@set-template="setTemplate('custom')" />
+				</div>
+				<div class="col-2 block space-R space-B">
+					<NcTile
+						:title="t('tables', '📄 Import table')"
+						:body="t('tables', 'Import table from file.')"
+						:active="templateChoice === 'import'"
+						:tabbable="true"
+						@set-template="setTemplate('import')" />
 				</div>
 				<div v-for="template in templates" :key="template.name" class="col-2 block space-R space-B">
 					<NcTile
@@ -64,6 +81,9 @@ import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import NcTile from '../../shared/components/ncTile/NcTile.vue'
 import displayError from '../../shared/utils/displayError.js'
+import TableDescription from '../../modules/main/sections/TableDescription.vue'
+import { emit } from '@nextcloud/event-bus'
+import { mapState } from 'vuex'
 
 export default {
 	name: 'CreateTable',
@@ -72,6 +92,7 @@ export default {
 		NcEmojiPicker,
 		NcButton,
 		NcTile,
+		TableDescription,
 	},
 	props: {
 		showModal: {
@@ -83,27 +104,28 @@ export default {
 		return {
 			title: '',
 			icon: '',
+			description: '',
 			errorTitle: false,
-			templates: null,
 			templateChoice: 'custom',
 			customIconChosen: false,
 			customTitleChosen: false,
 		}
 	},
+	computed: {
+		...mapState(['templates']),
+	},
 	watch: {
 		title() {
 			if (this.title.length >= 200) {
-				showError(t('tables', 'The title limit is reached with 200 characters. Please use a shorter title.'))
+				showError(t('tables', 'The title character limit is 200 characters. Please use a shorter title.'))
 				this.title = this.title.slice(0, 199)
 			}
 		},
 		showModal() {
 			// every time when the modal opens chose a new emoji
 			this.loadEmoji()
+			this.$nextTick(() => this.$refs.titleInput.focus())
 		},
-	},
-	beforeMount() {
-		this.loadTemplatesFromBE()
 	},
 	methods: {
 		titleChangedManually() {
@@ -119,6 +141,8 @@ export default {
 			if (!this.customIconChosen) {
 				if (name === 'custom') {
 					this.icon = '🔧'
+				} else if (name === 'import') {
+					this.icon = '📄'
 				} else {
 					const templateObject = this.templates?.find(item => item.name === name) || ''
 					this.icon = templateObject?.icon
@@ -126,7 +150,7 @@ export default {
 			}
 
 			if (!this.customTitleChosen) {
-				if (name === 'custom') {
+				if (name === 'custom' || name === 'import') {
 					this.title = ''
 				} else {
 					const templateObject = this.templates?.find(item => item.name === name) || ''
@@ -150,6 +174,9 @@ export default {
 				const newTableId = await this.sendNewTableToBE(this.templateChoice)
 				if (newTableId) {
 					await this.$router.push('/table/' + newTableId)
+					if (this.templateChoice === 'import') {
+						emit('tables:modal:import', { element: { tableId: newTableId, id: newTableId }, isView: false })
+					}
 					this.actionCancel()
 				}
 			}
@@ -157,6 +184,7 @@ export default {
 		async sendNewTableToBE(template) {
 			const data = {
 				title: this.title,
+				description: this.description,
 				emoji: this.icon,
 				template,
 			}
@@ -187,6 +215,11 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+
+:deep(.element-description) {
+	padding-inline: 0 !important;
+	max-width: 100%;
+}
 
 .modal__content {
 	padding-right: 0 !important;

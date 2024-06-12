@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div v-if="hasViews" class="row space-T">
-			<div class="col-4 space-L">
+			<div v-if="showOptions" class="col-4 space-L">
 				<h2>
 					{{ t('tables', 'Data') }}&nbsp;&nbsp;
 					<NcActions :force-menu="true" type="secondary">
@@ -83,7 +83,8 @@
 				<template #actions>
 					<NcActions :force-menu="true" :type="isViewSettingSet ? 'secondary' : 'tertiary'">
 						<NcActionCaption v-if="canManageElement(table)" :name="t('tables', 'Manage table')" />
-						<NcActionButton v-if="canManageElement(table) "
+						<NcActionButton v-if="canManageElement(table)"
+							data-cy="dataTableEditTableBtn"
 							:close-after-click="true"
 							@click="emit('tables:table:edit', table.id)">
 							<template #icon>
@@ -192,6 +193,10 @@ export default {
 		selectedRows: {
 			type: Array,
 			default: null,
+		},
+		showOptions: {
+			type: Boolean,
+			default: true,
 		},
 	},
 

@@ -10,7 +10,6 @@ use OCA\Tables\Errors\PermissionError;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
-use OCP\IConfig;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
@@ -27,24 +26,15 @@ class TableTemplateService {
 
 	private ?string $userId;
 
-	private IConfig $config;
-
 	private string $textRichColumnTypeName = 'rich';
 
-	public function __construct(LoggerInterface $logger, IL10N $l, ColumnService $columnService, ?string $userId, RowService $rowService, ViewService $viewService, IConfig $config) {
+	public function __construct(LoggerInterface $logger, IL10N $l, ColumnService $columnService, ?string $userId, RowService $rowService, ViewService $viewService) {
 		$this->logger = $logger;
 		$this->l = $l;
 		$this->columnService = $columnService;
 		$this->rowService = $rowService;
 		$this->viewService = $viewService;
 		$this->userId = $userId;
-		$this->config = $config;
-
-		// if we are on NC25, wie have to use the old text-long column type
-		// this is because NC25 does not serve the text editor globally
-		if (version_compare($this->config->getSystemValueString('version', '0.0.0'), '26.0.0', '<')) {
-			$this->textRichColumnTypeName = 'long';
-		}
 	}
 
 	/**
@@ -479,8 +469,8 @@ class TableTemplateService {
 				'title' => $this->l->t('Create Vacation Request'),
 				'emoji' => '️➕',
 				'columns' => json_encode([$columns['employee']->getId(), $columns['from']->getId(), $columns['to']->getId(), $columns['workingDays']->getId(), $columns['dateRequest']->getId()]),
-				'sort' => json_encode([["columnId" => -5, "mode" => "ASC"]]),
-				'filter' => json_encode([[["columnId" => -2, "operator" => "is-equal", "value" => "@my-name"], ["columnId" => $columns['approved']->getId(), "operator" => "is-empty", "value" => ""]]]),
+				'sort' => json_encode([["columnId" => Column::TYPE_META_UPDATED_AT, "mode" => "ASC"]]),
+				'filter' => json_encode([[["columnId" => Column::TYPE_META_CREATED_BY, "operator" => "is-equal", "value" => "@my-name"], ["columnId" => $columns['approved']->getId(), "operator" => "is-empty", "value" => ""]]]),
 			]
 		);
 		$this->createView($table,
@@ -501,8 +491,8 @@ class TableTemplateService {
 				'columns' => json_encode(array_values(array_map(function ($col) {
 					return $col->getId();
 				}, $columns))),
-				'sort' => json_encode([["columnId" => -3, "mode" => "ASC"]]),
-				'filter' => json_encode([[["columnId" => -2, "operator" => "is-equal", "value" => "@my-name"]]]),
+				'sort' => json_encode([["columnId" => Column::TYPE_META_UPDATED_BY, "mode" => "ASC"]]),
+				'filter' => json_encode([[["columnId" => Column::TYPE_META_CREATED_BY, "operator" => "is-equal", "value" => "@my-name"]]]),
 			]
 		);
 		$this->createView($table,
@@ -512,7 +502,7 @@ class TableTemplateService {
 				'columns' => json_encode(array_values(array_map(function ($col) {
 					return $col->getId();
 				}, $columns))),
-				'sort' => json_encode([["columnId" => -3, "mode" => "ASC"]]),
+				'sort' => json_encode([["columnId" => Column::TYPE_META_UPDATED_BY, "mode" => "ASC"]]),
 				'filter' => json_encode([[["columnId" => $columns['approved']->getId(), "operator" => "is-equal", "value" => "@checked"]], [["columnId" => $columns['approved']->getId(), "operator" => "is-equal", "value" => "@unchecked"]]]),
 			]
 		);

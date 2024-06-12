@@ -1,6 +1,7 @@
 import { AbstractTextColumn } from '../columnClass.js'
 import { ColumnTypes } from '../columnHandler.js'
 import { FilterIds } from '../filter.js'
+import { TYPE_META_CREATED_BY, TYPE_META_UPDATED_BY } from '../../../../constants.js'
 
 export default class TextLineColumn extends AbstractTextColumn {
 
@@ -10,12 +11,20 @@ export default class TextLineColumn extends AbstractTextColumn {
 		this.textMaxLength = data.textMaxLength
 	}
 
-	sort(mode) {
+	sort(mode, nextSorts) {
 		const factor = mode === 'DESC' ? -1 : 1
 		return (rowA, rowB) => {
-			const valueA = rowA.data.find(item => item.columnId === this.id)?.value?.toLowerCase() || ''
-			const valueB = rowB.data.find(item => item.columnId === this.id)?.value?.toLowerCase() || ''
-			return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor
+			let valueA = rowA.data.find(item => item.columnId === this.id)?.value?.toLowerCase() || ''
+			let valueB = rowB.data.find(item => item.columnId === this.id)?.value?.toLowerCase() || ''
+			if (this.id === TYPE_META_CREATED_BY) {
+				valueA = rowA.createdBy?.toLowerCase() || ''
+				valueB = rowB.createdBy?.toLowerCase() || ''
+			}
+			if (this.id === TYPE_META_UPDATED_BY) {
+				valueA = rowA.lastEditBy?.toLowerCase() || ''
+				valueB = rowB.lastEditBy?.toLowerCase() || ''
+			}
+			return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
 		}
 	}
 

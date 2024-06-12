@@ -35,11 +35,11 @@
 		"lint": "find . -name \\*.php -not -path './vendor/*' -not -path './build/*' -print0 | xargs -0 -n1 php -l",
 		"cs:check": "php-cs-fixer fix --dry-run --diff",
 		"cs:fix": "php-cs-fixer fix",
-		"psalm": "./vendor/bin/psalm.phar --show-info=true --no-cache",
+		"psalm": "./vendor/bin/psalm.phar --show-info=false --no-cache",
 		"psalm:update-baseline": "./vendor/bin/psalm.phar --update-baseline",
 		"psalm:fix": "./vendor/bin/psalm.phar --no-cache --alter --issues=InvalidReturnType,InvalidNullableReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingParamType,InvalidFalsableReturnType",
 		"psalm:fix:dry": "./vendor/bin/psalm.phar --no-cache --alter --issues=InvalidReturnType,InvalidNullableReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingParamType,InvalidFalsableReturnType --dry-run",
-		"openapi": "./vendor-bin/openapi-extractor/vendor/nextcloud/openapi-extractor/generate-spec",
+		"openapi": "generate-spec --verbose && (npm run typescript:generate || echo 'Please manually regenerate the typescript OpenAPI models')",
 		"post-install-cmd": [
 			"[ $COMPOSER_DEV_MODE -eq 0 ] || composer bin all install --ansi"
 		],

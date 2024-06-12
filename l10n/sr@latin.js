@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "Ne",
+    "Yes" : "Da",
     "Date" : "Date",
     "Name" : "Ime",
     "Description" : "Opis",
@@ -19,9 +21,9 @@ OC.L10N.register(
     "Cancel" : "Otkaži",
     "Delete" : "Obriši",
     "Owner" : "Vlasnik",
-    "File" : "Fajl",
+    "Close" : "Zatvori",
     "Copy" : "Kopiraj",
-    "Shared" : "Deljeno",
+    "Favorites" : "Omiljene",
     "group" : "grupa",
     "Sharing" : "Deljenje",
     "Read" : "Čitaj",

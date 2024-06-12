@@ -51,8 +51,7 @@ describe('Test column ' + columnTitle, () => {
 		cy.get('.modal__content input').first().should('contain.value', date)
 		cy.get('[data-cy="createRowAddMoreSwitch"]').click().click()
 		cy.get('button').contains('Save').click()
-		const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June',
-			'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
+		const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 		const datetime2 = new Date().getDate() + ' ' + monthNames[new Date().getMonth()] + ' ' + new Date().getFullYear()
 		cy.log(datetime2)
 		cy.get('.custom-table table tr td div').contains(new Date().getDate()).should('be.visible')

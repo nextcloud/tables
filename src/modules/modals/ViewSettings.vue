@@ -180,7 +180,7 @@ export default {
 	watch: {
 		title() {
 			if (this.title.length >= 200) {
-				showError(t('tables', 'The title limit is reached with 200 characters. Please use a shorter title.'))
+				showError(t('tables', 'The title character limit is 200 characters. Please use a shorter title.'))
 				this.title = this.title.slice(0, 199)
 			}
 		},
@@ -189,6 +189,7 @@ export default {
 				this.reset()
 				await this.loadTableColumnsFromBE()
 				this.open = true
+				this.$nextTick(() => this.$el.querySelector('input')?.focus())
 			}
 		},
 		open(value) {

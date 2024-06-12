@@ -10,6 +10,7 @@ return [
 			'verb' => 'OPTIONS', 'requirements' => ['path' => '.+']],
 
 		['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
+		['name' => 'page#context', 'url' => '/app/{contextId}', 'verb' => 'GET'],
 
 		['name' => 'tableTemplate#list', 'url' => '/table/templates', 'verb' => 'GET'],
 
@@ -33,6 +34,7 @@ return [
 		['name' => 'api1#createShare',	'url' => '/api/1/shares', 'verb' => 'POST'],
 		['name' => 'api1#deleteShare',	'url' => '/api/1/shares/{shareId}', 'verb' => 'DELETE'],
 		['name' => 'api1#updateSharePermissions',	'url' => '/api/1/shares/{shareId}', 'verb' => 'PUT'],
+		['name' => 'api1#updateShareDisplayMode',	'url' => '/api/1/shares/{shareId}/display-mode', 'verb' => 'PUT'],
 		['name' => 'api1#createTableShare',	'url' => '/api/1/tables/{tableId}/shares', 'verb' => 'POST'],
 		// -> columns
 		['name' => 'api1#indexTableColumns',	'url' => '/api/1/tables/{tableId}/columns', 'verb' => 'GET'],
@@ -97,11 +99,14 @@ return [
 		['name' => 'share#show', 'url' => '/share/{id}', 'verb' => 'GET'],
 		['name' => 'share#create', 'url' => '/share', 'verb' => 'POST'],
 		['name' => 'share#updatePermission', 'url' => '/share/{id}/permission', 'verb' => 'PUT'],
+		['name' => 'share#updateDisplayMode', 'url' => '/share/{id}/display-mode', 'verb' => 'PUT'],
 		['name' => 'share#destroy', 'url' => '/share/{id}', 'verb' => 'DELETE'],
 
 		// import
 		['name' => 'import#importInTable', 'url' => '/import/table/{tableId}', 'verb' => 'POST'],
 		['name' => 'import#importInView', 'url' => '/import/view/{viewId}', 'verb' => 'POST'],
+		['name' => 'import#importUploadInTable', 'url' => '/importupload/table/{tableId}', 'verb' => 'POST'],
+		['name' => 'import#importUploadInView', 'url' => '/importupload/view/{viewId}', 'verb' => 'POST'],
 
 		// search
 		['name' => 'search#all', 'url' => '/search/all', 'verb' => 'GET'],
@@ -123,5 +128,15 @@ return [
 		['name' => 'ApiColumns#createTextColumn', 'url' => '/api/2/columns/text', 'verb' => 'POST'],
 		['name' => 'ApiColumns#createSelectionColumn', 'url' => '/api/2/columns/selection', 'verb' => 'POST'],
 		['name' => 'ApiColumns#createDatetimeColumn', 'url' => '/api/2/columns/datetime', 'verb' => 'POST'],
+
+		['name' => 'ApiFavorite#create', 'url' => '/api/2/favorites/{nodeType}/{nodeId}', 'verb' => 'POST', 'requirements' => ['nodeType' => '(\d+)', 'nodeId' => '(\d+)']],
+		['name' => 'ApiFavorite#destroy', 'url' => '/api/2/favorites/{nodeType}/{nodeId}', 'verb' => 'DELETE', 'requirements' => ['nodeType' => '(\d+)', 'nodeId' => '(\d+)']],
+		['name' => 'Context#index', 'url' => '/api/2/contexts', 'verb' => 'GET'],
+		['name' => 'Context#show', 'url' => '/api/2/contexts/{contextId}', 'verb' => 'GET'],
+		['name' => 'Context#create', 'url' => '/api/2/contexts', 'verb' => 'POST'],
+		['name' => 'Context#update', 'url' => '/api/2/contexts/{contextId}', 'verb' => 'PUT'],
+		['name' => 'Context#destroy', 'url' => '/api/2/contexts/{contextId}', 'verb' => 'DELETE'],
+		['name' => 'Context#transfer', 'url' => '/api/2/contexts/{contextId}/transfer', 'verb' => 'PUT'],
+		['name' => 'Context#updateContentOrder', 'url' => '/api/2/contexts/{contextId}/pages/{pageId}', 'verb' => 'PUT'],
 	]
 ];

@@ -1,6 +1,6 @@
 <template>
 	<NcModal v-if="showModal" data-cy="editRowModal" @close="actionCancel">
-		<div class="modal__content">
+		<div class="modal__content" @keydown="onKeydown">
 			<div class="row">
 				<div class="col-4">
 					<h2 tabindex="0">
@@ -163,7 +163,8 @@ export default {
 			}
 			const res = await this.$store.dispatch('updateRow', {
 				id: this.row.id,
-				viewId: this.isView ? this.element.id : null,
+				isView: this.isView,
+				elementId: this.element.id,
 				data,
 			})
 			if (!res) {
@@ -182,13 +183,19 @@ export default {
 			this.localLoading = true
 			const res = await this.$store.dispatch('removeRow', {
 				rowId,
-				viewId: this.isView ? this.element.id : null,
+				isView: this.isView,
+				elementId: this.element.id,
 			})
 			if (!res) {
 				showError(t('tables', 'Could not delete row.'))
 			}
 			this.localLoading = false
 			this.actionCancel()
+		},
+		onKeydown(event) {
+			if (event.key === 'Enter' && event.ctrlKey) {
+				this.actionConfirm()
+			}
 		},
 	},
 }

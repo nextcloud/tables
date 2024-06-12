@@ -17,10 +17,14 @@ use OCP\AppFramework\Db\Entity;
  * @method setTitle(string $title)
  * @method getTableId(): int
  * @method setTableId(int $tableId)
+ * @method getColumns(): string
+ * @method setColumns(string $columns)
  * @method getCreatedBy(): string
  * @method setCreatedBy(string $createdBy)
  * @method getCreatedAt(): string
  * @method setCreatedAt(string $createdAt)
+ * @method getFilter(): string
+ * @method setFilter(string $filter)
  * @method getLastEditBy(): string
  * @method setLastEditBy(string $lastEditBy)
  * @method getLastEditAt(): string
@@ -35,10 +39,12 @@ use OCP\AppFramework\Db\Entity;
  * @method setOnSharePermissions(array $onSharePermissions)
  * @method getHasShares(): bool
  * @method setHasShares(bool $hasShares)
+ * @method getFavorite(): bool
+ * @method setFavorite(bool $favorite)
  * @method getRowsCount(): int
  * @method setRowsCount(int $rowCount)
- * @method getOwnership(): string
- * @method setOwnership(string $ownership)
+ * @method getSort(): string
+ * @method setSort(string $sort)
  * @method getOwnerDisplayName(): string
  * @method setOwnerDisplayName(string $ownerDisplayName)
  */
@@ -57,10 +63,10 @@ class View extends Entity implements JsonSerializable {
 	protected ?bool $isShared = null;
 	protected ?array $onSharePermissions = null;
 	protected ?bool $hasShares = false;
+	protected bool $favorite = false;
 	protected ?int $rowsCount = 0;
 	protected ?string $ownership = null;
 	protected ?string $ownerDisplayName = null;
-
 
 	public function __construct() {
 		$this->addType('id', 'integer');
@@ -119,6 +125,14 @@ class View extends Entity implements JsonSerializable {
 		return $this->getOnSharePermissions();
 	}
 
+	public function getOwnership(): ?string {
+		return $this->ownership;
+	}
+
+	public function setOwnership(string $ownership): void {
+		$this->ownership = $ownership;
+	}
+
 	/**
 	 * @psalm-return TablesView
 	 */
@@ -137,6 +151,7 @@ class View extends Entity implements JsonSerializable {
 			'columns' => $this->getColumnsArray(),
 			'sort' => $this->getSortArray(),
 			'isShared' => !!$this->isShared,
+			'favorite' => $this->favorite,
 			'onSharePermissions' => $this->getSharePermissions(),
 			'hasShares' => !!$this->hasShares,
 			'rowsCount' => $this->rowsCount ?: 0,

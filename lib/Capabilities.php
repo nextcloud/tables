@@ -46,7 +46,7 @@ class Capabilities implements ICapability {
 
 	/**
 	 *
-	 * @return array{tables: array{enabled: bool, version: string, apiVersions: string[], column_types: string[]}}
+	 * @return array{tables: array{enabled: bool, version: string, apiVersions: string[], features: string[], column_types: string[]}}
 	 *
 	 * @inheritDoc
 	 */
@@ -62,6 +62,10 @@ class Capabilities implements ICapability {
 				'version' => $this->appManager->getAppVersion('tables'),
 				'apiVersions' => [
 					'1.0'
+				],
+				'features' => [
+					'favorite',
+					'archive',
 				],
 				'column_types' => [
 					'text-line',

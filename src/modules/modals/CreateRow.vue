@@ -1,6 +1,6 @@
 <template>
 	<NcModal v-if="showModal" data-cy="createRowModal" @close="actionCancel">
-		<div class="modal__content">
+		<div class="modal__content" @keydown="onKeydown">
 			<div class="row">
 				<div class="col-4">
 					<h2 style="padding: 0" tabindex="0">
@@ -88,6 +88,13 @@ export default {
 			return mandatoryFieldsEmpty
 		},
 	},
+	watch: {
+		showModal() {
+			this.$nextTick(() => {
+				this.$el.querySelector('input')?.focus()
+			})
+		},
+	},
 	methods: {
 		actionCancel() {
 			this.reset()
@@ -138,6 +145,11 @@ export default {
 		},
 		reset() {
 			this.row = {}
+		},
+		onKeydown(event) {
+			if (event.key === 'Enter' && event.ctrlKey) {
+				this.actionConfirm()
+			}
 		},
 	},
 }

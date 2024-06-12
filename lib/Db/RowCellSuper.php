@@ -36,7 +36,10 @@ abstract class RowCellSuper extends Entity implements JsonSerializable {
 		$this->addType('rowId', 'integer');
 	}
 
-	public function jsonSerializePreparation($value): array {
+	/**
+	 * @param float|null|string $value
+	 */
+	public function jsonSerializePreparation(string|float|null $value): array {
 		return [
 			'id' => $this->id,
 			'columnId' => $this->columnId,

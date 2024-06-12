@@ -6,6 +6,10 @@ namespace OCA\Tables\Service;
 
 use DateTime;
 
+use InvalidArgumentException;
+use OCA\Tables\Db\Context;
+use OCA\Tables\Db\ContextNavigation;
+use OCA\Tables\Db\ContextNavigationMapper;
 use OCA\Tables\Db\Share;
 use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\Table;
@@ -21,13 +25,17 @@ use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
+use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
+use OCP\IDBConnection;
 use Psr\Log\LoggerInterface;
 
 /**
  * @psalm-import-type TablesShare from ResponseDefinitions
  */
 class ShareService extends SuperService {
+	use TTransactional;
+
 	protected ShareMapper $mapper;
 
 	protected TableMapper $tableMapper;
@@ -37,15 +45,29 @@ class ShareService extends SuperService {
 	protected UserHelper $userHelper;
 
 	protected GroupHelper $groupHelper;
+	private ContextNavigationMapper $contextNavigationMapper;
+	private IDBConnection $dbc;
 
-	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-		ShareMapper $shareMapper, TableMapper $tableMapper, ViewMapper $viewMapper, UserHelper $userHelper, GroupHelper $groupHelper) {
+	public function __construct(
+		PermissionsService $permissionsService,
+		LoggerInterface $logger,
+		?string $userId,
+		ShareMapper $shareMapper,
+		TableMapper $tableMapper,
+		ViewMapper $viewMapper,
+		UserHelper $userHelper,
+		GroupHelper $groupHelper,
+		ContextNavigationMapper $contextNavigationMapper,
+		IDBConnection $dbc,
+	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $shareMapper;
 		$this->tableMapper = $tableMapper;
 		$this->viewMapper = $viewMapper;
 		$this->userHelper = $userHelper;
 		$this->groupHelper = $groupHelper;
+		$this->contextNavigationMapper = $contextNavigationMapper;
+		$this->dbc = $dbc;
 	}
 
 
@@ -190,15 +212,12 @@ class ShareService extends SuperService {
 	 * @return Share
 	 * @throws InternalError
 	 */
-	public function create(int $nodeId, string $nodeType, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage):Share {
+	public function create(int $nodeId, string $nodeType, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage, int $displayMode):Share {
 		if (!$this->userId) {
 			$e = new \Exception('No user given.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
-		// TODO Do we need to check if create is allowed for requested nodeId?!
-		// should also return not found if share_node could not be found
-		// should also return no permission if sender don't have permission to create a share for node
 		$time = new DateTime();
 		$item = new Share();
 		$item->setSender($this->userId);
@@ -219,6 +238,22 @@ class ShareService extends SuperService {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
 		}
+
+		if ($nodeType === 'context') {
+			// set the default visibility of the nav bar item for Application shares
+			$navigationItem = new ContextNavigation();
+			$navigationItem->setShareId($item->getId());
+			$navigationItem->setUserId('');
+			$navigationItem->setDisplayMode($displayMode);
+
+			try {
+				$this->contextNavigationMapper->insert($navigationItem);
+			} catch (Exception $e) {
+				$this->logger->error($e->getMessage());
+				throw new InternalError($e->getMessage());
+			}
+		}
+
 		return $this->addReceiverDisplayName($newShare);
 	}
 
@@ -281,6 +316,40 @@ class ShareService extends SuperService {
 	}
 
 	/**
+	 * @throws InternalError|PermissionError|NotFoundError
+	 */
+	public function updateDisplayMode(int $shareId, int $displayMode, string $userId): ContextNavigation {
+		try {
+			$item = $this->mapper->find($shareId);
+
+			if ($item->getNodeType() !== 'context') {
+				// Contexts-only property
+				throw new InvalidArgumentException(get_class($this) . ' - ' . __FUNCTION__ . ': nav bar display mode can be set for shared contexts only');
+			}
+
+			if ($userId === '') {
+				// setting default display mode requires manage permissions
+				if (!$this->permissionsService->canManageContextById($item->getNodeId())) {
+					throw new PermissionError(sprintf('PermissionError: can not update share with id %d', $shareId));
+				}
+			} else {
+				// setting user display mode override only requires access
+				if (!$this->permissionsService->canAccessContextById($item->getId())) {
+					throw new PermissionError(sprintf('PermissionError: can not update share with id %d', $shareId));
+				}
+			}
+
+			return $this->contextNavigationMapper->setDisplayModeByShareId($shareId, $displayMode, '');
+		} catch (DoesNotExistException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		} catch (Exception|MultipleObjectsReturnedException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+	}
+
+	/**
 	 * @param int $id
 	 * @return Share
 	 * @throws InternalError
@@ -305,6 +374,9 @@ class ShareService extends SuperService {
 
 		try {
 			$this->mapper->delete($item);
+			if ($item->getNodeType() === 'context') {
+				$this->contextNavigationMapper->deleteByShareId($item->getId());
+			}
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
@@ -348,6 +420,21 @@ class ShareService extends SuperService {
 			$this->mapper->deleteByNode($view->getId(), 'view');
 		} catch (Exception $e) {
 			$this->logger->error('something went wrong while deleting shares for view: '.$view->getId());
+		}
+	}
+
+	public function deleteAllForContext(Context $context): void {
+		try {
+			$this->atomic(function () use ($context) {
+				$shares = $this->mapper->findAllSharesForNode('context', $context->getId(), $this->userId);
+				foreach ($shares as $share) {
+					/** @var Share $share */
+					$this->contextNavigationMapper->deleteByShareId($share->getId());
+				}
+				$this->mapper->deleteByNode($context->getId(), 'context');
+			}, $this->dbc);
+		} catch (Exception $e) {
+			$this->logger->error('something went wrong while deleting shares for context: '.$context->getId());
 		}
 	}
 

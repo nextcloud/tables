@@ -56,8 +56,8 @@
 				</NcActionButton>
 			</template>
 			<template v-else>
-				<NcActionCaption v-if="canSort" :name="t('tables', 'Sorting')" />
-				<NcActionButtonGroup v-if="canSort">
+				<NcActionCaption v-if="!hasPresetSorting && canSort" :name="t('tables', 'Sorting')" />
+				<NcActionButtonGroup v-if="!hasPresetSorting && canSort">
 					<NcActionButton :class="{ selected: getSortMode === 'ASC' }" :aria-label="t('tables', 'Sort asc')" @click="sort('ASC')">
 						<template #icon>
 							<SortAsc :size="20" />
@@ -225,8 +225,11 @@ export default {
 		canSort() {
 			return this.column.canSort()
 		},
+		hasPresetSorting() {
+			return this.localViewSetting?.presetSorting?.find(item => item.columnId === this.column?.id)
+		},
 		getSortMode() {
-			const sortObject = this.localViewSetting?.sorting?.find(item => item.columnId === this.column?.id)
+			const sortObject = this.localViewSetting?.presetSorting?.find(item => item.columnId === this.column?.id) ?? this.localViewSetting?.sorting?.find(item => item.columnId === this.column?.id)
 			if (sortObject) {
 				return sortObject.mode
 			}

@@ -86,7 +86,7 @@ export default {
 			}
 			const res = await this.$store.dispatch('transferTable', { id: this.table.id, data: { newOwnerUserId: this.newOwnerUserId } })
 			if (res) {
-				showSuccess(t('tables', 'Table "{emoji}{table}" transfered to {user}', { emoji: this.table?.emoji ? this.table?.emoji + ' ' : '', table: this.table?.title, user: this.newOwnerUserId }))
+				showSuccess(t('tables', 'Table "{emoji}{table}" transferred to {user}', { emoji: this.table?.emoji ? this.table?.emoji + ' ' : '', table: this.table?.title, user: this.newOwnerUserId }))
 
 				if (transferId === activeTableId) {
 					await this.$router.push('/').catch(err => err)

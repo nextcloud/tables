@@ -94,21 +94,7 @@ class ColumnService extends SuperService {
 			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 		$viewColumnIds = $view->getColumnsArray();
-		$viewColumns = [];
-		foreach ($viewColumnIds as $viewColumnId) {
-			if ($viewColumnId < 0) {
-				continue;
-			}
-			try {
-				$viewColumns[] = $this->mapper->find($viewColumnId);
-			} catch (DoesNotExistException $e) {
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
-			} catch (MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
-			}
-		}
+		$viewColumns = $this->mapper->findAll($viewColumnIds);
 		return $this->enhanceColumns($viewColumns);
 	}
 
@@ -478,6 +464,7 @@ class ColumnService extends SuperService {
 	 * @param int|null $tableId
 	 * @param int|null $viewId
 	 * @param array $titles example ['Test column 1', 'And so on', '3rd column title']
+	 * @param array $dataTypes example ['datetime', 'number', 'text']
 	 * @param string|null $userId
 	 * @param bool $createUnknownColumns
 	 * @param int $countCreatedColumns
@@ -488,7 +475,7 @@ class ColumnService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function findOrCreateColumnsByTitleForTableAsArray(?int $tableId, ?int $viewId, array $titles, ?string $userId, bool $createUnknownColumns, int &$countCreatedColumns, int &$countMatchingColumns): array {
+	public function findOrCreateColumnsByTitleForTableAsArray(?int $tableId, ?int $viewId, array $titles, array $dataTypes, ?string $userId, bool $createUnknownColumns, int &$countCreatedColumns, int &$countMatchingColumns): array {
 		$result = [];
 
 		if($userId === null) {
@@ -522,7 +509,29 @@ class ColumnService extends SuperService {
 			// if column was not found
 			if($result[$i] === '' && $createUnknownColumns) {
 				$description = $this->l->t('This column was automatically created by the import service.');
-				$result[$i] = $this->create($userId, $tableId, $viewId, 'text', 'line', $title, false, $description, null, null, null, null, null, null, null, null, null, null, null, null, []);
+				$result[$i] = $this->create(
+					$userId,
+					$tableId,
+					$viewId,
+					$dataTypes[$i]['type'],
+					$dataTypes[$i]['subtype'] ?? '',
+					$title,
+					false,
+					$description,
+					null,
+					null,
+					null,
+					$dataTypes[$i]['number_prefix'] ?? null,
+					$dataTypes[$i]['number_suffix'] ?? null,
+					null,
+					null,
+					null,
+					$dataTypes[$i]['number_decimals'] ?? null,
+					null,
+					$dataTypes[$i]['selection_default'] ?? null,
+					null,
+					[]
+				);
 				$countCreatedColumns++;
 			}
 		}

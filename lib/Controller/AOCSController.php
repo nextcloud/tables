@@ -4,6 +4,7 @@ namespace OCA\Tables\Controller;
 
 use Exception;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -57,6 +58,15 @@ abstract class AOCSController extends OCSController {
 	protected function handleNotFoundError(NotFoundError $e): DataResponse {
 		$this->logger->warning('A not found error occurred: ['. $e->getCode() . ']' . $e->getMessage());
 		return new DataResponse(['message' => $this->n->t('A not found error occurred. More details can be found in the logs. Please reach out to your administration.')], Http::STATUS_NOT_FOUND);
+	}
+
+	/**
+	 * @param BadRequestError $e
+	 * @return DataResponse<Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
+	 */
+	protected function handleBadRequestError(BadRequestError $e): DataResponse {
+		$this->logger->warning('An bad request was encountered: ['. $e->getCode() . ']' . $e->getMessage());
+		return new DataResponse(['message' => $this->n->t('An error caused by an invalid request occurred. More details can be found in the logs. Please reach out to your administration.')], Http::STATUS_BAD_REQUEST);
 	}
 
 }

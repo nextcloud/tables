@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "No file was uploaded" : "ವರ್ಗಾವಣೆಗೆ ﻿ಯಾವುದೇ ಕಡತಗಳು ಕಂಡುಬಂದಿಲ್ಲ",
+    "Missing a temporary folder" : "ತಾತ್ಕಾಲಿಕ ಕಡತಕೋಶ ದೊರೆಕುತ್ತಿಲ್ಲ",
     "No" : "﻿ಇಲ್ಲ",
     "Yes" : "﻿ಹೌದು",
     "Date" : "Date",
@@ -17,8 +19,9 @@ OC.L10N.register(
     "Title" : "ಶೀರ್ಷಿಕೆ",
     "Cancel" : "﻿ರದ್ದು",
     "Delete" : "﻿ಅಳಿಸಿ",
+    "Close" : "ಮುಚ್ಚು",
     "Copy" : "ನಕಲಿಸಿ",
-    "Shared" : "﻿ಹಂಚಿಕೆಯ",
+    "Favorites" : "ಅಚ್ಚುಮೆಚ್ಚಿನ",
     "group" : "﻿ಗುಂಪು",
     "Sharing" : "﻿ಹಂಚಿಕೆ",
     "Error" : "﻿ತಪ್ಪಾಗಿದೆ",

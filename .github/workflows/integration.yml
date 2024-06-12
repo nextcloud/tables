@@ -26,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        server-versions: ['stable25', 'stable27', 'master']
+        server-versions: ['stable26', 'stable27', 'master']
         php-versions: ['8.1']
         databases: ['mysql']
         include:

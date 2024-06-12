@@ -16,6 +16,7 @@ import Navigation from './modules/navigation/sections/Navigation.vue'
 import { mapState } from 'vuex'
 import Sidebar from './modules/sidebar/sections/Sidebar.vue'
 import { useResizeObserver } from '@vueuse/core'
+import { loadState } from '@nextcloud/initial-state'
 
 export default {
 	name: 'App',
@@ -38,9 +39,9 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(['tablesLoading']),
+		...mapState(['tablesLoading', 'contextsLoading']),
 		somethingIsLoading() {
-			return this.tablesLoading || this.loading
+			return this.tablesLoading || this.contextsLoading || this.loading
 		},
 	},
 	watch: {
@@ -50,12 +51,27 @@ export default {
 	},
 	async created() {
 		await this.$store.dispatch('loadTablesFromBE')
+		await this.$store.dispatch('getAllContexts')
 		await this.$store.dispatch('loadViewsSharedWithMeFromBE')
+		await this.$store.dispatch('loadTemplatesFromBE')
 		this.routing(this.$router.currentRoute)
 		this.observeAppContent()
 	},
 	methods: {
 		routing(currentRoute) {
+			try {
+				if (loadState('tables', 'contextId', undefined)) {
+					// prepare route, when Context is opened from navigation bar
+					const contextId = loadState('tables', 'contextId', undefined)
+					const originalUrl = window.location.href
+					this.$router.replace('/application/' + contextId).catch(() => {})
+					// reverts turning /apps/tables/app/28 into /apps/tables/app/28#/application/28
+					history.replaceState({}, undefined, originalUrl)
+				}
+			} catch (e) {
+				// contextId is not always set, it is fine.
+			}
+
 			if (currentRoute.name === 'tableRow' || currentRoute.name === 'viewRow') {
 				this.$store.commit('setActiveRowId', parseInt(currentRoute.params.rowId))
 			} else {
@@ -64,10 +80,31 @@ export default {
 			if (currentRoute.path.startsWith('/table/')) {
 				this.$store.commit('setActiveTableId', parseInt(currentRoute.params.tableId))
 				this.setPageTitle(this.$store.getters.activeTable.title)
+				this.switchActiveMenuEntry(document.querySelector('header .header-left .app-menu li[data-app-id="tables"]'))
 			} else if (currentRoute.path.startsWith('/view/')) {
 				this.$store.commit('setActiveViewId', parseInt(currentRoute.params.viewId))
 				this.setPageTitle(this.$store.getters.activeView.title)
+				this.switchActiveMenuEntry(document.querySelector('header .header-left .app-menu li[data-app-id="tables"]'))
+			} else if (currentRoute.path.startsWith('/application/')) {
+				const contextId = parseInt(currentRoute.params.contextId)
+				this.$store.commit('setActiveContextId', contextId)
+				this.setPageTitle(this.$store.getters.activeContext.name)
+				this.switchActiveMenuEntry(document.querySelector('header .header-left .app-menu li[data-app-id="tables_application_' + contextId + '"]'))
+
+				// move the focus away from nav bar (import for app-internal switch)
+				const appContent = document.getElementById('app-content-vue')
+				const oldTabIndex = appContent.tabIndex
+				if (oldTabIndex === -1) {
+					appContent.tabIndex = 0
+				}
+				appContent.focus()
+				appContent.tabIndex = oldTabIndex
 			}
+		},
+		switchActiveMenuEntry(targetElement) {
+			const currentlyActive = document.querySelector('header .header-left .app-menu li.app-menu-entry__active')
+			currentlyActive.classList.remove('app-menu-entry__active')
+			targetElement.classList.add('app-menu-entry__active')
 		},
 		setPageTitle(title) {
 			if (this.defaultPageTitle === false) {

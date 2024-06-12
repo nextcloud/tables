@@ -57,7 +57,7 @@ export default {
 			if (this.$options.components && this.$options.components[form]) {
 				return form
 			} else {
-				throw Error('Form ' + form + ' does no exist')
+				throw Error('Form ' + form + ' does not exist')
 			}
 		},
 	},

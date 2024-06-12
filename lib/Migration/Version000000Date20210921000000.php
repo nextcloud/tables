@@ -54,7 +54,13 @@ class Version000000Date20210921000000 extends SimpleMigrationStep {
 			$table->addColumn('last_edit_at', Types::DATETIME, [
 				'notnull' => true,
 			]);
+			$table->addColumn('description', Types::TEXT, [
+				'default' => '',
+				'notnull' => false,
+			]);
 			$table->setPrimaryKey(['id']);
+
+			$table->addIndex(["ownership"], 'tables_tables_ownership');
 		}
 
 		$table = 'tables_columns';
@@ -156,6 +162,8 @@ class Version000000Date20210921000000 extends SimpleMigrationStep {
 			]);
 
 			$table->setPrimaryKey(['id']);
+
+			$table->addIndex(['table_id'], 'tables_columns_t_id');
 		}
 
 		$table = 'tables_rows';

@@ -5,18 +5,20 @@
 namespace OCA\Tables\Service;
 
 use DateTime;
-
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Event\TableDeletedEvent;
+use OCA\Tables\Event\TableOwnershipTransferredEvent;
 use OCA\Tables\Helper\UserHelper;
-
 use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception as OcpDbException;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
@@ -38,7 +40,13 @@ class TableService extends SuperService {
 
 	protected UserHelper $userHelper;
 
+	protected FavoritesService $favoritesService;
+
+
 	protected IL10N $l;
+	private ContextService $contextService;
+
+	protected IEventDispatcher $eventDispatcher;
 
 	public function __construct(
 		PermissionsService $permissionsService,
@@ -51,7 +59,10 @@ class TableService extends SuperService {
 		ViewService $viewService,
 		ShareService $shareService,
 		UserHelper $userHelper,
-		IL10N $l
+		FavoritesService $favoritesService,
+		IEventDispatcher $eventDispatcher,
+		ContextService $contextService,
+		IL10N $l,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
@@ -61,7 +72,10 @@ class TableService extends SuperService {
 		$this->viewService = $viewService;
 		$this->shareService = $shareService;
 		$this->userHelper = $userHelper;
+		$this->favoritesService = $favoritesService;
 		$this->l = $l;
+		$this->eventDispatcher = $eventDispatcher;
+		$this->contextService = $contextService;
 	}
 
 	/**
@@ -80,9 +94,13 @@ class TableService extends SuperService {
 	public function findAll(?string $userId = null, bool $skipTableEnhancement = false, bool $skipSharedTables = false, bool $createTutorial = true): array {
 		/** @var string $userId */
 		$userId = $this->permissionsService->preCheckUserId($userId); // $userId can be set or ''
+		$allTables = [];
 
 		try {
-			$allTables = $this->mapper->findAll($userId); // get own tables
+			$ownedTables = $this->mapper->findAll($userId); // get own tables
+			foreach ($ownedTables as $ownedTable) {
+				$allTables[$ownedTable->getId()] = $ownedTable;
+			}
 		} catch (OcpDbException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError($e->getMessage());
@@ -91,7 +109,8 @@ class TableService extends SuperService {
 		// if there are no own tables found, create the tutorial table
 		if (count($allTables) === 0 && $createTutorial) {
 			try {
-				$allTables = [$this->create($this->l->t('Tutorial'), 'tutorial', '🚀')];
+				$tutorialTable = $this->create($this->l->t('Tutorial'), 'tutorial', '🚀');
+				$allTables[$tutorialTable->getId()] = $tutorialTable;
 			} catch (InternalError|PermissionError|DoesNotExistException|MultipleObjectsReturnedException|OcpDbException $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
@@ -103,16 +122,22 @@ class TableService extends SuperService {
 
 			// clean duplicates
 			foreach ($sharedTables as $sharedTable) {
-				$found = false;
-				foreach ($allTables as $table) {
-					if ($sharedTable->getId() === $table->getId()) {
-						$found = true;
-						break;
-					}
+				if (!isset($allTables[$sharedTable->getId()])) {
+					$allTables[$sharedTable->getId()] = $sharedTable;
 				}
-				if (!$found) {
-					$allTables[] = $sharedTable;
+			}
+		}
+
+		$contexts = $this->contextService->findAll($userId);
+		foreach ($contexts as $context) {
+			$nodes = $context->getNodes();
+			foreach ($nodes as $node) {
+				if ($node['node_type'] !== Application::NODE_TYPE_TABLE
+					|| isset($allTables[$node['node_id']])
+				) {
+					continue;
 				}
+				$allTables[$node['node_id']] = $this->find($node['node_id'], $skipTableEnhancement, $userId);
 			}
 		}
 
@@ -133,8 +158,7 @@ class TableService extends SuperService {
 			}
 		}
 
-
-		return $allTables;
+		return array_values($allTables);
 	}
 
 	/**
@@ -190,12 +214,23 @@ class TableService extends SuperService {
 				$table->setIsShared(true);
 				$table->setOnSharePermissions($permissions);
 			} catch (NotFoundError $e) {
+				try {
+					$table->setOnSharePermissions($this->permissionsService->getPermissionArrayForNodeFromContexts($table->getId(), 'table', $userId));
+					$table->setIsShared(true);
+				} catch (NotFoundError $e) {
+				}
+
 			}
 		}
 		if (!$table->getIsShared() || $table->getOnSharePermissions()['manage']) {
 			// add the corresponding views if it is an own table, or you have table manage rights
 			$table->setViews($this->viewService->findAll($table));
 		}
+
+		if ($this->favoritesService->isFavorite(Application::NODE_TYPE_TABLE, $table->getId())) {
+			$table->setFavorite(true);
+		}
+
 
 	}
 
@@ -244,12 +279,13 @@ class TableService extends SuperService {
 	 * @throws InternalError
 	 * @noinspection DuplicatedCode
 	 */
-	public function create(string $title, string $template, ?string $emoji, ?string $userId = null): Table {
+	public function create(string $title, string $template, ?string $emoji, ?string $description = '', ?string $userId = null): Table {
 		$userId = $this->permissionsService->preCheckUserId($userId, false); // we can assume that the $userId is set
 
 		$time = new DateTime();
 		$item = new Table();
 		$item->setTitle($title);
+		$item->setDescription($description);
 		if($emoji) {
 			$item->setEmoji($emoji);
 		}
@@ -332,6 +368,14 @@ class TableService extends SuperService {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 
+		$event = new TableOwnershipTransferredEvent(
+			table: $table,
+			toUserId: $newOwnerUserId,
+			fromUserId: $userId
+		);
+
+		$this->eventDispatcher->dispatchTyped($event);
+
 		return $table;
 	}
 
@@ -406,6 +450,11 @@ class TableService extends SuperService {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
+
+		$event = new TableDeletedEvent(table: $item);
+
+		$this->eventDispatcher->dispatchTyped($event);
+
 		return $item;
 	}
 
@@ -420,7 +469,7 @@ class TableService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function update(int $id, ?string $title, ?string $emoji, ?string $userId = null): Table {
+	public function update(int $id, ?string $title, ?string $emoji, ?string $description, ?bool $archived = null, ?string $userId = null): Table {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
@@ -444,6 +493,12 @@ class TableService extends SuperService {
 		}
 		if ($emoji !== null) {
 			$table->setEmoji($emoji);
+		}
+		if ($archived !== null) {
+			$table->setArchived($archived);
+		}
+		if ($description !== null) {
+			$table->setDescription($description);
 		}
 		$table->setLastEditBy($userId);
 		$table->setLastEditAt($time->format('Y-m-d H:i:s'));

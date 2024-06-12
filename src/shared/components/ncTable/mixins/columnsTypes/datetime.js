@@ -2,6 +2,10 @@ import { AbstractDatetimeColumn } from '../columnClass.js'
 import { ColumnTypes } from '../columnHandler.js'
 import Moment from '@nextcloud/moment'
 import { FilterIds } from '../filter.js'
+import {
+	TYPE_META_CREATED_AT,
+	TYPE_META_UPDATED_AT,
+} from '../../../../constants.js'
 
 export default class DatetimeColumn extends AbstractDatetimeColumn {
 
@@ -14,13 +18,20 @@ export default class DatetimeColumn extends AbstractDatetimeColumn {
 		return Moment(value, 'YYYY-MM-DD HH:mm:ss').format('lll')
 	}
 
-	sort(mode) {
+	sort(mode, nextSorts) {
 		const factor = mode === 'DESC' ? -1 : 1
 		return (rowA, rowB) => {
-			const tmpA = rowA.data.find(item => item.columnId === this.id)?.value || ''
-			const valueA = new Moment(tmpA, 'YYY-MM-DD HH:mm')
-			const tmpB = rowB.data.find(item => item.columnId === this.id)?.value || ''
-			const valueB = new Moment(tmpB, 'YYY-MM-DD HH:mm')
+			let tmpA = rowA.data.find(item => item.columnId === this.id)?.value || ''
+			let tmpB = rowB.data.find(item => item.columnId === this.id)?.value || ''
+			if (this.id === TYPE_META_CREATED_AT) {
+				tmpA = rowA.createdAt
+				tmpB = rowB.createdAt
+			}
+			if (this.id === TYPE_META_UPDATED_AT) {
+				tmpA = rowA.lastEditAt
+				tmpB = rowB.lastEditAt
+			}
+
 			if (!tmpA && tmpB) {
 				return -1 * factor
 			}
@@ -28,9 +39,12 @@ export default class DatetimeColumn extends AbstractDatetimeColumn {
 				return 1 * factor
 			}
 			if (!tmpA && !tmpB) {
-				return 0
+				return super.getNextSortsResult(nextSorts, rowA, rowB)
 			}
-			return (valueA.diff(valueB)) * factor
+
+			const valueA = new Moment(tmpA, 'YYY-MM-DD HH:mm')
+			const valueB = new Moment(tmpB, 'YYY-MM-DD HH:mm')
+			return (valueA.diff(valueB)) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
 		}
 	}
 
