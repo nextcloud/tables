@@ -80,6 +80,6 @@ class V1Api {
 			}
 			$data[] = $line;
 		}
-	        return $data;
+		return $data;
 	}
 }
