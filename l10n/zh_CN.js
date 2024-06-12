@@ -249,6 +249,7 @@ OC.L10N.register(
     "Content" : "内容",
     "Preview" : "预览",
     "Select" : "选择",
+    "Insert" : "插入",
     "Unchecked" : "未选中",
     "ID" : "ID"
 },
