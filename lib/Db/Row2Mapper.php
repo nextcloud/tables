@@ -170,7 +170,7 @@ class Row2Mapper {
 	 * @return Row2[]
 	 * @throws InternalError
 	 */
-	public function findAll(array $tableColumns, array $columns, int $tableId, int $limit = null, int $offset = null, array $filter = null, array $sort = null, string $userId = null): array {
+	public function findAll(array $tableColumns, array $columns, int $tableId, ?int $limit = null, ?int $offset = null, ?array $filter = null, ?array $sort = null, ?string $userId = null): array {
 		$this->setColumns($columns, $tableColumns);
 		$columnIdsArray = array_map(fn (Column $column) => $column->getId(), $columns);
 

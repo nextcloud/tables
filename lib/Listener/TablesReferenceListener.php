@@ -3,12 +3,12 @@
 namespace OCA\Tables\Listener;
 
 use OCA\Tables\AppInfo\Application;
+use OCA\Text\Event\LoadEditor;
 use OCP\Collaboration\Reference\RenderReferenceEvent;
 use OCP\EventDispatcher\Event;
-use OCP\EventDispatcher\IEventListener;
 use OCP\EventDispatcher\IEventDispatcher;
+use OCP\EventDispatcher\IEventListener;
 use OCP\Util;
-use OCA\Text\Event\LoadEditor;
 
 /**
  * @template-implements IEventListener<Event|RenderReferenceEvent>

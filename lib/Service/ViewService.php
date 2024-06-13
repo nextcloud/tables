@@ -252,7 +252,7 @@ class ViewService extends SuperService {
 				throw new PermissionError('PermissionError: can not update view with id '.$id);
 			}
 
-			$updatableParameter = array('title', 'emoji', 'description', 'columns', 'sort', 'filter');
+			$updatableParameter = ['title', 'emoji', 'description', 'columns', 'sort', 'filter'];
 
 			foreach ($data as $key => $value) {
 				if (!in_array($key, $updatableParameter)) {
