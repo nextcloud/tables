@@ -13,10 +13,8 @@ export default class NumberStarsColumn extends AbstractNumberColumn {
 		const factor = mode === 'DESC' ? 1 : -1
 		return (rowA, rowB) => {
 			const tmpA = rowA.data.find(item => item.columnId === this.id)?.value
-			const valueA = Number.isNaN(parseInt(tmpA)) ? -1 : parseInt(tmpA)
 			const tmpB = rowB.data.find(item => item.columnId === this.id)?.value
-			const valueB = Number.isNaN(parseInt(tmpB)) ? -1 : parseInt(tmpB)
-			return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
+			return tmpA.localeCompare(tmpB, undefined, { numeric: true }) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
 		}
 	}
 
