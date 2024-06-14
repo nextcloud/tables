@@ -159,7 +159,14 @@ export default {
 			return this.rows.find(row => row.id === rowId)
 		},
 		async loadRows() {
-			await this.$store.dispatch('loadRowsFromBE', { tableId: this.richObject.id })
+			const res = await this.$store.dispatch(
+				'loadRowsFromBE',
+				{ tableId: this.richObject.id },
+			)
+
+			if (res) {
+				this.rows = Object.values(this.$store.data.state.rows).at(0)
+			}
 		},
 	},
 }
