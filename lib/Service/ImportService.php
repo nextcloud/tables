@@ -46,6 +46,10 @@ class ImportService extends SuperService {
 	private int $countErrors = 0;
 	private int $countParsingErrors = 0;
 
+	private array $rawColumnTitles = [];
+	private array $rawColumnDataTypes = [];
+	private array $columnsConfig = [];
+
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
 		IRootFolder $rootFolder, ColumnService $columnService, RowService $rowService, TableService $tableService, ViewService $viewService, IUserManager $userManager) {
 		parent::__construct($logger, $userId, $permissionsService);
@@ -55,6 +59,126 @@ class ImportService extends SuperService {
 		$this->tableService = $tableService;
 		$this->viewService = $viewService;
 		$this->userManager = $userManager;
+	}
+
+	public function previewImport(?int $tableId, ?int $viewId, string $path): array {
+		if ($viewId !== null) {
+			$this->viewId = $viewId;
+		} elseif ($tableId) {
+			$this->tableId = $tableId;
+		} else {
+			$e = new \Exception('Neither tableId nor viewId is given.');
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+
+		$this->createUnknownColumns = false;
+		$previewData = [];
+
+		try {
+			$userFolder = $this->rootFolder->getUserFolder($this->userId);
+			$error = false;
+			if ($userFolder->nodeExists($path)) {
+				$file = $userFolder->get($path);
+				$tmpFileName = $file->getStorage()->getLocalFile($file->getInternalPath());
+				if($tmpFileName) {
+					$spreadsheet = IOFactory::load($tmpFileName);
+					$previewData = $this->getPreviewData($spreadsheet->getActiveSheet());
+				} else {
+					$error = true;
+				}
+			} elseif (\file_exists($path)) {
+				$spreadsheet = IOFactory::load($path);
+				$previewData = $this->getPreviewData($spreadsheet->getActiveSheet());
+			} else {
+				$error = true;
+			}
+
+			if($error) {
+				throw new NotFoundError('File for import could not be found.');
+			}
+
+		} catch (NotFoundException|NotPermittedException|NoUserException|InternalError|PermissionError $e) {
+			$this->logger->warning('Storage for user could not be found', ['exception' => $e]);
+			throw new NotFoundError('Storage for user could not be found');
+		}
+
+		return $previewData;
+	}
+
+	/**
+	 * @param Worksheet $worksheet
+	 * @throws DoesNotExistException
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
+	private function getPreviewData(Worksheet $worksheet): array {
+		$firstRow = $worksheet->getRowIterator()->current();
+		$secondRow = $worksheet->getRowIterator()->seek(2)->current();
+
+		// Prepare columns data
+		$columns = [];
+		$this->getColumns($firstRow, $secondRow);
+
+		foreach ($this->rawColumnTitles as $colIndex => $title) {
+			if ($this->columns[$colIndex] !== '') {
+				/** @var Column $column */
+				$column = $this->columns[$colIndex];
+				$columns[] = $column;
+			} else {
+				$columns[] = [
+					'title' => $title,
+					'type' => $this->rawColumnDataTypes[$colIndex]['type'],
+					'subtype' => $this->rawColumnDataTypes[$colIndex]['subtype'],
+					'numberDecimals' => $this->rawColumnDataTypes[$colIndex]['number_decimals'] ?? 0,
+					'numberPrefix' => $this->rawColumnDataTypes[$colIndex]['number_prefix'] ?? '',
+					'numberSuffix' => $this->rawColumnDataTypes[$colIndex]['number_suffix'] ?? '',
+				];
+			}
+		}
+
+		// Prepare rows data
+		$count = 0;
+		$maxCount = 3;
+		$rows = [];
+
+		foreach ($worksheet->getRowIterator(2) as $row) {
+			$rowData = [];
+			$cellIterator = $row->getCellIterator();
+			$cellIterator->setIterateOnlyExistingCells(false);
+
+			foreach ($cellIterator as $cellIndex => $cell) {
+				$value = $cell->getValue();
+				$colIndex = (int) $cellIndex;
+				$column = $this->columns[$colIndex];
+
+				if (($column && $column->getType() === 'datetime') || (is_array($columns[$colIndex]) && $columns[$colIndex]['type'] === 'datetime')) {
+					$value = Date::excelToDateTimeObject($value)->format('Y-m-d H:i');
+				} elseif (($column && $column->getType() === 'number' && $column->getNumberSuffix() === '%')
+					|| (is_array($columns[$colIndex]) && $columns[$colIndex]['type'] === 'number' && $columns[$colIndex]['numberSuffix'] === '%')) {
+					$value = $value * 100;
+				} elseif (($column && $column->getType() === 'selection' && $column->getSubtype() === 'check')
+					|| (is_array($columns[$colIndex]) && $columns[$colIndex]['type'] === 'selection' && $columns[$colIndex]['subtype'] === 'check')) {
+					$value = $cell->getFormattedValue() === 'TRUE' ? 'true' : 'false';
+				}
+
+				$rowData[] = $value;
+			}
+
+			$rows[] = $rowData;
+			$count++;
+
+			if ($count >= $maxCount) {
+				break;
+			}
+		}
+
+		return [
+			'columns' => $columns,
+			'rows' => $rows,
+		];
 	}
 
 	/**
@@ -69,7 +193,7 @@ class ImportService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function import(?int $tableId, ?int $viewId, string $path, bool $createMissingColumns = true): array {
+	public function import(?int $tableId, ?int $viewId, string $path, bool $createMissingColumns = true, array $columnsConfig = []): array {
 		if ($viewId !== null) {
 			$view = $this->viewService->find($viewId);
 			if (!$this->permissionsService->canCreateRows($view)) {
@@ -101,6 +225,7 @@ class ImportService extends SuperService {
 		}
 
 		$this->createUnknownColumns = $createMissingColumns;
+		$this->columnsConfig = $columnsConfig;
 
 		try {
 			$userFolder = $this->rootFolder->getUserFolder($this->userId);
@@ -274,9 +399,45 @@ class ImportService extends SuperService {
 		$secondRowCellIterator = $secondRow->getCellIterator();
 		$titles = [];
 		$dataTypes = [];
+		$index = 0;
+		$countMatchingColumnsFromConfig = 0;
+		$countCreatedColumnsFromConfig = 0;
 		foreach ($cellIterator as $cell) {
 			if ($cell && $cell->getValue() !== null && $cell->getValue() !== '') {
-				$titles[] = $cell->getValue();
+				$title = $cell->getValue();
+
+				if (isset($this->columnsConfig[$index]) && $this->columnsConfig[$index]['action'] === 'exist' && $this->columnsConfig[$index]['existColumn']) {
+					$title = $this->columnsConfig[$index]['existColumn']['label'];
+					$countMatchingColumnsFromConfig++;
+				}
+				if (isset($this->columnsConfig[$index]) && $this->columnsConfig[$index]['action'] === 'new' && $this->createUnknownColumns) {
+					$column = $this->columnService->create(
+						$this->userId,
+						$this->tableId,
+						$this->viewId,
+						$this->columnsConfig[$index]['type'],
+						$this->columnsConfig[$index]['subtype'],
+						$this->columnsConfig[$index]['title'],
+						$this->columnsConfig[$index]['mandatory'] ?? false,
+						$this->columnsConfig[$index]['description'] ?? '',
+						$this->columnsConfig[$index]['textDefault'] ?? '',
+						$this->columnsConfig[$index]['textAllowedPattern'] ?? '',
+						$this->columnsConfig[$index]['textMaxLength'] ?? null,
+						$this->columnsConfig[$index]['numberPrefix'] ?? '',
+						$this->columnsConfig[$index]['numberSuffix'] ?? '',
+						$this->columnsConfig[$index]['numberDefault'] ?? null,
+						$this->columnsConfig[$index]['numberMin'] ?? null,
+						$this->columnsConfig[$index]['numberMax'] ?? null,
+						$this->columnsConfig[$index]['numberDecimals'] ?? 0,
+						$this->columnsConfig[$index]['selectionOptions'] ?? '',
+						$this->columnsConfig[$index]['selectionDefault'] ?? '',
+						$this->columnsConfig[$index]['datetimeDefault'] ?? '',
+						$this->columnsConfig[$index]['selectedViewIds'] ?? []
+					);
+					$title = $column->getTitle();
+					$countCreatedColumnsFromConfig++;
+				}
+				$titles[] = $title;
 
 				// Convert data type to our data type
 				$dataTypes[] = $this->parseColumnDataType($secondRowCellIterator->current());
@@ -285,9 +446,18 @@ class ImportService extends SuperService {
 				$this->countErrors++;
 			}
 			$secondRowCellIterator->next();
+			$index++;
 		}
+
+		$this->rawColumnTitles = $titles;
+		$this->rawColumnDataTypes = $dataTypes;
+
 		try {
 			$this->columns = $this->columnService->findOrCreateColumnsByTitleForTableAsArray($this->tableId, $this->viewId, $titles, $dataTypes, $this->userId, $this->createUnknownColumns, $this->countCreatedColumns, $this->countMatchingColumns);
+			if (!empty($this->columnsConfig)) {
+				$this->countMatchingColumns = $countMatchingColumnsFromConfig;
+				$this->countCreatedColumns = $countCreatedColumnsFromConfig;
+			}
 		} catch (Exception $e) {
 			throw new InternalError($e->getMessage());
 		}

@@ -22,6 +22,9 @@ describe('Import csv', () => {
 		cy.get('.file-picker__files').contains('test-import').click()
 		cy.get('.file-picker button span').contains('Choose test-import.csv').click()
 		cy.get('.modal__content .import-filename', { timeout: 5000 }).should('be.visible')
+		cy.get('.modal__content button').contains('Preview').click()
+
+		cy.get('.file_import__preview tbody tr').should('have.length', 4)
 		cy.get('.modal__content button').contains('Import').click()
 
 		cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')
@@ -37,6 +40,9 @@ describe('Import csv', () => {
 		cy.clickOnTableThreeDotMenu('Import')
 		cy.get('.modal__content button').contains('Upload from device').click()
 		cy.get('input[type="file"]').selectFile('cypress/fixtures/test-import.csv', { force: true })
+		cy.get('.modal__content button').contains('Preview').click()
+
+		cy.get('.file_import__preview tbody tr', { timeout: 20000 }).should('have.length', 4)
 		cy.get('.modal__content button').contains('Import').click()
 
 		cy.get('[data-cy="importResultColumnsFound"]', { timeout: 20000 }).should('contain.text', '4')
@@ -102,6 +108,6 @@ if (!['stable26', 'stable27'].includes(Cypress.env('ncVersion'))) {
 			cy.get('[data-cy="importResultParsingErrors"]').should('contain.text', '0')
 			cy.get('[data-cy="importResultRowErrors"]').should('contain.text', '0')
 		})
-	
+
 	})
 }

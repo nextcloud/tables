@@ -103,9 +103,13 @@ return [
 		['name' => 'share#destroy', 'url' => '/share/{id}', 'verb' => 'DELETE'],
 
 		// import
+		['name' => 'import#previewImportTable', 'url' => '/import-preview/table/{tableId}', 'verb' => 'POST'],
 		['name' => 'import#importInTable', 'url' => '/import/table/{tableId}', 'verb' => 'POST'],
+		['name' => 'import#previewImportView', 'url' => '/import-preview/view/{viewId}', 'verb' => 'POST'],
 		['name' => 'import#importInView', 'url' => '/import/view/{viewId}', 'verb' => 'POST'],
+		['name' => 'import#previewUploadImportTable', 'url' => '/importupload-preview/table/{tableId}', 'verb' => 'POST'],
 		['name' => 'import#importUploadInTable', 'url' => '/importupload/table/{tableId}', 'verb' => 'POST'],
+		['name' => 'import#previewUploadImportView', 'url' => '/importupload-preview/view/{viewId}', 'verb' => 'POST'],
 		['name' => 'import#importUploadInView', 'url' => '/importupload/view/{viewId}', 'verb' => 'POST'],
 
 		// search

@@ -5,7 +5,7 @@
 		<EditTable :table-id="editTable" :show-modal="editTable !== null" @close="editTable = null" />
 		<TransferTable :table="tableToTransfer" :show-modal="tableToTransfer !== null" @close="tableToTransfer = null" />
 
-		<CreateColumn :show-modal="createColumnInfo !== null" :is-view="createColumnInfo?.isView" :element="createColumnInfo?.element" @close="createColumnInfo = null" />
+		<CreateColumn :show-modal="createColumnInfo !== null" :is-view="createColumnInfo?.isView" :element="createColumnInfo?.element" :preset="createColumnInfo?.preset" :is-custom-save="!!createColumnInfo?.onSave" @save="onSaveNewColumn" @close="createColumnInfo = null" />
 		<EditColumn v-if="columnToEdit" :column="columnToEdit?.column" :is-view="columnToEdit.isView" :element-id="columnToEdit?.elementId" @close="columnToEdit = false" />
 		<DeleteColumn v-if="columnToDelete" :is-view="columnToDelete?.isView" :element-id="columnToDelete?.elementId" :column-to-delete="columnToDelete?.column" @cancel="columnToDelete = null" />
 
@@ -177,6 +177,14 @@ export default {
 		unsubscribe('tables:context:edit', contextId => { this.editContext = contextId })
 		unsubscribe('tables:context:transfer', context => { this.contextToTransfer = context })
 		unsubscribe('tables:context:delete', context => { this.contextToDelete = context })
+	},
+
+	methods: {
+		onSaveNewColumn(event) {
+			if (this.createColumnInfo?.onSave) {
+				this.createColumnInfo.onSave(event)
+			}
+		},
 	},
 }
 </script>
