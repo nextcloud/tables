@@ -73,6 +73,8 @@ OC.L10N.register(
     "Move" : "Siirrä",
     "Metadata" : "Metatieto",
     "Column" : "Sarake",
+    "Ascending" : "Nouseva",
+    "Descending" : "Laskeva",
     "Views" : "Näkymät",
     "View" : "Näytä",
     "Shares" : "Jaot",
