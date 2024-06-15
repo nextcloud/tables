@@ -33,7 +33,7 @@ export default class NumberColumn extends AbstractNumberColumn {
 			if (!valueA && !valueB) {
 				return super.getNextSortsResult(nextSorts, rowA, rowB)
 			}
-			return valueA.localeCompare(valueB, undefined, { numeric: true }) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
+			return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
 		}
 	}
 

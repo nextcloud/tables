@@ -13,8 +13,10 @@ export default class NumberProgressColumn extends AbstractNumberColumn {
 		const factor = mode === 'DESC' ? -1 : 1
 		return (rowA, rowB) => {
 			const tmpA = rowA.data.find(item => item.columnId === this.id)?.value || null
+			const valueA = parseInt(tmpA)
 			const tmpB = rowB.data.find(item => item.columnId === this.id)?.value || null
-			return tmpA.localeCompare(tmpB, undefined, { numeric: true }) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
+			const valueB = parseInt(tmpB)
+			return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
 		}
 	}
 
