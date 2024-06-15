@@ -9,6 +9,19 @@ const config = createAppConfig({
 	reference: path.join(__dirname, 'src', 'reference.js'),
 }, {
 	inlineCSS: true,
+	config: {
+		build: {
+			rollupOptions: {
+				output: {
+					manualChunks: (id) => {
+						if (id.includes('img/material/')) {
+							return 'material-icons'
+						}
+					},
+				},
+			},
+		},
+	},
 })
 
 export default config
