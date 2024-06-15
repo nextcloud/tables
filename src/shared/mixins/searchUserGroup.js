@@ -4,9 +4,10 @@ import { getCurrentUser } from '@nextcloud/auth'
 import debounce from 'debounce'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
-import { SHARE_TYPES } from '../constants.js'
+import ShareTypes from './shareTypesMixin.js'
 
 export default {
+	mixins: [ShareTypes],
 	data() {
 		return {
 			query: '',
@@ -42,10 +43,10 @@ export default {
 		getShareTypes() {
 			const types = []
 			if (this.selectUsers) {
-				types.push(SHARE_TYPES.SHARE_TYPE_USER)
+				types.push(this.SHARE_TYPES.SHARE_TYPE_USER)
 			}
 			if (this.selectGroups) {
-				types.push(SHARE_TYPES.SHARE_TYPE_GROUP)
+				types.push(this.SHARE_TYPES.SHARE_TYPE_GROUP)
 			}
 			return types
 		},
@@ -95,7 +96,7 @@ export default {
 				showError(t('tables', 'Failed to fetch {shareTypeString}', { shareTypeString: this.getShareTypeString().toLowerCase() }))
 			}
 		},
-		debounceGetSuggestions: debounce(function(...args) {
+		debounceGetSuggestions: debounce(function (...args) {
 			this.getSuggestions(...args)
 		}, 300),
 

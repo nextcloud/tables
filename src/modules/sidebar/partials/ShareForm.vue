@@ -25,23 +25,11 @@
 <template>
 	<div class="row space-B">
 		<h3>{{ t('tables', 'Share with accounts or groups') }}</h3>
-		<NcSelect id="ajax"
-			style="width: 100%;"
-			:clear-on-select="true"
-			:hide-selected="true"
-			:internal-search="false"
-			:loading="loading"
-			:options="options"
-			:placeholder="t('tables', 'User or group name …')"
-			:preselect-first="true"
-			:preserve-search="true"
-			:searchable="true"
-			:user-select="true"
-			:get-option-key="(option) => option.key"
-			:aria-label-combobox="t('tables', 'User or group name …')"
-			label="displayName"
-			@search="asyncFind"
-			@input="addShare">
+		<NcSelect id="ajax" style="width: 100%;" :clear-on-select="true" :hide-selected="true" :internal-search="false"
+			:loading="loading" :options="options" :placeholder="t('tables', 'User or group name …')"
+			:preselect-first="true" :preserve-search="true" :searchable="true" :user-select="true"
+			:get-option-key="(option) => option.key" :aria-label-combobox="t('tables', 'User or group name …')"
+			label="displayName" @search="asyncFind" @input="addShare">
 			<template #no-options>
 				{{ t('tables', 'No recommendations. Start typing.') }}
 			</template>
@@ -60,7 +48,7 @@ import debounce from 'debounce'
 import { NcSelect } from '@nextcloud/vue'
 import { mapState } from 'vuex'
 import formatting from '../../../shared/mixins/formatting.js'
-import { SHARE_TYPES } from '../../../shared/constants.js'
+import ShareTypes from '../../../shared/mixins/shareTypesMixin.js'
 
 export default {
 	name: 'ShareForm',
@@ -68,7 +56,7 @@ export default {
 		NcSelect,
 	},
 
-	mixins: [formatting],
+	mixins: [formatting, ShareTypes],
 
 	props: {
 		shares: {
@@ -81,10 +69,8 @@ export default {
 		return {
 			query: '',
 			loading: false,
-
 			minSearchStringLength: 1,
 			maxAutocompleteResults: 20,
-
 			// Search data
 			recommendations: [],
 			suggestions: [],
@@ -160,8 +146,8 @@ export default {
 			this.loading = true
 
 			const shareType = [
-				SHARE_TYPES.SHARE_TYPE_USER,
-				SHARE_TYPES.SHARE_TYPE_GROUP,
+				this.SHARE_TYPES.SHARE_TYPE_USER,
+				this.SHARE_TYPES.SHARE_TYPE_GROUP,
 			]
 
 			const request = await axios.get(generateOcsUrl('apps/files_sharing/api/v1/sharees'), {
@@ -185,11 +171,11 @@ export default {
 			// remove invalid data and format to user-select layout
 			const exactSuggestions = this.filterOutUnwantedShares(rawExactSuggestions)
 				.map(share => this.formatForMultiselect(share))
-			// sort by type so we can get user&groups first...
+				// sort by type so we can get user&groups first...
 				.sort((a, b) => a.shareType - b.shareType)
 			const suggestions = this.filterOutUnwantedShares(rawSuggestions)
 				.map(share => this.formatForMultiselect(share))
-			// sort by type so we can get user&groups first...
+				// sort by type so we can get user&groups first...
 				.sort((a, b) => a.shareType - b.shareType)
 
 			this.suggestions = exactSuggestions.concat(suggestions)
@@ -203,7 +189,7 @@ export default {
 		 *
 		 * @param {...*} args the arguments
 		 */
-		debounceGetSuggestions: debounce(function(...args) {
+		debounceGetSuggestions: debounce(function (...args) {
 			this.getSuggestions(...args)
 		}, 300),
 
@@ -248,7 +234,7 @@ export default {
 
 				try {
 					// filter out current user
-					if (share.value.shareType === SHARE_TYPES.SHARE_TYPE_USER
+					if (share.value.shareType === this.SHARE_TYPES.SHARE_TYPE_USER
 							&& share.value.shareWith === getCurrentUser().uid) {
 						return arr
 					}
@@ -274,7 +260,7 @@ export default {
 				shareWith: result.value.shareWith,
 				shareType: result.value.shareType,
 				user: result.uuid || result.value.shareWith,
-				isNoUser: result.value.shareType !== SHARE_TYPES.SHARE_TYPE_USER,
+				isNoUser: result.value.shareType !== this.SHARE_TYPES.SHARE_TYPE_USER,
 				displayName: result.name || result.label,
 				icon: this.shareTypeToIcon(result.value.shareType),
 				// Vue unique binding to render within Multiselect's AvatarSelectOption
@@ -290,24 +276,24 @@ export default {
 		 */
 		shareTypeToIcon(type) {
 			switch (type) {
-			case SHARE_TYPES.SHARE_TYPE_GUEST:
-				// default is a user, other icons are here to differenciate
-				// themselves from it, so let's not display the user icon
-				// case SHARE_TYPES.SHARE_TYPE_REMOTE:
-				// case SHARE_TYPES.SHARE_TYPE_USER:
-				return 'icon-user'
-			case SHARE_TYPES.SHARE_TYPE_REMOTE_GROUP:
-			case SHARE_TYPES.SHARE_TYPE_GROUP:
-				return 'icon-group'
-			case SHARE_TYPES.SHARE_TYPE_EMAIL:
-				return 'icon-mail'
-			case SHARE_TYPES.SHARE_TYPE_CIRCLE:
-				return 'icon-circle'
-			case SHARE_TYPES.SHARE_TYPE_ROOM:
-				return 'icon-room'
+				case this.SHARE_TYPES.SHARE_TYPE_GUEST:
+					// default is a user, other icons are here to differenciate
+					// themselves from it, so let's not display the user icon
+					// case this.SHARE_TYPES.SHARE_TYPE_REMOTE:
+					// case this.SHARE_TYPES.SHARE_TYPE_USER:
+					return 'icon-user'
+				case this.SHARE_TYPES.SHARE_TYPE_REMOTE_GROUP:
+				case this.SHARE_TYPES.SHARE_TYPE_GROUP:
+					return 'icon-group'
+				case this.SHARE_TYPES.SHARE_TYPE_EMAIL:
+					return 'icon-mail'
+				case this.SHARE_TYPES.SHARE_TYPE_CIRCLE:
+					return 'icon-circle'
+				case this.SHARE_TYPES.SHARE_TYPE_ROOM:
+					return 'icon-room'
 
-			default:
-				return ''
+				default:
+					return ''
 			}
 		},
 
@@ -316,10 +302,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .multiselect {
 	width: 100% !important;
 	max-width: 100% !important;
 }
-
 </style>
