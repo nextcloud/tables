@@ -10,7 +10,7 @@ export default {
 			const { default: icon } = await import(
 				/* webpackChunkName: 'material-icons' */
 				/* webpackMode: 'lazy-once' */
-				`MaterialIcons/${iconName}.svg`
+				`./MaterialIcons/${iconName}.svg`
 			)
 
 			return this.uriToSvg(icon).replaceAll(/#fff/g, 'currentColor')
