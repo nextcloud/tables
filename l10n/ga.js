@@ -18,6 +18,7 @@ OC.L10N.register(
     "Date" : "Dáta",
     "Comments" : "Tuairimí",
     "Name" : "Ainm",
+    "Account manager" : "Bainisteoir cúntais",
     "Description" : "Cur síos",
     "Comment" : "Trácht",
     "from" : "ó",
