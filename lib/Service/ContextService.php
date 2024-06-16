@@ -127,8 +127,8 @@ class ContextService {
 			if (!empty($nodes)) {
 				$context->resetUpdatedFields();
 				$this->insertNodesFromArray($context, $nodes);
-				$this->insertPage($context);
 			}
+			$this->insertPage($context);
 		}, $this->dbc);
 
 		return $context;
