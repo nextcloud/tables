@@ -6,8 +6,8 @@
 			:confirm-title="t('tables', 'Delete')"
 			confirm-class="error"
 			:show-modal="showModal"
-			@confirm="deleteContext"
-			@cancel="$emit('cancel')" />
+			data-cy="deleteContextModal"
+			@confirm="deleteContext" @cancel="$emit('cancel')" />
 	</div>
 </template>
 

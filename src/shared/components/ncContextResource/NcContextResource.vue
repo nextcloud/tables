@@ -1,10 +1,10 @@
 <template>
 	<div>
 		<div>
-			<ResourceForm :resources="localResources" @add="addResource" />
-			<ResourceList :resources="localResources" @remove="removeResource" />
-			<ResourceSharees :select-users="true" :select-groups="false" :receivers="localReceivers" @update="updateReceivers" />
-			<ResourceSharePermissions :resources="localResources" @update="updateResourcePermissions" />
+			<ResourceForm :resources="localResources" data-cy="contextResourceForm" @add="addResource" />
+			<ResourceList :resources="localResources" data-cy="contextResourceList" @remove="removeResource" />
+			<ResourceSharees :select-users="true" :select-groups="false" :receivers="localReceivers" data-cy="contextResourceShare" @update="updateReceivers" />
+			<ResourceSharePermissions :resources="localResources" data-cy="contextResourcePerms" @update="updateResourcePermissions" />
 		</div>
 	</div>
 </template>
