@@ -321,20 +321,24 @@ export default {
 			this.result = null
 			this.loading = false
 		},
-		pickFile() {
+		async pickFile() {
 			const filePicker = getFilePickerBuilder(t('text', 'Select file for the import'))
 				.setMultiSelect(false)
 				.setMimeTypeFilter(this.mimeTypes)
-				.setType(FilePickerType.Choose)
+				.addButton({
+					label: t('tables', 'Import'),
+					callback: (nodes) => {
+						const fileInfo = nodes[0]
+						this.path = fileInfo.path === '/'
+							? `/${fileInfo.name}`
+							: `${fileInfo.path}/${fileInfo.name}`
+					},
+					type: 'primary',
+				})
 				.startAt(this.path)
 				.build()
 
-			filePicker.pick().then((file) => {
-				const client = OC.Files.getClient()
-				client.getFileInfo(file).then((_status, fileInfo) => {
-					this.path = fileInfo.path === '/' ? `/${fileInfo.name}` : `${fileInfo.path}/${fileInfo.name}`
-				})
-			})
+			await filePicker.pick()
 		},
 		selectUploadFile() {
 			this.$refs.uploadFileInput.click()
