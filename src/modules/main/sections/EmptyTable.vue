@@ -4,7 +4,7 @@
 		<template #icon>
 			{{ table.emoji }}
 		</template>
-		<template #action>
+		<template v-if="canManageTable(table)" #action>
 			<NcButton :aria-label="t('table', 'Create column')" type="primary" @click="createColumn()">
 				{{ t('tables', 'Create column') }}
 			</NcButton>
@@ -14,6 +14,7 @@
 <script>
 import { NcEmptyContent, NcButton } from '@nextcloud/vue'
 import { emit } from '@nextcloud/event-bus'
+import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 
 export default {
 	name: 'EmptyTable',
@@ -21,6 +22,7 @@ export default {
 		NcEmptyContent,
 		NcButton,
 	},
+	mixins: [permissionsMixin],
 	props: {
 		table: {
 			type: Object,
