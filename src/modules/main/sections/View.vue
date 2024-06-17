@@ -2,7 +2,7 @@
 	<div>
 		<ElementTitle :active-element="view" :is-table="false" :view-setting.sync="localViewSetting" />
 		<div class="table-wrapper">
-			<EmptyView v-if="columns.length === 0" />
+			<EmptyView v-if="columns.length === 0"  :view="view"/>
 			<TableView v-else
 				:rows="rows"
 				:columns="columns"
