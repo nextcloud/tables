@@ -13,6 +13,7 @@ use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Helper\ConversionHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -315,6 +316,11 @@ class PermissionsService {
 		return $this->checkPermission($element, 'view', 'create', $userId);
 	}
 
+	public function canCreateRowsById(int $nodeType, int $nodeId, ?string $userId = null): bool {
+		$sNodeType = ConversionHelper::constNodeType2String($nodeType);
+		return $this->checkPermissionById($nodeId, $sNodeType, 'create', $userId);
+	}
+
 	/**
 	 * @param int $viewId
 	 * @param string|null $userId
@@ -332,7 +338,6 @@ class PermissionsService {
 	public function canUpdateRowsByTableId(int $tableId, ?string $userId = null): bool {
 		return $this->checkPermissionById($tableId, 'table', 'update', $userId);
 	}
-
 
 	/**
 	 * @param int $viewId
@@ -470,10 +475,7 @@ class PermissionsService {
 	public function getPermissionIfAvailableThroughContext(int $nodeId, string $nodeType, string $userId): int {
 		$permissions = 0;
 		$found = false;
-		$iNodeType = match ($nodeType) {
-			'table' => Application::NODE_TYPE_TABLE,
-			'view' => Application::NODE_TYPE_VIEW,
-		};
+		$iNodeType = ConversionHelper::stringNodeType2Const($nodeType);
 		$contexts = $this->contextMapper->findAllContainingNode($iNodeType, $nodeId, $userId);
 		foreach ($contexts as $context) {
 			$found = true;
