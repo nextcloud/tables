@@ -23,8 +23,8 @@ class ConversionHelper {
 	 */
 	public static function stringNodeType2Const(string $nodeType): int {
 		return match ($nodeType) {
-			'table' => Application::NODE_TYPE_TABLE,
-			'view' => Application::NODE_TYPE_VIEW,
+			'table', 'tables' => Application::NODE_TYPE_TABLE,
+			'view', 'views' => Application::NODE_TYPE_VIEW,
 			default => throw new InvalidArgumentException('Invalid node type'),
 		};
 	}

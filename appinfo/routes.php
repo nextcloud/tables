@@ -131,6 +131,7 @@ return [
 
 		['name' => 'ApiFavorite#create', 'url' => '/api/2/favorites/{nodeType}/{nodeId}', 'verb' => 'POST', 'requirements' => ['nodeType' => '(\d+)', 'nodeId' => '(\d+)']],
 		['name' => 'ApiFavorite#destroy', 'url' => '/api/2/favorites/{nodeType}/{nodeId}', 'verb' => 'DELETE', 'requirements' => ['nodeType' => '(\d+)', 'nodeId' => '(\d+)']],
+
 		['name' => 'Context#index', 'url' => '/api/2/contexts', 'verb' => 'GET'],
 		['name' => 'Context#show', 'url' => '/api/2/contexts/{contextId}', 'verb' => 'GET'],
 		['name' => 'Context#create', 'url' => '/api/2/contexts', 'verb' => 'POST'],
@@ -138,5 +139,7 @@ return [
 		['name' => 'Context#destroy', 'url' => '/api/2/contexts/{contextId}', 'verb' => 'DELETE'],
 		['name' => 'Context#transfer', 'url' => '/api/2/contexts/{contextId}/transfer', 'verb' => 'PUT'],
 		['name' => 'Context#updateContentOrder', 'url' => '/api/2/contexts/{contextId}/pages/{pageId}', 'verb' => 'PUT'],
+
+		['name' => 'RowOCS#createRow',	'url' => '/api/2/{nodeCollection}/{nodeId}/rows', 'verb' => 'POST', 'requirements' => ['nodeCollection' => '(tables|views)', 'nodeId' => '(\d+)']],
 	]
 ];

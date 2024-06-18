@@ -14,6 +14,7 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Event\RowDeletedEvent;
+use OCA\Tables\Model\RowDataInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -152,7 +153,7 @@ class RowService extends SuperService {
 	/**
 	 * @param int|null $tableId
 	 * @param int|null $viewId
-	 * @param list<array{columnId: int, value: mixed}> $data
+	 * @param RowDataInput|list<array{columnId: int, value: mixed}> $data
 	 * @return Row2
 	 *
 	 * @throws NotFoundError
@@ -160,7 +161,7 @@ class RowService extends SuperService {
 	 * @throws Exception
 	 * @throws InternalError
 	 */
-	public function create(?int $tableId, ?int $viewId, array $data): Row2 {
+	public function create(?int $tableId, ?int $viewId, RowDataInput|array $data): Row2 {
 		if ($this->userId === null || $this->userId === '') {
 			$e = new \Exception('No user id in context, but needed.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
@@ -221,7 +222,7 @@ class RowService extends SuperService {
 	}
 
 	/**
-	 * @param list<array{columnId: string|int, value: mixed}> $data
+	 * @param RowDataInput|list<array{columnId: string|int, value: mixed}> $data
 	 * @param Column[] $columns
 	 * @param int|null $tableId
 	 * @param int|null $viewId
@@ -229,7 +230,7 @@ class RowService extends SuperService {
 	 *
 	 * @throws InternalError
 	 */
-	private function cleanupData(array $data, array $columns, ?int $tableId, ?int $viewId): array {
+	private function cleanupData(RowDataInput|array $data, array $columns, ?int $tableId, ?int $viewId): array {
 		$out = [];
 		foreach ($data as $entry) {
 			$column = $this->getColumnFromColumnsArray((int) $entry['columnId'], $columns);
