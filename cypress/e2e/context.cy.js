@@ -1,8 +1,11 @@
 let localUser
 let nonLocalUser
-let tableTitle = 'test table'
+let tableTitlePrefix = 'test table'
+let tableTitle = tableTitlePrefix
 let viewTitle = 'test view'
-let contextTitle = 'test application'
+let contextTitlePrefix = 'test application'
+let contextTitle = contextTitlePrefix
+let testNumber = 0
 
 describe('Manage a context', () => {
     before(function () {
@@ -15,20 +18,13 @@ describe('Manage a context', () => {
     })
 
     beforeEach(function () {
+        testNumber += 1
+        contextTitle = contextTitlePrefix + ' ' + testNumber
+        tableTitle = tableTitlePrefix + ' ' + testNumber
         cy.login(localUser)
         cy.visit('apps/tables')
         cy.createContext(contextTitle)
         cy.loadContext(contextTitle)
-    })
-
-    afterEach(function () {
-        // Delete context
-        cy.get('[data-cy="navigationContextItem"] button').click({ force: true })
-        cy.get('[data-cy="navigationContextDeleteBtn"]').contains('Delete application').click({ force: true })
-        cy.wait(1000)
-        cy.get('[data-cy="deleteContextModal"]').should('be.visible')
-        cy.get('[data-cy="deleteContextModal"] button').contains('Delete').click()
-        cy.get('[data-cy="navigationContextItem"]').should('not.exist')
     })
 
     it('Update and add resources', () => {
@@ -40,10 +36,7 @@ describe('Manage a context', () => {
         cy.get('[data-cy="createRowSaveButton"]').click()
         cy.createView(viewTitle)
 
-
-        cy.get('[data-cy="navigationContextItem"] button').last().click({ force: true })
-        cy.get('[data-cy="navigationContextEditBtn"]').contains('Edit application').click({ force: true })
-        cy.get('[data-cy="editContextModal"]').should('be.visible')
+        cy.openContextEditModal(contextTitle)
         cy.get('[data-cy="editContextTitle"]').clear().type(`updated ${contextTitle}`)
         cy.get('[data-cy="contextResourceForm"] input').clear().type(tableTitle)
         cy.get('ul.vs__dropdown-menu li div').contains(tableTitle).click()
@@ -59,14 +52,12 @@ describe('Manage a context', () => {
         cy.contains('h1', `updated ${contextTitle}`).should('exist')
         cy.contains('h1', tableTitle).should('exist')
         cy.contains('h1', viewTitle).should('exist')
+
     })
 
     it('Share context with resources', () => {
         cy.createTable(tableTitle)
-        cy.get('[data-cy="navigationContextItem"] button').last().click({ force: true })
-        cy.get('[data-cy="navigationContextEditBtn"]').contains('Edit application').click({ force: true })
-        cy.get('[data-cy="editContextModal"]').should('be.visible')
-
+        cy.openContextEditModal(contextTitle)
         cy.get('[data-cy="contextResourceForm"] input').clear().type(tableTitle)
         cy.get('ul.vs__dropdown-menu li div').contains(tableTitle).click()
         cy.get('[data-cy="contextResourceShare"] input').clear().type(nonLocalUser.userId)
@@ -74,6 +65,8 @@ describe('Manage a context', () => {
         cy.get('[data-cy="contextResourceShare"] span').contains(nonLocalUser.userId).should('exist')
         cy.get('[data-cy="editContextSubmitBtn"]').click()
         cy.loadContext(contextTitle)
+        cy.contains('h1', contextTitle).should('exist')
+        cy.contains('h1', tableTitle).should('exist')
 
         // verify context was shared properly
         cy.login(nonLocalUser)
@@ -91,15 +84,14 @@ describe('Manage a context', () => {
 
     it('Transfer context', () => {
         cy.createTable(tableTitle)
-        cy.get('[data-cy="navigationContextItem"] button').last().click({ force: true })
-        cy.get('[data-cy="navigationContextEditBtn"]').contains('Edit application').click({ force: true })
-        cy.get('[data-cy="editContextModal"]').should('be.visible')
+        cy.openContextEditModal(contextTitle)
         cy.get('[data-cy="transferContextSubmitBtn"]').click()
         cy.get('[data-cy="transferContextModal"]').should('be.visible')
         cy.get('[data-cy="transferContextModal"] input').clear().type(nonLocalUser.userId)
         cy.get(`.vs__dropdown-menu [user="${nonLocalUser.userId}"]`).click()
         cy.get('[data-cy="transferContextButton"]').click()
 
+        // verify that context was properly transferred
         cy.login(nonLocalUser)
         cy.visit('apps/tables')
         cy.loadContext(contextTitle)
@@ -109,85 +101,102 @@ describe('Manage a context', () => {
 
     it('Delete context with shares', () => {
         cy.loadContext(contextTitle)
-        cy.get('[data-cy="navigationContextItem"] button').last().click({ force: true })
-        cy.get('[data-cy="navigationContextEditBtn"]').contains('Edit application').click({ force: true })
-        cy.get('[data-cy="editContextModal"]').should('be.visible')
-        cy.get('[data-cy="editContextTitle"]').clear().type(`to delete ${contextTitle}`)
+        cy.openContextEditModal(contextTitle)
         cy.get('[data-cy="contextResourceShare"] input').clear().type(nonLocalUser.userId)
         cy.get(`.vs__dropdown-menu [user="${nonLocalUser.userId}"]`).click()
         cy.get('[data-cy="contextResourceShare"] span').contains(nonLocalUser.userId).should('exist')
-        cy.get('[data-cy="editContextSubmitBtn"]').click()
+        cy.get('[data-cy="editContextSubmitBtn"]').click()  
+        cy.wait(1000)
         
-        cy.get('[data-cy="navigationContextItem"] button').last().click({ force: true })
+        // verify that context was deleted from current user
+        cy.get(`[data-cy="navigationContextItem"]:contains("${contextTitle}")`).find('button').click({ force: true })
         cy.get('[data-cy="navigationContextDeleteBtn"]').contains('Delete application').click({ force: true })
         cy.get('[data-cy="deleteContextModal"]').should('be.visible')
         cy.get('[data-cy="deleteContextModal"] button').contains('Delete').click()
-        cy.get('[data-cy="navigationContextItem"]').contains(`to delete ${contextTitle}`).should('not.exist')
+        cy.get('li').contains(contextTitle).should('not.exist')
+        cy.contains('h1', contextTitle).should('not.exist')
 
+        // verify that context was deleted from shared user
         cy.login(nonLocalUser)
         cy.visit('apps/tables')
-        cy.get('[data-cy="navigationContextItem"]').contains(`to delete ${contextTitle}`).should('not.exist')
+        cy.get('li').contains(contextTitle).should('not.exist')
     })
 
-    it('Remove context resources', () => {
+    it('Remove context resource', () => {
         cy.createTable(tableTitle)
         cy.loadContext(contextTitle)
-        cy.get('[data-cy="navigationContextItem"] button').last().click({ force: true })
-        cy.get('[data-cy="navigationContextEditBtn"]').contains('Edit application').click({ force: true })
-        cy.get('[data-cy="editContextModal"]').should('be.visible')
+        cy.contains('header .header-left .app-menu li.app-menu-entry__active', contextTitle).should('exist')
+        cy.openContextEditModal(contextTitle)
         cy.get('[data-cy="contextResourceForm"] input').clear().type(tableTitle)
         cy.get('ul.vs__dropdown-menu li div').contains(tableTitle).click()
         cy.get('[data-cy="contextResourceList"]').should('contain.text', tableTitle)
         cy.get('[data-cy="contextResourcePerms"]').should('contain.text', tableTitle)
         cy.get('[data-cy="editContextSubmitBtn"]').click()
 
-        cy.get('[data-cy="navigationContextItem"] button').last().click({ force: true })
-        cy.get('[data-cy="navigationContextEditBtn"]').contains('Edit application').click({ force: true })
-        cy.get('[data-cy="editContextModal"]').should('be.visible')
+        cy.contains('h1', contextTitle).should('exist')
+        cy.contains('h1', tableTitle).should('exist') 
+        cy.openContextEditModal(contextTitle)
         cy.get('[data-cy="contextResourceList"] button').contains('Delete').click({ force: true })
         cy.get('[data-cy="contextResourceList"]').contains(tableTitle).should('not.exist')
         cy.get('[data-cy="editContextSubmitBtn"]').click()
-
-        cy.loadContext(contextTitle)
         cy.contains('h1', contextTitle).should('exist')
         cy.contains('h1', tableTitle).should('not.exist')
+    })
 
-        cy.login(nonLocalUser)
-        cy.visit('apps/tables')
-        cy.get('[data-cy="navigationContextItem"]').contains(`to delete ${contextTitle}`).should('not.exist')
+    it('Modify resource rows and columns from context', () => {
+        cy.createTable(tableTitle)
+        cy.loadContext(contextTitle)
+        cy.contains('h1', contextTitle).should('exist')
+        cy.openContextEditModal(contextTitle)
+        cy.get('[data-cy="contextResourceForm"] input').clear().type(tableTitle)
+        cy.get('ul.vs__dropdown-menu li div').contains(tableTitle).click()
+        cy.get('[data-cy="contextResourceList"]').should('contain.text', tableTitle)
+        cy.get('[data-cy="contextResourcePerms"]').should('contain.text', tableTitle)
+        cy.get('[data-cy="editContextSubmitBtn"]').click()
+        cy.createTextLineColumn('title', null, null, true)
+        cy.get('button').contains('Create row').click()
+        cy.fillInValueTextLine('title', 'first row')
+        cy.get('[data-cy="createRowSaveButton"]').click()
+		cy.get('[data-cy="ncTable"] table').contains('first row').should('exist')
     })
 
     it('Modify context resources and their permissions', () => {
         cy.createTable(tableTitle)
+        cy.loadTable(tableTitle)
+        cy.createTextLineColumn('title', null, null, true)
         cy.loadContext(contextTitle)
         cy.contains('h1', contextTitle).should('exist')
-        cy.get('[data-cy="navigationContextItem"] button').last().click({ force: true })
-        cy.get('[data-cy="navigationContextEditBtn"]').contains('Edit application').click({ force: true })
-        cy.get('[data-cy="editContextModal"]').should('be.visible')
+        cy.openContextEditModal(contextTitle)
         cy.get('[data-cy="contextResourceForm"] input').clear().type(tableTitle)
         cy.get('ul.vs__dropdown-menu li div').contains(tableTitle).click()
         cy.get('[data-cy="contextResourceList"]').should('contain.text', tableTitle)
         cy.get('[data-cy="contextResourcePerms"]').should('contain.text', tableTitle)
+        // give delete permission for resource
         cy.get('[data-cy="resourceSharePermsActions"] button').click()
         cy.get('li .action-checkbox').contains('Delete resource').click()
         cy.get('li [aria-checked="true"]').contains('Delete resource').should('exist')
+        
         cy.get('[data-cy="contextResourceShare"] input').clear().type(nonLocalUser.userId)
         cy.get(`.vs__dropdown-menu [user="${nonLocalUser.userId}"]`).click()
         cy.get('[data-cy="contextResourceShare"] span').contains(nonLocalUser.userId).should('exist')
         cy.get('[data-cy="editContextSubmitBtn"]').click()
         cy.contains('h1', contextTitle).should('exist')
-        cy.contains('h1', tableTitle).should('exist') // doing this to give Cypress time to load
+        cy.contains('h1', tableTitle).should('exist')
 
+        // verify that shared user can modify and delete data in the resource
         cy.login(nonLocalUser)
         cy.visit('apps/tables')
-        cy.contains('header .header-left .app-menu li.app-menu-entry', contextTitle).should('exist')
         cy.loadContext(contextTitle)
+        cy.contains('header .header-left .app-menu li.app-menu-entry__active', contextTitle).should('exist')
         cy.contains('h1', contextTitle).should('exist')
         cy.contains('h1', tableTitle).should('exist')
-        cy.createTextLineColumn('text line', 'test', '12', true)
         cy.get('button').contains('Create row').click()
         cy.fillInValueTextLine('title', 'first row')
-        cy.get('[data-cy="createRowSaveButton]').click()
-
+        cy.get('[data-cy="createRowSaveButton"]').click()
+        cy.get('[data-cy="ncTable"] table').contains('first row').should('exist')
+        cy.get('[data-cy="ncTable"] table').contains('first row').parent().parent().find('[aria-label="Edit row"]').click()
+		cy.get('[data-cy="editRowDeleteButton"]').click()
+		cy.get('[data-cy="editRowEditConfirmButton"]').click()
+        cy.get('[data-cy="ncTable"] table').contains('first row').should('not.exist')
     })
 })
