@@ -453,6 +453,9 @@ class TableService extends SuperService {
 		// delete all shares for that table
 		$this->shareService->deleteAllForTable($item);
 
+		// delete node relations if view is in any context
+		$this->contextService->deleteNodeRel($id, Application::NODE_TYPE_TABLE);
+
 		// delete table
 		try {
 			$this->mapper->delete($item);

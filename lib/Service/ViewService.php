@@ -308,6 +308,9 @@ class ViewService extends SuperService {
 		}
 		$this->shareService->deleteAllForView($view);
 
+		// delete node relations if view is in any context
+		$this->contextService->deleteNodeRel($id, Application::NODE_TYPE_VIEW);
+
 		try {
 			$deletedView = $this->mapper->delete($view);
 
@@ -340,6 +343,9 @@ class ViewService extends SuperService {
 			}
 			// delete all shares for that table
 			$this->shareService->deleteAllForView($view);
+
+			// delete node relations if view is in any context
+			$this->contextService->deleteNodeRel($view->getId(), Application::NODE_TYPE_VIEW);
 
 			$this->mapper->delete($view);
 
