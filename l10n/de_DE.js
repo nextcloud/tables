@@ -460,6 +460,7 @@ OC.L10N.register(
     "Url" : "URL",
     "Show fullscreen" : "Vollbild anzeigen",
     "Close editor" : "Bearbeitung schließen",
+    "Page number" : "Seitennummer",
     "Create Row" : "Zeile erstellen",
     "Export CSV" : "CSV esportieren",
     "Uncheck all" : "Auswahl aufheben",
