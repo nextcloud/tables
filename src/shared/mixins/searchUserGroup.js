@@ -15,6 +15,8 @@ export default {
 			minSearchStringLength: 1,
 			maxAutocompleteResults: 20,
 			suggestions: [],
+			recommendations: [],
+			currentUserId: getCurrentUser().uid,
 		}
 	},
 	computed: {
@@ -25,7 +27,7 @@ export default {
 			if (this.isValidQuery) {
 				return this.suggestions
 			}
-			return []
+			return this.recommendations
 		},
 
 		noResultText() {
@@ -35,9 +37,6 @@ export default {
 			return t('tables', 'No elements found.')
 		},
 
-		userId() {
-			return getCurrentUser().uid
-		},
 	},
 	methods: {
 		getShareTypes() {
@@ -80,14 +79,8 @@ export default {
 
 			try {
 				const res = await axios.get(url)
-				const rawSuggestions = res.data.ocs.data.map(autocompleteResult => {
-					return {
-						id: autocompleteResult.id,
-						displayName: autocompleteResult.label,
-						icon: autocompleteResult.icon,
-						isUser: autocompleteResult.source.startsWith('users'),
-						key: autocompleteResult.source + '-' + autocompleteResult.id,
-					}
+				const rawSuggestions = res.data.ocs.data.map(result => {
+					return this.formatResult(result)
 				})
 				this.suggestions = this.filterOutUnwantedItems(rawSuggestions)
 				this.loading = false
@@ -96,12 +89,10 @@ export default {
 				showError(t('tables', 'Failed to fetch {shareTypeString}', { shareTypeString: this.getShareTypeString().toLowerCase() }))
 			}
 		},
-		debounceGetSuggestions: debounce(function (...args) {
+
+		debounceGetSuggestions: debounce(function(...args) {
 			this.getSuggestions(...args)
 		}, 300),
 
-		filterOutCurrentUser(list) {
-			return list.filter((item) => !(item.isUser && item.id === getCurrentUser().uid))
-		},
 	},
 }

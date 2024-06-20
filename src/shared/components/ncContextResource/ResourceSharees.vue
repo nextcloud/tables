@@ -71,13 +71,22 @@ export default {
 			this.localValue = selectedItem
 		},
 
-		filterOutUnwantedItems(list) {
-			list = this.filterOutCurrentUser(list)
-			return this.filterOutSelectedUsers(list)
+		filterOutUnwantedItems(items) {
+			// Filter out existing items
+			items = items.filter((item) => !(item.isUser && this.localSharees.includes(item.id)))
+
+			// Filter out current user
+			return items.filter((item) => !(item.isUser && item.id === this.currentUserId))
 		},
 
-		filterOutSelectedUsers(list) {
-			return list.filter((item) => !(item.isUser && this.localSharees.includes(item.id)))
+		formatResult(autocompleteResult) {
+			return {
+				id: autocompleteResult.id,
+				displayName: autocompleteResult.label,
+				icon: autocompleteResult.icon,
+				isUser: autocompleteResult.source.startsWith('users'),
+				key: autocompleteResult.source + '-' + autocompleteResult.id,
+			}
 		},
 
 	},
