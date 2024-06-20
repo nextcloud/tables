@@ -423,6 +423,7 @@ OC.L10N.register(
     "Url" : "Webbadress",
     "Show fullscreen" : "Visa helskärm",
     "Close editor" : "Stäng redigeraren",
+    "Page number" : "Sidnummer",
     "Create Row" : "Skapa rad",
     "Export CSV" : "Exportera CSV",
     "Uncheck all" : "Avmarkera alla",

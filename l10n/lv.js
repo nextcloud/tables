@@ -9,6 +9,8 @@ OC.L10N.register(
     "Missing a temporary folder" : "Trūkst pagaidu mapes",
     "Could not write file to disk" : "Nevarēja ierakstīt datni diskā",
     "A PHP extension stopped the file upload" : "PHP paplašinājums apturēja datnes augšupielādi",
+    "No" : "Nē",
+    "Yes" : "Jā",
     "Members" : "Biedri",
     "Date" : "Datums",
     "Comments" : "Piebildes",
