@@ -34,6 +34,7 @@ import { NcSelect } from '@nextcloud/vue'
 import { mapState } from 'vuex'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../../../shared/constants.js'
 import SearchAndSelectOption from '../../../views/partials/SearchAndSelectOption.vue'
+import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 
 export default {
 	name: 'ResourceForm',
@@ -41,6 +42,8 @@ export default {
 		NcSelect,
 		SearchAndSelectOption,
 	},
+
+	mixins: [permissionsMixin],
 
 	props: {
 		resources: {
@@ -97,12 +100,15 @@ export default {
 
 		async getSuggestions(searchTerm) {
 			this.loading = true
-			let filteredTables = this.tables.filter((table) => table.title.toLowerCase().includes(searchTerm.toLowerCase())
+			let filteredTables = this.tables.filter((table) => this.canManageTable(table))
+			filteredTables = filteredTables.filter((table) => table.title.toLowerCase().includes(searchTerm.toLowerCase())
 				&& !this.resources.find(t => t.nodeType === NODE_TYPE_TABLE && parseInt(t.id) === parseInt(table.id)))
 			filteredTables = filteredTables.map(table => {
 				return this.formatElementData(table, NODE_TYPE_TABLE, 'table-')
 			})
-			let filteredViews = this.views.filter((view) => view.title.toLowerCase().includes(searchTerm.toLowerCase())
+
+			let filteredViews = this.views.filter((view) => this.canManageElement(view))
+			filteredViews = filteredViews.filter((view) => view.title.toLowerCase().includes(searchTerm.toLowerCase())
 				&& !this.resources.find(v => v.nodeType === NODE_TYPE_VIEW && parseInt(v.id) === parseInt(view.id)))
 			filteredViews = filteredViews.map(view => {
 				return this.formatElementData(view, NODE_TYPE_VIEW, 'view-')
