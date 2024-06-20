@@ -13,9 +13,9 @@
 
 <script>
 import { NcSelect } from '@nextcloud/vue'
-import formatting from '../../../shared/mixins/formatting.js'
+import formatting from '../../mixins/formatting.js'
 import '@nextcloud/dialogs/style.css'
-import searchUserGroup from '../../../shared/mixins/searchUserGroup.js'
+import searchUserGroup from '../../mixins/searchUserGroup.js'
 
 export default {
 
@@ -26,7 +26,7 @@ export default {
 	mixins: [formatting, searchUserGroup],
 
 	props: {
-		newOwnerUserId: {
+		selectedUserId: {
 			type: String,
 			default: '',
 		},
@@ -49,10 +49,10 @@ export default {
 	computed: {
 		localValue: {
 			get() {
-				return this.newOwnerUserId
+				return this.selectedUserId
 			},
 			set(v) {
-				this.$emit('update:newOwnerUserId', v?.id)
+				this.$emit('update:selectedUserId', v?.id)
 			},
 		},
 	},
@@ -61,8 +61,19 @@ export default {
 		addTransfer(selectedItem) {
 			this.localValue = selectedItem
 		},
-		filterOutUnwantedItems(list) {
-			return this.filterOutCurrentUser(list)
+
+		filterOutUnwantedItems(items) {
+			return items.filter((item) => !(item.isUser && item.id === this.currentUserId))
+		},
+
+		formatResult(autocompleteResult) {
+			return {
+				id: autocompleteResult.id,
+				displayName: autocompleteResult.label,
+				icon: autocompleteResult.icon,
+				isUser: autocompleteResult.source.startsWith('users'),
+				key: autocompleteResult.source + '-' + autocompleteResult.id,
+			}
 		},
 	},
 }

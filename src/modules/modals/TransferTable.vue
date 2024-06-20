@@ -10,11 +10,11 @@
 			</div>
 			<div class="row">
 				<h3>{{ t('tables', 'Transfer this table to another user') }}</h3>
-				<NcUserAndGroupPicker :select-users="true" :select-groups="false" :new-owner-user-id.sync="newOwnerUserId" />
+				<NcUserPicker :select-users="true" :select-groups="false" :selected-user-id.sync="selectedUserId" />
 			</div>
 			<div class="row">
 				<div class="fix-col-4 space-T end">
-					<NcButton type="warning" :disabled="newOwnerUserId === ''" data-cy="transferTableButton" @click="transferMe">
+					<NcButton type="warning" :disabled="selectedUserId === ''" data-cy="transferTableButton" @click="transferMe">
 						{{ t('tables', 'Transfer') }}
 					</NcButton>
 				</div>
@@ -28,7 +28,7 @@ import { NcModal, NcButton } from '@nextcloud/vue'
 import { showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
-import NcUserAndGroupPicker from '../../shared/components/ncUserAndGroupPicker/NcUserAndGroupPicker.vue'
+import NcUserPicker from '../../shared/components/ncUserPicker/NcUserPicker.vue'
 import { mapGetters } from 'vuex'
 import { getCurrentUser } from '@nextcloud/auth'
 
@@ -37,7 +37,7 @@ export default {
 	components: {
 		NcModal,
 		NcButton,
-		NcUserAndGroupPicker,
+		NcUserPicker,
 	},
 	mixins: [permissionsMixin],
 	props: {
@@ -53,7 +53,7 @@ export default {
 	data() {
 		return {
 			loading: false,
-			newOwnerUserId: '',
+			selectedUserId: '',
 		}
 	},
 	computed: {
@@ -84,9 +84,9 @@ export default {
 			if (this.activeTable) {
 				activeTableId = !this.isView ? this.activeTable.id : null
 			}
-			const res = await this.$store.dispatch('transferTable', { id: this.table.id, data: { newOwnerUserId: this.newOwnerUserId } })
+			const res = await this.$store.dispatch('transferTable', { id: this.table.id, data: { newOwnerUserId: this.selectedUserId } })
 			if (res) {
-				showSuccess(t('tables', 'Table "{emoji}{table}" transferred to {user}', { emoji: this.table?.emoji ? this.table?.emoji + ' ' : '', table: this.table?.title, user: this.newOwnerUserId }))
+				showSuccess(t('tables', 'Table "{emoji}{table}" transferred to {user}', { emoji: this.table?.emoji ? this.table?.emoji + ' ' : '', table: this.table?.title, user: this.selectedUserId }))
 
 				if (transferId === activeTableId) {
 					await this.$router.push('/').catch(err => err)
