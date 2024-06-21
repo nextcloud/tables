@@ -129,6 +129,7 @@ OC.L10N.register(
     "Suffix" : "Iarmhír",
     "Default" : "Réamhshocrú",
     "Options" : "Roghanna",
+    "Delete option" : "Scrios rogha",
     "Add option" : "Cuir rogha leis",
     "URL" : "URL",
     "Close editor" : "Dún eagarthóir",
