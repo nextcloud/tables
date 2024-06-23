@@ -148,6 +148,8 @@ class ContextController extends AOCSController {
 			)->jsonSerialize());
 		} catch (Exception|MultipleObjectsReturnedException $e) {
 			return $this->handleError($e);
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
 		} catch (DoesNotExistException $e) {
 			return $this->handleNotFoundError(new NotFoundError($e->getMessage(), $e->getCode(), $e));
 		}
