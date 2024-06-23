@@ -327,7 +327,7 @@ Feature: APIv2
       | alias | type  | permissions         |
       | t1    | table | read,create,update  |
       | t2    | table | read                |
-    Then the reported status is "200"
+    Then the reported status is "403"
     When user "participant1-v2" fetches Context "c1"
     Then the fetched Context "c1" has following data:
       | field | value                        |
