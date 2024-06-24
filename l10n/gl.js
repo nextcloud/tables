@@ -93,7 +93,7 @@ OC.L10N.register(
     "Title or short description" : "Título ou descrición breve",
     "Target" : "Destino",
     "Date, time or whatever" : "Data, hora ou o que sexa",
-    "Progress" : "Avance",
+    "Progress" : "Progreso",
     "Proofed" : "Probado",
     "Create initial milestones" : "Crear fitos iniciais",
     "Create some milestones to structure the project." : "Crear algúns fitos para estruturar o proxecto.",
