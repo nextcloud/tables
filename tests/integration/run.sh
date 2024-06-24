@@ -81,10 +81,19 @@ echo ''
 echo '#'
 echo '# Stopping PHP webserver and disabling spreedcheats'
 echo '#'
-kill $PHPPID1
-kill $PHPPID2
 
-wait $PHPPID1
-wait $PHPPID2
+if ps --pid ${PHPPID1} > /dev/null; then
+	kill ${PHPPID1}
+fi
+if ps --pid ${PHPPID2} > /dev/null; then
+	kill ${PHPPID2}
+fi
+
+if ps --pid ${PHPPID1} > /dev/null; then
+	wait ${PHPPID1}
+fi
+if ps --pid ${PHPPID2} > /dev/null; then
+	wait ${PHPPID2} || true
+fi
 
 exit $RESULT
