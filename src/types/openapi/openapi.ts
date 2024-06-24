@@ -3228,6 +3228,19 @@ export type operations = {
           };
         };
       };
+      /** @description No permissions */
+      403: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
       /** @description Not found */
       404: {
         content: {
