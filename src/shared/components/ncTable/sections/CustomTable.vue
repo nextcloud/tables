@@ -45,7 +45,7 @@
 					</template>
 				</NcButton>
 				<div class="page-number">
-					<NcSelect v-model="pageNumber" :options="allPageNumbersArray">
+					<NcSelect v-model="pageNumber" :options="allPageNumbersArray" :aria-label-combobox="t('tables', 'Page number')">
 						<template #selected-option-container="{ option }">
 							<span class="selected-page">
 								{{ option.label }} of {{ totalPages }}

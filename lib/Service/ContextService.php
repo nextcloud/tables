@@ -127,8 +127,8 @@ class ContextService {
 			if (!empty($nodes)) {
 				$context->resetUpdatedFields();
 				$this->insertNodesFromArray($context, $nodes);
-				$this->insertPage($context);
 			}
+			$this->insertPage($context);
 		}, $this->dbc);
 
 		return $context;
@@ -430,17 +430,20 @@ class ContextService {
 		$addedPage = $page->jsonSerialize();
 
 		$i = 1;
-		foreach ($context->getNodes() as $node) {
-			$pageContent = new PageContent();
-			$pageContent->setPageId($page->getId());
-			$pageContent->setNodeRelId($node['id']);
-			$pageContent->setOrder(10 * $i++);
-
-			$this->pageContentMapper->insert($pageContent);
-
-			$addedPage['content'][$pageContent->getId()] = $pageContent->jsonSerialize();
-			// the content is already embedded in the page
-			unset($addedPage['content'][$pageContent->getId()]['pageId']);
+		$contextNodes = $context->getNodes();
+		if ($contextNodes) {
+			foreach ($contextNodes as $node) {
+				$pageContent = new PageContent();
+				$pageContent->setPageId($page->getId());
+				$pageContent->setNodeRelId($node['id']);
+				$pageContent->setOrder(10 * $i++);
+	
+				$this->pageContentMapper->insert($pageContent);
+	
+				$addedPage['content'][$pageContent->getId()] = $pageContent->jsonSerialize();
+				// the content is already embedded in the page
+				unset($addedPage['content'][$pageContent->getId()]['pageId']);
+			}
 		}
 
 		$context->setPages([$addedPage['id'] => $addedPage]);

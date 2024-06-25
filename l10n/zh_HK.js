@@ -460,6 +460,7 @@ OC.L10N.register(
     "Url" : "URL",
     "Show fullscreen" : "顯示全螢幕",
     "Close editor" : "關閉編輯器",
+    "Page number" : "頁號",
     "Create Row" : "創建列",
     "Export CSV" : "匯出為 CSV",
     "Uncheck all" : "取消全選",

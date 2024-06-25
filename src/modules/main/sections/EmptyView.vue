@@ -2,7 +2,7 @@
 	<NcEmptyContent :name="t('tables', 'No columns selected')"
 		:description="t('tables', 'The view is empty. Edit which columns should be displayed.')">
 		<template #icon>
-			{{ activeView.emoji }}
+			{{ view.emoji }}
 		</template>
 		<template #action>
 			<NcButton :aria-label="t('table', 'Edit view')" type="primary" @click="editView()">
@@ -13,7 +13,6 @@
 </template>
 <script>
 import { NcEmptyContent, NcButton } from '@nextcloud/vue'
-import { mapGetters } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
 
 export default {
@@ -22,12 +21,15 @@ export default {
 		NcEmptyContent,
 		NcButton,
 	},
-	computed: {
-		...mapGetters(['activeView']),
+	props: {
+		view: {
+			type: Object,
+			default: null,
+		},
 	},
 	methods: {
 		editView() {
-			emit('tables:view:edit', { view: this.activeView, viewSetting: {} })
+			emit('tables:view:edit', { view: this.view, viewSetting: {} })
 		},
 	},
 }

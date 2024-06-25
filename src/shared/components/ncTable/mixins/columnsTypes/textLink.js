@@ -17,7 +17,7 @@ export default class TextLinkColumn extends AbstractTextColumn {
 			const valueA = this.getValueFromCellValue(tmpA)
 			const tmpB = rowB.data.find(item => item.columnId === this.id)?.value?.toLowerCase() || ''
 			const valueB = this.getValueFromCellValue(tmpB)
-			return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
+			return valueA.localeCompare(valueB, undefined) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
 		}
 	}
 

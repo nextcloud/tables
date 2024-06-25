@@ -24,7 +24,7 @@ export default class TextLineColumn extends AbstractTextColumn {
 				valueA = rowA.lastEditBy?.toLowerCase() || ''
 				valueB = rowB.lastEditBy?.toLowerCase() || ''
 			}
-			return ((valueA < valueB) ? -1 : (valueA > valueB) ? 1 : 0) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
+			return valueA.localeCompare(valueB, undefined) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
 		}
 	}
 

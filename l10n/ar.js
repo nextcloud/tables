@@ -460,6 +460,7 @@ OC.L10N.register(
     "Url" : "عنوان موقع الموارد المُوحّد URL",
     "Show fullscreen" : "أعرُض الشاشة كاملةً",
     "Close editor" : "أغلِق المُحرِّر",
+    "Page number" : "رقم الصفحة",
     "Create Row" : "أنشِيءْ سطراً",
     "Export CSV" : "صدِّر CSV",
     "Uncheck all" : "إلغاء تحديد الكل",
