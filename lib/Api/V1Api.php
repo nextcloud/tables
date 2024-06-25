@@ -58,7 +58,7 @@ class V1Api {
 
 		// now add the rows
 		foreach ($rows as $row) {
-			$rowData = $row->getDataArray();
+			$rowData = $row->getData();
 			$line = [];
 			foreach ($columns as $column) {
 				$value = '';
