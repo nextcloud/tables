@@ -9,7 +9,7 @@
  * @author Marcel Scherello <analytics@scherello.de>
  */
 
-namespace OCA\Tables\Datasource;
+namespace OCA\Tables\Analytics;
 
 use OCA\Analytics\Datasource\IDatasource;
 use OCA\Tables\Api\V1Api;

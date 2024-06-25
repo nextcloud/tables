@@ -64,14 +64,22 @@ class V1Api {
 				$value = '';
 				foreach ($rowData as $datum) {
 					if ($datum['columnId'] === $column->getId()) {
-						$value = $datum['value'];
+						// if column type selection, the corresponding labels need to be fetched
+						if ($column->getType() === 'selection') {
+							foreach ($column->getSelectionOptionsArray() as $option) {
+								if ($option['id'] === $datum['value']) {
+									$value = $option['label'];
+								}
+							}
+						} else {
+							$value = $datum['value'];
+						}
 					}
 				}
 				$line[] = $value;
 			}
 			$data[] = $line;
 		}
-
 		return $data;
 	}
 }
