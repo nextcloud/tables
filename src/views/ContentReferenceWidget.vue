@@ -22,14 +22,17 @@
 <template>
 	<div v-if="richObject" class="tables-content-widget">
 		<div class="header">
-			<h2>{{ richObject.emoji }}&nbsp;{{ richObject.title }}</h2>
+			<h2>
+				<NcLoadingIcon v-if="!rows" :size="30" />
+				<span v-else>{{ richObject.emoji }}</span>&nbsp;{{ richObject.title }}
+			</h2>
 			<Options
 				:config="tablePermissions"
 				:show-options="true"
 				@create-row="createRow"
 				@set-search-string="search" />
 		</div>
-		<div class="nc-table">
+		<div v-if="rows" class="nc-table">
 			<NcTable
 				:rows="filteredRows"
 				:columns="richObject.columns"
@@ -43,6 +46,7 @@
 import NcTable from '../shared/components/ncTable/NcTable.vue'
 import Options from '../shared/components/ncTable/sections/Options.vue'
 import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
+import { NcLoadingIcon } from '@nextcloud/vue'
 import { useResizeObserver } from '@vueuse/core'
 import { spawnDialog } from '@nextcloud/dialogs'
 
@@ -51,6 +55,7 @@ export default {
 	components: {
 		NcTable,
 		Options,
+		NcLoadingIcon,
 	},
 
 	mixins: [permissionsMixin],
@@ -73,7 +78,7 @@ export default {
 	data() {
 		return {
 			searchExp: null,
-			rows: this.richObject.rows,
+			rows: null,
 		}
 	},
 
@@ -200,6 +205,11 @@ export default {
 				background-color: var(--color-main-background);
 				margin: 0 !important;
 				padding: calc(var(--default-grid-baseline) * 4);
+
+				& .loading-icon {
+					display: inline-block;
+					vertical-align: middle;
+				}
 			}
 		}
 
