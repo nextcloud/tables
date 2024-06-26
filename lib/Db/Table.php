@@ -14,11 +14,13 @@ use OCP\AppFramework\Db\Entity;
  * @psalm-import-type TablesView from ResponseDefinitions
  *
  * @method getTitle(): string
+ * @method getId(): int
  * @method setTitle(string $title)
  * @method getEmoji(): string
  * @method setEmoji(string $emoji)
  * @method getArchived(): bool
  * @method setArchived(bool $archived)
+ * @method getDescription(): string
  * @method setDescription(string $description)
  * @method getOwnership(): string
  * @method setOwnership(string $ownership)

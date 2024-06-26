@@ -67,6 +67,13 @@
 				</template>
 			</NcActionButton>
 
+			<!-- EXPORT -->
+			<NcActionButton @click="exportFile">
+				{{ t('tables','Export') }}
+				<template #icon>
+					<Import :size="20" />
+				</template>
+			</NcActionButton>
 			<!-- INTEGRATION -->
 			<NcActionButton
 				:close-after-click="true"
@@ -149,6 +156,8 @@ import Import from 'vue-material-design-icons/Import.vue'
 import NavigationViewItem from './NavigationViewItem.vue'
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 import IconRename from 'vue-material-design-icons/Rename.vue'
+import axios from '@nextcloud/axios'
+import { generateOcsUrl } from '@nextcloud/router'
 
 export default {
 
@@ -235,6 +244,18 @@ export default {
 		createView() {
 			emit('tables:view:create', { tableId: this.table.id })
 		},
+
+		exportFile() {
+			axios.get(generateOcsUrl(`/apps/tables/api/2/tables/scheme/${this.table.id}`)).then(res => {
+				const blob = new Blob([JSON.stringify(res.data.ocs.data)], { type: 'application/json' })
+				const link = document.createElement('a')
+				link.href = URL.createObjectURL(blob)
+				link.download = this.table.title
+				link.click()
+				URL.revokeObjectURL(link.href)
+			})
+		},
+
 		async actionShowShare() {
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
 			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)

@@ -117,6 +117,8 @@ return [
 		// -> tables
 		['name' => 'ApiTables#index', 'url' => '/api/2/tables', 'verb' => 'GET'],
 		['name' => 'ApiTables#show', 'url' => '/api/2/tables/{id}', 'verb' => 'GET'],
+		['name' => 'ApiTables#showScheme', 'url' => '/api/2/tables/scheme/{id}', 'verb' => 'GET'],
+		['name' => 'ApiTables#createFromScheme', 'url' => '/api/2/tables/scheme', 'verb' => 'POST'],
 		['name' => 'ApiTables#create', 'url' => '/api/2/tables', 'verb' => 'POST'],
 		['name' => 'ApiTables#update', 'url' => '/api/2/tables/{id}', 'verb' => 'PUT'],
 		['name' => 'ApiTables#destroy', 'url' => '/api/2/tables/{id}', 'verb' => 'DELETE'],
