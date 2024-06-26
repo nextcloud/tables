@@ -3852,15 +3852,11 @@
                                             {
                                                 "type": "object",
                                                 "required": [
-                                                    "columnId",
-                                                    "value"
+                                                    null,
+                                                    null
                                                 ],
                                                 "properties": {
-                                                    "columnId": {
-                                                        "type": "integer",
-                                                        "format": "int64"
-                                                    },
-                                                    "value": {
+                                                    "": {
                                                         "type": "object"
                                                     }
                                                 }
