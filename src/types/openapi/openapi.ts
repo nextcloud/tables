@@ -220,6 +220,10 @@ export type paths = {
     /** [api v2] Update the order on a page of a context */
     put: operations["context-update-content-order"];
   };
+  "/ocs/v2.php/apps/tables/api/2/{nodeCollection}/{nodeId}/rows": {
+    /** [api v2] Create a new row in a table or a view */
+    post: operations["rowocs-create-row"];
+  };
 };
 
 export type webhooks = Record<string, never>;
@@ -3814,6 +3818,98 @@ export type operations = {
           };
         };
       };
+      500: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+  /** [api v2] Create a new row in a table or a view */
+  "rowocs-create-row": {
+    parameters: {
+      header: {
+        /** @description Required to be true for the API request to pass */
+        "OCS-APIRequest": boolean;
+      };
+      path: {
+        /** @description Indicates whether to create a row on a table or view */
+        nodeCollection: "tables" | "views";
+        /** @description The identifier of the targeted table or view */
+        nodeId: number;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description An array containing the column identifiers and their values */
+          data: OneOf<[string, {
+            /** Format: int64 */
+            columnId: number;
+            value: Record<string, never>;
+          }]>;
+        };
+      };
+    };
+    responses: {
+      /** @description Row returned */
+      200: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: components["schemas"]["Row"];
+            };
+          };
+        };
+      };
+      /** @description Invalid request parameters */
+      400: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+      /** @description No permissions */
+      403: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/json": {
+            ocs: {
+              meta: components["schemas"]["OCSMeta"];
+              data: {
+                message: string;
+              };
+            };
+          };
+        };
+      };
+      /** @description Internal error */
       500: {
         content: {
           "application/json": {

@@ -78,6 +78,7 @@ class FeatureContext implements Context {
 	private array $viewData = [];
 
 	// use CommandLineTrait;
+	private CollectionManager $collectionManager;
 
 	/**
 	 * FeatureContext constructor.
@@ -679,6 +680,11 @@ class FeatureContext implements Context {
 		$newItem = $this->getDataFromResponse($this->response);
 		$this->viewIds[$viewName] = $newItem['id'];
 
+		$this->collectionManager->register($newItem, 'view', $newItem['id'], $viewName, function () use ($user, $viewName) {
+			$this->deleteViewWithoutAssertion($user, $viewName);
+			unset($this->viewIds[$viewName]);
+		});
+
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($newItem['title'], $title);
 		Assert::assertEquals($newItem['emoji'], $emoji);
@@ -842,12 +848,10 @@ class FeatureContext implements Context {
 	 * @param string $viewName
 	 */
 	public function deleteView(string $user, string $viewName): void {
-		$this->setCurrentUser($user);
-
-		$this->sendRequest(
-			'DELETE',
-			'/apps/tables/api/1/views/'.$this->viewIds[$viewName]
-		);
+		if (!$this->deleteViewWithoutAssertion($user, $viewName)) {
+			// deletion was not triggered
+			Assert::assertTrue(isset($this->viewIds[$viewName]));
+		}
 		$deletedItem = $this->getDataFromResponse($this->response);
 
 		Assert::assertEquals(200, $this->response->getStatusCode());
@@ -859,6 +863,19 @@ class FeatureContext implements Context {
 		Assert::assertEquals(404, $this->response->getStatusCode());
 
 		unset($this->viewIds[$viewName]);
+	}
+
+	public function deleteViewWithoutAssertion(string $user, string $viewName): bool {
+		if (!isset($this->viewIds[$viewName])) {
+			return false;
+		}
+		$this->setCurrentUser($user);
+
+		$this->sendRequest(
+			'DELETE',
+			'/apps/tables/api/1/views/'.$this->viewIds[$viewName]
+		);
+		return true;
 	}
 
 	/**
@@ -1065,7 +1082,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'PUT',
-			'/apps/tables/api/1/shares/'.$this->shareId,
+			'/apps/tables/api/1/shares/' . $this->shareId,
 			[
 				'permissionType' => $permissionType,
 				'permissionValue' => $value
@@ -1231,6 +1248,87 @@ class FeatureContext implements Context {
 		$this->sendRequest(
 			'GET',
 			'/apps/tables/api/1/rows/'.$newRow['id'],
+		);
+
+		$rowToVerify = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		foreach ($rowToVerify['data'] as $cell) {
+			Assert::assertEquals($props[$cell['columnId']], $cell['value']);
+		}
+	}
+
+	/**
+	 * @When user :user tries to create a row using v2 on :nodeType :nodeAlias with following values
+	 *
+	 * @param TableNode $properties
+	 */
+	public function userTriesToCreateRowUsingV2OnNodeXWithFollowingValues(string $user, string $nodeType, string $nodeAlias, TableNode $properties): void {
+		$this->setCurrentUser($user);
+		$node = $this->collectionManager->getByAlias($nodeType, $nodeAlias);
+
+		$props = [];
+		foreach ($properties->getRows() as $row) {
+			$columnId = $this->tableColumns[$row[0]];
+			$props[$columnId] = $row[1];
+		}
+
+		$this->sendOcsRequest(
+			'POST',
+			sprintf('/apps/tables/api/2/%ss/%d/rows', $nodeType, $node['id']),
+			['data' => $props]
+		);
+	}
+
+	/**
+	 * @When user :user tries to create a row using v2 with following values
+	 *
+	 * @param TableNode $properties
+	 */
+	public function userTriesToCreateRowUsingV2WithFollowingValues(string $user, TableNode $properties): void {
+		$this->setCurrentUser($user);
+
+		$props = [];
+		foreach ($properties->getRows() as $row) {
+			$columnId = $this->tableColumns[$row[0]];
+			$props[$columnId] = $row[1];
+		}
+
+		$this->sendOcsRequest(
+			'POST',
+			'/apps/tables/api/2/tables/' . $this->tableId . '/rows',
+			['data' => $props]
+		);
+	}
+
+	/**
+	 * @Then row exists using v2 with following values
+	 *
+	 * @param TableNode $properties
+	 */
+	public function createRowV2(TableNode $properties): void {
+		$props = [];
+		foreach ($properties->getRows() as $row) {
+			$columnId = $this->tableColumns[$row[0]];
+			$props[$columnId] = $row[1];
+		}
+
+		$this->sendOcsRequest(
+			'POST',
+			'/apps/tables/api/2/tables/' . $this->tableId . '/rows',
+			['data' => $props]
+		);
+
+		$newRow = $this->getDataFromResponse($this->response)['ocs']['data'];
+		$this->rowId = $newRow['id'];
+
+		Assert::assertEquals(200, $this->response->getStatusCode());
+		foreach ($newRow['data'] as $cell) {
+			Assert::assertEquals($props[$cell['columnId']], $cell['value']);
+		}
+
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/rows/' . $newRow['id'],
 		);
 
 		$rowToVerify = $this->getDataFromResponse($this->response);
@@ -2215,4 +2313,34 @@ class FeatureContext implements Context {
 		}
 	}
 
+	/**
+	 * @Then user :initiator shares view :viewAlias with :recipient
+	 */
+	public function shareViewWithUser(string $initiator, string $viewAlias, string $recipient): void {
+		$this->setCurrentUser($initiator);
+		$view = $this->collectionManager->getByAlias('view', $viewAlias);
+
+		$permissions = [
+			'permissionRead' => true,
+			'permissionCreate' => true,
+			'permissionUpdate' => true,
+			'permissionDelete' => false,
+			'permissionManage' => false
+		];
+		$this->sendRequest(
+			'POST',
+			sprintf('/apps/tables/api/1/shares'),
+			array_merge($permissions, [
+				'receiverType' => 'user',
+				'receiver' => $recipient,
+				'nodeId' => $view['id'],
+				'nodeType' => 'view',
+			])
+		);
+
+		if ($this->response->getStatusCode() === 200) {
+			$share = $this->getDataFromResponse($this->response);
+			$this->shareId = $share['id'];
+		}
+	}
 }

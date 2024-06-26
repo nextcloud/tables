@@ -542,3 +542,265 @@ Feature: APIv2
     Then the reported status is "404"
     When user "participant3-v2" attempts to fetch Context "c1"
     Then the reported status is "404"
+
+  @api2 @rows
+  Scenario: Create rows via v2 and check them
+    Given table "Rows check" with emoji "👨🏻‍💻" exists for user "participant1-v2" as "base1" via v2
+    And column "one" exists with following properties
+      | type          | text                    |
+      | subtype       | line                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    And column "two" exists with following properties
+      | type          | number                  |
+      | mandatory     | 1                       |
+      | numberDefault | 10                      |
+      | description   | This is a description!  |
+    And column "three" exists with following properties
+      | type          | selection               |
+      | subtype       | check                   |
+      | mandatory     | 1                       |
+      | description   | This is a description!  |
+    And column "four" exists with following properties
+      | type          | datetime                |
+      | subtype       | date                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    When row exists using v2 with following values
+      | one           | AHA                     |
+      | two           | 161                     |
+      | three         | true                    |
+      | four          | 2023-12-24              |
+    Then the reported status is 200
+
+  @api2 @rows
+  Scenario: Try to create rows via v2 with permissions
+    Given table "Rows check" with emoji "👨🏻‍💻" exists for user "participant1-v2" as "base1" via v2
+    And column "one" exists with following properties
+      | type          | text                    |
+      | subtype       | line                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    And column "two" exists with following properties
+      | type          | number                  |
+      | mandatory     | 1                       |
+      | numberDefault | 10                      |
+      | description   | This is a description!  |
+    And column "three" exists with following properties
+      | type          | selection               |
+      | subtype       | check                   |
+      | mandatory     | 1                       |
+      | description   | This is a description!  |
+    And column "four" exists with following properties
+      | type          | datetime                |
+      | subtype       | date                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    And user "participant1-v2" shares table with user "participant2-v2"
+    And user "participant2-v2" has the following permissions
+      | read    | 1 |
+      | create  | 1 |
+      | update  | 1 |
+      | delete  | 0 |
+      | manage  | 0 |
+    When user "participant2-v2" tries to create a row using v2 with following values
+      | one           | AHA                     |
+      | two           | 161                     |
+      | three         | true                    |
+      | four          | 2023-12-24              |
+    Then the reported status is 200
+
+  @api2 @rows
+  Scenario: Try to create rows via v2 without permissions
+    Given table "Rows check" with emoji "👨🏻‍💻" exists for user "participant1-v2" as "base1" via v2
+    And column "one" exists with following properties
+      | type          | text                    |
+      | subtype       | line                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    And column "two" exists with following properties
+      | type          | number                  |
+      | mandatory     | 1                       |
+      | numberDefault | 10                      |
+      | description   | This is a description!  |
+    And column "three" exists with following properties
+      | type          | selection               |
+      | subtype       | check                   |
+      | mandatory     | 1                       |
+      | description   | This is a description!  |
+    And column "four" exists with following properties
+      | type          | datetime                |
+      | subtype       | date                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    And user "participant1-v2" shares table with user "participant2-v2"
+    And user "participant1-v2" sets permission "create" to 0
+    And user "participant2-v2" has the following permissions
+      | read    | 1 |
+      | create  | 0 |
+      | update  | 1 |
+      | delete  | 0 |
+      | manage  | 0 |
+    When user "participant2-v2" tries to create a row using v2 with following values
+      | one           | AHA                     |
+      | two           | 161                     |
+      | three         | true                    |
+      | four          | 2023-12-24              |
+    Then the reported status is 403
+
+  @api2 @rows
+  Scenario: Try to create rows via v2 without access
+    Given table "Rows check" with emoji "👨🏻‍💻" exists for user "participant1-v2" as "base3" via v2
+    And column "one" exists with following properties
+      | type          | text                    |
+      | subtype       | line                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    And column "two" exists with following properties
+      | type          | number                  |
+      | mandatory     | 1                       |
+      | numberDefault | 10                      |
+      | description   | This is a description!  |
+    And column "three" exists with following properties
+      | type          | selection               |
+      | subtype       | check                   |
+      | mandatory     | 1                       |
+      | description   | This is a description!  |
+    And column "four" exists with following properties
+      | type          | datetime                |
+      | subtype       | date                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    When user "participant2-v2" tries to create a row using v2 with following values
+      | one           | AHA                     |
+      | two           | 161                     |
+      | three         | true                    |
+      | four          | 2023-12-24              |
+    Then the reported status is 404
+
+  @api2 @rows @views
+  Scenario: Create rows on a view via v2
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And column "one" exists with following properties
+      | type          | text                    |
+      | subtype       | line                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    And column "two" exists with following properties
+      | type          | number                  |
+      | mandatory     | 1                       |
+      | numberDefault | 10                      |
+      | description   | This is a description!  |
+    And column "three" exists with following properties
+      | type          | selection               |
+      | subtype       | check                   |
+      | mandatory     | 1                       |
+      | description   | This is a description!  |
+    And column "four" exists with following properties
+      | type          | datetime                |
+      | subtype       | date                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
+    When user "participant1-v2" tries to create a row using v2 on "view" "v1" with following values
+      | one           | AHA                     |
+      | two           | 161                     |
+      | three         | true                    |
+      | four          | 2023-12-24              |
+    Then the reported status is 200
+
+  @api2 @rows @views
+  Scenario: Create rows on a view via v2 with permissions
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And column "one" exists with following properties
+      | type          | text                    |
+      | subtype       | line                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    And column "two" exists with following properties
+      | type          | number                  |
+      | mandatory     | 1                       |
+      | numberDefault | 10                      |
+      | description   | This is a description!  |
+    And column "three" exists with following properties
+      | type          | selection               |
+      | subtype       | check                   |
+      | mandatory     | 1                       |
+      | description   | This is a description!  |
+    And column "four" exists with following properties
+      | type          | datetime                |
+      | subtype       | date                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
+    And user "participant1-v2" shares view "v1" with "participant2-v2"
+    When user "participant2-v2" tries to create a row using v2 on "view" "v1" with following values
+      | one           | AHA                     |
+      | two           | 161                     |
+      | three         | true                    |
+      | four          | 2023-12-24              |
+    Then the reported status is 200
+
+  @api2 @rows @views
+  Scenario: Create rows on a view via v2 without permissions
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And column "one" exists with following properties
+      | type          | text                    |
+      | subtype       | line                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    And column "two" exists with following properties
+      | type          | number                  |
+      | mandatory     | 1                       |
+      | numberDefault | 10                      |
+      | description   | This is a description!  |
+    And column "three" exists with following properties
+      | type          | selection               |
+      | subtype       | check                   |
+      | mandatory     | 1                       |
+      | description   | This is a description!  |
+    And column "four" exists with following properties
+      | type          | datetime                |
+      | subtype       | date                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
+    And user "participant1-v2" shares view "v1" with "participant2-v2"
+    And user "participant1-v2" sets permission "create" to 0
+    When user "participant2-v2" tries to create a row using v2 on "view" "v1" with following values
+      | one           | AHA                     |
+      | two           | 161                     |
+      | three         | true                    |
+      | four          | 2023-12-24              |
+    Then the reported status is 403
+
+  @api2 @rows @views
+  Scenario: Create rows on a view via v2 without access
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And column "one" exists with following properties
+      | type          | text                    |
+      | subtype       | line                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    And column "two" exists with following properties
+      | type          | number                  |
+      | mandatory     | 1                       |
+      | numberDefault | 10                      |
+      | description   | This is a description!  |
+    And column "three" exists with following properties
+      | type          | selection               |
+      | subtype       | check                   |
+      | mandatory     | 1                       |
+      | description   | This is a description!  |
+    And column "four" exists with following properties
+      | type          | datetime                |
+      | subtype       | date                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
+    When user "participant2-v2" tries to create a row using v2 on "view" "v1" with following values
+      | one           | AHA                     |
+      | two           | 161                     |
+      | three         | true                    |
+      | four          | 2023-12-24              |
+    Then the reported status is 404
