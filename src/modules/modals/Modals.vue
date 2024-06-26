@@ -37,6 +37,9 @@
 			:is-element-view="importToElement?.isView"
 			@close="importToElement = null" />
 
+		<ImportScheme
+			:show-modal="showImportScheme"
+			@close="showImportScheme = false" />
 		<CreateContext :show-modal="showModalCreateContext" @close="showModalCreateContext = false" />
 		<EditContext :context-id="editContext" :show-modal="editContext !== null" @close="editContext = null" />
 		<TransferContext :context="contextToTransfer" :show-modal="contextToTransfer !== null" @close="contextToTransfer = null" />
@@ -48,6 +51,7 @@
 
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import CreateRow from './CreateRow.vue'
+import ImportScheme from './ImportScheme.vue'
 import DeleteColumn from './DeleteColumn.vue'
 import EditColumn from './EditColumn.vue'
 import CreateColumn from './CreateColumn.vue'
@@ -71,6 +75,7 @@ export default {
 		DeleteView,
 		CreateTable,
 		Import,
+		ImportScheme,
 		DeleteRows,
 		ViewSettings,
 		EditRow,
@@ -98,6 +103,7 @@ export default {
 			showModalCreateTable: false,
 			showModalCreateContext: false,
 			importToElement: null,
+			showImportScheme: false,
 			createViewTableId: null, // if null, no modal open
 			tableToDelete: null,
 			viewToDelete: null,
@@ -142,6 +148,7 @@ export default {
 
 		// misc
 		subscribe('tables:modal:import', element => { this.importToElement = element })
+		subscribe('tables:modal:scheme', () => { this.showImportScheme = true })
 
 		// context
 		subscribe('tables:context:create', () => { this.showModalCreateContext = true })

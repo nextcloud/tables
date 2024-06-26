@@ -7,27 +7,32 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\TableService;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IL10N;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
+use OCA\Tables\Controller\TableScheme;
 
 /**
  * @psalm-import-type TablesTable from ResponseDefinitions
  */
 class ApiTablesController extends AOCSController {
 	private TableService $service;
+	private ColumnService $columnService;
 
 	public function __construct(
 		IRequest $request,
 		LoggerInterface $logger,
 		TableService $service,
+		ColumnService $columnService,
 		IL10N $n,
 		string $userId) {
 		parent::__construct($request, $logger, $n, $userId);
 		$this->service = $service;
+		$this->columnService = $columnService;
 	}
 
 	/**
@@ -68,6 +73,73 @@ class ApiTablesController extends AOCSController {
 			return $this->handleError($e);
 		} catch (NotFoundError $e) {
 			return $this->handleNotFoundError($e);
+		}
+	}
+
+	/**
+	 * [api v2] Get a table Scheme
+	 *
+	 * @NoAdminRequired
+	 *
+	 * @param int $id Table ID
+	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 *
+	 * 200: Scheme returned
+	 * 403: No permissions
+	 * 404: Not found
+	 */
+	public function showScheme(int $id): DataResponse {
+		try {
+			$columns = $this->columnService->findAllByTable($id);
+			$table = $this->service->find($id);
+			$scheme = new TableScheme($table->getTitle(),$table->getEmoji(),$columns, $table->getDescription());
+		 	return new DataResponse($scheme->jsonSerialize());
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
+		} catch (InternalError $e) {
+			return $this->handleError($e);
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		}
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function createFromScheme(string $title, string $emoji, string $description, array $columns): DataResponse {
+		try {
+			$table = $this->service->create($title,'custom',$emoji, $description);
+			foreach ($columns as $column) {
+				$this->columnService->create(
+					$this->userId,
+					$table->getId(),
+					null,
+					$column['type'],
+					$column['subtype'],
+					$column['title'],
+					$column['mandatory'],
+					$column['description'],
+
+					$column['textDefault'],
+					$column['textAllowedPattern'],
+					$column['textMaxLength'],
+
+					$column['numberPrefix'],
+					$column['numberSuffix'],
+					$column['numberDefault'],
+					$column['numberMin'],
+					$column['numberMax'],
+					$column['numberDecimals'],
+
+					$column['selectionOptions'] == [] ? '' : $column['selectionOptions'],
+					$column['selectionDefault'],
+
+					$column['datetimeDefault'],
+					[],
+				);};
+			return new DataResponse($table->jsonSerialize());
+		} catch( InternalError | Exception $e) {
+			return $this->handleError($e);
 		}
 	}
 
