@@ -22,6 +22,11 @@ registerWidget('tables_content', async (el, { richObjectType, richObject, access
 	const { default: TableReferenceWidget } = interactive
 		? await import(/* webpackChunkName: "reference-table-lazy" */'./views/ContentReferenceWidget.vue')
 		: await import(/* webpackChunkName: "reference-table-lazy" */'./views/LinkReferenceWidget.vue')
+	const { default: store } = await import(/* webpackChunkName: 'store' */ './store/store.js')
+	const { default: data } = await import(/* webpackChunkName: 'store' */ './store/data.js')
+
+	store.data = data
+
 	Vue.mixin({ methods: { t, n } })
 	const Widget = Vue.extend(TableReferenceWidget)
 	new Widget({
@@ -30,6 +35,7 @@ registerWidget('tables_content', async (el, { richObjectType, richObject, access
 			richObject,
 			accessible,
 		},
+		store,
 	}).$mount(el)
 }, () => {}, { hasInteractiveView: true })
 

@@ -382,6 +382,8 @@ export default {
 <style lang="scss" scoped>
 .menu {
 	padding-left: calc(var(--default-grid-baseline) * 1);
+	min-width: 44px;
+	min-height: 44px;
 }
 
 .selected {

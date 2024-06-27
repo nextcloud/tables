@@ -38,6 +38,7 @@ import { NcModal, NcCheckboxRadioSwitch, NcNoteCard, NcButton } from '@nextcloud
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import ColumnFormComponent from '../main/partials/ColumnFormComponent.vue'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'CreateRow',
@@ -96,6 +97,7 @@ export default {
 		},
 	},
 	methods: {
+		t,
 		actionCancel() {
 			this.reset()
 			this.addNewAfterSave = false
@@ -125,6 +127,11 @@ export default {
 			}
 		},
 		async sendNewRowToBE() {
+			if (!this.$store) {
+				const { default: store } = await import(/* webpackChunkName: 'store' */ '../../store/store.js')
+				this.$store = store
+			}
+
 			try {
 				const data = []
 				for (const [key, value] of Object.entries(this.row)) {
@@ -155,6 +162,53 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+.modal-mask {
+	z-index: 2001;
+}
+
+.modal__content {
+	padding: 20px;
+
+	.row .space-T,
+	.row.space-T {
+		padding-top: 20px;
+	}
+
+	:where([class*='fix-col-']) {
+		display: flex;
+	}
+
+	:where(.slot) {
+		align-items: baseline;
+	}
+
+	:where(.end) {
+		justify-content: end;
+	}
+
+	:where(.fix-col-1.end) {
+		display: inline-block;
+		position: relative;
+		left: 65%;
+	}
+
+	:where(.slot.fix-col-2) {
+		min-width: 50%;
+	}
+
+	:where(.fix-col-3) {
+		display: inline-block;
+	}
+
+	:where(.slot.fix-col-4 input, .slot.fix-col-4 .row) {
+		min-width: 100% !important;
+	}
+
+	:where(.name-parts) {
+		display: block !important;
+		max-width: fit-content !important;
+	}
+}
 
 .padding-right {
 	padding-right: calc(var(--default-grid-baseline) * 3);

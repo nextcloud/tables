@@ -1,0 +1,25 @@
+@import 'default.css';
+@import 'server.css';
+
+div[data-preview] * {
+	box-sizing: border-box;
+}
+
+body {
+	position: relative;
+}
+
+h1,
+h2 {
+	line-height: 1.5 !important;
+}
+
+div[data-preview="AppNavigationItem"],
+div[data-preview="AppNavigationCaption"] {
+	width: auto;
+}
+
+div[data-preview="AppNavigationItem"] > div,
+div[data-preview="AppNavigationCaption"] > div {
+	width: 300px;
+}

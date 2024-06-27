@@ -83,6 +83,7 @@ import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
 } from '../../../../shared/constants.js'
 import { MetaColumns } from '../mixins/metaColumns.js'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'CustomTable',
@@ -316,6 +317,7 @@ export default {
 	},
 
 	methods: {
+		t,
 		addMagicFieldsValues(filter) {
 			Object.values(MagicFields).forEach(field => {
 				const newFilterValue = filter.value.replace('@' + field.id, field.replace)

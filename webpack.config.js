@@ -13,12 +13,12 @@ webpackConfig.module = {
 		{
 			resourceQuery: /raw/,
 			type: 'asset/source',
-		}
-	]
+		},
+	],
 }
 
 webpackConfig.resolve.alias = {
-  MaterialIcons: path.resolve(__dirname, 'img/material'),
+	MaterialIcons: path.resolve(__dirname, 'img/material'),
 }
 
 module.exports = webpackConfig

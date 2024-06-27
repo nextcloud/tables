@@ -111,7 +111,7 @@ class ColumnService extends SuperService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function find(int $id, string $userId = null): Column {
+	public function find(int $id, ?string $userId = null): Column {
 		try {
 			/** @var Column $column */
 			$column = $this->mapper->find($id);

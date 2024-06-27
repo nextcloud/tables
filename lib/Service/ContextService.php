@@ -349,7 +349,7 @@ class ContextService {
 		return $this->contextNodeRelMapper->insert($contextNodeRel);
 	}
 
-	public function addNodeRelToPage(ContextNodeRelation $nodeRel, int $order = null, ?int $pageId = null): PageContent {
+	public function addNodeRelToPage(ContextNodeRelation $nodeRel, ?int $order = null, ?int $pageId = null): PageContent {
 		if ($pageId === null) {
 			// when no page is given, find the startpage to add it to
 			$context = $this->contextMapper->findById($nodeRel->getContextId());

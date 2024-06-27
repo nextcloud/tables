@@ -1,0 +1,46 @@
+{
+    "id": 226,
+    "tableId": 49,
+    "createdBy": null,
+    "createdAt": null,
+    "lastEditBy": null,
+    "lastEditAt": null,
+    "data": [
+        {
+            "columnId": 159,
+            "value": "Giraffe"
+        },
+        {
+            "columnId": 160,
+            "value": "Mr. Smith"
+        },
+        {
+            "columnId": 161,
+            "value": "Dog food every week"
+        },
+        {
+            "columnId": 162,
+            "value": "2023-01-01"
+        },
+        {
+            "columnId": 163,
+            "value": "2023-12-31"
+        },
+        {
+            "columnId": 164,
+            "value": "The dog is our best friend."
+        },
+        {
+            "columnId": 165,
+            "value": "Standard, SLA Level 2"
+        },
+        {
+            "columnId": 166,
+            "value": 80
+        },
+        {
+            "columnId": 167,
+            "value": "Likes treats"
+        }
+    ]
+}

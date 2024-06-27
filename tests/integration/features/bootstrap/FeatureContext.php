@@ -120,7 +120,7 @@ class FeatureContext implements Context {
 	 * @param string|null $emoji
 	 * @throws Exception
 	 */
-	public function createTableV2(string $user, string $title, string $tableName, string $emoji = null): void {
+	public function createTableV2(string $user, string $title, string $tableName, ?string $emoji = null): void {
 		$this->setCurrentUser($user);
 		$this->sendOcsRequest('post', '/apps/tables/api/2/tables',
 			[
@@ -170,7 +170,7 @@ class FeatureContext implements Context {
 	 * @param TableNode|null $body
 	 * @throws Exception
 	 */
-	public function userTablesV2(string $user, TableNode $body = null): void {
+	public function userTablesV2(string $user, ?TableNode $body = null): void {
 		$this->setCurrentUser($user);
 		$this->sendOcsRequest(
 			'GET',
@@ -207,7 +207,7 @@ class FeatureContext implements Context {
 	 * @param TableNode|null $body
 	 * @throws Exception
 	 */
-	public function initialResourcesV2(string $user, TableNode $body = null): void {
+	public function initialResourcesV2(string $user, ?TableNode $body = null): void {
 		$this->setCurrentUser($user);
 		$this->sendOcsRequest(
 			'GET',
@@ -255,7 +255,7 @@ class FeatureContext implements Context {
 	 * @param string $tableName
 	 * @throws Exception
 	 */
-	public function updateTableV2(string $user, string $tableName, string $title = null, ?string $emoji = null, ?bool $archived = null): void {
+	public function updateTableV2(string $user, string $tableName, ?string $title = null, ?string $emoji = null, ?bool $archived = null): void {
 		$this->setCurrentUser($user);
 
 		$this->sendOcsRequest(
@@ -387,7 +387,7 @@ class FeatureContext implements Context {
 	 * @param string $columnName
 	 * @param TableNode|null $properties
 	 */
-	public function createColumnV2(string $nodeType, string $nodeName, string $columnType, string $columnName, TableNode $properties = null): void {
+	public function createColumnV2(string $nodeType, string $nodeName, string $columnType, string $columnName, ?TableNode $properties = null): void {
 		$props = [
 			'baseNodeType' => $nodeType,
 		];
@@ -433,7 +433,7 @@ class FeatureContext implements Context {
 	 * @param string $nodeName
 	 * @param TableNode|null $body
 	 */
-	public function columnsForNodeV2(string $nodeType, string $nodeName, TableNode $body = null): void {
+	public function columnsForNodeV2(string $nodeType, string $nodeName, ?TableNode $body = null): void {
 		$nodeId = null;
 		if($nodeType === 'table') {
 			$nodeId = $this->tableIds[$nodeName];
@@ -481,7 +481,7 @@ class FeatureContext implements Context {
 	 * @param string $file
 	 * @param TableNode|null $table
 	 */
-	public function createCsvFile(string $user, string $file, TableNode $table = null): void {
+	public function createCsvFile(string $user, string $file, ?TableNode $table = null): void {
 		$this->setCurrentUser($user);
 		$url = $this->baseUrl.'remote.php/dav/files/'.$user.$file;
 		$body = $this->tableNodeToCsv($table);
@@ -591,7 +591,7 @@ class FeatureContext implements Context {
 	 * @param string $user
 	 * @param TableNode|null $body
 	 */
-	public function userTables(string $user, TableNode $body = null): void {
+	public function userTables(string $user, ?TableNode $body = null): void {
 		$this->setCurrentUser($user);
 		$this->sendRequest(
 			'GET',
@@ -629,7 +629,7 @@ class FeatureContext implements Context {
 	 * @param string $user
 	 * @param TableNode|null $body
 	 */
-	public function tableViews(string $tableName, string $user, TableNode $body = null): void {
+	public function tableViews(string $tableName, string $user, ?TableNode $body = null): void {
 		$this->setCurrentUser($user);
 
 		$this->sendRequest(
@@ -666,7 +666,7 @@ class FeatureContext implements Context {
 	 * @param string $viewName
 	 * @param string|null $emoji
 	 */
-	public function createView(string $user, string $title, string $tableName, string $viewName, string $emoji = null): void {
+	public function createView(string $user, string $title, string $tableName, string $viewName, ?string $emoji = null): void {
 		$this->setCurrentUser($user);
 		$this->sendRequest(
 			'POST',
@@ -709,7 +709,7 @@ class FeatureContext implements Context {
 	 * @param string $tableName
 	 * @param string|null $emoji
 	 */
-	public function createTable(string $user, string $title, string $tableName, string $emoji = null): void {
+	public function createTable(string $user, string $title, string $tableName, ?string $emoji = null): void {
 		$this->setCurrentUser($user);
 		$this->sendRequest(
 			'POST',
@@ -1059,7 +1059,7 @@ class FeatureContext implements Context {
 	/**
 	 * @Then user :user has the following permissions
 	 */
-	public function checkSharePermissions($user, TableNode $permissions = null) {
+	public function checkSharePermissions($user, ?TableNode $permissions = null) {
 		$this->setCurrentUser($user);
 
 		$share = $this->getShareById($this->shareId);
@@ -1102,7 +1102,7 @@ class FeatureContext implements Context {
 	 * @param string $title
 	 * @param TableNode|null $properties
 	 */
-	public function createColumn(string $title, TableNode $properties = null): void {
+	public function createColumn(string $title, ?TableNode $properties = null): void {
 		$props = ['title' => $title];
 		foreach ($properties->getRows() as $row) {
 			$props[$row[0]] = $row[1];
@@ -1136,7 +1136,7 @@ class FeatureContext implements Context {
 	 *
 	 * @param TableNode|null $body
 	 */
-	public function tableColumns(TableNode $body = null): void {
+	public function tableColumns(?TableNode $body = null): void {
 		$this->sendRequest(
 			'GET',
 			'/apps/tables/api/1/tables/'.$this->tableId.'/columns'
@@ -1186,7 +1186,7 @@ class FeatureContext implements Context {
 	 *
 	 * @param TableNode|null $properties
 	 */
-	public function updateColumn(TableNode $properties = null): void {
+	public function updateColumn(?TableNode $properties = null): void {
 		$props = [];
 		foreach ($properties->getRows() as $row) {
 			$props[$row[0]] = $row[1];
@@ -1224,7 +1224,7 @@ class FeatureContext implements Context {
 	 *
 	 * @param TableNode|null $properties
 	 */
-	public function createRow(TableNode $properties = null): void {
+	public function createRow(?TableNode $properties = null): void {
 		$props = [];
 		foreach ($properties->getRows() as $row) {
 			$columnId = $this->tableColumns[$row[0]];
@@ -1343,7 +1343,7 @@ class FeatureContext implements Context {
 	 *
 	 * @param TableNode|null $properties
 	 */
-	public function createRowLegacy(TableNode $properties = null): void {
+	public function createRowLegacy(?TableNode $properties = null): void {
 		$props = [];
 		foreach ($properties->getRows() as $row) {
 			$columnId = $this->tableColumns[$row[0]];
@@ -1401,7 +1401,7 @@ class FeatureContext implements Context {
 	 *
 	 * @param TableNode|null $properties
 	 */
-	public function updateRow(TableNode $properties = null): void {
+	public function updateRow(?TableNode $properties = null): void {
 		$props = [];
 		foreach ($properties->getRows() as $row) {
 			$columnId = $this->tableColumns[$row[0]];
@@ -1438,7 +1438,7 @@ class FeatureContext implements Context {
 	 *
 	 * @param TableNode|null $properties
 	 */
-	public function updateRowLegacy(TableNode $properties = null): void {
+	public function updateRowLegacy(?TableNode $properties = null): void {
 		$props = [];
 		foreach ($properties->getRows() as $row) {
 			$columnId = $this->tableColumns[$row[0]];

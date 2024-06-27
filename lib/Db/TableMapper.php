@@ -67,7 +67,7 @@ class TableMapper extends QBMapper {
 	/**
 	 * @throws Exception
 	 */
-	public function search(string $term = null, ?string $userId = null, ?int $limit = null, ?int $offset = null): array {
+	public function search(?string $term = null, ?string $userId = null, ?int $limit = null, ?int $offset = null): array {
 		$qb = $this->db->getQueryBuilder();
 		$shareQueryTablesSharedViaUser = $this->db->getQueryBuilder();
 		$shareQueryTablesSharedViaGroup = $this->db->getQueryBuilder();

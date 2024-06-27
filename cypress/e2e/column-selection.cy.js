@@ -29,7 +29,7 @@ describe('Test column ' + columnTitle, () => {
 		cy.get('.modal__content h2').contains('Create row').should('be.visible')
 		cy.get('.modal__content .title').contains(columnTitle).should('be.visible')
 		cy.get('.modal__content .title').click()
-		cy.get('.modal__content .select span[title="second option"]').should('be.visible')
+		cy.get('.vs__dropdown-toggle .vs__selected span[title="second option"]').should('exist')
 		cy.get('button').contains('Save').click()
 		cy.get('.custom-table table tr td div').contains('second option').should('be.visible')
 

@@ -368,9 +368,9 @@ class ShareService extends SuperService {
 		}
 
 		// security
-			if (!$this->permissionsService->canManageElementById($item->getNodeId(), $item->getNodeType())) {
-				throw new PermissionError('PermissionError: can not delete share with id '.$id);
-			}
+		if (!$this->permissionsService->canManageElementById($item->getNodeId(), $item->getNodeType())) {
+			throw new PermissionError('PermissionError: can not delete share with id '.$id);
+		}
 
 		try {
 			$this->mapper->delete($item);

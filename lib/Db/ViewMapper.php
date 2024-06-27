@@ -52,7 +52,7 @@ class ViewMapper extends QBMapper {
 	 * @return View[]
 	 * @throws Exception
 	 */
-	public function search(string $term = null, ?string $userId = null, ?int $limit = null, ?int $offset = null): array {
+	public function search(?string $term = null, ?string $userId = null, ?int $limit = null, ?int $offset = null): array {
 		$qb = $this->db->getQueryBuilder();
 		$shareTableQuery = $this->db->getQueryBuilder();
 		$shareQueryViewsSharedViaUser = $this->db->getQueryBuilder();

@@ -70,7 +70,7 @@ class TableController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function update(int $id, string $title = null, string $emoji = null, ?bool $archived = null): DataResponse {
+	public function update(int $id, ?string $title = null, ?string $emoji = null, ?bool $archived = null): DataResponse {
 		return $this->handleError(function () use ($id, $title, $emoji, $archived) {
 			return $this->service->update($id, $title, $emoji, null, $archived, $this->userId);
 		});

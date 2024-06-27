@@ -202,7 +202,7 @@ class CleanLegacy extends Command {
 		}
 	}
 
-	private function print(string $message, int $level = null): void {
+	private function print(string $message, ?int $level = null): void {
 		if($level === self::PRINT_LEVEL_SUCCESS) {
 			echo "✅ ".$message;
 			echo "\n";

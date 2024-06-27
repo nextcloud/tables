@@ -48,6 +48,7 @@
 <script>
 import { NcModal, NcButton, NcNoteCard } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
+import { translate as t } from '@nextcloud/l10n'
 import '@nextcloud/dialogs/dist/index.css'
 import ColumnFormComponent from '../main/partials/ColumnFormComponent.vue'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
@@ -85,7 +86,7 @@ export default {
 	},
 	data() {
 		return {
-			localRow: {},
+			localRow: null,
 			prepareDeleteRow: false,
 			localLoading: false,
 		}
@@ -120,7 +121,11 @@ export default {
 			}
 		},
 	},
+	mounted() {
+		this.loadValues()
+	},
 	methods: {
+		t,
 		loadValues() {
 			if (this.row) {
 				const tmp = {}
@@ -131,7 +136,7 @@ export default {
 			}
 		},
 		actionCancel() {
-			this.$router.back()
+			this.$router?.back()
 			this.reset()
 			this.$emit('close')
 		},
@@ -154,11 +159,13 @@ export default {
 			this.actionCancel()
 		},
 		async sendRowToBE() {
+			await this.loadStore()
+
 			const data = []
 			for (const [key, value] of Object.entries(this.localRow)) {
 				data.push({
 					columnId: key,
-					value,
+					value: value ?? '',
 				})
 			}
 			const res = await this.$store.dispatch('updateRow', {
@@ -180,6 +187,8 @@ export default {
 			this.deleteRowAtBE(this.row.id)
 		},
 		async deleteRowAtBE(rowId) {
+			await this.loadStore()
+
 			this.localLoading = true
 			const res = await this.$store.dispatch('removeRow', {
 				rowId,
@@ -192,6 +201,12 @@ export default {
 			this.localLoading = false
 			this.actionCancel()
 		},
+		async loadStore() {
+			if (this.$store) { return }
+
+			const { default: store } = await import(/* webpackChunkName: 'store' */ '../../store/store.js')
+			this.$store = store
+		},
 		onKeydown(event) {
 			if (event.key === 'Enter' && event.ctrlKey) {
 				this.actionConfirm()
@@ -200,3 +215,52 @@ export default {
 	},
 }
 </script>
+
+<style lang="scss" scoped>
+.modal-mask {
+	z-index: 2001;
+}
+
+.modal__content {
+	padding: 20px;
+
+	:where(.row .space-T, .row.space-T) {
+		padding-top: 20px;
+	}
+
+	:where([class*='fix-col-']) {
+		display: flex;
+	}
+
+	:where(.slot) {
+		align-items: baseline;
+	}
+
+	:where(.end) {
+		justify-content: end;
+	}
+
+	:where(.slot.fix-col-2) {
+		min-width: 50%;
+	}
+
+	:where(.fix-col-1.end) {
+		display: inline-block;
+		position: relative;
+		left: 65%;
+	}
+
+	:where(.fix-col-3) {
+		display: inline-block;
+	}
+
+	:where(.fix-col-4) {
+		display: flex;
+		justify-content: space-between;
+	}
+
+	:where(.slot.fix-col-4 input, .slot.fix-col-4 .row) {
+		min-width: 100% !important;
+	}
+}
+</style>

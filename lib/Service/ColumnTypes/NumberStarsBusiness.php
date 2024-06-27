@@ -21,7 +21,7 @@ class NumberStarsBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	 * @return bool
 	 */
 	public function canBeParsed($value, ?Column $column = null): bool {
-		return !$value || in_array((int) $value, array(0,1,2,3,4,5));
+		return !$value || in_array((int) $value, [0,1,2,3,4,5]);
 	}
 
 }

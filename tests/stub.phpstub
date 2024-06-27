@@ -98,3 +98,7 @@ namespace Symfony\Component\Console\Command {
         public function setName(string $name);
     }
 }
+
+namespace OCA\Text\Event {
+	class LoadEditor extends \OCP\EventDispatcher\Event {}
+}

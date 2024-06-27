@@ -64,7 +64,7 @@ class PermissionsService {
 	 *
 	 * @throws InternalError
 	 */
-	public function preCheckUserId(string $userId = null, bool $canBeEmpty = true): string {
+	public function preCheckUserId(?string $userId = null, bool $canBeEmpty = true): string {
 		if ($userId === null) {
 			$userId = $this->userId;
 		}
@@ -353,7 +353,7 @@ class PermissionsService {
 	 * @param string|null $userId
 	 * @return bool
 	 */
-	public function canDeleteRowsByTableId(int $tableId = null, ?string $userId = null): bool {
+	public function canDeleteRowsByTableId(?int $tableId = null, ?string $userId = null): bool {
 		if ($tableId === null) {
 			return false;
 		}
@@ -642,7 +642,7 @@ class PermissionsService {
 	 * @param string|null $userId
 	 * @return bool
 	 */
-	private function userIsElementOwner($element, string $userId = null, ?string $nodeType = null): bool {
+	private function userIsElementOwner($element, ?string $userId = null, ?string $nodeType = null): bool {
 		if ($nodeType === 'context') {
 			return $element->getOwnerId() === $userId;
 		}
