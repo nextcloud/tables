@@ -9,9 +9,10 @@ const config = createAppConfig({
 	files: path.join(__dirname, 'src', 'file-actions.js'),
 	main: path.join(__dirname, 'src', 'main.js'),
 }, {
-	inlineCSS: true,
+	inlineCSS: false,
 	config: {
 		build: {
+			cssCodeSplit: true,
 			rollupOptions: {
 				output: {
 					manualChunks: (id) => {
