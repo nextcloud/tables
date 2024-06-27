@@ -22,6 +22,7 @@ use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
 
+use OCA\Tables\Model\Permissions;
 use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -186,15 +187,14 @@ class ShareService extends SuperService {
 	 * @param int $elementId
 	 * @param 'table'|'view' $elementType
 	 * @param string|null $userId
-	 * @return array
 	 * @throws NotFoundError
 	 */
-	public function getSharedPermissionsIfSharedWithMe(int $elementId, string $elementType = 'table', ?string $userId = null): array {
+	public function getSharedPermissionsIfSharedWithMe(int $elementId, string $elementType = 'table', ?string $userId = null): Permissions {
 		try {
 			$userId = $this->permissionsService->preCheckUserId($userId);
 		} catch (InternalError $e) {
 			$this->logger->warning('Could not pre check user: '.$e->getMessage().' Permission denied.');
-			return [];
+			return new Permissions();
 		}
 		return $this->permissionsService->getSharedPermissionsIfSharedWithMe($elementId, $elementType, $userId);
 	}

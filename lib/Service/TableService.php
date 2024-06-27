@@ -222,7 +222,7 @@ class TableService extends SuperService {
 
 			}
 		}
-		if (!$table->getIsShared() || $table->getOnSharePermissions()['manage']) {
+		if (!$table->getIsShared() || $table->getOnSharePermissions()->manage) {
 			// add the corresponding views if it is an own table, or you have table manage rights
 			$table->setViews($this->viewService->findAll($table));
 		}

@@ -15,6 +15,7 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Helper\ConversionHelper;
 use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\Model\Permissions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
@@ -414,31 +415,32 @@ class PermissionsService {
 	 * @param int $elementId
 	 * @param 'table'|'view' $elementType
 	 * @param string $userId
-	 * @return array
 	 * @throws NotFoundError
 	 */
-	public function getSharedPermissionsIfSharedWithMe(int $elementId, string $elementType, string $userId): array {
+	public function getSharedPermissionsIfSharedWithMe(int $elementId, string $elementType, string $userId): Permissions {
 		try {
 			$shares = $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userId);
 		} catch (Exception $e) {
 			$this->logger->warning('Exception occurred: '.$e->getMessage().' Permission denied.');
-			return [];
+			return new Permissions();
 		}
 
 		try {
 			$userGroups = $this->userHelper->getGroupsForUser($userId);
 		} catch (InternalError $e) {
 			$this->logger->warning('Exception occurred: '.$e->getMessage().' Permission denied.');
-			return [];
+			return new Permissions();
 		}
+		$additionalShares = [];
 		foreach ($userGroups as $userGroup) {
 			try {
-				$shares = array_merge($shares, $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userGroup->getGid(), 'group'));
+				$additionalShares[] = $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userGroup->getGid(), 'group');
 			} catch (Exception $e) {
 				$this->logger->warning('Exception occurred: '.$e->getMessage().' Permission denied.');
-				return [];
+				return new Permissions();
 			}
 		}
+		$shares = array_merge($shares, ...$additionalShares);
 		if (count($shares) > 0) {
 			$read = array_reduce($shares, function ($carry, $share) {
 				return $carry || ($share->getPermissionRead());
@@ -456,13 +458,13 @@ class PermissionsService {
 				return $carry || ($share->getPermissionManage());
 			}, false);
 
-			return [
-				'read' => $read || $update || $delete || $manage,
-				'create' => $create || $manage,
-				'update' => $update || $manage,
-				'delete' => $delete || $manage,
-				'manage' => $manage,
-			];
+			return new Permissions(
+				read: $read || $update || $delete || $manage,
+				create: $create || $manage,
+				update: $update || $manage,
+				delete: $delete || $manage,
+				manage: $manage,
+			);
 		}
 		throw new NotFoundError('No share for '.$elementType.' and given user ID found.');
 	}
@@ -498,15 +500,15 @@ class PermissionsService {
 	/**
 	 * @throws NotFoundError
 	 */
-	public function getPermissionArrayForNodeFromContexts(int $nodeId, string $nodeType, string $userId) {
+	public function getPermissionArrayForNodeFromContexts(int $nodeId, string $nodeType, string $userId): Permissions {
 		$permissions = $this->getPermissionIfAvailableThroughContext($nodeId, $nodeType, $userId);
-		return [
-			'read' => (bool)($permissions & Application::PERMISSION_READ),
-			'create' => (bool)($permissions & Application::PERMISSION_CREATE),
-			'update' => (bool)($permissions & Application::PERMISSION_UPDATE),
-			'delete' => (bool)($permissions & Application::PERMISSION_DELETE),
-			'manage' => (bool)($permissions & Application::PERMISSION_MANAGE),
-		];
+		return new Permissions(
+			read: (bool)($permissions & Application::PERMISSION_READ),
+			create: (bool)($permissions & Application::PERMISSION_CREATE),
+			update: (bool)($permissions & Application::PERMISSION_UPDATE),
+			delete: (bool)($permissions & Application::PERMISSION_DELETE),
+			manage: (bool)($permissions & Application::PERMISSION_MANAGE),
+		);
 	}
 
 	private function hasPermission(int $existingPermissions, string $permissionName): bool {
@@ -527,7 +529,7 @@ class PermissionsService {
 	/**
 	 * @param Table|View|Context $element
 	 * @param 'table'|'view'|'context' $nodeType
-	 * @param string $permission
+	 * @param 'read'|'create'|'update'|'delete'|'manage'|'manageTable' $permission
 	 * @param string|null $userId
 	 * @return bool
 	 */
@@ -541,7 +543,7 @@ class PermissionsService {
 		}
 
 		try {
-			return $this->getSharedPermissionsIfSharedWithMe($element->getId(), $nodeType, $userId)[$permission];
+			return $this->getSharedPermissionsIfSharedWithMe($element->getId(), $nodeType, $userId)->$permission;
 		} catch (NotFoundError $e) {
 			try {
 				if ($nodeType !== 'context'
@@ -560,7 +562,7 @@ class PermissionsService {
 	/**
 	 * @param int $elementId
 	 * @param 'table'|'view' $nodeType
-	 * @param string $permission
+	 * @param 'read'|'create'|'update'|'delete'|'manage'|'manageTable' $permission
 	 * @param string|null $userId
 	 * @return bool
 	 */
@@ -570,7 +572,7 @@ class PermissionsService {
 		}
 		if ($userId) {
 			try {
-				return $this->getSharedPermissionsIfSharedWithMe($elementId, $nodeType, $userId)[$permission];
+				return $this->getSharedPermissionsIfSharedWithMe($elementId, $nodeType, $userId)->$permission;
 			} catch (NotFoundError $e) {
 				try {
 					if ($this->hasPermission($this->getPermissionIfAvailableThroughContext($elementId, $nodeType, $userId), $permission)) {
@@ -602,7 +604,7 @@ class PermissionsService {
 		}
 		try {
 			$permissions = $this->getSharedPermissionsIfSharedWithMe($nodeType === 'view' ? $element->getTableId() : $element->getId(), 'table', $userId);
-			if($permissions['manage']) {
+			if ($permissions->manage) {
 				return true;
 			}
 		} catch (NotFoundError $e) {
