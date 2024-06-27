@@ -8,16 +8,14 @@ describe('Test column progress', () => {
 		cy.createRandomUser().then(user => {
 			localUser = user
 			cy.login(localUser)
+			cy.visit('apps/tables')
+			cy.createTable(tableTitle)
 		})
 	})
 
 	beforeEach(function() {
 		cy.login(localUser)
 		cy.visit('apps/tables')
-	})
-
-	it('Table and column setup', () => {
-		cy.createTable(tableTitle)
 	})
 
 	it('Insert and test rows - default values', () => {

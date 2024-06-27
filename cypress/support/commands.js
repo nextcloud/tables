@@ -192,7 +192,7 @@ Cypress.Commands.add('createDatetimeDateColumn', (title, setNow, firstColumn) =>
 	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
 	cy.get('.multiSelectOptionLabel').contains('Date and time').click({ force: true })
-	cy.get('[data-cy="createColumnDateSwitch"]').contains('Date').click({ force: true })
+	cy.get('[data-cy="createColumnDateSwitch"]').parent().contains('Date').click({ force: true })
 
 	if (setNow) {
 		cy.get('[data-cy="datetimeDateFormTodaySwitch"]').click({ force: true })
@@ -209,7 +209,7 @@ Cypress.Commands.add('createDatetimeTimeColumn', (title, setNow, firstColumn) =>
 	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
 	cy.get('.multiSelectOptionLabel').contains('Date and time').click({ force: true })
-	cy.get('[data-cy="createColumnTimeSwitch"]').contains('Time').click({ force: true })
+	cy.get('[data-cy="createColumnTimeSwitch"]').parent().contains('Time').click({ force: true })
 
 	if (setNow) {
 		cy.get('[data-cy="datetimeTimeFormNowSwitch"]').click({ force: true })

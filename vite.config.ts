@@ -5,8 +5,9 @@ import { createAppConfig } from '@nextcloud/vite-config'
 import path from 'path'
 
 const config = createAppConfig({
-	main: path.join(__dirname, 'src', 'main.js'),
 	reference: path.join(__dirname, 'src', 'reference.js'),
+	files: path.join(__dirname, 'src', 'file-actions.js'),
+	main: path.join(__dirname, 'src', 'main.js'),
 }, {
 	inlineCSS: true,
 	config: {

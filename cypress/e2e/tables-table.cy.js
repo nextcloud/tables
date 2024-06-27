@@ -44,7 +44,7 @@ describe('Manage a table', () => {
 
 		cy.get('.modal__content button').contains('Select from Files').click()
 		cy.get('.file-picker__files').contains('test-import').click()
-		cy.get('.file-picker button span').contains('Choose test-import.csv').click()
+		cy.get('.file-picker button span').contains('Import').click()
 		cy.get('.modal__content button').contains('Import').click()
 		cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')
 		cy.get('[data-cy="importResultColumnsMatch"]').should('contain.text', '0')

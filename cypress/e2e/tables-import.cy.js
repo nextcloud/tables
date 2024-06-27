@@ -87,7 +87,7 @@ if (!['stable26', 'stable27'].includes(Cypress.env('ncVersion'))) {
 			cy.get('[data-cy-files-list-row-name="test-import.csv"] [data-cy-files-list-row-actions] .action-item button').click()
 			cy.get('[data-cy-files-list-row-action="import-to-tables"]').click()
 
-			cy.get('[data-cy="importAsNewTableSwitch"]').click()
+			cy.get('[data-cy="importAsNewTableSwitch"]').click({ force: true })
 			cy.get('[data-cy="selectExistingTableDropdown"]').type('tutorial')
 			cy.get('.name-parts').click()
 
@@ -102,6 +102,5 @@ if (!['stable26', 'stable27'].includes(Cypress.env('ncVersion'))) {
 			cy.get('[data-cy="importResultParsingErrors"]').should('contain.text', '0')
 			cy.get('[data-cy="importResultRowErrors"]').should('contain.text', '0')
 		})
-	
 	})
 }
