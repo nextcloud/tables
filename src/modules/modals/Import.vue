@@ -323,15 +323,14 @@ export default {
 		},
 		async pickFile() {
 			const filePicker = getFilePickerBuilder(t('text', 'Select file for the import'))
+				.setType(FilePickerType.Custom)
 				.setMultiSelect(false)
 				.setMimeTypeFilter(this.mimeTypes)
 				.addButton({
 					label: t('tables', 'Import'),
 					callback: (nodes) => {
 						const fileInfo = nodes[0]
-						this.path = fileInfo.path === '/'
-							? `/${fileInfo.name}`
-							: `${fileInfo.path}/${fileInfo.name}`
+						this.path = fileInfo.path
 					},
 					type: 'primary',
 				})
