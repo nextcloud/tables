@@ -1650,9 +1650,7 @@ export type operations = {
       query: {
         /** @description Data as key - value store */
         data: OneOf<[string, {
-          /** Format: int64 */
-          columnId: number;
-          value: Record<string, never>;
+          ""?: Record<string, never>;
         }]>;
       };
       path: {
