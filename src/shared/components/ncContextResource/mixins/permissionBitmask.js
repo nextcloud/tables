@@ -1,4 +1,4 @@
-import { PERMISSION_READ, PERMISSION_CREATE, PERMISSION_UPDATE, PERMISSION_DELETE } from '../../../constants.js'
+import { PERMISSION_READ, PERMISSION_CREATE, PERMISSION_UPDATE, PERMISSION_DELETE } from '../../../constants.ts'
 
 export default {
 	data() {

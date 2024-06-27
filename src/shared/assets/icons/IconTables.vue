@@ -16,8 +16,10 @@
 	</span>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
 	name: 'IconTables',
 	props: {
 		title: {
@@ -33,5 +35,5 @@ export default {
 			default: 24,
 		},
 	},
-}
+})
 </script>

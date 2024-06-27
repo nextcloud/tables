@@ -34,12 +34,12 @@
 		</table>
 		<div class="pagination-footer" :class="{'large-width': !appNavCollapsed || isMobile}">
 			<div class="pagination-items">
-				<NcButton type="tertiary" :disabled="totalPages === 1 || pageNumber <= 1" @click="pageNumber = 1">
+				<NcButton type="tertiary" :disabled="totalPages === 1 || pageNumber <= 1" @click="pageNumber = 1" :aria-label="t('tables', 'Go to first page')">
 					<template #icon>
 						<PageFirstIcon :size="20" />
 					</template>
 				</NcButton>
-				<NcButton type="tertiary" :disabled="totalPages === 1 || pageNumber <= 1" @click="pageNumber--">
+				<NcButton type="tertiary" :disabled="totalPages === 1 || pageNumber <= 1" @click="pageNumber--" :aria-label="t('tables', 'Go to previous page')">
 					<template #icon>
 						<ChevronLeftIcon :size="20" />
 					</template>
@@ -53,12 +53,12 @@
 						</template>
 					</NcSelect>
 				</div>
-				<NcButton type="tertiary" :disabled="totalPages === 1 || pageNumber >= totalPages" @click="pageNumber++">
+				<NcButton type="tertiary" :disabled="totalPages === 1 || pageNumber >= totalPages" @click="pageNumber++" :aria-label="t('tables', 'Go to next page')">
 					<template #icon>
 						<ChevronRightIcon :size="20" />
 					</template>
 				</NcButton>
-				<NcButton type="tertiary" :disabled="totalPages === 1 || pageNumber >= totalPages" @click="pageNumber = totalPages">
+				<NcButton type="tertiary" :disabled="totalPages === 1 || pageNumber >= totalPages" @click="pageNumber = totalPages" :aria-label="t('tables', 'Go to last page')">
 					<template #icon>
 						<PageLastIcon :size="20" />
 					</template>
@@ -81,7 +81,7 @@ import { NcButton, useIsMobile, NcSelect } from '@nextcloud/vue'
 import { mapState } from 'vuex'
 import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
-} from '../../../../shared/constants.js'
+} from '../../../../shared/constants.ts'
 import { MetaColumns } from '../mixins/metaColumns.js'
 
 export default {
