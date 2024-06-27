@@ -176,6 +176,8 @@ OC.L10N.register(
     "Type" : "종류",
     "Simple text" : "간단한 텍스트",
     "Rich text" : "서식 있는 텍스트",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Single selection" : "한 개 선택",
     "Multiple selection" : "다중 선택",
     "Yes/No" : "네/아니오",

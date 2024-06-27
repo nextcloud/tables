@@ -33,6 +33,8 @@ OC.L10N.register(
     "Import" : "Importar",
     "Type" : "Tipo",
     "Rich text" : "Texto enriquecido",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Time" : "Hora",
     "Save" : "Guardar",
     "Title" : "Título",

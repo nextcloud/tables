@@ -192,6 +192,8 @@
     "Text line" : "文字行",
     "Simple text" : "簡單文字",
     "Rich text" : "RTF",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Single selection" : "單則選擇",
     "Multiple selection" : "多重選擇",
     "Yes/No" : "是／否",

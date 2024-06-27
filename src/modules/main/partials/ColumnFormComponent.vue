@@ -7,6 +7,9 @@
 import TextLineForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextLineForm.vue'
 import TextLongForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextLongForm.vue'
 import TextLinkForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextLinkForm.vue'
+import TextRichForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextRichForm.vue'
+import TextIpv4AddressForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextIpv4AddressForm.vue'
+import TextIpv6AddressForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextIpv6AddressForm.vue'
 import NumberForm from '../../../shared/components/ncTable/partials/rowTypePartials/NumberForm.vue'
 import NumberStarsForm from '../../../shared/components/ncTable/partials/rowTypePartials/NumberStarsForm.vue'
 import NumberProgressForm from '../../../shared/components/ncTable/partials/rowTypePartials/NumberProgressForm.vue'
@@ -16,7 +19,6 @@ import SelectionMultiForm from '../../../shared/components/ncTable/partials/rowT
 import DatetimeForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeForm.vue'
 import DatetimeDateForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../../shared/components/ncTable/partials/rowTypePartials/DatetimeTimeForm.vue'
-import TextRichForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextRichForm.vue'
 import { AbstractColumn } from '../../../shared/components/ncTable/mixins/columnClass.js'
 
 export default {
@@ -29,6 +31,8 @@ export default {
 		TextLongForm,
 		TextLinkForm,
 		TextRichForm,
+		TextIpv4AddressForm,
+		TextIpv6AddressForm,
 		NumberForm,
 		NumberStarsForm,
 		NumberProgressForm,

@@ -150,6 +150,8 @@ OC.L10N.register(
     "Text line" : "Текстовая строка",
     "Simple text" : "Простой текст",
     "Rich text" : "Текст с форматированием",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Yes/No" : "Да/Нет",
     "Time" : "Время",
     "Add more" : "Добавить больше",

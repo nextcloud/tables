@@ -93,6 +93,8 @@ OC.L10N.register(
     "Type" : "סוג",
     "Simple text" : "טקסט פשוט",
     "Rich text" : "טקסט עשיר",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Time" : "זמן",
     "Save" : "שמירה",
     "Title" : "תפקיד",

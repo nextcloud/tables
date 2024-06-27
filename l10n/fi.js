@@ -93,6 +93,8 @@ OC.L10N.register(
     "Text line" : "Tekstirivi",
     "Simple text" : "Yksinkertainen teksti",
     "Rich text" : "Rikas teksti",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Single selection" : "Yksittäisvalinta",
     "Multiple selection" : "Monivalinta",
     "Yes/No" : "Kyllä/Ei",

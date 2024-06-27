@@ -191,6 +191,8 @@ OC.L10N.register(
     "Text line" : "Testový řádek",
     "Simple text" : "Jen text",
     "Rich text" : "Formátovaný text",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Single selection" : "Jednotlivý výběr",
     "Multiple selection" : "Vícenásobný výběr",
     "Yes/No" : "Ano/Ne",

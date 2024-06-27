@@ -51,6 +51,8 @@ OC.L10N.register(
     "Type" : "Genia",
     "Simple text" : "Testu simpre",
     "Rich text" : "Testu formatadu",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Time" : "Ora",
     "Save" : "Sarva",
     "Title" : "Tìtulu",

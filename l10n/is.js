@@ -43,6 +43,8 @@ OC.L10N.register(
     "Type" : "Tegund",
     "Simple text" : "Einfaldur texti",
     "Rich text" : "Sniðinn texti",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Time" : "Tími",
     "Save" : "Vista",
     "Title" : "Titill",

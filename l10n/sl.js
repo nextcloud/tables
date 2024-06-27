@@ -176,6 +176,8 @@ OC.L10N.register(
     "Text line" : "Besedilna vrstica",
     "Simple text" : "Enostavno besedilo",
     "Rich text" : "Obogateno besedilo",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Single selection" : "Enojni izbor",
     "Multiple selection" : "Izbira po meri",
     "Yes/No" : "Možnost Da / Ne",

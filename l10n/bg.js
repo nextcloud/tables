@@ -149,6 +149,8 @@ OC.L10N.register(
     "Text line" : "Текстов ред",
     "Simple text" : "Обикновен текст",
     "Rich text" : "Форматиран текст",
+    "IPv4 address" : "IPv4 address",
+    "IPv6 address" : "IPv6 address",
     "Single selection" : "Единична селекция",
     "Multiple selection" : "Множествена селекция",
     "Yes/No" : "Да/Не",

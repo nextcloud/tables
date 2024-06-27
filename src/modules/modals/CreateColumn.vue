@@ -36,6 +36,12 @@
 							<NcCheckboxRadioSwitch v-if="textAppAvailable" :checked.sync="column.subtype" value="rich" name="textTypeSelection" type="radio">
 								{{ t('tables', 'Rich text') }}
 							</NcCheckboxRadioSwitch>
+							<NcCheckboxRadioSwitch :checked.sync="column.subtype" value="ipv4_address" name="textTypeSelection" type="radio">
+								{{ t('tables', 'IPv4 address') }}
+							</NcCheckboxRadioSwitch>
+							<NcCheckboxRadioSwitch :checked.sync="column.subtype" value="ipv6_address" name="textTypeSelection" type="radio">
+								{{ t('tables', 'IPv6 address') }}
+							</NcCheckboxRadioSwitch>
 						</div>
 					</div>
 
@@ -88,46 +94,50 @@
 </template>
 
 <script>
+import '@nextcloud/dialogs/dist/index.css'
+import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandler.js'
+import { NcModal, NcCheckboxRadioSwitch } from '@nextcloud/vue'
+import { showError, showInfo, showSuccess, showWarning } from '@nextcloud/dialogs'
+import ColumnTypeSelection from '../main/partials/ColumnTypeSelection.vue'
+import DatetimeDateForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeDateForm.vue'
+import DatetimeForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeForm.vue'
+import DatetimeTimeForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeTimeForm.vue'
+import MainForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/MainForm.vue'
 import NumberForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/NumberForm.vue'
-import NumberStarsForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/NumberStarsForm.vue'
 import NumberProgressForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/NumberProgressForm.vue'
+import NumberStarsForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/NumberStarsForm.vue'
+import SelectionCheckForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionCheckForm.vue'
+import SelectionForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionForm.vue'
+import SelectionMultiForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionMultiForm.vue'
 import TextLineForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextLineForm.vue'
 import TextLinkForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextLinkForm.vue'
 import TextLongForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextLongForm.vue'
-import SelectionCheckForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionCheckForm.vue'
-import MainForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/MainForm.vue'
-import DatetimeForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeForm.vue'
-import DatetimeDateForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeDateForm.vue'
-import DatetimeTimeForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeTimeForm.vue'
-import { NcModal, NcCheckboxRadioSwitch } from '@nextcloud/vue'
-import SelectionForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionForm.vue'
-import SelectionMultiForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionMultiForm.vue'
-import { showError, showInfo, showSuccess, showWarning } from '@nextcloud/dialogs'
-import '@nextcloud/dialogs/dist/index.css'
-import ColumnTypeSelection from '../main/partials/ColumnTypeSelection.vue'
 import TextRichForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextRichForm.vue'
-import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandler.js'
+import TextIpv4AddressForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextIpv4AddressForm.vue'
+import TextIpv6AddressForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextIpv6AddressForm.vue'
 
 export default {
 	name: 'CreateColumn',
 	components: {
 		ColumnTypeSelection,
+		DatetimeDateForm,
+		DatetimeForm,
+		DatetimeTimeForm,
+		MainForm,
+		NcCheckboxRadioSwitch,
 		NcModal,
 		NumberForm,
+		NumberProgressForm,
+		NumberStarsForm,
+		SelectionCheckForm,
+		SelectionForm,
+		SelectionMultiForm,
 		TextLineForm,
 		TextLinkForm,
 		TextLongForm,
 		TextRichForm,
-		MainForm,
-		NumberStarsForm,
-		NumberProgressForm,
-		SelectionCheckForm,
-		DatetimeDateForm,
-		DatetimeForm,
-		DatetimeTimeForm,
-		NcCheckboxRadioSwitch,
-		SelectionForm,
-		SelectionMultiForm,
+		TextIpv4AddressForm,
+		TextIpv6AddressForm,
 	},
 	props: {
 		showModal: {
