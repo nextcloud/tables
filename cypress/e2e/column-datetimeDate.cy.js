@@ -8,16 +8,14 @@ describe('Test column ' + columnTitle, () => {
 		cy.createRandomUser().then(user => {
 			localUser = user
 			cy.login(localUser)
+			cy.visit('apps/tables')
+			cy.createTable(tableTitle)
 		})
 	})
 
 	beforeEach(function() {
 		cy.login(localUser)
 		cy.visit('apps/tables')
-	})
-
-	it('Table and column setup', () => {
-		cy.createTable(tableTitle)
 	})
 
 	it('Insert and test rows', () => {
@@ -27,7 +25,6 @@ describe('Test column ' + columnTitle, () => {
 		// insert row with int value
 		cy.get('button').contains('Create row').click()
 		cy.get('.modal__content input').first().clear().type('2023-12-24')
-		cy.get('[data-cy="createRowAddMoreSwitch"]').click().click()
 		cy.get('button').contains('Save').click()
 		cy.get('.custom-table table tr td div').contains('24').should('be.visible')
 		cy.get('.custom-table table tr td div').contains('Dec').should('be.visible')
@@ -49,7 +46,6 @@ describe('Test column ' + columnTitle, () => {
 		cy.get('button').contains('Create row').click()
 		const date = new Date().toISOString().slice(2, 10)
 		cy.get('.modal__content input').first().should('contain.value', date)
-		cy.get('[data-cy="createRowAddMoreSwitch"]').click().click()
 		cy.get('button').contains('Save').click()
 		const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 		const datetime2 = new Date().getDate() + ' ' + monthNames[new Date().getMonth()] + ' ' + new Date().getFullYear()
