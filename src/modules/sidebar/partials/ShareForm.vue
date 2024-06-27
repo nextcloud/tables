@@ -25,23 +25,11 @@
 <template>
 	<div class="row space-B">
 		<h3>{{ t('tables', 'Share with accounts or groups') }}</h3>
-		<NcSelect id="ajax"
-			style="width: 100%;"
-			:clear-on-select="true"
-			:hide-selected="true"
-			:internal-search="false"
-			:loading="loading"
-			:options="options"
-			:placeholder="t('tables', 'User or group name …')"
-			:preselect-first="true"
-			:preserve-search="true"
-			:searchable="true"
-			:user-select="true"
-			:get-option-key="(option) => option.key"
-			:aria-label-combobox="t('tables', 'User or group name …')"
-			label="displayName"
-			@search="asyncFind"
-			@input="addShare">
+		<NcSelect id="ajax" style="width: 100%;" :clear-on-select="true" :hide-selected="true" :internal-search="false"
+			:loading="loading" :options="options" :placeholder="t('tables', 'User or group name …')"
+			:preselect-first="true" :preserve-search="true" :searchable="true" :user-select="true"
+			:get-option-key="(option) => option.key" :aria-label-combobox="t('tables', 'User or group name …')"
+			label="displayName" @search="asyncFind" @input="addShare">
 			<template #no-options>
 				{{ t('tables', 'No recommendations. Start typing.') }}
 			</template>
@@ -54,13 +42,13 @@
 
 <script>
 import { generateOcsUrl } from '@nextcloud/router'
-import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
-import debounce from 'debounce'
 import { NcSelect } from '@nextcloud/vue'
 import { mapState } from 'vuex'
 import formatting from '../../../shared/mixins/formatting.js'
 import ShareTypes from '../../../shared/mixins/shareTypesMixin.js'
+import searchUserGroup from '../../../shared/mixins/searchUserGroup.js'
+import { showError } from '@nextcloud/dialogs'
 
 export default {
 	name: 'ShareForm',
@@ -68,66 +56,25 @@ export default {
 		NcSelect,
 	},
 
-	mixins: [ShareTypes, formatting],
+	mixins: [formatting, ShareTypes, searchUserGroup],
 
 	props: {
 		shares: {
 			type: Array,
 			default: () => ([]),
 		},
-	},
-
-	data() {
-		return {
-			query: '',
-			loading: false,
-
-			minSearchStringLength: 1,
-			maxAutocompleteResults: 20,
-
-			// Search data
-			recommendations: [],
-			suggestions: [],
-		}
+		selectUsers: {
+			type: Boolean,
+			default: true,
+		},
+		selectGroups: {
+			type: Boolean,
+			default: true,
+		},
 	},
 
 	computed: {
 		...mapState(['tables', 'tablesLoading', 'showSidebar']),
-
-		/**
-		 * Is the search valid ?
-		 *
-		 * @return {boolean}
-		 */
-		isValidQuery() {
-			return this.query && this.query.trim() !== '' && this.query.length > this.minSearchStringLength
-		},
-
-		/**
-		 * Multiselect options. Recommendations by default,
-		 * direct search when search query is valid.
-		 * Filter out existing shares
-		 *
-		 * @return {Array}
-		 */
-		options() {
-			const shareTypes = { 0: 'user', 1: 'group' }
-			// const shares = [...this.userShares, ...this.groupShares]
-			const shares = this.shares
-			if (this.isValidQuery) {
-				// Filter out existing shares
-				return this.suggestions.filter(item => !shares.find(share => share.receiver === item.shareWith && share.receiverType === shareTypes[item.shareType]))
-			}
-			// Filter out existing shares
-			return this.recommendations.filter(item => !shares.find(share => share.receiver === item.shareWith && share.receiverType === shareTypes[item.shareType]))
-		},
-
-		noResultText() {
-			if (this.loading) {
-				return t('tables', 'Searching …')
-			}
-			return t('tables', 'No elements found.')
-		},
 	},
 
 	mounted() {
@@ -139,128 +86,61 @@ export default {
 			this.$emit('add', share)
 		},
 
-		async asyncFind(query) {
-			// save current query to check if we display
-			// recommendations or search results
-			this.query = query.trim()
-			if (this.isValidQuery) {
-				// start loading now to have proper ux feedback
-				// during the debounce
-				this.loading = true
-				await this.debounceGetSuggestions(query)
-			}
-		},
-
-		/**
-		 * Get suggestions
-		 *
-		 * @param {string} search the search query
-		 */
-		async getSuggestions(search) {
-			this.loading = true
-
-			const shareType = [
-				this.SHARE_TYPES.SHARE_TYPE_USER,
-				this.SHARE_TYPES.SHARE_TYPE_GROUP,
-			]
-
-			const request = await axios.get(generateOcsUrl('apps/files_sharing/api/v1/sharees'), {
-				params: {
-					format: 'json',
-					itemType: 'file',
-					search,
-					perPage: this.maxAutocompleteResults,
-					shareType,
-				},
-			})
-
-			const data = request.data.ocs.data
-			const exact = data.exact
-			data.exact = [] // removing exact from general results
-
-			// flatten array of arrays
-			const rawExactSuggestions = Object.values(exact).reduce((arr, elem) => arr.concat(elem), [])
-			const rawSuggestions = Object.values(data).reduce((arr, elem) => arr.concat(elem), [])
-
-			// remove invalid data and format to user-select layout
-			const exactSuggestions = this.filterOutUnwantedShares(rawExactSuggestions)
-				.map(share => this.formatForMultiselect(share))
-			// sort by type so we can get user&groups first...
-				.sort((a, b) => a.shareType - b.shareType)
-			const suggestions = this.filterOutUnwantedShares(rawSuggestions)
-				.map(share => this.formatForMultiselect(share))
-			// sort by type so we can get user&groups first...
-				.sort((a, b) => a.shareType - b.shareType)
-
-			this.suggestions = exactSuggestions.concat(suggestions)
-
-			this.loading = false
-			// console.info('suggestions', this.suggestions)
-		},
-
-		/**
-		 * Debounce getSuggestions
-		 *
-		 * @param {...*} args the arguments
-		 */
-		debounceGetSuggestions: debounce(function(...args) {
-			this.getSuggestions(...args)
-		}, 300),
-
 		/**
 		 * Get the sharing recommendations
 		 */
 		async getRecommendations() {
 			this.loading = true
 
-			const request = await axios.get(generateOcsUrl('apps/files_sharing/api/v1/sharees_recommended'), {
-				params: {
-					format: 'json',
-					itemType: 'file',
-				},
-			})
+			try {
+				const request = await axios.get(generateOcsUrl('apps/files_sharing/api/v1/sharees_recommended'), {
+					params: {
+						format: 'json',
+						itemType: 'file',
+					},
+				})
 
-			const exact = request.data.ocs.data.exact
+				const exact = request.data.ocs.data.exact
 
-			// flatten array of arrays
-			const rawRecommendations = Object.values(exact).reduce((arr, elem) => arr.concat(elem), [])
+				// flatten array of arrays
+				let rawRecommendations = Object.values(exact).reduce((arr, elem) => arr.concat(elem), [])
+				console.info('recommendations', rawRecommendations)
 
-			// remove invalid data and format to user-select layout
-			this.recommendations = this.filterOutUnwantedShares(rawRecommendations)
-				.map(share => this.formatForMultiselect(share))
-
-			this.loading = false
-			console.info('recommendations', this.recommendations)
+				rawRecommendations = rawRecommendations.map(result => {
+					return this.formatRecommendations(result)
+				})
+				this.recommendations = this.filterOutUnwantedItems(rawRecommendations)
+				this.loading = false
+			} catch (err) {
+				console.debug(err)
+				showError(t('tables', 'Failed to fetch share recommendations'))
+			}
 		},
 
-		/**
-		 * Filter out unwanted shares
-		 *
-		 * @param {object[]} shares the array of shares objects
-		 * @return {object}
-		 */
-		filterOutUnwantedShares(shares) {
-			return shares.reduce((arr, share) => {
-				// only check proper objects
-				if (typeof share !== 'object') {
-					return arr
-				}
+		filterOutUnwantedItems(items) {
+			const shareTypesList = this.getShareTypes()
+			const shareTypes = { 0: 'user', 1: 'group' }
 
-				try {
-					// filter out current user
-					if (share.value.shareType === this.SHARE_TYPES.SHARE_TYPE_USER
-							&& share.value.shareWith === getCurrentUser().uid) {
-						return arr
-					}
+			// Filter out current user and sort
+			items = items.filter((item) => !(item.shareType === this.SHARE_TYPES.SHARE_TYPE_USER && item.shareWith === this.currentUserId)).sort((a, b) => a.shareType - b.shareType)
 
-					// ALL GOOD
-					// let's add the suggestion
-					arr.push(share)
-				} catch {
-					return arr
-				}
-				return arr
-			}, [])
+			// Filter out non-valid share types
+			items = items.filter((item) => (shareTypesList.includes(item.shareType)))
+
+			// Filter out existing shares
+			return items.filter(item => !this.shares.find(share => share.receiver === item.shareWith && share.receiverType === shareTypes[item.shareType]))
+		},
+
+		formatResult(result) {
+			return {
+				shareWith: result.id,
+				shareType: result.source.startsWith('users') ? this.SHARE_TYPES.SHARE_TYPE_USER : this.SHARE_TYPES.SHARE_TYPE_GROUP,
+				user: result.id,
+				isNoUser: !result.source.startsWith('users'),
+				displayName: result.label,
+				icon: result.icon || result.source.startsWith('users') ? 'icon-user' : 'icon-group',
+				key: result.source + '-' + result.id,
+			}
 		},
 
 		/**
@@ -269,45 +149,16 @@ export default {
 		 * @param {object} result select entry item
 		 * @return {object}
 		 */
-		formatForMultiselect(result) {
+		formatRecommendations(result) {
 			return {
 				shareWith: result.value.shareWith,
 				shareType: result.value.shareType,
 				user: result.uuid || result.value.shareWith,
 				isNoUser: result.value.shareType !== this.SHARE_TYPES.SHARE_TYPE_USER,
 				displayName: result.name || result.label,
-				icon: this.shareTypeToIcon(result.value.shareType),
+				icon: result.value.shareType === this.SHARE_TYPES.SHARE_TYPE_USER ? 'icon-user' : 'icon-group',
 				// Vue unique binding to render within Multiselect's AvatarSelectOption
 				key: result.uuid || result.value.shareWith + '-' + result.value.shareType + '-' + result.name || result.label,
-			}
-		},
-
-		/**
-		 * Get the icon based on the share type
-		 *
-		 * @param {number} type the share type
-		 * @return {string} the icon class
-		 */
-		shareTypeToIcon(type) {
-			switch (type) {
-			case this.SHARE_TYPES.SHARE_TYPE_GUEST:
-				// default is a user, other icons are here to differenciate
-				// themselves from it, so let's not display the user icon
-				// case this.SHARE_TYPES.SHARE_TYPE_REMOTE:
-				// case this.SHARE_TYPES.SHARE_TYPE_USER:
-				return 'icon-user'
-			case this.SHARE_TYPES.SHARE_TYPE_REMOTE_GROUP:
-			case this.SHARE_TYPES.SHARE_TYPE_GROUP:
-				return 'icon-group'
-			case this.SHARE_TYPES.SHARE_TYPE_EMAIL:
-				return 'icon-mail'
-			case this.SHARE_TYPES.SHARE_TYPE_CIRCLE:
-				return 'icon-circle'
-			case this.SHARE_TYPES.SHARE_TYPE_ROOM:
-				return 'icon-room'
-
-			default:
-				return ''
 			}
 		},
 
@@ -316,10 +167,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .multiselect {
 	width: 100% !important;
 	max-width: 100% !important;
 }
-
 </style>

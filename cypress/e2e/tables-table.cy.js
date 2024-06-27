@@ -99,7 +99,7 @@ describe('Manage a table', () => {
 		cy.get('[data-cy="editTableModal"]').should('not.exist')
 		cy.get('[data-cy="transferTableModal"]').should('be.visible')
 		cy.get('[data-cy="transferTableModal"] input[type="search"]').clear().type(targetUserTransfer.userId)
-		cy.get(`.vs__dropdown-menu [user="${targetUserTransfer.userId}"]`).click()
+		cy.get(`.vs__dropdown-menu [id="${targetUserTransfer.userId}"]`).click()
 		cy.get('[data-cy="transferTableButton"]').should('be.enabled').click()
 		cy.get('.toastify.toast-success').should('be.visible')
 		cy.get('.app-navigation__list').contains('test table').should('not.exist')

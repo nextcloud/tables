@@ -10,7 +10,7 @@
 			</div>
 			<div class="row">
 				<h3>{{ t('tables', 'Transfer this application to another user') }}</h3>
-				<NcUserAndGroupPicker :select-users="true" :select-groups="false" :new-owner-user-id.sync="newOwnerId" />
+				<NcUserPicker :select-users="true" :select-groups="false" :selected-user-id.sync="newOwnerId" />
 			</div>
 			<div class="row">
 				<div class="fix-col-4 space-T end">
@@ -28,7 +28,7 @@ import { NcModal, NcButton } from '@nextcloud/vue'
 import { showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
-import NcUserAndGroupPicker from '../../shared/components/ncUserAndGroupPicker/NcUserAndGroupPicker.vue'
+import NcUserPicker from '../../shared/components/ncUserPicker/NcUserPicker.vue'
 import { mapGetters, mapState } from 'vuex'
 import { getCurrentUser } from '@nextcloud/auth'
 
@@ -37,7 +37,7 @@ export default {
 	components: {
 		NcModal,
 		NcButton,
-		NcUserAndGroupPicker,
+		NcUserPicker,
 	},
 	mixins: [permissionsMixin],
 	props: {
