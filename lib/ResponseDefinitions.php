@@ -53,7 +53,7 @@ namespace OCA\Tables;
  * 		create: bool,
  *     	update: bool,
  * 		delete: bool,
- * 		manage: bool
+ * 		manage: bool,
  * 	},
  *  hasShares: bool,
  *  rowsCount: int,

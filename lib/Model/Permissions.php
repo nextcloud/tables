@@ -2,7 +2,9 @@
 
 namespace OCA\Tables\Model;
 
-class Permissions {
+use JsonSerializable;
+
+class Permissions implements JsonSerializable {
 	public function __construct(
 		public bool $read = false,
 		public bool $create = false,
@@ -11,5 +13,19 @@ class Permissions {
 		public bool $manage = false,
 		public bool $manageTable = false,
 	) {
+	}
+
+	/**
+	 * @return array{read: bool, create: bool, update: bool, delete: bool, manage: bool}
+	 */
+	public function jsonSerialize(): array {
+		// manageTable is not serialized as it is used in the backend only
+		return [
+			'read' => $this->read,
+			'create' => $this->create,
+			'update' => $this->update,
+			'delete' => $this->delete,
+			'manage' => $this->manage,
+		];
 	}
 }
