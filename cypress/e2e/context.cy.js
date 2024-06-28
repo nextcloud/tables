@@ -61,7 +61,7 @@ describe('Manage a context', () => {
         cy.get('[data-cy="contextResourceForm"] input').clear().type(tableTitle)
         cy.get('ul.vs__dropdown-menu li div').contains(tableTitle).click()
         cy.get('[data-cy="contextResourceShare"] input').clear().type(nonLocalUser.userId)
-        cy.get(`.vs__dropdown-menu [user="${nonLocalUser.userId}"]`).click()
+        cy.get(`.vs__dropdown-menu [id="${nonLocalUser.userId}"]`).click()
         cy.get('[data-cy="contextResourceShare"] span').contains(nonLocalUser.userId).should('exist')
         cy.get('[data-cy="editContextSubmitBtn"]').click()
         cy.loadContext(contextTitle)
@@ -88,7 +88,7 @@ describe('Manage a context', () => {
         cy.get('[data-cy="transferContextSubmitBtn"]').click()
         cy.get('[data-cy="transferContextModal"]').should('be.visible')
         cy.get('[data-cy="transferContextModal"] input').clear().type(nonLocalUser.userId)
-        cy.get(`.vs__dropdown-menu [user="${nonLocalUser.userId}"]`).click()
+        cy.get(`.vs__dropdown-menu [id="${nonLocalUser.userId}"]`).click()
         cy.get('[data-cy="transferContextButton"]').click()
 
         // verify that context was properly transferred
@@ -103,7 +103,7 @@ describe('Manage a context', () => {
         cy.loadContext(contextTitle)
         cy.openContextEditModal(contextTitle)
         cy.get('[data-cy="contextResourceShare"] input').clear().type(nonLocalUser.userId)
-        cy.get(`.vs__dropdown-menu [user="${nonLocalUser.userId}"]`).click()
+        cy.get(`.vs__dropdown-menu [id="${nonLocalUser.userId}"]`).click()
         cy.get('[data-cy="contextResourceShare"] span').contains(nonLocalUser.userId).should('exist')
         cy.get('[data-cy="editContextSubmitBtn"]').click()  
         cy.wait(1000)
@@ -177,7 +177,7 @@ describe('Manage a context', () => {
         cy.get('li [aria-checked="true"]').contains('Delete resource').should('exist')
         
         cy.get('[data-cy="contextResourceShare"] input').clear().type(nonLocalUser.userId)
-        cy.get(`.vs__dropdown-menu [user="${nonLocalUser.userId}"]`).click()
+        cy.get(`.vs__dropdown-menu [id="${nonLocalUser.userId}"]`).click()
         cy.get('[data-cy="contextResourceShare"] span').contains(nonLocalUser.userId).should('exist')
         cy.get('[data-cy="editContextSubmitBtn"]').click()
         cy.contains('h1', contextTitle).should('exist')
