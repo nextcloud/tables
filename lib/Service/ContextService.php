@@ -138,7 +138,7 @@ class ContextService {
 	 * @psalm-param list<array{id: int, type: int, permissions?: int, order?: int}> $nodes
 	 * @throws Exception
 	 * @throws DoesNotExistException
-	 * @throws MultipleObjectsReturnedException
+	 * @throws PermissionError|MultipleObjectsReturnedException
 	 */
 	public function update(int $contextId, string $userId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): Context {
 		$context = $this->contextMapper->findById($contextId, $userId);
@@ -207,6 +207,12 @@ class ContextService {
 			unset($nodesBeingRemoved);
 
 			foreach ($nodesBeingAdded as $node) {
+				$nodeType = (int)($node['type']);
+				$nodeId = (int)($node['id']);
+				if (!$this->permissionsService->canManageNodeById($nodeType, $nodeId, $userId)) {
+					throw new PermissionError(sprintf('Owner cannot manage node %d (type %d)', $nodeId, $nodeType));
+				}
+
 				/** @var ContextNodeRelation $addedNode */
 				/** @var PageContent $updatedContent */
 				[$addedNode, $updatedContent] = $this->addNodeToContextAndStartpage(
