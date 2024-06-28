@@ -134,15 +134,15 @@
                     },
                     "numberDefault": {
                         "type": "number",
-                        "format": "float"
+                        "format": "double"
                     },
                     "numberMin": {
                         "type": "number",
-                        "format": "float"
+                        "format": "double"
                     },
                     "numberMax": {
                         "type": "number",
-                        "format": "float"
+                        "format": "double"
                     },
                     "numberDecimals": {
                         "type": "integer",
@@ -662,7 +662,7 @@
                                         ]
                                     },
                                     "value": {
-                                        "oneOf": [
+                                        "anyOf": [
                                             {
                                                 "type": "string"
                                             },
@@ -672,7 +672,7 @@
                                             },
                                             {
                                                 "type": "number",
-                                                "format": "float"
+                                                "format": "double"
                                             }
                                         ]
                                     }
@@ -728,7 +728,7 @@
     "paths": {
         "/index.php/apps/tables/api/1/tables": {
             "get": {
-                "operationId": "api1-list",
+                "operationId": "api1-index",
                 "summary": "Returns all Tables",
                 "tags": [
                     "api1"
@@ -783,35 +783,35 @@
                         "basic_auth": []
                     }
                 ],
-                "parameters": [
-                    {
-                        "name": "title",
-                        "in": "query",
-                        "description": "Title of the table",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "emoji",
-                        "in": "query",
-                        "description": "Emoji for the table",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "template",
-                        "in": "query",
-                        "description": "Template to use if wanted",
-                        "schema": {
-                            "type": "string",
-                            "default": "custom"
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "title"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "description": "Title of the table"
+                                    },
+                                    "emoji": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Emoji for the table"
+                                    },
+                                    "template": {
+                                        "type": "string",
+                                        "default": "custom",
+                                        "description": "Template to use if wanted"
+                                    }
+                                }
+                            }
                         }
                     }
-                ],
+                },
                 "responses": {
                     "200": {
                         "description": "Tables returned",
@@ -856,38 +856,34 @@
                         "basic_auth": []
                     }
                 ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "New table title"
+                                    },
+                                    "emoji": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "New table emoji"
+                                    },
+                                    "archived": {
+                                        "type": "boolean",
+                                        "default": false,
+                                        "description": "Whether the table is archived"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "parameters": [
-                    {
-                        "name": "title",
-                        "in": "query",
-                        "description": "New table title",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "emoji",
-                        "in": "query",
-                        "description": "New table emoji",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "archived",
-                        "in": "query",
-                        "description": "Whether the table is archived",
-                        "schema": {
-                            "type": "integer",
-                            "default": 0,
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
                     {
                         "name": "tableId",
                         "in": "path",
@@ -1149,7 +1145,7 @@
         },
         "/index.php/apps/tables/api/1/tables/{tableId}/views": {
             "get": {
-                "operationId": "api1-list-views",
+                "operationId": "api1-index-views",
                 "summary": "Get all views for a table",
                 "tags": [
                     "api1"
@@ -1252,25 +1248,31 @@
                         "basic_auth": []
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "title"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "description": "Title for the view"
+                                    },
+                                    "emoji": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Emoji for the view"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "parameters": [
-                    {
-                        "name": "title",
-                        "in": "query",
-                        "description": "Title for the view",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "emoji",
-                        "in": "query",
-                        "description": "Emoji for the view",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
                     {
                         "name": "tableId",
                         "in": "path",
@@ -1452,152 +1454,162 @@
                         "basic_auth": []
                     }
                 ],
-                "parameters": [
-                    {
-                        "name": "data",
-                        "in": "query",
-                        "description": "key-value pairs",
-                        "required": true,
-                        "schema": {
-                            "oneOf": [
-                                {
-                                    "type": "object",
-                                    "required": [
-                                        "key",
-                                        "value"
-                                    ],
-                                    "properties": {
-                                        "key": {
-                                            "type": "string",
-                                            "enum": [
-                                                "title",
-                                                "emoji",
-                                                "description"
-                                            ]
-                                        },
-                                        "value": {
-                                            "type": "string"
-                                        }
-                                    }
-                                },
-                                {
-                                    "type": "object",
-                                    "required": [
-                                        "key",
-                                        "value"
-                                    ],
-                                    "properties": {
-                                        "key": {
-                                            "type": "string",
-                                            "enum": [
-                                                "columns"
-                                            ]
-                                        },
-                                        "value": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "integer",
-                                                "format": "int64"
-                                            }
-                                        }
-                                    }
-                                },
-                                {
-                                    "type": "object",
-                                    "required": [
-                                        "key",
-                                        "value"
-                                    ],
-                                    "properties": {
-                                        "key": {
-                                            "type": "string",
-                                            "enum": [
-                                                "sort"
-                                            ]
-                                        },
-                                        "value": {
-                                            "type": "object",
-                                            "required": [
-                                                "columnId",
-                                                "mode"
-                                            ],
-                                            "properties": {
-                                                "columnId": {
-                                                    "type": "integer",
-                                                    "format": "int64"
-                                                },
-                                                "mode": {
-                                                    "type": "string",
-                                                    "enum": [
-                                                        "ASC",
-                                                        "DESC"
-                                                    ]
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "description": "key-value pairs",
+                                        "anyOf": [
+                                            {
+                                                "type": "object",
+                                                "required": [
+                                                    "key",
+                                                    "value"
+                                                ],
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "title",
+                                                            "emoji",
+                                                            "description"
+                                                        ]
+                                                    },
+                                                    "value": {
+                                                        "type": "string"
+                                                    }
                                                 }
-                                            }
-                                        }
-                                    }
-                                },
-                                {
-                                    "type": "object",
-                                    "required": [
-                                        "key",
-                                        "value"
-                                    ],
-                                    "properties": {
-                                        "key": {
-                                            "type": "string",
-                                            "enum": [
-                                                "filter"
-                                            ]
-                                        },
-                                        "value": {
-                                            "type": "object",
-                                            "required": [
-                                                "columnId",
-                                                "operator",
-                                                "value"
-                                            ],
-                                            "properties": {
-                                                "columnId": {
-                                                    "type": "integer",
-                                                    "format": "int64"
-                                                },
-                                                "operator": {
-                                                    "type": "string",
-                                                    "enum": [
-                                                        "begins-with",
-                                                        "ends-with",
-                                                        "contains",
-                                                        "is-equal",
-                                                        "is-greater-than",
-                                                        "is-greater-than-or-equal",
-                                                        "is-lower-than",
-                                                        "is-lower-than-or-equal",
-                                                        "is-empty"
-                                                    ]
-                                                },
-                                                "value": {
-                                                    "oneOf": [
-                                                        {
-                                                            "type": "string"
-                                                        },
-                                                        {
+                                            },
+                                            {
+                                                "type": "object",
+                                                "required": [
+                                                    "key",
+                                                    "value"
+                                                ],
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "columns"
+                                                        ]
+                                                    },
+                                                    "value": {
+                                                        "type": "array",
+                                                        "items": {
                                                             "type": "integer",
                                                             "format": "int64"
-                                                        },
-                                                        {
-                                                            "type": "number",
-                                                            "format": "float"
                                                         }
-                                                    ]
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "object",
+                                                "required": [
+                                                    "key",
+                                                    "value"
+                                                ],
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "sort"
+                                                        ]
+                                                    },
+                                                    "value": {
+                                                        "type": "object",
+                                                        "required": [
+                                                            "columnId",
+                                                            "mode"
+                                                        ],
+                                                        "properties": {
+                                                            "columnId": {
+                                                                "type": "integer",
+                                                                "format": "int64"
+                                                            },
+                                                            "mode": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "ASC",
+                                                                    "DESC"
+                                                                ]
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "object",
+                                                "required": [
+                                                    "key",
+                                                    "value"
+                                                ],
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "filter"
+                                                        ]
+                                                    },
+                                                    "value": {
+                                                        "type": "object",
+                                                        "required": [
+                                                            "columnId",
+                                                            "operator",
+                                                            "value"
+                                                        ],
+                                                        "properties": {
+                                                            "columnId": {
+                                                                "type": "integer",
+                                                                "format": "int64"
+                                                            },
+                                                            "operator": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "begins-with",
+                                                                    "ends-with",
+                                                                    "contains",
+                                                                    "is-equal",
+                                                                    "is-greater-than",
+                                                                    "is-greater-than-or-equal",
+                                                                    "is-lower-than",
+                                                                    "is-lower-than-or-equal",
+                                                                    "is-empty"
+                                                                ]
+                                                            },
+                                                            "value": {
+                                                                "anyOf": [
+                                                                    {
+                                                                        "type": "string"
+                                                                    },
+                                                                    {
+                                                                        "type": "integer",
+                                                                        "format": "int64"
+                                                                    },
+                                                                    {
+                                                                        "type": "number",
+                                                                        "format": "double"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                             }
-                                        }
+                                        ]
                                     }
                                 }
-                            ]
+                            }
                         }
-                    },
+                    }
+                },
+                "parameters": [
                     {
                         "name": "viewId",
                         "in": "path",
@@ -1941,29 +1953,31 @@
                         "basic_auth": []
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "permissionType",
+                                    "permissionValue"
+                                ],
+                                "properties": {
+                                    "permissionType": {
+                                        "type": "string",
+                                        "description": "Permission type that should be changed"
+                                    },
+                                    "permissionValue": {
+                                        "type": "boolean",
+                                        "description": "New permission value"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "parameters": [
-                    {
-                        "name": "permissionType",
-                        "in": "query",
-                        "description": "Permission type that should be changed",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "permissionValue",
-                        "in": "query",
-                        "description": "New permission value",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
                     {
                         "name": "shareId",
                         "in": "path",
@@ -2045,7 +2059,7 @@
         },
         "/index.php/apps/tables/api/1/views/{viewId}/shares": {
             "get": {
-                "operationId": "api1-list-view-shares",
+                "operationId": "api1-index-view-shares",
                 "summary": "Get all shares for a view Will be empty if view does not exist",
                 "tags": [
                     "api1"
@@ -2104,7 +2118,7 @@
         },
         "/index.php/apps/tables/api/1/tables/{tableId}/shares": {
             "get": {
-                "operationId": "api1-list-table-shares",
+                "operationId": "api1-index-table-shares",
                 "summary": "Get all shares for a table Will be empty if table does not exist",
                 "tags": [
                     "api1"
@@ -2171,94 +2185,60 @@
                         "basic_auth": []
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "receiver",
+                                    "receiverType",
+                                    "permissionRead",
+                                    "permissionCreate",
+                                    "permissionUpdate",
+                                    "permissionDelete",
+                                    "permissionManage"
+                                ],
+                                "properties": {
+                                    "receiver": {
+                                        "type": "string",
+                                        "description": "Receiver ID"
+                                    },
+                                    "receiverType": {
+                                        "type": "string",
+                                        "enum": [
+                                            "user",
+                                            "group"
+                                        ],
+                                        "description": "Receiver type"
+                                    },
+                                    "permissionRead": {
+                                        "type": "boolean",
+                                        "description": "Permission if receiver can read data"
+                                    },
+                                    "permissionCreate": {
+                                        "type": "boolean",
+                                        "description": "Permission if receiver can create data"
+                                    },
+                                    "permissionUpdate": {
+                                        "type": "boolean",
+                                        "description": "Permission if receiver can update data"
+                                    },
+                                    "permissionDelete": {
+                                        "type": "boolean",
+                                        "description": "Permission if receiver can delete data"
+                                    },
+                                    "permissionManage": {
+                                        "type": "boolean",
+                                        "description": "Permission if receiver can manage table"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "parameters": [
-                    {
-                        "name": "receiver",
-                        "in": "query",
-                        "description": "Receiver ID",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "receiverType",
-                        "in": "query",
-                        "description": "Receiver type",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "user",
-                                "group"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "permissionRead",
-                        "in": "query",
-                        "description": "Permission if receiver can read data",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
-                    {
-                        "name": "permissionCreate",
-                        "in": "query",
-                        "description": "Permission if receiver can create data",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
-                    {
-                        "name": "permissionUpdate",
-                        "in": "query",
-                        "description": "Permission if receiver can update data",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
-                    {
-                        "name": "permissionDelete",
-                        "in": "query",
-                        "description": "Permission if receiver can delete data",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
-                    {
-                        "name": "permissionManage",
-                        "in": "query",
-                        "description": "Permission if receiver can manage table",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
                     {
                         "name": "tableId",
                         "in": "path",
@@ -2350,129 +2330,81 @@
                         "basic_auth": []
                     }
                 ],
-                "parameters": [
-                    {
-                        "name": "nodeId",
-                        "in": "query",
-                        "description": "Node ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        }
-                    },
-                    {
-                        "name": "nodeType",
-                        "in": "query",
-                        "description": "Node type",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "table",
-                                "view",
-                                "context"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "receiver",
-                        "in": "query",
-                        "description": "Receiver ID",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "receiverType",
-                        "in": "query",
-                        "description": "Receiver type",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "user",
-                                "group"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "permissionRead",
-                        "in": "query",
-                        "description": "Permission if receiver can read data",
-                        "schema": {
-                            "type": "integer",
-                            "default": 0,
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
-                    {
-                        "name": "permissionCreate",
-                        "in": "query",
-                        "description": "Permission if receiver can create data",
-                        "schema": {
-                            "type": "integer",
-                            "default": 0,
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
-                    {
-                        "name": "permissionUpdate",
-                        "in": "query",
-                        "description": "Permission if receiver can update data",
-                        "schema": {
-                            "type": "integer",
-                            "default": 0,
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
-                    {
-                        "name": "permissionDelete",
-                        "in": "query",
-                        "description": "Permission if receiver can delete data",
-                        "schema": {
-                            "type": "integer",
-                            "default": 0,
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
-                    {
-                        "name": "permissionManage",
-                        "in": "query",
-                        "description": "Permission if receiver can manage node",
-                        "schema": {
-                            "type": "integer",
-                            "default": 0,
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
-                    {
-                        "name": "displayMode",
-                        "in": "query",
-                        "description": "context shares only, whether it should appear in nav bar. 0: no, 1: recipients, 2: all",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "default": 0
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "nodeId",
+                                    "nodeType",
+                                    "receiver",
+                                    "receiverType"
+                                ],
+                                "properties": {
+                                    "nodeId": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "description": "Node ID"
+                                    },
+                                    "nodeType": {
+                                        "type": "string",
+                                        "enum": [
+                                            "table",
+                                            "view",
+                                            "context"
+                                        ],
+                                        "description": "Node type"
+                                    },
+                                    "receiver": {
+                                        "type": "string",
+                                        "description": "Receiver ID"
+                                    },
+                                    "receiverType": {
+                                        "type": "string",
+                                        "enum": [
+                                            "user",
+                                            "group"
+                                        ],
+                                        "description": "Receiver type"
+                                    },
+                                    "permissionRead": {
+                                        "type": "boolean",
+                                        "default": false,
+                                        "description": "Permission if receiver can read data"
+                                    },
+                                    "permissionCreate": {
+                                        "type": "boolean",
+                                        "default": false,
+                                        "description": "Permission if receiver can create data"
+                                    },
+                                    "permissionUpdate": {
+                                        "type": "boolean",
+                                        "default": false,
+                                        "description": "Permission if receiver can update data"
+                                    },
+                                    "permissionDelete": {
+                                        "type": "boolean",
+                                        "default": false,
+                                        "description": "Permission if receiver can delete data"
+                                    },
+                                    "permissionManage": {
+                                        "type": "boolean",
+                                        "default": false,
+                                        "description": "Permission if receiver can manage node"
+                                    },
+                                    "displayMode": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "default": 0,
+                                        "description": "context shares only, whether it should appear in nav bar. 0: no, 1: recipients, 2: all"
+                                    }
+                                }
+                            }
                         }
                     }
-                ],
+                },
                 "responses": {
                     "200": {
                         "description": "Share returned",
@@ -2553,32 +2485,38 @@
                         "basic_auth": []
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "displayMode"
+                                ],
+                                "properties": {
+                                    "displayMode": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "description": "The new value for the display mode of the nav bar icon. 0: hidden, 1: visible for recipients, 2: visible for all",
+                                        "minimum": 0,
+                                        "maximum": 2
+                                    },
+                                    "target": {
+                                        "type": "string",
+                                        "default": "default",
+                                        "enum": [
+                                            "default",
+                                            "self"
+                                        ],
+                                        "description": "\"default\" to set the default, \"self\" to set an override for the authenticated user"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "parameters": [
-                    {
-                        "name": "displayMode",
-                        "in": "query",
-                        "description": "The new value for the display mode of the nav bar icon. 0: hidden, 1: visible for recipients, 2: visible for all",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "minimum": 0,
-                            "maximum": 2
-                        }
-                    },
-                    {
-                        "name": "target",
-                        "in": "query",
-                        "description": "\"default\" to set the default, \"self\" to set an override for the authenticated user",
-                        "schema": {
-                            "type": "string",
-                            "default": "default",
-                            "enum": [
-                                "default",
-                                "self"
-                            ]
-                        }
-                    },
                     {
                         "name": "shareId",
                         "in": "path",
@@ -2678,7 +2616,7 @@
         },
         "/index.php/apps/tables/api/1/tables/{tableId}/columns": {
             "get": {
-                "operationId": "api1-list-table-columns",
+                "operationId": "api1-index-table-columns",
                 "summary": "Get all columns for a table or a underlying view Return an empty array if no columns were found",
                 "tags": [
                     "api1"
@@ -2688,17 +2626,25 @@
                         "basic_auth": []
                     }
                 ],
-                "parameters": [
-                    {
-                        "name": "viewId",
-                        "in": "query",
-                        "description": "View ID",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "nullable": true
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "viewId": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "description": "View ID"
+                                    }
+                                }
+                            }
                         }
-                    },
+                    }
+                },
+                "parameters": [
                     {
                         "name": "tableId",
                         "in": "path",
@@ -2791,192 +2737,130 @@
                         "basic_auth": []
                     }
                 ],
-                "parameters": [
-                    {
-                        "name": "title",
-                        "in": "query",
-                        "description": "Title",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "type",
-                        "in": "query",
-                        "description": "Column main type",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "text",
-                                "number",
-                                "datetime",
-                                "select"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "subtype",
-                        "in": "query",
-                        "description": "Column sub type",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "mandatory",
-                        "in": "query",
-                        "description": "Is the column mandatory",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
-                    {
-                        "name": "description",
-                        "in": "query",
-                        "description": "Description",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberPrefix",
-                        "in": "query",
-                        "description": "Prefix if the column is a number field",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberSuffix",
-                        "in": "query",
-                        "description": "Suffix if the column is a number field",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberDefault",
-                        "in": "query",
-                        "description": "Default number, if column is a number",
-                        "schema": {
-                            "type": "number",
-                            "format": "float",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberMin",
-                        "in": "query",
-                        "description": "Min value, if column is a number",
-                        "schema": {
-                            "type": "number",
-                            "format": "float",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberMax",
-                        "in": "query",
-                        "description": "Max number, if column is a number",
-                        "schema": {
-                            "type": "number",
-                            "format": "float",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberDecimals",
-                        "in": "query",
-                        "description": "Number of decimals, if column is a number",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "textDefault",
-                        "in": "query",
-                        "description": "Default text, if column is a text",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "textAllowedPattern",
-                        "in": "query",
-                        "description": "Allowed pattern (regex) for text columns (not yet implemented)",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "textMaxLength",
-                        "in": "query",
-                        "description": "Max length, if column is a text",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "selectionOptions",
-                        "in": "query",
-                        "description": "Options for a selection (json array{id: int, label: string})",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true,
-                            "default": ""
-                        }
-                    },
-                    {
-                        "name": "selectionDefault",
-                        "in": "query",
-                        "description": "Default option IDs for a selection (json int[])",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true,
-                            "default": ""
-                        }
-                    },
-                    {
-                        "name": "datetimeDefault",
-                        "in": "query",
-                        "description": "Default value, if column is datetime",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true,
-                            "default": ""
-                        }
-                    },
-                    {
-                        "name": "selectedViewIds[]",
-                        "in": "query",
-                        "description": "View IDs where this column should be added to be presented",
-                        "schema": {
-                            "type": "array",
-                            "nullable": true,
-                            "default": [],
-                            "items": {
-                                "type": "integer",
-                                "format": "int64"
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "title",
+                                    "type",
+                                    "mandatory"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "description": "Title"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "text",
+                                            "number",
+                                            "datetime",
+                                            "select"
+                                        ],
+                                        "description": "Column main type"
+                                    },
+                                    "subtype": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Column sub type"
+                                    },
+                                    "mandatory": {
+                                        "type": "boolean",
+                                        "description": "Is the column mandatory"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Description"
+                                    },
+                                    "numberPrefix": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Prefix if the column is a number field"
+                                    },
+                                    "numberSuffix": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Suffix if the column is a number field"
+                                    },
+                                    "numberDefault": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "nullable": true,
+                                        "description": "Default number, if column is a number"
+                                    },
+                                    "numberMin": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "nullable": true,
+                                        "description": "Min value, if column is a number"
+                                    },
+                                    "numberMax": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "nullable": true,
+                                        "description": "Max number, if column is a number"
+                                    },
+                                    "numberDecimals": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "description": "Number of decimals, if column is a number"
+                                    },
+                                    "textDefault": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Default text, if column is a text"
+                                    },
+                                    "textAllowedPattern": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Allowed pattern (regex) for text columns (not yet implemented)"
+                                    },
+                                    "textMaxLength": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "description": "Max length, if column is a text"
+                                    },
+                                    "selectionOptions": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": "",
+                                        "description": "Options for a selection (json array{id: int, label: string})"
+                                    },
+                                    "selectionDefault": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": "",
+                                        "description": "Default option IDs for a selection (json int[])"
+                                    },
+                                    "datetimeDefault": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": "",
+                                        "description": "Default value, if column is datetime"
+                                    },
+                                    "selectedViewIds": {
+                                        "type": "array",
+                                        "nullable": true,
+                                        "default": [],
+                                        "description": "View IDs where this column should be added to be presented",
+                                        "items": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        }
+                                    }
+                                }
                             }
                         }
-                    },
+                    }
+                },
+                "parameters": [
                     {
                         "name": "tableId",
                         "in": "path",
@@ -3058,7 +2942,7 @@
         },
         "/index.php/apps/tables/api/1/views/{viewId}/columns": {
             "get": {
-                "operationId": "api1-list-view-columns",
+                "operationId": "api1-index-view-columns",
                 "summary": "Get all columns for a view Return an empty array if no columns were found",
                 "tags": [
                     "api1"
@@ -3163,213 +3047,141 @@
                         "basic_auth": []
                     }
                 ],
-                "parameters": [
-                    {
-                        "name": "tableId",
-                        "in": "query",
-                        "description": "Table ID",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "viewId",
-                        "in": "query",
-                        "description": "View ID",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "title",
-                        "in": "query",
-                        "description": "Title",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "type",
-                        "in": "query",
-                        "description": "Column main type",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "text",
-                                "number",
-                                "datetime",
-                                "select"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "subtype",
-                        "in": "query",
-                        "description": "Column sub type",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "mandatory",
-                        "in": "query",
-                        "description": "Is the column mandatory",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
-                    {
-                        "name": "description",
-                        "in": "query",
-                        "description": "Description",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberPrefix",
-                        "in": "query",
-                        "description": "Prefix if the column is a number field",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberSuffix",
-                        "in": "query",
-                        "description": "Suffix if the column is a number field",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberDefault",
-                        "in": "query",
-                        "description": "Default number, if column is a number",
-                        "schema": {
-                            "type": "number",
-                            "format": "float",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberMin",
-                        "in": "query",
-                        "description": "Min value, if column is a number",
-                        "schema": {
-                            "type": "number",
-                            "format": "float",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberMax",
-                        "in": "query",
-                        "description": "Max number, if column is a number",
-                        "schema": {
-                            "type": "number",
-                            "format": "float",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberDecimals",
-                        "in": "query",
-                        "description": "Number of decimals, if column is a number",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "textDefault",
-                        "in": "query",
-                        "description": "Default text, if column is a text",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "textAllowedPattern",
-                        "in": "query",
-                        "description": "Allowed pattern (regex) for text columns (not yet implemented)",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "textMaxLength",
-                        "in": "query",
-                        "description": "Max length, if column is a text",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "selectionOptions",
-                        "in": "query",
-                        "description": "Options for a selection (json array{id: int, label: string})",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true,
-                            "default": ""
-                        }
-                    },
-                    {
-                        "name": "selectionDefault",
-                        "in": "query",
-                        "description": "Default option IDs for a selection (json int[])",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true,
-                            "default": ""
-                        }
-                    },
-                    {
-                        "name": "datetimeDefault",
-                        "in": "query",
-                        "description": "Default value, if column is datetime",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true,
-                            "default": ""
-                        }
-                    },
-                    {
-                        "name": "selectedViewIds[]",
-                        "in": "query",
-                        "description": "View IDs where this column should be added to be presented",
-                        "schema": {
-                            "type": "array",
-                            "nullable": true,
-                            "default": [],
-                            "items": {
-                                "type": "integer",
-                                "format": "int64"
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "title",
+                                    "type",
+                                    "mandatory"
+                                ],
+                                "properties": {
+                                    "tableId": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "description": "Table ID"
+                                    },
+                                    "viewId": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "description": "View ID"
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "description": "Title"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "text",
+                                            "number",
+                                            "datetime",
+                                            "select"
+                                        ],
+                                        "description": "Column main type"
+                                    },
+                                    "subtype": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Column sub type"
+                                    },
+                                    "mandatory": {
+                                        "type": "boolean",
+                                        "description": "Is the column mandatory"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Description"
+                                    },
+                                    "numberPrefix": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Prefix if the column is a number field"
+                                    },
+                                    "numberSuffix": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Suffix if the column is a number field"
+                                    },
+                                    "numberDefault": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "nullable": true,
+                                        "description": "Default number, if column is a number"
+                                    },
+                                    "numberMin": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "nullable": true,
+                                        "description": "Min value, if column is a number"
+                                    },
+                                    "numberMax": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "nullable": true,
+                                        "description": "Max number, if column is a number"
+                                    },
+                                    "numberDecimals": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "description": "Number of decimals, if column is a number"
+                                    },
+                                    "textDefault": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Default text, if column is a text"
+                                    },
+                                    "textAllowedPattern": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Allowed pattern (regex) for text columns (not yet implemented)"
+                                    },
+                                    "textMaxLength": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "description": "Max length, if column is a text"
+                                    },
+                                    "selectionOptions": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": "",
+                                        "description": "Options for a selection (json array{id: int, label: string})"
+                                    },
+                                    "selectionDefault": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": "",
+                                        "description": "Default option IDs for a selection (json int[])"
+                                    },
+                                    "datetimeDefault": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": "",
+                                        "description": "Default value, if column is datetime"
+                                    },
+                                    "selectedViewIds": {
+                                        "type": "array",
+                                        "nullable": true,
+                                        "default": [],
+                                        "description": "View IDs where this column should be added to be presented",
+                                        "items": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
-                ],
+                },
                 "responses": {
                     "200": {
                         "description": "Column created",
@@ -3450,160 +3262,106 @@
                         "basic_auth": []
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "mandatory"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Title"
+                                    },
+                                    "subtype": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Column sub type"
+                                    },
+                                    "mandatory": {
+                                        "type": "boolean",
+                                        "description": "Is the column mandatory"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Description"
+                                    },
+                                    "numberPrefix": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Prefix if the column is a number field"
+                                    },
+                                    "numberSuffix": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Suffix if the column is a number field"
+                                    },
+                                    "numberDefault": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "nullable": true,
+                                        "description": "Default number, if column is a number"
+                                    },
+                                    "numberMin": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "nullable": true,
+                                        "description": "Min value, if column is a number"
+                                    },
+                                    "numberMax": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "nullable": true,
+                                        "description": "Max number, if column is a number"
+                                    },
+                                    "numberDecimals": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "description": "Number of decimals, if column is a number"
+                                    },
+                                    "textDefault": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Default text, if column is a text"
+                                    },
+                                    "textAllowedPattern": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Allowed pattern (regex) for text columns (not yet implemented)"
+                                    },
+                                    "textMaxLength": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "description": "Max length, if column is a text"
+                                    },
+                                    "selectionOptions": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Options for a selection (json array{id: int, label: string})"
+                                    },
+                                    "selectionDefault": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Default option IDs for a selection (json int[])"
+                                    },
+                                    "datetimeDefault": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Default value, if column is datetime"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "parameters": [
-                    {
-                        "name": "title",
-                        "in": "query",
-                        "description": "Title",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "subtype",
-                        "in": "query",
-                        "description": "Column sub type",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "mandatory",
-                        "in": "query",
-                        "description": "Is the column mandatory",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
-                    {
-                        "name": "description",
-                        "in": "query",
-                        "description": "Description",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberPrefix",
-                        "in": "query",
-                        "description": "Prefix if the column is a number field",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberSuffix",
-                        "in": "query",
-                        "description": "Suffix if the column is a number field",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberDefault",
-                        "in": "query",
-                        "description": "Default number, if column is a number",
-                        "schema": {
-                            "type": "number",
-                            "format": "float",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberMin",
-                        "in": "query",
-                        "description": "Min value, if column is a number",
-                        "schema": {
-                            "type": "number",
-                            "format": "float",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberMax",
-                        "in": "query",
-                        "description": "Max number, if column is a number",
-                        "schema": {
-                            "type": "number",
-                            "format": "float",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberDecimals",
-                        "in": "query",
-                        "description": "Number of decimals, if column is a number",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "textDefault",
-                        "in": "query",
-                        "description": "Default text, if column is a text",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "textAllowedPattern",
-                        "in": "query",
-                        "description": "Allowed pattern (regex) for text columns (not yet implemented)",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "textMaxLength",
-                        "in": "query",
-                        "description": "Max length, if column is a text",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "selectionOptions",
-                        "in": "query",
-                        "description": "Options for a selection (json array{id: int, label: string})",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "selectionDefault",
-                        "in": "query",
-                        "description": "Default option IDs for a selection (json int[])",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "datetimeDefault",
-                        "in": "query",
-                        "description": "Default value, if column is datetime",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
                     {
                         "name": "columnId",
                         "in": "path",
@@ -3829,7 +3587,7 @@
         },
         "/index.php/apps/tables/api/1/tables/{tableId}/rows/simple": {
             "get": {
-                "operationId": "api1-list-table-rows-simple",
+                "operationId": "api1-index-table-rows-simple",
                 "summary": "List all rows values for a table, first row are the column titles",
                 "tags": [
                     "api1"
@@ -3839,27 +3597,31 @@
                         "basic_auth": []
                     }
                 ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "limit": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "description": "Limit"
+                                    },
+                                    "offset": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "description": "Offset"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "parameters": [
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Limit",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "offset",
-                        "in": "query",
-                        "description": "Offset",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "nullable": true
-                        }
-                    },
                     {
                         "name": "tableId",
                         "in": "path",
@@ -3944,7 +3706,7 @@
         },
         "/index.php/apps/tables/api/1/tables/{tableId}/rows": {
             "get": {
-                "operationId": "api1-list-table-rows",
+                "operationId": "api1-index-table-rows",
                 "summary": "List all rows for a table",
                 "tags": [
                     "api1"
@@ -3954,27 +3716,31 @@
                         "basic_auth": []
                     }
                 ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "limit": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "description": "Limit"
+                                    },
+                                    "offset": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "description": "Offset"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "parameters": [
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Limit",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "offset",
-                        "in": "query",
-                        "description": "Offset",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "nullable": true
-                        }
-                    },
                     {
                         "name": "tableId",
                         "in": "path",
@@ -4090,9 +3856,11 @@
                                         }
                                     }
                                 }
-                            ]
+                            }
                         }
-                    },
+                    }
+                },
+                "parameters": [
                     {
                         "name": "tableId",
                         "in": "path",
@@ -4156,7 +3924,7 @@
         },
         "/index.php/apps/tables/api/1/views/{viewId}/rows": {
             "get": {
-                "operationId": "api1-list-view-rows",
+                "operationId": "api1-index-view-rows",
                 "summary": "List all rows for a view",
                 "tags": [
                     "api1"
@@ -4166,27 +3934,31 @@
                         "basic_auth": []
                     }
                 ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "limit": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "description": "Limit"
+                                    },
+                                    "offset": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "description": "Offset"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "parameters": [
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Limit",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "offset",
-                        "in": "query",
-                        "description": "Offset",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "nullable": true
-                        }
-                    },
                     {
                         "name": "viewId",
                         "in": "path",
@@ -4279,36 +4051,46 @@
                         "basic_auth": []
                     }
                 ],
-                "parameters": [
-                    {
-                        "name": "data",
-                        "in": "query",
-                        "description": "Data as key - value store",
-                        "required": true,
-                        "schema": {
-                            "oneOf": [
-                                {
-                                    "type": "string"
-                                },
-                                {
-                                    "type": "object",
-                                    "required": [
-                                        "columnId",
-                                        "value"
-                                    ],
-                                    "properties": {
-                                        "columnId": {
-                                            "type": "integer",
-                                            "format": "int64"
-                                        },
-                                        "value": {
-                                            "type": "object"
-                                        }
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "description": "Data as key - value store",
+                                        "oneOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "object",
+                                                "required": [
+                                                    "columnId",
+                                                    "value"
+                                                ],
+                                                "properties": {
+                                                    "columnId": {
+                                                        "type": "integer",
+                                                        "format": "int64"
+                                                    },
+                                                    "value": {
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            }
+                                        ]
                                     }
                                 }
-                            ]
+                            }
                         }
-                    },
+                    }
+                },
+                "parameters": [
                     {
                         "name": "viewId",
                         "in": "path",
@@ -4472,46 +4254,52 @@
                         "basic_auth": []
                     }
                 ],
-                "parameters": [
-                    {
-                        "name": "viewId",
-                        "in": "query",
-                        "description": "View ID",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "data",
-                        "in": "query",
-                        "description": "Data as key - value store",
-                        "required": true,
-                        "schema": {
-                            "oneOf": [
-                                {
-                                    "type": "string"
-                                },
-                                {
-                                    "type": "object",
-                                    "required": [
-                                        "columnId",
-                                        "value"
-                                    ],
-                                    "properties": {
-                                        "columnId": {
-                                            "type": "integer",
-                                            "format": "int64"
-                                        },
-                                        "value": {
-                                            "type": "object"
-                                        }
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "viewId": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "description": "View ID"
+                                    },
+                                    "data": {
+                                        "description": "Data as key - value store",
+                                        "oneOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "object",
+                                                "required": [
+                                                    "columnId",
+                                                    "value"
+                                                ],
+                                                "properties": {
+                                                    "columnId": {
+                                                        "type": "integer",
+                                                        "format": "int64"
+                                                    },
+                                                    "value": {
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            }
+                                        ]
                                     }
                                 }
-                            ]
+                            }
                         }
-                    },
+                    }
+                },
+                "parameters": [
                     {
                         "name": "rowId",
                         "in": "path",
@@ -4795,29 +4583,31 @@
                         "basic_auth": []
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "path"
+                                ],
+                                "properties": {
+                                    "path": {
+                                        "type": "string",
+                                        "description": "Path to file"
+                                    },
+                                    "createMissingColumns": {
+                                        "type": "boolean",
+                                        "default": true,
+                                        "description": "Create missing columns"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "parameters": [
-                    {
-                        "name": "path",
-                        "in": "query",
-                        "description": "Path to file",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "createMissingColumns",
-                        "in": "query",
-                        "description": "Create missing columns",
-                        "schema": {
-                            "type": "integer",
-                            "default": 1,
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
                     {
                         "name": "tableId",
                         "in": "path",
@@ -4909,29 +4699,31 @@
                         "basic_auth": []
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "path"
+                                ],
+                                "properties": {
+                                    "path": {
+                                        "type": "string",
+                                        "description": "Path to file"
+                                    },
+                                    "createMissingColumns": {
+                                        "type": "boolean",
+                                        "default": true,
+                                        "description": "Create missing columns"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "parameters": [
-                    {
-                        "name": "path",
-                        "in": "query",
-                        "description": "Path to file",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "createMissingColumns",
-                        "in": "query",
-                        "description": "Create missing columns",
-                        "schema": {
-                            "type": "integer",
-                            "default": 1,
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
                     {
                         "name": "viewId",
                         "in": "path",
@@ -5013,7 +4805,7 @@
         },
         "/ocs/v2.php/apps/tables/api/2/init": {
             "get": {
-                "operationId": "api_general-list",
+                "operationId": "api_general-index",
                 "summary": "[api v2] Returns all main resources",
                 "description": "Tables and views incl. shares",
                 "tags": [
@@ -5113,7 +4905,7 @@
         },
         "/ocs/v2.php/apps/tables/api/2/tables": {
             "get": {
-                "operationId": "api_tables-list",
+                "operationId": "api_tables-index",
                 "summary": "[api v2] Returns all Tables",
                 "tags": [
                     "api_tables"
@@ -5226,43 +5018,41 @@
                         "basic_auth": []
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "title"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "description": "Title of the table"
+                                    },
+                                    "emoji": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Emoji for the table"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Description for the table"
+                                    },
+                                    "template": {
+                                        "type": "string",
+                                        "default": "custom",
+                                        "description": "Template to use if wanted"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "parameters": [
-                    {
-                        "name": "title",
-                        "in": "query",
-                        "description": "Title of the table",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "emoji",
-                        "in": "query",
-                        "description": "Emoji for the table",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "description",
-                        "in": "query",
-                        "description": "Description for the table",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "template",
-                        "in": "query",
-                        "description": "Template to use if wanted",
-                        "schema": {
-                            "type": "string",
-                            "default": "custom"
-                        }
-                    },
                     {
                         "name": "OCS-APIRequest",
                         "in": "header",
@@ -5544,46 +5334,37 @@
                         "basic_auth": []
                     }
                 ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "New table title"
+                                    },
+                                    "emoji": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "New table emoji"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "description": "the tables description"
+                                    },
+                                    "archived": {
+                                        "type": "boolean",
+                                        "description": "whether the table is archived"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "parameters": [
-                    {
-                        "name": "title",
-                        "in": "query",
-                        "description": "New table title",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "emoji",
-                        "in": "query",
-                        "description": "New table emoji",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "description",
-                        "in": "query",
-                        "description": "the tables description",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "archived",
-                        "in": "query",
-                        "description": "whether the table is archived",
-                        "schema": {
-                            "type": "integer",
-                            "default": 0,
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
                     {
                         "name": "id",
                         "in": "path",
@@ -5952,16 +5733,26 @@
                         "basic_auth": []
                     }
                 ],
-                "parameters": [
-                    {
-                        "name": "newOwnerUserId",
-                        "in": "query",
-                        "description": "New user ID",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "newOwnerUserId"
+                                ],
+                                "properties": {
+                                    "newOwnerUserId": {
+                                        "type": "string",
+                                        "description": "New user ID"
+                                    }
+                                }
+                            }
                         }
-                    },
+                    }
+                },
+                "parameters": [
                     {
                         "name": "id",
                         "in": "path",
@@ -6133,7 +5924,7 @@
         },
         "/ocs/v2.php/apps/tables/api/2/columns/{nodeType}/{nodeId}": {
             "get": {
-                "operationId": "api_columns-list",
+                "operationId": "api_columns-index",
                 "summary": "[api v2] Get all columns for a table or a view",
                 "description": "Return an empty array if no columns were found",
                 "tags": [
@@ -6534,146 +6325,104 @@
                         "basic_auth": []
                     }
                 ],
-                "parameters": [
-                    {
-                        "name": "baseNodeId",
-                        "in": "query",
-                        "description": "Context of the column creation",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        }
-                    },
-                    {
-                        "name": "title",
-                        "in": "query",
-                        "description": "Title",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "numberDefault",
-                        "in": "query",
-                        "description": "Default value for new rows",
-                        "schema": {
-                            "type": "number",
-                            "format": "float",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberDecimals",
-                        "in": "query",
-                        "description": "Decimals",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberPrefix",
-                        "in": "query",
-                        "description": "Prefix",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberSuffix",
-                        "in": "query",
-                        "description": "Suffix",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberMin",
-                        "in": "query",
-                        "description": "Min",
-                        "schema": {
-                            "type": "number",
-                            "format": "float",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "numberMax",
-                        "in": "query",
-                        "description": "Max",
-                        "schema": {
-                            "type": "number",
-                            "format": "float",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "subtype",
-                        "in": "query",
-                        "description": "Subtype for the new column",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true,
-                            "enum": [
-                                "progress",
-                                "stars"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "description",
-                        "in": "query",
-                        "description": "Description",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "selectedViewIds[]",
-                        "in": "query",
-                        "description": "View IDs where this columns should be added",
-                        "schema": {
-                            "type": "array",
-                            "nullable": true,
-                            "default": [],
-                            "items": {
-                                "type": "integer",
-                                "format": "int64"
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "baseNodeId",
+                                    "title"
+                                ],
+                                "properties": {
+                                    "baseNodeId": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "description": "Context of the column creation"
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "description": "Title"
+                                    },
+                                    "numberDefault": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "nullable": true,
+                                        "description": "Default value for new rows"
+                                    },
+                                    "numberDecimals": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "description": "Decimals"
+                                    },
+                                    "numberPrefix": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Prefix"
+                                    },
+                                    "numberSuffix": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Suffix"
+                                    },
+                                    "numberMin": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "nullable": true,
+                                        "description": "Min"
+                                    },
+                                    "numberMax": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "nullable": true,
+                                        "description": "Max"
+                                    },
+                                    "subtype": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "enum": [
+                                            "progress",
+                                            "stars"
+                                        ],
+                                        "description": "Subtype for the new column"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Description"
+                                    },
+                                    "selectedViewIds": {
+                                        "type": "array",
+                                        "nullable": true,
+                                        "default": [],
+                                        "description": "View IDs where this columns should be added",
+                                        "items": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        }
+                                    },
+                                    "mandatory": {
+                                        "type": "boolean",
+                                        "default": false,
+                                        "description": "Is mandatory"
+                                    },
+                                    "baseNodeType": {
+                                        "type": "string",
+                                        "default": "table",
+                                        "enum": [
+                                            "table",
+                                            "view"
+                                        ],
+                                        "description": "Context type of the column creation"
+                                    }
+                                }
                             }
                         }
-                    },
-                    {
-                        "name": "mandatory",
-                        "in": "query",
-                        "description": "Is mandatory",
-                        "schema": {
-                            "type": "integer",
-                            "default": 0,
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
-                    {
-                        "name": "baseNodeType",
-                        "in": "query",
-                        "description": "Context type of the column creation",
-                        "schema": {
-                            "type": "string",
-                            "default": "table",
-                            "enum": [
-                                "table",
-                                "view"
-                            ]
-                        }
-                    },
+                    }
+                },
+                "parameters": [
                     {
                         "name": "OCS-APIRequest",
                         "in": "header",
@@ -6854,116 +6603,86 @@
                         "basic_auth": []
                     }
                 ],
-                "parameters": [
-                    {
-                        "name": "baseNodeId",
-                        "in": "query",
-                        "description": "Context of the column creation",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        }
-                    },
-                    {
-                        "name": "title",
-                        "in": "query",
-                        "description": "Title",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "textDefault",
-                        "in": "query",
-                        "description": "Default",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "textAllowedPattern",
-                        "in": "query",
-                        "description": "Allowed regex pattern",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "textMaxLength",
-                        "in": "query",
-                        "description": "Max raw text length",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "subtype",
-                        "in": "query",
-                        "description": "Subtype for the new column",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true,
-                            "enum": [
-                                "progress",
-                                "stars"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "description",
-                        "in": "query",
-                        "description": "Description",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "selectedViewIds[]",
-                        "in": "query",
-                        "description": "View IDs where this columns should be added",
-                        "schema": {
-                            "type": "array",
-                            "nullable": true,
-                            "default": [],
-                            "items": {
-                                "type": "integer",
-                                "format": "int64"
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "baseNodeId",
+                                    "title"
+                                ],
+                                "properties": {
+                                    "baseNodeId": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "description": "Context of the column creation"
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "description": "Title"
+                                    },
+                                    "textDefault": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Default"
+                                    },
+                                    "textAllowedPattern": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Allowed regex pattern"
+                                    },
+                                    "textMaxLength": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "description": "Max raw text length"
+                                    },
+                                    "subtype": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "enum": [
+                                            "progress",
+                                            "stars"
+                                        ],
+                                        "description": "Subtype for the new column"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Description"
+                                    },
+                                    "selectedViewIds": {
+                                        "type": "array",
+                                        "nullable": true,
+                                        "default": [],
+                                        "description": "View IDs where this columns should be added",
+                                        "items": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        }
+                                    },
+                                    "mandatory": {
+                                        "type": "boolean",
+                                        "default": false,
+                                        "description": "Is mandatory"
+                                    },
+                                    "baseNodeType": {
+                                        "type": "string",
+                                        "default": "table",
+                                        "enum": [
+                                            "table",
+                                            "view"
+                                        ],
+                                        "description": "Context type of the column creation"
+                                    }
+                                }
                             }
                         }
-                    },
-                    {
-                        "name": "mandatory",
-                        "in": "query",
-                        "description": "Is mandatory",
-                        "schema": {
-                            "type": "integer",
-                            "default": 0,
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
-                    {
-                        "name": "baseNodeType",
-                        "in": "query",
-                        "description": "Context type of the column creation",
-                        "schema": {
-                            "type": "string",
-                            "default": "table",
-                            "enum": [
-                                "table",
-                                "view"
-                            ]
-                        }
-                    },
+                    }
+                },
+                "parameters": [
                     {
                         "name": "OCS-APIRequest",
                         "in": "header",
@@ -7144,106 +6863,80 @@
                         "basic_auth": []
                     }
                 ],
-                "parameters": [
-                    {
-                        "name": "baseNodeId",
-                        "in": "query",
-                        "description": "Context of the column creation",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        }
-                    },
-                    {
-                        "name": "title",
-                        "in": "query",
-                        "description": "Title",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "selectionOptions",
-                        "in": "query",
-                        "description": "Json array{id: int, label: string} with options that can be selected, eg [{\"id\": 1, \"label\": \"first\"},{\"id\": 2, \"label\": \"second\"}]",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "selectionDefault",
-                        "in": "query",
-                        "description": "Json int|int[] for default selected option(s), eg 5 or [\"1\", \"8\"]",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "subtype",
-                        "in": "query",
-                        "description": "Subtype for the new column",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true,
-                            "enum": [
-                                "progress",
-                                "stars"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "description",
-                        "in": "query",
-                        "description": "Description",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "selectedViewIds[]",
-                        "in": "query",
-                        "description": "View IDs where this columns should be added",
-                        "schema": {
-                            "type": "array",
-                            "nullable": true,
-                            "default": [],
-                            "items": {
-                                "type": "integer",
-                                "format": "int64"
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "baseNodeId",
+                                    "title",
+                                    "selectionOptions"
+                                ],
+                                "properties": {
+                                    "baseNodeId": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "description": "Context of the column creation"
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "description": "Title"
+                                    },
+                                    "selectionOptions": {
+                                        "type": "string",
+                                        "description": "Json array{id: int, label: string} with options that can be selected, eg [{\"id\": 1, \"label\": \"first\"},{\"id\": 2, \"label\": \"second\"}]"
+                                    },
+                                    "selectionDefault": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Json int|int[] for default selected option(s), eg 5 or [\"1\", \"8\"]"
+                                    },
+                                    "subtype": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "enum": [
+                                            "progress",
+                                            "stars"
+                                        ],
+                                        "description": "Subtype for the new column"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Description"
+                                    },
+                                    "selectedViewIds": {
+                                        "type": "array",
+                                        "nullable": true,
+                                        "default": [],
+                                        "description": "View IDs where this columns should be added",
+                                        "items": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        }
+                                    },
+                                    "mandatory": {
+                                        "type": "boolean",
+                                        "default": false,
+                                        "description": "Is mandatory"
+                                    },
+                                    "baseNodeType": {
+                                        "type": "string",
+                                        "default": "table",
+                                        "enum": [
+                                            "table",
+                                            "view"
+                                        ],
+                                        "description": "Context type of the column creation"
+                                    }
+                                }
                             }
                         }
-                    },
-                    {
-                        "name": "mandatory",
-                        "in": "query",
-                        "description": "Is mandatory",
-                        "schema": {
-                            "type": "integer",
-                            "default": 0,
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
-                    {
-                        "name": "baseNodeType",
-                        "in": "query",
-                        "description": "Context type of the column creation",
-                        "schema": {
-                            "type": "string",
-                            "default": "table",
-                            "enum": [
-                                "table",
-                                "view"
-                            ]
-                        }
-                    },
+                    }
+                },
+                "parameters": [
                     {
                         "name": "OCS-APIRequest",
                         "in": "header",
@@ -7424,101 +7117,79 @@
                         "basic_auth": []
                     }
                 ],
-                "parameters": [
-                    {
-                        "name": "baseNodeId",
-                        "in": "query",
-                        "description": "Context of the column creation",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        }
-                    },
-                    {
-                        "name": "title",
-                        "in": "query",
-                        "description": "Title",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "datetimeDefault",
-                        "in": "query",
-                        "description": "For a subtype 'date' you can set 'today'. For a main type or subtype 'time' you can set to 'now'.",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true,
-                            "enum": [
-                                "today",
-                                "now"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "subtype",
-                        "in": "query",
-                        "description": "Subtype for the new column",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true,
-                            "enum": [
-                                "progress",
-                                "stars"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "description",
-                        "in": "query",
-                        "description": "Description",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "selectedViewIds[]",
-                        "in": "query",
-                        "description": "View IDs where this columns should be added",
-                        "schema": {
-                            "type": "array",
-                            "nullable": true,
-                            "default": [],
-                            "items": {
-                                "type": "integer",
-                                "format": "int64"
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "baseNodeId",
+                                    "title"
+                                ],
+                                "properties": {
+                                    "baseNodeId": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "description": "Context of the column creation"
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "description": "Title"
+                                    },
+                                    "datetimeDefault": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "enum": [
+                                            "today",
+                                            "now"
+                                        ],
+                                        "description": "For a subtype 'date' you can set 'today'. For a main type or subtype 'time' you can set to 'now'."
+                                    },
+                                    "subtype": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "enum": [
+                                            "progress",
+                                            "stars"
+                                        ],
+                                        "description": "Subtype for the new column"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "Description"
+                                    },
+                                    "selectedViewIds": {
+                                        "type": "array",
+                                        "nullable": true,
+                                        "default": [],
+                                        "description": "View IDs where this columns should be added",
+                                        "items": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        }
+                                    },
+                                    "mandatory": {
+                                        "type": "boolean",
+                                        "default": false,
+                                        "description": "Is mandatory"
+                                    },
+                                    "baseNodeType": {
+                                        "type": "string",
+                                        "default": "table",
+                                        "enum": [
+                                            "table",
+                                            "view"
+                                        ],
+                                        "description": "Context type of the column creation"
+                                    }
+                                }
                             }
                         }
-                    },
-                    {
-                        "name": "mandatory",
-                        "in": "query",
-                        "description": "Is mandatory",
-                        "schema": {
-                            "type": "integer",
-                            "default": 0,
-                            "enum": [
-                                0,
-                                1
-                            ]
-                        }
-                    },
-                    {
-                        "name": "baseNodeType",
-                        "in": "query",
-                        "description": "Context type of the column creation",
-                        "schema": {
-                            "type": "string",
-                            "default": "table",
-                            "enum": [
-                                "table",
-                                "view"
-                            ]
-                        }
-                    },
+                    }
+                },
+                "parameters": [
                     {
                         "name": "OCS-APIRequest",
                         "in": "header",
@@ -8073,7 +7744,7 @@
         },
         "/ocs/v2.php/apps/tables/api/2/contexts": {
             "get": {
-                "operationId": "context-list",
+                "operationId": "context-index",
                 "summary": "[api v3] Get all contexts available to the requesting person",
                 "description": "Return an empty array if no contexts were found",
                 "tags": [
@@ -8187,64 +7858,62 @@
                         "basic_auth": []
                     }
                 ],
-                "parameters": [
-                    {
-                        "name": "name",
-                        "in": "query",
-                        "description": "Name of the context",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "iconName",
-                        "in": "query",
-                        "description": "Material design icon name of the context",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "description",
-                        "in": "query",
-                        "description": "Descriptive text of the context",
-                        "schema": {
-                            "type": "string",
-                            "default": ""
-                        }
-                    },
-                    {
-                        "name": "nodes[]",
-                        "in": "query",
-                        "description": "optional nodes to be connected to this context",
-                        "schema": {
-                            "type": "array",
-                            "default": [],
-                            "items": {
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
                                 "type": "object",
                                 "required": [
-                                    "id",
-                                    "type"
+                                    "name",
+                                    "iconName"
                                 ],
                                 "properties": {
-                                    "id": {
-                                        "type": "integer",
-                                        "format": "int64"
+                                    "name": {
+                                        "type": "string",
+                                        "description": "Name of the context"
                                     },
-                                    "type": {
-                                        "type": "integer",
-                                        "format": "int64"
+                                    "iconName": {
+                                        "type": "string",
+                                        "description": "Material design icon name of the context"
                                     },
-                                    "permissions": {
-                                        "type": "integer",
-                                        "format": "int64"
+                                    "description": {
+                                        "type": "string",
+                                        "default": "",
+                                        "description": "Descriptive text of the context"
+                                    },
+                                    "nodes": {
+                                        "type": "array",
+                                        "default": [],
+                                        "description": "optional nodes to be connected to this context",
+                                        "items": {
+                                            "type": "object",
+                                            "required": [
+                                                "id",
+                                                "type"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "type": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "permissions": {
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
-                    },
+                    }
+                },
+                "parameters": [
                     {
                         "name": "OCS-APIRequest",
                         "in": "header",
@@ -8564,43 +8233,63 @@
                         "basic_auth": []
                     }
                 ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "provide this parameter to set a new name"
+                                    },
+                                    "iconName": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "provide this parameter to set a new icon"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "provide this parameter to set a new description"
+                                    },
+                                    "nodes": {
+                                        "type": "object",
+                                        "nullable": true,
+                                        "description": "provide this parameter to set a new list of nodes.",
+                                        "required": [
+                                            "id",
+                                            "type",
+                                            "permissions",
+                                            "order"
+                                        ],
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "format": "int64"
+                                            },
+                                            "type": {
+                                                "type": "integer",
+                                                "format": "int64"
+                                            },
+                                            "permissions": {
+                                                "type": "integer",
+                                                "format": "int64"
+                                            },
+                                            "order": {
+                                                "type": "integer",
+                                                "format": "int64"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "parameters": [
-                    {
-                        "name": "name",
-                        "in": "query",
-                        "description": "provide this parameter to set a new name",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "iconName",
-                        "in": "query",
-                        "description": "provide this parameter to set a new icon",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "description",
-                        "in": "query",
-                        "description": "provide this parameter to set a new description",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
-                    {
-                        "name": "nodes",
-                        "in": "query",
-                        "description": "provide this parameter to set a new list of nodes.",
-                        "schema": {
-                            "type": "string",
-                            "nullable": true
-                        }
-                    },
                     {
                         "name": "contextId",
                         "in": "path",
@@ -8930,28 +8619,34 @@
                         "basic_auth": []
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "newOwnerId"
+                                ],
+                                "properties": {
+                                    "newOwnerId": {
+                                        "type": "string",
+                                        "description": "ID of the new owner"
+                                    },
+                                    "newOwnerType": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "default": 0,
+                                        "description": "any Application::OWNER_TYPE_* constant",
+                                        "minimum": 0,
+                                        "maximum": 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "parameters": [
-                    {
-                        "name": "newOwnerId",
-                        "in": "query",
-                        "description": "ID of the new owner",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "newOwnerType",
-                        "in": "query",
-                        "description": "any Application::OWNER_TYPE_* constant",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "default": 0,
-                            "minimum": 0,
-                            "maximum": 0
-                        }
-                    },
                     {
                         "name": "contextId",
                         "in": "path",
@@ -9137,16 +8832,40 @@
                         "basic_auth": []
                     }
                 ],
-                "parameters": [
-                    {
-                        "name": "content",
-                        "in": "query",
-                        "description": "content items with it and order values",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "content"
+                                ],
+                                "properties": {
+                                    "content": {
+                                        "type": "object",
+                                        "description": "content items with it and order values",
+                                        "required": [
+                                            "id",
+                                            "order"
+                                        ],
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "format": "int64"
+                                            },
+                                            "order": {
+                                                "type": "integer",
+                                                "format": "int64"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
-                    },
+                    }
+                },
+                "parameters": [
                     {
                         "name": "contextId",
                         "in": "path",
