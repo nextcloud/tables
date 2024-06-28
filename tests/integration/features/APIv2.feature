@@ -543,6 +543,55 @@ Feature: APIv2
     When user "participant3-v2" attempts to fetch Context "c1"
     Then the reported status is "404"
 
+  @api2 @contexts @current
+  Scenario: Add a row to both a table and a view through a context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And column "one" exists with following properties
+      | type          | text                    |
+      | subtype       | line                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    And column "two" exists with following properties
+      | type          | number                  |
+      | mandatory     | 1                       |
+      | numberDefault | 10                      |
+      | description   | This is a description!  |
+    And column "three" exists with following properties
+      | type          | selection               |
+      | subtype       | check                   |
+      | mandatory     | 1                       |
+      | description   | This is a description!  |
+    And column "four" exists with following properties
+      | type          | datetime                |
+      | subtype       | date                    |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
+    And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions         |
+      | t1    | table | read,create,update  |
+      | v1    | view  | read,create         |
+    And user "participant1-v2" shares the Context "c1" to "user" "participant2-v2"
+    When user "participant2-v2" tries to create a row using v2 on "table" "t1" with following values
+      | one           | AHA                     |
+      | two           | 161                     |
+      | three         | true                    |
+      | four          | 2023-12-24              |
+    Then the reported status is 200
+    When user "participant2-v2" tries to create a row using v2 on "view" "v1" with following values
+      | one           | PHP                     |
+      | two           | 666                     |
+      | three         | false                   |
+      | four          | 2024-04-24              |
+    Then the reported status is 200
+    When user "participant1-v1" fetches the rows from "table" "t1"
+    Then there should be a row with following values:
+      | one           | AHA                     |
+      | two           | 161                     |
+      | three         | true                    |
+      | four          | 2023-12-24              |
+
+
   @api2 @rows
   Scenario: Create rows via v2 and check them
     Given table "Rows check" with emoji "👨🏻‍💻" exists for user "participant1-v2" as "base1" via v2
