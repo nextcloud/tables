@@ -342,6 +342,7 @@ OC.L10N.register(
     "Share with accounts or groups" : "شارك مع حسابات و مجموعات",
     "User or group name …" : "اسم المستخدم أو المجموعة...",
     "No recommendations. Start typing." : "لا توجد توصيات. ابدأ بالكتابة.",
+    "Failed to fetch share recommendations" : "تعذّر جلب توصيات المشاركة",
     "Receiver type" : "نوع المستقبل",
     "Create time" : "وقت الإنشاء",
     "Share ID" : "معرف المشاركة",

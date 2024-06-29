@@ -340,6 +340,7 @@
     "Share with accounts or groups" : "Mit Konten oder Gruppen teilen",
     "User or group name …" : "Benutzer oder Gruppenname …",
     "No recommendations. Start typing." : "Keine Empfehlungen. Beginnen Sie mit der Eingabe.",
+    "Failed to fetch share recommendations" : "Empfehlungen zum Teilen konnten nicht abgerufen werden.",
     "Receiver type" : "Empfänger-Typ",
     "Create time" : "Erstellungszeit",
     "Share ID" : "Teilen-ID",

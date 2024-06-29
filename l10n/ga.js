@@ -342,6 +342,7 @@ OC.L10N.register(
     "Share with accounts or groups" : "Roinn le cuntais nó grúpaí",
     "User or group name …" : "Ainm úsáideora nó grúpa…",
     "No recommendations. Start typing." : "Gan moltaí. Tosaigh ag clóscríobh.",
+    "Failed to fetch share recommendations" : "Theip ar na moltaí comhroinnte a fháil",
     "Receiver type" : "Cineál glacadóra",
     "Create time" : "Cruthaigh am",
     "Share ID" : "Comhroinn ID",

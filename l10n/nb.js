@@ -342,6 +342,7 @@ OC.L10N.register(
     "Share with accounts or groups" : "Del med kontoer eller grupper",
     "User or group name …" : "Bruker eller gruppenavn ...",
     "No recommendations. Start typing." : "Ingen anbefalinger. Start å skrive.",
+    "Failed to fetch share recommendations" : "Kunne ikke hente delingsanbefalinger",
     "Receiver type" : "Type mottaker",
     "Create time" : "Opprett tidspunkt",
     "Share ID" : "Delt ressurs-ID",
