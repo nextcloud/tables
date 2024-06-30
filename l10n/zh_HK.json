@@ -340,6 +340,7 @@
     "Share with accounts or groups" : "與帳戶或群組分享",
     "User or group name …" : "用戶或群組名稱……",
     "No recommendations. Start typing." : "沒有建議。開始輸入。",
+    "Failed to fetch share recommendations" : "擷取分享建議失敗",
     "Receiver type" : "接收類型",
     "Create time" : "創建時間",
     "Share ID" : "分享 ID",

@@ -342,6 +342,7 @@ OC.L10N.register(
     "Share with accounts or groups" : "Share with accounts or groups",
     "User or group name …" : "User or group name …",
     "No recommendations. Start typing." : "No recommendations. Start typing.",
+    "Failed to fetch share recommendations" : "Failed to fetch share recommendations",
     "Receiver type" : "Receiver type",
     "Create time" : "Create time",
     "Share ID" : "Share ID",
