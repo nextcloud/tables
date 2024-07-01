@@ -270,7 +270,7 @@ class ContextService {
 			}
 			
 		} catch (Exception $e) {
-			$this->logger->error('something went wrong while deleting node relation for node id: '.(string)$nodeId. ' and node type '.(string)$nodeType);
+			$this->logger->error('Something went wrong while deleting node relation for node id: ' . (string)$nodeId . ' and node type ' . (string)$nodeType, ['exception' => $e]);
 		}
 	}
 
