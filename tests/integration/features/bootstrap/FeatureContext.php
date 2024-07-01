@@ -95,6 +95,7 @@ class FeatureContext implements Context {
 	public function setUp() {
 		$this->createdUsers = [];
 		$this->createdGroups = [];
+		$this->tableId = null;
 	}
 
 	/**
@@ -161,6 +162,57 @@ class FeatureContext implements Context {
 		$this->tableId = $tableToVerify['id'];
 
 		return $tableToVerify;
+	}
+
+	/**
+	 * @When user :user fetches the rows from :nodeType :nodeAlias
+	 */
+	public function userFetchesRowsFromNode(string $user, string $nodeType, string $nodeAlias) {
+		$this->setCurrentUser($user);
+		$node = $this->collectionManager->getByAlias($nodeType, $nodeAlias);
+
+		$collection = $nodeType . 's';
+
+		$this->sendRequest(
+			'GET',
+			sprintf('/apps/tables/api/2/%s/%d/rows', $collection, $node['id'])
+		);
+
+		$data = $this->getDataFromResponse($this->response);
+		$this->collectionManager->register($data, $nodeType . '-rows', $node['id']);
+		$this->collectionManager->register(['type' => $nodeType, 'item' => $node], 'currentNode', 0);
+	}
+
+	/**
+	 * @Then there should be a row with following values:
+	 */
+	public function thereShouldBeARowWithFollowingValues(TableNode $rowValues) {
+		$nodeMeta = $this->collectionManager->getById('currentNode', 0);
+		$columns = $this->getColumnsForNode($nodeMeta['type'], $nodeMeta['item']['id']);
+
+		$expectedColumns = array_combine($rowValues->getColumn(0), $rowValues->getColumn(1));
+		$resultColumns = [];
+		foreach ($columns as $column) {
+			if (isset($expectedColumns[$column['title']])) {
+				$resultColumns[] = ['columnId' => $column['id'], 'value' => $expectedColumns[$column['title']]];
+				unset($expectedColumns[$column['title']]);
+			}
+		}
+		Assert::assertCount(0, $expectedColumns, 'not all expected columns are valid');
+
+		$actualRowData = $this->collectionManager->getById($nodeMeta['type'] . '-rows', $nodeMeta['item']['id']);
+		foreach ($actualRowData as $row) {
+			$found = true;
+			foreach ($resultColumns as $column) {
+				$found = $found && in_array($column, $row['data'], true);
+			}
+			if ($found) {
+				Assert::assertTrue(true);
+				return;
+			}
+		}
+
+		Assert::assertTrue(false, 'Expected row was not found');
 	}
 
 	/**
@@ -426,6 +478,22 @@ class FeatureContext implements Context {
 		Assert::assertEquals($columnToVerify['title'], $title);
 	}
 
+	protected function getColumnsForNode(string $nodeType, string $nodeAlias): array {
+		$nodeId = null;
+		if($nodeType === 'table') {
+			$nodeId = $this->tableIds[$nodeAlias];
+		} else if($nodeType === 'view') {
+			$nodeId = $this->viewIds[$nodeAlias];
+		}
+
+		$this->sendOcsRequest(
+			'GET',
+			sprintf('/apps/tables/api/2/columns/%s/%s', $nodeType, $nodeId),
+		);
+
+		return $this->getDataFromResponse($this->response)['ocs']['data'];
+	}
+
 	/**
 	 * @Then node with node type :nodeType and node name :nodeName has the following columns via v2
 	 *
@@ -434,20 +502,7 @@ class FeatureContext implements Context {
 	 * @param TableNode|null $body
 	 */
 	public function columnsForNodeV2(string $nodeType, string $nodeName, ?TableNode $body = null): void {
-		$nodeId = null;
-		if($nodeType === 'table') {
-			$nodeId = $this->tableIds[$nodeName];
-		}
-		if($nodeType === 'view') {
-			$nodeId = $this->viewIds[$nodeName];
-		}
-
-		$this->sendOcsRequest(
-			'GET',
-			'/apps/tables/api/2/columns/'.$nodeType.'/'.$nodeId
-		);
-
-		$data = $this->getDataFromResponse($this->response)['ocs']['data'];
+		$data = $this->getColumnsForNode($nodeType, $nodeName);
 		Assert::assertEquals(200, $this->response->getStatusCode());
 
 		// check if tables are empty
@@ -1264,6 +1319,7 @@ class FeatureContext implements Context {
 	 */
 	public function userTriesToCreateRowUsingV2OnNodeXWithFollowingValues(string $user, string $nodeType, string $nodeAlias, TableNode $properties): void {
 		$this->setCurrentUser($user);
+		// FIXME: tables are not in collectionManager yet
 		$node = $this->collectionManager->getByAlias($nodeType, $nodeAlias);
 
 		$props = [];
