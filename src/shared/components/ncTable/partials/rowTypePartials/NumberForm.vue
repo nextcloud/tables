@@ -73,7 +73,7 @@ export default {
 	},
 
 	mounted() {
-		this.localValue = this.value
+		this.localValue = this.value ?? this.column.numberDefault
 	},
 
 	methods: {
