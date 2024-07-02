@@ -18,6 +18,7 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Event\ViewDeletedEvent;
 use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\Model\Permissions;
 use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -374,7 +375,9 @@ class ViewService extends SuperService {
 						} catch (NotFoundError) {
 							$manageTableShare = $this->permissionsService->getPermissionArrayForNodeFromContexts($view->getTableId(), 'table', $userId);
 						} finally {
-							$permissions['manageTable'] = $manageTableShare['manage'] ?? false;
+							if ($manageTableShare->manage) {
+								$permissions->manageTable = true;
+							}
 						}
 					} catch (NotFoundError $e) {
 					} catch (\Exception $e) {
@@ -384,14 +387,7 @@ class ViewService extends SuperService {
 				} catch (NotFoundError $e) {
 				} catch (\Exception $e) {
 					$this->logger->warning('Exception occurred while setting shared permissions: ' . $e->getMessage() . ' No permissions granted.');
-					$view->setOnSharePermissions([
-						'read' => false,
-						'create' => false,
-						'update' => false,
-						'delete' => false,
-						'manage' => false,
-						'manageTable' => false
-					]);
+					$view->setOnSharePermissions(new Permissions());
 				}
 			} else {
 				// set hasShares if this table is shared by you (you share it with somebody else)
@@ -414,31 +410,29 @@ class ViewService extends SuperService {
 		} catch (InternalError|PermissionError $e) {
 		}
 
-		if ($view->getIsShared()) {
-			// Remove detailed view filtering and sorting information if necessary
-			if (!$view->getOnSharePermissions()['manageTable']) {
-				$rawFilterArray = $view->getFilterArray();
-				if ($rawFilterArray) {
-					$view->setFilterArray(
-						array_map(static function ($filterGroup) {
-							// Instead of filter just indicate that there is a filter, but hide details
-							return array_map(null, $filterGroup);
-						},
-							$rawFilterArray));
-				}
-				$rawSortArray = $view->getSortArray();
-				if ($rawSortArray) {
-					$view->setSortArray(
-						array_map(static function ($sortRule) use ($view) {
-							$columnsArray = $view->getColumnsArray();
-							if (isset($sortRule['columnId']) && $columnsArray && in_array($sortRule['columnId'], $columnsArray, true)) {
-								return $sortRule;
-							}
-							// Instead of sort rule just indicate that there is a rule, but hide details
-							return null;
-						},
-							$rawSortArray));
-				}
+		// Remove detailed view filtering and sorting information if necessary
+		if ($view->getIsShared() && !$view->getOnSharePermissions()->manageTable) {
+			$rawFilterArray = $view->getFilterArray();
+			if ($rawFilterArray) {
+				$view->setFilterArray(
+					array_map(static function ($filterGroup) {
+						// Instead of filter just indicate that there is a filter, but hide details
+						return array_map(null, $filterGroup);
+					},
+						$rawFilterArray));
+			}
+			$rawSortArray = $view->getSortArray();
+			if ($rawSortArray) {
+				$view->setSortArray(
+					array_map(static function ($sortRule) use ($view) {
+						$columnsArray = $view->getColumnsArray();
+						if (isset($sortRule['columnId']) && $columnsArray && in_array($sortRule['columnId'], $columnsArray, true)) {
+							return $sortRule;
+						}
+						// Instead of sort rule just indicate that there is a rule, but hide details
+						return null;
+					},
+						$rawSortArray));
 			}
 		}
 
