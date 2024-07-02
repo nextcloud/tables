@@ -258,6 +258,19 @@ class ContextService {
 		return $context;
 	}
 
+	public function deleteNodeRel(int $nodeId, int $nodeType): void {
+		try {
+			$nodeRelIds = $this->contextNodeRelMapper->getRelIdsForNode($nodeId, $nodeType);
+			foreach ($nodeRelIds as $nodeRelId) {
+				$this->pageContentMapper->deleteByNodeRelId($nodeRelId);
+				$this->contextNodeRelMapper->deleteByNodeRelId($nodeRelId);
+			}
+			
+		} catch (Exception $e) {
+			$this->logger->error('Something went wrong while deleting node relation for node id: ' . (string)$nodeId . ' and node type ' . (string)$nodeType, ['exception' => $e]);
+		}
+	}
+
 	/**
 	 * @throws MultipleObjectsReturnedException
 	 * @throws DoesNotExistException
