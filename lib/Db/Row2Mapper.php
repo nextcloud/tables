@@ -10,6 +10,7 @@ use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
+use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
 use OCP\DB\IResult;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -21,6 +22,8 @@ use Psr\Log\LoggerInterface;
 use Throwable;
 
 class Row2Mapper {
+	use TTransactional;
+	
 	private RowSleeveMapper $rowSleeveMapper;
 	private ?string $userId = null;
 	private IDBConnection $db;
@@ -524,7 +527,7 @@ class Row2Mapper {
 			$value = $this->formatValue($this->columns[$rowData['column_id']], $rowData['value'], 'out', $rowData['value_type']);
 			$compositeKey = (string)$rowData['row_id'] . ',' . (string)$rowData['column_id'];
 
-			if ($columnTypes[$rowData['column_id']] == 'usergroup') {
+			if ($columnTypes[$rowData['column_id']] === Column::TYPE_USERGROUP) {
 				if (array_key_exists($compositeKey, $rowValues)) {
 					$rowValues[$compositeKey][] = $value;
 				} else {
@@ -688,7 +691,7 @@ class Row2Mapper {
 
 		$v = $this->formatValue($this->columns[$columnId], $value, 'in');
 
-		if ($this->columns[$columnId]->getType() == 'usergroup') {
+		if ($this->columns[$columnId]->getType() === Column::TYPE_USERGROUP) {
 			foreach ($v as $val) {
 				/** @var RowCellSuper $cell */
 				$cell = new $cellClassName();
@@ -748,11 +751,12 @@ class Row2Mapper {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
-		if ($columnType == 'usergroup') {
+		if ($columnType === Column::TYPE_USERGROUP) {
 			try {
-				// TODO Maybe these should be a transaction?
-				$cellMapper->deleteAllForRow($rowId);
-				$this->insertCell($rowId, $columnId, $value);
+				$this->atomic(function () use ($cellMapper, $rowId, $columnId, $value) {
+					$cellMapper->deleteAllForRow($rowId);
+					$this->insertCell($rowId, $columnId, $value);
+				}, $this->db);
 			} catch (Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());

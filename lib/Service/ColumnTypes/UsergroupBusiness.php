@@ -40,7 +40,6 @@ class UsergroupBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		}
 
 		foreach ($value as $v) {
-			// TODO: maybe check if key exists first
 			if((array_key_exists('id', $v) && !is_string($v['id'])) && (array_key_exists('type', $v) && !is_int($v['type']))) {
 				return false;
 			}
