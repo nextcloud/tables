@@ -305,6 +305,7 @@ OC.L10N.register(
     "Share with accounts or groups" : "Dela med konton eller grupper",
     "User or group name …" : "Användar- eller gruppnamn ...",
     "No recommendations. Start typing." : "Inga rekommendationer. Börja skriva.",
+    "Failed to fetch share recommendations" : "Kunde inte hämta delningsrekommendationer",
     "Receiver type" : "Mottagartyp",
     "Create time" : "Skapad tid",
     "Share ID" : "Delnings-ID",
