@@ -56,6 +56,27 @@ Cypress.Commands.add('createView', (title) => {
 	cy.contains('.app-navigation-entry-link span', title).should('exist')
 })
 
+Cypress.Commands.add('createContext', (title) => {
+	cy.get('ul:nth-of-type(2) [data-cy="createContextIcon"]').click({ force: true })
+	cy.get('[data-cy="createContextModal"]').should('be.visible')
+	cy.get('[data-cy="createContextTitle"]').clear().type(title)
+	cy.get('[data-cy="createContextSubmitBtn"]').click()
+
+	// verify context was created properly
+	cy.get('[data-cy="navigationContextItem"]').contains(title).should('exist')
+	cy.contains('h1', title).should('exist')
+})
+
+Cypress.Commands.add('loadContext', (title) => {
+	cy.get('[data-cy="navigationContextItem"]').contains(title).click({ force: true })
+})
+
+Cypress.Commands.add('openContextEditModal', (title) => {
+	cy.get(`[data-cy="navigationContextItem"]:contains("${title}")`).find('button').click({ force: true })
+	cy.get('[data-cy="navigationContextEditBtn"]').contains('Edit application').click({ force: true })
+	cy.get('[data-cy="editContextModal"]').should('be.visible')
+})
+
 Cypress.Commands.add('clickOnTableThreeDotMenu', (optionName) => {
 	cy.get('[data-cy="customTableAction"] button').click()
 	cy.get('[data-cy="dataTableExportBtn"]').contains(optionName).click({ force: true })

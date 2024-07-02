@@ -60,7 +60,7 @@
 			<ul v-if="!contextsLoading">
 				<NcAppNavigationCaption :name="t('tables', 'Applications')">
 					<template #actions>
-						<NcActionButton :aria-label="t('tables', 'Create application')" icon="icon-add"
+						<NcActionButton :aria-label="t('tables', 'Create application')" icon="icon-add" data-cy="createContextIcon"
 							@click.prevent="createContext" />
 					</template>
 				</NcAppNavigationCaption>

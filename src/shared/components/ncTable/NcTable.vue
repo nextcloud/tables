@@ -37,7 +37,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 -->
 
 <template>
-	<div class="NcTable">
+	<div class="NcTable" data-cy="ncTable">
 		<div class="options row" style="padding-right: calc(var(--default-grid-baseline) * 2);">
 			<Options :rows="rows" :columns="parsedColumns" :element-id="elementId" :is-view="isView"
 				:selected-rows="localSelectedRows" :show-options="parsedColumns.length !== 0"

@@ -11,7 +11,7 @@
 			</template>
 		</template>
 		<template #actions>
-			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" @click="editContext">
+			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" data-cy="navigationContextEditBtn" @click="editContext">
 				<template #icon>
 					<PlaylistEdit :size="20" />
 				</template>
@@ -23,7 +23,7 @@
 				</template>
 				{{ t('tables', 'Transfer application') }}
 			</NcActionButton>
-			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" @click="deleteContext">
+			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" data-cy="navigationContextDeleteBtn" @click="deleteContext">
 				<template #icon>
 					<Delete :size="20" />
 				</template>

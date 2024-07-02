@@ -11,7 +11,7 @@
 					</div>
 				</div>
 				<div class="fix-col-2" style="justify-content: end;">
-					<NcActions :force-menu="true">
+					<NcActions :force-menu="true" data-cy="resourceSharePermsActions">
 						<NcActionCaption :name="t('tables', 'Permissions')" />
 						<NcActionCheckbox :checked.sync="resource.permissionRead" :disabled="true"
 							@check="updatePermission(resource, 'permissionRead', true)"
