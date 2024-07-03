@@ -49,9 +49,9 @@ describe('Import csv', () => {
 
 })
 
-// only run the following tests if not testing on v26 or v27
+// only run the following tests if not testing on v27
 // the files api in use is only supported on v28+
-if (!['stable26', 'stable27'].includes(Cypress.env('ncVersion'))) {
+if (!['stable27'].includes(Cypress.env('ncVersion'))) {
 	describe('Import csv from Files file action', () => {
 
 		before(function() {

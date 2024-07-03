@@ -47,8 +47,6 @@ class RowOCSController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 * 500: Internal error
-	 *
-	 * @NoAdminRequired (26 compatibility)
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, typeParam: 'nodeCollection')]
