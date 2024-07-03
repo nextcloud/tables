@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal" size="normal" @close="actionCancel">
+	<NcModal v-if="showModal" size="normal" data-cy="createContextModal" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
@@ -22,7 +22,7 @@
 							</template>
 						</NcButton>
 					</NcIconPicker>
-					<input ref="titleInput" v-model="title" :class="{ missing: errorTitle }" type="text"
+					<input ref="titleInput" v-model="title" :class="{ missing: errorTitle }" type="text" data-cy="createContextTitle"
 						:placeholder="t('tables', 'Title of the new application')" @input="titleChangedManually">
 				</div>
 			</div>
@@ -30,7 +30,7 @@
 				<div class="col-4">
 					{{ t('tables', 'Description') }}
 				</div>
-				<input v-model="description" type="text"
+				<input v-model="description" type="text" data-cy="createContextDes"
 					:placeholder="t('tables', 'Description of the new application')">
 			</div>
 			<div class="col-4 row space-T">
@@ -41,7 +41,7 @@
 			</div>
 			<div class="row space-R row space-T">
 				<div class="fix-col-4 end">
-					<NcButton type="primary" :aria-label="t('tables', 'Create application')" @click="submit">
+					<NcButton type="primary" :aria-label="t('tables', 'Create application')" data-cy="createContextSubmitBtn" @click="submit">
 						{{ t('tables', 'Create application') }}
 					</NcButton>
 				</div>

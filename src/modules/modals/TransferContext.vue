@@ -9,12 +9,12 @@
 				</div>
 			</div>
 			<div class="row">
-				<h3>{{ t('tables', 'Transfer this application to another user') }}</h3>
+				<h3>{{ t('tables', 'Transfer the application "{context}" to another user', { context: context.name }) }}</h3>
 				<NcUserPicker :select-users="true" :select-groups="false" :selected-user-id.sync="newOwnerId" />
 			</div>
 			<div class="row">
 				<div class="fix-col-4 space-T end">
-					<NcButton type="warning" :disabled="newOwnerId === ''" data-cy="transferTableButton" @click="transferContext">
+					<NcButton type="warning" :disabled="newOwnerId === ''" data-cy="transferContextButton" @click="transferContext">
 						{{ t('tables', 'Transfer') }}
 					</NcButton>
 				</div>
