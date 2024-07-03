@@ -9,13 +9,14 @@
  * @author Marcel Scherello <analytics@scherello.de>
  */
 
-namespace OCA\Tables\Datasource;
+namespace OCA\Tables\Analytics;
 
 use OCA\Analytics\Datasource\IDatasource;
-use OCA\Tables\Api\V1Api;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Service\ColumnService;
+use OCA\Tables\Service\RowService;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -28,7 +29,8 @@ class AnalyticsDatasource implements IDatasource {
 	private IL10N $l10n;
 	private TableService $tableService;
 	private ViewService $viewService;
-	private V1Api $api;
+	private RowService $rowService;
+	private ColumnService $columnService;
 
 	protected ?string $userId;
 
@@ -37,14 +39,16 @@ class AnalyticsDatasource implements IDatasource {
 		LoggerInterface $logger,
 		TableService    $tableService,
 		ViewService     $viewService,
-		V1Api           $api,
+		ColumnService   $columnService,
+		RowService      $rowService,
 		?string         $userId
 	) {
 		$this->l10n = $l10n;
 		$this->logger = $logger;
 		$this->tableService = $tableService;
 		$this->viewService = $viewService;
-		$this->api = $api;
+		$this->columnService = $columnService;
+		$this->rowService = $rowService;
 		$this->userId = $userId;
 	}
 
@@ -141,10 +145,10 @@ class AnalyticsDatasource implements IDatasource {
 
 		if (count($ids) === 1) {
 			// it's a table
-			$data = $this->api->getData((int) $ids[0], null, null, $this->userId);
+			$data = $this->getData((int)$ids[0], null, null);
 		} elseif (count($ids) === 2) {
 			// it's a view
-			$data = $this->api->getData((int) $ids[1], null, null, $this->userId, 'view');
+			$data = $this->getData((int)$ids[1], null, null, 'view');
 		}
 
 		// extract the header from the first row
@@ -172,13 +176,69 @@ class AnalyticsDatasource implements IDatasource {
 		}
 		unset($rows);
 
-		return [
-			'header' => $header,
-			'dimensions' => array_slice($header, 0, count($header) - 1),
-			'data' => $data,
-			//'rawdata' => $data,
-			'error' => 0,
-		];
+		return ['header' => $header, 'dimensions' => array_slice($header, 0, count($header) - 1), 'data' => $data, //'rawdata' => $data,
+			'error' => 0,];
+	}
+
+	/**
+	 * Get the data from the table backend
+	 * this was taken over from the former API
+	 *
+	 * @param int $nodeId
+	 * @param int|null $limit
+	 * @param int|null $offset
+	 * @param string|null $nodeType
+	 * @return array
+	 * @throws DoesNotExistException
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
+	private function getData(int $nodeId, ?int $limit, ?int $offset, ?string $nodeType = null): array {
+		if ($nodeType === 'view') {
+			$columns = $this->columnService->findAllByView($nodeId, $this->userId);
+			$rows = $this->rowService->findAllByView($nodeId, $this->userId, $limit, $offset);
+		} else {
+			// if no nodeType is provided, the old table selection is used to not break anything
+			$columns = $this->columnService->findAllByTable($nodeId, null, $this->userId);
+			$rows = $this->rowService->findAllByTable($nodeId, $this->userId, $limit, $offset);
+		}
+
+		$data = [];
+
+		// first line contains the titles
+		$header = [];
+		foreach ($columns as $column) {
+			$header[] = $column->getTitle();
+		}
+		$data[] = $header;
+
+		// now add the rows
+		foreach ($rows as $row) {
+			$rowData = $row->getData();
+			$line = [];
+			foreach ($columns as $column) {
+				$value = '';
+				foreach ($rowData as $datum) {
+					if ($datum['columnId'] === $column->getId()) {
+						// if column type selection, the corresponding labels need to be fetched
+						if ($column->getType() === 'selection') {
+							foreach ($column->getSelectionOptionsArray() as $option) {
+								if ($option['id'] === $datum['value']) {
+									$value = $option['label'];
+								}
+							}
+						} else {
+							$value = $datum['value'];
+						}
+					}
+				}
+				$line[] = $value;
+			}
+			$data[] = $line;
+		}
+		return $data;
 	}
 
 	/**
