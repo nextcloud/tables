@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "Xeyir",
+    "Yes" : "Bəli",
     "The file was uploaded" : "Fayl yükləndi",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Yüklənmiş fayl php.ini-də upload_max_filesize direktivini aşır",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Yüklənilən faylın həcmi HTML formasinda olan MAX_FILE_SIZE direktivində təyin dilmiş həcmi aşır.",
@@ -9,8 +11,6 @@ OC.L10N.register(
     "Missing a temporary folder" : "Müvəqqəti qovluq çatışmır",
     "Could not write file to disk" : "Faylı diskə yazmaq mümkün olmadı",
     "A PHP extension stopped the file upload" : "PHP uzantısı faylın yüklənməsini dayandırdı",
-    "No" : "Xeyir",
-    "Yes" : "Bəli",
     "Date" : "Date",
     "Comments" : "Şərhlər",
     "Name" : "Ad",

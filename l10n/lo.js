@@ -1,9 +1,9 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "ບໍ່",
     "The file was uploaded" : "ຟາຍຖຶກອັບໂຫລດສຳເລັດ",
     "No file was uploaded" : "ບໍ່ມີການອັບໂຫລດຟາຍ",
-    "No" : "ບໍ່",
     "Date" : "ວັນທີ",
     "Comments" : "ຄໍາເຫັນ",
     "Name" : "ຊື່",

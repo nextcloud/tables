@@ -1,4 +1,6 @@
 { "translations": {
+    "No" : "Ne",
+    "Yes" : "Taip",
     "The file was uploaded" : "Failas buvo įkeltas",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Įkeliamas failas viršija upload_max_filesize direktyvą, esančią faile php.ini",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Įkeltas failas viršija MAX_FILE_SIZE direktyvą, kuri buvo nurodyta HTML formoje",
@@ -8,8 +10,6 @@
     "Could not write file to disk" : "Nepavyko rašyti į diską",
     "A PHP extension stopped the file upload" : "PHP plėtinys sustabdė failo įkėlimą",
     "No file uploaded or file size exceeds maximum of %s" : "Neįkeltas joks failas arba failo dydis viršija maksimalų %s dydį",
-    "No" : "Ne",
-    "Yes" : "Taip",
     "ToDo list" : "Užduočių sąrašas",
     "Members" : "Nariai",
     "Date" : "Data",

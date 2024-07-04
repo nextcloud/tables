@@ -1,6 +1,11 @@
 OC.L10N.register(
     "tables",
     {
+    "Select columns" : "Selecteer kolommen",
+    "e.g. 1,2,4 or leave empty" : "bijv. 1,2,4 of laat leeg",
+    "Timestamp of data load" : "Tijdstempel van de datalading",
+    "No" : "Nee",
+    "Yes" : "Ja",
     "The file was uploaded" : "Het bestand werd geüpload",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Het geüploade bestand overschrijdt de upload_max_filesize optie in php.ini",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Het geüploade bestand overschrijdt de MAX_FILE_SIZE waarde die is opgegeven in het HTML formulier",
@@ -10,11 +15,6 @@ OC.L10N.register(
     "Could not write file to disk" : "Kon bestand niet naar schijf schrijven",
     "A PHP extension stopped the file upload" : "Een PHP-extensie blokkeerde de upload.",
     "No file uploaded or file size exceeds maximum of %s" : "Geen bestand geüpload of de grootte is meer dan het maximum van %s",
-    "Select columns" : "Selecteer kolommen",
-    "e.g. 1,2,4 or leave empty" : "bijv. 1,2,4 of laat leeg",
-    "Timestamp of data load" : "Tijdstempel van de datalading",
-    "No" : "Nee",
-    "Yes" : "Ja",
     "ToDo list" : "ToDo overzicht",
     "Setup a simple todo-list." : "Maak een eenvoudige takenlijst.",
     "Members" : "Leden",

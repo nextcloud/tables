@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "Ne",
+    "Yes" : "Jes",
     "The file was uploaded" : "La dosiero alŝutiĝis",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "La dosiero alŝutita superas la regulon „upload_max_filesize“ el „php.ini“",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "La dosiero alŝutita superas la regulon MAX_FILE_SIZE, kiu estas difinita en la HTML-formularo",
@@ -10,8 +12,6 @@ OC.L10N.register(
     "Could not write file to disk" : "Ne eblis skribi dosieron sur diskon",
     "A PHP extension stopped the file upload" : "PHP-modulo haltigis la dosieralŝuton",
     "No file uploaded or file size exceeds maximum of %s" : "Neniu dosiero alŝutita, aŭ dosiergrando transpasas la maksimumon %s",
-    "No" : "Ne",
-    "Yes" : "Jes",
     "Members" : "Membroj",
     "Date" : "Date",
     "Comments" : "Komentoj",

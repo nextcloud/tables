@@ -1,6 +1,9 @@
 OC.L10N.register(
     "tables",
     {
+    "Nextcloud Tables" : "Nextcloud Tables",
+    "No" : "Non",
+    "Yes" : "Sí",
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Prodúxose un error inesperáu. Pues atopar más detalles nos rexistros. Ponte en contautu cola alministración.",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "Prodúxose un error colos permisos. Pues atopar más detalles nos rexistros. Ponte en contautu cola alministración.",
     "An error caused by an invalid request occurred. More details can be found in the logs. Please reach out to your administration." : "Prodúxose un error por xenerase una solicitú inválida. Pues atopar más detalles nos rexistros. Ponte en contautu cola alministración",
@@ -15,9 +18,6 @@ OC.L10N.register(
     "Could not write file to disk" : "Nun se pudo escribir el ficheru nel discu",
     "A PHP extension stopped the file upload" : "Una estensión PHP paró la xuba de ficheros",
     "No file uploaded or file size exceeds maximum of %s" : "Nun se xubió nengún ficheru o'l tamañu del ficheru supera'l máximu de %s",
-    "Nextcloud Tables" : "Nextcloud Tables",
-    "No" : "Non",
-    "Yes" : "Sí",
     "Nextcloud tables" : "Tables de Nextcloud",
     "_%n row_::_%n rows_" : ["%n filera","%n fileres"],
     "table" : "tabla",

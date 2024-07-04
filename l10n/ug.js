@@ -1,10 +1,10 @@
 OC.L10N.register(
     "tables",
     {
-    "No file was uploaded" : "ھېچقانداق ھۆججەت يۈكلەنمىدى",
-    "Missing a temporary folder" : "ۋاقىتلىق قىسقۇچ كەم.",
     "No" : "ياق",
     "Yes" : "ھەئە",
+    "No file was uploaded" : "ھېچقانداق ھۆججەت يۈكلەنمىدى",
+    "Missing a temporary folder" : "ۋاقىتلىق قىسقۇچ كەم.",
     "Date" : "Date",
     "Name" : "ئاتى",
     "Description" : "چۈشەندۈرۈش",

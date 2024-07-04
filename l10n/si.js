@@ -1,9 +1,9 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "නැහැ",
     "No file was uploaded" : "කිසිදු ගොනුවක් උඩුගත කර නොමැත",
     "Missing a temporary folder" : "තාවකාලික බහාලුමක් අස්ථානගත වී ඇත",
-    "No" : "නැහැ",
     "Date" : "දිනය",
     "Comments" : "අදහස්",
     "Name" : "නම",

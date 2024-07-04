@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "No",
+    "Yes" : "Si",
     "The file was uploaded" : "S'archìviu est istadu carrigadu",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "S'archìviu carrigadu passat sa diretiva upload_max_filesize in php.ini",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "S'archìviu carrigadu passat sa diretiva MAX_FILE_SIZE ispetzificada in su mòdulu HTML",
@@ -10,8 +12,6 @@ OC.L10N.register(
     "Could not write file to disk" : "Non faghet a iscrìere s'archìviu in su discu",
     "A PHP extension stopped the file upload" : "Un'estensione PHP at firmadu su carrigamentu de s'archìviu",
     "No file uploaded or file size exceeds maximum of %s" : "Perun'archìviu carrigadu o sa mannària de s'archìviu superat su màssimu de %s",
-    "No" : "No",
-    "Yes" : "Si",
     "ToDo list" : "Cosas de fàghere",
     "Members" : "Membros",
     "Customers" : "Clientes",

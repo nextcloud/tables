@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "No",
+    "Yes" : "Yes",
     "The file was uploaded" : "ფაილი ატვირთულ იქნა",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "ატვირთული ფაილი აჭარბებს php.ini-ში დაყენებულ upload_max_filesize დირექტივას",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "ატვირთული ფაილი აჭარბებს MAX_FILE_SIZE დირექტივას, რომელიც მითითებული იყო HTML ფორმაში",
@@ -10,8 +12,6 @@ OC.L10N.register(
     "Could not write file to disk" : "დისკზე ჩაწერა ვერ მოხერხდა",
     "A PHP extension stopped the file upload" : "PHP გაფართოებამ შეწყვიტა ფაილის ატვირთვა",
     "No file uploaded or file size exceeds maximum of %s" : "No file uploaded or file size exceeds maximum of %s",
-    "No" : "No",
-    "Yes" : "Yes",
     "Members" : "Members",
     "Date" : "Date",
     "Comments" : "Comments",

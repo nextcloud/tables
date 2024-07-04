@@ -1,6 +1,9 @@
 OC.L10N.register(
     "tables",
     {
+    "Select table" : "בחירת טבלה",
+    "Select columns" : "בחירת עמודות",
+    "e.g. 1,2,4 or leave empty" : "למשל: 1,2,4 או להשאיר ריק",
     "The file was uploaded" : "הקובץ הועלה",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "הקובץ שהועלה חורג מההנחיה upload_max_filesize ב־php.ini",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "הקובץ שהועלה חורג מההנחיה MAX_FILE_SIZE שצוינה בטופס ה־HTML",
@@ -10,9 +13,6 @@ OC.L10N.register(
     "Could not write file to disk" : "לא ניתן לכתוב לכונן",
     "A PHP extension stopped the file upload" : "הרחבת PHP עצרה את העלאת הקובץ",
     "No file uploaded or file size exceeds maximum of %s" : "לא הועלה אף קובץ או שגודל הקובץ חרג מהסף המרבי של %s",
-    "Select table" : "בחירת טבלה",
-    "Select columns" : "בחירת עמודות",
-    "e.g. 1,2,4 or leave empty" : "למשל: 1,2,4 או להשאיר ריק",
     "Nextcloud tables" : "טכלאות של Nextcloud",
     "_%n row_::_%n rows_" : ["שורה","%n שורות","%n שורות"],
     "This column was automatically created by the import service." : "העמודה הזאת נוצרה אוטומטית על ידי שירות הייבוא.",

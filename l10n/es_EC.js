@@ -1,6 +1,11 @@
 OC.L10N.register(
     "tables",
     {
+    "Nextcloud Tables" : "Nextcloud Tablas",
+    "Select table" : "Seleccionar tabla",
+    "Select columns" : "Seleccionar columnas",
+    "e.g. 1,2,4 or leave empty" : "por ejemplo, 1,2,4 o dejar vacío",
+    "Timestamp of data load" : "Marca de tiempo de carga de datos",
     "Could not update row." : "No se pudo actualizar la fila.",
     "The file was uploaded" : "El archivo fue cargado",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "El archivo cargado excede el valor establecido en la directiva upload_max_filesize en el archivo php.ini",
@@ -11,11 +16,6 @@ OC.L10N.register(
     "Could not write file to disk" : "No fue posible escribir a disco",
     "A PHP extension stopped the file upload" : "Una extensión de PHP detuvo la carga del archivo",
     "No file uploaded or file size exceeds maximum of %s" : "No se ha subido ningún archivo o el tamaño del archivo supera el máximo de %s",
-    "Nextcloud Tables" : "Nextcloud Tablas",
-    "Select table" : "Seleccionar tabla",
-    "Select columns" : "Seleccionar columnas",
-    "e.g. 1,2,4 or leave empty" : "por ejemplo, 1,2,4 o dejar vacío",
-    "Timestamp of data load" : "Marca de tiempo de carga de datos",
     "Nextcloud tables" : "Tablas de Nextcloud",
     "_%n row_::_%n rows_" : ["%n fila","%n filas","%n filas"],
     "This column was automatically created by the import service." : "Esta columna fue creada automáticamente por el servicio de importación.",

@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "Ne",
+    "Yes" : "Da",
     "The file was uploaded" : "Datoteka je otpremljena",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Otpremljena datoteka premašuje postavku upload_max_filesize u datoteci php.ini",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Otpremljena datoteka premašuje postavku MAX_FILE_SIZE koja je navedena u obrascu HTML-a",
@@ -10,8 +12,6 @@ OC.L10N.register(
     "Could not write file to disk" : "Nije moguće zapisati datoteku na disk",
     "A PHP extension stopped the file upload" : "Proširenje PHP-a zaustavilo je otpremanje datoteke",
     "No file uploaded or file size exceeds maximum of %s" : "Nijedna datoteka nije otpremljena ili veličina datoteke premašuje maksimalnu veličinu od %s",
-    "No" : "Ne",
-    "Yes" : "Da",
     "ToDo list" : "Popis zadataka",
     "Members" : "Članovi",
     "Customers" : "Korisnici",

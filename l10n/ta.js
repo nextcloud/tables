@@ -1,11 +1,11 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "இல்லை",
+    "Yes" : "ஆம்",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "பதிவேற்றப்பட்ட கோப்பானது HTML  படிவத்தில் குறிப்பிடப்பட்டுள்ள MAX_FILE_SIZE  directive ஐ விட கூடியது",
     "No file was uploaded" : "எந்த கோப்பும் பதிவேற்றப்படவில்லை",
     "Missing a temporary folder" : "ஒரு தற்காலிகமான கோப்புறையை காணவில்லை",
-    "No" : "இல்லை",
-    "Yes" : "ஆம்",
     "Date" : "Date",
     "Name" : "பெயர்",
     "Description" : "விவரிப்பு",

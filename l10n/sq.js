@@ -1,11 +1,11 @@
 OC.L10N.register(
     "tables",
     {
+    "Yes" : "Po",
     "The file was uploaded" : "Skedari u ngarkua",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Kartela e ngarkuar tejkalon udhëzimin MAX_FILE_SIZE që qe përcaktuar te formulari HTML",
     "No file was uploaded" : "S’u ngarkua kartelë",
     "Missing a temporary folder" : "Mungon një dosje e përkohshme",
-    "Yes" : "Po",
     "Members" : "Anëtar",
     "Date" : "Data",
     "Comments" : "Komentet",

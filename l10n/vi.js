@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Yes" : "Có",
     "The file was uploaded" : "Tập tin đã được tải lên",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Tập tin tải lên đã vượt quá upload_max_filesize giới hạn trong php.in",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Tập được tải lên vượt quá MAX_FILE_SIZE đã được giới hạn trong biểu mẫu HTML",
@@ -10,7 +11,6 @@ OC.L10N.register(
     "Could not write file to disk" : "Không thể ghi tệp lên ổ đĩa",
     "A PHP extension stopped the file upload" : "Một phần mở rộng của PHP đã dừng tải tệp lên",
     "No file uploaded or file size exceeds maximum of %s" : "Chưa có tệp nào được tải lên hoặc kích thước tệp vượt quá giới hạn của %s",
-    "Yes" : "Có",
     "ToDo list" : "Cần làm",
     "Members" : "Thành viên",
     "Date" : "Date",

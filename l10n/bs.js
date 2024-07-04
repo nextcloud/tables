@@ -1,11 +1,11 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "Ne",
+    "Yes" : "Da",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Učitana datoteka premašuje maksimalnu dopuštenu veličinu datoteke MAX_FILE_SIZE navedenu u HTML formi",
     "No file was uploaded" : "Nijedna datoteka nije učitana.",
     "Missing a temporary folder" : "Nedostaje privremeni direktorij.",
-    "No" : "Ne",
-    "Yes" : "Da",
     "Members" : "Članovi",
     "Date" : "Date",
     "Comments" : "Komentari",

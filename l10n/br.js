@@ -1,9 +1,9 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "Nann",
     "The file was uploaded" : "Kaset eo bet ar restr",
     "No file was uploaded" : "N'eus restr ebet a zo bet kaset",
-    "No" : "Nann",
     "Date" : "Deiz",
     "Comments" : "Displegadennoù",
     "Name" : "Anv",

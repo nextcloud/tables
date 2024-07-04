@@ -1,12 +1,12 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "Uhu",
+    "Yes" : "Oui",
     "The file was uploaded" : "Ulac afaylu yettwaznen",
     "The file was only partially uploaded" : "Afaylu, cwiṭ kan i yettwaznen segs",
     "No file was uploaded" : "Ulac afaylu i d-yettwasulin",
     "Missing a temporary folder" : "Ixuṣ ukaram akudan",
-    "No" : "Uhu",
-    "Yes" : "Oui",
     "Comments" : "Commentaires",
     "Name" : "Nom",
     "Comment" : "Commentaire",
