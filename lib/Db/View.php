@@ -3,6 +3,7 @@
 namespace OCA\Tables\Db;
 
 use JsonSerializable;
+use OCA\Tables\Model\Permissions;
 use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\Entity;
 
@@ -35,8 +36,8 @@ use OCP\AppFramework\Db\Entity;
  * @method setDescription(string $description)
  * @method getIsShared(): bool
  * @method setIsShared(bool $isShared)
- * @method getOnSharePermissions(): array{create: bool,delete: bool,manage: bool,read: bool,update: bool}|null
- * @method setOnSharePermissions(array $onSharePermissions)
+ * @method getOnSharePermissions(): ?Permissions
+ * @method setOnSharePermissions(Permissions $onSharePermissions)
  * @method getHasShares(): bool
  * @method setHasShares(bool $hasShares)
  * @method getFavorite(): bool
@@ -61,7 +62,7 @@ class View extends Entity implements JsonSerializable {
 	protected ?string $sort = null; // json
 	protected ?string $filter = null; // json
 	protected ?bool $isShared = null;
-	protected ?array $onSharePermissions = null;
+	protected ?Permissions $onSharePermissions = null;
 	protected ?bool $hasShares = false;
 	protected bool $favorite = false;
 	protected ?int $rowsCount = 0;
@@ -117,11 +118,7 @@ class View extends Entity implements JsonSerializable {
 		$this->setFilter(\json_encode($array));
 	}
 
-	/**
-	 * @psalm-suppress MismatchingDocblockReturnType
-	 * @return array{create: bool, delete: bool, manage: bool, read: bool, update: bool}|null
-	 */
-	private function getSharePermissions(): ?array {
+	private function getSharePermissions(): ?Permissions {
 		return $this->getOnSharePermissions();
 	}
 
@@ -152,7 +149,7 @@ class View extends Entity implements JsonSerializable {
 			'sort' => $this->getSortArray(),
 			'isShared' => !!$this->isShared,
 			'favorite' => $this->favorite,
-			'onSharePermissions' => $this->getSharePermissions(),
+			'onSharePermissions' => $this->getSharePermissions()?->jsonSerialize(),
 			'hasShares' => !!$this->hasShares,
 			'rowsCount' => $this->rowsCount ?: 0,
 			'ownerDisplayName' => $this->ownerDisplayName,

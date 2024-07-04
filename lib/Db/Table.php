@@ -3,6 +3,7 @@
 namespace OCA\Tables\Db;
 
 use JsonSerializable;
+use OCA\Tables\Model\Permissions;
 use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\Entity;
 
@@ -25,8 +26,8 @@ use OCP\AppFramework\Db\Entity;
  * @method setOwnerDisplayName(string $ownerDisplayName)
  * @method getIsShared(): bool
  * @method setIsShared(bool $isShared)
- * @method getOnSharePermissions(): array
- * @method setOnSharePermissions(array $onSharePermissions)
+ * @method getOnSharePermissions(): ?Permissions
+ * @method setOnSharePermissions(Permissions $onSharePermissions)
  * @method getHasShares(): bool
  * @method setHasShares(bool $hasShares)
  * @method getFavorite(): bool
@@ -59,7 +60,7 @@ class Table extends Entity implements JsonSerializable {
 	protected ?string $lastEditAt = null;
 	protected bool $archived = false;
 	protected ?bool $isShared = null;
-	protected ?array $onSharePermissions = null;
+	protected ?Permissions $onSharePermissions = null;
 
 	protected ?bool $hasShares = false;
 	protected ?bool $favorite = false;
@@ -91,7 +92,7 @@ class Table extends Entity implements JsonSerializable {
 			'archived' => $this->archived,
 			'isShared' => !!$this->isShared,
 			'favorite' => $this->favorite,
-			'onSharePermissions' => $this->getSharePermissions(),
+			'onSharePermissions' => $this->getSharePermissions()?->jsonSerialize(),
 			'hasShares' => !!$this->hasShares,
 			'rowsCount' => $this->rowsCount ?: 0,
 			'columnsCount' => $this->columnsCount ?: 0,
@@ -100,11 +101,7 @@ class Table extends Entity implements JsonSerializable {
 		];
 	}
 
-	/**
-	 * @psalm-suppress MismatchingDocblockReturnType
-	 * @return array{read: bool, create: bool, update: bool, delete: bool, manage: bool}|null
-	 */
-	private function getSharePermissions(): ?array {
+	private function getSharePermissions(): ?Permissions {
 		return $this->onSharePermissions;
 	}
 
