@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.7.4
+
+### Added
+* [[stable0.7] Extract selection option labels for Analytics (tables#1181)](https://github.com/nextcloud/tables/pull/1181)
+
+### Fixed
+* [[stable0.7] fix: hide Create Column button on empty table if inadequate permissions (tables#1152)](https://github.com/nextcloud/tables/pull/1152)
+
+* [[stable0.7] fix(API): declared array shape was not correct (tables#1171)](https://github.com/nextcloud/tables/pull/1171)
+* [[stable0.7] fix: only add resource if user can manage resource (tables#1174)](https://github.com/nextcloud/tables/pull/1174)
+
+### Other
+* [[stable0.7] ci: add missing server branches to matrices (tables#1172)](https://github.com/nextcloud/tables/pull/1172)
+* [Chore(deps): update dependency cypress-downloadfile to ^1.2.4 (stable0.7) (tables#1164)](https://github.com/nextcloud/tables/pull/1164)
+
 ## 0.7.3
 
 ### Added
