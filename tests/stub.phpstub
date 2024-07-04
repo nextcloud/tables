@@ -1,6 +1,6 @@
 <?php
 
-// reference for: use OCA\Analytics\Datasource\DatasourceEvent;
+// reference for: use OCA\Analytics\Analytics\DatasourceEvent;
 namespace OCA\Analytics\Datasource {
     class DatasourceEvent extends \OCP\EventDispatcher\Event {
          abstract public function registerDatasource(string $datasource): void {}
