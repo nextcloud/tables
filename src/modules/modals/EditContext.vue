@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal" size="normal" @close="actionCancel">
+	<NcModal v-if="showModal" size="normal" data-cy="editContextModal" @close="actionCancel">
 		<div class="modal__content" data-cy="editContextModal">
 			<div class="row">
 				<div class="col-4">
@@ -19,7 +19,7 @@
 							</template>
 						</NcButton>
 					</NcIconPicker>
-					<input v-model="title" :class="{ missing: errorTitle }" type="text"
+					<input v-model="title" :class="{ missing: errorTitle }" type="text" data-cy="editContextTitle"
 						:placeholder="t('tables', 'Title of the application')">
 				</div>
 			</div>
@@ -27,7 +27,7 @@
 				<div class="col-4">
 					{{ t('tables', 'Description') }}
 				</div>
-				<input v-model="description" type="text" :placeholder="t('tables', 'Description of the application')">
+				<input v-model="description" type="text" data-cy="editContextDes" :placeholder="t('tables', 'Description of the application')">
 			</div>
 			<div class="col-4 row space-T">
 				<div class="col-4">
@@ -45,10 +45,10 @@
 						{{ t('tables', 'I really want to delete this application!') }}
 					</NcButton>
 					<div class="right-additional-button">
-						<NcButton v-if="ownsContext(localContext)" @click="actionTransfer">
+						<NcButton v-if="ownsContext(localContext)" data-cy="transferContextSubmitBtn" @click="actionTransfer">
 							{{ t('tables', 'Transfer application') }}
 						</NcButton>
-						<NcButton type="primary" @click="submit">
+						<NcButton type="primary" data-cy="editContextSubmitBtn" @click="submit">
 							{{ t('tables', 'Save') }}
 						</NcButton>
 					</div>

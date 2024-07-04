@@ -137,7 +137,7 @@ class ContextController extends AOCSController {
 	 */
 	public function update(int $contextId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): DataResponse {
 		try {
-			$nodes = $nodes ? $this->sanitizeInputNodes($nodes) : null;
+			$nodes = $nodes !== null ? $this->sanitizeInputNodes($nodes) : null;
 			return new DataResponse($this->contextService->update(
 				$contextId,
 				$this->userId,
