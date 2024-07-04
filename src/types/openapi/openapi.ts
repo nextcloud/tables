@@ -12,7 +12,7 @@ type OneOf<T extends any[]> = T extends [infer Only] ? Only : T extends [infer A
 export type paths = {
   "/index.php/apps/tables/api/1/tables": {
     /** Returns all Tables */
-    get: operations["api1-index"];
+    get: operations["api1-list"];
     /** Create a new table and return it */
     post: operations["api1-create-table"];
   };
@@ -26,7 +26,7 @@ export type paths = {
   };
   "/index.php/apps/tables/api/1/tables/{tableId}/views": {
     /** Get all views for a table */
-    get: operations["api1-index-views"];
+    get: operations["api1-list-views"];
     /** Create a new view for a table */
     post: operations["api1-create-view"];
   };
@@ -48,11 +48,11 @@ export type paths = {
   };
   "/index.php/apps/tables/api/1/views/{viewId}/shares": {
     /** Get all shares for a view Will be empty if view does not exist */
-    get: operations["api1-index-view-shares"];
+    get: operations["api1-list-view-shares"];
   };
   "/index.php/apps/tables/api/1/tables/{tableId}/shares": {
     /** Get all shares for a table Will be empty if table does not exist */
-    get: operations["api1-index-table-shares"];
+    get: operations["api1-list-table-shares"];
     /** Create a share for a table */
     post: operations["api1-create-table-share"];
   };
@@ -66,13 +66,13 @@ export type paths = {
   };
   "/index.php/apps/tables/api/1/tables/{tableId}/columns": {
     /** Get all columns for a table or a underlying view Return an empty array if no columns were found */
-    get: operations["api1-index-table-columns"];
+    get: operations["api1-list-table-columns"];
     /** Create a new column for a table */
     post: operations["api1-create-table-column"];
   };
   "/index.php/apps/tables/api/1/views/{viewId}/columns": {
     /** Get all columns for a view Return an empty array if no columns were found */
-    get: operations["api1-index-view-columns"];
+    get: operations["api1-list-view-columns"];
   };
   "/index.php/apps/tables/api/1/columns": {
     /** Create a column */
@@ -88,17 +88,17 @@ export type paths = {
   };
   "/index.php/apps/tables/api/1/tables/{tableId}/rows/simple": {
     /** List all rows values for a table, first row are the column titles */
-    get: operations["api1-index-table-rows-simple"];
+    get: operations["api1-list-table-rows-simple"];
   };
   "/index.php/apps/tables/api/1/tables/{tableId}/rows": {
     /** List all rows for a table */
-    get: operations["api1-index-table-rows"];
+    get: operations["api1-list-table-rows"];
     /** Create a row within a table */
     post: operations["api1-create-row-in-table"];
   };
   "/index.php/apps/tables/api/1/views/{viewId}/rows": {
     /** List all rows for a view */
-    get: operations["api1-index-view-rows"];
+    get: operations["api1-list-view-rows"];
     /** Create a row within a view */
     post: operations["api1-create-row-in-view"];
   };
@@ -127,11 +127,11 @@ export type paths = {
      * [api v2] Returns all main resources
      * @description Tables and views incl. shares
      */
-    get: operations["api_general-index"];
+    get: operations["api_general-list"];
   };
   "/ocs/v2.php/apps/tables/api/2/tables": {
     /** [api v2] Returns all Tables */
-    get: operations["api_tables-index"];
+    get: operations["api_tables-list"];
     /** [api v2] Create a new table and return it */
     post: operations["api_tables-create"];
   };
@@ -155,7 +155,7 @@ export type paths = {
      * [api v2] Get all columns for a table or a view
      * @description Return an empty array if no columns were found
      */
-    get: operations["api_columns-index"];
+    get: operations["api_columns-list"];
   };
   "/ocs/v2.php/apps/tables/api/2/columns/{id}": {
     /** [api v2] Get a column object */
@@ -200,7 +200,7 @@ export type paths = {
      * [api v3] Get all contexts available to the requesting person
      * @description Return an empty array if no contexts were found
      */
-    get: operations["context-index"];
+    get: operations["context-list"];
     /** [api v2] Create a new context and return it */
     post: operations["context-create"];
   };
@@ -251,11 +251,11 @@ export type components = {
       description: string;
       /** Format: int64 */
       orderWeight: number;
-      /** Format: double */
+      /** Format: float */
       numberDefault: number;
-      /** Format: double */
+      /** Format: float */
       numberMin: number;
-      /** Format: double */
+      /** Format: float */
       numberMax: number;
       /** Format: int64 */
       numberDecimals: number;
@@ -430,7 +430,7 @@ export type external = Record<string, never>;
 export type operations = {
 
   /** Returns all Tables */
-  "api1-index": {
+  "api1-list": {
     responses: {
       /** @description Tables returned */
       200: {
@@ -449,19 +449,14 @@ export type operations = {
   };
   /** Create a new table and return it */
   "api1-create-table": {
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Title of the table */
-          title: string;
-          /** @description Emoji for the table */
-          emoji?: string | null;
-          /**
-           * @description Template to use if wanted
-           * @default custom
-           */
-          template?: string;
-        };
+    parameters: {
+      query: {
+        /** @description Title of the table */
+        title: string;
+        /** @description Emoji for the table */
+        emoji?: string | null;
+        /** @description Template to use if wanted */
+        template?: string;
       };
     };
     responses: {
@@ -523,24 +518,17 @@ export type operations = {
   /** Update tables properties */
   "api1-update-table": {
     parameters: {
+      query?: {
+        /** @description New table title */
+        title?: string | null;
+        /** @description New table emoji */
+        emoji?: string | null;
+        /** @description Whether the table is archived */
+        archived?: 0 | 1;
+      };
       path: {
         /** @description Table ID */
         tableId: number;
-      };
-    };
-    requestBody?: {
-      content: {
-        "application/json": {
-          /** @description New table title */
-          title?: string | null;
-          /** @description New table emoji */
-          emoji?: string | null;
-          /**
-           * @description Whether the table is archived
-           * @default false
-           */
-          archived?: boolean;
-        };
       };
     };
     responses: {
@@ -616,7 +604,7 @@ export type operations = {
     };
   };
   /** Get all views for a table */
-  "api1-index-views": {
+  "api1-list-views": {
     parameters: {
       path: {
         /** @description Table ID */
@@ -658,19 +646,15 @@ export type operations = {
   /** Create a new view for a table */
   "api1-create-view": {
     parameters: {
+      query: {
+        /** @description Title for the view */
+        title: string;
+        /** @description Emoji for the view */
+        emoji?: string | null;
+      };
       path: {
         /** @description Table ID that will hold the view */
         tableId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Title for the view */
-          title: string;
-          /** @description Emoji for the view */
-          emoji?: string | null;
-        };
       };
     };
     responses: {
@@ -748,44 +732,40 @@ export type operations = {
   /** Update a view via key-value sets */
   "api1-update-view": {
     parameters: {
+      query: {
+        /** @description key-value pairs */
+        data: OneOf<[{
+          /** @enum {string} */
+          key: "title" | "emoji" | "description";
+          value: string;
+        }, {
+          /** @enum {string} */
+          key: "columns";
+          value: number[];
+        }, {
+          /** @enum {string} */
+          key: "sort";
+          value: {
+            /** Format: int64 */
+            columnId: number;
+            /** @enum {string} */
+            mode: "ASC" | "DESC";
+          };
+        }, {
+          /** @enum {string} */
+          key: "filter";
+          value: {
+            /** Format: int64 */
+            columnId: number;
+            /** @enum {string} */
+            operator: "begins-with" | "ends-with" | "contains" | "is-equal" | "is-greater-than" | "is-greater-than-or-equal" | "is-lower-than" | "is-lower-than-or-equal" | "is-empty";
+            value: string | number;
+          };
+        }]>;
+      };
       path: {
         /** @description View ID */
         viewId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description key-value pairs */
-          data: ({
-            /** @enum {string} */
-            key: "title" | "emoji" | "description";
-            value: string;
-          }) | {
-            /** @enum {string} */
-            key: "columns";
-            value: number[];
-          } | ({
-            /** @enum {string} */
-            key: "sort";
-            value: {
-              /** Format: int64 */
-              columnId: number;
-              /** @enum {string} */
-              mode: "ASC" | "DESC";
-            };
-          }) | ({
-            /** @enum {string} */
-            key: "filter";
-            value: {
-              /** Format: int64 */
-              columnId: number;
-              /** @enum {string} */
-              operator: "begins-with" | "ends-with" | "contains" | "is-equal" | "is-greater-than" | "is-greater-than-or-equal" | "is-lower-than" | "is-lower-than-or-equal" | "is-empty";
-              value: string | number;
-            };
-          });
-        };
       };
     };
     responses: {
@@ -895,19 +875,15 @@ export type operations = {
   /** Update a share permission */
   "api1-update-share-permissions": {
     parameters: {
+      query: {
+        /** @description Permission type that should be changed */
+        permissionType: string;
+        /** @description New permission value */
+        permissionValue: 0 | 1;
+      };
       path: {
         /** @description Share ID */
         shareId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Permission type that should be changed */
-          permissionType: string;
-          /** @description New permission value */
-          permissionValue: boolean;
-        };
       };
     };
     responses: {
@@ -983,7 +959,7 @@ export type operations = {
     };
   };
   /** Get all shares for a view Will be empty if view does not exist */
-  "api1-index-view-shares": {
+  "api1-list-view-shares": {
     parameters: {
       path: {
         /** @description View ID */
@@ -1007,7 +983,7 @@ export type operations = {
     };
   };
   /** Get all shares for a table Will be empty if table does not exist */
-  "api1-index-table-shares": {
+  "api1-list-table-shares": {
     parameters: {
       path: {
         /** @description Table ID */
@@ -1033,32 +1009,25 @@ export type operations = {
   /** Create a share for a table */
   "api1-create-table-share": {
     parameters: {
+      query: {
+        /** @description Receiver ID */
+        receiver: string;
+        /** @description Receiver type */
+        receiverType: "user" | "group";
+        /** @description Permission if receiver can read data */
+        permissionRead: 0 | 1;
+        /** @description Permission if receiver can create data */
+        permissionCreate: 0 | 1;
+        /** @description Permission if receiver can update data */
+        permissionUpdate: 0 | 1;
+        /** @description Permission if receiver can delete data */
+        permissionDelete: 0 | 1;
+        /** @description Permission if receiver can manage table */
+        permissionManage: 0 | 1;
+      };
       path: {
         /** @description Table ID */
         tableId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Receiver ID */
-          receiver: string;
-          /**
-           * @description Receiver type
-           * @enum {string}
-           */
-          receiverType: "user" | "group";
-          /** @description Permission if receiver can read data */
-          permissionRead: boolean;
-          /** @description Permission if receiver can create data */
-          permissionCreate: boolean;
-          /** @description Permission if receiver can update data */
-          permissionUpdate: boolean;
-          /** @description Permission if receiver can delete data */
-          permissionDelete: boolean;
-          /** @description Permission if receiver can manage table */
-          permissionManage: boolean;
-        };
       };
     };
     responses: {
@@ -1095,58 +1064,28 @@ export type operations = {
   };
   /** Create a new share */
   "api1-create-share": {
-    requestBody: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description Node ID
-           */
-          nodeId: number;
-          /**
-           * @description Node type
-           * @enum {string}
-           */
-          nodeType: "table" | "view" | "context";
-          /** @description Receiver ID */
-          receiver: string;
-          /**
-           * @description Receiver type
-           * @enum {string}
-           */
-          receiverType: "user" | "group";
-          /**
-           * @description Permission if receiver can read data
-           * @default false
-           */
-          permissionRead?: boolean;
-          /**
-           * @description Permission if receiver can create data
-           * @default false
-           */
-          permissionCreate?: boolean;
-          /**
-           * @description Permission if receiver can update data
-           * @default false
-           */
-          permissionUpdate?: boolean;
-          /**
-           * @description Permission if receiver can delete data
-           * @default false
-           */
-          permissionDelete?: boolean;
-          /**
-           * @description Permission if receiver can manage node
-           * @default false
-           */
-          permissionManage?: boolean;
-          /**
-           * Format: int64
-           * @description context shares only, whether it should appear in nav bar. 0: no, 1: recipients, 2: all
-           * @default 0
-           */
-          displayMode?: number;
-        };
+    parameters: {
+      query: {
+        /** @description Node ID */
+        nodeId: number;
+        /** @description Node type */
+        nodeType: "table" | "view" | "context";
+        /** @description Receiver ID */
+        receiver: string;
+        /** @description Receiver type */
+        receiverType: "user" | "group";
+        /** @description Permission if receiver can read data */
+        permissionRead?: 0 | 1;
+        /** @description Permission if receiver can create data */
+        permissionCreate?: 0 | 1;
+        /** @description Permission if receiver can update data */
+        permissionUpdate?: 0 | 1;
+        /** @description Permission if receiver can delete data */
+        permissionDelete?: 0 | 1;
+        /** @description Permission if receiver can manage node */
+        permissionManage?: 0 | 1;
+        /** @description context shares only, whether it should appear in nav bar. 0: no, 1: recipients, 2: all */
+        displayMode?: number;
       };
     };
     responses: {
@@ -1184,26 +1123,15 @@ export type operations = {
   /** Updates the display mode of a context share */
   "api1-update-share-display-mode": {
     parameters: {
+      query: {
+        /** @description The new value for the display mode of the nav bar icon. 0: hidden, 1: visible for recipients, 2: visible for all */
+        displayMode: number;
+        /** @description "default" to set the default, "self" to set an override for the authenticated user */
+        target?: "default" | "self";
+      };
       path: {
         /** @description Share ID */
         shareId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description The new value for the display mode of the nav bar icon. 0: hidden, 1: visible for recipients, 2: visible for all
-           */
-          displayMode: number;
-          /**
-           * @description "default" to set the default, "self" to set an override for the authenticated user
-           * @default default
-           * @enum {string}
-           */
-          target?: "default" | "self";
-        };
       };
     };
     responses: {
@@ -1247,22 +1175,15 @@ export type operations = {
     };
   };
   /** Get all columns for a table or a underlying view Return an empty array if no columns were found */
-  "api1-index-table-columns": {
+  "api1-list-table-columns": {
     parameters: {
+      query?: {
+        /** @description View ID */
+        viewId?: number | null;
+      };
       path: {
         /** @description Table ID */
         tableId: number;
-      };
-    };
-    requestBody?: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description View ID
-           */
-          viewId?: number | null;
-        };
       };
     };
     responses: {
@@ -1300,81 +1221,47 @@ export type operations = {
   /** Create a new column for a table */
   "api1-create-table-column": {
     parameters: {
+      query: {
+        /** @description Title */
+        title: string;
+        /** @description Column main type */
+        type: "text" | "number" | "datetime" | "select";
+        /** @description Column sub type */
+        subtype?: string | null;
+        /** @description Is the column mandatory */
+        mandatory: 0 | 1;
+        /** @description Description */
+        description?: string | null;
+        /** @description Prefix if the column is a number field */
+        numberPrefix?: string | null;
+        /** @description Suffix if the column is a number field */
+        numberSuffix?: string | null;
+        /** @description Default number, if column is a number */
+        numberDefault?: number | null;
+        /** @description Min value, if column is a number */
+        numberMin?: number | null;
+        /** @description Max number, if column is a number */
+        numberMax?: number | null;
+        /** @description Number of decimals, if column is a number */
+        numberDecimals?: number | null;
+        /** @description Default text, if column is a text */
+        textDefault?: string | null;
+        /** @description Allowed pattern (regex) for text columns (not yet implemented) */
+        textAllowedPattern?: string | null;
+        /** @description Max length, if column is a text */
+        textMaxLength?: number | null;
+        /** @description Options for a selection (json array{id: int, label: string}) */
+        selectionOptions?: string | null;
+        /** @description Default option IDs for a selection (json int[]) */
+        selectionDefault?: string | null;
+        /** @description Default value, if column is datetime */
+        datetimeDefault?: string | null;
+        /** @description View IDs where this column should be added to be presented */
+        "selectedViewIds[]"?: number[] | null;
+      };
       path: {
         /** @description Table ID */
         tableId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Title */
-          title: string;
-          /**
-           * @description Column main type
-           * @enum {string}
-           */
-          type: "text" | "number" | "datetime" | "select";
-          /** @description Column sub type */
-          subtype?: string | null;
-          /** @description Is the column mandatory */
-          mandatory: boolean;
-          /** @description Description */
-          description?: string | null;
-          /** @description Prefix if the column is a number field */
-          numberPrefix?: string | null;
-          /** @description Suffix if the column is a number field */
-          numberSuffix?: string | null;
-          /**
-           * Format: double
-           * @description Default number, if column is a number
-           */
-          numberDefault?: number | null;
-          /**
-           * Format: double
-           * @description Min value, if column is a number
-           */
-          numberMin?: number | null;
-          /**
-           * Format: double
-           * @description Max number, if column is a number
-           */
-          numberMax?: number | null;
-          /**
-           * Format: int64
-           * @description Number of decimals, if column is a number
-           */
-          numberDecimals?: number | null;
-          /** @description Default text, if column is a text */
-          textDefault?: string | null;
-          /** @description Allowed pattern (regex) for text columns (not yet implemented) */
-          textAllowedPattern?: string | null;
-          /**
-           * Format: int64
-           * @description Max length, if column is a text
-           */
-          textMaxLength?: number | null;
-          /**
-           * @description Options for a selection (json array{id: int, label: string})
-           * @default
-           */
-          selectionOptions?: string | null;
-          /**
-           * @description Default option IDs for a selection (json int[])
-           * @default
-           */
-          selectionDefault?: string | null;
-          /**
-           * @description Default value, if column is datetime
-           * @default
-           */
-          datetimeDefault?: string | null;
-          /**
-           * @description View IDs where this column should be added to be presented
-           * @default []
-           */
-          selectedViewIds?: number[] | null;
-        };
       };
     };
     responses: {
@@ -1410,7 +1297,7 @@ export type operations = {
     };
   };
   /** Get all columns for a view Return an empty array if no columns were found */
-  "api1-index-view-columns": {
+  "api1-list-view-columns": {
     parameters: {
       path: {
         /** @description View ID */
@@ -1451,86 +1338,48 @@ export type operations = {
   };
   /** Create a column */
   "api1-create-column": {
-    requestBody: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description Table ID
-           */
-          tableId?: number | null;
-          /**
-           * Format: int64
-           * @description View ID
-           */
-          viewId?: number | null;
-          /** @description Title */
-          title: string;
-          /**
-           * @description Column main type
-           * @enum {string}
-           */
-          type: "text" | "number" | "datetime" | "select";
-          /** @description Column sub type */
-          subtype?: string | null;
-          /** @description Is the column mandatory */
-          mandatory: boolean;
-          /** @description Description */
-          description?: string | null;
-          /** @description Prefix if the column is a number field */
-          numberPrefix?: string | null;
-          /** @description Suffix if the column is a number field */
-          numberSuffix?: string | null;
-          /**
-           * Format: double
-           * @description Default number, if column is a number
-           */
-          numberDefault?: number | null;
-          /**
-           * Format: double
-           * @description Min value, if column is a number
-           */
-          numberMin?: number | null;
-          /**
-           * Format: double
-           * @description Max number, if column is a number
-           */
-          numberMax?: number | null;
-          /**
-           * Format: int64
-           * @description Number of decimals, if column is a number
-           */
-          numberDecimals?: number | null;
-          /** @description Default text, if column is a text */
-          textDefault?: string | null;
-          /** @description Allowed pattern (regex) for text columns (not yet implemented) */
-          textAllowedPattern?: string | null;
-          /**
-           * Format: int64
-           * @description Max length, if column is a text
-           */
-          textMaxLength?: number | null;
-          /**
-           * @description Options for a selection (json array{id: int, label: string})
-           * @default
-           */
-          selectionOptions?: string | null;
-          /**
-           * @description Default option IDs for a selection (json int[])
-           * @default
-           */
-          selectionDefault?: string | null;
-          /**
-           * @description Default value, if column is datetime
-           * @default
-           */
-          datetimeDefault?: string | null;
-          /**
-           * @description View IDs where this column should be added to be presented
-           * @default []
-           */
-          selectedViewIds?: number[] | null;
-        };
+    parameters: {
+      query: {
+        /** @description Table ID */
+        tableId?: number | null;
+        /** @description View ID */
+        viewId?: number | null;
+        /** @description Title */
+        title: string;
+        /** @description Column main type */
+        type: "text" | "number" | "datetime" | "select";
+        /** @description Column sub type */
+        subtype?: string | null;
+        /** @description Is the column mandatory */
+        mandatory: 0 | 1;
+        /** @description Description */
+        description?: string | null;
+        /** @description Prefix if the column is a number field */
+        numberPrefix?: string | null;
+        /** @description Suffix if the column is a number field */
+        numberSuffix?: string | null;
+        /** @description Default number, if column is a number */
+        numberDefault?: number | null;
+        /** @description Min value, if column is a number */
+        numberMin?: number | null;
+        /** @description Max number, if column is a number */
+        numberMax?: number | null;
+        /** @description Number of decimals, if column is a number */
+        numberDecimals?: number | null;
+        /** @description Default text, if column is a text */
+        textDefault?: string | null;
+        /** @description Allowed pattern (regex) for text columns (not yet implemented) */
+        textAllowedPattern?: string | null;
+        /** @description Max length, if column is a text */
+        textMaxLength?: number | null;
+        /** @description Options for a selection (json array{id: int, label: string}) */
+        selectionOptions?: string | null;
+        /** @description Default option IDs for a selection (json int[]) */
+        selectionDefault?: string | null;
+        /** @description Default value, if column is datetime */
+        datetimeDefault?: string | null;
+        /** @description View IDs where this column should be added to be presented */
+        "selectedViewIds[]"?: number[] | null;
       };
     };
     responses: {
@@ -1608,62 +1457,43 @@ export type operations = {
   /** Update a column */
   "api1-update-column": {
     parameters: {
+      query: {
+        /** @description Title */
+        title?: string | null;
+        /** @description Column sub type */
+        subtype?: string | null;
+        /** @description Is the column mandatory */
+        mandatory: 0 | 1;
+        /** @description Description */
+        description?: string | null;
+        /** @description Prefix if the column is a number field */
+        numberPrefix?: string | null;
+        /** @description Suffix if the column is a number field */
+        numberSuffix?: string | null;
+        /** @description Default number, if column is a number */
+        numberDefault?: number | null;
+        /** @description Min value, if column is a number */
+        numberMin?: number | null;
+        /** @description Max number, if column is a number */
+        numberMax?: number | null;
+        /** @description Number of decimals, if column is a number */
+        numberDecimals?: number | null;
+        /** @description Default text, if column is a text */
+        textDefault?: string | null;
+        /** @description Allowed pattern (regex) for text columns (not yet implemented) */
+        textAllowedPattern?: string | null;
+        /** @description Max length, if column is a text */
+        textMaxLength?: number | null;
+        /** @description Options for a selection (json array{id: int, label: string}) */
+        selectionOptions?: string | null;
+        /** @description Default option IDs for a selection (json int[]) */
+        selectionDefault?: string | null;
+        /** @description Default value, if column is datetime */
+        datetimeDefault?: string | null;
+      };
       path: {
         /** @description Column ID that will be updated */
         columnId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Title */
-          title?: string | null;
-          /** @description Column sub type */
-          subtype?: string | null;
-          /** @description Is the column mandatory */
-          mandatory: boolean;
-          /** @description Description */
-          description?: string | null;
-          /** @description Prefix if the column is a number field */
-          numberPrefix?: string | null;
-          /** @description Suffix if the column is a number field */
-          numberSuffix?: string | null;
-          /**
-           * Format: double
-           * @description Default number, if column is a number
-           */
-          numberDefault?: number | null;
-          /**
-           * Format: double
-           * @description Min value, if column is a number
-           */
-          numberMin?: number | null;
-          /**
-           * Format: double
-           * @description Max number, if column is a number
-           */
-          numberMax?: number | null;
-          /**
-           * Format: int64
-           * @description Number of decimals, if column is a number
-           */
-          numberDecimals?: number | null;
-          /** @description Default text, if column is a text */
-          textDefault?: string | null;
-          /** @description Allowed pattern (regex) for text columns (not yet implemented) */
-          textAllowedPattern?: string | null;
-          /**
-           * Format: int64
-           * @description Max length, if column is a text
-           */
-          textMaxLength?: number | null;
-          /** @description Options for a selection (json array{id: int, label: string}) */
-          selectionOptions?: string | null;
-          /** @description Default option IDs for a selection (json int[]) */
-          selectionDefault?: string | null;
-          /** @description Default value, if column is datetime */
-          datetimeDefault?: string | null;
-        };
       };
     };
     responses: {
@@ -1723,27 +1553,17 @@ export type operations = {
     };
   };
   /** List all rows values for a table, first row are the column titles */
-  "api1-index-table-rows-simple": {
+  "api1-list-table-rows-simple": {
     parameters: {
+      query?: {
+        /** @description Limit */
+        limit?: number | null;
+        /** @description Offset */
+        offset?: number | null;
+      };
       path: {
         /** @description Table ID */
         tableId: number;
-      };
-    };
-    requestBody?: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description Limit
-           */
-          limit?: number | null;
-          /**
-           * Format: int64
-           * @description Offset
-           */
-          offset?: number | null;
-        };
       };
     };
     responses: {
@@ -1779,27 +1599,17 @@ export type operations = {
     };
   };
   /** List all rows for a table */
-  "api1-index-table-rows": {
+  "api1-list-table-rows": {
     parameters: {
+      query?: {
+        /** @description Limit */
+        limit?: number | null;
+        /** @description Offset */
+        offset?: number | null;
+      };
       path: {
         /** @description Table ID */
         tableId: number;
-      };
-    };
-    requestBody?: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description Limit
-           */
-          limit?: number | null;
-          /**
-           * Format: int64
-           * @description Offset
-           */
-          offset?: number | null;
-        };
       };
     };
     responses: {
@@ -1873,27 +1683,17 @@ export type operations = {
     };
   };
   /** List all rows for a view */
-  "api1-index-view-rows": {
+  "api1-list-view-rows": {
     parameters: {
+      query?: {
+        /** @description Limit */
+        limit?: number | null;
+        /** @description Offset */
+        offset?: number | null;
+      };
       path: {
         /** @description View ID */
         viewId: number;
-      };
-    };
-    requestBody?: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description Limit
-           */
-          limit?: number | null;
-          /**
-           * Format: int64
-           * @description Offset
-           */
-          offset?: number | null;
-        };
       };
     };
     responses: {
@@ -1931,21 +1731,17 @@ export type operations = {
   /** Create a row within a view */
   "api1-create-row-in-view": {
     parameters: {
+      query: {
+        /** @description Data as key - value store */
+        data: OneOf<[string, {
+          /** Format: int64 */
+          columnId: number;
+          value: Record<string, never>;
+        }]>;
+      };
       path: {
         /** @description View ID */
         viewId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Data as key - value store */
-          data: OneOf<[string, {
-            /** Format: int64 */
-            columnId: number;
-            value: Record<string, never>;
-          }]>;
-        };
       };
     };
     responses: {
@@ -2015,26 +1811,19 @@ export type operations = {
   /** Update a row */
   "api1-update-row": {
     parameters: {
+      query: {
+        /** @description View ID */
+        viewId?: number | null;
+        /** @description Data as key - value store */
+        data: OneOf<[string, {
+          /** Format: int64 */
+          columnId: number;
+          value: Record<string, never>;
+        }]>;
+      };
       path: {
         /** @description Row ID */
         rowId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description View ID
-           */
-          viewId?: number | null;
-          /** @description Data as key - value store */
-          data: OneOf<[string, {
-            /** Format: int64 */
-            columnId: number;
-            value: Record<string, never>;
-          }]>;
-        };
       };
     };
     responses: {
@@ -2154,22 +1943,15 @@ export type operations = {
   /** Import from file in to a table */
   "api1-import-in-table": {
     parameters: {
+      query: {
+        /** @description Path to file */
+        path: string;
+        /** @description Create missing columns */
+        createMissingColumns?: 0 | 1;
+      };
       path: {
         /** @description Table ID */
         tableId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Path to file */
-          path: string;
-          /**
-           * @description Create missing columns
-           * @default true
-           */
-          createMissingColumns?: boolean;
-        };
       };
     };
     responses: {
@@ -2207,22 +1989,15 @@ export type operations = {
   /** Import from file in to a table */
   "api1-import-in-view": {
     parameters: {
+      query: {
+        /** @description Path to file */
+        path: string;
+        /** @description Create missing columns */
+        createMissingColumns?: 0 | 1;
+      };
       path: {
         /** @description View ID */
         viewId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Path to file */
-          path: string;
-          /**
-           * @description Create missing columns
-           * @default true
-           */
-          createMissingColumns?: boolean;
-        };
       };
     };
     responses: {
@@ -2261,7 +2036,7 @@ export type operations = {
    * [api v2] Returns all main resources
    * @description Tables and views incl. shares
    */
-  "api_general-index": {
+  "api_general-list": {
     parameters: {
       header: {
         /** @description Required to be true for the API request to pass */
@@ -2295,7 +2070,7 @@ export type operations = {
     };
   };
   /** [api v2] Returns all Tables */
-  "api_tables-index": {
+  "api_tables-list": {
     parameters: {
       header: {
         /** @description Required to be true for the API request to pass */
@@ -2331,26 +2106,19 @@ export type operations = {
   /** [api v2] Create a new table and return it */
   "api_tables-create": {
     parameters: {
+      query: {
+        /** @description Title of the table */
+        title: string;
+        /** @description Emoji for the table */
+        emoji?: string | null;
+        /** @description Description for the table */
+        description?: string | null;
+        /** @description Template to use if wanted */
+        template?: string;
+      };
       header: {
         /** @description Required to be true for the API request to pass */
         "OCS-APIRequest": boolean;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Title of the table */
-          title: string;
-          /** @description Emoji for the table */
-          emoji?: string | null;
-          /** @description Description for the table */
-          description?: string | null;
-          /**
-           * @description Template to use if wanted
-           * @default custom
-           */
-          template?: string;
-        };
       };
     };
     responses: {
@@ -2446,6 +2214,16 @@ export type operations = {
   /** [api v2] Update tables properties */
   "api_tables-update": {
     parameters: {
+      query?: {
+        /** @description New table title */
+        title?: string | null;
+        /** @description New table emoji */
+        emoji?: string | null;
+        /** @description the tables description */
+        description?: string;
+        /** @description whether the table is archived */
+        archived?: 0 | 1;
+      };
       header: {
         /** @description Required to be true for the API request to pass */
         "OCS-APIRequest": boolean;
@@ -2453,20 +2231,6 @@ export type operations = {
       path: {
         /** @description Table ID */
         id: number;
-      };
-    };
-    requestBody?: {
-      content: {
-        "application/json": {
-          /** @description New table title */
-          title?: string | null;
-          /** @description New table emoji */
-          emoji?: string | null;
-          /** @description the tables description */
-          description?: string;
-          /** @description whether the table is archived */
-          archived?: boolean;
-        };
       };
     };
     responses: {
@@ -2591,6 +2355,10 @@ export type operations = {
    */
   "api_tables-transfer": {
     parameters: {
+      query: {
+        /** @description New user ID */
+        newOwnerUserId: string;
+      };
       header: {
         /** @description Required to be true for the API request to pass */
         "OCS-APIRequest": boolean;
@@ -2598,14 +2366,6 @@ export type operations = {
       path: {
         /** @description Table ID */
         id: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description New user ID */
-          newOwnerUserId: string;
-        };
       };
     };
     responses: {
@@ -2664,7 +2424,7 @@ export type operations = {
    * [api v2] Get all columns for a table or a view
    * @description Return an empty array if no columns were found
    */
-  "api_columns-index": {
+  "api_columns-list": {
     parameters: {
       header: {
         /** @description Required to be true for the API request to pass */
@@ -2799,69 +2559,37 @@ export type operations = {
    */
   "api_columns-create-number-column": {
     parameters: {
+      query: {
+        /** @description Context of the column creation */
+        baseNodeId: number;
+        /** @description Title */
+        title: string;
+        /** @description Default value for new rows */
+        numberDefault?: number | null;
+        /** @description Decimals */
+        numberDecimals?: number | null;
+        /** @description Prefix */
+        numberPrefix?: string | null;
+        /** @description Suffix */
+        numberSuffix?: string | null;
+        /** @description Min */
+        numberMin?: number | null;
+        /** @description Max */
+        numberMax?: number | null;
+        /** @description Subtype for the new column */
+        subtype?: "progress" | "stars" | null;
+        /** @description Description */
+        description?: string | null;
+        /** @description View IDs where this columns should be added */
+        "selectedViewIds[]"?: number[] | null;
+        /** @description Is mandatory */
+        mandatory?: 0 | 1;
+        /** @description Context type of the column creation */
+        baseNodeType?: "table" | "view";
+      };
       header: {
         /** @description Required to be true for the API request to pass */
         "OCS-APIRequest": boolean;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description Context of the column creation
-           */
-          baseNodeId: number;
-          /** @description Title */
-          title: string;
-          /**
-           * Format: double
-           * @description Default value for new rows
-           */
-          numberDefault?: number | null;
-          /**
-           * Format: int64
-           * @description Decimals
-           */
-          numberDecimals?: number | null;
-          /** @description Prefix */
-          numberPrefix?: string | null;
-          /** @description Suffix */
-          numberSuffix?: string | null;
-          /**
-           * Format: double
-           * @description Min
-           */
-          numberMin?: number | null;
-          /**
-           * Format: double
-           * @description Max
-           */
-          numberMax?: number | null;
-          /**
-           * @description Subtype for the new column
-           * @enum {string|null}
-           */
-          subtype?: "progress" | "stars" | null;
-          /** @description Description */
-          description?: string | null;
-          /**
-           * @description View IDs where this columns should be added
-           * @default []
-           */
-          selectedViewIds?: number[] | null;
-          /**
-           * @description Is mandatory
-           * @default false
-           */
-          mandatory?: boolean;
-          /**
-           * @description Context type of the column creation
-           * @default table
-           * @enum {string}
-           */
-          baseNodeType?: "table" | "view";
-        };
       };
     };
     responses: {
@@ -2923,54 +2651,31 @@ export type operations = {
    */
   "api_columns-create-text-column": {
     parameters: {
+      query: {
+        /** @description Context of the column creation */
+        baseNodeId: number;
+        /** @description Title */
+        title: string;
+        /** @description Default */
+        textDefault?: string | null;
+        /** @description Allowed regex pattern */
+        textAllowedPattern?: string | null;
+        /** @description Max raw text length */
+        textMaxLength?: number | null;
+        /** @description Subtype for the new column */
+        subtype?: "progress" | "stars" | null;
+        /** @description Description */
+        description?: string | null;
+        /** @description View IDs where this columns should be added */
+        "selectedViewIds[]"?: number[] | null;
+        /** @description Is mandatory */
+        mandatory?: 0 | 1;
+        /** @description Context type of the column creation */
+        baseNodeType?: "table" | "view";
+      };
       header: {
         /** @description Required to be true for the API request to pass */
         "OCS-APIRequest": boolean;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description Context of the column creation
-           */
-          baseNodeId: number;
-          /** @description Title */
-          title: string;
-          /** @description Default */
-          textDefault?: string | null;
-          /** @description Allowed regex pattern */
-          textAllowedPattern?: string | null;
-          /**
-           * Format: int64
-           * @description Max raw text length
-           */
-          textMaxLength?: number | null;
-          /**
-           * @description Subtype for the new column
-           * @enum {string|null}
-           */
-          subtype?: "progress" | "stars" | null;
-          /** @description Description */
-          description?: string | null;
-          /**
-           * @description View IDs where this columns should be added
-           * @default []
-           */
-          selectedViewIds?: number[] | null;
-          /**
-           * @description Is mandatory
-           * @default false
-           */
-          mandatory?: boolean;
-          /**
-           * @description Context type of the column creation
-           * @default table
-           * @enum {string}
-           */
-          baseNodeType?: "table" | "view";
-        };
       };
     };
     responses: {
@@ -3032,49 +2737,29 @@ export type operations = {
    */
   "api_columns-create-selection-column": {
     parameters: {
+      query: {
+        /** @description Context of the column creation */
+        baseNodeId: number;
+        /** @description Title */
+        title: string;
+        /** @description Json array{id: int, label: string} with options that can be selected, eg [{"id": 1, "label": "first"},{"id": 2, "label": "second"}] */
+        selectionOptions: string;
+        /** @description Json int|int[] for default selected option(s), eg 5 or ["1", "8"] */
+        selectionDefault?: string | null;
+        /** @description Subtype for the new column */
+        subtype?: "progress" | "stars" | null;
+        /** @description Description */
+        description?: string | null;
+        /** @description View IDs where this columns should be added */
+        "selectedViewIds[]"?: number[] | null;
+        /** @description Is mandatory */
+        mandatory?: 0 | 1;
+        /** @description Context type of the column creation */
+        baseNodeType?: "table" | "view";
+      };
       header: {
         /** @description Required to be true for the API request to pass */
         "OCS-APIRequest": boolean;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description Context of the column creation
-           */
-          baseNodeId: number;
-          /** @description Title */
-          title: string;
-          /** @description Json array{id: int, label: string} with options that can be selected, eg [{"id": 1, "label": "first"},{"id": 2, "label": "second"}] */
-          selectionOptions: string;
-          /** @description Json int|int[] for default selected option(s), eg 5 or ["1", "8"] */
-          selectionDefault?: string | null;
-          /**
-           * @description Subtype for the new column
-           * @enum {string|null}
-           */
-          subtype?: "progress" | "stars" | null;
-          /** @description Description */
-          description?: string | null;
-          /**
-           * @description View IDs where this columns should be added
-           * @default []
-           */
-          selectedViewIds?: number[] | null;
-          /**
-           * @description Is mandatory
-           * @default false
-           */
-          mandatory?: boolean;
-          /**
-           * @description Context type of the column creation
-           * @default table
-           * @enum {string}
-           */
-          baseNodeType?: "table" | "view";
-        };
       };
     };
     responses: {
@@ -3136,50 +2821,27 @@ export type operations = {
    */
   "api_columns-create-datetime-column": {
     parameters: {
+      query: {
+        /** @description Context of the column creation */
+        baseNodeId: number;
+        /** @description Title */
+        title: string;
+        /** @description For a subtype 'date' you can set 'today'. For a main type or subtype 'time' you can set to 'now'. */
+        datetimeDefault?: "today" | "now" | null;
+        /** @description Subtype for the new column */
+        subtype?: "progress" | "stars" | null;
+        /** @description Description */
+        description?: string | null;
+        /** @description View IDs where this columns should be added */
+        "selectedViewIds[]"?: number[] | null;
+        /** @description Is mandatory */
+        mandatory?: 0 | 1;
+        /** @description Context type of the column creation */
+        baseNodeType?: "table" | "view";
+      };
       header: {
         /** @description Required to be true for the API request to pass */
         "OCS-APIRequest": boolean;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description Context of the column creation
-           */
-          baseNodeId: number;
-          /** @description Title */
-          title: string;
-          /**
-           * @description For a subtype 'date' you can set 'today'. For a main type or subtype 'time' you can set to 'now'.
-           * @enum {string|null}
-           */
-          datetimeDefault?: "today" | "now" | null;
-          /**
-           * @description Subtype for the new column
-           * @enum {string|null}
-           */
-          subtype?: "progress" | "stars" | null;
-          /** @description Description */
-          description?: string | null;
-          /**
-           * @description View IDs where this columns should be added
-           * @default []
-           */
-          selectedViewIds?: number[] | null;
-          /**
-           * @description Is mandatory
-           * @default false
-           */
-          mandatory?: boolean;
-          /**
-           * @description Context type of the column creation
-           * @default table
-           * @enum {string}
-           */
-          baseNodeType?: "table" | "view";
-        };
       };
     };
     responses: {
@@ -3371,7 +3033,7 @@ export type operations = {
    * [api v3] Get all contexts available to the requesting person
    * @description Return an empty array if no contexts were found
    */
-  "context-index": {
+  "context-list": {
     parameters: {
       header: {
         /** @description Required to be true for the API request to pass */
@@ -3407,36 +3069,26 @@ export type operations = {
   /** [api v2] Create a new context and return it */
   "context-create": {
     parameters: {
+      query: {
+        /** @description Name of the context */
+        name: string;
+        /** @description Material design icon name of the context */
+        iconName: string;
+        /** @description Descriptive text of the context */
+        description?: string;
+        /** @description optional nodes to be connected to this context */
+        "nodes[]"?: {
+            /** Format: int64 */
+            id: number;
+            /** Format: int64 */
+            type: number;
+            /** Format: int64 */
+            permissions?: number;
+          }[];
+      };
       header: {
         /** @description Required to be true for the API request to pass */
         "OCS-APIRequest": boolean;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Name of the context */
-          name: string;
-          /** @description Material design icon name of the context */
-          iconName: string;
-          /**
-           * @description Descriptive text of the context
-           * @default
-           */
-          description?: string;
-          /**
-           * @description optional nodes to be connected to this context
-           * @default []
-           */
-          nodes?: {
-              /** Format: int64 */
-              id: number;
-              /** Format: int64 */
-              type: number;
-              /** Format: int64 */
-              permissions?: number;
-            }[];
-        };
       };
     };
     responses: {
@@ -3545,6 +3197,16 @@ export type operations = {
   /** [api v2] Update an existing context and return it */
   "context-update": {
     parameters: {
+      query?: {
+        /** @description provide this parameter to set a new name */
+        name?: string | null;
+        /** @description provide this parameter to set a new icon */
+        iconName?: string | null;
+        /** @description provide this parameter to set a new description */
+        description?: string | null;
+        /** @description provide this parameter to set a new list of nodes. */
+        nodes?: string | null;
+      };
       header: {
         /** @description Required to be true for the API request to pass */
         "OCS-APIRequest": boolean;
@@ -3552,29 +3214,6 @@ export type operations = {
       path: {
         /** @description ID of the context */
         contextId: number;
-      };
-    };
-    requestBody?: {
-      content: {
-        "application/json": {
-          /** @description provide this parameter to set a new name */
-          name?: string | null;
-          /** @description provide this parameter to set a new icon */
-          iconName?: string | null;
-          /** @description provide this parameter to set a new description */
-          description?: string | null;
-          /** @description provide this parameter to set a new list of nodes. */
-          nodes?: {
-            /** Format: int64 */
-            id: number;
-            /** Format: int64 */
-            type: number;
-            /** Format: int64 */
-            permissions: number;
-            /** Format: int64 */
-            order: number;
-          } | null;
-        };
       };
     };
     responses: {
@@ -3683,6 +3322,12 @@ export type operations = {
   /** [api v2] Transfer the ownership of a context and return it */
   "context-transfer": {
     parameters: {
+      query: {
+        /** @description ID of the new owner */
+        newOwnerId: string;
+        /** @description any Application::OWNER_TYPE_* constant */
+        newOwnerType?: number;
+      };
       header: {
         /** @description Required to be true for the API request to pass */
         "OCS-APIRequest": boolean;
@@ -3690,20 +3335,6 @@ export type operations = {
       path: {
         /** @description ID of the context */
         contextId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description ID of the new owner */
-          newOwnerId: string;
-          /**
-           * Format: int64
-           * @description any Application::OWNER_TYPE_* constant
-           * @default 0
-           */
-          newOwnerType?: number;
-        };
       };
     };
     responses: {
@@ -3761,6 +3392,10 @@ export type operations = {
   /** [api v2] Update the order on a page of a context */
   "context-update-content-order": {
     parameters: {
+      query: {
+        /** @description content items with it and order values */
+        content: string;
+      };
       header: {
         /** @description Required to be true for the API request to pass */
         "OCS-APIRequest": boolean;
@@ -3770,19 +3405,6 @@ export type operations = {
         contextId: number;
         /** @description ID of the page */
         pageId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description content items with it and order values */
-          content: {
-            /** Format: int64 */
-            id: number;
-            /** Format: int64 */
-            order: number;
-          };
-        };
       };
     };
     responses: {
