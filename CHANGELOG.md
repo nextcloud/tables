@@ -7,9 +7,9 @@
 
 ### Fixed
 * [[stable0.7] fix: hide Create Column button on empty table if inadequate permissions (tables#1152)](https://github.com/nextcloud/tables/pull/1152)
-
 * [[stable0.7] fix(API): declared array shape was not correct (tables#1171)](https://github.com/nextcloud/tables/pull/1171)
 * [[stable0.7] fix: only add resource if user can manage resource (tables#1174)](https://github.com/nextcloud/tables/pull/1174)
+* [[stable0.7] fix: modify context nodes update (tables#1183)](https://github.com/nextcloud/tables/pull/1183)
 
 ### Other
 * [[stable0.7] ci: add missing server branches to matrices (tables#1172)](https://github.com/nextcloud/tables/pull/1172)
