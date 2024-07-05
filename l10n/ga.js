@@ -303,6 +303,7 @@ OC.L10N.register(
     "Inserted rows" : "Sraitheanna curtha isteach",
     "Value parsing errors" : "Earráidí parsála luacha",
     "Row creation errors" : "Earráidí cruthú rónna",
+    "Transfer the application \"{context}\" to another user" : "Aistrigh an feidhmchlár \"{context}\" chuig úsáideoir eile",
     "Transfer" : "Aistriú",
     "Context \"{name}\" transferred to {user}" : "Comhthéacs \"{name}\" aistrithe go {user}",
     "Transfer table" : "Tábla aistrithe",

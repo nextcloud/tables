@@ -303,6 +303,7 @@ OC.L10N.register(
     "Inserted rows" : "Уметнути су редови",
     "Value parsing errors" : "Грешке у парсирању вредности",
     "Row creation errors" : "Грешке у креирању реда",
+    "Transfer the application \"{context}\" to another user" : "Преноси апликацију „{context}” другом кориснику",
     "Transfer" : "Пренеси",
     "Context \"{name}\" transferred to {user}" : "Контекст „{name}” је пренесен кориснику {user}",
     "Transfer table" : "Пренеси табелу",

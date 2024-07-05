@@ -303,6 +303,7 @@ OC.L10N.register(
     "Inserted rows" : "الصفوف المدرجة",
     "Value parsing errors" : "خطأ في تحليل القيمة",
     "Row creation errors" : "خطأ في إنشاء السطر",
+    "Transfer the application \"{context}\" to another user" : "نقل التطبيق \"{context}\"  إلى مستخدِم آخرَ",
     "Transfer" : "نقل",
     "Context \"{name}\" transferred to {user}" : "تمّ نقل السياق \"{name}\" إلى المستخدِم {user}",
     "Transfer table" : "نقل الجدول",

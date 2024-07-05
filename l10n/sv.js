@@ -266,6 +266,7 @@ OC.L10N.register(
     "Inserted rows" : "Infogade rader",
     "Value parsing errors" : "Värdeanalysfel",
     "Row creation errors" : "Fel vid skapande av rader",
+    "Transfer the application \"{context}\" to another user" : "Överför appen \"{context}\" till en annan användare",
     "Transfer" : "Överför",
     "Context \"{name}\" transferred to {user}" : "Kontext \"{name}\" överfördes till {user}",
     "Transfer table" : "Överför tabell",

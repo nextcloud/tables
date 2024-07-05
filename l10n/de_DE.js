@@ -303,6 +303,7 @@ OC.L10N.register(
     "Inserted rows" : "Eingefügte Reihen",
     "Value parsing errors" : "Fehler beim Einlesen von Werten",
     "Row creation errors" : "Fehler bei der Zeilenerstellung",
+    "Transfer the application \"{context}\" to another user" : "Die Anwendung \"{context}\" auf eine andere Person übertragen",
     "Transfer" : "Übertragen",
     "Context \"{name}\" transferred to {user}" : "Kontext \"{name}“ wurde an {user} übertragen",
     "Transfer table" : "Tabelle übertragen",
