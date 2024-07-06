@@ -301,6 +301,7 @@
     "Inserted rows" : "已插入列",
     "Value parsing errors" : "數值解析錯誤",
     "Row creation errors" : "列創建錯誤",
+    "Transfer the application \"{context}\" to another user" : "將應用程式「{context}」轉移另一個用戶",
     "Transfer" : "轉移",
     "Context \"{name}\" transferred to {user}" : "上下文「{name}」已轉移至 {user}",
     "Transfer table" : "轉移數據庫表",

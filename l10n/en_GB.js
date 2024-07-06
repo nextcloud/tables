@@ -303,6 +303,7 @@ OC.L10N.register(
     "Inserted rows" : "Inserted rows",
     "Value parsing errors" : "Value parsing errors",
     "Row creation errors" : "Row creation errors",
+    "Transfer the application \"{context}\" to another user" : "Transfer the application \"{context}\" to another user",
     "Transfer" : "Transfer",
     "Context \"{name}\" transferred to {user}" : "Context \"{name}\" transferred to {user}",
     "Transfer table" : "Transfer table",
