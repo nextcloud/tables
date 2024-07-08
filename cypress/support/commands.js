@@ -56,6 +56,15 @@ Cypress.Commands.add('createView', (title) => {
 	cy.contains('.app-navigation-entry-link span', title).should('exist')
 })
 
+Cypress.Commands.add('openCreateColumnModal', (isFirstColumn) => {
+	if (isFirstColumn) {
+		cy.get('.button-vue__text').contains('Create column').click({ force: true })
+	} else {
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
+	}
+})
+
 Cypress.Commands.add('createContext', (title) => {
 	cy.get('ul:nth-of-type(2) [data-cy="createContextIcon"]').click({ force: true })
 	cy.get('[data-cy="createContextModal"]').should('be.visible')
@@ -65,10 +74,6 @@ Cypress.Commands.add('createContext', (title) => {
 	// verify context was created properly
 	cy.get('[data-cy="navigationContextItem"]').contains(title).should('exist')
 	cy.contains('h1', title).should('exist')
-})
-
-Cypress.Commands.add('loadContext', (title) => {
-	cy.get('[data-cy="navigationContextItem"]').contains(title).click({ force: true })
 })
 
 Cypress.Commands.add('openContextEditModal', (title) => {
@@ -99,21 +104,48 @@ Cypress.Commands.add('loadView', (name) => {
 	cy.get('[data-cy="navigationViewItem"] a[title="' + name + '"]').click({ force: true })
 })
 
+Cypress.Commands.add('loadContext', (title) => {
+	cy.get('[data-cy="navigationContextItem"]').contains(title).click({ force: true })
+})
+
 Cypress.Commands.add('unifiedSearch', (term) => {
 	cy.get('#unified-search').click()
 	cy.get('#unified-search__input').type(term)
 	cy.get('.unified-search__results .unified-search__result-line-one span').contains(term, { matchCase: false }).should('exist')
 })
 
-Cypress.Commands.add('createTextLinkColumn', (title, ressourceProvider, firstColumn) => {
-	if (firstColumn) {
-		cy.get('.button-vue__text').contains('Create column').click({ force: true })
-	} else {
-		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
+Cypress.Commands.add('createUsergroupColumn', (title, selectUsers, selectGroups, hasMultipleValues, defaultValue, isFirstColumn) => {
+	cy.openCreateColumnModal(isFirstColumn)
+	cy.get('[data-cy="columnTypeFormInput"]').clear().type(title)
+	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
+	cy.get('.multiSelectOptionLabel').contains('Users and groups').click({ force: true })
+
+	if (hasMultipleValues) {
+		cy.get('[data-cy="usergroupMultipleSwitch"] .checkbox-content').click({ force: true })
 	}
 
-	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+	if (selectUsers && selectGroups) {
+		cy.get('[data-cy="userAndGroupSwitch"] .checkbox-content').click()
+	} else if (selectUsers) {
+		cy.get('[data-cy="userSwitch"] .checkbox-content').click()
+	} else if (selectGroups) {
+		cy.get('[data-cy="groupSwitch"] .checkbox-content').click()
+	}
+
+	defaultValue.forEach((value) => {
+		cy.get('[data-cy="usergroupDefaultSelect"] input').type(value)
+		cy.get(`.vs__dropdown-menu [id="${value}"]`).click()
+	})
+
+	cy.get('[data-cy="createColumnSaveBtn"]').click()
+	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.get('[data-cy="ncTable"] table tr th').contains(title).should('exist')
+})
+
+Cypress.Commands.add('createTextLinkColumn', (title, ressourceProvider, isFirstColumn) => {
+	cy.openCreateColumnModal(isFirstColumn)
+
+	cy.get('[data-cy="columnTypeFormInput"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
 	cy.get('.multiSelectOptionLabel').contains('Link').click({ force: true })
 	// deactivate unwanted provider
@@ -131,15 +163,10 @@ Cypress.Commands.add('createTextLinkColumn', (title, ressourceProvider, firstCol
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
-Cypress.Commands.add('createSelectionColumn', (title, options, defaultOption, firstColumn) => {
-	if (firstColumn) {
-		cy.get('.button-vue__text').contains('Create column').click({ force: true })
-	} else {
-		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
-	}
+Cypress.Commands.add('createSelectionColumn', (title, options, defaultOption, isFirstColumn) => {
+	cy.openCreateColumnModal(isFirstColumn)
 
-	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+	cy.get('[data-cy="columnTypeFormInput"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
 	cy.get('.multiSelectOptionLabel').contains('Selection').click({ force: true })
 	// remove default option
@@ -160,15 +187,11 @@ Cypress.Commands.add('createSelectionColumn', (title, options, defaultOption, fi
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
-Cypress.Commands.add('createSelectionMultiColumn', (title, options, defaultOptions, firstColumn) => {
-	if (firstColumn) {
-		cy.get('.button-vue__text').contains('Create column').click({ force: true })
-	} else {
-		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
-	}
 
-	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+Cypress.Commands.add('createSelectionMultiColumn', (title, options, defaultOptions, isFirstColumn) => {
+	cy.openCreateColumnModal(isFirstColumn)
+
+	cy.get('[data-cy="columnTypeFormInput"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
 	cy.get('.multiSelectOptionLabel').contains('Selection').click({ force: true })
 	cy.get('[data-cy="createColumnMultipleSelectionSwitch"]').contains('Multiple selection').click()
@@ -191,14 +214,9 @@ Cypress.Commands.add('createSelectionMultiColumn', (title, options, defaultOptio
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
-Cypress.Commands.add('createTextLineColumn', (title, defaultValue, maxLength, firstColumn) => {
-	if (firstColumn) {
-		cy.get('.button-vue__text').contains('Create column').click({ force: true })
-	} else {
-		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
-	}
-	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+Cypress.Commands.add('createTextLineColumn', (title, defaultValue, maxLength, isFirstColumn) => {
+	cy.openCreateColumnModal(isFirstColumn)
+	cy.get('[data-cy="columnTypeFormInput"]').clear().type(title)
 	if (defaultValue) {
 		cy.get('[data-cy="TextLineForm"] input').first().type(defaultValue)
 	}
@@ -210,14 +228,9 @@ Cypress.Commands.add('createTextLineColumn', (title, defaultValue, maxLength, fi
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
-Cypress.Commands.add('createDatetimeColumn', (title, setNow, firstColumn) => {
-	if (firstColumn) {
-		cy.get('.button-vue__text').contains('Create column').click({ force: true })
-	} else {
-		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
-	}
-	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+Cypress.Commands.add('createDatetimeColumn', (title, setNow, isFirstColumn) => {
+	cy.openCreateColumnModal(isFirstColumn)
+	cy.get('[data-cy="columnTypeFormInput"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
 	cy.get('.multiSelectOptionLabel').contains('Date and time').click({ force: true })
 
@@ -230,14 +243,9 @@ Cypress.Commands.add('createDatetimeColumn', (title, setNow, firstColumn) => {
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
-Cypress.Commands.add('createDatetimeDateColumn', (title, setNow, firstColumn) => {
-	if (firstColumn) {
-		cy.get('.button-vue__text').contains('Create column').click({ force: true })
-	} else {
-		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
-	}
-	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+Cypress.Commands.add('createDatetimeDateColumn', (title, setNow, isFirstColumn) => {
+	cy.openCreateColumnModal(isFirstColumn)
+	cy.get('[data-cy="columnTypeFormInput"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
 	cy.get('.multiSelectOptionLabel').contains('Date and time').click({ force: true })
 	cy.get('[data-cy="createColumnDateSwitch"]').contains('Date').click()
@@ -251,14 +259,9 @@ Cypress.Commands.add('createDatetimeDateColumn', (title, setNow, firstColumn) =>
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
-Cypress.Commands.add('createDatetimeTimeColumn', (title, setNow, firstColumn) => {
-	if (firstColumn) {
-		cy.get('.button-vue__text').contains('Create column').click({ force: true })
-	} else {
-		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
-	}
-	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+Cypress.Commands.add('createDatetimeTimeColumn', (title, setNow, isFirstColumn) => {
+	cy.openCreateColumnModal(isFirstColumn)
+	cy.get('[data-cy="columnTypeFormInput"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
 	cy.get('.multiSelectOptionLabel').contains('Date and time').click({ force: true })
 	cy.get('[data-cy="createColumnTimeSwitch"]').contains('Time').click()
@@ -272,14 +275,9 @@ Cypress.Commands.add('createDatetimeTimeColumn', (title, setNow, firstColumn) =>
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
-Cypress.Commands.add('createNumberColumn', (title, defaultValue, decimals, min, max, prefix, suffix, firstColumn) => {
-	if (firstColumn) {
-		cy.get('.button-vue__text').contains('Create column').click({ force: true })
-	} else {
-		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
-	}
-	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+Cypress.Commands.add('createNumberColumn', (title, defaultValue, decimals, min, max, prefix, suffix, isFirstColumn) => {
+	cy.openCreateColumnModal(isFirstColumn)
+	cy.get('[data-cy="columnTypeFormInput"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
 	cy.get('.multiSelectOptionLabel').contains('Number').click({ force: true })
 
@@ -306,14 +304,9 @@ Cypress.Commands.add('createNumberColumn', (title, defaultValue, decimals, min, 
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
-Cypress.Commands.add('createNumberProgressColumn', (title, defaultValue, firstColumn) => {
-	if (firstColumn) {
-		cy.get('.button-vue__text').contains('Create column').click({ force: true })
-	} else {
-		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
-	}
-	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+Cypress.Commands.add('createNumberProgressColumn', (title, defaultValue, isFirstColumn) => {
+	cy.openCreateColumnModal(isFirstColumn)
+	cy.get('[data-cy="columnTypeFormInput"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
 	cy.get('.multiSelectOptionLabel').contains('Progress').click({ force: true })
 
@@ -325,14 +318,9 @@ Cypress.Commands.add('createNumberProgressColumn', (title, defaultValue, firstCo
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
-Cypress.Commands.add('createNumberStarsColumn', (title, defaultValue, firstColumn) => {
-	if (firstColumn) {
-		cy.get('.button-vue__text').contains('Create column').click({ force: true })
-	} else {
-		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
-	}
-	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+Cypress.Commands.add('createNumberStarsColumn', (title, defaultValue, isFirstColumn) => {
+	cy.openCreateColumnModal(isFirstColumn)
+	cy.get('[data-cy="columnTypeFormInput"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
 	cy.get('.multiSelectOptionLabel').contains('Stars rating').click({ force: true })
 
@@ -346,14 +334,9 @@ Cypress.Commands.add('createNumberStarsColumn', (title, defaultValue, firstColum
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
-Cypress.Commands.add('createSelectionCheckColumn', (title, defaultValue, firstColumn) => {
-	if (firstColumn) {
-		cy.get('.button-vue__text').contains('Create column').click({ force: true })
-	} else {
-		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('[data-cy="dataTableCreateColumnBtn"]').contains('Create column').click({ force: true })
-	}
-	cy.get('.modal-container').get('input[placeholder*="Enter a column title"]').clear().type(title)
+Cypress.Commands.add('createSelectionCheckColumn', (title, defaultValue, isFirstColumn) => {
+	cy.openCreateColumnModal(isFirstColumn)
+	cy.get('[data-cy="columnTypeFormInput"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
 	cy.get('.multiSelectOptionLabel').contains('Selection').click({ force: true })
 	cy.get('[data-cy="createColumnYesNoSwitch"').contains('Yes/No').click()
