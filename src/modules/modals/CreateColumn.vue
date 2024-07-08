@@ -78,7 +78,7 @@
 							{{ t('tables', 'Add more') }}
 						</NcCheckboxRadioSwitch>
 					</div>
-					<button class="primary" @click="actionConfirm()">
+					<button class="primary" data-cy="createColumnSaveBtn" @click="actionConfirm()">
 						{{ t('tables', 'Save') }}
 					</button>
 				</div>

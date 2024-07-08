@@ -154,7 +154,7 @@ export default {
 				shareWith: result.value.shareWith,
 				shareType: result.value.shareType,
 				user: result.uuid || result.value.shareWith,
-				isNoUser: result.value.shareType !== SHARE_TYPES.SHARE_TYPE_USER,
+				isNoUser: result.value.shareType !== this.SHARE_TYPES.SHARE_TYPE_USER,
 				displayName: result.name || result.label,
 				icon: result.value.shareType === this.SHARE_TYPES.SHARE_TYPE_USER ? 'icon-user' : 'icon-group',
 				// Vue unique binding to render within Multiselect's AvatarSelectOption

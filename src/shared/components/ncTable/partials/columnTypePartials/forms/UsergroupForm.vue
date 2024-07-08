@@ -3,15 +3,15 @@
 		<div>
 			<div class="col-4 selections space-T space-L">
 				<NcCheckboxRadioSwitch :checked.sync="checkedValue" value="usergroup-user" name="usergroupTypeSelection"
-					type="radio" data-cy="createColumnUserSwitch">
+					type="radio" data-cy="userSwitch">
 					{{ t('tables', 'Users') }}
 				</NcCheckboxRadioSwitch>
 				<NcCheckboxRadioSwitch :checked.sync="checkedValue" value="usergroup-group"
-					name="usergroupTypeSelection" type="radio" data-cy="createColumnGroupSwitch">
+					name="usergroupTypeSelection" type="radio" data-cy="groupSwitch">
 					{{ t('tables', 'Groups') }}
 				</NcCheckboxRadioSwitch>
 				<NcCheckboxRadioSwitch :checked.sync="checkedValue" value="usergroup" name="usergroupTypeSelection"
-					type="radio" data-cy="createColumnUserAndGroupSwitch">
+					type="radio" data-cy="userAndGroupSwitch">
 					{{ t('tables', 'Users and groups') }}
 				</NcCheckboxRadioSwitch>
 			</div>
@@ -21,13 +21,11 @@
 					{{ t('tables', 'Default') }}
 				</div>
 				<div class="fix-col-4 space-B">
-					<!-- TODO: Add prop for single or multiple -->
 					<NcSelect v-model="value" style="width: 100%;" :loading="loading" :options="options"
 						:placeholder="getPlaceholder()" :searchable="true" :get-option-key="(option) => option.key"
 						label="id" :aria-label-combobox="getPlaceholder()"
-						:user-select="mutableColumn.usergroupSelectUsers"
-						:group-select="mutableColumn.usergroupSelectGroups" :close-on-select="false"
-						:multiple="mutableColumn.usergroupMultipleItems" @search="asyncFind" @input="addItem">
+						:user-select="true" :close-on-select="false"
+						:multiple="mutableColumn.usergroupMultipleItems" data-cy="usergroupDefaultSelect" @search="asyncFind" @input="addItem">
 						<template #noResult>
 							{{ noResultText }}
 						</template>
@@ -38,12 +36,11 @@
 						{{ t('tables', 'Select multiple items') }}
 					</div>
 					<div class="fix-col-4 space-L-small">
-						<NcCheckboxRadioSwitch type="switch" :checked.sync="mutableColumn.usergroupMultipleItems" />
+						<NcCheckboxRadioSwitch type="switch" :checked.sync="mutableColumn.usergroupMultipleItems" data-cy="usergroupMultipleSwitch" />
 					</div>
 				</div>
 			</div>
-			<!-- TODO: Make usergroupSelectUsers reactive -->
-			<div v-if="mutableColumn.usergroupSelectUsers" class="row">
+			<div v-if="selectUsers" class="row">
 				<div class="fix-col-4 title">
 					{{ t('tables', 'Show user status') }}
 				</div>
@@ -56,8 +53,6 @@
 </template>
 
 <script>
-import NcUserAndGroupPicker from '../../../../ncUserAndGroupPicker/NcUserAndGroupPicker.vue'
-import { translate as t } from '@nextcloud/l10n'
 import { NcCheckboxRadioSwitch, NcSelect } from '@nextcloud/vue'
 import searchUserGroup from '../../../../../mixins/searchUserGroup.js'
 import ShareTypes from '../../../../../mixins/shareTypesMixin.js'
@@ -65,7 +60,6 @@ import ShareTypes from '../../../../../mixins/shareTypesMixin.js'
 export default {
 	name: 'UsergroupForm',
 	components: {
-		NcUserAndGroupPicker,
 		NcCheckboxRadioSwitch,
 		NcSelect,
 	},
@@ -84,30 +78,30 @@ export default {
 		return {
 			mutableColumn: this.column,
 			value: this.column.usergroupDefault,
+			// Used in searchUserGroup mixin to decide types to search for
+			selectUsers: this.column.usergroupSelectUsers,
+			selectGroups: this.column.usergroupSelectGroups,
 		}
 	},
 	computed: {
 		localValue: {
 			get() {
-				return this.column.usergroupDefault
+				return this.mutableColumn.usergroupDefault
 			},
 			set(v) {
-				// TODO update to get groups too
 				if (Array.isArray(v)) {
-					this.column.usergroupDefault = v.map(o => {
-						return o
-					})
+					this.mutableColumn.usergroupDefault = v
 				} else {
-					this.column.usergroupDefault = [v]
+					this.mutableColumn.usergroupDefault = [v]
 				}
 
 			},
 		},
 		checkedValue: {
 			get() {
-				if (this.mutableColumn.usergroupSelectUsers && !this.mutableColumn.usergroupSelectGroups) {
+				if (this.selectUsers && !this.selectGroups) {
 					return 'usergroup-user'
-				} else if (!this.mutableColumn.usergroupSelectUsers && this.mutableColumn.usergroupSelectGroups) {
+				} else if (!this.selectUsers && this.selectGroups) {
 					return 'usergroup-group'
 				} else {
 					return 'usergroup'
@@ -115,13 +109,22 @@ export default {
 			},
 			set(newValue) {
 				if (newValue === 'usergroup-user') {
+					this.selectUsers = true
 					this.mutableColumn.usergroupSelectUsers = true
+
+					this.selectGroups = false
 					this.mutableColumn.usergroupSelectGroups = false
 				} else if (newValue === 'usergroup-group') {
+					this.selectUsers = false
 					this.mutableColumn.usergroupSelectUsers = false
+
+					this.selectGroups = true
 					this.mutableColumn.usergroupSelectGroups = true
 				} else {
+					this.selectUsers = true
 					this.mutableColumn.usergroupSelectUsers = true
+
+					this.selectGroups = true
 					this.mutableColumn.usergroupSelectGroups = true
 				}
 			},
@@ -141,10 +144,18 @@ export default {
 			}
 		},
 
-		// TODO: filter properly
 		filterOutUnwantedItems(list) {
 			return list
 		},
+
+		formatResult(autocompleteResult) {
+			return {
+				id: autocompleteResult.id,
+				type: autocompleteResult.source.startsWith('users') ? 0 : 1,
+				key: autocompleteResult.id,
+			}
+		},
+
 	},
 
 }
