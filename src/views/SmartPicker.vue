@@ -88,8 +88,6 @@ import IconLink from 'vue-material-design-icons/Link.vue'
 import IconText from 'vue-material-design-icons/Text.vue'
 import IconCheck from 'vue-material-design-icons/Check.vue'
 import { generateUrl } from '@nextcloud/router'
-import LinkReferenceWidget from './LinkReferenceWidget.vue'
-import ContentReferenceWidget from './ContentReferenceWidget.vue'
 import axios from '@nextcloud/axios'
 import displayError from '../shared/utils/displayError.js'
 
@@ -104,8 +102,8 @@ export default {
 		Search,
 		NcCheckboxRadioSwitch,
 		NcButton,
-		LinkReferenceWidget,
-		ContentReferenceWidget,
+		LinkReferenceWidget: import('./LinkReferenceWidget.vue'),
+		ContentReferenceWidget: import('./ContentReferenceWidget.vue'),
 		NcLoadingIcon,
 	},
 

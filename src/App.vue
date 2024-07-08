@@ -45,7 +45,7 @@ export default {
 		},
 	},
 	watch: {
-		'$route'(to, from) {
+		'$route'(to) {
 			this.routing(to)
 		},
 	},
