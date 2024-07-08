@@ -73,6 +73,9 @@ Feature: APIv2
       | subtype       | date                   |
       | title         | A single date          |
       | datetimeDefault | today                |
+    Then column from main type "usergroup" for node type "table" and node name "t2" exists with name "c7" and following properties via v2
+      | title             | Cool usergroup column        |
+      | usergroupDefault  | [{"id": "admin", "type": 0}] |
     Then node with node type "table" and node name "t2" has the following columns via v2
       | Beautiful text column | Rich is cool | Counter | Progress | Checking | A single date |
     Then print register
@@ -576,11 +579,16 @@ Feature: APIv2
       | subtype       | date                    |
       | mandatory     | 0                       |
       | description   | This is a description!  |
+    And column "five" exists with following properties
+      | type          | usergroup               |
+      | mandatory     | 0                       |
+      | description   | This is a description!  |
     When row exists using v2 with following values
       | one           | AHA                     |
       | two           | 161                     |
       | three         | true                    |
       | four          | 2023-12-24              |
+      | five          | [{"id": "admin", "type": 0}] |
     Then the reported status is 200
 
   @api2 @rows
@@ -606,6 +614,10 @@ Feature: APIv2
       | subtype       | date                    |
       | mandatory     | 0                       |
       | description   | This is a description!  |
+    And column "five" exists with following properties
+      | type          | usergroup               |
+      | mandatory     | 1                       |
+      | description   | This is a description!  |
     And user "participant1-v2" shares table with user "participant2-v2"
     And user "participant2-v2" has the following permissions
       | read    | 1 |
@@ -618,6 +630,7 @@ Feature: APIv2
       | two           | 161                     |
       | three         | true                    |
       | four          | 2023-12-24              |
+      | five          | [{"id": "admin", "type": 0}] |
     Then the reported status is 200
 
   @api2 @rows
@@ -643,6 +656,10 @@ Feature: APIv2
       | subtype       | date                    |
       | mandatory     | 0                       |
       | description   | This is a description!  |
+    And column "five" exists with following properties
+      | type          | usergroup               |
+      | mandatory     | 1                       |
+      | description   | This is a description!  |
     And user "participant1-v2" shares table with user "participant2-v2"
     And user "participant1-v2" sets permission "create" to 0
     And user "participant2-v2" has the following permissions
@@ -656,6 +673,7 @@ Feature: APIv2
       | two           | 161                     |
       | three         | true                    |
       | four          | 2023-12-24              |
+      | five          | [{"id": "admin", "type": 0}] |
     Then the reported status is 403
 
   @api2 @rows
@@ -681,11 +699,16 @@ Feature: APIv2
       | subtype       | date                    |
       | mandatory     | 0                       |
       | description   | This is a description!  |
+    And column "five" exists with following properties
+      | type          | usergroup               |
+      | mandatory     | 1                       |
+      | description   | This is a description!  |
     When user "participant2-v2" tries to create a row using v2 with following values
       | one           | AHA                     |
       | two           | 161                     |
       | three         | true                    |
       | four          | 2023-12-24              |
+      | five          | [{"id": "admin", "type": 0}] |
     Then the reported status is 404
 
   @api2 @rows @views
@@ -711,12 +734,17 @@ Feature: APIv2
       | subtype       | date                    |
       | mandatory     | 0                       |
       | description   | This is a description!  |
+    And column "five" exists with following properties
+      | type          | usergroup               |
+      | mandatory     | 1                       |
+      | description   | This is a description!  |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
     When user "participant1-v2" tries to create a row using v2 on "view" "v1" with following values
       | one           | AHA                     |
       | two           | 161                     |
       | three         | true                    |
       | four          | 2023-12-24              |
+      | five          | [{"id": "admin", "type": 0}] |
     Then the reported status is 200
 
   @api2 @rows @views
@@ -742,6 +770,10 @@ Feature: APIv2
       | subtype       | date                    |
       | mandatory     | 0                       |
       | description   | This is a description!  |
+    And column "five" exists with following properties
+      | type          | usergroup               |
+      | mandatory     | 1                       |
+      | description   | This is a description!  |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
     And user "participant1-v2" shares view "v1" with "participant2-v2"
     When user "participant2-v2" tries to create a row using v2 on "view" "v1" with following values
@@ -749,6 +781,7 @@ Feature: APIv2
       | two           | 161                     |
       | three         | true                    |
       | four          | 2023-12-24              |
+      | five          | [{"id": "admin", "type": 0}] |
     Then the reported status is 200
 
   @api2 @rows @views
@@ -774,6 +807,10 @@ Feature: APIv2
       | subtype       | date                    |
       | mandatory     | 0                       |
       | description   | This is a description!  |
+    And column "five" exists with following properties
+      | type          | usergroup               |
+      | mandatory     | 1                       |
+      | description   | This is a description!  |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
     And user "participant1-v2" shares view "v1" with "participant2-v2"
     And user "participant1-v2" sets permission "create" to 0
@@ -782,6 +819,7 @@ Feature: APIv2
       | two           | 161                     |
       | three         | true                    |
       | four          | 2023-12-24              |
+      | five          | [{"id": "admin", "type": 0}] |
     Then the reported status is 403
 
   @api2 @rows @views
@@ -807,10 +845,15 @@ Feature: APIv2
       | subtype       | date                    |
       | mandatory     | 0                       |
       | description   | This is a description!  |
+    And column "five" exists with following properties
+      | type          | usergroup               |
+      | mandatory     | 1                       |
+      | description   | This is a description!  |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
     When user "participant2-v2" tries to create a row using v2 on "view" "v1" with following values
       | one           | AHA                     |
       | two           | 161                     |
       | three         | true                    |
       | four          | 2023-12-24              |
+      | five          | [{"id": "admin", "type": 0}] |
     Then the reported status is 404
