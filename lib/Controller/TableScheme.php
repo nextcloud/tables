@@ -4,6 +4,8 @@ namespace OCA\Tables\Controller;
 
 use JsonSerializable;
 use OCA\Tables\Db\Column;
+use OCA\Tables\Db\View;
+use OCP\App\IAppManager;
 
 class TableScheme implements JsonSerializable {
 
@@ -12,42 +14,45 @@ class TableScheme implements JsonSerializable {
 
 	/** @var Column[]|null  */
 	protected ?array $columns = null;
-	protected ?string $description = null;
 
-	public function __construct(string $title, string $emoji, array $columns, string $description)
-	{
+	/** @var View[]|null */
+	protected ?array $views = null;
+	protected ?string $description = null;
+	protected ?string $tablesVersion = null;
+
+	public function __construct(string $title, string $emoji, array $columns, array $view, string $description, IAppManager $appManager) {
+		$this->tablesVersion = $appManager->getAppVersion("tables");
 		$this->title = $title;
 		$this->emoji = $emoji;
 		$this->columns = $columns;
 		$this->description = $description;
+		$this->views = $view;
 	}
 
 	public function getTitle():string {
-		return $this->title;
+		return $this->title | '';
 	}
 
-	public function jsonSerialize(): array
-	{
+	public function jsonSerialize(): array {
 		return [
 			'title' => $this->title ?: '',
 			'emoji' => $this->emoji,
 			'columns' => $this->columns,
+			'views' => $this->views,
 			'description' => $this->description ?:'',
+			'tablesVersion' => $this->tablesVersion,
 		];
 	}
 
-	public function getEmoji(): ?string
-	{
+	public function getEmoji(): ?string {
 		return $this->emoji;
 	}
 
-	public function getColumns(): ?array
-	{
+	public function getColumns(): ?array {
 		return $this->columns;
 	}
 
-	public function getDescription(): ?string
-	{
+	public function getDescription(): ?string {
 		return $this->description;
 	}
 }

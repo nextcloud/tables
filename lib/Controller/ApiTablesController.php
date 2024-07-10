@@ -3,18 +3,22 @@
 namespace OCA\Tables\Controller;
 
 use Exception;
+use OCA\Tables\Db\Column;
+use OCA\Tables\Db\View;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\TableService;
+use OCA\Tables\Service\ViewService;
+use OCP\App\IAppManager;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
+use OCP\IDBConnection;
 use OCP\IL10N;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
-use OCA\Tables\Controller\TableScheme;
 
 /**
  * @psalm-import-type TablesTable from ResponseDefinitions
@@ -22,17 +26,26 @@ use OCA\Tables\Controller\TableScheme;
 class ApiTablesController extends AOCSController {
 	private TableService $service;
 	private ColumnService $columnService;
+	private ViewService $viewService;
+	private IAppManager $appManager;
+	private IDBConnection $db;
 
 	public function __construct(
 		IRequest $request,
 		LoggerInterface $logger,
 		TableService $service,
 		ColumnService $columnService,
+		ViewService $viewService,
 		IL10N $n,
+		IAppManager $appManager,
+		IDBConnection $db,
 		string $userId) {
 		parent::__construct($request, $logger, $n, $userId);
 		$this->service = $service;
 		$this->columnService = $columnService;
+		$this->appManager = $appManager;
+		$this->viewService = $viewService;
+		$this->db = $db;
 	}
 
 	/**
@@ -90,10 +103,7 @@ class ApiTablesController extends AOCSController {
 	 */
 	public function showScheme(int $id): DataResponse {
 		try {
-			$columns = $this->columnService->findAllByTable($id);
-			$table = $this->service->find($id);
-			$scheme = new TableScheme($table->getTitle(),$table->getEmoji(),$columns, $table->getDescription());
-		 	return new DataResponse($scheme->jsonSerialize());
+			return new DataResponse($this->service->getScheme($id)->jsonSerialize());
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
 		} catch (InternalError $e) {
@@ -105,10 +115,18 @@ class ApiTablesController extends AOCSController {
 
 	/**
 	 * @NoAdminRequired
+	 *
+	 * @param string $title
+	 * @param string $emoji
+	 * @param string $description
+	 * @param Column[] $columns
+	 * @param View[] $views
+	 * @return DataResponse
 	 */
-	public function createFromScheme(string $title, string $emoji, string $description, array $columns): DataResponse {
+	public function createFromScheme(string $title, string $emoji, string $description, array $columns, array $views): DataResponse {
 		try {
-			$table = $this->service->create($title,'custom',$emoji, $description);
+			$this->db->beginTransaction();
+			$table = $this->service->create($title, 'custom', $emoji, $description);
 			foreach ($columns as $column) {
 				$this->columnService->create(
 					$this->userId,
@@ -136,9 +154,24 @@ class ApiTablesController extends AOCSController {
 
 					$column['datetimeDefault'],
 					[],
-				);};
+				);
+			};
+			foreach ($views as $view) {
+				$this->viewService->create(
+					$view['title'],
+					$view['emoji'],
+					$table,
+					$this->userId,
+				);
+			}
+			$this->db->commit();
 			return new DataResponse($table->jsonSerialize());
-		} catch( InternalError | Exception $e) {
+		} catch(InternalError | Exception $e) {
+			try {
+				$this->db->rollBack();
+			} catch (\OCP\DB\Exception $e) {
+				return $this->handleError($e);
+			}
 			return $this->handleError($e);
 		}
 	}
