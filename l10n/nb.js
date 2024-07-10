@@ -303,6 +303,7 @@ OC.L10N.register(
     "Inserted rows" : "Satt inn rader",
     "Value parsing errors" : "Feil ved verdianalyse",
     "Row creation errors" : "Feil ved opprettelse av rad",
+    "Transfer the application \"{context}\" to another user" : "Overfør applikasjonen \"{context}\" til en annen bruker",
     "Transfer" : "Overfør",
     "Context \"{name}\" transferred to {user}" : "Kontekst \"{name}\" overført til {user}",
     "Transfer table" : "Overfør tabell",
