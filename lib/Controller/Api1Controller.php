@@ -133,6 +133,18 @@ class Api1Controller extends ApiController {
 	}
 
 	/**
+	 * returns table scheme
+	 * @param int $tableId
+	 * @return \OCP\AppFramework\Http\DataResponse
+	 */
+	public function showScheme(int $tableId): DataResponse {
+		return $this->handleError(function () use ($tableId) {
+			$scheme = $this->tableService->getScheme($tableId);
+			return new DataResponse($scheme->jsonSerialize(), http::STATUS_OK, ["Content-Disposition" => "attachment", "filename" => $scheme->getTitle() . ".json", "Content-Type" => "application/octet-stream"]);
+		});
+	}
+
+	/**
 	 * Get a table object
 	 *
 	 * @NoAdminRequired

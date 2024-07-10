@@ -22,6 +22,8 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @psalm-import-type TablesTable from ResponseDefinitions
+ * @psalm-import-type TablesView from ResponseDefinitions
+ * @psalm-import-type TablesColumn from ResponseDefinitions
  */
 class ApiTablesController extends AOCSController {
 	private TableService $service;
@@ -116,12 +118,16 @@ class ApiTablesController extends AOCSController {
 	/**
 	 * @NoAdminRequired
 	 *
-	 * @param string $title
-	 * @param string $emoji
-	 * @param string $description
-	 * @param Column[] $columns
-	 * @param View[] $views
-	 * @return DataResponse
+	 * creates table from scheme
+	 *
+	 * @param string $title title of new table
+	 * @param string $emoji emoji
+	 * @param string $description description
+	 * @param array<TablesColumn > $columns columns
+	 * @param array<TablesView> $views views
+	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 *
+	 * 200: Tables returned
 	 */
 	public function createFromScheme(string $title, string $emoji, string $description, array $columns, array $views): DataResponse {
 		try {

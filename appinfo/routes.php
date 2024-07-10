@@ -20,6 +20,7 @@ return [
 		['name' => 'api1#createTable',	'url' => '/api/1/tables', 'verb' => 'POST'],
 		['name' => 'api1#updateTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'PUT'],
 		['name' => 'api1#getTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'GET'],
+		['name' => 'api1#showScheme',	'url' => '/api/1/tables/{tableId}/scheme', 'verb' => 'GET'],
 		['name' => 'api1#deleteTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'DELETE'],
 		// -> views
 		['name' => 'api1#indexViews', 'url' => '/api/1/tables/{tableId}/views', 'verb' => 'GET'],
