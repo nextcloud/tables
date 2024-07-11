@@ -39,6 +39,7 @@ import { showError, showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/dist/index.css'
 import ColumnFormComponent from '../main/partials/ColumnFormComponent.vue'
 import { translate as t } from '@nextcloud/l10n'
+import rowHelper from '../../shared/components/ncTable/mixins/rowHelper.js'
 
 export default {
 	name: 'CreateRow',
@@ -49,6 +50,7 @@ export default {
 		NcNoteCard,
 		NcButton,
 	},
+	mixins: [rowHelper],
 	props: {
 		showModal: {
 			type: Boolean,
@@ -79,14 +81,7 @@ export default {
 			return this.columns.filter(col => col.id >= 0)
 		},
 		hasEmptyMandatoryRows() {
-			let mandatoryFieldsEmpty = false
-			this.columns.forEach(col => {
-				if (col.mandatory) {
-					const validValue = this.isValueValidForColumn(this.row[col.id], col)
-					mandatoryFieldsEmpty = mandatoryFieldsEmpty || !validValue
-				}
-			})
-			return mandatoryFieldsEmpty
+			return this.checkMandatoryFields(this.row)
 		},
 	},
 	watch: {
@@ -102,18 +97,6 @@ export default {
 			this.reset()
 			this.addNewAfterSave = false
 			this.$emit('close')
-		},
-		isValueValidForColumn(value, column) {
-			if (column.type === 'selection') {
-				if (
-					(value instanceof Array && value.length > 0)
-					|| (value === parseInt(value))
-				) {
-					return true
-				}
-				return false
-			}
-			return !!value || value === 0
 		},
 		async actionConfirm() {
 			this.localLoading = true
