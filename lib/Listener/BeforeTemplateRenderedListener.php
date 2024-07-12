@@ -22,9 +22,9 @@ use OCP\IUserSession;
 class BeforeTemplateRenderedListener implements IEventListener {
 	public function __construct(
 		protected INavigationManager $navigationManager,
-		protected IURLGenerator $urlGenerator,
-		protected IUserSession $userSession,
-		protected ContextService $contextService,
+		protected IURLGenerator      $urlGenerator,
+		protected IUserSession       $userSession,
+		protected ContextService     $contextService,
 	) {
 	}
 
@@ -41,25 +41,22 @@ class BeforeTemplateRenderedListener implements IEventListener {
 			return;
 		}
 
-		// temporarily show all
-		//$contexts = $this->contextService->findForNavigation($user->getUID());
-		$contexts = $this->contextService->findAll($user->getUID());
+		$contexts = $this->contextService->findForNavigation($user->getUID());
 		foreach ($contexts as $context) {
-			/* temporarily, show all
 			if ($context->getOwnerType() === Application::OWNER_TYPE_USER
 				&& $context->getOwnerId() === $user->getUID()) {
-
 
 				// filter out entries for owners unless it is set to be visible
 				$skipEntry = true;
 				foreach ($context->getSharing() as $shareInfo) {
 					// TODO: integrate into DB query in Mapper
-
 					if (isset($shareInfo['display_mode']) && $shareInfo['display_mode'] === Application::NAV_ENTRY_MODE_ALL) {
 						// a custom override makes it visible
 						$skipEntry = false;
 						break;
-					} elseif (!isset($shareInfo['display_mode']) && $shareInfo['display_mode_default'] === Application::NAV_ENTRY_MODE_ALL) {
+					}
+
+					if (!isset($shareInfo['display_mode']) && $shareInfo['display_mode_default'] === Application::NAV_ENTRY_MODE_ALL) {
 						// no custom override, and visible also for owner by default
 						$skipEntry = false;
 						break;
@@ -69,7 +66,6 @@ class BeforeTemplateRenderedListener implements IEventListener {
 					continue;
 				}
 			}
-			*/
 
 			$this->navigationManager->add(function () use ($context) {
 				$iconRelPath = 'material/' . $context->getIcon() . '.svg';
