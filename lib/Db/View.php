@@ -95,7 +95,17 @@ class View extends Entity implements JsonSerializable {
 	 * @return list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>
 	 */
 	public function getFilterArray():array {
-		return $this->getArray($this->getFilter());
+		$filters = $this->getArray($this->getFilter());
+		// a filter(group) was stored with a not-selected column - it may break impressively.
+		// filter them out now until we have a permanent fix
+		foreach ($filters as &$filterGroups) {
+			$filterGroups = array_filter($filterGroups, function (array $item) {
+				return $item['columnId'] !== null;
+			});
+		}
+		return array_filter($filters, function (array $item) {
+			return !empty($item);
+		});
 	}
 
 	private function getArray(?string $json): array {
