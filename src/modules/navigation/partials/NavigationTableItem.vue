@@ -277,6 +277,10 @@ export default {
 </script>
 <style lang="scss">
 
+.app-navigation-entry.active .icon-share {
+	background-image: var(--icon-share-white);
+}
+
 .app-navigation-entry__counter-wrapper {
 	button.action-button {
 		padding-right: 0;
