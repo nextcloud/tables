@@ -344,7 +344,7 @@ class ShareService extends SuperService {
 				}
 			}
 
-			return $this->contextNavigationMapper->setDisplayModeByShareId($shareId, $displayMode, '');
+			return $this->contextNavigationMapper->setDisplayModeByShareId($shareId, $displayMode, $userId);
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
