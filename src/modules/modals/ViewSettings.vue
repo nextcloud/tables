@@ -283,7 +283,7 @@ export default {
 			}
 
 			if (!this.mutableView.filter.some(filterGroup => filterGroup.includes(null))) {
-				const filteredFilteringRules = this.mutableView.filter.map(filterGroup => filterGroup.filter(fil => fil.columnId !== undefined && fil.operator !== undefined)).filter(filterGroup => filterGroup.length > 0)
+				const filteredFilteringRules = this.mutableView.filter.map(filterGroup => filterGroup.filter(fil => fil.columnId !== undefined && fil.columnId !== null && fil.operator !== undefined && fil.operator !== null)).filter(filterGroup => filterGroup.length > 0)
 				data.data.filter = JSON.stringify(filteredFilteringRules)
 			}
 
