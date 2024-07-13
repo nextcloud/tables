@@ -420,7 +420,7 @@ OC.L10N.register(
     "Link providers" : "Länkleverantörer",
     "Could not load link provider results." : "Kunde inte ladda länkleverantörsresultat.",
     "Url" : "Webbadress",
-    "Show fullscreen" : "Visa helskärm",
+    "Show fullscreen" : "Visa fullskärm",
     "Close editor" : "Stäng redigeraren",
     "Page number" : "Sidnummer",
     "Create Row" : "Skapa rad",
