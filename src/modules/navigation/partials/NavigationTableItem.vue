@@ -20,7 +20,7 @@
 
 		<template #counter>
 			<NcCounterBubble v-if="canReadData(table)">
-				{{ n('tables', '%n row', '%n rows', table.rowsCount, {}) }}
+				{{ n('tables', ' %n ',table.rowsCount) }}
 			</NcCounterBubble>
 			<NcActionButton v-if="table.hasShares" icon="icon-share" :class="{'margin-right': !(activeTable && table.id === activeTable.id)}" @click="actionShowShare" />
 			<div v-if="table.isShared && table.ownership !== userId" class="margin-left">
@@ -277,8 +277,14 @@ export default {
 </script>
 <style lang="scss">
 
-.app-navigation-entry.active .icon-share {
-	background-image: var(--icon-share-white);
+.app-navigation-entry.active {
+	.icon-share  {
+		background-image: var(--icon-share-white);
+	}
+
+	.icon-collapse {
+		color: var(--color-primary-element-text)
+	}
 }
 
 .app-navigation-entry__counter-wrapper {

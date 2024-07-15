@@ -15,7 +15,7 @@
 		</template>
 		<template #counter>
 			<NcCounterBubble v-if="canReadData(view)">
-				{{ n('tables', '%n row', '%n rows', view.rowsCount, {}) }}
+				{{ n('tables', ' %n ', view.rowsCount) }}
 			</NcCounterBubble>
 			<NcActionButton v-if="view.hasShares" icon="icon-share" :class="{'margin-right': !(activeView && view.id === activeView.id)}" @click="actionShowShare" />
 			<div v-if="view.isShared && view.ownership !== userId && !canManageTable(view) && showShareSender" class="margin-left">
