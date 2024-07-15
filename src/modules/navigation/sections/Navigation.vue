@@ -25,7 +25,7 @@
 				<NcAppNavigationCaption :name="t('tables', 'Tables')">
 					<template #actions>
 						<NcActionButton :aria-label="t('tables', 'Create table')" icon="icon-add"
-							@click.prevent="createTable" />
+							data-cy="navigationCreateTableIcon" @click.prevent="createTable" />
 					</template>
 				</NcAppNavigationCaption>
 
