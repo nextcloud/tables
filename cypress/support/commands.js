@@ -32,12 +32,12 @@ Cypress.env('baseUrl', url)
 addCommands()
 
 Cypress.Commands.add('createTable', (title) => {
+	cy.get('.icon-loading').should('not.exist')
 	cy.get('[data-cy="navigationCreateTableIcon"]').click({ force: true })
-	cy.wait(1000)
+	cy.get('[data-cy="createTableModal"]').should('be.visible')
 	cy.get('.tile').contains('Custom table').click({ force: true })
-	cy.get('.modal__content input[type="text"]').clear().type(title)
+	cy.get('[data-cy="createTableModal"] input[type="text"]').clear().type(title)
 	cy.contains('button', 'Create table').click()
-
 	cy.contains('h1', title).should('be.visible')
 })
 

@@ -22,8 +22,9 @@ describe('Import csv', () => {
 		cy.get('.file-picker__files').contains('test-import').click()
 		cy.get('.file-picker button span').contains('Choose test-import.csv').click()
 		cy.get('.modal__content .import-filename', { timeout: 5000 }).should('be.visible')
+		cy.intercept({ method: 'POST', url: '**/apps/tables/import/table/*'}).as('importUploadReq')
 		cy.get('.modal__content button').contains('Import').click()
-
+		cy.wait('@importUploadReq')
 		cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')
 		cy.get('[data-cy="importResultColumnsMatch"]').should('contain.text', '4')
 		cy.get('[data-cy="importResultColumnsCreated"]').should('contain.text', '0')
@@ -37,8 +38,9 @@ describe('Import csv', () => {
 		cy.clickOnTableThreeDotMenu('Import')
 		cy.get('.modal__content button').contains('Upload from device').click()
 		cy.get('input[type="file"]').selectFile('cypress/fixtures/test-import.csv', { force: true })
+		cy.intercept({ method: 'POST', url: '**/apps/tables/importupload/table/*'}).as('importUploadReq')
 		cy.get('.modal__content button').contains('Import').click()
-
+		cy.wait('@importUploadReq')
 		cy.get('[data-cy="importResultColumnsFound"]', { timeout: 20000 }).should('contain.text', '4')
 		cy.get('[data-cy="importResultColumnsMatch"]').should('contain.text', '4')
 		cy.get('[data-cy="importResultColumnsCreated"]').should('contain.text', '0')
