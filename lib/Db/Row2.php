@@ -3,6 +3,7 @@
 namespace OCA\Tables\Db;
 
 use JsonSerializable;
+use OCA\Tables\Model\Public\Row;
 use OCA\Tables\ResponseDefinitions;
 
 /**
@@ -130,6 +131,15 @@ class Row2 implements JsonSerializable {
 			'lastEditAt' => $this->lastEditAt,
 			'data' => $this->data,
 		];
+	}
+
+	public function toPublicRow(?array $previousValues = null): Row {
+		return new Row(
+			tableId: $this->tableId,
+			rowId: $this->id,
+			previousValues: $previousValues,
+			values: $this->data,
+		);
 	}
 
 	/**

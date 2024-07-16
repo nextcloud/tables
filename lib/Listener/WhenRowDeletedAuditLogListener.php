@@ -22,7 +22,7 @@ final class WhenRowDeletedAuditLogListener implements IEventListener {
 		}
 
 		$row = $event->getRow();
-		$rowId = $row->getId();
+		$rowId = $row->rowId;
 
 		$this->auditLogService->log("Row with ID: $rowId was deleted", [
 			'row' => $row->jsonSerialize(),

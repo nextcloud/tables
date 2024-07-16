@@ -218,7 +218,7 @@ class RowService extends SuperService {
 		try {
 			$insertedRow = $this->row2Mapper->insert($row2, $this->columnMapper->findAllByTable($tableId));
 
-			$this->eventDispatcher->dispatchTyped(new RowAddedEvent(row: $insertedRow));
+			$this->eventDispatcher->dispatchTyped(new RowAddedEvent($insertedRow));
 
 			return $insertedRow;
 		} catch (InternalError|Exception $e) {
@@ -405,6 +405,7 @@ class RowService extends SuperService {
 			}
 		}
 
+		$previousData = $item->getData();
 		$data = $this->cleanupData($data, $columns, $item->getTableId(), $viewId);
 
 		foreach ($data as $entry) {
@@ -419,7 +420,7 @@ class RowService extends SuperService {
 
 		$updatedRow = $this->row2Mapper->update($item, $columns);
 
-		$this->eventDispatcher->dispatchTyped(new RowUpdatedEvent(row: $updatedRow));
+		$this->eventDispatcher->dispatchTyped(new RowUpdatedEvent($updatedRow, $previousData));
 
 		return $this->filterRowResult($view ?? null, $updatedRow);
 	}
@@ -476,7 +477,7 @@ class RowService extends SuperService {
 		try {
 			$deletedRow = $this->row2Mapper->delete($item);
 
-			$event = new RowDeletedEvent(row: $item);
+			$event = new RowDeletedEvent($item, $item->getData());
 
 			$this->eventDispatcher->dispatchTyped($event);
 
