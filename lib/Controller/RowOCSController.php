@@ -39,7 +39,7 @@ class RowOCSController extends AOCSController {
 	 *
 	 * @param 'tables'|'views' $nodeCollection Indicates whether to create a row on a table or view
 	 * @param int $nodeId The identifier of the targeted table or view
-	 * @param string|array{columnId: int, value: mixed} $data An array containing the column identifiers and their values
+	 * @param string|array<string, mixed> $data An array containing the column identifiers and their values
 	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Row returned

@@ -1851,7 +1851,7 @@ export type operations = {
         "application/json": {
           /** @description Data as key - value store */
           data: OneOf<[string, {
-            ""?: Record<string, never>;
+            [key: string]: Record<string, never>;
           }]>;
         };
       };
@@ -1949,9 +1949,7 @@ export type operations = {
         "application/json": {
           /** @description Data as key - value store */
           data: OneOf<[string, {
-            /** Format: int64 */
-            columnId: number;
-            value: Record<string, never>;
+            [key: string]: Record<string, never>;
           }]>;
         };
       };
@@ -2038,9 +2036,7 @@ export type operations = {
           viewId?: number | null;
           /** @description Data as key - value store */
           data: OneOf<[string, {
-            /** Format: int64 */
-            columnId: number;
-            value: Record<string, never>;
+            [key: string]: Record<string, never>;
           }]>;
         };
       };
@@ -3864,9 +3860,7 @@ export type operations = {
         "application/json": {
           /** @description An array containing the column identifiers and their values */
           data: OneOf<[string, {
-            /** Format: int64 */
-            columnId: number;
-            value: Record<string, never>;
+            [key: string]: Record<string, never>;
           }]>;
         };
       };
