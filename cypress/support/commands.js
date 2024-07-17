@@ -32,12 +32,12 @@ Cypress.env('baseUrl', url)
 addCommands()
 
 Cypress.Commands.add('createTable', (title) => {
-	cy.contains('.app-menu-entry--label', 'Tables').click()
-	cy.get('button[aria-label="Create new table"]').click()
+	cy.get('.icon-loading').should('not.exist')
+	cy.get('[data-cy="navigationCreateTableIcon"]').click({ force: true })
+	cy.get('[data-cy="createTableModal"]').should('be.visible')
 	cy.get('.tile').contains('Custom table').click({ force: true })
-	cy.get('.modal__content input[type="text"]').clear().type(title)
+	cy.get('[data-cy="createTableModal"] input[type="text"]').clear().type(title)
 	cy.contains('button', 'Create table').click()
-
 	cy.contains('h1', title).should('be.visible')
 })
 
@@ -92,11 +92,11 @@ Cypress.Commands.add('sortTableColumn', (columnTitle, mode = 'ASC') => {
 })
 
 Cypress.Commands.add('loadTable', (name) => {
-	cy.get('.app-navigation-entry a[title="' + name + '"]').click({ force: true })
+	cy.get('[data-cy="navigationTableItem"] a[title="' + name + '"]').click({ force: true })
 })
 
 Cypress.Commands.add('loadView', (name) => {
-	cy.get('.app-navigation-entry a[title="' + name + '"]').click({ force: true })
+	cy.get('[data-cy="navigationViewItem"] a[title="' + name + '"]').click({ force: true })
 })
 
 Cypress.Commands.add('unifiedSearch', (term) => {

@@ -1,6 +1,6 @@
 <template>
 	<NcModal v-if="showModal" size="normal"
-		@close="actionCancel">
+		data-cy="createTableModal" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">

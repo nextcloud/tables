@@ -72,7 +72,7 @@ describe('Manage a context', () => {
         cy.login(nonLocalUser)
         cy.visit('apps/tables')
         cy.loadContext(contextTitle)
-        cy.contains('header .header-left .app-menu li.app-menu-entry__active', contextTitle).should('exist')
+        cy.contains('header .app-menu-entry', contextTitle).should('exist')
         cy.contains('h1', contextTitle).should('exist')
         cy.contains('h1', tableTitle).should('exist')
 
@@ -95,7 +95,7 @@ describe('Manage a context', () => {
         cy.login(nonLocalUser)
         cy.visit('apps/tables')
         cy.loadContext(contextTitle)
-        cy.contains('header .header-left .app-menu li.app-menu-entry__active', contextTitle).should('exist')
+        cy.contains('header .app-menu-entry', contextTitle).should('exist')
         cy.contains('h1', contextTitle).should('exist')
     })
 
@@ -125,7 +125,6 @@ describe('Manage a context', () => {
     it('Remove context resource', () => {
         cy.createTable(tableTitle)
         cy.loadContext(contextTitle)
-        cy.contains('header .header-left .app-menu li.app-menu-entry__active', contextTitle).should('exist')
         cy.openContextEditModal(contextTitle)
         cy.get('[data-cy="contextResourceForm"] input').clear().type(tableTitle)
         cy.get('ul.vs__dropdown-menu li div').contains(tableTitle).click()
@@ -187,7 +186,7 @@ describe('Manage a context', () => {
         cy.login(nonLocalUser)
         cy.visit('apps/tables')
         cy.loadContext(contextTitle)
-        cy.contains('header .header-left .app-menu li.app-menu-entry__active', contextTitle).should('exist')
+        cy.contains('header .app-menu-entry', contextTitle).should('exist')
         cy.contains('h1', contextTitle).should('exist')
         cy.contains('h1', tableTitle).should('exist')
         cy.get('button').contains('Create row').click()

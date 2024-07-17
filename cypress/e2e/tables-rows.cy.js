@@ -49,11 +49,11 @@ describe('Rows for a table', () => {
 	})
 
 	it('Check mandatory fields error', () => {
-		cy.contains('.app-menu-entry--label', 'Tables').click()
-		cy.contains('button', 'Create new table').click()
+		cy.get('.icon-loading').should('not.exist')
+		cy.get('[data-cy="navigationCreateTableIcon"]').click({ force: true })
 		cy.get('.tile').contains('ToDo').click({ force: true })
-		cy.get('.modal__content').should('be.visible')
-		cy.get('.modal__content input[type="text"]').clear().type('to do list')
+		cy.get('[data-cy="createTableModal"]').should('be.visible')
+		cy.get('[data-cy="createTableModal"] input[type="text"]').clear().type('to do list')
 		cy.contains('button', 'Create table').click()
 
 		cy.get('.app-navigation-entry-link').contains('to do list').click({ force: true })

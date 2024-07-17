@@ -18,8 +18,8 @@ describe('Manage a table', () => {
 	})
 
 	it('Create', () => {
-		cy.contains('.app-menu-entry--label', 'Tables').click()
-		cy.contains('button', 'Create new table').click()
+		cy.get('.icon-loading').should('not.exist')
+		cy.get('[data-cy="navigationCreateTableIcon"]').click({ force: true })
 		cy.get('.tile').contains('ToDo').click({ force: true })
 		cy.get('.modal__content').should('be.visible')
 		cy.get('.modal__content input[type="text"]').clear().type('to do list')
@@ -34,8 +34,8 @@ describe('Manage a table', () => {
 
 	it('Create with import', () => {
 		cy.uploadFile('test-import.csv', 'text/csv')
-		cy.contains('.app-menu-entry--label', 'Tables').click()
-		cy.contains('button', 'Create new table').click()
+		cy.get('.icon-loading').should('not.exist')
+		cy.get('[data-cy="navigationCreateTableIcon"]').click({ force: true })
 		cy.get('.tile').contains('Import').click({ force: true })
 		cy.get('.modal__content').should('be.visible')
 		cy.get('.modal__content input[type="text"]').clear().type('import list')
@@ -45,7 +45,9 @@ describe('Manage a table', () => {
 		cy.get('.modal__content button').contains('Select from Files').click()
 		cy.get('.file-picker__files').contains('test-import').click()
 		cy.get('.file-picker button span').contains('Choose test-import.csv').click()
+		cy.intercept({ method: 'POST', url: '**/apps/tables/import/table/*'}).as('importUploadReq')
 		cy.get('.modal__content button').contains('Import').click()
+		cy.wait('@importUploadReq')
 		cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')
 		cy.get('[data-cy="importResultColumnsMatch"]').should('contain.text', '0')
 		cy.get('[data-cy="importResultColumnsCreated"]').should('contain.text', '4')
@@ -83,8 +85,8 @@ describe('Manage a table', () => {
 	})
 
 	it('Transfer', () => {
-		cy.contains('.app-menu-entry--label', 'Tables').click()
-		cy.contains('button', 'Create new table').click()
+		cy.get('.icon-loading').should('not.exist')
+		cy.get('[data-cy="navigationCreateTableIcon"]').click({ force: true })
 		cy.get('.tile').contains('ToDo').click({ force: true })
 		cy.get('.modal__content').should('be.visible')
 		cy.get('.modal__content input[type="text"]').clear().type('test table')
