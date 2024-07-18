@@ -1650,7 +1650,7 @@ export type operations = {
       query: {
         /** @description Data as key - value store */
         data: OneOf<[string, {
-          ""?: Record<string, never>;
+          [key: string]: Record<string, never>;
         }]>;
       };
       path: {
@@ -1734,9 +1734,7 @@ export type operations = {
       query: {
         /** @description Data as key - value store */
         data: OneOf<[string, {
-          /** Format: int64 */
-          columnId: number;
-          value: Record<string, never>;
+          [key: string]: Record<string, never>;
         }]>;
       };
       path: {
@@ -1816,9 +1814,7 @@ export type operations = {
         viewId?: number | null;
         /** @description Data as key - value store */
         data: OneOf<[string, {
-          /** Format: int64 */
-          columnId: number;
-          value: Record<string, never>;
+          [key: string]: Record<string, never>;
         }]>;
       };
       path: {

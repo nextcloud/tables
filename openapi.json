@@ -4080,14 +4080,8 @@
                                 },
                                 {
                                     "type": "object",
-                                    "required": [
-                                        null,
-                                        null
-                                    ],
-                                    "properties": {
-                                        "": {
-                                            "type": "object"
-                                        }
+                                    "additionalProperties": {
+                                        "type": "object"
                                     }
                                 }
                             ]
@@ -4292,18 +4286,8 @@
                                 },
                                 {
                                     "type": "object",
-                                    "required": [
-                                        "columnId",
-                                        "value"
-                                    ],
-                                    "properties": {
-                                        "columnId": {
-                                            "type": "integer",
-                                            "format": "int64"
-                                        },
-                                        "value": {
-                                            "type": "object"
-                                        }
+                                    "additionalProperties": {
+                                        "type": "object"
                                     }
                                 }
                             ]
@@ -4495,18 +4479,8 @@
                                 },
                                 {
                                     "type": "object",
-                                    "required": [
-                                        "columnId",
-                                        "value"
-                                    ],
-                                    "properties": {
-                                        "columnId": {
-                                            "type": "integer",
-                                            "format": "int64"
-                                        },
-                                        "value": {
-                                            "type": "object"
-                                        }
+                                    "additionalProperties": {
+                                        "type": "object"
                                     }
                                 }
                             ]

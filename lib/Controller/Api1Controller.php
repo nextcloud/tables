@@ -1052,7 +1052,7 @@ class Api1Controller extends ApiController {
 	 * @NoCSRFRequired
 	 *
 	 * @param int $viewId View ID
-	 * @param string|array{columnId: int, value: mixed} $data Data as key - value store
+	 * @param string|array<string, mixed> $data Data as key - value store
 	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Row returned
@@ -1097,7 +1097,7 @@ class Api1Controller extends ApiController {
 	 * @NoCSRFRequired
 	 *
 	 * @param int $tableId Table ID
-	 * @param string|array{int, mixed} $data Data as key - value store
+	 * @param string|array<string, mixed> $data Data as key - value store
 	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Row returned
@@ -1176,7 +1176,7 @@ class Api1Controller extends ApiController {
 	 *
 	 * @param int $rowId Row ID
 	 * @param int|null $viewId View ID
-	 * @param string|array{columnId: int, value: mixed} $data Data as key - value store
+	 * @param string|array<string, mixed> $data Data as key - value store
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
