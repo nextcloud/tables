@@ -32,7 +32,7 @@
 				<tr />
 			</tbody>
 		</table>
-		<div class="pagination-footer" :class="{'large-width': !appNavCollapsed || isMobile}">
+		<div v-if="totalPages > 1" class="pagination-footer" :class="{'large-width': !appNavCollapsed || isMobile}">
 			<div class="pagination-items">
 				<NcButton type="tertiary" :disabled="totalPages === 1 || pageNumber <= 1" @click="pageNumber = 1">
 					<template #icon>
@@ -415,11 +415,9 @@ export default {
 }
 
 .pagination-footer{
-	position: sticky;
 	box-shadow: var(--box-shadow);
-	filter: drop-shadow(0 1px 10px var(--color-box-shadow));
-	bottom: 20px;
-	left: 300px;
+	filter: drop-shadow(0 1px 6px var(--color-box-shadow));
+	padding-bottom: 20px;
 	width: calc(100vw - 316px);
 	pointer-events: none;
 
