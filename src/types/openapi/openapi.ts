@@ -197,7 +197,7 @@ export type paths = {
   };
   "/ocs/v2.php/apps/tables/api/2/contexts": {
     /**
-     * [api v3] Get all contexts available to the requesting person
+     * [api v2] Get all contexts available to the requesting person
      * @description Return an empty array if no contexts were found
      */
     get: operations["context-list"];
@@ -3026,7 +3026,7 @@ export type operations = {
     };
   };
   /**
-   * [api v3] Get all contexts available to the requesting person
+   * [api v2] Get all contexts available to the requesting person
    * @description Return an empty array if no contexts were found
    */
   "context-list": {

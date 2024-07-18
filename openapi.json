@@ -8048,7 +8048,7 @@
         "/ocs/v2.php/apps/tables/api/2/contexts": {
             "get": {
                 "operationId": "context-list",
-                "summary": "[api v3] Get all contexts available to the requesting person",
+                "summary": "[api v2] Get all contexts available to the requesting person",
                 "description": "Return an empty array if no contexts were found",
                 "tags": [
                     "context"
