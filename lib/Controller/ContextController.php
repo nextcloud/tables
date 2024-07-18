@@ -41,7 +41,7 @@ class ContextController extends AOCSController {
 	}
 
 	/**
-	 * [api v3] Get all contexts available to the requesting person
+	 * [api v2] Get all contexts available to the requesting person
 	 *
 	 * Return an empty array if no contexts were found
 	 *
