@@ -22,8 +22,9 @@ final class WhenRowDeletedAuditLogTest extends TestCase {
 	public function testHandle(): void {
 		$row = new Row2();
 		$row->setId(1);
+		$row->setTableId(161);
 
-		$event = new RowDeletedEvent(row: $row);
+		$event = new RowDeletedEvent($row);
 
 		$this->auditLogService
 			->expects($this->once())
@@ -31,7 +32,7 @@ final class WhenRowDeletedAuditLogTest extends TestCase {
 			->with(
 				$this->equalTo("Row with ID: {$row->getId()} was deleted"),
 				$this->equalTo([
-					'row' => $row->jsonSerialize(),
+					'row' => $row->toPublicRow()->jsonSerialize(),
 				])
 			);
 

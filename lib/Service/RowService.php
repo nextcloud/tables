@@ -13,7 +13,9 @@ use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Event\RowAddedEvent;
 use OCA\Tables\Event\RowDeletedEvent;
+use OCA\Tables\Event\RowUpdatedEvent;
 use OCA\Tables\Model\RowDataInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
@@ -214,7 +216,11 @@ class RowService extends SuperService {
 		$row2->setTableId($tableId);
 		$row2->setData($data);
 		try {
-			return $this->row2Mapper->insert($row2, $this->columnMapper->findAllByTable($tableId));
+			$insertedRow = $this->row2Mapper->insert($row2, $this->columnMapper->findAllByTable($tableId));
+
+			$this->eventDispatcher->dispatchTyped(new RowAddedEvent($insertedRow));
+
+			return $insertedRow;
 		} catch (InternalError|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
@@ -399,6 +405,7 @@ class RowService extends SuperService {
 			}
 		}
 
+		$previousData = $item->getData();
 		$data = $this->cleanupData($data, $columns, $item->getTableId(), $viewId);
 
 		foreach ($data as $entry) {
@@ -411,7 +418,11 @@ class RowService extends SuperService {
 			}
 		}
 
-		return $this->filterRowResult($view ?? null, $this->row2Mapper->update($item, $columns));
+		$updatedRow = $this->row2Mapper->update($item, $columns);
+
+		$this->eventDispatcher->dispatchTyped(new RowUpdatedEvent($updatedRow, $previousData));
+
+		return $this->filterRowResult($view ?? null, $updatedRow);
 	}
 
 	/**
@@ -466,7 +477,7 @@ class RowService extends SuperService {
 		try {
 			$deletedRow = $this->row2Mapper->delete($item);
 
-			$event = new RowDeletedEvent(row: $item);
+			$event = new RowDeletedEvent($item, $item->getData());
 
 			$this->eventDispatcher->dispatchTyped($event);
 
