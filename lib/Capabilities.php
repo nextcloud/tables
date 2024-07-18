@@ -61,7 +61,8 @@ class Capabilities implements ICapability {
 				'enabled' => $this->appManager->isEnabledForUser('tables'),
 				'version' => $this->appManager->getAppVersion('tables'),
 				'apiVersions' => [
-					'1.0'
+					'1.0',
+					'2.0'
 				],
 				'features' => [
 					'favorite',
