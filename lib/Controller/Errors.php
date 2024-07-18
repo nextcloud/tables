@@ -15,15 +15,15 @@ trait Errors {
 		try {
 			return new DataResponse($callback());
 		} catch (PermissionError $e) {
-			$this->logger->warning('A permission error accured: '.$e->getMessage());
+			$this->logger->warning('A permission error accured: '.$e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error accured: '.$e->getMessage());
+			$this->logger->warning('A not found error accured: '.$e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (InternalError|\Exception $e) {
-			$this->logger->warning('An internal error or exception occurred: '.$e->getMessage());
+			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}

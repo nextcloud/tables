@@ -53,7 +53,7 @@ class ApiGeneralController extends AOCSController {
 			$views = $this->viewService->formatViews($this->viewService->findSharedViewsWithMe($this->userId));
 			return new DataResponse([ 'tables' => $tables, 'views' => $views ]);
 		} catch (InternalError|Exception $e) {
-			$this->logger->warning('An internal error or exception occurred: '.$e->getMessage());
+			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
