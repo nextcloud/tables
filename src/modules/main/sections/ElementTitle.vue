@@ -86,12 +86,11 @@ export default {
 }
 
 .row.first-row {
-	width: var(--app-content-width, auto);
 	position: sticky;
 	left: 0;
 	top: 0;
 	z-index: 15;
-	background-color: var(--color-main-background-translucent);
+	background-color: var(--color-main-background);
 	align-items: center;
 }
 
