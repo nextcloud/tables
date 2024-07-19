@@ -3,3932 +3,5128 @@
  * Do not make direct changes to the file.
  */
 
-
-/** OneOf type helpers */
-type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
-type XOR<T, U> = (T | U) extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
-type OneOf<T extends any[]> = T extends [infer Only] ? Only : T extends [infer A, infer B, ...infer Rest] ? OneOf<[XOR<A, B>, ...Rest]> : never;
-
 export type paths = {
-  "/index.php/apps/tables/api/1/tables": {
-    /** Returns all Tables */
-    get: operations["api1-index"];
-    /** Create a new table and return it */
-    post: operations["api1-create-table"];
-  };
-  "/index.php/apps/tables/api/1/tables/{tableId}": {
-    /** Get a table object */
-    get: operations["api1-get-table"];
-    /** Update tables properties */
-    put: operations["api1-update-table"];
-    /** Delete a table */
-    delete: operations["api1-delete-table"];
-  };
-  "/index.php/apps/tables/api/1/tables/{tableId}/views": {
-    /** Get all views for a table */
-    get: operations["api1-index-views"];
-    /** Create a new view for a table */
-    post: operations["api1-create-view"];
-  };
-  "/index.php/apps/tables/api/1/views/{viewId}": {
-    /** Get a view object */
-    get: operations["api1-get-view"];
-    /** Update a view via key-value sets */
-    put: operations["api1-update-view"];
-    /** Delete a view */
-    delete: operations["api1-delete-view"];
-  };
-  "/index.php/apps/tables/api/1/shares/{shareId}": {
-    /** Get a share object */
-    get: operations["api1-get-share"];
-    /** Update a share permission */
-    put: operations["api1-update-share-permissions"];
-    /** Delete a share */
-    delete: operations["api1-delete-share"];
-  };
-  "/index.php/apps/tables/api/1/views/{viewId}/shares": {
-    /** Get all shares for a view Will be empty if view does not exist */
-    get: operations["api1-index-view-shares"];
-  };
-  "/index.php/apps/tables/api/1/tables/{tableId}/shares": {
-    /** Get all shares for a table Will be empty if table does not exist */
-    get: operations["api1-index-table-shares"];
-    /** Create a share for a table */
-    post: operations["api1-create-table-share"];
-  };
-  "/index.php/apps/tables/api/1/shares": {
-    /** Create a new share */
-    post: operations["api1-create-share"];
-  };
-  "/index.php/apps/tables/api/1/shares/{shareId}/display-mode": {
-    /** Updates the display mode of a context share */
-    put: operations["api1-update-share-display-mode"];
-  };
-  "/index.php/apps/tables/api/1/tables/{tableId}/columns": {
-    /** Get all columns for a table or a underlying view Return an empty array if no columns were found */
-    get: operations["api1-index-table-columns"];
-    /** Create a new column for a table */
-    post: operations["api1-create-table-column"];
-  };
-  "/index.php/apps/tables/api/1/views/{viewId}/columns": {
-    /** Get all columns for a view Return an empty array if no columns were found */
-    get: operations["api1-index-view-columns"];
-  };
-  "/index.php/apps/tables/api/1/columns": {
-    /** Create a column */
-    post: operations["api1-create-column"];
-  };
-  "/index.php/apps/tables/api/1/columns/{columnId}": {
-    /** Returns a column object */
-    get: operations["api1-get-column"];
-    /** Update a column */
-    put: operations["api1-update-column"];
-    /** Delete a column */
-    delete: operations["api1-delete-column"];
-  };
-  "/index.php/apps/tables/api/1/tables/{tableId}/rows/simple": {
-    /** List all rows values for a table, first row are the column titles */
-    get: operations["api1-index-table-rows-simple"];
-  };
-  "/index.php/apps/tables/api/1/tables/{tableId}/rows": {
-    /** List all rows for a table */
-    get: operations["api1-index-table-rows"];
-    /** Create a row within a table */
-    post: operations["api1-create-row-in-table"];
-  };
-  "/index.php/apps/tables/api/1/views/{viewId}/rows": {
-    /** List all rows for a view */
-    get: operations["api1-index-view-rows"];
-    /** Create a row within a view */
-    post: operations["api1-create-row-in-view"];
-  };
-  "/index.php/apps/tables/api/1/rows/{rowId}": {
-    /** Get a row */
-    get: operations["api1-get-row"];
-    /** Update a row */
-    put: operations["api1-update-row"];
-    /** Delete a row */
-    delete: operations["api1-delete-row"];
-  };
-  "/index.php/apps/tables/api/1/views/{viewId}/rows/{rowId}": {
-    /** Delete a row within a view */
-    delete: operations["api1-delete-row-by-view"];
-  };
-  "/index.php/apps/tables/api/1/import/table/{tableId}": {
-    /** Import from file in to a table */
-    post: operations["api1-import-in-table"];
-  };
-  "/index.php/apps/tables/api/1/import/views/{viewId}": {
-    /** Import from file in to a table */
-    post: operations["api1-import-in-view"];
-  };
-  "/ocs/v2.php/apps/tables/api/2/init": {
-    /**
-     * [api v2] Returns all main resources
-     * @description Tables and views incl. shares
-     */
-    get: operations["api_general-index"];
-  };
-  "/ocs/v2.php/apps/tables/api/2/tables": {
-    /** [api v2] Returns all Tables */
-    get: operations["api_tables-index"];
-    /** [api v2] Create a new table and return it */
-    post: operations["api_tables-create"];
-  };
-  "/ocs/v2.php/apps/tables/api/2/tables/{id}": {
-    /** [api v2] Get a table object */
-    get: operations["api_tables-show"];
-    /** [api v2] Update tables properties */
-    put: operations["api_tables-update"];
-    /** [api v2] Delete a table */
-    delete: operations["api_tables-destroy"];
-  };
-  "/ocs/v2.php/apps/tables/api/2/tables/{id}/transfer": {
-    /**
-     * [api v2] Transfer table
-     * @description Transfer table from one user to another
-     */
-    put: operations["api_tables-transfer"];
-  };
-  "/ocs/v2.php/apps/tables/api/2/columns/{nodeType}/{nodeId}": {
-    /**
-     * [api v2] Get all columns for a table or a view
-     * @description Return an empty array if no columns were found
-     */
-    get: operations["api_columns-index"];
-  };
-  "/ocs/v2.php/apps/tables/api/2/columns/{id}": {
-    /** [api v2] Get a column object */
-    get: operations["api_columns-show"];
-  };
-  "/ocs/v2.php/apps/tables/api/2/columns/number": {
-    /**
-     * [api v2] Create new numbered column
-     * @description Specify a subtype to use any special numbered column
-     */
-    post: operations["api_columns-create-number-column"];
-  };
-  "/ocs/v2.php/apps/tables/api/2/columns/text": {
-    /**
-     * [api v2] Create new text column
-     * @description Specify a subtype to use any special text column
-     */
-    post: operations["api_columns-create-text-column"];
-  };
-  "/ocs/v2.php/apps/tables/api/2/columns/selection": {
-    /**
-     * [api v2] Create new selection column
-     * @description Specify a subtype to use any special selection column
-     */
-    post: operations["api_columns-create-selection-column"];
-  };
-  "/ocs/v2.php/apps/tables/api/2/columns/datetime": {
-    /**
-     * [api v2] Create new datetime column
-     * @description Specify a subtype to use any special datetime column
-     */
-    post: operations["api_columns-create-datetime-column"];
-  };
-  "/ocs/v2.php/apps/tables/api/2/favorites/{nodeType}/{nodeId}": {
-    /** [api v2] Add a node (table or view) to user favorites */
-    post: operations["api_favorite-create"];
-    /** [api v2] Remove a node (table or view) to from favorites */
-    delete: operations["api_favorite-destroy"];
-  };
-  "/ocs/v2.php/apps/tables/api/2/contexts": {
-    /**
-     * [api v3] Get all contexts available to the requesting person
-     * @description Return an empty array if no contexts were found
-     */
-    get: operations["context-index"];
-    /** [api v2] Create a new context and return it */
-    post: operations["context-create"];
-  };
-  "/ocs/v2.php/apps/tables/api/2/contexts/{contextId}": {
-    /** [api v2] Get information about the requests context */
-    get: operations["context-show"];
-    /** [api v2] Update an existing context and return it */
-    put: operations["context-update"];
-    /** [api v2] Delete an existing context and return it */
-    delete: operations["context-destroy"];
-  };
-  "/ocs/v2.php/apps/tables/api/2/contexts/{contextId}/transfer": {
-    /** [api v2] Transfer the ownership of a context and return it */
-    put: operations["context-transfer"];
-  };
-  "/ocs/v2.php/apps/tables/api/2/contexts/{contextId}/pages/{pageId}": {
-    /** [api v2] Update the order on a page of a context */
-    put: operations["context-update-content-order"];
-  };
-  "/ocs/v2.php/apps/tables/api/2/{nodeCollection}/{nodeId}/rows": {
-    /** [api v2] Create a new row in a table or a view */
-    post: operations["rowocs-create-row"];
-  };
+    readonly "/index.php/apps/tables/api/1/tables": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** Returns all Tables */
+        readonly get: operations["api1-index"];
+        readonly put?: never;
+        /** Create a new table and return it */
+        readonly post: operations["api1-create-table"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/tables/{tableId}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** Get a table object */
+        readonly get: operations["api1-get-table"];
+        /** Update tables properties */
+        readonly put: operations["api1-update-table"];
+        readonly post?: never;
+        /** Delete a table */
+        readonly delete: operations["api1-delete-table"];
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/tables/{tableId}/views": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** Get all views for a table */
+        readonly get: operations["api1-index-views"];
+        readonly put?: never;
+        /** Create a new view for a table */
+        readonly post: operations["api1-create-view"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/views/{viewId}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** Get a view object */
+        readonly get: operations["api1-get-view"];
+        /** Update a view via key-value sets */
+        readonly put: operations["api1-update-view"];
+        readonly post?: never;
+        /** Delete a view */
+        readonly delete: operations["api1-delete-view"];
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/shares/{shareId}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** Get a share object */
+        readonly get: operations["api1-get-share"];
+        /** Update a share permission */
+        readonly put: operations["api1-update-share-permissions"];
+        readonly post?: never;
+        /** Delete a share */
+        readonly delete: operations["api1-delete-share"];
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/views/{viewId}/shares": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** Get all shares for a view Will be empty if view does not exist */
+        readonly get: operations["api1-index-view-shares"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/tables/{tableId}/shares": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** Get all shares for a table Will be empty if table does not exist */
+        readonly get: operations["api1-index-table-shares"];
+        readonly put?: never;
+        /** Create a share for a table */
+        readonly post: operations["api1-create-table-share"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/shares": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /** Create a new share */
+        readonly post: operations["api1-create-share"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/shares/{shareId}/display-mode": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        /** Updates the display mode of a context share */
+        readonly put: operations["api1-update-share-display-mode"];
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/tables/{tableId}/columns": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** Get all columns for a table or a underlying view Return an empty array if no columns were found */
+        readonly get: operations["api1-index-table-columns"];
+        readonly put?: never;
+        /** Create a new column for a table */
+        readonly post: operations["api1-create-table-column"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/views/{viewId}/columns": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** Get all columns for a view Return an empty array if no columns were found */
+        readonly get: operations["api1-index-view-columns"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/columns": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /** Create a column */
+        readonly post: operations["api1-create-column"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/columns/{columnId}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** Returns a column object */
+        readonly get: operations["api1-get-column"];
+        /** Update a column */
+        readonly put: operations["api1-update-column"];
+        readonly post?: never;
+        /** Delete a column */
+        readonly delete: operations["api1-delete-column"];
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/tables/{tableId}/rows/simple": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** List all rows values for a table, first row are the column titles */
+        readonly get: operations["api1-index-table-rows-simple"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/tables/{tableId}/rows": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** List all rows for a table */
+        readonly get: operations["api1-index-table-rows"];
+        readonly put?: never;
+        /** Create a row within a table */
+        readonly post: operations["api1-create-row-in-table"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/views/{viewId}/rows": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** List all rows for a view */
+        readonly get: operations["api1-index-view-rows"];
+        readonly put?: never;
+        /** Create a row within a view */
+        readonly post: operations["api1-create-row-in-view"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/rows/{rowId}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** Get a row */
+        readonly get: operations["api1-get-row"];
+        /** Update a row */
+        readonly put: operations["api1-update-row"];
+        readonly post?: never;
+        /** Delete a row */
+        readonly delete: operations["api1-delete-row"];
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/views/{viewId}/rows/{rowId}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        readonly post?: never;
+        /** Delete a row within a view */
+        readonly delete: operations["api1-delete-row-by-view"];
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/import/table/{tableId}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /** Import from file in to a table */
+        readonly post: operations["api1-import-in-table"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/import/views/{viewId}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /** Import from file in to a table */
+        readonly post: operations["api1-import-in-view"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/init": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * [api v2] Returns all main resources
+         * @description Tables and views incl. shares
+         */
+        readonly get: operations["api_general-index"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/tables": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** [api v2] Returns all Tables */
+        readonly get: operations["api_tables-index"];
+        readonly put?: never;
+        /** [api v2] Create a new table and return it */
+        readonly post: operations["api_tables-create"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/tables/{id}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** [api v2] Get a table object */
+        readonly get: operations["api_tables-show"];
+        /** [api v2] Update tables properties */
+        readonly put: operations["api_tables-update"];
+        readonly post?: never;
+        /** [api v2] Delete a table */
+        readonly delete: operations["api_tables-destroy"];
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/tables/{id}/transfer": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        /**
+         * [api v2] Transfer table
+         * @description Transfer table from one user to another
+         */
+        readonly put: operations["api_tables-transfer"];
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/columns/{nodeType}/{nodeId}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * [api v2] Get all columns for a table or a view
+         * @description Return an empty array if no columns were found
+         */
+        readonly get: operations["api_columns-index"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/columns/{id}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** [api v2] Get a column object */
+        readonly get: operations["api_columns-show"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/columns/number": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * [api v2] Create new numbered column
+         * @description Specify a subtype to use any special numbered column
+         */
+        readonly post: operations["api_columns-create-number-column"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/columns/text": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * [api v2] Create new text column
+         * @description Specify a subtype to use any special text column
+         */
+        readonly post: operations["api_columns-create-text-column"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/columns/selection": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * [api v2] Create new selection column
+         * @description Specify a subtype to use any special selection column
+         */
+        readonly post: operations["api_columns-create-selection-column"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/columns/datetime": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * [api v2] Create new datetime column
+         * @description Specify a subtype to use any special datetime column
+         */
+        readonly post: operations["api_columns-create-datetime-column"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/favorites/{nodeType}/{nodeId}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /** [api v2] Add a node (table or view) to user favorites */
+        readonly post: operations["api_favorite-create"];
+        /** [api v2] Remove a node (table or view) to from favorites */
+        readonly delete: operations["api_favorite-destroy"];
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/contexts": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * [api v2] Get all contexts available to the requesting person
+         * @description Return an empty array if no contexts were found
+         */
+        readonly get: operations["context-index"];
+        readonly put?: never;
+        /** [api v2] Create a new context and return it */
+        readonly post: operations["context-create"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/contexts/{contextId}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** [api v2] Get information about the requests context */
+        readonly get: operations["context-show"];
+        /** [api v2] Update an existing context and return it */
+        readonly put: operations["context-update"];
+        readonly post?: never;
+        /** [api v2] Delete an existing context and return it */
+        readonly delete: operations["context-destroy"];
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/contexts/{contextId}/transfer": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        /** [api v2] Transfer the ownership of a context and return it */
+        readonly put: operations["context-transfer"];
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/contexts/{contextId}/pages/{pageId}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        /** [api v2] Update the order on a page of a context */
+        readonly put: operations["context-update-content-order"];
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/{nodeCollection}/{nodeId}/rows": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /** [api v2] Create a new row in a table or a view */
+        readonly post: operations["rowocs-create-row"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
 };
-
 export type webhooks = Record<string, never>;
-
 export type components = {
-  schemas: {
-    Capabilities: {
-      tables: {
-        enabled: boolean;
-        version: string;
-        apiVersions: string[];
-        features: string[];
-        column_types: string[];
-      };
-    };
-    Column: {
-      /** Format: int64 */
-      id: number;
-      title: string;
-      /** Format: int64 */
-      tableId: number;
-      createdBy: string;
-      createdAt: string;
-      lastEditBy: string;
-      lastEditAt: string;
-      type: string;
-      subtype: string;
-      mandatory: boolean;
-      description: string;
-      /** Format: int64 */
-      orderWeight: number;
-      /** Format: double */
-      numberDefault: number;
-      /** Format: double */
-      numberMin: number;
-      /** Format: double */
-      numberMax: number;
-      /** Format: int64 */
-      numberDecimals: number;
-      numberPrefix: string;
-      numberSuffix: string;
-      textDefault: string;
-      textAllowedPattern: string;
-      /** Format: int64 */
-      textMaxLength: number;
-      selectionOptions: string;
-      selectionDefault: string;
-      datetimeDefault: string;
-    };
-    Context: {
-      /** Format: int64 */
-      id: number;
-      name: string;
-      iconName: string;
-      description: string;
-      owner: string;
-      /** Format: int64 */
-      ownerType: number;
-    };
-    ContextNavigation: {
-      /** Format: int64 */
-      id: number;
-      /** Format: int64 */
-      shareId: number;
-      /** Format: int64 */
-      displayMode: number;
-      userId: string;
-    };
-    ImportState: {
-      /** Format: int64 */
-      found_columns_count: number;
-      /** Format: int64 */
-      matching_columns_count: number;
-      /** Format: int64 */
-      created_columns_count: number;
-      /** Format: int64 */
-      inserted_rows_count: number;
-      /** Format: int64 */
-      errors_parsing_count: number;
-      /** Format: int64 */
-      errors_count: number;
-    };
-    Index: {
-      tables: components["schemas"]["Table"][];
-      views: components["schemas"]["View"][];
-    };
-    OCSMeta: {
-      status: string;
-      statuscode: number;
-      message?: string;
-      totalitems?: string;
-      itemsperpage?: string;
-    };
-    Row: {
-      /** Format: int64 */
-      id: number;
-      /** Format: int64 */
-      tableId: number;
-      createdBy: string;
-      createdAt: string;
-      lastEditBy: string;
-      lastEditAt: string;
-      data: {
-        /** Format: int64 */
-        columnId: number;
-        value: Record<string, never>;
-      } | null;
-    };
-    Share: {
-      /** Format: int64 */
-      id: number;
-      sender: string;
-      receiver: string;
-      receiverDisplayName: string;
-      receiverType: string;
-      /** Format: int64 */
-      nodeId: number;
-      nodeType: string;
-      permissionRead: boolean;
-      permissionCreate: boolean;
-      permissionUpdate: boolean;
-      permissionDelete: boolean;
-      permissionManage: boolean;
-      createdAt: string;
-      createdBy: string;
-    };
-    Table: {
-      /** Format: int64 */
-      id: number;
-      title: string;
-      emoji: string | null;
-      ownership: string;
-      ownerDisplayName: string;
-      createdBy: string;
-      createdAt: string;
-      lastEditBy: string;
-      lastEditAt: string;
-      archived: boolean;
-      favorite: boolean;
-      isShared: boolean;
-      onSharePermissions: {
-        read: boolean;
-        create: boolean;
-        update: boolean;
-        delete: boolean;
-        manage: boolean;
-      } | null;
-      hasShares: boolean;
-      /** Format: int64 */
-      rowsCount: number;
-      views: components["schemas"]["View"][];
-      /** Format: int64 */
-      columnsCount: number;
-    };
-    View: {
-      /** Format: int64 */
-      id: number;
-      title: string;
-      emoji: string | null;
-      /** Format: int64 */
-      tableId: number;
-      ownership: string;
-      ownerDisplayName: string | null;
-      createdBy: string;
-      createdAt: string;
-      lastEditBy: string;
-      lastEditAt: string;
-      description: string | null;
-      columns: number[];
-      sort: ({
-          /** Format: int64 */
-          columnId: number;
-          /** @enum {string} */
-          mode: "ASC" | "DESC";
-        })[];
-      filter: (({
+    schemas: {
+        readonly Capabilities: {
+            readonly tables: {
+                readonly enabled: boolean;
+                readonly version: string;
+                readonly apiVersions: readonly string[];
+                readonly features: readonly string[];
+                readonly column_types: readonly string[];
+            };
+        };
+        readonly Column: {
             /** Format: int64 */
-            columnId: number;
-            /** @enum {string} */
-            operator: "begins-with" | "ends-with" | "contains" | "is-equal" | "is-greater-than" | "is-greater-than-or-equal" | "is-lower-than" | "is-lower-than-or-equal" | "is-empty";
-            value: string | number;
-          })[])[];
-      isShared: boolean;
-      favorite: boolean;
-      onSharePermissions: {
-        read: boolean;
-        create: boolean;
-        update: boolean;
-        delete: boolean;
-        manage: boolean;
-      } | null;
-      hasShares: boolean;
-      /** Format: int64 */
-      rowsCount: number;
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
-};
-
-export type $defs = Record<string, never>;
-
-export type external = Record<string, never>;
-
-export type operations = {
-
-  /** Returns all Tables */
-  "api1-index": {
-    responses: {
-      /** @description Tables returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Table"][];
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Create a new table and return it */
-  "api1-create-table": {
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Title of the table */
-          title: string;
-          /** @description Emoji for the table */
-          emoji?: string | null;
-          /**
-           * @description Template to use if wanted
-           * @default custom
-           */
-          template?: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Tables returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Table"];
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Get a table object */
-  "api1-get-table": {
-    parameters: {
-      path: {
-        /** @description Table ID */
-        tableId: number;
-      };
-    };
-    responses: {
-      /** @description Table returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Table"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Update tables properties */
-  "api1-update-table": {
-    parameters: {
-      path: {
-        /** @description Table ID */
-        tableId: number;
-      };
-    };
-    requestBody?: {
-      content: {
-        "application/json": {
-          /** @description New table title */
-          title?: string | null;
-          /** @description New table emoji */
-          emoji?: string | null;
-          /**
-           * @description Whether the table is archived
-           * @default false
-           */
-          archived?: boolean;
-        };
-      };
-    };
-    responses: {
-      /** @description Tables returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Table"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Delete a table */
-  "api1-delete-table": {
-    parameters: {
-      path: {
-        /** @description Table ID */
-        tableId: number;
-      };
-    };
-    responses: {
-      /** @description Deleted table returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Table"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Get all views for a table */
-  "api1-index-views": {
-    parameters: {
-      path: {
-        /** @description Table ID */
-        tableId: number;
-      };
-    };
-    responses: {
-      /** @description Views returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["View"][];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Create a new view for a table */
-  "api1-create-view": {
-    parameters: {
-      path: {
-        /** @description Table ID that will hold the view */
-        tableId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Title for the view */
-          title: string;
-          /** @description Emoji for the view */
-          emoji?: string | null;
-        };
-      };
-    };
-    responses: {
-      /** @description View created */
-      200: {
-        content: {
-          "application/json": components["schemas"]["View"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Get a view object */
-  "api1-get-view": {
-    parameters: {
-      path: {
-        /** @description View ID */
-        viewId: number;
-      };
-    };
-    responses: {
-      /** @description View returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["View"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Update a view via key-value sets */
-  "api1-update-view": {
-    parameters: {
-      path: {
-        /** @description View ID */
-        viewId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description key-value pairs */
-          data: ({
-            /** @enum {string} */
-            key: "title" | "emoji" | "description";
-            value: string;
-          }) | {
-            /** @enum {string} */
-            key: "columns";
-            value: number[];
-          } | ({
-            /** @enum {string} */
-            key: "sort";
-            value: {
-              /** Format: int64 */
-              columnId: number;
-              /** @enum {string} */
-              mode: "ASC" | "DESC";
-            };
-          }) | ({
-            /** @enum {string} */
-            key: "filter";
-            value: {
-              /** Format: int64 */
-              columnId: number;
-              /** @enum {string} */
-              operator: "begins-with" | "ends-with" | "contains" | "is-equal" | "is-greater-than" | "is-greater-than-or-equal" | "is-lower-than" | "is-lower-than-or-equal" | "is-empty";
-              value: string | number;
-            };
-          });
-        };
-      };
-    };
-    responses: {
-      /** @description View updated */
-      200: {
-        content: {
-          "application/json": components["schemas"]["View"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Delete a view */
-  "api1-delete-view": {
-    parameters: {
-      path: {
-        /** @description View ID */
-        viewId: number;
-      };
-    };
-    responses: {
-      /** @description View deleted */
-      200: {
-        content: {
-          "application/json": components["schemas"]["View"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Get a share object */
-  "api1-get-share": {
-    parameters: {
-      path: {
-        /** @description Share ID */
-        shareId: number;
-      };
-    };
-    responses: {
-      /** @description Share returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Share"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Update a share permission */
-  "api1-update-share-permissions": {
-    parameters: {
-      path: {
-        /** @description Share ID */
-        shareId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Permission type that should be changed */
-          permissionType: string;
-          /** @description New permission value */
-          permissionValue: boolean;
-        };
-      };
-    };
-    responses: {
-      /** @description View deleted */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Share"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Delete a share */
-  "api1-delete-share": {
-    parameters: {
-      path: {
-        /** @description Share ID */
-        shareId: number;
-      };
-    };
-    responses: {
-      /** @description View deleted */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Share"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Get all shares for a view Will be empty if view does not exist */
-  "api1-index-view-shares": {
-    parameters: {
-      path: {
-        /** @description View ID */
-        viewId: number;
-      };
-    };
-    responses: {
-      /** @description Shares returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Share"][];
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Get all shares for a table Will be empty if table does not exist */
-  "api1-index-table-shares": {
-    parameters: {
-      path: {
-        /** @description Table ID */
-        tableId: number;
-      };
-    };
-    responses: {
-      /** @description Shares returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Share"][];
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Create a share for a table */
-  "api1-create-table-share": {
-    parameters: {
-      path: {
-        /** @description Table ID */
-        tableId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Receiver ID */
-          receiver: string;
-          /**
-           * @description Receiver type
-           * @enum {string}
-           */
-          receiverType: "user" | "group";
-          /** @description Permission if receiver can read data */
-          permissionRead: boolean;
-          /** @description Permission if receiver can create data */
-          permissionCreate: boolean;
-          /** @description Permission if receiver can update data */
-          permissionUpdate: boolean;
-          /** @description Permission if receiver can delete data */
-          permissionDelete: boolean;
-          /** @description Permission if receiver can manage table */
-          permissionManage: boolean;
-        };
-      };
-    };
-    responses: {
-      /** @description View deleted */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Share"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Create a new share */
-  "api1-create-share": {
-    requestBody: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description Node ID
-           */
-          nodeId: number;
-          /**
-           * @description Node type
-           * @enum {string}
-           */
-          nodeType: "table" | "view" | "context";
-          /** @description Receiver ID */
-          receiver: string;
-          /**
-           * @description Receiver type
-           * @enum {string}
-           */
-          receiverType: "user" | "group";
-          /**
-           * @description Permission if receiver can read data
-           * @default false
-           */
-          permissionRead?: boolean;
-          /**
-           * @description Permission if receiver can create data
-           * @default false
-           */
-          permissionCreate?: boolean;
-          /**
-           * @description Permission if receiver can update data
-           * @default false
-           */
-          permissionUpdate?: boolean;
-          /**
-           * @description Permission if receiver can delete data
-           * @default false
-           */
-          permissionDelete?: boolean;
-          /**
-           * @description Permission if receiver can manage node
-           * @default false
-           */
-          permissionManage?: boolean;
-          /**
-           * Format: int64
-           * @description context shares only, whether it should appear in nav bar. 0: no, 1: recipients, 2: all
-           * @default 0
-           */
-          displayMode?: number;
-        };
-      };
-    };
-    responses: {
-      /** @description Share returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Share"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Updates the display mode of a context share */
-  "api1-update-share-display-mode": {
-    parameters: {
-      path: {
-        /** @description Share ID */
-        shareId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description The new value for the display mode of the nav bar icon. 0: hidden, 1: visible for recipients, 2: visible for all
-           */
-          displayMode: number;
-          /**
-           * @description "default" to set the default, "self" to set an override for the authenticated user
-           * @default default
-           * @enum {string}
-           */
-          target?: "default" | "self";
-        };
-      };
-    };
-    responses: {
-      /** @description Display mode updated */
-      200: {
-        content: {
-          "application/json": components["schemas"]["ContextNavigation"];
-        };
-      };
-      /** @description Invalid parameter */
-      400: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Share not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Get all columns for a table or a underlying view Return an empty array if no columns were found */
-  "api1-index-table-columns": {
-    parameters: {
-      path: {
-        /** @description Table ID */
-        tableId: number;
-      };
-    };
-    requestBody?: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description View ID
-           */
-          viewId?: number | null;
-        };
-      };
-    };
-    responses: {
-      /** @description View deleted */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Column"][];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Create a new column for a table */
-  "api1-create-table-column": {
-    parameters: {
-      path: {
-        /** @description Table ID */
-        tableId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Title */
-          title: string;
-          /**
-           * @description Column main type
-           * @enum {string}
-           */
-          type: "text" | "number" | "datetime" | "select";
-          /** @description Column sub type */
-          subtype?: string | null;
-          /** @description Is the column mandatory */
-          mandatory: boolean;
-          /** @description Description */
-          description?: string | null;
-          /** @description Prefix if the column is a number field */
-          numberPrefix?: string | null;
-          /** @description Suffix if the column is a number field */
-          numberSuffix?: string | null;
-          /**
-           * Format: double
-           * @description Default number, if column is a number
-           */
-          numberDefault?: number | null;
-          /**
-           * Format: double
-           * @description Min value, if column is a number
-           */
-          numberMin?: number | null;
-          /**
-           * Format: double
-           * @description Max number, if column is a number
-           */
-          numberMax?: number | null;
-          /**
-           * Format: int64
-           * @description Number of decimals, if column is a number
-           */
-          numberDecimals?: number | null;
-          /** @description Default text, if column is a text */
-          textDefault?: string | null;
-          /** @description Allowed pattern (regex) for text columns (not yet implemented) */
-          textAllowedPattern?: string | null;
-          /**
-           * Format: int64
-           * @description Max length, if column is a text
-           */
-          textMaxLength?: number | null;
-          /**
-           * @description Options for a selection (json array{id: int, label: string})
-           * @default
-           */
-          selectionOptions?: string | null;
-          /**
-           * @description Default option IDs for a selection (json int[])
-           * @default
-           */
-          selectionDefault?: string | null;
-          /**
-           * @description Default value, if column is datetime
-           * @default
-           */
-          datetimeDefault?: string | null;
-          /**
-           * @description View IDs where this column should be added to be presented
-           * @default []
-           */
-          selectedViewIds?: number[] | null;
-        };
-      };
-    };
-    responses: {
-      /** @description Column created */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Column"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Get all columns for a view Return an empty array if no columns were found */
-  "api1-index-view-columns": {
-    parameters: {
-      path: {
-        /** @description View ID */
-        viewId: number;
-      };
-    };
-    responses: {
-      /** @description View deleted */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Column"][];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Create a column */
-  "api1-create-column": {
-    requestBody: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description Table ID
-           */
-          tableId?: number | null;
-          /**
-           * Format: int64
-           * @description View ID
-           */
-          viewId?: number | null;
-          /** @description Title */
-          title: string;
-          /**
-           * @description Column main type
-           * @enum {string}
-           */
-          type: "text" | "number" | "datetime" | "select";
-          /** @description Column sub type */
-          subtype?: string | null;
-          /** @description Is the column mandatory */
-          mandatory: boolean;
-          /** @description Description */
-          description?: string | null;
-          /** @description Prefix if the column is a number field */
-          numberPrefix?: string | null;
-          /** @description Suffix if the column is a number field */
-          numberSuffix?: string | null;
-          /**
-           * Format: double
-           * @description Default number, if column is a number
-           */
-          numberDefault?: number | null;
-          /**
-           * Format: double
-           * @description Min value, if column is a number
-           */
-          numberMin?: number | null;
-          /**
-           * Format: double
-           * @description Max number, if column is a number
-           */
-          numberMax?: number | null;
-          /**
-           * Format: int64
-           * @description Number of decimals, if column is a number
-           */
-          numberDecimals?: number | null;
-          /** @description Default text, if column is a text */
-          textDefault?: string | null;
-          /** @description Allowed pattern (regex) for text columns (not yet implemented) */
-          textAllowedPattern?: string | null;
-          /**
-           * Format: int64
-           * @description Max length, if column is a text
-           */
-          textMaxLength?: number | null;
-          /**
-           * @description Options for a selection (json array{id: int, label: string})
-           * @default
-           */
-          selectionOptions?: string | null;
-          /**
-           * @description Default option IDs for a selection (json int[])
-           * @default
-           */
-          selectionDefault?: string | null;
-          /**
-           * @description Default value, if column is datetime
-           * @default
-           */
-          datetimeDefault?: string | null;
-          /**
-           * @description View IDs where this column should be added to be presented
-           * @default []
-           */
-          selectedViewIds?: number[] | null;
-        };
-      };
-    };
-    responses: {
-      /** @description Column created */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Column"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Returns a column object */
-  "api1-get-column": {
-    parameters: {
-      path: {
-        /** @description Wanted Column ID */
-        columnId: number;
-      };
-    };
-    responses: {
-      /** @description Column returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Column"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Update a column */
-  "api1-update-column": {
-    parameters: {
-      path: {
-        /** @description Column ID that will be updated */
-        columnId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Title */
-          title?: string | null;
-          /** @description Column sub type */
-          subtype?: string | null;
-          /** @description Is the column mandatory */
-          mandatory: boolean;
-          /** @description Description */
-          description?: string | null;
-          /** @description Prefix if the column is a number field */
-          numberPrefix?: string | null;
-          /** @description Suffix if the column is a number field */
-          numberSuffix?: string | null;
-          /**
-           * Format: double
-           * @description Default number, if column is a number
-           */
-          numberDefault?: number | null;
-          /**
-           * Format: double
-           * @description Min value, if column is a number
-           */
-          numberMin?: number | null;
-          /**
-           * Format: double
-           * @description Max number, if column is a number
-           */
-          numberMax?: number | null;
-          /**
-           * Format: int64
-           * @description Number of decimals, if column is a number
-           */
-          numberDecimals?: number | null;
-          /** @description Default text, if column is a text */
-          textDefault?: string | null;
-          /** @description Allowed pattern (regex) for text columns (not yet implemented) */
-          textAllowedPattern?: string | null;
-          /**
-           * Format: int64
-           * @description Max length, if column is a text
-           */
-          textMaxLength?: number | null;
-          /** @description Options for a selection (json array{id: int, label: string}) */
-          selectionOptions?: string | null;
-          /** @description Default option IDs for a selection (json int[]) */
-          selectionDefault?: string | null;
-          /** @description Default value, if column is datetime */
-          datetimeDefault?: string | null;
-        };
-      };
-    };
-    responses: {
-      /** @description Updated column */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Column"];
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Delete a column */
-  "api1-delete-column": {
-    parameters: {
-      path: {
-        /** @description Wanted Column ID */
-        columnId: number;
-      };
-    };
-    responses: {
-      /** @description Deleted column returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Column"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** List all rows values for a table, first row are the column titles */
-  "api1-index-table-rows-simple": {
-    parameters: {
-      path: {
-        /** @description Table ID */
-        tableId: number;
-      };
-    };
-    requestBody?: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description Limit
-           */
-          limit?: number | null;
-          /**
-           * Format: int64
-           * @description Offset
-           */
-          offset?: number | null;
-        };
-      };
-    };
-    responses: {
-      /** @description Row values returned */
-      200: {
-        content: {
-          "application/json": string[];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** List all rows for a table */
-  "api1-index-table-rows": {
-    parameters: {
-      path: {
-        /** @description Table ID */
-        tableId: number;
-      };
-    };
-    requestBody?: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description Limit
-           */
-          limit?: number | null;
-          /**
-           * Format: int64
-           * @description Offset
-           */
-          offset?: number | null;
-        };
-      };
-    };
-    responses: {
-      /** @description Rows returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Row"][];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Create a row within a table */
-  "api1-create-row-in-table": {
-    parameters: {
-      path: {
-        /** @description Table ID */
-        tableId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Data as key - value store */
-          data: OneOf<[string, {
-            [key: string]: Record<string, never>;
-          }]>;
-        };
-      };
-    };
-    responses: {
-      /** @description Row returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Row"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** List all rows for a view */
-  "api1-index-view-rows": {
-    parameters: {
-      path: {
-        /** @description View ID */
-        viewId: number;
-      };
-    };
-    requestBody?: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description Limit
-           */
-          limit?: number | null;
-          /**
-           * Format: int64
-           * @description Offset
-           */
-          offset?: number | null;
-        };
-      };
-    };
-    responses: {
-      /** @description Rows returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Row"][];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Create a row within a view */
-  "api1-create-row-in-view": {
-    parameters: {
-      path: {
-        /** @description View ID */
-        viewId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Data as key - value store */
-          data: OneOf<[string, {
-            [key: string]: Record<string, never>;
-          }]>;
-        };
-      };
-    };
-    responses: {
-      /** @description Row returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Row"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Get a row */
-  "api1-get-row": {
-    parameters: {
-      path: {
-        /** @description Row ID */
-        rowId: number;
-      };
-    };
-    responses: {
-      /** @description Row returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Row"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Update a row */
-  "api1-update-row": {
-    parameters: {
-      path: {
-        /** @description Row ID */
-        rowId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description View ID
-           */
-          viewId?: number | null;
-          /** @description Data as key - value store */
-          data: OneOf<[string, {
-            [key: string]: Record<string, never>;
-          }]>;
-        };
-      };
-    };
-    responses: {
-      /** @description Updated row returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Row"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Delete a row */
-  "api1-delete-row": {
-    parameters: {
-      path: {
-        /** @description Row ID */
-        rowId: number;
-      };
-    };
-    responses: {
-      /** @description Deleted row returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Row"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Delete a row within a view */
-  "api1-delete-row-by-view": {
-    parameters: {
-      path: {
-        /** @description View ID */
-        viewId: number;
-        /** @description Row ID */
-        rowId: number;
-      };
-    };
-    responses: {
-      /** @description Deleted row returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Row"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Import from file in to a table */
-  "api1-import-in-table": {
-    parameters: {
-      path: {
-        /** @description Table ID */
-        tableId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Path to file */
-          path: string;
-          /**
-           * @description Create missing columns
-           * @default true
-           */
-          createMissingColumns?: boolean;
-        };
-      };
-    };
-    responses: {
-      /** @description Import status returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["ImportState"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /** Import from file in to a table */
-  "api1-import-in-view": {
-    parameters: {
-      path: {
-        /** @description View ID */
-        viewId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Path to file */
-          path: string;
-          /**
-           * @description Create missing columns
-           * @default true
-           */
-          createMissingColumns?: boolean;
-        };
-      };
-    };
-    responses: {
-      /** @description Import status returned */
-      200: {
-        content: {
-          "application/json": components["schemas"]["ImportState"];
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            message: string;
-          };
-        };
-      };
-    };
-  };
-  /**
-   * [api v2] Returns all main resources
-   * @description Tables and views incl. shares
-   */
-  "api_general-index": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-    };
-    responses: {
-      /** @description Index returned */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Index"];
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-    };
-  };
-  /** [api v2] Returns all Tables */
-  "api_tables-index": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-    };
-    responses: {
-      /** @description Tables returned */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Table"][];
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-    };
-  };
-  /** [api v2] Create a new table and return it */
-  "api_tables-create": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Title of the table */
-          title: string;
-          /** @description Emoji for the table */
-          emoji?: string | null;
-          /** @description Description for the table */
-          description?: string | null;
-          /**
-           * @description Template to use if wanted
-           * @default custom
-           */
-          template?: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Tables returned */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Table"];
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-    };
-  };
-  /** [api v2] Get a table object */
-  "api_tables-show": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-      path: {
-        /** @description Table ID */
-        id: number;
-      };
-    };
-    responses: {
-      /** @description Table returned */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Table"];
-            };
-          };
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-    };
-  };
-  /** [api v2] Update tables properties */
-  "api_tables-update": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-      path: {
-        /** @description Table ID */
-        id: number;
-      };
-    };
-    requestBody?: {
-      content: {
-        "application/json": {
-          /** @description New table title */
-          title?: string | null;
-          /** @description New table emoji */
-          emoji?: string | null;
-          /** @description the tables description */
-          description?: string;
-          /** @description whether the table is archived */
-          archived?: boolean;
-        };
-      };
-    };
-    responses: {
-      /** @description Tables returned */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Table"];
-            };
-          };
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-    };
-  };
-  /** [api v2] Delete a table */
-  "api_tables-destroy": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-      path: {
-        /** @description Table ID */
-        id: number;
-      };
-    };
-    responses: {
-      /** @description Deleted table returned */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Table"];
-            };
-          };
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-    };
-  };
-  /**
-   * [api v2] Transfer table
-   * @description Transfer table from one user to another
-   */
-  "api_tables-transfer": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-      path: {
-        /** @description Table ID */
-        id: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description New user ID */
-          newOwnerUserId: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Ownership changed */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Table"];
-            };
-          };
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-    };
-  };
-  /**
-   * [api v2] Get all columns for a table or a view
-   * @description Return an empty array if no columns were found
-   */
-  "api_columns-index": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-      path: {
-        /** @description Node type */
-        nodeType: "table" | "view";
-        /** @description Node ID */
-        nodeId: number;
-      };
-    };
-    responses: {
-      /** @description View deleted */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Column"][];
-            };
-          };
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-    };
-  };
-  /** [api v2] Get a column object */
-  "api_columns-show": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-      path: {
-        /** @description Column ID */
-        id: number;
-      };
-    };
-    responses: {
-      /** @description Column returned */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Column"];
-            };
-          };
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-    };
-  };
-  /**
-   * [api v2] Create new numbered column
-   * @description Specify a subtype to use any special numbered column
-   */
-  "api_columns-create-number-column": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description Context of the column creation
-           */
-          baseNodeId: number;
-          /** @description Title */
-          title: string;
-          /**
-           * Format: double
-           * @description Default value for new rows
-           */
-          numberDefault?: number | null;
-          /**
-           * Format: int64
-           * @description Decimals
-           */
-          numberDecimals?: number | null;
-          /** @description Prefix */
-          numberPrefix?: string | null;
-          /** @description Suffix */
-          numberSuffix?: string | null;
-          /**
-           * Format: double
-           * @description Min
-           */
-          numberMin?: number | null;
-          /**
-           * Format: double
-           * @description Max
-           */
-          numberMax?: number | null;
-          /**
-           * @description Subtype for the new column
-           * @enum {string|null}
-           */
-          subtype?: "progress" | "stars" | null;
-          /** @description Description */
-          description?: string | null;
-          /**
-           * @description View IDs where this columns should be added
-           * @default []
-           */
-          selectedViewIds?: number[] | null;
-          /**
-           * @description Is mandatory
-           * @default false
-           */
-          mandatory?: boolean;
-          /**
-           * @description Context type of the column creation
-           * @default table
-           * @enum {string}
-           */
-          baseNodeType?: "table" | "view";
-        };
-      };
-    };
-    responses: {
-      /** @description Column created */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Column"];
-            };
-          };
-        };
-      };
-      /** @description No permission */
-      403: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-          "text/plain": string;
-        };
-      };
-    };
-  };
-  /**
-   * [api v2] Create new text column
-   * @description Specify a subtype to use any special text column
-   */
-  "api_columns-create-text-column": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description Context of the column creation
-           */
-          baseNodeId: number;
-          /** @description Title */
-          title: string;
-          /** @description Default */
-          textDefault?: string | null;
-          /** @description Allowed regex pattern */
-          textAllowedPattern?: string | null;
-          /**
-           * Format: int64
-           * @description Max raw text length
-           */
-          textMaxLength?: number | null;
-          /**
-           * @description Subtype for the new column
-           * @enum {string|null}
-           */
-          subtype?: "progress" | "stars" | null;
-          /** @description Description */
-          description?: string | null;
-          /**
-           * @description View IDs where this columns should be added
-           * @default []
-           */
-          selectedViewIds?: number[] | null;
-          /**
-           * @description Is mandatory
-           * @default false
-           */
-          mandatory?: boolean;
-          /**
-           * @description Context type of the column creation
-           * @default table
-           * @enum {string}
-           */
-          baseNodeType?: "table" | "view";
-        };
-      };
-    };
-    responses: {
-      /** @description Column created */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Column"];
-            };
-          };
-        };
-      };
-      /** @description No permission */
-      403: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-          "text/plain": string;
-        };
-      };
-    };
-  };
-  /**
-   * [api v2] Create new selection column
-   * @description Specify a subtype to use any special selection column
-   */
-  "api_columns-create-selection-column": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description Context of the column creation
-           */
-          baseNodeId: number;
-          /** @description Title */
-          title: string;
-          /** @description Json array{id: int, label: string} with options that can be selected, eg [{"id": 1, "label": "first"},{"id": 2, "label": "second"}] */
-          selectionOptions: string;
-          /** @description Json int|int[] for default selected option(s), eg 5 or ["1", "8"] */
-          selectionDefault?: string | null;
-          /**
-           * @description Subtype for the new column
-           * @enum {string|null}
-           */
-          subtype?: "progress" | "stars" | null;
-          /** @description Description */
-          description?: string | null;
-          /**
-           * @description View IDs where this columns should be added
-           * @default []
-           */
-          selectedViewIds?: number[] | null;
-          /**
-           * @description Is mandatory
-           * @default false
-           */
-          mandatory?: boolean;
-          /**
-           * @description Context type of the column creation
-           * @default table
-           * @enum {string}
-           */
-          baseNodeType?: "table" | "view";
-        };
-      };
-    };
-    responses: {
-      /** @description Column created */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Column"];
-            };
-          };
-        };
-      };
-      /** @description No permission */
-      403: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-          "text/plain": string;
-        };
-      };
-    };
-  };
-  /**
-   * [api v2] Create new datetime column
-   * @description Specify a subtype to use any special datetime column
-   */
-  "api_columns-create-datetime-column": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /**
-           * Format: int64
-           * @description Context of the column creation
-           */
-          baseNodeId: number;
-          /** @description Title */
-          title: string;
-          /**
-           * @description For a subtype 'date' you can set 'today'. For a main type or subtype 'time' you can set to 'now'.
-           * @enum {string|null}
-           */
-          datetimeDefault?: "today" | "now" | null;
-          /**
-           * @description Subtype for the new column
-           * @enum {string|null}
-           */
-          subtype?: "progress" | "stars" | null;
-          /** @description Description */
-          description?: string | null;
-          /**
-           * @description View IDs where this columns should be added
-           * @default []
-           */
-          selectedViewIds?: number[] | null;
-          /**
-           * @description Is mandatory
-           * @default false
-           */
-          mandatory?: boolean;
-          /**
-           * @description Context type of the column creation
-           * @default table
-           * @enum {string}
-           */
-          baseNodeType?: "table" | "view";
-        };
-      };
-    };
-    responses: {
-      /** @description Column created */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Column"];
-            };
-          };
-        };
-      };
-      /** @description No permission */
-      403: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-          "text/plain": string;
-        };
-      };
-    };
-  };
-  /** [api v2] Add a node (table or view) to user favorites */
-  "api_favorite-create": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-      path: {
-        /** @description any Application::NODE_TYPE_* constant */
-        nodeType: number;
-        /** @description identifier of the node */
-        nodeId: number;
-      };
-    };
-    responses: {
-      /** @description Tables returned */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: Record<string, never>;
-            };
-          };
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-    };
-  };
-  /** [api v2] Remove a node (table or view) to from favorites */
-  "api_favorite-destroy": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-      path: {
-        /** @description any Application::NODE_TYPE_* constant */
-        nodeType: number;
-        /** @description identifier of the node */
-        nodeId: number;
-      };
-    };
-    responses: {
-      /** @description Deleted table returned */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: Record<string, never>;
-            };
-          };
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-    };
-  };
-  /**
-   * [api v3] Get all contexts available to the requesting person
-   * @description Return an empty array if no contexts were found
-   */
-  "context-index": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-    };
-    responses: {
-      /** @description reporting in available contexts */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Context"][];
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-    };
-  };
-  /** [api v2] Create a new context and return it */
-  "context-create": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Name of the context */
-          name: string;
-          /** @description Material design icon name of the context */
-          iconName: string;
-          /**
-           * @description Descriptive text of the context
-           * @default
-           */
-          description?: string;
-          /**
-           * @description optional nodes to be connected to this context
-           * @default []
-           */
-          nodes?: {
-              /** Format: int64 */
-              id: number;
-              /** Format: int64 */
-              type: number;
-              /** Format: int64 */
-              permissions?: number;
+            readonly id: number;
+            readonly title: string;
+            /** Format: int64 */
+            readonly tableId: number;
+            readonly createdBy: string;
+            readonly createdAt: string;
+            readonly lastEditBy: string;
+            readonly lastEditAt: string;
+            readonly type: string;
+            readonly subtype: string;
+            readonly mandatory: boolean;
+            readonly description: string;
+            /** Format: int64 */
+            readonly orderWeight: number;
+            /** Format: double */
+            readonly numberDefault: number;
+            /** Format: double */
+            readonly numberMin: number;
+            /** Format: double */
+            readonly numberMax: number;
+            /** Format: int64 */
+            readonly numberDecimals: number;
+            readonly numberPrefix: string;
+            readonly numberSuffix: string;
+            readonly textDefault: string;
+            readonly textAllowedPattern: string;
+            /** Format: int64 */
+            readonly textMaxLength: number;
+            readonly selectionOptions: string;
+            readonly selectionDefault: string;
+            readonly datetimeDefault: string;
+        };
+        readonly Context: {
+            /** Format: int64 */
+            readonly id: number;
+            readonly name: string;
+            readonly iconName: string;
+            readonly description: string;
+            readonly owner: string;
+            /** Format: int64 */
+            readonly ownerType: number;
+        };
+        readonly ContextNavigation: {
+            /** Format: int64 */
+            readonly id: number;
+            /** Format: int64 */
+            readonly shareId: number;
+            /** Format: int64 */
+            readonly displayMode: number;
+            readonly userId: string;
+        };
+        readonly ImportState: {
+            /** Format: int64 */
+            readonly found_columns_count: number;
+            /** Format: int64 */
+            readonly matching_columns_count: number;
+            /** Format: int64 */
+            readonly created_columns_count: number;
+            /** Format: int64 */
+            readonly inserted_rows_count: number;
+            /** Format: int64 */
+            readonly errors_parsing_count: number;
+            /** Format: int64 */
+            readonly errors_count: number;
+        };
+        readonly Index: {
+            readonly tables: readonly components["schemas"]["Table"][];
+            readonly views: readonly components["schemas"]["View"][];
+        };
+        readonly OCSMeta: {
+            readonly status: string;
+            readonly statuscode: number;
+            readonly message?: string;
+            readonly totalitems?: string;
+            readonly itemsperpage?: string;
+        };
+        readonly Row: {
+            /** Format: int64 */
+            readonly id: number;
+            /** Format: int64 */
+            readonly tableId: number;
+            readonly createdBy: string;
+            readonly createdAt: string;
+            readonly lastEditBy: string;
+            readonly lastEditAt: string;
+            readonly data: {
+                /** Format: int64 */
+                readonly columnId: number;
+                readonly value: Record<string, never>;
+            } | null;
+        };
+        readonly Share: {
+            /** Format: int64 */
+            readonly id: number;
+            readonly sender: string;
+            readonly receiver: string;
+            readonly receiverDisplayName: string;
+            readonly receiverType: string;
+            /** Format: int64 */
+            readonly nodeId: number;
+            readonly nodeType: string;
+            readonly permissionRead: boolean;
+            readonly permissionCreate: boolean;
+            readonly permissionUpdate: boolean;
+            readonly permissionDelete: boolean;
+            readonly permissionManage: boolean;
+            readonly createdAt: string;
+            readonly createdBy: string;
+        };
+        readonly Table: {
+            /** Format: int64 */
+            readonly id: number;
+            readonly title: string;
+            readonly emoji: string | null;
+            readonly ownership: string;
+            readonly ownerDisplayName: string;
+            readonly createdBy: string;
+            readonly createdAt: string;
+            readonly lastEditBy: string;
+            readonly lastEditAt: string;
+            readonly archived: boolean;
+            readonly favorite: boolean;
+            readonly isShared: boolean;
+            readonly onSharePermissions: {
+                readonly read: boolean;
+                readonly create: boolean;
+                readonly update: boolean;
+                readonly delete: boolean;
+                readonly manage: boolean;
+            } | null;
+            readonly hasShares: boolean;
+            /** Format: int64 */
+            readonly rowsCount: number;
+            readonly views: readonly components["schemas"]["View"][];
+            /** Format: int64 */
+            readonly columnsCount: number;
+        };
+        readonly View: {
+            /** Format: int64 */
+            readonly id: number;
+            readonly title: string;
+            readonly emoji: string | null;
+            /** Format: int64 */
+            readonly tableId: number;
+            readonly ownership: string;
+            readonly ownerDisplayName: string | null;
+            readonly createdBy: string;
+            readonly createdAt: string;
+            readonly lastEditBy: string;
+            readonly lastEditAt: string;
+            readonly description: string | null;
+            readonly columns: readonly number[];
+            readonly sort: readonly {
+                /** Format: int64 */
+                readonly columnId: number;
+                /** @enum {string} */
+                readonly mode: "ASC" | "DESC";
             }[];
-        };
-      };
-    };
-    responses: {
-      /** @description returning the full context information */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Context"];
-            };
-          };
-        };
-      };
-      /** @description invalid parameters were supplied */
-      400: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      /** @description lacking permissions on a resource */
-      403: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-    };
-  };
-  /** [api v2] Get information about the requests context */
-  "context-show": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-      path: {
-        /** @description ID of the context */
-        contextId: number;
-      };
-    };
-    responses: {
-      /** @description returning the full context information */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Context"];
-            };
-          };
-        };
-      };
-      /** @description context not found or not available anymore */
-      404: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-    };
-  };
-  /** [api v2] Update an existing context and return it */
-  "context-update": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-      path: {
-        /** @description ID of the context */
-        contextId: number;
-      };
-    };
-    requestBody?: {
-      content: {
-        "application/json": {
-          /** @description provide this parameter to set a new name */
-          name?: string | null;
-          /** @description provide this parameter to set a new icon */
-          iconName?: string | null;
-          /** @description provide this parameter to set a new description */
-          description?: string | null;
-          /** @description provide this parameter to set a new list of nodes. */
-          nodes?: {
+            readonly filter: readonly (readonly {
+                /** Format: int64 */
+                readonly columnId: number;
+                /** @enum {string} */
+                readonly operator: "begins-with" | "ends-with" | "contains" | "is-equal" | "is-greater-than" | "is-greater-than-or-equal" | "is-lower-than" | "is-lower-than-or-equal" | "is-empty";
+                readonly value: string | number;
+            }[])[];
+            readonly isShared: boolean;
+            readonly favorite: boolean;
+            readonly onSharePermissions: {
+                readonly read: boolean;
+                readonly create: boolean;
+                readonly update: boolean;
+                readonly delete: boolean;
+                readonly manage: boolean;
+            } | null;
+            readonly hasShares: boolean;
             /** Format: int64 */
-            id: number;
-            /** Format: int64 */
-            type: number;
-            /** Format: int64 */
-            permissions: number;
-            /** Format: int64 */
-            order: number;
-          } | null;
+            readonly rowsCount: number;
         };
-      };
     };
-    responses: {
-      /** @description returning the full context information */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Context"];
-            };
-          };
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-    };
-  };
-  /** [api v2] Delete an existing context and return it */
-  "context-destroy": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-      path: {
-        /** @description ID of the context */
-        contextId: number;
-      };
-    };
-    responses: {
-      /** @description returning the full context information */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Context"];
-            };
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-    };
-  };
-  /** [api v2] Transfer the ownership of a context and return it */
-  "context-transfer": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-      path: {
-        /** @description ID of the context */
-        contextId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description ID of the new owner */
-          newOwnerId: string;
-          /**
-           * Format: int64
-           * @description any Application::OWNER_TYPE_* constant
-           * @default 0
-           */
-          newOwnerType?: number;
-        };
-      };
-    };
-    responses: {
-      /** @description Ownership transferred */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Context"];
-            };
-          };
-        };
-      };
-      /** @description Invalid request */
-      400: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-    };
-  };
-  /** [api v2] Update the order on a page of a context */
-  "context-update-content-order": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-      path: {
-        /** @description ID of the context */
-        contextId: number;
-        /** @description ID of the page */
-        pageId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description content items with it and order values */
-          content: {
-            /** Format: int64 */
-            id: number;
-            /** Format: int64 */
-            order: number;
-          };
-        };
-      };
-    };
-    responses: {
-      /** @description content updated successfully */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Context"];
-            };
-          };
-        };
-      };
-      /** @description Invalid request */
-      400: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-    };
-  };
-  /** [api v2] Create a new row in a table or a view */
-  "rowocs-create-row": {
-    parameters: {
-      header: {
-        /** @description Required to be true for the API request to pass */
-        "OCS-APIRequest": boolean;
-      };
-      path: {
-        /** @description Indicates whether to create a row on a table or view */
-        nodeCollection: "tables" | "views";
-        /** @description The identifier of the targeted table or view */
-        nodeId: number;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description An array containing the column identifiers and their values */
-          data: OneOf<[string, {
-            [key: string]: Record<string, never>;
-          }]>;
-        };
-      };
-    };
-    responses: {
-      /** @description Row returned */
-      200: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: components["schemas"]["Row"];
-            };
-          };
-        };
-      };
-      /** @description Invalid request parameters */
-      400: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      /** @description No permissions */
-      403: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      /** @description Not found */
-      404: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-      /** @description Internal error */
-      500: {
-        content: {
-          "application/json": {
-            ocs: {
-              meta: components["schemas"]["OCSMeta"];
-              data: {
-                message: string;
-              };
-            };
-          };
-        };
-      };
-    };
-  };
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 };
+export type $defs = Record<string, never>;
+export interface operations {
+    readonly "api1-index": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Tables returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": readonly components["schemas"]["Table"][];
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-create-table": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description Title of the table */
+                    readonly title: string;
+                    /** @description Emoji for the table */
+                    readonly emoji?: string | null;
+                    /**
+                     * @description Template to use if wanted
+                     * @default custom
+                     */
+                    readonly template?: string;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Tables returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Table"];
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-get-table": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Table ID */
+                readonly tableId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Table returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Table"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-update-table": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Table ID */
+                readonly tableId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description New table title */
+                    readonly title?: string | null;
+                    /** @description New table emoji */
+                    readonly emoji?: string | null;
+                    /**
+                     * @description Whether the table is archived
+                     * @default false
+                     */
+                    readonly archived?: boolean;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Tables returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Table"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-delete-table": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Table ID */
+                readonly tableId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Deleted table returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Table"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-index-views": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Table ID */
+                readonly tableId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Views returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": readonly components["schemas"]["View"][];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-create-view": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Table ID that will hold the view */
+                readonly tableId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description Title for the view */
+                    readonly title: string;
+                    /** @description Emoji for the view */
+                    readonly emoji?: string | null;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description View created */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["View"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-get-view": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description View ID */
+                readonly viewId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description View returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["View"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-update-view": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description View ID */
+                readonly viewId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description key-value pairs */
+                    readonly data: {
+                        /** @enum {string} */
+                        readonly key: "title" | "emoji" | "description";
+                        readonly value: string;
+                    } | {
+                        /** @enum {string} */
+                        readonly key: "columns";
+                        readonly value: readonly number[];
+                    } | {
+                        /** @enum {string} */
+                        readonly key: "sort";
+                        readonly value: {
+                            /** Format: int64 */
+                            readonly columnId: number;
+                            /** @enum {string} */
+                            readonly mode: "ASC" | "DESC";
+                        };
+                    } | {
+                        /** @enum {string} */
+                        readonly key: "filter";
+                        readonly value: {
+                            /** Format: int64 */
+                            readonly columnId: number;
+                            /** @enum {string} */
+                            readonly operator: "begins-with" | "ends-with" | "contains" | "is-equal" | "is-greater-than" | "is-greater-than-or-equal" | "is-lower-than" | "is-lower-than-or-equal" | "is-empty";
+                            readonly value: string | number;
+                        };
+                    };
+                };
+            };
+        };
+        readonly responses: {
+            /** @description View updated */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["View"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-delete-view": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description View ID */
+                readonly viewId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description View deleted */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["View"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-get-share": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Share ID */
+                readonly shareId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Share returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Share"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-update-share-permissions": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Share ID */
+                readonly shareId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description Permission type that should be changed */
+                    readonly permissionType: string;
+                    /** @description New permission value */
+                    readonly permissionValue: boolean;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description View deleted */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Share"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-delete-share": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Share ID */
+                readonly shareId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description View deleted */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Share"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-index-view-shares": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description View ID */
+                readonly viewId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Shares returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": readonly components["schemas"]["Share"][];
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-index-table-shares": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Table ID */
+                readonly tableId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Shares returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": readonly components["schemas"]["Share"][];
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-create-table-share": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Table ID */
+                readonly tableId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description Receiver ID */
+                    readonly receiver: string;
+                    /**
+                     * @description Receiver type
+                     * @enum {string}
+                     */
+                    readonly receiverType: "user" | "group";
+                    /** @description Permission if receiver can read data */
+                    readonly permissionRead: boolean;
+                    /** @description Permission if receiver can create data */
+                    readonly permissionCreate: boolean;
+                    /** @description Permission if receiver can update data */
+                    readonly permissionUpdate: boolean;
+                    /** @description Permission if receiver can delete data */
+                    readonly permissionDelete: boolean;
+                    /** @description Permission if receiver can manage table */
+                    readonly permissionManage: boolean;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description View deleted */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Share"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-create-share": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * Format: int64
+                     * @description Node ID
+                     */
+                    readonly nodeId: number;
+                    /**
+                     * @description Node type
+                     * @enum {string}
+                     */
+                    readonly nodeType: "table" | "view" | "context";
+                    /** @description Receiver ID */
+                    readonly receiver: string;
+                    /**
+                     * @description Receiver type
+                     * @enum {string}
+                     */
+                    readonly receiverType: "user" | "group";
+                    /**
+                     * @description Permission if receiver can read data
+                     * @default false
+                     */
+                    readonly permissionRead?: boolean;
+                    /**
+                     * @description Permission if receiver can create data
+                     * @default false
+                     */
+                    readonly permissionCreate?: boolean;
+                    /**
+                     * @description Permission if receiver can update data
+                     * @default false
+                     */
+                    readonly permissionUpdate?: boolean;
+                    /**
+                     * @description Permission if receiver can delete data
+                     * @default false
+                     */
+                    readonly permissionDelete?: boolean;
+                    /**
+                     * @description Permission if receiver can manage node
+                     * @default false
+                     */
+                    readonly permissionManage?: boolean;
+                    /**
+                     * Format: int64
+                     * @description context shares only, whether it should appear in nav bar. 0: no, 1: recipients, 2: all
+                     * @default 0
+                     */
+                    readonly displayMode?: number;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Share returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Share"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-update-share-display-mode": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Share ID */
+                readonly shareId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * Format: int64
+                     * @description The new value for the display mode of the nav bar icon. 0: hidden, 1: visible for recipients, 2: visible for all
+                     */
+                    readonly displayMode: number;
+                    /**
+                     * @description "default" to set the default, "self" to set an override for the authenticated user
+                     * @default default
+                     * @enum {string}
+                     */
+                    readonly target?: "default" | "self";
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Display mode updated */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["ContextNavigation"];
+                };
+            };
+            /** @description Invalid parameter */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Share not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-index-table-columns": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Table ID */
+                readonly tableId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * Format: int64
+                     * @description View ID
+                     */
+                    readonly viewId?: number | null;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description View deleted */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": readonly components["schemas"]["Column"][];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-create-table-column": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Table ID */
+                readonly tableId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description Title */
+                    readonly title: string;
+                    /**
+                     * @description Column main type
+                     * @enum {string}
+                     */
+                    readonly type: "text" | "number" | "datetime" | "select";
+                    /** @description Column sub type */
+                    readonly subtype?: string | null;
+                    /** @description Is the column mandatory */
+                    readonly mandatory: boolean;
+                    /** @description Description */
+                    readonly description?: string | null;
+                    /** @description Prefix if the column is a number field */
+                    readonly numberPrefix?: string | null;
+                    /** @description Suffix if the column is a number field */
+                    readonly numberSuffix?: string | null;
+                    /**
+                     * Format: double
+                     * @description Default number, if column is a number
+                     */
+                    readonly numberDefault?: number | null;
+                    /**
+                     * Format: double
+                     * @description Min value, if column is a number
+                     */
+                    readonly numberMin?: number | null;
+                    /**
+                     * Format: double
+                     * @description Max number, if column is a number
+                     */
+                    readonly numberMax?: number | null;
+                    /**
+                     * Format: int64
+                     * @description Number of decimals, if column is a number
+                     */
+                    readonly numberDecimals?: number | null;
+                    /** @description Default text, if column is a text */
+                    readonly textDefault?: string | null;
+                    /** @description Allowed pattern (regex) for text columns (not yet implemented) */
+                    readonly textAllowedPattern?: string | null;
+                    /**
+                     * Format: int64
+                     * @description Max length, if column is a text
+                     */
+                    readonly textMaxLength?: number | null;
+                    /**
+                     * @description Options for a selection (json array{id: int, label: string})
+                     * @default
+                     */
+                    readonly selectionOptions?: string | null;
+                    /**
+                     * @description Default option IDs for a selection (json int[])
+                     * @default
+                     */
+                    readonly selectionDefault?: string | null;
+                    /**
+                     * @description Default value, if column is datetime
+                     * @default
+                     */
+                    readonly datetimeDefault?: string | null;
+                    /**
+                     * @description View IDs where this column should be added to be presented
+                     * @default []
+                     */
+                    readonly selectedViewIds?: readonly number[];
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Column created */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Column"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-index-view-columns": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description View ID */
+                readonly viewId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description View deleted */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": readonly components["schemas"]["Column"][];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-create-column": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * Format: int64
+                     * @description Table ID
+                     */
+                    readonly tableId?: number | null;
+                    /**
+                     * Format: int64
+                     * @description View ID
+                     */
+                    readonly viewId?: number | null;
+                    /** @description Title */
+                    readonly title: string;
+                    /**
+                     * @description Column main type
+                     * @enum {string}
+                     */
+                    readonly type: "text" | "number" | "datetime" | "select";
+                    /** @description Column sub type */
+                    readonly subtype?: string | null;
+                    /** @description Is the column mandatory */
+                    readonly mandatory: boolean;
+                    /** @description Description */
+                    readonly description?: string | null;
+                    /** @description Prefix if the column is a number field */
+                    readonly numberPrefix?: string | null;
+                    /** @description Suffix if the column is a number field */
+                    readonly numberSuffix?: string | null;
+                    /**
+                     * Format: double
+                     * @description Default number, if column is a number
+                     */
+                    readonly numberDefault?: number | null;
+                    /**
+                     * Format: double
+                     * @description Min value, if column is a number
+                     */
+                    readonly numberMin?: number | null;
+                    /**
+                     * Format: double
+                     * @description Max number, if column is a number
+                     */
+                    readonly numberMax?: number | null;
+                    /**
+                     * Format: int64
+                     * @description Number of decimals, if column is a number
+                     */
+                    readonly numberDecimals?: number | null;
+                    /** @description Default text, if column is a text */
+                    readonly textDefault?: string | null;
+                    /** @description Allowed pattern (regex) for text columns (not yet implemented) */
+                    readonly textAllowedPattern?: string | null;
+                    /**
+                     * Format: int64
+                     * @description Max length, if column is a text
+                     */
+                    readonly textMaxLength?: number | null;
+                    /**
+                     * @description Options for a selection (json array{id: int, label: string})
+                     * @default
+                     */
+                    readonly selectionOptions?: string | null;
+                    /**
+                     * @description Default option IDs for a selection (json int[])
+                     * @default
+                     */
+                    readonly selectionDefault?: string | null;
+                    /**
+                     * @description Default value, if column is datetime
+                     * @default
+                     */
+                    readonly datetimeDefault?: string | null;
+                    /**
+                     * @description View IDs where this column should be added to be presented
+                     * @default []
+                     */
+                    readonly selectedViewIds?: readonly number[];
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Column created */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Column"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-get-column": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Wanted Column ID */
+                readonly columnId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Column returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Column"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-update-column": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Column ID that will be updated */
+                readonly columnId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description Title */
+                    readonly title?: string | null;
+                    /** @description Column sub type */
+                    readonly subtype?: string | null;
+                    /** @description Is the column mandatory */
+                    readonly mandatory: boolean;
+                    /** @description Description */
+                    readonly description?: string | null;
+                    /** @description Prefix if the column is a number field */
+                    readonly numberPrefix?: string | null;
+                    /** @description Suffix if the column is a number field */
+                    readonly numberSuffix?: string | null;
+                    /**
+                     * Format: double
+                     * @description Default number, if column is a number
+                     */
+                    readonly numberDefault?: number | null;
+                    /**
+                     * Format: double
+                     * @description Min value, if column is a number
+                     */
+                    readonly numberMin?: number | null;
+                    /**
+                     * Format: double
+                     * @description Max number, if column is a number
+                     */
+                    readonly numberMax?: number | null;
+                    /**
+                     * Format: int64
+                     * @description Number of decimals, if column is a number
+                     */
+                    readonly numberDecimals?: number | null;
+                    /** @description Default text, if column is a text */
+                    readonly textDefault?: string | null;
+                    /** @description Allowed pattern (regex) for text columns (not yet implemented) */
+                    readonly textAllowedPattern?: string | null;
+                    /**
+                     * Format: int64
+                     * @description Max length, if column is a text
+                     */
+                    readonly textMaxLength?: number | null;
+                    /** @description Options for a selection (json array{id: int, label: string}) */
+                    readonly selectionOptions?: string | null;
+                    /** @description Default option IDs for a selection (json int[]) */
+                    readonly selectionDefault?: string | null;
+                    /** @description Default value, if column is datetime */
+                    readonly datetimeDefault?: string | null;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Updated column */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Column"];
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-delete-column": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Wanted Column ID */
+                readonly columnId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Deleted column returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Column"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-index-table-rows-simple": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Table ID */
+                readonly tableId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * Format: int64
+                     * @description Limit
+                     */
+                    readonly limit?: number | null;
+                    /**
+                     * Format: int64
+                     * @description Offset
+                     */
+                    readonly offset?: number | null;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Row values returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": readonly string[];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-index-table-rows": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Table ID */
+                readonly tableId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * Format: int64
+                     * @description Limit
+                     */
+                    readonly limit?: number | null;
+                    /**
+                     * Format: int64
+                     * @description Offset
+                     */
+                    readonly offset?: number | null;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Rows returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": readonly components["schemas"]["Row"][];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-create-row-in-table": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Table ID */
+                readonly tableId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description Data as key - value store */
+                    readonly data: string | {
+                        readonly [key: string]: Record<string, never> | undefined;
+                    };
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Row returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Row"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-index-view-rows": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description View ID */
+                readonly viewId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * Format: int64
+                     * @description Limit
+                     */
+                    readonly limit?: number | null;
+                    /**
+                     * Format: int64
+                     * @description Offset
+                     */
+                    readonly offset?: number | null;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Rows returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": readonly components["schemas"]["Row"][];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-create-row-in-view": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description View ID */
+                readonly viewId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description Data as key - value store */
+                    readonly data: string | {
+                        readonly [key: string]: Record<string, never> | undefined;
+                    };
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Row returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Row"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-get-row": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Row ID */
+                readonly rowId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Row returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Row"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-update-row": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Row ID */
+                readonly rowId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * Format: int64
+                     * @description View ID
+                     */
+                    readonly viewId?: number | null;
+                    /** @description Data as key - value store */
+                    readonly data: string | {
+                        readonly [key: string]: Record<string, never> | undefined;
+                    };
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Updated row returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Row"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-delete-row": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Row ID */
+                readonly rowId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Deleted row returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Row"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-delete-row-by-view": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description View ID */
+                readonly viewId: number;
+                /** @description Row ID */
+                readonly rowId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Deleted row returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["Row"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-import-in-table": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Table ID */
+                readonly tableId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description Path to file */
+                    readonly path: string;
+                    /**
+                     * @description Create missing columns
+                     * @default true
+                     */
+                    readonly createMissingColumns?: boolean;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Import status returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["ImportState"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-import-in-view": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description View ID */
+                readonly viewId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description Path to file */
+                    readonly path: string;
+                    /**
+                     * @description Create missing columns
+                     * @default true
+                     */
+                    readonly createMissingColumns?: boolean;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Import status returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["ImportState"];
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api_general-index": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Index returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Index"];
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "api_tables-index": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Tables returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: readonly components["schemas"]["Table"][];
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "api_tables-create": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description Title of the table */
+                    readonly title: string;
+                    /** @description Emoji for the table */
+                    readonly emoji?: string | null;
+                    /** @description Description for the table */
+                    readonly description?: string | null;
+                    /**
+                     * @description Template to use if wanted
+                     * @default custom
+                     */
+                    readonly template?: string;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Tables returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Table"];
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "api_tables-show": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description Table ID */
+                readonly id: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Table returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Table"];
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "api_tables-update": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description Table ID */
+                readonly id: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description New table title */
+                    readonly title?: string | null;
+                    /** @description New table emoji */
+                    readonly emoji?: string | null;
+                    /** @description the tables description */
+                    readonly description?: string;
+                    /** @description whether the table is archived */
+                    readonly archived?: boolean;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Tables returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Table"];
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "api_tables-destroy": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description Table ID */
+                readonly id: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Deleted table returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Table"];
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "api_tables-transfer": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description Table ID */
+                readonly id: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description New user ID */
+                    readonly newOwnerUserId: string;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Ownership changed */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Table"];
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "api_columns-index": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description Node type */
+                readonly nodeType: "table" | "view";
+                /** @description Node ID */
+                readonly nodeId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description View deleted */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: readonly components["schemas"]["Column"][];
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "api_columns-show": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description Column ID */
+                readonly id: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Column returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Column"];
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "api_columns-create-number-column": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * Format: int64
+                     * @description Context of the column creation
+                     */
+                    readonly baseNodeId: number;
+                    /** @description Title */
+                    readonly title: string;
+                    /**
+                     * Format: double
+                     * @description Default value for new rows
+                     */
+                    readonly numberDefault?: number | null;
+                    /**
+                     * Format: int64
+                     * @description Decimals
+                     */
+                    readonly numberDecimals?: number | null;
+                    /** @description Prefix */
+                    readonly numberPrefix?: string | null;
+                    /** @description Suffix */
+                    readonly numberSuffix?: string | null;
+                    /**
+                     * Format: double
+                     * @description Min
+                     */
+                    readonly numberMin?: number | null;
+                    /**
+                     * Format: double
+                     * @description Max
+                     */
+                    readonly numberMax?: number | null;
+                    /**
+                     * @description Subtype for the new column
+                     * @enum {string|null}
+                     */
+                    readonly subtype?: "progress" | "stars" | null;
+                    /** @description Description */
+                    readonly description?: string | null;
+                    /**
+                     * @description View IDs where this columns should be added
+                     * @default []
+                     */
+                    readonly selectedViewIds?: readonly number[];
+                    /**
+                     * @description Is mandatory
+                     * @default false
+                     */
+                    readonly mandatory?: boolean;
+                    /**
+                     * @description Context type of the column creation
+                     * @default table
+                     * @enum {string}
+                     */
+                    readonly baseNodeType?: "table" | "view";
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Column created */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Column"];
+                        };
+                    };
+                };
+            };
+            /** @description No permission */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                    readonly "text/plain": string;
+                };
+            };
+        };
+    };
+    readonly "api_columns-create-text-column": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * Format: int64
+                     * @description Context of the column creation
+                     */
+                    readonly baseNodeId: number;
+                    /** @description Title */
+                    readonly title: string;
+                    /** @description Default */
+                    readonly textDefault?: string | null;
+                    /** @description Allowed regex pattern */
+                    readonly textAllowedPattern?: string | null;
+                    /**
+                     * Format: int64
+                     * @description Max raw text length
+                     */
+                    readonly textMaxLength?: number | null;
+                    /**
+                     * @description Subtype for the new column
+                     * @enum {string|null}
+                     */
+                    readonly subtype?: "progress" | "stars" | null;
+                    /** @description Description */
+                    readonly description?: string | null;
+                    /**
+                     * @description View IDs where this columns should be added
+                     * @default []
+                     */
+                    readonly selectedViewIds?: readonly number[];
+                    /**
+                     * @description Is mandatory
+                     * @default false
+                     */
+                    readonly mandatory?: boolean;
+                    /**
+                     * @description Context type of the column creation
+                     * @default table
+                     * @enum {string}
+                     */
+                    readonly baseNodeType?: "table" | "view";
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Column created */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Column"];
+                        };
+                    };
+                };
+            };
+            /** @description No permission */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                    readonly "text/plain": string;
+                };
+            };
+        };
+    };
+    readonly "api_columns-create-selection-column": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * Format: int64
+                     * @description Context of the column creation
+                     */
+                    readonly baseNodeId: number;
+                    /** @description Title */
+                    readonly title: string;
+                    /** @description Json array{id: int, label: string} with options that can be selected, eg [{"id": 1, "label": "first"},{"id": 2, "label": "second"}] */
+                    readonly selectionOptions: string;
+                    /** @description Json int|int[] for default selected option(s), eg 5 or ["1", "8"] */
+                    readonly selectionDefault?: string | null;
+                    /**
+                     * @description Subtype for the new column
+                     * @enum {string|null}
+                     */
+                    readonly subtype?: "progress" | "stars" | null;
+                    /** @description Description */
+                    readonly description?: string | null;
+                    /**
+                     * @description View IDs where this columns should be added
+                     * @default []
+                     */
+                    readonly selectedViewIds?: readonly number[];
+                    /**
+                     * @description Is mandatory
+                     * @default false
+                     */
+                    readonly mandatory?: boolean;
+                    /**
+                     * @description Context type of the column creation
+                     * @default table
+                     * @enum {string}
+                     */
+                    readonly baseNodeType?: "table" | "view";
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Column created */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Column"];
+                        };
+                    };
+                };
+            };
+            /** @description No permission */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                    readonly "text/plain": string;
+                };
+            };
+        };
+    };
+    readonly "api_columns-create-datetime-column": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * Format: int64
+                     * @description Context of the column creation
+                     */
+                    readonly baseNodeId: number;
+                    /** @description Title */
+                    readonly title: string;
+                    /**
+                     * @description For a subtype 'date' you can set 'today'. For a main type or subtype 'time' you can set to 'now'.
+                     * @enum {string|null}
+                     */
+                    readonly datetimeDefault?: "today" | "now" | null;
+                    /**
+                     * @description Subtype for the new column
+                     * @enum {string|null}
+                     */
+                    readonly subtype?: "progress" | "stars" | null;
+                    /** @description Description */
+                    readonly description?: string | null;
+                    /**
+                     * @description View IDs where this columns should be added
+                     * @default []
+                     */
+                    readonly selectedViewIds?: readonly number[];
+                    /**
+                     * @description Is mandatory
+                     * @default false
+                     */
+                    readonly mandatory?: boolean;
+                    /**
+                     * @description Context type of the column creation
+                     * @default table
+                     * @enum {string}
+                     */
+                    readonly baseNodeType?: "table" | "view";
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Column created */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Column"];
+                        };
+                    };
+                };
+            };
+            /** @description No permission */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                    readonly "text/plain": string;
+                };
+            };
+        };
+    };
+    readonly "api_favorite-create": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description any Application::NODE_TYPE_* constant */
+                readonly nodeType: number;
+                /** @description identifier of the node */
+                readonly nodeId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Tables returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: Record<string, never>;
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "api_favorite-destroy": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description any Application::NODE_TYPE_* constant */
+                readonly nodeType: number;
+                /** @description identifier of the node */
+                readonly nodeId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Deleted table returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: Record<string, never>;
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "context-index": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description reporting in available contexts */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: readonly components["schemas"]["Context"][];
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "context-create": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description Name of the context */
+                    readonly name: string;
+                    /** @description Material design icon name of the context */
+                    readonly iconName: string;
+                    /**
+                     * @description Descriptive text of the context
+                     * @default
+                     */
+                    readonly description?: string;
+                    /**
+                     * @description optional nodes to be connected to this context
+                     * @default []
+                     */
+                    readonly nodes?: readonly {
+                        /** Format: int64 */
+                        readonly id: number;
+                        /** Format: int64 */
+                        readonly type: number;
+                        /** Format: int64 */
+                        readonly permissions?: number;
+                    }[];
+                };
+            };
+        };
+        readonly responses: {
+            /** @description returning the full context information */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Context"];
+                        };
+                    };
+                };
+            };
+            /** @description invalid parameters were supplied */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description lacking permissions on a resource */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "context-show": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description ID of the context */
+                readonly contextId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description returning the full context information */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Context"];
+                        };
+                    };
+                };
+            };
+            /** @description context not found or not available anymore */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "context-update": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description ID of the context */
+                readonly contextId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description provide this parameter to set a new name */
+                    readonly name?: string | null;
+                    /** @description provide this parameter to set a new icon */
+                    readonly iconName?: string | null;
+                    /** @description provide this parameter to set a new description */
+                    readonly description?: string | null;
+                    /** @description provide this parameter to set a new list of nodes. */
+                    readonly nodes?: {
+                        /** Format: int64 */
+                        readonly id: number;
+                        /** Format: int64 */
+                        readonly type: number;
+                        /** Format: int64 */
+                        readonly permissions: number;
+                        /** Format: int64 */
+                        readonly order: number;
+                    } | null;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description returning the full context information */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Context"];
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "context-destroy": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description ID of the context */
+                readonly contextId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description returning the full context information */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Context"];
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "context-transfer": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description ID of the context */
+                readonly contextId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description ID of the new owner */
+                    readonly newOwnerId: string;
+                    /**
+                     * Format: int64
+                     * @description any Application::OWNER_TYPE_* constant
+                     * @default 0
+                     */
+                    readonly newOwnerType?: number;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Ownership transferred */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Context"];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid request */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "context-update-content-order": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description ID of the context */
+                readonly contextId: number;
+                /** @description ID of the page */
+                readonly pageId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description content items with it and order values */
+                    readonly content: {
+                        /** Format: int64 */
+                        readonly id: number;
+                        /** Format: int64 */
+                        readonly order: number;
+                    };
+                };
+            };
+        };
+        readonly responses: {
+            /** @description content updated successfully */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Context"];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid request */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "rowocs-create-row": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description Indicates whether to create a row on a table or view */
+                readonly nodeCollection: "tables" | "views";
+                /** @description The identifier of the targeted table or view */
+                readonly nodeId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /** @description An array containing the column identifiers and their values */
+                    readonly data: string | {
+                        readonly [key: string]: Record<string, never> | undefined;
+                    };
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Row returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Row"];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid request parameters */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Internal error */
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+}
