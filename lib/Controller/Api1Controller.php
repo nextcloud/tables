@@ -799,10 +799,10 @@ class Api1Controller extends ApiController {
 		?string $datetimeDefault = '',
 
 		?string $usergroupDefault = '',
-		?bool $usergroupMultipleItems,
-		?bool $usergroupSelectUsers,
-		?bool $usergroupSelectGroups,
-		?bool $showUserStatus,
+		?bool $usergroupMultipleItems = null,
+		?bool $usergroupSelectUsers = null,
+		?bool $usergroupSelectGroups = null,
+		?bool $showUserStatus = null,
 
 		?array $selectedViewIds = []
 	): DataResponse {
@@ -1517,11 +1517,10 @@ class Api1Controller extends ApiController {
 		?string $datetimeDefault = '',
 
 		?string $usergroupDefault = '',
-		?bool $usergroupMultipleItems,
-		?bool $usergroupSelectUsers,
-		?bool $usergroupSelectGroups,
-		?bool $showUserStatus,
-
+		?bool $usergroupMultipleItems = null,
+		?bool $usergroupSelectUsers = null,
+		?bool $usergroupSelectGroups = null,
+		?bool $showUserStatus = null,
 		?array $selectedViewIds = []
 	): DataResponse {
 		try {

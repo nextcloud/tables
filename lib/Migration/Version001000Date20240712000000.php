@@ -24,9 +24,10 @@ class Version001000Date20240712000000 extends SimpleMigrationStep {
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
+		$this->createRowValueTable($schema, 'usergroup', Types::TEXT);
 
-		if ($schema->hasTable('tables_tables')) {
-			$table = $schema->getTable('tables_tables');
+		if ($schema->hasTable('tables_columns')) {
+			$table = $schema->getTable('tables_columns');
 			if (!$table->hasColumn('usergroup_default')) {
 				$table->addColumn('usergroup_default', Types::TEXT, [
 					'notnull' => false,
@@ -59,5 +60,23 @@ class Version001000Date20240712000000 extends SimpleMigrationStep {
 			return $schema;
 		}
 		return null;
+	}
+
+	private function createRowValueTable(ISchemaWrapper $schema, string $name, string $type) {
+		if (!$schema->hasTable('tables_row_cells_'.$name)) {
+			$table = $schema->createTable('tables_row_cells_'.$name);
+			$table->addColumn('id', Types::INTEGER, [
+				'autoincrement' => true,
+				'notnull' => true,
+			]);
+			$table->addColumn('column_id', Types::INTEGER, ['notnull' => true]);
+			$table->addColumn('row_id', Types::INTEGER, ['notnull' => true]);
+			$table->addColumn('value', $type, ['notnull' => false]);
+			$table->addColumn('value_type', Types::INTEGER, ['notnull' => false]);
+			$table->addColumn('last_edit_at', Types::DATETIME, ['notnull' => true]);
+			$table->addColumn('last_edit_by', Types::STRING, ['notnull' => true, 'length' => 64]);
+			$table->addIndex(['column_id', 'row_id']);
+			$table->setPrimaryKey(['id']);
+		}
 	}
 }
