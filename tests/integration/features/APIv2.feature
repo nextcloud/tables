@@ -74,8 +74,11 @@ Feature: APIv2
       | title         | A single date          |
       | datetimeDefault | today                |
     Then column from main type "usergroup" for node type "table" and node name "t2" exists with name "c7" and following properties via v2
-      | title             | Cool usergroup column        |
-      | usergroupDefault  | [{"id": "admin", "type": 0}] |
+      | title                   | Cool usergroup column        |
+      | usergroupDefault        | [{"id": "admin", "type": 0}] |
+      | usergroupMultipleItems  | true                         |
+      | usergroupSelectUsers    | true                         |
+      | usergroupSelectGroups   | false                        |
     Then node with node type "table" and node name "t2" has the following columns via v2
       | Beautiful text column | Rich is cool | Counter | Progress | Checking | A single date |
     Then print register
@@ -97,14 +100,23 @@ Feature: APIv2
     Then print register
 
   @api2usergroup
-  Scenario: Create usergroup columns
+  Scenario: Create and modify usergroup columns
     Given table "Table 5" with emoji "👋" exists for user "participant1-v2" as "t5" via v2
     Then column from main type "usergroup" for node type "table" and node name "t5" exists with name "ug-c1" and following properties via v2
-      | title             | ug column                                                 |
-      | usergroupDefault  | [{"id": "admin", "type": 0}] |
+      | title                  | ug column                 |
+      | usergroupMultipleItems | true                      |
+      | usergroupSelectUsers   | true                      |
+      | usergroupSelectGroups  | true                      |
     Then node with node type "table" and node name "t5" has the following columns via v2
       | ug column  |
     Then print register
+    Then set following properties for last created column
+      | title             | ug column renamed               |
+      | mandatory         | 0                               |
+      | description       | New description                 |
+      | usergroupDefault  | [{"id": "admin", "type": 0}]    |
+    Then table has at least following columns
+      | ug column renamed |
 
   @api2transfer
   Scenario: Transfer table
@@ -556,6 +568,24 @@ Feature: APIv2
     When user "participant3-v2" attempts to fetch Context "c1"
     Then the reported status is "404"
 
+
+  @api1 @rows
+  Scenario: Create and modify usergroup row via v1
+    Given table "Usergroup row check" with emoji "👨🏻‍💻" exists for user "participant1" as "base1"
+    Then column "one" exists with following properties
+      | title         | usergroup               |  
+      | mandatory     | 0                       |
+      | description   | New description         |
+      | usergroupMultipleItems  | true          |
+      | usergroupSelectUsers    | true          |
+      | usergroupSelectGroups   | true          |
+    Then row exists with following values
+      | one           | [{"id": "admin", "type": 0}] |
+    Then set following values for last created row
+      | one           | [{"id": "admin", "type": 1}] |
+    Then user deletes last created row
+    Then user "participant1" deletes table with keyword "Usergroup row check"
+
   @api2 @rows
   Scenario: Create rows via v2 and check them
     Given table "Rows check" with emoji "👨🏻‍💻" exists for user "participant1-v2" as "base1" via v2
@@ -583,6 +613,9 @@ Feature: APIv2
       | type          | usergroup               |
       | mandatory     | 0                       |
       | description   | This is a description!  |
+      | usergroupMultipleItems  | true          |
+      | usergroupSelectUsers    | true          |
+      | usergroupSelectGroups   | false         |
     When row exists using v2 with following values
       | one           | AHA                     |
       | two           | 161                     |
@@ -618,6 +651,9 @@ Feature: APIv2
       | type          | usergroup               |
       | mandatory     | 1                       |
       | description   | This is a description!  |
+      | usergroupMultipleItems  | true          |
+      | usergroupSelectUsers    | true          |
+      | usergroupSelectGroups   | false         |
     And user "participant1-v2" shares table with user "participant2-v2"
     And user "participant2-v2" has the following permissions
       | read    | 1 |
@@ -660,6 +696,9 @@ Feature: APIv2
       | type          | usergroup               |
       | mandatory     | 1                       |
       | description   | This is a description!  |
+      | usergroupMultipleItems  | true          |
+      | usergroupSelectUsers    | true          |
+      | usergroupSelectGroups   | false         |
     And user "participant1-v2" shares table with user "participant2-v2"
     And user "participant1-v2" sets permission "create" to 0
     And user "participant2-v2" has the following permissions
@@ -703,6 +742,9 @@ Feature: APIv2
       | type          | usergroup               |
       | mandatory     | 1                       |
       | description   | This is a description!  |
+      | usergroupMultipleItems  | true          |
+      | usergroupSelectUsers    | true          |
+      | usergroupSelectGroups   | false         |
     When user "participant2-v2" tries to create a row using v2 with following values
       | one           | AHA                     |
       | two           | 161                     |
@@ -738,6 +780,9 @@ Feature: APIv2
       | type          | usergroup               |
       | mandatory     | 1                       |
       | description   | This is a description!  |
+      | usergroupMultipleItems  | true          |
+      | usergroupSelectUsers    | true          |
+      | usergroupSelectGroups   | false         |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
     When user "participant1-v2" tries to create a row using v2 on "view" "v1" with following values
       | one           | AHA                     |
@@ -774,6 +819,9 @@ Feature: APIv2
       | type          | usergroup               |
       | mandatory     | 1                       |
       | description   | This is a description!  |
+      | usergroupMultipleItems  | true          |
+      | usergroupSelectUsers    | true          |
+      | usergroupSelectGroups   | false         |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
     And user "participant1-v2" shares view "v1" with "participant2-v2"
     When user "participant2-v2" tries to create a row using v2 on "view" "v1" with following values
@@ -811,6 +859,9 @@ Feature: APIv2
       | type          | usergroup               |
       | mandatory     | 1                       |
       | description   | This is a description!  |
+      | usergroupMultipleItems  | true          |
+      | usergroupSelectUsers    | true          |
+      | usergroupSelectGroups   | false         |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
     And user "participant1-v2" shares view "v1" with "participant2-v2"
     And user "participant1-v2" sets permission "create" to 0
@@ -849,6 +900,9 @@ Feature: APIv2
       | type          | usergroup               |
       | mandatory     | 1                       |
       | description   | This is a description!  |
+      | usergroupMultipleItems  | true          |
+      | usergroupSelectUsers    | true          |
+      | usergroupSelectGroups   | false         |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
     When user "participant2-v2" tries to create a row using v2 on "view" "v1" with following values
       | one           | AHA                     |
