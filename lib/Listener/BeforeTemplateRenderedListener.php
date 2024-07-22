@@ -43,30 +43,6 @@ class BeforeTemplateRenderedListener implements IEventListener {
 
 		$contexts = $this->contextService->findForNavigation($user->getUID());
 		foreach ($contexts as $context) {
-			if ($context->getOwnerType() === Application::OWNER_TYPE_USER
-				&& $context->getOwnerId() === $user->getUID()) {
-
-				// filter out entries for owners unless it is set to be visible
-				$skipEntry = true;
-				foreach ($context->getSharing() as $shareInfo) {
-					// TODO: integrate into DB query in Mapper
-					if (isset($shareInfo['display_mode']) && $shareInfo['display_mode'] === Application::NAV_ENTRY_MODE_ALL) {
-						// a custom override makes it visible
-						$skipEntry = false;
-						break;
-					}
-
-					if (!isset($shareInfo['display_mode']) && $shareInfo['display_mode_default'] === Application::NAV_ENTRY_MODE_ALL) {
-						// no custom override, and visible also for owner by default
-						$skipEntry = false;
-						break;
-					}
-				}
-				if ($skipEntry) {
-					continue;
-				}
-			}
-
 			$this->navigationManager->add(function () use ($context) {
 				$iconRelPath = 'material/' . $context->getIcon() . '.svg';
 				if (file_exists(__DIR__ . '/../../img/' . $iconRelPath)) {
