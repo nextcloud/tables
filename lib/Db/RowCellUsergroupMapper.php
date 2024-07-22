@@ -16,13 +16,13 @@ class RowCellUsergroupMapper extends RowCellMapperSuper {
 	 * @inheritDoc
 	 */
 	public function parseValueIncoming(Column $column, $value): array {
-		return json_decode(json_encode($value), true);
+		return json_decode($value, true);
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function parseValueOutgoing(Column $column, $value, ?int $value_type = null): array {
-		return ['id' => $value, 'type' => $value_type];
+	public function parseValueOutgoing(Column $column, $value, ?int $value_type = null): string {
+		return json_encode(['id' => $value, 'type' => $value_type]);
 	}
 }

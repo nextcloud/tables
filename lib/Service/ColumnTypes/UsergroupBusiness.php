@@ -25,7 +25,7 @@ class UsergroupBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	}
 
 	/**
-	 * @param mixed $value array{id: string, type: int}
+	 * @param string $value json encoded array{id: string, type: int}
 	 * @param Column|null $column
 	 * @return bool
 	 */
@@ -39,7 +39,7 @@ class UsergroupBusiness extends SuperBusiness implements IColumnTypeBusiness {
 			return true;
 		}
 
-		foreach ($value as $v) {
+		foreach (json_decode($value, true) as $v) {
 			if((array_key_exists('id', $v) && !is_string($v['id'])) && (array_key_exists('type', $v) && !is_int($v['type']))) {
 				return false;
 			}

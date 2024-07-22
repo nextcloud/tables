@@ -114,7 +114,7 @@ Feature: APIv2
       | title             | ug column renamed               |
       | mandatory         | 0                               |
       | description       | New description                 |
-      | usergroupDefault  | [{"id": "admin", "type": 0}]    |
+      | usergroupDefault  | [{"id":"admin","type":0}]       |
     Then table has at least following columns
       | ug column renamed |
 
@@ -571,20 +571,20 @@ Feature: APIv2
 
   @api1 @rows
   Scenario: Create and modify usergroup row via v1
-    Given table "Usergroup row check" with emoji "👨🏻‍💻" exists for user "participant1" as "base1"
+    Given table "Usergroup row check" with emoji "👋" exists for user "participant1-v2" as "base1" via v2
     Then column "one" exists with following properties
-      | title         | usergroup               |  
+      | type          | usergroup               |
       | mandatory     | 0                       |
       | description   | New description         |
       | usergroupMultipleItems  | true          |
       | usergroupSelectUsers    | true          |
       | usergroupSelectGroups   | true          |
     Then row exists with following values
-      | one           | [{"id": "admin", "type": 0}] |
+      | one           | [{"id":"admin","type":0}] |
     Then set following values for last created row
-      | one           | [{"id": "admin", "type": 1}] |
+      | one           | [{"id":"admin","type":1}] |
     Then user deletes last created row
-    Then user "participant1" deletes table with keyword "Usergroup row check"
+    Then user "participant1-v2" deletes table with keyword "Usergroup row check"
 
   @api2 @rows
   Scenario: Create rows via v2 and check them
