@@ -103,7 +103,7 @@
 </template>
 <script>
 import { NcAppNavigationItem, NcActionButton, NcCounterBubble, NcAvatar } from '@nextcloud/vue'
-import '@nextcloud/dialogs/dist/index.css'
+import '@nextcloud/dialogs/style.css'
 import { getCurrentUser } from '@nextcloud/auth'
 import { mapGetters } from 'vuex'
 import { showError } from '@nextcloud/dialogs'
