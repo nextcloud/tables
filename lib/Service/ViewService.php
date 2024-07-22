@@ -416,7 +416,8 @@ class ViewService extends SuperService {
 
 		if($view->getIsShared()) {
 			// Remove detailed view filtering and sorting information if necessary
-			if(!$view->getOnSharePermissions()['manageTable']) {
+			$permissions = $view->getOnSharePermissions();
+			if (!isset($permissions['manageTable']) || !$permissions['manageTable']) {
 				$rawFilterArray = $view->getFilterArray();
 				if($rawFilterArray) {
 					$view->setFilterArray(
