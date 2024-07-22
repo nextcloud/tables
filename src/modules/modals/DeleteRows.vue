@@ -17,7 +17,7 @@
 
 import DialogConfirmation from '../../shared/modals/DialogConfirmation.vue'
 import { showError } from '@nextcloud/dialogs'
-import '@nextcloud/dialogs/dist/index.css'
+import '@nextcloud/dialogs/style.css'
 import { emit } from '@nextcloud/event-bus'
 
 export default {
