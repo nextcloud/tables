@@ -29,7 +29,7 @@ describe('Test column ' + columnTitle, () => {
 
 		// insert row
 		cy.get('button').contains('Create row').click()
-		cy.get('[data-cy="selectionCheckFormSwitch"]').first().click({ force: true })
+		cy.get('[data-cy="selectionCheckFormSwitch"]').first().find('input').click({ force: true })
 		cy.get('button').contains('Save').click()
 		cy.get('.custom-table table tr td div .material-design-icon.check-circle-outline-icon').should('be.visible')
 
@@ -47,7 +47,7 @@ describe('Test column ' + columnTitle, () => {
 
 		// insert row
 		cy.get('button').contains('Create row').click()
-		cy.get('[data-cy="selectionCheckFormSwitch"]').first().click({ force: true })
+		cy.get('[data-cy="selectionCheckFormSwitch"]').first().find('input').click({ force: true })
 		cy.get('button').contains('Save').click()
 		cy.get('.custom-table table tr td div .material-design-icon.radiobox-blank-icon').should('be.visible')
 
