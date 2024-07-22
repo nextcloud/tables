@@ -134,14 +134,35 @@ class Api1Controller extends ApiController {
 
 	/**
 	 * returns table scheme
-	 * @param int $tableId
-	 * @return \OCP\AppFramework\Http\DataResponse
+	 *
+	 * @NoAdminRequired
+	 * @CORS
+	 * @NoCSRFRequired
+	 *
+	 * @param int $tableId Table ID
+	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{'Content-Disposition'?:string,'Content-Type'?:string}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 *
+	 * 200: Table returned
+	 * 403: No permissions
+	 * 404: Not found
 	 */
 	public function showScheme(int $tableId): DataResponse {
-		return $this->handleError(function () use ($tableId) {
+		try {
 			$scheme = $this->tableService->getScheme($tableId);
-			return new DataResponse($scheme->jsonSerialize(), http::STATUS_OK, ["Content-Disposition" => "attachment", "filename" => $scheme->getTitle() . ".json", "Content-Type" => "application/octet-stream"]);
-		});
+			return new DataResponse($scheme->jsonSerialize(), http::STATUS_OK, ['Content-Disposition' => 'attachment; filename="'.$scheme->getTitle() . '.json"', 'Content-Type' => 'application/octet-stream']);
+		} catch (PermissionError $e) {
+			$this->logger->warning('A permission error occurred: ' . $e->getMessage());
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_FORBIDDEN);
+		} catch (NotFoundError $e) {
+			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_NOT_FOUND);
+		} catch (InternalError|Exception $e) {
+			$this->logger->warning('An internal error or exception occurred: '.$e->getMessage());
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	/**

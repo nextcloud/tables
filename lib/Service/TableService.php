@@ -6,7 +6,6 @@ namespace OCA\Tables\Service;
 
 use DateTime;
 use OCA\Tables\AppInfo\Application;
-use OCA\Tables\Controller\TableScheme;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Errors\InternalError;
@@ -15,6 +14,7 @@ use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Event\TableDeletedEvent;
 use OCA\Tables\Event\TableOwnershipTransferredEvent;
 use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\Model\TableScheme;
 use OCA\Tables\ResponseDefinitions;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -551,7 +551,7 @@ class TableService extends SuperService {
 	public function getScheme(int $id): TableScheme {
 		$columns = $this->columnService->findAllByTable($id);
 		$table = $this->find($id);
-		return new TableScheme($table->getTitle(), $table->getEmoji(), $columns, $table->getViews(), $table->getDescription(), $this->appManager);
+		return new TableScheme($table->getTitle(), $table->getEmoji(), $columns, $table->getViews(), $table->getDescription(), $this->appManager->getAppVersion("tables"));
 	}
 
 	// PRIVATE FUNCTIONS ---------------------------------------------------------------

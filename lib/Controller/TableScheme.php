@@ -1,11 +1,10 @@
 <?php
 
-namespace OCA\Tables\Controller;
+namespace OCA\Tables\Model;
 
 use JsonSerializable;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\View;
-use OCP\App\IAppManager;
 
 class TableScheme implements JsonSerializable {
 
@@ -20,8 +19,8 @@ class TableScheme implements JsonSerializable {
 	protected ?string $description = null;
 	protected ?string $tablesVersion = null;
 
-	public function __construct(string $title, string $emoji, array $columns, array $view, string $description, IAppManager $appManager) {
-		$this->tablesVersion = $appManager->getAppVersion("tables");
+	public function __construct(string $title, string $emoji, array $columns, array $view, string $description, string $tablesVersion) {
+		$this->tablesVersion = $tablesVersion;
 		$this->title = $title;
 		$this->emoji = $emoji;
 		$this->columns = $columns;

@@ -3,8 +3,6 @@
 namespace OCA\Tables\Controller;
 
 use Exception;
-use OCA\Tables\Db\Column;
-use OCA\Tables\Db\View;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;

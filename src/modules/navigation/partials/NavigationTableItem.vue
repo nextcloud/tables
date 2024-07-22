@@ -150,14 +150,13 @@ import StarOutline from 'vue-material-design-icons/StarOutline.vue'
 import ArchiveArrowDown from 'vue-material-design-icons/ArchiveArrowDown.vue'
 import ArchiveArrowUpOutline from 'vue-material-design-icons/ArchiveArrowUpOutline.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
-import { getCurrentUser } from '@nextcloud/auth'
+import { getCurrentUser, getRequestToken } from '@nextcloud/auth'
 import Connection from 'vue-material-design-icons/Connection.vue'
 import Import from 'vue-material-design-icons/Import.vue'
 import NavigationViewItem from './NavigationViewItem.vue'
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 import IconRename from 'vue-material-design-icons/Rename.vue'
-import axios from '@nextcloud/axios'
-import { generateOcsUrl } from '@nextcloud/router'
+import { generateUrl } from '@nextcloud/router'
 
 export default {
 
@@ -246,14 +245,19 @@ export default {
 		},
 
 		exportFile() {
-			axios.get(generateOcsUrl(`/apps/tables/api/2/tables/scheme/${this.table.id}`)).then(res => {
-				const blob = new Blob([JSON.stringify(res.data.ocs.data)], { type: 'application/json' })
-				const link = document.createElement('a')
-				link.href = URL.createObjectURL(blob)
-				link.download = this.table.title
-				link.click()
-				URL.revokeObjectURL(link.href)
-			})
+			const form = document.createElement('form')
+			form.method = 'GET'
+			form.action = generateUrl(`/apps/tables/api/1/tables/${this.table.id}/scheme`)
+
+			const token = document.createElement('input')
+			token.type = 'hidden'
+			token.name = 'requesttoken'
+			token.value = getRequestToken()
+
+			form.appendChild(token)
+
+			document.body.appendChild(form)
+			form.submit()
 		},
 
 		async actionShowShare() {
