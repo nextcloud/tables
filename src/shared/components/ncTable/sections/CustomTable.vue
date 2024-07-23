@@ -1,7 +1,7 @@
 <template>
 	<div class="container">
-		<table>
-			<thead>
+		<table class="tables-list__table">
+			<thead class="tables-list__thead">
 				<TableHeader :columns="columns"
 					:selected-rows="selectedRows"
 					:rows="getSearchedAndFilteredAndSortedRows"
@@ -464,7 +464,7 @@ export default {
 
 	thead {
 		position: sticky;
-		top: 118px;
+		top: 108px;
 		z-index: 6;
 
 		tr {

@@ -254,7 +254,7 @@ export default {
 	top: 60px;
 	left: 0;
 	z-index: 15;
-	background-color: var(--color-main-background-translucent);
+	background-color: var(--color-main-background);
 	padding-top: 4px; // fix to show buttons completely
 	padding-bottom: 4px; // to make it nice with the padding-top
 }
