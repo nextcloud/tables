@@ -125,16 +125,18 @@
 				{{ t('tables', 'Delete table') }}
 			</NcActionButton>
 		</template>
-		<NavigationViewItem v-for="view in getViews"
-			:key="'view'+view.id"
-			:view="view"
-			:show-share-sender="false" />
+		<div>
+			<NavigationViewItem v-for="view in getViews"
+				:key="'view'+view.id"
+				:view="view"
+				:show-share-sender="false" />
+		</div>
 	</NcAppNavigationItem>
 </template>
 
 <script>
 import { NcActionButton, NcAppNavigationItem, NcCounterBubble, NcAvatar } from '@nextcloud/vue'
-import '@nextcloud/dialogs/dist/index.css'
+import '@nextcloud/dialogs/style.css'
 import { mapGetters, mapState } from 'vuex'
 import { emit } from '@nextcloud/event-bus'
 import Table from 'vue-material-design-icons/Table.vue'
