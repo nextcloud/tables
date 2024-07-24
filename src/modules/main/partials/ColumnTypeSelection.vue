@@ -132,6 +132,9 @@ export default {
 			this.combinedType = this.columnId
 		},
 	},
+	mounted() {
+		this.combinedType = this.columnId
+	},
 }
 </script>
 <style lang="scss" scoped>
