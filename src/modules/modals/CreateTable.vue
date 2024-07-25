@@ -61,6 +61,14 @@
 						:tabbable="true"
 						@set-template="setTemplate(template.name)" />
 				</div>
+				<div class="col-2 block space-R space-B">
+					<NcTile
+						:title="t('tables', '📄 Import Scheme')"
+						:body="t('tables', 'Import Scheme from file.')"
+						:active="templateChoice === 'scheme'"
+						:tabbable="true"
+						@set-template="setTemplate('scheme')" />
+				</div>
 			</div>
 			<div class="row space-R">
 				<div class="fix-col-4 end">
@@ -168,6 +176,11 @@ export default {
 		},
 		async submit() {
 			if (this.title === '') {
+				if (this.templateChoice === 'scheme') {
+					emit('tables:modal:scheme', {})
+					this.actionCancel()
+					return
+				}
 				showError(t('tables', 'Cannot create new table. Title is missing.'))
 				this.errorTitle = true
 			} else {

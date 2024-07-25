@@ -20,6 +20,7 @@ return [
 		['name' => 'api1#createTable',	'url' => '/api/1/tables', 'verb' => 'POST'],
 		['name' => 'api1#updateTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'PUT'],
 		['name' => 'api1#getTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'GET'],
+		['name' => 'api1#showScheme',	'url' => '/api/1/tables/{tableId}/scheme', 'verb' => 'GET'],
 		['name' => 'api1#deleteTable',	'url' => '/api/1/tables/{tableId}', 'verb' => 'DELETE'],
 		// -> views
 		['name' => 'api1#indexViews', 'url' => '/api/1/tables/{tableId}/views', 'verb' => 'GET'],
@@ -121,6 +122,8 @@ return [
 		// -> tables
 		['name' => 'ApiTables#index', 'url' => '/api/2/tables', 'verb' => 'GET'],
 		['name' => 'ApiTables#show', 'url' => '/api/2/tables/{id}', 'verb' => 'GET'],
+		['name' => 'ApiTables#showScheme', 'url' => '/api/2/tables/scheme/{id}', 'verb' => 'GET'],
+		['name' => 'ApiTables#createFromScheme', 'url' => '/api/2/tables/scheme', 'verb' => 'POST'],
 		['name' => 'ApiTables#create', 'url' => '/api/2/tables', 'verb' => 'POST'],
 		['name' => 'ApiTables#update', 'url' => '/api/2/tables/{id}', 'verb' => 'PUT'],
 		['name' => 'ApiTables#destroy', 'url' => '/api/2/tables/{id}', 'verb' => 'DELETE'],

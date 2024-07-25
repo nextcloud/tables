@@ -67,6 +67,13 @@
 				</template>
 			</NcActionButton>
 
+			<!-- EXPORT -->
+			<NcActionButton @click="exportFile">
+				{{ t('tables','Export') }}
+				<template #icon>
+					<Import :size="20" />
+				</template>
+			</NcActionButton>
 			<!-- INTEGRATION -->
 			<NcActionButton
 				:close-after-click="true"
@@ -143,12 +150,13 @@ import StarOutline from 'vue-material-design-icons/StarOutline.vue'
 import ArchiveArrowDown from 'vue-material-design-icons/ArchiveArrowDown.vue'
 import ArchiveArrowUpOutline from 'vue-material-design-icons/ArchiveArrowUpOutline.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
-import { getCurrentUser } from '@nextcloud/auth'
+import { getCurrentUser, getRequestToken } from '@nextcloud/auth'
 import Connection from 'vue-material-design-icons/Connection.vue'
 import Import from 'vue-material-design-icons/Import.vue'
 import NavigationViewItem from './NavigationViewItem.vue'
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 import IconRename from 'vue-material-design-icons/Rename.vue'
+import { generateUrl } from '@nextcloud/router'
 
 export default {
 
@@ -235,6 +243,23 @@ export default {
 		createView() {
 			emit('tables:view:create', { tableId: this.table.id })
 		},
+
+		exportFile() {
+			const form = document.createElement('form')
+			form.method = 'GET'
+			form.action = generateUrl(`/apps/tables/api/1/tables/${this.table.id}/scheme`)
+
+			const token = document.createElement('input')
+			token.type = 'hidden'
+			token.name = 'requesttoken'
+			token.value = getRequestToken()
+
+			form.appendChild(token)
+
+			document.body.appendChild(form)
+			form.submit()
+		},
+
 		async actionShowShare() {
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
 			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)

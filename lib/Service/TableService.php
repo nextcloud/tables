@@ -14,7 +14,9 @@ use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Event\TableDeletedEvent;
 use OCA\Tables\Event\TableOwnershipTransferredEvent;
 use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\Model\TableScheme;
 use OCA\Tables\ResponseDefinitions;
+use OCP\App\IAppManager;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception as OcpDbException;
@@ -42,6 +44,7 @@ class TableService extends SuperService {
 
 	protected FavoritesService $favoritesService;
 
+	protected IAppManager $appManager;
 
 	protected IL10N $l;
 	private ContextService $contextService;
@@ -62,9 +65,11 @@ class TableService extends SuperService {
 		FavoritesService $favoritesService,
 		IEventDispatcher $eventDispatcher,
 		ContextService $contextService,
+		IAppManager $appManager,
 		IL10N $l,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
+		$this->appManager = $appManager;
 		$this->mapper = $mapper;
 		$this->tableTemplateService = $tableTemplateService;
 		$this->columnService = $columnService;
@@ -533,9 +538,20 @@ class TableService extends SuperService {
 				$this->enhanceTable($table, $userId);
 			}
 			return $tables;
-		} catch (InternalError | PermissionError |OcpDbException $e) {
+		} catch (InternalError | PermissionError | OcpDbException $e) {
 			return [];
 		}
+	}
+
+	/**
+	 * @throws PermissionError
+	 * @throws NotFoundError
+	 * @throws InternalError
+	 */
+	public function getScheme(int $id): TableScheme {
+		$columns = $this->columnService->findAllByTable($id);
+		$table = $this->find($id);
+		return new TableScheme($table->getTitle(), $table->getEmoji(), $columns, $table->getViews(), $table->getDescription(), $this->appManager->getAppVersion("tables"));
 	}
 
 	// PRIVATE FUNCTIONS ---------------------------------------------------------------
