@@ -1,12 +1,9 @@
 <template>
-	<NcModal v-if="showModal" size="normal" @close="actionCancel">
+	<NcDialog v-if="showModal"
+		:name="title"
+		size="normal"
+		@closing="actionCancel">
 		<div class="modal__content">
-			<div class="row">
-				<div class="col-4">
-					<h2>{{ title }}</h2>
-				</div>
-			</div>
-
 			<!-- Starting -->
 			<div v-if="!loading && result === null && preview === null && !waitForReload">
 				<div class="row space-T">
@@ -104,11 +101,11 @@
 				<NcLoadingIcon :name="t('tables', 'Loading table data')" :size="64" />
 			</div>
 		</div>
-	</NcModal>
+	</NcDialog>
 </template>
 
 <script>
-import { NcModal, NcButton, NcCheckboxRadioSwitch, NcEmptyContent, NcLoadingIcon } from '@nextcloud/vue'
+import { NcDialog, NcButton, NcCheckboxRadioSwitch, NcEmptyContent, NcLoadingIcon } from '@nextcloud/vue'
 import { FilePicker, FilePickerType, showError, showWarning } from '@nextcloud/dialogs'
 import RowFormWrapper from '../../shared/components/ncTable/partials/rowTypePartials/RowFormWrapper.vue'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
@@ -131,7 +128,7 @@ export default {
 		IconFolder,
 		IconUpload,
 		IconFile,
-		NcModal,
+		NcDialog,
 		NcButton,
 		ImportResults,
 		ImportPreview,
@@ -489,11 +486,6 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-
-	h2 {
-		margin-bottom: 0;
-	}
-
 	:deep(.slot), .middle {
 		align-items: center;
 	}

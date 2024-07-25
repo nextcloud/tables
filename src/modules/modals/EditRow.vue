@@ -1,13 +1,9 @@
 <template>
-	<NcModal v-if="showModal" data-cy="editRowModal" @close="actionCancel">
+	<NcDialog v-if="showModal"
+		data-cy="editRowModal"
+		:name="t('tables', 'Edit row')"
+		@closing="actionCancel">
 		<div class="modal__content" @keydown="onKeydown">
-			<div class="row">
-				<div class="col-4">
-					<h2 tabindex="0">
-						{{ t('tables', 'Edit row') }}
-					</h2>
-				</div>
-			</div>
 			<div v-for="column in nonMetaColumns" :key="column.id">
 				<ColumnFormComponent
 					:column="column"
@@ -42,11 +38,11 @@
 				</div>
 			</div>
 		</div>
-	</NcModal>
+	</NcDialog>
 </template>
 
 <script>
-import { NcModal, NcButton, NcNoteCard } from '@nextcloud/vue'
+import { NcDialog, NcButton, NcNoteCard } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
 import { translate as t } from '@nextcloud/l10n'
 import '@nextcloud/dialogs/dist/index.css'
@@ -56,7 +52,7 @@ import permissionsMixin from '../../shared/components/ncTable/mixins/permissions
 export default {
 	name: 'EditRow',
 	components: {
-		NcModal,
+		NcDialog,
 		NcButton,
 		ColumnFormComponent,
 		NcNoteCard,

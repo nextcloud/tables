@@ -1,8 +1,9 @@
 <template>
-	<NcModal v-if="!importResults">
+	<NcDialog v-if="!importResults"
+		:name="t('tables', 'Import file into Tables')"
+		size="normal"
+		@closing="closeImportDialog">
 		<div class="modal__content">
-			<h2>{{ t('tables', 'Import file into Tables') }}</h2>
-
 			<RowFormWrapper
 				class="row"
 				:title="t('tables', 'Import as new table')"
@@ -82,7 +83,7 @@
 				</NcButton>
 			</div>
 		</div>
-	</NcModal>
+	</NcDialog>
 
 	<NcDialog v-else
 		:name="t('tables', 'Import successful')"
@@ -100,7 +101,6 @@
 
 <script>
 import {
-	NcModal,
 	NcDialog,
 	NcButton,
 	NcSelect,
@@ -121,7 +121,6 @@ export default {
 	name: 'FileActionImport',
 
 	components: {
-		NcModal,
 		NcButton,
 		NcDialog,
 		ImportResults,
@@ -222,6 +221,9 @@ export default {
 			}
 
 			this.importingFile = false
+		},
+		closeImportDialog() {
+			this.$emit('close')
 		},
 	},
 }

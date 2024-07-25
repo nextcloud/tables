@@ -1,11 +1,10 @@
 <template>
-	<NcModal v-if="showModal" size="large" @close="actionCancel">
+	<NcDialog v-if="showModal"
+		:name="t('tables', 'Create column')"
+		size="large"
+		@closing="actionCancel">
 		<div class="modal__content create-column">
 			<div class="row">
-				<div class="col-4">
-					<h2>{{ t('tables', 'Create column') }}</h2>
-				</div>
-
 				<div class="fix-col-2">
 					<MainForm :description.sync="column.description"
 						:mandatory.sync="column.mandatory"
@@ -84,7 +83,7 @@
 				</div>
 			</div>
 		</div>
-	</NcModal>
+	</NcDialog>
 </template>
 
 <script>
@@ -99,7 +98,7 @@ import MainForm from '../../shared/components/ncTable/partials/columnTypePartial
 import DatetimeForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeForm.vue'
 import DatetimeDateForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeTimeForm.vue'
-import { NcModal, NcCheckboxRadioSwitch } from '@nextcloud/vue'
+import { NcDialog, NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import SelectionForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionForm.vue'
 import SelectionMultiForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionMultiForm.vue'
 import { showError, showInfo, showSuccess, showWarning } from '@nextcloud/dialogs'
@@ -113,7 +112,7 @@ export default {
 	name: 'CreateColumn',
 	components: {
 		ColumnTypeSelection,
-		NcModal,
+		NcDialog,
 		NumberForm,
 		TextLineForm,
 		TextLinkForm,

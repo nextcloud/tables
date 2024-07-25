@@ -26,7 +26,7 @@ describe('Test column ' + columnTitle, () => {
 
 		// check if default value is set on row creation
 		cy.get('button').contains('Create row').click()
-		cy.get('.modal__content h2').contains('Create row').should('be.visible')
+		cy.get('.modal-container__content h2').contains('Create row').should('be.visible')
 		cy.get('.modal__content .title').contains(columnTitle).should('be.visible')
 		cy.get('.modal__content span[title="first option"]').should('be.visible')
 		cy.get('.modal__content span[title="second option"]').should('be.visible')
@@ -72,7 +72,7 @@ describe('Test column ' + columnTitle, () => {
 
 		// check if default value is set on row creation
 		cy.get('button').contains('Create row').click()
-		cy.get('.modal__content h2').contains('Create row').should('be.visible')
+		cy.get('.modal-container__content h2').contains('Create row').should('be.visible')
 		cy.get('button').contains('Save').click()
 		cy.get('.custom-table table tr td div').should('exist')
 		cy.get('.NcTable tr td button').should('exist')
