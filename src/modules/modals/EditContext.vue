@@ -3,14 +3,13 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcModal v-if="showModal" size="normal" data-cy="editContextModal" @close="actionCancel">
+	<NcDialog v-if="showModal"
+		:name="t('tables', 'Edit application')"
+		size="normal"
+		data-cy="editContextModal"
+		@closing="actionCancel">
 		<div class="modal__content" data-cy="editContextModal">
 			<div class="row">
-				<div class="col-4">
-					<h2>{{ t('tables', 'Edit application') }}</h2>
-				</div>
-			</div>
-			<div class="row space-T">
 				<div class="col-4 mandatory">
 					{{ t('tables', 'Title') }}
 				</div>
@@ -59,11 +58,11 @@
 				</div>
 			</div>
 		</div>
-	</NcModal>
+	</NcDialog>
 </template>
 
 <script>
-import { NcModal, NcButton, NcIconSvgWrapper } from '@nextcloud/vue'
+import { NcDialog, NcButton, NcIconSvgWrapper } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import { getCurrentUser } from '@nextcloud/auth'
 import '@nextcloud/dialogs/style.css'
@@ -79,7 +78,7 @@ import permissionsMixin from '../../shared/components/ncTable/mixins/permissions
 export default {
 	name: 'EditContext',
 	components: {
-		NcModal,
+		NcDialog,
 		NcButton,
 		NcIconPicker,
 		NcIconSvgWrapper,

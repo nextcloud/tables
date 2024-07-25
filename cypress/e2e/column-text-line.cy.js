@@ -30,7 +30,7 @@ describe('Test column text line', () => {
 
 		// check if default value is set on row creation
 		cy.get('button').contains('Create row').click()
-		cy.get('.modal__content h2').contains('Create row').should('be.visible')
+		cy.get('.modal-container__content h2').contains('Create row').should('be.visible')
 		cy.get('.modal__content .title').contains('text line').should('be.visible')
 		cy.get('.modal__content input').first().should('be.visible')
 		cy.get('.modal__content input').first().clear().type('hello world')

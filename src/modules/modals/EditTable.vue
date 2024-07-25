@@ -3,15 +3,11 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcModal v-if="showModal"
+	<NcDialog v-if="showModal"
+		:name="t('tables', 'Edit table')"
 		size="normal"
-		@close="actionCancel">
+		@closing="actionCancel">
 		<div class="modal__content" data-cy="editTableModal">
-			<div class="row">
-				<div class="col-4">
-					<h2>{{ t('tables', 'Edit table') }}</h2>
-				</div>
-			</div>
 			<div class="row">
 				<div class="col-4 mandatory">
 					{{ t('tables', 'Title') }}
@@ -73,11 +69,11 @@
 				</div>
 			</div>
 		</div>
-	</NcModal>
+	</NcDialog>
 </template>
 
 <script>
-import { NcModal, NcEmojiPicker, NcButton, NcUserBubble } from '@nextcloud/vue'
+import { NcDialog, NcEmojiPicker, NcButton, NcUserBubble } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import { mapGetters } from 'vuex'
@@ -88,7 +84,7 @@ import TableDescription from '../main/sections/TableDescription.vue'
 export default {
 	name: 'EditTable',
 	components: {
-		NcModal,
+		NcDialog,
 		NcEmojiPicker,
 		NcButton,
 		NcUserBubble,

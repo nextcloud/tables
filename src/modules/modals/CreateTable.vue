@@ -3,20 +3,18 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcModal v-if="showModal" size="normal"
-		data-cy="createTableModal" @close="actionCancel">
+	<NcDialog v-if="showModal"
+		:name="t('tables', 'Create table')"
+		data-cy="createTableModal"
+		size="normal"
+		@closing="actionCancel">
 		<div class="modal__content">
-			<div class="row">
-				<div class="col-4">
-					<h2>{{ t('tables', 'Create table') }}</h2>
-				</div>
-			</div>
-			<div class="row">
+			<div class="row space-T">
 				<div class="col-4 mandatory">
 					{{ t('tables', 'Title') }}
 				</div>
 				<div class="col-4 content-emoji">
-					<NcEmojiPicker :close-on-select="true" @select="setIcon">
+					<NcEmojiPicker class="content--emoji" :close-on-select="true" @select="setIcon">
 						<NcButton type="tertiary"
 							:aria-label="t('tables', 'Select emoji for table')"
 							:title="t('tables', 'Select emoji')"
@@ -82,11 +80,11 @@
 				</div>
 			</div>
 		</div>
-	</NcModal>
+	</NcDialog>
 </template>
 
 <script>
-import { NcModal, NcEmojiPicker, NcButton } from '@nextcloud/vue'
+import { NcDialog, NcEmojiPicker, NcButton } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import axios from '@nextcloud/axios'
@@ -100,7 +98,7 @@ import { mapState } from 'vuex'
 export default {
 	name: 'CreateTable',
 	components: {
-		NcModal,
+		NcDialog,
 		NcEmojiPicker,
 		NcButton,
 		NcTile,

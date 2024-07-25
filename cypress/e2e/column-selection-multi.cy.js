@@ -30,10 +30,11 @@ describe('Test column ' + columnTitle, () => {
 
 		// check if default value is set on row creation
 		cy.get('button').contains('Create row').click()
-		cy.get('.modal__content h2').contains('Create row').should('be.visible')
+		cy.get('.modal-container__content h2').contains('Create row').should('be.visible')
 		cy.get('.modal__content .title').contains(columnTitle).should('be.visible')
 		cy.get('.modal__content span[title="first option"]').should('be.visible')
 		cy.get('.modal__content span[title="second option"]').should('be.visible')
+		cy.get('.modal__content .title').click() // focus out of the multiselect
 		cy.get('button').contains('Save').click()
 		cy.get('.custom-table table tr td div').contains('first option').should('be.visible')
 		cy.get('.custom-table table tr td div').contains('second option').should('be.visible')
@@ -44,6 +45,7 @@ describe('Test column ' + columnTitle, () => {
 		cy.get('.vs--multiple .vs__selected button').first().click()
 		cy.get('.modal__content .slot input').first().click()
 		cy.get('ul.vs__dropdown-menu li span[title="👋 third option"]').click()
+		cy.get('.modal__content .title').click() // focus out of the multiselect
 		cy.get('button').contains('Save').click()
 		cy.get('.custom-table table tr td div').contains('third option').should('be.visible')
 
@@ -58,6 +60,7 @@ describe('Test column ' + columnTitle, () => {
 		cy.get('.NcTable tr td button').first().click()
 		cy.get('.modal__content .slot input').first().click()
 		cy.get('ul.vs__dropdown-menu li span[title="first option"]').click()
+		cy.get('.modal__content .title').click() // focus out of the multiselect
 		cy.get('button').contains('Save').click()
 		cy.get('.custom-table table tr td div').contains('first option').should('be.visible')
 		cy.get('.custom-table table tr td div').contains('third option').should('be.visible')
@@ -76,7 +79,7 @@ describe('Test column ' + columnTitle, () => {
 
 		// check if default value is set on row creation
 		cy.get('button').contains('Create row').click()
-		cy.get('.modal__content h2').contains('Create row').should('be.visible')
+		cy.get('.modal-container__content h2').contains('Create row').should('be.visible')
 		cy.get('button').contains('Save').click()
 		cy.get('.custom-table table tr td div').should('exist')
 		cy.get('.NcTable tr td button').should('exist')
