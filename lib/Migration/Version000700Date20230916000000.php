@@ -38,10 +38,6 @@ class Version000700Date20230916000000 extends SimpleMigrationStep {
 			'name' => 'selection',
 			'db_type' => Types::TEXT,
 		],
-		[
-			'name' => 'usergroup',
-			'db_type' => Types::TEXT,
-		],
 	];
 
 	/**
@@ -76,7 +72,6 @@ class Version000700Date20230916000000 extends SimpleMigrationStep {
 			$table->addColumn('column_id', Types::INTEGER, ['notnull' => true]);
 			$table->addColumn('row_id', Types::INTEGER, ['notnull' => true]);
 			$table->addColumn('value', $type, ['notnull' => false]);
-			$table->addColumn('value_type', Types::INTEGER, ['notnull' => false]);
 			// we will write this data to use it one day to extract versions of rows based on the timestamp
 			$table->addColumn('last_edit_at', Types::DATETIME, ['notnull' => true]);
 			$table->addColumn('last_edit_by', Types::STRING, ['notnull' => true, 'length' => 64]);

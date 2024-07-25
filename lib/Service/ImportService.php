@@ -432,6 +432,11 @@ class ImportService extends SuperService {
 						$this->columnsConfig[$index]['selectionOptions'] ?? '',
 						$this->columnsConfig[$index]['selectionDefault'] ?? '',
 						$this->columnsConfig[$index]['datetimeDefault'] ?? '',
+						$this->columnsConfig[$index]['usergroupDefault'] ?? null,
+						$this->columnsConfig[$index]['usergroupMultipleItems'] ?? null,
+						$this->columnsConfig[$index]['usergroupSelectUsers'] ?? null,
+						$this->columnsConfig[$index]['usergroupSelectGroups'] ?? null,
+						$this->columnsConfig[$index]['showUserStatus'] ?? null,
 						$this->columnsConfig[$index]['selectedViewIds'] ?? []
 					);
 					$title = $column->getTitle();

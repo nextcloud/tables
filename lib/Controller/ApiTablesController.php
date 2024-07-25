@@ -157,6 +157,13 @@ class ApiTablesController extends AOCSController {
 					$column['selectionDefault'],
 
 					$column['datetimeDefault'],
+
+					$column['usergroupDefault'],
+					$column['usergroupMultipleItems'],
+					$column['usergroupSelectUsers'],
+					$column['usergroupSelectGroups'],
+					$column['showUserStatus'],
+
 					[],
 				);
 			};
