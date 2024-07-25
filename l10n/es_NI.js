@@ -37,6 +37,7 @@ OC.L10N.register(
     "Owner" : "Dueño",
     "Close" : "Cerrar",
     "Select from Files" : "Seleccionar desde Archivos",
+    "Preview" : "Previsualizar",
     "Please select a file." : "Por favor selecciona un archivo.",
     "Result" : "Resultado",
     "Filter" : "Filtrar",
@@ -60,7 +61,6 @@ OC.L10N.register(
     "Default" : "Predeterminado",
     "Confirm" : "Confirmar",
     "Content" : "Contenido",
-    "Preview" : "Previsualizar",
     "ID" : "ID"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

@@ -31,6 +31,7 @@
     "Delete" : "Dileu",
     "Owner" : "Perchennog",
     "Close" : "Cau",
+    "Preview" : "Rhagolwg",
     "Sort" : "Trefnu",
     "Favorites" : "Ffefrynnau",
     "group" : "grŵp",
@@ -47,7 +48,6 @@
     "URL" : "URL",
     "Close editor" : "Cau'r golygydd",
     "Confirm" : "Cadarnhau",
-    "Preview" : "Rhagolwg",
     "ID" : "ID"
 },"pluralForm" :"nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != 11) ? 2 : 3;"
 }

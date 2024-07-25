@@ -38,6 +38,7 @@ OC.L10N.register(
     "Delete" : "წაშლა",
     "Close" : "დახურვა",
     "Select from Files" : "აირჩიეთ ფაილებიდან",
+    "Preview" : "წინასწარი ჩვენება",
     "Please select a file." : "გთხოვთ აირჩიოთ ფაილი.",
     "Result" : "შედეგი",
     "Filter" : "ფილტრი",
@@ -62,7 +63,6 @@ OC.L10N.register(
     "URL" : "URL",
     "Confirm" : "დადასტურება",
     "Content" : "მოცულობა",
-    "Preview" : "წინასწარი ჩვენება",
     "Unchecked" : "შეუმოწმებელია",
     "ID" : "ID"
 },

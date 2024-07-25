@@ -43,6 +43,7 @@ OC.L10N.register(
     "Close" : "Sulge",
     "Select from Files" : "Vali failidest",
     "Upload from device" : "Laadi üles seadmest",
+    "Preview" : "Eelvaade",
     "Please select a file." : "Palun vali fail.",
     "Filter" : "Filter",
     "Sort" : "Sorteeri",
@@ -67,7 +68,6 @@ OC.L10N.register(
     "URL" : "URL",
     "Confirm" : "Kinnita",
     "Content" : "Sisu",
-    "Preview" : "Eelvaade",
     "Select" : "Vali",
     "ID" : "ID"
 },

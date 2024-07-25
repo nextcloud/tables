@@ -49,6 +49,7 @@ OC.L10N.register(
     "Delete" : "Hapus",
     "Close" : "Tutup",
     "Select from Files" : "Pilih dari berkas",
+    "Preview" : "Pratinjau",
     "Please select a file." : "Silakan pilih berkas",
     "Transfer" : "Transfer",
     "Filter" : "Filter",
@@ -77,7 +78,6 @@ OC.L10N.register(
     "URL" : "URL",
     "Confirm" : "Konfirmasi",
     "Content" : "Konten",
-    "Preview" : "Pratinjau",
     "Select" : "Pilih",
     "ID" : "ID"
 },

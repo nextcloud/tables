@@ -41,6 +41,7 @@ OC.L10N.register(
     "Delete" : "Fshij",
     "Close" : "Mbylleni",
     "Select from Files" : "Përzgjidhni prej Kartelash",
+    "Preview" : "Parapamje ",
     "Please select a file." : "Ju lutem përzgjidhni një skedar.",
     "Result" : "Rezultatet",
     "Filter" : "Filtro",
@@ -72,7 +73,6 @@ OC.L10N.register(
     "URL" : "URL",
     "Confirm" : "Konfirmo",
     "Content" : "Përmbajtja",
-    "Preview" : "Parapamje ",
     "Select" : "Përzgjidh",
     "ID" : "ID"
 },

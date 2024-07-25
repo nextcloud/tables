@@ -48,6 +48,7 @@ OC.L10N.register(
     "Owner" : "Posedanto",
     "Close" : "Malfermi",
     "Select from Files" : "Elekti el dosieroj",
+    "Preview" : "Antaŭvidi",
     "Please select a file." : "Bonvolu elekti dosieron.",
     "Sort" : "Ordigi",
     "Add to favorites" : "Aldoni al pliŝatataĵoj",
@@ -83,7 +84,6 @@ OC.L10N.register(
     "Close editor" : "Fermi redaktilon",
     "Confirm" : "Konfirmi",
     "Content" : "Enhavo",
-    "Preview" : "Antaŭvidi",
     "Select" : "Elekti",
     "ID" : "Identigilo"
 },

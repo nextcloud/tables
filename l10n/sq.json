@@ -39,6 +39,7 @@
     "Delete" : "Fshij",
     "Close" : "Mbylleni",
     "Select from Files" : "Përzgjidhni prej Kartelash",
+    "Preview" : "Parapamje ",
     "Please select a file." : "Ju lutem përzgjidhni një skedar.",
     "Result" : "Rezultatet",
     "Filter" : "Filtro",
@@ -70,7 +71,6 @@
     "URL" : "URL",
     "Confirm" : "Konfirmo",
     "Content" : "Përmbajtja",
-    "Preview" : "Parapamje ",
     "Select" : "Përzgjidh",
     "ID" : "ID"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"

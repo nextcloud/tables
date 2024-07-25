@@ -50,6 +50,7 @@ OC.L10N.register(
     "Delete" : "Suprimir",
     "Close" : "Plegar",
     "Select from Files" : "Seleccionar dels fichièrs",
+    "Preview" : "Apercebut",
     "Please select a file." : "Seleccionatz un fichièr.",
     "Sort" : "Triar",
     "Add to favorites" : "Apondre als favorits",
@@ -80,7 +81,6 @@ OC.L10N.register(
     "Options" : "Opcions",
     "URL" : "URL",
     "Confirm" : "Confirmar",
-    "Preview" : "Apercebut",
     "ID" : "ID"
 },
 "nplurals=2; plural=(n > 1);");

@@ -44,6 +44,7 @@
     "Delete" : "Eliminar",
     "Close" : "Cerrar",
     "Select from Files" : "Seleccionar desde Archivos",
+    "Preview" : "Vista previa",
     "Please select a file." : "Favor de seleccionar un archivo.",
     "Result" : "Resultado",
     "Transfer" : "Transferir",
@@ -78,7 +79,6 @@
     "Options" : "Opciones",
     "URL" : "URL",
     "Confirm" : "Confirmar",
-    "Preview" : "Vista previa",
     "Select" : "Seleccionar",
     "ID" : "ID"
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"

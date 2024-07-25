@@ -41,6 +41,7 @@
     "Close" : "Sulge",
     "Select from Files" : "Vali failidest",
     "Upload from device" : "Laadi üles seadmest",
+    "Preview" : "Eelvaade",
     "Please select a file." : "Palun vali fail.",
     "Filter" : "Filter",
     "Sort" : "Sorteeri",
@@ -65,7 +66,6 @@
     "URL" : "URL",
     "Confirm" : "Kinnita",
     "Content" : "Sisu",
-    "Preview" : "Eelvaade",
     "Select" : "Vali",
     "ID" : "ID"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"

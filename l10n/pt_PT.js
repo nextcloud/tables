@@ -54,6 +54,7 @@ OC.L10N.register(
     "Owner" : "Proprietário",
     "Close" : "Fechar",
     "Select from Files" : "Seleccione dos Ficheiros",
+    "Preview" : "Pré-visualizar",
     "Please select a file." : "Por favor, selecione um ficheiro.",
     "Transfer" : "Transfere",
     "Filter" : "Filtro",
@@ -91,7 +92,6 @@ OC.L10N.register(
     "Close editor" : "Fechar editor",
     "Confirm" : "Confirmar",
     "Content" : "Conteúdo",
-    "Preview" : "Pré-visualizar",
     "Select" : "Selecionar",
     "ID" : "ID"
 },

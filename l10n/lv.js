@@ -48,6 +48,7 @@ OC.L10N.register(
     "Close" : "Aizvērt",
     "Select from Files" : "Izvēlēties no Datnes",
     "Upload from device" : "Augšupielādēt no ierīces",
+    "Preview" : "Priekšskatīt",
     "Please select a file." : "Lūdzu izvēlies datni.",
     "Sort" : "Kārtot",
     "Add to favorites" : "Pievienot favorītiem",
@@ -78,7 +79,6 @@ OC.L10N.register(
     "Close editor" : "Aizvērt redaktoru",
     "Confirm" : "Apstiprināt",
     "Content" : "Saturs",
-    "Preview" : "Priekšskatīt",
     "Select" : "Atzīmēt",
     "Unchecked" : "Neatzīmēts"
 },

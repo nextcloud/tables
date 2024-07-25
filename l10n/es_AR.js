@@ -46,6 +46,7 @@ OC.L10N.register(
     "Delete" : "Eliminar",
     "Close" : "Cerrar",
     "Select from Files" : "Seleccionar desde Archivos",
+    "Preview" : "Vista previa",
     "Please select a file." : "Favor de seleccionar un archivo.",
     "Result" : "Resultado",
     "Transfer" : "Transferir",
@@ -80,7 +81,6 @@ OC.L10N.register(
     "Options" : "Opciones",
     "URL" : "URL",
     "Confirm" : "Confirmar",
-    "Preview" : "Vista previa",
     "Select" : "Seleccionar",
     "ID" : "ID"
 },

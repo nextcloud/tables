@@ -46,6 +46,7 @@
     "Owner" : "Posedanto",
     "Close" : "Malfermi",
     "Select from Files" : "Elekti el dosieroj",
+    "Preview" : "Antaŭvidi",
     "Please select a file." : "Bonvolu elekti dosieron.",
     "Sort" : "Ordigi",
     "Add to favorites" : "Aldoni al pliŝatataĵoj",
@@ -81,7 +82,6 @@
     "Close editor" : "Fermi redaktilon",
     "Confirm" : "Konfirmi",
     "Content" : "Enhavo",
-    "Preview" : "Antaŭvidi",
     "Select" : "Elekti",
     "ID" : "Identigilo"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"

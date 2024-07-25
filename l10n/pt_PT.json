@@ -52,6 +52,7 @@
     "Owner" : "Proprietário",
     "Close" : "Fechar",
     "Select from Files" : "Seleccione dos Ficheiros",
+    "Preview" : "Pré-visualizar",
     "Please select a file." : "Por favor, selecione um ficheiro.",
     "Transfer" : "Transfere",
     "Filter" : "Filtro",
@@ -89,7 +90,6 @@
     "Close editor" : "Fechar editor",
     "Confirm" : "Confirmar",
     "Content" : "Conteúdo",
-    "Preview" : "Pré-visualizar",
     "Select" : "Selecionar",
     "ID" : "ID"
 },"pluralForm" :"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"

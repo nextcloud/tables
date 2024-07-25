@@ -51,6 +51,7 @@ OC.L10N.register(
     "Owner" : "Owner",
     "Close" : "Close",
     "Upload from device" : "Upload from device",
+    "Preview" : "Preview",
     "Please select a file." : "Please select a file.",
     "Result" : "Result",
     "Transfer" : "Transfer",
@@ -84,7 +85,6 @@ OC.L10N.register(
     "URL" : "URL",
     "Close editor" : "Close editor",
     "Confirm" : "Confirm",
-    "Preview" : "Preview",
     "Select" : "Select",
     "ID" : "ID"
 },

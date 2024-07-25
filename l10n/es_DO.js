@@ -41,6 +41,7 @@ OC.L10N.register(
     "Owner" : "Dueño",
     "Close" : "Cerrar",
     "Select from Files" : "Seleccionar desde Archivos",
+    "Preview" : "Previsualizar",
     "Please select a file." : "Por favor selecciona un archivo.",
     "Result" : "Resultado",
     "Filter" : "Filtrar",
@@ -65,7 +66,6 @@ OC.L10N.register(
     "URL" : "URL",
     "Confirm" : "Confirmar",
     "Content" : "Contenido",
-    "Preview" : "Previsualizar",
     "Select" : "Seleccionar",
     "Unchecked" : "Desmarcado",
     "ID" : "ID"

@@ -52,6 +52,7 @@ OC.L10N.register(
     "Close" : "Închide",
     "Select from Files" : "Selectează din fișiere",
     "Upload from device" : "Încarcă din dispozitiv",
+    "Preview" : "Previzualizare",
     "Please select a file." : "Te rugăm să alegi un fișier.",
     "Transfer" : "Transfer",
     "Filter" : "Filtru",
@@ -84,7 +85,6 @@ OC.L10N.register(
     "URL" : "URL",
     "Close editor" : "Închide editorul",
     "Confirm" : "Confirmă",
-    "Preview" : "Previzualizare",
     "Select" : "Selectează",
     "ID" : "ID"
 },

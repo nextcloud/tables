@@ -47,6 +47,7 @@
     "Delete" : "Hapus",
     "Close" : "Tutup",
     "Select from Files" : "Pilih dari berkas",
+    "Preview" : "Pratinjau",
     "Please select a file." : "Silakan pilih berkas",
     "Transfer" : "Transfer",
     "Filter" : "Filter",
@@ -75,7 +76,6 @@
     "URL" : "URL",
     "Confirm" : "Konfirmasi",
     "Content" : "Konten",
-    "Preview" : "Pratinjau",
     "Select" : "Pilih",
     "ID" : "ID"
 },"pluralForm" :"nplurals=1; plural=0;"

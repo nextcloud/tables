@@ -42,6 +42,7 @@ OC.L10N.register(
     "Owner" : "เจ้าของ",
     "Close" : "ปิด",
     "Select from Files" : "เลือกจากไฟล์",
+    "Preview" : "ตัวอย่าง",
     "Please select a file." : "กรุณาเลือกไฟล์",
     "Transfer" : "โอนย้าย",
     "Filter" : "ตัวกรอง",
@@ -69,7 +70,6 @@ OC.L10N.register(
     "Default" : "ค่าเริ่มต้น",
     "URL" : "URL",
     "Confirm" : "ยืนยัน",
-    "Preview" : "ตัวอย่าง",
     "Select" : "เลือก",
     "ID" : "ID"
 },

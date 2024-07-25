@@ -103,6 +103,7 @@ OC.L10N.register(
     "Import successful" : "הייבוא הצליח",
     "Close" : "סגירה",
     "Select from Files" : "בחירה מתוך קבצים",
+    "Preview" : "תצוגה מקדימה",
     "Please select a file." : "יש לבחור קובץ.",
     "Result" : "תוצאה",
     "Transfer" : "העברה",
@@ -148,7 +149,6 @@ OC.L10N.register(
     "Url" : "כתובת",
     "Confirm" : "אימות",
     "Content" : "תוכן",
-    "Preview" : "תצוגה מקדימה",
     "Select" : "בחר",
     "Unchecked" : "לא נבדק",
     "ID" : "מזהה"

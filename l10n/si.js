@@ -22,6 +22,7 @@ OC.L10N.register(
     "Cancel" : "අවලංගු කරන්න",
     "Owner" : "හිමිකරු",
     "Close" : "වසන්න",
+    "Preview" : "පෙරදසුන",
     "Please select a file." : "කරුණාකර ගොනුවක් තෝරන්න.",
     "Filter" : "පෙරහන",
     "Favorites" : "ප්‍රියතම",
@@ -31,7 +32,6 @@ OC.L10N.register(
     "Download" : "බාගන්න",
     "Search" : "සොයන්න",
     "Back" : "ආපසු",
-    "Confirm" : "තහවුරු කරන්න",
-    "Preview" : "පෙරදසුන"
+    "Confirm" : "තහවුරු කරන්න"
 },
 "nplurals=2; plural=(n != 1);");

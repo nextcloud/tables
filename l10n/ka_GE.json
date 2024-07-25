@@ -36,6 +36,7 @@
     "Delete" : "წაშლა",
     "Close" : "დახურვა",
     "Select from Files" : "აირჩიეთ ფაილებიდან",
+    "Preview" : "წინასწარი ჩვენება",
     "Please select a file." : "გთხოვთ აირჩიოთ ფაილი.",
     "Result" : "შედეგი",
     "Filter" : "ფილტრი",
@@ -60,7 +61,6 @@
     "URL" : "URL",
     "Confirm" : "დადასტურება",
     "Content" : "მოცულობა",
-    "Preview" : "წინასწარი ჩვენება",
     "Unchecked" : "შეუმოწმებელია",
     "ID" : "ID"
 },"pluralForm" :"nplurals=2; plural=(n!=1);"

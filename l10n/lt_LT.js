@@ -86,6 +86,7 @@ OC.L10N.register(
     "Import successful" : "Importavimas pavyko",
     "Close" : "Užverti",
     "Select from Files" : "Pasirinkti iš failų",
+    "Preview" : "Peržiūra",
     "Please select a file." : "Pasirinkite failą.",
     "Transfer" : "Persiųsti",
     "Filter" : "Filtras",
@@ -136,7 +137,6 @@ OC.L10N.register(
     "Close editor" : "Užverti redaktorių",
     "Confirm" : "Patvirtinti",
     "Content" : "Turinys",
-    "Preview" : "Peržiūra",
     "Select" : "Žymėti",
     "ID" : "ID"
 },

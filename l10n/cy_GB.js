@@ -33,6 +33,7 @@ OC.L10N.register(
     "Delete" : "Dileu",
     "Owner" : "Perchennog",
     "Close" : "Cau",
+    "Preview" : "Rhagolwg",
     "Sort" : "Trefnu",
     "Favorites" : "Ffefrynnau",
     "group" : "grŵp",
@@ -49,7 +50,6 @@ OC.L10N.register(
     "URL" : "URL",
     "Close editor" : "Cau'r golygydd",
     "Confirm" : "Cadarnhau",
-    "Preview" : "Rhagolwg",
     "ID" : "ID"
 },
 "nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != 11) ? 2 : 3;");

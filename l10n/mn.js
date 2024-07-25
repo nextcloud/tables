@@ -27,6 +27,7 @@ OC.L10N.register(
     "Delete" : "Устгах",
     "Owner" : "Эзэмшигч",
     "Select from Files" : "Файлуудаас сонгох",
+    "Preview" : "шалгах",
     "Please select a file." : "Файл сонгоно уу.",
     "Filter" : "Шүүлтүүр",
     "Copy" : "хуулах",
@@ -42,7 +43,6 @@ OC.L10N.register(
     "Undo" : "буцах",
     "URL" : "URL",
     "Confirm" : "Батлах",
-    "Preview" : "шалгах",
     "Select" : "Сонгох",
     "ID" : "ID"
 },

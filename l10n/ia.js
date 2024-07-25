@@ -32,6 +32,7 @@ OC.L10N.register(
     "Delete" : "Deler",
     "Close" : "Clauder",
     "Select from Files" : "Selectionar de Files",
+    "Preview" : "Previsualisar",
     "Please select a file." : "Per favor selectiona un file.",
     "Sort" : "Ordinar",
     "Favorites" : "Favoritos",
@@ -47,7 +48,6 @@ OC.L10N.register(
     "Suffix" : "Suffixo",
     "URL" : "URL",
     "Confirm" : "Confirmar",
-    "Preview" : "Previsualisar",
     "Select" : "Selectionar"
 },
 "nplurals=2; plural=(n != 1);");
