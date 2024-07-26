@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.5
+
+### Fixed
+* [[stable0.7] fix: remove View filter with null column (tables#1199)](https://github.com/nextcloud/tables/pull/1199)
+* [[stable0.7] fix: flaky Cypress tests (tables#1231)](https://github.com/nextcloud/tables/pull/1231)
+* [[stable0.7] fix(ViewService): treat missing index manageTable pragmatically (tables#1227)](https://github.com/nextcloud/tables/pull/1227)
+* [[stable0.7] fix(Capabilities): announce API 2.0 (tables#1216)](https://github.com/nextcloud/tables/pull/1216)
+* [[stable0.7] fix(api): Fix wrong array type (tables#1209)](https://github.com/nextcloud/tables/pull/1209)
+
 ## 0.7.4
 
 ### Added
