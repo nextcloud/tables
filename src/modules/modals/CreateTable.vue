@@ -7,11 +7,11 @@
 					<h2>{{ t('tables', 'Create table') }}</h2>
 				</div>
 			</div>
-			<div class="row space-T">
+			<div class="row">
 				<div class="col-4 mandatory">
 					{{ t('tables', 'Title') }}
 				</div>
-				<div class="col-4" style="display: inline-flex;">
+				<div class="col-4 content-emoji">
 					<NcEmojiPicker :close-on-select="true" @select="setIcon">
 						<NcButton type="tertiary"
 							:aria-label="t('tables', 'Select emoji for table')"
@@ -29,7 +29,7 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-4 mandatory">
+				<div class="col-4 space-T mandatory">
 					{{ t('tables', 'Description') }}
 				</div>
 				<div class="col-4">
@@ -236,6 +236,10 @@ export default {
 
 .modal__content {
 	padding-right: 0 !important;
+	.content-emoji {
+		display: inline-flex;
+		align-items: center;
+	}
 }
 
 </style>

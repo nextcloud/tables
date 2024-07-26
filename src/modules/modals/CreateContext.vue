@@ -10,7 +10,7 @@
 				<div class="col-4 mandatory">
 					{{ t('tables', 'Title') }}
 				</div>
-				<div class="col-4" style="display: inline-flex;">
+				<div class="col-4 content-emoji">
 					<NcIconPicker :close-on-select="true" @select="setIcon">
 						<NcButton
 							type="tertiary"
@@ -167,5 +167,10 @@ export default {
 <style lang="scss" scoped>
 .modal__content {
 	padding-right: 0 !important;
+
+	.content-emoji {
+		display: inline-flex;
+		align-items: center;
+	}
 }
 </style>

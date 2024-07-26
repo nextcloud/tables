@@ -12,7 +12,7 @@
 				<div class="col-4 mandatory">
 					{{ t('tables', 'Title') }}
 				</div>
-				<div class="col-3 inline">
+				<div class="col-3 content-emoji">
 					<NcEmojiPicker :close-on-select="true" @select="emoji => icon = emoji">
 						<NcButton type="tertiary"
 							:aria-label="t('tables', 'Select emoji for table')"
@@ -28,7 +28,7 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-4 mandatory">
+				<div class="col-4 space-T mandatory">
 					{{ t('tables', 'Description') }}
 				</div>
 				<div class="col-4">
@@ -191,6 +191,11 @@ export default {
 :deep(.element-description) {
 	padding-inline: 0 !important;
 	max-width: 100%;
+}
+
+.content-emoji {
+	display: inline-flex;
+	align-items: center;
 }
 
 </style>
