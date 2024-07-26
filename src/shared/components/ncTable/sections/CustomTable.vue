@@ -389,6 +389,14 @@ export default {
 	}
 }
 
+:deep(.text-editor__wrapper .paragraph-content:last-child) {
+	margin-bottom: 0!important;
+}
+
+:deep(.text-editor__wrapper .ProseMirror > *:first-child) {
+	margin-top: 0!important;
+}
+
 .selected-page{
 	padding-left: 5px;
 
