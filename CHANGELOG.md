@@ -1,5 +1,97 @@
 # Changelog
 
+## 0.8.0-beta.1
+
+### Feature highlights
+
+### Added
+
+- enh(Contexts): set active navigation entry @blizzz [#1037](https://github.com/nextcloud/tables/pull/1037)
+- enh(App): navigation tweaks for Contexts @blizzz [#1080](https://github.com/nextcloud/tables/pull/1080)
+- Enhancement/279 pagination for tables ui  @grnd-alt [#972](https://github.com/nextcloud/tables/pull/972)
+- feat: submit row details with ctrl + enter @luka-nextcloud [#1112](https://github.com/nextcloud/tables/pull/1112)
+- add table_id index to oc_tables_columns @grnd-alt [#1078](https://github.com/nextcloud/tables/pull/1078)
+- ci(integration): test against context sharing @blizzz [#1129](https://github.com/nextcloud/tables/pull/1129)
+- fix: pass view as prop to EmptyView @enjeck [#1147](https://github.com/nextcloud/tables/pull/1147)
+- enh(API): add OCS API to create rows @blizzz [#1161](https://github.com/nextcloud/tables/pull/1161)
+- feat: Add events for row added and row updated @come-nc [#1101](https://github.com/nextcloud/tables/pull/1101)
+- feat(import): change column format during import @luka-nextcloud [#944](https://github.com/nextcloud/tables/pull/944)
+- add scheme import and export @grnd-alt [#1170](https://github.com/nextcloud/tables/pull/1170)
+- feat: update error handling during import @luka-nextcloud [#1091](https://github.com/nextcloud/tables/pull/1091)
+- enh: gitignore Cypress download folder @enjeck [#1144](https://github.com/nextcloud/tables/pull/1144)
+- enh: Consolidate user/group search code @enjeck [#1025](https://github.com/nextcloud/tables/pull/1025)
+- enh: add context e2e tests @enjeck [#1149](https://github.com/nextcloud/tables/pull/1149)
+
+### Fixed
+
+- perf: Avoid extra queries to get the view ownership @juliushaertl [#1062](https://github.com/nextcloud/tables/pull/1062)
+- fix(DB): update tables_row_sleeves' sequence after migration @blizzz [#1049](https://github.com/nextcloud/tables/pull/1049)
+- perf: Make cache usable for unfavorited entries @juliushaertl [#1063](https://github.com/nextcloud/tables/pull/1063)
+- enh: Delete Application and its shares @enjeck [#1026](https://github.com/nextcloud/tables/pull/1026)
+- fix(DB): fetch pageId as int @blizzz [#1083](https://github.com/nextcloud/tables/pull/1083)
+- fix: reduce templates requests @luka-nextcloud [#1098](https://github.com/nextcloud/tables/pull/1098)
+- fix #1099 cosmetic bug: 3 typos `throw Error('Form ' + form + ' does no exist')` need correction @kirisakow [#1102](https://github.com/nextcloud/tables/pull/1102)
+- fix(Context): do not show hidden columns @blizzz [#1092](https://github.com/nextcloud/tables/pull/1092)
+- fix(Controller): remove unneeded endpoints @blizzz [#1130](https://github.com/nextcloud/tables/pull/1130)
+- fix(View): 'manageTable' array key is not always set @blizzz [#1136](https://github.com/nextcloud/tables/pull/1136)
+- fix: hide Create Column button on empty table if inadequate permissions @enjeck [#1151](https://github.com/nextcloud/tables/pull/1151)
+- fix: add aria-label to NcSelect @enjeck [#1148](https://github.com/nextcloud/tables/pull/1148)
+- fix(API): declared array shape was not correct @blizzz [#1169](https://github.com/nextcloud/tables/pull/1169)
+- Extract selection option labels for Analytics @Rello [#877](https://github.com/nextcloud/tables/pull/877)
+- fix(Backend): use object over loose array for permissions @blizzz [#1173](https://github.com/nextcloud/tables/pull/1173)
+- fix(api): Fix wrong array type @provokateurin [#1205](https://github.com/nextcloud/tables/pull/1205)
+- fix: remove View filter with null column @enjeck [#1199](https://github.com/nextcloud/tables/pull/1199)
+- fix(View): column might be saved as null @blizzz [#1196](https://github.com/nextcloud/tables/pull/1196)
+- fix(l10n): grammar fixes for table char limits @roliverio [#1084](https://github.com/nextcloud/tables/pull/1084)
+- fix: broken sort by date @luka-nextcloud [#1110](https://github.com/nextcloud/tables/pull/1110)
+- fix: insert context startpage for proper update @enjeck [#1146](https://github.com/nextcloud/tables/pull/1146)
+- fix: only add resource if user can manage resource @enjeck [#1160](https://github.com/nextcloud/tables/pull/1160)
+- fix(files): fix width, background of table row and interval between table header @JuliaKirschenheuter [#1220](https://github.com/nextcloud/tables/pull/1220)
+- fix(files): align icon to center @JuliaKirschenheuter [#1219](https://github.com/nextcloud/tables/pull/1219)
+- fix(files): remove unneeded extra place for the rows @JuliaKirschenheuter [#1234](https://github.com/nextcloud/tables/pull/1234)
+- fix: modify context nodes update @enjeck [#1178](https://github.com/nextcloud/tables/pull/1178)
+- fix: flaky Cypress tests @enjeck [#1204](https://github.com/nextcloud/tables/pull/1204)
+- fix(Capabilities): announce API 2.0 @blizzz [#1215](https://github.com/nextcloud/tables/pull/1215)
+- fix(files): remove pagination of there is just one page @JuliaKirschenheuter [#1218](https://github.com/nextcloud/tables/pull/1218)
+- Align button to the left side @JuliaKirschenheuter [#1240](https://github.com/nextcloud/tables/pull/1240)
+- use a built-in JS function `localeCompare()` to compare strings @kirisakow [#1141](https://github.com/nextcloud/tables/pull/1141)
+
+### Dependencies
+
+- fix(deps): update dependency @nextcloud/axios to ^2.5.0 (main) @renovate[bot] [#1053](https://github.com/nextcloud/tables/pull/1053)
+- fix(deps): update dependency @nextcloud/l10n to ^3.0.1 (main) @renovate[bot] [#1057](https://github.com/nextcloud/tables/pull/1057)
+- fix(deps): update dependency @nextcloud/l10n to v3 (main) @renovate[bot] [#1055](https://github.com/nextcloud/tables/pull/1055)
+- chore(deps): update dependency @nextcloud/stylelint-config to v3 (main) @renovate[bot] [#1054](https://github.com/nextcloud/tables/pull/1054)
+- fix(deps): update dependency @nextcloud/l10n to ^3.1.0 (main) @renovate[bot] [#1087](https://github.com/nextcloud/tables/pull/1087)
+- fix(deps): update tiptap to ^2.3.2 (main) @renovate[bot] [#1086](https://github.com/nextcloud/tables/pull/1086)
+- chore(deps): update dependency @nextcloud/babel-config to ^1.2.0 (main) @renovate[bot] [#1093](https://github.com/nextcloud/tables/pull/1093)
+- chore(deps): update dependency @nextcloud/eslint-config to ^8.4.1 (main) @renovate[bot] [#1094](https://github.com/nextcloud/tables/pull/1094)
+- fix(deps): update dependency @nextcloud/event-bus to ^3.3.0 (main) @renovate[bot] [#1095](https://github.com/nextcloud/tables/pull/1095)
+- fix(deps): update tiptap to ^2.4.0 (main) @renovate[bot] [#1096](https://github.com/nextcloud/tables/pull/1096)
+- chore(deps): update dependency openapi-typescript to ^6.7.6 (main) @renovate[bot] [#1106](https://github.com/nextcloud/tables/pull/1106)
+- fix(deps): update dependency debounce to ^2.1.0 (main) @renovate[bot] [#1108](https://github.com/nextcloud/tables/pull/1108)
+- fix(deps): update dependency @vueuse/core to ^10.10.0 (main) @renovate[bot] [#1115](https://github.com/nextcloud/tables/pull/1115)
+- fix(deps): update dependency @nextcloud/event-bus to ^3.3.1 (main) @renovate[bot] [#1114](https://github.com/nextcloud/tables/pull/1114)
+- chore(deps): Update openapi-extractor @provokateurin [#1116](https://github.com/nextcloud/tables/pull/1116)
+- fix(deps): update dependency @vueuse/core to ^10.11.0 (main) @renovate[bot] [#1142](https://github.com/nextcloud/tables/pull/1142)
+- chore(deps): update dependency cypress-downloadfile to ^1.2.4 (main) @renovate[bot] [#1162](https://github.com/nextcloud/tables/pull/1162)
+- chore(deps): update dependency openapi-typescript to v7 (main) @renovate[bot] [#1163](https://github.com/nextcloud/tables/pull/1163)
+- fix(deps): update dependency @nextcloud/vue to ^8.14.0 (main) @renovate[bot] [#1085](https://github.com/nextcloud/tables/pull/1085)
+- chore(deps): update dependency openapi-typescript to ^7.0.2 (main) @renovate[bot] [#1185](https://github.com/nextcloud/tables/pull/1185)
+- chore: update workflows from templates @skjnldsv [#1200](https://github.com/nextcloud/tables/pull/1200)
+- chore(deps): update dependency openapi-typescript to ^7.1.0 (main) @renovate[bot] [#1222](https://github.com/nextcloud/tables/pull/1222)
+
+### Other
+
+- ci(integration): tests against context deletion @blizzz [#1042](https://github.com/nextcloud/tables/pull/1042)
+- test(cypress): fix month names @blizzz [#1119](https://github.com/nextcloud/tables/pull/1119)
+- ci(integration): tests against context updates @blizzz [#1072](https://github.com/nextcloud/tables/pull/1072)
+- test(integration): cases against context transfer ownership @blizzz [#1124](https://github.com/nextcloud/tables/pull/1124)
+- ci(integration): add more share-related tests @blizzz [#1137](https://github.com/nextcloud/tables/pull/1137)
+- ci: add missing server branches to matrices @blizzz [#1168](https://github.com/nextcloud/tables/pull/1168)
+- chore: Drop Nextcloud 26 for the next release as it is EOL @juliushaertl [#1179](https://github.com/nextcloud/tables/pull/1179)
+- build(openapi): fix ms typescript generation command @blizzz [#1221](https://github.com/nextcloud/tables/pull/1221)
+
 ## 0.7.1
 
 ### Fixed
