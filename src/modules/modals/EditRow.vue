@@ -245,9 +245,8 @@ export default {
 	}
 
 	:where(.fix-col-1.end) {
-		display: inline-block;
-		position: relative;
-		left: 65%;
+		display: flex;
+		justify-content: flex-end;
 	}
 
 	:where(.fix-col-3) {
