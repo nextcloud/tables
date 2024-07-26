@@ -64,6 +64,7 @@ OC.L10N.register(
     "Transfer" : "Tràmuda",
     "Filter" : "Filtru",
     "Sort" : "Assenta",
+    "Export" : "Esporta",
     "Add to favorites" : "Agiunghe a preferidos",
     "Remove from favorites" : "Boga·nche dae preferidos",
     "Copy" : "Còpia",

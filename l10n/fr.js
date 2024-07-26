@@ -314,6 +314,7 @@ OC.L10N.register(
     "Could not create new view" : "Impossible de créer une nouvelle vue",
     "Could not update view" : "Impossible de mettre à jour la vue.",
     "Delete application" : "Supprimer l’application",
+    "Export" : "Exporter",
     "Add to favorites" : "Ajouter aux favoris",
     "Remove from favorites" : "Retirer des favoris",
     "Archive table" : "Archiver le tableau",

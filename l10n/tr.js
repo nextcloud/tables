@@ -325,6 +325,7 @@ OC.L10N.register(
     "Could not create new view" : "Yeni görünüm eklenemedi",
     "Could not update view" : "Görünüm güncellenemedi",
     "Delete application" : "Uygulamayı sil",
+    "Export" : "Dışa aktar",
     "Add to favorites" : "Sık kullanılanlara ekle",
     "Remove from favorites" : "Sık kullanılanlardan kaldır",
     "Archive table" : "Tabloyu arşivle",

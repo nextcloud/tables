@@ -48,6 +48,7 @@ OC.L10N.register(
     "Result" : "Resultado",
     "Filter" : "Filtrar",
     "Sort" : "Ordenar",
+    "Export" : "Exportar",
     "Add to favorites" : "Agregar a favoritos",
     "Favorites" : "Favoritos",
     "group" : "grupo",

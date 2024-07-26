@@ -54,6 +54,7 @@ OC.L10N.register(
     "Transfer" : "Transfer",
     "Filter" : "Filter",
     "Sort" : "Urutkan",
+    "Export" : "Ekspor",
     "Copy" : "Salin",
     "Favorites" : "Disukai",
     "Clear filter" : "Bersihkan filter",

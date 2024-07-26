@@ -91,6 +91,7 @@ OC.L10N.register(
     "Transfer" : "Persiųsti",
     "Filter" : "Filtras",
     "Sort" : "Rikiuoti",
+    "Export" : "Eksportuoti",
     "Remove from favorites" : "Šalinti iš svarbiausių",
     "Copy" : "Kopija",
     "Favorites" : "Mėgstami",

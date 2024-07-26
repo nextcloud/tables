@@ -326,6 +326,7 @@ OC.L10N.register(
     "Could not create new view" : "無法建立新檢視",
     "Could not update view" : "無法更新檢視",
     "Delete application" : "刪除應用程式",
+    "Export" : "匯出",
     "Add to favorites" : "新增至我的最愛",
     "Remove from favorites" : "取消我的最愛",
     "Archive table" : "封存表格",

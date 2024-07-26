@@ -326,6 +326,7 @@ OC.L10N.register(
     "Could not create new view" : "Није могао да се креира нови поглед",
     "Could not update view" : "Није могао да се ажурира поглед",
     "Delete application" : "Обриши апликацију",
+    "Export" : "Извези",
     "Add to favorites" : "Додаје у омиљене",
     "Remove from favorites" : "Избаци из омиљених",
     "Archive table" : "Архивирај табелу",

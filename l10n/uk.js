@@ -324,6 +324,7 @@ OC.L10N.register(
     "Could not create new view" : "Не вдалося створити нове подання",
     "Could not update view" : "Не вдалося оновити подання",
     "Delete application" : "Вилучити застосунок",
+    "Export" : "Експортувати",
     "Add to favorites" : "Додати зірочку",
     "Remove from favorites" : "Прибрати зірочку",
     "Archive table" : "Архівувати таблицю",

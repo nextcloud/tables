@@ -26,6 +26,7 @@ OC.L10N.register(
     "Delete" : "Padam",
     "Close" : "Tutup",
     "Sort" : "Susun",
+    "Export" : "Eksport",
     "Favorites" : "Favorites",
     "group" : "kumpulan",
     "Update" : "Kemaskini",

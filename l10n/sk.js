@@ -251,6 +251,7 @@ OC.L10N.register(
     "Title is missing." : "Chýba názov.",
     "Could not create new view" : "Nepodarilo sa vytvoriť nové zobrazenie",
     "Could not update view" : "Nebolo možné aktualizovať zobrazenie",
+    "Export" : "Export",
     "Add to favorites" : "Pridať do obľúbených",
     "Remove from favorites" : "Odstrániť z obľúbených",
     "Delete table" : "Vymazať tabuľku",

@@ -51,6 +51,7 @@ OC.L10N.register(
     "Preview" : "Antaŭvidi",
     "Please select a file." : "Bonvolu elekti dosieron.",
     "Sort" : "Ordigi",
+    "Export" : "Eksporti",
     "Add to favorites" : "Aldoni al pliŝatataĵoj",
     "Remove from favorites" : "Malpliŝatigi",
     "Favorites" : "Plej ŝatataj",

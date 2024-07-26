@@ -29,6 +29,7 @@ OC.L10N.register(
     "Delete" : "លុប",
     "Close" : "បិទ",
     "Sort" : "តម្រៀប",
+    "Export" : "នាំចេញ",
     "Favorites" : "Favorites",
     "group" : "ក្រុម",
     "Delete data" : "លុបទិន្នន័យ",

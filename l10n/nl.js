@@ -98,6 +98,7 @@ OC.L10N.register(
     "Transfer" : "Overdragen",
     "Filter" : "Filter",
     "Sort" : "Sorteren",
+    "Export" : "Exporteren",
     "Add to favorites" : "Toevoegen aan favorieten",
     "Remove from favorites" : "Verwijder uit favorieten",
     "Delete table" : "Verwijder tabel",

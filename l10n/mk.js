@@ -54,6 +54,7 @@ OC.L10N.register(
     "Transfer" : "Пренос",
     "Filter" : "Филтер",
     "Sort" : "Сортирај",
+    "Export" : "Извези",
     "Remove from favorites" : "Избриши од фаворити",
     "Favorites" : "Омилени",
     "Clear filter" : "Исчисти филтри",

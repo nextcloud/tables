@@ -23,6 +23,7 @@ OC.L10N.register(
     "Cancel" : "ۋاز كەچ",
     "Delete" : "ئۆچۈر",
     "Close" : "ياپ",
+    "Export" : "چىقار",
     "Favorites" : "يىغقۇچ",
     "group" : "گۇرۇپپا",
     "Sharing" : "ھەمبەھىر",

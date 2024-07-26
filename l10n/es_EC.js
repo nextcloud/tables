@@ -213,6 +213,7 @@ OC.L10N.register(
     "Transfer" : "Transferencia",
     "Filter" : "Filtrar",
     "Sort" : "Ordenar",
+    "Export" : "Exportar",
     "Add to favorites" : "Agregar a favoritos",
     "Delete table" : "Eliminar tabla",
     "Do you really want to delete the table \"{table}\"?" : "¿Realmente deseas eliminar la tabla \"{table}\"?",

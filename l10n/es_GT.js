@@ -45,6 +45,7 @@ OC.L10N.register(
     "Please select a file." : "Por favor selecciona un archivo.",
     "Result" : "Resultado",
     "Filter" : "Filtrar",
+    "Export" : "Exportar",
     "Add to favorites" : "Agregar a favoritos",
     "Favorites" : "Favoritos",
     "group" : "grupo",

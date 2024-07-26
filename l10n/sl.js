@@ -247,6 +247,7 @@ OC.L10N.register(
     "Title is missing." : "Manjka naziv",
     "Could not create new view" : "Ni mogoče ustvariti novega pogleda",
     "Could not update view" : "Ni mogoče posodobiti pogleda",
+    "Export" : "Izvozi",
     "Add to favorites" : "Dodaj med priljubljene",
     "Remove from favorites" : "Odstrani iz priljubljenih",
     "Delete table" : "Izbriši razpredelnico",

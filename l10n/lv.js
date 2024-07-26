@@ -51,6 +51,7 @@ OC.L10N.register(
     "Preview" : "Priekšskatīt",
     "Please select a file." : "Lūdzu izvēlies datni.",
     "Sort" : "Kārtot",
+    "Export" : "Eksportēt",
     "Add to favorites" : "Pievienot favorītiem",
     "Copy" : "Kopēt",
     "Favorites" : "Favorīti",

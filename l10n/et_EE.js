@@ -47,6 +47,7 @@ OC.L10N.register(
     "Please select a file." : "Palun vali fail.",
     "Filter" : "Filter",
     "Sort" : "Sorteeri",
+    "Export" : "Ekspordi",
     "Favorites" : "Lemmikud",
     "No recommendations. Start typing." : "Soovitusi pole. Alusta trükkimist.",
     "group" : "grupp",

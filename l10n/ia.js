@@ -35,6 +35,7 @@ OC.L10N.register(
     "Preview" : "Previsualisar",
     "Please select a file." : "Per favor selectiona un file.",
     "Sort" : "Ordinar",
+    "Export" : "Exportar",
     "Favorites" : "Favoritos",
     "group" : "gruppo",
     "Sharing" : "Compartente",

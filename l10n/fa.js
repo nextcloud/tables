@@ -266,6 +266,7 @@ OC.L10N.register(
     "Title is missing." : "Title is missing.",
     "Could not create new view" : "Could not create new view",
     "Could not update view" : "Could not update view",
+    "Export" : "دریافت خروجی",
     "Add to favorites" : "افزودن به برگزیده‌ها",
     "Remove from favorites" : "حذف از برگزیده‌ها",
     "Delete table" : "Delete table",

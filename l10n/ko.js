@@ -264,6 +264,7 @@ OC.L10N.register(
     "Title is missing." : "제목이 없습니다.",
     "Could not create new view" : "새 보기를 만들 수 없음",
     "Could not update view" : "보기를 갱신할 수 없음",
+    "Export" : "내보내기",
     "Remove from favorites" : "즐겨찾기에서 삭제",
     "Delete table" : "표 삭제",
     "Do you really want to delete the table \"{table}\"?" : "표 \"{table}\"을(를) 정말 삭제하겠습니까?",

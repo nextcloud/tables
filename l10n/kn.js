@@ -20,6 +20,7 @@ OC.L10N.register(
     "Cancel" : "﻿ರದ್ದು",
     "Delete" : "﻿ಅಳಿಸಿ",
     "Close" : "ಮುಚ್ಚು",
+    "Export" : "ರಫ್ತು",
     "Copy" : "ನಕಲಿಸಿ",
     "Favorites" : "ಅಚ್ಚುಮೆಚ್ಚಿನ",
     "group" : "﻿ಗುಂಪು",

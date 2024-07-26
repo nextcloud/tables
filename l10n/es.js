@@ -325,6 +325,7 @@ OC.L10N.register(
     "Could not create new view" : "No se pudo crear vista nueva",
     "Could not update view" : "No se pudo actualizar la vista",
     "Delete application" : "Eliminar aplicación",
+    "Export" : "Exportar",
     "Add to favorites" : "Añadir a favoritos",
     "Remove from favorites" : "Eliminar de favoritos",
     "Archive table" : "Archivar tabla",

@@ -280,6 +280,7 @@ OC.L10N.register(
     "Title is missing." : "Chybí nadpis.",
     "Could not create new view" : "Nepodařilo se vytvořit nový pohled",
     "Could not update view" : "Nepodařil ose zaktualizovat pohled",
+    "Export" : "Exportovat",
     "Add to favorites" : "Přidat do oblíbených",
     "Remove from favorites" : "Odebrat z oblíbených",
     "Delete table" : "Smazat tabulku",

@@ -30,6 +30,7 @@ OC.L10N.register(
     "Preview" : "шалгах",
     "Please select a file." : "Файл сонгоно уу.",
     "Filter" : "Шүүлтүүр",
+    "Export" : "Экспорт",
     "Copy" : "хуулах",
     "Favorites" : "Онцолсон",
     "group" : "бүлэг",

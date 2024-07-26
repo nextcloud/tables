@@ -213,6 +213,7 @@ OC.L10N.register(
     "Title is missing." : "Заголовок отсустувует.",
     "Could not create new view" : "Ошибка при создании представления",
     "Could not update view" : "Ошибка при изменении представления",
+    "Export" : "Экспорт",
     "Add to favorites" : "Добавить в избранное",
     "Remove from favorites" : "Убрать из избранного",
     "Delete table" : "Удалить таблицу",

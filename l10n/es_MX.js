@@ -60,6 +60,7 @@ OC.L10N.register(
     "Transfer" : "Transferir",
     "Filter" : "Filtrar",
     "Sort" : "Ordenar",
+    "Export" : "Exportar",
     "Remove from favorites" : "Eliminar de favoritos",
     "Copy" : "Copiar",
     "Favorites" : "Favoritos",

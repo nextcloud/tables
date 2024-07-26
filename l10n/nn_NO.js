@@ -33,6 +33,7 @@ OC.L10N.register(
     "Please select a file." : "Ver venleg og vel ei fil.",
     "Filter" : "Filter",
     "Sort" : "Sorter",
+    "Export" : "Eksporter",
     "Add to favorites" : "Legg til i favorittar",
     "Copy" : "Kopier",
     "Favorites" : "Favorittar",

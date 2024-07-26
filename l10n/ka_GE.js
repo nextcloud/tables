@@ -43,6 +43,7 @@ OC.L10N.register(
     "Result" : "შედეგი",
     "Filter" : "ფილტრი",
     "Sort" : "განლაგება",
+    "Export" : "ექსპორტი",
     "Remove from favorites" : "რჩეულებიდან მოშორება",
     "Favorites" : "რჩეულები",
     "group" : "ჯგუფი",

@@ -53,6 +53,7 @@ OC.L10N.register(
     "Preview" : "Apercebut",
     "Please select a file." : "Seleccionatz un fichièr.",
     "Sort" : "Triar",
+    "Export" : "Exportar",
     "Add to favorites" : "Apondre als favorits",
     "Remove from favorites" : "Tirar dels favorits",
     "Favorites" : "Favorits",

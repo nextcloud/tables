@@ -30,6 +30,7 @@ OC.L10N.register(
     "Close" : "Zoumaachen",
     "Please select a file." : "Wiel eng Datei aus.",
     "Sort" : "Zortéieren",
+    "Export" : "Exportéieren",
     "Copy" : "Kopie",
     "Favorites" : "Favoriten",
     "group" : "Grupp",

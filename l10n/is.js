@@ -61,6 +61,7 @@ OC.L10N.register(
     "Transfer" : "Færa",
     "Filter" : "Sía",
     "Sort" : "Flokka",
+    "Export" : "Flytja út",
     "Copy" : "Afrita",
     "Favorites" : "Eftirlæti",
     "Clear filter" : "Hreinsa síu",

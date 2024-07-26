@@ -33,6 +33,7 @@ OC.L10N.register(
     "Close" : "Փակել",
     "Please select a file." : "Խնդրում ենք ընտրել նիշք:",
     "Sort" : "Դասակարգել",
+    "Export" : "Արտահանում",
     "Copy" : "Պատճենել",
     "Favorites" : "Սիրվածներ",
     "group" : "խումբ",

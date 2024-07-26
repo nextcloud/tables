@@ -142,6 +142,7 @@ OC.L10N.register(
     "Transfer" : "Siirrä",
     "Filter" : "Suodatin",
     "Sort" : "Lajittele",
+    "Export" : "Vie",
     "Add to favorites" : "Lisää suosikkeihin",
     "Remove from favorites" : "Poista suosikeista",
     "Delete table" : "Poista taulukko",

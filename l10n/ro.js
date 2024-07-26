@@ -57,6 +57,7 @@ OC.L10N.register(
     "Transfer" : "Transfer",
     "Filter" : "Filtru",
     "Sort" : "Sortează",
+    "Export" : "Exportă",
     "Add to favorites" : "Adaugă la favorite",
     "Copy" : "Copiază",
     "Favorites" : "Favorite",

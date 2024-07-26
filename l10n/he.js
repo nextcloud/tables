@@ -109,6 +109,7 @@ OC.L10N.register(
     "Transfer" : "העברה",
     "Filter" : "מסנן",
     "Sort" : "מיון",
+    "Export" : "ייצוא",
     "Copy" : "העתקה",
     "Favorites" : "מועדפים",
     "Clear filter" : "מחיקת מסנן",

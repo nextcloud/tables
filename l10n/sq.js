@@ -46,6 +46,7 @@ OC.L10N.register(
     "Result" : "Rezultatet",
     "Filter" : "Filtro",
     "Sort" : "Renditni",
+    "Export" : "Eksport",
     "Add to favorites" : "U shtua te të parapëlqyerat",
     "Remove from favorites" : "Hiqeni nga të parapëlqyerat",
     "Copy" : "Kopjoni",

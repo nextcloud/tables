@@ -213,6 +213,7 @@ OC.L10N.register(
     "Transfer" : "Overførsel",
     "Filter" : "Filter",
     "Sort" : "Sortér",
+    "Export" : "Eksportér",
     "Add to favorites" : "Tilføj til favoritter",
     "Remove from favorites" : "Fjern fra favoritter",
     "Delete table" : "Slet tabel",

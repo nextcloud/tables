@@ -35,6 +35,7 @@ OC.L10N.register(
     "Close" : "Cau",
     "Preview" : "Rhagolwg",
     "Sort" : "Trefnu",
+    "Export" : "Allforio",
     "Favorites" : "Ffefrynnau",
     "group" : "grŵp",
     "Created at" : "Crëwyd ar",

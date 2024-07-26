@@ -26,6 +26,7 @@ OC.L10N.register(
     "Delete" : "நீக்குக",
     "Owner" : "Owner",
     "Close" : "மூடுக",
+    "Export" : "ஏற்றுமதி",
     "Remove from favorites" : "Remove from favorites",
     "Favorites" : "விருப்பங்கள்",
     "group" : "குழு",

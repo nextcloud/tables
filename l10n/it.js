@@ -121,6 +121,7 @@ OC.L10N.register(
     "Transfer" : "Trasferisci",
     "Filter" : "Filtra",
     "Sort" : "Ordina",
+    "Export" : "Esporta",
     "Add to favorites" : "Aggiungi ai preferiti",
     "Remove from favorites" : "Rimuovi dai preferiti",
     "Delete table" : "Elimina tabella",

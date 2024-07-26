@@ -195,6 +195,7 @@ OC.L10N.register(
     "Transfer" : "Transferitu",
     "Filter" : "Iragazi",
     "Sort" : "Ordenatu",
+    "Export" : "Esportatu",
     "Add to favorites" : "Gehitu gogokoetara",
     "Remove from favorites" : "Kendu gogokoetatik",
     "Delete table" : "Ezabatu taula",

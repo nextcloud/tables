@@ -326,6 +326,7 @@ OC.L10N.register(
     "Could not create new view" : "Kunne ikke opprette ny visning",
     "Could not update view" : "Kunne ikke oppdatere visning",
     "Delete application" : "Slett applikasjon",
+    "Export" : "Eksporter",
     "Add to favorites" : "Legg til favoritter",
     "Remove from favorites" : "Fjern fra favoritter",
     "Archive table" : "Arkiver tabell",

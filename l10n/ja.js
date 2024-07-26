@@ -263,6 +263,7 @@ OC.L10N.register(
     "Transfer" : "転送",
     "Filter" : "フィルター",
     "Sort" : "並び替え",
+    "Export" : "エクスポート",
     "Add to favorites" : "お気に入りに追加",
     "Delete table" : "表を削除",
     "Do you really want to delete the table \"{table}\"?" : "本当にテーブル\"{table}\"を削除しますか？",

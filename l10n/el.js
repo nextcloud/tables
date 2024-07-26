@@ -276,6 +276,7 @@ OC.L10N.register(
     "Title is missing." : "Απουσιάζει ο τίτλος.",
     "Could not create new view" : "Δεν ήταν δυνατή η δημιουργία νέας προβολής",
     "Could not update view" : "Δεν ήταν δυνατή η ενημέρωση της προβολής",
+    "Export" : "Εξαγωγή",
     "Add to favorites" : "Προσθήκη στα αγαπημένα ",
     "Remove from favorites" : "Αφαίρεση από τα αγαπημένα",
     "Archive table" : "Αρχειοθέτηση πίνακα",

@@ -268,6 +268,7 @@ OC.L10N.register(
     "Title is missing." : "Hiányzó cím.",
     "Could not create new view" : "Nem hozható létre új nézet",
     "Could not update view" : "Nem sikerült frissíteni a nézetet",
+    "Export" : "Exportálás",
     "Add to favorites" : "Hozzáadás a kedvencekhez ",
     "Remove from favorites" : "Eltávolítás a kedvencek közül",
     "Delete table" : "Táblázat törlése",
