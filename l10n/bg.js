@@ -198,6 +198,7 @@ OC.L10N.register(
     "Transfer" : "Прехвърляне",
     "Filter" : "Филтър",
     "Sort" : "Сортирай",
+    "Export" : "Експорт /изнасям/",
     "Add to favorites" : "Добавяне към любими",
     "Remove from favorites" : "Премахване от любими",
     "Delete table" : "Изтриване на таблица",

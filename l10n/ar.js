@@ -229,6 +229,8 @@ OC.L10N.register(
     "Custom table from scratch." : "جدول مخصص من البداية.",
     "📄 Import table" : "إستيراد جدول",
     "Import table from file." : "إستيراد جدول من ملف",
+    "📄 Import Scheme" : "📄 مخطط الاستيراد",
+    "Import Scheme from file." : "مخطط الاستيراد من ملف.",
     "Cannot create new table. Title is missing." : "لا يمكن إنشاء جدول جديد. العنوان مفقود.",
     "Could not create new table" : "تعذر إنشاء جدول جديد",
     "Could not load templates." : "تعذر تحميل القوالب.",
@@ -312,6 +314,7 @@ OC.L10N.register(
     "Inserted rows" : "الصفوف المدرجة",
     "Value parsing errors" : "خطأ في تحليل القيمة",
     "Row creation errors" : "خطأ في إنشاء السطر",
+    "Import scheme" : "مخطط الاستيراد",
     "Transfer the application \"{context}\" to another user" : "نقل التطبيق \"{context}\"  إلى مستخدِم آخرَ",
     "Transfer" : "نقل",
     "Context \"{name}\" transferred to {user}" : "تمّ نقل السياق \"{name}\" إلى المستخدِم {user}",
@@ -333,6 +336,7 @@ OC.L10N.register(
     "Could not create new view" : "يتعذّر إنشاء منظور جديد",
     "Could not update view" : "يتعذّر تحديث المنظور",
     "Delete application" : "حذف التطبيق",
+    "Export" : "تصدير",
     "Add to favorites" : "أضِف إلى المفضلة",
     "Remove from favorites" : "إزالة مِن المفضلة",
     "Archive table" : "أرشفة جدول",

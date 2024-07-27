@@ -140,6 +140,7 @@ OC.L10N.register(
     "Move" : "移動",
     "Metadata" : "メタデータ",
     "Column" : "カラム",
+    "Operator" : "条件",
     "Delete filter" : "フィルターを削除",
     "JJJJ-MM-DD hh:mm" : "JJJJ-MM-DD hh:mm",
     "JJJJ-MM-DD" : "JJJJ-MM-DD",
@@ -336,7 +337,18 @@ OC.L10N.register(
     "Content" : "内容",
     "Select" : "選択",
     "Insert" : "挿入する",
+    "Begins with" : "で始まる",
+    "Ends with" : "で終わる",
+    "Is equal" : "値を含む",
+    "Is greater than" : "値より大きい",
+    "Is greater than or equal" : "値以上である",
+    "Is lower than" : "値より小さい",
+    "Is lower than or equal" : "値以下である",
+    "Is empty" : "値が空",
     "Unchecked" : "未チェック",
-    "ID" : "ID"
+    "ID" : "ID",
+    "Creator" : "作成者",
+    "Last editor" : "最終更新者",
+    "Last edited at" : "最終更新日"
 },
 "nplurals=1; plural=0;");

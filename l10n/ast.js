@@ -175,6 +175,7 @@ OC.L10N.register(
     "Cannot create view." : "Nun se pue crear la vista.",
     "Title is missing." : "Falta'l títulu.",
     "Could not update view" : "Nun se pudo anovar la vista",
+    "Export" : "Esportar",
     "Add to favorites" : "Meter en Favoritos",
     "Remove from favorites" : "Quitar de Favoritos",
     "Delete table" : "Desaniciar la tabla",
