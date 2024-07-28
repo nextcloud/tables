@@ -102,16 +102,27 @@ class AnalyticsDatasource implements IDatasource {
 			$tables = $this->tableService->findAll($this->userId);
 		}
 
-		// concatenate the option-string. The format is tableId:viewId-title
+		// get all tables and subsequent views
 		foreach ($tables as $table) {
 			$tableString = $tableString . $table->getId() . '-' . $table->getTitle() . '/';
 			// get all views per table
-			$views = $this->viewService->findAll($this->tableService->find($table->getId()));
-			foreach ($views as $view) {
-				$tableString = $tableString . $table->getId() . ':' . $view->getId() . '-' . $view->getTitle() . '/';
+			try {
+				$views = $this->viewService->findAll($this->tableService->find($table->getId()), $this->userId);
+				foreach ($views as $view) {
+					// concatenate the option-string. The format is tableId:viewId-title
+					$tableString = $tableString . $table->getId() . ':' . $view->getId() . '-' . $view->getTitle() . '/';
+				}
+			} catch (PermissionError $e) {
+				// this is a shared table without shared views;
+				continue;
 			}
 		}
 
+		// get shared views without table authorization
+		$views = $this->viewService->findSharedViewsWithMe($this->userId);
+		foreach ($views as $view) {
+			$tableString = $tableString . $view->getTableId() . ':' . $view->getId() . '-' . $view->getTitle() . '/';
+		}
 		// add the tables to a dropdown in the data source settings
 		$template[] = ['id' => 'tableId', 'name' => $this->l10n->t('Select table'), 'type' => 'tf', 'placeholder' => $tableString];
 		$template[] = ['id' => 'columns', 'name' => $this->l10n->t('Select columns'), 'placeholder' => $this->l10n->t('e.g. 1,2,4 or leave empty'), 'type' => 'columnPicker'];
