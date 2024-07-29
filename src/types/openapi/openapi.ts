@@ -1937,8 +1937,8 @@ export interface operations {
                     readonly permissionManage?: boolean;
                     /**
                      * Format: int64
-                     * @description context shares only, whether it should appear in nav bar. 0: no, 1: recipients, 2: all
-                     * @default 0
+                     * @description context shares only, whether it should appear in nav bar. 0: no, 1: recipients, 2: all (default). Cf. Application::NAV_ENTRY_MODE_*.
+                     * @default 2
                      */
                     readonly displayMode?: number;
                 };

@@ -2538,8 +2538,10 @@
                                     "displayMode": {
                                         "type": "integer",
                                         "format": "int64",
-                                        "default": 0,
-                                        "description": "context shares only, whether it should appear in nav bar. 0: no, 1: recipients, 2: all"
+                                        "default": 2,
+                                        "description": "context shares only, whether it should appear in nav bar. 0: no, 1: recipients, 2: all (default). Cf. Application::NAV_ENTRY_MODE_*.",
+                                        "minimum": 0,
+                                        "maximum": 2
                                     }
                                 }
                             }
