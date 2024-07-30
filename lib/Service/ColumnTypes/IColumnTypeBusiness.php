@@ -11,7 +11,7 @@ interface IColumnTypeBusiness {
 	 *
 	 * Used when inserting from API to the database
 	 *
-	 * FIXME: Why is this not using Mapper::parseValueIncoming which should do the same thing
+	 * FIXME: Why is this not using Mapper methods which should do the same thing
 	 *
 	 * @param mixed $value
 	 * @param Column|null $column

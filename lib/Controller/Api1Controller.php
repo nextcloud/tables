@@ -155,7 +155,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (InternalError|Exception $e) {
@@ -187,7 +187,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (InternalError|Exception $e) {
@@ -222,7 +222,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (InternalError|Exception $e) {
@@ -254,7 +254,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (InternalError|Exception $e) {
@@ -288,7 +288,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (InternalError|Exception $e) {
@@ -355,7 +355,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		}
@@ -416,7 +416,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		}
@@ -450,7 +450,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		}
@@ -549,7 +549,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		}
@@ -581,7 +581,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		}
@@ -615,7 +615,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		}
@@ -660,7 +660,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (PermissionError $e) {
@@ -729,7 +729,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		}
@@ -850,7 +850,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (DoesNotExistException $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		}
@@ -982,7 +982,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (InternalError|Exception $e) {
@@ -1014,7 +1014,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (InternalError|Exception $e) {
@@ -1231,7 +1231,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		}
@@ -1307,7 +1307,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		}
@@ -1340,7 +1340,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		}
@@ -1373,7 +1373,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError|DoesNotExistException $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		}
@@ -1406,7 +1406,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError|DoesNotExistException $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		}
@@ -1448,7 +1448,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		}
@@ -1568,7 +1568,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (DoesNotExistException $e) {
-			$this->logger->warning('A not found error occurred: ' . $e->getMessage());
+			$this->logger->info('A not found error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		}

@@ -13,10 +13,8 @@ class RowCellNumberMapper extends RowCellMapperSuper {
 		parent::__construct($db, $this->table, RowCellNumber::class);
 	}
 
-	/**
-	 * @inheritDoc
-	 */
-	public function parseValueOutgoing(Column $column, $value) {
+	public function formatEntity(Column $column, RowCellSuper $cell) {
+		$value = $cell->getValue();
 		if($value === '') {
 			return null;
 		}
@@ -28,14 +26,11 @@ class RowCellNumberMapper extends RowCellMapperSuper {
 		}
 	}
 
-	/**
-	 * @inheritDoc
-	 */
-	public function parseValueIncoming(Column $column, $value): ?float {
-		if(!is_numeric($value)) {
-			return null;
+	public function applyDataToEntity(Column $column, RowCellSuper $cell, $data): void {
+		if(!is_numeric($data)) {
+			$cell->setValueWrapper(null);
 		}
-		return (float) $value;
+		$cell->setValueWrapper((float)$data);
 	}
 
 	public function getDbParamType() {

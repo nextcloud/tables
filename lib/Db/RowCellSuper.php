@@ -15,8 +15,6 @@ use OCP\AppFramework\Db\Entity;
  * @method setRowId(int $rowId)
  * @method getValue(): string
  * @method setValue(string $value)
- * @method getValueType(): int
- * @method setValueType(int $valueType)
  * @method getCreatedBy(): string
  * @method setCreatedBy(string $createdBy)
  * @method getCreatedAt(): string
@@ -31,11 +29,33 @@ abstract class RowCellSuper extends Entity implements JsonSerializable {
 	protected ?int $rowId = null;
 	protected ?string $lastEditBy = null;
 	protected ?string $lastEditAt = null;
+	protected ?string $createdBy = null;
+	protected ?string $createdAt = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');
 		$this->addType('columnId', 'integer');
 		$this->addType('rowId', 'integer');
+	}
+
+	/**
+	 * Same as Entity::fromRow but ignoring unknown properties
+	 */
+	public static function fromRowData(array $row): RowCellSuper {
+		$instance = new static();
+
+		foreach ($row as $key => $value) {
+			$property = $instance->columnToProperty($key);
+			$setter = 'set' . ucfirst($property);
+			;
+			if (property_exists($instance, $property)) {
+				$instance->$setter($value);
+			}
+		}
+
+		$instance->resetUpdatedFields();
+
+		return $instance;
 	}
 
 	/**
@@ -64,9 +84,5 @@ abstract class RowCellSuper extends Entity implements JsonSerializable {
 
 	public function setValueWrapper($value) {
 		$this->setValue($value);
-	}
-
-	public function setValueTypeWrapper($valueType) {
-		$this->setValueType($valueType);
 	}
 }

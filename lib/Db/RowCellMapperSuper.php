@@ -22,35 +22,37 @@ class RowCellMapperSuper extends QBMapper {
 	}
 
 	/**
-	 * Transform database value to row result data
-	 * (e.g. when selecting rows)
+	 * Format a row cell entity to API response array
 	 *
-	 * Example use case: table stores json encoded string, output is an array
-	 *
-	 * @param Column $column
-	 * @param TIncoming $value
+	 * @param T $cell
 	 * @return TOutgoing
 	 */
-	public function parseValueOutgoing(Column $column, $value) {
+	public function formatEntity(Column $column, RowCellSuper $cell) {
+		/** @var TOutgoing $value */
+		$value = $cell->getValue();
+		return $value;
+	}
+	/*
+	 * Transform value from a filter rule to the actual query parameter used
+	 * for constructing the view filter query
+	 */
+	public function filterValueToQueryParam(Column $column, $value) {
 		return $value;
 	}
 
-	/**
-	 * Transform value to actual database values to be used in db queries
-	 * (e.g. when filtering for row values in views)
-	 *
-	 * Example use case: input is an array, output is json encoded string to be stored in the db
-	 *
-	 * @param Column $column
-	 * @param TOutgoing $value
-	 * @return TIncoming
-	 */
-	public function parseValueIncoming(Column $column, $value) {
-		return $value;
+	public function applyDataToEntity(Column $column, RowCellSuper $cell, $data): void {
+		$cell->setValue($data);
 	}
 
 	public function getDbParamType() {
 		return IQueryBuilder::PARAM_STR;
+	}
+
+	/*
+	 * Indicating that the column can have multiple values represented by individual entities
+	 */
+	public function hasMultipleValues(): bool {
+		return false;
 	}
 
 	/**

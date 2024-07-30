@@ -149,6 +149,8 @@ namespace OCA\Tables;
  *     displayMode: int,
  *     userId: string,
  * }
+ *
+ * @psalm-type TablesColumn
  */
 class ResponseDefinitions {
 }

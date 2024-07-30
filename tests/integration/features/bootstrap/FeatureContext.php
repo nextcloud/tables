@@ -542,6 +542,10 @@ class FeatureContext implements Context {
 	 *
 	 */
 	public function printRegister(): void {
+		if (getenv('DEBUG') === '') {
+			return;
+		}
+
 		echo "REGISTER ========================\n";
 		echo "Tables --------------------\n";
 		print_r($this->tableIds);

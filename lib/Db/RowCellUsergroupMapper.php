@@ -3,26 +3,38 @@
 namespace OCA\Tables\Db;
 
 use OCP\IDBConnection;
+use OCP\IUserManager;
 
-/** @template-extends RowCellMapperSuper<RowCellUsergroup, string, string> */
+/** @template-extends RowCellMapperSuper<RowCellUsergroup, array, array> */
 class RowCellUsergroupMapper extends RowCellMapperSuper {
 	protected string $table = 'tables_row_cells_usergroup';
 
-	public function __construct(IDBConnection $db) {
+	public function __construct(IDBConnection $db, private IUserManager $userManager) {
 		parent::__construct($db, $this->table, RowCellUsergroup::class);
 	}
 
-	/**
-	 * @inheritDoc
-	 */
-	public function parseValueIncoming(Column $column, $value): array {
-		return json_decode($value, true);
+	public function filterValueToQueryParam(Column $column, $value) {
+		return $value;
 	}
 
-	/**
-	 * @inheritDoc
-	 */
-	public function parseValueOutgoing(Column $column, $value, ?int $value_type = null): string {
-		return json_encode(['id' => $value, 'type' => $value_type]);
+	public function applyDataToEntity(Column $column, RowCellSuper $cell, $data): void {
+		if (!RowCellUsergroup::verifyUserGroupArray($data)) {
+			throw new \InvalidArgumentException('Provided value is not valid user group data');
+		}
+
+		$cell->setValueWrapper($data);
+	}
+
+	public function formatEntity(Column $column, RowCellSuper $cell) {
+		$displayName = $cell->getValueType() === 0 ? ($this->userManager->getDisplayName($cell->getValue()) ?? $cell->getValue()) : $cell->getValue();
+		return [
+			'id' => $cell->getValue(),
+			'type' => $cell->getValueType(),
+			'displayName' => $displayName,
+		];
+	}
+
+	public function hasMultipleValues(): bool {
+		return true;
 	}
 }

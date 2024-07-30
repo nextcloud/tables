@@ -21,28 +21,8 @@ class Version000800Date20240712000000 extends SimpleMigrationStep {
 		$schema = $schemaClosure();
 
 		$hasChanges = $this->createUserGroupTable($schema, 'usergroup', Types::TEXT);
-		$hasChanges = $this->haveValueTypeColumn($schema) ?? $hasChanges;
 		$hasChanges = $this->haveUserGroupColumnDefinitionFields($schema) ?? $hasChanges;
 
-		return $hasChanges;
-	}
-
-	/**
-	 * Add new value_type column to all existing tables_row_cells_ tables for cell data
-	 */
-	private function haveValueTypeColumn(ISchemaWrapper $schema): ?ISchemaWrapper {
-		$existingTypes = Version000700Date20230916000000::$columns;
-		$hasChanges = null;
-		foreach ($existingTypes as $type) {
-			$tableName = 'tables_row_cells_' . $type['name'];
-			if ($schema->hasTable($tableName)) {
-				$table = $schema->getTable($tableName);
-				if (!$table->hasColumn('value_type')) {
-					$table->addColumn('value_type', Types::INTEGER, ['notnull' => false]);
-					$hasChanges = $schema;
-				}
-			}
-		}
 		return $hasChanges;
 	}
 
