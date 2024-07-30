@@ -12,8 +12,8 @@ use OCP\IDBConnection;
 /**
  * @template-extends QBMapper<T>
  * @template T of RowCellSuper
- * @template TIncoming
- * @template TOutgoing
+ * @template TIncoming Type the db is using to store the actual value
+ * @template TOutgoing Type the API is using
  */
 class RowCellMapperSuper extends QBMapper {
 
@@ -22,11 +22,13 @@ class RowCellMapperSuper extends QBMapper {
 	}
 
 	/**
-	 * Parse value for db results (after send request)
-	 * eg for filtering
+	 * Transform database value to row result data
+	 * (e.g. when selecting rows)
+	 *
+	 * Example use case: table stores json encoded string, output is an array
 	 *
 	 * @param Column $column
-	 * @param TOutgoing $value
+	 * @param TIncoming $value
 	 * @return TOutgoing
 	 */
 	public function parseValueOutgoing(Column $column, $value) {
@@ -34,10 +36,13 @@ class RowCellMapperSuper extends QBMapper {
 	}
 
 	/**
-	 * Parse value for db requests (before send request)
+	 * Transform value to actual database values to be used in db queries
+	 * (e.g. when filtering for row values in views)
+	 *
+	 * Example use case: input is an array, output is json encoded string to be stored in the db
 	 *
 	 * @param Column $column
-	 * @param TIncoming $value
+	 * @param TOutgoing $value
 	 * @return TIncoming
 	 */
 	public function parseValueIncoming(Column $column, $value) {

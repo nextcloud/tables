@@ -7,7 +7,11 @@ use OCA\Tables\Db\Column;
 interface IColumnTypeBusiness {
 
 	/**
-	 * try to parse a string for the given column type
+	 * Parse frontend value and transform for using it in the database
+	 *
+	 * Used when inserting from API to the database
+	 *
+	 * FIXME: Why is this not using Mapper::parseValueIncoming which should do the same thing
 	 *
 	 * @param mixed $value
 	 * @param Column|null $column

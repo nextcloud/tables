@@ -23,7 +23,7 @@ use Throwable;
 
 class Row2Mapper {
 	use TTransactional;
-	
+
 	private RowSleeveMapper $rowSleeveMapper;
 	private ?string $userId = null;
 	private IDBConnection $db;
