@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 APP_NAME=tables
+SCENARIO=$1
 
 APP_INTEGRATION_DIR=$PWD
 
@@ -74,7 +75,7 @@ echo ''
 echo '#'
 echo '# Running tests'
 echo '#'
-vendor/bin/behat --colors -f junit -f pretty
+vendor/bin/behat --colors -f junit -f pretty $SCENARIO
 RESULT=$?
 
 echo ''
