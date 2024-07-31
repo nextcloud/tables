@@ -413,6 +413,7 @@ class FeatureContext implements Context {
 
 		$newColumn = $this->getDataFromResponse($this->response)['ocs']['data'];
 		$this->columnIds[$columnName] = $newColumn['id'];
+		$this->columnId = $newColumn['id'];
 
 		Assert::assertEquals(200, $this->response->getStatusCode());
 
@@ -541,6 +542,10 @@ class FeatureContext implements Context {
 	 *
 	 */
 	public function printRegister(): void {
+		if (getenv('DEBUG') === '') {
+			return;
+		}
+
 		echo "REGISTER ========================\n";
 		echo "Tables --------------------\n";
 		print_r($this->tableIds);
@@ -1202,7 +1207,14 @@ class FeatureContext implements Context {
 
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		foreach ($props as $key => $value) {
-			Assert::assertEquals($column[$key], $value);
+			if (is_array($column[$key])) {
+				// I am afraid this is usergroupcolumn specific, but not generic
+				$retrieved = json_encode($column[$key], true);
+			} else {
+				$retrieved = $column[$key];
+			}
+
+			Assert::assertEquals($value, $retrieved, 'Failing key: ' . $key);
 		}
 
 		$this->sendRequest(
@@ -1213,7 +1225,14 @@ class FeatureContext implements Context {
 		$columnToVerify = $this->getDataFromResponse($this->response);
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		foreach ($props as $key => $value) {
-			Assert::assertEquals($columnToVerify[$key], $value);
+			// I am afraid this is usergroupcolumn specific, but not generic
+			if (is_array($columnToVerify[$key])) {
+				$retrieved = json_encode($columnToVerify[$key], true);
+			} else {
+				$retrieved = $columnToVerify[$key];
+			}
+
+			Assert::assertEquals($value, $retrieved, 'Failing key: ' . $key);
 		}
 	}
 
@@ -1253,7 +1272,17 @@ class FeatureContext implements Context {
 		$rowToVerify = $this->getDataFromResponse($this->response);
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		foreach ($rowToVerify['data'] as $cell) {
-			Assert::assertEquals($props[$cell['columnId']], $cell['value']);
+			// I am afraid this is usergroupcolumn specific, but not generic
+			if (is_array($cell['value'])) {
+				$retrieved = json_encode(array_reduce($cell['value'], function (array $carry, string $item): array {
+					$carry[] = json_decode($item, true);
+					return $carry;
+				}, []));
+			} else {
+				$retrieved = $cell['value'];
+			}
+
+			Assert::assertEquals($props[$cell['columnId']], $retrieved);
 		}
 	}
 
@@ -1429,7 +1458,17 @@ class FeatureContext implements Context {
 		$rowToVerify = $this->getDataFromResponse($this->response);
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		foreach ($rowToVerify['data'] as $cell) {
-			Assert::assertEquals($props[$cell['columnId']], $cell['value']);
+			// I am afraid this is usergroupcolumn specific, but not generic
+			if (is_array($cell['value'])) {
+				$retrieved = json_encode(array_reduce($cell['value'], function (array $carry, string $item): array {
+					$carry[] = json_decode($item, true);
+					return $carry;
+				}, []));
+			} else {
+				$retrieved = $cell['value'];
+			}
+
+			Assert::assertEquals($props[$cell['columnId']], $retrieved);
 		}
 	}
 

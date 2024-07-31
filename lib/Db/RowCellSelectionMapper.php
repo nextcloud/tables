@@ -14,10 +14,19 @@ class RowCellSelectionMapper extends RowCellMapperSuper {
 		parent::__construct($db, $this->table, RowCellSelection::class);
 	}
 
-	/**
-	 * @inheritDoc
-	 */
-	public function parseValueIncoming(Column $column, $value): string {
+	public function filterValueToQueryParam(Column $column, $value) {
+		return $this->valueToJsonDbValue($column, $value);
+	}
+
+	public function applyDataToEntity(Column $column, RowCellSuper $cell, $data): void {
+		$cell->setValue($this->valueToJsonDbValue($column, $data));
+	}
+
+	public function formatEntity(Column $column, RowCellSuper $cell) {
+		return json_decode($cell->getValue());
+	}
+
+	private function valueToJsonDbValue(Column $column, $value): string {
 		if ($column->getSubtype() === 'check') {
 			return json_encode(ltrim($value, '"'));
 		}
@@ -27,12 +36,5 @@ class RowCellSelectionMapper extends RowCellMapperSuper {
 		}
 
 		return json_encode($value);
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function parseValueOutgoing(Column $column, $value) {
-		return json_decode($value);
 	}
 }

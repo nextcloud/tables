@@ -853,6 +853,21 @@ class TableTemplateService {
 			// datetimeDefault
 			(isset($parameters['datetimeDefault'])) ? $parameters['datetimeDefault'] : '',
 
+			// usergroupDefault
+			(isset($parameters['usergroupDefault'])) ? $parameters['usergroupDefault'] : '',
+
+			// usergroupMultipleItems
+			(isset($parameters['usergroupMultipleItems'])) ? $parameters['usergroupMultipleItems'] : null,
+
+			// usergroupSelectUsers
+			(isset($parameters['usergroupSelectUsers'])) ? $parameters['usergroupSelectUsers'] : null,
+
+			// usergroupSelectGroups
+			(isset($parameters['usergroupSelectGroups'])) ? $parameters['usergroupSelectGroups'] : null,
+
+			// showUserStatus
+			(isset($parameters['showUserStatus'])) ? $parameters['showUserStatus'] : null,
+
 			// additional view ids
 			[]
 		);

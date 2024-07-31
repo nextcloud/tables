@@ -56,7 +56,7 @@ abstract class AOCSController extends OCSController {
 	 * @return DataResponse<Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 */
 	protected function handleNotFoundError(NotFoundError $e): DataResponse {
-		$this->logger->warning('A not found error occurred: ['. $e->getCode() . ']' . $e->getMessage());
+		$this->logger->info('A not found error occurred: ['. $e->getCode() . ']' . $e->getMessage());
 		return new DataResponse(['message' => $this->n->t('A not found error occurred. More details can be found in the logs. Please reach out to your administration.')], Http::STATUS_NOT_FOUND);
 	}
 

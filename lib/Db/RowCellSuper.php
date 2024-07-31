@@ -29,6 +29,8 @@ abstract class RowCellSuper extends Entity implements JsonSerializable {
 	protected ?int $rowId = null;
 	protected ?string $lastEditBy = null;
 	protected ?string $lastEditAt = null;
+	protected ?string $createdBy = null;
+	protected ?string $createdAt = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');
@@ -37,16 +39,38 @@ abstract class RowCellSuper extends Entity implements JsonSerializable {
 	}
 
 	/**
-	 * @param float|null|string $value
+	 * Same as Entity::fromRow but ignoring unknown properties
 	 */
-	public function jsonSerializePreparation(string|float|null $value): array {
+	public static function fromRowData(array $row): RowCellSuper {
+		$instance = new static();
+
+		foreach ($row as $key => $value) {
+			$property = $instance->columnToProperty($key);
+			$setter = 'set' . ucfirst($property);
+			;
+			if (property_exists($instance, $property)) {
+				$instance->$setter($value);
+			}
+		}
+
+		$instance->resetUpdatedFields();
+
+		return $instance;
+	}
+
+	/**
+	 * @param float|null|string $value
+	 * @param int $value_type
+	 */
+	public function jsonSerializePreparation(string|float|null $value, int $valueType): array {
 		return [
 			'id' => $this->id,
 			'columnId' => $this->columnId,
 			'rowId' => $this->rowId,
 			'lastEditBy' => $this->lastEditBy,
 			'lastEditAt' => $this->lastEditAt,
-			'value' => $value
+			'value' => $value,
+			'valueType' => $valueType
 		];
 	}
 

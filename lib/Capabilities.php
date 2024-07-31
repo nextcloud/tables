@@ -62,7 +62,8 @@ class Capabilities implements ICapability {
 				'version' => $this->appManager->getAppVersion('tables'),
 				'apiVersions' => [
 					'1.0',
-					'2.0'
+					'2.0',
+					'2.1',
 				],
 				'features' => [
 					'favorite',
@@ -81,6 +82,7 @@ class Capabilities implements ICapability {
 					'datetime',
 					'datetime-date',
 					'datetime-time',
+					'usergroup',
 				]
 			],
 		];

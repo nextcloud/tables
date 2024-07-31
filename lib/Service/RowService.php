@@ -275,7 +275,7 @@ class RowService extends SuperService {
 			/** @var IColumnTypeBusiness $columnBusiness */
 			$columnBusiness = Server::get($businessClassName);
 			if($columnBusiness->canBeParsed($value, $column)) {
-				return json_decode($columnBusiness->parseValue($value, $column));
+				return json_decode($columnBusiness->parseValue($value, $column), true);
 			}
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 			$this->logger->debug('Column type business class not found', ['exception' => $e]);

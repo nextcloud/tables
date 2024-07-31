@@ -12,8 +12,8 @@ use OCP\IDBConnection;
 /**
  * @template-extends QBMapper<T>
  * @template T of RowCellSuper
- * @template TIncoming
- * @template TOutgoing
+ * @template TIncoming Type the db is using to store the actual value
+ * @template TOutgoing Type the API is using
  */
 class RowCellMapperSuper extends QBMapper {
 
@@ -22,30 +22,37 @@ class RowCellMapperSuper extends QBMapper {
 	}
 
 	/**
-	 * Parse value for db results (after send request)
-	 * eg for filtering
+	 * Format a row cell entity to API response array
 	 *
-	 * @param Column $column
-	 * @param TOutgoing $value
+	 * @param T $cell
 	 * @return TOutgoing
 	 */
-	public function parseValueOutgoing(Column $column, $value) {
+	public function formatEntity(Column $column, RowCellSuper $cell) {
+		/** @var TOutgoing $value */
+		$value = $cell->getValue();
+		return $value;
+	}
+	/*
+	 * Transform value from a filter rule to the actual query parameter used
+	 * for constructing the view filter query
+	 */
+	public function filterValueToQueryParam(Column $column, $value) {
 		return $value;
 	}
 
-	/**
-	 * Parse value for db requests (before send request)
-	 *
-	 * @param Column $column
-	 * @param TIncoming $value
-	 * @return TIncoming
-	 */
-	public function parseValueIncoming(Column $column, $value) {
-		return $value;
+	public function applyDataToEntity(Column $column, RowCellSuper $cell, $data): void {
+		$cell->setValue($data);
 	}
 
 	public function getDbParamType() {
 		return IQueryBuilder::PARAM_STR;
+	}
+
+	/*
+	 * Indicating that the column can have multiple values represented by individual entities
+	 */
+	public function hasMultipleValues(): bool {
+		return false;
 	}
 
 	/**

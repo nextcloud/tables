@@ -605,6 +605,23 @@ export type paths = {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/ocs/v2.php/apps/tables/api/2/columns/usergroup": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /** [api v2] Create new usergroup column */
+        readonly post: operations["api_columns-create-usergroup-column"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/ocs/v2.php/apps/tables/api/2/favorites/{nodeType}/{nodeId}": {
         readonly parameters: {
             readonly query?: never;
@@ -760,6 +777,11 @@ export type components = {
             readonly selectionOptions: string;
             readonly selectionDefault: string;
             readonly datetimeDefault: string;
+            readonly usergroupDefault: string;
+            readonly usergroupMultipleItems: boolean;
+            readonly usergroupSelectUsers: boolean;
+            readonly usergroupSelectGroups: boolean;
+            readonly showUserStatus: boolean;
         };
         readonly Context: {
             /** Format: int64 */
@@ -2120,7 +2142,7 @@ export interface operations {
                      * @description Column main type
                      * @enum {string}
                      */
-                    readonly type: "text" | "number" | "datetime" | "select";
+                    readonly type: "text" | "number" | "datetime" | "select" | "usergroup";
                     /** @description Column sub type */
                     readonly subtype?: string | null;
                     /** @description Is the column mandatory */
@@ -2175,6 +2197,19 @@ export interface operations {
                      * @default
                      */
                     readonly datetimeDefault?: string | null;
+                    /**
+                     * @description Default value, if column is usergroup
+                     * @default
+                     */
+                    readonly usergroupDefault?: string | null;
+                    /** @description Can select multiple users or/and groups, if column is usergroup */
+                    readonly usergroupMultipleItems?: boolean | null;
+                    /** @description Can select users, if column type is usergroup */
+                    readonly usergroupSelectUsers?: boolean | null;
+                    /** @description Can select groups, if column type is usergroup */
+                    readonly usergroupSelectGroups?: boolean | null;
+                    /** @description Whether to show the user's status, if column type is usergroup */
+                    readonly usergroupShowUserStatus?: boolean | null;
                     /**
                      * @description View IDs where this column should be added to be presented
                      * @default []
@@ -2308,7 +2343,7 @@ export interface operations {
                      * @description Column main type
                      * @enum {string}
                      */
-                    readonly type: "text" | "number" | "datetime" | "select";
+                    readonly type: "text" | "number" | "datetime" | "select" | "usergroup";
                     /** @description Column sub type */
                     readonly subtype?: string | null;
                     /** @description Is the column mandatory */
@@ -2363,6 +2398,19 @@ export interface operations {
                      * @default
                      */
                     readonly datetimeDefault?: string | null;
+                    /**
+                     * @description Default value, if column is usergroup (json array{id: string, type: int})
+                     * @default
+                     */
+                    readonly usergroupDefault?: string | null;
+                    /** @description Can select multiple users or/and groups, if column is usergroup */
+                    readonly usergroupMultipleItems?: boolean | null;
+                    /** @description Can select users, if column type is usergroup */
+                    readonly usergroupSelectUsers?: boolean | null;
+                    /** @description Can select groups, if column type is usergroup */
+                    readonly usergroupSelectGroups?: boolean | null;
+                    /** @description Whether to show the user's status, if column type is usergroup */
+                    readonly usergroupShowUserStatus?: boolean | null;
                     /**
                      * @description View IDs where this column should be added to be presented
                      * @default []
@@ -2530,6 +2578,16 @@ export interface operations {
                     readonly selectionDefault?: string | null;
                     /** @description Default value, if column is datetime */
                     readonly datetimeDefault?: string | null;
+                    /** @description Default value, if column is usergroup */
+                    readonly usergroupDefault?: string | null;
+                    /** @description Can select multiple users or/and groups, if column is usergroup */
+                    readonly usergroupMultipleItems?: boolean | null;
+                    /** @description Can select users, if column type is usergroup */
+                    readonly usergroupSelectUsers?: boolean | null;
+                    /** @description Can select groups, if column type is usergroup */
+                    readonly usergroupSelectGroups?: boolean | null;
+                    /** @description Whether to show the user's status, if column type is usergroup */
+                    readonly usergroupShowUserStatus?: boolean | null;
                 };
             };
         };
@@ -4467,6 +4525,122 @@ export interface operations {
                      * @enum {string|null}
                      */
                     readonly subtype?: "progress" | "stars" | null;
+                    /** @description Description */
+                    readonly description?: string | null;
+                    /**
+                     * @description View IDs where this columns should be added
+                     * @default []
+                     */
+                    readonly selectedViewIds?: readonly number[];
+                    /**
+                     * @description Is mandatory
+                     * @default false
+                     */
+                    readonly mandatory?: boolean;
+                    /**
+                     * @description Context type of the column creation
+                     * @default table
+                     * @enum {string}
+                     */
+                    readonly baseNodeType?: "table" | "view";
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Column created */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["Column"];
+                        };
+                    };
+                };
+            };
+            /** @description No permission */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                    readonly "text/plain": string;
+                };
+            };
+        };
+    };
+    readonly "api_columns-create-usergroup-column": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * Format: int64
+                     * @description Context of the column creation
+                     */
+                    readonly baseNodeId: number;
+                    /** @description Title */
+                    readonly title: string;
+                    /** @description Json array{id: string, type: int}, eg [{"id": "admin", "type": 0}, {"id": "user1", "type": 0}] */
+                    readonly usergroupDefault?: string | null;
+                    /** @description Whether you can select multiple users or/and groups */
+                    readonly usergroupMultipleItems?: boolean;
+                    /** @description Whether you can select users */
+                    readonly usergroupSelectUsers?: boolean;
+                    /** @description Whether you can select groups */
+                    readonly usergroupSelectGroups?: boolean;
+                    /** @description Whether to show the user's status */
+                    readonly showUserStatus?: boolean;
                     /** @description Description */
                     readonly description?: string | null;
                     /**

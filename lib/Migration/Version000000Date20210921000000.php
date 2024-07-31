@@ -161,6 +161,28 @@ class Version000000Date20210921000000 extends SimpleMigrationStep {
 				'notnull' => false,
 			]);
 
+			// type usergroup (added in Version000800Date20240712000000)
+			$table->addColumn('usergroup_default', Types::TEXT, [
+				'notnull' => false,
+				'length' => 65535,
+			]);
+			$table->addColumn('usergroup_multiple_items', Types::BOOLEAN, [
+				'notnull' => false,
+				'default' => 0,
+			]);
+			$table->addColumn('usergroup_select_users', Types::BOOLEAN, [
+				'notnull' => false,
+				'default' => 0,
+			]);
+			$table->addColumn('usergroup_select_groups', Types::BOOLEAN, [
+				'notnull' => false,
+				'default' => 0,
+			]);
+			$table->addColumn('show_user_status', Types::BOOLEAN, [
+				'notnull' => false,
+				'default' => 0,
+			]);
+
 			$table->setPrimaryKey(['id']);
 
 			$table->addIndex(['table_id'], 'tables_columns_t_id');

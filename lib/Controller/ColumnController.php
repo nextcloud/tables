@@ -92,6 +92,13 @@ class ColumnController extends Controller {
 		?string $selectionDefault,
 
 		?string $datetimeDefault,
+
+		?string $usergroupDefault,
+		?bool $usergroupMultipleItems,
+		?bool $usergroupSelectUsers,
+		?bool $usergroupSelectGroups,
+		?bool $showUserStatus,
+
 		?array $selectedViewIds
 	): DataResponse {
 		return $this->handleError(function () use (
@@ -118,6 +125,13 @@ class ColumnController extends Controller {
 			$selectionDefault,
 
 			$datetimeDefault,
+
+			$usergroupDefault,
+			$usergroupMultipleItems,
+			$usergroupSelectUsers,
+			$usergroupSelectGroups,
+			$showUserStatus,
+
 			$selectedViewIds) {
 			return $this->service->create(
 				$this->userId,
@@ -144,6 +158,13 @@ class ColumnController extends Controller {
 				$selectionDefault,
 
 				$datetimeDefault,
+				
+				$usergroupDefault,
+				$usergroupMultipleItems,
+				$usergroupSelectUsers,
+				$usergroupSelectGroups,
+				$showUserStatus,
+
 				$selectedViewIds);
 		});
 	}
@@ -174,7 +195,13 @@ class ColumnController extends Controller {
 		?string $selectionOptions,
 		?string $selectionDefault,
 
-		?string $datetimeDefault
+		?string $datetimeDefault,
+
+		?string $usergroupDefault,
+		?bool $usergroupMultipleItems,
+		?bool $usergroupSelectUsers,
+		?bool $usergroupSelectGroups,
+		?bool $showUserStatus
 	): DataResponse {
 		return $this->handleError(function () use (
 			$id,
@@ -199,7 +226,13 @@ class ColumnController extends Controller {
 			$selectionOptions,
 			$selectionDefault,
 
-			$datetimeDefault
+			$datetimeDefault,
+
+			$usergroupDefault,
+			$usergroupMultipleItems,
+			$usergroupSelectUsers,
+			$usergroupSelectGroups,
+			$showUserStatus
 		) {
 			return $this->service->update(
 				$id,
@@ -225,7 +258,14 @@ class ColumnController extends Controller {
 				$selectionOptions,
 				$selectionDefault,
 
-				$datetimeDefault);
+				$datetimeDefault,
+
+				$usergroupDefault,
+				$usergroupMultipleItems,
+				$usergroupSelectUsers,
+				$usergroupSelectGroups,
+				$showUserStatus
+			);
 		});
 	}
 

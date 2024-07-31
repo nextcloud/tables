@@ -154,6 +154,11 @@ class ColumnService extends SuperService {
 	 * @param string|null $selectionOptions
 	 * @param string|null $selectionDefault
 	 * @param string|null $datetimeDefault
+	 * @param string|null $usergroupDefault
+	 * @param bool|null $usergroupMultipleItems
+	 * @param bool|null $usergroupSelectUsers
+	 * @param bool|null $usergroupSelectGroups
+	 * @param bool|null $showUserStatus
 	 * @param array $selectedViewIds
 	 * @return Column
 	 *
@@ -185,6 +190,13 @@ class ColumnService extends SuperService {
 		?string $selectionDefault,
 
 		?string $datetimeDefault,
+
+		?string $usergroupDefault,
+		?bool $usergroupMultipleItems,
+		?bool $usergroupSelectUsers,
+		?bool $usergroupSelectGroups,
+		?bool $showUserStatus,
+		
 		array $selectedViewIds = []
 	):Column {
 		// security
@@ -267,6 +279,11 @@ class ColumnService extends SuperService {
 		$item->setSelectionOptions($selectionOptions);
 		$item->setSelectionDefault($selectionDefault);
 		$item->setDatetimeDefault($datetimeDefault);
+		$item->setUsergroupDefault($usergroupDefault);
+		$item->setUsergroupMultipleItems($usergroupMultipleItems);
+		$item->setUsergroupSelectUsers($usergroupSelectUsers);
+		$item->setUsergroupSelectGroups($usergroupSelectGroups);
+		$item->setShowUserStatus($showUserStatus);
 
 		try {
 			$entity = $this->mapper->insert($item);
@@ -317,6 +334,11 @@ class ColumnService extends SuperService {
 	 * @param string|null $selectionOptions
 	 * @param string|null $selectionDefault
 	 * @param string|null $datetimeDefault
+	 * @param string|null $usergroupDefault
+	 * @param bool|null $usergroupMultipleItems
+	 * @param bool|null $usergroupSelectUsers
+	 * @param bool|null $usergroupSelectGroups
+	 * @param bool|null $showUserStatus
 	 * @return Column
 	 * @throws InternalError
 	 */
@@ -343,7 +365,14 @@ class ColumnService extends SuperService {
 
 		?string $selectionOptions,
 		?string $selectionDefault,
-		?string $datetimeDefault
+
+		?string $datetimeDefault,
+
+		?string $usergroupDefault,
+		?bool $usergroupMultipleItems,
+		?bool $usergroupSelectUsers,
+		?bool $usergroupSelectGroups,
+		?bool $showUserStatus,
 	):Column {
 		try {
 			/** @var Column $item */
@@ -390,6 +419,14 @@ class ColumnService extends SuperService {
 				$item->setSelectionDefault($selectionDefault);
 			}
 			$item->setDatetimeDefault($datetimeDefault);
+
+			if ($usergroupDefault !== null) {
+				$item->setUsergroupDefault($usergroupDefault);
+			}
+			$item->setUsergroupMultipleItems($usergroupMultipleItems);
+			$item->setUsergroupSelectUsers($usergroupSelectUsers);
+			$item->setUsergroupSelectGroups($usergroupSelectGroups);
+			$item->setShowUserStatus($showUserStatus);
 
 			$this->updateMetadata($item, $userId);
 			return $this->enhanceColumn($this->mapper->update($item));
@@ -548,6 +585,11 @@ class ColumnService extends SuperService {
 					$dataTypes[$i]['number_decimals'] ?? null,
 					null,
 					$dataTypes[$i]['selection_default'] ?? null,
+					null,
+					null,
+					null,
+					null,
+					null,
 					null,
 					[]
 				);

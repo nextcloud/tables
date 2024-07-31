@@ -108,16 +108,21 @@ namespace OCA\Tables;
  *  orderWeight: int,
  *  numberDefault: float,
  *  numberMin: float,
- *  	numberMax: float,
- *  	numberDecimals: int,
- *  	numberPrefix: string,
- *  	numberSuffix: string,
- *  	textDefault: string,
- *  	textAllowedPattern: string,
- *  	textMaxLength: int,
- *  	selectionOptions: string,
- *  	selectionDefault: string,
- *  	datetimeDefault: string,
+ *  numberMax: float,
+ *  numberDecimals: int,
+ *  numberPrefix: string,
+ *  numberSuffix: string,
+ *  textDefault: string,
+ *  textAllowedPattern: string,
+ *  textMaxLength: int,
+ *  selectionOptions: string,
+ *  selectionDefault: string,
+ *  datetimeDefault: string,
+ *  usergroupDefault: string,
+ *  usergroupMultipleItems: bool,
+ *  usergroupSelectUsers: bool,
+ *  usergroupSelectGroups: bool,
+ *  showUserStatus: bool,
  * }
  *
  * @psalm-type TablesImportState = array{
@@ -144,6 +149,8 @@ namespace OCA\Tables;
  *     displayMode: int,
  *     userId: string,
  * }
+ *
+ * @psalm-type TablesColumn
  */
 class ResponseDefinitions {
 }
