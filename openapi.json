@@ -2986,7 +2986,7 @@
                                         "nullable": true,
                                         "description": "Can select groups, if column type is usergroup"
                                     },
-                                    "showUserStatus": {
+                                    "usergroupShowUserStatus": {
                                         "type": "boolean",
                                         "nullable": true,
                                         "description": "Whether to show the user's status, if column type is usergroup"
@@ -3335,7 +3335,7 @@
                                         "nullable": true,
                                         "description": "Can select groups, if column type is usergroup"
                                     },
-                                    "showUserStatus": {
+                                    "usergroupShowUserStatus": {
                                         "type": "boolean",
                                         "nullable": true,
                                         "description": "Whether to show the user's status, if column type is usergroup"
@@ -3549,7 +3549,7 @@
                                         "nullable": true,
                                         "description": "Can select groups, if column type is usergroup"
                                     },
-                                    "showUserStatus": {
+                                    "usergroupShowUserStatus": {
                                         "type": "boolean",
                                         "nullable": true,
                                         "description": "Whether to show the user's status, if column type is usergroup"

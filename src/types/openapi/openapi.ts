@@ -2209,7 +2209,7 @@ export interface operations {
                     /** @description Can select groups, if column type is usergroup */
                     readonly usergroupSelectGroups?: boolean | null;
                     /** @description Whether to show the user's status, if column type is usergroup */
-                    readonly showUserStatus?: boolean | null;
+                    readonly usergroupShowUserStatus?: boolean | null;
                     /**
                      * @description View IDs where this column should be added to be presented
                      * @default []
@@ -2410,7 +2410,7 @@ export interface operations {
                     /** @description Can select groups, if column type is usergroup */
                     readonly usergroupSelectGroups?: boolean | null;
                     /** @description Whether to show the user's status, if column type is usergroup */
-                    readonly showUserStatus?: boolean | null;
+                    readonly usergroupShowUserStatus?: boolean | null;
                     /**
                      * @description View IDs where this column should be added to be presented
                      * @default []
@@ -2587,7 +2587,7 @@ export interface operations {
                     /** @description Can select groups, if column type is usergroup */
                     readonly usergroupSelectGroups?: boolean | null;
                     /** @description Whether to show the user's status, if column type is usergroup */
-                    readonly showUserStatus?: boolean | null;
+                    readonly usergroupShowUserStatus?: boolean | null;
                 };
             };
         };

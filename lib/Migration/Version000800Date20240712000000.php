@@ -20,10 +20,10 @@ class Version000800Date20240712000000 extends SimpleMigrationStep {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 
-		$hasChanges = $this->createUserGroupTable($schema, 'usergroup', Types::TEXT);
-		$hasChanges = $this->haveUserGroupColumnDefinitionFields($schema) ?? $hasChanges;
+		$changes = $this->createUserGroupTable($schema, 'usergroup', Types::TEXT);
+		$changes = $this->haveUserGroupColumnDefinitionFields($schema) ?? $changes;
 
-		return $hasChanges;
+		return $changes;
 	}
 
 	private function createUserGroupTable(ISchemaWrapper $schema, string $name, string $type): ?ISchemaWrapper {

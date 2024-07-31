@@ -765,7 +765,7 @@ class Api1Controller extends ApiController {
 	 * @param bool|null $usergroupMultipleItems Can select multiple users or/and groups, if column is usergroup
 	 * @param bool|null $usergroupSelectUsers Can select users, if column type is usergroup
 	 * @param bool|null $usergroupSelectGroups Can select groups, if column type is usergroup
-	 * @param bool|null $showUserStatus Whether to show the user's status, if column type is usergroup
+	 * @param bool|null $usergroupShowUserStatus Whether to show the user's status, if column type is usergroup
 	 * @param int[]|null $selectedViewIds View IDs where this column should be added to be presented
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
@@ -802,7 +802,7 @@ class Api1Controller extends ApiController {
 		?bool $usergroupMultipleItems = null,
 		?bool $usergroupSelectUsers = null,
 		?bool $usergroupSelectGroups = null,
-		?bool $showUserStatus = null,
+		?bool $usergroupShowUserStatus = null,
 
 		?array $selectedViewIds = []
 	): DataResponse {
@@ -837,7 +837,7 @@ class Api1Controller extends ApiController {
 				$usergroupMultipleItems,
 				$usergroupSelectUsers,
 				$usergroupSelectGroups,
-				$showUserStatus,
+				$usergroupShowUserStatus,
 
 				$selectedViewIds
 			)->jsonSerialize());
@@ -884,7 +884,7 @@ class Api1Controller extends ApiController {
 	 * @param bool|null $usergroupMultipleItems Can select multiple users or/and groups, if column is usergroup
 	 * @param bool|null $usergroupSelectUsers Can select users, if column type is usergroup
 	 * @param bool|null $usergroupSelectGroups Can select groups, if column type is usergroup
-	 * @param bool|null $showUserStatus Whether to show the user's status, if column type is usergroup
+	 * @param bool|null $usergroupShowUserStatus Whether to show the user's status, if column type is usergroup
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
@@ -917,7 +917,7 @@ class Api1Controller extends ApiController {
 		?bool $usergroupMultipleItems,
 		?bool $usergroupSelectUsers,
 		?bool $usergroupSelectGroups,
-		?bool $showUserStatus,
+		?bool $usergroupShowUserStatus,
 
 	): DataResponse {
 		try {
@@ -950,7 +950,7 @@ class Api1Controller extends ApiController {
 				$usergroupMultipleItems,
 				$usergroupSelectUsers,
 				$usergroupSelectGroups,
-				$showUserStatus,
+				$usergroupShowUserStatus,
 			);
 			return new DataResponse($item->jsonSerialize());
 		} catch (InternalError $e) {
@@ -1483,7 +1483,7 @@ class Api1Controller extends ApiController {
 	 * @param bool|null $usergroupMultipleItems Can select multiple users or/and groups, if column is usergroup
 	 * @param bool|null $usergroupSelectUsers Can select users, if column type is usergroup
 	 * @param bool|null $usergroupSelectGroups Can select groups, if column type is usergroup
-	 * @param bool|null $showUserStatus Whether to show the user's status, if column type is usergroup
+	 * @param bool|null $usergroupShowUserStatus Whether to show the user's status, if column type is usergroup
 	 * @param int[]|null $selectedViewIds View IDs where this column should be added to be presented
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
@@ -1520,7 +1520,7 @@ class Api1Controller extends ApiController {
 		?bool $usergroupMultipleItems = null,
 		?bool $usergroupSelectUsers = null,
 		?bool $usergroupSelectGroups = null,
-		?bool $showUserStatus = null,
+		?bool $usergroupShowUserStatus = null,
 		?array $selectedViewIds = []
 	): DataResponse {
 		try {
@@ -1554,7 +1554,7 @@ class Api1Controller extends ApiController {
 				$usergroupMultipleItems,
 				$usergroupSelectUsers,
 				$usergroupSelectGroups,
-				$showUserStatus,
+				$usergroupShowUserStatus,
 
 				$selectedViewIds
 			);
