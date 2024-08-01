@@ -30,8 +30,8 @@ describe('Test column ' + columnTitle, () => {
         cy.createUsergroupColumn(columnTitle, true, true, true, [localUser.userId, nonLocalUser.userId], true)
         cy.get('button').contains('Create row').click()
         cy.get('[data-cy="createRowSaveButton"]').click()
-        cy.get('[data-cy="ncTable"] table tr td .userInfo').contains(localUser.userId).should('be.visible')
-        cy.get('[data-cy="ncTable"] table tr td .userInfo').contains(nonLocalUser.userId).should('be.visible')
+        cy.get('[data-cy="ncTable"] table tr td .user-bubble__name').contains(localUser.userId).should('be.visible')
+        cy.get('[data-cy="ncTable"] table tr td .user-bubble__name').contains(nonLocalUser.userId).should('be.visible')
 	})
 
     it('Create column and rows without default values', () => {
@@ -43,7 +43,7 @@ describe('Test column ' + columnTitle, () => {
         cy.get('[data-cy="usergroupRowSelect"] input').type(nonLocalUser.userId)
         cy.get(`.vs__dropdown-menu [id="${nonLocalUser.userId}"]`).click()
         cy.get('[data-cy="createRowSaveButton"]').click()
-        cy.get('[data-cy="ncTable"] table tr td .userInfo').contains(nonLocalUser.userId).should('be.visible')
+        cy.get('[data-cy="ncTable"] table tr td .user-bubble__name').contains(nonLocalUser.userId).should('be.visible')
 	})
 
     it('Create and edit rows', () => {
@@ -52,14 +52,14 @@ describe('Test column ' + columnTitle, () => {
         cy.createUsergroupColumn(columnTitle, true, true, true, [localUser.userId], true)
         cy.get('button').contains('Create row').click()
         cy.get('[data-cy="createRowSaveButton"]').click()
-        cy.get('[data-cy="ncTable"] table tr td .userInfo').contains(localUser.userId).should('be.visible')
+        cy.get('[data-cy="ncTable"] table tr td .user-bubble__name').contains(localUser.userId).should('be.visible')
 
         cy.get('[data-cy="ncTable"] [data-cy="editRowBtn"]').click()
         cy.get('[data-cy="usergroupRowSelect"] input').clear().type(nonLocalUser.userId)
         cy.get(`.vs__dropdown-menu [id="${nonLocalUser.userId}"]`).click()
         cy.get('[data-cy="editRowSaveButton"]').click()
-        cy.get('[data-cy="ncTable"] table tr td .userInfo').contains(localUser.userId).should('not.exist')
-        cy.get('[data-cy="ncTable"] table tr td .userInfo').contains(nonLocalUser.userId).should('be.visible')
+        cy.get('[data-cy="ncTable"] table tr td .user-bubble__name').contains(localUser.userId).should('not.exist')
+        cy.get('[data-cy="ncTable"] table tr td .user-bubble__name').contains(nonLocalUser.userId).should('be.visible')
 	})
 
 
