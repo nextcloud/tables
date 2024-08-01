@@ -109,6 +109,7 @@ export default {
 		},
 		async updateColumn({ state, commit }, { id, isView, elementId, data }) {
 			data.selectionOptions = JSON.stringify(data.selectionOptions)
+			data.usergroupDefault = JSON.stringify(data.usergroupDefault)
 			let res = null
 
 			try {
