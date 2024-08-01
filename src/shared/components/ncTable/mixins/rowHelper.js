@@ -11,8 +11,7 @@ export default {
 				) {
 					return true
 				}
-				const hasDefaultValue = columnTypeDefault in column && !(['', 'null'].includes(column[columnTypeDefault]))
-				return false || hasDefaultValue
+				return columnTypeDefault in column && !(['', 'null'].includes(column[columnTypeDefault]))
 			}
 			let hasDefaultValue = columnTypeDefault in column && !(['', null].includes(column[columnTypeDefault]))
 			if (column.type === ColumnTypes.SelectionMulti) {
