@@ -188,6 +188,7 @@ OC.L10N.register(
     "Transfer" : "Transferència",
     "Filter" : "Filtra",
     "Sort" : "Ordena",
+    "Export" : "Exporta",
     "Add to favorites" : "Afegeix a preferits",
     "Remove from favorites" : "Suprimeix dels preferits",
     "Delete table" : "Suprimeix la taula",

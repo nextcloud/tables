@@ -30,6 +30,7 @@ OC.L10N.register(
     "Delete" : "মুছে",
     "Close" : "বন্ধ",
     "Please select a file." : "একটি ফাইল নির্বাচন করুন",
+    "Export" : "রপ্তানি",
     "Favorites" : "প্রিয়জন",
     "group" : "দল",
     "Sharing" : "ভাগাভাগিরত",

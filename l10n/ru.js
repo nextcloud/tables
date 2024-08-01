@@ -8,6 +8,8 @@ OC.L10N.register(
     "Timestamp of data load" : "Время загрузки данных",
     "No" : "Нет",
     "Yes" : "Да",
+    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Произошла непредвиденная ошибка. Более подробную информацию можно найти в журналах. Пожалуйста, обратитесь к своему администратору.",
+    "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "Произошла ошибка разрешения. Более подробную информацию можно найти в журналах. Пожалуйста, обратитесь к своему администратору.",
     "Could not create row." : "Не удалось создать строку",
     "Could not update row." : "Не удалось обновить строку.",
     "The file was uploaded" : "Файл загружен",
