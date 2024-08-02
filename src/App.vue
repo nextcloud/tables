@@ -2,9 +2,9 @@
 	<NcContent app-name="tables">
 		<Navigation />
 		<NcAppContent>
-			<div v-if="somethingIsLoading" class="icon-loading" />
+			<div v-if="isLoadingSomething" class="icon-loading" />
 
-			<router-view v-if="!somethingIsLoading" />
+			<router-view v-if="!isLoadingSomething" />
 		</NcAppContent>
 		<Sidebar />
 	</NcContent>
@@ -13,7 +13,7 @@
 <script>
 import { NcContent, NcAppContent } from '@nextcloud/vue'
 import Navigation from './modules/navigation/sections/Navigation.vue'
-import { mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 import Sidebar from './modules/sidebar/sections/Sidebar.vue'
 import { useResizeObserver } from '@vueuse/core'
 import { loadState } from '@nextcloud/initial-state'
@@ -39,10 +39,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(['tablesLoading', 'contextsLoading']),
-		somethingIsLoading() {
-			return this.tablesLoading || this.contextsLoading || this.loading
-		},
+		...mapGetters(['isLoadingSomething']),
 	},
 	watch: {
 		'$route'(to, from) {
