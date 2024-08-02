@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.8.0-beta.2
+
+### Feature highlights
+
+### Added
+
+* feat: add backend for new user/group column @enjeck [#1090](https://github.com/nextcloud/tables/pull/1090)
+* Analytics: permission error on shared tables with non-shared views @Rello [#1248](https://github.com/nextcloud/tables/pull/1248)
+* feat: User/group column frontend @enjeck [#1113](https://github.com/nextcloud/tables/pull/1113)
+
+### Fixed
+
+* fix: Make user listing in table more consistent by using NcUserBubble @juliushaertl [#1254](https://github.com/nextcloud/tables/pull/1254)
+* fix: Navigation table entries UI issues @enjeck [#1195](https://github.com/nextcloud/tables/pull/1195)
+* fix(files): fix appstore-build-publish.yml @JuliaKirschenheuter [#1244](https://github.com/nextcloud/tables/pull/1244)
+
+### Dependencies
+
+* fix(deps): update tiptap to ^2.5.7 (main) @renovate [#1245](https://github.com/nextcloud/tables/pull/1245)
+* fix(deps): update dependency @nextcloud/vue to ^8.15.0 (main) @renovate [#1246](https://github.com/nextcloud/tables/pull/1246)
+
 ## 0.8.0-beta.1
 
 ### Feature highlights
