@@ -144,14 +144,11 @@ export default new Vuex.Store({
 				displayError(e, t('tables', 'Could not insert table.'))
 				return false
 			}
-			if (data.template !== 'custom') {
-				await dispatch('loadTablesFromBE')
-				await dispatch('loadViewsSharedWithMeFromBE')
-			} else {
-				const tables = state.tables
-				tables.push(res.data)
-				commit('setTables', tables)
-			}
+
+			const tables = state.tables
+			tables.push(res.data)
+			commit('setTables', tables)
+
 			return res.data
 		},
 		async loadTablesFromBE({ commit, state }) {
