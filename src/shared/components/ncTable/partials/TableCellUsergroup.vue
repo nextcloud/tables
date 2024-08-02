@@ -1,28 +1,22 @@
 <template>
 	<!-- eslint-disable-next-line vue/no-v-html -->
 	<div v-if="value">
-		<div v-for="item in value" :key="item.id" class="inline">
-			<div class="fix-col-2">
-				<div style="display:flex; align-items: center;">
-					<NcAvatar :display-name="item.id" :user="item.id" :is-no-user="item.type !== 0"
-						:show-user-status="column.showUserStatus" />
-				</div>
-				<div class="userInfo">
-					<div class="high-line-height">
-						{{ item.id }}
-					</div>
-				</div>
-			</div>
+		<div v-for="item in value" :key="item.id" class="inline usergroup-entry">
+			<NcUserBubble :user="item.id" :avatar-image="item.type === 1 ? 'icon-group' : undefined" :is-no-user="item.type !== 0" :display-name="item.displayName ?? item.id" :show-user-status="isUser(item) && column.showUserStatus" :size="column.showUserStatus ? 34 : 20" :primary="isCurrentUser(item)" />
 		</div>
 	</div>
 </template>
 
 <script>
-import { NcAvatar } from '@nextcloud/vue'
+import { getCurrentUser } from '@nextcloud/auth'
+import { NcUserBubble } from '@nextcloud/vue'
+
+const currentUser = getCurrentUser()
+
 export default {
 	name: 'TableCellUsergroup',
 	components: {
-		NcAvatar,
+		NcUserBubble,
 	},
 	props: {
 		column: {
@@ -38,19 +32,19 @@ export default {
 			default: () => [],
 		},
 	},
+	computed: {
+		isCurrentUser() {
+			return (item) => this.isUser(item) && item.id === currentUser?.uid
+		},
+		isUser() {
+			return (item) => item.type === 0
+		},
+	},
 }
 </script>
 
 <style lang="scss" scoped>
-	.userInfo {
-		padding-left: 5px;
+	.usergroup-entry {
 		padding-right: 10px;
-		font-size: 100%;
-		display: flex;
-		flex-direction: column;
-	}
-
-	.high-line-height {
-		line-height: 35px;
 	}
 </style>

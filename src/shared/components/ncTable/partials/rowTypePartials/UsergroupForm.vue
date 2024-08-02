@@ -2,7 +2,7 @@
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :width="2">
 		<NcSelect v-model="localValue" style="width: 100%;" :loading="loading" :options="options"
 			:placeholder="getPlaceholder()" :searchable="true" :get-option-key="(option) => option.key"
-			label="id" :aria-label-combobox="getPlaceholder()"
+			label="displayName" :aria-label-combobox="getPlaceholder()"
 			:user-select="true"
 			:close-on-select="false" :multiple="column.usergroupMultipleItems" data-cy="usergroupRowSelect"
 			@search="asyncFind" @input="addItem">
@@ -75,6 +75,7 @@ export default {
 				id: autocompleteResult.id,
 				type: autocompleteResult.source.startsWith('users') ? 0 : 1,
 				key: autocompleteResult.id,
+				displayName: autocompleteResult.label,
 			}
 		},
 
