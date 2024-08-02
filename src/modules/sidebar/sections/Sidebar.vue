@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<NcAppSidebar v-show="showSidebar"
+		<NcAppSidebar v-if="showSidebar"
 			:active="activeSidebarTab"
 			:name="elementTitle"
 			@update:active="tab => activeSidebarTab = tab"
