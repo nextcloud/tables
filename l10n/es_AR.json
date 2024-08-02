@@ -52,6 +52,7 @@
     "Sort" : "Ordenar",
     "Export" : "Exportar",
     "Add to favorites" : "Añadir a favoritos",
+    "Remove from favorites" : "Quitar de favoritos",
     "Favorites" : "Favoritos",
     "User or group name …" : "Nombre de usuario o grupo",
     "No recommendations. Start typing." : "No hay sugerencias. Comenzar a escribir",
@@ -79,6 +80,8 @@
     "Default" : "Predeterminado",
     "Options" : "Opciones",
     "URL" : "URL",
+    "Users" : "Ususarios",
+    "Groups" : "Grupos",
     "Confirm" : "Confirmar",
     "Select" : "Seleccionar",
     "ID" : "ID"

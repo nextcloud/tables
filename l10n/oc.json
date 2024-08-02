@@ -32,6 +32,7 @@
     "Text" : "Tèxt",
     "Link" : "Ligam",
     "Selection" : "Seleccion",
+    "Users and groups" : "Utilizaires e grops",
     "Move" : "Desplaçar",
     "Metadata" : "Metadonadas",
     "Views" : "Vistas",
@@ -79,6 +80,7 @@
     "Default" : "Defaut",
     "Options" : "Opcions",
     "URL" : "URL",
+    "Users" : "Utilizaires",
     "Confirm" : "Confirmar",
     "ID" : "ID"
 },"pluralForm" :"nplurals=2; plural=(n > 1);"

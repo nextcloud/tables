@@ -30,6 +30,8 @@ OC.L10N.register(
     "Search" : "Search",
     "Default" : "ಆರಂಭದ ಪ್ರತಿ",
     "URL" : "ಜಾಲದ ಕೊಂಡಿ",
+    "Users" : "﻿ಬಳಕೆದಾರರು",
+    "Groups" : "﻿ಗುಂಪುಗಳು",
     "Select" : "ಆಯ್ಕೆ ಮಾಡಿ"
 },
 "nplurals=2; plural=(n > 1);");

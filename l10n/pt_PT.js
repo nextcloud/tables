@@ -90,6 +90,8 @@ OC.L10N.register(
     "Default" : "Predefinido",
     "Options" : "Opções",
     "URL" : "URL",
+    "Users" : "Utilizadores",
+    "Groups" : "Grupos",
     "Close editor" : "Fechar editor",
     "Confirm" : "Confirmar",
     "Content" : "Conteúdo",

@@ -54,6 +54,7 @@ OC.L10N.register(
     "Sort" : "Ordenar",
     "Export" : "Exportar",
     "Add to favorites" : "Añadir a favoritos",
+    "Remove from favorites" : "Quitar de favoritos",
     "Favorites" : "Favoritos",
     "User or group name …" : "Nombre de usuario o grupo",
     "No recommendations. Start typing." : "No hay sugerencias. Comenzar a escribir",
@@ -81,6 +82,8 @@ OC.L10N.register(
     "Default" : "Predeterminado",
     "Options" : "Opciones",
     "URL" : "URL",
+    "Users" : "Ususarios",
+    "Groups" : "Grupos",
     "Confirm" : "Confirmar",
     "Select" : "Seleccionar",
     "ID" : "ID"

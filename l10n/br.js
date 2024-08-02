@@ -15,6 +15,7 @@ OC.L10N.register(
     "Create" : "Krouiñ",
     "Today" : "Hiziv",
     "Link" : "Liamm",
+    "Users and groups" : "Implijourienn ha strolladoù",
     "Move" : "Diplasañ",
     "View" : "Gwell",
     "Shares" : "Rannañ",

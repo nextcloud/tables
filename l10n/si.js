@@ -32,6 +32,8 @@ OC.L10N.register(
     "Download" : "බාගන්න",
     "Search" : "සොයන්න",
     "Back" : "ආපසු",
+    "Users" : "පරිශීලකයින්",
+    "Groups" : "සමූහ",
     "Confirm" : "තහවුරු කරන්න"
 },
 "nplurals=2; plural=(n != 1);");

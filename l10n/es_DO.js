@@ -65,6 +65,8 @@ OC.L10N.register(
     "Suffix" : "Sufijo",
     "Default" : "Predeterminado",
     "URL" : "URL",
+    "Users" : "Usuarios",
+    "Groups" : "Grupos",
     "Confirm" : "Confirmar",
     "Content" : "Contenido",
     "Select" : "Seleccionar",

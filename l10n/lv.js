@@ -77,6 +77,8 @@ OC.L10N.register(
     "Suffix" : "Piedēklis",
     "Default" : "Noklusējuma",
     "URL" : "URL",
+    "Users" : "Lietotāji",
+    "Groups" : "Grupas",
     "Close editor" : "Aizvērt redaktoru",
     "Confirm" : "Apstiprināt",
     "Content" : "Saturs",

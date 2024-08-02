@@ -43,6 +43,7 @@ OC.L10N.register(
     "Search" : "Search",
     "Default" : "Լռելյայն",
     "URL" : "URL",
+    "Groups" : "Խմբեր",
     "Select" : "Նշել"
 },
 "nplurals=2; plural=(n != 1);");

@@ -60,6 +60,8 @@ OC.L10N.register(
     "Prefix" : "Prefijo",
     "Suffix" : "Sufijo",
     "Default" : "Predeterminado",
+    "Users" : "Usuarios",
+    "Groups" : "Grupos",
     "Confirm" : "Confirmar",
     "Content" : "Contenido",
     "ID" : "ID"

@@ -47,6 +47,8 @@ OC.L10N.register(
     "Search" : "Søk",
     "Default" : "Standard",
     "URL" : "URL",
+    "Users" : "Brukarare",
+    "Groups" : "Grupper",
     "ID" : "ID"
 },
 "nplurals=2; plural=(n != 1);");

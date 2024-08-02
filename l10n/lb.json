@@ -39,6 +39,8 @@
     "Search" : "Search",
     "Default" : "Standard",
     "URL" : "URL",
+    "Users" : "Benotzer",
+    "Groups" : "Gruppen",
     "Confirm" : "Konfirméieren",
     "Select" : "Auswielen"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"

@@ -33,6 +33,8 @@ OC.L10N.register(
     "Error" : "Ralat",
     "Download" : "Muat turun",
     "Search" : "Search",
-    "URL" : "URL"
+    "URL" : "URL",
+    "Users" : "Pengguna",
+    "Groups" : "Kumpulan"
 },
 "nplurals=1; plural=0;");

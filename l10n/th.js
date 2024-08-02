@@ -70,6 +70,8 @@ OC.L10N.register(
     "Suffix" : "คำต่อท้าย",
     "Default" : "ค่าเริ่มต้น",
     "URL" : "URL",
+    "Users" : "ผู้ใช้",
+    "Groups" : "กลุ่ม",
     "Confirm" : "ยืนยัน",
     "Select" : "เลือก",
     "ID" : "ID"

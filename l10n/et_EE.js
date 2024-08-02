@@ -67,6 +67,8 @@ OC.L10N.register(
     "Suffix" : "Järelliide",
     "Default" : "Vaikeväärtus",
     "URL" : "URL",
+    "Users" : "Kasutajad",
+    "Groups" : "Grupid",
     "Confirm" : "Kinnita",
     "Content" : "Sisu",
     "Select" : "Vali",

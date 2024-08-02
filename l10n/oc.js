@@ -34,6 +34,7 @@ OC.L10N.register(
     "Text" : "Tèxt",
     "Link" : "Ligam",
     "Selection" : "Seleccion",
+    "Users and groups" : "Utilizaires e grops",
     "Move" : "Desplaçar",
     "Metadata" : "Metadonadas",
     "Views" : "Vistas",
@@ -81,6 +82,7 @@ OC.L10N.register(
     "Default" : "Defaut",
     "Options" : "Opcions",
     "URL" : "URL",
+    "Users" : "Utilizaires",
     "Confirm" : "Confirmar",
     "ID" : "ID"
 },

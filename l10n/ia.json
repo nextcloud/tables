@@ -46,6 +46,8 @@
     "Prefix" : "Prefixo",
     "Suffix" : "Suffixo",
     "URL" : "URL",
+    "Users" : "Usatores",
+    "Groups" : "Gruppos",
     "Confirm" : "Confirmar",
     "Select" : "Selectionar"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"

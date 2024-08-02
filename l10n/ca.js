@@ -117,6 +117,7 @@ OC.L10N.register(
     "Progress bar" : "Barra de progrés",
     "Selection" : "Selecció",
     "Date and time" : "Data i hora",
+    "Users and groups" : "Usuaris i grups",
     "Move" : "Mou",
     "Metadata" : "Metadades",
     "Column" : "Columna",

@@ -41,6 +41,8 @@ OC.L10N.register(
     "Search" : "Search",
     "Default" : "Standard",
     "URL" : "URL",
+    "Users" : "Benotzer",
+    "Groups" : "Gruppen",
     "Confirm" : "Konfirméieren",
     "Select" : "Auswielen"
 },

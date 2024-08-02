@@ -136,6 +136,7 @@ OC.L10N.register(
     "Progress bar" : "Ukazatel míry dokončenosti",
     "Selection" : "Výběr",
     "Date and time" : "Datum a čas",
+    "Users and groups" : "Uživatelé a skupiny",
     "Move" : "Přesunout",
     "Metadata" : "Metadata",
     "Column" : "Sloupec",

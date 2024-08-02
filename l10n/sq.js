@@ -72,6 +72,8 @@ OC.L10N.register(
     "Suffix" : "Prapashtesë",
     "Default" : "E paracaktuar",
     "URL" : "URL",
+    "Users" : "Përdoruesit",
+    "Groups" : "Grupet",
     "Confirm" : "Konfirmo",
     "Content" : "Përmbajtja",
     "Select" : "Përzgjidh",

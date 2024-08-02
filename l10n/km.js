@@ -40,6 +40,8 @@ OC.L10N.register(
     "Search" : "ស្វែងរក",
     "Default" : "លំនាំ​ដើម",
     "Options" : "ជម្រើស",
-    "URL" : "URL"
+    "URL" : "URL",
+    "Users" : "អ្នកប្រើ",
+    "Groups" : "ក្រុ"
 },
 "nplurals=1; plural=0;");

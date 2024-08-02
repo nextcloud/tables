@@ -40,6 +40,8 @@ OC.L10N.register(
     "Default" : "Prédéfini(e)",
     "Options" : "Iɣewwaṛen",
     "Add option" : "Rnu aɣewwaṛ",
+    "Users" : "Iseqdacen",
+    "Groups" : "Igrawen",
     "Confirm" : "Serggeg",
     "Content" : "Agbur",
     "Select" : "Fren"

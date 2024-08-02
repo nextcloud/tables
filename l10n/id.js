@@ -77,6 +77,8 @@ OC.L10N.register(
     "Default" : "Bawaan",
     "Options" : "Pilihan",
     "URL" : "URL",
+    "Users" : "Pengguna",
+    "Groups" : "Grup",
     "Confirm" : "Konfirmasi",
     "Content" : "Konten",
     "Select" : "Pilih",

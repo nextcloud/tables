@@ -32,6 +32,8 @@ OC.L10N.register(
     "Download" : "چۈشۈر",
     "Search" : "Search",
     "Default" : "كۆڭۈلدىكى",
-    "URL" : "URL"
+    "URL" : "URL",
+    "Users" : "ئىشلەتكۈچىلەر",
+    "Groups" : "گۇرۇپپا"
 },
 "nplurals=2; plural=(n != 1);");
