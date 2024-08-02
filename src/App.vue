@@ -99,9 +99,9 @@ export default {
 			}
 		},
 		switchActiveMenuEntry(targetElement) {
-			const currentlyActive = document.querySelector('header .header-left .app-menu li.app-menu-entry__active')
-			currentlyActive.classList.remove('app-menu-entry__active')
-			targetElement.classList.add('app-menu-entry__active')
+			const currentlyActive = document.querySelector('header .header-left .app-menu li.app-menu-entry--active')
+			currentlyActive.classList.remove('app-menu-entry--active')
+			targetElement.classList.add('app-menu-entry--active')
 		},
 		setPageTitle(title) {
 			if (this.defaultPageTitle === false) {
