@@ -55,6 +55,7 @@ OC.L10N.register(
     "Export" : "Exportar",
     "Add to favorites" : "Añadir a favoritos",
     "Remove from favorites" : "Quitar de favoritos",
+    "Copy" : "Copiar",
     "Favorites" : "Favoritos",
     "User or group name …" : "Nombre de usuario o grupo",
     "No recommendations. Start typing." : "No hay sugerencias. Comenzar a escribir",

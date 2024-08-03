@@ -467,6 +467,8 @@ OC.L10N.register(
     "URL" : "URL",
     "Users" : "使用者",
     "Groups" : "群組",
+    "Select multiple items" : "選取多個項目",
+    "Show user status" : "顯示使用者狀態",
     "Please select a new time" : "請選取新時間",
     "This field is mandatory" : "此欄位為必填",
     "You can not insert any links in this field. Please configure at least one link provider in the column configuration." : "您無法在此欄位插入任何連結。請在欄位設定中設定至少一個連結提供者。",

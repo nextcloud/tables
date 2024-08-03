@@ -49,6 +49,8 @@
     "Back" : "Geri",
     "Default" : "Susmaya görə",
     "URL" : "URL",
+    "Users" : "İstifadəçilər",
+    "Groups" : "Qruplar",
     "Confirm" : "Təsdiq edin",
     "Select" : "Seç"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"

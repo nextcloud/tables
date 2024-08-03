@@ -55,6 +55,8 @@ OC.L10N.register(
     "Prefix" : "Voorvoegsel",
     "Suffix" : "Agtervoegsel",
     "Default" : "Verstek",
+    "Users" : "Gebruikers",
+    "Groups" : "Groepe",
     "Confirm" : "Bevestig",
     "ID" : "ID"
 },

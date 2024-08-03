@@ -51,6 +51,8 @@ OC.L10N.register(
     "Back" : "Geri",
     "Default" : "Susmaya görə",
     "URL" : "URL",
+    "Users" : "İstifadəçilər",
+    "Groups" : "Qruplar",
     "Confirm" : "Təsdiq edin",
     "Select" : "Seç"
 },

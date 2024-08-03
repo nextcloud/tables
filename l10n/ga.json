@@ -465,6 +465,8 @@
     "URL" : "URL",
     "Users" : "Úsáideoirí",
     "Groups" : "Grúpaí",
+    "Select multiple items" : "Roghnaigh míreanna éagsúla",
+    "Show user status" : "Taispeáin stádas úsáideora",
     "Please select a new time" : "Roghnaigh am nua le do thoil",
     "This field is mandatory" : "Tá an réimse seo éigeantach",
     "You can not insert any links in this field. Please configure at least one link provider in the column configuration." : "Ní féidir leat naisc ar bith a chur isteach sa réimse seo. Cumraigh soláthraí naisc amháin ar a laghad i gcumraíocht an cholúin le do thoil.",

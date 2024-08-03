@@ -41,6 +41,8 @@ OC.L10N.register(
     "Search" : "Search",
     "Default" : "পূর্বনির্ধারিত",
     "URL" : "URL",
+    "Users" : "ব্যবহারকারী",
+    "Groups" : "গোষ্ঠীসমূহ",
     "Select" : "সিলেক্ট"
 },
 "nplurals=2; plural=(n != 1);");
