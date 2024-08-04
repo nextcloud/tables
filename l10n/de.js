@@ -410,6 +410,7 @@ OC.L10N.register(
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "Die bereitgestellten Typen hängen von deinem System-Setup ab. Du kannst die gleichen Anbieter wie bei der Volltextsuche nutzen.",
     "Could not load link providers." : "Linkanbieter konnten nicht geladen werden.",
     "URL" : "URL",
+    "Users" : "Benutzer",
     "Groups" : "Gruppen",
     "This field is mandatory" : "Dieses Feld ist erforderlich",
     "You can not insert any links in this field. Please configure at least one link provider in the column configuration." : "Du kannst in dieses Feld keine Links einfügen. Bitte konfiguriere in der Spaltenkonfiguration mindestens einen Linkanbieter.",
