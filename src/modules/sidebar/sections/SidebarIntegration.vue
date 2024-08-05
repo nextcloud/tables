@@ -64,8 +64,8 @@ export default {
 	},
 
 	computed: {
-		...mapState(['tables', 'tablesLoading']),
-		...mapGetters(['activeElement', 'isView']),
+		...mapState(['tables']),
+		...mapGetters(['activeElement', 'isLoadingSomething', 'isView']),
 		apiEndpointUrl() {
 			const params = {
 				elementId: this.activeElement.id,

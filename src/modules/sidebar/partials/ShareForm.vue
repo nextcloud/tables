@@ -44,7 +44,7 @@
 import { generateOcsUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 import { NcSelect } from '@nextcloud/vue'
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import formatting from '../../../shared/mixins/formatting.js'
 import ShareTypes from '../../../shared/mixins/shareTypesMixin.js'
 import searchUserGroup from '../../../shared/mixins/searchUserGroup.js'
@@ -74,7 +74,8 @@ export default {
 	},
 
 	computed: {
-		...mapState(['tables', 'tablesLoading', 'showSidebar']),
+		...mapState(['tables', 'showSidebar']),
+		...mapGetters(['isLoadingSomething']),
 	},
 
 	mounted() {

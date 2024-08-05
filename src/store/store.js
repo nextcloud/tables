@@ -17,12 +17,15 @@ export default new Vuex.Store({
 	},
 
 	state: {
-		tablesLoading: false,
+		loading: {
+			tables: true,
+			viewsShared: true,
+			contexts: true,
+		},
 		tables: [],
 		views: [],
 		templates: [],
 		contexts: [],
-		contextsLoading: false,
 		activeViewId: null,
 		activeTableId: null,
 		activeRowId: null,
@@ -70,16 +73,19 @@ export default new Vuex.Store({
 		isView(state) {
 			return state.activeElementIsView
 		},
+		isLoading(state) {
+			return (key) => state.loading[key] ?? false
+		},
+		isLoadingSomething(state) {
+			return Object.keys(state.loading).filter(key => state.loading[key]).length > 0
+		},
 	},
 	mutations: {
 		setAppNavCollapsed(state, value) {
 			state.appNavCollapsed = !!(value)
 		},
-		setTablesLoading(state, value) {
-			state.tablesLoading = !!(value)
-		},
-		setContextsLoading(state, value) {
-			state.contextsLoading = !!(value)
+		setLoading(state, { key, value }) {
+			state.loading[key] = !!(value)
 		},
 		setActiveViewId(state, viewId) {
 			if (state.activeViewId !== viewId) {
@@ -138,18 +144,15 @@ export default new Vuex.Store({
 				displayError(e, t('tables', 'Could not insert table.'))
 				return false
 			}
-			if (data.template !== 'custom') {
-				await dispatch('loadTablesFromBE')
-				await dispatch('loadViewsSharedWithMeFromBE')
-			} else {
-				const tables = state.tables
-				tables.push(res.data)
-				commit('setTables', tables)
-			}
+
+			const tables = state.tables
+			tables.push(res.data)
+			commit('setTables', tables)
+
 			return res.data
 		},
 		async loadTablesFromBE({ commit, state }) {
-			commit('setTablesLoading', true)
+			commit('setLoading', { key: 'tables', value: true })
 
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/table'))
@@ -164,11 +167,11 @@ export default new Vuex.Store({
 				showError(t('tables', 'Could not fetch tables'))
 			}
 
-			commit('setTablesLoading', false)
+			commit('setLoading', { key: 'tables', value: false })
 			return true
 		},
 		async loadViewsSharedWithMeFromBE({ commit, state }) {
-			commit('setTablesLoading', true)
+			commit('setLoading', { key: 'viewsShared', value: true })
 
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/view'))
@@ -182,7 +185,7 @@ export default new Vuex.Store({
 				showError(t('tables', 'Could not load shared views'))
 			}
 
-			commit('setTablesLoading', false)
+			commit('setLoading', { key: 'viewsShared', value: false })
 			return true
 		},
 		async loadTemplatesFromBE({ commit }) {
@@ -374,7 +377,7 @@ export default new Vuex.Store({
 			}
 		},
 		async insertNewContext({ commit, state, dispatch }, { data, receivers }) {
-			commit('setContextsLoading', true)
+			commit('setLoading', { key: 'contexts', value: true })
 			let res = null
 
 			try {
@@ -391,7 +394,7 @@ export default new Vuex.Store({
 			contexts.push(res.data.ocs.data)
 			commit('setContexts', contexts)
 
-			commit('setContextsLoading', false)
+			commit('setLoading', { key: 'contexts', value: false })
 			return res.data.ocs.data
 		},
 		async updateContext({ state, commit, dispatch }, { id, data, previousReceivers, receivers }) {
@@ -429,7 +432,7 @@ export default new Vuex.Store({
 		},
 
 		async getAllContexts({ commit, state }) {
-			commit('setContextsLoading', true)
+			commit('setLoading', { key: 'contexts', value: true })
 			try {
 				const res = await axios.get(generateOcsUrl('/apps/tables/api/2/contexts'))
 				commit('setContexts', res.data.ocs.data)
@@ -438,7 +441,7 @@ export default new Vuex.Store({
 				displayError(e, t('tables', 'Could not load applications.'))
 				showError(t('tables', 'Could not fetch applications'))
 			}
-			commit('setContextsLoading', false)
+			commit('setLoading', { key: 'contexts', value: false })
 			return true
 		},
 

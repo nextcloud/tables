@@ -9,9 +9,9 @@
 				</NcTextField>
 			</div>
 
-			<div v-if="tablesLoading" class="icon-loading" />
+			<div v-if="isLoadingSomething" class="icon-loading" />
 
-			<ul v-if="!tablesLoading">
+			<ul v-if="!isLoadingSomething">
 				<NcAppNavigationCaption v-if="getFavoriteNodes.length > 0" :name="t('tables', 'Favorites')" />
 
 				<!-- FAVORITES -->
@@ -56,8 +56,7 @@
 						:filter-string="filterString" :table="table" />
 				</NcAppNavigationItem>
 			</ul>
-			<div v-if="contextsLoading" class="icon-loading" />
-			<ul v-if="!contextsLoading">
+			<ul v-if="!isLoadingSomething">
 				<NcAppNavigationCaption :name="t('tables', 'Applications')">
 					<template #actions>
 						<NcActionButton :aria-label="t('tables', 'Create application')" icon="icon-add" data-cy="createContextIcon"
@@ -102,7 +101,7 @@ import {
 import NavigationViewItem from '../partials/NavigationViewItem.vue'
 import NavigationTableItem from '../partials/NavigationTableItem.vue'
 import NavigationContextItem from '../partials/NavigationContextItem.vue'
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { emit, subscribe } from '@nextcloud/event-bus'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
 import Archive from 'vue-material-design-icons/Archive.vue'
@@ -134,7 +133,8 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(['appNavCollapsed', 'tables', 'views', 'tablesLoading', 'contexts', 'contextsLoading']),
+		...mapState(['appNavCollapsed', 'tables', 'views', 'contexts']),
+		...mapGetters(['isLoadingSomething', 'isLoading']),
 		getAllNodes() {
 			return [...this.getFilteredTables, ...this.getOwnViews, ...this.getSharedViews]
 		},

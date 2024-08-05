@@ -132,7 +132,7 @@ export default {
 		showModal() {
 			// every time when the modal opens chose a new emoji
 			this.loadEmoji()
-			this.$nextTick(() => this.$refs.titleInput.focus())
+			this.$nextTick(() => this.$refs?.titleInput?.focus())
 		},
 	},
 	methods: {
