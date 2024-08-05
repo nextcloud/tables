@@ -1,0 +1,30 @@
+# SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+version = 1
+SPDX-PackageName = "tables"
+SPDX-PackageSupplier = "Nextcloud <info@nextcloud.com>"
+SPDX-PackageDownloadLocation = "https://github.com/nextcloud/tables"
+
+[[annotations]]
+path = [".tx/config", "l10n/**.js", "l10n/**.json", "composer.json", "composer.lock", "package.json", "package-lock.json"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2021 Nextcloud GmbH and Nextcloud contributors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+[[annotations]]
+path = [".devcontainer/devcontainer.json", ".github/CODEOWNERS", "openapi.json", "renovate.json", "screenshots/sh-tables-1-small.png", "screenshots/sh-tables-1.png", "screenshots/sh-tables-2.png", "screenshots/sh-tables-3.png", "screenshots/sh-tables-4.png", "screenshots/sh-tables-5.png", "screenshots/sh-tables-6.png","screenshots/sh-tables-7.png"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2023 Nextcloud GmbH and Nextcloud contributors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+[[annotations]]
+path = ["tsconfig.json", "vendor-bin/openapi-extractor/composer.json", "vendor-bin/openapi-extractor/composer.lock"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Nextcloud GmbH and Nextcloud contributors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+[[annotations]]
+path = ["img/app-dark.svg", "img/app.svg", "img/view.svg", "img/view-dark.svg", "img/material/*.svg"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2018-2024 Google LLC"
+SPDX-License-Identifier = "Apache-2.0"
