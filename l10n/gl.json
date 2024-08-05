@@ -465,6 +465,8 @@
     "URL" : "URL",
     "Users" : "Usuarios",
     "Groups" : "Grupos",
+    "Select multiple items" : "Seleccionar varios elementos",
+    "Show user status" : "Amosar o estado do usuario",
     "Please select a new time" : "Seleccione unha nova hora",
     "This field is mandatory" : "Este campo é obrigatorio",
     "You can not insert any links in this field. Please configure at least one link provider in the column configuration." : "Non pode inserir ningunha ligazón neste campo. Configure polo menos un provedor de ligazóns na configuración da columna.",

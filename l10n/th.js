@@ -74,6 +74,7 @@ OC.L10N.register(
     "Groups" : "กลุ่ม",
     "Confirm" : "ยืนยัน",
     "Select" : "เลือก",
+    "Start of the year" : "เริ่มต้นของปี",
     "ID" : "ID"
 },
 "nplurals=1; plural=0;");

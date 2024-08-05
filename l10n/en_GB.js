@@ -467,6 +467,8 @@ OC.L10N.register(
     "URL" : "URL",
     "Users" : "Users",
     "Groups" : "Groups",
+    "Select multiple items" : "Select multiple items",
+    "Show user status" : "Show user status",
     "Please select a new time" : "Please select a new time",
     "This field is mandatory" : "This field is mandatory",
     "You can not insert any links in this field. Please configure at least one link provider in the column configuration." : "You can not insert any links in this field. Please configure at least one link provider in the column configuration.",
