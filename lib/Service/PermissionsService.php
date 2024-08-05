@@ -553,7 +553,7 @@ class PermissionsService {
 				}
 			} catch (NotFoundError $e) {
 			}
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			$this->logger->info($e->getMessage(), ['exception' => $e]);
 		}
 
 		return false;
@@ -580,7 +580,7 @@ class PermissionsService {
 					}
 				} catch (NotFoundError $e) {
 				}
-				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				$this->logger->info($e->getMessage(), ['exception' => $e]);
 			}
 		}
 		return false;
