@@ -52,6 +52,7 @@ import { translate as t } from '@nextcloud/l10n'
 import '@nextcloud/dialogs/dist/index.css'
 import ColumnFormComponent from '../main/partials/ColumnFormComponent.vue'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
+import rowHelper from '../../shared/components/ncTable/mixins/rowHelper.js'
 
 export default {
 	name: 'EditRow',
@@ -61,7 +62,7 @@ export default {
 		ColumnFormComponent,
 		NcNoteCard,
 	},
-	mixins: [permissionsMixin],
+	mixins: [permissionsMixin, rowHelper],
 	props: {
 		showModal: {
 			type: Boolean,
@@ -99,14 +100,7 @@ export default {
 			return this.columns.filter(col => col.id >= 0)
 		},
 		hasEmptyMandatoryRows() {
-			let mandatoryFieldsEmpty = false
-			this.columns.forEach(col => {
-				if (col.mandatory) {
-					const validValue = this.isValueValidForColumn(this.localRow[col.id], col)
-					mandatoryFieldsEmpty = mandatoryFieldsEmpty || !validValue
-				}
-			})
-			return mandatoryFieldsEmpty
+			return this.checkMandatoryFields(this.localRow)
 		},
 	},
 	watch: {
@@ -139,18 +133,6 @@ export default {
 			this.$router?.back()
 			this.reset()
 			this.$emit('close')
-		},
-		isValueValidForColumn(value, column) {
-			if (column.type === 'selection') {
-				if (
-					(value instanceof Array && value.length > 0)
-					|| (value === parseInt(value))
-				) {
-					return true
-				}
-				return false
-			}
-			return !!value || value === 0
 		},
 		async actionConfirm() {
 			this.localLoading = true
@@ -251,11 +233,6 @@ export default {
 
 	:where(.fix-col-3) {
 		display: inline-block;
-	}
-
-	:where(.fix-col-4) {
-		display: flex;
-		justify-content: space-between;
 	}
 
 	:where(.slot.fix-col-4 input, .slot.fix-col-4 .row) {

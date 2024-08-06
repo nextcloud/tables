@@ -1,0 +1,35 @@
+import { ColumnTypes } from './columnHandler.js'
+export default {
+	methods: {
+		isValueValidForColumn(value, column) {
+			const type = column?.type?.split('-')[0]
+			const columnTypeDefault = type + 'Default'
+			if (column.type === ColumnTypes.Selection) {
+				if (
+					(value instanceof Array && value.length > 0)
+					|| (value === parseInt(value))
+				) {
+					return true
+				}
+				return columnTypeDefault in column && !(['', 'null'].includes(column[columnTypeDefault]))
+			}
+			let hasDefaultValue = columnTypeDefault in column && !(['', null].includes(column[columnTypeDefault]))
+			if (column.type === ColumnTypes.SelectionMulti) {
+				hasDefaultValue = columnTypeDefault in column && column[columnTypeDefault] !== '[]'
+				return (value instanceof Array && value.length > 0) || hasDefaultValue
+			}
+			return (!!value || value === 0) || hasDefaultValue
+		},
+
+		checkMandatoryFields(row) {
+			let mandatoryFieldsEmpty = false
+			this.columns.forEach(col => {
+				if (col.mandatory) {
+					const validValue = this.isValueValidForColumn(row[col.id], col)
+					mandatoryFieldsEmpty = mandatoryFieldsEmpty || !validValue
+				}
+			})
+			return mandatoryFieldsEmpty
+		},
+	},
+}
