@@ -391,6 +391,7 @@
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "Které typy jsou poskytovány záleží na nastavení vámi využívaného systému. Je možné použít stejné poskytovatele jako u plnotextového vyhledávání.",
     "Could not load link providers." : "Nepodařilo se načíst poskytovatele odkazů.",
     "URL" : "URL",
+    "Groups" : "Skupiny",
     "This field is mandatory" : "Tuto kolonku je třeba zadat",
     "You can not insert any links in this field. Please configure at least one link provider in the column configuration." : "To této kolonky není možné vkládat žádné odkazy. V nastavení sloupce nastavte alespoň jednoho poskytovatele odkazů.",
     "Could not load link provider results." : "Nepodařilo se načíst výsledky od poskytovatele odkazu.",

@@ -402,6 +402,7 @@ OC.L10N.register(
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "Οι παρεχόμενοι τύποι εξαρτώνται από τη ρύθμιση του συστήματός σας. Μπορείτε να χρησιμοποιήσετε τους ίδιους παρόχους όπως και στην αναζήτηση κειμένου.",
     "Could not load link providers." : "Δεν ήταν δυνατή η φόρτωση παρόχων συνδέσμων.",
     "URL" : "URL",
+    "Users" : "Χρήστες",
     "Groups" : "Ομάδες",
     "This field is mandatory" : "Αυτό το πεδίο είναι υποχρεωτικό",
     "You can not insert any links in this field. Please configure at least one link provider in the column configuration." : "Δεν μπορείτε να εισάγετε συνδέσμους σε αυτό το πεδίο. Παρακαλούμε ρυθμίστε τουλάχιστον έναν πάροχο συνδέσμων στη διαμόρφωση της στήλης.",

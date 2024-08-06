@@ -253,6 +253,7 @@ OC.L10N.register(
     "Allowed pattern (regex)" : "Patró permès (regex)",
     "Maximum text length" : "Longitud màxima del text",
     "URL" : "URL",
+    "Groups" : "Grups",
     "Url" : "Url",
     "Close editor" : "Tanca l'editor",
     "Export CSV" : "Exporta CSV",

@@ -49,6 +49,7 @@ OC.L10N.register(
     "Prefix" : "Rhagddodiad",
     "Suffix" : "Ôl-ddodiad",
     "URL" : "URL",
+    "Users" : "Defnyddwyr",
     "Groups" : "Grwpiau",
     "Close editor" : "Cau'r golygydd",
     "Confirm" : "Cadarnhau",

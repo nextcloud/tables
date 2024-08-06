@@ -69,6 +69,7 @@ OC.L10N.register(
     "Prefix" : "คำนำหน้า",
     "Suffix" : "คำต่อท้าย",
     "Default" : "ค่าเริ่มต้น",
+    "Options" : "ตัวเลือก",
     "URL" : "URL",
     "Users" : "ผู้ใช้",
     "Groups" : "กลุ่ม",
