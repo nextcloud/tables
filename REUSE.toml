@@ -28,3 +28,81 @@ path = ["img/app-dark.svg", "img/app.svg", "img/view.svg", "img/view-dark.svg", 
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2018-2024 Google LLC"
 SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ["cypress/styleguide/assets/img/loading-dark.gif", "cypress/styleguide/assets/img/loading-small-dark.gif", "cypress/styleguide/assets/img/loading-small.gif", "cypress/styleguide/assets/img/loading.gif"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2016 ownCloud, Inc., 2016 Nextcloud GmbH and Nextcloud contributors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+[[annotations]]
+path = ["cypress/styleguide/assets/img/favicon*.*", "cypress/styleguide/assets/img/logo/logo*.*", "cypress/styleguide/assets/img/apps/spreed.svg"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2016-2024 Nextcloud GmbH"
+SPDX-License-Identifier = "LicenseRef-NextcloudTrademarks"
+
+[[annotations]]
+path = ["cypress/styleguide/assets/img/desktopapp.svg", "cypress/styleguide/assets/img/background.png", "cypress/styleguide/assets/img/background.svg", "cypress/styleguide/assets/img/categories/dashboard.svg"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2016-2024 Nextcloud GmbH and Nextcloud contributors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+[[annotations]]
+path = ["cypress/styleguide/assets/img/filetypes/package-x-generic.svg"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2016 Nextcloud GmbH and Nextcloud contributors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+[[annotations]]
+path = ["cypress/styleguide/assets/img/actions/checkbox-mixed.svg", "cypress/styleguide/assets/img/actions/checkmark-white.svg", "cypress/styleguide/assets/img/actions/checkbox-mark-dark.svg", "cypress/styleguide/assets/img/actions/checkbox-mark-white.svg", "cypress/styleguide/assets/img/actions/checkbox-mark.svg", "cypress/styleguide/assets/img/actions/checkbox-mixed-dark.svg", "cypress/styleguide/assets/img/actions/checkbox-mixed-white.svg", "cypress/styleguide/assets/img/actions/checkbox-mixed.svg", "cypress/styleguide/assets/img/actions/checkmark-white.svg", "cypress/styleguide/assets/img/actions/checkmark.png", "cypress/styleguide/assets/img/actions/checkmark.svg"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2017 Nextcloud GmbH and Nextcloud contributors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+[[annotations]]
+path = ["cypress/styleguide/assets/img/filetypes/font.svg", "cypress/styleguide/assets/img/actions/star-rounded.svg"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2023 Nextcloud GmbH and Nextcloud contributors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+[[annotations]]
+path = ["cypress/styleguide/assets/img/filetypes/application-pdf.svg", "cypress/styleguide/assets/img/breadcrumb.svg", "cypress/styleguide/assets/img/filetypes/application.svg", "cypress/styleguide/assets/img/filetypes/audio.svg", "cypress/styleguide/assets/img/filetypes/file.svg", "cypress/styleguide/assets/img/filetypes/folder-drag-accept.svg", "cypress/styleguide/assets/img/filetypes/folder-encrypted.svg", "cypress/styleguide/assets/img/filetypes/folder-external.svg", "cypress/styleguide/assets/img/filetypes/folder-public.svg", "cypress/styleguide/assets/img/filetypes/folder-shared.svg", "cypress/styleguide/assets/img/filetypes/folder-starred.svg", "cypress/styleguide/assets/img/filetypes/folder.svg", "cypress/styleguide/assets/img/filetypes/image.svg", "cypress/styleguide/assets/img/filetypes/link.svg", "cypress/styleguide/assets/img/filetypes/location.svg", "cypress/styleguide/assets/img/filetypes/mindmap.svg", "cypress/styleguide/assets/img/filetypes/text-calendar.svg", "cypress/styleguide/assets/img/filetypes/text-code.svg", "cypress/styleguide/assets/img/filetypes/text-vcard.svg", "cypress/styleguide/assets/img/filetypes/text.svg", "cypress/styleguide/assets/img/filetypes/video.svg", "cypress/styleguide/assets/img/filetypes/x-office-document.svg", "cypress/styleguide/assets/img/filetypes/x-office-drawing.svg", "cypress/styleguide/assets/img/filetypes/x-office-form-template.svg", "cypress/styleguide/assets/img/filetypes/x-office-form.svg", "cypress/styleguide/assets/img/filetypes/x-office-presentation.svg", "cypress/styleguide/assets/img/filetypes/x-office-spreadsheet.svg", "cypress/styleguide/assets/img/places/calendar-dark.png", "cypress/styleguide/assets/img/places/calendar.png", "cypress/styleguide/assets/img/places/calendar.svg", "cypress/styleguide/assets/img/places/contacts-dark.png", "cypress/styleguide/assets/img/places/contacts.svg", "cypress/styleguide/assets/img/places/default-app-icon.svg", "cypress/styleguide/assets/img/places/files.svg", "cypress/styleguide/assets/img/places/home.svg", "cypress/styleguide/assets/img/places/link.svg", "cypress/styleguide/assets/img/places/music.svg", "cypress/styleguide/assets/img/places/picture.svg", "cypress/styleguide/assets/img/rating/s0.svg", "cypress/styleguide/assets/img/rating/s1.svg", "cypress/styleguide/assets/img/rating/s10.svg", "cypress/styleguide/assets/img/rating/s2.svg", "cypress/styleguide/assets/img/rating/s3.svg", "cypress/styleguide/assets/img/rating/s4.svg", "cypress/styleguide/assets/img/rating/s5.svg", "cypress/styleguide/assets/img/rating/s6.svg", "cypress/styleguide/assets/img/rating/s7.svg", "cypress/styleguide/assets/img/rating/s8.svg", "cypress/styleguide/assets/img/rating/s9.svg", "cypress/styleguide/assets/img/mail.svg", "cypress/styleguide/assets/img/rss.svg", "cypress/styleguide/assets/img/clients/desktop.svg", "cypress/styleguide/assets/img/clients/phone.svg", "cypress/styleguide/assets/img/clients/tablet.svg", "cypress/styleguide/assets/img/categories/auth.svg", "cypress/styleguide/assets/img/categories/bundles.svg", "cypress/styleguide/assets/img/categories/customization.svg", "cypress/styleguide/assets/img/categories/files.svg", "cypress/styleguide/assets/img/categories/games.svg", "cypress/styleguide/assets/img/categories/integration.svg", "cypress/styleguide/assets/img/categories/monitoring.svg", "cypress/styleguide/assets/img/categories/multimedia.svg", "cypress/styleguide/assets/img/categories/office.svg", "cypress/styleguide/assets/img/categories/organization.svg", "cypress/styleguide/assets/img/categories/social.svg", "cypress/styleguide/assets/img/categories/workflow.svg", "cypress/styleguide/assets/img/apps/circles.svg", "cypress/styleguide/assets/img/apps/notes.svg", "cypress/styleguide/assets/img/apps/richdocuments.svg", "cypress/styleguide/assets/img/caldav/attendees.png", "cypress/styleguide/assets/img/caldav/attendees.svg", "cypress/styleguide/assets/img/caldav/description.png", "cypress/styleguide/assets/img/caldav/description.svg", "cypress/styleguide/assets/img/caldav/link.png", "cypress/styleguide/assets/img/caldav/link.svg", "cypress/styleguide/assets/img/caldav/location.png", "cypress/styleguide/assets/img/caldav/location.svg", "cypress/styleguide/assets/img/caldav/organizer.png", "cypress/styleguide/assets/img/caldav/organizer.svg", "cypress/styleguide/assets/img/caldav/time.png", "cypress/styleguide/assets/img/caldav/time.svg", "cypress/styleguide/assets/img/caldav/title.png", "cypress/styleguide/assets/img/caldav/title.svg", "cypress/styleguide/assets/img/actions/add-folder-description.svg", "cypress/styleguide/assets/img/actions/add.svg", "cypress/styleguide/assets/img/actions/address.png", "cypress/styleguide/assets/img/actions/address.svg", "cypress/styleguide/assets/img/actions/alert-outline.svg", "cypress/styleguide/assets/img/actions/arrow-left.svg", "cypress/styleguide/assets/img/actions/arrow-right.svg", "cypress/styleguide/assets/img/actions/audio-off.svg", "cypress/styleguide/assets/img/actions/audio.svg", "cypress/styleguide/assets/img/actions/caret-white.svg", "cypress/styleguide/assets/img/actions/caret.svg", "cypress/styleguide/assets/img/actions/change.svg", "cypress/styleguide/assets/img/actions/clippy.svg", "cypress/styleguide/assets/img/actions/close.svg", "cypress/styleguide/assets/img/actions/comment.png", "cypress/styleguide/assets/img/actions/comment.svg", "cypress/styleguide/assets/img/actions/confirm-fade.svg", "cypress/styleguide/assets/img/actions/confirm-white.svg", "cypress/styleguide/assets/img/actions/confirm.svg", "cypress/styleguide/assets/img/actions/delete.png", "cypress/styleguide/assets/img/actions/delete.svg", "cypress/styleguide/assets/img/actions/details.svg", "cypress/styleguide/assets/img/actions/disabled-user.svg", "cypress/styleguide/assets/img/actions/disabled-users.svg", "cypress/styleguide/assets/img/actions/download.png", "cypress/styleguide/assets/img/actions/download.svg", "cypress/styleguide/assets/img/actions/edit.svg", "cypress/styleguide/assets/img/actions/error-white.svg", "cypress/styleguide/assets/img/actions/error.svg", "cypress/styleguide/assets/img/actions/external.svg", "cypress/styleguide/assets/img/actions/filter.svg", "cypress/styleguide/assets/img/actions/fullscreen.svg", "cypress/styleguide/assets/img/actions/group.svg", "cypress/styleguide/assets/img/actions/history.png", "cypress/styleguide/assets/img/actions/history.svg", "cypress/styleguide/assets/img/actions/info-white.svg", "cypress/styleguide/assets/img/actions/info.png", "cypress/styleguide/assets/img/actions/info.svg", "cypress/styleguide/assets/img/actions/logout.svg", "cypress/styleguide/assets/img/actions/mail.svg", "cypress/styleguide/assets/img/actions/menu-sidebar.svg", "cypress/styleguide/assets/img/actions/menu.svg", "cypress/styleguide/assets/img/actions/more-white.svg", "cypress/styleguide/assets/img/actions/more.png", "cypress/styleguide/assets/img/actions/more.svg", "cypress/styleguide/assets/img/actions/password-white.svg", "cypress/styleguide/assets/img/actions/password.png", "cypress/styleguide/assets/img/actions/password.svg", "cypress/styleguide/assets/img/actions/pause.svg", "cypress/styleguide/assets/img/actions/phone.svg", "cypress/styleguide/assets/img/actions/play-add.svg", "cypress/styleguide/assets/img/actions/play-next.svg", "cypress/styleguide/assets/img/actions/play-previous.svg", "cypress/styleguide/assets/img/actions/play.svg", "cypress/styleguide/assets/img/actions/profile.svg", "cypress/styleguide/assets/img/actions/projects.svg", "cypress/styleguide/assets/img/actions/public-white.svg", "cypress/styleguide/assets/img/actions/public.svg", "cypress/styleguide/assets/img/actions/quota.svg", "cypress/styleguide/assets/img/actions/recent.svg", "cypress/styleguide/assets/img/actions/rename.svg", "cypress/styleguide/assets/img/actions/screen-off.svg", "cypress/styleguide/assets/img/actions/screen.svg", "cypress/styleguide/assets/img/actions/search.svg", "cypress/styleguide/assets/img/actions/settings-dark.svg", "cypress/styleguide/assets/img/actions/settings.svg", "cypress/styleguide/assets/img/actions/share.png", "cypress/styleguide/assets/img/actions/share.svg", "cypress/styleguide/assets/img/actions/shared.svg", "cypress/styleguide/assets/img/actions/sound-off.svg", "cypress/styleguide/assets/img/actions/sound.svg", "cypress/styleguide/assets/img/actions/star-dark.svg", "cypress/styleguide/assets/img/actions/star.png", "cypress/styleguide/assets/img/actions/star.svg", "cypress/styleguide/assets/img/actions/starred.png", "cypress/styleguide/assets/img/actions/starred.svg", "cypress/styleguide/assets/img/actions/tag.png", "cypress/styleguide/assets/img/actions/tag.svg", "cypress/styleguide/assets/img/actions/template-add.svg", "cypress/styleguide/assets/img/actions/timezone.svg", "cypress/styleguide/assets/img/actions/toggle-background.svg", "cypress/styleguide/assets/img/actions/toggle-filelist.svg", "cypress/styleguide/assets/img/actions/toggle-pictures.svg", "cypress/styleguide/assets/img/actions/toggle.svg", "cypress/styleguide/assets/img/actions/triangle-e.svg", "cypress/styleguide/assets/img/actions/triangle-n.svg", "cypress/styleguide/assets/img/actions/triangle-s.svg", "cypress/styleguide/assets/img/actions/unshare.svg", "cypress/styleguide/assets/img/actions/upload.svg", "cypress/styleguide/assets/img/actions/user-admin.svg", "cypress/styleguide/assets/img/actions/user.svg", "cypress/styleguide/assets/img/actions/verified.svg", "cypress/styleguide/assets/img/actions/verify.svg", "cypress/styleguide/assets/img/actions/verifying.svg", "cypress/styleguide/assets/img/actions/video-off.svg", "cypress/styleguide/assets/img/actions/video-switch.svg", "cypress/styleguide/assets/img/actions/video.svg", "cypress/styleguide/assets/img/actions/view-close.svg", "cypress/styleguide/assets/img/actions/view-download.svg", "cypress/styleguide/assets/img/actions/view-next.svg", "cypress/styleguide/assets/img/actions/view-pause.svg", "cypress/styleguide/assets/img/actions/view-play.svg", "cypress/styleguide/assets/img/actions/view-previous.svg", "cypress/styleguide/assets/img/places/contacts-dark.png", "cypress/styleguide/assets/img/places/contacts.svg"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2018-2024 Google LLC"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ["cypress/styleguide/assets/img/background/kamil-porembinski-clouds.jpg", "cypress/styleguide/assets/img/app-background.jpg"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2013 Kamil Porembiński <https://www.flickr.com/photos/paszczak000>"
+SPDX-License-Identifier = "CC-BY-SA-2.0"
+
+[[annotations]]
+path = ["cypress/styleguide/assets/img/twitter.svg"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "X Corp."
+SPDX-License-Identifier = "LicenseRef-XTrademarks"
+
+[[annotations]]
+path = ["cypress/styleguide/assets/img/facebook.svg"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Meta"
+SPDX-License-Identifier = "LicenseRef-FacebookTrademarks"
+
+[[annotations]]
+path = ["cypress/styleguide/assets/img/mastodon.svg"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Mastodon gGmbH"
+SPDX-License-Identifier = "LicenseRef-MastodonTrademarks"
+
+[[annotations]]
+path = ["cypress/styleguide/assets/img/googleplay.png"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Google LLC."
+SPDX-License-Identifier = "LicenseRef-GooglePlayBadge"
+
+[[annotations]]
+path = ["cypress/styleguide/assets/img/appstore.svg"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Apple Inc."
+SPDX-License-Identifier = "LicenseRef-AppleAppStoreBadge"
