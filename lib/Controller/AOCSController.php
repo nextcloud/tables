@@ -38,7 +38,7 @@ abstract class AOCSController extends OCSController {
 	 * @return DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 */
 	protected function handleError($e): DataResponse {
-		$this->logger->warning('An internal error or exception occurred: ['. $e->getCode() . ']' . $e->getMessage());
+		$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 		return new DataResponse(['message' => $this->n->t('An unexpected error occurred. More details can be found in the logs. Please reach out to your administration.')], Http::STATUS_INTERNAL_SERVER_ERROR);
 	}
 
@@ -47,7 +47,7 @@ abstract class AOCSController extends OCSController {
 	 * @return DataResponse<Http::STATUS_FORBIDDEN, array{message: string}, array{}>
 	 */
 	protected function handlePermissionError(PermissionError $e): DataResponse {
-		$this->logger->warning('A permission error occurred: ['. $e->getCode() . ']' . $e->getMessage());
+		$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 		return new DataResponse(['message' => $this->n->t('A permission error occurred. More details can be found in the logs. Please reach out to your administration.')], Http::STATUS_FORBIDDEN);
 	}
 
@@ -56,7 +56,7 @@ abstract class AOCSController extends OCSController {
 	 * @return DataResponse<Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 */
 	protected function handleNotFoundError(NotFoundError $e): DataResponse {
-		$this->logger->info('A not found error occurred: ['. $e->getCode() . ']' . $e->getMessage());
+		$this->logger->info('A not found error occurred: ' . $e->getMessage(), ['exception' => $e]);
 		return new DataResponse(['message' => $this->n->t('A not found error occurred. More details can be found in the logs. Please reach out to your administration.')], Http::STATUS_NOT_FOUND);
 	}
 
@@ -65,7 +65,7 @@ abstract class AOCSController extends OCSController {
 	 * @return DataResponse<Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
 	 */
 	protected function handleBadRequestError(BadRequestError $e): DataResponse {
-		$this->logger->warning('An bad request was encountered: ['. $e->getCode() . ']' . $e->getMessage());
+		$this->logger->warning('An bad request was encountered: ' . $e->getMessage(), ['exception' => $e]);
 		return new DataResponse(['message' => $this->n->t('An error caused by an invalid request occurred. More details can be found in the logs. Please reach out to your administration.')], Http::STATUS_BAD_REQUEST);
 	}
 
