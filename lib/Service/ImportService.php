@@ -9,6 +9,7 @@ namespace OCA\Tables\Service;
 
 use OC\User\NoUserException;
 use OCA\Tables\Db\Column;
+use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -419,28 +420,30 @@ class ImportService extends SuperService {
 						$this->userId,
 						$this->tableId,
 						$this->viewId,
-						$this->columnsConfig[$index]['type'],
-						$this->columnsConfig[$index]['subtype'],
-						$this->columnsConfig[$index]['title'],
-						$this->columnsConfig[$index]['mandatory'] ?? false,
-						$this->columnsConfig[$index]['description'] ?? '',
-						$this->columnsConfig[$index]['textDefault'] ?? '',
-						$this->columnsConfig[$index]['textAllowedPattern'] ?? '',
-						$this->columnsConfig[$index]['textMaxLength'] ?? null,
-						$this->columnsConfig[$index]['numberPrefix'] ?? '',
-						$this->columnsConfig[$index]['numberSuffix'] ?? '',
-						$this->columnsConfig[$index]['numberDefault'] ?? null,
-						$this->columnsConfig[$index]['numberMin'] ?? null,
-						$this->columnsConfig[$index]['numberMax'] ?? null,
-						$this->columnsConfig[$index]['numberDecimals'] ?? 0,
-						$this->columnsConfig[$index]['selectionOptions'] ?? '',
-						$this->columnsConfig[$index]['selectionDefault'] ?? '',
-						$this->columnsConfig[$index]['datetimeDefault'] ?? '',
-						$this->columnsConfig[$index]['usergroupDefault'] ?? null,
-						$this->columnsConfig[$index]['usergroupMultipleItems'] ?? null,
-						$this->columnsConfig[$index]['usergroupSelectUsers'] ?? null,
-						$this->columnsConfig[$index]['usergroupSelectGroups'] ?? null,
-						$this->columnsConfig[$index]['showUserStatus'] ?? null,
+						new ColumnDto(
+							title: $this->columnsConfig[$index]['title'],
+							type: $this->columnsConfig[$index]['type'],
+							subtype: $this->columnsConfig[$index]['subtype'],
+							mandatory: $this->columnsConfig[$index]['mandatory'] ?? false,
+							description: $this->columnsConfig[$index]['description'] ?? '',
+							textDefault: $this->columnsConfig[$index]['textDefault'] ?? '',
+							textAllowedPattern: $this->columnsConfig[$index]['textAllowedPattern'] ?? '',
+							textMaxLength: $this->columnsConfig[$index]['textMaxLength'] ?? null,
+							numberDefault: $this->columnsConfig[$index]['numberDefault'] ?? null,
+							numberMin: $this->columnsConfig[$index]['numberMin'] ?? null,
+							numberMax: $this->columnsConfig[$index]['numberMax'] ?? null,
+							numberDecimals: $this->columnsConfig[$index]['numberDecimals'] ?? 0,
+							numberPrefix: $this->columnsConfig[$index]['numberPrefix'] ?? '',
+							numberSuffix: $this->columnsConfig[$index]['numberSuffix'] ?? '',
+							selectionOptions: $this->columnsConfig[$index]['selectionOptions'] ?? '',
+							selectionDefault: $this->columnsConfig[$index]['selectionDefault'] ?? '',
+							datetimeDefault: $this->columnsConfig[$index]['datetimeDefault'] ?? '',
+							usergroupDefault: $this->columnsConfig[$index]['usergroupDefault'] ?? null,
+							usergroupMultipleItems: $this->columnsConfig[$index]['usergroupMultipleItems'] ?? null,
+							usergroupSelectUsers: $this->columnsConfig[$index]['usergroupSelectUsers'] ?? null,
+							usergroupSelectGroups: $this->columnsConfig[$index]['usergroupSelectGroups'] ?? null,
+							showUserStatus: $this->columnsConfig[$index]['showUserStatus'] ?? null
+						),
 						$this->columnsConfig[$index]['selectedViewIds'] ?? []
 					);
 					$title = $column->getTitle();

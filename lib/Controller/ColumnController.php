@@ -8,6 +8,7 @@
 namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Service\ColumnService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
@@ -142,35 +143,32 @@ class ColumnController extends Controller {
 				$this->userId,
 				$tableId,
 				$viewId,
-				$type,
-				$subtype,
-				$title,
-				$mandatory,
-				$description,
-
-				$textDefault,
-				$textAllowedPattern,
-				$textMaxLength,
-
-				$numberPrefix,
-				$numberSuffix,
-				$numberDefault,
-				$numberMin,
-				$numberMax,
-				$numberDecimals,
-
-				$selectionOptions,
-				$selectionDefault,
-
-				$datetimeDefault,
-				
-				$usergroupDefault,
-				$usergroupMultipleItems,
-				$usergroupSelectUsers,
-				$usergroupSelectGroups,
-				$showUserStatus,
-
-				$selectedViewIds);
+				new ColumnDto(
+					title: $title,
+					type: $type,
+					subtype: $subtype,
+					mandatory: $mandatory,
+					description: $description,
+					textDefault: $textDefault,
+					textAllowedPattern: $textAllowedPattern,
+					textMaxLength: $textMaxLength,
+					numberDefault: $numberDefault,
+					numberMin: $numberMin,
+					numberMax: $numberMax,
+					numberDecimals: $numberDecimals,
+					numberPrefix: $numberPrefix,
+					numberSuffix: $numberSuffix,
+					selectionOptions: $selectionOptions,
+					selectionDefault: $selectionDefault,
+					datetimeDefault: $datetimeDefault,
+					usergroupDefault: $usergroupDefault,
+					usergroupMultipleItems: $usergroupMultipleItems,
+					usergroupSelectUsers: $usergroupSelectUsers,
+					usergroupSelectGroups: $usergroupSelectGroups,
+					showUserStatus: $showUserStatus
+				),
+				$selectedViewIds
+			);
 		});
 	}
 
@@ -243,33 +241,30 @@ class ColumnController extends Controller {
 				$id,
 				$tableId,
 				$this->userId,
-				$type,
-				$subtype,
-				$title,
-				$mandatory,
-				$description,
-
-				$textDefault,
-				$textAllowedPattern,
-				$textMaxLength,
-
-				$numberPrefix,
-				$numberSuffix,
-				$numberDefault,
-				$numberMin,
-				$numberMax,
-				$numberDecimals,
-
-				$selectionOptions,
-				$selectionDefault,
-
-				$datetimeDefault,
-
-				$usergroupDefault,
-				$usergroupMultipleItems,
-				$usergroupSelectUsers,
-				$usergroupSelectGroups,
-				$showUserStatus
+				new ColumnDto(
+					title: $title,
+					type: $type,
+					subtype: $subtype,
+					mandatory: $mandatory,
+					description: $description,
+					textDefault: $textDefault,
+					textAllowedPattern: $textAllowedPattern,
+					textMaxLength: $textMaxLength,
+					numberDefault: $numberDefault,
+					numberMin: $numberMin,
+					numberMax: $numberMax,
+					numberDecimals: $numberDecimals,
+					numberPrefix: $numberPrefix,
+					numberSuffix: $numberSuffix,
+					selectionOptions: $selectionOptions,
+					selectionDefault: $selectionDefault,
+					datetimeDefault: $datetimeDefault,
+					usergroupDefault: $usergroupDefault,
+					usergroupMultipleItems: $usergroupMultipleItems,
+					usergroupSelectUsers: $usergroupSelectUsers,
+					usergroupSelectGroups: $usergroupSelectGroups,
+					showUserStatus: $showUserStatus
+				)
 			);
 		});
 	}
