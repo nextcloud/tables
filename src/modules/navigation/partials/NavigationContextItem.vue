@@ -1,3 +1,7 @@
+<!--
+  - SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: AGPL-3.0-or-later
+-->
 <template>
 	<NcAppNavigationItem v-if="context" data-cy="navigationContextItem" :name="context.name"
 		:class="{ active: activeContext && context.id === activeContext.id }" :force-menu="true"

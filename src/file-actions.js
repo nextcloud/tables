@@ -1,3 +1,7 @@
+/**
+ * SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 import { FileAction, registerFileAction } from '@nextcloud/files'
 import { spawnDialog } from '@nextcloud/dialogs'
 // eslint-disable-next-line import/no-unresolved

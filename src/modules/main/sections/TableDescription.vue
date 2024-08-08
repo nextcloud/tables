@@ -1,3 +1,7 @@
+<!--
+  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: AGPL-3.0-or-later
+-->
 <template>
 	<div class="element-description">
 		<div v-show="mode !== 'hidden' && (!readOnly || description.length > 0)" class="description__editor">

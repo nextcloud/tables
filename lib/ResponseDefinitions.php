@@ -1,5 +1,10 @@
 <?php
 /**
+ * SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+ 
+/**
  * This file is needed, because API extractor will only read this one and not all the php files
  * Otherwise API extractor won't know all the return types...
  */

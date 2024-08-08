@@ -1,3 +1,7 @@
+<!--
+  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: AGPL-3.0-or-later
+-->
 <template>
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :length="length" :max-length="column.textMaxLength" :description="column.description">
 		<input v-model="localValue" :maxlength="column.textMaxLength">
