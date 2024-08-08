@@ -13,6 +13,7 @@ use Exception;
 use OCA\Tables\Api\V1Api;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -816,34 +817,30 @@ class Api1Controller extends ApiController {
 				$this->userId,
 				$tableId,
 				$viewId,
-				$type,
-				$subtype,
-				$title,
-				$mandatory,
-				$description,
-
-				$textDefault,
-				$textAllowedPattern,
-				$textMaxLength,
-
-				$numberPrefix,
-				$numberSuffix,
-				$numberDefault,
-				$numberMin,
-				$numberMax,
-				$numberDecimals,
-
-				$selectionOptions,
-				$selectionDefault,
-
-				$datetimeDefault,
-
-				$usergroupDefault,
-				$usergroupMultipleItems,
-				$usergroupSelectUsers,
-				$usergroupSelectGroups,
-				$usergroupShowUserStatus,
-
+				new ColumnDto(
+					title: $title,
+					type: $type,
+					subtype: $subtype,
+					mandatory: $mandatory,
+					description: $description,
+					textDefault: $textDefault,
+					textAllowedPattern: $textAllowedPattern,
+					textMaxLength: $textMaxLength,
+					numberDefault: $numberDefault,
+					numberMin: $numberMin,
+					numberMax: $numberMax,
+					numberDecimals: $numberDecimals,
+					numberPrefix: $numberPrefix,
+					numberSuffix: $numberSuffix,
+					selectionOptions: $selectionOptions,
+					selectionDefault: $selectionDefault,
+					datetimeDefault: $datetimeDefault,
+					usergroupDefault: $usergroupDefault,
+					usergroupMultipleItems: $usergroupMultipleItems,
+					usergroupSelectUsers: $usergroupSelectUsers,
+					usergroupSelectGroups: $usergroupSelectGroups,
+					showUserStatus: $usergroupShowUserStatus
+				),
 				$selectedViewIds
 			)->jsonSerialize());
 		} catch (PermissionError $e) {
@@ -930,32 +927,29 @@ class Api1Controller extends ApiController {
 				$columnId,
 				null,
 				$this->userId,
-				null,
-				$subtype,
-				$title,
-				$mandatory,
-				$description,
-
-				$textDefault,
-				$textAllowedPattern,
-				$textMaxLength,
-
-				$numberPrefix,
-				$numberSuffix,
-				$numberDefault,
-				$numberMin,
-				$numberMax,
-				$numberDecimals,
-
-				$selectionOptions,
-				$selectionDefault,
-				$datetimeDefault,
-
-				$usergroupDefault,
-				$usergroupMultipleItems,
-				$usergroupSelectUsers,
-				$usergroupSelectGroups,
-				$usergroupShowUserStatus,
+				new ColumnDto(
+					title: $title,
+					subtype: $subtype,
+					mandatory: $mandatory,
+					description: $description,
+					textDefault: $textDefault,
+					textAllowedPattern: $textAllowedPattern,
+					textMaxLength: $textMaxLength,
+					numberDefault: $numberDefault,
+					numberMin: $numberMin,
+					numberMax: $numberMax,
+					numberDecimals: $numberDecimals,
+					numberPrefix: $numberPrefix,
+					numberSuffix: $numberSuffix,
+					selectionOptions: $selectionOptions,
+					selectionDefault: $selectionDefault,
+					datetimeDefault: $datetimeDefault,
+					usergroupDefault: $usergroupDefault,
+					usergroupMultipleItems: $usergroupMultipleItems,
+					usergroupSelectUsers: $usergroupSelectUsers,
+					usergroupSelectGroups: $usergroupSelectGroups,
+					showUserStatus: $usergroupShowUserStatus
+				)
 			);
 			return new DataResponse($item->jsonSerialize());
 		} catch (InternalError $e) {
@@ -1533,34 +1527,30 @@ class Api1Controller extends ApiController {
 				$this->userId,
 				$tableId,
 				null,
-				$type,
-				$subtype,
-				$title,
-				$mandatory,
-				$description,
-
-				$textDefault,
-				$textAllowedPattern,
-				$textMaxLength,
-
-				$numberPrefix,
-				$numberSuffix,
-				$numberDefault,
-				$numberMin,
-				$numberMax,
-				$numberDecimals,
-
-				$selectionOptions,
-				$selectionDefault,
-
-				$datetimeDefault,
-
-				$usergroupDefault,
-				$usergroupMultipleItems,
-				$usergroupSelectUsers,
-				$usergroupSelectGroups,
-				$usergroupShowUserStatus,
-
+				new ColumnDto(
+					title: $title,
+					type: $type,
+					subtype: $subtype,
+					mandatory: $mandatory,
+					description: $description,
+					textDefault: $textDefault,
+					textAllowedPattern: $textAllowedPattern,
+					textMaxLength: $textMaxLength,
+					numberDefault: $numberDefault,
+					numberMin: $numberMin,
+					numberMax: $numberMax,
+					numberDecimals: $numberDecimals,
+					numberPrefix: $numberPrefix,
+					numberSuffix: $numberSuffix,
+					selectionOptions: $selectionOptions,
+					selectionDefault: $selectionDefault,
+					datetimeDefault: $datetimeDefault,
+					usergroupDefault: $usergroupDefault,
+					usergroupMultipleItems: $usergroupMultipleItems,
+					usergroupSelectUsers: $usergroupSelectUsers,
+					usergroupSelectGroups: $usergroupSelectGroups,
+					showUserStatus: $usergroupShowUserStatus
+				),
 				$selectedViewIds
 			);
 			return new DataResponse($item->jsonSerialize());

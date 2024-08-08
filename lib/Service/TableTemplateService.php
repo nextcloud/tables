@@ -9,6 +9,7 @@ namespace OCA\Tables\Service;
 
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\Table;
+use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -797,84 +798,10 @@ class TableTemplateService {
 		}
 
 		return $this->columnService->create(
-
-			// userId
 			$this->userId,
-
-			// tableId
 			$tableId,
-
-			// viewId
 			null,
-
-			// column type
-			(isset($parameters['type'])) ? $parameters['type'] : 'text',
-
-			// column subtype
-			(isset($parameters['subtype'])) ? $parameters['subtype'] : '',
-
-			// title
-			(isset($parameters['title']) && $parameters['title'] != '') ? $parameters['title'] : $this->l->t('No title given'),
-
-			// mandatory
-			isset($parameters['mandatory']) && !!$parameters['mandatory'],
-
-			// description
-			(isset($parameters['description'])) ? $parameters['description'] : '',
-
-			// textDefault
-			(isset($parameters['textDefault'])) ? $parameters['textDefault'] : '',
-
-			// textAllowedPattern
-			(isset($parameters['textAllowedPattern'])) ? $parameters['textAllowedPattern'] : '',
-
-			// textMaxLength
-			(isset($parameters['textMaxLength'])) ? $parameters['textMaxLength'] : -1,
-
-			// numberPrefix
-			(isset($parameters['numberPrefix'])) ? $parameters['numberPrefix'] : '',
-
-			// numberSuffix
-			(isset($parameters['numberSuffix'])) ? $parameters['numberSuffix'] : '',
-
-			// numberDefault
-			(isset($parameters['numberDefault'])) ? $parameters['numberDefault'] : null,
-
-			// numberMin
-			(isset($parameters['numberMin'])) ? $parameters['numberMin'] : null,
-
-			// numberMax
-			(isset($parameters['numberMax'])) ? $parameters['numberMax'] : null,
-
-			// numberDecimals
-			(isset($parameters['numberDecimals'])) ? $parameters['numberDecimals'] : null,
-
-			// selectionOptions
-			(isset($parameters['selectionOptions'])) ? $parameters['selectionOptions'] : '',
-
-			// selectionDefault
-			(isset($parameters['selectionDefault'])) ? $parameters['selectionDefault'] : '',
-
-			// datetimeDefault
-			(isset($parameters['datetimeDefault'])) ? $parameters['datetimeDefault'] : '',
-
-			// usergroupDefault
-			(isset($parameters['usergroupDefault'])) ? $parameters['usergroupDefault'] : '',
-
-			// usergroupMultipleItems
-			(isset($parameters['usergroupMultipleItems'])) ? $parameters['usergroupMultipleItems'] : null,
-
-			// usergroupSelectUsers
-			(isset($parameters['usergroupSelectUsers'])) ? $parameters['usergroupSelectUsers'] : null,
-
-			// usergroupSelectGroups
-			(isset($parameters['usergroupSelectGroups'])) ? $parameters['usergroupSelectGroups'] : null,
-
-			// showUserStatus
-			(isset($parameters['showUserStatus'])) ? $parameters['showUserStatus'] : null,
-
-			// additional view ids
-			[]
+			ColumnDto::createFromArray($parameters)
 		);
 	}
 
