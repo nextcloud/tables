@@ -1,0 +1,43 @@
+<!--
+  - SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+# Authors
+
+- Andy Scherzinger <info@andy-scherzinger.de>
+- Arthur Schiwon <blizzz@arthur-schiwon.de>
+- Christoph Nölke <connium@christoph-noelke.de>
+- Cleopatra Enjeck M <patrathewhiz@gmail.com>
+- Côme Chilliet <come.chilliet@nextcloud.com>
+- Elizabeth Danzberger <spookystuff@protonmail.com>
+- FahrJo <johannes.fahr@posteo.de>
+- Florian Steffens <flost-dev@mailbox.org>
+- ganimed <g@nimed.es>
+- grnd-alt <salimbelakkaf@outlook.de>
+- Hephi2 <46924014+Hephi2@users.noreply.github.com>
+- Hoang Pham <hoangmaths96@gmail.com>
+- Joas Schilling <coding@schilljs.com>
+- John Molakvoæ <skjnldsv@protonmail.com>
+- Julia Kirschenheuter <julia.kirschenheuter@nextcloud.com>
+- Julien Veyssier <julien-nc@posteo.net>
+- Julio C. Ortega <jortega@localhost.localdomain>
+- Julius Härtl <jus@bitgrid.net>
+- Jérémie Tarot <silopolis@gmail.com>
+- Jérôme Herbinet <33763786+Jerome-Herbinet@users.noreply.github.com>
+- Kate <26026535+provokateurin@users.noreply.github.com>
+- Kiril Isakov <kirix.isakov@gmail.com>
+- Luka Trovic <luka@nextcloud.com>
+- Lukas Reschke <lukas@statuscode.ch>
+- Marius Henker <derlohlgianer@gmail.com>
+- Max <max@nextcloud.com>
+- René Gieling <github@dartcafe.de>
+- Philipp Hempel <Philipp.Hempel1@web.de>
+- provokateurin <kate@provokateurin.de>
+- rakekniven <2069590+rakekniven@users.noreply.github.com>
+- Rello <Rello@users.noreply.github.com>
+- Silikox <69534095+Silikox@users.noreply.github.com>
+- simonspa <1677436+simonspa@users.noreply.github.com>
+- snehar97 <121554887+snehar97@users.noreply.github.com>
+- Thomas Citharel <github@tcit.fr>
+- Valdnet <47037905+Valdnet@users.noreply.github.com>
+- ಠ_ಠ <51381523+QazCetelic@users.noreply.github.com>

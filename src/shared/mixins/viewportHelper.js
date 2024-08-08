@@ -1,9 +1,13 @@
+/**
+ * SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
 /*
 XS <= 460px
 x <= 640px
 m <= 1024px
  */
-
 export default {
 	data() {
 		return {

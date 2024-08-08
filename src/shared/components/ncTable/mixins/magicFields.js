@@ -1,3 +1,7 @@
+/**
+ * SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 import { getCurrentUser } from '@nextcloud/auth'
 import Moment from '@nextcloud/moment'
 import { ColumnTypes } from './columnHandler.js'

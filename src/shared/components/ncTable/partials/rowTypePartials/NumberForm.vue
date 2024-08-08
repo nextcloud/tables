@@ -1,3 +1,7 @@
+<!--
+  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: AGPL-3.0-or-later
+-->
 <template>
 	<RowFormWrapper :width="2" :title="column.title" :mandatory="column.mandatory" :description="column.description">
 		<div v-if="column.numberPrefix" class="prefix">

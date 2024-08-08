@@ -1,3 +1,7 @@
+<!--
+  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: AGPL-3.0-or-later
+-->
 <template>
 	<NcAppSettingsDialog :open.sync="open" :show-navigation="true" data-cy="viewSettingsDialog" :title="createView ? t('tables', 'Create view') : t('tables', 'Edit view')">
 		<NcAppSettingsSection v-if="columns === null" id="loading" name="">

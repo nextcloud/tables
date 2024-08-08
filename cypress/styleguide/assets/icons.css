@@ -1,3 +1,7 @@
+/**
+ * SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 :root {
   --original-icon-add-dark: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDE2IDE2IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik05LjAyIDEzLjk4aC0ydi01aC01di0yaDV2LTVoMnY1bDUtLjAyOFY4Ljk4aC01eiIgZmlsbD0iIzAwMDAwMCIvPjwvc3ZnPgo=);
   --original-icon-add-white: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDE2IDE2IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik05LjAyIDEzLjk4aC0ydi01aC01di0yaDV2LTVoMnY1bDUtLjAyOFY4Ljk4aC01eiIgZmlsbD0iI2ZmZmZmZiIvPjwvc3ZnPgo=);

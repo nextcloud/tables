@@ -4,6 +4,8 @@
 -->
 # Nextcloud App »Tables«
 
+[![REUSE status](https://api.reuse.software/badge/github.com/nextcloud/tables)](https://api.reuse.software/info/github.com/nextcloud/tables)
+
 **Manage data the way you need it.**
 
 With this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.

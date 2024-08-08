@@ -1,3 +1,7 @@
+<!--
+  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: AGPL-3.0-or-later
+-->
 <template>
 	<div class="editor-wrapper" :class="{ border: showBorder, 'hide-readonly-bar': !showReadonlyBar, 'height-small': height === 'small' }">
 		<div v-if="textAppAvailable">

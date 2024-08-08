@@ -1,3 +1,7 @@
+<!--
+  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: AGPL-3.0-or-later
+-->
 <template>
 	<NcEmptyContent :name="t('tables', 'No columns')"
 		:description="t('tables', 'We need at least one column, please be so kind and create one.')">

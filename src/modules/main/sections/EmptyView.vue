@@ -1,3 +1,7 @@
+<!--
+  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: AGPL-3.0-or-later
+-->
 <template>
 	<NcEmptyContent :name="t('tables', 'No columns selected')"
 		:description="t('tables', 'The view is empty. Edit which columns should be displayed.')">

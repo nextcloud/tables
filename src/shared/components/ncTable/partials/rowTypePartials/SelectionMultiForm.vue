@@ -1,3 +1,7 @@
+<!--
+  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: AGPL-3.0-or-later
+-->
 <template>
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description">
 		<NcSelect v-model="localValues" :tag-width="80" :options="getAllNonDeletedOrSelectedOptions" :multiple="true" :aria-label-combobox="t('tables', 'Options')" />

@@ -1,3 +1,7 @@
+<!--
+  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: AGPL-3.0-or-later
+-->
 <template>
 	<div :tabindex="tabbable ? 0 : null" class="tile" :class="{active: localeActive}" @click="$emit('set-template')" @keyup.enter="$emit('set-template')">
 		<h3>{{ title }}</h3>

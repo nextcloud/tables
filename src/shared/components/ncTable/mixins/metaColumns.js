@@ -1,3 +1,7 @@
+/**
+ * SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 import DatetimeColumn from './columnsTypes/datetime.js'
 import NumberColumn from './columnsTypes/number.js'
 import TextLineColumn from './columnsTypes/textLine.js'

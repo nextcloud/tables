@@ -1,3 +1,7 @@
+/**
+ * SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 import { mount } from 'cypress/vue2'
 import { translate as t, translatePlural as n } from '@nextcloud/l10n'
 import store from '../../src/store/store.js'
