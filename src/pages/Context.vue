@@ -9,7 +9,8 @@
 			<div class="content context">
 				<div class="row first-row">
 					<h1 class="context__title">
-						<NcIconSvgWrapper :svg="icon" :size="32" style="display: inline-block;" />&nbsp; {{ activeContext.name }}
+						<NcIconSvgWrapper :svg="icon" :size="32" style="display: inline-block;" />&nbsp; {{
+							activeContext.name }}
 					</h1>
 				</div>
 				<div class="row space-L context__description">
@@ -153,29 +154,34 @@ export default {
 					const nodeType = parseInt(node.node_type)
 					if (nodeType === NODE_TYPE_TABLE) {
 						const table = this.tables.find(table => table.id === node.node_id)
-						await this.$store.dispatch('loadColumnsFromBE', {
-							view: null,
-							tableId: table.id,
-						})
-						await this.$store.dispatch('loadRowsFromBE', {
-							viewId: null,
-							tableId: table.id,
-						})
-						table.key = (table.id).toString()
-						table.isView = false
-						this.contextResources.push(table)
+						if (table) {
+							await this.$store.dispatch('loadColumnsFromBE', {
+								view: null,
+								tableId: table.id,
+							})
+							await this.$store.dispatch('loadRowsFromBE', {
+								viewId: null,
+								tableId: table.id,
+							})
+							table.key = (table.id).toString()
+							table.isView = false
+							this.contextResources.push(table)
+						}
+
 					} else if (nodeType === NODE_TYPE_VIEW) {
 						const view = this.views.find(view => view.id === node.node_id)
-						await this.$store.dispatch('loadColumnsFromBE', {
-							view,
-						})
-						await this.$store.dispatch('loadRowsFromBE', {
-							viewId: view.id,
-							tableId: view.tableId,
-						})
-						view.key = 'view-' + (view.id).toString()
-						view.isView = true
-						this.contextResources.push(view)
+						if (view) {
+							await this.$store.dispatch('loadColumnsFromBE', {
+								view,
+							})
+							await this.$store.dispatch('loadRowsFromBE', {
+								viewId: view.id,
+								tableId: view.tableId,
+							})
+							view.key = 'view-' + (view.id).toString()
+							view.isView = true
+							this.contextResources.push(view)
+						}
 					}
 				}
 			}
