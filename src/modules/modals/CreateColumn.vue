@@ -260,9 +260,11 @@ export default {
 			deep: true,
 		},
 		showModal() {
-			this.$nextTick(() => {
-				this.$el.querySelector('input')?.focus()
-			})
+			if (this.showModal) {
+				this.$nextTick(() => {
+					this.$el.querySelector('input')?.focus()
+				})
+			}
 		},
 	},
 	methods: {
