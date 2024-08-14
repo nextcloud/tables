@@ -242,5 +242,10 @@ export default {
 	:where(.slot.fix-col-4 input, .slot.fix-col-4 .row) {
 		min-width: 100% !important;
 	}
+
+	:where(.name-parts) {
+		display: block !important;
+		max-width: fit-content !important;
+	}
 }
 </style>
