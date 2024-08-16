@@ -33,12 +33,15 @@
 				</template>
 				{{ t('tables', 'Delete application') }}
 			</NcActionButton>
+			<NcActionCheckbox :value="showInNavigation" @change="updateDisplayMode">
+				Show in Navigation
+			</NcActionCheckbox>
 		</template>
 	</NcAppNavigationItem>
 </template>
 <script>
-import { NcAppNavigationItem, NcActionButton, NcIconSvgWrapper } from '@nextcloud/vue'
-import '@nextcloud/dialogs/style.css'
+import { NcAppNavigationItem, NcActionButton, NcIconSvgWrapper, NcActionCheckbox } from '@nextcloud/vue'
+import '@nextcloud/dialogs/dist/index.css'
 import { mapGetters } from 'vuex'
 import TableIcon from 'vue-material-design-icons/Table.vue'
 import { emit } from '@nextcloud/event-bus'
@@ -47,6 +50,7 @@ import FileSwap from 'vue-material-design-icons/FileSwap.vue'
 import Delete from 'vue-material-design-icons/Delete.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import svgHelper from '../../../shared/components/ncIconPicker/mixins/svgHelper.js'
+import { getCurrentUser } from '@nextcloud/auth'
 
 export default {
 	name: 'NavigationContextItem',
@@ -59,6 +63,7 @@ export default {
 		NcIconSvgWrapper,
 		NcAppNavigationItem,
 		NcActionButton,
+		NcActionCheckbox,
 	},
 
 	mixins: [permissionsMixin, svgHelper],
@@ -73,6 +78,7 @@ export default {
 	data() {
 		return {
 			icon: null,
+			showInNavigation: false,
 		}
 	},
 	computed: {
@@ -98,6 +104,15 @@ export default {
 		},
 		deleteContext() {
 			emit('tables:context:delete', this.context)
+		},
+		updateDisplayMode() {
+			this.showInNavigation = !this.showInNavigation
+			if (this.context) {
+				const share = Object.values(this.context.sharing || {}).find(share => share.receiver === getCurrentUser().uid)
+				if (share) {
+					this.$store.dispatch('updateDisplayMode', { shareId: share.share_id, displayMode: this.showInNavigation ? 1 : 0, userId: getCurrentUser().uid })
+				}
+			}
 		},
 	},
 

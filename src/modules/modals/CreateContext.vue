@@ -42,6 +42,24 @@
 				</div>
 				<NcContextResource :resources.sync="resources" :receivers.sync="receivers" />
 			</div>
+			<div class="row space-T">
+				<div>
+					{{ t('tables', 'Navigation bar entry') }}
+				</div>
+				<NcCheckboxRadioSwitch :checked.sync="displayMode" value="NAV_ENTRY_MODE_HIDDEN"
+					name="NAV_ENTRY_MODE_HIDDEN" type="radio">
+					No navigation bar entry
+				</NcCheckboxRadioSwitch>
+				<NcCheckboxRadioSwitch :checked.sync="displayMode" value="NAV_ENTRY_MODE_RECIPIENTS"
+					name="NAV_ENTRY_MODE_RECIPIENTS" type="radio">
+					Navigation bar entry for share recipients, but not the owner
+				</NcCheckboxRadioSwitch>
+				<NcCheckboxRadioSwitch :checked.sync="displayMode" value="NAV_ENTRY_MODE_ALL" name="NAV_ENTRY_MODE_ALL"
+					type="radio">
+					Navigation bar entry for everybody
+				</NcCheckboxRadioSwitch>
+				<br>
+			</div>
 			<div class="row space-R row space-T">
 				<div class="fix-col-4 end">
 					<NcButton type="primary" :aria-label="t('tables', 'Create application')" data-cy="createContextSubmitBtn" @click="submit">
@@ -54,13 +72,14 @@
 </template>
 
 <script>
-import { NcDialog, NcButton, NcIconSvgWrapper } from '@nextcloud/vue'
+import { NcModal, NcButton, NcIconSvgWrapper, NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
 import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'
 import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'
 import permissionBitmask from '../../shared/components/ncContextResource/mixins/permissionBitmask.js'
+import { NAV_ENTRY_MODE } from '../../shared/constants.js'
 
 export default {
 	name: 'CreateContext',
@@ -70,6 +89,7 @@ export default {
 		NcButton,
 		NcIconSvgWrapper,
 		NcContextResource,
+		NcCheckboxRadioSwitch,
 	},
 	mixins: [svgHelper, permissionBitmask],
 	props: {
@@ -90,6 +110,7 @@ export default {
 			description: '',
 			resources: [],
 			receivers: [],
+			displayMode: 'NAV_ENTRY_MODE_HIDDEN',
 		}
 	},
 	watch: {
@@ -150,7 +171,7 @@ export default {
 				description: this.description,
 				nodes: dataResources,
 			}
-			const res = await this.$store.dispatch('insertNewContext', { data, previousReceivers: [], receivers: this.receivers })
+			const res = await this.$store.dispatch('insertNewContext', { data, previousReceivers: [], receivers: this.receivers, displayMode: NAV_ENTRY_MODE[this.displayMode] })
 			if (res) {
 				return res.id
 			} else {
@@ -162,6 +183,7 @@ export default {
 			this.errorTitle = false
 			this.setIcon(this.randomIcon())
 			this.customTitleChosen = false
+			this.displayMode = 'NAV_ENTRY_MODE_HIDDEN'
 		},
 	},
 }
