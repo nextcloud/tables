@@ -4,6 +4,8 @@
     "Select columns" : "Select columns",
     "e.g. 1,2,4 or leave empty" : "e.g. 1,2,4 or leave empty",
     "Timestamp of data load" : "Timestamp of data load",
+    "No" : "خیر",
+    "Yes" : "بله",
     "Could not update row." : "Could not update row.",
     "The file was uploaded" : "پرونده، بارگذاری شد",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "حجم پروندهٔ بارگذاری شده بیش‌تر از upload_max_filesize در php.ini است",
