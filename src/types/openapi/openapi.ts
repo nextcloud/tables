@@ -2060,7 +2060,10 @@ export interface operations {
     };
     readonly "api1-index-table-columns": {
         readonly parameters: {
-            readonly query?: never;
+            readonly query?: {
+                /** @description View ID */
+                readonly viewId?: number | null;
+            };
             readonly header?: never;
             readonly path: {
                 /** @description Table ID */
@@ -2068,17 +2071,7 @@ export interface operations {
             };
             readonly cookie?: never;
         };
-        readonly requestBody?: {
-            readonly content: {
-                readonly "application/json": {
-                    /**
-                     * Format: int64
-                     * @description View ID
-                     */
-                    readonly viewId?: number | null;
-                };
-            };
-        };
+        readonly requestBody?: never;
         readonly responses: {
             /** @description View deleted */
             readonly 200: {
@@ -2670,7 +2663,12 @@ export interface operations {
     };
     readonly "api1-index-table-rows-simple": {
         readonly parameters: {
-            readonly query?: never;
+            readonly query?: {
+                /** @description Limit */
+                readonly limit?: number | null;
+                /** @description Offset */
+                readonly offset?: number | null;
+            };
             readonly header?: never;
             readonly path: {
                 /** @description Table ID */
@@ -2678,22 +2676,7 @@ export interface operations {
             };
             readonly cookie?: never;
         };
-        readonly requestBody?: {
-            readonly content: {
-                readonly "application/json": {
-                    /**
-                     * Format: int64
-                     * @description Limit
-                     */
-                    readonly limit?: number | null;
-                    /**
-                     * Format: int64
-                     * @description Offset
-                     */
-                    readonly offset?: number | null;
-                };
-            };
-        };
+        readonly requestBody?: never;
         readonly responses: {
             /** @description Row values returned */
             readonly 200: {
@@ -2740,7 +2723,12 @@ export interface operations {
     };
     readonly "api1-index-table-rows": {
         readonly parameters: {
-            readonly query?: never;
+            readonly query?: {
+                /** @description Limit */
+                readonly limit?: number | null;
+                /** @description Offset */
+                readonly offset?: number | null;
+            };
             readonly header?: never;
             readonly path: {
                 /** @description Table ID */
@@ -2748,22 +2736,7 @@ export interface operations {
             };
             readonly cookie?: never;
         };
-        readonly requestBody?: {
-            readonly content: {
-                readonly "application/json": {
-                    /**
-                     * Format: int64
-                     * @description Limit
-                     */
-                    readonly limit?: number | null;
-                    /**
-                     * Format: int64
-                     * @description Offset
-                     */
-                    readonly offset?: number | null;
-                };
-            };
-        };
+        readonly requestBody?: never;
         readonly responses: {
             /** @description Rows returned */
             readonly 200: {
@@ -2863,7 +2836,12 @@ export interface operations {
     };
     readonly "api1-index-view-rows": {
         readonly parameters: {
-            readonly query?: never;
+            readonly query?: {
+                /** @description Limit */
+                readonly limit?: number | null;
+                /** @description Offset */
+                readonly offset?: number | null;
+            };
             readonly header?: never;
             readonly path: {
                 /** @description View ID */
@@ -2871,22 +2849,7 @@ export interface operations {
             };
             readonly cookie?: never;
         };
-        readonly requestBody?: {
-            readonly content: {
-                readonly "application/json": {
-                    /**
-                     * Format: int64
-                     * @description Limit
-                     */
-                    readonly limit?: number | null;
-                    /**
-                     * Format: int64
-                     * @description Offset
-                     */
-                    readonly offset?: number | null;
-                };
-            };
-        };
+        readonly requestBody?: never;
         readonly responses: {
             /** @description Rows returned */
             readonly 200: {
