@@ -833,6 +833,27 @@ class FeatureContext implements Context {
 	}
 
 	/**
+	 * @When user :user sets columns :columnList to view :viewAlias
+	 */
+	public function applyColumnsToView(string $user, string $columnList, string $viewAlias) {
+		$this->setCurrentUser($user);
+
+		$columns = explode(',', $columnList);
+		$columns = array_map(function (string $columnAlias) {
+			$col = $this->collectionManager->getByAlias('column', $columnAlias);
+			return $col['id'];
+		}, $columns);
+
+		$view = $this->collectionManager->getByAlias('view', $viewAlias);
+
+		$this->sendRequest(
+			'PUT',
+			'/apps/tables/api/1/views/' . $view['id'],
+			[ 'data' => ['columns' => json_encode($columns)] ]
+		);
+	}
+
+	/**
 	 * @When user :user deletes view :viewName
 	 *
 	 * @param string $user
@@ -1120,6 +1141,8 @@ class FeatureContext implements Context {
 		$columnToVerify = $this->getDataFromResponse($this->response);
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($columnToVerify['title'], $title);
+
+		$this->collectionManager->register($newColumn, 'column', $newColumn['id'], $title);
 	}
 
 	/**

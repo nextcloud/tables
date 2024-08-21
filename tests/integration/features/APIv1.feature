@@ -229,6 +229,31 @@ Feature: APIv1
     When user "participant1" deletes view "first-view"
     Then table "view-test" has the following views for user "participant1"
 
+  @api1 @views
+  Scenario: Column can be added to a view
+    Given table "Private One" with emoji "🤫" exists for user "participant1" as "table_p1"
+    Then column "Volatile Notes" exists with following properties
+      | type          | text            |
+      | subtype       | line            |
+      | mandatory     | 0               |
+      | description   | Note me a thing |
+    And user "participant1" create view "Simple View" with emoji "🙃" for "table_p1" as "simple-view"
+    When user "participant1" sets columns "Volatile Notes" to view "simple-view"
+    Then the reported status is "200"
+
+  @api1 @views
+  Scenario: Foreign or nonexistent columns cannot be added to a view
+    Given table "Private One" with emoji "🤫" exists for user "participant1" as "table_p1"
+    Then column "Volatile Notes" exists with following properties
+      | type          | text            |
+      | subtype       | line            |
+      | mandatory     | 0               |
+      | description   | Note me a thing |
+    And table "Private Two" with emoji "🥶" exists for user "participant2" as "table_p2"
+    And user "participant2" create view "Sneaky View" with emoji "🫣" for "table_p2" as "sneaky-view"
+    When user "participant2" sets columns "Volatile Notes" to view "sneaky-view"
+    Then the reported status is "400"
+
   @api1 @contexts @contexts-sharing
   Scenario: Share an owned context
     Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1" as "t1" via v2
