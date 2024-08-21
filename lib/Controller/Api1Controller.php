@@ -10,6 +10,7 @@
 namespace OCA\Tables\Controller;
 
 use Exception;
+use InvalidArgumentException;
 use OCA\Tables\Api\V1Api;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\ViewMapper;
@@ -376,9 +377,10 @@ class Api1Controller extends ApiController {
 	 *
 	 * @param int $viewId View ID
 	 * @param array{key: 'title'|'emoji'|'description', value: string}|array{key: 'columns', value: int[]}|array{key: 'sort', value: array{columnId: int, mode: 'ASC'|'DESC'}}|array{key: 'filter', value: array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}} $data key-value pairs
-	 * @return DataResponse<Http::STATUS_OK, TablesView, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesView, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: View updated
+	 * 400: Invalid data
 	 * 403: No permissions
 	 * 404: Not found
 	 */
@@ -386,9 +388,13 @@ class Api1Controller extends ApiController {
 		try {
 			return new DataResponse($this->viewService->update($viewId, $data)->jsonSerialize());
 		} catch (PermissionError $e) {
-			$this->logger->warning('A permission error occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
+		} catch (InvalidArgumentException $e) {
+			$this->logger->warning('An invalid request occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
 		} catch (InternalError|Exception $e) {
 			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];

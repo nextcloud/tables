@@ -11,13 +11,12 @@ namespace OCA\Tables\Service;
 
 use DateTime;
 use Exception;
-
+use InvalidArgumentException;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Db\Column;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
-
-
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -73,7 +72,6 @@ class ViewService extends SuperService {
 		$this->eventDispatcher = $eventDispatcher;
 		$this->contextService = $contextService;
 	}
-
 
 	/**
 	 * @param Table $table
@@ -246,6 +244,7 @@ class ViewService extends SuperService {
 	 * @return View
 	 * @throws InternalError
 	 * @throws PermissionError
+	 * @throws InvalidArgumentException
 	 */
 	public function update(int $id, array $data, ?string $userId = null, bool $skipTableEnhancement = false): View {
 		$userId = $this->permissionsService->preCheckUserId($userId);
@@ -255,26 +254,42 @@ class ViewService extends SuperService {
 
 			// security
 			if (!$this->permissionsService->canManageView($view, $userId)) {
-				throw new PermissionError('PermissionError: can not update view with id '.$id);
+				throw new PermissionError('PermissionError: can not update view with id ' . $id);
 			}
 
 			$updatableParameter = ['title', 'emoji', 'description', 'columns', 'sort', 'filter'];
 
 			foreach ($data as $key => $value) {
 				if (!in_array($key, $updatableParameter)) {
-					throw new InternalError('View parameter '.$key.' can not be updated.');
+					throw new InternalError('View parameter ' . $key . ' can not be updated.');
 				}
-				$setterMethod = 'set'.ucfirst($key);
+
+				if ($key === 'columns') {
+					// we have to fetch the service here as ColumnService already depends on the ViewService, i.e. no DI
+					$columnService = \OCP\Server::get(ColumnService::class);
+					$columnIds = \json_decode($value, true);
+					$availableColumns = $columnService->findAllByTable($view->getTableId(), $view->getId(), $this->userId);
+					$availableColumns = array_map(static fn (Column $column) => $column->getId(), $availableColumns);
+					foreach ($columnIds as $columnId) {
+						if (!in_array($columnId, $availableColumns, true)) {
+							throw new InvalidArgumentException('Invalid column ID provided');
+						}
+					}
+				}
+
+				$setterMethod = 'set' . ucfirst($key);
 				$view->$setterMethod($value);
 			}
 			$time = new DateTime();
 			$view->setLastEditBy($userId);
 			$view->setLastEditAt($time->format('Y-m-d H:i:s'));
 			$view = $this->mapper->update($view);
-			if(!$skipTableEnhancement) {
+			if (!$skipTableEnhancement) {
 				$this->enhanceView($view, $userId);
 			}
 			return $view;
+		} catch (InvalidArgumentException $e) {
+			throw $e;
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError($e->getMessage());

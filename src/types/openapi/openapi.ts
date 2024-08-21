@@ -1476,6 +1476,17 @@ export interface operations {
                     readonly "application/json": components["schemas"]["View"];
                 };
             };
+            /** @description Invalid data */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
             /** @description No permissions */
             readonly 403: {
                 headers: {
@@ -2796,7 +2807,7 @@ export interface operations {
                 readonly "application/json": {
                     /** @description Data as key - value store */
                     readonly data: string | {
-                        readonly [key: string]: Record<string, never>;
+                        readonly [key: string]: Record<string, never> | undefined;
                     };
                 };
             };
@@ -2909,7 +2920,7 @@ export interface operations {
                 readonly "application/json": {
                     /** @description Data as key - value store */
                     readonly data: string | {
-                        readonly [key: string]: Record<string, never>;
+                        readonly [key: string]: Record<string, never> | undefined;
                     };
                 };
             };
@@ -3022,7 +3033,7 @@ export interface operations {
                     readonly viewId?: number | null;
                     /** @description Data as key - value store */
                     readonly data: string | {
-                        readonly [key: string]: Record<string, never>;
+                        readonly [key: string]: Record<string, never> | undefined;
                     };
                 };
             };
@@ -5421,7 +5432,7 @@ export interface operations {
                 readonly "application/json": {
                     /** @description An array containing the column identifiers and their values */
                     readonly data: string | {
-                        readonly [key: string]: Record<string, never>;
+                        readonly [key: string]: Record<string, never> | undefined;
                     };
                 };
             };
