@@ -1,13 +1,6 @@
 {
-	"minimum-stability": "dev",
-	"repositories": [
-		{
-			"type": "vcs",
-			"url": "https://github.com/nextcloud/openapi-extractor"
-		}
-	],
 	"require-dev": {
-		"nextcloud/openapi-extractor": "dev-main"
+		"nextcloud/openapi-extractor": "^1.0.0"
 	},
 	"config": {
 		"platform": {
