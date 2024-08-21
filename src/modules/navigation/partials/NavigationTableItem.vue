@@ -342,7 +342,7 @@ export default {
 	}
 
 	.app-navigation-entry__counter-wrapper .counter-bubble__counter {
-		display: inline-flex;
+		display: inline;
 	}
 }
 
