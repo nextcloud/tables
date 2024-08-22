@@ -381,9 +381,9 @@ export default new Vuex.Store({
 			}
 		},
 
-		async updateDisplayMode({ dispatch }, { shareId, displayMode, userId }) {
+		async updateDisplayMode({ dispatch }, { shareId, displayMode, target }) {
 			try {
-				await axios.put(generateUrl('/apps/tables/share/' + shareId + '/display-mode'), { displayMode, userId })
+				await axios.put(generateUrl('/apps/tables/share/' + shareId + '/display-mode'), { displayMode, target })
 			} catch (e) {
 				displayError(e, t('tables', 'Could not update display mode.'))
 			}
