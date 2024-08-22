@@ -38,7 +38,24 @@
 				</div>
 				<NcContextResource :resources.sync="resources" :receivers.sync="receivers" />
 			</div>
-
+			<div class="row space-T">
+				<div>
+					{{ t('tables', 'Navigation bar display') }}
+				</div>
+				<NcCheckboxRadioSwitch :checked.sync="displayMode" value="NAV_ENTRY_MODE_HIDDEN"
+					name="NAV_ENTRY_MODE_HIDDEN" type="radio">
+					Hide navigation entry for everybody
+				</NcCheckboxRadioSwitch>
+				<NcCheckboxRadioSwitch :checked.sync="displayMode" value="NAV_ENTRY_MODE_RECIPIENTS"
+					name="NAV_ENTRY_MODE_RECIPIENTS" type="radio">
+					Show navigation entry for everybody, except me
+				</NcCheckboxRadioSwitch>
+				<NcCheckboxRadioSwitch :checked.sync="displayMode" value="NAV_ENTRY_MODE_ALL" name="NAV_ENTRY_MODE_ALL"
+					type="radio">
+					Show navigation entry for everybody
+				</NcCheckboxRadioSwitch>
+				<br>
+			</div>
 			<div class="row space-T">
 				<div class="fix-col-4 space-T justify-between">
 					<NcButton v-if="!prepareDeleteContext" type="error" @click="prepareDeleteContext = true">
@@ -62,7 +79,7 @@
 </template>
 
 <script>
-import { NcDialog, NcButton, NcIconSvgWrapper } from '@nextcloud/vue'
+import { NcModal, NcButton, NcIconSvgWrapper, NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import { getCurrentUser } from '@nextcloud/auth'
 import '@nextcloud/dialogs/style.css'
@@ -74,6 +91,7 @@ import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'
 import permissionBitmask from '../../shared/components/ncContextResource/mixins/permissionBitmask.js'
 import { emit } from '@nextcloud/event-bus'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
+import { NAV_ENTRY_MODE } from '../../shared/constants.js'
 
 export default {
 	name: 'EditContext',
@@ -83,6 +101,7 @@ export default {
 		NcIconPicker,
 		NcIconSvgWrapper,
 		NcContextResource,
+		NcCheckboxRadioSwitch,
 	},
 	mixins: [svgHelper, permissionBitmask, permissionsMixin],
 	props: {
@@ -111,6 +130,7 @@ export default {
 			PERMISSION_UPDATE,
 			PERMISSION_DELETE,
 			prepareDeleteContext: false,
+			displayMode: 'NAV_ENTRY_MODE_HIDDEN', // TODO: get the actual saved display mode
 		}
 	},
 	computed: {

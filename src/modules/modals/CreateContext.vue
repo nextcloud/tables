@@ -44,19 +44,19 @@
 			</div>
 			<div class="row space-T">
 				<div>
-					{{ t('tables', 'Navigation bar entry') }}
+					{{ t('tables', 'Navigation bar display') }}
 				</div>
 				<NcCheckboxRadioSwitch :checked.sync="displayMode" value="NAV_ENTRY_MODE_HIDDEN"
 					name="NAV_ENTRY_MODE_HIDDEN" type="radio">
-					No navigation bar entry
+					Hide navigation entry for everybody
 				</NcCheckboxRadioSwitch>
 				<NcCheckboxRadioSwitch :checked.sync="displayMode" value="NAV_ENTRY_MODE_RECIPIENTS"
 					name="NAV_ENTRY_MODE_RECIPIENTS" type="radio">
-					Navigation bar entry for share recipients, but not the owner
+					Show navigation entry for everybody, except me
 				</NcCheckboxRadioSwitch>
 				<NcCheckboxRadioSwitch :checked.sync="displayMode" value="NAV_ENTRY_MODE_ALL" name="NAV_ENTRY_MODE_ALL"
 					type="radio">
-					Navigation bar entry for everybody
+					Show navigation entry for everybody
 				</NcCheckboxRadioSwitch>
 				<br>
 			</div>

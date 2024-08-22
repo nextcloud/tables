@@ -15,7 +15,8 @@
 			</template>
 		</template>
 		<template #actions>
-			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" data-cy="navigationContextEditBtn" @click="editContext">
+			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" data-cy="navigationContextEditBtn"
+				@click="editContext">
 				<template #icon>
 					<PlaylistEdit :size="20" />
 				</template>
@@ -27,13 +28,14 @@
 				</template>
 				{{ t('tables', 'Transfer application') }}
 			</NcActionButton>
-			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" data-cy="navigationContextDeleteBtn" @click="deleteContext">
+			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" data-cy="navigationContextDeleteBtn"
+				@click="deleteContext">
 				<template #icon>
 					<Delete :size="20" />
 				</template>
 				{{ t('tables', 'Delete application') }}
 			</NcActionButton>
-			<NcActionCheckbox :value="showInNavigation" @change="updateDisplayMode">
+			<NcActionCheckbox v-if="!ownsContext(context)" :value="showInNavigation" @change="updateDisplayMode">
 				Show in Navigation
 			</NcActionCheckbox>
 		</template>
@@ -51,6 +53,7 @@ import Delete from 'vue-material-design-icons/Delete.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import svgHelper from '../../../shared/components/ncIconPicker/mixins/svgHelper.js'
 import { getCurrentUser } from '@nextcloud/auth'
+import { NAV_ENTRY_MODE } from '../../../shared/constants.js'
 
 export default {
 	name: 'NavigationContextItem',
@@ -78,7 +81,7 @@ export default {
 	data() {
 		return {
 			icon: null,
-			showInNavigation: false,
+			showInNavigation: this.getDisplayMode(),
 		}
 	},
 	computed: {
@@ -105,13 +108,18 @@ export default {
 		deleteContext() {
 			emit('tables:context:delete', this.context)
 		},
+		getDisplayMode() {
+			const share = Object.values(this.context.sharing || {}).find(share => share.receiver === getCurrentUser().uid)
+			if (share) {
+				return share.display_mode
+			}
+			return 0
+		},
 		updateDisplayMode() {
-			this.showInNavigation = !this.showInNavigation
-			if (this.context) {
-				const share = Object.values(this.context.sharing || {}).find(share => share.receiver === getCurrentUser().uid)
-				if (share) {
-					this.$store.dispatch('updateDisplayMode', { shareId: share.share_id, displayMode: this.showInNavigation ? 1 : 0, userId: getCurrentUser().uid })
-				}
+			this.showInNavigation = this.showInNavigation ? 0 : 1
+			const share = Object.values(this.context.sharing || {}).find(share => share.receiver === getCurrentUser().uid)
+			if (share) {
+				this.$store.dispatch('updateDisplayMode', { shareId: share.share_id, displayMode: this.showInNavigation ? NAV_ENTRY_MODE['NAV_ENTRY_MODE_RECIPIENTS'] : NAV_ENTRY_MODE['NAV_ENTRY_MODE_HIDDEN'], target: 'self' })
 			}
 		},
 	},
