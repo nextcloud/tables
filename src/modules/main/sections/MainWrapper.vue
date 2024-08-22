@@ -145,7 +145,7 @@ export default {
 					isView: this.isView,
 				}
 				if (this.activeRowId) {
-					emit('tables:row:edit', { row: this.rows.find(r => r.id === this.activeRowId), columns: this.columns, isView: this.isView, elementId: this.element.id })
+					emit('tables:row:edit', { row: this.rows.find(r => r.id === this.activeRowId), columns: this.columns, isView: this.isView, elementId: this.element.id, element: this.element })
 				}
 				this.localLoading = false
 			}
