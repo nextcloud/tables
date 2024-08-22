@@ -264,11 +264,10 @@ class ContextService {
 	public function deleteNodeRel(int $nodeId, int $nodeType): void {
 		try {
 			$nodeRelIds = $this->contextNodeRelMapper->getRelIdsForNode($nodeId, $nodeType);
-			foreach ($nodeRelIds as $nodeRelId) {
-				$this->pageContentMapper->deleteByNodeRelId($nodeRelId);
-				$this->contextNodeRelMapper->deleteByNodeRelId($nodeRelId);
-			}
-			
+			$this->atomic(function () use ($nodeRelIds) {
+				$this->pageContentMapper->deleteByNodeRelIds($nodeRelIds);
+				$this->contextNodeRelMapper->deleteByNodeRelIds($nodeRelIds);
+			}, $this->dbc);
 		} catch (Exception $e) {
 			$this->logger->error('Something went wrong while deleting node relation for node id: ' . (string)$nodeId . ' and node type ' . (string)$nodeType, ['exception' => $e]);
 		}

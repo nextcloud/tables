@@ -73,10 +73,10 @@ class PageContentMapper extends QBMapper {
 		return $qb->executeStatement();
 	}
 
-	public function deleteByNodeRelId(int $nodeRelId): int {
+	public function deleteByNodeRelIds(array $nodeRelIds): void {
 		$qb = $this->db->getQueryBuilder();
 		$qb->delete($this->table)
-			->where($qb->expr()->eq('node_rel_id', $qb->createNamedParameter($nodeRelId, IQueryBuilder::PARAM_INT)));
-		return $qb->executeStatement();
+			->where($qb->expr()->in('node_rel_id', $qb->createNamedParameter($nodeRelIds, IQueryBuilder::PARAM_INT_ARRAY), ':nodeRelIds'));
+		$qb->executeStatement();
 	}
 }
