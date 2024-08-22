@@ -258,4 +258,9 @@ button[class^='icon-'] {
 	display: inline-flex;
 }
 
+.v-select.select .vs__selected-options {
+    min-height: calc(var(--default-clickable-area) - 2 * var(--vs-border-width)) !important;
+    padding: 0 5px;
+}
+
 </style>
