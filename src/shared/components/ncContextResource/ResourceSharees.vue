@@ -54,7 +54,13 @@ export default {
 	data() {
 		return {
 			preExistingSharees: [...this.receivers],
-			localSharees: this.receivers.map(userObject => userObject.id),
+			localSharees: this.receivers.map(obj => ({
+				id: obj.id,
+				displayName: obj.displayName,
+				icon: obj.icon,
+				isUser: obj.isUser,
+				key: obj.key,
+			})),
 		}
 	},
 
@@ -64,7 +70,13 @@ export default {
 				return this.localSharees
 			},
 			set(v) {
-				this.localSharees = v.map(userObject => userObject.id)
+				this.localSharees = v.map(obj => ({
+					id: obj.id,
+					displayName: obj.displayName,
+					icon: obj.icon,
+					isUser: obj.isUser,
+					key: obj.key,
+				}))
 				this.$emit('update', v)
 			},
 		},
@@ -77,10 +89,15 @@ export default {
 
 		filterOutUnwantedItems(items) {
 			// Filter out existing items
-			items = items.filter((item) => !(item.isUser && this.localSharees.includes(item.id)))
-
+			const filteredItems = []
+			items.forEach((item) => {
+				const alreadyExists = this.localSharees.find((localItem) => item.id === localItem.id && item.isUser === localItem.isUser)
+				if (!alreadyExists) {
+					filteredItems.push(item)
+				}
+			})
 			// Filter out current user
-			return items.filter((item) => !(item.isUser && item.id === this.currentUserId))
+			return filteredItems.filter((item) => !(item.isUser && item.id === this.currentUserId))
 		},
 
 		formatResult(autocompleteResult) {

@@ -7,7 +7,7 @@
 		<div>
 			<ResourceForm :resources="localResources" data-cy="contextResourceForm" @add="addResource" />
 			<ResourceList :resources="localResources" data-cy="contextResourceList" @remove="removeResource" />
-			<ResourceSharees :select-users="true" :select-groups="false" :receivers="localReceivers" data-cy="contextResourceShare" @update="updateReceivers" />
+			<ResourceSharees :select-users="true" :select-groups="true" :receivers="localReceivers" data-cy="contextResourceShare" @update="updateReceivers" />
 			<ResourceSharePermissions :resources="localResources" data-cy="contextResourcePerms" @update="updateResourcePermissions" />
 		</div>
 	</div>

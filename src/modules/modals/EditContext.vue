@@ -186,7 +186,7 @@ export default {
 		},
 		getContextReceivers(context) {
 			let sharing = Object.values(context.sharing)
-			sharing = sharing.filter((share) => getCurrentUser().uid !== share.receiver)
+			sharing = sharing.filter((share) => !(getCurrentUser().uid === share.receiver && share.receiver_type === 'user'))
 			const receivers = sharing.map((share) => {
 				return {
 					id: share.receiver,
