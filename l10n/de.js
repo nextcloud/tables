@@ -378,7 +378,7 @@ OC.L10N.register(
     "No view in context" : "Keine Ansicht im Kontext",
     "From {ownerName}" : "Von {ownerName}",
     "API" : "API",
-    "This is your API endpoint for this view" : "Dies ist Ihr API-Endpunkt für diese Ansicht",
+    "This is your API endpoint for this view" : "Dies ist dein API-Endpunkt für diese Ansicht",
     "Copy to clipboard" : "In die Zwischenablage kopieren",
     "Your permissions" : "Deine Berechtigungen",
     "Read" : "Gelesen",
