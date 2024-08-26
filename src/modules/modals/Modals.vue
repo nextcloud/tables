@@ -43,6 +43,7 @@
 
 		<ImportScheme
 			:show-modal="showImportScheme"
+			:title="importSchemeTitle"
 			@close="showImportScheme = false" />
 		<CreateContext :show-modal="showModalCreateContext" @close="showModalCreateContext = false" />
 		<EditContext :context-id="editContext" :show-modal="editContext !== null" @close="editContext = null" />
@@ -108,6 +109,7 @@ export default {
 			showModalCreateContext: false,
 			importToElement: null,
 			showImportScheme: false,
+			importSchemeTitle: '',
 			createViewTableId: null, // if null, no modal open
 			tableToDelete: null,
 			viewToDelete: null,
@@ -152,7 +154,7 @@ export default {
 
 		// misc
 		subscribe('tables:modal:import', element => { this.importToElement = element })
-		subscribe('tables:modal:scheme', () => { this.showImportScheme = true })
+		subscribe('tables:modal:scheme', title => { this.importSchemeTitle = title; this.showImportScheme = true })
 
 		// context
 		subscribe('tables:context:create', () => { this.showModalCreateContext = true })

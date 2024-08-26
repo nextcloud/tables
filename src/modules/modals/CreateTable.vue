@@ -179,12 +179,12 @@ export default {
 			this.$emit('close')
 		},
 		async submit() {
+			if (this.templateChoice === 'scheme') {
+				emit('tables:modal:scheme', this.title)
+				this.actionCancel()
+				return
+			}
 			if (this.title === '') {
-				if (this.templateChoice === 'scheme') {
-					emit('tables:modal:scheme', {})
-					this.actionCancel()
-					return
-				}
 				showError(t('tables', 'Cannot create new table. Title is missing.'))
 				this.errorTitle = true
 			} else {
