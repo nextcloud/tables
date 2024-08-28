@@ -18,7 +18,7 @@ SPDX-FileCopyrightText = "2023 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 [[annotations]]
-path = ["tsconfig.json", "vendor-bin/openapi-extractor/composer.json", "vendor-bin/openapi-extractor/composer.lock"]
+path = ["tsconfig.json", "vendor-bin/openapi-extractor/composer.json", "cypress/e2e/ToDo list.json", "vendor-bin/openapi-extractor/composer.lock"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2024 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"

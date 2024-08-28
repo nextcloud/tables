@@ -23,6 +23,7 @@
 			class="hidden-visually"
 			:accept="mimeTypes.join(',')"
 			@change="onUploadFileInputChange">
+		<span v-if="selectedUploadFile">{{ selectedUploadFile?.name }}</span>
 		<div class="row">
 			<div class="fix-col-4 end">
 				<NcButton :aria-label="t('tables', 'Import')" type="primary" @click="actionSubmit">
@@ -49,6 +50,10 @@ export default {
 		showModal: {
 			type: Boolean,
 			default: false,
+		},
+		title: {
+			type: String,
+			default: '',
 		},
 	},
 	data() {
@@ -77,6 +82,9 @@ export default {
 			reader.readAsText(this.selectedUploadFile, 'UTF-8')
 			reader.onload = (evt) => {
 				const json = JSON.parse(evt.target.result)
+				if (this.title !== '') {
+					json.title = this.title
+				}
 			    axios.post(generateOcsUrl('/apps/tables/api/2/tables/scheme'), json).then(async res => {
 					if (res.status === 200) {
 						await this.$store.dispatch('loadTablesFromBE')
