@@ -794,6 +794,12 @@ Feature: APIv2
       | four          | 2023-12-24              |
       | five          | [{"id": "admin", "type": 0}] |
     Then the reported status is 200
+    And the inserted row has the following values
+      | one           | AHA                     |
+      | two           | 161                     |
+      | three         | true                    |
+      | four          | 2023-12-24              |
+      | five          | [{"id": "admin", "type": 0}] |
 
   @api2 @rows @views
   Scenario: Create rows on a view via v2 with permissions
@@ -835,6 +841,12 @@ Feature: APIv2
       | four          | 2023-12-24              |
       | five          | [{"id": "admin", "type": 0}] |
     Then the reported status is 200
+    And the inserted row has the following values
+      | one           | AHA                     |
+      | two           | 161                     |
+      | three         | true                    |
+      | four          | 2023-12-24              |
+      | five          | [{"id": "admin", "type": 0}] |
 
   @api2 @rows @views
   Scenario: Create rows on a view via v2 without permissions

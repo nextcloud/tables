@@ -2391,4 +2391,33 @@ class FeatureContext implements Context {
 			$this->shareId = $share['id'];
 		}
 	}
+
+	/**
+	 * @Given the inserted row has the following values
+	 */
+	public function theInsertedRowHasTheFollowingValues(TableNode $columnValues) {
+		$jsonBody = json_decode($this->response->getBody()->getContents(), true);
+		$insertedRow = $jsonBody['ocs']['data'];
+
+		$expected = [];
+		foreach ($columnValues->getRows() as $row) {
+			$columnId = $this->tableColumns[$row[0]];
+			$expected[$columnId] = $row[1];
+		}
+
+		foreach ($insertedRow['data'] as $entry) {
+			if (!isset($expected[$entry['columnId']])) {
+				throw new \Exception(sprintf('Unexpected column with ID %d was returned', $entry['columnId']));
+			}
+			// intentional weak comparison
+			if ($expected[$entry['columnId']] != $entry['value']) {
+				throw new \Exception(sprintf('Unexpected value %s for column with ID %d was returned', $entry['value'], $entry['columnId']));
+			}
+			unset($expected[$entry['columnId']]);
+		}
+
+		if (!empty($expected)) {
+			throw new \Exception(sprintf('Some expected columns were not returned: %s ', print_r($expected, true)));
+		}
+	}
 }
