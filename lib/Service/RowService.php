@@ -11,7 +11,6 @@ use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2;
 use OCA\Tables\Db\Row2Mapper;
-use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
@@ -192,7 +191,8 @@ class RowService extends SuperService {
 			}
 
 			$columns = $this->columnMapper->findMultiple($view->getColumnsArray());
-		} elseif ($tableId) {
+		}
+		if ($tableId) {
 			try {
 				$table = $this->tableMapper->find($tableId);
 			} catch (DoesNotExistException $e) {
@@ -209,7 +209,9 @@ class RowService extends SuperService {
 			}
 
 			$columns = $this->columnMapper->findAllByTable($tableId);
-		} else {
+		}
+
+		if (!$viewId && !$tableId) {
 			throw new InternalError('Cannot create row without table or view in context');
 		}
 
