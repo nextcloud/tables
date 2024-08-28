@@ -786,6 +786,7 @@ Feature: APIv2
       | usergroupSelectUsers    | true          |
       | usergroupSelectGroups   | false         |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
+    And user "participant1-v2" sets columns "one,two,three,four,five" to view "v1"
     When user "participant1-v2" tries to create a row using v2 on "view" "v1" with following values
       | one           | AHA                     |
       | two           | 161                     |
@@ -825,6 +826,7 @@ Feature: APIv2
       | usergroupSelectUsers    | true          |
       | usergroupSelectGroups   | false         |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
+    And user "participant1-v2" sets columns "one,two,three,four,five" to view "v1"
     And user "participant1-v2" shares view "v1" with "participant2-v2"
     When user "participant2-v2" tries to create a row using v2 on "view" "v1" with following values
       | one           | AHA                     |
@@ -865,6 +867,7 @@ Feature: APIv2
       | usergroupSelectUsers    | true          |
       | usergroupSelectGroups   | false         |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
+    And user "participant1-v2" sets columns "one,two,three,four,five" to view "v1"
     And user "participant1-v2" shares view "v1" with "participant2-v2"
     And user "participant1-v2" sets permission "create" to 0
     When user "participant2-v2" tries to create a row using v2 on "view" "v1" with following values
@@ -906,6 +909,7 @@ Feature: APIv2
       | usergroupSelectUsers    | true          |
       | usergroupSelectGroups   | false         |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
+    And user "participant1-v2" sets columns "one,two,three,four,five" to view "v1"
     When user "participant2-v2" tries to create a row using v2 on "view" "v1" with following values
       | one           | AHA                     |
       | two           | 161                     |
