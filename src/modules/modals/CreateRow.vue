@@ -3,15 +3,11 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcModal v-if="showModal" data-cy="createRowModal" @close="actionCancel">
+	<NcDialog v-if="showModal"
+		:name="t('tables', 'Create row')"
+		data-cy="createRowModal"
+		@closing="actionCancel">
 		<div class="modal__content" @keydown="onKeydown">
-			<div class="row">
-				<div class="col-4">
-					<h2 style="padding: 0" tabindex="0">
-						{{ t('tables', 'Create row') }}
-					</h2>
-				</div>
-			</div>
 			<div v-for="column in nonMetaColumns" :key="column.id" :data-cy="column.title">
 				<ColumnFormComponent
 					:column="column"
@@ -34,11 +30,11 @@
 				</div>
 			</div>
 		</div>
-	</NcModal>
+	</NcDialog>
 </template>
 
 <script>
-import { NcModal, NcCheckboxRadioSwitch, NcNoteCard, NcButton } from '@nextcloud/vue'
+import { NcDialog, NcCheckboxRadioSwitch, NcNoteCard, NcButton } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import ColumnFormComponent from '../main/partials/ColumnFormComponent.vue'
@@ -48,7 +44,7 @@ import rowHelper from '../../shared/components/ncTable/mixins/rowHelper.js'
 export default {
 	name: 'CreateRow',
 	components: {
-		NcModal,
+		NcDialog,
 		ColumnFormComponent,
 		NcCheckboxRadioSwitch,
 		NcNoteCard,

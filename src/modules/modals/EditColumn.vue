@@ -3,16 +3,11 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcModal size="large" @close="actionCancel">
+	<NcDialog size="large"
+		:name="t('tables', 'Edit column')"
+		@closing="actionCancel">
 		<div class="modal__content">
 			<div v-if="loading" class="icon-loading" />
-
-			<div class="row">
-				<div class="col-4">
-					<h2>{{ t('tables', 'Edit column') }}</h2>
-				</div>
-			</div>
-
 			<div class="row space-L">
 				<div class="col-2">
 					<MainForm :description.sync="editColumn.description"
@@ -26,15 +21,15 @@
 				</div>
 			</div>
 			<div class="buttons">
-				<div class="flex">
+				<div class="edit-info">
 					<ColumnInfoPopover :column="column" />&nbsp;
 					<div class="last-edit-info">
 						{{ t('tables', 'Last edit') + ': ' }}
 						{{ updateTime }}&nbsp;
-						<NcUserBubble :user="column.lastEditBy" :display-name="column.lastEditByDisplayName ? column.lastEditByDisplayName : column.lastEditBy" />
+						<NcUserBubble class="last-edit-info-bubble" :user="column.lastEditBy" :display-name="column.lastEditByDisplayName ? column.lastEditByDisplayName : column.lastEditBy" />
 					</div>
 				</div>
-				<div class="flex">
+				<div class="right-additional-button">
 					<div class="button-padding-right">
 						<NcButton type="secondary" :aria-label="t('tables', 'Cancel')" @click="actionCancel">
 							{{ t('tables', 'Cancel') }}
@@ -46,11 +41,11 @@
 				</div>
 			</div>
 		</div>
-	</NcModal>
+	</NcDialog>
 </template>
 
 <script>
-import { NcModal, NcActions, NcActionButton, NcButton, NcUserBubble } from '@nextcloud/vue'
+import { NcDialog, NcActions, NcActionButton, NcButton, NcUserBubble } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import ColumnInfoPopover from '../main/partials/ColumnInfoPopover.vue'
@@ -89,7 +84,7 @@ export default {
 		MainForm,
 		SelectionForm,
 		SelectionMultiForm,
-		NcModal,
+		NcDialog,
 		NcActions,
 		NcActionButton,
 		ColumnInfoPopover,
@@ -222,12 +217,24 @@ export default {
 .last-edit-info {
 	display: flex;
 	align-items: center;
+	flex-wrap: wrap;
 }
 
 .buttons :deep(.user-bubble__wrapper) {
 	padding-top: 5px;
 }
 
-.flex { display: flex }
+.edit-info {
+	display: flex;
+}
+
+.right-additional-button {
+	display: flex;
+	align-items: center;
+}
+
+.last-edit-info-bubble {
+	display: flex!important;
+}
 
 </style>

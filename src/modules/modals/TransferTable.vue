@@ -3,15 +3,11 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcModal v-if="showModal"
+	<NcDialog v-if="showModal"
+		:name="t('tables', 'Transfer table')"
 		size="normal"
-		@close="actionCancel">
+		@closing="actionCancel">
 		<div class="modal__content" data-cy="transferTableModal">
-			<div class="row">
-				<div class="col-4">
-					<h2>{{ t('tables', 'Transfer table') }}</h2>
-				</div>
-			</div>
 			<div class="row">
 				<h3>{{ t('tables', 'Transfer this table to another user') }}</h3>
 				<NcUserPicker :select-users="true" :select-groups="false" :selected-user-id.sync="selectedUserId" />
@@ -24,11 +20,11 @@
 				</div>
 			</div>
 		</div>
-	</NcModal>
+	</NcDialog>
 </template>
 
 <script>
-import { NcModal, NcButton } from '@nextcloud/vue'
+import { NcDialog, NcButton } from '@nextcloud/vue'
 import { showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
@@ -39,7 +35,7 @@ import { getCurrentUser } from '@nextcloud/auth'
 export default {
 	name: 'TransferTable',
 	components: {
-		NcModal,
+		NcDialog,
 		NcButton,
 		NcUserPicker,
 	},

@@ -3,13 +3,12 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcModal v-if="showModal" size="normal" data-cy="createContextModal" @close="actionCancel">
+	<NcDialog v-if="showModal"
+		:name="t('tables', 'Create an application')"
+		size="normal"
+		data-cy="createContextModal"
+		@closing="actionCancel">
 		<div class="modal__content">
-			<div class="row">
-				<div class="col-4">
-					<h2>{{ t('tables', 'Create an application') }}</h2>
-				</div>
-			</div>
 			<div class="row space-T">
 				<div class="col-4 mandatory">
 					{{ t('tables', 'Title') }}
@@ -51,11 +50,11 @@
 				</div>
 			</div>
 		</div>
-	</NcModal>
+	</NcDialog>
 </template>
 
 <script>
-import { NcModal, NcButton, NcIconSvgWrapper } from '@nextcloud/vue'
+import { NcDialog, NcButton, NcIconSvgWrapper } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
@@ -66,7 +65,7 @@ import permissionBitmask from '../../shared/components/ncContextResource/mixins/
 export default {
 	name: 'CreateContext',
 	components: {
-		NcModal,
+		NcDialog,
 		NcIconPicker,
 		NcButton,
 		NcIconSvgWrapper,
