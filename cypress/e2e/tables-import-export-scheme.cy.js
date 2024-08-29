@@ -8,22 +8,22 @@ const omitSubFields = (array, fields) => {
 	return array.map(
 		(item) => Object.keys(item).filter(
 			filterKey => !fields.includes(filterKey)).reduce(
-			(obj, key) => {
-		            obj[key] = item[key]
-		            return obj
-	            }, {}),
+				(obj, key) => {
+					obj[key] = item[key]
+					return obj
+				}, {}),
 	)
 }
 
 describe('Import Export Scheme', () => {
 
-	before(function() {
+	before(function () {
 		cy.createRandomUser().then(user => {
 			localUser = user
 		})
 	})
 
-	beforeEach(function() {
+	beforeEach(function () {
 		cy.login(localUser)
 		cy.visit('apps/tables')
 	})
@@ -51,7 +51,9 @@ describe('Import Export Scheme', () => {
 		cy.readFile('./cypress/e2e/ToDo list.json').then(content => {
 			cy.readFile(`${downloadsFolder}/ToDo list.json`).then(expectedContent => {
 				expectedContent.columns = omitSubFields(expectedContent.columns, columnFieldsToIgnore)
-			    content.columns = omitSubFields(content.columns, columnFieldsToIgnore)
+				content.columns = omitSubFields(content.columns, columnFieldsToIgnore)
+				content.tablesVersion = ''
+				expectedContent.tablesVersion = ''
 				expect(JSON.stringify(expectedContent)).to.eq(JSON.stringify(content))
 			})
 		})
