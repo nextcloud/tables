@@ -2,28 +2,59 @@
   - SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
+
 # Changelog
 
-## 0.8.0-beta.2
+## 0.8.0-beta-3
+
+### Fixed
+
+- repair schema export and import @grnd-alt [#1321](https://github.com/nextcloud/tables/pull/1321)
+- fix: Open row edit modal on initial load @juliushaertl [#1312](https://github.com/nextcloud/tables/pull/1312)
+- fix: unhide part of single selection NcSelect value @enjeck [#1293](https://github.com/nextcloud/tables/pull/1293)
+- fix: improve style alignment and heights @enjeck [#1307](https://github.com/nextcloud/tables/pull/1307)
+- fix: only focus on input if modal is open @enjeck [#1282](https://github.com/nextcloud/tables/pull/1282)
+- fix: use different app menu selectors @enjeck [#1292](https://github.com/nextcloud/tables/pull/1292)
+- chore: Proper logs with error level and exception trace @juliushaertl [#1217](https://github.com/nextcloud/tables/pull/1217)
+- fix: ensure default values show as filled @enjeck [#1176](https://github.com/nextcloud/tables/pull/1176)
+- fix: Avoid variable access on unhandled exception and lower log level for expected permission check failures @juliushaertl [#1274](https://github.com/nextcloud/tables/pull/1274)
+- fix/ui quirks @juliushaertl [#1259](https://github.com/nextcloud/tables/pull/1259)
+
+### Dependencies
+
+- fix(deps): update dependency @nextcloud/vue to ^8.17.0 (main) @app/renovate [#1317](https://github.com/nextcloud/tables/pull/1317)
+- fix(deps): update tiptap to ^2.6.6 (main) @app/renovate [#1316](https://github.com/nextcloud/tables/pull/1316)
+- fix(deps): update dependency @vueuse/core to ^11.0.1 (main) @app/renovate [#1315](https://github.com/nextcloud/tables/pull/1315)
+- chore(deps): Update openapi-extractor to v1.0.0 @provokateurin [#1303](https://github.com/nextcloud/tables/pull/1303)
+- fix(deps): update dependency @vueuse/core to v11 (main) @app/renovate [#1300](https://github.com/nextcloud/tables/pull/1300)
+- fix(deps): update tiptap to ^2.6.4 (main) @app/renovate [#1298](https://github.com/nextcloud/tables/pull/1298)
+- fix(deps): update dependency @nextcloud/auth to ^2.4.0 (main) @app/renovate [#1297](https://github.com/nextcloud/tables/pull/1297)
+- fix(deps): update tiptap to ^2.5.9 (main) @app/renovate [#1285](https://github.com/nextcloud/tables/pull/1285)
+- fix(deps): update dependency @vueuse/core to ^10.11.1 (main) @app/renovate [#1284](https://github.com/nextcloud/tables/pull/1284)
+- fix(deps): update dependency @vueuse/core to ^10.11.1 (main) @app/renovate [#1284](https://github.com/nextcloud/tables/pull/1284)
+- fix(deps): update dependency @nextcloud/vue to ^8.16.0 (main) @app/renovate [#1278](https://github.com/nextcloud/tables/pull/1278)
+- chore(deps): update dependency openapi-typescript to ^7.3.0 (main) @app/renovate [#1264](https://github.com/nextcloud/tables/pull/1264)
+- fix(deps): update tiptap to ^2.5.8 (main) @app/renovate [#1263](https://github.com/nextcloud/tables/pull/1263)
+- fix(deps): update dependency @nextcloud/vue to ^8.15.1 (main) @app/renovate [#1262](https://github.com/nextcloud/tables/pull/1262)
 
 ### Feature highlights
 
 ### Added
 
-* feat: add backend for new user/group column @enjeck [#1090](https://github.com/nextcloud/tables/pull/1090)
-* Analytics: permission error on shared tables with non-shared views @Rello [#1248](https://github.com/nextcloud/tables/pull/1248)
-* feat: User/group column frontend @enjeck [#1113](https://github.com/nextcloud/tables/pull/1113)
+- feat: add backend for new user/group column @enjeck [#1090](https://github.com/nextcloud/tables/pull/1090)
+- Analytics: permission error on shared tables with non-shared views @Rello [#1248](https://github.com/nextcloud/tables/pull/1248)
+- feat: User/group column frontend @enjeck [#1113](https://github.com/nextcloud/tables/pull/1113)
 
 ### Fixed
 
-* fix: Make user listing in table more consistent by using NcUserBubble @juliushaertl [#1254](https://github.com/nextcloud/tables/pull/1254)
-* fix: Navigation table entries UI issues @enjeck [#1195](https://github.com/nextcloud/tables/pull/1195)
-* fix(files): fix appstore-build-publish.yml @JuliaKirschenheuter [#1244](https://github.com/nextcloud/tables/pull/1244)
+- fix: Make user listing in table more consistent by using NcUserBubble @juliushaertl [#1254](https://github.com/nextcloud/tables/pull/1254)
+- fix: Navigation table entries UI issues @enjeck [#1195](https://github.com/nextcloud/tables/pull/1195)
+- fix(files): fix appstore-build-publish.yml @JuliaKirschenheuter [#1244](https://github.com/nextcloud/tables/pull/1244)
 
 ### Dependencies
 
-* fix(deps): update tiptap to ^2.5.7 (main) @renovate [#1245](https://github.com/nextcloud/tables/pull/1245)
-* fix(deps): update dependency @nextcloud/vue to ^8.15.0 (main) @renovate [#1246](https://github.com/nextcloud/tables/pull/1246)
+- fix(deps): update tiptap to ^2.5.7 (main) @renovate [#1245](https://github.com/nextcloud/tables/pull/1245)
+- fix(deps): update dependency @nextcloud/vue to ^8.15.0 (main) @renovate [#1246](https://github.com/nextcloud/tables/pull/1246)
 
 ## 0.8.0-beta.1
 
@@ -33,7 +64,7 @@
 
 - enh(Contexts): set active navigation entry @blizzz [#1037](https://github.com/nextcloud/tables/pull/1037)
 - enh(App): navigation tweaks for Contexts @blizzz [#1080](https://github.com/nextcloud/tables/pull/1080)
-- Enhancement/279 pagination for tables ui  @grnd-alt [#972](https://github.com/nextcloud/tables/pull/972)
+- Enhancement/279 pagination for tables ui @grnd-alt [#972](https://github.com/nextcloud/tables/pull/972)
 - feat: submit row details with ctrl + enter @luka-nextcloud [#1112](https://github.com/nextcloud/tables/pull/1112)
 - add table_id index to oc_tables_columns @grnd-alt [#1078](https://github.com/nextcloud/tables/pull/1078)
 - ci(integration): test against context sharing @blizzz [#1129](https://github.com/nextcloud/tables/pull/1129)
@@ -162,7 +193,7 @@
 - Match default values when querying views @juliushaertl [#900](https://github.com/nextcloud/tables/pull/900)
 - fix: properly indent child views of archived tables @elzody [#909](https://github.com/nextcloud/tables/pull/909)
 - fix: views respect sorting @enjeck [#912](https://github.com/nextcloud/tables/pull/912)
-- fix: Focus first input when creating  a new table/row/column/view @juliushaertl [#925](https://github.com/nextcloud/tables/pull/925)
+- fix: Focus first input when creating a new table/row/column/view @juliushaertl [#925](https://github.com/nextcloud/tables/pull/925)
 - fix: reintroduce content reference provider @elzody [#943](https://github.com/nextcloud/tables/pull/943)
 - fix(api): ContextMapper now coerces the row ID to an int for proper comparison @elzody [#954](https://github.com/nextcloud/tables/pull/954)
 - fix(Contexts): explicitely state non-int types @blizzz [#964](https://github.com/nextcloud/tables/pull/964)
@@ -189,7 +220,6 @@
 - fix: views respect sorting @enjeck [#912](https://github.com/nextcloud/tables/pull/912)
 - fix: reintroduce content reference provider @elzody [#943](https://github.com/nextcloud/tables/pull/943)
 - fix: Focus first input when creating a new table/row/column/view @juliushaertl [#925](https://github.com/nextcloud/tables/pull/925)
-
 
 ## 0.7.0-beta.2
 
@@ -244,47 +274,62 @@
 - cypress testing for archive/favorite @elzody [#901](https://github.com/nextcloud/tables/pull/901)
 
 ## 0.7.0-beta.1 - 2024-01-29
+
 ### Added
-- New database structure: https://github.com/nextcloud/tables/pull/749
-- Filtering in views for multi selection: https://github.com/nextcloud/tables/pull/798
+
+- New database structure: <https://github.com/nextcloud/tables/pull/749>
+- Filtering in views for multi selection: <https://github.com/nextcloud/tables/pull/798>
 - API v2 and docs in API viewer
 - icon replaced
 - occ commands for manual data transfer and cleanup
 
 ### Updated
+
 - Update software dependencies
 
 ## 0.6.6
+
 ### Updated
+
 - Fix number column issues [#784](https://github.com/nextcloud/tables/pull/784)
 - fix: add display names to all column meta data printouts [#785](https://github.com/nextcloud/tables/pull/785)
 - Avoid failures with link column database values from previous versions [#780](https://github.com/nextcloud/tables/pull/780)
 - fix(sorting): handle NaN results if the values are empty [#757](https://github.com/nextcloud/tables/pull/757)
 
 ## 0.6.5 - 2023-12-18
+
 ### Upgraded
+
 - 🏳️ Translations
 - 🐞 Bug fixing
-  - https://github.com/nextcloud/tables/pull/744
-  - https://github.com/nextcloud/tables/pull/735
+  - <https://github.com/nextcloud/tables/pull/744>
+  - <https://github.com/nextcloud/tables/pull/735>
 
 ## 0.6.4 - 2023-11-24
+
 ### Updated
+
 - 🐞 Bug fixing
 
 ## 0.6.2 - 2023-11-13
+
 ### Updated
+
 - 🐞 Bug fixing
 
 ## 0.6.1 - 2023-11-07
+
 ### Updated
+
 - 🏳️ Translations
 - 🐞 Bug fixing
 - ✨ Small design adjustments
 - 💾 Update software dependencies
 
 ## 0.6.0 - 2023-09-15
+
 ### Added
+
 - ⚗️ Add views to tables
 - 🤝 Share views individually
 - 🛠️ Adjust views with filters, sorting and column selection and ordering
@@ -293,13 +338,16 @@
 - 🤹 Insert dynamic tables directly into any Nextcloud text editor
 
 ### Updated
+
 - 🏳️ Translations
 - 🐞 Bug fixing
 - ✨ Small design adjustments
 - 💾 Update software dependencies
 
 ## 0.6.0-beta.4 - 2023-09-14
+
 ### Added
+
 - ⚗️ Add views to tables
 - 🤝 Share views individually
 - 🛠️ Adjust views with filters, sorting and column selection and ordering
@@ -308,13 +356,16 @@
 - 🤹 Insert dynamic tables directly into any Nextcloud text editor
 
 ### Updated
+
 - 🏳️ Translations
 - 🐞 Bug fixing
 - ✨ Small design adjustments
 - 💾 Update software dependencies
 
 ## 0.6.0-beta.3 - 2023-09-12
+
 ### Added
+
 - ⚗️ Add views to tables
 - 🤝 Share views individually
 - 🛠️ Adjust views with filters, sorting and column selection and ordering
@@ -323,13 +374,16 @@
 - 🤹 Insert dynamic tables directly into any Nextcloud text editor
 
 ### Updated
+
 - 🏳️ Translations
 - 🐞 Bug fixing
 - ✨ Small design adjustments
 - 💾 Update software dependencies
 
 ## 0.6.0-beta.2 - 2023-09-08
+
 ### Added
+
 - ⚗️ Add views to tables
 - 🤝 Share views individually
 - 🛠️ Adjust views with filters, sorting and column selection and ordering
@@ -338,13 +392,16 @@
 - 🤹 Insert dynamic tables directly into any Nextcloud text editor
 
 ### Updated
+
 - 🏳️ Translations
 - 🐞 Bug fixing
 - ✨ Small design adjustments
 - 💾 Update software dependencies
 
 ## 0.6.0-beta.1 - 2023-08-11
+
 ### Added
+
 - ⚗️ Add views to tables
 - 🤝 Share views individually
 - 🛠️ Adjust views with filters, sorting and column selection and ordering
@@ -353,30 +410,37 @@
 - 🤹 Insert dynamic tables directly into any Nextcloud text editor
 
 ### Updated
+
 - 🏳️ Translations
 - 🐞 Bug fixing
 - ✨ Small design adjustments
 - 💾 Update software dependencies
 
 ## 0.5.1 - 2023-06-12
+
 ### Added
+
 - 💻 OCC command to clean up row data
 - ✨ Filter for empty cells
 
 ### Updated
+
 - 🏳️ Translations
 - 🐞 A lot of bug fixing
 - ✨ Small design adjustments
 - 💾 Update software dependencies
 
 ## 0.5.0 - 2023-05-14
+
 ### Updated
+
 - Fix bugs
 - Update translations
 - Update software dependencies
 - Accessibility improvements
 
 ### Added
+
 - 🔍 Search and filter in tables
 - ↕️ Sorting
 - ✨ New column type "rich text", using Nextclouds default text editor
@@ -387,19 +451,25 @@
 ## 0.4.0
 
 ## 0.3.2 - 2023-03-15
+
 ### Updated
+
 - Add hints for translation #152
 - Fix bugs around show or hide options on shared tables
 - Fix and update npm dependencies
 
 ## 0.3.1 - 2023-02-28
+
 ### Updated
+
 - Clean up navigation UI
 - Fix bug that loads wrong template "Customers"
 - updated translations
 
 ## 0.3.0 - 2023-02-27
+
 ### Added
+
 - Read data via API
 - Filter tables in navigation
 - 2 new templates and template dummy data
@@ -409,6 +479,7 @@
 - reference provider for NC26
 
 ### Updated
+
 - Table component replaced
 - code cleanup
 - initial CI setup
@@ -416,31 +487,41 @@
 - translations
 
 ### Removed
+
 - Some functions are not replaced due to the replacement of the table component (paste data, instant sorting and filtering)
 
 ## 0.2.2 - 2023-01-10
+
 ### Updated
+
 - translation
 - npm dependencies
 - some UI fixes for Nextcloud 25 support
 - Updated app meta data
 
 ## 0.2.1 - 2022-09-27
+
 ### Updated
+
 - translation
 - npm dependencies
 - small UX enhancements
 
 ## 0.2.0 - 2022-07-10
+
 ### Added
+
 - sharing options for users and groups
 
 ### Updated
+
 - translations
 - npm dependencies
 
 ## 0.1.2 - 2022-04-28
+
 ### Updated
+
 - many css fixes
 - css cleanup
 - minor bug fixes
@@ -448,14 +529,18 @@
 - Nextcloud 24 compatible
 
 ## 0.1.1 - 2022-04-04
+
 ### Updated
+
 - many css fixes
 - css cleanup
 - minor bug fixes
 - translations
 
 ## 0.1.0 - 2022-03-26
+
 ### Added
+
 - Start page
 - translations
 - import data from clipboard
@@ -465,11 +550,15 @@
 - many fixes and small improvements
 
 ## 0.0.2 - 2022-03-16
+
 ### Added
+
 - this changelog
 - screenshots for the App Store
 - description texts
 
 ## 0.0.1 - 2022-03-16
+
 ### Added
+
 - Initial beta version
