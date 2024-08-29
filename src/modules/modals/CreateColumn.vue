@@ -181,6 +181,7 @@ export default {
 				usergroupMultipleItems: false,
 				usergroupSelectUsers: true,
 				usergroupSelectGroups: false,
+				usergroupSelectTeams: false,
 				showUserStatus: false,
 			},
 			textAppAvailable: !!window.OCA?.Text?.createEditor,
@@ -334,6 +335,7 @@ export default {
 				data.usergroupMultipleItems = this.column.usergroupMultipleItems
 				data.usergroupSelectUsers = this.column.usergroupSelectUsers
 				data.usergroupSelectGroups = this.column.usergroupSelectGroups
+				data.usergroupSelectTeams = this.column.usergroupSelectTeams
 				data.showUserStatus = this.column.showUserStatus
 			} else if (this.column.type === 'number') {
 				data.numberDefault = this.column.numberDefault
@@ -387,6 +389,7 @@ export default {
 				usergroupMultipleItems: false,
 				usergroupSelectUsers: true,
 				usergroupSelectGroups: false,
+				usergroupSelectTeams: false,
 				showUserStatus: false,
 			}
 			if (mainForm) {
