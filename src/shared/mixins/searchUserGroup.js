@@ -9,9 +9,10 @@ import debounce from 'debounce'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import ShareTypes from './shareTypesMixin.js'
+import generalHelper from './generalHelper.js'
 
 export default {
-	mixins: [ShareTypes],
+	mixins: [ShareTypes, generalHelper],
 	data() {
 		return {
 			query: '',
@@ -51,16 +52,23 @@ export default {
 			if (this.selectGroups) {
 				types.push(this.SHARE_TYPES.SHARE_TYPE_GROUP)
 			}
+			if (this?.selectTeams) {
+				types.push(this.SHARE_TYPES.SHARE_TYPE_CIRCLE)
+			}
 			return types
 		},
 		getShareTypeString() {
-			if (this.selectUsers && !this.selectGroups) {
-				return 'User'
-			} else if (!this.selectUsers && this.selectGroups) {
-				return 'Group'
-			} else {
-				return 'User or group'
+			const strings = []
+			if (this.selectUsers) {
+				strings.push('user')
 			}
+			if (this.selectGroups) {
+				strings.push('group')
+			}
+			if (this?.selectTeams) {
+				strings.push('team')
+			}
+			return strings.join(' or ')
 		},
 		getPlaceholder() {
 			return t('tables', '{shareTypeString}...', { shareTypeString: this.getShareTypeString() })
@@ -70,6 +78,18 @@ export default {
 			if (this.isValidQuery) {
 				this.loading = true
 				await this.debounceGetSuggestions(query)
+			}
+		},
+		getType(source) {
+			if (source.startsWith('users')) {
+				return 0
+			} else if (source.startsWith('circles')) {
+				return 2
+			} else if (source.startsWith('groups')) {
+				return 1
+			} else {
+				showError(t('tables', 'Unsupported source: {source}', { source }))
+				throw new Error('Unsupported source: ' + source)
 			}
 		},
 		async getSuggestions(search) {

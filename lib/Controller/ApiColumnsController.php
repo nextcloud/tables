@@ -295,6 +295,7 @@ class ApiColumnsController extends AOCSController {
 	 * @param boolean $usergroupMultipleItems Whether you can select multiple users or/and groups
 	 * @param boolean $usergroupSelectUsers Whether you can select users
 	 * @param boolean $usergroupSelectGroups Whether you can select groups
+	 * @param boolean $usergroupSelectTeams Whether you can select teams
 	 * @param boolean $showUserStatus Whether to show the user's status
 	 * @param string|null $description Description
 	 * @param int[]|null $selectedViewIds View IDs where this columns should be added
