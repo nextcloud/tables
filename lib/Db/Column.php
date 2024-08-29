@@ -74,6 +74,8 @@ use OCP\AppFramework\Db\Entity;
  * @method setUsergroupSelectUsers(?bool $usergroupSelectUsers)
  * @method getUsergroupSelectGroups(): bool
  * @method setUsergroupSelectGroups(?bool $usergroupSelectGroups)
+ * @method getUsergroupSelectTeams(): bool
+ * @method setUsergroupSelectTeams(?bool $usergroupSelectTeams)
  * @method getShowUserStatus(): bool
  * @method setShowUserStatus(?bool $showUserStatus)
  */
@@ -132,6 +134,7 @@ class Column extends Entity implements JsonSerializable {
 	protected ?bool $usergroupMultipleItems = null;
 	protected ?bool $usergroupSelectUsers = null;
 	protected ?bool $usergroupSelectGroups = null;
+	protected ?bool $usergroupSelectTeams = null;
 	protected ?bool $showUserStatus = null;
 
 	public function __construct() {
@@ -152,6 +155,7 @@ class Column extends Entity implements JsonSerializable {
 		$this->addType('usergroupMultipleItems', 'boolean');
 		$this->addType('usergroupSelectUsers', 'boolean');
 		$this->addType('usergroupSelectGroups', 'boolean');
+		$this->addType('usergroupSelectTeams', 'boolean');
 		$this->addType('showUserStatus', 'boolean');
 	}
 
@@ -264,6 +268,7 @@ class Column extends Entity implements JsonSerializable {
 			'usergroupMultipleItems' => $this->usergroupMultipleItems,
 			'usergroupSelectUsers' => $this->usergroupSelectUsers,
 			'usergroupSelectGroups' => $this->usergroupSelectGroups,
+			'usergroupSelectTeams' => $this->usergroupSelectTeams,
 			'showUserStatus' => $this->showUserStatus,
 		];
 	}

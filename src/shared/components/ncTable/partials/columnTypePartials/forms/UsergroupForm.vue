@@ -6,17 +6,15 @@
 	<div style="width: 100%">
 		<div>
 			<div class="col-4 selections space-T space-L">
-				<NcCheckboxRadioSwitch :checked.sync="checkedValue" value="usergroup-user" name="usergroupTypeSelection"
-					type="radio" data-cy="userSwitch">
-					{{ t('tables', 'Users') }}
-				</NcCheckboxRadioSwitch>
-				<NcCheckboxRadioSwitch :checked.sync="checkedValue" value="usergroup-group"
-					name="usergroupTypeSelection" type="radio" data-cy="groupSwitch">
-					{{ t('tables', 'Groups') }}
-				</NcCheckboxRadioSwitch>
-				<NcCheckboxRadioSwitch :checked.sync="checkedValue" value="usergroup" name="usergroupTypeSelection"
-					type="radio" data-cy="userAndGroupSwitch">
-					{{ t('tables', 'Users and groups') }}
+				<NcCheckboxRadioSwitch
+					v-for="key in Object.keys(selectOptions)"
+					:key="key"
+					:checked.sync="checkedValue"
+					:value="key"
+					name="usergroupTypeSelection"
+					:data-cy="`${selectOptions[key].toLowerCase()}Switch`"
+					:disabled="isOnlyChecked(key)">
+					{{ t('tables', selectOptions[key]) }}
 				</NcCheckboxRadioSwitch>
 			</div>
 
@@ -27,7 +25,7 @@
 				<div class="fix-col-4 space-B">
 					<NcSelect v-model="value" style="width: 100%;" :loading="loading" :options="options"
 						:placeholder="getPlaceholder()" :searchable="true" :get-option-key="(option) => option.key"
-						label="id" :aria-label-combobox="getPlaceholder()"
+						label="displayName" :aria-label-combobox="getPlaceholder()"
 						:user-select="true" :close-on-select="false"
 						:multiple="mutableColumn.usergroupMultipleItems" data-cy="usergroupDefaultSelect" @search="asyncFind" @input="addItem">
 						<template #noResult>
@@ -85,6 +83,12 @@ export default {
 			// Used in searchUserGroup mixin to decide types to search for
 			selectUsers: this.column.usergroupSelectUsers,
 			selectGroups: this.column.usergroupSelectGroups,
+			selectTeams: this.column.usergroupSelectTeams,
+			selectOptions: {
+				'usergroup-user': 'Users',
+				'usergroup-group': 'Groups',
+				'usergroup-team': 'Teams',
+			},
 		}
 	},
 	computed: {
@@ -103,34 +107,30 @@ export default {
 		},
 		checkedValue: {
 			get() {
-				if (this.selectUsers && !this.selectGroups) {
-					return 'usergroup-user'
-				} else if (!this.selectUsers && this.selectGroups) {
-					return 'usergroup-group'
-				} else {
-					return 'usergroup'
+				const values = []
+				if (this.selectUsers) {
+					values.push('usergroup-user')
 				}
+				if (this.selectGroups) {
+					values.push('usergroup-group')
+				}
+				if (this.selectTeams) {
+					values.push('usergroup-team')
+				}
+				return values
 			},
 			set(newValue) {
-				if (newValue === 'usergroup-user') {
-					this.selectUsers = true
-					this.mutableColumn.usergroupSelectUsers = true
-
-					this.selectGroups = false
-					this.mutableColumn.usergroupSelectGroups = false
-				} else if (newValue === 'usergroup-group') {
-					this.selectUsers = false
-					this.mutableColumn.usergroupSelectUsers = false
-
-					this.selectGroups = true
-					this.mutableColumn.usergroupSelectGroups = true
-				} else {
-					this.selectUsers = true
-					this.mutableColumn.usergroupSelectUsers = true
-
-					this.selectGroups = true
-					this.mutableColumn.usergroupSelectGroups = true
+				if (!Array.isArray(newValue)) {
+					return
 				}
+				this.selectUsers = newValue.includes('usergroup-user')
+				this.mutableColumn.usergroupSelectUsers = newValue.includes('usergroup-user')
+
+				this.selectGroups = newValue.includes('usergroup-group')
+				this.mutableColumn.usergroupSelectGroups = newValue.includes('usergroup-group')
+
+				this.selectTeams = newValue.includes('usergroup-team')
+				this.mutableColumn.usergroupSelectTeams = newValue.includes('usergroup-team')
 			},
 		},
 	},
@@ -140,6 +140,11 @@ export default {
 		},
 	},
 	methods: {
+		isOnlyChecked(key) {
+			// Assuming checkedValue is an array of checked keys
+			return this.checkedValue.length === 1 && this.checkedValue.includes(key)
+		},
+
 		addItem(selectedItem) {
 			if (selectedItem) {
 				this.localValue = selectedItem
@@ -155,8 +160,9 @@ export default {
 		formatResult(autocompleteResult) {
 			return {
 				id: autocompleteResult.id,
-				type: autocompleteResult.source.startsWith('users') ? 0 : 1,
-				key: autocompleteResult.id,
+				type: this.getType(autocompleteResult.source),
+				key: autocompleteResult.source + '-' + autocompleteResult.id,
+				displayName: autocompleteResult.label,
 			}
 		},
 
