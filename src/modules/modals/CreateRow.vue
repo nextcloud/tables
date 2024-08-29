@@ -40,7 +40,7 @@
 <script>
 import { NcModal, NcCheckboxRadioSwitch, NcNoteCard, NcButton } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
-import '@nextcloud/dialogs/dist/index.css'
+import '@nextcloud/dialogs/style.css'
 import ColumnFormComponent from '../main/partials/ColumnFormComponent.vue'
 import { translate as t } from '@nextcloud/l10n'
 import rowHelper from '../../shared/components/ncTable/mixins/rowHelper.js'
