@@ -1133,6 +1133,7 @@ class Api1Controller extends ApiController {
 	 * 200: Row returned
 	 * 403: No permissions
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function createRowInView(int $viewId, $data): DataResponse {
 		if(is_string($data)) {
 			$data = json_decode($data, true);
@@ -1179,6 +1180,7 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function createRowInTable(int $tableId, $data): DataResponse {
 		if(is_string($data)) {
 			$data = json_decode($data, true);
@@ -1366,8 +1368,10 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function importInTable(int $tableId, string $path, bool $createMissingColumns = true): DataResponse {
 		try {
+			// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
 			return new DataResponse($this->importService->import($tableId, null, $path, $createMissingColumns));
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
@@ -1399,8 +1403,10 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function importInView(int $viewId, string $path, bool $createMissingColumns = true): DataResponse {
 		try {
+			// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
 			return new DataResponse($this->importService->import(null, $viewId, $path, $createMissingColumns));
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
