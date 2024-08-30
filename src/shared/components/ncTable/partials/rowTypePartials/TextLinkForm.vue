@@ -23,7 +23,7 @@
 						<LinkWidget :thumbnail-url="props.thumbnailUrl" :icon-url="props.icon" :title="props.title" :subline="props.subline" :icon-size="40" />
 					</template>
 					<template #selected-option="props">
-						<LinkWidget :thumbnail-url="props.thumbnailUrl" :icon-url="props.icon" :title="props.title" :subline="props.subline" :icon-size="40" />
+						<LinkWidget :thumbnail-url="props.thumbnailUrl" :icon-url="props.icon" :title="props.title" :icon-size="24" />
 					</template>
 				</NcSelect>
 				<NcButton type="tertiary" :disabled="!localValue" :title="t('tables', 'Copy link')" @click="copyLink">
@@ -262,10 +262,19 @@ export default {
 	},
 }
 </script>
-<style scoped>
+<style lang="scss" scoped>
 .link-input {
 	display: flex;
 	align-items: center;
-	margin-bottom: var(--default-grid-baseline)
+	margin-bottom: var(--default-grid-baseline);
+
+	:deep(.v-select:not(.vs--open) .vs__search) {
+		position: absolute;
+	}
+
+	:deep(.vs__selected) {
+		flex-grow: 1;
+		height: auto !important;
+	}
 }
 </style>
