@@ -156,7 +156,9 @@ Cypress.Commands.add('createTextLinkColumn', (title, ressourceProvider, isFirstC
 	cy.get('.typeSelection span').contains('Url', { matchCase: false }).click()
 	cy.get('.typeSelection span').contains('Files').click()
 	// TODO is the contacts search provider deactivated by default beginning with nc28
-	// cy.get('.typeSelection span label').contains('Contacts').click()
+	if (['stable27'].includes(Cypress.env('ncVersion'))) {
+		cy.get('.typeSelection span').contains('Contacts').click()
+	}
 
 	ressourceProvider.forEach(provider =>
 		cy.get('.typeSelection span').contains(provider, { matchCase: false }).click(),
