@@ -196,7 +196,9 @@ export default {
 			this.removeResultsByProviderId(providerId)
 
 			if (providerId === 'url') {
-				this.addUrlResult(term)
+				if (this.isValidUrl(term)) {
+					this.addUrlResult(term)
+				}
 				this.setProviderLoading(providerId, false)
 				return
 			}
@@ -225,6 +227,14 @@ export default {
 			}
 			this.results = this.results.concat(res.data?.ocs?.data?.entries)
 			this.setProviderLoading(providerId, false)
+		},
+
+		isValidUrl(string) {
+			try {
+				return new URL(string)
+			} catch (err) {
+				return false
+			}
 		},
 
 		addUrlResult(term) {
