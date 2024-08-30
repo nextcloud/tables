@@ -50,7 +50,7 @@ describe('Favorite tables/views', () => {
 
     cy.get('[data-cy="navigationViewItem"]').first().as('testView')
 
-    cy.get('@testView').parent().parent().should('contain.text', 'Tutorial')
+    cy.get('@testView').parent().parent().parent().should('contain.text', 'Tutorial')
     cy.get('@testView').find('[aria-haspopup="menu"]').click({ force: true })
 
     cy.intercept({ method: 'POST', url: '**/ocs/v2.php/apps/tables/api/2/favorites/*/*' }).as('favoriteViewReq')
@@ -70,14 +70,14 @@ describe('Favorite tables/views', () => {
     cy.contains('Remove from favorites').click({ force: true })
     cy.wait('@unfavoriteViewReq').its('response.statusCode').should('equal', 200)
 
-    cy.get('@testView').parent().parent().should('contain.text', 'Tutorial')
+    cy.get('@testView').parent().parent().parent().should('contain.text', 'Tutorial')
   })
 
   it('can (un)favorite views with favorited parent tables', () => {
     cy.get('[data-cy="navigationViewItem"]').first().as('testView')
     cy.get('[data-cy="navigationTableItem"]').first().as('tutorialTable')
 
-    cy.get('@testView').parent().parent().should('contain.text', 'Tutorial')
+    cy.get('@testView').parent().parent().parent().should('contain.text', 'Tutorial')
     cy.get('@testView').find('[aria-haspopup="menu"]').click({ force: true })
     cy.contains('Add to favorites').click({ force: true })
 
