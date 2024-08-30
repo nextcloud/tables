@@ -46,7 +46,7 @@ export default {
 		...mapGetters(['isLoadingSomething']),
 	},
 	watch: {
-		'$route'(to, from) {
+		'$route'(to) {
 			this.routing(to)
 		},
 	},

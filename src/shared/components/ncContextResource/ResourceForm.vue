@@ -36,7 +36,7 @@
 import debounce from 'debounce'
 import { NcSelect } from '@nextcloud/vue'
 import { mapState } from 'vuex'
-import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../../../shared/constants.js'
+import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../../../shared/constants.ts'
 import SearchAndSelectOption from '../../../views/partials/SearchAndSelectOption.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 
