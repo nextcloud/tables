@@ -85,6 +85,7 @@ OC.L10N.register(
     "URL" : "URL",
     "Users" : "Ususarios",
     "Groups" : "Grupos",
+    "Copy link" : "Copiar link",
     "Confirm" : "Confirmar",
     "Select" : "Seleccionar",
     "ID" : "ID"

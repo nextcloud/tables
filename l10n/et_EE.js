@@ -69,6 +69,7 @@ OC.L10N.register(
     "URL" : "URL",
     "Users" : "Kasutajad",
     "Groups" : "Grupid",
+    "Copy link" : "Kopeeri link",
     "Confirm" : "Kinnita",
     "Content" : "Sisu",
     "Select" : "Vali",

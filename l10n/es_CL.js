@@ -68,6 +68,7 @@ OC.L10N.register(
     "URL" : "URL",
     "Users" : "Ususarios",
     "Groups" : "Grupos",
+    "Copy link" : "Copiar liga",
     "Confirm" : "Confirmar",
     "Content" : "Contenido",
     "Unchecked" : "Desmarcado",

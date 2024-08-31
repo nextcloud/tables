@@ -84,7 +84,6 @@ OC.L10N.register(
     "Read" : "Leer",
     "Update" : "Actualizar",
     "Manage" : "Administrar",
-    "Clipboard is not available" : "El portapapeles no está disponible",
     "Searching …" : "Buscando  …",
     "No elements found." : "No se encontraron elementos",
     "Error" : "Error",
@@ -109,13 +108,16 @@ OC.L10N.register(
     "URL" : "URL",
     "Users" : " Usuarios",
     "Groups" : "Grupos",
+    "Copy link" : "Copiar enlace",
     "Close editor" : "Cerrar editor",
+    "Go to previous page" : "Ir a la página anterior",
     "Confirmation" : "Confirmación",
     "Confirm" : "Confirmar",
     "Content" : "Contenido",
     "Select" : "Seleccionar",
     "Insert" : "Insertar",
     "Unchecked" : "Desmarcado",
-    "ID" : "ID"
+    "ID" : "ID",
+    "Clipboard is not available" : "El portapapeles no está disponible"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

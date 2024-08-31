@@ -69,7 +69,6 @@ OC.L10N.register(
     "Copy to clipboard" : "Копирај во клипборд",
     "Read" : "Прочитана",
     "Update" : "Ажурирај",
-    "Clipboard is not available" : "Клипбордот не е достапен",
     "Searching …" : "Пребарување ...",
     "No elements found." : "Нема пронајдено елементи.",
     "Error" : "Грешка",
@@ -91,9 +90,11 @@ OC.L10N.register(
     "Options" : "Опции",
     "URL" : "Адреса",
     "Groups" : "Групи",
+    "Copy link" : "Копирај линк",
     "Close editor" : "Затвори го уредникот",
     "Confirm" : "Потврди",
     "Select" : "Избери",
-    "ID" : "ID"
+    "ID" : "ID",
+    "Clipboard is not available" : "Клипбордот не е достапен"
 },
 "nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;");

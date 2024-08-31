@@ -163,7 +163,6 @@ OC.L10N.register(
     "Read" : "Đọc",
     "Update" : "Cập nhật",
     "Manage" : "Quản lý",
-    "Clipboard is not available" : "Bảng nhớ tạm không có sẵn",
     "Searching …" : "Đang tìm kiếm ...",
     "No elements found." : "Không tìm thấy phần tử nào.",
     "Error" : "Lỗi",
@@ -185,9 +184,11 @@ OC.L10N.register(
     "URL" : "URL",
     "Users" : "Người dùng",
     "Groups" : "Nhóm",
+    "Copy link" : "Sao chép liên kết",
     "Close editor" : "Đóng trình biên tập",
     "Confirm" : "Xác nhận",
     "Select" : "Chọn",
-    "ID" : "ID"
+    "ID" : "ID",
+    "Clipboard is not available" : "Bảng nhớ tạm không có sẵn"
 },
 "nplurals=1; plural=0;");

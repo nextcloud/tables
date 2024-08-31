@@ -221,7 +221,6 @@ OC.L10N.register(
     "Read" : "读取",
     "Update" : "更新",
     "Manage" : "管理",
-    "Clipboard is not available" : "剪贴板不可用",
     "Searching …" : "正在搜索 ...",
     "No elements found." : "未发现元素。",
     "Error" : "错误",
@@ -248,14 +247,17 @@ OC.L10N.register(
     "Add option" : "添加选项",
     "URL" : "URL",
     "Groups" : "用户组",
+    "Copy link" : "复制链接",
     "Url" : "Url",
     "Close editor" : "关闭编辑器",
+    "Go to previous page" : "回到前一页",
     "Confirmation" : "确认",
     "Confirm" : "确认",
     "Content" : "内容",
     "Select" : "选择",
     "Insert" : "插入",
     "Unchecked" : "未选中",
-    "ID" : "ID"
+    "ID" : "ID",
+    "Clipboard is not available" : "剪贴板不可用"
 },
 "nplurals=1; plural=0;");

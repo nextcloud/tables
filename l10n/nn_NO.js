@@ -49,6 +49,7 @@ OC.L10N.register(
     "URL" : "URL",
     "Users" : "Brukarare",
     "Groups" : "Grupper",
+    "Copy link" : "Kopier lenkje",
     "ID" : "ID"
 },
 "nplurals=2; plural=(n != 1);");

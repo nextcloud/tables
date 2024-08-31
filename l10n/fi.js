@@ -164,7 +164,6 @@ OC.L10N.register(
     "Read" : "Lue",
     "Update" : "Päivitä",
     "Manage" : "Hallitse",
-    "Clipboard is not available" : "Leikepöytä ei ole käytettävissä",
     "Create new table" : "Luo uusi taulukko",
     "Searching …" : "Haetaan…",
     "No elements found." : "Elementtejä ei löytynyt.",
@@ -200,7 +199,9 @@ OC.L10N.register(
     "URL" : "URL-osoite",
     "Groups" : "Ryhmät",
     "This field is mandatory" : "Tämä kenttä on pakollinen",
+    "Copy link" : "Kopioi linkki",
     "Close editor" : "Sulje muokkain",
+    "Go to previous page" : "Siirry edelliselle sivulle",
     "Export CSV" : "Vie CSV",
     "_%n selected row_::_%n selected rows_" : ["%n valittu rivi","%n valittua riviä"],
     "Confirmation" : "Vahvistus",
@@ -212,6 +213,7 @@ OC.L10N.register(
     "Unchecked" : "Ei tarkistettu",
     "Now" : "Nyt",
     "ID" : "ID",
+    "Clipboard is not available" : "Leikepöytä ei ole käytettävissä",
     "Could not fetch tables" : "Taulukkoja ei voitu noutaa"
 },
 "nplurals=2; plural=(n != 1);");

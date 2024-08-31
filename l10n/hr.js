@@ -104,6 +104,7 @@ OC.L10N.register(
     "URL" : "URL",
     "Users" : "Korisnici",
     "Groups" : "Grupe",
+    "Copy link" : "Kopiraj poveznicu",
     "Url" : "Url",
     "Confirm" : "Potvrdi",
     "Content" : "Sadržaj",

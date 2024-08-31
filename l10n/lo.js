@@ -29,6 +29,7 @@ OC.L10N.register(
     "Search" : "ຄົ້ນຫາ",
     "Default" : "ເລີ່ມຕົ້ນ",
     "Users" : "ຜູ້ໃຊ້",
+    "Copy link" : "ສຳເນົາລິງ",
     "Confirm" : "ຢືນຢັນ"
 },
 "nplurals=1; plural=0;");

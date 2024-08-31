@@ -34,6 +34,7 @@ OC.L10N.register(
     "Back" : "ආපසු",
     "Users" : "පරිශීලකයින්",
     "Groups" : "සමූහ",
+    "Copy link" : "සබැඳිය පිටපත් කරන්න",
     "Confirm" : "තහවුරු කරන්න"
 },
 "nplurals=2; plural=(n != 1);");

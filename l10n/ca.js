@@ -217,7 +217,6 @@ OC.L10N.register(
     "Read" : "Llegeix",
     "Update" : "Actualitzar",
     "Manage" : "Gestiona",
-    "Clipboard is not available" : "El porta-retalls no està disponible",
     "Create new table" : "No s'ha pogut crear una taula nova",
     "Searching …" : "Cercant …",
     "No elements found." : "No s'ha trobat cap element.",
@@ -256,6 +255,7 @@ OC.L10N.register(
     "Groups" : "Grups",
     "Url" : "Url",
     "Close editor" : "Tanca l'editor",
+    "Go to previous page" : "Torna a la pàgina anterior",
     "Export CSV" : "Exporta CSV",
     "_%n selected row_::_%n selected rows_" : ["%n fila seleccionada","%n files seleccionades"],
     "Confirmation" : "Confirmació",
@@ -265,6 +265,7 @@ OC.L10N.register(
     "Insert" : "Insereix",
     "Unchecked" : "Sense verificar",
     "ID" : "ID",
+    "Clipboard is not available" : "El porta-retalls no està disponible",
     "Could not fetch tables" : "No s'han pogut recuperar les taules"
 },
 "nplurals=2; plural=(n != 1);");

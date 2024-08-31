@@ -148,6 +148,7 @@ OC.L10N.register(
     "Maximum text length" : "Maximum tekstlengte",
     "URL" : "URL",
     "Groups" : "Groepen",
+    "Copy link" : "Link kopiëren",
     "Close editor" : "Sluit editor",
     "Confirmation" : "Bevestiging",
     "Confirm" : "Bevestigen",

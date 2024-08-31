@@ -76,7 +76,6 @@ OC.L10N.register(
     "Read" : "Lesa",
     "Update" : "Uppfæra",
     "Manage" : "Skipuleggja",
-    "Clipboard is not available" : "Klippispjald er ekki tiltækt",
     "Searching …" : "Leita …",
     "No elements found." : "Engin stök fundust.",
     "Error" : "Villa",
@@ -102,13 +101,16 @@ OC.L10N.register(
     "URL" : "Slóð",
     "Users" : "Notendur",
     "Groups" : "Hópar",
+    "Copy link" : "Afrita tengil",
     "Url" : "Slóð (URL)",
     "Close editor" : "Loka ritli",
+    "Go to previous page" : "Fara á fyrri síðu",
     "Confirm" : "Staðfesta",
     "Content" : "Efni",
     "Select" : "Velja",
     "Insert" : "Setja inn",
     "Unchecked" : "Ekki skoðað",
-    "ID" : "ID"
+    "ID" : "ID",
+    "Clipboard is not available" : "Klippispjald er ekki tiltækt"
 },
 "nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);");

@@ -66,7 +66,6 @@ OC.L10N.register(
     "Copy to clipboard" : "Salin ke papan klip",
     "Read" : "Baca",
     "Update" : "Perbarui",
-    "Clipboard is not available" : "Papan klip tidak tersedia",
     "Error" : "Galat",
     "Download" : "Unduh",
     "Search" : "Cari",
@@ -79,9 +78,11 @@ OC.L10N.register(
     "URL" : "URL",
     "Users" : "Pengguna",
     "Groups" : "Grup",
+    "Copy link" : "Salin tautan",
     "Confirm" : "Konfirmasi",
     "Content" : "Konten",
     "Select" : "Pilih",
-    "ID" : "ID"
+    "ID" : "ID",
+    "Clipboard is not available" : "Papan klip tidak tersedia"
 },
 "nplurals=1; plural=0;");

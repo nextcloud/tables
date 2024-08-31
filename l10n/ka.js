@@ -73,7 +73,6 @@ OC.L10N.register(
     "Copy to clipboard" : "Copy to clipboard",
     "Read" : "Read",
     "Update" : "Update",
-    "Clipboard is not available" : "Clipboard is not available",
     "Searching …" : "Searching …",
     "No elements found." : "No elements found.",
     "Error" : "Error",
@@ -87,9 +86,12 @@ OC.L10N.register(
     "URL" : "URL",
     "Users" : "Users",
     "Groups" : "Groups",
+    "Copy link" : "Copy link",
     "Close editor" : "Close editor",
+    "Go to previous page" : "Go to previous page",
     "Confirm" : "Confirm",
     "Select" : "Select",
-    "ID" : "ID"
+    "ID" : "ID",
+    "Clipboard is not available" : "Clipboard is not available"
 },
 "nplurals=2; plural=(n!=1);");

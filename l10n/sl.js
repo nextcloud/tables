@@ -281,7 +281,6 @@ OC.L10N.register(
     "Read" : "Branje",
     "Update" : "Posodobi",
     "Manage" : "Upravljanje",
-    "Clipboard is not available" : "Odložišče ni na voljo",
     "Create new table" : "Ustvari novo razpredelnico",
     "Searching …" : "Poteka iskanje ...",
     "No elements found." : "Ni najdenih predmetov",
@@ -331,6 +330,7 @@ OC.L10N.register(
     "URL" : "Naslov URL",
     "Groups" : "Skupine",
     "This field is mandatory" : "To polje je obvezno",
+    "Copy link" : "Kopiraj povezavo",
     "Url" : "Naslov URL",
     "Close editor" : "Zapri urejevalnik",
     "Export CSV" : "Izvozi CSV",
@@ -352,6 +352,7 @@ OC.L10N.register(
     "Is lower than or equal" : "Je enako ali manjše kot",
     "Unchecked" : "Nepregledano",
     "ID" : "ID",
+    "Clipboard is not available" : "Odložišče ni na voljo",
     "Unknown error." : "Neznana napaka.",
     "Could not fetch tables" : "Razpredelnic ni mogoče pridobiti."
 },

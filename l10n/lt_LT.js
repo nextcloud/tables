@@ -109,7 +109,6 @@ OC.L10N.register(
     "Read" : "Skaityti",
     "Update" : "Atnaujinti",
     "Manage" : "Tvarkyti",
-    "Clipboard is not available" : "Iškarpinė neprieinama",
     "Create new table" : "Sukurti naują lentelę",
     "Searching …" : "Ieškoma…",
     "No elements found." : "Nerasta jokių elementų.",
@@ -137,11 +136,13 @@ OC.L10N.register(
     "URL" : "URL",
     "Users" : "Vartotojai",
     "Groups" : "Grupės",
+    "Copy link" : "Kopijuoti nuorodą",
     "Url" : "Url",
     "Close editor" : "Užverti redaktorių",
     "Confirm" : "Patvirtinti",
     "Content" : "Turinys",
     "Select" : "Žymėti",
-    "ID" : "ID"
+    "ID" : "ID",
+    "Clipboard is not available" : "Iškarpinė neprieinama"
 },
 "nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);");

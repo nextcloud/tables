@@ -298,7 +298,6 @@ OC.L10N.register(
     "Read" : "読み込み",
     "Update" : "更新",
     "Manage" : "管理",
-    "Clipboard is not available" : "クリップボードは利用できません",
     "Select a table or view" : "テーブルまたはビューを選択",
     "Searching …" : "検索しています…",
     "No elements found." : "要素が見つかりませんでした。",
@@ -343,8 +342,10 @@ OC.L10N.register(
     "URL" : "URL",
     "Users" : "ユーザ",
     "Groups" : "グループ",
+    "Copy link" : "リンクをコピー",
     "Url" : "URL",
     "Close editor" : "エディタを閉じる",
+    "Go to previous page" : "前のページへ",
     "Export CSV" : "CSVエクスポート",
     "Confirmation" : "確認",
     "Confirm" : "承認",
@@ -364,6 +365,7 @@ OC.L10N.register(
     "ID" : "ID",
     "Creator" : "作成者",
     "Last editor" : "最終更新者",
-    "Last edited at" : "最終更新日"
+    "Last edited at" : "最終更新日",
+    "Clipboard is not available" : "クリップボードは利用できません"
 },
 "nplurals=1; plural=0;");

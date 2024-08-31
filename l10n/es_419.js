@@ -64,6 +64,7 @@ OC.L10N.register(
     "Default" : "Predeterminado",
     "URL" : "URL",
     "Users" : "Ususarios",
+    "Copy link" : "Copiar liga",
     "Confirm" : "Confirmar",
     "Content" : "Contenido",
     "Select" : "Seleccionar",

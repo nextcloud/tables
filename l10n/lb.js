@@ -43,6 +43,7 @@ OC.L10N.register(
     "URL" : "URL",
     "Users" : "Benotzer",
     "Groups" : "Gruppen",
+    "Copy link" : "Link kopéieren",
     "Confirm" : "Konfirméieren",
     "Select" : "Auswielen"
 },

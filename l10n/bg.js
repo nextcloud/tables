@@ -229,7 +229,6 @@ OC.L10N.register(
     "Read" : "Прочитане",
     "Update" : "Обновяване",
     "Manage" : "Управление",
-    "Clipboard is not available" : "Клипбордът не е достъпен",
     "Create new table" : "Създаване на нова таблица",
     "Searching …" : "Търсене ...",
     "No elements found." : "Няма намерен елемент.",
@@ -304,6 +303,7 @@ OC.L10N.register(
     "Start of the week" : "Начало на седмицата",
     "Now" : "Сега",
     "ID" : "ID /Идентификатор/",
+    "Clipboard is not available" : "Клипбордът не е достъпен",
     "Could not fetch tables" : "Таблиците не можаха да бъдат извлечени"
 },
 "nplurals=2; plural=(n != 1);");

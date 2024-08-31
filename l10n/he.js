@@ -149,6 +149,7 @@ OC.L10N.register(
     "URL" : "כתובת",
     "Users" : "משתמשים",
     "Groups" : "קבוצות",
+    "Copy link" : "העתקת קישור",
     "Url" : "כתובת",
     "Confirm" : "אימות",
     "Content" : "תוכן",

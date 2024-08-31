@@ -74,6 +74,7 @@ OC.L10N.register(
     "URL" : "URL",
     "Users" : "Përdoruesit",
     "Groups" : "Grupet",
+    "Copy link" : "Kopjoje lidhjen",
     "Confirm" : "Konfirmo",
     "Content" : "Përmbajtja",
     "Select" : "Përzgjidh",

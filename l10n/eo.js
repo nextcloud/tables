@@ -84,6 +84,7 @@ OC.L10N.register(
     "URL" : "Retadreso",
     "Users" : "Uzantoj",
     "Groups" : "Grupoj",
+    "Copy link" : "Kopii ligilon",
     "Close editor" : "Fermi redaktilon",
     "Confirm" : "Konfirmi",
     "Content" : "Enhavo",

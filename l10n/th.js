@@ -60,7 +60,6 @@ OC.L10N.register(
     "Copy to clipboard" : "คัดลอกไปยังคลิปบอร์ด",
     "Read" : "อ่าน",
     "Update" : "อัปเดต",
-    "Clipboard is not available" : "คลิปบอร์ดไม่พร้อมใช้งาน",
     "Searching …" : "กำลังค้นหา …",
     "Error" : "ข้อผิดพลาด",
     "Download" : "ดาวน์โหลด",
@@ -73,9 +72,11 @@ OC.L10N.register(
     "URL" : "URL",
     "Users" : "ผู้ใช้",
     "Groups" : "กลุ่ม",
+    "Copy link" : "คัดลอกลิงก์",
     "Confirm" : "ยืนยัน",
     "Select" : "เลือก",
     "Start of the year" : "เริ่มต้นของปี",
-    "ID" : "ID"
+    "ID" : "ID",
+    "Clipboard is not available" : "คลิปบอร์ดไม่พร้อมใช้งาน"
 },
 "nplurals=1; plural=0;");

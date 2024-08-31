@@ -42,6 +42,7 @@ OC.L10N.register(
     "Add option" : "Rnu aɣewwaṛ",
     "Users" : "Iseqdacen",
     "Groups" : "Igrawen",
+    "Copy link" : "Nɣel aseɣwen",
     "Confirm" : "Serggeg",
     "Content" : "Agbur",
     "Select" : "Fren"

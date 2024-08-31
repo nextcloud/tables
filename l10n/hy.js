@@ -44,6 +44,7 @@ OC.L10N.register(
     "Default" : "Լռելյայն",
     "URL" : "URL",
     "Groups" : "Խմբեր",
+    "Copy link" : "Պատճենել հղումը",
     "Select" : "Նշել"
 },
 "nplurals=2; plural=(n != 1);");

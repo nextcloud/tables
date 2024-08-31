@@ -50,6 +50,7 @@ OC.L10N.register(
     "URL" : "URL",
     "Users" : "Usatores",
     "Groups" : "Gruppos",
+    "Copy link" : "Copiar ligamine",
     "Confirm" : "Confirmar",
     "Select" : "Selectionar"
 },
