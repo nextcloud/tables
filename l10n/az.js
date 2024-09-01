@@ -53,6 +53,7 @@ OC.L10N.register(
     "URL" : "URL",
     "Users" : "İstifadəçilər",
     "Groups" : "Qruplar",
+    "Copy link" : "linki nüsxələ",
     "Confirm" : "Təsdiq edin",
     "Select" : "Seç"
 },
