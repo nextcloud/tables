@@ -253,6 +253,7 @@ OC.L10N.register(
     "Maximum text length" : "Longitud màxima del text",
     "URL" : "URL",
     "Groups" : "Grups",
+    "Copy link" : "Copia l'enllaç",
     "Url" : "Url",
     "Close editor" : "Tanca l'editor",
     "Go to previous page" : "Torna a la pàgina anterior",
@@ -264,6 +265,7 @@ OC.L10N.register(
     "Content" : "Contingut",
     "Insert" : "Insereix",
     "Unchecked" : "Sense verificar",
+    "Now" : "Ara",
     "ID" : "ID",
     "Clipboard is not available" : "El porta-retalls no està disponible",
     "Could not fetch tables" : "No s'han pogut recuperar les taules"
