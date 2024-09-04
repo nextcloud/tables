@@ -7,6 +7,7 @@ declare(strict_types=1);
  */
 namespace OCA\Tables\Db;
 
+use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -40,5 +41,39 @@ class ContextNavigationMapper extends QBMapper {
 		$entity->setUserId($userId);
 
 		return $this->insertOrUpdate($entity);
+	}
+
+	// we have to overwrite QBMapper`s update() because we do not have
+	// an id column in this table. Sad.
+	public function update(Entity $entity): ContextNavigation {
+		if (!$entity instanceof ContextNavigation) {
+			throw new \LogicException('Can only update context navigation entities');
+		}
+
+		// if entity wasn't changed it makes no sense to run a db query
+		$properties = $entity->getUpdatedFields();
+		if (\count($properties) === 0) {
+			return $entity;
+		}
+
+		$qb = $this->db->getQueryBuilder();
+		$qb->update($this->tableName);
+
+		// build the fields
+		foreach ($properties as $property => $updated) {
+			$column = $entity->propertyToColumn($property);
+			$getter = 'get' . ucfirst($property);
+			$value = $entity->$getter();
+
+			$type = $this->getParameterTypeForProperty($entity, $property);
+			$qb->set($column, $qb->createNamedParameter($value, $type));
+		}
+
+		$qb->where($qb->expr()->eq('share_id', $qb->createNamedParameter($entity->getShareId(), IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($entity->getUserId(), IQueryBuilder::PARAM_STR)));
+
+		$qb->executeStatement();
+
+		return $entity;
 	}
 }
