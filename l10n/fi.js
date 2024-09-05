@@ -74,6 +74,7 @@ OC.L10N.register(
     "Move" : "Siirrä",
     "Metadata" : "Metatieto",
     "Column" : "Sarake",
+    "Operator" : "Operaattori",
     "Ascending" : "Nouseva",
     "Descending" : "Laskeva",
     "Views" : "Näkymät",
