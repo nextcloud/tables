@@ -8,6 +8,7 @@
 namespace OCA\Tables\Controller;
 
 use Exception;
+use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -141,35 +142,30 @@ class ApiTablesController extends AOCSController {
 					$this->userId,
 					$table->getId(),
 					null,
-					$column['type'],
-					$column['subtype'],
-					$column['title'],
-					$column['mandatory'],
-					$column['description'],
-
-					$column['textDefault'],
-					$column['textAllowedPattern'],
-					$column['textMaxLength'],
-
-					$column['numberPrefix'],
-					$column['numberSuffix'],
-					$column['numberDefault'],
-					$column['numberMin'],
-					$column['numberMax'],
-					$column['numberDecimals'],
-
-					$column['selectionOptions'] == [] ? '' : $column['selectionOptions'],
-					$column['selectionDefault'],
-
-					$column['datetimeDefault'],
-
-					$column['usergroupDefault'][0] ?? '',
-					$column['usergroupMultipleItems'],
-					$column['usergroupSelectUsers'],
-					$column['usergroupSelectGroups'],
-					$column['showUserStatus'],
-
-					[],
+					new ColumnDto(
+						title: $column['title'],
+						type: $column['type'],
+						subtype: $column['subtype'],
+						mandatory: $column['mandatory'],
+						description: $column['description'],
+						textDefault: $column['textDefault'],
+						textAllowedPattern: $column['textAllowedPattern'],
+						textMaxLength: $column['textMaxLength'],
+						numberDefault: $column['numberDefault'],
+						numberMin: $column['numberMin'],
+						numberMax: $column['numberMax'],
+						numberDecimals: $column['numberDecimals'],
+						numberPrefix: $column['numberPrefix'],
+						numberSuffix: $column['numberSuffix'],
+						selectionOptions: $column['selectionOptions'] == [] ? '' : $column['selectionOptions'],
+						selectionDefault: $column['selectionDefault'],
+						datetimeDefault: $column['datetimeDefault'],
+						usergroupDefault: $column['usergroupDefault'][0] ?? '',
+						usergroupMultipleItems: $column['usergroupMultipleItems'],
+						usergroupSelectUsers: $column['usergroupSelectUsers'],
+						usergroupSelectGroups: $column['usergroupSelectGroups'],
+						showUserStatus: $column['showUserStatus'],
+					)
 				);
 			};
 			foreach ($views as $view) {

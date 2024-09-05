@@ -9,6 +9,7 @@ namespace OCA\Tables\Service;
 
 use OC\User\NoUserException;
 use OCA\Tables\Db\Column;
+use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -419,28 +420,7 @@ class ImportService extends SuperService {
 						$this->userId,
 						$this->tableId,
 						$this->viewId,
-						$this->columnsConfig[$index]['type'],
-						$this->columnsConfig[$index]['subtype'],
-						$this->columnsConfig[$index]['title'],
-						$this->columnsConfig[$index]['mandatory'] ?? false,
-						$this->columnsConfig[$index]['description'] ?? '',
-						$this->columnsConfig[$index]['textDefault'] ?? '',
-						$this->columnsConfig[$index]['textAllowedPattern'] ?? '',
-						$this->columnsConfig[$index]['textMaxLength'] ?? null,
-						$this->columnsConfig[$index]['numberPrefix'] ?? '',
-						$this->columnsConfig[$index]['numberSuffix'] ?? '',
-						$this->columnsConfig[$index]['numberDefault'] ?? null,
-						$this->columnsConfig[$index]['numberMin'] ?? null,
-						$this->columnsConfig[$index]['numberMax'] ?? null,
-						$this->columnsConfig[$index]['numberDecimals'] ?? 0,
-						$this->columnsConfig[$index]['selectionOptions'] ?? '',
-						$this->columnsConfig[$index]['selectionDefault'] ?? '',
-						$this->columnsConfig[$index]['datetimeDefault'] ?? '',
-						$this->columnsConfig[$index]['usergroupDefault'] ?? null,
-						$this->columnsConfig[$index]['usergroupMultipleItems'] ?? null,
-						$this->columnsConfig[$index]['usergroupSelectUsers'] ?? null,
-						$this->columnsConfig[$index]['usergroupSelectGroups'] ?? null,
-						$this->columnsConfig[$index]['showUserStatus'] ?? null,
+						ColumnDto::createFromArray($this->columnsConfig[$index]),
 						$this->columnsConfig[$index]['selectedViewIds'] ?? []
 					);
 					$title = $column->getTitle();

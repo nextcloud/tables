@@ -9,6 +9,7 @@ namespace OCA\Tables\Db;
 
 use JsonSerializable;
 
+use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\Entity;
 
@@ -150,6 +151,33 @@ class Column extends Entity implements JsonSerializable {
 		$this->addType('usergroupSelectUsers', 'boolean');
 		$this->addType('usergroupSelectGroups', 'boolean');
 		$this->addType('showUserStatus', 'boolean');
+	}
+
+	public static function fromDto(ColumnDto $data): self {
+		$column = new self();
+		$column->setTitle($data->getTitle());
+		$column->setType($data->getType());
+		$column->setSubtype($data->getSubtype() ?? '');
+		$column->setMandatory($data->isMandatory() ?? false);
+		$column->setDescription($data->getDescription() ?? '');
+		$column->setTextDefault($data->getTextDefault());
+		$column->setTextAllowedPattern($data->getTextAllowedPattern());
+		$column->setTextMaxLength($data->getTextMaxLength());
+		$column->setNumberDefault($data->getNumberDefault());
+		$column->setNumberMin($data->getNumberMin());
+		$column->setNumberMax($data->getNumberMax());
+		$column->setNumberDecimals($data->getNumberDecimals());
+		$column->setNumberPrefix($data->getNumberPrefix() ?? '');
+		$column->setNumberSuffix($data->getNumberSuffix() ?? '');
+		$column->setSelectionOptions($data->getSelectionOptions());
+		$column->setSelectionDefault($data->getSelectionDefault());
+		$column->setDatetimeDefault($data->getDatetimeDefault());
+		$column->setUsergroupDefault($data->getUsergroupDefault());
+		$column->setUsergroupMultipleItems($data->getUsergroupMultipleItems());
+		$column->setUsergroupSelectUsers($data->getUsergroupSelectUsers());
+		$column->setUsergroupSelectGroups($data->getUsergroupSelectGroups());
+		$column->setShowUserStatus($data->getShowUserStatus());
+		return $column;
 	}
 
 	public function getUsergroupDefaultArray():array {

@@ -12,6 +12,7 @@ use Exception;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -142,28 +143,7 @@ class ColumnService extends SuperService {
 	 * @param string|null $userId
 	 * @param int|null $tableId
 	 * @param int|null $viewId
-	 * @param string $type
-	 * @param string|null $subtype
-	 * @param string $title
-	 * @param bool $mandatory
-	 * @param string|null $description
-	 * @param string|null $textDefault
-	 * @param string|null $textAllowedPattern
-	 * @param int|null $textMaxLength
-	 * @param string|null $numberPrefix
-	 * @param string|null $numberSuffix
-	 * @param float|null $numberDefault
-	 * @param float|null $numberMin
-	 * @param float|null $numberMax
-	 * @param int|null $numberDecimals
-	 * @param string|null $selectionOptions
-	 * @param string|null $selectionDefault
-	 * @param string|null $datetimeDefault
-	 * @param string|null $usergroupDefault
-	 * @param bool|null $usergroupMultipleItems
-	 * @param bool|null $usergroupSelectUsers
-	 * @param bool|null $usergroupSelectGroups
-	 * @param bool|null $showUserStatus
+	 * @param ColumnDto $columnDto
 	 * @param array $selectedViewIds
 	 * @return Column
 	 *
@@ -174,34 +154,7 @@ class ColumnService extends SuperService {
 		?string $userId,
 		?int $tableId,
 		?int $viewId,
-		string $type,
-		?string $subtype,
-		string $title,
-		bool $mandatory,
-		?string $description,
-
-		?string $textDefault,
-		?string $textAllowedPattern,
-		?int $textMaxLength,
-
-		?string $numberPrefix,
-		?string $numberSuffix,
-		?float $numberDefault,
-		?float $numberMin,
-		?float $numberMax,
-		?int $numberDecimals,
-
-		?string $selectionOptions,
-		?string $selectionDefault,
-
-		?string $datetimeDefault,
-
-		?string $usergroupDefault,
-		?bool $usergroupMultipleItems,
-		?bool $usergroupSelectUsers,
-		?bool $usergroupSelectGroups,
-		?bool $showUserStatus,
-		
+		ColumnDto $columnDto,
 		array $selectedViewIds = []
 	):Column {
 		// security
@@ -247,7 +200,7 @@ class ColumnService extends SuperService {
 		// Add number to title to avoid duplicate
 		$columns = $this->mapper->findAllByTable($table->getId());
 		$i = 1;
-		$newTitle = $title;
+		$newTitle = $columnDto->getTitle();
 		while (true) {
 			$found = false;
 			foreach ($columns as $column) {
@@ -259,36 +212,15 @@ class ColumnService extends SuperService {
 			if (!$found) {
 				break;
 			}
-			$newTitle = $title . ' (' . $i . ')';
+			$newTitle = $columnDto->getTitle() . ' (' . $i . ')';
 			$i++;
 		}
 
 		$time = new DateTime();
-		$item = new Column();
+		$item = Column::fromDto($columnDto);
 		$item->setTitle($newTitle);
 		$item->setTableId($table->getId());
-		$item->setType($type);
-		$item->setSubtype($subtype !== null ? $subtype: '');
-		$item->setMandatory($mandatory);
-		$item->setDescription($description ?? '');
-		$item->setTextDefault($textDefault);
-		$item->setTextAllowedPattern($textAllowedPattern);
-		$item->setTextMaxLength($textMaxLength);
-		$item->setNumberDefault($numberDefault);
-		$item->setNumberMin($numberMin);
-		$item->setNumberMax($numberMax);
-		$item->setNumberDecimals($numberDecimals);
-		$item->setNumberPrefix($numberPrefix !== null ? $numberPrefix: '');
-		$item->setNumberSuffix($numberSuffix !== null ? $numberSuffix: '');
 		$this->updateMetadata($item, $userId, true);
-		$item->setSelectionOptions($selectionOptions);
-		$item->setSelectionDefault($selectionDefault);
-		$item->setDatetimeDefault($datetimeDefault);
-		$item->setUsergroupDefault($usergroupDefault);
-		$item->setUsergroupMultipleItems($usergroupMultipleItems);
-		$item->setUsergroupSelectUsers($usergroupSelectUsers);
-		$item->setUsergroupSelectGroups($usergroupSelectGroups);
-		$item->setShowUserStatus($showUserStatus);
 
 		try {
 			$entity = $this->mapper->insert($item);
@@ -322,28 +254,7 @@ class ColumnService extends SuperService {
 	 * @param int $columnId
 	 * @param int|null $tableId
 	 * @param string|null $userId
-	 * @param string|null $type
-	 * @param string|null $subtype
-	 * @param string|null $title
-	 * @param bool $mandatory
-	 * @param string|null $description
-	 * @param string|null $textDefault
-	 * @param string|null $textAllowedPattern
-	 * @param int|null $textMaxLength
-	 * @param string|null $numberPrefix
-	 * @param string|null $numberSuffix
-	 * @param float|null $numberDefault
-	 * @param float|null $numberMin
-	 * @param float|null $numberMax
-	 * @param int|null $numberDecimals
-	 * @param string|null $selectionOptions
-	 * @param string|null $selectionDefault
-	 * @param string|null $datetimeDefault
-	 * @param string|null $usergroupDefault
-	 * @param bool|null $usergroupMultipleItems
-	 * @param bool|null $usergroupSelectUsers
-	 * @param bool|null $usergroupSelectGroups
-	 * @param bool|null $showUserStatus
+	 * @param ColumnDto $columnDto
 	 * @return Column
 	 * @throws InternalError
 	 */
@@ -351,33 +262,7 @@ class ColumnService extends SuperService {
 		int $columnId,
 		?int $tableId,
 		?string $userId,
-		?string $type,
-		?string $subtype,
-		?string $title,
-		?bool $mandatory,
-		?string $description,
-
-		?string $textDefault,
-		?string $textAllowedPattern,
-		?int $textMaxLength,
-
-		?string $numberPrefix,
-		?string $numberSuffix,
-		?float $numberDefault,
-		?float $numberMin,
-		?float $numberMax,
-		?int $numberDecimals,
-
-		?string $selectionOptions,
-		?string $selectionDefault,
-
-		?string $datetimeDefault,
-
-		?string $usergroupDefault,
-		?bool $usergroupMultipleItems,
-		?bool $usergroupSelectUsers,
-		?bool $usergroupSelectGroups,
-		?bool $showUserStatus,
+		ColumnDto $columnDto
 	):Column {
 		try {
 			/** @var Column $item */
@@ -388,50 +273,50 @@ class ColumnService extends SuperService {
 				throw new PermissionError('update column id = '.$columnId.' is not allowed.');
 			}
 
-			if ($title !== null) {
-				$item->setTitle($title);
+			if ($columnDto->getTitle() !== null) {
+				$item->setTitle($columnDto->getTitle());
 			}
 			if ($tableId !== null) {
 				$item->setTableId($tableId);
 			}
-			if ($type !== null) {
-				$item->setType($type);
+			if ($columnDto->getType() !== null) {
+				$item->setType($columnDto->getType());
 			}
-			if ($subtype !== null) {
-				$item->setSubtype($subtype);
+			if ($columnDto->getSubtype() !== null) {
+				$item->setSubtype($columnDto->getSubtype());
 			}
-			if ($numberPrefix !== null) {
-				$item->setNumberPrefix($numberPrefix);
+			if ($columnDto->getNumberPrefix() !== null) {
+				$item->setNumberPrefix($columnDto->getNumberPrefix());
 			}
-			if ($numberSuffix !== null) {
-				$item->setNumberSuffix($numberSuffix);
+			if ($columnDto->getNumberSuffix() !== null) {
+				$item->setNumberSuffix($columnDto->getNumberSuffix());
 			}
-			if ($mandatory !== null) {
-				$item->setMandatory($mandatory);
+			if ($columnDto->isMandatory() !== null) {
+				$item->setMandatory($columnDto->isMandatory());
 			}
-			$item->setDescription($description);
-			$item->setTextDefault($textDefault);
-			$item->setTextAllowedPattern($textAllowedPattern);
-			$item->setTextMaxLength($textMaxLength);
-			$item->setNumberDefault($numberDefault);
-			$item->setNumberMin($numberMin);
-			$item->setNumberMax($numberMax);
-			$item->setNumberDecimals($numberDecimals);
-			if ($selectionOptions !== null) {
-				$item->setSelectionOptions($selectionOptions);
+			$item->setDescription($columnDto->getDescription());
+			$item->setTextDefault($columnDto->getTextDefault());
+			$item->setTextAllowedPattern($columnDto->getTextAllowedPattern());
+			$item->setTextMaxLength($columnDto->getTextMaxLength());
+			$item->setNumberDefault($columnDto->getNumberDefault());
+			$item->setNumberMin($columnDto->getNumberMin());
+			$item->setNumberMax($columnDto->getNumberMax());
+			$item->setNumberDecimals($columnDto->getNumberDecimals());
+			if ($columnDto->getSelectionOptions() !== null) {
+				$item->setSelectionOptions($columnDto->getSelectionOptions());
 			}
-			if ($selectionDefault !== null) {
-				$item->setSelectionDefault($selectionDefault);
+			if ($columnDto->getSelectionDefault() !== null) {
+				$item->setSelectionDefault($columnDto->getSelectionDefault());
 			}
-			$item->setDatetimeDefault($datetimeDefault);
+			$item->setDatetimeDefault($columnDto->getDatetimeDefault());
 
-			if ($usergroupDefault !== null) {
-				$item->setUsergroupDefault($usergroupDefault);
+			if ($columnDto->getUsergroupDefault() !== null) {
+				$item->setUsergroupDefault($columnDto->getUsergroupDefault());
 			}
-			$item->setUsergroupMultipleItems($usergroupMultipleItems);
-			$item->setUsergroupSelectUsers($usergroupSelectUsers);
-			$item->setUsergroupSelectGroups($usergroupSelectGroups);
-			$item->setShowUserStatus($showUserStatus);
+			$item->setUsergroupMultipleItems($columnDto->getUsergroupMultipleItems());
+			$item->setUsergroupSelectUsers($columnDto->getUsergroupSelectUsers());
+			$item->setUsergroupSelectGroups($columnDto->getUsergroupSelectGroups());
+			$item->setShowUserStatus($columnDto->getShowUserStatus());
 
 			$this->updateMetadata($item, $userId);
 			return $this->enhanceColumn($this->mapper->update($item));
@@ -574,29 +459,17 @@ class ColumnService extends SuperService {
 					$userId,
 					$tableId,
 					$viewId,
-					$dataTypes[$i]['type'],
-					$dataTypes[$i]['subtype'] ?? '',
-					$title,
-					false,
-					$description,
-					null,
-					null,
-					null,
-					$dataTypes[$i]['number_prefix'] ?? null,
-					$dataTypes[$i]['number_suffix'] ?? null,
-					null,
-					null,
-					null,
-					$dataTypes[$i]['number_decimals'] ?? null,
-					null,
-					$dataTypes[$i]['selection_default'] ?? null,
-					null,
-					null,
-					null,
-					null,
-					null,
-					null,
-					[]
+					new ColumnDto(
+						title: $title,
+						type: $dataTypes[$i]['type'],
+						subtype: $dataTypes[$i]['subtype'] ?? '',
+						mandatory: false,
+						description: $description,
+						numberDecimals: $dataTypes[$i]['number_decimals'] ?? null,
+						numberPrefix: $dataTypes[$i]['number_prefix'] ?? null,
+						numberSuffix: $dataTypes[$i]['number_suffix'] ?? null,
+						selectionDefault: $dataTypes[$i]['selection_default'] ?? null
+					),
 				);
 				$countCreatedColumns++;
 			}
