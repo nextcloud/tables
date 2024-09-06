@@ -107,7 +107,6 @@ OC.L10N.register(
     "Edit a row" : "Editatu errenkada bat",
     "Add a new column" : "Gehitu zutabe berri bat",
     "Read the docs" : "Irakurri dokumentazioa",
-    "No title given" : "Ez da izenbururik eman",
     "Tables" : "Taulak",
     "Last edit" : "Azken edizioa",
     "Create" : "Sortu",

@@ -61,7 +61,6 @@ OC.L10N.register(
     "Progress" : "Progresu",
     "We know what we are doing." : "Sabemos lo que facemos.",
     "Done" : "Fecho",
-    "No title given" : "Nun s'apurrió nengún títulu",
     "Tables" : "Tables",
     "Manage data the way you need it." : "Xestiona datos de la forma que precises.",
     "Last edit" : "Última edición",

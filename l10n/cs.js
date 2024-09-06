@@ -121,7 +121,6 @@ OC.L10N.register(
     "Edit a row" : "Upravit řádek",
     "Add a new column" : "Přidat nový sloupec",
     "Read the docs" : "Přečíst si dokumentaci",
-    "No title given" : "Nezadán žádný nadpis",
     "Tables" : "Tabulky",
     "Manage data the way you need it." : "Spravujte data tak, jak potřebujete.",
     "Last edit" : "Naposledy upraveno",

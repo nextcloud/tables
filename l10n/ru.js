@@ -96,7 +96,6 @@ OC.L10N.register(
     "Edit a row" : "Редактировать строку",
     "Add a new column" : "Добавить новый столбец",
     "Read the docs" : "Прочитать документацию",
-    "No title given" : "Не задан заголовок",
     "Tables" : "Таблицы",
     "Manage data the way you need it." : "Управляйте своими данными удобно.",
     "Last edit" : "Последнее редактирование",

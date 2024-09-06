@@ -48,7 +48,6 @@ OC.L10N.register(
     "What" : "Cosa",
     "Done" : "Completato",
     "Add a new column" : "Aggiungi una nuova colonna",
-    "No title given" : "Nessun titolo specificato",
     "Tables" : "Tabelle",
     "Last edit" : "Ultima modifica",
     "Create" : "Crea",

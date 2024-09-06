@@ -110,7 +110,6 @@ OC.L10N.register(
     "Edit a row" : "Urejanje vrstice",
     "Add a new column" : "Dodajanje novega stolpca",
     "Read the docs" : "Pregled dokumentacije",
-    "No title given" : "Ni podanega naslova",
     "Tables" : "Razpredelnice",
     "Manage data the way you need it." : "Upravljajte s podatki na svoj način.",
     "Last edit" : "Zadnje urejanje",

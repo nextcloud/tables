@@ -118,7 +118,6 @@ OC.L10N.register(
     "Edit a row" : "Sor szerkesztése",
     "Add a new column" : "Új sor hozzáadása",
     "Read the docs" : "Olvassa el a dokumentációt",
-    "No title given" : "Nincs cím megadva",
     "Tables" : "Táblázatok",
     "Manage data the way you need it." : "Kezelje az adatokat úgy, ahogy szüksége van rájuk.",
     "Last edit" : "Legutóbbi szerkesztés",

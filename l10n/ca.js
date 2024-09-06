@@ -102,7 +102,6 @@ OC.L10N.register(
     "What" : "Què",
     "Done" : "Desat",
     "Add a new column" : "Afegeix una nova columna",
-    "No title given" : "No s'ha donat cap títol",
     "Tables" : "Taules",
     "Manage data the way you need it." : "Gestioneu les dades com les necessiteu.",
     "Last edit" : "Última edició",

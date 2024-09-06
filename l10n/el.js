@@ -93,7 +93,6 @@ OC.L10N.register(
     "Edit a row" : "Επεξεργαστείτε μια γραμμή.",
     "Add a new column" : "Προσθήκη νέας στήλης",
     "Read the docs" : "Διαβάστε τις οδηγίες",
-    "No title given" : "Δε δόθηκε τίτλος",
     "Tables" : "Πίνακες",
     "Manage data the way you need it." : "Διαχειριστείτε δεδομένα όπως εσείς το χρειάζεστε.",
     "Last edit" : "Τελευταία επεξεργασία",

@@ -122,7 +122,6 @@ OC.L10N.register(
     "Edit a row" : "Cuir sraith in eagar",
     "Add a new column" : "Cuir colún nua leis",
     "Read the docs" : "Léigh na doiciméid",
-    "No title given" : "Níl teideal tugtha",
     "Tables" : "Táblaí",
     "Manage data the way you need it." : "Bainistigh sonraí ar an mbealach a theastaíonn uait.",
     "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link to urls or other nextcloud resources\n- Numbers\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n\nShare your tables and views with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Bainistigh sonraí ar an mbealach a theastaíonn uait.\n\nLeis an aip seo is féidir leat do tháblaí féin a chruthú le colúin aonair. Is féidir leat tosú le teimpléad nó ón tús agus na colúin atá uait a chur leis.\nIs féidir leat a roghnú as na cineálacha colún seo a leanas:\n- Líne téacs nó téacs saibhir\n- Nasc le URLanna nó acmhainní eile nextcloud\n- Uimhreacha\n- Barra dul chun cinn\n- Réaltaí rátáil\n- Tá/Níl tic\n- Dáta agus/nó am\n- (Il) roghnú\n\nRoinn do tháblaí agus do thuairimí le húsáideoirí agus le grúpaí laistigh de do scamall.\n\nBíodh am maith agat agus bainistigh cibé rud is mian leat.",

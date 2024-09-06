@@ -110,7 +110,6 @@ OC.L10N.register(
     "Done" : "Hotové",
     "Open the tables app" : "Otvorte apku Tabuľky",
     "Add a new column" : "Pridať nový stĺpec",
-    "No title given" : "Nebol zadaný žiadny názov",
     "Tables" : "Tabuľky",
     "Manage data the way you need it." : "Spravujte údaje spôsobom, akým to potrebujete.",
     "Last edit" : "Posledná zmena",

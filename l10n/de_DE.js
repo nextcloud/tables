@@ -122,7 +122,6 @@ OC.L10N.register(
     "Edit a row" : "Eine Zeile bearbeiten",
     "Add a new column" : "Neue Spalte hinzufügen",
     "Read the docs" : "Lesen Sie die Dokumentation",
-    "No title given" : "Kein Titel angegeben",
     "Tables" : "Tabellen",
     "Manage data the way you need it." : "Daten so verwalten, wie Sie es benötigen.",
     "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link to urls or other nextcloud resources\n- Numbers\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n\nShare your tables and views with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Verwalten Sie Daten so, wie Sie es benötigen.\n\nMit dieser App können Sie Ihre eigenen Tabellen mit individuellen Spalten erstellen. Sie können mit einer Vorlage oder von Grund auf neu beginnen und benötigte Spalten hinzufügen.\nSie können aus folgenden Spaltentypen wählen:\n- Textzeile oder Rich-Text\n- Link zu URLs oder anderen Nextcloud-Ressourcen\n- Zahlen\n- Fortschrittsanzeige\n- Sternebewertung\n- Ja/Nein ankreuzen\n- Datum und/oder Uhrzeit\n- (Mehrfach-) Auswahl\n\nTeilen Sie Ihre Tabellen und Ansichten mit Benutzern und Gruppen in Ihrer Cloud.\n\nLehnen Sie sich zurück und verwalten Sie, was immer Sie benötigen.",

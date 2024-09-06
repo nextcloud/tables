@@ -75,7 +75,6 @@ OC.L10N.register(
     "What" : "Co",
     "Done" : "Gotowe",
     "Add a new column" : "Dodaj nową kolumnę",
-    "No title given" : "Nie podano tytułu",
     "Tables" : "Tabele",
     "Last edit" : "Ostatnia edycja",
     "Create" : "Utwórz",

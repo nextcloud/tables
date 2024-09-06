@@ -90,7 +90,6 @@ OC.L10N.register(
     "Edit a row" : "Redigera en rad",
     "Add a new column" : "Lägg till en ny kolumn",
     "Read the docs" : "Läs dokumenten",
-    "No title given" : "Ingen titel har angivits",
     "Tables" : "Tabeller",
     "Manage data the way you need it." : " Hantera data som du behöver den.",
     "Last edit" : "Senaste redigering",

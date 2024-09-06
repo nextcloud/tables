@@ -114,7 +114,6 @@ OC.L10N.register(
     "Edit a row" : "Edit a row",
     "Add a new column" : "Add a new column",
     "Read the docs" : "Read the docs",
-    "No title given" : "No title given",
     "Tables" : "جدول‌ها",
     "Manage data the way you need it." : "Manage data the way you need it.",
     "Last edit" : "Last edit",

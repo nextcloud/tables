@@ -109,7 +109,6 @@ OC.L10N.register(
     "Edit a row" : "Editar una fila",
     "Add a new column" : "Agregar una nueva columna",
     "Read the docs" : "Leer la documentación",
-    "No title given" : "No se ha proporcionado título",
     "Tables" : "Tablas",
     "Manage data the way you need it." : "Gestiona los datos de la manera que necesites.",
     "Last edit" : "Última edición",

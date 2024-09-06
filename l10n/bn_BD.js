@@ -43,6 +43,7 @@ OC.L10N.register(
     "URL" : "URL",
     "Users" : "ব্যবহারকারী",
     "Groups" : "গোষ্ঠীসমূহ",
+    "Copy link" : "লিঙ্ক কপি করো",
     "Select" : "সিলেক্ট"
 },
 "nplurals=2; plural=(n != 1);");

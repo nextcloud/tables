@@ -44,7 +44,6 @@ OC.L10N.register(
     "Target" : "Doel",
     "Progress" : "Voortgang",
     "Done" : "Klaar",
-    "No title given" : "Geen titel gegeven",
     "Tables" : "Tabellen",
     "Create" : "Creëer",
     "Today" : "Vandaag",

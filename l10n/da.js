@@ -108,7 +108,6 @@ OC.L10N.register(
     "Edit a row" : "Editer række",
     "Add a new column" : "Tilføj ny kolonne",
     "Read the docs" : "Læs dokumentationen",
-    "No title given" : "Ingen titel givet",
     "Tables" : "Tabeller",
     "Manage data the way you need it." : "Administrer data efter dine ønsker og behov…",
     "Last edit" : "Sidste redigering",

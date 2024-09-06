@@ -120,7 +120,6 @@
     "Edit a row" : "Editar una fila",
     "Add a new column" : "Añadir una nueva columna",
     "Read the docs" : "Lea la documentación",
-    "No title given" : "No se ha puesto título",
     "Tables" : "Tablas",
     "Manage data the way you need it." : "Gestiona datos a tu manera.",
     "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link to urls or other nextcloud resources\n- Numbers\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n\nShare your tables and views with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Administre los datos de la manera que necesite.\n\nCon esta app puede crear sus propias tablas con columnas individuales. Puede comenzar con una plantilla o desde cero y agregar las columnas que desee.\nPuede elegir entre los siguientes tipos de columnas:\n- Línea de texto o texto enriquecido\n- Enlace a URL o a otros recursos de Nextcloud\n- Números\n- Barra de progreso\n- Calificación con estrellas\n- Marca de verificación Sí/No\n- Fecha y/o hora\n- Selección (múltiple)\n\nComparta sus tablas y vistas con usuarios y grupos dentro de su nube.\n\nDisfrute y gestione lo que desee.",
