@@ -207,7 +207,7 @@ OC.L10N.register(
     "Back" : "Atrás",
     "Sorting" : "Orde",
     "Manage column" : "Xestionar la columna",
-    "Hide column" : "Anubrir la columna",
+    "Hide column" : "Esconder la columna",
     "Undo" : "Desfacer",
     "Redo" : "Refacer",
     "Bold" : "Negrina",

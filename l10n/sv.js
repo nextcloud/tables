@@ -84,6 +84,7 @@ OC.L10N.register(
     "Add more actions" : "Lägg till fler åtgärder",
     "I guess we need more actions in here..." : "Jag antar att vi behöver fler åtgärder här...",
     "What" : "Vad",
+    "Ease of use" : "Lätt att använda",
     "Done" : "Klar",
     "Open the tables app" : "Öppna tabell-appen",
     "Add your first row" : "Lägg till din första rad",
