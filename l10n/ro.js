@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Timestamp of data load" : "Marca temporală a încărcării datelor",
     "No" : "Nu",
     "Yes" : "Da",
     "The file was uploaded" : "Fișierul a fost încărcat",
@@ -31,6 +32,7 @@ OC.L10N.register(
     "Today" : "Astăzi",
     "Text" : "Text",
     "Link" : "Legătură",
+    "Number" : "Număr",
     "Users and groups" : "Utilizatori și grupuri",
     "Move" : "Mută",
     "Views" : "Mod de viziualizare",
@@ -63,6 +65,7 @@ OC.L10N.register(
     "Copy" : "Copiază",
     "Favorites" : "Favorite",
     "Clear filter" : "Șterge filtrul",
+    "No recommendations. Start typing." : "Nu am găsit recomandări. Începeți să scrieți.",
     "group" : "grup",
     "Permissions" : "Permisiuni",
     "No shares" : "Nicio partajare",
@@ -72,6 +75,7 @@ OC.L10N.register(
     "Read" : "Citit",
     "Update" : "Actualizare",
     "Searching …" : "Căutare ...",
+    "No elements found." : "Nu sunt elemente.",
     "Error" : "Eroare",
     "Download" : "Descărcare",
     "Search" : "Căutare",
