@@ -31,6 +31,26 @@ class ContextNodeRelationMapper extends QBMapper {
 		$qb->executeStatement();
 	}
 
+	public function getRelIdsForNode(int $nodeId, int $nodeType): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('id')->from($this->table)
+			->where($qb->expr()->eq('node_id', $qb->createNamedParameter($nodeId)))
+			->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter($nodeType)));
+		$result = $qb->executeQuery();
+		$nodeRelIds = [];
+		while ($row = $result->fetch()) {
+			$nodeRelIds[] = (int)$row['id'];
+		}
+		return $nodeRelIds;
+	}
+
+	public function deleteByNodeRelIds(array $nodeRelIds): void {
+		$qb = $this->db->getQueryBuilder();
+		$qb->delete($this->table)
+			->where($qb->expr()->in('id', $qb->createNamedParameter($nodeRelIds, IQueryBuilder::PARAM_INT_ARRAY), ':nodeRelIds'));
+		$qb->executeStatement();
+	}
+
 	/**
 	 * @throws MultipleObjectsReturnedException
 	 * @throws DoesNotExistException
