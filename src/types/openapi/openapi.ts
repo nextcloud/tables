@@ -2807,7 +2807,7 @@ export interface operations {
                 readonly "application/json": {
                     /** @description Data as key - value store */
                     readonly data: string | {
-                        readonly [key: string]: Record<string, never> | undefined;
+                        readonly [key: string]: Record<string, never>;
                     };
                 };
             };
@@ -2920,7 +2920,7 @@ export interface operations {
                 readonly "application/json": {
                     /** @description Data as key - value store */
                     readonly data: string | {
-                        readonly [key: string]: Record<string, never> | undefined;
+                        readonly [key: string]: Record<string, never>;
                     };
                 };
             };
@@ -3033,7 +3033,7 @@ export interface operations {
                     readonly viewId?: number | null;
                     /** @description Data as key - value store */
                     readonly data: string | {
-                        readonly [key: string]: Record<string, never> | undefined;
+                        readonly [key: string]: Record<string, never>;
                     };
                 };
             };
@@ -5432,7 +5432,7 @@ export interface operations {
                 readonly "application/json": {
                     /** @description An array containing the column identifiers and their values */
                     readonly data: string | {
-                        readonly [key: string]: Record<string, never> | undefined;
+                        readonly [key: string]: Record<string, never>;
                     };
                 };
             };
