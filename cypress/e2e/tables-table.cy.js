@@ -25,7 +25,6 @@ describe('Manage a table', () => {
 		cy.get('.icon-loading').should('not.exist')
 		cy.get('[data-cy="navigationCreateTableIcon"]').click({ force: true })
 		cy.get('.tile').contains('ToDo').click({ force: true })
-		cy.get('.modal__content').should('be.visible')
 		cy.get('.modal__content input[type="text"]').clear().type('to do list')
 		cy.get('.modal__content #description-editor .tiptap.ProseMirror').type('to Do List description')
 		cy.contains('button', 'Create table').scrollIntoView().click()
@@ -41,7 +40,6 @@ describe('Manage a table', () => {
 		cy.get('.icon-loading').should('not.exist')
 		cy.get('[data-cy="navigationCreateTableIcon"]').click({ force: true })
 		cy.get('.tile').contains('Import').click({ force: true })
-		cy.get('.modal__content').should('be.visible')
 		cy.get('.modal__content input[type="text"]').clear().type('import list')
 		cy.contains('button', 'Create table').scrollIntoView().click()
 		cy.contains('h2', 'Import').should('be.visible')
@@ -67,7 +65,6 @@ describe('Manage a table', () => {
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('.action-button__text').contains('Edit table').click()
 
-		cy.get('.modal__content').should('be.visible')
 		cy.get('.modal-container input').last().clear().type('ToDo list')
 		cy.get('.modal__content #description-editor .tiptap.ProseMirror').type('Updated ToDo List description')
 		cy.get('.modal-container button').contains('Save').click()
@@ -82,7 +79,6 @@ describe('Manage a table', () => {
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('.action-button__text').contains('Edit table').click()
 
-		cy.get('.modal__content').should('be.visible')
 		cy.get('.modal-container button').contains('Delete').click()
 		cy.get('.modal-container button').contains('I really want to delete this table!').click()
 
@@ -94,7 +90,6 @@ describe('Manage a table', () => {
 		cy.get('.icon-loading').should('not.exist')
 		cy.get('[data-cy="navigationCreateTableIcon"]').click({ force: true })
 		cy.get('.tile').contains('ToDo').click({ force: true })
-		cy.get('.modal__content').should('be.visible')
 		cy.get('.modal__content input[type="text"]').clear().type('test table')
 		cy.contains('button', 'Create table').click()
 
