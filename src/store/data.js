@@ -209,9 +209,9 @@ export default {
 			let res = null
 
 			try {
-				const collection = viewId == null ? "tables" : "views"
+				const collection = viewId == null ? 'tables' : 'views'
 				const nodeId = viewId == null ? tableId : viewId
-				res = await axios.post(generateOcsUrl('/apps/tables/api/2/' + collection + '/' + nodeId + '/rows'), {data: data})
+				res = await axios.post(generateOcsUrl('/apps/tables/api/2/' + collection + '/' + nodeId + '/rows'), { data })
 			} catch (e) {
 				displayError(e, t('tables', 'Could not insert row.'))
 				return false

@@ -120,12 +120,12 @@ export default {
 			try {
 				const data = {}
 				for (const [key, value] of Object.entries(this.row)) {
-					data[key] = value;
+					data[key] = value
 				}
 				await this.$store.dispatch('insertNewRow', {
 					viewId: this.isView ? this.elementId : null,
 					tableId: !this.isView ? this.elementId : null,
-					data: data,
+					data,
 				})
 			} catch (e) {
 				console.error(e)
