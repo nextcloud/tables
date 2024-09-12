@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 import axios from '@nextcloud/axios'
-import { generateUrl } from '@nextcloud/router'
+import { generateUrl, generateOcsUrl } from '@nextcloud/router'
 import displayError from '../shared/utils/displayError.js'
 import { parseCol } from '../shared/components/ncTable/mixins/columnParser.js'
 import { MetaColumns } from '../shared/components/ncTable/mixins/metaColumns.js'
@@ -209,7 +209,9 @@ export default {
 			let res = null
 
 			try {
-				res = await axios.post(generateUrl('/apps/tables/row'), { viewId, tableId, data })
+				const collection = viewId == null ? 'tables' : 'views'
+				const nodeId = viewId == null ? tableId : viewId
+				res = await axios.post(generateOcsUrl('/apps/tables/api/2/' + collection + '/' + nodeId + '/rows'), { data })
 			} catch (e) {
 				displayError(e, t('tables', 'Could not insert row.'))
 				return false
@@ -217,7 +219,7 @@ export default {
 
 			const stateId = genStateKey(!!(viewId), viewId ?? tableId)
 			if (stateId) {
-				const row = res.data
+				const row = res?.data?.ocs?.data
 				const rows = state.rows[stateId]
 				rows.push(row)
 				commit('setRows', { stateId, rows: [...rows] })

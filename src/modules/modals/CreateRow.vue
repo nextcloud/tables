@@ -118,12 +118,9 @@ export default {
 			}
 
 			try {
-				const data = []
+				const data = {}
 				for (const [key, value] of Object.entries(this.row)) {
-					data.push({
-						columnId: key,
-						value,
-					})
+					data[key] = value
 				}
 				await this.$store.dispatch('insertNewRow', {
 					viewId: this.isView ? this.elementId : null,

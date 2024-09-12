@@ -1476,6 +1476,17 @@ export interface operations {
                     readonly "application/json": components["schemas"]["View"];
                 };
             };
+            /** @description Invalid data */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
             /** @description No permissions */
             readonly 403: {
                 headers: {

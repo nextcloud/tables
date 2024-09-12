@@ -187,8 +187,8 @@ class ImportService extends SuperService {
 	}
 
 	/**
-	 * @param int|null $tableId
-	 * @param int|null $viewId
+	 * @param ?int $tableId
+	 * @param ?int $viewId
 	 * @param string $path
 	 * @param bool $createMissingColumns
 	 * @return array
@@ -208,7 +208,8 @@ class ImportService extends SuperService {
 				throw new PermissionError('create columns at the view id = '.$viewId.' is not allowed.');
 			}
 			$this->viewId = $viewId;
-		} elseif ($tableId) {
+		}
+		if ($tableId) {
 			$table = $this->tableService->find($tableId);
 			if (!$this->permissionsService->canCreateRows($table, 'table')) {
 				throw new PermissionError('create row at the view id = '. (string) $viewId .' is not allowed.');
@@ -217,8 +218,14 @@ class ImportService extends SuperService {
 				throw new PermissionError('create columns at the view id = '. (string) $viewId .' is not allowed.');
 			}
 			$this->tableId = $tableId;
-		} else {
+		}
+		if (!$this->tableId && !$this->viewId) {
 			$e = new \Exception('Neither tableId nor viewId is given.');
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+		}
+		if ($this->tableId && $this->viewId) {
+			$e = new \LogicException('Both table ID and view ID are provided, but only one of them is allowed');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}

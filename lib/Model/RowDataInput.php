@@ -8,17 +8,23 @@
 namespace OCA\Tables\Model;
 
 use ArrayAccess;
+use Iterator;
+use function current;
+use function key;
+use function next;
+use function reset;
 
 /**
  * @template-implements ArrayAccess<mixed, array{'columnId': int, 'value': mixed}>
+ * @template-implements Iterator<mixed, array{'columnId': int, 'value': mixed}>
  */
-class RowDataInput implements ArrayAccess {
+class RowDataInput implements ArrayAccess, Iterator {
 	protected const DATA_KEY = 'columnId';
 	protected const DATA_VAL = 'value';
 	/** @psalm-var array<array{'columnId': int, 'value': mixed}> */
 	protected array $data = [];
 
-	public function add(int $columnId, string $value): self {
+	public function add(int $columnId, string|array $value): self {
 		$this->data[] = [self::DATA_KEY => $columnId, self::DATA_VAL => $value];
 		return $this;
 	}
@@ -44,5 +50,25 @@ class RowDataInput implements ArrayAccess {
 		if (isset($this->data[$offset])) {
 			unset($this->data[$offset]);
 		}
+	}
+
+	public function current(): mixed {
+		return current($this->data);
+	}
+
+	public function next(): void {
+		next($this->data);
+	}
+
+	public function key(): mixed {
+		return key($this->data);
+	}
+
+	public function valid(): bool {
+		return $this->key() !== null;
+	}
+
+	public function rewind(): void {
+		reset($this->data);
 	}
 }

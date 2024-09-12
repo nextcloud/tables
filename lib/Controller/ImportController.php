@@ -8,6 +8,7 @@
 namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Service\ImportService;
 use OCA\Tables\UploadException;
 use OCP\AppFramework\Controller;
@@ -65,8 +66,10 @@ class ImportController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function importInTable(int $tableId, String $path, bool $createMissingColumns = true, array $columnsConfig = []): DataResponse {
 		return $this->handleError(function () use ($tableId, $path, $createMissingColumns, $columnsConfig) {
+			// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
 			return $this->service->import($tableId, null, $path, $createMissingColumns, $columnsConfig);
 		});
 	}
@@ -83,8 +86,10 @@ class ImportController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function importInView(int $viewId, String $path, bool $createMissingColumns = true, array $columnsConfig = []): DataResponse {
 		return $this->handleError(function () use ($viewId, $path, $createMissingColumns, $columnsConfig) {
+			// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
 			return $this->service->import(null, $viewId, $path, $createMissingColumns, $columnsConfig);
 		});
 	}
@@ -107,11 +112,13 @@ class ImportController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function importUploadInTable(int $tableId, bool $createMissingColumns = true, string $columnsConfig = ''): DataResponse {
 		try {
 			$columnsConfigArray = json_decode($columnsConfig, true);
 			$file = $this->getUploadedFile('uploadfile');
 			return $this->handleError(function () use ($tableId, $file, $createMissingColumns, $columnsConfigArray) {
+				// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
 				return $this->service->import($tableId, null, $file['tmp_name'], $createMissingColumns, $columnsConfigArray);
 			});
 		} catch (UploadException | NotPermittedException $e) {
@@ -138,11 +145,13 @@ class ImportController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function importUploadInView(int $viewId, bool $createMissingColumns = true, string $columnsConfig = ''): DataResponse {
 		try {
 			$columnsConfigArray = json_decode($columnsConfig, true);
 			$file = $this->getUploadedFile('uploadfile');
 			return $this->handleError(function () use ($viewId, $file, $createMissingColumns, $columnsConfigArray) {
+				// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
 				return $this->service->import(null, $viewId, $file['tmp_name'], $createMissingColumns, $columnsConfigArray);
 			});
 		} catch (UploadException | NotPermittedException $e) {

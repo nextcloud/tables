@@ -8,6 +8,7 @@
 namespace OCA\Tables\Controller;
 
 use Closure;
+use InvalidArgumentException;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -20,13 +21,17 @@ trait Errors {
 		try {
 			return new DataResponse($callback());
 		} catch (PermissionError $e) {
-			$this->logger->warning('A permission error accured: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->warning('A permission error occurred: '.$e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (NotFoundError $e) {
-			$this->logger->warning('A not found error accured: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->warning('A not found error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
+		} catch (InvalidArgumentException $e) {
+			$this->logger->warning('An invalid request occurred: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
 		} catch (InternalError|\Exception $e) {
 			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];

@@ -66,22 +66,6 @@ class RowController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function create(
-		?int $tableId,
-		?int $viewId,
-		array $data
-	): DataResponse {
-		return $this->handleError(function () use ($tableId, $viewId, $data) {
-			return $this->service->create(
-				$tableId,
-				$viewId,
-				$data);
-		});
-	}
-
-	/**
-	 * @NoAdminRequired
-	 */
 	public function update(
 		int $id,
 		int $columnId,

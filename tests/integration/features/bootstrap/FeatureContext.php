@@ -833,6 +833,27 @@ class FeatureContext implements Context {
 	}
 
 	/**
+	 * @When user :user sets columns :columnList to view :viewAlias
+	 */
+	public function applyColumnsToView(string $user, string $columnList, string $viewAlias) {
+		$this->setCurrentUser($user);
+
+		$columns = explode(',', $columnList);
+		$columns = array_map(function (string $columnAlias) {
+			$col = $this->collectionManager->getByAlias('column', $columnAlias);
+			return $col['id'];
+		}, $columns);
+
+		$view = $this->collectionManager->getByAlias('view', $viewAlias);
+
+		$this->sendRequest(
+			'PUT',
+			'/apps/tables/api/1/views/' . $view['id'],
+			[ 'data' => ['columns' => json_encode($columns)] ]
+		);
+	}
+
+	/**
 	 * @When user :user deletes view :viewName
 	 *
 	 * @param string $user
@@ -1120,6 +1141,8 @@ class FeatureContext implements Context {
 		$columnToVerify = $this->getDataFromResponse($this->response);
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($columnToVerify['title'], $title);
+
+		$this->collectionManager->register($newColumn, 'column', $newColumn['id'], $title);
 	}
 
 	/**
@@ -2366,6 +2389,35 @@ class FeatureContext implements Context {
 		if ($this->response->getStatusCode() === 200) {
 			$share = $this->getDataFromResponse($this->response);
 			$this->shareId = $share['id'];
+		}
+	}
+
+	/**
+	 * @Given the inserted row has the following values
+	 */
+	public function theInsertedRowHasTheFollowingValues(TableNode $columnValues) {
+		$jsonBody = json_decode($this->response->getBody()->getContents(), true);
+		$insertedRow = $jsonBody['ocs']['data'];
+
+		$expected = [];
+		foreach ($columnValues->getRows() as $row) {
+			$columnId = $this->tableColumns[$row[0]];
+			$expected[$columnId] = $row[1];
+		}
+
+		foreach ($insertedRow['data'] as $entry) {
+			if (!isset($expected[$entry['columnId']])) {
+				throw new \Exception(sprintf('Unexpected column with ID %d was returned', $entry['columnId']));
+			}
+			// intentional weak comparison
+			if ($expected[$entry['columnId']] != $entry['value']) {
+				throw new \Exception(sprintf('Unexpected value %s for column with ID %d was returned', $entry['value'], $entry['columnId']));
+			}
+			unset($expected[$entry['columnId']]);
+		}
+
+		if (!empty($expected)) {
+			throw new \Exception(sprintf('Some expected columns were not returned: %s ', print_r($expected, true)));
 		}
 	}
 }
