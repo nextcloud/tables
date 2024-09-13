@@ -5,6 +5,89 @@
 
 # Changelog
 
+## 0.8.0
+
+### Added
+
+- Feat: Add backend for new user/group column [#1090](https://github.com/nextcloud/tables/pull/1090)
+- Feat: User/group column frontend [#1113](https://github.com/nextcloud/tables/pull/1113)
+- Feat: Add events for row added and row updated [#1101](https://github.com/nextcloud/tables/pull/1101)
+- Feat: Submit row details with ctrl + enter [#1112](https://github.com/nextcloud/tables/pull/1112)
+- Enh(API): Add OCS API to create rows [#1161](https://github.com/nextcloud/tables/pull/1161)
+- Add scheme import and export [#1170](https://github.com/nextcloud/tables/pull/1170)
+- Feat: Share Application with groups [#1311](https://github.com/nextcloud/tables/pull/1311)
+- Feat: Use simple input field instead of multiselect for plain URLs [#787](https://github.com/nextcloud/tables/pull/787)
+- Feat: Create new table from import [#915](https://github.com/nextcloud/tables/pull/915)
+- Feat(import): Change column format during import [#944](https://github.com/nextcloud/tables/pull/944)
+- Enh: Consolidate user/group search code [#1025](https://github.com/nextcloud/tables/pull/1025)
+- Enh: Delete Application and its shares [#1026](https://github.com/nextcloud/tables/pull/1026)
+- Enh(Contexts): Set active navigation entry [#1037](https://github.com/nextcloud/tables/pull/1037)
+- Enh(App): Navigation tweaks for Contexts [#1080](https://github.com/nextcloud/tables/pull/1080)
+- Perf: Avoid extra queries to get the view ownership [#1062](https://github.com/nextcloud/tables/pull/1062)
+- Perf: Make cache usable for unfavorited entries [#1063](https://github.com/nextcloud/tables/pull/1063)
+- Add table_id index to oc_tables_columns [#1078](https://github.com/nextcloud/tables/pull/1078)
+- Enh: Gitignore Cypress download folder [#1144](https://github.com/nextcloud/tables/pull/1144)
+- Enh: Add context e2e tests [#1149](https://github.com/nextcloud/tables/pull/1149)
+- Migrate `NcModal` to `NcDialog` [#1239](https://github.com/nextcloud/tables/pull/1239)
+- Enhancement/279 pagination for tables ui [#972](https://github.com/nextcloud/tables/pull/972)
+
+### Fixed
+
+- Fix: Properly set random icon on load [#1001](https://github.com/nextcloud/tables/pull/1001)
+- Fix(App): Unstuck navbar focus on internal entries [#1038](https://github.com/nextcloud/tables/pull/1038)
+- Fix(occ): Fix occ tables:update by defining the `description` option and making `title` optional [#1045](https://github.com/nextcloud/tables/pull/1045)
+- Fix(DB): Update tables_row_sleeves' sequence after migration [#1049](https://github.com/nextcloud/tables/pull/1049)
+- Fix(Context): Do not show hidden columns [#1092](https://github.com/nextcloud/tables/pull/1092)
+- Fix: Reduce templates requests [#1098](https://github.com/nextcloud/tables/pull/1098)
+- Fix: Broken sort by date [#1110](https://github.com/nextcloud/tables/pull/1110)
+- Fix(Controller): Remove unneeded endpoints [#1130](https://github.com/nextcloud/tables/pull/1130)
+- Fix(View): 'manageTable' array key is not always set [#1136](https://github.com/nextcloud/tables/pull/1136)
+- Fix: Insert context startpage for proper update [#1146](https://github.com/nextcloud/tables/pull/1146)
+- Fix: Pass view as prop to EmptyView [#1147](https://github.com/nextcloud/tables/pull/1147)
+- Fix: Add aria-label to NcSelect [#1148](https://github.com/nextcloud/tables/pull/1148)
+- Fix: Hide Create Column button on empty table if inadequate permissions [#1151](https://github.com/nextcloud/tables/pull/1151)
+- Fix: Remove deleted resource from associated applications [#1156](https://github.com/nextcloud/tables/pull/1156)
+- Fix: Only add resource if user can manage resource [#1160](https://github.com/nextcloud/tables/pull/1160)
+- Fix: Ensure default values show as filled [#1176](https://github.com/nextcloud/tables/pull/1176)
+- Fix: Modify context nodes update [#1178](https://github.com/nextcloud/tables/pull/1178)
+- Fix: Navigation table entries UI issues [#1195](https://github.com/nextcloud/tables/pull/1195)
+- Fix(View): Column might be saved as null [#1196](https://github.com/nextcloud/tables/pull/1196)
+- Fix: Remove View filter with null column [#1199](https://github.com/nextcloud/tables/pull/1199)
+- Fix: Flaky Cypress tests [#1204](https://github.com/nextcloud/tables/pull/1204)
+- Fix(api): Fix wrong array type [#1205](https://github.com/nextcloud/tables/pull/1205)
+- Fix(Capabilities): Announce API 2.0 [#1215](https://github.com/nextcloud/tables/pull/1215)
+- Fix: Make user listing in table more consistent by using NcUserBubble [#1254](https://github.com/nextcloud/tables/pull/1254)
+- Fix: Avoid variable access on unhandled exception and lower log level for expected permission check failures [#1274](https://github.com/nextcloud/tables/pull/1274)
+- Fix: Reduce arguments for column creation function [#1281](https://github.com/nextcloud/tables/pull/1281)
+- Fix: Only focus on input if modal is open [#1282](https://github.com/nextcloud/tables/pull/1282)
+- Fix: Use different app menu selectors [#1292](https://github.com/nextcloud/tables/pull/1292)
+- Fix: Unhide part of single selection NcSelect value [#1293](https://github.com/nextcloud/tables/pull/1293)
+- Fix: Improve style alignment and heights [#1307](https://github.com/nextcloud/tables/pull/1307)
+- Fix: Open row edit modal on initial load [#1312](https://github.com/nextcloud/tables/pull/1312)
+- Fix: Check sorting array is non-empty [#1338](https://github.com/nextcloud/tables/pull/1338)
+
+
+### Dependencies
+
+- Update dependency @nextcloud/browserslist-config to ^3.0.1 [#1012](https://github.com/nextcloud/tables/pull/1012)
+- Update dependency @nextcloud/router to ^3.0.1 [#1016](https://github.com/nextcloud/tables/pull/1016)
+- Update dependency @nextcloud/auth to ^2.4.0 [#1297](https://github.com/nextcloud/tables/pull/1297)
+- Update dependency @nextcloud/files to ^3.9.0 [#1344](https://github.com/nextcloud/tables/pull/1344)
+- Update tiptap to ^2.6.6 [#1316](https://github.com/nextcloud/tables/pull/1316)
+- Update dependency @nextcloud/babel-config to ^1.2.0 [#1093](https://github.com/nextcloud/tables/pull/1093)
+- Update dependency @nextcloud/axios to ^2.5.0 [#1053](https://github.com/nextcloud/tables/pull/1053)
+- Update dependency @nextcloud/stylelint-config to v3 [#1054](https://github.com/nextcloud/tables/pull/1054)
+- Update dependency @nextcloud/l10n to ^3.1.0 [#1087](https://github.com/nextcloud/tables/pull/1087)
+- Update dependency @nextcloud/vue to ^8.17.1 [#1333](https://github.com/nextcloud/tables/pull/1333)
+- Update dependency @nextcloud/eslint-config to ^8.4.1 [#1094](https://github.com/nextcloud/tables/pull/1094)
+- Update dependency @nextcloud/event-bus to ^3.3.1 [#1114](https://github.com/nextcloud/tables/pull/1114)
+- Update dependency openapi-typescript to ^7.4.0 [#1343](https://github.com/nextcloud/tables/pull/1343)
+- Update dependency debounce to ^2.1.0 [#1108](https://github.com/nextcloud/tables/pull/1108)
+- Update dependency @vueuse/core to ^11.0.3 [#1318](https://github.com/nextcloud/tables/pull/1318)
+- Update dependency cypress-downloadfile to ^1.2.4 [#1162](https://github.com/nextcloud/tables/pull/1162)
+- Update openapi-extractor to v1.0.0 [#1303](https://github.com/nextcloud/tables/pull/1303)
+- Update dependency @nextcloud/dialogs to v5 [#1329](https://github.com/nextcloud/tables/pull/1329)
+
 ## 0.8.0-beta-3
 
 ### Fixed
