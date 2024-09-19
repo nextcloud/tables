@@ -35,7 +35,7 @@
 				</template>
 				{{ t('tables', 'Delete application') }}
 			</NcActionButton>
-			<NcActionCheckbox v-if="!ownsContext(context)" :value="showInNavigation" @change="updateDisplayMode">
+			<NcActionCheckbox :checked="showInNavigation" @change="updateDisplayMode">
 				Show in Navigation
 			</NcActionCheckbox>
 		</template>
@@ -81,7 +81,7 @@ export default {
 	data() {
 		return {
 			icon: null,
-			showInNavigation: this.getDisplayMode(),
+			showInNavigation: this.getNavDisplay(),
 		}
 	},
 	computed: {
@@ -108,18 +108,19 @@ export default {
 		deleteContext() {
 			emit('tables:context:delete', this.context)
 		},
-		getDisplayMode() {
+		getNavDisplay() {
 			const share = Object.values(this.context.sharing || {}).find(share => share.receiver === getCurrentUser().uid)
 			if (share) {
-				return share.display_mode
+				return share?.display_mode !== NAV_ENTRY_MODE.NAV_ENTRY_MODE_HIDDEN
 			}
-			return 0
+			return false
 		},
 		updateDisplayMode() {
-			this.showInNavigation = this.showInNavigation ? 0 : 1
+			const value = !this.showInNavigation
 			const share = Object.values(this.context.sharing || {}).find(share => share.receiver === getCurrentUser().uid)
 			if (share) {
-				this.$store.dispatch('updateDisplayMode', { shareId: share.share_id, displayMode: this.showInNavigation ? NAV_ENTRY_MODE['NAV_ENTRY_MODE_RECIPIENTS'] : NAV_ENTRY_MODE['NAV_ENTRY_MODE_HIDDEN'], target: 'self' })
+				this.$store.dispatch('updateDisplayMode', { shareId: share.share_id, displayMode: value ? NAV_ENTRY_MODE.NAV_ENTRY_MODE_RECIPIENTS : NAV_ENTRY_MODE.NAV_ENTRY_MODE_HIDDEN, target: 'self' })
+				this.showInNavigation = value
 			}
 		},
 	},
