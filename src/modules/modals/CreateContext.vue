@@ -79,6 +79,7 @@ import NcContextResource from '../../shared/components/ncContextResource/NcConte
 import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'
 import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'
 import permissionBitmask from '../../shared/components/ncContextResource/mixins/permissionBitmask.js'
+import { getCurrentUser } from '@nextcloud/auth'
 import { NAV_ENTRY_MODE } from '../../shared/constants.js'
 
 export default {
@@ -171,6 +172,15 @@ export default {
 				description: this.description,
 				nodes: dataResources,
 			}
+			// adding share to oneself to have navigation display control
+			this.receivers.push(
+				{
+					id: getCurrentUser().uid,
+					displayName: getCurrentUser().uid,
+					icon: 'icon-user',
+					isUser: true,
+					key: 'user-' + getCurrentUser().uid,
+				})
 			const res = await this.$store.dispatch('insertNewContext', { data, previousReceivers: [], receivers: this.receivers, displayMode: NAV_ENTRY_MODE[this.displayMode] })
 			if (res) {
 				return res.id
