@@ -86,12 +86,11 @@ import '@nextcloud/dialogs/style.css'
 import { mapGetters, mapState } from 'vuex'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
 import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'
-import { NODE_TYPE_TABLE, NODE_TYPE_VIEW, PERMISSION_READ, PERMISSION_CREATE, PERMISSION_UPDATE, PERMISSION_DELETE } from '../../shared/constants.js'
+import { NODE_TYPE_TABLE, NODE_TYPE_VIEW, PERMISSION_READ, PERMISSION_CREATE, PERMISSION_UPDATE, PERMISSION_DELETE, NAV_ENTRY_MODE } from '../../shared/constants.js'
 import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'
 import permissionBitmask from '../../shared/components/ncContextResource/mixins/permissionBitmask.js'
 import { emit } from '@nextcloud/event-bus'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
-import { NAV_ENTRY_MODE } from '../../shared/constants.js'
 
 export default {
 	name: 'EditContext',
@@ -186,7 +185,15 @@ export default {
 					nodes: dataResources,
 				}
 				const context = this.getContext(this.contextId)
-
+				// adding share to oneself to have navigation display control
+				this.receivers.push(
+					{
+						id: getCurrentUser().uid,
+						displayName: getCurrentUser().uid,
+						icon: 'icon-user',
+						isUser: true,
+						key: 'user-' + getCurrentUser().uid,
+					})
 				const res = await this.$store.dispatch('updateContext', { id: this.contextId, data, previousReceivers: Object.values(context.sharing), receivers: this.receivers })
 				if (res) {
 					showSuccess(t('tables', 'Updated application "{contextTitle}".', { contextTitle: this.title }))
@@ -203,6 +210,15 @@ export default {
 			this.resources = context ? this.getContextResources(context) : []
 			this.receivers = context ? this.getContextReceivers(context) : []
 			this.prepareDeleteContext = false
+		},
+		getDisplayMode(context) {
+			const shares = Object.keys(context.sharing || {})
+			if (shares.length) {
+				print('vals', context.sharing[shares[0]])
+				const displayMode = context.sharing[shares[0]].display_mode_default
+				return Object.keys(NAV_ENTRY_MODE).find(key => NAV_ENTRY_MODE[key] === displayMode)
+			}
+			return 'NAV_ENTRY_MODE_HIDDEN'
 		},
 		getContextReceivers(context) {
 			let sharing = Object.values(context.sharing)
