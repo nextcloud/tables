@@ -8,9 +8,11 @@ declare(strict_types=1);
 namespace OCA\Tables\Controller;
 
 use Exception;
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\FavoritesService;
 use OCP\AppFramework\Http;
@@ -49,6 +51,7 @@ class ApiFavoriteController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_READ)]
 	public function create(int $nodeType, int $nodeId): DataResponse {
 		try {
 			$this->service->addFavorite($nodeType, $nodeId);
@@ -76,6 +79,7 @@ class ApiFavoriteController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_READ)]
 	public function destroy(int $nodeType, int $nodeId): DataResponse {
 		try {
 			$this->service->removeFavorite($nodeType, $nodeId);

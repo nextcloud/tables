@@ -9,6 +9,7 @@ namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Dto\Column as ColumnDto;
+use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Service\ColumnService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
@@ -56,6 +57,7 @@ class ColumnController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function indexView(int $viewId): DataResponse {
 		return $this->handleError(function () use ($viewId) {
 			return $this->service->findAllByView($viewId);

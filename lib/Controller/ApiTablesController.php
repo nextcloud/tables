@@ -8,10 +8,12 @@
 namespace OCA\Tables\Controller;
 
 use Exception;
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\TableService;
@@ -83,6 +85,7 @@ class ApiTablesController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
 	public function show(int $id): DataResponse {
 		try {
 			return new DataResponse($this->service->find($id)->jsonSerialize());
@@ -107,6 +110,7 @@ class ApiTablesController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
 	public function showScheme(int $id): DataResponse {
 		try {
 			return new DataResponse($this->service->getScheme($id)->jsonSerialize());

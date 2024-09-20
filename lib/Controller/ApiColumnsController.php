@@ -6,10 +6,12 @@
  */
 namespace OCA\Tables\Controller;
 
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
 use OCP\AppFramework\Http;
@@ -49,6 +51,7 @@ class ApiColumnsController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_READ)]
 	public function index(int $nodeId, string $nodeType): DataResponse {
 		try {
 			if($nodeType === 'table') {
