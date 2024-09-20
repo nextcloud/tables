@@ -12,6 +12,7 @@ use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Service\ColumnService;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
@@ -36,27 +37,21 @@ class ColumnController extends Controller {
 		$this->userId = $userId;
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	public function index(int $tableId, ?int $viewId): DataResponse {
 		return $this->handleError(function () use ($tableId, $viewId) {
 			return $this->service->findAllByTable($tableId, $viewId);
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	public function indexTableByView(int $tableId, ?int $viewId): DataResponse {
 		return $this->handleError(function () use ($tableId, $viewId) {
 			return $this->service->findAllByTable($tableId, $viewId);
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function indexView(int $viewId): DataResponse {
 		return $this->handleError(function () use ($viewId) {
@@ -64,18 +59,14 @@ class ColumnController extends Controller {
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	public function show(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
 			return $this->service->find($id);
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	public function create(
 		?int $tableId,
 		?int $viewId,
@@ -174,9 +165,7 @@ class ColumnController extends Controller {
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	public function update(
 		int $id,
 		?int $tableId,
@@ -271,9 +260,7 @@ class ColumnController extends Controller {
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	public function destroy(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
 			return $this->service->delete($id, false, $this->userId);

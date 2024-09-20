@@ -16,6 +16,7 @@ use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\FavoritesService;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\DB\Exception as DBException;
 use OCP\IL10N;
@@ -41,8 +42,6 @@ class ApiFavoriteController extends AOCSController {
 	/**
 	 * [api v2] Add a node (table or view) to user favorites
 	 *
-	 * @NoAdminRequired
-	 *
 	 * @param int $nodeType any Application::NODE_TYPE_* constant
 	 * @param int $nodeId identifier of the node
 	 * @return DataResponse<Http::STATUS_OK, array{}, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
@@ -51,6 +50,7 @@ class ApiFavoriteController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ)]
 	public function create(int $nodeType, int $nodeId): DataResponse {
 		try {
@@ -69,8 +69,6 @@ class ApiFavoriteController extends AOCSController {
 	/**
 	 * [api v2] Remove a node (table or view) to from favorites
 	 *
-	 * @NoAdminRequired
-	 *
 	 * @param int $nodeType any Application::NODE_TYPE_* constant
 	 * @param int $nodeId identifier of the node
 	 * @return DataResponse<Http::STATUS_OK, array{}, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
@@ -79,6 +77,7 @@ class ApiFavoriteController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ)]
 	public function destroy(int $nodeType, int $nodeId): DataResponse {
 		try {
