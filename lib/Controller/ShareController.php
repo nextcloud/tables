@@ -11,6 +11,7 @@ use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Service\ShareService;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
@@ -37,9 +38,7 @@ class ShareController extends Controller {
 	}
 
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function index(int $tableId): DataResponse {
 		return $this->handleError(function () use ($tableId) {
@@ -47,9 +46,7 @@ class ShareController extends Controller {
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function indexView(int $viewId): DataResponse {
 		return $this->handleError(function () use ($viewId) {
@@ -57,18 +54,14 @@ class ShareController extends Controller {
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	public function show(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
 			return $this->service->find($id);
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE)]
 	public function create(
 		int $nodeId,
@@ -87,9 +80,7 @@ class ShareController extends Controller {
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	public function updatePermission(int $id, string $permission, bool $value): DataResponse {
 		return $this->handleError(function () use ($id, $permission, $value) {
 			return $this->service->updatePermission($id, $permission, $value);
@@ -97,10 +88,10 @@ class ShareController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
 	 * @psalm-param int<0, 2> $displayMode
 	 * @psalm-param ("default"|"self") $target
 	 */
+	#[NoAdminRequired]
 	public function updateDisplayMode(int $id, int $displayMode, string $target = 'default') {
 		return $this->handleError(function () use ($id, $displayMode, $target) {
 			if ($target === 'default') {
@@ -115,9 +106,7 @@ class ShareController extends Controller {
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	public function destroy(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
 			return $this->service->delete($id);

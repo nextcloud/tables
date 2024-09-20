@@ -10,6 +10,7 @@ namespace OCA\Tables\Controller;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Service\SearchService;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
@@ -34,9 +35,7 @@ class SearchController extends Controller {
 	}
 
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	public function all(string $term = ''): DataResponse {
 		return $this->handleError(function () use ($term) {
 			return $this->service->all($term);

@@ -13,6 +13,7 @@ use OCA\Tables\Service\ImportService;
 use OCA\Tables\UploadException;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\Files\NotPermittedException;
 use OCP\IL10N;
@@ -54,9 +55,7 @@ class ImportController extends Controller {
 		$this->l10n = $l10n;
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function previewImportTable(int $tableId, String $path): DataResponse {
 		return $this->handleError(function () use ($tableId, $path) {
@@ -64,9 +63,7 @@ class ImportController extends Controller {
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function importInTable(int $tableId, String $path, bool $createMissingColumns = true, array $columnsConfig = []): DataResponse {
 		return $this->handleError(function () use ($tableId, $path, $createMissingColumns, $columnsConfig) {
@@ -75,9 +72,7 @@ class ImportController extends Controller {
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function previewImportView(int $viewId, String $path): DataResponse {
 		return $this->handleError(function () use ($viewId, $path) {
@@ -85,9 +80,7 @@ class ImportController extends Controller {
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function importInView(int $viewId, String $path, bool $createMissingColumns = true, array $columnsConfig = []): DataResponse {
 		return $this->handleError(function () use ($viewId, $path, $createMissingColumns, $columnsConfig) {
@@ -96,9 +89,7 @@ class ImportController extends Controller {
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function previewUploadImportTable(int $tableId): DataResponse {
 		try {
@@ -112,9 +103,7 @@ class ImportController extends Controller {
 		}
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function importUploadInTable(int $tableId, bool $createMissingColumns = true, string $columnsConfig = ''): DataResponse {
 		try {
@@ -130,9 +119,7 @@ class ImportController extends Controller {
 		}
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function previewUploadImportView(int $viewId): DataResponse {
 		try {
@@ -146,9 +133,7 @@ class ImportController extends Controller {
 		}
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function importUploadInView(int $viewId, bool $createMissingColumns = true, string $columnsConfig = ''): DataResponse {
 		try {

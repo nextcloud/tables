@@ -17,6 +17,7 @@ use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
@@ -51,9 +52,7 @@ class ViewController extends Controller {
 	}
 
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function index(int $tableId): DataResponse {
 		return $this->handleError(function () use ($tableId) {
@@ -61,18 +60,14 @@ class ViewController extends Controller {
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	public function indexSharedWithMe(): DataResponse {
 		return $this->handleError(function () {
 			return $this->service->findSharedViewsWithMe($this->userId);
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'id')]
 	public function show(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
@@ -80,9 +75,7 @@ class ViewController extends Controller {
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function create(int $tableId, string $title, ?string $emoji): DataResponse {
 		return $this->handleError(function () use ($tableId, $title, $emoji) {
@@ -90,9 +83,7 @@ class ViewController extends Controller {
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_VIEW, idParam: 'id')]
 	public function update(int $id, array $data): DataResponse {
 		return $this->handleError(function () use ($id, $data) {
@@ -100,9 +91,7 @@ class ViewController extends Controller {
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_VIEW, idParam: 'id')]
 	public function destroy(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
