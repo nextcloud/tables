@@ -57,6 +57,7 @@ class ImportController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function previewImportTable(int $tableId, String $path): DataResponse {
 		return $this->handleError(function () use ($tableId, $path) {
 			return $this->service->previewImport($tableId, null, $path);

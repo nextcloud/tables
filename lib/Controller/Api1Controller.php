@@ -153,6 +153,7 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function showScheme(int $tableId): DataResponse {
 		try {
 			$scheme = $this->tableService->getScheme($tableId);
@@ -186,6 +187,7 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function getTable(int $tableId): DataResponse {
 		try {
 			return new DataResponse($this->tableService->find($tableId)->jsonSerialize());
@@ -287,6 +289,7 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function indexViews(int $tableId): DataResponse {
 		try {
 			return new DataResponse($this->viewService->formatViews($this->viewService->findAll($this->tableService->find($tableId))));
@@ -350,6 +353,7 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function getView(int $viewId): DataResponse {
 		try {
 			return new DataResponse($this->viewService->find($viewId)->jsonSerialize());
@@ -729,6 +733,7 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function indexViewColumns(int $viewId): DataResponse {
 		try {
 			return new DataResponse($this->columnService->formatColumns($this->columnService->findAllByView($viewId)));
@@ -1045,6 +1050,7 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function indexTableRowsSimple(int $tableId, ?int $limit, ?int $offset): DataResponse {
 		try {
 			return new DataResponse($this->v1Api->getData($tableId, $limit, $offset, $this->userId));
@@ -1075,6 +1081,7 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function indexTableRows(int $tableId, ?int $limit, ?int $offset): DataResponse {
 		try {
 			return new DataResponse($this->rowService->formatRows($this->rowService->findAllByTable($tableId, $this->userId, $limit, $offset)));
@@ -1105,6 +1112,7 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function indexViewRows(int $viewId, ?int $limit, ?int $offset): DataResponse {
 		try {
 			return new DataResponse($this->rowService->formatRows($this->rowService->findAllByView($viewId, $this->userId, $limit, $offset)));
@@ -1579,8 +1587,5 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		}
-
-
-
 	}
 }
