@@ -230,6 +230,7 @@ class ApiTablesController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
 	public function update(int $id, ?string $title = null, ?string $emoji = null, ?string $description = null, ?bool $archived = null): DataResponse {
 		try {
 			return new DataResponse($this->service->update($id, $title, $emoji, $description, $archived, $this->userId)->jsonSerialize());
@@ -254,6 +255,7 @@ class ApiTablesController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
 	public function destroy(int $id): DataResponse {
 		try {
 			return new DataResponse($this->service->delete($id)->jsonSerialize());
