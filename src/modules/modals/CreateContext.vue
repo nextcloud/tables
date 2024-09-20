@@ -43,22 +43,12 @@
 				<NcContextResource :resources.sync="resources" :receivers.sync="receivers" />
 			</div>
 			<div class="row space-T">
-				<div>
-					{{ t('tables', 'Navigation bar display') }}
-				</div>
-				<NcCheckboxRadioSwitch :checked.sync="displayMode" value="NAV_ENTRY_MODE_HIDDEN"
-					name="NAV_ENTRY_MODE_HIDDEN" type="radio">
-					Hide navigation entry for everybody
-				</NcCheckboxRadioSwitch>
-				<NcCheckboxRadioSwitch :checked.sync="displayMode" value="NAV_ENTRY_MODE_RECIPIENTS"
-					name="NAV_ENTRY_MODE_RECIPIENTS" type="radio">
-					Show navigation entry for everybody, except me
-				</NcCheckboxRadioSwitch>
-				<NcCheckboxRadioSwitch :checked.sync="displayMode" value="NAV_ENTRY_MODE_ALL" name="NAV_ENTRY_MODE_ALL"
-					type="radio">
-					Show navigation entry for everybody
-				</NcCheckboxRadioSwitch>
-				<br>
+				<NcActionCheckbox :checked="showInNavigationDefault" @change="updateDisplayMode">
+					Show in app list
+				</NcActionCheckbox>
+				<p class="nav-display-subtext">
+					This can be overridden by a per-account preference
+				</p>
 			</div>
 			<div class="row space-R row space-T">
 				<div class="fix-col-4 end">
@@ -72,7 +62,7 @@
 </template>
 
 <script>
-import { NcDialog, NcButton, NcIconSvgWrapper, NcCheckboxRadioSwitch } from '@nextcloud/vue'
+import { NcDialog, NcButton, NcIconSvgWrapper, NcActionCheckbox } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
@@ -90,7 +80,7 @@ export default {
 		NcButton,
 		NcIconSvgWrapper,
 		NcContextResource,
-		NcCheckboxRadioSwitch,
+		NcActionCheckbox,
 	},
 	mixins: [svgHelper, permissionBitmask],
 	props: {
@@ -111,7 +101,7 @@ export default {
 			description: '',
 			resources: [],
 			receivers: [],
-			displayMode: 'NAV_ENTRY_MODE_HIDDEN',
+			showInNavigationDefault: false,
 		}
 	},
 	watch: {
@@ -181,19 +171,23 @@ export default {
 					isUser: true,
 					key: 'user-' + getCurrentUser().uid,
 				})
-			const res = await this.$store.dispatch('insertNewContext', { data, previousReceivers: [], receivers: this.receivers, displayMode: NAV_ENTRY_MODE[this.displayMode] })
+			const displayMode = this.showInNavigation ? 'NAV_ENTRY_MODE_ALL' : 'NAV_ENTRY_MODE_HIDDEN'
+			const res = await this.$store.dispatch('insertNewContext', { data, previousReceivers: [], receivers: this.receivers, displayMode: NAV_ENTRY_MODE[displayMode] })
 			if (res) {
 				return res.id
 			} else {
 				showError(t('tables', 'Could not create new application'))
 			}
 		},
+		updateDisplayMode() {
+			this.showInNavigation = !this.showInNavigation
+		},
 		reset() {
 			this.title = ''
 			this.errorTitle = false
 			this.setIcon(this.randomIcon())
 			this.customTitleChosen = false
-			this.displayMode = 'NAV_ENTRY_MODE_HIDDEN'
+			this.showInNavigationDefault = false
 		},
 	},
 }
@@ -206,6 +200,14 @@ export default {
 	.content-emoji {
 		display: inline-flex;
 		align-items: center;
+	}
+
+	.nav-display-subtext {
+		color: var(--color-text-maxcontrast)
+	}
+
+	li {
+		list-style: none;
 	}
 }
 </style>
