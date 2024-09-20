@@ -78,6 +78,7 @@ class ImportController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function previewImportView(int $viewId, String $path): DataResponse {
 		return $this->handleError(function () use ($viewId, $path) {
 			return $this->service->previewImport(null, $viewId, $path);
@@ -98,6 +99,7 @@ class ImportController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function previewUploadImportTable(int $tableId): DataResponse {
 		try {
 			$file = $this->getUploadedFile('uploadfile');
@@ -131,6 +133,7 @@ class ImportController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function previewUploadImportView(int $viewId): DataResponse {
 		try {
 			$file = $this->getUploadedFile('uploadfile');

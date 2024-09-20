@@ -83,6 +83,7 @@ class ViewController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function create(int $tableId, string $title, ?string $emoji): DataResponse {
 		return $this->handleError(function () use ($tableId, $title, $emoji) {
 			return $this->service->create($title, $emoji, $this->getTable($tableId, true));
@@ -92,6 +93,7 @@ class ViewController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_VIEW, idParam: 'id')]
 	public function update(int $id, array $data): DataResponse {
 		return $this->handleError(function () use ($id, $data) {
 			return $this->service->update($id, $data, $this->userId);
@@ -101,12 +103,12 @@ class ViewController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_VIEW, idParam: 'id')]
 	public function destroy(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
 			return $this->service->delete($id);
 		});
 	}
-
 
 	/**
 	 * @param int $tableId

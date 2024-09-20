@@ -223,6 +223,7 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function updateTable(int $tableId, ?string $title = null, ?string $emoji = null, ?bool $archived = false): DataResponse {
 		try {
 			return new DataResponse($this->tableService->update($tableId, $title, $emoji, null, $archived, $this->userId)->jsonSerialize());
@@ -255,6 +256,7 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function deleteTable(int $tableId): DataResponse {
 		try {
 			return new DataResponse($this->tableService->delete($tableId)->jsonSerialize());
@@ -325,6 +327,7 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function createView(int $tableId, string $title, ?string $emoji): DataResponse {
 		try {
 			return new DataResponse($this->viewService->create($title, $emoji, $this->tableService->find($tableId))->jsonSerialize());
@@ -388,6 +391,7 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function updateView(int $viewId, array $data): DataResponse {
 		try {
 			return new DataResponse($this->viewService->update($viewId, $data)->jsonSerialize());
@@ -420,6 +424,7 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function deleteView(int $viewId): DataResponse {
 		try {
 			return new DataResponse($this->viewService->delete($viewId)->jsonSerialize());
@@ -1511,6 +1516,7 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function createTableColumn(
 		int $tableId,
 		string $title,

@@ -68,6 +68,7 @@ class TableController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
 	public function destroy(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
 			return $this->service->delete($id);
@@ -77,6 +78,7 @@ class TableController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
 	public function update(int $id, ?string $title = null, ?string $emoji = null, ?bool $archived = null): DataResponse {
 		return $this->handleError(function () use ($id, $title, $emoji, $archived) {
 			return $this->service->update($id, $title, $emoji, null, $archived, $this->userId);
