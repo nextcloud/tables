@@ -410,11 +410,11 @@ export default new Vuex.Store({
 			commit('setLoading', { key: 'contexts', value: false })
 			return res.data.ocs.data
 		},
-		async updateContext({ state, commit, dispatch }, { id, data, previousReceivers, receivers }) {
+		async updateContext({ state, commit, dispatch }, { id, data, previousReceivers, receivers, displayMode }) {
 			let res = null
 			try {
 				res = await axios.put(generateOcsUrl('/apps/tables/api/2/contexts/' + id), data)
-				await dispatch('shareContext', { id, previousReceivers, receivers })
+				await dispatch('shareContext', { id, previousReceivers, receivers, displayMode })
 
 			} catch (e) {
 				displayError(e, t('tables', 'Could not update application.'))

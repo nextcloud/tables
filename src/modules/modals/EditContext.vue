@@ -39,22 +39,14 @@
 				<NcContextResource :resources.sync="resources" :receivers.sync="receivers" />
 			</div>
 			<div class="row space-T">
-				<div>
-					{{ t('tables', 'Navigation bar display') }}
-				</div>
-				<NcCheckboxRadioSwitch :checked.sync="displayMode" value="NAV_ENTRY_MODE_HIDDEN"
-					name="NAV_ENTRY_MODE_HIDDEN" type="radio">
-					Hide navigation entry for everybody
-				</NcCheckboxRadioSwitch>
-				<NcCheckboxRadioSwitch :checked.sync="displayMode" value="NAV_ENTRY_MODE_RECIPIENTS"
-					name="NAV_ENTRY_MODE_RECIPIENTS" type="radio">
-					Show navigation entry for everybody, except me
-				</NcCheckboxRadioSwitch>
-				<NcCheckboxRadioSwitch :checked.sync="displayMode" value="NAV_ENTRY_MODE_ALL" name="NAV_ENTRY_MODE_ALL"
-					type="radio">
-					Show navigation entry for everybody
-				</NcCheckboxRadioSwitch>
-				<br>
+				<NcActions>
+					<NcActionCheckbox :checked="showInNavigationDefault" @change="updateDisplayMode">
+						Show in app list
+					</NcActionCheckbox>
+				</NcActions>
+				<p class="nav-display-subtext">
+					This can be overridden by a per-account preference
+				</p>
 			</div>
 			<div class="row space-T">
 				<div class="fix-col-4 space-T justify-between">
@@ -79,7 +71,7 @@
 </template>
 
 <script>
-import { NcDialog, NcButton, NcIconSvgWrapper, NcCheckboxRadioSwitch } from '@nextcloud/vue'
+import { NcDialog, NcButton, NcIconSvgWrapper, NcActionCheckbox } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import { getCurrentUser } from '@nextcloud/auth'
 import '@nextcloud/dialogs/style.css'
@@ -100,7 +92,7 @@ export default {
 		NcIconPicker,
 		NcIconSvgWrapper,
 		NcContextResource,
-		NcCheckboxRadioSwitch,
+		NcActionCheckbox,
 	},
 	mixins: [svgHelper, permissionBitmask, permissionsMixin],
 	props: {
@@ -129,7 +121,7 @@ export default {
 			PERMISSION_UPDATE,
 			PERMISSION_DELETE,
 			prepareDeleteContext: false,
-			displayMode: 'NAV_ENTRY_MODE_HIDDEN', // TODO: get the actual saved display mode
+			showInNavigationDefault: false,
 		}
 	},
 	computed: {
@@ -154,6 +146,7 @@ export default {
 				this.description = context.description
 				this.resources = context ? this.getContextResources(context) : []
 				this.receivers = context ? this.getContextReceivers(context) : []
+				this.showInNavigationDefault = this.getNavDisplay(context)
 			}
 		},
 	},
@@ -194,7 +187,8 @@ export default {
 						isUser: true,
 						key: 'user-' + getCurrentUser().uid,
 					})
-				const res = await this.$store.dispatch('updateContext', { id: this.contextId, data, previousReceivers: Object.values(context.sharing), receivers: this.receivers })
+				const displayMode = this.showInNavigation ? 'NAV_ENTRY_MODE_ALL' : 'NAV_ENTRY_MODE_HIDDEN'
+				const res = await this.$store.dispatch('updateContext', { id: this.contextId, data, previousReceivers: Object.values(context.sharing), receivers: this.receivers, displayMode: NAV_ENTRY_MODE[displayMode] })
 				if (res) {
 					showSuccess(t('tables', 'Updated application "{contextTitle}".', { contextTitle: this.title }))
 					this.actionCancel()
@@ -210,15 +204,15 @@ export default {
 			this.resources = context ? this.getContextResources(context) : []
 			this.receivers = context ? this.getContextReceivers(context) : []
 			this.prepareDeleteContext = false
+			this.showInNavigationDefault = this.getNavDisplay(context)
 		},
-		getDisplayMode(context) {
+		getNavDisplay(context) {
 			const shares = Object.keys(context.sharing || {})
 			if (shares.length) {
-				print('vals', context.sharing[shares[0]])
 				const displayMode = context.sharing[shares[0]].display_mode_default
-				return Object.keys(NAV_ENTRY_MODE).find(key => NAV_ENTRY_MODE[key] === displayMode)
+				return displayMode !== 0
 			}
-			return 'NAV_ENTRY_MODE_HIDDEN'
+			return false
 		},
 		getContextReceivers(context) {
 			let sharing = Object.values(context.sharing)
@@ -276,6 +270,9 @@ export default {
 			}
 
 		},
+		updateDisplayMode() {
+			this.showInNavigation = !this.showInNavigation
+		},
 		actionTransfer() {
 			emit('tables:context:edit', null)
 			emit('tables:context:transfer', this.localContext)
@@ -295,5 +292,13 @@ export default {
 :deep(.element-description) {
 	padding-inline: 0 !important;
 	max-width: 100%;
+}
+
+.nav-display-subtext {
+	color: var(--color-text-maxcontrast)
+}
+
+li {
+	list-style: none;
 }
 </style>
