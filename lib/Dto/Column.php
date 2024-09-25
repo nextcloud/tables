@@ -23,7 +23,7 @@ class Column {
 		private ?int $numberDecimals = null,
 		private ?string $numberPrefix = null,
 		private ?string $numberSuffix = null,
-		private ?string $selectionOptions = null,
+		private ?array $selectionOptions = null,
 		private ?string $selectionDefault = null,
 		private ?string $datetimeDefault = null,
 		private ?string $usergroupDefault = null,
@@ -117,7 +117,7 @@ class Column {
 		return $this->numberSuffix;
 	}
 
-	public function getSelectionOptions(): ?string {
+	public function getSelectionOptions(): ?array {
 		return $this->selectionOptions;
 	}
 

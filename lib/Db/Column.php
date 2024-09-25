@@ -169,7 +169,7 @@ class Column extends Entity implements JsonSerializable {
 		$column->setNumberDecimals($data->getNumberDecimals());
 		$column->setNumberPrefix($data->getNumberPrefix() ?? '');
 		$column->setNumberSuffix($data->getNumberSuffix() ?? '');
-		$column->setSelectionOptions($data->getSelectionOptions());
+		$column->setSelectionOptionsArray($data->getSelectionOptions());
 		$column->setSelectionDefault($data->getSelectionDefault());
 		$column->setDatetimeDefault($data->getDatetimeDefault());
 		$column->setUsergroupDefault($data->getUsergroupDefault());
