@@ -41,6 +41,7 @@ OC.L10N.register(
     "Actions" : "Acțiuni",
     "Share" : "Partajează",
     "Integration" : "Integrare",
+    "Data" : "Date",
     "Import" : "Importă",
     "Type" : "Tip",
     "Simple text" : "Text simplu",
