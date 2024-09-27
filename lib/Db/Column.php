@@ -18,63 +18,63 @@ use OCP\AppFramework\Db\Entity;
  *
  * @psalm-import-type TablesColumn from ResponseDefinitions
  *
- * @method getTitle(): string
+ * @method string getTitle()
  * @method setTitle(string $title)
- * @method getTableId(): int
+ * @method int getTableId()
  * @method setTableId(int $tableId)
- * @method getCreatedBy(): string
+ * @method string getCreatedBy()
  * @method setCreatedBy(string $createdBy)
- * @method getCreatedByDisplayName(): string
+ * @method string getCreatedByDisplayName()
  * @method setCreatedByDisplayName(string $displayName)
- * @method getCreatedAt(): string
+ * @method string getCreatedAt()
  * @method setCreatedAt(string $createdAt)
- * @method getLastEditBy(): string
+ * @method string getLastEditBy()
  * @method setLastEditBy(string $lastEditBy)
- * @method getLastEditByDisplayName(): string
+ * @method string getLastEditByDisplayName()
  * @method setLastEditByDisplayName(string $displayName)
- * @method getLastEditAt(): string
+ * @method string getLastEditAt()
  * @method setLastEditAt(string $lastEditAt)
- * @method getType(): string
+ * @method string getType()
  * @method setType(string $type)
- * @method getSubtype(): string
+ * @method string getSubtype()
  * @method setSubtype(string $subtype)
- * @method getMandatory(): bool
+ * @method bool getMandatory()
  * @method setMandatory(?bool $mandatory)
- * @method getDescription(): string
+ * @method string getDescription()
  * @method setDescription(?string $description)
- * @method getNumberDefault(): float
+ * @method float getNumberDefault()
  * @method setNumberDefault(?float $numberDefault)
- * @method getNumberMin(): float
+ * @method float getNumberMin()
  * @method setNumberMin(?float $numberMin)
- * @method getNumberMax(): float
+ * @method float getNumberMax()
  * @method setNumberMax(?float $numberMax)
- * @method getNumberDecimals(): int
+ * @method int getNumberDecimals()
  * @method setNumberDecimals(?int $numberDecimals)
- * @method getNumberPrefix(): string
+ * @method string getNumberPrefix()
  * @method setNumberPrefix(?string $numberPrefix)
- * @method getNumberSuffix(): string
+ * @method string getNumberSuffix()
  * @method setNumberSuffix(?string $numberSuffix)
- * @method getTextDefault(): string
+ * @method string getTextDefault()
  * @method setTextDefault(?string $textDefault)
- * @method getTextAllowedPattern(): string
+ * @method string getTextAllowedPattern()
  * @method setTextAllowedPattern(?string $textAllowedPattern)
- * @method getTextMaxLength(): int
+ * @method int getTextMaxLength()
  * @method setTextMaxLength(?int $textMaxLength)
- * @method getSelectionOptions(): string
- * @method getSelectionDefault(): string
+ * @method string getSelectionOptions()
  * @method setSelectionOptions(?string $selectionOptionsArray)
+ * @method string getSelectionDefault()
  * @method setSelectionDefault(?string $selectionDefault)
- * @method getDatetimeDefault(): string
+ * @method string getDatetimeDefault()
  * @method setDatetimeDefault(?string $datetimeDefault)
- * @method getUsergroupDefault(): string
+ * @method string getUsergroupDefault()
  * @method setUsergroupDefault(?string $usergroupDefaultArray)
- * @method getUsergroupMultipleItems(): bool
+ * @method bool getUsergroupMultipleItems()
  * @method setUsergroupMultipleItems(?bool $usergroupMultipleItems)
- * @method getUsergroupSelectUsers(): bool
+ * @method bool getUsergroupSelectUsers()
  * @method setUsergroupSelectUsers(?bool $usergroupSelectUsers)
- * @method getUsergroupSelectGroups(): bool
+ * @method bool getUsergroupSelectGroups()
  * @method setUsergroupSelectGroups(?bool $usergroupSelectGroups)
- * @method getShowUserStatus(): bool
+ * @method bool getShowUserStatus()
  * @method setShowUserStatus(?bool $showUserStatus)
  */
 class Column extends Entity implements JsonSerializable {
@@ -91,18 +91,18 @@ class Column extends Entity implements JsonSerializable {
 	public const TYPE_DATETIME = 'datetime';
 	public const TYPE_USERGROUP = 'usergroup';
 
-	protected ?string $title = null;
-	protected ?int $tableId = null;
-	protected ?string $createdBy = null;
-	protected ?string $createdByDisplayName = null;
-	protected ?string $createdAt = null;
-	protected ?string $lastEditBy = null;
-	protected ?string $lastEditByDisplayName = null;
-	protected ?string $lastEditAt = null;
-	protected ?string $type = null;
-	protected ?string $subtype = null;
-	protected ?bool $mandatory = null;
-	protected ?string $description = null;
+	protected string $title = '';
+	protected int $tableId = 0;
+	protected string $createdBy = '';
+	protected string $createdByDisplayName = '';
+	protected string $createdAt = '';
+	protected string $lastEditBy = '';
+	protected string $lastEditByDisplayName = '';
+	protected string $lastEditAt = '';
+	protected string $type = '';
+	protected string $subtype = '';
+	protected bool $mandatory = false;
+	protected string $description = '';
 	protected ?int $orderWeight = null; // Deprecated
 
 	// type number
@@ -180,6 +180,9 @@ class Column extends Entity implements JsonSerializable {
 		return $column;
 	}
 
+	/**
+	 * @return array{id: int, label: string}|list<array{id: int, label: string}>
+	 */
 	public function getUsergroupDefaultArray():array {
 		$default = $this->getUsergroupDefault();
 		if ($default !== "" && $default !== null) {
@@ -194,6 +197,9 @@ class Column extends Entity implements JsonSerializable {
 		$this->setUsergroup($json);
 	}
 
+	/**
+	 * @return list<array{id: int, label: string}>
+	 */
 	public function getSelectionOptionsArray():array {
 		$options = $this->getSelectionOptions();
 		if ($options !== "" && $options !== null && $options !== 'null') {

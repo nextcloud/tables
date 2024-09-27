@@ -100,7 +100,7 @@ class Api1Controller extends ApiController {
 	 * @CORS
 	 * @NoCSRFRequired
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesTable[], array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesTable>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
 	 */
@@ -281,7 +281,7 @@ class Api1Controller extends ApiController {
 	 * @NoCSRFRequired
 	 *
 	 * @param int $tableId Table ID
-	 * @return DataResponse<Http::STATUS_OK, TablesView[], array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesView>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Views returned
 	 * 403: No permissions
@@ -376,7 +376,7 @@ class Api1Controller extends ApiController {
 	 * @NoCSRFRequired
 	 *
 	 * @param int $viewId View ID
-	 * @param array{key: 'title'|'emoji'|'description', value: string}|array{key: 'columns', value: int[]}|array{key: 'sort', value: array{columnId: int, mode: 'ASC'|'DESC'}}|array{key: 'filter', value: array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}} $data key-value pairs
+	 * @param array{key: 'title'|'emoji'|'description', value: string}|array{key: 'columns', value: list<int>}|array{key: 'sort', value: array{columnId: int, mode: 'ASC'|'DESC'}}|array{key: 'filter', value: array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}} $data key-value pairs
 	 * @return DataResponse<Http::STATUS_OK, TablesView, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: View updated
@@ -477,7 +477,7 @@ class Api1Controller extends ApiController {
 	 * @NoCSRFRequired
 	 *
 	 * @param int $viewId View ID
-	 * @return DataResponse<Http::STATUS_OK, TablesShare[], array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesShare>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Shares returned
 	 */
@@ -500,7 +500,7 @@ class Api1Controller extends ApiController {
 	 * @NoCSRFRequired
 	 *
 	 * @param int $tableId Table ID
-	 * @return DataResponse<Http::STATUS_OK, TablesShare[], array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesShare>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Shares returned
 	 */
@@ -694,7 +694,7 @@ class Api1Controller extends ApiController {
 	 *
 	 * @param int $tableId Table ID
 	 * @param int|null $viewId View ID
-	 * @return DataResponse<Http::STATUS_OK, TablesColumn[], array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesColumn>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: View deleted
 	 * 403: No permissions
@@ -723,7 +723,7 @@ class Api1Controller extends ApiController {
 	 * @NoCSRFRequired
 	 *
 	 * @param int $viewId View ID
-	 * @return DataResponse<Http::STATUS_OK, TablesColumn[], array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesColumn>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: View deleted
 	 * 403: No permissions
@@ -778,7 +778,7 @@ class Api1Controller extends ApiController {
 	 * @param bool|null $usergroupSelectUsers Can select users, if column type is usergroup
 	 * @param bool|null $usergroupSelectGroups Can select groups, if column type is usergroup
 	 * @param bool|null $usergroupShowUserStatus Whether to show the user's status, if column type is usergroup
-	 * @param int[]|null $selectedViewIds View IDs where this column should be added to be presented
+	 * @param list<int>|null $selectedViewIds View IDs where this column should be added to be presented
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -1039,7 +1039,7 @@ class Api1Controller extends ApiController {
 	 * @param int $tableId Table ID
 	 * @param int|null $limit Limit
 	 * @param int|null $offset Offset
-	 * @return DataResponse<Http::STATUS_OK, string[], array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<list<mixed>>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Row values returned
 	 * 403: No permissions
@@ -1069,7 +1069,7 @@ class Api1Controller extends ApiController {
 	 * @param int $tableId Table ID
 	 * @param int|null $limit Limit
 	 * @param int|null $offset Offset
-	 * @return DataResponse<Http::STATUS_OK, TablesRow[], array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesRow>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Rows returned
 	 * 403: No permissions
@@ -1099,7 +1099,7 @@ class Api1Controller extends ApiController {
 	 * @param int $viewId View ID
 	 * @param int|null $limit Limit
 	 * @param int|null $offset Offset
-	 * @return DataResponse<Http::STATUS_OK, TablesRow[], array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesRow>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Rows returned
 	 * 403: No permissions
@@ -1495,7 +1495,7 @@ class Api1Controller extends ApiController {
 	 * @param bool|null $usergroupSelectUsers Can select users, if column type is usergroup
 	 * @param bool|null $usergroupSelectGroups Can select groups, if column type is usergroup
 	 * @param bool|null $usergroupShowUserStatus Whether to show the user's status, if column type is usergroup
-	 * @param int[]|null $selectedViewIds View IDs where this column should be added to be presented
+	 * @param list<int>|null $selectedViewIds View IDs where this column should be added to be presented
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *

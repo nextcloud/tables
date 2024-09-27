@@ -30,7 +30,7 @@ class V1Api {
 	 * @param int|null $offset
 	 * @param string|null $userId
 	 * @param string|null $nodeType
-	 * @return array
+	 * @return list<list<mixed>>
 	 * @throws DoesNotExistException
 	 * @throws InternalError
 	 * @throws MultipleObjectsReturnedException

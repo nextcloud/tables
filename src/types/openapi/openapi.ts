@@ -751,37 +751,49 @@ export type components = {
             /** Format: int64 */
             readonly tableId: number;
             readonly createdBy: string;
+            readonly createdByDisplayName: string;
             readonly createdAt: string;
             readonly lastEditBy: string;
+            readonly lastEditByDisplayName: string;
             readonly lastEditAt: string;
             readonly type: string;
             readonly subtype: string;
             readonly mandatory: boolean;
             readonly description: string;
-            /** Format: int64 */
-            readonly orderWeight: number;
             /** Format: double */
-            readonly numberDefault: number;
+            readonly numberDefault: number | null;
             /** Format: double */
-            readonly numberMin: number;
+            readonly numberMin: number | null;
             /** Format: double */
-            readonly numberMax: number;
+            readonly numberMax: number | null;
             /** Format: int64 */
-            readonly numberDecimals: number;
-            readonly numberPrefix: string;
-            readonly numberSuffix: string;
-            readonly textDefault: string;
-            readonly textAllowedPattern: string;
+            readonly numberDecimals: number | null;
+            readonly numberPrefix: string | null;
+            readonly numberSuffix: string | null;
+            readonly textDefault: string | null;
+            readonly textAllowedPattern: string | null;
             /** Format: int64 */
-            readonly textMaxLength: number;
-            readonly selectionOptions: string;
-            readonly selectionDefault: string;
-            readonly datetimeDefault: string;
-            readonly usergroupDefault: string;
-            readonly usergroupMultipleItems: boolean;
-            readonly usergroupSelectUsers: boolean;
-            readonly usergroupSelectGroups: boolean;
-            readonly showUserStatus: boolean;
+            readonly textMaxLength: number | null;
+            readonly selectionOptions: readonly {
+                /** Format: int64 */
+                readonly id: number;
+                readonly label: string;
+            }[];
+            readonly selectionDefault: string | null;
+            readonly datetimeDefault: string | null;
+            readonly usergroupDefault: {
+                /** Format: int64 */
+                readonly id: number;
+                readonly label: string;
+            } | readonly {
+                /** Format: int64 */
+                readonly id: number;
+                readonly label: string;
+            }[];
+            readonly usergroupMultipleItems: boolean | null;
+            readonly usergroupSelectUsers: boolean | null;
+            readonly usergroupSelectGroups: boolean | null;
+            readonly showUserStatus: boolean | null;
         };
         readonly Context: {
             /** Format: int64 */
@@ -858,12 +870,13 @@ export type components = {
             readonly permissionDelete: boolean;
             readonly permissionManage: boolean;
             readonly createdAt: string;
-            readonly createdBy: string;
+            readonly lastEditAt: string;
         };
         readonly Table: {
             /** Format: int64 */
             readonly id: number;
             readonly title: string;
+            readonly description: string;
             readonly emoji: string | null;
             readonly ownership: string;
             readonly ownerDisplayName: string;
@@ -2695,7 +2708,7 @@ export interface operations {
                     readonly [name: string]: unknown;
                 };
                 content: {
-                    readonly "application/json": readonly string[];
+                    readonly "application/json": readonly (readonly Record<string, never>[])[];
                 };
             };
             /** @description No permissions */

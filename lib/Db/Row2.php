@@ -15,13 +15,13 @@ use OCA\Tables\ResponseDefinitions;
  * @psalm-import-type TablesRow from ResponseDefinitions
  */
 class Row2 implements JsonSerializable {
-	private ?int $id = null;
-	private ?int $tableId = null;
-	private ?string $createdBy = null;
-	private ?string $createdAt = null;
-	private ?string $lastEditBy = null;
-	private ?string $lastEditAt = null;
-	private ?array $data = [];
+	private int $id = 0;
+	private int $tableId = 0;
+	private string $createdBy = '';
+	private string $createdAt = '';
+	private string $lastEditBy = '';
+	private string $lastEditAt = '';
+	private array $data = [];
 	private array $changedColumnIds = []; // collect column ids that have changed after $loaded = true
 
 	private bool $loaded = false; // set to true if model is loaded, after that changed column ids will be collected

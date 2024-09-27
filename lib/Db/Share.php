@@ -17,48 +17,48 @@ use OCP\AppFramework\Db\Entity;
  *
  * @psalm-suppress PropertyNotSetInConstructor
  *
- * @method getSender(): string
+ * @method string getSender()
  * @method setSender(string $sender)
- * @method getReceiver(): string
+ * @method string getReceiver()
  * @method setReceiver(string $receiver)
- * @method getReceiverDisplayName(): string
+ * @method string getReceiverDisplayName()
  * @method setReceiverDisplayName(string $receiverDisplayName)
- * @method getReceiverType(): string
+ * @method string getReceiverType()
  * @method setReceiverType(string $receiverType)
- * @method getNodeId(): int
+ * @method int getNodeId()
  * @method setNodeId(int $nodeId)
- * @method getNodeType(): string
+ * @method string getNodeType()
  * @method setNodeType(string $nodeType)
- * @method getPermissionRead(): bool
+ * @method bool getPermissionRead()
  * @method setPermissionRead(bool $permissionRead)
- * @method getPermissionCreate(): bool
+ * @method bool getPermissionCreate()
  * @method setPermissionCreate(bool $permissionCreate)
- * @method getPermissionUpdate(): bool
+ * @method bool getPermissionUpdate()
  * @method setPermissionUpdate(bool $permissionUpdate)
- * @method getPermissionDelete(): bool
+ * @method bool getPermissionDelete()
  * @method setPermissionDelete(bool $permissionDelete)
- * @method getPermissionManage(): bool
+ * @method bool getPermissionManage()
  * @method setPermissionManage(bool $permissionManage)
- * @method getCreatedAt(): string
+ * @method string getCreatedAt()
  * @method setCreatedAt(string $createdAt)
- * @method getLastEditAt(): string
+ * @method string getLastEditAt()
  * @method setLastEditAt(string $lastEditAt)
  */
 class Share extends Entity implements JsonSerializable {
-	protected ?string $sender = null; // is also owner
+	protected string $sender = ''; // is also owner
 
-	protected ?string $receiver = null;
-	protected ?string $receiverDisplayName = null;
-	protected ?string $receiverType = null; // user, group
-	protected ?int $nodeId = null;
-	protected ?string $nodeType = null;
-	protected ?bool $permissionRead = null;
-	protected ?bool $permissionCreate = null;
-	protected ?bool $permissionUpdate = null;
-	protected ?bool $permissionDelete = null;
-	protected ?bool $permissionManage = null;
-	protected ?string $createdAt = null;
-	protected ?string $lastEditAt = null;
+	protected string $receiver = '';
+	protected string $receiverDisplayName = '';
+	protected string $receiverType = ''; // user, group
+	protected int $nodeId = 0;
+	protected string $nodeType = '';
+	protected bool $permissionRead = false;
+	protected bool $permissionCreate = false;
+	protected bool $permissionUpdate = false;
+	protected bool $permissionDelete = false;
+	protected bool $permissionManage = false;
+	protected string $createdAt = '';
+	protected string $lastEditAt = '';
 
 	public function __construct() {
 		$this->addType('id', 'integer');

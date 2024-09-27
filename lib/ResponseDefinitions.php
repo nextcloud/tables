@@ -15,18 +15,25 @@ namespace OCA\Tables;
  * @psalm-type TablesView = array{
  * 	id: int,
  * 	title: string,
- * 	emoji: string|null,
+ * 	emoji: ?string,
  *  tableId: int,
  * 	ownership: string,
- * 	ownerDisplayName: string|null,
+ * 	ownerDisplayName: ?string,
  * 	createdBy: string,
  * 	createdAt: string,
  * 	lastEditBy: string,
  * 	lastEditAt: string,
- *  description: string|null,
- *  columns: int[],
- *  sort: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
- *  filter: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>,
+ *  description: ?string,
+ *  columns: list<int>,
+ *  sort: list<array{
+ *     columnId: int,
+ *     mode: 'ASC'|'DESC',
+ *  }>,
+ *  filter: list<list<array{
+ *     columnId: int,
+ *     operator: 'begins-with'|'ends-with'|'contains'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty',
+ *     value: string|int|float,
+ *	}>>,
  * 	isShared: bool,
  *	favorite: bool,
  * 	onSharePermissions: ?array{
@@ -43,7 +50,8 @@ namespace OCA\Tables;
  * @psalm-type TablesTable = array{
  * 	id: int,
  * 	title: string,
- * 	emoji: string|null,
+ * 	description: string,
+ * 	emoji: ?string,
  * 	ownership: string,
  * 	ownerDisplayName: string,
  * 	createdBy: string,
@@ -62,13 +70,13 @@ namespace OCA\Tables;
  * 	},
  *  hasShares: bool,
  *  rowsCount: int,
- *  views: TablesView[],
+ *  views: list<TablesView>,
  *  columnsCount: int,
  * }
  *
  * @psalm-type TablesIndex = array{
- * 	tables: TablesTable[],
- *  views: TablesView[],
+ * 	tables: list<TablesTable>,
+ *  views: list<TablesView>,
  * }
  *
  * @psalm-type TablesRow = array{
@@ -78,7 +86,10 @@ namespace OCA\Tables;
  * 	createdAt: string,
  * 	lastEditBy: string,
  * 	lastEditAt: string,
- *  data: ?array{columnId: int, value: mixed},
+ *  data: ?array{
+ *     columnId: int,
+ *     value: mixed,
+ *  },
  * }
  *
  * @psalm-type TablesShare = array{
@@ -95,7 +106,7 @@ namespace OCA\Tables;
  *  permissionDelete: bool,
  * 	permissionManage: bool,
  *  createdAt: string,
- *  createdBy: string,
+ *  lastEditAt: string,
  * }
  *
  * @psalm-type TablesColumn = array{
@@ -103,31 +114,32 @@ namespace OCA\Tables;
  *  title: string,
  *  tableId: int,
  *  createdBy: string,
+ *  createdByDisplayName: string,
  *  createdAt: string,
  *  lastEditBy: string,
+ *  lastEditByDisplayName: string,
  *  lastEditAt: string,
  *  type: string,
  *  subtype: string,
  *  mandatory: bool,
  *  description: string,
- *  orderWeight: int,
- *  numberDefault: float,
- *  numberMin: float,
- *  numberMax: float,
- *  numberDecimals: int,
- *  numberPrefix: string,
- *  numberSuffix: string,
- *  textDefault: string,
- *  textAllowedPattern: string,
- *  textMaxLength: int,
- *  selectionOptions: string,
- *  selectionDefault: string,
- *  datetimeDefault: string,
- *  usergroupDefault: string,
- *  usergroupMultipleItems: bool,
- *  usergroupSelectUsers: bool,
- *  usergroupSelectGroups: bool,
- *  showUserStatus: bool,
+ *  numberDefault: ?float,
+ *  numberMin: ?float,
+ *  numberMax: ?float,
+ *  numberDecimals: ?int,
+ *  numberPrefix: ?string,
+ *  numberSuffix: ?string,
+ *  textDefault: ?string,
+ *  textAllowedPattern: ?string,
+ *  textMaxLength: ?int,
+ *  selectionOptions: list<array{id: int, label: string}>,
+ *  selectionDefault: ?string,
+ *  datetimeDefault: ?string,
+ *  usergroupDefault: array{id: int, label: string}|list<array{id: int, label: string}>,
+ *  usergroupMultipleItems: ?bool,
+ *  usergroupSelectUsers: ?bool,
+ *  usergroupSelectGroups: ?bool,
+ *  showUserStatus: ?bool,
  * }
  *
  * @psalm-type TablesImportState = array{
@@ -154,8 +166,6 @@ namespace OCA\Tables;
  *     displayMode: int,
  *     userId: string,
  * }
- *
- * @psalm-type TablesColumn
  */
 class ResponseDefinitions {
 }

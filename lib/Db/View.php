@@ -80,37 +80,40 @@ class View extends Entity implements JsonSerializable {
 	}
 
 	/**
-	 * @psalm-suppress MismatchingDocblockReturnType
-	 * @return int[]
+	 * @return list<int>
 	 */
 	public function getColumnsArray(): array {
-		return $this->getArray($this->getColumns());
+		/** @var list<int> $data */
+		$data = $this->getArray($this->getColumns());
+		return $data;
 	}
 
 	/**
-	 * @psalm-suppress MismatchingDocblockReturnType
 	 * @return list<array{columnId: int, mode: 'ASC'|'DESC'}>
 	 */
 	public function getSortArray(): array {
-		return $this->getArray($this->getSort());
+		/** @var list<array{columnId: int, mode: 'ASC'|'DESC'}> $data */
+		$data = $this->getArray($this->getSort());
+		return $data;
 	}
 
 	/**
-	 * @psalm-suppress MismatchingDocblockReturnType
 	 * @return list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>
 	 */
 	public function getFilterArray():array {
+		/** @var list<list<array{columnId: ?int, operator: 'begins-with'|'ends-with'|'contains'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>> $filters */
 		$filters = $this->getArray($this->getFilter());
 		// a filter(group) was stored with a not-selected column - it may break impressively.
 		// filter them out now until we have a permanent fix
 		foreach ($filters as &$filterGroups) {
-			$filterGroups = array_filter($filterGroups, function (array $item) {
+			$filterGroups = array_values(array_filter($filterGroups, function (array $item) {
 				return $item['columnId'] !== null;
-			});
+			}));
 		}
-		return array_filter($filters, function (array $item) {
+		/** @var list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>> $filters */
+		return array_values(array_filter($filters, function (array $item) {
 			return !empty($item);
-		});
+		}));
 	}
 
 	private function getArray(?string $json): array {
@@ -146,7 +149,7 @@ class View extends Entity implements JsonSerializable {
 	}
 
 	/**
-	 * @psalm-return TablesView
+	 * @return TablesView
 	 */
 	public function jsonSerialize(): array {
 		$serialisedJson = [

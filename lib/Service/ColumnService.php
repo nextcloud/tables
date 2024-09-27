@@ -106,10 +106,10 @@ class ColumnService extends SuperService {
 
 	/**
 	 * @param Column[] $columns
-	 * @return TablesColumn[]
+	 * @return list<TablesColumn>
 	 */
 	public function formatColumns(array $columns): array {
-		return array_map(fn (Column $item) => $item->jsonSerialize(), $columns);
+		return array_values(array_map(fn (Column $item) => $item->jsonSerialize(), $columns));
 	}
 
 	/**

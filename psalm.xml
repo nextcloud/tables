@@ -26,6 +26,10 @@
 		<directory name="vendor" />
 	</extraFiles>
 	<issueHandlers>
+		<LessSpecificReturnStatement errorLevel="error"/>
+		<LessSpecificReturnType errorLevel="error"/>
+		<LessSpecificImplementedReturnType errorLevel="error"/>
+		<MoreSpecificReturnType errorLevel="error"/>
 		<UndefinedMagicMethod>
 			<errorLevel type="suppress">
 				<directory name="lib/" />
