@@ -36,6 +36,8 @@ class TextLinkBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		if($data !== null) {
 			if (isset($data['resourceUrl'])) {
 				return json_encode(json_encode([
+					'thumbnailUrl' => $data['thumbnailUrl'],
+					'icon' => $data['icon'],
 					'title' => $data['title'] ?? $data['resourceUrl'],
 					'value' => $data['resourceUrl'],
 					'providerId' => 'url',
