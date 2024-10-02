@@ -60,13 +60,13 @@ export default {
 		getShareTypeString() {
 			const strings = []
 			if (this.selectUsers) {
-				strings.push('user')
+				strings.push('User')
 			}
 			if (this.selectGroups) {
-				strings.push('group')
+				strings.push('Group')
 			}
 			if (this?.selectTeams) {
-				strings.push('team')
+				strings.push('Team')
 			}
 			return strings.join(' or ')
 		},
