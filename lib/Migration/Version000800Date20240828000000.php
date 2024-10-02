@@ -28,15 +28,15 @@ class Version000800Date20240828000000 extends SimpleMigrationStep {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 
-        if ($schema->hasTable('tables_columns')) {
-            if ($schema->hasTable('tables_row_cells_usergroup')) {
-                $table = $schema->getTable('tables_columns');
-                if (!$table->hasColumn('usergroup_select_teams')) {
-                    $table->addColumn('usergroup_select_teams', Types::BOOLEAN, [
-                        'notnull' => false,
-                        'default' => 0,
-                    ]);
-                }
+		if ($schema->hasTable('tables_columns')) {
+			if ($schema->hasTable('tables_row_cells_usergroup')) {
+				$table = $schema->getTable('tables_columns');
+				if (!$table->hasColumn('usergroup_select_teams')) {
+					$table->addColumn('usergroup_select_teams', Types::BOOLEAN, [
+						'notnull' => false,
+						'default' => 0,
+					]);
+				}
 			}
 			return $schema;
 		}
