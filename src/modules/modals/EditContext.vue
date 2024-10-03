@@ -39,11 +39,9 @@
 				<NcContextResource :resources.sync="resources" :receivers.sync="receivers" />
 			</div>
 			<div class="row space-T">
-				<NcActions>
-					<NcActionCheckbox :checked="showInNavigationDefault" @change="updateDisplayMode">
-						Show in app list
-					</NcActionCheckbox>
-				</NcActions>
+				<NcActionCheckbox :checked="showInNavigationDefault" @change="updateDisplayMode">
+					Show in app list
+				</NcActionCheckbox>
 				<p class="nav-display-subtext">
 					This can be overridden by a per-account preference
 				</p>
