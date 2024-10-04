@@ -17,6 +17,9 @@ use OCA\Tables\Db\Column;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Db\ColumnMapper;
+use OCA\Tables\Db\Row2;
+use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -40,6 +43,9 @@ class ViewService extends SuperService {
 
 	private RowService $rowService;
 
+	private ColumnMapper $columnMapper;
+	private Row2Mapper $row2Mapper;
+
 	protected UserHelper $userHelper;
 
 	protected FavoritesService $favoritesService;
@@ -54,6 +60,8 @@ class ViewService extends SuperService {
 		LoggerInterface $logger,
 		?string $userId,
 		ViewMapper $mapper,
+		ColumnMapper $columnMapper,
+		Row2Mapper $row2Mapper,
 		ShareService $shareService,
 		RowService $rowService,
 		UserHelper $userHelper,
@@ -67,6 +75,8 @@ class ViewService extends SuperService {
 		$this->mapper = $mapper;
 		$this->shareService = $shareService;
 		$this->rowService = $rowService;
+		$this->columnMapper = $columnMapper;
+		$this->row2Mapper = $row2Mapper;
 		$this->userHelper = $userHelper;
 		$this->favoritesService = $favoritesService;
 		$this->eventDispatcher = $eventDispatcher;
@@ -550,4 +560,123 @@ class ViewService extends SuperService {
 			return [];
 		}
 	}
+
+	/**
+	 * @param int $tableId
+	 * @param array $data
+	 * @param string|null $userId
+	 * @return View
+	 * @throws InternalError
+	 * @throws PermissionError
+	 * @throws InvalidArgumentException
+	 */
+	public function createTemporaryView(int $tableId, array $data, ?string $userId = null): View {
+		$userId = $this->permissionsService->preCheckUserId($userId);
+
+		try {
+			// $table = $this->tableService->find($tableId);
+
+			// // security
+			// if (!$this->permissionsService->canReadTable($table, $userId)) {
+			// 	throw new PermissionError('PermissionError: can not read table with id ' . $tableId);
+			// }
+			$this->logger->warning((string)$tableId.' , '.$userId);
+
+			$view = new View();
+			$view->setTableId($tableId);
+			$view->setOwnership($userId);
+
+			$updatableParameter = ['title', 'emoji', 'description', 'columns', 'sort', 'filter'];
+
+			foreach ($data as $key => $value) {
+				if (!in_array($key, $updatableParameter)) {
+					throw new InvalidArgumentException('Invalid parameter: ' . $key);
+				}
+
+				switch ($key) {
+					case 'title':
+						$view->setTitle($value);
+						break;
+					case 'emoji':
+						$view->setEmoji($value);
+						break;
+					case 'description':
+						$view->setDescription($value);
+						break;
+					case 'columns':
+						$view->setColumnsArray($value);
+						break;
+					case 'sort':
+						$view->setSortArray($value);
+						break;
+					case 'filter':
+						$view->setFilterArray($value);
+						break;
+				}
+			}
+			$rows = $this->findRowsByView($tableId, $userId, $view);
+			$view->setRowsArray($rows);
+			$columnValues = $this->findColumnsByView($tableId, $view, $userId);
+			$view->setColumnValuesArray($columnValues);
+
+			// $this->enhanceTemporaryView($view, $userId);
+
+			return $view;
+		} catch (NotFoundError $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError('Table not found: ' . $tableId);
+		} catch (PermissionError $e) {
+			$this->logger->debug('permission error during creating temporary view', ['exception' => $e]);
+			throw $e;
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError($e->getMessage());
+		}
+	}
+
+	/**
+	 * @param int $tableId
+	 * @param string $userId
+	 * @param View view
+	 * @param int|null $limit
+	 * @param int|null $offset
+	 * @return Row2[]
+	 * @throws DoesNotExistException
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws PermissionError
+	 */
+	public function findRowsByView(int $tableId, string $userId, View $view, ?int $limit = null, ?int $offset = null): array {
+		try {
+			if ($this->permissionsService->canReadRowsByElementId($tableId, 'table', $userId)) {
+				$columnsArray = $view->getColumnsArray();
+				$filterColumns = $this->columnMapper->findAll($columnsArray);
+				$tableColumns = $this->columnMapper->findAllByTable($view->getTableId());
+
+				return $this->row2Mapper->findAll($tableColumns, $filterColumns, $view->getTableId(), $limit, $offset, $view->getFilterArray(), $view->getSortArray(), $userId);
+			} else {
+				throw new PermissionError('no read access to table id = '.$tableId);
+			}
+		} catch (Exception $e) {
+			$this->logger->error($e->getMessage());
+			throw new InternalError($e->getMessage());
+		}
+	}
+
+
+	/**
+	 * @param int $tableId
+	 * @param View view
+	 * @param string|null $userId
+	 * @return array
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 * @throws InternalError
+	 */
+	public function findColumnsByView(int $tableId, View $view, ?string $userId = null): array {
+		$viewColumnIds = $view->getColumnsArray();
+		$viewColumns = $this->columnMapper->findAll($viewColumnIds);
+		return $viewColumns;
+	}
+
 }

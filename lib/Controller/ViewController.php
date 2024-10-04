@@ -98,6 +98,15 @@ class ViewController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	public function createTemporaryView(int $tableId, array $data): DataResponse {
+		return $this->handleError(function () use ($tableId, $data) {
+			return $this->service->createTemporaryView($tableId, $data, $this->userId);
+		});
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
 	public function destroy(int $id): DataResponse {
 		return $this->handleError(function () use ($id) {
 			return $this->service->delete($id);
