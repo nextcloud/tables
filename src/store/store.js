@@ -221,6 +221,18 @@ export default new Vuex.Store({
 
 			return res.data.id
 		},
+
+		async createTemporaryView({ commit, state }, { tableId, data }) {
+			let res = null
+			try {
+				res = await axios.post(generateUrl('/apps/tables/view/' + tableId + '/temporary-view'), { data })
+			} catch (e) {
+				displayError(e, t('tables', 'Could not create temporary view.'))
+				return false
+			}
+			return res.data
+		},
+
 		async updateView({ state, commit, dispatch }, { id, data }) {
 			let res = null
 

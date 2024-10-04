@@ -9,6 +9,7 @@ import MainViewWrapper from './pages/View.vue'
 import MainDashboardWrapper from './pages/Table.vue'
 import Startpage from './pages/Startpage.vue'
 import Context from './pages/Context.vue'
+import TemporaryView from './pages/TemporaryView.vue'
 
 Vue.use(Router)
 
@@ -49,6 +50,11 @@ export default new Router({
 			path: '/view/:viewId',
 			component: MainViewWrapper,
 			name: 'view',
+		},
+		{
+			path: '/tempview',
+			component: TemporaryView,
+			name: 'temporaryView',
 		},
 		{
 			path: '/view/:viewId/content',

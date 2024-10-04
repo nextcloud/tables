@@ -53,6 +53,10 @@ use OCP\AppFramework\Db\Entity;
  * @method setSort(string $sort)
  * @method getOwnerDisplayName(): string
  * @method setOwnerDisplayName(string $ownerDisplayName)
+ * @method getRows(): string
+ * @method setRows(string $rows)
+ * @method getColumnValues(): string
+ * @method setColumnValues(string $columnValues)
  */
 class View extends Entity implements JsonSerializable {
 	protected ?string $title = null;
@@ -73,6 +77,8 @@ class View extends Entity implements JsonSerializable {
 	protected ?int $rowsCount = 0;
 	protected ?string $ownership = null;
 	protected ?string $ownerDisplayName = null;
+	protected ?string $rows = null;
+	protected ?string $columnValues = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');
@@ -86,6 +92,16 @@ class View extends Entity implements JsonSerializable {
 	public function getColumnsArray(): array {
 		return $this->getArray($this->getColumns());
 	}
+
+
+	public function getRowsArray(): array {
+		return $this->getArray($this->getRows());
+	}
+
+	public function getColumnValuesArray(): array {
+		return $this->getArray($this->getColumnValues());
+	}
+
 
 	/**
 	 * @psalm-suppress MismatchingDocblockReturnType
@@ -123,6 +139,14 @@ class View extends Entity implements JsonSerializable {
 
 	public function setColumnsArray(array $array):void {
 		$this->setColumns(\json_encode($array));
+	}
+
+	public function setRowsArray(array $array):void {
+		$this->setRows(\json_encode($array));
+	}
+
+	public function setColumnValuesArray(array $array):void {
+		$this->setColumnValues(\json_encode($array));
 	}
 
 	public function setSortArray(array $array):void {
@@ -168,6 +192,8 @@ class View extends Entity implements JsonSerializable {
 			'hasShares' => !!$this->hasShares,
 			'rowsCount' => $this->rowsCount ?: 0,
 			'ownerDisplayName' => $this->ownerDisplayName,
+			'rows' => $this->getRowsArray(),
+			'columnValues' => $this->getColumnValuesArray(),
 		];
 		$serialisedJson['filter'] = $this->getFilterArray();
 

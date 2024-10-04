@@ -79,6 +79,7 @@ return [
 		['name' => 'view#create', 'url' => '/view', 'verb' => 'POST'],
 		['name' => 'view#update', 'url' => '/view/{id}', 'verb' => 'PUT'],
 		['name' => 'view#destroy', 'url' => '/view/{id}', 'verb' => 'DELETE'],
+		['name' => 'view#createTemporaryView', 'url' => '/view/{tableId}/temporary-view', 'verb' => 'POST'],
 
 		// columns
 		['name' => 'column#indexTableByView', 'url' => '/column/table/{tableId}/view/{viewId}', 'verb' => 'GET'],
