@@ -43,6 +43,31 @@ class ContextNavigationMapper extends QBMapper {
 		return $this->insertOrUpdate($entity);
 	}
 
+	// we have to overwrite QBMapper`s insert() because we do not have
+	// an id column in this table. Sad.
+	public function insert(Entity $entity): Entity {
+		// get updated fields to save, fields have to be set using a setter to
+		// be saved
+		$properties = $entity->getUpdatedFields();
+
+		$qb = $this->db->getQueryBuilder();
+		$qb->insert($this->tableName);
+
+		// build the fields
+		foreach ($properties as $property => $updated) {
+			$column = $entity->propertyToColumn($property);
+			$getter = 'get' . ucfirst($property);
+			$value = $entity->$getter();
+
+			$type = $this->getParameterTypeForProperty($entity, $property);
+			$qb->setValue($column, $qb->createNamedParameter($value, $type));
+		}
+
+		$qb->executeStatement();
+
+		return $entity;
+	}
+
 	// we have to overwrite QBMapper`s update() because we do not have
 	// an id column in this table. Sad.
 	public function update(Entity $entity): ContextNavigation {
