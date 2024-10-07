@@ -48,7 +48,7 @@ class ContextController extends AOCSController {
 	 *
 	 * Return an empty array if no contexts were found
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesContext[], array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesContext>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: reporting in available contexts
 	 *

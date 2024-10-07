@@ -13,6 +13,7 @@ use DateTime;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\View;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -173,10 +174,10 @@ class TableService extends SuperService {
 
 	/**
 	 * @param Table[] $tables
-	 * @return TablesTable[]
+	 * @return list<TablesTable>
 	 */
 	public function formatTables(array $tables): array {
-		return array_map(fn (Table $table) => $table->jsonSerialize(), $tables);
+		return array_values(array_map(fn (Table $table) => $table->jsonSerialize(), $tables));
 	}
 
 	/**
@@ -234,7 +235,7 @@ class TableService extends SuperService {
 		}
 		if (!$table->getIsShared() || $table->getOnSharePermissions()->manage) {
 			// add the corresponding views if it is an own table, or you have table manage rights
-			$table->setViews($this->viewService->findAll($table));
+			$table->setViews(array_map(static fn (View $view) => $view->jsonSerialize(), $this->viewService->findAll($table)));
 		}
 
 		if ($this->favoritesService->isFavorite(Application::NODE_TYPE_TABLE, $table->getId())) {

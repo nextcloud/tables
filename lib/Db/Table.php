@@ -18,42 +18,42 @@ use OCP\AppFramework\Db\Entity;
  * @psalm-import-type TablesTable from ResponseDefinitions
  * @psalm-import-type TablesView from ResponseDefinitions
  *
- * @method getTitle(): string
- * @method getId(): int
+ * @method string getTitle()
+ * @method int getId()
  * @method setTitle(string $title)
- * @method getEmoji(): string
+ * @method string getEmoji()
  * @method setEmoji(string $emoji)
- * @method getArchived(): bool
+ * @method bool getArchived()
  * @method setArchived(bool $archived)
- * @method getDescription(): string
+ * @method string getDescription()
  * @method setDescription(string $description)
- * @method getOwnership(): string
+ * @method string getOwnership()
  * @method setOwnership(string $ownership)
- * @method getOwnerDisplayName(): string
+ * @method string getOwnerDisplayName()
  * @method setOwnerDisplayName(string $ownerDisplayName)
- * @method getIsShared(): bool
+ * @method bool getIsShared()
  * @method setIsShared(bool $isShared)
- * @method getOnSharePermissions(): ?Permissions
+ * @method Permissions|null getOnSharePermissions()
  * @method setOnSharePermissions(Permissions $onSharePermissions)
- * @method getHasShares(): bool
+ * @method bool getHasShares()
  * @method setHasShares(bool $hasShares)
- * @method getFavorite(): bool
+ * @method bool getFavorite()
  * @method setFavorite(bool $favorite)
- * @method getRowsCount(): int
+ * @method int getRowsCount()
  * @method setRowsCount(int $rowsCount)
- * @method getColumnsCount(): int
+ * @method int getColumnsCount()
  * @method setColumnsCount(int $columnsCount)
- * @method getViews(): array
+ * @method array getViews()
  * @method setViews(array $views)
- * @method getColumns(): array
+ * @method array getColumns()
  * @method setColumns(array $columns)
- * @method getCreatedBy(): string
+ * @method string getCreatedBy()
  * @method setCreatedBy(string $createdBy)
- * @method getCreatedAt(): string
+ * @method string getCreatedAt()
  * @method setCreatedAt(string $createdAt)
- * @method getLastEditBy(): string
+ * @method string getLastEditBy()
  * @method setLastEditBy(string $lastEditBy)
- * @method getLastEditAt(): string
+ * @method string getLastEditAt()
  * @method setLastEditAt(string $lastEditAt)
  */
 class Table extends Entity implements JsonSerializable {
@@ -70,7 +70,7 @@ class Table extends Entity implements JsonSerializable {
 	protected ?Permissions $onSharePermissions = null;
 
 	protected ?bool $hasShares = false;
-	protected ?bool $favorite = false;
+	protected bool $favorite = false;
 	protected ?int $rowsCount = 0;
 	protected ?int $columnsCount = 0;
 	protected ?array $views = null;
@@ -113,10 +113,11 @@ class Table extends Entity implements JsonSerializable {
 	}
 
 	/**
-	 * @psalm-suppress MismatchingDocblockReturnType
-	 * @return TablesView[]
+	 * @return list<TablesView>
 	 */
 	private function getViewsArray(): array {
-		return $this->getViews() ?: [];
+		/** @var list<TablesView> $views */
+		$views = $this->getViews() ?: [];
+		return $views;
 	}
 }

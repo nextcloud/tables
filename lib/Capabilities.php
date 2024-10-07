@@ -29,7 +29,15 @@ class Capabilities implements ICapability {
 
 	/**
 	 *
-	 * @return array{tables: array{enabled: bool, version: string, apiVersions: string[], features: string[], column_types: string[]}}
+	 * @return array{
+	 *     tables: array{
+	 *         enabled: bool,
+	 *         version: string,
+	 *         apiVersions: list<string>,
+	 *         features: list<string>,
+	 *         column_types: list<string>,
+	 *     }
+	 * }
 	 *
 	 * @inheritDoc
 	 */

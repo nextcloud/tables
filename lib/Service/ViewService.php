@@ -76,7 +76,7 @@ class ViewService extends SuperService {
 	/**
 	 * @param Table $table
 	 * @param string|null $userId
-	 * @return array
+	 * @return list<View>
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
@@ -93,7 +93,7 @@ class ViewService extends SuperService {
 			foreach ($allViews as $view) {
 				$this->enhanceView($view, $userId);
 			}
-			return $allViews;
+			return array_values($allViews);
 		} catch (\OCP\DB\Exception|InternalError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError($e->getMessage());
@@ -105,10 +105,10 @@ class ViewService extends SuperService {
 
 	/**
 	 * @param View[] $items
-	 * @return TablesView[]
+	 * @return list<TablesView>
 	 */
 	public function formatViews(array $items): array {
-		return array_map(fn (View $item) => $item->jsonSerialize(), $items);
+		return array_values(array_map(fn (View $item) => $item->jsonSerialize(), $items));
 	}
 
 	/**

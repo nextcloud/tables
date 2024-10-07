@@ -13,15 +13,15 @@ use OCP\AppFramework\Db\Entity;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
- * @method getTableId(): ?int
+ * @method int|null getTableId()
  * @method setTableId(int $columnId)
- * @method getCreatedBy(): string
+ * @method string getCreatedBy()
  * @method setCreatedBy(string $createdBy)
- * @method getCreatedAt(): string
+ * @method string getCreatedAt()
  * @method setCreatedAt(string $createdAt)
- * @method getLastEditBy(): string
+ * @method string getLastEditBy()
  * @method setLastEditBy(string $lastEditBy)
- * @method getLastEditAt(): string
+ * @method string getLastEditAt()
  * @method setLastEditAt(string $lastEditAt)
  */
 class RowSleeve extends Entity implements JsonSerializable {

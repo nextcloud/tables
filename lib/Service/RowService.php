@@ -64,10 +64,10 @@ class RowService extends SuperService {
 
 	/**
 	 * @param Row2[] $rows
-	 * @psalm-return TablesRow[]
+	 * @return list<TablesRow>
 	 */
 	public function formatRows(array $rows): array {
-		return array_map(fn (Row2 $row) => $row->jsonSerialize(), $rows);
+		return array_values(array_map(fn (Row2 $row) => $row->jsonSerialize(), $rows));
 	}
 
 	/**

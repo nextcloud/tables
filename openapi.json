@@ -71,14 +71,15 @@
                     "title",
                     "tableId",
                     "createdBy",
+                    "createdByDisplayName",
                     "createdAt",
                     "lastEditBy",
+                    "lastEditByDisplayName",
                     "lastEditAt",
                     "type",
                     "subtype",
                     "mandatory",
                     "description",
-                    "orderWeight",
                     "numberDefault",
                     "numberMin",
                     "numberMax",
@@ -112,10 +113,16 @@
                     "createdBy": {
                         "type": "string"
                     },
+                    "createdByDisplayName": {
+                        "type": "string"
+                    },
                     "createdAt": {
                         "type": "string"
                     },
                     "lastEditBy": {
+                        "type": "string"
+                    },
+                    "lastEditByDisplayName": {
                         "type": "string"
                     },
                     "lastEditAt": {
@@ -133,65 +140,128 @@
                     "description": {
                         "type": "string"
                     },
-                    "orderWeight": {
-                        "type": "integer",
-                        "format": "int64"
-                    },
                     "numberDefault": {
                         "type": "number",
-                        "format": "double"
+                        "format": "double",
+                        "nullable": true
                     },
                     "numberMin": {
                         "type": "number",
-                        "format": "double"
+                        "format": "double",
+                        "nullable": true
                     },
                     "numberMax": {
                         "type": "number",
-                        "format": "double"
+                        "format": "double",
+                        "nullable": true
                     },
                     "numberDecimals": {
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "nullable": true
                     },
                     "numberPrefix": {
-                        "type": "string"
+                        "type": "string",
+                        "nullable": true
                     },
                     "numberSuffix": {
-                        "type": "string"
+                        "type": "string",
+                        "nullable": true
                     },
                     "textDefault": {
-                        "type": "string"
+                        "type": "string",
+                        "nullable": true
                     },
                     "textAllowedPattern": {
-                        "type": "string"
+                        "type": "string",
+                        "nullable": true
                     },
                     "textMaxLength": {
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "nullable": true
                     },
                     "selectionOptions": {
-                        "type": "string"
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "id",
+                                "label"
+                            ],
+                            "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "label": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     },
                     "selectionDefault": {
-                        "type": "string"
+                        "type": "string",
+                        "nullable": true
                     },
                     "datetimeDefault": {
-                        "type": "string"
+                        "type": "string",
+                        "nullable": true
                     },
                     "usergroupDefault": {
-                        "type": "string"
+                        "oneOf": [
+                            {
+                                "type": "object",
+                                "required": [
+                                    "id",
+                                    "label"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "label": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "required": [
+                                        "id",
+                                        "label"
+                                    ],
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        },
+                                        "label": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        ]
                     },
                     "usergroupMultipleItems": {
-                        "type": "boolean"
+                        "type": "boolean",
+                        "nullable": true
                     },
                     "usergroupSelectUsers": {
-                        "type": "boolean"
+                        "type": "boolean",
+                        "nullable": true
                     },
                     "usergroupSelectGroups": {
-                        "type": "boolean"
+                        "type": "boolean",
+                        "nullable": true
                     },
                     "showUserStatus": {
-                        "type": "boolean"
+                        "type": "boolean",
+                        "nullable": true
                     }
                 }
             },
@@ -403,7 +473,7 @@
                     "permissionDelete",
                     "permissionManage",
                     "createdAt",
-                    "createdBy"
+                    "lastEditAt"
                 ],
                 "properties": {
                     "id": {
@@ -447,7 +517,7 @@
                     "createdAt": {
                         "type": "string"
                     },
-                    "createdBy": {
+                    "lastEditAt": {
                         "type": "string"
                     }
                 }
@@ -457,6 +527,7 @@
                 "required": [
                     "id",
                     "title",
+                    "description",
                     "emoji",
                     "ownership",
                     "ownerDisplayName",
@@ -479,6 +550,9 @@
                         "format": "int64"
                     },
                     "title": {
+                        "type": "string"
+                    },
+                    "description": {
                         "type": "string"
                     },
                     "emoji": {
@@ -3845,7 +3919,10 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "type": "string"
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object"
+                                        }
                                     }
                                 }
                             }
