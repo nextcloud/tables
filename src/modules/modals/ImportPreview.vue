@@ -213,7 +213,7 @@ export default {
 			for (let i = 0; i < this.previewData.rows.length; i++) {
 				// Limit value length to 30 characters
 				let value = this.previewData.rows[i][colIndex]
-				if (value.length > 20) {
+				if (value && value.length > 20) {
 					value = value.substring(0, 20) + '...'
 				}
 				if (i > 0) {
