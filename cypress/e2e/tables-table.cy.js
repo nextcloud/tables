@@ -32,7 +32,7 @@ describe('Manage a table', () => {
 		cy.contains('button', 'Create row').should('be.visible')
 		cy.contains('h1', 'to do list').should('be.visible')
 		cy.contains('table th', 'Task').should('exist')
-		cy.contains('.paragraph-content', 'to Do List description').should('be.visible')
+		cy.contains('.text-editor__content p', 'to Do List description').should('be.visible')
 	})
 
 	it('Create with import', () => {
@@ -71,7 +71,7 @@ describe('Manage a table', () => {
 
 		cy.wait(10).get('.toastify.toast-success').should('be.visible')
 		cy.get('.app-navigation__list').contains('ToDo list').should('exist')
-		cy.contains('.paragraph-content', 'Updated ToDo List description').should('be.visible')
+		cy.contains('.text-editor__content p', 'Updated ToDo List description').should('be.visible')
 	})
 
 	it('Delete', () => {
