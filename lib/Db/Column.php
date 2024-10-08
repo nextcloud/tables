@@ -211,7 +211,7 @@ class Column extends Entity implements JsonSerializable {
 		$this->setUsergroup($json);
 	}
 
-	public function getSelectionOptionsArray():array {
+	public function getSelectionOptionsArray(): array {
 		$options = $this->getSelectionOptions();
 		if ($options !== '' && $options !== null && $options !== 'null') {
 			return \json_decode($options, true);
