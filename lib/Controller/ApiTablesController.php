@@ -8,16 +8,19 @@
 namespace OCA\Tables\Controller;
 
 use Exception;
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IDBConnection;
 use OCP\IL10N;
@@ -57,12 +60,11 @@ class ApiTablesController extends AOCSController {
 	/**
 	 * [api v2] Returns all Tables
 	 *
-	 * @NoAdminRequired
-	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesTable[], array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
 	 */
+	#[NoAdminRequired]
 	public function index(): DataResponse {
 		try {
 			return new DataResponse($this->service->formatTables($this->service->findAll($this->userId)));
@@ -74,8 +76,6 @@ class ApiTablesController extends AOCSController {
 	/**
 	 * [api v2] Get a table object
 	 *
-	 * @NoAdminRequired
-	 *
 	 * @param int $id Table ID
 	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -83,6 +83,8 @@ class ApiTablesController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
 	public function show(int $id): DataResponse {
 		try {
 			return new DataResponse($this->service->find($id)->jsonSerialize());
@@ -98,8 +100,6 @@ class ApiTablesController extends AOCSController {
 	/**
 	 * [api v2] Get a table Scheme
 	 *
-	 * @NoAdminRequired
-	 *
 	 * @param int $id Table ID
 	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -107,6 +107,8 @@ class ApiTablesController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
 	public function showScheme(int $id): DataResponse {
 		try {
 			return new DataResponse($this->service->getScheme($id)->jsonSerialize());
@@ -120,8 +122,6 @@ class ApiTablesController extends AOCSController {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 *
 	 * creates table from scheme
 	 *
 	 * @param string $title title of new table
@@ -133,6 +133,7 @@ class ApiTablesController extends AOCSController {
 	 *
 	 * 200: Tables returned
 	 */
+	#[NoAdminRequired]
 	public function createFromScheme(string $title, string $emoji, string $description, array $columns, array $views): DataResponse {
 		try {
 			$this->db->beginTransaction();
@@ -191,8 +192,6 @@ class ApiTablesController extends AOCSController {
 	/**
 	 * [api v2] Create a new table and return it
 	 *
-	 * @NoAdminRequired
-	 *
 	 * @param string $title Title of the table
 	 * @param string|null $emoji Emoji for the table
 	 * @param string|null $description Description for the table
@@ -202,6 +201,7 @@ class ApiTablesController extends AOCSController {
 	 *
 	 * 200: Tables returned
 	 */
+	#[NoAdminRequired]
 	public function create(string $title, ?string $emoji, ?string $description, string $template = 'custom'): DataResponse {
 		try {
 			return new DataResponse($this->service->create($title, $template, $emoji, $description)->jsonSerialize());
@@ -212,8 +212,6 @@ class ApiTablesController extends AOCSController {
 
 	/**
 	 * [api v2] Update tables properties
-	 *
-	 * @NoAdminRequired
 	 *
 	 * @param int $id Table ID
 	 * @param string|null $title New table title
@@ -226,6 +224,8 @@ class ApiTablesController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
 	public function update(int $id, ?string $title = null, ?string $emoji = null, ?string $description = null, ?bool $archived = null): DataResponse {
 		try {
 			return new DataResponse($this->service->update($id, $title, $emoji, $description, $archived, $this->userId)->jsonSerialize());
@@ -241,8 +241,6 @@ class ApiTablesController extends AOCSController {
 	/**
 	 * [api v2] Delete a table
 	 *
-	 * @NoAdminRequired
-	 *
 	 * @param int $id Table ID
 	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -250,6 +248,8 @@ class ApiTablesController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'id')]
 	public function destroy(int $id): DataResponse {
 		try {
 			return new DataResponse($this->service->delete($id)->jsonSerialize());
@@ -267,8 +267,6 @@ class ApiTablesController extends AOCSController {
 	 *
 	 * Transfer table from one user to another
 	 *
-	 * @NoAdminRequired
-	 *
 	 * @param int $id Table ID
 	 * @param string $newOwnerUserId New user ID
 	 *
@@ -278,6 +276,7 @@ class ApiTablesController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
 	public function transfer(int $id, string $newOwnerUserId): DataResponse {
 		try {
 			return new DataResponse($this->service->setOwner($id, $newOwnerUserId)->jsonSerialize());
