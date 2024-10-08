@@ -6,7 +6,7 @@
 	<!-- eslint-disable-next-line vue/no-v-html -->
 	<div v-if="value">
 		<div v-for="item in value" :key="item.id" class="inline usergroup-entry">
-			<NcUserBubble :user="item.id" :avatar-image="item.type === 1 ? 'icon-group' : undefined" :is-no-user="item.type !== 0" :display-name="item.displayName ?? item.id" :show-user-status="isUser(item) && column.showUserStatus" :size="column.showUserStatus ? 34 : 20" :primary="isCurrentUser(item)" />
+			<NcUserBubble :user="item.id" :avatar-image="item.type === 1 ? 'icon-group' : ''" :is-no-user="item.type !== 0" :display-name="item.displayName ?? item.id" :show-user-status="isUser(item) && column.showUserStatus" :size="column.showUserStatus ? 34 : 20" :primary="isCurrentUser(item)" />
 		</div>
 	</div>
 </template>

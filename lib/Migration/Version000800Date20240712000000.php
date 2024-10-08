@@ -77,6 +77,12 @@ class Version000800Date20240712000000 extends SimpleMigrationStep {
 					'default' => 0,
 				]);
 			}
+			if (!$table->hasColumn('usergroup_select_teams')) {
+				$table->addColumn('usergroup_select_teams', Types::BOOLEAN, [
+					'notnull' => false,
+					'default' => 0,
+				]);
+			}
 			if (!$table->hasColumn('show_user_status')) {
 				$table->addColumn('show_user_status', Types::BOOLEAN, [
 					'notnull' => false,
