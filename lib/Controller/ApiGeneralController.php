@@ -15,6 +15,7 @@ use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\TableService;
 use OCA\Tables\Service\ViewService;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IL10N;
 use OCP\IRequest;
@@ -46,12 +47,11 @@ class ApiGeneralController extends AOCSController {
 	 *
 	 * Tables and views incl. shares
 	 *
-	 * @NoAdminRequired
-	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesIndex, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Index returned
 	 */
+	#[NoAdminRequired]
 	public function index(): DataResponse {
 		try {
 			$tables = $this->tableService->formatTables($this->tableService->findAll($this->userId));

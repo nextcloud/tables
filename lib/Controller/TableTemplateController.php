@@ -10,6 +10,7 @@ namespace OCA\Tables\Controller;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Service\TableTemplateService;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
@@ -30,9 +31,7 @@ class TableTemplateController extends Controller {
 		$this->service = $service;
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	public function list(): DataResponse {
 		return $this->handleError(function () {
 			return $this->service->getTemplateList();

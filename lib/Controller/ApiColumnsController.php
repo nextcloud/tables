@@ -6,13 +6,16 @@
  */
 namespace OCA\Tables\Controller;
 
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Middleware\Attribute\RequirePermission;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IL10N;
 use OCP\IRequest;
@@ -39,8 +42,6 @@ class ApiColumnsController extends AOCSController {
 	 *
 	 * Return an empty array if no columns were found
 	 *
-	 * @NoAdminRequired
-	 *
 	 * @param int $nodeId Node ID
 	 * @param 'table'|'view' $nodeType Node type
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn[], array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
@@ -49,6 +50,8 @@ class ApiColumnsController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_READ)]
 	public function index(int $nodeId, string $nodeType): DataResponse {
 		try {
 			if($nodeType === 'table') {
@@ -71,8 +74,6 @@ class ApiColumnsController extends AOCSController {
 	/**
 	 * [api v2] Get a column object
 	 *
-	 * @NoAdminRequired
-	 *
 	 * @param int $id Column ID
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -80,6 +81,7 @@ class ApiColumnsController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
 	public function show(int $id): DataResponse {
 		try {
 			return new DataResponse($this->service->find($id)->jsonSerialize());
@@ -96,8 +98,6 @@ class ApiColumnsController extends AOCSController {
 	 * [api v2] Create new numbered column
 	 *
 	 * Specify a subtype to use any special numbered column
-	 *
-	 * @NoAdminRequired
 	 *
 	 * @param int $baseNodeId Context of the column creation
 	 * @param string $title Title
@@ -121,6 +121,8 @@ class ApiColumnsController extends AOCSController {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
 	public function createNumberColumn(int $baseNodeId, string $title, ?float $numberDefault, ?int $numberDecimals, ?string $numberPrefix, ?string $numberSuffix, ?float $numberMin, ?float $numberMax, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
@@ -151,8 +153,6 @@ class ApiColumnsController extends AOCSController {
 	 *
 	 * Specify a subtype to use any special text column
 	 *
-	 * @NoAdminRequired
-	 *
 	 * @param int $baseNodeId Context of the column creation
 	 * @param string $title Title
 	 * @param string|null $textDefault Default
@@ -172,6 +172,8 @@ class ApiColumnsController extends AOCSController {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
 	public function createTextColumn(int $baseNodeId, string $title, ?string $textDefault, ?string $textAllowedPattern, ?int $textMaxLength, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
@@ -199,8 +201,6 @@ class ApiColumnsController extends AOCSController {
 	 *
 	 * Specify a subtype to use any special selection column
 	 *
-	 * @NoAdminRequired
-	 *
 	 * @param int $baseNodeId Context of the column creation
 	 * @param string $title Title
 	 * @param string $selectionOptions Json array{id: int, label: string} with options that can be selected, eg [{"id": 1, "label": "first"},{"id": 2, "label": "second"}]
@@ -219,6 +219,8 @@ class ApiColumnsController extends AOCSController {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
 	public function createSelectionColumn(int $baseNodeId, string $title, string $selectionOptions, ?string $selectionDefault, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
@@ -245,8 +247,6 @@ class ApiColumnsController extends AOCSController {
 	 *
 	 * Specify a subtype to use any special datetime column
 	 *
-	 * @NoAdminRequired
-	 *
 	 * @param int $baseNodeId Context of the column creation
 	 * @param string $title Title
 	 * @param 'today'|'now'|null $datetimeDefault For a subtype 'date' you can set 'today'. For a main type or subtype 'time' you can set to 'now'.
@@ -264,6 +264,8 @@ class ApiColumnsController extends AOCSController {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
 	public function createDatetimeColumn(int $baseNodeId, string $title, ?string $datetimeDefault, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
@@ -287,8 +289,6 @@ class ApiColumnsController extends AOCSController {
 	/**
 	 * [api v2] Create new usergroup column
 	 *
-	 * @NoAdminRequired
-	 *
 	 * @param int $baseNodeId Context of the column creation
 	 * @param string $title Title
 	 * @param string|null $usergroupDefault Json array{id: string, type: int}, eg [{"id": "admin", "type": 0}, {"id": "user1", "type": 0}]
@@ -309,6 +309,8 @@ class ApiColumnsController extends AOCSController {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
+	#[NoAdminRequired]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
 	public function createUsergroupColumn(int $baseNodeId, string $title, ?string $usergroupDefault, bool $usergroupMultipleItems = null, bool $usergroupSelectUsers = null, bool $usergroupSelectGroups = null, bool $showUserStatus = null, string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;

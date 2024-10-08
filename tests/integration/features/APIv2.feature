@@ -45,9 +45,7 @@ Feature: APIv2
     And user "participant1-v2" sees the following table attributes on table "t1"
       | favorite | 0 |
     When user "participant3-v2" adds the table "t1" to favorites
-    Then the last response should have a "403" status code
-
-
+    Then the last response should have a "404" status code
 
   @api2
   Scenario: Basic column actions
