@@ -5,6 +5,21 @@
 
 # Changelog
 
+## 0.8.1
+
+### Fixed
+
+* [fix: check for null in import preview (tables#1410)](https://github.com/nextcloud/tables/pull/1410)
+
+### Dependencies
+
+* [Fix npm audit (tables#1395)](https://github.com/nextcloud/tables/pull/1395)
+
+### Other
+
+* [refactor: Extend Permission Middleware usage and replace deprecated annotations with attributes (tables#1407)](https://github.com/nextcloud/tables/pull/1407)
+* [fix: use unique names for actions upload-artifact (tables#1408)](https://github.com/nextcloud/tables/pull/1408)
+
 ## 0.8.0
 
 ### Added
