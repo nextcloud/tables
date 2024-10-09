@@ -142,6 +142,7 @@ OC.L10N.register(
     "Confirm" : "Patvirtinti",
     "Content" : "Turinys",
     "Select" : "Žymėti",
+    "Now" : "Dabar",
     "ID" : "ID",
     "Clipboard is not available" : "Iškarpinė neprieinama"
 },
