@@ -375,7 +375,7 @@
     "No view in context" : "لا توجد مناظير views ضمن السياق context",
     "From {ownerName}" : "من {ownerName}",
     "API" : "واجهة برمجة التطبيقات \"API\"",
-    "This is your API endpoint for this view" : "هذه هي نقطتك الحدِّيَّة endpoint لـ API لهذا المنظور",
+    "This is your API endpoint for this view" : "هذه هي نقطتك النهائية endpoint لـ API لهذا المنظور",
     "Copy to clipboard" : "نسخ الرابط إلى الحافظة",
     "Your permissions" : "الأذونات الخاصة بك",
     "Read" : "القراءة",
