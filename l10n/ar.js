@@ -32,7 +32,7 @@ OC.L10N.register(
     "ToDo list" : "قائمة مهام",
     "Setup a simple todo-list." : "إعداد قائمة مهام بسيطة.",
     "Members" : "الاعضاء",
-    "List of members with some basic attributes." : "قائمة الأعضاء مع بعض السمات الأساسية.",
+    "List of members with some basic attributes." : "قائمة الأعضاء مع بعض الخصائص الأساسية.",
     "Customers" : "زبائن",
     "Manage your customers." : "أدِرْ زبائنك",
     "Vacation requests" : "طلب إجازة",
