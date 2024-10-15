@@ -117,6 +117,9 @@ class FeatureContext implements Context {
 
 		$newTable = $this->getDataFromResponse($this->response)['ocs']['data'];
 		$this->tableIds[$tableName] = $newTable['id'];
+		$this->collectionManager->register($newTable, 'table', $newTable['id'], $tableName, function () use ($user, $tableName) {
+			$this->deleteTableV2($user, $tableName);
+		});
 
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($newTable['title'], $title);
@@ -2419,5 +2422,129 @@ class FeatureContext implements Context {
 		if (!empty($expected)) {
 			throw new \Exception(sprintf('Some expected columns were not returned: %s ', print_r($expected, true)));
 		}
+	}
+
+	/**
+	 * @When using table :tableAlias
+	 */
+	public function usingTable(string $tableAlias): void {
+		$table = $this->collectionManager->getByAlias('table', $tableAlias);
+		$this->tableId = $table['id'];
+	}
+
+	/**
+	 * @Given user :user creates row :rowAlias with following values:
+	 */
+	public function userCreatesRowWithFollowingValues(string $user, string $rowAlias, TableNode $properties): void {
+		$this->setCurrentUser($user);
+
+		$props = [];
+		foreach ($properties->getRows() as $row) {
+			$columnId = $this->tableColumns[$row[0]];
+			$props[$columnId] = $row[1];
+		}
+
+		$this->sendOcsRequest(
+			'POST',
+			'/apps/tables/api/2/tables/' . $this->tableId . '/rows',
+			['data' => $props]
+		);
+
+		$newRow = $this->getDataFromResponse($this->response)['ocs']['data'];
+		if ($this->response->getStatusCode() === 200) {
+			$this->collectionManager->register($newRow, 'row', $newRow['id'], $rowAlias);
+		}
+	}
+
+	/**
+	 * @When user :user updates row :rowAlias with following values:
+	 */
+	public function userUpdatesRowWithFollowingValues(string $user, string $rowAlias, TableNode $properties): void {
+		$this->setCurrentUser($user);
+
+		$props = [];
+		foreach ($properties->getRows() as $row) {
+			$columnId = $this->tableColumns[$row[0]];
+			$props[$columnId] = $row[1];
+		}
+
+		$row = $this->collectionManager->getByAlias('row', $rowAlias);
+		$this->sendRequest(
+			'PUT',
+			'/apps/tables/api/1/rows/' . $row['id'],
+			['data' => $props]
+		);
+
+		if ($this->response->getStatusCode() === 200) {
+			$row = $this->getDataFromResponse($this->response);
+			$this->collectionManager->update($row, 'row', $row['id']);
+		}
+	}
+
+	/**
+	 * @When user :user deletes row :rowAlias
+	 */
+	public function userDeletesRow(string $user, string $rowAlias): void {
+		$this->setCurrentUser($user);
+
+		$row = $this->collectionManager->getByAlias('row', $rowAlias);
+		$this->sendRequest(
+			'DELETE',
+			'/apps/tables/api/1/rows/' . $row['id'],
+		);
+
+		$row = $this->getDataFromResponse($this->response);
+		if ($this->response->getStatusCode() === 200) {
+			$this->collectionManager->forget('row', $row['id']);
+		}
+	}
+
+	/**
+	 * @When the user :user fetches table :tableAlias, it has exactly these rows :rowAliasList
+	 */
+	public function tableHasExactlyThoseRows(string $user, string $tableAlias, string $rowAliasList): void {
+		$table = $this->collectionManager->getByAlias('table', $tableAlias);
+
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/tables/' . $table['id'] . '/rows',
+		);
+
+		$allRows = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		$rowAliases = explode(',', $rowAliasList);
+		$expectedIds = array_map(function ($rowAlias): int {
+			$row = $this->collectionManager->getByAlias('row', $rowAlias);
+			return $row['id'];
+		}, $rowAliases);
+		sort($expectedIds);
+
+		$actualRowIds = array_map(function (array $actualRow): int {
+			if ($this->collectionManager->getById('row', (int)$actualRow['id'])) {
+				$this->collectionManager->update($actualRow, 'row', (int)$actualRow['id']);
+			} else {
+				$this->collectionManager->register($actualRow, 'row', (int)$actualRow['id']);
+			}
+			return (int)$actualRow['id'];
+		}, $allRows);
+		sort($actualRowIds);
+
+		Assert::assertSame($expectedIds, $actualRowIds);
+	}
+
+	/**
+	 * @When the column :columnName of row :rowAlias has the value :value
+	 */
+	public function columnOfRowIs(string $columnName, string $rowAlias, string $value): void {
+		$row = $this->collectionManager->getByAlias('row', $rowAlias);
+		$column = $this->collectionManager->getByAlias('column', $columnName);
+
+		$expected = [
+			'columnId' => $column['id'],
+			'value' => $value,
+		];
+
+		Assert::assertContains($expected, $row['data']);
 	}
 }
