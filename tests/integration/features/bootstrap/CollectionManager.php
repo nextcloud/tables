@@ -44,7 +44,8 @@ class CollectionManager {
 		if ($alias) {
 			unset($this->mapByAlias[$this->makeKey($type, $alias)]);
 		}
-		unset($this->itemsById[$this->makeKey($type, $id)]);
+		$idKey = $this->makeKey($type, $id);
+		unset($this->cleanUp[$idKey], $this->itemsById[$idKey]);
 	}
 
 	public function cleanUp(): void {
