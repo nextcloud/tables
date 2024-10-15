@@ -2464,8 +2464,8 @@ class FeatureContext implements Context {
 			['data' => $props]
 		);
 
-		$newRow = $this->getDataFromResponse($this->response)['ocs']['data'];
 		if ($this->response->getStatusCode() === 200) {
+			$newRow = $this->getDataFromResponse($this->response)['ocs']['data'];
 			$this->collectionManager->register($newRow, 'row', $newRow['id'], $rowAlias);
 		}
 	}

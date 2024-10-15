@@ -1275,3 +1275,45 @@ Feature: APIv2
     Then the reported status is "403"
     And the user "participant1-v2" fetches view "v1", it has exactly these rows "r-not-updatable,r-not-deletable"
     And the column "statement" of row "r-not-updatable" has the value "testing not updated"
+
+  @api2 @contexts @contexts-content
+  Scenario: Ensure elements cannot be modified in an unavailable table or view, otherwise shared through a context
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And column "statement" exists with following properties
+      | type          | text                |
+      | subtype       | line                |
+      | mandatory     | 1                   |
+      | description   | State your business |
+    And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
+    And user "participant1-v2" sets columns "statement" to view "v1"
+    And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
+      | alias | type  | permissions               |
+      | t1    | table | read,create,update,delete |
+      | v1    | view  | read,create,update,delete |
+    And user "participant1-v2" shares the Context "c1" to "user" "participant2-v2"
+    And using table "t1"
+    And user "participant1-v2" creates row "r-not-updatable" with following values:
+      | statement     | testing not updated |
+    And user "participant1-v2" creates row "r-not-deletable" with following values:
+      | statement     | testing delete |
+    When user "participant3-v2" creates row "r-not-inserted" with following values:
+      | statement     | testing insert |
+    Then the reported status is "404"
+    When user "participant3-v2" updates row "r-not-updatable" with following values:
+      | statement     | update accomplished |
+    Then the reported status is "404"
+    When user "participant3-v2" deletes row "r-not-deletable"
+    Then the reported status is "404"
+    And the user "participant1-v2" fetches table "t1", it has exactly these rows "r-not-updatable,r-not-deletable"
+    And the column "statement" of row "r-not-updatable" has the value "testing not updated"
+    And using view "v1"
+    When user "participant3-v2" creates row "r-not-inserted" with following values:
+      | statement     | testing insert |
+    Then the reported status is "404"
+    When user "participant3-v2" updates row "r-not-updatable" with following values:
+      | statement     | update accomplished |
+    Then the reported status is "404"
+    When user "participant3-v2" deletes row "r-not-deletable"
+    Then the reported status is "404"
+    And the user "participant1-v2" fetches table "t1", it has exactly these rows "r-not-updatable,r-not-deletable"
+    And the column "statement" of row "r-not-updatable" has the value "testing not updated"
