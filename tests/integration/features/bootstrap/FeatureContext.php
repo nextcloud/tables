@@ -2508,7 +2508,7 @@ class FeatureContext implements Context {
 		$row = $this->collectionManager->getByAlias('row', $rowAlias);
 
 		if ($this->activeNode['type'] === 'view') {
-			$endpoint = sprintf('/apps/tables/api/1/views/%s/rows/%s',$this->activeNode['id'], $row['id']);
+			$endpoint = sprintf('/apps/tables/api/1/views/%s/rows/%s', $this->activeNode['id'], $row['id']);
 		} else {
 			$endpoint = sprintf('/apps/tables/api/1/rows/%s', $row['id']);
 		}
