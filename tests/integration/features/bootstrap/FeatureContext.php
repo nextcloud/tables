@@ -318,6 +318,9 @@ class FeatureContext implements Context {
 
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($updatedTable['ownership'], $newUser);
+		$this->collectionManager->update($updatedTable, 'table', $updatedTable['id'], function () use ($newUser, $tableName): void {
+			$this->deleteTableV2($newUser, $tableName);
+		});
 	}
 
 	/**
@@ -367,6 +370,9 @@ class FeatureContext implements Context {
 		Assert::assertEquals(404, $this->response->getStatusCode());
 
 		unset($this->tableIds[$tableName]);
+		if ($table = $this->collectionManager->getByAlias('table', $tableName)) {
+			$this->collectionManager->forget('table', $table['id']);
+		}
 	}
 
 	/**
@@ -914,6 +920,10 @@ class FeatureContext implements Context {
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($deletedTable['title'], $table['title']);
 		Assert::assertEquals($deletedTable['id'], $table['id']);
+
+		if ($tableItem = $this->collectionManager->getById('table', $table['id'])) {
+			$this->collectionManager->forget('table', $tableItem['id']);
+		}
 
 		$this->sendRequest(
 			'GET',
