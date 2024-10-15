@@ -49,6 +49,7 @@ class FeatureContext implements Context {
 	private ?int $rowId = null;
 	private ?array $tableColumns = [];
 	private ?array $importResult = null;
+	private ?array $activeNode = null;
 
 	// we need some ids to reuse it in some contexts,
 	// but we can not return them and reuse it in the scenarios,
@@ -81,6 +82,7 @@ class FeatureContext implements Context {
 	public function setUp() {
 		$this->createdUsers = [];
 		$this->createdGroups = [];
+		$this->activeNode = null;
 	}
 
 	/**
@@ -2425,11 +2427,19 @@ class FeatureContext implements Context {
 	}
 
 	/**
-	 * @When using table :tableAlias
+	 * @When using :nodeType :alias
 	 */
-	public function usingTable(string $tableAlias): void {
-		$table = $this->collectionManager->getByAlias('table', $tableAlias);
-		$this->tableId = $table['id'];
+	public function using(string $nodeType, string $alias): void {
+		$node = $this->collectionManager->getByAlias($nodeType, $alias);
+		$this->activeNode = [
+			'type' => $nodeType,
+			'alias' => $alias,
+			'id' => $node['id'],
+		];
+		if ($nodeType === 'table') {
+			//FIXME: remove $this->tableId everywhere
+			$this->tableId = $node['id'];
+		}
 	}
 
 	/**
@@ -2444,9 +2454,13 @@ class FeatureContext implements Context {
 			$props[$columnId] = $row[1];
 		}
 
+		if (!$this->activeNode) {
+			throw new \LogicException('Set an active node via "@And using table|view nodeAlias"');
+		}
+
 		$this->sendOcsRequest(
 			'POST',
-			'/apps/tables/api/2/tables/' . $this->tableId . '/rows',
+			sprintf('/apps/tables/api/2/%ss/%s/rows', $this->activeNode['type'], $this->activeNode['id']),
 			['data' => $props]
 		);
 
@@ -2469,10 +2483,14 @@ class FeatureContext implements Context {
 		}
 
 		$row = $this->collectionManager->getByAlias('row', $rowAlias);
+		$payload = ['data' => $props];
+		if ($this->activeNode['type'] === 'view') {
+			$payload['viewId'] = $this->activeNode['id'];
+		}
 		$this->sendRequest(
 			'PUT',
 			'/apps/tables/api/1/rows/' . $row['id'],
-			['data' => $props]
+			$payload,
 		);
 
 		if ($this->response->getStatusCode() === 200) {
@@ -2488,10 +2506,14 @@ class FeatureContext implements Context {
 		$this->setCurrentUser($user);
 
 		$row = $this->collectionManager->getByAlias('row', $rowAlias);
-		$this->sendRequest(
-			'DELETE',
-			'/apps/tables/api/1/rows/' . $row['id'],
-		);
+
+		if ($this->activeNode['type'] === 'view') {
+			$endpoint = sprintf('/apps/tables/api/1/views/%s/rows/%s',$this->activeNode['id'], $row['id']);
+		} else {
+			$endpoint = sprintf('/apps/tables/api/1/rows/%s', $row['id']);
+		}
+
+		$this->sendRequest('DELETE', $endpoint);
 
 		$row = $this->getDataFromResponse($this->response);
 		if ($this->response->getStatusCode() === 200) {
@@ -2500,14 +2522,15 @@ class FeatureContext implements Context {
 	}
 
 	/**
-	 * @When the user :user fetches table :tableAlias, it has exactly these rows :rowAliasList
+	 * @When the user :user fetches :nodeType :nodeAlias, it has exactly these rows :rowAliasList
 	 */
-	public function tableHasExactlyThoseRows(string $user, string $tableAlias, string $rowAliasList): void {
-		$table = $this->collectionManager->getByAlias('table', $tableAlias);
+	public function nodeHasExactlyThoseRows(string $user, string $nodeType, string $nodeAlias, string $rowAliasList): void {
+		$this->setCurrentUser($user);
+		$nodeItem = $this->collectionManager->getByAlias($nodeType, $nodeAlias);
 
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/tables/' . $table['id'] . '/rows',
+			sprintf('/apps/tables/api/1/%ss/%s/rows', $nodeType, $nodeItem['id']),
 		);
 
 		$allRows = $this->getDataFromResponse($this->response);
