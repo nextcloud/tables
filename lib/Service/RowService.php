@@ -460,7 +460,7 @@ class RowService extends SuperService {
 			if (!$this->permissionsService->canDeleteRowsByViewId($viewId)) {
 				$e = new \Exception('Update row is not allowed.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+				throw new PermissionError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 			}
 			try {
 				$view = $this->viewMapper->find($viewId);
