@@ -365,6 +365,11 @@ class RowService extends SuperService {
 
 		if ($viewId) {
 			// security
+			if (!$this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)) {
+				$e = new \Exception('Row not found.');
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			}
 			if (!$this->permissionsService->canUpdateRowsByViewId($viewId)) {
 				$e = new \Exception('Update row is not allowed.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
@@ -400,6 +405,11 @@ class RowService extends SuperService {
 			$tableId = $item->getTableId();
 
 			// security
+			if (!$this->permissionsService->canReadRowsByElementId($item->getTableId(), 'table', $userId)) {
+				$e = new \Exception('Row not found.');
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			}
 			if (!$this->permissionsService->canUpdateRowsByTableId($tableId)) {
 				$e = new \Exception('Update row is not allowed.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
@@ -457,6 +467,11 @@ class RowService extends SuperService {
 
 		if ($viewId) {
 			// security
+			if (!$this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)) {
+				$e = new \Exception('Row not found.');
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			}
 			if (!$this->permissionsService->canDeleteRowsByViewId($viewId)) {
 				$e = new \Exception('Update row is not allowed.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
@@ -475,6 +490,11 @@ class RowService extends SuperService {
 			}
 		} else {
 			// security
+			if (!$this->permissionsService->canReadRowsByElementId($item->getTableId(), 'table', $userId)) {
+				$e = new \Exception('Row not found.');
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			}
 			if (!$this->permissionsService->canDeleteRowsByTableId($item->getTableId())) {
 				$e = new \Exception('Update row is not allowed.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
