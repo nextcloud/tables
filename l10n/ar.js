@@ -171,7 +171,7 @@ OC.L10N.register(
     "Actions" : "الإجراءات",
     "Edit view" : "منظور التحرير",
     "Share" : "مشاركة",
-    "Integration" : "مُكاملة",
+    "Integration" : "التكامل ",
     "Delete view" : "منظور الحذف",
     "Total" : "المجموع",
     "Updated table \"{emoji}{table}\"." : "تمّ تحديث الجدول \"{emoji}{table}\".",
