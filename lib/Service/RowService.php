@@ -344,6 +344,7 @@ class RowService extends SuperService {
 	 *
 	 * @throws InternalError
 	 * @throws NotFoundError
+	 * @throws PermissionError
 	 * @noinspection DuplicatedCode
 	 */
 	public function updateSet(
@@ -364,10 +365,15 @@ class RowService extends SuperService {
 
 		if ($viewId) {
 			// security
+			if (!$this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)) {
+				$e = new \Exception('Row not found.');
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			}
 			if (!$this->permissionsService->canUpdateRowsByViewId($viewId)) {
 				$e = new \Exception('Update row is not allowed.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+				throw new PermissionError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 			}
 
 			try {
@@ -399,10 +405,15 @@ class RowService extends SuperService {
 			$tableId = $item->getTableId();
 
 			// security
+			if (!$this->permissionsService->canReadRowsByElementId($item->getTableId(), 'table', $userId)) {
+				$e = new \Exception('Row not found.');
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			}
 			if (!$this->permissionsService->canUpdateRowsByTableId($tableId)) {
 				$e = new \Exception('Update row is not allowed.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+				throw new PermissionError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 			}
 			try {
 				$columns = $this->columnMapper->findAllByTable($tableId);
@@ -456,10 +467,15 @@ class RowService extends SuperService {
 
 		if ($viewId) {
 			// security
+			if (!$this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)) {
+				$e = new \Exception('Row not found.');
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			}
 			if (!$this->permissionsService->canDeleteRowsByViewId($viewId)) {
 				$e = new \Exception('Update row is not allowed.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+				throw new PermissionError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 			}
 			try {
 				$view = $this->viewMapper->find($viewId);
@@ -474,6 +490,11 @@ class RowService extends SuperService {
 			}
 		} else {
 			// security
+			if (!$this->permissionsService->canReadRowsByElementId($item->getTableId(), 'table', $userId)) {
+				$e = new \Exception('Row not found.');
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			}
 			if (!$this->permissionsService->canDeleteRowsByTableId($item->getTableId())) {
 				$e = new \Exception('Update row is not allowed.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
