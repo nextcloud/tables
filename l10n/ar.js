@@ -435,7 +435,7 @@ OC.L10N.register(
     "Set now as default" : "تعيين الآن كافتراضي",
     "Enter a column title" : "أدخِل عنوان العمود",
     "Mandatory" : "إلزامي",
-    "Add column to other views" : "أضِف العمود إلى المناظير",
+    "Add column to other views" : "إضافة عمود إلى طرق العرض الأخرى",
     "Default value" : "القيمة الافتراضية",
     "Decimals" : "الكسور العشرية",
     "Minimum" : "الحد الأدنى",
