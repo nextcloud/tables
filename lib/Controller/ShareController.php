@@ -73,7 +73,7 @@ class ShareController extends Controller {
 		bool $permissionUpdate = false,
 		bool $permissionDelete = false,
 		bool $permissionManage = false,
-		int $displayMode = 0,
+		int $displayMode = Application::NAV_ENTRY_MODE_ALL,
 	): DataResponse {
 		return $this->handleError(function () use ($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage, $displayMode) {
 			return $this->service->create($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage, $displayMode);
