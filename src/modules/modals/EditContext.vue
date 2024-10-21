@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal" size="normal" @close="actionCancel">
+	<NcModal v-if="showModal" :name="t('tables', 'Edit application')" size="normal" @close="actionCancel">
 		<div class="modal__content" data-cy="editContextModal">
 			<div class="row">
 				<div class="col-4">
@@ -62,7 +62,7 @@
 import { NcModal, NcButton, NcIconSvgWrapper } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import { getCurrentUser } from '@nextcloud/auth'
-import '@nextcloud/dialogs/dist/index.css'
+import '@nextcloud/dialogs/style.css'
 import { mapGetters, mapState } from 'vuex'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
 import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'

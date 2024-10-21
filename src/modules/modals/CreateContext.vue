@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal" size="normal" @close="actionCancel">
+	<NcModal v-if="showModal" :name="t('tables', 'Create application')" size="normal" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
@@ -53,7 +53,7 @@
 <script>
 import { NcModal, NcButton, NcIconSvgWrapper } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
-import '@nextcloud/dialogs/dist/index.css'
+import '@nextcloud/dialogs/style.css'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
 import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'
 import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'

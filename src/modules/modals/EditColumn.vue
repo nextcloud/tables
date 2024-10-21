@@ -1,5 +1,5 @@
 <template>
-	<NcModal size="large" @close="actionCancel">
+	<NcModal :name="t('tables', 'Edit column')" size="large" @close="actionCancel">
 		<div class="modal__content">
 			<div v-if="loading" class="icon-loading" />
 
@@ -48,7 +48,7 @@
 <script>
 import { NcModal, NcActions, NcActionButton, NcButton, NcUserBubble } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
-import '@nextcloud/dialogs/dist/index.css'
+import '@nextcloud/dialogs/style.css'
 import ColumnInfoPopover from '../main/partials/ColumnInfoPopover.vue'
 import NumberForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/NumberForm.vue'
 import NumberStarsForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/NumberStarsForm.vue'

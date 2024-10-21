@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal" data-cy="editRowModal" @close="actionCancel">
+	<NcModal v-if="showModal" :name="t('tables', 'Edit row')" data-cy="editRowModal" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
@@ -48,7 +48,7 @@
 <script>
 import { NcModal, NcButton, NcNoteCard } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
-import '@nextcloud/dialogs/dist/index.css'
+import '@nextcloud/dialogs/style.css'
 import ColumnFormComponent from '../main/partials/ColumnFormComponent.vue'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 

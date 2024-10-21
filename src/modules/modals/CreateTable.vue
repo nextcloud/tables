@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal" size="normal"
+	<NcModal v-if="showModal" :name="t('tables', 'Create table')" size="normal"
 		data-cy="createTableModal" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
@@ -68,7 +68,7 @@
 <script>
 import { NcModal, NcEmojiPicker, NcButton } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
-import '@nextcloud/dialogs/dist/index.css'
+import '@nextcloud/dialogs/style.css'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import NcTile from '../../shared/components/ncTile/NcTile.vue'

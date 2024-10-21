@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal" size="large" @close="actionCancel">
+	<NcModal v-if="showModal" :name="t('tables', 'Create column')" size="large" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
@@ -103,7 +103,7 @@ import { NcModal, NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import SelectionForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionForm.vue'
 import SelectionMultiForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/SelectionMultiForm.vue'
 import { showError, showInfo, showSuccess, showWarning } from '@nextcloud/dialogs'
-import '@nextcloud/dialogs/dist/index.css'
+import '@nextcloud/dialogs/style.css'
 import ColumnTypeSelection from '../main/partials/ColumnTypeSelection.vue'
 import TextRichForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextRichForm.vue'
 import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandler.js'

@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="!importResults">
+	<NcModal v-if="!importResults" :name="t('tables', 'Import file into Tables')">
 		<div class="modal__content">
 			<h2>{{ t('tables', 'Import file into Tables') }}</h2>
 

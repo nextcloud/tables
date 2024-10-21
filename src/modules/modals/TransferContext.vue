@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal"
+	<NcModal v-if="showModal" :name="t('tables', 'Transfer application')"
 		size="normal"
 		@close="actionCancel">
 		<div class="modal__content" data-cy="transferContextModal">
@@ -26,7 +26,7 @@
 <script>
 import { NcModal, NcButton } from '@nextcloud/vue'
 import { showSuccess } from '@nextcloud/dialogs'
-import '@nextcloud/dialogs/dist/index.css'
+import '@nextcloud/dialogs/style.css'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import NcUserAndGroupPicker from '../../shared/components/ncUserAndGroupPicker/NcUserAndGroupPicker.vue'
 import { mapGetters, mapState } from 'vuex'
