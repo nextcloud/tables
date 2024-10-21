@@ -99,6 +99,7 @@
                     "usergroupMultipleItems",
                     "usergroupSelectUsers",
                     "usergroupSelectGroups",
+                    "usergroupSelectTeams",
                     "showUserStatus"
                 ],
                 "properties": {
@@ -192,6 +193,9 @@
                         "type": "boolean"
                     },
                     "usergroupSelectGroups": {
+                        "type": "boolean"
+                    },
+                    "usergroupSelectTeams": {
                         "type": "boolean"
                     },
                     "showUserStatus": {
@@ -3002,6 +3006,11 @@
                                         "nullable": true,
                                         "description": "Can select groups, if column type is usergroup"
                                     },
+                                    "usergroupSelectTeams": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "description": "Can select teams, if column type is usergroup"
+                                    },
                                     "usergroupShowUserStatus": {
                                         "type": "boolean",
                                         "nullable": true,
@@ -3351,6 +3360,11 @@
                                         "nullable": true,
                                         "description": "Can select groups, if column type is usergroup"
                                     },
+                                    "usergroupSelectTeams": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "description": "Can select teams, if column type is usergroup"
+                                    },
                                     "usergroupShowUserStatus": {
                                         "type": "boolean",
                                         "nullable": true,
@@ -3564,6 +3578,11 @@
                                         "type": "boolean",
                                         "nullable": true,
                                         "description": "Can select groups, if column type is usergroup"
+                                    },
+                                    "usergroupSelectTeams": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "description": "Can select teams, if column type is usergroup"
                                     },
                                     "usergroupShowUserStatus": {
                                         "type": "boolean",
