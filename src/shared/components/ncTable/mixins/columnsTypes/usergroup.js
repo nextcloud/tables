@@ -14,6 +14,7 @@ export default class UsergroupColumn extends AbstractUsergroupColumn {
 		this.usergroupMultipleItems = data.usergroupMultipleItems
 		this.usergroupSelectUsers = data.usergroupSelectUsers
 		this.usergroupSelectGroups = data.usergroupSelectGroups
+		this.usergroupSelectTeams = data.usergroupSelectTeams
 	}
 
 	getValueString(valueObject) {

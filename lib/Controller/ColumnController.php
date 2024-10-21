@@ -96,6 +96,7 @@ class ColumnController extends Controller {
 		?bool $usergroupMultipleItems,
 		?bool $usergroupSelectUsers,
 		?bool $usergroupSelectGroups,
+		?bool $usergroupSelectTeams,
 		?bool $showUserStatus,
 
 		?array $selectedViewIds
@@ -129,6 +130,7 @@ class ColumnController extends Controller {
 			$usergroupMultipleItems,
 			$usergroupSelectUsers,
 			$usergroupSelectGroups,
+			$usergroupSelectTeams,
 			$showUserStatus,
 
 			$selectedViewIds) {
@@ -195,6 +197,7 @@ class ColumnController extends Controller {
 		?bool $usergroupMultipleItems,
 		?bool $usergroupSelectUsers,
 		?bool $usergroupSelectGroups,
+		?bool $usergroupSelectTeams,
 		?bool $showUserStatus
 	): DataResponse {
 		return $this->handleError(function () use (
@@ -226,6 +229,7 @@ class ColumnController extends Controller {
 			$usergroupMultipleItems,
 			$usergroupSelectUsers,
 			$usergroupSelectGroups,
+			$usergroupSelectTeams,
 			$showUserStatus
 		) {
 			return $this->service->update(
