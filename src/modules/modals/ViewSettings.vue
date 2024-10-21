@@ -64,7 +64,7 @@
 <script>
 import { NcAppSettingsDialog, NcAppSettingsSection, NcEmojiPicker, NcButton } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
-import '@nextcloud/dialogs/dist/index.css'
+import '@nextcloud/dialogs/style.css'
 import FilterForm from '../main/partials/editViewPartials/filter/FilterForm.vue'
 import SortForm from '../main/partials/editViewPartials/sort/SortForm.vue'
 import SelectedViewColumns from '../main/partials/editViewPartials/SelectedViewColumns.vue'
