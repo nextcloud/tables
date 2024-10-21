@@ -315,11 +315,11 @@ export default {
 		},
 		pickFile() {
 			const filePicker = getFilePickerBuilder(t('tables', 'Select file for the import'))
-			.setMultiSelect(false)
-			.setMimeTypeFilter(this.mimeTypes)
-			.setType(FilePickerType.Choose)
-			.allowDirectories(false)
-			.build()
+				.setMultiSelect(false)
+				.setMimeTypeFilter(this.mimeTypes)
+				.setType(FilePickerType.Choose)
+				.allowDirectories(false)
+				.build()
 
 			filePicker.pick().then((file) => {
 				const client = OC.Files.getClient()
