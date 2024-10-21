@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal" data-cy="createRowModal" @close="actionCancel">
+	<NcModal :name="t('tables', 'Create row')" v-if="showModal" data-cy="createRowModal" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">

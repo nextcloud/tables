@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal" @close="$emit('cancel')">
+	<NcModal v-if="showModal" :name="t('tables', 'Confirm')" @close="$emit('cancel')">
 		<div class="modal__content">
 			<div class="row">
 				<div v-if="title" class="col-4">

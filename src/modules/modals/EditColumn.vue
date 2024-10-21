@@ -1,5 +1,5 @@
 <template>
-	<NcModal size="large" @close="actionCancel">
+	<NcModal :name="t('tables', 'Edit column')" size="large" @close="actionCancel">
 		<div class="modal__content">
 			<div v-if="loading" class="icon-loading" />
 

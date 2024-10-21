@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal"
+	<NcModal v-if="showModal" :name="t('tables', 'Edit table')"
 		size="normal"
 		@close="actionCancel">
 		<div class="modal__content" data-cy="editTableModal">
@@ -75,7 +75,7 @@
 <script>
 import { NcModal, NcEmojiPicker, NcButton, NcUserBubble } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
-import '@nextcloud/dialogs/dist/index.css'
+import '@nextcloud/dialogs/style.css'
 import { mapGetters } from 'vuex'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import { emit } from '@nextcloud/event-bus'

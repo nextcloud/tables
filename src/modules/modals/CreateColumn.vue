@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal" size="large" @close="actionCancel">
+	<NcModal v-if="showModal" :name="t('tables', 'Create column')" size="large" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">

@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal" size="normal" @close="actionCancel">
+	<NcModal v-if="showModal" :name="t('tables', 'Import table')" size="normal" @close="actionCancel">
 		<div class="modal__content">
 			<div class="row">
 				<div class="col-4">
@@ -96,7 +96,7 @@
 
 <script>
 import { NcModal, NcButton, NcCheckboxRadioSwitch, NcEmptyContent, NcLoadingIcon } from '@nextcloud/vue'
-import { FilePicker, FilePickerType, showError, showWarning } from '@nextcloud/dialogs'
+import { FilePickerType, showError, showWarning, getFilePickerBuilder } from '@nextcloud/dialogs'
 import RowFormWrapper from '../../shared/components/ncTable/partials/rowTypePartials/RowFormWrapper.vue'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import IconFolder from 'vue-material-design-icons/Folder.vue'
@@ -314,15 +314,12 @@ export default {
 			this.loading = false
 		},
 		pickFile() {
-			const filePicker = new FilePicker(
-				t('text', 'Select file for the import'),
-				false, // multiselect
-				this.mimeTypes, // mime filter
-				true, // modal
-				FilePickerType.Choose, // type
-				false, // directories
-				this.path, // path
-			)
+			const filePicker = getFilePickerBuilder(t('tables', 'Select file for the import'))
+			.setMultiSelect(false)
+			.setMimeTypeFilter(this.mimeTypes)
+			.setType(FilePickerType.Choose)
+			.allowDirectories(false)
+			.build()
 
 			filePicker.pick().then((file) => {
 				const client = OC.Files.getClient()

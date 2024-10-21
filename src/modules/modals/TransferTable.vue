@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="showModal"
+	<NcModal v-if="showModal" :name="t('tables', 'Transfer table')"
 		size="normal"
 		@close="actionCancel">
 		<div class="modal__content" data-cy="transferTableModal">

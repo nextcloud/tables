@@ -11,7 +11,7 @@
 					<Fullscreen :size="20" />
 				</template>
 			</NcButton>
-			<NcModal v-if="showBigEditorModal" :close-button-contained="false" size="full" :title="column.title" @close="showBigEditorModal = false">
+			<NcModal v-if="showBigEditorModal" :name="t('tables', 'Text editor')" :close-button-contained="false" size="full" :title="column.title" @close="showBigEditorModal = false">
 				<div class="row">
 					<div class="fix-col-4">
 						<NcEditor :text.sync="localValue" :show-border="false" />
