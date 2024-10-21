@@ -146,6 +146,7 @@ OC.L10N.register(
     "Error" : "Errore",
     "Download" : "Scarica",
     "Search" : "Cerca",
+    "Back" : "Indietro",
     "Sorting" : "Ordina",
     "Bold" : "Grassetto",
     "Italic" : "Corsivo",
