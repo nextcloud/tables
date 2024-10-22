@@ -49,6 +49,7 @@ OC.L10N.register(
     "Users and groups" : "Naudotojai ir grupės",
     "Move" : "Perkelti",
     "Metadata" : "Metaduomenys",
+    "Delete filter" : "Ištrinti filtrą",
     "Views" : "Rodiniai",
     "View" : "Rodyti",
     "Shares" : "Viešiniai",
@@ -142,6 +143,7 @@ OC.L10N.register(
     "Confirm" : "Patvirtinti",
     "Content" : "Turinys",
     "Select" : "Žymėti",
+    "Now" : "Dabar",
     "ID" : "ID",
     "Clipboard is not available" : "Iškarpinė neprieinama"
 },

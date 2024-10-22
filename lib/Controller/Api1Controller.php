@@ -30,6 +30,9 @@ use OCP\AppFramework\ApiController;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\CORS;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IL10N;
 use OCP\IRequest;
@@ -96,14 +99,13 @@ class Api1Controller extends ApiController {
 	/**
 	 * Returns all Tables
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesTable[], array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function index(): DataResponse {
 		try {
 			return new DataResponse($this->tableService->formatTables($this->tableService->findAll($this->userId)));
@@ -117,10 +119,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Create a new table and return it
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param string $title Title of the table
 	 * @param string|null $emoji Emoji for the table
 	 * @param string $template Template to use if wanted
@@ -129,6 +127,9 @@ class Api1Controller extends ApiController {
 	 *
 	 * 200: Tables returned
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function createTable(string $title, ?string $emoji, string $template = 'custom'): DataResponse {
 		try {
 			return new DataResponse($this->tableService->create($title, $template, $emoji)->jsonSerialize());
@@ -142,10 +143,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * returns table scheme
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $tableId Table ID
 	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{'Content-Disposition'?:string,'Content-Type'?:string}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -153,6 +150,10 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function showScheme(int $tableId): DataResponse {
 		try {
 			$scheme = $this->tableService->getScheme($tableId);
@@ -175,10 +176,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Get a table object
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $tableId Table ID
 	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -186,6 +183,10 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function getTable(int $tableId): DataResponse {
 		try {
 			return new DataResponse($this->tableService->find($tableId)->jsonSerialize());
@@ -207,10 +208,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Update tables properties
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $tableId Table ID
 	 * @param string|null $title New table title
 	 * @param string|null $emoji New table emoji
@@ -221,6 +218,10 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function updateTable(int $tableId, ?string $title = null, ?string $emoji = null, ?bool $archived = false): DataResponse {
 		try {
 			return new DataResponse($this->tableService->update($tableId, $title, $emoji, null, $archived, $this->userId)->jsonSerialize());
@@ -242,10 +243,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Delete a table
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $tableId Table ID
 	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -253,6 +250,10 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function deleteTable(int $tableId): DataResponse {
 		try {
 			return new DataResponse($this->tableService->delete($tableId)->jsonSerialize());
@@ -276,10 +277,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Get all views for a table
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $tableId Table ID
 	 * @return DataResponse<Http::STATUS_OK, TablesView[], array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -287,6 +284,10 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function indexViews(int $tableId): DataResponse {
 		try {
 			return new DataResponse($this->viewService->formatViews($this->viewService->findAll($this->tableService->find($tableId))));
@@ -308,10 +309,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Create a new view for a table
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $tableId Table ID that will hold the view
 	 * @param string $title Title for the view
 	 * @param string|null $emoji Emoji for the view
@@ -322,6 +319,10 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function createView(int $tableId, string $title, ?string $emoji): DataResponse {
 		try {
 			return new DataResponse($this->viewService->create($title, $emoji, $this->tableService->find($tableId))->jsonSerialize());
@@ -339,10 +340,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Get a view object
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $viewId View ID
 	 * @return DataResponse<Http::STATUS_OK, TablesView, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -350,6 +347,10 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function getView(int $viewId): DataResponse {
 		try {
 			return new DataResponse($this->viewService->find($viewId)->jsonSerialize());
@@ -371,10 +372,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Update a view via key-value sets
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $viewId View ID
 	 * @param array{key: 'title'|'emoji'|'description', value: string}|array{key: 'columns', value: int[]}|array{key: 'sort', value: array{columnId: int, mode: 'ASC'|'DESC'}}|array{key: 'filter', value: array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}} $data key-value pairs
 	 * @return DataResponse<Http::STATUS_OK, TablesView, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
@@ -384,6 +381,10 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function updateView(int $viewId, array $data): DataResponse {
 		try {
 			return new DataResponse($this->viewService->update($viewId, $data)->jsonSerialize());
@@ -405,10 +406,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Delete a view
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $viewId View ID
 	 * @return DataResponse<Http::STATUS_OK, TablesView, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -416,6 +413,10 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function deleteView(int $viewId): DataResponse {
 		try {
 			return new DataResponse($this->viewService->delete($viewId)->jsonSerialize());
@@ -439,10 +440,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Get a share object
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $shareId Share ID
 	 * @return DataResponse<Http::STATUS_OK, TablesShare, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -450,6 +447,9 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function getShare(int $shareId): DataResponse {
 		try {
 			return new DataResponse($this->shareService->find($shareId)->jsonSerialize());
@@ -472,15 +472,14 @@ class Api1Controller extends ApiController {
 	 * Get all shares for a view
 	 * Will be empty if view does not exist
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $viewId View ID
 	 * @return DataResponse<Http::STATUS_OK, TablesShare[], array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Shares returned
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function indexViewShares(int $viewId): DataResponse {
 		try {
 			return new DataResponse($this->shareService->formatShares($this->shareService->findAll('view', $viewId)));
@@ -495,15 +494,14 @@ class Api1Controller extends ApiController {
 	 * Get all shares for a table
 	 * Will be empty if table does not exist
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $tableId Table ID
 	 * @return DataResponse<Http::STATUS_OK, TablesShare[], array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Shares returned
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function indexTableShares(int $tableId): DataResponse {
 		try {
 			return new DataResponse($this->shareService->formatShares($this->shareService->findAll('table', $tableId)));
@@ -516,10 +514,6 @@ class Api1Controller extends ApiController {
 
 	/**
 	 * Create a new share
-	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
 	 *
 	 * @param int $nodeId Node ID
 	 * @param 'table'|'view'|'context' $nodeType Node type
@@ -537,6 +531,9 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE)]
 	public function createShare(
 		int $nodeId,
@@ -570,10 +567,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Delete a share
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $shareId Share ID
 	 * @return DataResponse<Http::STATUS_OK, TablesShare, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -581,6 +574,9 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function deleteShare(int $shareId): DataResponse {
 		try {
 			return new DataResponse($this->shareService->delete($shareId)->jsonSerialize());
@@ -602,10 +598,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Update a share permission
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $shareId Share ID
 	 * @param string $permissionType Permission type that should be changed
 	 * @param bool $permissionValue New permission value
@@ -615,6 +607,9 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function updateSharePermissions(int $shareId, string $permissionType, bool $permissionValue): DataResponse {
 		try {
 			return new DataResponse($this->shareService->updatePermission($shareId, $permissionType, $permissionValue)->jsonSerialize());
@@ -636,10 +631,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Updates the display mode of a context share
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $shareId Share ID
 	 * @param int $displayMode The new value for the display mode of the nav bar icon. 0: hidden, 1: visible for recipients, 2: visible for all
 	 * @param string $target "default" to set the default, "self" to set an override for the authenticated user
@@ -653,6 +644,9 @@ class Api1Controller extends ApiController {
 	 * @psalm-param int<0, 2> $displayMode
 	 * @psalm-param ("default"|"self") $target
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function updateShareDisplayMode(int $shareId, int $displayMode, string $target = 'default'): DataResponse {
 		if ($target === 'default') {
 			$userId = '';
@@ -688,10 +682,6 @@ class Api1Controller extends ApiController {
 	 * Get all columns for a table or a underlying view
 	 * Return an empty array if no columns were found
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $tableId Table ID
 	 * @param int|null $viewId View ID
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn[], array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
@@ -700,6 +690,9 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function indexTableColumns(int $tableId, ?int $viewId): DataResponse {
 		try {
 			return new DataResponse($this->columnService->formatColumns($this->columnService->findAllByTable($tableId, $viewId)));
@@ -718,10 +711,6 @@ class Api1Controller extends ApiController {
 	 * Get all columns for a view
 	 * Return an empty array if no columns were found
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $viewId View ID
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn[], array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -729,6 +718,10 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function indexViewColumns(int $viewId): DataResponse {
 		try {
 			return new DataResponse($this->columnService->formatColumns($this->columnService->findAllByView($viewId)));
@@ -749,10 +742,6 @@ class Api1Controller extends ApiController {
 
 	/**
 	 * Create a column
-	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
 	 *
 	 * @param int|null $tableId Table ID
 	 * @param int|null $viewId View ID
@@ -786,6 +775,9 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function createColumn(
 		?int $tableId,
 		?int $viewId,
@@ -867,10 +859,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Update a column
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $columnId Column ID that will be updated
 	 * @param string|null $title Title
 	 * @param string|null $subtype Column sub type
@@ -898,6 +886,9 @@ class Api1Controller extends ApiController {
 	 *
 	 * 200: Updated column
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function updateColumn(
 		int $columnId,
 		?string $title,
@@ -968,10 +959,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Returns a column object
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $columnId Wanted Column ID
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -979,6 +966,9 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function getColumn(int $columnId): DataResponse {
 		try {
 			return new DataResponse($this->columnService->find($columnId)->jsonSerialize());
@@ -1000,10 +990,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Delete a column
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $columnId Wanted Column ID
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -1011,6 +997,9 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function deleteColumn(int $columnId): DataResponse {
 		try {
 			return new DataResponse($this->columnService->delete($columnId)->jsonSerialize());
@@ -1032,10 +1021,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * List all rows values for a table, first row are the column titles
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $tableId Table ID
 	 * @param int|null $limit Limit
 	 * @param int|null $offset Offset
@@ -1045,6 +1030,10 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function indexTableRowsSimple(int $tableId, ?int $limit, ?int $offset): DataResponse {
 		try {
 			return new DataResponse($this->v1Api->getData($tableId, $limit, $offset, $this->userId));
@@ -1062,10 +1051,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * List all rows for a table
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $tableId Table ID
 	 * @param int|null $limit Limit
 	 * @param int|null $offset Offset
@@ -1075,6 +1060,10 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function indexTableRows(int $tableId, ?int $limit, ?int $offset): DataResponse {
 		try {
 			return new DataResponse($this->rowService->formatRows($this->rowService->findAllByTable($tableId, $this->userId, $limit, $offset)));
@@ -1092,10 +1081,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * List all rows for a view
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $viewId View ID
 	 * @param int|null $limit Limit
 	 * @param int|null $offset Offset
@@ -1105,6 +1090,10 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function indexViewRows(int $viewId, ?int $limit, ?int $offset): DataResponse {
 		try {
 			return new DataResponse($this->rowService->formatRows($this->rowService->findAllByView($viewId, $this->userId, $limit, $offset)));
@@ -1122,10 +1111,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Create a row within a view
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $viewId View ID
 	 * @param string|array<string, mixed> $data Data as key - value store
 	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
@@ -1133,6 +1118,9 @@ class Api1Controller extends ApiController {
 	 * 200: Row returned
 	 * 403: No permissions
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function createRowInView(int $viewId, $data): DataResponse {
 		if(is_string($data)) {
@@ -1168,10 +1156,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Create a row within a table
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $tableId Table ID
 	 * @param string|array<string, mixed> $data Data as key - value store
 	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
@@ -1180,6 +1164,9 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function createRowInTable(int $tableId, $data): DataResponse {
 		if(is_string($data)) {
@@ -1215,10 +1202,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Get a row
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $rowId Row ID
 	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -1226,6 +1209,9 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function getRow(int $rowId): DataResponse {
 		try {
 			return new DataResponse($this->rowService->find($rowId)->jsonSerialize());
@@ -1247,10 +1233,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Update a row
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $rowId Row ID
 	 * @param int|null $viewId View ID
 	 * @param string|array<string, mixed> $data Data as key - value store
@@ -1261,6 +1243,9 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function updateRow(int $rowId, ?int $viewId, $data): DataResponse {
 		if(is_string($data)) {
 			$data = json_decode($data, true);
@@ -1290,10 +1275,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Delete a row
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $rowId Row ID
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
@@ -1302,6 +1283,9 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function deleteRow(int $rowId): DataResponse {
 		try {
 			return new DataResponse($this->rowService->delete($rowId, null, $this->userId)->jsonSerialize());
@@ -1323,10 +1307,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Delete a row within a view
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $rowId Row ID
 	 * @param int $viewId View ID
 	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
@@ -1335,6 +1315,9 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function deleteRowByView(int $rowId, int $viewId): DataResponse {
 		try {
 			return new DataResponse($this->rowService->delete($rowId, $viewId, $this->userId)->jsonSerialize());
@@ -1356,9 +1339,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Import from file in to a table
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
 	 * @param int $tableId Table ID
 	 * @param string $path Path to file
 	 * @param bool $createMissingColumns Create missing columns
@@ -1368,6 +1348,9 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function importInTable(int $tableId, string $path, bool $createMissingColumns = true): DataResponse {
 		try {
@@ -1391,9 +1374,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Import from file in to a table
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
 	 * @param int $viewId View ID
 	 * @param string $path Path to file
 	 * @param bool $createMissingColumns Create missing columns
@@ -1403,6 +1383,9 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function importInView(int $viewId, string $path, bool $createMissingColumns = true): DataResponse {
 		try {
@@ -1428,10 +1411,6 @@ class Api1Controller extends ApiController {
 	/**
 	 * Create a share for a table
 	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $tableId Table ID
 	 * @param string $receiver Receiver ID
 	 * @param 'user'|'group' $receiverType Receiver type
@@ -1446,6 +1425,9 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function createTableShare(int $tableId, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage): DataResponse {
 		try {
@@ -1467,10 +1449,6 @@ class Api1Controller extends ApiController {
 
 	/**
 	 * Create a new column for a table
-	 *
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
 	 *
 	 * @param int $tableId Table ID
 	 * @param string $title Title
@@ -1503,6 +1481,10 @@ class Api1Controller extends ApiController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function createTableColumn(
 		int $tableId,
 		string $title,
@@ -1579,8 +1561,5 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		}
-
-
-
 	}
 }

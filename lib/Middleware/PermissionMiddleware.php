@@ -106,6 +106,7 @@ class PermissionMiddleware extends Middleware {
 		}
 
 		match ($attribute->getPermission()) {
+			Application::PERMISSION_READ => true, // this is guaranteed in the pre-test ^
 			Application::PERMISSION_MANAGE => $this->assertManagePermission($isContext, $nodeType, $nodeId),
 			Application::PERMISSION_CREATE => $this->assertCreatePermissions($nodeType, $nodeId),
 			Application::PERMISSION_UPDATE => $this->assertUpdatePermissions($nodeType, $nodeId),

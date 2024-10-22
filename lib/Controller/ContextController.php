@@ -18,6 +18,7 @@ use OCA\Tables\Service\ContextService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\DB\Exception;
 use OCP\IL10N;
@@ -51,9 +52,8 @@ class ContextController extends AOCSController {
 	 * @return DataResponse<Http::STATUS_OK, TablesContext[], array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: reporting in available contexts
-	 *
-	 * @NoAdminRequired
 	 */
+	#[NoAdminRequired]
 	public function index(): DataResponse {
 		try {
 			$contexts = $this->contextService->findAll($this->userId);
@@ -72,8 +72,8 @@ class ContextController extends AOCSController {
 	 * 200: returning the full context information
 	 * 404: context not found or not available anymore
 	 *
-	 * @NoAdminRequired
 	 */
+	#[NoAdminRequired]
 	public function show(int $contextId): DataResponse {
 		try {
 			$context = $this->contextService->findById($contextId, $this->userId);
@@ -88,8 +88,6 @@ class ContextController extends AOCSController {
 	/**
 	 * [api v2] Create a new context and return it
 	 *
-	 * @NoAdminRequired
-	 *
 	 * @param string $name Name of the context
 	 * @param string $iconName Material design icon name of the context
 	 * @param string $description Descriptive text of the context
@@ -101,6 +99,7 @@ class ContextController extends AOCSController {
 	 * 400: invalid parameters were supplied
 	 * 403: lacking permissions on a resource
 	 */
+	#[NoAdminRequired]
 	public function create(string $name, string $iconName, string $description = '', array $nodes = []): DataResponse {
 		try {
 			return new DataResponse($this->contextService->create(
@@ -135,9 +134,9 @@ class ContextController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 *
-	 * @NoAdminRequired
 	 * @CanManageContext
 	 */
+	#[NoAdminRequired]
 	public function update(int $contextId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): DataResponse {
 		try {
 			$nodes = $nodes !== null ? $this->sanitizeInputNodes($nodes) : null;
@@ -195,9 +194,9 @@ class ContextController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 *
-	 * @NoAdminRequired
 	 * @CanManageContext
 	 */
+	#[NoAdminRequired]
 	public function destroy(int $contextId): DataResponse {
 		try {
 			return new DataResponse($this->contextService->delete($contextId, $this->userId)->jsonSerialize());
@@ -222,12 +221,12 @@ class ContextController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 *
-	 * @NoAdminRequired
 	 * @CanManageContext
 	 *
 	 * @psalm-param int<0, max> $contextId
 	 * @psalm-param int<0, 0> $newOwnerType
 	 */
+	#[NoAdminRequired]
 	public function transfer(int $contextId, string $newOwnerId, int $newOwnerType = 0): DataResponse {
 		try {
 			return new DataResponse($this->contextService->transfer($contextId, $newOwnerId, $newOwnerType)->jsonSerialize());
@@ -249,7 +248,6 @@ class ContextController extends AOCSController {
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
 	 *
-	 * @NoAdminRequired
 	 * @CanManageContext
 	 *
 	 * 200: content updated successfully
@@ -257,6 +255,7 @@ class ContextController extends AOCSController {
 	 * 403: No permissions
 	 * 404: Not found
 	 */
+	#[NoAdminRequired]
 	public function updateContentOrder(int $contextId, int $pageId, array $content): DataResponse {
 		try {
 			$context = $this->contextService->findById($contextId, $this->userId);

@@ -63,6 +63,7 @@ OC.L10N.register(
     "Remove from favorites" : "Remover dos favoritos",
     "Copy" : "copiar",
     "Favorites" : "Favoritos",
+    "Clear filter" : "Limpar filtro",
     "User or group name …" : "Nome do utilizador ou grupo …",
     "No recommendations. Start typing." : "Nenhuma recomendação. Comece a escrever ",
     "group" : "grupo",

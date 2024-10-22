@@ -149,24 +149,24 @@ jobs:
           CYPRESS_ncVersion: ${{ matrix.server-versions }}
           npm_package_name: ${{ env.APP_NAME }}
 
-      - name: Print logs
+      - name: Print logs ${{ matrix.node-version }}-${{ matrix.php-versions }}-${{ matrix.server-versions }}-${{ matrix.databases }}
         if: always()
         run: |
           cat /tmp/requestlog
           cat data/nextcloud.log
 
-      - name: Upload test failure screenshots
+      - name: Upload test failure screenshots ${{ matrix.node-version }}-${{ matrix.php-versions }}-${{ matrix.server-versions }}-${{ matrix.databases }}
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: Upload screenshots
+          name: Upload screenshots ${{ matrix.node-version }}-${{ matrix.php-versions }}-${{ matrix.server-versions }}-${{ matrix.databases }}
           path: apps/${{ env.APP_NAME }}/cypress/screenshots/
           retention-days: 5
 
-      - name: Upload nextcloud logs
+      - name: Upload nextcloud logs ${{ matrix.node-version }}-${{ matrix.php-versions }}-${{ matrix.server-versions }}-${{ matrix.databases }}
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: Upload nextcloud log
+          name: Upload nextcloud log ${{ matrix.node-version }}-${{ matrix.php-versions }}-${{ matrix.server-versions }}-${{ matrix.databases }}
           path: data/nextcloud.log
           retention-days: 5

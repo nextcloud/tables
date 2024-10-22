@@ -191,6 +191,7 @@ OC.L10N.register(
     "I really want to delete this row!" : "Jeg ønsker at slette denne række!",
     "Could not update row" : "Rækken kunne ikke opdateres",
     "Could not delete row." : "Rækken kunne ikke slettes.",
+    "Owner" : "Ejer",
     "I really want to delete this table!" : "Jeg ønsker virkelig at slette denne tabel!",
     "Create missing columns" : "Opret manglende kolonner",
     "Close" : "Luk",
