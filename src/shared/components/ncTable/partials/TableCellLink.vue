@@ -50,6 +50,9 @@ export default {
 				const valueObject = JSON.parse(this.value)
 				delete valueObject.subline
 				if (!valueObject.resourceUrl && valueObject.value) {
+					const fileId = this.getFileIdFromURL(valueObject.value)
+					valueObject.thumbnailUrl = this.getPreviewURL(fileId)
+					valueObject.iconUrl = this.getDefaultIcon()
 					valueObject.resourceUrl = valueObject.value
 				}
 				return valueObject || {}
@@ -63,6 +66,22 @@ export default {
 			}
 		},
 	},
+	methods: {
+		getFileIdFromURL(url) {
+			const splitUrl = url.split('/')
+			const fileId = parseInt(splitUrl[splitUrl.length-1])
+			return fileId
+		},
+		getPreviewURL(fileId) {
+			// TODO: replace with actual domain and size variable
+			const prefix = 'http://nextcloud.local/index.php/core/preview?fileId='
+			return prefix + fileId + '&x=25&y=25'
+		},
+		getDefaultIcon() {
+			// TODO: fetch actual icon
+			return '/index.php/apps/theming/img/core/filetypes/image.svg?v=87d39db1'
+		}
+	}
 
 }
 </script>
