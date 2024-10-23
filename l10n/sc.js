@@ -60,6 +60,7 @@ OC.L10N.register(
     "Delete" : "Cantzella",
     "Close" : "Serra",
     "Select from Files" : "Seletziona dae Archìvios",
+    "Upload from device" : "Càrriga dae su dispositivu",
     "Please select a file." : "Seletziona un'archìviu.",
     "Result" : "Resurtadu",
     "Transfer" : "Tràmuda",
