@@ -766,6 +766,7 @@ class Api1Controller extends ApiController {
 	 * @param bool|null $usergroupMultipleItems Can select multiple users or/and groups, if column is usergroup
 	 * @param bool|null $usergroupSelectUsers Can select users, if column type is usergroup
 	 * @param bool|null $usergroupSelectGroups Can select groups, if column type is usergroup
+	 * @param bool|null $usergroupSelectTeams Can select teams, if column type is usergroup
 	 * @param bool|null $usergroupShowUserStatus Whether to show the user's status, if column type is usergroup
 	 * @param int[]|null $selectedViewIds View IDs where this column should be added to be presented
 	 *
@@ -806,6 +807,7 @@ class Api1Controller extends ApiController {
 		?bool $usergroupMultipleItems = null,
 		?bool $usergroupSelectUsers = null,
 		?bool $usergroupSelectGroups = null,
+		?bool $usergroupSelectTeams = null,
 		?bool $usergroupShowUserStatus = null,
 
 		?array $selectedViewIds = []
@@ -880,6 +882,7 @@ class Api1Controller extends ApiController {
 	 * @param bool|null $usergroupMultipleItems Can select multiple users or/and groups, if column is usergroup
 	 * @param bool|null $usergroupSelectUsers Can select users, if column type is usergroup
 	 * @param bool|null $usergroupSelectGroups Can select groups, if column type is usergroup
+	 * @param bool|null $usergroupSelectTeams Can select teams, if column type is usergroup
 	 * @param bool|null $usergroupShowUserStatus Whether to show the user's status, if column type is usergroup
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
@@ -916,6 +919,7 @@ class Api1Controller extends ApiController {
 		?bool $usergroupMultipleItems,
 		?bool $usergroupSelectUsers,
 		?bool $usergroupSelectGroups,
+		?bool $usergroupSelectTeams,
 		?bool $usergroupShowUserStatus,
 
 	): DataResponse {
@@ -1472,6 +1476,7 @@ class Api1Controller extends ApiController {
 	 * @param bool|null $usergroupMultipleItems Can select multiple users or/and groups, if column is usergroup
 	 * @param bool|null $usergroupSelectUsers Can select users, if column type is usergroup
 	 * @param bool|null $usergroupSelectGroups Can select groups, if column type is usergroup
+	 * @param bool|null $usergroupSelectTeams Can select teams, if column type is usergroup
 	 * @param bool|null $usergroupShowUserStatus Whether to show the user's status, if column type is usergroup
 	 * @param int[]|null $selectedViewIds View IDs where this column should be added to be presented
 	 *
@@ -1513,6 +1518,7 @@ class Api1Controller extends ApiController {
 		?bool $usergroupMultipleItems = null,
 		?bool $usergroupSelectUsers = null,
 		?bool $usergroupSelectGroups = null,
+		?bool $usergroupSelectTeams = null,
 		?bool $usergroupShowUserStatus = null,
 		?array $selectedViewIds = []
 	): DataResponse {
