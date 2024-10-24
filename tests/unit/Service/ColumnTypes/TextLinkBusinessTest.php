@@ -71,10 +71,25 @@ class TextLinkBusinessTest extends TestCase {
 			'unknown' => 'https://nextcloud.com'
 		]), $column));
 		self::assertEquals(json_encode(json_encode([
+			'thumbnailUrl' => 'https://cloud.nextcloud.com/index.php/core/preview?x=32&y=32&fileId=1',
+			'icon' => '/index.php/apps/theming/img/core/filetypes/images.svg?v=0a0a0a0a',
 			'title' => 'https://nextcloud.com',
 			'value' => 'https://nextcloud.com',
 			'providerId' => 'url',
 		])), $this->textLink->parseValue(json_encode([
+			'thumbnailUrl' => 'https://cloud.nextcloud.com/index.php/core/preview?x=32&y=32&fileId=1',
+			'icon' => '/index.php/apps/theming/img/core/filetypes/images.svg?v=0a0a0a0a',
+			'resourceUrl' => 'https://nextcloud.com'
+		]), $column));
+		self::assertEquals(json_encode(json_encode([
+			'thumbnailUrl' => '',
+			'icon' => '/index.php/apps/theming/img/core/filetypes/application-pdf.svg?v=0a0a0a0a',
+			'title' => 'https://nextcloud.com',
+			'value' => 'https://nextcloud.com',
+			'providerId' => 'url',
+		])), $this->textLink->parseValue(json_encode([
+			'thumbnailUrl' => '',
+			'icon' => '/index.php/apps/theming/img/core/filetypes/application-pdf.svg?v=0a0a0a0a',
 			'resourceUrl' => 'https://nextcloud.com'
 		]), $column));
 		self::assertEquals(json_encode(json_encode([
