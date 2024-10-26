@@ -71,4 +71,12 @@ class RowDataInput implements ArrayAccess, Iterator {
 	public function rewind(): void {
 		reset($this->data);
 	}
+
+	public static function fromArray(array $data): self {
+		$newRowData = new RowDataInput();
+		foreach ($data as $value) {
+			$newRowData->add((int)$value['columnId'], $value['value']);
+		}
+		return $newRowData;
+	}
 }
