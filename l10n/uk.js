@@ -363,7 +363,7 @@ OC.L10N.register(
     "Read data" : "Переглядати",
     "Create data" : "Створювати",
     "Update data" : "Вносити зміни",
-    "Delete data" : "Вилучати",
+    "Delete data" : "Вилучити",
     "Promote to table manager" : "Зробити адміністратором таблиці",
     "Demote to normal share" : "Понизити до нормального спільного ресурсу",
     "Open main table to adjust table management permissions" : "Відкрити головну таблицю для налаштування дозволів на керування",

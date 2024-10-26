@@ -111,6 +111,7 @@ OC.L10N.register(
     "Edit row" : "Modifica riga",
     "I really want to delete this row!" : "Confermo di voler eliminare questa riga!",
     "Could not delete row." : "Impossibile eliminare la riga.",
+    "Owner" : "Proprietario",
     "Import successful" : "Importazione avvenuta",
     "Close" : "Chiudi",
     "Select from Files" : "Seleziona da file",

@@ -187,6 +187,7 @@ OC.L10N.register(
     "Cannot create new table. Title is missing." : "Не удается создать новую таблицу. Заголовок отсутствует.",
     "Could not create new table" : "Не удалось создать новую таблицу",
     "Delete column" : "Удалить стопку",
+    "Error occurred while deleting column \"{column}\"." : "Произошла ошибка при удалении столбца \"{column}\".",
     "Cancel" : "Отменить",
     "Delete" : "Удалить",
     "Confirm table deletion" : "Подтверждение удаления таблицы",
