@@ -66,6 +66,6 @@
     "@nextcloud/webpack-vue-config": "^6.2.0",
     "cypress": "^13.6.4",
     "cypress-downloadfile": "^1.2.4",
-    "openapi-typescript": "^7.4.1"
+    "openapi-typescript": "^7.4.2"
   }
 }
