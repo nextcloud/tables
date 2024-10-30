@@ -230,6 +230,7 @@
     "I really want to delete this row!" : "Mindenképp törlöm ezt a sort.",
     "Could not update row" : "Nem sikerült a sor frissítése",
     "Could not delete row." : "Nem sikerült a sor törlése.",
+    "Owner" : "Tulajdonos",
     "I really want to delete this table!" : "Mindenképp törlöm ezt a táblázatot.",
     "Create missing columns" : "Hiányzó oszlopok létrehozása",
     "Close" : "Bezárás",
