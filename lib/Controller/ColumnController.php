@@ -160,6 +160,7 @@ class ColumnController extends Controller {
 					usergroupMultipleItems: $usergroupMultipleItems,
 					usergroupSelectUsers: $usergroupSelectUsers,
 					usergroupSelectGroups: $usergroupSelectGroups,
+					usergroupSelectTeams: $usergroupSelectTeams,
 					showUserStatus: $showUserStatus
 				),
 				$selectedViewIds
@@ -258,6 +259,7 @@ class ColumnController extends Controller {
 					usergroupMultipleItems: $usergroupMultipleItems,
 					usergroupSelectUsers: $usergroupSelectUsers,
 					usergroupSelectGroups: $usergroupSelectGroups,
+					usergroupSelectTeams: $usergroupSelectTeams,
 					showUserStatus: $showUserStatus
 				)
 			);
