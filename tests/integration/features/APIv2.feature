@@ -79,6 +79,7 @@ Feature: APIv2
       | usergroupMultipleItems  | true                         |
       | usergroupSelectUsers    | true                         |
       | usergroupSelectGroups   | false                        |
+      | usergroupSelectTeams    | false                        |
     Then node with node type "table" and node name "t2" has the following columns via v2
       | Beautiful text column | Rich is cool | Counter | Progress | Checking | A single date |
     Then print register
@@ -107,6 +108,7 @@ Feature: APIv2
       | usergroupMultipleItems | true                      |
       | usergroupSelectUsers   | true                      |
       | usergroupSelectGroups  | true                      |
+      | usergroupSelectTeams   | false                     |
     Then node with node type "table" and node name "t5" has the following columns via v2
       | ug column  |
     Then print register
@@ -579,6 +581,7 @@ Feature: APIv2
       | usergroupMultipleItems  | true          |
       | usergroupSelectUsers    | true          |
       | usergroupSelectGroups   | true          |
+      | usergroupSelectTeams    | false         |
     Then row exists with following values
       | one           | [{"id":"admin","type":0}] |
     Then set following values for last created row
@@ -616,6 +619,7 @@ Feature: APIv2
       | usergroupMultipleItems  | true          |
       | usergroupSelectUsers    | true          |
       | usergroupSelectGroups   | false         |
+      | usergroupSelectTeams    | false         |
     When row exists using v2 with following values
       | one           | AHA                     |
       | two           | 161                     |
@@ -654,6 +658,7 @@ Feature: APIv2
       | usergroupMultipleItems  | true          |
       | usergroupSelectUsers    | true          |
       | usergroupSelectGroups   | false         |
+      | usergroupSelectTeams    | false         |
     And user "participant1-v2" shares table with user "participant2-v2"
     And user "participant2-v2" has the following permissions
       | read    | 1 |
@@ -699,6 +704,7 @@ Feature: APIv2
       | usergroupMultipleItems  | true          |
       | usergroupSelectUsers    | true          |
       | usergroupSelectGroups   | false         |
+      | usergroupSelectTeams    | false         |
     And user "participant1-v2" shares table with user "participant2-v2"
     And user "participant1-v2" sets permission "create" to 0
     And user "participant2-v2" has the following permissions
@@ -745,6 +751,7 @@ Feature: APIv2
       | usergroupMultipleItems  | true          |
       | usergroupSelectUsers    | true          |
       | usergroupSelectGroups   | false         |
+      | usergroupSelectTeams    | false         |
     When user "participant2-v2" tries to create a row using v2 with following values
       | one           | AHA                     |
       | two           | 161                     |
@@ -783,6 +790,7 @@ Feature: APIv2
       | usergroupMultipleItems  | true          |
       | usergroupSelectUsers    | true          |
       | usergroupSelectGroups   | false         |
+      | usergroupSelectTeams    | false         |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
     And user "participant1-v2" sets columns "one,two,three,four,five" to view "v1"
     When user "participant1-v2" tries to create a row using v2 on "view" "v1" with following values
@@ -829,6 +837,7 @@ Feature: APIv2
       | usergroupMultipleItems  | true          |
       | usergroupSelectUsers    | true          |
       | usergroupSelectGroups   | false         |
+      | usergroupSelectTeams    | false         |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
     And user "participant1-v2" sets columns "one,two,three,four,five" to view "v1"
     And user "participant1-v2" shares view "v1" with "participant2-v2"
@@ -876,6 +885,7 @@ Feature: APIv2
       | usergroupMultipleItems  | true          |
       | usergroupSelectUsers    | true          |
       | usergroupSelectGroups   | false         |
+      | usergroupSelectTeams    | false         |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
     And user "participant1-v2" sets columns "one,two,three,four,five" to view "v1"
     And user "participant1-v2" shares view "v1" with "participant2-v2"
@@ -918,6 +928,7 @@ Feature: APIv2
       | usergroupMultipleItems  | true          |
       | usergroupSelectUsers    | true          |
       | usergroupSelectGroups   | false         |
+      | usergroupSelectTeams    | false         |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
     And user "participant1-v2" sets columns "one,two,three,four,five" to view "v1"
     When user "participant2-v2" tries to create a row using v2 on "view" "v1" with following values
