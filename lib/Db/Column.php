@@ -192,6 +192,7 @@ class Column extends Entity implements JsonSerializable {
 		$column->setUsergroupMultipleItems($data->getUsergroupMultipleItems());
 		$column->setUsergroupSelectUsers($data->getUsergroupSelectUsers());
 		$column->setUsergroupSelectGroups($data->getUsergroupSelectGroups());
+		$column->setUsergroupSelectTeams($data->getUsergroupSelectTeams());
 		$column->setShowUserStatus($data->getShowUserStatus());
 		return $column;
 	}

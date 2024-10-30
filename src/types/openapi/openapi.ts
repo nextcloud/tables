@@ -4621,6 +4621,8 @@ export interface operations {
                     readonly usergroupSelectUsers?: boolean;
                     /** @description Whether you can select groups */
                     readonly usergroupSelectGroups?: boolean;
+                    /** @description Whether you can select teams */
+                    readonly usergroupSelectTeams?: boolean;
                     /** @description Whether to show the user's status */
                     readonly showUserStatus?: boolean;
                     /** @description Description */

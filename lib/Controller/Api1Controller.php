@@ -852,6 +852,7 @@ class Api1Controller extends ApiController {
 					usergroupMultipleItems: $usergroupMultipleItems,
 					usergroupSelectUsers: $usergroupSelectUsers,
 					usergroupSelectGroups: $usergroupSelectGroups,
+					usergroupSelectTeams: $usergroupSelectTeams,
 					showUserStatus: $usergroupShowUserStatus
 				),
 				$selectedViewIds
@@ -962,6 +963,7 @@ class Api1Controller extends ApiController {
 					usergroupMultipleItems: $usergroupMultipleItems,
 					usergroupSelectUsers: $usergroupSelectUsers,
 					usergroupSelectGroups: $usergroupSelectGroups,
+					usergroupSelectTeams: $usergroupSelectTeams,
 					showUserStatus: $usergroupShowUserStatus
 				)
 			);
@@ -1575,6 +1577,7 @@ class Api1Controller extends ApiController {
 					usergroupMultipleItems: $usergroupMultipleItems,
 					usergroupSelectUsers: $usergroupSelectUsers,
 					usergroupSelectGroups: $usergroupSelectGroups,
+					usergroupSelectTeams: $usergroupSelectTeams,
 					showUserStatus: $usergroupShowUserStatus
 				),
 				$selectedViewIds

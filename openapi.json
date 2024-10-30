@@ -7938,6 +7938,10 @@
                                         "type": "boolean",
                                         "description": "Whether you can select groups"
                                     },
+                                    "usergroupSelectTeams": {
+                                        "type": "boolean",
+                                        "description": "Whether you can select teams"
+                                    },
                                     "showUserStatus": {
                                         "type": "boolean",
                                         "description": "Whether to show the user's status"
