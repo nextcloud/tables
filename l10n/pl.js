@@ -142,6 +142,7 @@ OC.L10N.register(
     "Edit row" : "Edytuj wiersz",
     "I really want to delete this row!" : "Naprawdę chcę usunąć ten wiersz!",
     "Could not delete row." : "Nie można usunąć wiersza.",
+    "Owner" : "Właściciel",
     "Import successful" : "Zaimportowano pomyślnie",
     "Close" : "Zamknij",
     "Select from Files" : "Wybierz z Plików",
