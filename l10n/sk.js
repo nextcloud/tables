@@ -214,6 +214,7 @@ OC.L10N.register(
     "I really want to delete this row!" : "Naozaj chcem zmazať tento riadok!",
     "Could not update row" : "Nepodarilo sa aktualizovať riadok",
     "Could not delete row." : "Nepodarilo sa zmazať riadok.",
+    "Owner" : "Vlastník",
     "I really want to delete this table!" : "Naozaj chcem odstrániť túto tabuľku!",
     "Create missing columns" : "Vytvoriť chýbajúce stĺpce",
     "Import successful" : "Import bol úspešný",
