@@ -78,7 +78,7 @@ OC.L10N.register(
     "Create table" : "Sukurti lentelę",
     "🔧 Custom table" : "🔧 Tinkinta lentelė",
     "Delete column" : "Ištrinti stulpelį",
-    "Cancel" : "Atšaukti",
+    "Cancel" : "Atsisakyti",
     "Delete" : "Ištrinti",
     "_Delete row_::_Delete rows_" : ["Ištrinti eilutę","Ištrinti eilutes","Ištrinti eilutes","Ištrinti eilutes"],
     "Edit row" : "Taisyti eilutę",
