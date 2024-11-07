@@ -6,8 +6,8 @@
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :width="2">
 		<input v-model="localValue"
 			type="number"
-			:min="column.numberMin"
-			:max="column.numberMax">
+			:min="0"
+			:max="100">
 	</RowFormWrapper>
 </template>
 
