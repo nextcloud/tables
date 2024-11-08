@@ -188,30 +188,32 @@ Feature: APIv1
     Then user "participant1" deletes table with keyword "Rows check"
 
 
-  @api1
+  @api1 @import
   Scenario: Import csv table
     Given file "/import.csv" exists for user "participant1" with following data
-      | Col1    | Col2   | Col3   | num   | emoji | special  |
-      | Val1    | Val2   | Val3   | 1     | 💙    | Ä        |
-      | great   | news   | here   | 99    | ⚠️    | Ö        |
+      | Col1    | Col2   | Col3   | num   | emoji | special  | date       | truth |
+      | Val1    | Val2   | Val3   | 1     | 💙    | Ä        | 2024-02-24 | false |
+      | great   | news   | here   | 99    | ⚠️    | Ö        | 2016-06-01 | true  |
     Given table "Import test" with emoji "👨🏻‍💻" exists for user "participant1" as "base1"
     When user imports file "/import.csv" into last created table
     Then import results have the following data
-      | found_columns_count     | 6 |
-      | created_columns_count   | 6 |
+      | found_columns_count     | 8 |
+      | created_columns_count   | 8 |
       | inserted_rows_count     | 2 |
       | errors_count            | 0 |
-    Then table has at least following columns
-      | Col1    |
-      | Col2    |
-      | Col3    |
-      | num     |
-      | emoji   |
-      | special |
+    Then table has at least following typed columns
+      | Col1    | text      |
+      | Col2    | text      |
+      | Col3    | text      |
+      | num     | number    |
+      | emoji   | text      |
+      | special | text      |
+      | date    | datetime  |
+      | truth   | selection |
     Then table contains at least following rows
-      | Col1    | Col2   | Col3   | num   | emoji | special  |
-      | Val1    | Val2   | Val3   | 1     | 💙    | Ä        |
-      | great   | news   | here   | 99    | ⚠️    | Ö        |
+      | Col1    | Col2   | Col3   | num   | emoji | special  | date       | truth |
+      | Val1    | Val2   | Val3   | 1     | 💙    | Ä        | 2024-02-24 | false |
+      | great   | news   | here   | 99    | ⚠️    | Ö        | 2016-06-01 | true  |
 
   @api1
   Scenario: Create, edit and delete views

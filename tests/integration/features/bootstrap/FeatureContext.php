@@ -1191,6 +1191,36 @@ class FeatureContext implements Context {
 	}
 
 	/**
+	 * @Then table has at least following typed columns
+	 *
+	 * @param TableNode|null $body
+	 */
+	public function tableTypedColumns(?TableNode $body = null): void {
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/tables/'.$this->tableId.'/columns'
+		);
+
+		$data = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		// check if no columns exists
+		if ($body === null) {
+			Assert::assertCount(0, $data);
+			return;
+		}
+
+		$colByTitle = [];
+		foreach ($data as $d) {
+			$colByTitle[$d['title']] = $d['type'];
+		}
+		foreach ($body->getRows() as $columnData) {
+			Assert::assertArrayHasKey($columnData[0], $colByTitle);
+			Assert::assertSame($columnData[1], $colByTitle[$columnData[0]], sprintf('Column "%s" has unexpected type "%s"', $columnData[0], $colByTitle[$columnData[0]]));
+		}
+	}
+
+	/**
 	 * @Then user deletes last created column
 	 */
 	public function deleteColumn(): void {
