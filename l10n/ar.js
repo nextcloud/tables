@@ -225,7 +225,7 @@ OC.L10N.register(
     "Select emoji for table" : "إختَر إيموجي emoji للجدول",
     "Select emoji" : "إختر رمزاً تعبيريّاً emji",
     "Title of the new table" : "عنوان الجدول الجديد",
-    "🔧 Custom table" : "🔧 جدولٌ مُخصَّصٌ",
+    "🔧 Custom table" : "🔧 جدول مخصص",
     "Custom table from scratch." : "جدول مخصص من البداية.",
     "📄 Import table" : "إستيراد جدول",
     "Import table from file." : "إستيراد جدول من ملف",
