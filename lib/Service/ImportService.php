@@ -285,8 +285,14 @@ class ImportService extends SuperService {
 	 * @throws PermissionError
 	 */
 	private function loop(Worksheet $worksheet): void {
-		$firstRow = $worksheet->getRowIterator()->current();
-		$secondRow = $worksheet->getRowIterator()->seek(2)->current();
+		$rowIterator = $worksheet->getRowIterator();
+		$firstRow = $rowIterator->current();
+		$rowIterator->next();
+		if (!$rowIterator->valid()) {
+			return;
+		}
+		$secondRow = $rowIterator->current();
+		unset($rowIterator);
 		$this->getColumns($firstRow, $secondRow);
 
 		if (empty(array_filter($this->columns))) {
