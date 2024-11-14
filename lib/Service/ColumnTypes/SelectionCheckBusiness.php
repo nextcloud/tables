@@ -10,8 +10,8 @@ namespace OCA\Tables\Service\ColumnTypes;
 use OCA\Tables\Db\Column;
 
 class SelectionCheckBusiness extends SuperBusiness implements IColumnTypeBusiness {
-	public const PATTERN_POSITIVE = ['yes', '1', true, 1, 'true'];
-	public const PATTERN_NEGATIVE = ['no', '0', false, 0, 'false'];
+	public const PATTERN_POSITIVE = ['yes', '1', true, 1, 'true', 'TRUE'];
+	public const PATTERN_NEGATIVE = ['no', '0', false, 0, 'false', 'FALSE'];
 
 	/**
 	 * @param mixed $value
