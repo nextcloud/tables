@@ -136,7 +136,7 @@ class ImportService extends SuperService {
 				$columns[] = [
 					'title' => $title,
 					'type' => $this->rawColumnDataTypes[$colIndex]['type'],
-					'subtype' => $this->rawColumnDataTypes[$colIndex]['subtype'],
+					'subtype' => $this->rawColumnDataTypes[$colIndex]['subtype'] ?? null,
 					'numberDecimals' => $this->rawColumnDataTypes[$colIndex]['number_decimals'] ?? 0,
 					'numberPrefix' => $this->rawColumnDataTypes[$colIndex]['number_prefix'] ?? '',
 					'numberSuffix' => $this->rawColumnDataTypes[$colIndex]['number_suffix'] ?? '',
@@ -367,8 +367,10 @@ class ImportService extends SuperService {
 
 				$value = $cell->getValue();
 				$hasData = $hasData || !empty($value);
-				if ($column->getType() === 'datetime') {
+				if ($column->getType() === 'datetime' && $column->getSubtype() === '') {
 					$value = Date::excelToDateTimeObject($value)->format('Y-m-d H:i');
+				} elseif ($column->getType() === 'datetime' && $column->getSubtype() === 'date') {
+					$value = Date::excelToDateTimeObject($value)->format('Y-m-d');
 				} elseif ($column->getType() === 'number' && $column->getNumberSuffix() === '%') {
 					$value = $value * 100;
 				} elseif ($column->getType() === 'selection' && $column->getSubtype() === 'check') {
@@ -477,6 +479,7 @@ class ImportService extends SuperService {
 		if (Date::isDateTime($cell) || $originDataType === DataType::TYPE_ISO_DATE) {
 			$dataType = [
 				'type' => 'datetime',
+				'subtype' => $cell->getCalculateDateTimeType() === Cell::CALCULATE_DATE_TIME_ASIS ? 'date' : '',
 			];
 		} elseif ($originDataType === DataType::TYPE_NUMERIC) {
 			if (str_contains($formattedValue, '%')) {

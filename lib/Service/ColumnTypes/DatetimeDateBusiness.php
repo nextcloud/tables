@@ -17,7 +17,7 @@ class DatetimeDateBusiness extends SuperBusiness implements IColumnTypeBusiness 
 	 * @return string
 	 */
 	public function parseValue($value, ?Column $column = null): string {
-		return json_encode($this->isValidDate($value, 'Y-m-d') ? $value : '');
+		return json_encode($this->isValidDate((string)$value, 'Y-m-d') ? (string)$value : '');
 	}
 
 	/**
@@ -26,7 +26,7 @@ class DatetimeDateBusiness extends SuperBusiness implements IColumnTypeBusiness 
 	 * @return bool
 	 */
 	public function canBeParsed($value, ?Column $column = null): bool {
-		return $this->isValidDate($value, 'Y-m-d');
+		return $this->isValidDate((string)$value, 'Y-m-d');
 	}
 
 }
