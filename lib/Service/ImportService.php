@@ -447,6 +447,12 @@ class ImportService extends SuperService {
 				$dataTypes[] = $this->parseColumnDataType($secondRowCellIterator->current());
 			} else {
 				$this->logger->debug('No cell given or cellValue is empty while loading columns for importing');
+				if ($cell->getDataType() === 'null') {
+					// LibreOffice generated XLSX doc may have more empty columns in the first row.
+					// Continue without increasing error count.
+					// Question: What about tables where a column does not have a heading?
+					continue;
+				}
 				$this->countErrors++;
 			}
 			$secondRowCellIterator->next();
@@ -523,7 +529,10 @@ class ImportService extends SuperService {
 					'type' => 'number',
 				];
 			}
-		} elseif ($originDataType === DataType::TYPE_BOOL) {
+		} elseif ($originDataType === DataType::TYPE_BOOL
+			|| ($originDataType === DataType::TYPE_FORMULA
+				&& in_array($formattedValue, ['FALSE', 'TRUE'], true))
+		) {
 			$dataType = [
 				'type' => 'selection',
 				'subtype' => 'check',
