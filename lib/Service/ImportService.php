@@ -368,9 +368,17 @@ class ImportService extends SuperService {
 				$value = $cell->getValue();
 				$hasData = $hasData || !empty($value);
 				if ($column->getType() === 'datetime' && $column->getSubtype() === '') {
-					$value = Date::excelToDateTimeObject($value)->format('Y-m-d H:i');
+					try {
+						$value = Date::excelToDateTimeObject($value)->format('Y-m-d H:i');
+					} catch (\TypeError) {
+						$value = (new \DateTimeImmutable($value))->format('Y-m-d H:i');
+					}
 				} elseif ($column->getType() === 'datetime' && $column->getSubtype() === 'date') {
-					$value = Date::excelToDateTimeObject($value)->format('Y-m-d');
+					try {
+						$value = Date::excelToDateTimeObject($value)->format('Y-m-d');
+					} catch (\TypeError) {
+						$value = (new \DateTimeImmutable($value))->format('Y-m-d');
+					}
 				} elseif ($column->getType() === 'number' && $column->getNumberSuffix() === '%') {
 					$value = $value * 100;
 				} elseif ($column->getType() === 'selection' && $column->getSubtype() === 'check') {
@@ -482,7 +490,13 @@ class ImportService extends SuperService {
 			'subtype' => 'line',
 		];
 
-		if (Date::isDateTime($cell) || $originDataType === DataType::TYPE_ISO_DATE) {
+		try {
+			$dateValue = new \DateTimeImmutable($value);
+		} catch (\Exception $e) {
+		}
+		if ((isset($dateValue) && $originDataType === DataType::TYPE_STRING)
+			|| Date::isDateTime($cell)
+			|| $originDataType === DataType::TYPE_ISO_DATE) {
 			$dataType = [
 				'type' => 'datetime',
 				'subtype' => $cell->getCalculateDateTimeType() === Cell::CALCULATE_DATE_TIME_ASIS ? 'date' : '',
