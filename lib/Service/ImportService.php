@@ -154,13 +154,18 @@ class ImportService extends SuperService {
 			$cellIterator = $row->getCellIterator();
 			$cellIterator->setIterateOnlyExistingCells(false);
 
-			foreach ($cellIterator as $cellIndex => $cell) {
+			foreach ($cellIterator as $cell) {
 				$value = $cell->getValue();
-				$colIndex = (int) $cellIndex;
+				// $cellIterator`s index is based on 1, not 0.
+				$colIndex = $cellIterator->getCurrentColumnIndex() - 1;
 				$column = $this->columns[$colIndex];
 
 				if (($column && $column->getType() === 'datetime') || (is_array($columns[$colIndex]) && $columns[$colIndex]['type'] === 'datetime')) {
-					$value = Date::excelToDateTimeObject($value)->format('Y-m-d H:i');
+					try {
+						$value = Date::excelToDateTimeObject($value)->format('Y-m-d H:i');
+					} catch (\TypeError) {
+						$value = (new \DateTimeImmutable($value))->format('Y-m-d H:i');
+					}
 				} elseif (($column && $column->getType() === 'number' && $column->getNumberSuffix() === '%')
 					|| (is_array($columns[$colIndex]) && $columns[$colIndex]['type'] === 'number' && $columns[$colIndex]['numberSuffix'] === '%')) {
 					$value = $value * 100;
