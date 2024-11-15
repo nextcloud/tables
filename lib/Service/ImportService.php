@@ -161,10 +161,18 @@ class ImportService extends SuperService {
 				$column = $this->columns[$colIndex];
 
 				if (($column && $column->getType() === 'datetime') || (is_array($columns[$colIndex]) && $columns[$colIndex]['type'] === 'datetime')) {
+					if (isset($columns[$colIndex]['subtype']) && $columns[$colIndex]['subtype'] === 'date') {
+						$format = 'Y-m-d';
+					} elseif (isset($columns[$colIndex]['subtype']) && $columns[$colIndex]['subtype'] === 'time') {
+						$format = 'H:i';
+					} else {
+						$format = 'Y-m-d H:i';
+					}
+
 					try {
-						$value = Date::excelToDateTimeObject($value)->format('Y-m-d H:i');
+						$value = Date::excelToDateTimeObject($value)->format($format);
 					} catch (\TypeError) {
-						$value = (new \DateTimeImmutable($value))->format('Y-m-d H:i');
+						$value = (new \DateTimeImmutable($value))->format($format);
 					}
 				} elseif (($column && $column->getType() === 'number' && $column->getNumberSuffix() === '%')
 					|| (is_array($columns[$colIndex]) && $columns[$colIndex]['type'] === 'number' && $columns[$colIndex]['numberSuffix'] === '%')) {
@@ -372,17 +380,31 @@ class ImportService extends SuperService {
 
 				$value = $cell->getValue();
 				$hasData = $hasData || !empty($value);
-				if ($column->getType() === 'datetime' && $column->getSubtype() === '') {
+
+				if ($column->getType() === 'datetime') {
+					if ($column->getType() === 'datetime' && $column->getSubtype() === 'date') {
+						$format = 'Y-m-d';
+					} elseif ($column->getType() === 'datetime' && $column->getSubtype() === 'time') {
+						$format = 'H:i';
+					} else {
+						$format = 'Y-m-d H:i';
+					}
 					try {
-						$value = Date::excelToDateTimeObject($value)->format('Y-m-d H:i');
+						$value = Date::excelToDateTimeObject($value)->format($format);
 					} catch (\TypeError) {
-						$value = (new \DateTimeImmutable($value))->format('Y-m-d H:i');
+						$value = (new \DateTimeImmutable($value))->format($format);
 					}
 				} elseif ($column->getType() === 'datetime' && $column->getSubtype() === 'date') {
 					try {
 						$value = Date::excelToDateTimeObject($value)->format('Y-m-d');
 					} catch (\TypeError) {
 						$value = (new \DateTimeImmutable($value))->format('Y-m-d');
+					}
+				} elseif ($column->getType() === 'datetime' && $column->getSubtype() === 'time') {
+					try {
+						$value = Date::excelToDateTimeObject($value)->format('H:i');
+					} catch (\TypeError) {
+						$value = (new \DateTimeImmutable($value))->format('H:i');
 					}
 				} elseif ($column->getType() === 'number' && $column->getNumberSuffix() === '%') {
 					$value = $value * 100;
@@ -496,15 +518,32 @@ class ImportService extends SuperService {
 		];
 
 		try {
+			if ($value === false) {
+				throw new \Exception('We do not accept `false` here');
+			}
 			$dateValue = new \DateTimeImmutable($value);
-		} catch (\Exception $e) {
+		} catch (\Exception) {
 		}
-		if ((isset($dateValue) && $originDataType === DataType::TYPE_STRING)
+
+		if (isset($dateValue)
 			|| Date::isDateTime($cell)
 			|| $originDataType === DataType::TYPE_ISO_DATE) {
+			// the formatted value stems from the office document and shows the original user intent
+			$dateAnalysis = date_parse($formattedValue);
+			$containsDate = $dateAnalysis['year'] !== false || $dateAnalysis['month'] !== false || $dateAnalysis['day'] !== false;
+			$containsTime = $dateAnalysis['hour'] !== false || $dateAnalysis['minute'] !== false || $dateAnalysis['second'] !== false;
+
+			if ($containsDate && !$containsTime) {
+				$subType = 'date';
+			} elseif (!$containsDate && $containsTime) {
+				$subType = 'time';
+			} else {
+				$subType = '';
+			}
+
 			$dataType = [
 				'type' => 'datetime',
-				'subtype' => $cell->getCalculateDateTimeType() === Cell::CALCULATE_DATE_TIME_ASIS ? 'date' : '',
+				'subtype' => $subType,
 			];
 		} elseif ($originDataType === DataType::TYPE_NUMERIC) {
 			if (str_contains($formattedValue, '%')) {
