@@ -234,7 +234,7 @@
     "Could not load templates." : "无法载入模板。",
     "Delete column" : "删除列",
     "Are you sure you want to delete column \"{column}\"?" : "您确定要删除列“{column}”吗？",
-    "Error occurred while deleting column \"{column}\"." : "删除列「{column}」时发生错误。",
+    "Error occurred while deleting column \"{column}\"." : "删除列“{column}”时发生错误。",
     "Confirm application deletion" : "确认删除应用程序",
     "Cancel" : "取消",
     "Delete" : "删除",
