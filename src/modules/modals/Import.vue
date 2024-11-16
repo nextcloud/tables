@@ -295,6 +295,7 @@ export default {
 					console.debug('error while importing', res)
 				}
 			} catch (e) {
+				showError(t('tables', 'Could not import data due to unknown errors.'))
 				console.error(e)
 				return false
 			}
@@ -329,6 +330,7 @@ export default {
 					console.debug('error while importing', res)
 				}
 			} catch (e) {
+				showError(t('tables', 'Could not import data due to unknown errors.'))
 				console.error(e)
 				return false
 			}
