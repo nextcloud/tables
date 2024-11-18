@@ -14,17 +14,26 @@ use OCP\IUser;
 use OCP\IUserManager;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @psalm-suppress UndefinedClass
+ * @psalm-suppress UndefinedDocblockClass
+ */
 class UserHelper {
 	private IUserManager $userManager;
 
 	private LoggerInterface $logger;
+
 	private IGroupManager $groupManager;
 
+	/**
+	 * @psalm-suppress UndefinedClass
+	 */
 	public function __construct(IUserManager $userManager, LoggerInterface $logger, IGroupManager $groupManager) {
 		$this->userManager = $userManager;
 		$this->logger = $logger;
 		$this->groupManager = $groupManager;
 	}
+
 	public function getUserDisplayName(string $userId): string {
 		try {
 			$user = $this->getUser($userId);
