@@ -18,6 +18,7 @@ use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
+use OCA\Tables\Helper\CircleHelper;
 use OCA\Tables\Helper\ConversionHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Model\Permissions;
@@ -25,6 +26,7 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 class PermissionsService {
 	private TableMapper $tableMapper;
@@ -35,11 +37,14 @@ class PermissionsService {
 
 	private UserHelper $userHelper;
 
+	private CircleHelper $circleHelper;
+
 	protected LoggerInterface $logger;
 
 	protected ?string $userId = null;
 
 	protected bool $isCli = false;
+
 	private ContextMapper $contextMapper;
 
 	public function __construct(
@@ -50,6 +55,7 @@ class PermissionsService {
 		ShareMapper     $shareMapper,
 		ContextMapper   $contextMapper,
 		UserHelper      $userHelper,
+		CircleHelper    $circleHelper,
 		bool            $isCLI
 	) {
 		$this->tableMapper = $tableMapper;
@@ -60,6 +66,7 @@ class PermissionsService {
 		$this->userId = $userId;
 		$this->isCli = $isCLI;
 		$this->contextMapper = $contextMapper;
+		$this->circleHelper = $circleHelper;
 	}
 
 
@@ -420,6 +427,7 @@ class PermissionsService {
 	 * @param int $elementId
 	 * @param 'table'|'view' $elementType
 	 * @param string $userId
+	 * @return Permissions
 	 * @throws NotFoundError
 	 */
 	public function getSharedPermissionsIfSharedWithMe(int $elementId, string $elementType, string $userId): Permissions {
@@ -436,16 +444,40 @@ class PermissionsService {
 			$this->logger->warning('Exception occurred: '.$e->getMessage().' Permission denied.');
 			return new Permissions();
 		}
-		$additionalShares = [];
+		$groupShares = [];
 		foreach ($userGroups as $userGroup) {
 			try {
-				$additionalShares[] = $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userGroup->getGid(), 'group');
+				$groupShares[] = $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userGroup->getGid(), 'group');
 			} catch (Exception $e) {
 				$this->logger->warning('Exception occurred: '.$e->getMessage().' Permission denied.');
 				return new Permissions();
 			}
 		}
-		$shares = array_merge($shares, ...$additionalShares);
+
+		$shares = array_merge($shares, ...$groupShares);
+
+		if ($this->circleHelper->isCirclesEnabled()) {
+			$circleShares = [];
+
+			try {
+				$userCircles = $this->circleHelper->getUserCircles($userId);
+			} catch (Throwable $e) {
+				$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Permission denied.');
+				return new Permissions();
+			}
+
+			foreach ($userCircles as $userCircle) {
+				try {
+					$circleShares[] = $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userCircle->getSingleId(), 'circle');
+				} catch (Exception $e) {
+					$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Permission denied.');
+					return new Permissions();
+				}
+			}
+
+			$shares = array_merge($shares, ...$circleShares);
+		}
+
 		if (count($shares) > 0) {
 			$read = array_reduce($shares, function ($carry, $share) {
 				return $carry || ($share->getPermissionRead());
@@ -520,7 +552,7 @@ class PermissionsService {
 		$constantName = 'PERMISSION_' . strtoupper($permissionName);
 		try {
 			$permissionBit = constant(Application::class . "::$constantName");
-		} catch (\Throwable $t) {
+		} catch (Throwable $t) {
 			$this->logger->error('Unexpected permission string {permission}', [
 				'app' => Application::APP_ID,
 				'permission' => $permissionName,

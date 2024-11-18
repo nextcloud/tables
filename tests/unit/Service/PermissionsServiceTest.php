@@ -14,6 +14,7 @@ use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Helper\CircleHelper;
 use OCA\Tables\Helper\UserHelper;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
@@ -26,8 +27,9 @@ class PermissionsServiceTest extends TestCase {
 		$viewMapper = $this->createMock(ViewMapper::class);
 		$contextMapper = $this->createMock(ContextMapper::class);
 		$userHelper = $this->createMock(UserHelper::class);
+		$circleHelper = $this->createMock(CircleHelper::class);
 
-		return new PermissionsService($logger, $userId, $tableMapper, $viewMapper, $shareMapper, $contextMapper, $userHelper, $isCli);
+		return new PermissionsService($logger, $userId, $tableMapper, $viewMapper, $shareMapper, $contextMapper, $userHelper, $circleHelper, $isCli);
 	}
 
 	public function testPreCheckUserIdGivenUser() {

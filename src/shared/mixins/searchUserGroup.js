@@ -44,23 +44,24 @@ export default {
 	},
 	methods: {
 		getShareTypes() {
-			const types = []
-			if (this.selectUsers) {
-				types.push(this.SHARE_TYPES.SHARE_TYPE_USER)
-			}
-			if (this.selectGroups) {
-				types.push(this.SHARE_TYPES.SHARE_TYPE_GROUP)
-			}
-			return types
+			return [
+				...(this.selectUsers ? [this.SHARE_TYPES.SHARE_TYPE_USER] : []),
+				...(this.selectGroups ? [this.SHARE_TYPES.SHARE_TYPE_GROUP] : []),
+				...(this.selectCircles && this.isCirclesEnabled ? [this.SHARE_TYPES.SHARE_TYPE_CIRCLE] : []),
+			]
 		},
 		getShareTypeString() {
-			if (this.selectUsers && !this.selectGroups) {
-				return 'User'
-			} else if (!this.selectUsers && this.selectGroups) {
-				return 'Group'
-			} else {
-				return 'User or group'
+			const shareTypes = this.getShareTypes()
+			const typeLabels = {
+				[this.SHARE_TYPES.SHARE_TYPE_USER]: 'User',
+				[this.SHARE_TYPES.SHARE_TYPE_GROUP]: 'Group',
+				[this.SHARE_TYPES.SHARE_TYPE_CIRCLE]: 'Team',
 			}
+
+			const selectedLabels = shareTypes.map(type => typeLabels[type])
+			return selectedLabels.length > 0
+				? selectedLabels.join(' or ')
+				: 'User, group or team'
 		},
 		getPlaceholder() {
 			return t('tables', '{shareTypeString}...', { shareTypeString: this.getShareTypeString() })

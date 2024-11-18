@@ -12,6 +12,7 @@ namespace OCA\Tables\Service;
 use DateTime;
 
 use InvalidArgumentException;
+use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextNavigation;
 use OCA\Tables\Db\ContextNavigationMapper;
@@ -24,9 +25,9 @@ use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Helper\CircleHelper;
 use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
-
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -35,6 +36,7 @@ use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
 use OCP\IDBConnection;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 /**
  * @psalm-import-type TablesShare from ResponseDefinitions
@@ -51,7 +53,11 @@ class ShareService extends SuperService {
 	protected UserHelper $userHelper;
 
 	protected GroupHelper $groupHelper;
+
+	protected CircleHelper $circleHelper;
+
 	private ContextNavigationMapper $contextNavigationMapper;
+
 	private IDBConnection $dbc;
 
 	public function __construct(
@@ -63,6 +69,7 @@ class ShareService extends SuperService {
 		ViewMapper $viewMapper,
 		UserHelper $userHelper,
 		GroupHelper $groupHelper,
+		CircleHelper $circleHelper,
 		ContextNavigationMapper $contextNavigationMapper,
 		IDBConnection $dbc,
 	) {
@@ -72,6 +79,7 @@ class ShareService extends SuperService {
 		$this->viewMapper = $viewMapper;
 		$this->userHelper = $userHelper;
 		$this->groupHelper = $groupHelper;
+		$this->circleHelper = $circleHelper;
 		$this->contextNavigationMapper = $contextNavigationMapper;
 		$this->dbc = $dbc;
 	}
@@ -85,7 +93,9 @@ class ShareService extends SuperService {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
-			$shares = $this->mapper->findAllSharesForNode($nodeType, $nodeId, $userId);
+			$excluded = !$this->circleHelper->isCirclesEnabled() ? [ShareReceiverType::CIRCLE] : [];
+			$shares = $this->mapper->findAllSharesForNode($nodeType, $nodeId, $userId, $excluded);
+
 			return $enhanceShares ? $this->addReceiverDisplayNames($shares) : $shares;
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());
@@ -112,7 +122,10 @@ class ShareService extends SuperService {
 		try {
 			$item = $this->mapper->find($id);
 
-			// security
+			if (!$this->circleHelper->isCirclesEnabled() && $item->getReceiverType() === ShareReceiverType::CIRCLE) {
+				throw new NotFoundError('Share not found - Circles app is disabled');
+			}
+
 			if (!$this->permissionsService->canReadShare($item)) {
 				throw new PermissionError('PermissionError: can not read share with id '.$id);
 			}
@@ -160,10 +173,20 @@ class ShareService extends SuperService {
 			// get all views or tables that are shared with me by group
 			$userGroups = $this->userHelper->getGroupsForUser($userId);
 			foreach ($userGroups as $userGroup) {
-				$shares = $this->mapper->findAllSharesFor($elementType, $userGroup->getGid(), $userId, 'group');
+				$shares = $this->mapper->findAllSharesFor($elementType, $userGroup->getGid(), $userId, ShareReceiverType::GROUP);
 				$elementsSharedWithMe = array_merge($elementsSharedWithMe, $shares);
 			}
-		} catch (Exception $e) {
+
+			// get all views or tables that are shared with me by circle
+			if ($this->circleHelper->isCirclesEnabled()) {
+				$userCircles = $this->circleHelper->getUserCircles($userId);
+
+				foreach ($userCircles as $userCircle) {
+					$shares = $this->mapper->findAllSharesFor($elementType, $userCircle->getSingleId(), $userId, ShareReceiverType::CIRCLE);
+					$elementsSharedWithMe = array_merge($elementsSharedWithMe, $shares);
+				}
+			}
+		} catch (Throwable $e) {
 			throw new InternalError($e->getMessage());
 		}
 		foreach ($elementsSharedWithMe as $share) {
@@ -394,10 +417,20 @@ class ShareService extends SuperService {
 	 * @return Share
 	 */
 	private function addReceiverDisplayName(Share $share):Share {
-		if ($share->getReceiverType() === 'user') {
+		if ($share->getReceiverType() === ShareReceiverType::USER) {
 			$share->setReceiverDisplayName($this->userHelper->getUserDisplayName($share->getReceiver()));
-		} elseif ($share->getReceiverType() === 'group') {
+		} elseif ($share->getReceiverType() === ShareReceiverType::GROUP) {
 			$share->setReceiverDisplayName($this->groupHelper->getGroupDisplayName($share->getReceiver()));
+		} elseif ($share->getReceiverType() === ShareReceiverType::CIRCLE) {
+			if ($this->circleHelper->isCirclesEnabled()) {
+				$share->setReceiverDisplayName($this->circleHelper->getCircleDisplayName($share->getReceiver(), $this->userId));
+			} else {
+				$this->logger->info(
+					'Could not get display name for receiver type {type}',
+					['type' => $share->getReceiverType()]
+				);
+				$share->setReceiverDisplayName($share->getReceiver());
+			}
 		} else {
 			$this->logger->info('can not use receiver type to get display name');
 			$share->setReceiverDisplayName($share->getReceiver());

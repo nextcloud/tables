@@ -12,11 +12,11 @@
 				class="row">
 				<div class="fix-col-2">
 					<div style="display:flex; align-items: center;">
-						<NcAvatar :user="share.receiver" :is-no-user="share.receiverType !== 'user'" />
+						<NcAvatar :user="getShareAvatar(share)" :is-no-user="share.receiverType !== 'user'" />
 					</div>
 					<div class="userInfo">
 						<div :class="{'high-line-height': !personHasTableManagePermission(share.receiver)}">
-							{{ share.receiverDisplayName }}{{ share.receiverType === 'group' ? ' (' + t('tables', 'group') + ')' : '' }}
+							{{ getShareDisplayName(share) }}
 						</div>
 						<div v-if="personHasTableManagePermission(share.receiver)">
 							{{ '(' + t('tables', 'Table manager') + ')' }}
@@ -180,10 +180,6 @@ export default {
 	computed: {
 		...mapState(['tables', 'showSidebar']),
 		...mapGetters(['isLoadingSomething', 'activeElement', 'isView']),
-		sortedShares() {
-			return [...this.userShares, ...this.groupShares].slice()
-				.sort(this.sortByDisplayName)
-		},
 		getShares() {
 			if (this.isView) {
 				return this.viewShares
@@ -193,7 +189,6 @@ export default {
 		},
 		viewShares() {
 			return this.shares.filter(share => share.nodeType === 'view')
-			// .filter(share => this.tableShares.find(tableShare => tableShare.nodeId === this.activeElement.tableId && share.receiver === tableShare.receiver && tableShare.permissionManage) === undefined)
 		},
 		tableShares() {
 			return this.shares.filter(share => share.nodeType === 'table')
@@ -209,11 +204,6 @@ export default {
 		},
 		async openDashboard() {
 			await this.$router.push('/table/' + this.activeElement.tableId)
-		},
-		sortByDisplayName(a, b) {
-			if (a.displayName.toLowerCase() < b.displayName.toLowerCase()) return -1
-			if (a.displayName.toLowerCase() > b.displayName.toLowerCase()) return 1
-			return 0
 		},
 		actionDelete(share) {
 			this.$emit('remove', share)
@@ -237,6 +227,20 @@ export default {
 		},
 		personHasTableManagePermission(userId) {
 			return this.tableShares.find(share => share.receiver === userId)?.permissionManage
+		},
+		getShareAvatar(share) {
+			return share.receiverDisplayName || share.receiver
+		},
+		getShareDisplayName(share) {
+			const name = share.receiverDisplayName || share.receiver
+			const type = share.receiverType
+
+			if (type === 'group') {
+				return `${name} (${t('tables', 'group')})`
+			} else if (type === 'circle') {
+				return `${name} (${t('tables', 'team')})`
+			}
+			return name
 		},
 	},
 }
