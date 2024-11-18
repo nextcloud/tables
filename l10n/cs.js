@@ -69,7 +69,7 @@ OC.L10N.register(
     "Hay and straw" : "Seno a sláma",
     "Summer only" : "Pouze léto",
     "Special" : "Speciální",
-    "Maybe we can make it fix for every year?!" : "Možná bychom mohli udělat opravu každý rok?!",
+    "Maybe we can make it fix for every year?!" : "Možná bychom mohli pořádat každoročně?!",
     "Employee name" : "Jméno zaměstnance",
     "from" : "od",
     "When is your vacation starting?" : "Kdy vaše dovolená začíná?",
