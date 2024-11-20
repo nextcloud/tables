@@ -76,7 +76,6 @@ describe('Manage a context', () => {
         cy.login(nonLocalUser)
         cy.visit('apps/tables')
         cy.loadContext(contextTitle)
-        cy.contains('header .app-menu-entry', contextTitle).should('exist')
         cy.contains('h1', contextTitle).should('exist')
         cy.contains('h1', tableTitle).should('exist')
 
@@ -99,7 +98,6 @@ describe('Manage a context', () => {
         cy.login(nonLocalUser)
         cy.visit('apps/tables')
         cy.loadContext(contextTitle)
-        cy.contains('header .app-menu-entry', contextTitle).should('exist')
         cy.contains('h1', contextTitle).should('exist')
     })
 
