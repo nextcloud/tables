@@ -108,6 +108,7 @@ OC.L10N.register(
     "Groups" : "Grupos",
     "Confirm" : "Cunfirma",
     "Select" : "Seletziona",
+    "Could not update share." : "No at fatu a agiornare sa cumpartzidura.",
     "Unchecked" : "Chene verìfica",
     "ID" : "ID"
 },
