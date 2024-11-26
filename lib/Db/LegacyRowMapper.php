@@ -151,7 +151,7 @@ class LegacyRowMapper extends QBMapper {
 			case 'datetime-date-start-of-month': return date('Y-m-01') ? date('Y-m-01') : '';
 			case 'datetime-date-start-of-week':
 				$day = date('w');
-				$result = date('m-d-Y', strtotime('-'.$day.' days'));
+				$result = date('Y-m-d', strtotime('-'.$day.' days'));
 				return  $result ?: '';
 			case 'datetime-time-now': return date('H:i');
 			case 'datetime-now': return date('Y-m-d H:i') ? date('Y-m-d H:i') : '';
