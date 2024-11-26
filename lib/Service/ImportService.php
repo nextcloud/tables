@@ -457,6 +457,8 @@ class ImportService extends SuperService {
 		$index = 0;
 		$countMatchingColumnsFromConfig = 0;
 		$countCreatedColumnsFromConfig = 0;
+		$lastCellWasEmpty = false;
+		$hasGapInTitles = false;
 		foreach ($cellIterator as $cell) {
 			if ($cell && $cell->getValue() !== null && $cell->getValue() !== '') {
 				$title = $cell->getValue();
@@ -480,18 +482,27 @@ class ImportService extends SuperService {
 
 				// Convert data type to our data type
 				$dataTypes[] = $this->parseColumnDataType($secondRowCellIterator->current());
+				if ($lastCellWasEmpty) {
+					$hasGapInTitles = true;
+				}
+				$lastCellWasEmpty = false;
 			} else {
 				$this->logger->debug('No cell given or cellValue is empty while loading columns for importing');
 				if ($cell->getDataType() === 'null') {
 					// LibreOffice generated XLSX doc may have more empty columns in the first row.
-					// Continue without increasing error count.
-					// Question: What about tables where a column does not have a heading?
+					// Continue without increasing error count, but leave a marker to detect gaps in titles.
+					$lastCellWasEmpty = true;
 					continue;
 				}
 				$this->countErrors++;
 			}
 			$secondRowCellIterator->next();
 			$index++;
+		}
+
+		if ($hasGapInTitles) {
+			$this->logger->info('Imported table is having a gap in column titles');
+			$this->countErrors++;
 		}
 
 		$this->rawColumnTitles = $titles;
