@@ -94,11 +94,17 @@
 
 			<!-- show loading -->
 			<div v-if="loading && !waitForReload">
-				<NcEmptyContent :name="t('tables', 'Importing data from ') + importFileName" :description="t('tables', 'This might take a while...')">
-					<template #icon>
-						<NcIconTimerSand />
-					</template>
-				</NcEmptyContent>
+				<div v-if="!importFailed">
+					<NcEmptyContent :name="t('tables', 'Importing data from ') + importFileName"
+						:description="t('tables', 'This might take a while...')">
+						<template #icon>
+							<NcIconTimerSand />
+						</template>
+					</NcEmptyContent>
+				</div>
+				<div v-else>
+					<NcEmptyContent :name="t('tables', 'Failed')" :description="t('tables', 'Unable to import data')" />
+				</div>
 			</div>
 
 			<div v-if="waitForReload">
@@ -164,6 +170,7 @@ export default {
 			createMissingColumns: true,
 			pathError: false,
 			loading: false,
+			importFailed: false,
 			result: null,
 			preview: null,
 			columnsConfig: [],
@@ -281,22 +288,26 @@ export default {
 				if (res.status === 200) {
 					this.preview = res.data
 					this.loading = false
-				} else if (res.status === 401) {
-					console.debug('error while importing', res)
-					showError(t('tables', 'Could not import, not authorized. Are you logged in?'))
-				} else if (res.status === 403) {
-					console.debug('error while importing', res)
-					showError(t('tables', 'Could not import, missing needed permission.'))
-				} else if (res.status === 404) {
-					console.debug('error while importing', res)
-					showError(t('tables', 'Could not import, needed resources were not found.'))
 				} else {
-					showError(t('tables', 'Could not import data due to unknown errors.'))
-					console.debug('error while importing', res)
+					if (res.status === 401) {
+						console.debug('error while importing', res)
+						showError(t('tables', 'Could not import, not authorized. Are you logged in?'))
+					} else if (res.status === 403) {
+						console.debug('error while importing', res)
+						showError(t('tables', 'Could not import, missing needed permission.'))
+					} else if (res.status === 404) {
+						console.debug('error while importing', res)
+						showError(t('tables', 'Could not import, needed resources were not found.'))
+					} else {
+						showError(t('tables', 'Could not import data due to unknown errors.'))
+						console.debug('error while importing', res)
+					}
+					this.importFailed = true
 				}
 			} catch (e) {
 				showError(t('tables', 'Could not import data due to unknown errors.'))
 				console.error(e)
+				this.importFailed = true
 				return false
 			}
 		},
@@ -316,22 +327,26 @@ export default {
 				if (res.status === 200) {
 					this.preview = res.data
 					this.loading = false
-				} else if (res.status === 401) {
-					console.debug('error while importing', res)
-					showError(t('tables', 'Could not import, not authorized. Are you logged in?'))
-				} else if (res.status === 403) {
-					console.debug('error while importing', res)
-					showError(t('tables', 'Could not import, missing needed permission.'))
-				} else if (res.status === 404) {
-					console.debug('error while importing', res)
-					showError(t('tables', 'Could not import, needed resources were not found.'))
 				} else {
-					showError(t('tables', 'Could not import data due to unknown errors.'))
-					console.debug('error while importing', res)
+					if (res.status === 401) {
+						console.debug('error while importing', res)
+						showError(t('tables', 'Could not import, not authorized. Are you logged in?'))
+					} else if (res.status === 403) {
+						console.debug('error while importing', res)
+						showError(t('tables', 'Could not import, missing needed permission.'))
+					} else if (res.status === 404) {
+						console.debug('error while importing', res)
+						showError(t('tables', 'Could not import, needed resources were not found.'))
+					} else {
+						showError(t('tables', 'Could not import data due to unknown errors.'))
+						console.debug('error while importing', res)
+					}
+					this.importFailed = true
 				}
 			} catch (e) {
 				showError(t('tables', 'Could not import data due to unknown errors.'))
 				console.error(e)
+				this.importFailed = true
 				return false
 			}
 		},
