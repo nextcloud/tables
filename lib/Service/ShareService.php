@@ -339,7 +339,8 @@ class ShareService extends SuperService {
 				}
 			} else {
 				// setting user display mode override only requires access
-				if (!$this->permissionsService->canAccessContextById($item->getId())) {
+				// this does not seem to work
+				if (!$this->permissionsService->canAccessContextById($item->getNodeId(), $userId)) {
 					throw new PermissionError(sprintf('PermissionError: can not update share with id %d', $shareId));
 				}
 			}
