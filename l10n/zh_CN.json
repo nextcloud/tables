@@ -284,7 +284,6 @@
     "Select from Files" : "选择文件",
     "Upload from device" : "从设备上传",
     "Supported formats: xlsx, xls, csv, html, xml" : "支持的格式：xlsx, xls, csv, html, xml",
-    "First row of the file must contain column headings." : "文件的第一列必须包含列标题",
     "⚠️ You don't have the permission to create columns." : "⚠️ 您没有足够的权限创建列。",
     "Preview" : "预览",
     "Importing data from " : "正在导入数据，从",

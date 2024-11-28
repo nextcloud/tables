@@ -286,7 +286,6 @@ OC.L10N.register(
     "Select from Files" : "Dosyalar uygulamasından seç",
     "Upload from device" : "Aygıttan yükle",
     "Supported formats: xlsx, xls, csv, html, xml" : "Desteklenen biçimler: xlsx, xls, csv, html, xml.",
-    "First row of the file must contain column headings." : "Dosyanın ilk satırında sütun başlıkları bulunmalıdır.",
     "⚠️ You don't have the permission to create columns." : "Sütunlar oluşturma izniniz yok.",
     "Preview" : "Ön izleme",
     "Importing data from " : "Şuradaki veriler içe aktarılıyor",

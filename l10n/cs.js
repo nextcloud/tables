@@ -285,7 +285,6 @@ OC.L10N.register(
     "Select from Files" : "Vybrat ze Souborů",
     "Upload from device" : "Nahrát ze zařízení",
     "Supported formats: xlsx, xls, csv, html, xml" : "Podporované formáty: xlsx, xls, csv, html, xml",
-    "First row of the file must contain column headings." : "Je třeba, aby první řádek souboru obsahoval záhlaví sloupců.",
     "⚠️ You don't have the permission to create columns." : "⚠️ Nemáte oprávnění vytvářet sloupce.",
     "Preview" : "Náhled",
     "Importing data from " : "Importování dat z",

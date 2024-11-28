@@ -283,7 +283,6 @@ OC.L10N.register(
     "Select from Files" : "ھۆججەتلەردىن تاللاڭ",
     "Upload from device" : "ئۈسكۈنىدىن يۈكلەش",
     "Supported formats: xlsx, xls, csv, html, xml" : "قوللايدىغان فورماتلىرى: xlsx, xls, csv, html, xml",
-    "First row of the file must contain column headings." : "ھۆججەتنىڭ بىرىنچى قۇردا چوقۇم ئىستون ماۋزۇسى بولۇشى كېرەك.",
     "⚠️ You don't have the permission to create columns." : "ئىستون قۇرۇش ھوقۇقىڭىز يوق.",
     "Preview" : "ئالدىن كۆرۈش",
     "Importing data from " : "سانلىق مەلۇماتلارنى ئەكىرىش ",

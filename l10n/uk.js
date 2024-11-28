@@ -284,7 +284,6 @@ OC.L10N.register(
     "Select from Files" : "Вибрати з файлів",
     "Upload from device" : "Завантажити з пристрою",
     "Supported formats: xlsx, xls, csv, html, xml" : "Підтримувані формати: xlsx, xls, csv, html, xml",
-    "First row of the file must contain column headings." : "Перший рядок файлу має містити заголовки стовпців.",
     "⚠️ You don't have the permission to create columns." : "⚠️ У вас відсутній дозвіл додавати стовпці.",
     "Preview" : "Попередній перегляд",
     "Importing data from " : "Імпорт даних з",

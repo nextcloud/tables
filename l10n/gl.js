@@ -286,7 +286,6 @@ OC.L10N.register(
     "Select from Files" : "Seleccionar desde Ficheiros",
     "Upload from device" : "Enviar desde o dispositivo",
     "Supported formats: xlsx, xls, csv, html, xml" : "Formatos admitidos: xlsx, xls, csv, html, xml",
-    "First row of the file must contain column headings." : "A primeira fila do ficheiro debe conter os títulos das columnas.",
     "⚠️ You don't have the permission to create columns." : "⚠️ Vde. non ten permiso para crear columnas.",
     "Preview" : "Vista previa",
     "Importing data from " : "Importando datos de ",

@@ -284,7 +284,6 @@
     "Select from Files" : "Sélectionner depuis Fichiers",
     "Upload from device" : "Téléverser depuis l’appareil",
     "Supported formats: xlsx, xls, csv, html, xml" : "Formats pris en charge : xlsx, xls, csv, html, xml",
-    "First row of the file must contain column headings." : "La première ligne du fichier doit contenir les entêtes des colonnes.",
     "⚠️ You don't have the permission to create columns." : "⚠️ Vous n'avez pas le droit de créer des colonnes.",
     "Preview" : "Prévisualiser",
     "Importing data from " : "Importation des données depuis",

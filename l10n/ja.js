@@ -260,7 +260,6 @@ OC.L10N.register(
     "Select from Files" : "ファイルから選択",
     "Upload from device" : "デバイスからアップロード",
     "Supported formats: xlsx, xls, csv, html, xml" : "対応フォーマット: xlsx, xls, csv, html, xml",
-    "First row of the file must contain column headings." : "ファイルの最初の行には列の見出しが含まれていなければならない。",
     "⚠️ You don't have the permission to create columns." : "⚠️ 列を作成する権限がありません。",
     "Preview" : "プレビュー",
     "Loading table data" : "テーブルデータの読み込み中",

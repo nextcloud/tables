@@ -51,6 +51,7 @@ OC.L10N.register(
     "Data" : "Datos",
     "Import" : "Importar",
     "Type" : "Tipo",
+    "Rich text" : "Texto enriquecido",
     "Time" : "Hora",
     "Save" : "Guardar",
     "Title" : "Título",

@@ -284,7 +284,6 @@
     "Select from Files" : "從雲端檔案選擇",
     "Upload from device" : "從裝置上傳",
     "Supported formats: xlsx, xls, csv, html, xml" : "支援的格式：xlsx, xls, csv, html, xml",
-    "First row of the file must contain column headings." : "檔案的第一列必須包含欄標題。",
     "⚠️ You don't have the permission to create columns." : "⚠️ 您無權建立縱列。",
     "Preview" : "預覽",
     "Importing data from " : "正在導入資料從",

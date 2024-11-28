@@ -246,7 +246,6 @@ OC.L10N.register(
     "Select from Files" : "Επιλογή από τα Αρχεία",
     "Upload from device" : "Μεταφόρτωση από συσκευή",
     "Supported formats: xlsx, xls, csv, html, xml" : "Υποστηριζόμενες μορφές: xlsx, xls, csv, html, xml",
-    "First row of the file must contain column headings." : "Η πρώτη γραμμή του αρχείου πρέπει να περιέχει τίτλους στηλών.",
     "⚠️ You don't have the permission to create columns." : "⚠️ Δεν έχετε δικαίωμα δημιουργίας στηλών.",
     "Preview" : "Προεπισκόπηση",
     "Importing data from " : "Εισαγωγή δεδομένων από ",

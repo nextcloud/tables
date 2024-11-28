@@ -286,7 +286,6 @@ OC.L10N.register(
     "Select from Files" : "Velg fra filer",
     "Upload from device" : "Last opp fra enhet",
     "Supported formats: xlsx, xls, csv, html, xml" : "Støttede formater: xlsx, xls, csv, html, xml",
-    "First row of the file must contain column headings." : "Første rad i filen må inneholde kolonneoverskrifter.",
     "⚠️ You don't have the permission to create columns." : "⚠️ Du har ikke tillatelse til å opprette kolonner.",
     "Preview" : "Forhåndsvis",
     "Importing data from " : "Importerer data fra",
