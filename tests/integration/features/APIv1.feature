@@ -187,31 +187,36 @@ Feature: APIv1
     Then user deletes last created row
     Then user "participant1" deletes table with keyword "Rows check"
 
-
-  @api1
-  Scenario: Import csv table
-    Given file "/import.csv" exists for user "participant1" with following data
-      | Col1    | Col2   | Col3   | num   | emoji | special  |
-      | Val1    | Val2   | Val3   | 1     | 💙    | Ä        |
-      | great   | news   | here   | 99    | ⚠️    | Ö        |
-    Given table "Import test" with emoji "👨🏻‍💻" exists for user "participant1" as "base1"
-    When user imports file "/import.csv" into last created table
+  @api1 @import
+  Scenario Outline: Import a document file
+    Given user "participant1" uploads file "<importfile>"
+    And table "Import test" with emoji "👨🏻‍💻" exists for user "participant1" as "base1"
+    When user imports file "/<importfile>" into last created table
     Then import results have the following data
-      | found_columns_count     | 6 |
-      | created_columns_count   | 6 |
-      | inserted_rows_count     | 2 |
-      | errors_count            | 0 |
-    Then table has at least following columns
-      | Col1    |
-      | Col2    |
-      | Col3    |
-      | num     |
-      | emoji   |
-      | special |
+      | found_columns_count     | 10 |
+      | created_columns_count   | 10 |
+      | inserted_rows_count     |  2 |
+      | errors_count            |  0 |
+    Then table has at least following typed columns
+      | Col1    | text      |
+      | Col2    | text      |
+      | Col3    | text      |
+      | num     | number    |
+      | emoji   | text      |
+      | special | text      |
+      | date    | datetime  |
+      | truth   | selection |
     Then table contains at least following rows
-      | Col1    | Col2   | Col3   | num   | emoji | special  |
-      | Val1    | Val2   | Val3   | 1     | 💙    | Ä        |
-      | great   | news   | here   | 99    | ⚠️    | Ö        |
+      | Date and Time    | Col1    | Col2   | Col3   | num   | emoji | special  | date       | truth | time  |
+      | 2022-02-20 08:42 | Val1    | Val2   | Val3   | 1     | 💙    | Ä        | 2024-02-24 | false | 18:48 |
+      | 2016-06-01 13:37 | great   | news   | here   | 99    | ⚠     | Ö        | 2016-06-01 | true  | 01:23 |
+
+  Examples:
+    | importfile                   |
+    | import-from-libreoffice.ods  |
+    | import-from-libreoffice.xlsx |
+    | import-from-ms365.xlsx       |
+    | import-from-libreoffice.csv  |
 
   @api1
   Scenario: Create, edit and delete views

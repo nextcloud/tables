@@ -136,7 +136,7 @@ class ImportService extends SuperService {
 				$columns[] = [
 					'title' => $title,
 					'type' => $this->rawColumnDataTypes[$colIndex]['type'],
-					'subtype' => $this->rawColumnDataTypes[$colIndex]['subtype'],
+					'subtype' => $this->rawColumnDataTypes[$colIndex]['subtype'] ?? null,
 					'numberDecimals' => $this->rawColumnDataTypes[$colIndex]['number_decimals'] ?? 0,
 					'numberPrefix' => $this->rawColumnDataTypes[$colIndex]['number_prefix'] ?? '',
 					'numberSuffix' => $this->rawColumnDataTypes[$colIndex]['number_suffix'] ?? '',
@@ -154,13 +154,26 @@ class ImportService extends SuperService {
 			$cellIterator = $row->getCellIterator();
 			$cellIterator->setIterateOnlyExistingCells(false);
 
-			foreach ($cellIterator as $cellIndex => $cell) {
+			foreach ($cellIterator as $cell) {
 				$value = $cell->getValue();
-				$colIndex = (int) $cellIndex;
+				// $cellIterator`s index is based on 1, not 0.
+				$colIndex = $cellIterator->getCurrentColumnIndex() - 1;
 				$column = $this->columns[$colIndex];
 
 				if (($column && $column->getType() === 'datetime') || (is_array($columns[$colIndex]) && $columns[$colIndex]['type'] === 'datetime')) {
-					$value = Date::excelToDateTimeObject($value)->format('Y-m-d H:i');
+					if (isset($columns[$colIndex]['subtype']) && $columns[$colIndex]['subtype'] === 'date') {
+						$format = 'Y-m-d';
+					} elseif (isset($columns[$colIndex]['subtype']) && $columns[$colIndex]['subtype'] === 'time') {
+						$format = 'H:i';
+					} else {
+						$format = 'Y-m-d H:i';
+					}
+
+					try {
+						$value = Date::excelToDateTimeObject($value)->format($format);
+					} catch (\TypeError) {
+						$value = (new \DateTimeImmutable($value))->format($format);
+					}
 				} elseif (($column && $column->getType() === 'number' && $column->getNumberSuffix() === '%')
 					|| (is_array($columns[$colIndex]) && $columns[$colIndex]['type'] === 'number' && $columns[$colIndex]['numberSuffix'] === '%')) {
 					$value = $value * 100;
@@ -285,8 +298,14 @@ class ImportService extends SuperService {
 	 * @throws PermissionError
 	 */
 	private function loop(Worksheet $worksheet): void {
-		$firstRow = $worksheet->getRowIterator()->current();
-		$secondRow = $worksheet->getRowIterator()->seek(2)->current();
+		$rowIterator = $worksheet->getRowIterator();
+		$firstRow = $rowIterator->current();
+		$rowIterator->next();
+		if (!$rowIterator->valid()) {
+			return;
+		}
+		$secondRow = $rowIterator->current();
+		unset($rowIterator);
 		$this->getColumns($firstRow, $secondRow);
 
 		if (empty(array_filter($this->columns))) {
@@ -361,8 +380,32 @@ class ImportService extends SuperService {
 
 				$value = $cell->getValue();
 				$hasData = $hasData || !empty($value);
+
 				if ($column->getType() === 'datetime') {
-					$value = Date::excelToDateTimeObject($value)->format('Y-m-d H:i');
+					if ($column->getType() === 'datetime' && $column->getSubtype() === 'date') {
+						$format = 'Y-m-d';
+					} elseif ($column->getType() === 'datetime' && $column->getSubtype() === 'time') {
+						$format = 'H:i';
+					} else {
+						$format = 'Y-m-d H:i';
+					}
+					try {
+						$value = Date::excelToDateTimeObject($value)->format($format);
+					} catch (\TypeError) {
+						$value = (new \DateTimeImmutable($value))->format($format);
+					}
+				} elseif ($column->getType() === 'datetime' && $column->getSubtype() === 'date') {
+					try {
+						$value = Date::excelToDateTimeObject($value)->format('Y-m-d');
+					} catch (\TypeError) {
+						$value = (new \DateTimeImmutable($value))->format('Y-m-d');
+					}
+				} elseif ($column->getType() === 'datetime' && $column->getSubtype() === 'time') {
+					try {
+						$value = Date::excelToDateTimeObject($value)->format('H:i');
+					} catch (\TypeError) {
+						$value = (new \DateTimeImmutable($value))->format('H:i');
+					}
 				} elseif ($column->getType() === 'number' && $column->getNumberSuffix() === '%') {
 					$value = $value * 100;
 				} elseif ($column->getType() === 'selection' && $column->getSubtype() === 'check') {
@@ -414,6 +457,8 @@ class ImportService extends SuperService {
 		$index = 0;
 		$countMatchingColumnsFromConfig = 0;
 		$countCreatedColumnsFromConfig = 0;
+		$lastCellWasEmpty = false;
+		$hasGapInTitles = false;
 		foreach ($cellIterator as $cell) {
 			if ($cell && $cell->getValue() !== null && $cell->getValue() !== '') {
 				$title = $cell->getValue();
@@ -437,12 +482,27 @@ class ImportService extends SuperService {
 
 				// Convert data type to our data type
 				$dataTypes[] = $this->parseColumnDataType($secondRowCellIterator->current());
+				if ($lastCellWasEmpty) {
+					$hasGapInTitles = true;
+				}
+				$lastCellWasEmpty = false;
 			} else {
 				$this->logger->debug('No cell given or cellValue is empty while loading columns for importing');
+				if ($cell->getDataType() === 'null') {
+					// LibreOffice generated XLSX doc may have more empty columns in the first row.
+					// Continue without increasing error count, but leave a marker to detect gaps in titles.
+					$lastCellWasEmpty = true;
+					continue;
+				}
 				$this->countErrors++;
 			}
 			$secondRowCellIterator->next();
 			$index++;
+		}
+
+		if ($hasGapInTitles) {
+			$this->logger->info('Imported table is having a gap in column titles');
+			$this->countErrors++;
 		}
 
 		$this->rawColumnTitles = $titles;
@@ -468,9 +528,33 @@ class ImportService extends SuperService {
 			'subtype' => 'line',
 		];
 
-		if (Date::isDateTime($cell) || $originDataType === DataType::TYPE_ISO_DATE) {
+		try {
+			if ($value === false) {
+				throw new \Exception('We do not accept `false` here');
+			}
+			$dateValue = new \DateTimeImmutable($value);
+		} catch (\Exception) {
+		}
+
+		if (isset($dateValue)
+			|| Date::isDateTime($cell)
+			|| $originDataType === DataType::TYPE_ISO_DATE) {
+			// the formatted value stems from the office document and shows the original user intent
+			$dateAnalysis = date_parse($formattedValue);
+			$containsDate = $dateAnalysis['year'] !== false || $dateAnalysis['month'] !== false || $dateAnalysis['day'] !== false;
+			$containsTime = $dateAnalysis['hour'] !== false || $dateAnalysis['minute'] !== false || $dateAnalysis['second'] !== false;
+
+			if ($containsDate && !$containsTime) {
+				$subType = 'date';
+			} elseif (!$containsDate && $containsTime) {
+				$subType = 'time';
+			} else {
+				$subType = '';
+			}
+
 			$dataType = [
 				'type' => 'datetime',
+				'subtype' => $subType,
 			];
 		} elseif ($originDataType === DataType::TYPE_NUMERIC) {
 			if (str_contains($formattedValue, '%')) {
@@ -514,7 +598,10 @@ class ImportService extends SuperService {
 					'type' => 'number',
 				];
 			}
-		} elseif ($originDataType === DataType::TYPE_BOOL) {
+		} elseif ($originDataType === DataType::TYPE_BOOL
+			|| ($originDataType === DataType::TYPE_FORMULA
+				&& in_array($formattedValue, ['FALSE', 'TRUE'], true))
+		) {
 			$dataType = [
 				'type' => 'selection',
 				'subtype' => 'check',

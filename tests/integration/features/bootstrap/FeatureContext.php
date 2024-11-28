@@ -13,6 +13,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\Utils;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\ExpectationFailedException;
 use Psr\Http\Message\ResponseInterface;
@@ -64,6 +65,8 @@ class FeatureContext implements Context {
 	private array $tableData = [];
 	private array $viewData = [];
 
+	private $importColumnData = null;
+
 	// use CommandLineTrait;
 	private CollectionManager $collectionManager;
 
@@ -89,6 +92,7 @@ class FeatureContext implements Context {
 	 * @AfterScenario
 	 */
 	public function cleanupUsers() {
+		$this->importColumnData = null;
 		$this->collectionManager->cleanUp();
 		foreach ($this->createdUsers as $user) {
 			$this->deleteUser($user);
@@ -467,8 +471,21 @@ class FeatureContext implements Context {
 	// (((((((((((((((((((((((((((( END API v2 )))))))))))))))))))))))))))))))))))
 
 
+	/**
+	 * @Given user :user uploads file :file
+	 */
+	public function uploadFile(string $user, string $file): void {
+		$this->setCurrentUser($user);
 
+		$localFilePath = __DIR__ . '/../../resources/' . $file;
 
+		$url = sprintf('%sremote.php/dav/files/%s/%s', $this->baseUrl, $user, $file);
+		$body = Utils::streamFor(fopen($localFilePath, 'rb'));
+
+		$this->sendRequestFullUrl('PUT', $url, $body);
+
+		Assert::assertEquals(201, $this->response->getStatusCode());
+	}
 
 	// IMPORT --------------------------
 
@@ -574,7 +591,7 @@ class FeatureContext implements Context {
 				$allValuesForColumn[] = $row[$indexForCol];
 			}
 			foreach ($table->getColumn($key) as $item) {
-				Assert::assertTrue(in_array($item, $allValuesForColumn));
+				Assert::assertTrue(in_array($item, $allValuesForColumn), sprintf('%s not in %s', $item, implode(', ', $allValuesForColumn)));
 			}
 		}
 	}
@@ -1187,6 +1204,36 @@ class FeatureContext implements Context {
 		}
 		foreach ($body->getRows()[0] as $columnTitle) {
 			Assert::assertTrue(in_array($columnTitle, $titles, true));
+		}
+	}
+
+	/**
+	 * @Then table has at least following typed columns
+	 *
+	 * @param TableNode|null $body
+	 */
+	public function tableTypedColumns(?TableNode $body = null): void {
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/tables/'.$this->tableId.'/columns'
+		);
+
+		$data = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		// check if no columns exists
+		if ($body === null) {
+			Assert::assertCount(0, $data);
+			return;
+		}
+
+		$colByTitle = [];
+		foreach ($data as $d) {
+			$colByTitle[$d['title']] = $d['type'];
+		}
+		foreach ($body->getRows() as $columnData) {
+			Assert::assertArrayHasKey($columnData[0], $colByTitle);
+			Assert::assertSame($columnData[1], $colByTitle[$columnData[0]], sprintf('Column "%s" has unexpected type "%s"', $columnData[0], $colByTitle[$columnData[0]]));
 		}
 	}
 

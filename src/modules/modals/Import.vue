@@ -41,7 +41,7 @@
 						<p class="span">
 							{{ t('tables', 'Supported formats: xlsx, xls, csv, html, xml') }}
 							<br>
-							{{ t('tables', 'First row of the file must contain column headings.') }}
+							{{ t('tables', 'First row of the file must contain column headings without gaps.') }}
 						</p>
 					</div>
 				</RowFormWrapper>
