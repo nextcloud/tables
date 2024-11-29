@@ -286,6 +286,7 @@ OC.L10N.register(
     "Select from Files" : "從雲端檔案選擇",
     "Upload from device" : "從裝置上傳",
     "Supported formats: xlsx, xls, csv, html, xml" : "支援的格式：xlsx, xls, csv, html, xml",
+    "First row of the file must contain column headings without gaps." : "檔案的第一列必須包含沒有間隙的欄位標題。",
     "⚠️ You don't have the permission to create columns." : "⚠️ 您無權建立欄。",
     "Preview" : "預覽",
     "Importing data from " : "正在匯入資料從",

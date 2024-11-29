@@ -284,6 +284,7 @@
     "Select from Files" : "إختر مِن بين الملفات",
     "Upload from device" : "إرفَع من الجهاز",
     "Supported formats: xlsx, xls, csv, html, xml" : "التنسيقات المدعومة: xslx، و xls، و  csv، و html، و xml",
+    "First row of the file must contain column headings without gaps." : "الصف الأول من الملف يجب أن يحتوي على عناوين الأعمدة بدون فجوات.",
     "⚠️ You don't have the permission to create columns." : "⚠️ ليس لديك إذن بإنشاء أعمدة.",
     "Preview" : "مُعاينة",
     "Importing data from " : "إستيراد البيانات من ",

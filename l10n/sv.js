@@ -254,6 +254,7 @@ OC.L10N.register(
     "Select from Files" : "Välj från Filer",
     "Upload from device" : "Ladda upp från enheten",
     "Supported formats: xlsx, xls, csv, html, xml" : "Format som stöds: xlsx, xls, csv, html, xml",
+    "First row of the file must contain column headings without gaps." : "Första raden i filen måste innehålla kolumnrubriker utan mellanrum.",
     "⚠️ You don't have the permission to create columns." : "⚠️ Du har inte behörighet att skapa kolumner.",
     "Preview" : "Förhandsvisa",
     "Importing data from " : "Importera data från",

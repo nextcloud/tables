@@ -286,6 +286,7 @@ OC.L10N.register(
     "Select from Files" : "Aus Dateien wählen",
     "Upload from device" : "Von Gerät hochladen",
     "Supported formats: xlsx, xls, csv, html, xml" : "Unterstützte Formate: xlsx, xls, csv, html, xml",
+    "First row of the file must contain column headings without gaps." : "Die erste Zeile der Datei muss lückenlose Spaltenüberschriften enthalten.",
     "⚠️ You don't have the permission to create columns." : "⚠️ Sie sind nicht berechtigt, Spalten zu erstellen.",
     "Preview" : "Vorschau",
     "Importing data from " : "Importiere Daten aus ",
