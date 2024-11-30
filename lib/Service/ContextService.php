@@ -111,6 +111,25 @@ class ContextService {
 		return $this->contextMapper->findById($id, $userId);
 	}
 
+
+		/**
+	 * @throws Exception
+	 * @throws InternalError
+	 * @throws NotFoundError
+	 */
+	public function findByTableId(int $tableId, ?string $userId): array {
+		if ($userId !== null && trim($userId) === '') {
+			$userId = null;
+		}
+		if ($userId === null && !$this->isCLI) {
+			$error = 'Try to set no user in context, but request is not allowed.';
+			$this->logger->warning($error);
+			throw new InternalError($error);
+		}
+
+		return $this->contextMapper->findAllContainingNode(Application::NODE_TYPE_TABLE, $tableId, $userId);
+	}
+
 	/**
 	 * @psalm-param list<array{id: int, type: int, permissions?: int, order?: int}> $nodes
 	 * @throws Exception|PermissionError|InvalidArgumentException

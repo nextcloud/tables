@@ -562,6 +562,18 @@ class TableService extends SuperService {
 		return new TableScheme($table->getTitle(), $table->getEmoji(), $columns, $table->getViews(), $table->getDescription(), $this->appManager->getAppVersion("tables"));
 	}
 
+
+	/**
+	 * @throws PermissionError
+	 * @throws NotFoundError
+	 * @throws InternalError
+	 */
+	public function listContextsByTable(int $id, ?string $userId = null): array {
+		$contexts = $this->contextService->findByTableId($id, $userId);
+		return $contexts;
+	}
+
+
 	// PRIVATE FUNCTIONS ---------------------------------------------------------------
 
 	/**

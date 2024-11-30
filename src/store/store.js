@@ -508,6 +508,11 @@ export default new Vuex.Store({
 			return res?.data
 		},
 
+		async loadContextsForTable({ commit, state, getters }, { tableId }) {
+			const res = await axios.get(generateOcsUrl('/apps/tables/api/2/tables/' + tableId + '/index-context'))
+			return res?.data.ocs.data
+		},
+
 		async transferContext({ state, commit, dispatch }, { id, data }) {
 			try {
 				await axios.put(generateOcsUrl('/apps/tables/api/2/contexts/' + id + '/transfer'), data)

@@ -288,4 +288,31 @@ class ApiTablesController extends AOCSController {
 			return $this->handleNotFoundError($e);
 		}
 	}
+
+
+	/**
+	 * [api v2] Index contexts
+	 *
+	 * Index contexts used in a table
+	 *
+	 * @param int $id Table ID
+	 *
+	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 *
+	 * 200: Contexts listed
+	 * 403: No permissions
+	 * 404: Table not found
+	 */
+	#[NoAdminRequired]
+	public function indexContext(int $id): DataResponse {
+		try {
+			return new DataResponse(['contexts' => $this->service->listContextsByTable($id, $this->userId)]);
+		} catch (PermissionError $e) {
+			return $this->handlePermissionError($e);
+		} catch (InternalError $e) {
+			return $this->handleError($e);
+		} catch (NotFoundError $e) {
+			return $this->handleNotFoundError($e);
+		}
+	}
 }
