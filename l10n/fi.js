@@ -131,6 +131,7 @@ OC.L10N.register(
     "I really want to delete this row!" : "Haluan todella poistaa tämän rivin!",
     "Could not update row" : "Riviä ei voitu päivittää",
     "Could not delete row." : "Riviä ei voitu poistaa.",
+    "Owner" : "Omistaja",
     "I really want to delete this table!" : "Haluan todella poistaa tämän taulukon!",
     "Create missing columns" : "Luo puuttuvat sarakkeet",
     "Close" : "Sulje",
