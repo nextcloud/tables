@@ -13,7 +13,8 @@
 				<input v-model="mutableColumn.numberDefault"
 					type="number"
 					min="0"
-					max="100">
+					max="100"
+					@input="enforceBounds">
 			</div>
 		</div>
 	</div>
@@ -47,6 +48,14 @@ export default {
 	},
 	methods: {
 		t,
+		enforceBounds(event) {
+			const value = parseInt(event.target.value)
+			if (isNaN(value)) {
+				this.mutableColumn.numberDefault = null
+				return
+			}
+			this.mutableColumn.numberDefault = Math.min(Math.max(0, value), 100)
+		},
 	},
 }
 </script>
