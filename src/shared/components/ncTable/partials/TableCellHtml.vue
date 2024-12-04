@@ -4,14 +4,20 @@
 -->
 <template>
 	<div>
-		<!-- eslint-disable-next-line vue/no-v-html -->
-		<div v-if="value" class="tiptap-reader-cell" v-html="value" />
+		<EditorContent :editor="editor" />
 	</div>
 </template>
 
 <script>
+import { Editor, EditorContent } from '@tiptap/vue-2'
+import { StarterKit } from '@tiptap/starter-kit'
+
 export default {
 	name: 'TableCellHtml',
+
+	components: {
+		EditorContent,
+	},
 
 	props: {
 		column: {
@@ -27,6 +33,33 @@ export default {
 			default: '',
 		},
 	},
+
+	data() {
+		return {
+			editor: null,
+		}
+	},
+
+	watch: {
+		value(value) {
+			this.editor.commands.setContent(value, false)
+		},
+	},
+
+	mounted() {
+		this.editor = new Editor({
+			extensions: [
+				StarterKit,
+			],
+			content: this.value,
+			editable: false,
+		})
+	},
+
+	beforeUnmount() {
+		this.editor.destroy()
+	},
+
 }
 </script>
 
