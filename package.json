@@ -42,7 +42,7 @@
     "@tiptap/extension-task-list": "^2.10.3",
     "@tiptap/starter-kit": "^2.10.3",
     "@tiptap/vue-2": "^2.10.3",
-    "@vueuse/core": "^12.0.0",
+    "@vueuse/core": "^11.3.0",
     "debounce": "^2.2.0",
     "vue": "^2.7.16",
     "vue-material-design-icons": "^5.3.1",
