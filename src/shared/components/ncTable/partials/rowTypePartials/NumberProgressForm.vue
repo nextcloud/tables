@@ -6,8 +6,9 @@
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :width="2">
 		<input v-model="localValue"
 			type="number"
-			:min="column.numberMin"
-			:max="column.numberMax">
+			min="0"
+			max="100"
+			@input="enforceBounds">
 	</RowFormWrapper>
 </template>
 
@@ -41,12 +42,28 @@ export default {
 					if (this.column.numberDefault !== undefined) {
 						this.$emit('update:value', this.column.numberDefault)
 						return this.column.numberDefault
-					} else {
-						return null
 					}
+					return null
 				}
 			},
-			set(v) { this.$emit('update:value', parseInt(v)) },
+			set(v) {
+				const parsedValue = parseInt(v)
+				const clampedValue = Math.min(Math.max(0, v), 100)
+				this.$emit('update:value', isNaN(parsedValue) ? null : parseInt(clampedValue))
+			},
+		},
+	},
+	methods: {
+		enforceBounds(event) {
+			const value = parseInt(event.target.value)
+			if (isNaN(value)) {
+				this.$emit('update:value', null)
+				event.target.value = null
+				return
+			}
+			const clampedValue = Math.min(Math.max(0, value), 100)
+			this.$emit('update:value', clampedValue)
+			event.target.value = clampedValue
 		},
 	},
 }
