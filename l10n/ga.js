@@ -286,6 +286,7 @@ OC.L10N.register(
     "Select from Files" : "Roghnaigh ó Chomhaid",
     "Upload from device" : "Íosluchtaigh ó gléas",
     "Supported formats: xlsx, xls, csv, html, xml" : "Formáidí tacaithe: xlsx, xls, csv, html, xml",
+    "First row of the file must contain column headings without gaps." : "Ní mór ceannteidil na gcolún gan bearnaí a bheith sa chéad ró den chomhad.",
     "⚠️ You don't have the permission to create columns." : "⚠️ Níl cead agat colúin a chruthú.",
     "Preview" : "Réamhamharc",
     "Importing data from " : "Sonraí á n-iompórtáil ó",
