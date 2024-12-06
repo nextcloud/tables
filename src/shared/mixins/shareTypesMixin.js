@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import { getCapabilities } from '@nextcloud/capabilities'
+
+const capabilities = getCapabilities()
+
 export default {
 	data() {
 		return {
@@ -18,5 +22,10 @@ export default {
 				SHARE_TYPE_ROOM: OC.Share.SHARE_TYPE_ROOM,
 			},
 		}
+	},
+	computed: {
+		isCirclesEnabled() {
+			return capabilities && capabilities.tables && capabilities.tables.isCirclesEnabled
+		},
 	},
 }
