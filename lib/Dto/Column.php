@@ -30,6 +30,7 @@ class Column {
 		private ?bool $usergroupMultipleItems = null,
 		private ?bool $usergroupSelectUsers = null,
 		private ?bool $usergroupSelectGroups = null,
+		private ?bool $usergroupSelectTeams = null,
 		private ?bool $showUserStatus = null,
 	) {
 	}
@@ -57,6 +58,7 @@ class Column {
 			$data['usergroupMultipleItems'] ?? null,
 			$data['usergroupSelectUsers'] ?? null,
 			$data['usergroupSelectGroups'] ?? null,
+			$data['usergroupSelectTeams'] ?? null,
 			$data['showUserStatus'] ?? null,
 		);
 	}
@@ -143,6 +145,10 @@ class Column {
 
 	public function getUsergroupSelectGroups(): ?bool {
 		return $this->usergroupSelectGroups;
+	}
+
+	public function getUsergroupSelectTeams(): ?bool {
+		return $this->usergroupSelectTeams;
 	}
 
 	public function getShowUserStatus(): ?bool {

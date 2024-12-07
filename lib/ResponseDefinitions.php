@@ -127,6 +127,7 @@ namespace OCA\Tables;
  *  usergroupMultipleItems: bool,
  *  usergroupSelectUsers: bool,
  *  usergroupSelectGroups: bool,
+ *  usergroupSelectTeams: bool,
  *  showUserStatus: bool,
  * }
  *
