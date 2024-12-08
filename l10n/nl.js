@@ -88,6 +88,7 @@ OC.L10N.register(
     "Cancel" : "Annuleren",
     "Delete" : "Verwijder",
     "Confirm table deletion" : "Bevestig verwijderen van tabel",
+    "Owner" : "Eigenaar",
     "Import successful" : "Import geslaagd",
     "Close" : "Sluit",
     "Select from Files" : "Kies uit bestanden",
@@ -123,6 +124,7 @@ OC.L10N.register(
     "Error" : "Fout",
     "Download" : "Download",
     "Search" : "Zoeken",
+    "Back" : "Terug",
     "Sorting" : "Sorteren",
     "Bold" : "Vet",
     "Italic" : "Cursief",
@@ -155,6 +157,7 @@ OC.L10N.register(
     "Select" : "Selecteer",
     "Unchecked" : "Niet gecontroleerd",
     "ID" : "ID",
+    "Clipboard is not available" : "Klembord niet beschikbaar",
     "Could not fetch tables" : "Kon tabellen niet ophalen"
 },
 "nplurals=2; plural=(n != 1);");
