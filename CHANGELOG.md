@@ -5,6 +5,21 @@
 
 # Changelog
 
+## 0.8.2
+
+### Fixed
+
+* [[stable0.8] fix and improve detection and import of ods, xlsx and csv documents (tables#1478)](https://github.com/nextcloud/tables/pull/1478)
+* [[stable0.8] enh: use tiptap's editor to render HTML (tables#1489)](https://github.com/nextcloud/tables/pull/1489)
+* [[stable0.8] fix return status in a few cases and add integration tests against content modification through Applications (tables#1423)](https://github.com/nextcloud/tables/pull/1423)
+
+### Dependencies
+
+* [[stable0.8] Fix npm audit (tables#1475)](https://github.com/nextcloud/tables/pull/1475)
+
+### Other
+* [[stable0.8] build(dev-deps): update phpunit for PHP 8.4 compat (tables#1479)](https://github.com/nextcloud/tables/pull/1479)
+
 ## 0.8.1
 
 ### Fixed
