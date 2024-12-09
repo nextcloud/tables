@@ -43,6 +43,7 @@ export default {
 		return {
 			selectUsers: this.column.usergroupSelectUsers,
 			selectGroups: this.column.usergroupSelectGroups,
+			selectTeams: this.column.usergroupSelectTeams,
 		}
 	},
 	computed: {
@@ -77,8 +78,8 @@ export default {
 		formatResult(autocompleteResult) {
 			return {
 				id: autocompleteResult.id,
-				type: autocompleteResult.source.startsWith('users') ? 0 : 1,
-				key: autocompleteResult.id,
+				type: this.getType(autocompleteResult.source),
+				key: autocompleteResult.source + '-' + autocompleteResult.id,
 				displayName: autocompleteResult.label,
 			}
 		},
