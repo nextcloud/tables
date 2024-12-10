@@ -158,7 +158,7 @@ class ApiTablesController extends AOCSController {
 						numberDecimals: $column['numberDecimals'],
 						numberPrefix: $column['numberPrefix'],
 						numberSuffix: $column['numberSuffix'],
-						selectionOptions: $column['selectionOptions'] == [] ? '' : $column['selectionOptions'],
+						selectionOptions: $column['selectionOptions'] === [] ? '' : \json_encode($column['selectionOptions'], JSON_THROW_ON_ERROR),
 						selectionDefault: $column['selectionDefault'],
 						datetimeDefault: $column['datetimeDefault'],
 						usergroupDefault: $column['usergroupDefault'][0] ?? '',
