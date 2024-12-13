@@ -119,7 +119,7 @@
 				:title="t('tables', 'Confirm table manager promotion')"
 				:cancel-title="t('tables', 'Cancel')"
 				:confirm-title="t('tables', 'Promote to table manager')"
-				confirm-class="error"
+				confirm-class="warning"
 				:show-modal="showModal"
 				@confirm="promoteToManager"
 				@cancel="showModal=false" />
