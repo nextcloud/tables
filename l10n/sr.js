@@ -286,6 +286,7 @@ OC.L10N.register(
     "Select from Files" : "Изабери из фајлова",
     "Upload from device" : "Отпреми са уређаја",
     "Supported formats: xlsx, xls, csv, html, xml" : "Подржани формати: xlsx, xls, csv, html, xml",
+    "First row of the file must contain column headings without gaps." : "Први ред фајла мора да садржи заглавља колона без размака.",
     "⚠️ You don't have the permission to create columns." : "⚠️ Немате дозволу да креирате колоне.",
     "Preview" : "Преглед",
     "Importing data from " : "Увозе се подаци из",
