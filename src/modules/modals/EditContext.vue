@@ -185,7 +185,7 @@ export default {
 						isUser: true,
 						key: 'user-' + getCurrentUser().uid,
 					})
-				const displayMode = this.showInNavigation ? 'NAV_ENTRY_MODE_ALL' : 'NAV_ENTRY_MODE_HIDDEN'
+				const displayMode = this.showInNavigationDefault ? 'NAV_ENTRY_MODE_RECIPIENTS' : 'NAV_ENTRY_MODE_HIDDEN'
 				const res = await this.$store.dispatch('updateContext', { id: this.contextId, data, previousReceivers: Object.values(context.sharing), receivers: this.receivers, displayMode: NAV_ENTRY_MODE[displayMode] })
 				if (res) {
 					showSuccess(t('tables', 'Updated application "{contextTitle}".', { contextTitle: this.title }))
@@ -269,7 +269,7 @@ export default {
 
 		},
 		updateDisplayMode() {
-			this.showInNavigation = !this.showInNavigation
+			this.showInNavigationDefault = !this.showInNavigationDefault
 		},
 		actionTransfer() {
 			emit('tables:context:edit', null)
