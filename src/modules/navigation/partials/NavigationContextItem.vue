@@ -117,9 +117,9 @@ export default {
 		},
 		updateDisplayMode() {
 			const value = !this.showInNavigation
-			let displayMode = value ? NAV_ENTRY_MODE.NAV_ENTRY_MODE_RECIPIENTS : NAV_ENTRY_MODE.NAV_ENTRY_MODE_HIDDEN
+			let displayMode = value ? NAV_ENTRY_MODE.NAV_ENTRY_MODE_ALL : NAV_ENTRY_MODE.NAV_ENTRY_MODE_HIDDEN
 			if (this.ownsContext(this.context)) {
-				displayMode = value ? NAV_ENTRY_MODE.NAV_ENTRY_MODE_ALL : NAV_ENTRY_MODE.NAV_ENTRY_MODE_HIDDEN
+				displayMode = value ? NAV_ENTRY_MODE.NAV_ENTRY_MODE_RECIPIENTS : NAV_ENTRY_MODE.NAV_ENTRY_MODE_HIDDEN
 			}
 			const share = Object.values(this.context.sharing || {}).find(share => share.receiver === getCurrentUser().uid)
 			if (share) {

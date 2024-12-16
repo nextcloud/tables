@@ -10,7 +10,8 @@ import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import data from './data.js'
 import displayError from '../shared/utils/displayError.js'
-import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../shared/constants.js'
+import { NODE_TYPE_TABLE, NODE_TYPE_VIEW, NAV_ENTRY_MODE } from '../shared/constants.js'
+import { getCurrentUser } from '@nextcloud/auth'
 
 Vue.use(Vuex)
 
@@ -359,7 +360,15 @@ export default new Vuex.Store({
 					// Avoid duplicate shares by checking if share exists first
 					const existingShare = previousReceivers.find((p) => p.receiver === share.receiver && p.receiver_type === share.receiverType)
 					if (!existingShare) {
-						await axios.post(generateUrl('/apps/tables/share'), share)
+						const createdShare = await axios.post(generateUrl('/apps/tables/share'), share)
+						if (createdShare?.data && createdShare?.data?.id) {
+							const shareId = createdShare.data.id
+							await dispatch('updateDisplayMode', { shareId, displayMode, target: 'default' })
+							// since we switch between NAV_ENTRY_MODE_HIDDEN and NAV_ENTRY_MODE_RECIPIENTS, we need to handle owner separately
+							if (receiver.id === getCurrentUser().uid) {
+								await dispatch('updateDisplayMode', { shareId, displayMode: displayMode === NAV_ENTRY_MODE.NAV_ENTRY_MODE_HIDDEN ? NAV_ENTRY_MODE.NAV_ENTRY_MODE_HIDDEN : NAV_ENTRY_MODE.NAV_ENTRY_MODE_ALL, target: 'self' })
+							}
+						}
 					}
 				}
 			} catch (e) {
@@ -374,6 +383,9 @@ export default new Vuex.Store({
 					})
 					if (!currentShare) {
 						await axios.delete(generateUrl('/apps/tables/share/' + previousReceiver.share_id))
+					} else {
+						const shareId = previousReceiver.share_id
+						await dispatch('updateDisplayMode', { shareId, displayMode, target: 'default' })
 					}
 				}
 			} catch (e) {

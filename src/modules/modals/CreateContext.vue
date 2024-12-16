@@ -171,7 +171,7 @@ export default {
 					isUser: true,
 					key: 'user-' + getCurrentUser().uid,
 				})
-			const displayMode = this.showInNavigation ? 'NAV_ENTRY_MODE_ALL' : 'NAV_ENTRY_MODE_HIDDEN'
+			const displayMode = this.showInNavigation ? 'NAV_ENTRY_MODE_RECIPIENTS' : 'NAV_ENTRY_MODE_HIDDEN'
 			const res = await this.$store.dispatch('insertNewContext', { data, previousReceivers: [], receivers: this.receivers, displayMode: NAV_ENTRY_MODE[displayMode] })
 			if (res) {
 				return res.id
