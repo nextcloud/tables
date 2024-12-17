@@ -4,12 +4,11 @@
 -->
 <template>
 	<div class="row space-B">
-		<h3>{{ t('tables', 'Share with accounts or groups') }}</h3>
+		<h3>{{ shareHeading }}</h3>
 		<NcSelect id="ajax" style="width: 100%;" :clear-on-select="true" :hide-selected="true" :internal-search="false"
-			:loading="loading" :options="options" :placeholder="t('tables', 'User or group name …')"
-			:preselect-first="true" :preserve-search="true" :searchable="true" :user-select="true"
-			:get-option-key="(option) => option.key" :aria-label-combobox="t('tables', 'User or group name …')"
-			label="displayName" @search="asyncFind" @input="addShare">
+			:loading="loading" :options="options" :placeholder="selectPlaceholder" :preselect-first="true"
+			:preserve-search="true" :searchable="true" :user-select="true" :get-option-key="(option) => option.key"
+			:aria-label-combobox="selectPlaceholder" label="displayName" @search="asyncFind" @input="addShare">
 			<template #no-options>
 				{{ t('tables', 'No recommendations. Start typing.') }}
 			</template>
@@ -51,11 +50,27 @@ export default {
 			type: Boolean,
 			default: true,
 		},
+		selectCircles: {
+			type: Boolean,
+			default: true,
+		},
 	},
 
 	computed: {
 		...mapState(['tables', 'showSidebar']),
 		...mapGetters(['isLoadingSomething']),
+
+		shareHeading() {
+			return this.isCirclesEnabled
+				? t('tables', 'Share with accounts, groups or teams')
+				: t('tables', 'Share with accounts or groups')
+		},
+
+		selectPlaceholder() {
+			return this.isCirclesEnabled
+				? t('tables', 'User, group or team …')
+				: t('tables', 'User or group …')
+		},
 	},
 
 	mounted() {
@@ -100,26 +115,57 @@ export default {
 
 		filterOutUnwantedItems(items) {
 			const shareTypesList = this.getShareTypes()
-			const shareTypes = { 0: 'user', 1: 'group' }
+			const shareTypes = {
+				[this.SHARE_TYPES.SHARE_TYPE_USER]: 'user',
+				[this.SHARE_TYPES.SHARE_TYPE_GROUP]: 'group',
+				...(this.isCirclesEnabled ? { [this.SHARE_TYPES.SHARE_TYPE_CIRCLE]: 'circle' } : {}),
+			}
 
 			// Filter out current user and sort
-			items = items.filter((item) => !(item.shareType === this.SHARE_TYPES.SHARE_TYPE_USER && item.shareWith === this.currentUserId)).sort((a, b) => a.shareType - b.shareType)
+			items = items.filter((item) =>
+				!(item.shareType === this.SHARE_TYPES.SHARE_TYPE_USER
+				&& item.shareWith === this.currentUserId))
+				.sort((a, b) => a.shareType - b.shareType)
 
-			// Filter out non-valid share types
-			items = items.filter((item) => (shareTypesList.includes(item.shareType)))
+			// Filter out non-valid share types and circles if disabled
+			items = items.filter((item) => (
+				shareTypesList.includes(item.shareType)
+				&& (item.shareType !== this.SHARE_TYPES.SHARE_TYPE_CIRCLE || this.isCirclesEnabled)
+			))
 
 			// Filter out existing shares
-			return items.filter(item => !this.shares.find(share => share.receiver === item.shareWith && share.receiverType === shareTypes[item.shareType]))
+			return items.filter(item =>
+				!this.shares.find(share =>
+					share.receiver === item.shareWith
+					&& share.receiverType === shareTypes[item.shareType],
+				),
+			)
 		},
 
 		formatResult(result) {
+			const isUser = result.source.startsWith('users')
+			const isGroup = result.source.startsWith('groups')
+			const isCircle = !isUser && !isGroup && this.isCirclesEnabled
+
 			return {
 				shareWith: result.id,
-				shareType: result.source.startsWith('users') ? this.SHARE_TYPES.SHARE_TYPE_USER : this.SHARE_TYPES.SHARE_TYPE_GROUP,
+				shareType: isUser
+					? this.SHARE_TYPES.SHARE_TYPE_USER
+					: isGroup
+						? this.SHARE_TYPES.SHARE_TYPE_GROUP
+						: isCircle
+							? this.SHARE_TYPES.SHARE_TYPE_CIRCLE
+							: this.SHARE_TYPES.SHARE_TYPE_USER,
 				user: result.id,
-				isNoUser: !result.source.startsWith('users'),
+				isNoUser: !isUser,
 				displayName: result.label,
-				icon: result.icon || result.source.startsWith('users') ? 'icon-user' : 'icon-group',
+				icon: isUser
+					? 'icon-user'
+					: isGroup
+						? 'icon-group'
+						: isCircle
+							? 'icon-circles'
+							: 'icon-user',
 				key: result.source + '-' + result.id,
 			}
 		},
@@ -131,15 +177,26 @@ export default {
 		 * @return {object}
 		 */
 		formatRecommendations(result) {
+			const isUser = result.value.shareType === this.SHARE_TYPES.SHARE_TYPE_USER
+			const isGroup = result.value.shareType === this.SHARE_TYPES.SHARE_TYPE_GROUP
+			const isCircle = !isUser && !isGroup && this.isCirclesEnabled
+
 			return {
 				shareWith: result.value.shareWith,
 				shareType: result.value.shareType,
 				user: result.uuid || result.value.shareWith,
-				isNoUser: result.value.shareType !== this.SHARE_TYPES.SHARE_TYPE_USER,
+				isNoUser: !isUser,
 				displayName: result.name || result.label,
-				icon: result.value.shareType === this.SHARE_TYPES.SHARE_TYPE_USER ? 'icon-user' : 'icon-group',
-				// Vue unique binding to render within Multiselect's AvatarSelectOption
-				key: result.uuid || result.value.shareWith + '-' + result.value.shareType + '-' + result.name || result.label,
+				icon: isUser
+					? 'icon-user'
+					: isGroup
+						? 'icon-group'
+						: isCircle
+							? 'icon-circle'
+							: 'icon-user',
+				key: result.uuid || result.value.shareWith + '-'
+					+ result.value.shareType + '-'
+					+ (result.name || result.label),
 			}
 		},
 
