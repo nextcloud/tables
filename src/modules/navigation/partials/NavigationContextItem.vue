@@ -52,7 +52,6 @@ import FileSwap from 'vue-material-design-icons/FileSwap.vue'
 import Delete from 'vue-material-design-icons/Delete.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import svgHelper from '../../../shared/components/ncIconPicker/mixins/svgHelper.js'
-import { getCurrentUser } from '@nextcloud/auth'
 import { NAV_ENTRY_MODE } from '../../../shared/constants.js'
 
 export default {
@@ -109,22 +108,27 @@ export default {
 			emit('tables:context:delete', this.context)
 		},
 		getNavDisplay() {
-			const share = Object.values(this.context.sharing || {}).find(share => share.receiver === getCurrentUser().uid)
-			if (share) {
-				return share?.display_mode !== NAV_ENTRY_MODE.NAV_ENTRY_MODE_HIDDEN
+			for (const share of Object.values(this.context.sharing || {})) {
+				if (share?.display_mode !== NAV_ENTRY_MODE.NAV_ENTRY_MODE_HIDDEN) {
+					return true
+				}
 			}
 			return false
 		},
 		updateDisplayMode() {
 			const value = !this.showInNavigation
-			let displayMode = value ? NAV_ENTRY_MODE.NAV_ENTRY_MODE_ALL : NAV_ENTRY_MODE.NAV_ENTRY_MODE_HIDDEN
-			if (this.ownsContext(this.context)) {
-				displayMode = value ? NAV_ENTRY_MODE.NAV_ENTRY_MODE_RECIPIENTS : NAV_ENTRY_MODE.NAV_ENTRY_MODE_HIDDEN
-			}
-			const share = Object.values(this.context.sharing || {}).find(share => share.receiver === getCurrentUser().uid)
-			if (share) {
+			const displayMode = value ? NAV_ENTRY_MODE.NAV_ENTRY_MODE_ALL : NAV_ENTRY_MODE.NAV_ENTRY_MODE_HIDDEN
+			let hadAtLeastOneEntry = false
+			for (const share of Object.values(this.context.sharing || {})) {
+				if (!share) {
+					continue
+				}
+				hadAtLeastOneEntry = true
 				this.$store.dispatch('updateDisplayMode', { shareId: share.share_id, displayMode, target: 'self' })
 				this.showInNavigation = value
+			}
+			if (!hadAtLeastOneEntry) {
+				console.error('No share found ' + this.context.sharing)
 			}
 		},
 	},
