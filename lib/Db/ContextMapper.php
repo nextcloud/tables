@@ -170,6 +170,7 @@ class ContextMapper extends QBMapper {
 	}
 	public function findForNavBar(string $userId): array {
 		$qb = $this->getFindContextBaseQuery($userId);
+		$groupIDs = $this->userHelper->getGroupIdsForUser($userId);
 		$qb->andWhere($qb->expr()->orX(
 			// default
 			$qb->expr()->andX(
@@ -183,6 +184,11 @@ class ContextMapper extends QBMapper {
 						$qb->expr()->neq('c.owner_id', $qb->createNamedParameter($userId)),
 						$qb->expr()->gt('n.display_mode', $qb->createNamedParameter(Application::NAV_ENTRY_MODE_HIDDEN, IQueryBuilder::PARAM_INT)),
 					),
+					$qb->expr()->andX(
+						$qb->expr()->eq('s.receiver_type', $qb->createNamedParameter('group')),
+						$qb->expr()->in('s.receiver', $qb->createNamedParameter($groupIDs, IQueryBuilder::PARAM_STR_ARRAY)),
+						$qb->expr()->gt('n.display_mode', $qb->createNamedParameter(Application::NAV_ENTRY_MODE_HIDDEN, IQueryBuilder::PARAM_INT)),
+					)
 				),
 			),
 			// user override
