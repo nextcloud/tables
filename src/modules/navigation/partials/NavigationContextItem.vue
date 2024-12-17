@@ -53,6 +53,7 @@ import Delete from 'vue-material-design-icons/Delete.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import svgHelper from '../../../shared/components/ncIconPicker/mixins/svgHelper.js'
 import { NAV_ENTRY_MODE } from '../../../shared/constants.js'
+import rebuildNavigation from '../../../service/rebuild-navigation.js'
 
 export default {
 	name: 'NavigationContextItem',
@@ -115,7 +116,7 @@ export default {
 			}
 			return false
 		},
-		updateDisplayMode() {
+		async updateDisplayMode() {
 			const value = !this.showInNavigation
 			const displayMode = value ? NAV_ENTRY_MODE.NAV_ENTRY_MODE_ALL : NAV_ENTRY_MODE.NAV_ENTRY_MODE_HIDDEN
 			let hadAtLeastOneEntry = false
@@ -124,10 +125,12 @@ export default {
 					continue
 				}
 				hadAtLeastOneEntry = true
-				this.$store.dispatch('updateDisplayMode', { shareId: share.share_id, displayMode, target: 'self' })
+				await this.$store.dispatch('updateDisplayMode', { shareId: share.share_id, displayMode, target: 'self' })
 				this.showInNavigation = value
 			}
-			if (!hadAtLeastOneEntry) {
+			if (hadAtLeastOneEntry) {
+				await rebuildNavigation()
+			} else {
 				console.error('No share found ' + this.context.sharing)
 			}
 		},
