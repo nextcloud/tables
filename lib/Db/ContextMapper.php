@@ -177,14 +177,12 @@ class ContextMapper extends QBMapper {
 				$qb->expr()->isNull('n2.display_mode'),
 				// requires a display mode also depending on the role…
 				$qb->expr()->orX(
-					// not an owner: requires RECIPIENT or ALL
+					// not an owner: requires (RECIPIENT or) ALL
 					$qb->expr()->andX(
 						// groups are not considered, yet
 						$qb->expr()->neq('c.owner_id', $qb->createNamedParameter($userId)),
 						$qb->expr()->gt('n.display_mode', $qb->createNamedParameter(Application::NAV_ENTRY_MODE_HIDDEN, IQueryBuilder::PARAM_INT)),
 					),
-					// an owner (no explicit check necessary): requires ALL
-					$qb->expr()->eq('n.display_mode', $qb->createNamedParameter(Application::NAV_ENTRY_MODE_ALL, IQueryBuilder::PARAM_INT)),
 				),
 			),
 			// user override
