@@ -411,6 +411,7 @@ OC.L10N.register(
     "Select" : "选择",
     "Insert" : "插入",
     "Unchecked" : "未选中",
+    "Now" : "现在",
     "ID" : "ID",
     "Clipboard is not available" : "剪贴板不可用",
     "Could not remove table." : "无法移除数据库表"
