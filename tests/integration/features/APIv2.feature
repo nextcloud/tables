@@ -1328,3 +1328,115 @@ Feature: APIv2
     Then the reported status is "404"
     And the user "participant1-v2" fetches table "t1", it has exactly these rows "r-not-updatable,r-not-deletable"
     And the column "statement" of row "r-not-updatable" has the value "testing not updated"
+
+  @views
+  Scenario: have a view with a sort order
+    Given as user "participant1-v2"
+    And table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And column "statement" exists with following properties
+      | type          | text                |
+      | subtype       | line                |
+      | mandatory     | 1                   |
+      | description   | State your business |
+    And column "weight" exists with following properties
+      | type          | number                  |
+      | mandatory     | 1                       |
+      | description   | Importance of statement |
+    And column "code" exists with following properties
+      | type          | text                   |
+      | subtype       | line                   |
+      | mandatory     | 1                      |
+      | description   | Shorthand of Statement |
+    And user "participant1-v2" create view "Important Statements" with emoji "⚡️" for "t1" as "v1"
+    And user "participant1-v2" sets columns "statement,weight,code" to view "v1"
+    And following sort order is applied to view "v1":
+      | weight | DESC |
+    And using "view" "v1"
+    And user "participant1-v2" creates row "r1" with following values:
+      | statement | Be yourself; everyone else is already taken. |
+      | weight    | 75                                           |
+      | code      | wil01                                        |
+    And user "participant1-v2" creates row "r2" with following values:
+      | statement | A room without books is like a body without a soul. |
+      | weight    | 67                                                  |
+      | code      | cic01                                               |
+    And user "participant1-v2" creates row "r3" with following values:
+      | statement | To live is the rarest thing in the world. Most people exist, that is all. |
+      | weight    | 92                                                                        |
+      | code      | wil02                                                                     |
+    Then "view" "v1" has exactly these rows "r3,r1,r2" in exactly this order
+
+  @views
+  Scenario: have a view with a sort order from a meta column
+    Given as user "participant1-v2"
+    And table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And column "statement" exists with following properties
+      | type          | text                |
+      | subtype       | line                |
+      | mandatory     | 1                   |
+      | description   | State your business |
+    And column "weight" exists with following properties
+      | type          | number                  |
+      | mandatory     | 1                       |
+      | description   | Importance of statement |
+    And column "code" exists with following properties
+      | type          | text                   |
+      | subtype       | line                   |
+      | mandatory     | 1                      |
+      | description   | Shorthand of Statement |
+    And user "participant1-v2" create view "Important Statements" with emoji "⚡️" for "t1" as "v1"
+    And user "participant1-v2" sets columns "statement,weight,code" to view "v1"
+    And following sort order is applied to view "v1":
+      | meta-id | DESC |
+    And using "view" "v1"
+    And user "participant1-v2" creates row "r1" with following values:
+      | statement | Be yourself; everyone else is already taken. |
+      | weight    | 75                                           |
+      | code      | wil01                                        |
+    And user "participant1-v2" creates row "r2" with following values:
+      | statement | A room without books is like a body without a soul. |
+      | weight    | 67                                                  |
+      | code      | cic01                                               |
+    And user "participant1-v2" creates row "r3" with following values:
+      | statement | To live is the rarest thing in the world. Most people exist, that is all. |
+      | weight    | 92                                                                        |
+      | code      | wil02                                                                     |
+    Then "view" "v1" has exactly these rows "r3,r2,r1" in exactly this order
+
+  @views
+  Scenario: have a view with a multiple sort orders
+    Given as user "participant1-v2"
+    And table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And column "statement" exists with following properties
+      | type          | text                |
+      | subtype       | line                |
+      | mandatory     | 1                   |
+      | description   | State your business |
+    And column "weight" exists with following properties
+      | type          | number                  |
+      | mandatory     | 1                       |
+      | description   | Importance of statement |
+    And column "code" exists with following properties
+      | type          | text                   |
+      | subtype       | line                   |
+      | mandatory     | 1                      |
+      | description   | Shorthand of Statement |
+    And user "participant1-v2" create view "Important Statements" with emoji "⚡️" for "t1" as "v1"
+    And user "participant1-v2" sets columns "statement,weight,code" to view "v1"
+    And following sort order is applied to view "v1":
+      | weight | DESC |
+      | code   | ASC  |
+    And using "view" "v1"
+    And user "participant1-v2" creates row "r1" with following values:
+      | statement | Be yourself; everyone else is already taken. |
+      | weight    | 92                                           |
+      | code      | wil01                                        |
+    And user "participant1-v2" creates row "r2" with following values:
+      | statement | A room without books is like a body without a soul. |
+      | weight    | 67                                                  |
+      | code      | cic01                                               |
+    And user "participant1-v2" creates row "r3" with following values:
+      | statement | To live is the rarest thing in the world. Most people exist, that is all. |
+      | weight    | 92                                                                        |
+      | code      | wil02                                                                     |
+    Then "view" "v1" has exactly these rows "r1,r3,r2" in exactly this order
