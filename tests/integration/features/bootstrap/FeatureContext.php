@@ -9,6 +9,8 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Step\Given;
+use Behat\Step\When;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ClientException;
@@ -101,7 +103,6 @@ class FeatureContext implements Context {
 			$this->deleteGroup($group);
 		}
 	}
-
 
 	/**
 	 * @Given table :table with emoji :emoji exists for user :user as :tableName via v2
@@ -821,6 +822,29 @@ class FeatureContext implements Context {
 		Assert::assertEquals($tableToVerify['ownership'], $user);
 	}
 
+	protected function sendUpdateViewRequest(string $viewName, array $data): void {
+		$viewId = $this->collectionManager->getByAlias('view', $viewName)['id'];
+		$this->sendRequest(
+			'PUT',
+			sprintf('/apps/tables/api/1/views/%d', $viewId),
+			[ 'data' => $data ]
+		);
+	}
+
+	#[When('following sort order is applied to view :viewName:')]
+	public function applySortToView(string $viewName, TableNode $sortOrder): void {
+		$sortData = [];
+		foreach ($sortOrder->getRows() as $row) {
+			// FIX ME: use register
+			$sortData[] = [
+				'columnId' =>  $this->tableColumns[$row[0]],
+				'mode' => $row[1]
+			];
+
+		}
+		$this->sendUpdateViewRequest($viewName, ['sort' => json_encode($sortData)]);
+	}
+
 	/**
 	 * @When user :user update view :viewName with title :title and emoji :emoji
 	 *
@@ -837,12 +861,7 @@ class FeatureContext implements Context {
 			$data['emoji'] = $emoji;
 		}
 
-		$this->sendRequest(
-			'PUT',
-			'/apps/tables/api/1/views/'.$this->viewIds[$viewName],
-			[ 'data' => $data ]
-		);
-
+		$this->sendUpdateViewRequest($viewName, $data);
 		$updatedItem = $this->getDataFromResponse($this->response);
 
 		Assert::assertEquals(200, $this->response->getStatusCode());
@@ -872,13 +891,7 @@ class FeatureContext implements Context {
 			return $col['id'];
 		}, $columns);
 
-		$view = $this->collectionManager->getByAlias('view', $viewAlias);
-
-		$this->sendRequest(
-			'PUT',
-			'/apps/tables/api/1/views/' . $view['id'],
-			[ 'data' => ['columns' => json_encode($columns)] ]
-		);
+		$this->sendUpdateViewRequest($viewAlias, ['columns' => json_encode($columns)]);
 	}
 
 	/**
@@ -1584,11 +1597,8 @@ class FeatureContext implements Context {
 	 * User management
 	 */
 
-	/**
-	 * @Given /^as user "([^"]*)"$/
-	 * @param string $user
-	 */
-	public function setCurrentUser($user) {
+	#[Given('as user :user')]
+	public function setCurrentUser(?string $user): void {
 		$this->currentUser = $user;
 	}
 
@@ -2609,6 +2619,38 @@ class FeatureContext implements Context {
 			return (int)$actualRow['id'];
 		}, $allRows);
 		sort($actualRowIds);
+
+		Assert::assertSame($expectedIds, $actualRowIds);
+	}
+
+	/**
+	 * @Then :nodeType :nodeAlias has exactly these rows :rowAliasList in exactly this order
+	 */
+	public function nodeHasExactlyThoseSortedRows(string $nodeType, string $nodeAlias, string $rowAliasList): void {
+		$nodeItem = $this->collectionManager->getByAlias($nodeType, $nodeAlias);
+
+		$this->sendRequest(
+			'GET',
+			sprintf('/apps/tables/api/1/%ss/%s/rows', $nodeType, $nodeItem['id']),
+		);
+
+		$allRows = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		$rowAliases = explode(',', $rowAliasList);
+		$expectedIds = array_map(function ($rowAlias): int {
+			$row = $this->collectionManager->getByAlias('row', $rowAlias);
+			return $row['id'];
+		}, $rowAliases);
+
+		$actualRowIds = array_map(function (array $actualRow): int {
+			if ($this->collectionManager->getById('row', (int)$actualRow['id'])) {
+				$this->collectionManager->update($actualRow, 'row', (int)$actualRow['id']);
+			} else {
+				$this->collectionManager->register($actualRow, 'row', (int)$actualRow['id']);
+			}
+			return (int)$actualRow['id'];
+		}, $allRows);
 
 		Assert::assertSame($expectedIds, $actualRowIds);
 	}
