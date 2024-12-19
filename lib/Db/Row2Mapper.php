@@ -175,9 +175,7 @@ class Row2Mapper {
 
 		$wantedRowIdsArray = $this->getWantedRowIds($userId, $tableId, $filter, $limit, $offset);
 
-		// TODO add sorting
-
-		return $this->getRows($wantedRowIdsArray, $columnIdsArray);
+		return $this->getRows($wantedRowIdsArray, $columnIdsArray, $sort ?? []);
 	}
 
 	/**
@@ -186,7 +184,7 @@ class Row2Mapper {
 	 * @return Row2[]
 	 * @throws InternalError
 	 */
-	private function getRows(array $rowIds, array $columnIds): array {
+	private function getRows(array $rowIds, array $columnIds, array $sort = []): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$qbSqlForColumnTypes = null;
@@ -224,14 +222,16 @@ class Row2Mapper {
 			->innerJoin('t1', 'tables_row_sleeves', 'rs', 'rs.id = t1.row_id');
 
 		try {
-			$result = $this->db->executeQuery($qb->getSQL(), $qb->getParameters(), $qb->getParameterTypes());
+			$result = $qb->executeQuery();
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), );
 		}
 
 		try {
-			$sleeves = $this->rowSleeveMapper->findMultiple($rowIds);
+			$sleeves = $this->rowSleeveMapper->findMultiple($rowIds, function (IQueryBuilder $qb, string $sleevesAlias) use ($sort) {
+				$this->addSortQueryForMultipleSleeveFinder($qb, $sleevesAlias, $sort);
+			});
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
@@ -262,6 +262,59 @@ class Row2Mapper {
 			);
 		}
 	}
+
+	/**
+	 * This method is passed to RowSleeveMapper::findMultiple() when the rows need sorting. The RowSleeveMapper does not have
+	 * knowledge about the column information, as they reside in this class, and the mapper is called from here.
+	 *
+	 * @throws InternalError
+	 */
+	private function addSortQueryForMultipleSleeveFinder(IQueryBuilder $qb, string $sleevesAlias, array $sort): void {
+		$i = 1;
+		foreach (array_reverse($sort) as $sortData) {
+			if (!isset($this->columns[$sortData['columnId']]) && !isset($this->allColumns[$sortData['columnId']]) && $sortData['columnId'] > 0) {
+				throw new InternalError('No column found to build filter with for id ' . $sortData['columnId']);
+			}
+
+			// if is normal column
+			if ($sortData['columnId'] >= 0) {
+				$column = $this->columns[$sortData['columnId']] ?? $this->allColumns[$sortData['columnId']];
+				$valueTable = 'tables_row_cells_' . $column->getType();
+				$alias = 'sort' . $i;
+				$qb->leftJoin($sleevesAlias, $valueTable, $alias,
+					$qb->expr()->andX(
+						$qb->expr()->eq($sleevesAlias . '.id', $alias . '.row_id'),
+						$qb->expr()->eq($alias . '.column_id', $qb->createNamedParameter($sortData['columnId']))
+					)
+				);
+				$qb->orderBy($alias . '.value', $sortData['mode']);
+			} elseif (Column::isValidMetaTypeId($sortData['columnId'])) {
+				$fieldName = match ($sortData['columnId']) {
+					Column::TYPE_META_ID => 'id',
+					Column::TYPE_META_CREATED_BY => 'created_by',
+					Column::TYPE_META_CREATED_AT => 'created_at',
+					Column::TYPE_META_UPDATED_BY => 'updated_by',
+					Column::TYPE_META_UPDATED_AT => 'updated_at',
+					default => null,
+				};
+
+				if ($fieldName === null) {
+					// Can happen, when–
+					// … a new meta column was introduced, but not considered here
+					// … a meta column was removed and existing sort rules are not being adapted
+					// those case are being ignored, but would require developer attention
+					$this->logger->error('No meta column (ID: {columnId}) found for sorting id', [
+						'columnId' => $sortData['columnId'],
+					]);
+					continue;
+				}
+
+				$qb->orderBy($sleevesAlias . '.' . $fieldName, $sortData['mode']);
+			}
+			$i++;
+		}
+	}
+
 
 	private function replacePlaceholderValues(array &$filters, string $userId): void {
 		foreach ($filters as &$filterGroup) {
