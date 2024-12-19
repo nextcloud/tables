@@ -40,14 +40,18 @@ class RowSleeveMapper extends QBMapper {
 
 	/**
 	 * @param int[] $ids
+	 * @param ?callable $sorter an optional callback function that accepts the IQueryBuilder as parameter
 	 * @return RowSleeve[]
 	 * @throws Exception
 	 */
-	public function findMultiple(array $ids): array {
+	public function findMultiple(array $ids, ?callable $sorter = null): array {
 		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->table)
-			->where($qb->expr()->in('id', $qb->createNamedParameter($ids, IQueryBuilder::PARAM_INT_ARRAY)));
+		$qb->select('sleeves.id', 'sleeves.table_id', 'sleeves.created_by', 'sleeves.created_at', 'sleeves.last_edit_by', 'sleeves.last_edit_at')
+			->from($this->table, 'sleeves')
+			->where($qb->expr()->in('sleeves.id', $qb->createNamedParameter($ids, IQueryBuilder::PARAM_INT_ARRAY)));
+		if ($sorter !== null) {
+			$sorter($qb);
+		}
 		return $this->findEntities($qb);
 	}
 
