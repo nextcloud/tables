@@ -103,7 +103,7 @@
 					</NcEmptyContent>
 				</div>
 				<div v-else>
-					<NcEmptyContent :name="t('tables', 'Failed')" :description="t('tables', 'Unable to import data')" />
+					<NcEmptyContent :name="t('tables', 'Failed')" :description="errorMessage" />
 				</div>
 			</div>
 
@@ -116,7 +116,7 @@
 
 <script>
 import { NcDialog, NcButton, NcCheckboxRadioSwitch, NcEmptyContent, NcLoadingIcon } from '@nextcloud/vue'
-import { getFilePickerBuilder, FilePickerType, showError, showWarning } from '@nextcloud/dialogs'
+import { getFilePickerBuilder, FilePickerType, showWarning } from '@nextcloud/dialogs'
 import RowFormWrapper from '../../shared/components/ncTable/partials/rowTypePartials/RowFormWrapper.vue'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import IconFolder from 'vue-material-design-icons/Folder.vue'
@@ -184,6 +184,7 @@ export default {
 				'application/vnd.oasis.opendocument.spreadsheet',
 			],
 			selectedUploadFile: null,
+			errorMessage: t('tables', 'Could not import data due to unknown errors.'),
 		}
 	},
 
@@ -289,23 +290,11 @@ export default {
 					this.preview = res.data
 					this.loading = false
 				} else {
-					if (res.status === 401) {
-						console.debug('error while importing', res)
-						showError(t('tables', 'Could not import, not authorized. Are you logged in?'))
-					} else if (res.status === 403) {
-						console.debug('error while importing', res)
-						showError(t('tables', 'Could not import, missing needed permission.'))
-					} else if (res.status === 404) {
-						console.debug('error while importing', res)
-						showError(t('tables', 'Could not import, needed resources were not found.'))
-					} else {
-						showError(t('tables', 'Could not import data due to unknown errors.'))
-						console.debug('error while importing', res)
-					}
+					this.handleResponse(res, null)
 					this.importFailed = true
 				}
 			} catch (e) {
-				showError(t('tables', 'Could not import data due to unknown errors.'))
+				this.errorMessage = t('tables', 'Could not import data due to unknown errors.')
 				console.error(e)
 				this.importFailed = true
 				return false
@@ -328,23 +317,11 @@ export default {
 					this.preview = res.data
 					this.loading = false
 				} else {
-					if (res.status === 401) {
-						console.debug('error while importing', res)
-						showError(t('tables', 'Could not import, not authorized. Are you logged in?'))
-					} else if (res.status === 403) {
-						console.debug('error while importing', res)
-						showError(t('tables', 'Could not import, missing needed permission.'))
-					} else if (res.status === 404) {
-						console.debug('error while importing', res)
-						showError(t('tables', 'Could not import, needed resources were not found.'))
-					} else {
-						showError(t('tables', 'Could not import data due to unknown errors.'))
-						console.debug('error while importing', res)
-					}
+					this.handleResponse(res, null)
 					this.importFailed = true
 				}
 			} catch (e) {
-				showError(t('tables', 'Could not import data due to unknown errors.'))
+				this.errorMessage = t('tables', 'Could not import data due to unknown errors.')
 				console.error(e)
 				this.importFailed = true
 				return false
@@ -406,22 +383,10 @@ export default {
 					this.result = res.data
 				} else {
 					console.debug('error while importing', res)
-					showError(t('tables', res.data?.message || 'Could not import data due to unknown errors.'))
+					this.errorMessage = t('tables', res.data?.message || 'Could not import data due to unknown errors.')
 				}
 			} catch (e) {
-				if (e.response?.status === 401) {
-					console.debug('error while importing', e)
-					showError(t('tables', 'Could not import, not authorized. Are you logged in?'))
-				} else if (e.response?.status === 403) {
-					console.debug('error while importing', e)
-					showError(t('tables', 'Could not import, missing needed permission.'))
-				} else if (e.response?.status === 404) {
-					console.debug('error while importing', e)
-					showError(t('tables', 'Could not import, needed resources were not found.'))
-				} else {
-					console.debug('error while importing', e)
-					showError(t('tables', e.response.data?.message || 'Could not import data due to unknown errors.'))
-				}
+				this.handleResponse(e.response, e)
 			}
 			this.loading = false
 		},
@@ -444,22 +409,10 @@ export default {
 					this.result = res.data
 				} else {
 					console.debug('error while importing', res)
-					showError(t('tables', res.data?.message || 'Could not import data due to unknown errors.'))
+					this.errorMessage = t('tables', res.data?.message || 'Could not import data due to unknown errors.')
 				}
 			} catch (e) {
-				if (e.response?.status === 401) {
-					console.debug('error while importing', e)
-					showError(t('tables', 'Could not import, not authorized. Are you logged in?'))
-				} else if (e.response?.status === 403) {
-					console.debug('error while importing', e)
-					showError(t('tables', 'Could not import, missing needed permission.'))
-				} else if (e.response?.status === 404) {
-					console.debug('error while importing', e)
-					showError(t('tables', 'Could not import, needed resources were not found.'))
-				} else {
-					console.debug('error while importing', e)
-					showError(t('tables', e.response?.data?.message || 'Could not import data due to unknown errors.'))
-				}
+				this.handleResponse(e.response, e)
 			}
 			this.loading = false
 		},
@@ -504,6 +457,21 @@ export default {
 		},
 		onUpdateColumnsConfig(event) {
 			this.columnsConfig = event
+		},
+		handleResponse(res, e) {
+			if (res?.status === 401) {
+				console.debug('error while importing', e || res)
+				this.errorMessage = t('tables', 'Could not import, not authorized. Are you logged in?')
+			} else if (res?.status === 403) {
+				console.debug('error while importing', e || res)
+				this.errorMessage = t('tables', 'Could not import, missing needed permission.')
+			} else if (res?.status === 404) {
+				console.debug('error while importing', e || res)
+				this.errorMessage = t('tables', 'Could not import, needed resources were not found.')
+			} else {
+				console.debug('error while importing', e || res)
+				this.errorMessage = t('tables', e?.response?.data?.message || 'Could not import data due to unknown errors.')
+			}
 		},
 	},
 
