@@ -121,6 +121,8 @@ return [
 		['name' => 'search#all', 'url' => '/search/all', 'verb' => 'GET'],
 	],
 	'ocs' => [
+		['name' => 'navigation#getAppsNavigation', 'url' => '/navigation', 'verb' => 'GET'],
+
 		// API v2
 		['name' => 'ApiGeneral#index', 'url' => '/api/2/init', 'verb' => 'GET'],
 		// -> tables

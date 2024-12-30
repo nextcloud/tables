@@ -25,3 +25,9 @@ export const TYPE_TEXT = 'text'
 export const TYPE_NUMBER = 'number'
 export const TYPE_DATETIME = 'datetime'
 export const TYPE_USERGROUP = 'usergroup'
+
+export const NAV_ENTRY_MODE = {
+	NAV_ENTRY_MODE_HIDDEN: 0, // no nav bar entry
+	// NAV_ENTRY_MODE_RECIPIENTS: 1, // nav bar entry for share recipients, but not the owner. Currently unused.
+	NAV_ENTRY_MODE_ALL: 2, // nav bar entry for everybody
+}
