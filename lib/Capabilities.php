@@ -6,6 +6,7 @@
 
 namespace OCA\Tables;
 
+use OCA\Tables\Helper\CircleHelper;
 use OCP\App\IAppManager;
 use OCP\Capabilities\ICapability;
 use OCP\IConfig;
@@ -18,18 +19,23 @@ use Psr\Log\LoggerInterface;
  */
 class Capabilities implements ICapability {
 	private IAppManager $appManager;
+
 	private LoggerInterface $logger;
+
 	private IConfig $config;
 
-	public function __construct(IAppManager $appManager, LoggerInterface $logger, IConfig $config) {
+	private CircleHelper $circleHelper;
+
+	public function __construct(IAppManager $appManager, LoggerInterface $logger, IConfig $config, CircleHelper $circleHelper) {
 		$this->appManager = $appManager;
 		$this->logger = $logger;
 		$this->config = $config;
+		$this->circleHelper = $circleHelper;
 	}
 
 	/**
 	 *
-	 * @return array{tables: array{enabled: bool, version: string, apiVersions: string[], features: string[], column_types: string[]}}
+	 * @return array{tables: array{enabled: bool, version: string, apiVersions: string[], features: string[], isCirclesEnabled: bool, column_types: string[]}}
 	 *
 	 * @inheritDoc
 	 */
@@ -52,6 +58,7 @@ class Capabilities implements ICapability {
 					'favorite',
 					'archive',
 				],
+				'isCirclesEnabled' => $this->circleHelper->isCirclesEnabled(),
 				'column_types' => [
 					'text-line',
 					$textColumnVariant,

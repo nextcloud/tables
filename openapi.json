@@ -33,6 +33,7 @@
                             "version",
                             "apiVersions",
                             "features",
+                            "isCirclesEnabled",
                             "column_types"
                         ],
                         "properties": {
@@ -53,6 +54,9 @@
                                 "items": {
                                     "type": "string"
                                 }
+                            },
+                            "isCirclesEnabled": {
+                                "type": "boolean"
                             },
                             "column_types": {
                                 "type": "array",
