@@ -524,7 +524,8 @@ class Api1Controller extends ApiController {
 	 * @param bool $permissionUpdate Permission if receiver can update data
 	 * @param bool $permissionDelete Permission if receiver can delete data
 	 * @param bool $permissionManage Permission if receiver can manage node
-	 * @param int $displayMode context shares only, whether it should appear in nav bar. 0: no, 1: recipients, 2: all
+	 * @param int $displayMode context shares only, whether it should appear in nav bar. 0: no, 1: recipients, 2: all (default). Cf. Application::NAV_ENTRY_MODE_*.
+	 * @psalm-param int<0, 2> $displayMode
 	 * @return DataResponse<Http::STATUS_OK, TablesShare, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Share returned
@@ -545,10 +546,22 @@ class Api1Controller extends ApiController {
 		bool $permissionUpdate = false,
 		bool $permissionDelete = false,
 		bool $permissionManage = false,
-		int $displayMode = 0,
+		int $displayMode = 2,
 	): DataResponse {
 		try {
-			return new DataResponse($this->shareService->create($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage, $displayMode)->jsonSerialize());
+			return new DataResponse(
+				$this->shareService->create(
+					$nodeId,
+					$nodeType,
+					$receiver,
+					$receiverType,
+					$permissionRead,
+					$permissionCreate,
+					$permissionUpdate,
+					$permissionDelete,
+					$permissionManage,
+					$displayMode
+				)->jsonSerialize());
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: '.$e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -1431,7 +1444,20 @@ class Api1Controller extends ApiController {
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function createTableShare(int $tableId, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage): DataResponse {
 		try {
-			return new DataResponse($this->shareService->create($tableId, 'table', $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage, 0)->jsonSerialize());
+			return new DataResponse(
+				$this->shareService->create(
+					$tableId,
+					'table',
+					$receiver,
+					$receiverType,
+					$permissionRead,
+					$permissionCreate,
+					$permissionUpdate,
+					$permissionDelete,
+					$permissionManage,
+					Application::NAV_ENTRY_MODE_ALL
+				)->jsonSerialize()
+			);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: '.$e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
