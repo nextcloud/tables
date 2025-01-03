@@ -159,7 +159,7 @@ Cypress.Commands.add('unifiedSearch', (term) => {
 	cy.get('.unified-search__results .unified-search__result-line-one span').contains(term, { matchCase: false }).should('exist')
 })
 
-Cypress.Commands.add('createUsergroupColumn', (title, selectUsers, selectGroups, selectTeams, hasMultipleValues, defaultValue, isFirstColumn) => {
+Cypress.Commands.add('createUsergroupColumn', (title, selectUsers, selectGroups, selectCircles, hasMultipleValues, defaultValue, isFirstColumn) => {
 	cy.openCreateColumnModal(isFirstColumn)
 	cy.get('[data-cy="columnTypeFormInput"]').clear().type(title)
 	cy.get('.columnTypeSelection .vs__open-indicator').click({ force: true })
@@ -172,11 +172,11 @@ Cypress.Commands.add('createUsergroupColumn', (title, selectUsers, selectGroups,
 	if (selectGroups) {
 		cy.get('[data-cy="groupsSwitch"] input').click({ force: true })
 	}
-	if (selectTeams) {
+	if (selectCircles) {
 		cy.get('[data-cy="teamsSwitch"] input').click({ force: true })
 	}
 	// Users is always checked by default, and we can only disable it if some other option is already enabled
-	if (!selectUsers & (selectGroups || selectTeams)) {
+	if (!selectUsers & (selectGroups || selectCircles)) {
 		cy.get('[data-cy="usersSwitch"] input').click({ force: true })
 	}
 

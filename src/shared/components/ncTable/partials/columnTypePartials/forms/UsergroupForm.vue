@@ -80,14 +80,12 @@ export default {
 		return {
 			mutableColumn: this.column,
 			value: this.column.usergroupDefault,
-			// Used in searchUserGroup mixin to decide types to search for
 			selectUsers: this.column.usergroupSelectUsers,
 			selectGroups: this.column.usergroupSelectGroups,
-			selectTeams: this.column.usergroupSelectTeams,
+			selectCircles: false,
 			selectOptions: {
 				'usergroup-user': 'Users',
 				'usergroup-group': 'Groups',
-				'usergroup-team': 'Teams',
 			},
 		}
 	},
@@ -114,7 +112,7 @@ export default {
 				if (this.selectGroups) {
 					values.push('usergroup-group')
 				}
-				if (this.selectTeams) {
+				if (this.selectCircles) {
 					values.push('usergroup-team')
 				}
 				return values
@@ -129,7 +127,7 @@ export default {
 				this.selectGroups = newValue.includes('usergroup-group')
 				this.mutableColumn.usergroupSelectGroups = newValue.includes('usergroup-group')
 
-				this.selectTeams = newValue.includes('usergroup-team')
+				this.selectCircles = newValue.includes('usergroup-team')
 				this.mutableColumn.usergroupSelectTeams = newValue.includes('usergroup-team')
 			},
 		},
@@ -138,6 +136,15 @@ export default {
 		column() {
 			this.mutableColumn = this.column
 		},
+	},
+	created() {
+		// Update the circles-related data once the component is created
+		// Doing this in data() doesn't work due to timing issues,
+		// since the data() function runs before the capabilities are fully initialized
+		this.selectCircles = this.isCirclesEnabled ? this.column.usergroupSelectTeams : false
+		if (this.isCirclesEnabled) {
+			this.selectOptions['usergroup-team'] = 'Teams'
+		}
 	},
 	methods: {
 		isOnlyChecked(key) {
