@@ -64,7 +64,7 @@
 							</NcActionCheckbox>
 							<NcActionButton v-if="!isView && !personHasTableManagePermission(share.receiver)"
 								:close-after-click="true"
-								@click="promoteToManager(share)">
+								@click="warnOnPromote(share)">
 								<template #icon>
 									<Crown :size="20" />
 								</template>
@@ -114,6 +114,16 @@
 		<div v-else>
 			{{ t('tables', 'No shares') }}
 		</div>
+		<div>
+			<DialogConfirmation :description="t('tables', 'After table promotion, any applications based on this table created by the share recipients will continue to consume its data even if you demote them later')"
+				:title="t('tables', 'Confirm table manager promotion')"
+				:cancel-title="t('tables', 'Cancel')"
+				:confirm-title="t('tables', 'Promote to table manager')"
+				confirm-class="warning"
+				:show-modal="showModal"
+				@confirm="promoteToManager"
+				@cancel="showModal=false" />
+		</div>
 	</div>
 </template>
 
@@ -127,6 +137,9 @@ import Crown from 'vue-material-design-icons/Crown.vue'
 import Information from 'vue-material-design-icons/Information.vue'
 import Account from 'vue-material-design-icons/Account.vue'
 import moment from '@nextcloud/moment'
+import { showWarning } from '@nextcloud/dialogs'
+import DialogConfirmation from '../../../shared/modals/DialogConfirmation.vue'
+import '@nextcloud/dialogs/style.css'
 
 export default {
 	components: {
@@ -142,6 +155,7 @@ export default {
 		NcActionSeparator,
 		OpenInNew,
 		Crown,
+		DialogConfirmation,
 	},
 
 	mixins: [formatting],
@@ -158,6 +172,8 @@ export default {
 			loading: false,
 			// To enable the share info popup
 			debug: false,
+			showModal: false,
+			currentShare: {},
 		}
 	},
 
@@ -205,10 +221,18 @@ export default {
 		updatePermission(share, permission, value) {
 			this.$emit('update', { id: share.id, permission, value })
 		},
-		promoteToManager(share) {
-			this.$emit('update', { id: share.id, permission: 'manage', value: true })
+		warnOnPromote(share) {
+			this.currentShare = share
+			this.showModal = true
 		},
-		demoteManager(share) {
+		promoteToManager() {
+			if (!this.currentShare) return
+			this.$emit('update', { id: this.currentShare?.id, permission: 'manage', value: true })
+			this.currentShare = {}
+			this.showModal = false
+		},
+		async demoteManager(share) {
+			showWarning(t('tables', 'Any application created by a demoted share recipients using a shared table will continue to consume its data.', { share: share.displayName }))
 			this.$emit('update', { id: share.id, permission: 'manage', value: false })
 		},
 		personHasTableManagePermission(userId) {
