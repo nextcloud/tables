@@ -61,6 +61,12 @@ export default {
 			},
 		},
 	},
+	created() {
+		// Update the circles-related data once the component is created
+		// Doing this in data() doesn't work due to timing issues,
+		// since the data() function runs before the capabilities are fully initialized
+		this.selectCircles = this.isCirclesEnabled ? this.column.usergroupSelectTeams : false
+	},
 	methods: {
 		addItem(selectedItem) {
 			if (selectedItem) {
@@ -77,8 +83,8 @@ export default {
 		formatResult(autocompleteResult) {
 			return {
 				id: autocompleteResult.id,
-				type: autocompleteResult.source.startsWith('users') ? 0 : 1,
-				key: autocompleteResult.id,
+				type: this.getType(autocompleteResult.source),
+				key: autocompleteResult.source + '-' + autocompleteResult.id,
 				displayName: autocompleteResult.label,
 			}
 		},

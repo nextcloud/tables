@@ -295,6 +295,7 @@ class ApiColumnsController extends AOCSController {
 	 * @param boolean $usergroupMultipleItems Whether you can select multiple users or/and groups
 	 * @param boolean $usergroupSelectUsers Whether you can select users
 	 * @param boolean $usergroupSelectGroups Whether you can select groups
+	 * @param boolean $usergroupSelectTeams Whether you can select teams
 	 * @param boolean $showUserStatus Whether to show the user's status
 	 * @param string|null $description Description
 	 * @param int[]|null $selectedViewIds View IDs where this columns should be added
@@ -311,7 +312,7 @@ class ApiColumnsController extends AOCSController {
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
-	public function createUsergroupColumn(int $baseNodeId, string $title, ?string $usergroupDefault, bool $usergroupMultipleItems = null, bool $usergroupSelectUsers = null, bool $usergroupSelectGroups = null, bool $showUserStatus = null, string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
+	public function createUsergroupColumn(int $baseNodeId, string $title, ?string $usergroupDefault, bool $usergroupMultipleItems = null, bool $usergroupSelectUsers = null, bool $usergroupSelectGroups = null, bool $usergroupSelectTeams = null, bool $showUserStatus = null, string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		$column = $this->service->create(
@@ -327,6 +328,7 @@ class ApiColumnsController extends AOCSController {
 				usergroupMultipleItems: $usergroupMultipleItems,
 				usergroupSelectUsers: $usergroupSelectUsers,
 				usergroupSelectGroups: $usergroupSelectGroups,
+				usergroupSelectTeams: $usergroupSelectTeams,
 				showUserStatus: $showUserStatus
 			),
 			$selectedViewIds

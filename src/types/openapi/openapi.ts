@@ -782,6 +782,7 @@ export type components = {
             readonly usergroupMultipleItems: boolean;
             readonly usergroupSelectUsers: boolean;
             readonly usergroupSelectGroups: boolean;
+            readonly usergroupSelectTeams: boolean;
             readonly showUserStatus: boolean;
         };
         readonly Context: {
@@ -2213,6 +2214,8 @@ export interface operations {
                     readonly usergroupSelectUsers?: boolean | null;
                     /** @description Can select groups, if column type is usergroup */
                     readonly usergroupSelectGroups?: boolean | null;
+                    /** @description Can select teams, if column type is usergroup */
+                    readonly usergroupSelectTeams?: boolean | null;
                     /** @description Whether to show the user's status, if column type is usergroup */
                     readonly usergroupShowUserStatus?: boolean | null;
                     /**
@@ -2414,6 +2417,8 @@ export interface operations {
                     readonly usergroupSelectUsers?: boolean | null;
                     /** @description Can select groups, if column type is usergroup */
                     readonly usergroupSelectGroups?: boolean | null;
+                    /** @description Can select teams, if column type is usergroup */
+                    readonly usergroupSelectTeams?: boolean | null;
                     /** @description Whether to show the user's status, if column type is usergroup */
                     readonly usergroupShowUserStatus?: boolean | null;
                     /**
@@ -2591,6 +2596,8 @@ export interface operations {
                     readonly usergroupSelectUsers?: boolean | null;
                     /** @description Can select groups, if column type is usergroup */
                     readonly usergroupSelectGroups?: boolean | null;
+                    /** @description Can select teams, if column type is usergroup */
+                    readonly usergroupSelectTeams?: boolean | null;
                     /** @description Whether to show the user's status, if column type is usergroup */
                     readonly usergroupShowUserStatus?: boolean | null;
                 };
@@ -4614,6 +4621,8 @@ export interface operations {
                     readonly usergroupSelectUsers?: boolean;
                     /** @description Whether you can select groups */
                     readonly usergroupSelectGroups?: boolean;
+                    /** @description Whether you can select teams */
+                    readonly usergroupSelectTeams?: boolean;
                     /** @description Whether to show the user's status */
                     readonly showUserStatus?: boolean;
                     /** @description Description */
