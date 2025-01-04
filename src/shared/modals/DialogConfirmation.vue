@@ -4,7 +4,8 @@
 -->
 <template>
 	<NcDialog v-if="showModal" :out-transition="true"
-		size="normal" close-on-click-outside :name="title" @closing="$emit('cancel')">
+		size="normal" close-on-click-outside :name="title" @closing="$emit('cancel')"
+		data-cy="confirmDialog">
 		<div class="row">
 			<div v-if="description" class="col-4">
 				<p>{{ description }}</p>
