@@ -449,13 +449,18 @@ class ViewService extends SuperService {
 			$rawSortArray = $view->getSortArray();
 			if ($rawSortArray) {
 				$view->setSortArray(
-					array_map(static function ($sortRule) use ($view) {
+					array_map(static function (array $sortRule) use ($view): array {
 						$columnsArray = $view->getColumnsArray();
-						if (isset($sortRule['columnId']) && $columnsArray && in_array($sortRule['columnId'], $columnsArray, true)) {
+						if (isset($sortRule['columnId'])
+							&& (
+								Column::isValidMetaTypeId($sortRule['columnId'])
+								|| in_array($sortRule['columnId'], $columnsArray, true)
+							)
+						) {
 							return $sortRule;
 						}
 						// Instead of sort rule just indicate that there is a rule, but hide details
-						return null;
+						return [];
 					},
 						$rawSortArray));
 			}
