@@ -868,6 +868,9 @@ class FeatureContext implements Context {
 
 		$columns = explode(',', $columnList);
 		$columns = array_map(function (string $columnAlias) {
+			if (is_numeric($columnAlias)) {
+				return (int)$columnAlias;
+			}
 			$col = $this->collectionManager->getByAlias('column', $columnAlias);
 			return $col['id'];
 		}, $columns);
