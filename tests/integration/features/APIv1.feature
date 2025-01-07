@@ -243,7 +243,7 @@ Feature: APIv1
       | mandatory     | 0               |
       | description   | Note me a thing |
     And user "participant1" create view "Simple View" with emoji "🙃" for "table_p1" as "simple-view"
-    When user "participant1" sets columns "Volatile Notes" to view "simple-view"
+    When user "participant1" sets columns "Volatile Notes,-1" to view "simple-view"
     Then the reported status is "200"
 
   @api1 @views
