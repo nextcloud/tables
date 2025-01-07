@@ -110,6 +110,7 @@
 					</NcActionButton>
 					<NcActionButton v-if="showDeleteColumn"
 						:aria-label="t('tables', 'Delete column')"
+						data-cy="deleteColumnActionBtn"
 						@click="deleteColumn()">
 						<template #icon>
 							<Delete :size="25" />
