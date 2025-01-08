@@ -94,6 +94,7 @@ OC.L10N.register(
     "Select from Files" : "Kies uit bestanden",
     "Upload from device" : "Uploaden vanaf apparaat",
     "Preview" : "Voorbeeld",
+    "Failed" : "Mislukt",
     "Please select a file." : "Selecteer een bestand.",
     "Result" : "Resultaat",
     "Transfer" : "Overdragen",

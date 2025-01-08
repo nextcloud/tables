@@ -53,6 +53,7 @@ OC.L10N.register(
     "Close" : "Close",
     "Upload from device" : "Upload from device",
     "Preview" : "Preview",
+    "Failed" : "Failed",
     "Please select a file." : "Please select a file.",
     "Result" : "Result",
     "Transfer" : "Transfer",

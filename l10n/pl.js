@@ -160,6 +160,7 @@ OC.L10N.register(
     "Select from Files" : "Wybierz z Plików",
     "Upload from device" : "Wyślij z urządzenia",
     "Preview" : "Podgląd",
+    "Failed" : "Nie powiodło się",
     "Please select a file." : "Wybierz plik.",
     "Could not import, not authorized. Are you logged in?" : "Nie można zaimportować, brak autoryzacji. Czy jesteś zalogowany?",
     "Result" : "Wynik",

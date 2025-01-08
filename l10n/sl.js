@@ -229,6 +229,7 @@ OC.L10N.register(
     "Upload from device" : "Pošlji z naprave",
     "⚠️ You don't have the permission to create columns." : "⚠️ Ni ustreznih dovoljenj za ustvarjanje stolpcev.",
     "Preview" : "Predogled",
+    "Failed" : "Opravilo je spodletelo!",
     "Please select a file." : "Izberite datoteko.",
     "Result" : "Rezultat",
     "Found columns" : "Najdeni stolpci",

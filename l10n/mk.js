@@ -51,6 +51,7 @@ OC.L10N.register(
     "Close" : "Затвори",
     "Select from Files" : "Избри од датотеките",
     "Upload from device" : "Прикачи од уред",
+    "Failed" : "Неуспешно",
     "Please select a file." : "Изберете датотека.",
     "Transfer" : "Пренос",
     "Filter" : "Филтер",

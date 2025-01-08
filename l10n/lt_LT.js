@@ -95,6 +95,7 @@ OC.L10N.register(
     "Select from Files" : "Pasirinkti iš failų",
     "Preview" : "Peržiūra",
     "This might take a while..." : "Tai gali šiek tiek užtrukti...",
+    "Failed" : "Nepavyko",
     "Please select a file." : "Pasirinkite failą.",
     "Transfer" : "Persiųsti",
     "Filter" : "Filtras",

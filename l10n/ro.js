@@ -57,6 +57,7 @@ OC.L10N.register(
     "Select from Files" : "Selectează din fișiere",
     "Upload from device" : "Încarcă din dispozitiv",
     "Preview" : "Previzualizare",
+    "Failed" : "Eșuat",
     "Please select a file." : "Te rugăm să alegi un fișier.",
     "Transfer" : "Transfer",
     "Filter" : "Filtru",

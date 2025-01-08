@@ -28,6 +28,7 @@ OC.L10N.register(
     "Cancel" : "Ofbriechen",
     "Delete" : "Läschen",
     "Close" : "Zoumaachen",
+    "Failed" : "Ausgefall",
     "Please select a file." : "Wiel eng Datei aus.",
     "Sort" : "Zortéieren",
     "Export" : "Exportéieren",

@@ -63,6 +63,7 @@ OC.L10N.register(
     "Select from Files" : "Seleccionar desde Archivos",
     "Upload from device" : "Cargar desde el dispositivo",
     "Preview" : "Previsualizar",
+    "Failed" : "Falló",
     "Please select a file." : "Por favor selecciona un archivo.",
     "Result" : "Resultado",
     "Transfer" : "Transferir",

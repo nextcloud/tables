@@ -138,6 +138,7 @@ OC.L10N.register(
     "Select from Files" : "Valitse tiedostosovelluksesta",
     "Upload from device" : "Lähetä laitteelta",
     "Preview" : "Esikatselu",
+    "Failed" : "Epäonnistui",
     "Loading table data" : "Ladataan taulukon tietoja",
     "Please select a file." : "Valitse tiedosto.",
     "Select file for the import" : "Valitse tuotava tiedosto",

@@ -50,6 +50,7 @@ OC.L10N.register(
     "Close" : "Tutup",
     "Select from Files" : "Pilih dari berkas",
     "Preview" : "Pratinjau",
+    "Failed" : "Gagal",
     "Please select a file." : "Silakan pilih berkas",
     "Transfer" : "Transfer",
     "Filter" : "Filter",

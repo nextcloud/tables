@@ -52,6 +52,7 @@ OC.L10N.register(
     "Close" : "Plegar",
     "Select from Files" : "Seleccionar dels fichièrs",
     "Preview" : "Apercebut",
+    "Failed" : "Fracàs",
     "Please select a file." : "Seleccionatz un fichièr.",
     "Sort" : "Triar",
     "Export" : "Exportar",

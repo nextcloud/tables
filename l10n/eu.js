@@ -211,6 +211,7 @@ OC.L10N.register(
     "Select from Files" : "Aukeratu fitxategien artean",
     "Upload from device" : "Igo gailutik",
     "Preview" : "Aurrebista",
+    "Failed" : "Huts egin du",
     "Import table" : "Inportatu taula",
     "Please select a file." : "Aukeratu fitxategi bat.",
     "Result" : "Emaitza",

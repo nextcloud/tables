@@ -44,6 +44,7 @@ OC.L10N.register(
     "Owner" : "Dueño",
     "Select from Files" : "Seleccionar desde Archivos",
     "Preview" : "Previsualizar",
+    "Failed" : "Falló",
     "Please select a file." : "Por favor selecciona un archivo.",
     "Result" : "Resultado",
     "Filter" : "Filtrar",

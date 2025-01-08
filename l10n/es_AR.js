@@ -54,6 +54,7 @@ OC.L10N.register(
     "Close" : "Cerrar",
     "Select from Files" : "Seleccionar desde Archivos",
     "Preview" : "Vista previa",
+    "Failed" : "Error",
     "Please select a file." : "Favor de seleccionar un archivo.",
     "Result" : "Resultado",
     "Transfer" : "Transferir",

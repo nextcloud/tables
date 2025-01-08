@@ -214,6 +214,7 @@ OC.L10N.register(
     "Upload from device" : "Загрузить с устройства",
     "⚠️ You don't have the permission to create columns." : "⚠️ У вас нет разрешений на создание столбцов.",
     "Preview" : "Предварительный просмотр",
+    "Failed" : "Не удалось",
     "Loading table data" : "Загрузка данных таблицы…",
     "Please select a file." : "Выберите файл.",
     "Create new column" : "Создайте новый столбец",

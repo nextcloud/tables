@@ -30,6 +30,7 @@ OC.L10N.register(
     "Delete" : "Obriši",
     "Owner" : "Vlasnik",
     "Close" : "Zatvori",
+    "Failed" : "Nije uspelo",
     "Please select a file." : "Izaberite fajl. ",
     "Copy" : "Kopiraj",
     "Favorites" : "Omiljene",
