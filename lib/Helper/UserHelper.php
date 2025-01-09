@@ -18,6 +18,7 @@ class UserHelper {
 	private IUserManager $userManager;
 
 	private LoggerInterface $logger;
+
 	private IGroupManager $groupManager;
 
 	public function __construct(IUserManager $userManager, LoggerInterface $logger, IGroupManager $groupManager) {
@@ -25,6 +26,7 @@ class UserHelper {
 		$this->logger = $logger;
 		$this->groupManager = $groupManager;
 	}
+
 	public function getUserDisplayName(string $userId): string {
 		try {
 			$user = $this->getUser($userId);

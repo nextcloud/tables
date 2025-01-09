@@ -741,6 +741,7 @@ export type components = {
                 readonly version: string;
                 readonly apiVersions: readonly string[];
                 readonly features: readonly string[];
+                readonly isCirclesEnabled: boolean;
                 readonly column_types: readonly string[];
             };
         };

@@ -50,7 +50,7 @@ class PermissionMiddleware extends Middleware {
 		$this->assertCanManageContext();
 	}
 
-	protected function assertPermission($controller, $methodName): void {
+	protected function assertPermission(Controller $controller, string $methodName): void {
 		$reflectionMethod = new \ReflectionMethod($controller, $methodName);
 		$permissionReqs = $reflectionMethod->getAttributes(RequirePermission::class);
 		if ($permissionReqs) {

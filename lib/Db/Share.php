@@ -49,7 +49,7 @@ class Share extends Entity implements JsonSerializable {
 
 	protected ?string $receiver = null;
 	protected ?string $receiverDisplayName = null;
-	protected ?string $receiverType = null; // user, group
+	protected ?string $receiverType = null; // user, group, circle
 	protected ?int $nodeId = null;
 	protected ?string $nodeType = null;
 	protected ?bool $permissionRead = null;

@@ -113,7 +113,12 @@ class LegacyRowMapper extends QBMapper {
 		return null;
 	}
 
-	private function getInnerFilterExpressions($qb, $filterGroup, int $groupIndex): array {
+	/**
+	 * @param (float|int|string)[][] $filterGroup
+	 *
+	 * @psalm-param list<array{columnId: int, operator: 'begins-with'|'contains'|'ends-with'|'is-empty'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal', value: float|int|string}> $filterGroup
+	 */
+	private function getInnerFilterExpressions(IQueryBuilder $qb, array $filterGroup, int $groupIndex): array {
 		$innerFilterExpressions = [];
 		foreach ($filterGroup as $index => $filter) {
 			$innerFilterExpressions[] = $this->buildFilterByColumnType($qb, $filter, $groupIndex.$index);
