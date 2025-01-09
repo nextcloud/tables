@@ -316,6 +316,7 @@ class ColumnService extends SuperService {
 			$item->setUsergroupMultipleItems($columnDto->getUsergroupMultipleItems());
 			$item->setUsergroupSelectUsers($columnDto->getUsergroupSelectUsers());
 			$item->setUsergroupSelectGroups($columnDto->getUsergroupSelectGroups());
+			$item->setUsergroupSelectTeams($columnDto->getUsergroupSelectTeams());
 			$item->setShowUserStatus($columnDto->getShowUserStatus());
 
 			$this->updateMetadata($item, $userId);
