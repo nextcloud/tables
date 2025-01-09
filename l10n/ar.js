@@ -291,6 +291,7 @@ OC.L10N.register(
     "Preview" : "مُعاينة",
     "Importing data from " : "إستيراد البيانات من ",
     "This might take a while..." : "يمكن أن يستغرق هذا بعض الوقت ...",
+    "Failed" : "فشل",
     "Loading table data" : "تحميل بيانات الجدول",
     "Could not import data due to unknown errors." : "تعذّر استيراد البيانات بسبب أخطاء غير معروفة.",
     "Import table" : "إستيراد جدول",

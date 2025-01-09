@@ -158,6 +158,7 @@ OC.L10N.register(
     "Could not create table" : "Nun se pudo crear la tabla",
     "Could not import data to table" : "Nun se pudieron importar los datos a la tabla",
     "Preview" : "Previsualizar",
+    "Failed" : "Falló",
     "Loading table data" : "Cargando los datos de la tabla",
     "The selected file is not supported." : "El ficheru seleicionáu nun ye compatible.",
     "Please select a file." : "Seleiciona un ficheru.",

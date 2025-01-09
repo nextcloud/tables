@@ -290,7 +290,7 @@ OC.L10N.register(
     "Preview" : "Vorschau",
     "Importing data from " : "Importiere Daten aus ",
     "This might take a while..." : "Dies kann etwas dauern…",
-    "Failed" : "Benötigt keine Übersetzung. Hier wird nur die formelle Übersetzung verwendet (de_DE).",
+    "Failed" : "Fehlgeschlagen",
     "Loading table data" : "Tabellendaten werden geladen",
     "Could not import data due to unknown errors." : "Daten konnten aufgrund unbekannter Fehler nicht importiert werden.",
     "Import table" : "Tabelle importieren",

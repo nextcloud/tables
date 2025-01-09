@@ -193,6 +193,7 @@ OC.L10N.register(
     "Select from Files" : "Избери от файловете",
     "Upload from device" : "Качване от устройство",
     "Preview" : "Визуализация",
+    "Failed" : "Неуспешно",
     "Please select a file." : "Моля изберете файл.",
     "Result" : "Резултат",
     "Transfer" : "Прехвърляне",
