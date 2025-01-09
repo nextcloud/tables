@@ -42,6 +42,14 @@
 				</div>
 				<NcContextResource :resources.sync="resources" :receivers.sync="receivers" />
 			</div>
+			<div class="row space-T">
+				<NcActionCheckbox :checked="showInNavigationDefault" @change="updateDisplayMode">
+					{{ t('tables', 'Show in app list') }}
+				</NcActionCheckbox>
+				<p class="nav-display-subtext">
+					{{ t('tables', 'This can be overridden by a per-account preference') }}
+				</p>
+			</div>
 			<div class="row space-R row space-T">
 				<div class="fix-col-4 end">
 					<NcButton type="primary" :aria-label="t('tables', 'Create application')" data-cy="createContextSubmitBtn" @click="submit">
@@ -54,13 +62,15 @@
 </template>
 
 <script>
-import { NcDialog, NcButton, NcIconSvgWrapper } from '@nextcloud/vue'
+import { NcDialog, NcButton, NcIconSvgWrapper, NcActionCheckbox } from '@nextcloud/vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
 import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'
 import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'
 import permissionBitmask from '../../shared/components/ncContextResource/mixins/permissionBitmask.js'
+import { getCurrentUser } from '@nextcloud/auth'
+import { NAV_ENTRY_MODE } from '../../shared/constants.js'
 
 export default {
 	name: 'CreateContext',
@@ -70,6 +80,7 @@ export default {
 		NcButton,
 		NcIconSvgWrapper,
 		NcContextResource,
+		NcActionCheckbox,
 	},
 	mixins: [svgHelper, permissionBitmask],
 	props: {
@@ -90,6 +101,7 @@ export default {
 			description: '',
 			resources: [],
 			receivers: [],
+			showInNavigationDefault: false,
 		}
 	},
 	watch: {
@@ -150,18 +162,32 @@ export default {
 				description: this.description,
 				nodes: dataResources,
 			}
-			const res = await this.$store.dispatch('insertNewContext', { data, previousReceivers: [], receivers: this.receivers })
+			// adding share to oneself to have navigation display control
+			this.receivers.push(
+				{
+					id: getCurrentUser().uid,
+					displayName: getCurrentUser().uid,
+					icon: 'icon-user',
+					isUser: true,
+					key: 'user-' + getCurrentUser().uid,
+				})
+			const displayMode = this.showInNavigation ? 'NAV_ENTRY_MODE_ALL' : 'NAV_ENTRY_MODE_HIDDEN'
+			const res = await this.$store.dispatch('insertNewContext', { data, previousReceivers: [], receivers: this.receivers, displayMode: NAV_ENTRY_MODE[displayMode] })
 			if (res) {
 				return res.id
 			} else {
 				showError(t('tables', 'Could not create new application'))
 			}
 		},
+		updateDisplayMode() {
+			this.showInNavigation = !this.showInNavigation
+		},
 		reset() {
 			this.title = ''
 			this.errorTitle = false
 			this.setIcon(this.randomIcon())
 			this.customTitleChosen = false
+			this.showInNavigationDefault = false
 		},
 	},
 }
@@ -174,6 +200,14 @@ export default {
 	.content-emoji {
 		display: inline-flex;
 		align-items: center;
+	}
+
+	.nav-display-subtext {
+		color: var(--color-text-maxcontrast)
+	}
+
+	li {
+		list-style: none;
 	}
 }
 </style>

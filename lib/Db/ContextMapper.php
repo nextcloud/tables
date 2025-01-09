@@ -96,6 +96,9 @@ class ContextMapper extends QBMapper {
 				'display_mode_default' => (int)$item['display_mode_default'],
 			];
 			if ($userId !== null) {
+				if ($item['display_mode'] === null) {
+					$item['display_mode'] = $item['display_mode_default'];
+				}
 				$carry[$item['share_id']]['display_mode'] = (int)$item['display_mode'];
 			}
 			return $carry;

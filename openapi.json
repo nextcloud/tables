@@ -10074,5 +10074,10 @@
             }
         }
     },
-    "tags": []
+    "tags": [
+        {
+            "name": "navigation",
+            "description": "This is a workaround until https://github.com/nextcloud/server/pull/49904 is settled in all covered NC versions; expected >= 31."
+        }
+    ]
 }
