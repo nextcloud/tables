@@ -40,10 +40,10 @@
 			</div>
 			<div class="row space-T">
 				<NcActionCheckbox :checked="showInNavigationDefault" @change="updateDisplayMode">
-					Show in app list
+					{{ t('tables', 'Show in app list') }}
 				</NcActionCheckbox>
 				<p class="nav-display-subtext">
-					This can be overridden by a per-account preference
+					{{ t('tables', 'This can be overridden by a per-account preference') }}
 				</p>
 			</div>
 			<div class="row space-T">
