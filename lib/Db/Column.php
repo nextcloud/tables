@@ -84,6 +84,8 @@ class Column extends Entity implements JsonSerializable {
 	public const TYPE_META_UPDATED_BY = -3;
 	public const TYPE_META_CREATED_AT = -4;
 	public const TYPE_META_UPDATED_AT = -5;
+	// In case a new one is added, add it to isValidMetaTypeId() as well.
+	// When we drop PHP 8.0, we can switch to enums.
 
 	public const TYPE_SELECTION = 'selection';
 	public const TYPE_TEXT = 'text';
@@ -151,6 +153,16 @@ class Column extends Entity implements JsonSerializable {
 		$this->addType('usergroupSelectUsers', 'boolean');
 		$this->addType('usergroupSelectGroups', 'boolean');
 		$this->addType('showUserStatus', 'boolean');
+	}
+
+	public static function isValidMetaTypeId(int $metaTypeId): bool {
+		return in_array($metaTypeId, [
+			self::TYPE_META_ID,
+			self::TYPE_META_CREATED_BY,
+			self::TYPE_META_UPDATED_BY,
+			self::TYPE_META_CREATED_AT,
+			self::TYPE_META_UPDATED_AT,
+		], true);
 	}
 
 	public static function fromDto(ColumnDto $data): self {

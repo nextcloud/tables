@@ -271,7 +271,7 @@ class ViewService extends SuperService {
 					$availableColumns = $columnService->findAllByTable($view->getTableId(), $view->getId(), $this->userId);
 					$availableColumns = array_map(static fn (Column $column) => $column->getId(), $availableColumns);
 					foreach ($columnIds as $columnId) {
-						if (!in_array($columnId, $availableColumns, true)) {
+						if (!Column::isValidMetaTypeId($columnId) && !in_array($columnId, $availableColumns, true)) {
 							throw new InvalidArgumentException('Invalid column ID provided');
 						}
 					}
