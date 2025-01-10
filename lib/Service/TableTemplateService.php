@@ -733,15 +733,12 @@ class TableTemplateService {
 
 		// let's add some example rows
 		$this->createRow($table, [
-			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Open the tables app'),
-			// TRANSLATORS This is an example account manager
 			$columns['how']->getId() => $this->l->t('Reachable via the Tables icon in the apps list.'),
 			$columns['ease']->getId() => 5,
 			$columns['done']->getId() => 'true',
 		]);
 		$this->createRow($table, [
-			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Add your first row'),
 			// TRANSLATORS: the asterisks (*) are used to format the button name in italics
 			$columns['how']->getId() => $this->l->t('Use the *+ Create row* button and enter some data inside of the form.'),
@@ -749,7 +746,6 @@ class TableTemplateService {
 			$columns['done']->getId() => 'false',
 		]);
 		$this->createRow($table, [
-			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Edit a row'),
 			// TRANSLATORS: the asterisks (*) are used to format the icon name and column name in italics
 			$columns['how']->getId() => $this->l->t('Go to a row you want to edit and use the *pencil* edit button. Maybe you want to add a *Done* status to this row?'),
@@ -765,23 +761,18 @@ class TableTemplateService {
 			$columns['done']->getId() => 'false',
 		]);
 		$this->createRow($table, [
-			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Create views for tables'),
-			// TRANSLATORS This is an example account manager
 			$columns['how']->getId() => $this->l->t('Filter data and save table presets as views to share and combine them into applications.'),
 			$columns['ease']->getId() => 4,
 			$columns['done']->getId() => 'false',
 		]);
 		$this->createRow($table, [
-			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Create applications'),
-			// TRANSLATORS This is an example account manager
 			$columns['how']->getId() => $this->l->t('Combine different tables and views into no-code applications for any purpose. This makes them easily accessible directly in the app bar.'),
 			$columns['ease']->getId() => 3,
 			$columns['done']->getId() => 'false',
 		]);
 		$this->createRow($table, [
-			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Read the docs'),
 			// TRANSLATORS: the link is formatted using markdown, the pattern is: [Title](URL)
 			$columns['how']->getId() => $this->l->t('If you want to go through the documentation, this can be found here: [Nextcloud Tables documentation](%s)', ['https://github.com/nextcloud/tables/wiki']),
