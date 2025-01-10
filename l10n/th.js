@@ -52,7 +52,6 @@ OC.L10N.register(
     "Remove from favorites" : "เอาออกจากรายการโปรด",
     "Copy" : "คัดลอก",
     "Favorites" : "รายการโปรด",
-    "User or group name …" : "ชื่อผู้ใช้หรือกลุ่ม …",
     "No recommendations. Start typing." : "ไม่มีคำแนะนำ เริ่มพิมพ์เลย",
     "group" : "กลุ่ม",
     "Created at" : "สร้างเมื่อ",

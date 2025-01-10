@@ -30,6 +30,7 @@ OC.L10N.register(
     "Close" : "Serriñ",
     "Select from Files" : "Choaz diouz ar restr",
     "Preview" : "Ragwell",
+    "Failed" : "C'hwitet",
     "Please select a file." : "Choazit ur restr mar-plij.",
     "Transfer" : "Treuzkas",
     "Filter" : "Filtre",
