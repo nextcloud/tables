@@ -50,6 +50,9 @@ Have a good time and manage whatever you want.
 		<nextcloud min-version="29" max-version="31"/>
 	</dependencies>
 	<repair-steps>
+		<pre-migration>
+			<step>OCA\Tables\Migration\FixContextsDefaults</step>
+		</pre-migration>
 		<post-migration>
 			<step>OCA\Tables\Migration\NewDbStructureRepairStep</step>
 			<step>OCA\Tables\Migration\DbRowSleeveSequence</step>
