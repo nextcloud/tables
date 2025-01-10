@@ -5,6 +5,20 @@
 
 # Changelog
 
+## 0.8.3
+
+### Fixed
+
+* [[stable0.8] fix(Import): expect selectionOptions as array from json (tables#1425)](https://github.com/nextcloud/tables/pull/1425)
+* [[stable0.8] fix: use actual providerId in link rows (tables#1498)](https://github.com/nextcloud/tables/pull/1498)
+* [[stable0.8] Fix "start of week" filter not working on table views (tables#1512)](https://github.com/nextcloud/tables/pull/1512)
+* [[stable0.8] fix: allow adding meta data columns to views again (tables#1530)](https://github.com/nextcloud/tables/pull/1530)
+* [[stable0.8] fix(Views): allow to sort for meta columns (tables#1533)](https://github.com/nextcloud/tables/pull/1533)
+
+### Other
+
+* dependency updates
+
 ## 0.8.2
 
 ### Fixed
