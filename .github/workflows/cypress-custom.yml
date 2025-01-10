@@ -79,6 +79,13 @@ jobs:
           path: apps/text
           ref: ${{ env.text_app_ref }}
 
+      - name: Checkout circles app
+        uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+        with:
+          repository: nextcloud/circles
+          path: apps/circles
+          ref: ${{ env.server-versions }}
+
       - name: Checkout app
         uses: actions/checkout@v3
         with:
@@ -126,6 +133,7 @@ jobs:
           cat config/config.php
           ./occ user:list
           ./occ app:enable --force text
+          ./occ app:enable --force circles
           ./occ app:enable --force ${{ env.APP_NAME }}
           ./occ config:system:set query_log_file --value '/home/runner/work/${{ env.APP_NAME }}/${{ env.APP_NAME }}/query.log'
           php -S 127.0.0.1:8081 > /tmp/requestlog 2>&1 &

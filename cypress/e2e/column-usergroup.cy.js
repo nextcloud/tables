@@ -31,7 +31,7 @@ describe('Test column ' + columnTitle, () => {
 	it('Create column and rows with default values', () => {
 		cy.createTable(tableTitle)
         cy.loadTable(tableTitle)
-        cy.createUsergroupColumn(columnTitle, true, true, true, [localUser.userId, nonLocalUser.userId], true)
+        cy.createUsergroupColumn(columnTitle, true, true, true, true, [localUser.userId, nonLocalUser.userId], true)
         cy.get('button').contains('Create row').click()
         cy.get('[data-cy="createRowSaveButton"]').click()
         cy.get('[data-cy="ncTable"] table tr td .user-bubble__name').contains(localUser.userId).should('be.visible')
@@ -41,7 +41,7 @@ describe('Test column ' + columnTitle, () => {
     it('Create column and rows without default values', () => {
 		cy.createTable(tableTitle)
         cy.loadTable(tableTitle)
-        cy.createUsergroupColumn(columnTitle, true, false, false, [], true)
+        cy.createUsergroupColumn(columnTitle, true, false, false, false, [], true)
         
         cy.get('button').contains('Create row').click()
         cy.get('[data-cy="usergroupRowSelect"] input').type(nonLocalUser.userId)
@@ -53,7 +53,7 @@ describe('Test column ' + columnTitle, () => {
     it('Create and edit rows', () => {
 		cy.createTable(tableTitle)
         cy.loadTable(tableTitle)
-        cy.createUsergroupColumn(columnTitle, true, true, true, [localUser.userId], true)
+        cy.createUsergroupColumn(columnTitle, true, true, true, true, [localUser.userId], true)
         cy.get('button').contains('Create row').click()
         cy.get('[data-cy="createRowSaveButton"]').click()
         cy.get('[data-cy="ncTable"] table tr td .user-bubble__name').contains(localUser.userId).should('be.visible')
