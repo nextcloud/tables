@@ -18,7 +18,7 @@ class RowCellUsergroupMapper extends RowCellMapperSuper {
 		parent::__construct($db, $this->table, RowCellUsergroup::class);
 	}
 
-	public function filterValueToQueryParam(Column $column, $value) {
+	public function filterValueToQueryParam(Column $column, mixed $value): mixed {
 		return $value;
 	}
 
