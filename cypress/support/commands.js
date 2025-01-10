@@ -145,6 +145,12 @@ Cypress.Commands.add('loadTable', (name) => {
 	cy.get('[data-cy="navigationTableItem"] a[title="' + name + '"]').click({ force: true })
 })
 
+Cypress.Commands.add('getTutorialTableName', () => {
+	return cy.get('[data-cy="navigationTableItem"] a[title^="Welcome to"]').invoke('attr', 'title').then((title) => {
+		return cy.wrap(title)
+	})
+})
+
 Cypress.Commands.add('loadView', (name) => {
 	cy.get('[data-cy="navigationViewItem"] a[title="' + name + '"]').click({ force: true })
 })

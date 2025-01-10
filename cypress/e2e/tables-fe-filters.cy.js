@@ -18,7 +18,7 @@ describe('FE sorting and filtering', () => {
 	})
 
 	it('FE Search in table', () => {
-		cy.get('.app-navigation-entry-link').contains('Tutorial').click({ force: true })
+		cy.get('.app-navigation-entry-link').contains('Welcome to Nextcloud Tables!').click({ force: true })
 
 		// test case-sensitive
 		cy.contains('Edit a row').should('exist')
