@@ -5,6 +5,39 @@
 
 # Changelog
 
+## 0.9.0-beta.1
+
+### Added
+
+* [Feat(Contexts): enable nav bar display logic (tables#1193)](https://github.com/nextcloud/tables/pull/1193)
+* [Make Applications visible by default in the app navigation bar (tables#1250)](https://github.com/nextcloud/tables/pull/1250)
+* [Feat: Add UI elements to modify navigation display (tables#1295)](https://github.com/nextcloud/tables/pull/1295)
+* [Feat: add support for teams in usergroup column (tables#1326)](https://github.com/nextcloud/tables/pull/1326)
+* [Enh: warn during table manager promotion/demotion (tables#1434)](https://github.com/nextcloud/tables/pull/1434)
+* [Enh: display error popup when import preview fails (tables#1463)](https://github.com/nextcloud/tables/pull/1463)
+* [Share with teams (tables#1465)](https://github.com/nextcloud/tables/pull/1465)
+* [Enh: use tiptap's editor to render HTML (tables#1488)](https://github.com/nextcloud/tables/pull/1488)
+
+### Fixed
+
+* [Fix: check for null in import preview (tables#1368)](https://github.com/nextcloud/tables/pull/1368)
+* [Fix(Import): expect selectionOptions as array from json (tables#1383)](https://github.com/nextcloud/tables/pull/1383)
+* [Fix return status in a few cases and add integration tests against content modification through Applications (tables#1421)](https://github.com/nextcloud/tables/pull/1421)
+* [Fix: use actual providerId in link rows (tables#1443)](https://github.com/nextcloud/tables/pull/1443)
+* [Fix: use 0 for falsy number progress values during sorting (tables#1444)](https://github.com/nextcloud/tables/pull/1444)
+* [Fix: ensure number progress stays within 1-100 range (tables#1445)](https://github.com/nextcloud/tables/pull/1445)
+* [Fix and improve detection and import of ods, xlsx and csv documents (tables#1446)](https://github.com/nextcloud/tables/pull/1446)
+* [Fix "start of week" filter not working on table views (tables#1476)](https://github.com/nextcloud/tables/pull/1476)
+* [Fix(Views): allow to sort for meta columns (tables#1525)](https://github.com/nextcloud/tables/pull/1525)
+* [Fix: allow adding meta data columns to views again (tables#1526)](https://github.com/nextcloud/tables/pull/1526)
+* [Fix(RowMappers): value might at least be null (tables#1534)](https://github.com/nextcloud/tables/pull/1534)
+
+### Other
+
+* dependency updates
+* [Refactor: Extend Permission Middleware usage and replace deprecated annotations with attributes (tables#1406)](https://github.com/nextcloud/tables/pull/1406)
+* [Fix: Use devcontainer with php v8.2 (tables#1485)](https://github.com/nextcloud/tables/pull/1485)
+
 ## 0.8.0
 
 ### Added
