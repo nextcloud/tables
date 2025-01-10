@@ -11,6 +11,7 @@ import '@nextcloud/dialogs/style.css'
 import data from './data.js'
 import displayError from '../shared/utils/displayError.js'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../shared/constants.js'
+import { getCurrentUser } from '@nextcloud/auth'
 
 Vue.use(Vuex)
 
@@ -346,11 +347,11 @@ export default new Vuex.Store({
 
 			return true
 		},
-		async shareContext({ dispatch }, { id, previousReceivers, receivers }) {
+		async shareContext({ dispatch }, { id, previousReceivers, receivers, displayMode }) {
 			const share = {
 				nodeType: 'context',
 				nodeId: id,
-				displayMode: 2,
+				displayMode,
 			}
 			try {
 				for (const receiver of receivers) {
@@ -359,7 +360,14 @@ export default new Vuex.Store({
 					// Avoid duplicate shares by checking if share exists first
 					const existingShare = previousReceivers.find((p) => p.receiver === share.receiver && p.receiver_type === share.receiverType)
 					if (!existingShare) {
-						await axios.post(generateUrl('/apps/tables/share'), share)
+						const createdShare = await axios.post(generateUrl('/apps/tables/share'), share)
+						if (createdShare?.data && createdShare?.data?.id) {
+							const shareId = createdShare.data.id
+							await dispatch('updateDisplayMode', { shareId, displayMode, target: 'default' })
+							if (receiver.id === getCurrentUser().uid) {
+								await dispatch('updateDisplayMode', { shareId, displayMode, target: 'self' })
+							}
+						}
 					}
 				}
 			} catch (e) {
@@ -374,13 +382,25 @@ export default new Vuex.Store({
 					})
 					if (!currentShare) {
 						await axios.delete(generateUrl('/apps/tables/share/' + previousReceiver.share_id))
+					} else {
+						const shareId = previousReceiver.share_id
+						await dispatch('updateDisplayMode', { shareId, displayMode, target: 'default' })
 					}
 				}
 			} catch (e) {
 				displayError(e, t('tables', 'Could not remove application share.'))
 			}
 		},
-		async insertNewContext({ commit, state, dispatch }, { data, receivers }) {
+
+		async updateDisplayMode({ dispatch }, { shareId, displayMode, target }) {
+			try {
+				await axios.put(generateUrl('/apps/tables/share/' + shareId + '/display-mode'), { displayMode, target })
+			} catch (e) {
+				displayError(e, t('tables', 'Could not update display mode.'))
+			}
+		},
+
+		async insertNewContext({ commit, state, dispatch }, { data, receivers, displayMode }) {
 			commit('setLoading', { key: 'contexts', value: true })
 			let res = null
 
@@ -388,7 +408,7 @@ export default new Vuex.Store({
 				res = await axios.post(generateOcsUrl('/apps/tables/api/2/contexts'), data)
 				const id = res?.data?.ocs?.data?.id
 				if (id) {
-					await dispatch('shareContext', { id, previousReceivers: [], receivers })
+					await dispatch('shareContext', { id, previousReceivers: [], receivers, displayMode })
 				}
 			} catch (e) {
 				displayError(e, t('tables', 'Could not insert application.'))
@@ -401,11 +421,11 @@ export default new Vuex.Store({
 			commit('setLoading', { key: 'contexts', value: false })
 			return res.data.ocs.data
 		},
-		async updateContext({ state, commit, dispatch }, { id, data, previousReceivers, receivers }) {
+		async updateContext({ state, commit, dispatch }, { id, data, previousReceivers, receivers, displayMode }) {
 			let res = null
 			try {
 				res = await axios.put(generateOcsUrl('/apps/tables/api/2/contexts/' + id), data)
-				await dispatch('shareContext', { id, previousReceivers, receivers })
+				await dispatch('shareContext', { id, previousReceivers, receivers, displayMode })
 
 			} catch (e) {
 				displayError(e, t('tables', 'Could not update application.'))

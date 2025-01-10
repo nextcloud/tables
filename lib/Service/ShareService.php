@@ -362,12 +362,12 @@ class ShareService extends SuperService {
 				}
 			} else {
 				// setting user display mode override only requires access
-				if (!$this->permissionsService->canAccessContextById($item->getId())) {
+				if (!$this->permissionsService->canAccessContextById($item->getNodeId(), $userId)) {
 					throw new PermissionError(sprintf('PermissionError: can not update share with id %d', $shareId));
 				}
 			}
 
-			return $this->contextNavigationMapper->setDisplayModeByShareId($shareId, $displayMode, '');
+			return $this->contextNavigationMapper->setDisplayModeByShareId($shareId, $displayMode, $userId);
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());

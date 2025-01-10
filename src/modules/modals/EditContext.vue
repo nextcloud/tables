@@ -38,7 +38,14 @@
 				</div>
 				<NcContextResource :resources.sync="resources" :receivers.sync="receivers" />
 			</div>
-
+			<div class="row space-T">
+				<NcActionCheckbox :checked="showInNavigationDefault" @change="updateDisplayMode">
+					{{ t('tables', 'Show in app list') }}
+				</NcActionCheckbox>
+				<p class="nav-display-subtext">
+					{{ t('tables', 'This can be overridden by a per-account preference') }}
+				</p>
+			</div>
 			<div class="row space-T">
 				<div class="fix-col-4 space-T justify-between">
 					<NcButton v-if="!prepareDeleteContext" type="error" @click="prepareDeleteContext = true">
@@ -62,14 +69,14 @@
 </template>
 
 <script>
-import { NcDialog, NcButton, NcIconSvgWrapper } from '@nextcloud/vue'
+import { NcDialog, NcButton, NcIconSvgWrapper, NcActionCheckbox } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import { getCurrentUser } from '@nextcloud/auth'
 import '@nextcloud/dialogs/style.css'
 import { mapGetters, mapState } from 'vuex'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
 import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'
-import { NODE_TYPE_TABLE, NODE_TYPE_VIEW, PERMISSION_READ, PERMISSION_CREATE, PERMISSION_UPDATE, PERMISSION_DELETE } from '../../shared/constants.js'
+import { NODE_TYPE_TABLE, NODE_TYPE_VIEW, PERMISSION_READ, PERMISSION_CREATE, PERMISSION_UPDATE, PERMISSION_DELETE, NAV_ENTRY_MODE } from '../../shared/constants.js'
 import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'
 import permissionBitmask from '../../shared/components/ncContextResource/mixins/permissionBitmask.js'
 import { emit } from '@nextcloud/event-bus'
@@ -83,6 +90,7 @@ export default {
 		NcIconPicker,
 		NcIconSvgWrapper,
 		NcContextResource,
+		NcActionCheckbox,
 	},
 	mixins: [svgHelper, permissionBitmask, permissionsMixin],
 	props: {
@@ -111,6 +119,7 @@ export default {
 			PERMISSION_UPDATE,
 			PERMISSION_DELETE,
 			prepareDeleteContext: false,
+			showInNavigationDefault: false,
 		}
 	},
 	computed: {
@@ -135,6 +144,7 @@ export default {
 				this.description = context.description
 				this.resources = context ? this.getContextResources(context) : []
 				this.receivers = context ? this.getContextReceivers(context) : []
+				this.showInNavigationDefault = this.getNavDisplay(context)
 			}
 		},
 	},
@@ -166,8 +176,17 @@ export default {
 					nodes: dataResources,
 				}
 				const context = this.getContext(this.contextId)
-
-				const res = await this.$store.dispatch('updateContext', { id: this.contextId, data, previousReceivers: Object.values(context.sharing), receivers: this.receivers })
+				// adding share to oneself to have navigation display control
+				this.receivers.push(
+					{
+						id: getCurrentUser().uid,
+						displayName: getCurrentUser().uid,
+						icon: 'icon-user',
+						isUser: true,
+						key: 'user-' + getCurrentUser().uid,
+					})
+				const displayMode = this.showInNavigationDefault ? 'NAV_ENTRY_MODE_ALL' : 'NAV_ENTRY_MODE_HIDDEN'
+				const res = await this.$store.dispatch('updateContext', { id: this.contextId, data, previousReceivers: Object.values(context.sharing), receivers: this.receivers, displayMode: NAV_ENTRY_MODE[displayMode] })
 				if (res) {
 					showSuccess(t('tables', 'Updated application "{contextTitle}".', { contextTitle: this.title }))
 					this.actionCancel()
@@ -183,6 +202,15 @@ export default {
 			this.resources = context ? this.getContextResources(context) : []
 			this.receivers = context ? this.getContextReceivers(context) : []
 			this.prepareDeleteContext = false
+			this.showInNavigationDefault = this.getNavDisplay(context)
+		},
+		getNavDisplay(context) {
+			const shares = Object.keys(context.sharing || {})
+			if (shares.length) {
+				const displayMode = context.sharing[shares[0]].display_mode_default
+				return displayMode !== 0
+			}
+			return false
 		},
 		getContextReceivers(context) {
 			let sharing = Object.values(context.sharing)
@@ -240,6 +268,9 @@ export default {
 			}
 
 		},
+		updateDisplayMode() {
+			this.showInNavigationDefault = !this.showInNavigationDefault
+		},
 		actionTransfer() {
 			emit('tables:context:edit', null)
 			emit('tables:context:transfer', this.localContext)
@@ -259,5 +290,13 @@ export default {
 :deep(.element-description) {
 	padding-inline: 0 !important;
 	max-width: 100%;
+}
+
+.nav-display-subtext {
+	color: var(--color-text-maxcontrast)
+}
+
+li {
+	list-style: none;
 }
 </style>

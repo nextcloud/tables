@@ -96,6 +96,9 @@ class ContextMapper extends QBMapper {
 				'display_mode_default' => (int)$item['display_mode_default'],
 			];
 			if ($userId !== null) {
+				if ($item['display_mode'] === null) {
+					$item['display_mode'] = $item['display_mode_default'];
+				}
 				$carry[$item['share_id']]['display_mode'] = (int)$item['display_mode'];
 			}
 			return $carry;
@@ -168,17 +171,31 @@ class ContextMapper extends QBMapper {
 
 		return $resultEntities;
 	}
-
 	public function findForNavBar(string $userId): array {
 		$qb = $this->getFindContextBaseQuery($userId);
-		$qb->andWhere($qb->expr()->andX(
+		$groupIDs = $this->userHelper->getGroupIdsForUser($userId);
+		$qb->andWhere($qb->expr()->orX(
 			// default
-			$qb->expr()->gt('n.display_mode', $qb->createNamedParameter(Application::NAV_ENTRY_MODE_HIDDEN, IQueryBuilder::PARAM_INT)),
-			// user override
-			$qb->expr()->orX(
-				$qb->expr()->gt('n2.display_mode', $qb->createNamedParameter(Application::NAV_ENTRY_MODE_HIDDEN, IQueryBuilder::PARAM_INT)),
+			$qb->expr()->andX(
+				// requires lack of user overwrite, indicated by n2.display_mode
 				$qb->expr()->isNull('n2.display_mode'),
-			)
+				// requires a display mode also depending on the role…
+				$qb->expr()->orX(
+					// not an owner: requires (RECIPIENT or) ALL
+					$qb->expr()->andX(
+						// groups are not considered, yet
+						$qb->expr()->neq('c.owner_id', $qb->createNamedParameter($userId)),
+						$qb->expr()->gt('n.display_mode', $qb->createNamedParameter(Application::NAV_ENTRY_MODE_HIDDEN, IQueryBuilder::PARAM_INT)),
+					),
+					$qb->expr()->andX(
+						$qb->expr()->eq('s.receiver_type', $qb->createNamedParameter('group')),
+						$qb->expr()->in('s.receiver', $qb->createNamedParameter($groupIDs, IQueryBuilder::PARAM_STR_ARRAY)),
+						$qb->expr()->gt('n.display_mode', $qb->createNamedParameter(Application::NAV_ENTRY_MODE_HIDDEN, IQueryBuilder::PARAM_INT)),
+					)
+				),
+			),
+			// user override
+			$qb->expr()->gt('n2.display_mode', $qb->createNamedParameter(Application::NAV_ENTRY_MODE_HIDDEN, IQueryBuilder::PARAM_INT)),
 		));
 
 		$result = $qb->executeQuery();

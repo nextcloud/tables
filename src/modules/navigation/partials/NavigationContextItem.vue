@@ -15,7 +15,8 @@
 			</template>
 		</template>
 		<template #actions>
-			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" data-cy="navigationContextEditBtn" @click="editContext">
+			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" data-cy="navigationContextEditBtn"
+				@click="editContext">
 				<template #icon>
 					<PlaylistEdit :size="20" />
 				</template>
@@ -27,17 +28,21 @@
 				</template>
 				{{ t('tables', 'Transfer application') }}
 			</NcActionButton>
-			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" data-cy="navigationContextDeleteBtn" @click="deleteContext">
+			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" data-cy="navigationContextDeleteBtn"
+				@click="deleteContext">
 				<template #icon>
 					<Delete :size="20" />
 				</template>
 				{{ t('tables', 'Delete application') }}
 			</NcActionButton>
+			<NcActionCheckbox :checked="showInNavigation" @change="updateDisplayMode">
+				{{ t('tables', 'Show in app list') }}
+			</NcActionCheckbox>
 		</template>
 	</NcAppNavigationItem>
 </template>
 <script>
-import { NcAppNavigationItem, NcActionButton, NcIconSvgWrapper } from '@nextcloud/vue'
+import { NcAppNavigationItem, NcActionButton, NcIconSvgWrapper, NcActionCheckbox } from '@nextcloud/vue'
 import '@nextcloud/dialogs/style.css'
 import { mapGetters } from 'vuex'
 import TableIcon from 'vue-material-design-icons/Table.vue'
@@ -47,6 +52,8 @@ import FileSwap from 'vue-material-design-icons/FileSwap.vue'
 import Delete from 'vue-material-design-icons/Delete.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import svgHelper from '../../../shared/components/ncIconPicker/mixins/svgHelper.js'
+import { NAV_ENTRY_MODE } from '../../../shared/constants.js'
+import rebuildNavigation from '../../../service/rebuild-navigation.js'
 
 export default {
 	name: 'NavigationContextItem',
@@ -59,6 +66,7 @@ export default {
 		NcIconSvgWrapper,
 		NcAppNavigationItem,
 		NcActionButton,
+		NcActionCheckbox,
 	},
 
 	mixins: [permissionsMixin, svgHelper],
@@ -73,6 +81,7 @@ export default {
 	data() {
 		return {
 			icon: null,
+			showInNavigation: this.getNavDisplay(),
 		}
 	},
 	computed: {
@@ -98,6 +107,32 @@ export default {
 		},
 		deleteContext() {
 			emit('tables:context:delete', this.context)
+		},
+		getNavDisplay() {
+			for (const share of Object.values(this.context.sharing || {})) {
+				if (share?.display_mode !== NAV_ENTRY_MODE.NAV_ENTRY_MODE_HIDDEN) {
+					return true
+				}
+			}
+			return false
+		},
+		async updateDisplayMode() {
+			const value = !this.showInNavigation
+			const displayMode = value ? NAV_ENTRY_MODE.NAV_ENTRY_MODE_ALL : NAV_ENTRY_MODE.NAV_ENTRY_MODE_HIDDEN
+			let hadAtLeastOneEntry = false
+			for (const share of Object.values(this.context.sharing || {})) {
+				if (!share) {
+					continue
+				}
+				hadAtLeastOneEntry = true
+				await this.$store.dispatch('updateDisplayMode', { shareId: share.share_id, displayMode, target: 'self' })
+				this.showInNavigation = value
+			}
+			if (hadAtLeastOneEntry) {
+				await rebuildNavigation()
+			} else {
+				console.error('No share found ' + this.context.sharing)
+			}
 		},
 	},
 
