@@ -19,7 +19,7 @@ class RowCellSelectionMapper extends RowCellMapperSuper {
 		parent::__construct($db, $this->table, RowCellSelection::class);
 	}
 
-	public function filterValueToQueryParam(Column $column, $value) {
+	public function filterValueToQueryParam(Column $column, mixed $value): mixed {
 		return $this->valueToJsonDbValue($column, $value);
 	}
 

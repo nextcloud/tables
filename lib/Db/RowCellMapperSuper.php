@@ -41,10 +41,7 @@ class RowCellMapperSuper extends QBMapper {
 	 * Transform value from a filter rule to the actual query parameter used
 	 * for constructing the view filter query
 	 */
-	/**
-	 * @param float|string $value
-	 */
-	public function filterValueToQueryParam(Column $column, string|float $value) {
+	public function filterValueToQueryParam(Column $column, mixed $value): mixed {
 		return $value;
 	}
 
