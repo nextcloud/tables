@@ -62,8 +62,6 @@ OC.L10N.register(
     "Prefix" : "Prefijo",
     "Suffix" : "Sufijo",
     "Default" : "Predeterminado",
-    "Users" : "Usuarios",
-    "Groups" : "Grupos",
     "Copy link" : "Copiar enlace",
     "Confirm" : "Confirmar",
     "Content" : "Contenido",

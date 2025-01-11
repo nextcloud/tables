@@ -460,8 +460,6 @@
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "Достављени типови зависе од поставки вашег система. Можете да користите исте пружаоце услуге као што је претрага по комплетном тексту.",
     "Could not load link providers." : "Не могу да се учитају пружаоци линка.",
     "URL" : "УРЛ",
-    "Users" : "Корисници",
-    "Groups" : "Групе",
     "Select multiple items" : "Изабери више ставки",
     "Show user status" : "Прикажи статус корисника",
     "Please select a new time" : "Молимо вас да изаберете ново време",

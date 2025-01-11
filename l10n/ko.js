@@ -365,8 +365,6 @@ OC.L10N.register(
     "Please select at least one provider." : "최소 하나의 공급자를 선택하십시오",
     "Could not load link providers." : "링크 제공자룰 불러올 수 없음",
     "URL" : "URL",
-    "Users" : "사용자",
-    "Groups" : "그룹",
     "This field is mandatory" : "이 필드는 필수입니다",
     "You can not insert any links in this field. Please configure at least one link provider in the column configuration." : "이 필드에 어떤 링크도 입력할 수 있습니다. 행 설정에서 최소 한개의 링크 공급자를 설정하십시오.",
     "Copy link" : "링크 주소 복사",

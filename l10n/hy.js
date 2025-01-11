@@ -43,7 +43,6 @@ OC.L10N.register(
     "Search" : "Search",
     "Default" : "Լռելյայն",
     "URL" : "URL",
-    "Groups" : "Խմբեր",
     "Copy link" : "Պատճենել հղումը",
     "Select" : "Նշել"
 },

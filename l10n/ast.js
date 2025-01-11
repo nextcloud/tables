@@ -229,8 +229,6 @@ OC.L10N.register(
     "First option" : "Primer opción",
     "Second option" : "Segunda opción",
     "URL" : "URL",
-    "Users" : "Usuarios",
-    "Groups" : "Grupos",
     "This field is mandatory" : "Esti campu ye obligatoriu",
     "Copy link" : "Copiar l'enllaz",
     "Url" : "URL",

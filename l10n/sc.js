@@ -103,8 +103,6 @@ OC.L10N.register(
     "Delete option" : "Cantzella sèberu",
     "Add option" : "Agiunghe sèberu",
     "URL" : "URL",
-    "Users" : "Utentes",
-    "Groups" : "Grupos",
     "Confirm" : "Cunfirma",
     "Select" : "Seletziona",
     "Could not update share." : "No at fatu a agiornare sa cumpartzidura.",

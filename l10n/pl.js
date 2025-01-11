@@ -226,7 +226,6 @@ OC.L10N.register(
     "Maximum text length" : "Maksymalna długość tekstu",
     "Could not load link providers." : "Nie można wczytać dostawcy odnośników.",
     "URL" : "Adres URL",
-    "Groups" : "Grupy",
     "Copy link" : "Kopiuj link",
     "Could not load link provider results." : "Nie można wczytać wyników dostawcy odnośników.",
     "Url" : "URL",

@@ -62,8 +62,6 @@ OC.L10N.register(
     "Suffix" : "სუფიქსი",
     "Default" : "საწყისი",
     "URL" : "URL",
-    "Users" : "მომხმარებლები",
-    "Groups" : "ჯგუფები",
     "Confirm" : "დადასტურება",
     "Content" : "მოცულობა",
     "Unchecked" : "შეუმოწმებელია",

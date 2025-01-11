@@ -43,7 +43,6 @@ OC.L10N.register(
     "Bold" : "Podebljano",
     "Italic" : "Kurziv",
     "Default" : "Podrazumevano",
-    "Groups" : "Grupe",
     "Copy link" : "Kopiraj vezu",
     "Select" : "Obeleži"
 },

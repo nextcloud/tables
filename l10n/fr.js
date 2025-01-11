@@ -462,8 +462,6 @@ OC.L10N.register(
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "Les types fournis dépendent de la configuration de votre système. Vous pouvez utiliser les même fournisseurs que la recherche de texte.",
     "Could not load link providers." : "Impossible de charger les fournisseurs de liens.",
     "URL" : "URL",
-    "Users" : "Utilisateurs",
-    "Groups" : "Groupes",
     "Select multiple items" : "Sélectionner plusieurs éléments",
     "Show user status" : "Afficher le statut de l'utilisateur",
     "Please select a new time" : "Veuillez sélectionner une nouvelle heure",

@@ -327,7 +327,6 @@ OC.L10N.register(
     "Allowed pattern (regex)" : "Dovoljen vzorec (logični izraz)",
     "Maximum text length" : "Najdaljša dolžina besedila",
     "URL" : "Naslov URL",
-    "Groups" : "Skupine",
     "This field is mandatory" : "To polje je obvezno",
     "Copy link" : "Kopiraj povezavo",
     "Url" : "Naslov URL",

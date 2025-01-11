@@ -199,7 +199,6 @@ OC.L10N.register(
     "Allowed pattern (regex)" : "Sallittu kaava (regex)",
     "Maximum text length" : "Tekstin enimmäispituus",
     "URL" : "URL-osoite",
-    "Groups" : "Ryhmät",
     "This field is mandatory" : "Tämä kenttä on pakollinen",
     "Copy link" : "Kopioi linkki",
     "Close editor" : "Sulje muokkain",

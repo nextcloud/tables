@@ -428,8 +428,6 @@
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "De tillhandahållna typerna beror på din systeminstallation. Du kan använda samma leverantörer som för fulltext-sökningen.",
     "Could not load link providers." : "Kunde inte ladda länkleverantörer.",
     "URL" : "Webbadress",
-    "Users" : "Användare",
-    "Groups" : "Grupper",
     "Select multiple items" : "Välj flera objekt",
     "Show user status" : "Visa användarstatus",
     "Please select a new time" : "Välj en ny tid",

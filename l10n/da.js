@@ -298,7 +298,6 @@ OC.L10N.register(
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "De angivne typer afhænger af din systemopsætning. Du kan bruge de samme udbydere som fuldtekst-søgning.",
     "Could not load link providers." : "Kunne ikke indlæse linkudbydere.",
     "URL" : "URL",
-    "Groups" : "Grupper",
     "This field is mandatory" : "Dette felt er obligatorisk",
     "Copy link" : "Kopiér link",
     "Could not load link provider results." : "Resultatet af linkudbyderen kunne ikke indlæses.",

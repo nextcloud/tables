@@ -462,8 +462,6 @@ OC.L10N.register(
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "Belirtilen türler, sistem kurulumunuza bağlıdır. Tam metin arama gibi aynı hizmet sağlayıcıları kullanabilirsiniz.",
     "Could not load link providers." : "Bağlantı hizmeti sağlayıcıları yüklenemedi.",
     "URL" : "Adres",
-    "Users" : "Kullanıcılar",
-    "Groups" : "Gruplar",
     "Select multiple items" : "Birkaç öge seçin",
     "Show user status" : "Kullanıcı durumunu görüntüle",
     "Please select a new time" : "Lütfen yeni bir zaman seçin",

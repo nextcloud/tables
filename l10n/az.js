@@ -51,8 +51,6 @@ OC.L10N.register(
     "Back" : "Geri",
     "Default" : "Susmaya görə",
     "URL" : "URL",
-    "Users" : "İstifadəçilər",
-    "Groups" : "Qruplar",
     "Copy link" : "linki nüsxələ",
     "Confirm" : "Təsdiq edin",
     "Select" : "Seç"

@@ -43,8 +43,6 @@ OC.L10N.register(
     "Back" : "Буцах",
     "Undo" : "буцах",
     "URL" : "URL",
-    "Users" : "хэрэглэгч",
-    "Groups" : "бүлэгүүд",
     "Confirm" : "Батлах",
     "Select" : "Сонгох",
     "ID" : "ID"

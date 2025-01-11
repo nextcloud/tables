@@ -48,8 +48,6 @@ OC.L10N.register(
     "Prefix" : "Prefixo",
     "Suffix" : "Suffixo",
     "URL" : "URL",
-    "Users" : "Usatores",
-    "Groups" : "Gruppos",
     "Copy link" : "Copiar ligamine",
     "Confirm" : "Confirmar",
     "Select" : "Selectionar"

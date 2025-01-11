@@ -380,8 +380,6 @@ OC.L10N.register(
     "Maximum text length" : "テキストの最大長さ",
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "提供されるタイプはシステムの設定に依存しています。全文検索と同じプロバイダを使用することができます。",
     "URL" : "URL",
-    "Users" : "ユーザ",
-    "Groups" : "グループ",
     "Select multiple items" : "複数の項目を選択",
     "Show user status" : "ユーザー ステータスの表示",
     "Copy link" : "リンクをコピー",

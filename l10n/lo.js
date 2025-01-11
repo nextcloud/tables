@@ -28,7 +28,6 @@ OC.L10N.register(
     "Download" : "ດາວໂຫລດ",
     "Search" : "ຄົ້ນຫາ",
     "Default" : "ເລີ່ມຕົ້ນ",
-    "Users" : "ຜູ້ໃຊ້",
     "Copy link" : "ສຳເນົາລິງ",
     "Confirm" : "ຢືນຢັນ"
 },

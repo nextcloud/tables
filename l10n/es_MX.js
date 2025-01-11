@@ -108,8 +108,6 @@ OC.L10N.register(
     "Default" : "Predeterminado",
     "Options" : "Opciones",
     "URL" : "URL",
-    "Users" : " Usuarios",
-    "Groups" : "Grupos",
     "Copy link" : "Copiar enlace",
     "Close editor" : "Cerrar editor",
     "Go to previous page" : "Ir a la página anterior",

@@ -47,8 +47,6 @@ OC.L10N.register(
     "Search" : "Søk",
     "Default" : "Standard",
     "URL" : "URL",
-    "Users" : "Brukarare",
-    "Groups" : "Grupper",
     "Copy link" : "Kopier lenkje",
     "ID" : "ID"
 },

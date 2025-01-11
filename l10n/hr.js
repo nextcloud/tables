@@ -101,8 +101,6 @@ OC.L10N.register(
     "Delete option" : "Izbriši mogućnost",
     "Add option" : "Dodaj mogućnost",
     "URL" : "URL",
-    "Users" : "Korisnici",
-    "Groups" : "Grupe",
     "Copy link" : "Kopiraj poveznicu",
     "Url" : "Url",
     "Confirm" : "Potvrdi",

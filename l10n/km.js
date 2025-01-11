@@ -41,8 +41,6 @@ OC.L10N.register(
     "Default" : "លំនាំ​ដើម",
     "Options" : "ជម្រើស",
     "URL" : "URL",
-    "Users" : "អ្នកប្រើ",
-    "Groups" : "ក្រុ",
     "Copy link" : "ចម្លងតំណ"
 },
 "nplurals=1; plural=0;");

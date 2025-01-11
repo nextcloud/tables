@@ -83,7 +83,6 @@ OC.L10N.register(
     "Default" : "Defaut",
     "Options" : "Opcions",
     "URL" : "URL",
-    "Users" : "Utilizaires",
     "Copy link" : "Copiar lo ligam",
     "Confirm" : "Confirmar",
     "ID" : "ID"

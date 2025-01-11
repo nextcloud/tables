@@ -82,8 +82,6 @@ OC.L10N.register(
     "Default" : "Defaŭlta",
     "Add option" : "Aldoni opcion",
     "URL" : "Retadreso",
-    "Users" : "Uzantoj",
-    "Groups" : "Grupoj",
     "Copy link" : "Kopii ligilon",
     "Close editor" : "Fermi redaktilon",
     "Confirm" : "Konfirmi",

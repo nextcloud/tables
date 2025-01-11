@@ -458,8 +458,6 @@ OC.L10N.register(
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "Надані типи залежать від системних налаштувань. Можна використовувати тих саме постачальників, як от контекстний пошук.",
     "Could not load link providers." : "Не вдалося завантажити посилання постачальників.",
     "URL" : "URL",
-    "Users" : "Користувачі",
-    "Groups" : "Групи",
     "Select multiple items" : "Виберіть кілька об'єктів",
     "Show user status" : "Показати статус користувача",
     "Please select a new time" : "Виберіть новий час",

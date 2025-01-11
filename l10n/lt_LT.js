@@ -142,8 +142,6 @@ OC.L10N.register(
     "Delete option" : "Ištrinti variantą",
     "Add option" : "Pridėti variantą",
     "URL" : "URL",
-    "Users" : "Naudotojai",
-    "Groups" : "Grupės",
     "Copy link" : "Kopijuoti nuorodą",
     "Open link" : "Atverti nuorodą",
     "Url" : "Url",

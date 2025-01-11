@@ -447,7 +447,6 @@
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "Los tipos provistos dependen de la configuración de su sistema. Puede utilizar los mismos proveedores como la búsqueda de texto completo.",
     "Could not load link providers." : "No se pudieron cargar los proveedores de enlaces.",
     "URL" : "URL",
-    "Groups" : "Grupos",
     "Please select a new time" : "Por favor seleccione una nueva fecha",
     "This field is mandatory" : "Este campo es obligatorio",
     "You can not insert any links in this field. Please configure at least one link provider in the column configuration." : "No puede insertar enlaces en este campo. Por favor, configure al menos un proveedor de enlaces en la configuración de columnas.",

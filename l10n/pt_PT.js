@@ -90,8 +90,6 @@ OC.L10N.register(
     "Default" : "Predefinido",
     "Options" : "Opções",
     "URL" : "URL",
-    "Users" : "Utilizadores",
-    "Groups" : "Grupos",
     "Copy link" : "Copiar hiperligação",
     "Close editor" : "Fechar editor",
     "Confirm" : "Confirmar",

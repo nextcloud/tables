@@ -321,8 +321,6 @@ OC.L10N.register(
     "Allowed types" : "Baimendutako motak",
     "Could not load link providers." : "Ezin izan dira esteka hornitzaileak kargatu.",
     "URL" : "URLa",
-    "Users" : "Erabiltzaileak",
-    "Groups" : "Taldeak",
     "Link providers" : "Esteka hornitzaileak",
     "Copy link" : "Kopiatu esteka",
     "Could not load link provider results." : "Ezin izan dira esteka hornitzaileen emaitzak kargatu.",

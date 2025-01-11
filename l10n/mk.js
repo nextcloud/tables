@@ -89,7 +89,6 @@ OC.L10N.register(
     "Default" : "Стандардно",
     "Options" : "Опции",
     "URL" : "Адреса",
-    "Groups" : "Групи",
     "Copy link" : "Копирај линк",
     "Close editor" : "Затвори го уредникот",
     "Confirm" : "Потврди",

@@ -53,8 +53,6 @@
     "Prefix" : "Voorvoegsel",
     "Suffix" : "Agtervoegsel",
     "Default" : "Verstek",
-    "Users" : "Gebruikers",
-    "Groups" : "Groepe",
     "Confirm" : "Bevestig",
     "ID" : "ID"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"

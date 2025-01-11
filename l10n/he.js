@@ -146,8 +146,6 @@ OC.L10N.register(
     "Options" : "אפשרויות",
     "Delete option" : "מחיקת אפשרות",
     "URL" : "כתובת",
-    "Users" : "משתמשים",
-    "Groups" : "קבוצות",
     "Copy link" : "העתקת קישור",
     "Url" : "כתובת",
     "Confirm" : "אימות",

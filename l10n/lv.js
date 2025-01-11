@@ -84,8 +84,6 @@ OC.L10N.register(
     "Suffix" : "Piedēklis",
     "Default" : "Noklusējuma",
     "URL" : "URL",
-    "Users" : "Lietotāji",
-    "Groups" : "Grupas",
     "Copy link" : "Kopēt saiti",
     "Close editor" : "Aizvērt redaktoru",
     "Confirm" : "Apstiprināt",

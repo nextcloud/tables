@@ -98,8 +98,6 @@ OC.L10N.register(
     "Delete option" : "Eyða valkosti",
     "Add option" : "Bæta við valkosti",
     "URL" : "Slóð",
-    "Users" : "Notendur",
-    "Groups" : "Hópar",
     "Copy link" : "Afrita tengil",
     "Url" : "Slóð (URL)",
     "Close editor" : "Loka ritli",

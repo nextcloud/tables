@@ -251,7 +251,6 @@ OC.L10N.register(
     "Allowed pattern (regex)" : "Patró permès (regex)",
     "Maximum text length" : "Longitud màxima del text",
     "URL" : "URL",
-    "Groups" : "Grups",
     "Copy link" : "Copia l'enllaç",
     "Url" : "Url",
     "Close editor" : "Tanca l'editor",

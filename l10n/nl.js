@@ -148,7 +148,6 @@ OC.L10N.register(
     "Allowed pattern (regex)" : "Toegestaan patroon (regex)",
     "Maximum text length" : "Maximum tekstlengte",
     "URL" : "URL",
-    "Groups" : "Groepen",
     "Copy link" : "Link kopiëren",
     "Close editor" : "Sluit editor",
     "Confirmation" : "Bevestiging",

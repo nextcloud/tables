@@ -42,8 +42,6 @@ OC.L10N.register(
     "Search" : "Search",
     "Default" : "Standard",
     "URL" : "URL",
-    "Users" : "Benotzer",
-    "Groups" : "Gruppen",
     "Copy link" : "Link kopéieren",
     "Confirm" : "Konfirméieren",
     "Select" : "Auswielen"

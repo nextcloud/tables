@@ -85,8 +85,6 @@ OC.L10N.register(
     "Code" : "Code",
     "Default" : "Default",
     "URL" : "URL",
-    "Users" : "Users",
-    "Groups" : "Groups",
     "Copy link" : "Copy link",
     "Close editor" : "Close editor",
     "Go to previous page" : "Go to previous page",

@@ -32,8 +32,6 @@ OC.L10N.register(
     "Download" : "බාගන්න",
     "Search" : "සොයන්න",
     "Back" : "ආපසු",
-    "Users" : "පරිශීලකයින්",
-    "Groups" : "සමූහ",
     "Copy link" : "සබැඳිය පිටපත් කරන්න",
     "Confirm" : "තහවුරු කරන්න"
 },

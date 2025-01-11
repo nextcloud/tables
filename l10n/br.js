@@ -47,8 +47,6 @@ OC.L10N.register(
     "Search" : "Klask",
     "Default" : "Dre ziouer",
     "URL" : "URL",
-    "Users" : "Implijer",
-    "Groups" : "Strolladoù",
     "Copy link" : "Eilañ al liamm",
     "Confirm" : "Kadarnañ"
 },

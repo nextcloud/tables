@@ -296,8 +296,6 @@ OC.L10N.register(
     "Allowed types" : "Tipos permitidos",
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "Los tipos disponibles dependen de la configuración de tu sistema. Puedes utilizar los mismos proveedores que la búsqueda de texto completo.",
     "Could not load link providers." : "No se pudieron cargar los proveedores de enlaces.",
-    "Users" : "Usuarios",
-    "Groups" : "Grupos",
     "This field is mandatory" : "Este campo es obligatorio",
     "Copy link" : "Copiar liga",
     "Could not load link provider results." : "No se pudieron cargar los resultados del proveedor de enlaces.",

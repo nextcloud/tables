@@ -375,8 +375,6 @@ OC.L10N.register(
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "The provided types depends on your system setup. You can use the same providers like the fulltext-search.",
     "Could not load link providers." : "Could not load link providers.",
     "URL" : "آدرس",
-    "Users" : "کاربران",
-    "Groups" : "گروه ها",
     "This field is mandatory" : "This field is mandatory",
     "Copy link" : "کپی کردن لینک",
     "Could not load link provider results." : "Could not load link provider results.",

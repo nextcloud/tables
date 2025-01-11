@@ -90,8 +90,6 @@ OC.L10N.register(
     "Default" : "Implicit",
     "Options" : "Opțiuni",
     "URL" : "URL",
-    "Users" : "Utilizatori",
-    "Groups" : "Grupuri",
     "Copy link" : "Copiază link",
     "Close editor" : "Închide editorul",
     "Confirm" : "Confirmă",

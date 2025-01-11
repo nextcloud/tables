@@ -61,8 +61,6 @@ OC.L10N.register(
     "Suffix" : "Sufijo",
     "Default" : "Predeterminado",
     "URL" : "URL",
-    "Users" : "Usuarios",
-    "Groups" : "Grupos",
     "Copy link" : "Copiar liga",
     "Confirm" : "Confirmar",
     "Content" : "Contenido",

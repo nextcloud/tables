@@ -456,8 +456,6 @@
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "تەمىنلەنگەن تىپلار سىستېمىڭىزنىڭ تەڭشىلىشىگە باغلىق. تولۇق تېكىست ئىزدەشكە ئوخشاش تەمىنلىگۈچىلەرنى ئىشلىتەلەيسىز.",
     "Could not load link providers." : "ئۇلىنىش تەمىنلىگۈچىلەرنى يۈكلىيەلمىدى.",
     "URL" : "URL",
-    "Users" : "ئىشلەتكۈچىلەر",
-    "Groups" : "گۇرۇپپا",
     "Select multiple items" : "كۆپ تۈرنى تاللاڭ",
     "Show user status" : "ئىشلەتكۈچى ھالىتىنى كۆرسەت",
     "Please select a new time" : "يېڭى ۋاقىتنى تاللاڭ",

@@ -35,8 +35,6 @@ OC.L10N.register(
     "Download" : "பதிவிறக்குக",
     "Search" : "தேடுதல்",
     "Back" : "பின்னுக்கு",
-    "Users" : "பயனாளர்",
-    "Groups" : "குழுக்கள்",
     "Select" : "Select"
 },
 "nplurals=2; plural=(n != 1);");

@@ -465,8 +465,6 @@ OC.L10N.register(
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "提供的類型取決於您的系統設定。您可以使用相同的提供者，如 fulltext-search。",
     "Could not load link providers." : "無法加載連結提供者。",
     "URL" : "URL",
-    "Users" : "使用者",
-    "Groups" : "群組",
     "Select multiple items" : "選取多個項目",
     "Show user status" : "顯示用戶狀態",
     "Please select a new time" : "請選擇一個新的時間",

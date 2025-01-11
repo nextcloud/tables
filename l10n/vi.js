@@ -182,8 +182,6 @@ OC.L10N.register(
     "Suffix" : "Hậu tố",
     "Default" : "Mặc định",
     "URL" : "URL",
-    "Users" : "Người dùng",
-    "Groups" : "Nhóm",
     "Copy link" : "Sao chép liên kết",
     "Close editor" : "Đóng trình biên tập",
     "Confirm" : "Xác nhận",

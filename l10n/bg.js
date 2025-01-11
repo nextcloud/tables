@@ -273,7 +273,6 @@ OC.L10N.register(
     "Allowed pattern (regex)" : "Разрешен шаблон (регламентен израз)",
     "Maximum text length" : "Максимална дължина на текста",
     "URL" : "URL адрес",
-    "Groups" : "Групи",
     "This field is mandatory" : "Това поле е задължително",
     "Copy link" : "Копиране на връзката",
     "Close editor" : "Затваряне на редактора",

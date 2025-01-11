@@ -90,8 +90,6 @@ OC.L10N.register(
     "Default" : "Predeterminado",
     "Options" : "Opciones",
     "URL" : "URL",
-    "Users" : "Ususarios",
-    "Groups" : "Grupos",
     "Copy link" : "Copiar link",
     "Confirm" : "Confirmar",
     "Select" : "Seleccionar",

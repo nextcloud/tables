@@ -72,8 +72,6 @@ OC.L10N.register(
     "Suffix" : "Prapashtesë",
     "Default" : "E paracaktuar",
     "URL" : "URL",
-    "Users" : "Përdoruesit",
-    "Groups" : "Grupet",
     "Copy link" : "Kopjoje lidhjen",
     "Confirm" : "Konfirmo",
     "Content" : "Përmbajtja",

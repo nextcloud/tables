@@ -460,8 +460,6 @@
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "تعتمد الأنواع المتاحة على إعدادات النظام الخاص بك. يمكنك استخدام نفس المزودين مثل البحث عن النص الكامل.",
     "Could not load link providers." : "تعذر تحميل مزود الرابط..",
     "URL" : "رابط URL",
-    "Users" : "المستخدمين",
-    "Groups" : "المجموعات",
     "Select multiple items" : "تحديد عدة عناصر",
     "Show user status" : "عرض حالة المستخدم",
     "Please select a new time" : "من فضلك، إختَر وقتاً جديداً",

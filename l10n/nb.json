@@ -459,8 +459,6 @@
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "Hvilke typer som følger med, avhenger av systemoppsettet. Du kan bruke de samme leverandørene som fulltekstsøk.",
     "Could not load link providers." : "Kan ikke laste inn koblingsleverandører.",
     "URL" : "URL",
-    "Users" : "Brukere",
-    "Groups" : "Grupper",
     "Select multiple items" : "Velg flere elementer",
     "Show user status" : "Velg status på bruker",
     "Please select a new time" : "Vennligst angi et nytt tidspunkt",

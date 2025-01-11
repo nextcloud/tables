@@ -400,7 +400,6 @@ OC.L10N.register(
     "Delete option" : "删除选项",
     "Add option" : "添加选项",
     "URL" : "URL",
-    "Groups" : "用户组",
     "Copy link" : "复制链接",
     "Url" : "Url",
     "Close editor" : "关闭编辑器",

@@ -460,8 +460,6 @@
     "The provided types depends on your system setup. You can use the same providers like the fulltext-search." : "Os tipos fornecidos dependem da configuração do sistema. Você pode usar os mesmos provedores como a pesquisa de texto completo.",
     "Could not load link providers." : "Não foi possível carregar os provedores de links.",
     "URL" : "URL",
-    "Users" : "Usuários",
-    "Groups" : "Grupos",
     "Select multiple items" : "Selecione vários itens",
     "Show user status" : "Mostrar status do usuário",
     "Please select a new time" : "Selecione um novo horário",
