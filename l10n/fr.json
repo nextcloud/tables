@@ -210,6 +210,7 @@
     "Title of the new application" : "Titre de la nouvelle application",
     "Description of the new application" : "Description de la nouvelle application",
     "Resources" : "Ressources",
+    "This can be overridden by a per-account preference" : "Cela peut être remplacé par une préférence spécifique à chaque compte",
     "Create application" : "Créer l’application",
     "The title character limit is 200 characters. Please use a shorter title." : "La limite de caractères du titre est de 200 caractères. Veuillez utiliser un titre plus court.",
     "Cannot create new application. Title is missing." : "Impossible de créer la nouvelle application. Le titre est manquant.",
