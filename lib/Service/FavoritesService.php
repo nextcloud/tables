@@ -48,7 +48,7 @@ class FavoritesService {
 
 			$result = $qb->executeQuery();
 			while ($row = $result->fetch()) {
-				$this->cache->set($cacheKey, true);
+				$this->cache->set(sprintf('%d_%d', $row['node_type'], $row['node_id']), true);
 			}
 		}
 
