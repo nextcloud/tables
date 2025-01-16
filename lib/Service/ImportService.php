@@ -31,6 +31,9 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
+use function is_string;
+use function mb_strlen;
+use function preg_match;
 
 class ImportService extends SuperService {
 
@@ -168,12 +171,7 @@ class ImportService extends SuperService {
 					} else {
 						$format = 'Y-m-d H:i';
 					}
-
-					try {
-						$value = Date::excelToDateTimeObject($value)->format($format);
-					} catch (\TypeError) {
-						$value = (new \DateTimeImmutable($value))->format($format);
-					}
+					$value = $this->parseAndFormatDateTimeString($value, $format);
 				} elseif (($column && $column->getType() === 'number' && $column->getNumberSuffix() === '%')
 					|| (is_array($columns[$colIndex]) && $columns[$colIndex]['type'] === 'number' && $columns[$colIndex]['numberSuffix'] === '%')) {
 					$value = $value * 100;
@@ -382,30 +380,14 @@ class ImportService extends SuperService {
 				$hasData = $hasData || !empty($value);
 
 				if ($column->getType() === 'datetime') {
-					if ($column->getType() === 'datetime' && $column->getSubtype() === 'date') {
+					if ($column->getSubtype() === 'date') {
 						$format = 'Y-m-d';
-					} elseif ($column->getType() === 'datetime' && $column->getSubtype() === 'time') {
+					} elseif ($column->getSubtype() === 'time') {
 						$format = 'H:i';
 					} else {
 						$format = 'Y-m-d H:i';
 					}
-					try {
-						$value = Date::excelToDateTimeObject($value)->format($format);
-					} catch (\TypeError) {
-						$value = (new \DateTimeImmutable($value))->format($format);
-					}
-				} elseif ($column->getType() === 'datetime' && $column->getSubtype() === 'date') {
-					try {
-						$value = Date::excelToDateTimeObject($value)->format('Y-m-d');
-					} catch (\TypeError) {
-						$value = (new \DateTimeImmutable($value))->format('Y-m-d');
-					}
-				} elseif ($column->getType() === 'datetime' && $column->getSubtype() === 'time') {
-					try {
-						$value = Date::excelToDateTimeObject($value)->format('H:i');
-					} catch (\TypeError) {
-						$value = (new \DateTimeImmutable($value))->format('H:i');
-					}
+					$value = $this->parseAndFormatDateTimeString($value, $format);
 				} elseif ($column->getType() === 'number' && $column->getNumberSuffix() === '%') {
 					$value = $value * 100;
 				} elseif ($column->getType() === 'selection' && $column->getSubtype() === 'check') {
@@ -438,6 +420,37 @@ class ImportService extends SuperService {
 			$this->logger->error('Error while creating new row for import.', ['exception' => $e]);
 		}
 
+	}
+
+	private function valueToDateTimeImmutable(mixed $value): ?\DateTimeImmutable {
+		if (
+			$value === false
+			|| $value === null
+			|| (is_string($value)
+				&& mb_strlen($value) < 3 // Let pass potential 3-letter month names
+				&& preg_match('/\d/', $value) !== 1) // or anything containing a digit
+		) {
+			return null;
+		}
+		try {
+			$dt = Date::excelToDateTimeObject($value);
+			return \DateTimeImmutable::createFromMutable($dt);
+		} catch (\TypeError) {
+			try {
+				return (new \DateTimeImmutable($value));
+			} catch (\Exception $e) {
+				$this->logger->debug('Could not parse string {value} as date time.', [
+					'exception' => $e,
+					'value' => $value,
+				]);
+				return null;
+			}
+		}
+	}
+
+	private function parseAndFormatDateTimeString(?string $value, string $format): string {
+		$dateTime = $this->valueToDateTimeImmutable($value);
+		return $dateTime?->format($format) ?: '';
 	}
 
 	/**
@@ -528,17 +541,11 @@ class ImportService extends SuperService {
 			'subtype' => 'line',
 		];
 
-		try {
-			if ($value === false) {
-				throw new \Exception('We do not accept `false` here');
-			}
-			$dateValue = new \DateTimeImmutable($value);
-		} catch (\Exception) {
-		}
-
-		if (isset($dateValue)
+		if (!is_numeric($formattedValue)
+			&& ($this->valueToDateTimeImmutable($value) instanceof \DateTimeImmutable
 			|| Date::isDateTime($cell)
-			|| $originDataType === DataType::TYPE_ISO_DATE) {
+			|| $originDataType === DataType::TYPE_ISO_DATE)
+		) {
 			// the formatted value stems from the office document and shows the original user intent
 			$dateAnalysis = date_parse($formattedValue);
 			$containsDate = $dateAnalysis['year'] !== false || $dateAnalysis['month'] !== false || $dateAnalysis['day'] !== false;
