@@ -53,6 +53,9 @@ import '@nextcloud/dialogs/style.css'
 import ColumnFormComponent from '../main/partials/ColumnFormComponent.vue'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import rowHelper from '../../shared/components/ncTable/mixins/rowHelper.js'
+import { mapActions } from 'pinia'
+import { useTablesStore } from '../../store/store.js'
+import { useDataStore } from '../../store/data.js'
 
 export default {
 	name: 'EditRow',
@@ -110,7 +113,7 @@ export default {
 					this.$router.replace(this.$router.currentRoute.path.split('/row/')[0])
 				}
 				this.$router.push(this.$router.currentRoute.path + '/row/' + this.row.id)
-				this.$store.commit('setActiveRowId', null)
+				this.setActiveRowId(null)
 				this.loadValues()
 			}
 		},
@@ -119,6 +122,8 @@ export default {
 		this.loadValues()
 	},
 	methods: {
+		...mapActions(useDataStore, ['updateRow', 'removeRow']),
+		...mapActions(useTablesStore, ['setActiveRowId']),
 		t,
 		loadValues() {
 			if (this.row) {
@@ -150,7 +155,8 @@ export default {
 					value: value ?? '',
 				})
 			}
-			const res = await this.$store.dispatch('updateRow', {
+
+			const res = await this.updateRow({
 				id: this.row.id,
 				isView: this.isView,
 				elementId: this.element.id,
@@ -172,7 +178,7 @@ export default {
 			await this.loadStore()
 
 			this.localLoading = true
-			const res = await this.$store.dispatch('removeRow', {
+			const res = await this.removeRow({
 				rowId,
 				isView: this.isView,
 				elementId: this.element.id,
@@ -184,10 +190,10 @@ export default {
 			this.actionCancel()
 		},
 		async loadStore() {
-			if (this.$store) { return }
+			if (this.tablesStore) { return }
 
 			const { default: store } = await import(/* webpackChunkName: 'store' */ '../../store/store.js')
-			this.$store = store
+			this.tablesStore = store
 		},
 		onKeydown(event) {
 			if (event.key === 'Enter' && event.ctrlKey) {

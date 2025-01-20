@@ -157,8 +157,9 @@ import EmptyTable from './EmptyTable.vue'
 import Connection from 'vue-material-design-icons/Connection.vue'
 import Import from 'vue-material-design-icons/Import.vue'
 import { NcActionButton, NcActions, NcActionCaption } from '@nextcloud/vue'
-import { mapState } from 'vuex'
+import { mapState } from 'pinia'
 import { emit } from '@nextcloud/event-bus'
+import { useTablesStore } from '../../../store/store.js'
 
 export default {
 	components: {
@@ -212,7 +213,7 @@ export default {
 	},
 
 	computed: {
-		...mapState(['views']),
+		...mapState(useTablesStore, ['views']),
 		hasViews() {
 			return this.views.some(v => v.tableId === this.table.id)
 		},

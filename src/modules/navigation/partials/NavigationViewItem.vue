@@ -109,7 +109,8 @@
 import { NcAppNavigationItem, NcActionButton, NcCounterBubble, NcAvatar } from '@nextcloud/vue'
 import '@nextcloud/dialogs/style.css'
 import { getCurrentUser } from '@nextcloud/auth'
-import { mapGetters } from 'vuex'
+import { mapState, mapActions } from 'pinia'
+import { useTablesStore } from '../../../store/store.js'
 import { showError } from '@nextcloud/dialogs'
 import Table from 'vue-material-design-icons/Table.vue'
 import Star from 'vue-material-design-icons/Star.vue'
@@ -170,7 +171,7 @@ export default {
 	},
 
 	computed: {
-		...mapGetters(['activeView']),
+		...mapState(useTablesStore, ['activeView']),
 		getTranslatedDescription() {
 			return t('tables', 'Do you really want to delete the view "{view}"?', { view: this.view.title })
 		},
@@ -179,6 +180,7 @@ export default {
 		},
 	},
 	methods: {
+		...mapActions(useTablesStore, ['favoriteView', 'removeFavoriteView', 'insertNewView', 'updateView']),
 		emit,
 		async actionShowShare() {
 			emit('tables:sidebar:sharing', { open: true, tab: 'sharing' })
@@ -200,7 +202,7 @@ export default {
 				title: this.view.title + ' ' + t('tables', 'Copy'),
 				emoji: this.view.emoji,
 			}
-			const newViewId = await this.$store.dispatch('insertNewView', { data })
+			const newViewId = await this.insertNewView({ data })
 			if (newViewId) {
 				data = {
 					data: {
@@ -209,7 +211,7 @@ export default {
 						sort: JSON.stringify(this.view.sort),
 					},
 				}
-				const res = await this.$store.dispatch('updateView', { id: newViewId, data })
+				const res = await this.updateView({ id: newViewId, data })
 				if (res) {
 					await this.$router.push('/view/' + newViewId)
 				} else {
@@ -221,11 +223,11 @@ export default {
 		},
 		async toggleFavoriteView(favorite) {
 			if (favorite) {
-				await this.$store.dispatch('favoriteView', {
+				await this.favoriteView({
 					id: this.view.id,
 				})
 			} else {
-				await this.$store.dispatch('removeFavoriteView', {
+				await this.removeFavoriteView({
 					id: this.view.id,
 				})
 			}

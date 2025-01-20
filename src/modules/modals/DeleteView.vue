@@ -16,11 +16,11 @@
 </template>
 
 <script>
-
 import DialogConfirmation from '../../shared/modals/DialogConfirmation.vue'
 import { showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
-import { mapGetters } from 'vuex'
+import { mapState, mapActions } from 'pinia'
+import { useTablesStore } from '../../store/store.js'
 
 export default {
 	components: {
@@ -37,16 +37,17 @@ export default {
 		},
 	},
 	computed: {
-		...mapGetters(['activeView', 'isView']),
+		...mapState(useTablesStore, ['activeView', 'isView']),
 		getTranslatedDescription() {
 			return t('tables', 'Do you really want to delete the view "{view}"?', { view: this.view?.title })
 		},
 	},
 	methods: {
+		...mapActions(useTablesStore, ['removeView']),
 		async deleteMe() {
 			const viewId = this.view.id
 			const activeViewId = this.activeView?.id
-			const res = await this.$store.dispatch('removeView', { viewId: this.view.id })
+			const res = await this.removeView({ viewId: this.view.id })
 			if (res) {
 				showSuccess(t('tables', 'View "{emoji}{view}" removed.', { emoji: this.view.emoji ? this.view.emoji + ' ' : '', view: this.view.title }))
 

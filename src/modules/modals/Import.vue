@@ -124,11 +124,13 @@ import IconUpload from 'vue-material-design-icons/Upload.vue'
 import IconFile from 'vue-material-design-icons/File.vue'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
-import { mapGetters } from 'vuex'
+import { useTablesStore } from '../../store/store.js'
+import { mapState, mapActions } from 'pinia'
 import NcIconTimerSand from '../../shared/components/ncIconTimerSand/NcIconTimerSand.vue'
 import ImportResults from './ImportResults.vue'
 import ImportPreview from './ImportPreview.vue'
 import { translate as t } from '@nextcloud/l10n'
+import { useDataStore } from '../../store/data.js'
 
 export default {
 
@@ -163,7 +165,6 @@ export default {
 			default: true,
 		},
 	},
-
 	data() {
 		return {
 			path: '',
@@ -189,7 +190,7 @@ export default {
 	},
 
 	computed: {
-		...mapGetters(['activeElement', 'isView']),
+		...mapState(useTablesStore, ['activeElement', 'isView']),
 		canCreateMissingColumns() {
 			return this.isElementView ? this.canManageTable(this.element) : this.canManageElement(this.element)
 		},
@@ -235,6 +236,8 @@ export default {
 	},
 
 	methods: {
+		...mapActions(useTablesStore, ['loadTablesFromBE', 'loadViewsSharedWithMeFromBE']),
+		...mapActions(useDataStore, ['loadRowsFromBE', 'loadColumnsFromBE']),
 		async actionCloseAndReload() {
 			if (!this?.activeElement) {
 				return
@@ -246,14 +249,14 @@ export default {
 			|| (!this.isView && this.isElementView && this.activeElement.id === this.element.tableId)
 			|| (!this.isView && !this.isElementView && this.activeElement.id === this.element.id)) {
 				this.waitForReload = true
-				await this.$store.dispatch('loadTablesFromBE')
-				await this.$store.dispatch('loadViewsSharedWithMeFromBE')
-				await this.$store.dispatch('loadColumnsFromBE', {
+				await this.loadTablesFromBE()
+				await this.loadViewsSharedWithMeFromBE()
+				await this.loadColumnsFromBE({
 					view: this.isElementView ? this.element : null,
 					tableId: !this.isElementView ? this.element.id : null,
 				})
 				if (this.canReadData(this.element)) {
-					await this.$store.dispatch('loadRowsFromBE', {
+					await this.loadRowsFromBE({
 						viewId: this.isElementView ? this.element.id : null,
 						tableId: !this.isElementView ? this.element.id : null,
 					})

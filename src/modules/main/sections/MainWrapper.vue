@@ -33,12 +33,15 @@
 
 <script>
 
-import { mapState } from 'vuex'
+import { mapState, mapActions, storeToRefs } from 'pinia'
 import { emit } from '@nextcloud/event-bus'
 import CustomView from './View.vue'
 import CustomTable from './Table.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import exportTableMixin from '../../../shared/components/ncTable/mixins/exportTableMixin.js'
+import { useTablesStore } from '../../../store/store.js'
+import { useDataStore } from '../../../store/data.js'
+import { computed } from 'vue'
 
 export default {
 	name: 'MainWrapper',
@@ -60,6 +63,15 @@ export default {
 			default: false,
 		},
 	},
+	setup(props) {
+		const store = useDataStore()
+		const { getColumns, getRows } = storeToRefs(store)
+		// When using storeToRefs, only the top-level state is made reactive.
+		// To make nested dynamic keys reactive, you need to use a computed property or watch for changes.
+		const rows = computed(() => getRows.value(props.isView, props.element.id))
+		const columns = computed(() => getColumns.value(props.isView, props.element.id))
+		return { rows, columns }
+	},
 
 	data() {
 		return {
@@ -70,11 +82,7 @@ export default {
 	},
 
 	computed: {
-		...mapState(['activeRowId']),
-		...mapState({
-			columns(state) { return state.data.columns[this.isView ? 'view-' + (this.element.id).toString() : (this.element.id).toString()] },
-			rows(state) { return state.data.rows[this.isView ? 'view-' + (this.element.id).toString() : (this.element.id).toString()] },
-		}),
+		...mapState(useTablesStore, ['activeRowId']),
 	},
 
 	watch: {
@@ -88,6 +96,7 @@ export default {
 	},
 
 	methods: {
+		...mapActions(useDataStore, ['removeRows', 'clearState', 'loadColumnsFromBE', 'loadRowsFromBE']),
 		createColumn() {
 			emit('tables:column:create', { isView: this.isView, element: this.element })
 		},
@@ -118,24 +127,24 @@ export default {
 				this.localLoading = true
 
 				// Since we show one page at a time, no need keep other tables in the store
-				await this.$store.dispatch('clearState')
+				this.clearState()
 
 				this.viewSetting = {}
 				if (this.isView && this.element?.sort?.length) {
 					this.viewSetting.presetSorting = [...this.element.sort]
 				}
 
-				await this.$store.dispatch('loadColumnsFromBE', {
+				await this.loadColumnsFromBE({
 					view: this.isView ? this.element : null,
 					tableId: !this.isView ? this.element.id : null,
 				})
 				if (this.canReadData(this.element)) {
-					await this.$store.dispatch('loadRowsFromBE', {
+					await this.loadRowsFromBE({
 						viewId: this.isView ? this.element.id : null,
 						tableId: !this.isView ? this.element.id : null,
 					})
 				} else {
-					await this.$store.dispatch('removeRows', {
+					await this.removeRows({
 						isView: this.isView,
 						elementId: this.element.id,
 					})

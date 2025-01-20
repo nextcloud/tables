@@ -23,11 +23,12 @@
 import { generateOcsUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 import { NcSelect } from '@nextcloud/vue'
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'pinia'
 import formatting from '../../../shared/mixins/formatting.js'
 import ShareTypes from '../../../shared/mixins/shareTypesMixin.js'
 import searchUserGroup from '../../../shared/mixins/searchUserGroup.js'
 import { showError } from '@nextcloud/dialogs'
+import { useTablesStore } from '../../../store/store.js'
 
 export default {
 	name: 'ShareForm',
@@ -57,8 +58,7 @@ export default {
 	},
 
 	computed: {
-		...mapState(['tables', 'showSidebar']),
-		...mapGetters(['isLoadingSomething']),
+		...mapState(useTablesStore, ['tables', 'showSidebar', 'isLoadingSomething']),
 
 		shareHeading() {
 			return this.isCirclesEnabled

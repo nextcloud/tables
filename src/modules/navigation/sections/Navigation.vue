@@ -105,12 +105,13 @@ import {
 import NavigationViewItem from '../partials/NavigationViewItem.vue'
 import NavigationTableItem from '../partials/NavigationTableItem.vue'
 import NavigationContextItem from '../partials/NavigationContextItem.vue'
-import { mapGetters, mapState } from 'vuex'
+import { useTablesStore } from '../../../store/store.js'
 import { emit, subscribe } from '@nextcloud/event-bus'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
 import Archive from 'vue-material-design-icons/Archive.vue'
 import { getCurrentUser } from '@nextcloud/auth'
 import { loadState } from '@nextcloud/initial-state'
+import { mapState, mapActions } from 'pinia'
 
 export default {
 	name: 'Navigation',
@@ -137,8 +138,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(['appNavCollapsed', 'tables', 'views', 'contexts']),
-		...mapGetters(['isLoadingSomething', 'isLoading']),
+		...mapState(useTablesStore, ['appNavCollapsed', 'tables', 'views', 'contexts', 'isLoadingSomething', 'isLoading']),
 		getAllNodes() {
 			return [...this.getFilteredTables, ...this.getOwnViews, ...this.getSharedViews]
 		},
@@ -197,6 +197,7 @@ export default {
 		subscribe('navigation-toggled', this.toggleNavigationByEventBus)
 	},
 	methods: {
+		...mapActions(useTablesStore, ['setAppNavCollapsed']),
 		createTable() {
 			emit('tables:table:create')
 		},
@@ -214,7 +215,7 @@ export default {
 			return this.getFilteredTables.map(t => t.id).includes(view.tableId)
 		},
 		toggleNavigationByEventBus({ open }) {
-			this.$store.commit('setAppNavCollapsed', open)
+			this.setAppNavCollapsed(open)
 		},
 	},
 }

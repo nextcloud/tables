@@ -14,7 +14,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState } from 'pinia'
+import { useTablesStore } from '../../../store/store.js'
 import ResourceForm from './ResourceForm.vue'
 import ResourceList from './ResourceList.vue'
 import ResourceSharePermissions from './ResourceSharePermissions.vue'
@@ -54,7 +55,7 @@ export default {
 	},
 
 	computed: {
-		...mapGetters(['activeContext']),
+		...mapState(useTablesStore, ['activeContext']),
 		localResources: {
 			get() {
 				return this.contextResources

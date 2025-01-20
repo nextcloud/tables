@@ -40,8 +40,7 @@
 
 <script>
 import MainModals from '../modules/modals/Modals.vue'
-import Vuex, { mapState, mapGetters } from 'vuex'
-import Vue from 'vue'
+import { mapState, mapActions, storeToRefs } from 'pinia'
 import { NcIconSvgWrapper } from '@nextcloud/vue'
 import TableWrapper from '../modules/main/sections/TableWrapper.vue'
 import CustomView from '../modules/main/sections/View.vue'
@@ -49,8 +48,8 @@ import { emit } from '@nextcloud/event-bus'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../shared/constants.js'
 import exportTableMixin from '../shared/components/ncTable/mixins/exportTableMixin.js'
 import svgHelper from '../shared/components/ncIconPicker/mixins/svgHelper.js'
-
-Vue.use(Vuex)
+import { useTablesStore } from '../store/store.js'
+import { useDataStore } from '../store/data.js'
 
 export default {
 	components: {
@@ -61,6 +60,11 @@ export default {
 	},
 
 	mixins: [exportTableMixin, svgHelper],
+	setup() {
+		const store = useDataStore()
+		const { getColumns, getRows } = storeToRefs(store)
+		return { getColumns, getRows }
+	},
 
 	data() {
 		return {
@@ -73,19 +77,17 @@ export default {
 	},
 
 	computed: {
-		...mapState(['tables', 'contexts', 'activeContextId', 'views']),
-		...mapGetters(['activeContext']),
+		...mapState(useTablesStore, ['tables', 'contexts', 'activeContextId', 'views', 'activeContext']),
 		rows() {
 			const rows = {}
 			if (this.context && this.context.nodes) {
 				for (const [, node] of Object.entries(this.context.nodes)) {
 					if (parseInt(node.node_type) === NODE_TYPE_TABLE) {
-						const rowId = (node.node_id).toString()
-						rows[rowId] = this.$store.state.data.rows[rowId]
-
+						const rowId = this.getKey(false, node.node_id)
+						rows[rowId] = this.getRows(false, node.node_id)
 					} else if (parseInt(node.node_type) === NODE_TYPE_VIEW) {
-						const rowId = 'view-' + (node.node_id).toString()
-						rows[rowId] = this.$store.state.data.rows[rowId]
+						const rowId = this.getKey(true, node.node_id)
+						rows[rowId] = this.getRows(true, node.node_id)
 					}
 				}
 			}
@@ -98,12 +100,11 @@ export default {
 			if (this.context && this.context.nodes) {
 				for (const [, node] of Object.entries(this.context.nodes)) {
 					if (parseInt(node.node_type) === NODE_TYPE_TABLE) {
-						const columnId = (node.node_id).toString()
-						columns[columnId] = this.$store.state.data.columns[columnId]
+						const columnId = this.getKey(false, node.node_id)
+						columns[columnId] = this.getColumns(false, node.node_id)
 					} else if (parseInt(node.node_type) === NODE_TYPE_VIEW) {
-						const columnId = 'view-' + (node.node_id).toString()
-						columns[columnId] = this.$store.state.data.columns[columnId]
-
+						const columnId = this.getKey(true, node.node_id)
+						columns[columnId] = this.getColumns(true, node.node_id)
 					}
 
 				}
@@ -138,6 +139,8 @@ export default {
 	},
 
 	methods: {
+		...mapActions(useTablesStore, ['loadContext']),
+		...mapActions(useDataStore, ['loadColumnsFromBE', 'loadRowsFromBE']),
 		async reload() {
 			if (!this.activeContextId) {
 				return
@@ -145,7 +148,7 @@ export default {
 			this.loading = true
 			this.icon = await this.getContextIcon(this.activeContext.iconName)
 			this.contextResources = []
-			await this.$store.dispatch('loadContext', { id: this.activeContextId })
+			await this.loadContext({ id: this.activeContextId })
 			const index = this.contexts.findIndex(c => parseInt(c.id) === parseInt(this.activeContextId))
 			this.context = this.contexts[index]
 
@@ -155,11 +158,11 @@ export default {
 					if (nodeType === NODE_TYPE_TABLE) {
 						const table = this.tables.find(table => table.id === node.node_id)
 						if (table) {
-							await this.$store.dispatch('loadColumnsFromBE', {
+							await this.loadColumnsFromBE({
 								view: null,
 								tableId: table.id,
 							})
-							await this.$store.dispatch('loadRowsFromBE', {
+							await this.loadRowsFromBE({
 								viewId: null,
 								tableId: table.id,
 							})
@@ -171,10 +174,10 @@ export default {
 					} else if (nodeType === NODE_TYPE_VIEW) {
 						const view = this.views.find(view => view.id === node.node_id)
 						if (view) {
-							await this.$store.dispatch('loadColumnsFromBE', {
+							await this.loadColumnsFromBE({
 								view,
 							})
-							await this.$store.dispatch('loadRowsFromBE', {
+							await this.loadRowsFromBE({
 								viewId: view.id,
 								tableId: view.tableId,
 							})
@@ -191,9 +194,12 @@ export default {
 			emit('tables:column:create', { isView, element })
 		},
 		downloadCSV(element, isView) {
-			const rowId = !isView ? element.key : 'view-' + element.key
-			const colId = !isView ? element.key : 'view-' + element.key
+			const rowId = this.getKey(isView, element.key)
+			const colId = this.getKey(isView, element.key)
 			this.downloadCsv(this.rows[rowId], this.columns[colId], element.title)
+		},
+		getKey(isView, id) {
+			return isView ? 'view-' + id : id
 		},
 		openImportModal(element, isView) {
 			emit('tables:modal:import', { element, isView })

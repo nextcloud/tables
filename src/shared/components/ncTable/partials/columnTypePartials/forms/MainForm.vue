@@ -60,8 +60,9 @@
 
 <script>
 import { NcCheckboxRadioSwitch, NcSelect } from '@nextcloud/vue'
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'pinia'
 import { translate as t } from '@nextcloud/l10n'
+import { useTablesStore } from '../../../../../../store/store.js'
 
 export default {
 	name: 'MainForm',
@@ -96,8 +97,7 @@ export default {
 		},
 	},
 	computed: {
-		...mapState(['views']),
-		...mapGetters(['activeElement', 'isView']),
+		...mapState(useTablesStore, ['views', 'activeElement', 'isView']),
 		localTitle: {
 			get() { return this.title },
 			set(title) { this.$emit('update:title', title) },

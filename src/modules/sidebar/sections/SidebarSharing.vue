@@ -12,7 +12,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { useTablesStore } from '../../../store/store.js'
+import { mapState, mapActions } from 'pinia'
 import shareAPI from '../mixins/shareAPI.js'
 import ShareForm from '../partials/ShareForm.vue'
 import ShareList from '../partials/ShareList.vue'
@@ -26,7 +27,6 @@ export default {
 	},
 
 	mixins: [shareAPI, permissionsMixin],
-
 	data() {
 		return {
 			loading: false,
@@ -37,7 +37,7 @@ export default {
 	},
 
 	computed: {
-		...mapGetters(['activeElement', 'isView']),
+		...mapState(useTablesStore, ['activeElement', 'isView']),
 	},
 
 	watch: {
@@ -55,6 +55,7 @@ export default {
 	},
 
 	methods: {
+		...mapActions(useTablesStore, ['setTableHasShares', 'setViewHasShares']),
 		getCurrentUser,
 		async loadSharesFromBE() {
 			this.loading = true
@@ -67,11 +68,11 @@ export default {
 			// If no share is left, remove shared indication
 			if (this.isView) {
 				if (this.shares.find(share => ((share.nodeType === 'view' && share.nodeId === this.activeElement.id) || (share.nodeType === 'table' && share.nodeId === this.activeElement.tableId))) === undefined) {
-					await this.$store.dispatch('setViewHasShares', { viewId: this.activeElement.id, hasShares: false })
+					await this.setViewHasShares({ viewId: this.activeElement.id, hasShares: false })
 				}
 			} else {
 				if (this.shares.find(share => (share.nodeType === 'table' && share.nodeId === this.activeElement.id)) === undefined) {
-					await this.$store.dispatch('setTableHasShares', { tableId: this.activeElement.id, hasShares: false })
+					await this.setTableHasShares({ tableId: this.activeElement.id, hasShares: false })
 				}
 			}
 		},

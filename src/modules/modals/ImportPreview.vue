@@ -64,10 +64,12 @@
 <script>
 import { translate as t } from '@nextcloud/l10n'
 import { NcButton, NcCheckboxRadioSwitch, NcSelect } from '@nextcloud/vue'
-import { mapGetters } from 'vuex'
+import { mapState, mapActions } from 'pinia'
 import PencilIcon from 'vue-material-design-icons/Pencil.vue'
 import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandler.js'
 import { emit } from '@nextcloud/event-bus'
+import { useTablesStore } from '../../store/store.js'
+import { useDataStore } from '../../store/data.js'
 
 export default {
 	name: 'ImportPreview',
@@ -98,7 +100,6 @@ export default {
 			default: false,
 		},
 	},
-
 	data() {
 		return {
 			editingColumnIndex: null,
@@ -109,7 +110,8 @@ export default {
 	},
 
 	computed: {
-		...mapGetters(['isView']),
+		...mapState(useTablesStore, ['isView']),
+		...mapState(useDataStore, ['getColumnsFromBE']),
 		existingColumnOptions() {
 			if (!this.existingColumns.length) {
 				return []
@@ -132,7 +134,7 @@ export default {
 	},
 
 	async mounted() {
-		this.existingColumns = await this.$store.dispatch('getColumnsFromBE', {
+		this.existingColumns = await this.getColumnsFromBE({
 			tableId: !this.isView ? this.element.id : null,
 			viewId: this.isView ? this.element.id : null,
 		})
@@ -156,6 +158,7 @@ export default {
 	},
 
 	methods: {
+		...mapActions(useDataStore, ['getColumnsFromBE', 'createColumn']),
 		t,
 		editColumn(index) {
 			this.editingColumnPreset = this.columnsConfig[index]

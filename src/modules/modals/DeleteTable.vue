@@ -20,7 +20,8 @@
 import DialogConfirmation from '../../shared/modals/DialogConfirmation.vue'
 import { showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
-import { mapGetters } from 'vuex'
+import { mapState, mapActions } from 'pinia'
+import { useTablesStore } from '../../store/store.js'
 
 export default {
 	components: {
@@ -37,17 +38,18 @@ export default {
 		},
 	},
 	computed: {
-		...mapGetters(['activeElement', 'isView']),
+		...mapState(useTablesStore, ['activeElement', 'isView']),
 		getTranslatedDescription() {
 			return t('tables', 'Do you really want to delete the table "{table}"? This will also delete all data, views and shares that are connected to this table.', { table: this.table?.title })
 		},
 	},
 	methods: {
+		...mapActions(useTablesStore, ['removeTable']),
 		async deleteMe() {
 			const tableId = this.table.id
 			let activeTableId
 			if (this.activeElement) activeTableId = this.isView ? this.activeElement.id : this.activeElement.tableId
-			const res = await this.$store.dispatch('removeTable', { tableId: this.table.id })
+			const res = await this.removeTable({ tableId: this.table.id })
 			if (res) {
 				showSuccess(t('tables', 'Table "{emoji}{table}" removed.', { emoji: this.table.emoji ? this.table.emoji + ' ' : '', table: this.table.title }))
 

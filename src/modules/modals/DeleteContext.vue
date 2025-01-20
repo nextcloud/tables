@@ -20,7 +20,8 @@
 import DialogConfirmation from '../../shared/modals/DialogConfirmation.vue'
 import { showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'pinia'
+import { useTablesStore } from '../../store/store.js'
 
 export default {
 	components: {
@@ -37,14 +38,15 @@ export default {
 		},
 	},
 	computed: {
-		...mapState(['activeContextId']),
+		...mapState(useTablesStore, ['activeContextId']),
 		getTranslatedDescription() {
 			return t('tables', 'Do you really want to delete the application "{context}"? This will also delete the shares and unshare the resources that are connected to this application.', { context: this.context?.name })
 		},
 	},
 	methods: {
+		...mapActions(useTablesStore, ['removeContext']),
 		async deleteContext() {
-			const res = await this.$store.dispatch('removeContext', { context: this.context, receivers: this.context.sharing })
+			const res = await this.removeContext({ context: this.context, receivers: this.context.sharing })
 			if (res) {
 				showSuccess(t('tables', 'Application "{context}" removed.', { context: this.context.name }))
 				// if the active context was deleted, go to startpage

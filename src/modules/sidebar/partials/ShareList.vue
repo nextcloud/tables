@@ -128,7 +128,8 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'pinia'
+import { useTablesStore } from '../../../store/store.js'
 import formatting from '../../../shared/mixins/formatting.js'
 import { NcActions, NcActionButton, NcAvatar, NcActionCheckbox, NcActionCaption, NcActionSeparator, NcActionText } from '@nextcloud/vue'
 import ShareInfoPopover from './ShareInfoPopover.vue'
@@ -178,8 +179,11 @@ export default {
 	},
 
 	computed: {
-		...mapState(['tables', 'showSidebar']),
-		...mapGetters(['isLoadingSomething', 'activeElement', 'isView']),
+		...mapState(useTablesStore, ['tables', 'showSidebar', 'isLoadingSomething', 'activeElement', 'isView']),
+		sortedShares() {
+			return [...this.userShares, ...this.groupShares].slice()
+				.sort(this.sortByDisplayName)
+		},
 		getShares() {
 			if (this.isView) {
 				return this.viewShares

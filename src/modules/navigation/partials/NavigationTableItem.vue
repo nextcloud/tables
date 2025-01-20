@@ -148,8 +148,9 @@
 <script>
 import { NcActionButton, NcAppNavigationItem, NcCounterBubble, NcAvatar } from '@nextcloud/vue'
 import '@nextcloud/dialogs/style.css'
-import { mapGetters, mapState } from 'vuex'
+import { mapState, mapActions } from 'pinia'
 import { emit } from '@nextcloud/event-bus'
+import { useTablesStore } from '../../../store/store.js'
 import Table from 'vue-material-design-icons/Table.vue'
 import Star from 'vue-material-design-icons/Star.vue'
 import StarOutline from 'vue-material-design-icons/StarOutline.vue'
@@ -214,8 +215,7 @@ export default {
 	},
 
 	computed: {
-		...mapGetters(['activeTable', 'activeView']),
-		...mapState(['views']),
+		...mapState(useTablesStore, ['activeTable', 'activeView', 'views']),
 		getTranslatedDescription() {
 			return t('tables', 'Do you really want to delete the table "{table}"?', { table: this.table.title })
 		},
@@ -242,6 +242,7 @@ export default {
 		},
 	},
 	methods: {
+		...mapActions(useTablesStore, ['favoriteTable', 'removeFavoriteTable', 'updateTable']),
 		emit,
 		deleteTable() {
 			emit('tables:table:delete', this.table)
@@ -287,18 +288,18 @@ export default {
 			}
 		},
 		async toggleArchiveTable(archived) {
-			await this.$store.dispatch('updateTable', {
+			await this.updateTable({
 				id: this.table.id,
 				data: { archived },
 			})
 		},
 		async toggleFavoriteTable(favorite) {
 			if (favorite) {
-				await this.$store.dispatch('favoriteTable', {
+				await this.favoriteTable({
 					id: this.table.id,
 				})
 			} else {
-				await this.$store.dispatch('removeFavoriteTable', {
+				await this.removeFavoriteTable({
 					id: this.table.id,
 				})
 			}
