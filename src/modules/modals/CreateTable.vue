@@ -93,7 +93,8 @@ import NcTile from '../../shared/components/ncTile/NcTile.vue'
 import displayError from '../../shared/utils/displayError.js'
 import TableDescription from '../../modules/main/sections/TableDescription.vue'
 import { emit } from '@nextcloud/event-bus'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'pinia'
+import { useTablesStore } from '../../store/store.js'
 
 export default {
 	name: 'CreateTable',
@@ -122,7 +123,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(['templates']),
+		...mapState(useTablesStore, ['templates']),
 	},
 	watch: {
 		title() {
@@ -138,6 +139,7 @@ export default {
 		},
 	},
 	methods: {
+		...mapActions(useTablesStore, ['insertNewTable']),
 		titleChangedManually() {
 			this.customTitleChosen = true
 		},
@@ -203,7 +205,7 @@ export default {
 				emoji: this.icon,
 				template,
 			}
-			const res = await this.$store.dispatch('insertNewTable', { data })
+			const res = await this.insertNewTable({ data })
 			if (res) {
 				return res.id
 			} else {

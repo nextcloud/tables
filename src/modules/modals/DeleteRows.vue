@@ -19,6 +19,8 @@ import DialogConfirmation from '../../shared/modals/DialogConfirmation.vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import { emit } from '@nextcloud/event-bus'
+import { mapActions } from 'pinia'
+import { useDataStore } from '../../store/data.js'
 
 export default {
 	name: 'DeleteRows',
@@ -40,10 +42,11 @@ export default {
 		},
 	},
 	methods: {
+		...mapActions(useDataStore, ['removeRow']),
 		deleteRows() {
 			let error = false
 			this.rowsToDelete.forEach(rowId => {
-				const res = this.$store.dispatch('removeRow', {
+				const res = this.removeRow({
 					rowId,
 					isView: this.isView,
 					elementId: this.elementId,

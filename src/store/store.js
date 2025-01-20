@@ -1,27 +1,14 @@
-/**
- * SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
- * SPDX-License-Identifier: AGPL-3.0-or-later
- */
-import Vue from 'vue'
-import Vuex from 'vuex'
+import { defineStore } from 'pinia'
 import axios from '@nextcloud/axios'
 import { generateUrl, generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
-import '@nextcloud/dialogs/style.css'
-import data from './data.js'
 import displayError from '../shared/utils/displayError.js'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../shared/constants.js'
 import { getCurrentUser } from '@nextcloud/auth'
+import { set } from 'vue'
 
-Vue.use(Vuex)
-
-// eslint-disable-next-line import/no-named-as-default-member
-export default new Vuex.Store({
-	modules: {
-		data,
-	},
-
-	state: {
+export const useTablesStore = defineStore('store', {
+	state: () => ({
 		loading: {
 			tables: true,
 			viewsShared: true,
@@ -37,7 +24,7 @@ export default new Vuex.Store({
 		activeElementIsView: false,
 		activeContextId: null,
 		appNavCollapsed: false,
-	},
+	}),
 
 	getters: {
 		getTable: (state) => (id) => {
@@ -49,13 +36,13 @@ export default new Vuex.Store({
 		getView: (state) => (id) => {
 			return state.views.find(view => view.id === id)
 		},
-		activeView(state) {
+		activeView: (state) => {
 			if (state.views && state.activeViewId) {
 				return state.views.find(item => item.id === state.activeViewId)
 			}
 			return null
 		},
-		activeTable(state) {
+		activeTable: (state) => {
 			if (state.tables && state.activeTableId) {
 				return state.tables.find(item => item.id === state.activeTableId)
 			}
@@ -69,78 +56,78 @@ export default new Vuex.Store({
 			}
 			return null
 		},
-		activeContext(state) {
+		activeContext: (state) => {
 			if (state.contexts && state.activeContextId) {
 				return state.contexts.find(item => item.id === state.activeContextId)
 			}
 			return null
 		},
-		isView(state) {
-			return state.activeElementIsView
-		},
-		isLoading(state) {
-			return (key) => state.loading[key] ?? false
-		},
-		isLoadingSomething(state) {
-			return Object.keys(state.loading).filter(key => state.loading[key]).length > 0
-		},
+
+		isView: (state) => state.activeElementIsView,
+
+		isLoading: (state) => (key) => state.loading[key] ?? false,
+
+		isLoadingSomething: (state) => Object.keys(state.loading).filter(key => state.loading[key]).length > 0,
 	},
-	mutations: {
-		setAppNavCollapsed(state, value) {
-			state.appNavCollapsed = !!(value)
-		},
-		setLoading(state, { key, value }) {
-			state.loading[key] = !!(value)
-		},
-		setActiveViewId(state, viewId) {
-			if (state.activeViewId !== viewId) {
-				state.activeViewId = viewId
-				state.activeTableId = null
-				state.activeElementIsView = true
-			}
-		},
-		setActiveTableId(state, tableId) {
-			if (state.activeTableId !== tableId) {
-				state.activeTableId = tableId
-				state.activeViewId = null
-				state.activeElementIsView = false
-			}
-		},
-		setActiveContextId(state, contextId) {
-			if (state.activeContextId !== contextId) {
-				state.activeContextId = parseInt(contextId)
-			}
-		},
-		setTables(state, tables) {
-			state.tables = tables
-		},
-		setViews(state, views) {
-			state.views = views
-		},
-		setTemplates(state, templates) {
-			state.templates = templates
-		},
-		setContexts(state, contexts) {
-			state.contexts = contexts
-		},
-		setTable(state, table) {
-			const index = state.tables.findIndex(t => t.id === table.id)
-			state.tables.splice(index, 1, table)
-		},
-		setView(state, view) {
-			const index = state.views.findIndex(v => v.id === view.id)
-			state.views[index] = view
-		},
-		setContext(state, context) {
-			const index = state.contexts.findIndex(c => c.id === context.id)
-			state.contexts[index] = context
-		},
-		setActiveRowId(state, rowId) {
-			state.activeRowId = rowId
-		},
-	},
+
 	actions: {
-		async insertNewTable({ commit, state, dispatch }, { data }) {
+		setAppNavCollapsed(value) {
+			this.appNavCollapsed = !!value
+		},
+
+		setLoading({ key, value }) {
+			this.loading[key] = !!value
+		},
+
+		setActiveViewId(viewId) {
+			if (this.activeViewId !== viewId) {
+				this.activeViewId = viewId
+				this.activeTableId = null
+				this.activeElementIsView = true
+			}
+		},
+
+		setActiveTableId(tableId) {
+			if (this.activeTableId !== tableId) {
+				this.activeTableId = tableId
+				this.activeViewId = null
+				this.activeElementIsView = false
+			}
+		},
+		setActiveContextId(contextId) {
+			if (this.activeContextId !== contextId) {
+				this.activeContextId = parseInt(contextId)
+			}
+		},
+		setTables(tables) {
+			this.tables = tables
+		},
+		setViews(views) {
+			this.views = views
+		},
+		setTemplates(templates) {
+			this.templates = templates
+		},
+		setContexts(contexts) {
+			this.contexts = contexts
+		},
+		setTable(table) {
+			const index = this.tables.findIndex(t => t.id === table.id)
+			this.tables.splice(index, 1, table)
+		},
+		setView(view) {
+			const index = this.views.findIndex(v => v.id === view.id)
+			this.views[index] = view
+		},
+		setContext(context) {
+			const index = this.contexts.findIndex(c => c.id === context.id)
+			this.contexts[index] = context
+		},
+		setActiveRowId(rowId) {
+			this.activeRowId = rowId
+		},
+
+		async insertNewTable({ data }) {
 			let res = null
 
 			try {
@@ -149,40 +136,39 @@ export default new Vuex.Store({
 				displayError(e, t('tables', 'Could not insert table.'))
 				return false
 			}
-
-			const tables = state.tables
+			const tables = this.tables
 			tables.push(res.data)
-			commit('setTables', tables)
-
+			this.setTables(tables)
 			return res.data
 		},
-		async loadTablesFromBE({ commit, state }) {
-			commit('setLoading', { key: 'tables', value: true })
+
+		async loadTablesFromBE() {
+			this.setLoading({ key: 'tables', value: true })
 
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/table'))
-				commit('setTables', res.data)
-				// Set Views
-				state.views = []
+				this.setTables(res.data)
+				this.views = []
 				res.data.forEach(table => {
-					if (table.views) state.views = state.views.concat(table.views)
+					if (table.views) this.views = this.views.concat(table.views)
 				})
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load tables.'))
 				showError(t('tables', 'Could not fetch tables'))
 			}
 
-			commit('setLoading', { key: 'tables', value: false })
+			this.setLoading({ key: 'tables', value: false })
 			return true
 		},
-		async loadViewsSharedWithMeFromBE({ commit, state }) {
-			commit('setLoading', { key: 'viewsShared', value: true })
+
+		async loadViewsSharedWithMeFromBE() {
+			this.setLoading({ key: 'viewsShared', value: true })
 
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/view'))
 				res.data.forEach(view => {
-					if (state.views.filter(v => v.id === view.id).length === 0) {
-						state.views = state.views.concat(view)
+					if (this.views.filter(v => v.id === view.id).length === 0) {
+						this.views.push(view)
 					}
 				})
 			} catch (e) {
@@ -190,21 +176,22 @@ export default new Vuex.Store({
 				showError(t('tables', 'Could not load shared views'))
 			}
 
-			commit('setLoading', { key: 'viewsShared', value: false })
+			this.setLoading({ key: 'viewsShared', value: false })
 			return true
 		},
-		async loadTemplatesFromBE({ commit }) {
+
+		async loadTemplatesFromBE() {
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/table/templates'))
-				commit('setTemplates', res.data)
+				this.templates = res.data
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load templates.'))
 				showError(t('tables', 'Could not fetch templates'))
 			}
 		},
-		async insertNewView({ commit, state }, { data }) {
-			let res = null
 
+		async insertNewView({ data }) {
+			let res = null
 			try {
 				res = await axios.post(generateUrl('/apps/tables/view'), data)
 			} catch (e) {
@@ -212,17 +199,16 @@ export default new Vuex.Store({
 				return false
 			}
 
-			const views = state.views
+			const views = this.views
 			views.push(res.data)
-			commit('setViews', views)
-
-			const tables = state.tables
-			const table = tables.find(t => t.id === res.data.tableId)
+			this.setViews(views)
+			const table = this.tables.find(t => t.id === res.data.tableId)
 			table.views.push(res.data)
 
 			return res.data.id
 		},
-		async updateView({ state, commit, dispatch }, { id, data }) {
+
+		async updateView({ id, data }) {
 			let res = null
 
 			try {
@@ -233,13 +219,14 @@ export default new Vuex.Store({
 			}
 
 			const view = res.data
-			const views = state.views
+			const views = this.views
 			const index = views.findIndex(v => v.id === view.id)
 			views[index] = view
-			commit('setViews', [...views])
+			this.setViews([...views])
 			return true
 		},
-		async removeView({ state, commit }, { viewId }) {
+
+		async removeView({ viewId }) {
 			try {
 				await axios.delete(generateUrl('/apps/tables/view/' + viewId))
 			} catch (e) {
@@ -247,30 +234,31 @@ export default new Vuex.Store({
 				return false
 			}
 
-			const views = state.views
+			const views = this.views
 			const index = views.findIndex(v => v.id === viewId)
 			views.splice(index, 1)
-			commit('setViews', [...views])
+			this.setViews([...views])
 			return true
 		},
-		async reloadViewsOfTable({ state, commit }, { tableId }) {
+
+		async reloadViewsOfTable({ tableId }) {
 			let res = null
 			try {
 				res = await axios.get(generateUrl('/apps/tables/view/table/' + tableId))
 				// Set Views
-				const views = state.views
+				const views = this.views
 				res.data.forEach(view => {
 					const index = views.findIndex(v => v.id === view.id)
-					views[index] = view
+					set(this.views, index, view)
 				})
-				commit('setViews', [...views])
 			} catch (e) {
 				displayError(e, t('tables', 'Could not reload view.'))
 				return false
 			}
 			return true
 		},
-		async updateTable({ state, commit, dispatch }, { id, data }) {
+
+		async updateTable({ id, data }) {
 			let res = null
 
 			try {
@@ -281,13 +269,13 @@ export default new Vuex.Store({
 			}
 
 			const table = res.data
-			const tables = state.tables
+			const tables = this.tables
 			const index = tables.findIndex(t => t.id === table.id)
-			tables[index] = table
-			commit('setTables', [...tables])
+			set(this.tables, index, table)
 			return true
 		},
-		async favoriteView({ state, commit, dispatch }, { id }) {
+
+		async favoriteView({ id }) {
 			try {
 				await axios.post(generateOcsUrl(`/apps/tables/api/2/favorites/${NODE_TYPE_VIEW}/${id}`))
 			} catch (e) {
@@ -295,14 +283,15 @@ export default new Vuex.Store({
 				return false
 			}
 
-			const index = state.views.findIndex(v => v.id === id)
-			const view = state.views[index]
+			const index = this.views.findIndex(v => v.id === id)
+			const view = this.views[index]
 			view.favorite = true
-			commit('setView', view)
+			this.setView(view)
 
 			return true
 		},
-		async removeFavoriteView({ state, commit, dispatch }, { id }) {
+
+		async removeFavoriteView({ id }) {
 			try {
 				await axios.delete(generateOcsUrl(`/apps/tables/api/2/favorites/${NODE_TYPE_VIEW}/${id}`))
 			} catch (e) {
@@ -310,14 +299,15 @@ export default new Vuex.Store({
 				return false
 			}
 
-			const index = state.views.findIndex(v => v.id === id)
-			const view = state.views[index]
+			const index = this.views.findIndex(v => v.id === id)
+			const view = this.views[index]
 			view.favorite = false
-			commit('setView', view)
+			this.setView(view)
 
 			return true
 		},
-		async favoriteTable({ state, commit, dispatch }, { id }) {
+
+		async favoriteTable({ id }) {
 			try {
 				await axios.post(generateOcsUrl(`/apps/tables/api/2/favorites/${NODE_TYPE_TABLE}/${id}`))
 			} catch (e) {
@@ -325,14 +315,15 @@ export default new Vuex.Store({
 				return false
 			}
 
-			const index = state.tables.findIndex(t => t.id === id)
-			const table = state.tables[index]
+			const index = this.tables.findIndex(t => t.id === id)
+			const table = this.tables[index]
 			table.favorite = true
-			commit('setTable', table)
+			this.setTable(table)
 
 			return true
 		},
-		async removeFavoriteTable({ state, commit, dispatch }, { id }) {
+
+		async removeFavoriteTable({ id }) {
 			try {
 				await axios.delete(generateOcsUrl(`/apps/tables/api/2/favorites/${NODE_TYPE_TABLE}/${id}`))
 			} catch (e) {
@@ -340,14 +331,15 @@ export default new Vuex.Store({
 				return false
 			}
 
-			const index = state.tables.findIndex(t => t.id === id)
-			const table = state.tables[index]
+			const index = this.tables.findIndex(t => t.id === id)
+			const table = this.tables[index]
 			table.favorite = false
-			commit('setTable', table)
+			this.setTable(table)
 
 			return true
 		},
-		async shareContext({ dispatch }, { id, previousReceivers, receivers, displayMode }) {
+
+		async shareContext({ id, previousReceivers, receivers, displayMode }) {
 			const share = {
 				nodeType: 'context',
 				nodeId: id,
@@ -400,47 +392,46 @@ export default new Vuex.Store({
 			}
 		},
 
-		async insertNewContext({ commit, state, dispatch }, { data, receivers, displayMode }) {
-			commit('setLoading', { key: 'contexts', value: true })
+		async insertNewContext({ data, receivers, displayMode }) {
+			this.setLoading({ key: 'contexts', value: true })
 			let res = null
 
 			try {
 				res = await axios.post(generateOcsUrl('/apps/tables/api/2/contexts'), data)
 				const id = res?.data?.ocs?.data?.id
 				if (id) {
-					await dispatch('shareContext', { id, previousReceivers: [], receivers, displayMode })
+					await this.shareContext({ id, previousReceivers: [], receivers, displayMode })
 				}
 			} catch (e) {
 				displayError(e, t('tables', 'Could not insert application.'))
 				return false
 			}
-			const contexts = state.contexts
+			const contexts = this.contexts
 			contexts.push(res.data.ocs.data)
-			commit('setContexts', contexts)
+			this.setContexts(contexts)
 
-			commit('setLoading', { key: 'contexts', value: false })
+			this.setLoading({ key: 'contexts', value: false })
 			return res.data.ocs.data
 		},
-		async updateContext({ state, commit, dispatch }, { id, data, previousReceivers, receivers, displayMode }) {
+
+		async updateContext({ id, data, previousReceivers, receivers, receivers, displayMode }) {
 			let res = null
 			try {
 				res = await axios.put(generateOcsUrl('/apps/tables/api/2/contexts/' + id), data)
-				await dispatch('shareContext', { id, previousReceivers, receivers, displayMode })
-
+				await this.shareContext({ id, previousReceivers, receivers, displayMode })
 			} catch (e) {
 				displayError(e, t('tables', 'Could not update application.'))
 				return false
 			}
 
 			const context = res.data.ocs.data
-			const contexts = state.contexts
-			const index = contexts.findIndex(c => c.id === context.id)
-			contexts[index] = context
-			commit('setContexts', [...contexts])
+			const index = this.contexts.findIndex(c => c.id === context.id)
+			set(this.contexts, index, context)
 
 			return true
 		},
-		async transferTable({ state, commit, dispatch }, { id, data }) {
+
+		async transferTable({ id, data }) {
 			try {
 				await axios.put(generateOcsUrl('/apps/tables/api/2/tables/' + id + '/transfer'), data)
 			} catch (e) {
@@ -448,61 +439,62 @@ export default new Vuex.Store({
 				return false
 			}
 
-			const tables = state.tables
+			const tables = this.tables
 			const index = tables.findIndex(t => t.id === id)
 			tables.splice(index, 1)
-			commit('setTables', [...tables])
+			this.setTables([...tables])
 			return true
 		},
 
-		async getAllContexts({ commit, state }) {
-			commit('setLoading', { key: 'contexts', value: true })
+		async getAllContexts() {
+			this.setLoading({ key: 'contexts', value: true })
 			try {
 				const res = await axios.get(generateOcsUrl('/apps/tables/api/2/contexts'))
-				commit('setContexts', res.data.ocs.data)
-				await this.dispatch('getContextsTablesAndViews')
+				this.contexts = res.data.ocs.data
+				await this.getContextsTablesAndViews()
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load applications.'))
 				showError(t('tables', 'Could not fetch applications'))
 			}
-			commit('setLoading', { key: 'contexts', value: false })
+			this.setLoading({ key: 'contexts', value: false })
 			return true
 		},
 
-		async loadContext({ state, commit, dispatch }, { id }) {
+		async loadContext({ id }) {
 			try {
 				const res = await axios.get(generateOcsUrl('/apps/tables/api/2/contexts/' + id))
-				commit('setContext', res.data.ocs.data)
+				this.setContext(res.data.ocs.data)
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load application.'))
 				showError(t('tables', 'Could not fetch application'))
 			}
 			return true
 		},
-		async getContextsTablesAndViews({ state }) {
-			for (const context of state.contexts) {
+
+		async getContextsTablesAndViews() {
+			for (const context of this.contexts) {
 				for (const node of Object.values(context?.nodes)) {
 					if (parseInt(node.node_type) === NODE_TYPE_TABLE) {
-						await this.dispatch('loadContextTable', { id: node.node_id })
+						await this.loadContextTable({ id: node.node_id })
 					} else if (parseInt(node.node_type) === NODE_TYPE_VIEW) {
-						await this.dispatch('loadContextView', { id: node.node_id })
+						await this.loadContextView({ id: node.node_id })
 					}
 				}
 
 			}
 		},
 
-		async loadContextTable({ commit, state, getters }, { id }) {
-			const table = getters.getTable(id)
+		async loadContextTable({ id }) {
+			const table = this.tables.find(table => table.id === id)
 			if (table) {
 				return true
 			}
 			let res
 			try {
 				res = await axios.get(generateOcsUrl('/apps/tables/api/2/tables/' + id))
-				const tables = state.tables
+				const tables = this.tables
 				tables.push(res.data.ocs.data)
-				commit('setTables', tables)
+				this.setTables([...tables])
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load table.'))
 				showError(t('tables', 'Could not fetch table'))
@@ -510,17 +502,17 @@ export default new Vuex.Store({
 			return res?.data.ocs.data
 		},
 
-		async loadContextView({ commit, state, getters }, { id }) {
-			const view = getters.getView(id)
+		async loadContextView({ id }) {
+			const view = this.views.find(view => view.id === id)
 			if (view) {
 				return true
 			}
 			let res
 			try {
 				res = await axios.get(generateUrl('/apps/tables/view/' + id))
-				const views = state.views
+				const views = this.views
 				views.push(res.data)
-				commit('setViews', views)
+				this.setViews([...views])
 			} catch (e) {
 				displayError(e, t('tables', 'Could not load view'))
 				showError(t('tables', 'Could not fetch view'))
@@ -528,7 +520,7 @@ export default new Vuex.Store({
 			return res?.data
 		},
 
-		async transferContext({ state, commit, dispatch }, { id, data }) {
+		async transferContext({ id, data }) {
 			try {
 				await axios.put(generateOcsUrl('/apps/tables/api/2/contexts/' + id + '/transfer'), data)
 			} catch (e) {
@@ -536,27 +528,28 @@ export default new Vuex.Store({
 				return false
 			}
 
-			const contexts = state.contexts
+			const contexts = this.contexts
 			const index = contexts.findIndex(c => c.id === id)
 			contexts.splice(index, 1)
-			commit('setContexts', [...contexts])
+			this.setContexts([...contexts])
 			return true
 		},
-		async removeContext({ state, commit }, { context }) {
+
+		async removeContext({ context }) {
 			try {
 				await axios.delete(generateOcsUrl('/apps/tables/api/2/contexts/' + context.id))
 			} catch (e) {
 				displayError(e, t('tables', 'Could not remove application.'))
 				return false
 			}
-			const contexts = state.contexts
+			const contexts = this.contexts
 			const index = contexts.findIndex(c => c.id === context.id)
 			contexts.splice(index, 1)
-			commit('setContexts', [...contexts])
+			this.setContexts([...contexts])
 			return true
 		},
 
-		async removeTable({ state, commit }, { tableId }) {
+		async removeTable({ tableId }) {
 			try {
 				await axios.delete(generateUrl('/apps/tables/table/' + tableId))
 			} catch (e) {
@@ -564,22 +557,26 @@ export default new Vuex.Store({
 				return false
 			}
 
-			const tables = state.tables
+			const tables = this.tables
 			const index = tables.findIndex(t => t.id === tableId)
 			tables.splice(index, 1)
-			commit('setTables', [...tables])
+			this.setTables([...tables])
 			return true
 		},
-		setTableHasShares({ state, commit, getters }, { tableId, hasShares }) {
-			const table = getters.getTable(tableId)
-			table.hasShares = !!hasShares
-			commit('setTable', table)
+
+		setTableHasShares({ tableId, hasShares }) {
+			const table = this.tables.find(t => t.id === tableId)
+			if (table) {
+				table.hasShares = !!hasShares
+			}
 		},
 
-		setViewHasShares({ state, commit, getters }, { viewId, hasShares }) {
-			const view = getters.getView(viewId)
-			view.hasShares = !!hasShares
-			commit('setView', view)
+		setViewHasShares({ viewId, hasShares }) {
+			const view = this.views.find(v => v.id === viewId)
+			if (view) {
+				view.hasShares = !!hasShares
+			}
 		},
+
 	},
 })

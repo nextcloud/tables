@@ -34,8 +34,9 @@
 
 <script>
 import debounce from 'debounce'
+import { mapState } from 'pinia'
 import { NcSelect } from '@nextcloud/vue'
-import { mapState } from 'vuex'
+import { useTablesStore } from '../../../store/store.js'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../../../shared/constants.js'
 import SearchAndSelectOption from '../../../views/partials/SearchAndSelectOption.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
@@ -68,7 +69,7 @@ export default {
 	},
 
 	computed: {
-		...mapState(['tables', 'views']),
+		...mapState(useTablesStore, ['tables', 'views']),
 
 		isValidQuery() {
 			return this.query?.trim() && this.query.length >= this.minSearchStringLength

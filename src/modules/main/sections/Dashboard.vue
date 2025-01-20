@@ -115,7 +115,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'pinia'
+import { useTablesStore } from '../../../store/store.js'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 import Delete from 'vue-material-design-icons/Delete.vue'
@@ -168,7 +169,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(['views']),
+		...mapState(useTablesStore, ['views']),
 		getViews() {
 			return this.views.filter(v => v.tableId === this.table.id)
 		},
@@ -184,6 +185,7 @@ export default {
 	},
 
 	methods: {
+		...mapActions(useTablesStore, ['updateTable']),
 		emit,
 		openView(view) {
 			this.$router.push('/view/' + parseInt(view.id)).catch(err => err)
@@ -207,9 +209,15 @@ export default {
 		},
 
 		async updateTableEmoji(emoji) {
-			const res = await this.$store.dispatch('updateTable', { id: this.table.id, data: { title: this.table.title, emoji } })
+			const res = await this.updateTable({
+				id: this.table.id,
+				data: { title: this.table.title, emoji },
+			})
 			if (res) {
-				showSuccess(t('tables', 'Updated table "{emoji}{table}".', { emoji: emoji ? emoji + ' ' : '', table: this.table.title }))
+				showSuccess(t('tables', 'Updated table "{emoji}{table}".', {
+					emoji: emoji ? emoji + ' ' : '',
+					table: this.table.title,
+				}))
 			}
 		},
 
@@ -217,9 +225,15 @@ export default {
 			if (this.tableTitle === '' || this.tableTitle === null) {
 				showError(t('tables', 'Cannot update table. Title is missing.'))
 			} else {
-				const res = await this.$store.dispatch('updateTable', { id: this.table.id, data: { title: this.tableTitle, emoji: this.table.emoji } })
+				const res = await this.updateTable({
+					id: this.table.id,
+					data: { title: this.tableTitle, emoji: this.table.emoji },
+				})
 				if (res) {
-					showSuccess(t('tables', 'Updated table "{emoji}{table}".', { emoji: this.icon ? this.icon + ' ' : '', table: this.tableTitle }))
+					showSuccess(t('tables', 'Updated table "{emoji}{table}".', {
+						emoji: this.icon ? this.icon + ' ' : '',
+						table: this.tableTitle,
+					}))
 					this.tableTitle = null
 				}
 			}

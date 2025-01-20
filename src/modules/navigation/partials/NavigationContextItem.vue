@@ -44,7 +44,7 @@
 <script>
 import { NcAppNavigationItem, NcActionButton, NcIconSvgWrapper, NcActionCheckbox } from '@nextcloud/vue'
 import '@nextcloud/dialogs/style.css'
-import { mapGetters } from 'vuex'
+import { mapState } from 'pinia'
 import TableIcon from 'vue-material-design-icons/Table.vue'
 import { emit } from '@nextcloud/event-bus'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
@@ -54,6 +54,7 @@ import permissionsMixin from '../../../shared/components/ncTable/mixins/permissi
 import svgHelper from '../../../shared/components/ncIconPicker/mixins/svgHelper.js'
 import { NAV_ENTRY_MODE } from '../../../shared/constants.js'
 import rebuildNavigation from '../../../service/rebuild-navigation.js'
+import { useTablesStore } from '../../../store/store.js'
 
 export default {
 	name: 'NavigationContextItem',
@@ -85,7 +86,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['activeContext']),
+		...mapState(useTablesStore, ['activeContext']),
 	},
 
 	watch: {

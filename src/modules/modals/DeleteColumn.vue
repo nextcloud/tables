@@ -18,6 +18,9 @@
 import DialogConfirmation from '../../shared/modals/DialogConfirmation.vue'
 import { showError } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
+import { mapActions } from 'pinia'
+import { useTablesStore } from '../../store/store.js'
+import { useDataStore } from '../../store/data.js'
 
 export default {
 	name: 'DeleteColumn',
@@ -44,13 +47,20 @@ export default {
 		},
 	},
 	methods: {
+		...mapActions(useTablesStore, ['reloadViewsOfTable']),
+		...mapActions(useDataStore, ['removeColumn']),
 		async deleteColumn() {
-			const res = await this.$store.dispatch('removeColumn', { id: this.columnToDelete.id, isView: this.isView, elementId: this.elementId })
+			const res = await this.removeColumn({
+				id: this.columnToDelete.id,
+				isView: this.isView,
+				elementId: this.elementId,
+			})
+
 			if (!res) {
 				showError(t('tables', 'Error occurred while deleting column "{column}".', { column: this.columnToDelete.title }))
 			}
 			if (!this.isView) {
-				await this.$store.dispatch('reloadViewsOfTable', { tableId: this.elementId })
+				await this.reloadViewsOfTable({ tableId: this.elementId })
 			}
 			this.$emit('cancel')
 		},

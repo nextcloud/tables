@@ -111,6 +111,9 @@ import ColumnTypeSelection from '../main/partials/ColumnTypeSelection.vue'
 import TextRichForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/TextRichForm.vue'
 import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandler.js'
 import UsergroupForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/UsergroupForm.vue'
+import { useTablesStore } from '../../store/store.js'
+import { useDataStore } from '../../store/data.js'
+import { mapActions } from 'pinia'
 
 export default {
 	name: 'CreateColumn',
@@ -268,6 +271,8 @@ export default {
 		},
 	},
 	methods: {
+		...mapActions(useTablesStore, ['reloadViewsOfTable']),
+		...mapActions(useDataStore, ['insertNewColumn']),
 		snakeToCamel(str) {
 			str = str.toLowerCase().replace(/([-_][a-z])/g, group =>
 				group
@@ -352,14 +357,22 @@ export default {
 		async sendNewColumnToBE() {
 			try {
 				const data = this.prepareSubmitData()
-				const res = await this.$store.dispatch('insertNewColumn', { isView: this.isView, elementId: this.element.id, data })
+				const res = await this.insertNewColumn({
+					isView: this.isView,
+					elementId: this.element.id,
+					data,
+				})
+
 				if (res) {
 					showSuccess(t('tables', 'The column "{column}" was created.', { column: this.column.title }))
 				} else {
 					showWarning(t('tables', 'Sorry, something went wrong.'))
 					console.debug('axios error', res)
 				}
-				await this.$store.dispatch('reloadViewsOfTable', { tableId: this.isView ? this.element.tableId : this.element.id })
+
+				await this.reloadViewsOfTable({
+					tableId: this.isView ? this.element.tableId : this.element.id,
+				})
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not create new column.'))

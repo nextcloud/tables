@@ -49,15 +49,17 @@
 		</NcAppSidebar>
 	</div>
 </template>
+
 <script>
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import SidebarSharing from './SidebarSharing.vue'
 import SidebarIntegration from './SidebarIntegration.vue'
 import { NcAppSidebar, NcAppSidebarTab, NcUserBubble } from '@nextcloud/vue'
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'pinia'
 import Connection from 'vue-material-design-icons/Connection.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import Moment from '@nextcloud/moment'
+import { useTablesStore } from '../../../store/store.js'
 
 export default {
 	name: 'Sidebar',
@@ -85,8 +87,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(['tables']),
-		...mapGetters(['activeElement', 'isView']),
+		...mapState(useTablesStore, ['tables', 'activeElement', 'isView']),
 		elementTitle() {
 			if (this.activeElement) {
 				return this.activeElement.emoji + ' ' + this.activeElement.title
@@ -103,6 +104,7 @@ export default {
 			}
 		},
 	},
+
 	mounted() {
 		subscribe('tables:sidebar:sharing', data => this.handleToggleSidebar(data))
 		subscribe('tables:sidebar:integration', data => this.handleToggleSidebar(data))

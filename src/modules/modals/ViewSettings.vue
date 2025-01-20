@@ -74,6 +74,9 @@ import SortForm from '../main/partials/editViewPartials/sort/SortForm.vue'
 import SelectedViewColumns from '../main/partials/editViewPartials/SelectedViewColumns.vue'
 import { MetaColumns } from '../../shared/components/ncTable/mixins/metaColumns.js'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
+import { mapActions } from 'pinia'
+import { useTablesStore } from '../../store/store.js'
+import { useDataStore } from '../../store/data.js'
 
 export default {
 	name: 'ViewSettings',
@@ -204,6 +207,8 @@ export default {
 		},
 	},
 	methods: {
+		...mapActions(useTablesStore, ['insertNewView', 'updateView']),
+		...mapActions(useDataStore, ['getColumnsFromBE']),
 		setIcon(icon) {
 			this.icon = icon
 		},
@@ -212,7 +217,7 @@ export default {
 			this.open = false
 		},
 		async loadTableColumnsFromBE() {
-			this.columns = await this.$store.dispatch('getColumnsFromBE', {
+			this.columns = await this.getColumnsFromBE({
 				tableId: this.canManageTable(this.view) ? this.mutableView.tableId : null,
 				viewId: this.mutableView.id,
 			})
@@ -264,7 +269,7 @@ export default {
 				title: this.title,
 				emoji: this.icon,
 			}
-			const res = await this.$store.dispatch('insertNewView', { data })
+			const res = await this.insertNewView({ data })
 			if (res) {
 				return res
 			} else {
@@ -291,7 +296,7 @@ export default {
 				data.data.filter = JSON.stringify(filteredFilteringRules)
 			}
 
-			const res = await this.$store.dispatch('updateView', { id, data })
+			const res = await this.updateView({ id, data })
 			if (res) {
 				return res
 			} else {

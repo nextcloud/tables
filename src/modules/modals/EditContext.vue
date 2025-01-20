@@ -73,7 +73,7 @@ import { NcDialog, NcButton, NcIconSvgWrapper, NcActionCheckbox } from '@nextclo
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import { getCurrentUser } from '@nextcloud/auth'
 import '@nextcloud/dialogs/style.css'
-import { mapGetters, mapState } from 'vuex'
+import { mapState, mapActions } from 'pinia'
 import NcContextResource from '../../shared/components/ncContextResource/NcContextResource.vue'
 import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'
 import { NODE_TYPE_TABLE, NODE_TYPE_VIEW, PERMISSION_READ, PERMISSION_CREATE, PERMISSION_UPDATE, PERMISSION_DELETE, NAV_ENTRY_MODE } from '../../shared/constants.js'
@@ -81,6 +81,7 @@ import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'
 import permissionBitmask from '../../shared/components/ncContextResource/mixins/permissionBitmask.js'
 import { emit } from '@nextcloud/event-bus'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
+import { useTablesStore } from '../../store/store.js'
 
 export default {
 	name: 'EditContext',
@@ -123,8 +124,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['getContext']),
-		...mapState(['tables', 'views', 'activeContextId']),
+		...mapState(useTablesStore, ['getContext', 'tables', 'views', 'activeContextId']),
 		localContext() {
 			return this.getContext(this.contextId)
 		},
@@ -149,6 +149,7 @@ export default {
 		},
 	},
 	methods: {
+		...mapActions(useTablesStore, ['updateContext', 'removeContext']),
 		async setIcon(iconName) {
 			this.icon.name = iconName
 			this.icon.svg = await this.getContextIcon(iconName)
@@ -186,7 +187,7 @@ export default {
 						key: 'user-' + getCurrentUser().uid,
 					})
 				const displayMode = this.showInNavigationDefault ? 'NAV_ENTRY_MODE_ALL' : 'NAV_ENTRY_MODE_HIDDEN'
-				const res = await this.$store.dispatch('updateContext', { id: this.contextId, data, previousReceivers: Object.values(context.sharing), receivers: this.receivers, displayMode: NAV_ENTRY_MODE[displayMode] })
+				const res = await this.updateContext({ id: this.contextId, data, previousReceivers: Object.values(context.sharing), receivers: this.receivers, displayMode: NAV_ENTRY_MODE[displayMode] })
 				if (res) {
 					showSuccess(t('tables', 'Updated application "{contextTitle}".', { contextTitle: this.title }))
 					this.actionCancel()
@@ -257,7 +258,7 @@ export default {
 		async actionDeleteContext() {
 			this.prepareDeleteContext = false
 			const context = this.getContext(this.contextId)
-			const res = await this.$store.dispatch('removeContext', { context, receivers: context.sharing })
+			const res = await this.removeContext({ context, receivers: context.sharing })
 			if (res) {
 				showSuccess(t('tables', 'Application "{context}" removed.', { context: this.title }))
 				// if the active context was deleted, go to startpage

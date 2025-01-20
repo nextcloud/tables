@@ -76,10 +76,11 @@
 import { NcDialog, NcEmojiPicker, NcButton, NcUserBubble } from '@nextcloud/vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
-import { mapGetters } from 'vuex'
+import { mapState, mapActions } from 'pinia'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import { emit } from '@nextcloud/event-bus'
 import TableDescription from '../main/sections/TableDescription.vue'
+import { useTablesStore } from '../../store/store.js'
 
 export default {
 	name: 'EditTable',
@@ -110,7 +111,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['getTable', 'activeTable']),
+		...mapState(useTablesStore, ['getTable', 'activeTable']),
 		localTable() {
 			return this.getTable(this.tableId)
 		},
@@ -131,6 +132,7 @@ export default {
 		},
 	},
 	methods: {
+		...mapActions(useTablesStore, ['removeTable', 'updateTable']),
 		actionCancel() {
 			this.reset()
 			this.$emit('close')
@@ -140,7 +142,7 @@ export default {
 				showError(t('tables', 'Cannot update table. Title is missing.'))
 				this.errorTitle = true
 			} else {
-				const res = await this.$store.dispatch('updateTable', { id: this.tableId, data: { title: this.title, emoji: this.icon, description: this.localTable.description } })
+				const res = await this.updateTable({ id: this.tableId, data: { title: this.title, emoji: this.icon, description: this.localTable.description } })
 				if (res) {
 					showSuccess(t('tables', 'Updated table "{emoji}{table}".', { emoji: this.icon ? this.icon + ' ' : '', table: this.title }))
 					this.actionCancel()
@@ -158,7 +160,7 @@ export default {
 			const deleteId = this.tableId
 			const activeTableId = this.activeTable.id
 			this.prepareDeleteTable = false
-			const res = await this.$store.dispatch('removeTable', { tableId: this.tableId })
+			const res = await this.removeTable({ tableId: this.tableId })
 			if (res) {
 				showSuccess(t('tables', 'Table "{emoji}{table}" removed.', { emoji: this.icon ? this.icon + ' ' : '', table: this.title }))
 

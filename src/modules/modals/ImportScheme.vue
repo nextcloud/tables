@@ -39,6 +39,8 @@ import IconUpload from 'vue-material-design-icons/Upload.vue'
 import axios from '@nextcloud/axios'
 import { showError, showWarning } from '@nextcloud/dialogs'
 import { generateOcsUrl } from '@nextcloud/router'
+import { mapActions } from 'pinia'
+import { useTablesStore } from '../../store/store.js'
 
 export default {
 	components: {
@@ -65,6 +67,7 @@ export default {
 		}
 	},
 	methods: {
+		...mapActions(useTablesStore, ['loadTablesFromBE', 'loadViewsSharedWithMeFromBE']),
 		actionCancel() {
 			this.$emit('close')
 		},
@@ -87,8 +90,8 @@ export default {
 				}
 			    axios.post(generateOcsUrl('/apps/tables/api/2/tables/scheme'), json).then(async res => {
 					if (res.status === 200) {
-						await this.$store.dispatch('loadTablesFromBE')
-				        await this.$store.dispatch('loadViewsSharedWithMeFromBE')
+						await this.loadTablesFromBE
+				        await this.loadViewsSharedWithMeFromBE
 						this.actionCancel()
 						return
 					}

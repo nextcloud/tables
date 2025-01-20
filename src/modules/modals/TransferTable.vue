@@ -29,8 +29,9 @@ import { showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import NcUserPicker from '../../shared/components/ncUserPicker/NcUserPicker.vue'
-import { mapGetters } from 'vuex'
+import { mapState, mapActions } from 'pinia'
 import { getCurrentUser } from '@nextcloud/auth'
+import { useTablesStore } from '../../store/store.js'
 
 export default {
 	name: 'TransferTable',
@@ -57,7 +58,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['getTable', 'activeTable']),
+		...mapState(useTablesStore, ['getTable', 'activeTable']),
 		localTable() {
 			return this.getTable(this.table.id)
 		},
@@ -75,6 +76,7 @@ export default {
 		},
 	},
 	methods: {
+		...mapActions(useTablesStore, ['transferTable']),
 		actionCancel() {
 			this.$emit('close')
 		},
@@ -84,7 +86,12 @@ export default {
 			if (this.activeTable) {
 				activeTableId = !this.isView ? this.activeTable.id : null
 			}
-			const res = await this.$store.dispatch('transferTable', { id: this.table.id, data: { newOwnerUserId: this.selectedUserId } })
+
+			const res = await this.transferTable({
+				id: this.table.id,
+				data: { newOwnerUserId: this.selectedUserId },
+			})
+
 			if (res) {
 				showSuccess(t('tables', 'Table "{emoji}{table}" transferred to {user}', { emoji: this.table?.emoji ? this.table?.emoji + ' ' : '', table: this.table?.title, user: this.selectedUserId }))
 
