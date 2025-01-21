@@ -90,8 +90,8 @@ export default {
 				}
 			    axios.post(generateOcsUrl('/apps/tables/api/2/tables/scheme'), json).then(async res => {
 					if (res.status === 200) {
-						await this.loadTablesFromBE
-				        await this.loadViewsSharedWithMeFromBE
+						await this.loadTablesFromBE()
+				        await this.loadViewsSharedWithMeFromBE()
 						this.actionCancel()
 						return
 					}
