@@ -1,3 +1,8 @@
+/**
+ * SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
 import { defineStore } from 'pinia'
 import axios from '@nextcloud/axios'
 import { generateUrl, generateOcsUrl } from '@nextcloud/router'
@@ -355,9 +360,9 @@ export const useTablesStore = defineStore('store', {
 						const createdShare = await axios.post(generateUrl('/apps/tables/share'), share)
 						if (createdShare?.data && createdShare?.data?.id) {
 							const shareId = createdShare.data.id
-							await dispatch('updateDisplayMode', { shareId, displayMode, target: 'default' })
+							await this.updateDisplayMode({ shareId, displayMode, target: 'default' })
 							if (receiver.id === getCurrentUser().uid) {
-								await dispatch('updateDisplayMode', { shareId, displayMode, target: 'self' })
+								await this.updateDisplayMode({ shareId, displayMode, target: 'self' })
 							}
 						}
 					}
@@ -376,7 +381,7 @@ export const useTablesStore = defineStore('store', {
 						await axios.delete(generateUrl('/apps/tables/share/' + previousReceiver.share_id))
 					} else {
 						const shareId = previousReceiver.share_id
-						await dispatch('updateDisplayMode', { shareId, displayMode, target: 'default' })
+						await this.updateDisplayMode({ shareId, displayMode, target: 'default' })
 					}
 				}
 			} catch (e) {
@@ -384,7 +389,7 @@ export const useTablesStore = defineStore('store', {
 			}
 		},
 
-		async updateDisplayMode({ dispatch }, { shareId, displayMode, target }) {
+		async updateDisplayMode({ shareId, displayMode, target }) {
 			try {
 				await axios.put(generateUrl('/apps/tables/share/' + shareId + '/display-mode'), { displayMode, target })
 			} catch (e) {
@@ -414,7 +419,7 @@ export const useTablesStore = defineStore('store', {
 			return res.data.ocs.data
 		},
 
-		async updateContext({ id, data, previousReceivers, receivers, receivers, displayMode }) {
+		async updateContext({ id, data, previousReceivers, receivers, displayMode }) {
 			let res = null
 			try {
 				res = await axios.put(generateOcsUrl('/apps/tables/api/2/contexts/' + id), data)

@@ -126,7 +126,7 @@ export default {
 					continue
 				}
 				hadAtLeastOneEntry = true
-				await this.$store.dispatch('updateDisplayMode', { shareId: share.share_id, displayMode, target: 'self' })
+				await this.updateDisplayMode({ shareId: share.share_id, displayMode, target: 'self' })
 				this.showInNavigation = value
 			}
 			if (hadAtLeastOneEntry) {

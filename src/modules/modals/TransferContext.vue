@@ -14,7 +14,7 @@
 			</div>
 			<div class="row">
 				<div class="fix-col-4 space-T end">
-					<NcButton type="warning" :disabled="newOwnerId === ''" data-cy="transferContextButton" @click="transferContext">
+					<NcButton type="warning" :disabled="newOwnerId === ''" data-cy="transferContextButton" @click="transferMe">
 						{{ t('tables', 'Transfer') }}
 					</NcButton>
 				</div>
@@ -71,7 +71,7 @@ export default {
 		actionCancel() {
 			this.$emit('close')
 		},
-		async transferContext() {
+		async transferMe() {
 			const transferId = this.context.id
 			const res = await this.transferContext({
 				id: this.context.id,
