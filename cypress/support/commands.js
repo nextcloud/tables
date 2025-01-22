@@ -470,8 +470,8 @@ Cypress.Commands.add('addUserToGroup', (userId, groupId) => {
 
 Cypress.Commands.add('removeColumn', (title) => {
 	cy.get('.custom-table table tr th .cell').contains(title).click()
-	cy.get('.v-popper__popper ul.nc-button-group-content').last().get('button').last().click()
-	cy.get('.modal__content button').contains('Confirm').click()
+	cy.get('[data-cy="deleteColumnActionBtn"] button').click()
+	cy.get('[data-cy="confirmDialog"] button').contains('Confirm').click()
 })
 
 // fill in a value in the 'create row' or 'edit row' model

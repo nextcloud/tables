@@ -3,34 +3,32 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcModal v-if="showModal" @close="$emit('cancel')">
-		<div class="modal__content">
-			<div class="row">
-				<div v-if="title" class="col-4">
-					<h2>{{ title }}</h2>
-				</div>
-				<div v-if="description" class="col-4">
-					<p>{{ description }}</p>
-				</div>
-			</div>
-			<div class="row space-T">
-				<div class="fix-col-4 end">
-					<NcButton :type="confirmClass" :aria-label="confirmTitle" @click="$emit('confirm')">
-						{{ confirmTitle }}
-					</NcButton>
-				</div>
+	<NcDialog v-if="showModal" :out-transition="true"
+		size="normal" close-on-click-outside :name="title" @closing="$emit('cancel')"
+		data-cy="confirmDialog">
+		<div class="row">
+			<div v-if="description" class="col-4">
+				<p>{{ description }}</p>
 			</div>
 		</div>
-	</NcModal>
+		<template #actions>
+			<NcButton :aria-label="cancelTitle" :type="cancelClass" @click="$emit('cancel')">
+				{{ cancelTitle }}
+			</NcButton>
+			<NcButton :type="confirmClass" :aria-label="confirmTitle" @click="$emit('confirm')">
+				{{ confirmTitle }}
+			</NcButton>
+		</template>
+	</NcDialog>
 </template>
 
 <script>
-import { NcModal, NcButton } from '@nextcloud/vue'
+import { NcDialog, NcButton } from '@nextcloud/vue'
 
 export default {
 	name: 'DialogConfirmation',
 	components: {
-		NcModal,
+		NcDialog,
 		NcButton,
 	},
 	props: {
@@ -45,6 +43,14 @@ export default {
 		description: {
 			type: String,
 			default: null,
+		},
+		cancelTitle: {
+			type: String,
+			default: t('tables', 'Cancel'),
+		},
+		cancelClass: {
+			type: String,
+			default: 'tertiary',
 		},
 		confirmTitle: {
 			type: String,
