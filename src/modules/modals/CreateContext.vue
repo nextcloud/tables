@@ -43,7 +43,7 @@
 				<NcContextResource :resources.sync="resources" :receivers.sync="receivers" />
 			</div>
 			<div class="row space-T">
-				<NcActionCheckbox :checked="showInNavigationDefault" @change="updateDisplayMode">
+				<NcActionCheckbox :checked="showInNavigationDefault" data-cy="createContextShowInNavSwitch" @change="changeDisplayMode">
 					{{ t('tables', 'Show in app list') }}
 				</NcActionCheckbox>
 				<p class="nav-display-subtext">
@@ -182,7 +182,7 @@ export default {
 				showError(t('tables', 'Could not create new application'))
 			}
 		},
-		updateDisplayMode() {
+		changeDisplayMode() {
 			this.showInNavigation = !this.showInNavigation
 		},
 		reset() {

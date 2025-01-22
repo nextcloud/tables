@@ -39,7 +39,7 @@
 				<NcContextResource :resources.sync="resources" :receivers.sync="receivers" />
 			</div>
 			<div class="row space-T">
-				<NcActionCheckbox :checked="showInNavigationDefault" @change="updateDisplayMode">
+				<NcActionCheckbox :checked="showInNavigationDefault" @change="changeDisplayMode">
 					{{ t('tables', 'Show in app list') }}
 				</NcActionCheckbox>
 				<p class="nav-display-subtext">
@@ -269,7 +269,7 @@ export default {
 			}
 
 		},
-		updateDisplayMode() {
+		changeDisplayMode() {
 			this.showInNavigationDefault = !this.showInNavigationDefault
 		},
 		actionTransfer() {
