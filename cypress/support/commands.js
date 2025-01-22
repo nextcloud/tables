@@ -127,10 +127,13 @@ Cypress.Commands.add('openCreateColumnModal', (isFirstColumn) => {
 	}
 })
 
-Cypress.Commands.add('createContext', (title) => {
+Cypress.Commands.add('createContext', (title, showInNav = false) => {
 	cy.get('ul:nth-of-type(2) [data-cy="createContextIcon"]').click({ force: true })
 	cy.get('[data-cy="createContextModal"]').should('be.visible')
 	cy.get('[data-cy="createContextTitle"]').clear().type(title)
+	if (showInNav) {
+		cy.get('[data-cy="createContextShowInNavSwitch"]').click()
+	}
 	cy.get('[data-cy="createContextSubmitBtn"]').click()
 
 	// verify context was created properly
