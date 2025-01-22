@@ -35,7 +35,7 @@
 				</template>
 				{{ t('tables', 'Delete application') }}
 			</NcActionButton>
-			<NcActionCheckbox :checked="showInNavigation" @change="updateDisplayMode">
+			<NcActionCheckbox :checked="showInNavigation" data-cy="navigationContextShowInNavSwitch" @change="changeDisplayMode">
 				{{ t('tables', 'Show in app list') }}
 			</NcActionCheckbox>
 		</template>
@@ -44,7 +44,7 @@
 <script>
 import { NcAppNavigationItem, NcActionButton, NcIconSvgWrapper, NcActionCheckbox } from '@nextcloud/vue'
 import '@nextcloud/dialogs/style.css'
-import { mapState } from 'pinia'
+import { mapState, mapActions } from 'pinia'
 import TableIcon from 'vue-material-design-icons/Table.vue'
 import { emit } from '@nextcloud/event-bus'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
@@ -99,6 +99,7 @@ export default {
 	},
 
 	methods: {
+		...mapActions(useTablesStore, ['updateDisplayMode']),
 		emit,
 		async editContext() {
 			emit('tables:context:edit', this.context.id)
@@ -117,7 +118,7 @@ export default {
 			}
 			return false
 		},
-		async updateDisplayMode() {
+		async changeDisplayMode() {
 			const value = !this.showInNavigation
 			const displayMode = value ? NAV_ENTRY_MODE.NAV_ENTRY_MODE_ALL : NAV_ENTRY_MODE.NAV_ENTRY_MODE_HIDDEN
 			let hadAtLeastOneEntry = false
