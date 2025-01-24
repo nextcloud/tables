@@ -341,7 +341,7 @@ OC.L10N.register(
     "Export" : "Exportovat",
     "Add to favorites" : "Přidat do oblíbených",
     "Remove from favorites" : "Odebrat z oblíbených",
-    "Archive table" : "Zaarchivovat tabulku",
+    "Archive table" : "Archivovat tabulku",
     "Unarchive table" : "Zrušit archivaci tabulky",
     "Delete table" : "Smazat tabulku",
     "Do you really want to delete the table \"{table}\"?" : "Opravdu chcete tabulku „{table}“ smazat?",

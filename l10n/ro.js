@@ -94,6 +94,7 @@ OC.L10N.register(
     "Close editor" : "Închide editorul",
     "Confirm" : "Confirmă",
     "Select" : "Selectează",
+    "Now" : "Acum",
     "ID" : "ID",
     "Clipboard is not available" : "Clipboardul este indisponibil"
 },
