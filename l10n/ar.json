@@ -372,7 +372,6 @@
     "Demote to normal share" : "التخفيض إلى مشاركة عادية",
     "Open main table to adjust table management permissions" : "فتح الجدول الرئيسي لضبط أذونات إدارة الجدول",
     "No shares" : "لا يوجد مشاركات",
-    "After table promotion, any applications based on this table created by the share recipients will continue to consume its data even if you demote them later" : "بعد رفع رتبة الجدول، ستستمر أي تطبيقات تعتمد على هذا الجدول تم إنشاؤها بواسطة مستلمي المشاركة في استهلاك بياناته حتى إذا قمت بخفض رتبتها لاحقًا",
     "Confirm table manager promotion" : "أكِّد على رفع رتبة مدير الجدول",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "سيستمر أي تطبيق تم إنشاؤه بواسطة مستلمي المشاركة مخفضة الرتبة باستعمال جدول مشترك في استهلاك بياناته.",
     "group" : "مجموعة",

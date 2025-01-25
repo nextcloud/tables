@@ -372,7 +372,6 @@
     "Demote to normal share" : "Врати на обично дељење",
     "Open main table to adjust table management permissions" : "Отвара главну табелу да би се подесиле дозволе за управљање табелом.",
     "No shares" : "Нема дељења",
-    "After table promotion, any applications based on this table created by the share recipients will continue to consume its data even if you demote them later" : "Након промовисања табеле, било која апликација заснована на овој табели коју креирају примаоци дељења ће наставити да користи њене податке чак и ако их касније деградирате",
     "Confirm table manager promotion" : "Потврди промовисање менаџера табеле",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "Било која апликација коју креирају примаоци деградираног дељења која користи дељену табелу ће наставити да користи њене податке.",
     "group" : "група",

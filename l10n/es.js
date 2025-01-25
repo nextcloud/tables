@@ -454,6 +454,7 @@ OC.L10N.register(
     "You can not insert any links in this field. Please configure at least one link provider in the column configuration." : "No puede insertar enlaces en este campo. Por favor, configure al menos un proveedor de enlaces en la configuración de columnas.",
     "Link providers" : "Proveedores de enlaces",
     "Copy link" : "Copiar enlace",
+    "Open link" : "Abrir enlace",
     "Could not load link provider results." : "No se pudieron cargar los resultados del proveedor de enlaces.",
     "Url" : "URL",
     "Show fullscreen" : "Mostrar en pantalla completa",

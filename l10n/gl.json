@@ -372,7 +372,6 @@
     "Demote to normal share" : "Relegar a compartición normal",
     "Open main table to adjust table management permissions" : "Abrir a táboa principal para axustar os permisos de xestión da táboa",
     "No shares" : "Ningunha compartición",
-    "After table promotion, any applications based on this table created by the share recipients will continue to consume its data even if you demote them later" : "Após a promoción da táboa, todas as aplicacións baseadas nesta táboa creadas polos destinatarios das comparticións seguirán consumindo os seus datos aínda que os relegue máis adiante",
     "Confirm table manager promotion" : "Confirmar a promoción do xestor da táboa",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "Calquera aplicación creada por destinatarios compartidos relegados mediante unha táboa compartida seguirá a consumir os seus datos.",
     "group" : "grupo",

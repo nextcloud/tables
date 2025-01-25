@@ -373,7 +373,6 @@ OC.L10N.register(
     "Demote to normal share" : "Odebrat oprávnění na úroveň běžného sdílení",
     "Open main table to adjust table management permissions" : "Pokud chcete upravit oprávnění pro správu tabulky, otevřete hlavní tabulku",
     "No shares" : "Žádná sdílení",
-    "After table promotion, any applications based on this table created by the share recipients will continue to consume its data even if you demote them later" : "Po povýšení tabulky, jakákoli aplikace založená na této tabulce, vytvořená příjemci sdílení, bude pokračovat v konzumaci jejích dat i když je později degradujete.",
     "Confirm table manager promotion" : "Potvrdit povýšení na správce tabulky",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "Jakákoli aplikace vytvořena degradovanými příjemci sdílení pomocí sdílené tabulky bude pokračovat v konzumaci jejích dat.",
     "group" : "skupina",
