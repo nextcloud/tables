@@ -374,6 +374,7 @@ OC.L10N.register(
     "Demote to normal share" : "Auf normale Freigabe herabstufen",
     "Open main table to adjust table management permissions" : "Haupttabelle öffnen, um die Tabellenverwaltungsberechtigungen anzupassen",
     "No shares" : "Keine Freigaben",
+    "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "Nach der Heraufstufung des Freigabeempfängers zum Tabellenmanager greifen alle von Freigabeempfängern erstellten Anwendungen, die diese Tabelle verwenden, weiterhin auf deren Daten zu, selbst wenn Sie sie später herabstufen.",
     "Confirm table manager promotion" : "Tabellenheraufstufung bestätigen",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "Jede von einem herabgestuften Freigabeempfänger mithilfe einer freigegebenen Tabelle erstellte Anwendung wird weiterhin deren Daten nutzen.",
     "group" : "Gruppe",

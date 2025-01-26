@@ -374,6 +374,7 @@ OC.L10N.register(
     "Demote to normal share" : "Demote to normal share",
     "Open main table to adjust table management permissions" : "Open main table to adjust table management permissions",
     "No shares" : "No shares",
+    "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them.",
     "Confirm table manager promotion" : "Confirm table manager promotion",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "Any application created by a demoted share recipient that uses a shared table will continue to access its data.",
     "group" : "group",

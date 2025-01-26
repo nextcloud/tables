@@ -374,6 +374,7 @@ OC.L10N.register(
     "Demote to normal share" : "Normal paylaşıma düşür",
     "Open main table to adjust table management permissions" : "Tablo yönetimi izinlerini ayarlamak için ana tabloyu açın",
     "No shares" : "Henüz bir şey paylaşılmamış",
+    "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "Paylaşım alıcısının tablo yöneticisi yetkisine yükseltilmesinden sonra, bu tabloyu kullanan paylaşım alıcıları tarafından oluşturulan tüm uygulamalar, daha sonra bu kişilerin yetkileri düşürülse bile, tablo verilerine erişmeyi sürdürür.",
     "Confirm table manager promotion" : "Tablo yöneticisi yükseltmesini onayla",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "Paylaşılan bir tabloyu kullanarak düşürülmüş paylaşım alıcıları tarafından oluşturulan herhangi bir uygulama, onun verilerini kullanmayı sürdürür.",
     "group" : "grup",

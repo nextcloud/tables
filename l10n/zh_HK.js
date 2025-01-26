@@ -374,6 +374,7 @@ OC.L10N.register(
     "Demote to normal share" : "降級為一般分享",
     "Open main table to adjust table management permissions" : "開啟主表格以調整數據庫表管理權限",
     "No shares" : "無分享",
+    "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "在共享接收者被提升為數據庫表管理員後，任何由這些共享接收者創建的使用該數據庫表的應用程序將持續存取其數據，即使在共享接收者被降級後。",
     "Confirm table manager promotion" : "確認數據庫表經理升級",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "任何由降級的分享接收者創建的共享數據庫表的應用程序，將繼續訪問該表格的數據。",
     "group" : "群組",
