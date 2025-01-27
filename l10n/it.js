@@ -173,6 +173,7 @@ OC.L10N.register(
     "Maximum text length" : "Lunghezza massima testo",
     "URL" : "URL",
     "Copy link" : "Copia collegamento",
+    "Open link" : "Apri link",
     "Show fullscreen" : "Mostra a schermo intero",
     "Close editor" : "Chiudi editor",
     "Go to previous page" : "Vai alla pagina precedente",

@@ -371,6 +371,7 @@
     "Demote to normal share" : "Odebrat oprávnění na úroveň běžného sdílení",
     "Open main table to adjust table management permissions" : "Pokud chcete upravit oprávnění pro správu tabulky, otevřete hlavní tabulku",
     "No shares" : "Žádná sdílení",
+    "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "Po povýšení příjemce sdílení na správce tabulky, jakékoli aplikace, vytvořené příjemci sdílení, které tuto tabulku využívají, budou pokračovat v přístupu k jejím datům, i když jejich povýšení později zrušíte.",
     "Confirm table manager promotion" : "Potvrdit povýšení na správce tabulky",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "Jakákoli aplikace vytvořena degradovanými příjemci sdílení pomocí sdílené tabulky bude pokračovat v konzumaci jejích dat.",
     "group" : "skupina",

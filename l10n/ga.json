@@ -372,6 +372,7 @@
     "Demote to normal share" : "Léim go gnáth-scair",
     "Open main table to adjust table management permissions" : "Oscail príomhthábla chun ceadanna bainistíochta tábla a choigeartú",
     "No shares" : "Uimh scaireanna",
+    "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "Tar éis an faighteoir scaireanna a chur chun cinn go bainisteoir boird, leanfaidh aon fheidhmchláir a chruthaíonn faighteoirí scaireanna a úsáideann an tábla seo ag rochtain a shonraí, fiú má scarann ​​tú iad níos déanaí.",
     "Confirm table manager promotion" : "Deimhnigh cur chun cinn bainisteoir tábla",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "Leanfaidh aon fheidhmchlár a chruthaíonn faighteoirí scaire taispeána a úsáideann tábla comhroinnte ag úsáid a shonraí.",
     "group" : "grúpa",
