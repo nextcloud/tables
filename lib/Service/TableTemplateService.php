@@ -16,31 +16,23 @@ use OCA\Tables\Errors\PermissionError;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
+use OCP\Defaults;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
 class TableTemplateService {
-	private IL10N $l;
-
-	private ColumnService $columnService;
-
-	private RowService $rowService;
-
-	private ViewService $viewService;
-
-	protected LoggerInterface $logger;
-
-	private ?string $userId;
 
 	private string $textRichColumnTypeName = 'rich';
 
-	public function __construct(LoggerInterface $logger, IL10N $l, ColumnService $columnService, ?string $userId, RowService $rowService, ViewService $viewService) {
-		$this->logger = $logger;
-		$this->l = $l;
-		$this->columnService = $columnService;
-		$this->rowService = $rowService;
-		$this->viewService = $viewService;
-		$this->userId = $userId;
+	public function __construct(
+		protected LoggerInterface $logger,
+		private IL10N $l,
+		private ColumnService $columnService,
+		private ?string $userId,
+		private RowService $rowService,
+		private ViewService $viewService,
+		protected Defaults $themingDefaults,
+	) {
 	}
 
 	/**
@@ -679,7 +671,7 @@ class TableTemplateService {
 			// TRANSLATORS This is an example target
 			$columns['target']->getId() => $this->l->t('We know what we are doing.'),
 			// TRANSLATORS This is an example comment
-			$columns['comments']->getId() => $this->l->t('We have heard that Nextcloud could be a nice solution for it, should give it a try.'),
+			$columns['comments']->getId() => $this->l->t('We have heard that %s could be a nice solution for it, should give it a try.', [$this->themingDefaults->getName()]),
 			$columns['progress']->getId() => 10,
 			$columns['proofed']->getId() => 'false',
 		]);
@@ -741,44 +733,58 @@ class TableTemplateService {
 
 		// let's add some example rows
 		$this->createRow($table, [
-			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Open the tables app'),
-			// TRANSLATORS This is an example account manager
-			$columns['how']->getId() => 'Click on tables icon in the menu bar.',
+			$columns['how']->getId() => $this->l->t('Reachable via the Tables icon in the apps list.'),
 			$columns['ease']->getId() => 5,
 			$columns['done']->getId() => 'true',
 		]);
 		$this->createRow($table, [
-			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Add your first row'),
-			// TRANSLATORS This is an example account manager
-			$columns['how']->getId() => 'Just click on "new row" and enter some data inside of the form. At the end click on the bottom "save".',
+			// TRANSLATORS: the asterisks (*) are used to format the button name in italics
+			$columns['how']->getId() => $this->l->t('Use the *+ Create row* button and enter some data inside of the form.'),
 			$columns['ease']->getId() => 5,
 			$columns['done']->getId() => 'false',
 		]);
 		$this->createRow($table, [
-			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Edit a row'),
-			// TRANSLATORS This is an example account manager
-			$columns['how']->getId() => 'Hover the mouse over a row you want to edit. Click on the pen on the right side. Maybe you want to add a "done" status to this row.',
+			// TRANSLATORS: the asterisks (*) are used to format the icon name and column name in italics
+			$columns['how']->getId() => $this->l->t('Go to a row you want to edit and use the *pencil* edit button. Maybe you want to add a *Done* status to this row?'),
 			$columns['ease']->getId() => 5,
 			$columns['done']->getId() => 'false',
 		]);
 		$this->createRow($table, [
 			// TRANSLATORS This is an example name
 			$columns['what']->getId() => $this->l->t('Add a new column'),
-			// TRANSLATORS This is an example account manager
-			$columns['how']->getId() => 'You can add, remove and adjust columns as you need it. Click on the three-dot-menu on the upper right of this table and choose "create column". Fill in the data you want, at least a title and column type.',
+			// TRANSLATORS: the asterisks (*) are used to format the menu entry title in italics
+			$columns['how']->getId() => $this->l->t('You can add, remove and adjust columns as you need. Open the three-dot-menu on the upper right of this table and choose *Create column*. Fill in the data you want, at least a title and column type.'),
 			$columns['ease']->getId() => 4,
 			$columns['done']->getId() => 'false',
 		]);
 		$this->createRow($table, [
-			// TRANSLATORS This is an example name
-			$columns['what']->getId() => $this->l->t('Read the docs'),
-			// TRANSLATORS This is an example account manager
-			$columns['how']->getId() => 'If you want to go through the documentation, this can be found here: https://github.com/nextcloud/tables/wiki',
+			$columns['what']->getId() => $this->l->t('Create views for tables'),
+			$columns['how']->getId() => $this->l->t('Filter data and save table presets as views to share and combine them into applications.'),
+			$columns['ease']->getId() => 4,
+			$columns['done']->getId() => 'false',
+		]);
+		$this->createRow($table, [
+			$columns['what']->getId() => $this->l->t('Create applications'),
+			$columns['how']->getId() => $this->l->t('Combine different tables and views into no-code applications for any purpose. This makes them easily accessible directly in the app bar.'),
 			$columns['ease']->getId() => 3,
 			$columns['done']->getId() => 'false',
+		]);
+		$this->createRow($table, [
+			$columns['what']->getId() => $this->l->t('Read the docs'),
+			// TRANSLATORS: the link is formatted using markdown, the pattern is: [Title](URL)
+			$columns['how']->getId() => $this->l->t('If you want to go through the documentation, this can be found here: [Nextcloud Tables documentation](%s)', ['https://github.com/nextcloud/tables/wiki']),
+			$columns['ease']->getId() => 3,
+			$columns['done']->getId() => 'false',
+		]);
+
+		$this->createView($table, [
+			'title' => $this->l->t('Check yourself!'),
+			'emoji' => '🏁',
+			'columns' => json_encode([$columns['what']->getId(), $columns['how']->getId(), $columns['ease']->getId(), $columns['done']->getId()]),
+			'filter' => json_encode([[['columnId' => $columns['done']->getId(), 'operator' => 'is-equal', 'value' => '@unchecked']]]),
 		]);
 	}
 

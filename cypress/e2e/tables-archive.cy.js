@@ -21,8 +21,8 @@ describe('Archive tables/views', () => {
   it('can archive tables', () => {
     cy.get('[data-cy="navigationTableItem"]').first().as('tutorialTable')
 
-    cy.get('@tutorialTable').should('contain.text', 'Tutorial')
-    cy.get('@tutorialTable').find('[aria-haspopup="menu"]').click({ force: true })
+    cy.get('@tutorialTable').should('contain.text', 'Welcome to Nextcloud Tables!')
+    cy.get('@tutorialTable').find('[aria-haspopup="menu"]').first().click({ force: true })
 
     cy.intercept({ method: 'PUT', url: '**/apps/tables/api/2/tables/*'}).as('archiveTableReq')
     cy.contains('Archive table').click({ force: true })
@@ -38,8 +38,8 @@ describe('Archive tables/views', () => {
   it('can unarchive tables', () => {
     cy.get('[data-cy="navigationTableItem"]').first().as('tutorialTable')
 
-    cy.get('@tutorialTable').should('contain.text', 'Tutorial')
-    cy.get('@tutorialTable').find('[aria-haspopup="menu"]').click({ force: true })
+    cy.get('@tutorialTable').should('contain.text', 'Welcome to Nextcloud Tables!')
+    cy.get('@tutorialTable').find('[aria-haspopup="menu"]').first().click({ force: true })
 
     cy.intercept({ method: 'PUT', url: '**/apps/tables/api/2/tables/*' }).as('unarchiveTableReq')
     cy.contains('Unarchive table').click({ force: true })

@@ -20,7 +20,7 @@ describe('Import csv', () => {
 	})
 
 	it('Import csv from Files', () => {
-		cy.loadTable('Tutorial')
+		cy.loadTable('Welcome to Nextcloud Tables!')
 		cy.clickOnTableThreeDotMenu('Import')
 		cy.get('.modal__content button').contains('Select from Files').click()
 		cy.get('.file-picker__files').contains('test-import').click()
@@ -42,7 +42,7 @@ describe('Import csv', () => {
 	})
 
 	it('Import csv from device', () => {
-		cy.loadTable('Tutorial')
+		cy.loadTable('Welcome to Nextcloud Tables!')
 		cy.clickOnTableThreeDotMenu('Import')
 		cy.get('.modal__content button').contains('Upload from device').click()
 		cy.get('input[type="file"]').selectFile('cypress/fixtures/test-import.csv', { force: true })
@@ -102,7 +102,7 @@ describe('Import csv from Files file action', () => {
 		cy.get('[data-cy-files-list-row-action="import-to-tables"]').click()
 
 		cy.get('[data-cy="importAsNewTableSwitch"]').click()
-		cy.get('[data-cy="selectExistingTableDropdown"]').type('tutorial')
+		cy.get('[data-cy="selectExistingTableDropdown"]').type('Welcome to Nextcloud Tables!')
 		cy.get('.name-parts').click()
 
 		cy.intercept({

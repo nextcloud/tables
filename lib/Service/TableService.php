@@ -25,6 +25,7 @@ use OCP\App\IAppManager;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception as OcpDbException;
+use OCP\Defaults;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
@@ -33,59 +34,26 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type TablesTable from ResponseDefinitions
  */
 class TableService extends SuperService {
-	private TableMapper $mapper;
-
-	private TableTemplateService $tableTemplateService;
-
-	private ColumnService $columnService;
-
-	private RowService $rowService;
-
-	private ViewService $viewService;
-
-	private ShareService $shareService;
-
-	protected UserHelper $userHelper;
-
-	protected FavoritesService $favoritesService;
-
-	protected IAppManager $appManager;
-
-	protected IL10N $l;
-	private ContextService $contextService;
-
-	protected IEventDispatcher $eventDispatcher;
 
 	public function __construct(
-		PermissionsService $permissionsService,
-		LoggerInterface $logger,
-		?string $userId,
-		TableMapper $mapper,
-		TableTemplateService $tableTemplateService,
-		ColumnService $columnService,
-		RowService $rowService,
-		ViewService $viewService,
-		ShareService $shareService,
-		UserHelper $userHelper,
-		FavoritesService $favoritesService,
-		IEventDispatcher $eventDispatcher,
-		ContextService $contextService,
-		IAppManager $appManager,
-		IL10N $l,
+		PermissionsService           $permissionsService,
+		LoggerInterface              $logger,
+		?string                      $userId,
+		private TableMapper          $mapper,
+		private TableTemplateService $tableTemplateService,
+		private ColumnService        $columnService,
+		private RowService           $rowService,
+		private ViewService          $viewService,
+		private ShareService         $shareService,
+		protected UserHelper         $userHelper,
+		protected FavoritesService   $favoritesService,
+		protected IEventDispatcher   $eventDispatcher,
+		private ContextService       $contextService,
+		protected IAppManager        $appManager,
+		protected IL10N              $l,
+		protected Defaults           $themingDefaults,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
-		$this->appManager = $appManager;
-		$this->mapper = $mapper;
-		$this->tableTemplateService = $tableTemplateService;
-		$this->columnService = $columnService;
-		$this->rowService = $rowService;
-		$this->viewService = $viewService;
-		$this->shareService = $shareService;
-		$this->userHelper = $userHelper;
-		$this->favoritesService = $favoritesService;
-		$this->l = $l;
-		$this->eventDispatcher = $eventDispatcher;
-		$this->contextService = $contextService;
 	}
 
 	/**
@@ -119,7 +87,8 @@ class TableService extends SuperService {
 		// if there are no own tables found, create the tutorial table
 		if (count($allTables) === 0 && $createTutorial) {
 			try {
-				$tutorialTable = $this->create($this->l->t('Tutorial'), 'tutorial', '🚀');
+				$productName = $this->themingDefaults->getName();
+				$tutorialTable = $this->create($this->l->t('Welcome to %s Tables!', [$productName]), 'tutorial', '🚀');
 				$allTables[$tutorialTable->getId()] = $tutorialTable;
 			} catch (InternalError|PermissionError|DoesNotExistException|MultipleObjectsReturnedException|OcpDbException $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
