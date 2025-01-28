@@ -374,6 +374,7 @@ OC.L10N.register(
     "Demote to normal share" : "Врати на обично дељење",
     "Open main table to adjust table management permissions" : "Отвара главну табелу да би се подесиле дозволе за управљање табелом.",
     "No shares" : "Нема дељења",
+    "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "Када се прималац дељења промовише у менаџера табеле, било које апликације које креирају примаоци дељења и које користе ову табелу, ће наставити да имају приступ њеним подацима, чак и ако им касније смањите права.",
     "Confirm table manager promotion" : "Потврди промовисање менаџера табеле",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "Било која апликација коју креирају примаоци деградираног дељења која користи дељену табелу ће наставити да користи њене податке.",
     "group" : "група",
