@@ -698,7 +698,10 @@ class ImportService extends SuperService {
 		}
 	}
 
-	private function valueToDateTimeImmutable(mixed $value): ?DateTimeImmutable {
+	/**
+	 * @param null|string $value
+	 */
+	private function valueToDateTimeImmutable(string|null $value): ?DateTimeImmutable {
 		if (
 			$value === false
 			|| $value === null

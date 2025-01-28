@@ -161,7 +161,7 @@ class Row2Mapper {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), );
 		}
 
-		return array_map(fn (array $item) => $item['id'], $result->fetchAll());
+		return array_map(static fn (array $item) => $item['id'], $result->fetchAll());
 	}
 
 	/**
