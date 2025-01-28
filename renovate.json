@@ -1,23 +1,29 @@
 {
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
 	"extends": [
-		"config:base"
+		"config:base",
+		":semanticCommits",
+		":gitSignOff"
 	],
 	"timezone": "Europe/Berlin",
 	"schedule": [
 		"every weekend"
 	],
-	"reviewers": ["datenangebot", "enjeck"],
-	"labels": ["dependencies"],
+	"labels": [
+		"dependencies",
+		"3. to review"
+	],
 	"rangeStrategy": "bump",
 	"rebaseWhen": "conflicted",
 	"ignoreUnstable": false,
 	"baseBranches": [
 		"main",
-		"stable0.7"
+		"stable0.8"
 	],
 	"enabledManagers": [
-		"npm"
+		"npm",
+		"composer",
+		"github-actions"
 	],
 	"ignoreDeps": [
 		"node",
@@ -25,9 +31,35 @@
 	],
 	"packageRules": [
 		{
-			"matchUpdateTypes": ["major", "minor"],
-			"matchBaseBranches": ["stable0.7"],
-			"enabled": false
+			"description": "Request JavaScript reviews",
+			"matchManagers": [
+				"npm"
+			],
+			"reviewers": [
+				"enjeck"
+			]
+		},
+		{
+			"description": "Request PHP reviews",
+			"matchManagers": [
+				"composer"
+			],
+			"reviewers": [
+				"blizzz"
+			]
+		},
+		{
+			"description": "Request maintainer reviews",
+			"matchManagers": [
+				"github-actions"
+			],
+			"extends": [
+				"schedule:monthly"
+			],
+			"reviewers": [
+				"enjeck",
+				"blizzz"
+			]
 		},
 		{
 			"groupName": "cypress",
@@ -45,15 +77,27 @@
 			]
 		},
 		{
-			"matchPackageNames": ["vue"],
+			"matchPackageNames": [
+				"vue"
+			],
 			"allowedVersions": "<3"
 		},
 		{
-			"matchPackageNames": ["vue-router"],
+			"matchPackageNames": [
+				"vuex"
+			],
 			"allowedVersions": "<4"
 		},
 		{
-			"matchPackageNames": ["@vue/test-utils"],
+			"matchPackageNames": [
+				"vue-router"
+			],
+			"allowedVersions": "<4"
+		},
+		{
+			"matchPackageNames": [
+				"@vue/test-utils"
+			],
 			"allowedVersions": "<2"
 		}
 	]
