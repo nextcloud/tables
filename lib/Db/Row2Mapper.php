@@ -155,10 +155,11 @@ class Row2Mapper {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), );
 		}
 
-		return array_map(fn (array $item) => $item['id'], $result->fetchAll());
+		return array_map(static fn (array $item) => $item['id'], $result->fetchAll());
 	}
 
 	/**
+	 * @param Column[] $tableColumns
 	 * @param Column[] $columns
 	 * @param int $tableId
 	 * @param int|null $limit
@@ -176,6 +177,29 @@ class Row2Mapper {
 		$wantedRowIdsArray = $this->getWantedRowIds($userId, $tableId, $filter, $limit, $offset);
 
 		return $this->getRows($wantedRowIdsArray, $columnIdsArray, $sort ?? []);
+	}
+
+	/**
+	 * @param Column[] $tableColumns
+	 * @param Column[] $columns
+	 * @param int $tableId
+	 * @param RowQuery $queryData
+	 * @return Row2[]
+	 * @throws InternalError
+	 */
+	public function findAllByQuery(array $tableColumns, array $columns, int $tableId, RowQuery $queryData): array {
+		$this->setColumns($columns, $tableColumns);
+		$columnIdsArray = array_map(static fn (Column $column) => $column->getId(), $columns);
+
+		$wantedRowIdsArray = $this->getWantedRowIds(
+			$queryData->getUserId(),
+			$tableId,
+			$queryData->getFilter(),
+			$queryData->getLimit(),
+			$queryData->getOffset()
+		);
+
+		return $this->getRows($wantedRowIdsArray, $columnIdsArray, $queryData->getSort() ?? []);
 	}
 
 	/**
@@ -250,7 +274,7 @@ class Row2Mapper {
 	/**
 	 * @throws InternalError
 	 */
-	private function addFilterToQuery(IQueryBuilder &$qb, array $filters, string $userId): void {
+	private function addFilterToQuery(IQueryBuilder $qb, array $filters, string $userId): void {
 		// TODO move this into service
 		$this->replacePlaceholderValues($filters, $userId);
 

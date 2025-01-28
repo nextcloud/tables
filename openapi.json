@@ -9862,7 +9862,7 @@
                                 ],
                                 "properties": {
                                     "data": {
-                                        "description": "An array containing the column identifiers and their values",
+                                        "description": "An array containing the column\n    identifiers and their values",
                                         "oneOf": [
                                             {
                                                 "type": "string"
@@ -9939,6 +9939,350 @@
                                                 },
                                                 "data": {
                                                     "$ref": "#/components/schemas/Row"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "message"
+                                                    ],
+                                                    "properties": {
+                                                        "message": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "operationId": "rowocs-get-rows",
+                "summary": "[api v2] get a number of rows from a table or view",
+                "description": "When reading from views, the specified filter is added to each existing filter group.\nThe filter definitions provided are all AND-connected.\nSort orders on the other hand do overwrite the view's default sort order. Only when `null` is passed the default sort order will be used.",
+                "tags": [
+                    "rowocs"
+                ],
+                "security": [
+                    {
+                        "bearer_auth": []
+                    },
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "nodeCollection",
+                        "in": "path",
+                        "description": "Indicates whether to create a row on a table or view",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "tables",
+                                "views"
+                            ],
+                            "pattern": "^(tables|views)$"
+                        }
+                    },
+                    {
+                        "name": "nodeId",
+                        "in": "path",
+                        "description": "The ID of the table or view",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64",
+                            "minimum": 0
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of rows to return between 1 and 500, fetches all by default (optional)",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64",
+                            "nullable": true,
+                            "minimum": 1,
+                            "maximum": 500
+                        }
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "Offset of the tows to be returned (optional)",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64",
+                            "nullable": true,
+                            "minimum": 0
+                        }
+                    },
+                    {
+                        "name": "filter[]",
+                        "in": "query",
+                        "description": "Additional row filter (optional)",
+                        "schema": {
+                            "type": "array",
+                            "nullable": true,
+                            "items": {
+                                "type": "object",
+                                "required": [
+                                    "columnId",
+                                    "operator",
+                                    "value"
+                                ],
+                                "properties": {
+                                    "columnId": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "operator": {
+                                        "type": "string",
+                                        "enum": [
+                                            "begins-with",
+                                            "ends-with",
+                                            "contains",
+                                            "is-equal",
+                                            "is-greater-than",
+                                            "is-greater-than-or-equal",
+                                            "is-lower-than",
+                                            "is-lower-than-or-equal",
+                                            "is-empty"
+                                        ]
+                                    },
+                                    "value": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "integer",
+                                                "format": "int64"
+                                            },
+                                            {
+                                                "type": "number",
+                                                "format": "double"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "sort[]",
+                        "in": "query",
+                        "description": "Custom sort order (optional)",
+                        "schema": {
+                            "type": "array",
+                            "nullable": true,
+                            "items": {
+                                "type": "object",
+                                "required": [
+                                    "columnId",
+                                    "mode"
+                                ],
+                                "properties": {
+                                    "columnId": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "mode": {
+                                        "type": "string",
+                                        "enum": [
+                                            "ASC",
+                                            "DESC"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "OCS-APIRequest",
+                        "in": "header",
+                        "description": "Required to be true for the API request to pass",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rows returned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Row"
+                                                    }
                                                 }
                                             }
                                         }
