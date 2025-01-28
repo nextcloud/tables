@@ -153,7 +153,7 @@ class Row2Mapper {
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), );
 		}
 
-		return array_map(fn (array $item) => $item['id'], $result->fetchAllAssociative());
+		return array_map(static fn (array $item) => $item['id'], $result->fetchAllAssociative());
 	}
 
 	/**
@@ -173,7 +173,6 @@ class Row2Mapper {
 
 			$wantedRowIdsArray = $this->getWantedRowIds($userId, $tableId, $filter, $sort, $limit, $offset);
 
-			// Get rows without SQL sorting
 			$rows = $this->getRows($wantedRowIdsArray, $showColumnIds);
 
 			// Sort rows in PHP to preserve the order from getWantedRowIds

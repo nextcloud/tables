@@ -8,11 +8,12 @@
 namespace OCA\Tables\Service;
 
 use OCA\Tables\Activity\ActivityManager;
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2;
 use OCA\Tables\Db\Row2Mapper;
-use OCA\Tables\Db\Table;
+use OCA\Tables\Db\RowQuery;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
@@ -83,6 +84,66 @@ class RowService extends SuperService {
 			/** @var TablesPublicRow $rowData */
 			return $rowData;
 		}, $rows);
+	}
+
+	/**
+	 * @throws MultipleObjectsReturnedException
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @throws InternalError
+	 * @return Row2[]
+	 */
+	public function findAllByQuery(RowQuery $rowQuery): array {
+		$tableId = $rowQuery->getNodeId();
+		$columns = null;
+
+		if ($rowQuery->getNodeType() === Application::NODE_TYPE_VIEW) {
+			$view = $this->viewMapper->find($rowQuery->getNodeId());
+			$tableId = $view->getTableId();
+			$columns = $this->columnMapper->findAll($view->getColumnsArray());
+
+			$userId = $this->resolveFilterUserId($rowQuery->getUserId() ?? $this->userId ?? '', $view);
+			$rowQuery->setUserId($userId);
+
+			if ($rowQuery->getFilter() !== null) {
+				$baseFilterGroups = $view->getFilterArray();
+				if (empty($baseFilterGroups)) {
+					$baseFilterGroups = $rowQuery->getFilter();
+				} else {
+					$additionalFilterRules = array_merge(...$rowQuery->getFilter());
+					foreach ($baseFilterGroups as &$baseFilterGroup) {
+						array_push($baseFilterGroup, ...$additionalFilterRules);
+					}
+					unset($baseFilterGroup);
+				}
+				$rowQuery->setFilter($baseFilterGroups);
+			} else {
+				$rowQuery->setFilter($view->getFilterArray());
+			}
+
+			if ($rowQuery->getSort() === null) {
+				$rowQuery->setSort($view->getSortArray());
+			}
+		} elseif ($rowQuery->getSort() === null) {
+			$table = $this->tableMapper->find($tableId);
+			$rowQuery->setSort($table->getSortArray() ?: null);
+		}
+
+		$tableColumns = $this->columnMapper->findAllByTable($tableId);
+		$columns ??= $tableColumns;
+		$showColumnIds = array_map(static fn (Column $column): int => $column->getId(), $columns);
+
+		$rows = $this->row2Mapper->findAll(
+			$showColumnIds,
+			$tableId,
+			$rowQuery->getLimit(),
+			$rowQuery->getOffset(),
+			$rowQuery->getFilter(),
+			$rowQuery->getSort(),
+			$rowQuery->getUserId() ?? $this->userId ?? '',
+		);
+		$this->attachAliasPayloads($rows, $columns);
+		return $rows;
 	}
 
 	/**
@@ -849,6 +910,9 @@ class RowService extends SuperService {
 	 * This deletes all data for a column, eg if the columns gets removed
 	 *
 	 * >>> SECURITY <<<
+	 * We do not check if you are allowed to remove this data. That has to be
+	 * done before! Why? Mostly this check will have be run before and we can
+	 * pass this here due to performance reasons.
 	 * We do not check if you are allowed to remove this data. That has to be
 	 * done before! Why? Mostly this check will have be run before and we can
 	 * pass this here due to performance reasons.
