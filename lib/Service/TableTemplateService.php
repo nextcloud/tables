@@ -775,7 +775,7 @@ class TableTemplateService {
 		$this->createRow($table, [
 			$columns['what']->getId() => $this->l->t('Read the docs'),
 			// TRANSLATORS: the link is formatted using markdown, the pattern is: [Title](URL)
-			$columns['how']->getId() => $this->l->t('If you want to go through the documentation, this can be found here: [Nextcloud Tables documentation](%s)', ['https://github.com/nextcloud/tables/wiki']),
+			$columns['how']->getId() => $this->l->t('If you want to go through the documentation, it can be found here: [Nextcloud Tables documentation](%s)', ['https://github.com/nextcloud/tables/wiki']),
 			$columns['ease']->getId() => 3,
 			$columns['done']->getId() => 'false',
 		]);
