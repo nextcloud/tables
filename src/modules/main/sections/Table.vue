@@ -28,9 +28,9 @@ import TableDescription from './TableDescription.vue'
 import ElementTitle from './ElementTitle.vue'
 import Dashboard from './Dashboard.vue'
 import DataTable from './DataTable.vue'
-import { mapState } from 'vuex'
-
+import { mapState } from 'pinia'
 import { emit } from '@nextcloud/event-bus'
+import { useTablesStore } from '../../../store/store.js'
 
 export default {
 	components: {
@@ -65,7 +65,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(['views']),
+		...mapState(useTablesStore, ['views']),
 		hasViews() {
 			return this.views.some(v => v.tableId === this.table.id)
 		},

@@ -82,12 +82,13 @@ import TableRow from '../partials/TableRow.vue'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { MagicFields } from '../mixins/magicFields.js'
 import { NcButton, useIsMobile, NcSelect } from '@nextcloud/vue'
-import { mapState } from 'vuex'
+import { mapState } from 'pinia'
 import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
 } from '../../../../shared/constants.js'
 import { MetaColumns } from '../mixins/metaColumns.js'
 import { translate as t } from '@nextcloud/l10n'
+import { useTablesStore } from '../../../../store/store.js'
 
 export default {
 	name: 'CustomTable',
@@ -147,7 +148,7 @@ export default {
 	},
 
 	computed: {
-		...mapState(['appNavCollapsed']),
+		...mapState(useTablesStore, ['appNavCollapsed']),
 		allPageNumbersArray() {
 			return Array.from(
 				{ length: this.totalPages },

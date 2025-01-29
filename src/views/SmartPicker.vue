@@ -76,6 +76,7 @@ import LinkReferenceWidget from './LinkReferenceWidget.vue'
 import ContentReferenceWidget from './ContentReferenceWidget.vue'
 import axios from '@nextcloud/axios'
 import displayError from '../shared/utils/displayError.js'
+import { useTablesStore } from '../store/store.js'
 
 export default {
 
@@ -91,6 +92,11 @@ export default {
 		LinkReferenceWidget,
 		ContentReferenceWidget,
 		NcLoadingIcon,
+	},
+
+	setup() {
+		const tablesStore = useTablesStore()
+		return { tablesStore }
 	},
 
 	data() {
@@ -124,7 +130,7 @@ export default {
 	},
 
 	async mounted() {
-		if (!this.$store) {
+		if (!this.tablesStore) {
 			const { default: store } = await import(
 				/* webpackChunkName: 'store' */
 				'../store/store.js')
@@ -132,8 +138,8 @@ export default {
 				/* webpackChunkName: 'store' */
 				'../store/data.js')
 
-			this.$store = store
-			this.$store.data = data
+			this.tablesStore = store
+			this.tablesStore.data = data
 		}
 	},
 

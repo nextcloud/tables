@@ -32,6 +32,9 @@ import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMix
 import { NcLoadingIcon } from '@nextcloud/vue'
 import { useResizeObserver } from '@vueuse/core'
 import { spawnDialog } from '@nextcloud/dialogs'
+import { useTablesStore } from '../store/store.js'
+import { useDataStore } from '../store/data.js'
+import { mapActions } from 'pinia'
 
 export default {
 
@@ -62,6 +65,8 @@ export default {
 		return {
 			searchExp: null,
 			rows: null,
+			tablesStore: useTablesStore(),
+			dataStore: useDataStore(),
 		}
 	},
 
@@ -107,6 +112,7 @@ export default {
 	},
 
 	methods: {
+		...mapActions(useDataStore, ['loadRowsFromBE', 'getRows']),
 		search(searchString) {
 			this.searchExp = (searchString !== '')
 				? new RegExp(searchString.trim(), 'ig')
@@ -120,8 +126,7 @@ export default {
 				isView: Boolean(this.richObject.type),
 				elementId: this.richObject.id,
 			}, () => {
-				const storeRows = Object.values(this.$store.data.state.rows).at(0)
-
+				const storeRows = this.getRows
 				if (storeRows.length > this.rows.length) {
 					const createdRow = storeRows.at(-1)
 					this.rows.push(createdRow)
@@ -137,7 +142,7 @@ export default {
 				isView: Boolean(this.richObject.type),
 				element: this.richObject,
 			}, () => {
-				const storeRows = Object.values(this.$store.data.state.rows).at(0)
+				const storeRows = this.getRows
 				const localRowIndex = this.rows.findIndex(row => row.id === rowId)
 				const updatedRow = storeRows.find(row => row.id === rowId)
 				this.rows.splice(localRowIndex, 1, updatedRow)
@@ -147,13 +152,12 @@ export default {
 			return this.rows.find(row => row.id === rowId)
 		},
 		async loadRows() {
-			const res = await this.$store.dispatch(
-				'loadRowsFromBE',
-				{ tableId: this.richObject.id },
-			)
+			const res = await this.loadRowsFromBE({
+				tableId: this.richObject.id,
+			})
 
 			if (res) {
-				this.rows = Object.values(this.$store.data.state.rows).at(0)
+				this.rows = this.getRows
 			}
 		},
 	},

@@ -49,10 +49,6 @@
 			"allowedVersions": "<3"
 		},
 		{
-			"matchPackageNames": ["vuex"],
-			"allowedVersions": "<4"
-		},
-		{
 			"matchPackageNames": ["vue-router"],
 			"allowedVersions": "<4"
 		},

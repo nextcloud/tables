@@ -14,7 +14,7 @@
 			</div>
 			<div class="row">
 				<div class="fix-col-4 space-T end">
-					<NcButton type="warning" :disabled="newOwnerId === ''" data-cy="transferContextButton" @click="transferContext">
+					<NcButton type="warning" :disabled="newOwnerId === ''" data-cy="transferContextButton" @click="transferMe">
 						{{ t('tables', 'Transfer') }}
 					</NcButton>
 				</div>
@@ -29,8 +29,9 @@ import { showSuccess } from '@nextcloud/dialogs'
 import '@nextcloud/dialogs/style.css'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import NcUserPicker from '../../shared/components/ncUserPicker/NcUserPicker.vue'
-import { mapGetters, mapState } from 'vuex'
+import { mapState, mapActions } from 'pinia'
 import { getCurrentUser } from '@nextcloud/auth'
+import { useTablesStore } from '../../store/store.js'
 
 export default {
 	name: 'TransferContext',
@@ -57,8 +58,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['getContext']),
-		...mapState(['activeContextId']),
+		...mapState(useTablesStore, ['activeContextId', 'getContext']),
 		localContext() {
 			return this.getContext(this.context.id)
 		},
@@ -67,14 +67,22 @@ export default {
 		},
 	},
 	methods: {
+		...mapActions(useTablesStore, ['transferContext']),
 		actionCancel() {
 			this.$emit('close')
 		},
-		async transferContext() {
+		async transferMe() {
 			const transferId = this.context.id
-			const res = await this.$store.dispatch('transferContext', { id: this.context.id, data: { newOwnerId: this.newOwnerId } })
+			const res = await this.transferContext({
+				id: this.context.id,
+				data: { newOwnerId: this.newOwnerId },
+			})
+
 			if (res) {
-				showSuccess(t('tables', 'Context "{name}" transferred to {user}', { name: this.context?.name, user: this.newOwnerId }))
+				showSuccess(t('tables', 'Context "{name}" transferred to {user}', {
+					name: this.context?.name,
+					user: this.newOwnerId,
+				}))
 
 				if (transferId === this.activeContextId) {
 					await this.$router.push('/').catch(err => err)
@@ -82,7 +90,6 @@ export default {
 
 				this.actionCancel()
 			}
-
 		},
 	},
 }

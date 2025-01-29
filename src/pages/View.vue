@@ -10,8 +10,8 @@
 </template>
 
 <script>
-
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'pinia'
+import { useTablesStore } from '../store/store.js'
 import MainWrapper from '../modules/main/sections/MainWrapper.vue'
 import MainModals from '../modules/modals/Modals.vue'
 
@@ -23,8 +23,7 @@ export default {
 	},
 
 	computed: {
-		...mapState(['activeViewId']),
-		...mapGetters(['activeView']),
+		...mapState(useTablesStore, ['activeViewId', 'activeView']),
 	},
 
 	watch: {

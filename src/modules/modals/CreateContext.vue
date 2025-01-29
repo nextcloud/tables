@@ -43,7 +43,7 @@
 				<NcContextResource :resources.sync="resources" :receivers.sync="receivers" />
 			</div>
 			<div class="row space-T">
-				<NcActionCheckbox :checked="showInNavigationDefault" @change="updateDisplayMode">
+				<NcActionCheckbox :checked="showInNavigationDefault" data-cy="createContextShowInNavSwitch" @change="changeDisplayMode">
 					{{ t('tables', 'Show in app list') }}
 				</NcActionCheckbox>
 				<p class="nav-display-subtext">
@@ -71,6 +71,8 @@ import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'
 import permissionBitmask from '../../shared/components/ncContextResource/mixins/permissionBitmask.js'
 import { getCurrentUser } from '@nextcloud/auth'
 import { NAV_ENTRY_MODE } from '../../shared/constants.js'
+import { useTablesStore } from '../../store/store.js'
+import { mapActions } from 'pinia'
 
 export default {
 	name: 'CreateContext',
@@ -121,6 +123,7 @@ export default {
 		await this.setIcon(this.randomIcon())
 	},
 	methods: {
+		...mapActions(useTablesStore, ['insertNewContext']),
 		titleChangedManually() {
 			this.customTitleChosen = true
 		},
@@ -172,14 +175,14 @@ export default {
 					key: 'user-' + getCurrentUser().uid,
 				})
 			const displayMode = this.showInNavigation ? 'NAV_ENTRY_MODE_ALL' : 'NAV_ENTRY_MODE_HIDDEN'
-			const res = await this.$store.dispatch('insertNewContext', { data, previousReceivers: [], receivers: this.receivers, displayMode: NAV_ENTRY_MODE[displayMode] })
+			const res = await this.insertNewContext({ data, previousReceivers: [], receivers: this.receivers, displayMode: NAV_ENTRY_MODE[displayMode] })
 			if (res) {
 				return res.id
 			} else {
 				showError(t('tables', 'Could not create new application'))
 			}
 		},
-		updateDisplayMode() {
+		changeDisplayMode() {
 			this.showInNavigation = !this.showInNavigation
 		},
 		reset() {

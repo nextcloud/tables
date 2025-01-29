@@ -66,6 +66,8 @@ import DatetimeTimeForm from '../../shared/components/ncTable/partials/columnTyp
 import UsergroupForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/UsergroupForm.vue'
 import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandler.js'
 import moment from '@nextcloud/moment'
+import { mapActions } from 'pinia'
+import { useDataStore } from '../../store/data.js'
 
 export default {
 	name: 'EditColumn',
@@ -141,6 +143,7 @@ export default {
 	},
 
 	methods: {
+		...mapActions(useDataStore, ['updateColumn']),
 		relativeDateTime(v) {
 			return moment(v).format('L') === moment().format('L') ? t('tables', 'Today') + ' ' + moment(v).format('LT') : moment(v).format('LLLL')
 		},
@@ -164,7 +167,7 @@ export default {
 				return
 			}
 			this.editErrorTitle = false
-			await this.updateColumn()
+			await this.updateLocalColumn()
 			this.reset()
 			this.$emit('close')
 		},
@@ -174,7 +177,7 @@ export default {
 			this.deleteId = null
 			this.editErrorTitle = false
 		},
-		async updateColumn() {
+		async updateLocalColumn() {
 			const data = Object.assign({}, this.editColumn)
 			if ((this.column.type === ColumnTypes.SelectionMulti || this.column.type === ColumnTypes.SelectionCheck) && data.selectionDefault !== null) data.selectionDefault = JSON.stringify(data.selectionDefault)
 			data.numberDefault = data.numberDefault === '' ? null : data.numberDefault
@@ -189,7 +192,13 @@ export default {
 			delete data.lastEditAt
 			delete data.lastEditBy
 			console.debug('this column data will be send', data)
-			const res = await this.$store.dispatch('updateColumn', { id: this.editColumn.id, isView: this.isView, elementId: this.elementId, data })
+			const res = await this.updateColumn({
+				id: this.editColumn.id,
+				isView: this.isView,
+				elementId: this.elementId,
+				data,
+			})
+
 			if (res) {
 				showSuccess(t('tables', 'The column "{column}" was updated.', { column: this.editColumn.title }))
 			}

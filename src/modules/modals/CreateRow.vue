@@ -40,6 +40,8 @@ import '@nextcloud/dialogs/style.css'
 import ColumnFormComponent from '../main/partials/ColumnFormComponent.vue'
 import { translate as t } from '@nextcloud/l10n'
 import rowHelper from '../../shared/components/ncTable/mixins/rowHelper.js'
+import { useDataStore } from '../../store/data.js'
+import { mapActions } from 'pinia'
 
 export default {
 	name: 'CreateRow',
@@ -94,6 +96,7 @@ export default {
 		},
 	},
 	methods: {
+		...mapActions(useDataStore, ['insertNewRow']),
 		t,
 		actionCancel() {
 			this.reset()
@@ -112,9 +115,9 @@ export default {
 			}
 		},
 		async sendNewRowToBE() {
-			if (!this.$store) {
+			if (!this.tablesStore) {
 				const { default: store } = await import(/* webpackChunkName: 'store' */ '../../store/store.js')
-				this.$store = store
+				this.tablesStore = store
 			}
 
 			try {
@@ -122,7 +125,7 @@ export default {
 				for (const [key, value] of Object.entries(this.row)) {
 					data[key] = value
 				}
-				await this.$store.dispatch('insertNewRow', {
+				await this.insertNewRow({
 					viewId: this.isView ? this.elementId : null,
 					tableId: !this.isView ? this.elementId : null,
 					data,

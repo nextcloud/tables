@@ -7,11 +7,19 @@ import { generateUrl } from '@nextcloud/router'
 import '@nextcloud/dialogs/style.css'
 import displayError from '../../../shared/utils/displayError.js'
 import ShareTypes from '../../../shared/mixins/shareTypesMixin.js'
+import { useTablesStore } from '../../../store/store.js'
+import { mapActions } from 'pinia'
 
 export default {
 	mixins: [ShareTypes],
+	data() {
+		return {
+			tablesStore: useTablesStore(),
+		}
+	},
 
 	methods: {
+		...mapActions('tables', ['setTableHasShares', 'setViewHasShares']),
 		async getSharedWithFromBE() {
 			try {
 				let res
@@ -55,21 +63,29 @@ export default {
 				displayError(e, t('tables', 'Could not create share.'))
 				return false
 			}
+
 			if (this.isView) {
-				await this.$store.dispatch('setViewHasShares', { viewId: this.activeElement.id, hasShares: true })
+				await this.setViewHasShares({
+					viewId: this.activeElement.id,
+					hasShares: true,
+				})
 			} else {
-				await this.$store.dispatch('setTableHasShares', { tableId: this.isView ? this.activeElement.tableId : this.activeElement.id, hasShares: true })
+				await this.setTableHasShares({
+					tableId: this.isView ? this.activeElement.tableId : this.activeElement.id,
+					hasShares: true,
+				})
 			}
 			return true
 		},
+
 		async removeShareFromBE(shareId) {
 			try {
 				await axios.delete(generateUrl('/apps/tables/share/' + shareId))
 			} catch (e) {
 				displayError(e, t('tables', 'Could not remove share.'))
 			}
-
 		},
+
 		async updateShareToBE(shareId, data) {
 			try {
 				await axios.put(generateUrl('/apps/tables/share/' + shareId + '/permission'), data)

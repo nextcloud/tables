@@ -17,10 +17,11 @@
 <script>
 import { NcContent, NcAppContent } from '@nextcloud/vue'
 import Navigation from './modules/navigation/sections/Navigation.vue'
-import { mapGetters } from 'vuex'
+import { mapState, mapActions } from 'pinia'
 import Sidebar from './modules/sidebar/sections/Sidebar.vue'
 import { useResizeObserver } from '@vueuse/core'
 import { loadState } from '@nextcloud/initial-state'
+import { useTablesStore } from './store/store.js'
 
 export default {
 	name: 'App',
@@ -43,7 +44,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['isLoadingSomething']),
+		...mapState(useTablesStore, ['isLoadingSomething']),
 	},
 	watch: {
 		'$route'(to, from) {
@@ -51,14 +52,16 @@ export default {
 		},
 	},
 	async created() {
-		await this.$store.dispatch('loadTablesFromBE')
-		await this.$store.dispatch('getAllContexts')
-		await this.$store.dispatch('loadViewsSharedWithMeFromBE')
-		await this.$store.dispatch('loadTemplatesFromBE')
+		const store = useTablesStore()
+		await store.loadTablesFromBE()
+		await store.getAllContexts()
+		await store.loadViewsSharedWithMeFromBE()
+		await store.loadTemplatesFromBE()
 		this.routing(this.$router.currentRoute)
 		this.observeAppContent()
 	},
 	methods: {
+		...mapActions(useTablesStore, ['loadTablesFromBE', 'getAllContexts', 'loadViewsSharedWithMeFromBE', 'loadTemplatesFromBE', 'setActiveRowId', 'setActiveTableId', 'setActiveViewId', 'setActiveContextId']),
 		routing(currentRoute) {
 			try {
 				if (loadState('tables', 'contextId', undefined)) {
@@ -74,28 +77,28 @@ export default {
 			}
 
 			if (currentRoute.name === 'tableRow' || currentRoute.name === 'viewRow') {
-				this.$store.commit('setActiveRowId', parseInt(currentRoute.params.rowId))
+				this.setActiveRowId(parseInt(currentRoute.params.rowId))
 			} else {
-				this.$store.commit('setActiveRowId', null)
+				this.setActiveRowId(null)
 			}
 			if (currentRoute.path.startsWith('/table/')) {
-				this.$store.commit('setActiveTableId', parseInt(currentRoute.params.tableId))
-				this.setPageTitle(this.$store.getters.activeTable.title)
+				this.setActiveTableId(parseInt(currentRoute.params.tableId))
+				this.setPageTitle(this.activeTable.title)
 				if (!currentRoute.path.includes('/row/')) {
 					this.switchActiveMenuEntry(document.querySelector('header .header-left .app-menu a[title="Tables"]'))
 				}
 			} else if (currentRoute.path.startsWith('/view/')) {
-				this.$store.commit('setActiveViewId', parseInt(currentRoute.params.viewId))
-				this.setPageTitle(this.$store.getters.activeView.title)
+				this.setActiveViewId(parseInt(currentRoute.params.viewId))
+				this.setPageTitle(this.activeView.title)
 				if (!currentRoute.path.includes('/row/')) {
 					this.switchActiveMenuEntry(document.querySelector('header .header-left .app-menu a[title="Tables"]'))
 				}
 			} else if (currentRoute.path.startsWith('/application/')) {
 				const contextId = parseInt(currentRoute.params.contextId)
-				this.$store.commit('setActiveContextId', contextId)
-				this.setPageTitle(this.$store.getters.activeContext.name)
+				this.setActiveContextId(contextId)
+				this.setPageTitle(this.activeContext.name)
 				// This breaks if there are multiple contexts with the same name or another app has the same name. We need a better way to identify the correct element.
-				this.switchActiveMenuEntry(document.querySelector(`header .header-left .app-menu [title="${this.$store.getters.activeContext.name}"]`))
+				this.switchActiveMenuEntry(document.querySelector(`header .header-left .app-menu [title="${this.activeContext.name}"]`))
 
 				// move the focus away from nav bar (import for app-internal switch)
 				const appContent = document.getElementById('app-content-vue')

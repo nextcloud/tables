@@ -35,7 +35,7 @@
 				</template>
 				{{ t('tables', 'Delete application') }}
 			</NcActionButton>
-			<NcActionCheckbox :checked="showInNavigation" @change="updateDisplayMode">
+			<NcActionCheckbox :checked="showInNavigation" data-cy="navigationContextShowInNavSwitch" @change="changeDisplayMode">
 				{{ t('tables', 'Show in app list') }}
 			</NcActionCheckbox>
 		</template>
@@ -44,7 +44,7 @@
 <script>
 import { NcAppNavigationItem, NcActionButton, NcIconSvgWrapper, NcActionCheckbox } from '@nextcloud/vue'
 import '@nextcloud/dialogs/style.css'
-import { mapGetters } from 'vuex'
+import { mapState, mapActions } from 'pinia'
 import TableIcon from 'vue-material-design-icons/Table.vue'
 import { emit } from '@nextcloud/event-bus'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
@@ -54,6 +54,7 @@ import permissionsMixin from '../../../shared/components/ncTable/mixins/permissi
 import svgHelper from '../../../shared/components/ncIconPicker/mixins/svgHelper.js'
 import { NAV_ENTRY_MODE } from '../../../shared/constants.js'
 import rebuildNavigation from '../../../service/rebuild-navigation.js'
+import { useTablesStore } from '../../../store/store.js'
 
 export default {
 	name: 'NavigationContextItem',
@@ -85,7 +86,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters(['activeContext']),
+		...mapState(useTablesStore, ['activeContext']),
 	},
 
 	watch: {
@@ -98,6 +99,7 @@ export default {
 	},
 
 	methods: {
+		...mapActions(useTablesStore, ['updateDisplayMode']),
 		emit,
 		async editContext() {
 			emit('tables:context:edit', this.context.id)
@@ -116,7 +118,7 @@ export default {
 			}
 			return false
 		},
-		async updateDisplayMode() {
+		async changeDisplayMode() {
 			const value = !this.showInNavigation
 			const displayMode = value ? NAV_ENTRY_MODE.NAV_ENTRY_MODE_ALL : NAV_ENTRY_MODE.NAV_ENTRY_MODE_HIDDEN
 			let hadAtLeastOneEntry = false
@@ -125,7 +127,7 @@ export default {
 					continue
 				}
 				hadAtLeastOneEntry = true
-				await this.$store.dispatch('updateDisplayMode', { shareId: share.share_id, displayMode, target: 'self' })
+				await this.updateDisplayMode({ shareId: share.share_id, displayMode, target: 'self' })
 				this.showInNavigation = value
 			}
 			if (hadAtLeastOneEntry) {

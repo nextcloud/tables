@@ -45,7 +45,8 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'pinia'
+import { useTablesStore } from '../../../store/store.js'
 import { generateUrl } from '@nextcloud/router'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import copyToClipboard from '../../../shared/mixins/copyToClipboard.js'
@@ -69,8 +70,7 @@ export default {
 	},
 
 	computed: {
-		...mapState(['tables']),
-		...mapGetters(['activeElement', 'isLoadingSomething', 'isView']),
+		...mapState(useTablesStore, ['tables', 'activeElement', 'isLoadingSomething', 'isView']),
 		apiEndpointUrl() {
 			const params = {
 				elementId: this.activeElement.id,
