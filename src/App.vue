@@ -82,20 +82,20 @@ export default {
 				this.$store.commit('setActiveTableId', parseInt(currentRoute.params.tableId))
 				this.setPageTitle(this.$store.getters.activeTable.title)
 				if (!currentRoute.path.includes('/row/')) {
-					this.switchActiveMenuEntry(document.querySelector('header .header-left .app-menu a[title="Tables"]'))
+					this.switchActiveMenuEntry(document.querySelector('header .header-start .app-menu a[title="Tables"]'))
 				}
 			} else if (currentRoute.path.startsWith('/view/')) {
 				this.$store.commit('setActiveViewId', parseInt(currentRoute.params.viewId))
 				this.setPageTitle(this.$store.getters.activeView.title)
 				if (!currentRoute.path.includes('/row/')) {
-					this.switchActiveMenuEntry(document.querySelector('header .header-left .app-menu a[title="Tables"]'))
+					this.switchActiveMenuEntry(document.querySelector('header .header-start .app-menu a[title="Tables"]'))
 				}
 			} else if (currentRoute.path.startsWith('/application/')) {
 				const contextId = parseInt(currentRoute.params.contextId)
 				this.$store.commit('setActiveContextId', contextId)
 				this.setPageTitle(this.$store.getters.activeContext.name)
 				// This breaks if there are multiple contexts with the same name or another app has the same name. We need a better way to identify the correct element.
-				this.switchActiveMenuEntry(document.querySelector(`header .header-left .app-menu [title="${this.$store.getters.activeContext.name}"]`))
+				this.switchActiveMenuEntry(document.querySelector(`header .header-start .app-menu [title="${this.$store.getters.activeContext.name}"]`))
 
 				// move the focus away from nav bar (import for app-internal switch)
 				const appContent = document.getElementById('app-content-vue')
@@ -109,7 +109,7 @@ export default {
 		},
 		switchActiveMenuEntry(targetElement) {
 			targetElement = targetElement?.tagName?.toLowerCase() === 'a' ? targetElement.parentElement : targetElement
-			const currentlyActive = document.querySelector('header .header-left .app-menu li.app-menu-entry--active')
+			const currentlyActive = document.querySelector('header .header-start .app-menu li.app-menu-entry--active')
 			currentlyActive.classList.remove('app-menu-entry--active')
 			targetElement.classList.add('app-menu-entry--active')
 		},
