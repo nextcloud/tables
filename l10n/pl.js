@@ -28,7 +28,6 @@ OC.L10N.register(
     "table" : "tabela",
     "table view" : "widok tabeli",
     "This column was automatically created by the import service." : "Ta kolumna została stworzona automatycznie przez usługę importu.",
-    "Tutorial" : "Poradnik",
     "ToDo list" : "Lista zadań",
     "Setup a simple todo-list." : "Skonfiguruj prostą listę zadań.",
     "Members" : "Członkowie",

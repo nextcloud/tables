@@ -24,7 +24,6 @@ OC.L10N.register(
     "No file uploaded or file size exceeds maximum of %s" : "Geen bestand geüpload of de grootte is meer dan het maximum van %s",
     "_%n row_::_%n rows_" : ["%n rij","%nrijen"],
     "table" : "tabel",
-    "Tutorial" : "Handleiding",
     "ToDo list" : "ToDo overzicht",
     "Setup a simple todo-list." : "Maak een eenvoudige takenlijst.",
     "Members" : "Leden",

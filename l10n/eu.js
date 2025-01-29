@@ -23,7 +23,6 @@ OC.L10N.register(
     "table" : "taula",
     "table view" : "taula ikuspegia",
     "This column was automatically created by the import service." : "Zutabea automatikoki sortu du inportazio zerbitzuak.",
-    "Tutorial" : "Tutoriala",
     "ToDo list" : "Egitekoen zerrenda",
     "Setup a simple todo-list." : "Konfiguratu zeregin-zerrenda sinple bat.",
     "Members" : "Partaideak",

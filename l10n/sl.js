@@ -24,7 +24,6 @@ OC.L10N.register(
     "table" : "razpredelnica",
     "table view" : "Razpredelni pogled",
     "This column was automatically created by the import service." : "Stolpec je samodejno ustvarjen s storitvijo uvoza.",
-    "Tutorial" : "Navodila za uporabo",
     "ToDo list" : "Seznam opravil",
     "Setup a simple todo-list." : "Ustvari enostaven seznam nalog.",
     "Members" : "Seznam članov",

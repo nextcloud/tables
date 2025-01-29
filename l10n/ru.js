@@ -28,7 +28,6 @@ OC.L10N.register(
     "table" : "таблица",
     "table view" : "вид таблицы",
     "This column was automatically created by the import service." : "Этот столбец был автоматически создан службой импорта.",
-    "Tutorial" : "Инструкция",
     "ToDo list" : "Список задач",
     "Setup a simple todo-list." : "Простой список задач.",
     "Members" : "Участники",

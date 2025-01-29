@@ -28,7 +28,6 @@ OC.L10N.register(
     "table" : "tabell",
     "table view" : "tabellvy",
     "This column was automatically created by the import service." : "Denna kolumn skapades automatiskt av importtjänsten.",
-    "Tutorial" : "Handledning",
     "ToDo list" : "Att göra-lista",
     "Setup a simple todo-list." : "Skapa en enkel att göra-lista.",
     "Members" : "Medlemmar",
