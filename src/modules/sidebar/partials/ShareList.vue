@@ -115,7 +115,7 @@
 			{{ t('tables', 'No shares') }}
 		</div>
 		<div>
-			<DialogConfirmation :description="t('tables', 'After table promotion, any applications based on this table created by the share recipients will continue to consume its data even if you demote them later')"
+			<DialogConfirmation :description="t('tables', 'After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them.')"
 				:title="t('tables', 'Confirm table manager promotion')"
 				:cancel-title="t('tables', 'Cancel')"
 				:confirm-title="t('tables', 'Promote to table manager')"
