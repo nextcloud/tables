@@ -114,6 +114,7 @@ describe('Manage a context', () => {
         
         // verify that context was deleted from current user
         cy.get(`[data-cy="navigationContextItem"]:contains("${contextTitle}")`).find('button').click({ force: true })
+        cy.wait(1000)
         cy.get('[data-cy="navigationContextDeleteBtn"]').contains('Delete application').click({ force: true })
         cy.get('[data-cy="deleteContextModal"]').should('be.visible')
         cy.get('[data-cy="deleteContextModal"] button').contains('Delete').click()
@@ -199,7 +200,7 @@ describe('Manage a context', () => {
         cy.get('[data-cy="ncTable"] table').contains('first row').should('exist')
         cy.get('[data-cy="ncTable"] table').contains('first row').parent().parent().find('[aria-label="Edit row"]').click()
 		cy.get('[data-cy="editRowDeleteButton"]').click()
-		cy.get('[data-cy="editRowEditConfirmButton"]').click()
+		cy.get('[data-cy="editRowDeleteConfirmButton"]').click()
         cy.get('[data-cy="ncTable"] table').contains('first row').should('not.exist')
     })
 })

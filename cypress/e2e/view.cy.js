@@ -126,7 +126,7 @@ describe('Interact with views', () => {
 		// Delete rows in the view
 		cy.get('[data-cy="customTableRow"]').contains('first row').parent().parent().find('[data-cy="editRowBtn"]').click()
 		cy.get('[data-cy="editRowModal"] [data-cy="editRowDeleteButton"]').contains('Delete').click()
-		cy.get('[data-cy="editRowModal"] [data-cy="editRowEditConfirmButton"]').contains('I really want to delete this row!').click()
+		cy.get('[data-cy="editRowModal"] [data-cy="editRowDeleteConfirmButton"]').contains('I really want to delete this row!').click()
 
 		cy.get('[data-cy="editRowModal"]').should('not.exist')
 		cy.get('[data-cy="customTableRow"]').contains('first row').should('not.exist')
