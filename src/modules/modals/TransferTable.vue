@@ -5,9 +5,10 @@
 <template>
 	<NcDialog v-if="showModal"
 		:name="t('tables', 'Transfer table')"
+		data-cy="transferTableModal"
 		size="normal"
 		@closing="actionCancel">
-		<div class="modal__content" data-cy="transferTableModal">
+		<div class="modal__content">
 			<div class="row">
 				<h3>{{ t('tables', 'Transfer this table to another user') }}</h3>
 				<NcUserPicker :select-users="true" :select-groups="false" :selected-user-id.sync="selectedUserId" />

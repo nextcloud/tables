@@ -4,6 +4,7 @@
  */
 let localUser
 let localUser2
+let tableTitle = 'Shared todo'
 
 describe('Manage a table', () => {
 
@@ -16,32 +17,25 @@ describe('Manage a table', () => {
 		})
 	})
 
-	beforeEach(function() {
-	})
 
 	it('Share table', () => {
 		cy.login(localUser)
 		cy.visit('apps/tables')
 
-		// create table to share
-		cy.get('.icon-loading').should('not.exist')
 		cy.get('[data-cy="navigationCreateTableIcon"]').click({ force: true })
 		cy.get('.tile').contains('ToDo').click({ force: true })
-		cy.get('.modal__content input[type="text"]').clear().type('Shared todo')
-		cy.contains('button', 'Create table').click()
+		cy.get('.modal__content input[type="text"]').clear().type(tableTitle)
+		cy.get('[data-cy="createTableSubmitBtn"]').scrollIntoView().click()
+		cy.loadTable(tableTitle)
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('[data-cy="dataTableShareBtn"]').click()
+		cy.get('[data-cy="shareFormSelect"] input').type(localUser2.userId)
+		cy.get(`.vs__dropdown-menu [user="${localUser2.userId}"]`).click()
+		cy.wait(1000)
+		cy.get('[data-cy="sharedWithList"]').contains(localUser2.userId).should('exist')
 
-		cy.get('.app-navigation-entry-link').contains('Shared todo').click({ force: true })
-		cy.get('.NcTable table tr th').last().find('button').click({ force: true })
-		cy.get('.v-popper__popper.v-popper--theme-dropdown.action-item__popper.v-popper__popper--shown').contains('Share').click({ force: true })
-		cy.get('.sharing input').type(localUser2.userId)
-		cy.wait(1000).get('.sharing input').type('{enter}')
-
-		cy.get('h3').contains('Shares').parent().find('ul').contains(localUser2.userId).should('exist')
-	})
-
-	it('Check for shared table', () => {
 		cy.login(localUser2)
 		cy.visit('apps/tables')
-		cy.get('.app-navigation-entry-link').contains('Shared todo').should('exist')
+		cy.get('[data-cy="navigationTableItem"]').contains(tableTitle).should('exist')
 	})
 })
