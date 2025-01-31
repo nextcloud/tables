@@ -24,7 +24,7 @@
 							{{ t('tables', 'Delete') }}
 						</NcButton>
 						<NcButton v-if="prepareDeleteRow"
-							data-cy="editRowEditConfirmButton"
+							data-cy="editRowDeleteConfirmButton"
 							:wide="true"
 							:aria-label="t('tables', 'I really want to delete this row!')"
 							type="error"

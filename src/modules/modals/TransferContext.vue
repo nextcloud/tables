@@ -6,8 +6,9 @@
 	<NcDialog v-if="showModal"
 		:name="t('tables', 'Transfer application')"
 		size="normal"
+		data-cy="transferContextModal"
 		@closing="actionCancel">
-		<div class="modal__content" data-cy="transferContextModal">
+		<div class="modal__content">
 			<div class="row">
 				<h3>{{ t('tables', 'Transfer the application "{context}" to another user', { context: context.name }) }}</h3>
 				<NcUserPicker :select-users="true" :select-groups="false" :selected-user-id.sync="newOwnerId" />

@@ -75,22 +75,14 @@ describe('Manage a table', () => {
 	})
 
 	it('Delete', () => {
-		cy.get('.app-navigation__list').contains('ToDo list').click({ force: true })
-		cy.get('[data-cy="customTableAction"] button').click()
-		cy.get('.action-button__text').contains('Edit table').click()
-
-		cy.get('.modal-container button').contains('Delete').click()
-		cy.get('.modal-container button').contains('I really want to delete this table!').click()
-
-		cy.wait(10).get('.toastify.toast-success').should('be.visible')
-		cy.get('.app-navigation__list').contains('to do list').should('not.exist')
+		cy.deleteTable('ToDo list')
 	})
 
 	it('Transfer', () => {
 		cy.get('.icon-loading').should('not.exist')
 		cy.get('[data-cy="navigationCreateTableIcon"]').click({ force: true })
 		cy.get('.tile').contains('ToDo').click({ force: true })
-		cy.get('.modal__content input[type="text"]').clear().type('test table')
+		cy.get('[data-cy="createTableModal"] input[type="text"]').clear().type('test table')
 		cy.contains('button', 'Create table').click()
 
 		cy.get('.app-navigation__list').contains('test table').click({ force: true })
