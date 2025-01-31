@@ -123,7 +123,7 @@
 						</NcActionButton>
 						<NcActionButton v-if="canReadData(table)" :close-after-click="true"
 							icon="icon-download"
-							data-cy="dataTableDownloadCSVBtn" @click="$emit('download-csv')">
+							data-cy="dataTableExportBtn" @click="$emit('download-csv')">
 							{{ t('tables', 'Export as CSV') }}
 						</NcActionButton>
 						<NcActionButton v-if="canShareElement(table)"

@@ -6,7 +6,7 @@ let localUser
 let localUser2
 let tableTitle = 'Shared todo'
 
-describe('Manage a table', () => {
+describe('Share a table', () => {
 
 	before(function() {
 		cy.createRandomUser().then(user => {
@@ -30,6 +30,7 @@ describe('Manage a table', () => {
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('[data-cy="dataTableShareBtn"]').click()
 		cy.get('[data-cy="shareFormSelect"] input').type(localUser2.userId)
+		cy.wait(1000)
 		cy.get(`.vs__dropdown-menu [user="${localUser2.userId}"]`).click()
 		cy.wait(1000)
 		cy.get('[data-cy="sharedWithList"]').contains(localUser2.userId).should('exist')
