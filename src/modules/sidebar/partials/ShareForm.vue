@@ -5,7 +5,8 @@
 <template>
 	<div class="row space-B">
 		<h3>{{ shareHeading }}</h3>
-		<NcSelect id="ajax" style="width: 100%;" :clear-on-select="true" :hide-selected="true" :internal-search="false"
+		<NcSelect id="ajax" style="width: 100%;" :clear-on-select="true"
+			data-cy="shareFormSelect" :hide-selected="true" :internal-search="false"
 			:loading="loading" :options="options" :placeholder="selectPlaceholder" :preselect-first="true"
 			:preserve-search="true" :searchable="true" :user-select="true" :get-option-key="(option) => option.key"
 			:aria-label-combobox="selectPlaceholder" label="displayName" @search="asyncFind" @input="addShare">

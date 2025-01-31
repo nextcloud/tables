@@ -6,7 +6,7 @@
 	<div>
 		<h3>{{ t('tables', 'Shares') }}</h3>
 		<div v-if="loading" class="icon-loading" />
-		<ul v-if="getShares && getShares.length > 0" class="sharedWithList">
+		<ul v-if="getShares && getShares.length > 0" data-cy="sharedWithList" class="sharedWithList">
 			<div v-for="share in getShares"
 				:key="share.id"
 				class="row">
