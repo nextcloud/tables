@@ -130,6 +130,7 @@ OC.L10N.register(
     "Create applications" : "إنشاء تطبيقات",
     "Combine different tables and views into no-code applications for any purpose. This makes them easily accessible directly in the app bar." : "دمج جداول ومناظير متعددة في تطبيقات بدون برمجة لجميع الأغراض. وهذا يجعلها سهلة الوصول إليها مباشرة من شريط التطبيق.",
     "Read the docs" : "قراءة الوثائق",
+    "If you want to go through the documentation, it can be found here: [Nextcloud Tables documentation](%s)" : "إذا رغبت في الاطلاع على التوثيق، يمكنك إيجاده هنا: [توثيق جداول نكست كلاود Nextcloud Tables] (%s)",
     "Check yourself!" : "إختبِر نفسك!",
     "Tables" : "الجداول",
     "Manage data the way you need it." : "أدِر بياناتك كيفما ترغب.",

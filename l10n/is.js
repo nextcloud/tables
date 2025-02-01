@@ -63,6 +63,7 @@ OC.L10N.register(
     "Filter" : "Sía",
     "Sort" : "Flokka",
     "Export" : "Flytja út",
+    "Remove from favorites" : "Fjarlægja úr eftirlætum",
     "Copy" : "Afrita",
     "Favorites" : "Eftirlæti",
     "Clear filter" : "Hreinsa síu",
@@ -109,6 +110,7 @@ OC.L10N.register(
     "Select" : "Velja",
     "Insert" : "Setja inn",
     "Unchecked" : "Ekki skoðað",
+    "Now" : "Núna",
     "ID" : "ID",
     "Clipboard is not available" : "Klippispjald er ekki tiltækt"
 },

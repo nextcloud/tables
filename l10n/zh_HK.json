@@ -128,6 +128,7 @@
     "Create applications" : "創建應用程式",
     "Combine different tables and views into no-code applications for any purpose. This makes them easily accessible directly in the app bar." : "將各種數據庫表和視圖整合到無需編碼的應用程式中，以適用於各種用途，從而能夠直接從應用程式工具列輕鬆訪問。",
     "Read the docs" : "閱讀說明書",
+    "If you want to go through the documentation, it can be found here: [Nextcloud Tables documentation](%s)" : "如果您想查看說明書，可以在此處找到：［Nextcloud 數據庫表說明書］（%s）",
     "Check yourself!" : "您自己檢查一下！",
     "Tables" : "數據庫表",
     "Manage data the way you need it." : "按您需要的方式管理數據。",
