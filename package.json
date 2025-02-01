@@ -45,7 +45,7 @@
     "@tiptap/vue-2": "^2.11.4",
     "@vueuse/core": "^11.3.0",
     "debounce": "^2.2.0",
-    "pinia": "^2.3.0",
+    "pinia": "^2.3.1",
     "vue": "^2.7.16",
     "vue-material-design-icons": "^5.3.1",
     "vue-papa-parse": "^3.1.0",
