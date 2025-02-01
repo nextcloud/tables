@@ -13,7 +13,8 @@
 							<IconTool :size="20" />
 						</template>
 						<NcActionCaption v-if="canManageElement(table)" :name="t('tables', 'Manage table')" />
-						<NcActionButton v-if="canManageElement(table) "
+						<NcActionButton v-if="canManageElement(table)"
+							data-cy="dataTableEditTableBtn"
 							:close-after-click="true"
 							@click="emit('tables:table:edit', table.id)">
 							<template #icon>
@@ -126,6 +127,7 @@
 							{{ t('tables', 'Export as CSV') }}
 						</NcActionButton>
 						<NcActionButton v-if="canShareElement(table)"
+							data-cy="dataTableShareBtn"
 							:close-after-click="true"
 							icon="icon-share"
 							@click="$emit('toggle-share')">

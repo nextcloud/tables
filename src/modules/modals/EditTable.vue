@@ -48,12 +48,13 @@
 				</div>
 				<div class="row">
 					<div class="fix-col-4 space-T justify-between">
-						<NcButton v-if="!prepareDeleteTable" type="error" @click="prepareDeleteTable = true">
+						<NcButton v-if="!prepareDeleteTable" type="error" data-cy="editTableDeleteBtn" @click="prepareDeleteTable = true">
 							{{ t('tables', 'Delete') }}
 						</NcButton>
 						<NcButton v-if="prepareDeleteTable"
 							:wide="true"
 							type="error"
+							data-cy="editTableConfirmDeleteBtn"
 							@click="actionDeleteTable">
 							{{ t('tables', 'I really want to delete this table!') }}
 						</NcButton>

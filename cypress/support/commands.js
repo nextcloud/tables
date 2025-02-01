@@ -86,6 +86,23 @@ Cypress.Commands.add('createTable', (title) => {
 	cy.contains('h1', title).should('be.visible')
 })
 
+Cypress.Commands.add('deleteTable', (title) => {
+	cy.get('[data-cy="navigationTableItem"]').contains(title).click({ force: true })
+	cy.get('[data-cy="customTableAction"] button').click()
+	cy.get('[data-cy="dataTableEditTableBtn"]').click()
+	cy.get('[data-cy="editTableModal"] [data-cy="editTableDeleteBtn"]').click()
+	cy.get('[data-cy="editTableModal"] [data-cy="editTableConfirmDeleteBtn"]').click()
+	cy.wait(10).get('.toastify.toast-success').should('be.visible')
+	cy.get('[data-cy="navigationTableItem"]').contains('to do list').should('not.exist')
+})
+
+
+Cypress.Commands.add('deleteRow', (rowIndex) => {
+	cy.get('[data-cy="ncTable"] [data-cy="editRowBtn"]').eq(rowIndex).click()
+	cy.get('[data-cy="editRowDeleteButton"]').click({ force: true })
+	cy.get('[data-cy="editRowDeleteConfirmButton"]').click({ force: true })
+})
+
 Cypress.Commands.add('createView', (title) => {
 	cy.get('[data-cy="customTableAction"] button').click()
 	cy.get('[data-cy="dataTableCreateViewBtn"]').contains('Create view').click({ force: true })
@@ -123,6 +140,7 @@ Cypress.Commands.add('createContext', (title) => {
 
 Cypress.Commands.add('openContextEditModal', (title) => {
 	cy.get(`[data-cy="navigationContextItem"]:contains("${title}")`).find('button').click({ force: true })
+	cy.wait(1000)
 	cy.get('[data-cy="navigationContextEditBtn"]').contains('Edit application').click({ force: true })
 	cy.get('[data-cy="editContextModal"]').should('be.visible')
 })
@@ -142,7 +160,7 @@ Cypress.Commands.add('sortTableColumn', (columnTitle, mode = 'ASC') => {
 })
 
 Cypress.Commands.add('loadTable', (name) => {
-	cy.get('[data-cy="navigationTableItem"] a[title="' + name + '"]').click({ force: true })
+	cy.get('[data-cy="navigationTableItem"] a[title="' + name + '"]').last().click({ force: true })
 })
 
 Cypress.Commands.add('loadView', (name) => {
