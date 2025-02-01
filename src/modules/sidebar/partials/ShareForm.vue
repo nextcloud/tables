@@ -5,7 +5,7 @@
 <template>
 	<div class="row space-B">
 		<h3>{{ t('tables', 'Share with accounts or groups') }}</h3>
-		<NcSelect id="ajax" style="width: 100%;" :clear-on-select="true" :hide-selected="true" :internal-search="false"
+		<NcSelect id="ajax" style="width: 100%;" data-cy="shareFormSelect" :clear-on-select="true" :hide-selected="true" :internal-search="false"
 			:loading="loading" :options="options" :placeholder="t('tables', 'User or group name …')"
 			:preselect-first="true" :preserve-search="true" :searchable="true" :user-select="true"
 			:get-option-key="(option) => option.key" :aria-label-combobox="t('tables', 'User or group name …')"
