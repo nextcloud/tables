@@ -29,8 +29,10 @@ describe('Share a table', () => {
 		cy.loadTable(tableTitle)
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('[data-cy="dataTableShareBtn"]').click()
+		
+		cy.intercept({ method: 'GET', url: `**/autocomplete/get?search=${localUser2.userId}&**` }).as('userSearch')
 		cy.get('[data-cy="shareFormSelect"] input').type(localUser2.userId)
-		cy.wait(1000)
+		cy.wait('@userSearch')
 		cy.get(`.vs__dropdown-menu [user="${localUser2.userId}"]`).click()
 		cy.wait(1000)
 		cy.get('[data-cy="sharedWithList"]').contains(localUser2.userId).should('exist')
