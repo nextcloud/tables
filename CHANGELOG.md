@@ -5,6 +5,42 @@
 
 # Changelog
 
+## 0.9.0-beta.2
+
+### Added
+
+* [Feat(Templates): extend the tutorial table (tables#1535)](https://github.com/nextcloud/tables/pull/1535)
+* [Feat: migrate from vuex to pinia (tables#1540)](https://github.com/nextcloud/tables/pull/1540)
+
+### Fixed
+
+* [Fix(Favorites): repair runtime cache population (tables#1542)](https://github.com/nextcloud/tables/pull/1542)
+* [Chore(i18n): Improved wording (tables#1549)](https://github.com/nextcloud/tables/pull/1549)
+* [Fix: wrap usergroup's cell values (tables#1551)](https://github.com/nextcloud/tables/pull/1551)
+* [Chore(i18n): Improved grammar (tables#1567)](https://github.com/nextcloud/tables/pull/1567)
+* [Build(NC): bump max compatible NC version (tables#1569)](https://github.com/nextcloud/tables/pull/1569)
+* [Enh(Cypress): improve some selectors (tables#1572)](https://github.com/nextcloud/tables/pull/1572)
+* [Ci(config): stop updates for 0.7, enable PHP updates in renovate (tables#1560)](https://github.com/nextcloud/tables/pull/1560)
+
+
+### Dependencies
+
+* [Deps(PHP): update phpoffice/phpspreadsheet (tables#1561)](https://github.com/nextcloud/tables/pull/1561)
+* [Fix(deps): update dependency @nextcloud/files to ^3.10.1 (main) (tables#1501)](https://github.com/nextcloud/tables/pull/1501)
+* [Fix(deps): update dependency @nextcloud/moment to ^1.3.2 (main) (tables#1502)](https://github.com/nextcloud/tables/pull/1502)
+* [[main] Fix npm audit (tables#1513)](https://github.com/nextcloud/tables/pull/1513)
+* [Fix(deps): update dependency @nextcloud/dialogs to ^6.1.1 (main) (tables#1554)](https://github.com/nextcloud/tables/pull/1554)
+* [Chore(dev-deps): Bump nextcloud/ocp package (tables#1557)](https://github.com/nextcloud/tables/pull/1557)
+* [Chore(deps): update actions/checkout digest to 1e31de5 (main) (tables#1574)](https://github.com/nextcloud/tables/pull/1574)
+* [Chore(deps): update alexwilson/enable-github-automerge-action digest to 4729e0d (main) (tables#1575)](https://github.com/nextcloud/tables/pull/1575)
+* [Chore(deps): update dependency bamarni/composer-bin-plugin to ^1.8.2 (main) (tables#1576)](https://github.com/nextcloud/tables/pull/1576)
+* [Chore(deps): update dependency staabm/annotate-pull-request-from-checkstyle to ^1.8.5 (main) (tables#1577)](https://github.com/nextcloud/tables/pull/1577)
+* [Fix(deps): update dependency pinia to ^2.3.1 (main) (tables#1579)](https://github.com/nextcloud/tables/pull/1579)
+* [Fix(deps): update tiptap to ^2.11.5 (main) (tables#1580)](https://github.com/nextcloud/tables/pull/1580)
+* [Chore(deps): update dependency psalm/phar to ^5.26.1 (main) (tables#1583)](https://github.com/nextcloud/tables/pull/1583)
+* [[main] Fix npm audit (tables#1585)](https://github.com/nextcloud/tables/pull/1585)
+* [Chore(deps): update dependency openapi-typescript to ^7.6.1 (main) (tables#1587)](https://github.com/nextcloud/tables/pull/1587)
+
 ## 0.9.0-beta.1
 
 ### Added
