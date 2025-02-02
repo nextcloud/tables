@@ -13,7 +13,7 @@
 		"nextcloud/coding-standard": "^v1.0.0",
 		"nextcloud/ocp": "dev-master",
 		"staabm/annotate-pull-request-from-checkstyle": "^1.8.5",
-		"phpunit/phpunit": "^9",
+		"phpunit/phpunit": "^11",
 		"psalm/phar": "^5.26.1",
 		"bamarni/composer-bin-plugin": "^1.8.2"
 	},
