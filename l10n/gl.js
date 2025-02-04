@@ -130,6 +130,7 @@ OC.L10N.register(
     "Create applications" : "Crear aplicacións",
     "Combine different tables and views into no-code applications for any purpose. This makes them easily accessible directly in the app bar." : "Combinar diferentes táboas e vistas en aplicacións sen código para calquera propósito. Isto fai que sexa doado acceder a elas directamente na barra de aplicacións.",
     "Read the docs" : "Lea os documentos",
+    "If you want to go through the documentation, it can be found here: [Nextcloud Tables documentation](%s)" : "Se quere consultar a documentación, pode atopala aquí: [Documentación de Táboas de NextCloud](%s)",
     "Check yourself!" : "Comprobeo Vde. mesmo!",
     "Tables" : "Táboas",
     "Manage data the way you need it." : "Xestione os datos da forma que necesite.",
