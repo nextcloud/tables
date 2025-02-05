@@ -5,6 +5,20 @@
 
 # Changelog
 
+## 0.8.4
+
+### Fixed
+
+* [[stable0.8] fix(Favorites): repair runtime cache population (tables#1543)](https://github.com/nextcloud/tables/pull/1543)
+* [[stable0.8] enh: warn during table manager promotion/demotion (tables#1552)](https://github.com/nextcloud/tables/pull/1552)
+* [[stable0.8] chore(i18n): Improved wording (tables#1564)](https://github.com/nextcloud/tables/pull/1564)
+* [[stable0.8] enh(Cypress): improve some selectors (tables#1573)](https://github.com/nextcloud/tables/pull/1573)
+* [[stable0.8] fix: wrap usergroup's cell values (tables#1563)](https://github.com/nextcloud/tables/pull/1563)
+
+### Dependencies
+* [[stable0.8] deps(PHP): update phpoffice/phpspreadsheet (tables#1562)](https://github.com/nextcloud/tables/pull/1562)
+* [[stable0.8] Fix npm audit (tables#1586)](https://github.com/nextcloud/tables/pull/1586)
+
 ## 0.8.3
 
 ### Fixed
