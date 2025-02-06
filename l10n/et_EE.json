@@ -21,11 +21,13 @@
     "Done" : "Valmis",
     "Create" : "Loo",
     "Today" : "Täna",
+    "Text" : "Tekst",
     "Link" : "Link",
     "Move" : "Liiguta",
     "Metadata" : "Metaandmed",
     "Operator" : "Operaator",
     "Views" : "Vaated",
+    "View" : "Vaata",
     "Shares" : "Jagamisi",
     "Actions" : "Tegevused",
     "Share" : "Jaga",
@@ -63,14 +65,17 @@
     "Download" : "Laadi alla",
     "Search" : "Otsi",
     "Undo" : "Tühista",
+    "Redo" : "Tee uuesti",
     "Prefix" : "Eesliide",
     "Suffix" : "Järelliide",
     "Default" : "Vaikeväärtus",
+    "Options" : "Sätted",
     "URL" : "URL",
     "Copy link" : "Kopeeri link",
     "Confirm" : "Kinnita",
     "Content" : "Sisu",
     "Select" : "Vali",
-    "ID" : "ID"
+    "ID" : "ID",
+    "Clipboard is not available" : "Lõikelauda ei ole saadaval"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
