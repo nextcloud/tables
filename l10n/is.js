@@ -63,6 +63,7 @@ OC.L10N.register(
     "Filter" : "Sía",
     "Sort" : "Flokka",
     "Export" : "Flytja út",
+    "Add to favorites" : "Bæta í eftirlæti",
     "Remove from favorites" : "Fjarlægja úr eftirlætum",
     "Copy" : "Afrita",
     "Favorites" : "Eftirlæti",
