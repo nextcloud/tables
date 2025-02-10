@@ -11,7 +11,7 @@
 	],
     "require-dev": {
 		"nextcloud/coding-standard": "^v1.0.0",
-		"nextcloud/ocp": "dev-master",
+		"nextcloud/ocp": "dev-stable29",
 		"staabm/annotate-pull-request-from-checkstyle": "^1.8.5",
 		"phpunit/phpunit": "^9",
 		"psalm/phar": "^5.26.1",
@@ -21,7 +21,7 @@
 		"optimize-autoloader": true,
 		"classmap-authoritative": true,
 		"platform": {
-			"php": "8.1"
+			"php": "8.0"
 		},
 		"allow-plugins": {
 			"bamarni/composer-bin-plugin": true
