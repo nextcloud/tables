@@ -439,7 +439,7 @@ OC.L10N.register(
     "Column manage actions" : "Akcie spravovania stĺpca",
     "Hide column" : "Skryť stĺpec",
     "Undo" : "Odvolať",
-    "Redo" : "Obnoviť",
+    "Redo" : "Vrátiť",
     "Bold" : "Tučné",
     "Italic" : "Kurzíva",
     "Bullet list" : "Zoznam odrážok",
