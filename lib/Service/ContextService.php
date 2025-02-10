@@ -36,18 +36,18 @@ use Psr\Log\LoggerInterface;
 class ContextService {
 
 	public function __construct(
-		private ContextMapper             $contextMapper,
+		private ContextMapper $contextMapper,
 		private ContextNodeRelationMapper $contextNodeRelMapper,
-		private PageMapper                $pageMapper,
-		private PageContentMapper         $pageContentMapper,
-		private LoggerInterface           $logger,
-		private PermissionsService        $permissionsService,
-		private IUserManager              $userManager,
-		private IEventDispatcher          $eventDispatcher,
-		private IDBConnection             $dbc,
-		private ShareService              $shareService,
-		private bool                      $isCLI,
-		protected INavigationManager      $navigationManager,
+		private PageMapper $pageMapper,
+		private PageContentMapper $pageContentMapper,
+		private LoggerInterface $logger,
+		private PermissionsService $permissionsService,
+		private IUserManager $userManager,
+		private IEventDispatcher $eventDispatcher,
+		private IDBConnection $dbc,
+		private ShareService $shareService,
+		private bool $isCLI,
+		protected INavigationManager $navigationManager,
 		protected IURLGenerator $urlGenerator,
 	) {
 	}

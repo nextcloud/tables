@@ -21,7 +21,7 @@ trait Errors {
 		try {
 			return new DataResponse($callback());
 		} catch (PermissionError $e) {
-			$this->logger->warning('A permission error occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (NotFoundError $e) {
@@ -33,7 +33,7 @@ trait Errors {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
 		} catch (InternalError|\Exception $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}

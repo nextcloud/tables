@@ -28,7 +28,7 @@ class NavigationController extends \OC\Core\Controller\NavigationController {
 		string $appName,
 		IRequest $request,
 		INavigationManager $navigationManager,
-		IURLGenerator $urlGenerator
+		IURLGenerator $urlGenerator,
 	) {
 		parent::__construct($appName, $request, $navigationManager, $urlGenerator);
 	}

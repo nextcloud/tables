@@ -104,7 +104,7 @@ class Row2Mapper {
 	public function findNextId(int $offsetId = -1): ?int {
 		try {
 			$rowSleeve = $this->rowSleeveMapper->findNext($offsetId);
-		} catch (MultipleObjectsReturnedException | Exception $e) {
+		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (DoesNotExistException $e) {
@@ -314,7 +314,7 @@ class Row2Mapper {
 
 				// if column id is unknown
 			} else {
-				$e = new Exception("Needed column (" . $columnId . ") not found.");
+				$e = new Exception('Needed column (' . $columnId . ') not found.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
@@ -497,7 +497,7 @@ class Row2Mapper {
 			case 'datetime-date-start-of-month': return date('Y-m-01') ? date('Y-m-01') : '';
 			case 'datetime-date-start-of-week':
 				$day = date('w');
-				$result = date('Y-m-d', strtotime('-'.$day.' days'));
+				$result = date('Y-m-d', strtotime('-' . $day . ' days'));
 				return  $result ?: '';
 			case 'datetime-time-now': return date('H:i');
 			case 'datetime-now': return date('Y-m-d H:i') ? date('Y-m-d H:i') : '';
@@ -536,7 +536,7 @@ class Row2Mapper {
 
 			$columnType = $this->columns[$rowData['column_id']]->getType();
 			$cellClassName = 'OCA\Tables\Db\RowCell' . ucfirst($columnType);
-			$entity = call_user_func($cellClassName .'::fromRowData', $rowData); // >5.2.3
+			$entity = call_user_func($cellClassName . '::fromRowData', $rowData); // >5.2.3
 			$cellMapper = $this->getCellMapperFromType($columnType);
 			$value = $cellMapper->formatEntity($this->columns[$rowData['column_id']], $entity);
 			$compositeKey = (string)$rowData['row_id'] . ',' . (string)$rowData['column_id'];
@@ -622,7 +622,7 @@ class Row2Mapper {
 			$sleeve = $this->rowSleeveMapper->find($row->getId());
 			$this->updateMetaData($sleeve);
 			$this->rowSleeveMapper->update($sleeve);
-		} catch (DoesNotExistException | MultipleObjectsReturnedException | Exception $e) {
+		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
@@ -686,9 +686,9 @@ class Row2Mapper {
 	 */
 	private function insertCell(int $rowId, int $columnId, $value, ?string $lastEditAt = null, ?string $lastEditBy = null): void {
 		if (!isset($this->columns[$columnId])) {
-			$e = new Exception("Can not insert cell, because the given column-id is not known");
+			$e = new Exception('Can not insert cell, because the given column-id is not known');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 
@@ -757,7 +757,7 @@ class Row2Mapper {
 			$this->insertCell($rowId, $columnId, $value);
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
 
@@ -781,13 +781,13 @@ class Row2Mapper {
 	}
 
 	private function getCellMapperFromType(string $columnType): RowCellMapperSuper {
-		$cellMapperClassName = 'OCA\Tables\Db\RowCell'.ucfirst($columnType).'Mapper';
+		$cellMapperClassName = 'OCA\Tables\Db\RowCell' . ucfirst($columnType) . 'Mapper';
 		/** @var RowCellMapperSuper $cellMapper */
 		try {
 			return Server::get($cellMapperClassName);
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
 

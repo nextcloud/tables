@@ -114,7 +114,7 @@ class View extends Entity implements JsonSerializable {
 	}
 
 	private function getArray(?string $json): array {
-		if ($json !== "" && $json !== null && $json !== 'null') {
+		if ($json !== '' && $json !== null && $json !== 'null') {
 			return \json_decode($json, true);
 		} else {
 			return [];
@@ -162,10 +162,10 @@ class View extends Entity implements JsonSerializable {
 			'lastEditAt' => $this->lastEditAt ?: '',
 			'columns' => $this->getColumnsArray(),
 			'sort' => $this->getSortArray(),
-			'isShared' => !!$this->isShared,
+			'isShared' => (bool)$this->isShared,
 			'favorite' => $this->favorite,
 			'onSharePermissions' => $this->getSharePermissions()?->jsonSerialize(),
-			'hasShares' => !!$this->hasShares,
+			'hasShares' => (bool)$this->hasShares,
 			'rowsCount' => $this->rowsCount ?: 0,
 			'ownerDisplayName' => $this->ownerDisplayName,
 		];

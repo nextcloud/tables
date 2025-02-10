@@ -100,7 +100,7 @@ class Row2 implements JsonSerializable {
 		$columnId = $entry['columnId'];
 		$value = $entry['value'];
 		foreach ($this->data as &$cell) {
-			if($cell['columnId'] === $columnId) {
+			if ($cell['columnId'] === $columnId) {
 				if ($cell['value'] != $value) { // yes, no type safety here
 					$cell['value'] = $value;
 					$this->addChangedColumnId($columnId);

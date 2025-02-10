@@ -28,9 +28,9 @@ final class Row implements JsonSerializable {
 		/** @readonly */
 		public int $rowId,
 		/** @readonly */
-		public null|array $previousValues = null,
+		public ?array $previousValues = null,
 		/** @readonly */
-		public null|array $values = null,
+		public ?array $values = null,
 	) {
 	}
 

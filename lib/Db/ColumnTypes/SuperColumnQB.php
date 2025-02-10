@@ -27,7 +27,7 @@ class SuperColumnQB implements IColumnTypeQB {
 
 	public function formatCellValue(string $unformattedValue): string {
 		if ($this->platform === self::DB_PLATFORM_PGSQL) {
-			return 'LOWER('.$unformattedValue.')';
+			return 'LOWER(' . $unformattedValue . ')';
 		} elseif ($this->platform === self::DB_PLATFORM_SQLITE) {
 			return $unformattedValue;
 		} else { // mariadb / mysql
@@ -65,31 +65,31 @@ class SuperColumnQB implements IColumnTypeQB {
 			case 'begins-with':
 			case 'ends-with':
 			case 'contains':
-				return $formattedCellValue.' LIKE :'.$searchValuePlaceHolder;
+				return $formattedCellValue . ' LIKE :' . $searchValuePlaceHolder;
 			case 'is-equal':
-				return $formattedCellValue.' = :'.$searchValuePlaceHolder;
+				return $formattedCellValue . ' = :' . $searchValuePlaceHolder;
 			case 'is-greater-than':
-				return $formattedCellValue.' > :'.$searchValuePlaceHolder;
+				return $formattedCellValue . ' > :' . $searchValuePlaceHolder;
 			case 'is-greater-than-or-equal':
-				return $formattedCellValue.' >= :'.$searchValuePlaceHolder;
+				return $formattedCellValue . ' >= :' . $searchValuePlaceHolder;
 			case 'is-lower-than':
-				return $formattedCellValue.' < :'.$searchValuePlaceHolder;
+				return $formattedCellValue . ' < :' . $searchValuePlaceHolder;
 			case 'is-lower-than-or-equal':
-				return $formattedCellValue.' <= :'.$searchValuePlaceHolder;
+				return $formattedCellValue . ' <= :' . $searchValuePlaceHolder;
 			case 'is-empty':
-				return $formattedCellValue.' = \'\' OR '.$formattedCellValue.' IS NULL';
+				return $formattedCellValue . ' = \'\' OR ' . $formattedCellValue . ' IS NULL';
 			default:
-				throw new InternalError('Operator '.$operator.' is not supported.');
+				throw new InternalError('Operator ' . $operator . ' is not supported.');
 		}
 	}
 
 	private function getFormattedDataCellValue(string $columnPlaceHolder, int $columnId): string {
 		if ($this->platform === self::DB_PLATFORM_PGSQL) {
-			$cellValue = 'c'.$columnId.' ->> \'value\'';
+			$cellValue = 'c' . $columnId . ' ->> \'value\'';
 		} elseif ($this->platform === self::DB_PLATFORM_SQLITE) {
-			$cellValue = 'json_extract(t2.value, "$.columnId") = '.$columnId.' AND LOWER(json_extract(t2.value, "$.value"))';
+			$cellValue = 'json_extract(t2.value, "$.columnId") = ' . $columnId . ' AND LOWER(json_extract(t2.value, "$.value"))';
 		} else {
-			$cellValue = 'JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'$[*].columnId\'), \'one\', :'.$columnPlaceHolder.')), \'.value\'))';
+			$cellValue = 'JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'$[*].columnId\'), \'one\', :' . $columnPlaceHolder . ')), \'.value\'))';
 		}
 
 		return $this->formatCellValue($cellValue);
@@ -125,10 +125,10 @@ class SuperColumnQB implements IColumnTypeQB {
 	 * @throws InternalError
 	 */
 	public function addWhereFilterExpression(IQueryBuilder $qb, array $filter, string $filterId): IQueryFunction {
-		$searchValuePlaceHolder = 'searchValue'.$filterId; // qb parameter binding name
+		$searchValuePlaceHolder = 'searchValue' . $filterId; // qb parameter binding name
 		$this->passSearchValue($qb, $filter['value'], $filter['operator'], $searchValuePlaceHolder);
-		$columnPlaceHolder = 'column'.$filterId; // qb parameter binding name
-		if($filter['columnId'] < 0) { // negative ids for meta data columns
+		$columnPlaceHolder = 'column' . $filterId; // qb parameter binding name
+		if ($filter['columnId'] < 0) { // negative ids for meta data columns
 			return $qb->createFunction($this->sqlFilterOperation($filter['operator'], $this->getMetaColumnName($filter['columnId']), $searchValuePlaceHolder));
 		}
 

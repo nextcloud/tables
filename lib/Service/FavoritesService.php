@@ -26,7 +26,7 @@ class FavoritesService {
 	public function __construct(
 		IDBConnection $connection,
 		PermissionsService $permissionsService,
-		?string $userId
+		?string $userId,
 	) {
 		$this->connection = $connection;
 		$this->permissionsService = $permissionsService;

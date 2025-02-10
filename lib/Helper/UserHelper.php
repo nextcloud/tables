@@ -45,7 +45,7 @@ class UserHelper {
 		if ($user instanceof IUser) {
 			return $user;
 		}
-		throw new InternalError('User not found for '.$userId);
+		throw new InternalError('User not found for ' . $userId);
 	}
 
 	/**

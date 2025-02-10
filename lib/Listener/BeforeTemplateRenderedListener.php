@@ -18,7 +18,7 @@ use OCP\IUserSession;
  */
 class BeforeTemplateRenderedListener implements IEventListener {
 	public function __construct(
-		protected IUserSession   $userSession,
+		protected IUserSession $userSession,
 		protected ContextService $contextService,
 	) {
 	}

@@ -17,8 +17,8 @@ class SelectionBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	 * @return string
 	 */
 	public function parseValue($value, ?Column $column = null): string {
-		if(!$column) {
-			$this->logger->warning('No column given, but expected on '.__FUNCTION__.' within '.__CLASS__, ['exception' => new \Exception()]);
+		if (!$column) {
+			$this->logger->warning('No column given, but expected on ' . __FUNCTION__ . ' within ' . __CLASS__, ['exception' => new \Exception()]);
 			return '';
 		}
 
@@ -26,13 +26,13 @@ class SelectionBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		if ((string)$intValue === (string)$value) {
 			// if it seems to be an option ID
 			foreach ($column->getSelectionOptionsArray() as $option) {
-				if($option['id'] === $intValue && $option['label'] !== $value) {
+				if ($option['id'] === $intValue && $option['label'] !== $value) {
 					return json_encode($option['id']);
 				}
 			}
 		} else {
 			foreach ($column->getSelectionOptionsArray() as $option) {
-				if($option['label'] === $value) {
+				if ($option['label'] === $value) {
 					return json_encode($option['id']);
 				}
 			}
@@ -47,25 +47,25 @@ class SelectionBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	 * @return bool
 	 */
 	public function canBeParsed($value, ?Column $column = null): bool {
-		if(!$column) {
-			$this->logger->warning('No column given, but expected on '.__FUNCTION__.' within '.__CLASS__, ['exception' => new \Exception()]);
+		if (!$column) {
+			$this->logger->warning('No column given, but expected on ' . __FUNCTION__ . ' within ' . __CLASS__, ['exception' => new \Exception()]);
 			return false;
 		}
-		if($value === null) {
+		if ($value === null) {
 			return true;
 		}
 
-		$intValue = (int) $value;
-		if ((string) $intValue === (string) $value) {
+		$intValue = (int)$value;
+		if ((string)$intValue === (string)$value) {
 			// if it seems to be an option ID
 			foreach ($column->getSelectionOptionsArray() as $option) {
-				if($option['id'] === $intValue && $option['label'] !== $value) {
+				if ($option['id'] === $intValue && $option['label'] !== $value) {
 					return true;
 				}
 			}
 		} else {
 			foreach ($column->getSelectionOptionsArray() as $option) {
-				if($option['label'] === $value) {
+				if ($option['label'] === $value) {
 					return true;
 				}
 			}

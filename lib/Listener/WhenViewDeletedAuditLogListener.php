@@ -16,7 +16,9 @@ use OCP\EventDispatcher\IEventListener;
  * @template-implements IEventListener<Event|ViewDeletedEvent>
  */
 final class WhenViewDeletedAuditLogListener implements IEventListener {
-	public function __construct(protected AuditLogServiceInterface $auditLogService) {
+	public function __construct(
+		protected AuditLogServiceInterface $auditLogService,
+	) {
 	}
 
 	public function handle(Event $event): void {

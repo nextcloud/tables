@@ -33,7 +33,7 @@ class TextLinkBusiness extends SuperBusiness implements IColumnTypeBusiness {
 
 		// if is json (this is the default case, other formats are backward compatibility
 		$data = json_decode($value, true);
-		if($data !== null) {
+		if ($data !== null) {
 			if (isset($data['resourceUrl'])) {
 				return json_encode(json_encode([
 					'title' => $data['title'] ?? $data['resourceUrl'],
@@ -42,10 +42,10 @@ class TextLinkBusiness extends SuperBusiness implements IColumnTypeBusiness {
 				]));
 			}
 			// at least title and resUrl have to be set
-			if(isset($data['title']) && isset($data['value'])) {
+			if (isset($data['title']) && isset($data['value'])) {
 				return json_encode($value);
 			} else {
-				$this->logger->warning("Link cell value has incomplete json string.");
+				$this->logger->warning('Link cell value has incomplete json string.');
 				return '';
 			}
 		}
@@ -77,16 +77,16 @@ class TextLinkBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		}
 
 		$data = json_decode($value, true);
-		if($data !== null) {
+		if ($data !== null) {
 			if (!isset($data['resourceUrl']) && !isset($data['value'])) {
-				$this->logger->error('Value ' . $value . ' cannot be parsed as the column ' . $column->getId(). ' as it contains incomplete data');
+				$this->logger->error('Value ' . $value . ' cannot be parsed as the column ' . $column->getId() . ' as it contains incomplete data');
 				return false;
 			}
 
 			// Validate url providers
 			$allowedProviders = explode(',', $column->getTextAllowedPattern() ?? '') ?: [];
 			if (isset($data['providerId']) && !in_array($data['providerId'], $allowedProviders)) {
-				$this->logger->error('Value ' . $value . ' cannot be parsed as the column ' . $column->getId(). ' does not allow the provider: ' . $data['providerId']);
+				$this->logger->error('Value ' . $value . ' cannot be parsed as the column ' . $column->getId() . ' does not allow the provider: ' . $data['providerId']);
 				return false;
 			}
 

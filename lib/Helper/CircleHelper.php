@@ -27,7 +27,7 @@ class CircleHelper {
 	 */
 	public function __construct(
 		private LoggerInterface $logger,
-		IAppManager     $appManager
+		IAppManager $appManager,
 	) {
 		$this->circlesEnabled = $appManager->isEnabledForUser('circles');
 		$this->circlesManager = null;

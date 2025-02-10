@@ -24,12 +24,12 @@ class UsergroupBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	 * @return string
 	 */
 	public function parseValue($value, ?Column $column = null): string {
-		if(!$column) {
-			$this->logger->warning('No column given, but expected on '.__FUNCTION__.' within '.__CLASS__, ['exception' => new \Exception()]);
+		if (!$column) {
+			$this->logger->warning('No column given, but expected on ' . __FUNCTION__ . ' within ' . __CLASS__, ['exception' => new \Exception()]);
 			return json_encode([]);
 		}
 
-		if($value === null) {
+		if ($value === null) {
 			return json_encode([]);
 		}
 
@@ -42,12 +42,12 @@ class UsergroupBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	 * @return bool
 	 */
 	public function canBeParsed($value, ?Column $column = null): bool {
-		if(!$column) {
-			$this->logger->warning('No column given, but expected on '.__FUNCTION__.' within '.__CLASS__, ['exception' => new \Exception()]);
+		if (!$column) {
+			$this->logger->warning('No column given, but expected on ' . __FUNCTION__ . ' within ' . __CLASS__, ['exception' => new \Exception()]);
 			return false;
 		}
 
-		if($value === null) {
+		if ($value === null) {
 			return true;
 		}
 
@@ -56,7 +56,7 @@ class UsergroupBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		}
 
 		foreach ($value as $v) {
-			if((array_key_exists('id', $v) && !is_string($v['id'])) && (array_key_exists('type', $v) && !is_int($v['type']))) {
+			if ((array_key_exists('id', $v) && !is_string($v['id'])) && (array_key_exists('type', $v) && !is_int($v['type']))) {
 				return false;
 			}
 		}

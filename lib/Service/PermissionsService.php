@@ -49,14 +49,14 @@ class PermissionsService {
 
 	public function __construct(
 		LoggerInterface $logger,
-		?string         $userId,
-		TableMapper     $tableMapper,
-		ViewMapper      $viewMapper,
-		ShareMapper     $shareMapper,
-		ContextMapper   $contextMapper,
-		UserHelper      $userHelper,
-		CircleHelper    $circleHelper,
-		bool            $isCLI
+		?string $userId,
+		TableMapper $tableMapper,
+		ViewMapper $viewMapper,
+		ShareMapper $shareMapper,
+		ContextMapper $contextMapper,
+		UserHelper $userHelper,
+		CircleHelper $circleHelper,
+		bool $isCLI,
 	) {
 		$this->tableMapper = $tableMapper;
 		$this->viewMapper = $viewMapper;
@@ -84,7 +84,7 @@ class PermissionsService {
 
 		if ($userId === null) {
 			$e = new \Exception();
-			$error = 'PreCheck for userId failed, requested in '. get_class($this) .'.';
+			$error = 'PreCheck for userId failed, requested in ' . get_class($this) . '.';
 			$this->logger->debug($error, ['exception' => new \Exception()]);
 			throw new InternalError($error);
 		}
@@ -199,7 +199,7 @@ class PermissionsService {
 		} elseif ($nodeType === 'context') {
 			return $this->canManageContextById($elementId, $userId);
 		} else {
-			throw new InternalError('Cannot read permission for node type '.$nodeType);
+			throw new InternalError('Cannot read permission for node type ' . $nodeType);
 		}
 	}
 
@@ -230,7 +230,7 @@ class PermissionsService {
 			$this->logger->warning('No table was found for this id');
 			return false;
 		} catch (Exception $e) {
-			$this->logger->warning('Error occurred: '.$e->getMessage());
+			$this->logger->warning('Error occurred: ' . $e->getMessage());
 			return false;
 		}
 		return $this->canManageTable($table, $userId);
@@ -245,8 +245,8 @@ class PermissionsService {
 		} catch (DoesNotExistException $e) {
 			$this->logger->warning('No table was found for this id');
 			return false;
-		} catch (InternalError | Exception $e) {
-			$this->logger->warning('Error occurred: '.$e->getMessage());
+		} catch (InternalError|Exception $e) {
+			$this->logger->warning('Error occurred: ' . $e->getMessage());
 			return false;
 		}
 		return $this->canManageView($view, $userId);
@@ -434,14 +434,14 @@ class PermissionsService {
 		try {
 			$shares = $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userId);
 		} catch (Exception $e) {
-			$this->logger->warning('Exception occurred: '.$e->getMessage().' Permission denied.');
+			$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Permission denied.');
 			return new Permissions();
 		}
 
 		try {
 			$userGroups = $this->userHelper->getGroupsForUser($userId);
 		} catch (InternalError $e) {
-			$this->logger->warning('Exception occurred: '.$e->getMessage().' Permission denied.');
+			$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Permission denied.');
 			return new Permissions();
 		}
 		$groupShares = [];
@@ -449,7 +449,7 @@ class PermissionsService {
 			try {
 				$groupShares[] = $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userGroup->getGid(), 'group');
 			} catch (Exception $e) {
-				$this->logger->warning('Exception occurred: '.$e->getMessage().' Permission denied.');
+				$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Permission denied.');
 				return new Permissions();
 			}
 		}
@@ -503,7 +503,7 @@ class PermissionsService {
 				manage: $manage,
 			);
 		}
-		throw new NotFoundError('No share for '.$elementType.' and given user ID found.');
+		throw new NotFoundError('No share for ' . $elementType . ' and given user ID found.');
 	}
 
 	//  private methods ==========================================================================
@@ -571,7 +571,7 @@ class PermissionsService {
 	 * @return bool
 	 */
 	private function checkPermission(Table|View|Context $element, string $nodeType, string $permission, ?string $userId = null): bool {
-		if($this->basisCheck($element, $nodeType, $userId)) {
+		if ($this->basisCheck($element, $nodeType, $userId)) {
 			return true;
 		}
 
@@ -604,7 +604,7 @@ class PermissionsService {
 	 * @return bool
 	 */
 	private function checkPermissionById(int $elementId, string $nodeType, string $permission, ?string $userId = null): bool {
-		if($this->basisCheckById($elementId, $nodeType, $userId)) {
+		if ($this->basisCheckById($elementId, $nodeType, $userId)) {
 			return true;
 		}
 		if ($userId) {
@@ -671,7 +671,7 @@ class PermissionsService {
 			$element = $nodeType === 'table' ? $this->tableMapper->find($elementId) : $this->viewMapper->find($elementId);
 			return $this->basisCheck($element, $nodeType, $userId);
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|\Exception $e) {
-			$this->logger->warning('Exception occurred: '.$e->getMessage());
+			$this->logger->warning('Exception occurred: ' . $e->getMessage());
 		}
 		return false;
 	}

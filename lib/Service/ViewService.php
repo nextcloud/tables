@@ -60,7 +60,7 @@ class ViewService extends SuperService {
 		FavoritesService $favoritesService,
 		IEventDispatcher $eventDispatcher,
 		ContextService $contextService,
-		IL10N $l
+		IL10N $l,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->l = $l;
@@ -86,7 +86,7 @@ class ViewService extends SuperService {
 		try {
 			// security
 			if (!$this->permissionsService->canManageTable($table, $userId)) {
-				throw new PermissionError('PermissionError: can not read views for tableId '.$table->getId());
+				throw new PermissionError('PermissionError: can not read views for tableId ' . $table->getId());
 			}
 
 			$allViews = $this->mapper->findAll($table->getId());
@@ -128,18 +128,18 @@ class ViewService extends SuperService {
 			$view = $this->mapper->find($id);
 		} catch (InternalError|\OCP\DB\Exception|MultipleObjectsReturnedException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// security
 
 		if (!$this->permissionsService->canAccessView($view, $userId)) {
-			throw new PermissionError('PermissionError: can not read view with id '.$id);
+			throw new PermissionError('PermissionError: can not read view with id ' . $id);
 		}
-		if(!$skipEnhancement) {
+		if (!$skipEnhancement) {
 			$this->enhanceView($view, $userId);
 		}
 
@@ -204,7 +204,7 @@ class ViewService extends SuperService {
 		$time = new DateTime();
 		$item = new View();
 		$item->setTitle($title);
-		if($emoji) {
+		if ($emoji) {
 			$item->setEmoji($emoji);
 		}
 		$item->setDescription('');
@@ -311,15 +311,15 @@ class ViewService extends SuperService {
 			$view = $this->mapper->find($id);
 		} catch (InternalError|MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// security
 		if (!$this->permissionsService->canManageView($view, $userId)) {
-			throw new PermissionError('PermissionError: can not delete view with id '.$id);
+			throw new PermissionError('PermissionError: can not delete view with id ' . $id);
 		}
 		$this->shareService->deleteAllForView($view);
 
@@ -336,7 +336,7 @@ class ViewService extends SuperService {
 			return $deletedView;
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
 
@@ -354,7 +354,7 @@ class ViewService extends SuperService {
 		try {
 			// security
 			if (!$this->permissionsService->canManageView($view, $userId)) {
-				throw new PermissionError('PermissionError: can not delete view with id '.$view->getId());
+				throw new PermissionError('PermissionError: can not delete view with id ' . $view->getId());
 			}
 			// delete all shares for that table
 			$this->shareService->deleteAllForView($view);
@@ -481,7 +481,7 @@ class ViewService extends SuperService {
 	public function deleteAllByTable(Table $table, ?string $userId = null): void {
 		// security
 		if (!$this->permissionsService->canManageTable($table, $userId)) {
-			throw new PermissionError('delete all rows for table id = '.$table->getId().' is not allowed.');
+			throw new PermissionError('delete all rows for table id = ' . $table->getId() . ' is not allowed.');
 		}
 		$views = $this->findAll($table, $userId);
 		foreach ($views as $view) {
@@ -551,7 +551,7 @@ class ViewService extends SuperService {
 				$this->enhanceView($view, $userId);
 			}
 			return $views;
-		} catch (InternalError | \OCP\DB\Exception $e) {
+		} catch (InternalError|\OCP\DB\Exception $e) {
 			return [];
 		}
 	}

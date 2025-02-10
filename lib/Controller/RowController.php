@@ -67,7 +67,7 @@ class RowController extends Controller {
 		int $columnId,
 		?int $tableId,
 		?int $viewId,
-		string $data
+		string $data,
 	): DataResponse {
 		return $this->handleError(function () use (
 			$id,
@@ -84,7 +84,7 @@ class RowController extends Controller {
 	public function updateSet(
 		int $id,
 		?int $viewId,
-		array $data
+		array $data,
 
 	): DataResponse {
 		return $this->handleError(function () use (

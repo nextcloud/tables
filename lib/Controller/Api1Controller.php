@@ -67,7 +67,7 @@ class Api1Controller extends ApiController {
 
 
 	public function __construct(
-		IRequest     $request,
+		IRequest $request,
 		TableService $service,
 		ShareService $shareService,
 		ColumnService $columnService,
@@ -78,7 +78,7 @@ class Api1Controller extends ApiController {
 		V1Api $v1Api,
 		LoggerInterface $logger,
 		IL10N $l10N,
-		?string $userId
+		?string $userId,
 	) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->tableService = $service;
@@ -110,7 +110,7 @@ class Api1Controller extends ApiController {
 		try {
 			return new DataResponse($this->tableService->formatTables($this->tableService->findAll($this->userId)));
 		} catch (InternalError|Exception $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -134,7 +134,7 @@ class Api1Controller extends ApiController {
 		try {
 			return new DataResponse($this->tableService->create($title, $template, $emoji)->jsonSerialize());
 		} catch (InternalError|Exception $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -157,7 +157,7 @@ class Api1Controller extends ApiController {
 	public function showScheme(int $tableId): DataResponse {
 		try {
 			$scheme = $this->tableService->getScheme($tableId);
-			return new DataResponse($scheme->jsonSerialize(), http::STATUS_OK, ['Content-Disposition' => 'attachment; filename="'.$scheme->getTitle() . '.json"', 'Content-Type' => 'application/octet-stream']);
+			return new DataResponse($scheme->jsonSerialize(), http::STATUS_OK, ['Content-Disposition' => 'attachment; filename="' . $scheme->getTitle() . '.json"', 'Content-Type' => 'application/octet-stream']);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
@@ -167,7 +167,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (InternalError|Exception $e) {
-			$this->logger->warning('An internal error or exception occurred: '.$e->getMessage());
+			$this->logger->warning('An internal error or exception occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -199,7 +199,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (InternalError|Exception $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -234,7 +234,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (InternalError|Exception $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -266,7 +266,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (InternalError|Exception $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -300,7 +300,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (InternalError|Exception $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -327,11 +327,11 @@ class Api1Controller extends ApiController {
 		try {
 			return new DataResponse($this->viewService->create($title, $emoji, $this->tableService->find($tableId))->jsonSerialize());
 		} catch (PermissionError $e) {
-			$this->logger->warning('A permission error occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError|Exception $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -355,11 +355,11 @@ class Api1Controller extends ApiController {
 		try {
 			return new DataResponse($this->viewService->find($viewId)->jsonSerialize());
 		} catch (PermissionError $e) {
-			$this->logger->warning('A permission error occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
@@ -397,7 +397,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
 		} catch (InternalError|Exception $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -421,11 +421,11 @@ class Api1Controller extends ApiController {
 		try {
 			return new DataResponse($this->viewService->delete($viewId)->jsonSerialize());
 		} catch (PermissionError $e) {
-			$this->logger->warning('A permission error occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
@@ -454,11 +454,11 @@ class Api1Controller extends ApiController {
 		try {
 			return new DataResponse($this->shareService->find($shareId)->jsonSerialize());
 		} catch (PermissionError $e) {
-			$this->logger->warning('A permission error occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
@@ -484,7 +484,7 @@ class Api1Controller extends ApiController {
 		try {
 			return new DataResponse($this->shareService->formatShares($this->shareService->findAll('view', $viewId)));
 		} catch (InternalError $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -506,7 +506,7 @@ class Api1Controller extends ApiController {
 		try {
 			return new DataResponse($this->shareService->formatShares($this->shareService->findAll('table', $tableId)));
 		} catch (InternalError $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -563,11 +563,11 @@ class Api1Controller extends ApiController {
 					$displayMode
 				)->jsonSerialize());
 		} catch (PermissionError $e) {
-			$this->logger->warning('A permission error occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
@@ -594,11 +594,11 @@ class Api1Controller extends ApiController {
 		try {
 			return new DataResponse($this->shareService->delete($shareId)->jsonSerialize());
 		} catch (PermissionError $e) {
-			$this->logger->warning('A permission error occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
@@ -627,11 +627,11 @@ class Api1Controller extends ApiController {
 		try {
 			return new DataResponse($this->shareService->updatePermission($shareId, $permissionType, $permissionValue)->jsonSerialize());
 		} catch (PermissionError $e) {
-			$this->logger->warning('A permission error occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
@@ -675,7 +675,7 @@ class Api1Controller extends ApiController {
 		try {
 			return new DataResponse($this->shareService->updateDisplayMode($shareId, $displayMode, $userId)->jsonSerialize());
 		} catch (InternalError $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
@@ -683,7 +683,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (PermissionError $e) {
-			$this->logger->warning('A permission error occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		}
@@ -710,11 +710,11 @@ class Api1Controller extends ApiController {
 		try {
 			return new DataResponse($this->columnService->formatColumns($this->columnService->findAllByTable($tableId, $viewId)));
 		} catch (PermissionError $e) {
-			$this->logger->warning('A permission error occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -739,11 +739,11 @@ class Api1Controller extends ApiController {
 		try {
 			return new DataResponse($this->columnService->formatColumns($this->columnService->findAllByView($viewId)));
 		} catch (PermissionError $e) {
-			$this->logger->warning('A permission error occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
@@ -823,7 +823,7 @@ class Api1Controller extends ApiController {
 		?bool $usergroupSelectTeams = null,
 		?bool $usergroupShowUserStatus = null,
 
-		?array $selectedViewIds = []
+		?array $selectedViewIds = [],
 	): DataResponse {
 		try {
 			return new DataResponse($this->columnService->create(
@@ -858,7 +858,7 @@ class Api1Controller extends ApiController {
 				$selectedViewIds
 			)->jsonSerialize());
 		} catch (PermissionError $e) {
-			$this->logger->warning('A permission error occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError $e) {
@@ -969,7 +969,7 @@ class Api1Controller extends ApiController {
 			);
 			return new DataResponse($item->jsonSerialize());
 		} catch (InternalError $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -1000,7 +1000,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (InternalError|Exception $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -1031,7 +1031,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (InternalError|Exception $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -1061,7 +1061,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError|Exception $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -1091,7 +1091,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError|Exception $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -1121,7 +1121,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError|Exception $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -1142,10 +1142,10 @@ class Api1Controller extends ApiController {
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function createRowInView(int $viewId, $data): DataResponse {
-		if(is_string($data)) {
+		if (is_string($data)) {
 			$data = json_decode($data, true);
 		}
-		if(!is_array($data)) {
+		if (!is_array($data)) {
 			$this->logger->warning('createRowInView not possible, data array invalid.');
 			$message = ['message' => $this->l10N->t('Could not create row.')];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
@@ -1154,7 +1154,7 @@ class Api1Controller extends ApiController {
 		$dataNew = [];
 		foreach ($data as $key => $value) {
 			$dataNew[] = [
-				'columnId' => (int) $key,
+				'columnId' => (int)$key,
 				'value' => $value
 			];
 		}
@@ -1166,7 +1166,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError|Exception $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -1188,10 +1188,10 @@ class Api1Controller extends ApiController {
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function createRowInTable(int $tableId, $data): DataResponse {
-		if(is_string($data)) {
+		if (is_string($data)) {
 			$data = json_decode($data, true);
 		}
-		if(!is_array($data)) {
+		if (!is_array($data)) {
 			$this->logger->warning('createRowInTable not possible, data array invalid.');
 			$message = ['message' => $this->l10N->t('Could not create row.')];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
@@ -1200,7 +1200,7 @@ class Api1Controller extends ApiController {
 		$dataNew = [];
 		foreach ($data as $key => $value) {
 			$dataNew[] = [
-				'columnId' => (int) $key,
+				'columnId' => (int)$key,
 				'value' => $value
 			];
 		}
@@ -1212,7 +1212,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError|Exception $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -1239,7 +1239,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
@@ -1266,10 +1266,10 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	public function updateRow(int $rowId, ?int $viewId, $data): DataResponse {
-		if(is_string($data)) {
+		if (is_string($data)) {
 			$data = json_decode($data, true);
 		}
-		if(!is_array($data)) {
+		if (!is_array($data)) {
 			$this->logger->warning('updateRow not possible, data array invalid.');
 			$message = ['message' => $this->l10N->t('Could not update row.')];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
@@ -1277,7 +1277,7 @@ class Api1Controller extends ApiController {
 		$dataNew = [];
 		foreach ($data as $key => $value) {
 			$dataNew[] = [
-				'columnId' => (int) $key,
+				'columnId' => (int)$key,
 				'value' => $value
 			];
 		}
@@ -1285,7 +1285,7 @@ class Api1Controller extends ApiController {
 		try {
 			return new DataResponse($this->rowService->updateSet($rowId, $viewId, $dataNew, $this->userId)->jsonSerialize());
 		} catch (InternalError $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -1313,7 +1313,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
@@ -1345,7 +1345,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
@@ -1380,7 +1380,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError|MultipleObjectsReturnedException $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError|DoesNotExistException $e) {
@@ -1415,7 +1415,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError|MultipleObjectsReturnedException $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError|DoesNotExistException $e) {
@@ -1465,11 +1465,11 @@ class Api1Controller extends ApiController {
 				)->jsonSerialize()
 			);
 		} catch (PermissionError $e) {
-			$this->logger->warning('A permission error occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (NotFoundError $e) {
@@ -1548,7 +1548,7 @@ class Api1Controller extends ApiController {
 		?bool $usergroupSelectGroups = null,
 		?bool $usergroupSelectTeams = null,
 		?bool $usergroupShowUserStatus = null,
-		?array $selectedViewIds = []
+		?array $selectedViewIds = [],
 	): DataResponse {
 		try {
 			$item = $this->columnService->create(
@@ -1588,7 +1588,7 @@ class Api1Controller extends ApiController {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		} catch (InternalError $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		} catch (DoesNotExistException $e) {

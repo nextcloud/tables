@@ -43,7 +43,7 @@ class SuperBusiness {
 			$newString = $dateTime->format($format);
 			return $newString === $dateString;
 		} catch (\Exception $e) {
-			$this->logger->warning('Could not validate date: '.$e->getMessage().' Returning false.');
+			$this->logger->warning('Could not validate date: ' . $e->getMessage() . ' Returning false.');
 			return false;
 		}
 	}

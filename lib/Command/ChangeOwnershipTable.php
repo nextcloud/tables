@@ -57,16 +57,16 @@ class ChangeOwnershipTable extends Command {
 			$table = $this->tableService->setOwner($id, $newOwnerUserId, '');
 			$output->writeln(json_encode($table->jsonSerialize(), JSON_PRETTY_PRINT));
 		} catch (InternalError $e) {
-			$output->writeln('Error occurred: '.$e->getMessage());
-			$this->logger->warning('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
+			$output->writeln('Error occurred: ' . $e->getMessage());
+			$this->logger->warning('Following error occurred during executing occ command "' . self::class . '"', ['exception' => $e]);
 			return 1;
 		} catch (NotFoundError $e) {
-			$output->writeln('Not found error occurred: '.$e->getMessage());
-			$this->logger->warning('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
+			$output->writeln('Not found error occurred: ' . $e->getMessage());
+			$this->logger->warning('Following error occurred during executing occ command "' . self::class . '"', ['exception' => $e]);
 			return 1;
 		} catch (PermissionError $e) {
-			$output->writeln('Permission error occurred: '.$e->getMessage());
-			$this->logger->warning('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
+			$output->writeln('Permission error occurred: ' . $e->getMessage());
+			$this->logger->warning('Following error occurred during executing occ command "' . self::class . '"', ['exception' => $e]);
 			return 1;
 		}
 		return 0;

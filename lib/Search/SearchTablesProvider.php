@@ -28,9 +28,9 @@ class SearchTablesProvider implements IProvider {
 	private TableService $tableService;
 	private IURLGenerator $urlGenerator;
 
-	public function __construct(IAppManager   $appManager,
-		IL10N         $l10n,
-		ViewService  $viewService,
+	public function __construct(IAppManager $appManager,
+		IL10N $l10n,
+		ViewService $viewService,
 		TableService $tableService,
 		IURLGenerator $urlGenerator) {
 		$this->appManager = $appManager;
@@ -77,7 +77,7 @@ class SearchTablesProvider implements IProvider {
 		$limit = $query->getLimit();
 		$term = $query->getTerm();
 		$offset = $query->getCursor();
-		$offset = $offset ? (int) $offset : 0;
+		$offset = $offset ? (int)$offset : 0;
 
 		$appIconUrl = $this->urlGenerator->getAbsoluteURL(
 			$this->urlGenerator->imagePath(Application::APP_ID, 'app-dark.svg')
@@ -91,8 +91,8 @@ class SearchTablesProvider implements IProvider {
 		$formattedTablesResults = array_map(function (Table $table) use ($appIconUrl): SearchResultEntry {
 			return new SearchResultEntry(
 				$appIconUrl,
-				$table->getEmoji() .' '. $table->getTitle(),
-				($table->getOwnerDisplayName() ? $table->getOwnerDisplayName() : $table->getOwnership()) . ', ' . $this->l10n->n('%n row', '%n rows', $table->getRowsCount()).', '.$this->l10n->t('table'),
+				$table->getEmoji() . ' ' . $table->getTitle(),
+				($table->getOwnerDisplayName() ? $table->getOwnerDisplayName() : $table->getOwnership()) . ', ' . $this->l10n->n('%n row', '%n rows', $table->getRowsCount()) . ', ' . $this->l10n->t('table'),
 				$this->getInternalLink($table->getId(), 'table'),
 				'',
 				false
@@ -104,8 +104,8 @@ class SearchTablesProvider implements IProvider {
 		$formattedViewResults = array_map(function (View $view) use ($viewIconUrl): SearchResultEntry {
 			return new SearchResultEntry(
 				$viewIconUrl,
-				$view->getEmoji() .' '. $view->getTitle(),
-				($view->getOwnerDisplayName() ? $view->getOwnerDisplayName(): $view->getOwnership()) . ', ' . $this->l10n->n('%n row', '%n rows', $view->getRowsCount()).', '.$this->l10n->t('table view'),
+				$view->getEmoji() . ' ' . $view->getTitle(),
+				($view->getOwnerDisplayName() ? $view->getOwnerDisplayName(): $view->getOwnership()) . ', ' . $this->l10n->n('%n row', '%n rows', $view->getRowsCount()) . ', ' . $this->l10n->t('table view'),
 				$this->getInternalLink($view->getId(), 'view'),
 				'',
 				false
@@ -126,9 +126,9 @@ class SearchTablesProvider implements IProvider {
 	 */
 	protected function getInternalLink(int $nodeId, string $nodeType = 'table'): string {
 		$allowedNodeTypes = ['table', 'view'];
-		if(in_array($nodeType, $allowedNodeTypes)) {
+		if (in_array($nodeType, $allowedNodeTypes)) {
 			return $this->urlGenerator->linkToRouteAbsolute(Application::APP_ID . '.page.index')
-				. '#/'.$nodeType.'/' . $nodeId;
+				. '#/' . $nodeType . '/' . $nodeId;
 		} else {
 			return '';
 		}

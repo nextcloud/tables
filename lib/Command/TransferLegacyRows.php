@@ -70,31 +70,31 @@ class TransferLegacyRows extends Command {
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$tableIds = $input->getArgument('table-ids');
-		$optionAll = !!$input->getOption('all');
+		$optionAll = (bool)$input->getOption('all');
 		$optionDelete = $input->getOption('delete') ?: null;
 
 		if ($optionAll) {
-			$output->writeln("Look for tables");
+			$output->writeln('Look for tables');
 			try {
 				$tables = $this->tableService->findAll('', true, true, false);
-				$output->writeln("Found ". count($tables) . " table(s)");
+				$output->writeln('Found ' . count($tables) . ' table(s)');
 			} catch (InternalError $e) {
-				$output->writeln("Error while fetching tables. Will aboard.");
+				$output->writeln('Error while fetching tables. Will aboard.');
 				return 1;
 			}
 		} elseif ($tableIds) {
-			$output->writeln("Look for given table(s)");
+			$output->writeln('Look for given table(s)');
 			$tableIds = explode(',', $tableIds);
 			$tables = [];
 			foreach ($tableIds as $tableId) {
 				try {
 					$tables[] = $this->tableService->find((int)ltrim($tableId), true, '');
 				} catch (InternalError|NotFoundError|PermissionError $e) {
-					$output->writeln("Could not load table id " . $tableId . ". Will continue.");
+					$output->writeln('Could not load table id ' . $tableId . '. Will continue.');
 				}
 			}
 		} else {
-			$output->writeln("🤷🏻‍ Add at least one table id or add the option --all to transfer all tables.");
+			$output->writeln('🤷🏻‍ Add at least one table id or add the option --all to transfer all tables.');
 			return 2;
 		}
 		if ($optionDelete) {
@@ -114,15 +114,15 @@ class TransferLegacyRows extends Command {
 		$i = 1;
 		foreach ($tables as $table) {
 			$output->writeln('');
-			$output->writeln("-- Start transfer for table " . $table->getId() . " (" . $table->getTitle() . ") [" . $i . "/" . count($tables) . "]");
+			$output->writeln('-- Start transfer for table ' . $table->getId() . ' (' . $table->getTitle() . ') [' . $i . '/' . count($tables) . ']');
 			try {
 				$this->transferTable($table, $output);
 			} catch (InternalError|PermissionError|Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				if ($output->isVerbose()) {
-					$output->writeln("❌ Error: " . $e->getMessage());
+					$output->writeln('❌ Error: ' . $e->getMessage());
 				}
-				$output->writeln("⚠️  Could not transfer data. Continue with next table. The logs will have more information about the error: " . $e->getMessage());
+				$output->writeln('⚠️  Could not transfer data. Continue with next table. The logs will have more information about the error: ' . $e->getMessage());
 			}
 			$i++;
 		}
@@ -135,15 +135,15 @@ class TransferLegacyRows extends Command {
 	 */
 	private function transferTable(Table $table, OutputInterface $output): void {
 		$columns = $this->columnService->findAllByTable($table->getId(), null, '');
-		$output->writeln("---- Found " . count($columns) . " columns");
+		$output->writeln('---- Found ' . count($columns) . ' columns');
 
 		$legacyRows = $this->legacyRowMapper->findAllByTable($table->getId());
-		$output->writeln("---- Found " . count($legacyRows) . " rows");
+		$output->writeln('---- Found ' . count($legacyRows) . ' rows');
 
 		foreach ($legacyRows as $legacyRow) {
 			$this->legacyRowMapper->transferLegacyRow($legacyRow, $columns);
 		}
-		$output->writeln("---- ✅  All rows transferred.");
+		$output->writeln('---- ✅  All rows transferred.');
 	}
 
 	/**
@@ -152,16 +152,16 @@ class TransferLegacyRows extends Command {
 	 * @return void
 	 */
 	private function deleteDataForTables(array $tables, OutputInterface $output): void {
-		$output->writeln("Start deleting data for tables that should be transferred.");
+		$output->writeln('Start deleting data for tables that should be transferred.');
 		foreach ($tables as $table) {
 			try {
 				$columns = $this->columnService->findAllByTable($table->getId(), null, '');
 			} catch (InternalError|PermissionError $e) {
-				$output->writeln("Could not delete data for table " . $table->getId());
+				$output->writeln('Could not delete data for table ' . $table->getId());
 				break;
 			}
 			$this->rowMapper->deleteAllForTable($table->getId(), $columns);
-			$output->writeln("🗑️  Data for table " . $table->getId() . " (" . $table->getTitle() . ")" . " removed.");
+			$output->writeln('🗑️  Data for table ' . $table->getId() . ' (' . $table->getTitle() . ')' . ' removed.');
 		}
 	}
 }

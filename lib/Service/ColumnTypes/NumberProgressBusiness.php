@@ -17,7 +17,7 @@ class NumberProgressBusiness extends SuperBusiness implements IColumnTypeBusines
 	 * @return string
 	 */
 	public function parseValue($value, ?Column $column = null): string {
-		return json_encode((int) $value);
+		return json_encode((int)$value);
 	}
 
 	/**
@@ -26,7 +26,7 @@ class NumberProgressBusiness extends SuperBusiness implements IColumnTypeBusines
 	 * @return bool
 	 */
 	public function canBeParsed($value, ?Column $column = null): bool {
-		return !$value || ((int) $value >= 0 && (int) $value <= 100);
+		return !$value || ((int)$value >= 0 && (int)$value <= 100);
 	}
 
 }

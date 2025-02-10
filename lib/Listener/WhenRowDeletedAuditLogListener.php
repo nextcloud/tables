@@ -16,7 +16,9 @@ use OCP\EventDispatcher\IEventListener;
  * @template-implements IEventListener<Event|RowDeletedEvent>
  */
 final class WhenRowDeletedAuditLogListener implements IEventListener {
-	public function __construct(protected AuditLogServiceInterface $auditLogService) {
+	public function __construct(
+		protected AuditLogServiceInterface $auditLogService,
+	) {
 	}
 
 	public function handle(Event $event): void {

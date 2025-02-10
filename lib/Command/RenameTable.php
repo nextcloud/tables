@@ -85,8 +85,8 @@ class RenameTable extends Command {
 			unset($arr['ownerDisplayName']);
 			$output->writeln(json_encode($arr, JSON_PRETTY_PRINT));
 		} catch (InternalError $e) {
-			$output->writeln('Error occurred: '.$e->getMessage());
-			$this->logger->warning('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
+			$output->writeln('Error occurred: ' . $e->getMessage());
+			$this->logger->warning('Following error occurred during executing occ command "' . self::class . '"', ['exception' => $e]);
 			return 1;
 		}
 		return 0;

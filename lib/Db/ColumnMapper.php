@@ -124,7 +124,7 @@ class ColumnMapper extends QBMapper {
 		$result = $qb->executeQuery();
 		try {
 			while ($row = $result->fetch()) {
-				$out[$row['id']] = $row['type'].($row['subtype'] ? '-'.$row['subtype']: '');
+				$out[$row['id']] = $row['type'] . ($row['subtype'] ? '-' . $row['subtype']: '');
 			}
 		} finally {
 			$result->closeCursor();
@@ -149,7 +149,7 @@ class ColumnMapper extends QBMapper {
 			$result = $this->findOneQuery($qb);
 			return (int)$result['counter'];
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
-			$this->logger->warning('Exception occurred: '.$e->getMessage().' Returning 0.');
+			$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Returning 0.');
 			return 0;
 		}
 	}

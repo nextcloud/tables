@@ -74,7 +74,7 @@ class ImportService extends SuperService {
 		} else {
 			$e = new \Exception('Neither tableId nor viewId is given.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		$this->createUnknownColumns = false;
@@ -86,7 +86,7 @@ class ImportService extends SuperService {
 			if ($userFolder->nodeExists($path)) {
 				$file = $userFolder->get($path);
 				$tmpFileName = $file->getStorage()->getLocalFile($file->getInternalPath());
-				if($tmpFileName) {
+				if ($tmpFileName) {
 					$spreadsheet = IOFactory::load($tmpFileName);
 					$previewData = $this->getPreviewData($spreadsheet->getActiveSheet());
 				} else {
@@ -99,7 +99,7 @@ class ImportService extends SuperService {
 				$error = true;
 			}
 
-			if($error) {
+			if ($error) {
 				throw new NotFoundError('File for import could not be found.');
 			}
 
@@ -215,32 +215,32 @@ class ImportService extends SuperService {
 		if ($viewId !== null) {
 			$view = $this->viewService->find($viewId);
 			if (!$this->permissionsService->canCreateRows($view)) {
-				throw new PermissionError('create row at the view id = '.$viewId.' is not allowed.');
+				throw new PermissionError('create row at the view id = ' . $viewId . ' is not allowed.');
 			}
 			if ($createMissingColumns && !$this->permissionsService->canManageTableById($view->getTableId())) {
-				throw new PermissionError('create columns at the view id = '.$viewId.' is not allowed.');
+				throw new PermissionError('create columns at the view id = ' . $viewId . ' is not allowed.');
 			}
 			$this->viewId = $viewId;
 		}
 		if ($tableId) {
 			$table = $this->tableService->find($tableId);
 			if (!$this->permissionsService->canCreateRows($table, 'table')) {
-				throw new PermissionError('create row at the view id = '. (string) $viewId .' is not allowed.');
+				throw new PermissionError('create row at the view id = ' . (string)$viewId . ' is not allowed.');
 			}
 			if ($createMissingColumns && !$this->permissionsService->canManageTable($table)) {
-				throw new PermissionError('create columns at the view id = '. (string) $viewId .' is not allowed.');
+				throw new PermissionError('create columns at the view id = ' . (string)$viewId . ' is not allowed.');
 			}
 			$this->tableId = $tableId;
 		}
 		if (!$this->tableId && !$this->viewId) {
 			$e = new \Exception('Neither tableId nor viewId is given.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 		if ($this->tableId && $this->viewId) {
 			$e = new \LogicException('Both table ID and view ID are provided, but only one of them is allowed');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		if ($this->userId === null || $this->userManager->get($this->userId) === null) {
@@ -258,7 +258,7 @@ class ImportService extends SuperService {
 			if ($userFolder->nodeExists($path)) {
 				$file = $userFolder->get($path);
 				$tmpFileName = $file->getStorage()->getLocalFile($file->getInternalPath());
-				if($tmpFileName) {
+				if ($tmpFileName) {
 					$spreadsheet = IOFactory::load($tmpFileName);
 					$this->loop($spreadsheet->getActiveSheet());
 				} else {
@@ -270,7 +270,7 @@ class ImportService extends SuperService {
 			} else {
 				$error = true;
 			}
-			if($error) {
+			if ($error) {
 				throw new NotFoundError('File for import could not be found.');
 			}
 
@@ -324,11 +324,11 @@ class ImportService extends SuperService {
 	private function parseValueByColumnType(string $value, Column $column): string {
 		try {
 			$businessClassName = 'OCA\Tables\Service\ColumnTypes\\';
-			$businessClassName .= ucfirst($column->getType()).ucfirst($column->getSubtype()).'Business';
+			$businessClassName .= ucfirst($column->getType()) . ucfirst($column->getSubtype()) . 'Business';
 			/** @var IColumnTypeBusiness $columnBusiness */
 			$columnBusiness = Server::get($businessClassName);
-			if(!$columnBusiness->canBeParsed($value, $column)) {
-				$this->logger->warning('Value '.$value.' could not be parsed for column '.$column->getTitle());
+			if (!$columnBusiness->canBeParsed($value, $column)) {
+				$this->logger->warning('Value ' . $value . ' could not be parsed for column ' . $column->getTitle());
 				$this->countParsingErrors++;
 				return '';
 			}
@@ -359,7 +359,7 @@ class ImportService extends SuperService {
 				$i++;
 
 				// only add the dataset if column is known
-				if(!isset($this->columns[$i]) || $this->columns[$i] === '') {
+				if (!isset($this->columns[$i]) || $this->columns[$i] === '') {
 					$this->logger->debug('Column unknown while fetching rows data for importing.');
 					continue;
 				}
@@ -368,9 +368,9 @@ class ImportService extends SuperService {
 				$column = $this->columns[$i];
 
 				// if cell is empty
-				if(!$cell || $cell->getValue() === null) {
+				if (!$cell || $cell->getValue() === null) {
 					$this->logger->info('Cell is empty while fetching rows data for importing.');
-					if($column->getMandatory()) {
+					if ($column->getMandatory()) {
 						$this->logger->warning('Mandatory column was not set');
 						$this->countErrors++;
 						return;
@@ -432,7 +432,7 @@ class ImportService extends SuperService {
 			$this->countErrors++;
 		} catch (NotFoundError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (\Throwable $e) {
 			$this->countErrors++;
 			$this->logger->error('Error while creating new row for import.', ['exception' => $e]);
@@ -588,7 +588,7 @@ class ImportService extends SuperService {
 					'number_suffix' => 'USD',
 				];
 			} elseif (is_float($value)) {
-				$decimals = strlen(substr(strrchr((string)$value, "."), 1));
+				$decimals = strlen(substr(strrchr((string)$value, '.'), 1));
 				$dataType = [
 					'type' => 'number',
 					'number_decimals' => $decimals,

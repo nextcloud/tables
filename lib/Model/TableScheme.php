@@ -16,7 +16,7 @@ class TableScheme implements JsonSerializable {
 	protected ?string $title = null;
 	protected ?string $emoji = null;
 
-	/** @var Column[]|null  */
+	/** @var Column[]|null */
 	protected ?array $columns = null;
 
 	/** @var View[]|null */

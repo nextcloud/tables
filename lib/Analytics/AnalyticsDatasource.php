@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
@@ -30,13 +31,13 @@ class AnalyticsDatasource implements IDatasource {
 	protected ?string $userId;
 
 	public function __construct(
-		IL10N           $l10n,
+		IL10N $l10n,
 		LoggerInterface $logger,
-		TableService    $tableService,
-		ViewService     $viewService,
-		ColumnService   $columnService,
-		RowService      $rowService,
-		?string         $userId
+		TableService $tableService,
+		ViewService $viewService,
+		ColumnService $columnService,
+		RowService $rowService,
+		?string $userId,
 	) {
 		$this->l10n = $l10n;
 		$this->logger = $logger;

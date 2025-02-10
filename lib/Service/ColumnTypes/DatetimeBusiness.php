@@ -30,7 +30,7 @@ class DatetimeBusiness extends SuperBusiness implements IColumnTypeBusiness {
 			$dateTime = new DateTime($value);
 			foreach ($allowedFormats as $format) {
 				$tmp = $dateTime->format($format);
-				if($value === $tmp) {
+				if ($value === $tmp) {
 					$newDateTime = $dateTime->format('Y-m-d H:i');
 				}
 			}
