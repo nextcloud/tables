@@ -27,8 +27,8 @@ class Version000800Date20240712000000 extends SimpleMigrationStep {
 	}
 
 	private function createUserGroupTable(ISchemaWrapper $schema, string $name, string $type): ?ISchemaWrapper {
-		if (!$schema->hasTable('tables_row_cells_'.$name)) {
-			$table = $schema->createTable('tables_row_cells_'.$name);
+		if (!$schema->hasTable('tables_row_cells_' . $name)) {
+			$table = $schema->createTable('tables_row_cells_' . $name);
 			$table->addColumn('id', Types::INTEGER, [
 				'autoincrement' => true,
 				'notnull' => true,

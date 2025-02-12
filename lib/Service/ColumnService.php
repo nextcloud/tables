@@ -48,7 +48,7 @@ class ColumnService extends SuperService {
 		ViewService $viewService,
 		RowService $rowService,
 		IL10N $l,
-		UserHelper $userHelper
+		UserHelper $userHelper,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
@@ -70,10 +70,10 @@ class ColumnService extends SuperService {
 				return $this->enhanceColumns($this->mapper->findAllByTable($tableId));
 			} catch (\OCP\DB\Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 		} else {
-			throw new PermissionError('no read access to table id = '.$tableId);
+			throw new PermissionError('no read access to table id = ' . $tableId);
 		}
 	}
 
@@ -91,13 +91,13 @@ class ColumnService extends SuperService {
 			$view = $this->viewService->find($viewId, true, $userId);
 		} catch (InternalError|MultipleObjectsReturnedException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (PermissionError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new PermissionError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new PermissionError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 		$viewColumnIds = $view->getColumnsArray();
 		$viewColumns = $this->mapper->findAll($viewColumnIds);
@@ -124,7 +124,7 @@ class ColumnService extends SuperService {
 
 			// security
 			if (!$this->permissionsService->canReadColumnsByTableId($column->getTableId(), $userId)) {
-				throw new PermissionError('PermissionError: can not read column with id '.$id);
+				throw new PermissionError('PermissionError: can not read column with id ' . $id);
 			}
 
 			return $this->enhanceColumn($column);
@@ -155,7 +155,7 @@ class ColumnService extends SuperService {
 		?int $tableId,
 		?int $viewId,
 		ColumnDto $columnDto,
-		array $selectedViewIds = []
+		array $selectedViewIds = [],
 	):Column {
 		// security
 		if ($viewId) {
@@ -163,38 +163,38 @@ class ColumnService extends SuperService {
 				$view = $this->viewService->find($viewId);
 			} catch (InternalError|MultipleObjectsReturnedException $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			} catch (PermissionError $e) {
 				throw new PermissionError('Can not load given view, no permission.');
 			} catch (DoesNotExistException $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 			try {
 				$table = $this->tableMapper->find($view->getTableId());
 			} catch (DoesNotExistException $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			} catch (MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 		} elseif ($tableId) {
 			try {
 				$table = $this->tableMapper->find($tableId);
 			} catch (DoesNotExistException $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			} catch (MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 		} else {
 			throw new InternalError('Cannot create column without table or view in context');
 		}
 
 		if (!$this->permissionsService->canCreateColumns($table)) {
-			throw new PermissionError('create column for the table id = '.$table->getId().' is not allowed.');
+			throw new PermissionError('create column for the table id = ' . $table->getId() . ' is not allowed.');
 		}
 
 		// Add number to title to avoid duplicate
@@ -226,9 +226,9 @@ class ColumnService extends SuperService {
 			$entity = $this->mapper->insert($item);
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
-		if(isset($view) && $view) {
+		if (isset($view) && $view) {
 			// Add columns to view(s)
 			$this->viewService->update($view->getId(), ['columns' => json_encode(array_merge($view->getColumnsArray(), [$entity->getId()]))], $userId, true);
 		}
@@ -237,12 +237,12 @@ class ColumnService extends SuperService {
 				$view = $this->viewService->find($viewId);
 			} catch (InternalError|MultipleObjectsReturnedException $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			} catch (PermissionError $e) {
 				throw new PermissionError('Can not add column to view, no permission.');
 			} catch (DoesNotExistException $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 			$this->viewService->update($viewId, ['columns' => json_encode(array_merge($view->getColumnsArray(), [$entity->getId()]))], $userId, true);
 		}
@@ -262,7 +262,7 @@ class ColumnService extends SuperService {
 		int $columnId,
 		?int $tableId,
 		?string $userId,
-		ColumnDto $columnDto
+		ColumnDto $columnDto,
 	):Column {
 		try {
 			/** @var Column $item */
@@ -270,7 +270,7 @@ class ColumnService extends SuperService {
 
 			// security
 			if (!$this->permissionsService->canUpdateColumnsByTableId($item->getTableId())) {
-				throw new PermissionError('update column id = '.$columnId.' is not allowed.');
+				throw new PermissionError('update column id = ' . $columnId . ' is not allowed.');
 			}
 
 			if ($columnDto->getTitle() !== null) {
@@ -371,15 +371,15 @@ class ColumnService extends SuperService {
 			$item = $this->mapper->find($id);
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// security
 		if (!$this->permissionsService->canDeleteColumnsByTableId($item->getTableId(), $userId)) {
-			throw new PermissionError('delete column id = '.$id.' is not allowed.');
+			throw new PermissionError('delete column id = ' . $id . ' is not allowed.');
 		}
 
 		if (!$skipRowCleanup) {
@@ -387,13 +387,13 @@ class ColumnService extends SuperService {
 				$this->rowService->deleteColumnDataFromRows($item);
 			} catch (InternalError $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 			try {
 				$table = $this->tableMapper->find($item->getTableId());
 			} catch (DoesNotExistException|MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 			$this->viewService->deleteColumnDataFromViews($id, $table);
 		}
@@ -402,7 +402,7 @@ class ColumnService extends SuperService {
 			$this->mapper->delete($item);
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 		return $this->enhanceColumn($item);
 	}
@@ -425,7 +425,7 @@ class ColumnService extends SuperService {
 	public function findOrCreateColumnsByTitleForTableAsArray(?int $tableId, ?int $viewId, array $titles, array $dataTypes, ?string $userId, bool $createUnknownColumns, int &$countCreatedColumns, int &$countMatchingColumns): array {
 		$result = [];
 
-		if($userId === null) {
+		if ($userId === null) {
 			$userId = $this->userId;
 		}
 		if ($viewId) {
@@ -435,14 +435,14 @@ class ColumnService extends SuperService {
 		} else {
 			$e = new Exception('Either tableId nor viewId is given.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		$i = -1;
 		foreach ($titles as $title) {
 			$i++;
 			foreach ($allColumns as $column) {
-				if($column->getTitle() === $title) {
+				if ($column->getTitle() === $title) {
 					$result[$i] = $column;
 					$countMatchingColumns++;
 					continue 2;
@@ -450,11 +450,11 @@ class ColumnService extends SuperService {
 				$result[$i] = '';
 			}
 			// if there are no columns at all
-			if(!isset($result[$i])) {
+			if (!isset($result[$i])) {
 				$result[$i] = '';
 			}
 			// if column was not found
-			if($result[$i] === '' && $createUnknownColumns) {
+			if ($result[$i] === '' && $createUnknownColumns) {
 				$description = $this->l->t('This column was automatically created by the import service.');
 				$result[$i] = $this->create(
 					$userId,
@@ -487,7 +487,7 @@ class ColumnService extends SuperService {
 		if ($this->permissionsService->canReadColumnsByTableId($tableId)) {
 			return $this->mapper->countColumns($tableId);
 		} else {
-			throw new PermissionError('no read access for counting to table id = '.$tableId);
+			throw new PermissionError('no read access for counting to table id = ' . $tableId);
 		}
 	}
 

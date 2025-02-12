@@ -50,22 +50,22 @@ class NewDbStructureRepairStep implements IRepairStep {
 	 * @param IOutput $output
 	 */
 	public function run(IOutput $output) {
-		$legacyRowTransferRunComplete = $this->config->getAppValue('tables', 'legacyRowTransferRunComplete', "false");
+		$legacyRowTransferRunComplete = $this->config->getAppValue('tables', 'legacyRowTransferRunComplete', 'false');
 
-		if ($legacyRowTransferRunComplete === "true") {
+		if ($legacyRowTransferRunComplete === 'true') {
 			return;
 		}
 
-		$output->info("Look for tables");
+		$output->info('Look for tables');
 		try {
 			$tables = $this->tableService->findAll('', true, true, false);
-			$output->info("Found ". count($tables) . " table(s)");
+			$output->info('Found ' . count($tables) . ' table(s)');
 		} catch (InternalError $e) {
-			$output->warning("Error while fetching tables. Will aboard.");
+			$output->warning('Error while fetching tables. Will aboard.');
 			return;
 		}
 		$this->transferDataForTables($tables, $output);
-		$this->config->setAppValue('tables', 'legacyRowTransferRunComplete', "true");
+		$this->config->setAppValue('tables', 'legacyRowTransferRunComplete', 'true');
 	}
 
 	/**
@@ -75,12 +75,12 @@ class NewDbStructureRepairStep implements IRepairStep {
 	private function transferDataForTables(array $tables, IOutput $output) {
 		$i = 1;
 		foreach ($tables as $table) {
-			$output->info("-- Start transfer for table " . $table->getId() . " (" . $table->getTitle() . ") [" . $i . "/" . count($tables) . "]");
+			$output->info('-- Start transfer for table ' . $table->getId() . ' (' . $table->getTitle() . ') [' . $i . '/' . count($tables) . ']');
 			try {
 				$this->transferTable($table, $output);
 			} catch (InternalError|PermissionError|Exception|Throwable $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				$output->warning("Could not transfer data. Continue with next table. The logs will have more information about the error: " . $e->getMessage());
+				$output->warning('Could not transfer data. Continue with next table. The logs will have more information about the error: ' . $e->getMessage());
 			}
 			$i++;
 		}
@@ -93,10 +93,10 @@ class NewDbStructureRepairStep implements IRepairStep {
 	 */
 	private function transferTable(Table $table, IOutput $output) {
 		$columns = $this->columnService->findAllByTable($table->getId(), null, '');
-		$output->info("---- Found " . count($columns) . " columns");
+		$output->info('---- Found ' . count($columns) . ' columns');
 
 		$legacyRows = $this->legacyRowMapper->findAllByTable($table->getId());
-		$output->info("---- Found " . count($legacyRows) . " rows");
+		$output->info('---- Found ' . count($legacyRows) . ' rows');
 
 		$output->startProgress(count($legacyRows));
 		foreach ($legacyRows as $legacyRow) {

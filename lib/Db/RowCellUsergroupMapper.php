@@ -14,7 +14,10 @@ use OCP\IUserManager;
 class RowCellUsergroupMapper extends RowCellMapperSuper {
 	protected string $table = 'tables_row_cells_usergroup';
 
-	public function __construct(IDBConnection $db, private IUserManager $userManager) {
+	public function __construct(
+		IDBConnection $db,
+		private IUserManager $userManager,
+	) {
 		parent::__construct($db, $this->table, RowCellUsergroup::class);
 	}
 

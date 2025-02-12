@@ -467,8 +467,8 @@ class TableTemplateService {
 				'title' => $this->l->t('Create Vacation Request'),
 				'emoji' => '️➕',
 				'columns' => json_encode([$columns['employee']->getId(), $columns['from']->getId(), $columns['to']->getId(), $columns['workingDays']->getId(), $columns['dateRequest']->getId()]),
-				'sort' => json_encode([["columnId" => Column::TYPE_META_UPDATED_AT, "mode" => "ASC"]]),
-				'filter' => json_encode([[["columnId" => Column::TYPE_META_CREATED_BY, "operator" => "is-equal", "value" => "@my-name"], ["columnId" => $columns['approved']->getId(), "operator" => "is-empty", "value" => ""]]]),
+				'sort' => json_encode([['columnId' => Column::TYPE_META_UPDATED_AT, 'mode' => 'ASC']]),
+				'filter' => json_encode([[['columnId' => Column::TYPE_META_CREATED_BY, 'operator' => 'is-equal', 'value' => '@my-name'], ['columnId' => $columns['approved']->getId(), 'operator' => 'is-empty', 'value' => '']]]),
 			]
 		);
 		$this->createView($table,
@@ -478,8 +478,8 @@ class TableTemplateService {
 				'columns' => json_encode(array_values(array_map(function ($col) {
 					return $col->getId();
 				}, $columns))),
-				'sort' => json_encode([["columnId" => $columns['from']->getId(), "mode" => "ASC"]]),
-				'filter' => json_encode([[["columnId" => $columns['approved']->getId(), "operator" => "is-empty", "value" => ""]]]),
+				'sort' => json_encode([['columnId' => $columns['from']->getId(), 'mode' => 'ASC']]),
+				'filter' => json_encode([[['columnId' => $columns['approved']->getId(), 'operator' => 'is-empty', 'value' => '']]]),
 			]
 		);
 		$this->createView($table,
@@ -489,8 +489,8 @@ class TableTemplateService {
 				'columns' => json_encode(array_values(array_map(function ($col) {
 					return $col->getId();
 				}, $columns))),
-				'sort' => json_encode([["columnId" => Column::TYPE_META_UPDATED_BY, "mode" => "ASC"]]),
-				'filter' => json_encode([[["columnId" => Column::TYPE_META_CREATED_BY, "operator" => "is-equal", "value" => "@my-name"]]]),
+				'sort' => json_encode([['columnId' => Column::TYPE_META_UPDATED_BY, 'mode' => 'ASC']]),
+				'filter' => json_encode([[['columnId' => Column::TYPE_META_CREATED_BY, 'operator' => 'is-equal', 'value' => '@my-name']]]),
 			]
 		);
 		$this->createView($table,
@@ -500,8 +500,8 @@ class TableTemplateService {
 				'columns' => json_encode(array_values(array_map(function ($col) {
 					return $col->getId();
 				}, $columns))),
-				'sort' => json_encode([["columnId" => Column::TYPE_META_UPDATED_BY, "mode" => "ASC"]]),
-				'filter' => json_encode([[["columnId" => $columns['approved']->getId(), "operator" => "is-equal", "value" => "@checked"]], [["columnId" => $columns['approved']->getId(), "operator" => "is-equal", "value" => "@unchecked"]]]),
+				'sort' => json_encode([['columnId' => Column::TYPE_META_UPDATED_BY, 'mode' => 'ASC']]),
+				'filter' => json_encode([[['columnId' => $columns['approved']->getId(), 'operator' => 'is-equal', 'value' => '@checked']], [['columnId' => $columns['approved']->getId(), 'operator' => 'is-equal', 'value' => '@unchecked']]]),
 			]
 		);
 	}
@@ -819,19 +819,19 @@ class TableTemplateService {
 		$data = [];
 		foreach ($values as $columnId => $value) {
 			$data[] = [
-				'columnId' => (int) $columnId,
+				'columnId' => (int)$columnId,
 				'value' => $value
 			];
 		}
 		try {
 			$this->rowService->create($table->getId(), null, $data);
 		} catch (PermissionError $e) {
-			$this->logger->warning('Cannot create row, permission denied: '.$e->getMessage());
+			$this->logger->warning('Cannot create row, permission denied: ' . $e->getMessage());
 		} catch (InternalError $e) {
-			$this->logger->warning('Exception occurred while creating a row: '.$e->getMessage());
+			$this->logger->warning('Exception occurred while creating a row: ' . $e->getMessage());
 		} catch (NotFoundError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
 
@@ -846,7 +846,7 @@ class TableTemplateService {
 			$view = $this->viewService->create($data['title'], $data['emoji'], $table);
 			$this->viewService->update($view->getId(), $data);
 		} catch (PermissionError $e) {
-			$this->logger->warning('Cannot create view, permission denied: '.$e->getMessage());
+			$this->logger->warning('Cannot create view, permission denied: ' . $e->getMessage());
 		}
 	}
 }

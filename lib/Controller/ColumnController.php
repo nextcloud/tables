@@ -99,7 +99,7 @@ class ColumnController extends Controller {
 		?bool $usergroupSelectTeams,
 		?bool $showUserStatus,
 
-		?array $selectedViewIds
+		?array $selectedViewIds,
 	): DataResponse {
 		return $this->handleError(function () use (
 			$tableId,
@@ -199,7 +199,7 @@ class ColumnController extends Controller {
 		?bool $usergroupSelectUsers,
 		?bool $usergroupSelectGroups,
 		?bool $usergroupSelectTeams,
-		?bool $showUserStatus
+		?bool $showUserStatus,
 	): DataResponse {
 		return $this->handleError(function () use (
 			$id,

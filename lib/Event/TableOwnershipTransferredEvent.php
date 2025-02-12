@@ -11,7 +11,11 @@ use OCA\Tables\Db\Table;
 use OCP\EventDispatcher\Event;
 
 final class TableOwnershipTransferredEvent extends Event {
-	public function __construct(protected Table $table, protected string $toUserId, protected ?string $fromUserId = null) {
+	public function __construct(
+		protected Table $table,
+		protected string $toUserId,
+		protected ?string $fromUserId = null,
+	) {
 		parent::__construct();
 	}
 
@@ -19,7 +23,7 @@ final class TableOwnershipTransferredEvent extends Event {
 		return $this->table;
 	}
 
-	public function getFromUserId(): string|null {
+	public function getFromUserId(): ?string {
 		return $this->fromUserId;
 	}
 

@@ -29,7 +29,7 @@ class SelectionCheckBusiness extends SuperBusiness implements IColumnTypeBusines
 	 * @return bool
 	 */
 	public function canBeParsed($value, ?Column $column = null): bool {
-		if($value === null) {
+		if ($value === null) {
 			return true;
 		}
 

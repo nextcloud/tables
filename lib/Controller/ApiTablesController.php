@@ -180,7 +180,7 @@ class ApiTablesController extends AOCSController {
 			}
 			$this->db->commit();
 			return new DataResponse($table->jsonSerialize());
-		} catch(InternalError | Exception $e) {
+		} catch (InternalError|Exception $e) {
 			try {
 				$this->db->rollBack();
 			} catch (\OCP\DB\Exception $e) {

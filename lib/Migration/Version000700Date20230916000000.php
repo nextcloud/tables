@@ -66,8 +66,8 @@ class Version000700Date20230916000000 extends SimpleMigrationStep {
 	}
 
 	private function createRowValueTable(ISchemaWrapper $schema, string $name, string $type) {
-		if (!$schema->hasTable('tables_row_cells_'.$name)) {
-			$table = $schema->createTable('tables_row_cells_'.$name);
+		if (!$schema->hasTable('tables_row_cells_' . $name)) {
+			$table = $schema->createTable('tables_row_cells_' . $name);
 			$table->addColumn('id', Types::INTEGER, [
 				'autoincrement' => true,
 				'notnull' => true,

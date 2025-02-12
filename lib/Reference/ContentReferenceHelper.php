@@ -73,7 +73,7 @@ class ContentReferenceHelper extends ReferenceHelper {
 	 */
 	public function resolveReference(string $referenceText): ?IReference {
 		if ($this->matchReference($referenceText)) {
-			if($this->matchReference($referenceText, 'table')) {
+			if ($this->matchReference($referenceText, 'table')) {
 				$elementId = $this->getTableIdFromLink($referenceText);
 			} elseif ($this->matchReference($referenceText, 'view')) {
 				$elementId = $this->getViewIdFromLink($referenceText);
@@ -84,16 +84,16 @@ class ContentReferenceHelper extends ReferenceHelper {
 				return $this->linkReferenceProvider->resolveReference($referenceText);
 			}
 			try {
-				if($this->matchReference($referenceText, 'table')) {
+				if ($this->matchReference($referenceText, 'table')) {
 					$element = $this->tableService->find($elementId, false, $this->userId);
 				} elseif ($this->matchReference($referenceText, 'view')) {
 					$element = $this->viewService->find($elementId, false, $this->userId);
 				} else {
-					$e = new Exception('Could not map '.$referenceText.' to any known type.');
+					$e = new Exception('Could not map ' . $referenceText . ' to any known type.');
 					$this->logger->error($e->getMessage(), ['exception' => $e]);
-					throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+					throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 				}
-			} catch (Exception | Throwable $e) {
+			} catch (Exception|Throwable $e) {
 				/** @psalm-suppress InvalidReturnStatement */
 				return $this->linkReferenceProvider->resolveReference($referenceText);
 			}
@@ -131,7 +131,7 @@ class ContentReferenceHelper extends ReferenceHelper {
 
 			// add Columns
 			try {
-				if($this->matchReference($referenceText, 'table')) {
+				if ($this->matchReference($referenceText, 'table')) {
 					$referenceInfo['columns'] = $this->columnService->findAllByTable($elementId);
 				} elseif ($this->matchReference($referenceText, 'view')) {
 					$referenceInfo['columns'] = $this->columnService->findAllByView($elementId);
@@ -141,7 +141,7 @@ class ContentReferenceHelper extends ReferenceHelper {
 
 			// add rows data
 			try {
-				if($this->matchReference($referenceText, 'table')) {
+				if ($this->matchReference($referenceText, 'table')) {
 					$referenceInfo['rows'] = $this->rowService->findAllByTable($elementId, $this->userId, 100, 0);
 				} elseif ($this->matchReference($referenceText, 'view')) {
 					$referenceInfo['rows'] = $this->rowService->findAllByView($elementId, $this->userId, 100, 0);

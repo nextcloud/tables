@@ -54,7 +54,7 @@ class ApiColumnsController extends AOCSController {
 	#[RequirePermission(permission: Application::PERMISSION_READ)]
 	public function index(int $nodeId, string $nodeType): DataResponse {
 		try {
-			if($nodeType === 'table') {
+			if ($nodeType === 'table') {
 				$columns = $this->service->findAllByTable($nodeId);
 			} elseif ($nodeType === 'view') {
 				$columns = $this->service->findAllByView($nodeId);
@@ -312,7 +312,7 @@ class ApiColumnsController extends AOCSController {
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
-	public function createUsergroupColumn(int $baseNodeId, string $title, ?string $usergroupDefault, bool $usergroupMultipleItems = null, bool $usergroupSelectUsers = null, bool $usergroupSelectGroups = null, bool $usergroupSelectTeams = null, bool $showUserStatus = null, string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
+	public function createUsergroupColumn(int $baseNodeId, string $title, ?string $usergroupDefault, ?bool $usergroupMultipleItems = null, ?bool $usergroupSelectUsers = null, ?bool $usergroupSelectGroups = null, ?bool $usergroupSelectTeams = null, ?bool $showUserStatus = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		$column = $this->service->create(

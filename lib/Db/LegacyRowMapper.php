@@ -100,9 +100,9 @@ class LegacyRowMapper extends QBMapper {
 	private function buildFilterByColumnType($qb, array $filter, string $filterId): ?IQueryFunction {
 		try {
 			$columnQbClassName = 'OCA\Tables\Db\ColumnTypes\\';
-			$type = explode("-", $filter['columnType'])[0];
+			$type = explode('-', $filter['columnType'])[0];
 
-			$columnQbClassName .= ucfirst($type).'ColumnQB';
+			$columnQbClassName .= ucfirst($type) . 'ColumnQB';
 
 			/** @var IColumnTypeQB $columnQb */
 			$columnQb = Server::get($columnQbClassName);
@@ -121,7 +121,7 @@ class LegacyRowMapper extends QBMapper {
 	private function getInnerFilterExpressions(IQueryBuilder $qb, array $filterGroup, int $groupIndex): array {
 		$innerFilterExpressions = [];
 		foreach ($filterGroup as $index => $filter) {
-			$innerFilterExpressions[] = $this->buildFilterByColumnType($qb, $filter, $groupIndex.$index);
+			$innerFilterExpressions[] = $this->buildFilterByColumnType($qb, $filter, $groupIndex . $index);
 		}
 		return $innerFilterExpressions;
 	}
@@ -156,7 +156,7 @@ class LegacyRowMapper extends QBMapper {
 			case 'datetime-date-start-of-month': return date('Y-m-01') ? date('Y-m-01') : '';
 			case 'datetime-date-start-of-week':
 				$day = date('w');
-				$result = date('Y-m-d', strtotime('-'.$day.' days'));
+				$result = date('Y-m-d', strtotime('-' . $day . ' days'));
 				return  $result ?: '';
 			case 'datetime-time-now': return date('H:i');
 			case 'datetime-now': return date('Y-m-d H:i') ? date('Y-m-d H:i') : '';
@@ -175,7 +175,7 @@ class LegacyRowMapper extends QBMapper {
 			if (!in_array($sortMode, ['ASC', 'DESC'])) {
 				continue;
 			}
-			$sortColumnPlaceholder = 'sortColumn'.$index;
+			$sortColumnPlaceholder = 'sortColumn' . $index;
 			if ($sortRule['columnId'] < 0) {
 				try {
 					$orderString = SuperColumnQB::getMetaColumnName($sortRule['columnId']);
@@ -184,15 +184,15 @@ class LegacyRowMapper extends QBMapper {
 				}
 			} else {
 				if ($this->platform === IColumnTypeQB::DB_PLATFORM_PGSQL) {
-					$orderString = 'c'.$sortRule['columnId'].'->>\'value\'';
+					$orderString = 'c' . $sortRule['columnId'] . '->>\'value\'';
 				} elseif ($this->platform === IColumnTypeQB::DB_PLATFORM_SQLITE) {
 					// here is an error for (multiple) sorting, works only for the first column at the moment
 					$orderString = 'json_extract(t2.value, "$.value")';
 				} else { // mariadb / mysql
-					$orderString = 'JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'$[*].columnId\'), \'one\', :'.$sortColumnPlaceholder.')), \'.value\'))';
+					$orderString = 'JSON_EXTRACT(data, CONCAT( JSON_UNQUOTE(JSON_SEARCH(JSON_EXTRACT(data, \'$[*].columnId\'), \'one\', :' . $sortColumnPlaceholder . ')), \'.value\'))';
 				}
 				if (str_starts_with($sortRule['columnType'], 'number')) {
-					$orderString = 'CAST('.$orderString.' as decimal)';
+					$orderString = 'CAST(' . $orderString . ' as decimal)';
 				}
 			}
 
@@ -228,7 +228,7 @@ class LegacyRowMapper extends QBMapper {
 			$result = $this->findOneQuery($qb);
 			return (int)$result['counter'];
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
-			$this->logger->warning('Exception occurred: '.$e->getMessage().' Returning 0.');
+			$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Returning 0.');
 			return 0;
 		}
 	}
@@ -266,8 +266,8 @@ class LegacyRowMapper extends QBMapper {
 				foreach ($filterGroup as &$filter) {
 					$filter['columnType'] = $neededColumnTypes[$filter['columnId']];
 					// TODO move resolution for magic fields to service layer
-					if(str_starts_with((string) $filter['value'], '@')) {
-						$filter['value'] = $this->resolveSearchValue((string) $filter['value'], $userId);
+					if (str_starts_with((string)$filter['value'], '@')) {
+						$filter['value'] = $this->resolveSearchValue((string)$filter['value'], $userId);
 					}
 				}
 			}
@@ -364,7 +364,7 @@ class LegacyRowMapper extends QBMapper {
 			foreach ($neededColumnIds as $columnId) {
 				if ($columnId >= 0) {
 					/** @psalm-suppress ImplicitToStringCast */
-					$qb->leftJoin("t1", $qb->createFunction('json_array_elements(t1.data)'), 'c' . intval($columnId), $qb->createFunction("CAST(c".intval($columnId).".value->>'columnId' AS int) = ".$columnId));
+					$qb->leftJoin('t1', $qb->createFunction('json_array_elements(t1.data)'), 'c' . intval($columnId), $qb->createFunction('CAST(c' . intval($columnId) . ".value->>'columnId' AS int) = " . $columnId));
 					// TODO Security
 				}
 			}
@@ -430,7 +430,7 @@ class LegacyRowMapper extends QBMapper {
 			$result = $this->findOneQuery($qb);
 			return (int)$result['counter'];
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
-			$this->logger->warning('Exception occurred: '.$e->getMessage().' Returning 0.');
+			$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Returning 0.');
 			return 0;
 		}
 	}
@@ -489,7 +489,7 @@ class LegacyRowMapper extends QBMapper {
 			if ($this->getColumnFromColumnsArray($columnId, $columns)) {
 				$data[] = $legacyDatum;
 			} else {
-				$this->logger->warning("The row with id " . $row->getId() . " has a value for the column with id " . $columnId . ". But this column does not exist or is not part of the table " . $row->getTableId() . ". Will ignore this value abd continue.");
+				$this->logger->warning('The row with id ' . $row->getId() . ' has a value for the column with id ' . $columnId . '. But this column does not exist or is not part of the table ' . $row->getTableId() . '. Will ignore this value abd continue.');
 			}
 		}
 		$row->setData($data);
@@ -504,7 +504,7 @@ class LegacyRowMapper extends QBMapper {
 	 */
 	private function getColumnFromColumnsArray(int $columnId, array $columns): ?Column {
 		foreach ($columns as $column) {
-			if($column->getId() === $columnId) {
+			if ($column->getId() === $columnId) {
 				return $column;
 			}
 		}

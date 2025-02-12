@@ -29,7 +29,7 @@ abstract class AOCSController extends OCSController {
 		IRequest $request,
 		LoggerInterface $logger,
 		IL10N $n,
-		string $userId
+		string $userId,
 	) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->logger = $logger;

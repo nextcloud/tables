@@ -73,13 +73,13 @@ class CleanLegacy extends Command {
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$this->output = $output;
-		$this->dry = !!$input->getOption('dry');
+		$this->dry = (bool)$input->getOption('dry');
 
 		if ($this->dry) {
-			$this->print("Dry run activated.");
+			$this->print('Dry run activated.');
 		}
 		if ($output->isVerbose()) {
-			$this->print("Verbose mode activated.");
+			$this->print('Verbose mode activated.');
 		}
 
 		// check action, starting point for magic
@@ -94,11 +94,11 @@ class CleanLegacy extends Command {
 			$this->offset = $this->row->getId();
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->print('Error while fetching row', self::PRINT_LEVEL_ERROR);
-			$this->logger->error('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
+			$this->logger->error('Following error occurred during executing occ command "' . self::class . '"', ['exception' => $e]);
 		} catch (DoesNotExistException $e) {
-			$this->print("");
-			$this->print("No more rows found.", self::PRINT_LEVEL_INFO);
-			$this->print("");
+			$this->print('');
+			$this->print('No more rows found.', self::PRINT_LEVEL_INFO);
+			$this->print('');
 			$this->row = null;
 		}
 	}
@@ -113,10 +113,10 @@ class CleanLegacy extends Command {
 
 		$this->getNextRow();
 		while ($this->row) {
-			$this->print("");
-			$this->print("");
-			$this->print("Lets check row with id = " . $this->row->getId());
-			$this->print("==========================================");
+			$this->print('');
+			$this->print('');
+			$this->print('Lets check row with id = ' . $this->row->getId());
+			$this->print('==========================================');
 
 			$this->checkColumns();
 
@@ -131,29 +131,29 @@ class CleanLegacy extends Command {
 			if (is_array($date->value)) {
 				$date->value = json_encode($date->value);
 			}
-			$suffix = strlen($date->value) > $this->truncateLength ? "...": "";
-			$this->print("");
-			$this->print("columnId: " . $date->columnId . " -> " . substr($date->value, 0, $this->truncateLength) . $suffix, self::PRINT_LEVEL_INFO);
+			$suffix = strlen($date->value) > $this->truncateLength ? '...': '';
+			$this->print('');
+			$this->print('columnId: ' . $date->columnId . ' -> ' . substr($date->value, 0, $this->truncateLength) . $suffix, self::PRINT_LEVEL_INFO);
 
 			try {
 				$this->columnService->find($date->columnId, '');
-				if($this->output->isVerbose()) {
-					$this->print("column found", self::PRINT_LEVEL_SUCCESS);
+				if ($this->output->isVerbose()) {
+					$this->print('column found', self::PRINT_LEVEL_SUCCESS);
 				}
 			} catch (InternalError $e) {
-				$this->print("😱️ internal error while looking for column", self::PRINT_LEVEL_ERROR);
-				$this->logger->error('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
+				$this->print('😱️ internal error while looking for column', self::PRINT_LEVEL_ERROR);
+				$this->logger->error('Following error occurred during executing occ command "' . self::class . '"', ['exception' => $e]);
 			} catch (NotFoundError $e) {
-				if($this->output->isVerbose()) {
-					$this->print("corresponding column not found.", self::PRINT_LEVEL_ERROR);
+				if ($this->output->isVerbose()) {
+					$this->print('corresponding column not found.', self::PRINT_LEVEL_ERROR);
 				} else {
-					$this->print("columnId: " . $date->columnId . " not found, but needed by row ".$this->row->getId(), self::PRINT_LEVEL_WARNING);
+					$this->print('columnId: ' . $date->columnId . ' not found, but needed by row ' . $this->row->getId(), self::PRINT_LEVEL_WARNING);
 				}
 				// if the corresponding column is not found, lets delete the data from the row.
 				$this->deleteDataFromRow($date->columnId);
 			} catch (PermissionError $e) {
-				$this->print("😱️ permission error while looking for column", self::PRINT_LEVEL_ERROR);
-				$this->logger->error('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
+				$this->print('😱️ permission error while looking for column', self::PRINT_LEVEL_ERROR);
+				$this->logger->error('Following error occurred during executing occ command "' . self::class . '"', ['exception' => $e]);
 			}
 		}
 	}
@@ -165,11 +165,11 @@ class CleanLegacy extends Command {
 	 */
 	private function deleteDataFromRow(int $columnId): void {
 		if ($this->dry) {
-			$this->print("Is dry run, will not remove the column data from row dataset.", self::PRINT_LEVEL_INFO);
+			$this->print('Is dry run, will not remove the column data from row dataset.', self::PRINT_LEVEL_INFO);
 			return;
 		}
 
-		$this->print("DANGER, start deleting", self::PRINT_LEVEL_WARNING);
+		$this->print('DANGER, start deleting', self::PRINT_LEVEL_WARNING);
 		$data = json_decode($this->row->getData(), true);
 
 		// $this->print("Data before: \t".json_encode(array_values($data), 0), self::PRINT_LEVEL_INFO);
@@ -179,25 +179,25 @@ class CleanLegacy extends Command {
 		$this->row->setDataArray(array_values($data));
 		try {
 			$this->rowMapper->update($this->row);
-			$this->print("Row successfully updated", self::PRINT_LEVEL_SUCCESS);
+			$this->print('Row successfully updated', self::PRINT_LEVEL_SUCCESS);
 		} catch (Exception $e) {
-			$this->print("Error while updating row to db.", self::PRINT_LEVEL_ERROR);
-			$this->logger->error('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
+			$this->print('Error while updating row to db.', self::PRINT_LEVEL_ERROR);
+			$this->logger->error('Following error occurred during executing occ command "' . self::class . '"', ['exception' => $e]);
 		}
 	}
 
 	private function print(string $message, ?int $level = null): void {
-		if($level === self::PRINT_LEVEL_SUCCESS) {
-			echo "✅ ".$message;
+		if ($level === self::PRINT_LEVEL_SUCCESS) {
+			echo '✅ ' . $message;
 			echo "\n";
 		} elseif ($level === self::PRINT_LEVEL_INFO && $this->output->isVerbose()) {
-			echo "ℹ️  ".$message;
+			echo 'ℹ️  ' . $message;
 			echo "\n";
 		} elseif ($level === self::PRINT_LEVEL_WARNING) {
-			echo "⚠️ ".$message;
+			echo '⚠️ ' . $message;
 			echo "\n";
 		} elseif ($level === self::PRINT_LEVEL_ERROR) {
-			echo "❌ ".$message;
+			echo '❌ ' . $message;
 			echo "\n";
 		} elseif ($this->output->isVerbose()) {
 			echo $message;

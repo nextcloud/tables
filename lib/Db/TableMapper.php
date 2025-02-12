@@ -87,7 +87,7 @@ class TableMapper extends QBMapper {
 				->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter('user', IQueryBuilder::PARAM_STR)))
 				->andWhere($qb->expr()->eq('receiver', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
 
-			if($userGroups) {
+			if ($userGroups) {
 				$shareQueryTablesSharedViaGroup->selectDistinct('node_id')
 					->from('tables_shares')
 					->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter('table', IQueryBuilder::PARAM_STR)))
@@ -102,7 +102,7 @@ class TableMapper extends QBMapper {
 		if ($userId) {
 			$qb->andWhere($qb->expr()->eq('ownership', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
 			$qb->orWhere($shareQueryTablesSharedViaUser->expr()->in('id', $qb->createFunction($shareQueryTablesSharedViaUser->getSQL()), IQueryBuilder::PARAM_INT_ARRAY));
-			if($userGroups) {
+			if ($userGroups) {
 				$qb->orWhere($shareQueryTablesSharedViaGroup->expr()->in('id', $qb->createFunction($shareQueryTablesSharedViaGroup->getSQL()), IQueryBuilder::PARAM_INT_ARRAY));
 			}
 		}

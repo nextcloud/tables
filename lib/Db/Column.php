@@ -199,7 +199,7 @@ class Column extends Entity implements JsonSerializable {
 
 	public function getUsergroupDefaultArray():array {
 		$default = $this->getUsergroupDefault();
-		if ($default !== "" && $default !== null) {
+		if ($default !== '' && $default !== null) {
 			return \json_decode($default, true) ?? [];
 		} else {
 			return [];
@@ -213,7 +213,7 @@ class Column extends Entity implements JsonSerializable {
 
 	public function getSelectionOptionsArray():array {
 		$options = $this->getSelectionOptions();
-		if ($options !== "" && $options !== null && $options !== 'null') {
+		if ($options !== '' && $options !== null && $options !== 'null') {
 			return \json_decode($options, true);
 		} else {
 			return [];

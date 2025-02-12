@@ -19,7 +19,10 @@ use OCP\IDBConnection;
 class ViewMapper extends QBMapper {
 	protected string $table = 'tables_views';
 
-	public function __construct(IDBConnection $db, private UserHelper $userHelper) {
+	public function __construct(
+		IDBConnection $db,
+		private UserHelper $userHelper,
+	) {
 		parent::__construct($db, $this->table, View::class);
 	}
 
@@ -73,7 +76,7 @@ class ViewMapper extends QBMapper {
 				->andWhere($qb->expr()->eq('receiver_type', $qb->createNamedParameter('user', IQueryBuilder::PARAM_STR)))
 				->andWhere($qb->expr()->eq('receiver', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
 
-			if($userGroups) {
+			if ($userGroups) {
 				$shareQueryViewsSharedViaGroup->selectDistinct('node_id')
 					->from('tables_shares')
 					->andWhere($qb->expr()->eq('node_type', $qb->createNamedParameter('view', IQueryBuilder::PARAM_STR)))
@@ -93,8 +96,8 @@ class ViewMapper extends QBMapper {
 
 		if ($userId) {
 			$qb->where($qb->expr()->eq('ownership', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)))
-			->orWhere($shareQueryViewsSharedViaUser->expr()->in('v.id', $qb->createFunction($shareQueryViewsSharedViaUser->getSQL()), IQueryBuilder::PARAM_INT_ARRAY));
-			if($userGroups) {
+				->orWhere($shareQueryViewsSharedViaUser->expr()->in('v.id', $qb->createFunction($shareQueryViewsSharedViaUser->getSQL()), IQueryBuilder::PARAM_INT_ARRAY));
+			if ($userGroups) {
 				$qb->orWhere($shareQueryViewsSharedViaGroup->expr()->in('v.id', $qb->createFunction($shareQueryViewsSharedViaGroup->getSQL()), IQueryBuilder::PARAM_INT_ARRAY));
 			}
 		}

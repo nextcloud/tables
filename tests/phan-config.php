@@ -10,7 +10,7 @@ return [
 		'lib/',
 		'vendor/',
 	],
-	"exclude_analysis_directory_list" => [
+	'exclude_analysis_directory_list' => [
 		'vendor/',
 	],
 ];

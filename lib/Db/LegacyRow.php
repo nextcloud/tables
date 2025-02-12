@@ -60,7 +60,7 @@ class LegacyRow extends Entity implements JsonSerializable {
 		$new = [];
 		foreach ($array as $a) {
 			$new[] = [
-				'columnId' => (int) $a['columnId'],
+				'columnId' => (int)$a['columnId'],
 				'value' => $a['value']
 			];
 		}

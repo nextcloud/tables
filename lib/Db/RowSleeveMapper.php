@@ -110,7 +110,7 @@ class RowSleeveMapper extends QBMapper {
 			$result = $this->findOneQuery($qb);
 			return (int)$result['counter'];
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
-			$this->logger->warning('Exception occurred: '.$e->getMessage().' Will return 0.');
+			$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Will return 0.');
 			return 0;
 		}
 	}

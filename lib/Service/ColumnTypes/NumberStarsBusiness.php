@@ -17,7 +17,7 @@ class NumberStarsBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	 * @return string
 	 */
 	public function parseValue($value, ?Column $column = null): string {
-		return json_encode((int) $value);
+		return json_encode((int)$value);
 	}
 
 	/**
@@ -26,7 +26,7 @@ class NumberStarsBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	 * @return bool
 	 */
 	public function canBeParsed($value, ?Column $column = null): bool {
-		return !$value || in_array((int) $value, [0,1,2,3,4,5]);
+		return !$value || in_array((int)$value, [0,1,2,3,4,5]);
 	}
 
 }

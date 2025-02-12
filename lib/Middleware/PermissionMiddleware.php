@@ -29,9 +29,9 @@ class PermissionMiddleware extends Middleware {
 
 	public function __construct(
 		IControllerMethodReflector $reflector,
-		PermissionsService         $permissionsService,
-		IRequest                   $request,
-		?string                    $userId,
+		PermissionsService $permissionsService,
+		IRequest $request,
+		?string $userId,
 	) {
 
 		$this->reflector = $reflector;

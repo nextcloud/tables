@@ -57,8 +57,8 @@ class ListTables extends Command {
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$userId = $input->getArgument('user-id');
-		$showCounter = !!$input->getOption('count');
-		$noSharedTables = !!$input->getOption('no-shares');
+		$showCounter = (bool)$input->getOption('count');
+		$noSharedTables = (bool)$input->getOption('no-shares');
 
 		$tables = [];
 		try {
@@ -69,12 +69,12 @@ class ListTables extends Command {
 			}
 		} catch (InternalError $e) {
 			$output->writeln('Error while reading tables from db.');
-			$this->logger->warning('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
+			$this->logger->warning('Following error occurred during executing occ command "' . self::class . '"', ['exception' => $e]);
 			return 1;
 		}
 
 		if ($showCounter) {
-			$output->writeln(count($tables).' tables');
+			$output->writeln(count($tables) . ' tables');
 		} else {
 			$out = [];
 			foreach ($tables as $table) {

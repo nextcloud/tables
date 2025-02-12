@@ -51,8 +51,8 @@ class RemoveTable extends Command {
 			$this->tableService->delete($id, '');
 			$output->writeln('Table deleted.');
 		} catch (InternalError|PermissionError|Exception $e) {
-			$output->writeln('Error occurred: '.$e->getMessage());
-			$this->logger->warning('Following error occurred during executing occ command "'.self::class.'"', ['exception' => $e]);
+			$output->writeln('Error occurred: ' . $e->getMessage());
+			$this->logger->warning('Following error occurred during executing occ command "' . self::class . '"', ['exception' => $e]);
 			return 1;
 		}
 		return 0;

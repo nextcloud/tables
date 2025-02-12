@@ -63,7 +63,7 @@ class Version000000Date20210921000000 extends SimpleMigrationStep {
 			]);
 			$table->setPrimaryKey(['id']);
 
-			$table->addIndex(["ownership"], 'tables_tables_ownership');
+			$table->addIndex(['ownership'], 'tables_tables_ownership');
 		}
 
 		$table = 'tables_columns';

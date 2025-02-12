@@ -11,7 +11,9 @@ use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Log\Audit\CriticalActionPerformedEvent;
 
 final class DefaultAuditLogService implements AuditLogServiceInterface {
-	public function __construct(private IEventDispatcher $eventDispatcher) {
+	public function __construct(
+		private IEventDispatcher $eventDispatcher,
+	) {
 	}
 
 	public function log(string $message, array $context): void {

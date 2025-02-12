@@ -20,19 +20,19 @@ class RowCellNumberMapper extends RowCellMapperSuper {
 
 	public function formatEntity(Column $column, RowCellSuper $cell) {
 		$value = $cell->getValue();
-		if($value === '') {
+		if ($value === '') {
 			return null;
 		}
 		$decimals = $column->getNumberDecimals() ?? 0;
 		if ($decimals === 0) {
-			return (int) $value;
+			return (int)$value;
 		} else {
 			return round(floatval($value), $decimals);
 		}
 	}
 
 	public function applyDataToEntity(Column $column, RowCellSuper $cell, $data): void {
-		if(!is_numeric($data)) {
+		if (!is_numeric($data)) {
 			$cell->setValueWrapper(null);
 		}
 		$cell->setValueWrapper((float)$data);

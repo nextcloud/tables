@@ -20,7 +20,11 @@ use OCP\IDBConnection;
 class ContextMapper extends QBMapper {
 	protected string $table = 'tables_contexts_context';
 
-	public function __construct(IDBConnection $db, protected UserHelper $userHelper, protected GroupHelper $groupHelper) {
+	public function __construct(
+		IDBConnection $db,
+		protected UserHelper $userHelper,
+		protected GroupHelper $groupHelper,
+	) {
 		parent::__construct($db, $this->table, Context::class);
 	}
 
@@ -162,7 +166,7 @@ class ContextMapper extends QBMapper {
 		foreach ($contextIds as $contextId) {
 			$workArray = [];
 			foreach ($r as $row) {
-				if ((int) $row['id'] === $contextId) {
+				if ((int)$row['id'] === $contextId) {
 					$workArray[] = $row;
 				}
 			}
@@ -212,7 +216,7 @@ class ContextMapper extends QBMapper {
 		foreach ($contextIds as $contextId) {
 			$workArray = [];
 			foreach ($r as $row) {
-				if ((int) $row['id'] === $contextId) {
+				if ((int)$row['id'] === $contextId) {
 					$workArray[] = $row;
 				}
 			}

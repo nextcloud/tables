@@ -127,7 +127,7 @@ class ShareService extends SuperService {
 			}
 
 			if (!$this->permissionsService->canReadShare($item)) {
-				throw new PermissionError('PermissionError: can not read share with id '.$id);
+				throw new PermissionError('PermissionError: can not read share with id ' . $id);
 			}
 
 			return $item;
@@ -196,7 +196,7 @@ class ShareService extends SuperService {
 				} elseif ($elementType === 'view') {
 					$element = $this->viewMapper->find($share->getNodeId());
 				} else {
-					throw new InternalError('Cannot find element of type '.$elementType);
+					throw new InternalError('Cannot find element of type ' . $elementType);
 				}
 				// Check if en element with this id is already in the result array
 				$index = array_search($element->getId(), array_column($returnArray, 'id'));
@@ -221,7 +221,7 @@ class ShareService extends SuperService {
 		try {
 			$userId = $this->permissionsService->preCheckUserId($userId);
 		} catch (InternalError $e) {
-			$this->logger->warning('Could not pre check user: '.$e->getMessage().' Permission denied.');
+			$this->logger->warning('Could not pre check user: ' . $e->getMessage() . ' Permission denied.');
 			return new Permissions();
 		}
 		return $this->permissionsService->getSharedPermissionsIfSharedWithMe($elementId, $elementType, $userId);
@@ -244,7 +244,7 @@ class ShareService extends SuperService {
 		if (!$this->userId) {
 			$e = new \Exception('No user given.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 		$time = new DateTime();
 		$item = new Share();
@@ -299,36 +299,36 @@ class ShareService extends SuperService {
 			$item = $this->mapper->find($id);
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// security
 		if (!$this->permissionsService->canManageElementById($item->getNodeId(), $item->getNodeType())) {
-			throw new PermissionError('PermissionError: can not update share with id '.$id);
+			throw new PermissionError('PermissionError: can not update share with id ' . $id);
 		}
 
 		$time = new DateTime();
 
-		if ($permission === "read") {
+		if ($permission === 'read') {
 			$item->setPermissionRead($value);
 		}
 
-		if ($permission === "create") {
+		if ($permission === 'create') {
 			$item->setPermissionCreate($value);
 		}
 
-		if ($permission === "update") {
+		if ($permission === 'update') {
 			$item->setPermissionUpdate($value);
 		}
 
-		if ($permission === "delete") {
+		if ($permission === 'delete') {
 			$item->setPermissionDelete($value);
 		}
 
-		if ($permission === "manage") {
+		if ($permission === 'manage') {
 			$item->setPermissionManage($value);
 		}
 
@@ -338,7 +338,7 @@ class ShareService extends SuperService {
 			$share = $this->mapper->update($item);
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 		return $this->addReceiverDisplayName($share);
 	}
@@ -370,10 +370,10 @@ class ShareService extends SuperService {
 			return $this->contextNavigationMapper->setDisplayModeByShareId($shareId, $displayMode, $userId);
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (Exception|MultipleObjectsReturnedException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
 
@@ -389,15 +389,15 @@ class ShareService extends SuperService {
 			$item = $this->mapper->find($id);
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// security
 		if (!$this->permissionsService->canManageElementById($item->getNodeId(), $item->getNodeType())) {
-			throw new PermissionError('PermissionError: can not delete share with id '.$id);
+			throw new PermissionError('PermissionError: can not delete share with id ' . $id);
 		}
 
 		try {
@@ -407,7 +407,7 @@ class ShareService extends SuperService {
 			}
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 		return $this->addReceiverDisplayName($item);
 	}
@@ -449,7 +449,7 @@ class ShareService extends SuperService {
 		try {
 			$this->mapper->deleteByNode($table->getId(), 'table');
 		} catch (Exception $e) {
-			$this->logger->error('something went wrong while deleting shares for table: '.$table->getId());
+			$this->logger->error('something went wrong while deleting shares for table: ' . $table->getId());
 		}
 	}
 
@@ -457,7 +457,7 @@ class ShareService extends SuperService {
 		try {
 			$this->mapper->deleteByNode($view->getId(), 'view');
 		} catch (Exception $e) {
-			$this->logger->error('something went wrong while deleting shares for view: '.$view->getId());
+			$this->logger->error('something went wrong while deleting shares for view: ' . $view->getId());
 		}
 	}
 
@@ -472,7 +472,7 @@ class ShareService extends SuperService {
 				$this->mapper->deleteByNode($context->getId(), 'context');
 			}, $this->dbc);
 		} catch (Exception $e) {
-			$this->logger->error('something went wrong while deleting shares for context: '.$context->getId());
+			$this->logger->error('something went wrong while deleting shares for context: ' . $context->getId());
 		}
 	}
 
@@ -490,8 +490,8 @@ class ShareService extends SuperService {
 			try {
 				$this->mapper->update($share);
 			} catch (Exception $e) {
-				$this->logger->warning("Could not update share to change the sender: ".$e->getMessage(), ['exception' => $e]);
-				throw new InternalError("Could not update share to change the sender");
+				$this->logger->warning('Could not update share to change the sender: ' . $e->getMessage(), ['exception' => $e]);
+				throw new InternalError('Could not update share to change the sender');
 			}
 			$newShares[] = $share;
 		}

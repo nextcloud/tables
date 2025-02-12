@@ -148,7 +148,7 @@ class FeatureContext implements Context {
 
 		$this->sendOcsRequest(
 			'GET',
-			'/apps/tables/api/2/tables/'.$tableId,
+			'/apps/tables/api/2/tables/' . $tableId,
 		);
 
 		$tableToVerify = $this->getDataFromResponse($this->response)['ocs']['data'];
@@ -255,7 +255,7 @@ class FeatureContext implements Context {
 
 		$this->sendOcsRequest(
 			'GET',
-			'/apps/tables/api/2/tables/'.$this->tableIds[$tableName],
+			'/apps/tables/api/2/tables/' . $this->tableIds[$tableName],
 		);
 
 		$previousData = $this->getDataFromResponse($this->response)['ocs']['data'];
@@ -273,7 +273,7 @@ class FeatureContext implements Context {
 
 		$this->sendOcsRequest(
 			'PUT',
-			'/apps/tables/api/2/tables/'.$this->tableIds[$tableName],
+			'/apps/tables/api/2/tables/' . $this->tableIds[$tableName],
 			$data
 		);
 
@@ -287,7 +287,7 @@ class FeatureContext implements Context {
 
 		$this->sendOcsRequest(
 			'GET',
-			'/apps/tables/api/2/tables/'.$updatedTable['id'],
+			'/apps/tables/api/2/tables/' . $updatedTable['id'],
 		);
 
 		$tableToVerify = $this->getDataFromResponse($this->response)['ocs']['data'];
@@ -314,7 +314,7 @@ class FeatureContext implements Context {
 
 		$this->sendOcsRequest(
 			'PUT',
-			'/apps/tables/api/2/tables/'.$this->tableIds[$tableName].'/transfer',
+			'/apps/tables/api/2/tables/' . $this->tableIds[$tableName] . '/transfer',
 			$data
 		);
 
@@ -339,7 +339,7 @@ class FeatureContext implements Context {
 
 		$this->sendOcsRequest(
 			'GET',
-			'/apps/tables/api/2/tables/'.$this->tableIds[$tableName]
+			'/apps/tables/api/2/tables/' . $this->tableIds[$tableName]
 		);
 
 		$table = $this->getDataFromResponse($this->response)['ocs']['data'];
@@ -360,7 +360,7 @@ class FeatureContext implements Context {
 
 		$this->sendOcsRequest(
 			'DELETE',
-			'/apps/tables/api/2/tables/'.$this->tableIds[$tableName]
+			'/apps/tables/api/2/tables/' . $this->tableIds[$tableName]
 		);
 
 		$deletedTable = $this->getDataFromResponse($this->response)['ocs']['data'];
@@ -369,7 +369,7 @@ class FeatureContext implements Context {
 
 		$this->sendOcsRequest(
 			'GET',
-			'/apps/tables/api/2/tables/'.$deletedTable['id'],
+			'/apps/tables/api/2/tables/' . $deletedTable['id'],
 		);
 		Assert::assertEquals(404, $this->response->getStatusCode());
 
@@ -392,15 +392,15 @@ class FeatureContext implements Context {
 		$props = [
 			'baseNodeType' => $nodeType,
 		];
-		if($nodeType === 'table') {
+		if ($nodeType === 'table') {
 			$props['baseNodeId'] = $this->tableIds[$nodeName];
 		}
-		if($nodeType === 'view') {
+		if ($nodeType === 'view') {
 			$props['baseNodeId'] = $this->viewIds[$nodeName];
 		}
 		$title = null;
 		foreach ($properties->getRows() as $row) {
-			if($row[0] === 'title') {
+			if ($row[0] === 'title') {
 				$title = $row[1];
 			}
 			$props[$row[0]] = $row[1];
@@ -408,7 +408,7 @@ class FeatureContext implements Context {
 
 		$this->sendOcsRequest(
 			'POST',
-			'/apps/tables/api/2/columns/'.$columnType,
+			'/apps/tables/api/2/columns/' . $columnType,
 			$props
 		);
 
@@ -420,7 +420,7 @@ class FeatureContext implements Context {
 
 		$this->sendOcsRequest(
 			'GET',
-			'/apps/tables/api/2/columns/'.$newColumn['id'],
+			'/apps/tables/api/2/columns/' . $newColumn['id'],
 		);
 
 		$columnToVerify = $this->getDataFromResponse($this->response)['ocs']['data'];
@@ -437,16 +437,16 @@ class FeatureContext implements Context {
 	 */
 	public function columnsForNodeV2(string $nodeType, string $nodeName, ?TableNode $body = null): void {
 		$nodeId = null;
-		if($nodeType === 'table') {
+		if ($nodeType === 'table') {
 			$nodeId = $this->tableIds[$nodeName];
 		}
-		if($nodeType === 'view') {
+		if ($nodeType === 'view') {
 			$nodeId = $this->viewIds[$nodeName];
 		}
 
 		$this->sendOcsRequest(
 			'GET',
-			'/apps/tables/api/2/columns/'.$nodeType.'/'.$nodeId
+			'/apps/tables/api/2/columns/' . $nodeType . '/' . $nodeId
 		);
 
 		$data = $this->getDataFromResponse($this->response)['ocs']['data'];
@@ -498,7 +498,7 @@ class FeatureContext implements Context {
 	 */
 	public function createCsvFile(string $user, string $file, ?TableNode $table = null): void {
 		$this->setCurrentUser($user);
-		$url = $this->baseUrl.'remote.php/dav/files/'.$user.$file;
+		$url = $this->baseUrl . 'remote.php/dav/files/' . $user . $file;
 		$body = $this->tableNodeToCsv($table);
 		$headers = ['Content-Type' => 'text/csv'];
 
@@ -511,8 +511,8 @@ class FeatureContext implements Context {
 		$out = '';
 		foreach ($node->getRows() as $row) {
 			foreach ($row as $value) {
-				if($out !== '' && substr($out, -1) !== "\n") {
-					$out .= ",";
+				if ($out !== '' && substr($out, -1) !== "\n") {
+					$out .= ',';
 				}
 				$out .= trim($value);
 			}
@@ -529,7 +529,7 @@ class FeatureContext implements Context {
 	public function importTable(string $file): void {
 		$this->sendRequest(
 			'POST',
-			'/apps/tables/api/1/import/table/'.$this->tableId,
+			'/apps/tables/api/1/import/table/' . $this->tableId,
 			[
 				'path' => $file,
 				'createMissingColumns' => true,
@@ -577,7 +577,7 @@ class FeatureContext implements Context {
 	public function checkRowsExists(TableNode $table): void {
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/tables/'.$this->tableId.'/rows/simple',
+			'/apps/tables/api/1/tables/' . $this->tableId . '/rows/simple',
 		);
 
 		$allRows = $this->getDataFromResponse($this->response);
@@ -653,7 +653,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/tables/'.$this->tableIds[$tableName].'/views'
+			'/apps/tables/api/1/tables/' . $this->tableIds[$tableName] . '/views'
 		);
 
 		$data = $this->getDataFromResponse($this->response);
@@ -689,7 +689,7 @@ class FeatureContext implements Context {
 		$this->setCurrentUser($user);
 		$this->sendRequest(
 			'POST',
-			'/apps/tables/api/1/tables/'.$this->tableIds[$tableName].'/views',
+			'/apps/tables/api/1/tables/' . $this->tableIds[$tableName] . '/views',
 			[
 				'title' => $title,
 				'emoji' => $emoji
@@ -710,7 +710,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/views/'.$newItem['id'],
+			'/apps/tables/api/1/views/' . $newItem['id'],
 		);
 
 		$itemToVerify = $this->getDataFromResponse($this->response);
@@ -750,7 +750,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/tables/'.$newTable['id'],
+			'/apps/tables/api/1/tables/' . $newTable['id'],
 		);
 
 		$tableToVerify = $this->getDataFromResponse($this->response);
@@ -763,7 +763,7 @@ class FeatureContext implements Context {
 	private function getTableByKeyword(string $keyword) {
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/tables?keyword='.$keyword
+			'/apps/tables/api/1/tables?keyword=' . $keyword
 		);
 
 		$tables = $this->getDataFromResponse($this->response);
@@ -773,7 +773,7 @@ class FeatureContext implements Context {
 	private function getTableById(int $tableId): array {
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/tables/'.$tableId
+			'/apps/tables/api/1/tables/' . $tableId
 		);
 
 		return $this->getDataFromResponse($this->response);
@@ -798,7 +798,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'PUT',
-			'/apps/tables/api/1/tables/'.$table['id'],
+			'/apps/tables/api/1/tables/' . $table['id'],
 			$data
 		);
 
@@ -811,7 +811,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/tables/'.$updatedTable['id'],
+			'/apps/tables/api/1/tables/' . $updatedTable['id'],
 		);
 
 		$tableToVerify = $this->getDataFromResponse($this->response);
@@ -839,7 +839,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'PUT',
-			'/apps/tables/api/1/views/'.$this->viewIds[$viewName],
+			'/apps/tables/api/1/views/' . $this->viewIds[$viewName],
 			[ 'data' => $data ]
 		);
 
@@ -851,7 +851,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/views/'.$updatedItem['id'],
+			'/apps/tables/api/1/views/' . $updatedItem['id'],
 		);
 
 		$itemToVerify = $this->getDataFromResponse($this->response);
@@ -901,7 +901,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/views/'.$deletedItem['id'],
+			'/apps/tables/api/1/views/' . $deletedItem['id'],
 		);
 		Assert::assertEquals(404, $this->response->getStatusCode());
 
@@ -916,7 +916,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'DELETE',
-			'/apps/tables/api/1/views/'.$this->viewIds[$viewName]
+			'/apps/tables/api/1/views/' . $this->viewIds[$viewName]
 		);
 		return true;
 	}
@@ -933,7 +933,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'DELETE',
-			'/apps/tables/api/1/tables/'.$table['id']
+			'/apps/tables/api/1/tables/' . $table['id']
 		);
 		$deletedTable = $this->getDataFromResponse($this->response);
 
@@ -947,7 +947,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/tables/'.$deletedTable['id'],
+			'/apps/tables/api/1/tables/' . $deletedTable['id'],
 		);
 		Assert::assertEquals(404, $this->response->getStatusCode());
 
@@ -998,7 +998,7 @@ class FeatureContext implements Context {
 		];
 		$this->sendRequest(
 			'POST',
-			'/apps/tables/api/1/tables/'.$table['id'].'/shares',
+			'/apps/tables/api/1/tables/' . $table['id'] . '/shares',
 			array_merge($permissions, [
 				'receiverType' => 'user',
 				'receiver' => $receiver
@@ -1020,7 +1020,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/shares/'.$share['id'],
+			'/apps/tables/api/1/shares/' . $share['id'],
 		);
 
 		$shareToVerify = $this->getDataFromResponse($this->response);
@@ -1055,7 +1055,7 @@ class FeatureContext implements Context {
 		];
 		$this->sendRequest(
 			'POST',
-			'/apps/tables/api/1/tables/'.$table['id'].'/shares',
+			'/apps/tables/api/1/tables/' . $table['id'] . '/shares',
 			array_merge($permissions, [
 				'receiverType' => 'group',
 				'receiver' => $receiver
@@ -1077,7 +1077,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/shares/'.$share['id'],
+			'/apps/tables/api/1/shares/' . $share['id'],
 		);
 
 		$shareToVerify = $this->getDataFromResponse($this->response);
@@ -1097,7 +1097,7 @@ class FeatureContext implements Context {
 	private function getShareById(int $shareId): array {
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/shares/'.$shareId
+			'/apps/tables/api/1/shares/' . $shareId
 		);
 
 		return $this->getDataFromResponse($this->response);
@@ -1138,7 +1138,7 @@ class FeatureContext implements Context {
 		$share = $this->getDataFromResponse($this->response);
 
 		Assert::assertEquals(200, $this->response->getStatusCode());
-		Assert::assertEquals($share['permission'.ucfirst($permissionType)], $value);
+		Assert::assertEquals($share['permission' . ucfirst($permissionType)], $value);
 	}
 
 	// COLUMNS --------------------------
@@ -1157,7 +1157,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'POST',
-			'/apps/tables/api/1/tables/'.$this->tableId.'/columns',
+			'/apps/tables/api/1/tables/' . $this->tableId . '/columns',
 			$props
 		);
 
@@ -1170,7 +1170,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/columns/'.$newColumn['id'],
+			'/apps/tables/api/1/columns/' . $newColumn['id'],
 		);
 
 		$columnToVerify = $this->getDataFromResponse($this->response);
@@ -1188,7 +1188,7 @@ class FeatureContext implements Context {
 	public function tableColumns(?TableNode $body = null): void {
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/tables/'.$this->tableId.'/columns'
+			'/apps/tables/api/1/tables/' . $this->tableId . '/columns'
 		);
 
 		$data = $this->getDataFromResponse($this->response);
@@ -1218,7 +1218,7 @@ class FeatureContext implements Context {
 	public function tableTypedColumns(?TableNode $body = null): void {
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/tables/'.$this->tableId.'/columns'
+			'/apps/tables/api/1/tables/' . $this->tableId . '/columns'
 		);
 
 		$data = $this->getDataFromResponse($this->response);
@@ -1246,7 +1246,7 @@ class FeatureContext implements Context {
 	public function deleteColumn(): void {
 		$this->sendRequest(
 			'DELETE',
-			'/apps/tables/api/1/columns/'.$this->columnId
+			'/apps/tables/api/1/columns/' . $this->columnId
 		);
 		$column = $this->getDataFromResponse($this->response);
 
@@ -1255,7 +1255,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/columns/'.$column['id'],
+			'/apps/tables/api/1/columns/' . $column['id'],
 		);
 		Assert::assertEquals(404, $this->response->getStatusCode());
 	}
@@ -1273,7 +1273,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'PUT',
-			'/apps/tables/api/1/columns/'.$this->columnId,
+			'/apps/tables/api/1/columns/' . $this->columnId,
 			$props
 		);
 
@@ -1293,7 +1293,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/columns/'.$column['id'],
+			'/apps/tables/api/1/columns/' . $column['id'],
 		);
 
 		$columnToVerify = $this->getDataFromResponse($this->response);
@@ -1326,7 +1326,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'POST',
-			'/apps/tables/api/1/tables/'.$this->tableId.'/rows',
+			'/apps/tables/api/1/tables/' . $this->tableId . '/rows',
 			['data' => $props]
 		);
 
@@ -1340,7 +1340,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/rows/'.$newRow['id'],
+			'/apps/tables/api/1/rows/' . $newRow['id'],
 		);
 
 		$rowToVerify = $this->getDataFromResponse($this->response);
@@ -1455,7 +1455,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'POST',
-			'/apps/tables/api/1/tables/'.$this->tableId.'/rows',
+			'/apps/tables/api/1/tables/' . $this->tableId . '/rows',
 			['data' => json_encode($props)]
 		);
 
@@ -1469,7 +1469,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/rows/'.$newRow['id'],
+			'/apps/tables/api/1/rows/' . $newRow['id'],
 		);
 
 		$rowToVerify = $this->getDataFromResponse($this->response);
@@ -1485,7 +1485,7 @@ class FeatureContext implements Context {
 	public function deleteRow(): void {
 		$this->sendRequest(
 			'DELETE',
-			'/apps/tables/api/1/rows/'.$this->rowId
+			'/apps/tables/api/1/rows/' . $this->rowId
 		);
 		$row = $this->getDataFromResponse($this->response);
 
@@ -1494,7 +1494,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/rows/'.$row['id'],
+			'/apps/tables/api/1/rows/' . $row['id'],
 		);
 		Assert::assertEquals(404, $this->response->getStatusCode());
 	}
@@ -1513,7 +1513,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'PUT',
-			'/apps/tables/api/1/rows/'.$this->rowId,
+			'/apps/tables/api/1/rows/' . $this->rowId,
 			['data' => $props]
 		);
 
@@ -1526,7 +1526,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/rows/'.$row['id'],
+			'/apps/tables/api/1/rows/' . $row['id'],
 		);
 
 		$rowToVerify = $this->getDataFromResponse($this->response);
@@ -1560,7 +1560,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'PUT',
-			'/apps/tables/api/1/rows/'.$this->rowId,
+			'/apps/tables/api/1/rows/' . $this->rowId,
 			['data' => json_encode($props)]
 		);
 
@@ -1573,7 +1573,7 @@ class FeatureContext implements Context {
 
 		$this->sendRequest(
 			'GET',
-			'/apps/tables/api/1/rows/'.$row['id'],
+			'/apps/tables/api/1/rows/' . $row['id'],
 		);
 
 		$rowToVerify = $this->getDataFromResponse($this->response);
@@ -1935,7 +1935,7 @@ class FeatureContext implements Context {
 
 		$this->sendOcsRequest(
 			'POST',
-			'/apps/tables/api/2/favorites/' . $nodeType. '/' . $tableId,
+			'/apps/tables/api/2/favorites/' . $nodeType . '/' . $tableId,
 		);
 		if ($this->response->getStatusCode() === 200) {
 			$this->userFetchesTableInfo($user, $tableName);
@@ -1952,7 +1952,7 @@ class FeatureContext implements Context {
 
 		$this->sendOcsRequest(
 			'DELETE',
-			'/apps/tables/api/2/favorites/' . $nodeType. '/' . $tableId,
+			'/apps/tables/api/2/favorites/' . $nodeType . '/' . $tableId,
 		);
 		if ($this->response->getStatusCode() === 200) {
 			$this->userFetchesTableInfo($user, $tableName);
@@ -2090,13 +2090,13 @@ class FeatureContext implements Context {
 
 		foreach ($expectedData as $field => $value) {
 			switch ($field) {
-				case "name":
+				case 'name':
 					Assert::assertEquals($value, $actualData['name']);
 					break;
-				case "icon":
+				case 'icon':
 					Assert::assertEquals($value, $actualData['iconName']);
 					break;
-				case "node":
+				case 'node':
 					[$strType, $alias, $strPermission] = explode(':', $value);
 					$nodeType = $strType === 'table' ? 0 : 1;
 					$nodeId = $nodeType === 0 ? $this->tableIds[$alias] : $this->viewIds[$alias];
@@ -2109,7 +2109,7 @@ class FeatureContext implements Context {
 					}
 					Assert::assertTrue($found);
 					break;
-				case "page":
+				case 'page':
 					[$pageType, $contentNodesCount] = explode(':', $value);
 					$found = false;
 					foreach ($actualData['pages'] as $actualPageData) {
@@ -2130,13 +2130,13 @@ class FeatureContext implements Context {
 
 		foreach ($expectedData as $field => $value) {
 			switch ($field) {
-				case "name":
+				case 'name':
 					Assert::assertNotEquals($value, $actualData['name']);
 					break;
-				case "icon":
+				case 'icon':
 					Assert::assertNotEquals($value, $actualData['iconName']);
 					break;
-				case "node":
+				case 'node':
 					[$strType, $alias, $strPermission] = explode(':', $value);
 					$nodeType = $strType === 'table' ? 0 : 1;
 					$nodeId = $nodeType === 0 ? $this->tableIds[$alias] : $this->viewIds[$alias];
@@ -2149,7 +2149,7 @@ class FeatureContext implements Context {
 					}
 					Assert::assertFalse($found);
 					break;
-				case "page":
+				case 'page':
 					[$pageType, $contentNodesCount] = explode(':', $value);
 					$found = false;
 					foreach ($actualData['pages'] as $actualPageData) {

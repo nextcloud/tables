@@ -29,12 +29,12 @@ class ApiGeneralController extends AOCSController {
 	private ViewService $viewService;
 
 	public function __construct(
-		IRequest     $request,
+		IRequest $request,
 		TableService $tableService,
 		ViewService $viewService,
 		LoggerInterface $logger,
 		IL10N $n,
-		?string $userId
+		?string $userId,
 	) {
 		parent::__construct($request, $logger, $n, $userId);
 		$this->tableService = $tableService;
@@ -58,7 +58,7 @@ class ApiGeneralController extends AOCSController {
 			$views = $this->viewService->formatViews($this->viewService->findSharedViewsWithMe($this->userId));
 			return new DataResponse([ 'tables' => $tables, 'views' => $views ]);
 		} catch (InternalError|Exception $e) {
-			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
+			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}

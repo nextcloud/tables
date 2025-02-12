@@ -97,7 +97,7 @@ class ImportController extends Controller {
 			return $this->handleError(function () use ($tableId, $file) {
 				return $this->service->previewImport($tableId, null, $file['tmp_name']);
 			});
-		} catch (UploadException | NotPermittedException $e) {
+		} catch (UploadException|NotPermittedException $e) {
 			$this->logger->error('Upload error', ['exception' => $e]);
 			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
@@ -113,7 +113,7 @@ class ImportController extends Controller {
 				// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
 				return $this->service->import($tableId, null, $file['tmp_name'], $createMissingColumns, $columnsConfigArray);
 			});
-		} catch (UploadException | NotPermittedException $e) {
+		} catch (UploadException|NotPermittedException $e) {
 			$this->logger->error('Upload error', ['exception' => $e]);
 			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
@@ -127,7 +127,7 @@ class ImportController extends Controller {
 			return $this->handleError(function () use ($viewId, $file) {
 				return $this->service->previewImport(null, $viewId, $file['tmp_name']);
 			});
-		} catch (UploadException | NotPermittedException $e) {
+		} catch (UploadException|NotPermittedException $e) {
 			$this->logger->error('Upload error', ['exception' => $e]);
 			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
@@ -143,7 +143,7 @@ class ImportController extends Controller {
 				// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
 				return $this->service->import(null, $viewId, $file['tmp_name'], $createMissingColumns, $columnsConfigArray);
 			});
-		} catch (UploadException | NotPermittedException $e) {
+		} catch (UploadException|NotPermittedException $e) {
 			$this->logger->error('Upload error', ['exception' => $e]);
 			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}

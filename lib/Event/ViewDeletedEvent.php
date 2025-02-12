@@ -11,7 +11,9 @@ use OCA\Tables\Db\View;
 use OCP\EventDispatcher\Event;
 
 final class ViewDeletedEvent extends Event {
-	public function __construct(protected View $view) {
+	public function __construct(
+		protected View $view,
+	) {
 		parent::__construct();
 	}
 
