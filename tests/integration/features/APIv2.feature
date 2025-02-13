@@ -9,9 +9,9 @@ Feature: APIv2
   @api2
   Scenario: Test initial setup
     Then user "participant1-v2" has the following tables via v2
-    | Tutorial |
+    | Welcome to Nextcloud Tables! |
     Then user "participant1-v2" has the following resources via v2
-    | Tutorial |
+    | Welcome to Nextcloud Tables! |
 
   @api2
   Scenario: Basic table actions

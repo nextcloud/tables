@@ -28,10 +28,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        server-versions: ['stable29', 'stable30' 'master']
+        server-versions: ['stable29', 'stable30', 'stable31', 'master']
         php-versions: ['8.1']
         databases: ['mysql']
         include:
+          - server-versions: 'stable31'
+            php-versions: '8.4'
+            databases: 'pgsql'
+          - server-versions: 'stable31'
+            php-versions: '8.4'
+            databases: 'sqlite'
           - server-versions: 'master'
             php-versions: '8.4'
             databases: 'pgsql'
