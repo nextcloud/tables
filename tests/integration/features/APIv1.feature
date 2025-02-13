@@ -11,7 +11,7 @@ Feature: APIv1
   @api1
   Scenario: User has initial table
     Then user "participant1" has the following tables
-      | Tutorial |
+      | Welcome to Nextcloud Tables! |
 
   @api1
   Scenario: User creates, rename and delete a table
@@ -22,7 +22,7 @@ Feature: APIv1
     Then user "participant1" updates table with keyword "renamed table" set title "renamed table without emoji" and optional emoji ""
     Then user "participant1" deletes table with keyword "without emoji"
     Then user "participant1" has the following tables
-      | Tutorial |
+      | Welcome to Nextcloud Tables! |
 
   @api1
   Scenario: Table sharing with a user
@@ -35,7 +35,7 @@ Feature: APIv1
       | delete  | 0 |
       | manage  | 0 |
     Then user "participant2" has the following tables
-      | Tutorial | Ready to share |
+      | Welcome to Nextcloud Tables! | Ready to share |
     Then user "participant1" sets permission "read" to 0
     Then user "participant1" sets permission "update" to 0
     Then user "participant2" has the following permissions
@@ -46,9 +46,9 @@ Feature: APIv1
       | manage  | 0 |
     Then user "participant1" deletes table with keyword "Ready to share"
     Then user "participant1" has the following tables
-      | Tutorial |
+      | Welcome to Nextcloud Tables! |
     Then user "participant2" has the following tables
-      | Tutorial |
+      | Welcome to Nextcloud Tables! |
 
   @api1 @table-sharing
   Scenario: Inaccessible table sharing with a user
@@ -57,19 +57,19 @@ Feature: APIv1
     When user "participant2" attempts to share the table with user "participant3"
     Then the reported status is "404"
     And user "participant3" has the following tables
-      | Tutorial |
+      | Welcome to Nextcloud Tables! |
 
   @api1
   Scenario: Table sharing with a group
     Given table "Ready to share" with emoji "🥪" exists for user "participant1" as "base1"
     Then user "participant1" shares table with group "phoenix"
     Then user "participant2" has the following tables
-      | Tutorial | Ready to share |
+      | Welcome to Nextcloud Tables! | Ready to share |
     Then user "participant1" deletes table with keyword "Ready to share"
     Then user "participant1" has the following tables
-      | Tutorial |
+      | Welcome to Nextcloud Tables! |
     Then user "participant2" has the following tables
-      | Tutorial |
+      | Welcome to Nextcloud Tables! |
 
   @api1
   Scenario: Create and check columns
