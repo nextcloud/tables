@@ -9,6 +9,8 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Step\Given;
+use Behat\Step\When;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ClientException;
@@ -48,7 +50,6 @@ class FeatureContext implements Context {
 	private ?int $tableId = null;
 	private ?int $columnId = null;
 	private ?int $rowId = null;
-	private ?array $tableColumns = [];
 	private ?array $importResult = null;
 	private ?array $activeNode = null;
 
@@ -63,7 +64,6 @@ class FeatureContext implements Context {
 
 	// Store data from last request to perform assertions, id is used as a key
 	private array $tableData = [];
-	private array $viewData = [];
 
 	private $importColumnData = null;
 
@@ -101,7 +101,6 @@ class FeatureContext implements Context {
 			$this->deleteGroup($group);
 		}
 	}
-
 
 	/**
 	 * @Given table :table with emoji :emoji exists for user :user as :tableName via v2
@@ -821,6 +820,38 @@ class FeatureContext implements Context {
 		Assert::assertEquals($tableToVerify['ownership'], $user);
 	}
 
+	protected function sendUpdateViewRequest(string $viewName, array $data): void {
+		$viewId = $this->collectionManager->getByAlias('view', $viewName)['id'];
+		$this->sendRequest(
+			'PUT',
+			sprintf('/apps/tables/api/1/views/%d', $viewId),
+			[ 'data' => $data ]
+		);
+	}
+
+	#[When('following sort order is applied to view :viewName:')]
+	public function applySortToView(string $viewName, TableNode $sortOrder): void {
+		$sortData = [];
+		foreach ($sortOrder->getRows() as $row) {
+
+			$columnId = match ($row[0]) {
+				'meta-id' => -1,
+				'meta-created-by' => -2,
+				'meta-updated-by' => -3,
+				'meta-created-at' => -4,
+				'meta-updated-at' => -5,
+				default => $this->collectionManager->getByAlias('column', $row[0])['id'],
+			};
+
+			$sortData[] = [
+				'columnId' => $columnId,
+				'mode' => $row[1]
+			];
+
+		}
+		$this->sendUpdateViewRequest($viewName, ['sort' => json_encode($sortData)]);
+	}
+
 	/**
 	 * @When user :user update view :viewName with title :title and emoji :emoji
 	 *
@@ -837,12 +868,7 @@ class FeatureContext implements Context {
 			$data['emoji'] = $emoji;
 		}
 
-		$this->sendRequest(
-			'PUT',
-			'/apps/tables/api/1/views/' . $this->viewIds[$viewName],
-			[ 'data' => $data ]
-		);
-
+		$this->sendUpdateViewRequest($viewName, $data);
 		$updatedItem = $this->getDataFromResponse($this->response);
 
 		Assert::assertEquals(200, $this->response->getStatusCode());
@@ -875,13 +901,7 @@ class FeatureContext implements Context {
 			return $col['id'];
 		}, $columns);
 
-		$view = $this->collectionManager->getByAlias('view', $viewAlias);
-
-		$this->sendRequest(
-			'PUT',
-			'/apps/tables/api/1/views/' . $view['id'],
-			[ 'data' => ['columns' => json_encode($columns)] ]
-		);
+		$this->sendUpdateViewRequest($viewAlias, ['columns' => json_encode($columns)]);
 	}
 
 	/**
@@ -953,7 +973,6 @@ class FeatureContext implements Context {
 
 		$this->tableId = null;
 		$this->columnId = null;
-		$this->tableColumns = [];
 	}
 
 	/**
@@ -1163,7 +1182,6 @@ class FeatureContext implements Context {
 
 		$newColumn = $this->getDataFromResponse($this->response);
 		$this->columnId = $newColumn['id'];
-		$this->tableColumns[$newColumn['title']] = $newColumn['id'];
 
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($newColumn['title'], $title);
@@ -1320,7 +1338,7 @@ class FeatureContext implements Context {
 	public function createRow(?TableNode $properties = null): void {
 		$props = [];
 		foreach ($properties->getRows() as $row) {
-			$columnId = $this->tableColumns[$row[0]];
+			$columnId = $this->collectionManager->getByAlias('column', $row[0])['id'];
 			$props[$columnId] = $row[1];
 		}
 
@@ -1371,7 +1389,7 @@ class FeatureContext implements Context {
 
 		$props = [];
 		foreach ($properties->getRows() as $row) {
-			$columnId = $this->tableColumns[$row[0]];
+			$columnId = $this->collectionManager->getByAlias('column', $row[0])['id'];
 			$props[$columnId] = $row[1];
 		}
 
@@ -1392,7 +1410,7 @@ class FeatureContext implements Context {
 
 		$props = [];
 		foreach ($properties->getRows() as $row) {
-			$columnId = $this->tableColumns[$row[0]];
+			$columnId = $this->collectionManager->getByAlias('column', $row[0])['id'];
 			$props[$columnId] = $row[1];
 		}
 
@@ -1411,7 +1429,7 @@ class FeatureContext implements Context {
 	public function createRowV2(TableNode $properties): void {
 		$props = [];
 		foreach ($properties->getRows() as $row) {
-			$columnId = $this->tableColumns[$row[0]];
+			$columnId = $this->collectionManager->getByAlias('column', $row[0])['id'];
 			$props[$columnId] = $row[1];
 		}
 
@@ -1449,7 +1467,7 @@ class FeatureContext implements Context {
 	public function createRowLegacy(?TableNode $properties = null): void {
 		$props = [];
 		foreach ($properties->getRows() as $row) {
-			$columnId = $this->tableColumns[$row[0]];
+			$columnId = $this->collectionManager->getByAlias('column', $row[0])['id'];
 			$props[$columnId] = $row[1];
 		}
 
@@ -1507,7 +1525,7 @@ class FeatureContext implements Context {
 	public function updateRow(?TableNode $properties = null): void {
 		$props = [];
 		foreach ($properties->getRows() as $row) {
-			$columnId = $this->tableColumns[$row[0]];
+			$columnId = $this->collectionManager->getByAlias('column', $row[0])['id'];
 			$props[$columnId] = $row[1];
 		}
 
@@ -1554,7 +1572,7 @@ class FeatureContext implements Context {
 	public function updateRowLegacy(?TableNode $properties = null): void {
 		$props = [];
 		foreach ($properties->getRows() as $row) {
-			$columnId = $this->tableColumns[$row[0]];
+			$columnId = $this->collectionManager->getByAlias('column', $row[0])['id'];
 			$props[$columnId] = $row[1];
 		}
 
@@ -1587,11 +1605,8 @@ class FeatureContext implements Context {
 	 * User management
 	 */
 
-	/**
-	 * @Given /^as user "([^"]*)"$/
-	 * @param string $user
-	 */
-	public function setCurrentUser($user) {
+	#[Given('as user :user')]
+	public function setCurrentUser(?string $user): void {
 		$this->currentUser = $user;
 	}
 
@@ -2466,7 +2481,7 @@ class FeatureContext implements Context {
 
 		$expected = [];
 		foreach ($columnValues->getRows() as $row) {
-			$columnId = $this->tableColumns[$row[0]];
+			$columnId = $this->collectionManager->getByAlias('column', $row[0])['id'];
 			$expected[$columnId] = $row[1];
 		}
 
@@ -2510,7 +2525,7 @@ class FeatureContext implements Context {
 
 		$props = [];
 		foreach ($properties->getRows() as $row) {
-			$columnId = $this->tableColumns[$row[0]];
+			$columnId = $this->collectionManager->getByAlias('column', $row[0])['id'];
 			$props[$columnId] = $row[1];
 		}
 
@@ -2538,7 +2553,7 @@ class FeatureContext implements Context {
 
 		$props = [];
 		foreach ($properties->getRows() as $row) {
-			$columnId = $this->tableColumns[$row[0]];
+			$columnId = $this->collectionManager->getByAlias('column', $row[0])['id'];
 			$props[$columnId] = $row[1];
 		}
 
@@ -2612,6 +2627,38 @@ class FeatureContext implements Context {
 			return (int)$actualRow['id'];
 		}, $allRows);
 		sort($actualRowIds);
+
+		Assert::assertSame($expectedIds, $actualRowIds);
+	}
+
+	/**
+	 * @Then :nodeType :nodeAlias has exactly these rows :rowAliasList in exactly this order
+	 */
+	public function nodeHasExactlyThoseSortedRows(string $nodeType, string $nodeAlias, string $rowAliasList): void {
+		$nodeItem = $this->collectionManager->getByAlias($nodeType, $nodeAlias);
+
+		$this->sendRequest(
+			'GET',
+			sprintf('/apps/tables/api/1/%ss/%s/rows', $nodeType, $nodeItem['id']),
+		);
+
+		$allRows = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		$rowAliases = explode(',', $rowAliasList);
+		$expectedIds = array_map(function ($rowAlias): int {
+			$row = $this->collectionManager->getByAlias('row', $rowAlias);
+			return $row['id'];
+		}, $rowAliases);
+
+		$actualRowIds = array_map(function (array $actualRow): int {
+			if ($this->collectionManager->getById('row', (int)$actualRow['id'])) {
+				$this->collectionManager->update($actualRow, 'row', (int)$actualRow['id']);
+			} else {
+				$this->collectionManager->register($actualRow, 'row', (int)$actualRow['id']);
+			}
+			return (int)$actualRow['id'];
+		}, $allRows);
 
 		Assert::assertSame($expectedIds, $actualRowIds);
 	}
