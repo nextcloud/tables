@@ -6,6 +6,7 @@
 	<NcDialog v-if="showModal"
 		data-cy="editRowModal"
 		:name="t('tables', 'Edit row')"
+		size="large"
 		@closing="actionCancel">
 		<div class="modal__content" @keydown="onKeydown">
 			<div v-for="column in nonMetaColumns" :key="column.id">
