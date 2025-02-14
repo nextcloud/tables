@@ -271,7 +271,7 @@ class Row2Mapper {
 	 */
 	private function addSortQueryForMultipleSleeveFinder(IQueryBuilder $qb, string $sleevesAlias, array $sort): void {
 		$i = 1;
-		foreach (array_reverse($sort) as $sortData) {
+		foreach ($sort as $sortData) {
 			if (!isset($this->columns[$sortData['columnId']]) && !isset($this->allColumns[$sortData['columnId']]) && $sortData['columnId'] > 0) {
 				throw new InternalError('No column found to build filter with for id ' . $sortData['columnId']);
 			}
@@ -287,7 +287,7 @@ class Row2Mapper {
 						$qb->expr()->eq($alias . '.column_id', $qb->createNamedParameter($sortData['columnId']))
 					)
 				);
-				$qb->orderBy($alias . '.value', $sortData['mode']);
+				$qb->addOrderBy($alias . '.value', $sortData['mode']);
 			} elseif (Column::isValidMetaTypeId($sortData['columnId'])) {
 				$fieldName = match ($sortData['columnId']) {
 					Column::TYPE_META_ID => 'id',
@@ -309,7 +309,7 @@ class Row2Mapper {
 					continue;
 				}
 
-				$qb->orderBy($sleevesAlias . '.' . $fieldName, $sortData['mode']);
+				$qb->addOrderBy($sleevesAlias . '.' . $fieldName, $sortData['mode']);
 			}
 			$i++;
 		}
