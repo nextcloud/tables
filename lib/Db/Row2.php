@@ -9,6 +9,7 @@ namespace OCA\Tables\Db;
 
 use JsonSerializable;
 use OCA\Tables\Model\Public\Row;
+use OCA\Tables\Model\RowDataInput;
 use OCA\Tables\ResponseDefinitions;
 
 /**
@@ -73,12 +74,21 @@ class Row2 implements JsonSerializable {
 	}
 
 	/**
-	 * @param list<array{columnId: int, value: mixed}> $data
+	 * @param RowDataInput|list<array{columnId: int, value: mixed}> $data
 	 * @return void
 	 */
-	public function setData(array $data): void {
-		foreach ($data as $cell) {
-			$this->insertOrUpdateCell($cell);
+	public function setData(array|RowDataInput $data): void {
+		if (is_array($data)) {
+			foreach ($data as $cell) {
+				if (!is_array($cell) || !isset($cell['columnId']) || !isset($cell['value'])) {
+					continue; // Skip invalid entries
+				}
+				$this->insertOrUpdateCell($cell);
+			}
+		} else {
+			foreach ($data as $cell) {
+				$this->insertOrUpdateCell($cell);
+			}
 		}
 	}
 
