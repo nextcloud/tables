@@ -163,20 +163,38 @@ class ImportService extends SuperService {
 				$colIndex = $cellIterator->getCurrentColumnIndex() - 1;
 				$column = $this->columns[$colIndex];
 
-				if (($column && $column->getType() === 'datetime') || (is_array($columns[$colIndex]) && $columns[$colIndex]['type'] === 'datetime')) {
-					if (isset($columns[$colIndex]['subtype']) && $columns[$colIndex]['subtype'] === 'date') {
+				if (
+					($column && $column->getType() === Column::TYPE_DATETIME)
+					|| (is_array($columns[$colIndex])
+						&& $columns[$colIndex]['type'] === Column::TYPE_DATETIME)
+				) {
+					if (isset($columns[$colIndex]['subtype'])
+						&& $columns[$colIndex]['subtype'] === Column::SUBTYPE_DATETIME_DATE
+					) {
 						$format = 'Y-m-d';
-					} elseif (isset($columns[$colIndex]['subtype']) && $columns[$colIndex]['subtype'] === 'time') {
+					} elseif (isset($columns[$colIndex]['subtype'])
+						&& $columns[$colIndex]['subtype'] === Column::SUBTYPE_DATETIME_TIME
+					) {
 						$format = 'H:i';
 					} else {
 						$format = 'Y-m-d H:i';
 					}
 					$value = $this->parseAndFormatDateTimeString($value, $format);
-				} elseif (($column && $column->getType() === 'number' && $column->getNumberSuffix() === '%')
-					|| (is_array($columns[$colIndex]) && $columns[$colIndex]['type'] === 'number' && $columns[$colIndex]['numberSuffix'] === '%')) {
+				} elseif (
+					($column && $column->getType() === Column::TYPE_NUMBER
+						&& $column->getNumberSuffix() === '%')
+					|| (is_array($columns[$colIndex])
+						&& $columns[$colIndex]['type'] === Column::TYPE_NUMBER
+						&& $columns[$colIndex]['numberSuffix'] === '%')
+				) {
 					$value = $value * 100;
-				} elseif (($column && $column->getType() === 'selection' && $column->getSubtype() === 'check')
-					|| (is_array($columns[$colIndex]) && $columns[$colIndex]['type'] === 'selection' && $columns[$colIndex]['subtype'] === 'check')) {
+				} elseif (
+					($column && $column->getType() === Column::TYPE_SELECTION
+						&& $column->getSubtype() === Column::SUBTYPE_SELECTION_CHECK)
+					|| (is_array($columns[$colIndex])
+						&& $columns[$colIndex]['type'] === Column::TYPE_SELECTION
+						&& $columns[$colIndex]['subtype'] === Column::SUBTYPE_SELECTION_CHECK)
+				) {
 					$value = $cell->getFormattedValue() === 'TRUE' ? 'true' : 'false';
 				}
 
@@ -379,18 +397,22 @@ class ImportService extends SuperService {
 				$value = $cell->getValue();
 				$hasData = $hasData || !empty($value);
 
-				if ($column->getType() === 'datetime') {
-					if ($column->getSubtype() === 'date') {
+				if ($column->getType() === Column::TYPE_DATETIME) {
+					if ($column->getSubtype() === Column::SUBTYPE_DATETIME_DATE) {
 						$format = 'Y-m-d';
-					} elseif ($column->getSubtype() === 'time') {
+					} elseif ($column->getSubtype() === Column::SUBTYPE_DATETIME_TIME) {
 						$format = 'H:i';
 					} else {
 						$format = 'Y-m-d H:i';
 					}
 					$value = $this->parseAndFormatDateTimeString($value, $format);
-				} elseif ($column->getType() === 'number' && $column->getNumberSuffix() === '%') {
+				} elseif ($column->getType() === Column::TYPE_NUMBER
+					&& $column->getNumberSuffix() === '%'
+				) {
 					$value = $value * 100;
-				} elseif ($column->getType() === 'selection' && $column->getSubtype() === 'check') {
+				} elseif ($column->getType() === Column::TYPE_SELECTION
+					&& $column->getSubtype() === Column::SUBTYPE_SELECTION_CHECK
+				) {
 					$value = $cell->getFormattedValue() === 'TRUE' ? 'true' : 'false';
 				}
 
@@ -537,8 +559,8 @@ class ImportService extends SuperService {
 		$value = $cell->getValue();
 		$formattedValue = $cell->getFormattedValue();
 		$dataType = [
-			'type' => 'text',
-			'subtype' => 'line',
+			'type' => Column::TYPE_TEXT,
+			'subtype' => Column::SUBTYPE_TEXT_LINE,
 		];
 
 		if (!is_numeric($formattedValue)
@@ -552,57 +574,57 @@ class ImportService extends SuperService {
 			$containsTime = $dateAnalysis['hour'] !== false || $dateAnalysis['minute'] !== false || $dateAnalysis['second'] !== false;
 
 			if ($containsDate && !$containsTime) {
-				$subType = 'date';
+				$subType = Column::SUBTYPE_DATETIME_DATE;
 			} elseif (!$containsDate && $containsTime) {
-				$subType = 'time';
+				$subType = Column::SUBTYPE_DATETIME_TIME;
 			} else {
 				$subType = '';
 			}
 
 			$dataType = [
-				'type' => 'datetime',
+				'type' => Column::TYPE_DATETIME,
 				'subtype' => $subType,
 			];
 		} elseif ($originDataType === DataType::TYPE_NUMERIC) {
 			if (str_contains($formattedValue, '%')) {
 				$dataType = [
-					'type' => 'number',
+					'type' => Column::TYPE_NUMBER,
 					'number_decimals' => 2,
 					'number_suffix' => '%',
 				];
 			} elseif (str_contains($formattedValue, '€')) {
 				$dataType = [
-					'type' => 'number',
+					'type' => Column::TYPE_NUMBER,
 					'number_decimals' => 2,
 					'number_suffix' => '€',
 				];
 			} elseif (str_contains($formattedValue, 'EUR')) {
 				$dataType = [
-					'type' => 'number',
+					'type' => Column::TYPE_NUMBER,
 					'number_decimals' => 2,
 					'number_suffix' => 'EUR',
 				];
 			} elseif (str_contains($formattedValue, '$')) {
 				$dataType = [
-					'type' => 'number',
+					'type' => Column::TYPE_NUMBER,
 					'number_decimals' => 2,
 					'number_prefix' => '$',
 				];
 			} elseif (str_contains($formattedValue, 'USD')) {
 				$dataType = [
-					'type' => 'number',
+					'type' => Column::TYPE_NUMBER,
 					'number_decimals' => 2,
 					'number_suffix' => 'USD',
 				];
 			} elseif (is_float($value)) {
 				$decimals = strlen(substr(strrchr((string)$value, "."), 1));
 				$dataType = [
-					'type' => 'number',
+					'type' => Column::TYPE_NUMBER,
 					'number_decimals' => $decimals,
 				];
 			} else {
 				$dataType = [
-					'type' => 'number',
+					'type' => Column::TYPE_NUMBER,
 				];
 			}
 		} elseif ($originDataType === DataType::TYPE_BOOL
@@ -610,8 +632,8 @@ class ImportService extends SuperService {
 				&& in_array($formattedValue, ['FALSE', 'TRUE'], true))
 		) {
 			$dataType = [
-				'type' => 'selection',
-				'subtype' => 'check',
+				'type' => Column::TYPE_SELECTION,
+				'subtype' => Column::SUBTYPE_SELECTION_CHECK,
 				'selection_default' => 'false',
 			];
 		}
