@@ -271,7 +271,7 @@ class Row2Mapper {
 	 */
 	private function addSortQueryForMultipleSleeveFinder(IQueryBuilder $qb, string $sleevesAlias, array $sort): void {
 		$i = 1;
-		foreach (array_reverse($sort) as $sortData) {
+		foreach ($sort as $sortData) {
 			if (!isset($this->columns[$sortData['columnId']]) && !isset($this->allColumns[$sortData['columnId']]) && $sortData['columnId'] > 0) {
 				throw new InternalError('No column found to build filter with for id ' . $sortData['columnId']);
 			}
