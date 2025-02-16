@@ -260,6 +260,7 @@ OC.L10N.register(
     "Confirm" : "Confirma",
     "_{nb} row_::_{nb} rows_" : ["{nb} fila","{nb} files"],
     "Content" : "Contingut",
+    "Select" : "Seleccioneu",
     "Insert" : "Insereix",
     "Unchecked" : "Sense verificar",
     "Now" : "Ara",
