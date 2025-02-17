@@ -172,12 +172,6 @@ export default {
 		justify-content: end;
 	}
 
-	:where(.fix-col-1.end) {
-		display: inline-block;
-		position: relative;
-		left: 65%;
-	}
-
 	:where(.slot.fix-col-2) {
 		min-width: 50%;
 	}
