@@ -15,7 +15,7 @@
 		"staabm/annotate-pull-request-from-checkstyle": "^1.8",
 		"phpunit/phpunit": "^9",
 		"psalm/phar": "^5.25",
-		"bamarni/composer-bin-plugin": "^1.8"
+		"bamarni/composer-bin-plugin": "^1.8.2"
 	},
 	"config": {
 		"optimize-autoloader": true,
