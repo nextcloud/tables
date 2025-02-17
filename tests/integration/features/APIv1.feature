@@ -290,3 +290,146 @@ Feature: APIv1
     Then the reported status is "404"
     When user "participant3" attempts to fetch Context "c1"
     Then the reported status is "404"
+
+  @api1 @views @view-filters
+  Scenario: Create row through filtered view with selection filter
+    Given table "Team Features" with emoji "✨" exists for user "participant1" as "team-features"
+    Then column "team" exists with following properties
+      | type          | selection              |
+      | mandatory     | 1                      |
+      | description   | The team responsible   |
+      | selectionOptions | [{"id":0,"label":"Office team"},{"id":1,"label":"Dev team"},{"id":2,"label":"Design team"}] |
+    Then column "feature" exists with following properties
+      | type          | text                   |
+      | subtype       | line                   |
+      | mandatory     | 1                      |
+      | description   | The feature to build   |
+    And user "participant1" create view "Office Features" with emoji "👔" for "team-features" as "office-features"
+    When user "participant1" sets columns "feature" to view "office-features"
+    And user "participant1" sets filter to view "office-features"
+      | column  | operator | value           |
+      | team    | is-equal | @selection-id-0 |
+    When user "participant1" tries to create a row using v2 on "view" "office-features" with following values
+      | feature                | Fancy tables features |
+    And user "participant1" create view "Design Features" with emoji "🎨" for "team-features" as "design-features"
+    When user "participant1" sets columns "feature" to view "design-features"
+    And user "participant1" sets filter to view "design-features"
+      | column  | operator | value           |
+      | team    | is-equal | @selection-id-2 |
+      | feature | contains | Design          |
+    When user "participant1" tries to create a row using v2 on "view" "design-features" with following values
+      | feature                | Design system components |
+    Then table contains at least following rows
+      | team          | feature                |
+      | 0  | Fancy tables features  |
+      | 2  | Design system components |
+    Then view "office-features" has exactly the following rows
+      | feature                |
+      | Fancy tables features  |
+    Then view "design-features" has exactly the following rows
+      | feature                |
+      | Design system components |
+
+  @api1 @views @view-filters
+  Scenario: Create row through filtered view with text filter
+    Given table "Project Tasks" with emoji "📝" exists for user "participant1" as "project-tasks"
+    Then column "status" exists with following properties
+      | type          | text                   |
+      | subtype       | line                   |
+      | mandatory     | 1                      |
+      | description   | The task status        |
+    Then column "task" exists with following properties
+      | type          | text                   |
+      | subtype       | line                   |
+      | mandatory     | 1                      |
+      | description   | The task description   |
+    And user "participant1" create view "Open Tasks" with emoji "🔔" for "project-tasks" as "open-tasks"
+    When user "participant1" sets columns "task" to view "open-tasks"
+    And user "participant1" sets filter to view "open-tasks"
+      | column  | operator | value    |
+      | status  | is-equal | open     |
+    When user "participant1" tries to create a row using v2 on "view" "open-tasks" with following values
+      | task                   | Implement new feature |
+    And user "participant1" create view "Completed Tasks" with emoji "✅" for "project-tasks" as "completed-tasks"
+    When user "participant1" sets columns "task" to view "completed-tasks"
+    And user "participant1" sets filter to view "completed-tasks"
+      | column  | operator | value      |
+      | status  | is-equal | completed  |
+    When user "participant1" tries to create a row using v2 on "view" "completed-tasks" with following values
+      | task                   | Fix reported bug |
+    Then table contains at least following rows
+      | status     | task                  |
+      | open       | Implement new feature |
+      | completed  | Fix reported bug      |
+    Then view "open-tasks" has exactly the following rows
+      | task                  |
+      | Implement new feature |
+    Then view "completed-tasks" has exactly the following rows
+      | task              |
+      | Fix reported bug  |
+
+  @api1 @views @view-filters
+  Scenario: Create row through filtered view with boolean selection filter
+    Given table "Task List" with emoji "📋" exists for user "participant1" as "task-list"
+    Then column "is_important" exists with following properties
+      | type          | selection             |
+      | subtype       | check                 |
+      | mandatory     | 1                     |
+      | description   | Important task flag   |
+    Then column "task" exists with following properties
+      | type          | text                  |
+      | subtype       | line                  |
+      | mandatory     | 1                     |
+      | description   | The task description  |
+    And user "participant1" create view "Important Tasks" with emoji "⭐" for "task-list" as "important-tasks"
+    When user "participant1" sets columns "task" to view "important-tasks"
+    And user "participant1" sets filter to view "important-tasks"
+      | column       | operator  | value |
+      | is_important | is-equal  | true  |
+    When user "participant1" tries to create a row using v2 on "view" "important-tasks" with following values
+      | task                   | Critical feature |
+    And user "participant1" create view "Regular Tasks" with emoji "📌" for "task-list" as "regular-tasks"
+    When user "participant1" sets columns "task" to view "regular-tasks"
+    And user "participant1" sets filter to view "regular-tasks"
+      | column       | operator  | value |
+      | is_important | is-equal  | false |
+    When user "participant1" tries to create a row using v2 on "view" "regular-tasks" with following values
+      | task                   | Minor update |
+    Then table contains at least following rows
+      | is_important | task            |
+      | true        | Critical feature |
+      | false       | Minor update     |
+    Then view "important-tasks" has exactly the following rows
+      | task             |
+      | Critical feature |
+    Then view "regular-tasks" has exactly the following rows
+      | task         |
+      | Minor update |
+
+  @api1 @views @view-filters
+  Scenario: Create row through filtered view with text column default value
+    Given table "Task List" with emoji "📋" exists for user "participant1" as "task-list"
+    Then column "task" exists with following properties
+      | type          | text                  |
+      | subtype       | line                  |
+      | mandatory     | 1                     |
+      | description   | The task description  |
+    Then column "category" exists with following properties
+      | type          | text                  |
+      | subtype       | line                  |
+      | mandatory     | 1                     |
+      | description   | Task category         |
+      | default       | general               |
+    And user "participant1" create view "General Tasks" with emoji "📝" for "task-list" as "general-tasks"
+    When user "participant1" sets columns "task" to view "general-tasks"
+    And user "participant1" sets filter to view "general-tasks"
+      | column       | operator  | value   |
+      | category     | is-equal  | general |
+    When user "participant1" tries to create a row using v2 on "view" "general-tasks" with following values
+      | task                   | New general task |
+    Then table contains at least following rows
+      | task             | category |
+      | New general task | general  |
+    Then view "general-tasks" has exactly the following rows
+      | task             |
+      | New general task |
