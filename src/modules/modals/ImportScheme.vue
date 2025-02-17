@@ -3,38 +3,30 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcModal v-if="showModal" size="normal" @close="actionCancel">
+	<NcDialog v-if="showModal" size="normal" close-on-click-outside :name="t('tables', 'Import scheme')"
+		@closing="actionCancel">
 		<div class="modal__content">
+			<NcButton :aria-label="t('tables', 'Upload from device')" @click="selectUploadFile">
+				<template #icon>
+					<IconUpload :size="20" />
+				</template>
+				{{ t('tables', 'Upload from device') }}
+			</NcButton>
+			<input ref="uploadFileInput" type="file" aria-hidden="true" class="hidden-visually"
+				:accept="mimeTypes.join(',')" @change="onUploadFileInputChange">
+			<span v-if="selectedUploadFile">{{ selectedUploadFile?.name }}</span>
 			<div class="row">
-				<div class="col-4">
-					<h2>{{ t('tables', 'Import scheme') }}</h2>
+				<div class="fix-col-4 end">
+					<NcButton :aria-label="t('tables', 'Import')" type="primary" @click="actionSubmit">
+						{{ t('tables', 'Import') }}
+					</NcButton>
 				</div>
 			</div>
 		</div>
-		<NcButton :aria-label="t('tables', 'Upload from device')" @click="selectUploadFile">
-			<template #icon>
-				<IconUpload :size="20" />
-			</template>
-			{{ t('tables', 'Upload from device') }}
-		</NcButton>
-		<input ref="uploadFileInput"
-			type="file"
-			aria-hidden="true"
-			class="hidden-visually"
-			:accept="mimeTypes.join(',')"
-			@change="onUploadFileInputChange">
-		<span v-if="selectedUploadFile">{{ selectedUploadFile?.name }}</span>
-		<div class="row">
-			<div class="fix-col-4 end">
-				<NcButton :aria-label="t('tables', 'Import')" type="primary" @click="actionSubmit">
-					{{ t('tables', 'Import') }}
-				</NcButton>
-			</div>
-		</div>
-	</NcModal>
+	</NcDialog>
 </template>
 <script>
-import { NcModal, NcButton } from '@nextcloud/vue'
+import { NcDialog, NcButton } from '@nextcloud/vue'
 import IconUpload from 'vue-material-design-icons/Upload.vue'
 import axios from '@nextcloud/axios'
 import { showError, showWarning } from '@nextcloud/dialogs'
@@ -44,7 +36,7 @@ import { useTablesStore } from '../../store/store.js'
 
 export default {
 	components: {
-		NcModal,
+		NcDialog,
 		IconUpload,
 		NcButton,
 	},
@@ -88,10 +80,10 @@ export default {
 				if (this.title !== '') {
 					json.title = this.title
 				}
-			    axios.post(generateOcsUrl('/apps/tables/api/2/tables/scheme'), json).then(async res => {
+				axios.post(generateOcsUrl('/apps/tables/api/2/tables/scheme'), json).then(async res => {
 					if (res.status === 200) {
 						await this.loadTablesFromBE()
-				        await this.loadViewsSharedWithMeFromBE()
+						await this.loadViewsSharedWithMeFromBE()
 						this.actionCancel()
 						return
 					}
