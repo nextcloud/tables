@@ -528,7 +528,7 @@ class TableService extends SuperService {
 	public function getScheme(int $id): TableScheme {
 		$columns = $this->columnService->findAllByTable($id);
 		$table = $this->find($id);
-		return new TableScheme($table->getTitle(), $table->getEmoji(), $columns, $table->getViews(), $table->getDescription(), $this->appManager->getAppVersion('tables'));
+		return new TableScheme($table->getTitle(), $table->getEmoji(), $columns, $table->getViews() ?: [], $table->getDescription(), $this->appManager->getAppVersion('tables'));
 	}
 
 	// PRIVATE FUNCTIONS ---------------------------------------------------------------
