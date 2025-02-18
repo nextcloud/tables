@@ -53,7 +53,7 @@ OC.L10N.register(
     "Upload from device" : "Augšupielādēt no ierīces",
     "Preview" : "Priekšskatīt",
     "Failed" : "Neizdevās",
-    "Please select a file." : "Lūdzu izvēlies datni.",
+    "Please select a file." : "Lūgums atlasīt datni.",
     "Sort" : "Kārtot",
     "Export" : "Eksportēt",
     "Add to favorites" : "Pievienot izlasei",

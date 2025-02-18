@@ -251,6 +251,7 @@ OC.L10N.register(
     "Maximum text length" : "Longitud màxima del text",
     "URL" : "URL",
     "Copy link" : "Copia l'enllaç",
+    "Open link" : "Obre l'enllaç",
     "Url" : "Url",
     "Close editor" : "Tanca l'editor",
     "Go to previous page" : "Torna a la pàgina anterior",
