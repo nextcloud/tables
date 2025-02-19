@@ -218,6 +218,32 @@ Feature: APIv1
     | import-from-ms365.xlsx       |
     | import-from-libreoffice.csv  |
 
+  @api1 @import
+  Scenario: Import a document with optional field
+    Given user "participant1" uploads file "import-from-libreoffice-optional-fields.csv"
+    And table "Import test" with emoji "👨🏻‍💻" exists for user "participant1" as "base1"
+    When user imports file "/import-from-libreoffice-optional-fields.csv" into last created table
+    Then import results have the following data
+      | found_columns_count     |  9 |
+      | created_columns_count   |  9 |
+      | inserted_rows_count     |  2 |
+      | errors_count            |  0 |
+    # At the moment, we only take the first row into account, when determining the cell format
+    # Hence, it is expected that all turn out to be text
+    Then table has at least following typed columns
+      | Case    | text      |
+      | Col1    | text      |
+      | num     | text    |
+      | emoji   | text      |
+      | special | text      |
+      | date    | text  |
+      | truth   | text |
+    # the library handles "true" as boolean and so is converted into the text representation "1"
+    Then table contains at least following rows
+      | Case | Date and Time    | Col1    | num   | emoji | special  | date       | truth | time  |
+      | A    | | | | | | | | |
+      | B    | 2016-06-01 13:37 | great   |  99    | ⚠     | Ö        | 2016-06-01 | 1     | 01:23 |
+
   @api1
   Scenario: Create, edit and delete views
     Given table "View test" with emoji "👨🏻‍💻" exists for user "participant1" as "view-test"
