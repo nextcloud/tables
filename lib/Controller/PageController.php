@@ -15,6 +15,7 @@ use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\Attribute\OpenAPI;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
+use OCA\Viewer\Event\LoadViewer;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\INavigationManager;
 use OCP\IRequest;
@@ -42,6 +43,10 @@ class PageController extends Controller {
 		Util::addStyle(Application::APP_ID, 'grid');
 		Util::addStyle(Application::APP_ID, 'modal');
 		Util::addStyle(Application::APP_ID, 'tiptap');
+
+		if (class_exists(LoadViewer::class)) {
+			$this->eventDispatcher->dispatchTyped(new LoadViewer());
+		}
 
 		if (class_exists(LoadEditor::class)) {
 			$this->eventDispatcher->dispatchTyped(new LoadEditor());
