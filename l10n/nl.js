@@ -196,6 +196,7 @@ OC.L10N.register(
     "Confirm" : "Bevestigen",
     "Content" : "Inhoud",
     "Select" : "Selecteer",
+    "Insert" : "Invoegen",
     "Unchecked" : "Niet gecontroleerd",
     "Now" : "Nu",
     "ID" : "ID",

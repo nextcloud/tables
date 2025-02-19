@@ -34,6 +34,8 @@ OC.L10N.register(
     "Selection" : "Val",
     "Move" : "Færa",
     "Metadata" : "Lýsigögn",
+    "Operator" : "Virki",
+    "Delete filter" : "Eyða síu",
     "Views" : "Skoðun",
     "View" : "Skoða",
     "Shares" : "Sameignir",
