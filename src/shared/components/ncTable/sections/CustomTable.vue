@@ -503,6 +503,22 @@ export default {
 			background-color: var(--color-background-dark);
 		}
 
+		// viewer integration
+		.editor-wrapper {
+			min-width: 100px;
+			max-height: 200px;
+			overflow-y: auto;
+
+			.preview .widget-custom {
+				margin-top: 0;
+				margin-bottom: 0;
+			}
+
+			.preview [data-node-view-content] {
+				display: none;
+			}
+		}
+
 		tr:focus-within > td:last-child {
 			opacity: 1;
 		}
