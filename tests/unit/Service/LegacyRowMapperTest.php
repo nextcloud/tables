@@ -12,6 +12,7 @@ use OCA\Tables\Db\ColumnTypes\NumberColumnQB;
 use OCA\Tables\Db\ColumnTypes\SelectionColumnQB;
 use OCA\Tables\Db\ColumnTypes\SuperColumnQB;
 use OCA\Tables\Db\ColumnTypes\TextColumnQB;
+use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCP\IDBConnection;
 use OCP\Server;
@@ -120,7 +121,8 @@ class LegacyRowMapperTest extends TestCase {
 		$row2Mapper = $this->createMock(Row2Mapper::class);
 		$logger = $this->createMock(LoggerInterface::class);
 		$userHelper = $this->createMock(UserHelper::class);
-		$legacyRowMapper = new LegacyRowMapper($dbConnection, $logger, $textColumnQb, $selectionColumnQb, $numberColumnQb, $datetimeColumnQb, $superColumnQb, $columnMapper, $userHelper, $row2Mapper);
+		$columnsHelper = $this->createMock(ColumnsHelper::class);
+		$legacyRowMapper = new LegacyRowMapper($dbConnection, $logger, $textColumnQb, $selectionColumnQb, $numberColumnQb, $datetimeColumnQb, $superColumnQb, $columnMapper, $columnsHelper, $userHelper, $row2Mapper);
 
 		$legacyRow = new LegacyRow();
 		$legacyRow->setId(5);

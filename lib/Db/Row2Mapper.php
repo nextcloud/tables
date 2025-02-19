@@ -320,7 +320,7 @@ class Row2Mapper {
 		foreach ($filters as &$filterGroup) {
 			foreach ($filterGroup as &$filter) {
 				if (substr($filter['value'], 0, 1) === '@') {
-					$filter['value'] = $this->resolveSearchValue($filter['value'], $userId);
+					$filter['value'] = $this->columnsHelper->resolveSearchValue($filter['value'], $userId);
 				}
 			}
 		}
@@ -526,35 +526,6 @@ class Row2Mapper {
 				return $qb->expr()->isNull($columnName);
 			default:
 				throw new InternalError('Operator ' . $operator . ' is not supported.');
-		}
-	}
-
-	/** @noinspection DuplicatedCode */
-	private function resolveSearchValue(string $placeholder, string $userId): string {
-		if (substr($placeholder, 0, 14) === '@selection-id-') {
-			return substr($placeholder, 14);
-		}
-		switch (ltrim($placeholder, '@')) {
-			case 'me': return $userId;
-			case 'my-name': return $this->userHelper->getUserDisplayName($userId);
-			case 'checked': return 'true';
-			case 'unchecked': return 'false';
-			case 'stars-0': return '0';
-			case 'stars-1': return '1';
-			case 'stars-2': return '2';
-			case 'stars-3': return '3';
-			case 'stars-4': return '4';
-			case 'stars-5': return '5';
-			case 'datetime-date-today': return date('Y-m-d') ? date('Y-m-d') : '';
-			case 'datetime-date-start-of-year': return date('Y-01-01') ? date('Y-01-01') : '';
-			case 'datetime-date-start-of-month': return date('Y-m-01') ? date('Y-m-01') : '';
-			case 'datetime-date-start-of-week':
-				$day = date('w');
-				$result = date('Y-m-d', strtotime('-' . $day . ' days'));
-				return  $result ?: '';
-			case 'datetime-time-now': return date('H:i');
-			case 'datetime-now': return date('Y-m-d H:i') ? date('Y-m-d H:i') : '';
-			default: return $placeholder;
 		}
 	}
 

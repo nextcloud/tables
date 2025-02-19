@@ -20,6 +20,7 @@ use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Event\RowAddedEvent;
 use OCA\Tables\Event\RowDeletedEvent;
 use OCA\Tables\Event\RowUpdatedEvent;
+use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Model\RowDataInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
@@ -36,30 +37,21 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type TablesRow from ResponseDefinitions
  */
 class RowService extends SuperService {
-	private ColumnMapper $columnMapper;
-	private ViewMapper $viewMapper;
-	private TableMapper $tableMapper;
-	private Row2Mapper $row2Mapper;
 	private array $tmpRows = []; // holds already loaded rows as a small cache
 
-	protected IEventDispatcher $eventDispatcher;
-
 	public function __construct(
-		PermissionsService $permissionsService,
 		LoggerInterface $logger,
 		?string $userId,
-		ColumnMapper $columnMapper,
-		ViewMapper $viewMapper,
-		TableMapper $tableMapper,
-		Row2Mapper $row2Mapper,
-		IEventDispatcher $eventDispatcher,
+		PermissionsService $permissionsService,
+		private ColumnMapper $columnMapper,
+		private ViewMapper $viewMapper,
+		private TableMapper $tableMapper,
+		private Row2Mapper $row2Mapper,
+		private IEventDispatcher $eventDispatcher,
+		private ColumnsHelper $columnsHelper,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
-		$this->columnMapper = $columnMapper;
-		$this->viewMapper = $viewMapper;
-		$this->tableMapper = $tableMapper;
-		$this->row2Mapper = $row2Mapper;
-		$this->eventDispatcher = $eventDispatcher;
+
 	}
 
 	/**
@@ -174,6 +166,8 @@ class RowService extends SuperService {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
+		$view = null;
+
 		if ($viewId) {
 			try {
 				$view = $this->viewMapper->find($viewId);
@@ -215,9 +209,10 @@ class RowService extends SuperService {
 			throw new InternalError('Cannot create row without table or view in context');
 		}
 
+		$data = $data instanceof RowDataInput ? $data : RowDataInput::fromArray($data);
 		$data = $this->cleanupData($data, $columns, $tableId, $viewId);
+		$data = $this->enhanceWithViewDefaults($view, $data);
 
-		// perf
 		$tableId = $tableId ?? $view->getTableId();
 		$row2 = new Row2();
 		$row2->setTableId($tableId);
@@ -227,7 +222,7 @@ class RowService extends SuperService {
 
 			$this->eventDispatcher->dispatchTyped(new RowAddedEvent($insertedRow));
 
-			return $insertedRow;
+			return $this->filterRowResult($view, $insertedRow);
 		} catch (InternalError|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
@@ -235,16 +230,56 @@ class RowService extends SuperService {
 	}
 
 	/**
-	 * @param RowDataInput|list<array{columnId: string|int, value: mixed}> $data
-	 * @param Column[] $columns
-	 * @param int|null $tableId
-	 * @param int|null $viewId
-	 * @return list<array{columnId: int, value: float|int|string|null}>
+	 * When inserting rows into views we try to prefill columns that are not accessible by reasonable defaults
 	 *
+	 * This might not work in all cases, but for single filter rules this is the sanest to ensure the row is actually part of the view
+	 */
+	private function enhanceWithViewDefaults(?View $view, RowDataInput $data): RowDataInput {
+		if ($view === null) {
+			return $data;
+		}
+
+		$filters = $view->getFilterArray();
+		if (empty($filters)) {
+			return $data;
+		}
+
+		// Process each filter rule group (AND groups)
+		foreach ($filters as $filterRules) {
+			if (!is_array($filterRules)) {
+				continue;
+			}
+
+			// Process each filter within the group (OR conditions)
+			foreach ($filterRules as $filter) {
+				if (!is_array($filter) || !isset($filter['columnId'], $filter['operator'], $filter['value'])) {
+					continue;
+				}
+
+				// Skip if the column is already visible in the view
+				if (in_array($filter['columnId'], $view->getColumnsArray())) {
+					continue;
+				}
+
+				// Only handle simple equality filters for now
+				if (!in_array($filter['operator'], ['is-equal'])) {
+					continue;
+				}
+
+				// Only set the default if the column hasn't been set yet
+				if (!$data->hasColumn($filter['columnId'])) {
+					$data->add($filter['columnId'], $this->columnsHelper->resolveSearchValue((string)$filter['value'], $this->userId));
+				}
+			}
+		}
+		return $data;
+	}
+
+	/**
 	 * @throws InternalError
 	 */
-	private function cleanupData(RowDataInput|array $data, array $columns, ?int $tableId, ?int $viewId): array {
-		$out = [];
+	private function cleanupData(RowDataInput $data, array $columns, ?int $tableId, ?int $viewId): RowDataInput {
+		$out = new RowDataInput();
 		foreach ($data as $entry) {
 			$column = $this->getColumnFromColumnsArray((int)$entry['columnId'], $columns);
 
@@ -262,10 +297,7 @@ class RowService extends SuperService {
 			}
 
 			// parse given value to respect the column type value format
-			$out[] = [
-				'columnId' => (int)$entry['columnId'],
-				'value' => $this->parseValueByColumnType($column, $entry['value'])
-			];
+			$out->add((int)$entry['columnId'], $this->parseValueByColumnType($column, $entry['value']));
 		}
 		return $out;
 	}
@@ -273,7 +305,7 @@ class RowService extends SuperService {
 	/**
 	 * @param Column $column
 	 * @param string|array|int|float|bool|null $value
-	 * @return string|int|float|null
+	 * @return array|string|int|float|null
 	 */
 	private function parseValueByColumnType(Column $column, $value = null) {
 		try {
@@ -424,6 +456,7 @@ class RowService extends SuperService {
 		}
 
 		$previousData = $item->getData();
+		$data = RowDataInput::fromArray($data);
 		$data = $this->cleanupData($data, $columns, $item->getTableId(), $viewId);
 
 		foreach ($data as $entry) {

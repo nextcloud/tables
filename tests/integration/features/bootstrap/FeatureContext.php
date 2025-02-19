@@ -595,14 +595,6 @@ class FeatureContext implements Context {
 		}
 	}
 
-
-
-
-
-
-
-
-
 	/**
 	 * @Then user :user has the following tables
 	 *
@@ -902,6 +894,10 @@ class FeatureContext implements Context {
 		}, $columns);
 
 		$this->sendUpdateViewRequest($viewAlias, ['columns' => json_encode($columns)]);
+
+		$view = $this->collectionManager->getByAlias('view', $viewAlias);
+		$view['columns'] = $columns;
+		$this->collectionManager->update($view, 'view', $view['id']);
 	}
 
 	/**
@@ -2676,5 +2672,101 @@ class FeatureContext implements Context {
 		];
 
 		Assert::assertContains($expected, $row['data']);
+	}
+
+	/**
+	 * @When user :user sets filter to view :viewName
+	 */
+	public function setFilterOnView(string $user, string $viewName, TableNode $filters): void {
+		$this->setCurrentUser($user);
+		$filterArray = [];
+
+		foreach ($filters->getRows() as $row) {
+			if ($row[0] === 'column') {
+				continue;
+			}
+
+			// Get the column ID for the given column name
+			$columnId = $this->collectionManager->getByAlias('column', $row[0])['id'];
+
+			// Add filter condition to array
+			$filterArray[] = [
+				[
+					'columnId' => $columnId,
+					'operator' => $row[1],
+					'value' => $row[2]
+				]
+			];
+		}
+
+		$this->sendRequest(
+			'PUT',
+			'/apps/tables/api/1/views/' . $this->viewIds[$viewName],
+			[ 'data' => ['filter' => json_encode($filterArray)] ]
+		);
+
+		$updatedView = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+	}
+
+	/**
+	 * @Then view :viewName has exactly the following rows
+	 *
+	 * @param string $viewName
+	 * @param TableNode $expectedRows
+	 */
+	public function viewHasExactRows(string $viewName, TableNode $expectedRows): void {
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/views/' . $this->viewIds[$viewName] . '/rows'
+		);
+
+		$actualRows = $this->getDataFromResponse($this->response);
+		Assert::assertEquals(200, $this->response->getStatusCode());
+
+		// Get column headers from first row of expected data
+		$columnHeaders = $expectedRows->getRow(0);
+		$expectedData = $expectedRows->getRows();
+		array_shift($expectedData); // Remove header row
+
+		$columnIds = $this->collectionManager->getByAlias('view', $viewName)['columns'];
+		$columnIdToHeader = array_combine($columnIds, $columnHeaders);
+
+		// Convert actual row data to match expected format
+		$actualFormattedRows = [];
+		foreach ($actualRows as $row) {
+			$formattedRow = [];
+			foreach ($row['data'] as $cell) {
+				$columnTitle = $columnIdToHeader[$cell['columnId']];
+				if ($columnTitle !== false) {
+					$formattedRow[$columnTitle] = $cell['value'];
+				}
+			}
+			$actualFormattedRows[] = $formattedRow;
+		}
+
+		// Convert expected data to associative array format
+		$expectedFormattedRows = [];
+		foreach ($expectedData as $row) {
+			$formattedRow = [];
+			foreach ($columnHeaders as $i => $header) {
+				$formattedRow[$header] = $row[$i];
+			}
+			$expectedFormattedRows[] = $formattedRow;
+		}
+
+		Assert::assertEquals(
+			count($expectedFormattedRows),
+			count($actualFormattedRows),
+			'Number of rows does not match expected'
+		);
+
+		foreach ($expectedFormattedRows as $i => $expectedRow) {
+			Assert::assertEquals(
+				$expectedRow,
+				$actualFormattedRows[$i],
+				'Row ' . $i . ' does not match expected values'
+			);
+		}
 	}
 }

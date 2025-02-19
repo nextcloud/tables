@@ -14,6 +14,7 @@ use OCA\Tables\Db\ColumnTypes\SelectionColumnQB;
 use OCA\Tables\Db\ColumnTypes\SuperColumnQB;
 use OCA\Tables\Db\ColumnTypes\TextColumnQB;
 use OCA\Tables\Errors\InternalError;
+use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -30,39 +31,23 @@ use Psr\Log\LoggerInterface;
 /** @template-extends QBMapper<LegacyRow> */
 class LegacyRowMapper extends QBMapper {
 	protected string $table = 'tables_rows';
-	protected TextColumnQB $textColumnQB;
-	protected SelectionColumnQB $selectionColumnQB;
-	protected NumberColumnQB $numberColumnQB;
-	protected DatetimeColumnQB $datetimeColumnQB;
-	protected SuperColumnQB $genericColumnQB;
-	protected ColumnMapper $columnMapper;
-	protected LoggerInterface $logger;
-	protected UserHelper $userHelper;
-	protected Row2Mapper $rowMapper;
 
 	protected int $platform;
 
 	public function __construct(
 		IDBConnection $db,
-		LoggerInterface $logger,
-		TextColumnQB $textColumnQB,
-		SelectionColumnQB $selectionColumnQB,
-		NumberColumnQB $numberColumnQB,
-		DatetimeColumnQB $datetimeColumnQB,
-		SuperColumnQB $columnQB,
-		ColumnMapper $columnMapper,
-		UserHelper $userHelper,
-		Row2Mapper $rowMapper) {
+		private LoggerInterface $logger,
+		private TextColumnQB $textColumnQB,
+		private SelectionColumnQB $selectionColumnQB,
+		private NumberColumnQB $numberColumnQB,
+		private DatetimeColumnQB $datetimeColumnQB,
+		private SuperColumnQB $genericColumnQB,
+		private ColumnMapper $columnMapper,
+		private ColumnsHelper $columnsHelper,
+		private UserHelper $userHelper,
+		private Row2Mapper $rowMapper,
+	) {
 		parent::__construct($db, $this->table, LegacyRow::class);
-		$this->logger = $logger;
-		$this->textColumnQB = $textColumnQB;
-		$this->numberColumnQB = $numberColumnQB;
-		$this->selectionColumnQB = $selectionColumnQB;
-		$this->datetimeColumnQB = $datetimeColumnQB;
-		$this->genericColumnQB = $columnQB;
-		$this->columnMapper = $columnMapper;
-		$this->userHelper = $userHelper;
-		$this->rowMapper = $rowMapper;
 		$this->setPlatform();
 	}
 
@@ -137,31 +122,6 @@ class LegacyRowMapper extends QBMapper {
 			$filterGroups[] = $qb->expr()->andX(...$this->getInnerFilterExpressions($qb, $filterGroup, $groupIndex));
 		}
 		return $filterGroups;
-	}
-
-	private function resolveSearchValue(string $unresolvedSearchValue, string $userId): string {
-		switch (ltrim($unresolvedSearchValue, '@')) {
-			case 'me': return $userId;
-			case 'my-name': return $this->userHelper->getUserDisplayName($userId);
-			case 'checked': return 'true';
-			case 'unchecked': return 'false';
-			case 'stars-0': return '0';
-			case 'stars-1': return '1';
-			case 'stars-2': return '2';
-			case 'stars-3': return '3';
-			case 'stars-4': return '4';
-			case 'stars-5': return '5';
-			case 'datetime-date-today': return date('Y-m-d') ? date('Y-m-d') : '';
-			case 'datetime-date-start-of-year': return date('Y-01-01') ? date('Y-01-01') : '';
-			case 'datetime-date-start-of-month': return date('Y-m-01') ? date('Y-m-01') : '';
-			case 'datetime-date-start-of-week':
-				$day = date('w');
-				$result = date('Y-m-d', strtotime('-' . $day . ' days'));
-				return  $result ?: '';
-			case 'datetime-time-now': return date('H:i');
-			case 'datetime-now': return date('Y-m-d H:i') ? date('Y-m-d H:i') : '';
-			default: return $unresolvedSearchValue;
-		}
 	}
 
 	/**
@@ -267,7 +227,7 @@ class LegacyRowMapper extends QBMapper {
 					$filter['columnType'] = $neededColumnTypes[$filter['columnId']];
 					// TODO move resolution for magic fields to service layer
 					if (str_starts_with((string)$filter['value'], '@')) {
-						$filter['value'] = $this->resolveSearchValue((string)$filter['value'], $userId);
+						$filter['value'] = $this->columnsHelper->resolveSearchValue((string)$filter['value'], $userId);
 					}
 				}
 			}
