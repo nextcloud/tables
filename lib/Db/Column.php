@@ -93,6 +93,13 @@ class Column extends Entity implements JsonSerializable {
 	public const TYPE_DATETIME = 'datetime';
 	public const TYPE_USERGROUP = 'usergroup';
 
+	public const SUBTYPE_DATETIME_DATE = 'date';
+	public const SUBTYPE_DATETIME_TIME = 'time';
+
+	public const SUBTYPE_SELECTION_CHECK = 'check';
+
+	public const SUBTYPE_TEXT_LINE = 'line';
+
 	protected ?string $title = null;
 	protected ?int $tableId = null;
 	protected ?string $createdBy = null;
