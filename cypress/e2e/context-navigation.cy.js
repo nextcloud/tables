@@ -74,7 +74,7 @@ describe('Test context navigation', () => {
         cy.get('[data-cy="editContextSubmitBtn"]').click()
 
         // Hiding the context from nav for the current user
-        cy.get('[data-cy="navigationContextItem"]').contains(`${contextTitle}`).find('button').click({ force: true })
+        cy.get('[data-cy="navigationContextItem"]').contains(contextTitle).click({ force: true })
         cy.get('[data-cy="navigationContextShowInNavSwitch"]').should('be.checked')
         cy.get('[data-cy="navigationContextShowInNavSwitch"]').click()
         cy.get('[data-cy="navigationContextShowInNavSwitch"]').should('not.be.checked')
