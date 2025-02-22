@@ -300,7 +300,7 @@ OC.L10N.register(
     "Could not load link providers." : "Kunne ikke indlæse linkudbydere.",
     "URL" : "URL",
     "This field is mandatory" : "Dette felt er obligatorisk",
-    "Copy link" : "Kopiér link",
+    "Copy link" : "Kopier link",
     "Open link" : "Åben link",
     "Could not load link provider results." : "Resultatet af linkudbyderen kunne ikke indlæses.",
     "Url" : "Url",
