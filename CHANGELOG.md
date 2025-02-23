@@ -5,6 +5,20 @@
 
 # Changelog
 
+## 0.8.5
+
+### Fixed
+
+* [[stable0.8] Fix npm audit (tables#1618)](https://github.com/nextcloud/tables/pull/1618)
+* [[stable0.8] fix(Import): DateTime import fixes (tables#1622)](https://github.com/nextcloud/tables/pull/1622)
+
+### Dependencies
+
+* [Chore(deps): update cypress (stable0.8) (tables#1590)](https://github.com/nextcloud/tables/pull/1590)
+* [Chore(deps): update dependency @nextcloud/webpack-vue-config to ^6.2.0 (stable0.8) (tables#1591)](https://github.com/nextcloud/tables/pull/1591)
+* [Chore(deps): update dependency bamarni/composer-bin-plugin to ^1.8.2 (stable0.8) (tables#1616)](https://github.com/nextcloud/tables/pull/1616)
+* [Chore(deps): update dependency staabm/annotate-pull-request-from-checkstyle to ^1.8.5 (stable0.8) (tables#1617)](https://github.com/nextcloud/tables/pull/1617)
+
 ## 0.8.4
 
 ### Fixed
