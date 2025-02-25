@@ -32,7 +32,7 @@ jobs:
       matrix:
         node-version: [ 16 ]
         databases: [ 'mysql' ]
-        server-versions: [ 'stable29', 'stable30', 'master' ]
+        server-versions: [ 'stable29', 'stable30', 'stable31', 'master' ]
         include:
           - php-versions: 8.1
 
@@ -178,3 +178,17 @@ jobs:
           name: Upload nextcloud log ${{ matrix.node-version }}-${{ matrix.php-versions }}-${{ matrix.server-versions }}-${{ matrix.databases }}
           path: data/nextcloud.log
           retention-days: 5
+
+  summary:
+    permissions:
+      contents: none
+    runs-on: ubuntu-latest-low
+    needs: cypress
+
+    if: always()
+
+    name: cypress-summary
+
+    steps:
+      - name: Summary status
+        run: if ${{ needs.cypress.result != 'success' && needs.cypress.result != 'skipped' }}; then exit 1; fi
