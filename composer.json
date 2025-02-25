@@ -10,11 +10,11 @@
 		}
 	],
     "require-dev": {
-		"nextcloud/coding-standard": "^v1.3.2",
+		"nextcloud/coding-standard": "^v1.0.0",
 		"nextcloud/ocp": "dev-master",
 		"staabm/annotate-pull-request-from-checkstyle": "^1.8.5",
-		"phpunit/phpunit": "^12",
-		"psalm/phar": "^6.8.6",
+		"phpunit/phpunit": "^9",
+		"psalm/phar": "^5.25",
 		"bamarni/composer-bin-plugin": "^1.8.2"
 	},
 	"config": {
@@ -48,7 +48,7 @@
 		]
 	},
 	"require": {
-		"phpoffice/phpspreadsheet": "^4.0.0",
+		"phpoffice/phpspreadsheet": "^1.28",
 		"ext-json": "*"
 	}
 }
