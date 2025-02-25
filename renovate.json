@@ -31,6 +31,14 @@
 	],
 	"packageRules": [
 		{
+			"matchUpdateTypes": [
+				"major",
+				"minor"
+			],
+			"matchBaseBranches": ["/^stable0\\.[3-8]$/"],
+			"enabled": false
+		},
+		{
 			"description": "Request JavaScript reviews",
 			"matchManagers": [
 				"npm"
