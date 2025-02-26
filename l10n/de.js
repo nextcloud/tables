@@ -129,7 +129,7 @@ OC.L10N.register(
     "Filter data and save table presets as views to share and combine them into applications." : "Daten filtern und Tabellenvorgaben als Ansichten speichern, um sie freizugeben und in Anwendungen zu kombinieren.",
     "Create applications" : "Anwendungen erstellen",
     "Combine different tables and views into no-code applications for any purpose. This makes them easily accessible directly in the app bar." : "Verschiedene Tabellen und Ansichten zu no-code Anwendungen für jeden Zweck kombinieren. Dadurch sind sie direkt in der App-Leiste leicht zugänglich.",
-    "Read the docs" : "Lese die Dokumentation",
+    "Read the docs" : "Lies die Dokumentation",
     "If you want to go through the documentation, it can be found here: [Nextcloud Tables documentation](%s)" : "Wenn du die Dokumentation durchgehen möchtest, findest du diese hier: [Nextcloud Tabellen-Dokumentation](%s)",
     "Check yourself!" : "Überprüfe dich selbst!",
     "Tables" : "Tabellen",
