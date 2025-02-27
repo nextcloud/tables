@@ -28,14 +28,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        server-versions: ['stable27', 'stable28', 'stable29', 'master']
+        server-versions: ['stable27', 'stable28', 'stable29', 'stable30', 'stable31']
         php-versions: ['8.1']
         databases: ['mysql']
         include:
-          - server-versions: 'master'
+          - server-versions: 'stable31'
             php-versions: '8.3'
             databases: 'pgsql'
-          - server-versions: 'master'
+          - server-versions: 'stable31'
             php-versions: '8.3'
             databases: 'sqlite'
 
@@ -120,7 +120,7 @@ jobs:
           cat data/nextcloud.log
 
       - name: Query count
-        if: ${{ matrix.databases == 'mysql' && matrix.php-versions == '8.2' && matrix.server-versions == 'master' && github.event_name == 'pull_request' }}
+        if: ${{ matrix.databases == 'mysql' && matrix.php-versions == '8.2' && matrix.server-versions == 'stable31' && github.event_name == 'pull_request' }}
         uses: actions/github-script@v6
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
