@@ -2769,4 +2769,31 @@ class FeatureContext implements Context {
 			);
 		}
 	}
+
+	/**
+	 * @When the current user fetches all rows from :nodeType :nodeId
+	 */
+	public function theCurrentUserFetchesAllRowsFromCollection(string $nodeType, string $nodeAlias) {
+		$nodeId = $this->collectionManager->getByAlias($nodeType, $nodeAlias)['id'];
+		$this->sendOcsRequest('GET', sprintf('/apps/tables/api/2/%ss/%d/rows', $nodeType, $nodeId));
+	}
+
+	/**
+	 * @When the current user fetches rows from :nodeType :nodeId with those parameters
+	 */
+	public function theCurrentUserFetchesRowsFromWithThoseParameters(string $nodeType, string $nodeAlias, TableNode $parameters) {
+		$query = '';
+		foreach ($parameters->getRows() as $row) {
+			$query .= $row[0] . '=' . urlencode($row[1]) . '&';
+		}
+		$nodeId = $this->collectionManager->getByAlias($nodeType, $nodeAlias)['id'];
+		$this->sendOcsRequest('GET', sprintf('/apps/tables/api/2/%ss/%d/rows?%s', $nodeType, $nodeId, $query));
+	}
+
+	/**
+	 * @Given :numberOfRows rows have been loaded
+	 */
+	public function rowsHaveBeenLoaded(int $numberOfRows) {
+		Assert::assertCount($numberOfRows, $this->getDataFromResponse($this->response)['ocs']['data']);
+	}
 }
