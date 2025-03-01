@@ -168,12 +168,16 @@ class ImportService extends SuperService {
 					|| (is_array($columns[$colIndex])
 						&& $columns[$colIndex]['type'] === Column::TYPE_DATETIME)
 				) {
-					if (isset($columns[$colIndex]['subtype'])
-						&& $columns[$colIndex]['subtype'] === Column::SUBTYPE_DATETIME_DATE
+					if (
+						($column && $column->getSubtype() === Column::SUBTYPE_DATETIME_DATE)
+						|| (is_array($columns[$colIndex])
+							&& $columns[$colIndex]['subtype'] === Column::SUBTYPE_DATETIME_DATE)
 					) {
 						$format = 'Y-m-d';
-					} elseif (isset($columns[$colIndex]['subtype'])
-						&& $columns[$colIndex]['subtype'] === Column::SUBTYPE_DATETIME_TIME
+					} elseif (
+						($column && $column->getSubtype() === Column::SUBTYPE_DATETIME_TIME)
+						|| (is_array($columns[$colIndex])
+							&& $columns[$colIndex]['subtype'] === Column::SUBTYPE_DATETIME_TIME)
 					) {
 						$format = 'H:i';
 					} else {
