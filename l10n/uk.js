@@ -188,7 +188,7 @@ OC.L10N.register(
     "Import" : "Імпорт",
     "Export as CSV" : "Експорт у CSV",
     "Filtered view" : "Подання з фільтром",
-    "Reset local adjustments" : "Скинути локальні налаштування",
+    "Reset local adjustments" : "Скинути фільтри",
     "No columns" : "Відсутні стовпці",
     "We need at least one column, please be so kind and create one." : "Потрібно створити принаймні один стовпець.",
     "No columns selected" : "Не вибрано жодного стовпця",

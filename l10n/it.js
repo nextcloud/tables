@@ -183,6 +183,7 @@ OC.L10N.register(
     "Select" : "Seleziona",
     "Insert" : "Inserisci",
     "Unchecked" : "Non selezionati",
+    "Now" : "Ora",
     "ID" : "ID",
     "Clipboard is not available" : "Appunti non disponibili",
     "Could not fetch tables" : "Impossibile recuperare le tabelle",
