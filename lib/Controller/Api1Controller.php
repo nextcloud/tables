@@ -156,7 +156,7 @@ class Api1Controller extends ApiController {
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function showScheme(int $tableId): DataResponse {
 		try {
-			$scheme = $this->tableService->getScheme($tableId);
+			$scheme = $this->tableService->getScheme($tableId, $this->userId);
 			return new DataResponse($scheme->jsonSerialize(), http::STATUS_OK, ['Content-Disposition' => 'attachment; filename="' . $scheme->getTitle() . '.json"', 'Content-Type' => 'application/octet-stream']);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage());

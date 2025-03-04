@@ -525,10 +525,11 @@ class TableService extends SuperService {
 	 * @throws NotFoundError
 	 * @throws InternalError
 	 */
-	public function getScheme(int $id): TableScheme {
+	public function getScheme(int $id, ?string $userId = null): TableScheme {
 		$columns = $this->columnService->findAllByTable($id);
 		$table = $this->find($id);
-		return new TableScheme($table->getTitle(), $table->getEmoji(), $columns, $table->getViews(), $table->getDescription(), $this->appManager->getAppVersion('tables'));
+		$this->enhanceTable($table, $userId);
+		return new TableScheme($table->getTitle(), $table->getEmoji(), $columns, $table->getViews() ?: [], $table->getDescription(), $this->appManager->getAppVersion('tables'));
 	}
 
 	// PRIVATE FUNCTIONS ---------------------------------------------------------------
