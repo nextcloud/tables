@@ -43,7 +43,7 @@ use OCP\AppFramework\Db\Entity;
  * @method setRowsCount(int $rowsCount)
  * @method getColumnsCount(): int
  * @method setColumnsCount(int $columnsCount)
- * @method getViews(): array
+ * @method getViews(): ?array
  * @method setViews(array $views)
  * @method getColumns(): array
  * @method setColumns(array $columns)
