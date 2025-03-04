@@ -123,6 +123,7 @@ OC.L10N.register(
     "Go to a row you want to edit and use the *pencil* edit button. Maybe you want to add a *Done* status to this row?" : "Перейдіть до рядка, який ви бажаєте відредагувати, скористайтеся інструментом редагування \"Олівець\". Можливо ви бажаєте додати статус \"Виконано\" до цього рядка?",
     "Add a new column" : "Додати новий стовпець",
     "Create views for tables" : "Створюйте подання для таблиць",
+    "Filter data and save table presets as views to share and combine them into applications." : "Відфільтруйте дані та збережіть налаштований набір як подання, щоби поділитися та перетворити їх у застосунок.",
     "Create applications" : "Створюйте застосунки",
     "Read the docs" : "Прочитайте документи",
     "Check yourself!" : "Перевірте себе!",
