@@ -9,6 +9,7 @@ namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
 use OCA\Text\Event\LoadEditor;
+use OCA\Viewer\Event\LoadViewer;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
@@ -42,6 +43,10 @@ class PageController extends Controller {
 		Util::addStyle(Application::APP_ID, 'grid');
 		Util::addStyle(Application::APP_ID, 'modal');
 		Util::addStyle(Application::APP_ID, 'tiptap');
+
+		if (class_exists(LoadViewer::class)) {
+			$this->eventDispatcher->dispatchTyped(new LoadViewer());
+		}
 
 		if (class_exists(LoadEditor::class)) {
 			$this->eventDispatcher->dispatchTyped(new LoadEditor());
