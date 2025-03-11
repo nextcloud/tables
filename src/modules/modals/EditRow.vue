@@ -17,6 +17,10 @@
 					type="error">
 					{{ t('tables', '"{columnTitle}" should not be empty', { columnTitle: column.title }) }}
 				</NcNoteCard>
+				<NcNoteCard v-if="localRow[column.id] && column.type === 'text-link' && !isValidUrlProtocol(localRow[column.id])"
+					type="error">
+					{{ t('tables', 'Invalid protocol. Allowed: {allowed}', {allowed: allowedProtocols.join(', ')}) }}
+				</NcNoteCard>
 			</div>
 			<div class="row">
 				<div class="fix-col-4 space-T" :class="{'justify-between': showDeleteButton, 'end': !showDeleteButton}">
@@ -35,7 +39,7 @@
 					</div>
 					<NcButton v-if="canUpdateData(element) && !localLoading" :aria-label="t('tables', 'Save')" type="primary"
 						data-cy="editRowSaveButton"
-						:disabled="hasEmptyMandatoryRows"
+						:disabled="hasEmptyMandatoryRows || hasInvalidUrlProtocol"
 						@click="actionConfirm">
 						{{ t('tables', 'Save') }}
 					</NcButton>
@@ -57,6 +61,7 @@ import rowHelper from '../../shared/components/ncTable/mixins/rowHelper.js'
 import { mapActions } from 'pinia'
 import { useTablesStore } from '../../store/store.js'
 import { useDataStore } from '../../store/data.js'
+import { ALLOWED_PROTOCOLS } from '../../shared/constants.js'
 
 export default {
 	name: 'EditRow',
@@ -94,6 +99,7 @@ export default {
 			localRow: null,
 			prepareDeleteRow: false,
 			localLoading: false,
+			allowedProtocols: ALLOWED_PROTOCOLS,
 		}
 	},
 	computed: {
@@ -105,6 +111,9 @@ export default {
 		},
 		hasEmptyMandatoryRows() {
 			return this.checkMandatoryFields(this.localRow)
+		},
+		hasInvalidUrlProtocol() {
+			return this.nonMetaColumns.some(col => col.type === 'text-link' && !this.isValidUrlProtocol(this.localRow[col.id]))
 		},
 	},
 	watch: {

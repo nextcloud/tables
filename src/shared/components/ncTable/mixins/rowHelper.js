@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 import { ColumnTypes } from './columnHandler.js'
+import { ALLOWED_PROTOCOLS } from '../../../constants.js'
+
 export default {
 	methods: {
 		isValueValidForColumn(value, column) {
@@ -34,6 +36,16 @@ export default {
 				}
 			})
 			return mandatoryFieldsEmpty
+		},
+
+		isValidUrlProtocol(value) {
+			value = JSON.parse(value ?? '{}')
+			try {
+				const parsedUrl = new URL(value?.value)
+				return ALLOWED_PROTOCOLS.includes(parsedUrl.protocol)
+			} catch (e) {
+				return false
+			}
 		},
 	},
 }

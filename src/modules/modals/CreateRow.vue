@@ -17,6 +17,10 @@
 					type="error">
 					{{ t('tables', '"{columnTitle}" should not be empty', { columnTitle: column.title }) }}
 				</NcNoteCard>
+				<NcNoteCard v-if="row[column.id] && column.type === 'text-link' && !isValidUrlProtocol(row[column.id])"
+					type="error">
+					{{ t('tables', 'Invalid protocol. Allowed: {allowed}', {allowed: allowedProtocols.join(', ')}) }}
+				</NcNoteCard>
 			</div>
 			<div class="row">
 				<div class="fix-col-4 space-T end">
@@ -25,7 +29,7 @@
 							{{ t('tables', 'Add more') }}
 						</NcCheckboxRadioSwitch>
 					</div>
-					<NcButton v-if="!localLoading" class="primary" :aria-label="t('tables', 'Save row')" :disabled="hasEmptyMandatoryRows" data-cy="createRowSaveButton" @click="actionConfirm()">
+					<NcButton v-if="!localLoading" class="primary" :aria-label="t('tables', 'Save row')" :disabled="hasEmptyMandatoryRows || hasInvalidUrlProtocol" data-cy="createRowSaveButton" @click="actionConfirm()">
 						{{ t('tables', 'Save') }}
 					</NcButton>
 				</div>
@@ -43,6 +47,7 @@ import { translate as t } from '@nextcloud/l10n'
 import rowHelper from '../../shared/components/ncTable/mixins/rowHelper.js'
 import { useDataStore } from '../../store/data.js'
 import { mapActions } from 'pinia'
+import { ALLOWED_PROTOCOLS } from '../../shared/constants.js'
 
 export default {
 	name: 'CreateRow',
@@ -77,6 +82,7 @@ export default {
 			row: {},
 			localLoading: false,
 			addNewAfterSave: false,
+			allowedProtocols: ALLOWED_PROTOCOLS,
 		}
 	},
 	computed: {
@@ -85,6 +91,9 @@ export default {
 		},
 		hasEmptyMandatoryRows() {
 			return this.checkMandatoryFields(this.row)
+		},
+		hasInvalidUrlProtocol() {
+			return this.nonMetaColumns.some(col => col.type === 'text-link' && !this.isValidUrlProtocol(this.row[col.id]))
 		},
 	},
 	watch: {
