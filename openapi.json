@@ -582,6 +582,7 @@
                     "lastEditAt",
                     "description",
                     "columns",
+                    "columnSettings",
                     "sort",
                     "filter",
                     "isShared",
@@ -634,6 +635,26 @@
                         "items": {
                             "type": "integer",
                             "format": "int64"
+                        }
+                    },
+                    "columnSettings": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "columnId",
+                                "order"
+                            ],
+                            "properties": {
+                                "columnId": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "order": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                }
+                            }
                         }
                     },
                     "sort": {

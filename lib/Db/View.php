@@ -25,6 +25,8 @@ use OCP\AppFramework\Db\Entity;
  * @method setTableId(int $tableId)
  * @method getColumns(): string
  * @method setColumns(string $columns)
+ * @method getColumnSettings(): string
+ * @method setColumnSettings(string $columnSettings)
  * @method getCreatedBy(): string
  * @method setCreatedBy(string $createdBy)
  * @method getCreatedAt(): string
@@ -84,7 +86,35 @@ class View extends Entity implements JsonSerializable {
 	 * @return int[]
 	 */
 	public function getColumnsArray(): array {
-		return $this->getArray($this->getColumns());
+		
+		$columnSettings = $this->getColumnsSettingsArray();
+		usort($columnSettings, function ($a, $b) {
+			return $a['order'] - $b['order'];
+		});
+		return array_column($columnSettings, 'columnId');
+	}
+
+	/**
+	 * @return array<array{columnId: int, order: int}>
+	 */
+	public function getColumnsSettingsArray(): array {
+		$columns = $this->getArray($this->getColumns());
+		if (empty($columns)) {
+			return [];
+		}
+		
+		if (is_array(reset($columns))) {
+			return $columns;
+		}
+		
+		$result = [];
+		foreach ($columns as $index => $columnId) {
+			$result[] = [
+				'columnId' => $columnId,
+				'order' => (int)$index + 1
+			];
+		}
+		return $result;
 	}
 
 	/**
@@ -125,6 +155,10 @@ class View extends Entity implements JsonSerializable {
 		$this->setColumns(\json_encode($array));
 	}
 
+	public function setColumnsSettingsArray(array $array): void {
+		$this->setColumnSettings(\json_encode($array));
+	}
+
 	public function setSortArray(array $array):void {
 		$this->setSort(\json_encode($array));
 	}
@@ -161,6 +195,7 @@ class View extends Entity implements JsonSerializable {
 			'lastEditBy' => $this->lastEditBy ?: '',
 			'lastEditAt' => $this->lastEditAt ?: '',
 			'columns' => $this->getColumnsArray(),
+			'columnSettings' => $this->getColumnsSettingsArray(),
 			'sort' => $this->getSortArray(),
 			'isShared' => (bool)$this->isShared,
 			'favorite' => $this->favorite,
@@ -172,5 +207,13 @@ class View extends Entity implements JsonSerializable {
 		$serialisedJson['filter'] = $this->getFilterArray();
 
 		return $serialisedJson;
+	}
+
+	/**
+	 * @psalm-suppress MismatchingDocblockReturnType
+	 * @return int[]
+	 */
+	public function getColumnIds(): array {
+		return array_column($this->getColumnsSettingsArray(), 'columnId');
 	}
 }

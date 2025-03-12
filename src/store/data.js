@@ -75,8 +75,20 @@ export const useDataStore = defineStore('data', {
 		async loadColumnsFromBE({ view, tableId }) {
 			let allColumns = await this.getColumnsFromBE({ tableId, viewId: view?.id })
 			if (view) {
-				allColumns = allColumns.concat(MetaColumns.filter(col => view.columns.includes(col.id)))
-				allColumns = allColumns.sort((a, b) => view.columns.indexOf(a.id) - view.columns.indexOf(b.id))
+				// Transform array to object for faster access
+				const columnSettingsMap = view.columnSettings?.reduce((acc, item) => {
+					acc[item.columnId] = item
+					return acc
+				}, {}) ?? {}
+
+				allColumns = allColumns.concat(MetaColumns.filter(col => columnSettingsMap[col.id]))
+				if (view.columnSettings) {
+					allColumns = allColumns.sort((a, b) => {
+						const orderA = columnSettingsMap[a.id]?.order ?? Number.MAX_SAFE_INTEGER
+						const orderB = columnSettingsMap[b.id]?.order ?? Number.MAX_SAFE_INTEGER
+						return orderA - orderB
+					})
+				}
 			}
 			const stateId = genStateKey(!!(view?.id), view?.id ?? tableId)
 			set(this.columns, stateId, allColumns)

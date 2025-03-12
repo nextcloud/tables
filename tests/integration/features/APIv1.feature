@@ -269,7 +269,7 @@ Feature: APIv1
       | mandatory     | 0               |
       | description   | Note me a thing |
     And user "participant1" create view "Simple View" with emoji "🙃" for "table_p1" as "simple-view"
-    When user "participant1" sets columns "Volatile Notes,-1" to view "simple-view"
+    When user "participant1" sets columnSettings "Volatile Notes,-1" to view "simple-view"
     Then the reported status is "200"
 
   @api1 @views
@@ -282,7 +282,7 @@ Feature: APIv1
       | description   | Note me a thing |
     And table "Private Two" with emoji "🥶" exists for user "participant2" as "table_p2"
     And user "participant2" create view "Sneaky View" with emoji "🫣" for "table_p2" as "sneaky-view"
-    When user "participant2" sets columns "Volatile Notes" to view "sneaky-view"
+    When user "participant2" sets columnSettings "Volatile Notes" to view "sneaky-view"
     Then the reported status is "400"
 
   @api1 @contexts @contexts-sharing
@@ -331,14 +331,14 @@ Feature: APIv1
       | mandatory     | 1                      |
       | description   | The feature to build   |
     And user "participant1" create view "Office Features" with emoji "👔" for "team-features" as "office-features"
-    When user "participant1" sets columns "feature" to view "office-features"
+    When user "participant1" sets columnSettings "feature" to view "office-features"
     And user "participant1" sets filter to view "office-features"
       | column  | operator | value           |
       | team    | is-equal | @selection-id-0 |
     When user "participant1" tries to create a row using v2 on "view" "office-features" with following values
       | feature                | Fancy tables features |
     And user "participant1" create view "Design Features" with emoji "🎨" for "team-features" as "design-features"
-    When user "participant1" sets columns "feature" to view "design-features"
+    When user "participant1" sets columnSettings "feature" to view "design-features"
     And user "participant1" sets filter to view "design-features"
       | column  | operator | value           |
       | team    | is-equal | @selection-id-2 |
@@ -370,14 +370,14 @@ Feature: APIv1
       | mandatory     | 1                      |
       | description   | The task description   |
     And user "participant1" create view "Open Tasks" with emoji "🔔" for "project-tasks" as "open-tasks"
-    When user "participant1" sets columns "task" to view "open-tasks"
+    When user "participant1" sets columnSettings "task" to view "open-tasks"
     And user "participant1" sets filter to view "open-tasks"
       | column  | operator | value    |
       | status  | is-equal | open     |
     When user "participant1" tries to create a row using v2 on "view" "open-tasks" with following values
       | task                   | Implement new feature |
     And user "participant1" create view "Completed Tasks" with emoji "✅" for "project-tasks" as "completed-tasks"
-    When user "participant1" sets columns "task" to view "completed-tasks"
+    When user "participant1" sets columnSettings "task" to view "completed-tasks"
     And user "participant1" sets filter to view "completed-tasks"
       | column  | operator | value      |
       | status  | is-equal | completed  |
@@ -408,14 +408,14 @@ Feature: APIv1
       | mandatory     | 1                     |
       | description   | The task description  |
     And user "participant1" create view "Important Tasks" with emoji "⭐" for "task-list" as "important-tasks"
-    When user "participant1" sets columns "task" to view "important-tasks"
+    When user "participant1" sets columnSettings "task" to view "important-tasks"
     And user "participant1" sets filter to view "important-tasks"
       | column       | operator  | value |
       | is_important | is-equal  | true  |
     When user "participant1" tries to create a row using v2 on "view" "important-tasks" with following values
       | task                   | Critical feature |
     And user "participant1" create view "Regular Tasks" with emoji "📌" for "task-list" as "regular-tasks"
-    When user "participant1" sets columns "task" to view "regular-tasks"
+    When user "participant1" sets columnSettings "task" to view "regular-tasks"
     And user "participant1" sets filter to view "regular-tasks"
       | column       | operator  | value |
       | is_important | is-equal  | false |
@@ -447,7 +447,7 @@ Feature: APIv1
       | description   | Task category         |
       | default       | general               |
     And user "participant1" create view "General Tasks" with emoji "📝" for "task-list" as "general-tasks"
-    When user "participant1" sets columns "task" to view "general-tasks"
+    When user "participant1" sets columnSettings "task" to view "general-tasks"
     And user "participant1" sets filter to view "general-tasks"
       | column       | operator  | value   |
       | category     | is-equal  | general |

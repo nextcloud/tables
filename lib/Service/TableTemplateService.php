@@ -466,7 +466,12 @@ class TableTemplateService {
 			[
 				'title' => $this->l->t('Create Vacation Request'),
 				'emoji' => '️➕',
-				'columns' => json_encode([$columns['employee']->getId(), $columns['from']->getId(), $columns['to']->getId(), $columns['workingDays']->getId(), $columns['dateRequest']->getId()]),
+				'columnSettings' => json_encode(array_map(function ($columnId, $index) {
+					return [
+						'columnId' => $columnId,
+						'order' => $index
+					];
+				}, [$columns['employee']->getId(), $columns['from']->getId(), $columns['to']->getId(), $columns['workingDays']->getId(), $columns['dateRequest']->getId()], array_keys([$columns['employee']->getId(), $columns['from']->getId(), $columns['to']->getId(), $columns['workingDays']->getId(), $columns['dateRequest']->getId()]))),
 				'sort' => json_encode([['columnId' => Column::TYPE_META_UPDATED_AT, 'mode' => 'ASC']]),
 				'filter' => json_encode([[['columnId' => Column::TYPE_META_CREATED_BY, 'operator' => 'is-equal', 'value' => '@my-name'], ['columnId' => $columns['approved']->getId(), 'operator' => 'is-empty', 'value' => '']]]),
 			]
@@ -475,9 +480,12 @@ class TableTemplateService {
 			[
 				'title' => $this->l->t('Open Request'),
 				'emoji' => '️📝',
-				'columns' => json_encode(array_values(array_map(function ($col) {
-					return $col->getId();
-				}, $columns))),
+				'columnSettings' => json_encode(array_map(function ($column, $index) {
+					return [
+						'columnId' => $column->getId(),
+						'order' => $index
+					];
+				}, array_values($columns), array_keys(array_values($columns)))),
 				'sort' => json_encode([['columnId' => $columns['from']->getId(), 'mode' => 'ASC']]),
 				'filter' => json_encode([[['columnId' => $columns['approved']->getId(), 'operator' => 'is-empty', 'value' => '']]]),
 			]
@@ -486,9 +494,12 @@ class TableTemplateService {
 			[
 				'title' => $this->l->t('Request Status'),
 				'emoji' => '️❓',
-				'columns' => json_encode(array_values(array_map(function ($col) {
-					return $col->getId();
-				}, $columns))),
+				'columnSettings' => json_encode(array_map(function ($column, $index) {
+					return [
+						'columnId' => $column->getId(),
+						'order' => $index
+					];
+				}, array_values($columns), array_keys(array_values($columns)))),
 				'sort' => json_encode([['columnId' => Column::TYPE_META_UPDATED_BY, 'mode' => 'ASC']]),
 				'filter' => json_encode([[['columnId' => Column::TYPE_META_CREATED_BY, 'operator' => 'is-equal', 'value' => '@my-name']]]),
 			]
@@ -497,9 +508,12 @@ class TableTemplateService {
 			[
 				'title' => $this->l->t('Closed requests'),
 				'emoji' => '️✅',
-				'columns' => json_encode(array_values(array_map(function ($col) {
-					return $col->getId();
-				}, $columns))),
+				'columnSettings' => json_encode(array_map(function ($column, $index) {
+					return [
+						'columnId' => $column->getId(),
+						'order' => $index
+					];
+				}, array_values($columns), array_keys(array_values($columns)))),
 				'sort' => json_encode([['columnId' => Column::TYPE_META_UPDATED_BY, 'mode' => 'ASC']]),
 				'filter' => json_encode([[['columnId' => $columns['approved']->getId(), 'operator' => 'is-equal', 'value' => '@checked']], [['columnId' => $columns['approved']->getId(), 'operator' => 'is-equal', 'value' => '@unchecked']]]),
 			]
@@ -783,7 +797,7 @@ class TableTemplateService {
 		$this->createView($table, [
 			'title' => $this->l->t('Check yourself!'),
 			'emoji' => '🏁',
-			'columns' => json_encode([$columns['what']->getId(), $columns['how']->getId(), $columns['ease']->getId(), $columns['done']->getId()]),
+			'columnSettings' => json_encode([['columnId' => $columns['what']->getId(), 'order' => 0], ['columnId' => $columns['how']->getId(), 'order' => 1], ['columnId' => $columns['ease']->getId(), 'order' => 2], ['columnId' => $columns['done']->getId(), 'order' => 3]]),
 			'filter' => json_encode([[['columnId' => $columns['done']->getId(), 'operator' => 'is-equal', 'value' => '@unchecked']]]),
 		]);
 	}
