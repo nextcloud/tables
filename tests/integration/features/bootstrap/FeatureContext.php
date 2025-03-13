@@ -65,8 +65,6 @@ class FeatureContext implements Context {
 	// Store data from last request to perform assertions, id is used as a key
 	private array $tableData = [];
 
-	private $importColumnData = null;
-
 	// use CommandLineTrait;
 	private CollectionManager $collectionManager;
 
@@ -92,7 +90,6 @@ class FeatureContext implements Context {
 	 * @AfterScenario
 	 */
 	public function cleanupUsers() {
-		$this->importColumnData = null;
 		$this->collectionManager->cleanUp();
 		foreach ($this->createdUsers as $user) {
 			$this->deleteUser($user);
@@ -2767,6 +2764,83 @@ class FeatureContext implements Context {
 				$actualFormattedRows[$i],
 				'Row ' . $i . ' does not match expected values'
 			);
+		}
+	}
+
+	/**
+	 * @When the current user fetches all rows from :nodeType :nodeId
+	 */
+	public function theCurrentUserFetchesAllRowsFromCollection(string $nodeType, string $nodeAlias): void {
+		$nodeId = $this->collectionManager->getByAlias($nodeType, $nodeAlias)['id'];
+		$this->sendOcsRequest('GET', sprintf('/apps/tables/api/2/%ss/%d/rows', $nodeType, $nodeId));
+	}
+
+	/**
+	 * @When the current user fetches rows from :nodeType :nodeId with those parameters
+	 */
+	public function theCurrentUserFetchesRowsFromWithThoseParameters(string $nodeType, string $nodeAlias, TableNode $parameters): void {
+		$query = '';
+		foreach ($parameters->getRows() as $row) {
+			if ($row[0] !== 'filter') {
+				$parameterName = $row[0];
+				$parameterValue = $row[1];
+			} else {
+				[$columnAlias,$operator,$value] = explode(',',$row[1]);
+				$columnId = $this->collectionManager->getByAlias('column', $columnAlias)['id'];
+				$filterArray = [ // all filters
+					[ // filter groups
+						[ // single filter definitions
+							'columnId' => $columnId,
+							'operator' => $operator,
+							'value' => $value
+						],
+					],
+				];
+				$parameterName = $row[0];
+				$parameterValue = json_encode($filterArray);
+			}
+			$query .= $parameterName . '=' . urlencode($parameterValue) . '&';
+		}
+		$nodeId = $this->collectionManager->getByAlias($nodeType, $nodeAlias)['id'];
+		$this->sendOcsRequest('GET', sprintf('/apps/tables/api/2/%ss/%d/rows?%s', $nodeType, $nodeId, $query));
+	}
+
+	/**
+	 * @Given :numberOfRows rows have been loaded
+	 */
+	public function rowsHaveBeenLoaded(int $numberOfRows): void {
+		$responseData = $this->getDataFromResponse($this->response)['ocs']['data'];
+		// do not count the error message, if present
+		unset($responseData['message']);
+		Assert::assertCount($numberOfRows, $responseData);
+		$returnedIDs = [];
+		foreach ($responseData as $row) {
+			$returnedIDs[] = $this->collectionManager->getById('row', $row['id']);
+		}
+		$this->collectionManager->register($returnedIDs, 'returnedRowIDs', 0);
+	}
+
+	/**
+	 * @Given rows :rowAliasList are not included in the response
+	 */
+	public function rowsAreNotIncludedInTheResponse(string $rowAliasList): void {
+		$unexpectedRowAliases = array_map('trim', explode(',', $rowAliasList));
+		$returnedRowIds = $this->collectionManager->getById('returnedRowIDs', 0);
+		foreach ($unexpectedRowAliases as $unexpectedRowAlias) {
+			$row = $this->collectionManager->getByAlias('row', $unexpectedRowAlias);
+			Assert::assertNotContains($row['id'], $returnedRowIds);
+		}
+	}
+
+	/**
+	 * @Given rows :rowAliasList are included in the response
+	 */
+	public function rowsAreIncludedInTheResponse(string $rowAliasList): void {
+		$unexpectedRowAliases = array_map('trim', explode(',', $rowAliasList));
+		$returnedRowIds = $this->collectionManager->getById('returnedRowIDs', 0);
+		foreach ($unexpectedRowAliases as $unexpectedRowAlias) {
+			$row = $this->collectionManager->getByAlias('row', $unexpectedRowAlias);
+			Assert::assertContains($row['id'], $returnedRowIds);
 		}
 	}
 }
