@@ -513,6 +513,7 @@ OC.L10N.register(
     "Insert" : "Insert",
     "Could not load search results." : "Could not load search results.",
     "Search for table and views..." : "Search for table and views...",
+    "Invalid protocol. Allowed: {allowed}" : "Invalid protocol. Allowed: {allowed}",
     "Import into Tables" : "Import into Tables",
     "Could not create share." : "Could not create share.",
     "Could not remove share." : "Could not remove share.",

@@ -513,6 +513,7 @@ OC.L10N.register(
     "Insert" : "Уметни",
     "Could not load search results." : "Нису могли да се учитају резултати претраге.",
     "Search for table and views..." : "Претрага табеле и погледа...",
+    "Invalid protocol. Allowed: {allowed}" : "Неисправан протокол. Дозвољено је: {allowed}",
     "Import into Tables" : "Увоз у Табеле",
     "Could not create share." : "Не може да се креира дељење.",
     "Could not remove share." : "Не може да се уклони дељење.",
