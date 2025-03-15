@@ -5,6 +5,7 @@
 <template>
 	<div>
 		<ElementTitle :active-element="view" :is-table="false" :view-setting.sync="localViewSetting" />
+		<TableDescription :description="view.description" :read-only="true" />
 		<div class="table-wrapper">
 			<EmptyView v-if="columns.length === 0" :view="view" />
 			<TableView v-else
@@ -86,9 +87,11 @@ import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
 import IconImport from 'vue-material-design-icons/Import.vue'
 import Connection from 'vue-material-design-icons/Connection.vue'
 import ElementTitle from './ElementTitle.vue'
+import TableDescription from './TableDescription.vue'
 
 export default {
 	components: {
+		TableDescription,
 		EmptyView,
 		TableView,
 		PlaylistEdit,
