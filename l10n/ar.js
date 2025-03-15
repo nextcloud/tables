@@ -513,6 +513,7 @@ OC.L10N.register(
     "Insert" : "إدخال",
     "Could not load search results." : "تعذّر تحميل نتائج البحث",
     "Search for table and views..." : "البحث في الصفوف و المناظير",
+    "Invalid protocol. Allowed: {allowed}" : "بروتوكول غير صحيح. مسموح: {allowed}",
     "Import into Tables" : "إستيراد إلى \"الجداول\" Tables",
     "Could not create share." : "تعذر إنشاء مشاركة.",
     "Could not remove share." : "تعذر نقل/ إزالة المشاركة.",
