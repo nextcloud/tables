@@ -293,8 +293,8 @@ class Row2Mapper {
 					Column::TYPE_META_ID => 'id',
 					Column::TYPE_META_CREATED_BY => 'created_by',
 					Column::TYPE_META_CREATED_AT => 'created_at',
-					Column::TYPE_META_UPDATED_BY => 'updated_by',
-					Column::TYPE_META_UPDATED_AT => 'updated_at',
+					Column::TYPE_META_UPDATED_BY => 'last_edit_by',
+					Column::TYPE_META_UPDATED_AT => 'last_edit_at',
 					default => null,
 				};
 
