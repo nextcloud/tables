@@ -261,6 +261,11 @@ class RowService extends SuperService {
 					continue;
 				}
 
+				// For meta columns, we don't need to add them to the data since they are handled separately
+				if (Column::isValidMetaTypeId($filter['columnId'])) {
+					continue;
+				}
+
 				// Only handle simple equality filters for now
 				if (!in_array($filter['operator'], ['is-equal'])) {
 					continue;
