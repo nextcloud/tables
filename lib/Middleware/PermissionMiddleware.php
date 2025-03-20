@@ -23,20 +23,16 @@ use OCP\IRequest;
 
 class PermissionMiddleware extends Middleware {
 	private IControllerMethodReflector $reflector;
-	private PermissionsService $permissionsService;
-	private ?string $userId;
 	private IRequest $request;
 
 	public function __construct(
 		IControllerMethodReflector $reflector,
-		PermissionsService $permissionsService,
+		private PermissionsService $permissionsService,
 		IRequest $request,
-		?string $userId,
+		private ?string $userId,
 	) {
 
 		$this->reflector = $reflector;
-		$this->permissionsService = $permissionsService;
-		$this->userId = $userId;
 		$this->request = $request;
 	}
 

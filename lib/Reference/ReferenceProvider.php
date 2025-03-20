@@ -16,13 +16,11 @@ use OCP\IL10N;
 use OCP\IURLGenerator;
 
 class ReferenceProvider extends ADiscoverableReferenceProvider implements ISearchableReferenceProvider {
-	private ReferenceHelper $referenceHelper;
 	private ReferenceManager $referenceManager;
 	private IURLGenerator $urlGenerator;
 	private IL10N $l10n;
 
-	public function __construct(IL10N $l10n, IURLGenerator $urlGenerator, ReferenceHelper $referenceHelper, ReferenceManager $referenceManager) {
-		$this->referenceHelper = $referenceHelper;
+	public function __construct(IL10N $l10n, IURLGenerator $urlGenerator, private ReferenceHelper $referenceHelper, ReferenceManager $referenceManager) {
 		$this->referenceManager = $referenceManager;
 		$this->urlGenerator = $urlGenerator;
 		$this->l10n = $l10n;

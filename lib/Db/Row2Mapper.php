@@ -27,29 +27,15 @@ use Throwable;
 
 class Row2Mapper {
 	use TTransactional;
-
-	private RowSleeveMapper $rowSleeveMapper;
-	private ?string $userId = null;
 	private IDBConnection $db;
-	private LoggerInterface $logger;
-	protected UserHelper $userHelper;
-	protected ColumnMapper $columnMapper;
 
 	/* @var Column[] $columns */
 	private array $columns = [];
 	/* @var Column[] $columns */
 	private array $allColumns = [];
 
-	private ColumnsHelper $columnsHelper;
-
-	public function __construct(?string $userId, IDBConnection $db, LoggerInterface $logger, UserHelper $userHelper, RowSleeveMapper $rowSleeveMapper, ColumnsHelper $columnsHelper, ColumnMapper $columnMapper) {
-		$this->rowSleeveMapper = $rowSleeveMapper;
-		$this->userId = $userId;
+	public function __construct(private ?string $userId, IDBConnection $db, private LoggerInterface $logger, protected UserHelper $userHelper, private RowSleeveMapper $rowSleeveMapper, private ColumnsHelper $columnsHelper, protected ColumnMapper $columnMapper) {
 		$this->db = $db;
-		$this->logger = $logger;
-		$this->userHelper = $userHelper;
-		$this->columnsHelper = $columnsHelper;
-		$this->columnMapper = $columnMapper;
 	}
 
 	/**
@@ -68,7 +54,7 @@ class Row2Mapper {
 		} catch (Throwable $e) {
 			$this->db->rollBack();
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new Exception(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new Exception(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		return $row;
@@ -90,11 +76,11 @@ class Row2Mapper {
 		} elseif (count($rows) === 0) {
 			$e = new Exception('Wanted row not found.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} else {
 			$e = new Exception('Too many results for one wanted row.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
 
@@ -106,8 +92,8 @@ class Row2Mapper {
 			$rowSleeve = $this->rowSleeveMapper->findNext($offsetId);
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
-		} catch (DoesNotExistException $e) {
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		} catch (DoesNotExistException) {
 			return null;
 		}
 		return $rowSleeve->getId();
@@ -152,7 +138,7 @@ class Row2Mapper {
 			$result = $this->db->executeQuery($qb->getSQL(), $qb->getParameters(), $qb->getParameterTypes());
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), );
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), );
 		}
 
 		return array_map(fn (array $item) => $item['id'], $result->fetchAll());
@@ -225,23 +211,23 @@ class Row2Mapper {
 			$result = $qb->executeQuery();
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), );
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), );
 		}
 
 		try {
-			$sleeves = $this->rowSleeveMapper->findMultiple($rowIds, function (IQueryBuilder $qb, string $sleevesAlias) use ($sort) {
+			$sleeves = $this->rowSleeveMapper->findMultiple($rowIds, function (IQueryBuilder $qb, string $sleevesAlias) use ($sort): void {
 				$this->addSortQueryForMultipleSleeveFinder($qb, $sleevesAlias, $sort);
 			});
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		try {
 			$columnTypes = $this->columnMapper->getColumnTypes($columnIds);
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		return $this->parseEntities($result, $sleeves, $columnTypes);
@@ -319,7 +305,7 @@ class Row2Mapper {
 	private function replacePlaceholderValues(array &$filters, string $userId): void {
 		foreach ($filters as &$filterGroup) {
 			foreach ($filterGroup as &$filter) {
-				if (substr($filter['value'], 0, 1) === '@') {
+				if (str_starts_with($filter['value'], '@')) {
 					$filter['value'] = $this->columnsHelper->resolveSearchValue($filter['value'], $userId);
 				}
 			}
@@ -369,7 +355,7 @@ class Row2Mapper {
 			} else {
 				$e = new Exception('Needed column (' . $columnId . ') not found.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
-				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+				throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 			$filterExpressions[] = $sql;
 		}
@@ -505,28 +491,18 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	private function getSqlOperator(string $operator, IQueryBuilder $qb, string $columnName, $value, $paramType): string {
-		switch ($operator) {
-			case 'begins-with':
-				return $qb->expr()->like($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value), $paramType));
-			case 'ends-with':
-				return $qb->expr()->like($columnName, $qb->createNamedParameter($this->db->escapeLikeParameter($value) . '%', $paramType));
-			case 'contains':
-				return $qb->expr()->like($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
-			case 'is-equal':
-				return $qb->expr()->eq($columnName, $qb->createNamedParameter($value, $paramType));
-			case 'is-greater-than':
-				return $qb->expr()->gt($columnName, $qb->createNamedParameter($value, $paramType));
-			case 'is-greater-than-or-equal':
-				return $qb->expr()->gte($columnName, $qb->createNamedParameter($value, $paramType));
-			case 'is-lower-than':
-				return $qb->expr()->lt($columnName, $qb->createNamedParameter($value, $paramType));
-			case 'is-lower-than-or-equal':
-				return $qb->expr()->lte($columnName, $qb->createNamedParameter($value, $paramType));
-			case 'is-empty':
-				return $qb->expr()->isNull($columnName);
-			default:
-				throw new InternalError('Operator ' . $operator . ' is not supported.');
-		}
+		return match ($operator) {
+            'begins-with' => $qb->expr()->like($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value), $paramType)),
+            'ends-with' => $qb->expr()->like($columnName, $qb->createNamedParameter($this->db->escapeLikeParameter($value) . '%', $paramType)),
+            'contains' => $qb->expr()->like($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType)),
+            'is-equal' => $qb->expr()->eq($columnName, $qb->createNamedParameter($value, $paramType)),
+            'is-greater-than' => $qb->expr()->gt($columnName, $qb->createNamedParameter($value, $paramType)),
+            'is-greater-than-or-equal' => $qb->expr()->gte($columnName, $qb->createNamedParameter($value, $paramType)),
+            'is-lower-than' => $qb->expr()->lt($columnName, $qb->createNamedParameter($value, $paramType)),
+            'is-lower-than-or-equal' => $qb->expr()->lte($columnName, $qb->createNamedParameter($value, $paramType)),
+            'is-empty' => $qb->expr()->isNull($columnName),
+            default => throw new InternalError('Operator ' . $operator . ' is not supported.'),
+        };
 	}
 
 	/**
@@ -632,7 +608,7 @@ class Row2Mapper {
 	 */
 	public function update(Row2 $row, array $columns): Row2 {
 		if (!$columns) {
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': columns are missing');
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': columns are missing');
 		}
 		$this->setColumns($columns);
 
@@ -648,7 +624,7 @@ class Row2Mapper {
 			$this->rowSleeveMapper->update($sleeve);
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// write all changed cells to its db-table
@@ -712,7 +688,7 @@ class Row2Mapper {
 		if (!isset($this->columns[$columnId])) {
 			$e = new Exception('Can not insert cell, because the given column-id is not known');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 
@@ -769,7 +745,7 @@ class Row2Mapper {
 		$cellMapper = $this->getCellMapper($this->columns[$columnId]);
 		try {
 			if ($cellMapper->hasMultipleValues()) {
-				$this->atomic(function () use ($cellMapper, $rowId, $columnId, $value) {
+				$this->atomic(function () use ($cellMapper, $rowId, $columnId, $value): void {
 					$cellMapper->deleteAllForRow($rowId);
 					$this->insertCell($rowId, $columnId, $value);
 				}, $this->db);
@@ -781,7 +757,7 @@ class Row2Mapper {
 			$this->insertCell($rowId, $columnId, $value);
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
 
@@ -811,7 +787,7 @@ class Row2Mapper {
 			return Server::get($cellMapperClassName);
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
 
@@ -830,7 +806,7 @@ class Row2Mapper {
 			$this->getCellMapper($column)->deleteAllForColumn($column->getId());
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
 
@@ -879,23 +855,14 @@ class Row2Mapper {
 
 	private function getFormattedDefaultValue(Column $column) {
 		$defaultValue = null;
-		switch ($column->getType()) {
-			case Column::TYPE_SELECTION:
-				$defaultValue = $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getSelectionDefault());
-				break;
-			case Column::TYPE_DATETIME:
-				$defaultValue = $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getDatetimeDefault());
-				break;
-			case Column::TYPE_NUMBER:
-				$defaultValue = $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getNumberDefault());
-				break;
-			case Column::TYPE_TEXT:
-				$defaultValue = $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getTextDefault());
-				break;
-			case Column::TYPE_USERGROUP:
-				$defaultValue = $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getUsergroupDefault());
-				break;
-		}
+		$defaultValue = match ($column->getType()) {
+            Column::TYPE_SELECTION => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getSelectionDefault()),
+            Column::TYPE_DATETIME => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getDatetimeDefault()),
+            Column::TYPE_NUMBER => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getNumberDefault()),
+            Column::TYPE_TEXT => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getTextDefault()),
+            Column::TYPE_USERGROUP => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getUsergroupDefault()),
+            default => $defaultValue,
+        };
 		return $defaultValue;
 	}
 }

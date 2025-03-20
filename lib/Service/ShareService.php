@@ -44,43 +44,22 @@ use Throwable;
 class ShareService extends SuperService {
 	use TTransactional;
 
-	protected ShareMapper $mapper;
-
-	protected TableMapper $tableMapper;
-
-	protected ViewMapper $viewMapper;
-
-	protected UserHelper $userHelper;
-
-	protected GroupHelper $groupHelper;
-
-	protected CircleHelper $circleHelper;
-
-	private ContextNavigationMapper $contextNavigationMapper;
-
 	private IDBConnection $dbc;
 
 	public function __construct(
 		PermissionsService $permissionsService,
 		LoggerInterface $logger,
 		?string $userId,
-		ShareMapper $shareMapper,
-		TableMapper $tableMapper,
-		ViewMapper $viewMapper,
-		UserHelper $userHelper,
-		GroupHelper $groupHelper,
-		CircleHelper $circleHelper,
-		ContextNavigationMapper $contextNavigationMapper,
+		protected ShareMapper $mapper,
+		protected TableMapper $tableMapper,
+		protected ViewMapper $viewMapper,
+		protected UserHelper $userHelper,
+		protected GroupHelper $groupHelper,
+		protected CircleHelper $circleHelper,
+		private ContextNavigationMapper $contextNavigationMapper,
 		IDBConnection $dbc,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
-		$this->mapper = $shareMapper;
-		$this->tableMapper = $tableMapper;
-		$this->viewMapper = $viewMapper;
-		$this->userHelper = $userHelper;
-		$this->groupHelper = $groupHelper;
-		$this->circleHelper = $circleHelper;
-		$this->contextNavigationMapper = $contextNavigationMapper;
 		$this->dbc = $dbc;
 	}
 
@@ -244,7 +223,7 @@ class ShareService extends SuperService {
 		if (!$this->userId) {
 			$e = new \Exception('No user given.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 		$time = new DateTime();
 		$item = new Share();
@@ -299,10 +278,10 @@ class ShareService extends SuperService {
 			$item = $this->mapper->find($id);
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// security
@@ -338,7 +317,7 @@ class ShareService extends SuperService {
 			$share = $this->mapper->update($item);
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 		return $this->addReceiverDisplayName($share);
 	}
@@ -352,7 +331,7 @@ class ShareService extends SuperService {
 
 			if ($item->getNodeType() !== 'context') {
 				// Contexts-only property
-				throw new InvalidArgumentException(get_class($this) . ' - ' . __FUNCTION__ . ': nav bar display mode can be set for shared contexts only');
+				throw new InvalidArgumentException(static::class . ' - ' . __FUNCTION__ . ': nav bar display mode can be set for shared contexts only');
 			}
 
 			if ($userId === '') {
@@ -370,10 +349,10 @@ class ShareService extends SuperService {
 			return $this->contextNavigationMapper->setDisplayModeByShareId($shareId, $displayMode, $userId);
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (Exception|MultipleObjectsReturnedException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
 
@@ -389,10 +368,10 @@ class ShareService extends SuperService {
 			$item = $this->mapper->find($id);
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// security
@@ -407,7 +386,7 @@ class ShareService extends SuperService {
 			}
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 		return $this->addReceiverDisplayName($item);
 	}
@@ -448,7 +427,7 @@ class ShareService extends SuperService {
 	public function deleteAllForTable(Table $table):void {
 		try {
 			$this->mapper->deleteByNode($table->getId(), 'table');
-		} catch (Exception $e) {
+		} catch (Exception) {
 			$this->logger->error('something went wrong while deleting shares for table: ' . $table->getId());
 		}
 	}
@@ -456,14 +435,14 @@ class ShareService extends SuperService {
 	public function deleteAllForView(View $view):void {
 		try {
 			$this->mapper->deleteByNode($view->getId(), 'view');
-		} catch (Exception $e) {
+		} catch (Exception) {
 			$this->logger->error('something went wrong while deleting shares for view: ' . $view->getId());
 		}
 	}
 
 	public function deleteAllForContext(Context $context): void {
 		try {
-			$this->atomic(function () use ($context) {
+			$this->atomic(function () use ($context): void {
 				$shares = $this->mapper->findAllSharesForNode('context', $context->getId(), $this->userId);
 				foreach ($shares as $share) {
 					/** @var Share $share */
@@ -471,7 +450,7 @@ class ShareService extends SuperService {
 				}
 				$this->mapper->deleteByNode($context->getId(), 'context');
 			}, $this->dbc);
-		} catch (Exception $e) {
+		} catch (Exception) {
 			$this->logger->error('something went wrong while deleting shares for context: ' . $context->getId());
 		}
 	}

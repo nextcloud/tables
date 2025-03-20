@@ -91,7 +91,7 @@ class ContentReferenceHelper extends ReferenceHelper {
 				} else {
 					$e = new Exception('Could not map ' . $referenceText . ' to any known type.');
 					$this->logger->error($e->getMessage(), ['exception' => $e]);
-					throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+					throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 				}
 			} catch (Exception|Throwable $e) {
 				/** @psalm-suppress InvalidReturnStatement */
@@ -113,7 +113,7 @@ class ContentReferenceHelper extends ReferenceHelper {
 				$referenceInfo['title'] = $element->getTitle();
 			}
 
-			$reference->setDescription($element->getOwnerDisplayName() ? $element->getOwnerDisplayName() : $element->getOwnership());
+			$reference->setDescription($element->getOwnerDisplayName() ?: $element->getOwnership());
 
 			$referenceInfo['ownership'] = $element->getOwnership();
 			$referenceInfo['ownerDisplayName'] = $element->getOwnerDisplayName();
@@ -146,7 +146,7 @@ class ContentReferenceHelper extends ReferenceHelper {
 				} elseif ($this->matchReference($referenceText, 'view')) {
 					$referenceInfo['rows'] = $this->rowService->findAllByView($elementId, $this->userId, 100, 0);
 				}
-			} catch (InternalError|PermissionError|DoesNotExistException|MultipleObjectsReturnedException $e) {
+			} catch (InternalError|PermissionError|DoesNotExistException|MultipleObjectsReturnedException) {
 			}
 
 			$reference->setRichObject(

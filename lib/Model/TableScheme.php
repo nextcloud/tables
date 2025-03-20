@@ -13,25 +13,18 @@ use OCA\Tables\Db\View;
 
 class TableScheme implements JsonSerializable {
 
-	protected ?string $title = null;
-	protected ?string $emoji = null;
-
-	/** @var Column[]|null */
-	protected ?array $columns = null;
-
-	/** @var View[]|null */
-	protected ?array $views = null;
-	protected ?string $description = null;
-	protected ?string $tablesVersion = null;
-
-	public function __construct(string $title, string $emoji, array $columns, array $view, string $description, string $tablesVersion) {
-		$this->tablesVersion = $tablesVersion;
-		$this->title = $title;
-		$this->emoji = $emoji;
-		$this->columns = $columns;
-		$this->description = $description;
-		$this->views = $view;
-	}
+	public function __construct(
+        protected ?string $title,
+        protected ?string $emoji,
+        /** @var Column[]|null */
+        protected ?array $columns,
+        /** @var View[]|null */
+        protected ?array $views,
+        protected ?string $description,
+        protected ?string $tablesVersion
+    )
+    {
+    }
 
 	public function getTitle():string {
 		return $this->title | '';

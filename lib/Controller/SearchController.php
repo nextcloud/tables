@@ -17,29 +17,20 @@ use Psr\Log\LoggerInterface;
 
 class SearchController extends Controller {
 
-	private SearchService $service;
-	private string $userId;
-	private LoggerInterface $logger;
-
 	use Errors;
 
 	public function __construct(
 		IRequest $request,
-		LoggerInterface $logger,
-		SearchService $service,
-		string $userId) {
+		private LoggerInterface $logger,
+		private SearchService $service,
+		private string $userId) {
 		parent::__construct(Application::APP_ID, $request);
-		$this->userId = $userId;
-		$this->service = $service;
-		$this->logger = $logger;
 	}
 
 
 	#[NoAdminRequired]
 	public function all(string $term = ''): DataResponse {
-		return $this->handleError(function () use ($term) {
-			return $this->service->all($term);
-		});
+		return $this->handleError(fn() => $this->service->all($term));
 	}
 
 }

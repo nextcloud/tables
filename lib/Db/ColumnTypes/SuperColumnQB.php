@@ -14,12 +14,11 @@ use OCP\DB\QueryBuilder\IQueryFunction;
 use Psr\Log\LoggerInterface;
 
 class SuperColumnQB implements IColumnTypeQB {
-	protected LoggerInterface $logger;
 	protected int $platform;
 
-	public function __construct(LoggerInterface $logger) {
-		$this->logger = $logger;
-	}
+	public function __construct(protected LoggerInterface $logger)
+    {
+    }
 
 	public function setPlatform(int $platform): void {
 		$this->platform = $platform;
@@ -61,26 +60,16 @@ class SuperColumnQB implements IColumnTypeQB {
 	 * @throws InternalError
 	 */
 	private function sqlFilterOperation(string $operator, string $formattedCellValue, string $searchValuePlaceHolder) : string {
-		switch ($operator) {
-			case 'begins-with':
-			case 'ends-with':
-			case 'contains':
-				return $formattedCellValue . ' LIKE :' . $searchValuePlaceHolder;
-			case 'is-equal':
-				return $formattedCellValue . ' = :' . $searchValuePlaceHolder;
-			case 'is-greater-than':
-				return $formattedCellValue . ' > :' . $searchValuePlaceHolder;
-			case 'is-greater-than-or-equal':
-				return $formattedCellValue . ' >= :' . $searchValuePlaceHolder;
-			case 'is-lower-than':
-				return $formattedCellValue . ' < :' . $searchValuePlaceHolder;
-			case 'is-lower-than-or-equal':
-				return $formattedCellValue . ' <= :' . $searchValuePlaceHolder;
-			case 'is-empty':
-				return $formattedCellValue . ' = \'\' OR ' . $formattedCellValue . ' IS NULL';
-			default:
-				throw new InternalError('Operator ' . $operator . ' is not supported.');
-		}
+		return match ($operator) {
+            'begins-with', 'ends-with', 'contains' => $formattedCellValue . ' LIKE :' . $searchValuePlaceHolder,
+            'is-equal' => $formattedCellValue . ' = :' . $searchValuePlaceHolder,
+            'is-greater-than' => $formattedCellValue . ' > :' . $searchValuePlaceHolder,
+            'is-greater-than-or-equal' => $formattedCellValue . ' >= :' . $searchValuePlaceHolder,
+            'is-lower-than' => $formattedCellValue . ' < :' . $searchValuePlaceHolder,
+            'is-lower-than-or-equal' => $formattedCellValue . ' <= :' . $searchValuePlaceHolder,
+            'is-empty' => $formattedCellValue . ' = \'\' OR ' . $formattedCellValue . ' IS NULL',
+            default => throw new InternalError('Operator ' . $operator . ' is not supported.'),
+        };
 	}
 
 	private function getFormattedDataCellValue(string $columnPlaceHolder, int $columnId): string {
@@ -101,20 +90,14 @@ class SuperColumnQB implements IColumnTypeQB {
 	 * @throws InternalError
 	 */
 	public static function getMetaColumnName(int $metaId): string {
-		switch ($metaId) {
-			case Column::TYPE_META_ID:
-				return 'id';
-			case Column::TYPE_META_CREATED_BY:
-				return 'created_by';
-			case Column::TYPE_META_UPDATED_BY:
-				return 'last_edit_by';
-			case Column::TYPE_META_CREATED_AT:
-				return 'created_at';
-			case Column::TYPE_META_UPDATED_AT:
-				return 'last_edit_at';
-			default:
-				throw new InternalError('No meta data column exists with id ' . $metaId);
-		}
+		return match ($metaId) {
+            Column::TYPE_META_ID => 'id',
+            Column::TYPE_META_CREATED_BY => 'created_by',
+            Column::TYPE_META_UPDATED_BY => 'last_edit_by',
+            Column::TYPE_META_CREATED_AT => 'created_at',
+            Column::TYPE_META_UPDATED_AT => 'last_edit_at',
+            default => throw new InternalError('No meta data column exists with id ' . $metaId),
+        };
 	}
 
 	/**
@@ -129,7 +112,7 @@ class SuperColumnQB implements IColumnTypeQB {
 		$this->passSearchValue($qb, $filter['value'], $filter['operator'], $searchValuePlaceHolder);
 		$columnPlaceHolder = 'column' . $filterId; // qb parameter binding name
 		if ($filter['columnId'] < 0) { // negative ids for meta data columns
-			return $qb->createFunction($this->sqlFilterOperation($filter['operator'], $this->getMetaColumnName($filter['columnId']), $searchValuePlaceHolder));
+			return $qb->createFunction($this->sqlFilterOperation($filter['operator'], static::getMetaColumnName($filter['columnId']), $searchValuePlaceHolder));
 		}
 
 		$qb->setParameter($columnPlaceHolder, $filter['columnId'], IQueryBuilder::PARAM_INT);

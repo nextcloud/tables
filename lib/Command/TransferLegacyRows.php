@@ -24,19 +24,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class TransferLegacyRows extends Command {
-	protected TableService $tableService;
-	protected LoggerInterface $logger;
-	protected LegacyRowMapper $legacyRowMapper;
-	protected Row2Mapper $rowMapper;
-	protected ColumnService $columnService;
-
-	public function __construct(TableService $tableService, LoggerInterface $logger, LegacyRowMapper $legacyRowMapper, Row2Mapper $rowMapper, ColumnService $columnService) {
+	public function __construct(protected TableService $tableService, protected LoggerInterface $logger, protected LegacyRowMapper $legacyRowMapper, protected Row2Mapper $rowMapper, protected ColumnService $columnService) {
 		parent::__construct();
-		$this->tableService = $tableService;
-		$this->logger = $logger;
-		$this->legacyRowMapper = $legacyRowMapper;
-		$this->rowMapper = $rowMapper;
-		$this->columnService = $columnService;
 	}
 
 	protected function configure(): void {
@@ -78,7 +67,7 @@ class TransferLegacyRows extends Command {
 			try {
 				$tables = $this->tableService->findAll('', true, true, false);
 				$output->writeln('Found ' . count($tables) . ' table(s)');
-			} catch (InternalError $e) {
+			} catch (InternalError) {
 				$output->writeln('Error while fetching tables. Will aboard.');
 				return 1;
 			}
@@ -89,7 +78,7 @@ class TransferLegacyRows extends Command {
 			foreach ($tableIds as $tableId) {
 				try {
 					$tables[] = $this->tableService->find((int)ltrim($tableId), true, '');
-				} catch (InternalError|NotFoundError|PermissionError $e) {
+				} catch (InternalError|NotFoundError|PermissionError) {
 					$output->writeln('Could not load table id ' . $tableId . '. Will continue.');
 				}
 			}
@@ -156,7 +145,7 @@ class TransferLegacyRows extends Command {
 		foreach ($tables as $table) {
 			try {
 				$columns = $this->columnService->findAllByTable($table->getId(), null, '');
-			} catch (InternalError|PermissionError $e) {
+			} catch (InternalError|PermissionError) {
 				$output->writeln('Could not delete data for table ' . $table->getId());
 				break;
 			}

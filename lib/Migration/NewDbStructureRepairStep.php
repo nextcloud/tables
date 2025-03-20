@@ -23,19 +23,9 @@ use Throwable;
 
 class NewDbStructureRepairStep implements IRepairStep {
 
-	protected LoggerInterface $logger;
-	protected TableService $tableService;
-	protected LegacyRowMapper $legacyRowMapper;
-	protected Row2Mapper $rowMapper;
-	protected ColumnService $columnService;
 	protected IConfig $config;
 
-	public function __construct(LoggerInterface $logger, TableService $tableService, ColumnService $columnService, LegacyRowMapper $legacyRowMapper, Row2Mapper $rowMapper, IConfig $config) {
-		$this->logger = $logger;
-		$this->tableService = $tableService;
-		$this->columnService = $columnService;
-		$this->legacyRowMapper = $legacyRowMapper;
-		$this->rowMapper = $rowMapper;
+	public function __construct(protected LoggerInterface $logger, protected TableService $tableService, protected ColumnService $columnService, protected LegacyRowMapper $legacyRowMapper, protected Row2Mapper $rowMapper, IConfig $config) {
 		$this->config = $config;
 	}
 
@@ -60,7 +50,7 @@ class NewDbStructureRepairStep implements IRepairStep {
 		try {
 			$tables = $this->tableService->findAll('', true, true, false);
 			$output->info('Found ' . count($tables) . ' table(s)');
-		} catch (InternalError $e) {
+		} catch (InternalError) {
 			$output->warning('Error while fetching tables. Will aboard.');
 			return;
 		}

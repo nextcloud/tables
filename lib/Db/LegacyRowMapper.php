@@ -52,9 +52,9 @@ class LegacyRowMapper extends QBMapper {
 	}
 
 	private function setPlatform() {
-		if (str_contains(strtolower(get_class($this->db->getDatabasePlatform())), 'postgres')) {
+		if (str_contains(strtolower($this->db->getDatabasePlatform()::class), 'postgres')) {
 			$this->platform = IColumnTypeQB::DB_PLATFORM_PGSQL;
-		} elseif (str_contains(strtolower(get_class($this->db->getDatabasePlatform())), 'sqlite')) {
+		} elseif (str_contains(strtolower($this->db->getDatabasePlatform()::class), 'sqlite')) {
 			$this->platform = IColumnTypeQB::DB_PLATFORM_SQLITE;
 		} else {
 			$this->platform = IColumnTypeQB::DB_PLATFORM_MYSQL;
@@ -92,7 +92,7 @@ class LegacyRowMapper extends QBMapper {
 			/** @var IColumnTypeQB $columnQb */
 			$columnQb = Server::get($columnQbClassName);
 			return $columnQb->addWhereFilterExpression($qb, $filter, $filterId);
-		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+		} catch (NotFoundExceptionInterface|ContainerExceptionInterface) {
 			$this->logger->debug('Column type query builder class not found');
 		}
 		return null;
@@ -139,7 +139,7 @@ class LegacyRowMapper extends QBMapper {
 			if ($sortRule['columnId'] < 0) {
 				try {
 					$orderString = SuperColumnQB::getMetaColumnName($sortRule['columnId']);
-				} catch (InternalError $e) {
+				} catch (InternalError) {
 					return;
 				}
 			} else {
@@ -300,9 +300,7 @@ class LegacyRowMapper extends QBMapper {
 		}
 		$rows = $this->findEntities($qb);
 		foreach ($rows as &$row) {
-			$row->setDataArray(array_filter($row->getDataArray(), function ($item) use ($view) {
-				return in_array($item['columnId'], $view->getColumnsArray());
-			}));
+			$row->setDataArray(array_filter($row->getDataArray(), fn($item) => in_array($item['columnId'], $view->getColumnsArray())));
 		}
 		return $rows;
 	}
@@ -410,9 +408,7 @@ class LegacyRowMapper extends QBMapper {
 			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
 		$row = $this->findEntity($qb);
 
-		$row->setDataArray(array_filter($row->getDataArray(), function ($item) use ($view) {
-			return in_array($item['columnId'], $view->getColumnsArray());
-		}));
+		$row->setDataArray(array_filter($row->getDataArray(), fn($item) => in_array($item['columnId'], $view->getColumnsArray())));
 
 		return $row;
 	}

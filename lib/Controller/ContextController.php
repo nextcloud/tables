@@ -30,17 +30,14 @@ use Psr\Log\LoggerInterface;
  */
 
 class ContextController extends AOCSController {
-	private ContextService $contextService;
-
 	public function __construct(
 		IRequest $request,
 		LoggerInterface $logger,
 		IL10N $n,
 		string $userId,
-		ContextService $contextService,
+		private ContextService $contextService,
 	) {
 		parent::__construct($request, $logger, $n, $userId);
-		$this->contextService = $contextService;
 		$this->userId = $userId;
 	}
 

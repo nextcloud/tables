@@ -21,19 +21,15 @@ use Psr\Log\LoggerInterface;
 
 abstract class AOCSController extends OCSController {
 
-	protected LoggerInterface $logger;
-	protected string $userId;
 	protected IL10N $n;
 
 	public function __construct(
 		IRequest $request,
-		LoggerInterface $logger,
+		protected LoggerInterface $logger,
 		IL10N $n,
-		string $userId,
+		protected string $userId,
 	) {
 		parent::__construct(Application::APP_ID, $request);
-		$this->logger = $logger;
-		$this->userId = $userId;
 		$this->n = $n;
 	}
 
