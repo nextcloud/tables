@@ -40,6 +40,7 @@ class LegacyRow extends Entity implements JsonSerializable {
 		$this->addType('tableId', 'integer');
 	}
 
+	#[\Override]
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->id,

@@ -12,6 +12,7 @@ class RowCellText extends RowCellSuper {
 	protected ?string $value = null;
 	protected ?int $valueType = null;
 
+	#[\Override]
 	public function jsonSerialize(): array {
 		return parent::jsonSerializePreparation($this->value, $this->valueType);
 	}

@@ -29,6 +29,7 @@ class PageContent extends Entity implements \JsonSerializable {
 		$this->addType('order', 'integer');
 	}
 
+	#[\Override]
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->getId(),

@@ -29,45 +29,9 @@ use Psr\Log\LoggerInterface;
 use Throwable;
 
 class PermissionsService {
-	private TableMapper $tableMapper;
-
-	private ViewMapper $viewMapper;
-
-	private ShareMapper $shareMapper;
-
-	private UserHelper $userHelper;
-
-	private CircleHelper $circleHelper;
-
-	protected LoggerInterface $logger;
-
-	protected ?string $userId = null;
-
-	protected bool $isCli = false;
-
-	private ContextMapper $contextMapper;
-
-	public function __construct(
-		LoggerInterface $logger,
-		?string $userId,
-		TableMapper $tableMapper,
-		ViewMapper $viewMapper,
-		ShareMapper $shareMapper,
-		ContextMapper $contextMapper,
-		UserHelper $userHelper,
-		CircleHelper $circleHelper,
-		bool $isCLI,
-	) {
-		$this->tableMapper = $tableMapper;
-		$this->viewMapper = $viewMapper;
-		$this->shareMapper = $shareMapper;
-		$this->userHelper = $userHelper;
-		$this->logger = $logger;
-		$this->userId = $userId;
-		$this->isCli = $isCLI;
-		$this->contextMapper = $contextMapper;
-		$this->circleHelper = $circleHelper;
-	}
+	public function __construct(protected LoggerInterface $logger, protected ?string $userId, private TableMapper $tableMapper, private ViewMapper $viewMapper, private ShareMapper $shareMapper, private ContextMapper $contextMapper, private UserHelper $userHelper, private CircleHelper $circleHelper, protected bool $isCli)
+    {
+    }
 
 
 	/**
@@ -84,7 +48,7 @@ class PermissionsService {
 
 		if ($userId === null) {
 			$e = new \Exception();
-			$error = 'PreCheck for userId failed, requested in ' . get_class($this) . '.';
+			$error = 'PreCheck for userId failed, requested in ' . static::class . '.';
 			$this->logger->debug($error, ['exception' => new \Exception()]);
 			throw new InternalError($error);
 		}
@@ -112,7 +76,7 @@ class PermissionsService {
 	public function canUpdateTable(Table $table, ?string $userId = null): bool {
 		try {
 			$userId = $this->preCheckUserId($userId);
-		} catch (InternalError $e) {
+		} catch (InternalError) {
 			return false;
 		}
 
@@ -148,10 +112,10 @@ class PermissionsService {
 	public function canManageContextById(int $contextId, ?string $userId = null): bool {
 		try {
 			$context = $this->contextMapper->findById($contextId, $userId);
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			$this->logger->warning('Context does not exist');
 			return false;
-		} catch (MultipleObjectsReturnedException $e) {
+		} catch (MultipleObjectsReturnedException) {
 			$this->logger->warning('Multiple contexts found for this ID');
 			return false;
 		} catch (Exception $e) {
@@ -174,7 +138,7 @@ class PermissionsService {
 		try {
 			$this->contextMapper->findById($contextId, $userId ?? $this->userId);
 			return true;
-		} catch (NotFoundError $e) {
+		} catch (NotFoundError) {
 			return false;
 		}
 	}
@@ -223,10 +187,10 @@ class PermissionsService {
 	public function canManageTableById(int $tableId, ?string $userId = null): bool {
 		try {
 			$table = $this->tableMapper->find($tableId);
-		} catch (MultipleObjectsReturnedException $e) {
+		} catch (MultipleObjectsReturnedException) {
 			$this->logger->warning('Multiple tables were found for this id');
 			return false;
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			$this->logger->warning('No table was found for this id');
 			return false;
 		} catch (Exception $e) {
@@ -239,10 +203,10 @@ class PermissionsService {
 	public function canManageViewById(int $viewId, ?string $userId = null): bool {
 		try {
 			$view = $this->viewMapper->find($viewId);
-		} catch (MultipleObjectsReturnedException $e) {
+		} catch (MultipleObjectsReturnedException) {
 			$this->logger->warning('Multiple tables were found for this id');
 			return false;
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			$this->logger->warning('No table was found for this id');
 			return false;
 		} catch (InternalError|Exception $e) {
@@ -392,7 +356,7 @@ class PermissionsService {
 			if ($this->canManageElementById($share->getNodeId(), $share->getNodeType())) {
 				return true;
 			}
-		} catch (InternalError $e) {
+		} catch (InternalError) {
 			$this->logger->warning('Cannot check manage permissions, permission denied');
 			return false;
 		}
@@ -414,7 +378,7 @@ class PermissionsService {
 						return true;
 					}
 				}
-			} catch (InternalError $e) {
+			} catch (InternalError) {
 				$this->logger->warning('Cannot get user groups, permission denied');
 				return false;
 			}
@@ -479,21 +443,11 @@ class PermissionsService {
 		}
 
 		if (count($shares) > 0) {
-			$read = array_reduce($shares, function ($carry, $share) {
-				return $carry || ($share->getPermissionRead());
-			}, false);
-			$create = array_reduce($shares, function ($carry, $share) {
-				return $carry || ($share->getPermissionCreate());
-			}, false);
-			$update = array_reduce($shares, function ($carry, $share) {
-				return $carry || ($share->getPermissionUpdate());
-			}, false);
-			$delete = array_reduce($shares, function ($carry, $share) {
-				return $carry || ($share->getPermissionDelete());
-			}, false);
-			$manage = array_reduce($shares, function ($carry, $share) {
-				return $carry || ($share->getPermissionManage());
-			}, false);
+			$read = array_reduce($shares, fn($carry, $share) => $carry || ($share->getPermissionRead()), false);
+			$create = array_reduce($shares, fn($carry, $share) => $carry || ($share->getPermissionCreate()), false);
+			$update = array_reduce($shares, fn($carry, $share) => $carry || ($share->getPermissionUpdate()), false);
+			$delete = array_reduce($shares, fn($carry, $share) => $carry || ($share->getPermissionDelete()), false);
+			$manage = array_reduce($shares, fn($carry, $share) => $carry || ($share->getPermissionManage()), false);
 
 			return new Permissions(
 				read: $read || $update || $delete || $manage,
@@ -644,7 +598,7 @@ class PermissionsService {
 			if ($permissions->manage) {
 				return true;
 			}
-		} catch (NotFoundError $e) {
+		} catch (NotFoundError) {
 			return false;
 		}
 		return false;

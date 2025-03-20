@@ -26,6 +26,7 @@ class DbRowSleeveSequence implements IRepairStep {
 	/**
 	 * @inheritDoc
 	 */
+	#[\Override]
 	public function getName() {
 		return 'Fixing the sequence of the row-sleeves table';
 	}
@@ -33,6 +34,7 @@ class DbRowSleeveSequence implements IRepairStep {
 	/**
 	 * @inheritDoc
 	 */
+	#[\Override]
 	public function run(IOutput $output) {
 		$legacyRowTransferRunComplete = $this->config->getAppValue('tables', 'legacyRowTransferRunComplete', 'false') === 'true';
 		$sequenceRepairComplete = $this->config->getAppValue('tables', 'sequenceRepairComplete', 'false') === 'true';
@@ -56,9 +58,7 @@ class DbRowSleeveSequence implements IRepairStep {
 		$schema = $this->db->createSchema();
 		$sequences = $schema->getSequences();
 
-		$candidates = array_filter($sequences, function (string $sequenceName): bool {
-			return str_contains($sequenceName, 'tables_row_sleeves');
-		}, ARRAY_FILTER_USE_KEY);
+		$candidates = array_filter($sequences, fn(string $sequenceName): bool => str_contains($sequenceName, 'tables_row_sleeves'), ARRAY_FILTER_USE_KEY);
 
 		if (count($candidates) > 1) {
 			$this->logger->error('Unexpected number of sequences, aborting.', [

@@ -131,7 +131,7 @@ class ContextService {
 		$context->setOwnerType($ownerType);
 
 
-		$this->atomic(function () use ($context, $nodes) {
+		$this->atomic(function () use ($context, $nodes): void {
 			$this->contextMapper->insert($context);
 
 			if (!empty($nodes)) {
@@ -271,7 +271,7 @@ class ContextService {
 	public function deleteNodeRel(int $nodeId, int $nodeType): void {
 		try {
 			$nodeRelIds = $this->contextNodeRelMapper->getRelIdsForNode($nodeId, $nodeType);
-			$this->atomic(function () use ($nodeRelIds) {
+			$this->atomic(function () use ($nodeRelIds): void {
 				$this->pageContentMapper->deleteByNodeRelIds($nodeRelIds);
 				$this->contextNodeRelMapper->deleteByNodeRelIds($nodeRelIds);
 			}, $this->dbc);

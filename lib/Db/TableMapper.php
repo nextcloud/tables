@@ -18,11 +18,9 @@ use OCP\IDBConnection;
 /** @template-extends QBMapper<Table> */
 class TableMapper extends QBMapper {
 	protected string $table = 'tables_tables';
-	private UserHelper $userHelper;
 
-	public function __construct(IDBConnection $db, UserHelper $userHelper) {
+	public function __construct(IDBConnection $db, private UserHelper $userHelper) {
 		parent::__construct($db, $this->table, Table::class);
-		$this->userHelper = $userHelper;
 	}
 
 	/**

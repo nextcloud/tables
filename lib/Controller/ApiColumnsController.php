@@ -25,16 +25,13 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type TablesColumn from ResponseDefinitions
  */
 class ApiColumnsController extends AOCSController {
-	private ColumnService $service;
-
 	public function __construct(
 		IRequest $request,
 		LoggerInterface $logger,
-		ColumnService $service,
+		private ColumnService $service,
 		IL10N $n,
 		string $userId) {
 		parent::__construct($request, $logger, $n, $userId);
-		$this->service = $service;
 	}
 
 	/**
