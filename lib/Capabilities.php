@@ -36,7 +36,7 @@ class Capabilities implements ICapability {
 
 	/**
 	 *
-	 * @return array{tables: array{enabled: bool, version: string, apiVersions: string[], features: string[], isCirclesEnabled: bool, column_types: string[]}}
+	 * @return array{tables: array{enabled: bool, version: string, apiVersions: list<string>, features: list<string>, isCirclesEnabled: bool, column_types: list<string>}}
 	 *
 	 * @inheritDoc
 	 */
