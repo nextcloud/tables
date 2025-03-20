@@ -9,19 +9,30 @@
 		</NcAppSettingsSection>
 		<!--title & emoji-->
 		<NcAppSettingsSection v-if="columns != null" id="title" :name="t('tables', 'Title')" data-cy="viewSettingsDialogSection">
-			<div class="col-4" style="display: inline-flex;">
-				<NcEmojiPicker :close-on-select="true" @select="setIcon">
-					<NcButton type="tertiary"
-						:aria-label="t('tables', 'Select emoji for view')"
-						:title="t('tables', 'Select emoji')"
-						@click.prevent>
-						{{ icon }}
-					</NcButton>
-				</NcEmojiPicker>
-				<input v-model="title"
-					:class="{missing: errorTitle}"
-					type="text"
-					:placeholder="createView ? t('tables', 'Title of the new view') : t('tables', 'New title of the view')">
+			<div class="row">
+				<div class="col-4" style="display: inline-flex;">
+					<NcEmojiPicker :close-on-select="true" @select="setIcon">
+						<NcButton type="tertiary"
+							:aria-label="t('tables', 'Select emoji for view')"
+							:title="t('tables', 'Select emoji')"
+							@click.prevent>
+							{{ icon }}
+						</NcButton>
+					</NcEmojiPicker>
+					<input v-model="title"
+						:class="{missing: errorTitle}"
+						type="text"
+						:placeholder="createView ? t('tables', 'Title of the new view') : t('tables', 'New title of the view')">
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-4 space-T mandatory">
+					{{ t('tables', 'Description') }}
+				</div>
+				<div class="col-4">
+					<TableDescription :description.sync="description" />
+				</div>
 			</div>
 		</NcAppSettingsSection>
 		<!--columns & order-->
@@ -72,6 +83,7 @@ import '@nextcloud/dialogs/style.css'
 import FilterForm from '../main/partials/editViewPartials/filter/FilterForm.vue'
 import SortForm from '../main/partials/editViewPartials/sort/SortForm.vue'
 import SelectedViewColumns from '../main/partials/editViewPartials/SelectedViewColumns.vue'
+import TableDescription from '../main/sections/TableDescription.vue'
 import { MetaColumns } from '../../shared/components/ncTable/mixins/metaColumns.js'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import { mapActions } from 'pinia'
@@ -88,6 +100,7 @@ export default {
 		FilterForm,
 		SelectedViewColumns,
 		SortForm,
+		TableDescription,
 	},
 	mixins: [permissionsMixin],
 	props: {
@@ -114,6 +127,7 @@ export default {
 		return {
 			open: false,
 			title: '',
+			description: '',
 			icon: '',
 			errorTitle: false,
 			selectedColumns: [],
@@ -267,6 +281,7 @@ export default {
 			const data = {
 				tableId: this.mutableView.tableId,
 				title: this.title,
+				description: this.description,
 				emoji: this.icon,
 			}
 			const res = await this.insertNewView({ data })
@@ -281,6 +296,7 @@ export default {
 			const data = {
 				data: {
 					title: this.title,
+					description: this.description,
 					emoji: this.icon,
 					columns: JSON.stringify(newSelectedColumnIds),
 				},
@@ -308,6 +324,7 @@ export default {
 			this.mutableView = JSON.parse(JSON.stringify(this.generateViewConfigData))
 			this.generatedView = JSON.parse(JSON.stringify(this.generateViewConfigData))
 			this.title = this.mutableView.title ?? ''
+			this.description = this.mutableView.description ?? ''
 			this.icon = this.mutableView.emoji ?? this.loadEmoji()
 			this.errorTitle = false
 			this.selectedColumns = this.mutableView.columns ? [...this.mutableView.columns] : null
@@ -334,6 +351,11 @@ export default {
 	width: auto;
 	flex: 1;
 	padding: calc(var(--default-grid-baseline) * 2);
+}
+
+:deep(.element-description) {
+	padding-inline: 0 !important;
+	max-width: 100%;
 }
 
 .sticky {
