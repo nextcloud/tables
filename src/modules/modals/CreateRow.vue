@@ -5,7 +5,7 @@
 <template>
 	<NcDialog v-if="showModal"
 		:name="t('tables', 'Create row')"
-		size="normal"
+		size="large"
 		data-cy="createRowModal"
 		@closing="actionCancel">
 		<div class="modal__content" @keydown="onKeydown">
@@ -179,12 +179,6 @@ export default {
 
 	:where(.end) {
 		justify-content: end;
-	}
-
-	:where(.fix-col-1.end) {
-		display: inline-block;
-		position: relative;
-		left: 65%;
 	}
 
 	:where(.slot.fix-col-2) {
