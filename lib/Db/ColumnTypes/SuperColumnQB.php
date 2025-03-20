@@ -20,10 +20,12 @@ class SuperColumnQB implements IColumnTypeQB {
     {
     }
 
+	#[\Override]
 	public function setPlatform(int $platform): void {
 		$this->platform = $platform;
 	}
 
+	#[\Override]
 	public function formatCellValue(string $unformattedValue): string {
 		if ($this->platform === self::DB_PLATFORM_PGSQL) {
 			return 'LOWER(' . $unformattedValue . ')';
@@ -34,6 +36,7 @@ class SuperColumnQB implements IColumnTypeQB {
 		}
 	}
 
+	#[\Override]
 	public function passSearchValue(IQueryBuilder $qb, string $unformattedSearchValue, string $operator, string $searchValuePlaceHolder): void {
 		$lowerCaseSearchValue = strtolower($unformattedSearchValue);
 		switch ($operator) {
@@ -107,6 +110,7 @@ class SuperColumnQB implements IColumnTypeQB {
 	 * @return IQueryFunction
 	 * @throws InternalError
 	 */
+	#[\Override]
 	public function addWhereFilterExpression(IQueryBuilder $qb, array $filter, string $filterId): IQueryFunction {
 		$searchValuePlaceHolder = 'searchValue' . $filterId; // qb parameter binding name
 		$this->passSearchValue($qb, $filter['value'], $filter['operator'], $searchValuePlaceHolder);
@@ -130,6 +134,7 @@ class SuperColumnQB implements IColumnTypeQB {
 		return $qb->createFunction($sqlFilterString);
 	}
 
+	#[\Override]
 	public function addWhereForFindAllWithColumn(IQueryBuilder $qb, int $columnId): void {
 		if ($this->platform === self::DB_PLATFORM_PGSQL) {
 			// due to errors using doctrine with json, I paste the columnId inline.

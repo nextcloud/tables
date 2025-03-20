@@ -40,6 +40,7 @@ final class Row implements JsonSerializable {
 	 *
 	 * @since 0.8
 	 */
+	#[\Override]
 	public function jsonSerialize(): array {
 		return [
 			'tableId' => $this->tableId,

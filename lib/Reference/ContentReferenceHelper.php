@@ -42,6 +42,7 @@ class ContentReferenceHelper extends ReferenceHelper {
 		parent::__construct($urlGenerator, $viewService, $tableService, $columnService, $rowService, $linkReferenceProvider, $userId, $config, $logger);
 	}
 
+	#[\Override]
 	public function matchReference(string $referenceText, ?string $type = null): bool {
 		if ($this->userId === null) {
 			return false;
@@ -71,6 +72,7 @@ class ContentReferenceHelper extends ReferenceHelper {
 	/** @psalm-suppress InvalidReturnType
 	 * @noinspection DuplicatedCode
 	 */
+	#[\Override]
 	public function resolveReference(string $referenceText): ?IReference {
 		if ($this->matchReference($referenceText)) {
 			if ($this->matchReference($referenceText, 'table')) {

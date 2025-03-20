@@ -10,6 +10,7 @@ namespace OCA\Tables\Db\ColumnTypes;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 
 class SelectionColumnQB extends SuperColumnQB implements IColumnTypeQB {
+	#[\Override]
 	public function passSearchValue(IQueryBuilder $qb, string $unformattedSearchValue, string $operator, string $searchValuePlaceHolder): void {
 		if (str_starts_with($unformattedSearchValue, '@')) {
 			$parts = explode('-', $unformattedSearchValue);

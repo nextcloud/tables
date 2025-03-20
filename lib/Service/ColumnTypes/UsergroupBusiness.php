@@ -23,6 +23,7 @@ class UsergroupBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	 * @param Column|null $column
 	 * @return string
 	 */
+	#[\Override]
 	public function parseValue($value, ?Column $column = null): string {
 		if (!$column) {
 			$this->logger->warning('No column given, but expected on ' . __FUNCTION__ . ' within ' . self::class, ['exception' => new \Exception()]);
@@ -41,6 +42,7 @@ class UsergroupBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	 * @param Column|null $column
 	 * @return bool
 	 */
+	#[\Override]
 	public function canBeParsed($value, ?Column $column = null): bool {
 		if (!$column) {
 			$this->logger->warning('No column given, but expected on ' . __FUNCTION__ . ' within ' . self::class, ['exception' => new \Exception()]);

@@ -40,6 +40,7 @@ class PermissionMiddleware extends Middleware {
 	 * @throws PermissionError
 	 * @throws InternalError
 	 */
+	#[\Override]
 	public function beforeController(Controller $controller, string $methodName) {
 		$this->assertPermission($controller, $methodName);
 		$this->assertCanManageNode();
@@ -225,6 +226,7 @@ class PermissionMiddleware extends Middleware {
 		}
 	}
 
+	#[\Override]
 	public function afterException($controller, $methodName, \Exception $exception) {
 		if ($exception instanceof PermissionError) {
 			return new Http\DataResponse(['message' => $exception->getMessage()], Http::STATUS_FORBIDDEN);

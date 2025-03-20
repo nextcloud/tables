@@ -26,6 +26,7 @@ class DbRowSleeveSequence implements IRepairStep {
 	/**
 	 * @inheritDoc
 	 */
+	#[\Override]
 	public function getName() {
 		return 'Fixing the sequence of the row-sleeves table';
 	}
@@ -33,6 +34,7 @@ class DbRowSleeveSequence implements IRepairStep {
 	/**
 	 * @inheritDoc
 	 */
+	#[\Override]
 	public function run(IOutput $output) {
 		$legacyRowTransferRunComplete = $this->config->getAppValue('tables', 'legacyRowTransferRunComplete', 'false') === 'true';
 		$sequenceRepairComplete = $this->config->getAppValue('tables', 'sequenceRepairComplete', 'false') === 'true';

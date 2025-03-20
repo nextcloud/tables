@@ -34,6 +34,7 @@ class Capabilities implements ICapability {
 	 *
 	 * @inheritDoc
 	 */
+	#[\Override]
 	public function getCapabilities(): array {
 		$textColumnVariant = 'text-rich';
 		if (version_compare($this->config->getSystemValueString('version', '0.0.0'), '26.0.0', '<')) {

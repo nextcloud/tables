@@ -21,6 +21,7 @@ class ContentReferenceProvider implements IReferenceProvider {
 	/**
 	 * @inheritDoc
 	 */
+	#[\Override]
 	public function matchReference(string $referenceText): bool {
 		return $this->referenceHelper->matchReference($referenceText);
 	}
@@ -28,6 +29,7 @@ class ContentReferenceProvider implements IReferenceProvider {
 	/**
 	 * @inheritDoc
 	 */
+	#[\Override]
 	public function resolveReference(string $referenceText): ?IReference {
 		return $this->referenceHelper->resolveReference($referenceText);
 	}
@@ -35,6 +37,7 @@ class ContentReferenceProvider implements IReferenceProvider {
 	/**
 	 * @inheritDoc
 	 */
+	#[\Override]
 	public function getCachePrefix(string $referenceId): string {
 		return $this->referenceHelper->getCachePrefix($referenceId);
 	}
@@ -42,6 +45,7 @@ class ContentReferenceProvider implements IReferenceProvider {
 	/**
 	 * @inheritDoc
 	 */
+	#[\Override]
 	public function getCacheKey(string $referenceId): ?string {
 		return $this->referenceHelper->getCacheKey($referenceId);
 	}

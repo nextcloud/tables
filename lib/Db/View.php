@@ -144,6 +144,7 @@ class View extends Entity implements JsonSerializable {
 	/**
 	 * @psalm-return TablesView
 	 */
+	#[\Override]
 	public function jsonSerialize(): array {
 		$serialisedJson = [
 			'id' => $this->id,

@@ -235,6 +235,7 @@ class Column extends Entity implements JsonSerializable {
 	/**
 	 * @psalm-return TablesColumn
 	 */
+	#[\Override]
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->id,

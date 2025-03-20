@@ -38,6 +38,7 @@ class AnalyticsDatasource implements IDatasource {
 	/**
 	 * @return string Display Name of the datasource
 	 */
+	#[\Override]
 	public function getName(): string {
 		return $this->l10n->t('Nextcloud Tables');
 	}
@@ -45,6 +46,7 @@ class AnalyticsDatasource implements IDatasource {
 	/**
 	 * @return int 2 digit unique datasource id
 	 */
+	#[\Override]
 	public function getId(): int {
 		return 55;
 	}
@@ -75,6 +77,7 @@ class AnalyticsDatasource implements IDatasource {
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
+	#[\Override]
 	public function getTemplate(): array {
 		$tableString = '';
 		$template = [];
@@ -132,6 +135,7 @@ class AnalyticsDatasource implements IDatasource {
 	 * @throws DoesNotExistException
 	 * @throws MultipleObjectsReturnedException
 	 */
+	#[\Override]
 	public function readData($option): array {
 		// get the ids which come in the format tableId:viewId
 		$ids = explode(':', $option['tableId']);

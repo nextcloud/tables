@@ -25,6 +25,7 @@ class Page extends Entity implements \JsonSerializable {
 		$this->addType('id', 'integer');
 	}
 
+	#[\Override]
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->getId(),

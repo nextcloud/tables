@@ -16,6 +16,7 @@ final class DefaultAuditLogService implements AuditLogServiceInterface {
 	) {
 	}
 
+	#[\Override]
 	public function log(string $message, array $context): void {
 		$auditEvent = new CriticalActionPerformedEvent($message, $context);
 

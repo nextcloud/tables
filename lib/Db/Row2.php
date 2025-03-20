@@ -134,6 +134,7 @@ class Row2 implements JsonSerializable {
 	/**
 	 * @psalm-return TablesRow
 	 */
+	#[\Override]
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->id,

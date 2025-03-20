@@ -26,6 +26,7 @@ class Version000400Date20230406000000 extends SimpleMigrationStep {
 	 * @throws SchemaException
 	 * @throws Exception
 	 */
+	#[\Override]
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();

@@ -30,6 +30,7 @@ class TableScheme implements JsonSerializable {
 		return $this->title | '';
 	}
 
+	#[\Override]
 	public function jsonSerialize(): array {
 		return [
 			'title' => $this->title ?: '',

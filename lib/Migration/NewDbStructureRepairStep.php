@@ -32,6 +32,7 @@ class NewDbStructureRepairStep implements IRepairStep {
 	/**
 	 * Returns the step's name
 	 */
+	#[\Override]
 	public function getName(): string {
 		return 'Copy the data into the new db structure';
 	}
@@ -39,6 +40,7 @@ class NewDbStructureRepairStep implements IRepairStep {
 	/**
 	 * @param IOutput $output
 	 */
+	#[\Override]
 	public function run(IOutput $output) {
 		$legacyRowTransferRunComplete = $this->config->getAppValue('tables', 'legacyRowTransferRunComplete', 'false');
 

@@ -39,6 +39,7 @@ class SearchTablesProvider implements IProvider {
 	/**
 	 * @inheritDoc
 	 */
+	#[\Override]
 	public function getId(): string {
 		return 'tables-search-tables';
 	}
@@ -46,6 +47,7 @@ class SearchTablesProvider implements IProvider {
 	/**
 	 * @inheritDoc
 	 */
+	#[\Override]
 	public function getName(): string {
 		return $this->l10n->t('Nextcloud tables');
 	}
@@ -53,6 +55,7 @@ class SearchTablesProvider implements IProvider {
 	/**
 	 * @inheritDoc
 	 */
+	#[\Override]
 	public function getOrder(string $route, array $routeParameters): int {
 		if (str_starts_with($route, Application::APP_ID . '.')) {
 			// Active app, prefer Tables results
@@ -65,6 +68,7 @@ class SearchTablesProvider implements IProvider {
 	/**
 	 * @inheritDoc
 	 */
+	#[\Override]
 	public function search(IUser $user, ISearchQuery $query): SearchResult {
 		if (!$this->appManager->isEnabledForUser(Application::APP_ID, $user)) {
 			return SearchResult::complete($this->getName(), []);
