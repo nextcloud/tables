@@ -81,6 +81,7 @@ OC.L10N.register(
     "Download" : "Descargar",
     "Search" : "Buscar",
     "Back" : "Volver",
+    "Sorting" : "Orden",
     "Undo" : "Deshacer",
     "Bold" : "Negrita",
     "Italic" : "Itálico",

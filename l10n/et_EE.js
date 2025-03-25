@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "No" : "Ei",
+    "Yes" : "Ja",
     "The file was uploaded" : "Fail laaditi üles",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Üleslaaditud fail on suurem kui php.ini failis määratud upload_max_filesize direktiiv",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Üleslaaditud fail on suurem kui HTML vormil määratud MAX_FILE_SIZE direktiiv",
@@ -69,6 +71,7 @@ OC.L10N.register(
     "Error" : "Viga",
     "Download" : "Laadi alla",
     "Search" : "Otsi",
+    "Back" : "Tagasi",
     "Undo" : "Tühista",
     "Redo" : "Tee uuesti",
     "Prefix" : "Eesliide",
