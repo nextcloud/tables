@@ -19,14 +19,17 @@ class RowCellSelectionMapper extends RowCellMapperSuper {
 		parent::__construct($db, $this->table, RowCellSelection::class);
 	}
 
+	#[\Override]
 	public function filterValueToQueryParam(Column $column, mixed $value): mixed {
 		return $this->valueToJsonDbValue($column, $value);
 	}
 
+	#[\Override]
 	public function applyDataToEntity(Column $column, RowCellSuper $cell, $data): void {
 		$cell->setValue($this->valueToJsonDbValue($column, $data));
 	}
 
+	#[\Override]
 	public function formatEntity(Column $column, RowCellSuper $cell) {
 		return json_decode($cell->getValue());
 	}

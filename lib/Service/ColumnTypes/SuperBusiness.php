@@ -13,11 +13,9 @@ use Psr\Log\LoggerInterface;
 
 class SuperBusiness {
 
-	protected LoggerInterface $logger;
-
-	public function __construct(LoggerInterface $logger) {
-		$this->logger = $logger;
-	}
+	public function __construct(protected LoggerInterface $logger)
+    {
+    }
 
 	/**
 	 * @param mixed $value

@@ -18,6 +18,7 @@ class SelectionCheckBusiness extends SuperBusiness implements IColumnTypeBusines
 	 * @param Column|null $column
 	 * @return string
 	 */
+	#[\Override]
 	public function parseValue($value, ?Column $column = null): string {
 		$found = in_array($value, self::PATTERN_POSITIVE, true);
 		return json_encode($found ? 'true' : 'false');
@@ -28,6 +29,7 @@ class SelectionCheckBusiness extends SuperBusiness implements IColumnTypeBusines
 	 * @param Column|null $column
 	 * @return bool
 	 */
+	#[\Override]
 	public function canBeParsed($value, ?Column $column = null): bool {
 		if ($value === null) {
 			return true;

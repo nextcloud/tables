@@ -75,6 +75,7 @@ class Share extends Entity implements JsonSerializable {
 	/**
 	 * @psalm-return TablesShare
 	 */
+	#[\Override]
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->id,

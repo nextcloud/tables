@@ -85,6 +85,7 @@ class Table extends Entity implements JsonSerializable {
 	/**
 	 * @psalm-return TablesTable
 	 */
+	#[\Override]
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->id,

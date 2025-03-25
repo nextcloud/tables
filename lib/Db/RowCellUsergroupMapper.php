@@ -21,10 +21,12 @@ class RowCellUsergroupMapper extends RowCellMapperSuper {
 		parent::__construct($db, $this->table, RowCellUsergroup::class);
 	}
 
+	#[\Override]
 	public function filterValueToQueryParam(Column $column, mixed $value): mixed {
 		return $value;
 	}
 
+	#[\Override]
 	public function applyDataToEntity(Column $column, RowCellSuper $cell, $data): void {
 		if (!RowCellUsergroup::verifyUserGroupArray($data)) {
 			throw new \InvalidArgumentException('Provided value is not valid user group data');
@@ -33,6 +35,7 @@ class RowCellUsergroupMapper extends RowCellMapperSuper {
 		$cell->setValueWrapper($data);
 	}
 
+	#[\Override]
 	public function formatEntity(Column $column, RowCellSuper $cell) {
 		$displayName = $cell->getValueType() === 0 ? ($this->userManager->getDisplayName($cell->getValue()) ?? $cell->getValue()) : $cell->getValue();
 		return [
@@ -42,6 +45,7 @@ class RowCellUsergroupMapper extends RowCellMapperSuper {
 		];
 	}
 
+	#[\Override]
 	public function hasMultipleValues(): bool {
 		return true;
 	}

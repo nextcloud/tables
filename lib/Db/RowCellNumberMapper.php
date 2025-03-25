@@ -18,6 +18,7 @@ class RowCellNumberMapper extends RowCellMapperSuper {
 		parent::__construct($db, $this->table, RowCellNumber::class);
 	}
 
+	#[\Override]
 	public function formatEntity(Column $column, RowCellSuper $cell) {
 		$value = $cell->getValue();
 		if ($value === '') {
@@ -31,6 +32,7 @@ class RowCellNumberMapper extends RowCellMapperSuper {
 		}
 	}
 
+	#[\Override]
 	public function applyDataToEntity(Column $column, RowCellSuper $cell, $data): void {
 		if (!is_numeric($data)) {
 			$cell->setValueWrapper(null);
@@ -38,6 +40,7 @@ class RowCellNumberMapper extends RowCellMapperSuper {
 		$cell->setValueWrapper((float)$data);
 	}
 
+	#[\Override]
 	public function getDbParamType() {
 		// seems to be a string for float/double values
 		return IQueryBuilder::PARAM_STR;

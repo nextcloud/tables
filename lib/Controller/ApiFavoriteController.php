@@ -27,16 +27,13 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type TablesTable from ResponseDefinitions
  */
 class ApiFavoriteController extends AOCSController {
-	private FavoritesService $service;
-
 	public function __construct(
 		IRequest $request,
 		LoggerInterface $logger,
-		FavoritesService $service,
+		private FavoritesService $service,
 		IL10N $n,
 		string $userId) {
 		parent::__construct($request, $logger, $n, $userId);
-		$this->service = $service;
 	}
 
 	/**

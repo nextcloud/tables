@@ -17,48 +17,33 @@ use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
 class ShareController extends Controller {
-	private ShareService $service;
-
-	private string $userId;
-
-	protected LoggerInterface $logger;
-
 	use Errors;
 
 
 	public function __construct(
 		IRequest $request,
-		LoggerInterface $logger,
-		ShareService $service,
-		string $userId) {
+		protected LoggerInterface $logger,
+		private ShareService $service,
+		private string $userId) {
 		parent::__construct(Application::APP_ID, $request);
-		$this->logger = $logger;
-		$this->service = $service;
-		$this->userId = $userId;
 	}
 
 
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function index(int $tableId): DataResponse {
-		return $this->handleError(function () use ($tableId) {
-			return $this->service->findAll('table', $tableId);
-		});
+		return $this->handleError(fn() => $this->service->findAll('table', $tableId));
 	}
 
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function indexView(int $viewId): DataResponse {
-		return $this->handleError(function () use ($viewId) {
-			return $this->service->findAll('view', $viewId);
-		});
+		return $this->handleError(fn() => $this->service->findAll('view', $viewId));
 	}
 
 	#[NoAdminRequired]
 	public function show(int $id): DataResponse {
-		return $this->handleError(function () use ($id) {
-			return $this->service->find($id);
-		});
+		return $this->handleError(fn() => $this->service->find($id));
 	}
 
 	#[NoAdminRequired]
@@ -75,16 +60,12 @@ class ShareController extends Controller {
 		bool $permissionManage = false,
 		int $displayMode = Application::NAV_ENTRY_MODE_ALL,
 	): DataResponse {
-		return $this->handleError(function () use ($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage, $displayMode) {
-			return $this->service->create($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage, $displayMode);
-		});
+		return $this->handleError(fn() => $this->service->create($nodeId, $nodeType, $receiver, $receiverType, $permissionRead, $permissionCreate, $permissionUpdate, $permissionDelete, $permissionManage, $displayMode));
 	}
 
 	#[NoAdminRequired]
 	public function updatePermission(int $id, string $permission, bool $value): DataResponse {
-		return $this->handleError(function () use ($id, $permission, $value) {
-			return $this->service->updatePermission($id, $permission, $value);
-		});
+		return $this->handleError(fn() => $this->service->updatePermission($id, $permission, $value));
 	}
 
 	/**
@@ -108,8 +89,6 @@ class ShareController extends Controller {
 
 	#[NoAdminRequired]
 	public function destroy(int $id): DataResponse {
-		return $this->handleError(function () use ($id) {
-			return $this->service->delete($id);
-		});
+		return $this->handleError(fn() => $this->service->delete($id));
 	}
 }

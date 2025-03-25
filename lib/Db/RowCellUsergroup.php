@@ -16,10 +16,12 @@ class RowCellUsergroup extends RowCellSuper {
 	protected ?string $value = null;
 	protected ?int $valueType = null;
 
+	#[\Override]
 	public function jsonSerialize(): array {
 		return parent::jsonSerializePreparation($this->value, $this->valueType);
 	}
 
+	#[\Override]
 	public function setValueWrapper($value) {
 		$this->setValue((string)$value['id']);
 		$this->setValueType((int)$value['type']);

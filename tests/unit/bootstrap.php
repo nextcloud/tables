@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../../../lib/base.php';
 
 \OC::$loader->addValidRoot(\OC::$SERVERROOT . '/tests');
 \OC_App::loadApp('tables');
-if (!class_exists('\PHPUnit\Framework\TestCase')) {
+if (!class_exists(\PHPUnit\Framework\TestCase::class)) {
 	require_once('PHPUnit/Autoload.php');
 }
 OC_Hook::clear();

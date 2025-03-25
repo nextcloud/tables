@@ -24,6 +24,7 @@ class Version000800Date20240213123743 extends SimpleMigrationStep {
 	/**
 	 * @throws SchemaException
 	 */
+	#[\Override]
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper {
 		// Introduction of Contexts tables
 

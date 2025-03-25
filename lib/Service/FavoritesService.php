@@ -18,19 +18,15 @@ use OCP\IDBConnection;
 class FavoritesService {
 
 	private IDBConnection $connection;
-	private PermissionsService $permissionsService;
-	private ?string $userId;
 	private bool $cached = false;
 	private CappedMemoryCache $cache;
 
 	public function __construct(
 		IDBConnection $connection,
-		PermissionsService $permissionsService,
-		?string $userId,
+		private PermissionsService $permissionsService,
+		private ?string $userId,
 	) {
 		$this->connection = $connection;
-		$this->permissionsService = $permissionsService;
-		$this->userId = $userId;
 		// The cache usage is currently not unique to the user id as only a memory cache is used
 		$this->cache = new CappedMemoryCache();
 	}

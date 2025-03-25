@@ -29,6 +29,7 @@ class RowDataInput implements ArrayAccess, Iterator {
 		return $this;
 	}
 
+	#[\Override]
 	public function offsetExists(mixed $offset): bool {
 		foreach ($this->data as $data) {
 			if ($data[self::DATA_KEY] === $offset[self::DATA_KEY]) {
@@ -38,14 +39,17 @@ class RowDataInput implements ArrayAccess, Iterator {
 		return false;
 	}
 
+	#[\Override]
 	public function offsetGet(mixed $offset): mixed {
 		return $this->data[$offset];
 	}
 
+	#[\Override]
 	public function offsetSet(mixed $offset, mixed $value): void {
 		$this->data[$offset] = $value;
 	}
 
+	#[\Override]
 	public function offsetUnset(mixed $offset): void {
 		if (isset($this->data[$offset])) {
 			unset($this->data[$offset]);
@@ -61,22 +65,27 @@ class RowDataInput implements ArrayAccess, Iterator {
 		return false;
 	}
 
+	#[\Override]
 	public function current(): mixed {
 		return current($this->data);
 	}
 
+	#[\Override]
 	public function next(): void {
 		next($this->data);
 	}
 
+	#[\Override]
 	public function key(): mixed {
 		return key($this->data);
 	}
 
+	#[\Override]
 	public function valid(): bool {
 		return $this->key() !== null;
 	}
 
+	#[\Override]
 	public function rewind(): void {
 		reset($this->data);
 	}

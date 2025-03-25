@@ -25,20 +25,15 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type TablesIndex from ResponseDefinitions
  */
 class ApiGeneralController extends AOCSController {
-	private TableService $tableService;
-	private ViewService $viewService;
-
 	public function __construct(
 		IRequest $request,
-		TableService $tableService,
-		ViewService $viewService,
+		private TableService $tableService,
+		private ViewService $viewService,
 		LoggerInterface $logger,
 		IL10N $n,
 		?string $userId,
 	) {
 		parent::__construct($request, $logger, $n, $userId);
-		$this->tableService = $tableService;
-		$this->viewService = $viewService;
 	}
 
 
