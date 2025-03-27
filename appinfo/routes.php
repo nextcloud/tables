@@ -153,7 +153,5 @@ return [
 		['name' => 'Context#destroy', 'url' => '/api/2/contexts/{contextId}', 'verb' => 'DELETE'],
 		['name' => 'Context#transfer', 'url' => '/api/2/contexts/{contextId}/transfer', 'verb' => 'PUT'],
 		['name' => 'Context#updateContentOrder', 'url' => '/api/2/contexts/{contextId}/pages/{pageId}', 'verb' => 'PUT'],
-
-		['name' => 'RowOCS#createRow',	'url' => '/api/2/{nodeCollection}/{nodeId}/rows', 'verb' => 'POST', 'requirements' => ['nodeCollection' => '(tables|views)', 'nodeId' => '(\d+)']],
 	]
 ];
