@@ -66,6 +66,8 @@ OC.L10N.register(
     "Metadata" : "Metadati",
     "Column" : "Colonna",
     "Operator" : "Operatore",
+    "Ascending" : "Ascendente",
+    "Descending" : "Discendente",
     "Views" : "Viste",
     "View" : "Visualizza",
     "Rows" : "Righe",
