@@ -513,6 +513,7 @@ OC.L10N.register(
     "Insert" : "Vložiť",
     "Could not load search results." : "Zlyhalo načítavanie výsledkov vyhľadávania.",
     "Search for table and views..." : "Hľadať tabuľky a hodnoty...",
+    "Invalid protocol. Allowed: {allowed}" : "Neplatný protokol. Povolené: {allowed}",
     "Import into Tables" : "Importovať do Tabuliek",
     "Could not create share." : "Nepodarilo sa vytvoriť zdieľanie.",
     "Could not remove share." : "Nepodarilo sa odstrániť zdieľanie.",
