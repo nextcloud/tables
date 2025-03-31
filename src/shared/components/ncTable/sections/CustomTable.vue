@@ -601,6 +601,8 @@ export default {
 		position: sticky;
 		inset-inline-end: 0;
 		width: 55px;
+		right: 0;
+		width: calc(var(--button-size) * 2);
 		background-color: inherit;
 		padding-inline-end: 16px;
 	}
