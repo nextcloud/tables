@@ -92,15 +92,15 @@
 		},
 		{
 			"matchPackageNames": [
-				"vuex"
+				"vue-router"
 			],
 			"allowedVersions": "<4"
 		},
 		{
 			"matchPackageNames": [
-				"vue-router"
+				"vueuse"
 			],
-			"allowedVersions": "<4"
+			"allowedVersions": "<12"
 		},
 		{
 			"matchPackageNames": [
