@@ -241,6 +241,10 @@ class AnalyticsDatasource implements IDatasource {
 						}
 					}
 				}
+				// Tables does not deliver any values for "blank" default columns
+				if ($value === '' && $column->getType() === 'number') {
+					$value = $column->getNumberDefault();
+				}
 				$line[] = $value;
 			}
 			$data[] = $line;
