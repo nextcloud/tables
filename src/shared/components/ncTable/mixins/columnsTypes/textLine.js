@@ -50,6 +50,7 @@ export default class TextLineColumn extends AbstractTextColumn {
 			[FilterIds.BeginsWith]() { return cellValue.startsWith(filterValue) },
 			[FilterIds.EndsWith]() { return cellValue.endsWith(filterValue) },
 			[FilterIds.IsEqual]() { return cellValue === filterValue },
+			[FilterIds.IsNotEqual]() { return cellValue !== filterValue },
 			[FilterIds.IsEmpty]() { return !cellValue },
 		}[filter.operator.id]
 
