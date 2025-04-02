@@ -464,6 +464,15 @@ class Row2Mapper {
 				}
 				$filterExpression = $qb->expr()->eq('value', $qb->createNamedParameter($value, $paramType));
 				break;
+			case 'is-not-equal':
+				$includeDefault = $defaultValue === $value;
+				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
+					$value = str_replace(['"', '\''], '', $value);
+					$filterExpression = $qb->expr()->neq('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ']', $paramType));
+					break;
+				}
+				$filterExpression = $qb->expr()->neq('value', $qb->createNamedParameter($value, $paramType));
+				break;
 			case 'is-greater-than':
 				$includeDefault = $column->getNumberDefault() > (float)$value;
 				$filterExpression = $qb->expr()->gt('value', $qb->createNamedParameter($value, $paramType));
@@ -547,6 +556,8 @@ class Row2Mapper {
 				return $qb->expr()->like($columnName, $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
 			case 'is-equal':
 				return $qb->expr()->eq($columnName, $qb->createNamedParameter($value, $paramType));
+			case 'is-not-equal':
+				return $qb->expr()->neq($columnName, $qb->createNamedParameter($value, $paramType));
 			case 'is-greater-than':
 				return $qb->expr()->gt($columnName, $qb->createNamedParameter($value, $paramType));
 			case 'is-greater-than-or-equal':
