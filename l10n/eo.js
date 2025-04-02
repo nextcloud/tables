@@ -37,6 +37,7 @@ OC.L10N.register(
     "Share" : "Kunhavigi",
     "Integration" : "Integrigo",
     "Total" : "Sumo",
+    "Data" : "Datumoj",
     "Import" : "Importi",
     "Type" : "Tipo",
     "Time" : "Dato",
