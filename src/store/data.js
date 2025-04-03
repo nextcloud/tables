@@ -21,6 +21,7 @@ export const useDataStore = defineStore('data', {
 		loading: {},
 		rows: {},
 		columns: {},
+		rowMetadata: {},
 	}),
 
 	getters: {
@@ -31,6 +32,9 @@ export const useDataStore = defineStore('data', {
 		getRows: (state) => (isView, elementId) => {
 			const stateId = genStateKey(isView, elementId)
 			return state.rows[stateId] ?? []
+		},
+		getRowMetadata: (state) => (rowId) => {
+			return state.rowMetadata[rowId] || null
 		},
 	},
 
@@ -170,6 +174,13 @@ export const useDataStore = defineStore('data', {
 				return false
 			}
 
+			res.data.forEach(row => {
+				this.rowMetadata[row.id] = {
+					isView: !!viewId,
+					elementId: viewId ?? tableId,
+				}
+			})
+
 			set(this.rows, stateId, res.data)
 			this.loading[stateId] = false
 			return true
@@ -177,9 +188,14 @@ export const useDataStore = defineStore('data', {
 
 		removeRows({ isView, elementId }) {
 			const stateId = genStateKey(isView, elementId)
+			const removedRows = this.rows[stateId] || []
+			removedRows.forEach(row => {
+				delete this.rowMetadata[row.id]
+			})
 			set(this.rows, stateId, [])
 		},
 
+		// TODO: check why inline editing makes two requests
 		async updateRow({ id, isView, elementId, data }) {
 			let res = null
 			const viewId = isView ? elementId : null
@@ -202,6 +218,13 @@ export const useDataStore = defineStore('data', {
 				const row = res.data
 				const index = this.rows[stateId].findIndex(r => r.id === row.id)
 				set(this.rows[stateId], index, row)
+				if (row.id !== id) {
+					this.rowMetadata[row.id] = {
+						isView,
+						elementId,
+					}
+					delete this.rowMetadata[id]
+				}
 			}
 			return true
 		},
@@ -223,6 +246,11 @@ export const useDataStore = defineStore('data', {
 				const row = res?.data?.ocs?.data
 				const newIndex = this.rows[stateId].length
 				set(this.rows[stateId], newIndex, row)
+
+				this.rowMetadata[row.id] = {
+					isView: !!viewId,
+					elementId: viewId ?? tableId,
+				}
 			}
 			return true
 		},
@@ -249,6 +277,7 @@ export const useDataStore = defineStore('data', {
 			if (stateId && this.rows[stateId]) {
 				const filteredRows = this.rows[stateId].filter(r => r.id !== rowId)
 				set(this.rows, stateId, filteredRows)
+				delete this.rowMetadata[rowId]
 			}
 			return true
 		},
