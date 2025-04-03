@@ -5,6 +5,23 @@
 
 # Changelog
 
+
+
+
+## 0.8.5
+
+### Fixed
+
+* [[stable0.8] Fix npm audit (tables#1618)](https://github.com/nextcloud/tables/pull/1618)
+* [[stable0.8] fix(Import): DateTime import fixes (tables#1622)](https://github.com/nextcloud/tables/pull/1622)
+* [[stable0.8] enh: escape CSV values (tables#1687)](https://github.com/nextcloud/tables/pull/1687)
+
+### Other
+
+* [[stable0.8] ci: add summaries for cypress and integration tests (tables#1663)](https://github.com/nextcloud/tables/pull/1663)
+* [Build: revert dependencies to last state with green ci (tables#1697)](https://github.com/nextcloud/tables/pull/1697)
+* Dependency updates
+
 ## 0.8.4
 
 ### Fixed
