@@ -52,10 +52,12 @@
     "Select from Files" : "Vali failidest",
     "Upload from device" : "Laadi üles seadmest",
     "Preview" : "Eelvaade",
+    "Failed" : "Ebaõnnestus",
     "Transfer" : "Teisalda",
     "Filter" : "Filter",
     "Sort" : "Sorteeri",
     "Export" : "Ekspordi",
+    "Remove from favorites" : "Eemalda lemmikutest",
     "Copy" : "Kopeeri",
     "Favorites" : "Lemmikud",
     "Clear filter" : "Tühjenda filter",
@@ -85,6 +87,7 @@
     "Confirm" : "Kinnita",
     "Content" : "Sisu",
     "Select" : "Vali",
+    "Now" : "Praegu",
     "ID" : "ID",
     "Clipboard is not available" : "Lõikelauda ei ole saadaval"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
