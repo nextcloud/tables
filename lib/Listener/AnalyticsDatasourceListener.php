@@ -16,6 +16,7 @@ use OCP\EventDispatcher\IEventListener;
  * @template-implements IEventListener<Event|DatasourceEvent>
  */
 class AnalyticsDatasourceListener implements IEventListener {
+	#[\Override]
 	public function handle(Event $event): void {
 		if (!($event instanceof DatasourceEvent)) {
 			// Unrelated

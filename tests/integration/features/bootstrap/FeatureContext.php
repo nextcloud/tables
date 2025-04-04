@@ -122,7 +122,7 @@ class FeatureContext implements Context {
 
 		$newTable = $this->getDataFromResponse($this->response)['ocs']['data'];
 		$this->tableIds[$tableName] = $newTable['id'];
-		$this->collectionManager->register($newTable, 'table', $newTable['id'], $tableName, function () use ($user, $tableName) {
+		$this->collectionManager->register($newTable, 'table', $newTable['id'], $tableName, function () use ($user, $tableName): void {
 			$this->deleteTableV2($user, $tableName);
 		});
 
@@ -510,7 +510,7 @@ class FeatureContext implements Context {
 		$out = '';
 		foreach ($node->getRows() as $row) {
 			foreach ($row as $value) {
-				if ($out !== '' && substr($out, -1) !== "\n") {
+				if ($out !== '' && !str_ends_with($out, "\n")) {
 					$out .= ',';
 				}
 				$out .= trim($value);
@@ -690,7 +690,7 @@ class FeatureContext implements Context {
 		$newItem = $this->getDataFromResponse($this->response);
 		$this->viewIds[$viewName] = $newItem['id'];
 
-		$this->collectionManager->register($newItem, 'view', $newItem['id'], $viewName, function () use ($user, $viewName) {
+		$this->collectionManager->register($newItem, 'view', $newItem['id'], $viewName, function () use ($user, $viewName): void {
 			$this->deleteViewWithoutAssertion($user, $viewName);
 			unset($this->viewIds[$viewName]);
 		});
@@ -1871,7 +1871,7 @@ class FeatureContext implements Context {
 		$options = array_merge($options, ['cookies' => $this->getUserCookieJar($this->currentUser)]);
 		if ($this->currentUser === 'admin') {
 			$options['auth'] = ['admin', 'admin'];
-		} elseif (strpos($this->currentUser, 'guest') !== 0) {
+		} elseif (!str_starts_with($this->currentUser, 'guest')) {
 			$options['auth'] = [$this->currentUser, self::TEST_PASSWORD];
 		}
 		if ($body instanceof TableNode) {
@@ -1890,9 +1890,7 @@ class FeatureContext implements Context {
 
 		try {
 			$this->response = $client->{$verb}($fullUrl, $options);
-		} catch (ClientException $ex) {
-			$this->response = $ex->getResponse();
-		} catch (\GuzzleHttp\Exception\ServerException $ex) {
+		} catch (ClientException|\GuzzleHttp\Exception\ServerException $ex) {
 			$this->response = $ex->getResponse();
 		}
 	}
@@ -2013,7 +2011,7 @@ class FeatureContext implements Context {
 		$exceptionCaught = false;
 		try {
 			$this->createContext($user, $alias, $name, $icon, $description, $table);
-		} catch (ExpectationFailedException $e) {
+		} catch (ExpectationFailedException) {
 			$exceptionCaught = true;
 
 		}
@@ -2053,7 +2051,7 @@ class FeatureContext implements Context {
 
 		$newContext = $this->getDataFromResponse($this->response)['ocs']['data'];
 
-		$this->collectionManager->register($newContext, 'context', $newContext['id'], $alias, function () use ($newContext) {
+		$this->collectionManager->register($newContext, 'context', $newContext['id'], $alias, function () use ($newContext): void {
 			$this->deleteContextWithFetchCheck($newContext['id'], $newContext['owner']);
 		});
 
@@ -2180,7 +2178,7 @@ class FeatureContext implements Context {
 		$caughtException = false;
 		try {
 			$this->userFetchesContext($user, $contextAlias);
-		} catch (ExpectationFailedException $e) {
+		} catch (ExpectationFailedException) {
 			$caughtException = true;
 		}
 
@@ -2230,9 +2228,7 @@ class FeatureContext implements Context {
 		$receivedContexts = $this->getDataFromResponse($this->response)['ocs']['data'];
 
 		$aliases = $contextAliasList === '' ? [] : explode(',', $contextAliasList);
-		$expectedContextIds = array_map(function (string $alias) {
-			return $this->collectionManager->getByAlias('context', trim($alias))['id'];
-		}, $aliases);
+		$expectedContextIds = array_map(fn(string $alias) => $this->collectionManager->getByAlias('context', trim($alias))['id'], $aliases);
 		sort($expectedContextIds);
 
 		$actualContextIds = [];
@@ -2340,7 +2336,7 @@ class FeatureContext implements Context {
 		$exceptionCaught = false;
 		try {
 			$this->deleteContext($context['id'], $user);
-		} catch (ExpectationFailedException $e) {
+		} catch (ExpectationFailedException) {
 			$exceptionCaught = true;
 		}
 
@@ -2401,7 +2397,7 @@ class FeatureContext implements Context {
 		);
 		if ($this->response->getStatusCode() === 200) {
 			$context['owner'] = $recipientUser;
-			$this->collectionManager->update($context, 'context', $context['id'], function () use ($context, $recipientUser) {
+			$this->collectionManager->update($context, 'context', $context['id'], function () use ($context, $recipientUser): void {
 				$this->deleteContextWithFetchCheck($context['id'], $recipientUser);
 			});
 		}

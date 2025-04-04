@@ -11,11 +11,9 @@ use OCP\IGroupManager;
 use Psr\Log\LoggerInterface;
 
 class GroupHelper {
-	private LoggerInterface $logger;
 	private IGroupManager $groupManager;
 
-	public function __construct(LoggerInterface $logger, IGroupManager $groupManager) {
-		$this->logger = $logger;
+	public function __construct(private LoggerInterface $logger, IGroupManager $groupManager) {
 		$this->groupManager = $groupManager;
 	}
 

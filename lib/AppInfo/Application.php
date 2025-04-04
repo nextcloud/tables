@@ -66,6 +66,7 @@ class Application extends App implements IBootstrap {
 	/**
 	 * @throws Exception
 	 */
+	#[\Override]
 	public function register(IRegistrationContext $context): void {
 		if ((@include_once __DIR__ . '/../../vendor/autoload.php') === false) {
 			throw new Exception('Cannot include autoload. Did you run install dependencies using composer?');
@@ -94,6 +95,7 @@ class Application extends App implements IBootstrap {
 		$context->registerMiddleware(PermissionMiddleware::class);
 	}
 
+	#[\Override]
 	public function boot(IBootContext $context): void {
 	}
 }

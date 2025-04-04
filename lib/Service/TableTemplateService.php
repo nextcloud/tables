@@ -475,9 +475,7 @@ class TableTemplateService {
 			[
 				'title' => $this->l->t('Open Request'),
 				'emoji' => '️📝',
-				'columns' => json_encode(array_values(array_map(function ($col) {
-					return $col->getId();
-				}, $columns))),
+				'columns' => json_encode(array_values(array_map(fn($col) => $col->getId(), $columns))),
 				'sort' => json_encode([['columnId' => $columns['from']->getId(), 'mode' => 'ASC']]),
 				'filter' => json_encode([[['columnId' => $columns['approved']->getId(), 'operator' => 'is-empty', 'value' => '']]]),
 			]
@@ -486,9 +484,7 @@ class TableTemplateService {
 			[
 				'title' => $this->l->t('Request Status'),
 				'emoji' => '️❓',
-				'columns' => json_encode(array_values(array_map(function ($col) {
-					return $col->getId();
-				}, $columns))),
+				'columns' => json_encode(array_values(array_map(fn($col) => $col->getId(), $columns))),
 				'sort' => json_encode([['columnId' => Column::TYPE_META_UPDATED_BY, 'mode' => 'ASC']]),
 				'filter' => json_encode([[['columnId' => Column::TYPE_META_CREATED_BY, 'operator' => 'is-equal', 'value' => '@my-name']]]),
 			]
@@ -497,9 +493,7 @@ class TableTemplateService {
 			[
 				'title' => $this->l->t('Closed requests'),
 				'emoji' => '️✅',
-				'columns' => json_encode(array_values(array_map(function ($col) {
-					return $col->getId();
-				}, $columns))),
+				'columns' => json_encode(array_values(array_map(fn($col) => $col->getId(), $columns))),
 				'sort' => json_encode([['columnId' => Column::TYPE_META_UPDATED_BY, 'mode' => 'ASC']]),
 				'filter' => json_encode([[['columnId' => $columns['approved']->getId(), 'operator' => 'is-equal', 'value' => '@checked']], [['columnId' => $columns['approved']->getId(), 'operator' => 'is-equal', 'value' => '@unchecked']]]),
 			]
@@ -831,7 +825,7 @@ class TableTemplateService {
 			$this->logger->warning('Exception occurred while creating a row: ' . $e->getMessage());
 		} catch (NotFoundError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
 

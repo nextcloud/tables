@@ -34,18 +34,7 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type TablesView from ResponseDefinitions
  */
 class ViewService extends SuperService {
-	private ViewMapper $mapper;
-
-	private ShareService $shareService;
-
-	private RowService $rowService;
-
-	protected UserHelper $userHelper;
-
-	protected FavoritesService $favoritesService;
-
 	protected IL10N $l;
-	private ContextService $contextService;
 
 	protected IEventDispatcher $eventDispatcher;
 
@@ -53,24 +42,18 @@ class ViewService extends SuperService {
 		PermissionsService $permissionsService,
 		LoggerInterface $logger,
 		?string $userId,
-		ViewMapper $mapper,
-		ShareService $shareService,
-		RowService $rowService,
-		UserHelper $userHelper,
-		FavoritesService $favoritesService,
+		private ViewMapper $mapper,
+		private ShareService $shareService,
+		private RowService $rowService,
+		protected UserHelper $userHelper,
+		protected FavoritesService $favoritesService,
 		IEventDispatcher $eventDispatcher,
-		ContextService $contextService,
+		private ContextService $contextService,
 		IL10N $l,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->l = $l;
-		$this->mapper = $mapper;
-		$this->shareService = $shareService;
-		$this->rowService = $rowService;
-		$this->userHelper = $userHelper;
-		$this->favoritesService = $favoritesService;
 		$this->eventDispatcher = $eventDispatcher;
-		$this->contextService = $contextService;
 	}
 
 	/**
@@ -128,10 +111,10 @@ class ViewService extends SuperService {
 			$view = $this->mapper->find($id);
 		} catch (InternalError|\OCP\DB\Exception|MultipleObjectsReturnedException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// security
@@ -311,10 +294,10 @@ class ViewService extends SuperService {
 			$view = $this->mapper->find($id);
 		} catch (InternalError|MultipleObjectsReturnedException|\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		// security
@@ -336,7 +319,7 @@ class ViewService extends SuperService {
 			return $deletedView;
 		} catch (\OCP\DB\Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 	}
 
@@ -409,7 +392,7 @@ class ViewService extends SuperService {
 						throw new InternalError($e->getMessage());
 					}
 					$view->setOnSharePermissions($permissions);
-				} catch (NotFoundError $e) {
+				} catch (NotFoundError) {
 				} catch (\Exception $e) {
 					$this->logger->warning('Exception occurred while setting shared permissions: ' . $e->getMessage() . ' No permissions granted.');
 					$view->setOnSharePermissions(new Permissions());
@@ -420,7 +403,7 @@ class ViewService extends SuperService {
 				try {
 					$allShares = $this->shareService->findAll('view', $view->getId());
 					$view->setHasShares(count($allShares) !== 0);
-				} catch (InternalError $e) {
+				} catch (InternalError) {
 				}
 			}
 
@@ -432,7 +415,7 @@ class ViewService extends SuperService {
 		// add the rows count
 		try {
 			$view->setRowsCount($this->rowService->getViewRowsCount($view, $userId));
-		} catch (InternalError|PermissionError $e) {
+		} catch (InternalError|PermissionError) {
 		}
 
 		// Remove detailed view filtering and sorting information if necessary
@@ -440,10 +423,9 @@ class ViewService extends SuperService {
 			$rawFilterArray = $view->getFilterArray();
 			if ($rawFilterArray) {
 				$view->setFilterArray(
-					array_map(static function ($filterGroup) {
-						// Instead of filter just indicate that there is a filter, but hide details
-						return array_map(null, $filterGroup);
-					},
+					array_map(static fn($filterGroup) =>
+                        // Instead of filter just indicate that there is a filter, but hide details
+                        array_map(null, $filterGroup),
 						$rawFilterArray));
 			}
 			$rawSortArray = $view->getSortArray();
@@ -502,22 +484,16 @@ class ViewService extends SuperService {
 			throw new InternalError($e->getMessage());
 		}
 		foreach ($views as $view) {
-			$filteredSortingRules = array_filter($view->getSortArray(), function (array $sort) use ($columnId) {
-				return $sort['columnId'] !== $columnId;
-			});
+			$filteredSortingRules = array_filter($view->getSortArray(), fn(array $sort) => $sort['columnId'] !== $columnId);
 			$filteredSortingRules = array_values($filteredSortingRules);
 
 			$filteredFilters = array_filter(
 
 				array_map(
-					function (array $filterGroup) use ($columnId) {
-						return array_filter(
+					fn(array $filterGroup) => array_filter(
 							$filterGroup,
-							function (array $filter) use ($columnId) {
-								return $filter['columnId'] !== $columnId;
-							}
-						);
-					},
+							fn(array $filter) => $filter['columnId'] !== $columnId
+						),
 					$view->getFilterArray()
 				),
 
@@ -551,7 +527,7 @@ class ViewService extends SuperService {
 				$this->enhanceView($view, $userId);
 			}
 			return $views;
-		} catch (InternalError|\OCP\DB\Exception $e) {
+		} catch (InternalError|\OCP\DB\Exception) {
 			return [];
 		}
 	}

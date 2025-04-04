@@ -28,12 +28,6 @@ class Clean extends Command {
 	public const PRINT_LEVEL_WARNING = 3;
 	public const PRINT_LEVEL_ERROR = 4;
 
-	protected ColumnService $columnService;
-	protected RowService $rowService;
-	protected TableService $tableService;
-	protected LoggerInterface $logger;
-	protected Row2Mapper $rowMapper;
-
 	private bool $dry = false;
 	private int $truncateLength = 20;
 
@@ -42,13 +36,8 @@ class Clean extends Command {
 
 	private OutputInterface $output;
 
-	public function __construct(LoggerInterface $logger, ColumnService $columnService, RowService $rowService, TableService $tableService, Row2Mapper $rowMapper) {
+	public function __construct(protected LoggerInterface $logger, protected ColumnService $columnService, protected RowService $rowService, protected TableService $tableService, protected Row2Mapper $rowMapper) {
 		parent::__construct();
-		$this->logger = $logger;
-		$this->columnService = $columnService;
-		$this->rowService = $rowService;
-		$this->tableService = $tableService;
-		$this->rowMapper = $rowMapper;
 	}
 
 	protected function configure(): void {
@@ -142,7 +131,7 @@ class Clean extends Command {
 			} catch (InternalError $e) {
 				$this->print('😱️ internal error while looking for column', self::PRINT_LEVEL_ERROR);
 				$this->logger->error('Following error occurred during executing occ command "' . self::class . '"', ['exception' => $e]);
-			} catch (NotFoundError $e) {
+			} catch (NotFoundError) {
 				if ($this->output->isVerbose()) {
 					$this->print('corresponding column not found.', self::PRINT_LEVEL_ERROR);
 				} else {
