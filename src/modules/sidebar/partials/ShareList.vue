@@ -12,7 +12,7 @@
 				class="row">
 				<div class="fix-col-2">
 					<div style="display:flex; align-items: center;">
-						<NcAvatar :user="getShareAvatar(share)" :is-no-user="share.receiverType !== 'user'" />
+						<NcAvatar :user="share.receiver" :is-no-user="share.receiverType !== 'user'" />
 					</div>
 					<div class="userInfo">
 						<div :class="{'high-line-height': !personHasTableManagePermission(share.receiver)}">
@@ -231,9 +231,6 @@ export default {
 		},
 		personHasTableManagePermission(userId) {
 			return this.tableShares.find(share => share.receiver === userId)?.permissionManage
-		},
-		getShareAvatar(share) {
-			return share.receiverDisplayName || share.receiver
 		},
 		getShareDisplayName(share) {
 			const name = share.receiverDisplayName || share.receiver
