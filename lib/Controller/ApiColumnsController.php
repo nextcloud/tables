@@ -44,7 +44,7 @@ class ApiColumnsController extends AOCSController {
 	 *
 	 * @param int $nodeId Node ID
 	 * @param 'table'|'view' $nodeType Node type
-	 * @return DataResponse<Http::STATUS_OK, TablesColumn[], array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesColumn>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: View deleted
 	 * 403: No permissions
@@ -111,7 +111,7 @@ class ApiColumnsController extends AOCSController {
 	 * @param float|null $numberMax Max
 	 * @param 'progress'|'stars'|null $subtype Subtype for the new column
 	 * @param string|null $description Description
-	 * @param int[]|null $selectedViewIds View IDs where this columns should be added
+	 * @param list<int>|null $selectedViewIds View IDs where this columns should be added
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Column created
@@ -160,7 +160,7 @@ class ApiColumnsController extends AOCSController {
 	 * @param int|null $textMaxLength Max raw text length
 	 * @param 'progress'|'stars'|null $subtype Subtype for the new column
 	 * @param string|null $description Description
-	 * @param int[]|null $selectedViewIds View IDs where this columns should be added
+	 * @param list<int>|null $selectedViewIds View IDs where this columns should be added
 	 * @param boolean $mandatory Is mandatory
 	 * @param 'table'|'view' $baseNodeType Context type of the column creation
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
@@ -207,7 +207,7 @@ class ApiColumnsController extends AOCSController {
 	 * @param string|null $selectionDefault Json int|int[] for default selected option(s), eg 5 or ["1", "8"]
 	 * @param 'progress'|'stars'|null $subtype Subtype for the new column
 	 * @param string|null $description Description
-	 * @param int[]|null $selectedViewIds View IDs where this columns should be added
+	 * @param list<int>|null $selectedViewIds View IDs where this columns should be added
 	 * @param boolean $mandatory Is mandatory
 	 * @param 'table'|'view' $baseNodeType Context type of the column creation
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
@@ -252,7 +252,7 @@ class ApiColumnsController extends AOCSController {
 	 * @param 'today'|'now'|null $datetimeDefault For a subtype 'date' you can set 'today'. For a main type or subtype 'time' you can set to 'now'.
 	 * @param 'progress'|'stars'|null $subtype Subtype for the new column
 	 * @param string|null $description Description
-	 * @param int[]|null $selectedViewIds View IDs where this columns should be added
+	 * @param list<int>|null $selectedViewIds View IDs where this columns should be added
 	 * @param boolean $mandatory Is mandatory
 	 * @param 'table'|'view' $baseNodeType Context type of the column creation
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
@@ -298,7 +298,7 @@ class ApiColumnsController extends AOCSController {
 	 * @param boolean $usergroupSelectTeams Whether you can select teams
 	 * @param boolean $showUserStatus Whether to show the user's status
 	 * @param string|null $description Description
-	 * @param int[]|null $selectedViewIds View IDs where this columns should be added
+	 * @param list<int>|null $selectedViewIds View IDs where this columns should be added
 	 * @param boolean $mandatory Is mandatory
 	 * @param 'table'|'view' $baseNodeType Context type of the column creation
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
