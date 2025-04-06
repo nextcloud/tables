@@ -71,6 +71,7 @@ OC.L10N.register(
     "Download" : "Unduh",
     "Search" : "Cari",
     "Undo" : "Undo",
+    "Redo" : "Ulang lagi",
     "Code" : "Kode",
     "Prefix" : "Prefix",
     "Suffix" : "Suffix",

@@ -32,6 +32,7 @@ OC.L10N.register(
     "Move" : "Liiguta",
     "Metadata" : "Metaandmed",
     "Operator" : "Operaator",
+    "Delete filter" : "Kustuta filter",
     "Views" : "Vaated",
     "View" : "Vaata",
     "Shares" : "Jagamisi",

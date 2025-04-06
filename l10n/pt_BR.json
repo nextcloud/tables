@@ -19,7 +19,7 @@
     "No file was uploaded" : "Nenhum arquivo foi enviado",
     "Missing a temporary folder" : "Faltando uma pasta temporária",
     "Could not write file to disk" : "Não foi possível gravar o arquivo no disco",
-    "A PHP extension stopped the file upload" : "Uma extensão PHP interrompeu o envio do arquivo",
+    "A PHP extension stopped the file upload" : "Uma extensão PHP interrompeu o upload do arquivo",
     "No file uploaded or file size exceeds maximum of %s" : "Ou nenhum arquivo foi enviado ou o tamanho do arquivo excede o máximo de%s",
     "Nextcloud tables" : "Tabelas Nextcloud",
     "_%n row_::_%n rows_" : ["%n row","%n rows","%n rows"],
