@@ -72,21 +72,21 @@
 					<NavigationContextItem :key="node.id" :context="node" />
 				</template>
 			</ul>
+
+			<div v-if="filterString !== ''" class="search-info">
+				<NcEmptyContent :description="t('tables', 'Your results are filtered.')">
+					<template #icon>
+						<Magnify :size="10" />
+					</template>
+
+					<template #action>
+						<NcButton :aria-label="t('tables', 'Clear filter')" @click="filterString = ''">
+							{{ t('tables', 'Clear filter') }}
+						</NcButton>
+					</template>
+				</NcEmptyContent>
+			</div>
 		</template>
-
-		<div v-if="filterString !== ''" class="search-info">
-			<NcEmptyContent :description="t('tables', 'Your results are filtered.')">
-				<template #icon>
-					<Magnify :size="10" />
-				</template>
-
-				<template #action>
-					<NcButton :aria-label="t('tables', 'Clear filter')" @click="filterString = ''">
-						{{ t('tables', 'Clear filter') }}
-					</NcButton>
-				</template>
-			</NcEmptyContent>
-		</div>
 	</NcAppNavigation>
 </template>
 
