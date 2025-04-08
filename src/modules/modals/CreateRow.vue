@@ -5,6 +5,7 @@
 <template>
 	<NcDialog v-if="showModal"
 		:name="t('tables', 'Create row')"
+		size="large"
 		data-cy="createRowModal"
 		@closing="actionCancel">
 		<div class="modal__content" @keydown="onKeydown">
