@@ -12,6 +12,7 @@ OC.L10N.register(
     "Could not write file to disk" : "Faili kirjutamine kettale ebaõnnestus",
     "A PHP extension stopped the file upload" : "PHP laiendus peatas faili üleslaadimise",
     "No file uploaded or file size exceeds maximum of %s" : "Faili ei laaditud üles või selle suurus ületab maksimaalse %s",
+    "Customers" : "Kliendid",
     "Date" : "Kuupäev",
     "Comments" : "Kommentaarid",
     "Name" : "Nimi",
