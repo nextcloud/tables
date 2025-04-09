@@ -27,6 +27,7 @@ class FixContextsDefaults implements IRepairStep {
 	/**
 	 * @inheritDoc
 	 */
+	#[\Override]
 	public function getName() {
 		return 'Fix navigation bar default of existing contexts to show for all';
 	}
@@ -34,6 +35,7 @@ class FixContextsDefaults implements IRepairStep {
 	/**
 	 * @inheritDoc
 	 */
+	#[\Override]
 	public function run(IOutput $output) {
 		$appVersion = $this->config->getAppValue(Application::APP_ID, 'installed_version', '0.0');
 		if (\version_compare($appVersion, '0.8.0-beta.1', '>')) {

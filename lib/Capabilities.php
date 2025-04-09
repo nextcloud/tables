@@ -21,17 +21,11 @@ use Psr\Log\LoggerInterface;
 class Capabilities implements ICapability {
 	private IAppManager $appManager;
 
-	private LoggerInterface $logger;
-
 	private IConfig $config;
 
-	private CircleHelper $circleHelper;
-
-	public function __construct(IAppManager $appManager, LoggerInterface $logger, IConfig $config, CircleHelper $circleHelper) {
+	public function __construct(IAppManager $appManager, private LoggerInterface $logger, IConfig $config, private CircleHelper $circleHelper) {
 		$this->appManager = $appManager;
-		$this->logger = $logger;
 		$this->config = $config;
-		$this->circleHelper = $circleHelper;
 	}
 
 	/**
@@ -40,6 +34,7 @@ class Capabilities implements ICapability {
 	 *
 	 * @inheritDoc
 	 */
+	#[\Override]
 	public function getCapabilities(): array {
 		$textColumnVariant = 'text-rich';
 		if (version_compare($this->config->getSystemValueString('version', '0.0.0'), '26.0.0', '<')) {

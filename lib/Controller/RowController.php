@@ -17,48 +17,31 @@ use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
 class RowController extends Controller {
-	/** @var RowService */
-	private RowService $service;
-
-	/** @var string */
-	private string $userId;
-
-	protected LoggerInterface $logger;
-
 	use Errors;
 
 	public function __construct(
 		IRequest $request,
-		LoggerInterface $logger,
-		RowService $service,
-		string $userId) {
+		protected LoggerInterface $logger,
+		private RowService $service,
+		private string $userId) {
 		parent::__construct(Application::APP_ID, $request);
-		$this->logger = $logger;
-		$this->service = $service;
-		$this->userId = $userId;
 	}
 
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function index(int $tableId): DataResponse {
-		return $this->handleError(function () use ($tableId) {
-			return $this->service->findAllByTable($tableId, $this->userId);
-		});
+		return $this->handleError(fn() => $this->service->findAllByTable($tableId, $this->userId));
 	}
 
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function indexView(int $viewId): DataResponse {
-		return $this->handleError(function () use ($viewId) {
-			return $this->service->findAllByView($viewId, $this->userId);
-		});
+		return $this->handleError(fn() => $this->service->findAllByView($viewId, $this->userId));
 	}
 
 	#[NoAdminRequired]
 	public function show(int $id): DataResponse {
-		return $this->handleError(function () use ($id) {
-			return $this->service->find($id);
-		});
+		return $this->handleError(fn() => $this->service->find($id));
 	}
 
 	#[NoAdminRequired]
@@ -69,15 +52,7 @@ class RowController extends Controller {
 		?int $viewId,
 		string $data,
 	): DataResponse {
-		return $this->handleError(function () use (
-			$id,
-			$tableId,
-			$viewId,
-			$columnId,
-			$data
-		) {
-			return $this->service->updateSet($id, $viewId, ['columnId' => $columnId, 'value' => $data], $this->userId);
-		});
+		return $this->handleError(fn() => $this->service->updateSet($id, $viewId, ['columnId' => $columnId, 'value' => $data], $this->userId));
 	}
 
 	#[NoAdminRequired]
@@ -87,29 +62,19 @@ class RowController extends Controller {
 		array $data,
 
 	): DataResponse {
-		return $this->handleError(function () use (
-			$id,
-			$viewId,
-			$data
-		) {
-			return $this->service->updateSet(
+		return $this->handleError(fn() => $this->service->updateSet(
 				$id,
 				$viewId,
 				$data,
-				$this->userId);
-		});
+				$this->userId));
 	}
 
 	#[NoAdminRequired]
 	public function destroy(int $id): DataResponse {
-		return $this->handleError(function () use ($id) {
-			return $this->service->delete($id, null, $this->userId);
-		});
+		return $this->handleError(fn() => $this->service->delete($id, null, $this->userId));
 	}
 	#[NoAdminRequired]
 	public function destroyByView(int $id, int $viewId): DataResponse {
-		return $this->handleError(function () use ($id, $viewId) {
-			return $this->service->delete($id, $viewId, $this->userId);
-		});
+		return $this->handleError(fn() => $this->service->delete($id, $viewId, $this->userId));
 	}
 }

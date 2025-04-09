@@ -27,6 +27,7 @@ class ContextNavigation extends Entity implements \JsonSerializable {
 		$this->addType('displayMode', 'integer');
 	}
 
+	#[\Override]
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->getId(),

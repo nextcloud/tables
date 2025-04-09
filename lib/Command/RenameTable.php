@@ -17,13 +17,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class RenameTable extends Command {
-	protected TableService $tableService;
-	protected LoggerInterface $logger;
-
-	public function __construct(TableService $tableService, LoggerInterface $logger) {
+	public function __construct(protected TableService $tableService, protected LoggerInterface $logger) {
 		parent::__construct();
-		$this->tableService = $tableService;
-		$this->logger = $logger;
 	}
 
 	protected function configure(): void {

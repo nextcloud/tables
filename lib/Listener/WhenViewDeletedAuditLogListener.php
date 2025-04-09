@@ -21,6 +21,7 @@ final class WhenViewDeletedAuditLogListener implements IEventListener {
 	) {
 	}
 
+	#[\Override]
 	public function handle(Event $event): void {
 		if (!($event instanceof ViewDeletedEvent)) {
 			return;

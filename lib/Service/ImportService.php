@@ -38,10 +38,6 @@ use function preg_match;
 class ImportService extends SuperService {
 
 	private IRootFolder $rootFolder;
-	private ColumnService $columnService;
-	private RowService $rowService;
-	private TableService $tableService;
-	private ViewService $viewService;
 	private IUserManager $userManager;
 
 	private ?int $tableId = null;
@@ -59,13 +55,9 @@ class ImportService extends SuperService {
 	private array $columnsConfig = [];
 
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-		IRootFolder $rootFolder, ColumnService $columnService, RowService $rowService, TableService $tableService, ViewService $viewService, IUserManager $userManager) {
+		IRootFolder $rootFolder, private ColumnService $columnService, private RowService $rowService, private TableService $tableService, private ViewService $viewService, IUserManager $userManager) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->rootFolder = $rootFolder;
-		$this->columnService = $columnService;
-		$this->rowService = $rowService;
-		$this->tableService = $tableService;
-		$this->viewService = $viewService;
 		$this->userManager = $userManager;
 	}
 
@@ -77,7 +69,7 @@ class ImportService extends SuperService {
 		} else {
 			$e = new \Exception('Neither tableId nor viewId is given.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		$this->createUnknownColumns = false;
@@ -255,12 +247,12 @@ class ImportService extends SuperService {
 		if (!$this->tableId && !$this->viewId) {
 			$e = new \Exception('Neither tableId nor viewId is given.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 		if ($this->tableId && $this->viewId) {
 			$e = new \LogicException('Both table ID and view ID are provided, but only one of them is allowed');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
 		if ($this->userId === null || $this->userManager->get($this->userId) === null) {
@@ -440,7 +432,7 @@ class ImportService extends SuperService {
 			$this->countErrors++;
 		} catch (NotFoundError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new NotFoundError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		} catch (\Throwable $e) {
 			$this->countErrors++;
 			$this->logger->error('Error while creating new row for import.', ['exception' => $e]);

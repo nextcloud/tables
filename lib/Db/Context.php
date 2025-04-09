@@ -44,6 +44,7 @@ class Context extends Entity implements JsonSerializable {
 		$this->addType('owner_type', 'integer');
 	}
 
+	#[\Override]
 	public function jsonSerialize(): array {
 		// basic information
 		$data = [

@@ -16,6 +16,7 @@ class TextLinkBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	 * @param Column|null $column
 	 * @return string
 	 */
+	#[\Override]
 	public function parseValue($value, ?Column $column = null): string {
 		if ($value === null) {
 			return '';
@@ -67,6 +68,7 @@ class TextLinkBusiness extends SuperBusiness implements IColumnTypeBusiness {
 	 * @param Column|null $column
 	 * @return bool
 	 */
+	#[\Override]
 	public function canBeParsed($value, ?Column $column = null): bool {
 		if (!$value) {
 			return true;

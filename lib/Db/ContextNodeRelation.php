@@ -34,6 +34,7 @@ class ContextNodeRelation extends Entity implements \JsonSerializable {
 		$this->addType('permissions', 'integer');
 	}
 
+	#[\Override]
 	public function jsonSerialize(): array {
 		return [
 			'id' => $this->getId(),

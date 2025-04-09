@@ -21,6 +21,7 @@ final class WhenTableDeletedAuditLogListener implements IEventListener {
 	) {
 	}
 
+	#[\Override]
 	public function handle(Event $event): void {
 		if (!($event instanceof TableDeletedEvent)) {
 			return;

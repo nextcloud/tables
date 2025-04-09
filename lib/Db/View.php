@@ -104,13 +104,9 @@ class View extends Entity implements JsonSerializable {
 		// a filter(group) was stored with a not-selected column - it may break impressively.
 		// filter them out now until we have a permanent fix
 		foreach ($filters as &$filterGroups) {
-			$filterGroups = array_filter($filterGroups, function (array $item) {
-				return $item['columnId'] !== null;
-			});
+			$filterGroups = array_filter($filterGroups, fn(array $item) => $item['columnId'] !== null);
 		}
-		return array_filter($filters, function (array $item) {
-			return !empty($item);
-		});
+		return array_filter($filters, fn(array $item) => !empty($item));
 	}
 
 	private function getArray(?string $json): array {
@@ -148,6 +144,7 @@ class View extends Entity implements JsonSerializable {
 	/**
 	 * @psalm-return TablesView
 	 */
+	#[\Override]
 	public function jsonSerialize(): array {
 		$serialisedJson = [
 			'id' => $this->id,

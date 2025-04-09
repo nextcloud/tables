@@ -23,6 +23,7 @@ class Permissions implements JsonSerializable {
 	/**
 	 * @return array{read: bool, create: bool, update: bool, delete: bool, manage: bool}
 	 */
+	#[\Override]
 	public function jsonSerialize(): array {
 		// manageTable is not serialized as it is used in the backend only
 		return [

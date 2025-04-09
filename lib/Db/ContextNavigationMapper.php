@@ -45,6 +45,7 @@ class ContextNavigationMapper extends QBMapper {
 
 	// we have to overwrite QBMapper`s insert() because we do not have
 	// an id column in this table. Sad.
+	#[\Override]
 	public function insert(Entity $entity): Entity {
 		// get updated fields to save, fields have to be set using a setter to
 		// be saved
@@ -70,6 +71,7 @@ class ContextNavigationMapper extends QBMapper {
 
 	// we have to overwrite QBMapper`s update() because we do not have
 	// an id column in this table. Sad.
+	#[\Override]
 	public function update(Entity $entity): ContextNavigation {
 		if (!$entity instanceof ContextNavigation) {
 			throw new \LogicException('Can only update context navigation entities');

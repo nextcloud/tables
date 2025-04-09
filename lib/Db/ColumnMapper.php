@@ -18,11 +18,9 @@ use Psr\Log\LoggerInterface;
 /** @template-extends QBMapper<Column> */
 class ColumnMapper extends QBMapper {
 	protected string $table = 'tables_columns';
-	private LoggerInterface $logger;
 
-	public function __construct(IDBConnection $db, LoggerInterface $logger) {
+	public function __construct(IDBConnection $db, private LoggerInterface $logger) {
 		parent::__construct($db, $this->table, Column::class);
-		$this->logger = $logger;
 	}
 
 	/**
