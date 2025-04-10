@@ -44,7 +44,7 @@ export default {
 			return this.column?.selectionOptions || null
 		},
 		getDefaultId() {
-			return parseInt(this.column.selectionDefault) || null
+			return !isNaN(this.column.selectionDefault) ? parseInt(this.column.selectionDefault) : null
 		},
 		getDefaultOptionObject() {
 			return this.getOptionObject(this.getDefaultId) || null
