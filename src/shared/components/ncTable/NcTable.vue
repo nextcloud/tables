@@ -41,7 +41,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 -->
 
 <template>
-	<div class="NcTable" data-cy="ncTable">
+	<div ref="table" class="NcTable" data-cy="ncTable">
 		<div class="options row" style="padding-right: calc(var(--default-grid-baseline) * 2);">
 			<Options :rows="rows" :columns="parsedColumns" :element-id="elementId" :is-view="isView"
 				:selected-rows="localSelectedRows" :show-options="parsedColumns.length !== 0"
@@ -193,6 +193,8 @@ export default {
 		return {
 			localSelectedRows: [],
 			localViewSetting: this.viewSetting ?? {},
+			viewerAppAvailable: !!window.OCA?.Viewer?.open,
+			table: null,
 		}
 	},
 	computed: {
@@ -232,6 +234,18 @@ export default {
 	},
 	mounted() {
 		subscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectRows(elementId, isView))
+
+		if (this.viewerAppAvailable) {
+			this.$refs.table.addEventListener('click', function(event) {
+				const $img = event.target.closest('.image_container.widget-file img')
+				if (!$img) {
+					return
+				}
+
+				const filePath = decodeURIComponent($img.src.match(/\/dav\/files\/(.+?)\/(.+)/)[2])
+				OCA.Viewer.open({ path: filePath, list: [{ filename: filePath }] })
+			})
+		}
 	},
 	beforeDestroy() {
 		unsubscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectRows(elementId, isView))
@@ -261,5 +275,15 @@ export default {
 	background-color: var(--color-main-background);
 	padding-top: 4px; // fix to show buttons completely
 	padding-bottom: 4px; // to make it nice with the padding-top
+}
+</style>
+
+<style lang="scss">
+.image_container.widget-file {
+	height: auto !important;
+}
+
+.image_container.widget-file img {
+	cursor: pointer !important;
 }
 </style>
