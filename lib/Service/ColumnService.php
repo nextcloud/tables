@@ -99,8 +99,8 @@ class ColumnService extends SuperService {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
-		$viewColumnIds = $view->getColumnsArray();
-		$viewColumns = $this->mapper->findAll($viewColumnIds);
+		$viewColumns = $this->mapper->findAll($view->getColumnIds());
+
 		return $this->enhanceColumns($viewColumns);
 	}
 
@@ -230,7 +230,13 @@ class ColumnService extends SuperService {
 		}
 		if (isset($view) && $view) {
 			// Add columns to view(s)
-			$this->viewService->update($view->getId(), ['columns' => json_encode(array_merge($view->getColumnsArray(), [$entity->getId()]))], $userId, true);
+			$columnsSettings = $view->getColumnsSettingsArray();
+			$nextOrder = empty($columnsSettings) ? 0 : max(array_column($columnsSettings, 'order')) + 1;
+			$columnsSettings[] = [
+				'columnId' => $entity->getId(),
+				'order' => $nextOrder
+			];
+			$this->viewService->update($view->getId(), ['column_settings' => json_encode($columnsSettings)], $userId, true);
 		}
 		foreach ($selectedViewIds as $viewId) {
 			try {
@@ -244,7 +250,13 @@ class ColumnService extends SuperService {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
-			$this->viewService->update($viewId, ['columns' => json_encode(array_merge($view->getColumnsArray(), [$entity->getId()]))], $userId, true);
+			$columnsSettings = $view->getColumnsSettingsArray();
+			$nextOrder = empty($columnsSettings) ? 0 : max(array_column($columnsSettings, 'order')) + 1;
+			$columnsSettings[] = [
+				'columnId' => $entity->getId(),
+				'order' => $nextOrder
+			];
+			$this->viewService->update($viewId, ['column_settings' => json_encode($columnsSettings)], $userId, true);
 		}
 		return $this->enhanceColumn($entity);
 	}
