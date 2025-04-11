@@ -57,6 +57,7 @@ OC.L10N.register(
     "Upload from device" : "Laadi üles seadmest",
     "Preview" : "Eelvaade",
     "Failed" : "Ebaõnnestus",
+    "Result" : "Tulemus",
     "Transfer" : "Teisalda",
     "Filter" : "Filter",
     "Sort" : "Sorteeri",
