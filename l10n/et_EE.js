@@ -34,6 +34,8 @@ OC.L10N.register(
     "Metadata" : "Metaandmed",
     "Operator" : "Operaator",
     "Delete filter" : "Kustuta filter",
+    "Ascending" : "Kasvavalt",
+    "Descending" : "Kahanevalt",
     "Views" : "Vaated",
     "View" : "Vaata",
     "Shares" : "Jagamisi",
