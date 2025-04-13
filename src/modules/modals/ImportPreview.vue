@@ -111,7 +111,6 @@ export default {
 
 	computed: {
 		...mapState(useTablesStore, ['isView']),
-		...mapState(useDataStore, ['getColumnsFromBE']),
 		existingColumnOptions() {
 			if (!this.existingColumns.length) {
 				return []
