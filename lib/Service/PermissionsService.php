@@ -432,29 +432,13 @@ class PermissionsService {
 	 */
 	public function getSharedPermissionsIfSharedWithMe(int $elementId, string $elementType, string $userId): Permissions {
 		try {
-			$shares = $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userId);
-		} catch (Exception $e) {
-			$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Permission denied.');
-			return new Permissions();
-		}
-
-		try {
 			$userGroups = $this->userHelper->getGroupsForUser($userId);
-		} catch (InternalError $e) {
+			$groupIds = array_map(function (\OCP\IGroup $group) { return $group->getGID(); }, $userGroups);
+			$shares = $this->shareMapper->findAllSharesForNodeTo($elementType, $elementId, $userId, $groupIds);
+		} catch (Exception|InternalError $e) {
 			$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Permission denied.');
 			return new Permissions();
 		}
-		$groupShares = [];
-		foreach ($userGroups as $userGroup) {
-			try {
-				$groupShares[] = $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userGroup->getGid(), 'group');
-			} catch (Exception $e) {
-				$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Permission denied.');
-				return new Permissions();
-			}
-		}
-
-		$shares = array_merge($shares, ...$groupShares);
 
 		if ($this->circleHelper->isCirclesEnabled()) {
 			$circleShares = [];
