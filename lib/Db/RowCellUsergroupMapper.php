@@ -7,8 +7,11 @@
 
 namespace OCA\Tables\Db;
 
+use OCA\Tables\Constants\UsergroupType;
+use OCA\Tables\Helper\CircleHelper;
 use OCP\IDBConnection;
 use OCP\IUserManager;
+use OCP\IUserSession;
 
 /** @template-extends RowCellMapperSuper<RowCellUsergroup, array, array> */
 class RowCellUsergroupMapper extends RowCellMapperSuper {
@@ -17,6 +20,8 @@ class RowCellUsergroupMapper extends RowCellMapperSuper {
 	public function __construct(
 		IDBConnection $db,
 		private IUserManager $userManager,
+		private CircleHelper $circleHelper,
+		protected IUserSession $userSession,
 	) {
 		parent::__construct($db, $this->table, RowCellUsergroup::class);
 	}
@@ -34,7 +39,12 @@ class RowCellUsergroupMapper extends RowCellMapperSuper {
 	}
 
 	public function formatEntity(Column $column, RowCellSuper $cell) {
-		$displayName = $cell->getValueType() === 0 ? ($this->userManager->getDisplayName($cell->getValue()) ?? $cell->getValue()) : $cell->getValue();
+		$displayName = $cell->getValue();
+		if ($cell->getValueType() === UsergroupType::USER) {
+			$displayName = $this->userManager->getDisplayName($cell->getValue()) ?? $cell->getValue();
+		} elseif ($cell->getValueType() === UsergroupType::CIRCLE) {
+			$displayName = $this->circleHelper->getCircleDisplayName($cell->getValue(), $this->userSession->getUser()->getUID() ?? '') ?? $cell->getValue();
+		}
 		return [
 			'id' => $cell->getValue(),
 			'type' => $cell->getValueType(),

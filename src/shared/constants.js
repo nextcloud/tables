@@ -33,3 +33,9 @@ export const NAV_ENTRY_MODE = {
 }
 
 export const ALLOWED_PROTOCOLS = ['http:', 'https:']
+
+export const USERGROUP_TYPE = {
+	USER: 0,
+	GROUP: 1,
+	CIRCLE: 2,
+}
