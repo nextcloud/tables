@@ -48,7 +48,7 @@ OC.L10N.register(
     "Title" : "Amats",
     "Resources" : "Resursi",
     "Cancel" : "Atcelt",
-    "Delete" : "Dzēst",
+    "Delete" : "Izdzēst",
     "Close" : "Aizvērt",
     "Please select a file." : "Lūgums atlasīt datni.",
     "Select from Files" : "Izvēlēties no Datnes",
