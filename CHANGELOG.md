@@ -5,6 +5,34 @@
 
 # Changelog
 
+## 0.9.1
+### Added
+
+* [Enhancement: Add description field for views (tables#1664)](https://github.com/nextcloud/tables/pull/1664)
+* [Enhancement: Improve viewer integration for images (tables#1624)](https://github.com/nextcloud/tables/pull/1624)
+* [Enh: Restrict text link protocols (tables#1656)](https://github.com/nextcloud/tables/pull/1656)
+* [Enh: escape CSV values (tables#1684)](https://github.com/nextcloud/tables/pull/1684)
+* [Enh: remove redundant primary key index (tables#1737)](https://github.com/nextcloud/tables/pull/1737)
+* [Analytics: get default values for number columns (tables#1717)](https://github.com/nextcloud/tables/pull/1717)
+
+### Fixed
+
+* [Fix: Export empty view array when exporting shared tables (tables#1620)](https://github.com/nextcloud/tables/pull/1620)
+* [Fix(Import): Fix DateTime subtype checks (tables#1661)](https://github.com/nextcloud/tables/pull/1661)
+* [Fix: fix creation failure when using creator filter (tables#1689)](https://github.com/nextcloud/tables/pull/1689)
+* [Fix: use proper meta column names for sorting (tables#1690)](https://github.com/nextcloud/tables/pull/1690)
+* [Fix(UI): fetch avatar correctly by user id (tables#1724)](https://github.com/nextcloud/tables/pull/1724)
+* [Fix: display ncemptycontent below search results (tables#1734)](https://github.com/nextcloud/tables/pull/1734)
+* [Fix: make it possible to use first option as default (tables#1738)](https://github.com/nextcloud/tables/pull/1738)
+* [Fix: computed property duplicates action on import (tables#1748)](https://github.com/nextcloud/tables/pull/1748)
+* [Enhancement: UI fixes for create/edit row dialogs (tables#1621)](https://github.com/nextcloud/tables/pull/1621)
+
+### Other
+* [Build: disable minor+ dep updates on old branches (tables#1659)](https://github.com/nextcloud/tables/pull/1659)
+* [Ci: add summaries for cypress and integration tests (tables#1660)](https://github.com/nextcloud/tables/pull/1660)
+* Multiple dependency updates
+
+
 ## 0.9.0
 
 ### Added
