@@ -257,7 +257,7 @@ class ViewService extends SuperService {
 				throw new PermissionError('PermissionError: can not update view with id ' . $id);
 			}
 
-			$updatableParameter = ['title', 'emoji', 'description', 'columns', 'sort', 'filter'];
+			$updatableParameter = ['title', 'emoji', 'description', 'sort', 'filter', 'columnSettings'];
 
 			foreach ($data as $key => $value) {
 				if (!in_array($key, $updatableParameter)) {
@@ -450,11 +450,10 @@ class ViewService extends SuperService {
 			if ($rawSortArray) {
 				$view->setSortArray(
 					array_map(static function (array $sortRule) use ($view): array {
-						$columnsArray = $view->getColumnsArray();
 						if (isset($sortRule['columnId'])
 							&& (
 								Column::isValidMetaTypeId($sortRule['columnId'])
-								|| in_array($sortRule['columnId'], $columnsArray, true)
+								|| in_array($sortRule['columnId'], $view->getColumnIds())
 							)
 						) {
 							return $sortRule;
@@ -508,7 +507,6 @@ class ViewService extends SuperService {
 			$filteredSortingRules = array_values($filteredSortingRules);
 
 			$filteredFilters = array_filter(
-
 				array_map(
 					function (array $filterGroup) use ($columnId) {
 						return array_filter(
@@ -520,15 +518,19 @@ class ViewService extends SuperService {
 					},
 					$view->getFilterArray()
 				),
-
 				fn ($filterGroup) => !empty($filterGroup)
-
 			);
 
+			$columnSettings = $view->getColumnsSettingsArray();
+			$columnSettings = array_filter($columnSettings, function (array $setting) use ($columnId) {
+				return $setting['columnId'] !== $columnId;
+			});
+			$columnSettings = array_values($columnSettings);
+
 			$data = [
-				'columns' => json_encode(array_values(array_diff($view->getColumnsArray(), [$columnId]))),
 				'sort' => json_encode($filteredSortingRules),
 				'filter' => json_encode($filteredFilters),
+				'column_settings' => json_encode($columnSettings),
 			];
 
 			$this->update($view->getId(), $data);

@@ -581,7 +581,7 @@
                     "lastEditBy",
                     "lastEditAt",
                     "description",
-                    "columns",
+                    "columnSettings",
                     "sort",
                     "filter",
                     "isShared",
@@ -629,11 +629,21 @@
                         "type": "string",
                         "nullable": true
                     },
-                    "columns": {
+                    "columnSettings": {
                         "type": "array",
                         "items": {
-                            "type": "integer",
-                            "format": "int64"
+                            "type": "object",
+                            "properties": {
+                                "columnId": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "order": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                }
+                            },
+                            "required": ["columnId"]
                         }
                     },
                     "sort": {
@@ -1624,14 +1634,24 @@
                                                     "key": {
                                                         "type": "string",
                                                         "enum": [
-                                                            "columns"
+                                                            "columnSettings"
                                                         ]
                                                     },
                                                     "value": {
                                                         "type": "array",
                                                         "items": {
-                                                            "type": "integer",
-                                                            "format": "int64"
+                                                            "type": "object",
+                                                            "required": ["columnId"],
+                                                            "properties": {
+                                                                "columnId": {
+                                                                    "type": "integer",
+                                                                    "format": "int64"
+                                                                },
+                                                                "order": {
+                                                                    "type": "integer",
+                                                                    "format": "int64"
+                                                                }
+                                                            }
                                                         }
                                                     }
                                                 }
