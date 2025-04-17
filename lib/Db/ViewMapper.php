@@ -9,8 +9,10 @@ namespace OCA\Tables\Db;
 
 use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
+use OCP\Cache\CappedMemoryCache;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
@@ -22,6 +24,7 @@ class ViewMapper extends QBMapper {
 	public function __construct(
 		IDBConnection $db,
 		private UserHelper $userHelper,
+		protected CappedMemoryCache $cache,
 	) {
 		parent::__construct($db, $this->table, View::class);
 	}
@@ -32,12 +35,28 @@ class ViewMapper extends QBMapper {
 	 * @throws MultipleObjectsReturnedException
 	 */
 	public function find(int $id): View {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('v.*', 't.ownership')
-			->from($this->table, 'v')
-			->innerJoin('v', 'tables_tables', 't', 't.id = v.table_id')
-			->where($qb->expr()->eq('v.id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
-		return $this->findEntity($qb);
+		$cacheKey = (string)$id;
+		if (!isset($this->cache[$cacheKey])) {
+			$qb = $this->db->getQueryBuilder();
+			$qb->select('v.*', 't.ownership')
+				->from($this->table, 'v')
+				->innerJoin('v', 'tables_tables', 't', 't.id = v.table_id')
+				->where($qb->expr()->eq('v.id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
+			$entity = $this->findEntity($qb);
+			$this->cache[$cacheKey] = $entity;
+		}
+		return $this->cache[$cacheKey];
+	}
+
+	public function delete(Entity $entity): View {
+		unset($this->cache[(string)$entity->getId()]);
+		return parent::delete($entity);
+	}
+
+	public function insert(Entity $entity): View {
+		$entity = parent::insert($entity);
+		$this->cache[(string)$entity->getId()] = $entity;
+		return $entity;
 	}
 
 	/**

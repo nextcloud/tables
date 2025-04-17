@@ -478,28 +478,61 @@ class PermissionsService {
 			$shares = array_merge($shares, ...$circleShares);
 		}
 
+		$table = null;
+		if ($elementType === 'view') {
+			// We need to take possibly inherited permissions into account
+			$view = $this->viewMapper->find($elementId);
+			$table = $this->tableMapper->find($view->getTableId());
+		}
+
 		if (count($shares) > 0) {
-			$read = array_reduce($shares, function ($carry, $share) {
-				return $carry || ($share->getPermissionRead());
-			}, false);
-			$create = array_reduce($shares, function ($carry, $share) {
-				return $carry || ($share->getPermissionCreate());
-			}, false);
-			$update = array_reduce($shares, function ($carry, $share) {
-				return $carry || ($share->getPermissionUpdate());
-			}, false);
-			$delete = array_reduce($shares, function ($carry, $share) {
-				return $carry || ($share->getPermissionDelete());
-			}, false);
-			$manage = array_reduce($shares, function ($carry, $share) {
-				return $carry || ($share->getPermissionManage());
-			}, false);
+			// manage permission trumps everything, otherwise permissions have to
+			// be fetched specifically.
+
+			$manage = (
+				array_reduce($shares, static function (bool $carry, Share $share): bool {
+					return $carry || ($share->getPermissionManage());
+				}, false)
+				|| ($table && $this->canManageTable($table, $userId))
+			);
+
+			$create = (
+				$manage
+				|| array_reduce($shares, static function (bool $carry, Share $share): bool {
+					return $carry || ($share->getPermissionCreate());
+				}, false)
+				|| ($table && $this->canCreateRows($table, 'table', $userId))
+			);
+
+			$update = (
+				$manage
+				|| array_reduce($shares, static function (bool $carry, Share $share): bool {
+					return $carry || ($share->getPermissionUpdate());
+				}, false)
+				|| ($table && $this->canUpdateTable($table, $userId))
+			);
+
+			$delete = (
+				$manage
+				|| array_reduce($shares, static function (bool $carry, Share $share): bool {
+					return $carry || ($share->getPermissionDelete());
+				}, false)
+				|| ($table && $this->canDeleteRowsByTableId($table->getId(), $userId))
+			);
+
+			$read = (
+				$manage || $create || $update || $delete
+				|| array_reduce($shares, static function (bool $carry, Share $share): bool {
+					return $carry || ($share->getPermissionRead());
+				}, false)
+				|| ($table && $this->canReadTable($table, $userId))
+			);
 
 			return new Permissions(
-				read: $read || $update || $delete || $manage,
-				create: $create || $manage,
-				update: $update || $manage,
-				delete: $delete || $manage,
+				read: $read,
+				create: $create,
+				update: $update,
+				delete: $delete,
 				manage: $manage,
 			);
 		}
