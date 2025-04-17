@@ -315,6 +315,7 @@ OC.L10N.register(
     "_{nb} row_::_{nb} rows_" : ["{nb} række","{nb} rækker"],
     "Content" : "Indhold",
     "Select" : "Vælg",
+    "Insert" : "Indsæt",
     "Could not create share." : "Deling kunne ikke oprettes.",
     "Could not remove share." : "Deling kunne ikke fjernes.",
     "Could not update share." : "Kunne ikke opdatere deling.",

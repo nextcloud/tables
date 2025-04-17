@@ -384,6 +384,7 @@ OC.L10N.register(
     "Demote to normal share" : "Понизити до нормального спільного ресурсу",
     "Open main table to adjust table management permissions" : "Відкрити головну таблицю для налаштування дозволів на керування",
     "No shares" : "Відсутні спільні дані",
+    "Confirm table manager promotion" : "Підтвердити надання додаткових прав для таблиці",
     "No view in context" : "Відсутні подання в контексті",
     "From {ownerName}" : "Від {ownerName}",
     "Created at" : "Коли створено",
