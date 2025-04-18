@@ -6,7 +6,7 @@
 	<!-- eslint-disable-next-line vue/no-v-html -->
 	<div v-if="value" class="table-cell-usergroup">
 		<div v-for="item in value" :key="item.id" class="inline usergroup-entry">
-			<NcUserBubble :user="item.id" :avatar-image="item.type === 1 ? 'icon-group' : ''" :is-no-user="item.type !== 0" :display-name="item.displayName ?? item.id" :show-user-status="isUser(item) && column.showUserStatus" :size="column.showUserStatus ? 34 : 20" :primary="isCurrentUser(item)" />
+			<NcUserBubble :user="item.id" :avatar-image="getAvatarImage(item)" :is-no-user="!isUser(item)" :display-name="item.displayName ?? item.id" :show-user-status="isUser(item) && column.showUserStatus" :size="column.showUserStatus ? 34 : 20" :primary="isCurrentUser(item)" />
 		</div>
 	</div>
 </template>
@@ -14,6 +14,7 @@
 <script>
 import { getCurrentUser } from '@nextcloud/auth'
 import { NcUserBubble } from '@nextcloud/vue'
+import { USERGROUP_TYPE } from '../../../constants.js'
 
 const currentUser = getCurrentUser()
 
@@ -41,7 +42,18 @@ export default {
 			return (item) => this.isUser(item) && item.id === currentUser?.uid
 		},
 		isUser() {
-			return (item) => item.type === 0
+			return (item) => item.type === USERGROUP_TYPE.USER
+		},
+	},
+	methods: {
+		getAvatarImage(item) {
+			if (item.type === USERGROUP_TYPE.GROUP) {
+				return 'icon-group'
+			}
+			if (item.type === USERGROUP_TYPE.CIRCLE) {
+				return 'icon-circles'
+			}
+			return ''
 		},
 	},
 }
