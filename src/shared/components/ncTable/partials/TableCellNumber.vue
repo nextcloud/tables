@@ -20,7 +20,7 @@
 				@blur="saveChanges"
 				@keyup.enter="saveChanges"
 				@keyup.esc="cancelEdit">
-			<div v-if="localLoading" class="icon-loading" />
+			<div v-if="localLoading" class="icon-loading-inline" />
 		</div>
 	</div>
 </template>
@@ -144,25 +144,5 @@ export default {
 .cell-number {
     width: 100%;
     text-align: right;
-}
-
-.editing-container {
-    position: relative;
-    width: 100%;
-}
-
-.cell-input {
-    width: 100%;
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
-    padding: 4px 8px;
-    text-align: right;
-}
-
-.icon-loading {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
 }
 </style>

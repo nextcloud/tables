@@ -525,6 +525,26 @@ export default {
 			}
 		}
 
+		// inline editing
+		.editing-container {
+			position: relative;
+			width: 100%;
+
+			.cell-input {
+				width: 100%;
+				height: 100%;
+				border-radius: 0;
+				padding: 4px 8px;
+			}
+		}
+
+		.icon-loading-inline {
+			position: absolute;
+			right: 8px;
+			top: 50%;
+			transform: translateY(-50%);
+		}
+
 		tr:focus-within > td:last-child {
 			opacity: 1;
 		}
