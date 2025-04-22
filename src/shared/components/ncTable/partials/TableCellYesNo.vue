@@ -8,7 +8,7 @@
 			<RadioboxBlankIcon v-if="value !== null && value === 'false'" />
 			<CheckCircleOutline v-if="value !== null && value === 'true'" />
 		</div>
-		<div v-else class="icon-loading" />
+		<div v-else class="icon-loading-inline" />
 	</div>
 </template>
 
@@ -95,10 +95,5 @@ export default {
     justify-content: center;
     width: 100%;
     height: 100%;
-}
-
-.icon-loading {
-    width: 24px;
-    height: 24px;
 }
 </style>
