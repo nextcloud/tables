@@ -536,8 +536,6 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	private function parseEntities(IResult $result, array $sleeves, array $columnTypes): array {
-		$data = $result->fetchAll();
-
 		$rows = [];
 		foreach ($sleeves as $sleeve) {
 			$rows[$sleeve->getId()] = new Row2();
@@ -552,8 +550,9 @@ class Row2Mapper {
 		$rowValues = [];
 		$keyToColumnId = [];
 		$keyToRowId = [];
+		$cellMapperCache = [];
 
-		foreach ($data as $rowData) {
+		while ($rowData = $result->fetch()) {
 			if (!isset($rowData['row_id']) || !isset($rows[$rowData['row_id']])) {
 				break;
 			}
@@ -561,11 +560,12 @@ class Row2Mapper {
 			$columnType = $this->columns[$rowData['column_id']]->getType();
 			$cellClassName = 'OCA\Tables\Db\RowCell' . ucfirst($columnType);
 			$entity = call_user_func($cellClassName . '::fromRowData', $rowData); // >5.2.3
-			$cellMapper = $this->getCellMapperFromType($columnType);
-			$value = $cellMapper->formatEntity($this->columns[$rowData['column_id']], $entity);
+			if (!isset($cellMapperCache[$columnType])) {
+				$cellMapperCache[$columnType] = $this->getCellMapperFromType($columnType);
+			}
+			$value = $cellMapperCache[$columnType]->formatEntity($this->columns[$rowData['column_id']], $entity);
 			$compositeKey = (string)$rowData['row_id'] . ',' . (string)$rowData['column_id'];
-
-			if ($cellMapper->hasMultipleValues()) {
+			if ($cellMapperCache[$columnType]->hasMultipleValues()) {
 				if (array_key_exists($compositeKey, $rowValues)) {
 					$rowValues[$compositeKey][] = $value;
 				} else {
@@ -582,12 +582,7 @@ class Row2Mapper {
 			$rows[$keyToRowId[$compositeKey]]->addCell($keyToColumnId[$compositeKey], $value);
 		}
 
-		// format an array without keys
-		$return = [];
-		foreach ($rows as $row) {
-			$return[] = $row;
-		}
-		return $return;
+		return array_values($rows);
 	}
 
 	/**
