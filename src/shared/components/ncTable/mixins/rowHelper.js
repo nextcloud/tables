@@ -39,7 +39,10 @@ export default {
 		},
 
 		isValidUrlProtocol(value) {
-			value = JSON.parse(value ?? '{}')
+			if (!value) {
+				return true
+			}
+			value = JSON.parse(value)
 			try {
 				const parsedUrl = new URL(value?.value)
 				return ALLOWED_PROTOCOLS.includes(parsedUrl.protocol)
