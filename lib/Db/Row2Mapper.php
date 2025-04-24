@@ -748,7 +748,7 @@ class Row2Mapper {
 				$this->atomic(function () use ($cellMapper, $rowId, $columnId, $value) {
 					// For a usergroup field with mutiple values, each is inserted as a new cell
 					// we need to delete all previous cells for this row and column, otherwise we get duplicates
-					$cellMapper->deleteAllForRowAndColumn($rowId, $columnId);
+					$cellMapper->deleteAllForColumnAndRow($columnId, $rowId);
 					$this->insertCell($rowId, $columnId, $value);
 				}, $this->db);
 			} else {
