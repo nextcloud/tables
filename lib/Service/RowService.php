@@ -14,6 +14,7 @@ use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -210,7 +211,7 @@ class RowService extends SuperService {
 		}
 
 		$data = $data instanceof RowDataInput ? $data : RowDataInput::fromArray($data);
-		$data = $this->cleanupData($data, $columns, $tableId, $viewId);
+		$data = $this->cleanupAndValidateData($data, $columns, $tableId, $viewId);
 		$data = $this->enhanceWithViewDefaults($view, $data);
 
 		$tableId = $tableId ?? $view->getTableId();
@@ -283,10 +284,21 @@ class RowService extends SuperService {
 	/**
 	 * @throws InternalError
 	 */
-	private function cleanupData(RowDataInput $data, array $columns, ?int $tableId, ?int $viewId): RowDataInput {
+	private function cleanupAndValidateData(RowDataInput $data, array $columns, ?int $tableId, ?int $viewId, ?int $rowId = null): RowDataInput {
 		$out = new RowDataInput();
+		$tableColumns = $this->columnMapper->findAllByTable($tableId);
 		foreach ($data as $entry) {
 			$column = $this->getColumnFromColumnsArray((int)$entry['columnId'], $columns);
+
+			if ($column && $column->getType() === Column::TYPE_TEXT
+				&& $column->getSubtype() ===  Column::SUBTYPE_TEXT_LINE
+				&& $column->getTextUnique()) {
+				$filter = [[['columnId' => $column->getId(), 'operator' => 'is-equal', 'value' => $entry['value']]]];
+				$alreadyExistentRows = $this->row2Mapper->findAll($tableColumns, $columns, $tableId, filter: $filter, userId: $this->userId);
+				if ($alreadyExistentRows && $alreadyExistentRows[0]->getId() !== $rowId) {
+					throw new BadRequestError('Column with id ' . $entry['columnId'] . ' is not unique.');
+				}
+			}
 
 			// check if it is allowed to insert a value for the requested column
 			if (!$column && $viewId) {
@@ -304,6 +316,7 @@ class RowService extends SuperService {
 			// parse given value to respect the column type value format
 			$out->add((int)$entry['columnId'], $this->parseValueByColumnType($column, $entry['value']));
 		}
+
 		return $out;
 	}
 
@@ -462,7 +475,7 @@ class RowService extends SuperService {
 
 		$previousData = $item->getData();
 		$data = RowDataInput::fromArray($data);
-		$data = $this->cleanupData($data, $columns, $item->getTableId(), $viewId);
+		$data = $this->cleanupAndValidateData($data, $columns, $item->getTableId(), $viewId, $id);
 
 		foreach ($data as $entry) {
 			// Check whether the column of which the value should change is part of the table / view

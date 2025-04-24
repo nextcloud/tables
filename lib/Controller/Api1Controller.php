@@ -772,6 +772,7 @@ class Api1Controller extends ApiController {
 	 * @param string|null $textDefault Default text, if column is a text
 	 * @param string|null $textAllowedPattern Allowed pattern (regex) for text columns (not yet implemented)
 	 * @param int|null $textMaxLength Max length, if column is a text
+	 * @param bool|null $textUnique Whether the text value must be unique, if column is a text
 	 * @param string|null $selectionOptions Options for a selection (json array{id: int, label: string})
 	 * @param string|null $selectionDefault Default option IDs for a selection (json int[])
 	 * @param string|null $datetimeDefault Default value, if column is datetime
@@ -810,6 +811,7 @@ class Api1Controller extends ApiController {
 		?string $textDefault,
 		?string $textAllowedPattern,
 		?int $textMaxLength,
+		?bool $textUnique = false,
 
 		?string $selectionOptions = '',
 		?string $selectionDefault = '',
@@ -839,6 +841,7 @@ class Api1Controller extends ApiController {
 					textDefault: $textDefault,
 					textAllowedPattern: $textAllowedPattern,
 					textMaxLength: $textMaxLength,
+					textUnique: $textUnique,
 					numberDefault: $numberDefault,
 					numberMin: $numberMin,
 					numberMax: $numberMax,
@@ -889,6 +892,7 @@ class Api1Controller extends ApiController {
 	 * @param string|null $textDefault Default text, if column is a text
 	 * @param string|null $textAllowedPattern Allowed pattern (regex) for text columns (not yet implemented)
 	 * @param int|null $textMaxLength Max length, if column is a text
+	 * @param bool|null $textUnique Whether the text value must be unique, if column is a text
 	 * @param string|null $selectionOptions Options for a selection (json array{id: int, label: string})
 	 * @param string|null $selectionDefault Default option IDs for a selection (json int[])
 	 * @param string|null $datetimeDefault Default value, if column is datetime
@@ -923,6 +927,7 @@ class Api1Controller extends ApiController {
 		?string $textDefault,
 		?string $textAllowedPattern,
 		?int $textMaxLength,
+		?bool $textUnique,
 
 		?string $selectionOptions,
 		?string $selectionDefault,
@@ -950,6 +955,7 @@ class Api1Controller extends ApiController {
 					textDefault: $textDefault,
 					textAllowedPattern: $textAllowedPattern,
 					textMaxLength: $textMaxLength,
+					textUnique: $textUnique,
 					numberDefault: $numberDefault,
 					numberMin: $numberMin,
 					numberMax: $numberMax,
@@ -1497,6 +1503,7 @@ class Api1Controller extends ApiController {
 	 * @param string|null $textDefault Default text, if column is a text
 	 * @param string|null $textAllowedPattern Allowed pattern (regex) for text columns (not yet implemented)
 	 * @param int|null $textMaxLength Max length, if column is a text
+	 * @param bool|null $textUnique Whether the text value must be unique, if column is a text
 	 * @param string|null $selectionOptions Options for a selection (json array{id: int, label: string})
 	 * @param string|null $selectionDefault Default option IDs for a selection (json int[])
 	 * @param string|null $datetimeDefault Default value, if column is datetime
@@ -1536,6 +1543,7 @@ class Api1Controller extends ApiController {
 		?string $textDefault,
 		?string $textAllowedPattern,
 		?int $textMaxLength,
+		?bool $textUnique,
 
 		?string $selectionOptions = '',
 		?string $selectionDefault = '',
@@ -1564,6 +1572,7 @@ class Api1Controller extends ApiController {
 					textDefault: $textDefault,
 					textAllowedPattern: $textAllowedPattern,
 					textMaxLength: $textMaxLength,
+					textUnique: $textUnique,
 					numberDefault: $numberDefault,
 					numberMin: $numberMin,
 					numberMax: $numberMax,
