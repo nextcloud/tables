@@ -25,7 +25,7 @@ describe('Test context navigation', () => {
         contextTitle = contextTitlePrefix + ' ' + testNumber
         cy.login(localUser)
         cy.visit('apps/tables')
-        cy.wait(1000)
+        cy.get('[aria-label="Create new table"]').should('be.visible')
     })
 
     it('Create context that is hidden in nav by default', () => {
@@ -48,7 +48,7 @@ describe('Test context navigation', () => {
         cy.get(`#header .app-menu-entry [title="${contextTitle}"]`).should('exist')
 
         cy.loadContext(contextTitle)
-        cy.wait(1000)
+        cy.get('[data-cy="context-title"]').should('be.visible')
         cy.openContextEditModal(contextTitle)
         cy.get('[data-cy="contextResourceShare"] input').clear().type(nonLocalUser.userId)
         cy.get(`.vs__dropdown-menu [id="${nonLocalUser.userId}"]`).click()
