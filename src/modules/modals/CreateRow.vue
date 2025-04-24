@@ -115,8 +115,12 @@ export default {
 		},
 		async actionConfirm() {
 			this.localLoading = true
-			await this.sendNewRowToBE()
+			const success = await this.sendNewRowToBE()
 			this.localLoading = false
+			// If the row was not created, we don't want to close the modal
+			if (!success) {
+				return
+			}
 			if (!this.addNewAfterSave) {
 				this.actionCancel()
 			} else {
@@ -135,7 +139,7 @@ export default {
 				for (const [key, value] of Object.entries(this.row)) {
 					data[key] = value
 				}
-				await this.insertNewRow({
+				return await this.insertNewRow({
 					viewId: this.isView ? this.elementId : null,
 					tableId: !this.isView ? this.elementId : null,
 					data,
@@ -143,6 +147,7 @@ export default {
 			} catch (e) {
 				console.error(e)
 				showError(t('tables', 'Could not create new row'))
+				return false
 			}
 		},
 		reset() {
