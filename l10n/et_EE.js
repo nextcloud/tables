@@ -93,6 +93,7 @@ OC.L10N.register(
     "Delete option" : "Kustuta valik",
     "URL" : "URL",
     "Copy link" : "Kopeeri link",
+    "Close editor" : "Sulge muutmisvaade",
     "Confirm" : "Kinnita",
     "Content" : "Sisu",
     "Select" : "Vali",
