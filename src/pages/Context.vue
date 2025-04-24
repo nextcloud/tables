@@ -8,7 +8,7 @@
 		<div v-if="!loading && context">
 			<div class="content context">
 				<div class="row first-row">
-					<h1 class="context__title">
+					<h1 class="context__title" data-cy="context-title">
 						<NcIconSvgWrapper :svg="icon" :size="32" style="display: inline-block;" />&nbsp; {{
 							activeContext.name }}
 					</h1>
