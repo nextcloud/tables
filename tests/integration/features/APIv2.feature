@@ -1440,3 +1440,39 @@ Feature: APIv2
       | weight    | 92                                                                        |
       | code      | wil02                                                                     |
     Then "view" "v1" has exactly these rows "r1,r3,r2" in exactly this order
+
+    @api2 @rows
+    Scenario: Try to create row with with non-unique values should fail
+      Given table "Table with unique column" with emoji "👨🏻‍💻" exists for user "participant1-v2" as "base1" via v2
+      And column "one" exists with following properties
+        | type          | text                   |
+        | subtype       | line                   |
+        | mandatory     | 1                      |
+        | description   | This is a description! |
+        | textUnique    | true                   |
+      When user "participant1-v2" tries to create a row using v2 with following values
+        | one           | AHA                     |
+      Then the reported status is 200
+      When user "participant1-v2" tries to create a row using v2 with following values
+        | one           | AHA                     |
+      Then the reported status is 400
+
+    @api2 @rows
+    Scenario: Try to edit row with with non-unique values should fail
+      Given table "Table with unique column" with emoji "👨🏻‍💻" exists for user "participant1-v2" as "base1" via v2
+      And column "one" exists with following properties
+        | type          | text                   |
+        | subtype       | line                   |
+        | mandatory     | 1                      |
+        | description   | This is a description! |
+        | textUnique    | true                   |
+      And using table "base1"
+      When user "participant1-v2" creates row "row-1" with following values:
+        | one | AHA |
+      Then the reported status is 200
+      When user "participant1-v2" creates row "row-2" with following values:
+        | one | YES |
+      Then the reported status is 200
+      When user "participant1-v2" updates row "row-1" with following values:
+        | one | YES |
+      Then the reported status is "400"

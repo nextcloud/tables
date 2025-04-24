@@ -314,6 +314,7 @@ class ColumnService extends SuperService {
 			$item->setTextDefault($columnDto->getTextDefault());
 			$item->setTextAllowedPattern($columnDto->getTextAllowedPattern());
 			$item->setTextMaxLength($columnDto->getTextMaxLength());
+			$item->setTextUnique($columnDto->getTextUnique());
 			$item->setNumberDefault($columnDto->getNumberDefault());
 			$item->setNumberMin($columnDto->getNumberMin());
 			$item->setNumberMax($columnDto->getNumberMax());

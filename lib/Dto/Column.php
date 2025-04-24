@@ -17,6 +17,7 @@ class Column {
 		private ?string $textDefault = null,
 		private ?string $textAllowedPattern = null,
 		private ?int $textMaxLength = null,
+		private ?bool $textUnique = null,
 		private ?float $numberDefault = null,
 		private ?float $numberMin = null,
 		private ?float $numberMax = null,
@@ -37,29 +38,30 @@ class Column {
 
 	public static function createFromArray(array $data): self {
 		return new self(
-			$data['title'] ?? null,
-			$data['type'] ?? null,
-			$data['subtype'] ?? null,
-			$data['mandatory'] ?? null,
-			$data['description'] ?? null,
-			$data['textDefault'] ?? null,
-			$data['textAllowedPattern'] ?? null,
-			$data['textMaxLength'] ?? null,
-			$data['numberDefault'] ?? null,
-			$data['numberMin'] ?? null,
-			$data['numberMax'] ?? null,
-			$data['numberDecimals'] ?? null,
-			$data['numberPrefix'] ?? null,
-			$data['numberSuffix'] ?? null,
-			$data['selectionOptions'] ?? null,
-			$data['selectionDefault'] ?? null,
-			$data['datetimeDefault'] ?? null,
-			$data['usergroupDefault'] ?? null,
-			$data['usergroupMultipleItems'] ?? null,
-			$data['usergroupSelectUsers'] ?? null,
-			$data['usergroupSelectGroups'] ?? null,
-			$data['usergroupSelectTeams'] ?? null,
-			$data['showUserStatus'] ?? null,
+			title: $data['title'] ?? null,
+			type: $data['type'] ?? null,
+			subtype: $data['subtype'] ?? null,
+			mandatory: $data['mandatory'] ?? null,
+			description: $data['description'] ?? null,
+			textDefault: $data['textDefault'] ?? null,
+			textAllowedPattern: $data['textAllowedPattern'] ?? null,
+			textMaxLength: $data['textMaxLength'] ?? null,
+			textUnique: $data['textUnique'] ?? null,
+			numberDefault: $data['numberDefault'] ?? null,
+			numberMin: $data['numberMin'] ?? null,
+			numberMax: $data['numberMax'] ?? null,
+			numberDecimals: $data['numberDecimals'] ?? null,
+			numberPrefix: $data['numberPrefix'] ?? null,
+			numberSuffix: $data['numberSuffix'] ?? null,
+			selectionOptions: $data['selectionOptions'] ?? null,
+			selectionDefault: $data['selectionDefault'] ?? null,
+			datetimeDefault: $data['datetimeDefault'] ?? null,
+			usergroupDefault: $data['usergroupDefault'] ?? null,
+			usergroupMultipleItems: $data['usergroupMultipleItems'] ?? null,
+			usergroupSelectUsers: $data['usergroupSelectUsers'] ?? null,
+			usergroupSelectGroups: $data['usergroupSelectGroups'] ?? null,
+			usergroupSelectTeams: $data['usergroupSelectTeams'] ?? null,
+			showUserStatus: $data['showUserStatus'] ?? null,
 		);
 	}
 
@@ -93,6 +95,10 @@ class Column {
 
 	public function getTextMaxLength(): ?int {
 		return $this->textMaxLength;
+	}
+
+	public function getTextUnique(): ?bool {
+		return $this->textUnique;
 	}
 
 	public function getNumberDefault(): ?float {

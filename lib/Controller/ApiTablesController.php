@@ -153,6 +153,7 @@ class ApiTablesController extends AOCSController {
 						textDefault: $column['textDefault'],
 						textAllowedPattern: $column['textAllowedPattern'],
 						textMaxLength: $column['textMaxLength'],
+						textUnique: $column['textUnique'],
 						numberDefault: $column['numberDefault'],
 						numberMin: $column['numberMin'],
 						numberMax: $column['numberMax'],
