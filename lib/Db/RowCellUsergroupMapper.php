@@ -43,7 +43,7 @@ class RowCellUsergroupMapper extends RowCellMapperSuper {
 		if ($cell->getValueType() === UsergroupType::USER) {
 			$displayName = $this->userManager->getDisplayName($cell->getValue()) ?? $cell->getValue();
 		} elseif ($cell->getValueType() === UsergroupType::CIRCLE) {
-			$displayName = $this->circleHelper->getCircleDisplayName($cell->getValue(), $this->userSession->getUser()->getUID() ?? '') ?? $cell->getValue();
+			$displayName = $this->circleHelper->getCircleDisplayName($cell->getValue(), ($this->userSession->getUser()?->getUID() ?? '')) ?? $cell->getValue();
 		}
 		return [
 			'id' => $cell->getValue(),
