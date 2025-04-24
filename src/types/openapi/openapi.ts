@@ -775,6 +775,7 @@ export type components = {
             readonly textAllowedPattern: string;
             /** Format: int64 */
             readonly textMaxLength: number;
+            readonly textUnique: boolean;
             readonly selectionOptions: string;
             readonly selectionDefault: string;
             readonly datetimeDefault: string;
@@ -2188,6 +2189,8 @@ export interface operations {
                      * @description Max length, if column is a text
                      */
                     readonly textMaxLength?: number | null;
+                    /** @description Whether the text value must be unique, if column is a text */
+                    readonly textUnique?: boolean | null;
                     /**
                      * @description Options for a selection (json array{id: int, label: string})
                      * @default
@@ -2392,6 +2395,11 @@ export interface operations {
                      */
                     readonly textMaxLength?: number | null;
                     /**
+                     * @description Whether the text value must be unique, if column is a text
+                     * @default false
+                     */
+                    readonly textUnique?: boolean | null;
+                    /**
                      * @description Options for a selection (json array{id: int, label: string})
                      * @default
                      */
@@ -2582,6 +2590,8 @@ export interface operations {
                      * @description Max length, if column is a text
                      */
                     readonly textMaxLength?: number | null;
+                    /** @description Whether the text value must be unique, if column is a text */
+                    readonly textUnique?: boolean | null;
                     /** @description Options for a selection (json array{id: int, label: string}) */
                     readonly selectionOptions?: string | null;
                     /** @description Default option IDs for a selection (json int[]) */
@@ -4271,6 +4281,11 @@ export interface operations {
                      * @description Max raw text length
                      */
                     readonly textMaxLength?: number | null;
+                    /**
+                     * @description Whether the text value must be unique, if column is a text
+                     * @default false
+                     */
+                    readonly textUnique?: boolean | null;
                     /**
                      * @description Subtype for the new column
                      * @enum {string|null}
