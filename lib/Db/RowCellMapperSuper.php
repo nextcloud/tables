@@ -75,6 +75,22 @@ class RowCellMapperSuper extends QBMapper {
 	/**
 	 * @throws Exception
 	 */
+	public function deleteAllForRowAndColumn(int $rowId, int $columnId): void {
+		$qb = $this->db->getQueryBuilder();
+		$qb->delete($this->tableName)
+			->where(
+				$qb->expr()->eq('row_id', $qb->createNamedParameter($rowId, IQueryBuilder::PARAM_INT))
+			)
+			->andWhere(
+				$qb->expr()->eq('column_id', $qb->createNamedParameter($columnId, IQueryBuilder::PARAM_INT))
+			);
+		$qb->executeStatement();
+	}
+
+
+	/**
+	 * @throws Exception
+	 */
 	public function deleteAllForColumn(int $columnId): void {
 		$qb = $this->db->getQueryBuilder();
 		$qb->delete($this->tableName)
