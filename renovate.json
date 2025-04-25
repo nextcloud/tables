@@ -17,8 +17,7 @@
 	"rebaseWhen": "conflicted",
 	"ignoreUnstable": false,
 	"baseBranches": [
-		"main",
-		"stable0.8"
+		"main"
 	],
 	"enabledManagers": [
 		"npm",
