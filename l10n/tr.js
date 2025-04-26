@@ -513,6 +513,7 @@ OC.L10N.register(
     "Insert" : "Ekle",
     "Could not load search results." : "Arama sonuçları yüklenemedi.",
     "Search for table and views..." : "Tablo ve görünümlerde arama...",
+    "Invalid protocol. Allowed: {allowed}" : "İletişim kuralı geçersiz. İzin verilen: {allowed}",
     "Import into Tables" : "Tablolar içine aktar",
     "Could not create share." : "Paylaşım oluşturulamadı.",
     "Could not remove share." : "Paylaşım kaldırılamadı.",
