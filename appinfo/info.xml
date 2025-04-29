@@ -19,13 +19,14 @@ You can choose from the following column types:
 - Yes/No tick
 - Date and/or time
 - (Multi) selection
+- Users, groups and teams
 
 Share your tables and views with users and groups within your cloud.
 
 Have a good time and manage whatever you want.
 
 ]]></description>
-	<version>0.9.1</version>
+	<version>0.9.2</version>
 	<licence>agpl</licence>
 	<author mail="florian.steffens@nextcloud.com">Florian Steffens</author>
 	<namespace>Tables</namespace>

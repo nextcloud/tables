@@ -5,7 +5,25 @@
 
 # Changelog
 
+## 0.9.2
+
+### Fixed
+
+* [Fix: Properly update usergroup cells (tables#1750)](https://github.com/nextcloud/tables/pull/1750)
+* [Fix: Allow searching for own user when selecting them (tables#1756)](https://github.com/nextcloud/tables/pull/1756)
+* [Refactor: optimized parseEntities for better efficiency (tables#1764)](https://github.com/nextcloud/tables/pull/1764)
+* [Fix: avoid marking empty link fields as invalid protocol (tables#1765)](https://github.com/nextcloud/tables/pull/1765)
+* [Reverse column and row order when deleting (tables#1767)](https://github.com/nextcloud/tables/pull/1767)
+
+## Other
+
+* [Tests(Cypress): add tests for Application navigation display (tables#1553)](https://github.com/nextcloud/tables/pull/1553)
+* [Fix(deps): update dependency @nextcloud/vue to ^8.25.1 (main) (tables#1760)](https://github.com/nextcloud/tables/pull/1760)
+* [[main] Fix npm audit (tables#1762)](https://github.com/nextcloud/tables/pull/1762)
+
+
 ## 0.9.1
+
 ### Added
 
 * [Enhancement: Add description field for views (tables#1664)](https://github.com/nextcloud/tables/pull/1664)
