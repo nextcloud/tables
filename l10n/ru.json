@@ -97,7 +97,6 @@
     "Read the docs" : "Прочитать документацию",
     "Tables" : "Таблицы",
     "Manage data the way you need it." : "Управляйте своими данными удобно.",
-    "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link to urls or other nextcloud resources\n- Numbers\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n\nShare your tables and views with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Управляйте данными так, как вам нужно.\n\nС помощью этого приложения вы можете создавать собственные таблицы с отдельными столбцами. Вы можете начать с шаблона или с нуля и добавлять нужные столбцы.\n\nВы можете выбрать один из следующих типов столбцов:\n- Текстовая строка или форматированный текст\n- Ссылка на URL-адреса или другие ресурсы nextcloud\n- Числа\n- Индикатор выполнения\n- Рейтинг звезд\n- Да/Нет\n- Дата и/или время\n- (Множественный) выбор\n\nПоделитесь своими таблицами и представлениями с пользователями и группами в вашем облаке.\n\nПриятно проводите время и управляйте всем, чем хотите.",
     "Today" : "Сегодня",
     "Last edit" : "Последнее редактирование",
     "Create" : "Создать",

@@ -132,7 +132,6 @@
     "Check yourself!" : "Überprüfe dich selbst!",
     "Tables" : "Tabellen",
     "Manage data the way you need it." : "Daten so verwalten, wie du es benötigst.",
-    "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link to urls or other nextcloud resources\n- Numbers\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n\nShare your tables and views with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Verwalte Daten so, wie du es benötigst.\n\nMit dieser App kannst du deine eigenen Tabellen mit individuellen Spalten erstellen. Du kannst mit einer Vorlage oder von Grund auf neu beginnen und benötigte Spalten hinzufügen.\nDu kannst aus folgenden Spaltentypen wählen:\n- Textzeile oder Rich-Text\n- Link zu URLs oder anderen Nextcloud-Ressourcen\n- Zahlen\n- Fortschrittsanzeige\n- Sternebewertung\n- Ja/Nein ankreuzen\n- Datum und/oder Uhrzeit\n- (Mehrfach-) Auswahl\n\nTeile deine Tabellen und Ansichten mit Benutzern und Gruppen in deiner Cloud.\n\nLehne dich zurück und verwalte was immer du benötigst.",
     "Today" : "Heute",
     "Last edit" : "Letzte Bearbeitung",
     "Create" : "Erstellen",
@@ -248,7 +247,7 @@
     "Error occurred while deleting column \"{column}\"." : "Es ist ein Fehler beim Löschen der Spalte \"{column}\" aufgetreten.",
     "Delete column" : "Spalte löschen",
     "Do you really want to delete the application \"{context}\"? This will also delete the shares and unshare the resources that are connected to this application." : "Möchtest du die Anwendung \"{context}\" wirklich löschen? Dadurch werden auch die Freigaben gelöscht und die Freigabe der mit dieser Anwendung verbundenen Ressourcen aufgehoben.",
-    "Application \"{context}\" removed." : "Anwendung \"{context}\" gelöscht.",
+    "Application \"{context}\" removed." : "Anwendung \"{context}\" entfernt.",
     "Confirm application deletion" : "Löschen der Anwendung bestätigen",
     "Cancel" : "Abbrechen",
     "Delete" : "Löschen",
@@ -543,7 +542,7 @@
     "Clipboard is not available" : "Zwischenablage ist nicht verfügbar",
     "{shareTypeString}..." : "{shareTypeString}…",
     "Unsupported source: {source}" : "Nicht unterstützte Quelle: {source}",
-    "Failed to fetch {shareTypeString}" : "Konnte {shareTypeString} nicht abrufen",
+    "Failed to fetch {shareTypeString}" : "{shareTypeString} konnte nicht abgerufen werden",
     "Request is not authorized. Are you logged in?" : "Anfrage ist nicht autorisiert. Bist du angemeldet?",
     "Request not allowed." : "Anfrage nicht erlaubt.",
     "Resource not found." : "Ressource nicht gefunden.",
@@ -582,7 +581,7 @@
     "Could not load view" : "Ansicht konnte nicht geladen werden",
     "Could not fetch view" : "Ansicht konnte nicht abgerufen werden",
     "Could not transfer application." : "Anwendung konnte nicht übertragen werden.",
-    "Could not remove application." : "Die Anwendung konnte nicht gelöscht werden.",
+    "Could not remove application." : "Die Anwendung konnte nicht entfernt werden.",
     "Could not remove table." : "Tabelle konnte nicht entfernt werden."
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

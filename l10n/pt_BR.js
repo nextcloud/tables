@@ -134,7 +134,6 @@ OC.L10N.register(
     "Check yourself!" : "Verifique você mesmo!",
     "Tables" : "Tabelas",
     "Manage data the way you need it." : "Gerencie os dados da maneira que você precisa.",
-    "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link to urls or other nextcloud resources\n- Numbers\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n\nShare your tables and views with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Gerencie os dados da maneira que você precisa. \n\nCom este aplicativo você pode criar suas próprias tabelas com colunas individuais. Você pode começar com um modelo ou do zero e adicionar as colunas desejadas. \nVocê pode escolher entre os seguintes tipos de coluna: \n- Linha de texto ou rich text \n- Link para URLs ou outros recursos do nextcloud \n- Números \n- Barra de progresso \n- Classificação por estrelas \n- Indicador Sim/Não \n- Data e/ou hora \n- (Multi) seleção \n\nCompartilhe suas tabelas e visualizações com usuários e grupos na sua nuvem. \n\nDivirta-se e gerencie o que quiser.",
     "Today" : "Hoje",
     "Last edit" : "Última edição",
     "Create" : "Criar",

@@ -122,7 +122,6 @@ OC.L10N.register(
     "Read the docs" : "Lue ohjeet",
     "Tables" : "Taulukot",
     "Manage data the way you need it." : "Hallitse tietoja haluamallasi tavalla.",
-    "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link to urls or other nextcloud resources\n- Numbers\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n\nShare your tables and views with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Hallitse tietoja haluamallasi tavalla.\n\nTämän sovelluksen avulla voit luoda omia taulukoita, joissa on yksittäisiä sarakkeita. Voit aloittaa mallin avulla tai tyhjästä ja lisätä haluamasi sarakkeet.\nVoit valita seuraavista saraketyypeistä:\n- Tekstirivi tai rikas teksti\n- Linkki verkko-osoitteisiin tai muihin Nextcloud-resursseihin.\n- Numerot\n- Edistymispalkki\n- Tähtiluokitus\n- Kyllä/Ei-rastitus\n- Päivämäärä ja/tai kellonaika\n- (Moni)valinta\n\nJaa taulukot ja näkymät käyttäjien ja ryhmien kanssa pilvipalvelussasi.\n\nPidä hauskaa ja hallitse mitä haluat.",
     "Today" : "Tänään",
     "Last edit" : "Viimeisin muokkaus",
     "Create" : "Luo",

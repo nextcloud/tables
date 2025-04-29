@@ -121,7 +121,6 @@ OC.L10N.register(
     "Read the docs" : "ドキュメントを読む",
     "Tables" : "テーブル",
     "Manage data the way you need it." : "データを自由に管理",
-    "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link to urls or other nextcloud resources\n- Numbers\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n\nShare your tables and views with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "データを自由に管理\n\nこのアプリを使用すると、個別の列を持つテーブルを作成できます。テンプレートから始めるか、ゼロから始めて必要な列を追加できます。\n次の列の種類から選択できます：\n- テキスト行またはリッチテキスト\n- URLまたは他のNextcloudリソースへのリンク\n- 数字\n- 進捗バー\n- スター評価\n- はい/いいえのチェック\n- 日付と/または時間\n- （複数）選択\n\nクラウド内のユーザーやグループとテーブルとビューを共有できます。\n\n楽しい時間を過ごし、好きなことを何でも管理してみてください。",
     "Today" : "今日",
     "Last edit" : "最終更新",
     "Create" : "作成",

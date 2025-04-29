@@ -134,7 +134,6 @@ OC.L10N.register(
     "Check yourself!" : "自行檢查！",
     "Tables" : "表格",
     "Manage data the way you need it." : "按您需要的方式管理資料。",
-    "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link to urls or other nextcloud resources\n- Numbers\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n\nShare your tables and views with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "按您需要的方式管理資料。\n\n您可以使用此應用程式建立包含單獨欄的表格。您可以從範本或是從零開始，然後新增需要的欄位。\n您可以從以下欄位類型選擇：\n- 文字行或格式化文字\n- 到 URL 或其他 Nextcloud 資源的連結\n- 數字\n- 進度列\n- 星級\n- 是/否挑選按鈕\n- 日期及/或時間\n- （多重）選擇\n\n與您雲端中的使用者與群組分享您的表格。\n\n玩得開心，隨心所欲。",
     "Today" : "今天",
     "Last edit" : "上次編輯",
     "Create" : "建立",

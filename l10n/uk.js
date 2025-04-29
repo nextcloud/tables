@@ -132,7 +132,6 @@ OC.L10N.register(
     "Check yourself!" : "Перевірте себе!",
     "Tables" : "Таблиці",
     "Manage data the way you need it." : "Керуйте даними так, як вам потрібно.",
-    "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link to urls or other nextcloud resources\n- Numbers\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n\nShare your tables and views with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Керуйте даними так, як вам потрібно.\n\nЗа допомогою цього застосунку ви зможете створювати власні таблиці з окремими стовпцями. Ви можете почати з шаблону або з нуля та додавати потрібні вам стовпці.\nДоступні такі типи стовпців:\n- Текстовий рядок або форматований текст\n- Гіпертекстові посилання або посилання на інші ресурси Nextcloud\n- Числа\n- Панель прогресу\n- Рейтинг із зірочками\n- Вибір \"так/ні\"\n- Дата та/або час\n- Множинний вибір\n\nВи можете поділитися вашими таблицями та поданнями таблиць з іншими користувачами та групами хмари.",
     "Today" : "Сьогодні",
     "Last edit" : "Останні зміни",
     "Create" : "Створювати",
