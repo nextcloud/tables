@@ -499,7 +499,7 @@ OC.L10N.register(
     "Go to next page" : "Zur nächsten Seite springen",
     "Go to last page" : "Zur letzten Seite springen",
     "Create Row" : "Zeile erstellen",
-    "Export CSV" : "CSV esportieren",
+    "Export CSV" : "CSV exportieren",
     "Uncheck all" : "Auswahl aufheben",
     "_%n selected row_::_%n selected rows_" : ["%n gewählte Zeile","%n gewählte Zeilen"],
     "Confirmation" : "Bestätigung",
