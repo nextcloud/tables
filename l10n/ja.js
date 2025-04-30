@@ -408,6 +408,7 @@ OC.L10N.register(
     "Me (user ID)" : "私(ユーザーID)",
     "Me (name)" : "私(名前)",
     "Unchecked" : "未チェック",
+    "Now" : "現在",
     "ID" : "ID",
     "Creator" : "作成者",
     "Last editor" : "最終更新者",

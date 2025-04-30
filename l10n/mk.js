@@ -48,6 +48,7 @@ OC.L10N.register(
     "Resources" : "Ресурси",
     "Cancel" : "Откажи",
     "Delete" : "Избриши",
+    "Owner" : "Сопственик",
     "Close" : "Затвори",
     "Please select a file." : "Изберете датотека.",
     "Select from Files" : "Избри од датотеките",
