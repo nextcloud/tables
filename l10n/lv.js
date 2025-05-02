@@ -51,7 +51,7 @@ OC.L10N.register(
     "Delete" : "Izdzēst",
     "Close" : "Aizvērt",
     "Please select a file." : "Lūgums atlasīt datni.",
-    "Select from Files" : "Izvēlēties no Datnes",
+    "Select from Files" : "Atlasīt no Datnēm",
     "Upload from device" : "Augšupielādēt no ierīces",
     "Preview" : "Priekšskatīt",
     "Importing data from " : "Ievieto datus no",
