@@ -81,6 +81,7 @@ OC.L10N.register(
     "Edit table" : "Modifica tabella",
     "Create column" : "Crea colonna",
     "Import" : "Importa",
+    "Export as CSV" : "Esporta come CSV",
     "Please insert a title for the new column." : "Digita il titolo per la nuova colonna",
     "You need to select a type for the new column." : "Devi selezionare il tipo da assegnare alla nuova colonna",
     "The column \"{column}\" was created." : "La colonna \"{column}\" è stata creata.",

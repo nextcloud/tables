@@ -19,6 +19,7 @@ OC.L10N.register(
     "from" : "dari",
     "to" : "untuk",
     "Approved" : "Disetujui",
+    "Position" : "Posisi",
     "Birthday" : "Tanggal lahir",
     "Progress" : "Kemajuan",
     "Done" : "Selesai",

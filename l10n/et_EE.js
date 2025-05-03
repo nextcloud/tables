@@ -50,6 +50,7 @@ OC.L10N.register(
     "Edit table" : "Muuda tabelit",
     "Import" : "Impordi",
     "Type" : "Tüüp",
+    "Simple text" : "Lihtsustatud tekst",
     "Rich text" : "Vormindatud tekst",
     "Time" : "Aeg",
     "Save" : "Salvesta",
