@@ -25,6 +25,8 @@
 			<tbody>
 				<TableRow v-for="(row, index) in currentPageRows"
 					:key="index"
+					:element-id="elementId"
+					:is-view="isView"
 					data-cy="customTableRow"
 					:row="row"
 					:columns="columns"
@@ -543,7 +545,7 @@ export default {
 	tr>th.sticky:last-child,tr>td.sticky:last-child {
 		position: sticky;
 		right: 0;
-		width: 55px;
+		width: calc(var(--button-size) * 2);
 		background-color: inherit;
 		padding-right: 16px;
 	}
