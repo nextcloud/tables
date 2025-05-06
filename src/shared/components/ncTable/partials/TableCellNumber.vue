@@ -7,7 +7,7 @@
 		<div v-if="!isEditing" @dblclick="startEditing">
 			{{ column.numberPrefix }}{{ getValue }}{{ column.numberSuffix }}
 		</div>
-		<div v-else class="editing-container">
+		<div v-else class="inline-editing-container">
 			<input
 				ref="input"
 				v-model="editValue"
@@ -20,7 +20,7 @@
 				@blur="saveChanges"
 				@keyup.enter="saveChanges"
 				@keyup.esc="cancelEdit">
-			<div v-if="localLoading" class="icon-loading-inline" />
+			<div v-if="localLoading" class="icon-loading-small icon-loading-inline" />
 		</div>
 	</div>
 </template>

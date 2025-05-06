@@ -4,11 +4,13 @@
 -->
 <template>
 	<div class="yes-no-cell" @click="toggleValue">
-		<div v-if="!localLoading">
-			<RadioboxBlankIcon v-if="value !== null && value === 'false'" />
-			<CheckCircleOutline v-if="value !== null && value === 'true'" />
+		<div class="inline-editing-container">
+			<div v-if="!localLoading">
+				<RadioboxBlankIcon v-if="value !== null && value === 'false'" />
+				<CheckCircleOutline v-if="value !== null && value === 'true'" />
+			</div>
+			<div v-else class="icon-loading-small icon-loading-inline" />
 		</div>
-		<div v-else class="icon-loading-inline" />
 	</div>
 </template>
 
