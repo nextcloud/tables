@@ -22,22 +22,22 @@ describe('Interact with views', () => {
 		cy.createSelectionColumn('selection', ['sel1', 'sel2', 'sel3', 'sel4'], null, false)
 
 		// add row
-		cy.get('button').contains('Create row').click()
+		cy.get('[data-cy="createRowBtn"]').click()
 		cy.fillInValueTextLine('title', 'first row')
 		cy.fillInValueSelection('selection', 'sel1')
-		cy.get('button').contains('Save').click()
+		cy.get('[data-cy="createRowSaveButton"]').click()
 
 		// add row
-		cy.get('button').contains('Create row').click()
+		cy.get('[data-cy="createRowBtn"]').click()
 		cy.fillInValueTextLine('title', 'second row')
 		cy.fillInValueSelection('selection', 'sel2')
-		cy.get('button').contains('Save').click()
+		cy.get('[data-cy="createRowSaveButton"]').click()
 
 		// add row
-		cy.get('button').contains('Create row').click()
+		cy.get('[data-cy="createRowBtn"]').click()
 		cy.fillInValueTextLine('title', 'sevenths row')
 		cy.fillInValueSelection('selection', 'sel2')
-		cy.get('button').contains('Save').click()
+		cy.get('[data-cy="createRowSaveButton"]').click()
 
 		// create view
 		cy.get('[data-cy="customTableAction"] button').click()
@@ -104,7 +104,7 @@ describe('Interact with views', () => {
 		cy.get('[data-cy="navigationViewItem"]').contains(title).should('exist')
 
 		// Update rows in the view
-		cy.get('[data-cy="customTableRow"]').contains('first row').parent().parent().find('[data-cy="editRowBtn"]').click()
+		cy.get('[data-cy="customTableRow"]').contains('first row').closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
 		cy.get('[data-cy="editRowModal"] input').first().clear().type('Changed row')
 		cy.get('[data-cy="editRowSaveButton"]').contains('Save').click()
 
@@ -124,7 +124,7 @@ describe('Interact with views', () => {
 		cy.get('[data-cy="navigationViewItem"]').contains(title).should('exist')
 
 		// Delete rows in the view
-		cy.get('[data-cy="customTableRow"]').contains('first row').parent().parent().find('[data-cy="editRowBtn"]').click()
+		cy.get('[data-cy="customTableRow"]').contains('first row').closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
 		cy.get('[data-cy="editRowModal"] [data-cy="editRowDeleteButton"]').contains('Delete').click()
 		cy.get('[data-cy="editRowModal"] [data-cy="editRowDeleteConfirmButton"]').contains('I really want to delete this row!').click()
 
