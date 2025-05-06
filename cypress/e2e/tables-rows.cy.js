@@ -59,7 +59,6 @@ describe('Rows for a table', () => {
 		cy.get('[data-cy="createTableModal"] input[type="text"]').clear().type('to do list')
 		cy.get('.tile').contains('ToDo').click({ force: true })
 		cy.get('[data-cy="createTableModal"]').should('be.visible')
-		cy.get('[data-cy="createTableModal"] input[type="text"]').clear().type('to do list')
 		cy.get('[data-cy="createTableSubmitBtn"]').click()
 
 		cy.loadTable('to do list')
