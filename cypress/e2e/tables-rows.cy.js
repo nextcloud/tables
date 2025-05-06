@@ -80,4 +80,31 @@ describe('Rows for a table', () => {
 		cy.get('[data-cy="editRowSaveButton"]').should('be.disabled')
 
 	})
+
+	it('Inline Edit', () => {
+		// Create a test row first
+		cy.loadTable('Welcome to Nextcloud Tables!')
+		cy.get('[data-cy="createRowBtn"]').click({ force: true })
+		cy.get('[data-cy="createRowModal"] .slot input').first().type('Test inline editing')
+		cy.get('[data-cy="createRowSaveButton"]').click()
+		cy.get('[data-cy="createRowModal"]').should('not.exist')
+		cy.get('[data-cy="ncTable"] table').contains('Test inline editing').should('exist')
+		
+		// Test inline editing by double-clicking the cell
+		cy.get('[data-cy="ncTable"] [data-cy="customTableRow"]')
+			.contains('Test inline editing')
+			.dblclick()
+		
+		// Verify the input field appears and is focused
+		cy.get('.cell-input').should('be.visible')
+		cy.get('.cell-input').should('have.focus')
+		
+		// Change the content
+		cy.get('.cell-input').clear().type('Edited inline{enter}')
+		
+		// Verify the edit was saved
+		cy.get('.icon-loading-small').should('not.exist')
+		cy.get('[data-cy="ncTable"] table').contains('Edited inline').should('exist')
+		cy.get('[data-cy="ncTable"] table').contains('Test inline editing').should('not.exist')
+	})
 })
