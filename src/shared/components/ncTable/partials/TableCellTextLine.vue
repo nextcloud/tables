@@ -84,6 +84,11 @@ export default {
 		},
 
 		async saveChanges() {
+			// Prevent multiple executions of saveChanges
+			if (this.localLoading) {
+				return
+			}
+
 			if (this.editValue === this.value) {
 				this.isEditing = false
 				return
