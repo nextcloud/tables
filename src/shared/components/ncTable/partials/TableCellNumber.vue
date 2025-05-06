@@ -102,6 +102,11 @@ export default {
 		},
 
 		async saveChanges() {
+			// Prevent multiple executions of saveChanges
+			if (this.localLoading) {
+				return
+			}
+
 			if (Number(this.editValue) === this.value) {
 				this.isEditing = false
 				return
