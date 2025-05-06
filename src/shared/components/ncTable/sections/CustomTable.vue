@@ -526,7 +526,7 @@ export default {
 		}
 
 		// inline editing
-		.editing-container {
+		.inline-editing-container {
 			position: relative;
 			width: 100%;
 
