@@ -195,7 +195,6 @@ export const useDataStore = defineStore('data', {
 			set(this.rows, stateId, [])
 		},
 
-		// TODO: check why inline editing makes two requests
 		async updateRow({ id, isView, elementId, data }) {
 			let res = null
 			const viewId = isView ? elementId : null
