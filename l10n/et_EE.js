@@ -89,6 +89,7 @@ OC.L10N.register(
     "Read" : "Lugemine",
     "Update" : "Uuenda",
     "Searching …" : "Otsin ...",
+    "No elements found." : "Elemente ei leidu.",
     "Error" : "Viga",
     "Download" : "Laadi alla",
     "Search" : "Otsi",
