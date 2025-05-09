@@ -733,6 +733,10 @@ class FeatureContext implements Context {
 		$newTable = $this->getDataFromResponse($this->response);
 		$this->tableId = $newTable['id'];
 		$this->tableIds[$tableName] = $newTable['id'];
+		$this->collectionManager->register($newTable, 'table', $newTable['id'], $tableName, function () use ($user, $tableName) {
+			$this->deleteViewWithoutAssertion($user, $tableName);
+			unset($this->tableIds[$tableName]);
+		});
 
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($newTable['title'], $title);
@@ -765,6 +769,15 @@ class FeatureContext implements Context {
 		$this->sendRequest(
 			'GET',
 			'/apps/tables/api/1/tables/' . $tableId
+		);
+
+		return $this->getDataFromResponse($this->response);
+	}
+
+	private function getViewById(int $viewId): array {
+		$this->sendRequest(
+			'GET',
+			'/apps/tables/api/1/views/' . $viewId
 		);
 
 		return $this->getDataFromResponse($this->response);
@@ -995,10 +1008,48 @@ class FeatureContext implements Context {
 	}
 
 	/**
+	 * @Then user :initiator shares :nodeType :nodeAlias with :shareType :recipient
+	 */
+	public function shareNodeWith(
+		string $initiator,
+		string $nodeType,
+		string $nodeAlias,
+		string $shareType,
+		string $recipient,
+	): void {
+		$this->setCurrentUser($initiator);
+		$node = $this->collectionManager->getByAlias($nodeType, $nodeAlias);
+
+		$permissions = [
+			'permissionRead' => true,
+			'permissionCreate' => true,
+			'permissionUpdate' => true,
+			'permissionDelete' => false,
+			'permissionManage' => false
+		];
+		$this->sendRequest(
+			'POST',
+			sprintf('/apps/tables/api/1/shares'),
+			array_merge($permissions, [
+				'receiverType' => $shareType,
+				'receiver' => $recipient,
+				'nodeId' => $node['id'],
+				'nodeType' => $nodeType,
+			])
+		);
+
+		if ($this->response->getStatusCode() === 200) {
+			$share = $this->getDataFromResponse($this->response);
+			$this->shareId = $share['id'];
+		}
+	}
+
+	/**
 	 * @Then user :user shares table with user :receiver
 	 *
 	 * @param string $user
 	 * @param string $receiver
+	 * @deprecated use shareTableWith
 	 */
 	public function shareTableWithUser(string $user, string $receiver): void {
 		$this->setCurrentUser($user);
@@ -1119,6 +1170,26 @@ class FeatureContext implements Context {
 	}
 
 	/**
+	 * @Then user :user has the following permissions against :nodeType :nodeAlias
+	 */
+	public function checkPermissionsOnNode(
+		string $user,
+		string $nodeType,
+		string $nodeAlias,
+		?TableNode $permissions = null): void {
+		$this->setCurrentUser($user);
+		$node = $this->collectionManager->getByAlias($nodeType, $nodeAlias);
+		$data = match ($nodeType) {
+			'view' => $this->getViewById($node['id']),
+			'table' => $this->getTableById($node['id']),
+		};
+
+		foreach ($permissions?->getRows() as $row) {
+			Assert::assertEquals($data['onSharePermissions'][$row[0]], (bool)$row[1], sprintf('Permission %s is not as expected', $row[0]));
+		}
+	}
+
+	/**
 	 * @Then user :user has the following permissions
 	 */
 	public function checkSharePermissions($user, ?TableNode $permissions = null) {
@@ -1127,8 +1198,8 @@ class FeatureContext implements Context {
 		$share = $this->getShareById($this->shareId);
 		$table = $this->getTableById($share['nodeId']);
 
-		foreach ($permissions->getRows() as $row) {
-			Assert::assertEquals($table['onSharePermissions'][$row[0]], boolval($row[1]));
+		foreach ($permissions?->getRows() as $row) {
+			Assert::assertEquals($table['onSharePermissions'][$row[0]], (bool)$row[1]);
 		}
 	}
 
