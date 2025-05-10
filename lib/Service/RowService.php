@@ -155,6 +155,7 @@ class RowService extends SuperService {
 	 * @param RowDataInput|list<array{columnId: int, value: mixed}> $data
 	 * @return Row2
 	 *
+	 * @throws BadRequestError
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 * @throws Exception
@@ -210,11 +211,12 @@ class RowService extends SuperService {
 			throw new InternalError('Cannot create row without table or view in context');
 		}
 
+		$tableId = $tableId ?? $view->getTableId();
+
 		$data = $data instanceof RowDataInput ? $data : RowDataInput::fromArray($data);
 		$data = $this->cleanupAndValidateData($data, $columns, $tableId, $viewId);
 		$data = $this->enhanceWithViewDefaults($view, $data);
 
-		$tableId = $tableId ?? $view->getTableId();
 		$row2 = new Row2();
 		$row2->setTableId($tableId);
 		$row2->setData($data);
@@ -283,21 +285,16 @@ class RowService extends SuperService {
 
 	/**
 	 * @throws InternalError
+	 * @throws BadRequestError
 	 */
 	private function cleanupAndValidateData(RowDataInput $data, array $columns, ?int $tableId, ?int $viewId, ?int $rowId = null): RowDataInput {
 		$out = new RowDataInput();
-		$tableColumns = $this->columnMapper->findAllByTable($tableId);
 		foreach ($data as $entry) {
 			$column = $this->getColumnFromColumnsArray((int)$entry['columnId'], $columns);
 
-			if ($column && $column->getType() === Column::TYPE_TEXT
-				&& $column->getSubtype() ===  Column::SUBTYPE_TEXT_LINE
-				&& $column->getTextUnique()) {
-				$filter = [[['columnId' => $column->getId(), 'operator' => 'is-equal', 'value' => $entry['value']]]];
-				$alreadyExistentRows = $this->row2Mapper->findAll($tableColumns, $columns, $tableId, filter: $filter, userId: $this->userId);
-				if ($alreadyExistentRows && $alreadyExistentRows[0]->getId() !== $rowId) {
-					throw new BadRequestError('Column with id ' . $entry['columnId'] . ' is not unique.');
-				}
+			if ($column) {
+				$columnBusiness = $this->getColumnBusiness($column);
+				$columnBusiness->validateValue($entry['value'], $column, $this->userId, $tableId, $rowId);
 			}
 
 			// check if it is allowed to insert a value for the requested column
@@ -327,10 +324,7 @@ class RowService extends SuperService {
 	 */
 	private function parseValueByColumnType(Column $column, $value = null) {
 		try {
-			$businessClassName = 'OCA\Tables\Service\ColumnTypes\\';
-			$businessClassName .= ucfirst($column->getType()) . ucfirst($column->getSubtype()) . 'Business';
-			/** @var IColumnTypeBusiness $columnBusiness */
-			$columnBusiness = Server::get($businessClassName);
+			$columnBusiness = $this->getColumnBusiness($column);
 			if ($columnBusiness->canBeParsed($value, $column)) {
 				return json_decode($columnBusiness->parseValue($value, $column), true);
 			}
@@ -641,5 +635,14 @@ class RowService extends SuperService {
 		$row->filterDataByColumns($view->getColumnsArray());
 
 		return $row;
+	}
+
+	private function getColumnBusiness(Column $column): IColumnTypeBusiness {
+		$businessClassName = 'OCA\Tables\Service\ColumnTypes\\';
+		$businessClassName .= ucfirst($column->getType()) . ucfirst($column->getSubtype()) . 'Business';
+		/** @var IColumnTypeBusiness $columnBusiness */
+		$columnBusiness = Server::get($businessClassName);
+
+		return $columnBusiness;
 	}
 }
