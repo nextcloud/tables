@@ -228,7 +228,7 @@ OC.L10N.register(
     "Show in app list" : "In App-Liste anzeigen",
     "This can be overridden by a per-account preference" : "Dies kann durch eine kontospezifische Einstellung überschrieben werden",
     "Create application" : "Anwendung erstellen",
-    "Row successfully created." : "Zeile erfolgreich erstellt.",
+    "Row successfully created." : "Zeile erstellt.",
     "Could not create new row" : "Neue Zeile konnte nicht erstellt werden",
     "Create row" : "Zeile erstellen",
     "\"{columnTitle}\" should not be empty" : "\"{columnTitle}\" sollte nicht leer sein",
