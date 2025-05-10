@@ -7,6 +7,33 @@
 
 namespace OCA\Tables\Service\ColumnTypes;
 
+use OCA\Tables\Db\Column;
+use OCA\Tables\Db\ColumnMapper;
+use OCA\Tables\Db\Row2Mapper;
+use OCA\Tables\Errors\BadRequestError;
+use Psr\Log\LoggerInterface;
+
 class TextLineBusiness extends SuperBusiness implements IColumnTypeBusiness {
 
+	public function __construct(
+		LoggerInterface $logger,
+		private Row2Mapper $row2Mapper,
+		private ColumnMapper $columnMapper,
+	) {
+		parent::__construct($logger);
+	}
+
+	public function validateValue(mixed $value, Column $column, string $userId, int $tableId, ?int $rowId): void {
+		if (!$column->getTextUnique()) {
+			return;
+		}
+
+		$tableColumns = $this->columnMapper->findAllByTable($tableId);
+
+		$filter = [[['columnId' => $column->getId(), 'operator' => 'is-equal', 'value' => $value]]];
+		$alreadyExistentRows = $this->row2Mapper->findAll($tableColumns, [$column], $tableId, filter: $filter, userId: $userId);
+		if ($alreadyExistentRows && $alreadyExistentRows[0]->getId() !== $rowId) {
+			throw new BadRequestError('Column "' . $column->getTitle() . '" contains not unique value.');
+		}
+	}
 }
