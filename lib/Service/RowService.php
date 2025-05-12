@@ -152,6 +152,7 @@ class RowService extends SuperService {
 	 * @param int|null $tableId
 	 * @param int|null $viewId
 	 * @param RowDataInput|list<array{columnId: int, value: mixed}> $data
+	 * @param string|null $userId
 	 * @return Row2
 	 *
 	 * @throws NotFoundError
@@ -159,7 +160,11 @@ class RowService extends SuperService {
 	 * @throws Exception
 	 * @throws InternalError
 	 */
-	public function create(?int $tableId, ?int $viewId, RowDataInput|array $data): Row2 {
+	public function create(?int $tableId, ?int $viewId, RowDataInput|array $data, ?string $userId = null): Row2 {
+		if ($userId) {
+			$this->userId = $userId;
+		}
+
 		if ($this->userId === null || $this->userId === '') {
 			$e = new \Exception('No user id in context, but needed.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
@@ -180,7 +185,7 @@ class RowService extends SuperService {
 			}
 
 			// security
-			if (!$this->permissionsService->canCreateRows($view)) {
+			if (!$this->permissionsService->canCreateRows($view, 'view', $this->userId)) {
 				throw new PermissionError('create row at the view id = ' . $viewId . ' is not allowed.');
 			}
 
@@ -198,7 +203,7 @@ class RowService extends SuperService {
 			}
 
 			// security
-			if (!$this->permissionsService->canCreateRows($table, 'table')) {
+			if (!$this->permissionsService->canCreateRows($table, 'table', $this->userId)) {
 				throw new PermissionError('create row at the table id = ' . $tableId . ' is not allowed.');
 			}
 
@@ -218,7 +223,7 @@ class RowService extends SuperService {
 		$row2->setTableId($tableId);
 		$row2->setData($data);
 		try {
-			$insertedRow = $this->row2Mapper->insert($row2, $this->columnMapper->findAllByTable($tableId));
+			$insertedRow = $this->row2Mapper->insert($row2, $this->columnMapper->findAllByTable($tableId), $this->userId);
 
 			$this->eventDispatcher->dispatchTyped(new RowAddedEvent($insertedRow));
 

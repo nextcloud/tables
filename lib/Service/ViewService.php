@@ -272,7 +272,7 @@ class ViewService extends SuperService {
 					// we have to fetch the service here as ColumnService already depends on the ViewService, i.e. no DI
 					$columnService = \OCP\Server::get(ColumnService::class);
 					$columnIds = \json_decode($value, true);
-					$availableColumns = $columnService->findAllByTable($view->getTableId(), $view->getId(), $this->userId);
+					$availableColumns = $columnService->findAllByTable($view->getTableId(), $view->getId(), $userId);
 					$availableColumns = array_map(static fn (Column $column) => $column->getId(), $availableColumns);
 					foreach ($columnIds as $columnId) {
 						if (!Column::isValidMetaTypeId($columnId) && !in_array($columnId, $availableColumns, true)) {
