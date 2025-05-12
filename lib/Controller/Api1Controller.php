@@ -922,7 +922,6 @@ class Api1Controller extends ApiController {
 		try {
 			$item = $this->columnService->update(
 				$columnId,
-				null,
 				$this->userId,
 				new ColumnDto(
 					title: $title,
