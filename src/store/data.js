@@ -58,14 +58,13 @@ export default {
 
 			try {
 				if (tableId && viewId) {
-					// Get all table columns. Try to access from view (Test if you have read access for view to read table columns)
-					res = await axios.get(generateUrl('/apps/tables/column/table/' + tableId + '/view/' + viewId))
+					res = await axios.get(generateUrl('/apps/tables/api/1/tables/' + tableId + '/columns') + '?viewId=' + viewId)
 				  } else if (tableId && !viewId) {
 					// Get all table columns without view. Table manage rights needed
-					res = await axios.get(generateUrl('/apps/tables/column/table/' + tableId))
+					res = await axios.get(generateUrl('/apps/tables/api/1/tables/' + tableId + '/columns'))
 				  } else if (!tableId && viewId) {
 					// Get all view columns.
-					res = await axios.get(generateUrl('/apps/tables/column/view/' + viewId))
+					res = await axios.get(generateUrl('/apps/tables/api/1/views/' + viewId + '/columns'))
 				  }
 				if (!Array.isArray(res.data)) {
 					const e = new Error('Expected array, but is not')
@@ -98,7 +97,7 @@ export default {
 			let res = null
 
 			try {
-				res = await axios.post(generateUrl('/apps/tables/column'), data)
+				res = await axios.post(generateUrl('/apps/tables/api/1/columns'), data)
 			} catch (e) {
 				displayError(e, t('tables', 'Could not insert column.'))
 				return false
@@ -117,7 +116,7 @@ export default {
 			let res = null
 
 			try {
-				res = await axios.put(generateUrl('/apps/tables/column/' + id), data)
+				res = await axios.put(generateUrl('/apps/tables/api/1/columns/' + id), data)
 			} catch (e) {
 				displayError(e, t('tables', 'Could not update column.'))
 				return false
@@ -136,7 +135,7 @@ export default {
 		},
 		async removeColumn({ state, commit }, { id, isView, elementId }) {
 			try {
-				await axios.delete(generateUrl('/apps/tables/column/' + id))
+				await axios.delete(generateUrl('/apps/tables/api/1/columns/' + id))
 			} catch (e) {
 				displayError(e, t('tables', 'Could not remove column.'))
 				return false

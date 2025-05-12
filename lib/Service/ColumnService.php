@@ -260,7 +260,6 @@ class ColumnService extends SuperService {
 	 */
 	public function update(
 		int $columnId,
-		?int $tableId,
 		?string $userId,
 		ColumnDto $columnDto
 	):Column {
@@ -275,9 +274,6 @@ class ColumnService extends SuperService {
 
 			if ($columnDto->getTitle() !== null) {
 				$item->setTitle($columnDto->getTitle());
-			}
-			if ($tableId !== null) {
-				$item->setTableId($tableId);
 			}
 			if ($columnDto->getType() !== null) {
 				$item->setType($columnDto->getType());
