@@ -68,7 +68,7 @@ class ImportController extends Controller {
 	public function importInTable(int $tableId, String $path, bool $createMissingColumns = true, array $columnsConfig = []): DataResponse {
 		return $this->handleError(function () use ($tableId, $path, $createMissingColumns, $columnsConfig) {
 			// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
-			return $this->service->import($tableId, null, $path, $createMissingColumns, $columnsConfig);
+			return $this->service->scheduleImport($tableId, null, $path, $createMissingColumns, $columnsConfig);
 		});
 	}
 
@@ -85,7 +85,7 @@ class ImportController extends Controller {
 	public function importInView(int $viewId, String $path, bool $createMissingColumns = true, array $columnsConfig = []): DataResponse {
 		return $this->handleError(function () use ($viewId, $path, $createMissingColumns, $columnsConfig) {
 			// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
-			return $this->service->import(null, $viewId, $path, $createMissingColumns, $columnsConfig);
+			return $this->service->scheduleImport(null, $viewId, $path, $createMissingColumns, $columnsConfig);
 		});
 	}
 
@@ -111,7 +111,7 @@ class ImportController extends Controller {
 			$file = $this->getUploadedFile('uploadfile');
 			return $this->handleError(function () use ($tableId, $file, $createMissingColumns, $columnsConfigArray) {
 				// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
-				return $this->service->import($tableId, null, $file['tmp_name'], $createMissingColumns, $columnsConfigArray);
+				return $this->service->scheduleImport($tableId, null, $file['tmp_name'], $createMissingColumns, $columnsConfigArray);
 			});
 		} catch (UploadException|NotPermittedException $e) {
 			$this->logger->error('Upload error', ['exception' => $e]);
@@ -141,7 +141,7 @@ class ImportController extends Controller {
 			$file = $this->getUploadedFile('uploadfile');
 			return $this->handleError(function () use ($viewId, $file, $createMissingColumns, $columnsConfigArray) {
 				// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
-				return $this->service->import(null, $viewId, $file['tmp_name'], $createMissingColumns, $columnsConfigArray);
+				return $this->service->scheduleImport(null, $viewId, $file['tmp_name'], $createMissingColumns, $columnsConfigArray);
 			});
 		} catch (UploadException|NotPermittedException $e) {
 			$this->logger->error('Upload error', ['exception' => $e]);

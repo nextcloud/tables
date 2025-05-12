@@ -193,7 +193,7 @@ class ColumnService extends SuperService {
 			throw new InternalError('Cannot create column without table or view in context');
 		}
 
-		if (!$this->permissionsService->canCreateColumns($table)) {
+		if (!$this->permissionsService->canCreateColumns($table, $userId)) {
 			throw new PermissionError('create column for the table id = ' . $table->getId() . ' is not allowed.');
 		}
 
