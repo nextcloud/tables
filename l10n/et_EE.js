@@ -70,6 +70,7 @@ OC.L10N.register(
     "Link" : "Link",
     "Number" : "Number",
     "Selection" : "Valik",
+    "Users and groups" : "Kasutajad ja grupid",
     "Move" : "Liiguta",
     "Metadata" : "Metaandmed",
     "Operator" : "Operaator",
