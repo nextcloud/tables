@@ -494,7 +494,7 @@ OC.L10N.register(
     "Show fullscreen" : "Vollbild anzeigen",
     "Close editor" : "Bearbeitung schließen",
     "Go to first page" : "Zur ersten Seite springen",
-    "Go to previous page" : "Zurück zur letzten Seite",
+    "Go to previous page" : "Zur vorigen Seite gehen",
     "Page number" : "Seitennummer",
     "Go to next page" : "Zur nächsten Seite springen",
     "Go to last page" : "Zur letzten Seite springen",
