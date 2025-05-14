@@ -1139,9 +1139,10 @@ class Api1Controller extends ApiController {
 	 *
 	 * @param int $viewId View ID
 	 * @param string|array<string, mixed> $data Data as key - value store
-	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Row returned
+	 * 400: Validation error
 	 * 403: No permissions
 	 */
 	#[NoAdminRequired]
@@ -1168,11 +1169,14 @@ class Api1Controller extends ApiController {
 
 		try {
 			return new DataResponse($this->rowService->create(null, $viewId, $dataNew)->jsonSerialize());
+		} catch (BadRequestError $e) {
+			$this->logger->warning('An bad request was encountered: ' . $e->getMessage(), ['exception' => $e]);
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
-		} catch (BadRequestError|InternalError|Exception $e) {
+		} catch (InternalError|Exception $e) {
 			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
@@ -1184,9 +1188,10 @@ class Api1Controller extends ApiController {
 	 *
 	 * @param int $tableId Table ID
 	 * @param string|array<string, mixed> $data Data as key - value store
-	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Row returned
+	 * 400: Validation error
 	 * 403: No permissions
 	 * 404: Not found
 	 */
@@ -1214,11 +1219,14 @@ class Api1Controller extends ApiController {
 
 		try {
 			return new DataResponse($this->rowService->create($tableId, null, $dataNew)->jsonSerialize());
+		} catch (BadRequestError $e) {
+			$this->logger->warning('An bad request was encountered: ' . $e->getMessage(), ['exception' => $e]);
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_FORBIDDEN);
-		} catch (BadRequestError|InternalError|Exception $e) {
+		} catch (InternalError|Exception $e) {
 			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
@@ -1263,9 +1271,10 @@ class Api1Controller extends ApiController {
 	 * @param int|null $viewId View ID
 	 * @param string|array<string, mixed> $data Data as key - value store
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Updated row returned
+	 * 400: Validation error
 	 * 403: No permissions
 	 * 404: Not found
 	 */
@@ -1291,6 +1300,9 @@ class Api1Controller extends ApiController {
 
 		try {
 			return new DataResponse($this->rowService->updateSet($rowId, $viewId, $dataNew, $this->userId)->jsonSerialize());
+		} catch (BadRequestError $e) {
+			$this->logger->warning('An bad request was encountered: ' . $e->getMessage(), ['exception' => $e]);
+			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (InternalError $e) {
 			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];

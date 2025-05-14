@@ -24,6 +24,10 @@ function statusMessage(e, status) {
 		if (e.response?.data?.ocs?.data?.message) {
 			return e.response.data.ocs.data.message
 		}
+		// for some reason the "edit" row returns a different structure
+		if (e.response?.data?.message) {
+			return e.response.data.message
+		}
 		return t('tables', 'Unknown error.')
 	}
 	if (status === 401) {

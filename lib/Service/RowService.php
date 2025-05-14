@@ -386,6 +386,7 @@ class RowService extends SuperService {
 	 * @param string $userId
 	 * @return Row2
 	 *
+	 * @throws BadRequestError
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
