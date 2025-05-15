@@ -92,6 +92,7 @@
                     "textDefault",
                     "textAllowedPattern",
                     "textMaxLength",
+                    "textUnique",
                     "selectionOptions",
                     "selectionDefault",
                     "datetimeDefault",
@@ -173,6 +174,9 @@
                     "textMaxLength": {
                         "type": "integer",
                         "format": "int64"
+                    },
+                    "textUnique": {
+                        "type": "boolean"
                     },
                     "selectionOptions": {
                         "type": "string"
@@ -2967,6 +2971,11 @@
                                         "nullable": true,
                                         "description": "Max length, if column is a text"
                                     },
+                                    "textUnique": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "description": "Whether the text value must be unique, if column is a text"
+                                    },
                                     "selectionOptions": {
                                         "type": "string",
                                         "nullable": true,
@@ -3321,6 +3330,12 @@
                                         "nullable": true,
                                         "description": "Max length, if column is a text"
                                     },
+                                    "textUnique": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "default": false,
+                                        "description": "Whether the text value must be unique, if column is a text"
+                                    },
                                     "selectionOptions": {
                                         "type": "string",
                                         "nullable": true,
@@ -3543,6 +3558,11 @@
                                         "format": "int64",
                                         "nullable": true,
                                         "description": "Max length, if column is a text"
+                                    },
+                                    "textUnique": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "description": "Whether the text value must be unique, if column is a text"
                                     },
                                     "selectionOptions": {
                                         "type": "string",
@@ -4128,6 +4148,24 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
                     "500": {
                         "description": "",
                         "content": {
@@ -4344,6 +4382,24 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
                     "500": {
                         "description": "",
                         "content": {
@@ -4527,6 +4583,24 @@
                     },
                     "403": {
                         "description": "No permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -7170,6 +7244,12 @@
                                         "format": "int64",
                                         "nullable": true,
                                         "description": "Max raw text length"
+                                    },
+                                    "textUnique": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "default": false,
+                                        "description": "Whether the text value must be unique, if column is a text"
                                     },
                                     "subtype": {
                                         "type": "string",

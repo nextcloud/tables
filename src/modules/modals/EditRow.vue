@@ -151,8 +151,12 @@ export default {
 		},
 		async actionConfirm() {
 			this.localLoading = true
-			await this.sendRowToBE()
+			const success = await this.sendRowToBE()
 			this.localLoading = false
+			// If the row was not created, we don't want to close the modal
+			if (!success) {
+				return
+			}
 			this.actionCancel()
 		},
 		async sendRowToBE() {
@@ -166,15 +170,12 @@ export default {
 				})
 			}
 
-			const res = await this.updateRow({
+			return await this.updateRow({
 				id: this.row.id,
 				isView: this.isView,
 				elementId: this.element.id,
 				data,
 			})
-			if (!res) {
-				showError(t('tables', 'Could not update row'))
-			}
 		},
 		reset() {
 			this.localRow = {}

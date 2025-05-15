@@ -79,6 +79,7 @@ class ColumnController extends Controller {
 		?string $textDefault,
 		?string $textAllowedPattern,
 		?int $textMaxLength,
+		?bool $textUnique,
 
 		?string $numberPrefix,
 		?string $numberSuffix,
@@ -113,6 +114,7 @@ class ColumnController extends Controller {
 			$textDefault,
 			$textAllowedPattern,
 			$textMaxLength,
+			$textUnique,
 
 			$numberPrefix,
 			$numberSuffix,
@@ -147,6 +149,7 @@ class ColumnController extends Controller {
 					textDefault: $textDefault,
 					textAllowedPattern: $textAllowedPattern,
 					textMaxLength: $textMaxLength,
+					textUnique: $textUnique,
 					numberDefault: $numberDefault,
 					numberMin: $numberMin,
 					numberMax: $numberMax,
@@ -181,6 +184,7 @@ class ColumnController extends Controller {
 		?string $textDefault,
 		?string $textAllowedPattern,
 		?int $textMaxLength,
+		?bool $textUnique,
 
 		?string $numberPrefix,
 		?string $numberSuffix,
@@ -213,6 +217,7 @@ class ColumnController extends Controller {
 			$textDefault,
 			$textAllowedPattern,
 			$textMaxLength,
+			$textUnique,
 
 			$numberPrefix,
 			$numberSuffix,
@@ -246,6 +251,7 @@ class ColumnController extends Controller {
 					textDefault: $textDefault,
 					textAllowedPattern: $textAllowedPattern,
 					textMaxLength: $textMaxLength,
+					textUnique: $textUnique,
 					numberDefault: $numberDefault,
 					numberMin: $numberMin,
 					numberMax: $numberMax,
