@@ -182,6 +182,7 @@ OC.L10N.register(
     "Default" : "Mặc định",
     "URL" : "URL",
     "Copy link" : "Sao chép liên kết",
+    "Open link" : "Mở liên kết",
     "Close editor" : "Đóng trình biên tập",
     "Confirm" : "Xác nhận",
     "Select" : "Chọn",
