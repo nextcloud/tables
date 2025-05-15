@@ -206,6 +206,7 @@ export default {
 			this.importingFile = true
 
 			if (this.importAsNew) {
+				// fixme: show message that import is in progress
 				this.importResults = await importToNewTable(this.newTable.title, this.newTable.emoji, this.file)
 
 				if (!this.importResults) {
@@ -217,6 +218,7 @@ export default {
 					return
 				}
 
+				// fixme: show message that import is in progress
 				this.importResults = await importToExistingTable(this.selectedTable.value, this.file, this.createMissingColumns)
 
 				if (!this.importResults) {

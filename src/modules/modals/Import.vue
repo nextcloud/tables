@@ -351,6 +351,7 @@ export default {
 				return null
 			}
 			this.pathError = false
+			// fixme: show message that import is in progress
 			this.importFromPath()
 		},
 		validateColumnsConfig() {

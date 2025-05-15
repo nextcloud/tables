@@ -1374,7 +1374,7 @@ class Api1Controller extends ApiController {
 	public function importInTable(int $tableId, string $path, bool $createMissingColumns = true): DataResponse {
 		try {
 			// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
-			return new DataResponse($this->importService->import($tableId, null, $path, $createMissingColumns));
+			return new DataResponse($this->importService->scheduleImport($tableId, null, $path, $createMissingColumns));
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -1409,7 +1409,7 @@ class Api1Controller extends ApiController {
 	public function importInView(int $viewId, string $path, bool $createMissingColumns = true): DataResponse {
 		try {
 			// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
-			return new DataResponse($this->importService->import(null, $viewId, $path, $createMissingColumns));
+			return new DataResponse($this->importService->scheduleImport(null, $viewId, $path, $createMissingColumns));
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
