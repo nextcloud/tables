@@ -21,7 +21,7 @@
 		"optimize-autoloader": true,
 		"classmap-authoritative": true,
 		"platform": {
-			"php": "8.0"
+			"php": "8.0.2"
 		},
 		"allow-plugins": {
 			"bamarni/composer-bin-plugin": true
@@ -48,7 +48,7 @@
 		]
 	},
 	"require": {
-		"phpoffice/phpspreadsheet": "^1.29.10",
+		"phpoffice/phpspreadsheet": "^2.1",
 		"ext-json": "*"
 	}
 }
