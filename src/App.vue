@@ -22,6 +22,7 @@ import Sidebar from './modules/sidebar/sections/Sidebar.vue'
 import { useResizeObserver } from '@vueuse/core'
 import { loadState } from '@nextcloud/initial-state'
 import { useTablesStore } from './store/store.js'
+import { generateUrl } from '@nextcloud/router'
 
 export default {
 	name: 'App',
@@ -44,7 +45,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(useTablesStore, ['isLoadingSomething']),
+		...mapState(useTablesStore, ['isLoadingSomething', 'activeView', 'activeTable', 'activeContext']),
 	},
 	watch: {
 		'$route'(to, from) {
@@ -63,6 +64,8 @@ export default {
 	methods: {
 		...mapActions(useTablesStore, ['loadTablesFromBE', 'getAllContexts', 'loadViewsSharedWithMeFromBE', 'loadTemplatesFromBE', 'setActiveRowId', 'setActiveTableId', 'setActiveViewId', 'setActiveContextId']),
 		routing(currentRoute) {
+			const url = generateUrl('/apps/tables/')
+
 			try {
 				if (loadState('tables', 'contextId', undefined)) {
 					// prepare route, when Context is opened from navigation bar
@@ -85,20 +88,29 @@ export default {
 				this.setActiveTableId(parseInt(currentRoute.params.tableId))
 				this.setPageTitle(this.activeTable.title)
 				if (!currentRoute.path.includes('/row/')) {
-					this.switchActiveMenuEntry(document.querySelector('header .header-left .app-menu a[title="Tables"]'))
+					const targetElement = document.querySelector(`header .header-start .app-menu a[href="${url}"]`)
+						|| document.querySelector(`header .header-left .app-menu a[href="${url}"]`)
+					this.switchActiveMenuEntry(targetElement)
 				}
 			} else if (currentRoute.path.startsWith('/view/')) {
 				this.setActiveViewId(parseInt(currentRoute.params.viewId))
 				this.setPageTitle(this.activeView.title)
 				if (!currentRoute.path.includes('/row/')) {
-					this.switchActiveMenuEntry(document.querySelector('header .header-left .app-menu a[title="Tables"]'))
+					const targetElement = document.querySelector(`header .header-start .app-menu a[href="${url}"]`)
+						|| document.querySelector(`header .header-left .app-menu a[href="${url}"]`)
+					this.switchActiveMenuEntry(targetElement)
 				}
 			} else if (currentRoute.path.startsWith('/application/')) {
 				const contextId = parseInt(currentRoute.params.contextId)
 				this.setActiveContextId(contextId)
 				this.setPageTitle(this.activeContext.name)
+
 				// This breaks if there are multiple contexts with the same name or another app has the same name. We need a better way to identify the correct element.
-				this.switchActiveMenuEntry(document.querySelector(`header .header-left .app-menu [title="${this.activeContext.name}"]`))
+				const targetElement = document.querySelector(`header .header-start .app-menu [title="${this.activeContext.name}"]`)
+					|| document.querySelector(`header .header-left .app-menu [title="${this.activeContext.name}"]`)
+				if (targetElement) {
+					this.switchActiveMenuEntry(targetElement)
+				}
 
 				// move the focus away from nav bar (import for app-internal switch)
 				const appContent = document.getElementById('app-content-vue')
@@ -112,7 +124,7 @@ export default {
 		},
 		switchActiveMenuEntry(targetElement) {
 			targetElement = targetElement?.tagName?.toLowerCase() === 'a' ? targetElement.parentElement : targetElement
-			const currentlyActive = document.querySelector('header .header-left .app-menu li.app-menu-entry--active')
+			const currentlyActive = document.querySelector('header .header-start .app-menu li.app-menu-entry--active') || document.querySelector('header .header-left .app-menu li.app-menu-entry--active')
 			currentlyActive.classList.remove('app-menu-entry--active')
 			targetElement.classList.add('app-menu-entry--active')
 		},
