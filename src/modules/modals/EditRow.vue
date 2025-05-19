@@ -61,7 +61,7 @@ import rowHelper from '../../shared/components/ncTable/mixins/rowHelper.js'
 import { mapActions } from 'pinia'
 import { useTablesStore } from '../../store/store.js'
 import { useDataStore } from '../../store/data.js'
-import { ALLOWED_PROTOCOLS } from '../../shared/constants.js'
+import { ALLOWED_PROTOCOLS } from '../../shared/constants.ts'
 
 export default {
 	name: 'EditRow',

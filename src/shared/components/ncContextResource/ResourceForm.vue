@@ -37,7 +37,7 @@ import debounce from 'debounce'
 import { mapState } from 'pinia'
 import { NcSelect } from '@nextcloud/vue'
 import { useTablesStore } from '../../../store/store.js'
-import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../../../shared/constants.js'
+import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../../../shared/constants.ts'
 import SearchAndSelectOption from '../../../views/partials/SearchAndSelectOption.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 
