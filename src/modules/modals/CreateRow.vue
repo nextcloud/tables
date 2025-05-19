@@ -47,7 +47,7 @@ import { translate as t } from '@nextcloud/l10n'
 import rowHelper from '../../shared/components/ncTable/mixins/rowHelper.js'
 import { useDataStore } from '../../store/data.js'
 import { mapActions } from 'pinia'
-import { ALLOWED_PROTOCOLS } from '../../shared/constants.js'
+import { ALLOWED_PROTOCOLS } from '../../shared/constants.ts'
 
 export default {
 	name: 'CreateRow',
