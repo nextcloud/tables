@@ -9,9 +9,16 @@ const config = createAppConfig({
 	files: path.join(__dirname, 'src', 'file-actions.js'),
 	main: path.join(__dirname, 'src', 'main.js'),
 }, {
-	inlineCSS: true,
+    inlineCSS: {
+        jsAssetsFilterFunction: (chunk) => {
+            return chunk.name === 'main' || 
+                   chunk.fileName.includes('main') || 
+                   chunk.fileName.includes('tables-main');
+        }
+    },
 	config: {
 		build: {
+			outDir: path.join(__dirname, 'js'),
 			cssCodeSplit: false,
 			rollupOptions: {
 				output: {
