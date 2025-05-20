@@ -4,7 +4,6 @@
  */
 import { registerCustomPickerElement, registerWidget, NcCustomPickerRenderResult } from '@nextcloud/vue/dist/Functions/registerReference.js'
 
-
 registerWidget('tables_link', async (el, { richObjectType, richObject, accessible }) => {
 	const { default: Vue } = await import('vue')
 	const { default: TableReferenceWidget } = await import('./views/LinkReferenceWidget.vue')
