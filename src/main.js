@@ -2,7 +2,6 @@
  * SPDX-FileCopyrightText: 2018 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-import { generateFilePath } from '@nextcloud/router'
 import { createPinia, PiniaVuePlugin } from 'pinia'
 import Vue from 'vue'
 import App from './App.vue'
