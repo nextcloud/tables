@@ -23,5 +23,3 @@ Server::get(IAppManager::class)->loadApp('tables');
 if (!class_exists(TestCase::class)) {
 	require_once('PHPUnit/Autoload.php');
 }
-
-OC_Hook::clear();
