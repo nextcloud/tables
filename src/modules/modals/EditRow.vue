@@ -202,7 +202,7 @@ export default {
 		async loadStore() {
 			if (this.tablesStore) { return }
 
-			const { default: store } = await import(/* webpackChunkName: 'store' */ '../../store/store.js')
+			const { default: store } = await import('../../store/store.js')
 			this.tablesStore = store
 		},
 		onKeydown(event) {

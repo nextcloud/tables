@@ -126,7 +126,7 @@ export default {
 		},
 		async sendNewRowToBE() {
 			if (!this.tablesStore) {
-				const { default: store } = await import(/* webpackChunkName: 'store' */ '../../store/store.js')
+				const { default: store } = await import('../../store/store.js')
 				this.tablesStore = store
 			}
 

@@ -20,12 +20,12 @@ registerWidget('tables_link', async (el, { richObjectType, richObject, accessibl
 })
 
 registerWidget('tables_content', async (el, { richObjectType, richObject, accessible, interactive = true }) => {
-	const { default: Vue } = await import(/* webpackChunkName: "reference-table-lazy" */'vue')
+	const { default: Vue } = await import('vue')
 	const { default: TableReferenceWidget } = interactive
-		? await import(/* webpackChunkName: "reference-table-lazy" */'./views/ContentReferenceWidget.vue')
-		: await import(/* webpackChunkName: "reference-table-lazy" */'./views/LinkReferenceWidget.vue')
-	const { default: store } = await import(/* webpackChunkName: 'store' */ './store/store.js')
-	const { default: data } = await import(/* webpackChunkName: 'store' */ './store/data.js')
+		? await import('./views/ContentReferenceWidget.vue')
+		: await import('./views/LinkReferenceWidget.vue')
+	const { default: store } = await import('./store/store.js')
+	const { default: data } = await import('./store/data.js')
 
 	store.data = data
 

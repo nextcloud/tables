@@ -130,10 +130,8 @@ export default {
 	async mounted() {
 		if (!this.tablesStore) {
 			const { default: store } = await import(
-				/* webpackChunkName: 'store' */
 				'../store/store.js')
 			const { default: data } = await import(
-				/* webpackChunkName: 'store' */
 				'../store/data.js')
 
 			this.tablesStore = store
