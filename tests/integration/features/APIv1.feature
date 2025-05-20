@@ -1,12 +1,22 @@
 # SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 Feature: APIv1
-  Background:
-    Given user "participant1" exists
-     Given user "participant2" exists
-     And group "phoenix" exists
-     And user "participant1" is member of group "phoenix"
-     And user "participant2" is member of group "phoenix"
+
+	Background:
+		Given user "participant1" exists
+		Given user "participant2" exists
+		Given user "participant3" exists
+		And group "phoenix" exists
+		And group "HierarchyA" exists
+		And group "HierarchyB" exists
+		And group "HierarchyC" exists
+		And user "participant1" is member of group "phoenix"
+		And user "participant1" is member of group "HierarchyA"
+		And user "participant1" is member of group "HierarchyB"
+		And user "participant2" is member of group "phoenix"
+		And user "participant2" is member of group "HierarchyB"
+		And user "participant2" is member of group "HierarchyC"
+		And user "participant3" is member of group "HierarchyC"
 
   @api1
   Scenario: User has initial table
@@ -49,6 +59,26 @@ Feature: APIv1
       | Welcome to Nextcloud Tables! |
     Then user "participant2" has the following tables
       | Welcome to Nextcloud Tables! |
+
+	@api1 @table-sharing @view-sharing @permissions
+	Scenario: Table sharing with inheriting permissions
+		Given table "Main table" with emoji "🥪" exists for user "participant1" as "t1"
+		And user "participant1" shares "table" "t1" with "group" "HierarchyB"
+		And user "participant1" sets permission "delete" to 1
+		And user "participant1" sets permission "manage" to 1
+		And user "participant1" shares "table" "t1" with "group" "HierarchyC"
+		And user "participant1" sets permission "create" to 0
+		And user "participant1" sets permission "update" to 0
+		When user "participant1" create view "Specific view" with emoji "⚡️" for "t1" as "v1"
+		And user "participant1" shares "view" "v1" with "group" "HierarchyC"
+		And user "participant1" sets permission "create" to 0
+		And user "participant1" sets permission "update" to 0
+		Then user "participant2" has the following permissions against "view" "v1"
+			| read    | 1 |
+			| create  | 1 |
+			| update  | 1 |
+			| delete  | 1 |
+			| manage  | 1 |
 
   @api1 @table-sharing
   Scenario: Inaccessible table sharing with a user

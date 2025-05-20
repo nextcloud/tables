@@ -213,6 +213,10 @@ class ViewService extends SuperService {
 		$item->setLastEditBy($userId);
 		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
 		$item->setLastEditAt($time->format('Y-m-d H:i:s'));
+		// ownership is not stored with the record, but it might be necessary upon
+		// further interaction with the view in the running process, as the instance
+		// is cached now. The ownership is always inherited from the table.
+		$item->setOwnership($table->getOwnership());
 		try {
 			$newItem = $this->mapper->insert($item);
 		} catch (\OCP\DB\Exception $e) {

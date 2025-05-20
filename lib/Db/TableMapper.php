@@ -9,8 +9,10 @@ namespace OCA\Tables\Db;
 
 use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
+use OCP\Cache\CappedMemoryCache;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
@@ -18,11 +20,13 @@ use OCP\IDBConnection;
 /** @template-extends QBMapper<Table> */
 class TableMapper extends QBMapper {
 	protected string $table = 'tables_tables';
-	private UserHelper $userHelper;
-
-	public function __construct(IDBConnection $db, UserHelper $userHelper) {
+	protected CappedMemoryCache $cache;
+	public function __construct(
+		IDBConnection $db,
+		private UserHelper $userHelper,
+	) {
 		parent::__construct($db, $this->table, Table::class);
-		$this->userHelper = $userHelper;
+		$this->cache = new CappedMemoryCache();
 	}
 
 	/**
@@ -34,24 +38,16 @@ class TableMapper extends QBMapper {
 	 * @throws MultipleObjectsReturnedException
 	 */
 	public function find(int $id): Table {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->table)
-			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
-		return $this->findEntity($qb);
-	}
-
-	/**
-	 * @param int $id
-	 * @return string
-	 * @throws Exception
-	 */
-	public function findOwnership(int $id): string {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('ownership')
-			->from($this->table)
-			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
-		return $qb->executeQuery()->fetch()['ownership'];
+		$cacheKey = (string)$id;
+		if (!isset($this->cache[$cacheKey])) {
+			$qb = $this->db->getQueryBuilder();
+			$qb->select('*')
+				->from($this->table)
+				->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
+			$entity = $this->findEntity($qb);
+			$this->cache[$cacheKey] = $entity;
+		}
+		return $this->cache[$cacheKey];
 	}
 
 	/**
@@ -66,7 +62,11 @@ class TableMapper extends QBMapper {
 		if ($userId !== null && $userId !== '') {
 			$qb->where($qb->expr()->eq('ownership', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
 		}
-		return $this->findEntities($qb);
+		$entities = $this->findEntities($qb);
+		foreach ($entities as $entity) {
+			$this->cache[(string)$entity->getId()] = $entity;
+		}
+		return $entities;
 	}
 
 	/**
@@ -125,5 +125,16 @@ class TableMapper extends QBMapper {
 		}
 
 		return $this->findEntities($qb);
+	}
+
+	public function delete(Entity $entity): Table {
+		unset($this->cache[(string)$entity->getId()]);
+		return parent::delete($entity);
+	}
+
+	public function insert(Entity $entity): Table {
+		$entity = parent::insert($entity);
+		$this->cache[(string)$entity->getId()] = $entity;
+		return $entity;
 	}
 }
