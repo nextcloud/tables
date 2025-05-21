@@ -18,7 +18,6 @@ const config = createAppConfig({
     },
 	config: {
 		build: {
-			outDir: path.join(__dirname, 'js'),
 			cssCodeSplit: false,
 			rollupOptions: {
 				output: {

@@ -70,7 +70,8 @@
     "cypress": "^13.6.4",
     "cypress-downloadfile": "^1.2.4",
     "openapi-typescript": "^7.8.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "cypress-vite": "^1.6.0"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "^4.10.0"
