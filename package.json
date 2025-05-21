@@ -68,6 +68,7 @@
     "@vue/tsconfig": "^0.5.1",
     "cypress": "^13.6.4",
     "cypress-downloadfile": "^1.2.4",
+    "cypress-vite": "^1.6.0",
     "openapi-typescript": "^7.6.1",
     "typescript": "~5.3.3"
   },
