@@ -39,11 +39,3 @@ export default {
 	},
 }
 </script>
-
-<style scoped>
-
-.empty-content {
-	margin-top: 20vh;
-}
-
-</style>
