@@ -4,8 +4,8 @@
  */
 import { mount } from 'cypress/vue2'
 import { translate as t, translatePlural as n } from '@nextcloud/l10n'
-import store from '../../src/store/store.js'
-import data from '../../src/store/data.js'
+import { useTablesStore as store } from '../../src/store/store.js'
+import { useDataStore as data } from '../../src/store/data.js'
 
 // Styles necessary for rendering the component
 import '../styleguide/assets/default.css'
