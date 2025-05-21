@@ -178,7 +178,7 @@ export default {
 			}
 
 			try {
-				const res = await axios.get(generateUrl('/apps/tables/column/' + this.value.type + '/' + this.value.value))
+				const res = await axios.get(generateUrl('/apps/tables/api/1/' + this.value.type + 's/' + this.value.value + '/columns'))
 				console.debug('columns from BE', res.data)
 				this.richObject.columns = res.data
 			} catch (e) {
