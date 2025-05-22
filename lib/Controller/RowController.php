@@ -65,13 +65,11 @@ class RowController extends Controller {
 	public function update(
 		int $id,
 		int $columnId,
-		?int $tableId,
 		?int $viewId,
 		string $data,
 	): DataResponse {
 		return $this->handleError(function () use (
 			$id,
-			$tableId,
 			$viewId,
 			$columnId,
 			$data
