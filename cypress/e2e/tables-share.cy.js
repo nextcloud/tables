@@ -23,8 +23,9 @@ describe('Share a table', () => {
 		cy.visit('apps/tables')
 
 		cy.get('[data-cy="navigationCreateTableIcon"]').click({ force: true })
-		cy.get('.tile').contains('ToDo').click({ force: true })
+		// should type before selecting the table type tile
 		cy.get('.modal__content input[type="text"]').clear().type(tableTitle)
+		cy.get('.tile').contains('ToDo').click({ force: true })
 		cy.get('[data-cy="createTableSubmitBtn"]').scrollIntoView().click()
 		cy.loadTable(tableTitle)
 		cy.get('[data-cy="customTableAction"] button').click()
