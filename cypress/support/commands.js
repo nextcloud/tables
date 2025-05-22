@@ -29,7 +29,7 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 import { addCommands } from '@nextcloud/cypress'
 import { emit } from '@nextcloud/event-bus'
-require('cypress-downloadfile/lib/downloadFileCommand')
+import 'cypress-downloadfile/lib/downloadFileCommand'
 
 const url = Cypress.config('baseUrl').replace(/\/index.php\/?$/g, '')
 Cypress.env('baseUrl', url)

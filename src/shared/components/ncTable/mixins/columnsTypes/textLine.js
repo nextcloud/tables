@@ -5,7 +5,7 @@
 import { AbstractTextColumn } from '../columnClass.js'
 import { ColumnTypes } from '../columnHandler.js'
 import { FilterIds } from '../filter.js'
-import { TYPE_META_CREATED_BY, TYPE_META_UPDATED_BY } from '../../../../constants.js'
+import { TYPE_META_CREATED_BY, TYPE_META_UPDATED_BY } from '../../../../constants.ts'
 
 export default class TextLineColumn extends AbstractTextColumn {
 

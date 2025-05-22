@@ -8,7 +8,7 @@ import axios from '@nextcloud/axios'
 import { generateUrl, generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import displayError from '../shared/utils/displayError.js'
-import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../shared/constants.js'
+import { NODE_TYPE_TABLE, NODE_TYPE_VIEW } from '../shared/constants.ts'
 import { getCurrentUser } from '@nextcloud/auth'
 import { set } from 'vue'
 
