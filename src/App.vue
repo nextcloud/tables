@@ -54,10 +54,12 @@ export default {
 	},
 	async created() {
 		const store = useTablesStore()
-		await store.loadTablesFromBE()
-		await store.getAllContexts()
-		await store.loadViewsSharedWithMeFromBE()
-		await store.loadTemplatesFromBE()
+		await Promise.all([
+			store.loadTablesFromBE(),
+			store.getAllContexts(),
+			store.loadViewsSharedWithMeFromBE(),
+			store.loadTemplatesFromBE(),
+		])
 		this.routing(this.$router.currentRoute)
 		this.observeAppContent()
 	},
