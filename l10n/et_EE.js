@@ -87,6 +87,7 @@ OC.L10N.register(
     "Data" : "Andmed",
     "Edit table" : "Muuda tabelit",
     "Import" : "Impordi",
+    "Export as CSV" : "Ekspordi CSV-failina",
     "Type" : "Tüüp",
     "Simple text" : "Lihtsustatud tekst",
     "Rich text" : "Vormindatud tekst",
