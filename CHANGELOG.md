@@ -5,6 +5,26 @@
 
 # Changelog
 
+## 0.9.3
+
+### Fixed
+
+* [Fix: Fix errors related to navigation (tables#1623)](https://github.com/nextcloud/tables/pull/1623)
+* [Fix(Permissions): view permissions inherit from table permissions (tables#1752)](https://github.com/nextcloud/tables/pull/1752)
+* [Fix: Update circles in cypress workflow (tables#1809)](https://github.com/nextcloud/tables/pull/1809)
+* [Perf: Parallelize initial requests (tables#1808)](https://github.com/nextcloud/tables/pull/1808)
+* [Refactor(Controller): remove private ColumnsController (tables#1810)](https://github.com/nextcloud/tables/pull/1810)
+
+### Other
+
+* [Chore(deps): update icewind1991/nextcloud-version-matrix digest to c2bf575 (tables#1792)](https://github.com/nextcloud/tables/pull/1792)
+* [Chore(deps): update shivammathur/setup-php digest to cf4cade (tables#1793)](https://github.com/nextcloud/tables/pull/1793)
+* [Chore(tests): Cleanup bootstrap.php to be forward-compatible (tables#1806)](https://github.com/nextcloud/tables/pull/1806)
+* [Ci: unblock integration test on irrelevant changes (tables#1811)](https://github.com/nextcloud/tables/pull/1811)
+* [Fix(deps): update dependency @nextcloud/dialogs to ^6.3.0 (tables#1797)](https://github.com/nextcloud/tables/pull/1797)
+* [Fix(deps): update dependency @nextcloud/moment to ^1.3.4 (tables#1805)](https://github.com/nextcloud/tables/pull/1805)
+
+
 ## 0.9.2
 
 ### Fixed
