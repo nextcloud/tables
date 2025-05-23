@@ -8,6 +8,7 @@
 namespace OCA\Tables\Service;
 
 use OC\User\NoUserException;
+use OCA\Tables\BackgroundJob\ImportTableJob;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\InternalError;
@@ -16,6 +17,7 @@ use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
+use OCP\BackgroundJob\IJobList;
 use OCP\DB\Exception;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
@@ -59,7 +61,9 @@ class ImportService extends SuperService {
 	private array $columnsConfig = [];
 
 	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-		IRootFolder $rootFolder, ColumnService $columnService, RowService $rowService, TableService $tableService, ViewService $viewService, IUserManager $userManager) {
+		IRootFolder $rootFolder, ColumnService $columnService, RowService $rowService, TableService $tableService,
+		ViewService $viewService, IUserManager $userManager,
+		private IJobList $jobList,) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->rootFolder = $rootFolder;
 		$this->columnService = $columnService;
@@ -224,14 +228,14 @@ class ImportService extends SuperService {
 	 * @param ?int $viewId
 	 * @param string $path
 	 * @param bool $createMissingColumns
-	 * @return array
 	 * @throws DoesNotExistException
 	 * @throws InternalError
 	 * @throws MultipleObjectsReturnedException
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function import(?int $tableId, ?int $viewId, string $path, bool $createMissingColumns = true, array $columnsConfig = []): array {
+	public function scheduleImport(?int $tableId, ?int $viewId, string $path, bool $createMissingColumns = true, array $columnsConfig = []): void
+	{
 		if ($viewId !== null) {
 			$view = $this->viewService->find($viewId);
 			if (!$this->permissionsService->canCreateRows($view)) {
@@ -268,6 +272,37 @@ class ImportService extends SuperService {
 			$this->logger->debug($error);
 			throw new InternalError($error);
 		}
+
+		$this->jobList->add(
+			ImportTableJob::class,
+			[
+				'user_id' => $this->userId,
+				'table_id' => $this->tableId,
+				'view_id' => $this->viewId,
+				'path' => $path,
+				'create_missing_columns' => $createMissingColumns,
+				'columns_config' => $columnsConfig,
+			]
+		);
+	}
+
+	/**
+	 * @param int $userId
+	 * @param ?int $tableId
+	 * @param ?int $viewId
+	 * @param string $path
+	 * @param bool $createMissingColumns
+	 * @return array
+	 * @throws DoesNotExistException
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
+	public function import(int $userId, ?int $tableId, ?int $viewId, string $path, bool $createMissingColumns = true, array $columnsConfig = []): array {
+		$this->userId = $userId;
+		$this->tableId = $tableId;
+		$this->viewId = $viewId;
 
 		$this->createUnknownColumns = $createMissingColumns;
 		$this->columnsConfig = $columnsConfig;
