@@ -8,6 +8,7 @@
 namespace OCA\Tables\Service\ColumnTypes;
 
 use OCA\Tables\Db\Column;
+use OCA\Tables\Errors\BadRequestError;
 
 interface IColumnTypeBusiness {
 
@@ -32,4 +33,13 @@ interface IColumnTypeBusiness {
 	 * @return bool
 	 */
 	public function canBeParsed($value, ?Column $column): bool;
+
+	/**
+	 * @throws BadRequestError In case the value is not valid
+	 *
+	 * @param mixed $value
+	 * @param Column $column
+	 * @param int|null $rowId
+	 */
+	public function validateValue(mixed $value, Column $column, string $userId, int $tableId, ?int $rowId): void;
 }
