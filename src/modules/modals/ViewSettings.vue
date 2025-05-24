@@ -40,7 +40,7 @@
 			<SelectedViewColumns
 				:columns="allColumns"
 				:selected-columns="selectedColumns"
-				:view-column-ids="viewSetting ? (view.columns ?? columns.map(col => col.id)) : null"
+				:view-column-ids="viewSetting ? (view.columnSettings ? view.columnSettings.map(item => item.columnId) : columns.map(col => col.id)) : null"
 				:generated-column-ids="viewSetting ? (generatedView.columns ?? [...selectedColumns]) : null"
 				:disable-hide="!canManageTable(view)" />
 		</NcAppSettingsSection>
@@ -165,11 +165,11 @@ export default {
 		generateViewConfigData() {
 			if (!this.viewSetting) return this.view
 			const mergedViewSettings = JSON.parse(JSON.stringify(this.view))
-			if (this.view.columns) {
+			if (this.view.columnSettings) {
 				if (this.viewSetting.hiddenColumns && this.viewSetting.hiddenColumns.length !== 0) {
-					mergedViewSettings.columns = this.view.columns.filter(id => !this.viewSetting.hiddenColumns.includes(id))
+					mergedViewSettings.columnSettings = this.view.columnSettings.filter(item => !this.viewSetting.hiddenColumns.includes(item.columnId))
 				} else {
-					mergedViewSettings.columns = this.view.columns
+					mergedViewSettings.columnSettings = this.view.columnSettings
 				}
 			}
 			if (this.viewSetting.sorting) {
@@ -239,8 +239,18 @@ export default {
 			// Show columns of view first
 			if (this.canManageTable(this.view)) this.allColumns = this.columns.concat(MetaColumns)
 			else this.allColumns = this.columns
-			if (this.view.columns) {
-				this.allColumns = this.view.columns.map(id => this.allColumns.find(col => col.id === id)).concat(this.allColumns.filter(col => !this.view.columns.includes(col.id)))
+			if (this.view.columnSettings) {
+				// Transform array to object for faster access
+				const columnSettingsMap = this.view.columnSettings.reduce((acc, item) => {
+					acc[item.columnId] = item
+					return acc
+				}, {})
+
+				this.allColumns.sort((a, b) => {
+					const orderA = columnSettingsMap[a.id]?.order ?? Number.MAX_SAFE_INTEGER
+					const orderB = columnSettingsMap[b.id]?.order ?? Number.MAX_SAFE_INTEGER
+					return orderA - orderB
+				})
 			}
 		},
 		async saveView() {
@@ -292,13 +302,19 @@ export default {
 			}
 		},
 		async updateViewToBE(id) {
-			const newSelectedColumnIds = this.allColumns.map(col => col.id).filter(id => this.selectedColumns.includes(id))
+			const newColumnSettings = this.allColumns
+				.map(col => col.id)
+				.filter(id => this.selectedColumns.includes(id))
+				.map((id, index) => ({
+					columnId: id,
+					order: index
+				}))
 			const data = {
 				data: {
 					title: this.title,
 					description: this.description,
 					emoji: this.icon,
-					columns: JSON.stringify(newSelectedColumnIds),
+					columnSettings: JSON.stringify(newColumnSettings),
 				},
 			}
 			// Update sorting rules if they don't contain hidden rules (= rules regarding rows the user can not see) that were not overwritten
@@ -327,7 +343,7 @@ export default {
 			this.description = this.mutableView.description ?? ''
 			this.icon = this.mutableView.emoji ?? this.loadEmoji()
 			this.errorTitle = false
-			this.selectedColumns = this.mutableView.columns ? [...this.mutableView.columns] : null
+			this.selectedColumns = this.mutableView.columnSettings ? this.mutableView.columnSettings.map(item => item.columnId) : null
 			this.allColumns = []
 			this.localLoading = false
 			this.columns = null
