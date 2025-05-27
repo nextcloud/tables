@@ -383,6 +383,7 @@ class RowService extends SuperService {
 		?int $viewId,
 		array $data,
 		string $userId,
+		?int $tableId,
 	): Row2 {
 		try {
 			$item = $this->getRowById($id);
@@ -432,8 +433,14 @@ class RowService extends SuperService {
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 			}
 		} else {
-			// if no view id is set, we assume a table and take the tableId from the row
-			$tableId = $item->getTableId();
+			if ($tableId === null) {
+				$tableId = $item->getTableId();
+			}
+			if ($tableId !== $item->getTableId()) {
+				$e = new \Exception('Row does not belong to table with id ' . $tableId);
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			}
 
 			// security
 			if (!$this->permissionsService->canReadRowsByElementId($item->getTableId(), 'table', $userId)) {
