@@ -38,6 +38,13 @@
 			</tr>
 
 			<tr>
+				<td>{{ t('tables', 'Updated rows') }}</td>
+				<td data-cy="importResultRowsUpdated">
+					{{ results.updated_rows_count }}
+				</td>
+			</tr>
+
+			<tr>
 				<td>{{ t('tables', 'Value parsing errors') }}</td>
 				<td data-cy="importResultParsingErrors">
 					{{ results.errors_parsing_count }}

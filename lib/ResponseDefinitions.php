@@ -147,6 +147,7 @@ namespace OCA\Tables;
  *  matching_columns_count: int,
  *  created_columns_count: int,
  *  inserted_rows_count: int,
+ *  updated_rows_count: int,
  *  errors_parsing_count: int,
  *  errors_count: int,
  * }

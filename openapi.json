@@ -310,6 +310,7 @@
                     "matching_columns_count",
                     "created_columns_count",
                     "inserted_rows_count",
+                    "updated_rows_count",
                     "errors_parsing_count",
                     "errors_count"
                 ],
@@ -327,6 +328,10 @@
                         "format": "int64"
                     },
                     "inserted_rows_count": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "updated_rows_count": {
                         "type": "integer",
                         "format": "int64"
                     },

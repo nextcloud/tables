@@ -61,6 +61,40 @@ describe('Import csv', () => {
 		cy.get('[data-cy="importResultRowErrors"]').should('contain.text', '0')
 	})
 
+	it('Import csv from device with updating of existent files', () => {
+		cy.intercept({ method: 'GET', url: '**/apps/tables/row/table/*' }).as('rowsReq')
+
+		cy.loadTable('Welcome to Nextcloud Tables!')
+
+		cy.wait('@rowsReq').then(({ response }) => {
+			const firstRow = response.body[0]
+			const csv = [
+				['id', 'What', 'How to do'],
+				[firstRow.id, 'What (Updated)', 'How to do (Updated)'],
+			]
+
+			cy.writeFile('cypress/fixtures/test-import-update.csv', csv.map(row => row.join(',')).join('\n'))
+		})
+
+		cy.clickOnTableThreeDotMenu('Import')
+		cy.get('.modal__content button').contains('Upload from device').click()
+		cy.get('input[type="file"]').selectFile('cypress/fixtures/test-import-update.csv', { force: true })
+
+		cy.get('.modal__content button').contains('Preview').click()
+		cy.get('.file_import__preview tbody tr', { timeout: 20000 }).should('have.length', 3)
+
+		cy.intercept({ method: 'POST', url: '**/apps/tables/importupload/table/*'}).as('importUploadReq')
+		cy.get('.modal__content button').contains('Import').click()
+		cy.wait('@importUploadReq')
+		cy.get('[data-cy="importResultColumnsFound"]', { timeout: 20000 }).should('contain.text', '2')
+		cy.get('[data-cy="importResultColumnsMatch"]').should('contain.text', '3')
+		cy.get('[data-cy="importResultColumnsCreated"]').should('contain.text', '0')
+		cy.get('[data-cy="importResultRowsInserted"]').should('contain.text', '0')
+		cy.get('[data-cy="importResultRowsUpdated"]').should('contain.text', '1')
+		cy.get('[data-cy="importResultParsingErrors"]').should('contain.text', '0')
+		cy.get('[data-cy="importResultRowErrors"]').should('contain.text', '0')
+	})
+
 })
 
 describe('Import csv from Files file action', () => {

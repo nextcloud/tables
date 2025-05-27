@@ -473,7 +473,7 @@ class ColumnService extends SuperService {
 				$result[$i] = '';
 			}
 			// if column was not found
-			if ($result[$i] === '' && $createUnknownColumns) {
+			if ($result[$i] === '' && $createUnknownColumns && $dataTypes[$i]['type'] !== Column::TYPE_META_ID) {
 				$description = $this->l->t('This column was automatically created by the import service.');
 				$result[$i] = $this->create(
 					$userId,
