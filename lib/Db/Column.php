@@ -108,6 +108,8 @@ class Column extends EntitySuper implements JsonSerializable {
 
 	public const SUBTYPE_TEXT_LINE = 'line';
 
+	public const META_ID_TITLE = 'id';
+
 	protected ?string $title = null;
 	protected ?int $tableId = null;
 	protected ?string $createdBy = null;
