@@ -122,8 +122,9 @@ describe('Filtering in a view by selection columns', () => {
 		// ## adjust filter
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('.v-popper__popper li button span').contains('Edit view').click({ force: true })
+		cy.get('[data-cy="viewSettingsDialog"]').should('be.visible')
 		cy.get('.modal-container .filter-group .v-select.select').eq(2).click()
-		cy.get('ul.vs__dropdown-menu li span[title="sel1"]').click()
+		cy.get('ul.vs__dropdown-menu li span').first().click()
 
 		// ## update view
 		cy.intercept({ method: 'PUT', url: '**/apps/tables/view/*' }).as('updateView')
