@@ -24,8 +24,9 @@ describe('Manage a table', () => {
 	it('Create', () => {
 		cy.get('.icon-loading').should('not.exist')
 		cy.get('[data-cy="navigationCreateTableIcon"]').click({ force: true })
-		cy.get('.tile').contains('ToDo').click({ force: true })
+		// should type before selecting the table type tile
 		cy.get('.modal__content input[type="text"]').clear().type('to do list')
+		cy.get('.tile').contains('ToDo').click({ force: true })
 		cy.get('.modal__content #description-editor .tiptap.ProseMirror').type('to Do List description')
 		cy.contains('button', 'Create table').scrollIntoView().click()
 
@@ -39,8 +40,9 @@ describe('Manage a table', () => {
 		cy.uploadFile('test-import.csv', 'text/csv')
 		cy.get('.icon-loading').should('not.exist')
 		cy.get('[data-cy="navigationCreateTableIcon"]').click({ force: true })
-		cy.get('.tile').contains('Import').click({ force: true })
+		// should type before selecting the table type tile
 		cy.get('.modal__content input[type="text"]').clear().type('import list')
+		cy.get('.tile').contains('Import').click({ force: true })
 		cy.contains('button', 'Create table').scrollIntoView().click()
 		cy.contains('h2', 'Import').should('be.visible')
 
@@ -65,6 +67,8 @@ describe('Manage a table', () => {
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('.action-button__text').contains('Edit table').click()
 
+		cy.get('[data-cy="editTableModal"]').should('be.visible')
+		cy.get('.modal-container input').last().should('be.visible').should('be.enabled')
 		cy.get('.modal-container input').last().clear().type('ToDo list')
 		cy.get('.modal__content #description-editor .tiptap.ProseMirror').type('Updated ToDo List description')
 		cy.get('.modal-container button').contains('Save').click()
@@ -81,8 +85,9 @@ describe('Manage a table', () => {
 	it('Transfer', () => {
 		cy.get('.icon-loading').should('not.exist')
 		cy.get('[data-cy="navigationCreateTableIcon"]').click({ force: true })
-		cy.get('.tile').contains('ToDo').click({ force: true })
+		// should type before selecting the table type tile
 		cy.get('[data-cy="createTableModal"] input[type="text"]').clear().type('test table')
+		cy.get('.tile').contains('ToDo').click({ force: true })
 		cy.contains('button', 'Create table').click()
 
 		cy.get('.app-navigation__list').contains('test table').click({ force: true })
