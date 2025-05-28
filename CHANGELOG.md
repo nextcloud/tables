@@ -5,8 +5,29 @@
 
 # Changelog
 
+## 0.8.6
+
+### Fixed
+
+* [[stable0.8] enhancement: UI fixes for create/edit row dialogs (tables#1716)](https://github.com/nextcloud/tables/pull/1716)
+* [[stable0.8] fix: Properly update usergroup cells (tables#1768)](https://github.com/nextcloud/tables/pull/1768)
+* [[stable0.8] Reverse column and row order when deleting (tables#1772)](https://github.com/nextcloud/tables/pull/1772)
+* [[stable0.8] refactor(Controller): remove private ColumnsController (tables#1815)](https://github.com/nextcloud/tables/pull/1815)
+* [[stable0.8] fix: Update circles in cypress workflow (tables#1816)](https://github.com/nextcloud/tables/pull/1816)
 
 
+### Dependencies
+
+* [Fix(deps): update dependency @nextcloud/axios to ^2.5.1 (stable0.8) (tables#1704)](https://github.com/nextcloud/tables/pull/1704)
+* [Fix(deps): update dependency @nextcloud/event-bus to ^3.3.2 (stable0.8) (tables#1706)](https://github.com/nextcloud/tables/pull/1706)
+* [Fix(deps): update dependency @nextcloud/moment to ^1.3.2 (stable0.8) (tables#1729)](https://github.com/nextcloud/tables/pull/1729)
+* [Fix(deps): update dependency @tiptap/vue-2 to ^2.11.7 (stable0.8) (tables#1730)](https://github.com/nextcloud/tables/pull/1730)
+* [Fix(deps): update dependency debounce to ^2.2.0 (stable0.8) (tables#1731)](https://github.com/nextcloud/tables/pull/1731)
+* [Fix(deps): update dependency @nextcloud/l10n to ^3.2.0 (stable0.8) (tables#1744)](https://github.com/nextcloud/tables/pull/1744)
+* [Fix(deps): update dependency @nextcloud/vue to ^8.24.0 (stable0.8) (tables#1745)](https://github.com/nextcloud/tables/pull/1745)
+* [Fix(deps): update dependency phpoffice/phpspreadsheet to ^1.29.10 (stable0.8) (tables#1746)](https://github.com/nextcloud/tables/pull/1746)
+* [Fix(deps): update dependency vue-material-design-icons to ^5.3.1 (stable0.8) (tables#1747)](https://github.com/nextcloud/tables/pull/1747)
+* [[stable0.8] Fix npm audit (tables#1763)](https://github.com/nextcloud/tables/pull/1763)
 
 ## 0.8.5
 
