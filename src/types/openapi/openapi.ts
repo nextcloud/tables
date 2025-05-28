@@ -2222,7 +2222,7 @@ export interface operations {
                      * @description View IDs where this column should be added to be presented
                      * @default []
                      */
-                    readonly selectedViewIds?: readonly number[];
+                    readonly selectedViewIds?: readonly number[] | null;
                 };
             };
         };
@@ -2425,7 +2425,7 @@ export interface operations {
                      * @description View IDs where this column should be added to be presented
                      * @default []
                      */
-                    readonly selectedViewIds?: readonly number[];
+                    readonly selectedViewIds?: readonly number[] | null;
                 };
             };
         };
@@ -4162,7 +4162,7 @@ export interface operations {
                      * @description View IDs where this columns should be added
                      * @default []
                      */
-                    readonly selectedViewIds?: readonly number[];
+                    readonly selectedViewIds?: readonly number[] | null;
                     /**
                      * @description Is mandatory
                      * @default false
@@ -4282,7 +4282,7 @@ export interface operations {
                      * @description View IDs where this columns should be added
                      * @default []
                      */
-                    readonly selectedViewIds?: readonly number[];
+                    readonly selectedViewIds?: readonly number[] | null;
                     /**
                      * @description Is mandatory
                      * @default false
@@ -4397,7 +4397,7 @@ export interface operations {
                      * @description View IDs where this columns should be added
                      * @default []
                      */
-                    readonly selectedViewIds?: readonly number[];
+                    readonly selectedViewIds?: readonly number[] | null;
                     /**
                      * @description Is mandatory
                      * @default false
@@ -4513,7 +4513,7 @@ export interface operations {
                      * @description View IDs where this columns should be added
                      * @default []
                      */
-                    readonly selectedViewIds?: readonly number[];
+                    readonly selectedViewIds?: readonly number[] | null;
                     /**
                      * @description Is mandatory
                      * @default false
@@ -4631,7 +4631,7 @@ export interface operations {
                      * @description View IDs where this columns should be added
                      * @default []
                      */
-                    readonly selectedViewIds?: readonly number[];
+                    readonly selectedViewIds?: readonly number[] | null;
                     /**
                      * @description Is mandatory
                      * @default false
