@@ -12,6 +12,9 @@
 * [[stable0.8] enhancement: UI fixes for create/edit row dialogs (tables#1716)](https://github.com/nextcloud/tables/pull/1716)
 * [[stable0.8] fix: Properly update usergroup cells (tables#1768)](https://github.com/nextcloud/tables/pull/1768)
 * [[stable0.8] Reverse column and row order when deleting (tables#1772)](https://github.com/nextcloud/tables/pull/1772)
+* [[stable0.8] refactor(Controller): remove private ColumnsController (tables#1815)](https://github.com/nextcloud/tables/pull/1815)
+* [[stable0.8] fix: Update circles in cypress workflow (tables#1816)](https://github.com/nextcloud/tables/pull/1816)
+
 
 ### Dependencies
 
