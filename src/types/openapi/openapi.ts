@@ -905,6 +905,12 @@ export type components = {
             readonly lastEditAt: string;
             readonly description: string | null;
             readonly columns: readonly number[];
+            readonly columnSettings: readonly {
+                /** Format: int64 */
+                readonly columnId: number;
+                /** Format: int64 */
+                readonly order: number;
+            }[];
             readonly sort: readonly {
                 /** Format: int64 */
                 readonly columnId: number;
