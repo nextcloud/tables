@@ -83,7 +83,6 @@ class PermissionsService {
 		}
 
 		if ($userId === null) {
-			$e = new \Exception();
 			$error = 'PreCheck for userId failed, requested in ' . get_class($this) . '.';
 			$this->logger->debug($error, ['exception' => new \Exception()]);
 			throw new InternalError($error);
@@ -666,7 +665,7 @@ class PermissionsService {
 		try {
 			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
-			$e = new \Exception('Cannot pre check the user id');
+			$e = new \Exception('Cannot pre check the user id', 0, $e);
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			return false;
 		}
