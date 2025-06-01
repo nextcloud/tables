@@ -307,6 +307,7 @@ OC.L10N.register(
     "Content" : "Sisu",
     "Select" : "Vali",
     "Insert" : "Lisa",
+    "Unchecked" : "Pole kontrollitud",
     "Now" : "Praegu",
     "ID" : "ID",
     "Creator" : "Looja",
