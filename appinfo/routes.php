@@ -43,7 +43,7 @@ return [
 		['name' => 'api1#updateShareDisplayMode',	'url' => '/api/1/shares/{shareId}/display-mode', 'verb' => 'PUT'],
 		['name' => 'api1#createTableShare',	'url' => '/api/1/tables/{tableId}/shares', 'verb' => 'POST'],
 		// -> columns
-		['name' => 'api1#indexTableColumns',	'url' => '/api/1/tables/{tableId}/columns', 'verb' => 'GET'],
+		['name' => 'api1#indexTableColumns', 'url' => '/api/1/tables/{tableId}/columns', 'verb' => 'GET'],
 		['name' => 'api1#indexViewColumns', 'url' => '/api/1/views/{viewId}/columns', 'verb' => 'GET'],
 		['name' => 'api1#createColumn',	'url' => '/api/1/columns', 'verb' => 'POST'],
 		['name' => 'api1#createTableColumn', 'url' => '/api/1/tables/{tableId}/columns', 'verb' => 'POST'],
@@ -79,15 +79,6 @@ return [
 		['name' => 'view#create', 'url' => '/view', 'verb' => 'POST'],
 		['name' => 'view#update', 'url' => '/view/{id}', 'verb' => 'PUT'],
 		['name' => 'view#destroy', 'url' => '/view/{id}', 'verb' => 'DELETE'],
-
-		// columns
-		['name' => 'column#indexTableByView', 'url' => '/column/table/{tableId}/view/{viewId}', 'verb' => 'GET'],
-		['name' => 'column#index', 'url' => '/column/table/{tableId}', 'verb' => 'GET'],
-		['name' => 'column#show', 'url' => '/column/{id}', 'verb' => 'GET'],
-		['name' => 'column#indexView', 'url' => '/column/view/{viewId}', 'verb' => 'GET'],
-		['name' => 'column#create', 'url' => '/column', 'verb' => 'POST'],
-		['name' => 'column#update', 'url' => '/column/{id}', 'verb' => 'PUT'],
-		['name' => 'column#destroy', 'url' => '/column/{id}', 'verb' => 'DELETE'],
 
 		// rows
 		['name' => 'row#index', 'url' => '/row/table/{tableId}', 'verb' => 'GET'],

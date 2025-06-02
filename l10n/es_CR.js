@@ -25,6 +25,7 @@ OC.L10N.register(
     "Text" : "Texto",
     "Link" : "Liga",
     "Move" : "Mover",
+    "Operator" : "Operador",
     "Shares" : "Elementos compartidos",
     "Actions" : "Acciones",
     "Share" : "Compartir",

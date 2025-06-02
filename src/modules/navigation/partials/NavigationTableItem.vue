@@ -34,7 +34,7 @@
 
 		<template #actions>
 			<!-- EDIT -->
-			<NcActionButton v-if="canManageElement(table) "
+			<NcActionButton v-if="canManageElement(table)"
 				:close-after-click="true"
 				@click="emit('tables:table:edit', table.id)">
 				<template #icon>

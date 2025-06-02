@@ -318,6 +318,7 @@ OC.L10N.register(
     "Close editor" : "Закрыть редактор",
     "Go to first page" : "Перейти на первую страницу",
     "Go to previous page" : "Перейти к предыдущей странице",
+    "Page number" : "Номер страницы",
     "Go to next page" : "Перейти на следующую страницу",
     "Go to last page" : "Перейти на последнюю страницу",
     "Create Row" : "Создать строку",
