@@ -13,11 +13,16 @@
       </span>
     </div>
 
-    <NcActionButton :title="copyTooltip" :aria-label="copyTooltip" @click="copyUrl" class="share-internal-link__button">
+    <NcButton
+      :title="copyTooltip"
+      :aria-label="copyTooltip"
+      class="share-internal-link__button"
+      @click="copyUrl"
+      variant="tertiary">
       <template #icon>
         <ContentCopy :size="20" />
       </template>
-    </NcActionButton>
+    </NcButton>
   </div>
 </template>
 
@@ -25,20 +30,20 @@
 import copyToClipboard from '../../../shared/mixins/copyToClipboard.js'
 import { t } from '@nextcloud/l10n'
 
-import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
+import { NcButton } from '@nextcloud/vue'
 import OpenInNew from 'vue-material-design-icons/OpenInNew.vue'
 import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
 
 export default {
   name: 'ShareInternalLink',
 
-  mixins: [copyToClipboard],
-
   components: {
-    NcActionButton,
+    NcButton,
     OpenInNew,
     ContentCopy,
   },
+
+  mixins: [copyToClipboard],
 
   props: {
     currentUrl: {
@@ -73,8 +78,8 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: var(--default-clickable-area);
+    height: var(--default-clickable-area);
     background-color: var(--color-text-maxcontrast);
     border-radius: 50%;
     color: var(--color-main-background);
@@ -102,16 +107,6 @@ export default {
   &__subtitle {
     font-size: 0.85em;
     color: var(--color-text-light);
-  }
-
-  &__button {
-    margin-inline-start: auto;
-    padding: 0.25rem !important;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 }
 </style>

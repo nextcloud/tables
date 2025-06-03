@@ -5,7 +5,7 @@
 <template>
 	<div v-if="activeElement" class="sharing">
 		<div v-if="canShareElement(activeElement)">
-			<ShareInternalLink :currentUrl="currentUrl" />
+			<ShareInternalLink :current-url="currentUrl" />
 			<ShareForm :shares="shares" @add="addShare" @update="updateShare" />
 			<ShareList :shares="shares" @remove="removeShare" @update="updateShare" />
 		</div>
@@ -20,6 +20,7 @@ import ShareForm from '../partials/ShareForm.vue'
 import ShareList from '../partials/ShareList.vue'
 import ShareInternalLink from '../partials/ShareInternalLink.vue'
 import { getCurrentUser } from '@nextcloud/auth'
+import { generateUrl } from '@nextcloud/router'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 
 export default {
@@ -42,12 +43,16 @@ export default {
 	computed: {
 		...mapState(useTablesStore, ['activeElement', 'isView']),
 		currentUrl() {
-			const url = this.activeElement
-				? `${window.location.origin}/index.php/apps/tables/#/table/${this.activeElement.id}`
-				: ''
-			console.log('Generated currentUrl:', url)
-			return url
-		}
+			if (!this.activeElement) {
+				return ''
+			}
+			const baseUrl = generateUrl('/apps/tables/', {}, { baseURL: window.location.origin })
+			
+			if (this.isView) {
+				return `${baseUrl}#/view/${this.activeElement.id}`
+			}
+			return `${baseUrl}#/table/${this.activeElement.id}`
+		},
 	},
 
 	watch: {
