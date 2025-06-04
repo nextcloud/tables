@@ -21,10 +21,19 @@ export const TYPE_META_CREATED_AT = -4
 export const TYPE_META_UPDATED_AT = -5
 
 export const TYPE_SELECTION = 'selection'
-export const TYPE_TEXT = 'text'
 export const TYPE_NUMBER = 'number'
 export const TYPE_DATETIME = 'datetime'
 export const TYPE_USERGROUP = 'usergroup'
+export const TYPE_TEXT_LINE = 'text-line'
+export const TYPE_TEXT_LINK = 'text-link'
+export const TYPE_TEXT_LONG = 'text-long'
+export const TYPE_TEXT_RICH = 'text-rich'
+export const TYPE_NUMBER_STARS = 'number-stars'
+export const TYPE_NUMBER_PROGRESS = 'number-progress'
+export const TYPE_SELECTION_MULTI = 'selection-multi'
+export const TYPE_SELECTION_CHECK = 'selection-check'
+export const TYPE_DATETIME_DATE = 'datetime-date'
+export const TYPE_DATETIME_TIME = 'datetime-time'
 
 export const NAV_ENTRY_MODE = {
 	NAV_ENTRY_MODE_HIDDEN: 0, // no nav bar entry
