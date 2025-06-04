@@ -8,6 +8,9 @@
 			{{ column.numberPrefix }}{{ getValue }}{{ column.numberSuffix }}
 		</div>
 		<div v-else class="inline-editing-container">
+			<div v-if="column.numberPrefix" class="number-prefix">
+				{{ column.numberPrefix }}
+			</div>
 			<input
 				ref="input"
 				v-model="editValue"
@@ -20,6 +23,9 @@
 				@blur="saveChanges"
 				@keyup.enter="saveChanges"
 				@keyup.esc="cancelEdit">
+			<div v-if="column.numberSuffix" class="number-suffix">
+				{{ column.numberSuffix }}
+			</div>
 			<div v-if="localLoading" class="icon-loading-small icon-loading-inline" />
 		</div>
 	</div>
@@ -149,5 +155,19 @@ export default {
 .cell-number {
     width: 100%;
     text-align: right;
+}
+
+.inline-editing-container {
+    display: flex;
+    align-items: center;
+}
+
+.cell-input {
+    text-align: right;
+    flex-grow: 1;
+}
+
+.number-prefix, .number-suffix {
+    padding: 0 4px;
 }
 </style>
