@@ -4,8 +4,11 @@
 -->
 <template>
 	<div class="cell-progress" @click="startEditing">
-		<div v-if="!isEditing">
+		<div v-if="!isEditing" class="progress-display">
 			<NcProgressBar v-if="getValue !== null" :value="getValue" />
+			<div v-else class="empty-progress-placeholder">
+				({{ t('tables', 'No progress set') }})
+			</div>
 		</div>
 		<div v-else class="inline-editing-container">
 			<input
@@ -139,5 +142,23 @@ export default {
 .cell-progress {
     padding-right: 10px;
     min-width: 12vw;
+    cursor: pointer;
+}
+
+.progress-display {
+    width: 100%;
+    min-height: 20px;
+}
+
+.empty-progress-placeholder {
+    color: var(--color-text-maxcontrast);
+    font-style: italic;
+    font-size: 0.9em;
+    padding: 4px 0;
+}
+
+.cell-input {
+    text-align: right;
+    width: 100%;
 }
 </style>
