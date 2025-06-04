@@ -93,7 +93,7 @@ describe('Rows for a table', () => {
 		// Test inline editing by double-clicking the cell
 		cy.get('[data-cy="ncTable"] [data-cy="customTableRow"]')
 			.contains('Test inline editing')
-			.dblclick()
+			.click()
 		
 		// Verify the input field appears and is focused
 		cy.get('.cell-input').should('be.visible')
