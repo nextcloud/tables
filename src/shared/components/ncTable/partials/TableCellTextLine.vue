@@ -4,7 +4,7 @@
 -->
 <template>
 	<div class="cell-text-line">
-		<div v-if="!isEditing && value" @dblclick="startEditing">
+		<div v-if="!isEditing && value" @click="startEditing">
 			{{ value | truncate(50) }}
 		</div>
 		<div v-else class="inline-editing-container">

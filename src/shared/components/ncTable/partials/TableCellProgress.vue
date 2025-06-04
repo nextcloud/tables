@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="cell-progress" @dblclick="startEditing">
+	<div class="cell-progress" @click="startEditing">
 		<div v-if="!isEditing">
 			<NcProgressBar v-if="getValue !== null" :value="getValue" />
 		</div>
