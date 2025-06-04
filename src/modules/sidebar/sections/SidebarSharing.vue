@@ -27,7 +27,7 @@ export default {
 	components: {
 		ShareForm,
 		ShareList,
-		ShareInternalLink
+		ShareInternalLink,
 	},
 
 	mixins: [shareAPI, permissionsMixin],
@@ -46,8 +46,8 @@ export default {
 			if (!this.activeElement) {
 				return ''
 			}
-			const baseUrl = generateUrl('/apps/tables/', {}, { baseURL: window.location.origin })
-			
+			const baseUrl = generateUrl('/apps/tables/')
+
 			if (this.isView) {
 				return `${baseUrl}#/view/${this.activeElement.id}`
 			}

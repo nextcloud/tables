@@ -1,29 +1,33 @@
+<!--
+  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: AGPL-3.0-or-later
+-->
 <template>
-  <div class="share-internal-link">
-    <div class="share-internal-link__icon">
-      <OpenInNew :size="20" />
-    </div>
+	<div class="share-internal-link">
+		<div class="share-internal-link__icon">
+			<OpenInNew :size="20" />
+		</div>
 
-    <div class="share-internal-link__info">
-      <span class="share-internal-link__title">
-        {{ t('tables', 'Internal link') }}
-      </span>
-      <span class="share-internal-link__subtitle">
-        {{ t('tables', 'Only works for users with access to this folder') }}
-      </span>
-    </div>
+		<div class="share-internal-link__info">
+			<span class="share-internal-link__title">
+				{{ t('tables', 'Internal link') }}
+			</span>
+			<span class="share-internal-link__subtitle">
+				{{ t('tables', 'Only works for users with access to this folder') }}
+			</span>
+		</div>
 
-    <NcButton
-      :title="copyTooltip"
-      :aria-label="copyTooltip"
-      class="share-internal-link__button"
-      @click="copyUrl"
-      variant="tertiary">
-      <template #icon>
-        <ContentCopy :size="20" />
-      </template>
-    </NcButton>
-  </div>
+		<NcButton
+			:title="copyTooltip"
+			:aria-label="copyTooltip"
+			class="share-internal-link__button"
+			variant="tertiary"
+			@click="copyUrl">
+			<template #icon>
+				<ContentCopy :size="20" />
+			</template>
+		</NcButton>
+	</div>
 </template>
 
 <script>
@@ -35,34 +39,34 @@ import OpenInNew from 'vue-material-design-icons/OpenInNew.vue'
 import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
 
 export default {
-  name: 'ShareInternalLink',
+	name: 'ShareInternalLink',
 
-  components: {
-    NcButton,
-    OpenInNew,
-    ContentCopy,
-  },
+	components: {
+		NcButton,
+		OpenInNew,
+		ContentCopy,
+	},
 
-  mixins: [copyToClipboard],
+	mixins: [copyToClipboard],
 
-  props: {
-    currentUrl: {
-      type: String,
-      required: true,
-    },
-  },
+	props: {
+		currentUrl: {
+			type: String,
+			required: true,
+		},
+	},
 
-  computed: {
-    copyTooltip() {
-      return t('tables', 'Copy internal link to clipboard')
-    },
-  },
+	computed: {
+		copyTooltip() {
+			return t('tables', 'Copy internal link to clipboard')
+		},
+	},
 
-  methods: {
-    copyUrl() {
-      this.copyToClipboard(this.currentUrl, false)
-    },
-  },
+	methods: {
+		copyUrl() {
+			this.copyToClipboard(this.currentUrl, false)
+		},
+	},
 }
 </script>
 
