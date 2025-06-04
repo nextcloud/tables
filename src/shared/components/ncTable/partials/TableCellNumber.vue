@@ -4,7 +4,7 @@
 -->
 <template>
 	<div class="cell-number">
-		<div v-if="!isEditing" @dblclick="startEditing">
+		<div v-if="!isEditing" @click="startEditing">
 			{{ column.numberPrefix }}{{ getValue }}{{ column.numberSuffix }}
 		</div>
 		<div v-else class="inline-editing-container">
