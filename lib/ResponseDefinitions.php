@@ -121,6 +121,7 @@ namespace OCA\Tables;
  *  textDefault: string,
  *  textAllowedPattern: string,
  *  textMaxLength: int,
+ *  textUnique: bool,
  *  selectionOptions: string,
  *  selectionDefault: string,
  *  datetimeDefault: string,
