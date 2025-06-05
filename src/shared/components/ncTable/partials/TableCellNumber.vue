@@ -32,44 +32,21 @@
 </template>
 
 <script>
-import { showError } from '@nextcloud/dialogs'
-import { translate as t } from '@nextcloud/l10n'
-import { mapActions, mapState } from 'pinia'
-import { useDataStore } from '../../../../store/data.js'
+import cellEditMixin from '../mixins/cellEditMixin.js'
 
 export default {
 	name: 'TableCellNumber',
 
+	mixins: [cellEditMixin],
+
 	props: {
-		column: {
-			type: Object,
-			required: true,
-		},
-		rowId: {
-			type: Number,
-			required: true,
-		},
 		value: {
 			type: Number,
 			default: null,
 		},
 	},
 
-	data() {
-		return {
-			isEditing: false,
-			editValue: '',
-			localLoading: false,
-		}
-	},
-
 	computed: {
-		...mapState(useDataStore, {
-			rowMetadata(state) {
-				return state.getRowMetadata(this.rowId)
-			},
-		}),
-
 		getValue() {
 			if (this.value === null) {
 				return null
@@ -97,16 +74,6 @@ export default {
 	},
 
 	methods: {
-		...mapActions(useDataStore, ['updateRow']),
-
-		startEditing() {
-			this.editValue = this.value
-			this.isEditing = true
-			this.$nextTick(() => {
-				this.$refs.input.focus()
-			})
-		},
-
 		async saveChanges() {
 			// Prevent multiple executions of saveChanges
 			if (this.localLoading) {
@@ -118,34 +85,15 @@ export default {
 				return
 			}
 
-			this.localLoading = true
+			const newValue = this.editValue === '' ? null : Number(this.editValue)
+			const success = await this.updateCellValue(newValue)
 
-			const data = [{
-				columnId: this.column.id,
-				value: this.editValue === '' ? null : Number(this.editValue),
-			}]
-
-			const res = await this.updateRow({
-				id: this.rowId,
-				isView: this.rowMetadata.isView,
-				elementId: this.rowMetadata.elementId,
-				data,
-			})
-
-			if (!res) {
-				showError(t('tables', 'Could not update cell'))
+			if (!success) {
 				this.cancelEdit()
-			} else {
-				this.$emit('update:value', Number(this.editValue))
 			}
 
 			this.localLoading = false
 			this.isEditing = false
-		},
-
-		cancelEdit() {
-			this.isEditing = false
-			this.editValue = this.value
 		},
 	},
 }
