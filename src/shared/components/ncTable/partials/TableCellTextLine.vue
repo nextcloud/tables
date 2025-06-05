@@ -23,10 +23,7 @@
 </template>
 
 <script>
-import { showError } from '@nextcloud/dialogs'
-import { translate as t } from '@nextcloud/l10n'
-import { mapActions, mapState } from 'pinia'
-import { useDataStore } from '../../../../store/data.js'
+import cellEditMixin from '../mixins/cellEditMixin.js'
 
 export default {
 	name: 'TableCellTextLine',
@@ -41,87 +38,31 @@ export default {
 		},
 	},
 
+	mixins: [cellEditMixin],
+
 	props: {
-		column: {
-			type: Object,
-			default: () => {},
-		},
-		rowId: {
-			type: Number,
-			default: null,
-		},
 		value: {
 			type: String,
 			default: '',
 		},
 	},
 
-	data() {
-		return {
-			isEditing: false,
-			editValue: '',
-			localLoading: false,
-		}
-	},
-
-	computed: {
-		...mapState(useDataStore, {
-			rowMetadata(state) {
-				return state.getRowMetadata(this.rowId)
-			},
-		}),
-	},
-
 	methods: {
-		...mapActions(useDataStore, ['updateRow']),
-
-		startEditing() {
-			this.editValue = this.value
-			this.isEditing = true
-			this.$nextTick(() => {
-				this.$refs.input.focus()
-			})
-		},
-
 		async saveChanges() {
-			// Prevent multiple executions of saveChanges
-			if (this.localLoading) {
-				return
-			}
-
 			if (this.editValue === this.value) {
 				this.isEditing = false
 				return
 			}
 
-			this.localLoading = true
+			const newValue = this.editValue ?? ''
+			const success = await this.updateCellValue(newValue)
 
-			const data = [{
-				columnId: this.column.id,
-				value: this.editValue ?? '',
-			}]
-
-			const res = await this.updateRow({
-				id: this.rowId,
-				isView: this.rowMetadata.isView,
-				elementId: this.rowMetadata.elementId,
-				data,
-			})
-
-			if (!res) {
-				showError(t('tables', 'Could not update cell'))
+			if (!success) {
 				this.cancelEdit()
-			} else {
-				this.$emit('update:value', this.editValue)
 			}
 
 			this.localLoading = false
 			this.isEditing = false
-		},
-
-		cancelEdit() {
-			this.isEditing = false
-			this.editValue = this.value
 		},
 	},
 }
