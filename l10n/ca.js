@@ -204,6 +204,8 @@ OC.L10N.register(
     "Receiver type" : "Tipus de receptor",
     "Create time" : "Crea temps",
     "Share ID" : "Comparteix ID",
+    "Copy internal link to clipboard" : "Copia l'enllaç intern al porta-retalls",
+    "Only works for users with access to this folder" : "Només funciona per als usuaris amb accés a aquesta carpeta",
     "group" : "grup",
     "Permissions" : "Permisos",
     "Read data" : "Llegeix dades",

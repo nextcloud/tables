@@ -135,6 +135,8 @@ OC.L10N.register(
     "Favorites" : "Preferiti",
     "Clear filter" : "Pulisci il filtro",
     "No recommendations. Start typing." : "Nessun consiglio. Inizia a scrivere.",
+    "Copy internal link to clipboard" : "Copia il collegamento interno negli appunti",
+    "Internal link" : "Collegamento interno",
     "group" : "group",
     "Permissions" : "Permessi",
     "Delete data" : "Elimina dati",

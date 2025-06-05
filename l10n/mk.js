@@ -62,6 +62,8 @@ OC.L10N.register(
     "Favorites" : "Омилени",
     "Clear filter" : "Исчисти филтри",
     "No recommendations. Start typing." : "Нема препораки. Започнете со пишување.",
+    "Copy internal link to clipboard" : "Копирај внатрешен линк во клипборд",
+    "Internal link" : "Внатрешен линк",
     "group" : "група",
     "Permissions" : "Дозволи",
     "No shares" : "Нема споделувања",

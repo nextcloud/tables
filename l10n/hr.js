@@ -71,6 +71,7 @@ OC.L10N.register(
     "Favorites" : "Favoriti",
     "Clear filter" : "Ukloni filtar",
     "No recommendations. Start typing." : "Nema preporuka. Započnite unos.",
+    "Internal link" : "Interna poveznica",
     "group" : "grupa",
     "Permissions" : "Dopuštenja",
     "No shares" : "Nema dijeljenja",

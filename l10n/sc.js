@@ -73,6 +73,7 @@ OC.L10N.register(
     "Favorites" : "Preferidos",
     "Clear filter" : "Lìmpia filtru",
     "No recommendations. Start typing." : "Peruna racumandatzione. Cumintza a iscrìere.",
+    "Copy internal link to clipboard" : "Còpia su ligòngiu internu in punta de billete",
     "group" : "grupu",
     "Permissions" : "Permissos",
     "No shares" : "Peruna cumpartzidura",

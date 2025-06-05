@@ -242,6 +242,8 @@ OC.L10N.register(
     "Receiver type" : "Jasotzaile mota",
     "Create time" : "Sortu denbora",
     "Share ID" : "Partekatze ID",
+    "Copy internal link to clipboard" : "Kopiatu barne esteka arbelera",
+    "Internal link" : "Barneko esteka",
     "group" : "taldea",
     "Table manager" : "Taulen kudeatzailea",
     "Permissions" : "Baimenak",

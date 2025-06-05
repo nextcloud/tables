@@ -374,6 +374,8 @@ OC.L10N.register(
     "Receiver type" : "Tipo de destinatário",
     "Create time" : "Data de criação",
     "Share ID" : "ID do compartilhamento",
+    "Copy internal link to clipboard" : "Copiar link interno para a área de transferência",
+    "Internal link" : "Link interno",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "Qualquer aplicativo criado por um destinatário de compartilhamento rebaixado usando uma tabela compartilhada continuará a consumir seus dados.",
     "group" : "grupo",
     "team" : "equipe",

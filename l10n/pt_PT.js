@@ -67,6 +67,7 @@ OC.L10N.register(
     "Favorites" : "Favoritos",
     "Clear filter" : "Limpar filtro",
     "No recommendations. Start typing." : "Nenhuma recomendação. Comece a escrever ",
+    "Only works for users with access to this folder" : "Apenas funciona para utilizadores com acesso a esta pasta",
     "group" : "grupo",
     "Delete data" : "Apagar dados",
     "Created at" : "Criado em",

@@ -65,6 +65,7 @@ OC.L10N.register(
     "Favorites" : "Izlases vienumi",
     "Applications" : "Lietotnes",
     "Clear filter" : "Notīrīt atlasi",
+    "Internal link" : "Iekšējā saite",
     "group" : "grupa",
     "Permissions" : "Atļaujas",
     "Delete data" : "Izdzēst datus",

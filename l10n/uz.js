@@ -63,6 +63,7 @@ OC.L10N.register(
     "Delete table" : "Jadvalni o'chirish",
     "Copy" : "Nusxalash",
     "Favorites" : "Favorites",
+    "Internal link" : "Ichki havola",
     "group" : "group",
     "Delete data" : "Ma'lumotlarni o'chirish",
     "Sharing" : "Ulashish",

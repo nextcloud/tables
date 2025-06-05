@@ -113,6 +113,8 @@ OC.L10N.register(
     "Favorites" : "מועדפים",
     "Clear filter" : "מחיקת מסנן",
     "No recommendations. Start typing." : "אין המלצות. נא להתחיל להקליד.",
+    "Internal link" : "קישור פנימי",
+    "Only works for users with access to this folder" : "עובד רק עבור משתמשים עם גישה לתיקייה הזו",
     "group" : "קבוצה",
     "Permissions" : "הרשאות",
     "No shares" : "אין שיתופים",

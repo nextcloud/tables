@@ -363,6 +363,8 @@ OC.L10N.register(
     "Receiver type" : "Type de destinataire",
     "Create time" : "Date de création",
     "Share ID" : "Identifiant du partage",
+    "Copy internal link to clipboard" : "Copier le lien interne dans le presse-papiers",
+    "Internal link" : "Lien interne",
     "group" : "groupe",
     "team" : "équipe",
     "Table manager" : "Gestionaire de tableau",

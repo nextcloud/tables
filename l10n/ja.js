@@ -299,6 +299,8 @@ OC.L10N.register(
     "Clear filter" : "フィルターをクリア",
     "Share with accounts or groups" : "アカウントまたはグループと共有",
     "No recommendations. Start typing." : "推奨事項はありません。 入力を開始します。",
+    "Copy internal link to clipboard" : "内部リンクをクリップボードにコピー",
+    "Internal link" : "内部リンク",
     "group" : "グループ",
     "Permissions" : "アクセス権限",
     "Read data" : "データの読み込み",

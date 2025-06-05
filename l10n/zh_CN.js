@@ -355,6 +355,8 @@ OC.L10N.register(
     "Receiver type" : "接收者类型",
     "Create time" : "创建时间",
     "Share ID" : "分享 ID",
+    "Copy internal link to clipboard" : "复制内部链接到剪贴板",
+    "Internal link" : "内部链接",
     "group" : "小组",
     "Table manager" : "数据表管理者",
     "Permissions" : "权限",

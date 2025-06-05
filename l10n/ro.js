@@ -68,6 +68,7 @@ OC.L10N.register(
     "Favorites" : "Favorite",
     "Clear filter" : "Șterge filtrul",
     "No recommendations. Start typing." : "Nu am găsit recomandări. Începeți să scrieți.",
+    "Internal link" : "Link intern",
     "group" : "grup",
     "Permissions" : "Permisiuni",
     "No shares" : "Nicio partajare",

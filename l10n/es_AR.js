@@ -66,6 +66,7 @@ OC.L10N.register(
     "Copy" : "Copiar",
     "Favorites" : "Favoritos",
     "No recommendations. Start typing." : "No hay sugerencias. Comenzar a escribir",
+    "Only works for users with access to this folder" : "Solo funciona para usuarios con acceso a esta carpeta",
     "group" : "grupo",
     "Permissions" : "Permisos",
     "Delete data" : "Borrar datos",

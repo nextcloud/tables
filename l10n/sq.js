@@ -51,6 +51,7 @@ OC.L10N.register(
     "Remove from favorites" : "Hiqeni nga të parapëlqyerat",
     "Copy" : "Kopjoni",
     "Favorites" : "Favorites",
+    "Only works for users with access to this folder" : "Punon vetëm për përdoruesit që kanë qasje në këtë dosje",
     "group" : "grup",
     "Permissions" : "Lejet",
     "Created at" : "U krijua në",

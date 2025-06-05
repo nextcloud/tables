@@ -245,6 +245,8 @@ OC.L10N.register(
     "User, group or team …" : "Kasutaja, grupp või tiim",
     "User or group …" : "Kasutaja või grupp…",
     "No recommendations. Start typing." : "Soovitusi pole. Alusta trükkimist.",
+    "Copy internal link to clipboard" : "Kopeeri sisemine link lõikelauale",
+    "Internal link" : "Sisemine link",
     "group" : "grupp",
     "team" : "tiim",
     "Permissions" : "Õigused",
