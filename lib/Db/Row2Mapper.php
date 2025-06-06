@@ -599,7 +599,10 @@ class Row2Mapper {
 	 * @throws InternalError
 	 * @throws Exception
 	 */
-	public function insert(Row2 $row, array $columns): Row2 {
+	public function insert(Row2 $row, array $columns, ?string $userId = null): Row2 {
+		if ($userId) {
+			$this->userId = $userId;
+		}
 		$this->setColumns($columns);
 
 		if ($row->getId()) {

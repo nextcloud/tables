@@ -50,6 +50,17 @@ Have a good time and manage whatever you want.
 		<database>sqlite</database>
 		<nextcloud min-version="29" max-version="32"/>
 	</dependencies>
+	<activity>
+		<settings>
+			<setting>OCA\Tables\Activity\Setting</setting>
+		</settings>
+		<filters>
+			<filter>OCA\Tables\Activity\Filter</filter>
+		</filters>
+		<providers>
+			<provider>OCA\Tables\Activity\Provider</provider>
+		</providers>
+	</activity>
 	<repair-steps>
 		<pre-migration>
 			<step>OCA\Tables\Migration\FixContextsDefaults</step>
