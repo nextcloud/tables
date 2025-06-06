@@ -9,6 +9,7 @@ namespace OCA\Tables\Db;
 
 use OCA\Tables\Constants\UsergroupType;
 use OCA\Tables\Helper\CircleHelper;
+use OCA\Tables\Helper\GroupHelper;
 use OCP\IDBConnection;
 use OCP\IUserManager;
 use OCP\IUserSession;
@@ -21,6 +22,7 @@ class RowCellUsergroupMapper extends RowCellMapperSuper {
 		IDBConnection $db,
 		private IUserManager $userManager,
 		private CircleHelper $circleHelper,
+		private GroupHelper $groupHelper,
 		protected IUserSession $userSession,
 	) {
 		parent::__construct($db, $this->table, RowCellUsergroup::class);
@@ -44,6 +46,8 @@ class RowCellUsergroupMapper extends RowCellMapperSuper {
 			$displayName = $this->userManager->getDisplayName($cell->getValue()) ?? $cell->getValue();
 		} elseif ($cell->getValueType() === UsergroupType::CIRCLE) {
 			$displayName = $this->circleHelper->getCircleDisplayName($cell->getValue(), ($this->userSession->getUser()?->getUID() ?: '')) ?: $cell->getValue();
+		} elseif ($cell->getValueType() === UsergroupType::GROUP) {
+			$displayName = $this->groupHelper->getGroupDisplayName($cell->getValue()) ?: $cell->getValue();
 		}
 		return [
 			'id' => $cell->getValue(),
