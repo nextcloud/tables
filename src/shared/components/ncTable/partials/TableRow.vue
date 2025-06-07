@@ -14,7 +14,10 @@
 			<component :is="getTableCell(col)"
 				:column="col"
 				:row-id="row.id"
-				:value="getCellValue(col)" />
+				:value="getCellValue(col)"
+				:element-id="elementId"
+				:is-view="isView"
+				 />
 		</td>
 		<td v-if="config.showActions" :class="{sticky: config.showActions}">
 			<NcButton v-if="config.canEditRows || config.canDeleteRows" type="primary" :aria-label="t('tables', 'Edit row')" data-cy="editRowBtn" @click="$emit('edit-row', row.id)">
@@ -87,6 +90,14 @@ export default {
 		config: {
 			type: Object,
 			default: null,
+		},
+		elementId: {
+			type: Number,
+			default: null,
+		},
+		isView: {
+			type: Boolean,
+			default: true,
 		},
 	},
 	computed: {
