@@ -75,6 +75,11 @@ import { generateUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 import displayError from '../shared/utils/displayError.js'
 import { useTablesStore } from '../store/store.js'
+import { useDataStore } from '../store/data.js'
+import { createPinia, setActivePinia } from 'pinia'
+
+const pinia = createPinia()
+setActivePinia(pinia)
 
 export default {
 
@@ -92,17 +97,14 @@ export default {
 		NcLoadingIcon,
 	},
 
-	setup() {
-		const tablesStore = useTablesStore()
-		return { tablesStore }
-	},
-
 	data() {
 		return {
 			renderMode: 'link', // { link, content }
 			value: null,
 			previewLoading: false,
 			richObject: {},
+			tablesStore: null,
+			dataStore: null,
 		}
 	},
 
@@ -128,15 +130,8 @@ export default {
 	},
 
 	async mounted() {
-		if (!this.tablesStore) {
-			const { default: store } = await import(
-				'../store/store.js')
-			const { default: data } = await import(
-				'../store/data.js')
-
-			this.tablesStore = store
-			this.tablesStore.data = data
-		}
+		this.tablesStore = useTablesStore()
+		this.dataStore = useDataStore()
 	},
 
 	methods: {
@@ -159,14 +154,14 @@ export default {
 			this.$emit('submit', this.getLink)
 		},
 		updateRichObject() {
-			this.richObject.emoji = this.value.emoji
+			this.richObject.emoji = this.value?.emoji || ''
 			this.richObject.link = this.getLink
-			this.richObject.ownerDisplayName = this.value.ownerDisplayName
-			this.richObject.ownership = this.value.owner
-			this.richObject.rowsCount = this.value.rowsCount
-			this.richObject.title = this.value.label
-			this.richObject.type = this.value.type
-			this.richObject.id = this.value.value
+			this.richObject.ownerDisplayName = this.value?.ownerDisplayName || ''
+			this.richObject.ownership = this.value?.owner || ''
+			this.richObject.rowsCount = this.value?.rowsCount || 0
+			this.richObject.title = this.value?.label || ''
+			this.richObject.type = this.value?.type || ''
+			this.richObject.id = this.value?.value || ''
 		},
 		async loadColumnsForContentPreview() {
 			if (this.value === null) {
@@ -175,7 +170,6 @@ export default {
 
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/api/1/' + this.value.type + 's/' + this.value.value + '/columns'))
-				console.debug('columns from BE', res.data)
 				this.richObject.columns = res.data
 			} catch (e) {
 				displayError(e, t('tables', 'Could not fetch columns for content preview.'))
@@ -188,7 +182,6 @@ export default {
 
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/row/' + this.value.type + '/' + this.value.value))
-				console.debug('rows from BE', res.data)
 				this.richObject.rows = res.data
 			} catch (e) {
 				displayError(e, t('tables', 'Could not fetch rows for content preview.'))
