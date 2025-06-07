@@ -31,6 +31,8 @@
 					:selected="isRowSelected(row?.id)"
 					:view-setting.sync="localViewSetting"
 					:config="config"
+					:element-id="elementId"
+					:is-view="isView"
 					@update-row-selection="updateRowSelection"
 					@edit-row="rowId => $emit('edit-row', rowId)" />
 				<tr />

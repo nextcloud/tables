@@ -4,7 +4,7 @@
  */
 import { showError } from '@nextcloud/dialogs'
 import { translate as t } from '@nextcloud/l10n'
-import { mapActions, mapState } from 'pinia'
+import { mapActions } from 'pinia'
 import { useDataStore } from '../../../../store/data.js'
 
 export default {
@@ -20,6 +20,14 @@ export default {
 		value: {
 			required: true,
 		},
+		elementId: {
+			type: Number,
+			default: null,
+		},
+		isView: {
+			type: Boolean,
+			default: true,
+		},
 	},
 
 	data() {
@@ -28,14 +36,6 @@ export default {
 			editValue: '',
 			localLoading: false,
 		}
-	},
-
-	computed: {
-		...mapState(useDataStore, {
-			rowMetadata(state) {
-				return state.getRowMetadata(this.rowId)
-			},
-		}),
 	},
 
 	methods: {
@@ -64,8 +64,8 @@ export default {
 
 			const res = await this.updateRow({
 				id: this.rowId,
-				isView: this.rowMetadata.isView,
-				elementId: this.rowMetadata.elementId,
+				isView: this.isView,
+				elementId: this.elementId,
 				data,
 			})
 
