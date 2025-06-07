@@ -31,7 +31,7 @@ import Options from '../shared/components/ncTable/sections/Options.vue'
 import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
 import { NcLoadingIcon } from '@nextcloud/vue'
 import { useResizeObserver } from '@vueuse/core'
-import { spawnDialog } from '@nextcloud/dialogs'
+import { spawnDialog } from '@nextcloud/vue/functions/dialog'
 import { useTablesStore } from '../store/store.js'
 import { useDataStore } from '../store/data.js'
 import { mapActions } from 'pinia'
@@ -65,8 +65,8 @@ export default {
 		return {
 			searchExp: null,
 			rows: null,
-			tablesStore: useTablesStore(),
-			dataStore: useDataStore(),
+			tablesStore: null,
+			dataStore: null,
 		}
 	},
 
@@ -99,6 +99,19 @@ export default {
 				return this.rows
 			}
 		},
+		getRows() {
+			return this.dataStore ? this.dataStore.getRows(false, this.richObject.id) : []
+		},
+	},
+
+	watch: {
+		rows: {
+			deep: true,
+			handler() {
+				// Force update of filteredRows when rows change
+				this.search(this.searchExp ? this.searchExp.source : '')
+			},
+		},
 	},
 
 	async mounted() {
@@ -108,11 +121,13 @@ export default {
 			this.$el.style.setProperty('--widget-content-width', `${width}px`)
 		})
 
+		this.tablesStore = useTablesStore()
+		this.dataStore = useDataStore()
+
 		await this.loadRows()
 	},
 
 	methods: {
-		...mapActions(useDataStore, ['loadRowsFromBE', 'getRows']),
 		search(searchString) {
 			this.searchExp = (searchString !== '')
 				? new RegExp(searchString.trim(), 'ig')
@@ -143,21 +158,33 @@ export default {
 				element: this.richObject,
 			}, () => {
 				const storeRows = this.getRows
-				const localRowIndex = this.rows.findIndex(row => row.id === rowId)
 				const updatedRow = storeRows.find(row => row.id === rowId)
-				this.rows.splice(localRowIndex, 1, updatedRow)
+				if (updatedRow) {
+					const localRowIndex = this.rows.findIndex(row => row.id === rowId)
+					if (localRowIndex !== -1) {
+						this.$set(this.rows, localRowIndex, updatedRow)
+					}
+				}
 			})
 		},
 		getRow(rowId) {
 			return this.rows.find(row => row.id === rowId)
 		},
 		async loadRows() {
-			const res = await this.loadRowsFromBE({
-				tableId: this.richObject.id,
-			})
+			if (!this.dataStore) return
 
-			if (res) {
-				this.rows = this.getRows
+			if (this.richObject.rows) {
+				this.rows = this.richObject.rows
+				return
+			}
+			
+			try {
+				await this.dataStore.loadRowsFromBE({
+					tableId: this.richObject.id,
+				})
+				this.rows = this.dataStore.getRows(false, this.richObject.id)
+			} catch (error) {
+				console.error('Error loading rows:', error)
 			}
 		},
 	},
@@ -229,6 +256,10 @@ export default {
 
 		& :deep(.options.row) {
 			width: calc(var(--widget-content-width, 100%) - 12px);
+		}
+
+		& :deep(td) {
+			vertical-align: middle !important;
 		}
 	}
 
