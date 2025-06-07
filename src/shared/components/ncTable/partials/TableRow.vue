@@ -16,8 +16,7 @@
 				:row-id="row.id"
 				:value="getCellValue(col)"
 				:element-id="elementId"
-				:is-view="isView"
-				 />
+				:is-view="isView" />
 		</td>
 		<td v-if="config.showActions" :class="{sticky: config.showActions}">
 			<NcButton v-if="config.canEditRows || config.canDeleteRows" type="primary" :aria-label="t('tables', 'Edit row')" data-cy="editRowBtn" @click="$emit('edit-row', row.id)">
