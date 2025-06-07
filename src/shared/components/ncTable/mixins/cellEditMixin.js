@@ -42,6 +42,10 @@ export default {
 		...mapActions(useDataStore, ['updateRow']),
 
 		startEditing() {
+			// Prevent editing for meta columns
+			if (this.column.id < 0) {
+				return
+			}
 			this.editValue = this.value
 			this.isEditing = true
 			this.$nextTick(() => {
