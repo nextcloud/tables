@@ -3,13 +3,28 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<!-- eslint-disable-next-line vue/no-v-html -->
-	<div v-if="value">
-		{{ value | truncate(50) }}
+	<div class="cell-text-line">
+		<div v-if="!isEditing && value" @click="startEditing">
+			{{ value | truncate(50) }}
+		</div>
+		<div v-else class="inline-editing-container">
+			<input
+				ref="input"
+				v-model="editValue"
+				type="text"
+				:disabled="localLoading"
+				class="cell-input"
+				@blur="saveChanges"
+				@keyup.enter="saveChanges"
+				@keyup.esc="cancelEdit">
+			<div v-if="localLoading" class="icon-loading-small icon-loading-inline" />
+		</div>
 	</div>
 </template>
 
 <script>
+import cellEditMixin from '../mixins/cellEditMixin.js'
+
 export default {
 	name: 'TableCellTextLine',
 
@@ -23,19 +38,38 @@ export default {
 		},
 	},
 
+	mixins: [cellEditMixin],
+
 	props: {
-		column: {
-			type: Object,
-			default: () => {},
-		},
-		rowId: {
-			type: Number,
-			default: null,
-		},
 		value: {
 			type: String,
 			default: '',
 		},
 	},
+
+	methods: {
+		async saveChanges() {
+			if (this.editValue === this.value) {
+				this.isEditing = false
+				return
+			}
+
+			const newValue = this.editValue ?? ''
+			const success = await this.updateCellValue(newValue)
+
+			if (!success) {
+				this.cancelEdit()
+			}
+
+			this.localLoading = false
+			this.isEditing = false
+		},
+	},
 }
 </script>
+
+<style scoped>
+.cell-text-line {
+    width: 100%;
+}
+</style>
