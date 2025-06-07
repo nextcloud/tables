@@ -192,12 +192,12 @@ export default {
 			if (!this.rows || !this.columns) {
 				return []
 			}
-			
+
 			for (const row of this.rows) {
 				if (!row || !row.data) {
 					continue
 				}
-				
+
 				if (debug) {
 					console.debug('new row ===============================================', row)
 				}
