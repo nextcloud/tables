@@ -892,24 +892,29 @@ class FeatureContext implements Context {
 	}
 
 	/**
-	 * @When user :user sets columns :columnList to view :viewAlias
+	 * @When user :user sets columnSettings :columnList to view :viewAlias
 	 */
 	public function applyColumnsToView(string $user, string $columnList, string $viewAlias) {
 		$this->setCurrentUser($user);
 
 		$columns = explode(',', $columnList);
-		$columns = array_map(function (string $columnAlias) {
+		$columnSettings = array_map(function (string $columnAlias, int $index) {
 			if (is_numeric($columnAlias)) {
 				return (int)$columnAlias;
 			}
-			$col = $this->collectionManager->getByAlias('column', $columnAlias);
-			return $col['id'];
-		}, $columns);
 
-		$this->sendUpdateViewRequest($viewAlias, ['columns' => json_encode($columns)]);
+			$col = $this->collectionManager->getByAlias('column', $columnAlias);
+
+			return [
+				'columnId' => $col['id'],
+				'order' => $index
+			];
+		}, $columns, array_keys($columns));
+
+		$this->sendUpdateViewRequest($viewAlias, ['columnSettings' => json_encode($columnSettings)]);
 
 		$view = $this->collectionManager->getByAlias('view', $viewAlias);
-		$view['columns'] = $columns;
+		$view['columnSettings'] = $columnSettings;
 		$this->collectionManager->update($view, 'view', $view['id']);
 	}
 
@@ -2800,8 +2805,8 @@ class FeatureContext implements Context {
 		$expectedData = $expectedRows->getRows();
 		array_shift($expectedData); // Remove header row
 
-		$columnIds = $this->collectionManager->getByAlias('view', $viewName)['columns'];
-		$columnIdToHeader = array_combine($columnIds, $columnHeaders);
+		$columnSettings = $this->collectionManager->getByAlias('view', $viewName)['columnSettings'];
+		$columnIdToHeader = array_combine(array_column($columnSettings, 'columnId'), $columnHeaders);
 
 		// Convert actual row data to match expected format
 		$actualFormattedRows = [];
