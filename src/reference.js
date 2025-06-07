@@ -23,7 +23,7 @@ registerWidget('tables_content', async (el, { richObjectType, richObject, access
 	const { default: TableReferenceWidget } = interactive
 		? await import(/* webpackChunkName: "reference-table-lazy" */'./views/ContentReferenceWidget.vue')
 		: await import(/* webpackChunkName: "reference-table-lazy" */'./views/LinkReferenceWidget.vue')
-	
+
 	// Import Pinia and stores
 	const { createPinia, setActivePinia } = await import('pinia')
 	const { useTablesStore } = await import(/* webpackChunkName: 'store' */ './store/store.js')
@@ -35,7 +35,6 @@ registerWidget('tables_content', async (el, { richObjectType, richObject, access
 
 	Vue.mixin({ methods: { t, n } })
 	Vue.use(pinia)
-	
 	const Widget = Vue.extend(TableReferenceWidget)
 	new Widget({
 		propsData: {
@@ -50,13 +49,13 @@ registerWidget('tables_content', async (el, { richObjectType, richObject, access
 registerCustomPickerElement('tables-ref-tables', async (el, { providerId, accessible }) => {
 	const { default: Vue } = await import('vue')
 	const { default: TablesSmartPicker } = await import('./views/SmartPicker.vue')
-	
+
 	// Import Pinia
 	const { createPinia } = await import('pinia')
 	const pinia = createPinia()
-	
+
 	Vue.use(pinia)
-	
+
 	const Element = Vue.extend(TablesSmartPicker)
 	const vueElement = new Element({
 		propsData: {
