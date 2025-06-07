@@ -24,12 +24,12 @@ class TableScheme implements JsonSerializable {
 	protected ?string $description = null;
 	protected ?string $tablesVersion = null;
 
-	public function __construct(string $title, string $emoji, array $columns, array $view, string $description, string $tablesVersion) {
+	public function __construct(string $title, string $emoji, array $columns, array $view, ?string $description, string $tablesVersion) {
 		$this->tablesVersion = $tablesVersion;
 		$this->title = $title;
 		$this->emoji = $emoji;
 		$this->columns = $columns;
-		$this->description = $description;
+		$this->description = $description ?: '';
 		$this->views = $view;
 	}
 
