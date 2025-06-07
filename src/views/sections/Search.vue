@@ -8,8 +8,8 @@
 			id="smartpicker-select"
 			v-model="localValue"
 			:loading="loading"
-			:placeholder="t('tables', 'Search for table and views...')"
-			:aria-label-combobox="t('tables', 'Search for table and views...')"
+			:placeholder="t('tables', 'Search for tables and views...')"
+			:aria-label-combobox="t('tables', 'Search for tables and views...')"
 			:options="getOptions"
 			@search="v => term = v">
 			<template #option="props">
@@ -87,10 +87,6 @@ export default {
 		},
 	},
 
-	mounted() {
-		// this.loadResultsFromBE()
-	},
-
 	methods: {
 		t,
 		async loadResultsFromBE() {
@@ -107,7 +103,7 @@ export default {
 			this.loading = false
 		},
 		async load() {
-			if (this.term?.length >= 3) {
+			if (this.term) {
 				await this.loadResultsFromBE()
 			}
 		},
