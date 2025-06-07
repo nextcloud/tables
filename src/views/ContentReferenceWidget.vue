@@ -34,7 +34,6 @@ import { useResizeObserver } from '@vueuse/core'
 import { spawnDialog } from '@nextcloud/vue/functions/dialog'
 import { useTablesStore } from '../store/store.js'
 import { useDataStore } from '../store/data.js'
-import { mapActions } from 'pinia'
 
 export default {
 
@@ -177,7 +176,7 @@ export default {
 				this.rows = this.richObject.rows
 				return
 			}
-			
+
 			try {
 				await this.dataStore.loadRowsFromBE({
 					tableId: this.richObject.id,
