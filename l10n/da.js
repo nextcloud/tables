@@ -228,7 +228,7 @@ OC.L10N.register(
     "Receiver type" : "Modtager type",
     "Create time" : "Skab tid",
     "Share ID" : "Dele ID",
-    "Copy internal link to clipboard" : "Kopier internt link til klippebord",
+    "Copy internal link to clipboard" : "Kopiér internt link til klippebord",
     "Internal link" : "Internt link",
     "Only works for users with access to this folder" : "Virker kun for brugere med adgang til denne folder",
     "group" : "gruppe",
