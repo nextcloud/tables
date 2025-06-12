@@ -116,33 +116,28 @@ class RowService extends SuperService {
 
 
 	/**
-	 * @param int $id
+	 * @param int $rowId
 	 * @return Row2
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
-	public function find(int $id): Row2 {
+	public function find(int $rowId): Row2 {
 		try {
-			$columns = $this->columnMapper->findAllByTable($id);
-		} catch (Exception $e) {
+			$tableId = $this->row2Mapper->getTableIdForRow($rowId);
+
+			if (!$this->permissionsService->canReadRowsByElementId($tableId, 'table')) {
+				throw new PermissionError('PermissionError: can not read row with id ' . $rowId);
+			}
+
+			$columns = $this->columnMapper->findAllByTable($tableId);
+			$row = $this->row2Mapper->find($rowId, $columns);
+		} catch (Exception|MultipleObjectsReturnedException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
-		}
-
-		try {
-			$row = $this->row2Mapper->find($id, $columns);
-		} catch (InternalError $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), $e->getCode(), $e);
-		} catch (NotFoundError $e) {
+		} catch (NotFoundError|DoesNotExistException $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
-		}
-
-		// security
-		if (!$this->permissionsService->canReadRowsByElementId($row->getTableId(), 'table')) {
-			throw new PermissionError('PermissionError: can not read row with id ' . $id);
 		}
 
 		return $row;
