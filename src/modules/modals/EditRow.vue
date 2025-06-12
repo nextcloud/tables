@@ -145,7 +145,10 @@ export default {
 			}
 		},
 		actionCancel() {
-			this.$router?.back()
+			// Remove the row path from URL if it exists
+			if (this.$router && this.$router.currentRoute.path.includes('/row/')) {
+				this.$router.back()
+			}
 			this.reset()
 			this.$emit('close')
 		},
@@ -216,7 +219,7 @@ export default {
 
 <style lang="scss" scoped>
 .modal-mask {
-	z-index: 2001;
+	z-index: 9999;
 }
 
 .modal__content {
