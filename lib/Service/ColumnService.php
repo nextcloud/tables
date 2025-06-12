@@ -160,7 +160,7 @@ class ColumnService extends SuperService {
 		// security
 		if ($viewId) {
 			try {
-				$view = $this->viewService->find($viewId);
+				$view = $this->viewService->find($viewId, true, $userId);
 			} catch (InternalError|MultipleObjectsReturnedException $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
@@ -193,7 +193,7 @@ class ColumnService extends SuperService {
 			throw new InternalError('Cannot create column without table or view in context');
 		}
 
-		if (!$this->permissionsService->canCreateColumns($table)) {
+		if (!$this->permissionsService->canCreateColumns($table, $userId)) {
 			throw new PermissionError('create column for the table id = ' . $table->getId() . ' is not allowed.');
 		}
 
@@ -216,7 +216,6 @@ class ColumnService extends SuperService {
 			$i++;
 		}
 
-		$time = new DateTime();
 		$item = Column::fromDto($columnDto);
 		$item->setTitle($newTitle);
 		$item->setTableId($table->getId());
