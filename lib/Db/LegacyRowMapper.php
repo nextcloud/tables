@@ -425,7 +425,7 @@ class LegacyRowMapper extends QBMapper {
 	 * @throws InternalError
 	 */
 	public function transferLegacyRow(LegacyRow $legacyRow, array $columns) {
-		$this->rowMapper->insert($this->migrateLegacyRow($legacyRow, $columns), $columns);
+		$this->rowMapper->insert($this->migrateLegacyRow($legacyRow, $columns));
 	}
 
 	/**

@@ -35,11 +35,6 @@ class Row2Mapper {
 	protected UserHelper $userHelper;
 	protected ColumnMapper $columnMapper;
 
-	/* @var Column[] $columns */
-	private array $columns = [];
-	/* @var Column[] $columns */
-	private array $allColumns = [];
-
 	private ColumnsHelper $columnsHelper;
 
 	public function __construct(?string $userId, IDBConnection $db, LoggerInterface $logger, UserHelper $userHelper, RowSleeveMapper $rowSleeveMapper, ColumnsHelper $columnsHelper, ColumnMapper $columnMapper) {
@@ -82,7 +77,6 @@ class Row2Mapper {
 	 * @throws NotFoundError
 	 */
 	public function find(int $id, array $columns): Row2 {
-		$this->setColumns($columns);
 		$columnIdsArray = array_map(fn (Column $column) => $column->getId(), $columns);
 		$rows = $this->getRows([$id], $columnIdsArray);
 		if (count($rows) === 1) {
@@ -159,7 +153,7 @@ class Row2Mapper {
 	}
 
 	/**
-	 * @param Column[] $columns
+	 * @param int[] $showColumnIds
 	 * @param int $tableId
 	 * @param int|null $limit
 	 * @param int|null $offset
@@ -169,13 +163,12 @@ class Row2Mapper {
 	 * @return Row2[]
 	 * @throws InternalError
 	 */
-	public function findAll(array $tableColumns, array $columns, int $tableId, ?int $limit = null, ?int $offset = null, ?array $filter = null, ?array $sort = null, ?string $userId = null): array {
-		$this->setColumns($columns, $tableColumns);
-		$columnIdsArray = array_map(fn (Column $column) => $column->getId(), $columns);
+	public function findAll(array $showColumnIds, int $tableId, ?int $limit = null, ?int $offset = null, ?array $filter = null, ?array $sort = null, ?string $userId = null): array {
+		$this->columnMapper->preloadColumns($showColumnIds, $filter, $sort);
 
 		$wantedRowIdsArray = $this->getWantedRowIds($userId, $tableId, $filter, $limit, $offset);
 
-		return $this->getRows($wantedRowIdsArray, $columnIdsArray, $sort ?? []);
+		return $this->getRows($wantedRowIdsArray, $showColumnIds, $sort ?? []);
 	}
 
 	/**
@@ -272,13 +265,13 @@ class Row2Mapper {
 	private function addSortQueryForMultipleSleeveFinder(IQueryBuilder $qb, string $sleevesAlias, array $sort): void {
 		$i = 1;
 		foreach ($sort as $sortData) {
-			if (!isset($this->columns[$sortData['columnId']]) && !isset($this->allColumns[$sortData['columnId']]) && $sortData['columnId'] > 0) {
+			$column = $sortData['columnId'] > 0 ? $this->columnMapper->find($sortData['columnId']) : null;
+			if ($column === null && $sortData['columnId'] > 0) {
 				throw new InternalError('No column found to build filter with for id ' . $sortData['columnId']);
 			}
 
 			// if is normal column
 			if ($sortData['columnId'] >= 0) {
-				$column = $this->columns[$sortData['columnId']] ?? $this->allColumns[$sortData['columnId']];
 				$valueTable = 'tables_row_cells_' . $column->getType();
 				$alias = 'sort' . $i;
 				$qb->leftJoin($sleevesAlias, $valueTable, $alias,
@@ -344,15 +337,14 @@ class Row2Mapper {
 		$filterExpressions = [];
 		foreach ($filterGroup as $filter) {
 			$columnId = $filter['columnId'];
+			$column = $columnId > 0 ? $this->columnMapper->find($columnId) : null;
 			// Fail if the filter is for a column that is not in the list and no meta column
-			if (!isset($this->columns[$columnId]) && !isset($this->allColumns[$columnId]) && $columnId > 0) {
+			if ($column === null && $columnId > 0) {
 				throw new InternalError('No column found to build filter with for id ' . $columnId);
 			}
 
 			// if is normal column
 			if ($columnId >= 0) {
-				$column = $this->columns[$columnId] ?? $this->allColumns[$columnId];
-
 				$sql = $qb->expr()->in(
 					'id',
 					$qb->createFunction($this->getFilterExpression($qb, $column, $filter['operator'], $filter['value'])->getSQL())
@@ -557,13 +549,14 @@ class Row2Mapper {
 				break;
 			}
 
-			$columnType = $this->columns[$rowData['column_id']]->getType();
+			$column = $this->columnMapper->find($rowData['column_id']);
+			$columnType = $column->getType();
 			$cellClassName = 'OCA\Tables\Db\RowCell' . ucfirst($columnType);
 			$entity = call_user_func($cellClassName . '::fromRowData', $rowData); // >5.2.3
 			if (!isset($cellMapperCache[$columnType])) {
 				$cellMapperCache[$columnType] = $this->getCellMapperFromType($columnType);
 			}
-			$value = $cellMapperCache[$columnType]->formatEntity($this->columns[$rowData['column_id']], $entity);
+			$value = $cellMapperCache[$columnType]->formatEntity($column, $entity);
 			$compositeKey = (string)$rowData['row_id'] . ',' . (string)$rowData['column_id'];
 			if ($cellMapperCache[$columnType]->hasMultipleValues()) {
 				if (array_key_exists($compositeKey, $rowValues)) {
@@ -594,14 +587,11 @@ class Row2Mapper {
 
 	/**
 	 * @param Row2 $row
-	 * @param Column[] $columns
 	 * @return Row2
 	 * @throws InternalError
 	 * @throws Exception
 	 */
-	public function insert(Row2 $row, array $columns): Row2 {
-		$this->setColumns($columns);
-
+	public function insert(Row2 $row): Row2 {
 		if ($row->getId()) {
 			// if row has an id from migration or import etc.
 			$rowSleeve = $this->createRowSleeveFromExistingData($row->getId(), $row->getTableId(), $row->getCreatedAt(), $row->getCreatedBy(), $row->getLastEditBy(), $row->getLastEditAt());
@@ -611,12 +601,9 @@ class Row2Mapper {
 			$row->setId($rowSleeve->getId());
 		}
 
-		// if the table/view has columns
-		if (count($columns) > 0) {
-			// write all cells to its db-table
-			foreach ($row->getData() as $cell) {
-				$this->insertCell($rowSleeve->getId(), $cell['columnId'], $cell['value'], $rowSleeve->getLastEditAt(), $rowSleeve->getLastEditBy());
-			}
+		// write all cells to its db-table
+		foreach ($row->getData() as $cell) {
+			$this->insertCell($rowSleeve->getId(), $cell['columnId'], $cell['value'], $rowSleeve->getLastEditAt(), $rowSleeve->getLastEditBy());
 		}
 
 		return $row;
@@ -625,14 +612,10 @@ class Row2Mapper {
 	/**
 	 * @throws InternalError
 	 */
-	public function update(Row2 $row, array $columns): Row2 {
-		if (!$columns) {
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': columns are missing');
-		}
-		$this->setColumns($columns);
-
+	public function update(Row2 $row): Row2 {
+		$changedCells = $row->getChangedCells();
 		// if nothing has changed
-		if (count($row->getChangedCells()) === 0) {
+		if (count($changedCells) === 0) {
 			return $row;
 		}
 
@@ -646,8 +629,10 @@ class Row2Mapper {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
+		$this->columnMapper->preloadColumns(array_column($changedCells, 'columnId'));
+
 		// write all changed cells to its db-table
-		foreach ($row->getChangedCells() as $cell) {
+		foreach ($changedCells as $cell) {
 			$this->insertOrUpdateCell($sleeve->getId(), $cell['columnId'], $cell['value']);
 		}
 
@@ -704,21 +689,19 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	private function insertCell(int $rowId, int $columnId, $value, ?string $lastEditAt = null, ?string $lastEditBy = null): void {
-		if (!isset($this->columns[$columnId])) {
+		try {
+			$column = $this->columnMapper->find($columnId);
+		} catch (DoesNotExistException $e) {
 			$e = new Exception('Can not insert cell, because the given column-id is not known');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
-
 		// insert new cell
-		$column = $this->columns[$columnId];
 		$cellMapper = $this->getCellMapper($column);
 
-		$column = $this->columns[$columnId];
-
 		try {
-			$cellClassName = 'OCA\Tables\Db\RowCell' . ucfirst($this->columns[$columnId]->getType());
+			$cellClassName = 'OCA\Tables\Db\RowCell' . ucfirst($column->getType());
 			if ($cellMapper->hasMultipleValues()) {
 				foreach ($value as $val) {
 					/** @var RowCellSuper $cell */
@@ -761,7 +744,8 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	private function insertOrUpdateCell(int $rowId, int $columnId, $value): void {
-		$cellMapper = $this->getCellMapper($this->columns[$columnId]);
+		$column = $this->columnMapper->find($columnId);
+		$cellMapper = $this->getCellMapper($column);
 		try {
 			if ($cellMapper->hasMultipleValues()) {
 				$this->atomic(function () use ($cellMapper, $rowId, $columnId, $value) {
@@ -772,7 +756,7 @@ class Row2Mapper {
 				}, $this->db);
 			} else {
 				$cell = $cellMapper->findByRowAndColumn($rowId, $columnId);
-				$this->updateCell($cell, $cellMapper, $value, $this->columns[$columnId]);
+				$this->updateCell($cell, $cellMapper, $value, $column);
 			}
 		} catch (DoesNotExistException) {
 			$this->insertCell($rowId, $columnId, $value);
@@ -780,21 +764,6 @@ class Row2Mapper {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
-	}
-
-	/**
-	 * @param Column[] $columns
-	 */
-	private function setColumns(array $columns, array $tableColumns = []): void {
-		foreach ($columns as $column) {
-			$this->columns[$column->getId()] = $column;
-		}
-
-		// We hold a list of all table columns to be used in filter expression building for those not visible in the view
-		foreach ($tableColumns as $column) {
-			$this->allColumns[$column->getId()] = $column;
-		}
-
 	}
 
 	private function getCellMapper(Column $column): RowCellMapperSuper {
@@ -858,14 +827,13 @@ class Row2Mapper {
 	/**
 	 * @param View $view
 	 * @param string $userId
-	 * @param Column[] $columns
 	 * @return int
 	 */
-	public function countRowsForView(View $view, string $userId, array $columns): int {
-		$this->setColumns($columns);
-
+	public function countRowsForView(View $view, string $userId): int {
 		$filter = $view->getFilterArray();
 		try {
+			$this->columnMapper->preloadColumns($view->getColumnsArray(), $filter, $view->getSortArray());
+
 			$rowIds = $this->getWantedRowIds($userId, $view->getTableId(), $filter);
 		} catch (InternalError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
