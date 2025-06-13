@@ -178,7 +178,7 @@ class Clean extends Command {
 		$this->row->setData(array_values($data));
 
 		try {
-			$this->rowMapper->update($this->row, $this->columnService->findAllByTable($this->row->getTableId()));
+			$this->rowMapper->update($this->row);
 			$this->print('Row successfully updated', self::PRINT_LEVEL_SUCCESS);
 		} catch (InternalError|PermissionError $e) {
 			$this->print('Error while updating row to db.', self::PRINT_LEVEL_ERROR);
