@@ -75,7 +75,9 @@ class RowService extends SuperService {
 		try {
 			if ($this->permissionsService->canReadRowsByElementId($tableId, 'table', $userId)) {
 				$tableColumns = $this->columnMapper->findAllByTable($tableId);
-				return $this->row2Mapper->findAll($tableColumns, $tableColumns, $tableId, $limit, $offset, null, null, $userId);
+				$showColumnIds = array_map(fn (Column $column) => $column->getId(), $tableColumns);
+
+				return $this->row2Mapper->findAll($showColumnIds, $tableId, $limit, $offset, null, null, $userId);
 			} else {
 				throw new PermissionError('no read access to table id = ' . $tableId);
 			}
@@ -100,11 +102,8 @@ class RowService extends SuperService {
 		try {
 			if ($this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)) {
 				$view = $this->viewMapper->find($viewId);
-				$columnsArray = $view->getColumnsArray();
-				$filterColumns = $this->columnMapper->findAll($columnsArray);
-				$tableColumns = $this->columnMapper->findAllByTable($view->getTableId());
 
-				return $this->row2Mapper->findAll($tableColumns, $filterColumns, $view->getTableId(), $limit, $offset, $view->getFilterArray(), $view->getSortArray(), $userId);
+				return $this->row2Mapper->findAll($view->getColumnsArray(), $view->getTableId(), $limit, $offset, $view->getFilterArray(), $view->getSortArray(), $userId);
 			} else {
 				throw new PermissionError('no read access to view id = ' . $viewId);
 			}
@@ -213,7 +212,7 @@ class RowService extends SuperService {
 		$row2->setTableId($tableId);
 		$row2->setData($data);
 		try {
-			$insertedRow = $this->row2Mapper->insert($row2, $this->columnMapper->findAllByTable($tableId));
+			$insertedRow = $this->row2Mapper->insert($row2);
 
 			$this->eventDispatcher->dispatchTyped(new RowAddedEvent($insertedRow));
 
@@ -469,7 +468,7 @@ class RowService extends SuperService {
 			}
 		}
 
-		$updatedRow = $this->row2Mapper->update($item, $columns);
+		$updatedRow = $this->row2Mapper->update($item);
 
 		$this->eventDispatcher->dispatchTyped(new RowUpdatedEvent($updatedRow, $previousData));
 
@@ -605,7 +604,7 @@ class RowService extends SuperService {
 	public function getViewRowsCount(View $view, string $userId): int {
 		if ($this->permissionsService->canReadRowsByElementId($view->getId(), 'view', $userId)) {
 			try {
-				return $this->row2Mapper->countRowsForView($view, $userId, $this->columnMapper->findAllByTable($view->getTableId()));
+				return $this->row2Mapper->countRowsForView($view, $userId);
 			} catch (Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				return 0;
