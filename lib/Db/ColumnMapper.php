@@ -19,6 +19,7 @@ use Psr\Log\LoggerInterface;
 class ColumnMapper extends QBMapper {
 	protected string $table = 'tables_columns';
 	private LoggerInterface $logger;
+	private array $cacheColumn = [];
 
 	public function __construct(IDBConnection $db, LoggerInterface $logger) {
 		parent::__construct($db, $this->table, Column::class);
@@ -34,11 +35,17 @@ class ColumnMapper extends QBMapper {
 	 * @throws MultipleObjectsReturnedException
 	 */
 	public function find(int $id): Column {
+		if (array_key_exists($id, $this->cacheColumn)) {
+			return $this->cacheColumn[$id];
+		}
+
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
 			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
-		return $this->findEntity($qb);
+		$result = $this->findEntity($qb);
+		$this->cacheColumn[$id] = $result;
+		return $result;
 	}
 
 	/**
@@ -48,11 +55,34 @@ class ColumnMapper extends QBMapper {
 	 * @throws Exception
 	 */
 	public function findAll(array $id): array {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->table)
-			->where($qb->expr()->in('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT_ARRAY)));
-		return $this->findEntities($qb);
+		$result = [];
+		$missingIds = [];
+
+		// Check cache first
+		foreach ($id as $columnId) {
+			if (array_key_exists($columnId, $this->cacheColumn)) {
+				$result[] = $this->cacheColumn[$columnId];
+			} else {
+				$missingIds[] = $columnId;
+			}
+		}
+
+		// If we have missing IDs, fetch them from database
+		if (!empty($missingIds)) {
+			$qb = $this->db->getQueryBuilder();
+			$qb->select('*')
+				->from($this->table)
+				->where($qb->expr()->in('id', $qb->createNamedParameter($missingIds, IQueryBuilder::PARAM_INT_ARRAY)));
+			$dbResults = $this->findEntities($qb);
+
+			// Cache the new results
+			foreach ($dbResults as $column) {
+				$this->cacheColumn[$column->getId()] = $column;
+				$result[] = $column;
+			}
+		}
+
+		return $result;
 	}
 
 	/**
@@ -62,11 +92,7 @@ class ColumnMapper extends QBMapper {
 	 * @throws Exception
 	 */
 	public function findMultiple(array $ids): array {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->table)
-			->where($qb->expr()->in('id', $qb->createNamedParameter($ids, IQueryBuilder::PARAM_INT_ARRAY)));
-		return $this->findEntities($qb);
+		return $this->findAll($ids);
 	}
 
 	/**
@@ -79,7 +105,16 @@ class ColumnMapper extends QBMapper {
 		$qb->select('*')
 			->from($this->table)
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId)));
-		return $this->findEntities($qb);
+
+		$dbResults = $this->findEntities($qb);
+
+		$result = [];
+		// Cache the new results
+		foreach ($dbResults as $column) {
+			$this->cacheColumn[$column->getId()] = $column;
+			$result[] = $column;
+		}
+		return $result;
 	}
 
 	/**
@@ -152,5 +187,24 @@ class ColumnMapper extends QBMapper {
 			$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Returning 0.');
 			return 0;
 		}
+	}
+
+	/**
+	 * Preloads columns data in bulk to optimize caching and reduce database queries.
+	 * This method efficiently loads column data for a given set of columns, filters, and sorts
+	 * by fetching all required data in a single database operation.
+	 */
+	public function preloadColumns(array $columns, ?array $filters = null, ?array $sorts = null): void {
+		$columnIds = $columns;
+		if (!is_null($sorts) && count($sorts) > 0) {
+			$columnIds = [...$columns, ...array_column($sorts, 'columnId')];
+		}
+		if (!is_null($filters) && count($filters) > 0) {
+			foreach ($filters as $filterGroup) {
+				array_push($columnIds, ...array_column($filterGroup, 'columnId'));
+			}
+		}
+
+		$this->findAll(array_unique($columnIds));
 	}
 }
