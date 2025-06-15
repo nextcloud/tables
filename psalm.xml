@@ -42,6 +42,7 @@
 				<referencedClass name="Doctrine\DBAL\Schema\Table" />
 				<referencedClass name="Doctrine\DBAL\Types\Types" />
 				<referencedClass name="OC\Core\Command\Base" />
+				<referencedClass name="OCP\Activity\Exceptions\UnknownActivityException " />
 			</errorLevel>
 		</UndefinedClass>
 		<UndefinedDocblockClass>
@@ -54,6 +55,7 @@
 				<referencedClass name="Doctrine\DBAL\Schema\SchemaException" />
 				<referencedClass name="Doctrine\DBAL\Schema\Sequence" />
 				<referencedClass name="Doctrine\DBAL\Schema\Table" />
+				<referencedClass name="OCP\Activity\Exceptions\UnknownActivityException " />
 			</errorLevel>
 		</UndefinedDocblockClass>
 	</issueHandlers>
