@@ -100,8 +100,7 @@ class RowService extends SuperService {
 		try {
 			if ($this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)) {
 				$view = $this->viewMapper->find($viewId);
-				$columnsArray = $view->getColumnsArray();
-				$filterColumns = $this->columnMapper->findAll($columnsArray);
+				$filterColumns = $this->columnMapper->findAll($view->getColumnIds());
 				$tableColumns = $this->columnMapper->findAllByTable($view->getTableId());
 
 				return $this->row2Mapper->findAll($tableColumns, $filterColumns, $view->getTableId(), $limit, $offset, $view->getFilterArray(), $view->getSortArray(), $userId);
@@ -179,7 +178,7 @@ class RowService extends SuperService {
 				throw new PermissionError('create row at the view id = ' . $viewId . ' is not allowed.');
 			}
 
-			$columns = $this->columnMapper->findMultiple($view->getColumnsArray());
+			$columns = $this->columnMapper->findMultiple($view->getColumnIds());
 		}
 		if ($tableId) {
 			try {
@@ -252,7 +251,7 @@ class RowService extends SuperService {
 				}
 
 				// Skip if the column is already visible in the view
-				if (in_array($filter['columnId'], $view->getColumnsArray())) {
+				if (in_array($filter['columnId'], $view->getColumnIds())) {
 					continue;
 				}
 
@@ -427,7 +426,7 @@ class RowService extends SuperService {
 
 			// fetch all needed columns
 			try {
-				$columns = $this->columnMapper->findMultiple($view->getColumnsArray());
+				$columns = $this->columnMapper->findMultiple($view->getColumnIds());
 			} catch (Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
@@ -620,7 +619,7 @@ class RowService extends SuperService {
 			return $row;
 		}
 
-		$row->filterDataByColumns($view->getColumnsArray());
+		$row->filterDataByColumns($view->getColumnIds());
 
 		return $row;
 	}

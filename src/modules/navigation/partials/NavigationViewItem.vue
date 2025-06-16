@@ -206,7 +206,7 @@ export default {
 			if (newViewId) {
 				data = {
 					data: {
-						columns: JSON.stringify(this.view.columns),
+						columnSettings: JSON.stringify(this.view.columnSettings),
 						filter: JSON.stringify(this.view.filter),
 						sort: JSON.stringify(this.view.sort),
 					},

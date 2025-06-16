@@ -792,7 +792,7 @@ Feature: APIv2
       | usergroupSelectGroups   | false         |
       | usergroupSelectTeams    | false         |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
-    And user "participant1-v2" sets columns "one,two,three,four,five" to view "v1"
+    And user "participant1-v2" sets columnSettings "one,two,three,four,five" to view "v1"
     When user "participant1-v2" tries to create a row using v2 on "view" "v1" with following values
       | one           | AHA                     |
       | two           | 161                     |
@@ -839,7 +839,7 @@ Feature: APIv2
       | usergroupSelectGroups   | false         |
       | usergroupSelectTeams    | false         |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
-    And user "participant1-v2" sets columns "one,two,three,four,five" to view "v1"
+    And user "participant1-v2" sets columnSettings "one,two,three,four,five" to view "v1"
     And user "participant1-v2" shares view "v1" with "participant2-v2"
     When user "participant2-v2" tries to create a row using v2 on "view" "v1" with following values
       | one           | AHA                     |
@@ -887,7 +887,7 @@ Feature: APIv2
       | usergroupSelectGroups   | false         |
       | usergroupSelectTeams    | false         |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
-    And user "participant1-v2" sets columns "one,two,three,four,five" to view "v1"
+    And user "participant1-v2" sets columnSettings "one,two,three,four,five" to view "v1"
     And user "participant1-v2" shares view "v1" with "participant2-v2"
     And user "participant1-v2" sets permission "create" to 0
     When user "participant2-v2" tries to create a row using v2 on "view" "v1" with following values
@@ -930,7 +930,7 @@ Feature: APIv2
       | usergroupSelectGroups   | false         |
       | usergroupSelectTeams    | false         |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
-    And user "participant1-v2" sets columns "one,two,three,four,five" to view "v1"
+    And user "participant1-v2" sets columnSettings "one,two,three,four,five" to view "v1"
     When user "participant2-v2" tries to create a row using v2 on "view" "v1" with following values
       | one           | AHA                     |
       | two           | 161                     |
@@ -1116,7 +1116,7 @@ Feature: APIv2
       | mandatory     | 1                   |
       | description   | State your business |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
-    And user "participant1-v2" sets columns "statement" to view "v1"
+    And user "participant1-v2" sets columnSettings "statement" to view "v1"
     And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
       | alias | type  | permissions              |
       | v1    | view | read,create,update,delete |
@@ -1146,7 +1146,7 @@ Feature: APIv2
       | mandatory     | 1                   |
       | description   | State your business |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
-    And user "participant1-v2" sets columns "statement" to view "v1"
+    And user "participant1-v2" sets columnSettings "statement" to view "v1"
     And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
       | alias | type | permissions               |
       | v1    | view | read,create,update        |
@@ -1176,7 +1176,7 @@ Feature: APIv2
       | mandatory     | 1                   |
       | description   | State your business |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
-    And user "participant1-v2" sets columns "statement" to view "v1"
+    And user "participant1-v2" sets columnSettings "statement" to view "v1"
     And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
       | alias | type | permissions               |
       | v1    | view | read,create,delete        |
@@ -1206,7 +1206,7 @@ Feature: APIv2
       | mandatory     | 1                   |
       | description   | State your business |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
-    And user "participant1-v2" sets columns "statement" to view "v1"
+    And user "participant1-v2" sets columnSettings "statement" to view "v1"
     And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
       | alias | type | permissions               |
       | v1    | view | read,update,delete        |
@@ -1236,7 +1236,7 @@ Feature: APIv2
       | mandatory     | 1                   |
       | description   | State your business |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
-    And user "participant1-v2" sets columns "statement" to view "v1"
+    And user "participant1-v2" sets columnSettings "statement" to view "v1"
     And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
       | alias | type | permissions        |
       | v1    | view | read,create        |
@@ -1266,7 +1266,7 @@ Feature: APIv2
       | mandatory     | 1                   |
       | description   | State your business |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
-    And user "participant1-v2" sets columns "statement" to view "v1"
+    And user "participant1-v2" sets columnSettings "statement" to view "v1"
     And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
       | alias | type | permissions |
       | v1    | view | read        |
@@ -1296,7 +1296,7 @@ Feature: APIv2
       | mandatory     | 1                   |
       | description   | State your business |
     And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
-    And user "participant1-v2" sets columns "statement" to view "v1"
+    And user "participant1-v2" sets columnSettings "statement" to view "v1"
     And user "participant1-v2" creates the Context "c1" with name "Enchanting Guitar" with icon "tennis" and description "Lorem ipsum dolor etc pp" and nodes:
       | alias | type  | permissions               |
       | t1    | table | read,create,update,delete |
@@ -1348,7 +1348,7 @@ Feature: APIv2
       | mandatory     | 1                      |
       | description   | Shorthand of Statement |
     And user "participant1-v2" create view "Important Statements" with emoji "⚡️" for "t1" as "v1"
-    And user "participant1-v2" sets columns "statement,weight,code" to view "v1"
+    And user "participant1-v2" sets columnSettings "statement,weight,code" to view "v1"
     And following sort order is applied to view "v1":
       | weight | DESC |
     And using "view" "v1"
@@ -1385,7 +1385,7 @@ Feature: APIv2
       | mandatory     | 1                      |
       | description   | Shorthand of Statement |
     And user "participant1-v2" create view "Important Statements" with emoji "⚡️" for "t1" as "v1"
-    And user "participant1-v2" sets columns "statement,weight,code" to view "v1"
+    And user "participant1-v2" sets columnSettings "statement,weight,code" to view "v1"
     And following sort order is applied to view "v1":
       | meta-id | DESC |
     And using "view" "v1"
@@ -1422,7 +1422,7 @@ Feature: APIv2
       | mandatory     | 1                      |
       | description   | Shorthand of Statement |
     And user "participant1-v2" create view "Important Statements" with emoji "⚡️" for "t1" as "v1"
-    And user "participant1-v2" sets columns "statement,weight,code" to view "v1"
+    And user "participant1-v2" sets columnSettings "statement,weight,code" to view "v1"
     And following sort order is applied to view "v1":
       | weight | DESC |
       | code   | ASC  |

@@ -39,7 +39,7 @@
 								{{ view.rowsCount }}
 							</td>
 							<td class="link-to-view number-column" @click="openView(view)">
-								{{ view.columns.length }}
+								{{ view.columnSettings ? Object.keys(view.columnSettings).length : 0 }}
 							</td>
 							<td class="link-to-view" @click="openView(view)">
 								{{ view.lastEditAt | niceDateTime }}

@@ -301,7 +301,7 @@ class LegacyRowMapper extends QBMapper {
 		$rows = $this->findEntities($qb);
 		foreach ($rows as &$row) {
 			$row->setDataArray(array_filter($row->getDataArray(), function ($item) use ($view) {
-				return in_array($item['columnId'], $view->getColumnsArray());
+				return in_array($item['columnId'], $view->getColumnIds());
 			}));
 		}
 		return $rows;
@@ -411,7 +411,7 @@ class LegacyRowMapper extends QBMapper {
 		$row = $this->findEntity($qb);
 
 		$row->setDataArray(array_filter($row->getDataArray(), function ($item) use ($view) {
-			return in_array($item['columnId'], $view->getColumnsArray());
+			return in_array($item['columnId'], $view->getColumnIds());
 		}));
 
 		return $row;
