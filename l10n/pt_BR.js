@@ -397,7 +397,7 @@ OC.L10N.register(
     "Created at" : "Criado em",
     "Ownership" : "Proprietário",
     "View ID" : "ID da visualização",
-    "Sharing" : "Compartilhando",
+    "Sharing" : "Compartilhamento",
     "API" : "API",
     "This is your API endpoint for this view" : "Este é o endpoint da API desta visualização",
     "Copy to clipboard" : "Copiar para área de transferência",
