@@ -12,6 +12,7 @@ use Exception;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\TableMapper;
+use OCA\Tables\Db\View;
 use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
@@ -64,8 +65,8 @@ class ColumnService extends SuperService {
 	 * @throws InternalError
 	 * @throws PermissionError
 	 */
-	public function findAllByTable(int $tableId, ?int $viewId = null, ?string $userId = null): array {
-		if ($this->permissionsService->canReadColumnsByTableId($tableId, $userId) || ($viewId != null && $this->permissionsService->canReadColumnsByViewId($viewId, $userId))) {
+	public function findAllByTable(int $tableId, ?string $userId = null): array {
+		if ($this->permissionsService->canReadColumnsByTableId($tableId, $userId)) {
 			try {
 				return $this->enhanceColumns($this->mapper->findAllByTable($tableId));
 			} catch (\OCP\DB\Exception $e) {
@@ -74,6 +75,24 @@ class ColumnService extends SuperService {
 			}
 		} else {
 			throw new PermissionError('no read access to table id = '.$tableId);
+		}
+	}
+
+	/**
+	 * @throws InternalError
+	 * @throws PermissionError
+	 * @return Column[]
+	 */
+	public function findAllByManagedView(View $view, string $userId): array {
+		if ($this->permissionsService->canManageView($view, $userId)) {
+			try {
+				return $this->enhanceColumns($this->mapper->findAllByTable($view->getTableId()));
+			} catch (\OCP\DB\Exception $e) {
+				$this->logger->error($e->getMessage(), ['exception' => $e]);
+				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			}
+		} else {
+			throw new PermissionError('no manage access to view id = ' . $view->getId());
 		}
 	}
 
@@ -426,7 +445,7 @@ class ColumnService extends SuperService {
 		if ($viewId) {
 			$allColumns = $this->findAllByView($viewId, $userId);
 		} elseif ($tableId) {
-			$allColumns = $this->findAllByTable($tableId, null, $userId);
+			$allColumns = $this->findAllByTable($tableId, $userId);
 		} else {
 			$e = new Exception('Either tableId nor viewId is given.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);

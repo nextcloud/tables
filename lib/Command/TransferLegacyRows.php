@@ -94,7 +94,7 @@ class TransferLegacyRows extends Command {
 				}
 			}
 		} else {
-			$output->writeln("🤷🏻‍ Add at least one table id or add the option --all to transfer all tables.");
+			$output->writeln("��‍ Add at least one table id or add the option --all to transfer all tables.");
 			return 2;
 		}
 		if ($optionDelete) {
@@ -134,7 +134,7 @@ class TransferLegacyRows extends Command {
 	 * @throws Exception
 	 */
 	private function transferTable(Table $table, OutputInterface $output): void {
-		$columns = $this->columnService->findAllByTable($table->getId(), null, '');
+		$columns = $this->columnService->findAllByTable($table->getId(), '');
 		$output->writeln("---- Found " . count($columns) . " columns");
 
 		$legacyRows = $this->legacyRowMapper->findAllByTable($table->getId());
@@ -155,13 +155,13 @@ class TransferLegacyRows extends Command {
 		$output->writeln("Start deleting data for tables that should be transferred.");
 		foreach ($tables as $table) {
 			try {
-				$columns = $this->columnService->findAllByTable($table->getId(), null, '');
+				$columns = $this->columnService->findAllByTable($table->getId(), '');
 			} catch (InternalError|PermissionError $e) {
 				$output->writeln("Could not delete data for table " . $table->getId());
 				break;
 			}
 			$this->rowMapper->deleteAllForTable($table->getId(), $columns);
-			$output->writeln("🗑️  Data for table " . $table->getId() . " (" . $table->getTitle() . ")" . " removed.");
+			$output->writeln("�️  Data for table " . $table->getId() . " (" . $table->getTitle() . ")" . " removed.");
 		}
 	}
 }
