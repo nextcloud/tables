@@ -208,7 +208,7 @@ class AnalyticsDatasource implements IDatasource {
 			$rows = $this->rowService->findAllByView($nodeId, $this->userId, $limit, $offset);
 		} else {
 			// if no nodeType is provided, the old table selection is used to not break anything
-			$columns = $this->columnService->findAllByTable($nodeId, null, $this->userId);
+			$columns = $this->columnService->findAllByTable($nodeId, $this->userId);
 			$rows = $this->rowService->findAllByTable($nodeId, $this->userId, $limit, $offset);
 		}
 

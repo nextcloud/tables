@@ -404,7 +404,7 @@ class TableService extends SuperService {
 
 		// delete all columns for that table
 		try {
-			$columns = $this->columnService->findAllByTable($id, null, $userId);
+			$columns = $this->columnService->findAllByTable($id, $userId);
 		} catch (InternalError|PermissionError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());

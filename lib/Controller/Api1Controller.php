@@ -708,7 +708,21 @@ class Api1Controller extends ApiController {
 	#[CORS]
 	public function indexTableColumns(int $tableId, ?int $viewId): DataResponse {
 		try {
-			return new DataResponse($this->columnService->formatColumns($this->columnService->findAllByTable($tableId, $viewId)));
+			try {
+				// permission check in service class
+				// they might be missing legally when only the view was shared
+				$columns = $this->columnService->findAllByTable($tableId);
+			} catch (PermissionError $e) {
+				if (!$viewId) {
+					throw $e;
+				}
+				$view = $this->viewService->find($viewId, false, $this->userId);
+				if ($tableId !== $view->getTableId()) {
+					throw new PermissionError('Given table is not a parent of the given view.');
+				}
+				$columns = $this->columnService->findAllByManagedView($view, $this->userId);
+			}
+			return new DataResponse($this->columnService->formatColumns($columns));
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -717,6 +731,10 @@ class Api1Controller extends ApiController {
 			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_INTERNAL_SERVER_ERROR);
+		} catch (NotFoundError $e) {
+			$this->logger->warning('The view could not be found: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		}
 	}
 
