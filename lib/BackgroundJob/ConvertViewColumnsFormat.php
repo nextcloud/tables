@@ -7,6 +7,7 @@ declare(strict_types=1);
  */
 namespace OCA\Tables\BackgroundJob;
 
+use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\IJobList;
 use OCP\BackgroundJob\TimedJob;
@@ -77,10 +78,7 @@ class ConvertViewColumnsFormat extends TimedJob {
 		// Create new columns structure
 		$newColumns = [];
 		foreach ($columns as $order => $columnId) {
-			$newColumns[] = [
-				'columnId' => (int)$columnId,
-				'order' => $order,
-			];
+			$newColumns[] = new ViewColumnInformation((int)$columnId, order: $order);
 		}
 
 		// Execute update query
