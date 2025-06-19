@@ -69,6 +69,7 @@ OC.L10N.register(
     "Go to next page" : "Nenda ukurasa unaofuata",
     "Go to last page" : "Nenda ukurasa uliopita",
     "Confirmation" : "Uthibitisho",
-    "Confirm" : "Thibitisha"
+    "Confirm" : "Thibitisha",
+    "Clipboard is not available" : "Ubao wa kunakili haupatikani"
 },
 "nplurals=2; plural=(n != 1);");
