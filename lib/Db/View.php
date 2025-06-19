@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
@@ -10,6 +12,7 @@ namespace OCA\Tables\Db;
 use JsonSerializable;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
@@ -93,14 +96,14 @@ class View extends EntitySuper implements JsonSerializable {
 	public function getColumnsArray(): array {
 
 		$columnSettings = $this->getColumnsSettingsArray();
-		usort($columnSettings, function ($a, $b) {
-			return $a['order'] - $b['order'];
+		usort($columnSettings, static function (ViewColumnInformation $a, ViewColumnInformation $b) {
+			return $a->getOrder() - $b->getOrder();
 		});
-		return array_column($columnSettings, 'columnId');
+		return array_column($columnSettings, ViewColumnInformation::KEY_ID);
 	}
 
 	/**
-	 * @return array<array{columnId: int, order: int}>
+	 * @return array<ViewColumnInformation>
 	 */
 	public function getColumnsSettingsArray(): array {
 		$columns = $this->getArray($this->getColumns());
@@ -109,15 +112,12 @@ class View extends EntitySuper implements JsonSerializable {
 		}
 
 		if (is_array(reset($columns))) {
-			return $columns;
+			return array_map(static fn (array $a): ViewColumnInformation => ViewColumnInformation::fromArray($a), $columns);
 		}
 
 		$result = [];
 		foreach ($columns as $index => $columnId) {
-			$result[] = [
-				'columnId' => $columnId,
-				'order' => (int)$index + 1
-			];
+			$result[] = new ViewColumnInformation($columnId, order: (int)$index + 1);
 		}
 		return $result;
 	}
@@ -158,10 +158,6 @@ class View extends EntitySuper implements JsonSerializable {
 
 	public function setColumnsArray(array $array):void {
 		$this->setColumns(\json_encode($array));
-	}
-
-	public function setColumnsSettingsArray(array $array): void {
-		$this->setColumnSettings(\json_encode($array));
 	}
 
 	public function setSortArray(array $array):void {
@@ -211,6 +207,7 @@ class View extends EntitySuper implements JsonSerializable {
 	 * @return int[]
 	 */
 	public function getColumnIds(): array {
-		return array_column($this->getColumnsSettingsArray(), 'columnId');
+		$columns = $this->getColumnsSettingsArray();
+		return array_map(static fn (ViewColumnInformation $column): int => $column[ViewColumnInformation::KEY_ID], $columns);
 	}
 }
