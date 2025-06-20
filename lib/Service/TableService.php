@@ -529,7 +529,7 @@ class TableService extends SuperService {
 		$columns = $this->columnService->findAllByTable($id);
 		$table = $this->find($id);
 		$this->enhanceTable($table, $userId);
-		return new TableScheme($table->getTitle(), $table->getEmoji(), $columns, $table->getViews() ?: [], $table->getDescription(), $this->appManager->getAppVersion('tables'));
+		return new TableScheme($table->getTitle(), $table->getEmoji(), $columns, $table->getViews() ?: [], $table->getDescription() ?: '', $this->appManager->getAppVersion('tables'));
 	}
 
 	// PRIVATE FUNCTIONS ---------------------------------------------------------------
