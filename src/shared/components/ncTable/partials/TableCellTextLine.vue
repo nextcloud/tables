@@ -4,10 +4,12 @@
 -->
 <template>
 	<div class="cell-text-line">
-		<div v-if="!isEditing && value" @click="startEditing">
-			{{ value | truncate(50) }}
-		</div>
-		<div v-else class="inline-editing-container">
+		<div class="inline-editing-container">
+			<NcTextField v-model="editValue" :disabled="localLoading"
+				@keyup.enter="saveChanges"
+				@keyup.esc="cancelEdit"
+				@blur="saveChanges" />
+			<!--
 			<input
 				ref="input"
 				v-model="editValue"
@@ -18,15 +20,21 @@
 				@keyup.enter="saveChanges"
 				@keyup.esc="cancelEdit">
 			<div v-if="localLoading" class="icon-loading-small icon-loading-inline" />
+			-->
 		</div>
 	</div>
 </template>
 
 <script>
 import cellEditMixin from '../mixins/cellEditMixin.js'
+import { NcTextField } from '@nextcloud/vue'
 
 export default {
 	name: 'TableCellTextLine',
+
+	components: {
+		NcTextField,
+	},
 
 	filters: {
 		truncate(string, num) {
@@ -45,6 +53,10 @@ export default {
 			type: String,
 			default: '',
 		},
+	},
+
+	beforeMount() {
+		this.editValue = this.value
 	},
 
 	methods: {
@@ -72,4 +84,9 @@ export default {
 .cell-text-line {
     width: 100%;
 }
+
+:deep(.input-field__input:not(:focus)) {
+	border: 1px solid var(--color-main-background);
+}
+
 </style>
