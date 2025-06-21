@@ -465,9 +465,9 @@ class ContextService {
 				$pageContent->setPageId($page->getId());
 				$pageContent->setNodeRelId($node['id']);
 				$pageContent->setOrder(10 * $i++);
-	
+
 				$this->pageContentMapper->insert($pageContent);
-	
+
 				$addedPage['content'][$pageContent->getId()] = $pageContent->jsonSerialize();
 				// the content is already embedded in the page
 				unset($addedPage['content'][$pageContent->getId()]['pageId']);

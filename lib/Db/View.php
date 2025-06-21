@@ -86,7 +86,7 @@ class View extends Entity implements JsonSerializable {
 	 * @return int[]
 	 */
 	public function getColumnsArray(): array {
-		
+
 		$columnSettings = $this->getColumnsSettingsArray();
 		usort($columnSettings, function ($a, $b) {
 			return $a['order'] - $b['order'];
@@ -102,11 +102,11 @@ class View extends Entity implements JsonSerializable {
 		if (empty($columns)) {
 			return [];
 		}
-		
+
 		if (is_array(reset($columns))) {
 			return $columns;
 		}
-		
+
 		$result = [];
 		foreach ($columns as $index => $columnId) {
 			$result[] = [
