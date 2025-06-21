@@ -30,7 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [ 18 ]
+        node-version-file: 'package.json'
         databases: [ 'mysql' ]
         server-versions: [ 'stable29', 'stable30', 'stable31', 'master' ]
         include:
@@ -97,7 +97,7 @@ jobs:
         with:
           cache: 'npm'
           cache-dependency-path: apps/${{ env.APP_NAME}}/package-lock.json
-          node-version: 18
+          node-version-file: 'package.json'
 
       - name: Install dependencies & build app
         working-directory: apps/${{ env.APP_NAME }}
