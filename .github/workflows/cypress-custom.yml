@@ -30,7 +30,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version-file: 'package.json'
         databases: [ 'mysql' ]
         server-versions: [ 'stable29', 'stable30', 'stable31', 'master' ]
         include:
@@ -92,7 +91,7 @@ jobs:
         with:
           path: apps/${{ env.APP_NAME }}
 
-      - name: Set up node 18
+      - name: Set up node from version file
         uses: actions/setup-node@v3
         with:
           cache: 'npm'
