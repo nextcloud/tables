@@ -40,7 +40,11 @@ export default {
 	methods: {
 		async onToggle() {
 			const response = await this.updateCellValue(this.localValue)
-			this.localValue = response
+			if (!response) {
+				this.localValue = !this.localValue // revert to previous value
+				return
+			}
+			this.isEditing = false
 			this.localLoading = false
 		},
 	},
