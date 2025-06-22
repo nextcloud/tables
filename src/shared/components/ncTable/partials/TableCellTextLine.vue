@@ -5,22 +5,8 @@
 <template>
 	<div class="cell-text-line">
 		<div class="inline-editing-container">
-			<NcTextField v-model="editValue" :disabled="localLoading"
-				@keyup.enter="saveChanges"
-				@keyup.esc="cancelEdit"
-				@blur="saveChanges" />
-			<!--
-			<input
-				ref="input"
-				v-model="editValue"
-				type="text"
-				:disabled="localLoading"
-				class="cell-input"
-				@blur="saveChanges"
-				@keyup.enter="saveChanges"
-				@keyup.esc="cancelEdit">
-			<div v-if="localLoading" class="icon-loading-small icon-loading-inline" />
-			-->
+			<NcTextField v-model="editValue" :disabled="localLoading || !canEditCell()" @keyup.enter="saveChanges"
+				@keyup.esc="cancelEdit" @blur="saveChanges" />
 		</div>
 	</div>
 </template>
@@ -55,10 +41,6 @@ export default {
 		},
 	},
 
-	beforeMount() {
-		this.editValue = this.value
-	},
-
 	methods: {
 		async saveChanges() {
 			if (this.editValue === this.value) {
@@ -82,11 +64,10 @@ export default {
 
 <style scoped>
 .cell-text-line {
-    width: 100%;
+	width: 100%;
 }
 
 :deep(.input-field__input:not(:focus)) {
 	border: 1px solid var(--color-main-background);
 }
-
 </style>
