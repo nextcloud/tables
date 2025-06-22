@@ -307,7 +307,7 @@ export default {
 				.filter(id => this.selectedColumns.includes(id))
 				.map((id, index) => ({
 					columnId: id,
-					order: index
+					order: index,
 				}))
 			const data = {
 				data: {
