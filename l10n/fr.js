@@ -122,6 +122,7 @@ OC.L10N.register(
     "Create views for tables" : "Créer des vues pour les tableaux",
     "Create applications" : "Créer des applications",
     "Read the docs" : "Lire la documentation",
+    "Check yourself!" : "Vérifiez par vous-même !",
     "Tables" : "Tableaux",
     "Manage data the way you need it." : "Gérez les données comme vous en avez besoin.",
     "Today" : "Aujourd'hui",
