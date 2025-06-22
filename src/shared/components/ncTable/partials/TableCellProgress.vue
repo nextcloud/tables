@@ -3,25 +3,13 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="cell-progress" @click="startEditing">
+	<div class="cell-progress" @click="startEditingProgress">
 		<div v-if="!isEditing" class="progress-display">
-			<NcProgressBar v-if="getValue !== null" :value="getValue" />
-			<div v-else class="empty-progress-placeholder">
-				({{ t('tables', 'No progress set') }})
-			</div>
+			<NcProgressBar :value="getValue" />
 		</div>
 		<div v-else class="inline-editing-container">
-			<input
-				ref="input"
-				v-model.number="editValue"
-				type="number"
-				min="0"
-				max="100"
-				:disabled="localLoading"
-				class="cell-input"
-				@blur="saveChanges"
-				@keyup.enter="saveChanges"
-				@keyup.esc="cancelEdit">
+			<input ref="input" v-model="editValue" type="number" min="0" max="100" :disabled="localLoading"
+				class="cell-input" @blur="saveChanges" @keyup.enter="saveChanges" @keyup.esc="cancelEdit">
 			<div v-if="localLoading" class="icon-loading-small icon-loading-inline" />
 		</div>
 	</div>
@@ -47,16 +35,32 @@ export default {
 		},
 	},
 
+	data() {
+		return {
+			editValue: this.value !== null ? this.value : 0,
+		}
+	},
+
 	computed: {
 		getValue() {
 			if (this.value !== null && !isNaN(this.value)) {
 				return this.value
 			}
-			return null
+			return 0
 		},
 	},
 
 	methods: {
+		startEditingProgress() {
+			if (!this.canEditCell()) {
+				return false
+			}
+			this.isEditing = true
+			this.$nextTick(() => {
+				this.$refs.input?.focus()
+			})
+		},
+
 		async saveChanges() {
 			// Prevent multiple executions of saveChanges
 			if (this.localLoading) {
@@ -87,25 +91,31 @@ export default {
 
 <style scoped>
 .cell-progress {
-    padding-right: 10px;
-    min-width: 12vw;
-    cursor: pointer;
+	padding-right: 10px;
+	min-width: 12vw;
+	cursor: pointer;
+
+	div {
+		min-height: 20px;
+        display: flex;
+        align-items: center;
+	}
 }
 
 .progress-display {
-    width: 100%;
-    min-height: 20px;
+	width: 100%;
+	min-height: 20px;
 }
 
 .empty-progress-placeholder {
-    color: var(--color-text-maxcontrast);
-    font-style: italic;
-    font-size: 0.9em;
-    padding: 4px 0;
+	color: var(--color-text-maxcontrast);
+	font-style: italic;
+	font-size: 0.9em;
+	padding: 4px 0;
 }
 
 .cell-input {
-    text-align: right;
-    width: 100%;
+	text-align: right;
+	width: 100%;
 }
 </style>

@@ -33,7 +33,7 @@ export default {
 	data() {
 		return {
 			isEditing: false,
-			editValue: '',
+			editValue: this.value,
 			localLoading: false,
 		}
 	},
@@ -41,10 +41,18 @@ export default {
 	methods: {
 		...mapActions(useDataStore, ['updateRow']),
 
-		startEditing() {
+		canEditCell() {
 			// Prevent editing for meta columns
 			if (this.column.id < 0) {
-				return
+				return false
+			}
+
+			return true
+		},
+
+		startEditing() {
+			if (!this.canEditCell()) {
+				return false
 			}
 			this.editValue = this.value
 			this.isEditing = true

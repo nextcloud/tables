@@ -11,18 +11,9 @@
 			<div v-if="column.numberPrefix" class="number-prefix">
 				{{ column.numberPrefix }}
 			</div>
-			<input
-				ref="input"
-				v-model="editValue"
-				type="number"
-				:min="getMin"
-				:max="getMax"
-				:step="getStep"
-				:disabled="localLoading"
-				class="cell-input"
-				@blur="saveChanges"
-				@keyup.enter="saveChanges"
-				@keyup.esc="cancelEdit">
+			<input ref="input" v-model="editValue" type="number" :min="getMin" :max="getMax" :step="getStep"
+				:disabled="localLoading || !canEditCell()" class="cell-input" @blur="saveChanges"
+				@keyup.enter="saveChanges" @keyup.esc="cancelEdit">
 			<div v-if="column.numberSuffix" class="number-suffix">
 				{{ column.numberSuffix }}
 			</div>
@@ -101,21 +92,26 @@ export default {
 
 <style scoped>
 .cell-number {
-    width: 100%;
-    text-align: right;
+	width: 100%;
+	text-align: right;
+
+	div {
+		min-height: 20px;
+	}
 }
 
 .inline-editing-container {
-    display: flex;
-    align-items: center;
+	display: flex;
+	align-items: center;
 }
 
 .cell-input {
-    text-align: right;
-    flex-grow: 1;
+	text-align: right;
+	flex-grow: 1;
 }
 
-.number-prefix, .number-suffix {
-    padding: 0 4px;
+.number-prefix,
+.number-suffix {
+	padding: 0 4px;
 }
 </style>
