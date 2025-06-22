@@ -31,13 +31,13 @@ describe('Test column ' + columnTitle, () => {
 		// insert row
 		cy.get('button').contains('Create row').click()
 		cy.get('button').contains('Save').click()
-		cy.get('.custom-table table tr td div .material-design-icon.radiobox-blank-icon').should('be.visible')
+		cy.get('.custom-table table tr td div .checkbox-radio-switch--checked').should('not.exist')
 
 		// insert row
 		cy.get('button').contains('Create row').click()
 		cy.get('[data-cy="selectionCheckFormSwitch"]').first().click()
 		cy.get('button').contains('Save').click()
-		cy.get('.custom-table table tr td div .material-design-icon.check-circle-outline-icon').should('be.visible')
+		cy.get('.custom-table table tr td div .checkbox-radio-switch--checked').should('be.visible')
 
 		cy.removeColumn(columnTitle)
 	})
@@ -49,13 +49,13 @@ describe('Test column ' + columnTitle, () => {
 		// insert row
 		cy.get('button').contains('Create row').click()
 		cy.get('button').contains('Save').click()
-		cy.get('.custom-table table tr td div .material-design-icon.check-circle-outline-icon').should('be.visible')
+		cy.get('.custom-table table tr td div .checkbox-radio-switch--checkedn').should('not.exist')
 
 		// insert row
 		cy.get('button').contains('Create row').click()
 		cy.get('[data-cy="selectionCheckFormSwitch"]').first().click()
 		cy.get('button').contains('Save').click()
-		cy.get('.custom-table table tr td div .material-design-icon.radiobox-blank-icon').should('be.visible')
+		cy.get('.custom-table table tr td div .checkbox-radio-switch--checked').should('be.visible')
 
 		cy.removeColumn(columnTitle)
 	})
