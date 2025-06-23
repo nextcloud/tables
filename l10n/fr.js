@@ -532,6 +532,7 @@ OC.L10N.register(
     "Copied to clipboard." : "Copié dans le presse-papiers.",
     "Clipboard is not available" : "Le presse-papiers n'est pas disponible",
     "{shareTypeString}..." : "{shareTypeString}...",
+    "Unsupported source: {source}" : "Source non supportée : {source}",
     "Failed to fetch {shareTypeString}" : "Échec de la récupération {shareTypeString}",
     "Request is not authorized. Are you logged in?" : "Requête n'est pas autorisée. Êtes-vous connecté ?",
     "Request not allowed." : "Requête non autorisée.",

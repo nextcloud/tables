@@ -19,12 +19,14 @@ OC.L10N.register(
     "Comments" : "Maoni",
     "Name" : "Jina",
     "Description" : "Maelezo",
+    "Comment" : "Maoni",
     "to" : "kwa",
     "Done" : "Imefanyika",
     "Tables" : "Majedwali",
     "Today" : "Leo",
     "Create" : "Tengeneza",
     "Text" : "Maandishi",
+    "Link" : "Kiungio",
     "Number" : "Namba",
     "Selection" : "Machaguo",
     "Move" : "Hamisha",
@@ -95,6 +97,7 @@ OC.L10N.register(
     "Go to last page" : "Nenda ukurasa uliopita",
     "Confirmation" : "Uthibitisho",
     "Confirm" : "Thibitisha",
+    "ID" : "Kitambulisho",
     "Clipboard is not available" : "Ubao wa kunakili haupatikani"
 },
 "nplurals=2; plural=(n != 1);");
