@@ -13,6 +13,7 @@ use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
@@ -466,11 +467,8 @@ class TableTemplateService {
 			[
 				'title' => $this->l->t('Create Vacation Request'),
 				'emoji' => '️➕',
-				'columnSettings' => json_encode(array_map(function ($columnId, $index) {
-					return [
-						'columnId' => $columnId,
-						'order' => $index
-					];
+				'columnSettings' => json_encode(array_map(function (int $columnId, int $index): ViewColumnInformation {
+					return new ViewColumnInformation($columnId, $index);
 				}, [$columns['employee']->getId(), $columns['from']->getId(), $columns['to']->getId(), $columns['workingDays']->getId(), $columns['dateRequest']->getId()], array_keys([$columns['employee']->getId(), $columns['from']->getId(), $columns['to']->getId(), $columns['workingDays']->getId(), $columns['dateRequest']->getId()]))),
 				'sort' => json_encode([['columnId' => Column::TYPE_META_UPDATED_AT, 'mode' => 'ASC']]),
 				'filter' => json_encode([[['columnId' => Column::TYPE_META_CREATED_BY, 'operator' => 'is-equal', 'value' => '@my-name'], ['columnId' => $columns['approved']->getId(), 'operator' => 'is-empty', 'value' => '']]]),
@@ -480,11 +478,8 @@ class TableTemplateService {
 			[
 				'title' => $this->l->t('Open Request'),
 				'emoji' => '️📝',
-				'columnSettings' => json_encode(array_map(function ($column, $index) {
-					return [
-						'columnId' => $column->getId(),
-						'order' => $index
-					];
+				'columnSettings' => json_encode(array_map(function (Column $column, int $index): ViewColumnInformation {
+					return new ViewColumnInformation($column->getId(), $index);
 				}, array_values($columns), array_keys(array_values($columns)))),
 				'sort' => json_encode([['columnId' => $columns['from']->getId(), 'mode' => 'ASC']]),
 				'filter' => json_encode([[['columnId' => $columns['approved']->getId(), 'operator' => 'is-empty', 'value' => '']]]),
@@ -494,11 +489,8 @@ class TableTemplateService {
 			[
 				'title' => $this->l->t('Request Status'),
 				'emoji' => '️❓',
-				'columnSettings' => json_encode(array_map(function ($column, $index) {
-					return [
-						'columnId' => $column->getId(),
-						'order' => $index
-					];
+				'columnSettings' => json_encode(array_map(function (Column $column, int $index): ViewColumnInformation {
+					return new ViewColumnInformation($column->getId(), $index);
 				}, array_values($columns), array_keys(array_values($columns)))),
 				'sort' => json_encode([['columnId' => Column::TYPE_META_UPDATED_BY, 'mode' => 'ASC']]),
 				'filter' => json_encode([[['columnId' => Column::TYPE_META_CREATED_BY, 'operator' => 'is-equal', 'value' => '@my-name']]]),
@@ -508,11 +500,8 @@ class TableTemplateService {
 			[
 				'title' => $this->l->t('Closed requests'),
 				'emoji' => '️✅',
-				'columnSettings' => json_encode(array_map(function ($column, $index) {
-					return [
-						'columnId' => $column->getId(),
-						'order' => $index
-					];
+				'columnSettings' => json_encode(array_map(function (Column $column, int $index): ViewColumnInformation {
+					return new ViewColumnInformation($column->getId(), $index);
 				}, array_values($columns), array_keys(array_values($columns)))),
 				'sort' => json_encode([['columnId' => Column::TYPE_META_UPDATED_BY, 'mode' => 'ASC']]),
 				'filter' => json_encode([[['columnId' => $columns['approved']->getId(), 'operator' => 'is-equal', 'value' => '@checked']], [['columnId' => $columns['approved']->getId(), 'operator' => 'is-equal', 'value' => '@unchecked']]]),
@@ -797,7 +786,14 @@ class TableTemplateService {
 		$this->createView($table, [
 			'title' => $this->l->t('Check yourself!'),
 			'emoji' => '🏁',
-			'columnSettings' => json_encode([['columnId' => $columns['what']->getId(), 'order' => 0], ['columnId' => $columns['how']->getId(), 'order' => 1], ['columnId' => $columns['ease']->getId(), 'order' => 2], ['columnId' => $columns['done']->getId(), 'order' => 3]]),
+			'columnSettings' => json_encode(
+				[
+					new ViewColumnInformation($columns['what']->getId(), order: 0),
+					new ViewColumnInformation($columns['how']->getId(), order: 1),
+					new ViewColumnInformation($columns['ease']->getId(), order: 2),
+					new ViewColumnInformation($columns['done']->getId(), order: 3),
+				]
+			),
 			'filter' => json_encode([[['columnId' => $columns['done']->getId(), 'operator' => 'is-equal', 'value' => '@unchecked']]]),
 		]);
 	}

@@ -10,6 +10,7 @@ namespace OCA\Tables\Db;
 use JsonSerializable;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 use OCP\AppFramework\Db\Entity;
 
 /**
@@ -86,33 +87,30 @@ class View extends Entity implements JsonSerializable {
 	 * @return int[]
 	 */
 	public function getColumnsArray(): array {
-		
+
 		$columnSettings = $this->getColumnsSettingsArray();
-		usort($columnSettings, function ($a, $b) {
-			return $a['order'] - $b['order'];
+		usort($columnSettings, function (ViewColumnInformation $a, ViewColumnInformation $b) {
+			return $a[ViewColumnInformation::KEY_ORDER] - $b[ViewColumnInformation::KEY_ORDER];
 		});
-		return array_column($columnSettings, 'columnId');
+		return array_column($columnSettings, ViewColumnInformation::KEY_ID);
 	}
 
 	/**
-	 * @return array<array{columnId: int, order: int}>
+	 * @return array<ViewColumnInformation>
 	 */
 	public function getColumnsSettingsArray(): array {
 		$columns = $this->getArray($this->getColumns());
 		if (empty($columns)) {
 			return [];
 		}
-		
+
 		if (is_array(reset($columns))) {
-			return $columns;
+			return array_map(static fn (array $a): ViewColumnInformation => ViewColumnInformation::fromArray($a), $columns);
 		}
-		
+
 		$result = [];
 		foreach ($columns as $index => $columnId) {
-			$result[] = [
-				'columnId' => $columnId,
-				'order' => (int)$index + 1
-			];
+			$result[] = new ViewColumnInformation($columnId, order: (int)$index + 1);
 		}
 		return $result;
 	}
@@ -153,10 +151,6 @@ class View extends Entity implements JsonSerializable {
 
 	public function setColumnsArray(array $array):void {
 		$this->setColumns(\json_encode($array));
-	}
-
-	public function setColumnsSettingsArray(array $array): void {
-		$this->setColumnSettings(\json_encode($array));
 	}
 
 	public function setSortArray(array $array):void {
@@ -214,6 +208,7 @@ class View extends Entity implements JsonSerializable {
 	 * @return int[]
 	 */
 	public function getColumnIds(): array {
-		return array_column($this->getColumnsSettingsArray(), 'columnId');
+		$columns = $this->getColumnsSettingsArray();
+		return array_map(static fn (ViewColumnInformation $column): int => $column[ViewColumnInformation::KEY_ID], $columns);
 	}
 }
