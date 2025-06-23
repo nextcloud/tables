@@ -11,6 +11,7 @@ use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Errors\BadRequestError;
+use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
 class TextLineBusiness extends SuperBusiness implements IColumnTypeBusiness {
@@ -19,6 +20,7 @@ class TextLineBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		LoggerInterface $logger,
 		private Row2Mapper $row2Mapper,
 		private ColumnMapper $columnMapper,
+		private IL10N $n,
 	) {
 		parent::__construct($logger);
 	}
@@ -36,7 +38,13 @@ class TextLineBusiness extends SuperBusiness implements IColumnTypeBusiness {
 			if ($alreadyExistentRow->getId() === $rowId) {
 				continue;
 			}
-			throw new BadRequestError('Column "' . $column->getTitle() . '" contains not unique value.');
+			throw new BadRequestError(
+				'Column "' . $column->getTitle() . '" contains a non-unique value.',
+				translatedMessage: $this->n->t(
+					'Column "{column}" contains a non-unique value.',
+					['{column}' => $column->getTitle()]
+				),
+			);
 		}
 	}
 }

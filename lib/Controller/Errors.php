@@ -23,7 +23,7 @@ trait Errors {
 			return new DataResponse($callback());
 		} catch (BadRequestError $e) {
 			$this->logger->warning('An bad request was encountered: ' . $e->getMessage(), ['exception' => $e]);
-			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+			return new DataResponse(['message' => $e->translatedMessage ?: $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];

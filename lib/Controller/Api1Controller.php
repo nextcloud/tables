@@ -1170,7 +1170,7 @@ class Api1Controller extends ApiController {
 			return new DataResponse($this->rowService->create(null, $viewId, $dataNew)->jsonSerialize());
 		} catch (BadRequestError $e) {
 			$this->logger->warning('An bad request was encountered: ' . $e->getMessage(), ['exception' => $e]);
-			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+			return new DataResponse(['message' => $e->translatedMessage ?: $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -1220,7 +1220,7 @@ class Api1Controller extends ApiController {
 			return new DataResponse($this->rowService->create($tableId, null, $dataNew)->jsonSerialize());
 		} catch (BadRequestError $e) {
 			$this->logger->warning('An bad request was encountered: ' . $e->getMessage(), ['exception' => $e]);
-			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+			return new DataResponse(['message' => $e->translatedMessage ?: $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -1301,7 +1301,7 @@ class Api1Controller extends ApiController {
 			return new DataResponse($this->rowService->updateSet($rowId, $viewId, $dataNew, $this->userId)->jsonSerialize());
 		} catch (BadRequestError $e) {
 			$this->logger->warning('An bad request was encountered: ' . $e->getMessage(), ['exception' => $e]);
-			return new DataResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+			return new DataResponse(['message' => $e->translatedMessage ?: $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (InternalError $e) {
 			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];

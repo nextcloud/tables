@@ -67,7 +67,7 @@ describe('Manage a table', () => {
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('.action-button__text').contains('Edit table').click()
 
-		cy.wait(5).get('[data-cy="editTableModal"]').should('be.visible')
+		cy.get('[data-cy="editTableModal"]').should('be.visible')
 		cy.get('.modal-container input').last().should('be.visible').should('be.enabled')
 		cy.get('.modal-container input').last().clear()
 		cy.get('.modal-container input').last().type('ToDo list')
