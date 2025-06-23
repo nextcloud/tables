@@ -26,14 +26,14 @@ class ConvertViewColumnsFormat extends TimedJob {
 
 	public function run($argument) {
 		$qb = $this->connection->getQueryBuilder();
-		
+
 		// Get all views that need processing
 		$qb->select('id', 'columns')
 			->from('tables_views')
 			->where($qb->expr()->isNotNull('columns'));
 
 		$result = $qb->executeQuery();
-		
+
 		// Predefine update query
 		$updateQb = $this->connection->getQueryBuilder();
 		$updateQb->update('tables_views')
