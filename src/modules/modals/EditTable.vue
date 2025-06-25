@@ -24,6 +24,7 @@
 					<input v-model="title"
 						:class="{missing: errorTitle}"
 						type="text"
+						data-cy="editTableTitleInput"
 						:placeholder="t('tables', 'Title of the new table')">
 				</div>
 			</div>
