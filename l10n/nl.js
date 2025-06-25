@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Nextcloud Tables" : "Nextcloud Tables",
     "Select table" : "Selecteer tabel",
     "Select columns" : "Selecteer kolommen",
     "e.g. 1,2,4 or leave empty" : "bijv. 1,2,4 of laat leeg",

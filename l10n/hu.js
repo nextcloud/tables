@@ -277,6 +277,7 @@ OC.L10N.register(
     "Could not configure new view" : "Nem lehetséges az új nézet konfigurálása",
     "Duplicate view" : "Nézet duplikálása",
     "Favorites" : "Kedvencek",
+    "Applications" : "Alkalmazások",
     "Your results are filtered." : "A találatok szűrtek.",
     "Clear filter" : "Szűrő törlése",
     "Share with accounts or groups" : "Megosztás fiókokkal vagy csoportokkal",
