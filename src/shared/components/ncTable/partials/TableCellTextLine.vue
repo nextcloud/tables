@@ -4,9 +4,13 @@
 -->
 <template>
 	<div class="cell-text-line">
-		<div class="inline-editing-container">
-			<NcTextField v-model="editValue" :disabled="localLoading || !canEditCell()" @keyup.enter="saveChanges"
-				@keyup.esc="cancelEdit" @blur="saveChanges" />
+		<div v-if="!isEditing" @click="startEditing">
+			{{ value || '' }}
+		</div>
+		<div v-else class="inline-editing-container">
+			<NcTextField v-model="editValue" :aria-label="t('tables', 'Cell input')" :disabled="localLoading || !canEditCell()" class="cell-input"
+				@keyup.enter="saveChanges" @keyup.esc="cancelEdit" @blur="saveChanges" />
+			<div v-if="localLoading" class="icon-loading-small icon-loading-inline" />
 		</div>
 	</div>
 </template>
@@ -43,6 +47,11 @@ export default {
 
 	methods: {
 		async saveChanges() {
+			// needed for properly saving on Enter key press
+			if (this.localLoading) {
+				return
+			}
+
 			if (this.editValue === this.value) {
 				this.isEditing = false
 				return
@@ -64,10 +73,20 @@ export default {
 
 <style scoped>
 .cell-text-line {
-	width: 100%;
+    width: 100%;
+}
+
+.cell-text-line > div {
+    min-height: 20px;
+    cursor: pointer;
+}
+
+.inline-editing-container {
+    display: flex;
+    align-items: center;
 }
 
 :deep(.input-field__input:not(:focus)) {
-	border: 1px solid var(--color-main-background);
+    border: 1px solid var(--color-main-background);
 }
 </style>
