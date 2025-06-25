@@ -12,7 +12,7 @@ import {
 	TYPE_META_ID,
 	TYPE_META_UPDATED_AT,
 	TYPE_META_UPDATED_BY,
-} from '../../../constants.js'
+} from '../../../constants.ts'
 
 export const MetaColumns = [
 	new NumberColumn({ id: TYPE_META_ID, title: t('tables', 'ID') }),

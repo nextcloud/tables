@@ -86,7 +86,7 @@ describe('Import csv from Files file action', () => {
 			method: 'POST',
 			url: '**/apps/tables/import/table/*'
 		}).as('importNewTableReq')
-		cy.get('[data-cy="fileActionImportButton"]').click()
+		cy.get('[data-cy="fileActionImportButton"]').click({ force: true })
 		cy.wait('@importNewTableReq').its('response.statusCode').should('equal', 200)
 
 		cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')
@@ -101,7 +101,7 @@ describe('Import csv from Files file action', () => {
 		cy.get('[data-cy-files-list-row-name="test-import.csv"] [data-cy-files-list-row-actions] .action-item button').click()
 		cy.get('[data-cy-files-list-row-action="import-to-tables"]').click()
 
-		cy.get('[data-cy="importAsNewTableSwitch"]').click()
+		cy.get('.modal__content [data-cy="importAsNewTableSwitch"] input').uncheck({ force: true })
 		cy.get('[data-cy="selectExistingTableDropdown"]').type('Welcome to Nextcloud Tables!')
 		cy.get('.name-parts').click()
 
@@ -109,7 +109,7 @@ describe('Import csv from Files file action', () => {
 			method: 'POST',
 			url: '**/apps/tables/import/table/*'
 		}).as('importExistingTableReq')
-		cy.get('[data-cy="fileActionImportButton"]').click()
+		cy.get('[data-cy="fileActionImportButton"]').click({force: true})
 		cy.wait('@importExistingTableReq').its('response.statusCode').should('equal', 200)
 
 		cy.get('[data-cy="importResultColumnsFound"]').should('contain.text', '4')

@@ -52,7 +52,7 @@ import FileSwap from 'vue-material-design-icons/FileSwap.vue'
 import Delete from 'vue-material-design-icons/Delete.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import svgHelper from '../../../shared/components/ncIconPicker/mixins/svgHelper.js'
-import { NAV_ENTRY_MODE } from '../../../shared/constants.js'
+import { NAV_ENTRY_MODE } from '../../../shared/constants.ts'
 import rebuildNavigation from '../../../service/rebuild-navigation.js'
 import { useTablesStore } from '../../../store/store.js'
 

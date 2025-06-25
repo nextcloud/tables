@@ -14,7 +14,7 @@
 <script>
 import { getCurrentUser } from '@nextcloud/auth'
 import { NcUserBubble } from '@nextcloud/vue'
-import { USERGROUP_TYPE } from '../../../constants.js'
+import { USERGROUP_TYPE } from '../../../constants.ts'
 
 const currentUser = getCurrentUser()
 

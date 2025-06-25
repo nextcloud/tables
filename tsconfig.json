@@ -1,5 +1,5 @@
 {
-	"extends": "@vue/tsconfig/tsconfig.json",
+	"extends": "@vue/tsconfig",
 	"include": ["src/**/*.ts"],
 	"exclude": ["node_modules", "vendor"],
 	"compilerOptions": {
@@ -7,9 +7,23 @@
 		"allowJs": true,
 		"checkJs": true,
 		"allowImportingTsExtensions": true,
-		"lib": ["ESNext"],
+		"allowSyntheticDefaultImports": true,
+		"declaration": true,
+		"esModuleInterop": true,
+		"lib": ["DOM", "ESNext"],
+		"noEmit": true,
+		"plugins": [
+			{ "name": "typescript-plugin-css-modules" }
+		],
+		"sourceMap": true
 	},
 	"vueCompilerOptions": {
 		"target": 2.7,
+	},
+	"ts-node": {
+		"compilerOptions": {
+			"module": "ESNext",
+			"moduleResolution": "Node"
+		}
 	}
 }

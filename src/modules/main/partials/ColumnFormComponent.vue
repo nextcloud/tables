@@ -70,7 +70,7 @@ export default {
 		},
 	},
 	watch: {
-		value_data(val) {
+		value_data() {
 			this.$emit('update:value', this.value_data)
 		},
 		value() {

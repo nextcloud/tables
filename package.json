@@ -10,14 +10,14 @@
     "url": "https://github.com/nextcloud/tables",
     "type": "git"
   },
+  "type": "module",
   "url": "https://github.com/nextcloud/tables/wiki",
   "license": "agpl",
   "private": true,
   "scripts": {
-    "build": "NODE_ENV=production webpack --progress --config webpack.config.js",
-    "dev": "NODE_ENV=development webpack --progress --config webpack.config.js",
-    "watch": "NODE_ENV=development webpack --progress --watch --config webpack.config.js",
-    "serve": "NODE_ENV=development webpack serve --progress --config webpack.config.js",
+    "build": "vite --mode production build",
+    "dev": "vite --mode development build",
+    "watch": "vite --mode development build --watch",
     "typescript:check": "tsc --noEmit",
     "typescript:generate": "npx openapi-typescript ./openapi.json --immutable -t -o src/types/openapi/openapi.ts",
     "lint": "eslint --ext .js,.vue src",
@@ -64,9 +64,15 @@
     "@nextcloud/cypress": "^1.0.0-beta.7",
     "@nextcloud/eslint-config": "^8.4.2",
     "@nextcloud/stylelint-config": "^3.1.0",
-    "@nextcloud/webpack-vue-config": "^6.3.0",
+    "@nextcloud/vite-config": "^1.5.6",
+    "@vue/tsconfig": "^0.5.1",
     "cypress": "^13.6.4",
     "cypress-downloadfile": "^1.2.4",
-    "openapi-typescript": "^7.8.0"
+    "openapi-typescript": "^7.8.0",
+    "typescript": "^5.3.3",
+    "cypress-vite": "^1.6.0"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.10.0"
   }
 }

@@ -70,7 +70,7 @@ import NcIconPicker from '../../shared/components/ncIconPicker/NcIconPicker.vue'
 import svgHelper from '../../shared/components/ncIconPicker/mixins/svgHelper.js'
 import permissionBitmask from '../../shared/components/ncContextResource/mixins/permissionBitmask.js'
 import { getCurrentUser } from '@nextcloud/auth'
-import { NAV_ENTRY_MODE } from '../../shared/constants.js'
+import { NAV_ENTRY_MODE } from '../../shared/constants.ts'
 import { useTablesStore } from '../../store/store.js'
 import { mapActions } from 'pinia'
 
