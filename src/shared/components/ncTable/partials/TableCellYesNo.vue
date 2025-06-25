@@ -4,7 +4,7 @@
 -->
 <template>
 	<div class="inline-editing-container">
-		<NcCheckboxRadioSwitch v-model="localValue" :loading="localLoading" @update:modelValue="onToggle" />
+		<NcCheckboxRadioSwitch v-model="localValue" :loading="localLoading" type="switch" @update:modelValue="onToggle" />
 	</div>
 </template>
 
@@ -29,12 +29,14 @@ export default {
 
 	data() {
 		return {
-			localValue: undefined,
+			localValue: this.value === 'true',
 		}
 	},
 
-	beforeMount() {
-		this.localValue = this.value === 'true'
+	watch: {
+		value(newValue) {
+			this.localValue = newValue === 'true'
+		},
 	},
 
 	methods: {
