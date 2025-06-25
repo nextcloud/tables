@@ -95,11 +95,12 @@ describe('Rows for a table', () => {
 			.click()
 		
 		// Verify the input field appears and is focused
-		cy.get('.cell-input').should('be.visible')
-		cy.get('.cell-input').should('have.focus')
+		cy.get('[data-cy="ncTable"] [data-cy="customTableRow"] .cell-input input').click()
+		cy.get('.cell-input input').should('be.visible')
+		cy.get('.cell-input input').should('have.focus')
 		
 		// Change the content
-		cy.get('.cell-input').clear().type('Edited inline{enter}')
+		cy.get('.cell-input input').clear().type('Edited inline{enter}')
 		
 		// Verify the edit was saved
 		cy.get('.icon-loading-small').should('not.exist')
