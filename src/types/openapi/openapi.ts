@@ -775,6 +775,7 @@ export type components = {
             readonly textAllowedPattern: string;
             /** Format: int64 */
             readonly textMaxLength: number;
+            readonly textUnique: boolean;
             readonly selectionOptions: string;
             readonly selectionDefault: string;
             readonly datetimeDefault: string;
@@ -2194,6 +2195,8 @@ export interface operations {
                      * @description Max length, if column is a text
                      */
                     readonly textMaxLength?: number | null;
+                    /** @description Whether the text value must be unique, if column is a text */
+                    readonly textUnique?: boolean | null;
                     /**
                      * @description Options for a selection (json array{id: int, label: string})
                      * @default
@@ -2398,6 +2401,11 @@ export interface operations {
                      */
                     readonly textMaxLength?: number | null;
                     /**
+                     * @description Whether the text value must be unique, if column is a text
+                     * @default false
+                     */
+                    readonly textUnique?: boolean | null;
+                    /**
                      * @description Options for a selection (json array{id: int, label: string})
                      * @default
                      */
@@ -2588,6 +2596,8 @@ export interface operations {
                      * @description Max length, if column is a text
                      */
                     readonly textMaxLength?: number | null;
+                    /** @description Whether the text value must be unique, if column is a text */
+                    readonly textUnique?: boolean | null;
                     /** @description Options for a selection (json array{id: int, label: string}) */
                     readonly selectionOptions?: string | null;
                     /** @description Default option IDs for a selection (json int[]) */
@@ -2836,6 +2846,17 @@ export interface operations {
                     readonly "application/json": components["schemas"]["Row"];
                 };
             };
+            /** @description Validation error */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
             /** @description No permissions */
             readonly 403: {
                 headers: {
@@ -2949,6 +2970,17 @@ export interface operations {
                     readonly "application/json": components["schemas"]["Row"];
                 };
             };
+            /** @description Validation error */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
             /** @description No permissions */
             readonly 403: {
                 headers: {
@@ -3060,6 +3092,17 @@ export interface operations {
                 };
                 content: {
                     readonly "application/json": components["schemas"]["Row"];
+                };
+            };
+            /** @description Validation error */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
                 };
             };
             /** @description No permissions */
@@ -4277,6 +4320,11 @@ export interface operations {
                      * @description Max raw text length
                      */
                     readonly textMaxLength?: number | null;
+                    /**
+                     * @description Whether the text value must be unique, if column is a text
+                     * @default false
+                     */
+                    readonly textUnique?: boolean | null;
                     /**
                      * @description Subtype for the new column
                      * @enum {string|null}

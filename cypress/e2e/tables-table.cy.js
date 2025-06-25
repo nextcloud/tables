@@ -69,7 +69,8 @@ describe('Manage a table', () => {
 
 		cy.get('[data-cy="editTableModal"]').should('be.visible')
 		cy.get('.modal-container input').last().should('be.visible').should('be.enabled')
-		cy.get('.modal-container input').last().clear().type('ToDo list')
+		cy.get('.modal-container input').last().clear()
+		cy.get('.modal-container input').last().type('ToDo list')
 		cy.get('.modal__content #description-editor .tiptap.ProseMirror').type('Updated ToDo List description')
 		cy.get('.modal-container button').contains('Save').click()
 
