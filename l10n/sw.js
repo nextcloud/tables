@@ -65,6 +65,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Hakuna maoni. Anza kuchapisha",
     "Internal link" : "Kiungo cha ndani",
     "Permissions" : "Ruhusa",
+    "Created at" : "Imetengenezwa katika",
     "Sharing" : "inashirikisha",
     "Copy to clipboard" : "Nakili kwenye ubao wa kunakili",
     "Update" : "Sasisha",

@@ -132,6 +132,8 @@ OC.L10N.register(
     "Cannot update table. Title is missing." : "Не може да се обнови таблицата. Липсва заглавие.",
     "Views" : "Изгледи",
     "View" : "Изглед",
+    "Rows" : "Редове",
+    "Columns" : "олони",
     "Shares" : "Споделени",
     "Actions" : "Действия",
     "Share" : "Споделяне",
