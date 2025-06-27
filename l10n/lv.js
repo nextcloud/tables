@@ -90,7 +90,7 @@ OC.L10N.register(
     "Suffix" : "Piedēklis",
     "Default" : "Noklusējuma",
     "URL" : "URL",
-    "Copy link" : "Kopēt saiti",
+    "Copy link" : "Ievietot saiti starpliktuvē",
     "Open link" : "Atvērt saiti",
     "Close editor" : "Aizvērt redaktoru",
     "_%n selected row_::_%n selected rows_" : ["%n atlasītu rindu","%n atlasīta rinda","%n atlasītas rindas"],
