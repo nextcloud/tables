@@ -385,6 +385,7 @@ OC.L10N.register(
     "Could not load link provider results." : "Nem sikerült betölteni a hivatkozás szolgáltató eredményeit.",
     "Url" : "Url",
     "Copy link" : "Hivatkozás másolása",
+    "Open link" : "Hivatkozás megnyitása",
     "Show fullscreen" : "Teljesképernyős nézet",
     "Close editor" : "Szerkesztő bezárása",
     "Go to previous page" : "Ugrás az előző oldalra",
