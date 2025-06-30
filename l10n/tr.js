@@ -425,7 +425,7 @@ OC.L10N.register(
     "No permissions" : "Herhangi bir izin yok",
     "You have no permissions for this table." : "Bu tablo üzerinde herhangi bir izniniz yok.",
     "Search" : "Arama",
-    "This option is outdated." : "Bu seçenek eskimiş.",
+    "This option is outdated." : "Bu seçenek eskide kalmış.",
     "Back" : "Geri",
     "Select operator" : "İşlem seçin",
     "Search for value" : "Değer ara",
