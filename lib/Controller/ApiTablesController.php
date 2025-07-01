@@ -180,19 +180,19 @@ class ApiTablesController extends AOCSController {
 					$this->userId,
 				);
 
-				$newColumns = array_map(function ($colId) use ($colMap) {
+				$newColumns = array_map(static function (int $colId) use ($colMap): int {
 					return $colId > 0 ? $colMap[$colId] : $colId;
 				}, $view['columns']);
 
-				$newSort = array_map(function ($sort) use ($colMap) {
+				$newSort = array_map(static function (array $sort) use ($colMap): array {
 					if ($sort['columnId'] > 0) {
 						$sort['columnId'] = $colMap[$sort['columnId']];
 					}
 					return $sort;
 				}, $view['sort']);
 
-				$newFilter = array_map(function ($filters) use ($colMap) {
-					return array_map(function ($filter) use ($colMap) {
+				$newFilter = array_map(static function (array $filters) use ($colMap): array {
+					return array_map(static function (array $filter) use ($colMap): array {
 						if ($filter['columnId'] > 0) {
 							$filter['columnId'] = $colMap[$filter['columnId']];
 						}
