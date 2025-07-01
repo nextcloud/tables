@@ -51,6 +51,7 @@ OC.L10N.register(
     "Please select a file." : "Tafadhali teua faili",
     "Upload from device" : "Pakia kutoka katika kifaa",
     "Preview" : "Mwonekano wa awali",
+    "Failed" : "Imeshindwa",
     "Transfer" : "Hamisha",
     "Export" : "Safirisha",
     "Add to favorites" : "Ongeza kwenye pendwa",
