@@ -53,6 +53,7 @@ OC.L10N.register(
     "Preview" : "Mwonekano wa awali",
     "Failed" : "Imeshindwa",
     "Transfer" : "Hamisha",
+    "Filter" : "Chujio",
     "Export" : "Safirisha",
     "Add to favorites" : "Ongeza kwenye pendwa",
     "Remove from favorites" : "Ondoa kutoka katika pendwa",
@@ -99,6 +100,7 @@ OC.L10N.register(
     "Go to last page" : "Nenda ukurasa uliopita",
     "Confirmation" : "Uthibitisho",
     "Confirm" : "Thibitisha",
+    "Select" : "Chagua",
     "ID" : "Kitambulisho",
     "Clipboard is not available" : "Ubao wa kunakili haupatikani"
 },
