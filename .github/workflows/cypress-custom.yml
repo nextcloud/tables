@@ -92,7 +92,7 @@ jobs:
           path: apps/${{ env.APP_NAME }}
 
       - name: Set up node from version file
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           cache: 'npm'
           cache-dependency-path: apps/${{ env.APP_NAME}}/package-lock.json
@@ -107,7 +107,7 @@ jobs:
 
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
