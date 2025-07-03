@@ -58,4 +58,26 @@ describe('Import Export Scheme', () => {
 			})
 		})
 	})
+
+	it('Import table from scheme with views', () => {
+		const columns = ['Target', 'Description', 'Progress', 'Proofed', 'Comments', 'Task']
+		cy.get('.icon-loading').should('not.exist')
+		cy.get('[data-cy="navigationCreateTableIcon"]').click({ force: true })
+		cy.get('p').contains('Import Scheme').click({ force: true })
+		cy.contains('button', 'Create table').scrollIntoView().click()
+		cy.get('input[type=file].hidden-visually').selectFile('./cypress/e2e/Views.json', { force: true })
+		cy.get('button').contains('Import').click()
+		cy.get('.app-navigation-toggle-wrapper').should('be.visible').click()
+		cy.get('.app-navigation__list').contains('Views').should('exist').parent().find('button.icon-collapse').click()
+		cy.get('.app-navigation__list').contains('Unfinished Tasks').should('exist').click().parent().find('button.action-item__menutoggle').click()
+		cy.get('.action-button').contains('Edit view').click()
+		for (let i = 0; i < columns.length; i++) {
+			cy.get('#settings-section_columns-and-order .column-entry > .row-elements:not(.move').eq(i).should('contain', columns[i]).find('input.checkbox-radio-switch__input').should('be.checked')
+		}
+		cy.get('#settings-section_filter .v-select').eq(0).should('contain', 'Progress')
+		cy.get('#settings-section_filter .v-select').eq(1).should('contain', 'Is lower than')
+		cy.get('#settings-section_filter .v-select').eq(2).should('contain', '100')
+		cy.get('#settings-section_sort .v-select').should('contain', 'Created at')
+		cy.get('#settings-section_sort .checkbox-radio-switch__input[value="DESC"]').should('be.checked')
+	})
 })
