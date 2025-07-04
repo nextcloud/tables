@@ -138,8 +138,9 @@ class ApiTablesController extends AOCSController {
 		try {
 			$this->db->beginTransaction();
 			$table = $this->service->create($title, 'custom', $emoji, $description);
+			$colMap = [];
 			foreach ($columns as $column) {
-				$this->columnService->create(
+				$col = $this->columnService->create(
 					$this->userId,
 					$table->getId(),
 					null,
@@ -169,14 +170,41 @@ class ApiTablesController extends AOCSController {
 						showUserStatus: $column['showUserStatus'],
 					)
 				);
+				$colMap[$column['id']] = $col->getId();
 			};
 			foreach ($views as $view) {
-				$this->viewService->create(
+				$newView = $this->viewService->create(
 					$view['title'],
 					$view['emoji'],
 					$table,
 					$this->userId,
 				);
+
+				$newColumns = array_map(static function (int $colId) use ($colMap): int {
+					return $colId > 0 ? $colMap[$colId] : $colId;
+				}, $view['columns']);
+
+				$newSort = array_map(static function (array $sort) use ($colMap): array {
+					if ($sort['columnId'] > 0) {
+						$sort['columnId'] = $colMap[$sort['columnId']];
+					}
+					return $sort;
+				}, $view['sort']);
+
+				$newFilter = array_map(static function (array $filters) use ($colMap): array {
+					return array_map(static function (array $filter) use ($colMap): array {
+						if ($filter['columnId'] > 0) {
+							$filter['columnId'] = $colMap[$filter['columnId']];
+						}
+						return $filter;
+					}, $filters);
+				}, $view['filter']);
+
+				$this->viewService->update($newView->getId(), [
+					'columns' => json_encode($newColumns),
+					'sort' => json_encode($newSort),
+					'filter' => json_encode($newFilter),
+				]);
 			}
 			$this->db->commit();
 			return new DataResponse($table->jsonSerialize());
