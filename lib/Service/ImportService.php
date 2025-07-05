@@ -462,7 +462,7 @@ class ImportService extends SuperService {
 
 			if ($id) {
 				try {
-					$this->rowService->updateSet($id, $this->viewId, $data, $this->userId);
+					$this->rowService->updateSet($id, $this->viewId, $data, $this->userId, $this->tableId);
 					$this->countUpdatedRows++;
 					return;
 				} catch (\Throwable $e) {

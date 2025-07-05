@@ -1282,7 +1282,7 @@ class Api1Controller extends ApiController {
 		}
 
 		try {
-			return new DataResponse($this->rowService->updateSet($rowId, $viewId, $dataNew, $this->userId)->jsonSerialize());
+			return new DataResponse($this->rowService->updateSet($rowId, $viewId, $dataNew, $this->userId, null)->jsonSerialize());
 		} catch (InternalError $e) {
 			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
