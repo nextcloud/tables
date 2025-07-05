@@ -15,6 +15,7 @@ use OCA\Tables\Api\V1Api;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Dto\Column as ColumnDto;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -772,6 +773,7 @@ class Api1Controller extends ApiController {
 	 * @param string|null $textDefault Default text, if column is a text
 	 * @param string|null $textAllowedPattern Allowed pattern (regex) for text columns (not yet implemented)
 	 * @param int|null $textMaxLength Max length, if column is a text
+	 * @param bool|null $textUnique Whether the text value must be unique, if column is a text
 	 * @param string|null $selectionOptions Options for a selection (json array{id: int, label: string})
 	 * @param string|null $selectionDefault Default option IDs for a selection (json int[])
 	 * @param string|null $datetimeDefault Default value, if column is datetime
@@ -810,6 +812,7 @@ class Api1Controller extends ApiController {
 		?string $textDefault,
 		?string $textAllowedPattern,
 		?int $textMaxLength,
+		?bool $textUnique = false,
 
 		?string $selectionOptions = '',
 		?string $selectionDefault = '',
@@ -839,6 +842,7 @@ class Api1Controller extends ApiController {
 					textDefault: $textDefault,
 					textAllowedPattern: $textAllowedPattern,
 					textMaxLength: $textMaxLength,
+					textUnique: $textUnique,
 					numberDefault: $numberDefault,
 					numberMin: $numberMin,
 					numberMax: $numberMax,
@@ -889,6 +893,7 @@ class Api1Controller extends ApiController {
 	 * @param string|null $textDefault Default text, if column is a text
 	 * @param string|null $textAllowedPattern Allowed pattern (regex) for text columns (not yet implemented)
 	 * @param int|null $textMaxLength Max length, if column is a text
+	 * @param bool|null $textUnique Whether the text value must be unique, if column is a text
 	 * @param string|null $selectionOptions Options for a selection (json array{id: int, label: string})
 	 * @param string|null $selectionDefault Default option IDs for a selection (json int[])
 	 * @param string|null $datetimeDefault Default value, if column is datetime
@@ -923,6 +928,7 @@ class Api1Controller extends ApiController {
 		?string $textDefault,
 		?string $textAllowedPattern,
 		?int $textMaxLength,
+		?bool $textUnique,
 
 		?string $selectionOptions,
 		?string $selectionDefault,
@@ -949,6 +955,7 @@ class Api1Controller extends ApiController {
 					textDefault: $textDefault,
 					textAllowedPattern: $textAllowedPattern,
 					textMaxLength: $textMaxLength,
+					textUnique: $textUnique,
 					numberDefault: $numberDefault,
 					numberMin: $numberMin,
 					numberMax: $numberMax,
@@ -1131,9 +1138,10 @@ class Api1Controller extends ApiController {
 	 *
 	 * @param int $viewId View ID
 	 * @param string|array<string, mixed> $data Data as key - value store
-	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Row returned
+	 * 400: Validation error
 	 * 403: No permissions
 	 */
 	#[NoAdminRequired]
@@ -1160,6 +1168,9 @@ class Api1Controller extends ApiController {
 
 		try {
 			return new DataResponse($this->rowService->create(null, $viewId, $dataNew)->jsonSerialize());
+		} catch (BadRequestError $e) {
+			$this->logger->warning('An bad request was encountered: ' . $e->getMessage(), ['exception' => $e]);
+			return new DataResponse(['message' => $e->translatedMessage ?: $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -1176,9 +1187,10 @@ class Api1Controller extends ApiController {
 	 *
 	 * @param int $tableId Table ID
 	 * @param string|array<string, mixed> $data Data as key - value store
-	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Row returned
+	 * 400: Validation error
 	 * 403: No permissions
 	 * 404: Not found
 	 */
@@ -1206,6 +1218,9 @@ class Api1Controller extends ApiController {
 
 		try {
 			return new DataResponse($this->rowService->create($tableId, null, $dataNew)->jsonSerialize());
+		} catch (BadRequestError $e) {
+			$this->logger->warning('An bad request was encountered: ' . $e->getMessage(), ['exception' => $e]);
+			return new DataResponse(['message' => $e->translatedMessage ?: $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -1255,9 +1270,10 @@ class Api1Controller extends ApiController {
 	 * @param int|null $viewId View ID
 	 * @param string|array<string, mixed> $data Data as key - value store
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Updated row returned
+	 * 400: Validation error
 	 * 403: No permissions
 	 * 404: Not found
 	 */
@@ -1283,6 +1299,9 @@ class Api1Controller extends ApiController {
 
 		try {
 			return new DataResponse($this->rowService->updateSet($rowId, $viewId, $dataNew, $this->userId)->jsonSerialize());
+		} catch (BadRequestError $e) {
+			$this->logger->warning('An bad request was encountered: ' . $e->getMessage(), ['exception' => $e]);
+			return new DataResponse(['message' => $e->translatedMessage ?: $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (InternalError $e) {
 			$this->logger->error('An internal error or exception occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -1496,6 +1515,7 @@ class Api1Controller extends ApiController {
 	 * @param string|null $textDefault Default text, if column is a text
 	 * @param string|null $textAllowedPattern Allowed pattern (regex) for text columns (not yet implemented)
 	 * @param int|null $textMaxLength Max length, if column is a text
+	 * @param bool|null $textUnique Whether the text value must be unique, if column is a text
 	 * @param string|null $selectionOptions Options for a selection (json array{id: int, label: string})
 	 * @param string|null $selectionDefault Default option IDs for a selection (json int[])
 	 * @param string|null $datetimeDefault Default value, if column is datetime
@@ -1535,6 +1555,7 @@ class Api1Controller extends ApiController {
 		?string $textDefault,
 		?string $textAllowedPattern,
 		?int $textMaxLength,
+		?bool $textUnique,
 
 		?string $selectionOptions = '',
 		?string $selectionDefault = '',
@@ -1563,6 +1584,7 @@ class Api1Controller extends ApiController {
 					textDefault: $textDefault,
 					textAllowedPattern: $textAllowedPattern,
 					textMaxLength: $textMaxLength,
+					textUnique: $textUnique,
 					numberDefault: $numberDefault,
 					numberMin: $numberMin,
 					numberMax: $numberMax,
