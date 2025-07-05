@@ -10,7 +10,6 @@ namespace OCA\Tables\Db;
 use JsonSerializable;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\ResponseDefinitions;
-use OCP\AppFramework\Db\Entity;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
@@ -55,8 +54,10 @@ use OCP\AppFramework\Db\Entity;
  * @method setSort(string $sort)
  * @method getOwnerDisplayName(): string
  * @method setOwnerDisplayName(string $ownerDisplayName)
+ * @method getOwnership(): ?string
+ * @method setOwnership(string $ownership)
  */
-class View extends Entity implements JsonSerializable {
+class View extends EntitySuper implements JsonSerializable {
 	protected ?string $title = null;
 	protected ?int $tableId = null;
 	protected ?string $createdBy = null;
@@ -68,6 +69,8 @@ class View extends Entity implements JsonSerializable {
 	protected ?string $columns = null; // json
 	protected ?string $sort = null; // json
 	protected ?string $filter = null; // json
+
+	// virtual properties
 	protected ?bool $isShared = null;
 	protected ?Permissions $onSharePermissions = null;
 	protected ?bool $hasShares = false;
@@ -75,6 +78,8 @@ class View extends Entity implements JsonSerializable {
 	protected ?int $rowsCount = 0;
 	protected ?string $ownership = null;
 	protected ?string $ownerDisplayName = null;
+
+	protected const VIRTUAL_PROPERTIES = ['isShared', 'onSharePermissions', 'hasShares', 'favorite', 'rowsCount', 'ownership', 'ownerDisplayName'];
 
 	public function __construct() {
 		$this->addType('id', 'integer');
@@ -169,14 +174,6 @@ class View extends Entity implements JsonSerializable {
 
 	private function getSharePermissions(): ?Permissions {
 		return $this->getOnSharePermissions();
-	}
-
-	public function getOwnership(): ?string {
-		return $this->ownership;
-	}
-
-	public function setOwnership(string $ownership): void {
-		$this->ownership = $ownership;
 	}
 
 	/**
