@@ -1,6 +1,8 @@
 OC.L10N.register(
     "tables",
     {
+    "Select columns" : "Pilih kolom",
+    "e.g. 1,2,4 or leave empty" : "contoh: 1,2,4 atau biarkan kosong",
     "The file was uploaded" : "Berkas terunggah",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Berkas terunggah melampau parameter upload_max_filesize pada php.ini",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Berkas yang diunggah melampaui direktif MAX_FILE_SIZE yang ditentukan dalam formulir HTML.",
@@ -31,6 +33,8 @@ OC.L10N.register(
     "Move" : "Pindah",
     "Column" : "Kolom",
     "Operator" : "Operator",
+    "Ascending" : "Naik",
+    "Descending" : "Menurun",
     "Views" : "Tampilan",
     "View" : "Tampilan",
     "Shares" : "Dibagikan",
@@ -57,6 +61,7 @@ OC.L10N.register(
     "Filter" : "Filter",
     "Sort" : "Urutkan",
     "Export" : "Ekspor",
+    "Remove from favorites" : "Hapus dari favorit",
     "Copy" : "Salin",
     "Favorites" : "Disukai",
     "Clear filter" : "Bersihkan filter",
@@ -83,6 +88,7 @@ OC.L10N.register(
     "Confirm" : "Konfirmasi",
     "Content" : "Konten",
     "Select" : "Pilih",
+    "Now" : "Sekarang",
     "ID" : "ID",
     "Clipboard is not available" : "Papan klip tidak tersedia"
 },
