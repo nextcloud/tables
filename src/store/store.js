@@ -284,7 +284,7 @@ export const useTablesStore = defineStore('store', {
 			try {
 				await axios.post(generateOcsUrl(`/apps/tables/api/2/favorites/${NODE_TYPE_VIEW}/${id}`))
 			} catch (e) {
-				displayError(e, t('tables', 'Could not favorite view'))
+				displayError(e, t('tables', 'Could not mark view as favorite'))
 				return false
 			}
 
@@ -316,7 +316,7 @@ export const useTablesStore = defineStore('store', {
 			try {
 				await axios.post(generateOcsUrl(`/apps/tables/api/2/favorites/${NODE_TYPE_TABLE}/${id}`))
 			} catch (e) {
-				displayError(e, t('tables', 'Could not favorite table'))
+				displayError(e, t('tables', 'Could not mark table as favorite'))
 				return false
 			}
 
