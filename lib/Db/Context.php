@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace OCA\Tables\Db;
 
 use JsonSerializable;
-use OCP\AppFramework\Db\Entity;
 
 /**
  * @method getName(): string
@@ -29,15 +28,19 @@ use OCP\AppFramework\Db\Entity;
  * @method getPages(): array
  * @method setPages(array $value): void
  */
-class Context extends Entity implements JsonSerializable {
+class Context extends EntitySuper implements JsonSerializable {
 	protected ?string $name = null;
 	protected ?string $icon = null;
 	protected ?string $description = null;
 	protected ?string $ownerId = null;
 	protected ?int $ownerType = null;
+
+	// virtual properties
 	protected ?array $sharing = null;
 	protected ?array $nodes = null;
 	protected ?array $pages = null;
+
+	protected const VIRTUAL_PROPERTIES = ['sharing', 'nodes', 'pages'];
 
 	public function __construct() {
 		$this->addType('id', 'integer');
