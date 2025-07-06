@@ -103,6 +103,7 @@ OC.L10N.register(
     "Confirmation" : "Uthibitisho",
     "Confirm" : "Thibitisha",
     "Select" : "Chagua",
+    "Unchecked" : "Haijaangaliwa",
     "ID" : "Kitambulisho",
     "Clipboard is not available" : "Ubao wa kunakili haupatikani"
 },
