@@ -23,18 +23,28 @@ class SelectionBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		}
 
 		$intValue = (int)$value;
-		if ((string)$intValue === (string)$value) {
-			// if it seems to be an option ID
-			foreach ($column->getSelectionOptionsArray() as $option) {
-				if ($option['id'] === $intValue && $option['label'] !== $value) {
-					return json_encode($option['id']);
-				}
+		if (!is_numeric($value) || $intValue != $value) {
+			return '';
+		}
+
+		foreach ($column->getSelectionOptionsArray() as $option) {
+			if ($option['id'] === $intValue) {
+				return json_encode($option['id']);
 			}
-		} else {
-			foreach ($column->getSelectionOptionsArray() as $option) {
-				if ($option['label'] === $value) {
-					return json_encode($option['id']);
-				}
+		}
+
+		return '';
+	}
+
+	public function parseDisplayValue($value, ?Column $column = null): string {
+		if (!$column) {
+			$this->logger->warning('No column given, but expected on ' . __FUNCTION__ . ' within ' . __CLASS__, ['exception' => new \Exception()]);
+			return '';
+		}
+
+		foreach ($column->getSelectionOptionsArray() as $option) {
+			if ($option['label'] === $value) {
+				return json_encode($option['id']);
 			}
 		}
 
@@ -56,22 +66,34 @@ class SelectionBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		}
 
 		$intValue = (int)$value;
-		if ((string)$intValue === (string)$value) {
-			// if it seems to be an option ID
-			foreach ($column->getSelectionOptionsArray() as $option) {
-				if ($option['id'] === $intValue && $option['label'] !== $value) {
-					return true;
-				}
-			}
-		} else {
-			foreach ($column->getSelectionOptionsArray() as $option) {
-				if ($option['label'] === $value) {
-					return true;
-				}
+		if (!is_numeric($value) || $intValue != $value) {
+			return false;
+		}
+
+		foreach ($column->getSelectionOptionsArray() as $option) {
+			if ($option['id'] === $intValue) {
+				return true;
 			}
 		}
 
 		return false;
 	}
 
+	public function canBeParsedDisplayValue($value, ?Column $column = null): bool {
+		if (!$column) {
+			$this->logger->warning('No column given, but expected on ' . __FUNCTION__ . ' within ' . __CLASS__, ['exception' => new \Exception()]);
+			return false;
+		}
+		if ($value === null) {
+			return true;
+		}
+
+		foreach ($column->getSelectionOptionsArray() as $option) {
+			if ($option['label'] === $value) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 }
