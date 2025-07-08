@@ -13,7 +13,7 @@
 				{{ t('tables', 'Internal link') }}
 			</span>
 			<span class="share-internal-link__subtitle">
-				{{ t('tables', 'Only works for users with access to this folder') }}
+				{{ internalLinkSubtitle }}
 			</span>
 		</div>
 
@@ -54,11 +54,21 @@ export default {
 			type: String,
 			required: true,
 		},
+		isView: {
+			type: Boolean,
+			default: false,
+		},
 	},
 
 	computed: {
 		copyTooltip() {
 			return t('tables', 'Copy internal link to clipboard')
+		},
+		internalLinkSubtitle() {
+			if (this.isView) {
+				return t('tables', 'Only works for users with access to this view')
+			}
+			return t('tables', 'Only works for users with access to this table')
 		},
 	},
 
