@@ -10,7 +10,6 @@ namespace OCA\Tables\Db;
 use JsonSerializable;
 
 use OCA\Tables\ResponseDefinitions;
-use OCP\AppFramework\Db\Entity;
 
 /**
  * @psalm-import-type TablesShare from ResponseDefinitions
@@ -44,11 +43,10 @@ use OCP\AppFramework\Db\Entity;
  * @method getLastEditAt(): string
  * @method setLastEditAt(string $lastEditAt)
  */
-class Share extends Entity implements JsonSerializable {
+class Share extends EntitySuper implements JsonSerializable {
 	protected ?string $sender = null; // is also owner
 
 	protected ?string $receiver = null;
-	protected ?string $receiverDisplayName = null;
 	protected ?string $receiverType = null; // user, group, circle
 	protected ?int $nodeId = null;
 	protected ?string $nodeType = null;
@@ -59,6 +57,11 @@ class Share extends Entity implements JsonSerializable {
 	protected ?bool $permissionManage = null;
 	protected ?string $createdAt = null;
 	protected ?string $lastEditAt = null;
+
+	// virtual properties
+	protected ?string $receiverDisplayName = null;
+
+	protected const VIRTUAL_PROPERTIES = ['receiverDisplayName'];
 
 	public function __construct() {
 		$this->addType('id', 'integer');

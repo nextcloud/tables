@@ -10,7 +10,6 @@ namespace OCA\Tables\Db;
 use JsonSerializable;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\ResponseDefinitions;
-use OCP\AppFramework\Db\Entity;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
@@ -27,7 +26,7 @@ use OCP\AppFramework\Db\Entity;
  * @method setArchived(bool $archived)
  * @method getDescription(): string
  * @method setDescription(string $description)
- * @method getOwnership(): string
+ * @method getOwnership(): ?string
  * @method setOwnership(string $ownership)
  * @method getOwnerDisplayName(): string
  * @method setOwnerDisplayName(string $ownerDisplayName)
@@ -56,26 +55,29 @@ use OCP\AppFramework\Db\Entity;
  * @method getLastEditAt(): string
  * @method setLastEditAt(string $lastEditAt)
  */
-class Table extends Entity implements JsonSerializable {
+class Table extends EntitySuper implements JsonSerializable {
 	protected ?string $title = null;
 	protected ?string $emoji = null;
 	protected ?string $ownership = null;
-	protected ?string $ownerDisplayName = null;
 	protected ?string $createdBy = null;
 	protected ?string $createdAt = null;
 	protected ?string $lastEditBy = null;
 	protected ?string $lastEditAt = null;
 	protected bool $archived = false;
+	protected ?string $description = null;
+
+	// virtual properties
 	protected ?bool $isShared = null;
 	protected ?Permissions $onSharePermissions = null;
-
 	protected ?bool $hasShares = false;
 	protected ?bool $favorite = false;
 	protected ?int $rowsCount = 0;
 	protected ?int $columnsCount = 0;
 	protected ?array $views = null;
 	protected ?array $columns = null;
-	protected ?string $description = null;
+	protected ?string $ownerDisplayName = null;
+
+	protected const VIRTUAL_PROPERTIES = ['isShared', 'onSharePermissions', 'hasShares', 'favorite', 'rowsCount', 'columnsCount', 'views', 'columns', 'ownerDisplayName'];
 
 	public function __construct() {
 		$this->addType('id', 'integer');

@@ -11,7 +11,6 @@ use JsonSerializable;
 
 use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\ResponseDefinitions;
-use OCP\AppFramework\Db\Entity;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
@@ -79,7 +78,7 @@ use OCP\AppFramework\Db\Entity;
  * @method getShowUserStatus(): bool
  * @method setShowUserStatus(?bool $showUserStatus)
  */
-class Column extends Entity implements JsonSerializable {
+class Column extends EntitySuper implements JsonSerializable {
 	// Meta column types
 	public const TYPE_META_ID = -1;
 	public const TYPE_META_CREATED_BY = -2;
@@ -105,10 +104,8 @@ class Column extends Entity implements JsonSerializable {
 	protected ?string $title = null;
 	protected ?int $tableId = null;
 	protected ?string $createdBy = null;
-	protected ?string $createdByDisplayName = null;
 	protected ?string $createdAt = null;
 	protected ?string $lastEditBy = null;
-	protected ?string $lastEditByDisplayName = null;
 	protected ?string $lastEditAt = null;
 	protected ?string $type = null;
 	protected ?string $subtype = null;
@@ -143,6 +140,12 @@ class Column extends Entity implements JsonSerializable {
 	protected ?bool $usergroupSelectGroups = null;
 	protected ?bool $usergroupSelectTeams = null;
 	protected ?bool $showUserStatus = null;
+
+	// virtual properties
+	protected ?string $createdByDisplayName = null;
+	protected ?string $lastEditByDisplayName = null;
+
+	protected const VIRTUAL_PROPERTIES = ['createdByDisplayName', 'lastEditByDisplayName'];
 
 	public function __construct() {
 		$this->addType('id', 'integer');
