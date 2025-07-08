@@ -127,20 +127,27 @@ class Row2Mapper {
 	 * @param string $userId
 	 * @param int $tableId
 	 * @param array|null $filter
+	 * @param array $sort
 	 * @param int|null $limit
 	 * @param int|null $offset
 	 * @return int[]
 	 * @throws InternalError
 	 */
-	private function getWantedRowIds(string $userId, int $tableId, ?array $filter = null, ?int $limit = null, ?int $offset = null): array {
+	private function getWantedRowIds(string $userId, int $tableId, ?array $filter = null, array $sort = [], ?int $limit = null, ?int $offset = null): array {
 		$qb = $this->db->getQueryBuilder();
 
-		$qb->select('id')
+		$qb->select('sleeves.id')
 			->from('tables_row_sleeves', 'sleeves')
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId, IQueryBuilder::PARAM_INT)));
+
 		if ($filter) {
 			$this->addFilterToQuery($qb, $filter, $userId);
 		}
+
+		$this->addSortQueryForMultipleSleeveFinder($qb, 'sleeves', $sort);
+
+		$qb->groupBy('sleeves.id');
+
 		if ($limit !== null) {
 			$qb->setMaxResults($limit);
 		}
@@ -173,9 +180,13 @@ class Row2Mapper {
 		$this->setColumns($columns, $tableColumns);
 		$columnIdsArray = array_map(fn (Column $column) => $column->getId(), $columns);
 
-		$wantedRowIdsArray = $this->getWantedRowIds($userId, $tableId, $filter, $limit, $offset);
+		$wantedRowIdsArray = $this->getWantedRowIds($userId, $tableId, $filter, $sort, $limit, $offset);
 
-		return $this->getRows($wantedRowIdsArray, $columnIdsArray, $sort ?? []);
+		// Get rows without SQL sorting
+		$rows = $this->getRows($wantedRowIdsArray, $columnIdsArray);
+
+		// Sort rows in PHP to preserve the order from getWantedRowIds
+		return $this->sortRowsByIds($rows, $wantedRowIdsArray);
 	}
 
 	/**
@@ -184,7 +195,7 @@ class Row2Mapper {
 	 * @return Row2[]
 	 * @throws InternalError
 	 */
-	private function getRows(array $rowIds, array $columnIds, array $sort = []): array {
+	private function getRows(array $rowIds, array $columnIds): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$qbSqlForColumnTypes = null;
@@ -229,9 +240,7 @@ class Row2Mapper {
 		}
 
 		try {
-			$sleeves = $this->rowSleeveMapper->findMultiple($rowIds, function (IQueryBuilder $qb, string $sleevesAlias) use ($sort) {
-				$this->addSortQueryForMultipleSleeveFinder($qb, $sleevesAlias, $sort);
-			});
+			$sleeves = $this->rowSleeveMapper->findMultiple($rowIds);
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
@@ -354,14 +363,14 @@ class Row2Mapper {
 				$column = $this->columns[$columnId] ?? $this->allColumns[$columnId];
 
 				$sql = $qb->expr()->in(
-					'id',
+					'sleeves.id',
 					$qb->createFunction($this->getFilterExpression($qb, $column, $filter['operator'], $filter['value'])->getSQL())
 				);
 
 				// if is meta data column
 			} elseif ($columnId < 0) {
 				$sql = $qb->expr()->in(
-					'id',
+					'sleeves.id',
 					$qb->createFunction($this->getMetaFilterExpression($qb, $columnId, $filter['operator'], $filter['value'])->getSQL())
 				);
 
@@ -894,5 +903,29 @@ class Row2Mapper {
 				break;
 		}
 		return $defaultValue;
+	}
+
+	/**
+	 * Sort rows array by the order specified in wantedRowIds
+	 * @param Row2[] $rows
+	 * @param int[] $wantedRowIds
+	 * @return Row2[]
+	 */
+	private function sortRowsByIds(array $rows, array $wantedRowIds): array {
+		// Create a map of row ID to row object for quick lookup
+		$rowMap = [];
+		foreach ($rows as $row) {
+			$rowMap[$row->getId()] = $row;
+		}
+
+		// Build sorted array in the order specified by wantedRowIds
+		$sortedRows = [];
+		foreach ($wantedRowIds as $rowId) {
+			if (isset($rowMap[$rowId])) {
+				$sortedRows[] = $rowMap[$rowId];
+			}
+		}
+
+		return $sortedRows;
 	}
 }
