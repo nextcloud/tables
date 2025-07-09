@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 jobs:
   update-nextcloud-ocp:
@@ -23,8 +24,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        branches: ['master']
-        target: ['stable29']
+        branches:
+          - ${{ github.event.repository.default_branch }}
 
     name: update-nextcloud-ocp-${{ matrix.branches }}
 
@@ -35,8 +36,12 @@ jobs:
           ref: ${{ matrix.branches }}
           submodules: true
 
+      - name: Get version matrix
+        id: versions
+        uses: icewind1991/nextcloud-version-matrix@58becf3b4bb6dc6cef677b15e2fd8e7d48c0908f # v1.3.1
+
       - name: Set up php8.2
-        uses: shivammathur/setup-php@0f7f1d08e3e32076e51cae65eb0b0c871405b16e # 2.34.1
+        uses: shivammathur/setup-php@0f7f1d08e3e32076e51cae65eb0b0c871405b16e # v2.34.1
         with:
           php-version: 8.2
           # https://docs.nextcloud.com/server/stable/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
@@ -56,7 +61,7 @@ jobs:
 
       - name: Composer update nextcloud/ocp
         id: update_branch
-        run: composer require --dev nextcloud/ocp:dev-${{ matrix.target }}
+        run: composer require --dev nextcloud/ocp:dev-${{ steps.versions.outputs.branches-min }}
 
       - name: Raise on issue on failure
         uses: dacbd/create-issue-action@cdb57ab6ff8862aa09fee2be6ba77a59581921c2 # v2.0.0
