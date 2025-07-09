@@ -5,7 +5,7 @@
 <template>
 	<div v-if="activeElement" class="sharing">
 		<div v-if="canShareElement(activeElement)">
-			<ShareInternalLink :current-url="currentUrl" />
+			<ShareInternalLink :current-url="currentUrl" :is-view="isView" />
 			<ShareForm :shares="shares" @add="addShare" @update="updateShare" />
 			<ShareList :shares="shares" @remove="removeShare" @update="updateShare" />
 		</div>
@@ -46,12 +46,12 @@ export default {
 			if (!this.activeElement) {
 				return ''
 			}
-			const baseUrl = generateUrl('/apps/tables/')
+			const internalLink = window.location.protocol + '//' + window.location.host + generateUrl('/apps/tables/')
 
 			if (this.isView) {
-				return `${baseUrl}#/view/${this.activeElement.id}`
+				return `${internalLink}#/view/${this.activeElement.id}`
 			}
-			return `${baseUrl}#/table/${this.activeElement.id}`
+			return `${internalLink}#/table/${this.activeElement.id}`
 		},
 	},
 
