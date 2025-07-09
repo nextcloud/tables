@@ -506,23 +506,22 @@ class FeatureContext implements Context {
 		Assert::assertEquals(201, $this->response->getStatusCode());
 	}
 
-	private function tableNodeToCsv(TableNode $node): string {
-		$file = new \SplTempFileObject();
+	/**
+	 * @param TableNode $node
+	 * @return false|resource
+	 */
+	private function tableNodeToCsv(TableNode $node) {
+		$resource = fopen('php://temp', 'rb+');
 		foreach ($node->getRows() as $row) {
 			$fields = array_map(function ($cell) {
 				return str_replace('{rowId}', $this->rowId, $cell);
 			}, $row);
-			$file->fputcsv($fields);
+			fputcsv($resource, $fields);
 		}
 
-		$file->rewind();
+		rewind($resource);
 
-		$lines = '';
-		while (!$file->eof()) {
-			$lines .= $file->fgets();
-		}
-
-		return $lines;
+		return $resource;
 	}
 
 	/**
