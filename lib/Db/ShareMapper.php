@@ -139,7 +139,7 @@ class ShareMapper extends QBMapper {
 		return $this->findEntities($qb);
 	}
 
-	public function findAllSharesForNodeTo(string $nodeType, int $nodeId, string $receivingUser, array $receivingGroups): array {
+	public function findAllSharesForNodeTo(string $nodeType, int $nodeId, string $receivingUser, array $receivingGroups, array $receivingCircles): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)
@@ -147,11 +147,15 @@ class ShareMapper extends QBMapper {
 				$qb->expr()->orX(
 					$qb->expr()->andX(
 						$qb->expr()->eq('receiver', $qb->createNamedParameter($receivingUser, IQueryBuilder::PARAM_STR)),
-						$qb->expr()->eq('receiver_type', $qb->createNamedParameter('user',IQueryBuilder::PARAM_STR)),
+						$qb->expr()->eq('receiver_type', $qb->createNamedParameter('user', IQueryBuilder::PARAM_STR)),
 					),
 					$qb->expr()->andX(
 						$qb->expr()->in('receiver', $qb->createNamedParameter($receivingGroups, IQueryBuilder::PARAM_STR_ARRAY)),
-						$qb->expr()->eq('receiver_type', $qb->createNamedParameter('group',IQueryBuilder::PARAM_STR)),
+						$qb->expr()->eq('receiver_type', $qb->createNamedParameter('group', IQueryBuilder::PARAM_STR)),
+					),
+					$qb->expr()->andX(
+						$qb->expr()->in('receiver', $qb->createNamedParameter($receivingCircles, IQueryBuilder::PARAM_STR_ARRAY)),
+						$qb->expr()->eq('receiver_type', $qb->createNamedParameter('circle', IQueryBuilder::PARAM_STR)),
 					)
 				)
 			)

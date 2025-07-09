@@ -432,34 +432,12 @@ class PermissionsService {
 	 */
 	public function getSharedPermissionsIfSharedWithMe(int $elementId, string $elementType, string $userId): Permissions {
 		try {
-			$userGroups = $this->userHelper->getGroupsForUser($userId);
-			$groupIds = array_map(function (\OCP\IGroup $group) { return $group->getGID(); }, $userGroups);
-			$shares = $this->shareMapper->findAllSharesForNodeTo($elementType, $elementId, $userId, $groupIds);
+			$groupIds = $this->userHelper->getGroupIdsForUser($userId) ?? [];
+			$userCircleIds = $this->circleHelper->getCircleIdsForUser($userId) ?? [];
+			$shares = $this->shareMapper->findAllSharesForNodeTo($elementType, $elementId, $userId, $groupIds, $userCircleIds);
 		} catch (Exception|InternalError $e) {
 			$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Permission denied.');
 			return new Permissions();
-		}
-
-		if ($this->circleHelper->isCirclesEnabled()) {
-			$circleShares = [];
-
-			try {
-				$userCircles = $this->circleHelper->getUserCircles($userId);
-			} catch (Throwable $e) {
-				$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Permission denied.');
-				return new Permissions();
-			}
-
-			foreach ($userCircles as $userCircle) {
-				try {
-					$circleShares[] = $this->shareMapper->findAllSharesForNodeFor($elementType, $elementId, $userCircle->getSingleId(), 'circle');
-				} catch (Exception $e) {
-					$this->logger->warning('Exception occurred: ' . $e->getMessage() . ' Permission denied.');
-					return new Permissions();
-				}
-			}
-
-			$shares = array_merge($shares, ...$circleShares);
 		}
 
 		if (count($shares) > 0) {
