@@ -5,6 +5,14 @@
 
 # Changelog
 
+## 0.8.7
+
+### Other
+
+* [[stable0.8] ci: update workflows from template (tables#1889)](https://github.com/nextcloud/tables/pull/1889)
+* [[stable0.8] refactor: simplify Columns::findAllByTable method (tables#1892)](https://github.com/nextcloud/tables/pull/1892)
+
+
 ## 0.8.6
 
 ### Fixed
