@@ -4,6 +4,7 @@
 -->
 <template>
 	<div>
+		<div v-if="getValue !== null" class="progress-percentage">{{ Math.round(getValue) }}%</div>
 		<NcProgressBar v-if="getValue !== null" :value="getValue" />
 	</div>
 </template>
@@ -44,6 +45,13 @@ export default {
 div {
 	padding-right: 10px;
 	min-width: 12vw;
+}
+
+.progress-percentage {
+	text-align: center;
+	font-weight: 500;
+	margin-bottom: 4px;
+	color: #666;
 }
 
 </style>
