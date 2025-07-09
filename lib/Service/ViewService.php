@@ -287,7 +287,7 @@ class ViewService extends SuperService {
 					$columnService = \OCP\Server::get(ColumnService::class);
 					$columnIds = array_column(\json_decode($value, true), 'columnId');
 
-					$availableColumns = $columnService->findAllByTable($view->getTableId(), $view->getId(), $this->userId);
+					$availableColumns = $columnService->findAllByManagedView($view, $userId);
 					$availableColumns = array_map(static fn (Column $column) => $column->getId(), $availableColumns);
 					foreach ($columnIds as $columnId) {
 						if (!Column::isValidMetaTypeId($columnId) && !in_array($columnId, $availableColumns, true)) {

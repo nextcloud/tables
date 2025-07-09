@@ -134,7 +134,7 @@ class TransferLegacyRows extends Command {
 	 * @throws Exception
 	 */
 	private function transferTable(Table $table, OutputInterface $output): void {
-		$columns = $this->columnService->findAllByTable($table->getId(), null, '');
+		$columns = $this->columnService->findAllByTable($table->getId(), '');
 		$output->writeln('---- Found ' . count($columns) . ' columns');
 
 		$legacyRows = $this->legacyRowMapper->findAllByTable($table->getId());
@@ -155,7 +155,7 @@ class TransferLegacyRows extends Command {
 		$output->writeln('Start deleting data for tables that should be transferred.');
 		foreach ($tables as $table) {
 			try {
-				$columns = $this->columnService->findAllByTable($table->getId(), null, '');
+				$columns = $this->columnService->findAllByTable($table->getId(), '');
 			} catch (InternalError|PermissionError $e) {
 				$output->writeln('Could not delete data for table ' . $table->getId());
 				break;

@@ -92,7 +92,7 @@ class NewDbStructureRepairStep implements IRepairStep {
 	 * @throws Exception
 	 */
 	private function transferTable(Table $table, IOutput $output) {
-		$columns = $this->columnService->findAllByTable($table->getId(), null, '');
+		$columns = $this->columnService->findAllByTable($table->getId(), '');
 		$output->info('---- Found ' . count($columns) . ' columns');
 
 		$legacyRows = $this->legacyRowMapper->findAllByTable($table->getId());

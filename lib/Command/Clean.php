@@ -97,7 +97,7 @@ class Clean extends Command {
 				return;
 			}
 			$tableId = $this->rowMapper->getTableIdForRow($nextRowId);
-			$columns = $this->columnService->findAllByTable($tableId, null, '');
+			$columns = $this->columnService->findAllByTable($tableId, '');
 			$this->row = $this->rowMapper->find($nextRowId, $columns);
 			$this->offset = $this->row->getId();
 		} catch (Exception $e) {
