@@ -15,6 +15,12 @@ namespace OCA\Analytics\Datasource {
     }
 }
 
+namespace OCA\Circles\Model {
+	class Circle {
+		abstract public function getSingleId(): string {}
+	}
+}
+
 namespace OC\Collaboration\Reference {
     class LinkReferenceProvider implements IReferenceProvider {
         abstract public function matchReference(string $referenceText): bool {}

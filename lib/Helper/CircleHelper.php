@@ -8,6 +8,7 @@
 namespace OCA\Tables\Helper;
 
 use OCA\Circles\CirclesManager;
+use OCA\Circles\Model\Circle;
 use OCA\Circles\Model\Member;
 use OCA\Circles\Model\Probes\CircleProbe;
 use OCP\App\IAppManager;
@@ -66,6 +67,11 @@ class CircleHelper {
 		}
 	}
 
+	/**
+	 * @param string $userId
+	 * @return Circle[]
+	 * @throws InternalError
+	 */
 	public function getUserCircles(string $userId): array {
 		if (!$this->circlesEnabled) {
 			return [];
@@ -82,4 +88,20 @@ class CircleHelper {
 			return [];
 		}
 	}
+
+	/**
+	 * @param string $userId
+	 * @return array|null
+	 */
+	public function getCircleIdsForUser(string $userId): ?array {
+		if (!$this->circlesEnabled) {
+			return null;
+		}
+
+		$circleIds = array_map(function (Circle $circle) {
+			return $circle->getSingleId();
+		}, $this->getUserCircles($userId));
+		return $circleIds;
+	}
+
 }

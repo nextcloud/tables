@@ -69,10 +69,9 @@ class UserHelper {
 			return null;
 		}
 
-		$groupArray = [];
-		foreach ($userGroups as $group) {
-			$groupArray[] = $group->getGID();
-		}
+		$groupArray = array_map(function (IGroup $group) {
+			return $group->getGID();
+		}, $userGroups);
 		return $groupArray;
 	}
 }
