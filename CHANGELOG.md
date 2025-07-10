@@ -5,6 +5,48 @@
 
 # Changelog
 
+## 0.9.4
+
+### Added
+
+* [Feat: Add usergroup column filters (tables#1720)](https://github.com/nextcloud/tables/pull/1720)
+* [Feat: Enhance "Contains" filter to support "selection" type (tables#1798)](https://github.com/nextcloud/tables/pull/1798)
+* [Add "Internal Link" Sharing Tile with Copy-to-Clipboard (tables#1831)](https://github.com/nextcloud/tables/pull/1831)
+* [Move to vite for bundling (tables#830)](https://github.com/nextcloud/tables/pull/830)
+
+### Fixed
+
+* [Fix: Properly display teams in usergroup (tables#1754)](https://github.com/nextcloud/tables/pull/1754)
+* [Fix(Row): find out necessary tableId for fetching the row (tables#1803)](https://github.com/nextcloud/tables/pull/1803)
+* [Fix: handle null description in TableScheme constructor (tables#1838)](https://github.com/nextcloud/tables/pull/1838)
+* [Fix: restore views fully (tables#1865)](https://github.com/nextcloud/tables/pull/1865)
+* [Fix: Error while creating column (tables#1881)](https://github.com/nextcloud/tables/pull/1881)
+* [Fix: Update internal link labels, use full link (tables#1888)](https://github.com/nextcloud/tables/pull/1888)
+
+### Other
+
+* [Refactor: restructure column config to support additional settings (tables#1688)](https://github.com/nextcloud/tables/pull/1688)
+* [Refactor: streamline row and column data handling by implementing caching (tables#1841)](https://github.com/nextcloud/tables/pull/1841)
+* [Refactor: simplify Columns::findAllByTable method (tables#1891)](https://github.com/nextcloud/tables/pull/1891)
+* [Chore(i18n): Improved grammar (tables#1882)](https://github.com/nextcloud/tables/pull/1882)
+* [Chore: Pin cypress version for renovate (tables#1834)](https://github.com/nextcloud/tables/pull/1834)
+* [Chore: pin versions for config packages in renovate (tables#1876)](https://github.com/nextcloud/tables/pull/1876)
+
+### Dependencies
+
+* [Fix(deps): update dependency @nextcloud/vue to ^8.27.0 (tables#1780)](https://github.com/nextcloud/tables/pull/1780)
+* [Fix(deps): update tiptap to ^2.25.0 (tables#1880)](https://github.com/nextcloud/tables/pull/1880)
+* [Fix(deps): update dependency @nextcloud/auth to ^2.5.1 (tables#1819)](https://github.com/nextcloud/tables/pull/1819)
+* [Fix(deps): update dependency @nextcloud/l10n to ^3.3.0 (tables#1832)](https://github.com/nextcloud/tables/pull/1832)
+* [Fix(deps): update dependency @nextcloud/dialogs to ^6.3.1 (tables#1843)](https://github.com/nextcloud/tables/pull/1843)
+* [Fix(deps): update dependency @nextcloud/files to ^3.11.0 (tables#1879)](https://github.com/nextcloud/tables/pull/1879)
+* [Chore(deps): update dependency @nextcloud/stylelint-config to ^3.1.0 (tables#1820)](https://github.com/nextcloud/tables/pull/1820)
+* [Chore(deps): update dependency openapi-typescript to ^7.8.0 (tables#1821)](https://github.com/nextcloud/tables/pull/1821)
+* [Chore(deps): update dependency nextcloud/coding-standard to ^v1.4.0 (tables#1846)](https://github.com/nextcloud/tables/pull/1846)
+* [Chore(deps): update dependency @rollup/rollup-linux-x64-gnu to ^4.44.2 (tables#1878)](https://github.com/nextcloud/tables/pull/1878)
+* [[main] Fix npm audit (tables#1883)](https://github.com/nextcloud/tables/pull/1883)
+
+
 ## 0.9.3
 
 ### Fixed
