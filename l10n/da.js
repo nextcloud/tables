@@ -230,7 +230,6 @@ OC.L10N.register(
     "Share ID" : "Dele ID",
     "Copy internal link to clipboard" : "Kopiér internt link til klippebord",
     "Internal link" : "Internt link",
-    "Only works for users with access to this folder" : "Virker kun for brugere med adgang til denne folder",
     "group" : "gruppe",
     "Permissions" : "Rettigheder",
     "Read data" : "Læs data",

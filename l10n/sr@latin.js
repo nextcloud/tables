@@ -34,7 +34,6 @@ OC.L10N.register(
     "Failed" : "Nije uspelo",
     "Copy" : "Kopiraj",
     "Favorites" : "Omiljene",
-    "Only works for users with access to this folder" : "Radiće samo za korisnike sa pristupom ovoj fascikli",
     "group" : "grupa",
     "Sharing" : "Deljenje",
     "Read" : "Čitaj",

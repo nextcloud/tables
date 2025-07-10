@@ -68,7 +68,6 @@ OC.L10N.register(
     "No recommendations. Start typing." : "No recommendations. Start typing.",
     "Copy internal link to clipboard" : "Copy internal link to clipboard",
     "Internal link" : "Internal link",
-    "Only works for users with access to this folder" : "Only works for users with access to this folder",
     "group" : "group",
     "Permissions" : "Permissions",
     "No shares" : "No shares",

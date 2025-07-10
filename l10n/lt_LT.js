@@ -119,7 +119,6 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Rekomendacijų nėra. Pradėkite rašyti.",
     "Copy internal link to clipboard" : "Kopijuoti vidinę nuorodą į iškarpinę",
     "Internal link" : "Vidinė nuoroda",
-    "Only works for users with access to this folder" : "Veikia tik naudotojams, kurie turi prieigą prie šio aplanko",
     "group" : "grupė",
     "Permissions" : "Leidimai",
     "No shares" : "Nėra jokių viešinių",

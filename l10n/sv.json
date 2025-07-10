@@ -342,7 +342,6 @@
     "Share ID" : "Delnings-ID",
     "Copy internal link to clipboard" : "Kopiera intern länk till urklipp",
     "Internal link" : "Intern länk",
-    "Only works for users with access to this folder" : "Fungerar bara för användare med tillgång till den här mappen",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "Alla appar som skapats av en degraderad delningsmottagare och som använder en delad tabell kommer fortsatt att konsumera dess data.",
     "group" : "grupp",
     "team" : "team",

@@ -375,7 +375,6 @@ OC.L10N.register(
     "Share ID" : "معرف المشاركة",
     "Copy internal link to clipboard" : "إنسَخ رابطاً داخليّاً إلى الحافظة",
     "Internal link" : "رابط داخلي",
-    "Only works for users with access to this folder" : "صالحٌ فقط للمستخدمين الذين لديهم حق الوصول إلى هذا المجلد",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "سيستمر أي تطبيق تم إنشاؤه بواسطة مستلمي المشاركة مخفضة الرتبة باستعمال جدول مشترك في استهلاك بياناته.",
     "group" : "مجموعة",
     "team" : "الفريق",

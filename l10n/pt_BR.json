@@ -374,7 +374,6 @@
     "Share ID" : "ID do compartilhamento",
     "Copy internal link to clipboard" : "Copiar link interno para a área de transferência",
     "Internal link" : "Link interno",
-    "Only works for users with access to this folder" : "Funciona somente para usuários com acesso a esta pasta",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "Qualquer aplicativo criado por um destinatário de compartilhamento rebaixado usando uma tabela compartilhada continuará a consumir seus dados.",
     "group" : "grupo",
     "team" : "equipe",

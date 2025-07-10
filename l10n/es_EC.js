@@ -226,7 +226,6 @@ OC.L10N.register(
     "Share ID" : "ID de recurso compartido",
     "Copy internal link to clipboard" : "Copiar enlace interno al portapapeles",
     "Internal link" : "Enlace interno",
-    "Only works for users with access to this folder" : "Solo funciona para usuarios con acceso a esta carpeta",
     "group" : "grupo",
     "Permissions" : "Permisos",
     "Read data" : "Leer datos",

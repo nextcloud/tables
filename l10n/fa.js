@@ -284,7 +284,6 @@ OC.L10N.register(
     "Share ID" : "Share ID",
     "Copy internal link to clipboard" : "Copy internal link to clipboard",
     "Internal link" : "پیوند داخلی",
-    "Only works for users with access to this folder" : "فقط برای کاربران دارای دسترسی به این پوشه کار می کند",
     "group" : "گروه",
     "Table manager" : "Table manager",
     "Permissions" : "مجوزها",

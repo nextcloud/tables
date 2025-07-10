@@ -161,7 +161,6 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Geen aanbevelingen. Begin te typen.",
     "Copy internal link to clipboard" : "Kopieer interne link naar klembord",
     "Internal link" : "Interne link",
-    "Only works for users with access to this folder" : "Dit werkt alleen voor gebruikers met toegang tot deze map",
     "group" : "groep",
     "Permissions" : "Machtigingen",
     "Delete data" : "Verwijder data",

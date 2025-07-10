@@ -264,7 +264,6 @@ OC.L10N.register(
     "Share ID" : "ID souporabe",
     "Copy internal link to clipboard" : "Kopiraj notranjo povezavo v odložišče",
     "Internal link" : "Notranja povezava",
-    "Only works for users with access to this folder" : "Možnost deluje le za uporabnike, ki imajo dostop do te mape",
     "group" : "skupina",
     "Permissions" : "Dovoljenja",
     "Read data" : "Preberi podatke",

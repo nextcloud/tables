@@ -357,7 +357,6 @@ OC.L10N.register(
     "Share ID" : "Delt ressurs-ID",
     "Copy internal link to clipboard" : "Kopier intern lenke til utklippstavlen",
     "Internal link" : "Intern lenke",
-    "Only works for users with access to this folder" : "Virker kun for brukere med tilgang til mappen",
     "group" : "gruppe",
     "Table manager" : "Tabell-behandler",
     "Permissions" : "Rettigheter",

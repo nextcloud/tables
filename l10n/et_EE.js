@@ -281,7 +281,6 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Soovitusi pole. Alusta trükkimist.",
     "Copy internal link to clipboard" : "Kopeeri sisemine link lõikelauale",
     "Internal link" : "Sisemine link",
-    "Only works for users with access to this folder" : "Toimib vaid kasutajate puhul, kellel on ligipääs siia kausta.",
     "group" : "grupp",
     "team" : "tiim",
     "Permissions" : "Õigused",

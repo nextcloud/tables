@@ -354,7 +354,6 @@ OC.L10N.register(
     "Share ID" : "كىملىكنى ئورتاقلىشىش",
     "Copy internal link to clipboard" : "ئىچكى ئۇلىنىشنى چاپلاش تاختىسىغا كۆچۈرۈڭ",
     "Internal link" : "ئىچكى ئۇلىنىش",
-    "Only works for users with access to this folder" : "پەقەت بۇ ھۆججەت قىسقۇچنى زىيارەت قىلالايدىغان ئىشلەتكۈچىلەر ئۈچۈن ئىشلەيدۇ",
     "group" : "گۇرۇپپا",
     "Table manager" : "جەدۋەل باشقۇرغۇچى",
     "Permissions" : "ئىجازەت",

@@ -375,7 +375,6 @@ OC.L10N.register(
     "Share ID" : "ID zdieľania",
     "Copy internal link to clipboard" : "Skopírovať interný odkaz do schránky",
     "Internal link" : "Interný odkaz",
-    "Only works for users with access to this folder" : "Funguje len pre používateľov s prístupom k tomuto priečinku",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "Akákoľvek aplikácia vytvorená príjemcami zdieľania, so zníženou úrovňou, pomocou zdieľanej tabuľky, bude naďalej spotrebúvať jej údaje.",
     "group" : "skupina",
     "team" : "tím",

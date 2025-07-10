@@ -289,7 +289,6 @@ OC.L10N.register(
     "Share ID" : "Megosztásazonosító",
     "Copy internal link to clipboard" : "Belső hivatkozás másolása a vágólapra",
     "Internal link" : "Belső hivatkozás",
-    "Only works for users with access to this folder" : "Csak azoknál a felhasználóknál működik, akiknek hozzáférésük van ehhez a mappához",
     "group" : "csoport",
     "Table manager" : "Tábla kezelő",
     "Permissions" : "Jogosultságok",

@@ -183,7 +183,6 @@ OC.L10N.register(
     "Share ID" : "ID udostępnienia",
     "Copy internal link to clipboard" : "Kopiuj link wewnętrzny do schowka",
     "Internal link" : "Link wewnętrzny",
-    "Only works for users with access to this folder" : "Działa tylko dla użytkowników mającym dostęp do tego katalogu",
     "group" : "grupa",
     "Permissions" : "Uprawnienia",
     "Read data" : "Czytaj dane",

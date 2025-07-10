@@ -207,7 +207,6 @@ OC.L10N.register(
     "Share ID" : "Comparteix ID",
     "Copy internal link to clipboard" : "Copia l'enllaç intern al porta-retalls",
     "Internal link" : "Enllaç intern",
-    "Only works for users with access to this folder" : "Només funciona per als usuaris amb accés a aquesta carpeta",
     "group" : "grup",
     "Permissions" : "Permisos",
     "Read data" : "Llegeix dades",

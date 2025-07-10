@@ -253,7 +253,6 @@ OC.L10N.register(
     "Create time" : "Время создания",
     "Copy internal link to clipboard" : "Скопировать внутреннюю ссылку в буфер обмена",
     "Internal link" : "Внутренняя ссылка",
-    "Only works for users with access to this folder" : "Только для пользователей с доступом к этой папке",
     "group" : "группа",
     "Table manager" : "Менеджер таблиц",
     "Permissions" : "Права доступа",

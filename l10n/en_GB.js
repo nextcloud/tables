@@ -376,7 +376,6 @@ OC.L10N.register(
     "Share ID" : "Share ID",
     "Copy internal link to clipboard" : "Copy internal link to clipboard",
     "Internal link" : "Internal link",
-    "Only works for users with access to this folder" : "Only works for users with access to this folder",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "Any application created by a demoted share recipient that uses a shared table will continue to access its data.",
     "group" : "group",
     "team" : "team",

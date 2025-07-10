@@ -374,7 +374,6 @@
     "Share ID" : "Paylaşım kimliği",
     "Copy internal link to clipboard" : "İç bağlantıyı panoya kopyala",
     "Internal link" : "İç bağlantı",
-    "Only works for users with access to this folder" : "Yalnızca bu klasöre erişebilen kullanıcılar için geçerlidir",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "Paylaşılan bir tabloyu kullanarak düşürülmüş paylaşım alıcıları tarafından oluşturulan herhangi bir uygulama, onun verilerini kullanmayı sürdürür.",
     "group" : "grup",
     "team" : "takım",

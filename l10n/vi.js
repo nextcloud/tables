@@ -155,7 +155,6 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Không có khuyến nghị. Bắt đầu gõ.",
     "Copy internal link to clipboard" : "Sao chép liên kết nội bộ vào bộ nhớ tạm",
     "Internal link" : "Liên kết nội bộ",
-    "Only works for users with access to this folder" : "Chỉ hoạt động đối với người dùng có quyền truy cập vào thư mục này",
     "group" : "nhóm",
     "Delete data" : "Xóa dữ liệu",
     "No shares" : "Không có lượt chia sẻ",

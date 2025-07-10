@@ -375,7 +375,6 @@ OC.L10N.register(
     "Share ID" : "ID de compartición",
     "Copy internal link to clipboard" : "Copiar a ligazón interna ao portapapeis",
     "Internal link" : "Ligazón interna",
-    "Only works for users with access to this folder" : "Só funciona para usuarios que teñen acceso a este cartafol",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "Calquera aplicación creada por destinatarios compartidos relegados mediante unha táboa compartida seguirá a consumir os seus datos.",
     "group" : "grupo",
     "team" : "equipo",

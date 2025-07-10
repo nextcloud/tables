@@ -359,7 +359,6 @@ OC.L10N.register(
     "Share ID" : "Jaon ID",
     "Copy internal link to clipboard" : "Kopioi sisäinen linkki leikepöydälle",
     "Internal link" : "Sisäinen linkki",
-    "Only works for users with access to this folder" : "Toimii vain käyttäjille, joilla on oikeus tähän kansioon",
     "group" : "ryhmä",
     "team" : "tiimi",
     "Table manager" : "Taulukon hallinta",
