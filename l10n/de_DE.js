@@ -375,6 +375,8 @@ OC.L10N.register(
     "Create time" : "Erstellungszeit",
     "Share ID" : "Teilen-ID",
     "Copy internal link to clipboard" : "Internen Link in die Zwischenablage kopieren",
+    "Only works for users with access to this view" : "Funktioniert nur für Benutzer mit Zugriff auf diese Ansicht",
+    "Only works for users with access to this table" : "Funktioniert nur für Benutzer mit Zugriff auf diese Tabelle",
     "Internal link" : "Interner Link",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "Jede von einem herabgestuften Freigabeempfänger mithilfe einer freigegebenen Tabelle erstellte Anwendung wird weiterhin deren Daten nutzen.",
     "group" : "Gruppe",

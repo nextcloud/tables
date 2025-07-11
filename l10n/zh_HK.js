@@ -375,6 +375,8 @@ OC.L10N.register(
     "Create time" : "創建時間",
     "Share ID" : "分享 ID",
     "Copy internal link to clipboard" : "將內部連結複製到剪貼板",
+    "Only works for users with access to this view" : "僅適用於有權存取此檢視的用戶",
+    "Only works for users with access to this table" : "僅適用於有權存取此數據庫表的用戶",
     "Internal link" : "內部連結",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "任何由降級的分享接收者創建的共享數據庫表的應用程序，將繼續訪問該表格的數據。",
     "group" : "群組",
