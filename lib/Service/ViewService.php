@@ -24,6 +24,7 @@ use OCA\Tables\Event\ViewDeletedEvent;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\EventDispatcher\IEventDispatcher;
@@ -272,11 +273,8 @@ class ViewService extends SuperService {
 					$this->logger->info('The old columns format is deprecated. Please use the new format with columnId and order properties.');
 					$decodedValue = \json_decode($value, true);
 					$value = [];
-					foreach ($decodedValue as $order => $id) {
-						$value[] = [
-							'columnId' => $id,
-							'order' => $order
-						];
+					foreach ($decodedValue as $order => $columnId) {
+						$value[] = new ViewColumnInformation($columnId, order: $order);
 					}
 
 					$value = \json_encode($value);
@@ -285,7 +283,8 @@ class ViewService extends SuperService {
 				if ($key === 'columnSettings' || $key === 'columns') {
 					// we have to fetch the service here as ColumnService already depends on the ViewService, i.e. no DI
 					$columnService = \OCP\Server::get(ColumnService::class);
-					$columnIds = array_column(\json_decode($value, true), 'columnId');
+					$rawColumnsArray = \json_decode($value, true);
+					$columnIds = array_column($rawColumnsArray, ViewColumnInformation::KEY_ID);
 
 					$availableColumns = $columnService->findAllByManagedView($view, $userId);
 					$availableColumns = array_map(static fn (Column $column) => $column->getId(), $availableColumns);
@@ -293,6 +292,14 @@ class ViewService extends SuperService {
 						if (!Column::isValidMetaTypeId($columnId) && !in_array($columnId, $availableColumns, true)) {
 							throw new InvalidArgumentException('Invalid column ID provided');
 						}
+					}
+
+					// ensure we have the correct format and expected values
+					try {
+						$columnsArray = array_map(static fn (array $a): ViewColumnInformation => ViewColumnInformation::fromArray($a), $rawColumnsArray);
+						$value = \json_encode($columnsArray);
+					} catch (\Throwable $t) {
+						throw new \InvalidArgumentException('Invalid column data provided', 400, $t);
 					}
 
 					$key = 'columns';
@@ -543,8 +550,8 @@ class ViewService extends SuperService {
 			);
 
 			$columnSettings = $view->getColumnsSettingsArray();
-			$columnSettings = array_filter($columnSettings, function (array $setting) use ($columnId): bool {
-				return $setting['columnId'] !== $columnId;
+			$columnSettings = array_filter($columnSettings, static function (ViewColumnInformation $setting) use ($columnId): bool {
+				return $setting[ViewColumnInformation::KEY_ID] !== $columnId;
 			});
 			$columnSettings = array_values($columnSettings);
 
@@ -587,16 +594,12 @@ class ViewService extends SuperService {
 	 * @param string|null $userId The user ID performing the action
 	 * @return void
 	 * @throws InternalError
-	 * @throws PermissionError
 	 */
 	public function addColumnToView(View $view, Column $column, ?string $userId = null): void {
 		try {
 			$columnsSettings = $view->getColumnsSettingsArray();
-			$nextOrder = empty($columnsSettings) ? 0 : max(array_column($columnsSettings, 'order')) + 1;
-			$columnsSettings[] = [
-				'columnId' => $column->getId(),
-				'order' => $nextOrder
-			];
+			$nextOrder = empty($columnsSettings) ? 0 : max(array_column($columnsSettings, ViewColumnInformation::KEY_ORDER)) + 1;
+			$columnsSettings[] = new ViewColumnInformation($column->getId(), $nextOrder);
 			$this->update($view->getId(), ['columnSettings' => json_encode($columnsSettings)], $userId, true);
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
