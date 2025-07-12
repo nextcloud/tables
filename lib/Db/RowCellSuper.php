@@ -34,8 +34,6 @@ abstract class RowCellSuper extends Entity implements JsonSerializable {
 	protected ?int $rowId = null;
 	protected ?string $lastEditBy = null;
 	protected ?string $lastEditAt = null;
-	protected ?string $createdBy = null;
-	protected ?string $createdAt = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');
