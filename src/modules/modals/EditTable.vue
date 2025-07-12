@@ -63,7 +63,7 @@
 							<NcButton v-if="ownsTable(localTable)" @click="actionTransfer">
 								{{ t('tables', 'Change owner') }}
 							</NcButton>
-							<NcButton type="primary" @click="submit">
+							<NcButton type="primary" data-cy="editTableSaveBtn" @click="submit">
 								{{ t('tables', 'Save') }}
 							</NcButton>
 						</div>

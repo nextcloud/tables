@@ -94,7 +94,7 @@ Cypress.Commands.add('deleteTable', (title) => {
 	cy.get('[data-cy="editTableModal"] [data-cy="editTableDeleteBtn"]').click()
 	cy.get('[data-cy="editTableModal"] [data-cy="editTableConfirmDeleteBtn"]').click()
 	cy.wait(10).get('.toastify.toast-success').should('be.visible')
-	cy.get('[data-cy="navigationTableItem"]').contains('to do list').should('not.exist')
+	cy.get('[data-cy="navigationTableItem"]').contains(title).should('not.exist')
 })
 
 
