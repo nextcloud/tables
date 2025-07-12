@@ -20,10 +20,6 @@ use OCP\AppFramework\Db\Entity;
  * @method setRowId(int $rowId)
  * @method getValue(): string
  * @method setValue(string $value)
- * @method getCreatedBy(): string
- * @method setCreatedBy(string $createdBy)
- * @method getCreatedAt(): string
- * @method setCreatedAt(string $createdAt)
  * @method getLastEditBy(): string
  * @method setLastEditBy(string $lastEditBy)
  * @method getLastEditAt(): string
@@ -34,8 +30,6 @@ abstract class RowCellSuper extends Entity implements JsonSerializable {
 	protected ?int $rowId = null;
 	protected ?string $lastEditBy = null;
 	protected ?string $lastEditAt = null;
-	protected ?string $createdBy = null;
-	protected ?string $createdAt = null;
 
 	public function __construct() {
 		$this->addType('id', 'integer');
@@ -67,7 +61,7 @@ abstract class RowCellSuper extends Entity implements JsonSerializable {
 	 * @param float|null|string $value
 	 * @param int $value_type
 	 */
-	public function jsonSerializePreparation(string|float|null $value, int $valueType): array {
+	public function jsonSerializePreparation(string|float|null $value, int $valueType = 0): array {
 		return [
 			'id' => $this->id,
 			'columnId' => $this->columnId,
