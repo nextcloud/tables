@@ -489,35 +489,39 @@ class FeatureContext implements Context {
 	// IMPORT --------------------------
 
 	/**
-	 * @Given file :file exists for user :user with following data
+	 * @Given file :file exists for user :user with the following data
 	 *
 	 * @param string $user
 	 * @param string $file
-	 * @param TableNode|null $table
+	 * @param TableNode $table
 	 */
-	public function createCsvFile(string $user, string $file, ?TableNode $table = null): void {
+	public function createCsvFile(string $user, string $file, TableNode $table): void {
 		$this->setCurrentUser($user);
-		$url = $this->baseUrl . 'remote.php/dav/files/' . $user . $file;
-		$body = $this->tableNodeToCsv($table);
-		$headers = ['Content-Type' => 'text/csv'];
 
-		$this->sendRequestFullUrl('PUT', $url, $body, $headers, []);
+		$url = sprintf('%sremote.php/dav/files/%s/%s', $this->baseUrl, $user, $file);
+		$body = Utils::streamFor($this->tableNodeToCsv($table));
+
+		$this->sendRequestFullUrl('PUT', $url, $body);
 
 		Assert::assertEquals(201, $this->response->getStatusCode());
 	}
 
-	private function tableNodeToCsv(TableNode $node): string {
-		$out = '';
+	/**
+	 * @param TableNode $node
+	 * @return false|resource
+	 */
+	private function tableNodeToCsv(TableNode $node) {
+		$resource = fopen('php://temp', 'rb+');
 		foreach ($node->getRows() as $row) {
-			foreach ($row as $value) {
-				if ($out !== '' && substr($out, -1) !== "\n") {
-					$out .= ',';
-				}
-				$out .= trim($value);
-			}
-			$out .= "\n";
+			$fields = array_map(function ($cell) {
+				return str_replace('{rowId}', $this->rowId, $cell);
+			}, $row);
+			fputcsv($resource, $fields);
 		}
-		return $out;
+
+		rewind($resource);
+
+		return $resource;
 	}
 
 	/**
