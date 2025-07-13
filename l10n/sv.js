@@ -343,6 +343,8 @@ OC.L10N.register(
     "Create time" : "Skapad tid",
     "Share ID" : "Delnings-ID",
     "Copy internal link to clipboard" : "Kopiera intern länk till urklipp",
+    "Only works for users with access to this view" : "Fungerar endast för användare med åtkomst till den här vyn",
+    "Only works for users with access to this table" : "Fungerar endast för användare med åtkomst till den här tabellen",
     "Internal link" : "Intern länk",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "Alla appar som skapats av en degraderad delningsmottagare och som använder en delad tabell kommer fortsatt att konsumera dess data.",
     "group" : "grupp",
