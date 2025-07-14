@@ -372,6 +372,8 @@
     "Create time" : "Čas vytvoření",
     "Share ID" : "Identifikátor sdílení",
     "Copy internal link to clipboard" : "Zkopírovat interní odkaz do schránky",
+    "Only works for users with access to this view" : "Funguje pouze pro uživatele, kteří mají přístup k tomuto pohledu",
+    "Only works for users with access to this table" : "Funguje pouze pro uživatele, kteří mají přístup k této tabulce",
     "Internal link" : "Interní odkaz",
     "Any application created by a demoted share recipients using a shared table will continue to consume its data." : "Jakákoli aplikace vytvořena degradovanými příjemci sdílení pomocí sdílené tabulky bude pokračovat v konzumaci jejích dat.",
     "group" : "skupina",
