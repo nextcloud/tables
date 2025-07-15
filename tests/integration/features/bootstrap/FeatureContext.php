@@ -900,7 +900,10 @@ class FeatureContext implements Context {
 		$columns = explode(',', $columnList);
 		$columnSettings = array_map(function (string $columnAlias, int $index) {
 			if (is_numeric($columnAlias)) {
-				return (int)$columnAlias;
+				return [
+					'columnId' => (int)$columnAlias,
+					'order' => $index
+				];
 			}
 
 			$col = $this->collectionManager->getByAlias('column', $columnAlias);
