@@ -29,6 +29,7 @@ OC.L10N.register(
     "Create" : "Креирај",
     "Text" : "Текст",
     "Link" : "Линк",
+    "Selection" : "Селектирање",
     "Users and groups" : "Корисници и групи",
     "Move" : "Премести",
     "Metadata" : "Метаподатоци",
