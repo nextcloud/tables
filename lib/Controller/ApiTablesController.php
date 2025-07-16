@@ -60,7 +60,7 @@ class ApiTablesController extends AOCSController {
 	/**
 	 * [api v2] Returns all Tables
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesTable[], array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesTable>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
 	 */
@@ -127,8 +127,8 @@ class ApiTablesController extends AOCSController {
 	 * @param string $title title of new table
 	 * @param string $emoji emoji
 	 * @param string $description description
-	 * @param array<TablesColumn > $columns columns
-	 * @param array<TablesView> $views views
+	 * @param list<TablesColumn> $columns columns
+	 * @param list<TablesView> $views views
 	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned

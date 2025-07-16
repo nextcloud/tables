@@ -17,7 +17,8 @@
 	"rebaseWhen": "conflicted",
 	"ignoreUnstable": false,
 	"baseBranches": [
-		"main"
+		"main",
+		"stable0.9"
 	],
 	"enabledManagers": [
 		"npm",
@@ -136,6 +137,13 @@
 				"typescript"
 			],
 			"allowedVersions": "<=5.3.3"
+		},
+		{
+			"matchPackageNames": [
+				"phpoffice/phpspreadsheet"
+			],
+			"allowedVersions": "<1.30.",
+			"description": "Pinned as later version have a regressive bug"
 		}
 	]
 }

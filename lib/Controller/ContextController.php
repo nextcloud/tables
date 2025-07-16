@@ -49,7 +49,7 @@ class ContextController extends AOCSController {
 	 *
 	 * Return an empty array if no contexts were found
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesContext[], array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesContext>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: reporting in available contexts
 	 */
@@ -188,7 +188,7 @@ class ContextController extends AOCSController {
 	 * [api v2] Delete an existing context and return it
 	 *
 	 * @param int $contextId ID of the context
-	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN, array{message: string}, array{}>
 	 *
 	 * 200: returning the full context information
 	 * 403: No permissions
@@ -214,7 +214,7 @@ class ContextController extends AOCSController {
 	 * @param string $newOwnerId ID of the new owner
 	 * @param int $newOwnerType any Application::OWNER_TYPE_* constant
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
 	 *
 	 * 200: Ownership transferred
 	 * 400: Invalid request
@@ -246,7 +246,7 @@ class ContextController extends AOCSController {
 	 * @param int $pageId ID of the page
 	 * @param array{id: int, order: int} $content content items with it and order values
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesContext, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
 	 *
 	 * @CanManageContext
 	 *
