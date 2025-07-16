@@ -33,6 +33,7 @@ use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\CORS;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
+use OCP\AppFramework\Http\Attribute\OpenAPI;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IL10N;
 use OCP\IRequest;
@@ -99,13 +100,14 @@ class Api1Controller extends ApiController {
 	/**
 	 * Returns all Tables
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesTable[], array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesTable>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Tables returned
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function index(): DataResponse {
 		try {
 			return new DataResponse($this->tableService->formatTables($this->tableService->findAll($this->userId)));
@@ -130,6 +132,7 @@ class Api1Controller extends ApiController {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function createTable(string $title, ?string $emoji, string $template = 'custom'): DataResponse {
 		try {
 			return new DataResponse($this->tableService->create($title, $template, $emoji)->jsonSerialize());
@@ -154,6 +157,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function showScheme(int $tableId): DataResponse {
 		try {
 			$scheme = $this->tableService->getScheme($tableId, $this->userId);
@@ -187,6 +191,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function getTable(int $tableId): DataResponse {
 		try {
 			return new DataResponse($this->tableService->find($tableId)->jsonSerialize());
@@ -222,6 +227,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function updateTable(int $tableId, ?string $title = null, ?string $emoji = null, ?bool $archived = false): DataResponse {
 		try {
 			return new DataResponse($this->tableService->update($tableId, $title, $emoji, null, $archived, $this->userId)->jsonSerialize());
@@ -254,6 +260,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function deleteTable(int $tableId): DataResponse {
 		try {
 			return new DataResponse($this->tableService->delete($tableId)->jsonSerialize());
@@ -278,7 +285,7 @@ class Api1Controller extends ApiController {
 	 * Get all views for a table
 	 *
 	 * @param int $tableId Table ID
-	 * @return DataResponse<Http::STATUS_OK, TablesView[], array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesView>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Views returned
 	 * 403: No permissions
@@ -288,6 +295,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexViews(int $tableId): DataResponse {
 		try {
 			return new DataResponse($this->viewService->formatViews($this->viewService->findAll($this->tableService->find($tableId))));
@@ -323,6 +331,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function createView(int $tableId, string $title, ?string $emoji): DataResponse {
 		try {
 			return new DataResponse($this->viewService->create($title, $emoji, $this->tableService->find($tableId))->jsonSerialize());
@@ -351,6 +360,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function getView(int $viewId): DataResponse {
 		try {
 			return new DataResponse($this->viewService->find($viewId)->jsonSerialize());
@@ -373,8 +383,8 @@ class Api1Controller extends ApiController {
 	 * Update a view via key-value sets
 	 *
 	 * @param int $viewId View ID
-	 * @param array{key: 'title'|'emoji'|'description', value: string}|array{key: 'columns', value: int[]}|array{key: 'sort', value: array{columnId: int, mode: 'ASC'|'DESC'}}|array{key: 'filter', value: array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}} $data key-value pairs
-	 * @return DataResponse<Http::STATUS_OK, TablesView, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @param array{key: 'title'|'emoji'|'description', value: string}|array{key: 'columns', value: list<int>}|array{key: 'sort', value: array{columnId: int, mode: 'ASC'|'DESC'}}|array{key: 'filter', value: array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}} $data key-value pairs
+	 * @return DataResponse<Http::STATUS_OK, TablesView, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: View updated
 	 * 400: Invalid data
@@ -385,6 +395,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function updateView(int $viewId, array $data): DataResponse {
 		try {
 			return new DataResponse($this->viewService->update($viewId, $data)->jsonSerialize());
@@ -417,6 +428,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function deleteView(int $viewId): DataResponse {
 		try {
 			return new DataResponse($this->viewService->delete($viewId)->jsonSerialize());
@@ -450,6 +462,7 @@ class Api1Controller extends ApiController {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function getShare(int $shareId): DataResponse {
 		try {
 			return new DataResponse($this->shareService->find($shareId)->jsonSerialize());
@@ -473,13 +486,14 @@ class Api1Controller extends ApiController {
 	 * Will be empty if view does not exist
 	 *
 	 * @param int $viewId View ID
-	 * @return DataResponse<Http::STATUS_OK, TablesShare[], array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesShare>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Shares returned
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexViewShares(int $viewId): DataResponse {
 		try {
 			return new DataResponse($this->shareService->formatShares($this->shareService->findAll('view', $viewId)));
@@ -495,13 +509,14 @@ class Api1Controller extends ApiController {
 	 * Will be empty if table does not exist
 	 *
 	 * @param int $tableId Table ID
-	 * @return DataResponse<Http::STATUS_OK, TablesShare[], array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesShare>, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Shares returned
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexTableShares(int $tableId): DataResponse {
 		try {
 			return new DataResponse($this->shareService->formatShares($this->shareService->findAll('table', $tableId)));
@@ -536,6 +551,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE)]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function createShare(
 		int $nodeId,
 		string $nodeType,
@@ -590,6 +606,7 @@ class Api1Controller extends ApiController {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function deleteShare(int $shareId): DataResponse {
 		try {
 			return new DataResponse($this->shareService->delete($shareId)->jsonSerialize());
@@ -623,6 +640,7 @@ class Api1Controller extends ApiController {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function updateSharePermissions(int $shareId, string $permissionType, bool $permissionValue): DataResponse {
 		try {
 			return new DataResponse($this->shareService->updatePermission($shareId, $permissionType, $permissionValue)->jsonSerialize());
@@ -660,6 +678,7 @@ class Api1Controller extends ApiController {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function updateShareDisplayMode(int $shareId, int $displayMode, string $target = 'default'): DataResponse {
 		if ($target === 'default') {
 			$userId = '';
@@ -697,7 +716,7 @@ class Api1Controller extends ApiController {
 	 *
 	 * @param int $tableId Table ID
 	 * @param int|null $viewId View ID
-	 * @return DataResponse<Http::STATUS_OK, TablesColumn[], array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesColumn>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: View deleted
 	 * 403: No permissions
@@ -706,6 +725,7 @@ class Api1Controller extends ApiController {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexTableColumns(int $tableId, ?int $viewId): DataResponse {
 		try {
 			try {
@@ -743,7 +763,7 @@ class Api1Controller extends ApiController {
 	 * Return an empty array if no columns were found
 	 *
 	 * @param int $viewId View ID
-	 * @return DataResponse<Http::STATUS_OK, TablesColumn[], array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesColumn>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: View deleted
 	 * 403: No permissions
@@ -753,6 +773,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexViewColumns(int $viewId): DataResponse {
 		try {
 			return new DataResponse($this->columnService->formatColumns($this->columnService->findAllByView($viewId)));
@@ -791,7 +812,7 @@ class Api1Controller extends ApiController {
 	 * @param string|null $textAllowedPattern Allowed pattern (regex) for text columns (not yet implemented)
 	 * @param int|null $textMaxLength Max length, if column is a text
 	 * @param string|null $selectionOptions Options for a selection (json array{id: int, label: string})
-	 * @param string|null $selectionDefault Default option IDs for a selection (json int[])
+	 * @param string|null $selectionDefault Default option IDs for a selection (json list<int>)
 	 * @param string|null $datetimeDefault Default value, if column is datetime
 	 * @param string|null $usergroupDefault Default value, if column is usergroup (json array{id: string, type: int})
 	 * @param bool|null $usergroupMultipleItems Can select multiple users or/and groups, if column is usergroup
@@ -799,7 +820,7 @@ class Api1Controller extends ApiController {
 	 * @param bool|null $usergroupSelectGroups Can select groups, if column type is usergroup
 	 * @param bool|null $usergroupSelectTeams Can select teams, if column type is usergroup
 	 * @param bool|null $usergroupShowUserStatus Whether to show the user's status, if column type is usergroup
-	 * @param int[]|null $selectedViewIds View IDs where this column should be added to be presented
+	 * @param list<int>|null $selectedViewIds View IDs where this column should be added to be presented
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -810,6 +831,7 @@ class Api1Controller extends ApiController {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function createColumn(
 		?int $tableId,
 		?int $viewId,
@@ -908,7 +930,7 @@ class Api1Controller extends ApiController {
 	 * @param string|null $textAllowedPattern Allowed pattern (regex) for text columns (not yet implemented)
 	 * @param int|null $textMaxLength Max length, if column is a text
 	 * @param string|null $selectionOptions Options for a selection (json array{id: int, label: string})
-	 * @param string|null $selectionDefault Default option IDs for a selection (json int[])
+	 * @param string|null $selectionDefault Default option IDs for a selection (json list<int>)
 	 * @param string|null $datetimeDefault Default value, if column is datetime
 	 * @param string|null $usergroupDefault Default value, if column is usergroup
 	 * @param bool|null $usergroupMultipleItems Can select multiple users or/and groups, if column is usergroup
@@ -924,6 +946,7 @@ class Api1Controller extends ApiController {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function updateColumn(
 		int $columnId,
 		?string $title,
@@ -1005,6 +1028,7 @@ class Api1Controller extends ApiController {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function getColumn(int $columnId): DataResponse {
 		try {
 			return new DataResponse($this->columnService->find($columnId)->jsonSerialize());
@@ -1036,6 +1060,7 @@ class Api1Controller extends ApiController {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function deleteColumn(int $columnId): DataResponse {
 		try {
 			return new DataResponse($this->columnService->delete($columnId)->jsonSerialize());
@@ -1060,7 +1085,7 @@ class Api1Controller extends ApiController {
 	 * @param int $tableId Table ID
 	 * @param int|null $limit Limit
 	 * @param int|null $offset Offset
-	 * @return DataResponse<Http::STATUS_OK, string[], array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<string>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Row values returned
 	 * 403: No permissions
@@ -1070,6 +1095,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexTableRowsSimple(int $tableId, ?int $limit, ?int $offset): DataResponse {
 		try {
 			return new DataResponse($this->v1Api->getData($tableId, $limit, $offset, $this->userId));
@@ -1090,7 +1116,7 @@ class Api1Controller extends ApiController {
 	 * @param int $tableId Table ID
 	 * @param int|null $limit Limit
 	 * @param int|null $offset Offset
-	 * @return DataResponse<Http::STATUS_OK, TablesRow[], array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesRow>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Rows returned
 	 * 403: No permissions
@@ -1100,6 +1126,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexTableRows(int $tableId, ?int $limit, ?int $offset): DataResponse {
 		try {
 			return new DataResponse($this->rowService->formatRows($this->rowService->findAllByTable($tableId, $this->userId, $limit, $offset)));
@@ -1120,7 +1147,7 @@ class Api1Controller extends ApiController {
 	 * @param int $viewId View ID
 	 * @param int|null $limit Limit
 	 * @param int|null $offset Offset
-	 * @return DataResponse<Http::STATUS_OK, TablesRow[], array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesRow>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Rows returned
 	 * 403: No permissions
@@ -1130,6 +1157,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexViewRows(int $viewId, ?int $limit, ?int $offset): DataResponse {
 		try {
 			return new DataResponse($this->rowService->formatRows($this->rowService->findAllByView($viewId, $this->userId, $limit, $offset)));
@@ -1158,6 +1186,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function createRowInView(int $viewId, $data): DataResponse {
 		if (is_string($data)) {
 			$data = json_decode($data, true);
@@ -1194,7 +1223,7 @@ class Api1Controller extends ApiController {
 	 *
 	 * @param int $tableId Table ID
 	 * @param string|array<string, mixed> $data Data as key - value store
-	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesRow, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Row returned
 	 * 403: No permissions
@@ -1204,6 +1233,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function createRowInTable(int $tableId, $data): DataResponse {
 		if (is_string($data)) {
 			$data = json_decode($data, true);
@@ -1248,6 +1278,7 @@ class Api1Controller extends ApiController {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function getRow(int $rowId): DataResponse {
 		try {
 			return new DataResponse($this->rowService->find($rowId)->jsonSerialize());
@@ -1282,6 +1313,7 @@ class Api1Controller extends ApiController {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function updateRow(int $rowId, ?int $viewId, $data): DataResponse {
 		if (is_string($data)) {
 			$data = json_decode($data, true);
@@ -1322,6 +1354,7 @@ class Api1Controller extends ApiController {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function deleteRow(int $rowId): DataResponse {
 		try {
 			return new DataResponse($this->rowService->delete($rowId, null, $this->userId)->jsonSerialize());
@@ -1354,6 +1387,7 @@ class Api1Controller extends ApiController {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function deleteRowByView(int $rowId, int $viewId): DataResponse {
 		try {
 			return new DataResponse($this->rowService->delete($rowId, $viewId, $this->userId)->jsonSerialize());
@@ -1388,6 +1422,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function importInTable(int $tableId, string $path, bool $createMissingColumns = true): DataResponse {
 		try {
 			// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
@@ -1423,6 +1458,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function importInView(int $viewId, string $path, bool $createMissingColumns = true): DataResponse {
 		try {
 			// minimal permission is checked, creating columns requires MANAGE permissions - currently tested on service layer
@@ -1465,6 +1501,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function createTableShare(int $tableId, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage): DataResponse {
 		try {
 			return new DataResponse(
@@ -1515,7 +1552,7 @@ class Api1Controller extends ApiController {
 	 * @param string|null $textAllowedPattern Allowed pattern (regex) for text columns (not yet implemented)
 	 * @param int|null $textMaxLength Max length, if column is a text
 	 * @param string|null $selectionOptions Options for a selection (json array{id: int, label: string})
-	 * @param string|null $selectionDefault Default option IDs for a selection (json int[])
+	 * @param string|null $selectionDefault Default option IDs for a selection (json list<int>)
 	 * @param string|null $datetimeDefault Default value, if column is datetime
 	 * @param string|null $usergroupDefault Default value, if column is usergroup
 	 * @param bool|null $usergroupMultipleItems Can select multiple users or/and groups, if column is usergroup
@@ -1523,7 +1560,7 @@ class Api1Controller extends ApiController {
 	 * @param bool|null $usergroupSelectGroups Can select groups, if column type is usergroup
 	 * @param bool|null $usergroupSelectTeams Can select teams, if column type is usergroup
 	 * @param bool|null $usergroupShowUserStatus Whether to show the user's status, if column type is usergroup
-	 * @param int[]|null $selectedViewIds View IDs where this column should be added to be presented
+	 * @param list<int>|null $selectedViewIds View IDs where this column should be added to be presented
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -1535,6 +1572,7 @@ class Api1Controller extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
+	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function createTableColumn(
 		int $tableId,
 		string $title,
