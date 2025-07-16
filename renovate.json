@@ -142,7 +142,7 @@
 			"matchPackageNames": [
 				"phpoffice/phpspreadsheet"
 			],
-			"allowedVersions": "<1.30.",
+			"allowedVersions": "<1.30",
 			"description": "Pinned as later version have a regressive bug"
 		}
 	]
