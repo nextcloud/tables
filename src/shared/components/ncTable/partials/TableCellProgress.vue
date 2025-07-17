@@ -105,6 +105,7 @@ export default {
 .progress-display {
 	width: 100%;
 	min-height: 20px;
+	cursor: pointer;
 }
 
 .empty-progress-placeholder {
