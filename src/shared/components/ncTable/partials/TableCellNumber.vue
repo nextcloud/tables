@@ -4,7 +4,7 @@
 -->
 <template>
 	<div class="cell-number">
-		<div v-if="!isEditing" @click="startEditing">
+		<div v-if="!isEditing" class="number-display" @click="startEditing">
 			{{ column.numberPrefix }}{{ getValue }}{{ column.numberSuffix }}
 		</div>
 		<div v-else class="inline-editing-container">
@@ -76,7 +76,17 @@ export default {
 				return
 			}
 
-			const newValue = this.editValue === '' ? null : Number(this.editValue)
+			let newValue = this.editValue === '' ? null : Number(this.editValue)
+
+			if (newValue !== null && !isNaN(newValue)) {
+				if (this.getMin !== null && newValue < this.getMin) {
+					newValue = this.getMin
+				}
+				if (this.getMax !== null && newValue > this.getMax) {
+					newValue = this.getMax
+				}
+			}
+
 			const success = await this.updateCellValue(newValue)
 
 			if (!success) {
@@ -98,6 +108,12 @@ export default {
 	div {
 		min-height: 20px;
 	}
+}
+
+.number-display {
+	width: 100%;
+	min-height: 20px;
+	cursor: pointer;
 }
 
 .inline-editing-container {
