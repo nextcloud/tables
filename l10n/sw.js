@@ -69,6 +69,7 @@ OC.L10N.register(
     "Clear filter" : "Futa kichujio",
     "No recommendations. Start typing." : "Hakuna maoni. Anza kuchapisha",
     "Internal link" : "Kiungo cha ndani",
+    "group" : "kundi",
     "Permissions" : "Ruhusa",
     "Created at" : "Imetengenezwa katika",
     "Sharing" : "inashirikisha",

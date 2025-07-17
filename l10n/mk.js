@@ -95,6 +95,7 @@ OC.L10N.register(
     "URL" : "Адреса",
     "Copy link" : "Копирај линк",
     "Close editor" : "Затвори го уредникот",
+    "Confirmation" : "Потврда",
     "Confirm" : "Потврди",
     "Select" : "Избери",
     "ID" : "ID",
