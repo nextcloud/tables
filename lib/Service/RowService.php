@@ -24,6 +24,7 @@ use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Model\RowDataInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
+use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
@@ -275,9 +276,22 @@ class RowService extends SuperService {
 	}
 
 	/**
+	 * @return array<int, true>
+	 */
+	private function extractReadOnlyColumns(View $view): array {
+		$columnSettings = $view->getColumnsSettingsArray();
+		return array_reduce($columnSettings, static function (array $carry, ViewColumnInformation $column) {
+			$carry[$column->getId()] = $column->isReadonly();
+			return $carry;
+		}, []);
+	}
+
+	/**
 	 * @throws InternalError
 	 */
 	private function cleanupData(RowDataInput $data, array $columns, ?int $tableId, ?int $viewId): RowDataInput {
+		$readOnlyColumns = $viewId ? $this->extractReadOnlyColumns($this->viewMapper->find($viewId)) : [];
+
 		$out = new RowDataInput();
 		foreach ($data as $entry) {
 			$column = $this->getColumnFromColumnsArray((int)$entry['columnId'], $columns);
@@ -293,6 +307,10 @@ class RowService extends SuperService {
 				$e = new \Exception('No column found, can not parse value.');
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			}
+
+			if (!empty($readOnlyColumns[$entry['columnId']])) {
+				continue;
 			}
 
 			// parse given value to respect the column type value format
