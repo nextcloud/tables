@@ -32,6 +32,7 @@
 			"@test:unit"
 		],
 		"test:unit": "./vendor/bin/phpunit -c tests/unit/phpunit.xml",
+		"test:unit:local": "TEST_MODE=local composer test:unit",
 		"lint": "find . -name \\*.php -not -path './vendor/*' -not -path './build/*' -print0 | xargs -0 -n1 php -l",
 		"cs:check": "php-cs-fixer fix --dry-run --diff",
 		"cs:fix": "php-cs-fixer fix",
