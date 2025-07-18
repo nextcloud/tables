@@ -896,6 +896,7 @@ export type components = {
             readonly usergroupSelectGroups: boolean;
             readonly usergroupSelectTeams: boolean;
             readonly showUserStatus: boolean;
+            readonly readonly: boolean;
         };
         readonly Context: {
             /** Format: int64 */
@@ -1022,6 +1023,7 @@ export type components = {
                 readonly columnId: number;
                 /** Format: int64 */
                 readonly order: number;
+                readonly readonly: boolean;
             }[];
             readonly sort: readonly {
                 /** Format: int64 */
