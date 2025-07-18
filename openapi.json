@@ -4228,8 +4228,8 @@
                             }
                         }
                     },
-                    "404": {
-                        "description": "Not found",
+                    "400": {
+                        "description": "Validation error",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4246,8 +4246,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Validation error",
+                    "404": {
+                        "description": "Not found",
                         "content": {
                             "application/json": {
                                 "schema": {
