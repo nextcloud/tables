@@ -25,11 +25,29 @@ interface IColumnTypeBusiness {
 	public function parseValue($value, ?Column $column): string;
 
 	/**
-	 * tests if the given string can be parsed to a value of the column type
+	 * tests if the given value can be parsed to a value of the column type
 	 *
 	 * @param mixed $value
 	 * @param Column|null $column
 	 * @return bool
 	 */
 	public function canBeParsed($value, ?Column $column): bool;
+
+	/**
+	 * tests if the given string can be parsed to a value/id of the column type
+	 *
+	 * @param mixed $value
+	 * @param Column|null $column
+	 * @return bool
+	 */
+	public function canBeParsedDisplayValue($value, ?Column $column): bool;
+
+	/**
+	 * parses the given string to a value/id of the column type
+	 *
+	 * @param mixed $value
+	 * @param Column|null $column
+	 * @return string
+	 */
+	public function parseDisplayValue($value, ?Column $column): string;
 }
