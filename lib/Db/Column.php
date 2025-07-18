@@ -79,6 +79,8 @@ use OCA\Tables\ResponseDefinitions;
  * @method setUsergroupSelectTeams(?bool $usergroupSelectTeams)
  * @method getShowUserStatus(): bool
  * @method setShowUserStatus(?bool $showUserStatus)
+ * @method getReadonly(): bool
+ * @method setReadonly(bool $readonly)
  */
 class Column extends EntitySuper implements JsonSerializable {
 	// Meta column types
@@ -147,8 +149,9 @@ class Column extends EntitySuper implements JsonSerializable {
 	// virtual properties
 	protected ?string $createdByDisplayName = null;
 	protected ?string $lastEditByDisplayName = null;
+	protected ?bool $readonly = null;
 
-	protected const VIRTUAL_PROPERTIES = ['createdByDisplayName', 'lastEditByDisplayName'];
+	protected const VIRTUAL_PROPERTIES = ['createdByDisplayName', 'lastEditByDisplayName', 'readonly'];
 
 	public function __construct() {
 		$this->addType('id', 'integer');
@@ -254,6 +257,7 @@ class Column extends EntitySuper implements JsonSerializable {
 			'lastEditBy' => $this->lastEditBy,
 			'lastEditByDisplayName' => $this->lastEditByDisplayName,
 			'lastEditAt' => $this->lastEditAt,
+			'readonly' => $this->readonly,
 			'type' => $this->type,
 			'subtype' => $this->subtype,
 			'mandatory' => $this->mandatory,

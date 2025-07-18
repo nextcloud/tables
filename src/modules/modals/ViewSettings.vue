@@ -304,11 +304,11 @@ export default {
 		},
 		async updateViewToBE(id) {
 			const newColumnSettings = this.allColumns
-				.map(col => col.id)
-				.filter(id => this.selectedColumns.includes(id))
-				.map((id, index) => ({
-					columnId: id,
+				.filter(col => this.selectedColumns.includes(col.id))
+				.map((col, index) => ({
+					columnId: col.id,
 					order: index,
+					readonly: col.readonly,
 				}))
 			const data = {
 				data: {
