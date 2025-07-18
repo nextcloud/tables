@@ -163,6 +163,10 @@ class ImportService extends SuperService {
 				$colIndex = $cellIterator->getCurrentColumnIndex() - 1;
 				$column = $this->columns[$colIndex];
 
+				if (!array_key_exists($colIndex, $this->columns)) {
+					continue;
+				}
+
 				if (
 					($column && $column->getType() === Column::TYPE_DATETIME)
 					|| (is_array($columns[$colIndex])
