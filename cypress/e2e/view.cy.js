@@ -113,6 +113,26 @@ describe('Interact with views', () => {
 		cy.get('[data-cy="customTableRow"]').contains('Changed row').should('exist')
 	})
 
+	it('Create view and make column readonly in the view', () => {
+		// trigger three dot menu and select readonly
+		cy.contains('.column-entry', 'title').find('[data-cy="customColumnAction"] button').click({ force: true })
+		cy.get('[data-cy="columnReadonlyCheckbox"]').contains('Readonly').click()
+
+		// ## save view
+		cy.intercept({ method: 'POST', url: '**/apps/tables/view' }).as('createView')
+		cy.intercept({ method: 'PUT', url: '**/apps/tables/view/*' }).as('updateView')
+		cy.get('[data-cy="modifyViewBtn"]').contains('Create View').click()
+		cy.wait('@createView')
+		cy.wait('@updateView')
+
+		cy.get('[data-cy="navigationViewItem"]').contains(title).should('exist')
+
+		// Make sure that column is readonly during edit
+		cy.get('[data-cy="customTableRow"]').contains('first row').parent().parent().find('[data-cy="editRowBtn"]').click()
+		cy.get('[data-cy="editRowModal"]').contains('.row.space-T', 'title').find('input').should('have.attr', 'readonly')
+		cy.get('[data-cy="editRowSaveButton"]').contains('Save').click()
+	})
+
 	it('Create view and delete rows in the view', () => {
 
 		// ## save view
