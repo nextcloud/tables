@@ -11,14 +11,25 @@ import { showError } from '@nextcloud/dialogs'
  */
 function handleAxiosError(e, message, status) {
 	console.error('Axios error', e)
-	showError(message + ' ' + statusMessage(status))
+	showError(message + ' ' + statusMessage(e, status))
 }
 
 /**
+ * @param {Error} e error object
  * @param {number} status http code
  * @return {string}
  */
-function statusMessage(status) {
+function statusMessage(e, status) {
+	if (status === 400) {
+		if (e.response?.data?.ocs?.data?.message) {
+			return e.response.data.ocs.data.message
+		}
+		// for some reason the "edit" row returns a different structure
+		if (e.response?.data?.message) {
+			return e.response.data.message
+		}
+		return t('tables', 'Unknown error.')
+	}
 	if (status === 401) {
 		return t('tables', 'Request is not authorized. Are you logged in?')
 	} else if (status === 403) {
