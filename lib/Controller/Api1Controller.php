@@ -729,19 +729,14 @@ class Api1Controller extends ApiController {
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function indexTableColumns(int $tableId, ?int $viewId): DataResponse {
 		try {
-			try {
-				// permission check in service class
-				// they might be missing legally when only the view was shared
-				$columns = $this->columnService->findAllByTable($tableId);
-			} catch (PermissionError $e) {
-				if (!$viewId) {
-					throw $e;
-				}
+			if ($viewId) {
 				$view = $this->viewService->find($viewId, false, $this->userId);
 				if ($tableId !== $view->getTableId()) {
 					throw new PermissionError('Given table is not a parent of the given view.');
 				}
 				$columns = $this->columnService->findAllByManagedView($view, $this->userId);
+			} else {
+				$columns = $this->columnService->findAllByTable($tableId);
 			}
 			return new DataResponse($this->columnService->formatColumns($columns));
 		} catch (PermissionError $e) {

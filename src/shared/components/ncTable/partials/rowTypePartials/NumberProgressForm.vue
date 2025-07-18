@@ -8,6 +8,7 @@
 			type="number"
 			min="0"
 			max="100"
+			:readonly="column.readonly"
 			@input="enforceBounds">
 	</RowFormWrapper>
 </template>

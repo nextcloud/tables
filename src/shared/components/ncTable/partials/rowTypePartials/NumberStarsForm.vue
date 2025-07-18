@@ -5,15 +5,15 @@
 <template>
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description">
 		<div class="align-center">
-			<NcButton type="tertiary" :aria-label="t('tables', 'Reduce stars')" @click="less">
+			<NcButton type="tertiary" :aria-label="t('tables', 'Reduce stars')" :disabled="column.readonly || localValue <= 0" @click="less">
 				<template #icon>
 					<Minus :size="20" />
 				</template>
 			</NcButton>
-			<div class="stars">
+			<div class="stars" :class="{ 'readonly': column.readonly }">
 				{{ getStars }}
 			</div>
-			<NcButton type="tertiary" :aria-label="t('tables', 'Increase stars')" @click="more">
+			<NcButton type="tertiary" :aria-label="t('tables', 'Increase stars')" :disabled="column.readonly || localValue >= 5" @click="more">
 				<template #icon>
 					<Plus :size="20" />
 				</template>
@@ -95,6 +95,10 @@ export default {
 .stars {
 	font-size: 1.4em;
 	padding: 7px;
+}
+
+.stars.readonly {
+	opacity: 0.6;
 }
 
 </style>

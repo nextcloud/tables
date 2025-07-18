@@ -598,7 +598,8 @@ class ViewService extends SuperService {
 	public function addColumnToView(View $view, Column $column, ?string $userId = null): void {
 		try {
 			$columnsSettings = $view->getColumnsSettingsArray();
-			$nextOrder = empty($columnsSettings) ? 0 : max(array_column($columnsSettings, ViewColumnInformation::KEY_ORDER)) + 1;
+			$orders = array_map(fn (ViewColumnInformation $setting) => $setting->getOrder(), $view->getColumnsSettingsArray());
+			$nextOrder = $orders ? max($orders) + 1 : 0;
 			$columnsSettings[] = new ViewColumnInformation($column->getId(), $nextOrder);
 			$this->update($view->getId(), ['columnSettings' => json_encode($columnsSettings)], $userId, true);
 		} catch (Exception $e) {
