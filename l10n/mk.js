@@ -79,6 +79,7 @@ OC.L10N.register(
     "Download" : "Преземи",
     "Search" : "Барај",
     "Back" : "Назад",
+    "Sorting" : "Сортирање",
     "Undo" : "Назад",
     "Redo" : "Напред",
     "Bold" : "Болд",
