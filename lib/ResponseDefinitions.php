@@ -137,6 +137,9 @@ namespace OCA\Tables;
  *     order: int,
  *     readonly: bool,
  *  },
+ *  customSettings: ?array{
+ *     width: int,
+ *  },
  * }
  *
  * @psalm-type TablesImportState = array{

@@ -13,8 +13,10 @@
 					<MainForm :description.sync="editColumn.description"
 						:mandatory.sync="editColumn.mandatory"
 						:title.sync="editColumn.title"
+						:custom-settings.sync="editColumn.customSettings"
 						:edit-column="true"
-						:title-missing-error="editErrorTitle" />
+						:title-missing-error="editErrorTitle"
+						:width-invalid-error="widthInvalidError" />
 				</div>
 				<div class="col-2 space-LR space-T">
 					<component :is="getColumnForm" :column="editColumn" :can-save.sync="canSave" />
@@ -68,6 +70,7 @@ import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandle
 import moment from '@nextcloud/moment'
 import { mapActions } from 'pinia'
 import { useDataStore } from '../../store/data.js'
+import { COLUMN_WIDTH_MAX, COLUMN_WIDTH_MIN } from '../../shared/constants.js'
 
 export default {
 	name: 'EditColumn',
@@ -119,9 +122,10 @@ export default {
 	data() {
 		return {
 			loading: false,
-			editColumn: Object.assign({}, this.column),
+			editColumn: JSON.parse(JSON.stringify(this.column)),
 			deleteId: null,
 			editErrorTitle: false,
+			widthInvalidError: false,
 			canSave: true, // used to avoid saving an incorrect config
 		}
 	},
@@ -166,7 +170,14 @@ export default {
 				this.editErrorTitle = true
 				return
 			}
-			this.editErrorTitle = false
+
+			if (this.editColumn.customSettings?.width
+				&& (this.editColumn.customSettings?.width < COLUMN_WIDTH_MIN || this.editColumn.customSettings?.width > COLUMN_WIDTH_MAX)) {
+				showError(t('tables', 'Cannot save column. Column width must be between {min} and {max}.', { min: COLUMN_WIDTH_MIN, max: COLUMN_WIDTH_MAX }))
+				this.widthInvalidError = true
+				return
+			}
+
 			await this.updateLocalColumn()
 			this.reset()
 			this.$emit('close')
@@ -176,6 +187,7 @@ export default {
 			this.editColumn = null
 			this.deleteId = null
 			this.editErrorTitle = false
+			this.widthInvalidError = false
 		},
 		async updateLocalColumn() {
 			const data = Object.assign({}, this.editColumn)
@@ -191,6 +203,7 @@ export default {
 			delete data.createdBy
 			delete data.lastEditAt
 			delete data.lastEditBy
+			data.customSettings = { width: data.customSettings.width }
 			console.debug('this column data will be send', data)
 			const res = await this.updateColumn({
 				id: this.editColumn.id,

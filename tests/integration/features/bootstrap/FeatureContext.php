@@ -1245,8 +1245,11 @@ class FeatureContext implements Context {
 	 */
 	public function createColumn(string $title, ?TableNode $properties = null): void {
 		$props = ['title' => $title];
-		foreach ($properties->getRows() as $row) {
-			$props[$row[0]] = $row[1];
+		foreach ($properties->getRows() as [$key, $value]) {
+			if ($key === 'customSettings') {
+				$value = json_decode($value, true);
+			}
+			$props[$key] = $value;
 		}
 
 		$this->sendRequest(
@@ -1270,6 +1273,21 @@ class FeatureContext implements Context {
 		Assert::assertEquals(200, $this->response->getStatusCode());
 		Assert::assertEquals($columnToVerify['title'], $title);
 
+		foreach ($properties->getRows() as [$key, $value]) {
+			if ($key === 'selectionOptions') {
+				continue;
+			}
+
+			$value = match (true) {
+				$key === 'customSettings' => json_decode($value, true),
+				$value === 'true' => true,
+				$value === 'false' => false,
+				$value === 'null' => null,
+				default => $value,
+			};
+			Assert::assertEquals($columnToVerify[$key], $value);
+		}
+
 		$this->collectionManager->register($newColumn, 'column', $newColumn['id'], $title);
 	}
 
@@ -1292,7 +1310,6 @@ class FeatureContext implements Context {
 			Assert::assertCount(0, $data);
 			return;
 		}
-
 
 		$titles = [];
 		foreach ($data as $d) {
