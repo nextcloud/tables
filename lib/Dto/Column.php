@@ -33,6 +33,7 @@ class Column {
 		private ?bool $usergroupSelectGroups = null,
 		private ?bool $usergroupSelectTeams = null,
 		private ?bool $showUserStatus = null,
+		private ?string $customSettings = null,
 	) {
 	}
 
@@ -62,6 +63,7 @@ class Column {
 			usergroupSelectGroups: $data['usergroupSelectGroups'] ?? null,
 			usergroupSelectTeams: $data['usergroupSelectTeams'] ?? null,
 			showUserStatus: $data['showUserStatus'] ?? null,
+			customSettings: $data['customSettings'] ?? null,
 		);
 	}
 
@@ -159,5 +161,9 @@ class Column {
 
 	public function getShowUserStatus(): ?bool {
 		return $this->showUserStatus;
+	}
+
+	public function getCustomSettings(): ?string {
+		return $this->customSettings;
 	}
 }

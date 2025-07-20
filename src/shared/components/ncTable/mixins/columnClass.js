@@ -21,6 +21,7 @@ export class AbstractColumn {
 		this.description = data.description
 		this.createdByDisplayName = data.createdByDisplayName
 		this.lastEditByDisplayName = data.lastEditByDisplayName
+		this.customSettings = data.customSettings
 	}
 
 	canSort() {
