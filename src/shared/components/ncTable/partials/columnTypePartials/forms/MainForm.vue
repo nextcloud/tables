@@ -28,6 +28,20 @@
 			<NcCheckboxRadioSwitch type="switch" :checked.sync="localMandatory" />
 		</div>
 
+		<!-- column width -->
+		<div class="fix-col-4 mandatory title space-T" :class="{error: widthInvalidError}">
+			{{ t('tables', 'Column width') }}
+		</div>
+		<div class="fix-col-4" :class="{error: widthInvalidError}">
+			<input
+				v-model.number="localColumnWidth"
+				type="number"
+				pattern="\d+"
+				min="20"
+				max="1000"
+				:placeholder="t('tables', 'Enter a column width between {min} and {max}', { min: COLUMN_WIDTH_MIN, max: COLUMN_WIDTH_MAX })">
+		</div>
+
 		<!-- add to views -->
 		<div v-if="!editColumn && views.length > 0" class="fix-col-4 title space-T">
 			{{ t('tables', 'Add column to other views') }}
@@ -63,6 +77,7 @@ import { NcCheckboxRadioSwitch, NcSelect } from '@nextcloud/vue'
 import { mapState } from 'pinia'
 import { translate as t } from '@nextcloud/l10n'
 import { useTablesStore } from '../../../../../../store/store.js'
+import { COLUMN_WIDTH_MAX, COLUMN_WIDTH_MIN } from '../../../../../constants.js'
 
 export default {
 	name: 'MainForm',
@@ -91,10 +106,26 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		widthInvalidError: {
+			type: Boolean,
+			default: false,
+		},
 		editColumn: {
 			type: Boolean,
 			default: false,
 		},
+		customSettings: {
+			type: Object,
+			default() {
+				return {}
+			},
+		},
+	},
+	data() {
+		return {
+			COLUMN_WIDTH_MIN,
+			COLUMN_WIDTH_MAX,
+		}
 	},
 	computed: {
 		...mapState(useTablesStore, ['views', 'activeElement', 'isView']),
@@ -114,6 +145,12 @@ export default {
 			get() { return this.selectedViews },
 			set(selectedViews) {
 				this.$emit('update:selectedViews', selectedViews)
+			},
+		},
+		localColumnWidth: {
+			get() { return this.customSettings.width ?? null },
+			set(width) {
+				this.$emit('update:customSettings', { ...this.customSettings, ...{ width } })
 			},
 		},
 		viewsForTable() {
@@ -137,3 +174,13 @@ export default {
 	},
 }
 </script>
+
+<style lang="scss" scoped>
+.error {
+	color:  var(--color-error);
+}
+
+.error input {
+	border-color: var(--color-error);
+}
+</style>
