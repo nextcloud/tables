@@ -823,6 +823,7 @@ class Api1Controller extends ApiController {
 	 * @param bool|null $usergroupSelectTeams Can select teams, if column type is usergroup
 	 * @param bool|null $usergroupShowUserStatus Whether to show the user's status, if column type is usergroup
 	 * @param list<int>|null $selectedViewIds View IDs where this column should be added to be presented
+	 * @param array<string, mixed> $customSettings Custom settings for the column
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -867,6 +868,7 @@ class Api1Controller extends ApiController {
 		?bool $usergroupShowUserStatus = null,
 
 		?array $selectedViewIds = [],
+		?array $customSettings = [],
 	): DataResponse {
 		try {
 			return new DataResponse($this->columnService->create(
@@ -897,7 +899,8 @@ class Api1Controller extends ApiController {
 					usergroupSelectUsers: $usergroupSelectUsers,
 					usergroupSelectGroups: $usergroupSelectGroups,
 					usergroupSelectTeams: $usergroupSelectTeams,
-					showUserStatus: $usergroupShowUserStatus
+					showUserStatus: $usergroupShowUserStatus,
+					customSettings: json_encode($customSettings),
 				),
 				$selectedViewIds
 			)->jsonSerialize());
@@ -943,6 +946,7 @@ class Api1Controller extends ApiController {
 	 * @param bool|null $usergroupSelectGroups Can select groups, if column type is usergroup
 	 * @param bool|null $usergroupSelectTeams Can select teams, if column type is usergroup
 	 * @param bool|null $usergroupShowUserStatus Whether to show the user's status, if column type is usergroup
+	 * @param array<string, mixed> $customSettings Custom settings for the column
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
@@ -982,7 +986,7 @@ class Api1Controller extends ApiController {
 		?bool $usergroupSelectGroups,
 		?bool $usergroupSelectTeams,
 		?bool $usergroupShowUserStatus,
-
+		?array $customSettings = [],
 	): DataResponse {
 		try {
 			$item = $this->columnService->update(
@@ -1011,7 +1015,8 @@ class Api1Controller extends ApiController {
 					usergroupSelectUsers: $usergroupSelectUsers,
 					usergroupSelectGroups: $usergroupSelectGroups,
 					usergroupSelectTeams: $usergroupSelectTeams,
-					showUserStatus: $usergroupShowUserStatus
+					showUserStatus: $usergroupShowUserStatus,
+					customSettings: json_encode($customSettings),
 				)
 			);
 			return new DataResponse($item->jsonSerialize());
@@ -1581,6 +1586,7 @@ class Api1Controller extends ApiController {
 	 * @param bool|null $usergroupSelectTeams Can select teams, if column type is usergroup
 	 * @param bool|null $usergroupShowUserStatus Whether to show the user's status, if column type is usergroup
 	 * @param list<int>|null $selectedViewIds View IDs where this column should be added to be presented
+	 * @param array<string, mixed> $customSettings Custom settings for the column
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
@@ -1625,6 +1631,7 @@ class Api1Controller extends ApiController {
 		?bool $usergroupSelectTeams = null,
 		?bool $usergroupShowUserStatus = null,
 		?array $selectedViewIds = [],
+		array $customSettings = [],
 	): DataResponse {
 		try {
 			$item = $this->columnService->create(
@@ -1655,7 +1662,8 @@ class Api1Controller extends ApiController {
 					usergroupSelectUsers: $usergroupSelectUsers,
 					usergroupSelectGroups: $usergroupSelectGroups,
 					usergroupSelectTeams: $usergroupSelectTeams,
-					showUserStatus: $usergroupShowUserStatus
+					showUserStatus: $usergroupShowUserStatus,
+					customSettings: json_encode($customSettings),
 				),
 				$selectedViewIds
 			);
