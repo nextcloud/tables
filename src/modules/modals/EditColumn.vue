@@ -13,6 +13,7 @@
 					<MainForm :description.sync="editColumn.description"
 						:mandatory.sync="editColumn.mandatory"
 						:title.sync="editColumn.title"
+						:custom-settings.sync="editColumn.customSettings"
 						:edit-column="true"
 						:title-missing-error="editErrorTitle" />
 				</div>
@@ -166,6 +167,14 @@ export default {
 				this.editErrorTitle = true
 				return
 			}
+
+			if (this.editColumn.customSettings?.width
+				&& (this.editColumn.customSettings?.width < 20 || this.editColumn.customSettings?.width > 1000)) {
+				showError(t('tables', 'Cannot save column. Column width must be between {min} and {max}.', { min: 20, max: 1000 }))
+				this.editErrorTitle = true
+				return
+			}
+
 			this.editErrorTitle = false
 			await this.updateLocalColumn()
 			this.reset()
@@ -191,6 +200,7 @@ export default {
 			delete data.createdBy
 			delete data.lastEditAt
 			delete data.lastEditBy
+			data.customSettings = { width: data.customSettings.width }
 			console.debug('this column data will be send', data)
 			const res = await this.updateColumn({
 				id: this.editColumn.id,

@@ -132,6 +132,9 @@ namespace OCA\Tables;
  *  usergroupSelectGroups: bool,
  *  usergroupSelectTeams: bool,
  *  showUserStatus: bool,
+ *  customSettings: ?array{
+ *     width: int,
+ *  },
  * }
  *
  * @psalm-type TablesImportState = array{
