@@ -38,6 +38,7 @@ OC.L10N.register(
     "Shares" : "Shiriki",
     "Actions" : "Utendekaji",
     "Share" : "Shirikisha",
+    "Total" : "Jumla",
     "Edit table" : "Hariri jedwali",
     "Export as CSV" : "Safirisha kama CSV",
     "Type" : "Aina",
