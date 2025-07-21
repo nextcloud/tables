@@ -7,6 +7,8 @@
 
 namespace OCA\Tables\Service;
 
+use DateTimeImmutable;
+use LogicException;
 use OC\User\NoUserException;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Dto\Column as ColumnDto;
@@ -31,7 +33,11 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
+use Throwable;
+use TypeError;
+use function file_exists;
 use function is_string;
+use function is_uploaded_file;
 use function mb_strlen;
 use function preg_match;
 
@@ -58,8 +64,17 @@ class ImportService extends SuperService {
 	private array $rawColumnDataTypes = [];
 	private array $columnsConfig = [];
 
-	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-		IRootFolder $rootFolder, ColumnService $columnService, RowService $rowService, TableService $tableService, ViewService $viewService, IUserManager $userManager) {
+	public function __construct(
+		PermissionsService $permissionsService,
+		LoggerInterface $logger,
+		?string $userId,
+		IRootFolder $rootFolder,
+		ColumnService $columnService,
+		RowService $rowService,
+		TableService $tableService,
+		ViewService $viewService,
+		IUserManager $userManager,
+	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->rootFolder = $rootFolder;
 		$this->columnService = $columnService;
@@ -95,7 +110,7 @@ class ImportService extends SuperService {
 				} else {
 					$error = true;
 				}
-			} elseif (\file_exists($path)) {
+			} elseif (is_uploaded_file($path) && file_exists($path)) {
 				$spreadsheet = IOFactory::load($path);
 				$previewData = $this->getPreviewData($spreadsheet->getActiveSheet());
 			} else {
@@ -254,7 +269,7 @@ class ImportService extends SuperService {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
 		if ($this->tableId && $this->viewId) {
-			$e = new \LogicException('Both table ID and view ID are provided, but only one of them is allowed');
+			$e = new LogicException('Both table ID and view ID are provided, but only one of them is allowed');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
 		}
@@ -280,7 +295,7 @@ class ImportService extends SuperService {
 				} else {
 					$error = true;
 				}
-			} elseif (\file_exists($path)) {
+			} elseif (is_uploaded_file($path) && file_exists($path)) {
 				$spreadsheet = IOFactory::load($path);
 				$this->loop($spreadsheet->getActiveSheet());
 			} else {
@@ -437,14 +452,14 @@ class ImportService extends SuperService {
 		} catch (NotFoundError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
-		} catch (\Throwable $e) {
+		} catch (Throwable $e) {
 			$this->countErrors++;
 			$this->logger->error('Error while creating new row for import.', ['exception' => $e]);
 		}
 
 	}
 
-	private function valueToDateTimeImmutable(mixed $value): ?\DateTimeImmutable {
+	private function valueToDateTimeImmutable(mixed $value): ?DateTimeImmutable {
 		if (
 			$value === false
 			|| $value === null
@@ -456,10 +471,10 @@ class ImportService extends SuperService {
 		}
 		try {
 			$dt = Date::excelToDateTimeObject($value);
-			return \DateTimeImmutable::createFromMutable($dt);
-		} catch (\TypeError) {
+			return DateTimeImmutable::createFromMutable($dt);
+		} catch (TypeError) {
 			try {
-				return (new \DateTimeImmutable($value));
+				return (new DateTimeImmutable($value));
 			} catch (\Exception $e) {
 				$this->logger->debug('Could not parse string {value} as date time.', [
 					'exception' => $e,
@@ -564,9 +579,9 @@ class ImportService extends SuperService {
 		];
 
 		if (!is_numeric($formattedValue)
-			&& ($this->valueToDateTimeImmutable($value) instanceof \DateTimeImmutable
-			|| Date::isDateTime($cell)
-			|| $originDataType === DataType::TYPE_ISO_DATE)
+			&& ($this->valueToDateTimeImmutable($value) instanceof DateTimeImmutable
+				|| Date::isDateTime($cell)
+				|| $originDataType === DataType::TYPE_ISO_DATE)
 		) {
 			// the formatted value stems from the office document and shows the original user intent
 			$dateAnalysis = date_parse($formattedValue);
