@@ -87,6 +87,7 @@ OC.L10N.register(
     "Search" : "Tafuta",
     "Back" : "Rudi",
     "Undo" : "Tendua",
+    "Redo" : "Redo",
     "Code" : "Msimbo",
     "Mandatory" : "Lazima",
     "Default value" : "Thamani ya msingi",
