@@ -26,13 +26,16 @@ OC.L10N.register(
     "Copy" : "Капіяваць",
     "Favorites" : "Абранае",
     "Clear filter" : "Ачысціць фільтр",
+    "No recommendations. Start typing." : "Няма рэкамендацый. Пачніце друкаваць.",
     "Copy to clipboard" : "Капіяваць у буфер абмену",
+    "Searching …" : "Пошук …",
     "Error" : "Памылка",
     "Download" : "Спампаваць",
     "Search" : "Пошук",
     "Back" : "Назад",
     "URL" : "URL-адрас",
     "Confirm" : "Пацвердзіць",
-    "Select" : "Выбраць"
+    "Select" : "Выбраць",
+    "Clipboard is not available" : "Буфер абмену недаступны"
 },
 "nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);");

@@ -40,6 +40,7 @@ OC.L10N.register(
     "Share" : "Shirikisha",
     "Total" : "Jumla",
     "Edit table" : "Hariri jedwali",
+    "Import" : "Import",
     "Export as CSV" : "Safirisha kama CSV",
     "Type" : "Aina",
     "Time" : "Muda",
