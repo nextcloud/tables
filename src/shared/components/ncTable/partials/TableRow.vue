@@ -13,19 +13,44 @@
 				:row-id="row.id"
 				:value="getCellValue(col)" />
 		</td>
-		<td v-if="config.showActions" :class="{sticky: config.showActions}">
-			<NcButton v-if="config.canEditRows || config.canDeleteRows" type="primary" :aria-label="t('tables', 'Edit row')" data-cy="editRowBtn" @click="$emit('edit-row', row.id)">
-				<template #icon>
-					<Pencil :size="20" />
-				</template>
-			</NcButton>
+		<td v-if="config.showActions" :class="{sticky: config.showActions}" class="row-actions">
+			<div class="row-actions-container">
+				<NcButton v-if="config.canEditRows || config.canDeleteRows" type="secondary" :aria-label="t('tables', 'Edit row')" data-cy="editRowBtn" @click="$emit('edit-row', row.id)">
+					<template #icon>
+						<Pencil :size="20" />
+					</template>
+				</NcButton>
+				<NcActions v-if="config.canDeleteRows || config.canCreateRows">
+					<NcActionButton v-if="config.canCreateRows"
+						:close-after-click="true"
+						@click="handleCloneRow">
+						<template #icon>
+							<ContentCopy :size="20" />
+						</template>
+						{{ t('tables', 'Duplicate row') }}
+					</NcActionButton>
+					<NcActionButton v-if="config.canDeleteRows"
+						:close-after-click="true"
+						@click="handleDeleteRow">
+						<template #icon>
+							<Delete :size="20" />
+						</template>
+						{{ t('tables', 'Delete row') }}
+					</NcActionButton>
+				</NcActions>
+			</div>
 		</td>
 	</tr>
 </template>
 
 <script>
-import { NcCheckboxRadioSwitch, NcButton } from '@nextcloud/vue'
+import { mapActions } from 'pinia'
+import { useDataStore } from '../../../../store/data.js'
+import { NcCheckboxRadioSwitch, NcButton, NcActions, NcActionButton } from '@nextcloud/vue'
+import { getDialogBuilder, showError, DialogSeverity } from '@nextcloud/dialogs'
 import Pencil from 'vue-material-design-icons/Pencil.vue'
+import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
+import Delete from 'vue-material-design-icons/Delete.vue'
 import TableCellHtml from './TableCellHtml.vue'
 import TableCellProgress from './TableCellProgress.vue'
 import TableCellLink from './TableCellLink.vue'
@@ -55,6 +80,8 @@ export default {
 		TableCellHtml,
 		NcButton,
 		Pencil,
+		ContentCopy,
+		Delete,
 		NcCheckboxRadioSwitch,
 		TableCellDateTime,
 		TableCellTextLine,
@@ -62,6 +89,8 @@ export default {
 		TableCellMultiSelection,
 		TableCellTextRich,
 		TableCellUsergroup,
+		NcActions,
+		NcActionButton,
 	},
 
 	props: {
@@ -84,6 +113,14 @@ export default {
 		config: {
 			type: Object,
 			default: null,
+		},
+		elementId: {
+			type: Number,
+			default: null,
+		},
+		isView: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	computed: {
@@ -165,6 +202,42 @@ export default {
 				return text
 			}
 		},
+		...mapActions(useDataStore, ['removeRow', 'insertNewRow']),
+		async handleDeleteRow() {
+			await getDialogBuilder(t('tables', 'Delete row'))
+				.setText(t('tables', 'Are you sure you want to delete this row?'))
+				.setSeverity(DialogSeverity.Warning)
+				.addButton({
+					label: t('tables', 'Delete'),
+					type: 'error',
+					callback: async () => {
+						const res = await this.removeRow({
+							rowId: this.row.id,
+							isView: this.isView,
+							elementId: this.elementId,
+						})
+						if (!res) {
+							showError(t('tables', 'Could not delete row.'))
+						}
+					},
+				})
+				.build()
+				.show()
+		},
+		async handleCloneRow() {
+			const data = this.row.data.reduce((acc, curr) => {
+				acc[curr.columnId] = curr.value
+				return acc
+			}, {})
+			const res = await this.insertNewRow({
+				viewId: this.isView ? this.elementId : null,
+				tableId: this.isView ? null : this.elementId,
+				data,
+			})
+			if (!res) {
+				showError(t('tables', 'Could not clone row.'))
+			}
+		},
 	},
 }
 </script>
@@ -183,6 +256,13 @@ tr.selected {
 
 :deep(.checkbox-radio-switch__icon) {
 	margin: 0;
+}
+
+.row-actions-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--default-grid-baseline);
 }
 
 </style>
