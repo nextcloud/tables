@@ -49,7 +49,7 @@
 		]
 	},
 	"require": {
-		"phpoffice/phpspreadsheet": "^1.29.10",
+		"phpoffice/phpspreadsheet": "^1.29.12",
 		"ext-json": "*"
 	}
 }
