@@ -11,10 +11,16 @@ export type paths = {
             readonly path?: never;
             readonly cookie?: never;
         };
-        /** Returns all Tables */
+        /**
+         * Returns all Tables
+         * @description This endpoint allows CORS requests
+         */
         readonly get: operations["api1-index"];
         readonly put?: never;
-        /** Create a new table and return it */
+        /**
+         * Create a new table and return it
+         * @description This endpoint allows CORS requests
+         */
         readonly post: operations["api1-create-table"];
         readonly delete?: never;
         readonly options?: never;
@@ -29,12 +35,21 @@ export type paths = {
             readonly path?: never;
             readonly cookie?: never;
         };
-        /** Get a table object */
+        /**
+         * Get a table object
+         * @description This endpoint allows CORS requests
+         */
         readonly get: operations["api1-get-table"];
-        /** Update tables properties */
+        /**
+         * Update tables properties
+         * @description This endpoint allows CORS requests
+         */
         readonly put: operations["api1-update-table"];
         readonly post?: never;
-        /** Delete a table */
+        /**
+         * Delete a table
+         * @description This endpoint allows CORS requests
+         */
         readonly delete: operations["api1-delete-table"];
         readonly options?: never;
         readonly head?: never;
@@ -48,7 +63,10 @@ export type paths = {
             readonly path?: never;
             readonly cookie?: never;
         };
-        /** returns table scheme */
+        /**
+         * returns table scheme
+         * @description This endpoint allows CORS requests
+         */
         readonly get: operations["api1-show-scheme"];
         readonly put?: never;
         readonly post?: never;
@@ -65,10 +83,16 @@ export type paths = {
             readonly path?: never;
             readonly cookie?: never;
         };
-        /** Get all views for a table */
+        /**
+         * Get all views for a table
+         * @description This endpoint allows CORS requests
+         */
         readonly get: operations["api1-index-views"];
         readonly put?: never;
-        /** Create a new view for a table */
+        /**
+         * Create a new view for a table
+         * @description This endpoint allows CORS requests
+         */
         readonly post: operations["api1-create-view"];
         readonly delete?: never;
         readonly options?: never;
@@ -83,12 +107,21 @@ export type paths = {
             readonly path?: never;
             readonly cookie?: never;
         };
-        /** Get a view object */
+        /**
+         * Get a view object
+         * @description This endpoint allows CORS requests
+         */
         readonly get: operations["api1-get-view"];
-        /** Update a view via key-value sets */
+        /**
+         * Update a view via key-value sets
+         * @description This endpoint allows CORS requests
+         */
         readonly put: operations["api1-update-view"];
         readonly post?: never;
-        /** Delete a view */
+        /**
+         * Delete a view
+         * @description This endpoint allows CORS requests
+         */
         readonly delete: operations["api1-delete-view"];
         readonly options?: never;
         readonly head?: never;
@@ -102,12 +135,21 @@ export type paths = {
             readonly path?: never;
             readonly cookie?: never;
         };
-        /** Get a share object */
+        /**
+         * Get a share object
+         * @description This endpoint allows CORS requests
+         */
         readonly get: operations["api1-get-share"];
-        /** Update a share permission */
+        /**
+         * Update a share permission
+         * @description This endpoint allows CORS requests
+         */
         readonly put: operations["api1-update-share-permissions"];
         readonly post?: never;
-        /** Delete a share */
+        /**
+         * Delete a share
+         * @description This endpoint allows CORS requests
+         */
         readonly delete: operations["api1-delete-share"];
         readonly options?: never;
         readonly head?: never;
@@ -121,7 +163,10 @@ export type paths = {
             readonly path?: never;
             readonly cookie?: never;
         };
-        /** Get all shares for a view Will be empty if view does not exist */
+        /**
+         * Get all shares for a view Will be empty if view does not exist
+         * @description This endpoint allows CORS requests
+         */
         readonly get: operations["api1-index-view-shares"];
         readonly put?: never;
         readonly post?: never;
@@ -138,10 +183,16 @@ export type paths = {
             readonly path?: never;
             readonly cookie?: never;
         };
-        /** Get all shares for a table Will be empty if table does not exist */
+        /**
+         * Get all shares for a table Will be empty if table does not exist
+         * @description This endpoint allows CORS requests
+         */
         readonly get: operations["api1-index-table-shares"];
         readonly put?: never;
-        /** Create a share for a table */
+        /**
+         * Create a share for a table
+         * @description This endpoint allows CORS requests
+         */
         readonly post: operations["api1-create-table-share"];
         readonly delete?: never;
         readonly options?: never;
@@ -158,7 +209,10 @@ export type paths = {
         };
         readonly get?: never;
         readonly put?: never;
-        /** Create a new share */
+        /**
+         * Create a new share
+         * @description This endpoint allows CORS requests
+         */
         readonly post: operations["api1-create-share"];
         readonly delete?: never;
         readonly options?: never;
@@ -174,7 +228,10 @@ export type paths = {
             readonly cookie?: never;
         };
         readonly get?: never;
-        /** Updates the display mode of a context share */
+        /**
+         * Updates the display mode of a context share
+         * @description This endpoint allows CORS requests
+         */
         readonly put: operations["api1-update-share-display-mode"];
         readonly post?: never;
         readonly delete?: never;
@@ -190,10 +247,16 @@ export type paths = {
             readonly path?: never;
             readonly cookie?: never;
         };
-        /** Get all columns for a table or a underlying view Return an empty array if no columns were found */
+        /**
+         * Get all columns for a table or a underlying view Return an empty array if no columns were found
+         * @description This endpoint allows CORS requests
+         */
         readonly get: operations["api1-index-table-columns"];
         readonly put?: never;
-        /** Create a new column for a table */
+        /**
+         * Create a new column for a table
+         * @description This endpoint allows CORS requests
+         */
         readonly post: operations["api1-create-table-column"];
         readonly delete?: never;
         readonly options?: never;
@@ -208,7 +271,10 @@ export type paths = {
             readonly path?: never;
             readonly cookie?: never;
         };
-        /** Get all columns for a view Return an empty array if no columns were found */
+        /**
+         * Get all columns for a view Return an empty array if no columns were found
+         * @description This endpoint allows CORS requests
+         */
         readonly get: operations["api1-index-view-columns"];
         readonly put?: never;
         readonly post?: never;
@@ -227,7 +293,10 @@ export type paths = {
         };
         readonly get?: never;
         readonly put?: never;
-        /** Create a column */
+        /**
+         * Create a column
+         * @description This endpoint allows CORS requests
+         */
         readonly post: operations["api1-create-column"];
         readonly delete?: never;
         readonly options?: never;
@@ -242,12 +311,21 @@ export type paths = {
             readonly path?: never;
             readonly cookie?: never;
         };
-        /** Returns a column object */
+        /**
+         * Returns a column object
+         * @description This endpoint allows CORS requests
+         */
         readonly get: operations["api1-get-column"];
-        /** Update a column */
+        /**
+         * Update a column
+         * @description This endpoint allows CORS requests
+         */
         readonly put: operations["api1-update-column"];
         readonly post?: never;
-        /** Delete a column */
+        /**
+         * Delete a column
+         * @description This endpoint allows CORS requests
+         */
         readonly delete: operations["api1-delete-column"];
         readonly options?: never;
         readonly head?: never;
@@ -261,7 +339,10 @@ export type paths = {
             readonly path?: never;
             readonly cookie?: never;
         };
-        /** List all rows values for a table, first row are the column titles */
+        /**
+         * List all rows values for a table, first row are the column titles
+         * @description This endpoint allows CORS requests
+         */
         readonly get: operations["api1-index-table-rows-simple"];
         readonly put?: never;
         readonly post?: never;
@@ -278,10 +359,16 @@ export type paths = {
             readonly path?: never;
             readonly cookie?: never;
         };
-        /** List all rows for a table */
+        /**
+         * List all rows for a table
+         * @description This endpoint allows CORS requests
+         */
         readonly get: operations["api1-index-table-rows"];
         readonly put?: never;
-        /** Create a row within a table */
+        /**
+         * Create a row within a table
+         * @description This endpoint allows CORS requests
+         */
         readonly post: operations["api1-create-row-in-table"];
         readonly delete?: never;
         readonly options?: never;
@@ -296,10 +383,16 @@ export type paths = {
             readonly path?: never;
             readonly cookie?: never;
         };
-        /** List all rows for a view */
+        /**
+         * List all rows for a view
+         * @description This endpoint allows CORS requests
+         */
         readonly get: operations["api1-index-view-rows"];
         readonly put?: never;
-        /** Create a row within a view */
+        /**
+         * Create a row within a view
+         * @description This endpoint allows CORS requests
+         */
         readonly post: operations["api1-create-row-in-view"];
         readonly delete?: never;
         readonly options?: never;
@@ -314,12 +407,21 @@ export type paths = {
             readonly path?: never;
             readonly cookie?: never;
         };
-        /** Get a row */
+        /**
+         * Get a row
+         * @description This endpoint allows CORS requests
+         */
         readonly get: operations["api1-get-row"];
-        /** Update a row */
+        /**
+         * Update a row
+         * @description This endpoint allows CORS requests
+         */
         readonly put: operations["api1-update-row"];
         readonly post?: never;
-        /** Delete a row */
+        /**
+         * Delete a row
+         * @description This endpoint allows CORS requests
+         */
         readonly delete: operations["api1-delete-row"];
         readonly options?: never;
         readonly head?: never;
@@ -336,7 +438,10 @@ export type paths = {
         readonly get?: never;
         readonly put?: never;
         readonly post?: never;
-        /** Delete a row within a view */
+        /**
+         * Delete a row within a view
+         * @description This endpoint allows CORS requests
+         */
         readonly delete: operations["api1-delete-row-by-view"];
         readonly options?: never;
         readonly head?: never;
@@ -352,7 +457,10 @@ export type paths = {
         };
         readonly get?: never;
         readonly put?: never;
-        /** Import from file in to a table */
+        /**
+         * Import from file in to a table
+         * @description This endpoint allows CORS requests
+         */
         readonly post: operations["api1-import-in-table"];
         readonly delete?: never;
         readonly options?: never;
@@ -369,7 +477,10 @@ export type paths = {
         };
         readonly get?: never;
         readonly put?: never;
-        /** Import from file in to a table */
+        /**
+         * Import from file in to a table
+         * @description This endpoint allows CORS requests
+         */
         readonly post: operations["api1-import-in-view"];
         readonly delete?: never;
         readonly options?: never;
@@ -1088,9 +1199,15 @@ export interface operations {
         readonly requestBody?: {
             readonly content: {
                 readonly "application/json": {
-                    /** @description New table title */
+                    /**
+                     * @description New table title
+                     * @default null
+                     */
                     readonly title?: string | null;
-                    /** @description New table emoji */
+                    /**
+                     * @description New table emoji
+                     * @default null
+                     */
                     readonly emoji?: string | null;
                     /**
                      * @description Whether the table is archived
@@ -1497,6 +1614,17 @@ export interface operations {
             };
             /** @description No permissions */
             readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
                 headers: {
                     readonly [name: string]: unknown;
                 };
@@ -2200,7 +2328,7 @@ export interface operations {
                      */
                     readonly selectionOptions?: string | null;
                     /**
-                     * @description Default option IDs for a selection (json int[])
+                     * @description Default option IDs for a selection (json list<int>)
                      * @default
                      */
                     readonly selectionDefault?: string | null;
@@ -2214,15 +2342,30 @@ export interface operations {
                      * @default
                      */
                     readonly usergroupDefault?: string | null;
-                    /** @description Can select multiple users or/and groups, if column is usergroup */
+                    /**
+                     * @description Can select multiple users or/and groups, if column is usergroup
+                     * @default null
+                     */
                     readonly usergroupMultipleItems?: boolean | null;
-                    /** @description Can select users, if column type is usergroup */
+                    /**
+                     * @description Can select users, if column type is usergroup
+                     * @default null
+                     */
                     readonly usergroupSelectUsers?: boolean | null;
-                    /** @description Can select groups, if column type is usergroup */
+                    /**
+                     * @description Can select groups, if column type is usergroup
+                     * @default null
+                     */
                     readonly usergroupSelectGroups?: boolean | null;
-                    /** @description Can select teams, if column type is usergroup */
+                    /**
+                     * @description Can select teams, if column type is usergroup
+                     * @default null
+                     */
                     readonly usergroupSelectTeams?: boolean | null;
-                    /** @description Whether to show the user's status, if column type is usergroup */
+                    /**
+                     * @description Whether to show the user's status, if column type is usergroup
+                     * @default null
+                     */
                     readonly usergroupShowUserStatus?: boolean | null;
                     /**
                      * @description View IDs where this column should be added to be presented
@@ -2403,7 +2546,7 @@ export interface operations {
                      */
                     readonly selectionOptions?: string | null;
                     /**
-                     * @description Default option IDs for a selection (json int[])
+                     * @description Default option IDs for a selection (json list<int>)
                      * @default
                      */
                     readonly selectionDefault?: string | null;
@@ -2417,15 +2560,30 @@ export interface operations {
                      * @default
                      */
                     readonly usergroupDefault?: string | null;
-                    /** @description Can select multiple users or/and groups, if column is usergroup */
+                    /**
+                     * @description Can select multiple users or/and groups, if column is usergroup
+                     * @default null
+                     */
                     readonly usergroupMultipleItems?: boolean | null;
-                    /** @description Can select users, if column type is usergroup */
+                    /**
+                     * @description Can select users, if column type is usergroup
+                     * @default null
+                     */
                     readonly usergroupSelectUsers?: boolean | null;
-                    /** @description Can select groups, if column type is usergroup */
+                    /**
+                     * @description Can select groups, if column type is usergroup
+                     * @default null
+                     */
                     readonly usergroupSelectGroups?: boolean | null;
-                    /** @description Can select teams, if column type is usergroup */
+                    /**
+                     * @description Can select teams, if column type is usergroup
+                     * @default null
+                     */
                     readonly usergroupSelectTeams?: boolean | null;
-                    /** @description Whether to show the user's status, if column type is usergroup */
+                    /**
+                     * @description Whether to show the user's status, if column type is usergroup
+                     * @default null
+                     */
                     readonly usergroupShowUserStatus?: boolean | null;
                     /**
                      * @description View IDs where this column should be added to be presented
@@ -2590,7 +2748,7 @@ export interface operations {
                     readonly textMaxLength?: number | null;
                     /** @description Options for a selection (json array{id: int, label: string}) */
                     readonly selectionOptions?: string | null;
-                    /** @description Default option IDs for a selection (json int[]) */
+                    /** @description Default option IDs for a selection (json list<int>) */
                     readonly selectionDefault?: string | null;
                     /** @description Default value, if column is datetime */
                     readonly datetimeDefault?: string | null;
@@ -2838,6 +2996,17 @@ export interface operations {
             };
             /** @description No permissions */
             readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
                 headers: {
                     readonly [name: string]: unknown;
                 };
@@ -3581,13 +3750,25 @@ export interface operations {
         readonly requestBody?: {
             readonly content: {
                 readonly "application/json": {
-                    /** @description New table title */
+                    /**
+                     * @description New table title
+                     * @default null
+                     */
                     readonly title?: string | null;
-                    /** @description New table emoji */
+                    /**
+                     * @description New table emoji
+                     * @default null
+                     */
                     readonly emoji?: string | null;
-                    /** @description the tables description */
+                    /**
+                     * @description the tables description
+                     * @default null
+                     */
                     readonly description?: string;
-                    /** @description whether the table is archived */
+                    /**
+                     * @description whether the table is archived
+                     * @default null
+                     */
                     readonly archived?: boolean;
                 };
             };
@@ -4159,10 +4340,14 @@ export interface operations {
                     readonly numberMax?: number | null;
                     /**
                      * @description Subtype for the new column
+                     * @default null
                      * @enum {string|null}
                      */
                     readonly subtype?: "progress" | "stars" | null;
-                    /** @description Description */
+                    /**
+                     * @description Description
+                     * @default null
+                     */
                     readonly description?: string | null;
                     /**
                      * @description View IDs where this columns should be added
@@ -4279,10 +4464,14 @@ export interface operations {
                     readonly textMaxLength?: number | null;
                     /**
                      * @description Subtype for the new column
+                     * @default null
                      * @enum {string|null}
                      */
                     readonly subtype?: "progress" | "stars" | null;
-                    /** @description Description */
+                    /**
+                     * @description Description
+                     * @default null
+                     */
                     readonly description?: string | null;
                     /**
                      * @description View IDs where this columns should be added
@@ -4390,14 +4579,18 @@ export interface operations {
                     readonly title: string;
                     /** @description Json array{id: int, label: string} with options that can be selected, eg [{"id": 1, "label": "first"},{"id": 2, "label": "second"}] */
                     readonly selectionOptions: string;
-                    /** @description Json int|int[] for default selected option(s), eg 5 or ["1", "8"] */
+                    /** @description Json int|list<int> for default selected option(s), eg 5 or ["1", "8"] */
                     readonly selectionDefault?: string | null;
                     /**
                      * @description Subtype for the new column
+                     * @default null
                      * @enum {string|null}
                      */
                     readonly subtype?: "progress" | "stars" | null;
-                    /** @description Description */
+                    /**
+                     * @description Description
+                     * @default null
+                     */
                     readonly description?: string | null;
                     /**
                      * @description View IDs where this columns should be added
@@ -4510,10 +4703,14 @@ export interface operations {
                     readonly datetimeDefault?: "today" | "now" | null;
                     /**
                      * @description Subtype for the new column
+                     * @default null
                      * @enum {string|null}
                      */
                     readonly subtype?: "progress" | "stars" | null;
-                    /** @description Description */
+                    /**
+                     * @description Description
+                     * @default null
+                     */
                     readonly description?: string | null;
                     /**
                      * @description View IDs where this columns should be added
@@ -4621,17 +4818,35 @@ export interface operations {
                     readonly title: string;
                     /** @description Json array{id: string, type: int}, eg [{"id": "admin", "type": 0}, {"id": "user1", "type": 0}] */
                     readonly usergroupDefault?: string | null;
-                    /** @description Whether you can select multiple users or/and groups */
+                    /**
+                     * @description Whether you can select multiple users or/and groups
+                     * @default null
+                     */
                     readonly usergroupMultipleItems?: boolean;
-                    /** @description Whether you can select users */
+                    /**
+                     * @description Whether you can select users
+                     * @default null
+                     */
                     readonly usergroupSelectUsers?: boolean;
-                    /** @description Whether you can select groups */
+                    /**
+                     * @description Whether you can select groups
+                     * @default null
+                     */
                     readonly usergroupSelectGroups?: boolean;
-                    /** @description Whether you can select teams */
+                    /**
+                     * @description Whether you can select teams
+                     * @default null
+                     */
                     readonly usergroupSelectTeams?: boolean;
-                    /** @description Whether to show the user's status */
+                    /**
+                     * @description Whether to show the user's status
+                     * @default null
+                     */
                     readonly showUserStatus?: boolean;
-                    /** @description Description */
+                    /**
+                     * @description Description
+                     * @default null
+                     */
                     readonly description?: string | null;
                     /**
                      * @description View IDs where this columns should be added
@@ -5212,6 +5427,22 @@ export interface operations {
                     };
                 };
             };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
             /** @description Not found */
             readonly 404: {
                 headers: {
@@ -5289,6 +5520,22 @@ export interface operations {
             };
             /** @description Invalid request */
             readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
                 headers: {
                     readonly [name: string]: unknown;
                 };
@@ -5381,6 +5628,22 @@ export interface operations {
             };
             /** @description Invalid request */
             readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
                 headers: {
                     readonly [name: string]: unknown;
                 };
