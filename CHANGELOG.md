@@ -5,6 +5,29 @@
 
 # Changelog
 
+## 0.9.5
+
+### Fixed
+
+* [Fix(DB): reduce number of SQL queries to get shares (tables#1749)](https://github.com/nextcloud/tables/pull/1749)
+* [[stable0.9] fix: update table edit functionality and improve element selectors (tables#1909)](https://github.com/nextcloud/tables/pull/1909)
+
+### Dependencies
+
+* [Fix(deps): update dependency @nextcloud/auth to ^2.5.2 (stable0.9) (tables#1920)](https://github.com/nextcloud/tables/pull/1920)
+* [Fix(deps): update dependency @nextcloud/moment to ^1.3.5 (stable0.9) (tables#1921)](https://github.com/nextcloud/tables/pull/1921)
+* [Fix(deps): update dependency phpoffice/phpspreadsheet to ^1.29.11 (stable0.9) (tables#1922)](https://github.com/nextcloud/tables/pull/1922)
+* [Fix(deps): update dependency @nextcloud/l10n to ^3.4.0 (stable0.9) (tables#1925)](https://github.com/nextcloud/tables/pull/1925)
+* [Fix(deps): update dependency @nextcloud/vue to ^8.28.0 (stable0.9) (tables#1926)](https://github.com/nextcloud/tables/pull/1926)
+
+### Other
+
+* [Chore(deps): update dependency @rollup/rollup-linux-x64-gnu to ^4.45.1 (stable0.9) (tables#1923)](https://github.com/nextcloud/tables/pull/1923)
+* [Chore(deps): update dependency nextcloud/openapi-extractor to ^1.8.1 (stable0.9) (tables#1924)](https://github.com/nextcloud/tables/pull/1924)
+* [[stable0.9] build(package): avoid shipping unnecessary files (tables#1939)](https://github.com/nextcloud/tables/pull/1939)
+* [[stable0.9] style: format constructor params import methods and classes (tables#1940)](https://github.com/nextcloud/tables/pull/1940)
+
+
 ## 0.9.4
 
 ### Added
