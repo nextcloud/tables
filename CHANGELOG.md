@@ -5,6 +5,44 @@
 
 # Changelog
 
+## 1.0.0-beta.1
+
+### Added
+
+* [Bump to 1.0.0, drop NC 29 support, bump PHP req to 8.1 (tables#1898)](https://github.com/nextcloud/tables/pull/1898)
+
+### Fixed
+
+* [Fix(DB): reduce number of SQL queries to get shares (tables#1749)](https://github.com/nextcloud/tables/pull/1749)
+* [Fix: add check for column index existence before processing (tables#1886)](https://github.com/nextcloud/tables/pull/1886)
+* [Fix: update table edit functionality and improve element selectors (tables#1899)](https://github.com/nextcloud/tables/pull/1899)
+
+### Other
+
+* [Refactor: turn columnSettings data from loose array to value object (tables#1845)](https://github.com/nextcloud/tables/pull/1845)
+* [Chore: enable local PHPUnit runs with SQLite support (tables#1903)](https://github.com/nextcloud/tables/pull/1903)
+* [Build: fix renovate config (tables#1915)](https://github.com/nextcloud/tables/pull/1915)
+* [Build(package): avoid shipping unnecessary files (tables#1935)](https://github.com/nextcloud/tables/pull/1935)
+* [Style: format constructor params import methods and classes (tables#1936)](https://github.com/nextcloud/tables/pull/1936)
+* [Ci: bump nc/ocp to stable30 with dependencies (tables#1931)](https://github.com/nextcloud/tables/pull/1931)
+
+### Dependencies
+
+* [Fix(deps): update dependency @nextcloud/auth to ^2.5.2 (tables#1900)](https://github.com/nextcloud/tables/pull/1900)
+* [Fix(deps): update dependency @nextcloud/l10n to ^3.4.0 (tables#1901)](https://github.com/nextcloud/tables/pull/1901)
+* [Fix(deps): update tiptap to ^2.26.1 (tables#1902)](https://github.com/nextcloud/tables/pull/1902)
+* [Fix(deps): update tiptap to v3 (major) (tables#1905)](https://github.com/nextcloud/tables/pull/1905)
+* [Fix(deps): update dependency @nextcloud/moment to ^1.3.5 (tables#1908)](https://github.com/nextcloud/tables/pull/1908)
+* [Fix(deps): update dependency @nextcloud/vue to ^8.28.0 (main) (tables#1919)](https://github.com/nextcloud/tables/pull/1919)
+* [Fix(deps): update dependency phpoffice/phpspreadsheet to ^1.29.12 (main) (tables#1918)](https://github.com/nextcloud/tables/pull/1918)
+* [Chore(deps): update dependency @rollup/rollup-linux-x64-gnu to ^4.45.1 (tables#1904)](https://github.com/nextcloud/tables/pull/1904)
+* [Chore(deps): update dependency nextcloud/openapi-extractor to ^1.8.1 (main) (tables#1917)](https://github.com/nextcloud/tables/pull/1917)
+* [Chore(deps): update nextcloud/pr-feedback-action digest to e397f3c (main) (tables#1933)](https://github.com/nextcloud/tables/pull/1933)
+* [[main] Update nextcloud/ocp dependency (tables#1906)](https://github.com/nextcloud/tables/pull/1906)
+* [[main] Fix npm audit (tables#1907)](https://github.com/nextcloud/tables/pull/1907)
+* [[main] Fix npm audit (tables#1928)](https://github.com/nextcloud/tables/pull/1928)
+
+
 ## 0.9.4
 
 ### Added
