@@ -1,11 +1,18 @@
 /build/
+/cypress/
+/.devcontainer/
 /.git
 /.github
 /docs/
+/screenshots/
 /tests
+/babel.config.cjs
 /babel.config.js
+/cypress.config.mjs
 /.editorconfig
+/.eslintrc.cjs
 /.eslintrc.js
+/.git-blame-ignore-revs
 /.nextcloudignore
 /webpack.*.js
 /.codecov.yml
@@ -14,6 +21,7 @@
 /_config.yml
 /.drone.yml
 /.travis.yml
+/tsconfig.json
 /.eslintignore
 /.eslintrc.yml
 /.gitignore
@@ -25,6 +33,7 @@
 /package.json
 /package-lock.json
 /node_modules/
+/renovate.json
 /src/
 .gitattributes
 .l10nignore
@@ -33,8 +42,10 @@
 phpunit.integration.xml
 phpunit.xml
 psalm.xml
+stylelint.config.cjs
 stylelint.config.js
 webpack.js
 releaseNotes.md
 /.scripts
 /vendor-bin
+/vite.config.ts
