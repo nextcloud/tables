@@ -7,6 +7,7 @@
 
 namespace OCA\Tables\Helper;
 
+use OCA\Tables\Constants\UsergroupType;
 use OCA\Tables\Db\Column;
 
 class ColumnsHelper {
@@ -21,15 +22,30 @@ class ColumnsHelper {
 
 	public function __construct(
 		private UserHelper $userHelper,
+		private CircleHelper $circleHelper,
 	) {
 	}
 
-	public function resolveSearchValue(string $placeholder, string $userId): string {
+	public function resolveSearchValue(string $placeholder, string $userId, ?Column $column = null): string|array {
 		if (str_starts_with($placeholder, '@selection-id-')) {
 			return substr($placeholder, 14);
 		}
 		switch (ltrim($placeholder, '@')) {
-			case 'me': return $userId;
+			case 'me':
+				if ($column?->getType() !== Column::TYPE_USERGROUP) {
+					return $userId;
+				}
+
+				$value = [UsergroupType::USER => $userId];
+				if ($column?->getUsergroupSelectGroups()) {
+					$value[UsergroupType::GROUP] = $this->userHelper->getGroupIdsForUser($userId);
+				}
+
+				if ($column?->getUsergroupSelectTeams()) {
+					$value[UsergroupType::CIRCLE] = $this->circleHelper->getCircleIdsForUser($userId);
+				}
+
+				return $value;
 			case 'my-name': return $this->userHelper->getUserDisplayName($userId);
 			case 'checked': return 'true';
 			case 'unchecked': return 'false';
