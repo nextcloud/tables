@@ -100,7 +100,8 @@
                     "usergroupSelectUsers",
                     "usergroupSelectGroups",
                     "usergroupSelectTeams",
-                    "showUserStatus"
+                    "showUserStatus",
+                    "customSettings"
                 ],
                 "properties": {
                     "id": {
@@ -200,6 +201,19 @@
                     },
                     "showUserStatus": {
                         "type": "boolean"
+                    },
+                    "customSettings": {
+                        "type": "object",
+                        "nullable": true,
+                        "required": [
+                            "width"
+                        ],
+                        "properties": {
+                            "width": {
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        }
                     }
                 }
             },
@@ -3453,6 +3467,14 @@
                                             "type": "integer",
                                             "format": "int64"
                                         }
+                                    },
+                                    "customSettings": {
+                                        "type": "object",
+                                        "default": {},
+                                        "description": "Custom settings for the column",
+                                        "additionalProperties": {
+                                            "type": "object"
+                                        }
                                     }
                                 }
                             }
@@ -3663,6 +3685,14 @@
                                         "type": "boolean",
                                         "nullable": true,
                                         "description": "Whether to show the user's status, if column type is usergroup"
+                                    },
+                                    "customSettings": {
+                                        "type": "object",
+                                        "default": {},
+                                        "description": "Custom settings for the column",
+                                        "additionalProperties": {
+                                            "type": "object"
+                                        }
                                     }
                                 }
                             }
@@ -7060,6 +7090,14 @@
                                             "view"
                                         ],
                                         "description": "Context type of the column creation"
+                                    },
+                                    "customSettings": {
+                                        "type": "object",
+                                        "default": {},
+                                        "description": "Custom settings for the column",
+                                        "additionalProperties": {
+                                            "type": "object"
+                                        }
                                     }
                                 }
                             }
@@ -7322,6 +7360,14 @@
                                             "view"
                                         ],
                                         "description": "Context type of the column creation"
+                                    },
+                                    "customSettings": {
+                                        "type": "object",
+                                        "default": {},
+                                        "description": "Custom settings for the column",
+                                        "additionalProperties": {
+                                            "type": "object"
+                                        }
                                     }
                                 }
                             }
@@ -7578,6 +7624,14 @@
                                             "view"
                                         ],
                                         "description": "Context type of the column creation"
+                                    },
+                                    "customSettings": {
+                                        "type": "object",
+                                        "default": {},
+                                        "description": "Custom settings for the column",
+                                        "additionalProperties": {
+                                            "type": "object"
+                                        }
                                     }
                                 }
                             }
@@ -7833,6 +7887,14 @@
                                             "view"
                                         ],
                                         "description": "Context type of the column creation"
+                                    },
+                                    "customSettings": {
+                                        "type": "object",
+                                        "default": {},
+                                        "description": "Custom settings for the column",
+                                        "additionalProperties": {
+                                            "type": "object"
+                                        }
                                     }
                                 }
                             }
@@ -8098,6 +8160,14 @@
                                             "view"
                                         ],
                                         "description": "Context type of the column creation"
+                                    },
+                                    "customSettings": {
+                                        "type": "object",
+                                        "default": {},
+                                        "description": "Custom settings for the column",
+                                        "additionalProperties": {
+                                            "type": "object"
+                                        }
                                     }
                                 }
                             }

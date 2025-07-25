@@ -28,6 +28,20 @@
 			<NcCheckboxRadioSwitch type="switch" :checked.sync="localMandatory" />
 		</div>
 
+		<!-- column width -->
+		<div class="fix-col-4 mandatory title space-T">
+			{{ t('tables', 'Column width') }}
+		</div>
+		<div class="fix-col-4">
+			<input
+				v-model.number="localColumnWidth"
+				type="number"
+				pattern="\d+"
+				min="20"
+				max="1000"
+				:placeholder="t('tables', 'Enter a column width')">
+		</div>
+
 		<!-- add to views -->
 		<div v-if="!editColumn && views.length > 0" class="fix-col-4 title space-T">
 			{{ t('tables', 'Add column to other views') }}
@@ -95,6 +109,12 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		customSettings: {
+			type: [Object, Array],
+			default() {
+				return {}
+			},
+		},
 	},
 	computed: {
 		...mapState(useTablesStore, ['views', 'activeElement', 'isView']),
@@ -114,6 +134,12 @@ export default {
 			get() { return this.selectedViews },
 			set(selectedViews) {
 				this.$emit('update:selectedViews', selectedViews)
+			},
+		},
+		localColumnWidth: {
+			get() { return this.customSettings.width ?? null },
+			set(width) {
+				this.$emit('update:customSettings', { ...this.customSettings, ...{ width } })
 			},
 		},
 		viewsForTable() {

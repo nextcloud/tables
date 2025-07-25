@@ -112,6 +112,7 @@ class ApiColumnsController extends AOCSController {
 	 * @param 'progress'|'stars'|null $subtype Subtype for the new column
 	 * @param string|null $description Description
 	 * @param list<int>|null $selectedViewIds View IDs where this columns should be added
+	 * @param array<string, mixed> $customSettings Custom settings for the column
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Column created
@@ -123,7 +124,7 @@ class ApiColumnsController extends AOCSController {
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
-	public function createNumberColumn(int $baseNodeId, string $title, ?float $numberDefault, ?int $numberDecimals, ?string $numberPrefix, ?string $numberSuffix, ?float $numberMin, ?float $numberMax, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
+	public function createNumberColumn(int $baseNodeId, string $title, ?float $numberDefault, ?int $numberDecimals, ?string $numberPrefix, ?string $numberSuffix, ?float $numberMin, ?float $numberMax, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		$column = $this->service->create(
@@ -141,7 +142,8 @@ class ApiColumnsController extends AOCSController {
 				numberMax: $numberMax,
 				numberDecimals: $numberDecimals,
 				numberPrefix: $numberPrefix,
-				numberSuffix: $numberSuffix
+				numberSuffix: $numberSuffix,
+				customSettings: json_encode($customSettings),
 			),
 			$selectedViewIds
 		);
@@ -163,6 +165,7 @@ class ApiColumnsController extends AOCSController {
 	 * @param list<int>|null $selectedViewIds View IDs where this columns should be added
 	 * @param boolean $mandatory Is mandatory
 	 * @param 'table'|'view' $baseNodeType Context type of the column creation
+	 * @param array<string, mixed> $customSettings Custom settings for the column
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Column created
@@ -174,7 +177,7 @@ class ApiColumnsController extends AOCSController {
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
-	public function createTextColumn(int $baseNodeId, string $title, ?string $textDefault, ?string $textAllowedPattern, ?int $textMaxLength, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
+	public function createTextColumn(int $baseNodeId, string $title, ?string $textDefault, ?string $textAllowedPattern, ?int $textMaxLength, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		$column = $this->service->create(
@@ -189,7 +192,8 @@ class ApiColumnsController extends AOCSController {
 				description: $description,
 				textDefault: $textDefault,
 				textAllowedPattern: $textAllowedPattern,
-				textMaxLength: $textMaxLength
+				textMaxLength: $textMaxLength,
+				customSettings: json_encode($customSettings),
 			),
 			$selectedViewIds
 		);
@@ -210,6 +214,7 @@ class ApiColumnsController extends AOCSController {
 	 * @param list<int>|null $selectedViewIds View IDs where this columns should be added
 	 * @param boolean $mandatory Is mandatory
 	 * @param 'table'|'view' $baseNodeType Context type of the column creation
+	 * @param array<string, mixed> $customSettings Custom settings for the column
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Column created
@@ -221,7 +226,7 @@ class ApiColumnsController extends AOCSController {
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
-	public function createSelectionColumn(int $baseNodeId, string $title, string $selectionOptions, ?string $selectionDefault, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
+	public function createSelectionColumn(int $baseNodeId, string $title, string $selectionOptions, ?string $selectionDefault, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		$column = $this->service->create(
@@ -235,7 +240,8 @@ class ApiColumnsController extends AOCSController {
 				mandatory: $mandatory,
 				description: $description,
 				selectionOptions: $selectionOptions,
-				selectionDefault: $selectionDefault
+				selectionDefault: $selectionDefault,
+				customSettings: json_encode($customSettings),
 			),
 			$selectedViewIds
 		);
@@ -255,6 +261,7 @@ class ApiColumnsController extends AOCSController {
 	 * @param list<int>|null $selectedViewIds View IDs where this columns should be added
 	 * @param boolean $mandatory Is mandatory
 	 * @param 'table'|'view' $baseNodeType Context type of the column creation
+	 * @param array<string, mixed> $customSettings Custom settings for the column
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Column created
@@ -266,7 +273,7 @@ class ApiColumnsController extends AOCSController {
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
-	public function createDatetimeColumn(int $baseNodeId, string $title, ?string $datetimeDefault, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
+	public function createDatetimeColumn(int $baseNodeId, string $title, ?string $datetimeDefault, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		$column = $this->service->create(
@@ -279,7 +286,8 @@ class ApiColumnsController extends AOCSController {
 				subtype: $subtype,
 				mandatory: $mandatory,
 				description: $description,
-				datetimeDefault: $datetimeDefault
+				datetimeDefault: $datetimeDefault,
+				customSettings: json_encode($customSettings),
 			),
 			$selectedViewIds
 		);
@@ -301,6 +309,7 @@ class ApiColumnsController extends AOCSController {
 	 * @param list<int>|null $selectedViewIds View IDs where this columns should be added
 	 * @param boolean $mandatory Is mandatory
 	 * @param 'table'|'view' $baseNodeType Context type of the column creation
+	 * @param array<string, mixed> $customSettings Custom settings for the column
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Column created
@@ -312,7 +321,7 @@ class ApiColumnsController extends AOCSController {
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
-	public function createUsergroupColumn(int $baseNodeId, string $title, ?string $usergroupDefault, ?bool $usergroupMultipleItems = null, ?bool $usergroupSelectUsers = null, ?bool $usergroupSelectGroups = null, ?bool $usergroupSelectTeams = null, ?bool $showUserStatus = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
+	public function createUsergroupColumn(int $baseNodeId, string $title, ?string $usergroupDefault, ?bool $usergroupMultipleItems = null, ?bool $usergroupSelectUsers = null, ?bool $usergroupSelectGroups = null, ?bool $usergroupSelectTeams = null, ?bool $showUserStatus = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		$column = $this->service->create(
@@ -329,7 +338,8 @@ class ApiColumnsController extends AOCSController {
 				usergroupSelectUsers: $usergroupSelectUsers,
 				usergroupSelectGroups: $usergroupSelectGroups,
 				usergroupSelectTeams: $usergroupSelectTeams,
-				showUserStatus: $showUserStatus
+				showUserStatus: $showUserStatus,
+				customSettings: json_encode($customSettings),
 			),
 			$selectedViewIds
 		);
