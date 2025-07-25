@@ -237,6 +237,7 @@ OC.L10N.register(
     "Could not load link provider results." : "Nie można wczytać wyników dostawcy odnośników.",
     "Url" : "URL",
     "Copy link" : "Kopiuj link",
+    "Open link" : "Otwórz link",
     "Close editor" : "Zamknij edytor",
     "Go to previous page" : "Przejdź do poprzedniej strony",
     "Confirmation" : "Potwierdzenie",

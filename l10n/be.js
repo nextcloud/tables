@@ -3,6 +3,8 @@ OC.L10N.register(
     {
     "No" : "Не",
     "Yes" : "Так",
+    "Missing a temporary folder" : "Адсутнічае часовая папка",
+    "Could not write file to disk" : "Не ўдалося запісаць файл на дыск",
     "Date" : "Дата",
     "Name" : "Назва",
     "Birthday" : "Дзень нараджэння",
@@ -14,6 +16,7 @@ OC.L10N.register(
     "Move" : "Перамясціць",
     "Actions" : "Дзеянні",
     "Share" : "Абагуліць",
+    "Import" : "Імпарт",
     "Type" : "Тып",
     "Save" : "Захаваць",
     "Title" : "Загаловак",
@@ -36,6 +39,7 @@ OC.L10N.register(
     "Search" : "Пошук",
     "Back" : "Назад",
     "URL" : "URL-адрас",
+    "Open link" : "Адкрыць спасылку",
     "Confirm" : "Пацвердзіць",
     "Select" : "Выбраць",
     "Clipboard is not available" : "Буфер абмену недаступны"
