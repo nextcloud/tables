@@ -5,6 +5,13 @@
 
 # Changelog
 
+## 0.8.8
+
+### Other
+
+* [[stable0.8] build(package): avoid shipping unnecessary files (tables#1938)](https://github.com/nextcloud/tables/pull/1938)
+* [[stable0.8] style: format constructor params import methods and classes (tables#1941)](https://github.com/nextcloud/tables/pull/1941)
+
 ## 0.8.7
 
 ### Other
