@@ -26,6 +26,9 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
+use Throwable;
+use function file_exists;
+use function is_uploaded_file;
 
 class ImportService extends SuperService {
 
@@ -46,8 +49,17 @@ class ImportService extends SuperService {
 	private int $countErrors = 0;
 	private int $countParsingErrors = 0;
 
-	public function __construct(PermissionsService $permissionsService, LoggerInterface $logger, ?string $userId,
-		IRootFolder $rootFolder, ColumnService $columnService, RowService $rowService, TableService $tableService, ViewService $viewService, IUserManager $userManager) {
+	public function __construct(
+		PermissionsService $permissionsService,
+		LoggerInterface $logger,
+		?string $userId,
+		IRootFolder $rootFolder,
+		ColumnService $columnService,
+		RowService $rowService,
+		TableService $tableService,
+		ViewService $viewService,
+		IUserManager $userManager,
+	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->rootFolder = $rootFolder;
 		$this->columnService = $columnService;
@@ -114,7 +126,7 @@ class ImportService extends SuperService {
 				} else {
 					$error = true;
 				}
-			} elseif (\file_exists($path)) {
+			} elseif (is_uploaded_file($path) && file_exists($path)) {
 				$spreadsheet = IOFactory::load($path);
 				$this->loop($spreadsheet->getActiveSheet());
 			} else {
@@ -253,7 +265,7 @@ class ImportService extends SuperService {
 		} catch (NotFoundError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': '.$e->getMessage());
-		} catch (\Throwable $e) {
+		} catch (Throwable $e) {
 			$this->countErrors++;
 			$this->logger->error('Error while creating new row for import.', ['exception' => $e]);
 		}
