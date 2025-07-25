@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.7.6
+
+### Fixed
+* [[stable0.7] fix(View): column might be saved as null (tables#1229)](https://github.com/nextcloud/tables/pull/1229)
+* [[stable0.7] Analytics: permission error on shared tables with non-shared views (tables#1253)](https://github.com/nextcloud/tables/pull/1253)
+* [[stable0.7] Fix npm audit (tables#1335)](https://github.com/nextcloud/tables/pull/1335)
+* [[stable0.7] fix: use actions/upload-artifact v4 for cypress workflow (tables#1349)](https://github.com/nextcloud/tables/pull/1349)
+* [Fix(deps): update dependency vue-material-design-icons to ^5.3.1 (stable0.7) (tables#1417)](https://github.com/nextcloud/tables/pull/1417)
+* [[stable0.7] fix: use unique names for actions upload-artifact (tables#1419)](https://github.com/nextcloud/tables/pull/1419)
+
+### Other
+* [[stable0.7] build(package): avoid shipping unnecessary files (tables#1937)](https://github.com/nextcloud/tables/pull/1937)
+* [[stable0.7] style: format constructor params import methods and classes (tables#1942)](https://github.com/nextcloud/tables/pull/1942)
+
+
 ## 0.7.5
 
 ### Fixed
