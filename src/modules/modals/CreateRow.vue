@@ -158,7 +158,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .modal-mask {
-	z-index: 2001;
+	z-index: 9999;
 }
 
 .modal__content {
