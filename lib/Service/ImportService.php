@@ -10,6 +10,7 @@ namespace OCA\Tables\Service;
 use OC\User\NoUserException;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Dto\Column as ColumnDto;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -439,7 +440,7 @@ class ImportService extends SuperService {
 		} catch (PermissionError $e) {
 			$this->logger->error('Could not create row while importing, no permission.', ['exception' => $e]);
 			$this->countErrors++;
-		} catch (InternalError $e) {
+		} catch (BadRequestError|InternalError $e) {
 			$this->logger->error('Error while creating  new row for import.', ['exception' => $e]);
 			$this->countErrors++;
 		} catch (NotFoundError $e) {
