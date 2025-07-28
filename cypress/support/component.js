@@ -6,11 +6,10 @@ import { mount } from 'cypress/vue2'
 import { translate as t, translatePlural as n } from '@nextcloud/l10n'
 import { createPinia, PiniaVuePlugin } from 'pinia'
 import Vue from 'vue'
-
-import '../styleguide/global.requires.js'
-
 Vue.use(PiniaVuePlugin)
 const pinia = createPinia()
+
+import '../styleguide/global.requires.js'
 
 // Styles necessary for rendering the component
 import '../styleguide/assets/default.css'
