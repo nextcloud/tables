@@ -77,6 +77,8 @@ import displayError from '../shared/utils/displayError.js'
 import { useTablesStore } from '../store/store.js'
 import { useDataStore } from '../store/data.js'
 import { createPinia, setActivePinia } from 'pinia'
+import LinkReferenceWidget from './LinkReferenceWidget.vue'
+import ContentReferenceWidget from './ContentReferenceWidget.vue'
 
 const pinia = createPinia()
 setActivePinia(pinia)
@@ -92,8 +94,8 @@ export default {
 		Search,
 		NcCheckboxRadioSwitch,
 		NcButton,
-		LinkReferenceWidget: import('./LinkReferenceWidget.vue'),
-		ContentReferenceWidget: import('./ContentReferenceWidget.vue'),
+		LinkReferenceWidget,
+		ContentReferenceWidget,
 		NcLoadingIcon,
 	},
 
@@ -102,7 +104,18 @@ export default {
 			renderMode: 'link', // { link, content }
 			value: null,
 			previewLoading: false,
-			richObject: {},
+			richObject: {
+				emoji: '',
+				link: '',
+				ownerDisplayName: '',
+				ownership: '',
+				rowsCount: 0,
+				title: '',
+				type: '',
+				id: '',
+				columns: [],
+				rows: [],
+			},
 			tablesStore: null,
 			dataStore: null,
 		}
@@ -146,23 +159,24 @@ export default {
 
 				this.previewLoading = false
 			} else {
-				delete this.richObject.rows
-				delete this.richObject.columns
+				this.$delete(this.richObject, 'rows')
+				this.$delete(this.richObject, 'columns')
 			}
 		},
 		selectReference() {
 			this.$emit('submit', this.getLink)
 		},
 		updateRichObject() {
-			this.richObject.emoji = this.value.emoji
-			this.richObject.link = this.getLink
-			this.richObject.ownerDisplayName = this.value.ownerDisplayName
-			this.richObject.ownership = this.value.owner
-			this.richObject.rowsCount = this.value.rowsCount
-			this.richObject.title = this.value.label
-			this.richObject.type = this.value.type
-			this.richObject.id = this.value.value
-			console.log('Rich object updated:', this.richObject)
+			if (!this.value) return
+
+			this.$set(this.richObject, 'emoji', this.value.emoji)
+			this.$set(this.richObject, 'link', this.getLink)
+			this.$set(this.richObject, 'ownerDisplayName', this.value.ownerDisplayName)
+			this.$set(this.richObject, 'ownership', this.value.owner)
+			this.$set(this.richObject, 'rowsCount', this.value.rowsCount)
+			this.$set(this.richObject, 'title', this.value.label)
+			this.$set(this.richObject, 'type', this.value.type)
+			this.$set(this.richObject, 'id', this.value.value)
 		},
 		async loadColumnsForContentPreview() {
 			if (this.value === null) {
@@ -171,7 +185,7 @@ export default {
 
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/api/1/' + this.value.type + 's/' + this.value.value + '/columns'))
-				this.richObject.columns = res.data
+				this.$set(this.richObject, 'columns', res.data)
 			} catch (e) {
 				displayError(e, t('tables', 'Could not fetch columns for content preview.'))
 			}
@@ -183,7 +197,7 @@ export default {
 
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/row/' + this.value.type + '/' + this.value.value))
-				this.richObject.rows = res.data
+				this.$set(this.richObject, 'rows', res.data)
 			} catch (e) {
 				displayError(e, t('tables', 'Could not fetch rows for content preview.'))
 			}
