@@ -48,6 +48,10 @@ describe('ContentReferenceWidget', () => {
 		cy.fixture('widgets/createRow.json')
 			.then((rowData) => {
 				cy.reply('**/ocs/v2.php/apps/tables/api/2/tables/*/rows', rowData)
+				
+				// Also mock the reload rows endpoint to return updated rows including the new one
+				const updatedRows = [...richObject.rows, rowData]
+				cy.reply('**/apps/tables/row/table/*', updatedRows)
 			})
 
 		// Click the Create Row button
@@ -62,7 +66,6 @@ describe('ContentReferenceWidget', () => {
 		cy.get('.modal__content').should('not.exist')
 
 		// Make sure the row was added and is visible
-		cy.wait(1000) // Wait for the row to be added
 		cy.get('@rows').last().children().as('createdRow')
 		cy.get('@createdRow').first().contains('Hello')
 		cy.get('@createdRow').next().contains('World')
@@ -100,7 +103,7 @@ describe('ContentReferenceWidget', () => {
 })
 
 function mountContentWidget(richObject) {
-	cy.reply('**/index.php/apps/tables/row/table/*', richObject.rows)
+	cy.reply('**/apps/tables/row/table/*', richObject.rows)
 
 	cy.mount(ContentReferenceWidget, {
 		propsData: {
