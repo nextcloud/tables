@@ -23,7 +23,9 @@
     "lint": "eslint --ext .js,.vue src",
     "lint:fix": "eslint --ext .js,.vue src --fix",
     "stylelint": "stylelint 'css/*.css' 'css/*.scss' 'src/**/*.scss' 'src/**/*.vue'",
-    "stylelint:fix": "stylelint 'css/*.css' 'css/*.scss' 'src/**/*.scss' 'src/**/*.vue' --fix"
+    "stylelint:fix": "stylelint 'css/*.css' 'css/*.scss' 'src/**/*.scss' 'src/**/*.vue' --fix",
+    "tests": "npx cypress run",
+    "tests:component": "npx cypress run --component"
   },
   "dependencies": {
     "@mdi/svg": "^7.4.47",
