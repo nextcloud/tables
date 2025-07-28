@@ -1,72 +1,77 @@
-	.picker-content {
-		width: 100%;
-		min-height: 350px;
-		display: flex;
-		flex-direction: column;
-		overflow-y: auto;
-		padding: 0 16px 16px 16px;
-	}
+/**
+ * SPDX-FileCopyrightText: 2025 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 
-	.picker-content > h2 {
-		margin: 12px 0;
-		text-align: center;
-	}
+.picker-content {
+	width: 100%;
+	min-height: 350px;
+	display: flex;
+	flex-direction: column;
+	overflow-y: auto;
+	padding: 0 16px 16px 16px;
+}
 
-	h3 {
-		margin: 0;
-	}
+.picker-content > h2 {
+	margin: 12px 0;
+	text-align: center;
+}
 
-	.space-B {
-		margin-bottom: calc(var(--default-grid-baseline) * 4);
-	}
+h3 {
+	margin: 0;
+}
 
-	.space-T {
-		margin-top: calc(var(--default-grid-baseline) * 2);
-	}
+.space-B {
+	margin-bottom: calc(var(--default-grid-baseline) * 4);
+}
 
-	table {
-		width: 100%;
-	}
+.space-T {
+	margin-top: calc(var(--default-grid-baseline) * 2);
+}
 
-	table th, table td {
-		border: none !important;
-		width: 50%;
-		padding-left: calc(var(--default-grid-baseline) * 2);
-		padding-right: calc(var(--default-grid-baseline) * 2);
-	}
+table {
+	width: 100%;
+}
 
-	.radio {
-		display: flex;
-	}
+table th, table td {
+	border: none !important;
+	width: 50%;
+	padding-left: calc(var(--default-grid-baseline) * 2);
+	padding-right: calc(var(--default-grid-baseline) * 2);
+}
 
-	.radio > span {
-		padding-right: calc(var(--default-grid-baseline) * 6);
-	}
+.radio {
+	display: flex;
+}
 
-	.radio label .material-design-icon {
-		padding-right: calc(var(--default-grid-baseline) * 1);
-	}
+.radio > span {
+	padding-right: calc(var(--default-grid-baseline) * 6);
+}
 
-	.select-button {
-		bottom: 0;
-		width: 100%;
-		display: flex;
-		align-items: end;
-		flex-direction: column;
-		position:sticky;
-	}
+.radio label .material-design-icon {
+	padding-right: calc(var(--default-grid-baseline) * 1);
+}
 
-	.selection-wrapper {
-		width: 100%;
-	}
+.select-button {
+	bottom: 0;
+	width: 100%;
+	display: flex;
+	align-items: end;
+	flex-direction: column;
+	position:sticky;
+}
 
-	.selection-wrapper .selection {
-		margin-left: auto;
-		margin-right: auto;
-		width: 550px;
-	}
+.selection-wrapper {
+	width: 100%;
+}
 
-	.preview {
-		border: 2px solid var(--color-border);
-		border-radius: var(--border-radius-large);
-	}
+.selection-wrapper .selection {
+	margin-left: auto;
+	margin-right: auto;
+	width: 550px;
+}
+
+.preview {
+	border: 2px solid var(--color-border);
+	border-radius: var(--border-radius-large);
+}
