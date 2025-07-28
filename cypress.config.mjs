@@ -46,6 +46,13 @@ export default defineConfig({
 			framework: 'vue',
 			bundler: 'vite',
 		},
+		setupNodeEvents(on, config) {
+			on('file:preprocessor', vitePreprocessor({
+				plugins: [vue(), nodePolyfills()],
+				configFile: false,
+			}))
+			return config
+		},
 		viewportWidth: 800,
 		viewportHeight: 600,
 	},
