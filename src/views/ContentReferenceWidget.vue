@@ -6,7 +6,7 @@
 	<div v-if="richObject" class="tables-content-widget">
 		<div class="header">
 			<h2>
-				<NcLoadingIcon v-if="!rows" :size="30" />
+				<NcLoadingIcon v-if="!rows || rows.length === 0" :size="30" />
 				<span v-else>{{ richObject.emoji }}</span>&nbsp;{{ richObject.title }}
 			</h2>
 			<Options
@@ -15,7 +15,7 @@
 				@create-row="createRow"
 				@set-search-string="search" />
 		</div>
-		<div v-if="rows" class="nc-table">
+		<div v-if="rows && rows.length > 0" class="nc-table">
 			<NcTable
 				:rows="filteredRows"
 				:columns="richObject.columns"
@@ -63,7 +63,7 @@ export default {
 	data() {
 		return {
 			searchExp: null,
-			rows: null,
+			localRows: [], // Keep as fallback only
 			tablesStore: null,
 			dataStore: null,
 		}
@@ -101,12 +101,36 @@ export default {
 		getRows() {
 			return this.dataStore ? this.dataStore.getRows(false, this.richObject.id) : []
 		},
+		// Use computed property to get rows from store or richObject
+		rows() {
+			// First try to get from the store
+			const storeRows = this.getRows
+			if (storeRows && storeRows.length > 0) {
+				return storeRows
+			}
+			// Fallback to richObject rows or local rows
+			return this.richObject?.rows || this.localRows
+		},
 	},
 
 	watch: {
+		richObject: {
+			deep: true,
+			handler(newVal) {
+				if (newVal && newVal.rows && this.localRows !== newVal.rows) {
+					this.localRows = newVal.rows
+				}
+			},
+		},
 		rows: {
 			deep: true,
-			handler() {
+			handler(newRows) {
+				// Sync changes back to richObject for reactivity
+				if (this.richObject && newRows) {
+					this.$set(this.richObject, 'rows', newRows)
+					// Update row count
+					this.$set(this.richObject, 'rowsCount', newRows.length)
+				}
 				// Force update of filteredRows when rows change
 				this.search(this.searchExp ? this.searchExp.source : '')
 			},
@@ -139,12 +163,11 @@ export default {
 				columns: this.richObject.columns,
 				isView: Boolean(this.richObject.type),
 				elementId: this.richObject.id,
-			}, () => {
-				const storeRows = this.getRows
-				if (storeRows.length > this.rows.length) {
-					const createdRow = storeRows.at(-1)
-					this.rows.push(createdRow)
-				}
+			}, async () => {
+				// Reload rows from the backend to get the latest data
+				await this.dataStore.loadRowsFromBE({
+					tableId: this.richObject.id,
+				})
 			})
 		},
 		async editRow(rowId) {
@@ -155,15 +178,11 @@ export default {
 				row: this.getRow(rowId),
 				isView: Boolean(this.richObject.type),
 				element: this.richObject,
-			}, () => {
-				const storeRows = this.getRows
-				const updatedRow = storeRows.find(row => row.id === rowId)
-				if (updatedRow) {
-					const localRowIndex = this.rows.findIndex(row => row.id === rowId)
-					if (localRowIndex !== -1) {
-						this.$set(this.rows, localRowIndex, updatedRow)
-					}
-				}
+			}, async () => {
+				// Reload rows from the backend to get the latest data
+				await this.dataStore.loadRowsFromBE({
+					tableId: this.richObject.id,
+				})
 			})
 		},
 		getRow(rowId) {
@@ -173,7 +192,7 @@ export default {
 			if (!this.dataStore) return
 
 			if (this.richObject.rows) {
-				this.rows = this.richObject.rows
+				this.localRows = this.richObject.rows
 				return
 			}
 
@@ -181,7 +200,7 @@ export default {
 				await this.dataStore.loadRowsFromBE({
 					tableId: this.richObject.id,
 				})
-				this.rows = this.dataStore.getRows(false, this.richObject.id)
+				// No need to set local rows as the computed property will use store data
 			} catch (error) {
 				console.error('Error loading rows:', error)
 			}
