@@ -13,7 +13,10 @@ const config = createAppConfig({
         jsAssetsFilterFunction: (chunk) => {
             return chunk.name === 'main' || 
                    chunk.fileName.includes('main') || 
-                   chunk.fileName.includes('tables-main');
+                   chunk.fileName.includes('tables-main') ||
+                   chunk.name === 'reference' ||
+                   chunk.fileName.includes('reference') ||
+                   chunk.fileName.includes('SmartPicker');
         }
     },
 	config: {

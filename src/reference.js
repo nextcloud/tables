@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 import { registerCustomPickerElement, registerWidget, NcCustomPickerRenderResult } from '@nextcloud/vue/dist/Functions/registerReference.js'
+import './styles/smart-picker.scss'
 
 registerWidget('tables_link', async (el, { richObjectType, richObject, accessible }) => {
 	const { default: Vue } = await import('vue')
