@@ -6,7 +6,7 @@
 	<div v-if="richObject" class="tables-content-widget">
 		<div class="header">
 			<h2>
-				<NcLoadingIcon v-if="!rows" :size="30" />
+				<NcLoadingIcon v-if="!rows || rows.length === 0" :size="30" />
 				<span v-else>{{ richObject.emoji }}</span>&nbsp;{{ richObject.title }}
 			</h2>
 			<Options
@@ -15,7 +15,7 @@
 				@create-row="createRow"
 				@set-search-string="search" />
 		</div>
-		<div v-if="rows" class="nc-table">
+		<div v-if="rows && rows.length > 0" class="nc-table">
 			<NcTable
 				:rows="filteredRows"
 				:columns="richObject.columns"
@@ -31,10 +31,9 @@ import Options from '../shared/components/ncTable/sections/Options.vue'
 import permissionsMixin from '../shared/components/ncTable/mixins/permissionsMixin.js'
 import { NcLoadingIcon } from '@nextcloud/vue'
 import { useResizeObserver } from '@vueuse/core'
-import { spawnDialog } from '@nextcloud/dialogs'
+import { spawnDialog } from '@nextcloud/vue/functions/dialog'
 import { useTablesStore } from '../store/store.js'
 import { useDataStore } from '../store/data.js'
-import { mapActions } from 'pinia'
 
 export default {
 
@@ -64,9 +63,9 @@ export default {
 	data() {
 		return {
 			searchExp: null,
-			rows: null,
-			tablesStore: useTablesStore(),
-			dataStore: useDataStore(),
+			localRows: [], // Keep as fallback only
+			tablesStore: null,
+			dataStore: null,
 		}
 	},
 
@@ -99,6 +98,43 @@ export default {
 				return this.rows
 			}
 		},
+		getRows() {
+			return this.dataStore ? this.dataStore.getRows(false, this.richObject.id) : []
+		},
+		// Use computed property to get rows from store or richObject
+		rows() {
+			// First try to get from the store
+			const storeRows = this.getRows
+			if (storeRows && storeRows.length > 0) {
+				return storeRows
+			}
+			// Fallback to richObject rows or local rows
+			return this.richObject?.rows || this.localRows
+		},
+	},
+
+	watch: {
+		richObject: {
+			deep: true,
+			handler(newVal) {
+				if (newVal && newVal.rows && this.localRows !== newVal.rows) {
+					this.localRows = newVal.rows
+				}
+			},
+		},
+		rows: {
+			deep: true,
+			handler(newRows) {
+				// Sync changes back to richObject for reactivity
+				if (this.richObject && newRows) {
+					this.$set(this.richObject, 'rows', newRows)
+					// Update row count
+					this.$set(this.richObject, 'rowsCount', newRows.length)
+				}
+				// Force update of filteredRows when rows change
+				this.search(this.searchExp ? this.searchExp.source : '')
+			},
+		},
 	},
 
 	async mounted() {
@@ -108,11 +144,13 @@ export default {
 			this.$el.style.setProperty('--widget-content-width', `${width}px`)
 		})
 
+		this.tablesStore = useTablesStore()
+		this.dataStore = useDataStore()
+
 		await this.loadRows()
 	},
 
 	methods: {
-		...mapActions(useDataStore, ['loadRowsFromBE', 'getRows']),
 		search(searchString) {
 			this.searchExp = (searchString !== '')
 				? new RegExp(searchString.trim(), 'ig')
@@ -125,12 +163,11 @@ export default {
 				columns: this.richObject.columns,
 				isView: Boolean(this.richObject.type),
 				elementId: this.richObject.id,
-			}, () => {
-				const storeRows = this.getRows
-				if (storeRows.length > this.rows.length) {
-					const createdRow = storeRows.at(-1)
-					this.rows.push(createdRow)
-				}
+			}, async () => {
+				// Reload rows from the backend to get the latest data
+				await this.dataStore.loadRowsFromBE({
+					tableId: this.richObject.id,
+				})
 			})
 		},
 		async editRow(rowId) {
@@ -141,23 +178,31 @@ export default {
 				row: this.getRow(rowId),
 				isView: Boolean(this.richObject.type),
 				element: this.richObject,
-			}, () => {
-				const storeRows = this.getRows
-				const localRowIndex = this.rows.findIndex(row => row.id === rowId)
-				const updatedRow = storeRows.find(row => row.id === rowId)
-				this.rows.splice(localRowIndex, 1, updatedRow)
+			}, async () => {
+				// Reload rows from the backend to get the latest data
+				await this.dataStore.loadRowsFromBE({
+					tableId: this.richObject.id,
+				})
 			})
 		},
 		getRow(rowId) {
 			return this.rows.find(row => row.id === rowId)
 		},
 		async loadRows() {
-			const res = await this.loadRowsFromBE({
-				tableId: this.richObject.id,
-			})
+			if (!this.dataStore) return
 
-			if (res) {
-				this.rows = this.getRows
+			if (this.richObject.rows) {
+				this.localRows = this.richObject.rows
+				return
+			}
+
+			try {
+				await this.dataStore.loadRowsFromBE({
+					tableId: this.richObject.id,
+				})
+				// No need to set local rows as the computed property will use store data
+			} catch (error) {
+				console.error('Error loading rows:', error)
 			}
 		},
 	},
@@ -229,6 +274,10 @@ export default {
 
 		& :deep(.options.row) {
 			width: calc(var(--widget-content-width, 100%) - 12px);
+		}
+
+		& :deep(td) {
+			vertical-align: middle !important;
 		}
 	}
 

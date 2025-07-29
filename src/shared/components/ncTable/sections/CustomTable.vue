@@ -28,7 +28,7 @@
 					data-cy="customTableRow"
 					:row="row"
 					:columns="columns"
-					:selected="isRowSelected(row.id)"
+					:selected="isRowSelected(row?.id)"
 					:view-setting.sync="localViewSetting"
 					:config="config"
 					@update-row-selection="updateRowSelection"
@@ -169,23 +169,35 @@ export default {
 			// if we don't have to search and/or filter
 			if (!this.viewSetting?.filter?.length > 0 && !this.viewSetting?.searchString) {
 				// cleanup markers
-				this.rows?.forEach(row => {
-					this.columns?.forEach(column => {
-						const cell = row.data.find(item => item.columnId === column.id)
-						if (cell === undefined) {
-							return
+				if (this.rows && this.columns) {
+					this.rows.forEach(row => {
+						if (row && row.data) {
+							this.columns.forEach(column => {
+								const cell = row.data.find(item => item && item.columnId === column.id)
+								if (cell === undefined) {
+									return
+								}
+								delete cell.searchStringFound
+								delete cell.filterFound
+							})
 						}
-						delete cell.searchStringFound
-						delete cell.filterFound
 					})
-				})
-				return this.rows
+				}
+				return this.rows || []
 			}
 
 			const data = [] // array of rows
 			const searchString = this.viewSetting?.searchString
 			// each row
+			if (!this.rows || !this.columns) {
+				return []
+			}
+
 			for (const row of this.rows) {
+				if (!row || !row.data) {
+					continue
+				}
+
 				if (debug) {
 					console.debug('new row ===============================================', row)
 				}
@@ -193,7 +205,7 @@ export default {
 				let searchStatusRow = false
 
 				// each column in a row => cell
-				this.columns?.forEach(column => {
+				this.columns.forEach(column => {
 					if (debug) {
 						console.debug('new column -------------------', column)
 					}
@@ -221,7 +233,7 @@ export default {
 							break
 						}
 					} else {
-						cell = row.data.find(item => item.columnId === column.id)
+						cell = row.data.find(item => item && item.columnId === column.id)
 					}
 
 					// if we don't have a value for this cell
