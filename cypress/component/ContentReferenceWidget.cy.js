@@ -22,7 +22,7 @@ describe('ContentReferenceWidget', () => {
 
 		// Verify the table loaded the richObject
 		// by checking the title
-		cy.get('.tables-content-widget h2').as('heading')
+		cy.get('[data-cy="contentReferenceWidget"] h2').as('heading')
 		cy.get('@heading').contains(title)
 	})
 
@@ -32,7 +32,7 @@ describe('ContentReferenceWidget', () => {
 		const searchTerm = 'cat'
 
 		// Search for the row including the above search term
-		cy.get('@options').find('input').type(searchTerm)
+		cy.get('@options').find('input').first().type(searchTerm)
 
 		// Ensure there is only one resultant row and
 		// verify the row correctly includes the search term
@@ -47,11 +47,15 @@ describe('ContentReferenceWidget', () => {
 		// Load a fixture used to reply to the create row request
 		cy.fixture('widgets/createRow.json')
 			.then((rowData) => {
-				cy.reply('**/index.php/apps/tables/row', rowData)
+				cy.reply('**/ocs/v2.php/apps/tables/api/2/tables/*/rows', rowData)
+				
+				// Also mock the reload rows endpoint to return updated rows including the new one
+				const updatedRows = [...richObject.rows, rowData]
+				cy.reply('**/apps/tables/row/table/*', updatedRows)
 			})
 
 		// Click the Create Row button
-		cy.get('@options').find('button').click()
+		cy.get('@options').find('button').first().click()
 
 		// Input row data
 		cy.get('[data-cy="Name"] input').type('Hello')
@@ -99,7 +103,7 @@ describe('ContentReferenceWidget', () => {
 })
 
 function mountContentWidget(richObject) {
-	cy.reply('**/index.php/apps/tables/row/table/*', richObject.rows)
+	cy.reply('**/apps/tables/row/table/*', richObject.rows)
 
 	cy.mount(ContentReferenceWidget, {
 		propsData: {
@@ -108,7 +112,7 @@ function mountContentWidget(richObject) {
 	})
 
 	// Get some often used elements
-	cy.get('.tables-content-widget > .options').as('options')
-	cy.get('.tables-content-widget .NcTable table').as('table')
+	cy.get('[data-cy="contentReferenceWidget"] .options').as('options')
+	cy.get('[data-cy="contentReferenceWidget"] .NcTable table').as('table')
 	cy.get('@table').find('tbody tr[data-cy="customTableRow"]').as('rows')
 }

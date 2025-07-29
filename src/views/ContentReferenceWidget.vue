@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div v-if="richObject" class="tables-content-widget">
+	<div v-if="richObject" class="tables-content-widget" data-cy="contentReferenceWidget">
 		<div class="header">
 			<h2>
 				<NcLoadingIcon v-if="!rows || rows.length === 0" :size="30" />

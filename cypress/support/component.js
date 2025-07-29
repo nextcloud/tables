@@ -4,8 +4,12 @@
  */
 import { mount } from 'cypress/vue2'
 import { translate as t, translatePlural as n } from '@nextcloud/l10n'
-import store from '../../src/store/store.js'
-import data from '../../src/store/data.js'
+import { createPinia, PiniaVuePlugin } from 'pinia'
+import Vue from 'vue'
+Vue.use(PiniaVuePlugin)
+const pinia = createPinia()
+
+import '../styleguide/global.requires.js'
 
 // Styles necessary for rendering the component
 import '../styleguide/assets/default.css'
@@ -13,13 +17,11 @@ import '../styleguide/assets/additional.css'
 import '../styleguide/assets/icons.css'
 
 const prepareOptions = (options = {}) => {
-	store.data = data
-
 	const defaultOptions = {
+		pinia,
 		extensions: {
 			mixins: [
 				{ methods: { t, n } },
-				{ store, },
 			],
 			plugins: [],
 			components: {},
