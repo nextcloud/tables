@@ -9,7 +9,7 @@
 		size="large"
 		@closing="actionCancel">
 		<div class="modal__content" @keydown="onKeydown">
-			<div v-for="column in editableColumns" :key="column.id">
+			<div v-for="column in nonMetaColumns" :key="column.id">
 				<ColumnFormComponent
 					:column="column"
 					:value.sync="localRow[column.id]" />
@@ -106,16 +106,14 @@ export default {
 		showDeleteButton() {
 			return this.canDeleteData(this.element) && !this.localLoading
 		},
-		editableColumns() {
-			return this.columns
-				.filter(col => col.id >= 0)
-				.filter(col => !col.readonly)
+		nonMetaColumns() {
+			return this.columns.filter(col => col.id >= 0)
 		},
 		hasEmptyMandatoryRows() {
 			return this.checkMandatoryFields(this.localRow)
 		},
 		hasInvalidUrlProtocol() {
-			return this.editableColumns.some(col => col.type === 'text-link' && !this.isValidUrlProtocol(this.localRow[col.id]))
+			return this.nonMetaColumns.some(col => col.type === 'text-link' && !this.isValidUrlProtocol(this.localRow[col.id]))
 		},
 	},
 	watch: {
@@ -183,7 +181,6 @@ export default {
 		},
 		reset() {
 			this.localRow = {}
-			this.dataLoaded = false
 			this.prepareDeleteRow = false
 		},
 		actionDeleteRow() {

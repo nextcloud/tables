@@ -9,7 +9,7 @@
 		data-cy="createRowModal"
 		@closing="actionCancel">
 		<div class="modal__content" @keydown="onKeydown">
-			<div v-for="column in editableColumns" :key="column.id" :data-cy="column.title">
+			<div v-for="column in nonMetaColumns" :key="column.id" :data-cy="column.title">
 				<ColumnFormComponent
 					:column="column"
 					:value.sync="row[column.id]" />
@@ -86,16 +86,14 @@ export default {
 		}
 	},
 	computed: {
-		editableColumns() {
-			return this.columns
-				.filter(col => col.id >= 0)
-				.filter(col => !col.readonly)
+		nonMetaColumns() {
+			return this.columns.filter(col => col.id >= 0)
 		},
 		hasEmptyMandatoryRows() {
 			return this.checkMandatoryFields(this.row)
 		},
 		hasInvalidUrlProtocol() {
-			return this.editableColumns.some(col => col.type === 'text-link' && !this.isValidUrlProtocol(this.row[col.id]))
+			return this.nonMetaColumns.some(col => col.type === 'text-link' && !this.isValidUrlProtocol(this.row[col.id]))
 		},
 	},
 	watch: {

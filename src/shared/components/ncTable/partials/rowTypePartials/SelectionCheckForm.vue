@@ -4,7 +4,11 @@
 -->
 <template>
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description">
-		<NcCheckboxRadioSwitch type="switch" :checked.sync="localValue" data-cy="selectionCheckFormSwitch" />
+		<NcCheckboxRadioSwitch
+			type="switch"
+			:checked.sync="localValue"
+			:disabled="column.readonly"
+			data-cy="selectionCheckFormSwitch" />
 	</RowFormWrapper>
 </template>
 
