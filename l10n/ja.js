@@ -394,7 +394,6 @@ OC.L10N.register(
     "Select" : "選択",
     "Insert" : "挿入する",
     "Could not load search results." : "検索結果を読み込めませんでした。",
-    "Search for table and views..." : "テーブルとビューを検索...",
     "Could not remove share." : "共有を削除できませんでした。",
     "Filter operator" : "フィルター 演算子",
     "Contains" : "　を含む",

@@ -516,7 +516,6 @@ OC.L10N.register(
     "Select" : "Roghnaigh",
     "Insert" : "cuir isteach",
     "Could not load search results." : "Níorbh fhéidir torthaí cuardaigh a lódáil.",
-    "Search for table and views..." : "Cuardaigh tábla agus radharcanna...",
     "Invalid protocol. Allowed: {allowed}" : "Prótacal neamhbhailí. Ceadaithe: {allowed}",
     "Import into Tables" : "Iompórtáil isteach i dTáblaí",
     "Could not create share." : "Níorbh fhéidir sciar a chruthú.",

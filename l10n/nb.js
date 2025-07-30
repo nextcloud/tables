@@ -491,7 +491,6 @@ OC.L10N.register(
     "Select" : "Velg",
     "Insert" : "Sett inn",
     "Could not load search results." : "Kunne ikke laste søkeresultater.",
-    "Search for table and views..." : "Søk etter tabell og visninger...",
     "Import into Tables" : "Importer til Tables",
     "Could not create share." : "Kunne ikke opprette deling.",
     "Could not remove share." : "Kunne ikke fjerne deling.",

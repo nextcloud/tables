@@ -471,7 +471,6 @@ OC.L10N.register(
     "Select" : "Valitse",
     "Insert" : "Lisää",
     "Could not load search results." : "Hakutuloksia ei voitu ladata.",
-    "Search for table and views..." : "Etsi taulukkoa ja näkymiä...",
     "Import into Tables" : "Tuo Taulukohin",
     "Could not create share." : "Jakoa ei voitu luoda.",
     "Could not remove share." : "Jakoa ei voitu poistaa.",

@@ -516,7 +516,6 @@ OC.L10N.register(
     "Select" : "Selecionar",
     "Insert" : "Colar",
     "Could not load search results." : "Não foi possível carregar resultados da pesquisa.",
-    "Search for table and views..." : "Pesquisar tabela e visualizações…",
     "Invalid protocol. Allowed: {allowed}" : "Protocolo inválido. Permitido: {allowed}",
     "Import into Tables" : "Importar para Tabelas",
     "Could not create share." : "Não foi possível criar compartilhamento.",

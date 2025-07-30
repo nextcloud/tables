@@ -484,7 +484,6 @@ OC.L10N.register(
     "Select" : "Välj",
     "Insert" : "Infoga",
     "Could not load search results." : "Det gick inte att läsa in sökresultat.",
-    "Search for table and views..." : "Sök efter tabell och vyer...",
     "Invalid protocol. Allowed: {allowed}" : "Ogiltigt protokoll. Tillåtet: {allowed}",
     "Import into Tables" : "Importera till Tabeller",
     "Could not create share." : "Kunde inte skapa delning.",

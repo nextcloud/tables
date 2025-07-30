@@ -486,7 +486,6 @@ OC.L10N.register(
     "Select" : "تاللاڭ",
     "Insert" : "قىستۇر",
     "Could not load search results." : "ئىزدەش نەتىجىسىنى يۈكلىيەلمىدى.",
-    "Search for table and views..." : "جەدۋەل ۋە كۆرۈنۈشلەرنى ئىزدەڭ ...",
     "Import into Tables" : "جەدۋەلگە ئەكىرىش",
     "Could not create share." : "ئورتاقلىشالمىدى.",
     "Could not remove share." : "ھەمبەھىرنى ئۆچۈرەلمىدى.",

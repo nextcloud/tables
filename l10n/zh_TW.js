@@ -516,7 +516,6 @@ OC.L10N.register(
     "Select" : "選取",
     "Insert" : "插入",
     "Could not load search results." : "無法載入搜尋結果。",
-    "Search for table and views..." : "搜尋表格與檢視……",
     "Invalid protocol. Allowed: {allowed}" : "無效的協定。允許：{allowed}",
     "Import into Tables" : "匯入至表格",
     "Could not create share." : "無法建立分享。",

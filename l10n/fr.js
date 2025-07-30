@@ -501,7 +501,6 @@ OC.L10N.register(
     "Select" : "Sélectionner",
     "Insert" : "Insérer",
     "Could not load search results." : "Impossible d'afficher les résultats de la recherche.",
-    "Search for table and views..." : "Rechercher des tableaux et vues...",
     "Import into Tables" : "Importer dans Tables",
     "Could not create share." : "Impossible de créer le partage.",
     "Could not remove share." : "Impossible de supprimer le partage.",

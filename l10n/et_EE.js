@@ -452,7 +452,6 @@ OC.L10N.register(
     "Select" : "Vali",
     "Insert" : "Lisa",
     "Could not load search results." : "Otsingutulemuste laadimine ei õnnestunud.",
-    "Search for table and views..." : "Otsi tabeleid ja vaateid...",
     "Invalid protocol. Allowed: {allowed}" : "Vigane protokoll. Lubatud on: {allowed}",
     "Import into Tables" : "Impordi tabelrakendusse",
     "Could not create share." : "Jagamise loomine ei õnnestunud.",

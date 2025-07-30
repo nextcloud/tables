@@ -33,6 +33,7 @@ OC.L10N.register(
     "Clear filter" : "Ачысціць фільтр",
     "No recommendations. Start typing." : "Няма рэкамендацый. Пачніце друкаваць.",
     "Copy to clipboard" : "Капіяваць у буфер абмену",
+    "Read" : "Чытаць",
     "Searching …" : "Пошук …",
     "Error" : "Памылка",
     "Download" : "Спампаваць",

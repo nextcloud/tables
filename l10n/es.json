@@ -511,7 +511,6 @@
     "Select" : "Seleccionar",
     "Insert" : "Insertar",
     "Could not load search results." : "No se pudieron cargar los resultados de la búsqueda.",
-    "Search for table and views..." : "Buscar tablas y vistas...",
     "Invalid protocol. Allowed: {allowed}" : "Protocolo inválido. Permitido: {allowed}",
     "Import into Tables" : "Importar en Tablas",
     "Could not create share." : "No se pudo crear el recurso compartido.",

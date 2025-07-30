@@ -421,7 +421,6 @@ OC.L10N.register(
     "Select" : "Επιλογή",
     "Insert" : "Εισαγωγή",
     "Could not load search results." : "Δεν ήταν δυνατή η φόρτωση των αποτελεσμάτων αναζήτησης.",
-    "Search for table and views..." : "Αναζήτηση για πίνακες και προβολές...",
     "Could not create share." : "Δεν ήταν δυνατή η δημιουργία κοινής χρήσης.",
     "Could not remove share." : "Δεν ήταν δυνατή η αφαίρεση της κοινής χρήσης.",
     "Could not update share." : "Δεν ήταν δυνατή η ενημέρωση της κοινής χρήσης.",

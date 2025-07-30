@@ -331,7 +331,6 @@ OC.L10N.register(
     "Select" : "Выбрать",
     "Insert" : "Вставить",
     "Could not load search results." : "Не удалось загрузить результаты поиска.",
-    "Search for table and views..." : "Поиск таблиц и представлений...",
     "Contains" : "Содержит",
     "Begins with" : "Начинается с",
     "Ends with" : "Заканчивается на",

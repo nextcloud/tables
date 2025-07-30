@@ -395,7 +395,6 @@ OC.L10N.register(
     "Select" : "گزینش<br>",
     "Insert" : "Insert",
     "Could not load search results." : "Could not load search results.",
-    "Search for table and views..." : "Search for table and views...",
     "Could not create share." : "Could not create share.",
     "Could not remove share." : "Could not remove share.",
     "Could not update share." : "Could not update share.",

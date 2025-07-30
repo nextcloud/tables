@@ -513,7 +513,6 @@ OC.L10N.register(
     "Select" : "Seleccionar",
     "Insert" : "Inserir",
     "Could not load search results." : "Non foi posíbel cargar os resultados da busca.",
-    "Search for table and views..." : "Buscar táboas e vistas…",
     "Import into Tables" : "Importar en Táboas",
     "Could not create share." : "Non foi posíbel crear a compartición.",
     "Could not remove share." : "Non foi posíbel retirar a compartición.",
