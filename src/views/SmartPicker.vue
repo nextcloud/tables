@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="picker-content">
+	<div class="tables-smart-picker picker-content">
 		<h2 class="picker-title">
 			{{ t('tables', 'Nextcloud Tables') }}
 		</h2>
@@ -75,6 +75,13 @@ import { generateUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 import displayError from '../shared/utils/displayError.js'
 import { useTablesStore } from '../store/store.js'
+import { useDataStore } from '../store/data.js'
+import { createPinia, setActivePinia } from 'pinia'
+import LinkReferenceWidget from './LinkReferenceWidget.vue'
+import ContentReferenceWidget from './ContentReferenceWidget.vue'
+
+const pinia = createPinia()
+setActivePinia(pinia)
 
 export default {
 
@@ -87,14 +94,9 @@ export default {
 		Search,
 		NcCheckboxRadioSwitch,
 		NcButton,
-		LinkReferenceWidget: import('./LinkReferenceWidget.vue'),
-		ContentReferenceWidget: import('./ContentReferenceWidget.vue'),
+		LinkReferenceWidget,
+		ContentReferenceWidget,
 		NcLoadingIcon,
-	},
-
-	setup() {
-		const tablesStore = useTablesStore()
-		return { tablesStore }
 	},
 
 	data() {
@@ -102,7 +104,20 @@ export default {
 			renderMode: 'link', // { link, content }
 			value: null,
 			previewLoading: false,
-			richObject: {},
+			richObject: {
+				emoji: '',
+				link: '',
+				ownerDisplayName: '',
+				ownership: '',
+				rowsCount: 0,
+				title: '',
+				type: '',
+				id: '',
+				columns: [],
+				rows: [],
+			},
+			tablesStore: null,
+			dataStore: null,
 		}
 	},
 
@@ -128,15 +143,8 @@ export default {
 	},
 
 	async mounted() {
-		if (!this.tablesStore) {
-			const { default: store } = await import(
-				'../store/store.js')
-			const { default: data } = await import(
-				'../store/data.js')
-
-			this.tablesStore = store
-			this.tablesStore.data = data
-		}
+		this.tablesStore = useTablesStore()
+		this.dataStore = useDataStore()
 	},
 
 	methods: {
@@ -151,22 +159,24 @@ export default {
 
 				this.previewLoading = false
 			} else {
-				delete this.richObject.rows
-				delete this.richObject.columns
+				this.$delete(this.richObject, 'rows')
+				this.$delete(this.richObject, 'columns')
 			}
 		},
 		selectReference() {
 			this.$emit('submit', this.getLink)
 		},
 		updateRichObject() {
-			this.richObject.emoji = this.value.emoji
-			this.richObject.link = this.getLink
-			this.richObject.ownerDisplayName = this.value.ownerDisplayName
-			this.richObject.ownership = this.value.owner
-			this.richObject.rowsCount = this.value.rowsCount
-			this.richObject.title = this.value.label
-			this.richObject.type = this.value.type
-			this.richObject.id = this.value.value
+			if (!this.value) return
+
+			this.$set(this.richObject, 'emoji', this.value.emoji)
+			this.$set(this.richObject, 'link', this.getLink)
+			this.$set(this.richObject, 'ownerDisplayName', this.value.ownerDisplayName)
+			this.$set(this.richObject, 'ownership', this.value.owner)
+			this.$set(this.richObject, 'rowsCount', this.value.rowsCount)
+			this.$set(this.richObject, 'title', this.value.label)
+			this.$set(this.richObject, 'type', this.value.type)
+			this.$set(this.richObject, 'id', this.value.value)
 		},
 		async loadColumnsForContentPreview() {
 			if (this.value === null) {
@@ -175,8 +185,7 @@ export default {
 
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/api/1/' + this.value.type + 's/' + this.value.value + '/columns'))
-				console.debug('columns from BE', res.data)
-				this.richObject.columns = res.data
+				this.$set(this.richObject, 'columns', res.data)
 			} catch (e) {
 				displayError(e, t('tables', 'Could not fetch columns for content preview.'))
 			}
@@ -188,8 +197,7 @@ export default {
 
 			try {
 				const res = await axios.get(generateUrl('/apps/tables/row/' + this.value.type + '/' + this.value.value))
-				console.debug('rows from BE', res.data)
-				this.richObject.rows = res.data
+				this.$set(this.richObject, 'rows', res.data)
 			} catch (e) {
 				displayError(e, t('tables', 'Could not fetch rows for content preview.'))
 			}
@@ -198,79 +206,3 @@ export default {
 
 }
 </script>
-<style scoped lang="scss">
-
-	.picker-content {
-		width: 100%;
-		min-height: 350px;
-		display: flex;
-		flex-direction: column;
-		overflow-y: auto;
-		padding: 0 16px 16px 16px;
-	}
-
-	.picker-content > h2 {
-		margin: 12px 0;
-		text-align: center;
-	}
-
-	h3 {
-		margin: 0;
-	}
-
-	.space-B {
-		margin-bottom: calc(var(--default-grid-baseline) * 4);
-	}
-
-	.space-T {
-		margin-top: calc(var(--default-grid-baseline) * 2);
-	}
-
-	table {
-		width: 100%;
-	}
-
-	table th, table td {
-		border: none !important;
-		width: 50%;
-		padding-left: calc(var(--default-grid-baseline) * 2);
-		padding-right: calc(var(--default-grid-baseline) * 2);
-	}
-
-	.radio {
-		display: flex;
-	}
-
-	.radio > span {
-		padding-right: calc(var(--default-grid-baseline) * 6);
-	}
-
-	.radio label .material-design-icon {
-		padding-right: calc(var(--default-grid-baseline) * 1);
-	}
-
-	.select-button {
-		bottom: 0;
-		width: 100%;
-		display: flex;
-		align-items: end;
-		flex-direction: column;
-		position:sticky;
-	}
-
-	.selection-wrapper {
-		width: 100%;
-	}
-
-	.selection-wrapper .selection {
-		margin-left: auto;
-		margin-right: auto;
-		width: 550px;
-	}
-
-	.preview {
-		border: 2px solid var(--color-border);
-		border-radius: var(--border-radius-large);
-	}
-
-</style>

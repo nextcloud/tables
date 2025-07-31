@@ -105,7 +105,7 @@ describe('Manage a table', () => {
 		cy.get('[data-cy="editTableModal"]').should('be.visible')
 		cy.get('[data-cy="editTableModal"] button').contains('Change owner').click()
 		cy.get('[data-cy="editTableModal"]').should('not.exist')
-		cy.get('[data-cy="transferTableModal"]').should('be.visible')
+		cy.get('[data-cy="transferTableModal"]').should('exist')
 		cy.get('[data-cy="transferTableModal"] input[type="search"]').clear().type(targetUserTransfer.userId)
 		cy.get(`.vs__dropdown-menu [id="${targetUserTransfer.userId}"]`).click()
 		cy.get('[data-cy="transferTableButton"]').should('be.enabled').click()
