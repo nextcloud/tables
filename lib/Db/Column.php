@@ -59,6 +59,8 @@ use OCA\Tables\ResponseDefinitions;
  * @method setTextAllowedPattern(?string $textAllowedPattern)
  * @method getTextMaxLength(): int
  * @method setTextMaxLength(?int $textMaxLength)
+ * @method getTextUnique(): bool
+ * @method setTextUnique(?bool $textUnique)
  * @method getSelectionOptions(): string
  * @method getSelectionDefault(): string
  * @method setSelectionOptions(?string $selectionOptionsArray)
@@ -125,6 +127,7 @@ class Column extends EntitySuper implements JsonSerializable {
 	protected ?string $textDefault = null;
 	protected ?string $textAllowedPattern = null;
 	protected ?int $textMaxLength = null;
+	protected ?bool $textUnique = null;
 
 	// type selection
 	protected ?string $selectionOptions = null;
@@ -160,6 +163,7 @@ class Column extends EntitySuper implements JsonSerializable {
 
 		// type text
 		$this->addType('textMaxLength', 'integer');
+		$this->addType('textUnique', 'boolean');
 
 		// // type usergroup
 		$this->addType('usergroupMultipleItems', 'boolean');
@@ -189,6 +193,7 @@ class Column extends EntitySuper implements JsonSerializable {
 		$column->setTextDefault($data->getTextDefault());
 		$column->setTextAllowedPattern($data->getTextAllowedPattern());
 		$column->setTextMaxLength($data->getTextMaxLength());
+		$column->setTextUnique($data->getTextUnique());
 		$column->setNumberDefault($data->getNumberDefault());
 		$column->setNumberMin($data->getNumberMin());
 		$column->setNumberMax($data->getNumberMax());
@@ -266,6 +271,7 @@ class Column extends EntitySuper implements JsonSerializable {
 			'textDefault' => $this->textDefault,
 			'textAllowedPattern' => $this->textAllowedPattern,
 			'textMaxLength' => $this->textMaxLength,
+			'textUnique' => $this->textUnique,
 
 			// type selection
 			'selectionOptions' => $this->getSelectionOptionsArray(),

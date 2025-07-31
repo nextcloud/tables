@@ -177,6 +177,7 @@ export default {
 				textDefault: '',
 				textAllowedPattern: '',
 				textMaxLength: null,
+				textUnique: false,
 				selectionOptions: null,
 				selectionDefault: null,
 				datetimeDefault: '',
@@ -321,6 +322,10 @@ export default {
 				viewId: this.isView ? this.element.id : null,
 				tableId: !this.isView ? this.element.id : null,
 			}
+			if (this.combinedType === ColumnTypes.TextLine) {
+				data.textUnique = this.column.textUnique
+			}
+
 			if (this.combinedType === ColumnTypes.TextLine || this.combinedType === ColumnTypes.TextLong) {
 				data.textDefault = this.column.textDefault
 				data.textMaxLength = this.column.textMaxLength
@@ -395,6 +400,7 @@ export default {
 				textDefault: '',
 				textAllowedPattern: '',
 				textMaxLength: null,
+				textUnique: false,
 				selectionOptions: null,
 				selectionDefault: null,
 				datetimeDefault: '',
