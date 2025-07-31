@@ -31,6 +31,8 @@
 					:selected="isRowSelected(row?.id)"
 					:view-setting.sync="localViewSetting"
 					:config="config"
+					:element-id="elementId"
+					:is-view="isView"
 					@update-row-selection="updateRowSelection"
 					@edit-row="rowId => $emit('edit-row', rowId)" />
 				<tr />
@@ -535,6 +537,26 @@ export default {
 			.preview [data-node-view-content] {
 				display: none;
 			}
+		}
+
+		// inline editing
+		.inline-editing-container {
+			position: relative;
+			width: 100%;
+
+			.cell-input {
+				width: 100%;
+				height: 100%;
+				border-radius: 0;
+				padding: 4px 8px;
+			}
+		}
+
+		.icon-loading-inline {
+			position: absolute;
+			right: 8px;
+			top: 50%;
+			transform: translateY(-50%);
 		}
 
 		tr:focus-within > td:last-child {

@@ -195,7 +195,7 @@ describe('Manage a context', () => {
         cy.fillInValueTextLine('title', 'first row')
         cy.get('[data-cy="createRowSaveButton"]').click()
         cy.get('[data-cy="ncTable"] table').contains('first row').should('exist')
-        cy.get('[data-cy="ncTable"] table').contains('first row').parent().parent().find('[aria-label="Edit row"]').click()
+        cy.get('[data-cy="ncTable"] [data-cy="customTableRow"]').contains('first row').closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
 		cy.get('[data-cy="editRowDeleteButton"]').click()
 		cy.get('[data-cy="editRowDeleteConfirmButton"]').click()
         cy.get('[data-cy="ncTable"] table').contains('first row').should('not.exist')
