@@ -68,6 +68,7 @@
     "Failed" : "Imeshindwa",
     "Transfer" : "Hamisha",
     "Filter" : "Chujio",
+    "Sort" : "Panga",
     "Export" : "Safirisha",
     "Add to favorites" : "Ongeza kwenye pendwa",
     "Remove from favorites" : "Ondoa kutoka katika pendwa",
@@ -124,6 +125,7 @@
     "Confirm" : "Thibitisha",
     "Select" : "Chagua",
     "Unchecked" : "Haijaangaliwa",
+    "Now" : "Sasa",
     "ID" : "Kitambulisho",
     "Clipboard is not available" : "Ubao wa kunakili haupatikani"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"

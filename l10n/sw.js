@@ -70,6 +70,7 @@ OC.L10N.register(
     "Failed" : "Imeshindwa",
     "Transfer" : "Hamisha",
     "Filter" : "Chujio",
+    "Sort" : "Panga",
     "Export" : "Safirisha",
     "Add to favorites" : "Ongeza kwenye pendwa",
     "Remove from favorites" : "Ondoa kutoka katika pendwa",
@@ -126,6 +127,7 @@ OC.L10N.register(
     "Confirm" : "Thibitisha",
     "Select" : "Chagua",
     "Unchecked" : "Haijaangaliwa",
+    "Now" : "Sasa",
     "ID" : "Kitambulisho",
     "Clipboard is not available" : "Ubao wa kunakili haupatikani"
 },

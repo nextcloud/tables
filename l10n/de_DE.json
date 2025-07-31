@@ -514,6 +514,7 @@
     "Select" : "Auswählen",
     "Insert" : "Einfügen",
     "Could not load search results." : "Suchergebnisse konnten nicht geladen werden.",
+    "Search for tables and views..." : "Suche nach Tabellen und Ansichten…",
     "Invalid protocol. Allowed: {allowed}" : "Ungültiges Protokoll. Zugelassen ist: {allowed}",
     "Import into Tables" : "In Tabellen importieren",
     "Could not create share." : "Freigabe konnte nicht erstellt werden.",

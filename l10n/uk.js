@@ -516,6 +516,7 @@ OC.L10N.register(
     "Select" : "Вибрати",
     "Insert" : "Вставити",
     "Could not load search results." : "Не вдалося завантажити результати пошуку.",
+    "Search for tables and views..." : "Пошук таблиць і переглядів...",
     "Invalid protocol. Allowed: {allowed}" : "Недійсний протокол. Дозволено: {allowed}",
     "Import into Tables" : "Імпортувати до Таблиць",
     "Could not create share." : "Не вдалося створити спільний ресурс.",
