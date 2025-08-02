@@ -8,6 +8,7 @@
 namespace OCA\Tables\Db;
 
 use DateTime;
+use OCA\Tables\Constants\UsergroupType;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Helper\ColumnsHelper;
@@ -308,12 +309,11 @@ class Row2Mapper {
 		}
 	}
 
-
 	private function replacePlaceholderValues(array &$filters, string $userId): void {
 		foreach ($filters as &$filterGroup) {
 			foreach ($filterGroup as &$filter) {
 				if (substr($filter['value'], 0, 1) === '@') {
-					$filter['value'] = $this->columnsHelper->resolveSearchValue($filter['value'], $userId);
+					$filter['value'] = $this->columnsHelper->resolveSearchValue($filter['value'], $userId, $this->columnMapper->find($filter['columnId']));
 				}
 			}
 		}
@@ -371,7 +371,7 @@ class Row2Mapper {
 	/**
 	 * @throws InternalError
 	 */
-	private function getFilterExpression(IQueryBuilder $qb, Column $column, string $operator, string $value): IQueryBuilder {
+	private function getFilterExpression(IQueryBuilder $qb, Column $column, string $operator, string|array $value): IQueryBuilder {
 		$paramType = $this->getColumnDbParamType($column);
 		$value = $this->getCellMapper($column)->filterValueToQueryParam($column, $value);
 
@@ -401,6 +401,30 @@ class Row2Mapper {
 				$filterExpression = $qb->expr()->like('value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value), $paramType));
 				break;
 			case 'contains':
+				$filterExpressions = [];
+				if (is_array($value) && $column->getType() === Column::TYPE_USERGROUP) {
+					$filterExpressions[] = $qb2->expr()->andX(
+						$qb->expr()->eq('value', $qb->createNamedParameter($value[UsergroupType::USER])),
+						$qb->expr()->eq('value_type', $qb->createNamedParameter(UsergroupType::USER, IQueryBuilder::PARAM_INT))
+					);
+					if (!empty($value[UsergroupType::GROUP])) {
+						$filterExpressions[] = $qb2->expr()->andX(
+							$qb->expr()->in('value', $qb->createNamedParameter($value[UsergroupType::GROUP], IQueryBuilder::PARAM_STR_ARRAY)),
+							$qb->expr()->eq('value_type', $qb->createNamedParameter(UsergroupType::GROUP, IQueryBuilder::PARAM_INT))
+						);
+					}
+					if (!empty($value[UsergroupType::CIRCLE])) {
+						$filterExpressions[] = $qb2->expr()->andX(
+							$qb->expr()->in('value', $qb->createNamedParameter($value[UsergroupType::CIRCLE], IQueryBuilder::PARAM_STR_ARRAY)),
+							$qb->expr()->eq('value_type', $qb->createNamedParameter(UsergroupType::CIRCLE, IQueryBuilder::PARAM_INT))
+						);
+					}
+					$filterExpression = $qb2->expr()->orX(...$filterExpressions);
+					$includeDefault = false;
+
+					break;
+				}
+
 				$includeDefault = str_contains($defaultValue, $value);
 				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
 					$value = str_replace(['"', '\''], '', $value);
