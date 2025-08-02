@@ -394,7 +394,6 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-
 :deep(.vs__clear) {
 	display: none;
 }
@@ -509,6 +508,11 @@ export default {
 			text-align: left;
 			vertical-align: middle;
 			border: 1px solid var(--color-border-dark);
+		}
+
+		td > div {
+			max-height: 200px;
+			overflow-y: auto;
 		}
 
 		tr:active, tr:hover, tr:focus, tr:hover .editor-wrapper .editor {

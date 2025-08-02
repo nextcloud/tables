@@ -13,6 +13,7 @@
 					<MainForm :description.sync="column.description"
 						:mandatory.sync="column.mandatory"
 						:title.sync="column.title"
+						:custom-settings.sync="column.customSettings"
 						:selected-views.sync="column.selectedViews"
 						:title-missing-error="titleMissingError" />
 				</div>
@@ -186,6 +187,7 @@ export default {
 				usergroupSelectGroups: false,
 				usergroupSelectTeams: false,
 				showUserStatus: false,
+				customSettings: {},
 			},
 			textAppAvailable: !!window.OCA?.Text?.createEditor,
 			addNewAfterSave: false,
@@ -286,6 +288,11 @@ export default {
 			if (!this.column.title) {
 				showInfo(t('tables', 'Please insert a title for the new column.'))
 				this.titleMissingError = true
+			} else if (this.column.customSettings?.width
+				&& (this.column.customSettings?.width < 20 || this.column.customSettings?.width > 1000)) {
+				this.titleMissingError = false
+				showError(t('tables', 'Cannot save column. Column width must be between {min} and {max}.', { min: 20, max: 1000 }))
+				this.typeMissingError = true
 			} else if (this.column.type === null) {
 				this.titleMissingError = false
 				showInfo(t('tables', 'You need to select a type for the new column.'))
@@ -320,7 +327,10 @@ export default {
 				mandatory: this.column.mandatory,
 				viewId: this.isView ? this.element.id : null,
 				tableId: !this.isView ? this.element.id : null,
+				customSettings: this.column.customSettings,
 			}
+			data.customSettings = { width: data.customSettings.width }
+
 			if (this.combinedType === ColumnTypes.TextLine || this.combinedType === ColumnTypes.TextLong) {
 				data.textDefault = this.column.textDefault
 				data.textMaxLength = this.column.textMaxLength
@@ -404,6 +414,7 @@ export default {
 				usergroupSelectGroups: false,
 				usergroupSelectTeams: false,
 				showUserStatus: false,
+				customSettings: {},
 			}
 			if (mainForm) {
 				this.column.title = ''
