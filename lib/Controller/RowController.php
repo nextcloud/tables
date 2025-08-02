@@ -17,25 +17,15 @@ use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
 class RowController extends Controller {
-	/** @var RowService */
-	private RowService $service;
-
-	/** @var string */
-	private string $userId;
-
-	protected LoggerInterface $logger;
-
 	use Errors;
 
 	public function __construct(
 		IRequest $request,
-		LoggerInterface $logger,
-		RowService $service,
-		string $userId) {
+		protected LoggerInterface $logger,
+		private RowService $service,
+		private ?string $userId,
+	) {
 		parent::__construct(Application::APP_ID, $request);
-		$this->logger = $logger;
-		$this->service = $service;
-		$this->userId = $userId;
 	}
 
 	#[NoAdminRequired]
