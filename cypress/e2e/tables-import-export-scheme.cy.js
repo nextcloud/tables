@@ -67,7 +67,7 @@ describe('Import Export Scheme', () => {
 				content.views = omitSubFields(content.columns, columnFieldsToIgnore)
 				content.tablesVersion = ''
 				expectedContent.tablesVersion = ''
-				expect(JSON.stringify(expectedContent)).to.eq(JSON.stringify(content))
+				expect(JSON.stringify(content, null, '  ')).to.eq(JSON.stringify(expectedContent, null, '  '))
 			})
 		})
 	})
