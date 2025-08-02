@@ -95,6 +95,7 @@ OC.L10N.register(
     "Options" : "Опции",
     "URL" : "Адреса",
     "Copy link" : "Копирај линк",
+    "Show fullscreen" : "Прикажи на цел екран",
     "Close editor" : "Затвори го уредникот",
     "Confirmation" : "Потврда",
     "Confirm" : "Потврди",
