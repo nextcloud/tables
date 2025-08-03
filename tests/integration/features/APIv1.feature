@@ -269,7 +269,7 @@ Feature: APIv1
       |         | new row     | 100     |
     When user imports file "update-rows.csv" into last created table
     Then import results have the following data
-      | found_columns_count    | 2 |
+      | found_columns_count    | 3 |
       | matching_columns_count | 2 |
       | created_columns_count  | 0 |
       | inserted_rows_count    | 1 |

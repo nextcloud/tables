@@ -33,7 +33,6 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
-use Throwable;
 use TypeError;
 use function file_exists;
 use function is_string;
@@ -185,7 +184,7 @@ class ImportService extends SuperService {
 				$colIndex = $cellIterator->getCurrentColumnIndex() - 1;
 				$column = $this->columns[$colIndex];
 
-				if (!array_key_exists($colIndex, $this->columns)) {
+				if (!array_key_exists($colIndex, $columns)) {
 					continue;
 				}
 
@@ -421,7 +420,7 @@ class ImportService extends SuperService {
 				}
 
 				$columnKey = $i;
-				if ($this->idColumnIndex !== null && $i > $this->idColumnIndex) {
+				if ($this->columnsConfig && $this->idColumnIndex !== null && $i > $this->idColumnIndex) {
 					// if we have an ID column, we need to adjust the index
 					$columnKey = $i - 1;
 				}
@@ -557,6 +556,8 @@ class ImportService extends SuperService {
 
 				if (!$this->columnsConfig && mb_strtolower($title) === Column::META_ID_TITLE) {
 					$this->idColumnIndex = $index;
+					$titles[] = $title;
+					$dataTypes[] = ['type' => Column::TYPE_META_ID];
 					$secondRowCellIterator->next();
 					$index++;
 					continue;
