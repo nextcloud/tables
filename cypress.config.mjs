@@ -53,6 +53,7 @@ export default defineConfig({
 			}))
 			return config
 		},
+		experimentalSourceRewriting: true,
 		viewportWidth: 800,
 		viewportHeight: 600,
 	},
