@@ -67,12 +67,13 @@
     "@nextcloud/eslint-config": "^8.4.2",
     "@nextcloud/stylelint-config": "^3.1.0",
     "@nextcloud/vite-config": "^1.5.6",
+    "@vitejs/plugin-vue2": "^2.3.3",
     "@vue/tsconfig": "^0.5.1",
     "cypress": "^13.6.4",
     "cypress-downloadfile": "^1.2.4",
+    "cypress-vite": "^1.6.0",
     "openapi-typescript": "^7.8.0",
-    "typescript": "^5.3.3",
-    "cypress-vite": "^1.6.0"
+    "typescript": "^5.3.3"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "^4.46.1"
