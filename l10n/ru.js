@@ -317,6 +317,7 @@ OC.L10N.register(
     "Please select a new time" : "Пожалуйста, выберите новое время",
     "Url" : "URL",
     "Copy link" : "Копировать ссылку",
+    "Open link" : "Открыть ссылку",
     "Close editor" : "Закрыть редактор",
     "Go to first page" : "Перейти на первую страницу",
     "Go to previous page" : "Перейти к предыдущей странице",
