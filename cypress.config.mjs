@@ -45,6 +45,11 @@ export default defineConfig({
 		devServer: {
 			framework: 'vue',
 			bundler: 'vite',
+			viteConfig: {
+				optimizeDeps: {
+					exclude: ['vite-plugin-node-polyfills'],
+				},
+			},
 		},
 		setupNodeEvents(on, config) {
 			on('file:preprocessor', vitePreprocessor({
@@ -53,7 +58,6 @@ export default defineConfig({
 			}))
 			return config
 		},
-		experimentalSourceRewriting: true,
 		viewportWidth: 800,
 		viewportHeight: 600,
 	},
