@@ -3,43 +3,52 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div>
-		<RadioboxBlankIcon v-if="value !== null && value === 'false'" />
-		<CheckCircleOutline v-if="value !== null && value === 'true'" />
+	<div class="inline-editing-container">
+		<NcCheckboxRadioSwitch v-model="localValue" :loading="localLoading" type="switch" @update:modelValue="onToggle" />
 	</div>
 </template>
 
 <script>
-import RadioboxBlankIcon from 'vue-material-design-icons/RadioboxBlank.vue'
-import CheckCircleOutline from 'vue-material-design-icons/CheckCircleOutline.vue'
+import cellEditMixin from '../mixins/cellEditMixin.js'
+import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 
 export default {
 	name: 'TableCellYesNo',
 	components: {
-		RadioboxBlankIcon,
-		CheckCircleOutline,
+		NcCheckboxRadioSwitch,
 	},
+
+	mixins: [cellEditMixin],
+
 	props: {
-		column: {
-			type: Object,
-			default: () => {},
-		},
-		rowId: {
-			type: Number,
-			default: null,
-		},
 		value: {
 			type: String,
 			default: 'false',
 		},
 	},
+
+	data() {
+		return {
+			localValue: this.value === 'true',
+		}
+	},
+
+	watch: {
+		value(newValue) {
+			this.localValue = newValue === 'true'
+		},
+	},
+
+	methods: {
+		async onToggle() {
+			const response = await this.updateCellValue(this.localValue)
+			if (!response) {
+				this.localValue = !this.localValue // revert to previous value
+				return
+			}
+			this.isEditing = false
+			this.localLoading = false
+		},
+	},
 }
 </script>
-
-<style scoped>
-
-.wrapper {
-	padding-right: 10px;
-}
-
-</style>

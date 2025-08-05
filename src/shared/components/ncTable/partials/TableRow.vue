@@ -7,11 +7,16 @@
 		<td v-if="config.canSelectRows" :class="{sticky: config.canSelectRows}">
 			<NcCheckboxRadioSwitch :checked="selected" @update:checked="v => $emit('update-row-selection', { rowId: row.id, value: v })" />
 		</td>
-		<td v-for="col in visibleColumns" :key="col.id" :class="{ 'search-result': getCell(col.id)?.searchStringFound, 'filter-result': getCell(col.id)?.filterFound }">
+		<td v-for="col in visibleColumns"
+			:key="col.id"
+			:class="{ 'search-result': getCell(col.id)?.searchStringFound, 'filter-result': getCell(col.id)?.filterFound }"
+			@click="handleCellClick(col)">
 			<component :is="getTableCell(col)"
 				:column="col"
 				:row-id="row.id"
-				:value="getCellValue(col)" />
+				:value="getCellValue(col)"
+				:element-id="elementId"
+				:is-view="isView" />
 		</td>
 		<td v-if="config.showActions" :class="{sticky: config.showActions}">
 			<NcButton v-if="config.canEditRows || config.canDeleteRows" type="primary" :aria-label="t('tables', 'Edit row')" data-cy="editRowBtn" @click="$emit('edit-row', row.id)">
@@ -85,6 +90,14 @@ export default {
 			type: Object,
 			default: null,
 		},
+		elementId: {
+			type: Number,
+			default: null,
+		},
+		isView: {
+			type: Boolean,
+			default: true,
+		},
 	},
 	computed: {
 		getSelection: {
@@ -94,9 +107,30 @@ export default {
 		visibleColumns() {
 			return this.columns.filter(col => !this.viewSetting?.hiddenColumns?.includes(col.id))
 		},
+		// column types that don't support inline editing yet
+		// to be used to trigger the edit modal instead of inline editing
+		nonInlineEditableColumnTypes() {
+			return [
+				ColumnTypes.TextRich,
+				ColumnTypes.Usergroup,
+				ColumnTypes.SelectionMulti,
+				ColumnTypes.TextLink,
+				ColumnTypes.NumberStars,
+				ColumnTypes.Datetime,
+				ColumnTypes.DatetimeDate,
+				ColumnTypes.DatetimeTime,
+				ColumnTypes.Selection,
+			]
+		},
 	},
 	methods: {
 		t,
+		handleCellClick(column) {
+			// If the column type doesn't support inline editing, trigger the edit modal
+			if (this.nonInlineEditableColumnTypes.includes(column.type) && this.config.canEditRows) {
+				this.$emit('edit-row', this.row.id)
+			}
+		},
 		getTableCell(column) {
 			switch (column.type) {
 			case ColumnTypes.TextLine: return 'TableCellTextLine'
