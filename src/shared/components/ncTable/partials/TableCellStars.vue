@@ -70,12 +70,6 @@ export default {
 		},
 	},
 
-	data() {
-		return {
-			// No additional data needed
-		}
-	},
-
 	computed: {
 		getValue() {
 			const starEmpty = '☆'
