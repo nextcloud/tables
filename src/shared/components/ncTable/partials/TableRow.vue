@@ -114,9 +114,6 @@ export default {
 		nonInlineEditableColumnTypes() {
 			return [
 				ColumnTypes.TextRich,
-				ColumnTypes.Datetime,
-				ColumnTypes.DatetimeDate,
-				ColumnTypes.DatetimeTime,
 			]
 		},
 	},
