@@ -114,7 +114,6 @@ export default {
 				ColumnTypes.TextRich,
 				ColumnTypes.Usergroup,
 				ColumnTypes.SelectionMulti,
-				ColumnTypes.TextLink,
 				ColumnTypes.NumberStars,
 				ColumnTypes.Datetime,
 				ColumnTypes.DatetimeDate,
