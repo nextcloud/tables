@@ -42,7 +42,7 @@ OC.L10N.register(
     "Integration" : "Integrācija",
     "Total" : "Kopā",
     "Data" : "Dati",
-    "Import" : "Importēt",
+    "Import" : "Ievietot",
     "Type" : "Veids",
     "Time" : "Laiks",
     "Save" : "Saglabāt",
