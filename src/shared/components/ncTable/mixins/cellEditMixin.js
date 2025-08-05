@@ -62,6 +62,7 @@ export default {
 		},
 
 		async updateCellValue(newValue) {
+			console.log('Updating cell value', this.localLoading, newValue)
 			// Prevent multiple executions
 			if (this.localLoading) {
 				return false
@@ -74,6 +75,7 @@ export default {
 				value: newValue,
 			}]
 
+			console.log('Updating cell with data:', data)
 			const res = await this.updateRow({
 				id: this.rowId,
 				isView: this.isView,

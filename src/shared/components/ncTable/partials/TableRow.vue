@@ -111,15 +111,7 @@ export default {
 		// to be used to trigger the edit modal instead of inline editing
 		nonInlineEditableColumnTypes() {
 			return [
-				ColumnTypes.TextRich,
-				ColumnTypes.Usergroup,
-				ColumnTypes.SelectionMulti,
-				ColumnTypes.TextLink,
-				ColumnTypes.NumberStars,
-				ColumnTypes.Datetime,
-				ColumnTypes.DatetimeDate,
-				ColumnTypes.DatetimeTime,
-				ColumnTypes.Selection,
+				// TODO: remove these when inline editing is implemented
 			]
 		},
 	},
