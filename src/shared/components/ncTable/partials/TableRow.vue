@@ -111,7 +111,6 @@ export default {
 		// to be used to trigger the edit modal instead of inline editing
 		nonInlineEditableColumnTypes() {
 			return [
-				ColumnTypes.TextRich,
 				ColumnTypes.Usergroup,
 				ColumnTypes.SelectionMulti,
 				ColumnTypes.TextLink,
