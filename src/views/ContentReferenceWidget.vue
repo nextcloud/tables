@@ -6,8 +6,8 @@
 	<div v-if="richObject" class="tables-content-widget" data-cy="contentReferenceWidget">
 		<div class="header">
 			<h2>
-				<NcLoadingIcon v-if="!rows || rows.length === 0" :size="30" />
-				<span v-else>{{ richObject.emoji }}</span>&nbsp;{{ richObject.title }}
+				<NcLoadingIcon v-if="!rows" :size="30" />
+				<span v-else>{{ richObject.emoji }}</span> {{ richObject.title }}
 			</h2>
 			<Options
 				:config="tablePermissions"
