@@ -115,7 +115,6 @@ export default {
 			return [
 				ColumnTypes.TextRich,
 				ColumnTypes.SelectionMulti,
-				ColumnTypes.TextLink,
 				ColumnTypes.Datetime,
 				ColumnTypes.DatetimeDate,
 				ColumnTypes.DatetimeTime,
