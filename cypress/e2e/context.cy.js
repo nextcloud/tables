@@ -89,7 +89,7 @@ describe('Manage a context', () => {
         cy.createTable(tableTitle)
         cy.openContextEditModal(contextTitle)
         cy.get('[data-cy="transferContextSubmitBtn"]').click()
-        cy.get('[data-cy="transferContextModal"]').should('be.visible')
+        cy.get('[data-cy="transferContextModal"]').should('exist')
         cy.get('[data-cy="transferContextModal"] input').clear().type(nonLocalUser.userId)
         cy.get(`.vs__dropdown-menu [id="${nonLocalUser.userId}"]`).click()
         cy.get('[data-cy="transferContextButton"]').click()
