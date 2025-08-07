@@ -28,6 +28,10 @@ class SuperBusiness {
 		return json_encode($value);
 	}
 
+	public function parseDisplayValue($value, ?Column $column = null): string {
+		return $this->parseValue($value, $column);
+	}
+
 	/**
 	 * @param mixed $value
 	 * @param Column|null $column
@@ -35,6 +39,10 @@ class SuperBusiness {
 	 */
 	public function canBeParsed($value, ?Column $column = null): bool {
 		return true;
+	}
+
+	public function canBeParsedDisplayValue($value, ?Column $column = null): bool {
+		return $this->canBeParsed($value, $column);
 	}
 
 	protected function isValidDate(string $dateString, string $format): bool {
