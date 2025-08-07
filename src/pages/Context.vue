@@ -5,7 +5,13 @@
 <template>
 	<div class="row">
 		<div v-if="loading" class="icon-loading" />
-		<div v-if="!loading && context">
+
+		<div v-else-if="errorMessage" class="error-container">
+			<IconTables :size="64" style="margin-bottom: 1rem;" />
+			<p>{{ errorMessage }}</p>
+		</div>
+
+		<div v-else>
 			<div class="content context">
 				<div class="row first-row">
 					<h1 class="context__title" data-cy="context-title">
@@ -50,11 +56,13 @@ import exportTableMixin from '../shared/components/ncTable/mixins/exportTableMix
 import svgHelper from '../shared/components/ncIconPicker/mixins/svgHelper.js'
 import { useTablesStore } from '../store/store.js'
 import { useDataStore } from '../store/data.js'
+import IconTables from '../shared/assets/icons/IconTables.vue'
 
 export default {
 	components: {
 		MainModals,
 		NcIconSvgWrapper,
+		IconTables,
 		TableWrapper,
 		CustomView,
 	},
@@ -73,6 +81,7 @@ export default {
 			viewSetting: {},
 			context: null,
 			contextResources: [],
+			errorMessage: null,
 		}
 	},
 
@@ -146,49 +155,66 @@ export default {
 				return
 			}
 			this.loading = true
-			this.icon = await this.getContextIcon(this.activeContext.iconName)
 			this.contextResources = []
-			await this.loadContext({ id: this.activeContextId })
-			const index = this.contexts.findIndex(c => parseInt(c.id) === parseInt(this.activeContextId))
-			this.context = this.contexts[index]
 
-			if (this.context && this.context.nodes) {
-				for (const [, node] of Object.entries(this.context.nodes)) {
-					const nodeType = parseInt(node.node_type)
-					if (nodeType === NODE_TYPE_TABLE) {
-						const table = this.tables.find(table => table.id === node.node_id)
-						if (table) {
-							await this.loadColumnsFromBE({
-								view: null,
-								tableId: table.id,
-							})
-							await this.loadRowsFromBE({
-								viewId: null,
-								tableId: table.id,
-							})
-							table.key = (table.id).toString()
-							table.isView = false
-							this.contextResources.push(table)
-						}
+			try {
+				await this.loadContext({ id: this.activeContextId })
+				const index = this.contexts.findIndex(c => parseInt(c.id) === parseInt(this.activeContextId))
+				this.context = this.contexts[index]
 
-					} else if (nodeType === NODE_TYPE_VIEW) {
-						const view = this.views.find(view => view.id === node.node_id)
-						if (view) {
-							await this.loadColumnsFromBE({
-								view,
-							})
-							await this.loadRowsFromBE({
-								viewId: view.id,
-								tableId: view.tableId,
-							})
-							view.key = 'view-' + (view.id).toString()
-							view.isView = true
-							this.contextResources.push(view)
+				if (!this.context) {
+					this.errorMessage = t('tables', 'This application could not be found')
+					return
+				}
+
+				this.icon = await this.getContextIcon(this.activeContext.iconName)
+
+				if (this.context && this.context.nodes) {
+					for (const [, node] of Object.entries(this.context.nodes)) {
+						const nodeType = parseInt(node.node_type)
+						if (nodeType === NODE_TYPE_TABLE) {
+							const table = this.tables.find(table => table.id === node.node_id)
+							if (table) {
+								await this.loadColumnsFromBE({
+									view: null,
+									tableId: table.id,
+								})
+								await this.loadRowsFromBE({
+									viewId: null,
+									tableId: table.id,
+								})
+								table.key = (table.id).toString()
+								table.isView = false
+								this.contextResources.push(table)
+							}
+
+						} else if (nodeType === NODE_TYPE_VIEW) {
+							const view = this.views.find(view => view.id === node.node_id)
+							if (view) {
+								await this.loadColumnsFromBE({
+									view,
+								})
+								await this.loadRowsFromBE({
+									viewId: view.id,
+									tableId: view.tableId,
+								})
+								view.key = 'view-' + (view.id).toString()
+								view.isView = true
+								this.contextResources.push(view)
+							}
 						}
 					}
 				}
+			} catch (e) {
+				if (e.message === 'NOT_FOUND') {
+					this.errorMessage = t('tables', 'This application could not be found')
+				} else {
+					this.errorMessage = t('tables', 'An error occurred while loading the application')
+					console.error(e)
+				}
+			} finally {
+				this.loading = false
 			}
-			this.loading = false
 		},
 		createColumn(isView, element) {
 			emit('tables:column:create', { isView, element })
@@ -233,6 +259,26 @@ export default {
 	&:deep(.row.first-row) {
 		margin-left: 20px;
 		padding-left: 0px;
+	}
+}
+
+.error-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	padding: 2rem;
+	height: 100dvh;
+	min-height: 100%;
+	color: var(--color-text);
+	opacity: 0.6;
+
+	p {
+		font-size: clamp(1.2rem, 4vw, 2rem);
+		font-weight: 600;
+		max-width: 90%;
+		word-wrap: break-word;
 	}
 }
 </style>
