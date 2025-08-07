@@ -23,11 +23,24 @@
 					:checked="selectedColumns.includes(column.id)"
 					class="display-checkbox"
 					@update:checked="onToggle(column.id)" />
-				{{ column.title }}
+				<span :class="{ 'title-readonly': column.readonly }">{{ column.title }}</span>
 				<div v-if="column.id < 0" class="meta-info">
 					({{ t('tables', 'Metadata') }})
 				</div>
 			</div>
+
+			<div class="row-elements actions">
+				<NcActions v-if="column.id > 0" data-cy="customColumnAction">
+					<NcActionCheckbox
+						v-if="selectedColumns.includes(column.id)"
+						data-cy="columnReadonlyCheckbox"
+						:checked="column.readonly"
+						@change="onReadonlyChanged(column.id, $event.target.checked)">
+						{{ t('tables', 'Readonly') }}
+					</NcActionCheckbox>
+				</NcActions>
+			</div>
+
 			<div class="row-elements move">
 				<NcButton
 					:disabled="index === 0"
@@ -53,7 +66,7 @@
 </template>
 
 <script>
-import { NcButton, NcCheckboxRadioSwitch } from '@nextcloud/vue'
+import { NcActionCheckbox, NcActions, NcButton, NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import DragHorizontalVariant from 'vue-material-design-icons/DragHorizontalVariant.vue'
 import ArrowUp from 'vue-material-design-icons/ArrowUp.vue'
 import ArrowDown from 'vue-material-design-icons/ArrowDown.vue'
@@ -61,6 +74,8 @@ import ArrowDown from 'vue-material-design-icons/ArrowDown.vue'
 export default {
 	name: 'SelectedViewColumns',
 	components: {
+		NcActionCheckbox,
+		NcActions,
 		NcButton,
 		DragHorizontalVariant,
 		NcCheckboxRadioSwitch,
@@ -128,6 +143,12 @@ export default {
 			const item = this.mutableColumns[index]
 			this.mutableColumns.splice(index, 1)
 			this.mutableColumns.splice(index + direction, 0, item)
+		},
+		onReadonlyChanged(columnId, readonly) {
+			const column = this.mutableColumns.find(col => col.id === columnId)
+			if (column) {
+				column.readonly = readonly
+			}
 		},
 		async dragEnd(goalIndex) {
 			if (this.draggedItem === null) return
@@ -210,11 +231,19 @@ export default {
 	align-items: center;
 }
 
-.row-elements.move {
+.row-elements .title-readonly {
+  opacity: 0.6;
+}
+
+.row-elements.move, .row-elements.actions {
 	display: none;
 }
 
-.column-entry:hover .row-elements.move, .column-entry:focus-within .row-elements.move {
+.row-elements.actions {
+	margin-left: auto;
+}
+
+.column-entry:hover .row-elements.move, .column-entry:focus-within .row-elements.move, .column-entry:hover .row-elements.actions, .column-entry:focus-within .row-elements.actions {
 	display: flex;
 }
 

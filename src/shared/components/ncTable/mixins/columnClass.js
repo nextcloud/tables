@@ -20,6 +20,7 @@ export class AbstractColumn {
 		this.title = data.title
 		this.description = data.description
 		this.createdByDisplayName = data.createdByDisplayName
+		this.readonly = data.readonly
 		this.lastEditByDisplayName = data.lastEditByDisplayName
 	}
 
