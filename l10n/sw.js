@@ -20,6 +20,7 @@ OC.L10N.register(
     "Date" : "Tarehe",
     "Comments" : "Maoni",
     "Name" : "Jina",
+    "Account manager" : "Account manager",
     "Description" : "Maelezo",
     "Comment" : "Maoni",
     "to" : "kwa",
