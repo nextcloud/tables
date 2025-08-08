@@ -69,7 +69,7 @@ describe('FE sorting and filtering', () => {
 		cy.get('.info').contains('Reset local adjustments').should('not.exist')
 	})
 
-	it.only('Navigation filtering', () => {
+	it('Navigation filtering', () => {
 		cy.viewport('macbook-15')
 		cy.createTable('first table')
 		cy.createTable('second table')
