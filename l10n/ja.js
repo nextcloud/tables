@@ -383,6 +383,7 @@ OC.L10N.register(
     "Show user status" : "ユーザー ステータスの表示",
     "Url" : "URL",
     "Copy link" : "リンクをコピー",
+    "Open link" : "リンクを開く",
     "Close editor" : "エディタを閉じる",
     "Go to first page" : "最初のページへ",
     "Go to previous page" : "前のページへ",
