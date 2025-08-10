@@ -45,6 +45,11 @@ export default defineConfig({
 		devServer: {
 			framework: 'vue',
 			bundler: 'vite',
+			viteConfig: {
+				optimizeDeps: {
+					exclude: ['vite-plugin-node-polyfills'],
+				},
+			},
 		},
 		setupNodeEvents(on, config) {
 			on('file:preprocessor', vitePreprocessor({
