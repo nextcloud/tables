@@ -614,20 +614,23 @@ class RowService extends SuperService {
 		}
 	}
 
+	/**
+	 * @param int $rowId
+	 * @param int $viewId
+	 * @param string $userId
+	 * @return bool
+	 *
+	 * @throws PermissionError
+	 */
 	public function isRowInViewPresent(int $rowId, int $viewId, string $userId): bool {
 		if (!$this->permissionsService->canReadRowsByElementId($viewId, 'view', $userId)) {
-        	$e = new \Exception('Row not found.');
+			$e = new \Exception('Row not found.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new PermissionError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
-   		}
-
-		try {
-			$view = $this->viewMapper->find($viewId);
-			return $this->row2Mapper->isRowInViewPresent($rowId, $view, $userId);
-		} catch (Exception $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
+
+		$view = $this->viewMapper->find($viewId);
+		return $this->row2Mapper->isRowInViewPresent($rowId, $view, $userId);
 	}
 
 	private function filterRowResult(?View $view, Row2 $row): Row2 {
