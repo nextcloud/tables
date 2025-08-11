@@ -4,10 +4,7 @@
 -->
 <template>
 	<div class="main-table-view">
-		<div v-if="errorMessage" class="error-container">
-			<IconTables :size="64" style="margin-bottom: 1rem;" />
-			<p>{{ errorMessage }}</p>
-		</div>
+		<ErrorMessage v-if="errorMessage" :message="errorMessage" />
 
 		<div v-else-if="!activeTable">
 			<div class="icon-loading" />
@@ -25,13 +22,14 @@ import { mapState, mapActions } from 'pinia'
 import { useTablesStore } from '../store/store.js'
 import MainWrapper from '../modules/main/sections/MainWrapper.vue'
 import MainModals from '../modules/modals/Modals.vue'
-import IconTables from '../shared/assets/icons/IconTables.vue'
+import ErrorMessage from '../modules/main/partials/ErrorMessage.vue'
+import displayError, { getNotFoundError, getGenericLoadError } from '../shared/utils/displayError.js'
 
 export default {
 	components: {
 		MainWrapper,
 		MainModals,
-		IconTables,
+		ErrorMessage,
 	},
 
 	data() {
@@ -62,19 +60,16 @@ export default {
 			if (!id) return
 
 			try {
-				if (!this.activeTableId) {
-					this.setActiveTableId(parseInt(id))
-				}
-
 				if (!this.activeTable) {
 					await this.loadContextTable({ id })
 				}
+				this.setActiveTableId(parseInt(id))
 			} catch (e) {
 				if (e.message === 'NOT_FOUND') {
-					this.errorMessage = t('tables', 'This table could not be found')
+					this.errorMessage = getNotFoundError('table')
 				} else {
-					this.errorMessage = t('tables', 'An error occurred while loading the table')
-					console.error(e)
+					this.errorMessage = getGenericLoadError('table')
+					displayError(e, this.errorMessage)
 				}
 			}
 		},
@@ -91,26 +86,6 @@ export default {
 @page {
 	size: auto;
 	margin: 5mm;
-}
-
-.error-container {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	text-align: center;
-	padding: 2rem;
-	height: 100dvh;
-	min-height: 100%;
-	color: var(--color-text);
-	opacity: 0.6;
-
-	p {
-		font-size: clamp(1.2rem, 4vw, 2rem);
-		font-weight: 600;
-		max-width: 90%;
-		word-wrap: break-word;
-	}
 }
 
 @media print {
