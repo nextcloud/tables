@@ -203,14 +203,7 @@ export const useDataStore = defineStore('data', {
 				const row = res.data
 				const index = this.rows[stateId].findIndex(r => r.id === row.id)
 				set(this.rows[stateId], index, row)
-
-				if (isView && row?.id != null) {
-					const rowInView = await this.checkRowInView({ rowId: row.id, viewId: viewId })
-					if (!rowInView) {
-						emit('tables:row:animate')
-						this.rows[stateId] = this.rows[stateId].filter(r => r.id !== row.id)
-					}
-				}
+				await this.removeRowIfNotInView({ rowId: row?.id, viewId: viewId, stateId: stateId })
 			}
 
 			return true
@@ -233,14 +226,7 @@ export const useDataStore = defineStore('data', {
 				const row = res?.data?.ocs?.data
 				const newIndex = this.rows[stateId].length
 				set(this.rows[stateId], newIndex, row)
-
-				if (viewId != null && row?.id != null) {
-					const rowInView = await this.checkRowInView({ rowId: row.id, viewId: viewId })
-					if (!rowInView) {
-						emit('tables:row:animate')
-						this.rows[stateId] = this.rows[stateId].filter(r => r.id !== row.id)
-					}
-				}
+				await this.removeRowIfNotInView({ rowId: row?.id, viewId: viewId, stateId: stateId })
 			}
 
 			return true
@@ -274,13 +260,24 @@ export const useDataStore = defineStore('data', {
 
 		async checkRowInView({ rowId, viewId }) {
 			try {
-				const res = await axios.get(generateUrl('/apps/tables/row/{rowId}/view/{viewId}/present', { rowId, viewId }))
+				const res = await axios.get(generateUrl('/apps/tables/view/{viewId}/row/{rowId}/present', { viewId, rowId }))
 				return res.data.present
 			} catch (e) {
 				showError(t('tables', 'Could not verify row. View is reloaded'))
 				await this.loadRowsFromBE({ viewId })
 			}
-			return true
+		},
+
+		async removeRowIfNotInView({ rowId, viewId, stateId }) {
+			if (!rowId || !viewId) {
+				return
+			}
+
+			const rowInView = await this.checkRowInView({ rowId, viewId })
+			if (rowInView === false) {
+				emit('tables:row:animate')
+				this.rows[stateId] = this.rows[stateId].filter(r => r.id !== rowId)
+			}
 		},
 	},
 
