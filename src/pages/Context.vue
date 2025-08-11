@@ -4,12 +4,9 @@
 -->
 <template>
 	<div class="row">
-		<div v-if="loading" class="icon-loading" />
+		<ErrorMessage v-if="errorMessage" :message="errorMessage" />
 
-		<div v-else-if="errorMessage" class="error-container">
-			<IconTables :size="64" style="margin-bottom: 1rem;" />
-			<p>{{ errorMessage }}</p>
-		</div>
+		<div v-else-if="loading" class="icon-loading" />
 
 		<div v-else>
 			<div class="content context">
@@ -56,13 +53,14 @@ import exportTableMixin from '../shared/components/ncTable/mixins/exportTableMix
 import svgHelper from '../shared/components/ncIconPicker/mixins/svgHelper.js'
 import { useTablesStore } from '../store/store.js'
 import { useDataStore } from '../store/data.js'
-import IconTables from '../shared/assets/icons/IconTables.vue'
+import ErrorMessage from '../modules/main/partials/ErrorMessage.vue'
+import displayError, { getNotFoundError, getGenericLoadError } from '../shared/utils/displayError.js'
 
 export default {
 	components: {
 		MainModals,
 		NcIconSvgWrapper,
-		IconTables,
+		ErrorMessage,
 		TableWrapper,
 		CustomView,
 	},
@@ -212,10 +210,10 @@ export default {
 				}
 			} catch (e) {
 				if (e.message === 'NOT_FOUND') {
-					this.errorMessage = t('tables', 'This application could not be found')
+					this.errorMessage = getNotFoundError('application')
 				} else {
-					this.errorMessage = t('tables', 'An error occurred while loading the application')
-					console.error(e)
+					this.errorMessage = getGenericLoadError('application')
+					displayError(e, this.errorMessage)
 				}
 			} finally {
 				this.loading = false
@@ -264,26 +262,6 @@ export default {
 	&:deep(.row.first-row) {
 		margin-left: 20px;
 		padding-left: 0px;
-	}
-}
-
-.error-container {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	text-align: center;
-	padding: 2rem;
-	height: 100dvh;
-	min-height: 100%;
-	color: var(--color-text);
-	opacity: 0.6;
-
-	p {
-		font-size: clamp(1.2rem, 4vw, 2rem);
-		font-weight: 600;
-		max-width: 90%;
-		word-wrap: break-word;
 	}
 }
 </style>
