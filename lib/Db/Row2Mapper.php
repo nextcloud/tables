@@ -313,7 +313,9 @@ class Row2Mapper {
 		foreach ($filters as &$filterGroup) {
 			foreach ($filterGroup as &$filter) {
 				if (substr($filter['value'], 0, 1) === '@') {
-					$filter['value'] = $this->columnsHelper->resolveSearchValue($filter['value'], $userId, $this->columnMapper->find($filter['columnId']));
+					$columnId = (int)($filter['columnId'] ?? 0);
+					$column = $columnId > 0 ? $this->columnMapper->find($columnId) : null;
+					$filter['value'] = $this->columnsHelper->resolveSearchValue($filter['value'], $userId, $column);
 				}
 			}
 		}
