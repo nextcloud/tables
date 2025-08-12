@@ -108,7 +108,7 @@ Cypress.Commands.add('createView', (title) => {
 	cy.get('[data-cy="customTableAction"] button').click()
 	cy.get('[data-cy="dataTableCreateViewBtn"]').contains('Create view').click({ force: true })
 
-	cy.get('.modal-container #settings-section_title input').type(title)
+	cy.get('[data-cy="viewSettingsDialogTitleInput"]').should('be.visible').should('not.be.disabled').type(title)
 
 	cy.intercept({ method: 'POST', url: '**/apps/tables/view' }).as('createView')
 	cy.intercept({ method: 'PUT', url: '**/apps/tables/view/*' }).as('updateView')
