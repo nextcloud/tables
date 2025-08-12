@@ -21,7 +21,7 @@
 		<td v-if="config.showActions" :class="{sticky: config.showActions}">
 			<NcButton v-if="config.canEditRows || config.canDeleteRows" type="primary" :aria-label="t('tables', 'Edit row')" data-cy="editRowBtn" @click="$emit('edit-row', row.id)">
 				<template #icon>
-					<Pencil :size="20" />
+					<PencilOutline :size="20" />
 				</template>
 			</NcButton>
 		</td>
@@ -31,6 +31,7 @@
 <script>
 import { NcCheckboxRadioSwitch, NcButton } from '@nextcloud/vue'
 import Pencil from 'vue-material-design-icons/Pencil.vue'
+import PencilOutline from 'vue-material-design-icons/PencilOutline.vue'
 import TableCellHtml from './TableCellHtml.vue'
 import TableCellProgress from './TableCellProgress.vue'
 import TableCellLink from './TableCellLink.vue'
@@ -60,6 +61,7 @@ export default {
 		TableCellHtml,
 		NcButton,
 		Pencil,
+		PencilOutline,
 		NcCheckboxRadioSwitch,
 		TableCellDateTime,
 		TableCellTextLine,

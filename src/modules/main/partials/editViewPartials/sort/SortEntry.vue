@@ -43,7 +43,7 @@
 			class="delete-button"
 			@click="$emit('delete-sorting-rule')">
 			<template #icon>
-				<Delete :size="25" />
+				<DeleteOutline :size="25" />
 			</template>
 		</NcButton>
 	</div>
@@ -51,7 +51,7 @@
 
 <script>
 import { NcButton, NcSelect, NcCheckboxRadioSwitch } from '@nextcloud/vue'
-import Delete from 'vue-material-design-icons/Delete.vue'
+import DeleteOutline from 'vue-material-design-icons/DeleteOutline.vue'
 import SortAsc from 'vue-material-design-icons/SortAscending.vue'
 import SortDesc from 'vue-material-design-icons/SortDescending.vue'
 
@@ -60,7 +60,7 @@ export default {
 	components: {
 		NcSelect,
 		NcButton,
-		Delete,
+		DeleteOutline,
 		NcCheckboxRadioSwitch,
 		SortAsc,
 		SortDesc,

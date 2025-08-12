@@ -47,7 +47,7 @@
 				<NcAppNavigationItem v-if="getArchivedTables.length > 0" :name="t('tables', 'Archived tables')"
 					:allow-collapse="true" :open="false">
 					<template #icon>
-						<Archive :size="20" />
+						<ArchiveOutline :size="20" />
 					</template>
 
 					<template #counter>
@@ -108,7 +108,7 @@ import NavigationContextItem from '../partials/NavigationContextItem.vue'
 import { useTablesStore } from '../../../store/store.js'
 import { emit, subscribe } from '@nextcloud/event-bus'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
-import Archive from 'vue-material-design-icons/Archive.vue'
+import ArchiveOutline from 'vue-material-design-icons/ArchiveOutline.vue'
 import { getCurrentUser } from '@nextcloud/auth'
 import { loadState } from '@nextcloud/initial-state'
 import { mapState, mapActions } from 'pinia'
@@ -125,7 +125,7 @@ export default {
 		NcActionButton,
 		NcTextField,
 		Magnify,
-		Archive,
+		ArchiveOutline,
 		NcButton,
 		NcCounterBubble,
 		NcEmptyContent,

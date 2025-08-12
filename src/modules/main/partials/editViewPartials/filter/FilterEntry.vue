@@ -43,7 +43,7 @@
 				:aria-label="t('tables', 'Delete filter')"
 				@click="$emit('delete-filter')">
 				<template #icon>
-					<Delete :size="25" />
+					<DeleteOutline :size="25" />
 				</template>
 			</NcButton>
 		</div>
@@ -52,7 +52,7 @@
 
 <script>
 import { NcButton, NcSelect } from '@nextcloud/vue'
-import Delete from 'vue-material-design-icons/Delete.vue'
+import DeleteOutline from 'vue-material-design-icons/DeleteOutline.vue'
 import { ColumnTypes } from '../../../../../shared/components/ncTable/mixins/columnHandler.js'
 
 export default {
@@ -60,7 +60,7 @@ export default {
 	components: {
 		NcSelect,
 		NcButton,
-		Delete,
+		DeleteOutline,
 	},
 
 	props: {
