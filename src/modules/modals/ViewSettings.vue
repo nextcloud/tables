@@ -20,6 +20,7 @@
 						</NcButton>
 					</NcEmojiPicker>
 					<input v-model="title"
+						data-cy="viewSettingsDialogTitleInput"
 						:class="{missing: errorTitle}"
 						type="text"
 						:placeholder="createView ? t('tables', 'Title of the new view') : t('tables', 'New title of the view')">
