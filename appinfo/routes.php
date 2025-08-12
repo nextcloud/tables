@@ -88,6 +88,7 @@ return [
 		['name' => 'row#updateSet', 'url' => '/row/{id}', 'verb' => 'PUT'],
 		['name' => 'row#destroyByView', 'url' => '/view/{viewId}/row/{id}', 'verb' => 'DELETE'],
 		['name' => 'row#destroy', 'url' => '/row/{id}', 'verb' => 'DELETE'],
+		['name' => 'row#presentInView', 'url' => '/view/{viewId}/row/{id}/present', 'verb' => 'GET'],
 
 		// shares
 		['name' => 'share#index', 'url' => '/share/table/{tableId}', 'verb' => 'GET'],

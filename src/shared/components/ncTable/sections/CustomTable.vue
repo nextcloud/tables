@@ -22,9 +22,13 @@
 					</template>
 				</TableHeader>
 			</thead>
-			<tbody>
-				<TableRow v-for="(row, index) in currentPageRows"
-					:key="index"
+			<transition-group
+				name="table-row"
+				tag="tbody"
+				:css="rowAnimation"
+				@after-leave="disableRowAnimation">
+				<TableRow v-for="row in currentPageRows"
+					:key="row.id"
 					data-cy="customTableRow"
 					:row="row"
 					:columns="columns"
@@ -35,8 +39,7 @@
 					:is-view="isView"
 					@update-row-selection="updateRowSelection"
 					@edit-row="rowId => $emit('edit-row', rowId)" />
-				<tr />
-			</tbody>
+			</transition-group>
 		</table>
 		<div v-if="totalPages > 1" class="pagination-footer" :class="{'large-width': !appNavCollapsed || isMobile}">
 			<div class="pagination-items">
@@ -146,6 +149,7 @@ export default {
 			localViewSetting: this.viewSetting,
 			pageNumber: 1,
 			rowsPerPage: 100,
+			rowAnimation: false,
 		}
 	},
 
@@ -330,9 +334,11 @@ export default {
 
 	mounted() {
 		subscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectAllRows(elementId, isView))
+		subscribe('tables:row:animate', this.enableRowAnimation)
 	},
 	beforeDestroy() {
 		unsubscribe('tables:selected-rows:deselect', ({ elementId, isView }) => this.deselectAllRows(elementId, isView))
+		unsubscribe('tables:row:animate', this.enableRowAnimation)
 	},
 
 	methods: {
@@ -384,6 +390,12 @@ export default {
 				this.selectedRows.push(values.rowId)
 				this.$emit('update-selected-rows', this.selectedRows)
 			}
+		},
+		enableRowAnimation() {
+			this.rowAnimation = true
+		},
+		disableRowAnimation() {
+			this.rowAnimation = false
 		},
 	},
 }
@@ -592,6 +604,20 @@ export default {
 		opacity: 1;
 	}
 
+}
+
+.table-row-leave-active {
+  transition: all 600ms ease;
+}
+
+.table-row-leave-to {
+  opacity: 0;
+  height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  transform: translateX(-1rem);
 }
 
 </style>
