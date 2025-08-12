@@ -88,7 +88,8 @@ export default {
 			}
 			if (currentRoute.path.startsWith('/table/')) {
 				this.setActiveTableId(parseInt(currentRoute.params.tableId))
-				this.setPageTitle(this.activeTable.title)
+				const tableName = this.activeTable?.title || t('tables', 'Table')
+				this.setPageTitle(tableName)
 				if (!currentRoute.path.includes('/row/')) {
 					const targetElement = document.querySelector(`header .header-start .app-menu a[href="${url}"]`)
 						|| document.querySelector(`header .header-left .app-menu a[href="${url}"]`)
@@ -96,7 +97,8 @@ export default {
 				}
 			} else if (currentRoute.path.startsWith('/view/')) {
 				this.setActiveViewId(parseInt(currentRoute.params.viewId))
-				this.setPageTitle(this.activeView.title)
+				const viewName = this.activeView?.title || t('tables', 'View')
+				this.setPageTitle(viewName)
 				if (!currentRoute.path.includes('/row/')) {
 					const targetElement = document.querySelector(`header .header-start .app-menu a[href="${url}"]`)
 						|| document.querySelector(`header .header-left .app-menu a[href="${url}"]`)
@@ -105,11 +107,12 @@ export default {
 			} else if (currentRoute.path.startsWith('/application/')) {
 				const contextId = parseInt(currentRoute.params.contextId)
 				this.setActiveContextId(contextId)
-				this.setPageTitle(this.activeContext.name)
+				const contextName = this.activeContext?.name || t('tables', 'Tables')
+				this.setPageTitle(contextName)
 
 				// This breaks if there are multiple contexts with the same name or another app has the same name. We need a better way to identify the correct element.
-				const targetElement = document.querySelector(`header .header-start .app-menu [title="${this.activeContext.name}"]`)
-					|| document.querySelector(`header .header-left .app-menu [title="${this.activeContext.name}"]`)
+				const targetElement = document.querySelector(`header .header-start .app-menu [title="${contextName}"]`)
+					|| document.querySelector(`header .header-left .app-menu [title="${contextName}"]`)
 				if (targetElement) {
 					this.switchActiveMenuEntry(targetElement)
 				}
@@ -127,8 +130,8 @@ export default {
 		switchActiveMenuEntry(targetElement) {
 			targetElement = targetElement?.tagName?.toLowerCase() === 'a' ? targetElement.parentElement : targetElement
 			const currentlyActive = document.querySelector('header .header-start .app-menu li.app-menu-entry--active') || document.querySelector('header .header-left .app-menu li.app-menu-entry--active')
-			currentlyActive.classList.remove('app-menu-entry--active')
-			targetElement.classList.add('app-menu-entry--active')
+			currentlyActive?.classList.remove('app-menu-entry--active')
+			targetElement?.classList.add('app-menu-entry--active')
 		},
 		setPageTitle(title) {
 			if (this.defaultPageTitle === false) {
