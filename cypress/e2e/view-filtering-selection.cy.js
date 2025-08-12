@@ -373,4 +373,89 @@ describe('Filtering in a view by selection columns', () => {
 			cy.get('.custom-table table tr td div').contains(item).should('not.exist')
 		})
 	})
+
+	it('Filter view remove row when it no longer matches filter', () => {
+		cy.loadTable('View filtering test table')
+
+		// # create view with filter
+		// ## create view and set title
+		const title = 'Filter for check enabled'
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('.v-popper__popper li button span').contains('Create view').click({ force: true })
+		cy.get('.modal-container #settings-section_title input').type(title)
+
+		// ## add filter 
+		cy.get('button').contains('Add new filter group').click()
+		cy.get('.modal-container .filter-group .v-select.select').eq(0).click()
+		cy.get('ul.vs__dropdown-menu li span[title="check"]').click()
+		cy.get('.modal-container .filter-group .v-select.select').eq(1).click()
+		cy.get('ul.vs__dropdown-menu li span[title="Is equal"]').click()
+		cy.get('.modal-container .filter-group .v-select.select').eq(2).click()
+		cy.get('ul.vs__dropdown-menu li span[title="Checked"]').click()
+
+		// ## save view
+		cy.intercept({ method: 'POST', url: '**/apps/tables/view' }).as('createView')
+		cy.intercept({ method: 'PUT', url: '**/apps/tables/view/*' }).as('updateView')
+		cy.contains('button', 'Create View').click()
+		cy.wait('@createView')
+		cy.wait('@updateView')
+		cy.contains('.app-navigation-entry-link span', title).should('exist')
+
+		// # insert a checked row
+		cy.get('button').contains('Create row').click()
+		cy.fillInValueTextLine('title', 'checked row')
+		cy.fillInValueSelectionCheck('check')
+		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresent')
+		cy.get('button').contains('Save').click()
+
+		// ## check server response for /view/{viewId}/row/{id}/present
+		cy.wait('@isRowInViewPresent').then(({ response: { body: { present } } }) => {
+			expect(present).to.be.true
+		})
+
+		// ## check if row is visible
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'checked row').should('be.visible')
+
+		// # insert a unchecked row
+		cy.get('button').contains('Create row').click()
+		cy.fillInValueTextLine('title', 'unchecked row')
+		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresent')
+		cy.get('button').contains('Save').click()
+
+		// ## check server response for /view/{viewId}/row/{id}/present
+		cy.wait('@isRowInViewPresent').then(({ response: { body: { present } } }) => {
+			expect(present).to.be.false
+		})
+
+		// ## check if row does not exist
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'unchecked row').should('not.exist')
+
+		// # edit checked row
+		// ## uncheck
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'checked row').closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
+		cy.get('[data-cy="editRowModal"] .checkbox-radio-switch').click()
+		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresent')
+		cy.get('[data-cy="editRowSaveButton"]').click()
+
+		// ## check server response for /view/{viewId}/row/{id}/present
+		cy.wait('@isRowInViewPresent').then(({ response: { body: { present } } }) => {
+			expect(present).to.be.false
+		})
+
+		// ## check if row does not exist
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'checked row').should('not.exist')
+
+		// # inline edit row
+		// ## uncheck row
+		cy.intercept({ method: 'GET', url: '**/apps/tables/view/*/row/*/present' }).as('isRowInViewPresent')
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'first row').closest('[data-cy="customTableRow"]').find('.inline-editing-container .checkbox-radio-switch').click()
+
+		// ## check server response for /view/{viewId}/row/{id}/present
+		cy.wait('@isRowInViewPresent').then(({ response: { body: { present } } }) => {
+			expect(present).to.be.false
+		})
+
+		// ## check if row does not exist
+		cy.contains('[data-cy="ncTable"] [data-cy="customTableRow"]', 'first row').should('not.exist')
+	})
 })
