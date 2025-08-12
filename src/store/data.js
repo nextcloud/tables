@@ -203,7 +203,7 @@ export const useDataStore = defineStore('data', {
 				const row = res.data
 				const index = this.rows[stateId].findIndex(r => r.id === row.id)
 				set(this.rows[stateId], index, row)
-				await this.removeRowIfNotInView({ rowId: row?.id, viewId: viewId, stateId: stateId })
+				await this.removeRowIfNotInView({ rowId: row?.id, viewId, stateId })
 			}
 
 			return true
@@ -226,7 +226,7 @@ export const useDataStore = defineStore('data', {
 				const row = res?.data?.ocs?.data
 				const newIndex = this.rows[stateId].length
 				set(this.rows[stateId], newIndex, row)
-				await this.removeRowIfNotInView({ rowId: row?.id, viewId: viewId, stateId: stateId })
+				await this.removeRowIfNotInView({ rowId: row?.id, viewId, stateId })
 			}
 
 			return true

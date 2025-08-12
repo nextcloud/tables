@@ -103,7 +103,7 @@ class RowController extends Controller {
 
 	#[NoAdminRequired]
 	public function presentInView(int $id, int $viewId): DataResponse {
-		return $this->handleError(function() use ($id, $viewId) {
+		return $this->handleError(function () use ($id, $viewId) {
 			$present = $this->service->isRowInViewPresent($id, $viewId, $this->userId);
 			return ['present' => $present];
 		});
