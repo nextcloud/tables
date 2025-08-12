@@ -97,10 +97,12 @@
 
 			<!-- DELETE -->
 			<NcActionButton v-if="canManageElement(view)"
-				icon="icon-delete"
 				:close-after-click="true"
 				@click="emit('tables:view:delete', view)">
 				{{ t('tables', 'Delete view') }}
+				<template #icon>
+					<DeleteOutline :size="20" />
+				</template>
 			</NcActionButton>
 		</template>
 	</NcAppNavigationItem>
@@ -115,6 +117,7 @@ import { showError } from '@nextcloud/dialogs'
 import Table from 'vue-material-design-icons/Table.vue'
 import Star from 'vue-material-design-icons/Star.vue'
 import StarOutline from 'vue-material-design-icons/StarOutline.vue'
+import DeleteOutline from 'vue-material-design-icons/DeleteOutline.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import Connection from 'vue-material-design-icons/Connection.vue'
 import PlaylistPlay from 'vue-material-design-icons/PlaylistPlay.vue'
@@ -138,6 +141,7 @@ export default {
 		NcAvatar,
 		PlaylistPlay,
 		Import,
+		DeleteOutline,
 	},
 
 	filters: {

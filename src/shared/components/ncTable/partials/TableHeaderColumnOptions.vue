@@ -79,7 +79,7 @@
 					:title="selectedOperator.label"
 					@click="selectOperator = true">
 					<template #icon>
-						<FilterCog :size="25" />
+						<FilterCogOutline :size="25" />
 					</template>
 					{{ t('tables', 'Select Operator') }}
 				</NcActionButton>
@@ -98,14 +98,14 @@
 						:aria-label="t('tables', 'Hide column')"
 						@click="hideColumn()">
 						<template #icon>
-							<EyeOff :size="25" />
+							<EyeOffOutline :size="25" />
 						</template>
 					</NcActionButton>
 					<NcActionButton v-if="showEditColumn"
 						:aria-label="t('tables', 'Edit column')"
 						@click="editColumn()">
 						<template #icon>
-							<Pencil :size="25" />
+							<PencilOutline :size="25" />
 						</template>
 					</NcActionButton>
 					<NcActionButton v-if="showDeleteColumn"
@@ -113,7 +113,7 @@
 						data-cy="deleteColumnActionBtn"
 						@click="deleteColumn()">
 						<template #icon>
-							<Delete :size="25" />
+							<DeleteOutline :size="25" />
 						</template>
 					</NcActionButton>
 				</NcActionButtonGroup>
@@ -126,11 +126,11 @@
 import generalHelper from '../../../mixins/generalHelper.js'
 import SortAsc from 'vue-material-design-icons/SortAscending.vue'
 import SortDesc from 'vue-material-design-icons/SortDescending.vue'
-import Delete from 'vue-material-design-icons/Delete.vue'
-import Pencil from 'vue-material-design-icons/Pencil.vue'
-import EyeOff from 'vue-material-design-icons/EyeOff.vue'
+import DeleteOutline from 'vue-material-design-icons/DeleteOutline.vue'
+import PencilOutline from 'vue-material-design-icons/PencilOutline.vue'
+import EyeOffOutline from 'vue-material-design-icons/EyeOffOutline.vue'
 import ChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
-import FilterCog from 'vue-material-design-icons/FilterCog.vue'
+import FilterCogOutline from 'vue-material-design-icons/FilterCogOutline.vue'
 import Magnify from 'vue-material-design-icons/Magnify.vue'
 import {
 	NcActionButton,
@@ -146,11 +146,11 @@ import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	components: {
-		EyeOff,
-		Delete,
-		Pencil,
+		EyeOffOutline,
+		DeleteOutline,
+		PencilOutline,
 		ChevronLeft,
-		FilterCog,
+		FilterCogOutline,
 		Magnify,
 		NcActionInput,
 		NcActionRadio,

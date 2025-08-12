@@ -24,14 +24,14 @@
 			</NcActionButton>
 			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" @click="transferContext">
 				<template #icon>
-					<FileSwap :size="20" />
+					<FileSwapOutline :size="20" />
 				</template>
 				{{ t('tables', 'Transfer application') }}
 			</NcActionButton>
 			<NcActionButton v-if="ownsContext(context)" :close-after-click="true" data-cy="navigationContextDeleteBtn"
 				@click="deleteContext">
 				<template #icon>
-					<Delete :size="20" />
+					<DeleteOutline :size="20" />
 				</template>
 				{{ t('tables', 'Delete application') }}
 			</NcActionButton>
@@ -48,8 +48,8 @@ import { mapState, mapActions } from 'pinia'
 import TableIcon from 'vue-material-design-icons/Table.vue'
 import { emit } from '@nextcloud/event-bus'
 import PlaylistEdit from 'vue-material-design-icons/PlaylistEdit.vue'
-import FileSwap from 'vue-material-design-icons/FileSwap.vue'
-import Delete from 'vue-material-design-icons/Delete.vue'
+import FileSwapOutline from 'vue-material-design-icons/FileSwapOutline.vue'
+import DeleteOutline from 'vue-material-design-icons/DeleteOutline.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import svgHelper from '../../../shared/components/ncIconPicker/mixins/svgHelper.js'
 import { NAV_ENTRY_MODE } from '../../../shared/constants.ts'
@@ -61,9 +61,9 @@ export default {
 
 	components: {
 		PlaylistEdit,
-		FileSwap,
+		FileSwapOutline,
 		TableIcon,
-		Delete,
+		DeleteOutline,
 		NcIconSvgWrapper,
 		NcAppNavigationItem,
 		NcActionButton,
