@@ -16,25 +16,16 @@
 			@keydown.enter="saveChanges"
 			@keydown.escape="cancelEdit">
 			<div class="align-center" :class="{ 'is-loading': localLoading }">
-				<NcButton type="tertiary"
-					:aria-label="t('tables', 'Reduce stars')"
-					:disabled="localLoading || editValue <= 0 || !canEditCell()"
-					@click="less">
-					<template #icon>
-						<span class="minus-icon">-</span>
-					</template>
-				</NcButton>
-				<div class="stars">
-					{{ getEditValue }}
+				<div class="clickable-stars">
+					<span v-for="star in 5"
+						:key="star"
+						class="star"
+						:class="{ 'filled': star <= editValue, 'clickable': !localLoading && canEditCell() }"
+						:aria-label="t('tables', 'Set {star} stars', { star })"
+						@click="setStar(star)">
+						{{ star <= editValue ? '★' : '☆' }}
+					</span>
 				</div>
-				<NcButton type="tertiary"
-					:aria-label="t('tables', 'Increase stars')"
-					:disabled="localLoading || editValue >= 5 || !canEditCell()"
-					@click="more">
-					<template #icon>
-						<span class="plus-icon">+</span>
-					</template>
-				</NcButton>
 				<div v-if="localLoading" class="icon-loading-small icon-loading-inline" />
 			</div>
 		</div>
@@ -42,16 +33,11 @@
 </template>
 
 <script>
-import { NcButton } from '@nextcloud/vue'
 import cellEditMixin from '../mixins/cellEditMixin.js'
 import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'TableCellStars',
-
-	components: {
-		NcButton,
-	},
 
 	mixins: [cellEditMixin],
 
@@ -89,11 +75,9 @@ export default {
 		isEditing(newValue) {
 			if (newValue) {
 				this.$nextTick(() => {
-					// Add click outside listener
 					document.addEventListener('click', this.handleClickOutside)
 				})
 			} else {
-				// Remove click outside listener
 				document.removeEventListener('click', this.handleClickOutside)
 			}
 		},
@@ -102,15 +86,14 @@ export default {
 	methods: {
 		t,
 
-		more() {
-			if (this.editValue < 5 && !this.localLoading && this.canEditCell()) {
-				this.editValue++
-			}
-		},
-
-		less() {
-			if (this.editValue > 0 && !this.localLoading && this.canEditCell()) {
-				this.editValue--
+		setStar(starNumber) {
+			if (!this.localLoading && this.canEditCell()) {
+				// If clicking on a star that represents the current rating, clear to 0
+				if (starNumber === this.editValue) {
+					this.editValue = 0
+				} else {
+					this.editValue = starNumber
+				}
 			}
 		},
 
@@ -172,6 +155,30 @@ export default {
 	padding: 7px;
 }
 
+.clickable-stars {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+}
+
+.star {
+	font-size: 1.4em;
+	padding: 4px;
+	transition: transform 0.1s ease;
+
+	&.clickable {
+		cursor: pointer;
+
+		&:hover {
+			transform: scale(1.1);
+		}
+	}
+
+	&.filled {
+		color: var(--color-warning);
+	}
+}
+
 .editor-buttons {
 	display: flex;
 	gap: 8px;
@@ -181,10 +188,5 @@ export default {
 
 .icon-loading-inline {
 	margin-left: 4px;
-}
-
-.minus-icon, .plus-icon {
-	font-size: 20px;
-	font-weight: bold;
 }
 </style>
