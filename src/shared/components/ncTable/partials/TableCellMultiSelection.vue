@@ -15,14 +15,15 @@
 			ref="editingContainer"
 			class="edit-mode"
 			tabindex="0"
-			@keydown.enter="saveChanges"
-			@keydown.escape="cancelEdit">
+			@keydown.enter.stop="saveChanges"
+			@keydown.escape.stop="cancelEdit">
 			<NcSelect v-model="editValues"
 				:tag-width="80"
 				:options="getAllNonDeletedOrSelectedOptions"
 				:multiple="true"
 				:aria-label-combobox="t('tables', 'Options')"
 				:disabled="localLoading || !canEditCell()"
+				:clearable="true"
 				style="width: 100%;" />
 			<div v-if="localLoading" class="loading-indicator">
 				<div class="icon-loading-small icon-loading-inline" />
@@ -62,6 +63,12 @@ export default {
 		},
 	},
 
+	data() {
+		return {
+			localEditValues: [],
+		}
+	},
+
 	computed: {
 		getOptions() {
 			return this.column.selectionOptions || []
@@ -78,6 +85,14 @@ export default {
 			})
 			return options
 		},
+		editValues: {
+			get() {
+				return this.localEditValues
+			},
+			set(newValues) {
+				this.localEditValues = newValues || []
+			},
+		},
 	},
 
 	watch: {
@@ -86,13 +101,13 @@ export default {
 				this.initEditValues()
 				// Use a small delay to prevent the same click event that triggered editing
 				// from immediately triggering the click outside handler
+				// TODO: implement better click outside detection without setTimeout
 				this.$nextTick(() => {
 					setTimeout(() => {
 						document.addEventListener('click', this.handleClickOutside)
-					}, 10)
+					}, 100)
 				})
 			} else {
-				// Remove click outside listener
 				document.removeEventListener('click', this.handleClickOutside)
 			}
 		},
@@ -120,11 +135,16 @@ export default {
 
 		initEditValues() {
 			if (this.value !== null) {
-				this.editValues = this.column.getObjects(this.value)
+				this.localEditValues = this.column.getObjects(this.value)
 			} else {
-				this.editValues = []
+				this.localEditValues = []
 			}
 		},
+		cancelEdit() {
+			this.isEditing = false
+			this.localEditValues = []
+		},
+
 		async saveChanges() {
 			if (this.localLoading) {
 				return
@@ -135,7 +155,7 @@ export default {
 			const success = await this.updateCellValue(newValue)
 
 			if (success) {
-				// Emit the updated value to parent to trigger immediate re-render
+				// trigger immediate re-render
 				this.$emit('input', newValue)
 				this.$emit('update:value', newValue)
 				this.isEditing = false
@@ -148,6 +168,7 @@ export default {
 
 		handleClickOutside(event) {
 			// Check if the click is outside the editing container
+			// But ignore clicks on dropdown options and scrollbars
 			if (this.$refs.editingContainer && !this.$refs.editingContainer.contains(event.target)) {
 				this.saveChanges()
 			}
