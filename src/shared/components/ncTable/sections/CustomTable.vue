@@ -522,9 +522,7 @@ export default {
 		td {
 			text-align: left;
 			vertical-align: middle;
-			border: 1px solid var(--color-border-dark);
-
-			
+			border: 1px solid var(--color-border-dark);	
 		}
 
 		tr:active, tr:hover, tr:focus, tr:hover .editor-wrapper .editor {
