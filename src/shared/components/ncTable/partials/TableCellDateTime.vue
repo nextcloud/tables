@@ -17,7 +17,6 @@
 				<NcDateTimePickerNative
 					v-model="editDateTimeValue"
 					:type="getPickerType"
-					:label="getPlaceholder"
 					:disabled="localLoading || !canEditCell()" />
 				<div v-if="canBeCleared" class="icon-close make-empty" @click="emptyValue" />
 			</div>
@@ -66,26 +65,10 @@ export default {
 
 	computed: {
 		getValue() {
-			// default value is for the form, if you want to present the date from today, you should use the calculating column
 			if (!this.value || this.value === 'none' || this.value === 'today' || this.value === 'now') {
 				return ''
 			}
 			return this.column.formatValue(this.value)
-		},
-
-		getDefaultValue() {
-			return this.column.formatValue(this.column.datetimeDefault)
-		},
-
-		getPlaceholder() {
-			switch (this.column.type) {
-			case 'datetime-date':
-				return t('tables', 'Select a date')
-			case 'datetime-time':
-				return t('tables', 'Select a time')
-			default:
-				return t('tables', 'Select a date and time')
-			}
 		},
 
 		getPickerType() {
@@ -116,7 +99,6 @@ export default {
 					}, 10)
 				})
 			} else {
-				// Remove click outside listener
 				document.removeEventListener('click', this.handleClickOutside)
 			}
 		},
@@ -130,7 +112,6 @@ export default {
 				const format = this.getDateFormat()
 
 				if (this.column.type === 'datetime-time') {
-					// For time-only values, use the same approach as DatetimeTimeForm
 					const timeMoment = Moment(this.value, format)
 					if (timeMoment.isValid()) {
 						this.editDateTimeValue = timeMoment.toDate()
@@ -138,19 +119,17 @@ export default {
 						this.editDateTimeValue = new Date()
 					}
 				} else {
-					// For date and datetime values, parse normally
 					const parsedMoment = Moment(this.value, format)
 					this.editDateTimeValue = parsedMoment.isValid() ? parsedMoment.toDate() : null
 				}
 			} else if ((this.value === null || this.value === '') && this.column.datetimeDefault) {
-				// Handle default values
 				if (this.column.datetimeDefault === 'now' || this.column.datetimeDefault === 'today') {
 					this.editDateTimeValue = new Date()
 				} else {
 					this.editDateTimeValue = this.column.type === 'datetime-time' ? new Date() : null
 				}
 			} else {
-				// For time columns, always provide a default Date object to prevent errors
+				// For time columns, have default Date object to prevent errors
 				this.editDateTimeValue = this.column.type === 'datetime-time' ? new Date() : null
 			}
 		},
@@ -235,6 +214,13 @@ export default {
 
 		div {
 			width: 100%;
+		}
+
+		/*
+		The fully accessible view with labels is always present in the row-editing-dialog. So it's ok if we do not have labels in inline editing.
+		*/
+		:deep(.native-datetime-picker--label) {
+			display: none;
 		}
 	}
 
