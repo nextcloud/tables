@@ -11,8 +11,8 @@
 			ref="editingContainer"
 			class="edit-mode"
 			tabindex="0"
-			@keydown.enter="saveChanges"
-			@keydown.escape="cancelEdit">
+			@keydown.enter.stop="saveChanges"
+			@keydown.escape.stop="cancelEdit">
 			<NcSelect v-model="editValue"
 				:options="getAllNonDeletedOptions"
 				:aria-label-combobox="t('tables', 'Options')"
@@ -73,6 +73,7 @@ export default {
 				this.initEditValue()
 				// Use a small delay to prevent the same click event that triggered editing
 				// from immediately triggering the click outside handler
+				// TODO: implement better click outside detection without setTimeout
 				this.$nextTick(() => {
 					setTimeout(() => {
 						document.addEventListener('click', this.handleClickOutside)
