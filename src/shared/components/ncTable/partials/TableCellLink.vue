@@ -151,12 +151,15 @@ export default {
 		isEditing(isEditing) {
 			if (isEditing) {
 				this.initEditMode()
+				// Use a small delay to prevent the same click event that triggered editing
+				// from immediately triggering the click outside handler
+				// TODO: implement better click outside detection without setTimeout
 				this.$nextTick(() => {
-					// Add click outside listener
-					document.addEventListener('click', this.handleClickOutside)
+					setTimeout(() => {
+						document.addEventListener('click', this.handleClickOutside)
+					}, 100)
 				})
 			} else {
-				// Remove click outside listener
 				document.removeEventListener('click', this.handleClickOutside)
 			}
 		},
@@ -233,15 +236,6 @@ export default {
 			}
 
 			for (const item of res.data.ocs.data.entries) {
-				// Remove previews for thumbnail and icons if they can not be fetched from the server
-				if (item.thumbnailUrl && !await this.isUrlReachable(item.thumbnailUrl)) {
-					delete item.thumbnailUrl
-				}
-				if (item.icon && !await this.isUrlReachable(item.icon)) {
-					delete item.icon
-				}
-
-				// Add needed general data
 				item.providerId = providerId
 				item.subline = res.data?.ocs?.data?.name
 				item.value = item.resourceUrl
@@ -312,6 +306,7 @@ export default {
 
 	.non-edit-mode {
 		cursor: pointer;
+		min-height: 20px;
 	}
 }
 
