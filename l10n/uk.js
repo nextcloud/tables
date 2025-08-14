@@ -564,6 +564,7 @@ OC.L10N.register(
     "Outdated data. View is reloaded" : "Застарілі дані. Подання завантажено повторно",
     "Could not insert row." : "Не вдалося вставити рядок.",
     "Could not remove row." : "Не вдалося вилучити рядок.",
+    "Could not verify row. View is reloaded" : "Не вдалося перевірити рядок. Вигляд перезавантажено.",
     "Could not insert table." : "Не вдалося вставити таблицю.",
     "Could not load tables." : "Не вдалося завантажити таблиці.",
     "Could not fetch tables" : "Не вдалося отримати таблиці.",

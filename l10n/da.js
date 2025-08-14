@@ -127,6 +127,8 @@ OC.L10N.register(
     "Metadata" : "Metadata",
     "Column" : "Kolonne",
     "Operator" : "Operatør",
+    "Ascending" : "stigende",
+    "Descending" : "Faldende",
     "Updated table \"{emoji}{table}\"." : "Opdateret tabel \"{emoji}{table}\".",
     "Cannot update table. Title is missing." : "Kan ikke opdatere tabellen. Titel mangler.",
     "Could not fetch shares." : "Kunne ikke hente delinger.",

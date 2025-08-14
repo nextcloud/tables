@@ -564,6 +564,7 @@ OC.L10N.register(
     "Outdated data. View is reloaded" : "Veraltete Daten. Ansicht wird neu geladen",
     "Could not insert row." : "Zeile konnte nicht eingefügt werden.",
     "Could not remove row." : "Zeile konnte nicht entfernt werden.",
+    "Could not verify row. View is reloaded" : "Zeile konnte nicht überprüft werden. Ansicht wird neu geladen",
     "Could not insert table." : "Tabelle konnte nicht eingefügt werden.",
     "Could not load tables." : "Tabellen konnten nicht geladen werden.",
     "Could not fetch tables" : "Tabellen konnten nicht geladen werden",

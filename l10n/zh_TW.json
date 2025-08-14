@@ -562,6 +562,7 @@
     "Outdated data. View is reloaded" : "過期資料。檢視已重新載入",
     "Could not insert row." : "無法插入列。",
     "Could not remove row." : "無法移除列。",
+    "Could not verify row. View is reloaded" : "無法驗證列。已重新載入檢視",
     "Could not insert table." : "無法插入表格。",
     "Could not load tables." : "無法載入表格。",
     "Could not fetch tables" : "無法擷取表格",

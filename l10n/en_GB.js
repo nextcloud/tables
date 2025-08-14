@@ -564,6 +564,7 @@ OC.L10N.register(
     "Outdated data. View is reloaded" : "Outdated data. View is reloaded",
     "Could not insert row." : "Could not insert row.",
     "Could not remove row." : "Could not remove row.",
+    "Could not verify row. View is reloaded" : "Could not verify row. View is reloaded",
     "Could not insert table." : "Could not insert table.",
     "Could not load tables." : "Could not load tables.",
     "Could not fetch tables" : "Could not fetch tables",
