@@ -523,10 +523,20 @@ export default {
 			text-align: left;
 			vertical-align: middle;
 			border: 1px solid var(--color-border-dark);
+
+			
 		}
 
 		tr:active, tr:hover, tr:focus, tr:hover .editor-wrapper .editor {
 			background-color: var(--color-background-dark);
+		}
+
+		.editor-wrapper .editor {
+			background-color: inherit;
+		}
+
+		.selected:active, .selected:hover, .selected:focus, tr:hover .editor-wrapper .editor {
+			background-color: inherit;
 		}
 
 		// viewer integration
