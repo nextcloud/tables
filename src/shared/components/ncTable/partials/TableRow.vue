@@ -19,11 +19,18 @@
 				:is-view="isView" />
 		</td>
 		<td v-if="config.showActions" :class="{sticky: config.showActions}">
-			<NcButton v-if="config.canEditRows || config.canDeleteRows" type="primary" :aria-label="t('tables', 'Edit row')" data-cy="editRowBtn" @click="$emit('edit-row', row.id)">
-				<template #icon>
-					<Pencil :size="20" />
-				</template>
-			</NcButton>
+			<div class="buttons-wrapper">
+				<NcButton v-if="config.canEditRows || config.canDeleteRows" type="primary" :aria-label="t('tables', 'Edit row')" data-cy="editRowBtn" @click="$emit('edit-row', row.id)">
+					<template #icon>
+						<Pencil :size="20" />
+					</template>
+				</NcButton>
+				<NcButton v-if="hasActivity" :aria-label="t('tables', 'Activity')" data-cy="activityRowBtn" @click="$emit('activity-row', row.id)">
+					<template #icon>
+						<ActivityIcon :size="20" />
+					</template>
+				</NcButton>
+			</div>
 		</td>
 	</tr>
 </template>
@@ -31,6 +38,7 @@
 <script>
 import { NcCheckboxRadioSwitch, NcButton } from '@nextcloud/vue'
 import Pencil from 'vue-material-design-icons/Pencil.vue'
+import ActivityIcon from 'vue-material-design-icons/LightningBolt.vue'
 import TableCellHtml from './TableCellHtml.vue'
 import TableCellProgress from './TableCellProgress.vue'
 import TableCellLink from './TableCellLink.vue'
@@ -48,6 +56,7 @@ import { translate as t } from '@nextcloud/l10n'
 import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
 } from '../../../../shared/constants.ts'
+const capabilities = window.OC.getCapabilities()
 
 export default {
 	name: 'TableRow',
@@ -60,6 +69,7 @@ export default {
 		TableCellHtml,
 		NcButton,
 		Pencil,
+		ActivityIcon,
 		NcCheckboxRadioSwitch,
 		TableCellDateTime,
 		TableCellTextLine,
@@ -98,6 +108,11 @@ export default {
 			type: Boolean,
 			default: true,
 		},
+	},
+	data() {
+		return {
+			hasActivity: capabilities && capabilities.activity,
+		}
 	},
 	computed: {
 		getSelection: {
@@ -217,6 +232,12 @@ tr.selected {
 
 :deep(.checkbox-radio-switch__icon) {
 	margin: 0;
+}
+
+.buttons-wrapper {
+	display: flex;
+	justify-content: flex-end;
+	gap: calc(var(--default-grid-baseline) * 2);
 }
 
 </style>

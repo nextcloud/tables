@@ -24,6 +24,7 @@
 		@delete-column="deleteColumn"
 		@create-row="createRow"
 		@edit-row="editRow"
+		@activity-row="activityRow"
 		@delete-selected-rows="deleteSelectedRows">
 		<template #actions>
 			<slot name="actions" />
@@ -132,6 +133,9 @@ export default {
 		},
 		deleteSelectedRows(rows) {
 			emit('tables:row:delete', { rows, isView: this.isView, elementId: this.element.id })
+		},
+		activityRow(rowId) {
+			emit('tables:row:activity', { row: this.rows.find(r => r.id === rowId) })
 		},
 
 		toggleShare() {

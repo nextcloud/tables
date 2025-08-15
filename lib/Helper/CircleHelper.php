@@ -104,4 +104,24 @@ class CircleHelper {
 		return $circleIds;
 	}
 
+	public function getUserIdsInCircle(string $circleId): array {
+		if (!$this->circlesEnabled || !$this->circlesManager) {
+			return [];
+		}
+
+		try {
+			$circle = $this->circlesManager->getCircle($circleId);
+			if ($circle === null) {
+				return [];
+			}
+			$members = $circle->getMembers();
+			return array_map(fn ($member) => $member->getUserId(), $members);
+		} catch (Throwable $e) {
+			$this->logger->warning('Failed to get users in circle: ' . $e->getMessage(), [
+				'circleId' => $circleId
+			]);
+			return [];
+		}
+	}
+
 }
