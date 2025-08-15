@@ -5,30 +5,23 @@
 <template>
 	<div class="cell-editor">
 		<div v-if="!isEditing" @click="startEditing">
-			<NcEditor v-if="value !== '' && value !== null"
+			<NcEditor v-if="value && value.trim()"
 				:can-edit="false"
 				:text="value"
 				:show-border="false"
 				:show-readonly-bar="false" />
 		</div>
-		<div v-else
-			ref="editingContainer"
-			tabindex="0"
-			@keydown.enter="saveChanges"
-			@keydown.escape="cancelEdit">
-			<NcEditor
-				:can-edit="true"
-				:text.sync="editValue"
-				:show-readonly-bar="false" />
-			<div v-if="localLoading" class="loading-indicator">
-				<div class="icon-loading-small icon-loading-inline" />
-			</div>
-		</div>
+		<RichEditor v-else
+			:value="value"
+			:loading="isSaving"
+			@save="saveChanges"
+			@cancel="cancelEdit" />
 	</div>
 </template>
 
 <script>
 import NcEditor from '../../ncEditor/NcEditor.vue'
+import RichEditor from './RichEditor.vue'
 import cellEditMixin from '../mixins/cellEditMixin.js'
 import { translate as t } from '@nextcloud/l10n'
 
@@ -36,7 +29,8 @@ export default {
 	name: 'TableCellEditor',
 
 	components: {
-		NcEditor
+		NcEditor,
+		RichEditor,
 	},
 
 	mixins: [cellEditMixin],
@@ -56,48 +50,41 @@ export default {
 		},
 	},
 
-	watch: {
-		isEditing(newValue) {
-			if (newValue) {
-				this.$nextTick(() => {
-					// Add click outside listener
-					document.addEventListener('click', this.handleClickOutside)
-				})
-			} else {
-				// Remove click outside listener
-				document.removeEventListener('click', this.handleClickOutside)
-			}
-		},
+	data() {
+		return {
+			isSaving: false,
+		}
 	},
 
 	methods: {
 		t,
-		async saveChanges() {
-			if (this.localLoading) {
-				return
-			}
 
-			if (this.editValue === this.value) {
+		async saveChanges(newValue) {
+			if (this.isSaving) return
+
+			if (newValue === this.value) {
 				this.isEditing = false
 				return
 			}
 
-			const newValue = this.editValue ?? ''
-			const success = await this.updateCellValue(newValue)
+			this.isSaving = true
+			const success = await this.updateCellValue(newValue || '')
+			this.isSaving = false
 
-			if (!success) {
+			if (success) {
+				this.isEditing = false
+			} else {
 				this.cancelEdit()
 			}
+		},
 
-			this.localLoading = false
+		cancelEdit() {
 			this.isEditing = false
 		},
 
-		handleClickOutside(event) {
-			// Check if the click is outside the editing container
-			if (this.$refs.editingContainer && !this.$refs.editingContainer.contains(event.target)) {
-				this.saveChanges()
-			}
+		startEditing() {
+			if (!this.canEditCell()) return false
+			this.isEditing = true
 		},
 	},
 }
@@ -110,43 +97,16 @@ export default {
 
 .cell-editor > div {
 	cursor: pointer;
-}
-
-.inline-editing-container {
-	display: flex;
-	flex-direction: column;
-}
-
-.editor-buttons {
-	display: flex;
-	gap: 8px;
-	margin-top: 8px;
-	align-items: center;
-}
-
-div {
-	max-width: 670px;
-	max-height: calc(var(--default-line-height) * 6);
-	overflow-y: hidden;
-	min-width: 100px;
-	margin-top: calc(var(--default-grid-baseline) * 2);
-	margin-bottom: calc(var(--default-grid-baseline) * 2);
+	min-height: 24px;
 }
 
 :deep(.text-editor__wrapper div.ProseMirror) {
-	padding: 0px 0px 0px 0px;
+	padding: 8px;
+	min-height: 24px;
 }
 
 :deep(div[contenteditable='false']) {
 	background: transparent;
 	color: var(--color-main-text);
-	width: auto;
-	min-height: auto;
-	opacity: 1;
-	font-size: var(--default-font-size);
-}
-
-:deep(.editor__content) {
-	max-width: 100% !important;
 }
 </style>
