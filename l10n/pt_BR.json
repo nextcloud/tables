@@ -562,6 +562,7 @@
     "Outdated data. View is reloaded" : "Dados desatualizados. Visualização é recarregada",
     "Could not insert row." : "Não foi possível colar linha.",
     "Could not remove row." : "Não foi possível remover linha.",
+    "Could not verify row. View is reloaded" : "Não foi possível verificar a linha. A visualização foi recarregada.",
     "Could not insert table." : "Não foi possível colar tabela.",
     "Could not load tables." : "Não foi possível carregar tabelas.",
     "Could not fetch tables" : "Não foi possível buscar tabelas",
