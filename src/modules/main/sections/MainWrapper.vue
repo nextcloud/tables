@@ -89,6 +89,9 @@ export default {
 		element() {
 			this.reload()
 		},
+		activeRowId() {
+			this.reload()
+		},
 	},
 
 	beforeMount() {
