@@ -32,12 +32,21 @@
 			</template>
 			<NcAppSidebarTab
 				id="integration"
-				:order="1"
+				:order="2"
 				:name="t('tables', 'Integration')">
 				<SidebarIntegration />
 				<template #icon>
 					<Connection :size="20" />
 				</template>
+			</NcAppSidebarTab>
+			<NcAppSidebarTab v-if="isActivityEnabled"
+				id="activity"
+				:order="1"
+				:name="t('tables', 'Activity')">
+				<template #icon>
+					<ActivityIcon :size="20" />
+				</template>
+				<SidebarActivity />
 			</NcAppSidebarTab>
 			<NcAppSidebarTab v-if="activeElement && canShareElement(activeElement)"
 				id="sharing"
@@ -52,12 +61,15 @@
 
 <script>
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
+import SidebarActivity from './SidebarActivity.vue'
 import SidebarSharing from './SidebarSharing.vue'
 import SidebarIntegration from './SidebarIntegration.vue'
 import { NcAppSidebar, NcAppSidebarTab, NcUserBubble } from '@nextcloud/vue'
 import { mapState } from 'pinia'
+import ActivityIcon from 'vue-material-design-icons/LightningBolt.vue'
 import Connection from 'vue-material-design-icons/Connection.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
+import activityMixin from '../../../shared/mixins/activityMixin.js'
 import Moment from '@nextcloud/moment'
 import { useTablesStore } from '../../../store/store.js'
 
@@ -65,10 +77,12 @@ export default {
 	name: 'Sidebar',
 	components: {
 		NcUserBubble,
+		SidebarActivity,
 		SidebarSharing,
 		SidebarIntegration,
 		NcAppSidebar,
 		NcAppSidebarTab,
+		ActivityIcon,
 		Connection,
 	},
 
@@ -78,7 +92,7 @@ export default {
 		},
 	},
 
-	mixins: [permissionsMixin],
+	mixins: [permissionsMixin, activityMixin],
 
 	data() {
 		return {
@@ -108,10 +122,12 @@ export default {
 	mounted() {
 		subscribe('tables:sidebar:sharing', data => this.handleToggleSidebar(data))
 		subscribe('tables:sidebar:integration', data => this.handleToggleSidebar(data))
+		subscribe('tables:sidebar:activity', data => this.handleToggleSidebar(data))
 	},
 	beforeDestroy() {
 		unsubscribe('tables:sidebar:sharing', data => this.handleToggleSidebar(data))
 		unsubscribe('tables:sidebar:integration', data => this.handleToggleSidebar(data))
+		unsubscribe('tables:sidebar:activity', data => this.handleToggleSidebar(data))
 	},
 	methods: {
 		handleToggleSidebar(data) {
