@@ -13,6 +13,7 @@ export default class TextLineColumn extends AbstractTextColumn {
 		super(data)
 		this.type = ColumnTypes.TextLine
 		this.textMaxLength = data.textMaxLength
+		this.textUnique = data.textUnique
 	}
 
 	sort(mode, nextSorts) {

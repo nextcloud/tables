@@ -127,6 +127,10 @@ class Version000000Date20210921000000 extends SimpleMigrationStep {
 			$table->addColumn('text_max_length', Types::INTEGER, [
 				'notnull' => false,
 			]);
+			$table->addColumn('text_unique', Types::BOOLEAN, [
+				'notnull' => false,
+				'default' => 0,
+			]);
 
 			// type number
 			$table->addColumn('number_default', Types::FLOAT, [

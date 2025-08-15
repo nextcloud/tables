@@ -158,6 +158,7 @@ class ApiColumnsController extends AOCSController {
 	 * @param string|null $textDefault Default
 	 * @param string|null $textAllowedPattern Allowed regex pattern
 	 * @param int|null $textMaxLength Max raw text length
+	 * @param bool|null $textUnique Whether the text value must be unique, if column is a text
 	 * @param 'progress'|'stars'|null $subtype Subtype for the new column
 	 * @param string|null $description Description
 	 * @param list<int>|null $selectedViewIds View IDs where this columns should be added
@@ -174,7 +175,7 @@ class ApiColumnsController extends AOCSController {
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
-	public function createTextColumn(int $baseNodeId, string $title, ?string $textDefault, ?string $textAllowedPattern, ?int $textMaxLength, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
+	public function createTextColumn(int $baseNodeId, string $title, ?string $textDefault, ?string $textAllowedPattern, ?int $textMaxLength, ?bool $textUnique = false, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table'): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		$column = $this->service->create(
@@ -189,7 +190,8 @@ class ApiColumnsController extends AOCSController {
 				description: $description,
 				textDefault: $textDefault,
 				textAllowedPattern: $textAllowedPattern,
-				textMaxLength: $textMaxLength
+				textMaxLength: $textMaxLength,
+				textUnique: $textUnique
 			),
 			$selectedViewIds
 		);

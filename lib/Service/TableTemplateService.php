@@ -12,6 +12,7 @@ namespace OCA\Tables\Service;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Dto\Column as ColumnDto;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
@@ -847,7 +848,7 @@ class TableTemplateService {
 			$this->rowService->create($table->getId(), null, $data);
 		} catch (PermissionError $e) {
 			$this->logger->warning('Cannot create row, permission denied: ' . $e->getMessage());
-		} catch (InternalError $e) {
+		} catch (BadRequestError|InternalError $e) {
 			$this->logger->warning('Exception occurred while creating a row: ' . $e->getMessage());
 		} catch (NotFoundError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);

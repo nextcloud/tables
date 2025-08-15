@@ -33,6 +33,7 @@
       "textDefault": "",
       "textAllowedPattern": "",
       "textMaxLength": -1,
+      "textUnique": false,
       "selectionOptions": [],
       "selectionDefault": "",
       "datetimeDefault": ""
@@ -60,6 +61,7 @@
       "textDefault": "",
       "textAllowedPattern": "",
       "textMaxLength": -1,
+      "textUnique": false,
       "selectionOptions": [],
       "selectionDefault": "",
       "datetimeDefault": ""
@@ -87,6 +89,7 @@
       "textDefault": "",
       "textAllowedPattern": "",
       "textMaxLength": -1,
+      "textUnique": false,
       "selectionOptions": [],
       "selectionDefault": "",
       "datetimeDefault": ""
@@ -114,6 +117,7 @@
       "textDefault": "",
       "textAllowedPattern": "",
       "textMaxLength": -1,
+      "textUnique": false,
       "selectionOptions": [],
       "selectionDefault": "",
       "datetimeDefault": "today"
@@ -141,6 +145,7 @@
       "textDefault": "",
       "textAllowedPattern": "",
       "textMaxLength": -1,
+      "textUnique": false,
       "selectionOptions": [],
       "selectionDefault": "",
       "datetimeDefault": ""
@@ -168,6 +173,7 @@
       "textDefault": "",
       "textAllowedPattern": "",
       "textMaxLength": -1,
+      "textUnique": false,
       "selectionOptions": [],
       "selectionDefault": "",
       "datetimeDefault": ""
@@ -195,6 +201,7 @@
       "textDefault": "",
       "textAllowedPattern": "",
       "textMaxLength": -1,
+      "textUnique": false,
       "selectionOptions": [],
       "selectionDefault": "",
       "datetimeDefault": ""
@@ -222,6 +229,7 @@
       "textDefault": "",
       "textAllowedPattern": "",
       "textMaxLength": -1,
+      "textUnique": false,
       "selectionOptions": [],
       "selectionDefault": "",
       "datetimeDefault": ""
@@ -249,6 +257,7 @@
       "textDefault": "",
       "textAllowedPattern": "",
       "textMaxLength": -1,
+      "textUnique": false,
       "selectionOptions": [],
       "selectionDefault": "",
       "datetimeDefault": ""

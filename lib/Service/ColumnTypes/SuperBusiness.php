@@ -37,6 +37,10 @@ class SuperBusiness {
 		return true;
 	}
 
+	public function validateValue(mixed $value, Column $column, string $userId, int $tableId, ?int $rowId): void {
+		// override this method in the child class when needed
+	}
+
 	protected function isValidDate(string $dateString, string $format): bool {
 		try {
 			$dateTime = new DateTime($dateString);

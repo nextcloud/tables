@@ -38,14 +38,30 @@
 					min="0">
 			</div>
 		</div>
+
+		<!-- unique value -->
+		<div class="row">
+			<div class="row space-T">
+				<div class="fix-col-4 title">
+					{{ t('tables', 'Unique value') }}
+				</div>
+				<div class="fix-col-4 margin-bottom">
+					<NcCheckboxRadioSwitch type="switch" :checked.sync="mutableColumn.textUnique" />
+				</div>
+			</div>
+		</div>
 	</div>
 </template>
 
 <script>
 
 import { translate as t } from '@nextcloud/l10n'
+import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 
 export default {
+	components: {
+		NcCheckboxRadioSwitch,
+	},
 
 	props: {
 		column: {

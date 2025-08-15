@@ -115,7 +115,7 @@ class ContextController extends AOCSController {
 		} catch (PermissionError $e) {
 			return $this->handlePermissionError($e);
 		} catch (InvalidArgumentException $e) {
-			return $this->handleBadRequestError(new BadRequestError($e->getMessage(), $e->getCode(), $e));
+			return $this->handleError(new InternalError($e->getMessage(), $e->getCode(), $e));
 		}
 	}
 
