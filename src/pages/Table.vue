@@ -4,21 +4,38 @@
 -->
 <template>
 	<div class="main-table-view">
-		<MainWrapper :element="activeTable" :is-view="false" />
-		<MainModals />
+		<ErrorMessage v-if="errorMessage" :message="errorMessage" />
+
+		<div v-else-if="!activeTable">
+			<div class="icon-loading" />
+		</div>
+
+		<div v-else>
+			<MainWrapper :element="activeTable" :is-view="false" />
+			<MainModals />
+		</div>
 	</div>
 </template>
 
 <script>
-import { mapState } from 'pinia'
+import { mapState, mapActions } from 'pinia'
 import { useTablesStore } from '../store/store.js'
 import MainWrapper from '../modules/main/sections/MainWrapper.vue'
 import MainModals from '../modules/modals/Modals.vue'
+import ErrorMessage from '../modules/main/partials/ErrorMessage.vue'
+import displayError, { getNotFoundError, getGenericLoadError } from '../shared/utils/displayError.js'
 
 export default {
 	components: {
 		MainWrapper,
 		MainModals,
+		ErrorMessage,
+	},
+
+	data() {
+		return {
+			errorMessage: null,
+		}
 	},
 
 	computed: {
@@ -26,20 +43,39 @@ export default {
 	},
 
 	watch: {
-		activeTableId() {
-			if (this.activeTableId && !this.activeTable) {
-				// table does not exists, go to startpage
-				this.$router.push('/').catch(err => err)
-			}
+		'$route.params.tableId': {
+			immediate: true,
+			handler() {
+				this.errorMessage = null // reset previous error
+				this.checkTable()
+			},
 		},
-		activeTable() {
-			if (this.activeTableId && !this.activeTable) {
-				// table does not exists, go to startpage
-				this.$router.push('/').catch(err => err)
+	},
+
+	methods: {
+		...mapActions(useTablesStore, ['loadContextTable', 'setActiveTableId']),
+
+		async checkTable() {
+			const id = this.activeTableId || this.$route.params.tableId
+			if (!id) return
+
+			try {
+				if (!this.activeTable) {
+					await this.loadContextTable({ id })
+				}
+				this.setActiveTableId(parseInt(id))
+			} catch (e) {
+				if (e.message === 'NOT_FOUND') {
+					this.errorMessage = getNotFoundError('table')
+				} else {
+					this.errorMessage = getGenericLoadError('table')
+					displayError(e, this.errorMessage)
+				}
 			}
 		},
 	},
 }
+
 </script>
 <style lang="scss">
 .main-table-view {
