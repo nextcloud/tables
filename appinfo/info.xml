@@ -71,6 +71,17 @@ Have a good time and manage whatever you want.
 		<command>OCA\Tables\Command\CleanLegacy</command>
 		<command>OCA\Tables\Command\TransferLegacyRows</command>
 	</commands>
+	<activity>
+		<settings>
+			<setting>OCA\Tables\Activity\SettingChanges</setting>
+		</settings>
+		<filters>
+			<filter>OCA\Tables\Activity\Filter</filter>
+		</filters>
+		<providers>
+			<provider>OCA\Tables\Activity\TablesProvider</provider>
+		</providers>
+	</activity>
 	<navigations>
 		<navigation>
 			<name>Tables</name>
