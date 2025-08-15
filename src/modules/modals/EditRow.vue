@@ -9,42 +9,75 @@
 		size="large"
 		@closing="actionCancel">
 		<div class="modal__content" @keydown="onKeydown">
-			<div v-for="column in nonMetaColumns" :key="column.id">
-				<ColumnFormComponent
-					:column="column"
-					:value.sync="localRow[column.id]" />
-				<NcNoteCard v-if="(column.viewColumnInformation?.mandatory ?? column.mandatory) && !isValueValidForColumn(localRow[column.id], column)"
-					type="error">
-					{{ t('tables', '"{columnTitle}" should not be empty', { columnTitle: column.title }) }}
-				</NcNoteCard>
-				<NcNoteCard v-if="localRow[column.id] && column.type === 'text-link' && !isValidUrlProtocol(localRow[column.id])"
-					type="error">
-					{{ t('tables', 'Invalid protocol. Allowed: {allowed}', {allowed: allowedProtocols.join(', ')}) }}
-				</NcNoteCard>
+			<div v-if="isActivityEnabled" class="tabs-navigation">
+				<NcButton :aria-label="t('tables', 'Edit')"
+					:active="activeTabId === 'edit'"
+					:variant="activeTabId === 'edit' ? 'primary' : 'secondary'"
+					wide
+					@click="activeTabId = 'edit'">
+					<template #icon>
+						<HomeIcon v-if="activeTabId === 'edit'" />
+						<HomeOutlineIcon v-else />
+					</template>
+					{{ t('tables', 'Edit') }}
+				</NcButton>
+				<NcButton :aria-label="t('tables', 'Activity')"
+					:active="activeTabId === 'activity'"
+					:variant="activeTabId === 'activity' ? 'primary' : 'secondary'"
+					wide
+					@click="activeTabId = 'activity'">
+					<template #icon>
+						<ActivityIcon />
+					</template>
+					{{ t('tables', 'Activity') }}
+				</NcButton>
 			</div>
-			<div class="row">
-				<div class="fix-col-4 space-T" :class="{'justify-between': showDeleteButton, 'end': !showDeleteButton}">
-					<div v-if="showDeleteButton">
-						<NcButton v-if="!prepareDeleteRow" :aria-label="t('tables', 'Delete')" type="error" data-cy="editRowDeleteButton" @click="prepareDeleteRow = true">
-							{{ t('tables', 'Delete') }}
-						</NcButton>
-						<NcButton v-if="prepareDeleteRow"
-							data-cy="editRowDeleteConfirmButton"
-							:wide="true"
-							:aria-label="t('tables', 'I really want to delete this row!')"
-							type="error"
-							@click="actionDeleteRow">
-							{{ t('tables', 'I really want to delete this row!') }}
-						</NcButton>
-					</div>
-					<NcButton v-if="canUpdateData(element) && !localLoading" :aria-label="t('tables', 'Save')" type="primary"
-						data-cy="editRowSaveButton"
-						:disabled="hasEmptyMandatoryRows || hasInvalidUrlProtocol"
-						@click="actionConfirm">
-						{{ t('tables', 'Save') }}
-					</NcButton>
-					<div v-if="localLoading" class="icon-loading" style="margin-left: 20px;" />
+
+			<div v-if="activeTabId === 'edit'" class="row">
+				<div v-for="column in nonMetaColumns" :key="column.id">
+					<ColumnFormComponent
+						:column="column"
+						:value.sync="localRow[column.id]" />
+					<NcNoteCard v-if="column.mandatory && !isValueValidForColumn(localRow[column.id], column)"
+						type="error">
+						{{ t('tables', '"{columnTitle}" should not be empty', { columnTitle: column.title }) }}
+					</NcNoteCard>
+					<NcNoteCard v-if="localRow[column.id] && column.type === 'text-link' && !isValidUrlProtocol(localRow[column.id])"
+						type="error">
+						{{ t('tables', 'Invalid protocol. Allowed: {allowed}', {allowed: allowedProtocols.join(', ')}) }}
+					</NcNoteCard>
 				</div>
+				<div class="row">
+					<div class="fix-col-4 space-T" :class="{'justify-between': showDeleteButton, 'end': !showDeleteButton}">
+						<div v-if="showDeleteButton">
+							<NcButton v-if="!prepareDeleteRow" :aria-label="t('tables', 'Delete')" type="error" data-cy="editRowDeleteButton" @click="prepareDeleteRow = true">
+								{{ t('tables', 'Delete') }}
+							</NcButton>
+							<NcButton v-if="prepareDeleteRow"
+								data-cy="editRowDeleteConfirmButton"
+								:wide="true"
+								:aria-label="t('tables', 'I really want to delete this row!')"
+								type="error"
+								@click="actionDeleteRow">
+								{{ t('tables', 'I really want to delete this row!') }}
+							</NcButton>
+						</div>
+						<NcButton v-if="canUpdateData(element) && !localLoading" :aria-label="t('tables', 'Save')" type="primary"
+							data-cy="editRowSaveButton"
+							:disabled="hasEmptyMandatoryRows || hasInvalidUrlProtocol"
+							@click="actionConfirm">
+							{{ t('tables', 'Save') }}
+						</NcButton>
+						<div v-if="localLoading" class="icon-loading" style="margin-left: 20px;" />
+					</div>
+				</div>
+			</div>
+
+			<div v-else-if="activeTabId === 'activity'">
+				<ActivityList filter="tables"
+					:object-id="row.id"
+					object-type="tables_row"
+					type="tables" />
 			</div>
 		</div>
 	</NcDialog>
@@ -62,16 +95,25 @@ import { mapActions } from 'pinia'
 import { useTablesStore } from '../../store/store.js'
 import { useDataStore } from '../../store/data.js'
 import { ALLOWED_PROTOCOLS } from '../../shared/constants.ts'
+import ActivityIcon from 'vue-material-design-icons/LightningBolt.vue'
+import HomeIcon from 'vue-material-design-icons/Home.vue'
+import HomeOutlineIcon from 'vue-material-design-icons/HomeOutline.vue'
+import ActivityList from '../../shared/components/ActivityList.vue'
+import activityMixin from '../../shared/mixins/activityMixin.js'
 
 export default {
 	name: 'EditRow',
 	components: {
+		ActivityList,
 		NcDialog,
 		NcButton,
 		ColumnFormComponent,
 		NcNoteCard,
+		ActivityIcon,
+		HomeIcon,
+		HomeOutlineIcon,
 	},
-	mixins: [permissionsMixin, rowHelper],
+	mixins: [permissionsMixin, rowHelper, activityMixin],
 	props: {
 		showModal: {
 			type: Boolean,
@@ -100,6 +142,7 @@ export default {
 			prepareDeleteRow: false,
 			localLoading: false,
 			allowedProtocols: ALLOWED_PROTOCOLS,
+			activeTabId: 'edit',
 		}
 	},
 	computed: {
@@ -276,5 +319,11 @@ export default {
 		display: block !important;
 		max-width: fit-content !important;
 	}
+}
+
+.tabs-navigation {
+	display: flex;
+	gap: 12px;
+	margin-bottom: 20px;
 }
 </style>

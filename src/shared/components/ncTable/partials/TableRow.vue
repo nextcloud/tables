@@ -25,7 +25,7 @@
 		<td v-if="config.showActions" :class="{sticky: config.showActions}">
 			<NcButton v-if="config.canEditRows || config.canDeleteRows" type="primary" :aria-label="t('tables', 'Edit row')" data-cy="editRowBtn" @click="$emit('edit-row', row.id)">
 				<template #icon>
-					<PencilOutline :size="20" />
+					<Fullscreen :size="20" />
 				</template>
 			</NcButton>
 		</td>
@@ -34,8 +34,7 @@
 
 <script>
 import { NcCheckboxRadioSwitch, NcButton } from '@nextcloud/vue'
-import Pencil from 'vue-material-design-icons/Pencil.vue'
-import PencilOutline from 'vue-material-design-icons/PencilOutline.vue'
+import Fullscreen from 'vue-material-design-icons/Fullscreen.vue'
 import TableCellHtml from './TableCellHtml.vue'
 import TableCellProgress from './TableCellProgress.vue'
 import TableCellLink from './TableCellLink.vue'
@@ -53,6 +52,7 @@ import { translate as t } from '@nextcloud/l10n'
 import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
 } from '../../../../shared/constants.ts'
+import activityMixin from '../../../mixins/activityMixin.js'
 
 export default {
 	name: 'TableRow',
@@ -64,8 +64,7 @@ export default {
 		TableCellProgress,
 		TableCellHtml,
 		NcButton,
-		Pencil,
-		PencilOutline,
+		Fullscreen,
 		NcCheckboxRadioSwitch,
 		TableCellDateTime,
 		TableCellTextLine,
@@ -75,6 +74,7 @@ export default {
 		TableCellUsergroup,
 	},
 
+	mixins: [activityMixin],
 	props: {
 		row: {
 			type: Object,
