@@ -3,22 +3,37 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcEditor v-if="value !== '' && value !== null"
-		:can-edit="false"
-		:text="value"
-		:show-border="false"
-		:show-readonly-bar="false" />
+	<div class="cell-editor">
+		<div v-if="!isEditing" @click="startEditing">
+			<NcEditor v-if="value && value.trim()"
+				:can-edit="false"
+				:text="value"
+				:show-border="false"
+				:show-readonly-bar="false" />
+		</div>
+		<RichEditor v-else
+			:value="value"
+			:loading="isSaving"
+			@save="saveChanges"
+			@cancel="cancelEdit" />
+	</div>
 </template>
 
 <script>
 import NcEditor from '../../ncEditor/NcEditor.vue'
+import RichEditor from './RichEditor.vue'
+import cellEditMixin from '../mixins/cellEditMixin.js'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'TableCellEditor',
 
 	components: {
 		NcEditor,
+		RichEditor,
 	},
+
+	mixins: [cellEditMixin],
 
 	props: {
 		column: {
@@ -34,35 +49,64 @@ export default {
 			default: '',
 		},
 	},
+
+	data() {
+		return {
+			isSaving: false,
+		}
+	},
+
+	methods: {
+		t,
+
+		async saveChanges(newValue) {
+			if (this.isSaving) return
+
+			if (newValue === this.value) {
+				this.isEditing = false
+				return
+			}
+
+			this.isSaving = true
+			const success = await this.updateCellValue(newValue || '')
+			this.isSaving = false
+
+			if (success) {
+				this.isEditing = false
+			} else {
+				this.cancelEdit()
+			}
+		},
+
+		cancelEdit() {
+			this.isEditing = false
+		},
+
+		startEditing() {
+			if (!this.canEditCell()) return false
+			this.isEditing = true
+		},
+	},
 }
 </script>
 
 <style lang="scss" scoped>
+.cell-editor {
+	width: 100%;
+}
 
-div {
-	max-width: 670px;
-	max-height: calc(var(--default-line-height) * 6);
-	overflow-y: scroll;
-	min-width: 100px;
-	margin-top: calc(var(--default-grid-baseline) * 2);
-	margin-bottom: calc(var(--default-grid-baseline) * 2);
+.cell-editor > div {
+	cursor: pointer;
+	min-height: 24px;
 }
 
 :deep(.text-editor__wrapper div.ProseMirror) {
-	padding: 0px 0px 0px 0px;
-
+	padding: 8px;
+	min-height: 24px;
 }
 
 :deep(div[contenteditable='false']) {
 	background: transparent;
 	color: var(--color-main-text);
-	width: auto;
-	min-height: auto;
-	opacity: 1;
-	font-size: var(--default-font-size);
-}
-
-:deep(.editor__content) {
-	max-width: 100% !important;
 }
 </style>

@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="editor-wrapper" :class="{ border: showBorder, 'hide-readonly-bar': !showReadonlyBar, 'height-small': height === 'small' }">
+	<div class="editor-wrapper" :class="{ border: showBorder, 'hide-readonly-bar': !showReadonlyBar, 'height-small': height === 'small', 'hide-menu-bar': !showMenuBar }">
 		<div v-if="textAppAvailable">
 			<div ref="editor" />
 		</div>
@@ -47,6 +47,10 @@ export default {
 		showReadonlyBar: {
 		      type: Boolean,
 		      default: true,
+		    },
+		showMenuBar: {
+			  type: Boolean,
+			  default: true,
 		    },
 		height: {
 		      type: String,
@@ -137,6 +141,10 @@ export default {
 	}
 
 	:deep(.text-readonly-bar) {
+		display: none !important;
+	}
+
+	.hide-menu-bar :deep(.text-menubar) {
 		display: none !important;
 	}
 
