@@ -11,7 +11,6 @@ OC.L10N.register(
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Er is een onverwachte fout opgetreden. Er zijn meer details beschikbaar in de logboeken. Neem alstublieft contact op met uw beheerder.",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "Er is een rechtenfout opgetreden. Er zijn meer details beschikbaar in de logboeken. Neem alstublieft contact op met uw beheerder.",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "Er is een niet gevonden-fout opgetreden. Er zijn meer details beschikbaar in de logboeken. Neem alstublieft contact op met uw beheerder.",
-    "An error caused by an invalid request occurred. More details can be found in the logs. Please reach out to your administration." : "Er is een fout opgetreden veroorzaakt door een ongeldig verzoek. Er zijn meer details beschikbaar in de logboeken. Neem alstublieft contact op met uw beheerder.",
     "Could not create row." : "Kon rij niet aanmaken.",
     "Could not update row." : "Kon rij niet updaten.",
     "The file was uploaded" : "Het bestand werd geüpload",

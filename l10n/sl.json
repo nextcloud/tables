@@ -215,7 +215,6 @@
     "Cannot update column. Title is missing." : "Ni mogoče posodobiti stolpca. Ni vpisanega naslova.",
     "The column \"{column}\" was updated." : "Stolpec »{column}« je posodobljen.",
     "Edit column" : "Uredi stolpec",
-    "Could not update row" : "Vrstice ni mogoče posodobiti",
     "Could not delete row." : "Vrstice ni mogoče izbrisati.",
     "Edit row" : "Uredi vrstico",
     "I really want to delete this row!" : "Zares želim izbrisati to vrstico!",

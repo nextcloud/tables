@@ -9,7 +9,6 @@
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "予期されていないエラーが発生しました。ログで詳細を確認してください。管理者にご連絡ください。",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "権限のエラーが発生しました。ログで詳細を確認してください。管理者にご連絡ください。",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "予期されていないエラーが発生しました。ログで詳細を確認してください。管理者にご連絡ください。",
-    "An error caused by an invalid request occurred. More details can be found in the logs. Please reach out to your administration." : "無効なリクエストによるエラーが発生しました。詳細はログを確認してください。管理者にお問い合わせください。",
     "Could not create row." : "行を追加できませんでした。",
     "Could not update row." : "行を更新できませんでした。",
     "The file was uploaded" : "ファイルがアップロードされました",

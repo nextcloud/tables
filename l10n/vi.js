@@ -11,7 +11,6 @@ OC.L10N.register(
     "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Đã xảy ra lỗi bất ngờ. Chi tiết có thể được tìm thấy trong nhật ký. Vui lòng liên hệ với quản trị viên của bạn.",
     "A permission error occurred. More details can be found in the logs. Please reach out to your administration." : "Đã xảy ra lỗi quyền hạn. Chi tiết có thể được tìm thấy trong nhật ký. Vui lòng liên hệ với quản trị viên của bạn.",
     "A not found error occurred. More details can be found in the logs. Please reach out to your administration." : "Đã xảy ra lỗi không tìm thấy. Chi tiết có thể được tìm thấy trong nhật ký. Vui lòng liên hệ với quản trị viên của bạn.",
-    "An error caused by an invalid request occurred. More details can be found in the logs. Please reach out to your administration." : "Đã xảy ra lỗi do yêu cầu không hợp lệ. Chi tiết có thể được tìm thấy trong nhật ký. Vui lòng liên hệ với quản trị viên của bạn.",
     "Could not create row." : "Không thể tạo hàng",
     "Could not update row." : "Không thể cập nhật hàng",
     "The file was uploaded" : "Tập tin đã được tải lên",

@@ -174,7 +174,6 @@
     "Confirm table deletion" : "Confirmeu l'eliminació de la taula",
     "Cannot update column. Title is missing." : "No es pot actualitzar la columna. Falta el títol.",
     "The column \"{column}\" was updated." : "La columna \"{column}\" s'ha actualitzat.",
-    "Could not update row" : "No s'ha pogut actualitzar la fila",
     "Could not delete row." : "No s'ha pogut suprimir la fila.",
     "Edit row" : "Edició fila",
     "I really want to delete this row!" : "Estic segur de suprimir aquesta fila!",

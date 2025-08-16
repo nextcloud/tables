@@ -199,7 +199,6 @@ OC.L10N.register(
     "Edit column" : "Editatu zutabea",
     "Edit application" : "Editatu aplikazioa",
     "Transfer application" : "Transferitu aplikazioa",
-    "Could not update row" : "Ezin izan da errenkada eguneratu",
     "Could not delete row." : "Ezin izan da errenkada ezabatu.",
     "Edit row" : "Editatu errenkada",
     "I really want to delete this row!" : "Errenkada hau ezabatu nahi dut!",
@@ -356,10 +355,10 @@ OC.L10N.register(
     "Last editor" : "Azken editorea",
     "Clipboard is not available" : "Arbela ez dago erabilgarri",
     "{shareTypeString}..." : "{shareTypeString}...",
+    "Unknown error." : "Errore ezezaguna.",
     "Request is not authorized. Are you logged in?" : "Eskaerak egiteko baimenik ez. Saioa hasi al duzu?",
     "Request not allowed." : "Ez da eskaera onartu.",
     "Resource not found." : "Ez da baliabidea aurkitu.",
-    "Unknown error." : "Errore ezezaguna.",
     "Could not fetch tables" : "Ezin izan dira taulak eskuratu"
 },
 "nplurals=2; plural=(n != 1);");
