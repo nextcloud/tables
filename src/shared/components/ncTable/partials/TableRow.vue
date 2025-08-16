@@ -116,9 +116,6 @@ export default {
 				ColumnTypes.SelectionMulti,
 				ColumnTypes.TextLink,
 				ColumnTypes.NumberStars,
-				ColumnTypes.Datetime,
-				ColumnTypes.DatetimeDate,
-				ColumnTypes.DatetimeTime,
 				ColumnTypes.Selection,
 			]
 		},
