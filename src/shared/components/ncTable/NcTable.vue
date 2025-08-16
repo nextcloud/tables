@@ -55,6 +55,7 @@ deselect-all-rows        -> unselect all rows, e.g. after deleting selected rows
 				:rows="rows" :is-view="isView" :element-id="elementId" :view-setting.sync="localViewSetting"
 				:config="config" @create-row="$emit('create-row')"
 				@edit-row="rowId => $emit('edit-row', rowId)"
+				@activity-row="rowId => $emit('activity-row', rowId)"
 				@create-column="$emit('create-column')"
 				@edit-column="col => $emit('edit-column', col)"
 				@delete-column="col => $emit('delete-column', col)"

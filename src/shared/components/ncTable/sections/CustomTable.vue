@@ -38,7 +38,8 @@
 					:element-id="elementId"
 					:is-view="isView"
 					@update-row-selection="updateRowSelection"
-					@edit-row="rowId => $emit('edit-row', rowId)" />
+					@edit-row="rowId => $emit('edit-row', rowId)"
+					@activity-row="rowId => $emit('activity-row', rowId)" />
 			</transition-group>
 		</table>
 		<div v-if="totalPages > 1" class="pagination-footer" :class="{'large-width': !appNavCollapsed || isMobile}">
@@ -589,7 +590,7 @@ export default {
 	tr>th.sticky:last-child,tr>td.sticky:last-child {
 		position: sticky;
 		right: 0;
-		width: 55px;
+		width: 100px;
 		background-color: inherit;
 		padding-right: 16px;
 	}

@@ -88,6 +88,16 @@
 				</template>
 			</NcActionButton>
 
+			<!-- Activity -->
+			<NcActionButton v-if="canReadData(table) && hasActivity"
+				:close-after-click="true"
+				@click="actionShowActivity">
+				{{ t('tables', 'Activity') }}
+				<template #icon>
+					<ActivityIcon :size="20" />
+				</template>
+			</NcActionButton>
+
 			<!-- FAVORITE -->
 			<NcActionButton v-if="!table.favorite && !table.archived"
 				:close-after-click="true"
@@ -163,7 +173,9 @@ import Import from 'vue-material-design-icons/Import.vue'
 import NavigationViewItem from './NavigationViewItem.vue'
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 import IconRename from 'vue-material-design-icons/Rename.vue'
+import ActivityIcon from 'vue-material-design-icons/LightningBolt.vue'
 import { generateUrl } from '@nextcloud/router'
+const capabilities = window.OC.getCapabilities()
 
 export default {
 
@@ -183,6 +195,7 @@ export default {
 		NcAvatar,
 		Connection,
 		PlaylistPlus,
+		ActivityIcon,
 	},
 
 	filters: {
@@ -211,6 +224,7 @@ export default {
 	data() {
 		return {
 			isParentOfActiveView: false,
+			hasActivity: capabilities && capabilities.activity,
 		}
 	},
 
@@ -276,6 +290,10 @@ export default {
 		},
 		async actionShowIntegration() {
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
+			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
+		},
+		async actionShowActivity() {
+			emit('tables:sidebar:activity', { open: true, tab: 'activity' })
 			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
 		},
 		openTable() {

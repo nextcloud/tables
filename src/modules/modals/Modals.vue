@@ -27,6 +27,8 @@
 			@close="editRow = null" />
 		<DeleteRows v-if="rowsToDelete" :rows-to-delete="rowsToDelete?.rows" :is-view="rowsToDelete?.isView" :element-id="rowsToDelete?.elementId" @cancel="rowsToDelete = null" />
 
+		<RowActivity :show-modal="activityRow !== null" :row-id="activityRow?.row.id" @close="activityRow = null" />
+
 		<ViewSettings
 			:show-modal="viewToEdit !== null"
 			:view="viewToEdit?.view"
@@ -73,6 +75,7 @@ import TransferTable from './TransferTable.vue'
 import CreateContext from './CreateContext.vue'
 import TransferContext from './TransferContext.vue'
 import DeleteContext from './DeleteContext.vue'
+import RowActivity from './RowActivity.vue'
 
 export default {
 	components: {
@@ -94,6 +97,7 @@ export default {
 		EditContext,
 		TransferContext,
 		DeleteContext,
+		RowActivity,
 	},
 
 	data() {
@@ -103,6 +107,7 @@ export default {
 			columnToDelete: null,
 			columnsForRow: null,
 			editRow: null,
+			activityRow: null,
 			rowsToDelete: null,
 			viewToEdit: null,
 			showModalCreateTable: false,
@@ -151,6 +156,7 @@ export default {
 		subscribe('tables:row:delete', tableInfo => {
 			this.rowsToDelete = tableInfo
 		})
+		subscribe('tables:row:activity', rowInfo => { this.activityRow = rowInfo })
 
 		// misc
 		subscribe('tables:modal:import', element => { this.importToElement = element })
@@ -173,6 +179,7 @@ export default {
 		unsubscribe('tables:row:delete', tableInfo => {
 			this.rowsToDelete = tableInfo
 		})
+		unsubscribe('tables:row:activity', rowInfo => { this.activityRow = rowInfo })
 		unsubscribe('tables:view:edit', view => { this.viewToEdit = { view, createView: false } })
 		unsubscribe('tables:view:create', tableInfos => {
 			this.viewToEdit = {
