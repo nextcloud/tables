@@ -326,4 +326,10 @@ class EntityVirtualPropertiesTest extends DatabaseTestCase {
 
 		return $property;
 	}
+
+	protected function tearDown(): void {
+		$this->cleanupTablesData();
+		parent::tearDown();
+	}
+
 }
