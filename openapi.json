@@ -101,7 +101,8 @@
                     "usergroupSelectUsers",
                     "usergroupSelectGroups",
                     "usergroupSelectTeams",
-                    "showUserStatus"
+                    "showUserStatus",
+                    "readonly"
                 ],
                 "properties": {
                     "id": {
@@ -203,6 +204,9 @@
                         "type": "boolean"
                     },
                     "showUserStatus": {
+                        "type": "boolean"
+                    },
+                    "readonly": {
                         "type": "boolean"
                     }
                 }
@@ -647,7 +651,8 @@
                             "type": "object",
                             "required": [
                                 "columnId",
-                                "order"
+                                "order",
+                                "readonly"
                             ],
                             "properties": {
                                 "columnId": {
@@ -657,6 +662,9 @@
                                 "order": {
                                     "type": "integer",
                                     "format": "int64"
+                                },
+                                "readonly": {
+                                    "type": "boolean"
                                 }
                             }
                         }
