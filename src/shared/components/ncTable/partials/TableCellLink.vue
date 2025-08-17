@@ -13,7 +13,7 @@
 				:title="getValueObject.title"
 				:subline="getValueObject.subline"
 				:url="getValueObject.resourceUrl"
-				:truncate-length="20"
+				:truncate-length="30"
 				:icon-size="25"
 				:hide-default-icon="true"
 				:underline-title="true" />
