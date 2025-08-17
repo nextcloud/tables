@@ -61,8 +61,8 @@ export default {
 		t,
 
 		handleStartEditing(event) {
-			// Don't start editing if clicking on widgets like images
-			if (event.target.closest('.widgets--list')) {
+			// Don't start editing if clicking on widgets like images, links, link preview icon (svg)
+			if (event.target.closest('.widgets--list') || event.target.closest('.ProseMirror-widget') || event.target.closest('.tippy-box') || event.target.closest('a') || event.target.closest('svg')) {
 				return
 			}
 

@@ -91,6 +91,9 @@ export default {
 										|| event.target.closest('.v-popper__popper') // For any tooltips/dropdowns
 										|| event.target.closest('[role="dialog"]') // For any modal dialogs
 										|| event.target.closest('.widgets--list') // For widgets like images, videos
+										|| event.target.closest('.tippy-box') // For link preview
+										|| event.target.closest('a') // For links
+										|| event.target.closest('svg') // For icons
 
 				if (!isEditorRelated) {
 					this.$emit('save', this.localValue)
