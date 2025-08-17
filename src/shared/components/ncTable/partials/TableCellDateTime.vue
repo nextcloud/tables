@@ -4,7 +4,7 @@
 -->
 <template>
 	<div class="cell-datetime">
-		<div v-if="!isEditing" class="non-edit-mode" @click="startEditing">
+		<div v-if="!isEditing" class="non-edit-mode" @click="handleStartEditing">
 			{{ getValue }}
 		</div>
 		<div v-else
@@ -18,7 +18,8 @@
 					v-model="editDateTimeValue"
 					:type="getPickerType"
 					:disabled="localLoading || !canEditCell()" />
-				<div v-if="canBeCleared" class="icon-close make-empty" @click="emptyValue" />
+				<div v-if="canBeCleared" class="icon-close make-empty" role="button"
+					:aria-label="t('tables', 'Clear value')" @click="emptyValue" />
 			</div>
 			<div v-if="localLoading" class="loading-indicator">
 				<div class="icon-loading-small icon-loading-inline" />
@@ -60,6 +61,7 @@ export default {
 	data() {
 		return {
 			editDateTimeValue: null,
+			isInitialEditClick: false,
 		}
 	},
 
@@ -91,21 +93,25 @@ export default {
 		isEditing(newValue) {
 			if (newValue) {
 				this.initEditValue()
-				// Use a small delay to prevent the same click event that triggered editing
-				// from immediately triggering the click outside handler
 				this.$nextTick(() => {
-					setTimeout(() => {
-						document.addEventListener('click', this.handleClickOutside)
-					}, 10)
+					document.addEventListener('click', this.handleClickOutside)
 				})
 			} else {
 				document.removeEventListener('click', this.handleClickOutside)
+				this.isInitialEditClick = false
 			}
 		},
 	},
 
 	methods: {
 		t,
+
+		handleStartEditing(event) {
+			this.isInitialEditClick = true
+			this.startEditing()
+			// Stop the event from propagating to avoid immediate click outside
+			event.stopPropagation()
+		},
 
 		initEditValue() {
 			if (this.value !== null && this.value !== 'none') {
@@ -179,6 +185,12 @@ export default {
 		},
 
 		handleClickOutside(event) {
+			// Ignore the initial click that started editing
+			if (this.isInitialEditClick) {
+				this.isInitialEditClick = false
+				return
+			}
+
 			if (this.$refs.editingContainer && !this.$refs.editingContainer.contains(event.target)) {
 				this.saveChanges()
 			}
@@ -228,13 +240,6 @@ export default {
 		width: 100%;
 	}
 
-}
-
-.editor-buttons {
-	display: flex;
-	gap: 8px;
-	margin-top: 8px;
-	align-items: center;
 }
 
 .make-empty {
