@@ -43,7 +43,7 @@ export default {
 	data() {
 		return {
 			localValue: this.value || '',
-			ignoreNextClick: true,
+			isInitialEditClick: false,
 		}
 	},
 
@@ -54,11 +54,11 @@ export default {
 	},
 
 	mounted() {
-		// Add a small delay to prevent the initial click from immediately triggering save
-		setTimeout(() => {
+		// Add click outside listener after the current event loop
+		// to avoid the same click that triggered editing from closing the editor
+		this.$nextTick(() => {
 			document.addEventListener('click', this.handleClickOutside)
-			this.ignoreNextClick = false
-		}, 200)
+		})
 	},
 
 	beforeDestroy() {
@@ -68,9 +68,14 @@ export default {
 	methods: {
 		t,
 
+		notifyEditingStarted() {
+			this.isInitialEditClick = true
+		},
+
 		handleClickOutside(event) {
-			// Ignore the first click to prevent immediate save after starting edit
-			if (this.ignoreNextClick) {
+			// Ignore the initial click that started editing
+			if (this.isInitialEditClick) {
+				this.isInitialEditClick = false
 				return
 			}
 
@@ -85,6 +90,7 @@ export default {
 										|| event.target.closest('.editor-wrapper')
 										|| event.target.closest('.v-popper__popper') // For any tooltips/dropdowns
 										|| event.target.closest('[role="dialog"]') // For any modal dialogs
+										|| event.target.closest('.widgets--list') // For widgets like images, videos
 
 				if (!isEditorRelated) {
 					this.$emit('save', this.localValue)

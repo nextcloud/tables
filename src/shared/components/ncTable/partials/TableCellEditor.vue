@@ -4,7 +4,7 @@
 -->
 <template>
 	<div class="cell-editor">
-		<div v-if="!isEditing" @click="startEditing">
+		<div v-if="!isEditing" @click="handleStartEditing">
 			<NcEditor v-if="value && value.trim()"
 				:can-edit="false"
 				:text="value"
@@ -12,6 +12,7 @@
 				:show-readonly-bar="false" />
 		</div>
 		<RichEditor v-else
+			ref="richEditor"
 			:value="value"
 			:loading="isSaving"
 			@save="saveChanges"
@@ -59,6 +60,17 @@ export default {
 	methods: {
 		t,
 
+		handleStartEditing(event) {
+			// Don't start editing if clicking on widgets like images
+			if (event.target.closest('.widgets--list')) {
+				return
+			}
+
+			this.startEditing()
+			// Stop the event from propagating to avoid immediate click outside
+			event.stopPropagation()
+		},
+
 		async saveChanges(newValue) {
 			if (this.isSaving) return
 
@@ -85,6 +97,12 @@ export default {
 		startEditing() {
 			if (!this.canEditCell()) return false
 			this.isEditing = true
+
+			this.$nextTick(() => {
+				if (this.$refs.richEditor) {
+					this.$refs.richEditor.notifyEditingStarted()
+				}
+			})
 		},
 	},
 }
