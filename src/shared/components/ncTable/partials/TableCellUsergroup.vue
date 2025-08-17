@@ -4,7 +4,7 @@
 -->
 <template>
 	<div class="cell-usergroup">
-		<div v-if="!isEditing" class="non-edit-mode" @click="startEditing">
+		<div v-if="!isEditing" class="non-edit-mode" @click="handleStartEditing">
 			<div v-if="value" class="table-cell-usergroup">
 				<div v-for="item in value" :key="item.id" class="inline usergroup-entry">
 					<NcUserBubble :user="item.id" :avatar-image="getAvatarImage(item)" :is-no-user="!isUser(item)" :display-name="item.displayName ?? item.id" :show-user-status="isUser(item) && column.showUserStatus" :size="column.showUserStatus ? 34 : 20" :primary="isCurrentUser(item)" />
@@ -88,6 +88,7 @@ export default {
 			selectUsers: this.column?.usergroupSelectUsers ?? true,
 			selectGroups: this.column?.usergroupSelectGroups ?? false,
 			selectCircles: false,
+			isInitialEditClick: false,
 		}
 	},
 
@@ -105,15 +106,14 @@ export default {
 			if (isEditing) {
 				this.editValue = this.value ? [...this.value] : []
 
-				// Use a small delay to prevent the same click event that triggered editing
-				// from immediately triggering the click outside handler
+				// Add click outside listener after the current event loop
+				// to avoid the same click that triggered editing from closing the editor
 				this.$nextTick(() => {
-					setTimeout(() => {
-						document.addEventListener('click', this.handleClickOutside)
-					}, 10)
+					document.addEventListener('click', this.handleClickOutside)
 				})
 			} else {
 				document.removeEventListener('click', this.handleClickOutside)
+				this.isInitialEditClick = false
 			}
 		},
 	},
@@ -124,6 +124,13 @@ export default {
 
 	methods: {
 		t,
+
+		handleStartEditing(event) {
+			this.isInitialEditClick = true
+			this.startEditing()
+			// Stop the event from propagating to avoid immediate click outside
+			event.stopPropagation()
+		},
 
 		getAvatarImage(item) {
 			if (item.type === USERGROUP_TYPE.GROUP) {
@@ -170,6 +177,11 @@ export default {
 		},
 
 		handleClickOutside(event) {
+			if (this.isInitialEditClick) {
+				this.isInitialEditClick = false
+				return
+			}
+
 			if (this.$refs.editingContainer && !this.$refs.editingContainer.contains(event.target)) {
 				this.saveChanges()
 			}
@@ -185,6 +197,10 @@ export default {
 	.non-edit-mode {
 		cursor: pointer;
 	}
+}
+
+:deep(.vs__dropdown-toggle) {
+    border: var(--vs-border-width) var(--vs-border-style) var(--vs-border-color);
 }
 
 .table-cell-usergroup {
