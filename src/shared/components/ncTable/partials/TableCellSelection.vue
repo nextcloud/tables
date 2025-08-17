@@ -4,7 +4,7 @@
 -->
 <template>
 	<div class="cell-selection">
-		<div v-if="!isEditing" class="non-edit-mode" @click="startEditing">
+		<div v-if="!isEditing" class="non-edit-mode" @click="handleStartEditing">
 			{{ column.getLabel(value) }}<span v-if="isDeleted()" :title="t('tables', 'This option is outdated.')">&nbsp;⚠️</span>
 		</div>
 		<div v-else
@@ -56,6 +56,12 @@ export default {
 		},
 	},
 
+	data() {
+		return {
+			isInitialEditClick: false,
+		}
+	},
+
 	computed: {
 		getOptions() {
 			return this.column?.selectionOptions || []
@@ -71,23 +77,28 @@ export default {
 		isEditing(isEditing) {
 			if (isEditing) {
 				this.initEditValue()
-				// Use a small delay to prevent the same click event that triggered editing
-				// from immediately triggering the click outside handler
-				// TODO: implement better click outside detection without setTimeout
+				// Add click outside listener after the current event loop
+				// to avoid the same click that triggered editing from closing the editor
 				this.$nextTick(() => {
-					setTimeout(() => {
-						document.addEventListener('click', this.handleClickOutside)
-					}, 10)
+					document.addEventListener('click', this.handleClickOutside)
 				})
 			} else {
 				// Remove click outside listener
 				document.removeEventListener('click', this.handleClickOutside)
+				this.isInitialEditClick = false
 			}
 		},
 	},
 
 	methods: {
 		t,
+
+		handleStartEditing(event) {
+			this.isInitialEditClick = true
+			this.startEditing()
+			// Stop the event from propagating to avoid immediate click outside
+			event.stopPropagation()
+		},
 
 		isDeleted() {
 			return this.column.isDeletedLabel(this.value)
@@ -122,6 +133,12 @@ export default {
 		},
 
 		handleClickOutside(event) {
+			// Ignore the initial click that started editing
+			if (this.isInitialEditClick) {
+				this.isInitialEditClick = false
+				return
+			}
+
 			// Check if the click is outside the editing container
 			if (this.$refs.editingContainer && !this.$refs.editingContainer.contains(event.target)) {
 				this.saveChanges()
@@ -139,6 +156,11 @@ export default {
 		cursor: pointer;
 		min-height: 20px;
 	}
+}
+
+:deep(.vs__dropdown-toggle) {
+    border: var(--vs-border-width) var(--vs-border-style) var(--vs-border-color);
+    border-radius: var(--vs-border-radius);
 }
 
 .edit-mode {

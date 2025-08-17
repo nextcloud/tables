@@ -4,7 +4,7 @@
 -->
 <template>
 	<div class="cell-multi-selection">
-		<div v-if="!isEditing" class="non-edit-mode" @click="startEditing">
+		<div v-if="!isEditing" class="non-edit-mode" @click="handleStartEditing">
 			<ul>
 				<li v-for="v in getObjects()" :key="v.id">
 					{{ v.label }}<span v-if="v.deleted" :title="t('tables', 'This option is outdated.')">&nbsp;⚠️</span>
@@ -66,6 +66,7 @@ export default {
 	data() {
 		return {
 			localEditValues: [],
+			isInitialEditClick: false,
 		}
 	},
 
@@ -99,22 +100,27 @@ export default {
 		isEditing(isEditing) {
 			if (isEditing) {
 				this.initEditValues()
-				// Use a small delay to prevent the same click event that triggered editing
-				// from immediately triggering the click outside handler
-				// TODO: implement better click outside detection without setTimeout
+				// Add click outside listener after the current event loop
+				// to avoid the same click that triggered editing from closing the editor
 				this.$nextTick(() => {
-					setTimeout(() => {
-						document.addEventListener('click', this.handleClickOutside)
-					}, 100)
+					document.addEventListener('click', this.handleClickOutside)
 				})
 			} else {
 				document.removeEventListener('click', this.handleClickOutside)
+				this.isInitialEditClick = false
 			}
 		},
 	},
 
 	methods: {
 		t,
+
+		handleStartEditing(event) {
+			this.isInitialEditClick = true
+			this.startEditing()
+			// Stop the event from propagating to avoid immediate click outside
+			event.stopPropagation()
+		},
 
 		getObjects() {
 			return this.column.getObjects(this.value)
@@ -167,6 +173,12 @@ export default {
 		},
 
 		handleClickOutside(event) {
+			// Ignore the initial click that started editing
+			if (this.isInitialEditClick) {
+				this.isInitialEditClick = false
+				return
+			}
+
 			// Check if the click is outside the editing container
 			// But ignore clicks on dropdown options and scrollbars
 			if (this.$refs.editingContainer && !this.$refs.editingContainer.contains(event.target)) {
