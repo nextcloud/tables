@@ -36,6 +36,7 @@ OC.L10N.register(
     "Number" : "Namba",
     "Selection" : "Machaguo",
     "Date and time" : "Tarehe na muda",
+    "Users and groups" : "Users and groups",
     "Move" : "Hamisha",
     "Metadata" : "Metadata",
     "Column" : "Safu wima",
