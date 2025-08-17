@@ -4,7 +4,10 @@
 -->
 <template>
 	<div class="cell-link">
-		<div v-if="!isEditing" class="non-edit-mode" @click="startEditing">
+		<div v-if="!isEditing" class="non-edit-mode"
+			@click="handleStartEditing"
+			@keydown.enter="handleStartEditing"
+			@keydown.space.prevent="handleStartEditing">
 			<LinkWidget :thumbnail-url="getValueObject.thumbnailUrl"
 				:icon-url="getValueObject.icon"
 				:title="getValueObject.title"
@@ -59,8 +62,11 @@ import { translate as t } from '@nextcloud/l10n'
 import debounce from 'debounce'
 import generalHelper from '../../../mixins/generalHelper.js'
 import cellEditMixin from '../mixins/cellEditMixin.js'
+import rowHelper from '../mixins/rowHelper.js'
 import displayError from '../../../utils/displayError.js'
+import { showError } from '@nextcloud/dialogs'
 import LinkWidget from './LinkWidget.vue'
+import { ALLOWED_PROTOCOLS } from '../../../constants.ts'
 
 export default {
 	name: 'TableCellLink',
@@ -71,7 +77,7 @@ export default {
 		NcSelect,
 	},
 
-	mixins: [generalHelper, cellEditMixin],
+	mixins: [generalHelper, cellEditMixin, rowHelper],
 
 	props: {
 		column: {
@@ -94,6 +100,8 @@ export default {
 			results: [],
 			term: '',
 			providerLoading: {},
+			isInitialEditClick: false,
+			allowedProtocols: ALLOWED_PROTOCOLS,
 		}
 	},
 
@@ -142,6 +150,32 @@ export default {
 			}
 			return false
 		},
+
+		hasInvalidProtocol() {
+			if (!this.editValue) {
+				return false
+			}
+
+			if (typeof this.editValue === 'string') {
+				try {
+					const parsedUrl = new URL(this.editValue)
+					return !this.allowedProtocols.includes(parsedUrl.protocol)
+				} catch (e) {
+					return this.editValue.length > 0
+				}
+			}
+
+			if (this.editValue?.value) {
+				try {
+					const parsedUrl = new URL(this.editValue.value)
+					return !this.allowedProtocols.includes(parsedUrl.protocol)
+				} catch (e) {
+					return true
+				}
+			}
+
+			return false
+		},
 	},
 
 	watch: {
@@ -151,16 +185,12 @@ export default {
 		isEditing(isEditing) {
 			if (isEditing) {
 				this.initEditMode()
-				// Use a small delay to prevent the same click event that triggered editing
-				// from immediately triggering the click outside handler
-				// TODO: implement better click outside detection without setTimeout
 				this.$nextTick(() => {
-					setTimeout(() => {
-						document.addEventListener('click', this.handleClickOutside)
-					}, 100)
+					document.addEventListener('click', this.handleClickOutside)
 				})
 			} else {
 				document.removeEventListener('click', this.handleClickOutside)
+				this.isInitialEditClick = false
 			}
 		},
 	},
@@ -180,6 +210,14 @@ export default {
 	methods: {
 		t,
 
+		handleStartEditing(event) {
+			this.isInitialEditClick = true
+			this.startEditing()
+			if (event) {
+				event.stopPropagation()
+			}
+		},
+
 		initEditMode() {
 			if (this.hasJsonStructure(this.value)) {
 				this.editValue = JSON.parse(this.value)
@@ -195,6 +233,24 @@ export default {
 			}
 
 			this.loadResults()
+
+			this.$nextTick(() => {
+				if (this.isPlainUrl) {
+					const input = this.$el.querySelector('input[type="text"]')
+					if (input) {
+						input.focus()
+						// Place cursor at the end for existing content
+						if (this.plainLink) {
+							input.setSelectionRange(this.plainLink.length, this.plainLink.length)
+						}
+					}
+				} else {
+					const selectInput = this.$el.querySelector('.vs__search')
+					if (selectInput) {
+						selectInput.focus()
+					}
+				}
+			})
 		},
 
 		setProviderLoading(providerId, status) {
@@ -270,6 +326,11 @@ export default {
 				return
 			}
 
+			if (this.hasInvalidProtocol) {
+				showError(t('tables', 'Invalid protocol. Allowed: {allowed}', { allowed: this.allowedProtocols.join(', ') }))
+				return
+			}
+
 			let newValue = null
 			if (this.editValue !== null && this.editValue !== '') {
 				newValue = JSON.stringify(this.editValue)
@@ -291,7 +352,12 @@ export default {
 		},
 
 		handleClickOutside(event) {
-			// Check if the click is outside the editing container
+			// Ignore the initial click that started editing
+			if (this.isInitialEditClick) {
+				this.isInitialEditClick = false
+				return
+			}
+
 			if (this.$refs.editingContainer && !this.$refs.editingContainer.contains(event.target)) {
 				this.saveChanges()
 			}
@@ -307,7 +373,24 @@ export default {
 	.non-edit-mode {
 		cursor: pointer;
 		min-height: 20px;
+		border-radius: var(--border-radius);
+		padding: 2px 4px;
+		transition: background-color 0.15s ease-in-out;
+
+		&:hover, &:focus {
+			background-color: var(--color-background-hover);
+			outline: none;
+		}
+
+		&.has-content:hover, &.has-content:focus {
+			background-color: var(--color-primary-element-light);
+		}
 	}
+
+}
+
+:deep(.vs__dropdown-toggle) {
+    border: var(--vs-border-width) var(--vs-border-style) var(--vs-border-color);
 }
 
 .edit-mode {
@@ -324,13 +407,6 @@ export default {
 			flex-grow: 1;
 			height: auto !important;
 		}
-	}
-
-	.editor-buttons {
-		display: flex;
-		gap: 8px;
-		margin-top: 8px;
-		align-items: center;
 	}
 
 	.icon-loading-inline {
