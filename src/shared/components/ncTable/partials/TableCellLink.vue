@@ -28,6 +28,7 @@
 				<NcTextField v-if="isPlainUrl"
 					v-model="plainLink"
 					:placeholder="t('tables', 'URL')"
+					:aria-label="t('tables', 'URL')"
 					:disabled="localLoading || !canEditCell()" />
 				<NcSelect v-else
 					v-model="editValue"
