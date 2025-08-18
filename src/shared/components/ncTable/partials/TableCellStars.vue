@@ -63,12 +63,6 @@ export default {
 			const v = this.value
 			return starFull.repeat(v) + starEmpty.repeat(5 - v)
 		},
-		getEditValue() {
-			const starEmpty = '☆'
-			const starFull = '★'
-			const v = this.editValue
-			return starFull.repeat(v) + starEmpty.repeat(5 - v)
-		},
 	},
 
 	watch: {
@@ -150,11 +144,6 @@ export default {
 	}
 }
 
-.stars {
-	font-size: 1.4em;
-	padding: 7px;
-}
-
 .clickable-stars {
 	display: flex;
 	align-items: center;
@@ -177,13 +166,6 @@ export default {
 	&.filled {
 		color: var(--color-warning);
 	}
-}
-
-.editor-buttons {
-	display: flex;
-	gap: 8px;
-	margin-top: 8px;
-	align-items: center;
 }
 
 .icon-loading-inline {
