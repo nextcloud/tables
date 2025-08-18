@@ -112,7 +112,6 @@ export default {
 		nonInlineEditableColumnTypes() {
 			return [
 				ColumnTypes.TextRich,
-				ColumnTypes.Usergroup,
 				ColumnTypes.SelectionMulti,
 				ColumnTypes.TextLink,
 				ColumnTypes.NumberStars,
