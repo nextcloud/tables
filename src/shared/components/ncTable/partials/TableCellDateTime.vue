@@ -4,13 +4,17 @@
 -->
 <template>
 	<div class="cell-datetime">
-		<div v-if="!isEditing" class="non-edit-mode" @click="handleStartEditing">
+		<div v-if="!isEditing" class="non-edit-mode" role="button" aria-label="Edit date/time"
+			tabindex="0"
+			@click="handleStartEditing">
 			{{ getValue }}
 		</div>
 		<div v-else
 			ref="editingContainer"
 			class="inline-editing-container"
 			tabindex="0"
+			role="group"
+			aria-label="Edit date/time"
 			@keydown.enter="saveChanges"
 			@keydown.escape="cancelEdit">
 			<div class="datetime-picker-container" :class="{ 'is-loading': localLoading }">
