@@ -45,11 +45,11 @@ import '@nextcloud/dialogs/style.css'
 import TextLongIcon from 'vue-material-design-icons/TextLong.vue'
 import LinkIcon from 'vue-material-design-icons/Link.vue'
 import CounterIcon from 'vue-material-design-icons/Counter.vue'
-import StarIcon from 'vue-material-design-icons/Star.vue'
+import StarIcon from 'vue-material-design-icons/StarOutline.vue'
 import ProgressIcon from 'vue-material-design-icons/ArrowRightThin.vue'
 import SelectionIcon from 'vue-material-design-icons/FormSelect.vue'
 import DatetimeIcon from 'vue-material-design-icons/ClipboardTextClockOutline.vue'
-import ContactsIcon from 'vue-material-design-icons/Contacts.vue'
+import ContactsIcon from 'vue-material-design-icons/ContactsOutline.vue'
 import { NcSelect } from '@nextcloud/vue'
 
 export default {
