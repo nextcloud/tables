@@ -14,7 +14,7 @@
 		<RichEditor v-else
 			ref="richEditor"
 			:value="value"
-			:loading="isSaving"
+			:loading="localLoading"
 			@save="saveChanges"
 			@cancel="cancelEdit" />
 	</div>
@@ -53,7 +53,6 @@ export default {
 
 	data() {
 		return {
-			isSaving: false,
 		}
 	},
 
@@ -72,22 +71,21 @@ export default {
 		},
 
 		async saveChanges(newValue) {
-			if (this.isSaving) return
+			if (this.localLoading) return
 
 			if (newValue === this.value) {
 				this.isEditing = false
 				return
 			}
 
-			this.isSaving = true
 			const success = await this.updateCellValue(newValue || '')
-			this.isSaving = false
 
 			if (success) {
 				this.isEditing = false
 			} else {
 				this.cancelEdit()
 			}
+			this.localLoading = false
 		},
 
 		cancelEdit() {
