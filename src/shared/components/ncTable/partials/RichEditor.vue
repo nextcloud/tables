@@ -5,7 +5,7 @@
 <template>
 	<div ref="editingContainer"
 		class="rich-editor-edit-mode"
-		@keydown.escape.prevent="canceEdit">
+		@keydown.escape.prevent="cancelEdit">
 		<NcEditor
 			:can-edit="true"
 			:text.sync="localValue"
@@ -105,7 +105,7 @@ export default {
 			return this.localValue
 		},
 
-		canceEdit() {
+		cancelEdit() {
 			this.$emit('cancel')
 		},
 	},
