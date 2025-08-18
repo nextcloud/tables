@@ -89,7 +89,7 @@
 										:close-after-click="true"
 										@click="emit('tables:view:delete', view)">
 										<template #icon>
-											<Delete :size="20" />
+											<DeleteOutline :size="20" />
 										</template>
 										{{ t('tables', 'Delete view') }}
 									</NcActionButton>
@@ -119,7 +119,7 @@ import { mapState, mapActions } from 'pinia'
 import { useTablesStore } from '../../../store/store.js'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
-import Delete from 'vue-material-design-icons/Delete.vue'
+import DeleteOutline from 'vue-material-design-icons/DeleteOutline.vue'
 import Moment from '@nextcloud/moment'
 import Connection from 'vue-material-design-icons/Connection.vue'
 import axios from '@nextcloud/axios'
@@ -140,7 +140,7 @@ export default {
 		NcAvatar,
 		PlaylistPlus,
 		PlaylistEditIcon,
-		Delete,
+		DeleteOutline,
 	},
 
 	filters: {
