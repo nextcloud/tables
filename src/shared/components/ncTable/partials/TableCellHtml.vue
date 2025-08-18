@@ -3,21 +3,41 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div>
-		<EditorContent :editor="editor" />
+	<div class="cell-editor">
+		<div v-if="!isEditing" @click="handleStartEditing">
+			<EditorContent :editor="editor" />
+		</div>
+		<div v-else
+			ref="editingContainer"
+			class="tiptap-edit-mode"
+			@keydown.escape.prevent="cancelEdit">
+			<TiptapMenuBar
+				:value.sync="localValue"
+				:text-length-limit="getTextLimit"
+				@input="updateText" />
+			<div v-if="localLoading" class="loading-indicator">
+				<div class="icon-loading-small icon-loading-inline" />
+			</div>
+		</div>
 	</div>
 </template>
 
 <script>
 import { Editor, EditorContent } from '@tiptap/vue-2'
 import { StarterKit } from '@tiptap/starter-kit'
+import TiptapMenuBar from './TiptapMenuBar.vue'
+import cellEditMixin from '../mixins/cellEditMixin.js'
+import { translate as t } from '@nextcloud/l10n'
 
 export default {
 	name: 'TableCellHtml',
 
 	components: {
 		EditorContent,
+		TiptapMenuBar,
 	},
+
+	mixins: [cellEditMixin],
 
 	props: {
 		column: {
@@ -37,12 +57,26 @@ export default {
 	data() {
 		return {
 			editor: null,
+			localValue: '',
+			isInitialEditClick: false,
 		}
+	},
+
+	computed: {
+		getTextLimit() {
+			if (this.column.textMaxLength === -1) {
+				return null
+			} else {
+				return this.column.textMaxLength
+			}
+		},
 	},
 
 	watch: {
 		value(value) {
-			this.editor.commands.setContent(value, false)
+			if (this.editor) {
+				this.editor.commands.setContent(value, false)
+			}
 		},
 	},
 
@@ -57,30 +91,158 @@ export default {
 	},
 
 	beforeUnmount() {
-		this.editor.destroy()
+		if (this.editor) {
+			this.editor.destroy()
+		}
+	},
+
+	methods: {
+		t,
+
+		handleStartEditing(event) {
+			// Don't start editing if clicking on links
+			if (event.target.closest('a')) {
+				return
+			}
+			this.startEditing()
+			event.stopPropagation()
+		},
+
+		handleClickOutside(event) {
+			if (!this.isEditing) return
+
+			if (this.isInitialEditClick) {
+				this.isInitialEditClick = false
+				return
+			}
+
+			// Check if the click is outside our editing container
+			if (this.$refs.editingContainer && !this.$refs.editingContainer.contains(event.target)) {
+				const isEditorRelated = event.target.closest('.tiptap-wrapper')
+										|| event.target.closest('.ProseMirror')
+										|| event.target.closest('[contenteditable]')
+										|| event.target.closest('.text-menubar')
+										|| event.target.closest('.text-editor')
+										|| event.target.closest('.editor-wrapper')
+										|| event.target.closest('[role="dialog"]')
+										|| event.target.closest('[role="menu"]')
+										|| event.target.closest('[role="listbox"]')
+
+				if (!isEditorRelated) {
+					this.saveChanges()
+				}
+			}
+		},
+
+		updateText(text) {
+			this.localValue = text
+		},
+
+		async saveChanges() {
+			if (this.localLoading) return
+
+			if (this.localValue === this.value) {
+				this.stopEditing()
+				return
+			}
+
+			const success = await this.updateCellValue(this.localValue || '')
+
+			if (success) {
+				this.stopEditing()
+			} else {
+				this.cancelEdit()
+			}
+			this.localLoading = false
+		},
+
+		cancelEdit() {
+			this.localValue = this.value
+			this.stopEditing()
+		},
+
+		startEditing() {
+			if (!this.canEditCell()) return false
+			this.localValue = this.value || ''
+			this.isEditing = true
+			this.isInitialEditClick = true
+
+			document.addEventListener('click', this.handleClickOutside, true)
+		},
+
+		stopEditing() {
+			this.isEditing = false
+			this.isInitialEditClick = false
+			document.removeEventListener('click', this.handleClickOutside, true)
+		},
 	},
 
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
+.cell-editor {
+	width: 100%;
+}
 
-:deep(.tiptap-reader-cell) {
-	max-height: calc(var(--default-line-height) * 6);
-	overflow-y: scroll;
-	min-width: 100px;
-	white-space: pre-wrap;
-	margin-top: calc(var(--default-grid-baseline) * 2);
-	margin-bottom: calc(var(--default-grid-baseline) * 2);
+.cell-editor > div {
+	cursor: pointer;
+	min-height: 24px;
+}
 
-	li {
-		display: flex;
-		align-items: center;
-	}
+.tiptap-edit-mode {
+	position: relative;
+	border: 1px solid var(--color-border-maxcontrast);
+	border-radius: var(--border-radius);
+	background: var(--color-main-background);
+	cursor: default;
+}
 
-	li > div {
-		padding-left: calc(var(--default-grid-baseline) * 2);
+.loading-indicator {
+	position: absolute;
+	top: 4px;
+	right: 4px;
+}
+
+:deep(.text-editor__wrapper div.ProseMirror) {
+	padding: 8px;
+	min-height: 24px;
+}
+
+:deep(div[contenteditable='false']) {
+	background: transparent;
+	color: var(--color-main-text);
+	width:100%;
+	opacity: 1;
+
+	&:hover {
+		background: var(--color-background-hover);
 	}
 }
 
+:deep(.tiptap-wrapper) {
+	.menuBar {
+		padding: 8px;
+		border-bottom: 1px solid var(--color-border);
+		background: var(--color-background-dark);
+		width: 100%;
+	}
+
+	.ProseMirror {
+		padding: 8px;
+		min-height: 60px;
+		outline: none;
+		border: none !important;
+		border-color: none !important;
+		box-shadow: none !important;
+	}
+
+	.character-count {
+		padding: 4px 8px;
+		font-size: 12px;
+		color: var(--color-text-maxcontrast);
+		border-top: 1px solid var(--color-border);
+		background: var(--color-background-dark);
+	}
+}
 </style>
