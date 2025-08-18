@@ -896,7 +896,13 @@ export type components = {
             readonly usergroupSelectGroups: boolean;
             readonly usergroupSelectTeams: boolean;
             readonly showUserStatus: boolean;
-            readonly readonly: boolean;
+            readonly viewColumnInformation: {
+                /** Format: int64 */
+                readonly columnId: number;
+                /** Format: int64 */
+                readonly order: number;
+                readonly readonly: boolean;
+            } | null;
         };
         readonly Context: {
             /** Format: int64 */

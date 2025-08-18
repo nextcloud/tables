@@ -128,7 +128,7 @@ describe('Interact with views', () => {
 		cy.get('[data-cy="navigationViewItem"]').contains(title).should('exist')
 
 		// Make sure that column is readonly during edit
-		cy.get('[data-cy="customTableRow"]').contains('first row').parent().parent().find('[data-cy="editRowBtn"]').click()
+		cy.get('[data-cy="customTableRow"]').contains('first row').closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
 		cy.get('[data-cy="editRowModal"]').contains('.row.space-T', 'title').find('input').should('have.attr', 'readonly')
 		cy.get('[data-cy="editRowSaveButton"]').contains('Save').click()
 	})

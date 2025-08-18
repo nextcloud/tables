@@ -132,7 +132,11 @@ namespace OCA\Tables;
  *  usergroupSelectGroups: bool,
  *  usergroupSelectTeams: bool,
  *  showUserStatus: bool,
- *  readonly: bool,
+ *  viewColumnInformation: ?array{
+ *     columnId: int,
+ *     order: int,
+ *     readonly: bool,
+ *  },
  * }
  *
  * @psalm-type TablesImportState = array{
