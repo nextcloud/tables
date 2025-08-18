@@ -7,7 +7,7 @@
 		<NcCheckboxRadioSwitch
 			type="switch"
 			:checked.sync="localValue"
-			:disabled="column.readonly"
+			:disabled="column.viewColumnInformation?.readonly"
 			data-cy="selectionCheckFormSwitch" />
 	</RowFormWrapper>
 </template>

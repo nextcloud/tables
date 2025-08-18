@@ -16,7 +16,7 @@
 					:options="results"
 					:clearable="true"
 					label="title"
-					:disabled="column.readonly"
+					:disabled="column.viewColumnInformation?.readonly"
 					:aria-label-combobox="t('tables', 'Link providers')"
 					style="width: 100%"
 					@search="v => term = v">

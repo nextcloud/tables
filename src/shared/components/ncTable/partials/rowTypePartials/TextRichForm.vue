@@ -6,7 +6,7 @@
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description">
 		<div class="row">
 			<div class="fix-col-4">
-				<NcEditor v-if="!showBigEditorModal" :can-edit="!column.readonly" :text.sync="localValue" height="small" />
+				<NcEditor v-if="!showBigEditorModal" :can-edit="!column.viewColumnInformation?.readonly" :text.sync="localValue" height="small" />
 			</div>
 		</div>
 		<template #head>
@@ -18,7 +18,7 @@
 			<NcModal v-if="showBigEditorModal" :close-button-contained="false" size="full" :title="column.title" @close="showBigEditorModal = false">
 				<div class="row">
 					<div class="fix-col-4">
-						<NcEditor :text.sync="localValue" :can-edit="!column.readonly" :show-border="false" />
+						<NcEditor :text.sync="localValue" :can-edit="!column.viewColumnInformation?.readonly" :show-border="false" />
 					</div>
 				</div>
 				<div class="closeModalButton">
