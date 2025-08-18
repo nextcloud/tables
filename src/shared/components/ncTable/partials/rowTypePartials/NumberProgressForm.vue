@@ -8,7 +8,7 @@
 			type="number"
 			min="0"
 			max="100"
-			:readonly="column.readonly"
+			:readonly="column.viewColumnInformation?.readonly"
 			@input="enforceBounds">
 	</RowFormWrapper>
 </template>

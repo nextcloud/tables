@@ -523,7 +523,7 @@ class ColumnService extends SuperService {
 		$column->setLastEditByDisplayName($this->userHelper->getUserDisplayName($column->getLastEditBy()));
 
 		if ($viewColumnInformation) {
-			$column->setReadonly($viewColumnInformation->isReadonly());
+			$column->setViewColumnInformation($viewColumnInformation);
 		}
 
 		return $column;

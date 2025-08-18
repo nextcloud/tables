@@ -11,6 +11,7 @@ use JsonSerializable;
 
 use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
@@ -79,8 +80,8 @@ use OCA\Tables\ResponseDefinitions;
  * @method setUsergroupSelectTeams(?bool $usergroupSelectTeams)
  * @method getShowUserStatus(): bool
  * @method setShowUserStatus(?bool $showUserStatus)
- * @method getReadonly(): bool
- * @method setReadonly(bool $readonly)
+ * @method getViewColumnInformation(): ViewColumnInformation
+ * @method setViewColumnInformation(ViewColumnInformation $viewColumnInformation)
  */
 class Column extends EntitySuper implements JsonSerializable {
 	// Meta column types
@@ -149,9 +150,9 @@ class Column extends EntitySuper implements JsonSerializable {
 	// virtual properties
 	protected ?string $createdByDisplayName = null;
 	protected ?string $lastEditByDisplayName = null;
-	protected ?bool $readonly = null;
+	protected ?ViewColumnInformation $viewColumnInformation = null;
 
-	protected const VIRTUAL_PROPERTIES = ['createdByDisplayName', 'lastEditByDisplayName', 'readonly'];
+	protected const VIRTUAL_PROPERTIES = ['createdByDisplayName', 'lastEditByDisplayName', 'viewColumnInformation'];
 
 	public function __construct() {
 		$this->addType('id', 'integer');
@@ -257,7 +258,7 @@ class Column extends EntitySuper implements JsonSerializable {
 			'lastEditBy' => $this->lastEditBy,
 			'lastEditByDisplayName' => $this->lastEditByDisplayName,
 			'lastEditAt' => $this->lastEditAt,
-			'readonly' => $this->readonly,
+			'viewColumnInformation' => $this->viewColumnInformation?->jsonSerialize(),
 			'type' => $this->type,
 			'subtype' => $this->subtype,
 			'mandatory' => $this->mandatory,

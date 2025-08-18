@@ -308,7 +308,7 @@ export default {
 				.map((col, index) => ({
 					columnId: col.id,
 					order: index,
-					readonly: col.readonly,
+					readonly: col.viewColumnInformation?.readonly,
 				}))
 			const data = {
 				data: {

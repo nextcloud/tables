@@ -23,7 +23,7 @@
 					:checked="selectedColumns.includes(column.id)"
 					class="display-checkbox"
 					@update:checked="onToggle(column.id)" />
-				<span :class="{ 'title-readonly': column.readonly }">{{ column.title }}</span>
+				<span :class="{ 'title-readonly': column.viewColumnInformation?.readonly }">{{ column.title }}</span>
 				<div v-if="column.id < 0" class="meta-info">
 					({{ t('tables', 'Metadata') }})
 				</div>
@@ -34,9 +34,9 @@
 					<NcActionCheckbox
 						v-if="selectedColumns.includes(column.id)"
 						data-cy="columnReadonlyCheckbox"
-						:checked="column.readonly"
+						:checked="column.viewColumnInformation?.readonly"
 						@change="onReadonlyChanged(column.id, $event.target.checked)">
-						{{ t('tables', 'Readonly') }}
+						{{ t('tables', 'Read only') }}
 					</NcActionCheckbox>
 				</NcActions>
 			</div>
@@ -147,7 +147,7 @@ export default {
 		onReadonlyChanged(columnId, readonly) {
 			const column = this.mutableColumns.find(col => col.id === columnId)
 			if (column) {
-				column.readonly = readonly
+				column.viewColumnInformation.readonly = readonly
 			}
 		},
 		async dragEnd(goalIndex) {
