@@ -5,6 +5,51 @@
 
 # Changelog
 
+## 1.0.0-beta.2
+
+### Added
+
+* [Feat: Inline editing (Number, Progress, Yes/No, Textline) (tables#1719)](https://github.com/nextcloud/tables/pull/1719)
+* [Feat: Inline editing - Stars (tables#1973)](https://github.com/nextcloud/tables/pull/1973)
+* [Feat: Inline editing - Datetime (tables#1974)](https://github.com/nextcloud/tables/pull/1974)
+* [Feat: Inline editing - Selection (tables#1975)](https://github.com/nextcloud/tables/pull/1975)
+* [Feat: Inline editing - link (tables#1977)](https://github.com/nextcloud/tables/pull/1977)
+* [Feat: Inline editing - usergroup (tables#1978)](https://github.com/nextcloud/tables/pull/1978)
+* [Feat: Inline editing - Rich text (tables#1976)](https://github.com/nextcloud/tables/pull/1976)
+* [Feat: Inline editing support for html column (tables#2014)](https://github.com/nextcloud/tables/pull/2014)
+* [Feat: remove rows in view after edit when they no longer match filter (tables#1979)](https://github.com/nextcloud/tables/pull/1979)
+* [Enhancement: Add validation for unique values for a short text fields (tables#1770)](https://github.com/nextcloud/tables/pull/1770)
+* [Replace filled icons with outlined versions for a modernized Tables app UI (tables#1996)](https://github.com/nextcloud/tables/pull/1996)
+
+### Fixed
+
+* [Fix: Smartpicker show content (tables#1836)](https://github.com/nextcloud/tables/pull/1836)
+* [Fix: sorting on backend with limit and offset (tables#1877)](https://github.com/nextcloud/tables/pull/1877)
+* [Fix: allow null userId (tables#1960)](https://github.com/nextcloud/tables/pull/1960)
+* [Fix: skip DB column lookup for negative IDs (e.g. meta columns) (tables#1999)](https://github.com/nextcloud/tables/pull/1999)
+* [Fix(cypress): remove leftover `only` (tables#1986)](https://github.com/nextcloud/tables/pull/1986)
+
+### Other
+
+* [Test(Cypress): Fix component tests (tables#1807)](https://github.com/nextcloud/tables/pull/1807)
+* [Test: added a test for remove filtered rows feature (tables#1998)](https://github.com/nextcloud/tables/pull/1998)
+
+### Dependencies
+
+* [Fix(deps): update dependency @nextcloud/files to ^3.12.0 (main) (tables#1947)](https://github.com/nextcloud/tables/pull/1947)
+* [Fix(deps): update tiptap to ^3.0.9 (main) (tables#1967)](https://github.com/nextcloud/tables/pull/1967)
+* [Fix(deps): update dependency @nextcloud/initial-state to v3 (main) (tables#1968)](https://github.com/nextcloud/tables/pull/1968)
+* [Fix(deps): update tiptap to ^3.1.0 (main) (tables#1990)](https://github.com/nextcloud/tables/pull/1990)
+* [Chore(deps): update dependency @rollup/rollup-linux-x64-gnu to ^4.46.1 (main) (tables#1955)](https://github.com/nextcloud/tables/pull/1955)
+* [Chore(deps): update icewind1991/nextcloud-version-matrix digest to c2bf575 (main) (tables#1963)](https://github.com/nextcloud/tables/pull/1963)
+* [Chore(deps): update shivammathur/setup-php digest to ccf2c62 (main) (tables#1964)](https://github.com/nextcloud/tables/pull/1964)
+* [Chore(deps): update dependency @rollup/rollup-linux-x64-gnu to ^4.46.2 (main) (tables#1966)](https://github.com/nextcloud/tables/pull/1966)
+* [Chore(deps): update dependency openapi-typescript to ^7.9.1 (main) (tables#2003)](https://github.com/nextcloud/tables/pull/2003)
+* [[main] Fix npm audit (tables#1957)](https://github.com/nextcloud/tables/pull/1957)
+* [[main] Fix npm audit (tables#1989)](https://github.com/nextcloud/tables/pull/1989)
+* [[main] Fix npm audit (tables#2008)](https://github.com/nextcloud/tables/pull/2008)
+
+
 ## 1.0.0-beta.1
 
 ### Added
