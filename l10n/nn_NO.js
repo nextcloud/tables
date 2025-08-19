@@ -45,8 +45,8 @@ OC.L10N.register(
     "Error" : "Feil",
     "Download" : "Last ned",
     "Search" : "Søk",
-    "Default" : "Standard",
     "URL" : "URL",
+    "Default" : "Standard",
     "Copy link" : "Kopier lenkje",
     "ID" : "ID"
 },

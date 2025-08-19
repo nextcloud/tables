@@ -39,8 +39,8 @@ OC.L10N.register(
     "Error" : "সমস্যা",
     "Download" : "ডাউনলোড",
     "Search" : "Search",
-    "Default" : "পূর্বনির্ধারিত",
     "URL" : "URL",
+    "Default" : "পূর্বনির্ধারিত",
     "Copy link" : "লিঙ্ক কপি করো",
     "Select" : "সিলেক্ট"
 },

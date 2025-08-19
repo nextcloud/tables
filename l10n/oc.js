@@ -71,6 +71,8 @@ OC.L10N.register(
     "Error" : "Error",
     "Download" : "Telecargar",
     "Search" : "Recercar",
+    "URL" : "URL",
+    "Options" : "Opcions",
     "Undo" : "Desfar",
     "Redo" : "Refar",
     "Bold" : "Gras",
@@ -81,8 +83,6 @@ OC.L10N.register(
     "Heading 3" : "Títol 3",
     "Code" : "Còdi",
     "Default" : "Defaut",
-    "Options" : "Opcions",
-    "URL" : "URL",
     "Copy link" : "Copiar lo ligam",
     "Confirm" : "Confirmar",
     "ID" : "ID"

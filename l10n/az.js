@@ -48,9 +48,9 @@ OC.L10N.register(
     "Error" : "Səhv",
     "Download" : "Yüklə",
     "Search" : "Axtarış",
+    "URL" : "URL",
     "Back" : "Geri",
     "Default" : "Susmaya görə",
-    "URL" : "URL",
     "Copy link" : "linki nüsxələ",
     "Confirm" : "Təsdiq edin",
     "Select" : "Seç"

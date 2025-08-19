@@ -41,8 +41,8 @@ OC.L10N.register(
     "Error" : "Սխալ",
     "Download" : "Ներբեռնել",
     "Search" : "Search",
-    "Default" : "Լռելյայն",
     "URL" : "URL",
+    "Default" : "Լռելյայն",
     "Copy link" : "Պատճենել հղումը",
     "Select" : "Նշել"
 },

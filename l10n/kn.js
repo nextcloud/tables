@@ -28,8 +28,8 @@ OC.L10N.register(
     "Error" : "﻿ತಪ್ಪಾಗಿದೆ",
     "Download" : "ಪ್ರತಿಯನ್ನು ಸ್ಥಳೀಯವಾಗಿ ಉಳಿಸಿಕೊಳ್ಳಿ",
     "Search" : "Search",
-    "Default" : "ಆರಂಭದ ಪ್ರತಿ",
     "URL" : "ಜಾಲದ ಕೊಂಡಿ",
+    "Default" : "ಆರಂಭದ ಪ್ರತಿ",
     "Select" : "ಆಯ್ಕೆ ಮಾಡಿ"
 },
 "nplurals=2; plural=(n > 1);");

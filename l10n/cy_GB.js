@@ -43,12 +43,12 @@ OC.L10N.register(
     "Error" : "Gwall",
     "Download" : "Llwytho i lawr",
     "Search" : "Chwilio",
+    "URL" : "URL",
     "Undo" : "Dadwneud",
     "Bold" : "Trwm",
     "Italic" : "Italig",
     "Prefix" : "Rhagddodiad",
     "Suffix" : "Ôl-ddodiad",
-    "URL" : "URL",
     "Close editor" : "Cau'r golygydd",
     "Confirm" : "Cadarnhau",
     "ID" : "ID"

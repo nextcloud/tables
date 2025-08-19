@@ -44,10 +44,10 @@ OC.L10N.register(
     "Error" : "Error",
     "Download" : "Discargar",
     "Search" : "Cercar",
+    "URL" : "URL",
     "Undo" : "Disfacer",
     "Prefix" : "Prefixo",
     "Suffix" : "Suffixo",
-    "URL" : "URL",
     "Copy link" : "Copiar ligamine",
     "Confirm" : "Confirmar",
     "Select" : "Selectionar"

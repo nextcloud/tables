@@ -38,9 +38,9 @@ OC.L10N.register(
     "Error" : "កំហុស",
     "Download" : "ទាញយក",
     "Search" : "ស្វែងរក",
-    "Default" : "លំនាំ​ដើម",
-    "Options" : "ជម្រើស",
     "URL" : "URL",
+    "Options" : "ជម្រើស",
+    "Default" : "លំនាំ​ដើម",
     "Copy link" : "ចម្លងតំណ"
 },
 "nplurals=1; plural=0;");

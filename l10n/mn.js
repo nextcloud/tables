@@ -40,9 +40,9 @@ OC.L10N.register(
     "Error" : "Алдаа",
     "Download" : "Татах",
     "Search" : "Хайх",
+    "URL" : "URL",
     "Back" : "Буцах",
     "Undo" : "буцах",
-    "URL" : "URL",
     "Confirm" : "Батлах",
     "Select" : "Сонгох",
     "ID" : "ID"
