@@ -4,16 +4,17 @@
 -->
 <template>
 	<div class="main-table-view">
-		<ErrorMessage v-if="errorMessage" :message="errorMessage" />
-
-		<div v-else-if="!activeTable">
+		<div v-if="!activeTable && !errorMessage">
 			<div class="icon-loading" />
 		</div>
 
-		<div v-else>
+		<div v-else-if="activeTable">
 			<MainWrapper :element="activeTable" :is-view="false" />
-			<MainModals />
 		</div>
+
+		<ErrorMessage v-else-if="errorMessage" :message="errorMessage" />
+
+		<MainModals />
 	</div>
 </template>
 
