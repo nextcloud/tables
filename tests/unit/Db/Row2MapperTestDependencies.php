@@ -88,7 +88,12 @@ trait Row2MapperTestDependencies {
 				['test_ident' => 'age', 'title' => 'Age', 'type' => 'number'],
 				['test_ident' => 'birthday', 'title' => 'Birthday', 'type' => 'datetime'],
 				['test_ident' => 'department', 'title' => 'Department', 'type' => 'text'],
-				['test_ident' => 'score', 'title' => 'Score', 'type' => 'number']
+				['test_ident' => 'score', 'title' => 'Score', 'type' => 'number'],
+				['test_ident' => 'surname', 'title' => 'Surname', 'type' => 'text'],
+				['test_ident' => 'status', 'title' => 'Status', 'type' => 'selection', 'subtype' => '', 'selection_options' => json_encode([['id' => 0, 'label' => 'Active'], ['id' => 1, 'label' => 'Inactive'], ['id' => 2, 'label' => 'Pending']])],
+				['test_ident' => 'skills', 'title' => 'Skills', 'type' => 'selection', 'subtype' => 'multi', 'selection_options' => json_encode([['id' => 0, 'label' => 'PHP'], ['id' => 1, 'label' => 'JavaScript'], ['id' => 2, 'label' => 'SQL'], ['id' => 3, 'label' => 'Python'], ['id' => 4, 'label' => 'Java'], ['id' => 5, 'label' => 'React'], ['id' => 6, 'label' => 'Node.js'], ['id' => 7, 'label' => 'MongoDB'], ['id' => 8, 'label' => 'Docker'], ['id' => 9, 'label' => 'Management'], ['id' => 10, 'label' => 'Communication'], ['id' => 11, 'label' => 'Excel'], ['id' => 12, 'label' => 'Accounting'], ['id' => 13, 'label' => 'Analysis']])],
+				['test_ident' => 'is_available', 'title' => 'Available', 'type' => 'selection', 'subtype' => 'check', 'selection_options' => ''],
+				['test_ident' => 'experience_years', 'title' => 'Experience (Years)', 'type' => 'number']
 			],
 			[
 				[
@@ -100,7 +105,12 @@ trait Row2MapperTestDependencies {
 						'age' => 28,
 						'birthday' => '1995-05-15 10:30:00',
 						'department' => 'IT',
-						'score' => 85.5
+						'score' => 85.5,
+						'surname' => 'Thompson-Jones',
+						'status' => 'Active',
+						'skills' => ['PHP', 'JavaScript', 'SQL', 'Python'],
+						'is_available' => '"true"',
+						'experience_years' => 5
 					]
 				],
 				[
@@ -112,7 +122,11 @@ trait Row2MapperTestDependencies {
 						'age' => 32,
 						'birthday' => '1991-12-03 14:20:00',
 						'department' => 'HR',
-						'score' => 92.0
+						'score' => 92.0,
+						'surname' => 'Thompson',
+						'status' => 'Inactive',
+						'skills' => ['Management', 'Communication'],
+						'is_available' => '"false"'
 					]
 				],
 				[
@@ -124,7 +138,12 @@ trait Row2MapperTestDependencies {
 						'age' => 25,
 						'birthday' => '1998-01-20 08:45:00',
 						'department' => 'IT',
-						'score' => 78.3
+						'score' => 78.3,
+						'surname' => 'Wilson',
+						'status' => 'Active',
+						'skills' => ['Python'],
+						'is_available' => '"true"',
+						'experience_years' => 2
 					]
 				],
 				[
@@ -136,7 +155,11 @@ trait Row2MapperTestDependencies {
 						'age' => 25,
 						'birthday' => '1998-08-10 16:00:00',
 						'department' => 'Finance',
-						'score' => 88.7
+						'score' => 88.7,
+						'status' => 'Pending',
+						'skills' => ['Excel', 'Accounting', 'Analysis'],
+						'is_available' => '"false"',
+						'experience_years' => 3
 					]
 				],
 				[
@@ -148,7 +171,11 @@ trait Row2MapperTestDependencies {
 						'age' => 30,
 						'birthday' => '1993-03-25 12:15:00',
 						'department' => 'IT',
-						'score' => 95.2
+						'score' => 95.2,
+						'surname' => 'Davis',
+						'status' => 'Active',
+						'skills' => ['React', 'Node.js', 'MongoDB', 'Docker'],
+						'experience_years' => 7
 					]
 				]
 			]
@@ -170,7 +197,7 @@ trait Row2MapperTestDependencies {
 	 */
 	protected function setupRealColumnMapper(int $tableId): void {
 		$qb = $this->connection->getQueryBuilder();
-		$result = $qb->select('id', 'title', 'type', 'table_id')
+		$result = $qb->select('id', 'title', 'type', 'subtype', 'table_id')
 			->from('tables_columns')
 			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId)))
 			->executeQuery();
@@ -182,6 +209,7 @@ trait Row2MapperTestDependencies {
 			$column->setId($row['id']);
 			$column->setTitle($row['title']);
 			$column->setType($row['type']);
+			$column->setSubtype($row['subtype']);
 			$column->setTableId($row['table_id']);
 			$columns[$row['id']] = $column;
 			$columnTypes[$row['id']] = $row['type'];

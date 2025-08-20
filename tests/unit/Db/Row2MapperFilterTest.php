@@ -155,6 +155,86 @@ class Row2MapperFilterTest extends \OCA\Tables\Tests\Unit\Database\DatabaseTestC
 				['Alice'],
 				'Filter by created_by meta column'
 			],
+
+			// Text column (surname): hyphenated edge case and a real empty match
+			'surname contains son' => [
+				[['columnId' => 'surname', 'operator' => 'contains', 'value' => 'son']],
+				['Alice', 'Bob', 'Charlie'],
+				'Filter surnames containing son'
+			],
+			'surname ends-with son' => [
+				[['columnId' => 'surname', 'operator' => 'ends-with', 'value' => 'son']],
+				['Bob', 'Charlie'],
+				'Filter surnames ending with son (Thompson-Jones excluded)'
+			],
+			'surname is-empty' => [
+				[['columnId' => 'surname', 'operator' => 'is-empty', 'value' => '']],
+				['Diana'],
+				'Filter empty surname'
+			],
+
+			// Number column (experience_years): equality, >=, <= and empty (Bob has none)
+			'experience is-equal 5' => [
+				[['columnId' => 'experience_years', 'operator' => 'is-equal', 'value' => '5']],
+				['Alice'],
+				'Filter experience years equal to 5'
+			],
+			'experience gte 5' => [
+				[['columnId' => 'experience_years', 'operator' => 'is-greater-than-or-equal', 'value' => '5']],
+				['Alice', 'Eve'],
+				'Filter experience years greater than or equal to 5'
+			],
+			'experience lte 5' => [
+				[['columnId' => 'experience_years', 'operator' => 'is-lower-than-or-equal', 'value' => '5']],
+				['Alice', 'Bob', 'Charlie', 'Diana'],
+				'Filter experience years lower than or equal to 5 (Bob included via default)'
+			],
+			'experience is-empty' => [
+				[['columnId' => 'experience_years', 'operator' => 'is-empty', 'value' => '']],
+				['Bob'],
+				'Filter empty experience years'
+			],
+
+			// Selection single column (status)
+			'status is-equal Inactive' => [
+				[['columnId' => 'status', 'operator' => 'is-equal', 'value' => '@selection-id-1']],
+				['Bob'],
+				'Filter status equal to Inactive (id 1)'
+			],
+			'status contains Active' => [
+				[['columnId' => 'status', 'operator' => 'contains', 'value' => '@selection-id-0']],
+				['Alice', 'Charlie', 'Eve'],
+				'Filter status containing Active (id 0)'
+			],
+
+			// Selection multi column (skills)
+			'skills contains PHP' => [
+				[['columnId' => 'skills', 'operator' => 'contains', 'value' => '@selection-id-0']],
+				['Alice'],
+				'Filter skills containing PHP (id 0)'
+			],
+			'skills is-equal Python' => [
+				[['columnId' => 'skills', 'operator' => 'is-equal', 'value' => '@selection-id-3']],
+				['Charlie'],
+				'Filter skills equal to exactly Python (id 3)'
+			],
+
+			// Selection checkbox column (is_available)
+			'available is checked' => [
+				[['columnId' => 'is_available', 'operator' => 'is-equal', 'value' => '@checked']],
+				['Alice', 'Charlie'],
+				'Filter available is checked'
+			],
+			'available is unchecked' => [
+				[['columnId' => 'is_available', 'operator' => 'is-equal', 'value' => '@unchecked']],
+				['Bob', 'Diana'],
+				'Filter available is unchecked'
+			],
+			'available is-empty' => [
+				[['columnId' => 'is_available', 'operator' => 'is-empty', 'value' => '']],
+				['Eve'],
+				'Filter available is empty'
+			],
 		];
 	}
 
