@@ -166,7 +166,7 @@ export default {
 	}
 
 </style>
-<style lang="scss">
+<style lang="scss" scoped>
 
 h1 {
 	font-size: 1.98em;

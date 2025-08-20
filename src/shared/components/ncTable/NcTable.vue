@@ -278,7 +278,7 @@ export default {
 }
 </style>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .image_container.widget-file {
 	height: auto !important;
 }
