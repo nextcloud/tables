@@ -10,6 +10,7 @@ import { parseCol } from '../shared/components/ncTable/mixins/columnParser.js'
 import { MetaColumns } from '../shared/components/ncTable/mixins/metaColumns.js'
 import { showError } from '@nextcloud/dialogs'
 import { set } from 'vue'
+import { emit } from '@nextcloud/event-bus'
 
 function genStateKey(isView, elementId) {
 	elementId = elementId.toString()
@@ -202,7 +203,9 @@ export const useDataStore = defineStore('data', {
 				const row = res.data
 				const index = this.rows[stateId].findIndex(r => r.id === row.id)
 				set(this.rows[stateId], index, row)
+				await this.removeRowIfNotInView({ rowId: row?.id, viewId, stateId })
 			}
+
 			return true
 		},
 
@@ -223,7 +226,9 @@ export const useDataStore = defineStore('data', {
 				const row = res?.data?.ocs?.data
 				const newIndex = this.rows[stateId].length
 				set(this.rows[stateId], newIndex, row)
+				await this.removeRowIfNotInView({ rowId: row?.id, viewId, stateId })
 			}
+
 			return true
 		},
 
@@ -252,5 +257,28 @@ export const useDataStore = defineStore('data', {
 			}
 			return true
 		},
+
+		async checkRowInView({ rowId, viewId }) {
+			try {
+				const res = await axios.get(generateUrl('/apps/tables/view/{viewId}/row/{rowId}/present', { viewId, rowId }))
+				return res.data.present
+			} catch (e) {
+				showError(t('tables', 'Could not verify row. View is reloaded'))
+				await this.loadRowsFromBE({ viewId })
+			}
+		},
+
+		async removeRowIfNotInView({ rowId, viewId, stateId }) {
+			if (!rowId || !viewId) {
+				return
+			}
+
+			const rowInView = await this.checkRowInView({ rowId, viewId })
+			if (rowInView === false) {
+				emit('tables:row:animate')
+				this.rows[stateId] = this.rows[stateId].filter(r => r.id !== rowId)
+			}
+		},
 	},
+
 })
