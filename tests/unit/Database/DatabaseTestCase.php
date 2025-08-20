@@ -193,7 +193,12 @@ abstract class DatabaseTestCase extends TestCase {
 			'mandatory' => false,
 			'order_weight' => 0,
 			'number_prefix' => '',
-			'number_suffix' => ''
+			'number_suffix' => '',
+			'text_default' => '',
+			'number_default' => null,
+			'datetime_default' => '',
+			'selection_default' => '',
+			'usergroup_default' => '',
 		];
 
 		$testIdent = $data['test_ident'] ?? null;
@@ -318,26 +323,31 @@ abstract class DatabaseTestCase extends TestCase {
 	 */
 	protected function insertCellData(int $rowId, int $columnId, $value): void {
 		$qb = $this->connection->getQueryBuilder();
-		$result = $qb->select('type')
+		$result = $qb->select('type', 'subtype')
 			->from('tables_columns')
 			->where($qb->expr()->eq('id', $qb->createNamedParameter($columnId)))
 			->executeQuery();
 
-		$columnType = $result->fetchOne();
+		$column = $result->fetch();
 		$result->closeCursor();
 
-		if (!$columnType) {
+		if (!$column) {
 			throw new \InvalidArgumentException("Column with ID $columnId not found");
 		}
 
-		$this->insertCellIntoTypeTable($rowId, $columnId, $value, $columnType);
+		$this->insertCellIntoTypeTable($rowId, $columnId, $value, $column['type'], $column['subtype']);
 	}
 
 	/**
 	 * Inserts cell data into the appropriate type-specific table
 	 */
-	protected function insertCellIntoTypeTable(int $rowId, int $columnId, $value, string $columnType): void {
+	protected function insertCellIntoTypeTable(int $rowId, int $columnId, $value, string $columnType, string $columnSubtype): void {
 		$tableName = 'tables_row_cells_' . $columnType;
+
+		// Handle selection type - convert values to IDs based on selection_options
+		if ($columnType === 'selection' && $columnSubtype !== 'check') {
+			$value = $this->convertSelectionValuesToIds($columnId, $value);
+		}
 
 		$qb = $this->connection->getQueryBuilder();
 		$qb->insert($tableName)
@@ -401,6 +411,53 @@ abstract class DatabaseTestCase extends TestCase {
 			}
 		}
 		return $mapping;
+	}
+
+	/**
+	 * Converts selection values to IDs based on selection_options
+	 */
+	protected function convertSelectionValuesToIds(int $columnId, $value) {
+		// Get column configuration to find selection_options
+		$qb = $this->connection->getQueryBuilder();
+		$result = $qb->select('selection_options')
+			->from('tables_columns')
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($columnId)))
+			->executeQuery();
+
+		$selectionOptions = $result->fetchOne();
+		$result->closeCursor();
+
+		if (!$selectionOptions) {
+			throw new \InvalidArgumentException("Column with ID $columnId not found");
+		}
+
+		$selectionOptions = json_decode($selectionOptions, true);
+
+		// Create mapping from label to id
+		$optionMapping = [];
+		foreach ($selectionOptions as $option) {
+			if (isset($option['label']) && isset($option['id'])) {
+				$optionMapping[$option['label']] = $option['id'];
+			}
+		}
+
+		// Convert single value or array of values
+		if (is_array($value)) {
+			// Multiple selection - convert each value to ID and return as JSON
+			$convertedValues = [];
+			foreach ($value as $optionText) {
+				if (isset($optionMapping[$optionText])) {
+					$convertedValues[] = $optionMapping[$optionText];
+				}
+			}
+			return json_encode($convertedValues);
+		} else {
+			// Single selection - convert to ID
+			if (isset($optionMapping[$value])) {
+				return $optionMapping[$value];
+			}
+			return null;
+		}
 	}
 
 	/**
