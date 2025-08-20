@@ -228,6 +228,7 @@ OC.L10N.register(
     "Create rows" : "Crea files",
     "You are not allowed to read this table, but you can still create rows." : "No podeu llegir aquesta taula, però encara podeu crear files.",
     "Search" : "Cercar",
+    "Clear value" : "Neteja el valor",
     "URL" : "URL",
     "Url" : "Url",
     "Options" : "Opcions",

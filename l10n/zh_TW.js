@@ -425,6 +425,7 @@ OC.L10N.register(
     "No permissions" : "沒有權限",
     "You have no permissions for this table." : "您在此表格沒有權限。",
     "Search" : "搜尋",
+    "Clear value" : "清除值",
     "URL" : "URL",
     "Could not load link provider results." : "無法載入連結提供者結果。",
     "Url" : "Url",

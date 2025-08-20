@@ -289,6 +289,7 @@ OC.L10N.register(
     "Create rows" : "Dodaj vrstice",
     "You are not allowed to read this table, but you can still create rows." : "Ni dovoljeno prebrati vsebine razpredelnice, lahko pa dodate nove vrstice.",
     "Search" : "Poišči",
+    "Clear value" : "Počisti vrednost",
     "URL" : "Naslov URL",
     "Url" : "Naslov URL",
     "This option is outdated." : "Ta možnost je zastarela.",

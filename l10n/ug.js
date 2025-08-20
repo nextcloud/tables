@@ -397,6 +397,7 @@ OC.L10N.register(
     "No permissions" : "رۇخسەت يوق",
     "You have no permissions for this table." : "بۇ جەدۋەلگە ئىجازەت يوق.",
     "Search" : "Search",
+    "Clear value" : "ئېنىق قىممەت",
     "URL" : "URL",
     "Could not load link provider results." : "ئۇلىنىش تەمىنلىگۈچىنىڭ نەتىجىسىنى يۈكلىيەلمىدى.",
     "Url" : "Url",

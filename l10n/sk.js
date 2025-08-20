@@ -422,6 +422,7 @@ OC.L10N.register(
     "No permissions" : "Žiadne oprávnenia",
     "You have no permissions for this table." : "Nemáte žiadne oprávnenia pre túto tabuľku",
     "Search" : "Hľadať",
+    "Clear value" : "Zmazať hodnotu",
     "URL" : "URL",
     "Could not load link provider results." : "Nepodarilo sa načítať výsledky poskytovateľa odkazov.",
     "Url" : "URL",

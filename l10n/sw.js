@@ -103,6 +103,7 @@ OC.L10N.register(
     "Error" : "Hitilafu",
     "Download" : "Pakua",
     "Search" : "Tafuta",
+    "Clear value" : "Futa thamani",
     "URL" : "Url",
     "Options" : "Chaguzi",
     "Back" : "Rudi",

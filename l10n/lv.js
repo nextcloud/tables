@@ -82,6 +82,7 @@ OC.L10N.register(
     "Error" : "Kļūda",
     "Download" : "Lejupielādēt",
     "Search" : "Meklēt",
+    "Clear value" : "Notīrīt vērtību",
     "URL" : "URL",
     "Undo" : "Atsaukt",
     "Redo" : "Atcelt atsaukšanu",

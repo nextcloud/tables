@@ -425,6 +425,7 @@ OC.L10N.register(
     "No permissions" : "Нема дозвола",
     "You have no permissions for this table." : "Немате дозволе за ову табелу.",
     "Search" : "Претрага",
+    "Clear value" : "Обриши вредност",
     "URL" : "УРЛ",
     "Could not load link provider results." : "Не могу да се учитају резултати пружаоца линка.",
     "Url" : "Адреса",

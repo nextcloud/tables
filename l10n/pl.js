@@ -203,6 +203,7 @@ OC.L10N.register(
     "Could not load editor, text not available." : "Nie można wczytać edytora, tekst jest niedostępny.",
     "Download" : "Pobierz",
     "Search" : "Szukaj",
+    "Clear value" : "Wyczyść wartość",
     "URL" : "Adres URL",
     "Could not load link provider results." : "Nie można wczytać wyników dostawcy odnośników.",
     "Url" : "URL",

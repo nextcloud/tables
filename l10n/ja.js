@@ -334,6 +334,7 @@ OC.L10N.register(
     "Error" : "エラー",
     "Download" : "ダウンロード",
     "Search" : "検索",
+    "Clear value" : "値をクリア",
     "URL" : "URL",
     "Url" : "URL",
     "Options" : "オプション",

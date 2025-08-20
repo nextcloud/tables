@@ -400,6 +400,7 @@ OC.L10N.register(
     "No permissions" : "Ingen rettigheter",
     "You have no permissions for this table." : "Du har ingen rettigheter for denne tabellen.",
     "Search" : "Søk",
+    "Clear value" : "Tøm verdi",
     "URL" : "URL",
     "Could not load link provider results." : "Kan ikke laste inn koblingsleverandørresultater.",
     "Url" : "URL",

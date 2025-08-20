@@ -425,6 +425,7 @@ OC.L10N.register(
     "No permissions" : "Sem permissões",
     "You have no permissions for this table." : "Você não tem permissões para esta tabela.",
     "Search" : "Pesquisar",
+    "Clear value" : "Limpar valor",
     "URL" : "URL",
     "Could not load link provider results." : "Não foi possível carregar os resultados do provedor de links.",
     "Url" : "Url",

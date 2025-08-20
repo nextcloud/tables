@@ -410,6 +410,7 @@ OC.L10N.register(
     "No permissions" : "Aucun droit.",
     "You have no permissions for this table." : "Vous n’avez pas l’autorisation pour ce tableau.",
     "Search" : "Rechercher",
+    "Clear value" : "Effacer la valeur",
     "URL" : "URL",
     "Could not load link provider results." : "Impossible de charger les résultats du fournisseur de lien.",
     "Url" : "URL",

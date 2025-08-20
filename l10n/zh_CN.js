@@ -378,6 +378,7 @@ OC.L10N.register(
     "Download" : "下载",
     "No permissions" : "没有权限",
     "Search" : "搜索",
+    "Clear value" : "清除值",
     "URL" : "URL",
     "Url" : "Url",
     "Options" : "选项",

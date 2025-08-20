@@ -425,6 +425,7 @@ OC.L10N.register(
     "No permissions" : "Herhangi bir izin yok",
     "You have no permissions for this table." : "Bu tablo üzerinde herhangi bir izniniz yok.",
     "Search" : "Arama",
+    "Clear value" : "Değeri temizle",
     "URL" : "Adres",
     "Could not load link provider results." : "Bağlantı hizmeti sağlayıcıları sonuçları yüklenemedi.",
     "Url" : "Adres",
