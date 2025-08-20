@@ -41,7 +41,7 @@ export default {
 	},
 }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .main-table-view {
 	width: max-content;
 	min-width: var(--app-content-width, 100%);

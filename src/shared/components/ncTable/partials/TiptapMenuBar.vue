@@ -201,7 +201,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 
 .character-count {
 	display: flex;
