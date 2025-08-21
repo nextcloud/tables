@@ -529,6 +529,14 @@ export default {
 			background-color: var(--color-background-dark);
 		}
 
+		.editor-wrapper .editor {
+			background-color: inherit;
+		}
+
+		.selected:active, .selected:hover, .selected:focus, tr:hover .editor-wrapper .editor {
+			background-color: inherit;
+		}
+
 		// viewer integration
 		.editor-wrapper {
 			min-width: 100px;
