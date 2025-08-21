@@ -314,9 +314,12 @@ export default {
 		},
 		submitFilterInput() {
 			// Ignore contains filter with the same value es old contain filters
-			if (this.selectedOperator.id === FilterIds.Contains) {
+			if ([FilterIds.Contains, FilterIds.DoesNotContain].includes(this.selectedOperator.id)) {
 				const columnFilters = this.getFilterForColumn(this.column)
-				if (columnFilters && columnFilters.filter(fil => fil.operator.id === FilterIds.Contains).map(fil => fil.value).includes(this.searchValue)) {
+				if (columnFilters && columnFilters
+					.filter(fil => fil.operator.id === this.selectedOperator.id)
+					.map(fil => fil.value)
+					.includes(this.searchValue)) {
 					this.reset()
 					return
 				}
