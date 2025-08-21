@@ -44,6 +44,7 @@ OC.L10N.register(
     "Error" : "Памылка",
     "Download" : "Спампаваць",
     "Search" : "Пошук",
+    "Clear value" : "Ачысціць значэнне",
     "URL" : "URL-адрас",
     "Back" : "Назад",
     "Undo" : "Адрабіць",

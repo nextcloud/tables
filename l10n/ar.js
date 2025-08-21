@@ -422,6 +422,7 @@ OC.L10N.register(
     "No permissions" : "لا أذونات",
     "You have no permissions for this table." : "ليس لدي أيّ أذونات لهذا الجدول",
     "Search" : "البحث",
+    "Clear value" : "مَحْو القيمة",
     "URL" : "رابط URL",
     "Could not load link provider results." : "تعذر تحميل نتائج مزود الرابط..",
     "Url" : "عنوان موقع الموارد المُوحّد URL",
