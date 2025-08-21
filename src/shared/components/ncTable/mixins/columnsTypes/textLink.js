@@ -57,6 +57,7 @@ export default class TextLinkColumn extends AbstractTextColumn {
 
 		const filterMethod = {
 			[FilterIds.Contains]() { return value.includes(filterValue) },
+			[FilterIds.DoesNotContain]() { return !value.includes(filterValue) },
 			[FilterIds.BeginsWith]() { return value.startsWith(filterValue) },
 			[FilterIds.EndsWith]() { return value.endsWith(filterValue) },
 			[FilterIds.IsEqual]() { return value === filterValue },
