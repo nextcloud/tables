@@ -114,5 +114,5 @@ function mountContentWidget(richObject) {
 	// Get some often used elements
 	cy.get('[data-cy="contentReferenceWidget"] .options').as('options')
 	cy.get('[data-cy="contentReferenceWidget"] .NcTable table').as('table')
-	cy.get('@table').find('tbody tr[data-cy="customTableRow"]').as('rows')
+	cy.get('@table').find('tr[data-cy="customTableRow"]').as('rows')
 }
