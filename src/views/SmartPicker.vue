@@ -3,8 +3,8 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="tables-smart-picker picker-content">
-		<h2 class="picker-title">
+	<div class="tables-smart-picker">
+		<h2>
 			{{ t('tables', 'Nextcloud Tables') }}
 		</h2>
 		<div class="selection-wrapper">
