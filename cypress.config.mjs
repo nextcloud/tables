@@ -45,6 +45,38 @@ export default defineConfig({
 		devServer: {
 			framework: 'vue',
 			bundler: 'vite',
+			viteConfig: {
+				plugins: [vue(), nodePolyfills()],
+				optimizeDeps: {
+					exclude: [
+						'vite-plugin-node-polyfills/shims/buffer',
+						'vite-plugin-node-polyfills/shims/global',
+						'vite-plugin-node-polyfills/shims/process'
+					],
+					force: true
+				},
+				define: {
+					global: 'globalThis',
+				},
+			},
+		},
+		setupNodeEvents(on, config) {
+			on('file:preprocessor', vitePreprocessor({
+				plugins: [vue(), nodePolyfills()],
+				configFile: false,
+				optimizeDeps: {
+					exclude: [
+						'vite-plugin-node-polyfills/shims/buffer',
+						'vite-plugin-node-polyfills/shims/global',
+						'vite-plugin-node-polyfills/shims/process'
+					],
+					force: true
+				},
+				define: {
+					global: 'globalThis',
+				},
+			}))
+			return config
 		},
 		viewportWidth: 800,
 		viewportHeight: 600,
