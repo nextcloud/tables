@@ -4,11 +4,9 @@
 -->
 <template>
 	<div class="row">
-		<ErrorMessage v-if="errorMessage" :message="errorMessage" />
+		<div v-if="loading" class="icon-loading" />
 
-		<div v-else-if="loading" class="icon-loading" />
-
-		<div v-else>
+		<div v-else-if="activeContext">
 			<div class="content context">
 				<div class="row first-row">
 					<h1 class="context__title" data-cy="context-title">
@@ -35,9 +33,11 @@
 					</div>
 				</div>
 			</div>
-
-			<MainModals />
 		</div>
+
+		<ErrorMessage v-else-if="errorMessage" :message="errorMessage" />
+
+		<MainModals />
 	</div>
 </template>
 
