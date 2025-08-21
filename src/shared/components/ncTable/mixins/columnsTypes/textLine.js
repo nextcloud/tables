@@ -47,6 +47,7 @@ export default class TextLineColumn extends AbstractTextColumn {
 		if (!cellValue & filter.operator.id !== FilterIds.IsEmpty) return false
 		const filterMethod = {
 			[FilterIds.Contains]() { return cellValue.includes(filterValue) },
+			[FilterIds.DoesNotContain]() { return !cellValue.includes(filterValue) },
 			[FilterIds.BeginsWith]() { return cellValue.startsWith(filterValue) },
 			[FilterIds.EndsWith]() { return cellValue.endsWith(filterValue) },
 			[FilterIds.IsEqual]() { return cellValue === filterValue },
