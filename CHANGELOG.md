@@ -5,6 +5,14 @@
 
 # Changelog
 
+## 1.0.0-beta.3
+
+### Fixed
+
+* [Fix: Background of text inputs when rows are selected (tables#2000)](https://github.com/nextcloud/tables/pull/2000)
+* [Fix(deps): update tiptap to ^3.2.0 (main) (tables#2004)](https://github.com/nextcloud/tables/pull/2004)
+* [Fix: Scope CSS styles (tables#2018)](https://github.com/nextcloud/tables/pull/2018)
+
 ## 1.0.0-beta.2
 
 ### Added
