@@ -19,6 +19,7 @@
 			:close-after-click="true"
 			type="tertiary"
 			:aria-label="t('tables', 'Add new filter')"
+			data-cy="filterGroupAddFilterBtn"
 			@click="addFilter">
 			{{ t('tables', 'Add new filter') }}
 			<template #icon>
