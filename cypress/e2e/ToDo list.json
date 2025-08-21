@@ -34,7 +34,8 @@
 			"usergroupSelectUsers": false,
 			"usergroupSelectGroups": false,
 			"usergroupSelectTeams": false,
-			"showUserStatus": false
+			"showUserStatus": false,
+			"customSettings": {}
 		},
 		{
 			"id": 92,
@@ -68,7 +69,10 @@
 			"usergroupSelectUsers": false,
 			"usergroupSelectGroups": false,
 			"usergroupSelectTeams": false,
-			"showUserStatus": false
+			"showUserStatus": false,
+			"customSettings": {
+				"width": 300
+			}
 		},
 		{
 			"id": 93,
@@ -102,7 +106,8 @@
 			"usergroupSelectUsers": false,
 			"usergroupSelectGroups": false,
 			"usergroupSelectTeams": false,
-			"showUserStatus": false
+			"showUserStatus": false,
+			"customSettings": {}
 		},
 		{
 			"id": 94,
@@ -136,7 +141,8 @@
 			"usergroupSelectUsers": false,
 			"usergroupSelectGroups": false,
 			"usergroupSelectTeams": false,
-			"showUserStatus": false
+			"showUserStatus": false,
+			"customSettings": {}
 		},
 		{
 			"id": 95,
@@ -170,7 +176,8 @@
 			"usergroupSelectUsers": false,
 			"usergroupSelectGroups": false,
 			"usergroupSelectTeams": false,
-			"showUserStatus": false
+			"showUserStatus": false,
+			"customSettings": {}
 		},
 		{
 			"id": 96,
@@ -204,7 +211,8 @@
 			"usergroupSelectUsers": false,
 			"usergroupSelectGroups": false,
 			"usergroupSelectTeams": false,
-			"showUserStatus": false
+			"showUserStatus": false,
+			"customSettings": {}
 		}
 	],
 	"views": [

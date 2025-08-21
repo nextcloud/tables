@@ -7,9 +7,16 @@
 		<td v-if="config.canSelectRows" :class="{sticky: config.canSelectRows}">
 			<NcCheckboxRadioSwitch :checked="selected" @update:checked="v => $emit('update-row-selection', { rowId: row.id, value: v })" />
 		</td>
-		<td v-for="col in visibleColumns"
-			:key="col.id"
-			:class="{ 'search-result': getCell(col.id)?.searchStringFound, 'filter-result': getCell(col.id)?.filterFound }"
+		<td v-for="col in visibleColumns" :key="col.id"
+			:style="{
+				width: col.customSettings?.width ? `${col.customSettings.width}px` : 'auto',
+				maxWidth: col.customSettings?.width ? `${col.customSettings.width}px` : 'auto',
+				minWidth: col.customSettings?.width ? `${col.customSettings.width}px` : 'auto'}"
+			:class="{
+				'search-result': getCell(col.id)?.searchStringFound,
+				'filter-result': getCell(col.id)?.filterFound,
+				'fixed-width': col.customSettings?.width > 0
+			}"
 			@click="handleCellClick(col)">
 			<component :is="getTableCell(col)"
 				:column="col"
@@ -210,6 +217,11 @@ tr.selected {
 
 :deep(.checkbox-radio-switch__icon) {
 	margin: 0;
+}
+
+td.fixed-width {
+	overflow: hidden;
+	white-space: normal;
 }
 
 </style>
