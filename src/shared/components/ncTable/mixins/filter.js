@@ -39,6 +39,7 @@ export function getFilterWithId(id) {
 
 export const FilterIds = {
 	Contains: 'contains',
+	DoesNotContain: 'does-not-contain',
 	BeginsWith: 'begins-with',
 	EndsWith: 'ends-with',
 	IsEqual: 'is-equal',
@@ -55,7 +56,13 @@ export const Filters = {
 		id: FilterIds.Contains,
 		label: t('tables', 'Contains'),
 		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextLong, ColumnTypes.TextLink, ColumnTypes.TextRich, ColumnTypes.SelectionMulti, ColumnTypes.Usergroup, ColumnTypes.Selection],
-		incompatibleWith: [FilterIds.IsEmpty, FilterIds.IsEqual],
+		incompatibleWith: [FilterIds.DoesNotContain, FilterIds.IsEmpty, FilterIds.IsEqual],
+	}),
+	DoesNotContain: new Filter({
+		id: FilterIds.DoesNotContain,
+		label: t('tables', 'Does not contain'),
+		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextLong, ColumnTypes.TextLink, ColumnTypes.TextRich, ColumnTypes.SelectionMulti, ColumnTypes.Usergroup, ColumnTypes.Selection],
+		incompatibleWith: [FilterIds.Contains, FilterIds.IsEmpty, FilterIds.IsEqual],
 	}),
 	BeginsWith: new Filter({
 		id: FilterIds.BeginsWith,
@@ -74,7 +81,7 @@ export const Filters = {
 		label: t('tables', 'Is equal'),
 		shortLabel: '=',
 		goodFor: [ColumnTypes.TextLine, ColumnTypes.Number, ColumnTypes.SelectionCheck, ColumnTypes.TextLink, ColumnTypes.NumberStars, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.Usergroup],
-		incompatibleWith: [FilterIds.IsEmpty, FilterIds.IsEqual, FilterIds.BeginsWith, FilterIds.EndsWith, FilterIds.Contains, FilterIds.IsGreaterThan, FilterIds.IsGreaterThanOrEqual, FilterIds.IsLowerThan, FilterIds.IsLowerThanOrEqual],
+		incompatibleWith: [FilterIds.IsNotEqual, FilterIds.IsEmpty, FilterIds.IsEqual, FilterIds.BeginsWith, FilterIds.EndsWith, FilterIds.Contains, FilterIds.IsGreaterThan, FilterIds.IsGreaterThanOrEqual, FilterIds.IsLowerThan, FilterIds.IsLowerThanOrEqual],
 	}),
 	IsNotEqual: new Filter({
 		id: FilterIds.IsNotEqual,
