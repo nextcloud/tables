@@ -455,6 +455,44 @@ class Row2Mapper {
 				}
 				$filterExpression = $qb->expr()->like('value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
 				break;
+			case 'does-not-contain':
+				$filterExpressions = [];
+				if (is_array($value) && $column->getType() === Column::TYPE_USERGROUP) {
+					$filterExpressions[] = $qb2->expr()->andX(
+						$qb->expr()->neq('value', $qb->createNamedParameter($value[UsergroupType::USER])),
+						$qb->expr()->eq('value_type', $qb->createNamedParameter(UsergroupType::USER, IQueryBuilder::PARAM_INT))
+					);
+					if (!empty($value[UsergroupType::GROUP])) {
+						$filterExpressions[] = $qb2->expr()->andX(
+							$qb->expr()->notIn('value', $qb->createNamedParameter($value[UsergroupType::GROUP], IQueryBuilder::PARAM_STR_ARRAY)),
+							$qb->expr()->eq('value_type', $qb->createNamedParameter(UsergroupType::GROUP, IQueryBuilder::PARAM_INT))
+						);
+					}
+					if (!empty($value[UsergroupType::CIRCLE])) {
+						$filterExpressions[] = $qb2->expr()->andX(
+							$qb->expr()->notIn('value', $qb->createNamedParameter($value[UsergroupType::CIRCLE], IQueryBuilder::PARAM_STR_ARRAY)),
+							$qb->expr()->eq('value_type', $qb->createNamedParameter(UsergroupType::CIRCLE, IQueryBuilder::PARAM_INT))
+						);
+					}
+					$filterExpression = $qb2->expr()->andX(...$filterExpressions);
+					$includeDefault = false;
+
+					break;
+				}
+
+				$includeDefault = !str_contains($defaultValue, $value);
+				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
+					$value = str_replace(['"', '\''], '', $value);
+					$filterExpression = $qb2->expr()->andX(
+						$qb->expr()->notLike('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ']')),
+						$qb->expr()->notLike('value', $qb->createNamedParameter('[' . $this->db->escapeLikeParameter($value) . ',%')),
+						$qb->expr()->notLike('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($value) . ']%')),
+						$qb->expr()->notLike('value', $qb->createNamedParameter('%,' . $this->db->escapeLikeParameter($value) . ',%'))
+					);
+					break;
+				}
+				$filterExpression = $qb->expr()->notLike('value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value) . '%', $paramType));
+				break;
 			case 'is-equal':
 				$includeDefault = $defaultValue === $value;
 				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
