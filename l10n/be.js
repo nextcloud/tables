@@ -37,6 +37,7 @@ OC.L10N.register(
     "Favorites" : "Абранае",
     "Clear filter" : "Ачысціць фільтр",
     "No recommendations. Start typing." : "Няма рэкамендацый. Пачніце друкаваць.",
+    "Sharing" : "Абагульванне",
     "Copy to clipboard" : "Капіяваць у буфер абмену",
     "Read" : "Чытаць",
     "Update" : "Абнавіць",
