@@ -60,6 +60,7 @@ OC.L10N.register(
     "Sort" : "Сортирај",
     "Export" : "Извези",
     "Remove from favorites" : "Избриши од фаворити",
+    "Copy" : "Копирај",
     "Favorites" : "Омилени",
     "Clear filter" : "Исчисти филтри",
     "No recommendations. Start typing." : "Нема препораки. Започнете со пишување.",
