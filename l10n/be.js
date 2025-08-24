@@ -31,6 +31,7 @@ OC.L10N.register(
     "Close" : "Закрыць",
     "Please select a file." : "Выберыце файл.",
     "Upload from device" : "Запампаваць з прылады",
+    "Preview" : "Перадпрагляд",
     "Result" : "Вынік",
     "Export" : "Экспарт",
     "Add to favorites" : "У абранае",
