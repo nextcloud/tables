@@ -4,7 +4,11 @@
 -->
 <template>
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :width="2">
-		<NcDateTimePickerNative id="datetime-time-picker" v-model="localValue" :label="t('tables', 'Please select a new time')"
+		<NcDateTimePickerNative
+			id="datetime-time-picker"
+			v-model="localValue"
+			:label="t('tables', 'Please select a new time')"
+			:readonly="column.viewColumnInformation?.readonly"
 			type="time" />
 		<div v-if="canBeCleared" class="icon-close make-empty" @click="emptyValue" />
 	</RowFormWrapper>
@@ -36,7 +40,7 @@ export default {
 	},
 	computed: {
 		canBeCleared() {
-			return !this.column.mandatory
+			return !this.column.viewColumnInformation?.readonly && !this.column.mandatory
 		},
 		localValue: {
 			get() {
