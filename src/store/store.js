@@ -470,8 +470,12 @@ export const useTablesStore = defineStore('store', {
 				const res = await axios.get(generateOcsUrl('/apps/tables/api/2/contexts/' + id))
 				this.setContext(res.data.ocs.data)
 			} catch (e) {
+				if (e?.response?.status === 404) {
+					throw new Error('NOT_FOUND')
+				}
 				displayError(e, t('tables', 'Could not load application.'))
 				showError(t('tables', 'Could not fetch application'))
+				throw e
 			}
 			return true
 		},
@@ -501,8 +505,12 @@ export const useTablesStore = defineStore('store', {
 				tables.push(res.data.ocs.data)
 				this.setTables([...tables])
 			} catch (e) {
+				if (e?.response?.status === 404) {
+					throw new Error('NOT_FOUND')
+				}
 				displayError(e, t('tables', 'Could not load table.'))
 				showError(t('tables', 'Could not fetch table'))
+				throw e
 			}
 			return res?.data.ocs.data
 		},
@@ -519,8 +527,12 @@ export const useTablesStore = defineStore('store', {
 				views.push(res.data)
 				this.setViews([...views])
 			} catch (e) {
+				if (e?.response?.status === 404) {
+					throw new Error('NOT_FOUND')
+				}
 				displayError(e, t('tables', 'Could not load view'))
 				showError(t('tables', 'Could not fetch view'))
+				throw e
 			}
 			return res?.data
 		},
