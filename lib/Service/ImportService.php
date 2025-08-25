@@ -367,12 +367,12 @@ class ImportService extends SuperService {
 			$businessClassName .= ucfirst($column->getType()) . ucfirst($column->getSubtype()) . 'Business';
 			/** @var IColumnTypeBusiness $columnBusiness */
 			$columnBusiness = Server::get($businessClassName);
-			if (!$columnBusiness->canBeParsed($value, $column)) {
+			if (!$columnBusiness->canBeParsedDisplayValue($value, $column)) {
 				$this->logger->warning('Value ' . $value . ' could not be parsed for column ' . $column->getTitle());
 				$this->countParsingErrors++;
 				return '';
 			}
-			return $columnBusiness->parseValue($value, $column);
+			return $columnBusiness->parseDisplayValue($value, $column);
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 			$this->logger->debug('Column type business class not found', ['exception' => $e]);
 		}
