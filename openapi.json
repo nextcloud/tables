@@ -101,7 +101,8 @@
                     "usergroupSelectUsers",
                     "usergroupSelectGroups",
                     "usergroupSelectTeams",
-                    "showUserStatus"
+                    "showUserStatus",
+                    "viewColumnInformation"
                 ],
                 "properties": {
                     "id": {
@@ -204,6 +205,28 @@
                     },
                     "showUserStatus": {
                         "type": "boolean"
+                    },
+                    "viewColumnInformation": {
+                        "type": "object",
+                        "nullable": true,
+                        "required": [
+                            "columnId",
+                            "order",
+                            "readonly"
+                        ],
+                        "properties": {
+                            "columnId": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "order": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "readonly": {
+                                "type": "boolean"
+                            }
+                        }
                     }
                 }
             },
@@ -647,7 +670,8 @@
                             "type": "object",
                             "required": [
                                 "columnId",
-                                "order"
+                                "order",
+                                "readonly"
                             ],
                             "properties": {
                                 "columnId": {
@@ -657,6 +681,9 @@
                                 "order": {
                                     "type": "integer",
                                     "format": "int64"
+                                },
+                                "readonly": {
+                                    "type": "boolean"
                                 }
                             }
                         }
