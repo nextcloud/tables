@@ -29,13 +29,32 @@ export default class SelectionCheckColumn extends AbstractSelectionColumn {
 	}
 
 	isFilterFound(cell, filter) {
-		const filterValue = '' + filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
+		const filterValue = filter.magicValuesEnriched ?? filter.value
+
+		// Normalize cell value to boolean
+		const cellBoolean = (cell.value === 'true') || (cell.value === true)
+
+		// Handle different filter value formats that might come from magic values
+		let filterBoolean
+		if (typeof filterValue === 'boolean') {
+			filterBoolean = filterValue
+		} else if (typeof filterValue === 'string') {
+			const normalized = filterValue.toLowerCase().trim()
+			filterBoolean = (normalized === 'true') || (normalized === 'yes')
+				? true
+				: (normalized === 'false') || (normalized === 'no')
+					? false
+					: Boolean(normalized)
+		} else {
+			filterBoolean = Boolean(filterValue)
+		}
 
 		const filterMethod = {
-			[FilterIds.IsEqual]() { return (cell.value === 'true' && filterValue === 'yes') || (cell.value === 'false' && filterValue === 'no') },
-			[FilterIds.IsEmpty]() { return !cell.value },
+			[FilterIds.IsEqual]() { return cellBoolean === filterBoolean },
+			[FilterIds.IsNotEqual]() { return cellBoolean !== filterBoolean },
+			[FilterIds.IsEmpty]() { return cell.value === null || cell.value === undefined || cell.value === '' },
 		}[filter.operator.id]
-		return super.isFilterFound(filterMethod, cell)
+		return filterMethod ? filterMethod() : super.isFilterFound(filterMethod, cell)
 	}
 
 }
