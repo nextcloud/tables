@@ -61,6 +61,7 @@ export default class TextLinkColumn extends AbstractTextColumn {
 			[FilterIds.BeginsWith]() { return value.startsWith(filterValue) },
 			[FilterIds.EndsWith]() { return value.endsWith(filterValue) },
 			[FilterIds.IsEqual]() { return value === filterValue },
+			[FilterIds.IsNotEqual]() { return value !== filterValue },
 			[FilterIds.IsEmpty]() { return !value },
 		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)
