@@ -313,7 +313,7 @@ export default {
 			}
 		},
 		submitFilterInput() {
-			// Ignore contains filter with the same value es old contain filters
+			// Prevents adding duplicate "Contains" or "DoesNotContain" filters with the same value on the same column
 			if ([FilterIds.Contains, FilterIds.DoesNotContain].includes(this.selectedOperator.id)) {
 				const columnFilters = this.getFilterForColumn(this.column)
 				if (columnFilters && columnFilters
