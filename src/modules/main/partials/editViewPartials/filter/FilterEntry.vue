@@ -52,7 +52,7 @@
 
 <script>
 import { NcButton, NcSelect } from '@nextcloud/vue'
-import DeleteOutline from 'vue-material-design-icons/DeleteOutline.vue'
+import DeleteOutline from 'vue-material-design-icons/TrashCanOutline.vue'
 import { ColumnTypes } from '../../../../../shared/components/ncTable/mixins/columnHandler.js'
 
 export default {

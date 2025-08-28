@@ -120,7 +120,7 @@ import { getFilePickerBuilder, FilePickerType, showWarning } from '@nextcloud/di
 import RowFormWrapper from '../../shared/components/ncTable/partials/rowTypePartials/RowFormWrapper.vue'
 import permissionsMixin from '../../shared/components/ncTable/mixins/permissionsMixin.js'
 import IconFolder from 'vue-material-design-icons/Folder.vue'
-import IconUpload from 'vue-material-design-icons/Upload.vue'
+import IconUpload from 'vue-material-design-icons/TrayArrowUp.vue'
 import IconFile from 'vue-material-design-icons/File.vue'
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'

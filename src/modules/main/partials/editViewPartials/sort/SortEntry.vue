@@ -51,7 +51,7 @@
 
 <script>
 import { NcButton, NcSelect, NcCheckboxRadioSwitch } from '@nextcloud/vue'
-import DeleteOutline from 'vue-material-design-icons/DeleteOutline.vue'
+import DeleteOutline from 'vue-material-design-icons/TrashCanOutline.vue'
 import SortAsc from 'vue-material-design-icons/SortAscending.vue'
 import SortDesc from 'vue-material-design-icons/SortDescending.vue'
 
