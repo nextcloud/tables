@@ -22,30 +22,24 @@ describe('Entity not found error handling', () => {
 		cy.visit('apps/tables')
 	})
 
-	it('Shows error message when Table is not found', () => {
+	it('Shows error message when table is not found', () => {
 		cy.visit('/apps/tables/#/table/999')
 
 		cy.get('.error-container', { timeout: 10000 })
 			.should('contain.text', 'This table could not be found')
 	})
 
-	it('Shows error message when View is not found', () => {
+	it('Shows error message when view is not found', () => {
 		cy.visit('/apps/tables/#/view/999')
 
 		cy.get('.error-container', { timeout: 10000 })
 			.should('contain.text', 'This view could not be found')
 	})
 
-	// In Cypress, a programmatic navigation (this.$router.push('/')) is triggered
-	// when an activeContextId exists but the context itself cannot be found.
-	// This causes a redirect to the start page. In contrast, Table.vue and View.vue
-	// only display an error message when a resource is not found, without redirecting.
-	// In a normal browser scenario, manually navigating to a non-existent context
-	// will also show the error message, keeping the user on the current page.
-
-	it('Redirect to startpage when Context is not found', () => {
+	it('Shows error message when application is not found', () => {
 		cy.visit('/apps/tables/#/application/999')
-		cy.location('hash', { timeout: 10000 })
-			.should('eq', '#/')
+
+		cy.get('.error-container', { timeout: 10000 })
+			.should('contain.text', 'This application could not be found')
 	})
 })
