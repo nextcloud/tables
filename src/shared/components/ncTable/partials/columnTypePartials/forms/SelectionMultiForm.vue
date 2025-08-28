@@ -29,7 +29,7 @@
 
 <script>
 import { NcCheckboxRadioSwitch, NcButton } from '@nextcloud/vue'
-import DeleteOutline from 'vue-material-design-icons/DeleteOutline.vue'
+import DeleteOutline from 'vue-material-design-icons/TrashCanOutline.vue'
 import { translate as t } from '@nextcloud/l10n'
 
 export default {

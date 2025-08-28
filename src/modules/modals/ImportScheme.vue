@@ -27,7 +27,7 @@
 </template>
 <script>
 import { NcDialog, NcButton } from '@nextcloud/vue'
-import IconUpload from 'vue-material-design-icons/Upload.vue'
+import IconUpload from 'vue-material-design-icons/TrayArrowUp.vue'
 import axios from '@nextcloud/axios'
 import { showError, showWarning } from '@nextcloud/dialogs'
 import { generateOcsUrl } from '@nextcloud/router'

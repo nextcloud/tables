@@ -34,7 +34,7 @@
 
 import { NcUserBubble } from '@nextcloud/vue'
 import TextIcon from 'vue-material-design-icons/Text.vue'
-import FilterRemove from 'vue-material-design-icons/FilterRemove.vue'
+import FilterRemove from 'vue-material-design-icons/FilterRemoveOutline.vue'
 import NcSmallButton from '../../../shared/components/ncSmallButton/NcSmallButton.vue'
 
 export default {
