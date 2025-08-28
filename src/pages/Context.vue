@@ -121,14 +121,12 @@ export default {
 	},
 
 	watch: {
-		// Watch for changes to active context to make page reactive
 		async activeContext() {
-			if (this.activeContextId && !this.activeContext) {
-				// context does not exists, go to startpage
-				this.$router.push('/').catch(err => err)
-			} else {
-				await this.reload()
+			if (this.errorMessage) {
+				// Already showing an error, don't redirect
+				return
 			}
+			await this.reload()
 		},
 		'context.iconName': {
 			async handler(value) {
