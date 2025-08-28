@@ -165,7 +165,7 @@ import Connection from 'vue-material-design-icons/Connection.vue'
 import Import from 'vue-material-design-icons/Import.vue'
 import NavigationViewItem from './NavigationViewItem.vue'
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
-import IconRename from 'vue-material-design-icons/Rename.vue'
+import IconRename from 'vue-material-design-icons/RenameOutline.vue'
 import { generateUrl } from '@nextcloud/router'
 
 export default {
