@@ -56,15 +56,15 @@ export default {
 
 	methods: {
 		...mapActions(useTablesStore, ['setActiveViewId', 'loadContextView']),
+
 		async checkView() {
 			const id = this.activeViewId || this.$route.params.viewId
 			if (!id) return
 
 			try {
-				if (!this.activeViewId) {
+				if (this.activeViewId !== id) {
 					this.setActiveViewId(parseInt(id))
 				}
-
 				if (!this.activeView) {
 					await this.loadContextView({ id })
 				}

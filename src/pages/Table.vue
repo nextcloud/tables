@@ -51,6 +51,19 @@ export default {
 				this.checkTable()
 			},
 		},
+		activeTable: {
+			handler(newVal, oldVal) {
+				if (this.activeTableId && !newVal) {
+					if (oldVal) {
+						// Table was deleted, redirect to home
+						this.$router.push({ path: '/' })
+					} else {
+						// Table did not exist from the beginning -> ErrorMessage
+						this.errorMessage = getNotFoundError('table')
+					}
+				}
+			},
+		},
 	},
 
 	methods: {
@@ -61,10 +74,12 @@ export default {
 			if (!id) return
 
 			try {
-				if (!this.activeTable) {
-					await this.loadContextTable({ id })
+				if (this.activeTableId !== id) {
+					this.setActiveTableId(parseInt(id))
 				}
-				this.setActiveTableId(parseInt(id))
+
+				await this.loadContextTable({ id })
+
 			} catch (e) {
 				if (e.message === 'NOT_FOUND') {
 					this.errorMessage = getNotFoundError('table')
