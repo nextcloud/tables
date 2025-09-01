@@ -74,12 +74,8 @@ export default {
 			if (!id) return
 
 			try {
-				if (this.activeTableId !== id) {
-					this.setActiveTableId(parseInt(id))
-				}
-
 				await this.loadContextTable({ id })
-
+				this.setActiveTableId(parseInt(id))
 			} catch (e) {
 				if (e.message === 'NOT_FOUND') {
 					this.errorMessage = getNotFoundError('table')

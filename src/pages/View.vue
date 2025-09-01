@@ -62,12 +62,8 @@ export default {
 			if (!id) return
 
 			try {
-				if (this.activeViewId !== id) {
-					this.setActiveViewId(parseInt(id))
-				}
-				if (!this.activeView) {
-					await this.loadContextView({ id })
-				}
+				await this.loadContextView({ id })
+				this.setActiveViewId(parseInt(id))
 			} catch (e) {
 				if (e.message === 'NOT_FOUND') {
 					this.errorMessage = getNotFoundError('view')
