@@ -5,11 +5,11 @@
 import { showError } from '@nextcloud/dialogs'
 
 export function getNotFoundError(type) {
-	return t('tables', `This ${type} could not be found`)
+	return t('tables', 'This {type} could not be found', { type })
 }
 
 export function getGenericLoadError(type) {
-	return t('tables', `An error occurred while loading the ${type}`)
+	return t('tables', 'An error occurred while loading the {type}', { type })
 }
 
 /**
