@@ -172,15 +172,20 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	public function findAll(array $showColumnIds, int $tableId, ?int $limit = null, ?int $offset = null, ?array $filter = null, ?array $sort = null, ?string $userId = null): array {
-		$this->columnMapper->preloadColumns($showColumnIds, $filter, $sort);
+		try {
+			$this->columnMapper->preloadColumns($showColumnIds, $filter, $sort);
 
-		$wantedRowIdsArray = $this->getWantedRowIds($userId, $tableId, $filter, $sort, $limit, $offset);
+			$wantedRowIdsArray = $this->getWantedRowIds($userId, $tableId, $filter, $sort, $limit, $offset);
 
-		// Get rows without SQL sorting
-		$rows = $this->getRows($wantedRowIdsArray, $showColumnIds);
+			// Get rows without SQL sorting
+			$rows = $this->getRows($wantedRowIdsArray, $showColumnIds);
 
-		// Sort rows in PHP to preserve the order from getWantedRowIds
-		return $this->sortRowsByIds($rows, $wantedRowIdsArray);
+			// Sort rows in PHP to preserve the order from getWantedRowIds
+			return $this->sortRowsByIds($rows, $wantedRowIdsArray);
+		} catch (DoesNotExistException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
 	}
 
 	/**
@@ -390,7 +395,12 @@ class Row2Mapper {
 	 */
 	private function getFilterExpression(IQueryBuilder $qb, Column $column, string $operator, string|array $value): IQueryBuilder {
 		$paramType = $this->getColumnDbParamType($column);
-		$value = $this->getCellMapper($column)->filterValueToQueryParam($column, $value);
+		try {
+			$value = $this->getCellMapper($column)->filterValueToQueryParam($column, $value);
+		} catch (DoesNotExistException $e) {
+			$this->logger->error('Cannot filter, because the column does not exist', ['exception' => $e]);
+			throw new InternalError(get_class($this) . '::' . __FUNCTION__ . ': Cannot filter, because the column does not exist');
+		}
 
 		// We try to match the requested value against the default before building the query
 		// so we know if we shall include rows that have no entry in the column_TYPE tables upfront
