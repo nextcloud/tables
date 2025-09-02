@@ -209,10 +209,10 @@ trait Row2MapperTestDependencies {
         $data = $row->getData();
         foreach ($data as $cell) {
             if ($cell['columnId'] === $columnId) {
-                return $cell['value'];
+                return $cell['value'] ?? '';
             }
         }
-        return null;
+        return '';
     }
 
     /**

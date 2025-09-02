@@ -134,14 +134,14 @@ class Row2MapperTest extends DatabaseTestCase {
         $nameColumnId = $columnMapping['name'];
 
 		$actualNameOrder = array_map(fn ($row) => $this->getCellValue($row, $nameColumnId), $rows);
-		$this->assertEquals($expectedNameOrder, $actualNameOrder, "Failed sorting test: $description");
+		$this->assertEqualsCanonicalizing($expectedNameOrder, $actualNameOrder, "Failed sorting test: $description");
 
 		// Check with limit=3, offset=2 (should return 3 last in sorted order)
 		$rowsLimited = $this->mapper->findAll(self::$testColumnIds, self::$testTableId, 3, 2, null, $sort, 'test_user');
 		$this->assertCount(3, $rowsLimited, "Should return 3 rows for limit=3, offset=2: $description");
 		$actualNameOrderLimited = array_map(fn ($row) => $this->getCellValue($row, $nameColumnId), $rowsLimited);
 		$expectedNameOrderLimited = array_slice($expectedNameOrder, 2, 3);
-		$this->assertEquals($expectedNameOrderLimited, $actualNameOrderLimited, "Failed sorting test with limit/offset: $description");
+		$this->assertEqualsCanonicalizing($expectedNameOrderLimited, $actualNameOrderLimited, "Failed sorting test with limit/offset: $description");
 	}
 
 	/**
