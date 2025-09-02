@@ -420,11 +420,11 @@ class Row2Mapper {
 
 		switch ($operator) {
 			case 'begins-with':
-				$includeDefault = str_starts_with($defaultValue, $value);
+				$includeDefault = str_starts_with((string)($defaultValue ?? ''), $value);
 				$filterExpression = $qb->expr()->like('value', $qb->createNamedParameter($this->db->escapeLikeParameter($value) . '%', $paramType));
 				break;
 			case 'ends-with':
-				$includeDefault = str_ends_with($defaultValue, $value);
+				$includeDefault = str_ends_with((string)($defaultValue ?? ''), $value);
 				$filterExpression = $qb->expr()->like('value', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($value), $paramType));
 				break;
 			case 'contains':
@@ -452,7 +452,7 @@ class Row2Mapper {
 					break;
 				}
 
-				$includeDefault = str_contains($defaultValue, $value);
+				$includeDefault = str_contains((string)($defaultValue ?? ''), $value);
 				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
 					$value = str_replace(['"', '\''], '', $value);
 					$filterExpression = $qb2->expr()->orX(
@@ -490,7 +490,7 @@ class Row2Mapper {
 					break;
 				}
 
-				$includeDefault = !str_contains($defaultValue, $value);
+				$includeDefault = !str_contains((string)($defaultValue ?? ''), $value);
 				if ($column->getType() === 'selection' && $column->getSubtype() === 'multi') {
 					$value = str_replace(['"', '\''], '', $value);
 					$filterExpression = $qb2->expr()->andX(
