@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * Test class for Row2Mapper core functionality
- * 
+ *
  * Tests sorting operations including single-column sorting, multi-column sorting,
  * meta column sorting, and edge cases with non-existent columns.
  */
@@ -27,18 +27,18 @@ class Row2MapperTest extends DatabaseTestCase {
 		$this->setupDependencies();
 		$this->setupRealColumnMapper(self::$testTableId);
 	}
-	
+
 	/**
-     * Data provider for sorting tests
-     * 
-     * Provides comprehensive test cases for various sorting scenarios including:
-     * - Single column sorting (text, number, datetime)
-     * - Multi-column sorting combinations
-     * - Meta column sorting (created_by, etc.)
-     * - Both ascending and descending orders
-     * 
-     * @return array Array of test cases with sort configuration, expected results, and descriptions
-     */
+	 * Data provider for sorting tests
+	 *
+	 * Provides comprehensive test cases for various sorting scenarios including:
+	 * - Single column sorting (text, number, datetime)
+	 * - Multi-column sorting combinations
+	 * - Meta column sorting (created_by, etc.)
+	 * - Both ascending and descending orders
+	 *
+	 * @return array Array of test cases with sort configuration, expected results, and descriptions
+	 */
 	public static function sortingDataProvider(): array {
 		return [
 			'Text column ASC' => [
@@ -111,13 +111,13 @@ class Row2MapperTest extends DatabaseTestCase {
 	}
 
 	/**
-     * Test various sorting operations using data provider
-     * 
-     * @dataProvider sortingDataProvider
-     * @param array $sortWithNames Sort configuration with column names as test identifiers
-     * @param array $expectedNameOrder Expected names in result order
-     * @param string $description Test case description
-     */
+	 * Test various sorting operations using data provider
+	 *
+	 * @dataProvider sortingDataProvider
+	 * @param array $sortWithNames Sort configuration with column names as test identifiers
+	 * @param array $expectedNameOrder Expected names in result order
+	 * @param string $description Test case description
+	 */
 	public function testFindAllWithVariousSorting(array $sortWithNames, array $expectedNameOrder, string $description): void {
 		$this->setupRealColumnMapper(self::$testTableId);
 
@@ -130,8 +130,8 @@ class Row2MapperTest extends DatabaseTestCase {
 		$this->assertCount(5, $rows, "Should return all 5 rows for: $description");
 
 		// Get name column ID using proper mapping
-        $columnMapping = $this->extractTestIdentMapping(self::$testDataResult['columns']);
-        $nameColumnId = $columnMapping['name'];
+		$columnMapping = $this->extractTestIdentMapping(self::$testDataResult['columns']);
+		$nameColumnId = $columnMapping['name'];
 
 		$actualNameOrder = array_map(fn ($row) => $this->getCellValue($row, $nameColumnId), $rows);
 		$this->assertEqualsCanonicalizing($expectedNameOrder, $actualNameOrder, "Failed sorting test: $description");
@@ -165,7 +165,7 @@ class Row2MapperTest extends DatabaseTestCase {
 		// Check that the order remained unchanged (without sorting)
 		// since sorting was skipped due to non-existent column
 		$columnMapping = $this->extractTestIdentMapping(self::$testDataResult['columns']);
-        $nameColumnId = $columnMapping['name'];
+		$nameColumnId = $columnMapping['name'];
 
 		$actualNameOrder = array_map(fn ($row) => $this->getCellValue($row, $nameColumnId), $rows);
 
@@ -182,7 +182,7 @@ class Row2MapperTest extends DatabaseTestCase {
 		$this->setupRealColumnMapper(self::$testTableId);
 
 		// Get column mappings for proper ID resolution
-        $columnMapping = $this->extractTestIdentMapping(self::$testDataResult['columns']);
+		$columnMapping = $this->extractTestIdentMapping(self::$testDataResult['columns']);
 
 		// Use mixed array: existing column + non-existent
 		$mixedSort = [
@@ -199,7 +199,7 @@ class Row2MapperTest extends DatabaseTestCase {
 		// Check that sorting works only for existing columns
 		// Expect sorting by Age ASC, then by Name ASC (non-existent column is ignored)
 		$nameColumnId = $columnMapping['name'];
-        $ageColumnId = $columnMapping['age'];
+		$ageColumnId = $columnMapping['age'];
 
 		$actualNameOrder = array_map(fn ($row) => $this->getCellValue($row, $nameColumnId), $rows);
 		$actualAgeOrder = array_map(fn ($row) => $this->getCellValue($row, $ageColumnId), $rows);
