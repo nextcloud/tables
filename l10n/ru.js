@@ -203,6 +203,7 @@ OC.L10N.register(
     "Import file into Tables" : "Импортировать файл в таблицы",
     "Import as new table" : "Импортировать как новую таблицу",
     "This will create a new table from the data in this file." : "Это позволит создать новую таблицу на основе данных из этого файла.",
+    "This will import the data from this file into an already existing table." : "Это позволит импортировать данные из этого файла в уже существующую таблицу.",
     "Create missing columns" : "Создать отсутствующие столбцы",
     "Import successful" : "Импорт успешно завершён",
     "Close" : "Закрыть",
