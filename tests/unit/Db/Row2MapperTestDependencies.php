@@ -10,77 +10,77 @@ declare(strict_types=1);
 namespace OCA\Tables\Tests\Unit\Db;
 
 use OCA\Tables\Db\Column;
+use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\RowSleeveMapper;
-use OCA\Tables\Db\ColumnMapper;
+use OCA\Tables\Helper\CircleHelper;
 use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Helper\UserHelper;
-use OCA\Tables\Helper\CircleHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
-use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LoggerInterface;
 
 /**
  * Trait providing test dependencies and utilities for Row2Mapper testing
- * 
+ *
  * This trait sets up mock objects, test data, and helper methods needed
  * for comprehensive testing of the Row2Mapper class functionality.
  */
 
 trait Row2MapperTestDependencies {
-    protected Row2Mapper $mapper;
-    protected ColumnMapper|MockObject $columnMapper;
-    protected RowSleeveMapper $rowSleeveMapper;
-    protected UserHelper|MockObject $userHelper;
-    protected ColumnsHelper|MockObject $columnsHelper;
-    protected LoggerInterface|MockObject $logger;
-    protected CircleHelper|MockObject $circleHelper;
+	protected Row2Mapper $mapper;
+	protected ColumnMapper|MockObject $columnMapper;
+	protected RowSleeveMapper $rowSleeveMapper;
+	protected UserHelper|MockObject $userHelper;
+	protected ColumnsHelper|MockObject $columnsHelper;
+	protected LoggerInterface|MockObject $logger;
+	protected CircleHelper|MockObject $circleHelper;
 
-    protected static bool $testDataInitialized = false;
-    protected static int $testTableId;
-    protected static array $testColumnIds = [];
-    protected static array $testRowIds = [];
-    protected static array $testDataResult = [];
+	protected static bool $testDataInitialized = false;
+	protected static int $testTableId;
+	protected static array $testColumnIds = [];
+	protected static array $testRowIds = [];
+	protected static array $testDataResult = [];
 
-    /**
-     * Sets up all required dependencies and mock objects for Row2Mapper testing
-     * 
-     * Initializes mock objects for external dependencies and creates real instances
-     * of helper classes. Also ensures test data is initialized only once.
-     */
+	/**
+	 * Sets up all required dependencies and mock objects for Row2Mapper testing
+	 *
+	 * Initializes mock objects for external dependencies and creates real instances
+	 * of helper classes. Also ensures test data is initialized only once.
+	 */
 
-    protected function setupDependencies(): void {
-        $this->columnMapper = $this->createMock(ColumnMapper::class);
-        $this->userHelper = $this->createMock(UserHelper::class);
-        $this->circleHelper = $this->createMock(CircleHelper::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
+	protected function setupDependencies(): void {
+		$this->columnMapper = $this->createMock(ColumnMapper::class);
+		$this->userHelper = $this->createMock(UserHelper::class);
+		$this->circleHelper = $this->createMock(CircleHelper::class);
+		$this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->rowSleeveMapper = new RowSleeveMapper($this->connectionAdapter, $this->logger);
-        $this->columnsHelper = new ColumnsHelper($this->userHelper, $this->circleHelper);
+		$this->rowSleeveMapper = new RowSleeveMapper($this->connectionAdapter, $this->logger);
+		$this->columnsHelper = new ColumnsHelper($this->userHelper, $this->circleHelper);
 
-        $this->mapper = new Row2Mapper(
-            'test_user',
-            $this->connectionAdapter,
-            $this->logger,
-            $this->userHelper,
-            $this->rowSleeveMapper,
-            $this->columnsHelper,
-            $this->columnMapper
-        );
+		$this->mapper = new Row2Mapper(
+			'test_user',
+			$this->connectionAdapter,
+			$this->logger,
+			$this->userHelper,
+			$this->rowSleeveMapper,
+			$this->columnsHelper,
+			$this->columnMapper
+		);
 
-        if (!self::$testDataInitialized) {
-            $this->initializeTestData();
-            self::$testDataInitialized = true;
-        }
-    }
+		if (!self::$testDataInitialized) {
+			$this->initializeTestData();
+			self::$testDataInitialized = true;
+		}
+	}
 
-    /**
-     * Initializes comprehensive test data for sorting and querying tests
-     * 
-     * Creates a complete test table with multiple columns of different types
-     * and sample rows with various data values for comprehensive testing.
-     */
-    private function initializeTestData(): void {
+	/**
+	 * Initializes comprehensive test data for sorting and querying tests
+	 *
+	 * Creates a complete test table with multiple columns of different types
+	 * and sample rows with various data values for comprehensive testing.
+	 */
+	private function initializeTestData(): void {
 		$result = $this->createCompleteTestTable(
 			['test_ident' => 'sort_test_table', 'title' => 'Comprehensive Sort Test Table'],
 			[
@@ -160,77 +160,77 @@ trait Row2MapperTestDependencies {
 		self::$testRowIds = array_map(fn ($row) => $row['id'], $result['rows']);
 	}
 
-     /**
-     * Sets up a real ColumnMapper with actual column data from the database
-     * 
-     * Instead of using mocked column data, this method loads real column
-     * information from the database for more realistic testing scenarios.
-     * 
-     * @param int $tableId The ID of the table to load columns for
-     */
-    protected function setupRealColumnMapper(int $tableId): void {
-        $qb = $this->connection->getQueryBuilder();
-        $result = $qb->select('id', 'title', 'type', 'table_id')
-            ->from('tables_columns')
-            ->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId)))
-            ->executeQuery();
+	/**
+	 * Sets up a real ColumnMapper with actual column data from the database
+	 *
+	 * Instead of using mocked column data, this method loads real column
+	 * information from the database for more realistic testing scenarios.
+	 *
+	 * @param int $tableId The ID of the table to load columns for
+	 */
+	protected function setupRealColumnMapper(int $tableId): void {
+		$qb = $this->connection->getQueryBuilder();
+		$result = $qb->select('id', 'title', 'type', 'table_id')
+			->from('tables_columns')
+			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId)))
+			->executeQuery();
 
-        $columns = [];
-        $columnTypes = [];
-        while ($row = $result->fetch()) {
-            $column = new Column();
-            $column->setId($row['id']);
-            $column->setTitle($row['title']);
-            $column->setType($row['type']);
-            $column->setTableId($row['table_id']);
-            $columns[$row['id']] = $column;
-            $columnTypes[$row['id']] = $row['type'];
-        }
-        $result->closeCursor();
+		$columns = [];
+		$columnTypes = [];
+		while ($row = $result->fetch()) {
+			$column = new Column();
+			$column->setId($row['id']);
+			$column->setTitle($row['title']);
+			$column->setType($row['type']);
+			$column->setTableId($row['table_id']);
+			$columns[$row['id']] = $column;
+			$columnTypes[$row['id']] = $row['type'];
+		}
+		$result->closeCursor();
 
-        $this->columnMapper->method('find')
-            ->willReturnCallback(fn($id) => $columns[$id] ?? throw new DoesNotExistException('test'));
+		$this->columnMapper->method('find')
+			->willReturnCallback(fn ($id) => $columns[$id] ?? throw new DoesNotExistException('test'));
 
-        $this->columnMapper->method('preloadColumns');
-        $this->columnMapper->method('getColumnTypes')->willReturn($columnTypes);
-    }
+		$this->columnMapper->method('preloadColumns');
+		$this->columnMapper->method('getColumnTypes')->willReturn($columnTypes);
+	}
 
-     /**
-     * Extracts the value of a specific cell from a Row object
-     * 
-     * Searches through the row's data array to find the cell with the
-     * specified column ID and returns its value.
-     * 
-     * @param mixed $row The Row object containing cell data
-     * @param int $columnId The ID of the column to get the value for
-     * @return mixed The cell value or null if not found
-     */
-    protected function getCellValue($row, int $columnId) {
-        $data = $row->getData();
-        foreach ($data as $cell) {
-            if ($cell['columnId'] === $columnId) {
-                return $cell['value'] ?? '';
-            }
-        }
-        return '';
-    }
+	/**
+	 * Extracts the value of a specific cell from a Row object
+	 *
+	 * Searches through the row's data array to find the cell with the
+	 * specified column ID and returns its value.
+	 *
+	 * @param mixed $row The Row object containing cell data
+	 * @param int $columnId The ID of the column to get the value for
+	 * @return mixed The cell value or null if not found
+	 */
+	protected function getCellValue($row, int $columnId) {
+		$data = $row->getData();
+		foreach ($data as $cell) {
+			if ($cell['columnId'] === $columnId) {
+				return $cell['value'] ?? '';
+			}
+		}
+		return '';
+	}
 
-    /**
-     * Helper method: Creates mapping from test identifiers to column IDs
-     * 
-     * Extracts test_ident values from column definitions and creates
-     * a lookup array for easier test assertions and data access.
-     * 
-     * @param array $columns Array of column definitions with test_ident keys
-     * @return array Associative array mapping test_ident to column ID
-     */
-    protected function extractTestIdentMapping(array $columns): array {
-        $mapping = [];
-        foreach ($columns as $column) {
-            if (isset($column['test_ident'])) {
-                $mapping[$column['test_ident']] = $column['id'];
-            }
-        }
-        return $mapping;
-    }
+	/**
+	 * Helper method: Creates mapping from test identifiers to column IDs
+	 *
+	 * Extracts test_ident values from column definitions and creates
+	 * a lookup array for easier test assertions and data access.
+	 *
+	 * @param array $columns Array of column definitions with test_ident keys
+	 * @return array Associative array mapping test_ident to column ID
+	 */
+	protected function extractTestIdentMapping(array $columns): array {
+		$mapping = [];
+		foreach ($columns as $column) {
+			if (isset($column['test_ident'])) {
+				$mapping[$column['test_ident']] = $column['id'];
+			}
+		}
+		return $mapping;
+	}
 }
