@@ -235,4 +235,8 @@ export default {
 		padding-left: 0px;
 	}
 }
+:deep(h1) {
+	font-size: unset;
+	font-size: revert;
+}
 </style>

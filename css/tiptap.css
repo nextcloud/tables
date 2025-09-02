@@ -2,20 +2,20 @@
  * SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-.tiptap-wrapper div[contenteditable=true] {
+.tables-tiptap-wrapper div[contenteditable=true] {
 	width: 100% !important;
 	min-height: 150px;
 }
 
-.tiptap-wrapper .is-active {
+.tables-tiptap-wrapper .is-active {
 	background-color: var(--color-primary) !important;
 }
 
-.tiptap-wrapper {
+.tables-tiptap-wrapper {
 	width: 100%;
 }
 
-.tiptap-wrapper .menuBar button {
+.tables-tiptap-wrapper .menuBar button {
 	position: relative;
 	width: 35px;
 	height: 35px;
@@ -29,10 +29,10 @@
 	vertical-align: top;
 }
 
-.tiptap-wrapper .menuBar button:hover, .tiptap-wrapper .menuBar button:focus, .tiptap-wrapper .menuBar button:active {
+.tables-tiptap-wrapper .menuBar button:hover, .tables-tiptap-wrapper .menuBar button:focus, .tables-tiptap-wrapper .menuBar button:active {
 	background-color: var(--color-background-dark);
 }
 
-.tiptap-wrapper em, .tabulator-cell em {
+.tables-tiptap-wrapper em, .tabulator-cell em {
 	font-style: italic;
 }

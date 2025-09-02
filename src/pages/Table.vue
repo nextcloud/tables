@@ -47,6 +47,11 @@ export default {
 	min-width: var(--app-content-width, 100%);
 }
 
+:deep(h1) {
+	font-size: unset;
+	font-size: revert;
+}
+
 @page {
 	size: auto;
 	margin: 5mm;

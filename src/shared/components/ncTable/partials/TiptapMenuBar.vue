@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="tiptap-wrapper">
+	<div class="tables-tiptap-wrapper">
 		<div v-if="editor" class="menuBar">
 			<NcButton type="tertiary-no-background" :aria-label="t('tables', 'Undo')" @click="editor.chain().focus().undo().run()">
 				<template #icon>
@@ -201,7 +201,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 
 .character-count {
 	display: flex;
@@ -215,7 +215,7 @@ export default {
 }
 
 /* Basic editor styles */
-.tiptap-wrapper .ProseMirror, .tabulator-cell .ProseMirror {
+.tables-tiptap-wrapper .ProseMirror, .tabulator-cell .ProseMirror {
 	> * + * {
 		/*margin-top: 0.75em;*/
 	}
@@ -232,6 +232,8 @@ export default {
 	h5,
 	h6 {
 		line-height: 1.1;
+		font-size: unset;
+		font-size: revert;
 	}
 
 	pre {
@@ -257,7 +259,7 @@ export default {
 	}
 }
 
-.tiptap-wrapper ul[data-type='taskList'], .tabulator-cell ul[data-type='taskList'] {
+.tables-tiptap-wrapper ul[data-type='taskList'], .tabulator-cell ul[data-type='taskList'] {
 	list-style: none;
 	padding: 0;
 	p {
@@ -277,7 +279,14 @@ export default {
 	}
 }
 
-.tiptap-wrapper ul, .tabulator-cell ul {
+.tables-tiptap-wrapper ol, .tabulator-cell ol {
+	li {
+		list-style-type: decimal;
+		margin-left: 15px;
+	}
+}
+
+.tables-tiptap-wrapper ul, .tabulator-cell ul {
 	li {
 		list-style-type: disc;
 		margin-left: 15px;

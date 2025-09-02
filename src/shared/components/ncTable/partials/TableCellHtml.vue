@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="cell-editor">
+	<div class="cell-editor tables-tiptap-wrapper">
 		<div v-if="!isEditing" @click="handleStartEditing">
 			<EditorContent :editor="editor" />
 		</div>
@@ -118,7 +118,7 @@ export default {
 
 			// Check if the click is outside our editing container
 			if (this.$refs.editingContainer && !this.$refs.editingContainer.contains(event.target)) {
-				const isEditorRelated = event.target.closest('.tiptap-wrapper')
+				const isEditorRelated = event.target.closest('.tables-tiptap-wrapper')
 										|| event.target.closest('.ProseMirror')
 										|| event.target.closest('[contenteditable]')
 										|| event.target.closest('.text-menubar')
@@ -220,7 +220,7 @@ export default {
 	}
 }
 
-:deep(.tiptap-wrapper) {
+:deep(.tables-tiptap-wrapper) {
 	.menuBar {
 		padding: 8px;
 		border-bottom: 1px solid var(--color-border);
