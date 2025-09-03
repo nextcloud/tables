@@ -35,6 +35,8 @@ OC.L10N.register(
     "Users and groups" : "Корисници и групи",
     "Move" : "Премести",
     "Metadata" : "Метаподатоци",
+    "Ascending" : "Растечки",
+    "Descending" : "Опаѓачки",
     "Views" : "Прегледи",
     "View" : "Погледни",
     "Shares" : "Споделувања",
