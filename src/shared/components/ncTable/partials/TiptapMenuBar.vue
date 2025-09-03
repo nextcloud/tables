@@ -216,9 +216,6 @@ export default {
 
 /* Basic editor styles */
 .tables-tiptap-wrapper .ProseMirror, .tabulator-cell .ProseMirror {
-	> * + * {
-		/*margin-top: 0.75em;*/
-	}
 
 	ul,
 	ol {
