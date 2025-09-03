@@ -4,21 +4,39 @@
 -->
 <template>
 	<div class="main-table-view">
-		<MainWrapper :element="activeTable" :is-view="false" />
+		<div v-if="!activeTable && !errorMessage">
+			<div class="icon-loading" />
+		</div>
+
+		<div v-else-if="activeTable">
+			<MainWrapper :element="activeTable" :is-view="false" />
+		</div>
+
+		<ErrorMessage v-else-if="errorMessage" :message="errorMessage" />
+
 		<MainModals />
 	</div>
 </template>
 
 <script>
-import { mapState } from 'pinia'
+import { mapState, mapActions } from 'pinia'
 import { useTablesStore } from '../store/store.js'
 import MainWrapper from '../modules/main/sections/MainWrapper.vue'
 import MainModals from '../modules/modals/Modals.vue'
+import ErrorMessage from '../modules/main/partials/ErrorMessage.vue'
+import displayError, { getNotFoundError, getGenericLoadError } from '../shared/utils/displayError.js'
 
 export default {
 	components: {
 		MainWrapper,
 		MainModals,
+		ErrorMessage,
+	},
+
+	data() {
+		return {
+			errorMessage: null,
+		}
 	},
 
 	computed: {
@@ -26,20 +44,50 @@ export default {
 	},
 
 	watch: {
-		activeTableId() {
-			if (this.activeTableId && !this.activeTable) {
-				// table does not exists, go to startpage
-				this.$router.push('/').catch(err => err)
-			}
+		'$route.params.tableId': {
+			immediate: true,
+			handler() {
+				this.errorMessage = null // reset previous error
+				this.checkTable()
+			},
 		},
-		activeTable() {
-			if (this.activeTableId && !this.activeTable) {
-				// table does not exists, go to startpage
-				this.$router.push('/').catch(err => err)
+		activeTable: {
+			handler(newVal, oldVal) {
+				if (this.activeTableId && !newVal) {
+					if (oldVal) {
+						// Table was deleted, redirect to home
+						this.$router.push({ path: '/' })
+					} else {
+						// Table did not exist from the beginning -> ErrorMessage
+						this.errorMessage = getNotFoundError('table')
+					}
+				}
+			},
+		},
+	},
+
+	methods: {
+		...mapActions(useTablesStore, ['loadContextTable', 'setActiveTableId']),
+
+		async checkTable() {
+			const id = this.activeTableId || this.$route.params.tableId
+			if (!id) return
+
+			try {
+				await this.loadContextTable({ id })
+				this.setActiveTableId(parseInt(id))
+			} catch (e) {
+				if (e.message === 'NOT_FOUND') {
+					this.errorMessage = getNotFoundError('table')
+				} else {
+					this.errorMessage = getGenericLoadError('table')
+					displayError(e, this.errorMessage)
+				}
 			}
 		},
 	},
 }
+
 </script>
 <style lang="scss" scoped>
 .main-table-view {
