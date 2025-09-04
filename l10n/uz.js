@@ -23,6 +23,7 @@ OC.L10N.register(
     "to" : "пф",
     "Done" : "Done",
     "Tables" : "Jadvallar",
+    "Table" : "Jadval",
     "Today" : "Today",
     "Create" : "Yaratish",
     "Text" : "Matn",

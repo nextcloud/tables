@@ -12,6 +12,7 @@ OC.L10N.register(
     "from" : "ពី",
     "to" : "ទៅ",
     "Birthday" : "ថ្ងៃ​កំណើត",
+    "Table" : "តារាង",
     "Today" : "ថ្ងៃ​នេះ",
     "Create" : "បង្កើត",
     "Link" : "Link",
