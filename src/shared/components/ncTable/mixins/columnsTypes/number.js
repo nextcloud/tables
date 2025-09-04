@@ -50,6 +50,7 @@ export default class NumberColumn extends AbstractNumberColumn {
 
 		const filterMethod = {
 			[FilterIds.IsEqual]() { return parseInt(cell.value) === parseInt(filterValue) },
+			[FilterIds.IsNotEqual]() { return parseInt(cell.value) !== parseInt(filterValue) },
 			[FilterIds.IsGreaterThan]() { return parseInt(cell.value) > parseInt(filterValue) },
 			[FilterIds.IsGreaterThanOrEqual]() { return parseInt(cell.value) >= parseInt(filterValue) },
 			[FilterIds.IsLowerThan]() { return parseInt(cell.value) < parseInt(filterValue) },

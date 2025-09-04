@@ -55,9 +55,11 @@ export default class SelectionColumn extends AbstractSelectionColumn {
 		const cellLabel = this.getLabel(cell.value)
 		const filterMethod = {
 			[FilterIds.Contains]() { return cellLabel?.toLowerCase().includes(filterValue?.toLowerCase()) },
+			[FilterIds.DoesNotContain]() { return !cellLabel?.toLowerCase().includes(filterValue?.toLowerCase()) },
 			[FilterIds.BeginsWith]() { return cellLabel?.startsWith(filterValue) },
 			[FilterIds.EndsWith]() { return cellLabel?.endsWith(filterValue) },
 			[FilterIds.IsEqual]() { return cellLabel === filterValue },
+			[FilterIds.IsNotEqual]() { return cellLabel !== filterValue },
 			[FilterIds.IsEmpty]() { return !cellLabel },
 		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)

@@ -50,6 +50,7 @@ export default class DatetimeTimeColumn extends AbstractDatetimeColumn {
 
 		const filterMethod = {
 			[FilterIds.IsEqual]() { return filterTime.isSame(valueTime) },
+			[FilterIds.IsNotEqual]() { return !filterTime.isSame(valueTime) },
 			[FilterIds.IsGreaterThan]() { return filterTime.isBefore(valueTime) },
 			[FilterIds.IsGreaterThanOrEqual]() { return filterTime.isSameOrBefore(valueTime) },
 			[FilterIds.IsLowerThan]() { return filterTime.isAfter(valueTime) },
