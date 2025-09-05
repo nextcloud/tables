@@ -81,4 +81,8 @@ export default {
 	width: max-content;
 	min-width: var(--app-content-width, 100%);
 }
+:deep(h1) {
+	font-size: unset;
+	font-size: revert;
+}
 </style>
