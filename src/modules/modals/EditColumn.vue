@@ -15,7 +15,8 @@
 						:title.sync="editColumn.title"
 						:custom-settings.sync="editColumn.customSettings"
 						:edit-column="true"
-						:title-missing-error="editErrorTitle" />
+						:title-missing-error="editErrorTitle"
+						:width-invalid-error="widthInvalidError" />
 				</div>
 				<div class="col-2 space-LR space-T">
 					<component :is="getColumnForm" :column="editColumn" :can-save.sync="canSave" />
@@ -69,6 +70,7 @@ import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandle
 import moment from '@nextcloud/moment'
 import { mapActions } from 'pinia'
 import { useDataStore } from '../../store/data.js'
+import { COLUMN_WIDTH_MAX, COLUMN_WIDTH_MIN } from '../../shared/constants.js'
 
 export default {
 	name: 'EditColumn',
@@ -120,9 +122,10 @@ export default {
 	data() {
 		return {
 			loading: false,
-			editColumn: Object.assign({}, this.column),
+			editColumn: JSON.parse(JSON.stringify(this.column)),
 			deleteId: null,
 			editErrorTitle: false,
+			widthInvalidError: false,
 			canSave: true, // used to avoid saving an incorrect config
 		}
 	},
@@ -169,13 +172,12 @@ export default {
 			}
 
 			if (this.editColumn.customSettings?.width
-				&& (this.editColumn.customSettings?.width < 20 || this.editColumn.customSettings?.width > 1000)) {
-				showError(t('tables', 'Cannot save column. Column width must be between {min} and {max}.', { min: 20, max: 1000 }))
-				this.editErrorTitle = true
+				&& (this.editColumn.customSettings?.width < COLUMN_WIDTH_MIN || this.editColumn.customSettings?.width > COLUMN_WIDTH_MAX)) {
+				showError(t('tables', 'Cannot save column. Column width must be between {min} and {max}.', { min: COLUMN_WIDTH_MIN, max: COLUMN_WIDTH_MAX }))
+				this.widthInvalidError = true
 				return
 			}
 
-			this.editErrorTitle = false
 			await this.updateLocalColumn()
 			this.reset()
 			this.$emit('close')
@@ -185,6 +187,7 @@ export default {
 			this.editColumn = null
 			this.deleteId = null
 			this.editErrorTitle = false
+			this.widthInvalidError = false
 		},
 		async updateLocalColumn() {
 			const data = Object.assign({}, this.editColumn)
