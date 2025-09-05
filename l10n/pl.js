@@ -100,6 +100,7 @@ OC.L10N.register(
     "Metadata" : "Metadane",
     "Column" : "Kolumna",
     "Operator" : "Operator",
+    "Delete filter" : "Usuń filtr",
     "Add new filter group" : "Dodaj nową grupę filtrów",
     "Add new filter" : "Dodaj nowy filtr",
     "Ascending" : "Rosnąco",

@@ -133,6 +133,7 @@ OC.L10N.register(
     "Check yourself!" : "إختبِر نفسك!",
     "Tables" : "الجداول",
     "Manage data the way you need it." : "أدِر بياناتك كيفما ترغب.",
+    "Table" : "جدول",
     "View" : "عرض",
     "Today" : "اليوم",
     "Last edit" : "آخر تعديل",

@@ -61,6 +61,7 @@ OC.L10N.register(
     "Done" : "Fecho",
     "Tables" : "Tables",
     "Manage data the way you need it." : "Xestiona datos de la forma que precises.",
+    "Table" : "Tabla",
     "View" : "Ver",
     "Today" : "Güei",
     "Last edit" : "Última edición",

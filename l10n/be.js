@@ -7,6 +7,8 @@ OC.L10N.register(
     "Could not create row." : "Не ўдалося стварыць радок.",
     "Could not update row." : "Не ўдалося абнавіць радок.",
     "The file was uploaded" : "Файл быў запампаваны.",
+    "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Памер запампаванага файла перавышае значэнне дырэктывы upload_max_filesize у php.ini",
+    "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Памер запампаванага файла перавышае значэнне дырэктывы MAX_FILE_SIZE у HTML форме",
     "The file was only partially uploaded" : "Файл быў запампаваны толькі часткова",
     "No file was uploaded" : "Ніводзін файл не быў запампаваны",
     "Missing a temporary folder" : "Адсутнічае часовая папка",
