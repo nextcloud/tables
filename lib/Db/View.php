@@ -122,6 +122,15 @@ class View extends EntitySuper implements JsonSerializable {
 		return $result;
 	}
 
+	public function findColumnSettingsForColumn(int $columnId): ?ViewColumnInformation {
+		foreach ($this->getColumnsSettingsArray() as $columnSettings) {
+			if ($columnSettings->getId() === $columnId) {
+				return $columnSettings;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * @psalm-suppress MismatchingDocblockReturnType
 	 * @return list<array{columnId: int, mode: 'ASC'|'DESC'}>

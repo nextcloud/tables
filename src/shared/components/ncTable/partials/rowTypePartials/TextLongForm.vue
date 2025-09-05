@@ -7,6 +7,7 @@
 		<TiptapMenuBar
 			:value.sync="localValue"
 			:text-length-limit="getTextLimit"
+			:readonly="column.viewColumnInformation?.readonly"
 			@input="updateText" />
 	</RowFormWrapper>
 </template>
