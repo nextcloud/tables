@@ -407,6 +407,7 @@ OC.L10N.register(
     "Update" : "Atualizar",
     "Manage" : "Gerenciar",
     "This application could not be found" : "Este aplicativo não pôde ser encontrado",
+    "Some resources in this application could not be loaded" : "Alguns recursos deste aplicativo não puderam ser carregados",
     "Create new table" : "Criar nova tabela",
     "Searching …" : "Pesquisando …",
     "No elements found." : "Nenhum elemento encontrado.",
