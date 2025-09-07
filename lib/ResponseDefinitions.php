@@ -26,7 +26,7 @@ namespace OCA\Tables;
  * 	lastEditAt: string,
  *  description: string|null,
  *  columns: list<int>,
- *  columnSettings:list<array{columnId: int, order: int}>,
+ *  columnSettings:list<array{columnId: int, order: int, readonly: bool}>,
  *  sort: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
  *  filter: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>,
  * 	isShared: bool,
@@ -132,6 +132,11 @@ namespace OCA\Tables;
  *  usergroupSelectGroups: bool,
  *  usergroupSelectTeams: bool,
  *  showUserStatus: bool,
+ *  viewColumnInformation: ?array{
+ *     columnId: int,
+ *     order: int,
+ *     readonly: bool,
+ *  },
  * }
  *
  * @psalm-type TablesImportState = array{

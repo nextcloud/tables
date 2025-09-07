@@ -90,3 +90,9 @@ export default {
 	},
 }
 </script>
+
+<style lang="scss" scoped>
+:deep(input[readonly]) {
+	opacity: 0.6;
+}
+</style>

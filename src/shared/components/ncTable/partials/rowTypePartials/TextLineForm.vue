@@ -4,7 +4,7 @@
 -->
 <template>
 	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :length="length" :max-length="column.textMaxLength" :description="column.description">
-		<input v-model="localValue" :maxlength="column.textMaxLength">
+		<input v-model="localValue" :maxlength="column.textMaxLength" :readonly="column.viewColumnInformation?.readonly">
 	</RowFormWrapper>
 </template>
 

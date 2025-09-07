@@ -19,6 +19,7 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\IL10N;
@@ -86,7 +87,7 @@ class ColumnService extends SuperService {
 	public function findAllByManagedView(View $view, string $userId): array {
 		if ($this->permissionsService->canManageView($view, $userId)) {
 			try {
-				return $this->enhanceColumns($this->mapper->findAllByTable($view->getTableId()));
+				return $this->enhanceColumns($this->mapper->findAllByTable($view->getTableId()), $view);
 			} catch (\OCP\DB\Exception $e) {
 				$this->logger->error($e->getMessage(), ['exception' => $e]);
 				throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
@@ -120,7 +121,7 @@ class ColumnService extends SuperService {
 		}
 		$viewColumns = $this->mapper->findAll($view->getColumnIds());
 
-		return $this->enhanceColumns($viewColumns);
+		return $this->enhanceColumns($viewColumns, $view);
 	}
 
 	/**
@@ -516,21 +517,26 @@ class ColumnService extends SuperService {
 	 *
 	 * @return Column
 	 */
-	private function enhanceColumn(Column $column): Column {
+	private function enhanceColumn(Column $column, ?ViewColumnInformation $viewColumnInformation = null): Column {
 		// add created by display name for UI usage
 		$column->setCreatedByDisplayName($this->userHelper->getUserDisplayName($column->getCreatedBy()));
 		$column->setLastEditByDisplayName($this->userHelper->getUserDisplayName($column->getLastEditBy()));
+
+		if ($viewColumnInformation) {
+			$column->setViewColumnInformation($viewColumnInformation);
+		}
+
 		return $column;
 	}
 
-	private function enhanceColumns(?array $columns): array {
+	private function enhanceColumns(?array $columns, ?View $view = null): array {
 		if ($columns === null) {
 			return [];
 		}
 
 		foreach ($columns as $column) {
 			if ($column instanceof Column) {
-				$this->enhanceColumn($column);
+				$this->enhanceColumn($column, $view?->findColumnSettingsForColumn($column->getId()));
 			}
 		}
 		return $columns;

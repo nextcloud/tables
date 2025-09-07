@@ -11,6 +11,7 @@
 			type="number"
 			:min="column.numberMin"
 			:max="column.numberMax"
+			:readonly="column.viewColumnInformation?.readonly"
 			:step="getStep">
 		<div v-if="column.numberSuffix" class="suffix">
 			{{ column.numberSuffix }}
