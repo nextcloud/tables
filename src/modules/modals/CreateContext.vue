@@ -198,7 +198,7 @@ export default {
 
 <style lang="scss" scoped>
 .modal__content {
-	padding-right: 0 !important;
+	padding-inline-end: 0 !important;
 
 	.content-emoji {
 		display: inline-flex;

@@ -136,7 +136,7 @@ export default {
 	}
 
 	:deep(#smartpicker-select .vs__selected) {
-		margin-left: 0;
+		margin-inline-start: 0;
 	}
 
 </style>

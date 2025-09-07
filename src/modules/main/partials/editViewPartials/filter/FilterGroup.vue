@@ -93,12 +93,12 @@ export default {
 <style>
 
 .group-text {
-	padding-left: calc(var(--default-grid-baseline) * 2);
+	padding-inline-start: calc(var(--default-grid-baseline) * 2);
 }
 
 .filter-group {
-	border-left: 6px solid var(--color-primary) !important;
-	padding-left: calc(var(--default-grid-baseline) * 2);
+	border-inline-start: 6px solid var(--color-primary) !important;
+	padding-inline-start: calc(var(--default-grid-baseline) * 2);
 }
 
 .locallyAdded {

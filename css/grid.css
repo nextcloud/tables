@@ -9,7 +9,7 @@
 
 .row.first-row {
 	padding-top: calc(var(--default-grid-baseline) * 4);
-	padding-left: 60px;
+	padding-inline-start: 60px;
 	/*width: calc(100% - 45px);*/
 	width: 100%;
 	padding-bottom: 20px;
@@ -47,7 +47,7 @@
 .col-4 { width: calc(100% - 20px); }
 
 .row [class^='col-'], .row [class^='fix-col-'] {
-	float: left;
+	float: inline-start;
 	position: relative;
 	/*
     padding-right: 20px;
@@ -56,65 +56,61 @@
 }
 
 .floatReverse [class*='col-'] {
-	float: right;
+	float: inline-end;
 }
 
 /* ===================== SPACES for rows OR columns =================00 */
 .row .space-L {
-	margin-left: 20px;
+	margin-inline-start: 20px;
 }
 
 .row.space-L {
-	margin-left: 20px;
+	margin-inline-start: 20px;
 	width: calc(100% - 20px);
 }
 
 .row .space-L-small {
-	margin-left: 8px;
+	margin-inline-start: 8px;
 }
 
 .row.space-L-small {
-	margin-left: 8px;
+	margin-inline-start: 8px;
 	width: calc(100% - 8px);
 }
 
 .row .space-R {
-	margin-right: 20px;
+	margin-inline-end: 20px;
 }
 
 .row.space-R {
-	margin-right: 20px;
+	margin-inline-end: 20px;
 	width: calc(100% - 20px);
 }
 
 .row .space-R-small {
-	margin-right: 8px;
+	margin-inline-end: 8px;
 }
 
 .row.space-R-small {
-	margin-right: 8px;
+	margin-inline-end: 8px;
 	width: calc(100% - 8px);
 }
 
 .row .space-LR {
-	margin-left: 20px;
-	margin-right: 20px;
+	margin-inline: 20px;
 }
 
 .row.space-LR {
-	margin-left: 20px;
-	margin-right: 20px;
+	margin-inline: 20px;
 	width: calc(100% - 40px);
 }
 
 .row .space-LR-small {
-	margin-left: 8px;
-	margin-right: 8px;
+	margin-inline: 8px;
 }
 
 .row.space-LR-small {
-	margin-left: 8px;
-	margin-right: 8px;
+	margin-inline: 8px;
 	width: calc(100% - 16px);
 }
 
@@ -145,7 +141,7 @@
 /* put two or more elements (buttons) to the left and right */
 .col-stretch-elements {
 	justify-content: space-between;
-	padding-right: 0;
+	padding-inline-end: 0;
 	width: 100%;
 }
 
@@ -159,14 +155,14 @@
 .fix-col-4 { width: 100%; }
 
 [class*='fix-col-'] {
-	float: left;
+	float: inline-start;
 	position: relative;
 	padding: 0;
 	display: flex;
 }
 
 .floatReverse [class*='fix-col-'] {
-	float: right;
+	float: inline-end;
 }
 
 /* ===== BOXES ========================== */
@@ -184,11 +180,11 @@
 }
 
 [class^='box-'] {
-	margin-right: 20px;
+	margin-inline-end: 20px;
 	margin-bottom: 20px;
 	background-color: var(--color-background-darker);
 	padding: 15px;
-	float: left;
+	float: inline-start;
 	position: relative;
 }
 
@@ -221,8 +217,8 @@
 	.hide-xs {
 		display: none;
 	}
-	.col-1, .fix-col-1 { width: 100%; padding-left: 0; padding-right: 0; }
-	.col-3, .fix-col-3 { width: 100%; padding-left: 0; padding-right: 0; }
+	.col-1, .fix-col-1 { width: 100%; padding-inline: 0; }
+	.col-3, .fix-col-3 { width: 100%; padding-inline: 0; }
 }
 
 input, textarea {

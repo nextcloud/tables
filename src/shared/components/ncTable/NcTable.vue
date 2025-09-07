@@ -270,7 +270,7 @@ export default {
 	width: var(--app-content-width, auto);
 	position: sticky;
 	top: 60px;
-	left: 0;
+	inset-inline-start: 0;
 	z-index: 15;
 	background-color: var(--color-main-background);
 	padding-top: 4px; // fix to show buttons completely

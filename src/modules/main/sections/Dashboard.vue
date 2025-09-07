@@ -286,7 +286,7 @@ export default {
 
 .table-dashboard {
 	display: sticky;
-	left: 0;
+	inset-inline-start: 0;
 }
 
 .table {
@@ -301,16 +301,16 @@ export default {
 
 .table th,
 .table td {
-	padding-right: calc(var(--default-grid-baseline) * 4);
+	padding-inline-end: calc(var(--default-grid-baseline) * 4);
 	padding-top: calc(var(--default-grid-baseline) * 1);
 	padding-bottom: calc(var(--default-grid-baseline) * 1);
-	text-align: left;
+	text-align: start;
 	align-items: center;
 }
 
 .table th:last-child,
 .table td:last-child {
-	border-right: none;
+	border-inline-end: none;
 }
 
 .table td:first-child {
@@ -336,7 +336,7 @@ td.actions {
 }
 
 td.actions button {
-	margin-left: calc(var(--default-grid-baseline) * 1);
+	margin-inline-start: calc(var(--default-grid-baseline) * 1);
 }
 
 tr:hover{

@@ -386,7 +386,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .menu {
-	padding-left: calc(var(--default-grid-baseline) * 1);
+	padding-inline-start: calc(var(--default-grid-baseline) * 1);
 	min-width: 44px;
 }
 

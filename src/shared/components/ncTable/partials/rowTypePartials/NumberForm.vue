@@ -107,11 +107,11 @@ export default {
 <style lang="scss" scoped>
 
 .prefix {
-	padding-right: calc(var(--default-grid-baseline) * 2);
+	padding-inline-end: calc(var(--default-grid-baseline) * 2);
 }
 
 .suffix {
-	padding-left: calc(var(--default-grid-baseline) * 2);
+	padding-inline-start: calc(var(--default-grid-baseline) * 2);
 }
 
 </style>

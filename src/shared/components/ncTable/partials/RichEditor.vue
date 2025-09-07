@@ -121,7 +121,7 @@ export default {
 .loading-indicator {
 	position: absolute;
 	top: 4px;
-	right: 4px;
+	inset-inline-end: 4px;
 }
 
 :deep(.text-editor__wrapper div.ProseMirror) {

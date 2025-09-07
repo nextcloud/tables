@@ -487,7 +487,7 @@ export default {
 
 	.slot button {
 		min-width: fit-content;
-		margin-right: calc(var(--default-grid-baseline) * 3);
+		margin-inline-end: calc(var(--default-grid-baseline) * 3);
 	}
 
 	:deep(.empty-content p) {
@@ -507,7 +507,7 @@ export default {
 		align-items: center;
 		justify-content: center;
 		gap: 12px;
-		padding-left: 12px;
+		padding-inline-start: 12px;
 		padding-bottom: 16px;
 	}
 

@@ -135,7 +135,7 @@ export default {
 }
 
 .mode-icon {
-	padding-right: calc(var(--default-grid-baseline) * 2);
+	padding-inline-end: calc(var(--default-grid-baseline) * 2);
 }
 
 :deep(.checkbox-radio-switch--button-variant .checkbox-radio-switch__label) {

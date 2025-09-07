@@ -360,7 +360,7 @@ export default {
 <style lang="scss" scoped>
 
 :deep(.app-settings__navigation) {
-	margin-right: 0;
+	margin-inline-end: 0;
 	min-width: auto;
 }
 

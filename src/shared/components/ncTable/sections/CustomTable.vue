@@ -429,7 +429,7 @@ export default {
 }
 
 .selected-page{
-	padding-left: 5px;
+	padding-inline-start: 5px;
 
 	display:inline-flex;
 	align-items: center;
@@ -441,7 +441,7 @@ export default {
 
 .large-width{
 	width: 100vw !important;
-	left: 0 !important;
+	inset-inline-start: 0 !important;
 }
 
 .pagination-items{
@@ -479,7 +479,7 @@ export default {
 	// white-space: nowrap;
 
 	td, th {
-		padding-right: 8px;
+		padding-inline-end: 8px;
 		max-width: 500px;
 	}
 
@@ -492,8 +492,7 @@ export default {
 	}
 
 	td:not(:first-child), th:not(:first-child) {
-		padding-right: 8px;
-		padding-left: 8px;
+		padding-inline: 8px;
 	}
 
 	tr {
@@ -520,7 +519,7 @@ export default {
 	tbody {
 
 		td {
-			text-align: left;
+			text-align: start;
 			vertical-align: middle;
 			border: 1px solid var(--color-border-dark);
 		}
@@ -574,7 +573,7 @@ export default {
 
 		.icon-loading-inline {
 			position: absolute;
-			right: 8px;
+			inset-inline-end: 8px;
 			top: 50%;
 			transform: translateY(-50%);
 		}
@@ -586,9 +585,8 @@ export default {
 
 	tr>th.sticky:first-child,tr>td.sticky:first-child {
 		position: sticky;
-		left: 0;
-		padding-left: calc(var(--default-grid-baseline) * 4);
-		padding-right: calc(var(--default-grid-baseline) * 4);
+		inset-inline-start: 0;
+		padding-inline: calc(var(--default-grid-baseline) * 4);
 		width: 60px;
 		background-color: inherit;
 		z-index: 5;
@@ -596,10 +594,10 @@ export default {
 
 	tr>th.sticky:last-child,tr>td.sticky:last-child {
 		position: sticky;
-		right: 0;
+		inset-inline-end: 0;
 		width: 55px;
 		background-color: inherit;
-		padding-right: 16px;
+		padding-inline-end: 16px;
 	}
 
 	tr>td.sticky:last-child {

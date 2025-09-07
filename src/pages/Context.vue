@@ -245,7 +245,7 @@ export default {
 	&__description {
 		margin: calc(3 * var(--default-grid-baseline, 4px));
 		max-width: 790px;
-		margin-left: 32px;
+		margin-inline-start: 32px;
 	}
 
 	&:deep(.icon-vue) {
@@ -258,10 +258,11 @@ export default {
 	margin: 40px 0;
 
 	&:deep(.row.first-row) {
-		margin-left: 20px;
-		padding-left: 0px;
+		margin-inline-start: 20px;
+		padding-inline-start: 0px;
 	}
 }
+
 :deep(h1) {
 	font-size: unset;
 	font-size: revert;

@@ -71,12 +71,12 @@ export default {
 <style scoped>
 
 .hint-padding-left {
-	padding-left: 20px;
+	padding-inline-start: 20px;
 }
 
 @media only screen and (max-width: 641px) {
 	.hint-padding-left {
-		padding-left: 0;
+		padding-inline-start: 0;
 	}
 }
 

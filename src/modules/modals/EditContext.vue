@@ -285,7 +285,7 @@ export default {
 }
 
 .right-additional-button>button {
-	margin-left: calc(var(--default-grid-baseline) * 3);
+	margin-inline-start: calc(var(--default-grid-baseline) * 3);
 }
 
 :deep(.element-description) {

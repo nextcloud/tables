@@ -214,7 +214,7 @@ export default {
 
 	> div:first-child {
 		cursor: pointer;
-		text-align: right;
+		text-align: end;
 	}
 }
 
@@ -247,12 +247,12 @@ export default {
 }
 
 .make-empty {
-	padding-left: 15px;
+	padding-inline-start: 15px;
 	cursor: pointer;
 }
 
 .icon-loading-inline {
-	margin-left: 4px;
+	margin-inline-start: 4px;
 }
 
 :deep(input[type="datetime-local"]),

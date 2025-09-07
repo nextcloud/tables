@@ -207,12 +207,12 @@ export default {
 	}
 
 	.icon-loading-inline {
-		margin-left: 4px;
+		margin-inline-start: 4px;
 	}
 }
 
 ul {
 	list-style-type: disc;
-	padding-left: calc(var(--default-grid-baseline) * 3);
+	padding-inline-start: calc(var(--default-grid-baseline) * 3);
 }
 </style>

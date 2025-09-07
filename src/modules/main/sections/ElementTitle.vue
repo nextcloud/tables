@@ -91,7 +91,7 @@ export default {
 
 .row.first-row {
 	position: sticky;
-	left: 0;
+	inset-inline-start: 0;
 	top: 0;
 	z-index: 15;
 	background-color: var(--color-main-background);
@@ -99,12 +99,12 @@ export default {
 }
 
 .user-bubble {
-	padding-left: calc(var(--default-grid-baseline) * 2);
+	padding-inline-start: calc(var(--default-grid-baseline) * 2);
 }
 
 .info {
 	display: inline-flex;
-	margin-left: calc(var(--default-grid-baseline) * 2);
+	margin-inline-start: calc(var(--default-grid-baseline) * 2);
 	align-items: center;
 	color: var(--color-text-maxcontrast);
 }

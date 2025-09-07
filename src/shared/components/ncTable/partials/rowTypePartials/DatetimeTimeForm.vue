@@ -73,7 +73,7 @@ export default {
 }
 
 .make-empty {
-	padding-left: 15px;
+	padding-inline-start: 15px;
 }
 
 .make-empty:hover {
@@ -81,12 +81,12 @@ export default {
 }
 
 .hint-padding-left {
-	padding-left: 20px;
+	padding-inline-start: 20px;
 }
 
 @media only screen and (max-width: 641px) {
 	.hint-padding-left {
-		padding-left: 0;
+		padding-inline-start: 0;
 	}
 }
 

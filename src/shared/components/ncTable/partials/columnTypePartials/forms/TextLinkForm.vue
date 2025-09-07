@@ -151,7 +151,7 @@ export default {
 		display: inline-flex;
 		flex-wrap: wrap;
 		max-height: 137px;
-		padding-left: calc(var(--default-grid-baseline) * 4);
+		padding-inline-start: calc(var(--default-grid-baseline) * 4);
 		overflow-y: auto;
 		overflow-x: hidden;
 	}

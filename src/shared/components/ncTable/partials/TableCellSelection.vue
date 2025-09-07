@@ -165,7 +165,7 @@ export default {
 
 .edit-mode {
 	.icon-loading-inline {
-		margin-left: 4px;
+		margin-inline-start: 4px;
 	}
 }
 

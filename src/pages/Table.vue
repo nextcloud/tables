@@ -139,7 +139,7 @@ export default {
 	}
 
 	#content-vue .row.first-row {
-		padding-left: 0px;
+		padding-inline-start: 0px;
 	}
 
 	.main-table-view, .main-view-view {

@@ -102,7 +102,7 @@ export default {
 		display: flex;
 		align-items: center;
 		img, :deep(svg) {
-			margin-right: calc(var(--default-grid-baseline) * 2);
+			margin-inline-end: calc(var(--default-grid-baseline) * 2);
 		}
 	}
 

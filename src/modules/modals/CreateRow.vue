@@ -205,7 +205,7 @@ export default {
 }
 
 .padding-right {
-	padding-right: calc(var(--default-grid-baseline) * 3);
+	padding-inline-end: calc(var(--default-grid-baseline) * 3);
 }
 
 </style>

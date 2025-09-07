@@ -155,7 +155,7 @@ export default {
 }
 
 .display-checkbox {
-	padding-right: calc(var(--default-grid-baseline) * 4);
+	padding-inline-end: calc(var(--default-grid-baseline) * 4);
 }
 
 :deep(.modal-container) {
@@ -181,8 +181,7 @@ export default {
 }
 
 :deep(.checkbox-radio-switch__icon) {
-	margin-right: 0 !important;
-	margin-left: 0 !important;
+	margin-inline: 0 !important;
 }
 
 .selected-columns-wrapper {
@@ -191,7 +190,7 @@ export default {
 }
 
 .move-button {
-	padding-right: 10px !important;
+	padding-inline-end: 10px !important;
 	cursor: move !important;
 }
 
@@ -201,7 +200,7 @@ export default {
 
 .meta-info {
 	font-style: italic;
-	padding-left:  calc(var(--default-grid-baseline) * 1);
+	padding-inline-start:  calc(var(--default-grid-baseline) * 1);
 	color: var(--color-info);
 }
 
