@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="cell-usergroup">
+	<div class="cell-usergroup" :style="{ opacity: !canEditCell() ? 0.6 : 1 }">
 		<div v-if="!isEditing" class="non-edit-mode" @click="handleStartEditing">
 			<div v-if="value" class="table-cell-usergroup">
 				<div v-for="item in value" :key="item.id" class="inline usergroup-entry">

@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="cell-multi-selection">
+	<div class="cell-multi-selection" :style="{ opacity: !canEditCell() ? 0.6 : 1 }">
 		<div v-if="!isEditing" class="non-edit-mode" @click="handleStartEditing">
 			<ul>
 				<li v-for="v in getObjects()" :key="v.id">

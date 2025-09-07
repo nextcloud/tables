@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="cell-datetime">
+	<div class="cell-datetime" :style="{ opacity: !canEditCell() ? 0.6 : 1 }">
 		<div v-if="!isEditing" class="non-edit-mode" role="button" aria-label="Edit date/time"
 			tabindex="0"
 			@click="handleStartEditing">

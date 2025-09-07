@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="cell-editor">
+	<div class="cell-editor" :style="{ opacity: !canEditCell() ? 0.6 : 1 }">
 		<div v-if="!isEditing" @click="handleStartEditing">
 			<NcEditor v-if="value && value.trim()"
 				:can-edit="false"
