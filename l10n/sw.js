@@ -64,6 +64,7 @@ OC.L10N.register(
     "Save" : "Hifadhi",
     "Title" : "Kichwa cha habari",
     "Resources" : "Rasilimali",
+    "Select emoji" : "Select emoji",
     "Delete column" : "Futa safu wima",
     "Cancel" : "Cancel",
     "Delete" : "Futa",
