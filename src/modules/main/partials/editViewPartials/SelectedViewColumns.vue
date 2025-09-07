@@ -9,7 +9,7 @@
 		<div v-for="(column, index) in columns" :key="column.id" :draggable="true" :class="{'locallyRemoved': isLocallyRemoved(column.id)}"
 			class="column-entry" @dragstart="dragStart(index)"
 			@dragover="dragOver(index)" @dragend="dragEnd(index)">
-			<div class="row-elements">
+			<div data-cy="selectedViewColumnEl" class="row-elements">
 				<NcButton
 					aria-label="t('tables', 'Move')"
 					type="tertiary-no-background"

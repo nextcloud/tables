@@ -41,7 +41,7 @@ describe('Import Export Scheme', () => {
 		cy.get('.action-button').contains('Edit view').click()
 		const columns = ['Target', 'Description', 'Progress', 'Proofed', 'Comments', 'Task']
 		for (let i = 0; i < columns.length; i++) {
-			cy.get('#settings-section_columns-and-order .column-entry > .row-elements:not(.move').eq(i).should('contain', columns[i]).find('input.checkbox-radio-switch__input').should('be.checked')
+			cy.get('[data-cy="selectedViewColumnEl"]').eq(i).should('contain', columns[i]).find('input.checkbox-radio-switch__input').should('be.checked')
 		}
 		cy.get('#settings-section_filter .v-select').eq(0).should('contain', 'Progress')
 		cy.get('#settings-section_filter .v-select').eq(1).should('contain', 'Is lower than')
