@@ -126,6 +126,7 @@ OC.L10N.register(
     "Users and groups" : "Usuarios y grupos",
     "Move" : "Mover",
     "Metadata" : "Metadatos",
+    "Read only" : "Sólo lectura",
     "Column" : "Columna",
     "Operator" : "Operador",
     "Updated table \"{emoji}{table}\"." : "Tabla \"{emoji}{table}\" actualizada.",

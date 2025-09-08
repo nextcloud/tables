@@ -153,6 +153,7 @@ OC.L10N.register(
     "Column type" : "Тип стовпця",
     "Move" : "Перемістити",
     "Metadata" : "Метадані",
+    "Read only" : "Тільки читання",
     "JJJJ-MM-DD hh:mm" : "РРРР-ММ-ДД гг:хх",
     "JJJJ-MM-DD" : "РРРР-ММ-ДД",
     "hh:mm" : "гг:хх",

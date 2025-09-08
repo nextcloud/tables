@@ -112,6 +112,7 @@ OC.L10N.register(
     "Column type" : "Τύπος στήλης",
     "Move" : "Μετακίνηση",
     "Metadata" : "Μεταδεδομένα",
+    "Read only" : "Μόνο για ανάγνωση",
     "Search Value" : "Τιμή Αναζήτησης",
     "Column" : "Στήλη",
     "Operator" : "Διαχειριστής",

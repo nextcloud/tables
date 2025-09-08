@@ -153,6 +153,7 @@ OC.L10N.register(
     "Column type" : "Spaltentyp",
     "Move" : "Verschieben",
     "Metadata" : "Metadaten",
+    "Read only" : "Schreibgeschützt",
     "JJJJ-MM-DD hh:mm" : "JJJJ-MM-DD hh:mm",
     "JJJJ-MM-DD" : "JJJJ-MM-DD",
     "hh:mm" : "hh:mm",

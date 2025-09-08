@@ -66,6 +66,7 @@ OC.L10N.register(
     "Users and groups" : "Utenti e gruppi",
     "Move" : "Sposta",
     "Metadata" : "Metadati",
+    "Read only" : "Sola lettura",
     "Column" : "Colonna",
     "Operator" : "Operatore",
     "Ascending" : "Ascendente",

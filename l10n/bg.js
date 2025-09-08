@@ -126,6 +126,7 @@ OC.L10N.register(
     "Users and groups" : "Потребители и групи",
     "Move" : "Преместване",
     "Metadata" : "Метаданни",
+    "Read only" : "Само за четене",
     "Column" : "Колона",
     "Operator" : "Оператор",
     "Ascending" : "Възходящо",

@@ -139,6 +139,7 @@ OC.L10N.register(
     "Column type" : "列类型",
     "Move" : "移动",
     "Metadata" : "元数据",
+    "Read only" : "只读",
     "JJJJ-MM-DD hh:mm" : "JJJJ-MM-DD hh:mm",
     "JJJJ-MM-DD" : "JJJJ-MM-DD",
     "hh:mm" : "hh:mm",

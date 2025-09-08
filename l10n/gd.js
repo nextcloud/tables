@@ -17,6 +17,7 @@ OC.L10N.register(
     "Create" : "Cruthaich",
     "Link" : "Ceangal",
     "Move" : "Gluais",
+    "Read only" : "Ri leughadh a-mhàin",
     "Share" : "Co-roinn",
     "Type" : "Seòrsa",
     "Save" : "Sàbhail",

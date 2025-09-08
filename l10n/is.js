@@ -36,6 +36,7 @@ OC.L10N.register(
     "Selection" : "Val",
     "Move" : "Færa",
     "Metadata" : "Lýsigögn",
+    "Read only" : "Skrifvarið",
     "Operator" : "Virki",
     "Delete filter" : "Eyða síu",
     "Views" : "Skoðun",

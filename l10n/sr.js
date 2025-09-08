@@ -153,6 +153,7 @@ OC.L10N.register(
     "Column type" : "Тип колоне",
     "Move" : "Помери",
     "Metadata" : "Метаподаци",
+    "Read only" : "Само за читање",
     "JJJJ-MM-DD hh:mm" : "ГГГГ-ММ-ДД сс:мм",
     "JJJJ-MM-DD" : "ГГГГ-ММ-ДД",
     "hh:mm" : "сс:м",

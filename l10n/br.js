@@ -19,6 +19,7 @@ OC.L10N.register(
     "Link" : "Liamm",
     "Users and groups" : "Implijourienn ha strolladoù",
     "Move" : "Diplasañ",
+    "Read only" : "Da lenn nemetken",
     "Shares" : "Rannañ",
     "Actions" : "Oberoù",
     "Share" : "Rannan",

@@ -39,6 +39,7 @@ OC.L10N.register(
     "Users and groups" : "Utilizaires e grops",
     "Move" : "Desplaçar",
     "Metadata" : "Metadonadas",
+    "Read only" : "Lectura sola",
     "Views" : "Vistas",
     "Shares" : "Partatges",
     "Actions" : "Accions",

@@ -81,6 +81,7 @@ OC.L10N.register(
     "Link" : "קישור",
     "Move" : "העברה",
     "Metadata" : "נתוני על",
+    "Read only" : "קריאה בלבד",
     "Views" : "תצוגות",
     "Shares" : "שיתופים",
     "Actions" : "פעולות",

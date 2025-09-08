@@ -151,6 +151,7 @@ OC.L10N.register(
     "Column type" : "Typ sloupce",
     "Move" : "Přesunout",
     "Metadata" : "Metadata",
+    "Read only" : "Pouze pro čtení",
     "JJJJ-MM-DD hh:mm" : "RRRR-MM-DD hh:mm",
     "JJJJ-MM-DD" : "RRRR-MM-DD",
     "hh:mm" : "hh:mm",

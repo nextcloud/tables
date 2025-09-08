@@ -127,6 +127,7 @@ OC.L10N.register(
     "Date and time" : "Dato og tid",
     "Move" : "Flyt",
     "Metadata" : "Metadata",
+    "Read only" : "Skrivebeskyttet",
     "Column" : "Kolonne",
     "Operator" : "Operatør",
     "Ascending" : "stigende",

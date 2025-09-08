@@ -127,6 +127,7 @@ OC.L10N.register(
     "Column type" : "Zutabe mota",
     "Move" : "Mugitu",
     "Metadata" : "Metadatuak",
+    "Read only" : "Irakurtzeko soilik",
     "JJJJ-MM-DD hh:mm" : "JJJJ-MM-DD hh:mm",
     "JJJJ-MM-DD" : "JJJJ-MM-DD",
     "hh:mm" : "hh:mm",

@@ -36,6 +36,7 @@ OC.L10N.register(
     "Link" : "Link",
     "Move" : "Mover",
     "Metadata" : "Metadados",
+    "Read only" : "Apenas leitura",
     "Operator" : "Operador",
     "Ascending" : "Ascending",
     "Descending" : "Descending",

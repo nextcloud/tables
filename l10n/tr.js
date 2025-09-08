@@ -153,6 +153,7 @@ OC.L10N.register(
     "Column type" : "Sütun türü",
     "Move" : "Taşı",
     "Metadata" : "Üst veriler",
+    "Read only" : "Salt okunur",
     "JJJJ-MM-DD hh:mm" : "YYYY-AA-GG ss:dd",
     "JJJJ-MM-DD" : "YYYY-AA-GG",
     "hh:mm" : "ss:dd",

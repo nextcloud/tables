@@ -40,6 +40,7 @@ OC.L10N.register(
     "Users and groups" : "Korisnici i grupe",
     "Move" : "Premjesti",
     "Metadata" : "Metapodaci",
+    "Read only" : "Samo za čitanje",
     "Views" : "Prikazi",
     "Shares" : "Dijeljenja",
     "Actions" : "Radnje",

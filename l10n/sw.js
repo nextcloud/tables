@@ -43,6 +43,7 @@ OC.L10N.register(
     "Users and groups" : "Users and groups",
     "Move" : "Hamisha",
     "Metadata" : "Metadata",
+    "Read only" : "Kusoma pekee",
     "Column" : "Safu wima",
     "Operator" : "Operator",
     "Ascending" : "Ascending",

@@ -32,6 +32,7 @@ OC.L10N.register(
     "Text" : "Teksto",
     "Link" : "Ligilo",
     "Move" : "Movi",
+    "Read only" : "Nurlega",
     "Shares" : "Kunhavoj",
     "Actions" : "Agoj",
     "Share" : "Kunhavigi",

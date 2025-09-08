@@ -91,6 +91,7 @@ OC.L10N.register(
     "Users and groups" : "Người dùng và nhóm",
     "Column type" : "Loại cột",
     "Move" : "Dịch chuyển",
+    "Read only" : "Chỉ xem",
     "JJJJ-MM-DD hh:mm" : "JJJJ-MM-DD hh:mm",
     "JJJJ-MM-DD" : "JJJJ-MM-DD",
     "hh:mm" : "hh:mm",

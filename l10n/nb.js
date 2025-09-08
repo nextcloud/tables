@@ -139,6 +139,7 @@ OC.L10N.register(
     "Column type" : "Kolonnetype",
     "Move" : "Flytt",
     "Metadata" : "Metadata",
+    "Read only" : "Skrivebeskyttet",
     "JJJJ-MM-DD hh:mm" : "DD-MM-JJJJ hh:mm",
     "JJJJ-MM-DD" : "DD-MM-JJJJ",
     "hh:mm" : "hh:mm",

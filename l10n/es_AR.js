@@ -34,6 +34,7 @@ OC.L10N.register(
     "Link" : "Link",
     "Selection" : "Selección",
     "Move" : "Mover",
+    "Read only" : "Solo lectura",
     "Column" : "Columna",
     "Operator" : "Operador",
     "Rows" : "Filas",

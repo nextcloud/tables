@@ -139,6 +139,7 @@ OC.L10N.register(
     "Column type" : "Sarakkeen tyyppi",
     "Move" : "Siirrä",
     "Metadata" : "Metatieto",
+    "Read only" : "Vain luku",
     "JJJJ-MM-DD hh:mm" : "JJJJ-MM-DD hh:mm",
     "JJJJ-MM-DD" : "JJJJ-MM-DD",
     "hh:mm" : "hh:mm",

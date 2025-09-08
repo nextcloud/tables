@@ -32,6 +32,7 @@ OC.L10N.register(
     "Text" : "Teks",
     "Link" : "Tautan",
     "Move" : "Pindah",
+    "Read only" : "Hanya baca",
     "Column" : "Kolom",
     "Operator" : "Operator",
     "Ascending" : "Naik",

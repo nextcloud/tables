@@ -131,6 +131,7 @@ OC.L10N.register(
     "Users and groups" : "사용자와 그룹",
     "Move" : "이동",
     "Metadata" : "메타데이터",
+    "Read only" : "Read only",
     "Search Value" : "입력값 찾기",
     "Column" : "행",
     "Operator" : "운영자",

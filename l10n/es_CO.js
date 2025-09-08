@@ -26,6 +26,7 @@ OC.L10N.register(
     "Text" : "Texto",
     "Link" : "Enlace",
     "Move" : "Mover",
+    "Read only" : "Sólo lectura",
     "Shares" : "Elementos compartidos",
     "Actions" : "Acciones",
     "Share" : "Compartir",

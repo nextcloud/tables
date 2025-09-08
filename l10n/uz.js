@@ -30,6 +30,7 @@ OC.L10N.register(
     "Link" : "Link",
     "Selection" : "Tanlash",
     "Move" : "Move",
+    "Read only" : "Faqat o'qing",
     "Column" : "Colonna",
     "Operator" : "Operator",
     "Ascending" : "Ko'tarilish",

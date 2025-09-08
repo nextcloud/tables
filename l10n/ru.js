@@ -115,6 +115,7 @@ OC.L10N.register(
     "Users and groups" : "Пользователи и группы",
     "Move" : "Переместить",
     "Metadata" : "Метаданные",
+    "Read only" : "Только для чтения",
     "JJJJ-MM-DD hh:mm" : "ГГГГ-ММ-ДД чч:мм",
     "JJJJ-MM-DD" : "ГГГГ-ММ-ДД",
     "hh:mm" : "чч:мм",

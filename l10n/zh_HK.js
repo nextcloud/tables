@@ -153,6 +153,7 @@ OC.L10N.register(
     "Column type" : "縱列類型",
     "Move" : "移動",
     "Metadata" : "元數據",
+    "Read only" : "唯讀",
     "JJJJ-MM-DD hh:mm" : "JJJJ-MM-DD hh:mm",
     "JJJJ-MM-DD" : "JJJJ-MM-DD",
     "hh:mm" : "hh:mm",

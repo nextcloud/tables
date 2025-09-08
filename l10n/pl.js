@@ -98,6 +98,7 @@ OC.L10N.register(
     "Users and groups" : "Użytkownicy i grupy",
     "Move" : "Przenieś",
     "Metadata" : "Metadane",
+    "Read only" : "Tylko do odczytu",
     "Column" : "Kolumna",
     "Operator" : "Operator",
     "Delete filter" : "Usuń filtr",

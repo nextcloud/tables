@@ -99,6 +99,7 @@ OC.L10N.register(
     "Users and groups" : "Gebruikers en groepen",
     "Move" : "Verplaatsen",
     "Metadata" : "Metadata",
+    "Read only" : "Alleen-lezen",
     "Column" : "Kolom",
     "Operator" : "Operator",
     "Ascending" : "Oplopend",

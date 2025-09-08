@@ -153,6 +153,7 @@ OC.L10N.register(
     "Column type" : "Cineál colún",
     "Move" : "Bog",
     "Metadata" : "Metadata",
+    "Read only" : "Léamh amháin",
     "JJJJ-MM-DD hh:mm" : "BBBB-MM-LL uu:nó",
     "JJJJ-MM-DD" : "BBBB-MM-LL",
     "hh:mm" : "uu:nó",

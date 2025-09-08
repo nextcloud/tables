@@ -41,6 +41,7 @@ OC.L10N.register(
     "Users and groups" : "Utentes e grupos",
     "Move" : "Tràmuda",
     "Metadata" : "Metadatos",
+    "Read only" : "letura sola",
     "Views" : "Visualizatziones",
     "Shares" : "Cumpartziduras",
     "Actions" : "Atziones",

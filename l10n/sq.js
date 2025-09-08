@@ -25,6 +25,7 @@ OC.L10N.register(
     "Text" : "Tekst",
     "Link" : "Lidhje",
     "Move" : "Zhvendos",
+    "Read only" : "Vetëm i lexueshëm",
     "Shares" : "Shpërndarje",
     "Actions" : "Veprimet",
     "Share" : "Shpërndaje",

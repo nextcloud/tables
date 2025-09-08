@@ -34,6 +34,7 @@ OC.L10N.register(
     "Users and groups" : "Users and groups",
     "Move" : "Move",
     "Metadata" : "Metadata",
+    "Read only" : "Read only",
     "Operator" : "ოპერატორი",
     "Views" : "Views",
     "Shares" : "Shares",

@@ -151,6 +151,7 @@ OC.L10N.register(
     "Column type" : "Typ stĺpca",
     "Move" : "Presunúť",
     "Metadata" : "Metadáta",
+    "Read only" : "Iba na čítanie",
     "JJJJ-MM-DD hh:mm" : "JJJJ-MM-DD hh:mm",
     "JJJJ-MM-DD" : "JJJJ-MM-DD",
     "hh:mm" : "hh:mm",

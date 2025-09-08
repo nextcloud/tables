@@ -121,6 +121,7 @@ OC.L10N.register(
     "Column type" : "Kolumntyp",
     "Move" : "Flytta",
     "Metadata" : "Metadata",
+    "Read only" : "Läsbehörighet",
     "JJJJ-MM-DD hh:mm" : "ÅÅÅÅ-MM-DD tt:mm",
     "JJJJ-MM-DD" : "ÅÅÅÅ-MM-DD",
     "hh:mm" : "tt:mm",

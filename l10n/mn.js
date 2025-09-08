@@ -15,6 +15,7 @@ OC.L10N.register(
     "Create" : "Үүсгэх",
     "Link" : "Холбоос",
     "Move" : "Зөөх",
+    "Read only" : "Зөвхөн унших",
     "Shares" : "Түгээлтүүд",
     "Actions" : "Үйл ажиллагаа",
     "Share" : "Түгээх",

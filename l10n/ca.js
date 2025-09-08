@@ -120,6 +120,7 @@ OC.L10N.register(
     "Users and groups" : "Usuaris i grups",
     "Move" : "Mou",
     "Metadata" : "Metadades",
+    "Read only" : "Només de lectura",
     "Column" : "Columna",
     "Operator" : "Operador",
     "Delete filter" : "Suprimeix el filtre",

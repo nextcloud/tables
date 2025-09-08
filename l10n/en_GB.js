@@ -153,6 +153,7 @@ OC.L10N.register(
     "Column type" : "Column type",
     "Move" : "Move",
     "Metadata" : "Metadata",
+    "Read only" : "Read only",
     "JJJJ-MM-DD hh:mm" : "JJJJ-MM-DD hh:mm",
     "JJJJ-MM-DD" : "JJJJ-MM-DD",
     "hh:mm" : "hh:mm",

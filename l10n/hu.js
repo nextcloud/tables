@@ -135,6 +135,7 @@ OC.L10N.register(
     "Users and groups" : "Felhasználók és csoportok",
     "Move" : "Áthelyezés",
     "Metadata" : "Metaadatok",
+    "Read only" : "Csak olvasható",
     "JJJJ-MM-DD hh:mm" : "ÉÉÉÉ-HH-NN óó:pp",
     "JJJJ-MM-DD" : "ÉÉÉÉ-HH-NN",
     "hh:mm" : "óó:pp",

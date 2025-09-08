@@ -153,6 +153,7 @@ OC.L10N.register(
     "Column type" : "Veeru tüüp",
     "Move" : "Teisalda",
     "Metadata" : "Metaandmed",
+    "Read only" : "kirjutuskaitstud",
     "JJJJ-MM-DD hh:mm" : "AAAA-KK-PP tt:mm",
     "JJJJ-MM-DD" : "AAAA-KK-PP",
     "hh:mm" : "tt:mm",

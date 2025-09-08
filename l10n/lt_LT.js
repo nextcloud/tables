@@ -55,6 +55,7 @@ OC.L10N.register(
     "Users and groups" : "Naudotojai ir grupės",
     "Move" : "Perkelti",
     "Metadata" : "Metaduomenys",
+    "Read only" : "Tik skaitymui",
     "Delete filter" : "Ištrinti filtrą",
     "Views" : "Rodiniai",
     "Rows" : "Eilutės",

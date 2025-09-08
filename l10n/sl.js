@@ -128,6 +128,7 @@ OC.L10N.register(
     "Users and groups" : "Uporabniki in skupine",
     "Move" : "Premakni",
     "Metadata" : "Metapodatki",
+    "Read only" : "Le za branje",
     "JJJJ-MM-DD hh:mm" : "JJJJ-MM-DD hh:mm",
     "JJJJ-MM-DD" : "JJJJ-MM-DD",
     "hh:mm" : "hh:mm",

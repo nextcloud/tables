@@ -138,6 +138,7 @@ OC.L10N.register(
     "Column type" : "ستون تىپى",
     "Move" : "Move",
     "Metadata" : "Metadata",
+    "Read only" : "پەقەت ئوقۇڭ",
     "JJJJ-MM-DD hh:mm" : "JJJJ-MM-DD hh: mm",
     "JJJJ-MM-DD" : "JJJJ-MM-DD",
     "hh:mm" : "hh: mm",

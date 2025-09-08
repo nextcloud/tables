@@ -33,6 +33,7 @@ OC.L10N.register(
     "Link" : "Saite",
     "Move" : "Pārvietot",
     "Metadata" : "Metadati",
+    "Read only" : "Tikai lasāms",
     "Column" : "Kolonnā",
     "Operator" : "Operators",
     "Views" : "Skatījumi",

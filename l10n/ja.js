@@ -138,6 +138,7 @@ OC.L10N.register(
     "Column type" : "カラム種類",
     "Move" : "移動",
     "Metadata" : "メタデータ",
+    "Read only" : "読み込み専用",
     "JJJJ-MM-DD hh:mm" : "JJJJ-MM-DD hh:mm",
     "JJJJ-MM-DD" : "JJJJ-MM-DD",
     "hh:mm" : "hh:mm",
