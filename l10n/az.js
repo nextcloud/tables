@@ -24,6 +24,7 @@ OC.L10N.register(
     "Create" : "Yarat",
     "Link" : "Link",
     "Move" : "Move",
+    "Read only" : "Oxumaq üçün",
     "Shares" : "Yayımlanmalar",
     "Actions" : "İşlər",
     "Share" : "Paylaş",

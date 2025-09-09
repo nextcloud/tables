@@ -130,7 +130,7 @@ OC.L10N.register(
     "Read only" : "Skrivebeskyttet",
     "Column" : "Kolonne",
     "Operator" : "Operatør",
-    "Ascending" : "stigende",
+    "Ascending" : "Stigende",
     "Descending" : "Faldende",
     "Updated table \"{emoji}{table}\"." : "Opdateret tabel \"{emoji}{table}\".",
     "Cannot update table. Title is missing." : "Kan ikke opdatere tabellen. Titel mangler.",

@@ -42,6 +42,7 @@ OC.L10N.register(
     "Column type" : "Тып слупка",
     "Move" : "Перамясціць",
     "Metadata" : "Метаданыя",
+    "Read only" : "Толькі для чытання",
     "JJJJ-MM-DD hh:mm" : "JJJJ-MM-DD hh:mm",
     "JJJJ-MM-DD" : "JJJJ-MM-DD",
     "hh:mm" : "hh:mm",

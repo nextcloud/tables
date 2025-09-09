@@ -24,6 +24,7 @@ OC.L10N.register(
     "Text" : "Teks",
     "Link" : "Skakel",
     "Move" : "Skuif",
+    "Read only" : "Leesalleen",
     "Actions" : "Aksies",
     "Share" : "Deel",
     "Integration" : "Integrasie",

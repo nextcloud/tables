@@ -151,6 +151,7 @@ OC.L10N.register(
     "Column type" : "نوع العمود",
     "Move" : "نقل",
     "Metadata" : "البيانات الوصفية metadata",
+    "Read only" : "للقراءة فقط",
     "JJJJ-MM-DD hh:mm" : "JJJJ-MM-DD hh:mm",
     "JJJJ-MM-DD" : "JJJJ-MM-DD",
     "hh:mm" : "hh:mm",

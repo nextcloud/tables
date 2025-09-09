@@ -78,6 +78,7 @@ OC.L10N.register(
     "Column type" : "Tipu de columna",
     "Move" : "Mover",
     "Metadata" : "Metadatos",
+    "Read only" : "Namás llectura",
     "Column" : "Columna",
     "Operator" : "Operador",
     "OR" : "O",
