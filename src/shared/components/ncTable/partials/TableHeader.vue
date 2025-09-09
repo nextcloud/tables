@@ -146,7 +146,7 @@ export default {
 }
 
 .cell span {
-	padding-left: 12px;
+	padding-inline-start: 12px;
 
 }
 
@@ -167,18 +167,18 @@ export default {
 }
 
 .hidden-indicator {
-	border-right: solid;
+	border-inline-end: solid;
 	border-color: var(--color-primary);
 	border-width: 3px;
-	padding-left: calc(var(--default-grid-baseline) * 1);
+	padding-inline-start: calc(var(--default-grid-baseline) * 1);
 	cursor: pointer;
 }
 
 .hidden-indicator-first {
-	border-right: solid;
+	border-inline-end: solid;
 	border-color: var(--color-primary);
 	border-width: 3px;
-	padding-left: calc(var(--default-grid-baseline) * 4);
+	padding-inline-start: calc(var(--default-grid-baseline) * 4);
 	cursor: pointer;
 }
 

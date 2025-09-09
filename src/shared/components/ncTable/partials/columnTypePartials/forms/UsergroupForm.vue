@@ -184,6 +184,6 @@ export default {
 }
 
 .selections span {
-    padding-right: 21px;
+    padding-inline-end: 21px;
 }
 </style>

@@ -259,7 +259,7 @@ table {
 	border: none;
 
 	td, th {
-		padding-right: 8px;
+		padding-inline-end: 8px;
 		max-width: 200px;
 		overflow: hidden;
 		white-space: nowrap;
@@ -274,8 +274,7 @@ table {
 	}
 
 	td:not(:first-child), th:not(:first-child) {
-		padding-right: 8px;
-		padding-left: 8px;
+		padding-inline: 8px;
 	}
 
 	tr {
@@ -294,14 +293,14 @@ table {
 
 	tbody {
 		td {
-			text-align: left;
+			text-align: start;
 			vertical-align: middle;
 
 			&.left {
 				max-width: 300px;
 			}
 			&.right {
-				text-align: right;
+				text-align: end;
 			}
 		}
 

@@ -78,8 +78,7 @@ export default {
 
 .filter {
 	padding-top: 1px;
-	padding-left: calc(var(--default-grid-baseline) * 2);
-	padding-right: calc(var(--default-grid-baseline) * 6);
+	padding-inline: calc(var(--default-grid-baseline) * 2) calc(var(--default-grid-baseline) * 6);
 	padding-bottom: calc(var(--default-grid-baseline) * .5);
 	font-size: 0.9em;
 	border-radius: var(--border-radius-pill);
@@ -94,10 +93,9 @@ button {
 	padding-top: 1px;
 	min-height: auto;
 	padding-bottom: 1px;
-	padding-left: 2px;
-	padding-right: 2px;
+	padding-inline: 2px;
 	margin: 0;
-	margin-left: 4px;
+	margin-inline-start: 4px;
 }
 
 </style>

@@ -184,7 +184,7 @@ export default {
 	position: -webkit-sticky; /* Safari */
 	position: sticky;
 	top: 90px;
-	left: 0;
+	inset-inline-start: 0;
 }
 
 .selected-rows-option {
@@ -196,7 +196,7 @@ export default {
 }
 
 .add-padding-left {
-	padding-left: calc(var(--default-grid-baseline) * 1);
+	padding-inline-start: calc(var(--default-grid-baseline) * 1);
 }
 
 :deep(.counter-bubble__counter) {
@@ -206,7 +206,7 @@ export default {
 .actionButtonsLeft {
 	display: inline-flex;
 	align-items: center;
-	padding-left: calc(var(--default-grid-baseline) * 1);
+	padding-inline-start: calc(var(--default-grid-baseline) * 1);
 }
 
 :deep(.actionButtonsLeft button) {
@@ -215,7 +215,7 @@ export default {
 }
 
 .searchAndFilter {
-	margin-left: calc(var(--default-grid-baseline) * 3);
+	margin-inline-start: calc(var(--default-grid-baseline) * 3);
 	width: auto;
 	min-width: 100px;
 }

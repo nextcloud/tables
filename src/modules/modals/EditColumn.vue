@@ -220,7 +220,7 @@ export default {
 }
 
 .button-padding-right {
-	padding-right: calc(var(--default-grid-baseline) * 2)
+	padding-inline-end: calc(var(--default-grid-baseline) * 2)
 }
 
 .last-edit-info {

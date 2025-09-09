@@ -96,7 +96,7 @@ export default {
 	}
 
 	&--image {
-		margin-right: 12px;
+		margin-inline-end: 12px;
 		display: flex;
 		align-items: center;
 		.table-emoji {

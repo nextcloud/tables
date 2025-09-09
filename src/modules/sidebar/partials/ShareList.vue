@@ -256,7 +256,7 @@ export default {
 	}
 
 	.userInfo {
-		padding-left: 5px;
+		padding-inline-start: 5px;
 		font-size: 100%;
 		display: flex;
 		flex-direction: column;

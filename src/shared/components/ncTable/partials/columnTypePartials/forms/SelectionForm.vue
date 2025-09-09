@@ -119,11 +119,11 @@ export default {
 
 input {
 	margin-top: 8px;
-	margin-left: calc(var(--default-grid-baseline) * 1);
+	margin-inline-start: calc(var(--default-grid-baseline) * 1);
 }
 
 .col-4.inline {
-	margin-left: calc(var(--default-grid-baseline) * 3);
+	margin-inline-start: calc(var(--default-grid-baseline) * 3);
 }
 
 </style>

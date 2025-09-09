@@ -218,7 +218,7 @@ export default {
 		& .header {
 			position: sticky;
 			top: 0;
-			left: 0;
+			inset-inline-start: 0;
 			z-index: 1;
 
 			:where(.options) {
@@ -268,7 +268,7 @@ export default {
 
 			:where(.pagination-footer) {
 				width: unset !important;
-				left: unset !important;
+				inset-inline-start: unset !important;
 			}
 		}
 

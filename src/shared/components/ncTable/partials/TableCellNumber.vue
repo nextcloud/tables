@@ -103,7 +103,7 @@ export default {
 <style scoped>
 .cell-number {
 	width: 100%;
-	text-align: right;
+	text-align: end;
 
 	div {
 		min-height: 20px;
@@ -122,7 +122,7 @@ export default {
 }
 
 .cell-input {
-	text-align: right;
+	text-align: end;
 	flex-grow: 1;
 }
 

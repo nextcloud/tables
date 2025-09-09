@@ -153,11 +153,11 @@ export default {
 }
 
 .typeSelections span {
-	padding-right: 21px;
+	padding-inline-end: 21px;
 }
 
 .multiSelectOptionLabel {
-	padding-left: calc(var(--default-grid-baseline) * 1);
+	padding-inline-start: calc(var(--default-grid-baseline) * 1);
 }
 
 .icon-label-container {

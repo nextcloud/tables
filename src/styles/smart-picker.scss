@@ -34,8 +34,7 @@
 		th, td {
 			border: none !important;
 			width: 50%;
-			padding-left: calc(var(--default-grid-baseline) * 2);
-			padding-right: calc(var(--default-grid-baseline) * 2);
+			padding-inline: calc(var(--default-grid-baseline) * 2);
 		}
 	}
 
@@ -43,11 +42,11 @@
 		display: flex;
 
 		> span {
-			padding-right: calc(var(--default-grid-baseline) * 6);
+			padding-inline-end: calc(var(--default-grid-baseline) * 6);
 		}
 
 		label .material-design-icon {
-			padding-right: calc(var(--default-grid-baseline) * 1);
+			padding-inline-end: calc(var(--default-grid-baseline) * 1);
 		}
 	}
 
@@ -64,8 +63,7 @@
 		width: 100%;
 
 		.selection {
-			margin-left: auto;
-			margin-right: auto;
+			margin-inline: auto;
 			width: 550px;
 		}
 	}

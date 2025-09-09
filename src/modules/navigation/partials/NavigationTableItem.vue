@@ -325,27 +325,27 @@ export default {
 
 .app-navigation-entry__counter-wrapper {
 	button.action-button {
-		padding-right: 0;
+		padding-inline-end: 0;
 	}
 
 	.counter-bubble__counter {
 		display: none;
 	}
-	margin-right: 0 !important;
+	margin-inline-end: 0 !important;
 }
 
 .app-navigation-entry {
 	.margin-right {
-		margin-right: 44px;
+		margin-inline-end: 44px;
 	}
 	.margin-left {
-		margin-left: calc(var(--default-grid-baseline) * 2);
+		margin-inline-start: calc(var(--default-grid-baseline) * 2);
 	}
 }
 
 .app-navigation-entry:hover {
 	.margin-right {
-		margin-right: 0;
+		margin-inline-end: 0;
 	}
 
 	.app-navigation-entry__counter-wrapper .counter-bubble__counter {

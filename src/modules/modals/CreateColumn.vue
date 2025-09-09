@@ -432,7 +432,7 @@ export default {
 <style lang="scss" scoped>
 
 .padding-right {
-	padding-right: calc(var(--default-grid-baseline) * 3);
+	padding-inline-end: calc(var(--default-grid-baseline) * 3);
 }
 
 .typeSelections {
@@ -441,11 +441,11 @@ export default {
 }
 
 .typeSelections span {
-	padding-right: 21px;
+	padding-inline-end: 21px;
 }
 
 .multiSelectOptionLabel {
-	padding-left: calc(var(--default-grid-baseline) * 1);
+	padding-inline-start: calc(var(--default-grid-baseline) * 1);
 }
 
 </style>

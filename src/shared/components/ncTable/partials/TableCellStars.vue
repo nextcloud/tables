@@ -169,6 +169,6 @@ export default {
 }
 
 .icon-loading-inline {
-	margin-left: 4px;
+	margin-inline-start: 4px;
 }
 </style>

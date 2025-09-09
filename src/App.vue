@@ -164,7 +164,7 @@ export default {
 
 	.sidebar-icon {
 		position: absolute;
-		right: 5px;
+		inset-inline-end: 5px;
 		top: 5px;
 	}
 
@@ -232,7 +232,7 @@ button[class^='icon-'] {
 
 .icon-left {
 	background-position: left;
-	padding-left: 22px;
+	padding-inline-start: 22px;
 }
 
 .mandatory {
@@ -241,7 +241,7 @@ button[class^='icon-'] {
 
 .v-popover button {
 	height: 25px;
-	margin-left: 10px;
+	margin-inline-start: 10px;
 	background-color: transparent;
 	border: none;
 }
@@ -251,7 +251,7 @@ button[class^='icon-'] {
 }
 
 .v-popper__inner table td {
-	padding-right: 15px;
+	padding-inline-end: 15px;
 }
 
 .error {
@@ -271,7 +271,7 @@ button[class^='icon-'] {
 }
 
 .align-right {
-	text-align: right;
+	text-align: end;
 }
 
 .inline-flex {

@@ -87,7 +87,7 @@ export default {
 	.closeModalButton {
 		position: fixed;
 		bottom: calc(var(--default-grid-baseline) * 2);
-		right: calc(var(--default-grid-baseline) * 2);
+		inset-inline-end: calc(var(--default-grid-baseline) * 2);
 	}
 
 </style>

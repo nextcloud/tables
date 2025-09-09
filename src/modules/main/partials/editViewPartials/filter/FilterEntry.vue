@@ -208,8 +208,7 @@ export default {
 	}
 
 	.actions button {
-		margin-right: calc(var(--default-grid-baseline) * 2);
-		margin-left: auto;
+		margin-inline: auto calc(var(--default-grid-baseline) * 2);
 		height: 44px;
 	}
 

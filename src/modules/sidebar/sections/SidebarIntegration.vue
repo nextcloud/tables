@@ -98,11 +98,11 @@ h4 {
 }
 
 ul {
-	margin-left: calc(var(--default-grid-baseline) * 3);
+	margin-inline-start: calc(var(--default-grid-baseline) * 3);
 }
 
 .notPermitted {
-	padding-left: 17px;
+	padding-inline-start: 17px;
 }
 
 </style>

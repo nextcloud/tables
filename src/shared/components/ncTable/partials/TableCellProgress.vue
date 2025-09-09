@@ -91,7 +91,7 @@ export default {
 
 <style scoped>
 .cell-progress {
-	padding-right: 10px;
+	padding-inline-end: 10px;
 	min-width: 12vw;
 	cursor: pointer;
 
@@ -116,7 +116,7 @@ export default {
 }
 
 .cell-input {
-	text-align: right;
+	text-align: end;
 	width: 100%;
 }
 </style>

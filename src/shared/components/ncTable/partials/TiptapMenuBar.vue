@@ -205,7 +205,7 @@ export default {
 
 .character-count {
 	display: flex;
-	margin-right: calc(var(--default-grid-baseline) * 3);
+	margin-inline-end: calc(var(--default-grid-baseline) * 3);
 	padding: 0;
 }
 
@@ -251,8 +251,8 @@ export default {
 	}
 
 	blockquote {
-		padding-left: 1rem;
-		border-left: 2px solid rgba(#0D0D0D, 0.1);
+		padding-inline-start: 1rem;
+		border-inline-start: 2px solid rgba(#0D0D0D, 0.1);
 	}
 }
 
@@ -267,7 +267,7 @@ export default {
 		display: flex;
 		> label {
 			flex: 0 0 auto;
-			margin-right: 0.5rem;
+			margin-inline-end: 0.5rem;
 			user-select: none;
 		}
 		> div {
@@ -279,14 +279,14 @@ export default {
 .tables-tiptap-wrapper ol, .tabulator-cell ol {
 	li {
 		list-style-type: decimal;
-		margin-left: 15px;
+		margin-inline-start: 15px;
 	}
 }
 
 .tables-tiptap-wrapper ul, .tabulator-cell ul {
 	li {
 		list-style-type: disc;
-		margin-left: 15px;
+		margin-inline-start: 15px;
 
 		label input {
 			max-height: 30px;

@@ -210,14 +210,14 @@ export default {
 }
 
 .usergroup-entry {
-	padding-right: 10px;
+	padding-inline-end: 10px;
 }
 
 .edit-mode {
 	padding: 10px 0;
 
 	.icon-loading-inline {
-		margin-left: 4px;
+		margin-inline-start: 4px;
 	}
 }
 </style>

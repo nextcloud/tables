@@ -87,7 +87,7 @@ export default {
 }
 
 .material-design-icon.loading-icon {
-	margin-left: calc(var(--default-grid-baseline) * 1);
+	margin-inline-start: calc(var(--default-grid-baseline) * 1);
 }
 
 pre {

@@ -73,7 +73,7 @@ export default {
 }
 
 .make-empty {
-	padding-left: 15px;
+	padding-inline-start: 15px;
 }
 
 .make-empty:hover {
