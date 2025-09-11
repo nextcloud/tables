@@ -13,7 +13,7 @@
 				<ColumnFormComponent
 					:column="column"
 					:value.sync="localRow[column.id]" />
-				<NcNoteCard v-if="column.mandatory && !isValueValidForColumn(localRow[column.id], column)"
+				<NcNoteCard v-if="(column.viewColumnInformation?.mandatory ?? column.mandatory) && !isValueValidForColumn(localRow[column.id], column)"
 					type="error">
 					{{ t('tables', '"{columnTitle}" should not be empty', { columnTitle: column.title }) }}
 				</NcNoteCard>
