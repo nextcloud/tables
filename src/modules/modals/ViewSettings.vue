@@ -309,6 +309,7 @@ export default {
 					columnId: col.id,
 					order: index,
 					readonly: col.viewColumnInformation?.readonly,
+					mandatory: col.viewColumnInformation?.mandatory ?? false,
 				}))
 			const data = {
 				data: {
