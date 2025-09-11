@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<RowFormWrapper :width="2" :title="column.title" :mandatory="column.mandatory" :description="column.description">
+	<RowFormWrapper :width="2" :title="column.title" :mandatory="column.viewColumnInformation?.mandatory ?? column.mandatory" :description="column.description">
 		<div v-if="column.numberPrefix" class="prefix">
 			{{ column.numberPrefix }}
 		</div>

@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :length="length" :max-length="column.textMaxLength" :description="column.description">
+	<RowFormWrapper :title="column.title" :mandatory="column.viewColumnInformation?.mandatory ?? column.mandatory" :length="length" :max-length="column.textMaxLength" :description="column.description">
 		<input v-model="localValue" :maxlength="column.textMaxLength" :readonly="column.viewColumnInformation?.readonly">
 	</RowFormWrapper>
 </template>
