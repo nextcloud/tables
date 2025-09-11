@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :width="2">
+	<RowFormWrapper :title="column.title" :mandatory="column.viewColumnInformation?.mandatory ?? column.mandatory" :description="column.description" :width="2">
 		<NcDateTimePickerNative id="datetime-picker" v-model="localValue" :readonly="column.viewColumnInformation?.readonly"
 			type="datetime-local" />
 		<div v-if="canBeCleared" class="icon-close make-empty" @click="emptyValue" />
