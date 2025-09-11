@@ -46,8 +46,8 @@ export default class DatetimeColumn extends AbstractDatetimeColumn {
 				return super.getNextSortsResult(nextSorts, rowA, rowB)
 			}
 
-			const valueA = new Moment(tmpA, 'YYY-MM-DD HH:mm')
-			const valueB = new Moment(tmpB, 'YYY-MM-DD HH:mm')
+			const valueA = new Moment(tmpA, 'YYYY-MM-DD HH:mm')
+			const valueB = new Moment(tmpB, 'YYYY-MM-DD HH:mm')
 			return (valueA.diff(valueB)) * factor || super.getNextSortsResult(nextSorts, rowA, rowB)
 		}
 	}
@@ -59,11 +59,12 @@ export default class DatetimeColumn extends AbstractDatetimeColumn {
 
 	isFilterFound(cell, filter) {
 		const filterValue = filter.magicValuesEnriched ? filter.magicValuesEnriched : filter.value
-		const filterDate = new Moment(filterValue, 'YYY-MM-DD HH:mm')
-		const valueDate = new Moment(cell.value, 'YYY-MM-DD HH:mm')
+		const filterDate = new Moment(filterValue, 'YYYY-MM-DD HH:mm')
+		const valueDate = new Moment(cell.value, 'YYYY-MM-DD HH:mm')
 
 		const filterMethod = {
 			[FilterIds.IsEqual]() { return filterDate.isSame(valueDate) },
+			[FilterIds.IsNotEqual]() { return !filterDate.isSame(valueDate) },
 			[FilterIds.IsGreaterThan]() { return filterDate.isBefore(valueDate) },
 			[FilterIds.IsGreaterThanOrEqual]() { return filterDate.isSameOrBefore(valueDate) },
 			[FilterIds.IsLowerThan]() { return filterDate.isAfter(valueDate) },

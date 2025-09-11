@@ -266,7 +266,7 @@ class RowService extends SuperService {
 				}
 
 				// Only handle simple equality filters for now
-				if (!in_array($filter['operator'], ['is-equal'])) {
+				if (!in_array($filter['operator'], ['is-equal', 'is-not-equal'])) {
 					continue;
 				}
 

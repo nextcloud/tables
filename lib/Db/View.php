@@ -141,7 +141,7 @@ class View extends EntitySuper implements JsonSerializable {
 
 	/**
 	 * @psalm-suppress MismatchingDocblockReturnType
-	 * @return list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>
+	 * @return list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>
 	 */
 	public function getFilterArray():array {
 		$filters = $this->getArray($this->getFilter());
