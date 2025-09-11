@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description">
+	<RowFormWrapper :title="column.title" :mandatory="column.viewColumnInformation?.mandatory ?? column.mandatory" :description="column.description">
 		<div class="align-center">
 			<NcButton type="tertiary" :aria-label="t('tables', 'Reduce stars')" :disabled="column.viewColumnInformation?.readonly || localValue <= 0" @click="less">
 				<template #icon>

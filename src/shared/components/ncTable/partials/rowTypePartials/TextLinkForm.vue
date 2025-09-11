@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :loading="isLoadingResults">
+	<RowFormWrapper :title="column.title" :mandatory="column.viewColumnInformation?.mandatory ?? column.mandatory" :description="column.description" :loading="isLoadingResults">
 		<div class="row">
 			<div v-if="providers?.length === 0" class="col-4">
 				<NcNoteCard type="info">
