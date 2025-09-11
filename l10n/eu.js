@@ -327,6 +327,7 @@ OC.L10N.register(
     "Could not load link providers." : "Ezin izan dira esteka hornitzaileak kargatu.",
     "Allowed types" : "Baimendutako motak",
     "Copy link" : "Kopiatu esteka",
+    "Open link" : "Ireki esteka",
     "Show fullscreen" : "Erakutsi pantaila osoan",
     "Close editor" : "Itxi editorea",
     "Go to previous page" : "Itzuli aurreko orrira",
