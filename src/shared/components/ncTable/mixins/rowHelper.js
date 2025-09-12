@@ -10,6 +10,7 @@ export default {
 		isValueValidForColumn(value, column) {
 			const type = column?.type?.split('-')[0]
 			const columnTypeDefault = type + 'Default'
+
 			if (column.type === ColumnTypes.Selection) {
 				if (
 					(value instanceof Array && value.length > 0)
@@ -30,7 +31,8 @@ export default {
 		checkMandatoryFields(row) {
 			let mandatoryFieldsEmpty = false
 			this.columns.forEach(col => {
-				if (col.mandatory) {
+				const isMandatory = col.viewColumnInformation?.mandatory ?? col.mandatory
+				if (isMandatory) {
 					const validValue = this.isValueValidForColumn(row[col.id], col)
 					mandatoryFieldsEmpty = mandatoryFieldsEmpty || !validValue
 				}

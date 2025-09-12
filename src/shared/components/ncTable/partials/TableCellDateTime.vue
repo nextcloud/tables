@@ -89,7 +89,7 @@ export default {
 		},
 
 		canBeCleared() {
-			return !this.column.mandatory
+			return !(this.column.viewColumnInformation?.mandatory ?? this.column.mandatory)
 		},
 	},
 
