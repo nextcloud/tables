@@ -10,7 +10,11 @@
 				<div v-if="hasRightHiddenNeighbor(-1)" class="hidden-indicator-first" @click="unhide(-1)" />
 			</div>
 		</th>
-		<th v-for="col in visibleColumns" :key="col.id">
+		<th v-for="col in visibleColumns" :key="col.id"
+			:style="{
+				width: col.customSettings?.width ? `${col.customSettings.width}px` : 'auto',
+				maxWidth: col.customSettings?.width ? `${col.customSettings.width}px` : 'auto',
+				minWidth: col.customSettings?.width ? `${col.customSettings.width}px` : 'auto'}">
 			<div class="cell-wrapper">
 				<div class="cell-options-wrapper">
 					<div class="cell">
@@ -139,6 +143,10 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+
+th {
+       white-space: normal;
+}
 
 .cell {
 	display: inline-flex;

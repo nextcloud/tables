@@ -169,6 +169,7 @@ class ApiTablesController extends AOCSController {
 						usergroupSelectGroups: $column['usergroupSelectGroups'],
 						usergroupSelectTeams: $column['usergroupSelectTeams'],
 						showUserStatus: $column['showUserStatus'],
+						customSettings: empty($column['customSettings']) ? null : json_encode($column['customSettings'])
 					)
 				);
 				$colMap[$column['id']] = $col->getId();

@@ -48,3 +48,6 @@ export const USERGROUP_TYPE = {
 	GROUP: 1,
 	CIRCLE: 2,
 }
+
+export const COLUMN_WIDTH_MIN = 50
+export const COLUMN_WIDTH_MAX = 1000

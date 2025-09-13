@@ -106,10 +106,11 @@ Feature: APIv1
     Given table "Column test" with emoji "🥶" exists for user "participant1" as "base1"
     Then table has at least following columns
     Then column "First column" exists with following properties
-      | type          | text                    |
-      | subtype       | line                    |
-      | mandatory     | 0                       |
-      | description   | This is a description!  |
+      | type           | text                   |
+      | subtype        | line                   |
+      | mandatory      | 0                      |
+      | description    | This is a description! |
+      | customSettings | {"width": 100} |
     Then column "Resources" exists with following properties
       | type               | text                    |
       | subtype            | link                    |
@@ -471,11 +472,11 @@ Feature: APIv1
       | mandatory     | 1                     |
       | description   | The task description  |
     Then column "category" exists with following properties
-      | type          | text                  |
-      | subtype       | line                  |
-      | mandatory     | 1                     |
-      | description   | Task category         |
-      | default       | general               |
+      | type        | text          |
+      | subtype     | line          |
+      | mandatory   | 1             |
+      | description | Task category |
+      | textDefault | general       |
     And user "participant1" create view "General Tasks" with emoji "📝" for "task-list" as "general-tasks"
     When user "participant1" sets columnSettings "task" to view "general-tasks"
     And user "participant1" sets filter to view "general-tasks"
