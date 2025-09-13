@@ -37,8 +37,8 @@
 				v-model.number="localColumnWidth"
 				type="number"
 				pattern="\d+"
-				min="20"
-				max="1000"
+				:min="COLUMN_WIDTH_MIN"
+				:max="COLUMN_WIDTH_MAX"
 				:placeholder="t('tables', 'Enter a column width between {min} and {max}', { min: COLUMN_WIDTH_MIN, max: COLUMN_WIDTH_MAX })">
 		</div>
 
@@ -148,7 +148,7 @@ export default {
 			},
 		},
 		localColumnWidth: {
-			get() { return this.customSettings.width ?? null },
+			get() { return this.customSettings?.width ?? null },
 			set(width) {
 				this.$emit('update:customSettings', { ...this.customSettings, ...{ width } })
 			},

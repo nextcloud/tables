@@ -10,11 +10,7 @@
 				<div v-if="hasRightHiddenNeighbor(-1)" class="hidden-indicator-first" @click="unhide(-1)" />
 			</div>
 		</th>
-		<th v-for="col in visibleColumns" :key="col.id"
-			:style="{
-				width: col.customSettings?.width ? `${col.customSettings.width}px` : 'auto',
-				maxWidth: col.customSettings?.width ? `${col.customSettings.width}px` : 'auto',
-				minWidth: col.customSettings?.width ? `${col.customSettings.width}px` : 'auto'}">
+		<th v-for="col in visibleColumns" :key="col.id" :style="getColumnWidthStyle(col)">
 			<div class="cell-wrapper">
 				<div class="cell-options-wrapper">
 					<div class="cell">
@@ -52,6 +48,7 @@ import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import TableHeaderColumnOptions from './TableHeaderColumnOptions.vue'
 import FilterLabel from './FilterLabel.vue'
 import { getFilterWithId } from '../mixins/filter.js'
+import { getColumnWidthStyle } from '../mixins/columnHandler.js'
 
 export default {
 
@@ -114,6 +111,7 @@ export default {
 
 	methods: {
 		getFilterWithId,
+		getColumnWidthStyle,
 		updateOpenState(columnId) {
 			this.openedColumnHeaderMenus[columnId] = !this.openedColumnHeaderMenus[columnId]
 			this.openedColumnHeaderMenus = Object.assign({}, this.openedColumnHeaderMenus)

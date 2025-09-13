@@ -8,10 +8,7 @@
 			<NcCheckboxRadioSwitch :checked="selected" @update:checked="v => $emit('update-row-selection', { rowId: row.id, value: v })" />
 		</td>
 		<td v-for="col in visibleColumns" :key="col.id"
-			:style="{
-				width: col.customSettings?.width ? `${col.customSettings.width}px` : 'auto',
-				maxWidth: col.customSettings?.width ? `${col.customSettings.width}px` : 'auto',
-				minWidth: col.customSettings?.width ? `${col.customSettings.width}px` : 'auto'}"
+			:style="getColumnWidthStyle(col)"
 			:class="{
 				'search-result': getCell(col.id)?.searchStringFound,
 				'filter-result': getCell(col.id)?.filterFound,
@@ -51,7 +48,7 @@ import TableCellSelection from './TableCellSelection.vue'
 import TableCellMultiSelection from './TableCellMultiSelection.vue'
 import TableCellTextRich from './TableCellEditor.vue'
 import TableCellUsergroup from './TableCellUsergroup.vue'
-import { ColumnTypes } from './../mixins/columnHandler.js'
+import { ColumnTypes, getColumnWidthStyle } from './../mixins/columnHandler.js'
 import { translate as t } from '@nextcloud/l10n'
 import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
@@ -125,6 +122,7 @@ export default {
 	},
 	methods: {
 		t,
+		getColumnWidthStyle,
 		handleCellClick(column) {
 			// If the column type doesn't support inline editing, trigger the edit modal
 			if (this.nonInlineEditableColumnTypes.includes(column.type) && this.config.canEditRows) {
