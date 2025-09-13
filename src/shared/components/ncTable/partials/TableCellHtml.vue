@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="cell-editor tables-tiptap-wrapper">
+	<div class="cell-editor tables-tiptap-wrapper" :style="{ opacity: !canEditCell() ? 0.6 : 1 }">
 		<div v-if="!isEditing" @click="handleStartEditing">
 			<EditorContent :editor="editor" />
 		</div>

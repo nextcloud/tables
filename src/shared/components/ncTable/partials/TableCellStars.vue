@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="cell-stars">
+	<div class="cell-stars" :style="{ opacity: !canEditCell() ? 0.6 : 1 }">
 		<div v-if="!isEditing" @click="startEditing">
 			<div class="stars-display">
 				{{ getValue }}

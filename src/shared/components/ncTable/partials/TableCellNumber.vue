@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="cell-number">
+	<div class="cell-number" :style="{ opacity: !canEditCell() ? 0.6 : 1 }">
 		<div v-if="!isEditing" class="number-display" @click="startEditing">
 			{{ column.numberPrefix }}{{ getValue }}{{ column.numberSuffix }}
 		</div>

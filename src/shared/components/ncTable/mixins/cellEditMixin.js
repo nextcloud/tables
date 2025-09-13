@@ -47,6 +47,11 @@ export default {
 				return false
 			}
 
+			// Prevent editing for readonly columns
+			if (this.isView && this.column?.viewColumnInformation?.readonly) {
+				return false
+			}
+
 			return true
 		},
 
