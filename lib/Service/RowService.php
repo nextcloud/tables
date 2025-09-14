@@ -413,12 +413,12 @@ class RowService extends SuperService {
 	}
 
 	private function isValueValidForMandatoryColumn($value, Column $column, IColumnTypeBusiness $columnBusiness): bool {
-		if ($value === null || $value === '' || $value === []) {
+		if ($value === null || $value === '') {
 			return false;
 		}
 		if ($column->getType() === 'selection') {
-			if (is_array($value) && count($value) > 0) {
-				return true;
+			if (is_array($value)) {
+				return count($value) > 0;
 			}
 			if (is_numeric($value) && $value > 0) {
 				return true;
@@ -426,13 +426,13 @@ class RowService extends SuperService {
 			return $column->getSelectionDefault() !== null && $column->getSelectionDefault() !== '';
 		}
 		if ($column->getType() === 'selection-multi') {
-			if (is_array($value) && count($value) > 0) {
-				return true;
+			if (is_array($value)) {
+				return count($value) > 0;
 			}
 			$defaultValue = $column->getSelectionDefault();
 			return $defaultValue !== null && $defaultValue !== '' && $defaultValue !== '[]';
 		}
-		return $value !== null && $value !== '';
+		return $value !== null && $value !== '' && $value !== [];
 	}
 
 	/**
