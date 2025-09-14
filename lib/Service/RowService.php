@@ -291,11 +291,23 @@ class RowService extends SuperService {
 	}
 
 	/**
+	 * @return array<int, true>
+	 */
+	private function extractMandatoryColumns(View $view): array {
+		$columnSettings = $view->getColumnsSettingsArray();
+		return array_reduce($columnSettings, static function (array $carry, ViewColumnInformation $column) {
+			$carry[$column->getId()] = $column->isMandatory();
+			return $carry;
+		}, []);
+	}
+
+	/**
 	 * @throws InternalError
 	 * @throws BadRequestError
 	 */
 	private function cleanupAndValidateData(RowDataInput $data, array $columns, ?int $tableId, ?int $viewId, ?int $rowId = null): RowDataInput {
 		$readOnlyColumns = $viewId ? $this->extractReadOnlyColumns($this->viewMapper->find($viewId)) : [];
+		$mandatoryColumns = $viewId ? $this->extractMandatoryColumns($this->viewMapper->find($viewId)) : [];
 
 		$out = new RowDataInput();
 		foreach ($data as $entry) {
@@ -327,7 +339,100 @@ class RowService extends SuperService {
 			$out->add((int)$entry['columnId'], $this->parseValueByColumnType($column, $entry['value']));
 		}
 
+		if ($viewId && !empty($mandatoryColumns)) {
+			$this->validateMandatoryColumns($mandatoryColumns, $out, $columns, $rowId);
+		}
+
 		return $out;
+	}
+
+	/**
+	 * @param array<int, true> $mandatoryColumns
+	 * @param RowDataInput $data
+	 * @param Column[] $columns
+	 * @param int|null $rowId
+	 * @throws BadRequestError
+	 * @throws InternalError
+	 */
+	private function validateMandatoryColumns(array $mandatoryColumns, RowDataInput $data, array $columns, ?int $rowId = null): void {
+		foreach ($mandatoryColumns as $columnId => $isMandatory) {
+			if (!$isMandatory) {
+				continue;
+			}
+
+			$column = $this->getColumnFromColumnsArray($columnId, $columns);
+			if (!$column) {
+				continue;
+			}
+
+			$hasValue = false;
+			$value = null;
+
+			foreach ($data as $entry) {
+				if ($entry['columnId'] === $columnId) {
+					$value = $entry['value'];
+					$hasValue = true;
+					break;
+				}
+			}
+
+			if (!$hasValue && $rowId !== null) {
+				try {
+					$existingRow = $this->getRowById($rowId);
+					$existingData = $existingRow->getData();
+					foreach ($existingData as $existingEntry) {
+						if ($existingEntry['columnId'] === $columnId) {
+							$value = $existingEntry['value'];
+							$hasValue = true;
+							break;
+						}
+					}
+				} catch (NotFoundError|InternalError $e) {
+
+				}
+			}
+
+			if ($hasValue) {
+				try {
+					$columnBusiness = $this->getColumnBusiness($column);
+					$isValid = $this->isValueValidForMandatoryColumn($value, $column, $columnBusiness);
+					if (!$isValid) {
+						throw new BadRequestError(
+							'Mandatory column "' . $column->getTitle() . '" cannot be empty or invalid.'
+						);
+					}
+				} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+					$this->logger->debug('Column type business class not found for mandatory validation', ['exception' => $e]);
+				}
+			} else {
+				throw new BadRequestError(
+					'Mandatory column "' . $column->getTitle() . '" cannot be empty.'
+				);
+			}
+		}
+	}
+
+	private function isValueValidForMandatoryColumn($value, Column $column, IColumnTypeBusiness $columnBusiness): bool {
+		if ($value === null || $value === '' || $value === []) {
+			return false;
+		}
+		if ($column->getType() === 'selection') {
+			if (is_array($value) && count($value) > 0) {
+				return true;
+			}
+			if (is_numeric($value) && $value > 0) {
+				return true;
+			}
+			return $column->getSelectionDefault() !== null && $column->getSelectionDefault() !== '';
+		}
+		if ($column->getType() === 'selection-multi') {
+			if (is_array($value) && count($value) > 0) {
+				return true;
+			}
+			$defaultValue = $column->getSelectionDefault();
+			return $defaultValue !== null && $defaultValue !== '' && $defaultValue !== '[]';
+		}
+		return $value !== null && $value !== '';
 	}
 
 	/**
