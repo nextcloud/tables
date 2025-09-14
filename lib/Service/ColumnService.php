@@ -336,6 +336,7 @@ class ColumnService extends SuperService {
 			$item->setUsergroupSelectGroups($columnDto->getUsergroupSelectGroups());
 			$item->setUsergroupSelectTeams($columnDto->getUsergroupSelectTeams());
 			$item->setShowUserStatus($columnDto->getShowUserStatus());
+			$item->setCustomSettings($columnDto->getCustomSettings());
 
 			$this->updateMetadata($item, $userId);
 			return $this->enhanceColumn($this->mapper->update($item));

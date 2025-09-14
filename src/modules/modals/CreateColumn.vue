@@ -13,8 +13,10 @@
 					<MainForm :description.sync="column.description"
 						:mandatory.sync="column.mandatory"
 						:title.sync="column.title"
+						:custom-settings.sync="column.customSettings"
 						:selected-views.sync="column.selectedViews"
-						:title-missing-error="titleMissingError" />
+						:title-missing-error="titleMissingError"
+						:width-invalid-error="widthInvalidError" />
 				</div>
 				<div class="fix-col-2" style="display: block">
 					<div class="row no-padding-on-mobile space-L">
@@ -114,6 +116,7 @@ import UsergroupForm from '../../shared/components/ncTable/partials/columnTypePa
 import { useTablesStore } from '../../store/store.js'
 import { useDataStore } from '../../store/data.js'
 import { mapActions } from 'pinia'
+import { COLUMN_WIDTH_MAX, COLUMN_WIDTH_MIN } from '../../shared/constants.js'
 
 export default {
 	name: 'CreateColumn',
@@ -187,10 +190,12 @@ export default {
 				usergroupSelectGroups: false,
 				usergroupSelectTeams: false,
 				showUserStatus: false,
+				customSettings: {},
 			},
 			textAppAvailable: !!window.OCA?.Text?.createEditor,
 			addNewAfterSave: false,
 			typeMissingError: false,
+			widthInvalidError: false,
 			titleMissingError: false,
 			typeOptions: [
 				{ id: 'text', label: t('tables', 'Text') },
@@ -287,6 +292,10 @@ export default {
 			if (!this.column.title) {
 				showInfo(t('tables', 'Please insert a title for the new column.'))
 				this.titleMissingError = true
+			} else if (this.column.customSettings?.width
+				&& (this.column.customSettings?.width < COLUMN_WIDTH_MIN || this.column.customSettings?.width > COLUMN_WIDTH_MAX)) {
+				showError(t('tables', 'Cannot save column. Column width must be between {min} and {max}.', { min: COLUMN_WIDTH_MIN, max: COLUMN_WIDTH_MAX }))
+				this.widthInvalidError = true
 			} else if (this.column.type === null) {
 				this.titleMissingError = false
 				showInfo(t('tables', 'You need to select a type for the new column.'))
@@ -321,6 +330,7 @@ export default {
 				mandatory: this.column.mandatory,
 				viewId: this.isView ? this.element.id : null,
 				tableId: !this.isView ? this.element.id : null,
+				customSettings: { width: this.column.customSettings.width },
 			}
 			if (this.combinedType === ColumnTypes.TextLine) {
 				data.textUnique = this.column.textUnique
@@ -410,6 +420,7 @@ export default {
 				usergroupSelectGroups: false,
 				usergroupSelectTeams: false,
 				showUserStatus: false,
+				customSettings: {},
 			}
 			if (mainForm) {
 				this.column.title = ''
@@ -424,6 +435,7 @@ export default {
 				this.column.selectedViews = []
 			}
 			this.titleMissingError = false
+			this.widthInvalidError = false
 			this.typeMissingError = false
 		},
 	},

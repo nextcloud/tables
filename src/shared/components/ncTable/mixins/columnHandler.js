@@ -18,3 +18,9 @@ export const ColumnTypes = {
 	Datetime: 'datetime',
 	Usergroup: 'usergroup',
 }
+
+export function getColumnWidthStyle(column) {
+	const width = column.customSettings?.width ? `min(${column.customSettings.width}px, 90vw)` : null
+
+	return width ? { width, maxWidth: width, minWidth: width } : null
+}

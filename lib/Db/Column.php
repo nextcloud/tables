@@ -82,6 +82,8 @@ use OCA\Tables\Service\ValueObject\ViewColumnInformation;
  * @method setShowUserStatus(?bool $showUserStatus)
  * @method getViewColumnInformation(): ViewColumnInformation
  * @method setViewColumnInformation(ViewColumnInformation $viewColumnInformation)
+ * @method getCustomSettings(): ?string
+ * @method setCustomSettings(?string $customSettings)
  */
 class Column extends EntitySuper implements JsonSerializable {
 	// Meta column types
@@ -146,6 +148,7 @@ class Column extends EntitySuper implements JsonSerializable {
 	protected ?bool $usergroupSelectGroups = null;
 	protected ?bool $usergroupSelectTeams = null;
 	protected ?bool $showUserStatus = null;
+	protected ?string $customSettings = null;
 
 	// virtual properties
 	protected ?string $createdByDisplayName = null;
@@ -175,6 +178,8 @@ class Column extends EntitySuper implements JsonSerializable {
 		$this->addType('usergroupSelectGroups', 'boolean');
 		$this->addType('usergroupSelectTeams', 'boolean');
 		$this->addType('showUserStatus', 'boolean');
+
+		$this->addType('customSettings', 'string');
 	}
 
 	public static function isValidMetaTypeId(int $metaTypeId): bool {
@@ -213,6 +218,7 @@ class Column extends EntitySuper implements JsonSerializable {
 		$column->setUsergroupSelectGroups($data->getUsergroupSelectGroups());
 		$column->setUsergroupSelectTeams($data->getUsergroupSelectTeams());
 		$column->setShowUserStatus($data->getShowUserStatus());
+		$column->setCustomSettings($data->getCustomSettings());
 		return $column;
 	}
 
@@ -292,6 +298,11 @@ class Column extends EntitySuper implements JsonSerializable {
 			'usergroupSelectGroups' => $this->usergroupSelectGroups,
 			'usergroupSelectTeams' => $this->usergroupSelectTeams,
 			'showUserStatus' => $this->showUserStatus,
+			'customSettings' => $this->getCustomSettingsArray() ?: new \stdClass(),
 		];
+	}
+
+	public function getCustomSettingsArray(): array {
+		return json_decode($this->customSettings, true) ?: [];
 	}
 }

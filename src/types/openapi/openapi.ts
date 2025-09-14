@@ -903,6 +903,10 @@ export type components = {
                 readonly order: number;
                 readonly readonly: boolean;
             } | null;
+            readonly customSettings: {
+                /** Format: int64 */
+                readonly width: number;
+            } | null;
         };
         readonly Context: {
             /** Format: int64 */
@@ -2603,6 +2607,13 @@ export interface operations {
                      * @default []
                      */
                     readonly selectedViewIds?: readonly number[] | null;
+                    /**
+                     * @description Custom settings for the column
+                     * @default {}
+                     */
+                    readonly customSettings?: {
+                        readonly [key: string]: Record<string, never>;
+                    };
                 };
             };
         };
@@ -2848,6 +2859,13 @@ export interface operations {
                      * @default []
                      */
                     readonly selectedViewIds?: readonly number[] | null;
+                    /**
+                     * @description Custom settings for the column
+                     * @default {}
+                     */
+                    readonly customSettings?: {
+                        readonly [key: string]: Record<string, never>;
+                    };
                 };
             };
         };
@@ -3046,6 +3064,13 @@ export interface operations {
                     readonly usergroupSelectTeams?: boolean | null;
                     /** @description Whether to show the user's status, if column type is usergroup */
                     readonly usergroupShowUserStatus?: boolean | null;
+                    /**
+                     * @description Custom settings for the column
+                     * @default {}
+                     */
+                    readonly customSettings?: {
+                        readonly [key: string]: Record<string, never>;
+                    };
                 };
             };
         };
@@ -4977,6 +5002,13 @@ export interface operations {
                      * @enum {string}
                      */
                     readonly baseNodeType?: "table" | "view";
+                    /**
+                     * @description Custom settings for the column
+                     * @default {}
+                     */
+                    readonly customSettings?: {
+                        readonly [key: string]: Record<string, never>;
+                    };
                 };
             };
         };
@@ -5120,6 +5152,13 @@ export interface operations {
                      * @enum {string}
                      */
                     readonly baseNodeType?: "table" | "view";
+                    /**
+                     * @description Custom settings for the column
+                     * @default {}
+                     */
+                    readonly customSettings?: {
+                        readonly [key: string]: Record<string, never>;
+                    };
                 };
             };
         };
@@ -5253,6 +5292,13 @@ export interface operations {
                      * @enum {string}
                      */
                     readonly baseNodeType?: "table" | "view";
+                    /**
+                     * @description Custom settings for the column
+                     * @default {}
+                     */
+                    readonly customSettings?: {
+                        readonly [key: string]: Record<string, never>;
+                    };
                 };
             };
         };
@@ -5387,6 +5433,13 @@ export interface operations {
                      * @enum {string}
                      */
                     readonly baseNodeType?: "table" | "view";
+                    /**
+                     * @description Custom settings for the column
+                     * @default {}
+                     */
+                    readonly customSettings?: {
+                        readonly [key: string]: Record<string, never>;
+                    };
                 };
             };
         };
@@ -5537,6 +5590,13 @@ export interface operations {
                      * @enum {string}
                      */
                     readonly baseNodeType?: "table" | "view";
+                    /**
+                     * @description Custom settings for the column
+                     * @default {}
+                     */
+                    readonly customSettings?: {
+                        readonly [key: string]: Record<string, never>;
+                    };
                 };
             };
         };
