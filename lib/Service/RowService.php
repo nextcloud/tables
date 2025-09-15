@@ -282,32 +282,29 @@ class RowService extends SuperService {
 	/**
 	 * @return array<int, true>
 	 */
-	private function extractReadOnlyColumns(View $view): array {
-		$columnSettings = $view->getColumnsSettingsArray();
-		return array_reduce($columnSettings, static function (array $carry, ViewColumnInformation $column) {
-			$carry[$column->getId()] = $column->isReadonly();
-			return $carry;
-		}, []);
+	private function extractColumnsByProperty(View $view, string $property): array {
+		return array_reduce(
+			$view->getColumnsSettingsArray(),
+			static function (array $carry, ViewColumnInformation $column) use ($property) {
+				if (method_exists($column, $property) && $column->{$property}()) {
+					$carry[$column->getId()] = true;
+				}
+				return $carry;
+			},
+			[]
+		);
 	}
 
 	/**
-	 * @return array<int, true>
-	 */
-	private function extractMandatoryColumns(View $view): array {
-		$columnSettings = $view->getColumnsSettingsArray();
-		return array_reduce($columnSettings, static function (array $carry, ViewColumnInformation $column) {
-			$carry[$column->getId()] = $column->isMandatory();
-			return $carry;
-		}, []);
-	}
-
-	/**
+	 * @param  RowDataInput $data
 	 * @throws InternalError
 	 * @throws BadRequestError
+	 * @return RowDataInput
 	 */
 	private function cleanupAndValidateData(RowDataInput $data, array $columns, ?int $tableId, ?int $viewId, ?int $rowId = null): RowDataInput {
-		$readOnlyColumns = $viewId ? $this->extractReadOnlyColumns($this->viewMapper->find($viewId)) : [];
-		$mandatoryColumns = $viewId ? $this->extractMandatoryColumns($this->viewMapper->find($viewId)) : [];
+		$view = $viewId ? $this->viewMapper->find($viewId) : null;
+		$readOnlyColumns = $view ? $this->extractColumnsByProperty($view, 'isReadonly') : [];
+		$mandatoryColumns = $view ? $this->extractColumnsByProperty($view, 'isMandatory') : [];
 
 		$out = new RowDataInput();
 		foreach ($data as $entry) {
@@ -340,21 +337,29 @@ class RowService extends SuperService {
 		}
 
 		if ($viewId && !empty($mandatoryColumns)) {
-			$this->validateMandatoryColumns($mandatoryColumns, $out, $columns, $rowId);
+			$existingRow = null;
+			if ($rowId !== null) {
+				try {
+					$existingRow = $this->getRowById($rowId);
+				} catch (NotFoundError|InternalError $e) {
+					$this->logger->debug('Could not load existing row for mandatory validation', ['rowId' => $rowId, 'exception' => $e]);
+				}
+			}
+			$this->validateMandatoryColumns($mandatoryColumns, $out, $columns, $existingRow);
 		}
 
 		return $out;
 	}
 
 	/**
-	 * @param array<int, true> $mandatoryColumns
+	 * @param array<int, bool> $mandatoryColumns
 	 * @param RowDataInput $data
 	 * @param Column[] $columns
-	 * @param int|null $rowId
+	 * @param Row2|null $existingRow
 	 * @throws BadRequestError
 	 * @throws InternalError
 	 */
-	private function validateMandatoryColumns(array $mandatoryColumns, RowDataInput $data, array $columns, ?int $rowId = null): void {
+	private function validateMandatoryColumns(array $mandatoryColumns, RowDataInput $data, array $columns, ?Row2 $existingRow = null): void {
 		foreach ($mandatoryColumns as $columnId => $isMandatory) {
 			if (!$isMandatory) {
 				continue;
@@ -376,19 +381,13 @@ class RowService extends SuperService {
 				}
 			}
 
-			if (!$hasValue && $rowId !== null) {
-				try {
-					$existingRow = $this->getRowById($rowId);
-					$existingData = $existingRow->getData();
-					foreach ($existingData as $existingEntry) {
-						if ($existingEntry['columnId'] === $columnId) {
-							$value = $existingEntry['value'];
-							$hasValue = true;
-							break;
-						}
+			if (!$hasValue && $existingRow !== null) {
+				foreach ($existingRow->getData() as $existingEntry) {
+					if ($existingEntry['columnId'] === $columnId) {
+						$value = $existingEntry['value'];
+						$hasValue = true;
+						break;
 					}
-				} catch (NotFoundError|InternalError $e) {
-
 				}
 			}
 
