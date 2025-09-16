@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<RowFormWrapper :title="column.title" :mandatory="column.viewColumnInformation?.mandatory ?? column.mandatory" :description="column.description" :width="2">
+	<RowFormWrapper :title="column.title" :mandatory="isMandatoryField" :description="column.description" :width="2">
 		<NcDateTimePickerNative
 			id="datetime-time-picker"
 			v-model="localValue"
@@ -18,12 +18,14 @@
 import { NcDateTimePickerNative } from '@nextcloud/vue'
 import Moment from '@nextcloud/moment'
 import RowFormWrapper from './RowFormWrapper.vue'
+import rowHelper from '../../mixins/rowHelper'
 
 export default {
 	components: {
 		NcDateTimePickerNative,
 		RowFormWrapper,
 	},
+	mixins: [rowHelper],
 	props: {
 		column: {
 			type: Object,
@@ -39,8 +41,11 @@ export default {
 		}
 	},
 	computed: {
+		isMandatoryField() {
+			return this.isMandatory(this.column)
+		},
 		canBeCleared() {
-			return !this.column.viewColumnInformation?.readonly && !this.column.mandatory
+			return !this.column.viewColumnInformation?.readonly && !this.isMandatoryField
 		},
 		localValue: {
 			get() {
