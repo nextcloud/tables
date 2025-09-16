@@ -154,7 +154,7 @@ export default {
 		saveText() {
 			if (this.createView) {
 				return t('tables', 'Create View')
-			} else if (this.viewSettings) {
+			} else if (this.viewSetting) {
 				return t('tables', 'Save modified View')
 			} else {
 				return t('tables', 'Save View')
