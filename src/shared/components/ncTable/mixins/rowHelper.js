@@ -13,45 +13,53 @@ export default {
 			return viewInfo.mandatory ?? column?.mandatory ?? false
 		},
 		isValueValidForColumn(value, column) {
+			switch (column.type) {
+			case ColumnTypes.Datetime:
+			case ColumnTypes.DatetimeDate:
+			case ColumnTypes.DatetimeTime:
+				return this.isDatetimeValueValid(value, column)
+			case ColumnTypes.Selection:
+				return this.isSelectionValueValid(value, column)
+			case ColumnTypes.MultiSelection:
+				return this.isMultiSelectionValueValid(value, column)
+			default:
+				return this.isStandardValueValid(value, column)
+			}
+		},
+		getColumnTypeDefault(column) {
 			const type = column?.type?.split('-')[0]
-			const columnTypeDefault = type + 'Default'
-			let hasDefaultValue
+			return type + 'Default'
+		},
+		isDatetimeValueValid(value, column) {
+			 const columnTypeDefault = this.getColumnTypeDefault(column)
 
-			// Datetime types ('none' counts as empty)
-			if ([
-				ColumnTypes.Datetime,
-				ColumnTypes.DatetimeDate,
-			].includes(column.type)) {
-				return !value || value === 'none'
-					? !this.isMandatory(column) || (!!column[columnTypeDefault] && column[columnTypeDefault] !== 'none')
-					: !isNaN(Date.parse(value))
+			if (!value || value === 'none') {
+				return !this.isMandatory(column) || (!!column[columnTypeDefault] && column[columnTypeDefault] !== 'none')
 			}
-
 			if (column.type === ColumnTypes.DatetimeTime) {
-				return !value || value === 'none'
-					? !this.isMandatory(column) || (!!column[columnTypeDefault] && column[columnTypeDefault] !== 'none')
-					: Moment(value, 'HH:mm', true).isValid()
+				return Moment(value, 'HH:mm', true).isValid()
 			}
+			return !isNaN(Date.parse(value))
+		},
+		isSelectionValueValid(value, column) {
+			 const columnTypeDefault = this.getColumnTypeDefault(column)
 
-			// Single selection types (value must be non-empty or default exists)
-			if (column.type === ColumnTypes.Selection) {
-				if (
-					(value instanceof Array && value.length > 0)
-					|| (value === parseInt(value))
-				) {
-					return true
-				}
-				hasDefaultValue = columnTypeDefault in column && !(['', 'null'].includes(column[columnTypeDefault]))
-				return hasDefaultValue
+			if ((value instanceof Array && value.length > 0) || (value === parseInt(value))) {
+				return true
 			}
+			const hasDefaultValue = columnTypeDefault in column && !(['', 'null'].includes(column[columnTypeDefault]))
+			return hasDefaultValue
+		},
+		isMultiSelectionValueValid(value, column) {
+			const columnTypeDefault = this.getColumnTypeDefault(column)
 
-			// Multi selection types (array must have items or default exists)
-			if (column.type === ColumnTypes.SelectionMulti) {
-				hasDefaultValue = columnTypeDefault in column && column[columnTypeDefault] !== '[]'
-				return (value instanceof Array && value.length > 0) || hasDefaultValue
-			}
-			// Standard check for other types (non-empty value or default exists)
-			hasDefaultValue = columnTypeDefault in column && !(['', null].includes(column[columnTypeDefault]))
+			const hasDefaultValue = columnTypeDefault in column && column[columnTypeDefault] !== '[]'
+			return (value instanceof Array && value.length > 0) || hasDefaultValue
+		},
+		isStandardValueValid(value, column) {
+			const columnTypeDefault = this.getColumnTypeDefault(column)
+
+			const hasDefaultValue = columnTypeDefault in column && !(['', null].includes(column[columnTypeDefault]))
 			return (!!value || value === 0) || hasDefaultValue
 		},
 
