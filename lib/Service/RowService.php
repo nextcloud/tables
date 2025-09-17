@@ -296,7 +296,7 @@ class RowService extends SuperService {
 	}
 
 	/**
-	 * @param  RowDataInput $data
+	 * @param RowDataInput $data
 	 * @throws InternalError
 	 * @throws BadRequestError
 	 * @return RowDataInput
