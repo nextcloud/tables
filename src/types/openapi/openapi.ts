@@ -902,6 +902,7 @@ export type components = {
                 /** Format: int64 */
                 readonly order: number;
                 readonly readonly: boolean;
+                readonly mandatory: boolean;
             } | null;
             readonly customSettings: {
                 /** Format: int64 */
