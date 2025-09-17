@@ -113,6 +113,8 @@ OC.L10N.register(
     "Hide column" : "Схаваць слупок",
     "Undo" : "Адрабіць",
     "Redo" : "Узнавіць",
+    "Bold" : "Тоўсты",
+    "Italic" : "Курсіў",
     "Code" : "Код",
     "Column width" : "Шырыня слупка",
     "Enter a column width between {min} and {max}" : "Увядзіце шырыню слупка ад {min} да {max}",
