@@ -70,6 +70,7 @@ import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandle
 import { emit } from '@nextcloud/event-bus'
 import { useTablesStore } from '../../store/store.js'
 import { useDataStore } from '../../store/data.js'
+import { TYPE_META_ID } from '../../shared/constants.js'
 
 export default {
 	name: 'ImportPreview',
@@ -116,10 +117,17 @@ export default {
 				return []
 			}
 
-			return this.existingColumns.map(column => ({
+			const columns = this.existingColumns.map(column => ({
 				id: column.id,
 				label: column.title,
 			}))
+
+			columns.unshift({
+				id: TYPE_META_ID,
+				label: t('tables', 'ID (Meta)'),
+			})
+
+			return columns
 		},
 	},
 

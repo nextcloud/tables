@@ -64,7 +64,7 @@ class RowController extends Controller {
 			$columnId,
 			$data
 		) {
-			return $this->service->updateSet($id, $viewId, ['columnId' => $columnId, 'value' => $data], $this->userId);
+			return $this->service->updateSet($id, $viewId, ['columnId' => $columnId, 'value' => $data], $this->userId, null);
 		});
 	}
 
@@ -73,18 +73,13 @@ class RowController extends Controller {
 		int $id,
 		?int $viewId,
 		array $data,
-
 	): DataResponse {
 		return $this->handleError(function () use (
 			$id,
 			$viewId,
 			$data
 		) {
-			return $this->service->updateSet(
-				$id,
-				$viewId,
-				$data,
-				$this->userId);
+			return $this->service->updateSet($id, $viewId, $data, $this->userId, null);
 		});
 	}
 

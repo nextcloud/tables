@@ -937,6 +937,8 @@ export type components = {
             /** Format: int64 */
             readonly inserted_rows_count: number;
             /** Format: int64 */
+            readonly updated_rows_count: number;
+            /** Format: int64 */
             readonly errors_parsing_count: number;
             /** Format: int64 */
             readonly errors_count: number;
