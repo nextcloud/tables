@@ -183,9 +183,6 @@ export default {
 			}
 
 			this.$set(column.viewColumnInformation, 'readonly', readonly)
-			if (readonly) {
-				this.$set(column.viewColumnInformation, 'mandatory', false)
-			}
 		},
 		onMandatoryChanged(columnId, mandatory) {
 			const column = this.mutableColumns.find(col => col.id === columnId)
@@ -196,9 +193,6 @@ export default {
 			}
 
 			this.$set(column.viewColumnInformation, 'mandatory', mandatory)
-			if (mandatory) {
-				this.$set(column.viewColumnInformation, 'readonly', false)
-			}
 		},
 		async dragEnd(goalIndex) {
 			if (this.draggedItem === null) return
