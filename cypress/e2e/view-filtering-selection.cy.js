@@ -128,7 +128,7 @@ describe('Filtering in a view by selection columns', () => {
 
 		// ## update view
 		cy.intercept({ method: 'PUT', url: '**/apps/tables/view/*' }).as('updateView')
-		cy.contains('button', 'Save View').click()
+		cy.contains('button', 'Save modified View').click()
 		cy.wait('@updateView')
 
 		// # check for expected rows
