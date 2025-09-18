@@ -466,6 +466,7 @@ OC.L10N.register(
     "Set now as default" : "Nastavit nyní jako výchozí",
     "Enter a column title" : "Zadejte název sloupce",
     "Mandatory" : "Povinné",
+    "Column width" : "Šířka sloupce",
     "Add column to other views" : "Přidat sloupec do ostatních pohledů",
     "The default value is lower than the minimum allowed value." : "Výchozí hodnota je nižší než minimální povolená.",
     "The default value is greater than the maximum allowed value." : "Výchozí hodnota je vyšší než maximálně povolená.",

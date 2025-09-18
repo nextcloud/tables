@@ -129,6 +129,7 @@ OC.L10N.register(
     "Select" : "Выбраць",
     "Insert" : "Уставіць",
     "Me (name)" : "Я (імя)",
+    "Now" : "Зараз",
     "Clipboard is not available" : "Буфер абмену недаступны",
     "Unknown error." : "Невядомая памылка."
 },
