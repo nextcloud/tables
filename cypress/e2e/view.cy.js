@@ -18,7 +18,7 @@ describe('Interact with views', () => {
 		cy.visit('apps/tables')
 
 		cy.createTable('View test table')
-		cy.createTextLineColumn('title', null, null, true)
+		cy.createTextLineColumn('title', null, null, false)
 		cy.createSelectionColumn('selection', ['sel1', 'sel2', 'sel3', 'sel4'], null, false)
 
 		// add row
