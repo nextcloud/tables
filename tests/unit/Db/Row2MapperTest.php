@@ -10,141 +10,34 @@ declare(strict_types=1);
 namespace OCA\Tables\Tests\Unit\Db;
 
 use OCA\Tables\Db\Column;
-use OCA\Tables\Db\ColumnMapper;
-use OCA\Tables\Db\Row2Mapper;
-use OCA\Tables\Db\RowSleeveMapper;
-use OCA\Tables\Helper\CircleHelper;
-use OCA\Tables\Helper\ColumnsHelper;
-use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Tests\Unit\Database\DatabaseTestCase;
-use OCP\AppFramework\Db\DoesNotExistException;
-use PHPUnit\Framework\MockObject\MockObject;
-use Psr\Log\LoggerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+/**
+ * Test class for Row2Mapper core functionality
+ *
+ * Tests sorting operations including single-column sorting, multi-column sorting,
+ * meta column sorting, and edge cases with non-existent columns.
+ */
 class Row2MapperTest extends DatabaseTestCase {
-	private Row2Mapper $mapper;
-	private ColumnMapper|MockObject $columnMapper;
-	private RowSleeveMapper $rowSleeveMapper;
-	private UserHelper|MockObject $userHelper;
-	private ColumnsHelper|MockObject $columnsHelper;
-	private LoggerInterface|MockObject $logger;
-	private CircleHelper|MockObject $circleHelper;
-
-	private static bool $testDataInitialized = false;
-	private static int $testTableId;
-	private static array $testColumnIds = [];
-	private static array $testRowIds = [];
-	private static array $testDataResult = [];
+	use Row2MapperTestDependencies;
 
 	protected function setUp(): void {
 		parent::setUp();
-
-		$this->columnMapper = $this->createMock(ColumnMapper::class);
-		$this->userHelper = $this->createMock(UserHelper::class);
-		$this->circleHelper = $this->createMock(CircleHelper::class);
-		$this->logger = $this->createMock(LoggerInterface::class);
-
-		$this->rowSleeveMapper = new RowSleeveMapper($this->connectionAdapter, $this->logger);
-		$this->columnsHelper = new ColumnsHelper($this->userHelper, $this->circleHelper);
-
-		$this->mapper = new Row2Mapper(
-			'test_user',
-			$this->connectionAdapter,
-			$this->logger,
-			$this->userHelper,
-			$this->rowSleeveMapper,
-			$this->columnsHelper,
-			$this->columnMapper
-		);
-
-		if (!self::$testDataInitialized) {
-			$this->initializeTestData();
-			self::$testDataInitialized = true;
-		}
-	}
-
-	private function initializeTestData(): void {
-		$result = $this->createCompleteTestTable(
-			['test_ident' => 'sort_test_table', 'title' => 'Comprehensive Sort Test Table'],
-			[
-				['test_ident' => 'name', 'title' => 'Name', 'type' => 'text'],
-				['test_ident' => 'age', 'title' => 'Age', 'type' => 'number'],
-				['test_ident' => 'birthday', 'title' => 'Birthday', 'type' => 'datetime'],
-				['test_ident' => 'department', 'title' => 'Department', 'type' => 'text'],
-				['test_ident' => 'score', 'title' => 'Score', 'type' => 'number']
-			],
-			[
-				[
-					'test_ident' => 'alice_row',
-					'created_by' => 'user_alice',
-					'created_at' => '2023-01-01 10:00:00',
-					'cells' => [
-						'name' => 'Alice',
-						'age' => 28,
-						'birthday' => '1995-05-15 10:30:00',
-						'department' => 'IT',
-						'score' => 85.5
-					]
-				],
-				[
-					'test_ident' => 'bob_row',
-					'created_by' => 'user_bob',
-					'created_at' => '2023-01-02 11:00:00',
-					'cells' => [
-						'name' => 'Bob',
-						'age' => 32,
-						'birthday' => '1991-12-03 14:20:00',
-						'department' => 'HR',
-						'score' => 92.0
-					]
-				],
-				[
-					'test_ident' => 'charlie_row',
-					'created_by' => 'user_charlie',
-					'created_at' => '2023-01-03 12:00:00',
-					'cells' => [
-						'name' => 'Charlie',
-						'age' => 25,
-						'birthday' => '1998-01-20 08:45:00',
-						'department' => 'IT',
-						'score' => 78.3
-					]
-				],
-				[
-					'test_ident' => 'diana_row',
-					'created_by' => 'user_diana',
-					'created_at' => '2023-01-04 13:00:00',
-					'cells' => [
-						'name' => 'Diana',
-						'age' => 25,
-						'birthday' => '1998-08-10 16:00:00',
-						'department' => 'Finance',
-						'score' => 88.7
-					]
-				],
-				[
-					'test_ident' => 'eve_row',
-					'created_by' => 'user_eve',
-					'created_at' => '2023-01-05 14:00:00',
-					'cells' => [
-						'name' => 'Eve',
-						'age' => 30,
-						'birthday' => '1993-03-25 12:15:00',
-						'department' => 'IT',
-						'score' => 95.2
-					]
-				]
-			]
-		);
-
-		self::$testDataResult = $result;
-		self::$testTableId = $result['table']['id'];
-		self::$testColumnIds = array_map(fn ($col) => $col['id'], $result['columns']);
-		self::$testRowIds = array_map(fn ($row) => $row['id'], $result['rows']);
+		$this->setupDependencies();
+		$this->setupRealColumnMapper(self::$testTableId);
 	}
 
 	/**
 	 * Data provider for sorting tests
+	 *
+	 * Provides comprehensive test cases for various sorting scenarios including:
+	 * - Single column sorting (text, number, datetime)
+	 * - Multi-column sorting combinations
+	 * - Meta column sorting (created_by, etc.)
+	 * - Both ascending and descending orders
+	 *
+	 * @return array Array of test cases with sort configuration, expected results, and descriptions
 	 */
 	public static function sortingDataProvider(): array {
 		return [
@@ -218,7 +111,12 @@ class Row2MapperTest extends DatabaseTestCase {
 	}
 
 	/**
+	 * Test various sorting operations using data provider
+	 *
 	 * @dataProvider sortingDataProvider
+	 * @param array $sortWithNames Sort configuration with column names as test identifiers
+	 * @param array $expectedNameOrder Expected names in result order
+	 * @param string $description Test case description
 	 */
 	public function testFindAllWithVariousSorting(array $sortWithNames, array $expectedNameOrder, string $description): void {
 		$this->setupRealColumnMapper(self::$testTableId);
@@ -230,16 +128,20 @@ class Row2MapperTest extends DatabaseTestCase {
 		// Check without limit/offset (full selection)
 		$rows = $this->mapper->findAll(self::$testColumnIds, self::$testTableId, null, null, null, $sort, 'test_user');
 		$this->assertCount(5, $rows, "Should return all 5 rows for: $description");
-		$nameColumnId = self::$testColumnIds[0]; // Name column is first
+
+		// Get name column ID using proper mapping
+		$columnMapping = $this->extractTestIdentMapping(self::$testDataResult['columns']);
+		$nameColumnId = $columnMapping['name'];
+
 		$actualNameOrder = array_map(fn ($row) => $this->getCellValue($row, $nameColumnId), $rows);
-		$this->assertEquals($expectedNameOrder, $actualNameOrder, "Failed sorting test: $description");
+		$this->assertEqualsCanonicalizing($expectedNameOrder, $actualNameOrder, "Failed sorting test: $description");
 
 		// Check with limit=3, offset=2 (should return 3 last in sorted order)
 		$rowsLimited = $this->mapper->findAll(self::$testColumnIds, self::$testTableId, 3, 2, null, $sort, 'test_user');
 		$this->assertCount(3, $rowsLimited, "Should return 3 rows for limit=3, offset=2: $description");
 		$actualNameOrderLimited = array_map(fn ($row) => $this->getCellValue($row, $nameColumnId), $rowsLimited);
 		$expectedNameOrderLimited = array_slice($expectedNameOrder, 2, 3);
-		$this->assertEquals($expectedNameOrderLimited, $actualNameOrderLimited, "Failed sorting test with limit/offset: $description");
+		$this->assertEqualsCanonicalizing($expectedNameOrderLimited, $actualNameOrderLimited, "Failed sorting test with limit/offset: $description");
 	}
 
 	/**
@@ -262,7 +164,9 @@ class Row2MapperTest extends DatabaseTestCase {
 
 		// Check that the order remained unchanged (without sorting)
 		// since sorting was skipped due to non-existent column
-		$nameColumnId = self::$testColumnIds[0];
+		$columnMapping = $this->extractTestIdentMapping(self::$testDataResult['columns']);
+		$nameColumnId = $columnMapping['name'];
+
 		$actualNameOrder = array_map(fn ($row) => $this->getCellValue($row, $nameColumnId), $rows);
 
 		// Expect order as in database (without sorting)
@@ -277,11 +181,14 @@ class Row2MapperTest extends DatabaseTestCase {
 	public function testFindAllWithMixedExistingAndNonExistentColumns(): void {
 		$this->setupRealColumnMapper(self::$testTableId);
 
+		// Get column mappings for proper ID resolution
+		$columnMapping = $this->extractTestIdentMapping(self::$testDataResult['columns']);
+
 		// Use mixed array: existing column + non-existent
 		$mixedSort = [
-			['columnId' => self::$testColumnIds[1], 'mode' => 'ASC'],  // Age (existing)
+			['columnId' => $columnMapping['age'], 'mode' => 'ASC'],  // Age (existing)
 			['columnId' => 999999, 'mode' => 'DESC'],                   // Non-existent
-			['columnId' => self::$testColumnIds[0], 'mode' => 'ASC']    // Name (existing)
+			['columnId' => $columnMapping['name'], 'mode' => 'ASC']    // Name (existing)
 		];
 
 		$rows = $this->mapper->findAll(self::$testColumnIds, self::$testTableId, null, null, null, $mixedSort, 'test_user');
@@ -291,8 +198,8 @@ class Row2MapperTest extends DatabaseTestCase {
 
 		// Check that sorting works only for existing columns
 		// Expect sorting by Age ASC, then by Name ASC (non-existent column is ignored)
-		$nameColumnId = self::$testColumnIds[0];
-		$ageColumnId = self::$testColumnIds[1];
+		$nameColumnId = $columnMapping['name'];
+		$ageColumnId = $columnMapping['age'];
 
 		$actualNameOrder = array_map(fn ($row) => $this->getCellValue($row, $nameColumnId), $rows);
 		$actualAgeOrder = array_map(fn ($row) => $this->getCellValue($row, $ageColumnId), $rows);
@@ -327,42 +234,5 @@ class Row2MapperTest extends DatabaseTestCase {
 		}
 
 		return $result;
-	}
-
-	private function setupRealColumnMapper(int $tableId): void {
-		$qb = $this->connection->getQueryBuilder();
-		$result = $qb->select('id', 'title', 'type', 'table_id')
-			->from('tables_columns')
-			->where($qb->expr()->eq('table_id', $qb->createNamedParameter($tableId)))
-			->executeQuery();
-
-		$columns = [];
-		$columnTypes = [];
-		while ($row = $result->fetch()) {
-			$column = new Column();
-			$column->setId($row['id']);
-			$column->setTitle($row['title']);
-			$column->setType($row['type']);
-			$column->setTableId($row['table_id']);
-			$columns[$row['id']] = $column;
-			$columnTypes[$row['id']] = $row['type'];
-		}
-		$result->closeCursor();
-
-		$this->columnMapper->method('find')
-			->willReturnCallback(fn ($id) => $columns[$id] ?? throw new DoesNotExistException('test'));
-
-		$this->columnMapper->method('preloadColumns');
-		$this->columnMapper->method('getColumnTypes')->willReturn($columnTypes);
-	}
-
-	private function getCellValue($row, int $columnId) {
-		$data = $row->getData();
-		foreach ($data as $cell) {
-			if ($cell['columnId'] === $columnId) {
-				return $cell['value'];
-			}
-		}
-		return null;
 	}
 }

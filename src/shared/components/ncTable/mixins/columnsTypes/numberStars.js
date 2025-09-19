@@ -33,6 +33,7 @@ export default class NumberStarsColumn extends AbstractNumberColumn {
 
 		const filterMethod = {
 			[FilterIds.IsEqual]() { return parseInt(cell.value ? cell.value : 0) === parseInt(filterValue) },
+			[FilterIds.IsNotEqual]() { return parseInt(cell.value ? cell.value : 0) !== parseInt(filterValue) },
 			[FilterIds.IsGreaterThan]() { return parseInt(cell.value ? cell.value : 0) > parseInt(filterValue) },
 			[FilterIds.IsGreaterThanOrEqual]() { return parseInt(cell.value ? cell.value : 0) >= parseInt(filterValue) },
 			[FilterIds.IsLowerThan]() { return parseInt(cell.value ? cell.value : 0) < parseInt(filterValue) },
