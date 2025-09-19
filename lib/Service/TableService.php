@@ -10,6 +10,8 @@
 namespace OCA\Tables\Service;
 
 use DateTime;
+use OCA\Tables\Activity\ActivityManager;
+use OCA\Tables\Activity\ChangeSet;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
@@ -52,6 +54,7 @@ class TableService extends SuperService {
 		protected IAppManager $appManager,
 		protected IL10N $l,
 		protected Defaults $themingDefaults,
+		private ActivityManager $activityManager,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 	}
@@ -296,6 +299,13 @@ class TableService extends SuperService {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
+		$this->activityManager->triggerEvent(
+			objectType: ActivityManager::TABLES_OBJECT_TABLE,
+			object: $table,
+			subject: ActivityManager::SUBJECT_TABLE_CREATE,
+			additionalParams: [],
+			author: $userId
+		);
 		return $table;
 	}
 
@@ -436,6 +446,13 @@ class TableService extends SuperService {
 		$event = new TableDeletedEvent(table: $item);
 
 		$this->eventDispatcher->dispatchTyped($event);
+		$this->activityManager->triggerEvent(
+			objectType: ActivityManager::TABLES_OBJECT_TABLE,
+			object: $item,
+			subject: ActivityManager::SUBJECT_TABLE_DELETE,
+			additionalParams: [],
+			author: $userId
+		);
 
 		return $item;
 	}
@@ -469,6 +486,7 @@ class TableService extends SuperService {
 			throw new PermissionError('PermissionError: can not update table with id ' . $id);
 		}
 
+		$changes = new ChangeSet($table);
 		$time = new DateTime();
 		if ($title !== null) {
 			$table->setTitle($title);
@@ -496,6 +514,12 @@ class TableService extends SuperService {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
+		$changes->setAfter($table);
+		$this->activityManager->triggerUpdateEvents(
+			objectType: ActivityManager::TABLES_OBJECT_TABLE,
+			changeSet: $changes,
+			subject: ActivityManager::SUBJECT_TABLE_UPDATE
+		);
 		return $table;
 	}
 
