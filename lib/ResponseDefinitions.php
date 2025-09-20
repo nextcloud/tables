@@ -136,6 +136,7 @@ namespace OCA\Tables;
  *     columnId: int,
  *     order: int,
  *     readonly: bool,
+ *     mandatory: bool,
  *  },
  *  customSettings: ?array{
  *     width: int,

@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description">
+	<RowFormWrapper :title="column.title" :mandatory="column.viewColumnInformation?.mandatory ?? column.mandatory" :description="column.description">
 		<div class="row">
 			<div class="fix-col-4">
 				<NcEditor v-if="!showBigEditorModal" :can-edit="!column.viewColumnInformation?.readonly" :text.sync="localValue" height="small" />

@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<RowFormWrapper :title="column.title" :mandatory="column.mandatory" :description="column.description" :width="2">
+	<RowFormWrapper :title="column.title" :mandatory="isMandatoryField" :description="column.description" :width="2">
 		<NcDateTimePickerNative id="datetime-date-picker" v-model="localValue" :readonly="column.viewColumnInformation?.readonly"
 			type="date" />
 		<div v-if="canBeCleared" class="icon-close make-empty" @click="emptyValue" />
@@ -14,12 +14,14 @@
 import { NcDateTimePickerNative } from '@nextcloud/vue'
 import Moment from '@nextcloud/moment'
 import RowFormWrapper from './RowFormWrapper.vue'
+import rowHelper from '../../mixins/rowHelper'
 
 export default {
 	components: {
 		NcDateTimePickerNative,
 		RowFormWrapper,
 	},
+	mixins: [rowHelper],
 	props: {
 		column: {
 			type: Object,
@@ -35,8 +37,11 @@ export default {
 		}
 	},
 	computed: {
+		isMandatoryField() {
+			return this.isMandatory(this.column)
+		},
 		canBeCleared() {
-			return !this.column.viewColumnInformation?.readonly && !this.column.mandatory
+			return !this.column.viewColumnInformation?.readonly && !this.isMandatoryField
 		},
 		localValue: {
 			get() {
@@ -51,9 +56,13 @@ export default {
 				}
 			},
 			set(v) {
+				// For datetime fields: emit `null` for mandatory fields because they must have a valid value.
+				// Optional datetime fields can use `"none"` to indicate the value has been cleared.
 				if (v === 'none') {
-					this.$emit('update:value', v)
-				} else if (v) {
+					this.$emit('update:value', this.isMandatoryField ? null : 'none')
+				} else if (!v) {
+					this.$emit('update:value', this.isMandatoryField ? null : 'none')
+				} else {
 					this.$emit('update:value', Moment(v).format('YYYY-MM-DD'))
 				}
 			},
@@ -61,7 +70,7 @@ export default {
 	},
 	methods: {
 		emptyValue() {
-			this.localValue = 'none'
+			this.localValue = this.isMandatoryField ? null : 'none'
 		},
 	},
 }

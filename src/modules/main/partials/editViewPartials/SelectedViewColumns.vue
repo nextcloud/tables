@@ -23,7 +23,10 @@
 					:checked="selectedColumns.includes(column.id)"
 					class="display-checkbox"
 					@update:checked="onToggle(column.id)" />
-				<span :class="{ 'title-readonly': column.viewColumnInformation?.readonly }">{{ column.title }}</span>
+				<span :class="{ 'title-readonly': column.viewColumnInformation?.readonly }">
+					{{ column.title }}
+					<span v-if="column.viewColumnInformation?.mandatory || column.mandatory" class="mandatory-indicator">*</span>
+				</span>
 				<div v-if="column.id < 0" class="meta-info">
 					({{ t('tables', 'Metadata') }})
 				</div>
@@ -31,12 +34,23 @@
 
 			<div class="row-elements actions">
 				<NcActions v-if="column.id > 0" data-cy="customColumnAction">
+					<!-- Read only -->
 					<NcActionCheckbox
 						v-if="selectedColumns.includes(column.id)"
 						data-cy="columnReadonlyCheckbox"
 						:checked="column.viewColumnInformation?.readonly"
+						:disabled="column.viewColumnInformation?.mandatory ?? column.mandatory"
 						@change="onReadonlyChanged(column.id, $event.target.checked)">
 						{{ t('tables', 'Read only') }}
+					</NcActionCheckbox>
+					<!-- Mandatory -->
+					<NcActionCheckbox
+						v-if="selectedColumns.includes(column.id)"
+						data-cy="columnMandatoryCheckbox"
+						:checked="column.viewColumnInformation?.mandatory ?? column.mandatory"
+						:disabled="column.viewColumnInformation?.readonly"
+						@change="onMandatoryChanged(column.id, $event.target.checked)">
+						{{ t('tables', 'Mandatory') }}
 					</NcActionCheckbox>
 				</NcActions>
 			</div>
@@ -112,6 +126,22 @@ export default {
 			startDragIndex: null,
 		}
 	},
+	watch: {
+		columns: {
+			handler(newColumns) {
+				this.mutableColumns = newColumns
+			},
+			deep: true,
+			immediate: true,
+		},
+		selectedColumns: {
+			handler(newSelectedColumns) {
+				this.mutableSelectedColumns = newSelectedColumns
+			},
+			deep: true,
+			immediate: true,
+		},
+	},
 	methods: {
 		isLocallyRemoved(columnId) {
 			if (!this.viewColumnIds || !this.generatedColumnIds) return false
@@ -146,9 +176,23 @@ export default {
 		},
 		onReadonlyChanged(columnId, readonly) {
 			const column = this.mutableColumns.find(col => col.id === columnId)
-			if (column) {
-				column.viewColumnInformation.readonly = readonly
+			if (!column) return
+
+			if (!column.viewColumnInformation) {
+				this.$set(column, 'viewColumnInformation', {})
 			}
+
+			this.$set(column.viewColumnInformation, 'readonly', readonly)
+		},
+		onMandatoryChanged(columnId, mandatory) {
+			const column = this.mutableColumns.find(col => col.id === columnId)
+			if (!column) return
+
+			if (!column.viewColumnInformation) {
+				this.$set(column, 'viewColumnInformation', {})
+			}
+
+			this.$set(column.viewColumnInformation, 'mandatory', mandatory)
 		},
 		async dragEnd(goalIndex) {
 			if (this.draggedItem === null) return
@@ -248,5 +292,12 @@ export default {
 
 .locallyRemoved {
 	background-color: var(--color-error-hover);
+}
+
+.mandatory-indicator {
+  color: var(--color-error);
+  margin-left: 4px;
+  font-size: 16px;
+  line-height: 1;
 }
 </style>
