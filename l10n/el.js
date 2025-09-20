@@ -407,6 +407,7 @@ OC.L10N.register(
     "Copy link" : "Αντιγραφή συνδέσμου",
     "Show fullscreen" : "Προβολή πλήρους οθόνης",
     "Close editor" : "Κλείσιμο του επεξεργαστή",
+    "Go to previous page" : "Μετάβαση στην προηγούμενη σελίδα",
     "Create Row" : "Δημιουργία Γραμμής",
     "Export CSV" : "Εξαγωγή CSV",
     "Uncheck all" : "Αποεπιλογή όλων",
