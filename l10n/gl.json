@@ -25,6 +25,7 @@
     "table" : "táboa",
     "table view" : "vista da táboa",
     "This column was automatically created by the import service." : "Esta columna foi creada automaticamente polo servizo de importación.",
+    "Column \"%s\" contains a non-unique value." : "A columna «%s» contén un valor non único.",
     "Welcome to %s Tables!" : "Dámoslle a benvida a Táboas de %s!",
     "ToDo list" : "Lista de tarefas pendentes",
     "Setup a simple todo-list." : "Estabeleza unha sinxela lista de tarefas.",
