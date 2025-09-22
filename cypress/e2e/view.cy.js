@@ -3,7 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 let localUser
-const title = 'Test view'
+const firstTitle = 'Test view'
+const secondTitle = 'Test view 2'
+const thirdTitle = 'Test view 3'
+const fourthTitle = 'Test view 4'
 
 describe('Interact with views', () => {
 
@@ -52,8 +55,10 @@ describe('Interact with views', () => {
 		cy.get('[data-cy="editTableModal"] [data-cy="editTableDeleteBtn"]').click()
 		cy.get('[data-cy="editTableModal"] [data-cy="editTableConfirmDeleteBtn"]').click()
 		cy.wait(10).get('.toastify.toast-success').should('be.visible')
-		cy.get('[data-cy="navigationTableItem"]').contains('View test table').should('not.exist')
-		cy.get('[data-cy="navigationTableItem"]').contains(title).should('not.exist')
+		cy.get('[data-cy="navigationTableItem"]').contains(firstTitle).should('not.exist')
+		cy.get('[data-cy="navigationTableItem"]').contains(secondTitle).should('not.exist')
+		cy.get('[data-cy="navigationTableItem"]').contains(thirdTitle).should('not.exist')
+		cy.get('[data-cy="navigationTableItem"]').contains(fourthTitle).should('not.exist')
 	})
 
 	it('Create view and insert rows in the view', () => {
@@ -62,7 +67,7 @@ describe('Interact with views', () => {
 		// create view
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('[data-cy="dataTableCreateViewBtn"]').contains('Create view').click({ force: true })
-		cy.get('[data-cy="viewSettingsDialogSection"] input').type(title)
+		cy.get('[data-cy="viewSettingsDialogSection"] input').type(firstTitle)
 
 		// ## add filter
 		cy.get('[data-cy="filterFormFilterGroupBtn"]').contains('Add new filter group').click()
@@ -79,7 +84,7 @@ describe('Interact with views', () => {
 		cy.get('[data-cy="modifyViewBtn"]').contains('Create View').click()
 		cy.wait('@createView')
 		cy.wait('@updateView')
-		cy.get('[data-cy="navigationViewItem"]').contains(title).should('exist')
+		cy.get('[data-cy="navigationViewItem"]').contains(firstTitle).should('exist')
 
 		const expected = ['sevenths row', 'second row']
 		expected.forEach(item => {
@@ -104,7 +109,7 @@ describe('Interact with views', () => {
 		// create view
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('[data-cy="dataTableCreateViewBtn"]').contains('Create view').click({ force: true })
-		cy.get('[data-cy="viewSettingsDialogSection"] input').type(title)
+		cy.get('[data-cy="viewSettingsDialogSection"] input').type(secondTitle)
 
 		// ## save view
 		cy.intercept({ method: 'POST', url: '**/apps/tables/view' }).as('createView')
@@ -112,7 +117,7 @@ describe('Interact with views', () => {
 		cy.get('[data-cy="modifyViewBtn"]').contains('Create View').click()
 		cy.wait('@createView')
 		cy.wait('@updateView')
-		cy.get('[data-cy="navigationViewItem"]').contains(title).should('exist')
+		cy.get('[data-cy="navigationViewItem"]').contains(secondTitle).should('exist')
 
 		// Update rows in the view
 		cy.get('[data-cy="customTableRow"]').contains('first row').closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
@@ -130,7 +135,7 @@ describe('Interact with views', () => {
 		// create view
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('[data-cy="dataTableCreateViewBtn"]').contains('Create view').click({ force: true })
-		cy.get('[data-cy="viewSettingsDialogSection"] input').type(title)
+		cy.get('[data-cy="viewSettingsDialogSection"] input').type(thirdTitle)
 
 		// trigger three dot menu and select readonly
 		cy.contains('.column-entry', 'title').find('[data-cy="customColumnAction"] button').click({ force: true })
@@ -143,7 +148,7 @@ describe('Interact with views', () => {
 		cy.wait('@createView')
 		cy.wait('@updateView')
 
-		cy.get('[data-cy="navigationViewItem"]').contains(title).should('exist')
+		cy.get('[data-cy="navigationViewItem"]').contains(thirdTitle).should('exist')
 
 		// TODO: Make sure that column is readonly during edit
 		// cy.get('[data-cy="customTableRow"]').contains('first row').closest('[data-cy="customTableRow"]').find('[data-cy="editRowBtn"]').click()
@@ -157,7 +162,7 @@ describe('Interact with views', () => {
 		// create view
 		cy.get('[data-cy="customTableAction"] button').click()
 		cy.get('[data-cy="dataTableCreateViewBtn"]').contains('Create view').click({ force: true })
-		cy.get('[data-cy="viewSettingsDialogSection"] input').type(title)
+		cy.get('[data-cy="viewSettingsDialogSection"] input').type(fourthTitle)
 
 		// ## save view
 		cy.intercept({ method: 'POST', url: '**/apps/tables/view' }).as('createView')
@@ -165,7 +170,7 @@ describe('Interact with views', () => {
 		cy.get('[data-cy="modifyViewBtn"]').contains('Create View').click()
 		cy.wait('@createView')
 		cy.wait('@updateView')
-		cy.get('[data-cy="navigationViewItem"]').contains(title).should('exist')
+		cy.get('[data-cy="navigationViewItem"]').contains(fourthTitle).should('exist')
 		cy.get('.icon-loading').should('not.exist')
 
 		// Delete the first row (whatever it is)
