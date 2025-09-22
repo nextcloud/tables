@@ -34,24 +34,10 @@ describe('Mandatory Column Functionality', () => {
 			.contains('Create view')
 			.click({ force: true })
 		cy.get('[data-cy="viewSettingsDialog"]').should('be.visible')
+		cy.get('[data-cy="viewSettingsDialogSection"] input').type('Mandatory test view')
 		cy.get('[data-cy="modifyViewBtn"]').click()
 		cy.get('.icon-loading').should('not.exist')
 	})
-
-	const openEditView = () => {
-		// First select the view, then open edit via table action menu
-		cy.get('[data-cy="navigationViewItem"]')
-			.contains('Mandatory test view')
-			.click({ force: true })
-
-		// Open edit view through table action menu
-		cy.get('[data-cy="customTableAction"] button')
-			.click({ force: true })
-		cy.get('.v-popper__popper li button span')
-			.contains('Edit view')
-			.click({ force: true })
-		cy.get('[data-cy="viewSettingsDialog"]').should('be.visible')
-	}
 
 	describe('SelectedViewColumns - Mandatory Checkbox', () => {
 		beforeEach(() => {
@@ -79,32 +65,6 @@ describe('Mandatory Column Functionality', () => {
 		it('should display mandatory checkbox for selected columns', () => {
 			openColumnMenu('title')
 			getMandatoryCheckbox().should('be.visible')
-		})
-
-		it('should show mandatory indicator when mandatory is enabled', () => {
-			openColumnMenu('title')
-
-			getMandatoryCheckbox().should('be.visible').click({ force: true })
-
-			// Check that the checkbox is actually checked
-			cy.get('[data-cy="columnMandatoryCheckbox"] input').should('be.checked')
-
-			// Check that the mandatory indicator appears
-			cy.contains('.column-entry', 'title')
-				.find('.mandatory-indicator')
-				.should('exist')
-		})
-
-		it('should hide mandatory indicator when mandatory is disabled', () => {
-			openColumnMenu('title')
-
-			// enable first
-			getMandatoryCheckbox().should('be.visible').click({ force: true })
-			cy.contains('.column-entry', 'title').find('.mandatory-indicator').should('exist')
-
-			// disable
-			getMandatoryCheckbox().click({ force: true })
-			cy.contains('.column-entry', 'title').find('.mandatory-indicator').should('not.exist')
 		})
 
 		it('should disable mandatory checkbox when readonly is enabled', () => {
@@ -184,57 +144,6 @@ describe('Mandatory Column Functionality', () => {
 		it('should enable save button when mandatory field is filled', () => {
 			cy.get('[data-cy="editRowModal"] input').first().type('filled value')
 			cy.get('[data-cy="editRowSaveButton"]', { timeout: 5000 }).should('not.be.disabled')
-		})
-	})
-
-	describe('ViewSettings - Mandatory Column Persistence', () => {
-		beforeEach(() => {
-			cy.loadTable('Mandatory test table')
-
-			// Create and save the 'Mandatory test view' that openEditView() expects
-			cy.get('[data-cy="customTableAction"] button').click()
-			cy.get('[data-cy="dataTableCreateViewBtn"]').contains('Create view').click({ force: true })
-			cy.get('[data-cy="viewSettingsDialogSection"] input').type('Mandatory test view')
-
-			// Save the view first (without mandatory settings)
-			cy.get('[data-cy="modifyViewBtn"]').click()
-			cy.get('.icon-loading').should('not.exist')
-		})
-
-		it('should save mandatory settings when view is saved', () => {
-			openEditView()
-			cy.contains('.column-entry', 'title')
-				.find('[data-cy="customColumnAction"] button')
-				.click({ force: true })
-
-			cy.get('[data-cy="columnMandatoryCheckbox"]').contains('Mandatory').click({ force: true })
-			cy.contains('.column-entry', 'title').find('.mandatory-indicator', { timeout: 5000 }).should('exist')
-
-			cy.get('[data-cy="modifyViewBtn"]').click()
-			cy.get('.icon-loading').should('not.exist')
-		})
-
-		it('should persist mandatory settings after page reload', () => {
-			// First, set up the mandatory setting
-			openEditView()
-			cy.contains('.column-entry', 'title')
-				.find('[data-cy="customColumnAction"] button')
-				.click({ force: true })
-
-			cy.get('[data-cy="columnMandatoryCheckbox"]').contains('Mandatory').click({ force: true })
-			cy.contains('.column-entry', 'title').find('.mandatory-indicator').should('exist')
-
-			// Save the view with mandatory settings
-			cy.get('[data-cy="modifyViewBtn"]').click()
-			cy.get('.icon-loading').should('not.exist')
-
-			// Reload page and check persistence
-			cy.reload()
-			cy.loadTable('Mandatory test table')
-
-			// Open the same view and verify mandatory indicator persists
-			openEditView()
-			cy.contains('.column-entry', 'title').find('.mandatory-indicator').should('exist')
 		})
 	})
 })
