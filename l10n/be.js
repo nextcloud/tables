@@ -93,6 +93,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Няма рэкамендацый. Пачніце друкаваць.",
     "Permissions" : "Дазволы",
     "Delete data" : "Выдаліць даныя",
+    "Promote to table manager" : "Прызначыць менеджарам табліцы",
     "Ownership" : "Уласнасць",
     "Sharing" : "Абагульванне",
     "API" : "API",

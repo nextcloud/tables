@@ -405,6 +405,7 @@ OC.L10N.register(
     "This field is mandatory" : "Αυτό το πεδίο είναι υποχρεωτικό",
     "You can not insert any links in this field. Please configure at least one link provider in the column configuration." : "Δεν μπορείτε να εισάγετε συνδέσμους σε αυτό το πεδίο. Παρακαλούμε ρυθμίστε τουλάχιστον έναν πάροχο συνδέσμων στη διαμόρφωση της στήλης.",
     "Copy link" : "Αντιγραφή συνδέσμου",
+    "Open link" : "Άνοιγμα συνδέσμου",
     "Show fullscreen" : "Προβολή πλήρους οθόνης",
     "Close editor" : "Κλείσιμο του επεξεργαστή",
     "Go to previous page" : "Μετάβαση στην προηγούμενη σελίδα",
