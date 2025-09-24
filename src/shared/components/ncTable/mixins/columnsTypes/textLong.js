@@ -26,6 +26,7 @@ export default class TextLongColumn extends AbstractTextColumn {
 
 		const filterMethod = {
 			[FilterIds.Contains]() { return cell.value.includes(filterValue) },
+			[FilterIds.DoesNotContain]() { return !cell.value.includes(filterValue) },
 			[FilterIds.IsEmpty]() { return !cell.value },
 		}[filter.operator.id]
 		return super.isFilterFound(filterMethod, cell)

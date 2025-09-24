@@ -1047,7 +1047,7 @@ export type components = {
                 /** Format: int64 */
                 readonly columnId: number;
                 /** @enum {string} */
-                readonly operator: "begins-with" | "ends-with" | "contains" | "is-equal" | "is-greater-than" | "is-greater-than-or-equal" | "is-lower-than" | "is-lower-than-or-equal" | "is-empty";
+                readonly operator: "begins-with" | "ends-with" | "contains" | "does-not-contain" | "is-equal" | "is-not-equal" | "is-greater-than" | "is-greater-than-or-equal" | "is-lower-than" | "is-lower-than-or-equal" | "is-empty";
                 readonly value: string | number;
             }[])[];
             readonly isShared: boolean;
@@ -1698,7 +1698,7 @@ export interface operations {
                             /** Format: int64 */
                             readonly columnId: number;
                             /** @enum {string} */
-                            readonly operator: "begins-with" | "ends-with" | "contains" | "is-equal" | "is-greater-than" | "is-greater-than-or-equal" | "is-lower-than" | "is-lower-than-or-equal" | "is-empty";
+                            readonly operator: "begins-with" | "ends-with" | "contains" | "does-not-contain" | "is-equal" | "is-not-equal" | "is-greater-than" | "is-greater-than-or-equal" | "is-lower-than" | "is-lower-than-or-equal" | "is-empty";
                             readonly value: string | number;
                         };
                     };

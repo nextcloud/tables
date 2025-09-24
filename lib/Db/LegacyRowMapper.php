@@ -101,7 +101,7 @@ class LegacyRowMapper extends QBMapper {
 	/**
 	 * @param (float|int|string)[][] $filterGroup
 	 *
-	 * @psalm-param list<array{columnId: int, operator: 'begins-with'|'contains'|'ends-with'|'is-empty'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal', value: float|int|string}> $filterGroup
+	 * @psalm-param list<array{columnId: int, operator: 'begins-with'|'contains'|'does-not-contain'|'ends-with'|'is-empty'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal', value: float|int|string}> $filterGroup
 	 */
 	private function getInnerFilterExpressions(IQueryBuilder $qb, array $filterGroup, int $groupIndex): array {
 		$innerFilterExpressions = [];
@@ -114,7 +114,7 @@ class LegacyRowMapper extends QBMapper {
 	/**
 	 * @param (float|int|string)[][][] $filters
 	 *
-	 * @psalm-param non-empty-list<list<array{columnId: int, operator: 'begins-with'|'contains'|'ends-with'|'is-empty'|'is-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal', value: float|int|string}>> $filters
+	 * @psalm-param non-empty-list<list<array{columnId: int, operator: 'begins-with'|'contains'|'does-not-contain'|'ends-with'|'is-empty'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal', value: float|int|string}>> $filters
 	 */
 	private function getFilterGroups(IQueryBuilder $qb, array $filters): array {
 		$filterGroups = [];

@@ -66,8 +66,12 @@ class SuperColumnQB implements IColumnTypeQB {
 			case 'ends-with':
 			case 'contains':
 				return $formattedCellValue . ' LIKE :' . $searchValuePlaceHolder;
+			case 'does-not-contain':
+				return $formattedCellValue . ' NOT LIKE :' . $searchValuePlaceHolder;
 			case 'is-equal':
 				return $formattedCellValue . ' = :' . $searchValuePlaceHolder;
+			case 'is-not-equal':
+				return $formattedCellValue . ' != :' . $searchValuePlaceHolder;
 			case 'is-greater-than':
 				return $formattedCellValue . ' > :' . $searchValuePlaceHolder;
 			case 'is-greater-than-or-equal':
