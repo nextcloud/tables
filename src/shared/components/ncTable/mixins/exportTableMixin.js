@@ -21,7 +21,7 @@ export default {
 
 			const data = []
 			rows.forEach(row => {
-				const rowData = {}
+				const rowData = { ID: row.id }
 				columns.forEach(column => {
 					// if a normal column
 					if (column.id >= 0) {

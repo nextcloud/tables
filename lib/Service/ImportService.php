@@ -34,7 +34,6 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
-use Throwable;
 use TypeError;
 use function file_exists;
 use function is_string;
@@ -55,9 +54,11 @@ class ImportService extends SuperService {
 	private ?int $viewId = null;
 	private array $columns = [];
 	private bool $createUnknownColumns = true;
+	private ?int $idColumnIndex = null;
 	private int $countMatchingColumns = 0;
 	private int $countCreatedColumns = 0;
 	private int $countInsertedRows = 0;
+	private int $countUpdatedRows = 0;
 	private int $countErrors = 0;
 	private int $countParsingErrors = 0;
 
@@ -152,7 +153,7 @@ class ImportService extends SuperService {
 				$column = $this->columns[$colIndex];
 				$columns[] = $column;
 			} else {
-				$columns[] = [
+				$column = [
 					'title' => $title,
 					'type' => $this->rawColumnDataTypes[$colIndex]['type'],
 					'subtype' => $this->rawColumnDataTypes[$colIndex]['subtype'] ?? null,
@@ -160,6 +161,11 @@ class ImportService extends SuperService {
 					'numberPrefix' => $this->rawColumnDataTypes[$colIndex]['number_prefix'] ?? '',
 					'numberSuffix' => $this->rawColumnDataTypes[$colIndex]['number_suffix'] ?? '',
 				];
+				if (mb_strtolower($title) === Column::META_ID_TITLE) {
+					$column['id'] = Column::TYPE_META_ID;
+				}
+
+				$columns[] = $column;
 			}
 		}
 
@@ -179,7 +185,7 @@ class ImportService extends SuperService {
 				$colIndex = $cellIterator->getCurrentColumnIndex() - 1;
 				$column = $this->columns[$colIndex];
 
-				if (!array_key_exists($colIndex, $this->columns)) {
+				if (!array_key_exists($colIndex, $columns)) {
 					continue;
 				}
 
@@ -324,6 +330,7 @@ class ImportService extends SuperService {
 			'matching_columns_count' => $this->countMatchingColumns,
 			'created_columns_count' => $this->countCreatedColumns,
 			'inserted_rows_count' => $this->countInsertedRows,
+			'updated_rows_count' => $this->countUpdatedRows,
 			'errors_parsing_count' => $this->countParsingErrors,
 			'errors_count' => $this->countErrors,
 		];
@@ -354,7 +361,7 @@ class ImportService extends SuperService {
 
 		foreach ($worksheet->getRowIterator(2) as $row) {
 			// parse row data
-			$this->createRow($row);
+			$this->upsertRow($row);
 		}
 	}
 
@@ -387,7 +394,7 @@ class ImportService extends SuperService {
 	 * @throws MultipleObjectsReturnedException
 	 * @throws NotFoundError
 	 */
-	private function createRow(Row $row): void {
+	private function upsertRow(Row $row): void {
 		$cellIterator = $row->getCellIterator();
 		$cellIterator->setIterateOnlyExistingCells(false);
 
@@ -395,17 +402,38 @@ class ImportService extends SuperService {
 			$i = -1;
 			$data = [];
 			$hasData = false;
+			$id = null;
 			foreach ($cellIterator as $cell) {
 				$i++;
 
+				if ($this->idColumnIndex !== null && $i === $this->idColumnIndex) {
+					// if this is the ID column, we need to get the ID from the cell
+					if ($cell && $cell->getValue() !== null) {
+						$id = $cell->getValue();
+					}
+					if ($id !== null && !is_numeric($id)) {
+						$this->logger->warning('ID column value is not numeric: ' . $id);
+						$this->countErrors++;
+						return;
+					}
+					$id = (int)$id;
+					continue;
+				}
+
+				$columnKey = $i;
+				if ($this->columnsConfig && $this->idColumnIndex !== null && $i > $this->idColumnIndex) {
+					// if we have an ID column, we need to adjust the index
+					$columnKey = $i - 1;
+				}
+
 				// only add the dataset if column is known
-				if (!isset($this->columns[$i]) || $this->columns[$i] === '') {
+				if (!isset($this->columns[$columnKey]) || $this->columns[$columnKey] === '') {
 					$this->logger->debug('Column unknown while fetching rows data for importing.');
 					continue;
 				}
 
 				/** @var Column $column */
-				$column = $this->columns[$i];
+				$column = $this->columns[$columnKey];
 
 				// if cell is empty
 				if (!$cell || $cell->getValue() === null) {
@@ -446,26 +474,31 @@ class ImportService extends SuperService {
 				];
 			}
 
-			if ($hasData) {
+			if (!$hasData) {
+				$this->logger->debug('Skipped empty row ' . $row->getRowIndex() . ' during import');
+				return;
+			}
+
+			if ($id) {
+				$this->rowService->updateSet($id, $this->viewId, $data, $this->userId, $this->tableId);
+				$this->countUpdatedRows++;
+			} else {
 				$this->rowService->create($this->tableId, $this->viewId, $data);
 				$this->countInsertedRows++;
-			} else {
-				$this->logger->debug('Skipped empty row ' . $row->getRowIndex() . ' during import');
 			}
 		} catch (PermissionError $e) {
-			$this->logger->error('Could not create row while importing, no permission.', ['exception' => $e]);
+			$this->logger->error('Could not create/update row while importing, no permission.', ['exception' => $e]);
 			$this->countErrors++;
 		} catch (BadRequestError|InternalError $e) {
-			$this->logger->error('Error while creating  new row for import.', ['exception' => $e]);
+			$this->logger->error('Error while creating/updating  new row for import.', ['exception' => $e]);
 			$this->countErrors++;
 		} catch (NotFoundError $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
-		} catch (Throwable $e) {
+			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), 0, $e);
+		} catch (\Throwable $e) {
 			$this->countErrors++;
-			$this->logger->error('Error while creating new row for import.', ['exception' => $e]);
+			$this->logger->error('Error while creating/updating new row for import.', ['exception' => $e]);
 		}
-
 	}
 
 	private function valueToDateTimeImmutable(mixed $value): ?DateTimeImmutable {
@@ -522,9 +555,25 @@ class ImportService extends SuperService {
 			if ($cell && $cell->getValue() !== null && $cell->getValue() !== '') {
 				$title = $cell->getValue();
 
+				if (!$this->columnsConfig && mb_strtolower($title) === Column::META_ID_TITLE) {
+					$this->idColumnIndex = $index;
+					$titles[] = $title;
+					$dataTypes[] = $this->parseColumnDataType($secondRowCellIterator->current());
+					$secondRowCellIterator->next();
+					$index++;
+					continue;
+				}
 				if (isset($this->columnsConfig[$index]) && $this->columnsConfig[$index]['action'] === 'exist' && $this->columnsConfig[$index]['existColumn']) {
 					$title = $this->columnsConfig[$index]['existColumn']['label'];
 					$countMatchingColumnsFromConfig++;
+
+					// no need to create the ID (Meta) column as it used for update
+					if ($this->columnsConfig[$index]['existColumn']['id'] === Column::TYPE_META_ID) {
+						$this->idColumnIndex = $index;
+						$secondRowCellIterator->next();
+						$index++;
+						continue;
+					}
 				}
 				if (isset($this->columnsConfig[$index]) && $this->columnsConfig[$index]['action'] === 'new' && $this->createUnknownColumns) {
 					$column = $this->columnService->create(

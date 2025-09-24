@@ -1348,7 +1348,7 @@ class Api1Controller extends ApiController {
 		}
 
 		try {
-			return new DataResponse($this->rowService->updateSet($rowId, $viewId, $dataNew, $this->userId)->jsonSerialize());
+			return new DataResponse($this->rowService->updateSet($rowId, $viewId, $dataNew, $this->userId, null)->jsonSerialize());
 		} catch (BadRequestError $e) {
 			$this->logger->warning('An bad request was encountered: ' . $e->getMessage(), ['exception' => $e]);
 			return new DataResponse(['message' => $e->translatedMessage ?: $e->getMessage()], Http::STATUS_BAD_REQUEST);

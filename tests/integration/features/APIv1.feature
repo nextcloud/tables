@@ -249,6 +249,38 @@ Feature: APIv1
     | import-from-ms365.xlsx       |
     | import-from-libreoffice.csv  |
 
+  @api1 @import @rows
+  Scenario: Import a document file that updates existing rows
+    Given table "Import check" with emoji "👨🏻‍💻" exists for user "participant1" as "base1"
+    Then column "one" exists with following properties
+      | type        | text                   |
+      | subtype     | line                   |
+      | mandatory   | 1                      |
+      | description | This is a description! |
+    Then column "two" exists with following properties
+      | type        | number                 |
+      | mandatory   | 1                      |
+      | description | This is a description! |
+    Then row exists with following values
+      | one | AHA |
+      | two | 88  |
+    Given file "update-rows.csv" exists for user "participant1" with the following data
+      | ID      | one         | two     |
+      | {rowId} | AHA updated | 99      |
+      |         | new row     | 100     |
+    When user imports file "update-rows.csv" into last created table
+    Then import results have the following data
+      | found_columns_count    | 3 |
+      | matching_columns_count | 2 |
+      | created_columns_count  | 1 |
+      | inserted_rows_count    | 1 |
+      | updated_rows_count     | 1 |
+      | errors_count           | 0 |
+    Then table contains at least following rows
+      | one         | two |
+      | AHA updated | 99  |
+      | new row     | 100 |
+
   @api1 @import
   Scenario: Import a document with optional field
     Given user "participant1" uploads file "import-from-libreoffice-optional-fields.csv"
