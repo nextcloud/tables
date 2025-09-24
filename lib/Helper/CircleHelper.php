@@ -115,7 +115,7 @@ class CircleHelper {
 				return [];
 			}
 			$members = $circle->getMembers();
-			return array_map(fn ($member) => $member->getUserId(), $members);
+			return array_map(static fn ($member) => $member->getUserId(), $members);
 		} catch (Throwable $e) {
 			$this->logger->warning('Failed to get users in circle: ' . $e->getMessage(), [
 				'circleId' => $circleId

@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 /**
  * SPDX-FileCopyrightText: 2025 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
@@ -10,7 +11,6 @@ namespace OCA\Tables\Activity;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2;
-use OCA\Tables\Db\Row2Mapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Service\ShareService;
@@ -21,9 +21,6 @@ use OCP\Server;
 use Psr\Log\LoggerInterface;
 
 class ActivityManager {
-	public const SUBJECT_PARAMS_MAX_LENGTH = 4000;
-	public const SHORTENED_MAX_LENGTH = 2000;
-	public const ROW_NAME_MAX_LENGTH = 20;
 
 	public const TABLES_OBJECT_TABLE = 'tables_table';
 	public const TABLES_OBJECT_ROW = 'tables_row';
@@ -39,13 +36,12 @@ class ActivityManager {
 	public const SUBJECT_ROW_DELETE = 'row_delete';
 
 	public function __construct(
-		private IManager $manager,
-		private IFactory $l10nFactory,
-		private TableMapper $tableMapper,
-		private Row2Mapper $rowMapper,
-		private ColumnMapper $columnMapper,
-		private ShareService $shareService,
-		private ?string $userId,
+		private readonly IManager $manager,
+		private readonly IFactory $l10nFactory,
+		private readonly TableMapper $tableMapper,
+		private readonly ColumnMapper $columnMapper,
+		private readonly ShareService $shareService,
+		private readonly ?string $userId,
 	) {
 	}
 
@@ -103,8 +99,6 @@ class ActivityManager {
 	}
 
 	private function createEvent($objectType, $object, $subject, $additionalParams = [], $author = null) {
-		$objectTitle = '';
-
 		if ($object instanceof Table) {
 			$objectTitle = $object->getTitle();
 			$table = $object;
@@ -128,9 +122,13 @@ class ActivityManager {
 		switch ($subject) {
 			// No need to enhance parameters since entity already contains the required data
 			case self::SUBJECT_TABLE_CREATE:
-			case self::SUBJECT_TABLE_UPDATE_TITLE:
-			case self::SUBJECT_TABLE_UPDATE_DESCRIPTION:
 			case self::SUBJECT_TABLE_DELETE:
+				break;
+			case self::SUBJECT_TABLE_UPDATE_DESCRIPTION:
+				$subjectParams['after'] = $additionalParams['after'] ?? null;
+				break;
+			case self::SUBJECT_TABLE_UPDATE_TITLE:
+				$subjectParams['before'] = $additionalParams['before'] ?? null;
 				break;
 			case self::SUBJECT_ROW_CREATE:
 			case self::SUBJECT_ROW_UPDATE:
@@ -224,13 +222,26 @@ class ActivityManager {
 				break;
 			case self::SUBJECT_ROW_UPDATE:
 				$columns = '';
+				$count = 1;
 				foreach ($subjectParams['changeCols'] as $index => $changeCol) {
 					$columns .= '{col-' . $changeCol['id'] . '}';
 					if ($index < count($subjectParams['changeCols']) - 1) {
+						$count++;
 						$columns .= ', ';
 					}
 				}
-				$subject = $ownActivity ? $l->t('You have updated cell(s) ' . $columns . ' on row {row} in table {table}') : $l->t('{user} has updated cell(s) ' . $columns . ' on row {row} in table {table}');
+
+				$subject = $ownActivity
+					? $l->n(
+						'You have updated cell ' . $columns . ' on row {row} in table {table}',
+						'You have updated cells ' . $columns . ' on row {row} in table {table}',
+						$count
+					)
+					: $l->n(
+						'{user} has updated cell(s) ' . $columns . ' on row {row} in table {table}',
+						'{user} has updated cells ' . $columns . ' on row {row} in table {table}',
+						$count,
+					);
 				break;
 			case self::SUBJECT_ROW_DELETE:
 				$subject = $ownActivity ? $l->t('You have deleted the row {row} in table {table}') : $l->t('{user} has deleted the row {row} in table {table}');
