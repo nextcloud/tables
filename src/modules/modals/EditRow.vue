@@ -141,6 +141,19 @@ export default {
 				this.row.data.forEach(item => {
 					tmp[item.columnId] = item.value
 				})
+
+				// Ensure all columns have entries, even if missing from row data
+				this.columns.forEach(column => {
+					if (!(column.id in tmp)) {
+						// For usergroup columns, initialize as empty array
+						if (column.type === 'usergroup') {
+							tmp[column.id] = []
+						} else {
+							tmp[column.id] = null
+						}
+					}
+				})
+
 				this.localRow = Object.assign({}, tmp)
 			}
 		},

@@ -22,6 +22,8 @@ export default {
 				return this.isSelectionValueValid(value, column)
 			case ColumnTypes.MultiSelection:
 				return this.isMultiSelectionValueValid(value, column)
+			case ColumnTypes.Usergroup:
+				return this.isUsergroupValueValid(value, column)
 			default:
 				return this.isStandardValueValid(value, column)
 			}
@@ -55,6 +57,36 @@ export default {
 
 			const hasDefaultValue = columnTypeDefault in column && column[columnTypeDefault] !== '[]'
 			return (value instanceof Array && value.length > 0) || hasDefaultValue
+		},
+		isUsergroupValueValid(value, column) {
+			const columnTypeDefault = this.getColumnTypeDefault(column)
+
+			// Handle array values
+			if (value instanceof Array) {
+				return value.length > 0
+			}
+
+			// Handle string values (JSON from backend)
+			if (typeof value === 'string') {
+				// Empty string or empty array string
+				if (value === '' || value === '[]') {
+					const hasDefaultValue = columnTypeDefault in column && column[columnTypeDefault] !== '[]' && column[columnTypeDefault] !== ''
+					return hasDefaultValue
+				}
+				// Try to parse as JSON array
+				try {
+					const parsed = JSON.parse(value)
+					if (parsed instanceof Array) {
+						return parsed.length > 0
+					}
+				} catch (e) {
+					// Not valid JSON, fall through to default check
+				}
+			}
+
+			// Handle null/undefined and any other edge cases
+			const hasDefaultValue = columnTypeDefault in column && column[columnTypeDefault] !== '[]' && column[columnTypeDefault] !== ''
+			return hasDefaultValue
 		},
 		isStandardValueValid(value, column) {
 			const columnTypeDefault = this.getColumnTypeDefault(column)
