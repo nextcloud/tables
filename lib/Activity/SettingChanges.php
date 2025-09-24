@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 /**
  * SPDX-FileCopyrightText: 2025 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
@@ -12,14 +13,9 @@ use OCP\IL10N;
 
 class SettingChanges extends ActivitySettings {
 
-	/** @var IL10N */
-	protected $l;
-
-	/**
-	 * @param IL10N $l
-	 */
-	public function __construct(IL10N $l) {
-		$this->l = $l;
+	public function __construct(
+		protected IL10N $l,
+	) {
 	}
 
 	public function getGroupIdentifier() {
