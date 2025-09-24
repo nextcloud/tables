@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 /**
  * SPDX-FileCopyrightText: 2025 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
@@ -12,15 +13,11 @@ use OCP\IL10N;
 use OCP\IURLGenerator;
 
 class Filter implements IFilter {
-	private $l10n;
-	private $urlGenerator;
 
 	public function __construct(
-		IL10N $l10n,
-		IURLGenerator $urlGenerator,
+		private readonly IL10N $l10n,
+		private readonly IURLGenerator $urlGenerator,
 	) {
-		$this->l10n = $l10n;
-		$this->urlGenerator = $urlGenerator;
 	}
 
 	/**

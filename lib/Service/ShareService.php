@@ -510,19 +510,19 @@ class ShareService extends SuperService {
 			/** @var Share $share */
 			foreach ($shares as $share) {
 				if ($share->getReceiverType() === ShareReceiverType::USER) {
-					$sharedWithUserIds[] = $share->getReceiver();
+					$sharedWithUserIds[$share->getReceiver()] = 1;
 				}
 				if ($share->getReceiverType() === ShareReceiverType::CIRCLE && $this->circleHelper->isCirclesEnabled()) {
 					$userIds = $this->circleHelper->getUserIdsInCircle($share->getReceiver());
-					$sharedWithUserIds = array_merge($sharedWithUserIds, $userIds);
+					$sharedWithUserIds += array_fill_keys($userIds, 1);
 				}
 				if ($share->getReceiverType() === ShareReceiverType::GROUP) {
 					$userIds = $this->groupHelper->getUserIdsInGroup($share->getReceiver());
-					$sharedWithUserIds = array_merge($sharedWithUserIds, $userIds);
+					$sharedWithUserIds += array_fill_keys($userIds, 1);
 				}
 			}
 
-			return array_unique($sharedWithUserIds);
+			return array_keys($sharedWithUserIds);
 		} catch (Exception $e) {
 			$this->logger->error('Could not find shared with users: ' . $e->getMessage(), ['exception' => $e]);
 			throw new InternalError('Could not find shared with users');
