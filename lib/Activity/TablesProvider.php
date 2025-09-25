@@ -100,7 +100,7 @@ class TablesProvider implements IProvider {
 		if (array_key_exists('before', $subjectParams) && is_string($subjectParams['before'])) {
 			$params['before'] = [
 				'type' => 'highlight',
-				'id' => (string)$subjectParams['before'],
+				'id' => $subjectParams['before'],
 				'name' => $subjectParams['before'] ?? ''
 			];
 		}
@@ -140,7 +140,7 @@ class TablesProvider implements IProvider {
 		return $event;
 	}
 
-	private function tablesUrl($endpoint) {
+	private function tablesUrl(string $endpoint) {
 		return $this->urlGenerator->linkToRouteAbsolute('tables.page.index') . '#/' . trim($endpoint, '/');
 	}
 
