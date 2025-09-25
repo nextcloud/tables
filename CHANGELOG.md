@@ -5,6 +5,42 @@
 
 # Changelog
 
+## 1.0.0-beta.4
+
+### Added
+
+* [Feat(Filter): add is-not-equal and does-not-contain operator (tables#1718)](https://github.com/nextcloud/tables/pull/1718)
+* [Enhancement: Update rows via import (tables#1824)](https://github.com/nextcloud/tables/pull/1824)
+* [Enhancement: Add column width setting (tables#1929)](https://github.com/nextcloud/tables/pull/1929)
+* [Enhancement: add a read-only option to view columns (tables#1958)](https://github.com/nextcloud/tables/pull/1958)
+* [1769 views set mandatory state of a column (tables#2053)](https://github.com/nextcloud/tables/pull/2053)
+* [Feat(Inline editing): prevent editing read-only values (tables#2049)](https://github.com/nextcloud/tables/pull/2049)
+
+### Fixed
+
+* [1296 infinite loading when visiting non existent application (tables#1985)](https://github.com/nextcloud/tables/pull/1985)
+* [Fix: Tiptap editor and heading styles (tables#2041)](https://github.com/nextcloud/tables/pull/2041)
+* [Fix: stylelint (tables#2050)](https://github.com/nextcloud/tables/pull/2050)
+* [Fix: Fix `npm run watch` (tables#2059)](https://github.com/nextcloud/tables/pull/2059)
+
+### Other
+
+* [Chore: split value and ID parsing into separate methods (tables#1887)](https://github.com/nextcloud/tables/pull/1887)
+* [Build: update node and npm engines versions (tables#2033)](https://github.com/nextcloud/tables/pull/2033)
+* [Update further icons to outline (tables#2034)](https://github.com/nextcloud/tables/pull/2034)
+
+### Dependencies
+
+* [Fix(deps): update tiptap to ^3.4.2 (main) (tables#2044)](https://github.com/nextcloud/tables/pull/2044)
+* [Fix(deps): update dependency @nextcloud/vue to ^8.31.0 (main) (tables#2056)](https://github.com/nextcloud/tables/pull/2056)
+* [Fix(deps): update dependency @nextcloud/dialogs to ^6.3.2 (main) (tables#2057)](https://github.com/nextcloud/tables/pull/2057)
+* [Chore(deps): update dependency @rollup/rollup-linux-x64-gnu to ^4.50.1 (main) (tables#2051)](https://github.com/nextcloud/tables/pull/2051)
+* [Chore(deps): update dependency nextcloud/openapi-extractor to ^1.8.3 (main) (tables#2042)](https://github.com/nextcloud/tables/pull/2042)
+* [Chore(deps): update dependency cypress-vite to ^1.8.0 (main) (tables#2055)](https://github.com/nextcloud/tables/pull/2055)
+* [Chore(deps): update dependency staabm/annotate-pull-request-from-checkstyle to ^1.8.6 (main) (tables#2065)](https://github.com/nextcloud/tables/pull/2065)
+* [[main] Fix npm audit (tables#2063)](https://github.com/nextcloud/tables/pull/2063)
+* [[main] Update nextcloud/ocp dependency (tables#2074)](https://github.com/nextcloud/tables/pull/2074)
+
 ## 1.0.0-beta.3
 
 ### Fixed
