@@ -102,6 +102,7 @@ OC.L10N.register(
     "Suffix" : "Суфикс",
     "Default" : "Стандардно",
     "Copy link" : "Копирај линк",
+    "Open link" : "Отвори линк",
     "Show fullscreen" : "Прикажи на цел екран",
     "Close editor" : "Затвори го уредникот",
     "Confirmation" : "Потврда",
