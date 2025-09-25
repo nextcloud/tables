@@ -412,10 +412,14 @@ class RowService extends SuperService {
 	}
 
 	private function isValueValidForMandatoryColumn($value, Column $column, IColumnTypeBusiness $columnBusiness): bool {
+		if ($column->getSubtype() === Column::SUBTYPE_SELECTION_CHECK) {
+			return true;
+		}
+
 		if ($value === null || $value === '') {
 			return false;
 		}
-		if ($column->getType() === 'selection') {
+		if ($column->getType() === Column::TYPE_SELECTION) {
 			if (is_array($value)) {
 				return count($value) > 0;
 			}
@@ -424,7 +428,7 @@ class RowService extends SuperService {
 			}
 			return $column->getSelectionDefault() !== null && $column->getSelectionDefault() !== '';
 		}
-		if ($column->getType() === 'selection-multi') {
+		if ($column->getSubtype() === Column::SUBTYPE_SELECTION_MULTI) {
 			if (is_array($value)) {
 				return count($value) > 0;
 			}
