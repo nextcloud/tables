@@ -149,9 +149,9 @@ class Api1Controller extends ApiController {
 	 * returns table scheme
 	 *
 	 * @param int $tableId Table ID
-	 * @return Response|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return Response<Http::STATUS_OK, array{'Content-Disposition': string, 'Content-Type': string}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
-	 * 200: Table returned
+	 * 200: Scheme returned
 	 * 403: No permissions
 	 * 404: Not found
 	 */
@@ -163,26 +163,26 @@ class Api1Controller extends ApiController {
 	public function showScheme(int $tableId): Response {
 		try {
 			$scheme = $this->tableService->getScheme($tableId, $this->userId);
-			
+
 			// Renders JSON content directly, bypassing content negotiation
 			$jsonContent = json_encode($scheme->jsonSerialize());
-			
+
 			$response = new class($jsonContent) extends Response {
 				private string $content;
-				
+
 				public function __construct(string $content) {
 					parent::__construct(Http::STATUS_OK);
 					$this->content = $content;
 				}
-				
+
 				public function render(): string {
 					return $this->content;
 				}
 			};
-			
+
 			$response->addHeader('Content-Disposition', 'attachment; filename="' . $scheme->getTitle() . '.json"')
-					 ->addHeader('Content-Type', 'application/json');
-					 
+				->addHeader('Content-Type', 'application/json');
+
 			return $response;
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage());

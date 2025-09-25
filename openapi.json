@@ -1372,18 +1372,11 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Table returned",
+                        "description": "Scheme returned",
                         "headers": {
                             "Content-Disposition": {
                                 "schema": {
                                     "type": "string"
-                                }
-                            }
-                        },
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Table"
                                 }
                             }
                         }
