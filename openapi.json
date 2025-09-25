@@ -213,7 +213,8 @@
                         "required": [
                             "columnId",
                             "order",
-                            "readonly"
+                            "readonly",
+                            "mandatory"
                         ],
                         "properties": {
                             "columnId": {
@@ -225,6 +226,9 @@
                                 "format": "int64"
                             },
                             "readonly": {
+                                "type": "boolean"
+                            },
+                            "mandatory": {
                                 "type": "boolean"
                             }
                         }

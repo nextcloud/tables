@@ -105,6 +105,7 @@ class Column extends EntitySuper implements JsonSerializable {
 	public const SUBTYPE_DATETIME_TIME = 'time';
 
 	public const SUBTYPE_SELECTION_CHECK = 'check';
+	public const SUBTYPE_SELECTION_MULTI = 'selection-multi';
 
 	public const SUBTYPE_TEXT_LINE = 'line';
 
