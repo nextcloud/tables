@@ -199,6 +199,7 @@ OC.L10N.register(
     "Owner" : "Ejer",
     "I really want to delete this table!" : "Jeg ønsker virkelig at slette denne tabel!",
     "Create missing columns" : "Opret manglende kolonner",
+    "Import successful" : "Import gennemført",
     "Close" : "Luk",
     "Could not import data due to unknown errors." : "Kunne ikke importere data på grund af ukendte fejl.",
     "Please select a file." : "Vælg venligst en fil.",
