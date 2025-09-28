@@ -19,6 +19,7 @@ OC.L10N.register(
     "Members" : "Wanachama",
     "Customers" : "Customers",
     "Date" : "Tarehe",
+    "Weight" : "Uzito",
     "Comments" : "Maoni",
     "Name" : "Jina",
     "Account manager" : "Account manager",
