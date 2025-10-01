@@ -345,6 +345,7 @@ OC.L10N.register(
     "No permissions" : "Χωρίς δικαιώματα",
     "You have no permissions for this table." : "Δεν έχετε δικαιώματα για αυτόν τον πίνακα.",
     "Search" : "Αναζήτηση",
+    "Clear value" : "Καθαρισμός τιμής",
     "URL" : "URL",
     "Could not load link provider results." : "Δεν ήταν δυνατή η φόρτωση των αποτελεσμάτων του παρόχου συνδέσμων.",
     "Url" : "Url",
