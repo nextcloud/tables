@@ -149,18 +149,17 @@ class Api1Controller extends ApiController {
 	 * returns table scheme
 	 *
 	 * @param int $tableId Table ID
-	 * @return Response<Http::STATUS_OK, array{'Content-Disposition': string, 'Content-Type': string}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
-	 * 200: Scheme returned
-	 * 403: No permissions
-	 * 404: Not found
+	 * @return DataResponse|Response 200: Scheme returned 403: No permissions 404: Not found
+	 *
+	 * @psalm-return DataResponse<403|404|500, array{message: string}, array<never, never>>|Response
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
-	public function showScheme(int $tableId): Response {
+	public function showScheme(int $tableId): DataResponse|Response {
 		try {
 			$scheme = $this->tableService->getScheme($tableId, $this->userId);
 
