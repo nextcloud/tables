@@ -149,10 +149,14 @@ class Api1Controller extends ApiController {
 	 * returns table scheme
 	 *
 	 * @param int $tableId Table ID
+	 * @return Response<Http::STATUS_OK, array{'Content-Disposition': string, 'Content-Type': string}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
-	 * @return DataResponse|Response 200: Scheme returned 403: No permissions 404: Not found
-	 *
-	 * @psalm-return DataResponse<403|404|500, array{message: string}, array<never, never>>|Response
+	 * 200: Scheme returned
+	 * 403: No permissions
+	 * 404: Not found
+	 * @psalm-suppress InvalidReturnType
+	 * @psalm-suppress InvalidReturnStatement
+	 * @psalm-suppress MissingTemplateParam
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
@@ -165,12 +169,16 @@ class Api1Controller extends ApiController {
 
 			// Renders JSON content directly, bypassing content negotiation
 			$jsonContent = json_encode($scheme->jsonSerialize());
+			$filename = $scheme->getTitle() . '.json';
 
-			$response = new class($jsonContent) extends Response {
+			return new class($jsonContent, $filename) extends Response {
 				private string $content;
 
-				public function __construct(string $content) {
-					parent::__construct(Http::STATUS_OK);
+				public function __construct(string $content, string $filename) {
+					parent::__construct(Http::STATUS_OK, [
+						'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+						'Content-Type' => 'application/json',
+					]);
 					$this->content = $content;
 				}
 
@@ -178,11 +186,6 @@ class Api1Controller extends ApiController {
 					return $this->content;
 				}
 			};
-
-			$response->addHeader('Content-Disposition', 'attachment; filename="' . $scheme->getTitle() . '.json"')
-				->addHeader('Content-Type', 'application/json');
-
-			return $response;
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
