@@ -207,6 +207,7 @@ OC.L10N.register(
     "Select multiple items" : "Selecteer meerdere items",
     "Show user status" : "Toon status gebruiker",
     "Copy link" : "Link kopiëren",
+    "Open link" : "Open link",
     "Close editor" : "Sluit editor",
     "Confirmation" : "Bevestiging",
     "Confirm" : "Bevestigen",
