@@ -225,7 +225,7 @@ class ImportService extends SuperService {
 						&& $columns[$colIndex]['type'] === Column::TYPE_SELECTION
 						&& $columns[$colIndex]['subtype'] === Column::SUBTYPE_SELECTION_CHECK)
 				) {
-					$value = $cell->getFormattedValue() === 'TRUE' ? 'true' : 'false';
+					$value = in_array($cell->getFormattedValue(), ['TRUE', '1'], true) ? 'true' : 'false';
 				}
 
 				$rowData[] = $value;
@@ -465,7 +465,7 @@ class ImportService extends SuperService {
 				} elseif ($column->getType() === Column::TYPE_SELECTION
 					&& $column->getSubtype() === Column::SUBTYPE_SELECTION_CHECK
 				) {
-					$value = $cell->getFormattedValue() === 'TRUE' ? 'true' : 'false';
+					$value = in_array($cell->getFormattedValue(), ['TRUE', '1'], true) ? 'true' : 'false';
 				}
 
 				$data[] = [
@@ -513,6 +513,7 @@ class ImportService extends SuperService {
 		}
 		try {
 			$dt = Date::excelToDateTimeObject($value);
+			Date::roundMicroseconds($dt);
 			return DateTimeImmutable::createFromMutable($dt);
 		} catch (TypeError) {
 			try {
@@ -702,7 +703,7 @@ class ImportService extends SuperService {
 			}
 		} elseif ($originDataType === DataType::TYPE_BOOL
 			|| ($originDataType === DataType::TYPE_FORMULA
-				&& in_array($formattedValue, ['FALSE', 'TRUE'], true))
+				&& in_array($formattedValue, ['FALSE', 'TRUE', '', '1'], true))
 		) {
 			$dataType = [
 				'type' => Column::TYPE_SELECTION,
