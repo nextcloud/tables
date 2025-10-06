@@ -105,10 +105,24 @@ export const useTablesStore = defineStore('store', {
 			}
 		},
 		setTables(tables) {
-			this.tables = tables
+			// Deduplicate tables by ID to prevent navigation duplication
+			const uniqueTables = tables.reduce((acc, table) => {
+				if (!acc.find(t => t.id === table.id)) {
+					acc.push(table)
+				}
+				return acc
+			}, [])
+			this.tables = uniqueTables
 		},
 		setViews(views) {
-			this.views = views
+			// Deduplicate views by ID to prevent navigation duplication
+			const uniqueViews = views.reduce((acc, view) => {
+				if (!acc.find(v => v.id === view.id)) {
+					acc.push(view)
+				}
+				return acc
+			}, [])
+			this.views = uniqueViews
 		},
 		setTemplates(templates) {
 			this.templates = templates
