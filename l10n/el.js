@@ -40,6 +40,7 @@ OC.L10N.register(
     "Body fat" : "Σωματικό λίπος",
     "Comments" : "Σχόλια",
     "Name" : "Όνομα",
+    "Account manager" : "Διαχειριστής λογαριασμού",
     "Contract type" : "Τύπος σύμβασης",
     "Contract start" : "Έναρξη σύμβασης",
     "Contract end" : "Λήξη σύμβασης",
