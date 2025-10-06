@@ -566,7 +566,6 @@ export default {
 		.inline-editing-container {
 			position: relative;
 			width: 100%;
-			overflow-y: hidden;
 
 			.cell-input {
 				width: 100%;

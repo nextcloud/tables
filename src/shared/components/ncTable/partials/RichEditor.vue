@@ -115,12 +115,7 @@ export default {
 <style lang="scss" scoped>
 .rich-editor-edit-mode {
 	position: relative;
-	border: 2px solid var(--color-border-maxcontrast);
-	min-height: 24px;
-
-	:deep(.smart-picker-menu-container) {
-		display: none;
-	}
+	border: 1px solid var(--color-border-maxcontrast);
 }
 
 .loading-indicator {

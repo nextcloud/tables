@@ -8,7 +8,7 @@
 			{{ value || '' }}
 		</div>
 		<div v-else class="inline-editing-container">
-			<NcTextField ref="input" v-model="editValue" :aria-label="t('tables', 'Cell input')" :disabled="localLoading || !canEditCell()" class="cell-input"
+			<NcTextField v-model="editValue" :aria-label="t('tables', 'Cell input')" :disabled="localLoading || !canEditCell()" class="cell-input"
 				@keyup.enter="saveChanges" @keyup.esc="cancelEdit" @blur="saveChanges" />
 			<div v-if="localLoading" class="icon-loading-small icon-loading-inline" />
 		</div>
