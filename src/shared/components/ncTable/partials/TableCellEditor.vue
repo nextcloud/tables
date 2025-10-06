@@ -4,14 +4,14 @@
 -->
 <template>
 	<div class="cell-editor" :style="{ opacity: !canEditCell() ? 0.6 : 1 }">
-		<div v-if="!isEditing" @click="handleStartEditing">
+		<div v-show="!isEditing" class="cell-display-mode" @click="handleStartEditing">
 			<NcEditor v-if="value && value.trim()"
 				:can-edit="false"
 				:text="value"
 				:show-border="false"
 				:show-readonly-bar="false" />
 		</div>
-		<RichEditor v-else
+		<RichEditor v-show="isEditing"
 			ref="richEditor"
 			:value="value"
 			:loading="localLoading"
@@ -109,10 +109,23 @@ export default {
 <style lang="scss" scoped>
 .cell-editor {
 	width: 100%;
+	position: relative;
 }
 
-.cell-editor > div {
+.cell-display-mode {
 	cursor: pointer;
+	min-height: 24px;
+	border: 2px solid transparent;
+	position: relative;
+
+	:deep(.content-wrapper) {
+		padding-left: 22px;
+	}
+}
+
+.cell-display-mode,
+:deep(.rich-editor-edit-mode) {
+	width: 100%;
 	min-height: 24px;
 }
 
