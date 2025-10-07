@@ -1405,7 +1405,9 @@ export interface operations {
                     readonly "Content-Disposition"?: string;
                     readonly [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    readonly "application/json": Record<string, never>;
+                };
             };
             /** @description Current user is not logged in */
             readonly 401: {

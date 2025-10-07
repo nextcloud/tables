@@ -36,7 +36,7 @@ use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\Attribute\OpenAPI;
 use OCP\AppFramework\Http\DataResponse;
-use OCP\AppFramework\Http\Response;
+use OCP\AppFramework\Http\JSONResponse;
 use OCP\IL10N;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
@@ -149,43 +149,30 @@ class Api1Controller extends ApiController {
 	 * returns table scheme
 	 *
 	 * @param int $tableId Table ID
-	 * @return Response<Http::STATUS_OK, array{'Content-Disposition': string, 'Content-Type': string}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return JSONResponse<Http::STATUS_OK, mixed, array{'Content-Disposition': string, 'Content-Type': string}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Scheme returned
 	 * 403: No permissions
 	 * 404: Not found
-	 * @psalm-suppress InvalidReturnType
-	 * @psalm-suppress InvalidReturnStatement
-	 * @psalm-suppress MissingTemplateParam
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
-	public function showScheme(int $tableId): DataResponse|Response {
+	public function showScheme(int $tableId): JSONResponse|DataResponse {
 		try {
 			$scheme = $this->tableService->getScheme($tableId, $this->userId);
-
-			// Renders JSON content directly, bypassing content negotiation
-			$jsonContent = json_encode($scheme->jsonSerialize());
 			$filename = $scheme->getTitle() . '.json';
 
-			return new class($jsonContent, $filename) extends Response {
-				private string $content;
-
-				public function __construct(string $content, string $filename) {
-					parent::__construct(Http::STATUS_OK, [
-						'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-						'Content-Type' => 'application/json',
-					]);
-					$this->content = $content;
-				}
-
-				public function render(): string {
-					return $this->content;
-				}
-			};
+			return new JSONResponse(
+				$scheme->jsonSerialize(),
+				Http::STATUS_OK,
+				[
+					'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+					'Content-Type' => 'application/json',
+				]
+			);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];

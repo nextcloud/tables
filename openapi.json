@@ -1379,6 +1379,13 @@
                                     "type": "string"
                                 }
                             }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
                         }
                     },
                     "403": {
