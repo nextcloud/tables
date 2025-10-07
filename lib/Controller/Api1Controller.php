@@ -149,7 +149,7 @@ class Api1Controller extends ApiController {
 	 * returns table scheme
 	 *
 	 * @param int $tableId Table ID
-	 * @return JSONResponse<Http::STATUS_OK, mixed, array{'Content-Disposition': string, 'Content-Type': string}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return JSONResponse<Http::STATUS_OK, array<string, mixed>, array{'Content-Disposition': string, 'Content-Type': string}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Scheme returned
 	 * 403: No permissions
