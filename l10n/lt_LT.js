@@ -106,6 +106,7 @@ OC.L10N.register(
     "Import table" : "Importuoti lentelę",
     "Please select a file." : "Pasirinkite failą.",
     "Select from Files" : "Pasirinkti iš failų",
+    "Upload from device" : "Įkelti iš įrenginio",
     "Preview" : "Peržiūra",
     "This might take a while..." : "Tai gali šiek tiek užtrukti...",
     "Failed" : "Nepavyko",
