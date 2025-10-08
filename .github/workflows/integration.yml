@@ -53,10 +53,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        server-versions: ['stable30', 'stable31', 'master']
-        php-versions: ['8.1']
+        server-versions: ['stable30', 'stable31', 'stable32', 'master']
+        php-versions: ['8.2']
         databases: ['mysql']
         include:
+          - server-versions: 'stable30'
+            php-versions: '8.1'
+            databases: 'sqlite'
           - server-versions: 'stable31'
             php-versions: '8.4'
             databases: 'pgsql'
