@@ -105,24 +105,10 @@ export const useTablesStore = defineStore('store', {
 			}
 		},
 		setTables(tables) {
-			// Deduplicate tables by ID to prevent navigation duplication
-			const uniqueTables = tables.reduce((acc, table) => {
-				if (!acc.find(t => t.id === table.id)) {
-					acc.push(table)
-				}
-				return acc
-			}, [])
-			this.tables = uniqueTables
+			this.tables = tables
 		},
 		setViews(views) {
-			// Deduplicate views by ID to prevent navigation duplication
-			const uniqueViews = views.reduce((acc, view) => {
-				if (!acc.find(v => v.id === view.id)) {
-					acc.push(view)
-				}
-				return acc
-			}, [])
-			this.views = uniqueViews
+			this.views = views
 		},
 		setTemplates(templates) {
 			this.templates = templates
@@ -508,6 +494,7 @@ export const useTablesStore = defineStore('store', {
 		},
 
 		async loadContextTable({ id }) {
+			id = parseInt(id)
 			const table = this.tables.find(table => table.id === id)
 			if (table) {
 				return true
@@ -530,6 +517,7 @@ export const useTablesStore = defineStore('store', {
 		},
 
 		async loadContextView({ id }) {
+			id = parseInt(id)
 			const view = this.views.find(view => view.id === id)
 			if (view) {
 				return true
