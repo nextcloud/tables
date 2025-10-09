@@ -18,19 +18,26 @@ class BaseMagicField {
 
 class MagicField extends BaseMagicField {
 
-	constructor({ id, label, icon, goodFor, replace } = {}) {
+	constructor({ id, label, icon, goodFor, replace, additionalInput, additionalInputLabel } = {}) {
 		super()
 		this.id = id
 		this.label = label
 		this.icon = icon
 		this.goodFor = goodFor
 		this.replace = replace
+		this.additionalInput = additionalInput
+		this.additionalInputLabel = additionalInputLabel
 	}
 
 }
 
 export function getMagicFieldWithId(id) {
 	return Object.values(MagicFields).find(mf => mf.id === id)
+}
+
+export const AdditionalInputTypes = {
+	DATE: 'date',
+	NUMBER: 'number',
 }
 
 export const MagicFields = {
@@ -113,21 +120,21 @@ export const MagicFields = {
 	}),
 	DatetimeDateStartOfYear: new MagicField({
 		id: 'datetime-date-start-of-year',
-		label: t('tables', 'Start of the year'),
+		label: t('tables', 'This year'),
 		icon: 'icon-history',
 		goodFor: [ColumnTypes.DatetimeDate],
 		replace: new Moment().startOf('year').format('YYYY-MM-DD'),
 	}),
 	DatetimeDateStartOfMonth: new MagicField({
 		id: 'datetime-date-start-of-month',
-		label: t('tables', 'Start of the month'),
+		label: t('tables', 'This month'),
 		icon: 'icon-history',
 		goodFor: [ColumnTypes.DatetimeDate],
 		replace: new Moment().startOf('month').format('YYYY-MM-DD'),
 	}),
 	DatetimeDateStartOfWeek: new MagicField({
 		id: 'datetime-date-start-of-week',
-		label: t('tables', 'Start of the week'),
+		label: t('tables', 'This week'),
 		icon: 'icon-history',
 		goodFor: [ColumnTypes.DatetimeDate],
 		replace: new Moment().startOf('week').format('YYYY-MM-DD'),
@@ -145,5 +152,32 @@ export const MagicFields = {
 		icon: 'icon-calendar-dark',
 		goodFor: [ColumnTypes.Datetime],
 		replace: new Moment().format('YYYY-MM-DD HH:mm'),
+	}),
+	DatetimeExactDate: new MagicField({
+		id: 'datetime-exact-date',
+		label: t('tables', 'Exact date'),
+		icon: 'icon-calendar-dark',
+		goodFor: [ColumnTypes.DatetimeDate, ColumnTypes.Datetime],
+		replace: null,
+		additionalInput: AdditionalInputTypes.DATE,
+		additionalInputLabel: t('tables', 'Select a date'),
+	}),
+	DatetimeDaysAhead: new MagicField({
+		id: 'datetime-days-ahead',
+		label: t('tables', 'Number of days ahead'),
+		icon: 'icon-calendar-dark',
+		goodFor: [ColumnTypes.DatetimeDate, ColumnTypes.Datetime],
+		replace: null,
+		additionalInput: AdditionalInputTypes.NUMBER,
+		additionalInputLabel: t('tables', 'Enter number of days'),
+	}),
+	DatetimeDaysAgo: new MagicField({
+		id: 'datetime-days-ago',
+		label: t('tables', 'Number of days ago'),
+		icon: 'icon-calendar-dark',
+		goodFor: [ColumnTypes.DatetimeDate, ColumnTypes.Datetime],
+		replace: null,
+		additionalInput: AdditionalInputTypes.NUMBER,
+		additionalInputLabel: t('tables', 'Enter number of days'),
 	}),
 }
