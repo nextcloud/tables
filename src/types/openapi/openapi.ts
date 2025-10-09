@@ -1406,9 +1406,7 @@ export interface operations {
                     readonly [name: string]: unknown;
                 };
                 content: {
-                    readonly "application/json": {
-                        readonly [key: string]: Record<string, never>;
-                    };
+                    readonly "application/json": components["schemas"]["Table"];
                 };
             };
             /** @description Current user is not logged in */
