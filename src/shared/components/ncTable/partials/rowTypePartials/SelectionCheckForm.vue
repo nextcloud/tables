@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<RowFormWrapper :title="column.title" :mandatory="column.viewColumnInformation?.mandatory ?? column.mandatory" :description="column.description">
+	<RowFormWrapper :title="column.title" :mandatory="isMandatory(column)" :description="column.description">
 		<NcCheckboxRadioSwitch
 			type="switch"
 			:checked.sync="localValue"
@@ -15,12 +15,14 @@
 <script>
 import { NcCheckboxRadioSwitch } from '@nextcloud/vue'
 import RowFormWrapper from './RowFormWrapper.vue'
+import rowHelper from '../../../../components/ncTable/mixins/rowHelper.js'
 
 export default {
 	components: {
 		NcCheckboxRadioSwitch,
 		RowFormWrapper,
 	},
+	mixins: [rowHelper],
 	props: {
 		column: {
 			type: Object,

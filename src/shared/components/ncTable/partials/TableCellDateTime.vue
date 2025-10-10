@@ -37,6 +37,7 @@ import { NcDateTimePickerNative } from '@nextcloud/vue'
 import Moment from '@nextcloud/moment'
 import cellEditMixin from '../mixins/cellEditMixin.js'
 import { translate as t } from '@nextcloud/l10n'
+import rowHelper from '../mixins/rowHelper.js'
 
 export default {
 	name: 'TableCellDateTime',
@@ -45,7 +46,7 @@ export default {
 		NcDateTimePickerNative,
 	},
 
-	mixins: [cellEditMixin],
+	mixins: [cellEditMixin, rowHelper],
 
 	props: {
 		column: {
@@ -89,7 +90,7 @@ export default {
 		},
 
 		canBeCleared() {
-			return !(this.column.viewColumnInformation?.mandatory ?? this.column.mandatory)
+			return !this.isMandatory(this.column)
 		},
 	},
 
