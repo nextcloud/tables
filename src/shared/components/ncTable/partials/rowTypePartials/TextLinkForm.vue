@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<RowFormWrapper :title="column.title" :mandatory="column.viewColumnInformation?.mandatory ?? column.mandatory" :description="column.description" :loading="isLoadingResults">
+	<RowFormWrapper :title="column.title" :mandatory="isMandatory(column)" :description="column.description" :loading="isLoadingResults">
 		<div class="row">
 			<div v-if="providers?.length === 0" class="col-4">
 				<NcNoteCard type="info">
@@ -57,6 +57,7 @@ import { NcButton, NcTextField, NcNoteCard, NcSelect } from '@nextcloud/vue'
 import debounce from 'debounce'
 import generalHelper from '../../../../mixins/generalHelper.js'
 import copyToClipboard from '../../../../mixins/copyToClipboard.js'
+import rowHelper from '../../../../components/ncTable/mixins/rowHelper.js'
 import LinkWidget from '../LinkWidget.vue'
 import { translate as t } from '@nextcloud/l10n'
 
@@ -75,7 +76,7 @@ export default {
 		LinkWidget,
 	},
 
-	mixins: [generalHelper, copyToClipboard],
+	mixins: [generalHelper, copyToClipboard, rowHelper],
 
 	props: {
 		column: {

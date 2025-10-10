@@ -25,7 +25,7 @@
 					@update:checked="onToggle(column.id)" />
 				<span :class="{ 'title-readonly': column.viewColumnInformation?.readonly }">
 					{{ column.title }}
-					<span v-if="column.viewColumnInformation?.mandatory || column.mandatory" class="mandatory-indicator">*</span>
+					<span v-if="isMandatory(column)" class="mandatory-indicator">*</span>
 				</span>
 				<div v-if="column.id < 0" class="meta-info">
 					({{ t('tables', 'Metadata') }})
@@ -39,7 +39,7 @@
 						v-if="selectedColumns.includes(column.id)"
 						data-cy="columnReadonlyCheckbox"
 						:checked="column.viewColumnInformation?.readonly"
-						:disabled="column.viewColumnInformation?.mandatory ?? column.mandatory"
+						:disabled="isMandatory(column)"
 						@change="onReadonlyChanged(column.id, $event.target.checked)">
 						{{ t('tables', 'Read only') }}
 					</NcActionCheckbox>
@@ -47,7 +47,7 @@
 					<NcActionCheckbox
 						v-if="selectedColumns.includes(column.id)"
 						data-cy="columnMandatoryCheckbox"
-						:checked="column.viewColumnInformation?.mandatory ?? column.mandatory"
+						:checked="isMandatory(column)"
 						:disabled="column.viewColumnInformation?.readonly"
 						@change="onMandatoryChanged(column.id, $event.target.checked)">
 						{{ t('tables', 'Mandatory') }}
@@ -84,6 +84,7 @@ import { NcActionCheckbox, NcActions, NcButton, NcCheckboxRadioSwitch } from '@n
 import DragHorizontalVariant from 'vue-material-design-icons/DragHorizontalVariant.vue'
 import ArrowUp from 'vue-material-design-icons/ArrowUp.vue'
 import ArrowDown from 'vue-material-design-icons/ArrowDown.vue'
+import rowHelper from '../../../../shared/components/ncTable/mixins/rowHelper.js'
 
 export default {
 	name: 'SelectedViewColumns',
@@ -96,6 +97,7 @@ export default {
 		ArrowUp,
 		ArrowDown,
 	},
+	mixins: [rowHelper],
 	props: {
 		columns: {
 			type: Array,
