@@ -7,6 +7,7 @@
 
 namespace OCA\Tables\Service;
 
+use OCA\Tables\Activity\ActivityManager;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2;
@@ -51,6 +52,7 @@ class RowService extends SuperService {
 		private Row2Mapper $row2Mapper,
 		private IEventDispatcher $eventDispatcher,
 		private ColumnsHelper $columnsHelper,
+		private ActivityManager $activityManager,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 
@@ -220,6 +222,12 @@ class RowService extends SuperService {
 			$insertedRow = $this->row2Mapper->insert($row2);
 
 			$this->eventDispatcher->dispatchTyped(new RowAddedEvent($insertedRow));
+			$this->activityManager->triggerEvent(
+				objectType: ActivityManager::TABLES_OBJECT_ROW,
+				object: $insertedRow,
+				subject: ActivityManager::SUBJECT_ROW_CREATE,
+				author: $this->userId,
+			);
 
 			return $this->filterRowResult($view, $insertedRow);
 		} catch (InternalError|Exception $e) {
@@ -614,6 +622,19 @@ class RowService extends SuperService {
 
 		$this->eventDispatcher->dispatchTyped(new RowUpdatedEvent($updatedRow, $previousData));
 
+		if ($updatedRow->getData() !== $previousData) {
+			$this->activityManager->triggerEvent(
+				objectType: ActivityManager::TABLES_OBJECT_ROW,
+				object: $updatedRow,
+				subject: ActivityManager::SUBJECT_ROW_UPDATE,
+				author: $this->userId,
+				additionalParams: [
+					'before' => $previousData,
+					'after' => $updatedRow->getData(),
+				]
+			);
+		}
+
 		return $this->filterRowResult($view ?? null, $updatedRow);
 	}
 
@@ -682,6 +703,12 @@ class RowService extends SuperService {
 			$event = new RowDeletedEvent($item, $item->getData());
 
 			$this->eventDispatcher->dispatchTyped($event);
+			$this->activityManager->triggerEvent(
+				objectType: ActivityManager::TABLES_OBJECT_ROW,
+				object: $deletedRow,
+				subject: ActivityManager::SUBJECT_ROW_DELETE,
+				author: $this->userId,
+			);
 
 			return $this->filterRowResult($view ?? null, $deletedRow);
 		} catch (Exception $e) {

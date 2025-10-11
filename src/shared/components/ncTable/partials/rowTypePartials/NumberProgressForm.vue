@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<RowFormWrapper :title="column.title" :mandatory="column.viewColumnInformation?.mandatory ?? column.mandatory" :description="column.description" :width="2">
+	<RowFormWrapper :title="column.title" :mandatory="isMandatory(column)" :description="column.description" :width="2">
 		<input v-model="localValue"
 			type="number"
 			min="0"
@@ -15,11 +15,13 @@
 
 <script>
 import RowFormWrapper from './RowFormWrapper.vue'
+import rowHelper from '../../../../components/ncTable/mixins/rowHelper.js'
 
 export default {
 	components: {
 		RowFormWrapper,
 	},
+	mixins: [rowHelper],
 	props: {
 		column: {
 			type: Object,

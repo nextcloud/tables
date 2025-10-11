@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<RowFormWrapper :title="column.title" :mandatory="column.viewColumnInformation?.mandatory ?? column.mandatory" :description="column.description">
+	<RowFormWrapper :title="column.title" :mandatory="isMandatory(column)" :description="column.description">
 		<div class="row">
 			<div class="fix-col-4">
 				<NcEditor v-if="!showBigEditorModal" :can-edit="!column.viewColumnInformation?.readonly" :text.sync="localValue" height="small" />
@@ -37,6 +37,7 @@ import NcEditor from '../../../ncEditor/NcEditor.vue'
 import { NcButton, NcModal } from '@nextcloud/vue'
 import Fullscreen from 'vue-material-design-icons/Fullscreen.vue'
 import { translate as t } from '@nextcloud/l10n'
+import rowHelper from '../../../../components/ncTable/mixins/rowHelper.js'
 
 export default {
 	components: {
@@ -46,6 +47,8 @@ export default {
 		NcButton,
 		NcModal,
 	},
+
+	mixins: [rowHelper],
 
 	props: {
 		column: {

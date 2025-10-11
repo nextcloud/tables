@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<RowFormWrapper :width="2" :title="column.title" :mandatory="column.viewColumnInformation?.mandatory ?? column.mandatory" :description="column.description">
+	<RowFormWrapper :width="2" :title="column.title" :mandatory="isMandatory(column)" :description="column.description">
 		<div v-if="column.numberPrefix" class="prefix">
 			{{ column.numberPrefix }}
 		</div>
@@ -21,13 +21,13 @@
 
 <script>
 import RowFormWrapper from './RowFormWrapper.vue'
-
+import rowHelper from '../../../../components/ncTable/mixins/rowHelper.js'
 export default {
 
 	components: {
 		RowFormWrapper,
 	},
-
+	mixins: [rowHelper],
 	props: {
 		column: {
 			type: Object,

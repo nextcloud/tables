@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<RowFormWrapper :title="column.title" :mandatory="column.viewColumnInformation?.mandatory ?? column.mandatory" :description="column.description">
+	<RowFormWrapper :title="column.title" :mandatory="isMandatory(column)" :description="column.description">
 		<div class="align-center">
 			<NcButton type="tertiary" :aria-label="t('tables', 'Reduce stars')" :disabled="column.viewColumnInformation?.readonly || localValue <= 0" @click="less">
 				<template #icon>
@@ -28,7 +28,7 @@ import RowFormWrapper from './RowFormWrapper.vue'
 import Plus from 'vue-material-design-icons/Plus.vue'
 import Minus from 'vue-material-design-icons/Minus.vue'
 import { translate as t } from '@nextcloud/l10n'
-
+import rowHelper from '../../../../components/ncTable/mixins/rowHelper.js'
 export default {
 	components: {
 		RowFormWrapper,
@@ -36,6 +36,7 @@ export default {
 		Plus,
 		Minus,
 	},
+	mixins: [rowHelper],
 	props: {
 		column: {
 			type: Object,
