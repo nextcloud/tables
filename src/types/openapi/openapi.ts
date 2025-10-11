@@ -1399,7 +1399,7 @@ export interface operations {
         };
         readonly requestBody?: never;
         readonly responses: {
-            /** @description Table returned */
+            /** @description Scheme returned */
             readonly 200: {
                 headers: {
                     readonly "Content-Disposition"?: string;

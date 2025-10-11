@@ -36,6 +36,7 @@ use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\Attribute\OpenAPI;
 use OCP\AppFramework\Http\DataResponse;
+use OCP\AppFramework\Http\JSONResponse;
 use OCP\IL10N;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
@@ -148,9 +149,9 @@ class Api1Controller extends ApiController {
 	 * returns table scheme
 	 *
 	 * @param int $tableId Table ID
-	 * @return DataResponse<Http::STATUS_OK, TablesTable, array{'Content-Disposition'?:string,'Content-Type'?:string}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return JSONResponse<Http::STATUS_OK, TablesTable, array{'Content-Disposition': string, 'Content-Type': string}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
-	 * 200: Table returned
+	 * 200: Scheme returned
 	 * 403: No permissions
 	 * 404: Not found
 	 */
@@ -159,10 +160,19 @@ class Api1Controller extends ApiController {
 	#[CORS]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
-	public function showScheme(int $tableId): DataResponse {
+	public function showScheme(int $tableId): JSONResponse|DataResponse {
 		try {
 			$scheme = $this->tableService->getScheme($tableId, $this->userId);
-			return new DataResponse($scheme->jsonSerialize(), http::STATUS_OK, ['Content-Disposition' => 'attachment; filename="' . $scheme->getTitle() . '.json"', 'Content-Type' => 'application/octet-stream']);
+			$filename = $scheme->getTitle() . '.json';
+
+			return new JSONResponse(
+				$scheme->jsonSerialize(),
+				Http::STATUS_OK,
+				[
+					'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+					'Content-Type' => 'application/json',
+				]
+			);
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage());
 			$message = ['message' => $e->getMessage()];
