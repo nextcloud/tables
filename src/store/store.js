@@ -494,6 +494,7 @@ export const useTablesStore = defineStore('store', {
 		},
 
 		async loadContextTable({ id }) {
+			id = parseInt(id)
 			const table = this.tables.find(table => table.id === id)
 			if (table) {
 				return true
@@ -516,6 +517,7 @@ export const useTablesStore = defineStore('store', {
 		},
 
 		async loadContextView({ id }) {
+			id = parseInt(id)
 			const view = this.views.find(view => view.id === id)
 			if (view) {
 				return true
