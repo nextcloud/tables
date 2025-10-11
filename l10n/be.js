@@ -17,6 +17,8 @@ OC.L10N.register(
     "No file uploaded or file size exceeds maximum of %s" : "Файл не запампаваны, або памер файла перавышае максімальны %s",
     "Nextcloud tables" : "Табліцы Nextcloud",
     "_%n row_::_%n rows_" : ["%n радок","%n радкі","%n радкоў","%n радкоў"],
+    "ToDo list" : "Спіс задач",
+    "Setup a simple todo-list." : "Стварыце просты спіс задач.",
     "Members" : "Удзельнікі",
     "Date" : "Дата",
     "Weight" : "Вага",

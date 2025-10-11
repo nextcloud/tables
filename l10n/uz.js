@@ -100,6 +100,7 @@ OC.L10N.register(
     "Close editor" : "Muharrirni yoping",
     "Confirmation" : "Tasdiqlash",
     "Confirm" : "Confirm",
-    "Select" : "Select"
+    "Select" : "Select",
+    "Now" : "Hozir"
 },
 "nplurals=1; plural=0;");

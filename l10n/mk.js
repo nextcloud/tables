@@ -110,6 +110,7 @@ OC.L10N.register(
     "Confirmation" : "Потврда",
     "Confirm" : "Потврди",
     "Select" : "Избери",
+    "Now" : "Сега",
     "ID" : "ID",
     "Clipboard is not available" : "Клипбордот не е достапен"
 },

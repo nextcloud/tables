@@ -108,6 +108,7 @@
     "Confirmation" : "Потврда",
     "Confirm" : "Потврди",
     "Select" : "Избери",
+    "Now" : "Сега",
     "ID" : "ID",
     "Clipboard is not available" : "Клипбордот не е достапен"
 },"pluralForm" :"nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;"
