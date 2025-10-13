@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "No" : "Nē",
     "Yes" : "Jā",
+    "An unexpected error occurred. More details can be found in the logs. Please reach out to your administration." : "Atgadījās neparedzēta kļūda. Vairāk informācijas var atrast žurnālos. Lūgums sazināties ar savu pārvaldītāju.",
     "The file was uploaded" : "Datne tika augšupielādēta",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Augšupielādētā datne pārsniedz php.ini norādīto upload_max_filesize vērtību",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Augšupielādētā datne pārsniedz MAX_FILE_SIZE norādi, kas ir norādīta HTML formā",
