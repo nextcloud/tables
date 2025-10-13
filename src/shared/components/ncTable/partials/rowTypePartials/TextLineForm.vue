@@ -3,18 +3,20 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<RowFormWrapper :title="column.title" :mandatory="column.viewColumnInformation?.mandatory ?? column.mandatory" :length="length" :max-length="column.textMaxLength" :description="column.description">
+	<RowFormWrapper :title="column.title" :mandatory="isMandatory(column)" :length="length" :max-length="column.textMaxLength" :description="column.description">
 		<input v-model="localValue" :maxlength="column.textMaxLength" :readonly="column.viewColumnInformation?.readonly">
 	</RowFormWrapper>
 </template>
 
 <script>
 import RowFormWrapper from './RowFormWrapper.vue'
+import rowHelper from '../../../../components/ncTable/mixins/rowHelper.js'
 
 export default {
 	components: {
 		RowFormWrapper,
 	},
+	mixins: [rowHelper],
 	props: {
 		column: {
 			type: Object,
