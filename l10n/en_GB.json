@@ -1,4 +1,5 @@
 { "translations": {
+    "Tables" : "Tables",
     "Nextcloud Tables" : "Nextcloud Tables",
     "Select table" : "Select table",
     "Select columns" : "Select columns",
@@ -130,7 +131,6 @@
     "Read the docs" : "Read the docs",
     "If you want to go through the documentation, it can be found here: [Nextcloud Tables documentation](%s)" : "If you want to go through the documentation, it can be found here: [Nextcloud Tables documentation](%s)",
     "Check yourself!" : "Check yourself!",
-    "Tables" : "Tables",
     "Manage data the way you need it." : "Manage data the way you need it.",
     "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link to urls or other nextcloud resources\n- Numbers\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n- Users, groups and teams\n\nShare your tables and views with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link to urls or other nextcloud resources\n- Numbers\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n- Users, groups and teams\n\nShare your tables and views with users and groups within your cloud.\n\nHave a good time and manage whatever you want.",
     "Table" : "Table",
@@ -278,6 +278,7 @@
     "Transfer application" : "Transfer application",
     "Could not delete row." : "Could not delete row.",
     "Edit row" : "Edit row",
+    "Activity" : "Activity",
     "I really want to delete this row!" : "I really want to delete this row!",
     "Owner" : "Owner",
     "I really want to delete this table!" : "I really want to delete this table!",

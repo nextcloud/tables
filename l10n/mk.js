@@ -56,6 +56,8 @@ OC.L10N.register(
     "Resources" : "Ресурси",
     "Cancel" : "Откажи",
     "Delete" : "Избриши",
+    "Edit" : "Уреди",
+    "Activity" : "Активност",
     "Owner" : "Сопственик",
     "Close" : "Затвори",
     "Please select a file." : "Изберете датотека.",
@@ -112,6 +114,7 @@ OC.L10N.register(
     "Select" : "Избери",
     "Now" : "Сега",
     "ID" : "ID",
-    "Clipboard is not available" : "Клипбордот не е достапен"
+    "Clipboard is not available" : "Клипбордот не е достапен",
+    "seconds ago" : "пред неколку секунди"
 },
 "nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;");

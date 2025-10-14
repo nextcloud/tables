@@ -26,6 +26,8 @@
     "Title" : "ចំណងជើង",
     "Cancel" : "បោះបង់",
     "Delete" : "លុប",
+    "Edit" : "កែប្រែ",
+    "Activity" : "សកម្មភាព",
     "Close" : "បិទ",
     "Sort" : "តម្រៀប",
     "Export" : "នាំចេញ",
@@ -40,6 +42,7 @@
     "URL" : "URL",
     "Options" : "ជម្រើស",
     "Default" : "លំនាំ​ដើម",
-    "Copy link" : "ចម្លងតំណ"
+    "Copy link" : "ចម្លងតំណ",
+    "seconds ago" : "វិនាទី​មុន"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

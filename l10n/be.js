@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Табліцы",
     "Nextcloud Tables" : "Табліцы Nextcloud",
     "No" : "Не",
     "Yes" : "Так",
@@ -35,7 +36,6 @@ OC.L10N.register(
     "Task" : "Заданне",
     "Progress" : "Ход выканання",
     "Done" : "Гатова",
-    "Tables" : "Табліцы",
     "Table" : "Табліца",
     "View" : "Выгляд",
     "Today" : "Сёння",

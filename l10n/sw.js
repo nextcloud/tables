@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Majedwali",
     "Nextcloud Tables" : "Nextcloud Tables",
     "Select columns" : "Select columns",
     "e.g. 1,2,4 or leave empty" : "e.g. 1,2,4 or leave empty",
@@ -31,7 +32,6 @@ OC.L10N.register(
     "Progress" : "Maendeleo",
     "What" : "What",
     "Done" : "Imefanyika",
-    "Tables" : "Majedwali",
     "Table" : "Jedwali",
     "View" : "Angalia",
     "Today" : "Leo",
@@ -73,6 +73,8 @@ OC.L10N.register(
     "Delete" : "Futa",
     "Edit column" : "Hariri safu wima",
     "Edit row" : "Hariri safu",
+    "Edit" : "Hariri",
+    "Activity" : "Shughuli",
     "Owner" : "Mmiliki",
     "Import successful" : "Import successful",
     "Close" : "Funga",
@@ -156,6 +158,7 @@ OC.L10N.register(
     "Now" : "Sasa",
     "ID" : "Kitambulisho",
     "Clipboard is not available" : "Ubao wa kunakili haupatikani",
+    "seconds ago" : "sukunde zilizopita",
     "Unknown error." : "Unknown error.",
     "Request is not authorized. Are you logged in?" : "Request is not authorized. Are you logged in?",
     "Request not allowed." : "Request not allowed.",

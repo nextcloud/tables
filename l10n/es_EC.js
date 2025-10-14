@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tablas",
     "Nextcloud Tables" : "Nextcloud Tablas",
     "Select table" : "Seleccionar tabla",
     "Select columns" : "Seleccionar columnas",
@@ -107,7 +108,6 @@ OC.L10N.register(
     "Edit a row" : "Editar una fila",
     "Add a new column" : "Agregar una nueva columna",
     "Read the docs" : "Leer la documentación",
-    "Tables" : "Tablas",
     "Manage data the way you need it." : "Gestiona los datos de la manera que necesites.",
     "Table" : "Tabla",
     "View" : "Ver",
@@ -190,6 +190,8 @@ OC.L10N.register(
     "Edit column" : "Editar columna",
     "Could not delete row." : "No se pudo eliminar la fila.",
     "Edit row" : "Editar fila",
+    "Edit" : "Editar",
+    "Activity" : "Actividad",
     "I really want to delete this row!" : "¡Realmente quiero eliminar esta fila!",
     "Owner" : "Dueño",
     "I really want to delete this table!" : "¡Realmente quiero eliminar esta tabla!",
@@ -334,6 +336,7 @@ OC.L10N.register(
     "Now" : "Ahora",
     "ID" : "ID",
     "Clipboard is not available" : "El portapapeles no está disponible",
+    "seconds ago" : "hace segundos",
     "Unknown error." : "Error desconocido.",
     "Request is not authorized. Are you logged in?" : "Solicitud no autorizada. ¿Has iniciado sesión?",
     "Request not allowed." : "Solicitud no permitida.",

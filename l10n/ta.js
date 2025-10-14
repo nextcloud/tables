@@ -24,6 +24,7 @@ OC.L10N.register(
     "Title" : "தலைப்பு",
     "Cancel" : "இரத்து செய்க",
     "Delete" : "நீக்குக",
+    "Edit" : "தொகுக்க",
     "Owner" : "Owner",
     "Close" : "மூடுக",
     "Export" : "ஏற்றுமதி",
@@ -35,6 +36,7 @@ OC.L10N.register(
     "Download" : "பதிவிறக்குக",
     "Search" : "தேடுதல்",
     "Back" : "பின்னுக்கு",
-    "Select" : "Select"
+    "Select" : "Select",
+    "seconds ago" : "செக்கன்களுக்கு முன்"
 },
 "nplurals=2; plural=(n != 1);");

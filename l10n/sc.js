@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tabellas",
     "No" : "No",
     "Yes" : "Si",
     "The file was uploaded" : "S'archìviu est istadu carrigadu",
@@ -30,7 +31,6 @@ OC.L10N.register(
     "Birthday" : "Cumpleannu",
     "Target" : "Obietivu",
     "Progress" : "Progressu",
-    "Tables" : "Tabellas",
     "View" : "Visualiza",
     "Today" : "Oe",
     "Create" : "Crea",
@@ -60,6 +60,8 @@ OC.L10N.register(
     "Resources" : "Risorsas",
     "Cancel" : "Annulla",
     "Delete" : "Cantzella",
+    "Edit" : "Modìfica",
+    "Activity" : "Atividade",
     "Close" : "Serra",
     "Please select a file." : "Seletziona un'archìviu.",
     "Select from Files" : "Seletziona dae Archìvios",
@@ -109,6 +111,7 @@ OC.L10N.register(
     "Select" : "Seletziona",
     "Could not update share." : "No at fatu a agiornare sa cumpartzidura.",
     "Unchecked" : "Chene verìfica",
-    "ID" : "ID"
+    "ID" : "ID",
+    "seconds ago" : "segundos a immoe"
 },
 "nplurals=2; plural=(n != 1);");

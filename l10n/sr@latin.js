@@ -28,6 +28,8 @@ OC.L10N.register(
     "Delete column" : "Obriši kolonu",
     "Cancel" : "Otkaži",
     "Delete" : "Obriši",
+    "Edit" : "Izmeni",
+    "Activity" : "Aktivnost",
     "Owner" : "Vlasnik",
     "Close" : "Zatvori",
     "Please select a file." : "Izaberite fajl. ",
@@ -44,6 +46,7 @@ OC.L10N.register(
     "Italic" : "Kurziv",
     "Default" : "Podrazumevano",
     "Copy link" : "Kopiraj vezu",
-    "Select" : "Obeleži"
+    "Select" : "Obeleži",
+    "seconds ago" : "pre nekoliko sekundi"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);");

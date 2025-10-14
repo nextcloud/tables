@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tablolar",
     "Nextcloud Tables" : "Nextcloud tabloları",
     "Select table" : "Tabloyu seçin",
     "Select columns" : "Sütunları seçin",
@@ -132,7 +133,6 @@ OC.L10N.register(
     "Read the docs" : "Belgeleri okuyun",
     "If you want to go through the documentation, it can be found here: [Nextcloud Tables documentation](%s)" : "Belgeleri incelemek isterseniz, şurada bulabilirsiniz: [Nextcloud Tablolar belgeleri](%s)",
     "Check yourself!" : "Kendiniz bakın!",
-    "Tables" : "Tablolar",
     "Manage data the way you need it." : "Verileri istediğiniz şekilde yönetin.",
     "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link to urls or other nextcloud resources\n- Numbers\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n- Users, groups and teams\n\nShare your tables and views with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Verileri gerek duyduğunuz şekilde yönetin.\n\nBu uygulama ile belirleyeceğiniz sütunlar ile kendi tablolarınızı oluşturabilirsiniz. Bir kalıp kullanabilir ya da sıfırdan başlayabilir ve istediğiniz sütunları ekleyebilirsiniz.\nŞu sütun türlerini seçebilirsiniz:\n- Yazı satırı ya da zengin yazı\n- Adres ya da diğer Nextcloud kaynaklarına bağlantı\n- Sayı\n- İlerleme çubuğu\n- Yıldız değerlendirmesi\n- Evet/Hayır işareti\n- Tarih ve/veya saat\n- (Çoklu) seçim\n- Kullanıcılar, gruplar ve takımlar\n\nTablolarınızı ve görünümlerinizi bulutunuzdaki kullanıcılar ve gruplar ile paylaşabilirsiniz.\n\nİyi eğlenceler, istediğiniz gibi yönetin.",
     "Table" : "Tablo",
@@ -280,6 +280,8 @@ OC.L10N.register(
     "Transfer application" : "Uygulamayı aktar",
     "Could not delete row." : "Satır silinemedi.",
     "Edit row" : "Satırı düzenle",
+    "Edit" : "Düzenle",
+    "Activity" : "İşlem",
     "I really want to delete this row!" : "Bu satırı silmek istediğime eminim!",
     "Owner" : "Sahibi",
     "I really want to delete this table!" : "Bu tabloyu silmek istediğime eminim!",
@@ -562,6 +564,7 @@ OC.L10N.register(
     "Last edited at" : "Son düzenlenme",
     "Copied to clipboard." : "Panoya kopyalandı.",
     "Clipboard is not available" : "Pano kullanılamıyor",
+    "seconds ago" : "saniye önce",
     "{shareTypeString}..." : "{shareTypeString}...",
     "Unsupported source: {source}" : "Desteklenmeyen kaynak: {source}",
     "Failed to fetch {shareTypeString}" : "{shareTypeString} alınamadı",

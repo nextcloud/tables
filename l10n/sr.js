@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Табеле",
     "Nextcloud Tables" : "Nextcloud Табеле",
     "Select table" : "Изабери табелу",
     "Select columns" : "Изаберите колоне",
@@ -132,7 +133,6 @@ OC.L10N.register(
     "Read the docs" : "Читај документацију",
     "If you want to go through the documentation, it can be found here: [Nextcloud Tables documentation](%s)" : "Ако желите да прођете кроз документацију, можете је пронаћи овде: [Документација за Nextcloud Табле](%s)",
     "Check yourself!" : "Проверите сами!",
-    "Tables" : "Табеле",
     "Manage data the way you need it." : "Управљајте подацима према својој потреби.",
     "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link to urls or other nextcloud resources\n- Numbers\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n- Users, groups and teams\n\nShare your tables and views with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Управљајте подацима према својој потреби.\n\nОвом, апликацијом можете да креирате сопствене табеле са појединачним колонама. Можете да почнете шаблоном или потпуно свеже, па да додате своје колоне.\nМожете да изаберете неке од следећих типова колона:\n- Линија текста или обогаћени текст\n- Линк на url адресе или остале nextcloud ресурсе\n- Број\n- Трака напредка\n- Рејтинг звездицама\n- Да/Не штиклирање\n- Датум и/или време\n- (Вишеструки) избор\n- Корисници, групе и тимови\n\nДелите своје табеле и погледе са корисницима и групама унутар вашег облака.\n\nДобро се забавите и управљајте оним што желите.",
     "Table" : "Табела",
@@ -280,6 +280,8 @@ OC.L10N.register(
     "Transfer application" : "Пренеси апликацију",
     "Could not delete row." : "Ред не може да се обрише.",
     "Edit row" : "Уреди ред",
+    "Edit" : "Измени",
+    "Activity" : "Активност",
     "I really want to delete this row!" : "Заиста желим да обришем овај ред!",
     "Owner" : "Власник",
     "I really want to delete this table!" : "Заиста желим да обришем ову табелу!",
@@ -562,6 +564,7 @@ OC.L10N.register(
     "Last edited at" : "Последњи пут је уређивано дана",
     "Copied to clipboard." : "Копирано у клипборд.",
     "Clipboard is not available" : "Клипборд није доступан",
+    "seconds ago" : "пре неколико секунди",
     "{shareTypeString}..." : "{shareTypeString}...",
     "Unsupported source: {source}" : "Неподржани извор: {source}",
     "Failed to fetch {shareTypeString}" : "Није успело добављање {shareTypeString}",

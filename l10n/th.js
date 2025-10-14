@@ -39,6 +39,8 @@ OC.L10N.register(
     "Resources" : "ทรัพยากร",
     "Cancel" : "ยกเลิก",
     "Delete" : "ลบ",
+    "Edit" : "แก้ไข",
+    "Activity" : "กิจกรรม",
     "Owner" : "เจ้าของ",
     "Close" : "ปิด",
     "Please select a file." : "กรุณาเลือกไฟล์",
@@ -74,6 +76,7 @@ OC.L10N.register(
     "Select" : "เลือก",
     "Start of the year" : "เริ่มต้นของปี",
     "ID" : "ID",
-    "Clipboard is not available" : "คลิปบอร์ดไม่พร้อมใช้งาน"
+    "Clipboard is not available" : "คลิปบอร์ดไม่พร้อมใช้งาน",
+    "seconds ago" : "วินาทีที่ผ่านมา"
 },
 "nplurals=1; plural=0;");

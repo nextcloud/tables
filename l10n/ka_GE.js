@@ -37,6 +37,8 @@ OC.L10N.register(
     "Resources" : "რესურსები",
     "Cancel" : "უარყოფა",
     "Delete" : "წაშლა",
+    "Edit" : "შეცვლა",
+    "Activity" : "აქტივობა",
     "Close" : "დახურვა",
     "Please select a file." : "გთხოვთ აირჩიოთ ფაილი.",
     "Select from Files" : "აირჩიეთ ფაილებიდან",
@@ -66,6 +68,7 @@ OC.L10N.register(
     "Confirm" : "დადასტურება",
     "Content" : "მოცულობა",
     "Unchecked" : "შეუმოწმებელია",
-    "ID" : "ID"
+    "ID" : "ID",
+    "seconds ago" : "წამის წინ"
 },
 "nplurals=2; plural=(n!=1);");

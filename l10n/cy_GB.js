@@ -31,6 +31,7 @@ OC.L10N.register(
     "Resources" : "Adnoddau",
     "Cancel" : "Diddymu",
     "Delete" : "Dileu",
+    "Activity" : "Gweithred",
     "Owner" : "Perchennog",
     "Close" : "Cau",
     "Preview" : "Rhagolwg",

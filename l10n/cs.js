@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tabulky",
     "Nextcloud Tables" : "Nextcloud tabulky",
     "Select table" : "Vybrat tabulku",
     "Select columns" : "Vybrat sloupce",
@@ -132,7 +133,6 @@ OC.L10N.register(
     "Read the docs" : "Přečíst si dokumentaci",
     "If you want to go through the documentation, it can be found here: [Nextcloud Tables documentation](%s)" : "Pokud si chcete projít dokumentaci, nachází se zde: [Nextcloud Tables documentation](%s)",
     "Check yourself!" : "Zkontrolujte sami!",
-    "Tables" : "Tabulky",
     "Manage data the way you need it." : "Spravujte data tak, jak potřebujete.",
     "Table" : "Tabulka",
     "View" : "Zobrazit",
@@ -279,6 +279,7 @@ OC.L10N.register(
     "Transfer application" : "Přenést aplikaci",
     "Could not delete row." : "Řádek se nepodařilo smazat.",
     "Edit row" : "Upravit řádek",
+    "Activity" : "Aktivita",
     "I really want to delete this row!" : "Opravdu chci tento řádek smazat!",
     "Owner" : "Vlastník",
     "I really want to delete this table!" : "Opravdu chci smazat tuto tabulku!",

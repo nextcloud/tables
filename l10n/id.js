@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tabel",
     "Select columns" : "Pilih kolom",
     "e.g. 1,2,4 or leave empty" : "contoh: 1,2,4 atau biarkan kosong",
     "The file was uploaded" : "Berkas terunggah",
@@ -25,7 +26,6 @@ OC.L10N.register(
     "Birthday" : "Tanggal lahir",
     "Progress" : "Kemajuan",
     "Done" : "Selesai",
-    "Tables" : "Tabel",
     "View" : "Tampilan",
     "Today" : "Hari ini",
     "Create" : "Buat",
@@ -53,6 +53,8 @@ OC.L10N.register(
     "Resources" : "Sumber daya",
     "Cancel" : "Membatalkan",
     "Delete" : "Hapus",
+    "Edit" : "Sunting",
+    "Activity" : "Aktivitas",
     "Close" : "Tutup",
     "Please select a file." : "Silakan pilih berkas",
     "Select from Files" : "Pilih dari berkas",
@@ -91,6 +93,7 @@ OC.L10N.register(
     "Select" : "Pilih",
     "Now" : "Sekarang",
     "ID" : "ID",
-    "Clipboard is not available" : "Papan klip tidak tersedia"
+    "Clipboard is not available" : "Papan klip tidak tersedia",
+    "seconds ago" : "beberapa detik yang lalu"
 },
 "nplurals=1; plural=0;");

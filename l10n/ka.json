@@ -1,4 +1,5 @@
 { "translations": {
+    "Tables" : "Tables",
     "No" : "No",
     "Yes" : "Yes",
     "The file was uploaded" : "ფაილი ატვირთულ იქნა",
@@ -23,7 +24,6 @@
     "Birthday" : "Birthday",
     "Progress" : "Progress",
     "Done" : "Done",
-    "Tables" : "Tables",
     "View" : "View",
     "Today" : "Today",
     "Create" : "Create",
@@ -48,6 +48,8 @@
     "Resources" : "Resources",
     "Cancel" : "Cancel",
     "Delete" : "Delete",
+    "Edit" : "Edit",
+    "Activity" : "აქტივობა",
     "Owner" : "Owner",
     "Close" : "Close",
     "Please select a file." : "Please select a file.",
@@ -92,6 +94,7 @@
     "Confirm" : "Confirm",
     "Select" : "Select",
     "ID" : "ID",
-    "Clipboard is not available" : "Clipboard is not available"
+    "Clipboard is not available" : "Clipboard is not available",
+    "seconds ago" : "seconds ago"
 },"pluralForm" :"nplurals=2; plural=(n!=1);"
 }

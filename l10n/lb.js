@@ -27,6 +27,8 @@ OC.L10N.register(
     "Title" : "Titel",
     "Cancel" : "Ofbriechen",
     "Delete" : "Läschen",
+    "Edit" : "Änneren",
+    "Activity" : "Aktivitéit",
     "Close" : "Zoumaachen",
     "Please select a file." : "Wiel eng Datei aus.",
     "Failed" : "Ausgefall",
@@ -44,6 +46,7 @@ OC.L10N.register(
     "Default" : "Standard",
     "Copy link" : "Link kopéieren",
     "Confirm" : "Konfirméieren",
-    "Select" : "Auswielen"
+    "Select" : "Auswielen",
+    "seconds ago" : "Sekonnen hier"
 },
 "nplurals=2; plural=(n != 1);");

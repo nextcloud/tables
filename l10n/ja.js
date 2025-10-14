@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "テーブル",
     "Nextcloud Tables" : "Nextcloud Tables",
     "Select table" : "テーブルを選択",
     "Select columns" : "列を選択する",
@@ -118,7 +119,6 @@ OC.L10N.register(
     "Edit a row" : "行を編集",
     "Add a new column" : "列を追加",
     "Read the docs" : "ドキュメントを読む",
-    "Tables" : "テーブル",
     "Manage data the way you need it." : "データを自由に管理",
     "Table" : "表",
     "View" : "表示",
@@ -249,6 +249,8 @@ OC.L10N.register(
     "I really want to delete this application!" : "このアプリケーションは本当に削除したい！",
     "Transfer application" : "アプリケーションの譲渡",
     "Edit row" : "行の編集",
+    "Edit" : "編集",
+    "Activity" : "アクティビティ",
     "I really want to delete this row!" : "この行は本当に削除したい！",
     "Owner" : "作成者",
     "I really want to delete this table!" : "このテーブルは本当に削除したい！",
@@ -423,6 +425,7 @@ OC.L10N.register(
     "Last editor" : "最終更新者",
     "Last edited at" : "最終更新日",
     "Clipboard is not available" : "クリップボードは利用できません",
+    "seconds ago" : "数秒前",
     "Unknown error." : "不明なエラー",
     "Resource not found." : "リソースが見つかりません。",
     "Could not remove column." : "列を削除できませんでした。",

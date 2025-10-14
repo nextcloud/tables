@@ -28,6 +28,8 @@ OC.L10N.register(
     "Title" : "Azwel",
     "Cancel" : "Sefsex",
     "Delete" : "Kkes",
+    "Edit" : "Ẓreg",
+    "Activity" : "Armud",
     "Owner" : "Bab",
     "Close" : "Mdel",
     "Please select a file." : "Ttxil fren afaylu.",

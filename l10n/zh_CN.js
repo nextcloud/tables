@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "表格",
     "Nextcloud Tables" : "Nextcloud 表格",
     "Select table" : "选择表",
     "Select columns" : "选择列",
@@ -119,7 +120,6 @@ OC.L10N.register(
     "Edit a row" : "编辑行",
     "Add a new column" : "添加新列",
     "Read the docs" : "阅读文档",
-    "Tables" : "表格",
     "Manage data the way you need it." : "按照您需要的方式管理数据。",
     "Table" : "表格",
     "View" : "查看",
@@ -263,6 +263,8 @@ OC.L10N.register(
     "Transfer application" : "转移应用程序",
     "Could not delete row." : "无法删除列。",
     "Edit row" : "编辑列",
+    "Edit" : "编辑",
+    "Activity" : "动态",
     "I really want to delete this row!" : "我真的想要删除此行！",
     "Owner" : "所有者",
     "I really want to delete this table!" : "我真的想要删除此表！",
@@ -414,6 +416,7 @@ OC.L10N.register(
     "Now" : "现在",
     "ID" : "ID",
     "Clipboard is not available" : "剪贴板不可用",
+    "seconds ago" : "几秒前",
     "Could not remove table." : "无法移除数据库表"
 },
 "nplurals=1; plural=0;");

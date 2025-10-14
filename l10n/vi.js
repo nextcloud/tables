@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Bảng",
     "Nextcloud Tables" : "Bảng Nextcloud",
     "Select table" : "Chọn bảng",
     "Select columns" : "Chọn các cột",
@@ -75,7 +76,6 @@ OC.L10N.register(
     "Birthday" : "Sinh nhật",
     "Progress" : "Tiến trình",
     "Done" : "Hoàn thành",
-    "Tables" : "Bảng",
     "View" : "Xem",
     "Today" : "Hôm nay",
     "Create" : "‎Tạo‎",
@@ -142,6 +142,8 @@ OC.L10N.register(
     "Resources" : "Các nguồn lực",
     "Cancel" : "Hủy",
     "Delete" : "Xóa",
+    "Edit" : "Chỉnh sửa",
+    "Activity" : "Nhật ký",
     "Owner" : "Chủ",
     "Close" : "Đóng",
     "Please select a file." : "Hãy chọn một tệp.",
@@ -189,6 +191,7 @@ OC.L10N.register(
     "Confirm" : "Xác nhận",
     "Select" : "Chọn",
     "ID" : "ID",
-    "Clipboard is not available" : "Bảng nhớ tạm không có sẵn"
+    "Clipboard is not available" : "Bảng nhớ tạm không có sẵn",
+    "seconds ago" : "vài giây trước"
 },
 "nplurals=1; plural=0;");

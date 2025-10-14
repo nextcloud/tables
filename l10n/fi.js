@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Taulukot",
     "Nextcloud Tables" : "Nextcloud-taulukot",
     "Select table" : "Valitse taulukko",
     "Select columns" : "Valitse sarakkeet",
@@ -119,7 +120,6 @@ OC.L10N.register(
     "Edit a row" : "Muokkaa riviä",
     "Add a new column" : "Lisää uusi sarake",
     "Read the docs" : "Lue ohjeet",
-    "Tables" : "Taulukot",
     "Manage data the way you need it." : "Hallitse tietoja haluamallasi tavalla.",
     "Table" : "Taulukko",
     "View" : "Näkymä",
@@ -265,6 +265,8 @@ OC.L10N.register(
     "Transfer application" : "Siirrä sovellus",
     "Could not delete row." : "Riviä ei voitu poistaa.",
     "Edit row" : "Muokkaa riviä",
+    "Edit" : "Muokkaa",
+    "Activity" : "Tapahtumat",
     "I really want to delete this row!" : "Haluan todella poistaa tämän rivin!",
     "Owner" : "Omistaja",
     "I really want to delete this table!" : "Haluan todella poistaa tämän taulukon!",
@@ -498,6 +500,7 @@ OC.L10N.register(
     "Last edited at" : "Viimeisin muokkausaika",
     "Copied to clipboard." : "Kopioitu leikepöydälle.",
     "Clipboard is not available" : "Leikepöytä ei ole käytettävissä",
+    "seconds ago" : "sekunteja sitten",
     "{shareTypeString}..." : "{shareTypeString}...",
     "Unsupported source: {source}" : "Lähdettä {source} ei tueta",
     "Failed to fetch {shareTypeString}" : "Nouto epäonnistui: {shareTypeString}",

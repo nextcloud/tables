@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tabeller",
     "Nextcloud Tables" : "Nextcloud Tabeller",
     "Select table" : "Välj tabell",
     "Select columns" : "Välj kolumner",
@@ -101,7 +102,6 @@ OC.L10N.register(
     "Read the docs" : "Läs dokumenten",
     "If you want to go through the documentation, it can be found here: [Nextcloud Tables documentation](%s)" : "Om du vill gå igenom dokumentationen hittar du den här: [Nextcloud Tables-dokumentation](%s)",
     "Check yourself!" : "Kontrollera själv!",
-    "Tables" : "Tabeller",
     "Manage data the way you need it." : " Hantera data som du behöver den.",
     "Table" : "Tabell",
     "View" : "Visa",
@@ -248,6 +248,8 @@ OC.L10N.register(
     "Transfer application" : "Överför app",
     "Could not delete row." : "Kunde inte radera rad.",
     "Edit row" : "Redigera rad",
+    "Edit" : "Redigera",
+    "Activity" : "Aktivitet",
     "I really want to delete this row!" : "Jag vill verkligen ta bort den här raden!",
     "Owner" : "Ägare",
     "I really want to delete this table!" : "Jag vill verkligen ta bort den här tabellen!",
@@ -530,6 +532,7 @@ OC.L10N.register(
     "Last edited at" : "Senast redigerad ",
     "Copied to clipboard." : "Kopierat till urklipp.",
     "Clipboard is not available" : "Urklipp är inte tillgängligt",
+    "seconds ago" : "sekunder sedan",
     "{shareTypeString}..." : "{shareTypeString}...",
     "Unsupported source: {source}" : "Källan stöds inte: {source}",
     "Failed to fetch {shareTypeString}" : "Misslyckades att hämta {shareTypeString}",

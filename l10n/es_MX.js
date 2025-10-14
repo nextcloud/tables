@@ -60,6 +60,8 @@ OC.L10N.register(
     "Resources" : "Recursos",
     "Cancel" : "Cancelar",
     "Delete" : "Eliminar",
+    "Edit" : "Editar",
+    "Activity" : "Actividad",
     "Owner" : "Propietario",
     "Close" : "Cerrar",
     "Please select a file." : "Por favor selecciona un archivo.",
@@ -122,6 +124,7 @@ OC.L10N.register(
     "Insert" : "Insertar",
     "Unchecked" : "Desmarcado",
     "ID" : "ID",
-    "Clipboard is not available" : "El portapapeles no está disponible"
+    "Clipboard is not available" : "El portapapeles no está disponible",
+    "seconds ago" : "hace algunos segundos"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

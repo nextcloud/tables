@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tabeloj",
     "No" : "Ne",
     "Yes" : "Jes",
     "The file was uploaded" : "La dosiero alŝutiĝis",
@@ -25,7 +26,6 @@ OC.L10N.register(
     "Position" : "Loko",
     "Birthday" : "Naskiĝotago",
     "Done" : "Farita",
-    "Tables" : "Tabeloj",
     "View" : "Vidi",
     "Today" : "Hodiaŭ",
     "Create" : "Krei",
@@ -47,6 +47,7 @@ OC.L10N.register(
     "Resources" : "Rimedoj",
     "Cancel" : "Nuligi",
     "Delete" : "Forigi",
+    "Activity" : "Aktivaĵoj",
     "Owner" : "Posedanto",
     "Close" : "Malfermi",
     "Please select a file." : "Bonvolu elekti dosieron.",

@@ -40,6 +40,8 @@ OC.L10N.register(
     "Delete column" : "Fshi kolonë",
     "Cancel" : "Anullo",
     "Delete" : "Fshij",
+    "Edit" : "Përpuno",
+    "Activity" : "Aktiviteti",
     "Close" : "Mbylleni",
     "Please select a file." : "Ju lutem përzgjidhni një skedar.",
     "Select from Files" : "Përzgjidhni prej Kartelash",
@@ -77,6 +79,7 @@ OC.L10N.register(
     "Confirm" : "Konfirmo",
     "Content" : "Përmbajtja",
     "Select" : "Përzgjidh",
-    "ID" : "ID"
+    "ID" : "ID",
+    "seconds ago" : "sekonda më parë"
 },
 "nplurals=2; plural=(n != 1);");

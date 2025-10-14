@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Таблици",
     "Select table" : "Избор на таблица",
     "Select columns" : "Избор на колони",
     "e.g. 1,2,4 or leave empty" : "напр. 1,2,4 или ги оставете празни",
@@ -107,7 +108,6 @@ OC.L10N.register(
     "Edit a row" : "Редактиране на ред",
     "Add a new column" : "Добавяне на нова колона",
     "Read the docs" : "Прочитане на документите",
-    "Tables" : "Таблици",
     "Manage data the way you need it." : "Управление на данните, по необходимият от вас начин.",
     "Table" : "Таблица",
     "View" : "Изглед",

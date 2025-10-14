@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tabele",
     "Nextcloud Tables" : "Tabele Nextcloud",
     "Select table" : "Wybierz tabelę",
     "Select columns" : "Wybierz kolumny",
@@ -80,7 +81,6 @@ OC.L10N.register(
     "What" : "Co",
     "Done" : "Gotowe",
     "Add a new column" : "Dodaj nową kolumnę",
-    "Tables" : "Tabele",
     "Table" : "Tabela",
     "View" : "Podgląd",
     "Today" : "Dzisiaj",
@@ -156,6 +156,8 @@ OC.L10N.register(
     "Description of the application" : "Opis aplikacji",
     "Could not delete row." : "Nie można usunąć wiersza.",
     "Edit row" : "Edytuj wiersz",
+    "Edit" : "Edycja",
+    "Activity" : "Aktywność",
     "I really want to delete this row!" : "Naprawdę chcę usunąć ten wiersz!",
     "Owner" : "Właściciel",
     "Import successful" : "Zaimportowano pomyślnie",
@@ -257,6 +259,7 @@ OC.L10N.register(
     "Last editor" : "Ostatni redaktor",
     "Last edited at" : "Ostatnia edycja o godz.",
     "Clipboard is not available" : "Schowek jest niedostępny",
+    "seconds ago" : "przed chwilą",
     "Unknown error." : "Nieznany błąd.",
     "Request is not authorized. Are you logged in?" : "Żądanie nie jest autoryzowane. Czy jesteś zalogowany?",
     "Request not allowed." : "Żądanie niedozwolone.",

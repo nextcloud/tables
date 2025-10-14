@@ -52,6 +52,8 @@ OC.L10N.register(
     "Resources" : "Resursi",
     "Cancel" : "Atcelt",
     "Delete" : "Izdzēst",
+    "Edit" : "Labot",
+    "Activity" : "Darbības",
     "Close" : "Aizvērt",
     "Please select a file." : "Lūgums atlasīt datni.",
     "Select from Files" : "Atlasīt no Datnēm",
@@ -101,6 +103,8 @@ OC.L10N.register(
     "Confirm" : "Apstiprināt",
     "Content" : "Saturs",
     "Select" : "Atzīmēt",
-    "Unchecked" : "Neatzīmēts"
+    "Unchecked" : "Neatzīmēts",
+    "Now" : "Tagad",
+    "seconds ago" : "pirms vairākām sekundēm"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);");

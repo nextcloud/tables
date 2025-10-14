@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tabeller",
     "Nextcloud Tables" : "Nextcloud tabeller",
     "Select table" : "Vælg tabel",
     "Select columns" : "Vælg kolonner",
@@ -109,7 +110,6 @@ OC.L10N.register(
     "Edit a row" : "Editer række",
     "Add a new column" : "Tilføj ny kolonne",
     "Read the docs" : "Læs dokumentationen",
-    "Tables" : "Tabeller",
     "Manage data the way you need it." : "Administrer data efter dine ønsker og behov…",
     "Table" : "Tabel",
     "View" : "Vis",
@@ -195,6 +195,7 @@ OC.L10N.register(
     "Edit column" : "Rediger kolonne",
     "Could not delete row." : "Rækken kunne ikke slettes.",
     "Edit row" : "Redigér række",
+    "Activity" : "Aktivitet",
     "I really want to delete this row!" : "Jeg ønsker at slette denne række!",
     "Owner" : "Ejer",
     "I really want to delete this table!" : "Jeg ønsker virkelig at slette denne tabel!",

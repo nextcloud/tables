@@ -1,4 +1,5 @@
 { "translations": {
+    "Tables" : "Tablèus",
     "No" : "Non",
     "Yes" : "Òc",
     "The file was uploaded" : "Lo fichièr es estat enviat",
@@ -26,7 +27,6 @@
     "Position" : "Posicion",
     "Birthday" : "Data de naissença",
     "Task" : "Prètzfach",
-    "Tables" : "Tablèus",
     "Table" : "Tablèu",
     "View" : "Veire",
     "Today" : "Uèi",
@@ -49,6 +49,8 @@
     "Title" : "Títol",
     "Cancel" : "Anullar",
     "Delete" : "Suprimir",
+    "Edit" : "Modificar",
+    "Activity" : "Activitat",
     "Close" : "Plegar",
     "Please select a file." : "Seleccionatz un fichièr.",
     "Select from Files" : "Seleccionar dels fichièrs",
@@ -85,6 +87,7 @@
     "Default" : "Defaut",
     "Copy link" : "Copiar lo ligam",
     "Confirm" : "Confirmar",
-    "ID" : "ID"
+    "ID" : "ID",
+    "seconds ago" : "fa qualques segondas"
 },"pluralForm" :"nplurals=2; plural=(n > 1);"
 }

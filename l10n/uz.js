@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Jadvallar",
     "Nextcloud Tables" : "Nextcloud jadvallari",
     "Select columns" : "Ustunni tanlash",
     "e.g. 1,2,4 or leave empty" : "masalan. 1,2,4 yoki bo'sh qoldiring",
@@ -22,7 +23,6 @@ OC.L10N.register(
     "Comment" : "Izoh",
     "to" : "пф",
     "Done" : "Done",
-    "Tables" : "Jadvallar",
     "Table" : "Jadval",
     "View" : "Ko'rish",
     "Today" : "Today",
@@ -56,6 +56,8 @@ OC.L10N.register(
     "Delete" : "O'chirish",
     "Edit column" : "Ustunni tahrirlash",
     "Edit row" : "Qatorni tahrirlash",
+    "Edit" : "Tahrirlash",
+    "Activity" : "Faollik",
     "Owner" : "Owner",
     "Close" : "Yopish",
     "Please select a file." : "Iltimos, faylni tanlang.",
@@ -101,6 +103,7 @@ OC.L10N.register(
     "Confirmation" : "Tasdiqlash",
     "Confirm" : "Confirm",
     "Select" : "Select",
-    "Now" : "Hozir"
+    "Now" : "Hozir",
+    "seconds ago" : "soniya avval"
 },
 "nplurals=1; plural=0;");

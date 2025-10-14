@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tables",
     "Nextcloud Tables" : "Nextcloud Tables",
     "No" : "Non",
     "Yes" : "Sí",
@@ -59,7 +60,6 @@ OC.L10N.register(
     "Progress" : "Progresu",
     "We know what we are doing." : "Sabemos lo que facemos.",
     "Done" : "Fecho",
-    "Tables" : "Tables",
     "Manage data the way you need it." : "Xestiona datos de la forma que precises.",
     "Table" : "Tabla",
     "View" : "Ver",

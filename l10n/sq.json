@@ -38,6 +38,8 @@
     "Delete column" : "Fshi kolonë",
     "Cancel" : "Anullo",
     "Delete" : "Fshij",
+    "Edit" : "Përpuno",
+    "Activity" : "Aktiviteti",
     "Close" : "Mbylleni",
     "Please select a file." : "Ju lutem përzgjidhni një skedar.",
     "Select from Files" : "Përzgjidhni prej Kartelash",
@@ -75,6 +77,7 @@
     "Confirm" : "Konfirmo",
     "Content" : "Përmbajtja",
     "Select" : "Përzgjidh",
-    "ID" : "ID"
+    "ID" : "ID",
+    "seconds ago" : "sekonda më parë"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

@@ -30,6 +30,8 @@ OC.L10N.register(
     "Title" : "Վերնագիր",
     "Cancel" : "ընդհատել",
     "Delete" : "հեռացնել",
+    "Edit" : "մշակել",
+    "Activity" : "Գործունեություն",
     "Close" : "Փակել",
     "Please select a file." : "Խնդրում ենք ընտրել նիշք:",
     "Sort" : "Դասակարգել",
@@ -44,6 +46,7 @@ OC.L10N.register(
     "URL" : "URL",
     "Default" : "Լռելյայն",
     "Copy link" : "Պատճենել հղումը",
-    "Select" : "Նշել"
+    "Select" : "Նշել",
+    "seconds ago" : "վրկ. առաջ"
 },
 "nplurals=2; plural=(n != 1);");

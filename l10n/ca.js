@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Taules",
     "Select table" : "Seleccioneu una taula",
     "Select columns" : "Seleccioneu columnes",
     "e.g. 1,2,4 or leave empty" : "per exemple. 1,2,4 o deixar buit",
@@ -101,7 +102,6 @@ OC.L10N.register(
     "What" : "Què",
     "Done" : "Desat",
     "Add a new column" : "Afegeix una nova columna",
-    "Tables" : "Taules",
     "Manage data the way you need it." : "Gestioneu les dades com les necessiteu.",
     "Table" : "Taula",
     "View" : "Visualització",

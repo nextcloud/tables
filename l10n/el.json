@@ -1,4 +1,5 @@
 { "translations": {
+    "Tables" : "Πίνακες",
     "Select table" : "Επιλογή πίνακα",
     "Select columns" : "Επιλέξτε στήλες",
     "e.g. 1,2,4 or leave empty" : "π.χ. 1,2,4 ή αφήστε κενό",
@@ -129,7 +130,6 @@
     "Read the docs" : "Διαβάστε την τεκμηρίωση",
     "If you want to go through the documentation, it can be found here: [Nextcloud Tables documentation](%s)" : "Εάν θέλετε να διαβάσετε την τεκμηρίωση, μπορείτε να τη βρείτε εδώ: [Τεκμηρίωση Nextcloud Tables](%s)",
     "Check yourself!" : "Ελέγξτε τον εαυτό σας!",
-    "Tables" : "Πίνακες",
     "Manage data the way you need it." : "Διαχειριστείτε δεδομένα όπως εσείς το χρειάζεστε.",
     "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link to urls or other nextcloud resources\n- Numbers\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n- Users, groups and teams\n\nShare your tables and views with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Διαχειριστείτε δεδομένα όπως εσείς το χρειάζεστε.\n\nΜε αυτή την εφαρμογή μπορείτε να δημιουργήσετε τους δικούς σας πίνακες με μεμονωμένες στήλες. Μπορείτε να ξεκινήσετε με ένα πρότυπο ή από το μηδέν και να προσθέσετε τις στήλες που θέλετε.\nΜπορείτε να επιλέξετε από τους ακόλουθους τύπους στηλών:\n- Γραμμή κειμένου ή εμπλουτισμένο κείμενο\n- Σύνδεσμος προς URLs ή άλλους πόρους nextcloud\n- Αριθμοί\n- Μπάρα προόδου\n- Αξιολόγηση με αστέρια\n- Ναι/Όχι επιλογή\n- Ημερομηνία και/ή ώρα\n- (Πολλαπλή) επιλογή\n- Χρήστες, ομάδες και ομάδες\n\nΜοιραστείτε τους πίνακες και τις προβολές σας με χρήστες και ομάδες μέσα στο cloud σας.\n\nΚαλή διασκέδαση και διαχειριστείτε ό,τι θέλετε.",
     "Table" : "Πίνακας",
@@ -277,6 +277,7 @@
     "Transfer application" : "Μεταφορά εφαρμογής",
     "Could not delete row." : "Αδυναμία διαγραφής γραμμής.",
     "Edit row" : "Επεξεργασία γραμμής",
+    "Activity" : "Δραστηριότητα",
     "I really want to delete this row!" : "Θέλω πραγματικά να διαγράψω αυτή τη γραμμή!",
     "Owner" : "Κάτοχος",
     "I really want to delete this table!" : "Θέλω πραγματικά να διαγράψω αυτόν τον πίνακα!",

@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tablas",
     "Nextcloud Tables" : "Tablas de Nextcloud",
     "Select table" : "Seleccionar tabla",
     "Select columns" : "Seleccionar columnas",
@@ -132,7 +133,6 @@ OC.L10N.register(
     "Read the docs" : "Lea la documentación",
     "If you want to go through the documentation, it can be found here: [Nextcloud Tables documentation](%s)" : "Si quiere navegar la documentación, puede conseguirse aquí: {Documentación de tablas de Nextcloud}(%s)",
     "Check yourself!" : "¡Vea Ud. mismo!",
-    "Tables" : "Tablas",
     "Manage data the way you need it." : "Gestione los datos, en la manera que lo necesite.",
     "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link to urls or other nextcloud resources\n- Numbers\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n- Users, groups and teams\n\nShare your tables and views with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Administre los datos de la manera que necesite.\n\nCon esta app puede crear sus propias tablas con columnas individuales. Puede comenzar con una plantilla o desde cero y agregar las columnas que desee.\nPuede elegir entre los siguientes tipos de columnas:\n- Línea de texto o texto enriquecido\n- Enlace a URL o a otros recursos de Nextcloud\n- Números\n- Barra de progreso\n- Calificación con estrellas\n- Marca de verificación Sí/No\n- Fecha y/o hora\n- Selección (múltiple)\n- Usuarios, grupos y equipos\n\nComparta sus tablas y vistas con usuarios y grupos dentro de su nube.\n\nDisfrute y gestione lo que desee.",
     "Table" : "Tabla",
@@ -280,6 +280,7 @@ OC.L10N.register(
     "Transfer application" : "Transferir aplicación",
     "Could not delete row." : "No se ha podido eliminar la fila.",
     "Edit row" : "Editar fila",
+    "Activity" : "Actividad",
     "I really want to delete this row!" : "¡Realmente quiero eliminar esta fila!",
     "Owner" : "Propietario",
     "I really want to delete this table!" : "¡Realmente quiero eliminar esta tabla!",

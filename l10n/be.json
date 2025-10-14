@@ -1,4 +1,5 @@
 { "translations": {
+    "Tables" : "Табліцы",
     "Nextcloud Tables" : "Табліцы Nextcloud",
     "No" : "Не",
     "Yes" : "Так",
@@ -33,7 +34,6 @@
     "Task" : "Заданне",
     "Progress" : "Ход выканання",
     "Done" : "Гатова",
-    "Tables" : "Табліцы",
     "Table" : "Табліца",
     "View" : "Выгляд",
     "Today" : "Сёння",
