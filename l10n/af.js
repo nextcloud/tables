@@ -57,6 +57,7 @@ OC.L10N.register(
     "Suffix" : "Agtervoegsel",
     "Default" : "Verstek",
     "Confirm" : "Bevestig",
-    "ID" : "ID"
+    "ID" : "ID",
+    "seconds ago" : "sekondes gelede"
 },
 "nplurals=2; plural=(n != 1);");

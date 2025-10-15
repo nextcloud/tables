@@ -1,7 +1,12 @@
 OC.L10N.register(
     "tables",
     {
+    "_You have updated cell _::_You have updated cells _" : ["Você atualizou uma célula","Você atualizou células","Você atualizou células"],
+    "_{user} has updated cell(s) _::_{user} has updated cells _" : ["{user} atualizou uma célula","{user} atualizou células","{user} atualizou células"],
+    "You have deleted the row {row} in table {table}" : "Você excluiu a linha {row} na tabela {table}",
+    "{user} has deleted the row {row} in table {table}" : "{user} excluiu a linha {row} na tabela {table}",
     "Tables" : "Tabelas",
+    "A <strong>table or row</strong> was changed" : "Uma <strong>tabela ou linha</strong> foi alterada",
     "Nextcloud Tables" : "Nextcloud Tabelas",
     "Select table" : "Selecionar tabela",
     "Select columns" : "Selecionar colunas",

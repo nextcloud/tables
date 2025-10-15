@@ -31,6 +31,7 @@ OC.L10N.register(
     "Resources" : "Adnoddau",
     "Cancel" : "Diddymu",
     "Delete" : "Dileu",
+    "Edit" : "Golygu",
     "Activity" : "Gweithred",
     "Owner" : "Perchennog",
     "Close" : "Cau",
@@ -52,6 +53,7 @@ OC.L10N.register(
     "Suffix" : "Ôl-ddodiad",
     "Close editor" : "Cau'r golygydd",
     "Confirm" : "Cadarnhau",
-    "ID" : "ID"
+    "ID" : "ID",
+    "seconds ago" : "eiliad yn ôl"
 },
 "nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != 11) ? 2 : 3;");

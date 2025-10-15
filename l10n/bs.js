@@ -27,6 +27,8 @@ OC.L10N.register(
     "Title" : "Naslov",
     "Cancel" : "Otkaži",
     "Delete" : "Obriši",
+    "Edit" : "Izmjeni",
+    "Activity" : "Aktivnost",
     "Owner" : "Vlasnik",
     "Close" : "Zatvori",
     "Export" : "Izvezi",

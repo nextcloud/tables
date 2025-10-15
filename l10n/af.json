@@ -55,6 +55,7 @@
     "Suffix" : "Agtervoegsel",
     "Default" : "Verstek",
     "Confirm" : "Bevestig",
-    "ID" : "ID"
+    "ID" : "ID",
+    "seconds ago" : "sekondes gelede"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

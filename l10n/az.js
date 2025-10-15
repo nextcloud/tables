@@ -36,6 +36,8 @@ OC.L10N.register(
     "Resources" : "Resurslar",
     "Cancel" : "Dayandır",
     "Delete" : "Sil",
+    "Edit" : "Dəyişiklik et",
+    "Activity" : "Fəallıq",
     "Close" : "Bağla",
     "Please select a file." : "Lütfən, fayl seçin.",
     "Sort" : "Çeşidləmək",
@@ -54,6 +56,7 @@ OC.L10N.register(
     "Default" : "Susmaya görə",
     "Copy link" : "linki nüsxələ",
     "Confirm" : "Təsdiq edin",
-    "Select" : "Seç"
+    "Select" : "Seç",
+    "seconds ago" : "saniyələr öncə"
 },
 "nplurals=2; plural=(n != 1);");

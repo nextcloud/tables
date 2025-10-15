@@ -45,6 +45,7 @@
     "Resources" : "Rimedoj",
     "Cancel" : "Nuligi",
     "Delete" : "Forigi",
+    "Edit" : "Modifi",
     "Activity" : "Aktivaĵoj",
     "Owner" : "Posedanto",
     "Close" : "Malfermi",
@@ -89,6 +90,7 @@
     "Confirm" : "Konfirmi",
     "Content" : "Enhavo",
     "Select" : "Elekti",
-    "ID" : "Identigilo"
+    "ID" : "Identigilo",
+    "seconds ago" : "antaŭ kelkaj sekundoj"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

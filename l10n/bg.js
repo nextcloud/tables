@@ -190,6 +190,8 @@ OC.L10N.register(
     "The column \"{column}\" was updated." : "Колоната „{column}“ беше обновена.",
     "Could not delete row." : "Редът не можа да се изтрие.",
     "Edit row" : "Редактиране на ред",
+    "Edit" : "Промяна",
+    "Activity" : "Активност",
     "I really want to delete this row!" : "Наистина искам да изтрия този ред!",
     "Owner" : "Създател",
     "I really want to delete this table!" : "Наистина искам да изтрия тази таблица!",
@@ -307,6 +309,7 @@ OC.L10N.register(
     "Now" : "Сега",
     "ID" : "ID /Идентификатор/",
     "Clipboard is not available" : "Клипбордът не е достъпен",
+    "seconds ago" : "преди секунди",
     "Could not fetch tables" : "Таблиците не можаха да бъдат извлечени"
 },
 "nplurals=2; plural=(n != 1);");

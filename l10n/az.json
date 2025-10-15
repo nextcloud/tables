@@ -34,6 +34,8 @@
     "Resources" : "Resurslar",
     "Cancel" : "Dayandır",
     "Delete" : "Sil",
+    "Edit" : "Dəyişiklik et",
+    "Activity" : "Fəallıq",
     "Close" : "Bağla",
     "Please select a file." : "Lütfən, fayl seçin.",
     "Sort" : "Çeşidləmək",
@@ -52,6 +54,7 @@
     "Default" : "Susmaya görə",
     "Copy link" : "linki nüsxələ",
     "Confirm" : "Təsdiq edin",
-    "Select" : "Seç"
+    "Select" : "Seç",
+    "seconds ago" : "saniyələr öncə"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

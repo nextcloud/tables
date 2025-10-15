@@ -47,6 +47,7 @@ OC.L10N.register(
     "Resources" : "Rimedoj",
     "Cancel" : "Nuligi",
     "Delete" : "Forigi",
+    "Edit" : "Modifi",
     "Activity" : "Aktivaĵoj",
     "Owner" : "Posedanto",
     "Close" : "Malfermi",
@@ -91,6 +92,7 @@ OC.L10N.register(
     "Confirm" : "Konfirmi",
     "Content" : "Enhavo",
     "Select" : "Elekti",
-    "ID" : "Identigilo"
+    "ID" : "Identigilo",
+    "seconds ago" : "antaŭ kelkaj sekundoj"
 },
 "nplurals=2; plural=(n != 1);");
