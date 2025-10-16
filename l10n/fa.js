@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "جدول‌ها",
     "Nextcloud Tables" : "Nextcloud Tables",
     "Select table" : "Select table",
     "Select columns" : "Select columns",
@@ -112,7 +113,6 @@ OC.L10N.register(
     "Edit a row" : "Edit a row",
     "Add a new column" : "Add a new column",
     "Read the docs" : "Read the docs",
-    "Tables" : "جدول‌ها",
     "Manage data the way you need it." : "Manage data the way you need it.",
     "Table" : "Table",
     "View" : "نمایش",
@@ -229,6 +229,8 @@ OC.L10N.register(
     "Edit column" : "Edit column",
     "Could not delete row." : "Could not delete row.",
     "Edit row" : "Edit row",
+    "Edit" : "ویرایش",
+    "Activity" : "فعالیت",
     "I really want to delete this row!" : "I really want to delete this row!",
     "Owner" : "مالک",
     "I really want to delete this table!" : "I really want to delete this table!",
@@ -423,6 +425,7 @@ OC.L10N.register(
     "Last editor" : "Last editor",
     "Last edited at" : "Last edited at",
     "Clipboard is not available" : "تخته گیره موحود نیست",
+    "seconds ago" : "یک ثانیه پیش",
     "Unknown error." : "Unknown error.",
     "Request is not authorized. Are you logged in?" : "Request is not authorized. Are you logged in?",
     "Request not allowed." : "Request not allowed.",

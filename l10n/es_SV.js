@@ -39,6 +39,8 @@ OC.L10N.register(
     "Resources" : "Recursos",
     "Cancel" : "Cancelar",
     "Delete" : "Borrar",
+    "Edit" : "Editar",
+    "Activity" : "Actividad",
     "Owner" : "Dueño",
     "Close" : "Cerrar",
     "Please select a file." : "Por favor selecciona un archivo.",
@@ -71,6 +73,7 @@ OC.L10N.register(
     "Content" : "Contenido",
     "Select" : "Seleccionar",
     "Unchecked" : "Desmarcado",
-    "ID" : "ID"
+    "ID" : "ID",
+    "seconds ago" : "hace segundos"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

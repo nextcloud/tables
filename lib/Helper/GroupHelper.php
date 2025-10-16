@@ -27,4 +27,19 @@ class GroupHelper {
 			return $groupId;
 		}
 	}
+
+	public function getUserIdsInGroup(string $groupId): array {
+		$users = [];
+		try {
+			$group = $this->groupManager->get($groupId);
+			if ($group) {
+				foreach ($group->getUsers() as $user) {
+					$users[] = $user->getUID();
+				}
+			}
+		} catch (\Exception $e) {
+			$this->logger->error('Error fetching users in group: ' . $e->getMessage());
+		}
+		return $users;
+	}
 }

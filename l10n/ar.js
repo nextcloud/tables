@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "الجداول",
     "Nextcloud Tables" : "جداول نكست كلاود Tables",
     "Select table" : "إختَر جدولاً",
     "Select columns" : "حدد الأعمدة",
@@ -131,7 +132,6 @@ OC.L10N.register(
     "Read the docs" : "قراءة الوثائق",
     "If you want to go through the documentation, it can be found here: [Nextcloud Tables documentation](%s)" : "إذا رغبت في الاطلاع على التوثيق، يمكنك إيجاده هنا: [توثيق جداول نكست كلاود Nextcloud Tables] (%s)",
     "Check yourself!" : "إختبِر نفسك!",
-    "Tables" : "الجداول",
     "Manage data the way you need it." : "أدِر بياناتك كيفما ترغب.",
     "Table" : "جدول",
     "View" : "عرض",
@@ -277,6 +277,8 @@ OC.L10N.register(
     "Transfer application" : "نقل التطبيق",
     "Could not delete row." : "تعذر حذف الصف.",
     "Edit row" : "تعديل صف",
+    "Edit" : "تحرير",
+    "Activity" : "الأنشطة",
     "I really want to delete this row!" : "أنا حقا أريد حذف هذا الصف!",
     "Owner" : "مالك",
     "I really want to delete this table!" : "أنا أرغب فعلاً في حذف هذا الجدول!",
@@ -544,6 +546,7 @@ OC.L10N.register(
     "Last edited at" : "آخر تعديل تمّ في",
     "Copied to clipboard." : "تمّ النسخ إلى الحافطة.",
     "Clipboard is not available" : "الحافظة غير متاحة",
+    "seconds ago" : "منذ ثوان مضت",
     "{shareTypeString}..." : "{shareTypeString}...",
     "Unsupported source: {source}" : "مصدر غير مدعوم: {source}",
     "Failed to fetch {shareTypeString}" : "تعذّر جلب {shareTypeString}",

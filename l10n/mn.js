@@ -26,6 +26,8 @@ OC.L10N.register(
     "Title" : "Цол/Албан тушаал",
     "Cancel" : "болиулах",
     "Delete" : "Устгах",
+    "Edit" : "Өөрчлөх",
+    "Activity" : "Үйлдлүүд",
     "Owner" : "Эзэмшигч",
     "Please select a file." : "Файл сонгоно уу.",
     "Select from Files" : "Файлуудаас сонгох",
@@ -46,6 +48,7 @@ OC.L10N.register(
     "Undo" : "буцах",
     "Confirm" : "Батлах",
     "Select" : "Сонгох",
-    "ID" : "ID"
+    "ID" : "ID",
+    "seconds ago" : "хоёрдахь өмнө"
 },
 "nplurals=2; plural=(n != 1);");

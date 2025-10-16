@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tablèus",
     "No" : "Non",
     "Yes" : "Òc",
     "The file was uploaded" : "Lo fichièr es estat enviat",
@@ -28,7 +29,6 @@ OC.L10N.register(
     "Position" : "Posicion",
     "Birthday" : "Data de naissença",
     "Task" : "Prètzfach",
-    "Tables" : "Tablèus",
     "Table" : "Tablèu",
     "View" : "Veire",
     "Today" : "Uèi",
@@ -51,6 +51,8 @@ OC.L10N.register(
     "Title" : "Títol",
     "Cancel" : "Anullar",
     "Delete" : "Suprimir",
+    "Edit" : "Modificar",
+    "Activity" : "Activitat",
     "Close" : "Plegar",
     "Please select a file." : "Seleccionatz un fichièr.",
     "Select from Files" : "Seleccionar dels fichièrs",
@@ -87,6 +89,7 @@ OC.L10N.register(
     "Default" : "Defaut",
     "Copy link" : "Copiar lo ligam",
     "Confirm" : "Confirmar",
-    "ID" : "ID"
+    "ID" : "ID",
+    "seconds ago" : "fa qualques segondas"
 },
 "nplurals=2; plural=(n > 1);");

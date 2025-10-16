@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Razpredelnice",
     "Nextcloud Tables" : "Razpredelnice Nextcloud",
     "Select table" : "Izbor razpredelnice",
     "Select columns" : "Izbor stolpcev",
@@ -109,7 +110,6 @@ OC.L10N.register(
     "Edit a row" : "Urejanje vrstice",
     "Add a new column" : "Dodajanje novega stolpca",
     "Read the docs" : "Pregled dokumentacije",
-    "Tables" : "Razpredelnice",
     "Manage data the way you need it." : "Upravljajte s podatki na svoj način.",
     "Table" : "Razpredelnica",
     "View" : "Pogled",
@@ -222,6 +222,8 @@ OC.L10N.register(
     "Edit column" : "Uredi stolpec",
     "Could not delete row." : "Vrstice ni mogoče izbrisati.",
     "Edit row" : "Uredi vrstico",
+    "Edit" : "Uredi",
+    "Activity" : "Dejavnost",
     "I really want to delete this row!" : "Zares želim izbrisati to vrstico!",
     "Owner" : "Lastnik",
     "I really want to delete this table!" : "Zares hočem izbrisati to razpredelnico!",
@@ -356,6 +358,7 @@ OC.L10N.register(
     "Unchecked" : "Nepregledano",
     "ID" : "ID",
     "Clipboard is not available" : "Odložišče ni na voljo",
+    "seconds ago" : "pred nekaj sekundami",
     "Unknown error." : "Neznana napaka.",
     "Could not fetch tables" : "Razpredelnic ni mogoče pridobiti."
 },

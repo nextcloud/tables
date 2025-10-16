@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tables",
     "No" : "No",
     "Yes" : "Yes",
     "The file was uploaded" : "ფაილი ატვირთულ იქნა",
@@ -25,7 +26,6 @@ OC.L10N.register(
     "Birthday" : "Birthday",
     "Progress" : "Progress",
     "Done" : "Done",
-    "Tables" : "Tables",
     "View" : "View",
     "Today" : "Today",
     "Create" : "Create",
@@ -50,6 +50,8 @@ OC.L10N.register(
     "Resources" : "Resources",
     "Cancel" : "Cancel",
     "Delete" : "Delete",
+    "Edit" : "Edit",
+    "Activity" : "აქტივობა",
     "Owner" : "Owner",
     "Close" : "Close",
     "Please select a file." : "Please select a file.",
@@ -94,6 +96,7 @@ OC.L10N.register(
     "Confirm" : "Confirm",
     "Select" : "Select",
     "ID" : "ID",
-    "Clipboard is not available" : "Clipboard is not available"
+    "Clipboard is not available" : "Clipboard is not available",
+    "seconds ago" : "seconds ago"
 },
 "nplurals=2; plural=(n!=1);");

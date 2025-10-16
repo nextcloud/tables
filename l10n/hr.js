@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tablice",
     "No" : "Ne",
     "Yes" : "Da",
     "The file was uploaded" : "Datoteka je otpremljena",
@@ -30,7 +31,6 @@ OC.L10N.register(
     "Birthday" : "Rođendan",
     "Target" : "Cilj",
     "Progress" : "Napredak",
-    "Tables" : "Tablice",
     "View" : "Pregledaj",
     "Today" : "Danas",
     "Create" : "Stvori",
@@ -60,6 +60,8 @@ OC.L10N.register(
     "Delete column" : "Izbriši stupac",
     "Cancel" : "Odustani",
     "Delete" : "Izbriši",
+    "Edit" : "Uredi",
+    "Activity" : "Aktivnost",
     "Import successful" : "Uspješan uvoz",
     "Close" : "Zatvori",
     "Please select a file." : "Odaberite datoteku.",
@@ -109,6 +111,7 @@ OC.L10N.register(
     "Content" : "Sadržaj",
     "Select" : "Odaberi",
     "Unchecked" : "Neprovjereno",
-    "ID" : "ID"
+    "ID" : "ID",
+    "seconds ago" : "prije par sekundi"
 },
 "nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;");

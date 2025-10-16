@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tableaux",
     "Nextcloud Tables" : "Nextcloud Tables",
     "Select table" : "Sélectionner un tableau",
     "Select columns" : "Sélectionner les colonnes",
@@ -126,7 +127,6 @@ OC.L10N.register(
     "Create applications" : "Créer des applications",
     "Read the docs" : "Lire la documentation",
     "Check yourself!" : "Vérifiez par vous-même !",
-    "Tables" : "Tableaux",
     "Manage data the way you need it." : "Gérez les données comme vous en avez besoin.",
     "Table" : "Tableau",
     "View" : "Vue",
@@ -272,6 +272,8 @@ OC.L10N.register(
     "Transfer application" : "Transférer l’application",
     "Could not delete row." : "Impossible de supprimer la ligne.",
     "Edit row" : "Modifier la ligne",
+    "Edit" : "Modifier",
+    "Activity" : "Activité",
     "I really want to delete this row!" : "Je veux vraiment supprimer cette ligne !",
     "Owner" : "Propriétaire",
     "I really want to delete this table!" : "Je souhaite vraiment supprimer ce tableau !",
@@ -544,6 +546,7 @@ OC.L10N.register(
     "Last edited at" : "Dernière modification le",
     "Copied to clipboard." : "Copié dans le presse-papiers.",
     "Clipboard is not available" : "Le presse-papiers n'est pas disponible",
+    "seconds ago" : "à l'instant",
     "{shareTypeString}..." : "{shareTypeString}...",
     "Unsupported source: {source}" : "Source non supportée : {source}",
     "Failed to fetch {shareTypeString}" : "Échec de la récupération {shareTypeString}",

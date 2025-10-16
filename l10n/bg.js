@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Таблици",
     "Select table" : "Избор на таблица",
     "Select columns" : "Избор на колони",
     "e.g. 1,2,4 or leave empty" : "напр. 1,2,4 или ги оставете празни",
@@ -107,7 +108,6 @@ OC.L10N.register(
     "Edit a row" : "Редактиране на ред",
     "Add a new column" : "Добавяне на нова колона",
     "Read the docs" : "Прочитане на документите",
-    "Tables" : "Таблици",
     "Manage data the way you need it." : "Управление на данните, по необходимият от вас начин.",
     "Table" : "Таблица",
     "View" : "Изглед",
@@ -190,6 +190,8 @@ OC.L10N.register(
     "The column \"{column}\" was updated." : "Колоната „{column}“ беше обновена.",
     "Could not delete row." : "Редът не можа да се изтрие.",
     "Edit row" : "Редактиране на ред",
+    "Edit" : "Промяна",
+    "Activity" : "Активност",
     "I really want to delete this row!" : "Наистина искам да изтрия този ред!",
     "Owner" : "Създател",
     "I really want to delete this table!" : "Наистина искам да изтрия тази таблица!",
@@ -307,6 +309,7 @@ OC.L10N.register(
     "Now" : "Сега",
     "ID" : "ID /Идентификатор/",
     "Clipboard is not available" : "Клипбордът не е достъпен",
+    "seconds ago" : "преди секунди",
     "Could not fetch tables" : "Таблиците не можаха да бъдат извлечени"
 },
 "nplurals=2; plural=(n != 1);");

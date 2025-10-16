@@ -30,6 +30,8 @@ OC.L10N.register(
     "Title" : "Titulo",
     "Cancel" : "Cancellar",
     "Delete" : "Deler",
+    "Edit" : "Modificar",
+    "Activity" : "Activitate",
     "Close" : "Clauder",
     "Please select a file." : "Per favor selectiona un file.",
     "Select from Files" : "Selectionar de Files",
@@ -50,6 +52,7 @@ OC.L10N.register(
     "Suffix" : "Suffixo",
     "Copy link" : "Copiar ligamine",
     "Confirm" : "Confirmar",
-    "Select" : "Selectionar"
+    "Select" : "Selectionar",
+    "seconds ago" : "secundas passate"
 },
 "nplurals=2; plural=(n != 1);");

@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "جەدۋەل",
     "Nextcloud Tables" : "كېيىنكى بۇلۇت جەدۋىلى",
     "Select table" : "جەدۋەلنى تاللاڭ",
     "Select columns" : "ستوننى تاللاڭ",
@@ -118,7 +119,6 @@ OC.L10N.register(
     "Edit a row" : "بىر قۇر تەھرىرلەڭ",
     "Add a new column" : "يېڭى ئىستون قوشۇڭ",
     "Read the docs" : "ھۆججەتلەرنى ئوقۇڭ",
-    "Tables" : "جەدۋەل",
     "Manage data the way you need it." : "سانلىق مەلۇماتنى ئۆزىڭىز ئېھتىياجلىق ئۇسۇلدا باشقۇرۇڭ.",
     "Table" : "جەدۋەل",
     "View" : "كۆرۈش",
@@ -260,6 +260,8 @@ OC.L10N.register(
     "Transfer application" : "ئىلتىماسنى يۆتكەش",
     "Could not delete row." : "قۇرنى ئۆچۈرەلمىدى.",
     "Edit row" : "قۇرنى تەھرىرلەش",
+    "Edit" : "تەھرىر",
+    "Activity" : "پائالىيەت",
     "I really want to delete this row!" : "مەن بۇ قۇرنى ئۆچۈرمەكچى!",
     "Owner" : "ئىگىسى",
     "I really want to delete this table!" : "مەن بۇ جەدۋەلنى ئۆچۈرمەكچى!",
@@ -516,6 +518,7 @@ OC.L10N.register(
     "Last edited at" : "ئاخىرقى قېتىم تەھرىرلەندى",
     "Copied to clipboard." : "چاپلاش تاختىسىغا كۆچۈرۈلدى.",
     "Clipboard is not available" : "چاپلاش تاختىسى يوق",
+    "seconds ago" : "سېكۇنت بۇرۇن",
     "{shareTypeString}..." : "{shareTypeString} ...",
     "Failed to fetch {shareTypeString}" : "{shareTypeString} نى ئالالمىدى",
     "Unknown error." : "نامەلۇم خاتالىق.",

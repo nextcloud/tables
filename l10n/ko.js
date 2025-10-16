@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "표",
     "Nextcloud Tables" : "Nextcloud Tables",
     "Select table" : "표 선택",
     "Select columns" : "열 선택",
@@ -113,7 +114,6 @@ OC.L10N.register(
     "Edit a row" : "행 편집",
     "Add a new column" : "새 행 만들기",
     "Read the docs" : "문서를 읽는다",
-    "Tables" : "표",
     "Table" : "표",
     "View" : "보기",
     "Today" : "오늘",
@@ -224,6 +224,8 @@ OC.L10N.register(
     "Edit column" : "행 편집",
     "Could not delete row." : "행을 삭제할 수 없음.",
     "Edit row" : "행 수정",
+    "Edit" : "편집",
+    "Activity" : "활동",
     "I really want to delete this row!" : "이 행을 삭제합니다",
     "Owner" : "소유자",
     "I really want to delete this table!" : "이 표를 삭제합니다",
@@ -412,6 +414,7 @@ OC.L10N.register(
     "Last editor" : "마지막 편집자",
     "Last edited at" : "마지막으로 편집됨: ",
     "Clipboard is not available" : "클립보드를 사용할 수 없습니다.",
+    "seconds ago" : "몇 초 전",
     "Failed to fetch {shareTypeString}" : "{shareTypeString}을(를) 가져올 수 없음",
     "Unknown error." : "알 수 없는 오류",
     "Request is not authorized. Are you logged in?" : "요청이 인증되지 않았습니다. 로그인되어 있습니까?",

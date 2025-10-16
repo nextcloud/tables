@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tabeller",
     "Nextcloud Tables" : "Nextcloud-tabeller",
     "Select table" : "Velg tabell",
     "Select columns" : "Velg kolonner",
@@ -119,7 +120,6 @@ OC.L10N.register(
     "Edit a row" : "Rediger en rad",
     "Add a new column" : "Legg til en ny kolonne",
     "Read the docs" : "Les dokumentasjonen",
-    "Tables" : "Tabeller",
     "Manage data the way you need it." : "Administrer data slik du trenger dem.",
     "Table" : "Bord",
     "View" : "Vis",
@@ -263,6 +263,8 @@ OC.L10N.register(
     "Transfer application" : "Overfør applikasjon",
     "Could not delete row." : "Kunne ikke slette rad.",
     "Edit row" : "Rediger rad",
+    "Edit" : "Rediger",
+    "Activity" : "Aktivitet",
     "I really want to delete this row!" : "Jeg vil virkelig slette denne raden!",
     "Owner" : "Eier",
     "I really want to delete this table!" : "Jeg ønsker virkelig å slette denne tabellen!",
@@ -521,6 +523,7 @@ OC.L10N.register(
     "Last edited at" : "Sist endret på",
     "Copied to clipboard." : "Kopiert til utklippstavlen.",
     "Clipboard is not available" : "Utklippstavlen er ikke tilgjengelig",
+    "seconds ago" : "sekunder siden",
     "{shareTypeString}..." : "{shareTypeString}...",
     "Failed to fetch {shareTypeString}" : "Kunne ikke hente {shareTypeString}",
     "Unknown error." : "Ukjent feil.",

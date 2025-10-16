@@ -20,6 +20,8 @@ OC.L10N.register(
     "Time" : "වේලාව",
     "Save" : "සුරකින්න",
     "Cancel" : "අවලංගු කරන්න",
+    "Edit" : "සංස්කරණය",
+    "Activity" : "ක්‍රියාකාරකම",
     "Owner" : "හිමිකරු",
     "Close" : "වසන්න",
     "Please select a file." : "කරුණාකර ගොනුවක් තෝරන්න.",
@@ -33,6 +35,7 @@ OC.L10N.register(
     "Search" : "සොයන්න",
     "Back" : "ආපසු",
     "Copy link" : "සබැඳිය පිටපත් කරන්න",
-    "Confirm" : "තහවුරු කරන්න"
+    "Confirm" : "තහවුරු කරන්න",
+    "seconds ago" : "තත්පර කිහිපයකට පෙර"
 },
 "nplurals=2; plural=(n != 1);");

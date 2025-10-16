@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Taulak",
     "Nextcloud Tables" : "Nextcloud Taulak",
     "Select table" : "Hautatu taula",
     "Select columns" : "Hautatu zutabeak",
@@ -108,7 +109,6 @@ OC.L10N.register(
     "Edit a row" : "Editatu errenkada bat",
     "Add a new column" : "Gehitu zutabe berri bat",
     "Read the docs" : "Irakurri dokumentazioa",
-    "Tables" : "Taulak",
     "Table" : "Taula",
     "View" : "Ikusi",
     "Today" : "Gaur",
@@ -204,6 +204,8 @@ OC.L10N.register(
     "Transfer application" : "Transferitu aplikazioa",
     "Could not delete row." : "Ezin izan da errenkada ezabatu.",
     "Edit row" : "Editatu errenkada",
+    "Edit" : "Editatu",
+    "Activity" : "Jarduerak",
     "I really want to delete this row!" : "Errenkada hau ezabatu nahi dut!",
     "Owner" : "Jabea",
     "Change owner" : "Aldatu jabea",
@@ -357,6 +359,7 @@ OC.L10N.register(
     "Creator" : "Sortzailea",
     "Last editor" : "Azken editorea",
     "Clipboard is not available" : "Arbela ez dago erabilgarri",
+    "seconds ago" : "duela segundo batzuk",
     "{shareTypeString}..." : "{shareTypeString}...",
     "Unknown error." : "Errore ezezaguna.",
     "Request is not authorized. Are you logged in?" : "Eskaerak egiteko baimenik ez. Saioa hasi al duzu?",

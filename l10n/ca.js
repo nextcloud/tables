@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Taules",
     "Select table" : "Seleccioneu una taula",
     "Select columns" : "Seleccioneu columnes",
     "e.g. 1,2,4 or leave empty" : "per exemple. 1,2,4 o deixar buit",
@@ -101,7 +102,6 @@ OC.L10N.register(
     "What" : "Què",
     "Done" : "Desat",
     "Add a new column" : "Afegeix una nova columna",
-    "Tables" : "Taules",
     "Manage data the way you need it." : "Gestioneu les dades com les necessiteu.",
     "Table" : "Taula",
     "View" : "Visualització",
@@ -181,6 +181,8 @@ OC.L10N.register(
     "The column \"{column}\" was updated." : "La columna \"{column}\" s'ha actualitzat.",
     "Could not delete row." : "No s'ha pogut suprimir la fila.",
     "Edit row" : "Edició fila",
+    "Edit" : "Edició",
+    "Activity" : "Activitat",
     "I really want to delete this row!" : "Estic segur de suprimir aquesta fila!",
     "Owner" : "Propietat",
     "I really want to delete this table!" : "Tinc moltes ganes d'esborrar aquesta taula!",
@@ -275,6 +277,7 @@ OC.L10N.register(
     "Now" : "Ara",
     "ID" : "ID",
     "Clipboard is not available" : "El porta-retalls no està disponible",
+    "seconds ago" : "fa uns segons",
     "Could not fetch tables" : "No s'han pogut recuperar les taules"
 },
 "nplurals=2; plural=(n != 1);");

@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tabellen",
     "Nextcloud Tables" : "Nextcloud Tables",
     "Select table" : "Selecteer tabel",
     "Select columns" : "Selecteer kolommen",
@@ -86,7 +87,6 @@ OC.L10N.register(
     "Date, time or whatever" : "Datum, tijd of wat dan ook",
     "Progress" : "Voortgang",
     "Done" : "Klaar",
-    "Tables" : "Tabellen",
     "Table" : "Tabel",
     "View" : "Bekijken",
     "Today" : "Vandaag",
@@ -138,6 +138,8 @@ OC.L10N.register(
     "Confirm table deletion" : "Bevestig verwijderen van tabel",
     "Edit column" : "Bewerk kolom",
     "Edit row" : "Bewerk regel",
+    "Edit" : "Bewerken",
+    "Activity" : "Activiteit",
     "Owner" : "Eigenaar",
     "Import successful" : "Import geslaagd",
     "Close" : "Sluit",
@@ -218,6 +220,7 @@ OC.L10N.register(
     "Now" : "Nu",
     "ID" : "ID",
     "Clipboard is not available" : "Klembord niet beschikbaar",
+    "seconds ago" : "seconden geleden",
     "Could not fetch tables" : "Kon tabellen niet ophalen"
 },
 "nplurals=2; plural=(n != 1);");

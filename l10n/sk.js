@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tabuľky",
     "Nextcloud Tables" : "Tabuľky Nextcloud",
     "Select table" : "Vyberte tabuľku",
     "Select columns" : "Vyberte stĺpce",
@@ -131,7 +132,6 @@ OC.L10N.register(
     "Read the docs" : "Prečítať dokumentáciu",
     "If you want to go through the documentation, it can be found here: [Nextcloud Tables documentation](%s)" : "Ak si chcete prejsť dokumentáciu, nájdete ju tu: [Dokumentácia tabuliek Nextcloud](%s)",
     "Check yourself!" : "Vyskúšajte si to sami!",
-    "Tables" : "Tabuľky",
     "Manage data the way you need it." : "Spravujte údaje spôsobom, akým to potrebujete.",
     "Table" : "Tabuľka",
     "View" : "Zobrazenie",
@@ -277,6 +277,8 @@ OC.L10N.register(
     "Transfer application" : "Presunúť aplikáciu",
     "Could not delete row." : "Nepodarilo sa zmazať riadok.",
     "Edit row" : "Upraviť riadok",
+    "Edit" : "Upraviť",
+    "Activity" : "Aktivita",
     "I really want to delete this row!" : "Naozaj chcem zmazať tento riadok!",
     "Owner" : "Vlastník",
     "I really want to delete this table!" : "Naozaj chcem odstrániť túto tabuľku!",
@@ -544,6 +546,7 @@ OC.L10N.register(
     "Last edited at" : "Naposledy upravené dňa",
     "Copied to clipboard." : "Skopírované do schránky.",
     "Clipboard is not available" : "Schránka nie je prístupná",
+    "seconds ago" : "sekúnd dozadu",
     "{shareTypeString}..." : "{shareTypeString}...",
     "Unsupported source: {source}" : "Nepodporovaný zdroj: {source}",
     "Failed to fetch {shareTypeString}" : "Nepodarilo sa načítať {shareTypeString}",

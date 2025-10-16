@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Таблицы",
     "Nextcloud Tables" : "Nextcloud Tables",
     "Select table" : "Выбрать таблицу",
     "Select columns" : "Выбрать столбцы",
@@ -96,7 +97,6 @@ OC.L10N.register(
     "Edit a row" : "Редактировать строку",
     "Add a new column" : "Добавить новый столбец",
     "Read the docs" : "Прочитать документацию",
-    "Tables" : "Таблицы",
     "Manage data the way you need it." : "Управляйте своими данными удобно.",
     "Table" : "Таблица",
     "View" : "Режим просмотра",
@@ -200,6 +200,8 @@ OC.L10N.register(
     "Edit column" : "Изменить столбец",
     "Could not delete row." : "Ошибка удаления строки.",
     "Edit row" : "Изменить строку",
+    "Edit" : "Редактировать",
+    "Activity" : "Активность",
     "I really want to delete this row!" : "Удалить строку.",
     "Owner" : "Владелец",
     "I really want to delete this table!" : "Удалить таблицу",
@@ -360,6 +362,7 @@ OC.L10N.register(
     "Last editor" : "Последняя правка",
     "Last edited at" : "Последняя правка от",
     "Clipboard is not available" : "Буфер обмена недоступен",
+    "seconds ago" : "только что",
     "Failed to fetch {shareTypeString}" : "Не удалось получить {shareTypeString}",
     "Unknown error." : "Неизвестная ошибка",
     "Request is not authorized. Are you logged in?" : "Запрос не авторизован. Вы вошли в систему?",

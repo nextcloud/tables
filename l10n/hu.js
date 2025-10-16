@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Táblázatok",
     "Nextcloud Tables" : "Nextcloud Táblázatok",
     "Select table" : "Táblázat kiválasztása",
     "Select columns" : "Válasszon oszlopokat",
@@ -116,7 +117,6 @@ OC.L10N.register(
     "Edit a row" : "Sor szerkesztése",
     "Add a new column" : "Új sor hozzáadása",
     "Read the docs" : "Olvassa el a dokumentációt",
-    "Tables" : "Táblázatok",
     "Manage data the way you need it." : "Kezelje az adatokat úgy, ahogy szüksége van rájuk.",
     "Table" : "Táblázat",
     "View" : "Nézet",
@@ -231,6 +231,8 @@ OC.L10N.register(
     "Edit column" : "Oszlop szerkesztése",
     "Could not delete row." : "Nem sikerült a sor törlése.",
     "Edit row" : "Sor szerkesztése",
+    "Edit" : "Szerkesztés",
+    "Activity" : "Tevékenység",
     "I really want to delete this row!" : "Mindenképp törlöm ezt a sort.",
     "Owner" : "Tulajdonos",
     "I really want to delete this table!" : "Mindenképp törlöm ezt a táblázatot.",
@@ -429,6 +431,7 @@ OC.L10N.register(
     "Last editor" : "Utolsó szerkesztő",
     "Last edited at" : "Utolsó módosítás",
     "Clipboard is not available" : "A vágólap nem érhető el",
+    "seconds ago" : "pár másodperce",
     "Unknown error." : "Ismeretlen hiba.",
     "Request is not authorized. Are you logged in?" : "A kérés nem engedélyezett. Bejelentkezett?",
     "Request not allowed." : "A kérés nem engedélyezett.",

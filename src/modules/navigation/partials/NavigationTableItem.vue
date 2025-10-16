@@ -88,6 +88,16 @@
 				</template>
 			</NcActionButton>
 
+			<!-- Activity -->
+			<NcActionButton v-if="canReadData(table) && isActivityEnabled"
+				:close-after-click="true"
+				@click="actionShowActivity">
+				{{ t('tables', 'Activity') }}
+				<template #icon>
+					<ActivityIcon :size="20" />
+				</template>
+			</NcActionButton>
+
 			<!-- FAVORITE -->
 			<NcActionButton v-if="!table.favorite && !table.archived"
 				:close-after-click="true"
@@ -160,12 +170,14 @@ import ArchiveArrowDown from 'vue-material-design-icons/ArchiveArrowDown.vue'
 import ArchiveArrowUpOutline from 'vue-material-design-icons/ArchiveArrowUpOutline.vue'
 import DeleteOutline from 'vue-material-design-icons/TrashCanOutline.vue'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
+import activityMixin from '../../../shared/mixins/activityMixin.js'
 import { getCurrentUser, getRequestToken } from '@nextcloud/auth'
 import Connection from 'vue-material-design-icons/Connection.vue'
 import Import from 'vue-material-design-icons/Import.vue'
 import NavigationViewItem from './NavigationViewItem.vue'
 import PlaylistPlus from 'vue-material-design-icons/PlaylistPlus.vue'
 import IconRename from 'vue-material-design-icons/RenameOutline.vue'
+import ActivityIcon from 'vue-material-design-icons/LightningBolt.vue'
 import { generateUrl } from '@nextcloud/router'
 
 export default {
@@ -187,6 +199,7 @@ export default {
 		Connection,
 		PlaylistPlus,
 		DeleteOutline,
+		ActivityIcon,
 	},
 
 	filters: {
@@ -199,7 +212,7 @@ export default {
 		},
 	},
 
-	mixins: [permissionsMixin],
+	mixins: [permissionsMixin, activityMixin],
 
 	props: {
 		table: {
@@ -280,6 +293,10 @@ export default {
 		},
 		async actionShowIntegration() {
 			emit('tables:sidebar:integration', { open: true, tab: 'integration' })
+			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
+		},
+		async actionShowActivity() {
+			emit('tables:sidebar:activity', { open: true, tab: 'activity' })
 			await this.$router.push('/table/' + parseInt(this.table.id)).catch(err => err)
 		},
 		openTable() {

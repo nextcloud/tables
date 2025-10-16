@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<RowFormWrapper :title="column.title" :mandatory="column.viewColumnInformation?.mandatory ?? column.mandatory" :description="column.description" :width="2">
+	<RowFormWrapper :title="column.title" :mandatory="isMandatory(column)" :description="column.description" :width="2">
 		<NcSelect v-model="localValue" style="width: 100%;" :loading="loading" :options="options"
 			:placeholder="getPlaceholder()" :searchable="true" :get-option-key="(option) => option.key"
 			label="displayName" :aria-label-combobox="getPlaceholder()"
@@ -23,13 +23,13 @@ import { NcSelect } from '@nextcloud/vue'
 import RowFormWrapper from './RowFormWrapper.vue'
 import searchUserGroup from '../../../../mixins/searchUserGroup.js'
 import ShareTypes from '../../../../mixins/shareTypesMixin.js'
-
+import rowHelper from '../../../../components/ncTable/mixins/rowHelper.js'
 export default {
 	components: {
 		RowFormWrapper,
 		NcSelect,
 	},
-	mixins: [ShareTypes, searchUserGroup],
+	mixins: [ShareTypes, searchUserGroup, rowHelper],
 	props: {
 		column: {
 			type: Object,

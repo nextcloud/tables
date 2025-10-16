@@ -35,6 +35,8 @@
     "Resources" : "რესურსები",
     "Cancel" : "უარყოფა",
     "Delete" : "წაშლა",
+    "Edit" : "შეცვლა",
+    "Activity" : "აქტივობა",
     "Close" : "დახურვა",
     "Please select a file." : "გთხოვთ აირჩიოთ ფაილი.",
     "Select from Files" : "აირჩიეთ ფაილებიდან",
@@ -64,6 +66,7 @@
     "Confirm" : "დადასტურება",
     "Content" : "მოცულობა",
     "Unchecked" : "შეუმოწმებელია",
-    "ID" : "ID"
+    "ID" : "ID",
+    "seconds ago" : "წამის წინ"
 },"pluralForm" :"nplurals=2; plural=(n!=1);"
 }

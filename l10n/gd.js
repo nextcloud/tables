@@ -23,6 +23,8 @@ OC.L10N.register(
     "Save" : "Sàbhail",
     "Cancel" : "Sguir dheth",
     "Delete" : "Sguab às",
+    "Edit" : "Deasaich",
+    "Activity" : "Gnìomhachd",
     "Close" : "Dùin",
     "Please select a file." : "Tagh faidhle.",
     "Preview" : "Ro-sheall",
@@ -38,6 +40,7 @@ OC.L10N.register(
     "Back" : "Air ais",
     "Undo" : "Neo-dhèan",
     "Default" : "Bunaiteach",
-    "Copy link" : "Dèan lethbhreac dhen cheangal"
+    "Copy link" : "Dèan lethbhreac dhen cheangal",
+    "seconds ago" : "diog air ais"
 },
 "nplurals=4; plural=(n==1 || n==11) ? 0 : (n==2 || n==12) ? 1 : (n > 2 && n < 20) ? 2 : 3;");

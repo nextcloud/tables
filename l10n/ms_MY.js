@@ -27,6 +27,8 @@ OC.L10N.register(
     "Title" : "Judul",
     "Cancel" : "Batal",
     "Delete" : "Padam",
+    "Edit" : "Sunting",
+    "Activity" : "Aktiviti",
     "Close" : "Tutup",
     "Sort" : "Susun",
     "Export" : "Eksport",

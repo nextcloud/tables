@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tables",
     "Nextcloud Tables" : "Nextcloud Tables",
     "No" : "Non",
     "Yes" : "Sí",
@@ -59,7 +60,6 @@ OC.L10N.register(
     "Progress" : "Progresu",
     "We know what we are doing." : "Sabemos lo que facemos.",
     "Done" : "Fecho",
-    "Tables" : "Tables",
     "Manage data the way you need it." : "Xestiona datos de la forma que precises.",
     "Table" : "Tabla",
     "View" : "Ver",
@@ -150,6 +150,8 @@ OC.L10N.register(
     "Edit column" : "Editar la columna",
     "Could not delete row." : "Nun se pudo desaniciar la filera.",
     "Edit row" : "Editar la filera",
+    "Edit" : "Editar",
+    "Activity" : "Actividá",
     "Owner" : "Propietariu",
     "Change owner" : "Camudar el propietariu",
     "Could not create table" : "Nun se pudo crear la tabla",
@@ -258,6 +260,7 @@ OC.L10N.register(
     "Now" : "Agora",
     "ID" : "ID",
     "Clipboard is not available" : "El cartafueyu nun ta disponible",
+    "seconds ago" : "hai segundos",
     "{shareTypeString}..." : "{shareTypeString}…",
     "Unknown error." : "Error desconocíu.",
     "Request is not authorized. Are you logged in?" : "Nun s'autorizó la solicitú. ¿Aniciesti la sesión?",

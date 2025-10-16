@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tabele",
     "Timestamp of data load" : "Marca temporală a încărcării datelor",
     "No" : "Nu",
     "Yes" : "Da",
@@ -27,7 +28,6 @@ OC.L10N.register(
     "Birthday" : "Zi de naștere",
     "Progress" : "Progres",
     "Done" : "Realizat",
-    "Tables" : "Tabele",
     "View" : "Vizualizare",
     "Today" : "Astăzi",
     "Create" : "Crează",
@@ -53,6 +53,8 @@ OC.L10N.register(
     "Resources" : "Resurse",
     "Cancel" : "Anulare",
     "Delete" : "Șterge",
+    "Edit" : "Editează",
+    "Activity" : "Activitate",
     "Owner" : "Proprietar",
     "Close" : "Închide",
     "Please select a file." : "Te rugăm să alegi un fișier.",
@@ -98,6 +100,7 @@ OC.L10N.register(
     "Select" : "Selectează",
     "Now" : "Acum",
     "ID" : "ID",
-    "Clipboard is not available" : "Clipboardul este indisponibil"
+    "Clipboard is not available" : "Clipboardul este indisponibil",
+    "seconds ago" : "secunde în urmă"
 },
 "nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));");

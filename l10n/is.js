@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Töflur",
     "The file was uploaded" : "Skráin var send inn",
     "The uploaded file exceeds the upload_max_filesize directive in php.ini" : "Innsend skrá er stærri en upload_max stillingin í php.ini:",
     "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Innsenda skráin er stærri en MAX_FILE_SIZE sem skilgreint er í HTML sniðinu.",
@@ -26,7 +27,6 @@ OC.L10N.register(
     "Progress" : "Framvinda",
     "What" : "Hvað",
     "Done" : "Lokið",
-    "Tables" : "Töflur",
     "Table" : "Tafla",
     "View" : "Skoða",
     "Today" : "Í dag",
@@ -56,6 +56,8 @@ OC.L10N.register(
     "Delete column" : "Eyða dálki",
     "Cancel" : "Hætta við",
     "Delete" : "Eyða",
+    "Edit" : "Breyta",
+    "Activity" : "Athafnir",
     "Owner" : "Eigandi",
     "Import successful" : "Innflutningur tókst",
     "Close" : "Loka",
@@ -121,6 +123,7 @@ OC.L10N.register(
     "Unchecked" : "Ekki skoðað",
     "Now" : "Núna",
     "ID" : "ID",
-    "Clipboard is not available" : "Klippispjald er ekki tiltækt"
+    "Clipboard is not available" : "Klippispjald er ekki tiltækt",
+    "seconds ago" : "sekúndum síðan"
 },
 "nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);");

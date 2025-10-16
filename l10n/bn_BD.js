@@ -28,6 +28,8 @@ OC.L10N.register(
     "Title" : "শিরোনাম",
     "Cancel" : "বাতির",
     "Delete" : "মুছে",
+    "Edit" : "সম্পাদনা",
+    "Activity" : "সক্রিয়তা",
     "Close" : "বন্ধ",
     "Please select a file." : "একটি ফাইল নির্বাচন করুন",
     "Export" : "রপ্তানি",
@@ -42,6 +44,7 @@ OC.L10N.register(
     "URL" : "URL",
     "Default" : "পূর্বনির্ধারিত",
     "Copy link" : "লিঙ্ক কপি করো",
-    "Select" : "সিলেক্ট"
+    "Select" : "সিলেক্ট",
+    "seconds ago" : "সেকেন্ড পূর্বে"
 },
 "nplurals=2; plural=(n != 1);");

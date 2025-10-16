@@ -28,6 +28,8 @@ OC.L10N.register(
     "Title" : "Tittel",
     "Cancel" : "Avbryt",
     "Delete" : "Slett",
+    "Edit" : "Rediger",
+    "Activity" : "Aktivitet",
     "Close" : "Lat att",
     "Please select a file." : "Ver venleg og vel ei fil.",
     "Select from Files" : "Vel frå filer",
@@ -48,6 +50,7 @@ OC.L10N.register(
     "URL" : "URL",
     "Default" : "Standard",
     "Copy link" : "Kopier lenkje",
-    "ID" : "ID"
+    "ID" : "ID",
+    "seconds ago" : "sekund sidan"
 },
 "nplurals=2; plural=(n != 1);");

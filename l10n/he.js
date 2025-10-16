@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "טבלאות",
     "Select table" : "בחירת טבלה",
     "Select columns" : "בחירת עמודות",
     "e.g. 1,2,4 or leave empty" : "למשל: 1,2,4 או להשאיר ריק",
@@ -73,7 +74,6 @@ OC.L10N.register(
     "Date, time or whatever" : "תאריך שעה או משהו",
     "Progress" : "תהליך",
     "Done" : "הסתיים",
-    "Tables" : "טבלאות",
     "View" : "צפייה",
     "Today" : "היום",
     "Create" : "יצירה",
@@ -100,6 +100,8 @@ OC.L10N.register(
     "Resources" : "משאבים",
     "Cancel" : "ביטול",
     "Delete" : "מחיקה",
+    "Edit" : "עריכה",
+    "Activity" : "פעילות",
     "Owner" : "בעלות",
     "Import successful" : "הייבוא הצליח",
     "Close" : "סגירה",
@@ -153,6 +155,7 @@ OC.L10N.register(
     "Content" : "תוכן",
     "Select" : "בחר",
     "Unchecked" : "לא נבדק",
-    "ID" : "מזהה"
+    "ID" : "מזהה",
+    "seconds ago" : "לפני מספר שניות"
 },
 "nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: 2;");

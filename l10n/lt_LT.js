@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Lentelės",
     "No" : "Ne",
     "Yes" : "Taip",
     "Could not create row." : "Nepavyko sukurti eilutės.",
@@ -40,7 +41,6 @@ OC.L10N.register(
     "Progress" : "Eiga",
     "Add more actions" : "Pridėti daugiau veiksmų",
     "Done" : "Atlikta",
-    "Tables" : "Lentelės",
     "Table" : "Lentelė",
     "View" : "Rodyti",
     "Today" : "Šiandien",
@@ -97,6 +97,8 @@ OC.L10N.register(
     "Edit column" : "Taisyti stulpelį",
     "Could not delete row." : "Nepavyko ištrinti eilutės.",
     "Edit row" : "Taisyti eilutę",
+    "Edit" : "Taisyti",
+    "Activity" : "Veikla",
     "I really want to delete this row!" : "Aš tikrai noriu ištrinti šią eilutę!",
     "Owner" : "Savivinkas",
     "I really want to delete this table!" : "Aš tikrai noriu ištrinti šią lentelę!",
@@ -168,6 +170,7 @@ OC.L10N.register(
     "ID" : "ID",
     "Copied to clipboard." : "Nukopijuota į iškarpinę.",
     "Clipboard is not available" : "Iškarpinė neprieinama",
+    "seconds ago" : "prieš keletą sekundžių",
     "{shareTypeString}..." : "{shareTypeString}...",
     "Unknown error." : "Nežinoma klaida.",
     "Resource not found." : "Išteklius nerastas.",

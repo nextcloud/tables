@@ -41,6 +41,8 @@ OC.L10N.register(
     "Resources" : "Recursos",
     "Cancel" : "Cancelar",
     "Delete" : "Borrar",
+    "Edit" : "Editar",
+    "Activity" : "Actividad",
     "Close" : "Cerrar",
     "Please select a file." : "Por favor selecciona un archivo.",
     "Select from Files" : "Seleccionar desde Archivos",

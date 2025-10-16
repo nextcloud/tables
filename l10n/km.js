@@ -28,6 +28,8 @@ OC.L10N.register(
     "Title" : "ចំណងជើង",
     "Cancel" : "បោះបង់",
     "Delete" : "លុប",
+    "Edit" : "កែប្រែ",
+    "Activity" : "សកម្មភាព",
     "Close" : "បិទ",
     "Sort" : "តម្រៀប",
     "Export" : "នាំចេញ",
@@ -42,6 +44,7 @@ OC.L10N.register(
     "URL" : "URL",
     "Options" : "ជម្រើស",
     "Default" : "លំនាំ​ដើម",
-    "Copy link" : "ចម្លងតំណ"
+    "Copy link" : "ចម្លងតំណ",
+    "seconds ago" : "វិនាទី​មុន"
 },
 "nplurals=1; plural=0;");

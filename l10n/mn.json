@@ -24,6 +24,8 @@
     "Title" : "Цол/Албан тушаал",
     "Cancel" : "болиулах",
     "Delete" : "Устгах",
+    "Edit" : "Өөрчлөх",
+    "Activity" : "Үйлдлүүд",
     "Owner" : "Эзэмшигч",
     "Please select a file." : "Файл сонгоно уу.",
     "Select from Files" : "Файлуудаас сонгох",
@@ -44,6 +46,7 @@
     "Undo" : "буцах",
     "Confirm" : "Батлах",
     "Select" : "Сонгох",
-    "ID" : "ID"
+    "ID" : "ID",
+    "seconds ago" : "хоёрдахь өмнө"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Tabelle",
     "Nextcloud Tables" : "Tabelle Nextcloud",
     "Select columns" : "Seleziona colonne",
     "e.g. 1,2,4 or leave empty" : "es. 1,2,4 o lascia vuoto",
@@ -48,7 +49,6 @@ OC.L10N.register(
     "What" : "Cosa",
     "Done" : "Completato",
     "Add a new column" : "Aggiungi una nuova colonna",
-    "Tables" : "Tabelle",
     "Table" : "Tabella",
     "View" : "Visualizza",
     "Today" : "Oggi",
@@ -116,6 +116,8 @@ OC.L10N.register(
     "Edit column" : "Modifica colonna",
     "Could not delete row." : "Impossibile eliminare la riga.",
     "Edit row" : "Modifica riga",
+    "Edit" : "Modifica",
+    "Activity" : "Attività",
     "I really want to delete this row!" : "Confermo di voler eliminare questa riga!",
     "Owner" : "Proprietario",
     "Import successful" : "Importazione avvenuta",
@@ -197,6 +199,7 @@ OC.L10N.register(
     "Now" : "Ora",
     "ID" : "ID",
     "Clipboard is not available" : "Appunti non disponibili",
+    "seconds ago" : "secondi fa",
     "Could not fetch tables" : "Impossibile recuperare le tabelle",
     "Could not load shared views." : "Impossibile caricare le viste condivise.",
     "Could not load shared views" : "Impossibile caricare le viste condivise"

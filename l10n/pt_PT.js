@@ -57,6 +57,8 @@ OC.L10N.register(
     "Delete column" : "Eliminar coluna",
     "Cancel" : "Cancelar",
     "Delete" : "Apagar",
+    "Edit" : "Editar",
+    "Activity" : "Atividade",
     "Owner" : "Proprietário",
     "Close" : "Fechar",
     "Please select a file." : "Por favor, selecione um ficheiro.",
@@ -102,6 +104,7 @@ OC.L10N.register(
     "Content" : "Conteúdo",
     "Select" : "Selecionar",
     "Now" : "Agora",
-    "ID" : "ID"
+    "ID" : "ID",
+    "seconds ago" : "segundos atrás"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

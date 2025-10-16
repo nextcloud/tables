@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "Tables" : "Таблиці",
     "Nextcloud Tables" : "Таблиці",
     "Select table" : "Виберіть таблицю",
     "Select columns" : "Виберіть стовпці",
@@ -132,7 +133,6 @@ OC.L10N.register(
     "Read the docs" : "Прочитайте документи",
     "If you want to go through the documentation, it can be found here: [Nextcloud Tables documentation](%s)" : "Ознайомитися з документацією з користування Таблицями Nextcloud: [Nextcloud Tables documentation](%s)",
     "Check yourself!" : "Перевірте себе!",
-    "Tables" : "Таблиці",
     "Manage data the way you need it." : "Керуйте даними так, як вам потрібно.",
     "Manage data the way you need it.\n\nWith this app you are able to create your own tables with individual columns. You can start with a template or from scratch and add your wanted columns.\nYou can choose from the following column types:\n- Text line or rich text\n- Link to urls or other nextcloud resources\n- Numbers\n- Progress bar\n- Stars rating\n- Yes/No tick\n- Date and/or time\n- (Multi) selection\n- Users, groups and teams\n\nShare your tables and views with users and groups within your cloud.\n\nHave a good time and manage whatever you want." : "Керуйте даними так, як вам потрібно.\n\nЗа допомогою цього додатка ви можете створювати власні таблиці з окремими стовпцями. Ви можете почати з шаблону або з нуля і додати потрібні стовпці.\nВи можете вибрати один із таких типів стовпців:\n- Текстовий рядок або форматований текст\n- Посилання на URL-адреси або інші ресурси Nextcloud\n- Числа\n- Смуга прогресу\n- Рейтинг зірок\n- Відмітка «Так/Ні»\n- Дата та/або час\n- (Багато) вибір\n- Користувачі, групи та команди\n\nДіліться своїми таблицями та переглядами з користувачами та групами у вашій хмарі.\n\nПриємного користування та керуйте тим, чим хочете.",
     "Table" : "Таблиця",
@@ -280,6 +280,8 @@ OC.L10N.register(
     "Transfer application" : "Передати застосунок",
     "Could not delete row." : "Не вдалося вилучити рядок.",
     "Edit row" : "Редагувати рядок",
+    "Edit" : "Редагувати",
+    "Activity" : "Активність",
     "I really want to delete this row!" : "Я справді бажаю вилучити цей рядок!",
     "Owner" : "Власник",
     "I really want to delete this table!" : "Я справді хочу вилучити цю таблицю!",
@@ -562,6 +564,7 @@ OC.L10N.register(
     "Last edited at" : "Коли змінено",
     "Copied to clipboard." : "Скопійовано до буферу обміну",
     "Clipboard is not available" : "Буфер обміну недоступний",
+    "seconds ago" : "кілька секунд тому",
     "{shareTypeString}..." : "{shareTypeString}...",
     "Unsupported source: {source}" : "Джерело не підтримується: {source}",
     "Failed to fetch {shareTypeString}" : "Не вдалося отримати {shareTypeString}",
