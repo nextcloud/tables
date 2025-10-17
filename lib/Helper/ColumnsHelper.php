@@ -30,7 +30,12 @@ class ColumnsHelper {
 		if (str_starts_with($placeholder, '@selection-id-')) {
 			return substr($placeholder, 14);
 		}
-		switch (ltrim($placeholder, '@')) {
+
+		$placeholderParts = explode(':', $placeholder, 2);
+		$placeholderName = ltrim($placeholderParts[0], '@');
+		$additionalValue = $placeholderParts[1] ?? null;
+
+		switch ($placeholderName) {
 			case 'me':
 				if ($column?->getType() !== Column::TYPE_USERGROUP) {
 					return $userId;
@@ -64,6 +69,13 @@ class ColumnsHelper {
 				return  $result ?: '';
 			case 'datetime-time-now': return date('H:i');
 			case 'datetime-now': return date('Y-m-d H:i') ? date('Y-m-d H:i') : '';
+			case 'datetime-exact-date': return $additionalValue ?? '';
+			case 'datetime-days-ahead':
+				$days = max(0, (int)$additionalValue);
+				return date('Y-m-d', strtotime("+{$days} days")) ?: '';
+			case 'datetime-days-ago':
+				$days = max(0, (int)$additionalValue);
+				return date('Y-m-d', strtotime("-{$days} days")) ?: '';
 			default: return $placeholder;
 		}
 	}
