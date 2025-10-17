@@ -14,6 +14,7 @@ use OCA\Tables\UploadException;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\UserRateLimit;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\Files\NotPermittedException;
 use OCP\IL10N;
@@ -56,6 +57,7 @@ class ImportController extends Controller {
 	}
 
 	#[NoAdminRequired]
+	#[UserRateLimit(limit: 20, period: 60)]
 	#[RequirePermission(permission: Application::PERMISSION_READ, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function previewImportTable(int $tableId, String $path): DataResponse {
 		return $this->handleError(function () use ($tableId, $path) {
@@ -73,6 +75,7 @@ class ImportController extends Controller {
 	}
 
 	#[NoAdminRequired]
+	#[UserRateLimit(limit: 20, period: 60)]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function previewImportView(int $viewId, String $path): DataResponse {
 		return $this->handleError(function () use ($viewId, $path) {
@@ -90,6 +93,7 @@ class ImportController extends Controller {
 	}
 
 	#[NoAdminRequired]
+	#[UserRateLimit(limit: 20, period: 60)]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function previewUploadImportTable(int $tableId): DataResponse {
 		try {
@@ -120,6 +124,7 @@ class ImportController extends Controller {
 	}
 
 	#[NoAdminRequired]
+	#[UserRateLimit(limit: 20, period: 60)]
 	#[RequirePermission(permission: Application::PERMISSION_CREATE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function previewUploadImportView(int $viewId): DataResponse {
 		try {
