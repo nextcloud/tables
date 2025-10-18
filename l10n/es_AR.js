@@ -98,6 +98,7 @@ OC.L10N.register(
     "Copy link" : "Copiar link",
     "Confirm" : "Confirmar",
     "Select" : "Seleccionar",
-    "ID" : "ID"
+    "ID" : "ID",
+    "seconds ago" : "segundos"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");
