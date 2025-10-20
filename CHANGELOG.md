@@ -5,6 +5,37 @@
 
 # Changelog
 
+## 1.0.0
+
+### Added
+
+* [Feat: activity support (tables#2002)](https://github.com/nextcloud/tables/pull/2002)
+
+### Fixed
+
+* [Fix(deps): update tiptap to ^3.6.6 (main) (tables#2066)](https://github.com/nextcloud/tables/pull/2066)
+* [Fix: Export JSON scheme (tables#2075)](https://github.com/nextcloud/tables/pull/2075)
+* [Fix: Avoid duplicate navigation items (tables#2094)](https://github.com/nextcloud/tables/pull/2094)
+* [Fix(deps): update dependency @nextcloud/auth to ^2.5.3 (main) (tables#2104)](https://github.com/nextcloud/tables/pull/2104)
+* [Fix: Add attribute to import preview functions (tables#2108)](https://github.com/nextcloud/tables/pull/2108)
+
+### Other
+
+* [Build(deps): claim supporting NC 33 (tables#2097)](https://github.com/nextcloud/tables/pull/2097)
+* [Ci: reduce assumptions about paths on the ci host (tables#2098)](https://github.com/nextcloud/tables/pull/2098)
+
+### Dependencies
+
+* [Chore(deps): update dependency vite to ^7.1.9 (main) (tables#2064)](https://github.com/nextcloud/tables/pull/2064)
+* [Chore(deps): update dependency @rollup/rollup-linux-x64-gnu to ^4.52.4 (main) (tables#2067)](https://github.com/nextcloud/tables/pull/2067)
+* [[main] Fix npm audit (tables#2081)](https://github.com/nextcloud/tables/pull/2081)
+* [Chore(deps): update shivammathur/setup-php digest to bf6b4fb (main) (tables#2090)](https://github.com/nextcloud/tables/pull/2090)
+* [Chore(deps): update skjnldsv/xpath-action digest to d813024 (main) (tables#2091)](https://github.com/nextcloud/tables/pull/2091)
+* [Chore(deps): update dependency @nextcloud/stylelint-config to ^3.1.1 (main) (tables#2101)](https://github.com/nextcloud/tables/pull/2101)
+* [Chore(deps): update dependency nextcloud/openapi-extractor to ^1.8.6 (main) (tables#2102)](https://github.com/nextcloud/tables/pull/2102)
+* [[main] Update nextcloud/ocp dependency (tables#2103)](https://github.com/nextcloud/tables/pull/2103)
+
+
 ## 1.0.0-beta.4
 
 ### Added
