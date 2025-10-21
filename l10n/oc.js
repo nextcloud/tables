@@ -63,6 +63,7 @@ OC.L10N.register(
     "Add to favorites" : "Apondre als favorits",
     "Remove from favorites" : "Tirar dels favorits",
     "Favorites" : "Favorits",
+    "Internal link" : "Ligam intèrn",
     "group" : "grop",
     "Permissions" : "Autorizacions",
     "Delete data" : "Suprimir donada",
