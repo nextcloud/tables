@@ -8,7 +8,7 @@ const tableTitle = 'View datetime filtering test table'
 const today = new Date()
 const [tomorrow, yesterday, daysAhead30, daysAhead60, daysAgo30, daysAgo60] = [1, -1, 30, 60, -30, -60].map(days => {
 	const d = new Date()
-	d.setDate(d.getDate() + days)
+	d.setUTCDate(d.getUTCDate() + days)
 	return d
 })
 
