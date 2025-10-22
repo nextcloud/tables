@@ -1,6 +1,7 @@
 OC.L10N.register(
     "tables",
     {
+    "You have created a new table {table}" : "Ви створили нову таблицю {table}",
     "Tables" : "Таблиці",
     "Nextcloud Tables" : "Таблиці",
     "Select table" : "Виберіть таблицю",
