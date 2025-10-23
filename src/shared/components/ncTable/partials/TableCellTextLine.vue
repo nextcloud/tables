@@ -26,16 +26,6 @@ export default {
 		NcTextField,
 	},
 
-	filters: {
-		truncate(string, num) {
-			if (string?.length >= num) {
-				return string.substring(0, num) + '...'
-			} else {
-				return string
-			}
-		},
-	},
-
 	mixins: [cellEditMixin],
 
 	props: {
