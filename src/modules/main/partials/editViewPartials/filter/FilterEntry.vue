@@ -24,7 +24,7 @@
 				:placeholder="t('tables', 'Operator')"
 				data-cy="filterEntryOperator" />
 		</div>
-		<div class="fix-col-2">
+		<div class="fix-col-2" :class="{ 'has-additional-input': additionalInputType }">
 			<NcSelect
 				v-if="selectedOperator && !selectedOperator.noSearchValue"
 				v-model="searchValue"
@@ -34,6 +34,21 @@
 				:placeholder="getValuePlaceholder"
 				data-cy="filterEntrySeachValue"
 				@search="v => term = v" />
+			<NcDateTimePickerNative
+				v-if="additionalInputType === AdditionalInputTypes.DATE"
+				v-model="additionalInputValue"
+				class="additional-input"
+				:label="selectedMagicField?.additionalInputLabel"
+				type="date"
+				data-cy="filterEntryDate" />
+			<NcTextField
+				v-if="additionalInputType === AdditionalInputTypes.NUMBER"
+				v-model.number="additionalInputValue"
+				class="additional-input"
+				:label="selectedMagicField?.additionalInputLabel"
+				type="number"
+				:min="0"
+				data-cy="filterEntryNumber" />
 		</div>
 		<div class="fix-col-2 actions">
 			<NcButton
@@ -51,9 +66,11 @@
 </template>
 
 <script>
-import { NcButton, NcSelect } from '@nextcloud/vue'
+import { NcButton, NcSelect, NcDateTimePickerNative, NcTextField } from '@nextcloud/vue'
+import Moment from '@nextcloud/moment'
 import DeleteOutline from 'vue-material-design-icons/TrashCanOutline.vue'
 import { ColumnTypes } from '../../../../../shared/components/ncTable/mixins/columnHandler.js'
+import { AdditionalInputTypes } from '../../../../../shared/components/ncTable/mixins/magicFields.js'
 
 export default {
 
@@ -61,6 +78,8 @@ export default {
 		NcSelect,
 		NcButton,
 		DeleteOutline,
+		NcDateTimePickerNative,
+		NcTextField,
 	},
 
 	props: {
@@ -77,6 +96,8 @@ export default {
 	data() {
 		return {
 			term: '',
+			additionalInputValue: null,
+			AdditionalInputTypes,
 		}
 	},
 
@@ -98,7 +119,8 @@ export default {
 
 				// if the value starts with @, we try to load the magic-value object
 				if (this.filterEntry?.value.substr(0, 1) === '@') {
-					return this.magicFields.find(item => item.id === this.filterEntry?.value || item.id === this.filterEntry?.value.substr(1))
+					const magicFieldId = this.getMagicFieldId()
+					return this.magicFields.find(item => item.id === magicFieldId || item.id === magicFieldId.substr(1))
 				}
 
 				return this.filterEntry.value
@@ -181,6 +203,78 @@ export default {
 			}
 			return t('tables', 'Search Value')
 		},
+		selectedMagicField() {
+			const magicFieldId = this.getMagicFieldId()
+			if (!magicFieldId) return
+			return this.magicFields.find(item => item.id === magicFieldId || item.id === magicFieldId.substr(1))
+		},
+		additionalInputType() {
+			return this.selectedMagicField?.additionalInput || null
+		},
+	},
+
+	watch: {
+		additionalInputValue: 'applyAdditionalInput',
+		'selectedMagicField.id'() {
+			this.applyAdditionalInput()
+			this.focusAdditionalInput()
+		},
+		'filterEntry.value': {
+			handler: 'loadAdditionalInputValue',
+			immediate: true,
+		},
+	},
+
+	methods: {
+		getMagicFieldId() {
+			if (!this.filterEntry?.value) return null
+			return this.filterEntry.value.split(':')[0]
+		},
+		applyAdditionalInput() {
+			if (!this.additionalInputType || this.additionalInputValue == null) return
+
+			const magicFieldId = this.getMagicFieldId()
+			if (!magicFieldId) return
+
+			let formattedValue
+			if (this.additionalInputType === AdditionalInputTypes.DATE) {
+				if (!(this.additionalInputValue instanceof Date)) return
+				formattedValue = new Moment(this.additionalInputValue).format('YYYY-MM-DD')
+			} else if (this.additionalInputType === AdditionalInputTypes.NUMBER) {
+				const number = parseInt(this.additionalInputValue)
+				if (isNaN(number) || number < 0) return
+				formattedValue = number
+			} else {
+				return
+			}
+
+			const newFilterValue = `${magicFieldId}:${formattedValue}`
+			if (this.filterEntry.value !== newFilterValue) {
+				this.mutableFilterEntry.value = newFilterValue
+			}
+		},
+		focusAdditionalInput() {
+			if (!this.additionalInputType) return
+
+			this.$nextTick(() => {
+				const input = this.$el.querySelector('.additional-input input')
+				if (input) {
+					input.focus()
+				}
+			})
+		},
+		loadAdditionalInputValue(newValue) {
+			if (!newValue?.includes(':')) return
+
+			const extractedValue = newValue.split(':')[1]
+			if (this.additionalInputValue === extractedValue) return
+
+			if (this.additionalInputType === AdditionalInputTypes.DATE) {
+				this.additionalInputValue = new Moment(extractedValue, 'YYYY-MM-DD').toDate()
+			} else if (this.additionalInputType === AdditionalInputTypes.NUMBER) {
+				this.additionalInputValue = parseInt(extractedValue)
+			}
+		},
 	},
 }
 </script>
@@ -205,6 +299,22 @@ export default {
 
 	.row .fix-col-2.actions {
 		align-items: center;
+	}
+
+	.row .fix-col-2.has-additional-input {
+		height: auto;
+		min-height: 63.32px;
+		flex-wrap: wrap;
+		padding-bottom: 14px;
+	}
+
+	.row .fix-col-2 .additional-input :deep(.input-field__main-wrapper) {
+		--input-border-width-offset: 2px;
+	}
+
+	.row .fix-col-2 .additional-input :deep(.input-field__main-wrapper:has(input:focus)) {
+		padding: var(--border-width-input, 2px);
+		--input-border-width-offset: 0;
 	}
 
 	.actions button {
