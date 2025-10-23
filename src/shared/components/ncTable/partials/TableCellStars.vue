@@ -11,14 +11,14 @@
 					:key="star"
 					class="star"
 					:class="{
-						'filled': star <= (hoverValue !== null ? hoverValue : editValue),
-						'clickable': !localLoading && canEditCell(),
+						'filled': star <= displayValue,
+						'clickable': isClickable,
 						'hovering': hoverValue !== null
 					}"
 					:aria-label="t('tables', 'Set {star} stars', { star })"
 					@mouseenter="hoverValue = star"
 					@click="setStar(star)">
-					{{ star <= (hoverValue !== null ? hoverValue : editValue) ? '★' : '☆' }}
+					{{ star <= displayValue ? '★' : '☆' }}
 				</span>
 			</div>
 			<div v-if="localLoading" class="icon-loading-small icon-loading-inline" />
@@ -49,6 +49,16 @@ export default {
 		}
 	},
 
+	computed: {
+		displayValue() {
+			return this.hoverValue !== null ? this.hoverValue : this.editValue
+		},
+
+		isClickable() {
+			return !this.localLoading && this.canEditCell()
+		},
+	},
+
 	watch: {
 		value(newValue) {
 			this.editValue = newValue
@@ -59,7 +69,7 @@ export default {
 		t,
 
 		setStar(starNumber) {
-			if (!this.localLoading && this.canEditCell()) {
+			if (this.isClickable) {
 				// If clicking on a star that represents the current rating, clear to 0
 				if (starNumber === this.value) {
 					this.editValue = 0

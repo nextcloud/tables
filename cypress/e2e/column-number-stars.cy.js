@@ -18,9 +18,6 @@ describe('Test column stars', () => {
 	beforeEach(function() {
 		cy.login(localUser)
 		cy.visit('apps/tables')
-	})
-
-	it('Table and column setup', () => {
 		cy.createTable(tableTitle)
 	})
 
@@ -29,22 +26,23 @@ describe('Test column stars', () => {
 		cy.createNumberStarsColumn(columnTitle, 2, true)
 
 		// insert default value row
-		cy.get('button').contains('Create row').click()
-		cy.get('.modal__content').contains('★★☆☆☆').should('be.visible')
-		cy.get('button').contains('Save').click()
-		cy.get('.custom-table table tr td div').contains('★★☆☆☆').should('be.visible')
+		cy.get('[data-cy="createRowBtn"]').click()
+		cy.get('[data-cy="createRowModal"] .stars').contains('★★☆☆☆').should('be.visible')
+		cy.get('[data-cy="createRowSaveButton"]').click()
+		cy.get('.custom-table table tr td .interactive-stars .star.filled').should('have.length', 2)
+		cy.get('.custom-table table tr td .interactive-stars').should('contain', '★').and('contain', '☆')
 
 		// insert row
-		cy.get('button').contains('Create row').click()
+		cy.get('[data-cy="createRowBtn"]').click()
 		cy.get('.slot button').last().click().click()
-		cy.get('button').contains('Save').click()
-		cy.get('.custom-table table tr td div').contains('★★★★☆').should('be.visible')
+		cy.get('[data-cy="createRowSaveButton"]').click()
+		cy.get('.custom-table table tr').last().find('.star.filled').should('have.length', 4)
 
 		// insert row
-		cy.get('button').contains('Create row').click()
+		cy.get('[data-cy="createRowBtn"]').click()
 		cy.get('.slot button').first().click().click()
-		cy.get('button').contains('Save').click()
-		cy.get('.custom-table table tr td div').contains('☆☆☆☆☆').should('be.visible')
+		cy.get('[data-cy="createRowSaveButton"]').click()
+		cy.get('.custom-table table tr').last().find('.star.filled').should('have.length', 0)
 	})
 
 })
