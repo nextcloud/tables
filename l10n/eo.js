@@ -92,6 +92,8 @@ OC.L10N.register(
     "Confirm" : "Konfirmi",
     "Content" : "Enhavo",
     "Select" : "Elekti",
+    "This year" : "Ĉi jaro",
+    "This week" : "Ĉi semajno",
     "ID" : "Identigilo",
     "seconds ago" : "antaŭ kelkaj sekundoj"
 },

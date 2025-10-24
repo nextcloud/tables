@@ -123,6 +123,10 @@ OC.L10N.register(
     "Select" : "Seleccionar",
     "Insert" : "Insertar",
     "Unchecked" : "Desmarcado",
+    "This year" : "Este año",
+    "This month" : "Este mes",
+    "This week" : "Esta semana",
+    "Select a date" : "Seleccionar una fecha",
     "ID" : "ID",
     "Clipboard is not available" : "El portapapeles no está disponible",
     "seconds ago" : "hace algunos segundos"

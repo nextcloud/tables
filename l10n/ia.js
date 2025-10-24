@@ -53,6 +53,8 @@ OC.L10N.register(
     "Copy link" : "Copiar ligamine",
     "Confirm" : "Confirmar",
     "Select" : "Selectionar",
+    "This month" : "Iste mense",
+    "This week" : "Iste septimana",
     "seconds ago" : "secundas passate"
 },
 "nplurals=2; plural=(n != 1);");

@@ -95,6 +95,9 @@ OC.L10N.register(
     "Go to previous page" : "Go to previous page",
     "Confirm" : "Confirm",
     "Select" : "Select",
+    "This year" : "This year",
+    "This month" : "This month",
+    "This week" : "This week",
     "ID" : "ID",
     "Clipboard is not available" : "Clipboard is not available",
     "seconds ago" : "seconds ago"

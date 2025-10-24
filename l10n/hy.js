@@ -47,6 +47,8 @@ OC.L10N.register(
     "Default" : "Լռելյայն",
     "Copy link" : "Պատճենել հղումը",
     "Select" : "Նշել",
+    "This month" : "այս ամիս",
+    "This week" : "այս շաբաթ",
     "seconds ago" : "վրկ. առաջ"
 },
 "nplurals=2; plural=(n != 1);");

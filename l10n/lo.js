@@ -33,6 +33,7 @@ OC.L10N.register(
     "Default" : "ເລີ່ມຕົ້ນ",
     "Copy link" : "ສຳເນົາລິງ",
     "Confirm" : "ຢືນຢັນ",
+    "This week" : "ທິດນີ້",
     "seconds ago" : "ວິນາທີຜ່ານມາ"
 },
 "nplurals=1; plural=0;");

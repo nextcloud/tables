@@ -90,6 +90,8 @@ OC.L10N.register(
     "Default" : "Defaut",
     "Copy link" : "Copiar lo ligam",
     "Confirm" : "Confirmar",
+    "This month" : "Aqueste mes",
+    "This week" : "Aquesta setmana",
     "ID" : "ID",
     "seconds ago" : "fa qualques segondas"
 },

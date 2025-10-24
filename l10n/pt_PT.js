@@ -103,6 +103,9 @@ OC.L10N.register(
     "Confirm" : "Confirmar",
     "Content" : "Conteúdo",
     "Select" : "Selecionar",
+    "This year" : "Este ano",
+    "This month" : "Este mês",
+    "This week" : "Esta semana",
     "Now" : "Agora",
     "ID" : "ID",
     "seconds ago" : "segundos atrás"

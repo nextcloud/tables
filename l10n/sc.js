@@ -111,6 +111,7 @@ OC.L10N.register(
     "Select" : "Seletziona",
     "Could not update share." : "No at fatu a agiornare sa cumpartzidura.",
     "Unchecked" : "Chene verìfica",
+    "This year" : "Ocannu",
     "ID" : "ID",
     "seconds ago" : "segundos a immoe"
 },

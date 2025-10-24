@@ -68,6 +68,8 @@ OC.L10N.register(
     "Confirm" : "დადასტურება",
     "Content" : "მოცულობა",
     "Unchecked" : "შეუმოწმებელია",
+    "This month" : "ამ თვეში",
+    "This week" : "ამ კვირაში",
     "ID" : "ID",
     "seconds ago" : "წამის წინ"
 },

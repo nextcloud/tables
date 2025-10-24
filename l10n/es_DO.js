@@ -72,6 +72,8 @@ OC.L10N.register(
     "Content" : "Contenido",
     "Select" : "Seleccionar",
     "Unchecked" : "Desmarcado",
+    "This month" : "Este mes",
+    "This week" : "Esta semana",
     "ID" : "ID",
     "seconds ago" : "hace segundos"
 },

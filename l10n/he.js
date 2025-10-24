@@ -155,6 +155,8 @@ OC.L10N.register(
     "Content" : "תוכן",
     "Select" : "בחר",
     "Unchecked" : "לא נבדק",
+    "This month" : "החודש",
+    "This week" : "השבוע",
     "ID" : "מזהה",
     "seconds ago" : "לפני מספר שניות"
 },

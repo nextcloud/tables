@@ -74,7 +74,9 @@ OC.L10N.register(
     "Copy link" : "คัดลอกลิงก์",
     "Confirm" : "ยืนยัน",
     "Select" : "เลือก",
-    "Start of the year" : "เริ่มต้นของปี",
+    "This year" : "ปีนี้",
+    "This month" : "เดือนนี้",
+    "This week" : "สัปดาห์นี้",
     "ID" : "ID",
     "Clipboard is not available" : "คลิปบอร์ดไม่พร้อมใช้งาน",
     "seconds ago" : "วินาทีที่ผ่านมา"

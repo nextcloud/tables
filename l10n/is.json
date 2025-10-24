@@ -119,7 +119,11 @@
     "Select" : "Velja",
     "Insert" : "Setja inn",
     "Unchecked" : "Ekki skoðað",
+    "This year" : "Á þessu ári",
+    "This month" : "Í þessum mánuði",
+    "This week" : "Í þessari viku",
     "Now" : "Núna",
+    "Select a date" : "Veldu dagsetningu",
     "ID" : "ID",
     "Clipboard is not available" : "Klippispjald er ekki tiltækt",
     "seconds ago" : "sekúndum síðan"

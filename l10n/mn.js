@@ -48,6 +48,8 @@ OC.L10N.register(
     "Undo" : "буцах",
     "Confirm" : "Батлах",
     "Select" : "Сонгох",
+    "This month" : "1 сар",
+    "This week" : "7 хоног",
     "ID" : "ID",
     "seconds ago" : "хоёрдахь өмнө"
 },

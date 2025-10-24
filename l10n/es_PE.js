@@ -66,6 +66,8 @@ OC.L10N.register(
     "Copy link" : "Copiar liga",
     "Confirm" : "Confirmar",
     "Content" : "Contenido",
+    "This month" : "Este mes",
+    "This week" : "Esta semana",
     "ID" : "ID",
     "seconds ago" : "hace segundos"
 },

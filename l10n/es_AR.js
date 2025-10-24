@@ -98,6 +98,9 @@ OC.L10N.register(
     "Copy link" : "Copiar link",
     "Confirm" : "Confirmar",
     "Select" : "Seleccionar",
+    "This month" : "Este mes",
+    "This week" : "Esta semana",
+    "Select a date" : "Elija una fecha",
     "ID" : "ID",
     "seconds ago" : "segundos"
 },

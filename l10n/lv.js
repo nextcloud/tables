@@ -104,6 +104,8 @@ OC.L10N.register(
     "Content" : "Saturs",
     "Select" : "Atzīmēt",
     "Unchecked" : "Neatzīmēts",
+    "This month" : "Šis mēnesis",
+    "This week" : "Šonedēļ",
     "Now" : "Tagad",
     "seconds ago" : "pirms vairākām sekundēm"
 },

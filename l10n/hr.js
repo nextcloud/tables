@@ -111,6 +111,7 @@ OC.L10N.register(
     "Content" : "Sadržaj",
     "Select" : "Odaberi",
     "Unchecked" : "Neprovjereno",
+    "This month" : "Ovaj mjesec",
     "ID" : "ID",
     "seconds ago" : "prije par sekundi"
 },

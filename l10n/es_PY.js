@@ -67,6 +67,8 @@ OC.L10N.register(
     "Confirm" : "Confirmar",
     "Content" : "Contenido",
     "Select" : "Seleccionar",
+    "This month" : "Este mes",
+    "This week" : "Esta semana",
     "ID" : "ID",
     "seconds ago" : "hace segundos"
 },

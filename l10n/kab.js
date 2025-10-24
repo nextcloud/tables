@@ -58,6 +58,8 @@ OC.L10N.register(
     "Confirm" : "Serggeg",
     "Content" : "Agbur",
     "Select" : "Fren",
+    "This year" : "Aseggas-a",
+    "This week" : "Dduṛt-a",
     "Now" : "Tura"
 },
 "nplurals=2; plural=(n != 1);");

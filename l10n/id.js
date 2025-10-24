@@ -91,6 +91,8 @@ OC.L10N.register(
     "Confirm" : "Konfirmasi",
     "Content" : "Konten",
     "Select" : "Pilih",
+    "This month" : "Bulan ini",
+    "This week" : "Pekan ini",
     "Now" : "Sekarang",
     "ID" : "ID",
     "Clipboard is not available" : "Papan klip tidak tersedia",

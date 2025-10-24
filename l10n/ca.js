@@ -274,6 +274,8 @@ OC.L10N.register(
     "Select" : "Seleccioneu",
     "Insert" : "Insereix",
     "Unchecked" : "Sense verificar",
+    "This year" : "Aquest any",
+    "This week" : "Aquesta setmana",
     "Now" : "Ara",
     "ID" : "ID",
     "Clipboard is not available" : "El porta-retalls no està disponible",

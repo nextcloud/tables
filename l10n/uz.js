@@ -103,7 +103,11 @@ OC.L10N.register(
     "Confirmation" : "Tasdiqlash",
     "Confirm" : "Confirm",
     "Select" : "Select",
+    "This year" : "Shu yil",
+    "This month" : "Shu oy",
+    "This week" : "Shu hafta",
     "Now" : "Hozir",
+    "Select a date" : "Sana tanlash",
     "seconds ago" : "soniya avval"
 },
 "nplurals=1; plural=0;");

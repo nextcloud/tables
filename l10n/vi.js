@@ -190,6 +190,9 @@ OC.L10N.register(
     "Close editor" : "Đóng trình biên tập",
     "Confirm" : "Xác nhận",
     "Select" : "Chọn",
+    "This year" : "Năm nay",
+    "This month" : "Tháng này",
+    "This week" : "Tuần này",
     "ID" : "ID",
     "Clipboard is not available" : "Bảng nhớ tạm không có sẵn",
     "seconds ago" : "vài giây trước"

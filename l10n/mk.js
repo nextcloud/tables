@@ -112,7 +112,10 @@ OC.L10N.register(
     "Confirmation" : "Потврда",
     "Confirm" : "Потврди",
     "Select" : "Избери",
+    "This year" : "Оваа година",
+    "This week" : "Оваа недела",
     "Now" : "Сега",
+    "Select a date" : "Избери датум",
     "ID" : "ID",
     "Clipboard is not available" : "Клипбордот не е достапен",
     "seconds ago" : "пред неколку секунди"

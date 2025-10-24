@@ -79,6 +79,8 @@ OC.L10N.register(
     "Confirm" : "Konfirmo",
     "Content" : "Përmbajtja",
     "Select" : "Përzgjidh",
+    "This month" : "Këtë muaj",
+    "This week" : "Këtë javë",
     "ID" : "ID",
     "seconds ago" : "sekonda më parë"
 },

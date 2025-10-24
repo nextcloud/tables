@@ -36,6 +36,7 @@ OC.L10N.register(
     "Back" : "ආපසු",
     "Copy link" : "සබැඳිය පිටපත් කරන්න",
     "Confirm" : "තහවුරු කරන්න",
+    "This week" : "මෙම සතිය",
     "seconds ago" : "තත්පර කිහිපයකට පෙර"
 },
 "nplurals=2; plural=(n != 1);");

@@ -96,6 +96,9 @@
     "Copy link" : "Copiar link",
     "Confirm" : "Confirmar",
     "Select" : "Seleccionar",
+    "This month" : "Este mes",
+    "This week" : "Esta semana",
+    "Select a date" : "Elija una fecha",
     "ID" : "ID",
     "seconds ago" : "segundos"
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
