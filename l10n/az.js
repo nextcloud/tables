@@ -57,6 +57,7 @@ OC.L10N.register(
     "Copy link" : "linki nüsxələ",
     "Confirm" : "Təsdiq edin",
     "Select" : "Seç",
+    "This year" : "Bu il",
     "seconds ago" : "saniyələr öncə"
 },
 "nplurals=2; plural=(n != 1);");

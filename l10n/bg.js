@@ -304,6 +304,7 @@ OC.L10N.register(
     "Checked" : "Проверено",
     "Unchecked" : "Непроверен",
     "This year" : "Тази година",
+    "This month" : "Този месец",
     "Now" : "Сега",
     "ID" : "ID /Идентификатор/",
     "Clipboard is not available" : "Клипбордът не е достъпен",

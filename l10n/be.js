@@ -178,6 +178,8 @@ OC.L10N.register(
     "Select" : "Выбраць",
     "Insert" : "Уставіць",
     "Me (name)" : "Я (імя)",
+    "This year" : "Гэты год",
+    "This week" : "На гэтым тыдні",
     "Now" : "Зараз",
     "Clipboard is not available" : "Буфер абмену недаступны",
     "seconds ago" : "с таму",

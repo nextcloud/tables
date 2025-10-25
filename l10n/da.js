@@ -349,6 +349,7 @@ OC.L10N.register(
     "Checked" : "Tjekket",
     "Unchecked" : "Ukontrolleret",
     "This year" : "Dette år",
+    "This month" : "Denne måned",
     "This week" : "Denne uge",
     "Now" : "Nu",
     "Select a date" : "Vælg en dato",
