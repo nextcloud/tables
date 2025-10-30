@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 import { defineConfig } from 'cypress'
+import cypressSplit from 'cypress-split'
 import vitePreprocessor from 'cypress-vite'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import vue from '@vitejs/plugin-vue2'
@@ -36,6 +37,7 @@ export default defineConfig({
 					return launchOptions
 				}
 			})
+			cypressSplit(on, config)
 
 			return config
 		},
