@@ -4,37 +4,31 @@
 -->
 <template>
 	<div class="cell-stars" :style="{ opacity: !canEditCell() ? 0.6 : 1 }">
-		<div v-if="!isEditing" @click="startEditing">
-			<div class="stars-display">
-				{{ getValue }}
+		<div class="inline-editing-container">
+			<div class="interactive-stars"
+				@mouseleave="hoverValue = null">
+				<span v-for="star in 5"
+					:key="star"
+					class="star"
+					:class="{
+						'filled': star <= displayValue,
+						'clickable': isClickable,
+						'hovering': hoverValue !== null
+					}"
+					:aria-label="t('tables', 'Set {star} stars', { star })"
+					@mouseenter="hoverValue = star"
+					@click="setStar(star)">
+					{{ star <= displayValue ? '★' : '☆' }}
+				</span>
 			</div>
-		</div>
-		<div v-else
-			ref="editingContainer"
-			class="inline-editing-container"
-			tabindex="0"
-			@keydown.enter="saveChanges"
-			@keydown.escape="cancelEdit">
-			<div class="align-center" :class="{ 'is-loading': localLoading }">
-				<div class="clickable-stars">
-					<span v-for="star in 5"
-						:key="star"
-						class="star"
-						:class="{ 'filled': star <= editValue, 'clickable': !localLoading && canEditCell() }"
-						:aria-label="t('tables', 'Set {star} stars', { star })"
-						@click="setStar(star)">
-						{{ star <= editValue ? '★' : '☆' }}
-					</span>
-				</div>
-				<div v-if="localLoading" class="icon-loading-small icon-loading-inline" />
-			</div>
+			<div v-if="localLoading" class="icon-loading-small icon-loading-inline" />
 		</div>
 	</div>
 </template>
 
 <script>
-import cellEditMixin from '../mixins/cellEditMixin.js'
 import { translate as t } from '@nextcloud/l10n'
+import cellEditMixin from '../mixins/cellEditMixin.js'
 
 export default {
 	name: 'TableCellStars',
@@ -42,38 +36,32 @@ export default {
 	mixins: [cellEditMixin],
 
 	props: {
-		column: {
-			type: Object,
-			default: () => {},
-		},
-		rowId: {
-			type: Number,
-			default: null,
-		},
 		value: {
 			type: Number,
 			default: 0,
 		},
 	},
 
+	data() {
+		return {
+			hoverValue: null,
+			editValue: this.value,
+		}
+	},
+
 	computed: {
-		getValue() {
-			const starEmpty = '☆'
-			const starFull = '★'
-			const v = this.value
-			return starFull.repeat(v) + starEmpty.repeat(5 - v)
+		displayValue() {
+			return this.hoverValue !== null ? this.hoverValue : this.editValue
+		},
+
+		isClickable() {
+			return !this.localLoading && this.canEditCell()
 		},
 	},
 
 	watch: {
-		isEditing(newValue) {
-			if (newValue) {
-				this.$nextTick(() => {
-					document.addEventListener('click', this.handleClickOutside)
-				})
-			} else {
-				document.removeEventListener('click', this.handleClickOutside)
-			}
+		value(newValue) {
+			this.editValue = newValue
 		},
 	},
 
@@ -81,13 +69,16 @@ export default {
 		t,
 
 		setStar(starNumber) {
-			if (!this.localLoading && this.canEditCell()) {
+			if (this.isClickable) {
 				// If clicking on a star that represents the current rating, clear to 0
-				if (starNumber === this.editValue) {
+				if (starNumber === this.value) {
 					this.editValue = 0
 				} else {
 					this.editValue = starNumber
 				}
+
+				this.hoverValue = null
+				this.saveChanges()
 			}
 		},
 
@@ -97,25 +88,16 @@ export default {
 			}
 
 			if (this.editValue === this.value) {
-				this.isEditing = false
 				return
 			}
 
 			const success = await this.updateCellValue(this.editValue)
 
 			if (!success) {
-				this.cancelEdit()
+				this.editValue = this.value
 			}
 
 			this.localLoading = false
-			this.isEditing = false
-		},
-
-		handleClickOutside(event) {
-			// Check if the click is outside the editing container
-			if (this.$refs.editingContainer && !this.$refs.editingContainer.contains(event.target)) {
-				this.saveChanges()
-			}
 		},
 	},
 }
@@ -126,45 +108,35 @@ export default {
 	width: 100%;
 }
 
-.cell-stars > div:first-child {
-	cursor: pointer;
-}
-
-.stars-display {
-	font-size: 20px;
-	cursor: pointer;
-}
-
-.align-center {
-	align-items: center;
-	display: flex;
-
-	&.is-loading {
-		opacity: 0.7;
-	}
-}
-
-.clickable-stars {
+.inline-editing-container {
 	display: flex;
 	align-items: center;
-	gap: 2px;
+}
+
+.interactive-stars {
+	display: flex;
+	align-items: center;
+	gap: 0;
 }
 
 .star {
-	font-size: 1.4em;
-	padding: 4px;
-	transition: transform 0.1s ease;
+	font-size: 20px;
+	color: var(--color-main-text);
+	padding: 0;
+	transition: color 0.1s ease;
 
 	&.clickable {
 		cursor: pointer;
-
-		&:hover {
-			transform: scale(1.1);
-		}
 	}
 
 	&.filled {
-		color: var(--color-warning);
+		color: var(--color-main-text);
+	}
+
+	&.hovering {
+		&.filled {
+			color: var(--color-text-maxcontrast);
+		}
 	}
 }
 
