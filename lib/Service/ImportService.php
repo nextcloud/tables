@@ -10,12 +10,15 @@ namespace OCA\Tables\Service;
 use DateTimeImmutable;
 use LogicException;
 use OC\User\NoUserException;
+use OCA\Tables\AppInfo\Application;
+use OCA\Tables\BackgroundJob\ImportTableJob;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Model\ImportStats;
 use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
 use OCA\Tables\Vendor\PhpOffice\PhpSpreadsheet\Cell\Cell;
 use OCA\Tables\Vendor\PhpOffice\PhpSpreadsheet\Cell\DataType;
@@ -25,10 +28,15 @@ use OCA\Tables\Vendor\PhpOffice\PhpSpreadsheet\Worksheet\Row;
 use OCA\Tables\Vendor\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
+use OCP\BackgroundJob\IJobList;
 use OCP\DB\Exception;
+use OCP\Files\AppData\IAppDataFactory;
+use OCP\Files\IAppData;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
+use OCP\Files\SimpleFS\ISimpleFolder;
+use OCP\ITempManager;
 use OCP\IUserManager;
 use OCP\Server;
 use Psr\Container\ContainerExceptionInterface;
@@ -49,6 +57,7 @@ class ImportService extends SuperService {
 	private TableService $tableService;
 	private ViewService $viewService;
 	private IUserManager $userManager;
+	private IAppData $appData;
 
 	private ?int $tableId = null;
 	private ?int $viewId = null;
@@ -76,6 +85,9 @@ class ImportService extends SuperService {
 		TableService $tableService,
 		ViewService $viewService,
 		IUserManager $userManager,
+		private IJobList $jobList,
+		private ITempManager $tempManager,
+		IAppDataFactory $appDataFactory,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->rootFolder = $rootFolder;
@@ -84,6 +96,7 @@ class ImportService extends SuperService {
 		$this->tableService = $tableService;
 		$this->viewService = $viewService;
 		$this->userManager = $userManager;
+		$this->appData = $appDataFactory->get(Application::APP_ID);
 	}
 
 	public function previewImport(?int $tableId, ?int $viewId, string $path): array {
@@ -246,6 +259,7 @@ class ImportService extends SuperService {
 	}
 
 	/**
+	 * @deprecated Use {@link scheduleImport} and {@link importV2} instead.
 	 * @param ?int $tableId
 	 * @param ?int $viewId
 	 * @param string $path
@@ -334,6 +348,138 @@ class ImportService extends SuperService {
 			'errors_parsing_count' => $this->countParsingErrors,
 			'errors_count' => $this->countErrors,
 		];
+	}
+
+	/**
+	 * @param ?int $tableId
+	 * @param ?int $viewId
+	 * @param string $path
+	 * @param bool $createMissingColumns
+	 * @throws DoesNotExistException
+	 * @throws InternalError
+	 * @throws MultipleObjectsReturnedException
+	 * @throws NotFoundError
+	 * @throws PermissionError
+	 */
+	public function scheduleImport(?int $tableId, ?int $viewId, string $path, bool $createMissingColumns = true, array $columnsConfig = []) {
+		if ($viewId !== null) {
+			$view = $this->viewService->find($viewId);
+			if (!$this->permissionsService->canCreateRows($view)) {
+				throw new PermissionError('create row at the view id = ' . $viewId . ' is not allowed.');
+			}
+			if ($createMissingColumns && !$this->permissionsService->canManageTableById($view->getTableId())) {
+				throw new PermissionError('create columns at the view id = ' . $viewId . ' is not allowed.');
+			}
+			$this->viewId = $viewId;
+		}
+		if ($tableId) {
+			$table = $this->tableService->find($tableId);
+			if (!$this->permissionsService->canCreateRows($table, 'table')) {
+				throw new PermissionError('create row at the view id = ' . (string)$viewId . ' is not allowed.');
+			}
+			if ($createMissingColumns && !$this->permissionsService->canManageTable($table)) {
+				throw new PermissionError('create columns at the view id = ' . (string)$viewId . ' is not allowed.');
+			}
+			$this->tableId = $tableId;
+		}
+		if (!$this->tableId && !$this->viewId) {
+			$e = new \Exception('Neither tableId nor viewId is given.');
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+		if ($this->tableId && $this->viewId) {
+			$e = new \LogicException('Both table ID and view ID are provided, but only one of them is allowed');
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
+
+		if ($this->userId === null || $this->userManager->get($this->userId) === null) {
+			$error = 'No user in context, can not import data. Cancel.';
+			$this->logger->debug($error);
+			throw new InternalError($error);
+		}
+
+		$importFileName = null;
+		// uploaded file
+		if (\file_exists($path)) {
+			$importFileName = 'import_u-' . $this->userId;
+			if ($this->tableId) {
+				$importFileName .= '_t-' . $this->tableId;
+			}
+			if ($this->viewId) {
+				$importFileName .= '_v-' . $this->viewId;
+			}
+			$importFileName .= '_' . \date('Y-m-d_H-i-s') . '.' . pathinfo($path, PATHINFO_EXTENSION);
+
+			$this->getImportAppDataDir()
+				->newFile($importFileName)
+				->putContent(\file_get_contents($path));
+		}
+
+		$this->jobList->add(
+			ImportTableJob::class,
+			[
+				'user_id' => $this->userId,
+				'table_id' => $this->tableId,
+				'view_id' => $this->viewId,
+				'user_file_path' => $importFileName ? null : $path,
+				'import_file_name' => $importFileName,
+				'create_missing_columns' => $createMissingColumns,
+				'columns_config' => $columnsConfig,
+			]
+		);
+	}
+
+
+	/**
+	 * @param string $userId
+	 * @param ?int $tableId
+	 * @param ?int $viewId
+	 * @param ?string $userFilePath Path to a file in the user's storage, if the file is not uploaded
+	 * @param ?string $importFileName Name of the file in the app data directory, if the file is uploaded
+	 * @param bool $createMissingColumns
+	 * @param array $columnsConfig
+	 * @return ImportStats
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 * @throws NotFoundError
+	 */
+	public function importV2(string $userId, ?int $tableId, ?int $viewId, ?string $userFilePath, ?string $importFileName, bool $createMissingColumns = true, array $columnsConfig = []): ImportStats {
+		$this->userId = $userId;
+		$this->tableId = $tableId;
+		$this->viewId = $viewId;
+		$this->createUnknownColumns = $createMissingColumns;
+		$this->columnsConfig = $columnsConfig;
+
+		try {
+			if ($importFileName) {
+				$file = $this->getImportAppDataDir()->getFile($importFileName);
+				$temporaryFile = $this->tempManager->getTemporaryFile('.' . $file->getExtension());
+				file_put_contents($temporaryFile, $file->getContent());
+				$spreadsheet = IOFactory::load($temporaryFile);
+				$this->loop($spreadsheet->getActiveSheet());
+			} elseif ($userFilePath) {
+				$file = $this->rootFolder->getUserFolder($this->userId)->get($userFilePath);
+				$temporaryFile = $file->getStorage()->getLocalFile($file->getInternalPath());
+				$spreadsheet = IOFactory::load($temporaryFile);
+				$this->loop($spreadsheet->getActiveSheet());
+			} else {
+				throw new NotFoundError('No file for import given.');
+			}
+		} catch (NotFoundException|NotPermittedException|NoUserException|InternalError|PermissionError $e) {
+			$this->logger->warning('Storage for user could not be found', ['exception' => $e]);
+			throw new NotFoundError('Storage for user could not be found', 0, $e);
+		}
+
+		return new ImportStats(
+			count($this->columns),
+			$this->countMatchingColumns,
+			$this->countCreatedColumns,
+			$this->countInsertedRows,
+			$this->countUpdatedRows,
+			$this->countParsingErrors,
+			$this->countErrors
+		);
 	}
 
 	/**
@@ -483,7 +629,7 @@ class ImportService extends SuperService {
 				$this->rowService->updateSet($id, $this->viewId, $data, $this->userId, $this->tableId);
 				$this->countUpdatedRows++;
 			} else {
-				$this->rowService->create($this->tableId, $this->viewId, $data);
+				$this->rowService->create($this->tableId, $this->viewId, $data, $this->userId);
 				$this->countInsertedRows++;
 			}
 		} catch (PermissionError $e) {
@@ -713,5 +859,17 @@ class ImportService extends SuperService {
 		}
 
 		return $dataType;
+	}
+
+	/**
+	 * @return ISimpleFolder
+	 * @throws \OCP\Files\NotPermittedException
+	 */
+	private function getImportAppDataDir(): ISimpleFolder {
+		try {
+			return $this->appData->getFolder('import');
+		} catch (NotFoundException) {
+			return $this->appData->newFolder('import');
+		}
 	}
 }
