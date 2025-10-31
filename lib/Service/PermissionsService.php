@@ -628,7 +628,7 @@ class PermissionsService {
 		try {
 			$userId = $this->preCheckUserId($userId);
 		} catch (InternalError $e) {
-			$e = new \Exception('Cannot pre check the user id');
+			$e = new \Exception('Cannot pre check the user id', 0, $e);
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			return false;
 		}
