@@ -689,11 +689,15 @@ class Row2Mapper {
 
 	/**
 	 * @param Row2 $row
+	 * @param string|null $userId
 	 * @return Row2
 	 * @throws InternalError
 	 * @throws Exception
 	 */
-	public function insert(Row2 $row): Row2 {
+	public function insert(Row2 $row, ?string $userId = null): Row2 {
+		if ($userId) {
+			$this->userId = $userId;
+		}
 		if ($row->getId()) {
 			// if row has an id from migration or import etc.
 			$rowSleeve = $this->createRowSleeveFromExistingData($row->getId(), $row->getTableId(), $row->getCreatedAt(), $row->getCreatedBy(), $row->getLastEditBy(), $row->getLastEditAt());
@@ -712,9 +716,15 @@ class Row2Mapper {
 	}
 
 	/**
+	 * @param Row2 $row
+	 * @param string|null $userId
+	 * @return Row2
 	 * @throws InternalError
 	 */
-	public function update(Row2 $row): Row2 {
+	public function update(Row2 $row, ?string $userId = null): Row2 {
+		if ($userId) {
+			$this->userId = $userId;
+		}
 		$changedCells = $row->getChangedCells();
 		// if nothing has changed
 		if (count($changedCells) === 0) {
