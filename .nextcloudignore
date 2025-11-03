@@ -37,6 +37,10 @@
 /node_modules/
 /renovate.json
 /src/
+/scoper.inc.php
+/.scoper-production-dependencies
+/.lib-vendor-organizer.php
+/update-scoper-dependencies.sh
 .gitattributes
 .l10nignore
 .php-cs-fixer.dist.php
@@ -49,5 +53,7 @@ stylelint.config.js
 webpack.js
 releaseNotes.md
 /.scripts
+/vendor/bamarni
+/vendor/bin
 /vendor-bin
 /vite.config.ts

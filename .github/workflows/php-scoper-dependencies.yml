@@ -1,0 +1,57 @@
+# SPDX-FileCopyrightText: 2025 Nextcloud GmbH and Nextcloud contributors
+# SPDX-License-Identifier: MIT
+name: PHP Scoper Dependencies
+
+on:
+  pull_request:
+    branches: main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: openapi-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  php-scoper-deps:
+    runs-on: ubuntu-latest
+
+    if: ${{ github.repository_owner != 'nextcloud-gmbh' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+
+      - name: Get php version
+        id: versions
+        uses: icewind1991/nextcloud-version-matrix@58becf3b4bb6dc6cef677b15e2fd8e7d48c0908f # v1.3.1
+
+      - name: Set up php${{ steps.versions.outputs.php-min }}
+        uses: shivammathur/setup-php@bf6b4fbd49ca58e4608c9c89fba0b8d90bd2a39f # v2.35.5
+        with:
+          php-version: ${{ steps.versions.outputs.php-min }}
+          extensions: bz2, ctype, curl, dom, fileinfo, gd, iconv, intl, json, libxml, mbstring, openssl, pcntl, posix, session, simplexml, xmlreader, xmlwriter, zip, zlib, sqlite, pdo_sqlite
+          coverage: none
+          ini-file: development
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install production dependencies, bypassing scripts
+        run: composer i --no-dev --no-scripts
+
+      - name: Update php-scoper dependency file
+        run: composer run scoper:update-deps
+
+      - name: Check for changes against .scoper-production-dependencies
+        run: |
+          bash -c "[[ ! \"`git status --porcelain `\" ]] || (echo 'Please run composer run scoper:update-deps and commit the changes' && exit 1)"
+
+      - name: Show changes on failure
+        if: failure()
+        run: |
+          git status
+          git --no-pager diff
+          exit 1 # make it red to grab attention
