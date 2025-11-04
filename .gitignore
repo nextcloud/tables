@@ -20,3 +20,4 @@ tests/unit/.phpunit.result.cache
 /cypress/videos
 /cypress/downloads
 /vendor-bin/*/vendor
+/lib/Vendor/

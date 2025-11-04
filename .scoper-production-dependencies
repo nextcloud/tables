@@ -1,0 +1,9 @@
+phpoffice/phpspreadsheet
+composer/pcre
+maennchen/zipstream-php
+markbaker/complex
+markbaker/matrix
+psr/http-client
+psr/http-factory
+psr/http-message
+psr/simple-cache
