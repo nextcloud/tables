@@ -316,7 +316,14 @@ class RowService extends SuperService {
 
 		$out = new RowDataInput();
 		foreach ($data as $entry) {
-			$column = $this->getColumnFromColumnsArray((int)$entry['columnId'], $columns);
+			$columnId = (int)$entry['columnId'];
+
+			// Skip metadata columns
+			if (Column::isValidMetaTypeId($columnId)) {
+				continue;
+			}
+
+			$column = $this->getColumnFromColumnsArray($columnId, $columns);
 
 			if ($column) {
 				$columnBusiness = $this->getColumnBusiness($column);
