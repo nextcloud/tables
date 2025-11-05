@@ -233,14 +233,16 @@ class ActivityManager {
 
 				$subject = $ownActivity
 					? $l->n(
-						'You have updated cell ' . $columns . ' on row {row} in table {table}',
-						'You have updated cells ' . $columns . ' on row {row} in table {table}',
-						$count
+						'You have updated cell %1$s on row {row} in table {table}',
+						'You have updated cells %1$s on row {row} in table {table}',
+						$count,
+						[$columns],
 					)
 					: $l->n(
-						'{user} has updated cell(s) ' . $columns . ' on row {row} in table {table}',
-						'{user} has updated cells ' . $columns . ' on row {row} in table {table}',
+						'{user} has updated cell %1$s on row {row} in table {table}',
+						'{user} has updated cells %1$s on row {row} in table {table}',
 						$count,
+						[$columns],
 					);
 				break;
 			case self::SUBJECT_ROW_DELETE:
