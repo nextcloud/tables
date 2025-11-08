@@ -308,6 +308,7 @@ OC.L10N.register(
     "This year" : "Тази година",
     "This month" : "Този месец",
     "Now" : "Сега",
+    "Select a date" : "Избор на дата",
     "ID" : "ID /Идентификатор/",
     "Clipboard is not available" : "Клипбордът не е достъпен",
     "seconds ago" : "преди секунди",

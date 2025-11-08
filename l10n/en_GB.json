@@ -9,8 +9,6 @@
     "{user} has updated the description of table {table} to {after}" : "{user} has updated the description of table {table} to {after}",
     "You have created a new row {row} in table {table}" : "You have created a new row {row} in table {table}",
     "{user} has created a new row {row} in table {table}" : "{user} has created a new row {row} in table {table}",
-    "_You have updated cell _::_You have updated cells _" : ["You have updated cell ","You have updated cells "],
-    "_{user} has updated cell(s) _::_{user} has updated cells _" : ["{user} has updated cell(s) ","{user} has updated cells "],
     "You have deleted the row {row} in table {table}" : "You have deleted the row {row} in table {table}",
     "{user} has deleted the row {row} in table {table}" : "{user} has deleted the row {row} in table {table}",
     "Tables" : "Tables",

@@ -11,8 +11,6 @@ OC.L10N.register(
     "{user} has updated the description of table {table} to {after}" : "{user} actualizou a descrición da táboa {table} a {after}",
     "You have created a new row {row} in table {table}" : "Vde. creou unha nova fila {row} na táboa {table}",
     "{user} has created a new row {row} in table {table}" : "{user} creou unha nova fila {row} na táboa {table}",
-    "_You have updated cell _::_You have updated cells _" : ["Vde. actualizou a cela","Vde. actualizou as celas "],
-    "_{user} has updated cell(s) _::_{user} has updated cells _" : ["{user} actualizou a cela","{user} actualizou as celas "],
     "You have deleted the row {row} in table {table}" : "Vde. eliminou a fila {row} na táboa {table}",
     "{user} has deleted the row {row} in table {table}" : "{user} eliminou a fila {row} na táboa {table}",
     "Tables" : "Táboas",

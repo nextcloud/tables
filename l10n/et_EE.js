@@ -11,8 +11,6 @@ OC.L10N.register(
     "{user} has updated the description of table {table} to {after}" : "{user} on muutnud „{table}“ tabeli uueks nimeks „{after}“",
     "You have created a new row {row} in table {table}" : "Sina oled lisanud {row}. rea tabelisse „{table}“",
     "{user} has created a new row {row} in table {table}" : "Kasutaja {user} on lisanud {row}. rea tabelisse „{table}“",
-    "_You have updated cell _::_You have updated cells _" : ["Sina oled uuendanud välja","Sina oled uuendanud välju"],
-    "_{user} has updated cell(s) _::_{user} has updated cells _" : ["{user} on uuendanud välja","{user} on uuendanud välju"],
     "You have deleted the row {row} in table {table}" : "Sa oled kustutanud {row}. rea tabelist „{table}“",
     "{user} has deleted the row {row} in table {table}" : "Kasutaja {user} on kustutanud {row}. rea tabelist „{table}“",
     "Tables" : "Tabelid",

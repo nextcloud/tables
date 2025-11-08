@@ -9,8 +9,6 @@
     "{user} has updated the description of table {table} to {after}" : "Tá cur síos an tábla {table} nuashonraithe ag {user} go {after}",
     "You have created a new row {row} in table {table}" : "Tá sraith nua {row} cruthaithe agat sa tábla {table}.",
     "{user} has created a new row {row} in table {table}" : "Chruthaigh {user} ró nua {row} sa tábla {table}",
-    "_You have updated cell _::_You have updated cells _" : ["Tá cill nuashonraithe agat","Tá cealla nuashonraithe agat","Tá cealla nuashonraithe agat","Tá cealla nuashonraithe agat","Tá cealla nuashonraithe agat"],
-    "_{user} has updated cell(s) _::_{user} has updated cells _" : ["Tá cealla nuashonraithe ag {user}","Tá cealla nuashonraithe ag {user}","Tá cealla nuashonraithe ag {user}","Tá cealla nuashonraithe ag {user}","Tá cealla nuashonraithe ag {user}"],
     "You have deleted the row {row} in table {table}" : "Scrios tú an tsraith {row} sa tábla {table}",
     "{user} has deleted the row {row} in table {table}" : "Scrios {user} an tsraith {row} sa tábla {table}",
     "Tables" : "Táblaí",

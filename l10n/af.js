@@ -57,6 +57,7 @@ OC.L10N.register(
     "Suffix" : "Agtervoegsel",
     "Default" : "Verstek",
     "Confirm" : "Bevestig",
+    "This week" : "Vandeesweek",
     "ID" : "ID",
     "seconds ago" : "sekondes gelede"
 },

@@ -9,8 +9,6 @@
     "{user} has updated the description of table {table} to {after}" : "{user}, {table} tablosunun açıklamasını {after} olarak güncelledi",
     "You have created a new row {row} in table {table}" : "{table} tablosuna yeni {row} satırını eklediniz",
     "{user} has created a new row {row} in table {table}" : "{user}, {table} tablosuna yeni {row} satırını ekledi",
-    "_You have updated cell _::_You have updated cells _" : ["Hücreyi güncellediniz","Hücreleri güncellediniz"],
-    "_{user} has updated cell(s) _::_{user} has updated cells _" : ["{user}, hücreyi güncelledi","{user}, hücreleri güncelledi"],
     "You have deleted the row {row} in table {table}" : "{table} tablosundaki {row} satırını sildiniz",
     "{user} has deleted the row {row} in table {table}" : "{user}, {table} tablosundaki {row} satırını sildi",
     "Tables" : "Tablolar",

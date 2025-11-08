@@ -9,8 +9,6 @@
     "{user} has updated the description of table {table} to {after}" : "{user} hat die Beschreibung der Tabelle {table} nach  {after} aktualisiert",
     "You have created a new row {row} in table {table}" : "Du hast eine neue Zeile {row} in der Tabelle {table} erstellt",
     "{user} has created a new row {row} in table {table}" : "{user} hat eine neue Zeile {row} in der Tabelle {table} erstellt",
-    "_You have updated cell _::_You have updated cells _" : ["Sie haben eine aktualisierte Zelle","Sie haben aktualisierte Zellen"],
-    "_{user} has updated cell(s) _::_{user} has updated cells _" : ["{user} hat eine Zelle aktualisiert","{user} hat Zellen aktualisiert"],
     "You have deleted the row {row} in table {table}" : "Du hast die Zeile {row} in der Tabelle {table} gelöscht",
     "{user} has deleted the row {row} in table {table}" : "{user} hat die Zeile {row} in der Tabelle {table} gelöscht",
     "Tables" : "Tabellen",

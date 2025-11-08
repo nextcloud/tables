@@ -11,8 +11,6 @@ OC.L10N.register(
     "{user} has updated the description of table {table} to {after}" : "{user} змяніў(-ла) апісанне табліцы {table} на {after}",
     "You have created a new row {row} in table {table}" : "Вы стварылі новы радок {row} у табліцы {table}",
     "{user} has created a new row {row} in table {table}" : "{user} стварыў(-ла) новы радок {row} у табліцы {table}",
-    "_You have updated cell _::_You have updated cells _" : ["Вы абнавілі ячэйку","Вы абнавілі ячэйкі","Вы абнавілі ячэйкі","Вы абнавілі ячэйкі"],
-    "_{user} has updated cell(s) _::_{user} has updated cells _" : ["{user} абнавіў(-ла) ячэйку","{user} абнавіў(-ла) ячэйкі","{user} абнавіў(-ла) ячэйкі","{user} абнавіў(-ла) ячэйкі"],
     "You have deleted the row {row} in table {table}" : "Вы выдалілі радок {row} у табліцы {table}",
     "{user} has deleted the row {row} in table {table}" : "{user} выдаліў(-ла) радок {row} у табліцы {table}",
     "Tables" : "Табліцы",

@@ -53,6 +53,7 @@ OC.L10N.register(
     "Suffix" : "Ôl-ddodiad",
     "Close editor" : "Cau'r golygydd",
     "Confirm" : "Cadarnhau",
+    "This month" : "Mis yma",
     "This week" : "Wythnos yma",
     "ID" : "ID",
     "seconds ago" : "eiliad yn ôl"

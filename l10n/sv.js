@@ -11,8 +11,6 @@ OC.L10N.register(
     "{user} has updated the description of table {table} to {after}" : "{user} har uppdaterat beskrivningen av tabellen {table} till {after}",
     "You have created a new row {row} in table {table}" : "Du har skapat en ny rad {row} i tabellen {table}",
     "{user} has created a new row {row} in table {table}" : "{user} har skapat en ny rad {row} i tabellen {table}",
-    "_You have updated cell _::_You have updated cells _" : ["Du har uppdaterat cellen","Du har uppdaterat cellerna"],
-    "_{user} has updated cell(s) _::_{user} has updated cells _" : ["{user} har uppdaterat cell(er)","{user} har uppdaterat cellerna "],
     "You have deleted the row {row} in table {table}" : "Du har tagit bort raden {row} i tabellen {table}",
     "{user} has deleted the row {row} in table {table}" : "{user} har tagit bort raden {row} i tabellen {table}",
     "Tables" : "Tabeller",
