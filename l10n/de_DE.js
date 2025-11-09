@@ -11,6 +11,8 @@ OC.L10N.register(
     "{user} has updated the description of table {table} to {after}" : "{user} hat die Beschreibung der Tabelle {table} nach  {after} aktualisiert",
     "You have created a new row {row} in table {table}" : "Sie haben eine neue Zeile {row} in der Tabelle {table} erstellt",
     "{user} has created a new row {row} in table {table}" : "{user} hat eine neue Zeile {row} in der Tabelle {table} erstellt",
+    "_You have updated cell %1$s on row {row} in table {table}_::_You have updated cells %1$s on row {row} in table {table}_" : ["Sie haben %1$s aktualisierte Zelle in Reihe {row} in der Tabelle {table}","Sie haben %1$s aktualisierte Zellen in Reihe {row} in der Tabelle {table}"],
+    "_{user} has updated cell %1$s on row {row} in table {table}_::_{user} has updated cells %1$s on row {row} in table {table}_" : ["{user} hat %1$s aktualisierte Zelle in Zeile {row} in der Tabelle {table}","{user} hat %1$s aktualisierte Zellen in Zeile {row} in der Tabelle {table}"],
     "You have deleted the row {row} in table {table}" : "Sie haben die Zeile {row} in der Tabelle {table} gelöscht",
     "{user} has deleted the row {row} in table {table}" : "{user} hat die Zeile {row} in der Tabelle {table} gelöscht",
     "Tables" : "Tabellen",
