@@ -11,6 +11,8 @@ OC.L10N.register(
     "{user} has updated the description of table {table} to {after}" : "Tá cur síos an tábla {table} nuashonraithe ag {user} go {after}",
     "You have created a new row {row} in table {table}" : "Tá sraith nua {row} cruthaithe agat sa tábla {table}.",
     "{user} has created a new row {row} in table {table}" : "Chruthaigh {user} ró nua {row} sa tábla {table}",
+    "_You have updated cell %1$s on row {row} in table {table}_::_You have updated cells %1$s on row {row} in table {table}_" : ["Tá cill %1$s nuashonraithe agat ar shraith {row} sa tábla {table}","Tá cealla %1$s nuashonraithe agat ar shraith {row} sa tábla {table}","Tá cealla %1$s nuashonraithe agat ar shraith {row} sa tábla {table}","Tá cealla %1$s nuashonraithe agat ar shraith {row} sa tábla {table}","Tá cealla %1$s nuashonraithe agat ar shraith {row} sa tábla {table}"],
+    "_{user} has updated cell %1$s on row {row} in table {table}_::_{user} has updated cells %1$s on row {row} in table {table}_" : ["Tá cill %1$s nuashonraithe ag {user} ar shraith {row} sa tábla {table}","Tá cealla %1$s nuashonraithe ag {user} ar shraith {row} sa tábla {table}","Tá cealla %1$s nuashonraithe ag {user} ar shraith {row} sa tábla {table}","Tá cealla %1$s nuashonraithe ag {user} ar shraith {row} sa tábla {table}","Tá cealla %1$s nuashonraithe ag {user} ar shraith {row} sa tábla {table}"],
     "You have deleted the row {row} in table {table}" : "Scrios tú an tsraith {row} sa tábla {table}",
     "{user} has deleted the row {row} in table {table}" : "Scrios {user} an tsraith {row} sa tábla {table}",
     "Tables" : "Táblaí",
