@@ -47,7 +47,7 @@ jobs:
     strategy:
       matrix:
         php-versions: ['8.2']
-        server-versions: ['master']
+        server-versions: ['stable31']
 
     services:
       mysql:
@@ -73,7 +73,7 @@ jobs:
 
       - name: Register text Git reference
         run: |
-          text_app_ref="$(if [ "${{ matrix.server-versions }}" = "master" ]; then echo -n "main"; else echo -n "${{ matrix.server-versions }}"; fi)"
+          text_app_ref="$(if [ "${{ matrix.server-versions }}" = "stable31" ]; then echo -n "main"; else echo -n "${{ matrix.server-versions }}"; fi)"
           echo "text_app_ref=$text_app_ref" >> $GITHUB_ENV
 
       - name: Checkout text app
