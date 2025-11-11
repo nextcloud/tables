@@ -441,11 +441,10 @@ class Api1Controller extends ApiController {
 	 * Get a share object
 	 *
 	 * @param int $shareId Share ID
-	 * @return DataResponse<Http::STATUS_OK, TablesShare, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesShare, array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
 	 *
 	 * 200: Share returned
-	 * 403: No permissions
-	 * 404: Not found
+	 * 404: Not found/No permissions
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
@@ -456,7 +455,7 @@ class Api1Controller extends ApiController {
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: '.$e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
-			return new DataResponse($message, Http::STATUS_FORBIDDEN);
+			return new DataResponse($message, Http::STATUS_NOT_FOUND);
 		} catch (InternalError $e) {
 			$this->logger->error('An internal error or exception occurred: '.$e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -473,13 +472,16 @@ class Api1Controller extends ApiController {
 	 * Will be empty if view does not exist
 	 *
 	 * @param int $viewId View ID
-	 * @return DataResponse<Http::STATUS_OK, TablesShare[], array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesShare>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Shares returned
+	 * 403: No permissions
+	 * 404: Not found
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_VIEW, idParam: 'viewId')]
 	public function indexViewShares(int $viewId): DataResponse {
 		try {
 			return new DataResponse($this->shareService->formatShares($this->shareService->findAll('view', $viewId)));
@@ -495,13 +497,16 @@ class Api1Controller extends ApiController {
 	 * Will be empty if table does not exist
 	 *
 	 * @param int $tableId Table ID
-	 * @return DataResponse<Http::STATUS_OK, TablesShare[], array{}>|DataResponse<Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<TablesShare>, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: Shares returned
+	 * 403: No permissions
+	 * 404: Not found
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
+	#[RequirePermission(permission: Application::PERMISSION_MANAGE, type: Application::NODE_TYPE_TABLE, idParam: 'tableId')]
 	public function indexTableShares(int $tableId): DataResponse {
 		try {
 			return new DataResponse($this->shareService->formatShares($this->shareService->findAll('table', $tableId)));
