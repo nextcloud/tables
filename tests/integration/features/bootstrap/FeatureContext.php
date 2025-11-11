@@ -1202,6 +1202,27 @@ class FeatureContext implements Context {
 	}
 
 	/**
+	 * @When user :user attempts to check the share permissions
+	 */
+	public function attemptToCheckSharePermissions(string $user): void {
+		$this->setCurrentUser($user);
+		$this->getShareById($this->shareId);
+	}
+
+	/**
+	 * @When user :user attempts to fetch all shares of :element :alias
+	 */
+	public function attemptToFetchAllShares(string $user, string $element, string $alias): void {
+		$this->setCurrentUser($user);
+		$tableId = $this->collectionManager->getByAlias($element, $alias)['id'];
+
+		$this->sendRequest(
+			'GET',
+			sprintf('/apps/tables/api/1/%ss/%d/shares', $element, $tableId)
+		);
+	}
+
+	/**
 	 * @Then user :user has the following permissions
 	 */
 	public function checkSharePermissions($user, ?TableNode $permissions = null) {

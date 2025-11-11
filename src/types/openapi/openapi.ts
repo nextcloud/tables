@@ -1870,18 +1870,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description No permissions */
-            readonly 403: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly message: string;
-                    };
-                };
-            };
-            /** @description Not found */
+            /** @description Not found/No permissions */
             readonly 404: {
                 headers: {
                     readonly [name: string]: unknown;
@@ -2077,6 +2066,28 @@ export interface operations {
                     };
                 };
             };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
             readonly 500: {
                 headers: {
                     readonly [name: string]: unknown;
@@ -2112,6 +2123,28 @@ export interface operations {
             };
             /** @description Current user is not logged in */
             readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
                 headers: {
                     readonly [name: string]: unknown;
                 };
