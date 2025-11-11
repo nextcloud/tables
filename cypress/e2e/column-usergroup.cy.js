@@ -59,6 +59,7 @@ describe('Test column ' + columnTitle, () => {
         cy.get('[data-cy="ncTable"] table tr td .user-bubble__name').contains(localUser.userId).should('be.visible')
 
         cy.get('[data-cy="ncTable"] [data-cy="editRowBtn"]').click()
+        cy.get('[data-cy="usergroupRowSelect"] .vs__deselect').click({ multiple: true })
         cy.get('[data-cy="usergroupRowSelect"] input').clear().type(nonLocalUser.userId)
         cy.get(`.vs__dropdown-menu [id="${nonLocalUser.userId}"]`).click()
         cy.get('[data-cy="editRowSaveButton"]').click()

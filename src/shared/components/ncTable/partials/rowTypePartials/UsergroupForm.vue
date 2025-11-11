@@ -44,12 +44,13 @@ export default {
 		return {
 			selectUsers: this.column.usergroupSelectUsers,
 			selectGroups: this.column.usergroupSelectGroups,
+			internalLocalValue: [],
 		}
 	},
 	computed: {
 		localValue: {
 			get() {
-				return this.value
+				return this.internalLocalValue
 			},
 			set(v) {
 				let formattedValue = null
@@ -58,6 +59,7 @@ export default {
 				} else {
 					formattedValue = [v]
 				}
+				this.internalLocalValue = formattedValue
 				this.$emit('update:value', formattedValue)
 			},
 		},
@@ -67,6 +69,22 @@ export default {
 		// Doing this in data() doesn't work due to timing issues,
 		// since the data() function runs before the capabilities are fully initialized
 		this.selectCircles = this.isCirclesEnabled ? this.column.usergroupSelectTeams : false
+
+		let initialValue = this.value
+		if (!initialValue || (Array.isArray(initialValue) && initialValue.length === 0)) {
+			initialValue = this.column.usergroupDefault || []
+		}
+
+		const formatted = (Array.isArray(initialValue) ? initialValue : []).map(item => ({
+			...(item ?? {}),
+			// Adding a unique key such that removing items works correctly
+			key: this.getKeyPrefix(item?.type) + (item?.id ?? ''),
+		}))
+		this.internalLocalValue = formatted
+
+		if (formatted.length > 0) {
+			this.$emit('update:value', formatted)
+		}
 	},
 	methods: {
 		addItem(selectedItem) {
@@ -74,6 +92,15 @@ export default {
 				this.localValue = selectedItem
 			} else {
 				this.localValue = []
+			}
+		},
+
+		getKeyPrefix(type) {
+			switch (type) {
+			case 0: return 'users-'
+			case 1: return 'groups-'
+			case 2: return 'circles-'
+			default: return 'unknown-'
 			}
 		},
 
