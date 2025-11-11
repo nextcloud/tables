@@ -72,20 +72,8 @@
 		{
 			"groupName": "cypress",
 			"matchPackageNames": [
-				"cypress"
-			],
-			"allowedVersions": "<=13.6.4"
-		},
-		{
-			"groupName": "cypress",
-			"matchPackageNames": [
-				"@nextcloud/cypress"
-			],
-			"allowedVersions": "<=1.0.0-beta.7"
-		},
-		{
-			"groupName": "cypress",
-			"matchPackageNames": [
+				"cypress",
+				"@nextcloud/cypress",
 				"@cypress/"
 			]
 		},
