@@ -5,6 +5,37 @@
 
 # Changelog
 
+## 0.9.6
+
+### Fixed
+
+* [[stable0.9] fix: Smartpicker show content (tables#1961)](https://github.com/nextcloud/tables/pull/1961)
+* [[stable0.9] test(Cypress): Fix component tests (tables#1962)](https://github.com/nextcloud/tables/pull/1962)
+* [[stable0.9] fix: allow null userId (tables#1981)](https://github.com/nextcloud/tables/pull/1981)
+* [[stable0.9] fix(cypress): remove leftover `only` (tables#1995)](https://github.com/nextcloud/tables/pull/1995)
+* [[stable0.9] feat: remove rows in view after edit when they no longer match filter (tables#2017)](https://github.com/nextcloud/tables/pull/2017)
+* [[stable0.9] fix: Scope CSS styles (tables#2022)](https://github.com/nextcloud/tables/pull/2022)
+* [[stable0.9] fix: Add attribute to import preview functions (tables#2116)](https://github.com/nextcloud/tables/pull/2116)
+
+### Dependencies
+
+* [Fix(deps): update dependency phpoffice/phpspreadsheet to ^1.29.12 (stable0.9) (tables#1948)](https://github.com/nextcloud/tables/pull/1948)
+* [Fix(deps): update dependency @nextcloud/files to ^3.12.0 (stable0.9) (tables#1949)](https://github.com/nextcloud/tables/pull/1949)
+* [Fix(deps): update tiptap to ^3.5.2 (stable0.9) (tables#2069)](https://github.com/nextcloud/tables/pull/2069)
+* [Fix(deps): update dependency @nextcloud/initial-state to v3 (stable0.9) (tables#1987)](https://github.com/nextcloud/tables/pull/1987)
+* [Fix(deps): update dependency @nextcloud/vue to ^8.31.0 (stable0.9) (tables#2062)](https://github.com/nextcloud/tables/pull/2062)
+* [Fix(deps): update dependency @nextcloud/dialogs to ^6.3.2 (stable0.9) (tables#2058)](https://github.com/nextcloud/tables/pull/2058)
+* [Fix(deps): update dependency @nextcloud/axios to ^2.5.2 (stable0.9) (tables#2072)](https://github.com/nextcloud/tables/pull/2072)
+
+### Other
+
+* [Chore(deps): update dependency @rollup/rollup-linux-x64-gnu to ^4.52.2 (stable0.9) (tables#2070)](https://github.com/nextcloud/tables/pull/2070)
+* [Chore(deps): update dependency openapi-typescript to ^7.9.1 (stable0.9) (tables#2005)](https://github.com/nextcloud/tables/pull/2005)
+* [Chore(deps): update dependency nextcloud/openapi-extractor to ^1.8.3 (stable0.9) (tables#2045)](https://github.com/nextcloud/tables/pull/2045)
+* [Chore(deps): update dependency cypress-vite to ^1.8.0 (stable0.9) (tables#2061)](https://github.com/nextcloud/tables/pull/2061)
+* [Chore(deps): update dependency staabm/annotate-pull-request-from-checkstyle to ^1.8.6 (stable0.9) (tables#2068)](https://github.com/nextcloud/tables/pull/2068)
+* [[stable0.9] tests(Integration): extend sharing tests (tables#2150)](https://github.com/nextcloud/tables/pull/2150)
+
 ## 0.9.5
 
 ### Fixed
