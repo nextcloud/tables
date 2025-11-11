@@ -9,6 +9,8 @@
     "{user} has updated the description of table {table} to {after}" : "{user} 已將表格 {table} 的描述更新為 {after}",
     "You have created a new row {row} in table {table}" : "您已在 {table} 表格中建立新列 {row}",
     "{user} has created a new row {row} in table {table}" : "{user} 已在 {table} 表格中建立新列 {row}",
+    "_You have updated cell %1$s on row {row} in table {table}_::_You have updated cells %1$s on row {row} in table {table}_" : ["您已在 {table} 表格的第 {row} 列更新了儲存格 %1$s"],
+    "_{user} has updated cell %1$s on row {row} in table {table}_::_{user} has updated cells %1$s on row {row} in table {table}_" : ["{user} 已在 {table} 表格的第 {row} 列更新了儲存格 %1$s"],
     "You have deleted the row {row} in table {table}" : "您已刪除表格 {table} 中的 {row} 列",
     "{user} has deleted the row {row} in table {table}" : "{user} 已刪除表格 {table} 中的 {row} 列",
     "Tables" : "表格",
