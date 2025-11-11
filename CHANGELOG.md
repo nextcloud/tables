@@ -5,6 +5,17 @@
 
 # Changelog
 
+## 0.8.9
+
+### Fixed
+
+* [[stable0.8] fix: allow null userId (tables#1982)](https://github.com/nextcloud/tables/pull/1982)
+* [[stable0.8] fix: update table edit functionality and improve element selectors (tables#1993)](https://github.com/nextcloud/tables/pull/1993)
+
+### Other
+
+* [[stable0.8] tests(Integration): extend sharing tests (tables#2149)](https://github.com/nextcloud/tables/pull/2149)
+
 ## 0.8.8
 
 ### Other
