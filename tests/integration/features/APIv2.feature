@@ -5,6 +5,7 @@ Feature: APIv2
     Given user "participant1-v2" exists
     Given user "participant2-v2" exists
     Given user "participant3-v2" exists
+    Given user "participant4-v2" exists
 
   @api2
   Scenario: Test initial setup
@@ -897,6 +898,53 @@ Feature: APIv2
       | four          | 2023-12-24              |
       | five          | [{"id": "admin", "type": 0}] |
     Then the reported status is 403
+
+  @api2 @sharing @tables
+  Scenario: Create a shared table and check its permissions
+  Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+  And user "participant1-v2" shares table with user "participant2-v2"
+  And user "participant1-v2" shares table with user "participant3-v2"
+  Then user "participant3-v2" has the following permissions
+	  | read    | 1 |
+	  | create  | 1 |
+	  | update  | 1 |
+	  | delete  | 0 |
+	  | manage  | 0 |
+  # Current share-Id is set to the share towards participant3-v2!
+  When user "participant3-v2" attempts to check the share permissions
+  Then the reported status is 200
+  When user "participant2-v2" attempts to check the share permissions
+  Then the reported status is 404
+  When user "participant4-v2" attempts to check the share permissions
+  Then the reported status is 404
+  # test against the share overview
+  When user "participant1-v2" attempts to fetch all shares of table t1
+  Then the reported status is 200
+  When user "participant2-v2" attempts to fetch all shares of table t1
+  Then the reported status is 403
+  When user "participant4-v2" attempts to fetch all shares of table t1
+  Then the reported status is 404
+
+  @api2 @sharing @views
+  Scenario: Create a shared view and check its permissions
+    Given table "Table 1 via api v2" with emoji "👋" exists for user "participant1-v2" as "t1" via v2
+    And user "participant1-v2" create view "v1" with emoji "⚡️" for "t1" as "v1"
+    And user "participant1-v2" shares view "v1" with "participant2-v2"
+    And user "participant1-v2" shares view "v1" with "participant3-v2"
+    # Current share-Id is set to the share towards participant3-v2!
+    When user "participant2-v2" attempts to check the share permissions
+    Then the reported status is 404
+    When user "participant3-v2" attempts to check the share permissions
+    Then the reported status is 200
+    When user "participant4-v2" attempts to check the share permissions
+    Then the reported status is 404
+    # test against the share overview
+    When user "participant1-v2" attempts to fetch all shares of view v1
+    Then the reported status is 200
+    When user "participant2-v2" attempts to fetch all shares of view v1
+    Then the reported status is 403
+    When user "participant4-v2" attempts to fetch all shares of view v1
+    Then the reported status is 404
 
   @api2 @rows @views
   Scenario: Create rows on a view via v2 without access
