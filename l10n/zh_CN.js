@@ -398,6 +398,7 @@ OC.L10N.register(
     "Heading 2" : "标题 2",
     "Heading 3" : "标题 3",
     "Code" : "代码",
+    "Default value" : "默认值",
     "Prefix" : "前缀",
     "Suffix" : "后缀",
     "Default" : "默认",

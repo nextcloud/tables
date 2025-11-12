@@ -11,6 +11,8 @@ OC.L10N.register(
     "{user} has updated the description of table {table} to {after}" : "{user} оновив опис таблиці {table} у {after}",
     "You have created a new row {row} in table {table}" : "Ви додали новий рядок {row} у таблиці {table}",
     "{user} has created a new row {row} in table {table}" : "{user} додав(-ла) новий рядок {row} у таблиці {table}",
+    "_You have updated cell %1$s on row {row} in table {table}_::_You have updated cells %1$s on row {row} in table {table}_" : ["Ви оновили комірку %1$s у рядку {row} таблиці {table}","Ви оновили комірки %1$s у рядку {row} таблиці {table}","Ви оновили комірки %1$s у рядку {row} таблиці {table}","Ви оновили комірки  %1$s у рядку {row} таблиці {table}"],
+    "_{user} has updated cell %1$s on row {row} in table {table}_::_{user} has updated cells %1$s on row {row} in table {table}_" : ["{user} оновив(-ла) комірку %1$s у рядку {row} таблиці {table}","{user} оновив(-ла) комірки %1$s у рядку {row} таблиці {table}","{user} оновив(-ла) комірки %1$s у рядку {row} таблиці {table}","{user} оновив(-ла) комірки %1$s у рядку {row} таблиці {table}"],
     "You have deleted the row {row} in table {table}" : "Ви вилучили рядок {row} у таблиці {table}",
     "{user} has deleted the row {row} in table {table}" : "{user} вилучив(-ла) рядок {row} у таблиці {table}",
     "Tables" : "Таблиці",
