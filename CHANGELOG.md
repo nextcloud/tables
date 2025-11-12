@@ -5,6 +5,33 @@
 
 # Changelog
 
+## 1.0.1
+
+### Added
+
+* [Feat: add additional date filter options (tables#2099)](https://github.com/nextcloud/tables/pull/2099)
+
+### Fixed
+
+* [Fix: Add key to pre-existing usergroup items (tables#2117)](https://github.com/nextcloud/tables/pull/2117)
+* [Fix: Do not use meta columns as key (tables#2135)](https://github.com/nextcloud/tables/pull/2135)
+* [Fix(l10n): use a splitless string for translation (tables#2140)](https://github.com/nextcloud/tables/pull/2140)
+* [Enh: Polish inline editing fields (tables#2095)](https://github.com/nextcloud/tables/pull/2095)
+
+### Other
+* [Build(dependencies): scope dependencies in lib/Vendor (tables#2136)](https://github.com/nextcloud/tables/pull/2136)
+* [Build: update node and npm engines versions (tables#2141)](https://github.com/nextcloud/tables/pull/2141)
+* [Ci: do not force old phpunit in server`s own integration tests (tables#2147)](https://github.com/nextcloud/tables/pull/2147)
+* [Tests(Integration): extend sharing tests (tables#2148)](https://github.com/nextcloud/tables/pull/2148)
+
+### Dependencies
+* [Fix(lint): Update ESLint command to use flat config (tables#2118)](https://github.com/nextcloud/tables/pull/2118)
+* [Fix(deps): update dependency @nextcloud/dialogs to ^6.4.1 (main) (tables#2120)](https://github.com/nextcloud/tables/pull/2120)
+* [Fix(deps): update tiptap to ^3.9.0 (main) (tables#2122)](https://github.com/nextcloud/tables/pull/2122)
+* [Chore(deps): update dependency phpoffice/phpspreadsheet to 5.1 (tables#2096)](https://github.com/nextcloud/tables/pull/2096)
+* [[main] Fix npm audit (tables#2115)](https://github.com/nextcloud/tables/pull/2115)
+* [[main] Fix npm audit (tables#2123)](https://github.com/nextcloud/tables/pull/2123)
+
 ## 1.0.0
 
 ### Added

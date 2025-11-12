@@ -1,7 +1,7 @@
 {
   "name": "tables",
   "description": "Manage data within tables.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Florian Steffens <florian.steffens@nextcloud.com",
   "bugs": {
     "url": "https://github.com/nextcloud/tables/issues"
