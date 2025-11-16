@@ -11,6 +11,8 @@ OC.L10N.register(
     "{user} has updated the description of table {table} to {after}" : "{user} zaktualizovali jste popis tabulky {table} na {after}",
     "You have created a new row {row} in table {table}" : "Vytvořili jste nový řádek {row} v tabulce {table}",
     "{user} has created a new row {row} in table {table}" : "{user} vytvořil/a nový řádek {row} v tabulce {table}",
+    "_You have updated cell %1$s on row {row} in table {table}_::_You have updated cells %1$s on row {row} in table {table}_" : ["Zaktualizovali jste buňku %1$s na řádku {row} v tabulce {table}","Zaktualizovali jste buňky %1$s na řádku {row} v tabulce {table}","Zaktualizovali jste buňky %1$s na řádku {row} v tabulce {table}","Zaktualizovali jste buňky %1$s na řádku {row} v tabulce {table}"],
+    "_{user} has updated cell %1$s on row {row} in table {table}_::_{user} has updated cells %1$s on row {row} in table {table}_" : ["{user} zaktualizoval/a buňku %1$s na řádku {row} v tabulce {table}","{user} zaktualizoval/a buňky %1$s na řádku {row} v tabulce {table}","{user} zaktualizoval/a buňky %1$s na řádku {row} v tabulce {table}","{user} zaktualizoval/a buňky %1$s na řádku {row} v tabulce {table}"],
     "You have deleted the row {row} in table {table}" : "Smazali jste řádek {row} v tabulce {table}",
     "{user} has deleted the row {row} in table {table}" : "{user} smazal/a řádek {row} v tabulce {table}",
     "Tables" : "Tabulky",

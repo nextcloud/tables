@@ -9,6 +9,8 @@
     "{user} has updated the description of table {table} to {after}" : "{user} har uppdaterat beskrivningen av tabellen {table} till {after}",
     "You have created a new row {row} in table {table}" : "Du har skapat en ny rad {row} i tabellen {table}",
     "{user} has created a new row {row} in table {table}" : "{user} har skapat en ny rad {row} i tabellen {table}",
+    "_You have updated cell %1$s on row {row} in table {table}_::_You have updated cells %1$s on row {row} in table {table}_" : ["Du har uppdaterat cellen %1$s på rad {row} i tabellen {table}","Du har uppdaterat cellerna %1$s på rad {row} i tabellen {table}"],
+    "_{user} has updated cell %1$s on row {row} in table {table}_::_{user} has updated cells %1$s on row {row} in table {table}_" : ["{user} har uppdaterat cellen %1$s på rad {row} i tabellen {table}","{user} har uppdaterat cellerna %1$s på rad {row} i tabellen {table}"],
     "You have deleted the row {row} in table {table}" : "Du har tagit bort raden {row} i tabellen {table}",
     "{user} has deleted the row {row} in table {table}" : "{user} har tagit bort raden {row} i tabellen {table}",
     "Tables" : "Tabeller",
