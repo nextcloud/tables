@@ -33,6 +33,7 @@
 				<NcActions v-if="config.canDeleteRows || config.canCreateRows">
 					<NcActionButton v-if="config.canCreateRows"
 						:close-after-click="true"
+						data-cy="duplicateRowBtn"
 						@click="handleCloneRow">
 						<template #icon>
 							<ContentCopy :size="20" />
@@ -41,6 +42,7 @@
 					</NcActionButton>
 					<NcActionButton v-if="config.canDeleteRows"
 						:close-after-click="true"
+						data-cy="deleteRowBtn"
 						@click="handleDeleteRow">
 						<template #icon>
 							<Delete :size="20" />
@@ -58,7 +60,7 @@ import Fullscreen from 'vue-material-design-icons/Fullscreen.vue'
 import { mapActions } from 'pinia'
 import { useDataStore } from '../../../../store/data.js'
 import { NcCheckboxRadioSwitch, NcButton, NcActions, NcActionButton } from '@nextcloud/vue'
-import { getDialogBuilder, showError, DialogSeverity } from '@nextcloud/dialogs'
+import { getDialogBuilder, showError, showSuccess, DialogSeverity } from '@nextcloud/dialogs'
 import Pencil from 'vue-material-design-icons/Pencil.vue'
 import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
 import Delete from 'vue-material-design-icons/Delete.vue'
@@ -245,6 +247,8 @@ export default {
 						})
 						if (!res) {
 							showError(t('tables', 'Could not delete row.'))
+						} else {
+							showSuccess(t('tables', 'Row deleted successfully.'))
 						}
 					},
 				})
@@ -253,6 +257,13 @@ export default {
 		},
 		async handleCloneRow() {
 			const data = this.row.data.reduce((acc, curr) => {
+				const column = this.visibleColumns.find(col => col.id === curr.columnId)
+				// Skip unique text columns to avoid constraint violations
+				if (column && column.type === 'text' && column.textUnique) {
+					// Don't copy values from unique columns
+					return acc
+				}
+
 				acc[curr.columnId] = curr.value
 				return acc
 			}, {})
@@ -263,6 +274,8 @@ export default {
 			})
 			if (!res) {
 				showError(t('tables', 'Could not clone row.'))
+			} else {
+				showSuccess(t('tables', 'Row duplicated successfully.'))
 			}
 		},
 	},
@@ -294,6 +307,7 @@ td.fixed-width {
 	align-items: center;
 	justify-content: center;
 	gap: var(--default-grid-baseline);
+	min-width: calc(var(--button-size) * 2);
 }
 
 </style>
