@@ -107,4 +107,107 @@ describe('Rows for a table', () => {
 		cy.get('[data-cy="ncTable"] table').contains('Edited inline').should('exist')
 		cy.get('[data-cy="ncTable"] table').contains('Test inline editing').should('not.exist')
 	})
+
+	it('Duplicate row using action menu', () => {
+		cy.loadTable('Welcome to Nextcloud Tables!')
+		cy.get('[data-cy="createRowBtn"]').click({ force: true })
+		cy.get('[data-cy="createRowModal"] .slot input').first().type('Original row')
+		cy.get('[data-cy="createRowModal"] .ProseMirror').first().click()
+		cy.get('[data-cy="createRowModal"] .ProseMirror').first().clear()
+		cy.get('[data-cy="createRowModal"] .ProseMirror').first().type('Original description')
+		cy.get('[data-cy="createRowModal"] [aria-label="Increase stars"]').click().click()
+		cy.get('[data-cy="createRowSaveButton"]').click()
+
+		cy.get('[data-cy="createRowModal"]').should('not.exist')
+		cy.get('[data-cy="ncTable"] table').contains('Original row').should('exist')
+		
+		// Find the row and click duplicate action
+		cy.get('[data-cy="ncTable"] [data-cy="customTableRow"]').contains('Original row').closest('[data-cy="customTableRow"]').within(() => {
+			// Click the actions menu button (three dots)
+			cy.get('.action-item__menutoggle').click()
+		})
+		
+		// Click duplicate action
+		cy.get('[data-cy="duplicateRowBtn"]').click()
+		
+		// Verify the row was duplicated
+		cy.get('.icon-loading').should('not.exist')
+		cy.get('[data-cy="ncTable"] table').contains('Original row').should('have.length.at.least', 2)
+		cy.get('[data-cy="ncTable"] [data-cy="customTableRow"]').should('have.length.at.least', 2)
+	})
+
+	it('Delete row using action menu', () => {
+		cy.loadTable('Welcome to Nextcloud Tables!')
+		cy.get('[data-cy="createRowBtn"]').click({ force: true })
+		cy.get('[data-cy="createRowModal"] .slot input').first().type('Row to delete')
+		cy.get('[data-cy="createRowSaveButton"]').click()
+
+		cy.get('[data-cy="createRowModal"]').should('not.exist')
+		cy.get('[data-cy="ncTable"] table').contains('Row to delete').should('exist')
+		
+		// Find the row and click delete action
+		cy.get('[data-cy="ncTable"] [data-cy="customTableRow"]').contains('Row to delete').closest('[data-cy="customTableRow"]').within(() => {
+			// Click the actions menu button (three dots)
+			cy.get('.action-item__menutoggle').click()
+		})
+		
+		// Click delete action
+		cy.get('[data-cy="deleteRowBtn"]').click()
+		
+		// Confirm deletion in dialog
+		cy.get('.dialog__actions .error').contains('Delete').click()
+		
+		// Verify the row was deleted
+		cy.get('.icon-loading').should('not.exist')
+		cy.get('[data-cy="ncTable"] table').contains('Row to delete').should('not.exist')
+	})
+
+	it('Handle unique constraint when duplicating row', () => {
+		// Create a new table with a unique column
+		cy.get('.icon-loading').should('not.exist')
+		cy.get('[data-cy="navigationCreateTableIcon"]').click({ force: true })
+		cy.get('[data-cy="createTableModal"] input[type="text"]').clear().type('Unique Test Table')
+		cy.get('.tile').contains('Custom').click({ force: true })
+		cy.get('[data-cy="createTableModal"]').should('be.visible')
+		cy.get('[data-cy="createTableSubmitBtn"]').click()
+
+		cy.loadTable('Unique Test Table')
+
+		// Add a unique text column
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('.action-button').contains('Create column').click()
+		
+		// Configure the column
+		cy.get('[data-cy="createColumnModal"] input').first().type('Unique Field')
+		cy.get('[data-cy="createColumnModal"] .column-type').click()
+		cy.get('.nc-select__option').contains('Text line').click()
+		
+		// Enable unique constraint
+		cy.get('[data-cy="createColumnModal"]').contains('Unique value').parent().find('.checkbox-radio-switch__input').click()
+		
+		cy.get('[data-cy="createColumnModal"] .nc-modal__content [data-cy="createColumnSaveButton"]').click()
+		cy.get('[data-cy="createColumnModal"]').should('not.exist')
+
+		// Create a row with unique data
+		cy.get('[data-cy="createRowBtn"]').click({ force: true })
+		cy.get('[data-cy="createRowModal"] .slot input').first().type('unique-value-123')
+		cy.get('[data-cy="createRowSaveButton"]').click()
+
+		cy.get('[data-cy="createRowModal"]').should('not.exist')
+		cy.get('[data-cy="ncTable"] table').contains('unique-value-123').should('exist')
+		
+		// Try to duplicate the row
+		cy.get('[data-cy="ncTable"] [data-cy="customTableRow"]').contains('unique-value-123').closest('[data-cy="customTableRow"]').within(() => {
+			cy.get('.action-item__menutoggle').click()
+		})
+		
+		cy.get('[data-cy="duplicateRowBtn"]').click()
+		
+		// Verify that a new row was created but without the unique field value
+		cy.get('.icon-loading').should('not.exist')
+		cy.get('[data-cy="ncTable"] [data-cy="customTableRow"]').should('have.length', 2)
+		
+		// The new row should exist but should not have the unique value duplicated
+		cy.get('[data-cy="ncTable"] table').contains('unique-value-123').should('have.length', 1)
+	})
 })
