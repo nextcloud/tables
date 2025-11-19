@@ -181,6 +181,7 @@ OC.L10N.register(
     "Transfer table" : "Перадаць табліцу",
     "Transfer this table to another user" : "Перадаць гэту табліцу іншаму карыстальніку",
     "Title is missing." : "Адсутнічае загаловак.",
+    "Filter" : "Фільтр",
     "Do you really want to delete the table \"{table}\"?" : "Вы сапраўды хочаце выдаліць табліцу \"{table}\"?",
     "Export" : "Экспарт",
     "Add to favorites" : "У абранае",
