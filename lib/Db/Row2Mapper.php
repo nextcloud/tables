@@ -539,7 +539,14 @@ class Row2Mapper {
 				break;
 			case 'is-empty':
 				$includeDefault = empty($defaultValue);
-				$filterExpression = $qb->expr()->isNull('value');
+				if ($column->getType() === Column::TYPE_TEXT) {
+					$filterExpression = $qb2->expr()->orX(
+						$qb->expr()->isNull('value'),
+						$qb->expr()->eq('value', $qb->createNamedParameter('', $paramType))
+					);
+				} else {
+					$filterExpression = $qb->expr()->isNull('value');
+				}
 				break;
 			default:
 				throw new InternalError('Operator ' . $operator . ' is not supported.');
