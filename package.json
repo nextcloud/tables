@@ -31,7 +31,7 @@
     "@mdi/svg": "^7.4.47",
     "@nextcloud/auth": "^2.5.3",
     "@nextcloud/axios": "^2.5.2",
-    "@nextcloud/capabilities": "^1.2.0",
+    "@nextcloud/capabilities": "^1.2.1",
     "@nextcloud/dialogs": "^6.4.1",
     "@nextcloud/event-bus": "^3.3.3",
     "@nextcloud/files": "^3.12.0",
