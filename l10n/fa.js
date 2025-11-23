@@ -420,6 +420,7 @@ OC.L10N.register(
     "This month" : "این ماه",
     "This week" : "این هفته",
     "Now" : "Now",
+    "Select a date" : "تاریخ را انتخاب کنید",
     "ID" : "شناسه",
     "Creator" : "Creator",
     "Last editor" : "Last editor",

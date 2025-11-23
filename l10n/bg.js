@@ -248,6 +248,7 @@ OC.L10N.register(
     "This option is outdated." : "Тази опция не е актуална.",
     "Options" : "Опции",
     "Back" : "Назад",
+    "Sorting" : "Сортиране",
     "Undo" : "Отмяна",
     "Redo" : "Повторение",
     "Bold" : "Удебелен",
