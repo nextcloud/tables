@@ -173,7 +173,7 @@ class ApiTablesController extends AOCSController {
 					)
 				);
 				$colMap[$column['id']] = $col->getId();
-			};
+			}
 			foreach ($views as $view) {
 				$newView = $this->viewService->create(
 					$view['title'],
@@ -182,9 +182,19 @@ class ApiTablesController extends AOCSController {
 					$this->userId,
 				);
 
-				$newColumns = array_map(static function (int $colId) use ($colMap): int {
-					return $colId > 0 ? $colMap[$colId] : $colId;
-				}, $view['columns']);
+				if (isset($view['columnSettings'])) {
+					$newColumns = array_map(static function (array $column) use ($colMap): array {
+						$colId = $column['columnId'];
+						$column['columnId'] = $colId > 0 ? $colMap[$colId] : $colId;
+						return $column;
+					}, $view['columnSettings']);
+					$columnModeKey = 'columnSettings';
+				} else {
+					$newColumns = array_map(static function (int $colId) use ($colMap): int {
+						return $colId > 0 ? $colMap[$colId] : $colId;
+					}, $view['columns']);
+					$columnModeKey = 'columns';
+				}
 
 				$newSort = array_map(static function (array $sort) use ($colMap): array {
 					if ($sort['columnId'] > 0) {
@@ -203,7 +213,7 @@ class ApiTablesController extends AOCSController {
 				}, $view['filter']);
 
 				$this->viewService->update($newView->getId(), [
-					'columns' => json_encode($newColumns),
+					$columnModeKey => json_encode($newColumns),
 					'sort' => json_encode($newSort),
 					'filter' => json_encode($newFilter),
 				]);
