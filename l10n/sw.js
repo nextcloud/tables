@@ -48,6 +48,7 @@ OC.L10N.register(
     "Mandatory" : "Lazima",
     "Column" : "Safu wima",
     "Operator" : "Operator",
+    "OR" : "OR",
     "Ascending" : "Ascending",
     "Descending" : "Descending",
     "Views" : "Mionekano",
