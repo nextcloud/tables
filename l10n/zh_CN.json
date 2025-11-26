@@ -370,6 +370,7 @@
     "Open main table to adjust table management permissions" : "打开主表以调整表管理权限",
     "No shares" : "没有共享",
     "Created at" : "创建于",
+    "Ownership" : "所有人",
     "Sharing" : "共享",
     "Copy to clipboard" : "复制到剪贴板",
     "Read" : "读取",
@@ -397,6 +398,8 @@
     "Heading 3" : "标题 3",
     "Code" : "代码",
     "Default value" : "默认值",
+    "Minimum" : "最少",
+    "Maximum" : "最多",
     "Prefix" : "前缀",
     "Suffix" : "后缀",
     "Default" : "默认",
@@ -415,6 +418,7 @@
     "Content" : "内容",
     "Select" : "选择",
     "Insert" : "插入",
+    "Checked" : "已检查",
     "Unchecked" : "未选中",
     "This year" : "今年",
     "This month" : "本月",
@@ -422,8 +426,10 @@
     "Now" : "现在",
     "Select a date" : "选择一个日期",
     "ID" : "ID",
+    "Creator" : "创建人",
     "Clipboard is not available" : "剪贴板不可用",
     "seconds ago" : "几秒前",
+    "{shareTypeString}..." : "{shareTypeString}...",
     "Could not remove table." : "无法移除数据库表"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

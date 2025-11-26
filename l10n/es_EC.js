@@ -259,6 +259,7 @@ OC.L10N.register(
     "Url" : "URL",
     "This option is outdated." : "Esta opción está desactualizada.",
     "Options" : "Opciones",
+    "Back" : "Regresar",
     "Keyword and submit" : "Palabra clave y enviar",
     "Or use magic values" : "O usa valores mágicos",
     "Sorting" : "Ordenar",
