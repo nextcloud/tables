@@ -8,6 +8,7 @@
 			confirm-class="error"
 			:title="n('tables', 'Delete row', 'Delete rows', rowsToDelete.length, {})"
 			:description="n('tables', 'Are you sure you want to delete the selected row?', 'Are you sure you want to delete the %n selected rows?', rowsToDelete.length, {})"
+			data-cy="deleteRowsConfirmation"
 			@confirm="deleteRows"
 			@cancel="$emit('cancel')" />
 	</div>
