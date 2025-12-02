@@ -29,7 +29,10 @@
 						<Fullscreen :size="20" />
 					</template>
 				</NcButton>
-				<NcActions v-if="config.canDeleteRows || config.canCreateRows">
+				<NcActions v-if="config.canDeleteRows || config.canCreateRows"
+					:force-menu="true"
+					:aria-label="t('tables', 'Row actions')"
+					data-cy="tableRowActions">
 					<NcActionButton v-if="config.canCreateRows"
 						:close-after-click="true"
 						data-cy="duplicateRowBtn"
@@ -59,7 +62,7 @@ import Fullscreen from 'vue-material-design-icons/Fullscreen.vue'
 import { mapActions } from 'pinia'
 import { useDataStore } from '../../../../store/data.js'
 import { NcCheckboxRadioSwitch, NcButton, NcActions, NcActionButton } from '@nextcloud/vue'
-import { getDialogBuilder, showError, showSuccess, DialogSeverity } from '@nextcloud/dialogs'
+import { showError, showSuccess } from '@nextcloud/dialogs'
 import Pencil from 'vue-material-design-icons/Pencil.vue'
 import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
 import Delete from 'vue-material-design-icons/Delete.vue'
@@ -81,6 +84,7 @@ import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
 } from '../../../../shared/constants.ts'
 import activityMixin from '../../../mixins/activityMixin.js'
+import { emit } from '@nextcloud/event-bus'
 
 export default {
 	name: 'TableRow',
@@ -231,28 +235,8 @@ export default {
 			}
 		},
 		...mapActions(useDataStore, ['removeRow', 'insertNewRow']),
-		async handleDeleteRow() {
-			await getDialogBuilder(t('tables', 'Delete row'))
-				.setText(t('tables', 'Are you sure you want to delete this row?'))
-				.setSeverity(DialogSeverity.Warning)
-				.addButton({
-					label: t('tables', 'Delete'),
-					type: 'error',
-					callback: async () => {
-						const res = await this.removeRow({
-							rowId: this.row.id,
-							isView: this.isView,
-							elementId: this.elementId,
-						})
-						if (!res) {
-							showError(t('tables', 'Could not delete row.'))
-						} else {
-							showSuccess(t('tables', 'Row deleted successfully.'))
-						}
-					},
-				})
-				.build()
-				.show()
+		handleDeleteRow() {
+			emit('tables:row:delete', { rows: [this.row.id], isView: this.isView, elementId: this.elementId })
 		},
 		async handleCloneRow() {
 			const data = this.row.data.reduce((acc, curr) => {
@@ -272,7 +256,7 @@ export default {
 				data,
 			})
 			if (!res) {
-				showError(t('tables', 'Could not clone row.'))
+				showError(t('tables', 'Could not duplicate row.'))
 			} else {
 				showSuccess(t('tables', 'Row duplicated successfully.'))
 			}
