@@ -12,7 +12,9 @@
 			:min="column.numberMin"
 			:max="column.numberMax"
 			:readonly="column.viewColumnInformation?.readonly"
-			:step="getStep">
+			:step="getStep"
+			@blur="validateAndUpdate"
+			@keyup.enter="validateAndUpdate">
 		<div v-if="column.numberSuffix" class="suffix">
 			{{ column.numberSuffix }}
 		</div>
@@ -62,16 +64,13 @@ export default {
 					}
 				}
 			},
-			set(v) { this.$emit('update:value', this.parseValue(v)) },
+			set(v) {
+				this.$emit('update:value', v === '' ? null : v)
+			},
 		},
 	},
 
 	watch: {
-		localValue() {
-			const value = this.parseValue(this.localValue)
-			this.localValue = value
-			this.$emit('update:value', value)
-		},
 		value() {
 			this.localValue = this.value
 		},
@@ -82,6 +81,11 @@ export default {
 	},
 
 	methods: {
+		validateAndUpdate() {
+			const parsedValue = this.parseValue(this.localValue)
+			this.localValue = parsedValue
+			this.$emit('update:value', parsedValue)
+		},
 		parseValue(inputValue) {
 			if (inputValue === null || inputValue === '') {
 				return null
