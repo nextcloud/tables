@@ -8,6 +8,7 @@
 namespace OCA\Tables\Db;
 
 use DateTime;
+use DateTimeImmutable;
 use OCA\Tables\Constants\UsergroupType;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
@@ -30,7 +31,7 @@ class Row2Mapper {
 	use TTransactional;
 
 	private RowSleeveMapper $rowSleeveMapper;
-	private ?string $userId = null;
+	private ?string $userId;
 	private IDBConnection $db;
 	private LoggerInterface $logger;
 	protected UserHelper $userHelper;
@@ -80,17 +81,20 @@ class Row2Mapper {
 	public function find(int $id, array $columns): Row2 {
 		$columnIdsArray = array_map(fn (Column $column) => $column->getId(), $columns);
 		$rows = $this->getRows([$id], $columnIdsArray);
+
 		if (count($rows) === 1) {
 			return $rows[0];
-		} elseif (count($rows) === 0) {
+		}
+
+		if (count($rows) === 0) {
 			$e = new Exception('Wanted row not found.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new NotFoundError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
-		} else {
-			$e = new Exception('Too many results for one wanted row.');
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
+
+		$e = new Exception('Too many results for one wanted row.');
+		$this->logger->error($e->getMessage(), ['exception' => $e]);
+		throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 	}
 
 	/**
@@ -102,7 +106,7 @@ class Row2Mapper {
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			return null;
 		}
 		return $rowSleeve->getId();
@@ -119,12 +123,6 @@ class Row2Mapper {
 	}
 
 	/**
-	 * @param string $userId
-	 * @param int $tableId
-	 * @param array|null $filter
-	 * @param array $sort
-	 * @param int|null $limit
-	 * @param int|null $offset
 	 * @return int[]
 	 * @throws InternalError
 	 */
@@ -245,20 +243,13 @@ class Row2Mapper {
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
-		try {
-			$columnTypes = $this->columnMapper->getColumnTypes($columnIds);
-		} catch (Exception $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
-		}
-
-		return $this->parseEntities($result, $sleeves, $columnTypes);
+		return $this->parseEntities($result, $sleeves);
 	}
 
 	/**
 	 * @throws InternalError
 	 */
-	private function addFilterToQuery(IQueryBuilder &$qb, array $filters, string $userId): void {
+	private function addFilterToQuery(IQueryBuilder $qb, array $filters, string $userId): void {
 		// TODO move this into service
 		$this->replacePlaceholderValues($filters, $userId);
 
@@ -284,9 +275,12 @@ class Row2Mapper {
 
 		$i = 1;
 		foreach ($sort as $sortData) {
+			if (!in_array($sortData['mode'], ['ASC', 'DESC'])) {
+				continue;
+			}
 			try {
 				$column = $sortData['columnId'] > 0 ? $this->columnMapper->find($sortData['columnId']) : null;
-			} catch (DoesNotExistException $e) {
+			} catch (DoesNotExistException) {
 				$this->logger->debug('No column found to build filter with for id ' . $sortData['columnId']);
 				continue;
 			}
@@ -301,7 +295,7 @@ class Row2Mapper {
 						$qb->expr()->eq($alias . '.column_id', $qb->createNamedParameter($sortData['columnId']))
 					)
 				);
-				$qb->addOrderBy($qb->createFunction("MAX($alias.value)"), $sortData['mode']);
+				$qb->addOrderBy($qb->func()->max($alias . '.value'), $sortData['mode']);
 			} elseif (Column::isValidMetaTypeId($sortData['columnId'])) {
 				$fieldName = match ($sortData['columnId']) {
 					Column::TYPE_META_ID => 'id',
@@ -323,7 +317,7 @@ class Row2Mapper {
 					continue;
 				}
 
-				$qb->addOrderBy($qb->createFunction("MAX($sleevesAlias.$fieldName)"), $sortData['mode']);
+				$qb->addOrderBy($qb->func()->max($sleevesAlias . '.' . $fieldName), $sortData['mode']);
 			}
 			$i++;
 		}
@@ -332,7 +326,7 @@ class Row2Mapper {
 	private function replacePlaceholderValues(array &$filters, string $userId): void {
 		foreach ($filters as &$filterGroup) {
 			foreach ($filterGroup as &$filter) {
-				if (substr($filter['value'], 0, 1) === '@') {
+				if (str_starts_with($filter['value'], '@')) {
 					$columnId = (int)($filter['columnId'] ?? 0);
 					$column = $columnId > 0 ? $this->columnMapper->find($columnId) : null;
 					$filter['value'] = $this->columnsHelper->resolveSearchValue($filter['value'], $userId, $column);
@@ -344,7 +338,7 @@ class Row2Mapper {
 	/**
 	 * @throws InternalError
 	 */
-	private function getFilterGroups(IQueryBuilder &$qb, array $filters): array {
+	private function getFilterGroups(IQueryBuilder $qb, array $filters): array {
 		$filterGroups = [];
 		foreach ($filters as $filterGroup) {
 			$filterGroups[] = $qb->expr()->andX(...$this->getFilter($qb, $filterGroup));
@@ -355,7 +349,7 @@ class Row2Mapper {
 	/**
 	 * @throws InternalError
 	 */
-	private function getFilter(IQueryBuilder &$qb, array $filterGroup): array {
+	private function getFilter(IQueryBuilder $qb, array $filterGroup): array {
 		$filterExpressions = [];
 		foreach ($filterGroup as $filter) {
 			$columnId = $filter['columnId'];
@@ -404,7 +398,6 @@ class Row2Mapper {
 
 		// We try to match the requested value against the default before building the query
 		// so we know if we shall include rows that have no entry in the column_TYPE tables upfront
-		$includeDefault = false;
 		$defaultValue = $this->getFormattedDefaultValue($column);
 
 		$qb2 = $this->db->getQueryBuilder();
@@ -578,15 +571,13 @@ class Row2Mapper {
 				$qb2->where($this->getSqlOperator($operator, $qb, 'created_by', $value, IQueryBuilder::PARAM_STR));
 				break;
 			case Column::TYPE_META_CREATED_AT:
-				$value = new \DateTimeImmutable($value);
-				$qb2->where($this->getSqlOperator($operator, $qb, 'created_at', $value, IQueryBuilder::PARAM_DATE));
+				$qb2->where($this->getSqlOperator($operator, $qb, 'created_at', new DateTimeImmutable($value), IQueryBuilder::PARAM_DATE));
 				break;
 			case Column::TYPE_META_UPDATED_BY:
 				$qb2->where($this->getSqlOperator($operator, $qb, 'last_edit_by', $value, IQueryBuilder::PARAM_STR));
 				break;
 			case Column::TYPE_META_UPDATED_AT:
-				$value = new \DateTimeImmutable($value);
-				$qb2->where($this->getSqlOperator($operator, $qb, 'last_edit_at', $value, IQueryBuilder::PARAM_DATE));
+				$qb2->where($this->getSqlOperator($operator, $qb, 'last_edit_at', new DateTimeImmutable($value), IQueryBuilder::PARAM_DATE));
 				break;
 		}
 		return $qb2;
@@ -634,7 +625,7 @@ class Row2Mapper {
 	 * @return Row2[]
 	 * @throws InternalError
 	 */
-	private function parseEntities(IResult $result, array $sleeves, array $columnTypes): array {
+	private function parseEntities(IResult $result, array $sleeves): array {
 		$rows = [];
 		foreach ($sleeves as $sleeve) {
 			$rows[$sleeve->getId()] = new Row2();
@@ -652,7 +643,7 @@ class Row2Mapper {
 		$cellMapperCache = [];
 
 		while ($rowData = $result->fetch()) {
-			if (!isset($rowData['row_id']) || !isset($rows[$rowData['row_id']])) {
+			if (!isset($rowData['row_id'], $rows[$rowData['row_id']])) {
 				break;
 			}
 
@@ -799,8 +790,7 @@ class Row2Mapper {
 		try {
 			$column = $this->columnMapper->find($columnId);
 		} catch (DoesNotExistException $e) {
-			$e = new Exception('Can not insert cell, because the given column-id is not known');
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			$this->logger->error('Can not insert cell, because the given column-id is not known', ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
@@ -891,7 +881,7 @@ class Row2Mapper {
 	/**
 	 * @throws InternalError
 	 */
-	private function getColumnDbParamType(Column $column) {
+	private function getColumnDbParamType(Column $column): int {
 		return $this->getCellMapper($column)->getDbParamType();
 	}
 
