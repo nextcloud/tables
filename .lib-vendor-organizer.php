@@ -53,7 +53,7 @@ foreach ($projectList as $projectDir) {
 		if ($stripNamespacePrefix !== '' && strpos($namespace, $stripNamespacePrefix) === 0) {
 			$namespace = str_replace($stripNamespacePrefix, '', $namespace);
 		}
-		$destination = $sourceDirectory . str_replace('\\', '/', $namespace);
+		$destination = $sourceDirectory . '/build/' . str_replace('\\', '/', $namespace);
 		if (file_exists($destination)) {
 			rmdir_recursive($destination);
 		}
@@ -68,6 +68,14 @@ foreach ($projectList as $projectDir) {
 foreach($organizationList as $organizationDir) {
 	rmdir_recursive($organizationDir);
 }
+
+foreach(scandir($sourceDirectory . 'build/') as $file) {
+	if (!is_dir($sourceDirectory . 'build/' . $file) || $file === '.' || $file === '..') {
+		continue;
+	}
+	rename($sourceDirectory . 'build/' . $file, $sourceDirectory . '/' . $file);
+}
+rmdir($sourceDirectory . 'build');
 
 function rmdir_recursive($dir) {
 	foreach(scandir($dir) as $file) {
