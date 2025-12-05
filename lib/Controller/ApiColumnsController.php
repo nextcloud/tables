@@ -7,6 +7,7 @@
 namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Constants\ColumnType;
 use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
@@ -134,7 +135,7 @@ class ApiColumnsController extends AOCSController {
 			$viewId,
 			new ColumnDto(
 				title: $title,
-				type: 'number',
+				type: ColumnType::NUMBER->value,
 				subtype: $subtype,
 				mandatory: $mandatory,
 				description: $description,
@@ -188,7 +189,7 @@ class ApiColumnsController extends AOCSController {
 			$viewId,
 			new ColumnDto(
 				title: $title,
-				type: 'text',
+				type: ColumnType::TEXT->value,
 				subtype: $subtype,
 				mandatory: $mandatory,
 				description: $description,
@@ -239,7 +240,7 @@ class ApiColumnsController extends AOCSController {
 			$viewId,
 			new ColumnDto(
 				title: $title,
-				type: 'selection',
+				type: ColumnType::SELECTION->value,
 				subtype: $subtype,
 				mandatory: $mandatory,
 				description: $description,
@@ -287,7 +288,7 @@ class ApiColumnsController extends AOCSController {
 			$viewId,
 			new ColumnDto(
 				title: $title,
-				type: 'datetime',
+				type: ColumnType::DATETIME->value,
 				subtype: $subtype,
 				mandatory: $mandatory,
 				description: $description,
@@ -336,7 +337,7 @@ class ApiColumnsController extends AOCSController {
 			$viewId,
 			new ColumnDto(
 				title: $title,
-				type: 'usergroup',
+				type: ColumnType::PEOPLE->value,
 				mandatory: $mandatory,
 				description: $description,
 				usergroupDefault: $usergroupDefault,

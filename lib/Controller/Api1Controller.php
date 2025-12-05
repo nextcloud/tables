@@ -13,6 +13,7 @@ use Exception;
 use InvalidArgumentException;
 use OCA\Tables\Api\V1Api;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Constants\ColumnType;
 use OCA\Tables\Db\ViewMapper;
 use OCA\Tables\Dto\Column as ColumnDto;
 use OCA\Tables\Errors\BadRequestError;
@@ -20,6 +21,7 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Middleware\Attribute\RequirePermission;
+use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ImportService;
@@ -40,6 +42,7 @@ use OCP\AppFramework\Http\JSONResponse;
 use OCP\IL10N;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
+use ValueError;
 
 /**
  * @psalm-import-type TablesTable from ResponseDefinitions
@@ -394,7 +397,15 @@ class Api1Controller extends ApiController {
 	 * Update a view via key-value sets
 	 *
 	 * @param int $viewId View ID
-	 * @param array{key: 'title'|'emoji'|'description', value: string}|array{key: 'columns', value: list<int>}|array{key: 'sort', value: array{columnId: int, mode: 'ASC'|'DESC'}}|array{key: 'filter', value: array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}} $data key-value pairs
+	 * @param array{
+	 *      title?: string,
+	 *      emoji?: string,
+	 *      description?: string,
+	 *      columns?: list<int>,
+	 *      columnSettings?: list<array{columnId?: int, order?: int, readonly?: bool, mandatory?: bool}>,
+	 *      sort?: list<array{columnId: int, mode: 'ASC'|'DESC'}>,
+	 *      filter?: list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>
+	 *  } $data fields of the view with their new values
 	 * @return DataResponse<Http::STATUS_OK, TablesView, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_NOT_FOUND|Http::STATUS_BAD_REQUEST|Http::STATUS_INTERNAL_SERVER_ERROR, array{message: string}, array{}>
 	 *
 	 * 200: View updated
@@ -409,7 +420,8 @@ class Api1Controller extends ApiController {
 	#[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
 	public function updateView(int $viewId, array $data): DataResponse {
 		try {
-			return new DataResponse($this->viewService->update($viewId, $data)->jsonSerialize());
+			$inputData = ViewUpdateInput::fromInputArray($data);
+			return new DataResponse($this->viewService->update($viewId, $inputData)->jsonSerialize());
 		} catch (PermissionError $e) {
 			$this->logger->warning('A permission error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
@@ -835,9 +847,10 @@ class Api1Controller extends ApiController {
 	 * @param list<int>|null $selectedViewIds View IDs where this column should be added to be presented
 	 * @param array<string, mixed> $customSettings Custom settings for the column
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
 	 *
 	 * 200: Column created
+	 * 400: Invalid input data
 	 * 403: No permissions
 	 * 404: Not found
 	 */
@@ -887,7 +900,7 @@ class Api1Controller extends ApiController {
 				$viewId,
 				new ColumnDto(
 					title: $title,
-					type: $type,
+					type: ColumnType::from($type)->value,
 					subtype: $subtype,
 					mandatory: $mandatory,
 					description: $description,
@@ -926,6 +939,10 @@ class Api1Controller extends ApiController {
 			$this->logger->info('A not found error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
+		} catch (ValueError $e) {
+			$this->logger->info('A invalid value was provided: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
 		}
 	}
 
@@ -1598,9 +1615,10 @@ class Api1Controller extends ApiController {
 	 * @param list<int>|null $selectedViewIds View IDs where this column should be added to be presented
 	 * @param array<string, mixed> $customSettings Custom settings for the column
 	 *
-	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND, array{message: string}, array{}>
+	 * @return DataResponse<Http::STATUS_OK, TablesColumn, array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND|Http::STATUS_BAD_REQUEST, array{message: string}, array{}>
 	 *
 	 * 200: Column created
+	 * 400: Bad request
 	 * 403: No permissions
 	 * 404: Not found
 	 */
@@ -1650,7 +1668,7 @@ class Api1Controller extends ApiController {
 				null,
 				new ColumnDto(
 					title: $title,
-					type: $type,
+					type: ColumnType::from($type)->value,
 					subtype: $subtype,
 					mandatory: $mandatory,
 					description: $description,
@@ -1690,6 +1708,10 @@ class Api1Controller extends ApiController {
 			$this->logger->info('A not found error occurred: ' . $e->getMessage(), ['exception' => $e]);
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_NOT_FOUND);
+		} catch (ValueError $e) {
+			$this->logger->info('A invalid value was provided: ' . $e->getMessage(), ['exception' => $e]);
+			$message = ['message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
 		}
 	}
 }

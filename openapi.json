@@ -1843,99 +1843,75 @@
                                 ],
                                 "properties": {
                                     "data": {
-                                        "description": "key-value pairs",
-                                        "anyOf": [
-                                            {
-                                                "type": "object",
-                                                "required": [
-                                                    "key",
-                                                    "value"
-                                                ],
-                                                "properties": {
-                                                    "key": {
-                                                        "type": "string",
-                                                        "enum": [
-                                                            "title",
-                                                            "emoji",
-                                                            "description"
-                                                        ]
-                                                    },
-                                                    "value": {
-                                                        "type": "string"
-                                                    }
+                                        "type": "object",
+                                        "description": "fields of the view with their new values",
+                                        "properties": {
+                                            "title": {
+                                                "type": "string"
+                                            },
+                                            "emoji": {
+                                                "type": "string"
+                                            },
+                                            "description": {
+                                                "type": "string"
+                                            },
+                                            "columns": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "integer",
+                                                    "format": "int64"
                                                 }
                                             },
-                                            {
-                                                "type": "object",
-                                                "required": [
-                                                    "key",
-                                                    "value"
-                                                ],
-                                                "properties": {
-                                                    "key": {
-                                                        "type": "string",
-                                                        "enum": [
-                                                            "columns"
-                                                        ]
-                                                    },
-                                                    "value": {
-                                                        "type": "array",
-                                                        "items": {
+                                            "columnSettings": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "columnId": {
                                                             "type": "integer",
                                                             "format": "int64"
+                                                        },
+                                                        "order": {
+                                                            "type": "integer",
+                                                            "format": "int64"
+                                                        },
+                                                        "readonly": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "mandatory": {
+                                                            "type": "boolean"
                                                         }
                                                     }
                                                 }
                                             },
-                                            {
-                                                "type": "object",
-                                                "required": [
-                                                    "key",
-                                                    "value"
-                                                ],
-                                                "properties": {
-                                                    "key": {
-                                                        "type": "string",
-                                                        "enum": [
-                                                            "sort"
-                                                        ]
-                                                    },
-                                                    "value": {
-                                                        "type": "object",
-                                                        "required": [
-                                                            "columnId",
-                                                            "mode"
-                                                        ],
-                                                        "properties": {
-                                                            "columnId": {
-                                                                "type": "integer",
-                                                                "format": "int64"
-                                                            },
-                                                            "mode": {
-                                                                "type": "string",
-                                                                "enum": [
-                                                                    "ASC",
-                                                                    "DESC"
-                                                                ]
-                                                            }
+                                            "sort": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "columnId",
+                                                        "mode"
+                                                    ],
+                                                    "properties": {
+                                                        "columnId": {
+                                                            "type": "integer",
+                                                            "format": "int64"
+                                                        },
+                                                        "mode": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "ASC",
+                                                                "DESC"
+                                                            ]
                                                         }
                                                     }
                                                 }
                                             },
-                                            {
-                                                "type": "object",
-                                                "required": [
-                                                    "key",
-                                                    "value"
-                                                ],
-                                                "properties": {
-                                                    "key": {
-                                                        "type": "string",
-                                                        "enum": [
-                                                            "filter"
-                                                        ]
-                                                    },
-                                                    "value": {
+                                            "filter": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
                                                         "type": "object",
                                                         "required": [
                                                             "columnId",
@@ -1982,7 +1958,7 @@
                                                     }
                                                 }
                                             }
-                                        ]
+                                        }
                                     }
                                 }
                             }
@@ -3660,6 +3636,24 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
                     "401": {
                         "description": "Current user is not logged in",
                         "content": {
@@ -4043,6 +4037,24 @@
                     },
                     "404": {
                         "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input data",
                         "content": {
                             "application/json": {
                                 "schema": {
