@@ -12,7 +12,7 @@ use ArrayAccess;
 use JsonSerializable;
 
 /**
- * @template-implements ArrayAccess<string, mixed>
+ * @template-implements ArrayAccess<string, bool|int>
  */
 class ViewColumnInformation implements ArrayAccess, JsonSerializable {
 	public const KEY_ID = 'columnId';
@@ -20,8 +20,8 @@ class ViewColumnInformation implements ArrayAccess, JsonSerializable {
 	public const KEY_READONLY = 'readonly';
 	public const KEY_MANDATORY = 'mandatory';
 
-	/** @var array{columndId?: int, order?: int, readonly?: bool, mandatory?: bool} */
-	protected array $data = [];
+	/** @var array{columnId: int, order: int, readonly?: bool, mandatory?: bool} */
+	protected array $data;
 	protected const KEYS = [
 		self::KEY_ID,
 		self::KEY_ORDER,
@@ -42,19 +42,19 @@ class ViewColumnInformation implements ArrayAccess, JsonSerializable {
 	}
 
 	public function getId(): int {
-		return $this->offsetGet(self::KEY_ID);
+		return (int)$this->offsetGet(self::KEY_ID);
 	}
 
 	public function getOrder(): int {
-		return $this->offsetGet(self::KEY_ORDER);
+		return (int)$this->offsetGet(self::KEY_ORDER);
 	}
 
 	public function isReadonly(): bool {
-		return $this->offsetGet(self::KEY_READONLY) ?? false;
+		return (bool)$this->offsetGet(self::KEY_READONLY);
 	}
 
 	public function isMandatory(): bool {
-		return $this->offsetGet(self::KEY_MANDATORY) ?? false;
+		return (bool)$this->offsetGet(self::KEY_MANDATORY);
 	}
 
 	public static function fromArray(array $data): static {
@@ -72,8 +72,8 @@ class ViewColumnInformation implements ArrayAccess, JsonSerializable {
 		return in_array((string)$offset, self::KEYS);
 	}
 
-	public function offsetGet(mixed $offset): mixed {
-		return $this->data[$offset] ?? null;
+	public function offsetGet(mixed $offset): bool|int {
+		return $this->data[$offset];
 	}
 
 	public function offsetSet(mixed $offset, mixed $value): void {
@@ -91,11 +91,14 @@ class ViewColumnInformation implements ArrayAccess, JsonSerializable {
 		unset($this->data[(string)$offset]);
 	}
 
+	/**
+	 * @return array{columnId: int, order: int, readonly?: bool, mandatory?: bool}
+	 */
 	public function jsonSerialize(): array {
 		return $this->data;
 	}
 
-	protected function ensureType(string $offset, mixed $value): mixed {
+	protected function ensureType(string $offset, mixed $value): int|bool {
 		return match ($offset) {
 			self::KEY_ID,
 			self::KEY_ORDER => (int)$value,

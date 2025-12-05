@@ -1660,34 +1660,33 @@ export interface operations {
         readonly requestBody: {
             readonly content: {
                 readonly "application/json": {
-                    /** @description key-value pairs */
+                    /** @description fields of the view with their new values */
                     readonly data: {
-                        /** @enum {string} */
-                        readonly key: "title" | "emoji" | "description";
-                        readonly value: string;
-                    } | {
-                        /** @enum {string} */
-                        readonly key: "columns";
-                        readonly value: readonly number[];
-                    } | {
-                        /** @enum {string} */
-                        readonly key: "sort";
-                        readonly value: {
+                        readonly title?: string;
+                        readonly emoji?: string;
+                        readonly description?: string;
+                        readonly columns?: readonly number[];
+                        readonly columnSettings?: readonly {
+                            /** Format: int64 */
+                            readonly columnId?: number;
+                            /** Format: int64 */
+                            readonly order?: number;
+                            readonly readonly?: boolean;
+                            readonly mandatory?: boolean;
+                        }[];
+                        readonly sort?: readonly {
                             /** Format: int64 */
                             readonly columnId: number;
                             /** @enum {string} */
                             readonly mode: "ASC" | "DESC";
-                        };
-                    } | {
-                        /** @enum {string} */
-                        readonly key: "filter";
-                        readonly value: {
+                        }[];
+                        readonly filter?: readonly (readonly {
                             /** Format: int64 */
                             readonly columnId: number;
                             /** @enum {string} */
                             readonly operator: "begins-with" | "ends-with" | "contains" | "does-not-contain" | "is-equal" | "is-not-equal" | "is-greater-than" | "is-greater-than-or-equal" | "is-lower-than" | "is-lower-than-or-equal" | "is-empty";
                             readonly value: string | number;
-                        };
+                        }[])[];
                     };
                 };
             };
@@ -2649,6 +2648,17 @@ export interface operations {
                     readonly "application/json": components["schemas"]["Column"];
                 };
             };
+            /** @description Bad request */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
             /** @description Current user is not logged in */
             readonly 401: {
                 headers: {
@@ -2899,6 +2909,17 @@ export interface operations {
                 };
                 content: {
                     readonly "application/json": components["schemas"]["Column"];
+                };
+            };
+            /** @description Invalid input data */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
                 };
             };
             /** @description Current user is not logged in */

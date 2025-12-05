@@ -12,7 +12,9 @@ namespace OCA\Tables\Service;
 use DateTime;
 use Exception;
 use InvalidArgumentException;
+use JsonSerializable;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Constants\ViewUpdatableParameters;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\View;
@@ -22,7 +24,11 @@ use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Event\ViewDeletedEvent;
 use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\Model\ColumnSettings;
+use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\Permissions;
+use OCA\Tables\Model\SortRuleSet;
+use OCA\Tables\Model\ViewUpdateInput;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -228,30 +234,12 @@ class ViewService extends SuperService {
 		return $newItem;
 	}
 
-
 	/**
-	 * @param int $id
-	 * @param string $key
-	 * @param string|null $value
-	 * @param string|null $userId
-	 * @return View
-	 * @throws InternalError
-	 */
-	public function updateSingle(int $id, string $key, ?string $value, ?string $userId = null): View {
-		return $this->update($id, [$key => $value], $userId);
-	}
-
-	/**
-	 * @param int $id
-	 * @param array $data
-	 * @param string|null $userId
-	 * @param bool $skipTableEnhancement
-	 * @return View
 	 * @throws InternalError
 	 * @throws PermissionError
 	 * @throws InvalidArgumentException
 	 */
-	public function update(int $id, array $data, ?string $userId = null, bool $skipTableEnhancement = false): View {
+	public function update(int $id, ViewUpdateInput $data, ?string $userId = null, bool $skipTableEnhancement = false): View {
 		$userId = $this->permissionsService->preCheckUserId($userId);
 
 		try {
@@ -262,52 +250,21 @@ class ViewService extends SuperService {
 				throw new PermissionError('PermissionError: can not update view with id ' . $id);
 			}
 
-			$updatableParameter = ['title', 'emoji', 'description', 'sort', 'filter', 'columns', 'columnSettings'];
-
-			foreach ($data as $key => $value) {
-				if (!in_array($key, $updatableParameter)) {
-					throw new InternalError('View parameter ' . $key . ' can not be updated.');
+			foreach ($data->updateDetail() as $parameter => $value) {
+				if ($parameter === ViewUpdatableParameters::COLUMN_SETTINGS
+					&& $value instanceof ColumnSettings
+				) {
+					$this->assertInputColumnsAreValid($view, $userId, $value);
 				}
 
-				if ($key === 'columns') {
-					$this->logger->info('The old columns format is deprecated. Please use the new format with columnId and order properties.');
-					$decodedValue = \json_decode($value, true);
-					$value = [];
-					foreach ($decodedValue as $order => $columnId) {
-						$value[] = new ViewColumnInformation($columnId, order: $order);
-					}
-
-					$value = \json_encode($value);
+				if ($value instanceof JsonSerializable) {
+					$insertableValue = json_encode($value);
 				}
 
-				if ($key === 'columnSettings' || $key === 'columns') {
-					// we have to fetch the service here as ColumnService already depends on the ViewService, i.e. no DI
-					$columnService = \OCP\Server::get(ColumnService::class);
-					$rawColumnsArray = \json_decode($value, true);
-					$columnIds = array_column($rawColumnsArray, ViewColumnInformation::KEY_ID);
-
-					$availableColumns = $columnService->findAllByManagedView($view, $userId);
-					$availableColumns = array_map(static fn (Column $column) => $column->getId(), $availableColumns);
-					foreach ($columnIds as $columnId) {
-						if (!Column::isValidMetaTypeId($columnId) && !in_array($columnId, $availableColumns, true)) {
-							throw new InvalidArgumentException('Invalid column ID provided');
-						}
-					}
-
-					// ensure we have the correct format and expected values
-					try {
-						$columnsArray = array_map(static fn (array $a): ViewColumnInformation => ViewColumnInformation::fromArray($a), $rawColumnsArray);
-						$value = \json_encode($columnsArray);
-					} catch (\Throwable $t) {
-						throw new \InvalidArgumentException('Invalid column data provided', 400, $t);
-					}
-
-					$key = 'columns';
-				}
-
-				$setterMethod = 'set' . ucfirst($key);
-				$view->$setterMethod($value);
+				$setterMethod = 'set' . ucfirst($parameter->value);
+				$view->$setterMethod($insertableValue ?? $value);
 			}
+
 			$time = new DateTime();
 			$view->setLastEditBy($userId);
 			$view->setLastEditAt($time->format('Y-m-d H:i:s'));
@@ -321,6 +278,24 @@ class ViewService extends SuperService {
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError($e->getMessage());
+		}
+	}
+
+	/**
+	 * @throws InvalidArgumentException
+	 * @throws PermissionError
+	 */
+	protected function assertInputColumnsAreValid(View $view, string $userId, ColumnSettings $columnSettings): void {
+		$columnService = \OCP\Server::get(ColumnService::class);
+		$availableColumns = $columnService->findAllByManagedView($view, $userId);
+		$availableColumnIds = array_map(static fn (Column $column) => $column->getId(), $availableColumns);
+
+		foreach ($columnSettings->columnInformation() as $columnInfo) {
+			if (!in_array($columnInfo->getId(), $availableColumnIds, true)
+				&& !Column::isValidMetaTypeId($columnInfo->getId())
+			) {
+				throw new InvalidArgumentException('Invalid column ID provided: ' . $columnInfo->getId());
+			}
 		}
 	}
 
@@ -527,48 +502,52 @@ class ViewService extends SuperService {
 	 * @param Table $table
 	 * @return void
 	 * @throws InternalError
+	 * @throws PermissionError
 	 */
-	public function deleteColumnDataFromViews(int $columnId, Table $table) {
+	public function deleteColumnDataFromViews(int $columnId, Table $table): void {
 		try {
 			$views = $this->mapper->findAll($table->getId());
 		} catch (\OCP\DB\Exception $e) {
 			throw new InternalError($e->getMessage());
 		}
 		foreach ($views as $view) {
-			$filteredSortingRules = array_filter($view->getSortArray(), function (array $sort) use ($columnId) {
+			$filteredSortingRules = array_filter($view->getSortArray(), static function (array $sort) use ($columnId) {
 				return $sort['columnId'] !== $columnId;
 			});
 			$filteredSortingRules = array_values($filteredSortingRules);
 
-			$filteredFilters = array_filter(
-				array_map(
-					function (array $filterGroup) use ($columnId) {
-						return array_filter(
-							$filterGroup,
-							function (array $filter) use ($columnId) {
-								return $filter['columnId'] !== $columnId;
-							}
-						);
-					},
-					$view->getFilterArray()
-				),
-				fn ($filterGroup) => !empty($filterGroup)
+			$applicableFilterArray = $this->removeColumnFromFilters($view->getFilterArray(), $columnId);
+
+			$applicableViewColumnInformationRecords = array_filter(
+				$view->getColumnsSettingsArray(),
+				static function (ViewColumnInformation $viewColumnInformation) use ($columnId): bool {
+					return $viewColumnInformation->getId() !== $columnId;
+				}
 			);
 
-			$columnSettings = $view->getColumnsSettingsArray();
-			$columnSettings = array_filter($columnSettings, static function (ViewColumnInformation $setting) use ($columnId): bool {
-				return $setting[ViewColumnInformation::KEY_ID] !== $columnId;
-			});
-			$columnSettings = array_values($columnSettings);
+			$viewUpdateInput = new ViewUpdateInput(
+				columnSettings: new ColumnSettings($applicableViewColumnInformationRecords),
+				filterSet: FilterSet::createFromInputArray($applicableFilterArray),
+				sortRuleSet: SortRuleSet::createFromInputArray($filteredSortingRules),
+			);
 
-			$data = [
-				'sort' => json_encode($filteredSortingRules),
-				'filter' => json_encode($filteredFilters),
-				'columnSettings' => json_encode($columnSettings),
-			];
-
-			$this->update($view->getId(), $data);
+			$this->update($view->getId(), $viewUpdateInput);
 		}
+	}
+
+	protected function removeColumnFromFilters(array $originalFilterSetArray, int $columnId): array {
+		$applicableFilterSetArray = [];
+		foreach ($originalFilterSetArray as $filterGroupArray) {
+			$currentGroup = [];
+			foreach ($filterGroupArray as $filterArray) {
+				if ($filterArray['columnId'] === $columnId) {
+					continue;
+				}
+				$currentGroup[] = $filterArray;
+			}
+			$applicableFilterSetArray[] = $currentGroup;
+		}
+		return $applicableFilterSetArray;
 	}
 
 	/**
@@ -603,11 +582,16 @@ class ViewService extends SuperService {
 	 */
 	public function addColumnToView(View $view, Column $column, ?string $userId = null): void {
 		try {
-			$columnsSettings = $view->getColumnsSettingsArray();
-			$orders = array_map(fn (ViewColumnInformation $setting) => $setting->getOrder(), $view->getColumnsSettingsArray());
+			$viewColumnInformation = $view->getColumnsSettingsArray();
+
+			$orders = array_map(fn (ViewColumnInformation $setting) => $setting->getOrder(), $viewColumnInformation);
 			$nextOrder = $orders ? max($orders) + 1 : 0;
-			$columnsSettings[] = new ViewColumnInformation($column->getId(), $nextOrder);
-			$this->update($view->getId(), ['columnSettings' => json_encode($columnsSettings)], $userId, true);
+
+			$viewColumnInformation[] = new ViewColumnInformation($column->getId(), $nextOrder);
+			$columnSettings = new ColumnSettings($viewColumnInformation);
+
+			$viewUpdate = new ViewUpdateInput(columnSettings: $columnSettings);
+			$this->update($view->getId(), $viewUpdate, $userId, true);
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError($e->getMessage());

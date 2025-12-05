@@ -16,7 +16,7 @@ use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
-use OCA\Tables\Service\ValueObject\ViewColumnInformation;
+use OCA\Tables\Model\ViewUpdateInput;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
@@ -65,7 +65,7 @@ class TableTemplateService {
 			[
 				'name' => 'vacation-requests',
 				'title' => $this->l->t('Vacation requests'),
-				'icon' => '️🏝',
+				'icon' => '🏝',
 				'description' => $this->l->t('Use this table to collect and manage vacation requests.')
 			],
 			[
@@ -451,7 +451,6 @@ class TableTemplateService {
 			$columns['workingDays']->getId() => 34,
 			$columns['dateRequest']->getId() => '2023-01-30',
 			$columns['approved']->getId() => 'false',
-			$columns['dateApprove']->getId() => '',
 			$columns['approveBy']->getId() => '',
 			// TRANSLATORS This is an example comment
 			$columns['comment']->getId() => $this->l->t('We have to talk about that.'),
@@ -469,54 +468,53 @@ class TableTemplateService {
 		$this->createView($table,
 			[
 				'title' => $this->l->t('Create Vacation Request'),
-				'emoji' => '️➕',
-				'columnSettings' => $this->columnsToColumnSettingsJsonString($columns),
-				'filter' => json_encode([[['columnId' => Column::TYPE_META_CREATED_BY, 'operator' => 'is-equal', 'value' => '@my-name'], ['columnId' => $columns['approved']->getId(), 'operator' => 'is-empty', 'value' => '']]]),
+				'emoji' => '➕',
+				'columnSettings' => $this->columnsToInputArray($columns),
+				'filter' => [[['columnId' => Column::TYPE_META_CREATED_BY, 'operator' => 'is-equal', 'value' => '@my-name'], ['columnId' => $columns['approved']->getId(), 'operator' => 'is-empty', 'value' => '']]],
 			]
 		);
 		$this->createView($table,
 			[
 				'title' => $this->l->t('Open Request'),
-				'emoji' => '️📝',
-				'columnSettings' => $this->columnsToColumnSettingsJsonString($columns),
-				'sort' => json_encode([['columnId' => $columns['from']->getId(), 'mode' => 'ASC']]),
-				'filter' => json_encode([[['columnId' => $columns['approved']->getId(), 'operator' => 'is-empty', 'value' => '']]]),
+				'emoji' => '📝',
+				'columnSettings' => $this->columnsToInputArray($columns),
+				'sort' => [['columnId' => $columns['from']->getId(), 'mode' => 'ASC']],
+				'filter' => [[['columnId' => $columns['approved']->getId(), 'operator' => 'is-empty', 'value' => '']]],
 			]
 		);
 		$this->createView($table,
 			[
 				'title' => $this->l->t('Request Status'),
-				'emoji' => '️❓',
-				'columnSettings' => $this->columnsToColumnSettingsJsonString($columns),
-				'sort' => json_encode([['columnId' => Column::TYPE_META_UPDATED_BY, 'mode' => 'ASC']]),
-				'filter' => json_encode([[['columnId' => Column::TYPE_META_CREATED_BY, 'operator' => 'is-equal', 'value' => '@my-name']]]),
+				'emoji' => '❓',
+				'columnSettings' => $this->columnsToInputArray($columns),
+				'sort' => [['columnId' => Column::TYPE_META_UPDATED_BY, 'mode' => 'ASC']],
+				'filter' => [[['columnId' => Column::TYPE_META_CREATED_BY, 'operator' => 'is-equal', 'value' => '@my-name']]],
 			]
 		);
 		$this->createView($table,
 			[
 				'title' => $this->l->t('Closed requests'),
-				'emoji' => '️✅',
-				'columnSettings' => $this->columnsToColumnSettingsJsonString($columns),
-				'sort' => json_encode([['columnId' => Column::TYPE_META_UPDATED_BY, 'mode' => 'ASC']]),
-				'filter' => json_encode([[['columnId' => $columns['approved']->getId(), 'operator' => 'is-equal', 'value' => '@checked']], [['columnId' => $columns['approved']->getId(), 'operator' => 'is-equal', 'value' => '@unchecked']]]),
+				'emoji' => '✅',
+				'columnSettings' => $this->columnsToInputArray($columns),
+				'sort' => [['columnId' => Column::TYPE_META_UPDATED_BY, 'mode' => 'ASC']],
+				'filter' => [[['columnId' => $columns['approved']->getId(), 'operator' => 'is-equal', 'value' => '@checked']], [['columnId' => $columns['approved']->getId(), 'operator' => 'is-equal', 'value' => '@unchecked']]],
 			]
 		);
 	}
 
 	/**
 	 * @param array<?Column> $columns
+	 * @return list<array{columnId: int, order: int}>
 	 */
-	private function columnsToColumnSettingsJsonString(array $columns): string {
+	private function columnsToInputArray(array $columns): array {
 		$columns = array_filter($columns, static function ($item) {
 			return $item instanceof Column;
 		});
-		return json_encode(
-			array_map(
-				static function (Column $column, int $index): ViewColumnInformation {
-					return new ViewColumnInformation($column->getId(), order: $index);
-				},
-				array_values($columns), array_keys(array_values($columns))
-			)
+		return array_map(
+			static function (Column $column, int $index): array {
+				return ['columnId' => $column->getId(), 'order' => $index];
+			},
+			array_values($columns), array_keys(array_values($columns))
 		);
 	}
 
@@ -797,15 +795,8 @@ class TableTemplateService {
 		$this->createView($table, [
 			'title' => $this->l->t('Check yourself!'),
 			'emoji' => '🏁',
-			'columnSettings' => json_encode(
-				[
-					new ViewColumnInformation($columns['what']->getId(), order: 0),
-					new ViewColumnInformation($columns['how']->getId(), order: 1),
-					new ViewColumnInformation($columns['ease']->getId(), order: 2),
-					new ViewColumnInformation($columns['done']->getId(), order: 3),
-				]
-			),
-			'filter' => json_encode([[['columnId' => $columns['done']->getId(), 'operator' => 'is-equal', 'value' => '@unchecked']]]),
+			'columnSettings' => $this->columnsToInputArray($columns),
+			'filter' => [[['columnId' => $columns['done']->getId(), 'operator' => 'is-equal', 'value' => '@unchecked']]],
 		]);
 	}
 
@@ -864,8 +855,9 @@ class TableTemplateService {
 	 */
 	private function createView(Table $table, array $data): void {
 		try {
+			$inputData = ViewUpdateInput::fromInputArray($data);
 			$view = $this->viewService->create($data['title'], $data['emoji'], $table);
-			$this->viewService->update($view->getId(), $data);
+			$this->viewService->update($view->getId(), $inputData);
 		} catch (PermissionError $e) {
 			$this->logger->warning('Cannot create view, permission denied: ' . $e->getMessage());
 		}

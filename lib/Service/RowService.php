@@ -231,7 +231,6 @@ class RowService extends SuperService {
 		$data = $this->cleanupAndValidateData($data, $columns, $tableId, $viewId);
 		$data = $this->enhanceWithViewDefaults($view, $data);
 
-		$tableId = $tableId ?? $view->getTableId();
 		$row2 = new Row2();
 		$row2->setTableId($tableId);
 		$row2->setData($data);
@@ -469,7 +468,7 @@ class RowService extends SuperService {
 			$defaultValue = $column->getSelectionDefault();
 			return $defaultValue !== null && $defaultValue !== '' && $defaultValue !== '[]';
 		}
-		return $value !== null && $value !== '' && $value !== [];
+		return $value !== [];
 	}
 
 	/**

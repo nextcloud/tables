@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace OCA\Tables\Db;
 
 use JsonSerializable;
+use OCA\Tables\Model\FilterSet;
 use OCA\Tables\Model\Permissions;
+use OCA\Tables\Model\SortRuleSet;
 use OCA\Tables\ResponseDefinitions;
 use OCA\Tables\Service\ValueObject\ViewColumnInformation;
 
@@ -136,7 +138,8 @@ class View extends EntitySuper implements JsonSerializable {
 	 * @return list<array{columnId: int, mode: 'ASC'|'DESC'}>
 	 */
 	public function getSortArray(): array {
-		return $this->getArray($this->getSort());
+		$rawSortRules = $this->getArray($this->getSort());
+		return SortRuleSet::createFromInputArray($rawSortRules)->jsonSerialize();
 	}
 
 	/**
@@ -144,17 +147,8 @@ class View extends EntitySuper implements JsonSerializable {
 	 * @return list<list<array{columnId: int, operator: 'begins-with'|'ends-with'|'contains'|'does-not-contain'|'is-equal'|'is-not-equal'|'is-greater-than'|'is-greater-than-or-equal'|'is-lower-than'|'is-lower-than-or-equal'|'is-empty', value: string|int|float}>>
 	 */
 	public function getFilterArray():array {
-		$filters = $this->getArray($this->getFilter());
-		// a filter(group) was stored with a not-selected column - it may break impressively.
-		// filter them out now until we have a permanent fix
-		foreach ($filters as &$filterGroups) {
-			$filterGroups = array_filter($filterGroups, function (array $item) {
-				return $item['columnId'] !== null;
-			});
-		}
-		return array_filter($filters, function (array $item) {
-			return !empty($item);
-		});
+		$rawFilters = $this->getArray($this->getFilter());
+		return FilterSet::createFromInputArray($rawFilters)->jsonSerialize();
 	}
 
 	private function getArray(?string $json): array {
@@ -217,6 +211,7 @@ class View extends EntitySuper implements JsonSerializable {
 	 */
 	public function getColumnIds(): array {
 		$columns = $this->getColumnsSettingsArray();
-		return array_map(static fn (ViewColumnInformation $column): int => $column[ViewColumnInformation::KEY_ID], $columns);
+
+		return array_map(static fn (ViewColumnInformation $column): int => $column->getId(), $columns);
 	}
 }
