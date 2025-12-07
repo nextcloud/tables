@@ -75,6 +75,6 @@
     "cypress-vite": "^1.8.0"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "^4.52.2"
+    "@rollup/rollup-linux-x64-gnu": "^4.53.3"
   }
 }
