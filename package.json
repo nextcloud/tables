@@ -70,7 +70,7 @@
     "@vue/tsconfig": "^0.5.1",
     "cypress": "^13.6.4",
     "cypress-downloadfile": "^1.2.4",
-    "openapi-typescript": "^7.9.1",
+    "openapi-typescript": "^7.10.1",
     "typescript": "^5.3.3",
     "cypress-vite": "^1.8.0"
   },
