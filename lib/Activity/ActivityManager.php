@@ -35,6 +35,8 @@ class ActivityManager {
 	public const SUBJECT_ROW_UPDATE = 'row_update';
 	public const SUBJECT_ROW_DELETE = 'row_delete';
 
+	public const SUBJECT_IMPORT_FINISHED = 'import_finished';
+
 	public function __construct(
 		private readonly IManager $manager,
 		private readonly IFactory $l10nFactory,
@@ -135,9 +137,11 @@ class ActivityManager {
 			case self::SUBJECT_ROW_DELETE:
 				$subjectParams['row'] = $object;
 				break;
-			default:
-				throw new \Exception('Unknown subject for activity.');
+			case self::SUBJECT_IMPORT_FINISHED:
+				$subjectParams['importStats'] = $additionalParams['importStats'] ?? null;
 				break;
+			default:
+				throw new \Exception(sprintf('Unknown subject "%s" for activity.', $subject));
 		}
 
 		if ($subject === self::SUBJECT_ROW_UPDATE) {
@@ -200,7 +204,7 @@ class ActivityManager {
 		}
 	}
 
-	public function getActivityFormat($language, $subjectIdentifier, $subjectParams = [], $ownActivity = false) {
+	public function getActivitySubject($language, $subjectIdentifier, $subjectParams = [], $ownActivity = false) {
 		$subject = '';
 		$l = $this->l10nFactory->get(Application::APP_ID, $language);
 
@@ -248,10 +252,34 @@ class ActivityManager {
 			case self::SUBJECT_ROW_DELETE:
 				$subject = $ownActivity ? $l->t('You have deleted the row {row} in table {table}') : $l->t('{user} has deleted the row {row} in table {table}');
 				break;
+			case self::SUBJECT_IMPORT_FINISHED:
+				$subject = $ownActivity ? $l->t('You have imported file to table {table}') : $l->t('{user} has imported file to table {table}');
+				break;
 			default:
 				break;
 		}
 
 		return $subject;
+	}
+
+	public function getActivityMessage($language, $subjectIdentifier) {
+		$l = $this->l10nFactory->get(Application::APP_ID, $language);
+
+		switch ($subjectIdentifier) {
+			case self::SUBJECT_IMPORT_FINISHED:
+				$lines = [
+					$l->t('Found columns: {foundColumnsCount}'),
+					$l->t('Matching columns: {matchingColumnsCount}'),
+					$l->t('Created columns: {createdColumnsCount}'),
+					$l->t('Inserted rows: {insertedRowsCount}'),
+					$l->t('Updated rows: {updatedRowsCount}'),
+					$l->t('Value parsing errors: {errorsParsingCount}'),
+					$l->t('Row creation errors: {errorsCount}'),
+				];
+				return implode("\n", $lines);
+
+			default:
+				return null;
+		}
 	}
 }
