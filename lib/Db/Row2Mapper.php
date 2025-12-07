@@ -13,6 +13,7 @@ use OCA\Tables\Constants\UsergroupType;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Helper\ColumnsHelper;
+use OCA\Tables\Helper\TimezoneHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -39,7 +40,16 @@ class Row2Mapper {
 
 	private ColumnsHelper $columnsHelper;
 
-	public function __construct(?string $userId, IDBConnection $db, LoggerInterface $logger, UserHelper $userHelper, RowSleeveMapper $rowSleeveMapper, ColumnsHelper $columnsHelper, ColumnMapper $columnMapper) {
+	public function __construct(
+		?string $userId,
+		IDBConnection $db,
+		LoggerInterface $logger,
+		UserHelper $userHelper,
+		RowSleeveMapper $rowSleeveMapper,
+		ColumnsHelper $columnsHelper,
+		ColumnMapper $columnMapper,
+		private TimezoneHelper $timezoneHelper,
+	) {
 		$this->rowSleeveMapper = $rowSleeveMapper;
 		$this->userId = $userId;
 		$this->db = $db;
@@ -635,9 +645,9 @@ class Row2Mapper {
 			$rows[$sleeve->getId()] = new Row2();
 			$rows[$sleeve->getId()]->setId($sleeve->getId());
 			$rows[$sleeve->getId()]->setCreatedBy($sleeve->getCreatedBy());
-			$rows[$sleeve->getId()]->setCreatedAt($sleeve->getCreatedAt());
+			$rows[$sleeve->getId()]->setCreatedAt($this->timezoneHelper->applyUserTimezone($sleeve->getCreatedAt()));
 			$rows[$sleeve->getId()]->setLastEditBy($sleeve->getLastEditBy());
-			$rows[$sleeve->getId()]->setLastEditAt($sleeve->getLastEditAt());
+			$rows[$sleeve->getId()]->setLastEditAt($this->timezoneHelper->applyUserTimezone($sleeve->getLastEditAt()));
 			$rows[$sleeve->getId()]->setTableId($sleeve->getTableId());
 		}
 
