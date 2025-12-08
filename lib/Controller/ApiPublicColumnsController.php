@@ -31,7 +31,8 @@ use Psr\Log\LoggerInterface;
 /**
  * @psalm-import-type TablesPublicColumn from ResponseDefinitions
  */
-class ApiPublicColumnsController extends ACommonColumnsController {
+class ApiPublicColumnsController extends ACommonColumnsController
+{
 
 	public function __construct(
 		protected ColumnService $service,
@@ -62,12 +63,15 @@ class ApiPublicColumnsController extends ACommonColumnsController {
 	#[ApiRoute(verb: 'GET', url: '/api/2/public/{token}/columns')]
 	#[OpenAPI]
 	#[AnonRateLimit(limit: 10, period: 10)]
-	public function indexByPublicLink(string $token): DataResponse {
+	public function indexByPublicLink(string $token): DataResponse
+	{
 		try {
 			$shareToken = new ShareToken($token);
 		} catch (InvalidArgumentException $e) {
 			return $this->handleBadRequestError(new BadRequestError(
-				'Invalid share token', $e->getCode(), $e
+				'Invalid share token',
+				$e->getCode(),
+				$e
 			));
 		}
 
