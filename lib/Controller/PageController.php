@@ -10,6 +10,7 @@ namespace OCA\Tables\Controller;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Service\NodeService;
 use OCA\Tables\Service\ShareService;
+use OCA\Tables\Service\ValueObject\ShareToken;
 use OCA\Text\Event\LoadEditor;
 use OCA\Viewer\Event\LoadViewer;
 use OCP\AppFramework\Controller;
