@@ -12,6 +12,7 @@ namespace OCA\Tables\Service;
 use DateTime;
 
 use InvalidArgumentException;
+use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Constants\ShareReceiverType;
 use OCA\Tables\Db\Context;
 use OCA\Tables\Db\ContextNavigation;
@@ -26,15 +27,18 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\CircleHelper;
+use OCA\Tables\Helper\ConversionHelper;
 use OCA\Tables\Helper\GroupHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\Model\Permissions;
 use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Service\ValueObject\ShareToken;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
 use OCP\IDBConnection;
+use OCP\Security\ISecureRandom;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -44,44 +48,21 @@ use Throwable;
 class ShareService extends SuperService {
 	use TTransactional;
 
-	protected ShareMapper $mapper;
-
-	protected TableMapper $tableMapper;
-
-	protected ViewMapper $viewMapper;
-
-	protected UserHelper $userHelper;
-
-	protected GroupHelper $groupHelper;
-
-	protected CircleHelper $circleHelper;
-
-	private ContextNavigationMapper $contextNavigationMapper;
-
-	private IDBConnection $dbc;
-
 	public function __construct(
 		PermissionsService $permissionsService,
 		LoggerInterface $logger,
 		?string $userId,
-		ShareMapper $shareMapper,
-		TableMapper $tableMapper,
-		ViewMapper $viewMapper,
-		UserHelper $userHelper,
-		GroupHelper $groupHelper,
-		CircleHelper $circleHelper,
-		ContextNavigationMapper $contextNavigationMapper,
-		IDBConnection $dbc,
+		protected ShareMapper $mapper,
+		protected TableMapper $tableMapper,
+		protected ViewMapper $viewMapper,
+		protected UserHelper $userHelper,
+		protected GroupHelper $groupHelper,
+		protected CircleHelper $circleHelper,
+		private ContextNavigationMapper $contextNavigationMapper,
+		private IDBConnection $dbc,
+		protected ISecureRandom $secureRandom,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
-		$this->mapper = $shareMapper;
-		$this->tableMapper = $tableMapper;
-		$this->viewMapper = $viewMapper;
-		$this->userHelper = $userHelper;
-		$this->groupHelper = $groupHelper;
-		$this->circleHelper = $circleHelper;
-		$this->contextNavigationMapper = $contextNavigationMapper;
-		$this->dbc = $dbc;
 	}
 
 
@@ -138,6 +119,50 @@ class ShareService extends SuperService {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());
 		}
+	}
+
+	/**
+	 * @throws NotFoundError
+	 */
+	public function findByToken(ShareToken $token): Share {
+		try {
+			return $this->mapper->findByToken($token);
+		} catch (DoesNotExistException $e) {
+			throw new NotFoundError($e->getMessage());
+		}
+	}
+
+	/**
+	 * @throws InternalError
+	 */
+	public function createLinkShare(Table|View $node, ?string $password = null): Share {
+		for ($i = 0; $i < 3; $i++) {
+			// there is the theoretical chance, that an existing share token would be re-used,
+			// so we take up to three attempts to try to generate it.
+			try {
+				return $this->create(
+					$node->getId(),
+					ConversionHelper::object2String($node),
+					'',
+					ShareReceiverType::LINK,
+					true,
+					false,
+					false,
+					false,
+					false,
+					Application::NAV_ENTRY_MODE_HIDDEN,
+					$this->generateShareToken(),
+					$password,
+				);
+			} catch (InternalError $e) {
+			}
+		}
+		throw $e;
+	}
+
+	protected function generateShareToken(): ShareToken {
+		$shareToken = $this->secureRandom->generate(ShareToken::MIN_LENGTH, ISecureRandom::CHAR_LOWER . ISecureRandom::CHAR_UPPER . ISecureRandom::CHAR_DIGITS);
+		return new ShareToken($shareToken);
 	}
 
 	/**
@@ -240,7 +265,7 @@ class ShareService extends SuperService {
 	 * @return Share
 	 * @throws InternalError
 	 */
-	public function create(int $nodeId, string $nodeType, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage, int $displayMode):Share {
+	public function create(int $nodeId, string $nodeType, string $receiver, string $receiverType, bool $permissionRead, bool $permissionCreate, bool $permissionUpdate, bool $permissionDelete, bool $permissionManage, int $displayMode, ?ShareToken $shareToken = null, ?string $password = null):Share {
 		if (!$this->userId) {
 			$e = new \Exception('No user given.');
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
@@ -260,6 +285,14 @@ class ShareService extends SuperService {
 		$item->setPermissionManage($permissionManage);
 		$item->setCreatedAt($time->format('Y-m-d H:i:s'));
 		$item->setLastEditAt($time->format('Y-m-d H:i:s'));
+
+		if ($shareToken) {
+			$item->setToken((string)$shareToken);
+		}
+		if ($password) {
+			$item->setPassword($password);
+		}
+
 		try {
 			$newShare = $this->mapper->insert($item);
 		} catch (Exception $e) {
@@ -417,6 +450,11 @@ class ShareService extends SuperService {
 	 * @return Share
 	 */
 	private function addReceiverDisplayName(Share $share):Share {
+		if ($share->getReceiverType() === ShareReceiverType::LINK) {
+			$share->setReceiverDisplayName('');
+			return $share;
+		}
+
 		if ($share->getReceiverType() === ShareReceiverType::USER) {
 			$share->setReceiverDisplayName($this->userHelper->getUserDisplayName($share->getReceiver()));
 		} elseif ($share->getReceiverType() === ShareReceiverType::GROUP) {

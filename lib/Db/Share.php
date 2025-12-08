@@ -28,6 +28,10 @@ use OCA\Tables\ResponseDefinitions;
  * @method setNodeId(int $nodeId)
  * @method getNodeType(): string
  * @method setNodeType(string $nodeType)
+ * @method \string getToken()
+ * @method setToken(string $token)
+ * @method getPassword(): string
+ * @method setPassword(string $password)
  * @method getPermissionRead(): bool
  * @method setPermissionRead(bool $permissionRead)
  * @method getPermissionCreate(): bool
@@ -50,6 +54,8 @@ class Share extends EntitySuper implements JsonSerializable {
 	protected ?string $receiverType = null; // user, group, circle
 	protected ?int $nodeId = null;
 	protected ?string $nodeType = null;
+	protected ?string $token = null;
+	protected ?string $password = null;
 	protected ?bool $permissionRead = null;
 	protected ?bool $permissionCreate = null;
 	protected ?bool $permissionUpdate = null;
@@ -92,6 +98,8 @@ class Share extends EntitySuper implements JsonSerializable {
 			'receiver' => $this->receiver,
 			'receiverDisplayName' => $this->receiverDisplayName,
 			'receiverType' => $this->receiverType,
+			'token' => $this->token,
+			'password' => $this->password,
 			'createdAt' => $this->createdAt,
 			'lastEditAt' => $this->lastEditAt,
 		];
