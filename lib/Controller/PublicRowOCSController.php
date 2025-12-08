@@ -32,7 +32,8 @@ use Psr\Log\LoggerInterface;
 /**
  * @psalm-import-type TablesPublicRow from ResponseDefinitions
  */
-class PublicRowOCSController extends AOCSController {
+class PublicRowOCSController extends AOCSController
+{
 
 	public function __construct(
 		protected ShareService $shareService,
@@ -63,7 +64,8 @@ class PublicRowOCSController extends AOCSController {
 	#[ApiRoute(verb: 'GET', url: '/api/2/public/{token}/rows', requirements: ['token' => '[a-zA-Z0-9]{16}'])]
 	#[OpenAPI]
 	#[AnonRateLimit(limit: 20, period: 30)]
-	public function getRows(string $token, ?int $limit, ?int $offset): DataResponse {
+	public function getRows(string $token, ?int $limit, ?int $offset): DataResponse
+	{
 		try {
 			$shareToken = new ShareToken($token);
 			$share = $this->shareService->findByToken($shareToken);

@@ -35,7 +35,8 @@ use Psr\Log\LoggerInterface;
 /**
  * @psalm-import-type TablesLinkShare from ResponseDefinitions
  */
-class ShareOCSController extends AOCSController {
+class ShareOCSController extends AOCSController
+{
 	public function __construct(
 		IRequest $request,
 		LoggerInterface $logger,
