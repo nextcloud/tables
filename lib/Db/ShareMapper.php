@@ -7,6 +7,7 @@
 
 namespace OCA\Tables\Db;
 
+use OCA\Tables\Service\ValueObject\ShareToken;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
@@ -38,6 +39,17 @@ class ShareMapper extends QBMapper {
 		$qb->select('*')
 			->from($this->table)
 			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
+		return $this->findEntity($qb);
+	}
+
+	/**
+	 * @throws DoesNotExistException
+	 */
+	public function findByToken(ShareToken $token): Share {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->eq('token', $qb->createNamedParameter((string)$token, IQueryBuilder::PARAM_STR)));
 		return $this->findEntity($qb);
 	}
 

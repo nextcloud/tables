@@ -38,6 +38,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @psalm-import-type TablesRow from ResponseDefinitions
+ * @psalm-import-type TablesPublicRow from ResponseDefinitions
  */
 class RowService extends SuperService {
 	private array $tmpRows = []; // holds already loaded rows as a small cache
@@ -64,6 +65,18 @@ class RowService extends SuperService {
 	 */
 	public function formatRows(array $rows): array {
 		return array_map(fn (Row2 $row) => $row->jsonSerialize(), $rows);
+	}
+
+	/**
+	 * @param Row2[] $rows
+	 * @return TablesPublicRow[]
+	 */
+	public function formatRowsForPublicShare(array $rows): array {
+		return array_map(static function (Row2 $row): array {
+			$rowData = $row->jsonSerialize();
+			unset($rowData['tableId'], $rowData['createdBy'], $rowData['lastEditBy']);
+			return $rowData;
+		}, $rows);
 	}
 
 	/**

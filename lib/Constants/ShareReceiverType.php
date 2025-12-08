@@ -14,4 +14,5 @@ class ShareReceiverType {
 	public const USER = 'user';
 	public const GROUP = 'group';
 	public const CIRCLE = 'circle';
+	public const LINK = 'link';
 }
