@@ -83,6 +83,11 @@ namespace OCA\Tables;
  *  data: ?array{columnId: int, value: mixed},
  * }
  *
+ * @psalm-type TablesLinkShare = array{
+ *    shareToken: string,
+ *    url: string,
+ *  }
+ *
  * @psalm-type TablesShare = array{
  * 	id: int,
  * 	sender: string,

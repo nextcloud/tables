@@ -10,6 +10,7 @@ namespace OCA\Tables\Db;
 use JsonSerializable;
 
 use OCA\Tables\ResponseDefinitions;
+use OCA\Tables\Service\ValueObject\ShareToken;
 
 /**
  * @psalm-import-type TablesShare from ResponseDefinitions
@@ -28,6 +29,9 @@ use OCA\Tables\ResponseDefinitions;
  * @method setNodeId(int $nodeId)
  * @method getNodeType(): string
  * @method setNodeType(string $nodeType)
+ * @method getToken(): ShareToken
+ * @method getPassword(): string
+ * @method setPassword(string $password)
  * @method getPermissionRead(): bool
  * @method setPermissionRead(bool $permissionRead)
  * @method getPermissionCreate(): bool
@@ -50,6 +54,8 @@ class Share extends EntitySuper implements JsonSerializable {
 	protected ?string $receiverType = null; // user, group, circle
 	protected ?int $nodeId = null;
 	protected ?string $nodeType = null;
+	protected ?ShareToken $token = null;
+	protected ?string $password = null;
 	protected ?bool $permissionRead = null;
 	protected ?bool $permissionCreate = null;
 	protected ?bool $permissionUpdate = null;
@@ -75,6 +81,10 @@ class Share extends EntitySuper implements JsonSerializable {
 		$this->addType('permissionManage', 'boolean');
 	}
 
+	public function setToken(string $token): void {
+		$this->token = new ShareToken($token);
+	}
+
 	/**
 	 * @psalm-return TablesShare
 	 */
@@ -92,6 +102,8 @@ class Share extends EntitySuper implements JsonSerializable {
 			'receiver' => $this->receiver,
 			'receiverDisplayName' => $this->receiverDisplayName,
 			'receiverType' => $this->receiverType,
+			'token' => $this->token,
+			'password' => $this->password,
 			'createdAt' => $this->createdAt,
 			'lastEditAt' => $this->lastEditAt,
 		];
