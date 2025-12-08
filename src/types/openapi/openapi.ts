@@ -599,140 +599,6 @@ export type paths = {
         readonly patch?: never;
         readonly trace?: never;
     };
-    readonly "/ocs/v2.php/apps/tables/api/2/columns/{nodeType}/{nodeId}": {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header?: never;
-            readonly path?: never;
-            readonly cookie?: never;
-        };
-        /**
-         * [api v2] Get all columns for a table or a view
-         * @description Return an empty array if no columns were found
-         */
-        readonly get: operations["api_columns-index"];
-        readonly put?: never;
-        readonly post?: never;
-        readonly delete?: never;
-        readonly options?: never;
-        readonly head?: never;
-        readonly patch?: never;
-        readonly trace?: never;
-    };
-    readonly "/ocs/v2.php/apps/tables/api/2/columns/{id}": {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header?: never;
-            readonly path?: never;
-            readonly cookie?: never;
-        };
-        /** [api v2] Get a column object */
-        readonly get: operations["api_columns-show"];
-        readonly put?: never;
-        readonly post?: never;
-        readonly delete?: never;
-        readonly options?: never;
-        readonly head?: never;
-        readonly patch?: never;
-        readonly trace?: never;
-    };
-    readonly "/ocs/v2.php/apps/tables/api/2/columns/number": {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header?: never;
-            readonly path?: never;
-            readonly cookie?: never;
-        };
-        readonly get?: never;
-        readonly put?: never;
-        /**
-         * [api v2] Create new numbered column
-         * @description Specify a subtype to use any special numbered column
-         */
-        readonly post: operations["api_columns-create-number-column"];
-        readonly delete?: never;
-        readonly options?: never;
-        readonly head?: never;
-        readonly patch?: never;
-        readonly trace?: never;
-    };
-    readonly "/ocs/v2.php/apps/tables/api/2/columns/text": {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header?: never;
-            readonly path?: never;
-            readonly cookie?: never;
-        };
-        readonly get?: never;
-        readonly put?: never;
-        /**
-         * [api v2] Create new text column
-         * @description Specify a subtype to use any special text column
-         */
-        readonly post: operations["api_columns-create-text-column"];
-        readonly delete?: never;
-        readonly options?: never;
-        readonly head?: never;
-        readonly patch?: never;
-        readonly trace?: never;
-    };
-    readonly "/ocs/v2.php/apps/tables/api/2/columns/selection": {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header?: never;
-            readonly path?: never;
-            readonly cookie?: never;
-        };
-        readonly get?: never;
-        readonly put?: never;
-        /**
-         * [api v2] Create new selection column
-         * @description Specify a subtype to use any special selection column
-         */
-        readonly post: operations["api_columns-create-selection-column"];
-        readonly delete?: never;
-        readonly options?: never;
-        readonly head?: never;
-        readonly patch?: never;
-        readonly trace?: never;
-    };
-    readonly "/ocs/v2.php/apps/tables/api/2/columns/datetime": {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header?: never;
-            readonly path?: never;
-            readonly cookie?: never;
-        };
-        readonly get?: never;
-        readonly put?: never;
-        /**
-         * [api v2] Create new datetime column
-         * @description Specify a subtype to use any special datetime column
-         */
-        readonly post: operations["api_columns-create-datetime-column"];
-        readonly delete?: never;
-        readonly options?: never;
-        readonly head?: never;
-        readonly patch?: never;
-        readonly trace?: never;
-    };
-    readonly "/ocs/v2.php/apps/tables/api/2/columns/usergroup": {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header?: never;
-            readonly path?: never;
-            readonly cookie?: never;
-        };
-        readonly get?: never;
-        readonly put?: never;
-        /** [api v2] Create new usergroup column */
-        readonly post: operations["api_columns-create-usergroup-column"];
-        readonly delete?: never;
-        readonly options?: never;
-        readonly head?: never;
-        readonly patch?: never;
-        readonly trace?: never;
-    };
     readonly "/ocs/v2.php/apps/tables/api/2/favorites/{nodeType}/{nodeId}": {
         readonly parameters: {
             readonly query?: never;
@@ -842,6 +708,60 @@ export type paths = {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/ocs/v2.php/apps/tables/api/2/public/{token}/columns": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * [api v2] Get all columns for a table or a view shared by link
+         * @description Return an empty array if no columns were found
+         */
+        readonly get: operations["api_public_columns-index-by-public-link"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/public/{token}/rows": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** [api v2] Fetch all rows from a link share */
+        readonly get: operations["public_rowocs-get-rows"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/ocs/v2.php/apps/tables/api/2/{nodeCollection}/{nodeId}/share": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /** [api v2] Create a new link share of a table or view */
+        readonly post: operations["shareocs-create-link-share"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
 };
 export type webhooks = Record<string, never>;
 export type components = {
@@ -863,8 +783,10 @@ export type components = {
             /** Format: int64 */
             readonly tableId: number;
             readonly createdBy: string;
+            readonly createdByDisplayName: string;
             readonly createdAt: string;
             readonly lastEditBy: string;
+            readonly lastEditByDisplayName: string;
             readonly lastEditAt: string;
             readonly type: string;
             readonly subtype: string;
@@ -948,12 +870,76 @@ export type components = {
             readonly tables: readonly components["schemas"]["Table"][];
             readonly views: readonly components["schemas"]["View"][];
         };
+        readonly LinkShare: {
+            readonly shareToken: string;
+            readonly url: string;
+        };
         readonly OCSMeta: {
             readonly status: string;
             readonly statuscode: number;
             readonly message?: string;
             readonly totalitems?: string;
             readonly itemsperpage?: string;
+        };
+        readonly PublicColumn: {
+            /** Format: int64 */
+            readonly id: number;
+            readonly title: string;
+            readonly createdAt: string;
+            readonly lastEditAt: string;
+            readonly type: string;
+            readonly subtype: string;
+            readonly mandatory: boolean;
+            readonly description: string;
+            /** Format: int64 */
+            readonly orderWeight: number;
+            /** Format: double */
+            readonly numberDefault: number;
+            /** Format: double */
+            readonly numberMin: number;
+            /** Format: double */
+            readonly numberMax: number;
+            /** Format: int64 */
+            readonly numberDecimals: number;
+            readonly numberPrefix: string;
+            readonly numberSuffix: string;
+            readonly textDefault: string;
+            readonly textAllowedPattern: string;
+            /** Format: int64 */
+            readonly textMaxLength: number;
+            readonly textUnique: boolean;
+            readonly selectionOptions: string;
+            readonly selectionDefault: string;
+            readonly datetimeDefault: string;
+            readonly usergroupDefault: string;
+            readonly usergroupMultipleItems: boolean;
+            readonly usergroupSelectUsers: boolean;
+            readonly usergroupSelectGroups: boolean;
+            readonly usergroupSelectTeams: boolean;
+            readonly showUserStatus: boolean;
+            readonly viewColumnInformation: {
+                /** Format: int64 */
+                readonly columnId: number;
+                /** Format: int64 */
+                readonly order: number;
+                readonly readonly: boolean;
+                readonly mandatory: boolean;
+            } | null;
+            readonly customSettings: {
+                /** Format: int64 */
+                readonly width: number;
+            } | null;
+        };
+        readonly PublicRow: {
+            /** Format: int64 */
+            readonly id: number;
+            readonly createdAt: string;
+            readonly lastEditAt: string;
+            readonly data: {
+                /** Format: int64 */
+                readonly columnId: number;
+                readonly value: Record<string, never>;
+            } | null;
         };
         readonly Row: {
             /** Format: int64 */
@@ -4781,940 +4767,6 @@ export interface operations {
             };
         };
     };
-    readonly "api_columns-index": {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header: {
-                /** @description Required to be true for the API request to pass */
-                readonly "OCS-APIRequest": boolean;
-            };
-            readonly path: {
-                /** @description Node type */
-                readonly nodeType: "table" | "view";
-                /** @description Node ID */
-                readonly nodeId: number;
-            };
-            readonly cookie?: never;
-        };
-        readonly requestBody?: never;
-        readonly responses: {
-            /** @description View deleted */
-            readonly 200: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: readonly components["schemas"]["Column"][];
-                        };
-                    };
-                };
-            };
-            /** @description Current user is not logged in */
-            readonly 401: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: unknown;
-                        };
-                    };
-                };
-            };
-            /** @description No permissions */
-            readonly 403: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                };
-            };
-            /** @description Not found */
-            readonly 404: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                };
-            };
-            readonly 500: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                };
-            };
-        };
-    };
-    readonly "api_columns-show": {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header: {
-                /** @description Required to be true for the API request to pass */
-                readonly "OCS-APIRequest": boolean;
-            };
-            readonly path: {
-                /** @description Column ID */
-                readonly id: number;
-            };
-            readonly cookie?: never;
-        };
-        readonly requestBody?: never;
-        readonly responses: {
-            /** @description Column returned */
-            readonly 200: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: components["schemas"]["Column"];
-                        };
-                    };
-                };
-            };
-            /** @description Current user is not logged in */
-            readonly 401: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: unknown;
-                        };
-                    };
-                };
-            };
-            /** @description No permissions */
-            readonly 403: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                };
-            };
-            /** @description Not found */
-            readonly 404: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                };
-            };
-            readonly 500: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                };
-            };
-        };
-    };
-    readonly "api_columns-create-number-column": {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header: {
-                /** @description Required to be true for the API request to pass */
-                readonly "OCS-APIRequest": boolean;
-            };
-            readonly path?: never;
-            readonly cookie?: never;
-        };
-        readonly requestBody: {
-            readonly content: {
-                readonly "application/json": {
-                    /**
-                     * Format: int64
-                     * @description Context of the column creation
-                     */
-                    readonly baseNodeId: number;
-                    /** @description Title */
-                    readonly title: string;
-                    /**
-                     * Format: double
-                     * @description Default value for new rows
-                     */
-                    readonly numberDefault?: number | null;
-                    /**
-                     * Format: int64
-                     * @description Decimals
-                     */
-                    readonly numberDecimals?: number | null;
-                    /** @description Prefix */
-                    readonly numberPrefix?: string | null;
-                    /** @description Suffix */
-                    readonly numberSuffix?: string | null;
-                    /**
-                     * Format: double
-                     * @description Min
-                     */
-                    readonly numberMin?: number | null;
-                    /**
-                     * Format: double
-                     * @description Max
-                     */
-                    readonly numberMax?: number | null;
-                    /**
-                     * @description Subtype for the new column
-                     * @default null
-                     * @enum {string|null}
-                     */
-                    readonly subtype?: "progress" | "stars" | null;
-                    /**
-                     * @description Description
-                     * @default null
-                     */
-                    readonly description?: string | null;
-                    /**
-                     * @description View IDs where this columns should be added
-                     * @default []
-                     */
-                    readonly selectedViewIds?: readonly number[] | null;
-                    /**
-                     * @description Is mandatory
-                     * @default false
-                     */
-                    readonly mandatory?: boolean;
-                    /**
-                     * @description Context type of the column creation
-                     * @default table
-                     * @enum {string}
-                     */
-                    readonly baseNodeType?: "table" | "view";
-                    /**
-                     * @description Custom settings for the column
-                     * @default {}
-                     */
-                    readonly customSettings?: {
-                        readonly [key: string]: Record<string, never>;
-                    };
-                };
-            };
-        };
-        readonly responses: {
-            /** @description Column created */
-            readonly 200: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: components["schemas"]["Column"];
-                        };
-                    };
-                };
-            };
-            /** @description Current user is not logged in */
-            readonly 401: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: unknown;
-                        };
-                    };
-                };
-            };
-            /** @description No permission */
-            readonly 403: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                };
-            };
-            /** @description Not found */
-            readonly 404: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                };
-            };
-            readonly 500: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                    readonly "text/plain": string;
-                };
-            };
-        };
-    };
-    readonly "api_columns-create-text-column": {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header: {
-                /** @description Required to be true for the API request to pass */
-                readonly "OCS-APIRequest": boolean;
-            };
-            readonly path?: never;
-            readonly cookie?: never;
-        };
-        readonly requestBody: {
-            readonly content: {
-                readonly "application/json": {
-                    /**
-                     * Format: int64
-                     * @description Context of the column creation
-                     */
-                    readonly baseNodeId: number;
-                    /** @description Title */
-                    readonly title: string;
-                    /** @description Default */
-                    readonly textDefault?: string | null;
-                    /** @description Allowed regex pattern */
-                    readonly textAllowedPattern?: string | null;
-                    /**
-                     * Format: int64
-                     * @description Max raw text length
-                     */
-                    readonly textMaxLength?: number | null;
-                    /**
-                     * @description Whether the text value must be unique, if column is a text
-                     * @default false
-                     */
-                    readonly textUnique?: boolean | null;
-                    /**
-                     * @description Subtype for the new column
-                     * @default null
-                     * @enum {string|null}
-                     */
-                    readonly subtype?: "progress" | "stars" | null;
-                    /**
-                     * @description Description
-                     * @default null
-                     */
-                    readonly description?: string | null;
-                    /**
-                     * @description View IDs where this columns should be added
-                     * @default []
-                     */
-                    readonly selectedViewIds?: readonly number[] | null;
-                    /**
-                     * @description Is mandatory
-                     * @default false
-                     */
-                    readonly mandatory?: boolean;
-                    /**
-                     * @description Context type of the column creation
-                     * @default table
-                     * @enum {string}
-                     */
-                    readonly baseNodeType?: "table" | "view";
-                    /**
-                     * @description Custom settings for the column
-                     * @default {}
-                     */
-                    readonly customSettings?: {
-                        readonly [key: string]: Record<string, never>;
-                    };
-                };
-            };
-        };
-        readonly responses: {
-            /** @description Column created */
-            readonly 200: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: components["schemas"]["Column"];
-                        };
-                    };
-                };
-            };
-            /** @description Current user is not logged in */
-            readonly 401: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: unknown;
-                        };
-                    };
-                };
-            };
-            /** @description No permission */
-            readonly 403: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                };
-            };
-            /** @description Not found */
-            readonly 404: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                };
-            };
-            readonly 500: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                    readonly "text/plain": string;
-                };
-            };
-        };
-    };
-    readonly "api_columns-create-selection-column": {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header: {
-                /** @description Required to be true for the API request to pass */
-                readonly "OCS-APIRequest": boolean;
-            };
-            readonly path?: never;
-            readonly cookie?: never;
-        };
-        readonly requestBody: {
-            readonly content: {
-                readonly "application/json": {
-                    /**
-                     * Format: int64
-                     * @description Context of the column creation
-                     */
-                    readonly baseNodeId: number;
-                    /** @description Title */
-                    readonly title: string;
-                    /** @description Json array{id: int, label: string} with options that can be selected, eg [{"id": 1, "label": "first"},{"id": 2, "label": "second"}] */
-                    readonly selectionOptions: string;
-                    /** @description Json int|list<int> for default selected option(s), eg 5 or ["1", "8"] */
-                    readonly selectionDefault?: string | null;
-                    /**
-                     * @description Subtype for the new column
-                     * @default null
-                     * @enum {string|null}
-                     */
-                    readonly subtype?: "progress" | "stars" | null;
-                    /**
-                     * @description Description
-                     * @default null
-                     */
-                    readonly description?: string | null;
-                    /**
-                     * @description View IDs where this columns should be added
-                     * @default []
-                     */
-                    readonly selectedViewIds?: readonly number[] | null;
-                    /**
-                     * @description Is mandatory
-                     * @default false
-                     */
-                    readonly mandatory?: boolean;
-                    /**
-                     * @description Context type of the column creation
-                     * @default table
-                     * @enum {string}
-                     */
-                    readonly baseNodeType?: "table" | "view";
-                    /**
-                     * @description Custom settings for the column
-                     * @default {}
-                     */
-                    readonly customSettings?: {
-                        readonly [key: string]: Record<string, never>;
-                    };
-                };
-            };
-        };
-        readonly responses: {
-            /** @description Column created */
-            readonly 200: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: components["schemas"]["Column"];
-                        };
-                    };
-                };
-            };
-            /** @description Current user is not logged in */
-            readonly 401: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: unknown;
-                        };
-                    };
-                };
-            };
-            /** @description No permission */
-            readonly 403: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                };
-            };
-            /** @description Not found */
-            readonly 404: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                };
-            };
-            readonly 500: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                    readonly "text/plain": string;
-                };
-            };
-        };
-    };
-    readonly "api_columns-create-datetime-column": {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header: {
-                /** @description Required to be true for the API request to pass */
-                readonly "OCS-APIRequest": boolean;
-            };
-            readonly path?: never;
-            readonly cookie?: never;
-        };
-        readonly requestBody: {
-            readonly content: {
-                readonly "application/json": {
-                    /**
-                     * Format: int64
-                     * @description Context of the column creation
-                     */
-                    readonly baseNodeId: number;
-                    /** @description Title */
-                    readonly title: string;
-                    /**
-                     * @description For a subtype 'date' you can set 'today'. For a main type or subtype 'time' you can set to 'now'.
-                     * @enum {string|null}
-                     */
-                    readonly datetimeDefault?: "today" | "now" | null;
-                    /**
-                     * @description Subtype for the new column
-                     * @default null
-                     * @enum {string|null}
-                     */
-                    readonly subtype?: "progress" | "stars" | null;
-                    /**
-                     * @description Description
-                     * @default null
-                     */
-                    readonly description?: string | null;
-                    /**
-                     * @description View IDs where this columns should be added
-                     * @default []
-                     */
-                    readonly selectedViewIds?: readonly number[] | null;
-                    /**
-                     * @description Is mandatory
-                     * @default false
-                     */
-                    readonly mandatory?: boolean;
-                    /**
-                     * @description Context type of the column creation
-                     * @default table
-                     * @enum {string}
-                     */
-                    readonly baseNodeType?: "table" | "view";
-                    /**
-                     * @description Custom settings for the column
-                     * @default {}
-                     */
-                    readonly customSettings?: {
-                        readonly [key: string]: Record<string, never>;
-                    };
-                };
-            };
-        };
-        readonly responses: {
-            /** @description Column created */
-            readonly 200: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: components["schemas"]["Column"];
-                        };
-                    };
-                };
-            };
-            /** @description Current user is not logged in */
-            readonly 401: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: unknown;
-                        };
-                    };
-                };
-            };
-            /** @description No permission */
-            readonly 403: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                };
-            };
-            /** @description Not found */
-            readonly 404: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                };
-            };
-            readonly 500: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                    readonly "text/plain": string;
-                };
-            };
-        };
-    };
-    readonly "api_columns-create-usergroup-column": {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header: {
-                /** @description Required to be true for the API request to pass */
-                readonly "OCS-APIRequest": boolean;
-            };
-            readonly path?: never;
-            readonly cookie?: never;
-        };
-        readonly requestBody: {
-            readonly content: {
-                readonly "application/json": {
-                    /**
-                     * Format: int64
-                     * @description Context of the column creation
-                     */
-                    readonly baseNodeId: number;
-                    /** @description Title */
-                    readonly title: string;
-                    /** @description Json array{id: string, type: int}, eg [{"id": "admin", "type": 0}, {"id": "user1", "type": 0}] */
-                    readonly usergroupDefault?: string | null;
-                    /**
-                     * @description Whether you can select multiple users or/and groups
-                     * @default null
-                     */
-                    readonly usergroupMultipleItems?: boolean;
-                    /**
-                     * @description Whether you can select users
-                     * @default null
-                     */
-                    readonly usergroupSelectUsers?: boolean;
-                    /**
-                     * @description Whether you can select groups
-                     * @default null
-                     */
-                    readonly usergroupSelectGroups?: boolean;
-                    /**
-                     * @description Whether you can select teams
-                     * @default null
-                     */
-                    readonly usergroupSelectTeams?: boolean;
-                    /**
-                     * @description Whether to show the user's status
-                     * @default null
-                     */
-                    readonly showUserStatus?: boolean;
-                    /**
-                     * @description Description
-                     * @default null
-                     */
-                    readonly description?: string | null;
-                    /**
-                     * @description View IDs where this columns should be added
-                     * @default []
-                     */
-                    readonly selectedViewIds?: readonly number[] | null;
-                    /**
-                     * @description Is mandatory
-                     * @default false
-                     */
-                    readonly mandatory?: boolean;
-                    /**
-                     * @description Context type of the column creation
-                     * @default table
-                     * @enum {string}
-                     */
-                    readonly baseNodeType?: "table" | "view";
-                    /**
-                     * @description Custom settings for the column
-                     * @default {}
-                     */
-                    readonly customSettings?: {
-                        readonly [key: string]: Record<string, never>;
-                    };
-                };
-            };
-        };
-        readonly responses: {
-            /** @description Column created */
-            readonly 200: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: components["schemas"]["Column"];
-                        };
-                    };
-                };
-            };
-            /** @description Current user is not logged in */
-            readonly 401: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: unknown;
-                        };
-                    };
-                };
-            };
-            /** @description No permission */
-            readonly 403: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                };
-            };
-            /** @description Not found */
-            readonly 404: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                };
-            };
-            readonly 500: {
-                headers: {
-                    readonly [name: string]: unknown;
-                };
-                content: {
-                    readonly "application/json": {
-                        readonly ocs: {
-                            readonly meta: components["schemas"]["OCSMeta"];
-                            readonly data: {
-                                readonly message: string;
-                            };
-                        };
-                    };
-                    readonly "text/plain": string;
-                };
-            };
-        };
-    };
     readonly "api_favorite-create": {
         readonly parameters: {
             readonly query?: never;
@@ -6636,6 +5688,297 @@ export interface operations {
                         readonly ocs: {
                             readonly meta: components["schemas"]["OCSMeta"];
                             readonly data: components["schemas"]["Row"];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid request parameters */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Internal error */
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "api_public_columns-index-by-public-link": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description The share token */
+                readonly token: string;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Columns are returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": readonly components["schemas"]["PublicColumn"][];
+                };
+            };
+            /** @description Invalid request parameters */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Internal error */
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "public_rowocs-get-rows": {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Optional: maximum number of results, capped at 500 */
+                readonly limit?: number | null;
+                /** @description Optional: the offset for this operation */
+                readonly offset?: number | null;
+            };
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description The share token */
+                readonly token: string;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Rows are returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: readonly components["schemas"]["PublicRow"][];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid request parameters */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Internal error */
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "shareocs-create-link-share": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description Indicates whether to create a row on a table or view */
+                readonly nodeCollection: "tables" | "views";
+                /** @description The identifier of the targeted table or view */
+                readonly nodeId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * @description (Optional) A password to protect the link share with
+                     * @default null
+                     */
+                    readonly password?: string | null;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Link share created */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["LinkShare"];
                         };
                     };
                 };
