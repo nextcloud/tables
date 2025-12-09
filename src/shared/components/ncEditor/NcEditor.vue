@@ -63,6 +63,9 @@ export default {
 			textAppAvailable: !!window.OCA?.Text?.createEditor,
 			editor: null,
 			localValue: '',
+			observer: null,
+			initialized: false,
+			idleHandle: null,
 		}
 	},
 
@@ -96,16 +99,56 @@ export default {
 
 	async mounted() {
 		this.localValue = this.text
-		await this.setupEditor()
-		this.editor?.setContent(this.localValue, false)
+		// Lazy initialize the editor:
+		// 1) When the component becomes visible (IntersectionObserver)
+		// 2) Or when the browser is idle (requestIdleCallback fallback)
+		this.setupLazyInitialization()
 	},
 
 	beforeDestroy() {
-		this?.editor?.destroy()
+		this?.observer?.disconnect?.()
+		if (this.idleHandle && typeof cancelIdleCallback === 'function') {
+			cancelIdleCallback(this.idleHandle)
+		}
+		this?.editor?.destroy?.()
 	},
 
 	methods: {
 		t,
+		setupLazyInitialization() {
+			if (this.initialized) return
+
+			// Prefer initializing when the editor wrapper enters the viewport
+			if ('IntersectionObserver' in window) {
+				this.observer = new IntersectionObserver((entries) => {
+					for (const entry of entries) {
+						if (entry.isIntersecting && !this.initialized) {
+							this.initialized = true
+							this.setupEditor().then(() => {
+								this.editor?.setContent(this.localValue, false)
+							})
+							this.observer?.disconnect?.()
+							break
+						}
+					}
+				}, { rootMargin: '200px' })
+				this.$nextTick(() => {
+					const el = this.$el
+					if (el) this.observer.observe(el)
+				})
+			} else {
+				// Fallback: schedule during idle time to avoid blocking
+				const idle = window.requestIdleCallback || ((cb) => setTimeout(() => cb({ timeRemaining: () => 0 }), 50))
+				const cancel = window.cancelIdleCallback || clearTimeout
+				this.idleHandle = idle(() => {
+					if (this.initialized) return
+					this.initialized = true
+					this.setupEditor().then(() => {
+						this.editor?.setContent(this.localValue, false)
+					})
+				})
+			}
+		},
 		async setupEditor() {
 			this?.editor?.destroy()
 			if (this.textAppAvailable) {
