@@ -12,6 +12,7 @@ use OCA\Circles\Model\Circle;
 use OCA\Circles\Model\Member;
 use OCA\Circles\Model\Probes\CircleProbe;
 use OCP\App\IAppManager;
+use OCP\IL10N;
 use OCP\Server;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -29,6 +30,7 @@ class CircleHelper {
 	public function __construct(
 		private LoggerInterface $logger,
 		IAppManager $appManager,
+		private IL10N $l10n,
 	) {
 		$this->circlesEnabled = $appManager->isEnabledForUser('circles');
 		$this->circlesManager = null;
@@ -59,6 +61,10 @@ class CircleHelper {
 			$circle = $this->circlesManager->getCircle($circleId);
 			return $circle ? ($circle->getDisplayName() ?: $circleId) : $circleId;
 		} catch (Throwable $e) {
+			if ($e->getCode() === 404) {
+				return $this->l10n->t('Deleted circle %s.', [$circleId]);
+			}
+
 			$this->logger->warning('Failed to get circle display name: ' . $e->getMessage(), [
 				'circleId' => $circleId,
 				'userId' => $userId
