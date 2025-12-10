@@ -11,6 +11,8 @@ OC.L10N.register(
     "{user} has updated the description of table {table} to {after}" : "{user}, {table} tablosunun açıklamasını {after} olarak güncelledi",
     "You have created a new row {row} in table {table}" : "{table} tablosuna yeni {row} satırını eklediniz",
     "{user} has created a new row {row} in table {table}" : "{user}, {table} tablosuna yeni {row} satırını ekledi",
+    "_You have updated cell %1$s on row {row} in table {table}_::_You have updated cells %1$s on row {row} in table {table}_" : ["{table} tablosunda {row} satırında %1$s hücreyi güncellediniz","{table} tablosunda {row} satırında %1$s hücreyi güncellediniz"],
+    "_{user} has updated cell %1$s on row {row} in table {table}_::_{user} has updated cells %1$s on row {row} in table {table}_" : ["{user} kullanıcısı {table} tablosunda {row} satırında %1$s hücreyi güncelledi","{user} kullanıcısı {table} tablosunda {row} satırında %1$s hücreyi güncelledi"],
     "You have deleted the row {row} in table {table}" : "{table} tablosundaki {row} satırını sildiniz",
     "{user} has deleted the row {row} in table {table}" : "{user}, {table} tablosundaki {row} satırını sildi",
     "Tables" : "Tablolar",
