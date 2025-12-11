@@ -288,7 +288,7 @@ Cypress.Commands.add('createSelectionMultiColumn', (title, options, defaultOptio
 	cy.get('.custom-table table tr th .cell').contains(title).should('exist')
 })
 
-Cypress.Commands.add('createTextLineColumn', (title, defaultValue, maxLength, isFirstColumn) => {
+Cypress.Commands.add('createTextLineColumn', (title, defaultValue, maxLength, isFirstColumn, isUnique = false) => {
 	cy.openCreateColumnModal(isFirstColumn)
 	cy.get('[data-cy="columnTypeFormInput"]').clear().type(title)
 	if (defaultValue) {
@@ -296,6 +296,9 @@ Cypress.Commands.add('createTextLineColumn', (title, defaultValue, maxLength, is
 	}
 	if (maxLength) {
 		cy.get('[data-cy="TextLineForm"] input').eq(1).type(maxLength)
+	}
+	if (isUnique) {
+		cy.get('[data-cy="textLineUniqueSwitch"] input[type="checkbox"]').check({ force: true })
 	}
 	cy.get('.modal-container button').contains('Save').click()
 	cy.wait(10).get('.toastify.toast-success').should('be.visible')
@@ -499,6 +502,83 @@ Cypress.Commands.add('removeColumn', (title) => {
 	cy.get('.custom-table table tr th .cell').contains(title).click()
 	cy.get('[data-cy="deleteColumnActionBtn"] button').click()
 	cy.get('[data-cy="confirmDialog"] button').contains('Confirm').click()
+})
+
+Cypress.Commands.add('createTestRow', (tableName, rowData) => {
+	cy.loadTable(tableName)
+	cy.get('[data-cy="createRowBtn"]').click({ force: true })
+	
+	if (rowData.text) {
+		cy.get('[data-cy="createRowModal"] .slot input').first().type(rowData.text)
+	}
+	
+	if (rowData.description) {
+		cy.get('[data-cy="createRowModal"] .ProseMirror').first().click()
+		cy.get('[data-cy="createRowModal"] .ProseMirror').first().clear()
+		cy.get('[data-cy="createRowModal"] .ProseMirror').first().type(rowData.description)
+	}
+	
+	if (rowData.stars) {
+		for (let i = 0; i < rowData.stars; i++) {
+			cy.get('[data-cy="createRowModal"] [aria-label="Increase stars"]').click()
+		}
+	}
+	
+	cy.get('[data-cy="createRowSaveButton"]').click()
+	cy.get('[data-cy="createRowModal"]').should('not.exist')
+	
+	if (rowData.text) {
+		cy.get('[data-cy="ncTable"] table').contains(rowData.text).should('exist')
+	}
+})
+
+Cypress.Commands.add('editRowInline', (originalText, newText) => {
+	cy.get('[data-cy="ncTable"] [data-cy="customTableRow"]')
+		.contains(originalText)
+		.click()
+	
+	cy.get('[data-cy="ncTable"] [data-cy="customTableRow"] .cell-input input').click()
+	cy.get('.cell-input input').should('be.visible')
+	cy.get('.cell-input input').should('have.focus')
+	cy.get('.cell-input input').clear().type(`${newText}{enter}`)
+	
+	cy.get('.icon-loading-small').should('not.exist')
+	cy.get('[data-cy="ncTable"] table').contains(newText).should('exist')
+	cy.get('[data-cy="ncTable"] table').contains(originalText).should('not.exist')
+})
+
+Cypress.Commands.add('deleteRowByText', (rowText) => {
+	cy.get('[data-cy="ncTable"] [data-cy="customTableRow"]').contains(rowText).closest('[data-cy="customTableRow"]').within(() => {
+		cy.get('[data-cy="tableRowActions"]').click()
+	})
+	cy.get('[data-cy="deleteRowBtn"]').click()
+	cy.get('[data-cy="deleteRowsConfirmation"] button').contains('Confirm').click()
+	cy.get('.icon-loading').should('not.exist')
+	cy.get('[data-cy="ncTable"] table').contains(rowText).should('not.exist')
+})
+
+Cypress.Commands.add('duplicateRowByText', (rowText) => {
+	cy.get('[data-cy="ncTable"] [data-cy="customTableRow"]').contains(rowText).closest('[data-cy="customTableRow"]').within(() => {
+		cy.get('[data-cy="tableRowActions"]').click()
+	})
+	cy.get('[data-cy="duplicateRowBtn"]').click()
+	cy.get('.icon-loading').should('not.exist')
+})
+
+Cypress.Commands.add('cleanupTestTables', () => {
+	const testTableNames = [
+		'to do list',
+		'Unique Test Table',
+		'Test Table'
+	]
+	
+	testTableNames.forEach(tableName => {
+		cy.get('body').then($body => {
+			if ($body.find(`[data-cy="navigationTableItem"]:contains("${tableName}")`).length > 0) {
+				cy.deleteTable(tableName)
+			}
+		})
+	})
 })
 
 // fill in a value in the 'create row' or 'edit row' model

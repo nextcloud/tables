@@ -46,7 +46,7 @@
 					{{ t('tables', 'Unique value') }}
 				</div>
 				<div class="fix-col-4 margin-bottom">
-					<NcCheckboxRadioSwitch type="switch" :checked.sync="mutableColumn.textUnique" />
+					<NcCheckboxRadioSwitch type="switch" :checked.sync="mutableColumn.textUnique" data-cy="textLineUniqueSwitch" />
 				</div>
 			</div>
 		</div>
