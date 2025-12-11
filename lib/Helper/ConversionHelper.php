@@ -9,6 +9,8 @@ namespace OCA\Tables\Helper;
 
 use InvalidArgumentException;
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Db\Table;
+use OCA\Tables\Db\View;
 
 class ConversionHelper {
 
@@ -32,5 +34,12 @@ class ConversionHelper {
 			'view', 'views' => Application::NODE_TYPE_VIEW,
 			default => throw new InvalidArgumentException('Invalid node type'),
 		};
+	}
+
+	public static function object2String(Table|View $node): string {
+		if ($node instanceof Table) {
+			return 'table';
+		}
+		return 'view';
 	}
 }

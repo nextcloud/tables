@@ -842,6 +842,23 @@ export type paths = {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/ocs/v2.php/apps/tables/api/2/{nodeCollection}/{nodeId}/share": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /** [api v2] Create a new link share of a table or view */
+        readonly post: operations["shareocs-create-link-share"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
 };
 export type webhooks = Record<string, never>;
 export type components = {
@@ -947,6 +964,10 @@ export type components = {
         readonly Index: {
             readonly tables: readonly components["schemas"]["Table"][];
             readonly views: readonly components["schemas"]["View"][];
+        };
+        readonly LinkShare: {
+            readonly shareToken: string;
+            readonly url: string;
         };
         readonly OCSMeta: {
             readonly status: string;
@@ -6636,6 +6657,127 @@ export interface operations {
                         readonly ocs: {
                             readonly meta: components["schemas"]["OCSMeta"];
                             readonly data: components["schemas"]["Row"];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid request parameters */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Internal error */
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: {
+                                readonly message: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    readonly "shareocs-create-link-share": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required to be true for the API request to pass */
+                readonly "OCS-APIRequest": boolean;
+            };
+            readonly path: {
+                /** @description Indicates whether to create a row on a table or view */
+                readonly nodeCollection: "tables" | "views";
+                /** @description The identifier of the targeted table or view */
+                readonly nodeId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: {
+            readonly content: {
+                readonly "application/json": {
+                    /**
+                     * @description (Optional) A password to protect the link share with
+                     * @default null
+                     */
+                    readonly password?: string | null;
+                };
+            };
+        };
+        readonly responses: {
+            /** @description Link share created */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly ocs: {
+                            readonly meta: components["schemas"]["OCSMeta"];
+                            readonly data: components["schemas"]["LinkShare"];
                         };
                     };
                 };
