@@ -31,7 +31,7 @@ jobs:
       fail-fast: false
       matrix:
         databases: [ 'mysql' ]
-        server-versions: [ 'stable30', 'stable31', 'stable32', 'master' ]
+        server-versions: [ 'stable31', 'stable32', 'master' ]
         include:
           - php-versions: 8.2
 
