@@ -38,6 +38,7 @@ OC.L10N.register(
     "Could not write file to disk" : "無法將檔案寫入磁碟",
     "A PHP extension stopped the file upload" : "某個 PHP 擴充功能終止檔案的上傳",
     "No file uploaded or file size exceeds maximum of %s" : "沒有上傳檔案或檔案大小超過 %s 的最大值",
+    "Deleted circle %s." : "已刪除社交圈子 %s。",
     "Nextcloud tables" : "Nextcloud 數據庫表",
     "_%n row_::_%n rows_" : ["%n 列"],
     "table" : "表",

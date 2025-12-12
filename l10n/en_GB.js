@@ -38,6 +38,7 @@ OC.L10N.register(
     "Could not write file to disk" : "Could not write file to disk",
     "A PHP extension stopped the file upload" : "A PHP extension stopped the file upload",
     "No file uploaded or file size exceeds maximum of %s" : "No file uploaded or file size exceeds maximum of %s",
+    "Deleted circle %s." : "Deleted circle %s.",
     "Nextcloud tables" : "Nextcloud tables",
     "_%n row_::_%n rows_" : ["%n row","%n rows"],
     "table" : "table",

@@ -36,6 +36,7 @@
     "Could not write file to disk" : "Dosya diske yazılamadı",
     "A PHP extension stopped the file upload" : "Bir PHP eklentisi dosyanın yüklenmesini engelledi",
     "No file uploaded or file size exceeds maximum of %s" : "Herhangi bir dosya yüklenmedi ya da %s olan en büyük dosya boyutu sınırı aşıldı",
+    "Deleted circle %s." : "%s çevresi silindi.",
     "Nextcloud tables" : "Nextcloud tabloları",
     "_%n row_::_%n rows_" : ["%n satır","%n satır"],
     "table" : "tablo",
