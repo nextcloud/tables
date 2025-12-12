@@ -5,6 +5,22 @@
 
 # Changelog
 
+## 0.9.7
+
+### Dependencies
+
+* [Fix\(deps\): update tiptap to ^3.10.7 \(stable0.9\) (tables#2078)](https://github.com/nextcloud/tables/pull/2078)
+* [Fix\(deps\): update dependency @nextcloud/auth to ^2.5.3 \(stable0.9\) (tables#2196)](https://github.com/nextcloud/tables/pull/2196)
+* [Fix\(deps\): update dependency @nextcloud/capabilities to ^1.2.1 \(stable0.9\) (tables#2197)](https://github.com/nextcloud/tables/pull/2197)
+* [Fix\(deps\): update dependency @nextcloud/event\-bus to ^3.3.3 \(stable0.9\) \- autoclosed (tables#2201)](https://github.com/nextcloud/tables/pull/2201)
+* [Fix\(deps\): update dependency @nextcloud/l10n to ^3.4.1 \(stable0.9\) (tables#2202)](https://github.com/nextcloud/tables/pull/2202)
+* [Fix\(deps\): update dependency @nextcloud/dialogs to ^6.4.1 \(stable0.9\) \- autoclosed (tables#2207)](https://github.com/nextcloud/tables/pull/2207)
+* [Fix\(deps\): update dependency @nextcloud/router to ^3.1.0 \(stable0.9\) (tables#2208)](https://github.com/nextcloud/tables/pull/2208)
+
+### Other
+
+* [\[stable0.9\] refactor: remove unnecessary parameter \(plus cleanup\) (tables#2187)](https://github.com/nextcloud/tables/pull/2187)
+
 ## 0.9.6
 
 ### Fixed
