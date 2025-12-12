@@ -5,6 +5,34 @@
 
 # Changelog
 
+## 1.0.2
+
+### Fixed
+
+* [Fix: Properly filter empty text values (tables#2161)](https://github.com/nextcloud/tables/pull/2161)
+* [Fix\(Import\): take columnSettings into account when importing schema (tables#2176)](https://github.com/nextcloud/tables/pull/2176)
+* [Enhancement: Reduce logs for non\-existent circles (tables#2209)](https://github.com/nextcloud/tables/pull/2209)
+
+### Other
+
+* [Refactor: remove unnecessary parameter \(plus cleanup\) (tables#2186)](https://github.com/nextcloud/tables/pull/2186)
+* Do not claim NC 33 support anymore
+
+### Dependencies
+
+* [Fix\(deps\): update dependency @nextcloud/axios to ^2.5.2 \(main\) (tables#2071)](https://github.com/nextcloud/tables/pull/2071)
+* [Fix\(deps\): update dependency dompurify to ^3.3.0 \(main\) (tables#2121)](https://github.com/nextcloud/tables/pull/2121)
+* [\[main\] Fix npm audit (tables#2144)](https://github.com/nextcloud/tables/pull/2144)
+* [Fix\(deps\): update dependency @nextcloud/capabilities to ^1.2.1 \(main\) (tables#2164)](https://github.com/nextcloud/tables/pull/2164)
+* [Fix\(deps\): update dependency @nextcloud/event\-bus to ^3.3.3 \(main\) (tables#2165)](https://github.com/nextcloud/tables/pull/2165)
+* [Fix\(deps\): update dependency @nextcloud/l10n to ^3.4.1 \(main\) (tables#2166)](https://github.com/nextcloud/tables/pull/2166)
+* [\[main\] Fix npm audit (tables#2172)](https://github.com/nextcloud/tables/pull/2172)
+* [Deps\(PHP\): update composer bin plugin to 1.8.3 (tables#2175)](https://github.com/nextcloud/tables/pull/2175)
+* [Fix\(deps\): update dependency @nextcloud/router to ^3.1.0 \(main\) (tables#2179)](https://github.com/nextcloud/tables/pull/2179)
+* [Fix\(deps\): update tiptap to ^3.13.0 \(main\) (tables#2189)](https://github.com/nextcloud/tables/pull/2189)
+* [Fix\(deps\): update dependency debounce to v3 \(main\) (tables#2192)](https://github.com/nextcloud/tables/pull/2192)
+* [\[main\] Fix npm audit (tables#2199)](https://github.com/nextcloud/tables/pull/2199)
+
 ## 1.0.1
 
 ### Added

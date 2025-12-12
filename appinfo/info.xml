@@ -26,7 +26,7 @@ Share your tables and views with users and groups within your cloud.
 Have a good time and manage whatever you want.
 
 ]]></description>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<licence>agpl</licence>
 	<author mail="florian.steffens@nextcloud.com">Florian Steffens</author>
 	<namespace>Tables</namespace>
@@ -48,7 +48,7 @@ Have a good time and manage whatever you want.
 		<database>pgsql</database>
 		<database>mysql</database>
 		<database>sqlite</database>
-		<nextcloud min-version="30" max-version="33"/>
+		<nextcloud min-version="30" max-version="32"/>
 	</dependencies>
 	<repair-steps>
 		<pre-migration>
