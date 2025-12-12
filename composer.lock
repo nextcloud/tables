@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1396e38d088254c0c4308c4c46f8038d",
+    "content-hash": "34c8ce04cebd8985e91b4146b24f6f77",
     "packages": [
         {
             "name": "bamarni/composer-bin-plugin",
@@ -874,29 +874,29 @@
         },
         {
             "name": "nextcloud/ocp",
-            "version": "dev-stable30",
+            "version": "dev-stable31",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nextcloud-deps/ocp.git",
-                "reference": "d93fc10fea3db4b4896e37db312fae685cff54c4"
+                "reference": "6936f710b025679d886371461ef1cfb8026eaf6d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/d93fc10fea3db4b4896e37db312fae685cff54c4",
-                "reference": "d93fc10fea3db4b4896e37db312fae685cff54c4",
+                "url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/6936f710b025679d886371461ef1cfb8026eaf6d",
+                "reference": "6936f710b025679d886371461ef1cfb8026eaf6d",
                 "shasum": ""
             },
             "require": {
-                "php": "~8.0 || ~8.1 || ~8.2 || ~8.3",
+                "php": "~8.1 || ~8.2 || ~8.3 || ~8.4",
                 "psr/clock": "^1.0",
                 "psr/container": "^2.0.2",
                 "psr/event-dispatcher": "^1.0",
-                "psr/log": "^2.0.0"
+                "psr/log": "^3.0.2"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-stable30": "30.0.0-dev"
+                    "dev-stable31": "31.0.0-dev"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -907,12 +907,16 @@
                 {
                     "name": "Christoph Wurst",
                     "email": "christoph@winzerhof-wurst.at"
+                },
+                {
+                    "name": "Joas Schilling",
+                    "email": "coding@schilljs.com"
                 }
             ],
-            "description": "Composer package containing Nextcloud's public API (classes, interfaces)",
+            "description": "Composer package containing Nextcloud's public OCP API and the unstable NCU API",
             "support": {
                 "issues": "https://github.com/nextcloud-deps/ocp/issues",
-                "source": "https://github.com/nextcloud-deps/ocp/tree/stable30"
+                "source": "https://github.com/nextcloud-deps/ocp/tree/stable31"
             },
             "time": "2025-12-02T00:53:40+00:00"
         },
@@ -1762,16 +1766,16 @@
         },
         {
             "name": "psr/log",
-            "version": "2.0.0",
+            "version": "3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "ef29f6d262798707a9edd554e2b82517ef3a9376"
+                "reference": "f16e1d5863e37f8d8c2a01719f5b34baa2b714d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/ef29f6d262798707a9edd554e2b82517ef3a9376",
-                "reference": "ef29f6d262798707a9edd554e2b82517ef3a9376",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/f16e1d5863e37f8d8c2a01719f5b34baa2b714d3",
+                "reference": "f16e1d5863e37f8d8c2a01719f5b34baa2b714d3",
                 "shasum": ""
             },
             "require": {
@@ -1780,7 +1784,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.0.x-dev"
+                    "dev-master": "3.x-dev"
                 }
             },
             "autoload": {
@@ -1806,9 +1810,9 @@
                 "psr-3"
             ],
             "support": {
-                "source": "https://github.com/php-fig/log/tree/2.0.0"
+                "source": "https://github.com/php-fig/log/tree/3.0.2"
             },
-            "time": "2021-07-14T16:41:46+00:00"
+            "time": "2024-09-11T13:17:53+00:00"
         },
         {
             "name": "sebastian/cli-parser",
