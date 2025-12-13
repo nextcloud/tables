@@ -38,6 +38,7 @@ OC.L10N.register(
     "Could not write file to disk" : "Níorbh fhéidir an comhad a scríobh ar an diosca",
     "A PHP extension stopped the file upload" : "Chuir síneadh PHP stop le huaslódáil an chomhaid",
     "No file uploaded or file size exceeds maximum of %s" : "Níl aon chomhad uaslódáilte nó méid comhaid níos mó ná uasmhéid%s",
+    "Deleted circle %s." : "Scriosadh an ciorcal %s.",
     "Nextcloud tables" : "Táblaí Nextcloud",
     "_%n row_::_%n rows_" : ["%n ró","%n rónna","%n rónna","%n rónna","%n rónna"],
     "table" : "tábla",
