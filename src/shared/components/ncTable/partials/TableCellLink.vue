@@ -212,6 +212,10 @@ export default {
 		t,
 
 		handleStartEditing(event) {
+			if (event && (event.ctrlKey || event.metaKey)) {
+				return
+			}
+
 			this.isInitialEditClick = true
 			this.startEditing()
 			if (event) {
