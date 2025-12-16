@@ -38,6 +38,7 @@ OC.L10N.register(
     "Could not write file to disk" : "Não foi possível gravar o arquivo no disco",
     "A PHP extension stopped the file upload" : "Uma extensão PHP interrompeu o upload do arquivo",
     "No file uploaded or file size exceeds maximum of %s" : "Ou nenhum arquivo foi carregado ou o tamanho do arquivo excede o máximo de %s",
+    "Deleted circle %s." : "Círculo %s excluído.",
     "Nextcloud tables" : "Nextcloud Tabelas",
     "_%n row_::_%n rows_" : ["%n linha","%n linhas","%n linhas"],
     "table" : "tabela",
