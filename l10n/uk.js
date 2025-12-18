@@ -413,7 +413,7 @@ OC.L10N.register(
     "Promote to table manager" : "Зробити адміністратором таблиці",
     "Demote to normal share" : "Понизити до нормального спільного ресурсу",
     "Open main table to adjust table management permissions" : "Відкрити головну таблицю для налаштування дозволів на керування",
-    "No shares" : "Відсутні спільні дані",
+    "No shares" : "Відсутні спільні ресурси",
     "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "Після підвищення одержувача доступу до таблиці до менеджера таблиці, будь-які програми, створені одержувачами доступу, які використовують цю таблицю, продовжуватимуть отримувати доступ до її даних, навіть якщо ви пізніше понизите їх у посаді.",
     "Confirm table manager promotion" : "Підтвердити надання додаткових прав для таблиці",
     "No view in context" : "Відсутні подання в контексті",

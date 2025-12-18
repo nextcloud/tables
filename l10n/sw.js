@@ -28,6 +28,7 @@ OC.L10N.register(
     "Comment" : "Maoni",
     "to" : "kwa",
     "Approved" : "Approved",
+    "Approved by" : "Approved by",
     "Position" : "Nafasi",
     "Progress" : "Maendeleo",
     "What" : "What",
