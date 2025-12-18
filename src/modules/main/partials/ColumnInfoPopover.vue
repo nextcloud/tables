@@ -72,7 +72,8 @@ export default {
 	},
 	methods: {
 		relativeDateTime(v) {
-			return moment(v).format('L') === moment().format('L') ? t('tables', 'Today') + ' ' + moment(v).format('LT') : moment(v).format('LLLL')
+			const value = moment.utc(v).local()
+			return value.format('L') === moment().format('L') ? t('tables', 'Today') + ' ' + value.format('LT') : value.format('LLLL')
 		},
 	},
 }
