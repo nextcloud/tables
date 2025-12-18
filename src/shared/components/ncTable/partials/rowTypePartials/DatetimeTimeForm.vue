@@ -63,7 +63,7 @@ export default {
 				if (v === 'none') {
 					this.$emit('update:value', v)
 				} else if (v) {
-					this.$emit('update:value', Moment(v).format('HH:mm'))
+					this.$emit('update:value', Moment(v).utc().format('HH:mm'))
 				}
 			},
 		},
