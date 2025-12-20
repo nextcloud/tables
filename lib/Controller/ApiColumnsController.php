@@ -114,9 +114,9 @@ class ApiColumnsController extends ACommonColumnsController {
 	 * @param 'progress'|'stars'|null $subtype Subtype for the new column
 	 * @param string|null $description Description
 	 * @param list<int>|null $selectedViewIds View IDs where this columns
-	 *     should be added
+	 *                                        should be added
 	 * @param array<string, mixed> $customSettings Custom settings for the
-	 *     column
+	 *                                             column
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn,
 	 *     array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
@@ -168,15 +168,15 @@ class ApiColumnsController extends ACommonColumnsController {
 	 * @param string|null $textAllowedPattern Allowed regex pattern
 	 * @param int|null $textMaxLength Max raw text length
 	 * @param bool|null $textUnique Whether the text value must be unique, if
-	 *     column is a text
+	 *                              column is a text
 	 * @param 'progress'|'stars'|null $subtype Subtype for the new column
 	 * @param string|null $description Description
 	 * @param list<int>|null $selectedViewIds View IDs where this columns
-	 *     should be added
+	 *                                        should be added
 	 * @param boolean $mandatory Is mandatory
 	 * @param 'table'|'view' $baseNodeType Context type of the column creation
 	 * @param array<string, mixed> $customSettings Custom settings for the
-	 *     column
+	 *                                             column
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn,
 	 *     array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
 	 *     array{message: string}, array{}>
@@ -222,18 +222,18 @@ class ApiColumnsController extends ACommonColumnsController {
 	 * @param int $baseNodeId Context of the column creation
 	 * @param string $title Title
 	 * @param string $selectionOptions Json array{id: int, label: string} with
-	 *     options that can be selected, eg [{"id": 1, "label": "first"},{"id":
-	 *     2, "label": "second"}]
+	 *                                 options that can be selected, eg [{"id": 1, "label": "first"},{"id":
+	 *                                 2, "label": "second"}]
 	 * @param string|null $selectionDefault Json int|list<int> for default
-	 *     selected option(s), eg 5 or ["1", "8"]
+	 *                                      selected option(s), eg 5 or ["1", "8"]
 	 * @param 'progress'|'stars'|null $subtype Subtype for the new column
 	 * @param string|null $description Description
 	 * @param list<int>|null $selectedViewIds View IDs where this columns
-	 *     should be added
+	 *                                        should be added
 	 * @param boolean $mandatory Is mandatory
 	 * @param 'table'|'view' $baseNodeType Context type of the column creation
 	 * @param array<string, mixed> $customSettings Custom settings for the
-	 *     column
+	 *                                             column
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn,
 	 *     array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
@@ -278,15 +278,15 @@ class ApiColumnsController extends ACommonColumnsController {
 	 * @param int $baseNodeId Context of the column creation
 	 * @param string $title Title
 	 * @param 'today'|'now'|null $datetimeDefault For a subtype 'date' you can
-	 *     set 'today'. For a main type or subtype 'time' you can set to 'now'.
+	 *                                            set 'today'. For a main type or subtype 'time' you can set to 'now'.
 	 * @param 'progress'|'stars'|null $subtype Subtype for the new column
 	 * @param string|null $description Description
 	 * @param list<int>|null $selectedViewIds View IDs where this columns
-	 *     should be added
+	 *                                        should be added
 	 * @param boolean $mandatory Is mandatory
 	 * @param 'table'|'view' $baseNodeType Context type of the column creation
 	 * @param array<string, mixed> $customSettings Custom settings for the
-	 *     column
+	 *                                             column
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn,
 	 *     array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
@@ -328,20 +328,20 @@ class ApiColumnsController extends ACommonColumnsController {
 	 * @param int $baseNodeId Context of the column creation
 	 * @param string $title Title
 	 * @param string|null $usergroupDefault Json array{id: string, type: int},
-	 *     eg [{"id": "admin", "type": 0}, {"id": "user1", "type": 0}]
+	 *                                      eg [{"id": "admin", "type": 0}, {"id": "user1", "type": 0}]
 	 * @param boolean $usergroupMultipleItems Whether you can select multiple
-	 *     users or/and groups
+	 *                                        users or/and groups
 	 * @param boolean $usergroupSelectUsers Whether you can select users
 	 * @param boolean $usergroupSelectGroups Whether you can select groups
 	 * @param boolean $usergroupSelectTeams Whether you can select teams
 	 * @param boolean $showUserStatus Whether to show the user's status
 	 * @param string|null $description Description
 	 * @param list<int>|null $selectedViewIds View IDs where this columns
-	 *     should be added
+	 *                                        should be added
 	 * @param boolean $mandatory Is mandatory
 	 * @param 'table'|'view' $baseNodeType Context type of the column creation
 	 * @param array<string, mixed> $customSettings Custom settings for the
-	 *     column
+	 *                                             column
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn,
 	 *     array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
