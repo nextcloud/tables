@@ -59,7 +59,7 @@ export default {
 				} else if (!v) {
 					this.$emit('update:value', this.isMandatoryField ? null : 'none')
 				} else {
-					this.$emit('update:value', Moment(v).format('YYYY-MM-DD HH:mm'))
+					this.$emit('update:value', Moment(v).utc().format('YYYY-MM-DD HH:mm'))
 				}
 			},
 		},
