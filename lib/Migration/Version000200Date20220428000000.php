@@ -54,6 +54,14 @@ class Version000200Date20220428000000 extends SimpleMigrationStep {
 				'notnull' => true,
 				'length' => 50
 			]);
+			$table->addColumn('token', Types::STRING, [
+				'notnull' => false,
+				'length' => 64
+			]);
+			$table->addColumn('password', Types::STRING, [
+				'notnull' => false,
+				'length' => 255
+			]);
 
 			$table->addColumn('permission_read', Types::BOOLEAN, [
 				'notnull' => false,
@@ -83,6 +91,8 @@ class Version000200Date20220428000000 extends SimpleMigrationStep {
 				'notnull' => true,
 			]);
 			$table->setPrimaryKey(['id']);
+			$table->addIndex(['node_id', 'node_type'], 'shares_node_idx');
+			$table->addIndex(['receiver', 'receiver_type'], 'shares_receiver_idx');
 		}
 
 		return $schema;

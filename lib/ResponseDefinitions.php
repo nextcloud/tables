@@ -83,6 +83,18 @@ namespace OCA\Tables;
  *  data: ?array{columnId: int, value: mixed},
  * }
  *
+ * @psalm-type TablesPublicRow = array{
+ *    id: int,
+ *    createdAt: string,
+ *    lastEditAt: string,
+ *    data: ?array{columnId: int, value: mixed},
+ *  }
+ *
+ * @psalm-type TablesLinkShare = array{
+ *    shareToken: string,
+ *    url: string,
+ *  }
+ *
  * @psalm-type TablesShare = array{
  * 	id: int,
  * 	sender: string,
@@ -105,8 +117,10 @@ namespace OCA\Tables;
  *  title: string,
  *  tableId: int,
  *  createdBy: string,
+ *  createdByDisplayName: string,
  *  createdAt: string,
  *  lastEditBy: string,
+ *  lastEditByDisplayName: string,
  *  lastEditAt: string,
  *  type: string,
  *  subtype: string,
@@ -142,6 +156,46 @@ namespace OCA\Tables;
  *     width: int,
  *  },
  * }
+ *
+ * @psalm-type TablesPublicColumn = array{
+ *   id: int,
+ *   title: string,
+ *   createdAt: string,
+ *   lastEditAt: string,
+ *   type: string,
+ *   subtype: string,
+ *   mandatory: bool,
+ *   description: string,
+ *   orderWeight: int,
+ *   numberDefault: float,
+ *   numberMin: float,
+ *   numberMax: float,
+ *   numberDecimals: int,
+ *   numberPrefix: string,
+ *   numberSuffix: string,
+ *   textDefault: string,
+ *   textAllowedPattern: string,
+ *   textMaxLength: int,
+ *   textUnique: bool,
+ *   selectionOptions: string,
+ *   selectionDefault: string,
+ *   datetimeDefault: string,
+ *   usergroupDefault: string,
+ *   usergroupMultipleItems: bool,
+ *   usergroupSelectUsers: bool,
+ *   usergroupSelectGroups: bool,
+ *   usergroupSelectTeams: bool,
+ *   showUserStatus: bool,
+ *   viewColumnInformation: ?array{
+ *      columnId: int,
+ *      order: int,
+ *      readonly: bool,
+ *      mandatory: bool,
+ *   },
+ *   customSettings: ?array{
+ *      width: int,
+ *   },
+ *  }
  *
  * @psalm-type TablesImportState = array{
  *  found_columns_count: int,

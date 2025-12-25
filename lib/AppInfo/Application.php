@@ -24,6 +24,7 @@ use OCA\Tables\Listener\WhenTableDeletedAuditLogListener;
 use OCA\Tables\Listener\WhenTableTransferredAuditLogListener;
 use OCA\Tables\Listener\WhenViewDeletedAuditLogListener;
 use OCA\Tables\Middleware\PermissionMiddleware;
+use OCA\Tables\Middleware\ShareControlMiddleware;
 use OCA\Tables\Reference\ContentReferenceProvider;
 use OCA\Tables\Reference\ReferenceProvider;
 use OCA\Tables\Search\SearchTablesProvider;
@@ -92,6 +93,7 @@ class Application extends App implements IBootstrap {
 		$context->registerCapability(Capabilities::class);
 
 		$context->registerMiddleware(PermissionMiddleware::class);
+		$context->registerMiddleware(ShareControlMiddleware::class);
 	}
 
 	public function boot(IBootContext $context): void {
