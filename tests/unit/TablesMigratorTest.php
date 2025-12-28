@@ -23,6 +23,7 @@ use OCA\Tables\Db\ShareMapper;
 use OCA\Tables\Db\Table;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\ViewMapper;
+use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Service\ColumnService;
 use OCA\Tables\Service\ContextService;
 use OCA\Tables\Service\FavoritesService;
@@ -36,6 +37,7 @@ use OCP\IUser;
 use OCP\UserMigration\IExportDestination;
 use OCP\UserMigration\IImportSource;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\NullOutput;
 
 class TablesMigratorTest extends TestCase {
@@ -44,6 +46,7 @@ class TablesMigratorTest extends TestCase {
 	private $tableMapper;
 	private $columnMapper;
 	private $rowSleeveMapper;
+	private $columnsHelper;
 	private $viewMapper;
 	private $contextMapper;
 	private $shareMapper;
@@ -60,12 +63,14 @@ class TablesMigratorTest extends TestCase {
 	private $rowService;
 	private $contextService;
 	private $shareService;
+	private $logger;
 
 	protected function setUp(): void {
 		$this->l10n = $this->createMock(IL10N::class);
 		$this->tableMapper = $this->createMock(TableMapper::class);
 		$this->columnMapper = $this->createMock(ColumnMapper::class);
 		$this->rowSleeveMapper = $this->createMock(RowSleeveMapper::class);
+		$this->columnsHelper = $this->createMock(ColumnsHelper::class);
 		$this->viewMapper = $this->createMock(ViewMapper::class);
 		$this->contextMapper = $this->createMock(ContextMapper::class);
 		$this->shareMapper = $this->createMock(ShareMapper::class);
@@ -82,12 +87,14 @@ class TablesMigratorTest extends TestCase {
 		$this->rowService = $this->createMock(RowService::class);
 		$this->contextService = $this->createMock(ContextService::class);
 		$this->shareService = $this->createMock(ShareService::class);
+		$this->logger = $this->createMock(LoggerInterface::class);
 
 		$this->migrator = new TablesMigrator(
 			$this->l10n,
 			$this->tableMapper,
 			$this->columnMapper,
 			$this->rowSleeveMapper,
+			$this->columnsHelper,
 			$this->viewMapper,
 			$this->contextMapper,
 			$this->shareMapper,
@@ -103,7 +110,8 @@ class TablesMigratorTest extends TestCase {
 			$this->columnService,
 			$this->rowService,
 			$this->contextService,
-			$this->shareService
+			$this->shareService,
+			$this->logger
 		);
 	}
 
