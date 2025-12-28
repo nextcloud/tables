@@ -60,6 +60,13 @@ class RowCellUsergroupMapper extends RowCellMapperSuper {
 		];
 	}
 
+	public function toArray(RowCellSuper $cell): array {
+		return [
+			'value' => $cell->getValue(),
+			'value_type' => $cell->getValueType(),
+		];
+	}
+
 	public function hasMultipleValues(): bool {
 		return true;
 	}
