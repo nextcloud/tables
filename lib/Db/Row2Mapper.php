@@ -28,9 +28,9 @@ use Psr\Log\LoggerInterface;
 use Throwable;
 
 class Row2Mapper {
-	use TTransactional;
-
 	private const DB_CHUNK_SIZE = 1_000;
+
+	use TTransactional;
 
 	private RowSleeveMapper $rowSleeveMapper;
 	private ?string $userId;
@@ -124,10 +124,6 @@ class Row2Mapper {
 		return $rowSleeve->getTableId();
 	}
 
-	public function setUserId(string $userId): void {
-		$this->userId = $userId;
-	}
-
 	/**
 	 * @return int[]
 	 * @throws InternalError
@@ -203,14 +199,27 @@ class Row2Mapper {
 			return [];
 		}
 
-		$allRows = [];
-		foreach (array_chunk($rowIds, self::DB_CHUNK_SIZE) as $rowIdChunk) {
-			$allRows[] = $this->getRowsChunk($rowIdChunk, $columnIds);
+		$columnTypesCount = count($this->columnsHelper->columns);
+		if ($columnTypesCount === 0) {
+			return [];
 		}
-		return array_merge(...$allRows);
+
+		$columnsCount = count($columnIds);
+		$maxParamsPerType = floor(self::DB_CHUNK_SIZE / $columnTypesCount) ;
+		$calculatedChunkSize = (int)($maxParamsPerType - $columnsCount);
+		$chunkSize = max(1, $calculatedChunkSize);
+
+		$rowIdChunks = array_chunk($rowIds, $chunkSize);
+		$chunks = [];
+		foreach ($rowIdChunks as $chunkedRowIds) {
+			$chunks[] = $this->getRowsChunk($chunkedRowIds, $columnIds);
+		}
+
+		return array_merge(...$chunks);
 	}
 
 	/**
+	 * Builds and executes the UNION ALL query for a specific chunk of rows.
 	 * @param array $rowIds
 	 * @param array $columnIds
 	 * @return Row2[]
