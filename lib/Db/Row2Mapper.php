@@ -28,6 +28,8 @@ use Psr\Log\LoggerInterface;
 use Throwable;
 
 class Row2Mapper {
+	private const MAX_DB_PARAMETERS = 65535;
+
 	use TTransactional;
 
 	private RowSleeveMapper $rowSleeveMapper;
@@ -193,6 +195,37 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	private function getRows(array $rowIds, array $columnIds): array {
+		if (empty($rowIds)) {
+			return [];
+		}
+
+		$columnTypesCount = count($this->columnsHelper->columns);
+		if ($columnTypesCount === 0) {
+			return [];
+		}
+
+		$columnsCount = count($columnIds);
+		$maxParamsPerType = floor(self::MAX_DB_PARAMETERS / $columnTypesCount) ;
+		$calculatedChunkSize = (int)($maxParamsPerType - $columnsCount);
+		$chunkSize = max(1, $calculatedChunkSize);
+
+		$rowIdChunks = array_chunk($rowIds, $chunkSize);
+		$chunks = [];
+		foreach ($rowIdChunks as $chunkedRowIds) {
+			$chunks[] = $this->getRowsChunk($chunkedRowIds, $columnIds);
+		}
+
+		return array_merge(...$chunks);
+	}
+
+	/**
+	 * Builds and executes the UNION ALL query for a specific chunk of rows.
+	 * @param array $rowIds
+	 * @param array $columnIds
+	 * @return Row2[]
+	 * @throws InternalError
+	 */
+	private function getRowsChunk(array $rowIds, array $columnIds): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$qbSqlForColumnTypes = null;
