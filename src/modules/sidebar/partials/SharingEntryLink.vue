@@ -76,7 +76,7 @@
 					class="sharing-entry-link__avatar" />
 
 				<div>
-					<span class="sharing-entry__title" :title="t('tables', 'Public link')">
+					<span class="sharing-entry__title" data-cy="sharingEntryLinkTitle" :title="t('tables', 'Public link')">
 						{{ t('tables', 'Public link') }}
 					</span>
 					<div v-if="hasPassword" class="sharing-entry-link__subtitle">
@@ -88,6 +88,7 @@
 					<!-- Copy Button -->
 					<NcActionButton
 						:aria-label="t('tables', 'Copy public link')"
+						data-cy="sharingEntryLinkCopyButton"
 						@click="copyLink">
 						<template #icon>
 							<ContentCopy :size="20" />
@@ -101,7 +102,7 @@
 						</template>
 
 						<!-- Delete -->
-						<NcActionButton @click="onDelete">
+						<NcActionButton data-cy="sharingEntryLinkDeleteButton" @click="onDelete">
 							<template #icon>
 								<TrashCan :size="20" />
 							</template>

@@ -21,6 +21,7 @@
 				<NcActions :force-menu="true" type="tertiary">
 					<NcActionButton :close-after-click="true"
 						icon="icon-download"
+						data-cy="dataTableExportBtn"
 						@click="$emit('download-csv')">
 						{{ t('tables', 'Export as CSV') }}
 					</NcActionButton>
