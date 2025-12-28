@@ -4,19 +4,21 @@
 -->
 <template>
 	<NcContent app-name="tables">
-		<Navigation />
+		<Navigation v-if="!isPublicShare" />
 		<NcAppContent>
 			<div v-if="isLoadingSomething" class="icon-loading" />
 
-			<router-view v-if="!isLoadingSomething" />
+			<PublicTableView v-if="isPublicShare && !isLoadingSomething" :token="shareToken" />
+			<router-view v-else-if="!isLoadingSomething" />
 		</NcAppContent>
-		<Sidebar />
+		<Sidebar v-if="!isPublicShare" />
 	</NcContent>
 </template>
 
 <script>
 import { NcContent, NcAppContent } from '@nextcloud/vue'
 import Navigation from './modules/navigation/sections/Navigation.vue'
+import PublicTableView from './pages/PublicTableView.vue'
 import { mapState, mapActions } from 'pinia'
 import Sidebar from './modules/sidebar/sections/Sidebar.vue'
 import { useResizeObserver } from '@vueuse/core'
@@ -27,6 +29,7 @@ import { generateUrl } from '@nextcloud/router'
 export default {
 	name: 'App',
 	components: {
+		PublicTableView,
 		Sidebar,
 		NcContent,
 		NcAppContent,
@@ -46,6 +49,12 @@ export default {
 	},
 	computed: {
 		...mapState(useTablesStore, ['isLoadingSomething', 'activeView', 'activeTable', 'activeContext']),
+		isPublicShare() {
+			return !!this.shareToken
+		},
+		shareToken() {
+			return loadState('tables', 'shareToken', false)
+		},
 	},
 	watch: {
 		'$route'(to) {
@@ -54,12 +63,18 @@ export default {
 	},
 	async created() {
 		const store = useTablesStore()
-		await Promise.all([
-			store.loadTablesFromBE(),
-			store.getAllContexts(),
-			store.loadViewsSharedWithMeFromBE(),
-			store.loadTemplatesFromBE(),
-		])
+		if (!this.isPublicShare) {
+			await Promise.all([
+				store.loadTablesFromBE(),
+				store.getAllContexts(),
+				store.loadViewsSharedWithMeFromBE(),
+				store.loadTemplatesFromBE(),
+			])
+		} else {
+			store.setLoading({ key: 'tables', value: false })
+			store.setLoading({ key: 'viewsShared', value: false })
+			store.setLoading({ key: 'contexts', value: false })
+		}
 		this.routing(this.$router.currentRoute)
 		this.observeAppContent()
 	},

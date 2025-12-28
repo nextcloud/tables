@@ -8,6 +8,11 @@
 			<ShareInternalLink :current-url="currentUrl" :is-view="isView" />
 			<ShareForm :shares="shares" @add="addShare" @update="updateShare" />
 			<ShareList :shares="shares" @remove="removeShare" @update="updateShare" />
+			<SharingLinkList
+				:shares="linkShares"
+				@create-link-share="onCreateLinkShare"
+				@delete-share="removeShare"
+				@update-share="updateShare" />
 		</div>
 	</div>
 </template>
@@ -19,15 +24,18 @@ import shareAPI from '../mixins/shareAPI.js'
 import ShareForm from '../partials/ShareForm.vue'
 import ShareList from '../partials/ShareList.vue'
 import ShareInternalLink from '../partials/ShareInternalLink.vue'
+import SharingLinkList from '../partials/SharingLinkList.vue'
 import { getCurrentUser } from '@nextcloud/auth'
 import { generateUrl } from '@nextcloud/router'
 import permissionsMixin from '../../../shared/components/ncTable/mixins/permissionsMixin.js'
+import { isPublicLinkShare } from '../../../shared/utils/shareUtils.js'
 
 export default {
 	components: {
 		ShareForm,
 		ShareList,
 		ShareInternalLink,
+		SharingLinkList,
 	},
 
 	mixins: [shareAPI, permissionsMixin],
@@ -37,6 +45,7 @@ export default {
 
 			// shared with
 			shares: [],
+			linkShares: [],
 		}
 	},
 
@@ -74,19 +83,32 @@ export default {
 		getCurrentUser,
 		async loadSharesFromBE() {
 			this.loading = true
-			this.shares = await this.getSharedWithFromBE()
+			const allShares = await this.getSharedWithFromBE()
+
+			this.shares = allShares.filter(share => !isPublicLinkShare(share))
+			this.linkShares = allShares.filter(share => isPublicLinkShare(share))
+
 			this.loading = false
 		},
 		async removeShare(share) {
 			await this.removeShareFromBE(share.id)
 			await this.loadSharesFromBE()
 			// If no share is left, remove shared indication
-			if (this.isView) {
-				if (this.shares.find(share => ((share.nodeType === 'view' && share.nodeId === this.activeElement.id) || (share.nodeType === 'table' && share.nodeId === this.activeElement.tableId))) === undefined) {
+			const hasStandardShares = this.shares.some(share =>
+				(this.isView
+					? (share.nodeType === 'view' && share.nodeId === this.activeElement.id)
+					: (share.nodeType === 'table' && share.nodeId === this.activeElement.id)),
+			)
+			const hasLinkShares = this.linkShares.some(share =>
+				(this.isView
+					? (share.nodeType === 'view' && share.nodeId === this.activeElement.id)
+					: (share.nodeType === 'table' && share.nodeId === this.activeElement.id)),
+			)
+
+			if (!hasStandardShares && !hasLinkShares) {
+				if (this.isView) {
 					await this.setViewHasShares({ viewId: this.activeElement.id, hasShares: false })
-				}
-			} else {
-				if (this.shares.find(share => (share.nodeType === 'table' && share.nodeId === this.activeElement.id)) === undefined) {
+				} else {
 					await this.setTableHasShares({ tableId: this.activeElement.id, hasShares: false })
 				}
 			}
@@ -100,6 +122,12 @@ export default {
 			delete data.id
 			await this.updateShareToBE(shareId, data)
 			await this.loadSharesFromBE()
+		},
+		async onCreateLinkShare(password) {
+			const success = await this.createLinkShare(password)
+			if (success) {
+				await this.loadSharesFromBE()
+			}
 		},
 	},
 }
