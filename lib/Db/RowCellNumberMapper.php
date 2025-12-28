@@ -20,17 +20,17 @@ class RowCellNumberMapper extends RowCellMapperSuper {
 		parent::__construct($db, $this->table, RowCellNumber::class);
 	}
 
-	public function formatEntity(Column $column, RowCellSuper $cell) {
-		$value = $cell->getValue();
+	public function formatRowData(Column $column, array $row) {
+		$value = $row['value'];
 		if ($value === '') {
 			return null;
 		}
 		$decimals = $column->getNumberDecimals() ?? 0;
 		if ($decimals === 0) {
 			return (int)$value;
-		} else {
-			return round(floatval($value), $decimals);
 		}
+
+		return round(floatval($value), $decimals);
 	}
 
 	public function applyDataToEntity(Column $column, RowCellSuper $cell, $data): void {
