@@ -9,11 +9,15 @@ namespace OCA\Tables\Helper;
 
 use OCA\Tables\Constants\UsergroupType;
 use OCA\Tables\Db\Column;
+use OCA\Tables\Db\RowCellMapperSuper;
+use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
 use OCP\Server;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\Log\LoggerInterface;
 
 class ColumnsHelper {
-
 	public array $columns = [
 		Column::TYPE_TEXT,
 		Column::TYPE_NUMBER,
@@ -28,9 +32,15 @@ class ColumnsHelper {
 	 */
 	private array $columnBusinesses = [];
 
+	/**
+	 * @var array<string, RowCellMapperSuper>
+	 */
+	private array $cellMappers = [];
+
 	public function __construct(
 		private readonly UserHelper $userHelper,
 		private readonly CircleHelper $circleHelper,
+		private readonly LoggerInterface $logger,
 	) {
 	}
 
@@ -103,5 +113,44 @@ class ColumnsHelper {
 		$columnBusiness = Server::get($businessClassName);
 
 		return $this->columnBusinesses[$cacheKey] = $columnBusiness;
+	}
+
+	public function getCellMapperFromType(string $columnType): RowCellMapperSuper {
+		if (isset($this->cellMappers[$columnType])) {
+			return $this->cellMappers[$columnType];
+		}
+
+		$cellMapperClassName = 'OCA\Tables\Db\RowCell' . ucfirst($columnType) . 'Mapper';
+		/** @var RowCellMapperSuper $cellMapper */
+		try {
+			$cellMapper = Server::get($cellMapperClassName);
+		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), previous: $e);
+		}
+
+		return $this->cellMappers[$columnType] = $cellMapper;
+	}
+
+	/**
+	 * Collects all cells of a row in the format used for the cached_cells column
+	 *
+	 * @param Column[] $columns
+	 * @return array<int, mixed>
+	 */
+	public function getCachedCellsForRow(int $rowId, array $columns): array {
+		$cachedCells = [];
+		foreach ($columns as $column) {
+			$cellMapper = $this->getCellMapperFromType($column->getType());
+			$columnId = $column->getId();
+			foreach ($cellMapper->findManyByRowAndColumn($rowId, $columnId) as $cell) {
+				if ($cellMapper->hasMultipleValues()) {
+					$cachedCells[$columnId][] = $cellMapper->toArray($cell);
+				} else {
+					$cachedCells[$columnId] = $cellMapper->toArray($cell);
+				}
+			}
+		}
+		return $cachedCells;
 	}
 }

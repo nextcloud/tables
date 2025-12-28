@@ -42,8 +42,24 @@ class RowSleeveMapper extends QBMapper {
 	}
 
 	/**
+	 * @throws MultipleObjectsReturnedException
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 */
+	public function findForUpdate(int $id): RowSleeve {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
+		if ($this->db->getDatabaseProvider() !== IDBConnection::PLATFORM_SQLITE) {
+			$qb->forUpdate();
+		}
+		return $this->findEntity($qb);
+	}
+
+	/**
 	 * @param int[] $ids
-	 * @return RowSleeve[]
+	 * @return list<array<string, mixed>> Raw data from DB for the best performance
 	 * @throws Exception
 	 */
 	public function findMultiple(array $ids): array {
@@ -52,6 +68,7 @@ class RowSleeveMapper extends QBMapper {
 		$qb->select(
 			$sleeveAlias . '.id',
 			$sleeveAlias . '.table_id',
+			$sleeveAlias . '.cached_cells',
 			$sleeveAlias . '.created_by',
 			$sleeveAlias . '.created_at',
 			$sleeveAlias . '.last_edit_by',
@@ -59,7 +76,8 @@ class RowSleeveMapper extends QBMapper {
 		)
 			->from($this->table, $sleeveAlias)
 			->where($qb->expr()->in($sleeveAlias . '.id', $qb->createNamedParameter($ids, IQueryBuilder::PARAM_INT_ARRAY)));
-		return $this->findEntities($qb);
+
+		return $qb->executeQuery()->fetchAllAssociative();
 	}
 
 	/**
