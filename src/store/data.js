@@ -26,11 +26,11 @@ export const useDataStore = defineStore('data', {
 
 	getters: {
 		getColumns: (state) => (isView, elementId) => {
-			const stateId = genStateKey(isView, elementId)
+			const stateId = typeof elementId === 'string' && elementId.startsWith('public-') ? elementId : genStateKey(isView, elementId)
 			return state.columns[stateId] ?? []
 		},
 		getRows: (state) => (isView, elementId) => {
-			const stateId = genStateKey(isView, elementId)
+			const stateId = typeof elementId === 'string' && elementId.startsWith('public-') ? elementId : genStateKey(isView, elementId)
 			return state.rows[stateId] ?? []
 		},
 	},
@@ -94,6 +94,30 @@ export const useDataStore = defineStore('data', {
 			const stateId = genStateKey(!!(view?.id), view?.id ?? tableId)
 			set(this.columns, stateId, allColumns)
 			return true
+		},
+
+		async loadPublicColumnsFromBE({ token }) {
+			const stateId = 'public-' + token
+			this.loading[stateId] = true
+			let res = null
+
+			try {
+				res = await axios.get(generateOcsUrl('/apps/tables/api/2/public/' + token + '/columns'))
+				if (!res?.data?.ocs?.data || !Array.isArray(res.data.ocs.data)) {
+					throw new Error('Expected array')
+				}
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load columns.'))
+				return false
+			}
+
+			const columns = res.data.ocs.data.map(col => parseCol(col))
+			// Fix up columns to match expected structure if needed
+			// Public API might return slightly different structure, but parseCol should handle it if it's standard TableColumn
+
+			set(this.columns, stateId, columns)
+			this.loading[stateId] = false
+			return columns
 		},
 
 		async insertNewColumn({ isView, elementId, data }) {
@@ -172,6 +196,23 @@ export const useDataStore = defineStore('data', {
 			}
 
 			set(this.rows, stateId, res.data)
+			this.loading[stateId] = false
+			return true
+		},
+
+		async loadPublicRowsFromBE({ token }) {
+			const stateId = 'public-' + token
+			this.loading[stateId] = true
+			let res
+
+			try {
+				res = await axios.get(generateOcsUrl('/apps/tables/api/2/public/' + token + '/rows'))
+			} catch (e) {
+				displayError(e, t('tables', 'Could not load rows.'))
+				return false
+			}
+
+			set(this.rows, stateId, res.data.ocs.data)
 			this.loading[stateId] = false
 			return true
 		},

@@ -129,6 +129,7 @@ import { NcActionButton, NcActions, NcAvatar, NcButton, NcLoadingIcon } from '@n
 import PlaylistEditIcon from 'vue-material-design-icons/PlaylistEdit.vue'
 import { emit } from '@nextcloud/event-bus'
 import { showError, showSuccess } from '@nextcloud/dialogs'
+import { isPublicLinkShare } from '../../../shared/utils/shareUtils.js'
 
 export default {
 	components: {
@@ -263,7 +264,8 @@ export default {
 		async loadShares() {
 			// load shares for table
 			this.loadingTableShares = true
-			this.tableShares = await this.getSharesForTableFromBE(this.table.id)
+			const allTableShares = await this.getSharesForTableFromBE(this.table.id)
+			this.tableShares = allTableShares.filter(s => !isPublicLinkShare(s))
 			this.loadingTableShares = false
 
 			// load shares for all views
@@ -271,10 +273,10 @@ export default {
 			for (const index in this.table.views) {
 				const view = this.table.views[index]
 				if (view.hasShares) {
-					this.viewShares[view.id] = await this.getSharesForViewFromBE(view.id)
+					const allViewShares = await this.getSharesForViewFromBE(view.id)
+					this.viewShares[view.id] = allViewShares.filter(s => !isPublicLinkShare(s))
 				}
 			}
-			this.tableShares = await this.getSharesForTableFromBE(this.table.id)
 			this.loadingViewShares = false
 		},
 	},
