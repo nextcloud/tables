@@ -653,12 +653,10 @@ class Row2Mapper {
 
 			$column = $this->columnMapper->find($rowData['column_id']);
 			$columnType = $column->getType();
-			$cellClassName = 'OCA\Tables\Db\RowCell' . ucfirst($columnType);
-			$entity = call_user_func($cellClassName . '::fromRowData', $rowData); // >5.2.3
 			if (!isset($cellMapperCache[$columnType])) {
 				$cellMapperCache[$columnType] = $this->getCellMapperFromType($columnType);
 			}
-			$value = $cellMapperCache[$columnType]->formatEntity($column, $entity);
+			$value = $cellMapperCache[$columnType]->formatRowData($column, $rowData);
 			$compositeKey = (string)$rowData['row_id'] . ',' . (string)$rowData['column_id'];
 			if ($cellMapperCache[$columnType]->hasMultipleValues()) {
 				if (array_key_exists($compositeKey, $rowValues)) {
