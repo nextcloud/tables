@@ -38,6 +38,11 @@ class Column {
 	}
 
 	public static function createFromArray(array $data): self {
+		$customSettings = $data['customSettings'] ?? null;
+		if (is_array($customSettings)) {
+			$customSettings = json_encode($customSettings);
+		}
+
 		return new self(
 			title: $data['title'] ?? null,
 			type: $data['type'] ?? null,
@@ -63,7 +68,7 @@ class Column {
 			usergroupSelectGroups: $data['usergroupSelectGroups'] ?? null,
 			usergroupSelectTeams: $data['usergroupSelectTeams'] ?? null,
 			showUserStatus: $data['showUserStatus'] ?? null,
-			customSettings: $data['customSettings'] ?? null,
+			customSettings: $customSettings,
 		);
 	}
 
