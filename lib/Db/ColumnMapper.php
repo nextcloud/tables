@@ -91,7 +91,7 @@ class ColumnMapper extends QBMapper {
 
 	/**
 	 * @param integer $tableId
-	 * @return array
+	 * @return Column[]
 	 * @throws Exception
 	 */
 	public function findAllByTable(int $tableId): array {
@@ -116,7 +116,7 @@ class ColumnMapper extends QBMapper {
 
 	/**
 	 * @param integer $tableID
-	 * @return array
+	 * @return int[]
 	 * @throws Exception
 	 */
 	public function findAllIdsByTable(int $tableID): array {

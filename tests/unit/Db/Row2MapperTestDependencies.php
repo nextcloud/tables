@@ -12,6 +12,8 @@ namespace OCA\Tables\Tests\Unit\Db;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\Row2Mapper;
+use OCA\Tables\Db\RowLoader\CachedRowLoader;
+use OCA\Tables\Db\RowLoader\NormalizedRowLoader;
 use OCA\Tables\Db\RowSleeveMapper;
 use OCA\Tables\Helper\CircleHelper;
 use OCA\Tables\Helper\ColumnsHelper;
@@ -35,6 +37,8 @@ trait Row2MapperTestDependencies {
 	protected ColumnsHelper|MockObject $columnsHelper;
 	protected LoggerInterface|MockObject $logger;
 	protected CircleHelper|MockObject $circleHelper;
+	protected NormalizedRowLoader|MockObject $normalizedRowLoader;
+	protected CachedRowLoader|MockObject $cachedRowLoader;
 
 	protected static bool $testDataInitialized = false;
 	protected static int $testTableId;
@@ -54,9 +58,11 @@ trait Row2MapperTestDependencies {
 		$this->userHelper = $this->createMock(UserHelper::class);
 		$this->circleHelper = $this->createMock(CircleHelper::class);
 		$this->logger = $this->createMock(LoggerInterface::class);
+		$this->normalizedRowLoader = $this->createMock(NormalizedRowLoader::class);
+		$this->cachedRowLoader = $this->createMock(CachedRowLoader::class);
 
 		$this->rowSleeveMapper = new RowSleeveMapper($this->connectionAdapter, $this->logger);
-		$this->columnsHelper = new ColumnsHelper($this->userHelper, $this->circleHelper);
+		$this->columnsHelper = new ColumnsHelper($this->userHelper, $this->circleHelper, $this->logger);
 
 		$this->mapper = new Row2Mapper(
 			'test_user',
@@ -65,7 +71,9 @@ trait Row2MapperTestDependencies {
 			$this->userHelper,
 			$this->rowSleeveMapper,
 			$this->columnsHelper,
-			$this->columnMapper
+			$this->columnMapper,
+			$this->normalizedRowLoader,
+			$this->cachedRowLoader
 		);
 
 		if (!self::$testDataInitialized) {
