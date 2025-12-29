@@ -9,6 +9,12 @@ namespace OCA\Tables\Helper;
 
 use OCA\Tables\Constants\UsergroupType;
 use OCA\Tables\Db\Column;
+use OCA\Tables\Db\RowCellMapperSuper;
+use OCA\Tables\Errors\InternalError;
+use OCP\Server;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\Log\LoggerInterface;
 
 class ColumnsHelper {
 
@@ -23,6 +29,7 @@ class ColumnsHelper {
 	public function __construct(
 		private UserHelper $userHelper,
 		private CircleHelper $circleHelper,
+		private LoggerInterface $logger,
 	) {
 	}
 
@@ -77,6 +84,17 @@ class ColumnsHelper {
 				$days = max(0, (int)$additionalValue);
 				return date('Y-m-d', strtotime("-{$days} days")) ?: '';
 			default: return $placeholder;
+		}
+	}
+
+	public function getCellMapperFromType(string $columnType): RowCellMapperSuper {
+		$cellMapperClassName = 'OCA\Tables\Db\RowCell' . ucfirst($columnType) . 'Mapper';
+		/** @var RowCellMapperSuper $cellMapper */
+		try {
+			return Server::get($cellMapperClassName);
+		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), $e->getCode(), $e);
 		}
 	}
 }

@@ -49,6 +49,10 @@ class RowCellMapperSuper extends QBMapper {
 		$cell->setValue($data);
 	}
 
+	public function toArray(RowCellSuper $cell): array {
+		return ['value' => $cell->getValue()];
+	}
+
 	public function getDbParamType() {
 		return IQueryBuilder::PARAM_STR;
 	}
@@ -112,6 +116,21 @@ class RowCellMapperSuper extends QBMapper {
 			->where($qb->expr()->eq('row_id', $qb->createNamedParameter($rowId, IQueryBuilder::PARAM_INT)))
 			->andWhere($qb->expr()->eq('column_id', $qb->createNamedParameter($columnId, IQueryBuilder::PARAM_INT)));
 		return $this->findEntity($qb);
+	}
+
+	/**
+	 * @throws MultipleObjectsReturnedException
+	 * @throws DoesNotExistException
+	 * @throws Exception
+	 * @return RowCellSuper[]
+	 */
+	public function findManyByRowAndColumn(int $rowId, int $columnId): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->tableName)
+			->where($qb->expr()->eq('row_id', $qb->createNamedParameter($rowId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('column_id', $qb->createNamedParameter($columnId, IQueryBuilder::PARAM_INT)));
+		return $this->findEntities($qb);
 	}
 
 	/**

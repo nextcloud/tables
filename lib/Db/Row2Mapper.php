@@ -10,6 +10,8 @@ namespace OCA\Tables\Db;
 use DateTime;
 use DateTimeImmutable;
 use OCA\Tables\Constants\UsergroupType;
+use OCA\Tables\Db\RowLoader\CachedRowLoader;
+use OCA\Tables\Db\RowLoader\NormalizedRowLoader;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Helper\ColumnsHelper;
@@ -18,18 +20,12 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\DB\Exception;
-use OCP\DB\IResult;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
-use OCP\Server;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
 class Row2Mapper {
-	private const MAX_DB_PARAMETERS = 65535;
-
 	use TTransactional;
 
 	private RowSleeveMapper $rowSleeveMapper;
@@ -40,8 +36,15 @@ class Row2Mapper {
 	protected ColumnMapper $columnMapper;
 
 	private ColumnsHelper $columnsHelper;
+	/**
+	 * @var array<RowLoader\RowLoader::LOADER_*, RowLoader\RowLoader>
+	 */
+	private array $rowLoaders;
 
-	public function __construct(?string $userId, IDBConnection $db, LoggerInterface $logger, UserHelper $userHelper, RowSleeveMapper $rowSleeveMapper, ColumnsHelper $columnsHelper, ColumnMapper $columnMapper) {
+	public function __construct(?string $userId, IDBConnection $db, LoggerInterface $logger, UserHelper $userHelper, RowSleeveMapper $rowSleeveMapper, ColumnsHelper $columnsHelper, ColumnMapper $columnMapper,
+		NormalizedRowLoader $normalizedRowLoader,
+		CachedRowLoader $cachedRowLoader,
+	) {
 		$this->rowSleeveMapper = $rowSleeveMapper;
 		$this->userId = $userId;
 		$this->db = $db;
@@ -49,6 +52,10 @@ class Row2Mapper {
 		$this->userHelper = $userHelper;
 		$this->columnsHelper = $columnsHelper;
 		$this->columnMapper = $columnMapper;
+		$this->rowLoaders = [
+			RowLoader\RowLoader::LOADER_NORMALIZED => $normalizedRowLoader,
+			RowLoader\RowLoader::LOADER_CACHED => $cachedRowLoader,
+		];
 	}
 
 	/**
@@ -60,7 +67,7 @@ class Row2Mapper {
 		$this->db->beginTransaction();
 		try {
 			foreach ($this->columnsHelper->columns as $columnType) {
-				$this->getCellMapperFromType($columnType)->deleteAllForRow($row->getId());
+				$this->columnsHelper->getCellMapperFromType($columnType)->deleteAllForRow($row->getId());
 			}
 			$this->rowSleeveMapper->deleteById($row->getId());
 			$this->db->commit();
@@ -178,7 +185,7 @@ class Row2Mapper {
 			$wantedRowIdsArray = $this->getWantedRowIds($userId, $tableId, $filter, $sort, $limit, $offset);
 
 			// Get rows without SQL sorting
-			$rows = $this->getRows($wantedRowIdsArray, $showColumnIds);
+			$rows = $this->getRows($wantedRowIdsArray, $showColumnIds, RowLoader\RowLoader::LOADER_CACHED);
 
 			// Sort rows in PHP to preserve the order from getWantedRowIds
 			return $this->sortRowsByIds($rows, $wantedRowIdsArray);
@@ -191,92 +198,27 @@ class Row2Mapper {
 	/**
 	 * @param array $rowIds
 	 * @param array $columnIds
+	 * @param RowLoader\RowLoader::LOADER_* $loader
 	 * @return Row2[]
 	 * @throws InternalError
 	 */
-	private function getRows(array $rowIds, array $columnIds): array {
+	private function getRows(array $rowIds, array $columnIds, string $loader = RowLoader\RowLoader::LOADER_NORMALIZED): array {
 		if (empty($rowIds)) {
 			return [];
 		}
 
-		$columnTypesCount = count($this->columnsHelper->columns);
-		if ($columnTypesCount === 0) {
-			return [];
+		$columns = $mappers = [];
+		foreach ($columnIds as $columnId) {
+			$columns[$columnId] = $this->columnMapper->find($columnId);
+			$mappers[$columnId] = $this->columnsHelper->getCellMapperFromType($columns[$columnId]->getType());
 		}
 
-		$columnsCount = count($columnIds);
-		$maxParamsPerType = floor(self::MAX_DB_PARAMETERS / $columnTypesCount) ;
-		$calculatedChunkSize = (int)($maxParamsPerType - $columnsCount);
-		$chunkSize = max(1, $calculatedChunkSize);
-
-		$rowIdChunks = array_chunk($rowIds, $chunkSize);
-		$chunks = [];
-		foreach ($rowIdChunks as $chunkedRowIds) {
-			$chunks[] = $this->getRowsChunk($chunkedRowIds, $columnIds);
+		$rows = [];
+		foreach ($this->rowLoaders[$loader]->getRows($rowIds, $columns, $mappers) as $row) {
+			$rows[] = $row;
 		}
+		return $rows;
 
-		return array_merge(...$chunks);
-	}
-
-	/**
-	 * Builds and executes the UNION ALL query for a specific chunk of rows.
-	 * @param array $rowIds
-	 * @param array $columnIds
-	 * @return Row2[]
-	 * @throws InternalError
-	 */
-	private function getRowsChunk(array $rowIds, array $columnIds): array {
-		$qb = $this->db->getQueryBuilder();
-
-		$qbSqlForColumnTypes = null;
-		foreach ($this->columnsHelper->columns as $columnType) {
-			$qbTmp = $this->db->getQueryBuilder();
-			$qbTmp->select('row_id', 'column_id', 'last_edit_at', 'last_edit_by')
-				->selectAlias($qb->expr()->castColumn('value', IQueryBuilder::PARAM_STR), 'value');
-
-			// This is not ideal but I cannot think of a good way to abstract this away into the mapper right now
-			// Ideally we dynamically construct this query depending on what additional selects the column type requires
-			// however the union requires us to match the exact number of selects for each column type
-			if ($columnType === Column::TYPE_USERGROUP) {
-				$qbTmp->selectAlias($qb->expr()->castColumn('value_type', IQueryBuilder::PARAM_STR), 'value_type');
-			} else {
-				$qbTmp->selectAlias($qbTmp->createFunction('NULL'), 'value_type');
-			}
-
-			$qbTmp
-				->from('tables_row_cells_' . $columnType)
-				->where($qb->expr()->in('column_id', $qb->createNamedParameter($columnIds, IQueryBuilder::PARAM_INT_ARRAY, ':columnIds')))
-				->andWhere($qb->expr()->in('row_id', $qb->createNamedParameter($rowIds, IQueryBuilder::PARAM_INT_ARRAY, ':rowsIds')));
-
-			if ($qbSqlForColumnTypes) {
-				$qbSqlForColumnTypes .= ' UNION ALL ' . $qbTmp->getSQL() . ' ';
-			} else {
-				$qbSqlForColumnTypes = '(' . $qbTmp->getSQL();
-			}
-		}
-		$qbSqlForColumnTypes .= ')';
-
-		$qb->select('row_id', 'column_id', 'created_by', 'created_at', 't1.last_edit_by', 't1.last_edit_at', 'value', 'table_id')
-			// Also should be more generic (see above)
-			->addSelect('value_type')
-			->from($qb->createFunction($qbSqlForColumnTypes), 't1')
-			->innerJoin('t1', 'tables_row_sleeves', 'rs', 'rs.id = t1.row_id');
-
-		try {
-			$result = $qb->executeQuery();
-		} catch (Exception $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), );
-		}
-
-		try {
-			$sleeves = $this->rowSleeveMapper->findMultiple($rowIds);
-		} catch (Exception $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
-		}
-
-		return $this->parseEntities($result, $sleeves);
 	}
 
 	/**
@@ -657,61 +599,6 @@ class Row2Mapper {
 	}
 
 	/**
-	 * @param IResult $result
-	 * @param RowSleeve[] $sleeves
-	 * @return Row2[]
-	 * @throws InternalError
-	 */
-	private function parseEntities(IResult $result, array $sleeves): array {
-		$rows = [];
-		foreach ($sleeves as $sleeve) {
-			$rows[$sleeve->getId()] = new Row2();
-			$rows[$sleeve->getId()]->setId($sleeve->getId());
-			$rows[$sleeve->getId()]->setCreatedBy($sleeve->getCreatedBy());
-			$rows[$sleeve->getId()]->setCreatedAt($sleeve->getCreatedAt());
-			$rows[$sleeve->getId()]->setLastEditBy($sleeve->getLastEditBy());
-			$rows[$sleeve->getId()]->setLastEditAt($sleeve->getLastEditAt());
-			$rows[$sleeve->getId()]->setTableId($sleeve->getTableId());
-		}
-
-		$rowValues = [];
-		$keyToColumnId = [];
-		$keyToRowId = [];
-		$cellMapperCache = [];
-
-		while ($rowData = $result->fetch()) {
-			if (!isset($rowData['row_id'], $rows[$rowData['row_id']])) {
-				break;
-			}
-
-			$column = $this->columnMapper->find($rowData['column_id']);
-			$columnType = $column->getType();
-			if (!isset($cellMapperCache[$columnType])) {
-				$cellMapperCache[$columnType] = $this->getCellMapperFromType($columnType);
-			}
-			$value = $cellMapperCache[$columnType]->formatRowData($column, $rowData);
-			$compositeKey = (string)$rowData['row_id'] . ',' . (string)$rowData['column_id'];
-			if ($cellMapperCache[$columnType]->hasMultipleValues()) {
-				if (array_key_exists($compositeKey, $rowValues)) {
-					$rowValues[$compositeKey][] = $value;
-				} else {
-					$rowValues[$compositeKey] = [$value];
-				}
-			} else {
-				$rowValues[$compositeKey] = $value;
-			}
-			$keyToColumnId[$compositeKey] = $rowData['column_id'];
-			$keyToRowId[$compositeKey] = $rowData['row_id'];
-		}
-
-		foreach ($rowValues as $compositeKey => $value) {
-			$rows[$keyToRowId[$compositeKey]]->addCell($keyToColumnId[$compositeKey], $value);
-		}
-
-		return array_values($rows);
-	}
-
-	/**
 	 * @throws InternalError
 	 */
 	public function isRowInViewPresent(int $rowId, View $view, string $userId): bool {
@@ -735,9 +622,12 @@ class Row2Mapper {
 		}
 
 		// write all cells to its db-table
+		$cachedCells = [];
 		foreach ($row->getData() as $cell) {
-			$this->insertCell($rowSleeve->getId(), $cell['columnId'], $cell['value'], $rowSleeve->getLastEditAt(), $rowSleeve->getLastEditBy());
+			$cachedCells[$cell['columnId']] = $this->insertCell($rowSleeve->getId(), $cell['columnId'], $cell['value'], $rowSleeve->getLastEditAt(), $rowSleeve->getLastEditBy());
 		}
+		$rowSleeve->setCachedCellsArray($cachedCells);
+		$this->rowSleeveMapper->update($rowSleeve);
 
 		return $row;
 	}
@@ -754,9 +644,9 @@ class Row2Mapper {
 
 		// update meta data for sleeve
 		try {
-			$sleeve = $this->rowSleeveMapper->find($row->getId());
-			$this->updateMetaData($sleeve);
-			$this->rowSleeveMapper->update($sleeve);
+			$rowSleeve = $this->rowSleeveMapper->find($row->getId());
+			$this->updateMetaData($rowSleeve);
+			$this->rowSleeveMapper->update($rowSleeve);
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
@@ -765,9 +655,12 @@ class Row2Mapper {
 		$this->columnMapper->preloadColumns(array_column($changedCells, 'columnId'));
 
 		// write all changed cells to its db-table
+		$cachedCells = $rowSleeve->getCachedCellsArray();
 		foreach ($changedCells as $cell) {
-			$this->insertOrUpdateCell($sleeve->getId(), $cell['columnId'], $cell['value']);
+			$cachedCells[$cell['columnId']] = $this->insertOrUpdateCell($rowSleeve->getId(), $cell['columnId'], $cell['value']);
 		}
+		$rowSleeve->setCachedCellsArray($cachedCells);
+		$this->rowSleeveMapper->update($rowSleeve);
 
 		return $row;
 	}
@@ -819,9 +712,11 @@ class Row2Mapper {
 	/**
 	 * Insert a cell to its specific db-table
 	 *
+	 * @return array<string, mixed> normalized cell data
+	 *
 	 * @throws InternalError
 	 */
-	private function insertCell(int $rowId, int $columnId, $value, ?string $lastEditAt = null, ?string $lastEditBy = null): void {
+	private function insertCell(int $rowId, int $columnId, $value, ?string $lastEditAt = null, ?string $lastEditBy = null): array {
 		try {
 			$column = $this->columnMapper->find($columnId);
 		} catch (DoesNotExistException $e) {
@@ -831,7 +726,7 @@ class Row2Mapper {
 
 		// insert new cell
 		$cellMapper = $this->getCellMapper($column);
-
+		$cachedCell = [];
 		try {
 			$cellClassName = 'OCA\Tables\Db\RowCell' . ucfirst($column->getType());
 			if ($cellMapper->hasMultipleValues()) {
@@ -843,6 +738,7 @@ class Row2Mapper {
 					$this->updateMetaData($cell, false, $lastEditAt, $lastEditBy);
 					$cellMapper->applyDataToEntity($column, $cell, $val);
 					$cellMapper->insert($cell);
+					$cachedCell[] = $cellMapper->toArray($cell);
 				}
 			} else {
 				/** @var RowCellSuper $cell */
@@ -852,11 +748,14 @@ class Row2Mapper {
 				$this->updateMetaData($cell, false, $lastEditAt, $lastEditBy);
 				$cellMapper->applyDataToEntity($column, $cell, $value);
 				$cellMapper->insert($cell);
+				$cachedCell = $cellMapper->toArray($cell);
 			}
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			throw new InternalError('Failed to insert column: ' . $e->getMessage(), 0, $e);
 		}
+
+		return $cachedCell;
 	}
 
 	/**
@@ -864,53 +763,51 @@ class Row2Mapper {
 	 * @param RowCellMapperSuper $mapper
 	 * @param mixed $value the value should be parsed to the correct format within the row service
 	 * @param Column $column
+	 *
+	 * @return array<string, mixed> normalized cell data
 	 * @throws InternalError
 	 */
-	private function updateCell(RowCellSuper $cell, RowCellMapperSuper $mapper, $value, Column $column): void {
-		$this->getCellMapper($column)->applyDataToEntity($column, $cell, $value);
+	private function updateCell(RowCellSuper $cell, RowCellMapperSuper $mapper, $value, Column $column): array {
+		$cellMapper = $this->getCellMapper($column);
+		$cellMapper->applyDataToEntity($column, $cell, $value);
 		$this->updateMetaData($cell);
 		$mapper->updateWrapper($cell);
+
+		return $cellMapper->toArray($cell);
 	}
 
 	/**
+	 * @return array<string, mixed> normalized cell data
 	 * @throws InternalError
 	 */
-	private function insertOrUpdateCell(int $rowId, int $columnId, $value): void {
+	private function insertOrUpdateCell(int $rowId, int $columnId, $value): array {
 		$column = $this->columnMapper->find($columnId);
 		$cellMapper = $this->getCellMapper($column);
+		$cachedCell = [];
 		try {
 			if ($cellMapper->hasMultipleValues()) {
-				$this->atomic(function () use ($cellMapper, $rowId, $columnId, $value) {
+				$this->atomic(function () use ($cellMapper, $rowId, $columnId, $value, &$cachedCell) {
 					// For a usergroup field with mutiple values, each is inserted as a new cell
 					// we need to delete all previous cells for this row and column, otherwise we get duplicates
 					$cellMapper->deleteAllForColumnAndRow($columnId, $rowId);
-					$this->insertCell($rowId, $columnId, $value);
+					$cachedCell = $this->insertCell($rowId, $columnId, $value);
 				}, $this->db);
 			} else {
 				$cell = $cellMapper->findByRowAndColumn($rowId, $columnId);
-				$this->updateCell($cell, $cellMapper, $value, $column);
+				$cachedCell = $this->updateCell($cell, $cellMapper, $value, $column);
 			}
 		} catch (DoesNotExistException) {
-			$this->insertCell($rowId, $columnId, $value);
+			$cachedCell = $this->insertCell($rowId, $columnId, $value);
 		} catch (MultipleObjectsReturnedException|Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage(), $e->getCode(), $e);
 		}
+
+		return $cachedCell;
 	}
 
 	private function getCellMapper(Column $column): RowCellMapperSuper {
-		return $this->getCellMapperFromType($column->getType());
-	}
-
-	private function getCellMapperFromType(string $columnType): RowCellMapperSuper {
-		$cellMapperClassName = 'OCA\Tables\Db\RowCell' . ucfirst($columnType) . 'Mapper';
-		/** @var RowCellMapperSuper $cellMapper */
-		try {
-			return Server::get($cellMapperClassName);
-		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-			throw new InternalError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
-		}
+		return $this->columnsHelper->getCellMapperFromType($column->getType());
 	}
 
 	/**

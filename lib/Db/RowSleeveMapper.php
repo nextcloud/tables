@@ -40,7 +40,7 @@ class RowSleeveMapper extends QBMapper {
 
 	/**
 	 * @param int[] $ids
-	 * @return RowSleeve[]
+	 * @return array<string, mixed> Raw data from DB for the best performance
 	 * @throws Exception
 	 */
 	public function findMultiple(array $ids): array {
@@ -49,6 +49,7 @@ class RowSleeveMapper extends QBMapper {
 		$qb->select(
 			$sleeveAlias . '.id',
 			$sleeveAlias . '.table_id',
+			$sleeveAlias . '.cached_cells',
 			$sleeveAlias . '.created_by',
 			$sleeveAlias . '.created_at',
 			$sleeveAlias . '.last_edit_by',
@@ -56,7 +57,8 @@ class RowSleeveMapper extends QBMapper {
 		)
 			->from($this->table, $sleeveAlias)
 			->where($qb->expr()->in($sleeveAlias . '.id', $qb->createNamedParameter($ids, IQueryBuilder::PARAM_INT_ARRAY)));
-		return $this->findEntities($qb);
+
+		return $qb->executeQuery()->fetchAll();
 	}
 
 	/**

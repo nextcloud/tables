@@ -26,7 +26,7 @@ Share your tables and views with users and groups within your cloud.
 Have a good time and manage whatever you want.
 
 ]]></description>
-	<version>2.0.0-beta.1</version>
+	<version>2.0.0-beta.2</version>
 	<licence>agpl</licence>
 	<author mail="florian.steffens@nextcloud.com">Florian Steffens</author>
 	<namespace>Tables</namespace>
@@ -57,6 +57,7 @@ Have a good time and manage whatever you want.
 		<post-migration>
 			<step>OCA\Tables\Migration\NewDbStructureRepairStep</step>
 			<step>OCA\Tables\Migration\DbRowSleeveSequence</step>
+			<step>OCA\Tables\Migration\CacheSleeveCells</step>
 		</post-migration>
 	</repair-steps>
 	<commands>
