@@ -8,7 +8,7 @@
 
 		<div v-else>
 			<PublicElement
-				:view="mockView"
+				:element="mockView"
 				:columns="columns"
 				:rows="rows"
 				@download-csv="downloadCSV" />
@@ -53,6 +53,7 @@ export default {
 	data() {
 		return {
 			loading: false,
+			// TODO: remove mockView and replace with actual data
 			mockView: {
 				id: 'public',
 				title: 'Public Share',

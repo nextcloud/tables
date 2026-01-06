@@ -4,11 +4,11 @@
 -->
 <template>
 	<div class="table-wrapper">
-		<EmptyView v-if="columns.length === 0" :view="view" />
+		<EmptyView v-if="columns.length === 0" :view="element" />
 		<TableView v-else
 			:rows="rows"
 			:columns="columns"
-			:element="view"
+			:element="element"
 			:can-read-rows="true"
 			:can-create-rows="false"
 			:can-edit-rows="false"
@@ -46,7 +46,7 @@ export default {
 	},
 
 	props: {
-		view: {
+		element: {
 			type: Object,
 			default: null,
 		},

@@ -4,34 +4,25 @@
 -->
 <template>
 	<div class="options">
-		<div v-if="showOptions && (config.canReadRows || (config.canCreateRows && rows.length > 0))" class="fix-col-4" style="justify-content: space-between;">
-			<div :class="{'add-padding-left': isSmallMobile }"
-				class="actionButtonsLeft">
-				<NcButton v-if="!isSmallMobile && config.canCreateRows"
-					:aria-label="t('tables', 'Create row')"
-					:close-after-click="true"
-					type="tertiary"
-					data-cy="createRowBtn"
-					@click="$emit('create-row')">
+		<div v-if="showOptions && (config.canReadRows || (config.canCreateRows && rows.length > 0))" class="fix-col-4"
+			style="justify-content: space-between;">
+			<div :class="{ 'add-padding-left': isSmallMobile }" class="actionButtonsLeft">
+				<NcButton v-if="!isSmallMobile && config.canCreateRows" :aria-label="t('tables', 'Create row')"
+					:close-after-click="true" type="tertiary" data-cy="createRowBtn" @click="$emit('create-row')">
 					{{ t('tables', 'Create row') }}
 					<template #icon>
 						<Plus :size="25" />
 					</template>
 				</NcButton>
-				<NcButton v-if="isSmallMobile && config.canCreateRows"
-					:close-after-click="true"
-					:aria-label="t('tables', 'Create Row')"
-					type="tertiary"
-					data-cy="createRowBtn"
+				<NcButton v-if="isSmallMobile && config.canCreateRows" :close-after-click="true"
+					:aria-label="t('tables', 'Create Row')" type="tertiary" data-cy="createRowBtn"
 					@click="$emit('create-row')">
 					<template #icon>
 						<Plus :size="25" />
 					</template>
 				</NcButton>
 				<div class="searchAndFilter">
-					<SearchForm
-						:columns="columns"
-						:search-string="getSearchString"
+					<SearchForm :columns="columns" :search-string="getSearchString"
 						@set-search-string="str => $emit('set-search-string', str)" />
 				</div>
 			</div>
@@ -41,15 +32,13 @@
 					{{ n('tables', '%n selected row', '%n selected rows', selectedRows.length, {}) }}
 				</div>
 				<NcActions type="secondary" :force-name="true" :inline="showFullOptions ? 2 : 0">
-					<NcActionButton
-						@click="exportCsv">
+					<NcActionButton @click="exportCsv">
 						<template #icon>
 							<Export :size="20" />
 						</template>
 						{{ t('tables', 'Export CSV') }}
 					</NcActionButton>
-					<NcActionButton v-if="config.canDeleteRows"
-						@click="deleteSelectedRows">
+					<NcActionButton v-if="config.canDeleteRows" @click="deleteSelectedRows">
 						<template #icon>
 							<Delete :size="20" />
 						</template>
@@ -147,7 +136,7 @@ export default {
 			return this.viewSetting?.searchString || ''
 		},
 		showFullOptions() {
-			 return this.optionsDivWidth > 800
+			return this.optionsDivWidth > 800
 		},
 	},
 
@@ -179,9 +168,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
-
 .sticky {
-	position: -webkit-sticky; /* Safari */
+	position: -webkit-sticky;
+	/* Safari */
 	position: sticky;
 	top: 90px;
 	inset-inline-start: 0;
@@ -211,7 +200,6 @@ export default {
 
 :deep(.actionButtonsLeft button) {
 	min-width: fit-content;
-	margin-top: 5px;
 }
 
 .searchAndFilter {
@@ -219,5 +207,4 @@ export default {
 	width: auto;
 	min-width: 100px;
 }
-
 </style>

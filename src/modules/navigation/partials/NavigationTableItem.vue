@@ -3,15 +3,9 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcAppNavigationItem v-if="table"
-		data-cy="navigationTableItem"
-		:name="table.title"
-		:class="{active: activeTable && table.id === activeTable.id}"
-		:allow-collapse="hasViews"
-		:force-menu="true"
-		:open.sync="isParentOfActiveView"
-		:to="'/table/' + parseInt(table.id)"
-		@click="openTable">
+	<NcAppNavigationItem v-if="table" data-cy="navigationTableItem" :name="table.title"
+		:class="{ active: activeTable && table.id === activeTable.id }" :allow-collapse="hasViews" :force-menu="true"
+		:open.sync="isParentOfActiveView" :to="'/table/' + parseInt(table.id)" @click="openTable">
 		<template #icon>
 			<template v-if="table.emoji">
 				{{ table.emoji }}
@@ -26,7 +20,8 @@
 			<NcCounterBubble v-if="canReadData(table)">
 				{{ table.rowsCount }}
 			</NcCounterBubble>
-			<NcActionButton v-if="table.hasShares" icon="icon-share" :class="{'margin-right': !(activeTable && table.id === activeTable.id)}" @click="actionShowShare" />
+			<NcActionButton v-if="table.hasShares" icon="icon-share"
+				:class="{ 'margin-right': !(activeTable && table.id === activeTable.id) }" @click="actionShowShare" />
 			<div v-if="table.isShared && table.ownership !== userId" class="margin-left">
 				<NcAvatar :user="table.ownership" :show-user-status="false" />
 			</div>
@@ -34,8 +29,7 @@
 
 		<template #actions>
 			<!-- EDIT -->
-			<NcActionButton v-if="canManageElement(table)"
-				:close-after-click="true"
+			<NcActionButton v-if="canManageElement(table)" :close-after-click="true"
 				@click="emit('tables:table:edit', table.id)">
 				<template #icon>
 					<IconRename :size="20" decorative />
@@ -44,9 +38,7 @@
 			</NcActionButton>
 
 			<!-- CREATE VIEW -->
-			<NcActionButton v-if="canManageElement(table)"
-				:close-after-click="true"
-				@click="createView">
+			<NcActionButton v-if="canManageElement(table)" :close-after-click="true" @click="createView">
 				<template #icon>
 					<PlaylistPlus :size="20" />
 				</template>
@@ -54,16 +46,13 @@
 			</NcActionButton>
 
 			<!-- SHARE -->
-			<NcActionButton v-if="canShareElement(table)"
-				icon="icon-share"
-				:close-after-click="true"
+			<NcActionButton v-if="canShareElement(table)" icon="icon-share" :close-after-click="true"
 				@click="actionShowShare">
 				{{ t('tables', 'Share') }}
 			</NcActionButton>
 
 			<!-- IMPORT -->
-			<NcActionButton v-if="canCreateRowInElement(table)"
-				:close-after-click="true"
+			<NcActionButton v-if="canCreateRowInElement(table)" :close-after-click="true"
 				@click="actionShowImport(table)">
 				{{ t('tables', 'Import') }}
 				<template #icon>
@@ -73,15 +62,13 @@
 
 			<!-- EXPORT -->
 			<NcActionButton @click="exportFile">
-				{{ t('tables','Export') }}
+				{{ t('tables', 'Export') }}
 				<template #icon>
 					<Import :size="20" />
 				</template>
 			</NcActionButton>
 			<!-- INTEGRATION -->
-			<NcActionButton
-				:close-after-click="true"
-				@click="actionShowIntegration">
+			<NcActionButton :close-after-click="true" @click="actionShowIntegration">
 				{{ t('tables', 'Integration') }}
 				<template #icon>
 					<Connection :size="20" />
@@ -89,8 +76,7 @@
 			</NcActionButton>
 
 			<!-- Activity -->
-			<NcActionButton v-if="canReadData(table) && isActivityEnabled"
-				:close-after-click="true"
+			<NcActionButton v-if="canReadData(table) && isActivityEnabled" :close-after-click="true"
 				@click="actionShowActivity">
 				{{ t('tables', 'Activity') }}
 				<template #icon>
@@ -99,8 +85,7 @@
 			</NcActionButton>
 
 			<!-- FAVORITE -->
-			<NcActionButton v-if="!table.favorite && !table.archived"
-				:close-after-click="true"
+			<NcActionButton v-if="!table.favorite && !table.archived" :close-after-click="true"
 				@click="toggleFavoriteTable(true)">
 				{{ t('tables', 'Add to favorites') }}
 				<template #icon>
@@ -109,9 +94,7 @@
 			</NcActionButton>
 
 			<!-- UNFAVORITE -->
-			<NcActionButton v-if="table.favorite"
-				:close-after-click="true"
-				@click="toggleFavoriteTable(false)">
+			<NcActionButton v-if="table.favorite" :close-after-click="true" @click="toggleFavoriteTable(false)">
 				{{ t('tables', 'Remove from favorites') }}
 				<template #icon>
 					<StarOutline :size="20" />
@@ -120,8 +103,7 @@
 
 			<!-- ARCHIVE -->
 			<NcActionButton v-if="canManageElement(table) && !table.archived && !table.favorite"
-				:close-after-click="true"
-				@click="toggleArchiveTable(true)">
+				:close-after-click="true" @click="toggleArchiveTable(true)">
 				{{ t('tables', 'Archive table') }}
 				<template #icon>
 					<ArchiveArrowDown :size="20" />
@@ -129,8 +111,7 @@
 			</NcActionButton>
 
 			<!-- UNARCHIVE -->
-			<NcActionButton v-if="canManageElement(table) && table.archived"
-				:close-after-click="true"
+			<NcActionButton v-if="canManageElement(table) && table.archived" :close-after-click="true"
 				@click="toggleArchiveTable(false)">
 				{{ t('tables', 'Unarchive table') }}
 				<template #icon>
@@ -139,9 +120,7 @@
 			</NcActionButton>
 
 			<!-- DELETE -->
-			<NcActionButton v-if="canManageElement(table)"
-				:close-after-click="true"
-				@click="deleteTable()">
+			<NcActionButton v-if="canManageElement(table)" :close-after-click="true" @click="deleteTable()">
 				{{ t('tables', 'Delete table') }}
 				<template #icon>
 					<DeleteOutline :size="20" />
@@ -149,9 +128,7 @@
 			</NcActionButton>
 		</template>
 		<ul>
-			<NavigationViewItem v-for="view in getViews"
-				:key="'view'+view.id"
-				:view="view"
+			<NavigationViewItem v-for="view in getViews" :key="'view' + view.id" :view="view"
 				:show-share-sender="false" />
 		</ul>
 	</NcAppNavigationItem>
@@ -329,9 +306,8 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-
 .app-navigation-entry.active {
-	.icon-share  {
+	.icon-share {
 		background-image: var(--icon-share-white)
 	}
 
@@ -340,21 +316,17 @@ export default {
 	}
 }
 
-.app-navigation-entry__counter-wrapper {
-	button.action-button {
+:deep(.app-navigation-entry__counter-wrapper) {
+	.action-button {
 		padding-inline-end: 0;
 	}
-
-	.counter-bubble__counter {
-		display: none;
-	}
-	margin-inline-end: 0 !important;
 }
 
 .app-navigation-entry {
 	.margin-right {
 		margin-inline-end: 44px;
 	}
+
 	.margin-left {
 		margin-inline-start: calc(var(--default-grid-baseline) * 2);
 	}
@@ -369,5 +341,4 @@ export default {
 		display: inline;
 	}
 }
-
 </style>

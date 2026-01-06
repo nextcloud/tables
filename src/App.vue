@@ -45,15 +45,13 @@ export default {
 		return {
 			loading: false,
 			defaultPageTitle: false,
+			shareToken: loadState('tables', 'shareToken', false),
 		}
 	},
 	computed: {
 		...mapState(useTablesStore, ['isLoadingSomething', 'activeView', 'activeTable', 'activeContext']),
 		isPublicShare() {
 			return !!this.shareToken
-		},
-		shareToken() {
-			return loadState('tables', 'shareToken', false)
 		},
 	},
 	watch: {
@@ -88,7 +86,7 @@ export default {
 					// prepare route, when Context is opened from navigation bar
 					const contextId = loadState('tables', 'contextId', undefined)
 					const originalUrl = window.location.href
-					this.$router.replace('/application/' + contextId).catch(() => {})
+					this.$router.replace('/application/' + contextId).catch(() => { })
 					// reverts turning /apps/tables/app/28 into /apps/tables/app/28#/application/28
 					history.replaceState({}, undefined, originalUrl)
 				}
@@ -176,16 +174,13 @@ export default {
 }
 </script>
 <style scoped lang="scss">
-
-	.sidebar-icon {
-		position: absolute;
-		inset-inline-end: 5px;
-		top: 5px;
-	}
-
+.sidebar-icon {
+	position: absolute;
+	inset-inline-end: 5px;
+	top: 5px;
+}
 </style>
 <style lang="scss" scoped>
-
 h1 {
 	font-size: 1.98em;
 }
@@ -203,16 +198,24 @@ h4 {
 	font-weight: 300;
 }
 
-p, .p {
+p,
+.p {
 	padding-top: 5px;
 	padding-bottom: 7px;
 }
 
-.editor-wrapper p, .editor-wrapper .p {
+.editor-wrapper p,
+.editor-wrapper .p {
 	padding: 0;
 }
 
-p span, .p span, p .span, .p .span, .p.span, p.span, .light {
+p span,
+.p span,
+p .span,
+.p .span,
+.p.span,
+p.span,
+.light {
 	color: var(--color-text-maxcontrast);
 }
 
@@ -241,7 +244,7 @@ button[class^='icon-'] {
 	min-width: 36px !important;
 }
 
-[class^='col-'] > span {
+[class^='col-']>span {
 	color: var(--color-text-maxcontrast);
 }
 
@@ -261,7 +264,8 @@ button[class^='icon-'] {
 	border: none;
 }
 
-.popover__inner p, .v-popper__inner table {
+.popover__inner p,
+.v-popper__inner table {
 	padding: 15px;
 }
 
@@ -270,7 +274,7 @@ button[class^='icon-'] {
 }
 
 .error {
-	color:  var(--color-error);
+	color: var(--color-error);
 }
 
 .error input {
@@ -294,8 +298,7 @@ button[class^='icon-'] {
 }
 
 .v-select.select .vs__selected-options {
-    min-height: calc(var(--default-clickable-area) - 2 * var(--vs-border-width)) !important;
-    padding: 0 5px;
+	min-height: calc(var(--default-clickable-area) - 2 * var(--vs-border-width)) !important;
+	padding: 0 5px;
 }
-
 </style>
