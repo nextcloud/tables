@@ -28,8 +28,7 @@ use Psr\Log\LoggerInterface;
 /**
  * @psalm-import-type TablesColumn from ResponseDefinitions
  */
-class ApiColumnsController extends ACommonColumnsController
-{
+class ApiColumnsController extends ACommonColumnsController {
 
 
 	public function __construct(
@@ -54,18 +53,17 @@ class ApiColumnsController extends ACommonColumnsController
 	 * @return DataResponse<Http::STATUS_OK, list<TablesColumn>,
 	 *     array{}>|DataResponse<Http::STATUS_BAD_REQUEST|Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
 	 *     array{message: string}, array{}>
-
+	 *
 	 *
 	 * 200: View deleted
 	 * 400: Invalid input arguments
-
+	 *
 	 * 403: No permissions
 	 * 404: Not found
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_READ)]
-	public function index(int $nodeId, string $nodeType): DataResponse
-	{
+	public function index(int $nodeId, string $nodeType): DataResponse {
 		try {
 			$columns = $this->getColumnsFromTableOrView($nodeType, $nodeId);
 
@@ -88,15 +86,14 @@ class ApiColumnsController extends ACommonColumnsController
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn,
 	 *     array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
 	 *     array{message: string}, array{}>
-
+	 *
 	 *
 	 * 200: Column returned
 	 * 403: No permissions
 	 * 404: Not found
 	 */
 	#[NoAdminRequired]
-	public function show(int $id): DataResponse
-	{
+	public function show(int $id): DataResponse {
 		try {
 			return new DataResponse($this->service->find($id)->jsonSerialize());
 		} catch (PermissionError $e) {
@@ -126,15 +123,15 @@ class ApiColumnsController extends ACommonColumnsController
 	 * @param 'progress'|'stars'|null $subtype Subtype for the new column
 	 * @param string|null $description Description
 	 * @param list<int>|null $selectedViewIds View IDs where this columns
-	 *     should be added
+	 *                                        should be added
 	 * @param array<string, mixed> $customSettings Custom settings for the
-	 *     column
-
+	 *                                             column
+	 *
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn,
 	 *     array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
 	 *     array{message: string}, array{}>
-
+	 *
 	 *
 	 * 200: Column created
 	 * 403: No permission
@@ -145,8 +142,7 @@ class ApiColumnsController extends ACommonColumnsController
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
-	public function createNumberColumn(int $baseNodeId, string $title, ?float $numberDefault, ?int $numberDecimals, ?string $numberPrefix, ?string $numberSuffix, ?float $numberMin, ?float $numberMax, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse
-	{
+	public function createNumberColumn(int $baseNodeId, string $title, ?float $numberDefault, ?int $numberDecimals, ?string $numberPrefix, ?string $numberSuffix, ?float $numberMin, ?float $numberMax, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		$column = $this->service->create(
@@ -183,21 +179,21 @@ class ApiColumnsController extends ACommonColumnsController
 	 * @param string|null $textAllowedPattern Allowed regex pattern
 	 * @param int|null $textMaxLength Max raw text length
 	 * @param bool|null $textUnique Whether the text value must be unique, if
-	 *     column is a text
-
+	 *                              column is a text
+	 *
 	 * @param 'progress'|'stars'|null $subtype Subtype for the new column
 	 * @param string|null $description Description
 	 * @param list<int>|null $selectedViewIds View IDs where this columns
-	 *     should be added
-
+	 *                                        should be added
+	 *
 	 * @param boolean $mandatory Is mandatory
 	 * @param 'table'|'view' $baseNodeType Context type of the column creation
 	 * @param array<string, mixed> $customSettings Custom settings for the
-	 *     column
+	 *                                             column
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn,
 	 *     array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
 	 *     array{message: string}, array{}>
-
+	 *
 	 *
 	 * 200: Column created
 	 * 403: No permission
@@ -208,8 +204,7 @@ class ApiColumnsController extends ACommonColumnsController
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
-	public function createTextColumn(int $baseNodeId, string $title, ?string $textDefault, ?string $textAllowedPattern, ?int $textMaxLength, ?bool $textUnique = false, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse
-	{
+	public function createTextColumn(int $baseNodeId, string $title, ?string $textDefault, ?string $textAllowedPattern, ?int $textMaxLength, ?bool $textUnique = false, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		$column = $this->service->create(
@@ -241,26 +236,26 @@ class ApiColumnsController extends ACommonColumnsController
 	 * @param int $baseNodeId Context of the column creation
 	 * @param string $title Title
 	 * @param string $selectionOptions Json array{id: int, label: string} with
-	 *     options that can be selected, eg [{"id": 1, "label": "first"},{"id":
-	 *     2, "label": "second"}]
+	 *                                 options that can be selected, eg [{"id": 1, "label": "first"},{"id":
+	 *                                 2, "label": "second"}]
 	 * @param string|null $selectionDefault Json int|list<int> for default
-	 *     selected option(s), eg 5 or ["1", "8"]
-
+	 *                                      selected option(s), eg 5 or ["1", "8"]
+	 *
 	 * @param 'progress'|'stars'|null $subtype Subtype for the new column
 	 * @param string|null $description Description
 	 * @param list<int>|null $selectedViewIds View IDs where this columns
-	 *     should be added
-
+	 *                                        should be added
+	 *
 	 * @param boolean $mandatory Is mandatory
 	 * @param 'table'|'view' $baseNodeType Context type of the column creation
 	 * @param array<string, mixed> $customSettings Custom settings for the
-	 *     column
-
+	 *                                             column
+	 *
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn,
 	 *     array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
 	 *     array{message: string}, array{}>
-
+	 *
 	 *
 	 * 200: Column created
 	 * 403: No permission
@@ -271,8 +266,7 @@ class ApiColumnsController extends ACommonColumnsController
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
-	public function createSelectionColumn(int $baseNodeId, string $title, string $selectionOptions, ?string $selectionDefault, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse
-	{
+	public function createSelectionColumn(int $baseNodeId, string $title, string $selectionOptions, ?string $selectionDefault, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		$column = $this->service->create(
@@ -302,23 +296,23 @@ class ApiColumnsController extends ACommonColumnsController
 	 * @param int $baseNodeId Context of the column creation
 	 * @param string $title Title
 	 * @param 'today'|'now'|null $datetimeDefault For a subtype 'date' you can
-	 *     set 'today'. For a main type or subtype 'time' you can set to 'now'.
-
+	 *                                            set 'today'. For a main type or subtype 'time' you can set to 'now'.
+	 *
 	 * @param 'progress'|'stars'|null $subtype Subtype for the new column
 	 * @param string|null $description Description
 	 * @param list<int>|null $selectedViewIds View IDs where this columns
-	 *     should be added
-
+	 *                                        should be added
+	 *
 	 * @param boolean $mandatory Is mandatory
 	 * @param 'table'|'view' $baseNodeType Context type of the column creation
 	 * @param array<string, mixed> $customSettings Custom settings for the
-	 *     column
-
+	 *                                             column
+	 *
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn,
 	 *     array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
 	 *     array{message: string}, array{}>
-
+	 *
 	 *
 	 * 200: Column created
 	 * 403: No permission
@@ -329,8 +323,7 @@ class ApiColumnsController extends ACommonColumnsController
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
-	public function createDatetimeColumn(int $baseNodeId, string $title, ?string $datetimeDefault, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse
-	{
+	public function createDatetimeColumn(int $baseNodeId, string $title, ?string $datetimeDefault, ?string $subtype = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		$column = $this->service->create(
@@ -357,28 +350,28 @@ class ApiColumnsController extends ACommonColumnsController
 	 * @param int $baseNodeId Context of the column creation
 	 * @param string $title Title
 	 * @param string|null $usergroupDefault Json array{id: string, type: int},
-	 *     eg [{"id": "admin", "type": 0}, {"id": "user1", "type": 0}]
+	 *                                      eg [{"id": "admin", "type": 0}, {"id": "user1", "type": 0}]
 	 * @param boolean $usergroupMultipleItems Whether you can select multiple
-	 *     users or/and groups
-
+	 *                                        users or/and groups
+	 *
 	 * @param boolean $usergroupSelectUsers Whether you can select users
 	 * @param boolean $usergroupSelectGroups Whether you can select groups
 	 * @param boolean $usergroupSelectTeams Whether you can select teams
 	 * @param boolean $showUserStatus Whether to show the user's status
 	 * @param string|null $description Description
 	 * @param list<int>|null $selectedViewIds View IDs where this columns
-	 *     should be added
-
+	 *                                        should be added
+	 *
 	 * @param boolean $mandatory Is mandatory
 	 * @param 'table'|'view' $baseNodeType Context type of the column creation
 	 * @param array<string, mixed> $customSettings Custom settings for the
-	 *     column
-
+	 *                                             column
+	 *
 	 *
 	 * @return DataResponse<Http::STATUS_OK, TablesColumn,
 	 *     array{}>|DataResponse<Http::STATUS_FORBIDDEN|Http::STATUS_INTERNAL_SERVER_ERROR|Http::STATUS_NOT_FOUND,
 	 *     array{message: string}, array{}>
-
+	 *
 	 *
 	 * 200: Column created
 	 * 403: No permission
@@ -389,8 +382,7 @@ class ApiColumnsController extends ACommonColumnsController
 	 */
 	#[NoAdminRequired]
 	#[RequirePermission(permission: Application::PERMISSION_MANAGE, typeParam: 'baseNodeType', idParam: 'baseNodeId')]
-	public function createUsergroupColumn(int $baseNodeId, string $title, ?string $usergroupDefault, ?bool $usergroupMultipleItems = null, ?bool $usergroupSelectUsers = null, ?bool $usergroupSelectGroups = null, ?bool $usergroupSelectTeams = null, ?bool $showUserStatus = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse
-	{
+	public function createUsergroupColumn(int $baseNodeId, string $title, ?string $usergroupDefault, ?bool $usergroupMultipleItems = null, ?bool $usergroupSelectUsers = null, ?bool $usergroupSelectGroups = null, ?bool $usergroupSelectTeams = null, ?bool $showUserStatus = null, ?string $description = null, ?array $selectedViewIds = [], bool $mandatory = false, string $baseNodeType = 'table', array $customSettings = []): DataResponse {
 		$tableId = $baseNodeType === 'table' ? $baseNodeId : null;
 		$viewId = $baseNodeType === 'view' ? $baseNodeId : null;
 		$column = $this->service->create(

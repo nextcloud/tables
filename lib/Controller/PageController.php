@@ -89,6 +89,6 @@ class PageController extends Controller
 		Util::addStyle(Application::APP_ID, 'grid');
 		Util::addStyle(Application::APP_ID, 'modal');
 		Util::addStyle(Application::APP_ID, 'tiptap');
-		Util::addStyle(Application::APP_ID, 'tables-style');
+		Util::addStyle(Application::APP_ID, 'error');
 	}
 }
