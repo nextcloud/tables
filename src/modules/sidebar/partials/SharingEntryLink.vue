@@ -14,8 +14,8 @@
 					</div>
 				</div>
 				<NcActionButton :disabled="loading" :aria-label="t('tables', 'Create a new share link')"
-					:icon="loading ? 'icon-loading-small' : 'icon-add'" @click.prevent.stop="showCreateForm = true"
-					data-cy="sharingEntryLinkCreateButton" />
+					:icon="loading ? 'icon-loading-small' : 'icon-add'" data-cy="sharingEntryLinkCreateButton"
+					@click.prevent.stop="showCreateForm = true" />
 			</div>
 
 			<!-- Inline Creation Form -->
@@ -41,7 +41,7 @@
 
 				<div class="sharing-entry-link__form-actions">
 					<NcButton type="primary" :disabled="loading || (usePassword && !password && password !== 0)"
-						@click="onCreate" data-cy="sharingEntryLinkCreateFormCreateButton">
+						data-cy="sharingEntryLinkCreateFormCreateButton" @click="onCreate">
 						{{ t('tables', 'Create') }}
 					</NcButton>
 					<NcButton type="tertiary" :disabled="loading" @click="cancelCreate">

@@ -1,0 +1,61 @@
+.tables-error-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.body-public-container {
+  --color-text-maxcontrast: var(
+    --color-text-maxcontrast-background-blur,
+    var(--color-main-text)
+  );
+  color: var(--color-main-text);
+  background-color: var(--color-main-background-blur);
+  padding: calc(3 * var(--default-grid-baseline));
+  border-radius: var(--border-radius-container);
+  box-shadow: 0 0 10px var(--color-box-shadow);
+  display: inline-block;
+  -webkit-backdrop-filter: var(--filter-background-blur);
+  backdrop-filter: var(--filter-background-blur);
+  display: flex;
+  flex-direction: column;
+  text-align: start;
+  word-wrap: break-word;
+  border-radius: 10px;
+  cursor: default;
+  -moz-user-select: text;
+  -webkit-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  height: fit-content;
+  width: 100%;
+  max-width: 700px;
+  margin-block: 10vh auto;
+}
+
+.body-public-container .icon-big {
+  background-size: 70px;
+  height: 70px;
+}
+
+.body-public-container form {
+  width: initial;
+}
+
+.body-public-container p:not(:last-child) {
+  margin-bottom: 12px;
+}
+
+.infogroup {
+  margin: 8px 0;
+}
+
+.infogroup:last-child {
+  margin-bottom: 0;
+}
+
+.update {
+  width: calc(100% - 32px);
+  text-align: center;
+}
