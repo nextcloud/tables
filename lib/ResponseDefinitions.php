@@ -112,6 +112,15 @@ namespace OCA\Tables;
  *  createdBy: string,
  * }
  *
+ * @psalm-type TablesPublicNode = array{
+ *  title: string,
+ *  emoji: string,
+ *  description: string,
+ *  createdAt: string,
+ *  lastEditAt: string,
+ *  rowsCount: int,
+ * }
+ *
  * @psalm-type TablesColumn = array{
  *  id: int,
  *  title: string,

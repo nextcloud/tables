@@ -14,7 +14,6 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\ConversionHelper;
-
 class NodeService {
 	private const PUBLIC_NODE_KEYS = [
 		'title',
