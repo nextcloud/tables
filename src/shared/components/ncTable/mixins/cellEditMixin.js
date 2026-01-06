@@ -28,6 +28,10 @@ export default {
 			type: Boolean,
 			default: true,
 		},
+		canEdit: {
+			type: Boolean,
+			default: true,
+		},
 	},
 
 	data() {
@@ -42,6 +46,11 @@ export default {
 		...mapActions(useDataStore, ['updateRow']),
 
 		canEditCell() {
+			// Prevent editing if row editing is globally disabled
+			if (!this.canEdit) {
+				return false
+			}
+
 			// Prevent editing for meta columns
 			if (this.column.id < 0) {
 				return false

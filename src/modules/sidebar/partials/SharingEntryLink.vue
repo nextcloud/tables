@@ -7,41 +7,30 @@
 		<!-- Create Link State -->
 		<div v-if="isCreateMode">
 			<div v-if="!showCreateForm" class="sharing-entry-link__create">
-				<NcButton
-					type="secondary"
-					class="sharing-entry-link__create-button"
-					:disabled="loading"
-					@click="showCreateForm = true">
-					<template #icon>
-						<Plus :size="20" />
-					</template>
-					{{ t('tables', 'Create public link') }}
-				</NcButton>
+				<div class="sharing-entry-link__create-row">
+					<NcAvatar :is-no-user="true" icon-class="avatar-class-icon avatar-link-share icon-public-white " />
+					<div class="sharing-entry-link__create-text">
+						{{ t('tables', 'Create public link') }}
+					</div>
+				</div>
+				<NcActionButton :disabled="loading" :aria-label="t('tables', 'Create a new share link')"
+					:icon="loading ? 'icon-loading-small' : 'icon-add'" @click.prevent.stop="showCreateForm = true"
+					data-cy="sharingEntryLinkCreateButton" />
 			</div>
 
 			<!-- Inline Creation Form -->
 			<div v-else class="sharing-entry-link__create-form">
 				<div class="sharing-entry-link__form-row">
-					<NcActionCheckbox
-						:checked.sync="usePassword"
-						@update:chk="onTogglePassword">
-						{{ t('tables', 'Password protection') }}
+					<NcActionCheckbox :checked.sync="usePassword" @update:chk="onTogglePassword">
+						{{ t('tables', 'Set password') }}
 					</NcActionCheckbox>
 				</div>
 
 				<div v-if="usePassword" class="sharing-entry-link__form-row">
-					<NcActionInput
-						:value.sync="password"
-						type="text"
-						:label="t('tables', 'Password')"
-						:show-trailing-button="true"
-						class="sharing-entry-link__password-input">
-						<template #icon>
-							<LockIcon :size="20" />
-						</template>
+					<NcActionInput :value.sync="password" type="password" :label="t('tables', 'Password')"
+						:show-trailing-button="true" class="sharing-entry-link__password-input">
 						<template #trailing>
-							<NcActionButton
-								@click="copyPassword">
+							<NcActionButton @click="copyPassword">
 								<template #icon>
 									<ContentCopy :size="20" />
 								</template>
@@ -51,16 +40,11 @@
 				</div>
 
 				<div class="sharing-entry-link__form-actions">
-					<NcButton
-						type="primary"
-						:disabled="loading"
-						@click="onCreate">
+					<NcButton type="primary" :disabled="loading || (usePassword && !password && password !== 0)"
+						@click="onCreate" data-cy="sharingEntryLinkCreateFormCreateButton">
 						{{ t('tables', 'Create') }}
 					</NcButton>
-					<NcButton
-						type="tertiary"
-						:disabled="loading"
-						@click="cancelCreate">
+					<NcButton type="tertiary" :disabled="loading" @click="cancelCreate">
 						{{ t('tables', 'Cancel') }}
 					</NcButton>
 				</div>
@@ -70,26 +54,25 @@
 		<!-- Existing Link State -->
 		<div v-else-if="share" class="sharing-entry-link__content">
 			<div class="sharing-entry-link__row">
-				<NcAvatar
-					:is-no-user="true"
-					icon-class="icon-public-white"
-					class="sharing-entry-link__avatar" />
+				<div class="sharing-entry-link__row-content">
+					<NcAvatar :is-no-user="true" icon-class="icon-public-white" class="sharing-entry-link__avatar" />
 
-				<div>
-					<span class="sharing-entry__title" data-cy="sharingEntryLinkTitle" :title="t('tables', 'Public link')">
-						{{ t('tables', 'Public link') }}
-					</span>
-					<div v-if="hasPassword" class="sharing-entry-link__subtitle">
-						<LockIcon :size="12" /> {{ t('tables', 'Password protected') }}
+					<div>
+						<span class="sharing-entry__title" data-cy="sharingEntryLinkTitle"
+							:title="t('tables', 'Share link')">
+							{{ t('tables', 'Share link') }}
+						</span>
+						<div class="sharing-entry-link__subtitle">
+							{{ t('tables', 'View only') }}
+							<LockIcon v-if="hasPassword" :size="12" />
+						</div>
 					</div>
 				</div>
 
 				<div class="sharing-entry-link__actions">
 					<!-- Copy Button -->
-					<NcActionButton
-						:aria-label="t('tables', 'Copy public link')"
-						data-cy="sharingEntryLinkCopyButton"
-						@click="copyLink">
+					<NcActionButton :aria-label="t('tables', 'Copy public share link')"
+						data-cy="sharingEntryLinkCopyButton" @click="copyLink">
 						<template #icon>
 							<ContentCopy :size="20" />
 						</template>
@@ -133,7 +116,6 @@ import {
 import TrashCan from 'vue-material-design-icons/TrashCan.vue'
 import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
 import LockIcon from 'vue-material-design-icons/Lock.vue'
-import Plus from 'vue-material-design-icons/Plus.vue'
 import DotsHorizontal from 'vue-material-design-icons/DotsHorizontal.vue'
 
 export default {
@@ -149,7 +131,6 @@ export default {
 		TrashCan,
 		ContentCopy,
 		LockIcon,
-		Plus,
 		DotsHorizontal,
 	},
 
@@ -173,7 +154,7 @@ export default {
 
 			// Creation State
 			showCreateForm: false,
-			usePassword: true,
+			usePassword: false,
 			password: '',
 		}
 	},
@@ -207,7 +188,7 @@ export default {
 		cancelCreate() {
 			this.showCreateForm = false
 			this.password = ''
-			this.usePassword = true
+			this.usePassword = false
 		},
 		async onCreate() {
 			this.loading = true
@@ -258,6 +239,7 @@ export default {
 .sharing-entry-link {
 	margin-bottom: 10px;
 	padding-bottom: 5px;
+	align-items: center;
 
 	&__create {
 		display: flex;
@@ -334,12 +316,42 @@ export default {
 		flex-shrink: 0;
 	}
 
-    li {
-        list-style-type: none;
-    }
+	li {
+		list-style-type: none;
+	}
 
-    .sharing-entry__title {
-        font-weight:normal;
-    }
+	.sharing-entry__title {
+		font-weight: normal;
+	}
+
+	.sharing-entry-link__create {
+		display: flex;
+		width: 100%;
+		justify-content: space-between;
+		align-items: center;
+
+		:deep(.avatar-class-icon) {
+			background-color: var(--color-primary-element);
+		}
+	}
+
+	.sharing-entry-link__create-row {
+		display: flex;
+		align-items: center;
+
+	}
+
+	.sharing-entry-link__row-content {
+		flex-grow: 1;
+		overflow: hidden;
+		display: flex;
+		flex-direction: row;
+		justify-content: left;
+		align-items: center;
+	}
+
+	.sharing-entry-link__create-text {
+		padding: 10px;
+	}
 }
 </style>

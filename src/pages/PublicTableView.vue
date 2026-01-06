@@ -3,7 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div class="public-table-view">
+	<div class="public-table-element" data-cy="publicTableElement">
 		<header id="header">
 			<div class="header-left">
 				<div class="logo logo-icon">
@@ -48,7 +48,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.public-table-view {
+.public-table-element {
 	display: flex;
 	flex-direction: column;
 }
