@@ -30,7 +30,8 @@ use OCP\INavigationManager;
 use OCP\IRequest;
 use OCP\Util;
 
-class PageController extends Controller {
+class PageController extends Controller
+{
 
 	public function __construct(
 		IRequest $request,
@@ -50,7 +51,8 @@ class PageController extends Controller {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[OpenAPI(scope: OpenAPI::SCOPE_IGNORE)]
-	public function index(): TemplateResponse {
+	public function index(): TemplateResponse
+	{
 		Util::addScript(Application::APP_ID, 'tables-main');
 		$this->loadStyles();
 
@@ -73,7 +75,8 @@ class PageController extends Controller {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[OpenAPI(scope: OpenAPI::SCOPE_IGNORE)]
-	public function context(int $contextId): TemplateResponse {
+	public function context(int $contextId): TemplateResponse
+	{
 		$navId = Application::APP_ID . '_application_' . $contextId;
 		$this->navigationManager->setActiveEntry($navId);
 

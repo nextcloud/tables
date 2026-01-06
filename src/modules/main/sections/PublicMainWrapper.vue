@@ -7,7 +7,7 @@
 		<div v-if="loading" class="icon-loading" />
 
 		<div v-else>
-			<PublicView
+			<PublicElement
 				:view="mockView"
 				:columns="columns"
 				:rows="rows"
@@ -18,7 +18,7 @@
 
 <script>
 import { mapActions, storeToRefs } from 'pinia'
-import PublicView from './PublicView.vue'
+import PublicElement from './PublicElement.vue'
 import exportTableMixin from '../../../shared/components/ncTable/mixins/exportTableMixin.js'
 import { useDataStore } from '../../../store/data.js'
 import { computed } from 'vue'
@@ -27,7 +27,7 @@ export default {
 	name: 'PublicMainWrapper',
 
 	components: {
-		PublicView,
+		PublicElement,
 	},
 
 	mixins: [exportTableMixin],
