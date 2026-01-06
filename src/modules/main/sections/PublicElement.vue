@@ -37,7 +37,7 @@ import EmptyView from './EmptyView.vue'
 import { NcActions, NcActionButton } from '@nextcloud/vue'
 
 export default {
-	name: 'PublicView',
+	name: 'PublicElement',
 	components: {
 		EmptyView,
 		TableView,
