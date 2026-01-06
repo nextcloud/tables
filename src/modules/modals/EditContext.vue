@@ -3,10 +3,7 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<NcDialog v-if="showModal"
-		:name="t('tables', 'Edit application')"
-		size="normal"
-		data-cy="editContextModal"
+	<NcDialog v-if="showModal" :name="t('tables', 'Edit application')" size="normal" data-cy="editContextModal"
 		@closing="actionCancel">
 		<div class="modal__content" data-cy="editContextModal">
 			<div class="row">
@@ -30,7 +27,8 @@
 				<div class="col-4">
 					{{ t('tables', 'Description') }}
 				</div>
-				<input v-model="description" type="text" data-cy="editContextDes" :placeholder="t('tables', 'Description of the application')">
+				<input v-model="description" type="text" data-cy="editContextDes"
+					:placeholder="t('tables', 'Description of the application')">
 			</div>
 			<div class="col-4 row space-T">
 				<div class="col-4">
@@ -55,7 +53,8 @@
 						{{ t('tables', 'I really want to delete this application!') }}
 					</NcButton>
 					<div class="right-additional-button">
-						<NcButton v-if="ownsContext(localContext)" data-cy="transferContextSubmitBtn" @click="actionTransfer">
+						<NcButton v-if="ownsContext(localContext)" data-cy="transferContextSubmitBtn"
+							@click="actionTransfer">
 							{{ t('tables', 'Transfer application') }}
 						</NcButton>
 						<NcButton type="primary" data-cy="editContextSubmitBtn" @click="submit">
@@ -232,24 +231,35 @@ export default {
 		},
 		getContextResources(context) {
 			const resources = []
-			const nodes = Object.values(context.nodes)
-			for (const node of nodes) {
-				if (parseInt(node.node_type) === NODE_TYPE_TABLE || parseInt(node.node_type) === NODE_TYPE_VIEW) {
-					const element = parseInt(node.node_type) === NODE_TYPE_TABLE ? this.tables.find(t => t.id === node.node_id) : this.views.find(v => v.id === node.node_id)
-					if (element) {
-						const elementKey = parseInt(node.node_type) === NODE_TYPE_TABLE ? 'table-' : 'view-'
-						const resource = {
-							title: element.title,
-							emoji: element.emoji,
-							key: `${elementKey}` + element.id,
-							nodeType: parseInt(node.node_type) === NODE_TYPE_TABLE ? NODE_TYPE_TABLE : NODE_TYPE_VIEW,
-							id: (element.id).toString(),
-							permissionRead: this.getPermissionFromBitmask(node.permissions, PERMISSION_READ),
-							permissionCreate: this.getPermissionFromBitmask(node.permissions, PERMISSION_CREATE),
-							permissionUpdate: this.getPermissionFromBitmask(node.permissions, PERMISSION_UPDATE),
-							permissionDelete: this.getPermissionFromBitmask(node.permissions, PERMISSION_DELETE),
+			if (context && context.pages) {
+				const pages = Object.values(context.pages)
+				const startPage = pages.find(p => p.page_type === 'startpage')
+
+				if (startPage && startPage.content) {
+					const sortedContent = Object.values(startPage.content).sort((a, b) => a.order - b.order)
+
+					for (const content of sortedContent) {
+						const node = context.nodes[content.node_rel_id]
+						if (!node) continue
+
+						if (parseInt(node.node_type) === NODE_TYPE_TABLE || parseInt(node.node_type) === NODE_TYPE_VIEW) {
+							const element = parseInt(node.node_type) === NODE_TYPE_TABLE ? this.tables.find(t => t.id === node.node_id) : this.views.find(v => v.id === node.node_id)
+							if (element) {
+								const elementKey = parseInt(node.node_type) === NODE_TYPE_TABLE ? 'table-' : 'view-'
+								const resource = {
+									title: element.title,
+									emoji: element.emoji,
+									key: `${elementKey}` + element.id,
+									nodeType: parseInt(node.node_type) === NODE_TYPE_TABLE ? NODE_TYPE_TABLE : NODE_TYPE_VIEW,
+									id: (element.id).toString(),
+									permissionRead: this.getPermissionFromBitmask(node.permissions, PERMISSION_READ),
+									permissionCreate: this.getPermissionFromBitmask(node.permissions, PERMISSION_CREATE),
+									permissionUpdate: this.getPermissionFromBitmask(node.permissions, PERMISSION_UPDATE),
+									permissionDelete: this.getPermissionFromBitmask(node.permissions, PERMISSION_DELETE),
+								}
+								resources.push(resource)
+							}
 						}
-						resources.push(resource)
 					}
 				}
 			}
