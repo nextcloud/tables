@@ -4,20 +4,8 @@
 -->
 <template>
 	<div class="public-table-element" data-cy="publicTableElement">
-		<header id="header">
-			<div class="header-left">
-				<div class="logo logo-icon">
-					<h1 class="hidden-visually">
-						Nextcloud Tables
-					</h1>
-				</div>
-			</div>
-		</header>
-
-		<div>
-			<div class="content-wrapper">
-				<PublicMainWrapper v-if="tokenToUse" :token="tokenToUse" />
-			</div>
+		<div class="content-wrapper">
+			<PublicMainWrapper v-if="tokenToUse" :token="tokenToUse" />
 		</div>
 	</div>
 </template>
@@ -51,6 +39,22 @@ export default {
 .public-table-element {
 	display: flex;
 	flex-direction: column;
+
+	:deep(.first-row) {
+		padding-inline-start: calc(var(--default-grid-baseline) * 5);
+
+		h1 {
+			font-size: revert;
+		}
+	}
+
+	:deep(.element-description) {
+		padding-inline: calc(var(--default-grid-baseline) * 5);
+	}
+
+	:deep(.tables-list__table) {
+		margin-top: 0;
+	}
 }
 
 #header {

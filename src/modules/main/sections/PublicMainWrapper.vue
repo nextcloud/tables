@@ -7,11 +7,7 @@
 		<div v-if="loading" class="icon-loading" />
 
 		<div v-else>
-			<PublicElement
-				:element="mockView"
-				:columns="columns"
-				:rows="rows"
-				@download-csv="downloadCSV" />
+			<PublicElement :element="publicElement" :columns="columns" :rows="rows" @download-csv="downloadCSV" />
 		</div>
 	</div>
 </template>
@@ -22,6 +18,7 @@ import PublicElement from './PublicElement.vue'
 import exportTableMixin from '../../../shared/components/ncTable/mixins/exportTableMixin.js'
 import { useDataStore } from '../../../store/data.js'
 import { computed } from 'vue'
+import { loadState } from '@nextcloud/initial-state'
 
 export default {
 	name: 'PublicMainWrapper',
@@ -46,19 +43,20 @@ export default {
 		const stateKey = 'public-' + props.token
 		const rows = computed(() => getRows.value(false, stateKey))
 		const columns = computed(() => getColumns.value(false, stateKey))
+		const nodeData = loadState('tables', 'nodeData')
 
-		return { rows, columns }
+		return { rows, columns, nodeData }
 	},
 
 	data() {
 		return {
 			loading: false,
-			// TODO: remove mockView and replace with actual data
-			mockView: {
+			publicElement: {
 				id: 'public',
-				title: 'Public Share',
-				description: '',
-				isShared: true,
+				emoji: this.nodeData.emoji,
+				title: this.nodeData.title,
+				description: this.nodeData.description,
+				isShared: false, // Setting as false to hide the user bubble
 				onSharePermissions: {
 					read: true,
 					manage: false,
