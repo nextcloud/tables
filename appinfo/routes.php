@@ -16,6 +16,7 @@ return [
 
 		['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
 		['name' => 'page#context', 'url' => '/app/{contextId}', 'verb' => 'GET'],
+		['name' => 'PublicSharePage#authenticate', 'url' => '/s/{token}/authenticate', 'verb' => 'POST'],
 
 		['name' => 'tableTemplate#list', 'url' => '/table/templates', 'verb' => 'GET'],
 

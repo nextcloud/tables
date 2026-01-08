@@ -10,16 +10,12 @@ namespace OCA\Tables\Controller;
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Service\NodeService;
 use OCA\Tables\Service\ShareService;
-use OCA\Tables\Service\ValueObject\ShareToken;
 use OCA\Text\Event\LoadEditor;
 use OCA\Viewer\Event\LoadViewer;
 use OCP\AppFramework\Controller;
-use OCP\AppFramework\Http\Attribute\AnonRateLimit;
-use OCP\AppFramework\Http\Attribute\FrontpageRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\Attribute\OpenAPI;
-use OCP\AppFramework\Http\Attribute\PublicPage;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\EventDispatcher\IEventDispatcher;
@@ -76,26 +72,6 @@ class PageController extends Controller {
 		$this->initialState->provideInitialState('contextId', $contextId);
 
 		return $this->index();
-	}
-
-	#[PublicPage]
-	#[NoCSRFRequired]
-	#[OpenAPI(scope: OpenAPI::SCOPE_IGNORE)]
-	#[FrontpageRoute(verb: 'GET', url: '/s/{token}')]
-	#[AnonRateLimit(limit: 10, period: 10)]
-	public function linkShare(string $token): TemplateResponse {
-		Util::addScript(Application::APP_ID, 'tables-main');
-		$this->loadStyles();
-
-		$shareToken = new ShareToken($token);
-		$share = $this->shareService->findByToken($shareToken);
-		$nodeData = $this->nodeService->getPublicDataOfNode($share->getNodeType(), $share->getNodeId());
-
-		$this->initialState->provideInitialState('shareToken', (string)$shareToken);
-		$this->initialState->provideInitialState('nodeType', $share->getNodeType());
-		$this->initialState->provideInitialState('nodeData', $nodeData);
-
-		return new TemplateResponse(Application::APP_ID, 'main', [], TemplateResponse::RENDER_AS_PUBLIC);
 	}
 
 	protected function loadStyles(): void {

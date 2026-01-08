@@ -21,6 +21,7 @@ use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Event\TableDeletedEvent;
 use OCA\Tables\Event\TableOwnershipTransferredEvent;
 use OCA\Tables\Helper\UserHelper;
+use OCA\Tables\Model\Permissions;
 use OCA\Tables\Model\TableScheme;
 use OCA\Tables\ResponseDefinitions;
 use OCP\App\IAppManager;
@@ -188,6 +189,19 @@ class TableService extends SuperService {
 			$table->setColumnsCount(0);
 		}
 
+		$this->setIsSharedState($table, $userId);
+
+		if (!$table->getIsShared() || $table->getOnSharePermissions()->manage) {
+			// add the corresponding views if it is an own table, or you have table manage rights
+			$table->setViews($this->viewService->findAll($table));
+		}
+
+		if ($this->favoritesService->isFavorite(Application::NODE_TYPE_TABLE, $table->getId())) {
+			$table->setFavorite(true);
+		}
+	}
+
+	private function setIsSharedState(Table $table, string $userId): void {
 		// set if this is a shared table with you (somebody else shared it with you)
 		// (senseless if we have no user in context)
 		if ($userId !== '' && $userId !== $table->getOwnership()) {
@@ -201,19 +215,11 @@ class TableService extends SuperService {
 					$table->setIsShared(true);
 				} catch (NotFoundError $e) {
 				}
-
 			}
+		} else {
+			$table->setIsShared($userId === '' && $this->shareService->hasLinkShare($table));
+			$table->setOnSharePermissions(new Permissions(read: true));
 		}
-		if (!$table->getIsShared() || $table->getOnSharePermissions()->manage) {
-			// add the corresponding views if it is an own table, or you have table manage rights
-			$table->setViews($this->viewService->findAll($table));
-		}
-
-		if ($this->favoritesService->isFavorite(Application::NODE_TYPE_TABLE, $table->getId())) {
-			$table->setFavorite(true);
-		}
-
-
 	}
 
 

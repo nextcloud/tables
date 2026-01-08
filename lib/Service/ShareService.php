@@ -160,6 +160,17 @@ class ShareService extends SuperService {
 		throw $e;
 	}
 
+	public function hasLinkShare(Table|View $node): bool {
+		$type = ConversionHelper::object2String($node);
+		$nodeShares = $this->mapper->findAllSharesForNode($type, $node->getId());
+		foreach ($nodeShares as $share) {
+			if ($share->getReceiverType() === ShareReceiverType::LINK) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	protected function generateShareToken(): ShareToken {
 		$shareToken = $this->secureRandom->generate(ShareToken::MIN_LENGTH, ISecureRandom::CHAR_LOWER . ISecureRandom::CHAR_UPPER . ISecureRandom::CHAR_DIGITS);
 		return new ShareToken($shareToken);

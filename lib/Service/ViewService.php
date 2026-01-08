@@ -412,47 +412,7 @@ class ViewService extends SuperService {
 		// add owner display name for UI
 		$view->setOwnerDisplayName($this->userHelper->getUserDisplayName($view->getOwnership()));
 
-		// set if this is a shared table with you (somebody else shared it with you)
-		// (senseless if we have no user in context)
-		if ($userId !== '') {
-			if ($userId !== $view->getOwnership()) {
-				try {
-					try {
-						$permissions = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getId(), 'view', $userId);
-					} catch (NotFoundError) {
-						$permissions = $this->permissionsService->getPermissionArrayForNodeFromContexts($view->getId(), 'view', $userId);
-					}
-					$view->setIsShared(true);
-					try {
-						try {
-							$manageTableShare = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getTableId(), 'table', $userId);
-						} catch (NotFoundError) {
-							$manageTableShare = $this->permissionsService->getPermissionArrayForNodeFromContexts($view->getTableId(), 'table', $userId);
-						}
-						if ($manageTableShare->manage) {
-							$permissions->manageTable = true;
-						}
-					} catch (NotFoundError $e) {
-					} catch (\Exception $e) {
-						throw new InternalError($e->getMessage());
-					}
-					$view->setOnSharePermissions($permissions);
-				} catch (NotFoundError $e) {
-				} catch (\Exception $e) {
-					$this->logger->warning('Exception occurred while setting shared permissions: ' . $e->getMessage() . ' No permissions granted.');
-					$view->setOnSharePermissions(new Permissions());
-				}
-			} else {
-				// set hasShares if this table is shared by you (you share it with somebody else)
-				// (senseless if we have no user in context)
-				try {
-					$allShares = $this->shareService->findAll('view', $view->getId());
-					$view->setHasShares(count($allShares) !== 0);
-				} catch (InternalError $e) {
-				}
-			}
-
-		}
+		$this->setIsSharedState($view, $userId);
 
 		if (!$this->permissionsService->canReadRowsByElement($view, 'view', $userId)) {
 			return;
@@ -495,6 +455,52 @@ class ViewService extends SuperService {
 
 		if ($this->favoritesService->isFavorite(Application::NODE_TYPE_VIEW, $view->getId())) {
 			$view->setFavorite(true);
+		}
+	}
+
+	private function setIsSharedState(View $view, string $userId): void {
+		// set if this is a shared table with you (somebody else shared it with you)
+		// (senseless if we have no user in context)
+		if ($userId !== '') {
+			if ($userId !== $view->getOwnership()) {
+				try {
+					try {
+						$permissions = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getId(), 'view', $userId);
+					} catch (NotFoundError) {
+						$permissions = $this->permissionsService->getPermissionArrayForNodeFromContexts($view->getId(), 'view', $userId);
+					}
+					$view->setIsShared(true);
+					try {
+						try {
+							$manageTableShare = $this->shareService->getSharedPermissionsIfSharedWithMe($view->getTableId(), 'table', $userId);
+						} catch (NotFoundError) {
+							$manageTableShare = $this->permissionsService->getPermissionArrayForNodeFromContexts($view->getTableId(), 'table', $userId);
+						}
+						if ($manageTableShare->manage) {
+							$permissions->manageTable = true;
+						}
+					} catch (NotFoundError $e) {
+					} catch (\Exception $e) {
+						throw new InternalError($e->getMessage());
+					}
+					$view->setOnSharePermissions($permissions);
+				} catch (NotFoundError $e) {
+				} catch (\Exception $e) {
+					$this->logger->warning('Exception occurred while setting shared permissions: ' . $e->getMessage() . ' No permissions granted.');
+					$view->setOnSharePermissions(new Permissions());
+				}
+			} else {
+				// set hasShares if this table is shared by you (you share it with somebody else)
+				// (senseless if we have no user in context)
+				try {
+					$allShares = $this->shareService->findAll('view', $view->getId());
+					$view->setHasShares(count($allShares) !== 0);
+				} catch (InternalError $e) {
+				}
+			}
+		} else {
+			$view->setIsShared($this->shareService->hasLinkShare($view));
+			$view->setOnSharePermissions(new Permissions(read: true));
 		}
 	}
 
