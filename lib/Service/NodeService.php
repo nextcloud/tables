@@ -14,11 +14,7 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCA\Tables\Helper\ConversionHelper;
-use OCA\Tables\ResponseDefinitions;
 
-/**
- * @psalm-import-type TablesPublicNode from ResponseDefinitions
- */
 class NodeService {
 	private const PUBLIC_NODE_KEYS = [
 		'title',
@@ -38,7 +34,7 @@ class NodeService {
 	/**
 	 * @param 'table'|'view' $nodeType
 	 * @param int $nodeId
-	 * @return TablesPublicNode[]
+	 * @return array{title: string, emoji: string, description: string, createdAt: string, lastEditAt: string, rowsCount: int}
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
@@ -55,26 +51,28 @@ class NodeService {
 	}
 
 	/**
-	 * @return TablesPublicNode[]
+	 * @return array{title: string, emoji: string, description: string, createdAt: string, lastEditAt: string, rowsCount: int}
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
 	private function publicDataOfTable(int $id): array {
 		$table = $this->tableService->find($id, false, '');
+		/** @var array{title: string, emoji: string, description: string, createdAt: string, lastEditAt: string, rowsCount: int} */
 		return array_filter($table->jsonSerialize(), static function (string $key): bool {
 			return in_array($key, self::PUBLIC_NODE_KEYS, true);
 		}, ARRAY_FILTER_USE_KEY);
 	}
 
 	/**
-	 * @return TablesPublicNode[]
+	 * @return array{title: string, emoji: string, description: string, createdAt: string, lastEditAt: string, rowsCount: int}
 	 * @throws InternalError
 	 * @throws NotFoundError
 	 * @throws PermissionError
 	 */
 	private function publicDataOfView(int $id): array {
 		$view = $this->viewService->find($id, false, '');
+		/** @var array{title: string, emoji: string, description: string, createdAt: string, lastEditAt: string, rowsCount: int} */
 		return array_filter($view->jsonSerialize(), static function (string $key): bool {
 			return in_array($key, self::PUBLIC_NODE_KEYS, true);
 		}, ARRAY_FILTER_USE_KEY);
