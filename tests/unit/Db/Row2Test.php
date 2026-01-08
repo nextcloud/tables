@@ -8,25 +8,25 @@ use OCA\Tables\Db\Row2;
 use PHPUnit\Framework\TestCase;
 
 class Row2Test extends TestCase {
-    public function testToResponseArrayMergesMetaButJsonSerializeDoesNot(): void {
-        $row = new Row2();
-        $row->setTableId(1);
+	public function testToResponseArrayMergesMetaButJsonSerializeDoesNot(): void {
+		$row = new Row2();
+		$row->setTableId(1);
 
-        $row->setData([
-            ['columnId' => 57, 'value' => 'foo'],
-            ['columnId' => 58, 'value' => 'bar'],
-        ]);
+		$row->setData([
+			['columnId' => 57, 'value' => 'foo'],
+			['columnId' => 58, 'value' => 'bar'],
+		]);
 
-        $json = $row->jsonSerialize();
-        $this->assertArrayNotHasKey('columnName', $json['data'][0]);
+		$json = $row->jsonSerialize();
+		$this->assertArrayNotHasKey('columnName', $json['data'][0]);
 
-        $row->addCellMeta(57, ['columnName' => 'Title 57']);
+		$row->addCellMeta(57, ['columnName' => 'Title 57']);
 
-        $resp = $row->toResponseArray();
-        $this->assertArrayHasKey('columnName', $resp['data'][0]);
-        $this->assertSame('Title 57', $resp['data'][0]['columnName']);
+		$resp = $row->toResponseArray();
+		$this->assertArrayHasKey('columnName', $resp['data'][0]);
+		$this->assertSame('Title 57', $resp['data'][0]['columnName']);
 
-        $json2 = $row->jsonSerialize();
-        $this->assertArrayNotHasKey('columnName', $json2['data'][0]);
-    }
+		$json2 = $row->jsonSerialize();
+		$this->assertArrayNotHasKey('columnName', $json2['data'][0]);
+	}
 }

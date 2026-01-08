@@ -208,13 +208,13 @@ class RowService extends SuperService {
 			throw new InternalError('Cannot create row without table or view in context');
 		}
 
-		$fullRowData = [];				
+		$fullRowData = [];
 		$columnNames = [];
 
 		foreach ($columns as $c) {
 			$columnNames[$c->getId()] = $c->getTitle();
 		}
-		
+
 		$rows = $data instanceof RowDataInput ? iterator_to_array($data) : $data;
 
 		foreach ($rows as $r) {
