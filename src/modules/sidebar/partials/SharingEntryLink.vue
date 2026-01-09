@@ -100,7 +100,7 @@
 
 <script>
 import { t } from '@nextcloud/l10n'
-import { generateUrl, getBaseUrl } from '@nextcloud/router'
+import { generateUrl } from '@nextcloud/router'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import copyToClipboard from '../../../shared/mixins/copyToClipboard.js'
 
@@ -162,7 +162,7 @@ export default {
 	computed: {
 		linkShareUrl() {
 			if (!this.share) return ''
-			return getBaseUrl() + generateUrl('/apps/tables/s/{token}', { token: this.share.token })
+			return window.location.origin + generateUrl('/apps/tables/s/{token}', { token: this.share.token })
 		},
 		hasPassword() {
 			return !!this.share?.password
