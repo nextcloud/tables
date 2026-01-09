@@ -49,19 +49,20 @@ export const FilterIds = {
 	IsLowerThan: 'is-lower-than',
 	IsLowerThanOrEqual: 'is-lower-than-or-equal',
 	IsEmpty: 'is-empty',
+	IsNotEmpty: 'is-not-empty',
 }
 
 export const Filters = {
 	Contains: new Filter({
 		id: FilterIds.Contains,
 		label: t('tables', 'Contains'),
-		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextLong, ColumnTypes.TextLink, ColumnTypes.TextRich, ColumnTypes.SelectionMulti, ColumnTypes.Usergroup, ColumnTypes.Selection],
+		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextLong, ColumnTypes.TextLink, ColumnTypes.TextRich, ColumnTypes.SelectionMulti, ColumnTypes.Usergroup, ColumnTypes.Selection, ColumnTypes.Relation],
 		incompatibleWith: [FilterIds.DoesNotContain, FilterIds.IsEmpty, FilterIds.IsEqual],
 	}),
 	DoesNotContain: new Filter({
 		id: FilterIds.DoesNotContain,
 		label: t('tables', 'Does not contain'),
-		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextLong, ColumnTypes.TextLink, ColumnTypes.TextRich, ColumnTypes.SelectionMulti, ColumnTypes.Usergroup, ColumnTypes.Selection],
+		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextLong, ColumnTypes.TextLink, ColumnTypes.TextRich, ColumnTypes.SelectionMulti, ColumnTypes.Usergroup, ColumnTypes.Selection, ColumnTypes.Relation],
 		incompatibleWith: [FilterIds.Contains, FilterIds.IsEmpty, FilterIds.IsEqual],
 	}),
 	BeginsWith: new Filter({
@@ -80,14 +81,14 @@ export const Filters = {
 		id: FilterIds.IsEqual,
 		label: t('tables', 'Is equal'),
 		shortLabel: '=',
-		goodFor: [ColumnTypes.TextLine, ColumnTypes.Number, ColumnTypes.SelectionCheck, ColumnTypes.TextLink, ColumnTypes.NumberStars, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.Usergroup],
+		goodFor: [ColumnTypes.TextLine, ColumnTypes.Number, ColumnTypes.SelectionCheck, ColumnTypes.TextLink, ColumnTypes.NumberStars, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.Usergroup, ColumnTypes.Relation],
 		incompatibleWith: [FilterIds.IsNotEqual, FilterIds.IsEmpty, FilterIds.IsEqual, FilterIds.BeginsWith, FilterIds.EndsWith, FilterIds.Contains, FilterIds.IsGreaterThan, FilterIds.IsGreaterThanOrEqual, FilterIds.IsLowerThan, FilterIds.IsLowerThanOrEqual],
 	}),
 	IsNotEqual: new Filter({
 		id: FilterIds.IsNotEqual,
 		label: t('tables', 'Is not equal'),
 		shortLabel: '!=',
-		goodFor: [ColumnTypes.TextLine, ColumnTypes.Number, ColumnTypes.SelectionCheck, ColumnTypes.TextLink, ColumnTypes.NumberStars, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.Usergroup],
+		goodFor: [ColumnTypes.TextLine, ColumnTypes.Number, ColumnTypes.SelectionCheck, ColumnTypes.TextLink, ColumnTypes.NumberStars, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime, ColumnTypes.Selection, ColumnTypes.SelectionMulti, ColumnTypes.Usergroup, ColumnTypes.Relation],
 		incompatibleWith: [FilterIds.IsEmpty, FilterIds.IsEqual, FilterIds.BeginsWith, FilterIds.EndsWith, FilterIds.Contains, FilterIds.IsGreaterThan, FilterIds.IsGreaterThanOrEqual, FilterIds.IsLowerThan, FilterIds.IsLowerThanOrEqual],
 	}),
 	IsGreaterThan: new Filter({
@@ -121,8 +122,15 @@ export const Filters = {
 	IsEmpty: new Filter({
 		id: FilterIds.IsEmpty,
 		label: t('tables', 'Is empty'),
-		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextRich, ColumnTypes.Number, ColumnTypes.TextLink, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime, ColumnTypes.SelectionCheck, ColumnTypes.Usergroup],
-		incompatibleWith: [FilterIds.Contains, FilterIds.BeginsWith, FilterIds.EndsWith, FilterIds.IsEqual, FilterIds.IsGreaterThan, FilterIds.IsGreaterThanOrEqual, FilterIds.IsLowerThan, FilterIds.IsLowerThanOrEqual, FilterIds.IsEmpty],
+		goodFor: [ColumnTypes.TextLine, ColumnTypes.TextRich, ColumnTypes.Number, ColumnTypes.TextLink, ColumnTypes.NumberProgress, ColumnTypes.DatetimeDate, ColumnTypes.DatetimeTime, ColumnTypes.Datetime, ColumnTypes.SelectionCheck, ColumnTypes.Usergroup, ColumnTypes.Relation],
+		incompatibleWith: [FilterIds.Contains, FilterIds.BeginsWith, FilterIds.EndsWith, FilterIds.IsEqual, FilterIds.IsGreaterThan, FilterIds.IsGreaterThanOrEqual, FilterIds.IsLowerThan, FilterIds.IsLowerThanOrEqual, FilterIds.IsEmpty, FilterIds.IsNotEmpty],
+		noSearchValue: true,
+	}),
+	IsNotEmpty: new Filter({
+		id: FilterIds.IsNotEmpty,
+		label: t('tables', 'Is not empty'),
+		goodFor: [ColumnTypes.Relation],
+		incompatibleWith: [FilterIds.Contains, FilterIds.BeginsWith, FilterIds.EndsWith, FilterIds.IsEqual, FilterIds.IsGreaterThan, FilterIds.IsGreaterThanOrEqual, FilterIds.IsLowerThan, FilterIds.IsLowerThanOrEqual, FilterIds.IsEmpty, FilterIds.IsNotEmpty],
 		noSearchValue: true,
 	}),
 }
