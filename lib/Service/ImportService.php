@@ -183,6 +183,10 @@ class ImportService extends SuperService {
 				$value = $cell->getValue();
 				// $cellIterator`s index is based on 1, not 0.
 				$colIndex = $cellIterator->getCurrentColumnIndex() - 1;
+				if (!array_key_exists($colIndex, $this->columns)) {
+					continue;
+				}
+
 				$column = $this->columns[$colIndex];
 
 				if (!array_key_exists($colIndex, $columns)) {

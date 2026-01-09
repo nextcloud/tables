@@ -211,6 +211,8 @@ export default {
 			case ColumnTypes.DatetimeDate:
 			case ColumnTypes.DatetimeTime:
 				return t('tables', 'Date and time')
+			case ColumnTypes.Relation:
+				return t('tables', 'Relation')
 			default:
 				return ''
 			}

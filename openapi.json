@@ -3661,7 +3661,8 @@
                                             "number",
                                             "datetime",
                                             "select",
-                                            "usergroup"
+                                            "usergroup",
+                                            "relation"
                                         ],
                                         "description": "Column main type"
                                     },
@@ -4071,7 +4072,8 @@
                                             "number",
                                             "datetime",
                                             "select",
-                                            "usergroup"
+                                            "usergroup",
+                                            "relation"
                                         ],
                                         "description": "Column main type"
                                     },

@@ -30,6 +30,7 @@
 				v-model="searchValue"
 				class="select-field"
 				:options="magicFields"
+				:loading="relationsLoading"
 				:aria-label-combobox="getValuePlaceholder"
 				:placeholder="getValuePlaceholder"
 				data-cy="filterEntrySeachValue"
@@ -66,11 +67,13 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
 import { NcButton, NcSelect, NcDateTimePickerNative, NcTextField } from '@nextcloud/vue'
 import Moment from '@nextcloud/moment'
 import DeleteOutline from 'vue-material-design-icons/TrashCanOutline.vue'
 import { ColumnTypes } from '../../../../../shared/components/ncTable/mixins/columnHandler.js'
 import { AdditionalInputTypes } from '../../../../../shared/components/ncTable/mixins/magicFields.js'
+import { useDataStore } from '../../../../../store/data.js'
 
 export default {
 
@@ -165,8 +168,18 @@ export default {
 				return []
 			}
 		},
+		relationsLoading() {
+			if (this.selectedColumn?.type === 'relation' && this.columns?.length > 0) {
+				const dataStore = useDataStore()
+				return dataStore.getRelationsLoading(false, this.columns[0].tableId)
+			}
+			return false
+		},
 		magicFields() {
-			if (this.selectedColumn && (this.selectedColumn.type.substr(0, 9) !== 'selection' || this.selectedColumn?.type === 'selection-check')) {
+			if (this.selectedColumn
+				&& (this.selectedColumn.type.substr(0, 9) !== 'selection' || this.selectedColumn?.type === 'selection-check')
+				&& this.selectedColumn?.type !== 'relation'
+			) {
 				const fields = []
 				this.selectedColumn.getPossibleMagicFields().forEach(field => {
 					if (field.id.substr(0, 1) !== '@') {
@@ -188,6 +201,22 @@ export default {
 						label: item.label,
 					})
 				})
+				return options
+			} else if (this.selectedColumn && this.selectedColumn.type === 'relation') {
+				if (this.relationsLoading) {
+					return []
+				}
+				const options = []
+				// Get relations from DataStore using the column's tableId
+				const dataStore = useDataStore()
+				const columnRelations = dataStore.getRelations(this.selectedColumn.id)
+				Object.values(columnRelations).forEach(item => {
+					options.push({
+						id: '@relation-id-' + item.id,
+						label: item.label,
+					})
+				})
+
 				return options
 			} else {
 				return []
@@ -224,7 +253,9 @@ export default {
 			immediate: true,
 		},
 	},
-
+	beforeMount() {
+		this.loadRelationsFromBE({ tableId: this.columns[0].tableId })
+	},
 	methods: {
 		getMagicFieldId() {
 			if (!this.filterEntry?.value) return null
@@ -275,6 +306,7 @@ export default {
 				this.additionalInputValue = parseInt(extractedValue)
 			}
 		},
+		...mapActions(useDataStore, ['loadRelationsFromBE']),
 	},
 }
 </script>

@@ -19,7 +19,9 @@
 						:width-invalid-error="widthInvalidError" />
 				</div>
 				<div class="col-2 space-LR space-T">
-					<component :is="getColumnForm" :column="editColumn" :can-save.sync="canSave" />
+					<component :is="getColumnForm" :column="editColumn"
+						:can-save.sync="canSave"
+						@update:customSettings="onUpdateCustomSettings" />
 				</div>
 			</div>
 			<div class="buttons">
@@ -66,6 +68,7 @@ import DatetimeForm from '../../shared/components/ncTable/partials/columnTypePar
 import DatetimeDateForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeDateForm.vue'
 import DatetimeTimeForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/DatetimeTimeForm.vue'
 import UsergroupForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/UsergroupForm.vue'
+import RelationForm from '../../shared/components/ncTable/partials/columnTypePartials/forms/RelationForm.vue'
 import { ColumnTypes } from '../../shared/components/ncTable/mixins/columnHandler.js'
 import moment from '@nextcloud/moment'
 import { mapActions } from 'pinia'
@@ -96,6 +99,7 @@ export default {
 		NcButton,
 		NcUserBubble,
 		UsergroupForm,
+		RelationForm,
 	},
 	filters: {
 		truncate(text, length, suffix) {
@@ -164,6 +168,9 @@ export default {
 			this.reset()
 			this.$emit('close')
 		},
+		onUpdateCustomSettings(customSettings) {
+			this.editColumn.customSettings = { ...this.editColumn.customSettings, ...customSettings }
+		},
 		async saveColumn() {
 			if (this.editColumn.title === '') {
 				showError(t('tables', 'Cannot update column. Title is missing.'))
@@ -203,8 +210,6 @@ export default {
 			delete data.createdBy
 			delete data.lastEditAt
 			delete data.lastEditBy
-			data.customSettings = { width: data.customSettings.width }
-			console.debug('this column data will be send', data)
 			const res = await this.updateColumn({
 				id: this.editColumn.id,
 				isView: this.isView,

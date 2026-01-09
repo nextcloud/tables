@@ -408,10 +408,6 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-:deep(.vs__clear) {
-	display: none;
-}
-
 :deep(.v-select) {
 	min-width: 95px !important;
 	.vs__dropdown-toggle {
