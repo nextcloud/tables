@@ -31,8 +31,8 @@ use OCP\Util;
 
 #[OpenAPI(scope: OpenAPI::SCOPE_IGNORE)]
 class PublicSharePageController extends AuthPublicShareController {
-	private readonly Share $share;
-	private readonly ShareToken $shareToken;
+	private ?Share $share = null;
+	private ?ShareToken $shareToken = null;
 
 	public function __construct(
 		string $appName,
@@ -45,8 +45,15 @@ class PublicSharePageController extends AuthPublicShareController {
 		private IEventDispatcher $eventDispatcher,
 	) {
 		parent::__construct($appName, $request, $session, $urlGenerator);
-		$this->shareToken = new ShareToken($this->getToken());
-		$this->share = $this->shareService->findByToken($this->shareToken);
+		$token = $request->getParam('token');
+		if (is_string($token) && $token !== '') {
+			$this->shareToken = new ShareToken($token);
+			try {
+				$this->share = $this->shareService->findByToken($this->shareToken);
+			} catch (\Exception $e) {
+				$this->share = null;
+			}
+		}
 	}
 
 	#[PublicPage]
@@ -54,6 +61,7 @@ class PublicSharePageController extends AuthPublicShareController {
 	#[FrontpageRoute(verb: 'GET', url: '/s/{token}')]
 	#[AnonRateLimit(limit: 10, period: 10)]
 	public function showShare(): TemplateResponse {
+
 		$this->loadStyles();
 		Util::addScript(Application::APP_ID, 'tables-main');
 
@@ -91,11 +99,13 @@ class PublicSharePageController extends AuthPublicShareController {
 	}
 
 	public function isValidToken(): bool {
-		$this->shareToken;
-		return true;
+		return $this->share !== null;
 	}
 
 	protected function isPasswordProtected(): bool {
+		if ($this->share === null) {
+			return false;
+		}
 		$password = $this->share->getPassword();
 		return $password !== null && $password !== '';
 	}

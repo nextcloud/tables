@@ -7,21 +7,15 @@
 
 namespace OCA\Tables\Controller;
 
-use InvalidArgumentException;
 use OCA\Tables\AppInfo\Application;
-use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Service\NodeService;
 use OCA\Tables\Service\ShareService;
-use OCA\Tables\Service\ValueObject\ShareToken;
 use OCA\Text\Event\LoadEditor;
 use OCA\Viewer\Event\LoadViewer;
 use OCP\AppFramework\Controller;
-use OCP\AppFramework\Http\Attribute\AnonRateLimit;
-use OCP\AppFramework\Http\Attribute\FrontpageRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\Attribute\OpenAPI;
-use OCP\AppFramework\Http\Attribute\PublicPage;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\EventDispatcher\IEventDispatcher;
@@ -30,8 +24,7 @@ use OCP\INavigationManager;
 use OCP\IRequest;
 use OCP\Util;
 
-class PageController extends Controller
-{
+class PageController extends Controller {
 
 	public function __construct(
 		IRequest $request,
@@ -51,8 +44,7 @@ class PageController extends Controller
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[OpenAPI(scope: OpenAPI::SCOPE_IGNORE)]
-	public function index(): TemplateResponse
-	{
+	public function index(): TemplateResponse {
 		Util::addScript(Application::APP_ID, 'tables-main');
 		$this->loadStyles();
 
@@ -75,8 +67,7 @@ class PageController extends Controller
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[OpenAPI(scope: OpenAPI::SCOPE_IGNORE)]
-	public function context(int $contextId): TemplateResponse
-	{
+	public function context(int $contextId): TemplateResponse {
 		$navId = Application::APP_ID . '_application_' . $contextId;
 		$this->navigationManager->setActiveEntry($navId);
 
