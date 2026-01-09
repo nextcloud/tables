@@ -21,14 +21,14 @@
 			<!-- Inline Creation Form -->
 			<div v-else class="sharing-entry-link__create-form">
 				<div class="sharing-entry-link__form-row">
-					<NcActionCheckbox :checked.sync="usePassword" @update:chk="onTogglePassword">
+					<NcActionCheckbox :checked.sync="usePassword" data-cy="sharingEntryLinkPasswordCheck" @update:chk="onTogglePassword">
 						{{ t('tables', 'Set password') }}
 					</NcActionCheckbox>
 				</div>
 
 				<div v-if="usePassword" class="sharing-entry-link__form-row">
 					<NcActionInput :value.sync="password" type="password" :label="t('tables', 'Password')"
-						:show-trailing-button="true" class="sharing-entry-link__password-input">
+						:show-trailing-button="true" class="sharing-entry-link__password-input" data-cy="sharingEntryLinkPasswordInput">
 						<template #trailing>
 							<NcActionButton @click="copyPassword">
 								<template #icon>

@@ -59,6 +59,62 @@ describe('Public link sharing', () => {
 			cy.get('[data-cy="sharingEntryLinkDeleteButton"]').click()
 
 			cy.get('[data-cy="sharingEntryLinkTitle"]').should('not.exist')
+
+			// Verify share is gone
+			cy.clearCookies()
+			cy.visit(`apps/tables/s/${shareToken}`, { failOnStatusCode: false })
+			cy.get('h2').contains('Share not found').should('be.visible')
+		})
+	})
+
+	it('Create, access and delete a password protected public link share', () => {
+		const password = 'extremelySafePassword123'
+
+		cy.get('[data-cy="customTableAction"] button').click()
+		cy.get('[data-cy="dataTableShareBtn"]').click()
+		cy.contains('Public links').should('be.visible')
+		cy.intercept('POST', '**/apps/tables/api/2/tables/*/share').as('createShare')
+
+		// Open create form
+		cy.get('[data-cy="sharingEntryLinkCreateButton"]').click()
+		
+		// Set password
+		cy.get('[data-cy="sharingEntryLinkPasswordCheck"]').click()
+		cy.get('[data-cy="sharingEntryLinkPasswordInput"] input').type(password)
+
+		// Create
+		cy.get('[data-cy="sharingEntryLinkCreateFormCreateButton"]').click()
+
+		cy.wait('@createShare').then((interception) => {
+			expect(interception.response.statusCode).to.eq(200)
+			const shareToken = interception.response.body.ocs.data.shareToken
+			expect(shareToken).to.be.a('string')
+
+			cy.clearCookies()
+			cy.visit(`apps/tables/s/${shareToken}`)
+
+			// Password Gate
+			cy.get('input[type="password"]#password').should('be.visible').type(password)
+			cy.get('input#password-submit').click()
+			cy.get('[data-cy="publicTableElement"]').should('be.visible')
+
+			// Login again to delete share
+			cy.login(localUser)
+			cy.visit('apps/tables')
+			cy.loadTable(tableTitle)
+
+			cy.get('[data-cy="customTableAction"] button').click()
+			cy.get('[data-cy="dataTableShareBtn"]').click()
+
+			cy.get('[data-cy="sharingEntryLinkTitle"]').should('be.visible')
+			cy.get('[data-cy="sharingEntryLinkDeleteButton"]').click()
+
+			cy.get('[data-cy="sharingEntryLinkTitle"]').should('not.exist')
+
+			// Verify share is gone
+			cy.clearCookies()
+			cy.visit(`apps/tables/s/${shareToken}`, { failOnStatusCode: false })
+			cy.get('h2').contains('Share not found').should('be.visible')
 		})
 	})
 })
