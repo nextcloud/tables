@@ -194,88 +194,82 @@ class EntityVirtualPropertiesTest extends DatabaseTestCase {
 	 * Get database table fields for Entity class
 	 */
 	private function getDatabaseTableFields(string $className): array {
-		try {
-			// Try to get table name from class
-			$tableName = $this->getTableNameFromClass($className);
-			if (!$tableName) {
-				return [];
-			}
-
-			$schema = $this->connection->createSchema();
-			$fullTableName = $this->connection->getPrefix() . $tableName;
-
-			if (!$schema->hasTable($fullTableName)) {
-				return [];
-			}
-
-			$table = $schema->getTable($fullTableName);
-			$columns = $table->getColumns();
-
-			$fields = [];
-			foreach ($columns as $column) {
-				$fields[] = $column->getName();
-			}
-
-			return $fields;
-		} catch (\Exception $e) {
-			// If we can't get table fields, return empty array
+		// Try to get table name from class
+		$tableName = $this->getTableNameFromClass($className);
+		if (!$tableName) {
 			return [];
 		}
+
+		$schema = $this->connection->createSchema();
+		$fullTableName = $this->connection->getPrefix() . $tableName;
+
+		if (!$schema->hasTable($fullTableName)) {
+			return [];
+		}
+
+		$table = $schema->getTable($fullTableName);
+		$columns = $table->getColumns();
+
+		$fields = [];
+		foreach ($columns as $column) {
+			$fields[] = $column->getName();
+		}
+
+		return $fields;
 	}
 
 	/**
 	 * Get table name from Entity class
 	 */
 	private function getTableNameFromClass(string $className): ?string {
-		try {
-			$reflection = new ReflectionClass($className);
+		$reflection = new ReflectionClass($className);
 
-			// Try to get table name from protected property
-			if ($reflection->hasProperty('table')) {
-				$tableProperty = $reflection->getProperty('table');
+		// Try to get table name from protected property
+		if ($reflection->hasProperty('table')) {
+			$tableProperty = $reflection->getProperty('table');
+			if (PHP_VERSION_ID < 80200) {
 				$tableProperty->setAccessible(true);
+			}
 
-				// Create instance to get table name
-				$instance = $reflection->newInstanceWithoutConstructor();
-				$tableName = $tableProperty->getValue($instance);
+			// Create instance to get table name
+			$instance = $reflection->newInstanceWithoutConstructor();
+			$tableName = $tableProperty->getValue($instance);
+
+			if ($tableName) {
+				return $tableName;
+			}
+		}
+
+		// Try to get table name from mapper class
+		$mapperClassName = $className . 'Mapper';
+		if (class_exists($mapperClassName)) {
+			$mapperReflection = new ReflectionClass($mapperClassName);
+			if ($mapperReflection->hasProperty('table')) {
+				$tableProperty = $mapperReflection->getProperty('table');
+				if (PHP_VERSION_ID < 80200) {
+					$tableProperty->setAccessible(true);
+				}
+
+				// Create mapper instance to get table name
+				$mapperInstance = $mapperReflection->newInstanceWithoutConstructor();
+				$tableName = $tableProperty->getValue($mapperInstance);
 
 				if ($tableName) {
 					return $tableName;
 				}
 			}
+		}
 
-			// Try to get table name from mapper class
-			$mapperClassName = $className . 'Mapper';
-			if (class_exists($mapperClassName)) {
-				$mapperReflection = new ReflectionClass($mapperClassName);
-				if ($mapperReflection->hasProperty('table')) {
-					$tableProperty = $mapperReflection->getProperty('table');
-					$tableProperty->setAccessible(true);
+		// Try to infer table name from class name
+		$shortClassName = basename(str_replace('\\', '/', $className));
+		$tableName = 'tables_' . strtolower($shortClassName) . 's';
 
-					// Create mapper instance to get table name
-					$mapperInstance = $mapperReflection->newInstanceWithoutConstructor();
-					$tableName = $tableProperty->getValue($mapperInstance);
+		// Check if table exists
+		$schema = $this->connection->createSchema();
+		$fullTableName = $this->connection->getPrefix() . $tableName;
 
-					if ($tableName) {
-						return $tableName;
-					}
-				}
-			}
-
-			// Try to infer table name from class name
-			$shortClassName = basename(str_replace('\\', '/', $className));
-			$tableName = 'tables_' . strtolower($shortClassName) . 's';
-
-			// Check if table exists
-			$schema = $this->connection->createSchema();
-			$fullTableName = $this->connection->getPrefix() . $tableName;
-
-			if ($schema->hasTable($fullTableName)) {
-				return $tableName;
-			}
-
-		} catch (\Exception $e) {
-			// If we can't get table name, return null
+		if ($schema->hasTable($fullTableName)) {
+			return $tableName;
 		}
 
 		return null;
