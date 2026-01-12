@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 import { FileAction, registerFileAction } from '@nextcloud/files'
-import { spawnDialog } from '@nextcloud/dialogs'
+import { spawnDialog } from '@nextcloud/vue'
 // eslint-disable-next-line import/no-unresolved
 import tablesIcon from '@mdi/svg/svg/table-large.svg?raw'
 
@@ -22,12 +22,17 @@ const fileAction = new FileAction({
 	iconSvgInline: () => tablesIcon,
 
 	enabled: (files) => {
-		const file = files[0]
+		// Nextcloud v33 introduces `nodes` property
+		const file = files[0] ?? files.nodes[0]
 
 		return file.type === 'file' && validMimeTypes.includes(file.mime)
 	},
 
 	exec: async (file) => {
+		// Nextcloud v33 introduces `nodes` property
+		if (file.nodes) {
+			file = file.nodes[0]
+		}
 		const { default: FileActionImport } = await import('./modules/modals/FileActionImport.vue')
 		spawnDialog(FileActionImport, { file })
 		return null
