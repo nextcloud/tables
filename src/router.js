@@ -9,6 +9,7 @@ import MainViewWrapper from './pages/View.vue'
 import MainDashboardWrapper from './pages/Table.vue'
 import Startpage from './pages/Startpage.vue'
 import Context from './pages/Context.vue'
+import PublicTableView from './pages/PublicTableView.vue'
 
 Vue.use(Router)
 
@@ -59,6 +60,11 @@ export default new Router({
 			path: '/view/:viewId/row/:rowId',
 			component: MainViewWrapper,
 			name: 'viewRow',
+		},
+		{
+			path: '/s/:token',
+			component: PublicTableView,
+			name: 'publicShare',
 		},
 	],
 })

@@ -38,6 +38,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @psalm-import-type TablesRow from ResponseDefinitions
+ * @psalm-import-type TablesPublicRow from ResponseDefinitions
  */
 class RowService extends SuperService {
 	private array $tmpRows = []; // holds already loaded rows as a small cache
@@ -64,6 +65,18 @@ class RowService extends SuperService {
 	 */
 	public function formatRows(array $rows): array {
 		return array_map(fn (Row2 $row) => $row->jsonSerialize(), $rows);
+	}
+
+	/**
+	 * @param Row2[] $rows
+	 * @return TablesPublicRow[]
+	 */
+	public function formatRowsForPublicShare(array $rows): array {
+		return array_map(static function (Row2 $row): array {
+			$rowData = $row->jsonSerialize();
+			unset($rowData['tableId'], $rowData['createdBy'], $rowData['lastEditBy']);
+			return $rowData;
+		}, $rows);
 	}
 
 	/**
@@ -237,9 +250,11 @@ class RowService extends SuperService {
 	}
 
 	/**
-	 * When inserting rows into views we try to prefill columns that are not accessible by reasonable defaults
+	 * When inserting rows into views we try to prefill columns that are not
+	 * accessible by reasonable defaults
 	 *
-	 * This might not work in all cases, but for single filter rules this is the sanest to ensure the row is actually part of the view
+	 * This might not work in all cases, but for single filter rules this is
+	 * the sanest to ensure the row is actually part of the view
 	 */
 	private function enhanceWithViewDefaults(?View $view, RowDataInput $data): RowDataInput {
 		if ($view === null) {
@@ -746,8 +761,9 @@ class RowService extends SuperService {
 	 * This deletes all data for a column, eg if the columns gets removed
 	 *
 	 * >>> SECURITY <<<
-	 * We do not check if you are allowed to remove this data. That has to be done before!
-	 * Why? Mostly this check will have be run before and we can pass this here due to performance reasons.
+	 * We do not check if you are allowed to remove this data. That has to be
+	 * done before! Why? Mostly this check will have be run before and we can
+	 * pass this here due to performance reasons.
 	 *
 	 * @param Column $column
 	 * @throws InternalError

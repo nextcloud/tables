@@ -7,6 +7,7 @@
 
 namespace OCA\Tables\Db;
 
+use OCA\Tables\Service\ValueObject\ShareToken;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
@@ -38,6 +39,17 @@ class ShareMapper extends QBMapper {
 		$qb->select('*')
 			->from($this->table)
 			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
+		return $this->findEntity($qb);
+	}
+
+	/**
+	 * @throws DoesNotExistException
+	 */
+	public function findByToken(ShareToken $token): Share {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->table)
+			->where($qb->expr()->eq('token', $qb->createNamedParameter((string)$token, IQueryBuilder::PARAM_STR)));
 		return $this->findEntity($qb);
 	}
 
@@ -103,10 +115,10 @@ class ShareMapper extends QBMapper {
 	 * @param int $nodeId
 	 * @param string $sender
 	 * @param array<string> $excluded receiver types to exclude from results
-	 * @return array
+	 * @return Share[]
 	 * @throws Exception
 	 */
-	public function findAllSharesForNode(string $nodeType, int $nodeId, string $sender, array $excluded = []): array {
+	public function findAllSharesForNode(string $nodeType, int $nodeId, string $sender = '', array $excluded = []): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->table)

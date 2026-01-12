@@ -8,6 +8,8 @@
 namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
+use OCA\Tables\Service\NodeService;
+use OCA\Tables\Service\ShareService;
 use OCA\Text\Event\LoadEditor;
 use OCA\Viewer\Event\LoadViewer;
 use OCP\AppFramework\Controller;
@@ -28,6 +30,8 @@ class PageController extends Controller {
 		protected IEventDispatcher $eventDispatcher,
 		protected INavigationManager $navigationManager,
 		protected IInitialState $initialState,
+		protected ShareService $shareService,
+		protected NodeService $nodeService,
 	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
@@ -40,9 +44,7 @@ class PageController extends Controller {
 	#[OpenAPI(scope: OpenAPI::SCOPE_IGNORE)]
 	public function index(): TemplateResponse {
 		Util::addScript(Application::APP_ID, 'tables-main');
-		Util::addStyle(Application::APP_ID, 'grid');
-		Util::addStyle(Application::APP_ID, 'modal');
-		Util::addStyle(Application::APP_ID, 'tiptap');
+		$this->loadStyles();
 
 		if (class_exists(LoadViewer::class)) {
 			$this->eventDispatcher->dispatchTyped(new LoadViewer());
@@ -70,5 +72,12 @@ class PageController extends Controller {
 		$this->initialState->provideInitialState('contextId', $contextId);
 
 		return $this->index();
+	}
+
+	protected function loadStyles(): void {
+		Util::addStyle(Application::APP_ID, 'grid');
+		Util::addStyle(Application::APP_ID, 'modal');
+		Util::addStyle(Application::APP_ID, 'tiptap');
+		Util::addStyle(Application::APP_ID, 'error');
 	}
 }

@@ -133,6 +133,22 @@ class ColumnService extends SuperService {
 	}
 
 	/**
+	 * @param Column[] $columns
+	 * @return array
+	 */
+	public function formatColumnsForPublicShare(array $columns): array {
+		return array_map(static function (Column $column): array {
+			$columnData = $column->jsonSerialize();
+			unset($columnData['tableId']);
+			unset($columnData['createdBy']);
+			unset($columnData['createdByDisplayName']);
+			unset($columnData['lastEditBy']);
+			unset($columnData['lastEditByDisplayName']);
+			return $columnData;
+		}, $columns);
+	}
+
+	/**
 	 * @throws NotFoundError
 	 * @throws InternalError
 	 * @throws PermissionError
