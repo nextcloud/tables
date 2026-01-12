@@ -31,7 +31,7 @@ use OCP\Util;
 
 #[OpenAPI(scope: OpenAPI::SCOPE_IGNORE)]
 class PublicSharePageController extends AuthPublicShareController {
-	private ?Share $share = null;
+	private Share $share;
 	private ?ShareToken $shareToken = null;
 
 	public function __construct(
@@ -48,11 +48,7 @@ class PublicSharePageController extends AuthPublicShareController {
 		$token = $request->getParam('token');
 		if (is_string($token) && $token !== '') {
 			$this->shareToken = new ShareToken($token);
-			try {
-				$this->share = $this->shareService->findByToken($this->shareToken);
-			} catch (\Exception $e) {
-				$this->share = null;
-			}
+			$this->share = $this->shareService->findByToken($this->shareToken);
 		}
 	}
 
