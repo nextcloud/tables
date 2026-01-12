@@ -5,10 +5,16 @@
 <template>
 	<div>
 		<div v-if="loading" class="icon-loading" />
-		<ul v-if="getResources && getResources.length > 0" class="resource-list">
-			<div v-for="resource in getResources" :key="resource.key" class="row">
+		<ul v-if="mutableResources && mutableResources.length > 0" class="resource-list">
+			<li v-for="(resource, index) in mutableResources" :key="resource.key" class="row" draggable="true"
+				@dragstart="dragStart(index)" @dragover.prevent="dragOver(index)" @dragend="dragEnd(index)">
 				<div class="fix-col-2">
-					<div style="display:flex; align-items: center; padding: 10px;">
+					<div style="display:flex; align-items: center; width: 100%;">
+						<NcButton :aria-label="t('tables', 'Move')" type="tertiary-no-background" class="move-button">
+							<template #icon>
+								<DragHorizontalVariant :size="20" />
+							</template>
+						</NcButton>
 						{{ resource.emoji }} &nbsp; {{ resource.title }}
 					</div>
 				</div>
@@ -17,7 +23,7 @@
 						{{ t('tables', 'Delete') }}
 					</NcActionButton>
 				</div>
-			</div>
+			</li>
 		</ul>
 		<div v-else>
 			{{ t('tables', 'No selected resources') }}
@@ -26,11 +32,14 @@
 </template>
 
 <script>
-import { NcActionButton } from '@nextcloud/vue'
+import { NcActionButton, NcButton } from '@nextcloud/vue'
+import DragHorizontalVariant from 'vue-material-design-icons/DragHorizontalVariant.vue'
 
 export default {
 	components: {
 		NcActionButton,
+		NcButton,
+		DragHorizontalVariant,
 	},
 
 	props: {
@@ -43,27 +52,50 @@ export default {
 	data() {
 		return {
 			loading: false,
+			mutableResources: [],
+			draggedItem: null,
+			startDragIndex: null,
 		}
 	},
 
-	computed: {
-		sortedResources() {
-			return [...this.tableResources, ...this.viewResources].slice()
-		},
-		getResources() {
-			return [...this.viewResources, ...this.tableResources]
-		},
-		viewResources() {
-			return this.resources.filter(resource => resource.nodeType === 1)
-		},
-		tableResources() {
-			return this.resources.filter(resource => resource.nodeType === 0)
+	watch: {
+		resources: {
+			handler(newResources) {
+				this.mutableResources = [...newResources]
+			},
+			deep: true,
+			immediate: true,
 		},
 	},
 
 	methods: {
 		actionDelete(resource) {
 			this.$emit('remove', resource)
+		},
+		dragStart(index) {
+			this.draggedItem = this.mutableResources[index]
+			this.startDragIndex = index
+		},
+		dragOver(index) {
+			if (this.draggedItem === null) return
+			const draggedIndex = this.mutableResources.indexOf(this.draggedItem)
+			if (index !== draggedIndex) {
+				this.mutableResources.splice(draggedIndex, 1)
+				this.mutableResources.splice(index, 0, this.draggedItem)
+				this.$emit('update:resources', this.mutableResources)
+			}
+		},
+		dragEnd(goalIndex) {
+			if (this.draggedItem === null) return
+			const goal = goalIndex !== undefined ? goalIndex : this.mutableResources.indexOf(this.draggedItem)
+			if (this.startDragIndex === goal) {
+				this.draggedItem = null
+				this.startDragIndex = null
+				return
+			}
+			this.draggedItem = null
+			this.startDragIndex = null
+			this.$emit('update:resources', this.mutableResources)
 		},
 	},
 }
@@ -78,5 +110,10 @@ export default {
 
 .resource-label {
 	font-style: italic;
+}
+
+.move-button {
+	cursor: move !important;
+	padding-right: 10px;
 }
 </style>
