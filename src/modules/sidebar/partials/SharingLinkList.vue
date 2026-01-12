@@ -77,6 +77,7 @@ export default {
 		font-size: 16px;
 	}
 }
+
 li {
     list-style-type: none;
 }

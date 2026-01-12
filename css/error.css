@@ -18,9 +18,7 @@
   color: var(--color-main-text);
   background-color: var(--color-main-background-blur);
   padding: calc(3 * var(--default-grid-baseline));
-  border-radius: var(--border-radius-container);
   box-shadow: 0 0 10px var(--color-box-shadow);
-  display: inline-block;
   -webkit-backdrop-filter: var(--filter-background-blur);
   backdrop-filter: var(--filter-background-blur);
   display: flex;

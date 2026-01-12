@@ -119,7 +119,7 @@ export default {
 	position: relative;
 
 	:deep(.content-wrapper) {
-		padding-left: 22px;
+		padding-inline-start: 22px;
 	}
 }
 

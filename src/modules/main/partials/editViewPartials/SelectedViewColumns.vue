@@ -285,7 +285,7 @@ export default {
 }
 
 .row-elements.actions {
-	margin-left: auto;
+	margin-inline-start: auto;
 }
 
 .column-entry:hover .row-elements.move, .column-entry:focus-within .row-elements.move, .column-entry:hover .row-elements.actions, .column-entry:focus-within .row-elements.actions {
@@ -298,7 +298,7 @@ export default {
 
 .mandatory-indicator {
   color: var(--color-error);
-  margin-left: 4px;
+  margin-inline-start: 4px;
   font-size: 16px;
   line-height: 1;
 }

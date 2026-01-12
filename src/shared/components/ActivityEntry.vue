@@ -118,17 +118,17 @@ export default {
 			flex-grow: 0;
 		}
 		.activity--subject {
-			margin-left: 10px;
+			margin-inline-start: 10px;
 		}
 		.activity--message {
-			margin-left: var(--default-clickable-area);
+			margin-inline-start: var(--default-clickable-area);
 			color: var(--color-text-light);
 			margin-bottom: 10px;
 		}
 		.activity--timestamp {
 			flex-grow: 1;
 			color: var(--color-text-maxcontrast);
-			text-align: right;
+			text-align: end;
 			font-size: 0.8em;
 			padding: 1px;
 		}

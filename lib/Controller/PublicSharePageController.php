@@ -31,7 +31,7 @@ use OCP\Util;
 
 #[OpenAPI(scope: OpenAPI::SCOPE_IGNORE)]
 class PublicSharePageController extends AuthPublicShareController {
-	private Share $share;
+	private ?Share $share = null;
 	private ?ShareToken $shareToken = null;
 
 	public function __construct(
