@@ -55,7 +55,7 @@ describe('Public link sharing', () => {
 			cy.get('[data-cy="customTableAction"] button').click()
 			cy.get('[data-cy="dataTableShareBtn"]').click()
 
-			cy.get('[data-cy="sharingEntryLinkTitle"]').should('be.visible')
+			cy.get('[data-cy="sharingEntryLinkTitle"]').scrollIntoView().should('be.visible')
 			cy.get('[data-cy="sharingEntryLinkDeleteButton"]').click()
 
 			cy.get('[data-cy="sharingEntryLinkTitle"]').should('not.exist')
@@ -106,7 +106,7 @@ describe('Public link sharing', () => {
 			cy.get('[data-cy="customTableAction"] button').click()
 			cy.get('[data-cy="dataTableShareBtn"]').click()
 
-			cy.get('[data-cy="sharingEntryLinkTitle"]').should('be.visible')
+			cy.get('[data-cy="sharingEntryLinkTitle"]').scrollIntoView().should('be.visible')
 			cy.get('[data-cy="sharingEntryLinkDeleteButton"]').click()
 
 			cy.get('[data-cy="sharingEntryLinkTitle"]').should('not.exist')
