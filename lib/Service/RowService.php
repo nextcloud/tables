@@ -211,21 +211,21 @@ class RowService extends SuperService {
 		$fullRowData = [];
 		$columnNames = [];
 
-		foreach ($columns as $c) {
-			$columnNames[$c->getId()] = $c->getTitle();
+		foreach ($columns as $column) {
+			$columnNames[$column->getId()] = $column->getTitle();
 		}
 
 		$rows = $data instanceof RowDataInput ? iterator_to_array($data) : $data;
 
-		foreach ($rows as $r) {
-			$colId = (int)$r['columnId'];
+		foreach ($rows as $row) {
+			$colId = (int)$row['columnId'];
 			if (!isset($columnNames[$colId])) {
 				continue;
 			}
 
 			$fullRowData[] = [
 				'columnId' => $colId,
-				'value' => $r['value'],
+				'value' => $row['value'],
 				'columnName' => $columnNames[$colId],
 			];
 		}
@@ -242,12 +242,8 @@ class RowService extends SuperService {
 		$row2->setData($data);
 		try {
 			$insertedRow = $this->row2Mapper->insert($row2);
-			// attached columnname to returned row for the response only
-			foreach ($fullRowData as $meta) {
-				if (isset($meta['columnId']) && array_key_exists('columnName', $meta)) {
-					$insertedRow->addCellMeta((int)$meta['columnId'], ['columnName' => $meta['columnName']]);
-				}
-			}
+			// attach columnName to returned row for the response only
+			$insertedRow->addColumnNames($fullRowData);
 
 			$this->eventDispatcher->dispatchTyped(new RowAddedEvent($insertedRow));
 			$this->activityManager->triggerEvent(

@@ -77,7 +77,7 @@ class RowOCSController extends AOCSController {
 		}
 
 		try {
-			return new DataResponse($this->rowService->create($tableId, $viewId, $newRowData)->toResponseArray());
+			return new DataResponse($this->rowService->create($tableId, $viewId, $newRowData)->jsonSerialize());
 		} catch (BadRequestError $e) {
 			return $this->handleBadRequestError($e);
 		} catch (NotFoundError $e) {
