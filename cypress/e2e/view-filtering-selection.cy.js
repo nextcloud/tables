@@ -569,6 +569,7 @@ describe('Filtering in a view by selection columns', () => {
 
 		// ## check server response for /view/{viewId}/row/{id}/present
 		cy.wait('@isRowInViewPresent').then(({ response: { body: { present } } }) => {
+			cy.wait(1000)
 			expect(present).to.be.false
 		})
 
