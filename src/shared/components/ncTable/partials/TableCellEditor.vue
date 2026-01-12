@@ -11,7 +11,7 @@
 				:show-border="false"
 				:show-readonly-bar="false" />
 		</div>
-		<RichEditor v-show="isEditing"
+		<RichEditor v-if="isEditing"
 			ref="richEditor"
 			:value="value"
 			:loading="localLoading"
