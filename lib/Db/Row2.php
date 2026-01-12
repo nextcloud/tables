@@ -212,8 +212,8 @@ class Row2 implements JsonSerializable {
 	}
 
 	/**
-	* attach columnName as metadata for each cell
-	*/
+	 * attach columnName as metadata for each cell
+	 */
 	public function addColumnNames(array $fullRowData): void {
 		foreach ($fullRowData as $meta) {
 			if (isset($meta['columnId']) && array_key_exists('columnName', $meta)) {
