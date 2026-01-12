@@ -19,7 +19,6 @@ use OCP\AppFramework\Http\Attribute\OpenAPI;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\EventDispatcher\IEventDispatcher;
-use OCP\IL10N;
 use OCP\INavigationManager;
 use OCP\IRequest;
 use OCP\Util;
@@ -33,7 +32,6 @@ class PageController extends Controller {
 		protected IInitialState $initialState,
 		protected ShareService $shareService,
 		protected NodeService $nodeService,
-		protected IL10N $l,
 	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
