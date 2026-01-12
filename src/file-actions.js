@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 import { FileAction, registerFileAction } from '@nextcloud/files'
-import { spawnDialog } from '@nextcloud/dialogs'
+import { spawnDialog } from '@nextcloud/vue/functions/dialog'
 // eslint-disable-next-line import/no-unresolved
 import tablesIcon from '@mdi/svg/svg/table-large.svg?raw'
 
