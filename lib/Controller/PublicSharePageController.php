@@ -10,6 +10,7 @@ namespace OCA\Tables\Controller;
 
 use OCA\Tables\AppInfo\Application;
 use OCA\Tables\Db\Share;
+use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Service\NodeService;
 use OCA\Tables\Service\ShareService;
 use OCA\Tables\Service\ValueObject\ShareToken;
@@ -48,7 +49,11 @@ class PublicSharePageController extends AuthPublicShareController {
 		$token = $request->getParam('token');
 		if (is_string($token) && $token !== '') {
 			$this->shareToken = new ShareToken($token);
-			$this->share = $this->shareService->findByToken($this->shareToken);
+			try {
+				$this->share = $this->shareService->findByToken($this->shareToken);
+			} catch (NotFoundError) {
+				$this->share = null;
+			}
 		}
 	}
 
