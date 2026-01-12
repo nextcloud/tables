@@ -1,149 +1,87 @@
 {
-	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
-	"extends": [
-		"config:base",
-		":semanticCommits",
-		":gitSignOff"
-	],
-	"timezone": "Europe/Berlin",
-	"schedule": [
-		"every weekend"
-	],
-	"labels": [
-		"dependencies",
-		"3. to review"
-	],
-	"rangeStrategy": "bump",
-	"rebaseWhen": "conflicted",
-	"ignoreUnstable": false,
-	"baseBranches": [
-		"main",
-		"stable0.9"
-	],
-	"enabledManagers": [
-		"npm",
-		"composer",
-		"github-actions"
-	],
-	"ignoreDeps": [
-		"node",
-		"npm"
-	],
-	"packageRules": [
-		{
-			"matchUpdateTypes": [
-				"major",
-				"minor"
-			],
-			"matchBaseBranches": ["/^stable0\\.[3-8]$/"],
-			"enabled": false
-		},
-		{
-			"description": "Request JavaScript reviews",
-			"matchManagers": [
-				"npm"
-			],
-			"reviewers": [
-				"enjeck"
-			]
-		},
-		{
-			"description": "Request PHP reviews",
-			"matchManagers": [
-				"composer"
-			],
-			"reviewers": [
-				"blizzz"
-			]
-		},
-		{
-			"description": "Request maintainer reviews",
-			"matchManagers": [
-				"github-actions"
-			],
-			"extends": [
-				"schedule:monthly"
-			],
-			"reviewers": [
-				"enjeck",
-				"blizzz"
-			]
-		},
-		{
-			"groupName": "cypress",
-			"matchPackageNames": [
-				"cypress"
-			],
-			"allowedVersions": "<=13.6.4"
-		},
-		{
-			"groupName": "cypress",
-			"matchPackageNames": [
-				"@nextcloud/cypress"
-			],
-			"allowedVersions": "<=1.0.0-beta.7"
-		},
-		{
-			"groupName": "cypress",
-			"matchPackageNames": [
-				"@cypress/"
-			]
-		},
-		{
-			"groupName": "tiptap",
-			"matchPackagePrefixes": [
-				"@tiptap/",
-				"prosemirror-"
-			]
-		},
-		{
-			"matchPackageNames": [
-				"vue"
-			],
-			"allowedVersions": "<3"
-		},
-		{
-			"matchPackageNames": [
-				"vue-router"
-			],
-			"allowedVersions": "<4"
-		},
-		{
-			"matchPackageNames": [
-				"vueuse"
-			],
-			"allowedVersions": "<12"
-		},
-		{
-			"matchPackageNames": [
-				"@vue/test-utils"
-			],
-			"allowedVersions": "<2"
-		},
-		{
-			"matchPackageNames": [
-				"@nextcloud/vite-config"
-			],
-			"allowedVersions": "<=1.5.6"
-		},
-		{
-			"matchPackageNames": [
-				"@vue/tsconfig"
-			],
-			"allowedVersions": "<=0.5.1"
-		},
-		{
-			"matchPackageNames": [
-				"typescript"
-			],
-			"allowedVersions": "<=5.3.3"
-		},
-		{
-			"matchPackageNames": [
-				"phpoffice/phpspreadsheet"
-			],
-			"allowedVersions": "<1.30",
-			"description": "Pinned as later version have a regressive bug"
-		}
-	]
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base", ":semanticCommits", ":gitSignOff"],
+  "timezone": "Europe/Berlin",
+  "schedule": ["every weekend"],
+  "labels": ["dependencies", "3. to review"],
+  "rangeStrategy": "bump",
+  "rebaseWhen": "conflicted",
+  "ignoreUnstable": false,
+  "baseBranches": ["main", "stable1.0", "stable0.9"],
+  "enabledManagers": ["npm", "composer", "github-actions"],
+  "ignoreDeps": ["node", "npm"],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["major", "minor"],
+      "matchBaseBranches": ["/^stable0\\.[3-8]$/"],
+      "enabled": false
+    },
+    {
+      "description": "Request JavaScript reviews",
+      "matchManagers": ["npm"],
+      "reviewers": ["enjeck"]
+    },
+    {
+      "description": "Request PHP reviews",
+      "matchManagers": ["composer"],
+      "reviewers": ["blizzz"]
+    },
+    {
+      "description": "Request maintainer reviews",
+      "matchManagers": ["github-actions"],
+      "extends": ["schedule:monthly"],
+      "reviewers": ["enjeck", "blizzz"]
+    },
+    {
+      "groupName": "cypress",
+      "matchPackageNames": ["cypress"],
+      "allowedVersions": "<=13.6.4"
+    },
+    {
+      "groupName": "cypress",
+      "matchPackageNames": ["@nextcloud/cypress"],
+      "allowedVersions": "<=1.0.0-beta.7"
+    },
+    {
+      "groupName": "cypress",
+      "matchPackageNames": ["@cypress/"]
+    },
+    {
+      "groupName": "tiptap",
+      "matchPackagePrefixes": ["@tiptap/", "prosemirror-"]
+    },
+    {
+      "matchPackageNames": ["vue"],
+      "allowedVersions": "<3"
+    },
+    {
+      "matchPackageNames": ["vue-router"],
+      "allowedVersions": "<4"
+    },
+    {
+      "matchPackageNames": ["vueuse"],
+      "allowedVersions": "<12"
+    },
+    {
+      "matchPackageNames": ["@vue/test-utils"],
+      "allowedVersions": "<2"
+    },
+    {
+      "matchPackageNames": ["@nextcloud/vite-config"],
+      "allowedVersions": "<=1.5.6"
+    },
+    {
+      "matchPackageNames": ["@vue/tsconfig"],
+      "allowedVersions": "<=0.5.1"
+    },
+    {
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<=5.3.3"
+    },
+    {
+      "matchPackageNames": ["phpoffice/phpspreadsheet"],
+      "allowedVersions": "<1.30",
+      "description": "Pinned as later version have a regressive bug"
+    }
+  ]
 }
