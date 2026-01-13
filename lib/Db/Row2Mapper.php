@@ -353,7 +353,11 @@ class Row2Mapper {
 		$filterExpressions = [];
 		foreach ($filterGroup as $filter) {
 			$columnId = $filter['columnId'];
-			$column = $columnId > 0 ? $this->columnMapper->find($columnId) : null;
+			try {
+				$column = $columnId > 0 ? $this->columnMapper->find($columnId) : null;
+			} catch (DoesNotExistException) {
+				$column = null;
+			}
 			// Fail if the filter is for a column that is not in the list and no meta column
 			if ($column === null && $columnId > 0) {
 				throw new InternalError('No column found to build filter with for id ' . $columnId);
