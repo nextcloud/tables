@@ -57,6 +57,7 @@ OC.L10N.register(
     "Favorites" : "Favoritos",
     "group" : "grupo",
     "Permissions" : "Permisos",
+    "Password" : "Clave",
     "Created at" : "Creado en",
     "Sharing" : "Compartiendo",
     "Copy to clipboard" : "Copiar al portapapeles",

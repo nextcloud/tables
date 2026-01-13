@@ -371,6 +371,15 @@ OC.L10N.register(
     "Demote to normal share" : "Nedgrader til normal del",
     "Open main table to adjust table management permissions" : "Åpne hovedtabellen for å justere tillatelser for tabellbehandling",
     "No shares" : "Ingen delinger",
+    "Link copied to clipboard" : "Lenke kopiert til utklippstavlen",
+    "Create public link" : "Opprett offentlig kobling",
+    "Create a new share link" : "Opprett ny delingslenke",
+    "Set password" : "Velg passord",
+    "Password" : "PassordP",
+    "Share link" : "Del lenke",
+    "View only" : "Kun se",
+    "Delete link" : "Slett kobling",
+    "Public links" : "Offentlige koblinger",
     "No view in context" : "Ingen visning i kontekst",
     "From {ownerName}" : "Fra {ownerName}",
     "Created at" : "Opprettet den",
@@ -565,6 +574,9 @@ OC.L10N.register(
     "Could not fetch view" : "Kunne ikke hente visning",
     "Could not transfer application." : "Kunne ikke overføre applikasjon.",
     "Could not remove application." : "Kunne ikke fjerne applikasjonen.",
-    "Could not remove table." : "Kunne ikke fjerne tabell."
+    "Could not remove table." : "Kunne ikke fjerne tabell.",
+    "Share not found" : "Deling ikke funnet",
+    "This share does not exist or is no longer available" : "Denne delingen eksisterer ikke eller er ikke lenger tilgjengelig",
+    "Back to %s" : "Tilbake til %s"
 },
 "nplurals=2; plural=(n != 1);");

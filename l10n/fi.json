@@ -366,6 +366,14 @@
     "Permissions" : "Oikeudet",
     "Delete data" : "Poista data",
     "No shares" : "Ei jakoja",
+    "Link copied to clipboard" : "Linkki kopioitu leikepöydälle",
+    "Create public link" : "Luo julkinen linkki",
+    "Create a new share link" : "Luo uusi jakolinkki",
+    "Set password" : "Aseta salasana",
+    "Password" : "Salasana",
+    "Share link" : "Jaa linkki",
+    "View only" : "Vain katselu",
+    "Public links" : "Julkiset linkit",
     "Created at" : "Luotu",
     "Ownership" : "Omistajuus",
     "View ID" : "Näkymän ID",
@@ -542,6 +550,9 @@
     "Could not fetch view" : "Näkymää ei voitu hakea",
     "Could not transfer application." : "Sovellusta ei voitu siirtää.",
     "Could not remove application." : "Sovellusta ei voitu poistaa.",
-    "Could not remove table." : "Taulukkoa ei voitu poistaa."
+    "Could not remove table." : "Taulukkoa ei voitu poistaa.",
+    "Share not found" : "Jakoa ei löytynyt",
+    "This share does not exist or is no longer available" : "Jakoa ei ole olemassa tai se ei ole enää saatavilla",
+    "Back to %s" : "Takaisin kohtaan %s"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

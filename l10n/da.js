@@ -247,6 +247,9 @@ OC.L10N.register(
     "Update data" : "Opdatér data",
     "Delete data" : "Slet data",
     "No shares" : "Ingen delinger",
+    "Link copied to clipboard" : "Link kopieret til udklipsholder",
+    "Set password" : "Angiv adgangskode",
+    "Delete link" : "Slet link",
     "From {ownerName}" : "Fra {ownerName}",
     "Created at" : "Oprettet",
     "Sharing" : "Deling",
@@ -371,6 +374,7 @@ OC.L10N.register(
     "Could not load tables." : "Kunne ikke indlæse tabeller.",
     "Could not fetch tables" : "Kunne ikke hente tabeller",
     "Could not update table." : "Tabellen kunne ikke opdateres.",
-    "Could not remove table." : "Tabellen kunne ikke fjernes."
+    "Could not remove table." : "Tabellen kunne ikke fjernes.",
+    "Back to %s" : "Tilbage til %s"
 },
 "nplurals=2; plural=(n != 1);");

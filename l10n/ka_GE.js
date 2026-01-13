@@ -51,6 +51,8 @@ OC.L10N.register(
     "Favorites" : "რჩეულები",
     "group" : "ჯგუფი",
     "Permissions" : "უფლებები",
+    "Password" : "პაროლ",
+    "Share link" : "ბმულს გაზიარება",
     "Created at" : "შეიქმნა",
     "Sharing" : "გაზიარება",
     "Copy to clipboard" : "კოპირება ბუფერში",

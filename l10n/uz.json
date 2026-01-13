@@ -77,6 +77,8 @@
     "Internal link" : "Ichki havola",
     "group" : "group",
     "Delete data" : "Ma'lumotlarni o'chirish",
+    "Password" : "Parol",
+    "Share link" : "Havolani ulashish",
     "Sharing" : "Ulashish",
     "Update" : "Update",
     "Searching …" : "Qidirilmoqda …",
@@ -108,6 +110,8 @@
     "This week" : "Shu hafta",
     "Now" : "Hozir",
     "Select a date" : "Sana tanlash",
-    "seconds ago" : "soniya avval"
+    "seconds ago" : "soniya avval",
+    "Share not found" : "Ulashish topilmadi",
+    "Back to %s" : "%sga qaytish"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

@@ -160,6 +160,11 @@ OC.L10N.register(
     "group" : "nhóm",
     "Delete data" : "Xóa dữ liệu",
     "No shares" : "Không có lượt chia sẻ",
+    "Create a new share link" : "Tạo liên kết chia sẻ mới",
+    "Set password" : "Đặt mật khẩu",
+    "Password" : "Mật khẩu",
+    "Share link" : "Chia sẻ liên kết",
+    "View only" : "Chỉ xem",
     "Created at" : "Được tạo ra vào lúc",
     "Sharing" : "Đang chia sẽ",
     "Copy to clipboard" : "Sao chép vào clipboard",
@@ -195,6 +200,8 @@ OC.L10N.register(
     "This week" : "Tuần này",
     "ID" : "ID",
     "Clipboard is not available" : "Bảng nhớ tạm không có sẵn",
-    "seconds ago" : "vài giây trước"
+    "seconds ago" : "vài giây trước",
+    "Share not found" : "Không tìm thấy chia sẻ.",
+    "Back to %s" : "Quay lại %s"
 },
 "nplurals=1; plural=0;");

@@ -121,6 +121,13 @@ OC.L10N.register(
     "group" : "קבוצה",
     "Permissions" : "הרשאות",
     "No shares" : "אין שיתופים",
+    "Link copied to clipboard" : "הקישור הועתק ללוח הגזירים",
+    "Create public link" : "יצירת קישור ציבורי",
+    "Create a new share link" : "יצירת קישור שיתוף חדש",
+    "Password" : "ססמה",
+    "Share link" : "שיתוף קישור",
+    "View only" : "לצפיה בלבד",
+    "Delete link" : "מחיקת קישור",
     "Created at" : "נוצר ב־",
     "Sharing" : "שיתוף",
     "Copy to clipboard" : "העתקה ללוח הגזירים",
@@ -158,6 +165,8 @@ OC.L10N.register(
     "This month" : "החודש",
     "This week" : "השבוע",
     "ID" : "מזהה",
-    "seconds ago" : "לפני מספר שניות"
+    "seconds ago" : "לפני מספר שניות",
+    "Share not found" : "השיתוף לא נמצא",
+    "Back to %s" : "חזרה אל %s"
 },
 "nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: 2;");

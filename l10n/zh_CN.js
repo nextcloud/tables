@@ -371,6 +371,14 @@ OC.L10N.register(
     "Demote to normal share" : "降级为普通分享",
     "Open main table to adjust table management permissions" : "打开主表以调整表管理权限",
     "No shares" : "没有共享",
+    "Link copied to clipboard" : "链接已复制到剪贴板",
+    "Create public link" : "创建公开链接",
+    "Create a new share link" : "创建新的共享链接",
+    "Set password" : "设置密码",
+    "Password" : "密码",
+    "Share link" : "共享链接",
+    "View only" : "仅查看",
+    "Public links" : "公开链接",
     "Created at" : "创建于",
     "Ownership" : "所有人",
     "Sharing" : "共享",
@@ -432,6 +440,9 @@ OC.L10N.register(
     "Clipboard is not available" : "剪贴板不可用",
     "seconds ago" : "几秒前",
     "{shareTypeString}..." : "{shareTypeString}...",
-    "Could not remove table." : "无法移除数据库表"
+    "Could not remove table." : "无法移除数据库表",
+    "Share not found" : "未找到共享",
+    "This share does not exist or is no longer available" : "此共享不存在或不再可用",
+    "Back to %s" : "返回 %s"
 },
 "nplurals=1; plural=0;");

@@ -75,6 +75,9 @@ OC.L10N.register(
     "group" : "grup",
     "Permissions" : "Permisiuni",
     "No shares" : "Nicio partajare",
+    "Password" : "Parolă",
+    "Share link" : "Partajază legătură",
+    "View only" : "Numai se vizualizează",
     "Created at" : "Creat la",
     "Sharing" : "Partajare",
     "Copy to clipboard" : "Copiază în clipboard",
@@ -104,6 +107,7 @@ OC.L10N.register(
     "Now" : "Acum",
     "ID" : "ID",
     "Clipboard is not available" : "Clipboardul este indisponibil",
-    "seconds ago" : "secunde în urmă"
+    "seconds ago" : "secunde în urmă",
+    "Back to %s" : "Înapoi la %s"
 },
 "nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));");

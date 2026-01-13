@@ -381,6 +381,15 @@
     "No shares" : "Inga delningar",
     "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "Efter att delningsmottagaren har befordrats till tabellansvarig kommer alla appar som skapats av delningsmottagare och som använder denna tabell fortsätta att ha åtkomst till dess data, även om du senare degraderar dem.",
     "Confirm table manager promotion" : "Bekräfta befordran till tabellansvarig",
+    "Link copied to clipboard" : "Länken kopierad till urklipp",
+    "Create public link" : "Skapa offentlig länk",
+    "Create a new share link" : "Skapa en ny delad länk",
+    "Set password" : "Ange lösenord",
+    "Password" : "Lösenord",
+    "Share link" : "Delningslänk",
+    "View only" : "Skrivskyddat läge",
+    "Delete link" : "Ta bort länk",
+    "Public links" : "Publika länkar",
     "No view in context" : "Ingen vy i sammanhanget",
     "From {ownerName}" : "Från {ownerName}",
     "Created at" : "Skapad",
@@ -600,6 +609,9 @@
     "Could not fetch view" : "Kunde inte hämta vyn",
     "Could not transfer application." : "Kunde inte överföra appen.",
     "Could not remove application." : "Kunde inte ta bort appen.",
-    "Could not remove table." : "Kunde inte ta bort tabell."
+    "Could not remove table." : "Kunde inte ta bort tabell.",
+    "Share not found" : "Delningen hittades inte",
+    "This share does not exist or is no longer available" : "Den här delningen finns inte eller är inte längre tillgänglig",
+    "Back to %s" : "Tillbaka till %s"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

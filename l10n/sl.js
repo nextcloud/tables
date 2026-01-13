@@ -275,6 +275,13 @@ OC.L10N.register(
     "Update data" : "Posodobi podatke",
     "Delete data" : "Izbriši podatke",
     "No shares" : "Ni še vpisanih razpredelnic v souporabi",
+    "Link copied to clipboard" : "Povezava je kopirana v odložišče",
+    "Create public link" : "Ustvari javno povezavo",
+    "Create a new share link" : "Ustvari novo povezavo za souporabo",
+    "Set password" : "Nastavi geslo",
+    "Password" : "Geslo",
+    "Share link" : "Povezava za souporabo",
+    "View only" : "Le ogled",
     "From {ownerName}" : "Priprava: {ownerName}",
     "Created at" : "Ustvarjeno",
     "Ownership" : "Lastništvo",
@@ -364,6 +371,8 @@ OC.L10N.register(
     "Clipboard is not available" : "Odložišče ni na voljo",
     "seconds ago" : "pred nekaj sekundami",
     "Unknown error." : "Neznana napaka.",
-    "Could not fetch tables" : "Razpredelnic ni mogoče pridobiti."
+    "Could not fetch tables" : "Razpredelnic ni mogoče pridobiti.",
+    "Share not found" : "Mesta souporabe ni mogoče najti.",
+    "Back to %s" : "Nazaj na %s"
 },
 "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);");

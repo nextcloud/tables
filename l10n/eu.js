@@ -256,6 +256,14 @@ OC.L10N.register(
     "Update data" : "Eguneratu datuak",
     "Delete data" : "Ezabatu datuak",
     "No shares" : "Partekatzerik ez",
+    "Link copied to clipboard" : "Arbelara kopiatutako esteka",
+    "Create public link" : "Sortu esteka publikoa",
+    "Create a new share link" : "Sortu partekatze esteka berria",
+    "Set password" : "Pasahitza ezarri",
+    "Password" : "Pasahitza",
+    "Share link" : "Partekatu esteka",
+    "View only" : "Ikustea soilik",
+    "Public links" : "Esteka publikoak",
     "From {ownerName}" : "{ownerName}-(r)ena",
     "Created at" : "Sortze data",
     "Ownership" : "Jabetza",
@@ -369,6 +377,9 @@ OC.L10N.register(
     "Request is not authorized. Are you logged in?" : "Eskaerak egiteko baimenik ez. Saioa hasi al duzu?",
     "Request not allowed." : "Ez da eskaera onartu.",
     "Resource not found." : "Ez da baliabidea aurkitu.",
-    "Could not fetch tables" : "Ezin izan dira taulak eskuratu"
+    "Could not fetch tables" : "Ezin izan dira taulak eskuratu",
+    "Share not found" : "Partekatzea ez da aurkitu",
+    "This share does not exist or is no longer available" : "Partekatze hau ez dago edo jada ez dago erabilgarri",
+    "Back to %s" : "Itzuli %s(e)ra"
 },
 "nplurals=2; plural=(n != 1);");

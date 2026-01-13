@@ -317,6 +317,13 @@
     "Promote to table manager" : "テーブル マネージャーに昇格",
     "Demote to normal share" : "通常の共有に降格",
     "No shares" : "共有なし",
+    "Link copied to clipboard" : "クリップボードにリンクをコピーしました",
+    "Create public link" : "公開リンクを作成",
+    "Create a new share link" : "新しい共有リンクを作成する",
+    "Set password" : "パスワード設定",
+    "Password" : "パスワード",
+    "Share link" : "共有リンク",
+    "View only" : "閲覧のみ",
     "Created at" : "作成:",
     "Ownership" : "所有権",
     "View ID" : "ビュー ID",
@@ -442,6 +449,9 @@
     "Could not transfer table." : "テーブルを譲渡できませんでした。",
     "Could not transfer application." : "アプリケーションを譲渡できませんでした。",
     "Could not remove application." : "アプリケーションを削除できませんでした。",
-    "Could not remove table." : "テーブルを削除できませんでした。"
+    "Could not remove table." : "テーブルを削除できませんでした。",
+    "Share not found" : "共有が見つかりません",
+    "This share does not exist or is no longer available" : "このシェアは存在していないか、または利用できなくなりました",
+    "Back to %s" : "%s に戻る"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

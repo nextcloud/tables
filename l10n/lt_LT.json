@@ -125,6 +125,14 @@
     "group" : "grupė",
     "Permissions" : "Leidimai",
     "No shares" : "Nėra jokių viešinių",
+    "Link copied to clipboard" : "Nuoroda nukopijuota į iškarpinę",
+    "Create public link" : "Sukurti viešąją nuorodą",
+    "Create a new share link" : "Sukurti naują viešinio nuorodą",
+    "Set password" : "Nustatyti slaptažodį",
+    "Password" : "Slaptažodis",
+    "Share link" : "Viešinio nuoroda",
+    "View only" : "Tik peržiūrėti",
+    "Delete link" : "Ištrinti nuorodą",
     "Created at" : "Sukurta",
     "Sharing" : "Bendrinimas",
     "Copy to clipboard" : "Kopijuoti į iškarpinę",
@@ -185,6 +193,9 @@
     "Could not remove row." : "Nepavyko pašalinti eilutės.",
     "Could not insert table." : "Nepavyko įterpti lentelės.",
     "Could not load tables." : "Nepavyko įkelti lentelių.",
-    "Could not fetch tables" : "Nepavyko gauti lentelių"
+    "Could not fetch tables" : "Nepavyko gauti lentelių",
+    "Share not found" : "Viešinys nerastas",
+    "This share does not exist or is no longer available" : "Šio viešinio nebėra arba jis daugiau nebeprieinamas",
+    "Back to %s" : "Atgal į %s"
 },"pluralForm" :"nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);"
 }

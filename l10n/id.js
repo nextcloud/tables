@@ -71,6 +71,11 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Tidak ada saran. Mulai mengetik.",
     "group" : "grup",
     "Delete data" : "Hapus data",
+    "Create public link" : "Buat tautan publik",
+    "Password" : "Kata sandi",
+    "Share link" : "Bagikan tautan",
+    "View only" : "Hanya lihat",
+    "Delete link" : "Hapus tautan",
     "Created at" : "Dibuat saat",
     "Sharing" : "Berbagi",
     "Copy to clipboard" : "Salin ke papan klip",
@@ -96,6 +101,7 @@ OC.L10N.register(
     "Now" : "Sekarang",
     "ID" : "ID",
     "Clipboard is not available" : "Papan klip tidak tersedia",
-    "seconds ago" : "beberapa detik yang lalu"
+    "seconds ago" : "beberapa detik yang lalu",
+    "Back to %s" : "Kembali ke %s"
 },
 "nplurals=1; plural=0;");

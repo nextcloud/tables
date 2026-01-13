@@ -81,6 +81,14 @@ OC.L10N.register(
     "group" : "hópur",
     "Permissions" : "Heimildir",
     "No shares" : "Engar sameignir",
+    "Link copied to clipboard" : "Tengill afritaður á klippispjald",
+    "Create public link" : "Búa til opinberan tengil",
+    "Create a new share link" : "Búa til nýjan tengil á sameign",
+    "Set password" : "Stilltu lykilorð",
+    "Password" : "Lykilorð",
+    "Share link" : "Tengill á sameign",
+    "View only" : "Einungis skoða",
+    "Delete link" : "Eyða tengli",
     "Created at" : "Búið til",
     "Sharing" : "Deiling",
     "Copy to clipboard" : "Afrita á klippispjald",
@@ -128,6 +136,9 @@ OC.L10N.register(
     "Select a date" : "Veldu dagsetningu",
     "ID" : "ID",
     "Clipboard is not available" : "Klippispjald er ekki tiltækt",
-    "seconds ago" : "sekúndum síðan"
+    "seconds ago" : "sekúndum síðan",
+    "Share not found" : "Sameign fannst ekki",
+    "This share does not exist or is no longer available" : "Þessi sameign er ekki til eða ekki lengur tiltæk",
+    "Back to %s" : "Til baka í %s"
 },
 "nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);");

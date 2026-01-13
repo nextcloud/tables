@@ -416,6 +416,14 @@ OC.L10N.register(
     "No shares" : "Aucun partage",
     "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "Après la promotion d'un destinataire du partage en tant que gestionnaire, toute application créé par un destinataire du partage qui utilise cette table continuera à accéder à ses données, même si vous lui retirer ce droit ensuite.",
     "Confirm table manager promotion" : "Confirmer la promotion en gestionnaire de tableau",
+    "Link copied to clipboard" : "Lien copié dans le presse-papier",
+    "Create public link" : "Créer un lien de partage public",
+    "Create a new share link" : "Créer un nouveau lien de partage",
+    "Set password" : "Définir un mot de passe",
+    "Password" : "Mot de passe",
+    "Share link" : "Partager par lien",
+    "View only" : "Afficher seulement",
+    "Public links" : "Liens publics",
     "No view in context" : "Aucune vue en contexte",
     "From {ownerName}" : "De {ownerName}",
     "Created at" : "Créé le",
@@ -635,6 +643,9 @@ OC.L10N.register(
     "Could not fetch view" : "Impossible de récupérer la vue",
     "Could not transfer application." : "Impossible de transférer l’application.",
     "Could not remove application." : "Impossible de retirer l'application.",
-    "Could not remove table." : "Impossible de supprimer le tableau."
+    "Could not remove table." : "Impossible de supprimer le tableau.",
+    "Share not found" : "Partage non trouvé",
+    "This share does not exist or is no longer available" : "Ce partage n'existe pas ou n'est plus disponible",
+    "Back to %s" : "Retourner à %s"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

@@ -294,6 +294,14 @@
     "Demote to normal share" : "일반 공유로 권한 복귀",
     "Open main table to adjust table management permissions" : "주된 표를 열고 표 관리 권한을 지정하십시오",
     "No shares" : "공유 없음",
+    "Link copied to clipboard" : "링크가 클립보드로 복사됨",
+    "Create public link" : "공개 링크 만들기",
+    "Create a new share link" : "새로운 공유 링크 생성",
+    "Set password" : "비밀번호 설정",
+    "Password" : "암호",
+    "Share link" : "링크 공유",
+    "View only" : "읽기 전용",
+    "Public links" : "공개 링크",
     "No view in context" : "보기 없음",
     "From {ownerName}" : "{ownerName} 으로부터",
     "Created at" : "만든 날짜:",
@@ -336,6 +344,7 @@
     "Redo" : "다시 실행",
     "Bold" : "굵게",
     "Italic" : "Italic체",
+    "Bullet list" : "글머리 기호 목록",
     "Ordered list" : "순서 있는 목록",
     "Heading 1" : "제목 1",
     "Heading 2" : "제목 2",
@@ -405,6 +414,7 @@
     "Unchecked" : "검사되지 않음",
     "This year" : "올해",
     "This month" : "이번 달",
+    "This week" : "이번 주",
     "Now" : "지금",
     "Select a date" : "날짜 선택",
     "ID" : "ID",
@@ -437,6 +447,9 @@
     "Could not reload view." : "보기를 다시 불러올 수 없음",
     "Could not update table." : "표를 갱신할 수 없음",
     "Could not transfer table." : "표를 전송할 수 없음",
-    "Could not remove table." : "표를 삭제할 수 없음"
+    "Could not remove table." : "표를 삭제할 수 없음",
+    "Share not found" : "공유를 찾을 수 없음",
+    "This share does not exist or is no longer available" : "이 공유는 존재하지 않거나 더이상 사용할 수 없습니다.",
+    "Back to %s" : "%s(으)로 돌아가기"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

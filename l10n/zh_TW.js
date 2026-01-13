@@ -416,6 +416,14 @@ OC.L10N.register(
     "No shares" : "無分享",
     "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "將分享接收者升級為表格管理員後，任何由分享接收者建立並使用此表格的應用程式將繼續存取其資料，即使您之後將它們降級也是如此。",
     "Confirm table manager promotion" : "確認表格管理者升級",
+    "Link copied to clipboard" : "已複製連結至剪貼簿",
+    "Create public link" : "建立公開連結",
+    "Create a new share link" : "建立新分享連結",
+    "Set password" : "設定密碼",
+    "Password" : "密碼",
+    "Share link" : "分享連結",
+    "View only" : "僅供檢視",
+    "Public links" : "公開連結",
     "No view in context" : "情境中無檢視",
     "From {ownerName}" : "來自 {ownerName}",
     "Created at" : "建立於",
@@ -635,6 +643,9 @@ OC.L10N.register(
     "Could not fetch view" : "無法擷取檢視",
     "Could not transfer application." : "無法轉移應用程式。",
     "Could not remove application." : "無法移除應用程式。",
-    "Could not remove table." : "無法移除表格。"
+    "Could not remove table." : "無法移除表格。",
+    "Share not found" : "找不到分享",
+    "This share does not exist or is no longer available" : "此分享不存在或是不再提供",
+    "Back to %s" : "返回 %s"
 },
 "nplurals=1; plural=0;");

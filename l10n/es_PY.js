@@ -70,6 +70,7 @@ OC.L10N.register(
     "This month" : "Este mes",
     "This week" : "Esta semana",
     "ID" : "ID",
-    "seconds ago" : "hace segundos"
+    "seconds ago" : "hace segundos",
+    "Back to %s" : "Volver a %s"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

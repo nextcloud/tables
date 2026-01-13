@@ -169,6 +169,14 @@ OC.L10N.register(
     "Permissions" : "Machtigingen",
     "Delete data" : "Verwijder data",
     "No shares" : "Geen shares",
+    "Link copied to clipboard" : "Link gekopieerd naar het klembord",
+    "Create public link" : "Creëer openbare link",
+    "Create a new share link" : "Creëer een nieuwe deellink",
+    "Set password" : "Instellen wachtwoord",
+    "Password" : "Wachtwoord",
+    "Share link" : "Deel link",
+    "View only" : "Alleen bekijken",
+    "Public links" : "Openbare links",
     "From {ownerName}" : "Van {ownerName}",
     "Created at" : "Gemaakt op",
     "Sharing" : "Delen",
@@ -225,6 +233,9 @@ OC.L10N.register(
     "ID" : "ID",
     "Clipboard is not available" : "Klembord niet beschikbaar",
     "seconds ago" : "seconden geleden",
-    "Could not fetch tables" : "Kon tabellen niet ophalen"
+    "Could not fetch tables" : "Kon tabellen niet ophalen",
+    "Share not found" : "Gedeelde map niet gevonden",
+    "This share does not exist or is no longer available" : "Deze share bestaat niet of is niet meer beschikbaar",
+    "Back to %s" : "Terug naar %s"
 },
 "nplurals=2; plural=(n != 1);");

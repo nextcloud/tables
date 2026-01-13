@@ -416,6 +416,15 @@ OC.L10N.register(
     "No shares" : "Uimh scaireanna",
     "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "Tar éis an faighteoir scaireanna a chur chun cinn go bainisteoir boird, leanfaidh aon fheidhmchláir a chruthaíonn faighteoirí scaireanna a úsáideann an tábla seo ag rochtain a shonraí, fiú má scarann ​​tú iad níos déanaí.",
     "Confirm table manager promotion" : "Deimhnigh cur chun cinn bainisteoir tábla",
+    "Link copied to clipboard" : "Cóipeáladh an nasc chuig an ngearrthaisce",
+    "Create public link" : "Cruthaigh nasc poiblí",
+    "Create a new share link" : "Cruthaigh nasc comhroinnte nua",
+    "Set password" : "Socraigh pasfhocal",
+    "Password" : "Pasfhocal",
+    "Share link" : "Comhroinn nasc",
+    "View only" : "Amharc amháin",
+    "Delete link" : "Scrios an nasc",
+    "Public links" : "Naisc phoiblí",
     "No view in context" : "Gan dearcadh i gcomhthéacs",
     "From {ownerName}" : "Ó {ownerName}",
     "Created at" : "Cruthaithe ag",
@@ -635,6 +644,9 @@ OC.L10N.register(
     "Could not fetch view" : "Níorbh fhéidir an t-amharc a fháil",
     "Could not transfer application." : "Níorbh fhéidir an t-iarratas a aistriú.",
     "Could not remove application." : "Níorbh fhéidir an feidhmchlár a bhaint.",
-    "Could not remove table." : "Níorbh fhéidir an tábla a bhaint."
+    "Could not remove table." : "Níorbh fhéidir an tábla a bhaint.",
+    "Share not found" : "Ní bhfuarthas an sciar",
+    "This share does not exist or is no longer available" : "Níl an sciar seo ann nó níl sé ar fáil a thuilleadh",
+    "Back to %s" : "Ar ais go dtí %s"
 },
 "nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : 4);");

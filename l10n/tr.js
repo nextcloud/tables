@@ -416,6 +416,15 @@ OC.L10N.register(
     "No shares" : "Henüz bir şey paylaşılmamış",
     "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "Paylaşım alıcısının tablo yöneticisi yetkisine yükseltilmesinden sonra, bu tabloyu kullanan paylaşım alıcıları tarafından oluşturulan tüm uygulamalar, daha sonra bu kişilerin yetkileri düşürülse bile, tablo verilerine erişmeyi sürdürür.",
     "Confirm table manager promotion" : "Tablo yöneticisi yükseltmesini onayla",
+    "Link copied to clipboard" : "Bağlantı panoya kopyalandı",
+    "Create public link" : "Herkese açık bağlantı ekle",
+    "Create a new share link" : "Yeni bir paylaşım bağlantısı ekle",
+    "Set password" : "Parola ayarla",
+    "Password" : "Parola",
+    "Share link" : "Bağlantıyı paylaş",
+    "View only" : "Yalnızca görüntüleme",
+    "Delete link" : "Bağlantıyı sil",
+    "Public links" : "Herkese açık bağlantılar",
     "No view in context" : "Bağlamda bir görünüm bulunamadı",
     "From {ownerName}" : "{ownerName} tarafından",
     "Created at" : "Oluşturulma",
@@ -635,6 +644,9 @@ OC.L10N.register(
     "Could not fetch view" : "Görünüm alınamadı",
     "Could not transfer application." : "Uygulama aktarılamadı.",
     "Could not remove application." : "Uygulama kaldırılamadı.",
-    "Could not remove table." : "Tablo silinemedi."
+    "Could not remove table." : "Tablo silinemedi.",
+    "Share not found" : "Paylaşım bulunamadı",
+    "This share does not exist or is no longer available" : "Bu paylaşım bulunamadı ya da artık kullanılamıyor",
+    "Back to %s" : "%s sayfasına dön"
 },
 "nplurals=2; plural=(n > 1);");

@@ -416,6 +416,11 @@ OC.L10N.register(
     "No shares" : "No shares",
     "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them.",
     "Confirm table manager promotion" : "Confirm table manager promotion",
+    "Link copied to clipboard" : "Link copied to clipboard",
+    "Create public link" : "Create public link",
+    "Set password" : "Set password",
+    "View only" : "View only",
+    "Delete link" : "Delete link",
     "No view in context" : "No view in context",
     "From {ownerName}" : "From {ownerName}",
     "Created at" : "Created at",
@@ -635,6 +640,7 @@ OC.L10N.register(
     "Could not fetch view" : "Could not fetch view",
     "Could not transfer application." : "Could not transfer application.",
     "Could not remove application." : "Could not remove application.",
-    "Could not remove table." : "Could not remove table."
+    "Could not remove table." : "Could not remove table.",
+    "Back to %s" : "Back to %s"
 },
 "nplurals=2; plural=(n != 1);");

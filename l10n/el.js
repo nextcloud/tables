@@ -399,6 +399,10 @@ OC.L10N.register(
     "No shares" : "Κανένα κοινόχρηστο",
     "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "Μετά την προαγωγή του αποδέκτη κοινής χρήσης σε διαχειριστή πίνακα, οποιεσδήποτε εφαρμογές δημιουργηθούν από αποδέκτες κοινής χρήσης που χρησιμοποιούν αυτόν τον πίνακα θα συνεχίσουν να έχουν πρόσβαση στα δεδομένα του, ακόμα και αν τους υποβιβάσετε αργότερα.",
     "Confirm table manager promotion" : "Επιβεβαίωση προαγωγής σε διαχειριστή πίνακα",
+    "Link copied to clipboard" : "Ο σύνδεσμος αντιγράφηκε στο πρόχειρο",
+    "Create public link" : "Δημιουργία δημόσιου συνδέσμου",
+    "Set password" : "Ορισμός συνθηματικού",
+    "View only" : "Μόνο προβολή",
     "No view in context" : "Καμία προβολή στο πλαίσιο",
     "From {ownerName}" : "Από {ownerName}",
     "Created at" : "Έχει δημιουργηθεί στις",
@@ -614,6 +618,7 @@ OC.L10N.register(
     "Could not fetch view" : "Αδυναμία ανάκτησης προβολής",
     "Could not transfer application." : "Δεν ήταν δυνατή η μεταφορά εφαρμογής.",
     "Could not remove application." : "Δεν ήταν δυνατή η αφαίρεση εφαρμογής.",
-    "Could not remove table." : "Δεν ήταν δυνατή η αφαίρεση πίνακα."
+    "Could not remove table." : "Δεν ήταν δυνατή η αφαίρεση πίνακα.",
+    "Back to %s" : "Πίσω στο %s"
 },
 "nplurals=2; plural=(n != 1);");

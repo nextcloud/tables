@@ -409,6 +409,15 @@ OC.L10N.register(
     "Open main table to adjust table management permissions" : "Tabeli haldusõiguste kohendamiseks ava põhitabel",
     "No shares" : "Jagamisi pole",
     "Confirm table manager promotion" : "Kinnita tabelihalduri muudatus",
+    "Link copied to clipboard" : "Link on lõikelauale kopeeritud",
+    "Create public link" : "Loo avalik link",
+    "Create a new share link" : "Loo uus jagamislink",
+    "Set password" : "Määra salasõna",
+    "Password" : "Salasõna",
+    "Share link" : "Jaga linki",
+    "View only" : "Ainult vaatamine",
+    "Delete link" : "Kustuta link",
+    "Public links" : "Avalikud lingid",
     "No view in context" : "Ühtegi vaadet pole kontekstis/fookuses",
     "From {ownerName}" : "Kasutajalt {ownerName}",
     "Created at" : "Loodud",
@@ -625,6 +634,9 @@ OC.L10N.register(
     "Could not fetch view" : "Vaadet polnud võimalik kätte saada",
     "Could not transfer application." : "Rakenduse omandi üleandmine ei õnnestunud.",
     "Could not remove application." : "Ei õnnestunud eemaldada rakendust.",
-    "Could not remove table." : "Ei õnnestunud eemaldada tabelit."
+    "Could not remove table." : "Ei õnnestunud eemaldada tabelit.",
+    "Share not found" : "Jagamist ei leidu",
+    "This share does not exist or is no longer available" : "See jaosmeedia pole enam olemas või saadaval",
+    "Back to %s" : "Tagasi siia: %s"
 },
 "nplurals=2; plural=(n != 1);");

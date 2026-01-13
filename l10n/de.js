@@ -416,6 +416,9 @@ OC.L10N.register(
     "No shares" : "Keine Freigaben",
     "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "Nach der Heraufstufung des Freigabeempfängers zum Tabellenmanager greifen alle von Freigabeempfängern erstellten Anwendungen, die diese Tabelle verwenden, weiterhin auf deren Daten zu, selbst wenn du sie später herabstufst.",
     "Confirm table manager promotion" : "Tabellenmanagement-Heraufstufung bestätigen",
+    "Link copied to clipboard" : "Link wurde in die Zwischenablage kopiert",
+    "Set password" : "Benötigt keine Übersetzung. Hier wird nur die formelle Übersetzung verwendet (de_DE).",
+    "Delete link" : "Link löschen",
     "No view in context" : "Keine Ansicht im Kontext",
     "From {ownerName}" : "Von {ownerName}",
     "Created at" : "Erstellt am",
@@ -635,6 +638,7 @@ OC.L10N.register(
     "Could not fetch view" : "Ansicht konnte nicht abgerufen werden",
     "Could not transfer application." : "Anwendung konnte nicht übertragen werden.",
     "Could not remove application." : "Die Anwendung konnte nicht entfernt werden.",
-    "Could not remove table." : "Tabelle konnte nicht entfernt werden."
+    "Could not remove table." : "Tabelle konnte nicht entfernt werden.",
+    "Back to %s" : "Zurück zu %s"
 },
 "nplurals=2; plural=(n != 1);");

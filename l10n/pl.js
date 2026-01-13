@@ -196,6 +196,14 @@ OC.L10N.register(
     "Update data" : "Uaktualnij dane",
     "Delete data" : "Usuń dane",
     "No shares" : "Brak udostępnień",
+    "Link copied to clipboard" : "Link skopiowany do schowka",
+    "Create public link" : "Utwórz link publiczny",
+    "Create a new share link" : "Utwórz nowy link udostępnienia",
+    "Set password" : "Ustaw hasło",
+    "Password" : "Hasło",
+    "Share link" : "Udostępnij link",
+    "View only" : "Tylko podgląd",
+    "Public links" : "Odnośniki publiczne",
     "From {ownerName}" : "Od {ownerName}",
     "Created at" : "Utworzono",
     "Sharing" : "Udostępnianie",
@@ -298,6 +306,9 @@ OC.L10N.register(
     "Could not fetch view" : "Nie udało się pobrać widoku",
     "Could not transfer application." : "Nie udało się przenieść aplikacji.",
     "Could not remove application." : "Nie można usunąć aplikacji.",
-    "Could not remove table." : "Nie można usunąć tabeli."
+    "Could not remove table." : "Nie można usunąć tabeli.",
+    "Share not found" : "Nie znaleziono udostępnienia",
+    "This share does not exist or is no longer available" : "Ten współudział nie istnieje lub nie jest już dostępny",
+    "Back to %s" : "Powrót do %s"
 },
 "nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);");

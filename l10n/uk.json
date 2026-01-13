@@ -414,6 +414,15 @@
     "No shares" : "Відсутні спільні ресурси",
     "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "Після підвищення одержувача доступу до таблиці до менеджера таблиці, будь-які програми, створені одержувачами доступу, які використовують цю таблицю, продовжуватимуть отримувати доступ до її даних, навіть якщо ви пізніше понизите їх у посаді.",
     "Confirm table manager promotion" : "Підтвердити надання додаткових прав для таблиці",
+    "Link copied to clipboard" : "Посилання скопійовано в буфер обміну",
+    "Create public link" : "Створити публічне посилання",
+    "Create a new share link" : "Створити нове посилання спільного доступу",
+    "Set password" : "Встановити пароль",
+    "Password" : "Пароль",
+    "Share link" : "Передати у публічний доступ",
+    "View only" : "Лише перегляд",
+    "Delete link" : "Вилучити посилання",
+    "Public links" : "Публічні посилання",
     "No view in context" : "Відсутні подання в контексті",
     "From {ownerName}" : "Від {ownerName}",
     "Created at" : "Коли створено",
@@ -633,6 +642,9 @@
     "Could not fetch view" : "Не вдалося отримати подання",
     "Could not transfer application." : "Не вдалося передати застосунок.",
     "Could not remove application." : "Неможливо вилучити застосунок.",
-    "Could not remove table." : "Не вдалося вилучити таблицю."
+    "Could not remove table." : "Не вдалося вилучити таблицю.",
+    "Share not found" : "Спільний ресурс не знайдено",
+    "This share does not exist or is no longer available" : "Спільний ресурс не існує або більше не доступний",
+    "Back to %s" : "Назад до %s"
 },"pluralForm" :"nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);"
 }

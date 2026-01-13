@@ -37,6 +37,7 @@ OC.L10N.register(
     "Copy" : "Kopiraj",
     "Favorites" : "Omiljene",
     "group" : "grupa",
+    "Share link" : "Veza deljenja",
     "Sharing" : "Deljenje",
     "Read" : "Čitaj",
     "Error" : "Greška",

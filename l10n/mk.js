@@ -79,6 +79,13 @@ OC.L10N.register(
     "group" : "група",
     "Permissions" : "Дозволи",
     "No shares" : "Нема споделувања",
+    "Link copied to clipboard" : "Линкот е копиран во клипборд",
+    "Create public link" : "Креирај јавен линк",
+    "Create a new share link" : "Креирајте нов линк за споделување",
+    "Set password" : "Постави лозинка",
+    "Password" : "Лозинка",
+    "Share link" : "Сподели ја врската",
+    "View only" : "Само за гледање",
     "Created at" : "Создадена на",
     "Sharing" : "Споделување",
     "Copy to clipboard" : "Копирај во клипборд",
@@ -118,6 +125,9 @@ OC.L10N.register(
     "Select a date" : "Избери датум",
     "ID" : "ID",
     "Clipboard is not available" : "Клипбордот не е достапен",
-    "seconds ago" : "пред неколку секунди"
+    "seconds ago" : "пред неколку секунди",
+    "Share not found" : "Споделувањето не е пронајдено",
+    "This share does not exist or is no longer available" : "Споделувањето не постои или не е повеќе достапно",
+    "Back to %s" : "Врати се на %s"
 },
 "nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;");

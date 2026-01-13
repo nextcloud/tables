@@ -42,6 +42,7 @@ OC.L10N.register(
     "Add to favorites" : "Ouzhpennañ d'ar penndibaboù",
     "Favorites" : "Pennrolloù",
     "group" : "strollad",
+    "Set password" : "Termeniñ ur ger-tremen",
     "Created at" : "Krouet da",
     "Sharing" : "Rannan",
     "Update" : "Hizivaat",

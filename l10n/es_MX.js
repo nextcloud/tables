@@ -86,6 +86,13 @@ OC.L10N.register(
     "Permissions" : "Permisos",
     "Delete data" : "Eliminar datos",
     "No shares" : "No hay recursos compartidos",
+    "Link copied to clipboard" : "Enlace copiado al portapapeles",
+    "Create public link" : "Crear enlace público",
+    "Set password" : "Establecer contraseña",
+    "Password" : "Contraseña",
+    "Share link" : "Compartir enlace",
+    "View only" : "Sólo lectura",
+    "Delete link" : "Eliminar enlace",
     "Created at" : "Creado en",
     "Sharing" : "Compartiendo",
     "Copy to clipboard" : "Copiar al portapapeles",
@@ -129,6 +136,9 @@ OC.L10N.register(
     "Select a date" : "Seleccionar una fecha",
     "ID" : "ID",
     "Clipboard is not available" : "El portapapeles no está disponible",
-    "seconds ago" : "hace algunos segundos"
+    "seconds ago" : "hace algunos segundos",
+    "Share not found" : "No se encontró el elemento compartido",
+    "This share does not exist or is no longer available" : "El recurso compartido no existe o ya no está disponible",
+    "Back to %s" : "Volver a %s"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

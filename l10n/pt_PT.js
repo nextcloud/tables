@@ -78,6 +78,12 @@ OC.L10N.register(
     "Internal link" : "Ligação interna",
     "group" : "grupo",
     "Delete data" : "Apagar dados",
+    "Link copied to clipboard" : "Ligação copiada para a área de transferência",
+    "Create public link" : "Criar link público",
+    "Set password" : "Definir palavra-passe",
+    "Password" : "Password",
+    "Share link" : "Partilhar ligação",
+    "View only" : "Visualizar apenas",
     "Created at" : "Criado em",
     "Sharing" : "Partilha",
     "Copy to clipboard" : "Copiar para área de transferência",
@@ -112,6 +118,8 @@ OC.L10N.register(
     "This week" : "Esta semana",
     "Now" : "Agora",
     "ID" : "ID",
-    "seconds ago" : "segundos atrás"
+    "seconds ago" : "segundos atrás",
+    "Share not found" : "Partilha não encontrada",
+    "Back to %s" : "Voltar para %s"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

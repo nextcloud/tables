@@ -414,6 +414,15 @@
     "No shares" : "Ningunha compartición",
     "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "Após 0a promoción do destinatario de comparticións a xestor de táboas, todas as aplicacións creadas por destinatarios de comparticións que utilizan esta táboa continuarán accedendo aos seus datos, aínda que após sexa relegado.",
     "Confirm table manager promotion" : "Confirmar a promoción do xestor da táboa",
+    "Link copied to clipboard" : "A ligazón foi copiada no portapapeis",
+    "Create public link" : "Crear ligazón pública",
+    "Create a new share link" : "Crear unha nova ligazón para compartir",
+    "Set password" : "Definir o contrasinal",
+    "Password" : "Contrasinal",
+    "Share link" : "Compartir a ligazón",
+    "View only" : "Só ver",
+    "Delete link" : "Eliminar ligazón",
+    "Public links" : "Ligazóns públicas",
     "No view in context" : "Non hai ningunha vista no contexto",
     "From {ownerName}" : "De {ownerName}",
     "Created at" : "Creado ás",
@@ -633,6 +642,9 @@
     "Could not fetch view" : "Non foi posíbel recuperar a vista",
     "Could not transfer application." : "Non foi posíbel transferir a aplicación.",
     "Could not remove application." : "Non foi posíbel retirar a aplicación.",
-    "Could not remove table." : "Non foi posíbel retirar a táboa."
+    "Could not remove table." : "Non foi posíbel retirar a táboa.",
+    "Share not found" : "Non se atopou a compartición",
+    "This share does not exist or is no longer available" : "Este recurso compartido non existe ou xa non está dispoñíbel",
+    "Back to %s" : "Volver a %s"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

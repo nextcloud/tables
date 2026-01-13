@@ -299,6 +299,15 @@ OC.L10N.register(
     "Demote to normal share" : "Demote to normal share",
     "Open main table to adjust table management permissions" : "Open main table to adjust table management permissions",
     "No shares" : "اشتراک گذاری وجود ندارد",
+    "Link copied to clipboard" : "پیوند در حافظه موقت کپی شده",
+    "Create public link" : "ایجاد لینک عمومی",
+    "Create a new share link" : "پیوند اشتراک گذاری جدیدی ایجاد کنید",
+    "Set password" : "تنظیم گذرواژه",
+    "Password" : "گذرواژه",
+    "Share link" : "اشتراک‌گذاری لینک",
+    "View only" : "تنها مشاهده",
+    "Delete link" : "حذف پیوند",
+    "Public links" : "Public links",
     "No view in context" : "No view in context",
     "From {ownerName}" : "From {ownerName}",
     "Created at" : "ایجاد شده در",
@@ -450,6 +459,9 @@ OC.L10N.register(
     "Could not remove view." : "Could not remove view.",
     "Could not reload view." : "Could not reload view.",
     "Could not update table." : "Could not update table.",
-    "Could not remove table." : "Could not remove table."
+    "Could not remove table." : "Could not remove table.",
+    "Share not found" : "اشتراک گذاری یافت نشد",
+    "This share does not exist or is no longer available" : "این سهم وجود ندارد یا دیگر در دسترس نیست",
+    "Back to %s" : "بازگشت به %s"
 },
 "nplurals=2; plural=(n > 1);");

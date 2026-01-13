@@ -400,6 +400,11 @@ OC.L10N.register(
     "No shares" : "Sin recursos compartidos",
     "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "Luego de que se ascienda al recipiente del recurso compartido a administrador de la tabla, cualesquiera aplicaciones creadas por los recipientes del recurso compartido que utilicen esta tabla continuarán accediendo a sus datos, incluso si los degrada.",
     "Confirm table manager promotion" : "Confirmar el ascenso a administrador de la tabla",
+    "Link copied to clipboard" : "Enlace copiado al portapapeles",
+    "Create public link" : "Crear un enlace público",
+    "Set password" : "Establecer contraseña",
+    "View only" : "Solo ver",
+    "Delete link" : "Eliminar enlace",
     "No view in context" : "No hay vista en contexto",
     "From {ownerName}" : "De {ownerName}",
     "Created at" : "Creada el",
@@ -615,6 +620,7 @@ OC.L10N.register(
     "Could not fetch view" : "No se pudo obtener la vista",
     "Could not transfer application." : "No se pudo transferir la aplicación.",
     "Could not remove application." : "No se pudo eliminar la aplicación.",
-    "Could not remove table." : "No se pudo eliminar la tabla."
+    "Could not remove table." : "No se pudo eliminar la tabla.",
+    "Back to %s" : "Volver a %s"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

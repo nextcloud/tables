@@ -31,6 +31,8 @@ OC.L10N.register(
     "Remove from favorites" : "Remove from favorites",
     "Favorites" : "விருப்பங்கள்",
     "group" : "குழு",
+    "Password" : "கடவுச்சொல்",
+    "Share link" : "இணைப்பைப் பகிரவும்",
     "Update" : "இற்றைப்படுத்தல்",
     "Error" : "வழு",
     "Download" : "பதிவிறக்குக",

@@ -40,6 +40,7 @@ OC.L10N.register(
     "Export" : "Exportar",
     "Favorites" : "Favoritos",
     "group" : "gruppo",
+    "Share link" : "Divulgar ligamine",
     "Sharing" : "Compartente",
     "Update" : "Actualisation",
     "Manage" : "Administrar",

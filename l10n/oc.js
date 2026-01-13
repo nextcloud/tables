@@ -67,6 +67,11 @@ OC.L10N.register(
     "group" : "grop",
     "Permissions" : "Autorizacions",
     "Delete data" : "Suprimir donada",
+    "Create a new share link" : "Crear un ligam de partatge novèl",
+    "Set password" : "Definir lo senhal",
+    "Password" : "Senhal",
+    "Share link" : "Partejar via ligam",
+    "View only" : "Veire solament",
     "Created at" : "Creat lo",
     "Sharing" : "Partiment",
     "Copy to clipboard" : "Copiar dins lo quichapapièrs",
@@ -93,6 +98,8 @@ OC.L10N.register(
     "This month" : "Aqueste mes",
     "This week" : "Aquesta setmana",
     "ID" : "ID",
-    "seconds ago" : "fa qualques segondas"
+    "seconds ago" : "fa qualques segondas",
+    "Share not found" : "Partiment pas trobat",
+    "Back to %s" : "Tornar a %s"
 },
 "nplurals=2; plural=(n > 1);");

@@ -40,6 +40,9 @@ OC.L10N.register(
     "Remove from favorites" : "Kkes-it seg ismal",
     "Copy" : "Nɣel",
     "Favorites" : "Imenyafen",
+    "Set password" : "Sbadu awal uffir",
+    "Password" : "Awal n uɛeddi",
+    "Share link" : "Bḍu aseɣwen",
     "Sharing" : "Beṭṭu",
     "Copy to clipboard" : "Nɣel-it ar tecfawit",
     "Read" : "Taɣuri",
@@ -60,6 +63,7 @@ OC.L10N.register(
     "Select" : "Fren",
     "This year" : "Aseggas-a",
     "This week" : "Dduṛt-a",
-    "Now" : "Tura"
+    "Now" : "Tura",
+    "Back to %s" : "Uɣal ar %s"
 },
 "nplurals=2; plural=(n != 1);");

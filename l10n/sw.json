@@ -103,6 +103,15 @@
     "Permissions" : "Ruhusa",
     "Delete data" : "Futa data",
     "No shares" : "No shares",
+    "Link copied to clipboard" : "Kiungo kimenakiliwa kwenye ubao wakunakilia",
+    "Create public link" : "Tengeneza kiungo cha umma",
+    "Create a new share link" : "Tengeneza kiungo kingine cha kushiriki",
+    "Set password" : "Weka nenosiri",
+    "Password" : "Nenosiri",
+    "Share link" : "Shirikisha kiungio",
+    "View only" : "Tazama pekee",
+    "Delete link" : "Futa kiungo",
+    "Public links" : "Viungo vya umma",
     "Created at" : "Imetengenezwa katika",
     "Sharing" : "inashirikisha",
     "Copy to clipboard" : "Nakili kwenye ubao wa kunakili",
@@ -173,6 +182,9 @@
     "Unknown error." : "Unknown error.",
     "Request is not authorized. Are you logged in?" : "Request is not authorized. Are you logged in?",
     "Request not allowed." : "Request not allowed.",
-    "Resource not found." : "Resource not found."
+    "Resource not found." : "Resource not found.",
+    "Share not found" : "Ushirikishaji haupo",
+    "This share does not exist or is no longer available" : "Ushiriki huu haupo au haupatikani tena.",
+    "Back to %s" : "Rudi kwenye %s"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

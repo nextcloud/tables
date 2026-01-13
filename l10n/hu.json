@@ -301,6 +301,15 @@
     "Promote to table manager" : "Kinevezés tábla kezelővé",
     "Demote to normal share" : "Lefokozás normális megosztássá",
     "No shares" : "Nincs megosztás",
+    "Link copied to clipboard" : "Hivatkozás a vágólapra másolva",
+    "Create public link" : "Nyilvános hivatkozás létrehozása",
+    "Create a new share link" : "Új megosztási hivatkozás létrehozása",
+    "Set password" : "Jelszó beállítása",
+    "Password" : "Jelszó",
+    "Share link" : "Megosztási hivatkozás",
+    "View only" : "Csak megtekintés",
+    "Delete link" : "Hivatkozás törlése",
+    "Public links" : "Nyilvános hivatkozások",
     "No view in context" : "Nincs nézet a környezetben",
     "From {ownerName}" : "Tulajdonos: {ownerName}",
     "Created at" : "Létrehozva:",
@@ -453,6 +462,8 @@
     "Could not remove view." : "Nem sikerült a nézet eltávolítása.",
     "Could not reload view." : "Nem sikerült a nézet újra betöltése.",
     "Could not update table." : "Nem sikerült a táblázat frissítése.",
-    "Could not remove table." : "Nem sikerült a táblázat eltávolítása."
+    "Could not remove table." : "Nem sikerült a táblázat eltávolítása.",
+    "Share not found" : "A megosztás nem található",
+    "Back to %s" : "Vissza ide: %s"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

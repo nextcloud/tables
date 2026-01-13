@@ -79,6 +79,8 @@ OC.L10N.register(
     "Internal link" : "Ichki havola",
     "group" : "group",
     "Delete data" : "Ma'lumotlarni o'chirish",
+    "Password" : "Parol",
+    "Share link" : "Havolani ulashish",
     "Sharing" : "Ulashish",
     "Update" : "Update",
     "Searching …" : "Qidirilmoqda …",
@@ -110,6 +112,8 @@ OC.L10N.register(
     "This week" : "Shu hafta",
     "Now" : "Hozir",
     "Select a date" : "Sana tanlash",
-    "seconds ago" : "soniya avval"
+    "seconds ago" : "soniya avval",
+    "Share not found" : "Ulashish topilmadi",
+    "Back to %s" : "%sga qaytish"
 },
 "nplurals=1; plural=0;");

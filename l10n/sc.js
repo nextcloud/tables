@@ -81,6 +81,13 @@ OC.L10N.register(
     "group" : "grupu",
     "Permissions" : "Permissos",
     "No shares" : "Peruna cumpartzidura",
+    "Link copied to clipboard" : "Ligòngiu copiadu in punta de billete",
+    "Create public link" : "Crea unu ligòngiu pùblicu",
+    "Create a new share link" : "Crea unu ligòngiu de cumpartzidura nou",
+    "Set password" : "Cunfigura sa crae",
+    "Password" : "Crae",
+    "Share link" : "Cumpartzi ligòngiu",
+    "View only" : "Isceti in visualizatzione",
     "Created at" : "Creadu su",
     "Sharing" : "Cumpartzidura",
     "Copy to clipboard" : "Còpia in is punta de billete",
@@ -113,6 +120,8 @@ OC.L10N.register(
     "Unchecked" : "Chene verìfica",
     "This year" : "Ocannu",
     "ID" : "ID",
-    "seconds ago" : "segundos a immoe"
+    "seconds ago" : "segundos a immoe",
+    "Share not found" : "Cumpartzidura no agatada",
+    "Back to %s" : "Torra a %s"
 },
 "nplurals=2; plural=(n != 1);");

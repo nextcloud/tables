@@ -227,6 +227,8 @@ OC.L10N.register(
     "Update data" : "Актуализиране на данни",
     "Delete data" : "Изтриване на данни",
     "No shares" : "Няма споделяния",
+    "Link copied to clipboard" : "Връзката е копирана в клипборда",
+    "Delete link" : "Изтриване на връзка",
     "From {ownerName}" : "От {ownerName}",
     "Created at" : "Създаден на",
     "Sharing" : "Споделяне",

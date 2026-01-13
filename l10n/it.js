@@ -146,6 +146,13 @@ OC.L10N.register(
     "Permissions" : "Permessi",
     "Delete data" : "Elimina dati",
     "No shares" : "Nessuna condivisione",
+    "Link copied to clipboard" : "Collegamento copiato negli appunti",
+    "Create public link" : "Crea collegamento pubblico",
+    "Create a new share link" : "Crea un nuovo collegamento di condivisione",
+    "Set password" : "Imposta password",
+    "Password" : "Password",
+    "Share link" : "Collegamento di condivisione",
+    "View only" : "Sola lettura",
     "Created at" : "Creato il",
     "Sharing" : "Condivisione",
     "Copy to clipboard" : "Copia negli appunti",
@@ -206,6 +213,9 @@ OC.L10N.register(
     "seconds ago" : "secondi fa",
     "Could not fetch tables" : "Impossibile recuperare le tabelle",
     "Could not load shared views." : "Impossibile caricare le viste condivise.",
-    "Could not load shared views" : "Impossibile caricare le viste condivise"
+    "Could not load shared views" : "Impossibile caricare le viste condivise",
+    "Share not found" : "Condivisione non trovata",
+    "This share does not exist or is no longer available" : "Questa condivisione non esiste o non è più disponibile",
+    "Back to %s" : "Torna a %s"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

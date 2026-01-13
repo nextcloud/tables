@@ -39,6 +39,7 @@ OC.L10N.register(
     "Copy" : "Պատճենել",
     "Favorites" : "Սիրվածներ",
     "group" : "խումբ",
+    "Password" : "գախտնաբառ",
     "Update" : "Թարմացնել",
     "Error" : "Սխալ",
     "Download" : "Ներբեռնել",

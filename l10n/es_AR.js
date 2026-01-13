@@ -74,6 +74,9 @@ OC.L10N.register(
     "group" : "grupo",
     "Permissions" : "Permisos",
     "Delete data" : "Borrar datos",
+    "Link copied to clipboard" : "Enlace copiado al portapapeles",
+    "Password" : "Contraseña",
+    "View only" : "Solo ver",
     "Created at" : "Creado en",
     "Sharing" : "Compartiendo",
     "Copy to clipboard" : "Copiar al portapapeles",
@@ -102,6 +105,7 @@ OC.L10N.register(
     "This week" : "Esta semana",
     "Select a date" : "Elija una fecha",
     "ID" : "ID",
-    "seconds ago" : "segundos"
+    "seconds ago" : "segundos",
+    "Back to %s" : "Volver a %s"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

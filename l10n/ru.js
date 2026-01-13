@@ -269,6 +269,14 @@ OC.L10N.register(
     "Delete data" : "Удаление данные",
     "Open main table to adjust table management permissions" : "Откройте основную таблицу, чтобы настроить разрешения на управление таблицей.",
     "No shares" : "Нет ресурсов общего доступа",
+    "Link copied to clipboard" : "Ссылка скопирована в буфер обмена",
+    "Create public link" : "Создать общедоступную ссылку",
+    "Create a new share link" : "Создать ссылку доступа",
+    "Set password" : "Задать пароль",
+    "Password" : "Пароль",
+    "Share link" : "Поделиться ссылкой",
+    "View only" : "Для просмотра",
+    "Delete link" : "Удалить ссылку",
     "From {ownerName}" : "От {ownerName}",
     "Created at" : "Время создания:",
     "Ownership" : "Владелец:",
@@ -377,6 +385,9 @@ OC.L10N.register(
     "Could not insert row." : "Невозможно вставить строку",
     "Could not remove row." : "Невозможно удалить строку",
     "Could not insert table." : "Невозможно вставить таблицу",
-    "Could not load tables." : "Невозможно загрузить таблицы"
+    "Could not load tables." : "Невозможно загрузить таблицы",
+    "Share not found" : "Ресурс с общим доступом не найден",
+    "This share does not exist or is no longer available" : "Этот общий ресурс отсутствует или недоступен",
+    "Back to %s" : "Вернуться к %s"
 },
 "nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);");

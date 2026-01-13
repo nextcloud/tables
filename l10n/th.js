@@ -56,6 +56,8 @@ OC.L10N.register(
     "Favorites" : "รายการโปรด",
     "No recommendations. Start typing." : "ไม่มีคำแนะนำ เริ่มพิมพ์เลย",
     "group" : "กลุ่ม",
+    "Share link" : "แชร์ลิงก์",
+    "View only" : "ดูเท่านั้น",
     "Created at" : "สร้างเมื่อ",
     "Sharing" : "การแชร์",
     "Copy to clipboard" : "คัดลอกไปยังคลิปบอร์ด",
@@ -79,6 +81,7 @@ OC.L10N.register(
     "This week" : "สัปดาห์นี้",
     "ID" : "ID",
     "Clipboard is not available" : "คลิปบอร์ดไม่พร้อมใช้งาน",
-    "seconds ago" : "วินาทีที่ผ่านมา"
+    "seconds ago" : "วินาทีที่ผ่านมา",
+    "Back to %s" : "กลับสู่ %s"
 },
 "nplurals=1; plural=0;");

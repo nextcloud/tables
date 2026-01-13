@@ -416,6 +416,15 @@ OC.L10N.register(
     "No shares" : "پاي يوق",
     "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "ئورتاقلىشىش قوبۇل قىلغۇچىسى جەدۋەل باشقۇرغۇچىسىغا ئۆستۈرۈلگەندىن كېيىن، ئورتاقلىشىش قوبۇل قىلغۇچىلار تەرىپىدىن ياسالغان ۋە بۇ جەدۋەلنى ئىشلىتىدىغان ھەر قانداق قوللىنىشچان پروگراممىلار، كېيىن ئۇلارنىڭ دەرىجىسى تۆۋەنلىتىلسىمۇ، ئۇنىڭ سانلىق مەلۇماتلىرىغا كىرىشنى داۋاملاشتۇرىدۇ.",
     "Confirm table manager promotion" : "جەدۋەل باشقۇرغۇچىسىنىڭ تەشۋىقاتىنى جەزملەشتۈرۈڭ",
+    "Link copied to clipboard" : "ئۇلىنىش چاپلاش تاختىسىغا كۆچۈرۈلدى",
+    "Create public link" : "ئاممىۋى ئۇلىنىش قۇر",
+    "Create a new share link" : "يېڭى ئورتاقلىشىش ئۇلىنىشى قۇر",
+    "Set password" : "پارول بەلگىلەڭ",
+    "Password" : "پارول",
+    "Share link" : "ھەمبەھىر ئۇلىنىشى",
+    "View only" : "پەقەت كۆرۈش",
+    "Delete link" : "ئۇلىنىشنى ئۆچۈرۈڭ",
+    "Public links" : "ئاممىۋى ئۇلىنىش",
     "No view in context" : "مەزمۇندا قاراش يوق",
     "From {ownerName}" : "{ownerName} from دىن",
     "Created at" : "قۇرۇلدى",
@@ -635,6 +644,9 @@ OC.L10N.register(
     "Could not fetch view" : "كۆرۈنۈشنى ئالالمىدى",
     "Could not transfer application." : "ئىلتىماسنى يۆتكىگىلى بولمىدى.",
     "Could not remove application." : "پروگراممىنى ئۆچۈرەلمىدى.",
-    "Could not remove table." : "جەدۋەلنى ئۆچۈرەلمىدى."
+    "Could not remove table." : "جەدۋەلنى ئۆچۈرەلمىدى.",
+    "Share not found" : "ھەمبەھىر تېپىلمىدى",
+    "This share does not exist or is no longer available" : "بۇ ئۈلۈش مەۋجۇت ئەمەس ياكى ئەمدى ئىشلەتكىلى بولمايدۇ",
+    "Back to %s" : "%s گە قايتىش"
 },
 "nplurals=2; plural=(n != 1);");

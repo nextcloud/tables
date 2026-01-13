@@ -415,6 +415,15 @@ OC.L10N.register(
     "No shares" : "ບໍ່ມີການແບ່ງປັນ",
     "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "ຫຼັງຈາກການເລື່ອນຂັ້ນຜູ້ຮັບການແບ່ງປັນເປັນຜູ້ຈັດການຕາຕະລາງ, ແອັບພລິເຄຊັນໃດໆທີ່ສ້າງຂຶ້ນໂດຍຜູ້ຮັບການແບ່ງປັນທີ່ນຳໃຊ້ຕາຕະລາງນີ້ ຈະຍັງຄົງເຂົ້າເຖິງຂໍ້ມູນຂອງມັນຕໍ່ໄປ, ເຖິງແມ່ນວ່າທ່ານຈະລົດລະດັບພວກເຂົາໃນພາຍຫຼັງ.",
     "Confirm table manager promotion" : "ຢືນຢັນການເລື່ອນຂັ້ນຜູ້ຈັດການຕາຕະລາງ",
+    "Link copied to clipboard" : "ສຳເນົາລິງໃສ່ຄລິບບອດແລ້ວ",
+    "Create public link" : "ສ້າງລິງສາທາລະນະ",
+    "Create a new share link" : "ສ້າງລິງແບ່ງປັນໃໝ່",
+    "Set password" : "ກຳນົດລະຫັດຜ່ານ",
+    "Password" : "ລະຫັດຜ່ານ",
+    "Share link" : "ແບ່ງປັນລິງ",
+    "View only" : "ເບິ່ງເທົ່ານັ້ນ",
+    "Delete link" : "ລຶບລິ້ງ",
+    "Public links" : "ລິງສາທາລະນະ",
     "No view in context" : "ບໍ່ມີມຸມມອງໃນບໍລິບົດ",
     "From {ownerName}" : "ຈາກ {ownerName}",
     "Created at" : "ສ້າງເມື່ອ",
@@ -634,6 +643,9 @@ OC.L10N.register(
     "Could not fetch view" : "ບໍ່ສາມາດດຶງຂໍ້ມູນມຸມມອງໄດ້",
     "Could not transfer application." : "ບໍ່ສາມາດໂອນຍ້າຍແອັບພລິເຄຊັນໄດ້.",
     "Could not remove application." : "ບໍ່ສາມາດລຶບແອັບພລິເຄຊັນໄດ້.",
-    "Could not remove table." : "ບໍ່ສາມາດລຶບຕາຕະລາງໄດ້."
+    "Could not remove table." : "ບໍ່ສາມາດລຶບຕາຕະລາງໄດ້.",
+    "Share not found" : "ບໍ່ພົບການແບ່ງປັນ",
+    "This share does not exist or is no longer available" : "ການແບ່ງປັນນີ້ບໍ່ມີຢູ່ ຫຼື ບໍ່ສາມາດໃຊ້ງານໄດ້ອີກຕໍ່ໄປ",
+    "Back to %s" : "ກັບໄປທີ່ %s"
 },
 "nplurals=1; plural=0;");

@@ -56,6 +56,8 @@ OC.L10N.register(
     "Favorites" : "Favorites",
     "group" : "grup",
     "Permissions" : "Lejet",
+    "Password" : "Fjalëkalimi",
+    "Share link" : "Lidhje ndarjeje",
     "Created at" : "U krijua në",
     "Sharing" : "Ndarje",
     "Copy to clipboard" : "Kopjo në dërrasë ",

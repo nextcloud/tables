@@ -237,6 +237,11 @@ OC.L10N.register(
     "Update data" : "Actualizar datos",
     "Delete data" : "Eliminar datos",
     "No shares" : "No hay comparticiones",
+    "Link copied to clipboard" : "Enlace copiado al portapapeles",
+    "Create public link" : "Crear enlace público",
+    "Share link" : "Compartir liga",
+    "View only" : "Solo vista",
+    "Delete link" : "Eliminar enlace",
     "From {ownerName}" : "De {ownerName}",
     "Created at" : "Creado en",
     "Sharing" : "Compartiendo",
@@ -352,6 +357,8 @@ OC.L10N.register(
     "Could not load tables." : "No se pudieron cargar las tablas.",
     "Could not fetch tables" : "No se pudieron obtener las tablas.",
     "Could not update table." : "No se pudo actualizar la tabla.",
-    "Could not remove table." : "No se pudo eliminar la tabla."
+    "Could not remove table." : "No se pudo eliminar la tabla.",
+    "Share not found" : "No se encontró el elemento compartido",
+    "Back to %s" : "Volver a %s"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

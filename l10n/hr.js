@@ -79,6 +79,12 @@ OC.L10N.register(
     "group" : "grupa",
     "Permissions" : "Dopuštenja",
     "No shares" : "Nema dijeljenja",
+    "Link copied to clipboard" : "Poveznica je kopirana u međuspremnik",
+    "Create public link" : "Stvori javnu poveznicu",
+    "Create a new share link" : "Stvori novu poveznicu dijeljenja",
+    "Password" : "Zaporka",
+    "Share link" : "Dijeli poveznicu",
+    "View only" : "Samo za gledanje",
     "Created at" : "Stvoreno",
     "Sharing" : "Dijeljenje",
     "Copy to clipboard" : "Kopiraj u međuspremnik",
@@ -113,6 +119,8 @@ OC.L10N.register(
     "Unchecked" : "Neprovjereno",
     "This month" : "Ovaj mjesec",
     "ID" : "ID",
-    "seconds ago" : "prije par sekundi"
+    "seconds ago" : "prije par sekundi",
+    "Share not found" : "Dijeljenje nije pronađeno",
+    "Back to %s" : "Natrag na %s"
 },
 "nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;");

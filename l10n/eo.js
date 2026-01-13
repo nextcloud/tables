@@ -63,6 +63,7 @@ OC.L10N.register(
     "Internal link" : "Interna ligilo",
     "group" : "grupo",
     "No shares" : "Neniu kunhavo",
+    "Link copied to clipboard" : "Ligilo kopiita al tondujo",
     "Created at" : "Kreita je",
     "Sharing" : "Kunhavigo",
     "Copy to clipboard" : "Kopii tondejen",
@@ -95,6 +96,7 @@ OC.L10N.register(
     "This year" : "Ĉi jaro",
     "This week" : "Ĉi semajno",
     "ID" : "Identigilo",
-    "seconds ago" : "antaŭ kelkaj sekundoj"
+    "seconds ago" : "antaŭ kelkaj sekundoj",
+    "Back to %s" : "Antaŭen al %s"
 },
 "nplurals=2; plural=(n != 1);");

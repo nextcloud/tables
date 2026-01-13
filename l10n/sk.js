@@ -416,6 +416,14 @@ OC.L10N.register(
     "No shares" : "Žiadne sprístupnené položky",
     "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "Po povýšení príjemcu zdieľania na správcu tabuľky budú všetky aplikácie vytvorené príjemcami zdieľania, ktoré využívajú túto tabuľku, naďalej pristupovať k jeho údajom, aj keď neskôr práva odoberiete.",
     "Confirm table manager promotion" : "Potvrďte povýšenie správcu tabuľky",
+    "Link copied to clipboard" : "Odkaz bol skopírovaný do schránky",
+    "Create public link" : "Vytvoriť verejný odkaz",
+    "Create a new share link" : "Vytvoriť nový odkaz pre zdieľanie",
+    "Set password" : "Nastaviť heslo",
+    "Password" : "Heslo",
+    "Share link" : "Zdieľať odkaz",
+    "View only" : "Iba pre čítanie",
+    "Public links" : "Verejné odkazy",
     "No view in context" : "V tomto kontexte nie je žiadny pohľad",
     "From {ownerName}" : "Od {ownerName}",
     "Created at" : "Vytvorené:",
@@ -635,6 +643,9 @@ OC.L10N.register(
     "Could not fetch view" : "Nepodarilo sa získať pohľad",
     "Could not transfer application." : "Nepodarilo sa presunúť aplikáciu.",
     "Could not remove application." : "Nepodarilo sa odstrániť aplikáciu.",
-    "Could not remove table." : "Tabuľku sa nepodarilo odstrániť"
+    "Could not remove table." : "Tabuľku sa nepodarilo odstrániť",
+    "Share not found" : "Zdieľanie sa nenašlo",
+    "This share does not exist or is no longer available" : "Toto zdieľanie neexistuje alebo už nie je dostupné",
+    "Back to %s" : "Späť na %s"
 },
 "nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);");

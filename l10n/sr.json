@@ -413,6 +413,15 @@
     "No shares" : "Нема дељења",
     "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "Када се прималац дељења промовише у менаџера табеле, било које апликације које креирају примаоци дељења и које користе ову табелу, ће наставити да имају приступ њеним подацима, чак и ако им касније смањите права.",
     "Confirm table manager promotion" : "Потврди промовисање менаџера табеле",
+    "Link copied to clipboard" : "Веза копирана у оставу",
+    "Create public link" : "Направи јавну везу",
+    "Create a new share link" : "Направи нову везу дељења",
+    "Set password" : "Постави лозинку",
+    "Password" : "Лозинка",
+    "Share link" : "Подели везу",
+    "View only" : "Само преглед",
+    "Delete link" : "Обриши везу",
+    "Public links" : "Јавни линкови",
     "No view in context" : "Нема погледа у контексту",
     "From {ownerName}" : "Од {ownerName}",
     "Created at" : "Направљено",
@@ -632,6 +641,9 @@
     "Could not fetch view" : "Не може да се преузме поглед",
     "Could not transfer application." : "Не може да се пренесе апликација.",
     "Could not remove application." : "Не може да се уклони апликација.",
-    "Could not remove table." : "Не може да се уклони табела."
+    "Could not remove table." : "Не може да се уклони табела.",
+    "Share not found" : "Дељење није нађено",
+    "This share does not exist or is no longer available" : "Ово дељење не постоји или више није доступно",
+    "Back to %s" : "Назад на %s"
 },"pluralForm" :"nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);"
 }

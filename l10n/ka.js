@@ -74,6 +74,11 @@ OC.L10N.register(
     "group" : "group",
     "Permissions" : "Permissions",
     "No shares" : "No shares",
+    "Create a new share link" : "Create a new share link",
+    "Set password" : "Set password",
+    "Password" : "Password",
+    "Share link" : "გაზიარების ლინკი",
+    "View only" : "View only",
     "Created at" : "Created at",
     "Sharing" : "Sharing",
     "Copy to clipboard" : "Copy to clipboard",
@@ -100,6 +105,8 @@ OC.L10N.register(
     "This week" : "This week",
     "ID" : "ID",
     "Clipboard is not available" : "Clipboard is not available",
-    "seconds ago" : "seconds ago"
+    "seconds ago" : "seconds ago",
+    "Share not found" : "Share not found",
+    "Back to %s" : "Back to %s"
 },
 "nplurals=2; plural=(n!=1);");

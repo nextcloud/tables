@@ -415,6 +415,9 @@ OC.L10N.register(
     "No shares" : "Žádná sdílení",
     "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "Po povýšení příjemce sdílení na správce tabulky, jakékoli aplikace, vytvořené příjemci sdílení, které tuto tabulku využívají, budou pokračovat v přístupu k jejím datům, i když jejich povýšení později zrušíte.",
     "Confirm table manager promotion" : "Potvrdit povýšení na správce tabulky",
+    "Link copied to clipboard" : "Odkaz zkopírován do schánky",
+    "Set password" : "Nastavit heslo",
+    "Delete link" : "Smazat odkaz",
     "No view in context" : "Žádný pohled v kontextu",
     "From {ownerName}" : "Od {ownerName}",
     "Created at" : "Vytvořeno",
@@ -634,6 +637,7 @@ OC.L10N.register(
     "Could not fetch view" : "Nepodařilo se získat pohled",
     "Could not transfer application." : "Nepodařilo se přenést aplikaci.",
     "Could not remove application." : "Nepodařilo se odebrat aplikaci.",
-    "Could not remove table." : "Nepodařilo se odebrat tabulku."
+    "Could not remove table." : "Nepodařilo se odebrat tabulku.",
+    "Back to %s" : "Zpět na %s"
 },
 "nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;");
