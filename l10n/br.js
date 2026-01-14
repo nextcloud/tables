@@ -43,6 +43,7 @@ OC.L10N.register(
     "Favorites" : "Pennrolloù",
     "group" : "strollad",
     "Set password" : "Termeniñ ur ger-tremen",
+    "Share link" : "Lodañ al liamm",
     "Created at" : "Krouet da",
     "Sharing" : "Rannan",
     "Update" : "Hizivaat",
@@ -57,6 +58,7 @@ OC.L10N.register(
     "Select" : "Diuzañ",
     "This week" : "Er sizhun-mañ",
     "ID" : "ID",
-    "seconds ago" : "eilenn zo"
+    "seconds ago" : "eilenn zo",
+    "Back to %s" : "Distro da %s"
 },
 "nplurals=5; plural=((n%10 == 1) && (n%100 != 11) && (n%100 !=71) && (n%100 !=91) ? 0 :(n%10 == 2) && (n%100 != 12) && (n%100 !=72) && (n%100 !=92) ? 1 :(n%10 ==3 || n%10==4 || n%10==9) && (n%100 < 10 || n% 100 > 19) && (n%100 < 70 || n%100 > 79) && (n%100 < 90 || n%100 > 99) ? 2 :(n != 0 && n % 1000000 == 0) ? 3 : 4);");

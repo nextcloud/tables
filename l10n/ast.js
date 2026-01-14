@@ -193,6 +193,12 @@ OC.L10N.register(
     "Update data" : "Anovar los datos",
     "Delete data" : "Desaniciar los datos",
     "No shares" : "Nun hai nenguna compartición",
+    "Link copied to clipboard" : "L'enllaz copióse nel cartafueyu",
+    "Create a new share link" : "Creaer un enllaz d'usu compartíu",
+    "Set password" : "Afitar la contraseña",
+    "Password" : "Contraseña",
+    "Share link" : "Compartir l'enllaz",
+    "View only" : "Ver namás",
     "Created at" : "Data de creación",
     "Ownership" : "Propiedá",
     "Sharing" : "Comparticiñon",
@@ -279,6 +285,8 @@ OC.L10N.register(
     "Could not load tables." : "Nun se pudieron cargar les tables.",
     "Could not update table." : "Nun se pudo anovar la tabla.",
     "Could not transfer table." : "Nun se pudo tresferir la tabla.",
-    "Could not remove table." : "Nun se pudo quitar la tabla."
+    "Could not remove table." : "Nun se pudo quitar la tabla.",
+    "Share not found" : "Nun s'atopó la compartición",
+    "Back to %s" : "Volver a «%s»"
 },
 "nplurals=2; plural=(n != 1);");

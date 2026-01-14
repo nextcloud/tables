@@ -391,6 +391,15 @@
     "No shares" : "لا يوجد مشاركات",
     "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "بعد ترقية متلقي المُشاركة إلى مدير الجدول، ستستمر أي تطبيقات تم إنشاؤها بواسطة الأشخاص المتلقين للمشاركات التي تستعمل هذا الجدول في الوصول إلى بياناته حتى إذا قمت بخفض رتبتهم لاحقًا.",
     "Confirm table manager promotion" : "أكِّد على رفع رتبة مدير الجدول",
+    "Link copied to clipboard" : "تمّ نسخ الرابط إلى الحافظة",
+    "Create public link" : "إنشاء رابط عمومي",
+    "Create a new share link" : "إنشاء رابط مشاركة جديد",
+    "Set password" : "تعيين كلمة المرور",
+    "Password" : "كلمة المرور",
+    "Share link" : "رابط مشاركة",
+    "View only" : "للعرض فقط",
+    "Delete link" : "حذف الرابط",
+    "Public links" : "روابط عامة",
     "No view in context" : "لا توجد مناظير views ضمن السياق context",
     "From {ownerName}" : "من {ownerName}",
     "Created at" : "أُنشأت في",
@@ -588,6 +597,9 @@
     "Could not fetch view" : "تعذّر جلب المنظور view",
     "Could not transfer application." : "تعذّر نقل التطبيق.",
     "Could not remove application." : "تعذّر حذف التطبيق.",
-    "Could not remove table." : "تعذر إزالة/نقل الجدول."
+    "Could not remove table." : "تعذر إزالة/نقل الجدول.",
+    "Share not found" : "مشاركة غير موجودة",
+    "This share does not exist or is no longer available" : "هذه المشاركة غير موجودة أو لم تعد متاحة الآن",
+    "Back to %s" : "عودة إلى %s"
 },"pluralForm" :"nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;"
 }

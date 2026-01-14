@@ -226,7 +226,13 @@
     "Delete data" : "Изтриване на данни",
     "No shares" : "Няма споделяния",
     "Link copied to clipboard" : "Връзката е копирана в клипборда",
+    "Create public link" : "Създаване на публична връзка",
+    "Create a new share link" : "Създаване на нова връзка за споделяне",
+    "Password" : "Парола",
+    "Share link" : "Връзка за споделяне",
+    "View only" : "Само изглед",
     "Delete link" : "Изтриване на връзка",
+    "Public links" : "Публични връзки",
     "From {ownerName}" : "От {ownerName}",
     "Created at" : "Създаден на",
     "Sharing" : "Споделяне",
@@ -313,6 +319,8 @@
     "ID" : "ID /Идентификатор/",
     "Clipboard is not available" : "Клипбордът не е достъпен",
     "seconds ago" : "преди секунди",
-    "Could not fetch tables" : "Таблиците не можаха да бъдат извлечени"
+    "Could not fetch tables" : "Таблиците не можаха да бъдат извлечени",
+    "Share not found" : "Споделянето не е открито",
+    "Back to %s" : "Обратно към %s"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

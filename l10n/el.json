@@ -399,8 +399,12 @@
     "Confirm table manager promotion" : "Επιβεβαίωση προαγωγής σε διαχειριστή πίνακα",
     "Link copied to clipboard" : "Ο σύνδεσμος αντιγράφηκε στο πρόχειρο",
     "Create public link" : "Δημιουργία δημόσιου συνδέσμου",
+    "Create a new share link" : "Δημιουργία νέου συνδέσμου κοινής χρήσης",
     "Set password" : "Ορισμός συνθηματικού",
+    "Password" : "Συνθηματικό",
+    "Share link" : "Διαμοιρασμός συνδέσμου",
     "View only" : "Μόνο προβολή",
+    "Public links" : "Δημόσιοι σύνδεσμοι",
     "No view in context" : "Καμία προβολή στο πλαίσιο",
     "From {ownerName}" : "Από {ownerName}",
     "Created at" : "Έχει δημιουργηθεί στις",
@@ -617,6 +621,8 @@
     "Could not transfer application." : "Δεν ήταν δυνατή η μεταφορά εφαρμογής.",
     "Could not remove application." : "Δεν ήταν δυνατή η αφαίρεση εφαρμογής.",
     "Could not remove table." : "Δεν ήταν δυνατή η αφαίρεση πίνακα.",
+    "Share not found" : "Δεν βρέθηκε ο σύνδεσμος κοινής χρήσης",
+    "This share does not exist or is no longer available" : "Αυτός ο διαμοιρασμός δεν υπάρχει ή δεν είναι πλέον διαθέσιμος",
     "Back to %s" : "Πίσω στο %s"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

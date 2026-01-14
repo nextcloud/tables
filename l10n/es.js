@@ -402,9 +402,13 @@ OC.L10N.register(
     "Confirm table manager promotion" : "Confirmar el ascenso a administrador de la tabla",
     "Link copied to clipboard" : "Enlace copiado al portapapeles",
     "Create public link" : "Crear un enlace público",
+    "Create a new share link" : "Crear un nuevo enlace de recurso compartido",
     "Set password" : "Establecer contraseña",
+    "Password" : "Contraseña",
+    "Share link" : "Enlace del recurso compartido",
     "View only" : "Solo ver",
     "Delete link" : "Eliminar enlace",
+    "Public links" : "Enlaces públicos",
     "No view in context" : "No hay vista en contexto",
     "From {ownerName}" : "De {ownerName}",
     "Created at" : "Creada el",
@@ -621,6 +625,8 @@ OC.L10N.register(
     "Could not transfer application." : "No se pudo transferir la aplicación.",
     "Could not remove application." : "No se pudo eliminar la aplicación.",
     "Could not remove table." : "No se pudo eliminar la tabla.",
+    "Share not found" : "Recurso compartido no encontrado",
+    "This share does not exist or is no longer available" : "El recurso compartido no existe o ya no está disponible",
     "Back to %s" : "Volver a %s"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

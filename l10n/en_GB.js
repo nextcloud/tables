@@ -418,9 +418,13 @@ OC.L10N.register(
     "Confirm table manager promotion" : "Confirm table manager promotion",
     "Link copied to clipboard" : "Link copied to clipboard",
     "Create public link" : "Create public link",
+    "Create a new share link" : "Create a new share link",
     "Set password" : "Set password",
+    "Password" : "Password",
+    "Share link" : "Share link",
     "View only" : "View only",
     "Delete link" : "Delete link",
+    "Public links" : "Public links",
     "No view in context" : "No view in context",
     "From {ownerName}" : "From {ownerName}",
     "Created at" : "Created at",
@@ -641,6 +645,8 @@ OC.L10N.register(
     "Could not transfer application." : "Could not transfer application.",
     "Could not remove application." : "Could not remove application.",
     "Could not remove table." : "Could not remove table.",
+    "Share not found" : "Share not found",
+    "This share does not exist or is no longer available" : "This share does not exist or is no longer available",
     "Back to %s" : "Back to %s"
 },
 "nplurals=2; plural=(n != 1);");

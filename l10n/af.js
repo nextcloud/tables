@@ -59,6 +59,7 @@ OC.L10N.register(
     "Confirm" : "Bevestig",
     "This week" : "Vandeesweek",
     "ID" : "ID",
-    "seconds ago" : "sekondes gelede"
+    "seconds ago" : "sekondes gelede",
+    "Back to %s" : "Terug na %s"
 },
 "nplurals=2; plural=(n != 1);");

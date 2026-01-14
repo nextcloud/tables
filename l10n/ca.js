@@ -219,7 +219,12 @@ OC.L10N.register(
     "Delete data" : "Suprimeix les dades",
     "No shares" : "No hi ha comparticions",
     "Link copied to clipboard" : "Enllaç copiat al porta-retalls",
+    "Create public link" : "Crea un enllaç públic",
+    "Create a new share link" : "Crea un enllaç d'ús compartit nou",
     "Set password" : "Estableix una contrasenya",
+    "Password" : "Contrasenya",
+    "Share link" : "Comparteix un enllaç",
+    "View only" : "Només visualitació",
     "Delete link" : "Suprimeix l'enllaç",
     "From {ownerName}" : "Des de {ownerName}",
     "Created at" : "Data de creació",
@@ -285,6 +290,9 @@ OC.L10N.register(
     "ID" : "ID",
     "Clipboard is not available" : "El porta-retalls no està disponible",
     "seconds ago" : "fa uns segons",
-    "Could not fetch tables" : "No s'han pogut recuperar les taules"
+    "Could not fetch tables" : "No s'han pogut recuperar les taules",
+    "Share not found" : "No s'ha trobat la compartició",
+    "This share does not exist or is no longer available" : "Aquesta compartició no existeix o ja no està disponible",
+    "Back to %s" : "Torna a %s"
 },
 "nplurals=2; plural=(n != 1);");

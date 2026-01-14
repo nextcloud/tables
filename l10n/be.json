@@ -205,6 +205,13 @@
     "Promote to table manager" : "Прызначыць менеджарам табліцы",
     "Demote to normal share" : "Панізіць да звычайнага абагульвання",
     "After the promotion of the share recipient to table manager, any applications created by share recipients that utilise this table will continue to access its data, even if you later demote them." : "Пасля павышэння атрымальніка абагульвання да менеджара табліцы любыя праграмы, створаныя атрымальнікамі абагульвання, якія выкарыстоўваюць гэту табліцу, будуць працягваць атрымліваць доступ да яе даных, нават калі вы пазней панізіце іх статус.",
+    "Link copied to clipboard" : "Спасылка скапіявана ў буфер абмену",
+    "Create public link" : "Стварыць публічную спасылку",
+    "Password" : "Пароль",
+    "Share link" : "Абагуліць спасылку",
+    "View only" : "Толькі прагляд",
+    "Delete link" : "Выдаліць спасылку",
+    "Public links" : "Публічныя спасылкі",
     "Created at" : "Створана",
     "Ownership" : "Уласнасць",
     "Sharing" : "Абагульванне",
@@ -304,6 +311,7 @@
     "Could not transfer table." : "Не ўдалося перадаць табліцу.",
     "Could not load table." : "Не ўдалося загрузіць табліцу.",
     "Could not fetch table" : "Не ўдалося атрымаць табліцу",
-    "Could not remove table." : "Не ўдалося выдаліць табліцу."
+    "Could not remove table." : "Не ўдалося выдаліць табліцу.",
+    "Back to %s" : "Назад да %s"
 },"pluralForm" :"nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);"
 }

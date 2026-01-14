@@ -248,8 +248,14 @@ OC.L10N.register(
     "Delete data" : "Slet data",
     "No shares" : "Ingen delinger",
     "Link copied to clipboard" : "Link kopieret til udklipsholder",
+    "Create public link" : "Opret offentligt link",
+    "Create a new share link" : "Opret et nyt delingslink",
     "Set password" : "Angiv adgangskode",
+    "Password" : "Adgangskode",
+    "Share link" : "Del link",
+    "View only" : "Kun visning",
     "Delete link" : "Slet link",
+    "Public links" : "Offentlige links",
     "From {ownerName}" : "Fra {ownerName}",
     "Created at" : "Oprettet",
     "Sharing" : "Deling",
@@ -375,6 +381,8 @@ OC.L10N.register(
     "Could not fetch tables" : "Kunne ikke hente tabeller",
     "Could not update table." : "Tabellen kunne ikke opdateres.",
     "Could not remove table." : "Tabellen kunne ikke fjernes.",
+    "Share not found" : "Delt fil ikke fundet",
+    "This share does not exist or is no longer available" : "Denne deling eksisterer ikke eller er ikke længere tilgængelig",
     "Back to %s" : "Tilbage til %s"
 },
 "nplurals=2; plural=(n != 1);");
