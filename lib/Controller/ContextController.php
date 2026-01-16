@@ -102,6 +102,9 @@ class ContextController extends AOCSController {
 	#[NoAdminRequired]
 	public function create(string $name, string $iconName, string $description = '', array $nodes = []): DataResponse {
 		try {
+			if (!$this->isValidIcon($iconName)) {
+				return new DataResponse(['message' => 'Invalid icon name'], Http::STATUS_BAD_REQUEST);
+			}
 			return new DataResponse($this->contextService->create(
 				$name,
 				$iconName,
@@ -139,6 +142,9 @@ class ContextController extends AOCSController {
 	#[NoAdminRequired]
 	public function update(int $contextId, ?string $name, ?string $iconName, ?string $description, ?array $nodes): DataResponse {
 		try {
+			if ($iconName !== null && !$this->isValidIcon($iconName)) {
+				return new DataResponse(['message' => 'Invalid icon name'], Http::STATUS_BAD_REQUEST);
+			}
 			$nodes = $nodes !== null ? $this->sanitizeInputNodes($nodes) : null;
 			return new DataResponse($this->contextService->update(
 				$contextId,
@@ -269,6 +275,14 @@ class ContextController extends AOCSController {
 		}
 
 		return new DataResponse($this->contextService->updateContentOrder($pageId, $content));
+	}
+
+	protected function isValidIcon(string $iconName): bool {
+		if ($iconName === '' || !preg_match('/^[a-zA-Z0-9-]+$/', $iconName)) {
+			return false;
+		}
+		$iconPath = dirname(__DIR__, 2) . '/img/material/' . $iconName . '.svg';
+		return file_exists($iconPath);
 	}
 
 	/**
