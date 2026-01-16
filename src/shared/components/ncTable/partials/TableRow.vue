@@ -23,19 +23,50 @@
 				:is-view="isView"
 				:can-edit="config.canEditRows" />
 		</td>
-		<td v-if="config.showActions" :class="{sticky: config.showActions}">
-			<NcButton v-if="config.canEditRows || config.canDeleteRows" type="primary" :aria-label="t('tables', 'Edit row')" data-cy="editRowBtn" @click="$emit('edit-row', row.id)">
-				<template #icon>
-					<Fullscreen :size="20" />
-				</template>
-			</NcButton>
+		<td v-if="config.showActions" :class="{sticky: config.showActions}" class="row-actions">
+			<div class="row-actions-container">
+				<NcButton v-if="config.canEditRows || config.canDeleteRows" type="primary" :aria-label="t('tables', 'Edit row')" data-cy="editRowBtn" @click="$emit('edit-row', row.id)">
+					<template #icon>
+						<Fullscreen :size="20" />
+					</template>
+				</NcButton>
+				<NcActions v-if="config.canDeleteRows || config.canCreateRows"
+					:force-menu="true"
+					:aria-label="t('tables', 'Row actions')"
+					data-cy="tableRowActions">
+					<NcActionButton v-if="config.canCreateRows"
+						:close-after-click="true"
+						data-cy="duplicateRowBtn"
+						@click="handleCloneRow">
+						<template #icon>
+							<ContentCopy :size="20" />
+						</template>
+						{{ t('tables', 'Duplicate row') }}
+					</NcActionButton>
+					<NcActionButton v-if="config.canDeleteRows"
+						:close-after-click="true"
+						data-cy="deleteRowBtn"
+						@click="handleDeleteRow">
+						<template #icon>
+							<Delete :size="20" />
+						</template>
+						{{ t('tables', 'Delete row') }}
+					</NcActionButton>
+				</NcActions>
+			</div>
 		</td>
 	</tr>
 </template>
 
 <script>
-import { NcCheckboxRadioSwitch, NcButton } from '@nextcloud/vue'
 import Fullscreen from 'vue-material-design-icons/Fullscreen.vue'
+import { mapActions } from 'pinia'
+import { useDataStore } from '../../../../store/data.js'
+import { NcCheckboxRadioSwitch, NcButton, NcActions, NcActionButton } from '@nextcloud/vue'
+import { showError, showSuccess } from '@nextcloud/dialogs'
+import Pencil from 'vue-material-design-icons/Pencil.vue'
+import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
+import Delete from 'vue-material-design-icons/Delete.vue'
 import TableCellHtml from './TableCellHtml.vue'
 import TableCellProgress from './TableCellProgress.vue'
 import TableCellLink from './TableCellLink.vue'
@@ -54,6 +85,7 @@ import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
 } from '../../../../shared/constants.ts'
 import activityMixin from '../../../mixins/activityMixin.js'
+import { emit } from '@nextcloud/event-bus'
 
 export default {
 	name: 'TableRow',
@@ -66,6 +98,9 @@ export default {
 		TableCellHtml,
 		NcButton,
 		Fullscreen,
+		Pencil,
+		ContentCopy,
+		Delete,
 		NcCheckboxRadioSwitch,
 		TableCellDateTime,
 		TableCellTextLine,
@@ -73,6 +108,8 @@ export default {
 		TableCellMultiSelection,
 		TableCellTextRich,
 		TableCellUsergroup,
+		NcActions,
+		NcActionButton,
 	},
 
 	mixins: [activityMixin],
@@ -103,7 +140,7 @@ export default {
 		},
 		isView: {
 			type: Boolean,
-			default: true,
+			default: false,
 		},
 	},
 	computed: {
@@ -198,6 +235,33 @@ export default {
 				return text
 			}
 		},
+		...mapActions(useDataStore, ['removeRow', 'insertNewRow']),
+		handleDeleteRow() {
+			emit('tables:row:delete', { rows: [this.row.id], isView: this.isView, elementId: this.elementId })
+		},
+		async handleCloneRow() {
+			const data = this.row.data.reduce((acc, curr) => {
+				const column = this.visibleColumns.find(col => col.id === curr.columnId)
+				// Skip unique text columns to avoid constraint violations
+				if (column && column.type === 'text' && column.textUnique) {
+					// Don't copy values from unique columns
+					return acc
+				}
+
+				acc[curr.columnId] = curr.value
+				return acc
+			}, {})
+			const res = await this.insertNewRow({
+				viewId: this.isView ? this.elementId : null,
+				tableId: this.isView ? null : this.elementId,
+				data,
+			})
+			if (!res) {
+				showError(t('tables', 'Could not duplicate row.'))
+			} else {
+				showSuccess(t('tables', 'Row duplicated successfully.'))
+			}
+		},
 	},
 }
 </script>
@@ -221,6 +285,13 @@ tr.selected {
 td.fixed-width {
 	overflow: hidden;
 	white-space: normal;
+}
+.row-actions-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--default-grid-baseline);
+	min-width: calc(var(--button-size) * 2);
 }
 
 </style>
