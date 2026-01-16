@@ -49,7 +49,7 @@ class ListContexts extends Base {
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int {
-		$userId = trim($input->getArgument('user-id'));
+		$userId = trim($input->getArgument('user-id') ?? '');
 		if ($userId === '') {
 			$userId = null;
 		}
