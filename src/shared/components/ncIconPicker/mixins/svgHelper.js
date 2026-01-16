@@ -5,11 +5,18 @@
 export default {
 	methods: {
 		async getContextIcon(iconName) {
-			const { default: icon } = await import(
-				`./../../../../../img/material/${iconName}.svg?raw`
-			)
+			try {
+				const { default: icon } = await import(
+					`./../../../../../img/material/${iconName}.svg?raw`
+				)
 
-			return icon.replaceAll(/#fff/g, 'currentColor')
+				return icon.replaceAll(/#fff/g, 'currentColor')
+			} catch (e) {
+				if (iconName !== 'apps') {
+					return this.getContextIcon('apps')
+				}
+				throw e
+			}
 		},
 	},
 }
