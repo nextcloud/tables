@@ -63,6 +63,8 @@ export default {
 			textAppAvailable: !!window.OCA?.Text?.createEditor,
 			editor: null,
 			localValue: '',
+			observer: null,
+			initialized: false,
 		}
 	},
 
@@ -96,16 +98,36 @@ export default {
 
 	async mounted() {
 		this.localValue = this.text
-		await this.setupEditor()
-		this.editor?.setContent(this.localValue, false)
+		this.setupLazyInitialization()
 	},
 
 	beforeDestroy() {
-		this?.editor?.destroy()
+		this?.observer?.disconnect?.()
+		this?.editor?.destroy?.()
 	},
 
 	methods: {
 		t,
+		setupLazyInitialization() {
+			if (this.initialized) return
+
+			this.observer = new IntersectionObserver((entries) => {
+				for (const entry of entries) {
+					if (entry.isIntersecting && !this.initialized) {
+						this.initialized = true
+						this.setupEditor().then(() => {
+							this.editor?.setContent(this.localValue, false)
+						})
+						this.observer?.disconnect?.()
+						break
+					}
+				}
+			}, { rootMargin: '200px' })
+			this.$nextTick(() => {
+				const el = this.$el
+				if (el) this.observer.observe(el)
+			})
+		},
 		async setupEditor() {
 			this?.editor?.destroy()
 			if (this.textAppAvailable) {
