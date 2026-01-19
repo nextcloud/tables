@@ -332,6 +332,46 @@ export type paths = {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/index.php/apps/tables/api/1/tables/{tableId}/relations": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * Get all relation data for a table
+         * @description This endpoint allows CORS requests
+         */
+        readonly get: operations["api1-index-table-relations"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/index.php/apps/tables/api/1/views/{viewId}/relations": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * Get all relation data for a view
+         * @description This endpoint allows CORS requests
+         */
+        readonly get: operations["api1-index-view-relations"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/index.php/apps/tables/api/1/tables/{tableId}/rows/simple": {
         readonly parameters: {
             readonly query?: never;
@@ -1160,6 +1200,14 @@ export type components = {
                 };
             };
         };
+        readonly RelationData: readonly {
+            readonly column: components["schemas"]["Column"] | null;
+            readonly values: readonly {
+                /** Format: int64 */
+                readonly id: number;
+                readonly value: Record<string, never>;
+            }[];
+        }[];
         readonly Row: {
             /** Format: int64 */
             readonly id: number;
@@ -2806,7 +2854,7 @@ export interface operations {
                      * @description Column main type
                      * @enum {string}
                      */
-                    readonly type: "text" | "number" | "datetime" | "select" | "usergroup" | "relation";
+                    readonly type: "text" | "number" | "datetime" | "select" | "usergroup" | "relation" | "relation_lookup";
                     /** @description Column sub type */
                     readonly subtype?: string | null;
                     /** @description Is the column mandatory */
@@ -3068,7 +3116,7 @@ export interface operations {
                      * @description Column main type
                      * @enum {string}
                      */
-                    readonly type: "text" | "number" | "datetime" | "select" | "usergroup" | "relation";
+                    readonly type: "text" | "number" | "datetime" | "select" | "usergroup" | "relation" | "relation_lookup";
                     /** @description Column sub type */
                     readonly subtype?: string | null;
                     /** @description Is the column mandatory */
@@ -3455,6 +3503,152 @@ export interface operations {
                 };
                 content: {
                     readonly "application/json": components["schemas"]["Column"];
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-index-table-relations": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description Table ID */
+                readonly tableId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Relation data returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["RelationData"] | readonly {
+                        readonly column: components["schemas"]["Column"] | null;
+                        readonly values: readonly {
+                            /** Format: int64 */
+                            readonly id: number;
+                            readonly value: Record<string, never>;
+                        }[];
+                    }[];
+                };
+            };
+            /** @description Current user is not logged in */
+            readonly 401: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description No permissions */
+            readonly 403: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            readonly 404: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+            readonly 500: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
+        };
+    };
+    readonly "api1-index-view-relations": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description View ID */
+                readonly viewId: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description Relation data returned */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": components["schemas"]["RelationData"] | readonly {
+                        readonly column: components["schemas"]["Column"] | null;
+                        readonly values: readonly {
+                            /** Format: int64 */
+                            readonly id: number;
+                            readonly value: Record<string, never>;
+                        }[];
+                    }[];
                 };
             };
             /** @description Current user is not logged in */

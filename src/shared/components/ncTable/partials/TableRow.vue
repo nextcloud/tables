@@ -20,8 +20,7 @@
 				'frozen-column--last': index === pinnedColumnIndex,
 			}"
 			@click="handleCellClick(col)">
-			<component :is="getTableCell(col)"
-				:column="col"
+			<TableCell :column="col"
 				:row-id="row.id"
 				:value="getCellValue(col)"
 				:element-id="elementId"
@@ -68,19 +67,7 @@ import { NcCheckboxRadioSwitch, NcActions, NcActionButton } from '@nextcloud/vue
 import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
 import Pencil from 'vue-material-design-icons/PencilOutline.vue'
 import TrashCanOutline from 'vue-material-design-icons/TrashCanOutline.vue'
-import TableCellHtml from './TableCellHtml.vue'
-import TableCellProgress from './TableCellProgress.vue'
-import TableCellLink from './TableCellLink.vue'
-import TableCellNumber from './TableCellNumber.vue'
-import TableCellStars from './TableCellStars.vue'
-import TableCellYesNo from './TableCellYesNo.vue'
-import TableCellDateTime from './TableCellDateTime.vue'
-import TableCellTextLine from './TableCellTextLine.vue'
-import TableCellSelection from './TableCellSelection.vue'
-import TableCellMultiSelection from './TableCellMultiSelection.vue'
-import TableCellRelation from './TableCellRelation.vue'
-import TableCellTextRich from './TableCellEditor.vue'
-import TableCellUsergroup from './TableCellUsergroup.vue'
+import TableCell from './TableCell.vue'
 import { ColumnTypes, getColumnWidthStyle, getFrozenColumnStyle } from './../mixins/columnHandler.js'
 import { translate as t } from '@nextcloud/l10n'
 import {
@@ -91,25 +78,13 @@ import activityMixin from '../../../mixins/activityMixin.js'
 export default {
 	name: 'TableRow',
 	components: {
-		TableCellYesNo,
-		TableCellStars,
-		TableCellNumber,
-		TableCellLink,
-		TableCellProgress,
-		TableCellHtml,
+		TableCell,
 		NcActions,
 		NcActionButton,
 		ContentCopy,
 		Pencil,
 		TrashCanOutline,
 		NcCheckboxRadioSwitch,
-		TableCellDateTime,
-		TableCellTextLine,
-		TableCellSelection,
-		TableCellMultiSelection,
-		TableCellRelation,
-		TableCellTextRich,
-		TableCellUsergroup,
 	},
 
 	mixins: [activityMixin],
@@ -173,6 +148,7 @@ export default {
 		// to be used to trigger the edit modal instead of inline editing
 		nonInlineEditableColumnTypes() {
 			return [
+				ColumnTypes.RelationLookup,
 			]
 		},
 	},
@@ -184,25 +160,6 @@ export default {
 			// If the column type doesn't support inline editing, trigger the edit modal
 			if (this.nonInlineEditableColumnTypes.includes(column.type) && this.config.canEditRows) {
 				this.$emit('edit-row', this.row.id)
-			}
-		},
-		getTableCell(column) {
-			switch (column.type) {
-			case ColumnTypes.TextLine: return 'TableCellTextLine'
-			case ColumnTypes.TextLink: return 'TableCellLink'
-			case ColumnTypes.TextRich:return 'TableCellTextRich'
-			case ColumnTypes.Number: return 'TableCellNumber'
-			case ColumnTypes.NumberStars: return 'TableCellStars'
-			case ColumnTypes.NumberProgress: return 'TableCellProgress'
-			case ColumnTypes.Selection: return 'TableCellSelection'
-			case ColumnTypes.SelectionMulti: return 'TableCellMultiSelection'
-			case ColumnTypes.SelectionCheck: return 'TableCellYesNo'
-			case ColumnTypes.Relation: return 'TableCellRelation'
-			case ColumnTypes.Datetime: return 'TableCellDateTime'
-			case ColumnTypes.DatetimeDate: return 'TableCellDateTime'
-			case ColumnTypes.DatetimeTime: return 'TableCellDateTime'
-			case ColumnTypes.Usergroup: return 'TableCellUsergroup'
-			default: return 'TableCellHtml'
 			}
 		},
 		getCell(columnId) {
@@ -236,7 +193,7 @@ export default {
 			}
 
 			// lets see if we have a value
-			const cell = this.getCell(column.id)
+			const cell = this.getCell(column.getValueColumnId())
 			let value
 
 			if (cell) {

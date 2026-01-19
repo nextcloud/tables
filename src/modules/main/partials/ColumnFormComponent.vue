@@ -23,6 +23,7 @@ import DatetimeTimeForm from '../../../shared/components/ncTable/partials/rowTyp
 import TextRichForm from '../../../shared/components/ncTable/partials/rowTypePartials/TextRichForm.vue'
 import UsergroupForm from '../../../shared/components/ncTable/partials/rowTypePartials/UsergroupForm.vue'
 import RelationForm from '../../../shared/components/ncTable/partials/rowTypePartials/RelationForm.vue'
+import RelationLookupForm from '../../../shared/components/ncTable/partials/rowTypePartials/RelationLookupForm.vue'
 
 export default {
 	name: 'ColumnFormComponent',
@@ -42,6 +43,7 @@ export default {
 		DatetimeTimeForm,
 		UsergroupForm,
 		RelationForm,
+		RelationLookupForm,
 	},
 	props: {
 		column: {
@@ -58,7 +60,7 @@ export default {
 	],
 	data() {
 		return {
-			value_data: this.value,
+			value_data: this.getValueForColumn(),
 		}
 	},
 	computed: {
@@ -74,15 +76,10 @@ export default {
 			}
 		},
 	},
-	watch: {
-		value_data() {
-			this.$emit('update:value', this.value_data)
-		},
-		value() {
-			this.value_data = this.value
-		},
-	},
 	methods: {
+		getValueForColumn() {
+			return this.column.getValueForForm(this.value)
+		},
 		snakeToCamel(str) {
 			str = str.toLowerCase().replace(/([-_][a-z])/g, group =>
 				group
@@ -91,6 +88,14 @@ export default {
 					.replace('-', ''),
 			)
 			return str.charAt(0).toUpperCase() + str.slice(1)
+		},
+	},
+	watch: {
+		value_data() {
+			this.$emit('update:value', this.value_data)
+		},
+		value() {
+			this.value_data = this.getValueForColumn()
 		},
 	},
 }

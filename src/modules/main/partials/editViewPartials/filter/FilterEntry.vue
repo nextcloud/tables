@@ -215,10 +215,10 @@ export default {
 				// Get relations from DataStore using the column's tableId
 				const dataStore = useDataStore()
 				const columnRelations = dataStore.getRelations(this.selectedColumn.id)
-				Object.values(columnRelations).forEach(item => {
+				Object.entries(columnRelations.values || {}).forEach(([, item]) => {
 					options.push({
 						id: '@relation-id-' + item.id,
-						label: item.label,
+						label: item.value,
 					})
 				})
 

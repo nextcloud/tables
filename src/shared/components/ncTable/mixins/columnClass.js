@@ -81,6 +81,27 @@ export class AbstractColumn {
 		return value
 	}
 
+	/**
+	 * Get the id of the column whose cell holds this column's value.
+	 * Virtual columns may source their value from another column.
+	 *
+	 * @return {number} The column id to read the cell value from
+	 */
+	getValueColumnId() {
+		return this.id
+	}
+
+	/**
+	 * Get the value for form input.
+	 * Default implementation returns the value as-is.
+	 *
+	 * @param {*} value The raw value
+	 * @return {*} The value for form input
+	 */
+	getValueForForm(value) {
+		return value
+	}
+
 }
 
 export class AbstractUsergroupColumn extends AbstractColumn {

@@ -5,9 +5,11 @@
 import moment from '@nextcloud/moment'
 import Papa from 'papaparse'
 import generalHelper from '../../../mixins/generalHelper.js'
+import { ColumnTypes } from './columnHandler.js'
 import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
 } from '../../../../shared/constants.ts'
+import { useDataStore } from '../../../../store/data.js'
 
 export default {
 
@@ -15,19 +17,59 @@ export default {
 
 	methods: {
 
+		getRelationLookupValue(column, row, dataStore) {
+			const relationColumnId = column.customSettings?.relationColumnId
+			if (!relationColumnId) {
+				return ''
+			}
+
+			const relationCell = row.data?.find(d => d.columnId === relationColumnId)
+			if (!relationCell) {
+				return ''
+			}
+
+			try {
+				const relationLookup = dataStore.getRelations(column.id)
+				if (!relationLookup?.values || !relationCell.value) {
+					return ''
+				}
+
+				const relatedRow = relationLookup.values[relationCell.value]
+				if (!relatedRow || relatedRow.value === null || relatedRow.value === undefined) {
+					return ''
+				}
+
+				try {
+					const valueString = relationLookup.column.getValueString({ value: relatedRow.value })
+					return valueString || ''
+				} catch (error) {
+					console.warn('Failed to get value string for relation lookup:', error)
+					return ''
+				}
+			} catch (error) {
+				console.warn('Failed to get relation lookup value for export:', error)
+				return ''
+			}
+		},
+
 		downloadCsv(rows, columns, fileName) {
 			if (!rows || rows.length === 0) {
 				console.debug('downloadCSV has empty parameter, expected array ob row objects', rows)
 			}
 
+			const dataStore = useDataStore()
 			const data = []
 			rows.forEach(row => {
 				const rowData = { ID: row.id }
 				columns.forEach(column => {
 					// if a normal column
 					if (column.id >= 0) {
-						const set = row.data ? row.data.find(d => d.columnId === column.id) || '' : null
-						rowData[column.title] = set ? column.getValueString(set) : ''
+						if (column.type === ColumnTypes.RelationLookup) {
+							rowData[column.title] = this.getRelationLookupValue(column, row, dataStore)
+						} else {
+							const set = row.data ? row.data.find(d => d.columnId === column.id) || '' : null
+							rowData[column.title] = set ? column.getValueString(set) : ''
+						}
 					} else {
 						// if is a meta data column (id < 0)
 						switch (column.id) {
