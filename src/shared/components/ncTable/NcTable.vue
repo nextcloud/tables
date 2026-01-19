@@ -125,6 +125,7 @@ import {
 import { MetaColumns } from './mixins/metaColumns.js'
 import { MagicFields } from './mixins/magicFields.js'
 import { FilterIds, getFiltersForColumn } from './mixins/filter.js'
+import { ColumnTypes } from './mixins/columnHandler.js'
 
 export default {
 	name: 'NcTable',
@@ -371,7 +372,11 @@ export default {
 					})
 					// if we should search
 					if (searchString) {
-						searchStatus = column.isSearchStringFound(cell, searchString.toLowerCase())
+						if (column.type === ColumnTypes.RelationLookup) {
+							searchStatus = column.isSearchStringFound(row.data, cell, searchString.toLowerCase())
+						} else {
+							searchStatus = column.isSearchStringFound(cell, searchString.toLowerCase())
+						}
 					}
 
 					// if filterStatus is null, this result should be ignored

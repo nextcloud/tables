@@ -12,7 +12,7 @@ use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Service\RelationService;
 use Psr\Log\LoggerInterface;
 
-class RelationBusiness extends SuperBusiness implements IColumnTypeBusiness {
+class RelationBusiness extends SuperBusiness {
 
 	public function __construct(
 		LoggerInterface $logger,
@@ -35,7 +35,7 @@ class RelationBusiness extends SuperBusiness implements IColumnTypeBusiness {
 
 		$relationData = $this->relationService->getRelationData($column);
 		// try to find value by label
-		$matchingRelation = array_filter($relationData, fn (array $relation) => $relation['label'] === $value);
+		$matchingRelation = array_filter($relationData, fn (array $relation) => $relation['value'] === $value);
 		if (!empty($matchingRelation)) {
 			return json_encode(reset($matchingRelation)['id']);
 		}
@@ -64,7 +64,7 @@ class RelationBusiness extends SuperBusiness implements IColumnTypeBusiness {
 
 		$relationData = $this->relationService->getRelationData($column);
 		// try to find value by label
-		$matchingRelation = array_filter($relationData, fn (array $relation) => $relation['label'] === $value);
+		$matchingRelation = array_filter($relationData, fn (array $relation) => $relation['value'] === $value);
 		if (!empty($matchingRelation)) {
 			return true;
 		}
@@ -84,7 +84,7 @@ class RelationBusiness extends SuperBusiness implements IColumnTypeBusiness {
 		$relationData = $this->relationService->getRelationData($column);
 
 		// Try to find value by label first
-		$matchingRelation = array_filter($relationData, fn (array $relation) => $relation['label'] === $value);
+		$matchingRelation = array_filter($relationData, fn (array $relation) => $relation['value'] === $value);
 		if (!empty($matchingRelation)) {
 			return;
 		}

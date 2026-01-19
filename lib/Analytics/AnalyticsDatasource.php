@@ -381,7 +381,7 @@ class AnalyticsDatasource implements IDatasource {
 		$relationData = $this->relationService->getRelationData($column);
 		$valueId = (int)$value;
 
-		return $relationData[$valueId]['label'] ?? (string)$value;
+		return $relationData[$valueId]['value'] ?? (string)$value;
 	}
 
 	private function parseDefaultValue(?string $value): mixed {

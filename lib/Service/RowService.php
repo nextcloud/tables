@@ -393,6 +393,10 @@ class RowService extends SuperService {
 
 			$column = $this->getColumnFromColumnsArray($columnId, $columns);
 
+			if ($column && $this->row2Mapper->isVirtualColumn($column->getType())) {
+				continue;
+			}
+
 			if ($column) {
 				$this->validateColumnValueLimits($column, $entry['value']);
 				$columnBusiness = $this->columnsHelper->getColumnBusinessObject($column);
@@ -923,6 +927,8 @@ class RowService extends SuperService {
 		}
 
 		$columnIds = $view->getColumnIds();
+		$columnIds = $this->row2Mapper->addRelationColumnIdsForLookupColumns($columnIds);
+
 		$row->filterDataByColumns($columnIds);
 		$row->filterDataByAliasByColumns($columnIds);
 
