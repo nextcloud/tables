@@ -107,6 +107,7 @@ class Column extends EntitySuper implements JsonSerializable {
 	public const TYPE_DATETIME = 'datetime';
 	public const TYPE_USERGROUP = 'usergroup';
 	public const TYPE_RELATION = 'relation';
+	public const TYPE_RELATION_LOOKUP = 'relation_lookup';
 
 	public const SUBTYPE_DATETIME_DATE = 'date';
 	public const SUBTYPE_DATETIME_TIME = 'time';
@@ -350,6 +351,20 @@ class Column extends EntitySuper implements JsonSerializable {
 
 	public function getCustomSettingsArray(): array {
 		return json_decode($this->customSettings, true) ?: [];
+	}
+
+	/**
+	 * @template T
+	 * @param class-string<T> $className
+	 * @return T
+	 * @throws \InvalidArgumentException
+	 */
+	public function getCustomSettingsObject(string $className): mixed {
+		$array = $this->getCustomSettingsArray();
+		if (method_exists($className, 'fromArray')) {
+			return $className::fromArray($array);
+		}
+		throw new \InvalidArgumentException("Class $className must have a fromArray method");
 	}
 
 	/**

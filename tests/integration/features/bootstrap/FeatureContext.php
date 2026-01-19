@@ -2707,7 +2707,7 @@ class FeatureContext implements Context {
 		Assert::assertNotNull($this->relationsData, 'Relations response was not fetched or returned non-200');
 		$columnId = (int)$this->collectionManager->getByAlias('column', $columnName)['id'];
 		Assert::assertArrayHasKey($columnId, $this->relationsData, 'Column "' . $columnName . '" (id=' . $columnId . ') not found in relations response');
-		Assert::assertCount($count, $this->relationsData[$columnId], 'Expected ' . $count . ' entries for column "' . $columnName . '"');
+		Assert::assertCount($count, $this->relationsData[$columnId]['values'], 'Expected ' . $count . ' entries for column "' . $columnName . '"');
 	}
 
 	/**
@@ -2717,7 +2717,7 @@ class FeatureContext implements Context {
 		Assert::assertNotNull($this->relationsData, 'Relations response was not fetched or returned non-200');
 		$columnId = (int)$this->collectionManager->getByAlias('column', $columnName)['id'];
 		Assert::assertArrayHasKey($columnId, $this->relationsData, 'Column "' . $columnName . '" not found in relations response');
-		$labels = array_column($this->relationsData[$columnId], 'label');
+		$labels = array_column($this->relationsData[$columnId]['values'], 'value');
 		Assert::assertContains($label, $labels, 'Label "' . $label . '" not found in relations for column "' . $columnName . '"');
 	}
 
