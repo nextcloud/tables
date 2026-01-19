@@ -36,7 +36,12 @@
 
 			<div v-if="activeTabId === 'edit'" class="row">
 				<div v-for="column in nonMetaColumns" :key="column.id">
-					<ColumnFormComponent
+					<RowFormWrapper v-if="column.type === 'relation_lookup'" :title="column.title" :mandatory="column.mandatory" :description="column.description" :readonly="column.readonly">
+						<TableCellRelationLookup :column="column"
+							:row-id="row.id"
+							:value="localRow[column.customSettings.relationColumnId]" />
+					</RowFormWrapper>
+					<ColumnFormComponent v-else-if="column.type !== 'relation_lookup' && column.type !== 'text-template'"
 						:column="column"
 						:value.sync="localRow[column.id]" />
 					<NcNoteCard v-if="isMandatory(column) && !isValueValidForColumn(localRow[column.id], column)"
@@ -102,6 +107,8 @@ import HomeIcon from 'vue-material-design-icons/Home.vue'
 import HomeOutlineIcon from 'vue-material-design-icons/HomeOutline.vue'
 import ActivityList from '../../shared/components/ActivityList.vue'
 import activityMixin from '../../shared/mixins/activityMixin.js'
+import TableCellRelationLookup from '../../shared/components/ncTable/partials/TableCellRelationLookup.vue'
+import RowFormWrapper from '../../shared/components/ncTable/partials/rowTypePartials/RowFormWrapper.vue'
 
 export default {
 	name: 'EditRow',
@@ -115,6 +122,8 @@ export default {
 		ActivityOutlineIcon,
 		HomeIcon,
 		HomeOutlineIcon,
+		TableCellRelationLookup,
+		RowFormWrapper,
 	},
 	mixins: [permissionsMixin, rowHelper, activityMixin],
 	props: {
@@ -188,7 +197,10 @@ export default {
 			if (this.row) {
 				const tmp = {}
 				this.row.data.forEach(item => {
-					tmp[item.columnId] = item.value
+					// Only include columns that are in nonMetaColumns
+					if (this.nonMetaColumns.some(col => col.id === item.columnId)) {
+						tmp[item.columnId] = item.value
+					}
 				})
 
 				// Ensure all columns have entries, even if missing from row data

@@ -15,6 +15,7 @@ use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
 use OCP\AppFramework\Db\DoesNotExistException;
+use Psr\Log\LoggerInterface;
 
 class RelationService {
 	/** @var array<string, array> Cache for relation data */
@@ -26,6 +27,7 @@ class RelationService {
 		private Row2Mapper $row2Mapper,
 		private ColumnService $columnService,
 		private ?string $userId,
+		private LoggerInterface $logger,
 	) {
 	}
 
@@ -46,7 +48,14 @@ class RelationService {
 			return $column->getType() === Column::TYPE_RELATION;
 		});
 
-		return $this->getRelationsForColumns($relationColumns);
+		$relationLookupColumns = array_filter($columns, function ($column) {
+			return $column->getType() === Column::TYPE_RELATION_LOOKUP;
+		});
+
+		$relationData = $this->getRelationsForColumns($relationColumns);
+		$relationLookupData = $this->getRelationsForLookupColumns($relationLookupColumns, $relationData);
+
+		return $relationData + $relationLookupData;
 	}
 
 	/**
@@ -66,7 +75,14 @@ class RelationService {
 			return $column->getType() === Column::TYPE_RELATION;
 		});
 
-		return $this->getRelationsForColumns($relationColumns);
+		$relationLookupColumns = array_filter($columns, function ($column) {
+			return $column->getType() === Column::TYPE_RELATION_LOOKUP;
+		});
+
+		$relationData = $this->getRelationsForColumns($relationColumns);
+		$relationLookupData = $this->getRelationsForLookupColumns($relationLookupColumns, $relationData);
+
+		return $relationData + $relationLookupData;
 	}
 
 	/**
@@ -136,6 +152,142 @@ class RelationService {
 		$target = sprintf('%s_%s_%s', $settings['relationType'], $settings['targetId'], $settings['labelColumn']);
 
 		return $this->getRelationDataForTarget($target, $column);
+	}
+
+	/**
+	 * Get relation data for relation lookup columns
+	 *
+	 * @param Column[] $relationLookupColumns
+	 * @param array $existingRelationData Existing relation data from relation columns
+	 * @return array Relation data grouped by column ID
+	 * @throws InternalError
+	 */
+	private function getRelationsForLookupColumns(array $relationLookupColumns, array $existingRelationData): array {
+		$result = [];
+
+		foreach ($relationLookupColumns as $lookupColumn) {
+			$settings = $lookupColumn->getCustomSettingsArray();
+			$relationColumnId = $settings['relationColumnId'] ?? null;
+
+			if (!$relationColumnId) {
+				continue;
+			}
+
+			// Get the relation data from the parent relation column
+			$relationData = $existingRelationData[$relationColumnId] ?? null;
+
+			// Always fetch the relation column object to get its settings
+			$relationColumn = null;
+			try {
+				$relationColumn = $this->columnMapper->find($relationColumnId);
+			} catch (DoesNotExistException $e) {
+				$this->logger->warning('Relation column not found for relation lookup: ' . $relationColumnId);
+				continue;
+			}
+
+			if (!$relationData) {
+				// If the relation column data doesn't exist, try to fetch it
+				if ($relationColumn->getType() === Column::TYPE_RELATION) {
+					$relationData = $this->getRelationData($relationColumn);
+				}
+			}
+
+			if (!$relationData) {
+				continue;
+			}
+
+			// Get the target column metadata for the lookup
+			$targetColumnId = $settings['targetColumnId'] ?? null;
+			$targetColumn = null;
+			if ($targetColumnId) {
+				try {
+					$targetColumn = $this->columnMapper->find($targetColumnId);
+				} catch (DoesNotExistException $e) {
+					$this->logger->warning('Target column not found for relation lookup: ' . $targetColumnId);
+				}
+			}
+
+			// Fetch relation data using the target column instead of the parent relation's label column
+			$lookupData = [];
+			if ($targetColumn && $relationColumn) {
+				$relationSettings = $relationColumn->getCustomSettingsArray();
+				$isView = ($relationSettings['relationType'] ?? '') === 'view';
+				$targetId = $relationSettings['targetId'] ?? null;
+
+				$cacheKey = sprintf('%s_%s_%s_%s', $relationSettings['relationType'] ?? '', $targetId, $targetColumnId, $this->userId ?? 'anonymous');
+				if (isset($this->cacheRelationData[$cacheKey])) {
+					$lookupData = $this->cacheRelationData[$cacheKey];
+				} else {
+					try {
+						if ($isView && $targetId) {
+							$view = $this->viewMapper->find($targetId);
+							$rows = $this->row2Mapper->findAll(
+								[$targetColumn->getId()],
+								$view->getTableId(),
+								null,
+								null,
+								$view->getFilterArray(),
+								$view->getSortArray(),
+								$this->userId
+							);
+						} elseif ($targetId) {
+							$rows = $this->row2Mapper->findAll(
+								[$targetColumn->getId()],
+								$targetId,
+								null,
+								null,
+								null,
+								null,
+								$this->userId
+							);
+						} else {
+							$rows = [];
+						}
+
+						// Build a map of target row IDs to their values
+						$targetRowValues = [];
+						foreach ($rows as $row) {
+							$data = $row->getData();
+							$displayFieldData = array_filter($data, function ($item) use ($targetColumnId) {
+								return $item['columnId'] === (int)$targetColumnId;
+							});
+							$value = reset($displayFieldData)['value'] ?? null;
+
+							// Convert value based on column type
+							if ($targetColumn->getType() === Column::TYPE_NUMBER) {
+								$targetRowValues[(int)$row->getId()] = is_numeric($value) ? (float)$value : null;
+							} else {
+								$targetRowValues[(int)$row->getId()] = (string)$value;
+							}
+						}
+
+						// Map the relation data (which has current table row IDs) to target table row IDs
+						// The relation data structure is: {currentRowId: {id: targetRowId, label: targetLabel}}
+						foreach ($relationData as $currentRowId => $relationInfo) {
+							$targetRowId = $relationInfo['id'] ?? null;
+							if ($targetRowId !== null && isset($targetRowValues[$targetRowId])) {
+								$lookupData[$currentRowId] = [
+									'id' => $currentRowId,
+									'label' => $targetRowValues[$targetRowId],
+								];
+							}
+						}
+
+						$this->cacheRelationData[$cacheKey] = $lookupData;
+					} catch (DoesNotExistException $e) {
+						$this->logger->warning('Failed to fetch lookup data: ' . $e->getMessage());
+					}
+				}
+			}
+
+			// Structure the data for the frontend: {column: Column, data: {rowId: {id, label}}}
+			$result[$lookupColumn->getId()] = [
+				'column' => $targetColumn ? $targetColumn->jsonSerialize() : null,
+				'data' => $lookupData,
+			];
+		}
+
+		return $result;
 	}
 
 	/**

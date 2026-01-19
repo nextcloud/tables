@@ -79,6 +79,7 @@ import TableCellTextLine from './TableCellTextLine.vue'
 import TableCellSelection from './TableCellSelection.vue'
 import TableCellMultiSelection from './TableCellMultiSelection.vue'
 import TableCellRelation from './TableCellRelation.vue'
+import TableCellRelationLookup from './TableCellRelationLookup.vue'
 import TableCellTextRich from './TableCellEditor.vue'
 import TableCellUsergroup from './TableCellUsergroup.vue'
 import { ColumnTypes, getColumnWidthStyle, getFrozenColumnStyle } from './../mixins/columnHandler.js'
@@ -108,6 +109,7 @@ export default {
 		TableCellSelection,
 		TableCellMultiSelection,
 		TableCellRelation,
+		TableCellRelationLookup,
 		TableCellTextRich,
 		TableCellUsergroup,
 	},
@@ -193,6 +195,7 @@ export default {
 			case ColumnTypes.SelectionCheck: return 'TableCellYesNo'
 			case ColumnTypes.Relation: return 'TableCellRelation'
 			case ColumnTypes.Datetime: return 'TableCellDateTime'
+			case ColumnTypes.RelationLookup: return 'TableCellRelationLookup'
 			case ColumnTypes.DatetimeDate: return 'TableCellDateTime'
 			case ColumnTypes.DatetimeTime: return 'TableCellDateTime'
 			case ColumnTypes.Usergroup: return 'TableCellUsergroup'
@@ -225,6 +228,11 @@ export default {
 			return this.row.data.find(item => item.columnId === columnId) || null
 		},
 		getCellValue(column) {
+			if (column.type === ColumnTypes.RelationLookup) {
+				// fixme: not sure about current implementation
+				return this.getCell(column.customSettings.relationColumnId)
+			}
+
 			if (!this.row) {
 				return null
 			}
