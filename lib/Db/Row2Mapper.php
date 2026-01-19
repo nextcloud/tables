@@ -10,6 +10,7 @@ namespace OCA\Tables\Db;
 use DateTime;
 use DateTimeImmutable;
 use OCA\Tables\Constants\UsergroupType;
+use OCA\Tables\Dto\RelationLookupSettings;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Helper\ColumnsHelper;
@@ -52,6 +53,9 @@ class Row2Mapper {
 		$this->db->beginTransaction();
 		try {
 			foreach ($this->columnsHelper->columns as $columnType) {
+				if ($this->isVirtualColumn($columnType)) {
+					continue;
+				}
 				$this->getCellMapperFromType($columnType)->deleteAllForRow($row->getId());
 			}
 			$this->rowSleeveMapper->deleteById($row->getId());
@@ -214,6 +218,8 @@ class Row2Mapper {
 	private function getRowsChunk(array $rowIds, array $columnIds): array {
 		$qb = $this->db->getQueryBuilder();
 
+		$columnIds = $this->addRelationColumnIdsForLookupColumns($columnIds);
+
 		$qbSqlForColumnTypes = null;
 		foreach ($this->columnsHelper->columns as $columnType) {
 			$qbTmp = $this->db->getQueryBuilder();
@@ -229,6 +235,9 @@ class Row2Mapper {
 				$qbTmp->selectAlias($qbTmp->createFunction('NULL'), 'value_type');
 			}
 
+			if ($this->isVirtualColumn($columnType)) {
+				continue;
+			}
 			$qbTmp
 				->from('tables_row_cells_' . $columnType)
 				->where($qb->expr()->in('column_id', $qb->createNamedParameter($columnIds, IQueryBuilder::PARAM_INT_ARRAY, ':columnIds')))
@@ -892,6 +901,10 @@ class Row2Mapper {
 			throw new InternalError(static::class . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
 		}
 
+		if ($this->isVirtualColumn($column->getType())) {
+			return;
+		}
+
 		// insert new cell
 		$cellMapper = $this->getCellMapper($column);
 
@@ -930,6 +943,10 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	private function updateCell(RowCellSuper $cell, RowCellMapperSuper $mapper, $value, Column $column): void {
+		if ($this->isVirtualColumn($column->getType())) {
+			return;
+		}
+
 		$this->getCellMapper($column)->applyDataToEntity($column, $cell, $value);
 		$this->updateMetaData($cell);
 		$mapper->updateWrapper($cell);
@@ -940,6 +957,9 @@ class Row2Mapper {
 	 */
 	private function insertOrUpdateCell(int $rowId, int $columnId, $value): void {
 		$column = $this->columnMapper->find($columnId);
+		if ($this->isVirtualColumn($column->getType())) {
+			return;
+		}
 		$cellMapper = $this->getCellMapper($column);
 		try {
 			if ($cellMapper->hasMultipleValues()) {
@@ -966,6 +986,9 @@ class Row2Mapper {
 	}
 
 	private function getCellMapperFromType(string $columnType): RowCellMapperSuper {
+		if ($this->isVirtualColumn($columnType)) {
+			throw new InternalError('Virtual columns do not have cell mappers');
+		}
 		$cellMapperClassName = 'OCA\Tables\Db\RowCell' . ucfirst($columnType) . 'Mapper';
 		/** @var RowCellMapperSuper $cellMapper */
 		try {
@@ -987,6 +1010,9 @@ class Row2Mapper {
 	 * @throws InternalError
 	 */
 	public function deleteDataForColumn(Column $column): void {
+		if ($this->isVirtualColumn($column->getType())) {
+			return;
+		}
 		try {
 			$this->getCellMapper($column)->deleteAllForColumn($column->getId());
 		} catch (Exception $e) {
@@ -1067,6 +1093,7 @@ class Row2Mapper {
 			Column::TYPE_NUMBER => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getNumberDefault()),
 			Column::TYPE_TEXT => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getTextDefault()),
 			Column::TYPE_USERGROUP => $this->getCellMapper($column)->filterValueToQueryParam($column, $column->getUsergroupDefault()),
+			Column::TYPE_RELATION_LOOKUP => null,
 			default => $defaultValue,
 		};
 		return $defaultValue;
@@ -1095,4 +1122,26 @@ class Row2Mapper {
 
 		return $sortedRows;
 	}
+
+	public function isVirtualColumn(string $columnType): bool {
+		return $columnType === Column::TYPE_RELATION_LOOKUP;
+	}
+
+	/**
+	 * @param int[] $columnIds
+	 * @return int[]
+	 */
+	public function addRelationColumnIdsForLookupColumns(array $columnIds): array {
+		$allColumns = $this->columnMapper->findAll($columnIds);
+		foreach ($allColumns as $column) {
+			if ($column->getType() !== Column::TYPE_RELATION_LOOKUP) {
+				continue;
+			}
+
+			$settings = $column->getCustomSettingsObject(RelationLookupSettings::class);
+			$columnIds[] = $settings->relationColumnId;
+		}
+		return array_values(array_unique(array_filter($columnIds)));
+	}
+
 }

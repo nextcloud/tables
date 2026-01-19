@@ -43,7 +43,7 @@ export default class RelationColumn extends AbstractColumn {
 
 	getValueString(valueObject) {
 		valueObject = valueObject || this.value || null
-		return this.getLabel(valueObject.value)
+		return this.getLabel(valueObject.value) ?? String(valueObject.value)
 	}
 
 	getLabel(rowId) {
@@ -52,9 +52,9 @@ export default class RelationColumn extends AbstractColumn {
 			const dataStore = useDataStore()
 
 			const columnRelations = dataStore.getRelations(this.id)
-			const option = columnRelations[rowId]
+			const option = columnRelations.values?.[rowId]
 
-			return option ? option.label : ''
+			return option ? option.value : ''
 		} catch (error) {
 			console.warn('Failed to get relation label:', error)
 			return ''

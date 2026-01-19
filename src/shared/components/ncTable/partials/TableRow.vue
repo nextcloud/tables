@@ -148,6 +148,7 @@ export default {
 		// to be used to trigger the edit modal instead of inline editing
 		nonInlineEditableColumnTypes() {
 			return [
+				ColumnTypes.RelationLookup,
 			]
 		},
 	},
@@ -193,7 +194,7 @@ export default {
 			}
 
 			// lets see if we have a value
-			const cell = this.getCell(column.id)
+			const cell = this.getCell(column.getValueColumnId())
 			let value
 
 			if (cell) {
