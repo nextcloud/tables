@@ -15,13 +15,13 @@
 				'fixed-width': col.customSettings?.width > 0
 			}"
 			@click="handleCellClick(col)">
-			<component :is="getTableCell(col)"
+			<TableCell
 				:column="col"
-				:row-id="row.id"
-				:value="getCellValue(col)"
+				:row="row"
 				:element-id="elementId"
 				:is-view="isView"
 				:can-edit="config.canEditRows" />
+			/>
 		</td>
 		<td v-if="config.showActions" :class="{sticky: config.showActions}">
 			<NcButton v-if="config.canEditRows || config.canDeleteRows" type="primary" :aria-label="t('tables', 'Edit row')" data-cy="editRowBtn" @click="$emit('edit-row', row.id)">
@@ -36,47 +36,21 @@
 <script>
 import { NcCheckboxRadioSwitch, NcButton } from '@nextcloud/vue'
 import Fullscreen from 'vue-material-design-icons/Fullscreen.vue'
-import TableCellHtml from './TableCellHtml.vue'
-import TableCellProgress from './TableCellProgress.vue'
-import TableCellLink from './TableCellLink.vue'
-import TableCellNumber from './TableCellNumber.vue'
-import TableCellStars from './TableCellStars.vue'
-import TableCellYesNo from './TableCellYesNo.vue'
-import TableCellDateTime from './TableCellDateTime.vue'
-import TableCellTextLine from './TableCellTextLine.vue'
-import TableCellSelection from './TableCellSelection.vue'
-import TableCellMultiSelection from './TableCellMultiSelection.vue'
-import TableCellTextRich from './TableCellEditor.vue'
-import TableCellUsergroup from './TableCellUsergroup.vue'
-import TableCellRelation from './TableCellRelation.vue'
-import { ColumnTypes, getColumnWidthStyle } from './../mixins/columnHandler.js'
-import TableCellRelationLookup from './TableCellRelationLookup.vue'
+import TableCell from './TableCell.vue'
+import { getColumnWidthStyle } from './../mixins/columnHandler.js'
 import { translate as t } from '@nextcloud/l10n'
 import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
-} from '../../../../shared/constants.ts'
+} from '../../../constants.ts'
 import activityMixin from '../../../mixins/activityMixin.js'
 
 export default {
 	name: 'TableRow',
 	components: {
-		TableCellYesNo,
-		TableCellStars,
-		TableCellNumber,
-		TableCellLink,
-		TableCellProgress,
-		TableCellHtml,
+		TableCell,
 		NcButton,
 		Fullscreen,
 		NcCheckboxRadioSwitch,
-		TableCellDateTime,
-		TableCellTextLine,
-		TableCellSelection,
-		TableCellMultiSelection,
-		TableCellTextRich,
-		TableCellUsergroup,
-		TableCellRelation,
-		TableCellRelationLookup,
 	},
 
 	mixins: [activityMixin],
@@ -134,26 +108,7 @@ export default {
 				this.$emit('edit-row', this.row.id)
 			}
 		},
-		getTableCell(column) {
-			switch (column.type) {
-			case ColumnTypes.TextLine: return 'TableCellTextLine'
-			case ColumnTypes.TextLink: return 'TableCellLink'
-			case ColumnTypes.TextRich:return 'TableCellTextRich'
-			case ColumnTypes.Number: return 'TableCellNumber'
-			case ColumnTypes.NumberStars: return 'TableCellStars'
-			case ColumnTypes.NumberProgress: return 'TableCellProgress'
-			case ColumnTypes.Selection: return 'TableCellSelection'
-			case ColumnTypes.SelectionMulti: return 'TableCellMultiSelection'
-			case ColumnTypes.SelectionCheck: return 'TableCellYesNo'
-			case ColumnTypes.Datetime: return 'TableCellDateTime'
-			case ColumnTypes.DatetimeDate: return 'TableCellDateTime'
-			case ColumnTypes.DatetimeTime: return 'TableCellDateTime'
-			case ColumnTypes.Usergroup: return 'TableCellUsergroup'
-			case ColumnTypes.Relation: return 'TableCellRelation'
-			case ColumnTypes.RelationLookup: return 'TableCellRelationLookup'
-			default: return 'TableCellHtml'
-			}
-		},
+
 		getCell(columnId) {
 			if (columnId < 0) {
 				// See metaColumns.js for mapping
@@ -178,28 +133,6 @@ export default {
 				return { columnId, value }
 			}
 			return this.row.data.find(item => item.columnId === columnId) || null
-		},
-		getCellValue(column) {
-			if (column.type === ColumnTypes.RelationLookup) {
-				return this.getCell(column.customSettings.relationColumnId)
-			}
-
-			if (!this.row) {
-				return null
-			}
-
-			// lets see if we have a value
-			const cell = this.getCell(column.id)
-			let value
-
-			if (cell) {
-				value = cell.value
-			} else {
-				// if no value is given, try to get the default value from the column definition
-				value = column.default()
-			}
-
-			return column.parseValue(value)
 		},
 		truncate(text) {
 			if (text.length >= 400) {

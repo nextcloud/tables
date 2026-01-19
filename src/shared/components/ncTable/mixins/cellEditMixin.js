@@ -32,10 +32,6 @@ export default {
 			type: Boolean,
 			default: true,
 		},
-		isRelationLookup: {
-			type: Boolean,
-			default: false,
-		},
 	},
 
 	data() {
@@ -57,10 +53,6 @@ export default {
 
 			// Prevent editing for meta columns
 			if (this.column.id < 0) {
-				return false
-			}
-
-			if (this.isRelationLookup) {
 				return false
 			}
 
