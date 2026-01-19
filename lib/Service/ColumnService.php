@@ -9,14 +9,17 @@ namespace OCA\Tables\Service;
 
 use DateTime;
 use Exception;
+use InvalidArgumentException;
 use OCA\Tables\Db\Column;
 use OCA\Tables\Db\ColumnMapper;
 use OCA\Tables\Db\TableMapper;
 use OCA\Tables\Db\View;
 use OCA\Tables\Dto\Column as ColumnDto;
+use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Helper\UserHelper;
 use OCA\Tables\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -50,6 +53,7 @@ class ColumnService extends SuperService {
 		RowService $rowService,
 		IL10N $l,
 		UserHelper $userHelper,
+		private ColumnsHelper $columnsHelper,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->mapper = $mapper;
@@ -167,7 +171,7 @@ class ColumnService extends SuperService {
 	 * @return Column
 	 *
 	 * @throws InternalError
-	 * @throws PermissionError|NotFoundError
+	 * @throws PermissionError|NotFoundError|BadRequestError
 	 */
 	public function create(
 		?string $userId,
@@ -235,8 +239,12 @@ class ColumnService extends SuperService {
 			$i++;
 		}
 
-		$time = new DateTime();
-		$item = Column::fromDto($columnDto);
+		try {
+			$item = Column::fromDto($columnDto);
+		} catch (InvalidArgumentException $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
+			throw new BadRequestError(get_class($this) . ' - ' . __FUNCTION__ . ': ' . $e->getMessage());
+		}
 		$item->setTitle($newTitle);
 		$item->setTableId($table->getId());
 		$this->updateMetadata($item, $userId, true);
@@ -276,7 +284,7 @@ class ColumnService extends SuperService {
 	 * @param string|null $userId
 	 * @param ColumnDto $columnDto
 	 * @return Column
-	 * @throws InternalError
+	 * @throws InternalError|BadRequestError
 	 */
 	public function update(
 		int $columnId,
@@ -284,7 +292,6 @@ class ColumnService extends SuperService {
 		ColumnDto $columnDto,
 	):Column {
 		try {
-			/** @var Column $item */
 			$item = $this->mapper->find($columnId);
 
 			// security
@@ -295,7 +302,9 @@ class ColumnService extends SuperService {
 			if ($columnDto->getTitle() !== null) {
 				$item->setTitle($columnDto->getTitle());
 			}
-			if ($columnDto->getType() !== null) {
+			if ($columnDto->getType() !== null
+				&& $this->columnsHelper->isSupportedColumnType($columnDto->getType())
+			) {
 				$item->setType($columnDto->getType());
 			}
 			if ($columnDto->getSubtype() !== null) {
@@ -337,6 +346,9 @@ class ColumnService extends SuperService {
 
 			$this->updateMetadata($item, $userId);
 			return $this->enhanceColumn($this->mapper->update($item));
+		} catch (InvalidArgumentException $e) {
+			$this->logger->error($e->getMessage());
+			throw new BadRequestError($e->getMessage());
 		} catch (Exception $e) {
 			$this->logger->error($e->getMessage());
 			throw new InternalError($e->getMessage());

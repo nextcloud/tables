@@ -2878,6 +2878,17 @@ export interface operations {
                     readonly "application/json": components["schemas"]["Column"];
                 };
             };
+            /** @description Invalid arguments */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
+                };
+            };
             /** @description Current user is not logged in */
             readonly 401: {
                 headers: {
@@ -3072,6 +3083,17 @@ export interface operations {
                 };
                 content: {
                     readonly "application/json": components["schemas"]["Column"];
+                };
+            };
+            /** @description Invalid arguments */
+            readonly 400: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "application/json": {
+                        readonly message: string;
+                    };
                 };
             };
             /** @description Current user is not logged in */
