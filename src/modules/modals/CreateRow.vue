@@ -10,7 +10,12 @@
 		@closing="actionCancel">
 		<div class="modal__content" @keydown="onKeydown">
 			<div v-for="column in nonMetaColumns" :key="column.id" :data-cy="column.title">
-				<ColumnFormComponent
+				<!-- fixme: move logic to get row for component -->
+				<RowFormWrapper v-if="column.type === 'relation_lookup'" :title="column.title" :mandatory="column.mandatory" :description="column.description" :readonly="column.readonly">
+					<TableCellRelationLookup :column="column"
+						:value="row[column.customSettings.relationColumnId]" />
+				</RowFormWrapper>
+				<ColumnFormComponent v-else
 					:column="column"
 					:value.sync="row[column.id]" />
 				<NcNoteCard v-if="isMandatory(column) && !isValueValidForColumn(row[column.id], column)"
@@ -48,6 +53,8 @@ import rowHelper from '../../shared/components/ncTable/mixins/rowHelper.js'
 import { useDataStore } from '../../store/data.js'
 import { mapActions } from 'pinia'
 import { ALLOWED_PROTOCOLS } from '../../shared/constants.ts'
+import TableCellRelationLookup from '../../shared/components/ncTable/partials/TableCellRelationLookup.vue'
+import RowFormWrapper from '../../shared/components/ncTable/partials/rowTypePartials/RowFormWrapper.vue'
 
 export default {
 	name: 'CreateRow',
@@ -57,6 +64,8 @@ export default {
 		NcCheckboxRadioSwitch,
 		NcNoteCard,
 		NcButton,
+		TableCellRelationLookup,
+		RowFormWrapper,
 	},
 	mixins: [rowHelper],
 	props: {

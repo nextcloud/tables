@@ -101,6 +101,7 @@ class Column extends EntitySuper implements JsonSerializable {
 	public const TYPE_DATETIME = 'datetime';
 	public const TYPE_USERGROUP = 'usergroup';
 	public const TYPE_RELATION = 'relation';
+	public const TYPE_RELATION_LOOKUP = 'relation_lookup';
 
 	public const SUBTYPE_DATETIME_DATE = 'date';
 	public const SUBTYPE_DATETIME_TIME = 'time';

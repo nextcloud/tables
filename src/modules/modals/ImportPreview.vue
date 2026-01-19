@@ -117,7 +117,10 @@ export default {
 				return []
 			}
 
-			const columns = this.existingColumns.map(column => ({
+			// Filter out columns with type relation_lookup
+			const filteredColumns = this.existingColumns.filter(column => column.type !== ColumnTypes.RelationLookup)
+
+			const columns = filteredColumns.map(column => ({
 				id: column.id,
 				label: column.title,
 			}))

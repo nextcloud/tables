@@ -265,7 +265,11 @@ export default {
 					// if we should search
 					if (searchString) {
 						console.debug('look for searchString', searchString)
-						searchStatus = column.isSearchStringFound(cell, searchString.toLowerCase())
+						if (column.type === 'relation_lookup') {
+							searchStatus = column.isSearchStringFound(row.data, cell, searchString.toLowerCase())
+						} else {
+							searchStatus = column.isSearchStringFound(cell, searchString.toLowerCase())
+						}
 					}
 
 					if (debug) {
