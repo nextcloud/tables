@@ -477,6 +477,11 @@ class ColumnService extends SuperService {
 		foreach ($titles as $title) {
 			$i++;
 			foreach ($allColumns as $column) {
+				// Skip matching columns with type relation_lookup
+				if ($column->getType() === Column::TYPE_RELATION_LOOKUP) {
+					continue;
+				}
+
 				if ($column->getTitle() === $title) {
 					$result[$i] = $column;
 					$countMatchingColumns++;

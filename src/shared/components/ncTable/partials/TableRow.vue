@@ -50,6 +50,7 @@ import TableCellTextRich from './TableCellEditor.vue'
 import TableCellUsergroup from './TableCellUsergroup.vue'
 import TableCellRelation from './TableCellRelation.vue'
 import { ColumnTypes, getColumnWidthStyle } from './../mixins/columnHandler.js'
+import TableCellRelationLookup from './TableCellRelationLookup.vue'
 import { translate as t } from '@nextcloud/l10n'
 import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
@@ -75,6 +76,7 @@ export default {
 		TableCellTextRich,
 		TableCellUsergroup,
 		TableCellRelation,
+		TableCellRelationLookup,
 	},
 
 	mixins: [activityMixin],
@@ -148,6 +150,7 @@ export default {
 			case ColumnTypes.DatetimeTime: return 'TableCellDateTime'
 			case ColumnTypes.Usergroup: return 'TableCellUsergroup'
 			case ColumnTypes.Relation: return 'TableCellRelation'
+			case ColumnTypes.RelationLookup: return 'TableCellRelationLookup'
 			default: return 'TableCellHtml'
 			}
 		},
@@ -177,6 +180,10 @@ export default {
 			return this.row.data.find(item => item.columnId === columnId) || null
 		},
 		getCellValue(column) {
+			if (column.type === ColumnTypes.RelationLookup) {
+				return this.getCell(column.customSettings.relationColumnId)
+			}
+
 			if (!this.row) {
 				return null
 			}

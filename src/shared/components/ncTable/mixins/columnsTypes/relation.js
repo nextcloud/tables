@@ -58,7 +58,7 @@ export default class RelationColumn extends AbstractColumn {
 			}
 
 			const columnRelations = dataStore.getRelations(this.id)
-			const option = columnRelations[rowId]
+			const option = columnRelations.data?.[rowId]
 
 			return option ? option.label : undefined
 		} catch (error) {

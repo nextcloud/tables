@@ -340,6 +340,10 @@ class RowService extends SuperService {
 
 			$column = $this->getColumnFromColumnsArray($columnId, $columns);
 
+			if ($column && $this->row2Mapper->isVirtualColumn($column->getType())) {
+				continue;
+			}
+
 			if ($column) {
 				$columnBusiness = $this->getColumnBusiness($column);
 				$columnBusiness->validateValue($entry['value'], $column, $this->userId, $tableId, $rowId);
@@ -830,7 +834,12 @@ class RowService extends SuperService {
 			return $row;
 		}
 
-		$row->filterDataByColumns($view->getColumnIds());
+		$columnIds = $view->getColumnIds();
+
+		// Додаємо relationColumnId для relation_lookup колонок
+		$columnIds = $this->row2Mapper->addRelationColumnIdsForSupplementColumns($columnIds);
+
+		$row->filterDataByColumns($columnIds);
 
 		return $row;
 	}

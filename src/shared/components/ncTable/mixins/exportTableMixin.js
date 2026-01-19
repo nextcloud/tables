@@ -7,6 +7,7 @@ import generalHelper from '../../../mixins/generalHelper.js'
 import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
 } from '../../../../shared/constants.ts'
+import { useDataStore } from '../../../../store/data.js'
 
 export default {
 
@@ -19,14 +20,53 @@ export default {
 				console.debug('downloadCSV has empty parameter, expected array ob row objects', rows)
 			}
 
+			const dataStore = useDataStore()
 			const data = []
 			rows.forEach(row => {
 				const rowData = { ID: row.id }
 				columns.forEach(column => {
 					// if a normal column
 					if (column.id >= 0) {
-						const set = row.data ? row.data.find(d => d.columnId === column.id) || '' : null
-						rowData[column.title] = set ? column.getValueString(set) : ''
+						if (column.type === 'relation_lookup') {
+							const relationColumnId = column.customSettings?.relationColumnId
+							if (relationColumnId) {
+								const relationCell = row.data ? row.data.find(d => d.columnId === relationColumnId) : null
+								if (relationCell) {
+									try {
+										const relationLookup = dataStore.getRelations(column.id)
+										if (relationLookup?.data && relationCell.value) {
+											const relatedRow = relationLookup.data[relationCell.value]
+											if (relatedRow && relatedRow.label !== null && relatedRow.label !== undefined) {
+												// For selection columns, relatedRow.label is the option ID (number or string)
+												// getValueString expects an object with a 'value' property
+												// Note: relatedRow.label can be 0 (valid selection option ID), so we check for null/undefined only
+												try {
+													const valueString = relationLookup.column.getValueString({ value: relatedRow.label })
+													rowData[column.title] = valueString || ''
+												} catch (error) {
+													console.warn('Failed to get value string for relation supplement:', error)
+													rowData[column.title] = ''
+												}
+											} else {
+												rowData[column.title] = ''
+											}
+										} else {
+											rowData[column.title] = ''
+										}
+									} catch (error) {
+										console.warn('Failed to get relation supplement value for export:', error)
+										rowData[column.title] = ''
+									}
+								} else {
+									rowData[column.title] = ''
+								}
+							} else {
+								rowData[column.title] = ''
+							}
+						} else {
+							const set = row.data ? row.data.find(d => d.columnId === column.id) || '' : null
+							rowData[column.title] = set ? column.getValueString(set) : ''
+						}
 					} else {
 						// if is a meta data column (id < 0)
 						switch (column.id) {

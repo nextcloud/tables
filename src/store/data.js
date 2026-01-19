@@ -218,6 +218,8 @@ export const useDataStore = defineStore('data', {
 			}
 
 			Object.entries(res.data).forEach(([columnId, relations]) => {
+				relations.column = relations.column ? parseCol(relations.column) : null
+
 				set(this.relations, columnId, relations)
 			})
 			set(this.relationsLoading, stateId, false)
