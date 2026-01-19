@@ -19,7 +19,7 @@
 		<div v-if="rows && rows.length > 0" class="nc-table">
 			<NcTable
 				:rows="filteredRows"
-				:columns="richObject.columns"
+				:columns="parsedColumns"
 				:element-id="richObject.id"
 				:is-view="Boolean(richObject.type)"
 				v-bind="tablePermissions"
@@ -28,7 +28,7 @@
 				@delete-row="deleteRow" />
 		</div>
 		<CreateRow
-			:columns="richObject.columns"
+			:columns="parsedColumns"
 			:is-view="Boolean(richObject.type)"
 			:element-id="richObject.id"
 			:show-modal="showCopyRow"
@@ -54,6 +54,8 @@ import { useResizeObserver } from '@vueuse/core'
 import { spawnDialog } from '@nextcloud/vue/functions/dialog'
 import { useTablesStore } from '../store/store.js'
 import { useDataStore } from '../store/data.js'
+import { parseCol } from '../shared/components/ncTable/mixins/columnParser.js'
+import { AbstractColumn } from '../shared/components/ncTable/mixins/columnClass.js'
 
 export default {
 
@@ -95,6 +97,10 @@ export default {
 	},
 
 	computed: {
+		parsedColumns() {
+			if (!this.richObject?.columns) return []
+			return this.richObject.columns.map(col => (col instanceof AbstractColumn || col.id < 0) ? col : parseCol(col))
+		},
 		tablePermissions() {
 			return {
 				canCreateRows: this.canCreateRowInElement(this.richObject),
@@ -186,7 +192,7 @@ export default {
 			const { default: CreateRow } = await import('../modules/modals/CreateRow.vue')
 			spawnDialog(CreateRow, {
 				showModal: true,
-				columns: this.richObject.columns,
+				columns: this.parsedColumns,
 				isView: Boolean(this.richObject.type),
 				elementId: this.richObject.id,
 			}, async () => {
@@ -200,7 +206,7 @@ export default {
 			const { default: EditRow } = await import('../modules/modals/EditRow.vue')
 			spawnDialog(EditRow, {
 				showModal: true,
-				columns: this.richObject.columns,
+				columns: this.parsedColumns,
 				row: this.getRow(rowId),
 				isView: Boolean(this.richObject.type),
 				element: this.richObject,
