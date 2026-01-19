@@ -38,8 +38,8 @@
 					<NcActionCheckbox
 						v-if="selectedColumns.includes(column.id)"
 						data-cy="columnReadonlyCheckbox"
-						:model-value="column.viewColumnInformation?.readonly"
-						:disabled="isMandatory(column)"
+						:model-value="column.isVirtual() || column.viewColumnInformation?.readonly"
+						:disabled="isMandatory(column) || column.isVirtual()"
 						@change="onReadonlyChanged(column.id, $event.target.checked)">
 						{{ t('tables', 'Read only') }}
 					</NcActionCheckbox>
@@ -48,7 +48,7 @@
 						v-if="selectedColumns.includes(column.id)"
 						data-cy="columnMandatoryCheckbox"
 						:model-value="isMandatory(column)"
-						:disabled="column.viewColumnInformation?.readonly"
+						:disabled="column.viewColumnInformation?.readonly || column.isVirtual()"
 						@change="onMandatoryChanged(column.id, $event.target.checked)">
 						{{ t('tables', 'Mandatory') }}
 					</NcActionCheckbox>
@@ -132,6 +132,12 @@ export default {
 		columns: {
 			handler(newColumns) {
 				this.mutableColumns = newColumns
+				for (const column of newColumns ?? []) {
+					if (column.isVirtual() && column.viewColumnInformation) {
+						column.viewColumnInformation.mandatory = false
+						column.viewColumnInformation.readonly = true
+					}
+				}
 			},
 			deep: true,
 			immediate: true,
