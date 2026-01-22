@@ -21,6 +21,7 @@
 		@import="openImportModal"
 		@create-column="createColumn"
 		@edit-column="editColumn"
+				@duplicate-column="duplicateColumn"
 		@delete-column="deleteColumn"
 		@create-row="createRow"
 		@edit-row="editRow"
@@ -121,6 +122,9 @@ export default {
 		editColumn(column) {
 			emit('tables:column:edit', { column, isView: this.isView, elementId: this.element.id })
 		},
+                duplicateColumn(column) {
+                        emit('tables:column:duplicate', { column, isView: this.isView, elementId: this.element.id })
+                },
 		deleteColumn(column) {
 			emit('tables:column:delete', { column, isView: this.isView, elementId: this.element.id })
 		},
