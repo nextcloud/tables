@@ -47,7 +47,7 @@
     "@tiptap/vue-2": "^3.13.0",
     "@vueuse/core": "^11.3.0",
     "debounce": "^3.0.0",
-    "dompurify": "^3.3.0",
+    "dompurify": "^3.3.1",
     "pinia": "^2.3.1",
     "vue": "^2.7.16",
     "vue-infinite-loading": "^2.4.5",
