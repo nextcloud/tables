@@ -64,6 +64,7 @@ OC.L10N.register(
     "This year" : "Aseggas-a",
     "This week" : "Dduṛt-a",
     "Now" : "Tura",
+    "seconds ago" : "Tasinin aya",
     "Back to %s" : "Uɣal ar %s"
 },
 "nplurals=2; plural=(n != 1);");
