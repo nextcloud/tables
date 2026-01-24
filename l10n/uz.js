@@ -41,6 +41,7 @@ OC.L10N.register(
     "Views" : "Koʻrishlar",
     "Rows" : "Qatorlar",
     "Columns" : "Ustunlar",
+    "Shares" : "Ulashishlar",
     "Actions" : "Actions",
     "Share" : "Ulashish",
     "Total" : "Total",

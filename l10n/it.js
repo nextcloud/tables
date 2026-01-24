@@ -189,7 +189,7 @@ OC.L10N.register(
     "Allowed pattern (regex)" : "Schema consentito (regex)",
     "Maximum text length" : "Lunghezza massima testo",
     "Copy link" : "Copia collegamento",
-    "Open link" : "Apri link",
+    "Open link" : "Apri collegamento",
     "Show fullscreen" : "Mostra a schermo intero",
     "Close editor" : "Chiudi editor",
     "Go to first page" : "Vai alla prima pagina",
