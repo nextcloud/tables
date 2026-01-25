@@ -32,19 +32,19 @@
 					{{ n('tables', '%n selected row', '%n selected rows', selectedRows.length, {}) }}
 				</div>
 				<NcActions type="secondary" :force-name="true" :inline="showFullOptions ? 2 : 0">
-					<NcActionButton @click="exportCsv">
+					<NcActionButton close-after-click @click="exportCsv">
 						<template #icon>
 							<Export :size="20" />
 						</template>
 						{{ t('tables', 'Export CSV') }}
 					</NcActionButton>
-					<NcActionButton v-if="config.canDeleteRows" @click="deleteSelectedRows">
+					<NcActionButton v-if="config.canDeleteRows" close-after-click @click="deleteSelectedRows">
 						<template #icon>
 							<Delete :size="20" />
 						</template>
 						{{ t('tables', 'Delete') }}
 					</NcActionButton>
-					<NcActionButton v-if="!showFullOptions" @click="deselectAllRows">
+					<NcActionButton v-if="!showFullOptions" close-after-click @click="deselectAllRows">
 						<template #icon>
 							<Check :size="20" />
 						</template>
