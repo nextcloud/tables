@@ -9,6 +9,8 @@ namespace OCA\Tables\Helper;
 
 use OCA\Tables\Constants\UsergroupType;
 use OCA\Tables\Db\Column;
+use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
+use OCP\Server;
 
 class ColumnsHelper {
 
@@ -19,6 +21,11 @@ class ColumnsHelper {
 		Column::TYPE_SELECTION,
 		Column::TYPE_USERGROUP,
 	];
+
+	/**
+	 * @var array<string, IColumnTypeBusiness>
+	 */
+	private array $columnBusinesses = [];
 
 	public function __construct(
 		private UserHelper $userHelper,
@@ -78,5 +85,19 @@ class ColumnsHelper {
 				return date('Y-m-d', strtotime("-{$days} days")) ?: '';
 			default: return $placeholder;
 		}
+	}
+
+	public function getColumnBusinessObject(Column $column): IColumnTypeBusiness {
+		$cacheKey = implode(':', [$column->getType(), $column->getSubtype()]);
+		if (isset($this->columnBusinesses[$cacheKey])) {
+			return $this->columnBusinesses[$cacheKey];
+		}
+
+		$businessClassName = 'OCA\Tables\Service\ColumnTypes\\';
+		$businessClassName .= ucfirst($column->getType()) . ucfirst($column->getSubtype()) . 'Business';
+		/** @var IColumnTypeBusiness $columnBusiness */
+		$columnBusiness = Server::get($businessClassName);
+
+		return $this->columnBusinesses[$cacheKey] = $columnBusiness;
 	}
 }

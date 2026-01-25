@@ -16,6 +16,7 @@ use OCA\Tables\Errors\BadRequestError;
 use OCA\Tables\Errors\InternalError;
 use OCA\Tables\Errors\NotFoundError;
 use OCA\Tables\Errors\PermissionError;
+use OCA\Tables\Helper\ColumnsHelper;
 use OCA\Tables\Service\ColumnTypes\IColumnTypeBusiness;
 use OCA\Tables\Vendor\PhpOffice\PhpSpreadsheet\Cell\Cell;
 use OCA\Tables\Vendor\PhpOffice\PhpSpreadsheet\Cell\DataType;
@@ -30,7 +31,6 @@ use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
 use OCP\IUserManager;
-use OCP\Server;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
@@ -52,6 +52,9 @@ class ImportService extends SuperService {
 
 	private ?int $tableId = null;
 	private ?int $viewId = null;
+	/**
+	 * @var Column[]
+	 */
 	private array $columns = [];
 	private bool $createUnknownColumns = true;
 	private ?int $idColumnIndex = null;
@@ -76,6 +79,7 @@ class ImportService extends SuperService {
 		TableService $tableService,
 		ViewService $viewService,
 		IUserManager $userManager,
+		private readonly ColumnsHelper $columnsHelper,
 	) {
 		parent::__construct($logger, $userId, $permissionsService);
 		$this->rootFolder = $rootFolder;
@@ -358,22 +362,22 @@ class ImportService extends SuperService {
 		if (empty(array_filter($this->columns))) {
 			return;
 		}
+		$columnBusinesses = [];
+		foreach ($this->columns as $column) {
+			$columnBusinesses[$column->getId()] = $this->columnsHelper->getColumnBusinessObject($column);
+		}
 
 		foreach ($worksheet->getRowIterator(2) as $row) {
 			// parse row data
-			$this->upsertRow($row);
+			$this->upsertRow($row, $columnBusinesses);
 		}
 	}
 
 	/*
-	 * @return stringify value
+	 * @return string Stringified value
 	 */
-	private function parseValueByColumnType(string $value, Column $column): string {
+	private function parseValueByColumnType(string $value, Column $column, IColumnTypeBusiness $columnBusiness): string {
 		try {
-			$businessClassName = 'OCA\Tables\Service\ColumnTypes\\';
-			$businessClassName .= ucfirst($column->getType()) . ucfirst($column->getSubtype()) . 'Business';
-			/** @var IColumnTypeBusiness $columnBusiness */
-			$columnBusiness = Server::get($businessClassName);
 			if (!$columnBusiness->canBeParsedDisplayValue($value, $column)) {
 				$this->logger->warning('Value ' . $value . ' could not be parsed for column ' . $column->getTitle());
 				$this->countParsingErrors++;
@@ -381,20 +385,21 @@ class ImportService extends SuperService {
 			}
 			return $columnBusiness->parseDisplayValue($value, $column);
 		} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
-			$this->logger->debug('Column type business class not found', ['exception' => $e]);
+			$this->logger->error('Column type business class not found', ['exception' => $e]);
 		}
 		return '';
 	}
 
 	/**
 	 * @param Row $row
+	 * @param array<int, IColumnTypeBusiness> $columnBusinesses Indexed by columnId
 	 * @return void
 	 * @throws DoesNotExistException
 	 * @throws InternalError
 	 * @throws MultipleObjectsReturnedException
 	 * @throws NotFoundError
 	 */
-	private function upsertRow(Row $row): void {
+	private function upsertRow(Row $row, array $columnBusinesses): void {
 		$cellIterator = $row->getCellIterator();
 		$cellIterator->setIterateOnlyExistingCells(false);
 
@@ -402,21 +407,21 @@ class ImportService extends SuperService {
 			$i = -1;
 			$data = [];
 			$hasData = false;
-			$id = null;
+			$rowId = null;
 			foreach ($cellIterator as $cell) {
 				$i++;
 
 				if ($this->idColumnIndex !== null && $i === $this->idColumnIndex) {
 					// if this is the ID column, we need to get the ID from the cell
 					if ($cell && $cell->getValue() !== null) {
-						$id = $cell->getValue();
+						$rowId = $cell->getValue();
 					}
-					if ($id !== null && !is_numeric($id)) {
-						$this->logger->warning('ID column value is not numeric: ' . $id);
+					if ($rowId !== null && !is_numeric($rowId)) {
+						$this->logger->warning('ID column value is not numeric: ' . $rowId);
 						$this->countErrors++;
 						return;
 					}
-					$id = (int)$id;
+					$rowId = (int)$rowId;
 					continue;
 				}
 
@@ -470,7 +475,7 @@ class ImportService extends SuperService {
 
 				$data[] = [
 					'columnId' => $column->getId(),
-					'value' => json_decode($this->parseValueByColumnType($value, $column)),
+					'value' => json_decode($this->parseValueByColumnType($value, $column, $columnBusinesses[$column->getId()])),
 				];
 			}
 
@@ -479,8 +484,8 @@ class ImportService extends SuperService {
 				return;
 			}
 
-			if ($id) {
-				$this->rowService->updateSet($id, $this->viewId, $data, $this->userId, $this->tableId);
+			if ($rowId) {
+				$this->rowService->updateSet($rowId, $this->viewId, $data, $this->userId, $this->tableId);
 				$this->countUpdatedRows++;
 			} else {
 				$this->rowService->create($this->tableId, $this->viewId, $data);

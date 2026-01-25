@@ -9,14 +9,14 @@ namespace OCA\Tables\Service\ColumnTypes;
 
 use OCA\Tables\Db\Column;
 
-class NumberBusiness extends SuperBusiness implements IColumnTypeBusiness {
+class NumberBusiness extends SuperBusiness {
 
 	/**
 	 * @param mixed $value (int|float|string|null)
-	 * @param Column|null $column
+	 * @param Column $column
 	 * @return string
 	 */
-	public function parseValue($value, ?Column $column = null): string {
+	public function parseValue($value, Column $column): string {
 		if ($value === null) {
 			return '';
 		}
@@ -26,10 +26,10 @@ class NumberBusiness extends SuperBusiness implements IColumnTypeBusiness {
 
 	/**
 	 * @param mixed $value (int|float|string|null)
-	 * @param Column|null $column
+	 * @param Column $column
 	 * @return bool
 	 */
-	public function canBeParsed($value, ?Column $column = null): bool {
+	public function canBeParsed($value, Column $column): bool {
 		return !$value || floatval($value);
 	}
 

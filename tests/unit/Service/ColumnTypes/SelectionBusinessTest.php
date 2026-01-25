@@ -114,22 +114,4 @@ class SelectionBusinessTest extends TestCase {
 		$result = $this->selectionBusiness->canBeParsedDisplayValue($value, $this->column);
 		$this->assertEquals($expected, $result);
 	}
-
-	public function withoutColumnProvider(): array {
-		return [
-			'parseValue' => ['parseValue', 1, ''],
-			'parseDisplayValue' => ['parseDisplayValue', 'Option 1', ''],
-			'canBeParsed' => ['canBeParsed', 1, false],
-			'canBeParsedDisplayValue' => ['canBeParsedDisplayValue', 'Option 1', false],
-		];
-	}
-
-	/**
-	 * @dataProvider withoutColumnProvider
-	 */
-	public function testMethodsWithoutColumn(string $method, $value, $expected): void {
-		$result = $this->selectionBusiness->$method($value, null);
-		$this->assertEquals($expected, $result);
-	}
-
 }

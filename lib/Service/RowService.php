@@ -34,7 +34,6 @@ use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IDBConnection;
-use OCP\Server;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
@@ -344,7 +343,7 @@ class RowService extends SuperService {
 			$column = $this->getColumnFromColumnsArray($columnId, $columns);
 
 			if ($column) {
-				$columnBusiness = $this->getColumnBusiness($column);
+				$columnBusiness = $this->columnsHelper->getColumnBusinessObject($column);
 				$columnBusiness->validateValue($entry['value'], $column, $this->userId, $tableId, $rowId);
 			}
 
@@ -426,7 +425,7 @@ class RowService extends SuperService {
 
 			if ($hasValue) {
 				try {
-					$columnBusiness = $this->getColumnBusiness($column);
+					$columnBusiness = $this->columnsHelper->getColumnBusinessObject($column);
 					$isValid = $this->isValueValidForMandatoryColumn($value, $column, $columnBusiness);
 					if (!$isValid) {
 						throw new BadRequestError(
@@ -478,7 +477,7 @@ class RowService extends SuperService {
 	 */
 	private function parseValueByColumnType(Column $column, $value = null) {
 		try {
-			$columnBusiness = $this->getColumnBusiness($column);
+			$columnBusiness = $this->columnsHelper->getColumnBusinessObject($column);
 			if ($columnBusiness->canBeParsed($value, $column)) {
 				return json_decode($columnBusiness->parseValue($value, $column), true);
 			}
@@ -836,15 +835,6 @@ class RowService extends SuperService {
 		$row->filterDataByColumns($view->getColumnIds());
 
 		return $row;
-	}
-
-	private function getColumnBusiness(Column $column): IColumnTypeBusiness {
-		$businessClassName = 'OCA\Tables\Service\ColumnTypes\\';
-		$businessClassName .= ucfirst($column->getType()) . ucfirst($column->getSubtype()) . 'Business';
-		/** @var IColumnTypeBusiness $columnBusiness */
-		$columnBusiness = Server::get($businessClassName);
-
-		return $columnBusiness;
 	}
 
 	/**

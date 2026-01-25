@@ -9,14 +9,14 @@ namespace OCA\Tables\Service\ColumnTypes;
 
 use OCA\Tables\Db\Column;
 
-class TextLinkBusiness extends SuperBusiness implements IColumnTypeBusiness {
+class TextLinkBusiness extends SuperBusiness {
 
 	/**
 	 * @param mixed $value (string|null)
-	 * @param Column|null $column
+	 * @param Column $column
 	 * @return string
 	 */
-	public function parseValue($value, ?Column $column = null): string {
+	public function parseValue($value, Column $column): string {
 		if ($value === null) {
 			return '';
 		}
@@ -64,10 +64,10 @@ class TextLinkBusiness extends SuperBusiness implements IColumnTypeBusiness {
 
 	/**
 	 * @param mixed $value (string|null)
-	 * @param Column|null $column
+	 * @param Column $column
 	 * @return bool
 	 */
-	public function canBeParsed($value, ?Column $column = null): bool {
+	public function canBeParsed($value, Column $column): bool {
 		if (!$value) {
 			return true;
 		}
