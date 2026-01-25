@@ -15,6 +15,7 @@
 			@keydown.escape.stop="cancelEdit">
 			<NcSelect v-model="editValue"
 				:options="getAllNonDeletedOptions"
+				:clearable="!column.mandatory"
 				:aria-label-combobox="t('tables', 'Options')"
 				:disabled="localLoading || !canEditCell()"
 				style="width: 100%;" />

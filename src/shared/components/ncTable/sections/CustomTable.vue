@@ -54,7 +54,11 @@
 					</template>
 				</NcButton>
 				<div class="page-number">
-					<NcSelect v-model="pageNumber" :options="allPageNumbersArray" :aria-label-combobox="t('tables', 'Page number')">
+					<NcSelect
+						v-model="pageNumber"
+						:options="allPageNumbersArray"
+						:clearable="false"
+						:aria-label-combobox="t('tables', 'Page number')">
 						<template #selected-option-container="{ option }">
 							<span class="selected-page">
 								{{ option.label }} of {{ totalPages }}
@@ -90,7 +94,7 @@ import { NcButton, useIsMobile, NcSelect } from '@nextcloud/vue'
 import { mapState } from 'pinia'
 import {
 	TYPE_META_ID, TYPE_META_CREATED_BY, TYPE_META_CREATED_AT, TYPE_META_UPDATED_BY, TYPE_META_UPDATED_AT,
-} from '../../../../shared/constants.ts'
+} from '../../../constants.ts'
 import { MetaColumns } from '../mixins/metaColumns.js'
 import { translate as t } from '@nextcloud/l10n'
 import { useTablesStore } from '../../../../store/store.js'
@@ -408,17 +412,6 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-:deep(.vs__clear) {
-	display: none;
-}
-
-:deep(.v-select) {
-	min-width: 95px !important;
-	.vs__dropdown-toggle {
-		background: none;
-	}
-}
-
 :deep(.text-editor__wrapper .paragraph-content:last-child) {
 	margin-bottom: 0!important;
 }
@@ -462,6 +455,10 @@ export default {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+
+	:deep(.v-select) {
+		min-width: 95px !important;
+	}
 }
 
 :deep(table) {

@@ -7,6 +7,7 @@
 		<NcSelect
 			v-model="localValue"
 			:options="getAllNonDeletedOptions"
+			:clearable="!column.mandatory"
 			:disabled="column.viewColumnInformation?.readonly"
 			:aria-label-combobox="t('tables', 'Options')" />
 	</RowFormWrapper>

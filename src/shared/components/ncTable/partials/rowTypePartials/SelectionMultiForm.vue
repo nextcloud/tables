@@ -8,6 +8,7 @@
 			v-model="localValues"
 			:tag-width="80"
 			:options="getAllNonDeletedOrSelectedOptions"
+			:clearable="!column.mandatory"
 			:disabled="column.viewColumnInformation?.readonly"
 			:multiple="true"
 			:aria-label-combobox="t('tables', 'Options')" />
