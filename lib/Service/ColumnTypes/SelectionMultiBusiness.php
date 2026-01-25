@@ -9,21 +9,16 @@ namespace OCA\Tables\Service\ColumnTypes;
 
 use OCA\Tables\Db\Column;
 
-class SelectionMultiBusiness extends SuperBusiness implements IColumnTypeBusiness {
+class SelectionMultiBusiness extends SuperBusiness {
 
 	private array $options = [];
 
 	/**
 	 * @param mixed $value (array|string|null)
-	 * @param Column|null $column
+	 * @param Column $column
 	 * @return string
 	 */
-	public function parseValue($value, ?Column $column = null): string {
-		if (!$column) {
-			$this->logger->warning('No column given, but expected on ' . __FUNCTION__ . ' within ' . __CLASS__, ['exception' => new \Exception()]);
-			return json_encode([]);
-		}
-
+	public function parseValue($value, Column $column): string {
 		if ($value === null) {
 			return json_encode([]);
 		}
@@ -74,15 +69,10 @@ class SelectionMultiBusiness extends SuperBusiness implements IColumnTypeBusines
 
 	/**
 	 * @param mixed $value (int[]|string|null) Array of option IDs or string with comma seperated labels
-	 * @param Column|null $column
+	 * @param Column $column
 	 * @return bool
 	 */
-	public function canBeParsed($value, ?Column $column = null): bool {
-		if (!$column) {
-			$this->logger->warning('No column given, but expected on ' . __FUNCTION__ . ' within ' . __CLASS__, ['exception' => new \Exception()]);
-			return false;
-		}
-
+	public function canBeParsed($value, Column $column): bool {
 		if ($value === null) {
 			return true;
 		}
